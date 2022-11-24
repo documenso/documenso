@@ -1,0 +1,3 @@
+[submodule "apps/website/--force"]
+	path = apps/website/--force
+	url = https://github.com/ElTimuro/website.git
