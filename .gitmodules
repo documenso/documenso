@@ -1,3 +1,0 @@
-[submodule "website"]
-	path = apps/website/website
-	url = https://github.com/ElTimuro/website.git
