@@ -1,4 +1,0 @@
-[submodule "apps/website"]
-	path = apps/website
-	url = https://github.com/ElTimuro/website.git
-	branch = main
