@@ -1,6 +1,11 @@
 import { Fragment } from "react";
 import { Disclosure, Menu, Transition } from "@headlessui/react";
-import { Bars3Icon, BellIcon, XMarkIcon } from "@heroicons/react/24/outline";
+import {
+  Bars3Icon,
+  BellIcon,
+  MagnifyingGlassIcon,
+  XMarkIcon,
+} from "@heroicons/react/24/outline";
 import Logo from "./logo";
 
 const user = {
@@ -52,6 +57,29 @@ export default function Layout({ children }: any) {
                           {item.name}
                         </a>
                       ))}
+                    </div>
+                    {/* Search section */}
+                    <div className="mt-3 flex flex-1 justify-center lg:justify-end">
+                      <div className="w-full px-2 lg:px-6">
+                        <label htmlFor="search" className="sr-only">
+                          Search Documents
+                        </label>
+                        <div className="relative text-indigo-100 focus-within:text-gray-400">
+                          <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+                            <MagnifyingGlassIcon
+                              className="h-5 w-5"
+                              aria-hidden="true"
+                            />
+                          </div>
+                          <input
+                            id="search"
+                            name="search"
+                            className="block w-full rounded-md border border-transparent bg-white bg-opacity-25 py-2 pl-10 pr-3 leading-5 text-indigo-100 placeholder-indigo-200 focus:bg-white focus:text-gray-900 focus:placeholder-gray-400 focus:outline-none focus:ring-0 sm:text-sm"
+                            placeholder="Search Documents"
+                            type="search"
+                          />
+                        </div>
+                      </div>
                     </div>
                   </div>
                   <div className="hidden sm:ml-6 sm:flex sm:items-center">
@@ -187,9 +215,7 @@ export default function Layout({ children }: any) {
         </Disclosure>
 
         <main>
-          <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
-            {children}
-          </div>
+          <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">{children}</div>
         </main>
       </div>
     </>
