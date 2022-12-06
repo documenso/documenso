@@ -3,7 +3,7 @@ import Layout from "../components/layout";
 import type { NextPageWithLayout } from "./_app";
 
 const Page: NextPageWithLayout = () => {
-  return <p>hello world</p>;
+  return <p className="text-red-900">This is the index page</p>;
 };
 
 Page.getLayout = function getLayout(page: ReactElement) {
