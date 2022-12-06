@@ -9,9 +9,9 @@ const user = {
     "https://pbs.twimg.com/profile_images/1382036502390181888/4BT30oTM_400x400.jpg",
 };
 const navigation = [
-  { name: "Dashboard", href: "#", current: true },
-  { name: "Team", href: "#", current: false },
-  { name: "Settings", href: "#" },
+  { name: "Dashboard", href: "/", current: true },
+  { name: "Team", href: "/", current: false },
+  { name: "Settings", href: "settings" },
 ];
 const userNavigation = [
   { name: "Your Profile", href: "#" },
@@ -200,26 +200,11 @@ export default function Layout({ children }: any) {
           )}
         </Disclosure>
 
-        <div className="py-10">
-          <header>
-            <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-              <h1 className="text-3xl font-bold leading-tight tracking-tight text-brown">
-                Dashboard
-              </h1>
-            </div>
-          </header>
-          <main>
-            <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
-              {/* Replace with your content */}
-              <div className="px-4 py-8 sm:px-0">
-                <div className="h-96 rounded-lg border-2 border-dashed border-gray-900">
-                  {children}
-                </div>
-              </div>
-              {/* /End replace */}
-            </div>
-          </main>
-        </div>
+        <main>
+          <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
+            <div className="px-4 py-8 sm:px-0">{children}</div>
+          </div>
+        </main>
       </div>
     </>
   );
