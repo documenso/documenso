@@ -14,7 +14,7 @@ export default function Example() {
             <p className="mt-2 text-center text-sm text-gray-600">
               Or{" "}
               <a href="#" className="font-medium text-neon hover:text-neon">
-                start your 14-day free trial
+                create a new Account
               </a>
             </p>
           </div>
