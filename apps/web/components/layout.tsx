@@ -1,5 +1,8 @@
 import { Fragment } from "react";
 import { Disclosure, Menu, Transition } from "@headlessui/react";
+import Link from "next/link";
+import { useRouter } from "next/router";
+
 import {
   Bars3Icon,
   BellIcon,
@@ -15,12 +18,12 @@ const user = {
     "https://pbs.twimg.com/profile_images/1382036502390181888/4BT30oTM_400x400.jpg",
 };
 const navigation = [
-  { name: "Dashboard", href: "/", current: true },
-  { name: "Team", href: "/", current: false },
-  { name: "Settings", href: "settings" },
+  { name: "Dashboard", href: "/dashboard", current: true },
+  { name: "Team", href: "/team", current: false },
+  { name: "Settings", href: "/settings" },
 ];
 const userNavigation = [
-  { name: "Your Profile", href: "#" },
+  { name: "Your Profile", href: "/settings" },
   { name: "Sign out", href: "/login" },
 ];
 
@@ -29,6 +32,12 @@ function classNames(...classes: any) {
 }
 
 export default function Layout({ children }: any) {
+  const router = useRouter();
+
+  navigation.forEach((element) => {
+    element.current = element.href == router.route;
+  });
+
   return (
     <>
       <div className="min-h-full">
@@ -43,7 +52,7 @@ export default function Layout({ children }: any) {
                     </div>
                     <div className="hidden sm:-my-px sm:ml-6 sm:flex sm:space-x-8">
                       {navigation.map((item) => (
-                        <a
+                        <Link
                           key={item.name}
                           href={item.href}
                           className={classNames(
@@ -55,7 +64,7 @@ export default function Layout({ children }: any) {
                           aria-current={item.current ? "page" : undefined}
                         >
                           {item.name}
-                        </a>
+                        </Link>
                       ))}
                     </div>
                     {/* Search section */}
@@ -116,7 +125,7 @@ export default function Layout({ children }: any) {
                           {userNavigation.map((item) => (
                             <Menu.Item key={item.name}>
                               {({ active }) => (
-                                <a
+                                <Link
                                   href={item.href}
                                   className={classNames(
                                     active ? "bg-gray-100" : "",
@@ -124,7 +133,7 @@ export default function Layout({ children }: any) {
                                   )}
                                 >
                                   {item.name}
-                                </a>
+                                </Link>
                               )}
                             </Menu.Item>
                           ))}

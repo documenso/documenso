@@ -24,14 +24,7 @@ const subNavigation = [
   { name: "Profile", href: "#", icon: UserCircleIcon, current: true },
   { name: "Account", href: "#", icon: CogIcon, current: false },
   { name: "Password", href: "#", icon: KeyIcon, current: false },
-  { name: "Notifications", href: "#", icon: BellIcon, current: false },
-  { name: "Billing", href: "#", icon: CreditCardIcon, current: false },
   { name: "Integrations", href: "#", icon: SquaresPlusIcon, current: false },
-];
-const userNavigation = [
-  { name: "Your Profile", href: "#" },
-  { name: "Settings", href: "#" },
-  { name: "Sign out", href: "#" },
 ];
 
 function classNames(...classes: any) {
