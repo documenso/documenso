@@ -5,7 +5,10 @@ export default function Document(props) {
   let pageProps = props.__NEXT_DATA__?.props?.pageProps;
 
   return (
-    <Html className="h-full scroll-smooth font-normal antialiased" lang="en">
+    <Html
+      className="h-full bg-gray-100 scroll-smooth font-normal antialiased"
+      lang="en"
+    >
       <Head>
         <meta name="color-scheme"></meta>
       </Head>

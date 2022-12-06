@@ -46,15 +46,13 @@ export default function Setttings() {
 
   return (
     <div>
-      <div className="py-10">
-        <header>
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <h1 className="text-3xl font-bold leading-tight tracking-tight text-brown">
-              Dashboard
-            </h1>
-          </div>
-        </header>
-      </div>
+      <header className="py-10">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <h1 className="text-3xl font-bold leading-tight tracking-tight text-brown">
+            Dashboard
+          </h1>
+        </div>
+      </header>
       <div className="mx-auto max-w-screen-xl px-4 pb-6 sm:px-6 lg:px-8 lg:pb-16">
         <div className="overflow-hidden rounded-lg bg-white shadow">
           <div className="divide-y divide-gray-200 lg:grid lg:grid-cols-12 lg:divide-y-0 lg:divide-x">
