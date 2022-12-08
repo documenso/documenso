@@ -1,4 +1,3 @@
-[submodule "documenso/website"]
-	path = apps/website
-	url = https://github.com/ElTimuro/website.git
-	branch = main
+[submodule "apps/website/documenso/website"]
+	path = apps/website/documenso/website
+	url = http://github.com/eltimuro/website.git
