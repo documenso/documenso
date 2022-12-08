@@ -10,6 +10,7 @@ import {
   SquaresPlusIcon,
   UserCircleIcon,
   XMarkIcon,
+  UsersIcon,
 } from "@heroicons/react/24/outline";
 
 const user = {
@@ -24,7 +25,7 @@ const subNavigation = [
   { name: "Profile", href: "#", icon: UserCircleIcon, current: true },
   { name: "Password", href: "#", icon: KeyIcon, current: false },
   { name: "Account", href: "#", icon: CogIcon, current: false },
-  { name: "Team", href: "#", icon: SquaresPlusIcon, current: false },
+  { name: "Team", href: "#", icon: UsersIcon, current: false },
 ];
 
 function classNames(...classes: any) {
