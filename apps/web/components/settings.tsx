@@ -22,9 +22,9 @@ const user = {
 
 const subNavigation = [
   { name: "Profile", href: "#", icon: UserCircleIcon, current: true },
-  { name: "Account", href: "#", icon: CogIcon, current: false },
   { name: "Password", href: "#", icon: KeyIcon, current: false },
-  { name: "Integrations", href: "#", icon: SquaresPlusIcon, current: false },
+  { name: "Account", href: "#", icon: CogIcon, current: false },
+  { name: "Team", href: "#", icon: SquaresPlusIcon, current: false },
 ];
 
 function classNames(...classes: any) {
