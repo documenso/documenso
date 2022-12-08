@@ -2,6 +2,7 @@ import { Fragment } from "react";
 import { Disclosure, Menu, Transition } from "@headlessui/react";
 import Link from "next/link";
 import { useRouter } from "next/router";
+import { signOut } from "next-auth/react";
 
 import {
   Bars3Icon,
@@ -24,7 +25,14 @@ const navigation = [
 ];
 const userNavigation = [
   { name: "Your Profile", href: "/settings" },
-  { name: "Sign out", href: "/login" },
+  {
+    name: "Sign out",
+    href: "/login",
+    click: (e: any) => {
+      e.preventDefault();
+      signOut();
+    },
+  },
 ];
 
 function classNames(...classes: any) {
@@ -127,6 +135,7 @@ export default function Layout({ children }: any) {
                               {({ active }) => (
                                 <Link
                                   href={item.href}
+                                  onClick={item.click}
                                   className={classNames(
                                     active ? "bg-gray-100" : "",
                                     "block px-4 py-2 text-sm text-gray-700"
