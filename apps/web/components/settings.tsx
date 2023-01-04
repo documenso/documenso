@@ -51,12 +51,8 @@ function classNames(...classes: any) {
 
 export default function Setttings() {
   const [availableToHire, setAvailableToHire] = useState(true);
-  const [privateAccount, setPrivateAccount] = useState(false);
-  const [allowCommenting, setAllowCommenting] = useState(true);
-  const [allowMentions, setAllowMentions] = useState(true);
 
   const router = useRouter();
-  console.log(router.route);
   subNavigation.forEach((element) => {
     element.current = element.href == router.route;
   });
