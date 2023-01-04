@@ -27,10 +27,10 @@ const userNavigation = [
   { name: "Your Profile", href: "/settings" },
   {
     name: "Sign out",
-    href: "/login",
+    href: "",
     click: (e: any) => {
       e.preventDefault();
-      signOut();
+      signOut({ callbackUrl: "/login" });
     },
   },
 ];
@@ -41,7 +41,6 @@ function classNames(...classes: any) {
 
 export default function Layout({ children }: any) {
   const router = useRouter();
-
   navigation.forEach((element) => {
     element.current = element.href == router.route;
   });
