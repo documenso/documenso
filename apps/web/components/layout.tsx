@@ -19,9 +19,9 @@ const user = {
     "https://pbs.twimg.com/profile_images/1382036502390181888/4BT30oTM_400x400.jpg",
 };
 const navigation = [
-  { name: "Dashboard", href: "/dashboard", current: true },
+  { name: "Dashboard", href: "/dashboard", current: false },
   { name: "Documents", href: "/documents", current: false },
-  { name: "Settings", href: "/settings" },
+  { name: "Settings", href: "/settings", current: true },
 ];
 const userNavigation = [
   { name: "Your Profile", href: "/settings" },
@@ -42,7 +42,7 @@ function classNames(...classes: any) {
 export default function Layout({ children }: any) {
   const router = useRouter();
   navigation.forEach((element) => {
-    element.current = element.href == router.route;
+    element.current = router.route.startsWith(element.href);
   });
 
   return (

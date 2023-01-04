@@ -12,6 +12,8 @@ import {
   XMarkIcon,
   UsersIcon,
 } from "@heroicons/react/24/outline";
+import { useRouter } from "next/router";
+import Link from "next/link";
 
 const user = {
   name: "Debbie Lewis",
@@ -22,9 +24,24 @@ const user = {
 };
 
 const subNavigation = [
-  { name: "Profile", href: "#", icon: UserCircleIcon, current: true },
-  { name: "Password", href: "#", icon: KeyIcon, current: false },
-  { name: "Account", href: "#", icon: CogIcon, current: false },
+  {
+    name: "Profile",
+    href: "/settings/profile",
+    icon: UserCircleIcon,
+    current: true,
+  },
+  {
+    name: "Password",
+    href: "/settings/password",
+    icon: KeyIcon,
+    current: false,
+  },
+  {
+    name: "Account",
+    href: "/settings/account",
+    icon: CogIcon,
+    current: false,
+  },
 ];
 
 function classNames(...classes: any) {
@@ -36,6 +53,13 @@ export default function Setttings() {
   const [privateAccount, setPrivateAccount] = useState(false);
   const [allowCommenting, setAllowCommenting] = useState(true);
   const [allowMentions, setAllowMentions] = useState(true);
+
+  const router = useRouter();
+  console.log(router.route);
+
+  subNavigation.forEach((element) => {
+    element.current = element.href == router.route;
+  });
 
   return (
     <div>
@@ -52,7 +76,7 @@ export default function Setttings() {
             <aside className="py-6 lg:col-span-3">
               <nav className="space-y-1">
                 {subNavigation.map((item) => (
-                  <a
+                  <Link
                     key={item.name}
                     href={item.href}
                     className={classNames(
@@ -73,7 +97,7 @@ export default function Setttings() {
                       aria-hidden="true"
                     />
                     <span className="truncate">{item.name}</span>
-                  </a>
+                  </Link>
                 ))}
               </nav>
             </aside>
