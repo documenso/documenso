@@ -90,8 +90,9 @@ export default function Setttings() {
                     Profile
                   </h2>
                   <p className="mt-1 text-sm text-gray-500">
-                    This information will be displayed publicly so be careful
-                    what you share.
+                    Let people know who they are dealing with builds trust.
+                    Leave your profile blank and your email will be used as your
+                    name.
                   </p>
                 </div>
 
