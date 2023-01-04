@@ -8,8 +8,6 @@ import { SessionProvider } from "next-auth/react";
 const DocumentsPage: NextPageWithLayout = () => {
   const { data: session } = useSession();
 
-  console.log("Session:" + JSON.stringify(session));
-
   return <>This is the documents page</>;
 };
 
