@@ -24,7 +24,7 @@ const navigation = [
   { name: "Settings", href: "/settings", current: true },
 ];
 const userNavigation = [
-  { name: "Your Profile", href: "/settings" },
+  { name: "Your Profile", href: "/settings/profile" },
   {
     name: "Sign out",
     href: "",
@@ -42,7 +42,7 @@ function classNames(...classes: any) {
 export default function Layout({ children }: any) {
   const router = useRouter();
   navigation.forEach((element) => {
-    element.current = router.route.startsWith(element.href);
+    element.current = router.route.startsWith("/" + element.href.split("/")[1]);
   });
 
   return (

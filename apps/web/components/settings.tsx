@@ -14,6 +14,7 @@ import {
 } from "@heroicons/react/24/outline";
 import { useRouter } from "next/router";
 import Link from "next/link";
+import Head from "next/head";
 
 const user = {
   name: "Debbie Lewis",
@@ -56,13 +57,15 @@ export default function Setttings() {
 
   const router = useRouter();
   console.log(router.route);
-
   subNavigation.forEach((element) => {
     element.current = element.href == router.route;
   });
 
   return (
     <div>
+      <Head>
+        <title>Settings | Documenso</title>
+      </Head>
       <header className="py-10">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <h1 className="text-3xl font-bold leading-tight tracking-tight text-brown">
