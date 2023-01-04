@@ -75,40 +75,8 @@ export default function Layout({ children }: any) {
                         </Link>
                       ))}
                     </div>
-                    {/* Search section */}
-                    <div className="mt-3 flex flex-1 justify-center lg:justify-end">
-                      <div className="w-full px-2 lg:px-6">
-                        <label htmlFor="search" className="sr-only">
-                          Search Documents
-                        </label>
-                        <div className="relative text-indigo-100 focus-within:text-gray-400">
-                          <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                            <MagnifyingGlassIcon
-                              className="h-5 w-5"
-                              aria-hidden="true"
-                            />
-                          </div>
-                          <input
-                            id="search"
-                            name="search"
-                            className="block w-full rounded-md border border-transparent bg-white bg-opacity-25 py-2 pl-10 pr-3 leading-5 text-indigo-100 placeholder-indigo-200 focus:bg-white focus:text-gray-900 focus:placeholder-gray-400 focus:outline-none focus:ring-0 sm:text-sm"
-                            placeholder="Search Documents"
-                            type="search"
-                          />
-                        </div>
-                      </div>
-                    </div>
                   </div>
                   <div className="hidden sm:ml-6 sm:flex sm:items-center">
-                    <button
-                      type="button"
-                      className="rounded-full bg-white p-1 text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-                    >
-                      <span className="sr-only">View notifications</span>
-                      <BellIcon className="h-6 w-6" aria-hidden="true" />
-                    </button>
-
-                    {/* Profile dropdown */}
                     <Menu as="div" className="relative ml-3">
                       <div>
                         <Menu.Button className="flex max-w-xs items-center rounded-full bg-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">

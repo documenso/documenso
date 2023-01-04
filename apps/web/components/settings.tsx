@@ -25,7 +25,6 @@ const subNavigation = [
   { name: "Profile", href: "#", icon: UserCircleIcon, current: true },
   { name: "Password", href: "#", icon: KeyIcon, current: false },
   { name: "Account", href: "#", icon: CogIcon, current: false },
-  { name: "Team", href: "#", icon: UsersIcon, current: false },
 ];
 
 function classNames(...classes: any) {
