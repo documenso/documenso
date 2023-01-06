@@ -8,7 +8,16 @@ datasource db {
 }
 
 model User {
-  id    Int     @id @default(autoincrement())
-  name  String? @db.VarChar(255)
-  email String  @unique @db.VarChar(255)
+  id        Int     @id @default(autoincrement())
+  email     String  @unique @db.VarChar(255)
+  firstName String? @db.VarChar(255)
+  lastName  String? @db.VarChar(255)
+}
+
+model Document {
+  id Int @id @default(autoincrement())
+}
+
+model Signature {
+  id Int @id @default(autoincrement())
 }
