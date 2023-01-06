@@ -8,16 +8,43 @@ datasource db {
 }
 
 model User {
-  id        Int     @id @default(autoincrement())
-  email     String  @unique @db.VarChar(255)
-  firstName String? @db.VarChar(255)
-  lastName  String? @db.VarChar(255)
+  id        Int        @id @default(autoincrement())
+  email     String     @unique @db.VarChar(255)
+  password  String     @db.VarChar(255)
+  firstName String?    @db.VarChar(255)
+  lastName  String?    @db.VarChar(255)
+  documents Document[]
 }
 
 model Document {
-  id Int @id @default(autoincrement())
+  id         Int         @id @default(autoincrement())
+  owner      User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId     Int
+  recipients Recipient[]
+  document   Bytes
 }
 
-model Signature {
-  id Int @id @default(autoincrement())
+enum SigningStatus {
+  NOT_SIGNED
+  SIGNED
+}
+
+enum ReadStatus {
+  NOT_OPENED
+  OPENED
+}
+
+enum SendStatus {
+  NOT_SENT
+  SENT
+}
+
+model Recipient {
+  id            Int           @id @default(autoincrement())
+  Document      Document      @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  documentId    Int
+  email         String        @db.VarChar(255)
+  readStatus    ReadStatus
+  signingStatus SigningStatus
+  sendStatus    SendStatus
 }
