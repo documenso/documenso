@@ -1,4 +1,4 @@
-import { PrismaClient } from "@documenso/prisma";
+import PrismaClient  from "@documenso/prisma";
 import type { NextApiRequest, NextApiResponse } from "next";
 
 export default async function userHandler(
