@@ -1,6 +1,6 @@
 // POST to create
-import PrismaClient from "@documenso/prisma";
-import User from "@documenso/prisma";
+import { PrismaClient } from "@documenso/prisma";
+import { User } from "@documenso/prisma";
 
 import type { NextApiRequest, NextApiResponse } from "next";
 import { json } from "stream/consumers";
