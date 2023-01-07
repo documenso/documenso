@@ -7,21 +7,12 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
-  id        Int        @id @default(autoincrement())
-  firstName String?    @db.VarChar(255)
-  lastName  String?    @db.VarChar(255)
-  email     String     @unique @db.VarChar(255)
-  password  String?    @db.VarChar(255)
-  documents Document[]
-}
-
 model Document {
-  id         Int         @id @default(autoincrement())
-  userId     Int
-  document   Bytes
-  owner      User        @relation(fields: [userId], references: [id], onDelete: Cascade)
-  recipients Recipient[]
+  id        Int         @id @default(autoincrement())
+  userId    Int
+  document  Bytes
+  User      User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  Recipient Recipient[]
 }
 
 model Recipient {
@@ -34,9 +25,13 @@ model Recipient {
   Document      Document      @relation(fields: [documentId], references: [id], onDelete: Cascade)
 }
 
-enum SigningStatus {
-  NOT_SIGNED
-  SIGNED
+model User {
+  id        Int        @id @default(autoincrement())
+  firstName String?    @db.VarChar(255)
+  lastName  String?    @db.VarChar(255)
+  email     String     @unique @db.VarChar(255)
+  password  String?    @db.VarChar(255)
+  Document  Document[]
 }
 
 enum ReadStatus {
@@ -47,4 +42,9 @@ enum ReadStatus {
 enum SendStatus {
   NOT_SENT
   SENT
+}
+
+enum SigningStatus {
+  NOT_SIGNED
+  SIGNED
 }

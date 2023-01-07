@@ -1,0 +1,12 @@
+{
+  "name": "@documenso/prisma",
+  "version": "0.0.0",
+  "private": true,
+  "main": "index.ts",
+  "devDependencies": {
+    "prisma": "^4.8.0"
+  },
+  "dependencies": {
+    "@prisma/client": "^4.8.0"
+  }
+}
