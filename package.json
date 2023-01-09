@@ -1,6 +1,10 @@
 {
   "name": "documenso-monorepo",
   "version": "0.0.0",
+  "scripts": {
+    "build": "cd apps&cd web&next build",
+    "start": "next start"
+  },
   "workspaces": [
     "apps/*",
     "packages/*"

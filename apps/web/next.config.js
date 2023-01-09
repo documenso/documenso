@@ -4,7 +4,7 @@ require("dotenv").config({ path: "../../.env" });
 const nextConfig = {
   reactStrictMode: true,
   swcMinify: true,
-  distDir: "build",
+  distDir: "../../build",
 };
 
 const withTM = require("next-transpile-modules")(["@documenso/prisma"]);
