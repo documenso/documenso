@@ -1,0 +1,8 @@
+{
+  "name": "@documenso/lib",
+  "version": "0.0.0",
+  "private": true,
+  "main": "index.ts",
+  "devDependencies": {},
+  "dependencies": {}
+}
