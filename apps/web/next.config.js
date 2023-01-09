@@ -7,7 +7,10 @@ const nextConfig = {
   distDir: "build",
 };
 
-const withTM = require("next-transpile-modules")(["@documenso/prisma"]);
+const withTM = require("next-transpile-modules")([
+  "@documenso/prisma",
+  "@documenso/lib",
+]);
 const plugins = [];
 plugins.push(withTM);
 

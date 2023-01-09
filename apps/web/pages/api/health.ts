@@ -1,12 +1,19 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 
-type Data = {
+import { defaultHandler, defaultResponder } from "@documenso/lib/server";
+import prisma from "@documenso/prisma";
+
+type responseData = {
   status: string;
 };
 
-export default function handler(
-  req: NextApiRequest,
-  res: NextApiResponse<Data>
-) {
-  res.status(200).json({ status: "Api up and running :)" });
+// Return a healthy 200 status code for uptime monitoring and render.com zero-downtime-deploy
+async function getHandler(req: NextApiRequest, res: NextApiResponse) {
+  // A generic database access to make sure the service is healthy.
+  const users = await prisma.user.findFirst();
+  res.status(200).json({ message: "Api up and running :)" });
 }
+
+export default defaultHandler({
+  GET: Promise.resolve({ default: defaultResponder(getHandler) }),
+});
