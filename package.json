@@ -8,5 +8,8 @@
   "workspaces": [
     "apps/*",
     "packages/*"
-  ]
+  ],
+  "dependencies": {
+    "next": "13.0.3"
+  }
 }
