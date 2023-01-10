@@ -3,6 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "main": "index.ts",
-  "devDependencies": {},
-  "dependencies": {}
+  "dependencies": {
+    "bcryptjs": "^2.4.3"
+  }
 }
