@@ -6,9 +6,16 @@ import prisma from "@documenso/prisma";
 import { verifyPassword } from "@documenso/lib/auth";
 
 export default NextAuth({
+  secret: process.env.AUTH_SECRET,
+  pages: {
+    signIn: "/login",
+    signOut: "/login",
+    error: "/auth/error", // Error code passed in query string as ?error=
+    verifyRequest: "/auth/verify-request", // (used for check email message)
+  },
   providers: [
     CredentialsProvider({
-      id: "crediantials",
+      id: "credentials",
       name: "Documenso.com Login",
       type: "credentials",
       credentials: {

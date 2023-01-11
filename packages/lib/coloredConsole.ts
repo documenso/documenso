@@ -1,6 +1,6 @@
 // https://stackoverflow.com/questions/9781218/how-to-change-node-jss-console-font-color
 
-export default class coloredConsole {
+export class coloredConsole {
   public static setupColoredConsole(): void {
     let infoLog = console.info;
     let logLog = console.log;
