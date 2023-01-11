@@ -1,1 +1,1 @@
-export {};
+export { coloredConsole } from "./coloredConsole";

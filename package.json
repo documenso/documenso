@@ -4,10 +4,14 @@
   "scripts": {
     "dev": "cd apps&&cd web&&next dev",
     "build": "cd apps&&cd web&&next build",
-    "start": "cd apps&&cd web&&next start"
+    "start": "cd apps&&cd web&&next start",
+    "db-seed": "prisma db seed"
   },
   "workspaces": [
     "apps/*",
     "packages/*"
-  ]
+  ],
+  "prisma": {
+    "seed": "ts-node --transpile-only ./packages/prisma/seed.ts"
+  }
 }
