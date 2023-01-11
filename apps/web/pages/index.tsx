@@ -1,13 +1,18 @@
-import type { ReactElement } from "react";
-import Layout from "../components/layout";
-import type { NextPageWithLayout } from "./_app";
+import { NextPageContext } from "next";
+import { getSession } from "next-auth/react";
 
-const Page: NextPageWithLayout = () => {
-  return <p className="text-red-900">This is the index page</p>;
-};
+function RedirectPage() {
+  return;
+}
 
-Page.getLayout = function getLayout(page: ReactElement) {
-  return <Layout>{page}</Layout>;
-};
+export async function getServerSideProps(context: NextPageContext) {
+  const session = await getSession(context);
 
-export default Page;
+  if (!session?.user?.email) {
+    return { redirect: { permanent: false, destination: "/login" } };
+  }
+
+  return { redirect: { permanent: false, destination: "/dashboard" } };
+}
+
+export default RedirectPage;

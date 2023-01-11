@@ -1,4 +1,4 @@
-import { Fragment } from "react";
+import { Fragment, useEffect } from "react";
 import { Disclosure, Menu, Transition } from "@headlessui/react";
 import Link from "next/link";
 import { useRouter } from "next/router";
@@ -42,13 +42,37 @@ function classNames(...classes: any) {
   return classes.filter(Boolean).join(" ");
 }
 
+function useRedirectToLoginIfUnauthenticated() {
+  const { data: session, status } = useSession();
+  const loading = status === "loading";
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!loading && !session) {
+      router.replace({
+        pathname: "/login",
+        query: {
+          callbackUrl: `http://localhost:3000${location.pathname}${location.search}`,
+        },
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [loading, session]);
+
+  return {
+    loading: loading && !session,
+    session,
+  };
+}
+
 export default function Layout({ children }: any) {
+  useRedirectToLoginIfUnauthenticated();
   const router = useRouter();
   navigation.forEach((element) => {
     element.current = router.route.startsWith("/" + element.href.split("/")[1]);
   });
 
-  const session = useSession();
+  const { status } = useSession();
 
   return (
     <>
