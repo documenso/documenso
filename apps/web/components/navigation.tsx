@@ -8,8 +8,11 @@ import {
   Bars3Icon,
   BellIcon,
   XMarkIcon,
-  ArrowLeftOnRectangleIcon,
   UserCircleIcon,
+  ArrowRightOnRectangleIcon,
+  DocumentTextIcon,
+  ChartBarIcon,
+  WrenchIcon,
 } from "@heroicons/react/24/outline";
 import Logo from "./logo";
 
@@ -20,9 +23,24 @@ const user = {
     "https://pbs.twimg.com/profile_images/1382036502390181888/4BT30oTM_400x400.jpg",
 };
 const navigation = [
-  { name: "Dashboard", href: "/dashboard", current: false },
-  { name: "Documents", href: "/documents", current: false },
-  { name: "Settings", href: "/settings", current: true },
+  {
+    name: "Dashboard",
+    href: "/dashboard",
+    current: false,
+    icon: ChartBarIcon,
+  },
+  {
+    name: "Documents",
+    href: "/documents",
+    current: false,
+    icon: DocumentTextIcon,
+  },
+  {
+    name: "Settings",
+    href: "/settings",
+    current: true,
+    icon: WrenchIcon,
+  },
 ];
 const userNavigation = [
   { name: "Your Profile", href: "/settings/profile", icon: UserCircleIcon },
@@ -33,7 +51,7 @@ const userNavigation = [
       e.preventDefault();
       signOut({ callbackUrl: "/login" });
     },
-    icon: ArrowLeftOnRectangleIcon,
+    icon: ArrowRightOnRectangleIcon,
   },
 ];
 
@@ -73,15 +91,23 @@ export default function TopNavigation() {
                         )}
                         aria-current={item.current ? "page" : undefined}
                       >
+                        <item.icon
+                          className="flex-shrink-0 -ml-1 mr-3 h-6 w-6 inline"
+                          aria-hidden="true"
+                        ></item.icon>
                         {item.name}
                       </Link>
                     ))}
                   </div>
                 </div>
                 <div className="hidden sm:ml-6 sm:flex sm:items-center">
+                  <span className="text-sm">
+                    <p className="font-bold">{user.name}</p>
+                    <p>{user.email}</p>
+                  </span>
                   <Menu as="div" className="relative ml-3">
                     <div>
-                      <Menu.Button className="flex max-w-xs items-center rounded-full bg-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+                      <Menu.Button className="flex max-w-xs items-center rounded-full bg-white text-sm focus:outline-none focus:ring-2 focus:ring-neon focus:ring-offset-2">
                         <span className="sr-only">Open user menu</span>
                         <img
                           className="h-8 w-8 rounded-full"
@@ -126,7 +152,7 @@ export default function TopNavigation() {
                 </div>
                 <div className="-mr-2 flex items-center sm:hidden">
                   {/* Mobile menu button */}
-                  <Disclosure.Button className="inline-flex items-center justify-center rounded-md bg-white p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+                  <Disclosure.Button className="inline-flex items-center justify-center rounded-md bg-white p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-neon focus:ring-offset-2">
                     <span className="sr-only">Open main menu</span>
                     {open ? (
                       <XMarkIcon className="block h-6 w-6" aria-hidden="true" />
@@ -176,7 +202,7 @@ export default function TopNavigation() {
                   </div>
                   <button
                     type="button"
-                    className="ml-auto flex-shrink-0 rounded-full bg-white p-1 text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                    className="ml-auto flex-shrink-0 rounded-full bg-white p-1 text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-neon focus:ring-offset-2"
                   >
                     <span className="sr-only">View notifications</span>
                     <BellIcon className="h-6 w-6" aria-hidden="true" />
