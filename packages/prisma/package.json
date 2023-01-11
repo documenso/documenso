@@ -9,10 +9,11 @@
     "typescript": "4.8.4"
   },
   "dependencies": {
-    "@prisma/client": "^4.8.0",
-    "prisma": "^4.8.0"
+    "@prisma/client": "^4.8.1",
+    "prisma": "^4.8.1"
   },
   "scripts": {
+    "db-studio": "prisma studio",
     "db-seed": "prisma db seed"
   },
   "prisma": {

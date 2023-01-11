@@ -5,13 +5,15 @@
     "dev": "cd apps&&cd web&&next dev",
     "build": "cd apps&&cd web&&next build",
     "start": "cd apps&&cd web&&next start",
-    "db-seed": "prisma db seed"
+    "db-seed": "prisma db seed",
+    "db-studio": "prisma studio"
   },
   "workspaces": [
     "apps/*",
     "packages/*"
   ],
   "prisma": {
+    "schema": "packages/prisma/schema.prisma",
     "seed": "ts-node --transpile-only ./packages/prisma/seed.ts"
   }
 }
