@@ -54,15 +54,6 @@ export default function Login() {
             <h2 className="mt-6 text-center text-3xl font-bold tracking-tight text-gray-900">
               Sign in to your account
             </h2>
-            <p className="mt-2 text-center text-sm text-gray-600">
-              Or{" "}
-              <Link
-                href="/signup"
-                className="font-medium text-neon hover:text-neon"
-              >
-                create a new Account
-              </Link>
-            </p>
           </div>
           <FormProvider {...methods}>
             <form
@@ -126,6 +117,15 @@ export default function Login() {
                   Sign in
                 </button>
               </div>
+              <p className="mt-2 text-center text-sm text-gray-600">
+                Are you new here?{" "}
+                <Link
+                  href="/signup"
+                  className="font-medium text-neon hover:text-neon"
+                >
+                  Create a new Account
+                </Link>
+              </p>
             </form>
           </FormProvider>
         </div>

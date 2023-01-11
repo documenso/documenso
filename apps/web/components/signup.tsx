@@ -1,4 +1,5 @@
 import { signIn } from "next-auth/react";
+import Link from "next/link";
 import { FormProvider, SubmitHandler, useForm } from "react-hook-form";
 
 import Logo from "./logo";
@@ -123,6 +124,15 @@ export default function Signup() {
                   Create Account
                 </button>
               </div>
+              <p className="mt-2 text-center text-sm text-gray-600">
+                Already have an account?{" "}
+                <Link
+                  href="/login"
+                  className="font-medium text-neon hover:text-neon"
+                >
+                  Sign In
+                </Link>
+              </p>
             </form>
           </FormProvider>
         </div>

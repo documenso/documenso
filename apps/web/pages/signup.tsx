@@ -5,7 +5,7 @@ export default function SignupPage() {
   return (
     <>
       <Head>
-        <title>Login | Documenso</title>
+        <title>Signup | Documenso</title>
       </Head>
       <Signup></Signup>
     </>
