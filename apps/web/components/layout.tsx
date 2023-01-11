@@ -7,8 +7,9 @@ import { signOut } from "next-auth/react";
 import {
   Bars3Icon,
   BellIcon,
-  MagnifyingGlassIcon,
   XMarkIcon,
+  ArrowLeftOnRectangleIcon,
+  UserCircleIcon,
 } from "@heroicons/react/24/outline";
 import Logo from "./logo";
 
@@ -24,7 +25,7 @@ const navigation = [
   { name: "Settings", href: "/settings", current: true },
 ];
 const userNavigation = [
-  { name: "Your Profile", href: "/settings/profile" },
+  { name: "Your Profile", href: "/settings/profile", icon: UserCircleIcon },
   {
     name: "Sign out",
     href: "",
@@ -32,6 +33,7 @@ const userNavigation = [
       e.preventDefault();
       signOut({ callbackUrl: "/login" });
     },
+    icon: ArrowLeftOnRectangleIcon,
   },
 ];
 
@@ -108,6 +110,10 @@ export default function Layout({ children }: any) {
                                     "block px-4 py-2 text-sm text-gray-700"
                                   )}
                                 >
+                                  <item.icon
+                                    className="flex-shrink-0 -ml-1 mr-3 h-6 w-6 inline"
+                                    aria-hidden="true"
+                                  ></item.icon>
                                   {item.name}
                                 </Link>
                               )}
