@@ -123,6 +123,17 @@ export default function Signup() {
                   Create Account
                 </button>
               </div>
+              <div>
+                <div className="relative">
+                  <div
+                    className="absolute inset-0 flex items-center"
+                    aria-hidden="true"
+                  >
+                    <div className="w-full border-t border-gray-300" />
+                  </div>
+                  <div className="relative flex justify-center"></div>
+                </div>
+              </div>
               <p className="mt-2 text-center text-sm text-gray-600">
                 Already have an account?{" "}
                 <Link
