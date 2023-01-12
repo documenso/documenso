@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import { signOut, useSession } from "next-auth/react";
 import avatarFromInitials from "avatar-from-initials";
+import { toast, Toaster } from "react-hot-toast";
 
 import {
   Bars3Icon,
@@ -48,9 +49,11 @@ const userNavigation = [
   {
     name: "Sign out",
     href: "",
-    click: (e: any) => {
+    click: async (e: any) => {
       e.preventDefault();
-      signOut({ callbackUrl: "/login" });
+      const res: any = await signOut({ callbackUrl: "/login" }).finally(() => {
+        if (!res?.error) toast.success("Logout successful");
+      });
     },
     icon: ArrowRightOnRectangleIcon,
   },
@@ -226,6 +229,7 @@ export default function TopNavigation() {
           </>
         )}
       </Disclosure>
+      <Toaster position="top-center"></Toaster>
     </>
   );
 }

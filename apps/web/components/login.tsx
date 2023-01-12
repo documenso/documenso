@@ -7,6 +7,7 @@ import { getCsrfToken, signIn } from "next-auth/react";
 import { ErrorCode } from "@documenso/lib/auth";
 import { useState } from "react";
 import { useRouter } from "next/router";
+import { toast, Toaster } from "react-hot-toast";
 
 interface LoginValues {
   email: string;
@@ -38,11 +39,25 @@ export default function Login() {
       callbackUrl,
       redirect: false,
     });
-    if (!res) setErrorMessage("error");
+    if (!res) {
+      setErrorMessage("error");
+      toast.error("Something went wrong.");
+    }
     // we're logged in! let's do a hard refresh to the desired url
-    else if (!res.error) router.push(callbackUrl);
+    else if (!res.error) {
+      router.push(callbackUrl).then(() => {
+        toast.success("Login successful");
+      });
+      // toast.error("error");
+    }
     // fallback if error not found
-    else setErrorMessage("something_went_wrong");
+    else {
+      if (res.status == 401) {
+        toast.error("Invalid email or password.");
+      } else {
+        toast.error("Could not login.");
+      }
+    }
   };
 
   return (
@@ -141,6 +156,7 @@ export default function Login() {
           </FormProvider>
         </div>
       </div>
+      <Toaster position="top-center" />
     </>
   );
 }
