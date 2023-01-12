@@ -10,7 +10,6 @@ import {
   CheckBadgeIcon,
   EnvelopeIcon,
   EyeIcon,
-  PaperAirplaneIcon,
   SunIcon,
   XCircleIcon,
 } from "@heroicons/react/24/outline";
