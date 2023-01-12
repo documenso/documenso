@@ -5,7 +5,7 @@ import Layout from "../components/layout";
 import Settings from "../components/settings";
 import type { NextPageWithLayout } from "./_app";
 import {
-  CheckIcon,
+  CheckBadgeIcon,
   PaperAirplaneIcon,
   SunIcon,
 } from "@heroicons/react/24/outline";
@@ -15,7 +15,7 @@ const DashboardPage: NextPageWithLayout = () => {
   const stats = [
     { name: "Draft", stat: "0", icon: SunIcon },
     { name: "Sent", stat: "0", icon: PaperAirplaneIcon },
-    { name: "Signed", stat: "0", icon: CheckIcon },
+    { name: "Signed", stat: "0", icon: CheckBadgeIcon },
   ];
   return (
     <>
