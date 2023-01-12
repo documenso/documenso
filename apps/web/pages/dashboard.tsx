@@ -3,6 +3,7 @@ import Head from "next/head";
 import type { ReactElement } from "react";
 import Layout from "../components/layout";
 import Settings from "../components/settings";
+import Link from "next/link";
 import type { NextPageWithLayout } from "./_app";
 import {
   BellSnoozeIcon,
@@ -17,12 +18,42 @@ import {
 const DashboardPage: NextPageWithLayout = () => {
   const status = useSession();
   const stats = [
-    { name: "Draft", stat: "0", icon: SunIcon },
-    { name: "Sent", stat: "0", icon: EnvelopeIcon },
-    { name: "Viewed", stat: "0", icon: EyeIcon },
-    { name: "Signed", stat: "0", icon: CheckBadgeIcon },
-    { name: "Expired", stat: "0", icon: BellSnoozeIcon },
-    { name: "Declined", stat: "0", icon: XCircleIcon },
+    {
+      name: "Draft",
+      stat: "0",
+      icon: SunIcon,
+      link: "/documents?filter=",
+    },
+    {
+      name: "Sent",
+      stat: "0",
+      icon: EnvelopeIcon,
+      link: "/documents?filter=",
+    },
+    {
+      name: "Viewed",
+      stat: "0",
+      icon: EyeIcon,
+      link: "/documents?filter=",
+    },
+    {
+      name: "Signed",
+      stat: "0",
+      icon: CheckBadgeIcon,
+      link: "/documents?filter=",
+    },
+    {
+      name: "Expired",
+      stat: "0",
+      icon: BellSnoozeIcon,
+      link: "/documents?filter=",
+    },
+    {
+      name: "Declined",
+      stat: "0",
+      icon: XCircleIcon,
+      link: "/documents?filter=",
+    },
   ];
   return (
     <>
@@ -37,21 +68,20 @@ const DashboardPage: NextPageWithLayout = () => {
         </header>
         <dl className="mt-5 grid grid-cols-1 gap-5 sm:grid-cols-3">
           {stats.map((item) => (
-            <div
-              key={item.name}
-              className="overflow-hidden rounded-lg bg-white px-4 py-5 shadow sm:p-6"
-            >
-              <dt className="truncate text-sm font-medium text-gray-500">
-                <item.icon
-                  className="flex-shrink-0 mr-3 h-6 w-6 inline text-neon"
-                  aria-hidden="true"
-                ></item.icon>
-                {item.name}
-              </dt>
-              <dd className="mt-1 text-3xl font-semibold tracking-tight text-gray-900">
-                {item.stat}
-              </dd>
-            </div>
+            <Link href={item.link} key={item.name}>
+              <div className="overflow-hidden rounded-lg bg-white px-4 py-5 shadow sm:p-6">
+                <dt className="truncate text-sm font-medium text-gray-500">
+                  <item.icon
+                    className="flex-shrink-0 mr-3 h-6 w-6 inline text-neon"
+                    aria-hidden="true"
+                  ></item.icon>
+                  {item.name}
+                </dt>
+                <dd className="mt-1 text-3xl font-semibold tracking-tight text-gray-900">
+                  {item.stat}
+                </dd>
+              </div>
+            </Link>
           ))}
         </dl>
         <div className="mt-12">
