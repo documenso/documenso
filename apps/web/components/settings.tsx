@@ -15,6 +15,7 @@ import {
 import { useRouter } from "next/router";
 import Link from "next/link";
 import Head from "next/head";
+import avatarFromInitials from "avatar-from-initials";
 
 const user = {
   name: "Debbie Lewis",
@@ -127,16 +128,17 @@ export default function Setttings() {
                     >
                       Photo
                     </p>
+
                     <div className="mt-1 lg:hidden">
                       <div className="flex items-center">
                         <div
                           className="inline-block h-12 w-12 flex-shrink-0 overflow-hidden rounded-full"
                           aria-hidden="true"
                         >
-                          <img
-                            className="h-full w-full rounded-full"
-                            src={user.imageUrl}
-                            alt=""
+                          <div
+                            dangerouslySetInnerHTML={{
+                              __html: avatarFromInitials("Timur Ercan", 48),
+                            }}
                           />
                         </div>
                         <div className="ml-5 rounded-md shadow-sm">
@@ -160,10 +162,10 @@ export default function Setttings() {
                     </div>
 
                     <div className="relative hidden overflow-hidden rounded-full lg:block">
-                      <img
-                        className="relative h-40 w-40 rounded-full"
-                        src={user.imageUrl}
-                        alt=""
+                      <div
+                        dangerouslySetInnerHTML={{
+                          __html: avatarFromInitials("Timur Ercan", 160),
+                        }}
                       />
                       <label
                         htmlFor="desktop-user-photo"
@@ -194,6 +196,7 @@ export default function Setttings() {
                       type="text"
                       name="first-name"
                       id="first-name"
+                      value="Timur Ercan"
                       autoComplete="given-name"
                       className="mt-1 block w-full rounded-md border border-gray-300 py-2 px-3 shadow-sm focus:border-neon focus:outline-none focus:ring-neon sm:text-sm"
                     />
