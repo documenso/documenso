@@ -3,6 +3,7 @@ import { Disclosure, Menu, Transition } from "@headlessui/react";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { signOut, useSession } from "next-auth/react";
+import avatarFromInitials from "avatar-from-initials";
 
 import {
   Bars3Icon,
@@ -109,10 +110,10 @@ export default function TopNavigation() {
                     <div>
                       <Menu.Button className="flex max-w-xs items-center rounded-full bg-white text-sm focus:outline-none focus:ring-2 focus:ring-neon focus:ring-offset-2">
                         <span className="sr-only">Open user menu</span>
-                        <img
-                          className="h-8 w-8 rounded-full"
-                          src={user.imageUrl}
-                          alt=""
+                        <div
+                          dangerouslySetInnerHTML={{
+                            __html: avatarFromInitials("Timur Ercan", 40),
+                          }}
                         />
                       </Menu.Button>
                     </div>
