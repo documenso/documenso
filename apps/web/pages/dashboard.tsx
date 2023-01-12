@@ -87,6 +87,9 @@ const DashboardPage: NextPageWithLayout = () => {
         <div className="mt-12">
           <button
             type="button"
+            onClick={() => {
+              document?.getElementById("fileUploadHelper")?.click();
+            }}
             className="relative block w-full rounded-lg border-2 border-dashed border-gray-300 p-12 text-center hover:border-neon focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
           >
             <svg
@@ -106,6 +109,7 @@ const DashboardPage: NextPageWithLayout = () => {
               Upload a new document
             </span>
           </button>
+          <input id="fileUploadHelper" type="file" hidden />
         </div>
       </div>
     </>
