@@ -210,14 +210,14 @@ export default function TopNavigation() {
                 </div>
                 <div className="mt-3 space-y-1">
                   {userNavigation.map((item) => (
-                    <Disclosure.Button
+                    <Link
                       key={item.name}
                       as="a"
                       href={item.href}
                       className="block px-4 py-2 text-base font-medium text-gray-500 hover:bg-gray-100 hover:text-gray-800"
                     >
                       {item.name}
-                    </Disclosure.Button>
+                    </Link>
                   ))}
                 </div>
               </div>
