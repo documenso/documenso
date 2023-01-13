@@ -51,9 +51,22 @@ const userNavigation = [
     href: "",
     click: async (e: any) => {
       e.preventDefault();
-      const res: any = await signOut({ callbackUrl: "/login" }).finally(() => {
-        if (!res?.error) toast.success("Logout successful");
-      });
+      const res: any = await toast.promise(
+        signOut({ callbackUrl: "/login" }),
+        {
+          loading: "Logging out",
+          success: "Your are logged out.",
+          error: "Could not log out :/",
+        },
+        {
+          style: {
+            minWidth: "200px",
+          },
+          success: {
+            duration: 10000,
+          },
+        }
+      );
     },
     icon: ArrowRightOnRectangleIcon,
   },
@@ -229,7 +242,7 @@ export default function TopNavigation() {
           </>
         )}
       </Disclosure>
-      <Toaster position="top-center"></Toaster>
+      {/* <Toaster position="top-center"></Toaster> */}
     </>
   );
 }

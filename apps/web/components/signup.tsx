@@ -2,7 +2,7 @@ import { XCircleIcon } from "@heroicons/react/24/outline";
 import { signIn } from "next-auth/react";
 import Link from "next/link";
 import { FormProvider, SubmitHandler, useForm } from "react-hook-form";
-import { Toast, Toaster } from "react-hot-toast";
+import { toast, Toast, Toaster } from "react-hot-toast";
 
 import Logo from "./logo";
 
@@ -29,26 +29,37 @@ export default function Signup() {
   };
 
   const signUp: SubmitHandler<FormValues> = async (data) => {
-    // methods.clearErrors();
-    await fetch("/api/auth/signup", {
-      body: JSON.stringify({
-        ...data,
-      }),
-      headers: {
-        "Content-Type": "application/json",
-      },
-      method: "POST",
-    })
-      .then(handleErrors)
-      .then(async () => {
-        await signIn<"credentials">("credentials", {
+    const res = await toast.promise(
+      fetch("/api/auth/signup", {
+        body: JSON.stringify({
           ...data,
-          callbackUrl: "http://localhost:3000/dashboard",
-        });
+        }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+        method: "POST",
       })
-      .catch((err) => {
-        methods.setError("apiError", { message: err.message });
-      });
+        .then(handleErrors)
+        .then(async () => {
+          await signIn<"credentials">("credentials", {
+            ...data,
+            callbackUrl: "http://localhost:3000/dashboard",
+          });
+        })
+        .catch((err) => {
+          methods.setError("apiError", { message: err.message });
+        }),
+      {
+        loading: "Creating your account...",
+        success: "Done!",
+        error: (err) => err.message,
+      },
+      {
+        style: {
+          minWidth: "200px",
+        },
+      }
+    );
   };
 
   function renderApiError() {
@@ -202,7 +213,7 @@ export default function Signup() {
           </FormProvider>
         </div>
       </div>
-      <Toaster position="top-center"></Toaster>
+      {/* <Toaster position="top-center"></Toaster> */}
     </>
   );
 }

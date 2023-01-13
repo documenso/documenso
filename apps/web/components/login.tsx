@@ -34,20 +34,30 @@ export default function Login() {
 
   const onSubmit = async (values: LoginValues) => {
     setErrorMessage(null);
-    const res = await signIn<"credentials">("credentials", {
-      ...values,
-      callbackUrl,
-      redirect: false,
-    });
+    const res = await toast.promise(
+      signIn<"credentials">("credentials", {
+        ...values,
+        callbackUrl,
+        redirect: false,
+      }),
+      {
+        loading: "Loggin in...",
+        success: "Login successful.",
+        error: "Could not log in :/",
+      },
+      {
+        style: {
+          minWidth: "200px",
+        },
+      }
+    );
     if (!res) {
       setErrorMessage("error");
       toast.error("Something went wrong.");
     }
     // we're logged in! let's do a hard refresh to the desired url
     else if (!res.error) {
-      router.push(callbackUrl).then(() => {
-        toast.success("Login successful");
-      });
+      router.push(callbackUrl);
       // toast.error("error");
     }
     // fallback if error not found
@@ -89,7 +99,7 @@ export default function Login() {
                     autoComplete="email"
                     required
                     className="relative block w-full appearance-none rounded-none rounded-t-md border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-500 focus:z-10 focus:border-neon focus:outline-none focus:ring-neon sm:text-sm"
-                    placeholder="Email address"
+                    placeholder="Email"
                   />
                 </div>
                 <div>
@@ -156,7 +166,7 @@ export default function Login() {
           </FormProvider>
         </div>
       </div>
-      <Toaster position="top-center" />
+      {/* <Toaster position="top-center" /> */}
     </>
   );
 }
