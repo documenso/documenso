@@ -115,10 +115,8 @@ export default function Signup() {
               state-of-the-art document signing for free.
             </p>
           </div>
-          <div className="h-7">
-            {renderApiError()}
-            {renderFormValidation()}
-          </div>
+          {renderApiError()}
+          {renderFormValidation()}
           <FormProvider {...methods}>
             <form
               onSubmit={methods.handleSubmit(signUp)}
