@@ -16,6 +16,7 @@ export default function Signup() {
   const methods = useForm<FormValues>({});
   const {
     register,
+    trigger,
     formState: { errors, isSubmitting },
   } = methods;
 
@@ -67,6 +68,27 @@ export default function Signup() {
     );
   }
 
+  function renderFormValidation() {
+    if (!errors.password && !errors.email) return;
+    return (
+      <div className="rounded-md bg-red-50 p-4">
+        <div className="flex">
+          <div className="flex-shrink-0">
+            <XCircleIcon className="h-5 w-5 text-red-400" aria-hidden="true" />
+          </div>
+          <div className="ml-3">
+            <h3 className="text-sm font-medium text-red-800">
+              {errors.password && <div>{errors.password?.message}</div>}
+            </h3>
+            <h3 className="text-sm font-medium text-red-800">
+              {errors.email && <div>{errors.email?.message}</div>}
+            </h3>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <>
       <div className="flex min-h-full items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
@@ -93,10 +115,17 @@ export default function Signup() {
               state-of-the-art document signing for free.
             </p>
           </div>
-          {renderApiError()}
+          <div className="h-7">
+            {renderApiError()}
+            {renderFormValidation()}
+          </div>
           <FormProvider {...methods}>
             <form
               onSubmit={methods.handleSubmit(signUp)}
+              onChange={() => {
+                methods.clearErrors();
+                trigger();
+              }}
               className="mt-8 space-y-6"
             >
               <input type="hidden" name="remember" defaultValue="true" />
@@ -121,7 +150,13 @@ export default function Signup() {
                     Password
                   </label>
                   <input
-                    {...register("password")}
+                    {...register("password", {
+                      minLength: {
+                        value: 7,
+                        message:
+                          "Password has to be at least 7 characters long.",
+                      },
+                    })}
                     id="password"
                     name="password"
                     type="password"
@@ -133,20 +168,18 @@ export default function Signup() {
                 </div>
               </div>
 
-              <div>
-                <button
-                  onClick={() => {
-                    methods.clearErrors();
-                  }}
-                  type="submit"
-                  value="submit"
-                  className="group relative flex w-full justify-center rounded-md border border-transparent bg-neon py-2 px-4 text-sm font-medium text-white hover:bg-neon-dark focus:outline-none focus:ring-2 focus:ring-neon focus:ring-offset-2"
-                >
-                  <span className="absolute inset-y-0 left-0 flex items-center pl-3"></span>
-                  Create Account
-                </button>
-              </div>
-              <div>
+              <button
+                onClick={() => {
+                  methods.clearErrors();
+                }}
+                type="submit"
+                value="submit"
+                className="sgroup relative flex w-full justify-center rounded-md border border-transparent bg-neon py-2 px-4 text-sm font-medium text-white hover:bg-neon-dark focus:outline-none focus:ring-2 focus:ring-neon focus:ring-offset-2"
+              >
+                <span className="absolute inset-y-0 left-0 flex items-center pl-3"></span>
+                Create Account
+              </button>
+              <div className="pt-2">
                 <div className="relative">
                   <div
                     className="absolute inset-0 flex items-center"
