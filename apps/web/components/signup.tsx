@@ -2,6 +2,7 @@ import { XCircleIcon } from "@heroicons/react/24/outline";
 import { signIn } from "next-auth/react";
 import Link from "next/link";
 import { FormProvider, SubmitHandler, useForm } from "react-hook-form";
+import { Toast, Toaster } from "react-hot-toast";
 
 import Logo from "./logo";
 
@@ -28,7 +29,7 @@ export default function Signup() {
   };
 
   const signUp: SubmitHandler<FormValues> = async (data) => {
-    methods.clearErrors();
+    // methods.clearErrors();
     await fetch("/api/auth/signup", {
       body: JSON.stringify({
         ...data,
@@ -152,7 +153,7 @@ export default function Signup() {
                       minLength: {
                         value: 7,
                         message:
-                          "Password has to be at least 7 characters long.",
+                          "Your password has to be at least 7 characters long.",
                       },
                     })}
                     id="password"
@@ -201,6 +202,7 @@ export default function Signup() {
           </FormProvider>
         </div>
       </div>
+      <Toaster position="top-center"></Toaster>
     </>
   );
 }
