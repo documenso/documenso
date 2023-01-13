@@ -16,10 +16,9 @@ async function postHandler(req: NextApiRequest, res: NextApiResponse) {
   }
 
   if (!password || password.trim().length < 7) {
-    res.status(422).json({
-      message: "Invalid input - password should be at least 7 characters long.",
+    return res.status(422).json({
+      message: "Password should be at least 7 characters long.",
     });
-    return;
   }
 
   // User already exists if email already exists
@@ -30,7 +29,7 @@ async function postHandler(req: NextApiRequest, res: NextApiResponse) {
   });
 
   if (existingUser) {
-    const message: string = "Email address is already registered";
+    const message: string = "This email is already registered.";
     return res.status(409).json({ message });
   }
 

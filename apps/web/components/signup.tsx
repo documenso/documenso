@@ -1,3 +1,4 @@
+import { XCircleIcon } from "@heroicons/react/24/outline";
 import { signIn } from "next-auth/react";
 import Link from "next/link";
 import { FormProvider, SubmitHandler, useForm } from "react-hook-form";
@@ -8,7 +9,6 @@ type FormValues = {
   username: string;
   email: string;
   password: string;
-  passwordcheck: string;
   apiError: string;
 };
 
@@ -27,6 +27,7 @@ export default function Signup() {
   };
 
   const signUp: SubmitHandler<FormValues> = async (data) => {
+    methods.clearErrors();
     await fetch("/api/auth/signup", {
       body: JSON.stringify({
         ...data,
@@ -47,6 +48,24 @@ export default function Signup() {
         methods.setError("apiError", { message: err.message });
       });
   };
+
+  function renderApiError() {
+    if (!errors.apiError) return;
+    return (
+      <div className="rounded-md bg-red-50 p-4">
+        <div className="flex">
+          <div className="flex-shrink-0">
+            <XCircleIcon className="h-5 w-5 text-red-400" aria-hidden="true" />
+          </div>
+          <div className="ml-3">
+            <h3 className="text-sm font-medium text-red-800">
+              {errors.apiError && <div>{errors.apiError?.message}</div>}
+            </h3>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <>
@@ -74,6 +93,7 @@ export default function Signup() {
               state-of-the-art document signing for free.
             </p>
           </div>
+          {renderApiError()}
           <FormProvider {...methods}>
             <form
               onSubmit={methods.handleSubmit(signUp)}
@@ -115,6 +135,9 @@ export default function Signup() {
 
               <div>
                 <button
+                  onClick={() => {
+                    methods.clearErrors();
+                  }}
                   type="submit"
                   value="submit"
                   className="group relative flex w-full justify-center rounded-md border border-transparent bg-neon py-2 px-4 text-sm font-medium text-white hover:bg-neon-dark focus:outline-none focus:ring-2 focus:ring-neon focus:ring-offset-2"
