@@ -29,7 +29,7 @@ export default function Login() {
 
   // If not absolute URL, make it absolute
   if (!/^https?:\/\//.test(callbackUrl)) {
-    callbackUrl = `http://localhost:3000/${callbackUrl}`;
+    callbackUrl = `https://app.documenso.com/${callbackUrl}`;
   }
 
   const onSubmit = async (values: LoginValues) => {

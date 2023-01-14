@@ -43,7 +43,7 @@ export default function Signup() {
         .then(async () => {
           await signIn<"credentials">("credentials", {
             ...data,
-            callbackUrl: "http://localhost:3000/dashboard",
+            callbackUrl: "https://app.documenso.com/dashboard",
           });
         })
         .catch((err) => {

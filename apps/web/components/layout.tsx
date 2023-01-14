@@ -16,7 +16,7 @@ function useRedirectToLoginIfUnauthenticated() {
       router.replace({
         pathname: "/login",
         query: {
-          callbackUrl: `http://localhost:3000${location.pathname}${location.search}`,
+          callbackUrl: `https://app.documenso.com/${location.pathname}${location.search}`,
         },
       });
     }
