@@ -215,7 +215,6 @@ export default function Signup() {
           </FormProvider>
         </div>
       </div>
-      {/* <Toaster position="top-center"></Toaster> */}
     </>
   );
 }
