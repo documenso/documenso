@@ -48,6 +48,8 @@ export default function Signup() {
         })
         .catch((err) => {
           methods.setError("apiError", { message: err.message });
+          // Throw again for toast
+          throw new Error(err.message);
         }),
       {
         loading: "Creating your account...",
