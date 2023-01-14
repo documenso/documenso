@@ -17,6 +17,7 @@
     "seed": "ts-node --transpile-only ./packages/prisma/seed.ts"
   },
   "dependencies": {
-    "react-hot-toast": "^2.4.0"
+    "react-hot-toast": "^2.4.0",
+    "next": "13.0.3"
   }
 }
