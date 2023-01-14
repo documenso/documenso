@@ -29,39 +29,39 @@ export default function Signup() {
   };
 
   const signUp: SubmitHandler<FormValues> = async (data) => {
-    const res = await toast.promise(
-      fetch("/api/auth/signup", {
-        body: JSON.stringify({
-          ...data,
-        }),
-        headers: {
-          "Content-Type": "application/json",
-        },
-        method: "POST",
-      })
-        .then(handleErrors)
-        .then(async () => {
-          await signIn<"credentials">("credentials", {
+    const res = await toast
+      .promise(
+        fetch("/api/auth/signup", {
+          body: JSON.stringify({
             ...data,
-            callbackUrl: "https://app.documenso.com/dashboard",
-          });
+          }),
+          headers: {
+            "Content-Type": "application/json",
+          },
+          method: "POST",
         })
-        .catch((err) => {
-          methods.setError("apiError", { message: err.message });
-          // Throw again for toast
-          throw new Error(err.message);
-        }),
-      {
-        loading: "Creating your account...",
-        success: "Done!",
-        error: (err) => err.message,
-      },
-      {
-        style: {
-          minWidth: "200px",
+          .then(handleErrors)
+          .then(async () => {
+            await signIn<"credentials">("credentials", {
+              ...data,
+              callbackUrl: "https://app.documenso.com/dashboard",
+            });
+          }),
+        {
+          loading: "Creating your account...",
+          success: "Done!",
+          error: (err) => err.message,
         },
-      }
-    );
+        {
+          style: {
+            minWidth: "200px",
+          },
+        }
+      )
+      .catch((err) => {
+        toast.dismiss();
+        methods.setError("apiError", { message: err.message });
+      });
   };
 
   function renderApiError() {
