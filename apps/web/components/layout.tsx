@@ -3,6 +3,7 @@ import { Disclosure, Menu, Transition } from "@headlessui/react";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { signOut, useSession } from "next-auth/react";
+import { NEXT_PUBLIC_WEBAPP_URL } from "@documenso/lib/constants";
 
 import Navigation from "./navigation";
 
@@ -16,7 +17,7 @@ function useRedirectToLoginIfUnauthenticated() {
       router.replace({
         pathname: "/login",
         query: {
-          callbackUrl: `https://app.documenso.com/${location.pathname}${location.search}`,
+          callbackUrl: `${NEXT_PUBLIC_WEBAPP_URL}/${location.pathname}${location.search}`,
         },
       });
     }

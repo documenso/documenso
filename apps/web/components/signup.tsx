@@ -1,3 +1,4 @@
+import { NEXT_PUBLIC_WEBAPP_URL } from "@documenso/lib/constants";
 import { XCircleIcon } from "@heroicons/react/24/outline";
 import { signIn } from "next-auth/react";
 import Link from "next/link";
@@ -44,7 +45,7 @@ export default function Signup() {
           .then(async () => {
             await signIn<"credentials">("credentials", {
               ...data,
-              callbackUrl: "https://app.documenso.com/dashboard",
+              callbackUrl: `${NEXT_PUBLIC_WEBAPP_URL}/dashboard`,
             });
           }),
         {

@@ -8,6 +8,7 @@ import { ErrorCode } from "@documenso/lib/auth";
 import { useState } from "react";
 import { useRouter } from "next/router";
 import { toast, Toaster } from "react-hot-toast";
+import { NEXT_PUBLIC_WEBAPP_URL } from "@documenso/lib/constants";
 
 interface LoginValues {
   email: string;
@@ -29,7 +30,9 @@ export default function Login() {
 
   // If not absolute URL, make it absolute
   if (!/^https?:\/\//.test(callbackUrl)) {
-    callbackUrl = `https://app.documenso.com/${callbackUrl}`;
+    if (process.env.NODE_ENV !== "production") {
+    }
+    callbackUrl = `${NEXT_PUBLIC_WEBAPP_URL}/${callbackUrl}`;
   }
 
   const onSubmit = async (values: LoginValues) => {
