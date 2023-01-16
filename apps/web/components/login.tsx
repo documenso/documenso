@@ -44,7 +44,7 @@ export default function Login() {
         redirect: false,
       }),
       {
-        loading: "Loggin in...",
+        loading: "Logging in...",
         success: "Login successful.",
         error: "Could not log in :/",
       },

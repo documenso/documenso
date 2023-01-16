@@ -54,7 +54,7 @@ const userNavigation = [
       const res: any = await toast.promise(
         signOut({ callbackUrl: "/login" }),
         {
-          loading: "Logging out",
+          loading: "Logging out...",
           success: "Your are logged out.",
           error: "Could not log out :/",
         },
