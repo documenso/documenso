@@ -27,9 +27,11 @@
     "next-auth": "^4.18.3",
     "next-transpile-modules": "^10.0.0",
     "npm": "^9.1.3",
+    "placeholder-loading": "^0.6.0",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-hook-form": "^7.41.5",
+    "sass": "^1.57.1",
     "typescript": "4.8.4"
   },
   "devDependencies": {

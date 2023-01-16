@@ -1,4 +1,5 @@
 import "../styles/tailwind.css";
+import "../../../node_modules/placeholder-loading/src/scss/placeholder-loading.scss";
 import { ReactElement, ReactNode } from "react";
 import type { AppProps } from "next/app";
 import { NextPage } from "next";
