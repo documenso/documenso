@@ -115,8 +115,6 @@ export default function Setttings() {
                   </h2>
                   <p className="mt-1 text-sm text-gray-500">
                     Let people know who they are dealing with builds trust.
-                    Leave your profile blank and your email will be used as your
-                    name.
                   </p>
                 </div>
 
