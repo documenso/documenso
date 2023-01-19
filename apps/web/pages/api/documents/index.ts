@@ -6,6 +6,7 @@ import { useSession } from "next-auth/react";
 import { buffer } from "stream/consumers";
 
 async function postHandler(req: NextApiRequest, res: NextApiResponse) {
+  // todo move token validation to import
   const token = await getToken({ req });
   const tokenEmail = token?.email?.toString();
   if (!token) {

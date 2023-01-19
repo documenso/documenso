@@ -86,7 +86,7 @@ export default function TopNavigation() {
 
   const router = useRouter();
   navigation.forEach((element) => {
-    element.current = router.route.startsWith("/" + element.href.split("/")[1]);
+    element.current = router.route.endsWith("/" + element.href.split("/")[1]);
   });
 
   return (

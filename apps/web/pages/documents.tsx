@@ -1,25 +1,11 @@
 import { useSession } from "next-auth/react";
 import type { ReactElement } from "react";
 import Layout from "../components/layout";
-import Settings from "../components/settings";
 import type { NextPageWithLayout } from "./_app";
-import { SessionProvider } from "next-auth/react";
 import Head from "next/head";
 import { PlusIcon } from "@heroicons/react/24/outline";
 
 const DocumentsPage: NextPageWithLayout = () => {
-  const { data: session } = useSession();
-
-  const people = [
-    {
-      name: "NDA acme Corps",
-      title: "✉ Sent",
-      email: "12.01.2023 16:08",
-      role: "",
-    },
-    // More people...
-  ];
-
   return (
     <>
       <Head>
@@ -50,7 +36,7 @@ const DocumentsPage: NextPageWithLayout = () => {
             className="inline-flex items-center rounded-md border border-transparent bg-neon px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
           >
             <PlusIcon className="-ml-1 mr-2 h-5 w-5" aria-hidden="true" />
-            Upload PDF Document
+            Upload Document
           </button>
         </div>
       </div>
