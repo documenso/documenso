@@ -17,7 +17,6 @@
     "seed": "ts-node --transpile-only ./packages/prisma/seed.ts"
   },
   "dependencies": {
-    "react-hot-toast": "^2.4.0",
     "@documenso/prisma": "*",
     "@headlessui/react": "^1.7.4",
     "@heroicons/react": "^2.0.13",
@@ -38,6 +37,10 @@
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-hook-form": "^7.41.5",
+    "react-hot-toast": "^2.4.0",
     "typescript": "4.8.4"
+  },
+  "devDependencies": {
+    "file-loader": "^6.2.0"
   }
 }
