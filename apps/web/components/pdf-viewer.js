@@ -13,26 +13,30 @@ export default function PDFViewer() {
     setNumPages(nextNumPages);
   }
 
+  const options = {
+    cMapUrl: "cmaps/",
+    cMapPacked: true,
+    standardFontDataUrl: "standard_fonts/",
+  };
+
   return (
     <>
-      <div>
-        <div>
-          <label htmlFor="file">Load from file:</label>{" "}
-          <input onChange={onFileChange} type="file" />
-        </div>
-        <div>
-          <Document file={file} onLoadSuccess={onDocumentLoadSuccess}>
-            {Array.from({ length: numPages }, (_, index) => (
-              <Page
-                key={`page_${index + 1}`}
-                pageNumber={index + 1}
-                renderAnnotationLayer={false}
-                renderTextLayer={false}
-              />
-            ))}
-          </Document>
-        </div>
-      </div>
+      <label htmlFor="file">Load from file:</label>{" "}
+      <input onChange={onFileChange} type="file" />
+      <Document
+        file={"/sample.pdf"}
+        onLoadSuccess={onDocumentLoadSuccess}
+        options={options}
+      >
+        {Array.from({ length: numPages }, (_, index) => (
+          <Page
+            key={`page_${index + 1}`}
+            pageNumber={index + 1}
+            renderAnnotationLayer={false}
+            renderTextLayer={false}
+          />
+        ))}
+      </Document>
     </>
   );
 }
