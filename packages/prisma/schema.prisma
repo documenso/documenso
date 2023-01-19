@@ -10,7 +10,7 @@ datasource db {
 model Document {
   id        Int         @id @default(autoincrement())
   userId    Int
-  document  Bytes
+  document  Bytes?
   User      User        @relation(fields: [userId], references: [id], onDelete: Cascade)
   Recipient Recipient[]
 }
