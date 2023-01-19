@@ -1,4 +1,4 @@
-import NextAuth from "next-auth";
+import NextAuth, { Session } from "next-auth";
 import GitHubProvider from "next-auth/providers/github";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { ErrorCode } from "@documenso/lib/auth";
@@ -67,11 +67,29 @@ export default NextAuth({
         }
 
         return {
-          id: user.id.toString(),
+          id: user.id,
           email: user.email,
           name: user.name,
         };
       },
     }),
   ],
+  callbacks: {
+    async jwt({ token, user, account }) {
+      return {
+        ...token,
+      };
+    },
+    async session({ session, token }) {
+      const documensoSession: Session = {
+        ...session,
+        user: {
+          ...session.user,
+        },
+      };
+
+      documensoSession.expires;
+      return documensoSession;
+    },
+  },
 });

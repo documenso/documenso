@@ -16,14 +16,9 @@ import { useRouter } from "next/router";
 import Link from "next/link";
 import Head from "next/head";
 import avatarFromInitials from "avatar-from-initials";
-
-const user = {
-  name: "Debbie Lewis",
-  handle: "deblewis",
-  email: "debbielewis@example.com",
-  imageUrl:
-    "https://images.unsplash.com/photo-1517365830460-955ce3ccd263?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=4&w=320&h=320&q=80",
-};
+import { useSession } from "next-auth/react";
+import { User } from "next-auth";
+import { Value } from "sass";
 
 const subNavigation = [
   {
@@ -52,6 +47,8 @@ function classNames(...classes: any) {
 
 export default function Setttings() {
   const [availableToHire, setAvailableToHire] = useState(true);
+  const session = useSession();
+  let user = session.data?.user;
 
   const router = useRouter();
   subNavigation.forEach((element) => {
@@ -81,7 +78,7 @@ export default function Setttings() {
                     href={item.href}
                     className={classNames(
                       item.current
-                        ? "bg-teal-50 border-teal-500 text-teal-700 hover:bg-teal-50 hover:text-teal-700"
+                        ? "bg-teal-50 border-neon-dark text-teal-700 hover:bg-teal-50 hover:text-teal-700"
                         : "border-transparent text-gray-900 hover:bg-gray-50 hover:text-gray-900",
                       "group border-l-4 px-3 py-2 flex items-center text-sm font-medium"
                     )}
@@ -194,7 +191,8 @@ export default function Setttings() {
                       type="text"
                       name="first-name"
                       id="first-name"
-                      value="Timur Ercan"
+                      value={user?.name || ""}
+                      onChange={() => {}}
                       autoComplete="given-name"
                       className="mt-1 block w-full rounded-md border border-gray-300 py-2 px-3 shadow-sm focus:border-neon focus:outline-none focus:ring-neon sm:text-sm"
                     />
@@ -208,7 +206,7 @@ export default function Setttings() {
                     </label>
                     <input
                       disabled
-                      value={user.email}
+                      value={user?.email}
                       type="text"
                       name="first-name"
                       id="first-name"
