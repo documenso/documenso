@@ -8,7 +8,6 @@ import { toast, Toast, Toaster } from "react-hot-toast";
 import Logo from "./logo";
 
 type FormValues = {
-  username: string;
   email: string;
   password: string;
   apiError: string;

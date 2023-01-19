@@ -206,7 +206,7 @@ export default function Setttings() {
                     </label>
                     <input
                       disabled
-                      value={user?.email}
+                      value={user?.email!}
                       type="text"
                       name="first-name"
                       id="first-name"

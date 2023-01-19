@@ -15,6 +15,5 @@ declare module "next-auth" {
     email_verified?: boolean;
     impersonatedByUID?: number;
     belongsToActiveTeam?: boolean;
-    username?: PrismaUser["username"];
   }
 }

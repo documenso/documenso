@@ -27,7 +27,6 @@ model Recipient {
 
 model User {
   id               Int              @id @default(autoincrement())
-  username         String?          @unique
   name             String?
   email            String           @unique
   emailVerified    DateTime?
