@@ -65,7 +65,7 @@ const DashboardPage: NextPageWithLayout = () => {
             Dashboard
           </h1>
         </header>
-        <dl className="mt-5 grid grid-cols-1 gap-5 sm:grid-cols-3">
+        <dl className="mt-8 grid grid-cols-1 gap-5 sm:grid-cols-3">
           {stats.map((item) => (
             <Link href={item.link} key={item.name}>
               <div className="overflow-hidden rounded-lg bg-white px-4 py-5 shadow sm:p-6">
@@ -105,7 +105,7 @@ const DashboardPage: NextPageWithLayout = () => {
               />
             </svg>
             <span className="mt-2 block text-sm font-medium text-neon">
-              Upload a new document
+              Upload a new PDF document
             </span>
           </button>
           <input id="fileUploadHelper" type="file" hidden />
