@@ -21,22 +21,23 @@ export default function PDFViewer() {
 
   return (
     <>
-      <label htmlFor="file">Load from file:</label>{" "}
-      <input onChange={onFileChange} type="file" />
-      <Document
-        file={"/sample.pdf"}
-        onLoadSuccess={onDocumentLoadSuccess}
-        options={options}
-      >
-        {Array.from({ length: numPages }, (_, index) => (
-          <Page
-            key={`page_${index + 1}`}
-            pageNumber={index + 1}
-            renderAnnotationLayer={false}
-            renderTextLayer={false}
-          />
-        ))}
-      </Document>
+      <div className="">
+        <Document
+          file={"/sample.pdf"}
+          onLoadSuccess={onDocumentLoadSuccess}
+          options={options}
+        >
+          {Array.from({ length: numPages }, (_, index) => (
+            <Page
+              className="mt-5"
+              key={`page_${index + 1}`}
+              pageNumber={index + 1}
+              renderAnnotationLayer={false}
+              renderTextLayer={false}
+            />
+          ))}
+        </Document>
+      </div>
     </>
   );
 }
