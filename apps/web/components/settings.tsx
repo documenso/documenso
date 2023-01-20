@@ -33,12 +33,6 @@ const subNavigation = [
     icon: KeyIcon,
     current: false,
   },
-  {
-    name: "Account",
-    href: "/settings/account",
-    icon: CogIcon,
-    current: false,
-  },
 ];
 
 function classNames(...classes: any) {

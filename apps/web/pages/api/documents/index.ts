@@ -1,9 +1,6 @@
 import { defaultHandler, defaultResponder } from "@documenso/lib/server";
 import prisma from "@documenso/prisma";
 import { NextApiRequest, NextApiResponse } from "next";
-import { getToken } from "next-auth/jwt";
-import { useSession } from "next-auth/react";
-import { buffer } from "stream/consumers";
 import { getUserFromToken } from "@documenso/lib/server";
 
 async function postHandler(req: NextApiRequest, res: NextApiResponse) {
