@@ -196,7 +196,6 @@ export default function TopNavigation() {
                   <Link
                     key={item.name}
                     href={item.href}
-                    as="a"
                     className={classNames(
                       item.current
                         ? "bg-teal-50 border-teal-500 text-teal-700"
