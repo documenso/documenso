@@ -1,9 +1,5 @@
 // POST to create
-import {
-  defaultHandler,
-  defaultResponder,
-  HttpError,
-} from "@documenso/lib/server";
+import { defaultHandler, defaultResponder } from "@documenso/lib/server";
 import prisma from "@documenso/prisma";
 
 import type { NextApiRequest, NextApiResponse } from "next";
