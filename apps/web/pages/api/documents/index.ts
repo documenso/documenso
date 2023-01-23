@@ -3,6 +3,7 @@ import prisma from "@documenso/prisma";
 import { NextApiRequest, NextApiResponse } from "next";
 import { getUserFromToken } from "@documenso/lib/server";
 
+// POST /documents
 async function postHandler(req: NextApiRequest, res: NextApiResponse) {
   let user = await getUserFromToken(req, res);
   if (!user) return;
