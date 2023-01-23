@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Document, Page } from "react-pdf/dist/esm/entry.webpack5";
 
-export default function PDFViewer() {
+export default function PDFViewer(props) {
   const [file, setFile] = useState("./sample.pdf");
   const [numPages, setNumPages] = useState(null);
 
@@ -23,7 +23,7 @@ export default function PDFViewer() {
     <>
       <div className="">
         <Document
-          file={"/sample.pdf"}
+          file={props.pdfUrl}
           onLoadSuccess={onDocumentLoadSuccess}
           options={options}
         >

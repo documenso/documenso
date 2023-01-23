@@ -11,7 +11,7 @@ const PDFViewer = dynamic(() => import("../../components/pdf-viewer"), {
 const DocumentsDetailPage: NextPageWithLayout = () => {
   return (
     <div>
-      <PDFViewer />
+      <PDFViewer pdfUrl={"http://localhost:3000/api/documents/3"} />
     </div>
   );
 };
