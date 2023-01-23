@@ -8,7 +8,6 @@ const nextConfig = {
 
 const withTM = require("next-transpile-modules")([
   "@documenso/prisma",
-  "@documenso/prisma/client",
   "@documenso/lib",
   "@documenso/ui",
 ]);
