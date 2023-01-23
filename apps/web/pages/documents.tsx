@@ -1,17 +1,45 @@
 import { useSession } from "next-auth/react";
-import type { ReactElement } from "react";
+import { ReactElement, useEffect, useState } from "react";
 import Layout from "../components/layout";
 import type { NextPageWithLayout } from "./_app";
 import Head from "next/head";
 import { PlusIcon } from "@heroicons/react/24/outline";
+import { Document as PrismaDocument } from "@prisma/client";
+import { getUserFromToken } from "@documenso/lib/server";
+import Link from "next/link";
 
-const DocumentsPage: NextPageWithLayout = () => {
+const DocumentsPage: NextPageWithLayout = (req, res) => {
+  const [documents = [], setDocuments] = useState([]);
+
+  useEffect(() => {
+    getDocuments();
+  }, []);
+
+  const getDocuments = async () => {
+    fetch("/api/documents", {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }).then((res) => {
+      res.json().then((j) => {
+        setDocuments(j);
+      });
+    });
+  };
+
   return (
     <>
       <Head>
         <title>Documents | Documenso</title>
       </Head>
-      <div className="text-center mt-24" id="empty">
+      {documents.map((item: any) => (
+        <div>
+          <Link key={item.id} href={"/documents/" + item.id} target="_blank">
+            Document Nr.{item.id}
+          </Link>
+        </div>
+      ))}
+      <div className="text-center mt-24" id="empty" hidden>
         <svg
           className="mx-auto h-12 w-12 text-gray-400"
           fill="none"
