@@ -20,21 +20,26 @@ async function postHandler(req: NextApiRequest, res: NextApiResponse) {
   form.parse(req, async (err, fields, files) => {
     if (err) throw err;
 
-    // let uploadedDocument: any = files["document"];
-    // const path = uploadedDocument[0].filepath;
-    // const fs = require("fs");
-    // const buffer = fs.readFileSync(path);
-    // const documentAsBase64EncodedString = buffer.toString("base64");
-
-    const createdDocument = await prisma.$transaction([
-      prisma.document.create({
-        data: {
-          userId: user?.id,
-          document: "sss",
-        },
-      }),
-    ]);
-    return res.status(201).end(createdDocument);
+    let uploadedDocument: any = files["document"];
+    const path = uploadedDocument[0].filepath;
+    const fs = require("fs");
+    const buffer = fs.readFileSync(path);
+    const documentAsBase64EncodedString = buffer.toString("base64");
+    await prisma
+      .$transaction([
+        prisma.document.create({
+          data: {
+            userId: user?.id,
+            document: documentAsBase64EncodedString,
+          },
+        }),
+      ])
+      .then((document) => {
+        return res.status(201).send(document[0].id);
+      })
+      .catch((err) => {
+        throw err;
+      });
   });
 }
 

@@ -68,12 +68,12 @@ const DashboardPage: NextPageWithLayout = () => {
       const response: any = await fetch("/api/documents", {
         method: "POST",
         body,
-      }).then((response: any) => {
-        Router.push(
-          `${NEXT_PUBLIC_WEBAPP_URL}/documents/${
-            response.json().creadtedDocumentId
-          }`
-        );
+      }).then((response: Response) => {
+        response.json().then((createdDocumentIdFromBody) => {
+          Router.push(
+            `${NEXT_PUBLIC_WEBAPP_URL}/documents/${createdDocumentIdFromBody}`
+          );
+        });
       });
     }
   };
