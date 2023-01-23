@@ -8,6 +8,7 @@ import { NextApiRequest, NextApiResponse } from "next";
 import { useRouter } from "next/router";
 import fs from "fs";
 import { buffer } from "stream/consumers";
+import { Document as PrismaDocument } from "@documenso/prisma/client";
 
 async function getHandler(req: NextApiRequest, res: NextApiResponse) {
   const user = getUserFromToken(req, res);
@@ -20,7 +21,7 @@ async function getHandler(req: NextApiRequest, res: NextApiResponse) {
     return;
   }
 
-  const document = await prisma.document.findFirst({
+  const document: PrismaDocument = await prisma.document.findFirst({
     where: {
       id: +documentId,
     },
@@ -28,16 +29,15 @@ async function getHandler(req: NextApiRequest, res: NextApiResponse) {
 
   if (!document)
     res.status(404).end(`No document with id ${documentId} found.`);
-  else {
-    console.log("document: " + document.document);
-    const buffer: Buffer = Buffer.from(document?.document.toString(), "base64");
-    res.setHeader("Content-Type", "application/pdf");
-    res.setHeader("Content-Disposition", "attachment; filename=dummy.pdf");
-    res.setHeader("Content-Length", buffer.length);
 
-    res.status(200).send(buffer);
-    return;
-  }
+  console.log("document: " + document.document);
+  const buffer: Buffer = Buffer.from(document.document.toString(), "base64");
+  res.setHeader("Content-Type", "application/pdf");
+  res.setHeader("Content-Disposition", "attachment; filename=dummy.pdf");
+  res.setHeader("Content-Length", buffer.length);
+
+  res.status(200).send(buffer);
+  return;
 }
 
 export default defaultHandler({
