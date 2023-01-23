@@ -1,6 +1,6 @@
 import { useSession } from "next-auth/react";
 import Head from "next/head";
-import type { ReactElement } from "react";
+import { ReactElement, useEffect, useState } from "react";
 import Layout from "../components/layout";
 import Settings from "../components/settings";
 import Link from "next/link";
@@ -13,9 +13,15 @@ import {
   SunIcon,
   XCircleIcon,
 } from "@heroicons/react/24/outline";
+import { FormProvider, useForm } from "react-hook-form";
+import Router from "next/router";
+import { NEXT_PUBLIC_WEBAPP_URL } from "@documenso/lib";
+
+type FormValues = {
+  document: File;
+};
 
 const DashboardPage: NextPageWithLayout = () => {
-  const status = useSession();
   const stats = [
     {
       name: "Draft",
@@ -54,6 +60,24 @@ const DashboardPage: NextPageWithLayout = () => {
       link: "/documents?filter=",
     },
   ];
+  const uploadToServer = async (event: any) => {
+    if (event.target.files && event.target.files[0]) {
+      const body = new FormData();
+      const document = event.target.files[0];
+      body.append("document", document || "");
+      const response: any = await fetch("/api/documents", {
+        method: "POST",
+        body,
+      }).then((response: any) => {
+        Router.push(
+          `${NEXT_PUBLIC_WEBAPP_URL}/documents/${
+            response.json().creadtedDocumentId
+          }`
+        );
+      });
+    }
+  };
+
   return (
     <>
       <Head>
@@ -108,7 +132,14 @@ const DashboardPage: NextPageWithLayout = () => {
               Upload a new PDF document
             </span>
           </button>
-          <input id="fileUploadHelper" type="file" hidden />
+          <input
+            id="fileUploadHelper"
+            type="file"
+            onChange={(event: any) => {
+              uploadToServer(event);
+            }}
+            hidden
+          />
         </div>
       </div>
     </>
