@@ -41,10 +41,60 @@ export default function PDFViewer(props) {
           ))}
         </Document>
       </div>
-      <div className="mt-10" hidden={!loading}>
+      <div className="mt-10 w-[600px]" hidden={!loading}>
         <div className="ph-item">
           <div className="ph-col-12">
             <div className="ph-picture"></div>
+            <div className="ph-row">
+              <div className="ph-col-6 big"></div>
+              <div className="ph-col-4 empty big"></div>
+              <div className="ph-col-2 big"></div>
+              <div className="ph-col-4"></div>
+              <div className="ph-col-8 empty"></div>
+              <div className="ph-col-6"></div>
+              <div className="ph-col-6 empty"></div>
+              <div className="ph-col-12"></div>
+            </div>
+            <div className="ph-row">
+              <div className="ph-col-6 big"></div>
+              <div className="ph-col-4 empty big"></div>
+              <div className="ph-col-2 big"></div>
+              <div className="ph-col-4"></div>
+              <div className="ph-col-8 empty"></div>
+              <div className="ph-col-6"></div>
+              <div className="ph-col-6 empty"></div>
+              <div className="ph-col-12"></div>
+            </div>
+            <div className="ph-row">
+              <div className="ph-col-6 big"></div>
+              <div className="ph-col-4 empty big"></div>
+              <div className="ph-col-2 big"></div>
+              <div className="ph-col-4"></div>
+              <div className="ph-col-8 empty"></div>
+              <div className="ph-col-6"></div>
+              <div className="ph-col-6 empty"></div>
+              <div className="ph-col-12"></div>
+            </div>
+            <div className="ph-row">
+              <div className="ph-col-6 big"></div>
+              <div className="ph-col-4 empty big"></div>
+              <div className="ph-col-2 big"></div>
+              <div className="ph-col-4"></div>
+              <div className="ph-col-8 empty"></div>
+              <div className="ph-col-6"></div>
+              <div className="ph-col-6 empty"></div>
+              <div className="ph-col-12"></div>
+            </div>
+            <div className="ph-row">
+              <div className="ph-col-6 big"></div>
+              <div className="ph-col-4 empty big"></div>
+              <div className="ph-col-2 big"></div>
+              <div className="ph-col-4"></div>
+              <div className="ph-col-8 empty"></div>
+              <div className="ph-col-6"></div>
+              <div className="ph-col-6 empty"></div>
+              <div className="ph-col-12"></div>
+            </div>
             <div className="ph-row">
               <div className="ph-col-6 big"></div>
               <div className="ph-col-4 empty big"></div>
