@@ -13,13 +13,15 @@ import toast from "react-hot-toast";
 
 const DocumentsPage: NextPageWithLayout = (req, res) => {
   const router = useRouter();
-  const [documents, setDocuments] = useState([]);
+  const [documents = [], setDocuments] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     getDocuments();
-  });
+  }, []);
 
   const getDocuments = async () => {
+    setLoading(true);
     fetch("/api/documents", {
       headers: {
         "Content-Type": "application/json",
@@ -27,6 +29,7 @@ const DocumentsPage: NextPageWithLayout = (req, res) => {
     }).then((res) => {
       res.json().then((j) => {
         setDocuments(j);
+        setLoading(false);
       });
     });
   };
@@ -67,7 +70,27 @@ const DocumentsPage: NextPageWithLayout = (req, res) => {
       <Head>
         <title>Documents | Documenso</title>
       </Head>
-      <div className="px-4 sm:px-6 lg:px-8" hidden={!documents.length}>
+      <div className="mt-10" hidden={!loading}>
+        <div className="ph-item">
+          <div className="ph-col-12">
+            <div className="ph-picture"></div>
+            <div className="ph-row">
+              <div className="ph-col-6 big"></div>
+              <div className="ph-col-4 empty big"></div>
+              <div className="ph-col-2 big"></div>
+              <div className="ph-col-4"></div>
+              <div className="ph-col-8 empty"></div>
+              <div className="ph-col-6"></div>
+              <div className="ph-col-6 empty"></div>
+              <div className="ph-col-12"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div
+        className="px-4 sm:px-6 lg:px-8"
+        hidden={!documents.length || loading}
+      >
         <div className="sm:flex sm:items-center mt-10">
           <div className="sm:flex-auto">
             <header>
@@ -176,7 +199,7 @@ const DocumentsPage: NextPageWithLayout = (req, res) => {
       <div
         className="text-center mt-24"
         id="empty"
-        hidden={documents.length > 0}
+        hidden={documents.length > 0 || loading}
       >
         <svg
           className="mx-auto h-12 w-12 text-gray-400"
