@@ -40,6 +40,29 @@ async function getHandler(req: NextApiRequest, res: NextApiResponse) {
   return;
 }
 
+async function deleteHandler(req: NextApiRequest, res: NextApiResponse) {
+  const user = getUserFromToken(req, res);
+  const { id: documentId } = req.query;
+
+  if (!user) return;
+
+  if (!documentId) {
+    res.status(400).send("Missing parameter documentId.");
+    return;
+  }
+
+  await prisma.document
+    .delete({
+      where: {
+        id: +documentId,
+      },
+    })
+    .then(() => {
+      res.status(200).end();
+    });
+}
+
 export default defaultHandler({
   GET: Promise.resolve({ default: defaultResponder(getHandler) }),
+  DELETE: Promise.resolve({ default: defaultResponder(deleteHandler) }),
 });
