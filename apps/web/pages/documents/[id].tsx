@@ -14,7 +14,7 @@ const DocumentsDetailPage: NextPageWithLayout = () => {
   const router = useRouter();
 
   return (
-    <div>
+    <div className="mx-auto w-fit">
       <PDFViewer
         pdfUrl={`${NEXT_PUBLIC_WEBAPP_URL}/api/documents/${router.query.id}`}
       />
