@@ -40,7 +40,6 @@ function classNames(...classes: any) {
 }
 
 export default function Setttings() {
-  const [availableToHire, setAvailableToHire] = useState(true);
   const session = useSession();
   let user = session.data?.user;
 
