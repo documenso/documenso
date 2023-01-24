@@ -70,27 +70,7 @@ const DocumentsPage: NextPageWithLayout = (req, res) => {
       <Head>
         <title>Documents | Documenso</title>
       </Head>
-      <div className="mt-10" hidden={!loading}>
-        <div className="ph-item">
-          <div className="ph-col-12">
-            <div className="ph-picture"></div>
-            <div className="ph-row">
-              <div className="ph-col-6 big"></div>
-              <div className="ph-col-4 empty big"></div>
-              <div className="ph-col-2 big"></div>
-              <div className="ph-col-4"></div>
-              <div className="ph-col-8 empty"></div>
-              <div className="ph-col-6"></div>
-              <div className="ph-col-6 empty"></div>
-              <div className="ph-col-12"></div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div
-        className="px-4 sm:px-6 lg:px-8"
-        hidden={!documents.length || loading}
-      >
+      <div className="px-4 sm:px-6 lg:px-8">
         <div className="sm:flex sm:items-center mt-10">
           <div className="sm:flex-auto">
             <header>
@@ -111,8 +91,31 @@ const DocumentsPage: NextPageWithLayout = (req, res) => {
             </button>
           </div>
         </div>
-        <div className="mt-8 flex flex-col">
-          <div className="-my-2 -mx-4 overflow-x-auto sm:-mx-6 lg:-mx-8">
+        <div className="mt-10 max-w-[1100px]" hidden={!loading}>
+          <div className="ph-item">
+            <div className="ph-col-12">
+              <div className="ph-picture"></div>
+              <div className="ph-row">
+                <div className="ph-col-6 big"></div>
+                <div className="ph-col-4 empty big"></div>
+                <div className="ph-col-2 big"></div>
+                <div className="ph-col-4"></div>
+                <div className="ph-col-8 empty"></div>
+                <div className="ph-col-6"></div>
+                <div className="ph-col-6 empty"></div>
+                <div className="ph-col-12"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div
+          className="mt-8 flex flex-col"
+          hidden={!documents.length || loading}
+        >
+          <div
+            className="-my-2 -mx-4 overflow-x-auto sm:-mx-6 lg:-mx-8"
+            hidden={!documents.length || loading}
+          >
             <div className="inline-block min-w-full py-2 align-middle md:px-6 lg:px-8">
               <div className="overflow-hidden shadow ring-1 ring-black ring-opacity-5 md:rounded-lg">
                 <table className="min-w-full divide-y divide-gray-300">
