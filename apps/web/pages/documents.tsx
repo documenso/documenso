@@ -21,7 +21,7 @@ const DocumentsPage: NextPageWithLayout = (req, res) => {
   }, []);
 
   const getDocuments = async () => {
-    setLoading(true);
+    if (!documents.length) setLoading(true);
     fetch("/api/documents", {
       headers: {
         "Content-Type": "application/json",
