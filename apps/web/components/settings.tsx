@@ -1,24 +1,9 @@
-import { ChangeEvent, Fragment, useEffect, useState } from "react";
-import { Disclosure, Menu, Switch, Transition } from "@headlessui/react";
-import { MagnifyingGlassIcon } from "@heroicons/react/20/solid";
-import {
-  Bars3Icon,
-  BellIcon,
-  CogIcon,
-  CreditCardIcon,
-  KeyIcon,
-  SquaresPlusIcon,
-  UserCircleIcon,
-  XMarkIcon,
-  UsersIcon,
-} from "@heroicons/react/24/outline";
+import { ChangeEvent, useEffect, useState } from "react";
+import { KeyIcon, UserCircleIcon } from "@heroicons/react/24/outline";
 import { useRouter } from "next/router";
 import Link from "next/link";
 import Head from "next/head";
-import avatarFromInitials from "avatar-from-initials";
 import { useSession } from "next-auth/react";
-import { User } from "next-auth";
-import { Value } from "sass";
 import { updateUser } from "@documenso/features";
 
 const subNavigation = [
@@ -189,6 +174,23 @@ export default function Setttings() {
                 </div>
               </div>
             </form>
+          </div>
+        </div>
+      </div>
+      <div className="mt-10 max-w-[1100px]" hidden={!!user.email}>
+        <div className="ph-item">
+          <div className="ph-col-12">
+            <div className="ph-picture"></div>
+            <div className="ph-row">
+              <div className="ph-col-6 big"></div>
+              <div className="ph-col-4 empty big"></div>
+              <div className="ph-col-2 big"></div>
+              <div className="ph-col-4"></div>
+              <div className="ph-col-8 empty"></div>
+              <div className="ph-col-6"></div>
+              <div className="ph-col-6 empty"></div>
+              <div className="ph-col-12"></div>
+            </div>
           </div>
         </div>
       </div>
