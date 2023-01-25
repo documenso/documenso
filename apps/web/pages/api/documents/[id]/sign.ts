@@ -7,7 +7,7 @@ import prisma from "@documenso/prisma";
 import { NextApiRequest, NextApiResponse } from "next";
 
 async function postHandler(req: NextApiRequest, res: NextApiResponse) {
-  const user = getUserFromToken(req, res);
+  const user = await getUserFromToken(req, res);
   const { id: documentId } = req.query;
   if (!user) return;
 
