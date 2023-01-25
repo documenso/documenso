@@ -1,4 +1,4 @@
-import { Fragment, useEffect } from "react";
+import { Fragment, useEffect, useState } from "react";
 import { Disclosure, Menu, Transition } from "@headlessui/react";
 import Link from "next/link";
 import { useRouter } from "next/router";
@@ -17,13 +17,6 @@ import {
   WrenchIcon,
 } from "@heroicons/react/24/outline";
 import Logo from "./logo";
-
-let user: {
-  id?: number | undefined;
-  name?: string | null;
-  email?: string | null;
-  image?: string | null;
-};
 
 const navigation = [
   {
@@ -77,12 +70,20 @@ function classNames(...classes: any) {
   return classes.filter(Boolean).join(" ");
 }
 
+type UserType = {
+  id?: number | undefined;
+  name?: string | null;
+  email?: string | null;
+  image?: string | null;
+};
+
 export default function TopNavigation() {
+  const [user, setUser] = useState<UserType>();
   const session = useSession();
 
   useEffect(() => {
-    user = { ...session.data?.user };
-  });
+    setUser(session.data?.user);
+  }, [session]);
 
   const router = useRouter();
   navigation.forEach((element) => {
