@@ -11,7 +11,7 @@ import { buffer } from "stream/consumers";
 import { Document as PrismaDocument } from "@prisma/client";
 
 async function getHandler(req: NextApiRequest, res: NextApiResponse) {
-  const user = getUserFromToken(req, res);
+  const user = await getUserFromToken(req, res);
   const { id: documentId } = req.query;
 
   if (!user) return;
@@ -40,7 +40,7 @@ async function getHandler(req: NextApiRequest, res: NextApiResponse) {
 }
 
 async function deleteHandler(req: NextApiRequest, res: NextApiResponse) {
-  const user = getUserFromToken(req, res);
+  const user = await getUserFromToken(req, res);
   const { id: documentId } = req.query;
 
   if (!user) return;
