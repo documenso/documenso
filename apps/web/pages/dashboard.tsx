@@ -17,6 +17,7 @@ import { FormProvider, useForm } from "react-hook-form";
 import Router from "next/router";
 import { NEXT_PUBLIC_WEBAPP_URL } from "@documenso/lib";
 import toast from "react-hot-toast";
+import { uploadDocument } from "@documenso/features";
 
 type FormValues = {
   document: File;
@@ -62,33 +63,6 @@ const DashboardPage: NextPageWithLayout = () => {
     },
   ];
 
-  const uploadToServer = async (event: any) => {
-    if (event.target.files && event.target.files[0]) {
-      const body = new FormData();
-      const document = event.target.files[0];
-      body.append("document", document || "");
-      const response: any = await toast
-        .promise(
-          fetch("/api/documents", {
-            method: "POST",
-            body,
-          }),
-          {
-            loading: "Uploading document...",
-            success: "Document uploaded successfully.",
-            error: "Could not upload document :/",
-          }
-        )
-        .then((response: Response) => {
-          response.json().then((createdDocumentIdFromBody) => {
-            Router.push(
-              `${NEXT_PUBLIC_WEBAPP_URL}/documents/${createdDocumentIdFromBody}`
-            );
-          });
-        });
-    }
-  };
-
   return (
     <>
       <Head>
@@ -123,7 +97,7 @@ const DashboardPage: NextPageWithLayout = () => {
             id="fileUploadHelper"
             type="file"
             onChange={(event: any) => {
-              uploadToServer(event);
+              uploadDocument(event);
             }}
             hidden
           />

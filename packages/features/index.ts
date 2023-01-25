@@ -1,0 +1,1 @@
+export { uploadDocument } from "./uploadDocument";

@@ -20,7 +20,8 @@ async function postHandler(req: NextApiRequest, res: NextApiResponse) {
   form.parse(req, async (err, fields, files) => {
     if (err) throw err;
 
-    let uploadedDocument: any = files["document"];
+    const uploadedDocument: any = files["document"];
+    const title = uploadedDocument[0].originalFilename;
     const path = uploadedDocument[0].filepath;
     const fs = require("fs");
     const buffer = fs.readFileSync(path);
@@ -29,6 +30,7 @@ async function postHandler(req: NextApiRequest, res: NextApiResponse) {
       .$transaction([
         prisma.document.create({
           data: {
+            title: title,
             userId: user?.id,
             document: documentAsBase64EncodedString,
           },
@@ -49,8 +51,13 @@ async function getHandler(req: NextApiRequest, res: NextApiResponse) {
 
   return res.status(200).json(
     await prisma.document.findMany({
-      where: { userId: user?.id },
-      select: { id: true },
+      where: {
+        userId: user?.id,
+      },
+      select: {
+        id: true,
+        title: true,
+      },
     })
   );
 }

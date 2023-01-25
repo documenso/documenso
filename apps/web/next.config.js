@@ -10,6 +10,7 @@ const withTM = require("next-transpile-modules")([
   "@documenso/prisma",
   "@documenso/lib",
   "@documenso/ui",
+  "@documenso/features",
 ]);
 const plugins = [];
 plugins.push(withTM);

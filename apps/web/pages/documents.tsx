@@ -4,12 +4,9 @@ import Layout from "../components/layout";
 import type { NextPageWithLayout } from "./_app";
 import Head from "next/head";
 import { PlusIcon, TrashIcon } from "@heroicons/react/24/outline";
-import { Document as PrismaDocument } from "@prisma/client";
-import { getUserFromToken } from "@documenso/lib/server";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { NEXT_PUBLIC_WEBAPP_URL } from "@documenso/lib/constants";
-import toast from "react-hot-toast";
+import { uploadDocument } from "@documenso/features";
 
 const DocumentsPage: NextPageWithLayout = (req, res) => {
   const router = useRouter();
@@ -37,33 +34,6 @@ const DocumentsPage: NextPageWithLayout = (req, res) => {
   function showDocument(documentId: number) {
     router.push("/documents/" + documentId);
   }
-
-  const uploadToServer = async (event: any) => {
-    if (event.target.files && event.target.files[0]) {
-      const body = new FormData();
-      const document = event.target.files[0];
-      body.append("document", document || "");
-      const response: any = await toast
-        .promise(
-          fetch("/api/documents", {
-            method: "POST",
-            body,
-          }),
-          {
-            loading: "Uploading document...",
-            success: "Document uploaded successfully.",
-            error: "Could not upload document :/",
-          }
-        )
-        .then((response: Response) => {
-          response.json().then((createdDocumentIdFromBody) => {
-            router.push(
-              `${NEXT_PUBLIC_WEBAPP_URL}/documents/${createdDocumentIdFromBody}`
-            );
-          });
-        });
-    }
-  };
 
   return (
     <>
@@ -237,7 +207,7 @@ const DocumentsPage: NextPageWithLayout = (req, res) => {
             id="fileUploadHelper"
             type="file"
             onChange={(event: any) => {
-              uploadToServer(event);
+              uploadDocument(event);
             }}
             hidden
           />
