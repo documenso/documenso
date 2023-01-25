@@ -30,7 +30,6 @@ async function getHandler(req: NextApiRequest, res: NextApiResponse) {
   if (!document)
     res.status(404).end(`No document with id ${documentId} found.`);
 
-  console.log("document: " + document?.document);
   const buffer: Buffer = Buffer.from(document.document.toString(), "base64");
   res.setHeader("Content-Type", "application/pdf");
   res.setHeader("Content-Disposition", "attachment; filename=dummy.pdf");
