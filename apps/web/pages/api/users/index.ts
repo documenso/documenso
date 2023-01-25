@@ -1,9 +1,11 @@
-// POST to create
-import { defaultHandler, defaultResponder } from "@documenso/lib/server";
+import {
+  defaultHandler,
+  defaultResponder,
+  getUserFromToken,
+} from "@documenso/lib/server";
 import prisma from "@documenso/prisma";
 
 import type { NextApiRequest, NextApiResponse } from "next";
-import { json } from "stream/consumers";
 
 async function postHandler(req: NextApiRequest, res: NextApiResponse) {
   const { method, body } = req;
@@ -22,6 +24,27 @@ async function postHandler(req: NextApiRequest, res: NextApiResponse) {
     });
 }
 
+async function patchHandler(req: NextApiRequest, res: NextApiResponse) {
+  const user = await getUserFromToken(req, res);
+  if (!user) return;
+
+  const updatedUser = req.body;
+  console.log(updatedUser);
+  await prisma.user
+    .update({
+      where: {
+        id: user.id,
+      },
+      data: {
+        name: updatedUser.name,
+      },
+    })
+    .then(() => {
+      return res.status(200).end();
+    });
+}
+
 export default defaultHandler({
   POST: Promise.resolve({ default: defaultResponder(postHandler) }),
+  PATCH: Promise.resolve({ default: defaultResponder(patchHandler) }),
 });
