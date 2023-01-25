@@ -78,14 +78,21 @@ type UserType = {
 };
 
 export default function TopNavigation() {
-  const [user, setUser] = useState<UserType>();
+  const router = useRouter();
   const session = useSession();
+  const [user, setUser] = useState({
+    email: "",
+    name: "",
+  });
 
   useEffect(() => {
-    setUser(session.data?.user);
-  }, [session]);
+    fetch("/api/users/me").then((res) => {
+      res.json().then((j) => {
+        setUser(j);
+      });
+    });
+  }, [session, user]);
 
-  const router = useRouter();
   navigation.forEach((element) => {
     element.current = router.route.endsWith("/" + element.href.split("/")[1]);
   });

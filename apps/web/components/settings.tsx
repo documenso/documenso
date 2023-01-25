@@ -1,4 +1,4 @@
-import { Fragment, useState } from "react";
+import { ChangeEvent, Fragment, useEffect, useState } from "react";
 import { Disclosure, Menu, Switch, Transition } from "@headlessui/react";
 import { MagnifyingGlassIcon } from "@heroicons/react/20/solid";
 import {
@@ -19,6 +19,7 @@ import avatarFromInitials from "avatar-from-initials";
 import { useSession } from "next-auth/react";
 import { User } from "next-auth";
 import { Value } from "sass";
+import { updateUser } from "@documenso/features";
 
 const subNavigation = [
   {
@@ -41,12 +42,43 @@ function classNames(...classes: any) {
 
 export default function Setttings() {
   const session = useSession();
-  let user = session.data?.user;
+  const [user, setUser] = useState({
+    email: "",
+    name: "",
+  });
+
+  useEffect(() => {
+    fetch("/api/users/me").then((res) => {
+      res.json().then((j) => {
+        setUser(j);
+      });
+    });
+  }, [session]);
 
   const router = useRouter();
   subNavigation.forEach((element) => {
     element.current = element.href == router.route;
   });
+
+  const [savingTimeout, setSavingTimeout] = useState<any>();
+  function handleNameChange(e: ChangeEvent<HTMLInputElement>): void {
+    let u = { ...user };
+    u.name = e.target.value;
+    setUser(u);
+    clearTimeout(savingTimeout);
+    const t = setTimeout(() => {
+      updateUser(u);
+    }, 1000);
+
+    setSavingTimeout(t);
+  }
+
+  const handleKeyPress = (event: any) => {
+    if (event.key === "Enter") {
+      clearTimeout(savingTimeout);
+      updateUser(user);
+    }
+  };
 
   return (
     <div>
@@ -60,7 +92,10 @@ export default function Setttings() {
           </h1>
         </div>
       </header>
-      <div className="mx-auto max-w-screen-xl px-4 pb-6 sm:px-6 lg:px-8 lg:pb-16">
+      <div
+        className="mx-auto max-w-screen-xl px-4 pb-6 sm:px-6 lg:px-8 lg:pb-16"
+        hidden={!user.email}
+      >
         <div className="overflow-hidden rounded-lg bg-white shadow">
           <div className="divide-y divide-gray-200 lg:grid lg:grid-cols-12 lg:divide-y-0 lg:divide-x">
             <aside className="py-6 lg:col-span-3">
@@ -121,7 +156,8 @@ export default function Setttings() {
                       name="first-name"
                       id="first-name"
                       value={user?.name || ""}
-                      onChange={() => {}}
+                      onChange={(e) => handleNameChange(e)}
+                      onKeyDown={handleKeyPress}
                       autoComplete="given-name"
                       className="mt-1 block w-full rounded-md border border-gray-300 py-2 px-3 shadow-sm focus:border-neon focus:outline-none focus:ring-neon sm:text-sm"
                     />
@@ -143,6 +179,13 @@ export default function Setttings() {
                       className="mt-1 block w-full rounded-md border border-gray-300 py-2 px-3 shadow-sm focus:border-neon focus:outline-none focus:ring-neon sm:text-sm"
                     />
                   </div>
+                  <button
+                    type="button"
+                    onClick={() => updateUser(user)}
+                    className="inline-flex items-center justify-center rounded-md border border-transparent bg-neon px-10 py-2 text-sm font-medium text-white shadow-sm hover:bg-neon-dark focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 sm:w-auto"
+                  >
+                    Save
+                  </button>
                 </div>
               </div>
             </form>
