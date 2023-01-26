@@ -91,7 +91,7 @@ export default function TopNavigation() {
         setUser(j);
       });
     });
-  }, [session, user]);
+  }, [session]);
 
   navigation.forEach((element) => {
     element.current = router.route.endsWith("/" + element.href.split("/")[1]);
