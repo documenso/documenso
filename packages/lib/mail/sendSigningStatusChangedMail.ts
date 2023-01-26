@@ -1,2 +1,0 @@
-// nodemailer
-// sendgrid
