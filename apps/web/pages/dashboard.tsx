@@ -18,12 +18,20 @@ import Router from "next/router";
 import { NEXT_PUBLIC_WEBAPP_URL } from "@documenso/lib";
 import toast from "react-hot-toast";
 import { uploadDocument } from "@documenso/features";
+import prisma from "@documenso/prisma";
+import {
+  ReadStatus,
+  SendStatus,
+  SigningStatus,
+  DocumentStatus,
+} from "@prisma/client";
+import { getUserFromToken } from "@documenso/lib/server";
 
 type FormValues = {
   document: File;
 };
 
-const DashboardPage: NextPageWithLayout = () => {
+const DashboardPage: NextPageWithLayout = (props: any) => {
   const stats = [
     {
       name: "Draft",
@@ -86,7 +94,7 @@ const DashboardPage: NextPageWithLayout = () => {
                   {item.name}
                 </dt>
                 <dd className="mt-1 text-3xl font-semibold tracking-tight text-gray-900">
-                  {item.stat}
+                  {getStat(item.name, props)}
                 </dd>
               </div>
             </Link>
@@ -135,5 +143,57 @@ const DashboardPage: NextPageWithLayout = () => {
 DashboardPage.getLayout = function getLayout(page: ReactElement) {
   return <Layout>{page}</Layout>;
 };
+
+function getStat(name: string, props: any) {
+  if (name === "Draft") return props.dashboard.drafts;
+  if (name === "Sent") return props.dashboard.sent;
+  if (name === "Viewed") return props.dashboard.viewed;
+  if (name === "Signed") return props.dashboard.signed;
+  return 0;
+}
+
+export async function getServerSideProps(context: any) {
+  const user = await getUserFromToken(context.req, context.res);
+  if (!user) return;
+
+  const drafts = await prisma.document.findMany({
+    where: {
+      userId: user.id,
+      status: DocumentStatus.DRAFT,
+    },
+  });
+
+  const sent = await prisma.recipient.groupBy({
+    by: ["documentId"],
+    where: {
+      sendStatus: SendStatus.SENT,
+    },
+  });
+
+  const opened = await prisma.recipient.groupBy({
+    by: ["documentId"],
+    where: {
+      readStatus: ReadStatus.OPENED,
+    },
+  });
+
+  const completed = await prisma.document.findMany({
+    where: {
+      userId: user.id,
+      status: DocumentStatus.COMPLETED,
+    },
+  });
+
+  return {
+    props: {
+      dashboard: {
+        drafts: drafts.length,
+        sent: sent.length,
+        viewed: opened.length,
+        signed: completed.length,
+      },
+    },
+  };
+}
 
 export default DashboardPage;

@@ -5,7 +5,7 @@ import {
 } from "@documenso/lib/server";
 import prisma from "@documenso/prisma";
 import { NextApiRequest, NextApiResponse } from "next";
-import { SigningStatus } from "@prisma/client";
+import { SigningStatus, DocumentStatus } from "@prisma/client";
 
 async function postHandler(req: NextApiRequest, res: NextApiResponse) {
   const existingUser = await getUserFromToken(req, res);
@@ -33,7 +33,24 @@ async function postHandler(req: NextApiRequest, res: NextApiResponse) {
 
   if (!document) res.status(404).end(`No document found.`);
 
-  // todo sign ui
+  // todo sign stuff
+
+  const unsignedRecipients = await prisma.recipient.findMany({
+    where: {
+      signingStatus: SigningStatus.NOT_SIGNED,
+    },
+  });
+
+  if (unsignedRecipients.length === 0) {
+    await prisma.document.update({
+      where: {
+        id: recipient.documentId,
+      },
+      data: {
+        status: DocumentStatus.COMPLETED,
+      },
+    });
+  }
 
   await prisma.recipient.update({
     where: {

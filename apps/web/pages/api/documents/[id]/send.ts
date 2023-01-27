@@ -39,18 +39,14 @@ async function postHandler(req: NextApiRequest, res: NextApiResponse) {
   // todo handle sending to single recipient even though more exist
 
   const recipients = prisma.recipient.findMany({
-    where: { documentId: +documentId },
+    where: {
+      documentId: +documentId,
+      sendStatus: SendStatus.NOT_SENT,
+    },
   });
 
   (await recipients).forEach(async (recipient) => {
     await sendSigningRequestMail(recipient, document);
-    await prisma.recipient.updateMany({
-      where: {
-        id: recipient.id,
-        sendStatus: SendStatus.NOT_SENT,
-      },
-      data: { sendStatus: SendStatus.SENT },
-    });
   });
 
   return res.status(200).end();

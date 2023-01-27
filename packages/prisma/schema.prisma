@@ -8,10 +8,11 @@ datasource db {
 }
 
 model Document {
-  id        Int         @id @default(autoincrement())
+  id        Int            @id @default(autoincrement())
   userId    Int
-  User      User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  User      User           @relation(fields: [userId], references: [id], onDelete: Cascade)
   title     String
+  status    DocumentStatus @default(DRAFT)
   document  String
   Recipient Recipient[]
 }
@@ -84,4 +85,10 @@ enum SendStatus {
 enum SigningStatus {
   NOT_SIGNED
   SIGNED
+}
+
+enum DocumentStatus {
+  DRAFT
+  PENDING
+  COMPLETED
 }
