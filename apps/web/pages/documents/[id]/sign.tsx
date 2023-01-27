@@ -1,8 +1,11 @@
+import prisma from "@documenso/prisma";
 import Head from "next/head";
 import { ReactElement } from "react";
 import Layout from "../../../components/layout";
 import Logo from "../../../components/logo";
 import { NextPageWithLayout } from "../../_app";
+import { Router } from "next/router";
+import { ReadStatus } from "@prisma/client";
 
 const SignPage: NextPageWithLayout = () => {
   return (
@@ -18,5 +21,22 @@ const SignPage: NextPageWithLayout = () => {
 SignPage.getLayout = function getLayout(page: ReactElement) {
   return <Layout>{page}</Layout>;
 };
+
+export async function getServerSideProps(context: any) {
+  const recipientToken: string = context.query["token"];
+
+  await prisma.recipient.updateMany({
+    where: {
+      token: recipientToken,
+    },
+    data: {
+      readStatus: ReadStatus.OPENED,
+    },
+  });
+
+  return {
+    props: {},
+  };
+}
 
 export default SignPage;
