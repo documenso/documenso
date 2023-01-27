@@ -163,6 +163,8 @@ export async function getServerSideProps(context: any) {
     },
   });
 
+  // todo optimize querys
+
   const sent = await prisma.recipient.groupBy({
     by: ["documentId"],
     where: {
