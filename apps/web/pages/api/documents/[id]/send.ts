@@ -49,6 +49,7 @@ async function postHandler(req: NextApiRequest, res: NextApiResponse) {
     await sendSigningRequestMail(recipient, document);
   });
 
+  // todo way better error handling
   return res.status(200).end();
 }
 

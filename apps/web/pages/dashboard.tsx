@@ -24,6 +24,7 @@ import {
   SendStatus,
   SigningStatus,
   DocumentStatus,
+  Document as PrismaDocument,
 } from "@prisma/client";
 import { getUserFromToken } from "@documenso/lib/server";
 
@@ -156,33 +157,36 @@ export async function getServerSideProps(context: any) {
   const user = await getUserFromToken(context.req, context.res);
   if (!user) return;
 
-  const drafts = await prisma.document.findMany({
+  // todo optimize querys
+  // todo no intersection groups
+
+  const documents: PrismaDocument[] = await prisma.document.findMany({
     where: {
       userId: user.id,
-      status: DocumentStatus.DRAFT,
     },
   });
 
-  // todo optimize querys
+  const drafts: PrismaDocument[] = documents.filter(
+    (d) => d.status === DocumentStatus.DRAFT
+  );
+
+  const completed: PrismaDocument[] = documents.filter(
+    (d) => d.status === DocumentStatus.COMPLETED
+  );
 
   const sent = await prisma.recipient.groupBy({
     by: ["documentId"],
     where: {
       sendStatus: SendStatus.SENT,
+      readStatus: ReadStatus.NOT_OPENED,
     },
   });
 
   const opened = await prisma.recipient.groupBy({
     by: ["documentId"],
     where: {
+      sendStatus: SendStatus.SENT,
       readStatus: ReadStatus.OPENED,
-    },
-  });
-
-  const completed = await prisma.document.findMany({
-    where: {
-      userId: user.id,
-      status: DocumentStatus.COMPLETED,
     },
   });
 
