@@ -19,9 +19,17 @@ async function postHandler(req: NextApiRequest, res: NextApiResponse) {
     return;
   }
 
-  let document = await prisma.document.findFirst({
+  const document = await prisma.document.findFirstOrThrow({
     where: {
       id: +documentId,
+    },
+    include: {
+      User: {
+        select: {
+          name: true,
+        },
+      },
+      Recipient: true,
     },
   });
 
@@ -35,14 +43,17 @@ async function postHandler(req: NextApiRequest, res: NextApiResponse) {
   });
 
   (await recipients).forEach(async (recipient) => {
-    sendSigningRequestMail(recipient, document);
-    await prisma.recipient.update({
-      where: { id: recipient.id },
+    await sendSigningRequestMail(recipient, document);
+    await prisma.recipient.updateMany({
+      where: {
+        id: recipient.id,
+        sendStatus: SendStatus.NOT_SENT,
+      },
       data: { sendStatus: SendStatus.SENT },
     });
   });
 
-  res.status(200);
+  return res.status(200).end();
 }
 
 export default defaultHandler({

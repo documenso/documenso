@@ -16,7 +16,7 @@ export const sendMail = async (
   );
 
   await transport.sendMail({
-    from: process.env.SENDGRID_API_KEY,
+    from: process.env.MAIL_FROM,
     to: to,
     subject: subject,
     html: htmlFormattedMessage,
