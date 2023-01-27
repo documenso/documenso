@@ -57,6 +57,7 @@ async function getHandler(req: NextApiRequest, res: NextApiResponse) {
       select: {
         id: true,
         title: true,
+        Recipient: true,
       },
     })
   );

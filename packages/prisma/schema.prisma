@@ -21,9 +21,9 @@ model Recipient {
   documentId    Int
   email         String        @db.VarChar(255)
   token         String
-  readStatus    ReadStatus
-  signingStatus SigningStatus
-  sendStatus    SendStatus
+  readStatus    ReadStatus    @default(NOT_OPENED)
+  signingStatus SigningStatus @default(NOT_SIGNED)
+  sendStatus    SendStatus    @default(NOT_SENT)
   Document      Document      @relation(fields: [documentId], references: [id], onDelete: Cascade)
 }
 
