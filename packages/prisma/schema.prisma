@@ -20,6 +20,7 @@ model Recipient {
   id            Int           @id @default(autoincrement())
   documentId    Int
   email         String        @db.VarChar(255)
+  token         String
   readStatus    ReadStatus
   signingStatus SigningStatus
   sendStatus    SendStatus
