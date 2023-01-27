@@ -7,6 +7,7 @@ import { PlusIcon, TrashIcon } from "@heroicons/react/24/outline";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { uploadDocument } from "@documenso/features";
+import { DocumentStatus } from "@prisma/client";
 
 const DocumentsPage: NextPageWithLayout = (req, res) => {
   const router = useRouter();
@@ -131,7 +132,7 @@ const DocumentsPage: NextPageWithLayout = (req, res) => {
                           {document.recipients || "-"}
                         </td>
                         <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                          {document.status || "Draft"}
+                          {formatDocumentStatus(document.status)}
                         </td>
                         <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
                           <Link
@@ -216,6 +217,19 @@ const DocumentsPage: NextPageWithLayout = (req, res) => {
     </>
   );
 };
+
+function formatDocumentStatus(status: DocumentStatus) {
+  switch (status) {
+    case DocumentStatus.DRAFT:
+      return "Draft";
+
+    case DocumentStatus.PENDING:
+      return "Pending";
+
+    case DocumentStatus.COMPLETED:
+      return "Completed";
+  }
+}
 
 DocumentsPage.getLayout = function getLayout(page: ReactElement) {
   return <Layout>{page}</Layout>;
