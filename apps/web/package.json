@@ -37,6 +37,7 @@
     "react-hook-form": "^7.41.5",
     "react-pdf": "^6.2.2",
     "sass": "^1.57.1",
+    "short-uuid": "^4.2.2",
     "typescript": "4.8.4"
   },
   "devDependencies": {
