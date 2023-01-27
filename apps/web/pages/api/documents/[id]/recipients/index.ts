@@ -35,7 +35,7 @@ async function postHandler(req: NextApiRequest, res: NextApiResponse) {
     data: {
       documentId: +documentId,
       email: body.email,
-      token: short.generate(),
+      token: short.generate().toString(),
     },
   });
 
