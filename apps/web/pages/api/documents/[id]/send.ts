@@ -45,6 +45,7 @@ async function postHandler(req: NextApiRequest, res: NextApiResponse) {
     },
   });
 
+  // todo check if recipient has an account and show them in their inbox or something
   (await recipients).forEach(async (recipient) => {
     await sendSigningRequestMail(recipient, document);
   });

@@ -49,19 +49,19 @@ async function getHandler(req: NextApiRequest, res: NextApiResponse) {
   let user = await getUserFromToken(req, res);
   if (!user) return;
 
-  return res.status(200).json(
-    await prisma.document.findMany({
-      where: {
-        userId: user?.id,
-      },
-      select: {
-        id: true,
-        title: true,
-        status: true,
-        Recipient: true,
-      },
-    })
-  );
+  const documents = await prisma.document.findMany({
+    where: {
+      userId: user?.id,
+    },
+    select: {
+      id: true,
+      title: true,
+      status: true,
+      Recipient: true,
+    },
+  });
+
+  return res.status(200).json(documents);
 }
 
 export default defaultHandler({

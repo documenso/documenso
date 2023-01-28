@@ -133,6 +133,11 @@ const DocumentsPage: NextPageWithLayout = (req, res) => {
                         </td>
                         <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
                           {formatDocumentStatus(document.status)}
+                          <p>
+                            <small>
+                              {document.recipients || 0}/{document.signed || 0}
+                            </small>
+                          </p>
                         </td>
                         <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
                           <Link
