@@ -42,17 +42,20 @@ async function postHandler(req: NextApiRequest, res: NextApiResponse) {
   const recipients = prisma.recipient.findMany({
     where: {
       documentId: +documentId,
-      sendStatus: SendStatus.NOT_SENT, // TODO REDO AFTER DEBUG
+      // sendStatus: SendStatus.NOT_SENT, // TODO REDO AFTER DEBUG
     },
+  });
+  (await recipients).forEach(async (recipient) => {
+    await sendSigningRequest(recipient, document)
+      .then(() => {
+        res.status(200).end();
+      })
+      .catch((err) => {
+        return res.status(502).end("Coud not send request for signing.");
+      });
   });
 
   // todo check if recipient has an account and show them in their inbox or something
-  (await recipients).forEach(async (recipient) => {
-    await sendSigningRequest(recipient, document);
-  });
-
-  // todo way better error handling
-  return res.status(200).end();
 }
 
 export default defaultHandler({
