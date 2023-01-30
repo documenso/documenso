@@ -6,7 +6,7 @@ import { NEXT_PUBLIC_WEBAPP_URL } from "../constants";
 export const sendSigningRequest = async (recipient: any, document: any) => {
   // todo errror handling
   await sendMail(
-    "timur.ercan31+234234@gmail.com",
+    document.User.email,
     `Please sign ${document.title}`,
     `
     <div style="background-color: #eaeaea; padding: 2%;">
@@ -15,7 +15,7 @@ export const sendSigningRequest = async (recipient: any, document: any) => {
 }">
       ${document.User.name} (${document.User.email}) has sent you a document to sign. 
         <p style="margin: 24px;">
-          <a href="${NEXT_PUBLIC_WEBAPP_URL}/document/${document.id}/sign?token=${recipient.token}" style="background-color: #37f095; color: white; border-color: transparent; border-width: 1px; border-radius: 0.375rem; font-size: 18px; padding-left: 16px; padding-right: 16px; padding-top: 10px; padding-bottom: 10px; text-decoration: none;">
+          <a href="${NEXT_PUBLIC_WEBAPP_URL}/documents/${document.id}/sign?token=${recipient.token}" style="background-color: #37f095; color: white; border-color: transparent; border-width: 1px; border-radius: 0.375rem; font-size: 18px; padding-left: 16px; padding-right: 16px; padding-top: 10px; padding-bottom: 10px; text-decoration: none;">
             Sign Document
           </a>
         </p>
