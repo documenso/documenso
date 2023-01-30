@@ -7,7 +7,7 @@ export const sendSigningRequest = async (recipient: any, document: any) => {
   // todo errror handling
   await sendMail(
     "timur.ercan31+234234@gmail.com",
-    `Please sign ${document.title} ${NEXT_PUBLIC_WEBAPP_URL}/logo_h.png`,
+    `Please sign ${document.title}`,
     `
     <div style="background-color: #eaeaea; padding: 2%;">
       <div style="text-align:center; margin: auto; font-size: 14px; font-color: #353434; max-width: 500px; border-radius: 0.375rem; background: white; padding: 50px">
