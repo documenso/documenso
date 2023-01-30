@@ -18,10 +18,6 @@ const SignPage: NextPageWithLayout = () => {
   );
 };
 
-SignPage.getLayout = function getLayout(page: ReactElement) {
-  return <Layout>{page}</Layout>;
-};
-
 export async function getServerSideProps(context: any) {
   const recipientToken: string = context.query["token"];
 
