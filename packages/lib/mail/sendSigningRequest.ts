@@ -17,7 +17,6 @@ export const sendSigningRequest = async (recipient: any, document: any) => {
       `Sign Document`
     )
   ).catch((err) => {
-    console.log("catch 1");
     throw err;
   });
   await prisma.recipient.update({

@@ -29,7 +29,6 @@ async function patchHandler(req: NextApiRequest, res: NextApiResponse) {
   if (!user) return;
 
   const updatedUser = req.body;
-  console.log(updatedUser);
   await prisma.user
     .update({
       where: {
