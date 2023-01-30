@@ -5,7 +5,7 @@ import {
 } from "@documenso/lib/server";
 import prisma from "@documenso/prisma";
 import { NextApiRequest, NextApiResponse } from "next";
-import { sendSigningRequestMail } from "@documenso/lib/mail";
+import { sendSigningRequest } from "@documenso/lib/mail";
 import { SendStatus } from "@prisma/client";
 
 async function postHandler(req: NextApiRequest, res: NextApiResponse) {
@@ -27,6 +27,7 @@ async function postHandler(req: NextApiRequest, res: NextApiResponse) {
       User: {
         select: {
           name: true,
+          email: true,
         },
       },
       Recipient: true,
@@ -41,13 +42,13 @@ async function postHandler(req: NextApiRequest, res: NextApiResponse) {
   const recipients = prisma.recipient.findMany({
     where: {
       documentId: +documentId,
-      sendStatus: SendStatus.NOT_SENT,
+      sendStatus: SendStatus.NOT_SENT, // TODO REDO AFTER DEBUG
     },
   });
 
   // todo check if recipient has an account and show them in their inbox or something
   (await recipients).forEach(async (recipient) => {
-    await sendSigningRequestMail(recipient, document);
+    await sendSigningRequest(recipient, document);
   });
 
   // todo way better error handling

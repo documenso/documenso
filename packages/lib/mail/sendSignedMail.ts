@@ -6,6 +6,6 @@ export const sendSignedMail = async (document: any, recipient: any) => {
   await sendMail(
     document.user.email,
     `${recipient.email} signed ${document.title}`,
-    `Hi ${document.user.name}, ${recipient.email} has signed your document ${document.title}. Click <a href="${NEXT_PUBLIC_WEBAPP_URL}/document/${document.id}?token=${recipient.token}"> VIEW DOCUMENT</a> to view it now.`
+    `Hi ${document.user.name}, ${recipient.email} has signed your document ${document.title}. Click <a href="${NEXT_PUBLIC_WEBAPP_URL}/document/${document.id}}"> VIEW DOCUMENT</a> to view it now.`
   );
 };
