@@ -42,14 +42,13 @@ async function postHandler(req: NextApiRequest, res: NextApiResponse) {
   const recipients = prisma.recipient.findMany({
     where: {
       documentId: +documentId,
-      // sendStatus: SendStatus.NOT_SENT, // TODO REDO AFTER DEBUG
+      sendStatus: SendStatus.NOT_SENT, // TODO REDO AFTER DEBUG
     },
   });
 
   // todo check if recipient has an account and show them in their inbox or something
   (await recipients).forEach(async (recipient) => {
     await sendSigningRequest(recipient, document);
-    await sendSignedMail(recipient, document);
   });
 
   // todo way better error handling

@@ -14,10 +14,10 @@ export const sendSignedMail = async (recipient: any, document: any) => {
       ${document.User.name || recipient.email} has signed your document ${
       document.title
     }.
-        <p style="margin: 24px;">
+        <p style="margin: 30px;">
           <a href="${NEXT_PUBLIC_WEBAPP_URL}/documents/${
       document.id
-    }" style="background-color: #37f095; color: white; border-color: transparent; border-width: 1px; border-radius: 0.375rem; font-size: 18px; padding-left: 16px; padding-right: 16px; padding-top: 10px; padding-bottom: 10px; text-decoration: none;">
+    }" style="background-color: #37f095; color: white; border-color: transparent; border-width: 1px; border-radius: 0.375rem; font-size: 18px; padding-left: 16px; padding-right: 16px; padding-top: 10px; padding-bottom: 10px; text-decoration: none; margin-top: 4px; margin-bottom: 4px;">
             View Document
           </a>
         </p>
@@ -39,6 +39,10 @@ export const sendSignedMail = async (recipient: any, document: any) => {
           <b>Need help?</b>
           <br>
           Contact us at <a href="mailto:hi@documenso.com">hi@documenso.com</a>  
+      </div>
+      <hr size="1" style="height: 1px; border: none; color: #D8D8D8; background-color: #D8D8D8">
+      <div style="text-align: center">
+        <small>Easy and beautiful document signing by Documenso.</small>
       </div>
     </div>
     `

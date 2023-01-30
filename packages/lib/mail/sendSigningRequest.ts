@@ -13,8 +13,8 @@ export const sendSigningRequest = async (recipient: any, document: any) => {
       <div style="text-align:center; margin: auto; font-size: 14px; font-color: #353434; max-width: 500px; border-radius: 0.375rem; background: white; padding: 50px">
         <img src="${NEXT_PUBLIC_WEBAPP_URL}/logo_h.png" alt="Documenso Logo" style="width: 180px; display: block; margin: auto; margin-bottom: 14px;">
       ${document.User.name} (${document.User.email}) has sent you a document to sign. 
-        <p style="margin: 24px;">
-          <a href="${NEXT_PUBLIC_WEBAPP_URL}/documents/${document.id}/sign?token=${recipient.token}" style="background-color: #37f095; color: white; border-color: transparent; border-width: 1px; border-radius: 0.375rem; font-size: 18px; padding-left: 16px; padding-right: 16px; padding-top: 10px; padding-bottom: 10px; text-decoration: none;">
+        <p style="margin: 30px;">
+          <a href="${NEXT_PUBLIC_WEBAPP_URL}/documents/${document.id}/sign?token=${recipient.token}" style="background-color: #37f095; color: white; border-color: transparent; border-width: 1px; border-radius: 0.375rem; font-size: 18px; padding-left: 16px; padding-right: 16px; padding-top: 10px; padding-bottom: 10px; text-decoration: none; margin-top: 4px; margin-bottom: 4px;">
             Sign Document
           </a>
         </p>
@@ -34,6 +34,10 @@ export const sendSigningRequest = async (recipient: any, document: any) => {
           <b>Need help?</b>
           <br>
           Contact us at <a href="mailto:hi@documenso.com">hi@documenso.com</a>  
+      </div>
+      <hr size="1" style="height: 1px; border: none; color: #D8D8D8; background-color: #D8D8D8">
+      <div style="text-align: center">
+        <small>Easy and beautiful document signing by Documenso.</small>
       </div>
     </div>
     `
