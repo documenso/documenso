@@ -23,7 +23,7 @@ export const uploadDocument = async (event: any) => {
       .then((response: Response) => {
         response.json().then((createdDocumentIdFromBody) => {
           router.push(
-            `${NEXT_PUBLIC_WEBAPP_URL}/documents/${createdDocumentIdFromBody}`
+            `${NEXT_PUBLIC_WEBAPP_URL}/documents/${createdDocumentIdFromBody}/recipients`
           );
         });
       });
