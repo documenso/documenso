@@ -3,11 +3,18 @@ import { ReactElement, useEffect, useState } from "react";
 import Layout from "../components/layout";
 import type { NextPageWithLayout } from "./_app";
 import Head from "next/head";
-import { PlusIcon, TrashIcon } from "@heroicons/react/24/outline";
+import {
+  CheckBadgeIcon,
+  EnvelopeIcon,
+  EyeIcon,
+  PlusIcon,
+  TrashIcon,
+} from "@heroicons/react/24/outline";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { uploadDocument } from "@documenso/features";
 import { DocumentStatus } from "@prisma/client";
+import { Tooltip as ReactTooltip } from "react-tooltip";
 
 const DocumentsPage: NextPageWithLayout = (req, res) => {
   const router = useRouter();
@@ -129,13 +136,62 @@ const DocumentsPage: NextPageWithLayout = (req, res) => {
                           {document.title || "#" + document.id}
                         </td>
                         <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                          {document.recipients || "-"}
+                          {document.Recipient.map((item: any) => (
+                            <div>
+                              {item.sendStatus === "SENT" &&
+                              item.readStatus !== "OPENED" &&
+                              item.signingStatus !== "SIGNED" ? (
+                                <span id="sent_icon">
+                                  <EnvelopeIcon className="inline h-5 mr-1"></EnvelopeIcon>
+                                  {item.email}
+                                </span>
+                              ) : (
+                                ""
+                              )}
+                              {item.sendStatus === "SENT" &&
+                              item.readStatus === "OPENED" ? (
+                                <span id="read_icon">
+                                  <EyeIcon className="inline h-5 mr-1"></EyeIcon>{" "}
+                                  {item.email}
+                                </span>
+                              ) : (
+                                ""
+                              )}
+                              {item.sendStatus === "SENT" &&
+                              item.readStatus === "OPENED" &&
+                              item.signingStatus === "SIGNED" ? (
+                                <span id="signed_icon">
+                                  <CheckBadgeIcon className="inline h-5 mr-1"></CheckBadgeIcon>{" "}
+                                  {item.email}
+                                </span>
+                              ) : (
+                                ""
+                              )}
+                            </div>
+                          ))}
+                          {document.Recipient.length === 0 ? "-" : null}
+                          <ReactTooltip
+                            anchorId="sent_icon"
+                            place="bottom"
+                            content="Document was sent to recipient."
+                          />
+                          <ReactTooltip
+                            anchorId="read_icon"
+                            place="bottom"
+                            content="Document was opened but not signed yet."
+                          />
+                          <ReactTooltip
+                            anchorId="signed_icon"
+                            place="bottom"
+                            content="Document was signed by the recipient."
+                          />
                         </td>
                         <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
                           {formatDocumentStatus(document.status)}
                           <p>
                             <small>
-                              {document.recipients || 0}/{document.signed || 0}
+                              {document.signed || 0}/
+                              {document.Recipient.length || 0}
                             </small>
                           </p>
                         </td>
