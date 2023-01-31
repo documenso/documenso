@@ -129,17 +129,32 @@ const RecipientsPage: NextPageWithLayout = (props: any) => {
             </button>
           </div>
         </div>
-        <div className="overflow-hidden rounded-md bg-white shadow mt-10">
+        <div className="overflow-hidden rounded-md bg-white shadow mt-10 p-6">
+          <div className="border-b border-gray-200 pb-5">
+            <h3 className="text-lg font-medium leading-6 text-gray-900">
+              Signers
+            </h3>
+            <p className="mt-2 max-w-4xl text-sm text-gray-500">
+              The people who will sign the document.
+            </p>
+          </div>
           <ul role="list" className="divide-y divide-gray-200">
             {props?.document?.Recipient.map((item: any) => (
-              <li key={item.id} className="px-6 py-4">
+              <li key={item.id} className="px-0 py-4">
                 <div>
                   <UserCircleIcon className="inline w-6 mr-2"></UserCircleIcon>
                   {item.email}
+                  <span> (You)</span>
                 </div>
               </li>
             ))}
           </ul>
+          <div className="border-b border-gray-200 pb-5 mt-6">
+            <h3 className="text-lg font-medium leading-6 text-gray-900">CC</h3>
+            <p className="mt-2 max-w-4xl text-sm text-gray-500">
+              Anybody who should get a copy.
+            </p>
+          </div>
         </div>
       </div>
     </>
