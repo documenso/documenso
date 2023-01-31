@@ -18,6 +18,7 @@ import {
 import { classNames, NEXT_PUBLIC_WEBAPP_URL } from "@documenso/lib";
 import {
   PaperAirplaneIcon,
+  UserCircleIcon,
   UserGroupIcon,
   UserIcon,
   UsersIcon,
@@ -118,7 +119,7 @@ const RecipientsPage: NextPageWithLayout = (props: any) => {
               disabled={(props?.document?.Recipient?.length || 0) === 0}
               onClick={() =>
                 confirm(
-                  `Send document out to ${props?.document?.recipient?.length} recipients?`
+                  `Send document out to ${props?.document?.Recipient?.length} recipients?`
                 )
               }
               className="ml-3 inline-flex items-center rounded-md border border-transparent bg-neon px-4 py-2 text-sm font-medium text-white shadow-sm bg-grey hover:bg-neon-dark focus:outline-none focus:ring-2 focus:neon-dark focus:ring-offset-2"
@@ -127,6 +128,18 @@ const RecipientsPage: NextPageWithLayout = (props: any) => {
               Send
             </button>
           </div>
+        </div>
+        <div className="overflow-hidden rounded-md bg-white shadow mt-10">
+          <ul role="list" className="divide-y divide-gray-200">
+            {props?.document?.Recipient.map((item: any) => (
+              <li key={item.id} className="px-6 py-4">
+                <div>
+                  <UserCircleIcon className="inline w-6 mr-2"></UserCircleIcon>
+                  {item.email}
+                </div>
+              </li>
+            ))}
+          </ul>
         </div>
       </div>
     </>
