@@ -25,8 +25,11 @@ import {
 } from "@heroicons/react/24/outline";
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/20/solid";
 import { getUserFromToken } from "@documenso/lib/server";
+import { useRouter } from "next/router";
+import { toast } from "react-hot-toast";
 
 const RecipientsPage: NextPageWithLayout = (props: any) => {
+  const router = useRouter();
   const title: string =
     `"` + props?.document?.title + `"` + "Recipients | Documenso";
   return (
@@ -117,11 +120,16 @@ const RecipientsPage: NextPageWithLayout = (props: any) => {
             <button
               type="button"
               disabled={(props?.document?.Recipient?.length || 0) === 0}
-              onClick={() =>
-                confirm(
-                  `Send document out to ${props?.document?.Recipient?.length} recipients?`
-                )
-              }
+              onClick={() => {
+                if (
+                  confirm(
+                    `Send document out to ${props?.document?.Recipient?.length} recipients?`
+                  )
+                ) {
+                  router.push("/documents/" + props.document.id);
+                  toast.success("Document sent!");
+                }
+              }}
               className="ml-3 inline-flex items-center rounded-md border border-transparent bg-neon px-4 py-2 text-sm font-medium text-white shadow-sm bg-grey hover:bg-neon-dark focus:outline-none focus:ring-2 focus:neon-dark focus:ring-offset-2"
             >
               <PaperAirplaneIcon className="inline text-white w-4 mr-1"></PaperAirplaneIcon>
