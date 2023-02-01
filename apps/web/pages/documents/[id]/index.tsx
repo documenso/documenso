@@ -158,8 +158,8 @@ export async function getServerSideProps(context: any) {
 
   const document: PrismaDocument = await getDocument(
     +documentId,
-    context.res,
-    context.req
+    context.req,
+    context.res
   );
 
   // todo optimize querys
