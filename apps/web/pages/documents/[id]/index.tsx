@@ -1,23 +1,17 @@
-import { ReactElement, useEffect } from "react";
+import { ReactElement } from "react";
 import Layout from "../../../components/layout";
 import { NextPageWithLayout } from "../../_app";
-import { Document, Page, pdfjs } from "react-pdf";
 import dynamic from "next/dynamic";
 import { useRouter } from "next/router";
 import { NEXT_PUBLIC_WEBAPP_URL } from "@documenso/lib";
 import prisma from "@documenso/prisma";
 import { getUserFromToken } from "@documenso/lib/server";
-import Logo from "../../../components/logo";
 import Link from "next/link";
 import { DocumentStatus } from "@prisma/client";
 import {
-  BriefcaseIcon,
-  CalendarIcon,
   ChevronLeftIcon,
   ChevronRightIcon,
-  CurrencyDollarIcon,
   InformationCircleIcon,
-  MapPinIcon,
   PaperAirplaneIcon,
   UserPlusIcon,
   UsersIcon,

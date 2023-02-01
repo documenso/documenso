@@ -9,5 +9,8 @@
   },
   "[prisma]": {
     "editor.defaultFormatter": "Prisma.prisma"
+  },
+  "editor.codeActionsOnSave": {
+    "source.removeUnusedImports": true
   }
 }
