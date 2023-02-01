@@ -156,10 +156,11 @@ export async function getServerSideProps(context: any) {
 
   const { id: documentId } = context.query;
 
-  const document: PrismaDocument = await getDocument(+documentId, {
-    res: context.res,
-    req: context.req,
-  });
+  const document: PrismaDocument = await getDocument(
+    +documentId,
+    context.res,
+    context.req
+  );
 
   // todo optimize querys
   // todo no intersection groups

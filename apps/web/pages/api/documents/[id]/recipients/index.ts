@@ -21,10 +21,7 @@ async function postHandler(req: NextApiRequest, res: NextApiResponse) {
     return;
   }
 
-  const document: PrismaDocument = await getDocument(+documentId, {
-    res: res,
-    req: req,
-  });
+  const document: PrismaDocument = await getDocument(+documentId, req, res);
 
   // todo encapsulate entity ownerships
   if (document.userId !== user.id) {

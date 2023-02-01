@@ -4,12 +4,13 @@ import { Document as PrismaDocument } from "@prisma/client";
 
 export const getDocument = async (
   documentId: number,
-  context: any
+  req: any,
+  res: any
 ): Promise<PrismaDocument> => {
-  const user = await getUserFromToken(context.req, context.res);
+  const user = await getUserFromToken(req, res);
   if (!user) return Promise.reject("Invalid user or token.");
   if (!documentId) Promise.reject("No documentId");
-  if (!context) Promise.reject("No context");
+  if (!req || !res) Promise.reject("No res or req");
 
   const document: PrismaDocument = await prisma.document.findFirstOrThrow({
     where: {

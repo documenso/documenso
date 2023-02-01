@@ -20,10 +20,7 @@ async function postHandler(req: NextApiRequest, res: NextApiResponse) {
     return;
   }
 
-  const document: PrismaDocument = await getDocument(+documentId, {
-    res: res,
-    req: req,
-  });
+  const document: PrismaDocument = await getDocument(+documentId, req, res);
 
   if (!document)
     res.status(404).end(`No document with id ${documentId} found.`);
