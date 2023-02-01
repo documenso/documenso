@@ -6,7 +6,7 @@ export const getDocumentsForUserFromToken = async (
   context: any
 ): Promise<PrismaDocument[]> => {
   const user = await getUserFromToken(context.req, context.res);
-  if (!user) return Promise.reject("Invalid user or token.s");
+  if (!user) return Promise.reject("Invalid user or token.");
 
   const documents: PrismaDocument[] = await prisma.document.findMany({
     where: {
