@@ -5,10 +5,8 @@ import {
 } from "@documenso/lib/server";
 import prisma from "@documenso/prisma";
 import { NextApiRequest, NextApiResponse } from "next";
-import { useRouter } from "next/router";
-import fs from "fs";
-import { buffer } from "stream/consumers";
 import { Document as PrismaDocument } from "@prisma/client";
+import { getDocument } from "@documenso/lib/query";
 
 async function getHandler(req: NextApiRequest, res: NextApiResponse) {
   const user = await getUserFromToken(req, res);
@@ -21,10 +19,9 @@ async function getHandler(req: NextApiRequest, res: NextApiResponse) {
     return;
   }
 
-  const document: PrismaDocument = await prisma.document.findFirstOrThrow({
-    where: {
-      id: +documentId,
-    },
+  const document: PrismaDocument = await getDocument(+documentId, {
+    res: res,
+    req: req,
   });
 
   if (!document)

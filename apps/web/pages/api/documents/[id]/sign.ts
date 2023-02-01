@@ -6,6 +6,8 @@ import {
 import prisma from "@documenso/prisma";
 import { NextApiRequest, NextApiResponse } from "next";
 import { SigningStatus, DocumentStatus } from "@prisma/client";
+import { getDocument } from "@documenso/lib/query";
+import { Document as PrismaDocument } from "@prisma/client";
 
 async function postHandler(req: NextApiRequest, res: NextApiResponse) {
   const existingUser = await getUserFromToken(req, res);
@@ -25,10 +27,9 @@ async function postHandler(req: NextApiRequest, res: NextApiResponse) {
     return;
   }
 
-  let document = await prisma.document.findFirstOrThrow({
-    where: {
-      id: recipient.documentId,
-    },
+  const document: PrismaDocument = await getDocument(recipient.documentId, {
+    res: res,
+    req: req,
   });
 
   if (!document) res.status(404).end(`No document found.`);

@@ -5,8 +5,9 @@ import {
 } from "@documenso/lib/server";
 import prisma from "@documenso/prisma";
 import { NextApiRequest, NextApiResponse } from "next";
-import { sendSignedMail, sendSigningRequest } from "@documenso/lib/mail";
-import { SendStatus } from "@prisma/client";
+import { sendSigningRequest } from "@documenso/lib/mail";
+import { getDocument } from "@documenso/lib/query";
+import { Document as PrismaDocument } from "@prisma/client";
 
 async function postHandler(req: NextApiRequest, res: NextApiResponse) {
   const user = await getUserFromToken(req, res);
@@ -19,19 +20,9 @@ async function postHandler(req: NextApiRequest, res: NextApiResponse) {
     return;
   }
 
-  const document = await prisma.document.findFirstOrThrow({
-    where: {
-      id: +documentId,
-    },
-    include: {
-      User: {
-        select: {
-          name: true,
-          email: true,
-        },
-      },
-      Recipient: true,
-    },
+  const document: PrismaDocument = await getDocument(+documentId, {
+    res: res,
+    req: req,
   });
 
   if (!document)

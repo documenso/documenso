@@ -7,6 +7,7 @@ import prisma from "@documenso/prisma";
 import { NextApiRequest, NextApiResponse } from "next";
 import short from "short-uuid";
 import { Document as PrismaDocument } from "@prisma/client";
+import { getDocument } from "@documenso/lib/query";
 
 async function postHandler(req: NextApiRequest, res: NextApiResponse) {
   const user = await getUserFromToken(req, res);
@@ -20,10 +21,9 @@ async function postHandler(req: NextApiRequest, res: NextApiResponse) {
     return;
   }
 
-  const document: PrismaDocument = await prisma.document.findFirstOrThrow({
-    where: {
-      id: +documentId,
-    },
+  const document: PrismaDocument = await getDocument(+documentId, {
+    res: res,
+    req: req,
   });
 
   // todo encapsulate entity ownerships

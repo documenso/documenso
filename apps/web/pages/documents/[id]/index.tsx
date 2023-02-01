@@ -4,7 +4,6 @@ import { NextPageWithLayout } from "../../_app";
 import dynamic from "next/dynamic";
 import { useRouter } from "next/router";
 import { NEXT_PUBLIC_WEBAPP_URL } from "@documenso/lib";
-import prisma from "@documenso/prisma";
 import { getUserFromToken } from "@documenso/lib/server";
 import Link from "next/link";
 import { DocumentStatus } from "@prisma/client";
@@ -16,6 +15,8 @@ import {
   UserPlusIcon,
   UsersIcon,
 } from "@heroicons/react/24/outline";
+import { getDocument } from "@documenso/lib/query";
+import { Document as PrismaDocument } from "@prisma/client";
 
 const PDFViewer = dynamic(() => import("../../../components/pdf-viewer"), {
   ssr: false,
@@ -154,13 +155,10 @@ export async function getServerSideProps(context: any) {
   if (!user) return;
 
   const { id: documentId } = context.query;
-  const document = await prisma.document.findFirstOrThrow({
-    where: {
-      id: +documentId,
-    },
-    include: {
-      Recipient: true,
-    },
+
+  const document: PrismaDocument = await getDocument(+documentId, {
+    res: context.res,
+    req: context.req,
   });
 
   // todo optimize querys

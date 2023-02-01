@@ -1,32 +1,15 @@
-import prisma from "@documenso/prisma";
 import Head from "next/head";
 import { ReactElement } from "react";
 import Layout from "../../../components/layout";
 import { NextPageWithLayout } from "../../_app";
-import { Fragment } from "react";
-import { Menu, Transition } from "@headlessui/react";
-import {
-  ArchiveBoxIcon,
-  ArrowRightCircleIcon,
-  ChevronDownIcon,
-  DocumentDuplicateIcon,
-  HeartIcon,
-  PencilSquareIcon,
-  TrashIcon,
-  UserPlusIcon,
-} from "@heroicons/react/20/solid";
-import { classNames, NEXT_PUBLIC_WEBAPP_URL } from "@documenso/lib";
-import {
-  PaperAirplaneIcon,
-  UserCircleIcon,
-  UserGroupIcon,
-  UserIcon,
-  UsersIcon,
-} from "@heroicons/react/24/outline";
+import { NEXT_PUBLIC_WEBAPP_URL } from "@documenso/lib";
+import { PaperAirplaneIcon, UserCircleIcon } from "@heroicons/react/24/outline";
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/20/solid";
 import { getUserFromToken } from "@documenso/lib/server";
 import { useRouter } from "next/router";
 import { toast } from "react-hot-toast";
+import { getDocument } from "@documenso/lib/query";
+import { Document as PrismaDocument } from "@prisma/client";
 
 const RecipientsPage: NextPageWithLayout = (props: any) => {
   const router = useRouter();
@@ -172,13 +155,9 @@ export async function getServerSideProps(context: any) {
   if (!user) return;
 
   const { id: documentId } = context.query;
-  const document = await prisma.document.findFirstOrThrow({
-    where: {
-      id: +documentId,
-    },
-    include: {
-      Recipient: true,
-    },
+  const document: PrismaDocument = await getDocument(+documentId, {
+    res: context.res,
+    req: context.req,
   });
 
   return {

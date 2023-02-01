@@ -3,9 +3,9 @@ import prisma from "@documenso/prisma";
 import { Document as PrismaDocument } from "@prisma/client";
 
 export const getDocumentsForUserFromToken = async (
-  ssrContext: any
+  context: any
 ): Promise<PrismaDocument[]> => {
-  const user = await getUserFromToken(ssrContext.req, ssrContext.res);
+  const user = await getUserFromToken(context.req, context.res);
   if (!user) return Promise.reject("Invalid user or token.s");
 
   const documents: PrismaDocument[] = await prisma.document.findMany({
