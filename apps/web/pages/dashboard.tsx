@@ -1,8 +1,6 @@
-import { useSession } from "next-auth/react";
 import Head from "next/head";
-import { ReactElement, useEffect, useState } from "react";
+import { ReactElement } from "react";
 import Layout from "../components/layout";
-import Settings from "../components/settings";
 import Link from "next/link";
 import type { NextPageWithLayout } from "./_app";
 import {
@@ -13,20 +11,16 @@ import {
   SunIcon,
   XCircleIcon,
 } from "@heroicons/react/24/outline";
-import { FormProvider, useForm } from "react-hook-form";
-import Router from "next/router";
-import { NEXT_PUBLIC_WEBAPP_URL } from "@documenso/lib";
-import toast from "react-hot-toast";
 import { uploadDocument } from "@documenso/features";
 import prisma from "@documenso/prisma";
 import {
   ReadStatus,
   SendStatus,
-  SigningStatus,
   DocumentStatus,
   Document as PrismaDocument,
 } from "@prisma/client";
 import { getUserFromToken } from "@documenso/lib/server";
+import { getDocumentsForUserFromToken } from "@documenso/lib/query";
 
 type FormValues = {
   document: File;
@@ -160,11 +154,9 @@ export async function getServerSideProps(context: any) {
   // todo optimize querys
   // todo no intersection groups
 
-  const documents: PrismaDocument[] = await prisma.document.findMany({
-    where: {
-      userId: user.id,
-    },
-  });
+  const documents: PrismaDocument[] = await getDocumentsForUserFromToken(
+    context
+  );
 
   const drafts: PrismaDocument[] = documents.filter(
     (d) => d.status === DocumentStatus.DRAFT

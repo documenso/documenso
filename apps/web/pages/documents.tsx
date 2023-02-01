@@ -1,5 +1,4 @@
-import { useSession } from "next-auth/react";
-import { ReactElement, useEffect, useState } from "react";
+import { ReactElement, useState } from "react";
 import Layout from "../components/layout";
 import type { NextPageWithLayout } from "./_app";
 import Head from "next/head";
@@ -15,15 +14,12 @@ import { useRouter } from "next/router";
 import { uploadDocument } from "@documenso/features";
 import { DocumentStatus } from "@prisma/client";
 import { Tooltip as ReactTooltip } from "react-tooltip";
+import { getDocumentsForUserFromToken } from "@documenso/lib/query";
 
-const DocumentsPage: NextPageWithLayout = (req, res) => {
+const DocumentsPage: NextPageWithLayout = (props: any) => {
   const router = useRouter();
-  const [documents = [], setDocuments] = useState([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    getDocuments();
-  }, []);
+  const [documents = [], setDocuments] = useState(props.documents);
+  const [loading, setLoading] = useState(false);
 
   const getDocuments = async () => {
     if (!documents.length) setLoading(true);
@@ -278,6 +274,14 @@ const DocumentsPage: NextPageWithLayout = (req, res) => {
     </>
   );
 };
+
+export async function getServerSideProps(context: any) {
+  return {
+    props: {
+      documents: await getDocumentsForUserFromToken(context),
+    },
+  };
+}
 
 function formatDocumentStatus(status: DocumentStatus) {
   switch (status) {

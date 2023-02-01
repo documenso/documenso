@@ -2,8 +2,8 @@ import { defaultHandler, defaultResponder } from "@documenso/lib/server";
 import prisma from "@documenso/prisma";
 import { NextApiRequest, NextApiResponse } from "next";
 import { getUserFromToken } from "@documenso/lib/server";
-import formidable, { Files } from "formidable";
-import { getToken } from "next-auth/jwt";
+import formidable from "formidable";
+import { getDocumentsForUserFromToken } from "@documenso/lib/query";
 
 export const config = {
   api: {
@@ -49,17 +49,7 @@ async function getHandler(req: NextApiRequest, res: NextApiResponse) {
   let user = await getUserFromToken(req, res);
   if (!user) return;
 
-  const documents = await prisma.document.findMany({
-    where: {
-      userId: user?.id,
-    },
-    select: {
-      id: true,
-      title: true,
-      status: true,
-      Recipient: true,
-    },
-  });
+  const documents = await getDocumentsForUserFromToken({ req: req, res: res });
 
   return res.status(200).json(documents);
 }
