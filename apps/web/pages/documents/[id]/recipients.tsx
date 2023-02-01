@@ -113,12 +113,6 @@ const RecipientsPage: NextPageWithLayout = (props: any) => {
           <div className="mt-4 flex flex-shrink-0 md:mt-0 md:ml-4">
             <button
               type="button"
-              className="inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-            >
-              Save and Close
-            </button>
-            <button
-              type="button"
               disabled={(props?.document?.Recipient?.length || 0) === 0}
               onClick={() => {
                 if (
@@ -130,7 +124,7 @@ const RecipientsPage: NextPageWithLayout = (props: any) => {
                   toast.success("Document sent!");
                 }
               }}
-              className="ml-3 inline-flex items-center rounded-md border border-transparent bg-neon px-4 py-2 text-sm font-medium text-white shadow-sm bg-grey hover:bg-neon-dark focus:outline-none focus:ring-2 focus:neon-dark focus:ring-offset-2"
+              className="ml-3 inline-flex items-center rounded-md border border-transparent  disabled:bg-gray-300 bg-neon px-4 py-2 text-sm font-medium text-white shadow-sm bg-grey hover:bg-neon-dark focus:outline-none focus:ring-2 focus:neon-dark focus:ring-offset-2"
             >
               <PaperAirplaneIcon className="inline text-white w-4 mr-1"></PaperAirplaneIcon>
               Send

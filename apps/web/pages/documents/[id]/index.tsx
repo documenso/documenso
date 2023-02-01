@@ -19,6 +19,7 @@ import {
   InformationCircleIcon,
   MapPinIcon,
   PaperAirplaneIcon,
+  UserPlusIcon,
   UsersIcon,
 } from "@heroicons/react/24/outline";
 
@@ -107,9 +108,10 @@ const DocumentsDetailPage: NextPageWithLayout = (props: any) => {
                 props.document.id +
                 "/recipients"
               }
-              className="inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+              className="ml-3 inline-flex items-center rounded-md border border-transparent bg-neon px-4 py-2 text-sm font-medium text-white shadow-sm bg-grey hover:bg-neon-dark focus:outline-none focus:ring-2 focus:neon-dark focus:ring-offset-2"
             >
-              Edit Recipients
+              <UserPlusIcon className="inline text-white h-4 mr-1"></UserPlusIcon>
+              Add Recipients
             </Link>
             <button
               type="button"
@@ -123,7 +125,7 @@ const DocumentsDetailPage: NextPageWithLayout = (props: any) => {
                   alert();
                 }
               }}
-              className="ml-3 inline-flex items-center rounded-md border border-transparent bg-neon px-4 py-2 text-sm font-medium text-white shadow-sm bg-grey hover:bg-neon-dark focus:outline-none focus:ring-2 focus:neon-dark focus:ring-offset-2"
+              className="ml-3 inline-flex items-center rounded-md border border-transparent bg-neon disabled:bg-gray-300 px-4 py-2 text-sm font-medium text-white shadow-sm bg-grey hover:bg-neon-dark focus:outline-none focus:ring-2 focus:neon-dark focus:ring-offset-2"
             >
               <PaperAirplaneIcon className="inline text-white w-4 mr-1"></PaperAirplaneIcon>
               Send
