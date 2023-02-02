@@ -234,10 +234,6 @@ export default function TopNavigation() {
                       {user?.email}
                     </div>
                   </div>
-                  <button
-                    type="button"
-                    className="ml-auto flex-shrink-0 rounded-full bg-white p-1 text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-neon focus:ring-offset-2"
-                  ></button>
                 </div>
                 <div className="mt-3 space-y-1">
                   {userNavigation.map((item) => (

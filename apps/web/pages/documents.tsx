@@ -15,6 +15,7 @@ import { uploadDocument } from "@documenso/features";
 import { DocumentStatus } from "@prisma/client";
 import { Tooltip as ReactTooltip } from "react-tooltip";
 import { getDocumentsForUserFromToken } from "@documenso/lib/query";
+import { Button } from "@documenso/ui";
 
 const DocumentsPage: NextPageWithLayout = (props: any) => {
   const router = useRouter();
@@ -54,15 +55,13 @@ const DocumentsPage: NextPageWithLayout = (props: any) => {
             </header>
           </div>
           <div className="mt-4 sm:mt-0 sm:ml-16 sm:flex-none">
-            <button
-              type="button"
-              className="inline-flex items-center justify-center rounded-md border border-transparent bg-neon px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-neon-dark focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 sm:w-auto"
+            <Button
               onClick={() => {
                 document?.getElementById("fileUploadHelper")?.click();
               }}
             >
               Add Document
-            </button>
+            </Button>
           </div>
         </div>
         <div className="mt-10 max-w-[1100px]" hidden={!loading}>
@@ -251,16 +250,14 @@ const DocumentsPage: NextPageWithLayout = (props: any) => {
           Get started by creating a new document.
         </p>
         <div className="mt-6">
-          <button
-            type="button"
+          <Button
+            icon={PlusIcon}
             onClick={() => {
               document?.getElementById("fileUploadHelper")?.click();
             }}
-            className="inline-flex items-center rounded-md border border-transparent bg-neon px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
           >
-            <PlusIcon className="-ml-1 mr-2 h-5 w-5" aria-hidden="true" />
             Upload Document
-          </button>
+          </Button>
           <input
             id="fileUploadHelper"
             type="file"

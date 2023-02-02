@@ -17,6 +17,7 @@ import {
 } from "@heroicons/react/24/outline";
 import { getDocument } from "@documenso/lib/query";
 import { Document as PrismaDocument } from "@prisma/client";
+import { Button } from "@documenso/ui";
 
 const PDFViewer = dynamic(() => import("../../../components/pdf-viewer"), {
   ssr: false,
@@ -108,8 +109,8 @@ const DocumentsDetailPage: NextPageWithLayout = (props: any) => {
               <UserPlusIcon className="inline text-white h-4 mr-1"></UserPlusIcon>
               Add Recipients
             </Link>
-            <button
-              type="button"
+            <Button
+              icon={PaperAirplaneIcon}
               disabled={(props?.document?.Recipient?.length || 0) === 0}
               onClick={() => {
                 if (
@@ -120,11 +121,9 @@ const DocumentsDetailPage: NextPageWithLayout = (props: any) => {
                   alert();
                 }
               }}
-              className="ml-3 inline-flex items-center rounded-md border border-transparent bg-neon disabled:bg-gray-300 px-4 py-2 text-sm font-medium text-white shadow-sm bg-grey hover:bg-neon-dark focus:outline-none focus:ring-2 focus:neon-dark focus:ring-offset-2"
             >
-              <PaperAirplaneIcon className="inline text-white w-4 mr-1"></PaperAirplaneIcon>
               Send
-            </button>
+            </Button>
           </div>
         </div>
       </div>

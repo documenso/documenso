@@ -1,4 +1,5 @@
 import { NEXT_PUBLIC_WEBAPP_URL } from "@documenso/lib/constants";
+import { Button } from "@documenso/ui";
 import { XCircleIcon } from "@heroicons/react/24/outline";
 import { signIn } from "next-auth/react";
 import Link from "next/link";
@@ -180,17 +181,14 @@ export default function Signup() {
                 </div>
               </div>
 
-              <button
+              <Button
                 onClick={() => {
                   methods.clearErrors();
                 }}
-                type="submit"
-                value="submit"
-                className="sgroup relative flex w-full justify-center rounded-md border border-transparent bg-neon py-2 px-4 text-sm font-medium text-white hover:bg-neon-dark focus:outline-none focus:ring-2 focus:ring-neon focus:ring-offset-2"
+                className="sgroup relative flex w-full"
               >
-                <span className="absolute inset-y-0 left-0 flex items-center pl-3"></span>
                 Create Account
-              </button>
+              </Button>
               <div className="pt-2">
                 <div className="relative">
                   <div

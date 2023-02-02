@@ -5,6 +5,7 @@ import Link from "next/link";
 import Head from "next/head";
 import { useSession } from "next-auth/react";
 import { updateUser } from "@documenso/features";
+import { Button } from "@documenso/ui";
 
 const subNavigation = [
   {
@@ -164,13 +165,7 @@ export default function Setttings() {
                       className="mt-1 block w-full rounded-md border border-gray-300 py-2 px-3 shadow-sm focus:border-neon focus:outline-none focus:ring-neon sm:text-sm"
                     />
                   </div>
-                  <button
-                    type="button"
-                    onClick={() => updateUser(user)}
-                    className="inline-flex items-center justify-center rounded-md border border-transparent bg-neon px-10 py-2 text-sm font-medium text-white shadow-sm hover:bg-neon-dark focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 sm:w-auto"
-                  >
-                    Save
-                  </button>
+                  <Button onClick={() => updateUser(user)}>Save</Button>
                 </div>
               </div>
             </form>

@@ -9,6 +9,7 @@ import { useState } from "react";
 import { useRouter } from "next/router";
 import { toast, Toaster } from "react-hot-toast";
 import { NEXT_PUBLIC_WEBAPP_URL } from "@documenso/lib/constants";
+import { Button } from "@documenso/ui";
 
 interface LoginValues {
   email: string;
@@ -133,19 +134,18 @@ export default function Login() {
               </div>
 
               <div>
-                <button
-                  type="submit"
+                <Button
                   disabled={formState.isSubmitting}
-                  className="group relative flex w-full justify-center rounded-md border border-transparent bg-neon py-2 px-4 text-sm font-medium text-white hover:bg-neon-dark focus:outline-none focus:ring-2 focus:ring-neon focus:ring-offset-2"
+                  className="group relative flex w-full"
                 >
                   <span className="absolute inset-y-0 left-0 flex items-center pl-3">
                     <LockClosedIcon
-                      className="h-5 w-5 text-neon-dark group-hover:text-neon"
+                      className="h-5 w-5 text-neon-dark group-hover:text-neon disabled:group-hover:bg-gray-600 disabled:disabled:bg-gray-600"
                       aria-hidden="true"
                     />
                   </span>
                   Sign in
-                </button>
+                </Button>
               </div>
               <div>
                 <div className="relative">

@@ -105,8 +105,7 @@ const DashboardPage: NextPageWithLayout = (props: any) => {
             hidden
           />
         </div>
-        <button
-          type="button"
+        <div
           onClick={() => {
             document?.getElementById("fileUploadHelper")?.click();
           }}
@@ -128,7 +127,7 @@ const DashboardPage: NextPageWithLayout = (props: any) => {
           <span className="mt-2 block text-sm font-medium text-neon">
             Upload a new PDF document
           </span>
-        </button>
+        </div>
       </div>
     </>
   );
