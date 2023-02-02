@@ -4,6 +4,7 @@ import type { NextPageWithLayout } from "./_app";
 import Head from "next/head";
 import {
   CheckBadgeIcon,
+  DocumentPlusIcon,
   EnvelopeIcon,
   EyeIcon,
   PlusIcon,
@@ -56,6 +57,7 @@ const DocumentsPage: NextPageWithLayout = (props: any) => {
           </div>
           <div className="mt-4 sm:mt-0 sm:ml-16 sm:flex-none">
             <Button
+              icon={DocumentPlusIcon}
               onClick={() => {
                 document?.getElementById("fileUploadHelper")?.click();
               }}
