@@ -10,6 +10,7 @@ import { useRouter } from "next/router";
 import { toast } from "react-hot-toast";
 import { getDocument } from "@documenso/lib/query";
 import { Document as PrismaDocument } from "@prisma/client";
+import { Button } from "@documenso/ui";
 
 const RecipientsPage: NextPageWithLayout = (props: any) => {
   const router = useRouter();
@@ -20,8 +21,6 @@ const RecipientsPage: NextPageWithLayout = (props: any) => {
       <Head>
         <title>{title}</title>
       </Head>
-      {/* -todo add signers ui -todo add breadcrumps -todo who will sign this
-      dropdown */}
       <div className="mt-10">
         <div>
           <nav className="sm:hidden" aria-label="Back">
@@ -94,24 +93,17 @@ const RecipientsPage: NextPageWithLayout = (props: any) => {
             </h2>
           </div>
           <div className="mt-4 flex flex-shrink-0 md:mt-0 md:ml-4">
-            <button
-              type="button"
-              disabled={(props?.document?.Recipient?.length || 0) === 0}
+            <Button
+              color="primary"
+              icon={PaperAirplaneIcon}
               onClick={() => {
-                if (
-                  confirm(
-                    `Send document out to ${props?.document?.Recipient?.length} recipients?`
-                  )
-                ) {
-                  router.push("/documents/" + props.document.id);
-                  toast.success("Document sent!");
-                }
+                alert();
+                // todo do stuff
               }}
-              className="ml-3 inline-flex items-center rounded-md border border-transparent  disabled:bg-gray-300 bg-neon px-4 py-2 text-sm font-medium text-white shadow-sm bg-grey hover:bg-neon-dark focus:outline-none focus:ring-2 focus:neon-dark focus:ring-offset-2"
+              disabled={(props?.document?.Recipient?.length || 0) === 0}
             >
-              <PaperAirplaneIcon className="inline text-white w-4 mr-1"></PaperAirplaneIcon>
               Send
-            </button>
+            </Button>
           </div>
         </div>
         <div className="overflow-hidden rounded-md bg-white shadow mt-10 p-6">
