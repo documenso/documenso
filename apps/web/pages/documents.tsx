@@ -191,10 +191,7 @@ const DocumentsPage: NextPageWithLayout = (props: any) => {
                           </p>
                         </td>
                         <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
-                          <Link
-                            href={"/documents/" + document.id}
-                            className="text-indigo-600 hover:text-indigo-900"
-                          >
+                          <Link href={"/documents/" + document.id}>
                             <TrashIcon
                               className="flex-shrink-0 -ml-1 mr-3 h-6 w-6 inline text-neon"
                               aria-hidden="true"
