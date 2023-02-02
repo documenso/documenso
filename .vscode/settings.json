@@ -11,6 +11,6 @@
     "editor.defaultFormatter": "Prisma.prisma"
   },
   "editor.codeActionsOnSave": {
-    "source.removeUnusedImports": true
+    "source.removeUnusedImports": false
   }
 }
