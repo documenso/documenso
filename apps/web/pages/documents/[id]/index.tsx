@@ -96,19 +96,17 @@ const DocumentsDetailPage: NextPageWithLayout = (props: any) => {
             </div>
           </div>
           <div className="mt-4 flex flex-shrink-0 md:mt-0 md:ml-4">
-            <Link
-              type="a"
+            <Button
+              icon={UserPlusIcon}
               href={
                 NEXT_PUBLIC_WEBAPP_URL +
                 "/documents/" +
                 props.document.id +
                 "/recipients"
               }
-              className="ml-3 inline-flex items-center rounded-md border border-transparent bg-neon px-4 py-2 text-sm font-medium text-white shadow-sm bg-grey hover:bg-neon-dark focus:outline-none focus:ring-2 focus:neon-dark focus:ring-offset-2"
             >
-              <UserPlusIcon className="inline text-white h-4 mr-1"></UserPlusIcon>
               Add Recipients
-            </Link>
+            </Button>
             <Button
               icon={PaperAirplaneIcon}
               disabled={(props?.document?.Recipient?.length || 0) === 0}

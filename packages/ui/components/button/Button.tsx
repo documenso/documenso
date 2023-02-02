@@ -6,8 +6,8 @@ export function Button(props: any) {
   const isLink = typeof props.href !== "undefined";
   const { color = "primary", icon, disabled, onClick } = props;
   const baseStyles =
-    "inline-flex items-center justify-center min-w-[80px] rounded-md border border-transparent px-4 py-2 text-sm font-medium text-white shadow-sm disabled:bg-gray-300";
-  const primaryStyles = "bg-neon hover:bg-neon-dark";
+    "ml-3 inline-flex items-center justify-center min-w-[80px] rounded-md border border-transparent px-4 py-2 text-sm font-medium shadow-sm disabled:bg-gray-300";
+  const primaryStyles = "text-white bg-neon hover:bg-neon-dark";
   const secondaryStyles =
     "border-gray-300 bg-white text-gray-700 hover:bg-gray-50";
 
@@ -21,6 +21,14 @@ export function Button(props: any) {
         props.className
       )}
     >
+      {props.icon ? (
+        <props.icon
+          className="inline text-inherit h-5 mr-1"
+          aria-hidden="true"
+        ></props.icon>
+      ) : (
+        ""
+      )}
       {props.children}
     </Link>
   ) : (
@@ -36,7 +44,7 @@ export function Button(props: any) {
     >
       {props.icon ? (
         <props.icon
-          className="inline text-inherit w-4 mr-1"
+          className="inline text-inherit h-5 mr-1"
           aria-hidden="true"
         ></props.icon>
       ) : (

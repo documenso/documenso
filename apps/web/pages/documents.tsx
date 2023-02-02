@@ -132,7 +132,7 @@ const DocumentsPage: NextPageWithLayout = (props: any) => {
                         </td>
                         <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
                           {document.Recipient.map((item: any) => (
-                            <div>
+                            <div key={item.id}>
                               {item.sendStatus === "SENT" &&
                               item.readStatus !== "OPENED" &&
                               item.signingStatus !== "SIGNED" ? (
