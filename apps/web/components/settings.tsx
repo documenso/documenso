@@ -129,7 +129,7 @@ export default function Setttings() {
                   </p>
                 </div>
 
-                <div className="mt-6 grid grid-cols-12 gap-6">
+                <div className="my-6 grid grid-cols-12 gap-6">
                   <div className="col-span-12 sm:col-span-6">
                     <label
                       htmlFor="first-name"
@@ -165,8 +165,8 @@ export default function Setttings() {
                       className="mt-1 block w-full rounded-md border border-gray-300 py-2 px-3 shadow-sm focus:border-neon focus:outline-none focus:ring-neon sm:text-sm"
                     />
                   </div>
-                  <Button onClick={() => updateUser(user)}>Save</Button>
                 </div>
+                <Button onClick={() => updateUser(user)}>Save</Button>
               </div>
             </form>
           </div>
