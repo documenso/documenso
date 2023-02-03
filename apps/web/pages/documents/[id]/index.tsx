@@ -82,6 +82,7 @@ const DocumentsDetailPage: NextPageWithLayout = (props: any) => {
             <Button
               icon={PaperAirplaneIcon}
               disabled={(props?.document?.Recipient?.length || 0) === 0}
+              className="ml-3"
               onClick={() => {
                 if (
                   confirm(
