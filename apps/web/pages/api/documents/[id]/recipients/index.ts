@@ -23,7 +23,7 @@ async function postHandler(req: NextApiRequest, res: NextApiResponse) {
 
   const document: PrismaDocument = await getDocument(+documentId, req, res);
 
-  // todo encapsulate entity ownerships
+  // todo encapsulate entity ownerships checks
   if (document.userId !== user.id) {
     return res.status(401).send("User does not have access to this document.");
   }
