@@ -11,7 +11,6 @@ export const config = {
   },
 };
 
-// POST /documents
 async function postHandler(req: NextApiRequest, res: NextApiResponse) {
   const form = formidable();
 

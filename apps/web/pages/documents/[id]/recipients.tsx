@@ -180,6 +180,29 @@ const RecipientsPage: NextPageWithLayout = (props: any) => {
   );
 };
 
+async delete(recipient:any){
+  toast.promise(
+    fetch("/api/documents/" + recipient.documentId + "/recipients", {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(recipient),
+    }),
+    {
+      loading: "Deleting...",
+      success: "Deleted.",
+      error: "Could not delete :/",
+    },
+    {
+      id: "deleting",
+      style: {
+        minWidth: "200px",
+      },
+    }
+  );
+}
+
 async function upsertRecipient(recipient: any) {
   toast.promise(
     fetch("/api/documents/" + recipient.documentId + "/recipients", {

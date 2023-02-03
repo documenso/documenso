@@ -32,9 +32,10 @@ async function postHandler(req: NextApiRequest, res: NextApiResponse) {
     return res.status(401).send("User does not have access to this document.");
   }
 
-  const upsert = await prisma.recipient.upsert({
+  await prisma.recipient.upsert({
     where: {
       email: body.email,
+      // todo id
     },
     update: {
       email: body.email,
