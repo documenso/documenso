@@ -17,7 +17,7 @@ import {
 } from "@heroicons/react/24/outline";
 import { getDocument } from "@documenso/lib/query";
 import { Document as PrismaDocument } from "@prisma/client";
-import { Button } from "@documenso/ui";
+import { Button, Breadcrumb } from "@documenso/ui";
 
 const PDFViewer = dynamic(() => import("../../../components/pdf-viewer"), {
   ssr: false,
@@ -30,48 +30,7 @@ const DocumentsDetailPage: NextPageWithLayout = (props: any) => {
     <div className="mt-4">
       <div>
         <div>
-          <nav className="sm:hidden" aria-label="Back">
-            <a
-              href="#"
-              className="flex items-center text-sm font-medium text-gray-500 hover:text-gray-700"
-            >
-              <ChevronLeftIcon
-                className="-ml-1 mr-1 h-5 w-5 flex-shrink-0 text-gray-400"
-                aria-hidden="true"
-              />
-              Back
-            </a>
-          </nav>
-          <nav className="hidden sm:flex" aria-label="Breadcrumb">
-            <ol role="list" className="flex items-center space-x-4">
-              <li>
-                <div className="flex">
-                  <a
-                    href="/documents"
-                    className="text-sm font-medium text-gray-500 hover:text-gray-700"
-                  >
-                    Documents
-                  </a>
-                </div>
-              </li>
-              <li>
-                <div className="flex items-center">
-                  <ChevronRightIcon
-                    className="h-5 w-5 flex-shrink-0 text-gray-400"
-                    aria-hidden="true"
-                  />
-                  <a
-                    href={
-                      NEXT_PUBLIC_WEBAPP_URL + "/documents/" + props.document.id
-                    }
-                    className="ml-4 text-sm font-medium text-gray-500 hover:text-gray-700"
-                  >
-                    "{props.document.title}"
-                  </a>
-                </div>
-              </li>
-            </ol>
-          </nav>
+          <Breadcrumb document={props.document}></Breadcrumb>
         </div>
         <div className="mt-2 md:flex md:items-center md:justify-between">
           <div className="min-w-0 flex-1">
