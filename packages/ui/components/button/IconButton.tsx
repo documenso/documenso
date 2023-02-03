@@ -2,14 +2,12 @@ import { classNames } from "@documenso/lib";
 import Link from "next/link";
 import React from "react";
 
-export function Button(props: any) {
+export function IconButton(props: any) {
   const isLink = typeof props.href !== "undefined";
   const { color = "primary", icon, disabled, onClick } = props;
-  const baseStyles =
-    "inline-flex items-center justify-center min-w-[80px] rounded-md border border-transparent px-4 py-2 text-sm font-medium shadow-sm disabled:bg-gray-300";
-  const primaryStyles = "text-white bg-neon hover:bg-neon-dark";
-  const secondaryStyles =
-    "border-gray-300 bg-white text-gray-700 hover:bg-gray-50";
+  const baseStyles = "disabled:text-gray-300";
+  const primaryStyles = "text-neon hover:text-neon-dark";
+  const secondaryStyles = "text-gray-700 hover:text-neon-dark";
 
   return isLink ? (
     <Link
@@ -24,13 +22,12 @@ export function Button(props: any) {
     >
       {props.icon ? (
         <props.icon
-          className="inline text-inherit h-5 mr-1"
+          className="inline text-inherit h-6 mr-1"
           aria-hidden="true"
         ></props.icon>
       ) : (
         ""
       )}
-      {props.children}
     </Link>
   ) : (
     <button
@@ -46,13 +43,12 @@ export function Button(props: any) {
     >
       {props.icon ? (
         <props.icon
-          className="inline text-inherit h-5 mr-1"
+          className="inline text-inherit h-6 mr-1"
           aria-hidden="true"
         ></props.icon>
       ) : (
         ""
       )}
-      {props.children}
     </button>
   );
 }
