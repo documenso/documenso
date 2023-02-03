@@ -33,13 +33,13 @@ async function postHandler(req: NextApiRequest, res: NextApiResponse) {
       id: +body.id,
     },
     update: {
-      email: body.email,
-      name: body.name,
+      email: body.email.toString(),
+      name: body.name.toString(),
     },
     create: {
       documentId: +documentId,
-      email: body.email,
-      name: body.name,
+      email: body.email.toString(),
+      name: body.name.toString(),
       token: short.generate().toString(),
     },
   });
