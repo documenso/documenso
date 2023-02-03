@@ -1,6 +1,5 @@
 import React from "react";
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/20/solid";
-import { NEXT_PUBLIC_WEBAPP_URL } from "@documenso/lib";
 import Link from "next/link";
 
 export function Breadcrumb(props: any) {
@@ -25,17 +24,16 @@ export function Breadcrumb(props: any) {
       <nav className="hidden sm:flex" aria-label="Breadcrumb">
         <ol role="list" className="flex items-center space-x-4">
           {props?.items.map((item: any, index: number) => (
-            <React.Fragment>
+            <React.Fragment key={item.href}>
               {index > 0 ? (
                 <ChevronRightIcon
-                  key={item.href}
                   className="h-5 w-5 flex-shrink-0 text-gray-400"
                   aria-hidden="true"
                 />
               ) : (
                 ""
               )}
-              <li key={item.href}>
+              <li>
                 <div className="flex">
                   <Link
                     href={item.href}
