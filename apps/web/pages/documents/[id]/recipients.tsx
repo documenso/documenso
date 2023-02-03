@@ -171,12 +171,6 @@ const RecipientsPage: NextPageWithLayout = (props: any) => {
           >
             Add Signer
           </Button>
-          <div className="border-b border-gray-200 pb-5 mt-6">
-            <h3 className="text-lg font-medium leading-6 text-gray-900">CC</h3>
-            <p className="mt-2 max-w-4xl text-sm text-gray-500">
-              Anybody who should get a copy.
-            </p>
-          </div>
         </div>
       </div>
     </>
