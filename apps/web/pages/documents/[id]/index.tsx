@@ -89,7 +89,6 @@ const DocumentsDetailPage: NextPageWithLayout = (props: any) => {
                     `Send document out to ${props?.document?.Recipient?.length} recipients?`
                   )
                 ) {
-                  alert();
                 }
               }}
             >

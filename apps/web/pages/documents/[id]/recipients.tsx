@@ -40,8 +40,6 @@ const RecipientsPage: NextPageWithLayout = (props: any) => {
 
   const [signers, setSigners] = useState(props?.document?.Recipient);
 
-  if (signers.length === 0) setSigners([{ email: "", name: "" }]);
-
   return (
     <>
       <Head>
@@ -144,15 +142,13 @@ const RecipientsPage: NextPageWithLayout = (props: any) => {
                   <div className="ml-auto flex">
                     <IconButton
                       icon={XMarkIcon}
-                      disabled={!signers[0].name && !signers[0].email}
                       onClick={() => {
                         const signersWithoutIndex = [...signers];
                         signersWithoutIndex.splice(index, 1);
                         setSigners(signersWithoutIndex);
-                        console.log("click");
-                        // todo save to api
+                        deleteRecipient(item);
                       }}
-                      className="group-hover:text-neon-dark"
+                      className="group-hover:text-neon-dark group-hover:disabled:text-gray-400"
                     ></IconButton>
                   </div>
                 </div>
@@ -163,7 +159,20 @@ const RecipientsPage: NextPageWithLayout = (props: any) => {
             icon={UserPlusIcon}
             className="mt-3"
             onClick={() => {
-              setSigners(signers.concat({ email: "", name: "" }));
+              setSigners(
+                signers.concat({
+                  id: "",
+                  email: "",
+                  name: "",
+                  documentId: props.document.id,
+                })
+              );
+              upsertRecipient({
+                id: "",
+                email: "",
+                name: "",
+                documentId: props.document.id,
+              });
             }}
           >
             Add Signer
@@ -180,22 +189,28 @@ const RecipientsPage: NextPageWithLayout = (props: any) => {
   );
 };
 
-async delete(recipient:any){
-  toast.promise(
-    fetch("/api/documents/" + recipient.documentId + "/recipients", {
-      method: "DELETE",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(recipient),
-    }),
+async function deleteRecipient(recipient: any) {
+  if (!recipient.id) {
+    return;
+  }
+  const res = toast.promise(
+    fetch(
+      "/api/documents/" + recipient.documentId + "/recipients/" + recipient.id,
+      {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(recipient),
+      }
+    ),
     {
       loading: "Deleting...",
       success: "Deleted.",
       error: "Could not delete :/",
     },
     {
-      id: "deleting",
+      id: "delete",
       style: {
         minWidth: "200px",
       },
@@ -204,26 +219,32 @@ async delete(recipient:any){
 }
 
 async function upsertRecipient(recipient: any) {
-  toast.promise(
-    fetch("/api/documents/" + recipient.documentId + "/recipients", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
+  try {
+    await toast.promise(
+      fetch("/api/documents/" + recipient.documentId + "/recipients", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(recipient),
+      }).then((res) => {
+        if (!res.ok) {
+          throw new Error(res.status.toString());
+        }
+      }),
+      {
+        loading: "Saving...",
+        success: "Saved.",
+        error: "Could not save :/",
       },
-      body: JSON.stringify(recipient),
-    }),
-    {
-      loading: "Saving...",
-      success: "Saved.",
-      error: "Could not save :/",
-    },
-    {
-      id: "saving",
-      style: {
-        minWidth: "200px",
-      },
-    }
-  );
+      {
+        id: "saving",
+        style: {
+          minWidth: "200px",
+        },
+      }
+    );
+  } catch (error) {}
 }
 
 RecipientsPage.getLayout = function getLayout(page: ReactElement) {
