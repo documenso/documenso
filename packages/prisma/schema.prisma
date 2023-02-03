@@ -20,7 +20,7 @@ model Document {
 model Recipient {
   id            Int           @id @default(autoincrement())
   documentId    Int
-  email         String        @unique @db.VarChar(255)
+  email         String        @db.VarChar(255)
   name          String        @default("") @db.VarChar(255)
   token         String
   readStatus    ReadStatus    @default(NOT_OPENED)

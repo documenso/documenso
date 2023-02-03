@@ -159,19 +159,13 @@ const RecipientsPage: NextPageWithLayout = (props: any) => {
             icon={UserPlusIcon}
             className="mt-3"
             onClick={() => {
-              setSigners(
-                signers.concat({
-                  id: "",
-                  email: "",
-                  name: "",
-                  documentId: props.document.id,
-                })
-              );
               upsertRecipient({
                 id: "",
                 email: "",
                 name: "",
                 documentId: props.document.id,
+              }).then((res) => {
+                setSigners(signers.concat(res));
               });
             }}
           >
@@ -218,9 +212,9 @@ async function deleteRecipient(recipient: any) {
   );
 }
 
-async function upsertRecipient(recipient: any) {
+async function upsertRecipient(recipient: any): Promise<any> {
   try {
-    await toast.promise(
+    const created = await toast.promise(
       fetch("/api/documents/" + recipient.documentId + "/recipients", {
         method: "POST",
         headers: {
@@ -231,6 +225,7 @@ async function upsertRecipient(recipient: any) {
         if (!res.ok) {
           throw new Error(res.status.toString());
         }
+        return res.json();
       }),
       {
         loading: "Saving...",
@@ -244,6 +239,7 @@ async function upsertRecipient(recipient: any) {
         },
       }
     );
+    return created;
   } catch (error) {}
 }
 
