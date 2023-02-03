@@ -30,7 +30,20 @@ const DocumentsDetailPage: NextPageWithLayout = (props: any) => {
     <div className="mt-4">
       <div>
         <div>
-          <Breadcrumb document={props.document}></Breadcrumb>
+          <Breadcrumb
+            document={props.document}
+            items={[
+              {
+                title: "Documents",
+                href: "/documents",
+              },
+              {
+                title: props.document.title,
+                href:
+                  NEXT_PUBLIC_WEBAPP_URL + "/documents/" + props.document.id,
+              },
+            ]}
+          />
         </div>
         <div className="mt-2 md:flex md:items-center md:justify-between">
           <div className="min-w-0 flex-1">

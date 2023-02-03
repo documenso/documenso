@@ -1,13 +1,18 @@
 import React from "react";
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/20/solid";
 import { NEXT_PUBLIC_WEBAPP_URL } from "@documenso/lib";
+import Link from "next/link";
 
 export function Breadcrumb(props: any) {
   return (
     <>
       <nav className="sm:hidden" aria-label="Back">
-        <a
-          href="#"
+        <Link
+          href={
+            props.items.length > 1
+              ? props.items[props.items.length - 2].href
+              : props.items[0].href
+          }
           className="flex items-center text-sm font-medium text-gray-500 hover:text-gray-700"
         >
           <ChevronLeftIcon
@@ -15,36 +20,33 @@ export function Breadcrumb(props: any) {
             aria-hidden="true"
           />
           Back
-        </a>
+        </Link>
       </nav>
       <nav className="hidden sm:flex" aria-label="Breadcrumb">
         <ol role="list" className="flex items-center space-x-4">
-          <li>
-            <div className="flex">
-              <a
-                href="/documents"
-                className="text-sm font-medium text-gray-500 hover:text-gray-700"
-              >
-                Documents
-              </a>
-            </div>
-          </li>
-          <li>
-            <div className="flex items-center">
-              <ChevronRightIcon
-                className="h-5 w-5 flex-shrink-0 text-gray-400"
-                aria-hidden="true"
-              />
-              <a
-                href={
-                  NEXT_PUBLIC_WEBAPP_URL + "/documents/" + props.document.id
-                }
-                className="ml-4 text-sm font-medium text-gray-500 hover:text-gray-700"
-              >
-                "{props.document.title}"
-              </a>
-            </div>
-          </li>
+          {props?.items.map((item: any, index: number) => (
+            <React.Fragment>
+              {index > 0 ? (
+                <ChevronRightIcon
+                  key={item.href}
+                  className="h-5 w-5 flex-shrink-0 text-gray-400"
+                  aria-hidden="true"
+                />
+              ) : (
+                ""
+              )}
+              <li key={item.href}>
+                <div className="flex">
+                  <Link
+                    href={item.href}
+                    className="text-sm font-medium text-gray-500 hover:text-gray-700"
+                  >
+                    {item.title}
+                  </Link>
+                </div>
+              </li>
+            </React.Fragment>
+          ))}
         </ol>
       </nav>
     </>
