@@ -130,14 +130,22 @@ export default function TopNavigation() {
                     ))}
                   </div>
                 </div>
-                <div className="hidden sm:ml-6 sm:flex sm:items-center">
+                <div
+                  onClick={() => {
+                    document?.getElementById("mb")?.click();
+                  }}
+                  className="hidden sm:ml-6 sm:flex sm:items-center hover:bg-gray-200 px-3 cursor-pointer"
+                >
                   <span className="text-sm">
                     <p className="font-bold">{user?.name || ""}</p>
                     <p>{user?.email}</p>
                   </span>
                   <Menu as="div" className="relative ml-3">
                     <div>
-                      <Menu.Button className="flex max-w-xs items-center rounded-full bg-white text-sm">
+                      <Menu.Button
+                        id="mb"
+                        className="flex max-w-xs items-center rounded-full bg-white text-sm"
+                      >
                         <span className="sr-only">Open user menu</span>
                         <div
                           key={user?.email}
