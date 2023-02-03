@@ -4,18 +4,33 @@ import Layout from "../../../components/layout";
 import { NextPageWithLayout } from "../../_app";
 import { NEXT_PUBLIC_WEBAPP_URL } from "@documenso/lib";
 import { PaperAirplaneIcon, UserCircleIcon } from "@heroicons/react/24/outline";
-import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/20/solid";
 import { getUserFromToken } from "@documenso/lib/server";
-import { useRouter } from "next/router";
-import { toast } from "react-hot-toast";
 import { getDocument } from "@documenso/lib/query";
 import { Document as PrismaDocument } from "@prisma/client";
 import { Breadcrumb, Button } from "@documenso/ui";
 
 const RecipientsPage: NextPageWithLayout = (props: any) => {
-  const router = useRouter();
   const title: string =
     `"` + props?.document?.title + `"` + "Recipients | Documenso";
+  const breadcrumbItems = [
+    {
+      title: "Documents",
+      href: "/documents",
+    },
+    {
+      title: props.document.title,
+      href: NEXT_PUBLIC_WEBAPP_URL + "/documents/" + props.document.id,
+    },
+    {
+      title: "Recipients",
+      href:
+        NEXT_PUBLIC_WEBAPP_URL +
+        "/documents/" +
+        props.document.id +
+        "/recipients",
+    },
+  ];
+
   return (
     <>
       <Head>
@@ -23,28 +38,7 @@ const RecipientsPage: NextPageWithLayout = (props: any) => {
       </Head>
       <div className="mt-10">
         <div>
-          <Breadcrumb
-            document={props.document}
-            items={[
-              {
-                title: "Documents",
-                href: "/documents",
-              },
-              {
-                title: props.document.title,
-                href:
-                  NEXT_PUBLIC_WEBAPP_URL + "/documents/" + props.document.id,
-              },
-              {
-                title: "Recipients",
-                href:
-                  NEXT_PUBLIC_WEBAPP_URL +
-                  "/documents/" +
-                  props.document.id +
-                  "/recipients",
-              },
-            ]}
-          />
+          <Breadcrumb document={props.document} items={breadcrumbItems} />
         </div>
         <div className="mt-2 md:flex md:items-center md:justify-between">
           <div className="min-w-0 flex-1">
