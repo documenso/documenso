@@ -21,6 +21,10 @@ async function postHandler(req: NextApiRequest, res: NextApiResponse) {
     return;
   }
 
+  if (!body.email) {
+    res.status(400).send("Missing parameter email.");
+  }
+
   const document: PrismaDocument = await getDocument(+documentId, req, res);
 
   // todo encapsulate entity ownerships checks
@@ -28,15 +32,23 @@ async function postHandler(req: NextApiRequest, res: NextApiResponse) {
     return res.status(401).send("User does not have access to this document.");
   }
 
-  await prisma.recipient.create({
-    data: {
+  const upsert = await prisma.recipient.upsert({
+    where: {
+      email: body.email,
+    },
+    update: {
+      email: body.email,
+      name: body.name,
+    },
+    create: {
       documentId: +documentId,
       email: body.email,
+      name: body.name,
       token: short.generate().toString(),
     },
   });
 
-  return res.status(201).end();
+  return res.status(200).end();
 }
 
 export default defaultHandler({

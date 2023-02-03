@@ -8,6 +8,7 @@ import {
   EnvelopeIcon,
   EyeIcon,
   PlusIcon,
+  SunIcon,
   TrashIcon,
 } from "@heroicons/react/24/outline";
 import Link from "next/link";
@@ -135,28 +136,51 @@ const DocumentsPage: NextPageWithLayout = (props: any) => {
                         <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
                           {document.Recipient.map((item: any) => (
                             <div key={item.id}>
+                              {item.sendStatus === "NOT_SENT" ? (
+                                <span
+                                  id="sent_icon"
+                                  className="inline-block flex-shrink-0 rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-800"
+                                >
+                                  {item.name
+                                    ? item.name + " <" + item.email + ">"
+                                    : item.email}
+                                </span>
+                              ) : (
+                                ""
+                              )}
                               {item.sendStatus === "SENT" &&
-                              item.readStatus !== "OPENED" &&
-                              item.signingStatus !== "SIGNED" ? (
+                              item.readStatus !== "OPENED" ? (
                                 <span id="sent_icon">
                                   <EnvelopeIcon className="inline h-5 mr-1"></EnvelopeIcon>
-                                  {item.email}
+                                  <span
+                                    id="sent_icon"
+                                    className="inline-block flex-shrink-0 rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-800"
+                                  >
+                                    {item.name
+                                      ? item.name + " <" + item.email + ">"
+                                      : item.email}
+                                  </span>
                                 </span>
                               ) : (
                                 ""
                               )}
-                              {item.sendStatus === "SENT" &&
-                              item.readStatus === "OPENED" ? (
+                              {item.readStatus === "OPENED" &&
+                              item.signingStatus === "NOT_SIGNED" ? (
                                 <span id="read_icon">
                                   <EyeIcon className="inline h-5 mr-1"></EyeIcon>{" "}
-                                  {item.email}
+                                  <span
+                                    id="sent_icon"
+                                    className="inline-block flex-shrink-0 rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-800"
+                                  >
+                                    {item.name
+                                      ? item.name + " <" + item.email + ">"
+                                      : item.email}
+                                  </span>
                                 </span>
                               ) : (
                                 ""
                               )}
-                              {item.sendStatus === "SENT" &&
-                              item.readStatus === "OPENED" &&
-                              item.signingStatus === "SIGNED" ? (
+                              {item.signingStatus === "SIGNED" ? (
                                 <span id="signed_icon">
                                   <CheckBadgeIcon className="inline h-5 mr-1"></CheckBadgeIcon>{" "}
                                   {item.email}

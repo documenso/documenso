@@ -14,6 +14,7 @@ import { getUserFromToken } from "@documenso/lib/server";
 import { getDocument } from "@documenso/lib/query";
 import { Document as PrismaDocument } from "@prisma/client";
 import { Breadcrumb, Button, IconButton } from "@documenso/ui";
+import toast from "react-hot-toast";
 
 const RecipientsPage: NextPageWithLayout = (props: any) => {
   const title: string =
@@ -91,7 +92,34 @@ const RecipientsPage: NextPageWithLayout = (props: any) => {
                       htmlFor="name"
                       className="block text-xs font-medium text-gray-900"
                     >
-                      Name
+                      Email
+                    </label>
+                    <input
+                      type="email"
+                      name="email"
+                      value={item.email}
+                      onChange={(e) => {
+                        const updatedSigners = [...signers];
+                        updatedSigners[index].email = e.target.value;
+                        setSigners(updatedSigners);
+                      }}
+                      onBlur={() => {
+                        item.documentId = props.document.id;
+                        upsertRecipient(item);
+                      }}
+                      onKeyDown={(event: any) => {
+                        if (event.key === "Enter") upsertRecipient(item);
+                      }}
+                      className="block w-full border-0 p-0 text-gray-900 placeholder-gray-500 sm:text-sm outline-none bg-inherit"
+                      placeholder="john.dorian@loremipsum.com"
+                    />
+                  </div>
+                  <div className="ml-3 w-[250px] rounded-md border border-gray-300 px-3 py-2 shadow-sm focus-within:border-neon focus-within:ring-1 focus-within:ring-neon">
+                    <label
+                      htmlFor="name"
+                      className="block text-xs font-medium text-gray-900"
+                    >
+                      Name (optional)
                     </label>
                     <input
                       type="email"
@@ -102,30 +130,15 @@ const RecipientsPage: NextPageWithLayout = (props: any) => {
                         updatedSigners[index].name = e.target.value;
                         setSigners(updatedSigners);
                       }}
-                      id="name"
+                      onBlur={() => {
+                        item.documentId = props.document.id;
+                        upsertRecipient(item);
+                      }}
+                      onKeyDown={(event: any) => {
+                        if (event.key === "Enter") upsertRecipient(item);
+                      }}
                       className="block w-full border-0 p-0 text-gray-900 placeholder-gray-500 sm:text-sm outline-none bg-inherit"
                       placeholder="John Dorian"
-                    />
-                  </div>
-                  <div className="ml-3 w-[250px] rounded-md border border-gray-300 px-3 py-2 shadow-sm focus-within:border-neon focus-within:ring-1 focus-within:ring-neon">
-                    <label
-                      htmlFor="name"
-                      className="block text-xs font-medium text-gray-900"
-                    >
-                      Email
-                    </label>
-                    <input
-                      type="email"
-                      name="name"
-                      value={item.email}
-                      onChange={(e) => {
-                        const updatedSigners = [...signers];
-                        updatedSigners[index].email = e.target.value;
-                        setSigners(updatedSigners);
-                      }}
-                      id="name"
-                      className="block w-full border-0 p-0 text-gray-900 placeholder-gray-500 sm:text-sm outline-none bg-inherit"
-                      placeholder="john.dorian@loremipsum.com"
                     />
                   </div>
                   <div className="ml-auto flex">
@@ -139,7 +152,7 @@ const RecipientsPage: NextPageWithLayout = (props: any) => {
                         console.log("click");
                         // todo save to api
                       }}
-                      // className="group-hover:text-neon-dark"
+                      className="group-hover:text-neon-dark"
                     ></IconButton>
                   </div>
                 </div>
@@ -166,6 +179,29 @@ const RecipientsPage: NextPageWithLayout = (props: any) => {
     </>
   );
 };
+
+async function upsertRecipient(recipient: any) {
+  toast.promise(
+    fetch("/api/documents/" + recipient.documentId + "/recipients", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(recipient),
+    }),
+    {
+      loading: "Saving...",
+      success: "Saved.",
+      error: "Could not save :/",
+    },
+    {
+      id: "saving",
+      style: {
+        minWidth: "200px",
+      },
+    }
+  );
+}
 
 RecipientsPage.getLayout = function getLayout(page: ReactElement) {
   return <Layout>{page}</Layout>;
