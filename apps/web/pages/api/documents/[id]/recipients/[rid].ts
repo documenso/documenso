@@ -25,7 +25,7 @@ async function deleteHandler(req: NextApiRequest, res: NextApiResponse) {
     },
   });
 
-  return res.status(200).send(documentId + "<- did rid ->" + recipientId);
+  return res.status(200).end();
 }
 
 export default defaultHandler({
