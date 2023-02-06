@@ -181,6 +181,7 @@ async function deleteRecipient(recipient: any) {
   if (!recipient.id) {
     return;
   }
+
   const res = toast.promise(
     fetch(
       "/api/documents/" + recipient.documentId + "/recipients/" + recipient.id,
