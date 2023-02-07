@@ -67,10 +67,9 @@ const RecipientsPage: NextPageWithLayout = (props: any) => {
                 });
               }}
               disabled={
-                (props?.document?.Recipient?.length || 0) === 0 ||
-                !props?.document?.Recipient?.some(
-                  (r: any) => r.sendStatus === "NOT_SENT"
-                )
+                (signers.length || 0) === 0 ||
+                !signers.some((r: any) => r.sendStatus === "NOT_SENT") ||
+                loading
               }
             >
               Send
@@ -346,15 +345,24 @@ async function send(document: any) {
   // todo toast
   // loading
   if (!document || !document.id) return;
-  return await fetch(`/api/documents/${document.id}/send`, {
-    body: "",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    method: "POST",
-  }).finally(() => {
-    location.reload();
-  });
+  return toast
+    .promise(
+      fetch(`/api/documents/${document.id}/send`, {
+        body: "",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        method: "POST",
+      }),
+      {
+        loading: "Sending...",
+        success: `Sent!`,
+        error: "Changes could not send :/",
+      }
+    )
+    .finally(() => {
+      location.reload();
+    });
 }
 
 export default RecipientsPage;
