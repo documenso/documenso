@@ -60,8 +60,7 @@ const RecipientsPage: NextPageWithLayout = (props: any) => {
               color="primary"
               icon={PaperAirplaneIcon}
               onClick={() => {
-                alert();
-                // todo do stuff
+                send(props.document);
               }}
               disabled={(props?.document?.Recipient?.length || 0) === 0}
             >
@@ -264,6 +263,19 @@ export async function getServerSideProps(context: any) {
       document: document,
     },
   };
+}
+
+async function send(document: any) {
+  // todo toast
+  // loading
+  if (!document || !document.id) return;
+  await fetch(`/api/documents/${document.id}/send`, {
+    body: "",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    method: "POST",
+  });
 }
 
 export default RecipientsPage;

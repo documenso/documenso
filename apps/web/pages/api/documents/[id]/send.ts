@@ -39,6 +39,7 @@ async function postHandler(req: NextApiRequest, res: NextApiResponse) {
         res.status(200).end();
       })
       .catch((err) => {
+        console.log(err);
         return res.status(502).end("Coud not send request for signing.");
       });
   });

@@ -19,6 +19,7 @@ export const getDocument = async (
     },
     include: {
       Recipient: true,
+      User: { select: { name: true, email: true } },
     },
   });
 
