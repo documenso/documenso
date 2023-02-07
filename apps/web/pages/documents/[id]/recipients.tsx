@@ -142,11 +142,17 @@ const RecipientsPage: NextPageWithLayout = (props: any) => {
                   <div className="ml-auto flex">
                     <IconButton
                       icon={XMarkIcon}
+                      disabled={!item.id}
                       onClick={() => {
                         const signersWithoutIndex = [...signers];
-                        signersWithoutIndex.splice(index, 1);
+                        const removedItem = signersWithoutIndex.splice(
+                          index,
+                          1
+                        );
                         setSigners(signersWithoutIndex);
-                        deleteRecipient(item);
+                        deleteRecipient(item).catch((err) => {
+                          setSigners(signersWithoutIndex.concat(removedItem));
+                        });
                       }}
                       className="group-hover:text-neon-dark group-hover:disabled:text-gray-400"
                     ></IconButton>
@@ -182,7 +188,7 @@ async function deleteRecipient(recipient: any) {
     return;
   }
 
-  const res = toast.promise(
+  return toast.promise(
     fetch(
       "/api/documents/" + recipient.documentId + "/recipients/" + recipient.id,
       {
