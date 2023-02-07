@@ -12,7 +12,7 @@ import { getDocument } from "@documenso/lib/query";
 async function postHandler(req: NextApiRequest, res: NextApiResponse) {
   const user = await getUserFromToken(req, res);
   const { id: documentId } = req.query;
-  const body = req.body;
+  const body: { name: string; email: string; id: string } = req.body;
 
   if (!user) return;
 
