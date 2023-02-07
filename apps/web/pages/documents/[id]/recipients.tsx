@@ -3,7 +3,13 @@ import { ReactElement, useState } from "react";
 import Layout from "../../../components/layout";
 import { NextPageWithLayout } from "../../_app";
 import { classNames, NEXT_PUBLIC_WEBAPP_URL } from "@documenso/lib";
-import { CheckBadgeIcon, CheckIcon, PaperAirplaneIcon, UserPlusIcon, XMarkIcon } from "@heroicons/react/24/outline";
+import {
+  CheckBadgeIcon,
+  CheckIcon,
+  PaperAirplaneIcon,
+  UserPlusIcon,
+  XMarkIcon,
+} from "@heroicons/react/24/outline";
 import { getUserFromToken } from "@documenso/lib/server";
 import { getDocument } from "@documenso/lib/query";
 import { Document as PrismaDocument } from "@prisma/client";
@@ -33,6 +39,7 @@ const RecipientsPage: NextPageWithLayout = (props: any) => {
   ];
 
   const [signers, setSigners] = useState(props?.document?.Recipient);
+  const [loading, setLoading] = useState(false);
 
   return (
     <>
@@ -54,7 +61,10 @@ const RecipientsPage: NextPageWithLayout = (props: any) => {
               color="primary"
               icon={PaperAirplaneIcon}
               onClick={() => {
-                send(props.document);
+                setLoading(true);
+                send(props.document).finally(() => {
+                  setLoading(false);
+                });
               }}
               disabled={(props?.document?.Recipient?.length || 0) === 0}
             >
@@ -331,7 +341,7 @@ async function send(document: any) {
   // todo toast
   // loading
   if (!document || !document.id) return;
-  await fetch(`/api/documents/${document.id}/send`, {
+  return await fetch(`/api/documents/${document.id}/send`, {
     body: "",
     headers: {
       "Content-Type": "application/json",

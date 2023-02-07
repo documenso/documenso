@@ -41,7 +41,7 @@ export function Button(props: any) {
         props.className
       )}
       onClick={props.onClick}
-      disabled={props.disabled}
+      disabled={props.disabled || props.loading}
       hidden={props.hidden}
     >
       {props.icon ? (

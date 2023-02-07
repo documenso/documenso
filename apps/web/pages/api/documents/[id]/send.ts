@@ -7,7 +7,7 @@ import prisma from "@documenso/prisma";
 import { NextApiRequest, NextApiResponse } from "next";
 import { sendSigningRequest } from "@documenso/lib/mail";
 import { getDocument } from "@documenso/lib/query";
-import { Document as PrismaDocument } from "@prisma/client";
+import { Document as PrismaDocument, SendStatus } from "@prisma/client";
 
 async function postHandler(req: NextApiRequest, res: NextApiResponse) {
   const user = await getUserFromToken(req, res);
@@ -27,16 +27,19 @@ async function postHandler(req: NextApiRequest, res: NextApiResponse) {
 
   // todo handle sending to single recipient even though more exist
 
-  const recipients = prisma.recipient.findMany({
+  const recipients = await prisma.recipient.findMany({
     where: {
       documentId: +documentId,
-      // sendStatus: SendStatus.NOT_SENT, // TODO REDO AFTER DEBUG
+      sendStatus: SendStatus.NOT_SENT,
     },
   });
+
+  if (!recipients.length) return res.status(200).end("");
+
   (await recipients).forEach(async (recipient) => {
     await sendSigningRequest(recipient, document)
       .then(() => {
-        res.status(200).end();
+        return res.status(200).end();
       })
       .catch((err) => {
         console.log(err);
@@ -44,6 +47,7 @@ async function postHandler(req: NextApiRequest, res: NextApiResponse) {
       });
   });
 
+  // return res.status(500).end();
   // todo check if recipient has an account and show them in their inbox or something
 }
 
