@@ -2,14 +2,8 @@ import Head from "next/head";
 import { ReactElement, useState } from "react";
 import Layout from "../../../components/layout";
 import { NextPageWithLayout } from "../../_app";
-import { NEXT_PUBLIC_WEBAPP_URL } from "@documenso/lib";
-import {
-  PaperAirplaneIcon,
-  TrashIcon,
-  UserCircleIcon,
-  UserPlusIcon,
-  XMarkIcon,
-} from "@heroicons/react/24/outline";
+import { classNames, NEXT_PUBLIC_WEBAPP_URL } from "@documenso/lib";
+import { CheckBadgeIcon, CheckIcon, PaperAirplaneIcon, UserPlusIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import { getUserFromToken } from "@documenso/lib/server";
 import { getDocument } from "@documenso/lib/query";
 import { Document as PrismaDocument } from "@prisma/client";
@@ -84,7 +78,12 @@ const RecipientsPage: NextPageWithLayout = (props: any) => {
                 className="px-0 py-4 w-full hover:bg-green-50 border-0 group"
               >
                 <div id="container" className="flex w-full">
-                  <div className="w-[250px] rounded-md border border-gray-300 px-3 py-2 shadow-sm focus-within:border-neon focus-within:ring-1 focus-within:ring-neon">
+                  <div
+                    className={classNames(
+                      "ml-3 w-[250px] rounded-md border border-gray-300 px-3 py-2 shadow-sm focus-within:border-neon focus-within:ring-1 focus-within:ring-neon",
+                      item.sendStatus === "SENT" ? "bg-gray-100" : ""
+                    )}
+                  >
                     <label
                       htmlFor="name"
                       className="block text-xs font-medium text-gray-900"
@@ -95,6 +94,7 @@ const RecipientsPage: NextPageWithLayout = (props: any) => {
                       type="email"
                       name="email"
                       value={item.email}
+                      disabled={item.sendStatus === "SENT"}
                       onChange={(e) => {
                         const updatedSigners = [...signers];
                         updatedSigners[index].email = e.target.value;
@@ -111,7 +111,12 @@ const RecipientsPage: NextPageWithLayout = (props: any) => {
                       placeholder="john.dorian@loremipsum.com"
                     />
                   </div>
-                  <div className="ml-3 w-[250px] rounded-md border border-gray-300 px-3 py-2 shadow-sm focus-within:border-neon focus-within:ring-1 focus-within:ring-neon">
+                  <div
+                    className={classNames(
+                      "ml-3 w-[250px] rounded-md border border-gray-300 px-3 py-2 shadow-sm focus-within:border-neon focus-within:ring-1 focus-within:ring-neon",
+                      item.sendStatus === "SENT" ? "bg-gray-100" : ""
+                    )}
+                  >
                     <label
                       htmlFor="name"
                       className="block text-xs font-medium text-gray-900"
@@ -122,6 +127,7 @@ const RecipientsPage: NextPageWithLayout = (props: any) => {
                       type="email"
                       name="name"
                       value={item.name}
+                      disabled={item.sendStatus === "SENT"}
                       onChange={(e) => {
                         const updatedSigners = [...signers];
                         updatedSigners[index].name = e.target.value;
@@ -139,9 +145,65 @@ const RecipientsPage: NextPageWithLayout = (props: any) => {
                     />
                   </div>
                   <div className="ml-auto flex">
+                    <div key={item.id}>
+                      {item.sendStatus === "NOT_SENT" ? (
+                        <span
+                          id="sent_icon"
+                          className="inline-block flex-shrink-0 rounded-full bg-gray-200 px-2 py-0.5 text-xs font-medium text-gray-800"
+                        >
+                          Not Sent
+                        </span>
+                      ) : (
+                        ""
+                      )}
+                      {item.sendStatus === "SENT" &&
+                      item.readStatus !== "OPENED" ? (
+                        <span id="sent_icon">
+                          <span
+                            id="sent_icon"
+                            className="inline-block flex-shrink-0 rounded-full bg-yellow-200 px-2 py-0.5 text-xs font-medium text-gray-800"
+                          >
+                            <CheckIcon className="inline h-5 mr-1"></CheckIcon>{" "}
+                            Sent
+                          </span>
+                        </span>
+                      ) : (
+                        ""
+                      )}
+                      {item.readStatus === "OPENED" &&
+                      item.signingStatus === "NOT_SIGNED" ? (
+                        <span id="read_icon">
+                          <span
+                            id="sent_icon"
+                            className="inline-block flex-shrink-0 rounded-full bg-yellow-200 px-2 py-0.5 text-xs font-medium text-gray-800"
+                          >
+                            <CheckIcon className="inline h-5 -mr-2"></CheckIcon>
+                            <CheckIcon className="inline h-5 mr-1"></CheckIcon>
+                            Seen
+                          </span>
+                        </span>
+                      ) : (
+                        ""
+                      )}
+                      {item.signingStatus === "SIGNED" ? (
+                        <span id="signed_icon">
+                          <span
+                            id="sent_icon"
+                            className="inline-block flex-shrink-0 rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-800"
+                          >
+                            <CheckBadgeIcon className="inline h-5 mr-1"></CheckBadgeIcon>
+                            Signed
+                          </span>
+                        </span>
+                      ) : (
+                        ""
+                      )}
+                    </div>
+                  </div>
+                  <div className="ml-auto flex">
                     <IconButton
                       icon={XMarkIcon}
-                      disabled={!item.id}
+                      disabled={!item.id || item.sendStatus === "SENT"}
                       onClick={() => {
                         const signersWithoutIndex = [...signers];
                         const removedItem = signersWithoutIndex.splice(
@@ -275,6 +337,8 @@ async function send(document: any) {
       "Content-Type": "application/json",
     },
     method: "POST",
+  }).finally(() => {
+    location.reload();
   });
 }
 
