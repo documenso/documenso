@@ -66,7 +66,12 @@ const RecipientsPage: NextPageWithLayout = (props: any) => {
                   setLoading(false);
                 });
               }}
-              disabled={(props?.document?.Recipient?.length || 0) === 0}
+              disabled={
+                (props?.document?.Recipient?.length || 0) === 0 ||
+                !props?.document?.Recipient?.some(
+                  (r: any) => r.sendStatus === "NOT_SENT"
+                )
+              }
             >
               Send
             </Button>
