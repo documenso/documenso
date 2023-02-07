@@ -72,20 +72,15 @@ const DocumentsDetailPage: NextPageWithLayout = (props: any) => {
           </div>
           <div className="mt-4 flex flex-shrink-0 md:mt-0 md:ml-4">
             <Button
-              icon={UserPlusIcon}
+              icon={PaperAirplaneIcon}
+              disabled={(props?.document?.Recipient?.length || 0) === 0}
+              className="ml-3"
               href={
                 NEXT_PUBLIC_WEBAPP_URL +
                 "/documents/" +
                 props.document.id +
                 "/recipients"
               }
-            >
-              Add Recipients
-            </Button>
-            <Button
-              icon={PaperAirplaneIcon}
-              disabled={(props?.document?.Recipient?.length || 0) === 0}
-              className="ml-3"
               onClick={() => {
                 if (
                   confirm(
@@ -95,7 +90,7 @@ const DocumentsDetailPage: NextPageWithLayout = (props: any) => {
                 }
               }}
             >
-              Send
+              Prepare to Send
             </Button>
           </div>
         </div>
