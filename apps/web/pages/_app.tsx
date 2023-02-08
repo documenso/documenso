@@ -1,5 +1,6 @@
 import "../styles/tailwind.css";
 import "../../../node_modules/placeholder-loading/src/scss/placeholder-loading.scss";
+import "../../../node_modules/react-resizable/css/styles.css";
 import "react-tooltip/dist/react-tooltip.css";
 import { ReactElement, ReactNode } from "react";
 import type { AppProps } from "next/app";
