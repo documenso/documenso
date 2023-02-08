@@ -15,8 +15,8 @@ export default function Field(props: FieldPropsType) {
       <ResizableBox
         width={200}
         height={100}
-        minConstraints={[150, 75]}
-        maxConstraints={[250, 125]}
+        minConstraints={[140, 65]}
+        maxConstraints={[260, 125]}
         className="bg-neon opacity-90 w-auto h-auto flex align-middle"
         lockAspectRatio={true}
         onResizeStart={(e: SyntheticEvent, data: ResizeCallbackData) => {
