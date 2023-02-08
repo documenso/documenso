@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { Fragment, useState } from "react";
 import { Document, Page } from "react-pdf/dist/esm/entry.webpack5";
+import Field from "./editor/field";
 
 export default function PDFViewer(props) {
   const [file, setFile] = useState("");
@@ -29,15 +30,33 @@ export default function PDFViewer(props) {
           options={options}
         >
           {Array.from({ length: numPages }, (_, index) => (
-            <Page
-              className="mt-5"
-              key={`page_${index + 1}`}
-              pageNumber={index + 1}
-              renderAnnotationLayer={false}
-              renderTextLayer={false}
-              onLoadSuccess={() => setLoading(false)}
-              onRenderError={() => setLoading(false)}
-            />
+            <Fragment>
+              <div
+                style={{
+                  position: "relative",
+                  background: "green",
+                }}
+              >
+                <div
+                  style={{
+                    width: "100%",
+                    background: "red",
+                  }}
+                >
+                  <Page
+                    className="mt-5"
+                    key={`page_${index + 1}`}
+                    pageNumber={index + 1}
+                    renderAnnotationLayer={false}
+                    renderTextLayer={false}
+                    onLoadSuccess={() => setLoading(false)}
+                    onRenderError={() => setLoading(false)}
+                  >
+                    <Field></Field>
+                  </Page>
+                </div>
+              </div>
+            </Fragment>
           ))}
         </Document>
       </div>
