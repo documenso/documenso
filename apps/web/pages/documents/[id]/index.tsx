@@ -23,7 +23,6 @@ const PDFViewer = dynamic(() => import("../../../components/pdf-viewer"), {
 
 const DocumentsDetailPage: NextPageWithLayout = (props: any) => {
   const router = useRouter();
-  const [fields, setFields]: any[] = useState([]);
 
   return (
     <div className="mt-4">
@@ -95,34 +94,8 @@ const DocumentsDetailPage: NextPageWithLayout = (props: any) => {
         </div>
       </div>
       <div className="mx-auto w-fit">
-        <div className="max-w-xs mt-6">
-          <select
-            className="mb-3 inline mt-1 w-full rounded-md border-gray-300 py-2 pl-3 pr-10 text-base focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm"
-            defaultValue={props?.document?.Recipient[0]}
-          >
-            {props?.document?.Recipient?.map((item: any) => (
-              <option key={item.email + short.generate().toString()}>
-                {item.name ? `${item.name} <${item.email}>` : item.email}
-              </option>
-            ))}
-          </select>
-          <Button
-            className="inline ml-1"
-            onClick={() => {
-              setFields(fields.concat({ type: "signature" }));
-            }}
-          >
-            Add Signature
-          </Button>
-          <Button color="secondary" className="inline ml-1">
-            Add Date
-          </Button>
-          <Button color="secondary" className="inline ml-1">
-            Add Text
-          </Button>
-        </div>
         <PDFViewer
-          fields={fields}
+          document={props.document}
           pdfUrl={`${NEXT_PUBLIC_WEBAPP_URL}/api/documents/${router.query.id}`}
         />
       </div>
