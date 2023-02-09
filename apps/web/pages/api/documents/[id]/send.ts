@@ -47,7 +47,6 @@ async function postHandler(req: NextApiRequest, res: NextApiResponse) {
       });
   });
 
-  // return res.status(500).end();
   // todo check if recipient has an account and show them in their inbox or something
 }
 
