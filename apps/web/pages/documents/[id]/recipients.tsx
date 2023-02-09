@@ -430,24 +430,32 @@ async function send(document: any) {
   // todo toast
   // loading
   if (!document || !document.id) return;
-  return toast
-    .promise(
+  try {
+    const sent = await toast.promise(
       fetch(`/api/documents/${document.id}/send`, {
         body: "",
         headers: {
           "Content-Type": "application/json",
         },
         method: "POST",
-      }),
+      })
+        .then((res: any) => {
+          if (!res.ok) {
+            throw new Error(res.status.toString());
+          }
+        })
+        .finally(() => {
+          location.reload();
+        }),
       {
         loading: "Sending...",
         success: `Sent!`,
-        error: "Changes could not send :/",
+        error: "Could not send :/",
       }
-    )
-    .finally(() => {
-      location.reload();
-    });
+    );
+  } catch (err) {
+    console.log(err);
+  }
 }
 
 export default RecipientsPage;

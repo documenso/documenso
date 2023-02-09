@@ -18,7 +18,8 @@ export const sendSigningRequest = async (
       document,
       recipient,
       `${NEXT_PUBLIC_WEBAPP_URL}/documents/${document.id}/sign?token=${recipient.token}`,
-      `Sign Document`
+      `Sign Document`,
+      user
     )
   ).catch((err) => {
     throw err;

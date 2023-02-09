@@ -6,7 +6,8 @@ export const transactionEmailTemplate = (
   document: any,
   recipient: any,
   ctaLink: string,
-  ctaLabel: string
+  ctaLabel: string,
+  user: any
 ) => {
   const html = `
     <div style="background-color: #eaeaea; padding: 2%;">
@@ -20,7 +21,7 @@ export const transactionEmailTemplate = (
         </p>
         <hr size="1" style="height:1px;border:none;color:#e0e0e0;background-color:#e0e0e0">
         Click the button to view "${document.title}".<br>
-        <small>If you have questions about this document, you should ask ${document.User.name}.</small>
+        <small>If you have questions about this document, you should ask ${user.name}.</small>
         <hr size="1" style="height:1px;border:none;color:#e0e0e0;background-color:#e0e0e0">
       </div>
     `;
