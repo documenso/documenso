@@ -4,13 +4,17 @@ import { SendStatus, DocumentStatus } from "@prisma/client";
 import { NEXT_PUBLIC_WEBAPP_URL } from "../constants";
 import { transactionEmailTemplate } from "@documenso/lib/mail";
 
-export const sendSigningRequest = async (recipient: any, document: any) => {
+export const sendSigningRequest = async (
+  recipient: any,
+  document: any,
+  user: any
+) => {
   // todo errror handling
   await sendMail(
-    document.User.email,
+    user.email,
     `Please sign ${document.title}`,
     transactionEmailTemplate(
-      `${document.User.name} (${document.User.email}) has sent you a document to sign. `,
+      `${user.name} (${user.email}) has sent you a document to sign. `,
       document,
       recipient,
       `${NEXT_PUBLIC_WEBAPP_URL}/documents/${document.id}/sign?token=${recipient.token}`,
