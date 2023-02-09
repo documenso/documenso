@@ -9,6 +9,14 @@ const SignPage: NextPageWithLayout = (props: any) => {
   useEffect(() => {
     const canvas: any = document.querySelector("canvas");
     const signaturePad = new SignaturePad(canvas);
+    const resizeCanvas = () => {
+      const ratio = Math.max(window.devicePixelRatio || 1, 1);
+      canvas.width = canvas.offsetWidth * ratio;
+      canvas.height = canvas.offsetHeight * ratio;
+      canvas.getContext("2d").scale(ratio, ratio);
+      // signaturePad.clear(); // otherwise isEmpty() might return incorrect value
+    };
+    window.addEventListener("resize", resizeCanvas);
   });
   return (
     <>
