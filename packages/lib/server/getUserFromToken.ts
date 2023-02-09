@@ -20,7 +20,7 @@ export async function getUserFromToken(
     return null;
   }
 
-  let user = await prisma.user.findFirst({
+  let user = await prisma.user.findFirstOrThrow({
     where: { email: tokenEmail },
   });
 
