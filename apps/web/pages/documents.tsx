@@ -1,4 +1,4 @@
-import { ReactElement, useState } from "react";
+import { ReactElement, useEffect, useState } from "react";
 import Layout from "../components/layout";
 import type { NextPageWithLayout } from "./_app";
 import Head from "next/head";
@@ -22,8 +22,8 @@ import { Button } from "@documenso/ui";
 
 const DocumentsPage: NextPageWithLayout = (props: any) => {
   const router = useRouter();
-  const [documents = [], setDocuments] = useState(props.documents);
-  const [loading, setLoading] = useState(false);
+  const [documents, setDocuments]: any[] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   const getDocuments = async () => {
     if (!documents.length) setLoading(true);
@@ -38,6 +38,10 @@ const DocumentsPage: NextPageWithLayout = (props: any) => {
       });
     });
   };
+
+  useEffect(() => {
+    getDocuments();
+  }, []);
 
   function showDocument(documentId: number) {
     router.push("/documents/" + documentId);
@@ -125,7 +129,7 @@ const DocumentsPage: NextPageWithLayout = (props: any) => {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-200 bg-white">
-                    {documents.map((document: any) => (
+                    {documents.map((document: any, index: number) => (
                       <tr
                         key={document.id}
                         className="hover:bg-gray-100 cursor-pointer"
@@ -233,11 +237,24 @@ const DocumentsPage: NextPageWithLayout = (props: any) => {
                                     "Are you sure you want to delete this document"
                                   )
                                 ) {
+                                  const documentsWithoutIndex = [...documents];
+                                  const removedItem: any =
+                                    documentsWithoutIndex.splice(index, 1);
+                                  setDocuments(documentsWithoutIndex);
                                   fetch(`/api/documents/${document.id}`, {
                                     method: "DELETE",
-                                  }).then(() => {
-                                    getDocuments();
-                                  });
+                                  })
+                                    .catch((err) => {
+                                      documentsWithoutIndex.splice(
+                                        index,
+                                        0,
+                                        removedItem
+                                      );
+                                      setDocuments(documentsWithoutIndex);
+                                    })
+                                    .then(() => {
+                                      getDocuments();
+                                    });
                                 }
                               }}
                             />
@@ -299,13 +316,13 @@ const DocumentsPage: NextPageWithLayout = (props: any) => {
   );
 };
 
-export async function getServerSideProps(context: any) {
-  return {
-    props: {
-      documents: await getDocumentsForUserFromToken(context),
-    },
-  };
-}
+// export async function getServerSideProps(context: any) {
+//   return {
+//     props: {
+//       documents: await getDocumentsForUserFromToken(context),
+//     },
+//   };
+// }
 
 function formatDocumentStatus(status: DocumentStatus) {
   switch (status) {
