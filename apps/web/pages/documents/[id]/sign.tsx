@@ -1,14 +1,11 @@
 import prisma from "@documenso/prisma";
 import Head from "next/head";
-import { ReactElement, useEffect } from "react";
-import Layout from "../../../components/layout";
-import Logo from "../../../components/logo";
+import { useEffect } from "react";
 import { NextPageWithLayout } from "../../_app";
-import { Router } from "next/router";
 import { ReadStatus } from "@prisma/client";
 import SignaturePad from "signature_pad";
 
-const SignPage: NextPageWithLayout = () => {
+const SignPage: NextPageWithLayout = (props: any) => {
   useEffect(() => {
     const canvas: any = document.querySelector("canvas");
     const signaturePad = new SignaturePad(canvas);
@@ -21,6 +18,7 @@ const SignPage: NextPageWithLayout = () => {
       Hello, please sign at the dotted line.
       <canvas className="mx-auto bg-neon"></canvas>
       <hr></hr>
+      {/* todo read/ sign version of editor => flag or own component */}
     </>
   );
 };
@@ -37,10 +35,22 @@ export async function getServerSideProps(context: any) {
     },
   });
 
+  const document = await prisma.recipient
+    .findFirstOrThrow({
+      where: {
+        token: recipientToken,
+      },
+    })
+    .Document();
+
+  // todo get r
+
   // todo sign ui
 
   return {
-    props: {},
+    props: {
+      document: document,
+    },
   };
 }
 
