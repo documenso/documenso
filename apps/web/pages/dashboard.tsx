@@ -4,19 +4,15 @@ import Layout from "../components/layout";
 import Link from "next/link";
 import type { NextPageWithLayout } from "./_app";
 import {
-  BellSnoozeIcon,
   CheckBadgeIcon,
-  EnvelopeIcon,
-  EyeIcon,
-  SunIcon,
-  XCircleIcon,
+  DocumentIcon,
+  ExclamationTriangleIcon,
+  UsersIcon,
 } from "@heroicons/react/24/outline";
 import { uploadDocument } from "@documenso/features";
-import prisma from "@documenso/prisma";
 import {
-  ReadStatus,
-  SendStatus,
   DocumentStatus,
+  SendStatus,
   Document as PrismaDocument,
 } from "@prisma/client";
 import { getUserFromToken } from "@documenso/lib/server";
@@ -31,38 +27,26 @@ const DashboardPage: NextPageWithLayout = (props: any) => {
     {
       name: "Draft",
       stat: "0",
-      icon: SunIcon,
-      link: "/documents?filter=",
+      icon: DocumentIcon,
+      link: "/documents?filter=draft",
     },
     {
-      name: "Sent",
+      name: "Action required",
       stat: "0",
-      icon: EnvelopeIcon,
-      link: "/documents?filter=",
+      icon: ExclamationTriangleIcon,
+      link: "/documents?filter=action_required",
     },
     {
-      name: "Viewed",
+      name: "Waiting for others",
       stat: "0",
-      icon: EyeIcon,
-      link: "/documents?filter=",
+      icon: UsersIcon,
+      link: "/documents?filter=waiting_for_others",
     },
     {
-      name: "Signed",
+      name: "Completed",
       stat: "0",
       icon: CheckBadgeIcon,
-      link: "/documents?filter=",
-    },
-    {
-      name: "Expired",
-      stat: "0",
-      icon: BellSnoozeIcon,
-      link: "/documents?filter=",
-    },
-    {
-      name: "Declined",
-      stat: "0",
-      icon: XCircleIcon,
-      link: "/documents?filter=",
+      link: "/documents?filter=completed",
     },
   ];
 
@@ -77,11 +61,11 @@ const DashboardPage: NextPageWithLayout = (props: any) => {
             Dashboard
           </h1>
         </header>
-        <dl className="mt-8 grid grid-cols-1 gap-5 sm:grid-cols-3">
+        <dl className="mt-8 grid grid-cols-4 xs:grid-cols-2 gap-5">
           {stats.map((item) => (
             <Link href={item.link} key={item.name}>
-              <div className="overflow-hidden rounded-lg bg-white px-4 py-5 shadow sm:p-6">
-                <dt className="truncate text-sm font-medium text-gray-500">
+              <div className="overflow-hidden rounded-lg bg-white px-4 py-5 shadow sm:p-6 ">
+                <dt className="truncate text-sm font-medium text-gray-500 ">
                   <item.icon
                     className="flex-shrink-0 mr-3 h-6 w-6 inline text-neon"
                     aria-hidden="true"
@@ -141,9 +125,9 @@ DashboardPage.getLayout = function getLayout(page: ReactElement) {
 
 function getStat(name: string, props: any) {
   if (name === "Draft") return props.dashboard.drafts;
-  if (name === "Sent") return props.dashboard.sent;
-  if (name === "Viewed") return props.dashboard.viewed;
-  if (name === "Signed") return props.dashboard.signed;
+  if (name === "Action required") return props.dashboard.action;
+  if (name === "Waiting for others") return props.dashboard.waiting;
+  if (name === "Completed") return props.dashboard.completed;
   return 0;
 }
 
@@ -154,41 +138,30 @@ export async function getServerSideProps(context: any) {
   // todo optimize querys
   // todo no intersection groups
 
-  const documents: PrismaDocument[] = await getDocumentsForUserFromToken(
-    context
-  );
+  const documents: any[] = await getDocumentsForUserFromToken(context);
 
   const drafts: PrismaDocument[] = documents.filter(
     (d) => d.status === DocumentStatus.DRAFT
+  );
+
+  // Todo count declined, expired etc.
+  const action: PrismaDocument[] = [];
+
+  const waiting: any[] = documents.filter((e) =>
+    e.Recipient.some((e: any) => e.sendStatus === SendStatus.SENT)
   );
 
   const completed: PrismaDocument[] = documents.filter(
     (d) => d.status === DocumentStatus.COMPLETED
   );
 
-  const sent = await prisma.recipient.groupBy({
-    by: ["documentId"],
-    where: {
-      sendStatus: SendStatus.SENT,
-      readStatus: ReadStatus.NOT_OPENED,
-    },
-  });
-
-  const opened = await prisma.recipient.groupBy({
-    by: ["documentId"],
-    where: {
-      sendStatus: SendStatus.SENT,
-      readStatus: ReadStatus.OPENED,
-    },
-  });
-
   return {
     props: {
       dashboard: {
         drafts: drafts.length,
-        sent: sent.length,
-        viewed: opened.length,
-        signed: completed.length,
+        action: action.length,
+        waiting: waiting.length,
+        completed: completed.length,
       },
     },
   };
