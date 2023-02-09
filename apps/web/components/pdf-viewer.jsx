@@ -1,6 +1,7 @@
 import { Fragment, useState } from "react";
 import { Document, Page } from "react-pdf/dist/esm/entry.webpack5";
 import Field from "./editor/field";
+import short from "short-uuid";
 
 export default function PDFViewer(props) {
   const [file, setFile] = useState("");
@@ -30,8 +31,9 @@ export default function PDFViewer(props) {
           options={options}
         >
           {Array.from({ length: numPages }, (_, index) => (
-            <Fragment>
+            <Fragment key={short.generate().toString()}>
               <div
+                key={short.generate().toString()}
                 style={{
                   position: "relative",
                   background: "green",
@@ -51,9 +53,14 @@ export default function PDFViewer(props) {
                     renderTextLayer={false}
                     onLoadSuccess={() => setLoading(false)}
                     onRenderError={() => setLoading(false)}
-                  >
-                    <Field></Field>
-                  </Page>
+                  ></Page>
+                  {props.fields.map((item) => (
+                    <Field
+                      key={short.generate().toString()}
+                      position={{ x: 0, y: -500 }}
+                      className="absolute"
+                    ></Field>
+                  ))}
                 </div>
               </div>
             </Fragment>

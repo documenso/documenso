@@ -15,6 +15,7 @@ import {
 import { getDocument } from "@documenso/lib/query";
 import { Document as PrismaDocument } from "@prisma/client";
 import { Button, Breadcrumb } from "@documenso/ui";
+import short from "short-uuid";
 
 const PDFViewer = dynamic(() => import("../../../components/pdf-viewer"), {
   ssr: false,
@@ -100,7 +101,7 @@ const DocumentsDetailPage: NextPageWithLayout = (props: any) => {
             defaultValue={props?.document?.Recipient[0]}
           >
             {props?.document?.Recipient?.map((item: any) => (
-              <option key={item.email}>
+              <option key={item.email + short.generate().toString()}>
                 {item.name ? `${item.name} <${item.email}>` : item.email}
               </option>
             ))}
