@@ -6,7 +6,7 @@ Documenso aims to be the world's most trusted document signing tool. This trust 
 
 ## todos
 
-- Sendgrid setup and nodemailer-sendgrid SMTP hint
+- Sendgrid setup and nodemailer-sendgrid SMTP hint (import for interchangeability like SMTP)
 - Render Deploy YAML file or similar
 
 # Setup
