@@ -63,6 +63,7 @@ const RecipientsPage: NextPageWithLayout = (props: any) => {
           </div>
           <div className="mt-4 flex flex-shrink-0 md:mt-0 md:ml-4">
             <Button
+              className="min-w-[125px]"
               color="primary"
               icon={PaperAirplaneIcon}
               onClick={() => {
