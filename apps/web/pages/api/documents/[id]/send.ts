@@ -37,7 +37,7 @@ async function postHandler(req: NextApiRequest, res: NextApiResponse) {
   if (!recipients.length) return res.status(200).end("");
 
   (await recipients).forEach(async (recipient) => {
-    await sendSigningRequest(recipient, document)
+    await sendSigningRequest(recipient, document, user)
       .then(() => {
         return res.status(200).end();
       })
