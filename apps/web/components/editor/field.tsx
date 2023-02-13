@@ -22,8 +22,6 @@ export default function Field(props: FieldPropsType) {
     props.field.position || { x: 0, y: -842 }
   );
   const nodeRef = React.createRef<HTMLDivElement>();
-  console.log(props.field);
-
   const onControlledDrag = (e: any, position: any) => {
     const { x, y } = position;
     setPosition({ x, y });
