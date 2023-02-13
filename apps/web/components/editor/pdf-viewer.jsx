@@ -69,7 +69,7 @@ export default function PDFViewer(props) {
           ))}
         </Document>
       </div>
-      <div className="mt-10 w-[600px]" hidden={!loading}>
+      <div className="mx-auto mt-10 w-[600px]" hidden={!loading}>
         <div className="ph-item">
           <div className="ph-col-12">
             <div className="ph-picture"></div>
