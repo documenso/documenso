@@ -131,6 +131,12 @@ export async function getServerSideProps(context: any) {
   // todo optimize querys
   // todo no intersection groups
 
+  if (!document) {
+    return {
+      notFound: true,
+    };
+  }
+
   return {
     props: {
       document: document,
