@@ -16,10 +16,7 @@ import { getDocument } from "@documenso/lib/query";
 import { Document as PrismaDocument } from "@prisma/client";
 import { Button, Breadcrumb } from "@documenso/ui";
 import short from "short-uuid";
-
-const PDFViewer = dynamic(() => import("../../../components/pdf-viewer"), {
-  ssr: false,
-});
+import PDFEditor from "../../../components/editor/pdf-editor";
 
 const DocumentsDetailPage: NextPageWithLayout = (props: any) => {
   const router = useRouter();
@@ -94,10 +91,7 @@ const DocumentsDetailPage: NextPageWithLayout = (props: any) => {
         </div>
       </div>
       <div className="mx-auto w-fit">
-        <PDFViewer
-          document={props.document}
-          pdfUrl={`${NEXT_PUBLIC_WEBAPP_URL}/api/documents/${router.query.id}`}
-        />
+        <PDFEditor document={props.document} />
       </div>
     </div>
   );
@@ -130,6 +124,12 @@ export async function getServerSideProps(context: any) {
 
   // todo optimize querys
   // todo no intersection groups
+
+  if (!document) {
+    return {
+      notFound: true,
+    };
+  }
 
   return {
     props: {

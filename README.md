@@ -17,5 +17,3 @@ Documenso aims to be the world's most trusted document signing tool. This trust 
 - Set DATABASE_URL and SENDGRID_API_KEY values in .env file
 - Run <code>npm run dev</code> root directory to start
 - Register a new user at http://localhost:3000/signup
-
-test

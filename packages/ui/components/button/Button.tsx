@@ -35,6 +35,7 @@ export function Button(props: any) {
   ) : (
     <button
       id={props.id}
+      type="button"
       className={classNames(
         baseStyles,
         color === "primary" ? primaryStyles : secondaryStyles,
