@@ -17,9 +17,12 @@ import { Document as PrismaDocument } from "@prisma/client";
 import { Button, Breadcrumb } from "@documenso/ui";
 import short from "short-uuid";
 
-const PDFViewer = dynamic(() => import("../../../components/pdf-viewer"), {
-  ssr: false,
-});
+const PDFViewer = dynamic(
+  () => import("../../../components/editor/pdf-viewer"),
+  {
+    ssr: false,
+  }
+);
 
 const DocumentsDetailPage: NextPageWithLayout = (props: any) => {
   const router = useRouter();

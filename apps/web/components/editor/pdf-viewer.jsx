@@ -1,6 +1,6 @@
 import { Fragment, useState } from "react";
 import { Document, Page } from "react-pdf/dist/esm/entry.webpack5";
-import Field from "./editor/field";
+import Field from "./field";
 import short from "short-uuid";
 import { Button } from "@documenso/ui";
 const stc = require("string-to-color");
