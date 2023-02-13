@@ -45,7 +45,7 @@ export default function Field(props: FieldPropsType) {
       <div
         ref={nodeRef}
         style={{ background: stc(props.field.recipient) }}
-        className="cursor-move opacity-90 p-2 m-auto w-auto flex-row-reverse text-lg font-bold text-center absolute"
+        className="cursor-move opacity-80 p-2 m-auto w-auto flex-row-reverse text-lg font-bold text-center absolute"
       >
         <div className="m-auto w-auto flex-row-reverse text-lg font-bold text-center">
           {/* todo icons */}
