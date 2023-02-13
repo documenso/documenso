@@ -53,7 +53,7 @@ export default function PDFEditor(props: any) {
               id: short.generate().toString(),
               page: 0,
               type: "signature",
-              position: { x: 0, y: -600 },
+              position: { x: 0, y: -842 },
               recipient: selectedValue,
             })
           );
