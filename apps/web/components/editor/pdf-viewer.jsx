@@ -43,33 +43,27 @@ export default function PDFViewer(props) {
                   position: "relative",
                   background: "green",
                 }}
+                className="mx-auto w-fit"
               >
-                <div
-                  style={{
-                    width: "100%",
-                    background: "red",
-                  }}
-                >
-                  <Page
-                    className="mt-5"
-                    key={`page_${index + 1}`}
-                    pageNumber={index + 1}
-                    renderAnnotationLayer={false}
-                    renderTextLayer={false}
-                    onLoadSuccess={() => setLoading(false)}
-                    onRenderError={() => setLoading(false)}
-                  ></Page>
-                  {props?.fields
-                    .filter((item) => item.page === index)
-                    .map((item) => (
-                      <Field
-                        key={item.id}
-                        field={item}
-                        className="absolute"
-                        onPositionChanged={onPositionChangedHandler}
-                      ></Field>
-                    ))}
-                </div>
+                <Page
+                  className="mt-5"
+                  key={`page_${index + 1}`}
+                  pageNumber={index + 1}
+                  renderAnnotationLayer={false}
+                  renderTextLayer={false}
+                  onLoadSuccess={() => setLoading(false)}
+                  onRenderError={() => setLoading(false)}
+                ></Page>
+                {props?.fields
+                  .filter((item) => item.page === index)
+                  .map((item) => (
+                    <Field
+                      key={item.id}
+                      field={item}
+                      className="absolute"
+                      onPositionChanged={onPositionChangedHandler}
+                    ></Field>
+                  ))}
               </div>
             </Fragment>
           ))}
