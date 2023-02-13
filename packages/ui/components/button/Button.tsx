@@ -24,7 +24,7 @@ export function Button(props: any) {
     >
       {props.icon ? (
         <props.icon
-          className="inline text-inherit h-5 mr-1"
+          className="inline h-5 mr-1 text-inherit"
           aria-hidden="true"
         ></props.icon>
       ) : (
@@ -46,7 +46,7 @@ export function Button(props: any) {
     >
       {props.icon ? (
         <props.icon
-          className="inline text-inherit h-5 mr-1"
+          className="inline h-5 mr-1 text-inherit"
           aria-hidden="true"
         ></props.icon>
       ) : (
