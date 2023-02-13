@@ -13,7 +13,7 @@ type FieldPropsType = {
     id: string;
     recipient: string;
   };
-  onPositionChangedHandler: any;
+  onPositionChanged: any;
 };
 
 export default function Field(props: FieldPropsType) {
@@ -31,7 +31,7 @@ export default function Field(props: FieldPropsType) {
     if (!position) return;
     const { x, y } = position;
 
-    props.onPositionChangedHandler({ x, y }, props.field.id);
+    props.onPositionChanged({ x, y }, props.field.id);
   };
 
   return (
