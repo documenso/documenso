@@ -53,7 +53,7 @@ export default function Field(props: FieldPropsType) {
       >
         <div className="m-auto w-auto flex-row-reverse text-lg font-bold text-center">
           {/* todo icons */}
-          Signature
+          {field.type}
           <div className="text-xs text-center">{props.field.recipient}</div>
         </div>
       </div>
