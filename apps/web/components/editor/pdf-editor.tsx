@@ -12,13 +12,14 @@ const PDFViewer = dynamic(() => import("./pdf-viewer"), {
 
 export default function PDFEditor(props: any) {
   const [selectedValue, setSelectedValue] = useState("");
-  const [fields, setFields] = useState<any[]>([]);
+  const [fields, setFields] = useState<any[]>(props.document.Field);
   const router = useRouter();
 
   function onPositionChangedHandler(position: any, id: any) {
     if (!position) return;
     const newFields = [...fields];
-    fields.find((e) => e.id == id).position = position;
+    fields.find((e) => e.id == id).positionX = position.x;
+    fields.find((e) => e.id == id).positionY = position.y;
 
     // no instant redraw neccessary, postion information for saving or later rerender is enough
     // setFields(newFields);
@@ -53,7 +54,8 @@ export default function PDFEditor(props: any) {
               id: short.generate().toString(),
               page: 0,
               type: "signature",
-              position: { x: 0, y: -842 },
+              positionX: 0,
+              positionY: 0,
               recipient: selectedValue,
             })
           );

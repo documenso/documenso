@@ -10,6 +10,8 @@ type FieldPropsType = {
     color: string;
     type: string;
     position: any;
+    positionX: number;
+    positionY: number;
     id: string;
     recipient: string;
   };
@@ -18,9 +20,10 @@ type FieldPropsType = {
 
 export default function Field(props: FieldPropsType) {
   const [field, setField]: any = useState(props.field);
-  const [position, setPosition]: any = useState(
-    props.field.position || { x: 0, y: -842 }
-  );
+  const [position, setPosition]: any = useState({
+    x: props.field.positionX,
+    y: props.field.positionY,
+  });
   const nodeRef = React.createRef<HTMLDivElement>();
   const onControlledDrag = (e: any, position: any) => {
     const { x, y } = position;
@@ -41,11 +44,12 @@ export default function Field(props: FieldPropsType) {
       position={position}
       onDrag={onControlledDrag}
       onStop={onDragStop}
+      defaultPosition={{ x: 0, y: 0 }}
     >
       <div
         ref={nodeRef}
         style={{ background: stc(props.field.recipient) }}
-        className="cursor-move opacity-80 p-2 m-auto w-auto flex-row-reverse text-lg font-bold text-center absolute"
+        className="cursor-move opacity-80 p-2 m-auto w-auto flex-row-reverse text-lg font-bold text-center absolute top-0 left-0"
       >
         <div className="m-auto w-auto flex-row-reverse text-lg font-bold text-center">
           {/* todo icons */}
