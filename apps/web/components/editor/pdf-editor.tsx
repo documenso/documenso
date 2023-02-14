@@ -4,6 +4,8 @@ import dynamic from "next/dynamic";
 import React, { useState } from "react";
 import { Button } from "@documenso/ui";
 import short from "short-uuid";
+import toast from "react-hot-toast";
+import { FieldType } from "@prisma/client";
 const stc = require("string-to-color");
 
 const PDFViewer = dynamic(() => import("./pdf-viewer"), {
@@ -17,9 +19,10 @@ export default function PDFEditor(props: any) {
 
   function onPositionChangedHandler(position: any, id: any) {
     if (!position) return;
-    const newFields = [...fields];
-    fields.find((e) => e.id == id).positionX = position.x;
-    fields.find((e) => e.id == id).positionY = position.y;
+    const movedField = fields.find((e) => e.id == id);
+    movedField.positionX = position.x;
+    movedField.positionY = position.y;
+    upsertField(props.document, movedField);
 
     // no instant redraw neccessary, postion information for saving or later rerender is enough
     // setFields(newFields);
@@ -49,16 +52,18 @@ export default function PDFEditor(props: any) {
       <Button
         className="inline ml-1"
         onClick={() => {
-          setFields(
-            fields.concat({
-              id: short.generate().toString(),
-              page: 0,
-              type: "signature",
-              positionX: 0,
-              positionY: 0,
-              recipient: selectedValue,
-            })
-          );
+          const signatureField = {
+            id: -1,
+            page: 0,
+            type: FieldType.SIGNATURE,
+            positionX: 0,
+            positionY: 0,
+            recipient: selectedValue,
+          };
+
+          upsertField(props?.document, signatureField).then((res) => {
+            setFields(fields.concat(res));
+          });
         }}
       >
         Add Signature Field
@@ -77,4 +82,35 @@ export default function PDFEditor(props: any) {
       />
     </>
   );
+}
+
+async function upsertField(document: any, field: any): Promise<any> {
+  try {
+    const created = await toast.promise(
+      fetch("/api/documents/" + document.id + "/fields", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(field),
+      }).then((res) => {
+        if (!res.ok) {
+          throw new Error(res.status.toString());
+        }
+        return res.json();
+      }),
+      {
+        loading: "Saving...",
+        success: "Saved.",
+        error: "Could not save :/",
+      },
+      {
+        id: "saving field",
+        style: {
+          minWidth: "200px",
+        },
+      }
+    );
+    return created;
+  } catch (error) {}
 }

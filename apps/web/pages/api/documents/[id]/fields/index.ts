@@ -42,7 +42,8 @@ async function postHandler(req: NextApiRequest, res: NextApiResponse) {
     id: number;
     type: FieldType;
     page: number;
-    position: { x: number; y: number };
+    positionX: number;
+    positionY: number;
   } = req.body;
 
   if (!user) return;
@@ -64,15 +65,17 @@ async function postHandler(req: NextApiRequest, res: NextApiResponse) {
       id: +body.id,
     },
     update: {
-      positionX: +body.position.x,
-      positionY: +body.position.y,
+      type: body.type,
+      page: +body.page,
+      positionX: +body.positionX,
+      positionY: +body.positionY,
     },
     create: {
       documentId: +documentId,
       type: body.type,
       page: +body.page,
-      positionX: +body.position.x,
-      positionY: +body.position.y,
+      positionX: +body.positionX,
+      positionY: +body.positionY,
     },
   });
 
