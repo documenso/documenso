@@ -120,22 +120,20 @@ export async function getServerSideProps(context: any) {
       context.req,
       context.res
     );
+
+    // todo optimize querys
+    // todo no intersection groups
+
+    return {
+      props: {
+        document: document,
+      },
+    };
   } catch (error) {
-    if (!document) {
-      return {
-        notFound: true,
-      };
-    }
+    return {
+      notFound: true,
+    };
   }
-
-  // todo optimize querys
-  // todo no intersection groups
-
-  return {
-    props: {
-      document: document,
-    },
-  };
 }
 
 DocumentsDetailPage.getLayout = function getLayout(page: ReactElement) {
