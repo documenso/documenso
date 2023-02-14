@@ -230,8 +230,6 @@ const DocumentsPage: NextPageWithLayout = (props: any) => {
                               className="flex-shrink-0 -ml-1 mr-3 h-6 w-6 inline text-neon"
                               aria-hidden="true"
                               onClick={(event) => {
-                                event.preventDefault();
-                                event.stopPropagation();
                                 if (
                                   confirm(
                                     "Are you sure you want to delete this document"

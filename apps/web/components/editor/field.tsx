@@ -1,8 +1,10 @@
 import { ResizableBox, ResizeCallbackData } from "react-resizable";
 import React, { SyntheticEvent, useEffect, useState } from "react";
 import Draggable from "react-draggable";
-import { CircleStackIcon } from "@heroicons/react/24/outline";
+import { CircleStackIcon, TrashIcon } from "@heroicons/react/24/solid";
 import Logo from "../logo";
+import { IconButton } from "@documenso/ui";
+import toast from "react-hot-toast";
 const stc = require("string-to-color");
 
 type FieldPropsType = {
@@ -52,11 +54,46 @@ export default function Field(props: FieldPropsType) {
         className="cursor-move opacity-80 p-2 m-auto w-auto flex-row-reverse text-lg font-bold text-center absolute top-0 left-0"
       >
         <div className="m-auto w-auto flex-row-reverse text-lg font-bold text-center">
+          <IconButton
+            icon={TrashIcon}
+            onClick={(e: any) => {
+              if (confirm("Delete field?")) {
+                deleteField(e, props.field);
+              }
+            }}
+          ></IconButton>
           {/* todo icons */}
           {field.type}
           <div className="text-xs text-center">{props.field.recipient}</div>
         </div>
       </div>
     </Draggable>
+  );
+}
+
+function deleteField(event: any, field: any) {
+  if (!field.id) {
+    return;
+  }
+
+  return toast.promise(
+    fetch("/api/documents/" + 0 + "/fields/" + field.id, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(field),
+    }),
+    {
+      loading: "Deleting...",
+      success: "Deleted.",
+      error: "Could not delete :/",
+    },
+    {
+      id: "delete",
+      style: {
+        minWidth: "200px",
+      },
+    }
   );
 }
