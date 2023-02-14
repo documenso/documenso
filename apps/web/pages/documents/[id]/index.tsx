@@ -114,20 +114,22 @@ export async function getServerSideProps(context: any) {
 
   const { id: documentId } = context.query;
 
-  const document: PrismaDocument = await getDocument(
-    +documentId,
-    context.req,
-    context.res
-  );
+  try {
+    const document: PrismaDocument = await getDocument(
+      +documentId,
+      context.req,
+      context.res
+    );
+  } catch (error) {
+    if (!document) {
+      return {
+        notFound: true,
+      };
+    }
+  }
 
   // todo optimize querys
   // todo no intersection groups
-
-  if (!document) {
-    return {
-      notFound: true,
-    };
-  }
 
   return {
     props: {

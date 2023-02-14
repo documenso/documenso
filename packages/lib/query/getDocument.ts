@@ -12,7 +12,7 @@ export const getDocument = async (
   if (!documentId) Promise.reject("No documentId");
   if (!req || !res) Promise.reject("No res or req");
 
-  const document: PrismaDocument = await prisma.document.findFirst({
+  const document: PrismaDocument = await prisma.document.findFirstOrThrow({
     where: {
       id: documentId,
       userId: user.id,
