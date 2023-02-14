@@ -6,7 +6,7 @@ Documenso aims to be the world's most trusted document signing tool. This trust 
 
 ## Tools
 
-This repos uses https://gitmoji.dev/ for more expressive commit messages.
+This repos uses 📝 https://gitmoji.dev/ for more expressive commit messages.
 
 ## todos
 
