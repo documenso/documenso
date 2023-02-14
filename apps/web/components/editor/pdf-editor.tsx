@@ -28,6 +28,19 @@ export default function PDFEditor(props: any) {
     // setFields(newFields);
   }
 
+  function onDeleteHandler(id: any) {
+    const field = fields.find((e) => e.id == id);
+    const fieldIndex = fields.map((item) => item.id).indexOf(id);
+    console.log(fieldIndex);
+    if (fieldIndex > -1) {
+      const newFields = [...fields];
+      newFields.splice(fieldIndex, 1);
+
+      setFields(newFields);
+      deleteField(field);
+    }
+  }
+
   return (
     <>
       <select
@@ -78,6 +91,7 @@ export default function PDFEditor(props: any) {
         document={props.document}
         fields={fields}
         onPositionChanged={onPositionChangedHandler}
+        onDelete={onDeleteHandler}
         pdfUrl={`${NEXT_PUBLIC_WEBAPP_URL}/api/documents/${router.query.id}`}
       />
     </>
@@ -112,5 +126,40 @@ async function upsertField(document: any, field: any): Promise<any> {
       }
     );
     return created;
+  } catch (error) {}
+}
+
+async function deleteField(field: any) {
+  if (!field.id) {
+    return;
+  }
+
+  try {
+    const deleted = await toast.promise(
+      fetch("/api/documents/" + 0 + "/fields/" + field.id, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(field),
+      }).then((res) => {
+        if (!res.ok) {
+          throw new Error(res.status.toString());
+        }
+        return res.json();
+      }),
+      {
+        loading: "Deleting...",
+        success: "Deleted.",
+        error: "Could not delete :/",
+      },
+      {
+        id: "delete",
+        style: {
+          minWidth: "200px",
+        },
+      }
+    );
+    return deleted;
   } catch (error) {}
 }

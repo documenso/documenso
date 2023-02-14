@@ -12,6 +12,10 @@ export default function PDFViewer(props) {
     props.onPositionChanged(position, id);
   }
 
+  function onDeleteHandler(id) {
+    props.onDelete(id);
+  }
+
   function onFileChange(event) {
     setFile(event.target.files[0]);
   }
@@ -62,6 +66,7 @@ export default function PDFViewer(props) {
                       field={item}
                       className="absolute"
                       onPositionChanged={onPositionChangedHandler}
+                      onDelete={onDeleteHandler}
                     ></Field>
                   ))}
               </div>

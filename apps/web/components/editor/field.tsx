@@ -18,6 +18,7 @@ type FieldPropsType = {
     recipient: string;
   };
   onPositionChanged: any;
+  onDelete: any;
 };
 
 export default function Field(props: FieldPropsType) {
@@ -56,9 +57,9 @@ export default function Field(props: FieldPropsType) {
         <div className="m-auto w-auto flex-row-reverse text-lg font-bold text-center">
           <IconButton
             icon={TrashIcon}
-            onClick={(e: any) => {
+            onClick={(event: any) => {
               if (confirm("Delete field?")) {
-                deleteField(e, props.field);
+                props.onDelete(props.field.id);
               }
             }}
           ></IconButton>
@@ -68,32 +69,5 @@ export default function Field(props: FieldPropsType) {
         </div>
       </div>
     </Draggable>
-  );
-}
-
-function deleteField(event: any, field: any) {
-  if (!field.id) {
-    return;
-  }
-
-  return toast.promise(
-    fetch("/api/documents/" + 0 + "/fields/" + field.id, {
-      method: "DELETE",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(field),
-    }),
-    {
-      loading: "Deleting...",
-      success: "Deleted.",
-      error: "Could not delete :/",
-    },
-    {
-      id: "delete",
-      style: {
-        minWidth: "200px",
-      },
-    }
   );
 }
