@@ -1,7 +1,6 @@
-import { ReactElement, useState } from "react";
+import { ReactElement } from "react";
 import Layout from "../../../components/layout";
 import { NextPageWithLayout } from "../../_app";
-import dynamic from "next/dynamic";
 import { useRouter } from "next/router";
 import { NEXT_PUBLIC_WEBAPP_URL } from "@documenso/lib";
 import { getUserFromToken } from "@documenso/lib/server";
@@ -15,7 +14,6 @@ import {
 import { getDocument } from "@documenso/lib/query";
 import { Document as PrismaDocument } from "@prisma/client";
 import { Button, Breadcrumb } from "@documenso/ui";
-import short from "short-uuid";
 import PDFEditor from "../../../components/editor/pdf-editor";
 
 const DocumentsDetailPage: NextPageWithLayout = (props: any) => {
