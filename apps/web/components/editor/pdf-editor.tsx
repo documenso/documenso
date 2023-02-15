@@ -146,7 +146,7 @@ async function deleteField(field: any) {
         if (!res.ok) {
           throw new Error(res.status.toString());
         }
-        return res.json();
+        return res;
       }),
       {
         loading: "Deleting...",
