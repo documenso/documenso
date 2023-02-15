@@ -4,6 +4,10 @@
 
 Documenso aims to be the world's most trusted document signing tool. This trust is built by empowering you to self-host Documenso and review how it works under the hood. Join us in creating the new internet of trust.
 
+## Tools
+
+This repos uses 📝 https://gitmoji.dev/ for more expressive commit messages.
+
 ## todos
 
 - Sendgrid setup and nodemailer-sendgrid SMTP hint (import for interchangeability like SMTP)

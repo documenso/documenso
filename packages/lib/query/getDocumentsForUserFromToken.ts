@@ -17,5 +17,5 @@ export const getDocumentsForUserFromToken = async (
     },
   });
 
-  return documents;
+  return documents.map((e) => ({ ...e, document: "" }));
 };

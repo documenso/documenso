@@ -2,21 +2,18 @@ import { Fragment, useState } from "react";
 import { Document, Page } from "react-pdf/dist/esm/entry.webpack5";
 import Field from "./field";
 import short from "short-uuid";
-import { Button } from "@documenso/ui";
-const stc = require("string-to-color");
 
 export default function PDFViewer(props) {
   const [file, setFile] = useState("");
-  const [selectedValue, setSelectedValue] = useState("");
   const [numPages, setNumPages] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [fields, setFields] = useState([]);
 
   function onPositionChangedHandler(position, id) {
-    if (!position) return;
-    const newFields = [...fields];
-    fields.find((e) => e.id == id).position = position;
-    // setFields(newFields);
+    props.onPositionChanged(position, id);
+  }
+
+  function onDeleteHandler(id) {
+    props.onDelete(id);
   }
 
   function onFileChange(event) {
@@ -36,50 +33,7 @@ export default function PDFViewer(props) {
   return (
     <>
       <div hidden={loading}>
-        <div className="max-w-xs mt-6">
-          <select
-            className="mb-3 inline mt-1 w-full rounded-md border-gray-300 py-2 pl-3 pr-10 text-base focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm"
-            style={{ background: stc(selectedValue) }}
-            defaultValue={props?.document?.Recipient[0]}
-            value={selectedValue}
-            selectedIndex={0}
-            onChange={(e) => setSelectedValue(e.target.value)}
-          >
-            {props?.document?.Recipient?.map((item) => (
-              <option
-                key={item.email + short.generate().toString()}
-                style={{
-                  background: stc(
-                    item.name ? `${item.name} <${item.email}>` : item.email
-                  ),
-                }}
-              >
-                {item.name ? `${item.name} <${item.email}>` : item.email}
-              </option>
-            ))}
-          </select>
-        </div>
-        <Button
-          className="inline ml-1"
-          onClick={() => {
-            setFields(
-              fields.concat({
-                id: short.generate().toString(),
-                type: "signature",
-                position: { x: 0, y: -842 },
-                recipient: selectedValue,
-              })
-            );
-          }}
-        >
-          Add Signature Field
-        </Button>
-        <Button color="secondary" className="inline ml-1">
-          Add Date Field
-        </Button>
-        <Button color="secondary" className="inline ml-1">
-          Add Text Field
-        </Button>
+        <div className="max-w-xs mt-6"></div>
         <Document
           file={props.pdfUrl}
           onLoadSuccess={onDocumentLoadSuccess}
@@ -93,37 +47,34 @@ export default function PDFViewer(props) {
                   position: "relative",
                   background: "green",
                 }}
+                className="mx-auto w-fit"
               >
-                <div
-                  style={{
-                    width: "100%",
-                    background: "red",
-                  }}
-                >
-                  <Page
-                    className="mt-5"
-                    key={`page_${index + 1}`}
-                    pageNumber={index + 1}
-                    renderAnnotationLayer={false}
-                    renderTextLayer={false}
-                    onLoadSuccess={() => setLoading(false)}
-                    onRenderError={() => setLoading(false)}
-                  ></Page>
-                  {fields.map((item) => (
+                <Page
+                  className="mt-5"
+                  key={`page_${index + 1}`}
+                  pageNumber={index + 1}
+                  renderAnnotationLayer={false}
+                  renderTextLayer={false}
+                  onLoadSuccess={() => setLoading(false)}
+                  onRenderError={() => setLoading(false)}
+                ></Page>
+                {props?.fields
+                  .filter((item) => item.page === index)
+                  .map((item) => (
                     <Field
                       key={item.id}
                       field={item}
                       className="absolute"
-                      onPositionChangedHandler={onPositionChangedHandler}
+                      onPositionChanged={onPositionChangedHandler}
+                      onDelete={onDeleteHandler}
                     ></Field>
                   ))}
-                </div>
               </div>
             </Fragment>
           ))}
         </Document>
       </div>
-      <div className="mt-10 w-[600px]" hidden={!loading}>
+      <div className="mx-auto mt-10 w-[600px]" hidden={!loading}>
         <div className="ph-item">
           <div className="ph-col-12">
             <div className="ph-picture"></div>

@@ -1,7 +1,6 @@
-import { ReactElement, useState } from "react";
+import { ReactElement } from "react";
 import Layout from "../../../components/layout";
 import { NextPageWithLayout } from "../../_app";
-import dynamic from "next/dynamic";
 import { useRouter } from "next/router";
 import { NEXT_PUBLIC_WEBAPP_URL } from "@documenso/lib";
 import { getUserFromToken } from "@documenso/lib/server";
@@ -15,7 +14,6 @@ import {
 import { getDocument } from "@documenso/lib/query";
 import { Document as PrismaDocument } from "@prisma/client";
 import { Button, Breadcrumb } from "@documenso/ui";
-import short from "short-uuid";
 import PDFEditor from "../../../components/editor/pdf-editor";
 
 const DocumentsDetailPage: NextPageWithLayout = (props: any) => {
@@ -116,26 +114,26 @@ export async function getServerSideProps(context: any) {
 
   const { id: documentId } = context.query;
 
-  const document: PrismaDocument = await getDocument(
-    +documentId,
-    context.req,
-    context.res
-  );
+  try {
+    const document: PrismaDocument = await getDocument(
+      +documentId,
+      context.req,
+      context.res
+    );
 
-  // todo optimize querys
-  // todo no intersection groups
+    // todo optimize querys
+    // todo no intersection groups
 
-  if (!document) {
+    return {
+      props: {
+        document: document,
+      },
+    };
+  } catch (error) {
     return {
       notFound: true,
     };
   }
-
-  return {
-    props: {
-      document: document,
-    },
-  };
 }
 
 DocumentsDetailPage.getLayout = function getLayout(page: ReactElement) {

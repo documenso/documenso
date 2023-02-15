@@ -15,6 +15,19 @@ model Document {
   status    DocumentStatus @default(DRAFT)
   document  String
   Recipient Recipient[]
+  Field     Field[]
+}
+
+model Field {
+  id          Int        @id @default(autoincrement())
+  documentId  Int
+  recipientId Int?
+  type        FieldType
+  page        Int
+  positionX   Int        @default(0)
+  positionY   Int        @default(0)
+  Document    Document   @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  Recipient   Recipient? @relation(fields: [recipientId], references: [id], onDelete: Cascade)
 }
 
 model Recipient {
@@ -27,6 +40,7 @@ model Recipient {
   signingStatus SigningStatus @default(NOT_SIGNED)
   sendStatus    SendStatus    @default(NOT_SENT)
   Document      Document      @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  Field         Field[]
 }
 
 model User {
@@ -66,6 +80,12 @@ model Session {
   userId       Int
   expires      DateTime
   user         User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+enum FieldType {
+  SIGNATURE
+  DATE
+  TEXT
 }
 
 enum IdentityProvider {
