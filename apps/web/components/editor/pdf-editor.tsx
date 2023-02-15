@@ -50,7 +50,14 @@ export default function PDFEditor(props: any) {
 
   return (
     <>
-      <div hidden={noRecipients}>
+      <PDFViewer
+        document={props.document}
+        fields={fields}
+        onPositionChanged={onPositionChangedHandler}
+        onDelete={onDeleteHandler}
+        pdfUrl={`${NEXT_PUBLIC_WEBAPP_URL}/api/documents/${router.query.id}`}
+      ></PDFViewer>
+      <div hidden={noRecipients} className="fixed left-0 top-1/3 max-w-xs">
         <Listbox value={selectedRecipient} onChange={setSelectedRecipient}>
           {({ open }) => (
             <div className="relative mt-1 mb-2">
@@ -85,7 +92,7 @@ export default function PDFEditor(props: any) {
                       key={recipient?.id}
                       className={({ active }) =>
                         classNames(
-                          active ? "text-white bg-indigo-600" : "text-gray-900",
+                          active ? "text-white bg-neon-dark" : "text-gray-900",
                           "relative cursor-default select-none py-2 pl-3 pr-9"
                         )
                       }
@@ -113,7 +120,7 @@ export default function PDFEditor(props: any) {
                           {selected ? (
                             <span
                               className={classNames(
-                                active ? "text-white" : "text-indigo-600",
+                                active ? "text-white" : "text-neon-dark",
                                 "absolute inset-y-0 right-0 flex items-center pr-4"
                               )}
                             >
@@ -133,7 +140,7 @@ export default function PDFEditor(props: any) {
           )}
         </Listbox>
         <Button
-          className="inline ml-1"
+          className="ml-1"
           color="secondary"
           onClick={() => {
             console.log(selectedRecipient);
@@ -159,7 +166,7 @@ export default function PDFEditor(props: any) {
           />
           Add Signature Field
         </Button>
-        <Button color="secondary" className="inline ml-1" disabled>
+        <Button color="secondary" className="m-1" disabled>
           <span
             className="inline-block h-4 w-4 flex-shrink-0 rounded-full mr-3"
             style={{
@@ -168,7 +175,7 @@ export default function PDFEditor(props: any) {
           />
           Add Date Field
         </Button>
-        <Button color="secondary" className="inline ml-1" disabled>
+        <Button color="secondary" className="m-1" disabled>
           <span
             className="inline-block h-4 w-4 flex-shrink-0 rounded-full mr-3"
             style={{
@@ -178,13 +185,6 @@ export default function PDFEditor(props: any) {
           Add Text Field
         </Button>
       </div>
-      <PDFViewer
-        document={props.document}
-        fields={fields}
-        onPositionChanged={onPositionChangedHandler}
-        onDelete={onDeleteHandler}
-        pdfUrl={`${NEXT_PUBLIC_WEBAPP_URL}/api/documents/${router.query.id}`}
-      />
     </>
   );
 }
