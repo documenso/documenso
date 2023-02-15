@@ -6,14 +6,13 @@ import { Button } from "@documenso/ui";
 import short from "short-uuid";
 import toast from "react-hot-toast";
 import { FieldType } from "@prisma/client";
-const stc = require("string-to-color");
 
 const PDFViewer = dynamic(() => import("./pdf-viewer"), {
   ssr: false,
 });
 
 export default function PDFEditor(props: any) {
-  const [selectedValue, setSelectedValue] = useState("");
+  const [selectedRecipient, setSelectedRecipient] = useState("");
   const [fields, setFields] = useState<any[]>(props.document.Field);
   const router = useRouter();
 
@@ -44,21 +43,19 @@ export default function PDFEditor(props: any) {
 
   return (
     <>
+      <label
+        htmlFor="location"
+        className="block text-sm font-medium text-gray-700"
+      >
+        Location
+      </label>
       <select
-        className="mb-3 inline mt-1 w-full rounded-md border-gray-300 py-2 pl-3 pr-10 text-base focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm"
-        style={{ background: stc(selectedValue) }}
-        value={selectedValue}
-        onChange={(e) => setSelectedValue(e.target.value)}
+        className="mt-1 block w-full rounded-md border-gray-300 py-2 pl-3 pr-10 text-base focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm"
+        value={selectedRecipient}
+        onChange={(e) => setSelectedRecipient(e.target.value)}
       >
         {props?.document?.Recipient?.map((item: any) => (
-          <option
-            key={item.email + short.generate().toString()}
-            style={{
-              background: stc(
-                item.name ? `${item.name} <${item.email}>` : item.email
-              ),
-            }}
-          >
+          <option key={item.email + short.generate().toString()}>
             {item.name ? `${item.name} <${item.email}>` : item.email}
           </option>
         ))}
@@ -72,7 +69,7 @@ export default function PDFEditor(props: any) {
             type: FieldType.SIGNATURE,
             positionX: 0,
             positionY: 0,
-            recipient: selectedValue,
+            recipient: selectedRecipient,
           };
 
           upsertField(props?.document, signatureField).then((res) => {
