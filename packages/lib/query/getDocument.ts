@@ -19,7 +19,7 @@ export const getDocument = async (
     },
     include: {
       Recipient: true,
-      Field: true,
+      Field: { include: { Recipient: true } },
     },
   });
 

@@ -1,18 +1,25 @@
 import { NEXT_PUBLIC_WEBAPP_URL } from "@documenso/lib/constants";
 import { useRouter } from "next/router";
 import dynamic from "next/dynamic";
-import React, { useState } from "react";
+import React, { Fragment, useState } from "react";
 import { Button } from "@documenso/ui";
 import short from "short-uuid";
 import toast from "react-hot-toast";
 import { FieldType } from "@prisma/client";
+import { Listbox, Transition } from "@headlessui/react";
+import { CheckIcon, ChevronUpDownIcon } from "@heroicons/react/24/outline";
+import { classNames } from "@documenso/lib";
+const stc = require("string-to-color");
 
 const PDFViewer = dynamic(() => import("./pdf-viewer"), {
   ssr: false,
 });
 
 export default function PDFEditor(props: any) {
-  const [selectedRecipient, setSelectedRecipient] = useState("");
+  const [selectedRecipient, setSelectedRecipient]: any = useState(
+    props?.document?.Recipient[0]
+  );
+  const noRecipients = props?.document?.Recipient?.length === 0;
   const [fields, setFields] = useState<any[]>(props.document.Field);
   const router = useRouter();
 
@@ -43,48 +50,134 @@ export default function PDFEditor(props: any) {
 
   return (
     <>
-      <label
-        htmlFor="location"
-        className="block text-sm font-medium text-gray-700"
-      >
-        Location
-      </label>
-      <select
-        className="mt-1 block w-full rounded-md border-gray-300 py-2 pl-3 pr-10 text-base focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm"
-        value={selectedRecipient}
-        onChange={(e) => setSelectedRecipient(e.target.value)}
-      >
-        {props?.document?.Recipient?.map((item: any) => (
-          <option key={item.email + short.generate().toString()}>
-            {item.name ? `${item.name} <${item.email}>` : item.email}
-          </option>
-        ))}
-      </select>
-      <Button
-        className="inline ml-1"
-        onClick={() => {
-          const signatureField = {
-            id: -1,
-            page: 0,
-            type: FieldType.SIGNATURE,
-            positionX: 0,
-            positionY: 0,
-            recipient: selectedRecipient,
-          };
+      <div hidden={noRecipients}>
+        <Listbox value={selectedRecipient} onChange={setSelectedRecipient}>
+          {({ open }) => (
+            <div className="relative mt-1 mb-2">
+              <Listbox.Button className="relative w-full cursor-default rounded-md border border-gray-300 bg-white py-2 pl-3 pr-10 text-left shadow-sm focus:border-neon focus:outline-none focus:ring-1 focus:ring-neon sm:text-sm">
+                <span className="flex items-center">
+                  <span
+                    className="inline-block h-4 w-4 flex-shrink-0 rounded-full"
+                    style={{ background: stc(selectedRecipient?.email) }}
+                  />
+                  <span className="ml-3 block truncate">
+                    {`${selectedRecipient?.name} <${selectedRecipient?.email}>`}
+                  </span>
+                </span>
+                <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
+                  <ChevronUpDownIcon
+                    className="h-5 w-5 text-gray-400"
+                    aria-hidden="true"
+                  />
+                </span>
+              </Listbox.Button>
 
-          upsertField(props?.document, signatureField).then((res) => {
-            setFields(fields.concat(res));
-          });
-        }}
-      >
-        Add Signature Field
-      </Button>
-      <Button color="secondary" className="inline ml-1">
-        Add Date Field
-      </Button>
-      <Button color="secondary" className="inline ml-1">
-        Add Text Field
-      </Button>
+              <Transition
+                show={open}
+                as={Fragment}
+                leave="transition ease-in duration-100"
+                leaveFrom="opacity-100"
+                leaveTo="opacity-0"
+              >
+                <Listbox.Options className="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
+                  {props?.document?.Recipient?.map((recipient: any) => (
+                    <Listbox.Option
+                      key={recipient?.id}
+                      className={({ active }) =>
+                        classNames(
+                          active ? "text-white bg-indigo-600" : "text-gray-900",
+                          "relative cursor-default select-none py-2 pl-3 pr-9"
+                        )
+                      }
+                      value={recipient}
+                    >
+                      {({ selected, active }) => (
+                        <>
+                          <div className="flex items-center">
+                            <span
+                              className="inline-block h-4 w-4 flex-shrink-0 rounded-full"
+                              style={{
+                                background: stc(recipient?.email),
+                              }}
+                            />
+                            <span
+                              className={classNames(
+                                selected ? "font-semibold" : "font-normal",
+                                "ml-3 block truncate"
+                              )}
+                            >
+                              {`${selectedRecipient?.name} <${selectedRecipient?.email}>`}
+                            </span>
+                          </div>
+
+                          {selected ? (
+                            <span
+                              className={classNames(
+                                active ? "text-white" : "text-indigo-600",
+                                "absolute inset-y-0 right-0 flex items-center pr-4"
+                              )}
+                            >
+                              <CheckIcon
+                                className="h-5 w-5"
+                                aria-hidden="true"
+                              />
+                            </span>
+                          ) : null}
+                        </>
+                      )}
+                    </Listbox.Option>
+                  ))}
+                </Listbox.Options>
+              </Transition>
+            </div>
+          )}
+        </Listbox>
+        <Button
+          className="inline ml-1"
+          color="secondary"
+          onClick={() => {
+            console.log(selectedRecipient);
+            const signatureField = {
+              id: -1,
+              page: 0,
+              type: FieldType.SIGNATURE,
+              positionX: 0,
+              positionY: 0,
+              Recipient: selectedRecipient,
+            };
+
+            upsertField(props?.document, signatureField).then((res) => {
+              setFields(fields.concat(res));
+            });
+          }}
+        >
+          <span
+            className="inline-block h-4 w-4 flex-shrink-0 rounded-full mr-3"
+            style={{
+              background: stc(selectedRecipient?.email),
+            }}
+          />
+          Add Signature Field
+        </Button>
+        <Button color="secondary" className="inline ml-1" disabled>
+          <span
+            className="inline-block h-4 w-4 flex-shrink-0 rounded-full mr-3"
+            style={{
+              background: stc(selectedRecipient?.email),
+            }}
+          />
+          Add Date Field
+        </Button>
+        <Button color="secondary" className="inline ml-1" disabled>
+          <span
+            className="inline-block h-4 w-4 flex-shrink-0 rounded-full mr-3"
+            style={{
+              background: stc(selectedRecipient?.email),
+            }}
+          />
+          Add Text Field
+        </Button>
+      </div>
       <PDFViewer
         document={props.document}
         fields={fields}

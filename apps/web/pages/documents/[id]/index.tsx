@@ -9,6 +9,7 @@ import { DocumentStatus } from "@prisma/client";
 import {
   InformationCircleIcon,
   PaperAirplaneIcon,
+  UserPlusIcon,
   UsersIcon,
 } from "@heroicons/react/24/outline";
 import { getDocument } from "@documenso/lib/query";
@@ -66,7 +67,6 @@ const DocumentsDetailPage: NextPageWithLayout = (props: any) => {
           <div className="mt-4 flex flex-shrink-0 md:mt-0 md:ml-4">
             <Button
               icon={PaperAirplaneIcon}
-              disabled={(props?.document?.Recipient?.length || 0) === 0}
               className="ml-3"
               href={
                 NEXT_PUBLIC_WEBAPP_URL +
