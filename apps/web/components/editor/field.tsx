@@ -5,6 +5,7 @@ import { CircleStackIcon, TrashIcon } from "@heroicons/react/24/solid";
 import Logo from "../logo";
 import { IconButton } from "@documenso/ui";
 import toast from "react-hot-toast";
+import { XCircleIcon } from "@heroicons/react/20/solid";
 const stc = require("string-to-color");
 
 type FieldPropsType = {
@@ -62,12 +63,11 @@ export default function Field(props: FieldPropsType) {
         </div>
         <strong>
           <IconButton
-            className="absolute top-0 right-0"
-            icon={TrashIcon}
+            className="absolute top-0 right-0 -m-5"
+            color="secondary"
+            icon={XCircleIcon}
             onClick={(event: any) => {
-              if (confirm("Delete field?")) {
-                props.onDelete(props.field.id);
-              }
+              props.onDelete(props.field.id);
             }}
           ></IconButton>
         </strong>
