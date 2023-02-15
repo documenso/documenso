@@ -30,6 +30,7 @@ async function getHandler(req: NextApiRequest, res: NextApiResponse) {
 
   const fields = await prisma.field.findMany({
     where: { documentId: +documentId },
+    include: { Recipient: true },
   });
 
   return res.status(200).end(JSON.stringify(fields));
@@ -44,6 +45,7 @@ async function postHandler(req: NextApiRequest, res: NextApiResponse) {
     page: number;
     positionX: number;
     positionY: number;
+    Recipient: { id: number };
   } = req.body;
 
   if (!user) return;
@@ -69,6 +71,7 @@ async function postHandler(req: NextApiRequest, res: NextApiResponse) {
       page: +body.page,
       positionX: +body.positionX,
       positionY: +body.positionY,
+      recipientId: body.Recipient.id,
     },
     create: {
       documentId: +documentId,
@@ -76,6 +79,11 @@ async function postHandler(req: NextApiRequest, res: NextApiResponse) {
       page: +body.page,
       positionX: +body.positionX,
       positionY: +body.positionY,
+      // todo refactor only one type of recipientId
+      recipientId: body.Recipient.id,
+    },
+    include: {
+      Recipient: true,
     },
   });
 

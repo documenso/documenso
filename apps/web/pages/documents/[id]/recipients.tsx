@@ -8,6 +8,7 @@ import {
   CheckIcon,
   EnvelopeIcon,
   PaperAirplaneIcon,
+  PencilSquareIcon,
   UserPlusIcon,
   XMarkIcon,
 } from "@heroicons/react/24/outline";
@@ -62,6 +63,14 @@ const RecipientsPage: NextPageWithLayout = (props: any) => {
             </h2>
           </div>
           <div className="mt-4 flex flex-shrink-0 md:mt-0 md:ml-4">
+            <Button
+              icon={PencilSquareIcon}
+              color="secondary"
+              className="mr-2"
+              href={breadcrumbItems[1].href}
+            >
+              Customize Document
+            </Button>
             <Button
               className="min-w-[125px]"
               color="primary"

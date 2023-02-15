@@ -16,7 +16,7 @@ type FieldPropsType = {
     positionX: number;
     positionY: number;
     id: string;
-    recipient: string;
+    Recipient: { name: ""; email: "" };
   };
   onPositionChanged: any;
   onDelete: any;
@@ -53,13 +53,22 @@ export default function Field(props: FieldPropsType) {
     >
       <div
         ref={nodeRef}
-        style={{ background: stc(props.field.recipient) }}
         className="cursor-move opacity-80 p-2 m-auto w-auto flex-row-reverse text-lg font-bold text-center absolute top-0 left-0"
+        style={{
+          background: stc(props.field.Recipient.email),
+        }}
       >
+        <Logo className="mx-auto w-16 mb-2"></Logo>
         <div className="m-auto w-auto flex-row-reverse text-lg font-bold text-center">
           {/* todo icons */}
           {field.type}
-          <div className="text-xs text-center">{props.field.recipient}</div>
+          {field.type === "SIGNATURE" ? (
+            <div className="text-xs text-center">
+              {`${props.field.Recipient?.name} <${props.field.Recipient?.email}>`}
+            </div>
+          ) : (
+            ""
+          )}
         </div>
         <strong>
           <IconButton

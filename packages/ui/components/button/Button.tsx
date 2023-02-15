@@ -3,7 +3,7 @@ import Link from "next/link";
 import React from "react";
 
 export function Button(props: any) {
-  const isLink = typeof props.href !== "undefined";
+  const isLink = typeof props.href !== "undefined" && !props.disabled;
   const { color = "primary", icon, disabled, onClick } = props;
   const baseStyles =
     "inline-flex items-center justify-center min-w-[80px] rounded-md border border-transparent px-4 py-2 text-sm font-medium shadow-sm disabled:bg-gray-300";
