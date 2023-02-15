@@ -33,11 +33,12 @@ export default function PDFEditor(props: any) {
     const fieldIndex = fields.map((item) => item.id).indexOf(id);
     console.log(fieldIndex);
     if (fieldIndex > -1) {
-      const newFields = [...fields];
-      newFields.splice(fieldIndex, 1);
-
-      setFields(newFields);
-      deleteField(field);
+      const fieldWithoutRemoved = [...fields];
+      const removedField = fieldWithoutRemoved.splice(fieldIndex, 1);
+      setFields(fieldWithoutRemoved);
+      deleteField(field).catch((err) => {
+        setFields(fieldWithoutRemoved.concat(removedField));
+      });
     }
   }
 
@@ -135,7 +136,7 @@ async function deleteField(field: any) {
   }
 
   try {
-    const deleted = await toast.promise(
+    const deleted = toast.promise(
       fetch("/api/documents/" + 0 + "/fields/" + field.id, {
         method: "DELETE",
         headers: {
