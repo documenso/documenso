@@ -44,7 +44,7 @@ const DocumentsPage: NextPageWithLayout = (props: any) => {
   }, []);
 
   function showDocument(documentId: number) {
-    router.push(`/documents/ + ${documentId}`);
+    router.push(`/documents/${documentId}`);
   }
 
   return (
