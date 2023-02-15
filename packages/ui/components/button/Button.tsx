@@ -6,10 +6,11 @@ export function Button(props: any) {
   const isLink = typeof props.href !== "undefined";
   const { color = "primary", icon, disabled, onClick } = props;
   const baseStyles =
-    "inline-flex items-center justify-center min-w-[80px] rounded-md border border-transparent px-4 py-2 text-sm font-medium shadow-sm disabled:bg-gray-300";
-  const primaryStyles = "text-white bg-neon hover:bg-neon-dark";
+    "inline-flex items-center justify-center min-w-[80px] rounded-2xl border border-transparent px-4 py-3 text-sm font-medium shadow-sm disabled:bg-gray-300   transition-all duration-300  ";
+  const primaryStyles =
+    "text-gray-900 bg-neon hover:bg-neon-dark  ";
   const secondaryStyles =
-    "border-gray-300 bg-white text-gray-700 hover:bg-gray-50";
+    "border-brown/30 bg-white text-brown hover:bg-brown hover:text-white hover:shadow-xl shadow-md hover:shadow-3xl shadow-gray-500/20 hover:shadow-slate-600/30 hover:-translate-y-1 ";
 
   return isLink ? (
     <Link
