@@ -48,6 +48,7 @@ export default function Field(props: FieldPropsType) {
       onDrag={onControlledDrag}
       onStop={onDragStop}
       defaultPosition={{ x: 0, y: 0 }}
+      cancel="strong"
     >
       <div
         ref={nodeRef}
@@ -55,7 +56,13 @@ export default function Field(props: FieldPropsType) {
         className="cursor-move opacity-80 p-2 m-auto w-auto flex-row-reverse text-lg font-bold text-center absolute top-0 left-0"
       >
         <div className="m-auto w-auto flex-row-reverse text-lg font-bold text-center">
+          {/* todo icons */}
+          {field.type}
+          <div className="text-xs text-center">{props.field.recipient}</div>
+        </div>
+        <strong>
           <IconButton
+            className="absolute top-0 right-0"
             icon={TrashIcon}
             onClick={(event: any) => {
               if (confirm("Delete field?")) {
@@ -63,10 +70,7 @@ export default function Field(props: FieldPropsType) {
               }
             }}
           ></IconButton>
-          {/* todo icons */}
-          {field.type}
-          <div className="text-xs text-center">{props.field.recipient}</div>
-        </div>
+        </strong>
       </div>
     </Draggable>
   );
