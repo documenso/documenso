@@ -182,6 +182,7 @@ export default function Signup() {
               </div>
 
               <Button
+                type="submit"
                 onClick={() => {
                   methods.clearErrors();
                 }}

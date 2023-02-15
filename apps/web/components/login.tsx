@@ -135,6 +135,7 @@ export default function Login() {
 
               <div>
                 <Button
+                  type="submit"
                   disabled={formState.isSubmitting}
                   className="group relative flex w-full"
                 >
