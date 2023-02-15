@@ -8,7 +8,7 @@ Documenso aims to be the world's most trusted document signing tool. This trust 
 
 - This repos uses 📝 https://gitmoji.dev/ for more expressive commit messages.
 
-## todos
+## Todos
 
 - Sendgrid setup and nodemailer-sendgrid SMTP hint (import for interchangeability like SMTP)
 - Render Deploy YAML file or similar
