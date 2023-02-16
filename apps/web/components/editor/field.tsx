@@ -40,7 +40,6 @@ export default function Field(props: FieldPropsType) {
 
     props.onPositionChanged({ x, y }, props.field.id);
   };
-
   return (
     <Draggable
       nodeRef={nodeRef}
@@ -53,12 +52,14 @@ export default function Field(props: FieldPropsType) {
     >
       <div
         ref={nodeRef}
-        className="cursor-move opacity-80 p-2 m-auto w-auto flex-row-reverse text-lg font-bold text-center absolute top-0 left-0"
+        className="cursor-move opacity-80 p-2 m-auto w-auto flex-row-reverse text-lg font-bold text-center absolute top-0 left-0 select-none"
         style={{
           background: stc(props.field.Recipient.email),
         }}
       >
-        <Logo className="mx-auto w-16 mb-2"></Logo>
+        <div className="mb-2 pointer-events-none">
+          <Logo className="w-16 mx-auto"></Logo>
+        </div>
         <div className="m-auto w-auto flex-row-reverse text-lg font-bold text-center">
           {/* todo icons */}
           {field.type}
