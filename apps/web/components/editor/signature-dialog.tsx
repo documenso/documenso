@@ -20,6 +20,7 @@ const tabs = [
 
 export default function SignatureDialog(props: any) {
   const [currentTab, setCurrentTab] = useState(tabs[0]);
+  const [typedName, setTypedName] = useState("");
 
   return (
     <>
@@ -48,7 +49,7 @@ export default function SignatureDialog(props: any) {
                 leaveFrom="opacity-100 translate-y-0 sm:scale-100"
                 leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
               >
-                <Dialog.Panel className="relative transform overflow-hidden rounded-lg bg-white px-4 pt-5 pb-4 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-sm sm:p-6">
+                <Dialog.Panel className="min-h-[300px] relative transform overflow-hidden rounded-lg bg-white px-4 pt-5 pb-4 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-sm sm:p-6">
                   <div className="">
                     <div className="border-b border-gray-200 mb-3">
                       <nav className="-mb-px flex space-x-8" aria-label="Tabs">
@@ -83,32 +84,52 @@ export default function SignatureDialog(props: any) {
                       </nav>
                     </div>
                     {isCurrentTab("Type") ? (
-                      <div className="my-8 min-h-[50px]">
-                        <input
-                          type="email"
-                          name="email"
-                          id="email"
-                          className="mt-3 pb-1 text-center block border-b w-full border-gray-300 focus:border-neon focus:ring-neon text-2xl"
-                          placeholder="Kindly type your name"
-                        />
+                      <div>
+                        <div className="my-8">
+                          <input
+                            type="email"
+                            name="email"
+                            id="email"
+                            value={typedName}
+                            onChange={(e) => {
+                              setTypedName(e.target.value);
+                            }}
+                            className="mt-3 p-1 text-center block border-b w-full border-gray-300 focus:border-neon focus:ring-neon text-2xl"
+                            placeholder="Kindly type your name"
+                          />
+                        </div>
+                        <div className="float-right">
+                          <Button
+                            color="secondary"
+                            onClick={() => props.setOpen(false)}
+                          >
+                            Cancel
+                          </Button>
+                          <Button className="ml-3" disabled={!typedName}>
+                            Sign
+                          </Button>
+                        </div>
                       </div>
                     ) : (
                       ""
                     )}
                     {isCurrentTab("Draw") ? (
-                      <div className="my-8 min-h-[50px]">draw</div>
+                      <div className="my-8">
+                        <div className="float-right">
+                          <Button
+                            color="secondary"
+                            onClick={() => props.setOpen(false)}
+                          >
+                            Cancel
+                          </Button>
+                          <Button className="ml-3" disabled={!typedName}>
+                            Sign
+                          </Button>
+                        </div>
+                      </div>
                     ) : (
                       ""
                     )}
-                  </div>
-                  <div className="float-right">
-                    <Button
-                      color="secondary"
-                      onClick={() => props.setOpen(false)}
-                    >
-                      Cancel
-                    </Button>
-                    <Button className="ml-3">Sign</Button>
                   </div>
                 </Dialog.Panel>
               </Transition.Child>

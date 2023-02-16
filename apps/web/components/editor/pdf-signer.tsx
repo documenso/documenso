@@ -4,6 +4,8 @@ import { useRouter } from "next/router";
 import dynamic from "next/dynamic";
 import SignatureDialog from "./signature-dialog";
 import { useState } from "react";
+import { Button } from "@documenso/ui";
+import { CheckBadgeIcon } from "@heroicons/react/24/outline";
 
 const PDFViewer = dynamic(() => import("./pdf-viewer"), {
   ssr: false,
@@ -28,10 +30,18 @@ export default function PDFSigner(props: any) {
             <Logo className="inline w-10"></Logo>
           </div>
           <div className="ml-3 flex-1 md:flex md:justify-between">
-            <p className="text-lg text-slate-700 align-baseline">
+            <p className="text-lg text-slate-700">
               Timur Ercan (timur.ercan31@gmail.com) would like you to sign this
               document.
             </p>
+            <Button
+              disabled
+              icon={CheckBadgeIcon}
+              color="secondary"
+              className="float-right"
+            >
+              Done
+            </Button>
           </div>
         </div>
       </div>
