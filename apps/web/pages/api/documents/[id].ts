@@ -12,6 +12,9 @@ async function getHandler(req: NextApiRequest, res: NextApiResponse) {
   const user = await getUserFromToken(req, res);
   const { id: documentId } = req.query;
 
+  // TODO Check if this is a public link with token and validate the token
+  const { token: recipientToken } = req.query;
+
   if (!user) return;
 
   if (!documentId) {

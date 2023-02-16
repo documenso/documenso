@@ -51,6 +51,7 @@ export default function PDFEditor(props: any) {
   return (
     <>
       <PDFViewer
+        readonly={false}
         document={props.document}
         fields={fields}
         onPositionChanged={onPositionChangedHandler}

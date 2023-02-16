@@ -22,7 +22,7 @@ type FieldPropsType = {
   onDelete: any;
 };
 
-export default function Field(props: FieldPropsType) {
+export default function EditableField(props: FieldPropsType) {
   const [field, setField]: any = useState(props.field);
   const [position, setPosition]: any = useState({
     x: props.field.positionX,
@@ -40,6 +40,7 @@ export default function Field(props: FieldPropsType) {
 
     props.onPositionChanged({ x, y }, props.field.id);
   };
+
   return (
     <Draggable
       nodeRef={nodeRef}

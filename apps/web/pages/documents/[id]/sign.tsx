@@ -4,28 +4,18 @@ import { useEffect } from "react";
 import { NextPageWithLayout } from "../../_app";
 import { ReadStatus } from "@prisma/client";
 import SignaturePad from "signature_pad";
-
+import { InformationCircleIcon, PencilIcon } from "@heroicons/react/24/outline";
+import Logo from "../../../components/logo";
+import PDFSigner from "../../../components/editor/pdf-signer";
+import fields from "../../api/documents/[id]/fields";
+//http://localhost:3000/documents/40/sign?token=wu82JFMxLvdYVJ9sKy9jvd
 const SignPage: NextPageWithLayout = (props: any) => {
-  useEffect(() => {
-    const canvas: any = document.querySelector("canvas");
-    const signaturePad = new SignaturePad(canvas);
-    const resizeCanvas = () => {
-      const ratio = Math.max(window.devicePixelRatio || 1, 1);
-      canvas.width = canvas.offsetWidth * ratio;
-      canvas.height = canvas.offsetHeight * ratio;
-      canvas.getContext("2d").scale(ratio, ratio);
-      // signaturePad.clear(); // otherwise isEmpty() might return incorrect value
-    };
-    window.addEventListener("resize", resizeCanvas);
-  });
   return (
     <>
       <Head>
         <title>Sign | Documenso</title>
       </Head>
-      Hello, please sign at the dotted line.
-      <canvas className="mx-auto bg-neon"></canvas>
-      <hr></hr>
+      <PDFSigner document={props.document} fields={props.fields} />
       {/* todo read/ sign version of editor => flag or own component */}
     </>
   );
@@ -43,13 +33,23 @@ export async function getServerSideProps(context: any) {
     },
   });
 
-  const document = await prisma.recipient
-    .findFirstOrThrow({
-      where: {
-        token: recipientToken,
-      },
-    })
-    .Document();
+  const recipient = await prisma.recipient.findFirstOrThrow({
+    where: {
+      token: recipientToken,
+    },
+    include: {
+      Document: true,
+    },
+  });
+
+  const fields = await prisma.field.findMany({
+    where: {
+      documentId: recipient.Document.id,
+    },
+    include: {
+      Recipient: true,
+    },
+  });
 
   // todo get r
 
@@ -57,7 +57,8 @@ export async function getServerSideProps(context: any) {
 
   return {
     props: {
-      document: document,
+      document: recipient.Document,
+      fields: fields,
     },
   };
 }
