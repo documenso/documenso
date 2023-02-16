@@ -24,7 +24,7 @@ export default function PDFSigner(props: any) {
   return (
     <>
       <SignatureDialog open={open} setOpen={setOpen}></SignatureDialog>
-      <div className="bg-neon p-4">
+      <div className="bg-slate-50 shadow-lg p-4">
         <div className="flex">
           <div className="flex-shrink-0">
             <Logo className="inline w-10"></Logo>
@@ -34,12 +34,7 @@ export default function PDFSigner(props: any) {
               Timur Ercan (timur.ercan31@gmail.com) would like you to sign this
               document.
             </p>
-            <Button
-              disabled
-              icon={CheckBadgeIcon}
-              color="secondary"
-              className="float-right"
-            >
+            <Button icon={CheckBadgeIcon} className="float-right">
               Done
             </Button>
           </div>
