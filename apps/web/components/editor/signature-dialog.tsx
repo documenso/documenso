@@ -49,7 +49,7 @@ export default function SignatureDialog(props: any) {
                 leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
               >
                 <Dialog.Panel className="relative transform overflow-hidden rounded-lg bg-white px-4 pt-5 pb-4 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-sm sm:p-6">
-                  <div className="min-h-[50px]">
+                  <div className="">
                     <div className="border-b border-gray-200 mb-3">
                       <nav className="-mb-px flex space-x-8" aria-label="Tabs">
                         {tabs.map((tab) => (
@@ -83,7 +83,7 @@ export default function SignatureDialog(props: any) {
                       </nav>
                     </div>
                     {isCurrentTab("Type") ? (
-                      <div className="my-8">
+                      <div className="my-8 min-h-[50px]">
                         <input
                           type="email"
                           name="email"
@@ -96,7 +96,7 @@ export default function SignatureDialog(props: any) {
                       ""
                     )}
                     {isCurrentTab("Draw") ? (
-                      <div className="my-8">draw</div>
+                      <div className="my-8 min-h-[50px]">draw</div>
                     ) : (
                       ""
                     )}
