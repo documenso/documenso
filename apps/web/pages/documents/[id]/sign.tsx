@@ -51,8 +51,6 @@ export async function getServerSideProps(context: any) {
     },
   });
 
-  // todo get r
-
   // todo sign ui
 
   return {
