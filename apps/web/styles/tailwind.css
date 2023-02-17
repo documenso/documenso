@@ -9,8 +9,7 @@
   min-height: 100%;
 }
 
-/* @media (prefers-color-scheme: dark) {
-  html {
-    color-scheme: dark;
-  }
-} */
+@font-face {
+  font-family: "Qwigley";
+  src: url("/fonts/Qwigley-Regular.ttf");
+}
