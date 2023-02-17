@@ -105,7 +105,16 @@ export default function SignatureDialog(props: any) {
                           >
                             Cancel
                           </Button>
-                          <Button className="ml-3" disabled={!typedName}>
+                          <Button
+                            className="ml-3"
+                            disabled={!typedName}
+                            onClick={() => {
+                              props.onClose({
+                                type: "type",
+                                name: "typedName",
+                              });
+                            }}
+                          >
                             Sign
                           </Button>
                         </div>

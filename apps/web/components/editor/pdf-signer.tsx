@@ -6,6 +6,7 @@ import SignatureDialog from "./signature-dialog";
 import { useState } from "react";
 import { Button } from "@documenso/ui";
 import { CheckBadgeIcon } from "@heroicons/react/24/outline";
+import toast from "react-hot-toast";
 
 const PDFViewer = dynamic(() => import("./pdf-viewer"), {
   ssr: false,
@@ -14,17 +15,61 @@ const PDFViewer = dynamic(() => import("./pdf-viewer"), {
 export default function PDFSigner(props: any) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
-  const [fields, setFields] = useState<any[]>(props.fields);
+  const [signatures, setSignatures] = useState<any[]>([]);
+  const [dialogField, setDialogField] = useState<any>();
 
   function onClick(item: any) {
     if (item.type === "SIGNATURE") {
+      setDialogField(item);
       setOpen(true);
     }
   }
 
+  function onDialogClose(dialogResult: any) {
+    console.log(dialogResult);
+    console.log(dialogField);
+    setSignatures(
+      signatures.concat({
+        fieldId: dialogField.id,
+        type: dialogResult.type,
+        name: dialogResult.name,
+        signatureImage: null,
+      })
+    );
+    setOpen(false);
+    setDialogField(null);
+  }
+
+  function sign() {
+    const body = { documentId: props.document.id, signatures: signatures };
+    toast.promise(
+      fetch(
+        `/api/documents/${props.document.id}/sign?token=${router.query.token}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(body),
+        }
+      ).then(() => {
+        router.push(
+          `/documents/${props.document.id}/signed?token=${router.query.token}`
+        );
+      }),
+      {
+        loading: "Signing...",
+        success: `"${props.document.title}" signed successfully.`,
+        error: "Could not sign :/",
+      }
+    );
+
+    // goto signing done page
+  }
+
   return (
     <>
-      <SignatureDialog open={open} setOpen={setOpen}></SignatureDialog>
+      <SignatureDialog open={open} setOpen={setOpen} onClose={onDialogClose} />
       <div className="bg-neon p-4">
         <div className="flex">
           <div className="flex-shrink-0">
@@ -36,9 +81,13 @@ export default function PDFSigner(props: any) {
               document.
             </p>
             <Button
+              disabled={signatures.length < props.fields.length}
               color="secondary"
               icon={CheckBadgeIcon}
               className="float-right"
+              onClick={() => {
+                sign();
+              }}
             >
               Done
             </Button>
