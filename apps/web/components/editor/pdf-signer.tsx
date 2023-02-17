@@ -14,6 +14,7 @@ const PDFViewer = dynamic(() => import("./pdf-viewer"), {
 export default function PDFSigner(props: any) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
+  const [fields, setFields] = useState<any[]>(props.fields);
 
   function onClick(item: any) {
     if (item.type === "SIGNATURE") {
@@ -24,7 +25,7 @@ export default function PDFSigner(props: any) {
   return (
     <>
       <SignatureDialog open={open} setOpen={setOpen}></SignatureDialog>
-      <div className="bg-slate-50 shadow-lg p-4">
+      <div className="bg-neon p-4">
         <div className="flex">
           <div className="flex-shrink-0">
             <Logo className="inline w-10"></Logo>
@@ -34,7 +35,11 @@ export default function PDFSigner(props: any) {
               Timur Ercan (timur.ercan31@gmail.com) would like you to sign this
               document.
             </p>
-            <Button icon={CheckBadgeIcon} className="float-right">
+            <Button
+              color="secondary"
+              icon={CheckBadgeIcon}
+              className="float-right"
+            >
               Done
             </Button>
           </div>
