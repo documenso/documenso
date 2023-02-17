@@ -219,8 +219,10 @@ const DocumentsPage: NextPageWithLayout = (props: any) => {
                           {formatDocumentStatus(document.status)}
                           <p>
                             <small>
-                              {document.signed || 0}/
-                              {document.Recipient.length || 0}
+                              {document.Recipient.filter(
+                                (r: any) => r.signingStatus === "SIGNED"
+                              ).length || 0}
+                              /{document.Recipient.length || 0}
                             </small>
                           </p>
                         </td>
