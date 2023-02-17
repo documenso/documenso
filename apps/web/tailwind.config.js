@@ -13,7 +13,7 @@ module.exports = {
     extend: {
       fontFamily: {
         monteserrat: ["Monteserrat", "serif"],
-        // qwigley: ["Qwigley", "serif"],
+        qwigley: ["Qwigley", "serif"],
       },
       colors: {
         neon: "#37f095",

@@ -24,6 +24,8 @@ const SignPage: NextPageWithLayout = (props: any) => {
 export async function getServerSideProps(context: any) {
   const recipientToken: string = context.query["token"];
 
+  // todo redirect to sigend of all already signed
+
   await prisma.recipient.updateMany({
     where: {
       token: recipientToken,

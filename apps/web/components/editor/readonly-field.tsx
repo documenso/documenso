@@ -39,7 +39,7 @@ export default function ReadOnlyField(props: FieldPropsType) {
     >
       <div
         onClick={() => {
-          props.onClick(props.field);
+          if (!field?.signature) props.onClick(props.field);
         }}
         ref={nodeRef}
         className="cursor-pointer opacity-80 p-2 m-auto w-auto flex-row-reverse text-lg font-bold text-center absolute top-0 left-0 select-none hover:brightness-50"
@@ -47,8 +47,34 @@ export default function ReadOnlyField(props: FieldPropsType) {
           background: stc(props.field.Recipient.email),
         }}
       >
-        <div className="m-auto w-auto flex-row-reverse font-medium text-center px-12 py-2">
+        <div
+          hidden={field?.signature}
+          className="m-auto w-auto flex-row-reverse font-medium text-center px-12 py-2"
+        >
           {field.type === "SIGNATURE" ? "SIGN HERE" : ""}
+        </div>
+        <div
+          hidden={!field?.signature}
+          className="font-qwigley text-5xl m-auto w-auto flex-row-reverse font-medium text-center"
+        >
+          {field?.signature?.type === "type" ? field?.signature.name : ""}
+          {field?.signature?.type === "draw" ? (
+            <img className="w-50 h-20" src={field?.signature?.signatureImage} />
+          ) : (
+            ""
+          )}
+          <IconButton
+            icon={XCircleIcon}
+            color="secondary"
+            className="absolute top-0 right-0 -m-5"
+            onClick={(event: any) => {
+              event.preventDefault();
+              event.stopPropagation();
+              const newField = { ...field };
+              newField.signature = null;
+              setField(newField);
+            }}
+          />
         </div>
       </div>
     </Draggable>

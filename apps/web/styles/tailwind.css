@@ -6,7 +6,9 @@
   min-height: 100%;
 }
 
-body {
+html,
+body,
+:host {
   font-family: montserrat;
 }
 

@@ -42,7 +42,6 @@
     "react-tooltip": "^5.7.2",
     "sass": "^1.57.1",
     "short-uuid": "^4.2.2",
-    "signature_pad": "^4.1.4",
     "string-to-color": "^2.2.2",
     "typescript": "4.8.4"
   },

@@ -16,6 +16,7 @@ export default function PDFSigner(props: any) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [signatures, setSignatures] = useState<any[]>([]);
+  const [fields, setFields] = useState<any[]>(props.fields);
   const [dialogField, setDialogField] = useState<any>();
 
   function onClick(item: any) {
@@ -26,16 +27,24 @@ export default function PDFSigner(props: any) {
   }
 
   function onDialogClose(dialogResult: any) {
-    console.log(dialogResult);
-    console.log(dialogField);
-    setSignatures(
-      signatures.concat({
-        fieldId: dialogField.id,
-        type: dialogResult.type,
-        name: dialogResult.name,
-        signatureImage: null,
-      })
+    const signature = {
+      fieldId: dialogField.id,
+      type: dialogResult.type,
+      name: dialogResult.name,
+      signatureImage: dialogResult.signatureImage,
+    };
+
+    setSignatures(signatures.concat(signature));
+
+    fields.splice(
+      fields.findIndex(function (i) {
+        return i.id === signature.fieldId;
+      }),
+      1
     );
+    const signedField = { ...dialogField };
+    signedField.signature = signature;
+    setFields(fields.concat(signedField));
     setOpen(false);
     setDialogField(null);
   }
@@ -98,7 +107,7 @@ export default function PDFSigner(props: any) {
       <PDFViewer
         readonly={true}
         document={props.document}
-        fields={props.fields}
+        fields={fields}
         pdfUrl={`${NEXT_PUBLIC_WEBAPP_URL}/api/documents/${router.query.id}?token=${router.query.token}`}
         onClick={onClick}
       ></PDFViewer>

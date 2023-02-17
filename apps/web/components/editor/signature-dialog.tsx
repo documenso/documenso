@@ -2,25 +2,24 @@ import { classNames } from "@documenso/lib";
 import { Button, IconButton } from "@documenso/ui";
 import { Dialog, Transition } from "@headlessui/react";
 import {
-  BuildingOfficeIcon,
-  CreditCardIcon,
   LanguageIcon,
   PencilIcon,
-  UserIcon,
-  UsersIcon,
-  XMarkIcon,
+  TrashIcon,
 } from "@heroicons/react/24/outline";
-import React from "react";
 import { Fragment, useState } from "react";
+import SignatureCanvas from "react-signature-canvas";
 
 const tabs = [
-  { name: "Type", href: "#", icon: LanguageIcon, current: true },
-  { name: "Draw", href: "#", icon: PencilIcon, current: false },
+  { name: "Type", icon: LanguageIcon, current: true },
+  { name: "Draw", icon: PencilIcon, current: false },
 ];
 
 export default function SignatureDialog(props: any) {
   const [currentTab, setCurrentTab] = useState(tabs[0]);
   const [typedName, setTypedName] = useState("");
+  const [signatureEmpty, setSignatureEmpty] = useState(true);
+
+  let signCanvas: any | undefined;
 
   return (
     <>
@@ -49,37 +48,35 @@ export default function SignatureDialog(props: any) {
                 leaveFrom="opacity-100 translate-y-0 sm:scale-100"
                 leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
               >
-                <Dialog.Panel className="min-h-[300px] relative transform overflow-hidden rounded-lg bg-white px-4 pt-5 pb-4 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-sm sm:p-6">
+                <Dialog.Panel className="min-h-[350px] relative transform overflow-hidden rounded-lg bg-white px-4 pt-5 pb-4 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-sm sm:p-6">
                   <div className="">
                     <div className="border-b border-gray-200 mb-3">
                       <nav className="-mb-px flex space-x-8" aria-label="Tabs">
                         {tabs.map((tab) => (
-                          <Fragment>
-                            <a
-                              key={tab.name}
-                              onClick={() => {
-                                setCurrent(tab);
-                              }}
+                          <a
+                            key={tab.name}
+                            onClick={() => {
+                              setCurrent(tab);
+                            }}
+                            className={classNames(
+                              tab.current
+                                ? "border-neon text-neon"
+                                : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300",
+                              "group inline-flex items-center py-4 px-1 border-b-2 font-medium text-sm cursor-pointer"
+                            )}
+                            aria-current={tab.current ? "page" : undefined}
+                          >
+                            <tab.icon
                               className={classNames(
                                 tab.current
-                                  ? "border-neon text-neon"
-                                  : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300",
-                                "group inline-flex items-center py-4 px-1 border-b-2 font-medium text-sm cursor-pointer"
+                                  ? "text-neon"
+                                  : "text-gray-400 group-hover:text-gray-500",
+                                "-ml-0.5 mr-2 h-5 w-5"
                               )}
-                              aria-current={tab.current ? "page" : undefined}
-                            >
-                              <tab.icon
-                                className={classNames(
-                                  tab.current
-                                    ? "text-neon"
-                                    : "text-gray-400 group-hover:text-gray-500",
-                                  "-ml-0.5 mr-2 h-5 w-5"
-                                )}
-                                aria-hidden="true"
-                              />
-                              <span>{tab.name}</span>
-                            </a>
-                          </Fragment>
+                              aria-hidden="true"
+                            />
+                            <span>{tab.name}</span>
+                          </a>
                         ))}
                       </nav>
                     </div>
@@ -87,14 +84,11 @@ export default function SignatureDialog(props: any) {
                       <div>
                         <div className="my-8">
                           <input
-                            type="email"
-                            name="email"
-                            id="email"
                             value={typedName}
                             onChange={(e) => {
                               setTypedName(e.target.value);
                             }}
-                            className="mt-3 p-1 text-center block border-b w-full border-gray-300 focus:border-neon focus:ring-neon text-2xl"
+                            className="font-qw leading-none h-10 align-bottom font-qwigley mt-14 text-center block border-b w-full border-gray-300 focus:border-neon focus:ring-neon text-2xl"
                             placeholder="Kindly type your name"
                           />
                         </div>
@@ -111,7 +105,7 @@ export default function SignatureDialog(props: any) {
                             onClick={() => {
                               props.onClose({
                                 type: "type",
-                                name: "typedName",
+                                name: typedName,
                               });
                             }}
                           >
@@ -123,15 +117,45 @@ export default function SignatureDialog(props: any) {
                       ""
                     )}
                     {isCurrentTab("Draw") ? (
-                      <div className="my-8">
-                        <div className="float-right">
+                      <div className="">
+                        <SignatureCanvas
+                          ref={(ref) => {
+                            signCanvas = ref;
+                          }}
+                          canvasProps={{
+                            className:
+                              "sigCanvas border-b b-2 border-slate w-full h-full mb-3",
+                          }}
+                          onEnd={() => {
+                            setSignatureEmpty(signCanvas?.isEmpty());
+                          }}
+                        />
+                        <IconButton
+                          className="block float-left"
+                          icon={TrashIcon}
+                          onClick={() => {
+                            signCanvas?.clear();
+                            setSignatureEmpty(signCanvas?.isEmpty());
+                          }}
+                        ></IconButton>
+                        <div className="mt-10 float-right">
                           <Button
                             color="secondary"
                             onClick={() => props.setOpen(false)}
                           >
                             Cancel
                           </Button>
-                          <Button className="ml-3" disabled={!typedName}>
+                          <Button
+                            className="ml-3"
+                            onClick={() => {
+                              props.onClose({
+                                type: "draw",
+                                signatureImage:
+                                  signCanvas.toDataURL("image/png"),
+                              });
+                            }}
+                            disabled={signatureEmpty}
+                          >
                             Sign
                           </Button>
                         </div>
