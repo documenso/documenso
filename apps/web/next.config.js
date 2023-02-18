@@ -12,6 +12,7 @@ const withTM = require("next-transpile-modules")([
   "@documenso/ui",
   "@documenso/pdf",
   "@documenso/features",
+  "react-signature-canvas",
 ]);
 const plugins = [];
 plugins.push(withTM);
