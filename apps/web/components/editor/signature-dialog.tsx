@@ -126,6 +126,7 @@ export default function SignatureDialog(props: any) {
                             className:
                               "sigCanvas border-b b-2 border-slate w-full h-full mb-3",
                           }}
+                          clearOnResize={true}
                           onEnd={() => {
                             setSignatureEmpty(signCanvas?.isEmpty());
                           }}
