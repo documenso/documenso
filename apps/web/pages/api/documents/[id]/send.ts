@@ -36,17 +36,14 @@ async function postHandler(req: NextApiRequest, res: NextApiResponse) {
 
   if (!recipients.length) return res.status(200).end("");
 
-  (await recipients).forEach(async (recipient) => {
-    await sendSigningRequest(recipient, document, user)
-      .then(() => {
-        return res.status(200).end();
-      })
-      .catch((err) => {
-        console.log(err);
-        return res.status(502).end("Coud not send request for signing.");
-      });
+  recipients.forEach(async (recipient) => {
+    await sendSigningRequest(recipient, document, user).catch((err) => {
+      console.log(err);
+      return res.status(502).end("Coud not send request for signing.");
+    });
   });
 
+  return res.status(202).end();
   // todo check if recipient has an account and show them in their inbox or something
 }
 
