@@ -8,6 +8,7 @@ import { NextApiRequest, NextApiResponse } from "next";
 import { SigningStatus, DocumentStatus } from "@prisma/client";
 import { getDocument } from "@documenso/lib/query";
 import { Document as PrismaDocument } from "@prisma/client";
+import { insertImageInPDF, insertTextInPDF } from "@documenso/pdf";
 
 async function postHandler(req: NextApiRequest, res: NextApiResponse) {
   const existingUser = await getUserFromToken(req, res);
@@ -33,7 +34,7 @@ async function postHandler(req: NextApiRequest, res: NextApiResponse) {
 
   if (!document) res.status(404).end(`No document found.`);
 
-  // save signature to db for later use
+  // todo save signature to db for later use
 
   await prisma.recipient.update({
     where: {
@@ -61,7 +62,7 @@ async function postHandler(req: NextApiRequest, res: NextApiResponse) {
   });
 
   if (unsignedRecipients.length === 0) {
-    // if everybody signed insert images and create signature
+    // todo if everybody signed insert images and create signature
     await prisma.document.update({
       where: {
         id: recipient.documentId,
@@ -70,7 +71,7 @@ async function postHandler(req: NextApiRequest, res: NextApiResponse) {
         status: DocumentStatus.COMPLETED,
       },
     });
-    // send notifications
+    // todo send notifications
   }
 
   return res.status(200).end();

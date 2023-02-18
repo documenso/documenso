@@ -1,0 +1,7 @@
+{
+  "name": "@documenso/pdf",
+  "version": "0.0.0",
+  "private": true,
+  "main": "index.ts",
+  "dependencies": {}
+}
