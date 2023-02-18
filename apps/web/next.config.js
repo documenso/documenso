@@ -3,7 +3,7 @@ require("dotenv").config({ path: "../../.env" });
 
 const nextConfig = {
   reactStrictMode: true,
-  swcMinify: true,
+  swcMinify: false,
 };
 
 const withTM = require("next-transpile-modules")([
