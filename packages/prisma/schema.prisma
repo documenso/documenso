@@ -7,53 +7,9 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Document {
-  id        Int            @id @default(autoincrement())
-  userId    Int
-  User      User           @relation(fields: [userId], references: [id], onDelete: Cascade)
-  title     String
-  status    DocumentStatus @default(DRAFT)
-  document  String
-  Recipient Recipient[]
-  Field     Field[]
-}
-
-model Field {
-  id          Int        @id @default(autoincrement())
-  documentId  Int
-  recipientId Int?
-  type        FieldType
-  page        Int
-  positionX   Int        @default(0)
-  positionY   Int        @default(0)
-  Document    Document   @relation(fields: [documentId], references: [id], onDelete: Cascade)
-  Recipient   Recipient? @relation(fields: [recipientId], references: [id], onDelete: Cascade)
-  Signature   Signature?
-}
-
-model Signature {
-  id                     Int      @id @default(autoincrement())
-  created                DateTime @default(now())
-  recipientId            Int
-  fieldId                Int      @unique
-  signatureImageAsBase64 String
-
-  Recipient Recipient @relation(fields: [recipientId], references: [id], onDelete: Restrict)
-  Field     Field     @relation(fields: [fieldId], references: [id], onDelete: Restrict)
-}
-
-model Recipient {
-  id            Int           @id @default(autoincrement())
-  documentId    Int
-  email         String        @db.VarChar(255)
-  name          String        @default("") @db.VarChar(255)
-  token         String
-  readStatus    ReadStatus    @default(NOT_OPENED)
-  signingStatus SigningStatus @default(NOT_SIGNED)
-  sendStatus    SendStatus    @default(NOT_SENT)
-  Document      Document      @relation(fields: [documentId], references: [id], onDelete: Cascade)
-  Field         Field[]
-  Signature     Signature[]
+enum IdentityProvider {
+  DOCUMENSO
+  GOOGLE
 }
 
 model User {
@@ -95,15 +51,21 @@ model Session {
   user         User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
-enum FieldType {
-  SIGNATURE
-  DATE
-  TEXT
+enum DocumentStatus {
+  DRAFT
+  PENDING
+  COMPLETED
 }
 
-enum IdentityProvider {
-  DOCUMENSO
-  GOOGLE
+model Document {
+  id        Int            @id @default(autoincrement())
+  userId    Int
+  User      User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title     String
+  status    DocumentStatus @default(DRAFT)
+  document  String
+  Recipient Recipient[]
+  Field     Field[]
 }
 
 enum ReadStatus {
@@ -121,8 +83,46 @@ enum SigningStatus {
   SIGNED
 }
 
-enum DocumentStatus {
-  DRAFT
-  PENDING
-  COMPLETED
+model Recipient {
+  id            Int           @id @default(autoincrement())
+  documentId    Int
+  email         String        @db.VarChar(255)
+  name          String        @default("") @db.VarChar(255)
+  token         String
+  readStatus    ReadStatus    @default(NOT_OPENED)
+  signingStatus SigningStatus @default(NOT_SIGNED)
+  sendStatus    SendStatus    @default(NOT_SENT)
+  Document      Document      @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  Field         Field[]
+  Signature     Signature[]
+}
+
+enum FieldType {
+  SIGNATURE
+  DATE
+  TEXT
+}
+
+model Field {
+  id          Int        @id @default(autoincrement())
+  documentId  Int
+  recipientId Int?
+  type        FieldType
+  page        Int
+  positionX   Int        @default(0)
+  positionY   Int        @default(0)
+  Document    Document   @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  Recipient   Recipient? @relation(fields: [recipientId], references: [id], onDelete: Cascade)
+  Signature   Signature?
+}
+
+model Signature {
+  id                     Int      @id @default(autoincrement())
+  created                DateTime @default(now())
+  recipientId            Int
+  fieldId                Int      @unique
+  signatureImageAsBase64 String
+
+  Recipient Recipient @relation(fields: [recipientId], references: [id], onDelete: Restrict)
+  Field     Field     @relation(fields: [fieldId], references: [id], onDelete: Restrict)
 }
