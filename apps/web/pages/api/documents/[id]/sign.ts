@@ -34,7 +34,7 @@ async function postHandler(req: NextApiRequest, res: NextApiResponse) {
 
   if (!document) res.status(404).end(`No document found.`);
 
-  // todo save signature to db for later use
+  // todo save signature from body to db for later use
 
   await prisma.recipient.update({
     where: {
