@@ -28,6 +28,18 @@ model Field {
   positionY   Int        @default(0)
   Document    Document   @relation(fields: [documentId], references: [id], onDelete: Cascade)
   Recipient   Recipient? @relation(fields: [recipientId], references: [id], onDelete: Cascade)
+  Signature   Signature?
+}
+
+model Signature {
+  id                     Int      @id @default(autoincrement())
+  created                DateTime @default(now())
+  recipientId            Int
+  fieldId                Int      @unique
+  signatureImageAsBase64 String
+
+  Recipient Recipient @relation(fields: [recipientId], references: [id], onDelete: Restrict)
+  Field     Field     @relation(fields: [fieldId], references: [id], onDelete: Restrict)
 }
 
 model Recipient {
@@ -41,6 +53,7 @@ model Recipient {
   sendStatus    SendStatus    @default(NOT_SENT)
   Document      Document      @relation(fields: [documentId], references: [id], onDelete: Cascade)
   Field         Field[]
+  Signature     Signature[]
 }
 
 model User {
