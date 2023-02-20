@@ -57,7 +57,9 @@ export default function ReadOnlyField(props: FieldPropsType) {
           hidden={!field?.signature}
           className="font-qwigley text-5xl m-auto w-auto flex-row-reverse font-medium text-center"
         >
-          {field?.signature?.type === "type" ? field?.signature.name : ""}
+          {field?.signature?.type === "type"
+            ? field?.signature.typedSignature
+            : ""}
           {field?.signature?.type === "draw" ? (
             <img className="w-50 h-20" src={field?.signature?.signatureImage} />
           ) : (

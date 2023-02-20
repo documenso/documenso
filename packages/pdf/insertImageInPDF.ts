@@ -1,4 +1,4 @@
-import { degrees, PDFDocument, PDFImage, rgb, StandardFonts } from "pdf-lib";
+import { PDFDocument } from "pdf-lib";
 
 export async function insertImageInPDF(
   pdfAsBase64: string,
@@ -12,12 +12,13 @@ export async function insertImageInPDF(
   const pages = pdfDoc.getPages();
   const pdfPage = pages[page];
   const pngImage = await pdfDoc.embedPng(image);
+  const drawSize = { width: 213, height: 50 };
 
   pdfPage.drawImage(pngImage, {
-    x: positionX,
-    y: positionY,
-    width: pngImage.width,
-    height: pngImage.height,
+    x: pdfPage.getWidth() - positionX - drawSize.width,
+    y: pdfPage.getHeight() - positionY - drawSize.height,
+    width: drawSize.width,
+    height: drawSize.height,
   });
 
   const pdfAsUint8Array = await pdfDoc.save();

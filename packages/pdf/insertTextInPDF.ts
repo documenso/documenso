@@ -1,4 +1,4 @@
-import { degrees, PDFDocument, rgb, StandardFonts } from "pdf-lib";
+import { PDFDocument, rgb, StandardFonts } from "pdf-lib";
 
 export async function insertTextInPDF(
   pdfAsBase64: string,
@@ -13,10 +13,12 @@ export async function insertTextInPDF(
   const helveticaFont = await pdfDoc.embedFont(StandardFonts.Helvetica);
 
   const pages = pdfDoc.getPages();
-  const firstPage = pages[page];
-  firstPage.drawText(text, {
-    x: positionX,
-    y: positionY,
+  const pdfPage = pages[page];
+  const lineHeightEsimate = 25;
+
+  pdfPage.drawText(text, {
+    x: pdfPage.getWidth() - positionX,
+    y: pdfPage.getHeight() - positionY - lineHeightEsimate,
     size: 25,
     font: helveticaFont,
     color: rgb(0, 0, 0),

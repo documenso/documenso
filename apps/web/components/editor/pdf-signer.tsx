@@ -30,7 +30,7 @@ export default function PDFSigner(props: any) {
     const signature = {
       fieldId: dialogField.id,
       type: dialogResult.type,
-      name: dialogResult.name,
+      typedSignature: dialogResult.typedSignature,
       signatureImage: dialogResult.signatureImage,
     };
 
@@ -72,8 +72,6 @@ export default function PDFSigner(props: any) {
         error: "Could not sign :/",
       }
     );
-
-    // goto signing done page
   }
 
   return (
