@@ -31,12 +31,6 @@ const DashboardPage: NextPageWithLayout = (props: any) => {
       link: "/documents?filter=draft",
     },
     {
-      name: "Action required",
-      stat: "0",
-      icon: ExclamationTriangleIcon,
-      link: "/documents?filter=action_required",
-    },
-    {
       name: "Waiting for others",
       stat: "0",
       icon: UsersIcon,
@@ -61,7 +55,7 @@ const DashboardPage: NextPageWithLayout = (props: any) => {
             Dashboard
           </h1>
         </header>
-        <dl className="mt-8 grid grid-cols-4 xs:grid-cols-2 gap-5">
+        <dl className="mt-8 grid grid-cols-3 xs:grid-cols-2 gap-5">
           {stats.map((item) => (
             <Link href={item.link} key={item.name}>
               <div className="overflow-hidden rounded-lg bg-white px-4 py-5 shadow sm:p-6 ">
