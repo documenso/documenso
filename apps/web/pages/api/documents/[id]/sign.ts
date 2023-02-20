@@ -9,6 +9,7 @@ import { SigningStatus, DocumentStatus } from "@prisma/client";
 import { getDocument } from "@documenso/lib/query";
 import { Document as PrismaDocument } from "@prisma/client";
 import { insertImageInPDF, insertTextInPDF } from "@documenso/pdf";
+import { create } from "domain";
 const text2png = require("text2png");
 
 async function postHandler(req: NextApiRequest, res: NextApiResponse) {
@@ -37,17 +38,23 @@ async function postHandler(req: NextApiRequest, res: NextApiResponse) {
   if (!document) res.status(404).end(`No document found.`);
   // todo insert if not exits
   signatures.forEach(async (signature) => {
-    await prisma.signature.create({
-      data: {
+    if (!signature.signatureImage && !signature.typedSignature)
+      throw new Error("Cant't save invalid signature.");
+
+    await prisma.signature.upsert({
+      where: {
+        fieldId: signature.fieldId,
+      },
+      update: {},
+      create: {
         recipientId: recipient.id,
         fieldId: signature.fieldId,
         signatureImageAsBase64: signature.signatureImage
           ? signature.signatureImage
-          : text2png(signature.typedSignature, {
-              color: "black",
-              lineSpacing: 10,
-              padding: 20,
-            }).toString("base64"),
+          : null,
+        typedSignature: signature.typedSignature
+          ? signature.typedSignature
+          : null,
       },
     });
   });
@@ -68,6 +75,7 @@ async function postHandler(req: NextApiRequest, res: NextApiResponse) {
     },
   });
 
+  console.log("unsignedRecipients.length.." + unsignedRecipients.length);
   if (unsignedRecipients.length === 0) {
     // todo if everybody signed insert images and create signature
     const signedFields = await prisma.field.findMany({
@@ -77,18 +85,36 @@ async function postHandler(req: NextApiRequest, res: NextApiResponse) {
     // todo rename .document to documentImageAsBase64 or sth. like that
     let documentWithSignatureImages = document.document;
     let signaturesInserted = 0;
-    signedFields.forEach(async (item) => {
-      if (!item.Signature) {
+    signedFields.forEach(async (signedField) => {
+      if (!signedField.Signature) {
         documentWithSignatureImages = document.document;
         throw new Error("Invalid Signature in Field");
       }
-      documentWithSignatureImages = await insertImageInPDF(
-        documentWithSignatureImages,
-        item.Signature ? item.Signature?.signatureImageAsBase64 : "",
-        item.positionX,
-        item.positionY,
-        item.page
-      );
+
+      if (signedField.Signature.signatureImageAsBase64) {
+        documentWithSignatureImages = await insertImageInPDF(
+          documentWithSignatureImages,
+          signedField.Signature
+            ? signedField.Signature?.signatureImageAsBase64
+            : "",
+          signedField.positionX,
+          signedField.positionY,
+          signedField.page
+        );
+      } else if (signedField.Signature.typedSignature) {
+        console.log("inserting text");
+        documentWithSignatureImages = await insertTextInPDF(
+          documentWithSignatureImages,
+          signedField.Signature.typedSignature,
+          signedField.positionX,
+          signedField.positionY,
+          signedField.page
+        );
+      } else {
+        documentWithSignatureImages = document.document;
+        throw new Error("Invalid signature could not be inserted.");
+      }
+
       signaturesInserted++;
       if (signaturesInserted == signedFields.length) {
         await prisma.document.update({

@@ -15,6 +15,7 @@
     "@documenso/ui": "*",
     "@headlessui/react": "^1.7.4",
     "@heroicons/react": "^2.0.13",
+    "@pdf-lib/fontkit": "^1.1.1",
     "@tailwindcss/forms": "^0.5.3",
     "@types/bcryptjs": "^2.4.2",
     "@types/filesystem": "^0.0.32",
@@ -45,7 +46,6 @@
     "sass": "^1.57.1",
     "short-uuid": "^4.2.2",
     "string-to-color": "^2.2.2",
-    "text2png": "^2.3.0",
     "typescript": "4.8.4"
   },
   "devDependencies": {
