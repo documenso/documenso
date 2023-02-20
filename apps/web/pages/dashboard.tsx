@@ -13,10 +13,12 @@ import { uploadDocument } from "@documenso/features";
 import {
   DocumentStatus,
   SendStatus,
+  SigningStatus,
   Document as PrismaDocument,
 } from "@prisma/client";
 import { getUserFromToken } from "@documenso/lib/server";
 import { getDocumentsForUserFromToken } from "@documenso/lib/query";
+import { truncate } from "fs";
 
 type FormValues = {
   document: File;
@@ -49,6 +51,7 @@ const DashboardPage: NextPageWithLayout = (props: any) => {
       <Head>
         <title>Dashboard | Documenso</title>
       </Head>
+
       <div className="py-10 max-sm:px-4">
         <header>
           <h1 className="text-3xl font-bold leading-tight tracking-tight text-gray-900">
@@ -119,7 +122,6 @@ DashboardPage.getLayout = function getLayout(page: ReactElement) {
 
 function getStat(name: string, props: any) {
   if (name === "Draft") return props.dashboard.drafts;
-  if (name === "Action required") return props.dashboard.action;
   if (name === "Waiting for others") return props.dashboard.waiting;
   if (name === "Completed") return props.dashboard.completed;
   return 0;
@@ -138,11 +140,11 @@ export async function getServerSideProps(context: any) {
     (d) => d.status === DocumentStatus.DRAFT
   );
 
-  // Todo count declined, expired etc.
-  const action: PrismaDocument[] = [];
-
-  const waiting: any[] = documents.filter((e) =>
-    e.Recipient.some((e: any) => e.sendStatus === SendStatus.SENT)
+  const waiting: any[] = documents.filter(
+    (e) =>
+      e.Recipient.length > 0 &&
+      e.Recipient.some((r: any) => r.sendStatus === SendStatus.SENT) &&
+      e.Recipient.some((r: any) => r.signingStatus === SigningStatus.NOT_SIGNED)
   );
 
   const completed: PrismaDocument[] = documents.filter(
@@ -153,8 +155,8 @@ export async function getServerSideProps(context: any) {
     props: {
       dashboard: {
         drafts: drafts.length,
-        action: action.length,
         waiting: waiting.length,
+        docs: waiting,
         completed: completed.length,
       },
     },
