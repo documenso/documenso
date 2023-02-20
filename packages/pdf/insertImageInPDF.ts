@@ -15,7 +15,7 @@ export async function insertImageInPDF(
   const drawSize = { width: 213, height: 50 };
 
   pdfPage.drawImage(pngImage, {
-    x: pdfPage.getWidth() - positionX - drawSize.width,
+    x: positionX,
     y: pdfPage.getHeight() - positionY - drawSize.height,
     width: drawSize.width,
     height: drawSize.height,

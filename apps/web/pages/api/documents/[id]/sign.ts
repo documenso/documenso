@@ -9,8 +9,6 @@ import { SigningStatus, DocumentStatus } from "@prisma/client";
 import { getDocument } from "@documenso/lib/query";
 import { Document as PrismaDocument } from "@prisma/client";
 import { insertImageInPDF, insertTextInPDF } from "@documenso/pdf";
-import { create } from "domain";
-const text2png = require("text2png");
 
 async function postHandler(req: NextApiRequest, res: NextApiResponse) {
   const existingUser = await getUserFromToken(req, res);
