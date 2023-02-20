@@ -43,7 +43,11 @@ async function postHandler(req: NextApiRequest, res: NextApiResponse) {
         fieldId: signature.fieldId,
         signatureImageAsBase64: signature.signatureImage
           ? signature.signatureImage
-          : text2png(signature.typedSignature).toString("base64"),
+          : text2png(signature.typedSignature, {
+              color: "black",
+              lineSpacing: 10,
+              padding: 20,
+            }).toString("base64"),
       },
     });
   });
