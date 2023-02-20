@@ -9,7 +9,6 @@ export const sendSigningRequest = async (
   document: any,
   user: any
 ) => {
-  // todo errror handling
   await sendMail(
     user.email,
     `Please sign ${document.title}`,

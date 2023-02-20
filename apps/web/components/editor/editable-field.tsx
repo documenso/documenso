@@ -62,7 +62,6 @@ export default function EditableField(props: FieldPropsType) {
           <Logo className="w-16 mx-auto"></Logo>
         </div>
         <div className="m-auto w-auto flex-row-reverse text-lg font-bold text-center">
-          {/* todo icons */}
           {field.type}
           {field.type === "SIGNATURE" ? (
             <div className="text-xs text-center">

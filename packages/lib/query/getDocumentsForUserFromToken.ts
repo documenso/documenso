@@ -7,7 +7,6 @@ export const getDocumentsForUserFromToken = async (
   const user = await getUserFromToken(context.req, context.res);
   if (!user) return Promise.reject("Invalid user or token.");
 
-  // todo remove document base64 data
   const documents = await prisma.document.findMany({
     where: {
       userId: user.id,

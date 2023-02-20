@@ -156,7 +156,6 @@ export async function getServerSideProps(context: any) {
       dashboard: {
         drafts: drafts.length,
         waiting: waiting.length,
-        docs: waiting,
         completed: completed.length,
       },
     },
