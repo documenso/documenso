@@ -2,7 +2,7 @@ import prisma from "@documenso/prisma";
 import { sendMail } from "./sendMail";
 import { SendStatus, DocumentStatus } from "@prisma/client";
 import { NEXT_PUBLIC_WEBAPP_URL } from "../constants";
-import { transactionEmailTemplate } from "@documenso/lib/mail";
+import { signingRequestTemplate } from "@documenso/lib/mail";
 
 export const sendSigningRequest = async (
   recipient: any,
@@ -12,7 +12,7 @@ export const sendSigningRequest = async (
   await sendMail(
     user.email,
     `Please sign ${document.title}`,
-    transactionEmailTemplate(
+    signingRequestTemplate(
       `${user.name} (${user.email}) has sent you a document to sign. `,
       document,
       recipient,
