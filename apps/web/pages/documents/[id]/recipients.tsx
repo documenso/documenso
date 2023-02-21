@@ -4,6 +4,7 @@ import Layout from "../../../components/layout";
 import { NextPageWithLayout } from "../../_app";
 import { classNames, NEXT_PUBLIC_WEBAPP_URL } from "@documenso/lib";
 import {
+  ArrowDownTrayIcon,
   CheckBadgeIcon,
   CheckIcon,
   EnvelopeIcon,
@@ -63,6 +64,14 @@ const RecipientsPage: NextPageWithLayout = (props: any) => {
             </h2>
           </div>
           <div className="mt-4 flex flex-shrink-0 md:mt-0 md:ml-4">
+            <Button
+              icon={ArrowDownTrayIcon}
+              color="secondary"
+              className="mr-2"
+              href={"/api/documents/" + props.document.id}
+            >
+              Download
+            </Button>
             <Button
               icon={PencilSquareIcon}
               color="secondary"

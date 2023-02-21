@@ -3,10 +3,12 @@ import Layout from "../components/layout";
 import type { NextPageWithLayout } from "./_app";
 import Head from "next/head";
 import {
+  ArrowDownTrayIcon,
   CheckBadgeIcon,
   CheckIcon,
   DocumentPlusIcon,
   EnvelopeIcon,
+  PencilSquareIcon,
   PlusIcon,
   TrashIcon,
 } from "@heroicons/react/24/outline";
@@ -225,8 +227,30 @@ const DocumentsPage: NextPageWithLayout = (props: any) => {
                         <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
                           <div>
                             <IconButton
+                              icon={PencilSquareIcon}
+                              className="mr-2"
+                              onClick={(event: any) => {
+                                event.preventDefault();
+                                event.stopPropagation();
+                                router.push("/documents/" + document.id);
+                              }}
+                            >
+                              Edit
+                            </IconButton>
+                            <IconButton
+                              icon={ArrowDownTrayIcon}
+                              className="mr-2"
+                              onClick={(event: any) => {
+                                event.preventDefault();
+                                event.stopPropagation();
+                                router.push("/api/documents/" + document.id);
+                              }}
+                              download
+                            >
+                              Download
+                            </IconButton>
+                            <IconButton
                               icon={TrashIcon}
-                              className="flex-shrink-0 -ml-1 mr-3 h-6 w-6 inline text-neon"
                               onClick={(event: any) => {
                                 event.preventDefault();
                                 event.stopPropagation();
