@@ -9,10 +9,10 @@ export const sendSigningDoneMail = async (
 ) => {
   // todo check if recipient has an account
   await sendMail(
-    document.User.email,
-    `${recipient.email} signed "${document.title}"`,
+    user.email,
+    `Completed: "${document.title}"`,
     transactionEmailTemplate(
-      `All recipients have signed your document ${document.title}`,
+      `All recipients have signed "${document.title}"`,
       document,
       recipient,
       `${NEXT_PUBLIC_WEBAPP_URL}/api/documents/${document.id}`,
