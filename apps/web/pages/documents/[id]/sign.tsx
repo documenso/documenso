@@ -1,14 +1,9 @@
 import prisma from "@documenso/prisma";
 import Head from "next/head";
-import { useEffect } from "react";
 import { NextPageWithLayout } from "../../_app";
 import { ReadStatus } from "@prisma/client";
-import SignaturePad from "signature_pad";
-import { InformationCircleIcon, PencilIcon } from "@heroicons/react/24/outline";
-import Logo from "../../../components/logo";
 import PDFSigner from "../../../components/editor/pdf-signer";
-import fields from "../../api/documents/[id]/fields";
-//http://localhost:3000/documents/40/sign?token=wu82JFMxLvdYVJ9sKy9jvd
+
 const SignPage: NextPageWithLayout = (props: any) => {
   return (
     <>
