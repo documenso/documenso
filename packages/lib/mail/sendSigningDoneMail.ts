@@ -2,7 +2,7 @@ import { sendMail } from "./sendMail";
 import { NEXT_PUBLIC_WEBAPP_URL } from "@documenso/lib/constants";
 import { transactionEmailTemplate } from "@documenso/lib/mail";
 
-export const sendSignedMail = async (
+export const sendSigningDoneMail = async (
   recipient: any,
   document: any,
   user: any
@@ -12,13 +12,11 @@ export const sendSignedMail = async (
     document.User.email,
     `${recipient.email} signed "${document.title}"`,
     transactionEmailTemplate(
-      `${document.User.name || recipient.email} has signed your document ${
-        document.title
-      }`,
+      `All recipients have signed your document ${document.title}`,
       document,
       recipient,
-      `${NEXT_PUBLIC_WEBAPP_URL}/documents/${document.id}`,
-      `View Document`,
+      `${NEXT_PUBLIC_WEBAPP_URL}/api/documents/${document.id}`,
+      `Download "${document.title}"`,
       user
     )
   );

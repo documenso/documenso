@@ -1,3 +1,3 @@
 export { sendSigningRequest as sendSigningRequest } from "./sendSigningRequest";
-export { sendSignedMail } from "./sendSignedMail";
-export { transactionEmailTemplate } from "./transactionEmailTemplate"
+export { sendSigningDoneMail } from "./sendSigningDoneMail";
+export { transactionEmailTemplate } from "./transactionEmailTemplate";

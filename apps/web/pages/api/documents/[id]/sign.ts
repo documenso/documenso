@@ -9,6 +9,7 @@ import { SigningStatus, DocumentStatus } from "@prisma/client";
 import { getDocument } from "@documenso/lib/query";
 import { Document as PrismaDocument } from "@prisma/client";
 import { insertImageInPDF, insertTextInPDF } from "@documenso/pdf";
+import { sendSigningDoneMail } from "@documenso/lib/mail";
 
 async function postHandler(req: NextApiRequest, res: NextApiResponse) {
   const existingUser = await getUserFromToken(req, res);
@@ -82,6 +83,15 @@ async function postHandler(req: NextApiRequest, res: NextApiResponse) {
           : DocumentStatus.COMPLETED,
     },
   });
+
+  if (unsignedRecipients.length === 0) {
+    const documentOwner = await prisma.user.findFirstOrThrow({
+      where: { id: document.userId },
+      select: { email: true, name: true },
+    });
+
+    if (documentOwner) sendSigningDoneMail(recipient, document, documentOwner);
+  }
 
   return res.status(200).end();
 
