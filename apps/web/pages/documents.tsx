@@ -245,7 +245,6 @@ const DocumentsPage: NextPageWithLayout = (props: any) => {
                                 event.stopPropagation();
                                 router.push("/api/documents/" + document.id);
                               }}
-                              download
                             >
                               Download
                             </IconButton>
