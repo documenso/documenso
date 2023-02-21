@@ -1,12 +1,17 @@
 import prisma from "@documenso/prisma";
 import Head from "next/head";
 import { NextPageWithLayout } from "../../_app";
-import { ReadStatus } from "@prisma/client";
-import { CheckBadgeIcon } from "@heroicons/react/24/outline";
-import { Button } from "@documenso/ui";
+import { ArrowDownTrayIcon, CheckBadgeIcon } from "@heroicons/react/24/outline";
+import { Button, IconButton } from "@documenso/ui";
 import Link from "next/link";
+import { useRouter } from "next/router";
 
 const SignPage: NextPageWithLayout = (props: any) => {
+  const router = useRouter();
+  const allRecipientsSigned = props.document.Recipient?.every(
+    (r: any) => r.signingStatus === "SIGNED"
+  );
+
   return (
     <>
       <Head>
@@ -20,9 +25,34 @@ const SignPage: NextPageWithLayout = (props: any) => {
         <p className="mt-2 text-4xl font-bold tracking-tight">
           You signed "{props.document.title}"
         </p>
-        <p className="mt-2 text-base text-gray-500 max-w-sm">
+        <p
+          className="mt-2 text-base text-gray-500 max-w-sm"
+          hidden={allRecipientsSigned}
+        >
           You will be notfied when all recipients have signed.
         </p>
+        <p
+          className="mt-2 text-base text-gray-500 max-w-sm"
+          hidden={!allRecipientsSigned}
+        >
+          All recipients signed.
+        </p>
+        <div
+          className="mx-auto w-fit text-xl pt-20"
+          hidden={!allRecipientsSigned}
+        >
+          <Button
+            icon={ArrowDownTrayIcon}
+            color="secondary"
+            onClick={(event: any) => {
+              event.preventDefault();
+              event.stopPropagation();
+              router.push("/api/documents/" + props.document.id);
+            }}
+          >
+            Download Document
+          </Button>
+        </div>
       </div>
       <div>
         <div className="relative mx-96">
@@ -53,7 +83,7 @@ export async function getServerSideProps(context: any) {
       token: recipientToken,
     },
     include: {
-      Document: true,
+      Document: { include: { Recipient: true } },
     },
   });
 
