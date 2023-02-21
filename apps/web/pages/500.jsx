@@ -14,12 +14,9 @@ export default function Custom500() {
         <div className="px-6 py-48 mx-auto text-center max-w-7xl sm:py-40 lg:px-8">
           <h1 className="inline text-3xl font-bold tracking-tight sm:text-5xl">
             500
-            <span className="px-3 font-thin">
-           |
-            </span>
+            <span className="px-3 font-thin">|</span>
           </h1>
           <p className="inline text-base font-semibold leading-8 sm:text-2xl">
-            
             Something went wrong.
           </p>
           <div className="flex justify-center mt-10">
