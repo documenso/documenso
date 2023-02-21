@@ -65,20 +65,20 @@ const RecipientsPage: NextPageWithLayout = (props: any) => {
           </div>
           <div className="mt-4 flex flex-shrink-0 md:mt-0 md:ml-4">
             <Button
-              icon={ArrowDownTrayIcon}
-              color="secondary"
-              className="mr-2"
-              href={"/api/documents/" + props.document.id}
-            >
-              Download
-            </Button>
-            <Button
               icon={PencilSquareIcon}
               color="secondary"
               className="mr-2"
               href={breadcrumbItems[1].href}
             >
               Edit Document
+            </Button>
+            <Button
+              icon={ArrowDownTrayIcon}
+              color="secondary"
+              className="mr-2"
+              href={"/api/documents/" + props.document.id}
+            >
+              Download
             </Button>
             <Button
               className="min-w-[125px]"
