@@ -1,14 +1,9 @@
 import prisma from "@documenso/prisma";
 import Head from "next/head";
-import { useEffect } from "react";
 import { NextPageWithLayout } from "../../_app";
 import { ReadStatus } from "@prisma/client";
-import SignaturePad from "signature_pad";
-import { InformationCircleIcon, PencilIcon } from "@heroicons/react/24/outline";
-import Logo from "../../../components/logo";
 import PDFSigner from "../../../components/editor/pdf-signer";
-import fields from "../../api/documents/[id]/fields";
-//http://localhost:3000/documents/40/sign?token=wu82JFMxLvdYVJ9sKy9jvd
+
 const SignPage: NextPageWithLayout = (props: any) => {
   return (
     <>
@@ -16,7 +11,6 @@ const SignPage: NextPageWithLayout = (props: any) => {
         <title>Sign | Documenso</title>
       </Head>
       <PDFSigner document={props.document} fields={props.fields} />
-      {/* todo read/ sign version of editor => flag or own component */}
     </>
   );
 };
@@ -44,19 +38,31 @@ export async function getServerSideProps(context: any) {
     },
   });
 
-  const fields = await prisma.field.findMany({
+  const unsignedFields = await prisma.field.findMany({
     where: {
       documentId: recipient.Document.id,
+      recipientId: recipient.id,
+      Signature: { is: null },
     },
     include: {
       Recipient: true,
+      Signature: true,
     },
   });
+
+  if (unsignedFields.length === 0) {
+    return {
+      redirect: {
+        permanent: false,
+        destination: `/documents/${recipient.Document.id}/signed`,
+      },
+    };
+  }
 
   return {
     props: {
       document: recipient.Document,
-      fields: fields,
+      fields: unsignedFields,
     },
   };
 }
