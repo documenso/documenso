@@ -37,7 +37,6 @@ export default function PDFEditor(props: any) {
   function onDeleteHandler(id: any) {
     const field = fields.find((e) => e.id == id);
     const fieldIndex = fields.map((item) => item.id).indexOf(id);
-    console.log(fieldIndex);
     if (fieldIndex > -1) {
       const fieldWithoutRemoved = [...fields];
       const removedField = fieldWithoutRemoved.splice(fieldIndex, 1);

@@ -9,7 +9,6 @@ import { DocumentStatus } from "@prisma/client";
 import {
   InformationCircleIcon,
   PaperAirplaneIcon,
-  UserPlusIcon,
   UsersIcon,
 } from "@heroicons/react/24/outline";
 import { getDocument } from "@documenso/lib/query";
@@ -126,7 +125,7 @@ export async function getServerSideProps(context: any) {
 
     return {
       props: {
-        document: document,
+        document: JSON.parse(JSON.stringify(document)),
       },
     };
   } catch (error) {

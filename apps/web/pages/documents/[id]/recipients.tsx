@@ -69,7 +69,7 @@ const RecipientsPage: NextPageWithLayout = (props: any) => {
               className="mr-2"
               href={breadcrumbItems[1].href}
             >
-              Customize Document
+              Edit Document
             </Button>
             <Button
               className="min-w-[125px]"
@@ -431,7 +431,7 @@ export async function getServerSideProps(context: any) {
 
   return {
     props: {
-      document: document,
+      document: JSON.parse(JSON.stringify(document)),
     },
   };
 }
