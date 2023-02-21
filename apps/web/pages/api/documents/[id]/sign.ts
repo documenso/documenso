@@ -13,12 +13,13 @@ import { insertImageInPDF, insertTextInPDF } from "@documenso/pdf";
 async function postHandler(req: NextApiRequest, res: NextApiResponse) {
   const existingUser = await getUserFromToken(req, res);
   const { token: recipientToken } = req.query;
-  const { signatures: signatures }: { signatures: any[] } = req.body;
+  const { signatures: signaturesFromBody }: { signatures: any[] } = req.body;
 
   if (!recipientToken) {
     return res.status(401).send("Missing recipient token.");
   }
 
+  // The recipient who received the signing request
   const recipient = await prisma.recipient.findFirstOrThrow({
     where: { token: recipientToken?.toString() },
   });
@@ -34,28 +35,24 @@ async function postHandler(req: NextApiRequest, res: NextApiResponse) {
   );
 
   if (!document) res.status(404).end(`No document found.`);
-  // todo insert if not exits
-  signatures.forEach(async (signature) => {
-    if (!signature.signatureImage && !signature.typedSignature)
-      throw new Error("Cant't save invalid signature.");
 
-    await prisma.signature.upsert({
-      where: {
-        fieldId: signature.fieldId,
-      },
-      update: {},
-      create: {
-        recipientId: recipient.id,
-        fieldId: signature.fieldId,
-        signatureImageAsBase64: signature.signatureImage
-          ? signature.signatureImage
-          : null,
-        typedSignature: signature.typedSignature
-          ? signature.typedSignature
-          : null,
-      },
+  // todo rename .document to documentImageAsBase64 or sth. like that
+  let documentWithSignatureImages = document.document;
+  for (const signature of signaturesFromBody) {
+    if (!signature.signatureImage && !signature.typedSignature) {
+      documentWithSignatureImages = document.document;
+      throw new Error("Cant't save invalid signature.");
+    }
+
+    await saveSignature(signature);
+
+    const signedField = await prisma.field.findFirstOrThrow({
+      where: { id: signature.fieldId },
+      include: { Signature: true },
     });
-  });
+
+    await insertSignatureInDocument(signedField);
+  }
 
   await prisma.recipient.update({
     where: {
@@ -73,63 +70,64 @@ async function postHandler(req: NextApiRequest, res: NextApiResponse) {
     },
   });
 
-  console.log("unsignedRecipients.length.." + unsignedRecipients.length);
-  if (unsignedRecipients.length === 0) {
-    // todo if everybody signed insert images and create signature
-    const signedFields = await prisma.field.findMany({
-      where: { documentId: document.id },
-      include: { Signature: true },
-    });
-    // todo rename .document to documentImageAsBase64 or sth. like that
-    let documentWithSignatureImages = document.document;
-    let signaturesInserted = 0;
-    signedFields.forEach(async (signedField) => {
-      if (!signedField.Signature) {
-        documentWithSignatureImages = document.document;
-        throw new Error("Invalid Signature in Field");
-      }
-
-      if (signedField.Signature.signatureImageAsBase64) {
-        documentWithSignatureImages = await insertImageInPDF(
-          documentWithSignatureImages,
-          signedField.Signature
-            ? signedField.Signature?.signatureImageAsBase64
-            : "",
-          signedField.positionX,
-          signedField.positionY,
-          signedField.page
-        );
-      } else if (signedField.Signature.typedSignature) {
-        console.log("inserting text");
-        documentWithSignatureImages = await insertTextInPDF(
-          documentWithSignatureImages,
-          signedField.Signature.typedSignature,
-          signedField.positionX,
-          signedField.positionY,
-          signedField.page
-        );
-      } else {
-        documentWithSignatureImages = document.document;
-        throw new Error("Invalid signature could not be inserted.");
-      }
-
-      signaturesInserted++;
-      if (signaturesInserted == signedFields.length) {
-        await prisma.document.update({
-          where: {
-            id: recipient.documentId,
-          },
-          data: {
-            status: DocumentStatus.COMPLETED,
-            document: documentWithSignatureImages,
-          },
-        });
-      }
-      // todo send notifications
-    });
-  }
+  await prisma.document.update({
+    where: {
+      id: recipient.documentId,
+    },
+    data: {
+      document: documentWithSignatureImages,
+      status:
+        unsignedRecipients.length > 0
+          ? DocumentStatus.PENDING
+          : DocumentStatus.COMPLETED,
+    },
+  });
 
   return res.status(200).end();
+
+  async function insertSignatureInDocument(signedField: any) {
+    if (signedField?.Signature?.signatureImageAsBase64) {
+      documentWithSignatureImages = await insertImageInPDF(
+        documentWithSignatureImages,
+        signedField.Signature
+          ? signedField.Signature?.signatureImageAsBase64
+          : "",
+        signedField.positionX,
+        signedField.positionY,
+        signedField.page
+      );
+    } else if (signedField?.Signature?.typedSignature) {
+      documentWithSignatureImages = await insertTextInPDF(
+        documentWithSignatureImages,
+        signedField.Signature.typedSignature,
+        signedField.positionX,
+        signedField.positionY,
+        signedField.page
+      );
+    } else {
+      documentWithSignatureImages = document.document;
+      throw new Error("Invalid signature could not be inserted.");
+    }
+  }
+
+  async function saveSignature(signature: any) {
+    await prisma.signature.upsert({
+      where: {
+        fieldId: signature.fieldId,
+      },
+      update: {},
+      create: {
+        recipientId: recipient.id,
+        fieldId: signature.fieldId,
+        signatureImageAsBase64: signature.signatureImage
+          ? signature.signatureImage
+          : null,
+        typedSignature: signature.typedSignature
+          ? signature.typedSignature
+          : null,
+      },
+    });
+  }
 }
 
 export default defaultHandler({
