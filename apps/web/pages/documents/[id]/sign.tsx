@@ -11,7 +11,6 @@ const SignPage: NextPageWithLayout = (props: any) => {
         <title>Sign | Documenso</title>
       </Head>
       <PDFSigner document={props.document} fields={props.fields} />
-      {/* todo read/ sign version of editor => flag or own component */}
     </>
   );
 };
@@ -39,19 +38,31 @@ export async function getServerSideProps(context: any) {
     },
   });
 
-  const fields = await prisma.field.findMany({
+  const unsignedFields = await prisma.field.findMany({
     where: {
       documentId: recipient.Document.id,
+      recipientId: recipient.id,
+      Signature: { is: null },
     },
     include: {
       Recipient: true,
+      Signature: true,
     },
   });
+
+  if (unsignedFields.length === 0) {
+    return {
+      redirect: {
+        permanent: false,
+        destination: `/documents/${recipient.Document.id}/signed`,
+      },
+    };
+  }
 
   return {
     props: {
       document: recipient.Document,
-      fields: fields,
+      fields: unsignedFields,
     },
   };
 }

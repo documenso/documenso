@@ -50,7 +50,7 @@ const SignPage: NextPageWithLayout = (props: any) => {
               router.push("/api/documents/" + props.document.id);
             }}
           >
-            Download Document
+            Download "{props.document.title}"
           </Button>
         </div>
       </div>

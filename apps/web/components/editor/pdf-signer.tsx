@@ -3,7 +3,7 @@ import { NEXT_PUBLIC_WEBAPP_URL } from "@documenso/lib/constants";
 import { useRouter } from "next/router";
 import dynamic from "next/dynamic";
 import SignatureDialog from "./signature-dialog";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@documenso/ui";
 import { CheckBadgeIcon } from "@heroicons/react/24/outline";
 import toast from "react-hot-toast";
@@ -15,9 +15,14 @@ const PDFViewer = dynamic(() => import("./pdf-viewer"), {
 export default function PDFSigner(props: any) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
+  const [signingDone, setSigningDone] = useState(false);
   const [signatures, setSignatures] = useState<any[]>([]);
   const [fields, setFields] = useState<any[]>(props.fields);
   const [dialogField, setDialogField] = useState<any>();
+
+  useEffect(() => {
+    setSigningDone(checkIfSigningIsDone());
+  }, [fields]);
 
   function onClick(item: any) {
     if (item.type === "SIGNATURE") {
@@ -27,6 +32,7 @@ export default function PDFSigner(props: any) {
   }
 
   function onDialogClose(dialogResult: any) {
+    // todo handle signature removed from field
     const signature = {
       fieldId: dialogField.id,
       type: dialogResult.type,
@@ -88,7 +94,7 @@ export default function PDFSigner(props: any) {
               document.
             </p>
             <Button
-              disabled={signatures.length < props.fields.length}
+              disabled={!signingDone}
               color="secondary"
               icon={CheckBadgeIcon}
               className="float-right"
@@ -111,4 +117,14 @@ export default function PDFSigner(props: any) {
       ></PDFViewer>
     </>
   );
+
+  function checkIfSigningIsDone(): boolean {
+    // Check if all fields are signed..
+    if (fields.length > 0) {
+      // If there are no fields to sign at least one signature is enough
+      return fields.every((field) => field.signature);
+    } else {
+      return signatures.length > 0;
+    }
+  }
 }
