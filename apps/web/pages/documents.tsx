@@ -3,22 +3,20 @@ import Layout from "../components/layout";
 import type { NextPageWithLayout } from "./_app";
 import Head from "next/head";
 import {
+  ArrowDownTrayIcon,
   CheckBadgeIcon,
   CheckIcon,
   DocumentPlusIcon,
   EnvelopeIcon,
-  EyeIcon,
+  PencilSquareIcon,
   PlusIcon,
-  SunIcon,
   TrashIcon,
 } from "@heroicons/react/24/outline";
-import Link from "next/link";
 import { useRouter } from "next/router";
 import { uploadDocument } from "@documenso/features";
 import { DocumentStatus } from "@prisma/client";
 import { Tooltip as ReactTooltip } from "react-tooltip";
-import { getDocumentsForUserFromToken } from "@documenso/lib/query";
-import { Button } from "@documenso/ui";
+import { Button, IconButton } from "@documenso/ui";
 
 const DocumentsPage: NextPageWithLayout = (props: any) => {
   const router = useRouter();
@@ -44,7 +42,7 @@ const DocumentsPage: NextPageWithLayout = (props: any) => {
   }, []);
 
   function showDocument(documentId: number) {
-    router.push(`/documents/${documentId}`);
+    router.push(`/documents/${documentId}/recipients`);
   }
 
   return (
@@ -227,11 +225,33 @@ const DocumentsPage: NextPageWithLayout = (props: any) => {
                           </p>
                         </td>
                         <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
-                          <Link href={"/documents/" + document.id}>
-                            <TrashIcon
-                              className="flex-shrink-0 -ml-1 mr-3 h-6 w-6 inline text-neon"
-                              aria-hidden="true"
-                              onClick={(event) => {
+                          <div>
+                            <IconButton
+                              icon={PencilSquareIcon}
+                              className="mr-2"
+                              onClick={(event: any) => {
+                                event.preventDefault();
+                                event.stopPropagation();
+                                router.push("/documents/" + document.id);
+                              }}
+                            >
+                              Edit
+                            </IconButton>
+                            <IconButton
+                              icon={ArrowDownTrayIcon}
+                              className="mr-2"
+                              onClick={(event: any) => {
+                                event.preventDefault();
+                                event.stopPropagation();
+                                router.push("/api/documents/" + document.id);
+                              }}
+                              download
+                            >
+                              Download
+                            </IconButton>
+                            <IconButton
+                              icon={TrashIcon}
+                              onClick={(event: any) => {
                                 event.preventDefault();
                                 event.stopPropagation();
                                 if (
@@ -259,9 +279,9 @@ const DocumentsPage: NextPageWithLayout = (props: any) => {
                                     });
                                 }
                               }}
-                            />
+                            ></IconButton>
                             <span className="sr-only">, {document.name}</span>
-                          </Link>
+                          </div>
                         </td>
                       </tr>
                     ))}
