@@ -67,11 +67,8 @@ async function postHandler(req: NextApiRequest, res: NextApiResponse) {
       id: +body.id,
     },
     update: {
-      type: body.type,
-      page: +body.page,
       positionX: +body.positionX,
       positionY: +body.positionY,
-      recipientId: body.Recipient.id,
     },
     create: {
       documentId: +documentId,

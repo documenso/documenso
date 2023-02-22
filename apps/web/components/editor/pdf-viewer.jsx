@@ -34,7 +34,7 @@ export default function PDFViewer(props) {
 
   return (
     <>
-      <div hidden={loading}>
+      <div hidden={loading} onMouseUp={props.onMouseUp}>
         <div className="max-w-xs mt-6"></div>
         <Document
           file={props.pdfUrl}
@@ -47,6 +47,9 @@ export default function PDFViewer(props) {
               <div
                 onMouseDown={(e) => {
                   props.onMouseDown(e, index);
+                }}
+                onMouseUp={(e) => {
+                  props.onMouseUp(e, index);
                 }}
                 key={short.generate().toString()}
                 style={{
