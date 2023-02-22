@@ -8,6 +8,7 @@ export default function PDFViewer(props) {
   const [file, setFile] = useState("");
   const [numPages, setNumPages] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [scrollPosition, setScrollPosition] = useState(0);
 
   function onPositionChangedHandler(position, id) {
     props.onPositionChanged(position, id);
@@ -45,6 +46,12 @@ export default function PDFViewer(props) {
             <Fragment key={short.generate().toString()}>
               <div
                 onMouseDown={(e) => {
+                  console.log("saving " + window.scrollY);
+                  setScrollPosition(window.scrollY);
+                  setTimeout(() => {
+                    console.log("setting " + scrollPosition);
+                    window.scroll(0, scrollPosition);
+                  }, 0);
                   props.onMouseDown(e, index);
                 }}
                 key={short.generate().toString()}
