@@ -48,10 +48,6 @@ export default function PDFViewer(props) {
                 onMouseDown={(e) => {
                   console.log("saving " + window.scrollY);
                   setScrollPosition(window.scrollY);
-                  setTimeout(() => {
-                    console.log("setting " + scrollPosition);
-                    window.scroll(0, scrollPosition);
-                  }, 0);
                   props.onMouseDown(e, index);
                 }}
                 key={short.generate().toString()}
@@ -67,7 +63,10 @@ export default function PDFViewer(props) {
                   pageNumber={index + 1}
                   renderAnnotationLayer={false}
                   renderTextLayer={false}
-                  onLoadSuccess={() => setLoading(false)}
+                  onLoadSuccess={() => {
+                    setLoading(false);
+                    window.scroll(0, scrollPosition);
+                  }}
                   onRenderError={() => setLoading(false)}
                 ></Page>
                 {props?.fields
