@@ -46,8 +46,6 @@ export default function PDFViewer(props) {
             <Fragment key={short.generate().toString()}>
               <div
                 onMouseDown={(e) => {
-                  console.log("saving " + window.scrollY);
-                  setScrollPosition(window.scrollY);
                   props.onMouseDown(e, index);
                 }}
                 key={short.generate().toString()}
@@ -65,7 +63,6 @@ export default function PDFViewer(props) {
                   renderTextLayer={false}
                   onLoadSuccess={() => {
                     setLoading(false);
-                    window.scroll(0, scrollPosition);
                   }}
                   onRenderError={() => setLoading(false)}
                 ></Page>
