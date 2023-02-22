@@ -9,6 +9,7 @@ import { FieldType } from "@prisma/client";
 import { Listbox, Transition } from "@headlessui/react";
 import { CheckIcon, ChevronUpDownIcon } from "@heroicons/react/24/outline";
 import { classNames } from "@documenso/lib";
+import Draggable from "react-draggable";
 const stc = require("string-to-color");
 
 const PDFViewer = dynamic(() => import("./pdf-viewer"), {
@@ -56,6 +57,23 @@ export default function PDFEditor(props: any) {
         onPositionChanged={onPositionChangedHandler}
         onDelete={onDeleteHandler}
         pdfUrl={`${NEXT_PUBLIC_WEBAPP_URL}/api/documents/${router.query.id}`}
+        onMouseDown={(e: any, page: number) => {
+          var rect = e.target.getBoundingClientRect();
+          var newFieldX = e.clientX - rect.left; //x position within the element.
+          var newFieldY = e.clientY - rect.top; //y position within the element.
+          const signatureField = {
+            id: -1,
+            page: page,
+            type: FieldType.SIGNATURE,
+            positionX: newFieldX.toFixed(0),
+            positionY: newFieldY.toFixed(0),
+            Recipient: selectedRecipient,
+          };
+
+          upsertField(props?.document, signatureField).then((res) => {
+            setFields(fields.concat(res));
+          });
+        }}
       ></PDFViewer>
       <div hidden={noRecipients} className="fixed left-0 top-1/3 max-w-xs">
         <Listbox value={selectedRecipient} onChange={setSelectedRecipient}>
@@ -139,51 +157,40 @@ export default function PDFEditor(props: any) {
             </div>
           )}
         </Listbox>
-        <Button
-          className="ml-1"
-          color="secondary"
-          onClick={() => {
-            console.log(selectedRecipient);
-            const signatureField = {
-              id: -1,
-              page: 0,
-              type: FieldType.SIGNATURE,
-              positionX: 0,
-              positionY: 0,
-              Recipient: selectedRecipient,
-            };
-
-            upsertField(props?.document, signatureField).then((res) => {
-              setFields(fields.concat(res));
-            });
-          }}
-        >
-          <span
-            className="inline-block h-4 w-4 flex-shrink-0 rounded-full mr-3"
-            style={{
-              background: stc(selectedRecipient?.email),
-            }}
-          />
-          Add Signature Field
-        </Button>
-        <Button color="secondary" className="m-1" disabled>
-          <span
-            className="inline-block h-4 w-4 flex-shrink-0 rounded-full mr-3"
-            style={{
-              background: stc(selectedRecipient?.email),
-            }}
-          />
-          Add Date Field
-        </Button>
-        <Button color="secondary" className="m-1" disabled>
-          <span
-            className="inline-block h-4 w-4 flex-shrink-0 rounded-full mr-3"
-            style={{
-              background: stc(selectedRecipient?.email),
-            }}
-          />
-          Add Text Field
-        </Button>
+        <div>
+          <Draggable>
+            <div
+              className="ml-1 cursor-move p-3 border-2 border-slate-200 my-2 rounded-md"
+              color="secondary"
+            >
+              <span
+                className="inline-block h-4 w-4 flex-shrink-0 rounded-full mr-3"
+                style={{
+                  background: stc(selectedRecipient?.email),
+                }}
+              />
+              Add Signature Field
+            </div>
+          </Draggable>
+          <div color="secondary" className="ml-1 ">
+            <span
+              className="inline-block h-4 w-4 flex-shrink-0 rounded-full mr-3"
+              style={{
+                background: stc(selectedRecipient?.email),
+              }}
+            />
+            Add Date Field
+          </div>
+          <div color="secondary" className="ml-1 cursor-move">
+            <span
+              className="inline-block h-4 w-4 flex-shrink-0 rounded-full mr-3"
+              style={{
+                background: stc(selectedRecipient?.email),
+              }}
+            />
+            Add Text Field
+          </div>
+        </div>
       </div>
     </>
   );

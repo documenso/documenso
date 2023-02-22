@@ -39,14 +39,19 @@ export default function PDFViewer(props) {
           file={props.pdfUrl}
           onLoadSuccess={onDocumentLoadSuccess}
           options={options}
+          renderMode="canvas"
         >
           {Array.from({ length: numPages }, (_, index) => (
             <Fragment key={short.generate().toString()}>
               <div
+                onMouseDown={(e) => {
+                  props.onMouseDown(e, index);
+                }}
                 key={short.generate().toString()}
                 style={{
                   position: "relative",
                   background: "green",
+                  cursor: 'url("https://place-hold.it/110x64"), auto',
                 }}
                 className="mx-auto w-fit"
               >

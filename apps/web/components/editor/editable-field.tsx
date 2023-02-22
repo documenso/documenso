@@ -48,6 +48,10 @@ export default function EditableField(props: FieldPropsType) {
       onStop={onDragStop}
       defaultPosition={{ x: 0, y: 0 }}
       cancel="strong"
+      onMouseDown={(e: any) => {
+        e.preventDefault();
+        e.stopPropagation();
+      }}
     >
       <div
         hidden={props.hidden}
