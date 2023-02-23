@@ -337,14 +337,6 @@ const DocumentsPage: NextPageWithLayout = (props: any) => {
   );
 };
 
-// export async function getServerSideProps(context: any) {
-//   return {
-//     props: {
-//       documents: await getDocumentsForUserFromToken(context),
-//     },
-//   };
-// }
-
 function formatDocumentStatus(status: DocumentStatus) {
   switch (status) {
     case DocumentStatus.DRAFT:
