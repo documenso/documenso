@@ -30,19 +30,19 @@ const DashboardPage: NextPageWithLayout = (props: any) => {
       name: "Draft",
       stat: "0",
       icon: DocumentIcon,
-      link: "/documents?filter=draft",
+      link: "/documents?filter=DRAFT",
     },
     {
       name: "Waiting for others",
       stat: "0",
       icon: UsersIcon,
-      link: "/documents?filter=waiting_for_others",
+      link: "/documents?filter=PENDING",
     },
     {
       name: "Completed",
       stat: "0",
       icon: CheckBadgeIcon,
-      link: "/documents?filter=completed",
+      link: "/documents?filter=COMPLETED",
     },
   ];
 
