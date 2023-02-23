@@ -216,7 +216,7 @@ const DocumentsPage: NextPageWithLayout = (props: any) => {
                         <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
                           {formatDocumentStatus(document.status)}
                           <p>
-                            <small>
+                            <small hidden={document.Recipient.length === 0}>
                               {document.Recipient.filter(
                                 (r: any) => r.signingStatus === "SIGNED"
                               ).length || 0}
