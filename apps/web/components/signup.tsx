@@ -14,7 +14,7 @@ type FormValues = {
   apiError: string;
 };
 
-export default function Signup() {
+export default function Signup(props: { source: string }) {
   const methods = useForm<FormValues>({});
   const {
     register,
@@ -34,6 +34,7 @@ export default function Signup() {
       .promise(
         fetch("/api/auth/signup", {
           body: JSON.stringify({
+            source: props.source,
             ...data,
           }),
           headers: {

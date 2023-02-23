@@ -18,6 +18,7 @@ model User {
   email            String           @unique
   emailVerified    DateTime?
   password         String?
+  source           String?
   identityProvider IdentityProvider @default(DOCUMENSO)
   accounts         Account[]
   sessions         Session[]

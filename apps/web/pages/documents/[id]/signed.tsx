@@ -67,7 +67,10 @@ const SignPage: NextPageWithLayout = (props: any) => {
       </div>
       <p className="mt-4 text-center text-sm text-gray-600">
         Want to send slick signing links like this one?{" "}
-        <Link href="/signup" className="font-medium text-neon hover:text-neon">
+        <Link
+          href="/signup?source=signed"
+          className="font-medium text-neon hover:text-neon"
+        >
           Create your own Account
         </Link>
       </p>

@@ -16,6 +16,9 @@ export const signingRequestTemplate = (
       ${ctaLabel}
     </a>
   </p>
+  <p style="margin-top: 14px;">
+    <small>Want to send you own signing links? <a href="https://app.documenso.com/signup?source=signrequest">Create your own acccount</a>.</small>
+  </p>
   <hr size="1" style="height:1px;border:none;color:#e0e0e0;background-color:#e0e0e0">
   Click the button to view "${document.title}".<br>
   <small>If you have questions about this document, you should ask ${user.name}.</small>

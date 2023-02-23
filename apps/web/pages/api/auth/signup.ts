@@ -6,8 +6,7 @@ import { hashPassword } from "@documenso/lib/auth";
 import { defaultHandler, defaultResponder } from "@documenso/lib/server";
 
 async function postHandler(req: NextApiRequest, res: NextApiResponse) {
-  const data = req.body;
-  const { email, password } = data;
+  const { email, password, source } = req.body;
   const cleanEmail = email.toLowerCase();
 
   if (!cleanEmail || !cleanEmail.includes("@")) {
@@ -46,6 +45,7 @@ async function postHandler(req: NextApiRequest, res: NextApiResponse) {
       email: cleanEmail,
       password: hashedPassword,
       identityProvider: IdentityProvider.DOCUMENSO,
+      source: source,
     },
   });
 
