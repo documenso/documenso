@@ -17,6 +17,7 @@ import { uploadDocument } from "@documenso/features";
 import { DocumentStatus } from "@prisma/client";
 import { Tooltip as ReactTooltip } from "react-tooltip";
 import { Button, IconButton } from "@documenso/ui";
+import Filter from "../components/filter";
 
 const DocumentsPage: NextPageWithLayout = (props: any) => {
   const router = useRouter();
@@ -87,6 +88,7 @@ const DocumentsPage: NextPageWithLayout = (props: any) => {
             </div>
           </div>
         </div>
+        <Filter></Filter>
         <div
           className="mt-8 flex flex-col"
           hidden={!documents.length || loading}
