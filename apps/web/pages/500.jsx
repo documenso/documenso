@@ -12,16 +12,15 @@ export default function Custom500() {
         </div>
 
         <div className="px-4 py-10 mt-20 max-w-7xl">
-          
-            <p className="inline text-3xl font-bold tracking-tight sm:text-5xl">
-              500
-              <span className="px-3 font-thin">|</span>{" "}
-              <span className="inline text-base font-semibold leading-8 align-middle sm:text-2xl">
-                Something went wrong.
-              </span>
-            </p>
-          
-
+          <p className="inline-flex items-center text-3xl font-bold sm:text-5xl">
+            500
+            <span className="relative px-3 font-thin sm:text-6xl -top-1.5">
+              |
+            </span>{" "}
+            <span className="text-base font-semibold align-middle sm:text-2xl">
+              Something went wrong.
+            </span>
+          </p>
           <div className="flex justify-center mt-10">
             <Button color="secondary" href="/" icon={ArrowSmallLeftIcon}>
               Back to home
