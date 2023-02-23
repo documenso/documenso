@@ -30,7 +30,7 @@ const DocumentsPage: NextPageWithLayout = (props: any) => {
     { label: "Completed", value: "COMPLETED" },
   ];
   const createdFilter = [
-    { label: "All Time", value: 0 },
+    { label: "All Time", value: -1 },
     { label: "Last 7 days", value: 7 },
     { label: "Last 30 days", value: 30 },
     { label: "Last 3 months", value: 90 },
@@ -87,6 +87,8 @@ const DocumentsPage: NextPageWithLayout = (props: any) => {
   }
 
   function wasXDaysAgoOrLess(documentDate: Date, lastXDays: number): boolean {
+    if (lastXDays < 0) return true;
+
     const millisecondsInDay = 24 * 60 * 60 * 1000; // Number of milliseconds in a day
     const today: Date = new Date(); // Today's date
 
