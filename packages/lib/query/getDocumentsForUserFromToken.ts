@@ -14,6 +14,9 @@ export const getDocumentsForUserFromToken = async (
     include: {
       Recipient: true,
     },
+    orderBy: {
+      created: "desc",
+    },
   });
 
   return documents.map((e) => ({ ...e, document: "" }));
