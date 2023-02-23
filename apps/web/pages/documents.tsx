@@ -26,7 +26,7 @@ const DocumentsPage: NextPageWithLayout = (props: any) => {
   const statusFilters = [
     { label: "All", value: "ALL" },
     { label: "Draft", value: "DRAFT" },
-    { label: "Pending", value: "PENDING" },
+    { label: "Waiting for others", value: "PENDING" },
     { label: "Completed", value: "COMPLETED" },
   ];
   const createdFilter = [
@@ -424,7 +424,7 @@ function formatDocumentStatus(status: DocumentStatus) {
       return "Draft";
 
     case DocumentStatus.PENDING:
-      return "Pending";
+      return "Waiting for others";
 
     case DocumentStatus.COMPLETED:
       return "Completed";

@@ -100,7 +100,7 @@ function formatDocumentStatus(status: DocumentStatus) {
       return "Draft";
 
     case DocumentStatus.PENDING:
-      return "Pending";
+      return "Waiting for others";
 
     case DocumentStatus.COMPLETED:
       return "Completed";
