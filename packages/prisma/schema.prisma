@@ -59,6 +59,7 @@ enum DocumentStatus {
 
 model Document {
   id        Int            @id @default(autoincrement())
+  created   DateTime       @default(now())
   userId    Int
   User      User           @relation(fields: [userId], references: [id], onDelete: Cascade)
   title     String
