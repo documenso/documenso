@@ -1,1 +1,4 @@
-export const signDocument = (document: any) => {};
+export const signDocument = (documentAsBase64: string): string => {
+    
+  return documentAsBase64;
+};
