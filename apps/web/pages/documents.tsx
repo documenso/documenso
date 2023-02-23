@@ -16,12 +16,33 @@ import { useRouter } from "next/router";
 import { uploadDocument } from "@documenso/features";
 import { DocumentStatus } from "@prisma/client";
 import { Tooltip as ReactTooltip } from "react-tooltip";
-import { Button, IconButton } from "@documenso/ui";
+import { Button, IconButton, SelectBox } from "@documenso/ui";
+import { NextPageContext } from "next";
 
 const DocumentsPage: NextPageWithLayout = (props: any) => {
   const router = useRouter();
   const [documents, setDocuments]: any[] = useState([]);
   const [loading, setLoading] = useState(true);
+  const statusFilters = [
+    { label: "All", value: "ALL" },
+    { label: "Draft", value: "DRAFT" },
+    { label: "Pending", value: "PENDING" },
+    { label: "Completed", value: "COMPLETED" },
+  ];
+  const createdFilter = [
+    { label: "All Time", value: 0 },
+    { label: "Last 7 days", value: 7 },
+    { label: "Last 30 days", value: 30 },
+    { label: "Last 3 months", value: 90 },
+    { label: "Last 12 months", value: 66 },
+  ];
+
+  const [selectedStatusFilter, setSelectedStatusFilter] = useState(
+    statusFilters[0]
+  );
+  const [selectedCreatedFilter, setSelectedCreatedFilter] = useState(
+    createdFilter[0]
+  );
 
   const getDocuments = async () => {
     if (!documents.length) setLoading(true);
@@ -38,11 +59,44 @@ const DocumentsPage: NextPageWithLayout = (props: any) => {
   };
 
   useEffect(() => {
-    getDocuments();
+    getDocuments().finally(() => {
+      setSelectedStatusFilter(
+        statusFilters.filter(
+          (status) => status.value === props.filter.toUpperCase()
+        )[0]
+      );
+    });
   }, []);
 
   function showDocument(documentId: number) {
     router.push(`/documents/${documentId}/recipients`);
+  }
+
+  function filterDocumentes(documents: []): any {
+    let filteredDocuments = documents.filter(
+      (d: any) =>
+        d.status === selectedStatusFilter.value ||
+        selectedStatusFilter.value === "ALL"
+    );
+
+    filteredDocuments = filteredDocuments.filter((document: any) =>
+      wasXDaysAgoOrLess(new Date(document.created), selectedCreatedFilter.value)
+    );
+
+    return filteredDocuments;
+  }
+
+  function wasXDaysAgoOrLess(documentDate: Date, lastXDays: number): boolean {
+    const millisecondsInDay = 24 * 60 * 60 * 1000; // Number of milliseconds in a day
+    const today: Date = new Date(); // Today's date
+
+    // Calculate the difference between the two dates in days
+    const diffInDays = Math.floor(
+      (today.getTime() - documentDate.getTime()) / millisecondsInDay
+    );
+
+    // Check if the difference is letss or equal to lastXDays
+    return diffInDays <= lastXDays;
   }
 
   return (
@@ -70,7 +124,28 @@ const DocumentsPage: NextPageWithLayout = (props: any) => {
             </Button>
           </div>
         </div>
-        <div className="mt-10 max-w-[1100px]" hidden={!loading}>
+        <div className="mt-3 mb-12">
+          <div className="w-fit block float-right ml-3 mt-7">
+            {filterDocumentes(documents).length > 1
+              ? filterDocumentes(documents).length + " Documents"
+              : "1 Document"}
+          </div>
+          <SelectBox
+            className="w-1/4 block float-right"
+            label="Created"
+            options={createdFilter}
+            value={selectedCreatedFilter}
+            onChange={setSelectedCreatedFilter}
+          />
+          <SelectBox
+            className="w-1/4 block float-right ml-3"
+            label="Status"
+            options={statusFilters}
+            value={selectedStatusFilter}
+            onChange={setSelectedStatusFilter}
+          />
+        </div>
+        <div className="mt-20 max-w-[1100px]" hidden={!loading}>
           <div className="ph-item">
             <div className="ph-col-12">
               <div className="ph-picture"></div>
@@ -88,7 +163,7 @@ const DocumentsPage: NextPageWithLayout = (props: any) => {
           </div>
         </div>
         <div
-          className="mt-8 flex flex-col"
+          className="mt-28 flex flex-col"
           hidden={!documents.length || loading}
         >
           <div
@@ -127,163 +202,167 @@ const DocumentsPage: NextPageWithLayout = (props: any) => {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-200 bg-white">
-                    {documents.map((document: any, index: number) => (
-                      <tr
-                        key={document.id}
-                        className="hover:bg-gray-100 cursor-pointer"
-                        onClick={(event) => showDocument(document.id)}
-                      >
-                        <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                          {document.title || "#" + document.id}
-                        </td>
-                        <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                          {document.Recipient.map((item: any) => (
-                            <div key={item.id}>
-                              {item.sendStatus === "NOT_SENT" ? (
-                                <span
-                                  id="sent_icon"
-                                  className="inline-block flex-shrink-0 rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-800"
-                                >
-                                  {item.name
-                                    ? item.name + " <" + item.email + ">"
-                                    : item.email}
-                                </span>
-                              ) : (
-                                ""
-                              )}
-                              {item.sendStatus === "SENT" &&
-                              item.readStatus !== "OPENED" ? (
-                                <span id="sent_icon">
+                    {filterDocumentes(documents).map(
+                      (document: any, index: number) => (
+                        <tr
+                          key={document.id}
+                          className="hover:bg-gray-100 cursor-pointer"
+                          onClick={(event) => showDocument(document.id)}
+                        >
+                          <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                            {document.title || "#" + document.id}
+                          </td>
+                          <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                            {document.Recipient.map((item: any) => (
+                              <div key={item.id}>
+                                {item.sendStatus === "NOT_SENT" ? (
                                   <span
                                     id="sent_icon"
-                                    className="inline-block flex-shrink-0 rounded-full bg-yellow-200 px-2 py-0.5 text-xs font-medium text-green-800"
+                                    className="inline-block flex-shrink-0 rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-800"
                                   >
-                                    <EnvelopeIcon className="inline h-5 mr-1"></EnvelopeIcon>
                                     {item.name
                                       ? item.name + " <" + item.email + ">"
                                       : item.email}
                                   </span>
-                                </span>
-                              ) : (
-                                ""
-                              )}
-                              {item.readStatus === "OPENED" &&
-                              item.signingStatus === "NOT_SIGNED" ? (
-                                <span id="read_icon">
-                                  <span
-                                    id="sent_icon"
-                                    className="inline-block flex-shrink-0 rounded-full bg-yellow-200 px-2 py-0.5 text-xs font-medium text-green-800"
-                                  >
-                                    <CheckIcon className="inline h-5 -mr-2"></CheckIcon>
-                                    <CheckIcon className="inline h-5 mr-1"></CheckIcon>
-                                    {item.name
-                                      ? item.name + " <" + item.email + ">"
-                                      : item.email}
+                                ) : (
+                                  ""
+                                )}
+                                {item.sendStatus === "SENT" &&
+                                item.readStatus !== "OPENED" ? (
+                                  <span id="sent_icon">
+                                    <span
+                                      id="sent_icon"
+                                      className="inline-block flex-shrink-0 rounded-full bg-yellow-200 px-2 py-0.5 text-xs font-medium text-green-800"
+                                    >
+                                      <EnvelopeIcon className="inline h-5 mr-1"></EnvelopeIcon>
+                                      {item.name
+                                        ? item.name + " <" + item.email + ">"
+                                        : item.email}
+                                    </span>
                                   </span>
-                                </span>
-                              ) : (
-                                ""
-                              )}
-                              {item.signingStatus === "SIGNED" ? (
-                                <span id="signed_icon">
-                                  <span className="inline-block flex-shrink-0 rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-800">
-                                    <CheckBadgeIcon className="inline h-5 mr-1"></CheckBadgeIcon>{" "}
-                                    {item.email}
+                                ) : (
+                                  ""
+                                )}
+                                {item.readStatus === "OPENED" &&
+                                item.signingStatus === "NOT_SIGNED" ? (
+                                  <span id="read_icon">
+                                    <span
+                                      id="sent_icon"
+                                      className="inline-block flex-shrink-0 rounded-full bg-yellow-200 px-2 py-0.5 text-xs font-medium text-green-800"
+                                    >
+                                      <CheckIcon className="inline h-5 -mr-2"></CheckIcon>
+                                      <CheckIcon className="inline h-5 mr-1"></CheckIcon>
+                                      {item.name
+                                        ? item.name + " <" + item.email + ">"
+                                        : item.email}
+                                    </span>
                                   </span>
-                                </span>
-                              ) : (
-                                ""
-                              )}
-                            </div>
-                          ))}
-                          {document.Recipient.length === 0 ? "-" : null}
-                          <ReactTooltip
-                            anchorId="sent_icon"
-                            place="bottom"
-                            content="Document was sent to recipient."
-                          />
-                          <ReactTooltip
-                            anchorId="read_icon"
-                            place="bottom"
-                            content="Document was opened but not signed yet."
-                          />
-                          <ReactTooltip
-                            anchorId="signed_icon"
-                            place="bottom"
-                            content="Document was signed by the recipient."
-                          />
-                        </td>
-                        <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                          {formatDocumentStatus(document.status)}
-                          <p>
-                            <small hidden={document.Recipient.length === 0}>
-                              {document.Recipient.filter(
-                                (r: any) => r.signingStatus === "SIGNED"
-                              ).length || 0}
-                              /{document.Recipient.length || 0}
-                            </small>
-                          </p>
-                        </td>
-                        <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
-                          <div>
-                            <IconButton
-                              icon={PencilSquareIcon}
-                              className="mr-2"
-                              onClick={(event: any) => {
-                                event.preventDefault();
-                                event.stopPropagation();
-                                router.push("/documents/" + document.id);
-                              }}
-                            >
-                              Edit
-                            </IconButton>
-                            <IconButton
-                              icon={ArrowDownTrayIcon}
-                              className="mr-2"
-                              onClick={(event: any) => {
-                                event.preventDefault();
-                                event.stopPropagation();
-                                router.push("/api/documents/" + document.id);
-                              }}
-                            >
-                              Download
-                            </IconButton>
-                            <IconButton
-                              icon={TrashIcon}
-                              onClick={(event: any) => {
-                                event.preventDefault();
-                                event.stopPropagation();
-                                if (
-                                  confirm(
-                                    "Are you sure you want to delete this document"
-                                  )
-                                ) {
-                                  const documentsWithoutIndex = [...documents];
-                                  const removedItem: any =
-                                    documentsWithoutIndex.splice(index, 1);
-                                  setDocuments(documentsWithoutIndex);
-                                  fetch(`/api/documents/${document.id}`, {
-                                    method: "DELETE",
-                                  })
-                                    .catch((err) => {
-                                      documentsWithoutIndex.splice(
-                                        index,
-                                        0,
-                                        removedItem
-                                      );
-                                      setDocuments(documentsWithoutIndex);
+                                ) : (
+                                  ""
+                                )}
+                                {item.signingStatus === "SIGNED" ? (
+                                  <span id="signed_icon">
+                                    <span className="inline-block flex-shrink-0 rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-800">
+                                      <CheckBadgeIcon className="inline h-5 mr-1"></CheckBadgeIcon>{" "}
+                                      {item.email}
+                                    </span>
+                                  </span>
+                                ) : (
+                                  ""
+                                )}
+                              </div>
+                            ))}
+                            {document.Recipient.length === 0 ? "-" : null}
+                            <ReactTooltip
+                              anchorId="sent_icon"
+                              place="bottom"
+                              content="Document was sent to recipient."
+                            />
+                            <ReactTooltip
+                              anchorId="read_icon"
+                              place="bottom"
+                              content="Document was opened but not signed yet."
+                            />
+                            <ReactTooltip
+                              anchorId="signed_icon"
+                              place="bottom"
+                              content="Document was signed by the recipient."
+                            />
+                          </td>
+                          <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                            {formatDocumentStatus(document.status)}
+                            <p>
+                              <small hidden={document.Recipient.length === 0}>
+                                {document.Recipient.filter(
+                                  (r: any) => r.signingStatus === "SIGNED"
+                                ).length || 0}
+                                /{document.Recipient.length || 0}
+                              </small>
+                            </p>
+                          </td>
+                          <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
+                            <div>
+                              <IconButton
+                                icon={PencilSquareIcon}
+                                className="mr-2"
+                                onClick={(event: any) => {
+                                  event.preventDefault();
+                                  event.stopPropagation();
+                                  router.push("/documents/" + document.id);
+                                }}
+                              >
+                                Edit
+                              </IconButton>
+                              <IconButton
+                                icon={ArrowDownTrayIcon}
+                                className="mr-2"
+                                onClick={(event: any) => {
+                                  event.preventDefault();
+                                  event.stopPropagation();
+                                  router.push("/api/documents/" + document.id);
+                                }}
+                              >
+                                Download
+                              </IconButton>
+                              <IconButton
+                                icon={TrashIcon}
+                                onClick={(event: any) => {
+                                  event.preventDefault();
+                                  event.stopPropagation();
+                                  if (
+                                    confirm(
+                                      "Are you sure you want to delete this document"
+                                    )
+                                  ) {
+                                    const documentsWithoutIndex = [
+                                      ...documents,
+                                    ];
+                                    const removedItem: any =
+                                      documentsWithoutIndex.splice(index, 1);
+                                    setDocuments(documentsWithoutIndex);
+                                    fetch(`/api/documents/${document.id}`, {
+                                      method: "DELETE",
                                     })
-                                    .then(() => {
-                                      getDocuments();
-                                    });
-                                }
-                              }}
-                            ></IconButton>
-                            <span className="sr-only">, {document.name}</span>
-                          </div>
-                        </td>
-                      </tr>
-                    ))}
+                                      .catch((err) => {
+                                        documentsWithoutIndex.splice(
+                                          index,
+                                          0,
+                                          removedItem
+                                        );
+                                        setDocuments(documentsWithoutIndex);
+                                      })
+                                      .then(() => {
+                                        getDocuments();
+                                      });
+                                  }
+                                }}
+                              ></IconButton>
+                              <span className="sr-only">, {document.name}</span>
+                            </div>
+                          </td>
+                        </tr>
+                      )
+                    )}
                   </tbody>
                 </table>
               </div>
@@ -348,6 +427,16 @@ function formatDocumentStatus(status: DocumentStatus) {
     case DocumentStatus.COMPLETED:
       return "Completed";
   }
+}
+
+export async function getServerSideProps(context: NextPageContext) {
+  const filter = context.query["filter"];
+
+  return {
+    props: {
+      filter: filter,
+    },
+  };
 }
 
 DocumentsPage.getLayout = function getLayout(page: ReactElement) {
