@@ -28,6 +28,7 @@ export function IconButton(props: any) {
       ) : (
         ""
       )}
+      {props.children}
     </Link>
   ) : (
     <button
@@ -49,6 +50,7 @@ export function IconButton(props: any) {
       ) : (
         ""
       )}
+      {props.children}
     </button>
   );
 }
