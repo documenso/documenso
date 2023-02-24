@@ -23,11 +23,19 @@ export const sendSigningRequest = async (
   ).catch((err) => {
     throw err;
   });
+
+  const expiryDate = new Date();
+  expiryDate.setDate(expiryDate.getDate() + 60);
+
   await prisma.recipient.update({
     where: {
       id: recipient.id,
     },
-    data: { sendStatus: SendStatus.SENT, readStatus: ReadStatus.NOT_OPENED },
+    data: {
+      sendStatus: SendStatus.SENT,
+      readStatus: ReadStatus.NOT_OPENED,
+      expired: expiryDate,
+    },
   });
 
   await prisma.document.update({
