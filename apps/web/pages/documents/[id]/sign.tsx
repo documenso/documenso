@@ -122,7 +122,9 @@ export async function getServerSideProps(context: any) {
   return {
     props: {
       recipient: JSON.parse(JSON.stringify(recipient)),
-      document: JSON.parse(JSON.stringify(recipient.Document)),
+      document: JSON.parse(
+        JSON.stringify({ ...recipient.Document, document: "" })
+      ),
       fields: JSON.parse(JSON.stringify(unsignedFields)),
       expired: recipient.expired
         ? new Date(recipient.expired) < new Date()
