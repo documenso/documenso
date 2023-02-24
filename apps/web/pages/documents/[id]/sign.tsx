@@ -3,10 +3,9 @@ import Head from "next/head";
 import { NextPageWithLayout } from "../../_app";
 import { ReadStatus } from "@prisma/client";
 import PDFSigner from "../../../components/editor/pdf-signer";
-import Logo from "../../../components/logo";
 import Link from "next/link";
-import { Button } from "@documenso/ui";
-import { CheckBadgeIcon, ClockIcon } from "@heroicons/react/24/outline";
+import { ClockIcon } from "@heroicons/react/24/outline";
+import { FieldType, DocumentStatus } from "@prisma/client";
 
 const SignPage: NextPageWithLayout = (props: any) => {
   return (
@@ -15,7 +14,11 @@ const SignPage: NextPageWithLayout = (props: any) => {
         <title>Sign | Documenso</title>
       </Head>
       {!props.expired ? (
-        <PDFSigner document={props.document} fields={props.fields} />
+        <PDFSigner
+          document={props.document}
+          recipient={props.recipient}
+          fields={props.fields}
+        />
       ) : (
         <>
           <div className="mx-auto w-fit px-4 py-16 sm:px-6 sm:py-24 lg:px-8">
@@ -84,19 +87,8 @@ export async function getServerSideProps(context: any) {
     },
   });
 
-  const unsignedFields = await prisma.field.findMany({
-    where: {
-      documentId: recipient.Document.id,
-      recipientId: recipient.id,
-      Signature: { is: null },
-    },
-    include: {
-      Recipient: true,
-      Signature: true,
-    },
-  });
-
-  if (unsignedFields.length === 0) {
+  // Document was already signed
+  if (recipient.Document.status === DocumentStatus.COMPLETED) {
     return {
       redirect: {
         permanent: false,
@@ -105,8 +97,31 @@ export async function getServerSideProps(context: any) {
     };
   }
 
+  // Clean up unsigned free place fields from UI from previous page visits
+  // todo refactor free sign fields to be client side only
+  await prisma.field.deleteMany({
+    where: {
+      type: { in: [FieldType.FREE_SIGNATURE] },
+      Signature: { is: null },
+    },
+  });
+
+  const unsignedFields = await prisma.field.findMany({
+    where: {
+      documentId: recipient.Document.id,
+      recipientId: recipient.id,
+      type: { in: [FieldType.SIGNATURE] },
+      Signature: { is: null },
+    },
+    include: {
+      Recipient: true,
+      Signature: true,
+    },
+  });
+
   return {
     props: {
+      recipient: JSON.parse(JSON.stringify(recipient)),
       document: JSON.parse(JSON.stringify(recipient.Document)),
       fields: JSON.parse(JSON.stringify(unsignedFields)),
       expired: recipient.expired

@@ -78,6 +78,7 @@ export default function PDFViewer(props) {
                         key={item.id}
                         field={item}
                         className="absolute"
+                        onDelete={onDeleteHandler}
                       ></ReadOnlyField>
                     ) : (
                       <EditableField

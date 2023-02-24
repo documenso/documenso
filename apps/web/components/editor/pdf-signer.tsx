@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 import { Button } from "@documenso/ui";
 import { CheckBadgeIcon } from "@heroicons/react/24/outline";
 import toast from "react-hot-toast";
+import { FieldType } from "@prisma/client";
 
 const PDFViewer = dynamic(() => import("./pdf-viewer"), {
   ssr: false,
@@ -83,6 +84,7 @@ export default function PDFSigner(props: any) {
   return (
     <>
       <SignatureDialog open={open} setOpen={setOpen} onClose={onDialogClose} />
+      {JSON.stringify(signatures)}
       <div className="bg-neon p-4">
         <div className="flex">
           <div className="flex-shrink-0">
@@ -114,6 +116,15 @@ export default function PDFSigner(props: any) {
         fields={fields}
         pdfUrl={`${NEXT_PUBLIC_WEBAPP_URL}/api/documents/${router.query.id}?token=${router.query.token}`}
         onClick={onClick}
+        onMouseDown={function onMouseDown(e: any, page: number) {
+          if (
+            fields.filter((field) => field.type === FieldType.SIGNATURE)
+              .length === 0
+          )
+            createFieldForFreeSignature(e, page, props.recipient);
+        }}
+        onMouseUp={() => {}}
+        onDelete={onDeleteHandler}
       ></PDFViewer>
     </>
   );
@@ -126,5 +137,121 @@ export default function PDFSigner(props: any) {
     } else {
       return signatures.length > 0;
     }
+  }
+
+  function createFieldForFreeSignature(
+    e: any,
+    page: number,
+    recipient: any
+  ): any {
+    var rect = e.target.getBoundingClientRect();
+    var newFieldX = e.clientX - rect.left; //x position within the element.
+    var newFieldY = e.clientY - rect.top; //y position within the element.
+    const signatureField = {
+      id: -1,
+      page: page,
+      type: FieldType.FREE_SIGNATURE,
+      positionX: newFieldX.toFixed(0),
+      positionY: newFieldY.toFixed(0),
+      Recipient: recipient,
+    };
+
+    upsertField(props.document, signatureField).then((res) => {
+      setFields(fields.concat(res));
+      setDialogField(res);
+      setOpen(true);
+    });
+
+    return signatureField;
+  }
+
+  function onDeleteHandler(id: any) {
+    const field = fields.find((e) => e.id == id);
+    const fieldIndex = fields.map((item) => item.id).indexOf(id);
+    if (fieldIndex > -1) {
+      const fieldWithoutRemoved = [...fields];
+      const removedField = fieldWithoutRemoved.splice(fieldIndex, 1);
+      setFields(fieldWithoutRemoved);
+
+      const signaturesWithoutRemoved = [...signatures];
+      const removedSignature = signaturesWithoutRemoved.splice(
+        signaturesWithoutRemoved.findIndex(function (i) {
+          return i.fieldId === id;
+        }),
+        1
+      );
+
+      setSignatures(signaturesWithoutRemoved);
+      deleteField(field).catch((err) => {
+        setFields(fieldWithoutRemoved.concat(removedField));
+        setSignatures(signaturesWithoutRemoved.concat(removedSignature));
+      });
+    }
+  }
+
+  async function deleteField(field: any) {
+    if (!field.id) {
+      return;
+    }
+
+    try {
+      const deleted = toast.promise(
+        fetch("/api/documents/" + 0 + "/fields/" + field.id, {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(field),
+        }).then((res) => {
+          if (!res.ok) {
+            throw new Error(res.status.toString());
+          }
+          return res;
+        }),
+        {
+          loading: "Deleting...",
+          success: "Deleted.",
+          error: "Could not delete :/",
+        },
+        {
+          id: "delete",
+          style: {
+            minWidth: "200px",
+          },
+        }
+      );
+      return deleted;
+    } catch (error) {}
+  }
+
+  async function upsertField(document: any, field: any): Promise<any> {
+    try {
+      const created = await toast.promise(
+        fetch("/api/documents/" + document.id + "/fields", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(field),
+        }).then((res) => {
+          if (!res.ok) {
+            throw new Error(res.status.toString());
+          }
+          return res.json();
+        }),
+        {
+          loading: "Saving...",
+          success: "Saved.",
+          error: "Could not save :/",
+        },
+        {
+          id: "saving field",
+          style: {
+            minWidth: "200px",
+          },
+        }
+      );
+      return created;
+    } catch (error) {}
   }
 }
