@@ -23,7 +23,7 @@ export default function SignatureDialog(props: any) {
 
   useEffect(() => {
     setTypedSignature(localStorage.getItem("typedSignature") || "");
-  });
+  }, []);
 
   return (
     <>
