@@ -23,7 +23,7 @@ import { NextPageContext } from "next";
 const DocumentsPage: NextPageWithLayout = (props: any) => {
   const router = useRouter();
   const [documents, setDocuments]: any[] = useState([]);
-  const [filterdDocuments, setFilteredDocuments] = useState([]);
+  const [filteredDocuments, setFilteredDocuments] = useState([]);
 
   const [loading, setLoading] = useState(true);
   const statusFilters = [
@@ -138,8 +138,8 @@ const DocumentsPage: NextPageWithLayout = (props: any) => {
         </div>
         <div className="mt-3 mb-12">
           <div className="w-fit block float-right ml-3 mt-7">
-            {filterdDocuments.length != 1
-              ? filterdDocuments.length + " Documents"
+            {filteredDocuments.length != 1
+              ? filteredDocuments.length + " Documents"
               : "1 Document"}
           </div>
           <SelectBox
@@ -220,7 +220,7 @@ const DocumentsPage: NextPageWithLayout = (props: any) => {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-200 bg-white">
-                    {filterdDocuments.map((document: any, index: number) => (
+                    {filteredDocuments.map((document: any, index: number) => (
                       <tr
                         key={document.id}
                         className="hover:bg-gray-100 cursor-pointer"
@@ -330,9 +330,7 @@ const DocumentsPage: NextPageWithLayout = (props: any) => {
                                 event.stopPropagation();
                                 router.push("/documents/" + document.id);
                               }}
-                            >
-                              Edit
-                            </IconButton>
+                            />
                             <IconButton
                               icon={ArrowDownTrayIcon}
                               className="mr-2"
@@ -341,9 +339,7 @@ const DocumentsPage: NextPageWithLayout = (props: any) => {
                                 event.stopPropagation();
                                 router.push("/api/documents/" + document.id);
                               }}
-                            >
-                              Download
-                            </IconButton>
+                            />
                             <IconButton
                               icon={TrashIcon}
                               onClick={(event: any) => {
@@ -384,7 +380,7 @@ const DocumentsPage: NextPageWithLayout = (props: any) => {
                 </table>
               </div>
               <div
-                hidden={filterdDocuments.length > 0}
+                hidden={filteredDocuments.length > 0}
                 className="mx-auto w-fit mt-12 p-3"
               >
                 <FunnelIcon className="w-5 inline mr-1 align-middle" /> Nothing

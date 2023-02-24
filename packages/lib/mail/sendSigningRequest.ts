@@ -1,6 +1,6 @@
 import prisma from "@documenso/prisma";
 import { sendMail } from "./sendMail";
-import { SendStatus, DocumentStatus } from "@prisma/client";
+import { SendStatus, ReadStatus, DocumentStatus } from "@prisma/client";
 import { NEXT_PUBLIC_WEBAPP_URL } from "../constants";
 import { signingRequestTemplate } from "@documenso/lib/mail";
 
@@ -27,7 +27,7 @@ export const sendSigningRequest = async (
     where: {
       id: recipient.id,
     },
-    data: { sendStatus: SendStatus.SENT },
+    data: { sendStatus: SendStatus.SENT, readStatus: ReadStatus.NOT_OPENED },
   });
 
   await prisma.document.update({

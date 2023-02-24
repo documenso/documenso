@@ -10,8 +10,8 @@ import {
   EnvelopeIcon,
   PaperAirplaneIcon,
   PencilSquareIcon,
+  TrashIcon,
   UserPlusIcon,
-  XMarkIcon,
 } from "@heroicons/react/24/outline";
 import { getUserFromToken } from "@documenso/lib/server";
 import { getDocument } from "@documenso/lib/query";
@@ -236,9 +236,30 @@ const RecipientsPage: NextPageWithLayout = (props: any) => {
                       )}
                     </div>
                   </div>
-                  <div className="ml-auto flex">
+                  <div className="ml-auto flex mr-1">
                     <IconButton
-                      icon={XMarkIcon}
+                      icon={PaperAirplaneIcon}
+                      disabled={
+                        !item.id ||
+                        item.sendStatus !== "SENT" ||
+                        item.signingStatus === "SIGNED" ||
+                        loading
+                      }
+                      color="secondary"
+                      className="mr-4 h-9 my-auto"
+                      onClick={() => {
+                        if (confirm("Resend this signing request?")) {
+                          setLoading(true);
+                          send(props.document, [item.id]).finally(() => {
+                            setLoading(false);
+                          });
+                        }
+                      }}
+                    >
+                      Resend
+                    </IconButton>
+                    <IconButton
+                      icon={TrashIcon}
                       disabled={
                         !item.id || item.sendStatus === "SENT" || loading
                       }
@@ -254,7 +275,7 @@ const RecipientsPage: NextPageWithLayout = (props: any) => {
                         });
                       }}
                       className="group-hover:text-neon-dark group-hover:disabled:text-gray-400"
-                    ></IconButton>
+                    />
                   </div>
                 </div>
               </li>
@@ -445,17 +466,13 @@ export async function getServerSideProps(context: any) {
   };
 }
 
-async function send(document: any) {
-  // todo toast
-  // loading
+async function send(document: any, resendTo: number[] = []) {
   if (!document || !document.id) return;
   try {
     const sent = await toast.promise(
       fetch(`/api/documents/${document.id}/send`, {
-        body: "",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        body: JSON.stringify({ resendTo: resendTo }),
+        headers: { "Content-Type": "application/json" },
         method: "POST",
       })
         .then((res: any) => {
