@@ -18,6 +18,7 @@ import { DocumentStatus } from "@prisma/client";
 import { Tooltip as ReactTooltip } from "react-tooltip";
 import { Button, IconButton, SelectBox } from "@documenso/ui";
 import { NextPageContext } from "next";
+import prisma from "@documenso/prisma";
 
 const DocumentsPage: NextPageWithLayout = (props: any) => {
   const router = useRouter();
@@ -35,7 +36,7 @@ const DocumentsPage: NextPageWithLayout = (props: any) => {
     { label: "Last 7 days", value: 7 },
     { label: "Last 30 days", value: 30 },
     { label: "Last 3 months", value: 90 },
-    { label: "Last 12 months", value: 66 },
+    { label: "Last 12 months", value: 366 },
   ];
 
   const [selectedStatusFilter, setSelectedStatusFilter] = useState(
@@ -97,6 +98,8 @@ const DocumentsPage: NextPageWithLayout = (props: any) => {
     const diffInDays = Math.floor(
       (today.getTime() - documentDate.getTime()) / millisecondsInDay
     );
+
+    console.log(diffInDays);
 
     // Check if the difference is letss or equal to lastXDays
     return diffInDays <= lastXDays;
@@ -195,6 +198,12 @@ const DocumentsPage: NextPageWithLayout = (props: any) => {
                         className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
                       >
                         Status
+                      </th>
+                      <th
+                        scope="col"
+                        className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
+                      >
+                        Created
                       </th>
                       <th
                         scope="col"
@@ -302,6 +311,9 @@ const DocumentsPage: NextPageWithLayout = (props: any) => {
                                 /{document.Recipient.length || 0}
                               </small>
                             </p>
+                          </td>
+                          <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                            {new Date(document.created).toLocaleDateString()}
                           </td>
                           <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
                             <div>
