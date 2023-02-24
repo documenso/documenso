@@ -102,7 +102,10 @@ export default function SignatureDialog(props: any) {
                         <div className="float-right">
                           <Button
                             color="secondary"
-                            onClick={() => props.setOpen(false)}
+                            onClick={() => {
+                              props.onClose();
+                              props.setOpen(false);
+                            }}
                           >
                             Cancel
                           </Button>
@@ -153,7 +156,10 @@ export default function SignatureDialog(props: any) {
                         <div className="mt-10 float-right">
                           <Button
                             color="secondary"
-                            onClick={() => props.setOpen(false)}
+                            onClick={() => {
+                              props.onClose();
+                              props.setOpen(false);
+                            }}
                           >
                             Cancel
                           </Button>

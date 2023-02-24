@@ -34,6 +34,12 @@ export default function PDFSigner(props: any) {
 
   function onDialogClose(dialogResult: any) {
     // todo handle signature removed from field
+    // todo remove free field if dialogresult is empty (or the id )
+    if (!dialogResult && dialogField.type === "FREE_SIGNATURE") {
+      onDeleteHandler(dialogField.id);
+      return;
+    }
+
     const signature = {
       fieldId: dialogField.id,
       type: dialogResult.type,
@@ -194,19 +200,18 @@ export default function PDFSigner(props: any) {
     }
 
     try {
-      const deleted = toast.promise(
-        fetch("/api/documents/" + 0 + "/fields/" + field.id, {
-          method: "DELETE",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(field),
-        }).then((res) => {
-          if (!res.ok) {
-            throw new Error(res.status.toString());
-          }
-          return res;
-        }),
+      fetch("/api/documents/" + 0 + "/fields/" + field.id, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(field),
+      }).then((res) => {
+        if (!res.ok) {
+          throw new Error(res.status.toString());
+        }
+        return res;
+      }),
         {
           loading: "Deleting...",
           success: "Deleted.",
@@ -217,9 +222,7 @@ export default function PDFSigner(props: any) {
           style: {
             minWidth: "200px",
           },
-        }
-      );
-      return deleted;
+        };
     } catch (error) {}
   }
 
@@ -239,9 +242,9 @@ export default function PDFSigner(props: any) {
           return res.json();
         }),
         {
-          loading: "Saving...",
-          success: "Saved.",
-          error: "Could not save :/",
+          loading: "Adding...",
+          success: "Added.",
+          error: "Could not add :/",
         },
         {
           id: "saving field",
