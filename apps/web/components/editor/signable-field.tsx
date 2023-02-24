@@ -18,7 +18,7 @@ type FieldPropsType = {
   onDelete: any;
 };
 
-export default function ReadOnlyField(props: FieldPropsType) {
+export default function SignableField(props: FieldPropsType) {
   const [field, setField]: any = useState(props.field);
   const [position, setPosition]: any = useState({
     x: props.field.positionX,

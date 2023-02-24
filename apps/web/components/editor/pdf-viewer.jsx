@@ -1,7 +1,7 @@
 import { Fragment, useState } from "react";
 import { Document, Page } from "react-pdf/dist/esm/entry.webpack5";
 import EditableField from "./editable-field";
-import ReadOnlyField from "./readonly-field";
+import SignableField from "./signable-field";
 import short from "short-uuid";
 
 export default function PDFViewer(props) {
@@ -73,13 +73,13 @@ export default function PDFViewer(props) {
                   .filter((item) => item.page === index)
                   .map((item) =>
                     props.readonly ? (
-                      <ReadOnlyField
+                      <SignableField
                         onClick={props.onClick}
                         key={item.id}
                         field={item}
                         className="absolute"
                         onDelete={onDeleteHandler}
-                      ></ReadOnlyField>
+                      ></SignableField>
                     ) : (
                       <EditableField
                         hidden={item.Signature}
