@@ -102,7 +102,7 @@ export async function getServerSideProps(context: any) {
   return {
     props: {
       document: JSON.parse(JSON.stringify(recipient.Document)),
-      fields: fields,
+      fields: JSON.parse(JSON.stringify(fields)),
     },
   };
 }

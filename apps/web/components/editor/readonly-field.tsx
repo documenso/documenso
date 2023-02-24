@@ -19,6 +19,7 @@ type FieldPropsType = {
     Recipient: { name: ""; email: "" };
   };
   onClick: any;
+  onDelete: any;
 };
 
 export default function ReadOnlyField(props: FieldPropsType) {
@@ -36,6 +37,10 @@ export default function ReadOnlyField(props: FieldPropsType) {
       position={position}
       defaultPosition={{ x: 0, y: 0 }}
       cancel="div"
+      onMouseDown={(e: any) => {
+        e.preventDefault();
+        e.stopPropagation();
+      }}
     >
       <div
         onClick={() => {
@@ -75,6 +80,8 @@ export default function ReadOnlyField(props: FieldPropsType) {
               const newField = { ...field };
               newField.signature = null;
               setField(newField);
+              // remove not only signature but whole field if it is a freely places signature
+              if (field.type === "FREE_SIGNATURE") props.onDelete(field.id);
             }}
           />
         </div>
