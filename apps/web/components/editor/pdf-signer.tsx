@@ -84,7 +84,6 @@ export default function PDFSigner(props: any) {
   return (
     <>
       <SignatureDialog open={open} setOpen={setOpen} onClose={onDialogClose} />
-      {JSON.stringify(signatures)}
       <div className="bg-neon p-4">
         <div className="flex">
           <div className="flex-shrink-0">
