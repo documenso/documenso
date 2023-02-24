@@ -1,10 +1,6 @@
-import { ResizableBox, ResizeCallbackData } from "react-resizable";
-import React, { SyntheticEvent, useEffect, useState } from "react";
+import React, { useState } from "react";
 import Draggable from "react-draggable";
-import { CircleStackIcon, TrashIcon } from "@heroicons/react/24/solid";
-import Logo from "../logo";
 import { IconButton } from "@documenso/ui";
-import toast from "react-hot-toast";
 import { XCircleIcon } from "@heroicons/react/20/solid";
 const stc = require("string-to-color");
 
