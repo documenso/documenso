@@ -1,16 +1,12 @@
 import { NEXT_PUBLIC_WEBAPP_URL } from "@documenso/lib/constants";
 import { useRouter } from "next/router";
 import dynamic from "next/dynamic";
-import React, { Fragment, useState } from "react";
-import { Button } from "@documenso/ui";
-import short from "short-uuid";
+import { Fragment, useState } from "react";
 import toast from "react-hot-toast";
 import { FieldType } from "@prisma/client";
 import { Listbox, RadioGroup, Transition } from "@headlessui/react";
 import { CheckIcon, ChevronUpDownIcon } from "@heroicons/react/24/outline";
 import { classNames } from "@documenso/lib";
-import Draggable from "react-draggable";
-import Logo from "../logo";
 const stc = require("string-to-color");
 
 const PDFViewer = dynamic(() => import("./pdf-viewer"), {
