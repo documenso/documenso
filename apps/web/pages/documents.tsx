@@ -436,7 +436,7 @@ export async function getServerSideProps(context: NextPageContext) {
 
   return {
     props: {
-      filter: filter,
+      filter: filter || "ALL",
     },
   };
 }
