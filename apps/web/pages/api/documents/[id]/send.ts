@@ -12,6 +12,7 @@ import { Document as PrismaDocument, SendStatus } from "@prisma/client";
 async function postHandler(req: NextApiRequest, res: NextApiResponse) {
   const user = await getUserFromToken(req, res);
   const { id: documentId } = req.query;
+  const { resendTo: resendTo = [] } = req.body;
 
   if (!user) return;
 
@@ -25,16 +26,25 @@ async function postHandler(req: NextApiRequest, res: NextApiResponse) {
   if (!document)
     res.status(404).end(`No document with id ${documentId} found.`);
 
-  // todo handle sending to single recipient even though more exist
+  let recipientCondition: any = {
+    documentId: +documentId,
+    sendStatus: SendStatus.NOT_SENT,
+  };
+
+  if (resendTo.length) {
+    recipientCondition = {
+      documentId: +documentId,
+      id: { in: resendTo },
+    };
+  }
 
   const recipients = await prisma.recipient.findMany({
     where: {
-      documentId: +documentId,
-      sendStatus: SendStatus.NOT_SENT,
+      ...recipientCondition,
     },
   });
 
-  if (!recipients.length) return res.status(200).end("");
+  if (!recipients.length) return res.status(200).send(recipients.length);
 
   let sentRequests = 0;
   recipients.forEach(async (recipient) => {
@@ -45,7 +55,7 @@ async function postHandler(req: NextApiRequest, res: NextApiResponse) {
 
     sentRequests++;
     if (sentRequests === recipients.length) {
-      return res.status(200).end();
+      return res.status(200).send(recipients.length);
     }
   });
 
