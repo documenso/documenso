@@ -19,7 +19,6 @@ import { DocumentStatus } from "@prisma/client";
 import { Tooltip as ReactTooltip } from "react-tooltip";
 import { Button, IconButton, SelectBox } from "@documenso/ui";
 import { NextPageContext } from "next";
-import prisma from "@documenso/prisma";
 
 const DocumentsPage: NextPageWithLayout = (props: any) => {
   const router = useRouter();
@@ -75,7 +74,7 @@ const DocumentsPage: NextPageWithLayout = (props: any) => {
 
   useEffect(() => {
     setFilteredDocuments(filterDocumentes(documents));
-  }, [selectedStatusFilter, selectedCreatedFilter]);
+  }, [documents, selectedStatusFilter, selectedCreatedFilter]);
 
   function showDocument(documentId: number) {
     router.push(`/documents/${documentId}/recipients`);
