@@ -9,6 +9,7 @@ export default function PDFViewer(props) {
   const [numPages, setNumPages] = useState(null);
   const [loading, setLoading] = useState(true);
   const [scrollPosition, setScrollPosition] = useState(0);
+  const [pageHeight, setPageHeight] = useState(0);
 
   function onPositionChangedHandler(position, id) {
     props.onPositionChanged(position, id);
@@ -34,13 +35,18 @@ export default function PDFViewer(props) {
 
   return (
     <>
-      <div hidden={loading} onMouseUp={props.onMouseUp}>
+      <div
+        hidden={loading}
+        onMouseUp={props.onMouseUp}
+        style={{ height: numPages * pageHeight + 1000 }}
+      >
         <div className="max-w-xs mt-6"></div>
         <Document
           file={props.pdfUrl}
           onLoadSuccess={onDocumentLoadSuccess}
           options={options}
           renderMode="canvas"
+          className="absolute w-auto mx-auto left-0 right-0"
         >
           {Array.from({ length: numPages }, (_, index) => (
             <Fragment key={short.generate().toString()}>
@@ -64,7 +70,8 @@ export default function PDFViewer(props) {
                   pageNumber={index + 1}
                   renderAnnotationLayer={false}
                   renderTextLayer={false}
-                  onLoadSuccess={() => {
+                  onLoadSuccess={(e) => {
+                    if (e.height) setPageHeight(e.height);
                     setLoading(false);
                   }}
                   onRenderError={() => setLoading(false)}
