@@ -83,6 +83,9 @@ export default function PDFEditor(props: any) {
   );
 
   function addField(e: any, page: number) {
+    if (!selectedRecipient) return;
+    if (!selectedFieldType) return;
+
     const signatureField = createField(
       e,
       page,
