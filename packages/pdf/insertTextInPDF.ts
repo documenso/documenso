@@ -24,7 +24,7 @@ export async function insertTextInPDF(
   const textHeight = customFont.heightAtSize(textSize);
 
   pdfPage.drawText(text, {
-    x: pdfPage.getWidth() - positionX - textWidth / 2, // todo adjust for exact field size
+    x: positionX, // todo adjust for exact field size
     y: pdfPage.getHeight() - positionY - textHeight / 2, // todo adjust for exact field size
     size: textSize,
     font: customFont,
