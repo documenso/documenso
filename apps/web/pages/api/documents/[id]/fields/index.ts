@@ -46,6 +46,7 @@ async function postHandler(req: NextApiRequest, res: NextApiResponse) {
     positionX: number;
     positionY: number;
     Recipient: { id: number };
+    customText: string;
   } = req.body;
 
   if (!user) return;
@@ -69,6 +70,7 @@ async function postHandler(req: NextApiRequest, res: NextApiResponse) {
     update: {
       positionX: +body.positionX,
       positionY: +body.positionY,
+      customText: body.customText,
     },
     create: {
       documentId: +documentId,
@@ -76,6 +78,7 @@ async function postHandler(req: NextApiRequest, res: NextApiResponse) {
       page: +body.page,
       positionX: +body.positionX,
       positionY: +body.positionY,
+      customText: body.customText,
       // todo refactor only one type of recipientId
       recipientId: body.Recipient.id,
     },

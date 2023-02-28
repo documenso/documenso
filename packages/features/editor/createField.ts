@@ -1,11 +1,12 @@
 import { FieldType } from "@prisma/client";
 
-export const createField = function addField(
+export const createField = (
   e: any,
   page: number,
   selectedRecipient: any,
-  type: FieldType = FieldType.SIGNATURE
-): any {
+  type: FieldType = FieldType.SIGNATURE,
+  customText = ""
+): any => {
   var rect = e.target.getBoundingClientRect();
   const fieldSize = { width: 192, height: 96 };
   var newFieldX = e.clientX - rect.left - fieldSize.width / 2; //x position within the element.
@@ -25,6 +26,7 @@ export const createField = function addField(
     positionX: newFieldX.toFixed(0),
     positionY: newFieldY.toFixed(0),
     Recipient: selectedRecipient,
+    customText: customText,
   };
 
   return signatureField;

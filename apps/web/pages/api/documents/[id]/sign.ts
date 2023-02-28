@@ -71,20 +71,24 @@ async function postHandler(req: NextApiRequest, res: NextApiResponse) {
     },
   });
 
-  const dateFields = await prisma.field.findMany({
+  const nonSignatureFields = await prisma.field.findMany({
     where: {
       documentId: document.id,
-      type: FieldType.DATE,
+      type: { in: [FieldType.DATE, FieldType.TEXT] },
     },
   });
 
-  for (const dateField of dateFields) {
+  // Insert fields other than signatures
+  for (const field of nonSignatureFields) {
     documentWithInserts = await insertTextInPDF(
       documentWithInserts,
-      new Date().toDateString(),
-      dateField.positionX,
-      dateField.positionY,
-      dateField.page
+      field.type === FieldType.DATE
+        ? new Date().toDateString()
+        : field.customText || "",
+      field.positionX,
+      field.positionY,
+      field.page,
+      false
     );
   }
 

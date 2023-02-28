@@ -7,7 +7,8 @@ export async function insertTextInPDF(
   text: string,
   positionX: number,
   positionY: number,
-  page: number = 0
+  page: number = 0,
+  useHandwritingFont = true
 ): Promise<string> {
   const fontBytes = fs.readFileSync("public/fonts/Qwigley-Regular.ttf");
 
@@ -16,10 +17,11 @@ export async function insertTextInPDF(
   const pdfDoc = await PDFDocument.load(existingPdfBytes);
   pdfDoc.registerFontkit(fontkit);
   const customFont = await pdfDoc.embedFont(fontBytes);
+  const helveticaFont = await pdfDoc.embedFont(StandardFonts.Helvetica);
 
   const pages = pdfDoc.getPages();
   const pdfPage = pages[page];
-  const textSize = 50;
+  const textSize = useHandwritingFont ? 50 : 15;
   const textWidth = customFont.widthOfTextAtSize(text, textSize);
   const textHeight = customFont.heightAtSize(textSize);
 
@@ -27,7 +29,7 @@ export async function insertTextInPDF(
     x: positionX, // todo adjust for exact field size
     y: pdfPage.getHeight() - positionY - textHeight / 2, // todo adjust for exact field size
     size: textSize,
-    font: customFont,
+    font: useHandwritingFont ? customFont : helveticaFont,
     color: rgb(0, 0, 0),
   });
 
