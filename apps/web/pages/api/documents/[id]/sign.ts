@@ -7,7 +7,7 @@ import prisma from "@documenso/prisma";
 import { NextApiRequest, NextApiResponse } from "next";
 import { SigningStatus, DocumentStatus } from "@prisma/client";
 import { getDocument } from "@documenso/lib/query";
-import { Document as PrismaDocument } from "@prisma/client";
+import { Document as PrismaDocument, FieldType } from "@prisma/client";
 import { insertImageInPDF, insertTextInPDF } from "@documenso/pdf";
 import { sendSigningDoneMail } from "@documenso/lib/mail";
 
@@ -38,10 +38,10 @@ async function postHandler(req: NextApiRequest, res: NextApiResponse) {
   if (!document) res.status(404).end(`No document found.`);
 
   // todo rename .document to documentImageAsBase64 or sth. like that
-  let documentWithSignatureImages = document.document;
+  let documentWithInserts = document.document;
   for (const signature of signaturesFromBody) {
     if (!signature.signatureImage && !signature.typedSignature) {
-      documentWithSignatureImages = document.document;
+      documentWithInserts = document.document;
       throw new Error("Cant't save invalid signature.");
     }
 
@@ -71,12 +71,29 @@ async function postHandler(req: NextApiRequest, res: NextApiResponse) {
     },
   });
 
+  const dateFields = await prisma.field.findMany({
+    where: {
+      documentId: document.id,
+      type: FieldType.DATE,
+    },
+  });
+
+  for (const dateField of dateFields) {
+    documentWithInserts = await insertTextInPDF(
+      documentWithInserts,
+      new Date().toDateString(),
+      dateField.positionX,
+      dateField.positionY,
+      dateField.page
+    );
+  }
+
   await prisma.document.update({
     where: {
       id: recipient.documentId,
     },
     data: {
-      document: documentWithSignatureImages,
+      document: documentWithInserts,
       status:
         unsignedRecipients.length > 0
           ? DocumentStatus.PENDING
@@ -90,7 +107,7 @@ async function postHandler(req: NextApiRequest, res: NextApiResponse) {
       select: { email: true, name: true },
     });
 
-    document.document = documentWithSignatureImages;
+    document.document = documentWithInserts;
     if (documentOwner)
       await sendSigningDoneMail(recipient, document, documentOwner);
   }
@@ -99,8 +116,8 @@ async function postHandler(req: NextApiRequest, res: NextApiResponse) {
 
   async function insertSignatureInDocument(signedField: any) {
     if (signedField?.Signature?.signatureImageAsBase64) {
-      documentWithSignatureImages = await insertImageInPDF(
-        documentWithSignatureImages,
+      documentWithInserts = await insertImageInPDF(
+        documentWithInserts,
         signedField.Signature
           ? signedField.Signature?.signatureImageAsBase64
           : "",
@@ -109,15 +126,15 @@ async function postHandler(req: NextApiRequest, res: NextApiResponse) {
         signedField.page
       );
     } else if (signedField?.Signature?.typedSignature) {
-      documentWithSignatureImages = await insertTextInPDF(
-        documentWithSignatureImages,
+      documentWithInserts = await insertTextInPDF(
+        documentWithInserts,
         signedField.Signature.typedSignature,
         signedField.positionX,
         signedField.positionY,
         signedField.page
       );
     } else {
-      documentWithSignatureImages = document.document;
+      documentWithInserts = document.document;
       throw new Error("Invalid signature could not be inserted.");
     }
   }
