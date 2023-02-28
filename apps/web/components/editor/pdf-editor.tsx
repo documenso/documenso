@@ -98,7 +98,6 @@ export default function PDFEditor(props: any) {
       selectedRecipient,
       selectedFieldType
     );
-    // toast.success("Adding " + selectedFieldType);
 
     createOrUpdateField(props?.document, signatureField).then((res) => {
       setFields(fields.concat(res));
