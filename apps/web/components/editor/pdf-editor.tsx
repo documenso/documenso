@@ -223,8 +223,17 @@ export default function PDFEditor(props: any) {
 
   function addField(e: any, page: number) {
     var rect = e.target.getBoundingClientRect();
-    var newFieldX = e.clientX - rect.left; //x position within the element.
-    var newFieldY = e.clientY - rect.top; //y position within the element.
+    const fieldSize = { width: 192, height: 96 };
+    var newFieldX = e.clientX - rect.left - fieldSize.width / 2; //x position within the element.
+    var newFieldY = e.clientY - rect.top - fieldSize.height / 2; //y position within the element.
+    if (newFieldX < 0) newFieldX = 0;
+    if (newFieldY < 0) newFieldY = 0;
+
+    if (newFieldX + fieldSize.width > rect.width)
+      newFieldX = rect.width - fieldSize.width;
+    if (newFieldY + fieldSize.height > rect.height)
+      newFieldY = rect.height - fieldSize.height;
+
     const signatureField = {
       id: -1,
       page: page,

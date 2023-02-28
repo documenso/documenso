@@ -56,7 +56,7 @@ export default function EditableField(props: FieldPropsType) {
       <div
         hidden={props.hidden}
         ref={nodeRef}
-        className="cursor-move opacity-80 p-2 m-auto w-auto flex-row-reverse text-lg font-bold text-center absolute top-0 left-0 select-none"
+        className="cursor-move opacity-80 p-2 m-auto w-48 h-24 flex-row-reverse text-lg font-bold text-center absolute top-0 left-0 select-none"
         style={{
           background: stc(props.field.Recipient.email),
         }}
@@ -64,7 +64,8 @@ export default function EditableField(props: FieldPropsType) {
         <div className="mb-2 pointer-events-none">
           <Logo className="w-16 mx-auto"></Logo>
         </div>
-        <div className="m-auto w-auto flex-row-reverse text-lg font-bold text-center">
+        {/* width: 192 height 96 */}
+        <div className="m-auto overflow-hidden flex-row-reverse text-lg font-bold text-center">
           {field.type}
           {field.type === "SIGNATURE" ? (
             <div className="text-xs text-center">
