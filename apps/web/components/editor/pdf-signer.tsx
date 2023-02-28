@@ -103,7 +103,6 @@ export default function PDFSigner(props: any) {
           </div>
         </div>
       </div>
-      {/* todo use public url with token auth to get document */}
       <PDFViewer
         readonly={true}
         document={props.document}
@@ -133,11 +132,7 @@ export default function PDFSigner(props: any) {
     }
   }
 
-  function addFreeSignature(
-    e: any,
-    page: number,
-    recipient: any
-  ): any {
+  function addFreeSignature(e: any, page: number, recipient: any): any {
     const freeSignatureField = createField(
       e,
       page,
