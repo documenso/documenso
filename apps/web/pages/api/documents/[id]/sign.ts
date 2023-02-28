@@ -90,7 +90,9 @@ async function postHandler(req: NextApiRequest, res: NextApiResponse) {
       select: { email: true, name: true },
     });
 
-    if (documentOwner) sendSigningDoneMail(recipient, document, documentOwner);
+    document.document = documentWithSignatureImages;
+    if (documentOwner)
+      await sendSigningDoneMail(recipient, document, documentOwner);
   }
 
   return res.status(200).end();
