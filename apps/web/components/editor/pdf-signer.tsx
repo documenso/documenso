@@ -8,6 +8,7 @@ import { Button } from "@documenso/ui";
 import { CheckBadgeIcon } from "@heroicons/react/24/outline";
 import toast from "react-hot-toast";
 import { FieldType } from "@prisma/client";
+import { createOrUpdateField, deleteField } from "@documenso/lib/api";
 
 const PDFViewer = dynamic(() => import("./pdf-viewer"), {
   ssr: false,
@@ -161,7 +162,7 @@ export default function PDFSigner(props: any) {
       Recipient: recipient,
     };
 
-    upsertField(props.document, signatureField).then((res) => {
+    createOrUpdateField(props.document, signatureField).then((res) => {
       setFields(fields.concat(res));
       setDialogField(res);
       setOpen(true);
@@ -192,68 +193,5 @@ export default function PDFSigner(props: any) {
         setSignatures(signaturesWithoutRemoved.concat(removedSignature));
       });
     }
-  }
-
-  async function deleteField(field: any) {
-    if (!field.id) {
-      return;
-    }
-
-    try {
-      fetch("/api/documents/" + 0 + "/fields/" + field.id, {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(field),
-      }).then((res) => {
-        if (!res.ok) {
-          throw new Error(res.status.toString());
-        }
-        return res;
-      }),
-        {
-          loading: "Deleting...",
-          success: "Deleted.",
-          error: "Could not delete :/",
-        },
-        {
-          id: "delete",
-          style: {
-            minWidth: "200px",
-          },
-        };
-    } catch (error) {}
-  }
-
-  async function upsertField(document: any, field: any): Promise<any> {
-    try {
-      const created = await toast.promise(
-        fetch("/api/documents/" + document.id + "/fields", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(field),
-        }).then((res) => {
-          if (!res.ok) {
-            throw new Error(res.status.toString());
-          }
-          return res.json();
-        }),
-        {
-          loading: "Adding...",
-          success: "Added.",
-          error: "Could not add :/",
-        },
-        {
-          id: "saving field",
-          style: {
-            minWidth: "200px",
-          },
-        }
-      );
-      return created;
-    } catch (error) {}
   }
 }

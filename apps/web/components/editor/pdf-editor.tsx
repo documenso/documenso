@@ -7,6 +7,7 @@ import { FieldType } from "@prisma/client";
 import { Listbox, RadioGroup, Transition } from "@headlessui/react";
 import { CheckIcon, ChevronUpDownIcon } from "@heroicons/react/24/outline";
 import { classNames } from "@documenso/lib";
+import { createOrUpdateField, deleteField } from "@documenso/lib/api";
 const stc = require("string-to-color");
 
 const PDFViewer = dynamic(() => import("./pdf-viewer"), {
@@ -14,13 +15,13 @@ const PDFViewer = dynamic(() => import("./pdf-viewer"), {
 });
 
 export default function PDFEditor(props: any) {
+  const router = useRouter();
   const [selectedRecipient, setSelectedRecipient]: any = useState(
     props?.document?.Recipient[0]
   );
   const noRecipients = props?.document?.Recipient?.length === 0;
   const [fields, setFields] = useState<any[]>(props.document.Field);
   const [adding, setAdding] = useState(false);
-  const router = useRouter();
   const fieldTypes = [
     { name: "Signature" },
     { name: "Text" },
@@ -35,7 +36,7 @@ export default function PDFEditor(props: any) {
     const movedField = fields.find((e) => e.id == id);
     movedField.positionX = position.x.toFixed(0);
     movedField.positionY = position.y.toFixed(0);
-    upsertField(props.document, movedField);
+    createOrUpdateField(props.document, movedField);
 
     // no instant redraw neccessary, postion information for saving or later rerender is enough
     // setFields(newFields);
@@ -221,7 +222,11 @@ export default function PDFEditor(props: any) {
     </>
   );
 
-  function addField(e: any, page: number) {
+  function addField(
+    e: any,
+    page: number,
+    type: FieldType = FieldType.SIGNATURE
+  ) {
     var rect = e.target.getBoundingClientRect();
     const fieldSize = { width: 192, height: 96 };
     var newFieldX = e.clientX - rect.left - fieldSize.width / 2; //x position within the element.
@@ -243,74 +248,8 @@ export default function PDFEditor(props: any) {
       Recipient: selectedRecipient,
     };
 
-    upsertField(props?.document, signatureField).then((res) => {
+    createOrUpdateField(props?.document, signatureField).then((res) => {
       setFields(fields.concat(res));
     });
   }
-}
-
-async function upsertField(document: any, field: any): Promise<any> {
-  try {
-    const created = await toast.promise(
-      fetch("/api/documents/" + document.id + "/fields", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(field),
-      }).then((res) => {
-        if (!res.ok) {
-          throw new Error(res.status.toString());
-        }
-        return res.json();
-      }),
-      {
-        loading: "Saving...",
-        success: "Saved.",
-        error: "Could not save :/",
-      },
-      {
-        id: "saving field",
-        style: {
-          minWidth: "200px",
-        },
-      }
-    );
-    return created;
-  } catch (error) {}
-}
-
-async function deleteField(field: any) {
-  if (!field.id) {
-    return;
-  }
-
-  try {
-    const deleted = toast.promise(
-      fetch("/api/documents/" + 0 + "/fields/" + field.id, {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(field),
-      }).then((res) => {
-        if (!res.ok) {
-          throw new Error(res.status.toString());
-        }
-        return res;
-      }),
-      {
-        loading: "Deleting...",
-        success: "Deleted.",
-        error: "Could not delete :/",
-      },
-      {
-        id: "delete",
-        style: {
-          minWidth: "200px",
-        },
-      }
-    );
-    return deleted;
-  } catch (error) {}
 }
