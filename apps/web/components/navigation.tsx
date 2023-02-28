@@ -86,6 +86,7 @@ export default function TopNavigation() {
   });
 
   useEffect(() => {
+    // todo encapsulate
     fetch("/api/users/me").then((res) => {
       res.json().then((j) => {
         setUser(j);

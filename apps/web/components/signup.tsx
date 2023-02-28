@@ -30,6 +30,7 @@ export default function Signup(props: { source: string }) {
   };
 
   const signUp: SubmitHandler<FormValues> = async (data) => {
+    // todo encapsulate
     const res = await toast
       .promise(
         fetch("/api/auth/signup", {

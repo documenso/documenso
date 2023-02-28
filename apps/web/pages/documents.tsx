@@ -50,6 +50,7 @@ const DocumentsPage: NextPageWithLayout = (props: any) => {
 
   const getDocuments = async () => {
     if (!documents.length) setLoading(true);
+    // todo encapsulate
     fetch("/api/documents", {
       headers: {
         "Content-Type": "application/json",
@@ -354,6 +355,7 @@ const DocumentsPage: NextPageWithLayout = (props: any) => {
                                   const removedItem: any =
                                     documentsWithoutIndex.splice(index, 1);
                                   setDocuments(documentsWithoutIndex);
+                                  // todo encapsulate
                                   fetch(`/api/documents/${document.id}`, {
                                     method: "DELETE",
                                   })

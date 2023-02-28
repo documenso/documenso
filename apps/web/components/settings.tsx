@@ -34,6 +34,7 @@ export default function Setttings() {
   });
 
   useEffect(() => {
+    // todo encapsulate
     fetch("/api/users/me").then((res) => {
       res.json().then((j) => {
         setUser(j);

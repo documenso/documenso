@@ -383,6 +383,7 @@ const RecipientsPage: NextPageWithLayout = (props: any) => {
   );
 };
 
+// todo encapsulate
 async function deleteRecipient(recipient: any) {
   if (!recipient.id) {
     return;
@@ -413,6 +414,7 @@ async function deleteRecipient(recipient: any) {
   );
 }
 
+// todo encapsulate
 async function upsertRecipient(recipient: any): Promise<any> {
   try {
     const created = await toast.promise(
@@ -466,6 +468,7 @@ export async function getServerSideProps(context: any) {
   };
 }
 
+// todo encapsulate
 async function send(document: any, resendTo: number[] = []) {
   if (!document || !document.id) return;
   try {
