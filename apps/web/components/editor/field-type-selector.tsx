@@ -26,6 +26,9 @@ export default function FieldTypeSelector(props: any) {
       onChange={(e: any) => {
         setSelectedFieldType(e);
       }}
+      onMouseDown={() => {
+        props.setAdding(true);
+      }}
     >
       <div className="space-y-4">
         {fieldTypes.map((fieldType) => (

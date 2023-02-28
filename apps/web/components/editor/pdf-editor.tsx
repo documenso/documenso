@@ -20,6 +20,7 @@ export default function PDFEditor(props: any) {
   const [selectedRecipient, setSelectedRecipient]: any = useState();
   const [selectedFieldType, setSelectedFieldType] = useState();
   const noRecipients = props?.document.Recipient.length === 0;
+  const [adding, setAdding] = useState(false);
 
   function onPositionChangedHandler(position: any, id: any) {
     if (!position) return;
@@ -58,7 +59,11 @@ export default function PDFEditor(props: any) {
           onMouseUp={(e: any, page: number) => {
             e.preventDefault();
             e.stopPropagation();
-            addField(e, page);
+            console.log(adding);
+            if (adding) {
+              addField(e, page);
+              setAdding(false);
+            }
           }}
           onMouseDown={(e: any, page: number) => {
             addField(e, page);
@@ -74,6 +79,7 @@ export default function PDFEditor(props: any) {
           />
           <hr className="m-3 border-slate-300"></hr>
           <FieldTypeSelector
+            setAdding={setAdding}
             selectedRecipient={selectedRecipient}
             onChange={setSelectedFieldType}
           />

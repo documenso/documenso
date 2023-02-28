@@ -19,9 +19,9 @@ export const createOrUpdateField = async (
         return res.json();
       }),
       {
-        loading: "Adding...",
-        success: "Added.",
-        error: "Could not add :/",
+        loading: field?.id !== -1 ? "Saving..." : "Adding...",
+        success: field?.id !== -1 ? "Saved." : "Added.",
+        error: field?.id !== -1 ? "Could not save :/" : "Could not add :/",
       },
       {
         id: "saving field",
