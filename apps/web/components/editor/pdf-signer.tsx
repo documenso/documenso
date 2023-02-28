@@ -8,7 +8,11 @@ import { Button } from "@documenso/ui";
 import { CheckBadgeIcon } from "@heroicons/react/24/outline";
 import toast from "react-hot-toast";
 import { FieldType } from "@prisma/client";
-import { createOrUpdateField, deleteField } from "@documenso/lib/api";
+import {
+  createOrUpdateField,
+  deleteField,
+  signDocument,
+} from "@documenso/lib/api";
 import { createField } from "@documenso/features/editor";
 
 const PDFViewer = dynamic(() => import("./pdf-viewer"), {
@@ -64,31 +68,6 @@ export default function PDFSigner(props: any) {
     setDialogField(null);
   }
 
-  function sign() {
-    const body = { documentId: props.document.id, signatures: localSignatures };
-    toast.promise(
-      fetch(
-        `/api/documents/${props.document.id}/sign?token=${router.query.token}`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(body),
-        }
-      ).then(() => {
-        router.push(
-          `/documents/${props.document.id}/signed?token=${router.query.token}`
-        );
-      }),
-      {
-        loading: "Signing...",
-        success: `"${props.document.title}" signed successfully.`,
-        error: "Could not sign :/",
-      }
-    );
-  }
-
   return (
     <>
       <SignatureDialog open={open} setOpen={setOpen} onClose={onDialogClose} />
@@ -108,7 +87,15 @@ export default function PDFSigner(props: any) {
               icon={CheckBadgeIcon}
               className="float-right"
               onClick={() => {
-                sign();
+                signDocument(
+                  props.document,
+                  localSignatures,
+                  `${router.query.token}`
+                ).then(() => {
+                  router.push(
+                    `/documents/${props.document.id}/signed?token=${router.query.token}`
+                  );
+                });
               }}
             >
               Done
