@@ -19,7 +19,7 @@ export default function PDFSigner(props: any) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [signingDone, setSigningDone] = useState(false);
-  const [signatures, setSignatures] = useState<any[]>([]);
+  const [localSignatures, setLocalSignatures] = useState<any[]>([]);
   const [fields, setFields] = useState<any[]>(props.fields);
   const [dialogField, setDialogField] = useState<any>();
 
@@ -49,7 +49,7 @@ export default function PDFSigner(props: any) {
       signatureImage: dialogResult.signatureImage,
     };
 
-    setSignatures(signatures.concat(signature));
+    setLocalSignatures(localSignatures.concat(signature));
 
     fields.splice(
       fields.findIndex(function (i) {
@@ -65,7 +65,7 @@ export default function PDFSigner(props: any) {
   }
 
   function sign() {
-    const body = { documentId: props.document.id, signatures: signatures };
+    const body = { documentId: props.document.id, signatures: localSignatures };
     toast.promise(
       fetch(
         `/api/documents/${props.document.id}/sign?token=${router.query.token}`,
@@ -142,7 +142,7 @@ export default function PDFSigner(props: any) {
       // If there are no fields to sign at least one signature is enough
       return fields.every((field) => field.signature);
     } else {
-      return signatures.length > 0;
+      return localSignatures.length > 0;
     }
   }
 
@@ -175,7 +175,7 @@ export default function PDFSigner(props: any) {
       const removedField = fieldWithoutRemoved.splice(fieldIndex, 1);
       setFields(fieldWithoutRemoved);
 
-      const signaturesWithoutRemoved = [...signatures];
+      const signaturesWithoutRemoved = [...localSignatures];
       const removedSignature = signaturesWithoutRemoved.splice(
         signaturesWithoutRemoved.findIndex(function (i) {
           return i.fieldId === id;
@@ -183,10 +183,10 @@ export default function PDFSigner(props: any) {
         1
       );
 
-      setSignatures(signaturesWithoutRemoved);
+      setLocalSignatures(signaturesWithoutRemoved);
       deleteField(field).catch((err) => {
         setFields(fieldWithoutRemoved.concat(removedField));
-        setSignatures(signaturesWithoutRemoved.concat(removedSignature));
+        setLocalSignatures(signaturesWithoutRemoved.concat(removedSignature));
       });
     }
   }
