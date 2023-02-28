@@ -2,7 +2,6 @@ import { NEXT_PUBLIC_WEBAPP_URL } from "@documenso/lib/constants";
 import { useRouter } from "next/router";
 import dynamic from "next/dynamic";
 import { Fragment, useState } from "react";
-import toast from "react-hot-toast";
 import { FieldType } from "@prisma/client";
 import { Listbox, RadioGroup, Transition } from "@headlessui/react";
 import { CheckIcon, ChevronUpDownIcon } from "@heroicons/react/24/outline";
@@ -22,7 +21,6 @@ export default function PDFEditor(props: any) {
   );
   const noRecipients = props?.document?.Recipient?.length === 0;
   const [fields, setFields] = useState<any[]>(props.document.Field);
-  const [adding, setAdding] = useState(false);
   const fieldTypes = [
     { name: "Signature" },
     { name: "Text" },
@@ -167,9 +165,6 @@ export default function PDFEditor(props: any) {
             <RadioGroup
               value={selectedFieldType}
               onChange={setSelectedFieldType}
-              onMouseDown={() => {
-                setAdding(true);
-              }}
             >
               <div className="space-y-4">
                 {fieldTypes.map((fieldType) => (
