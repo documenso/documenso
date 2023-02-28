@@ -9,6 +9,7 @@ import { CheckBadgeIcon } from "@heroicons/react/24/outline";
 import toast from "react-hot-toast";
 import { FieldType } from "@prisma/client";
 import { createOrUpdateField, deleteField } from "@documenso/lib/api";
+import { createField } from "@documenso/features/editor";
 
 const PDFViewer = dynamic(() => import("./pdf-viewer"), {
   ssr: false,
@@ -150,25 +151,20 @@ export default function PDFSigner(props: any) {
     page: number,
     recipient: any
   ): any {
-    var rect = e.target.getBoundingClientRect();
-    var newFieldX = e.clientX - rect.left; //x position within the element.
-    var newFieldY = e.clientY - rect.top; //y position within the element.
-    const signatureField = {
-      id: -1,
-      page: page,
-      type: FieldType.FREE_SIGNATURE,
-      positionX: newFieldX.toFixed(0),
-      positionY: newFieldY.toFixed(0),
-      Recipient: recipient,
-    };
+    const freeSignatureField = createField(
+      e,
+      page,
+      recipient,
+      FieldType.FREE_SIGNATURE
+    );
 
-    createOrUpdateField(props.document, signatureField).then((res) => {
+    createOrUpdateField(props.document, freeSignatureField).then((res) => {
       setFields(fields.concat(res));
       setDialogField(res);
       setOpen(true);
     });
 
-    return signatureField;
+    return freeSignatureField;
   }
 
   function onDeleteHandler(id: any) {
