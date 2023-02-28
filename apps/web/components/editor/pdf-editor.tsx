@@ -8,6 +8,7 @@ import { Listbox, RadioGroup, Transition } from "@headlessui/react";
 import { CheckIcon, ChevronUpDownIcon } from "@heroicons/react/24/outline";
 import { classNames } from "@documenso/lib";
 import { createOrUpdateField, deleteField } from "@documenso/lib/api";
+import { createField } from "@documenso/features/editor";
 const stc = require("string-to-color");
 
 const PDFViewer = dynamic(() => import("./pdf-viewer"), {
@@ -68,11 +69,7 @@ export default function PDFEditor(props: any) {
           onMouseUp={(e: any, page: number) => {
             e.preventDefault();
             e.stopPropagation();
-            if (adding) {
-              console.log("adding to page " + page);
-              addField(e, page);
-              setAdding(false);
-            }
+            addField(e, page);
           }}
           onMouseDown={(e: any, page: number) => {
             addField(e, page);
@@ -227,26 +224,12 @@ export default function PDFEditor(props: any) {
     page: number,
     type: FieldType = FieldType.SIGNATURE
   ) {
-    var rect = e.target.getBoundingClientRect();
-    const fieldSize = { width: 192, height: 96 };
-    var newFieldX = e.clientX - rect.left - fieldSize.width / 2; //x position within the element.
-    var newFieldY = e.clientY - rect.top - fieldSize.height / 2; //y position within the element.
-    if (newFieldX < 0) newFieldX = 0;
-    if (newFieldY < 0) newFieldY = 0;
-
-    if (newFieldX + fieldSize.width > rect.width)
-      newFieldX = rect.width - fieldSize.width;
-    if (newFieldY + fieldSize.height > rect.height)
-      newFieldY = rect.height - fieldSize.height;
-
-    const signatureField = {
-      id: -1,
-      page: page,
-      type: FieldType.SIGNATURE,
-      positionX: newFieldX.toFixed(0),
-      positionY: newFieldY.toFixed(0),
-      Recipient: selectedRecipient,
-    };
+    const signatureField = createField(
+      e,
+      page,
+      selectedRecipient,
+      FieldType.SIGNATURE
+    );
 
     createOrUpdateField(props?.document, signatureField).then((res) => {
       setFields(fields.concat(res));
