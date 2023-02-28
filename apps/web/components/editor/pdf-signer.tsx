@@ -115,7 +115,7 @@ export default function PDFSigner(props: any) {
             fields.filter((field) => field.type === FieldType.SIGNATURE)
               .length === 0
           )
-            createFieldForFreeSignature(e, page, props.recipient);
+            addFreeSignature(e, page, props.recipient);
         }}
         onMouseUp={() => {}}
         onDelete={onDeleteHandler}
@@ -133,7 +133,7 @@ export default function PDFSigner(props: any) {
     }
   }
 
-  function createFieldForFreeSignature(
+  function addFreeSignature(
     e: any,
     page: number,
     recipient: any
