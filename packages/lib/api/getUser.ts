@@ -1,3 +1,3 @@
-export const getUser = (): Promise<any> => {
+export const getUser = (): Promise<Response> => {
   return fetch("/api/users/me");
 };

@@ -19,7 +19,7 @@ import { DocumentStatus } from "@prisma/client";
 import { Tooltip as ReactTooltip } from "react-tooltip";
 import { Button, IconButton, SelectBox } from "@documenso/ui";
 import { NextPageContext } from "next";
-import { getDocuments } from "@documenso/lib/api";
+import { deleteDocument, getDocuments } from "@documenso/lib/api";
 
 const DocumentsPage: NextPageWithLayout = (props: any) => {
   const router = useRouter();
@@ -352,9 +352,7 @@ const DocumentsPage: NextPageWithLayout = (props: any) => {
                                     documentsWithoutIndex.splice(index, 1);
                                   setDocuments(documentsWithoutIndex);
                                   // todo encapsulate
-                                  fetch(`/api/documents/${document.id}`, {
-                                    method: "DELETE",
-                                  })
+                                  deleteDocument(document.id)
                                     .catch((err) => {
                                       documentsWithoutIndex.splice(
                                         index,
