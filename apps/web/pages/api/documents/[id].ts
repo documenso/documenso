@@ -12,9 +12,6 @@ async function getHandler(req: NextApiRequest, res: NextApiResponse) {
   const user = await getUserFromToken(req, res);
   const { id: documentId } = req.query;
 
-  // TODO Check if this is a public link with token and validate the token
-  const { token: recipientToken } = req.query;
-
   if (!user) return;
 
   if (!documentId) {
@@ -29,7 +26,10 @@ async function getHandler(req: NextApiRequest, res: NextApiResponse) {
 
   const buffer: Buffer = Buffer.from(document.document.toString(), "base64");
   res.setHeader("Content-Type", "application/pdf");
-  res.setHeader("Content-Disposition", "attachment; filename=dummy.pdf");
+  res.setHeader(
+    "Content-Disposition",
+    `attachment; filename=${document.title}`
+  );
   res.setHeader("Content-Length", buffer.length);
 
   res.status(200).send(buffer);
