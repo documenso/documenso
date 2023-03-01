@@ -19,6 +19,7 @@ import { DocumentStatus } from "@prisma/client";
 import { Tooltip as ReactTooltip } from "react-tooltip";
 import { Button, IconButton, SelectBox } from "@documenso/ui";
 import { NextPageContext } from "next";
+import { getDocuments } from "@documenso/lib/api";
 
 const DocumentsPage: NextPageWithLayout = (props: any) => {
   const router = useRouter();
@@ -48,15 +49,10 @@ const DocumentsPage: NextPageWithLayout = (props: any) => {
     createdFilter[0]
   );
 
-  const getDocuments = async () => {
+  const loadDocuments = async () => {
     if (!documents.length) setLoading(true);
-    // todo encapsulate
-    fetch("/api/documents", {
-      headers: {
-        "Content-Type": "application/json",
-      },
-    }).then((res) => {
-      res.json().then((j) => {
+    getDocuments().then((res: any) => {
+      res.json().then((j: any) => {
         setDocuments(j);
         setLoading(false);
       });
@@ -64,7 +60,7 @@ const DocumentsPage: NextPageWithLayout = (props: any) => {
   };
 
   useEffect(() => {
-    getDocuments().finally(() => {
+    loadDocuments().finally(() => {
       setSelectedStatusFilter(
         statusFilters.filter(
           (status) => status.value === props.filter.toUpperCase()
@@ -368,7 +364,7 @@ const DocumentsPage: NextPageWithLayout = (props: any) => {
                                       setDocuments(documentsWithoutIndex);
                                     })
                                     .then(() => {
-                                      getDocuments();
+                                      loadDocuments();
                                     });
                                 }
                               }}
