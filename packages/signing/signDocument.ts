@@ -1,26 +1,78 @@
-const signer = require("../../node_modules/node-signpdf/dist/signpdf");
-const {
-  pdfkitAddPlaceholder,
-} = require("../../node_modules/node-signpdf/dist/helpers/pdfkitAddPlaceholder");
-import * as fs from "fs";
+const fs = require("fs");
+const signer = require("./node-signpdf/dist/signpdf");
+import {
+  PDFDocument,
+  PDFName,
+  PDFNumber,
+  PDFHexString,
+  PDFString,
+} from "pdf-lib";
 
-export const signDocument = (documentAsBase64: string): any => {
+export const signDocument = async (documentAsBase64: string): Promise<any> => {
+  // Custom code to add Byterange to PDF
+  const PDFArrayCustom = require("./PDFArrayCustom");
+
+  // The PDF we're going to sign
   const pdfBuffer = Buffer.from(documentAsBase64, "base64");
-  const certBuffer = fs.readFileSync("public/certificate.p12");
 
-  console.log("adding placeholder..");
-  console.log(signer.pdfkitAddPlaceholder);
-  const inputBuffer = signer.pdfkitAddPlaceholder({
-    pdfBuffer,
-    reason: "Signed Certificate.",
-    contactInfo: "sign@example.com",
-    name: "Example",
-    location: "Jakarta",
-    signatureLength: certBuffer.length,
+  // The p12 certificate we're going to sign with
+  const p12Buffer = fs.readFileSync("ressources/certificate.p12");
+
+  const SIGNATURE_LENGTH = 4540;
+
+  const pdfDoc = await PDFDocument.load(pdfBuffer);
+  const pages = pdfDoc.getPages();
+
+  const ByteRange = PDFArrayCustom.withContext(pdfDoc.context);
+  ByteRange.push(PDFNumber.of(0));
+  ByteRange.push(PDFName.of(signer.DEFAULT_BYTE_RANGE_PLACEHOLDER));
+  ByteRange.push(PDFName.of(signer.DEFAULT_BYTE_RANGE_PLACEHOLDER));
+  ByteRange.push(PDFName.of(signer.DEFAULT_BYTE_RANGE_PLACEHOLDER));
+
+  const signatureDict = pdfDoc.context.obj({
+    Type: "Sig",
+    Filter: "Adobe.PPKLite",
+    SubFilter: "adbe.pkcs7.detached",
+    ByteRange,
+    Contents: PDFHexString.of("A".repeat(SIGNATURE_LENGTH)),
+    Reason: PDFString.of("Signed by Documenso"),
+    M: PDFString.fromDate(new Date()),
+  });
+  const signatureDictRef = pdfDoc.context.register(signatureDict);
+
+  const widgetDict = pdfDoc.context.obj({
+    Type: "Annot",
+    Subtype: "Widget",
+    FT: "Sig",
+    Rect: [0, 0, 0, 0],
+    V: signatureDictRef,
+    T: PDFString.of("Signature1"),
+    F: 4,
+    P: pages[0].ref,
+  });
+  const widgetDictRef = pdfDoc.context.register(widgetDict);
+
+  // Add our signature widget to the first page
+  pages[0].node.set(PDFName.of("Annots"), pdfDoc.context.obj([widgetDictRef]));
+
+  // Create an AcroForm object containing our signature widget
+  pdfDoc.catalog.set(
+    PDFName.of("AcroForm"),
+    pdfDoc.context.obj({
+      SigFlags: 3,
+      Fields: [widgetDictRef],
+    })
+  );
+
+  const modifiedPdfBytes = await pdfDoc.save({ useObjectStreams: false });
+  const modifiedPdfBuffer = Buffer.from(modifiedPdfBytes);
+
+  const signObj = new signer.SignPdf();
+  const signedPdfBuffer = signObj.sign(modifiedPdfBuffer, p12Buffer, {
+    passphrase: "",
   });
 
-  console.log("signing..");
-  const signedPdf = new signer.SignPdf().sign(inputBuffer, certBuffer);
-
-  return signedPdf;
+  // Write the signed file
+  // fs.writeFileSync("./signed.pdf", signedPdfBuffer);
+  return signedPdfBuffer;
 };

@@ -10,25 +10,9 @@ import { getDocument } from "@documenso/lib/query";
 import { signDocument } from "@documenso/signing/signDocument";
 
 async function getHandler(req: NextApiRequest, res: NextApiResponse) {
-  const user = await getUserFromToken(req, res);
-  const { id: documentId } = req.query;
-
-  if (!user) return;
-
-  if (!documentId) {
-    res.status(400).send("Missing parameter documentId.");
-    return;
-  }
-
+  const documentId = req.query.id || 1;
   const document: PrismaDocument = await getDocument(+documentId, req, res);
-
-  if (!document)
-    res.status(404).end(`No document with id ${documentId} found.`);
-
-  const signedDocumentAsBase64 = await signDocument(
-    document.document.toString()
-  );
-
+  const signedDocumentAsBase64 = await signDocument(document.document.toString());
   const buffer: Buffer = Buffer.from(signedDocumentAsBase64, "base64");
   res.setHeader("Content-Type", "application/pdf");
   res.setHeader(
@@ -41,29 +25,6 @@ async function getHandler(req: NextApiRequest, res: NextApiResponse) {
   return;
 }
 
-async function deleteHandler(req: NextApiRequest, res: NextApiResponse) {
-  const user = await getUserFromToken(req, res);
-  const { id: documentId } = req.query;
-
-  if (!user) return;
-
-  if (!documentId) {
-    res.status(400).send("Missing parameter documentId.");
-    return;
-  }
-
-  await prisma.document
-    .delete({
-      where: {
-        id: +documentId,
-      },
-    })
-    .then(() => {
-      res.status(200).end();
-    });
-}
-
 export default defaultHandler({
   GET: Promise.resolve({ default: defaultResponder(getHandler) }),
-  DELETE: Promise.resolve({ default: defaultResponder(deleteHandler) }),
 });
