@@ -17,6 +17,7 @@ import {
   WrenchIcon,
 } from "@heroicons/react/24/outline";
 import Logo from "./logo";
+import { getUser } from "@documenso/lib/api";
 
 const navigation = [
   {
@@ -86,9 +87,8 @@ export default function TopNavigation() {
   });
 
   useEffect(() => {
-    // todo encapsulate
-    fetch("/api/users/me").then((res) => {
-      res.json().then((j) => {
+    getUser().then((res) => {
+      res.json().then((j: any) => {
         setUser(j);
       });
     });

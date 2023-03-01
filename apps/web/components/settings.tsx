@@ -6,6 +6,7 @@ import Head from "next/head";
 import { useSession } from "next-auth/react";
 import { updateUser } from "@documenso/features";
 import { Button } from "@documenso/ui";
+import { getUser } from "@documenso/lib/api";
 
 const subNavigation = [
   {
@@ -34,9 +35,8 @@ export default function Setttings() {
   });
 
   useEffect(() => {
-    // todo encapsulate
-    fetch("/api/users/me").then((res) => {
-      res.json().then((j) => {
+    getUser().then((res: any) => {
+      res.json().then((j: any) => {
         setUser(j);
       });
     });
