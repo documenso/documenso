@@ -150,14 +150,14 @@ class SignPdf {
         type: _nodeForge.default.pki.oids.contentType,
         value: _nodeForge.default.pki.oids.data
       }, {
-        type: _nodeForge.default.pki.oids.messageDigest // value will be auto-populated at signing time
-
-      }, {
         type: _nodeForge.default.pki.oids.signingTime,
         // value can also be auto-populated at signing time
         // We may also support passing this as an option to sign().
         // Would be useful to match the creation time of the document for example.
         value: new Date()
+      }, {
+        type: _nodeForge.default.pki.oids.messageDigest // value will be auto-populated at signing time
+
       }]
     }); // Sign in detached mode.
 
