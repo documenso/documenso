@@ -115,7 +115,6 @@ const DashboardPage: NextPageWithLayout = (props: any) => {
   );
 };
 
-// todo layout as component
 DashboardPage.getLayout = function getLayout(page: ReactElement) {
   return <Layout>{page}</Layout>;
 };

@@ -1,8 +1,6 @@
-import { Fragment, useEffect } from "react";
-import { Disclosure, Menu, Transition } from "@headlessui/react";
-import Link from "next/link";
+import { useEffect } from "react";
 import { useRouter } from "next/router";
-import { signOut, useSession } from "next-auth/react";
+import { useSession } from "next-auth/react";
 import { NEXT_PUBLIC_WEBAPP_URL } from "@documenso/lib/constants";
 
 import Navigation from "./navigation";
