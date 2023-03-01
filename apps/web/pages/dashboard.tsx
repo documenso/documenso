@@ -130,9 +130,6 @@ export async function getServerSideProps(context: any) {
   const user = await getUserFromToken(context.req, context.res);
   if (!user) return;
 
-  // todo optimize querys
-  // todo no intersection groups
-
   const documents: any[] = await getDocumentsForUserFromToken(context);
 
   const drafts: PrismaDocument[] = documents.filter(
