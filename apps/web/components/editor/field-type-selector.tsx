@@ -10,8 +10,7 @@ export default function FieldTypeSelector(props: any) {
       name: "Signature",
       id: FieldType.SIGNATURE,
     },
-    { name: "Text", id: FieldType.TEXT },
-    { name: "Date", id: FieldType.DATE },
+    { name: "Date", id: FieldType.DATE },s
   ];
 
   const [selectedFieldType, setSelectedFieldType] = useState(fieldTypes[0].id);
