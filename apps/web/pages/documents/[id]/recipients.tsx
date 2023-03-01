@@ -17,8 +17,12 @@ import { getUserFromToken } from "@documenso/lib/server";
 import { getDocument } from "@documenso/lib/query";
 import { Document as PrismaDocument } from "@prisma/client";
 import { Breadcrumb, Button, IconButton } from "@documenso/ui";
-import toast from "react-hot-toast";
 import { Dialog, Transition } from "@headlessui/react";
+import {
+  createOrUpdateRecipient,
+  deleteRecipient,
+  sendSigningRequests,
+} from "@documenso/lib/api";
 
 const RecipientsPage: NextPageWithLayout = (props: any) => {
   const title: string =
@@ -138,10 +142,11 @@ const RecipientsPage: NextPageWithLayout = (props: any) => {
                       }}
                       onBlur={() => {
                         item.documentId = props.document.id;
-                        upsertRecipient(item);
+                        createOrUpdateRecipient(item);
                       }}
                       onKeyDown={(event: any) => {
-                        if (event.key === "Enter") upsertRecipient(item);
+                        if (event.key === "Enter")
+                          createOrUpdateRecipient(item);
                       }}
                       className="block w-full border-0 p-0 text-gray-900 placeholder-gray-500 sm:text-sm outline-none bg-inherit"
                       placeholder="john.dorian@loremipsum.com"
@@ -171,10 +176,11 @@ const RecipientsPage: NextPageWithLayout = (props: any) => {
                       }}
                       onBlur={() => {
                         item.documentId = props.document.id;
-                        upsertRecipient(item);
+                        createOrUpdateRecipient(item);
                       }}
                       onKeyDown={(event: any) => {
-                        if (event.key === "Enter") upsertRecipient(item);
+                        if (event.key === "Enter")
+                          createOrUpdateRecipient(item);
                       }}
                       className="block w-full border-0 p-0 text-gray-900 placeholder-gray-500 sm:text-sm outline-none bg-inherit"
                       placeholder="John Dorian"
@@ -250,7 +256,9 @@ const RecipientsPage: NextPageWithLayout = (props: any) => {
                       onClick={() => {
                         if (confirm("Resend this signing request?")) {
                           setLoading(true);
-                          send(props.document, [item.id]).finally(() => {
+                          sendSigningRequests(props.document, [
+                            item.id,
+                          ]).finally(() => {
                             setLoading(false);
                           });
                         }
@@ -270,7 +278,7 @@ const RecipientsPage: NextPageWithLayout = (props: any) => {
                           1
                         );
                         setSigners(signersWithoutIndex);
-                        deleteRecipient(item).catch((err) => {
+                        deleteRecipient(item)?.catch((err) => {
                           setSigners(signersWithoutIndex.concat(removedItem));
                         });
                       }}
@@ -285,7 +293,7 @@ const RecipientsPage: NextPageWithLayout = (props: any) => {
             icon={UserPlusIcon}
             className="mt-3"
             onClick={() => {
-              upsertRecipient({
+              createOrUpdateRecipient({
                 id: "",
                 email: "",
                 name: "",
@@ -365,7 +373,7 @@ const RecipientsPage: NextPageWithLayout = (props: any) => {
                     <Button
                       onClick={() => {
                         setOpen(false);
-                        send(props.document).finally(() => {
+                        sendSigningRequests(props.document).finally(() => {
                           setLoading(false);
                         });
                       }}
@@ -382,69 +390,6 @@ const RecipientsPage: NextPageWithLayout = (props: any) => {
     </>
   );
 };
-
-// todo encapsulate
-async function deleteRecipient(recipient: any) {
-  if (!recipient.id) {
-    return;
-  }
-
-  return toast.promise(
-    fetch(
-      "/api/documents/" + recipient.documentId + "/recipients/" + recipient.id,
-      {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(recipient),
-      }
-    ),
-    {
-      loading: "Deleting...",
-      success: "Deleted.",
-      error: "Could not delete :/",
-    },
-    {
-      id: "delete",
-      style: {
-        minWidth: "200px",
-      },
-    }
-  );
-}
-
-// todo encapsulate
-async function upsertRecipient(recipient: any): Promise<any> {
-  try {
-    const created = await toast.promise(
-      fetch("/api/documents/" + recipient.documentId + "/recipients", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(recipient),
-      }).then((res) => {
-        if (!res.ok) {
-          throw new Error(res.status.toString());
-        }
-        return res.json();
-      }),
-      {
-        loading: "Saving...",
-        success: "Saved.",
-        error: "Could not save :/",
-      },
-      {
-        id: "saving",
-        style: {
-          minWidth: "200px",
-        },
-      }
-    );
-    return created;
-  } catch (error) {}
-}
 
 RecipientsPage.getLayout = function getLayout(page: ReactElement) {
   return <Layout>{page}</Layout>;
@@ -466,35 +411,6 @@ export async function getServerSideProps(context: any) {
       document: JSON.parse(JSON.stringify({ ...document, document: "" })),
     },
   };
-}
-
-// todo encapsulate
-async function send(document: any, resendTo: number[] = []) {
-  if (!document || !document.id) return;
-  try {
-    const sent = await toast.promise(
-      fetch(`/api/documents/${document.id}/send`, {
-        body: JSON.stringify({ resendTo: resendTo }),
-        headers: { "Content-Type": "application/json" },
-        method: "POST",
-      })
-        .then((res: any) => {
-          if (!res.ok) {
-            throw new Error(res.status.toString());
-          }
-        })
-        .finally(() => {
-          location.reload();
-        }),
-      {
-        loading: "Sending...",
-        success: `Sent!`,
-        error: "Could not send :/",
-      }
-    );
-  } catch (err) {
-    console.log(err);
-  }
 }
 
 export default RecipientsPage;

@@ -25,7 +25,7 @@ async function getHandler(req: NextApiRequest, res: NextApiResponse) {
     return;
   }
 
-  // todo encapsulate entity ownerships checks
+  // todo entity ownerships checks
 
   const fields = await prisma.field.findMany({
     where: { documentId: +documentId },
@@ -57,7 +57,7 @@ async function postHandler(req: NextApiRequest, res: NextApiResponse) {
 
   const document: PrismaDocument = await getDocument(+documentId, req, res);
 
-  // todo encapsulate entity ownerships checks
+  // todo entity ownerships checks
   if (document.userId !== user.id) {
     return res.status(401).send("User does not have access to this document.");
   }

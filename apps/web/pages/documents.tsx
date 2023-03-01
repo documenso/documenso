@@ -351,7 +351,6 @@ const DocumentsPage: NextPageWithLayout = (props: any) => {
                                   const removedItem: any =
                                     documentsWithoutIndex.splice(index, 1);
                                   setDocuments(documentsWithoutIndex);
-                                  // todo encapsulate
                                   deleteDocument(document.id)
                                     .catch((err) => {
                                       documentsWithoutIndex.splice(

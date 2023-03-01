@@ -5,3 +5,6 @@ export { getUser } from "./getUser";
 export { signup } from "./signup";
 export { getDocuments } from "./getDocuments";
 export { deleteDocument } from "./deleteDocument";
+export { deleteRecipient } from "./deleteRecipient";
+export { createOrUpdateRecipient } from "./createOrUpdateRecipient";
+export { sendSigningRequests } from "./sendSigningRequests";
