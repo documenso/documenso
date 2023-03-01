@@ -1,3 +1,4 @@
+import { signup } from "@documenso/lib/api";
 import { NEXT_PUBLIC_WEBAPP_URL } from "@documenso/lib/constants";
 import { Button } from "@documenso/ui";
 import { XCircleIcon } from "@heroicons/react/24/outline";
@@ -30,19 +31,9 @@ export default function Signup(props: { source: string }) {
   };
 
   const signUp: SubmitHandler<FormValues> = async (data) => {
-    // todo encapsulate
-    const res = await toast
+    await toast
       .promise(
-        fetch("/api/auth/signup", {
-          body: JSON.stringify({
-            source: props.source,
-            ...data,
-          }),
-          headers: {
-            "Content-Type": "application/json",
-          },
-          method: "POST",
-        })
+        signup(props.source, data)
           .then(handleErrors)
           .then(async () => {
             await signIn<"credentials">("credentials", {
