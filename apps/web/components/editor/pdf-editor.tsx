@@ -2,12 +2,10 @@ import { NEXT_PUBLIC_WEBAPP_URL } from "@documenso/lib/constants";
 import { useRouter } from "next/router";
 import dynamic from "next/dynamic";
 import { useState } from "react";
-import { FieldType } from "@prisma/client";
 import { createOrUpdateField, deleteField } from "@documenso/lib/api";
 import { createField } from "@documenso/features/editor";
 import RecipientSelector from "./recipient-selector";
 import FieldTypeSelector from "./field-type-selector";
-import toast from "react-hot-toast";
 const stc = require("string-to-color");
 
 const PDFViewer = dynamic(() => import("./pdf-viewer"), {
