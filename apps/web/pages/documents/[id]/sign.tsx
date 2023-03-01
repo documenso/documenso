@@ -67,8 +67,6 @@ const SignPage: NextPageWithLayout = (props: any) => {
 export async function getServerSideProps(context: any) {
   const recipientToken: string = context.query["token"];
 
-  // todo redirect to sigend of all already signed
-
   await prisma.recipient.updateMany({
     where: {
       token: recipientToken,
@@ -87,7 +85,7 @@ export async function getServerSideProps(context: any) {
     },
   });
 
-  // Document was already signed
+  // Document is already signed
   if (recipient.Document.status === DocumentStatus.COMPLETED) {
     return {
       redirect: {
@@ -97,8 +95,7 @@ export async function getServerSideProps(context: any) {
     };
   }
 
-  // Clean up unsigned free place fields from UI from previous page visits
-  // todo refactor free sign fields to be client side only
+  // Clean up potential unsigned free place fields from UI from previous page visits
   await prisma.field.deleteMany({
     where: {
       type: { in: [FieldType.FREE_SIGNATURE] },

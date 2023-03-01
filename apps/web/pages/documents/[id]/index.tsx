@@ -120,9 +120,6 @@ export async function getServerSideProps(context: any) {
       context.res
     );
 
-    // todo optimize querys
-    // todo no intersection groups
-
     return {
       props: {
         document: JSON.parse(JSON.stringify({ ...document, document: "" })),

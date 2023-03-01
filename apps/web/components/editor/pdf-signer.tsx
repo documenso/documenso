@@ -39,8 +39,7 @@ export default function PDFSigner(props: any) {
   }
 
   function onDialogClose(dialogResult: any) {
-    // todo handle signature removed from field
-    // todo remove free field if dialogresult is empty (or the id )
+    // todo handle signature removed from field, remove free field if dialogresult is empty (or the id )
     if (!dialogResult && dialogField.type === "FREE_SIGNATURE") {
       onDeleteHandler(dialogField.id);
       return;

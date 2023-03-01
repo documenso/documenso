@@ -37,7 +37,6 @@ async function postHandler(req: NextApiRequest, res: NextApiResponse) {
 
   if (!document) res.status(404).end(`No document found.`);
 
-  // todo rename .document to documentImageAsBase64 or sth. like that
   let documentWithInserts = document.document;
   for (const signature of signaturesFromBody) {
     if (!signature.signatureImage && !signature.typedSignature) {

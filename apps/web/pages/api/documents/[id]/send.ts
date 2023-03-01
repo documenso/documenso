@@ -58,8 +58,6 @@ async function postHandler(req: NextApiRequest, res: NextApiResponse) {
       return res.status(200).send(recipients.length);
     }
   });
-
-  // todo check if recipient has an account and show them in their inbox or something
 }
 
 export default defaultHandler({

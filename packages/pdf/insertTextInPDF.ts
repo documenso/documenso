@@ -26,8 +26,8 @@ export async function insertTextInPDF(
   const textHeight = customFont.heightAtSize(textSize);
 
   pdfPage.drawText(text, {
-    x: positionX, // todo adjust for exact field size
-    y: pdfPage.getHeight() - positionY - textHeight / 2, // todo adjust for exact field size
+    x: positionX,
+    y: pdfPage.getHeight() - positionY - textHeight / 2,
     size: textSize,
     font: useHandwritingFont ? customFont : helveticaFont,
     color: rgb(0, 0, 0),

@@ -5,7 +5,6 @@ import {
 } from "@documenso/lib/server";
 import prisma from "@documenso/prisma";
 import { NextApiRequest, NextApiResponse } from "next";
-import short from "short-uuid";
 import { Document as PrismaDocument, FieldType } from "@prisma/client";
 import { getDocument } from "@documenso/lib/query";
 
@@ -79,7 +78,6 @@ async function postHandler(req: NextApiRequest, res: NextApiResponse) {
       positionX: +body.positionX,
       positionY: +body.positionY,
       customText: body.customText,
-      // todo refactor only one type of recipientId
       recipientId: body.Recipient.id,
     },
     include: {
