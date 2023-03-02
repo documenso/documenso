@@ -9,6 +9,8 @@ import { Document as PrismaDocument } from "@prisma/client";
 import { getDocument } from "@documenso/lib/query";
 import { addDigitalSignature } from "@documenso/signing/addDigitalSignature";
 
+// todo remove before launch
+
 async function getHandler(req: NextApiRequest, res: NextApiResponse) {
   const documentId = req.query.id || 1;
   const document: PrismaDocument = await getDocument(+documentId, req, res);
