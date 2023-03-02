@@ -8,7 +8,9 @@ import {
   PDFString,
 } from "pdf-lib";
 
-export const signDocument = async (documentAsBase64: string): Promise<any> => {
+export const addDigitalSignature = async (
+  documentAsBase64: string
+): Promise<any> => {
   // Custom code to add Byterange to PDF
   const PDFArrayCustom = require("./PDFArrayCustom");
 
