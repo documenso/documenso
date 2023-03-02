@@ -13,6 +13,7 @@ Documenso aims to be the world's most trusted document signing tool. This trust 
 
 - Sendgrid setup and nodemailer-sendgrid SMTP hint (import for interchangeability like SMTP)
 - Render Deploy YAML file or similar
+- Create self signed cert step by step with recommendation for use and validity scope
 
 # Setup
 
