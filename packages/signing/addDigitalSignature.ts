@@ -49,10 +49,10 @@ export const addDigitalSignature = async (
   });
   const widgetDictRef = pdfDoc.context.register(widgetDict);
 
-  // Add our signature widget to the first page
+  // Add signature widget to the first page
   pages[0].node.set(PDFName.of("Annots"), pdfDoc.context.obj([widgetDictRef]));
 
-  // Create an AcroForm object containing our signature widget
+  // Create an AcroForm object containing the signature widget
   pdfDoc.catalog.set(
     PDFName.of("AcroForm"),
     pdfDoc.context.obj({
