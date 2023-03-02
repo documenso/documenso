@@ -10,16 +10,11 @@ import {
 
 export const addDigitalSignature = async (
   documentAsBase64: string
-): Promise<any> => {
+): Promise<string> => {
   // Custom code to add Byterange to PDF
   const PDFArrayCustom = require("./PDFArrayCustom");
-
-  // The PDF we're going to sign
   const pdfBuffer = Buffer.from(documentAsBase64, "base64");
-
-  // The p12 certificate we're going to sign with
   const p12Buffer = fs.readFileSync("ressources/certificate.p12");
-
   const SIGNATURE_LENGTH = 4540;
 
   const pdfDoc = await PDFDocument.load(pdfBuffer);
@@ -70,11 +65,9 @@ export const addDigitalSignature = async (
   const modifiedPdfBuffer = Buffer.from(modifiedPdfBytes);
 
   const signObj = new signer.SignPdf();
-  const signedPdfBuffer = signObj.sign(modifiedPdfBuffer, p12Buffer, {
+  const signedPdfBuffer: Buffer = signObj.sign(modifiedPdfBuffer, p12Buffer, {
     passphrase: "",
   });
 
-  // Write the signed file
-  // fs.writeFileSync("./signed.pdf", signedPdfBuffer);
-  return signedPdfBuffer;
+  return signedPdfBuffer.toString("base64");
 };

@@ -48,8 +48,7 @@ async function getHandler(req: NextApiRequest, res: NextApiResponse) {
     `attachment; filename=${document.title}`
   );
 
-  res.status(200).send(buffer);
-  return;
+  return res.status(200).send(buffer);
 }
 
 async function deleteHandler(req: NextApiRequest, res: NextApiResponse) {
