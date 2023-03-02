@@ -31,11 +31,11 @@ async function getHandler(req: NextApiRequest, res: NextApiResponse) {
 
   const buffer: Buffer = Buffer.from(signedDocumentAsBase64, "base64");
   res.setHeader("Content-Type", "application/pdf");
+  res.setHeader("Content-Length", buffer.length);
   res.setHeader(
     "Content-Disposition",
     `attachment; filename=${document.title}`
   );
-  res.setHeader("Content-Length", buffer.length);
 
   res.status(200).send(buffer);
   return;
