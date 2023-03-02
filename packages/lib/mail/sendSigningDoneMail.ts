@@ -1,7 +1,7 @@
 import { sendMail } from "./sendMail";
-import { NEXT_PUBLIC_WEBAPP_URL } from "@documenso/lib/constants";
 import { signingCompleteTemplate } from "@documenso/lib/mail";
 import { Document as PrismaDocument } from "@prisma/client";
+import { addDigitalSignature } from "@documenso/signing/addDigitalSignature";
 
 export const sendSigningDoneMail = async (
   recipient: any,
@@ -16,7 +16,10 @@ export const sendSigningDoneMail = async (
     [
       {
         filename: document.title,
-        content: Buffer.from(document.document.toString(), "base64"),
+        content: Buffer.from(
+          await addDigitalSignature(document.document),
+          "base64"
+        ),
       },
     ]
   );
