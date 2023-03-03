@@ -56,16 +56,14 @@ export default function Login() {
       }
     );
     if (!res) {
-      setErrorMessage("error");
+      setErrorMessage("Error");
       toast.dismiss();
       toast.error("Something went wrong.");
     }
-    // we're logged in! let's do a hard refresh to the desired url
     else if (!res.error) {
+      // we're logged in, let's do a hard refresh to the original url
       router.push(callbackUrl);
-      // toast.error("error");
     }
-    // fallback if error not found
     else {
       toast.dismiss();
       if (res.status == 401) {

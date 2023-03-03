@@ -11,7 +11,6 @@ export const sendSigningDoneMail = async (
   await sendMail(
     user.email,
     `Completed: "${document.title}"`,
-    // base template with footer and box vs content template for eact type
     signingCompleteTemplate(`All recipients have signed "${document.title}".`),
     [
       {
