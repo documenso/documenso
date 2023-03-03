@@ -5,9 +5,7 @@ import { XCircleIcon } from "@heroicons/react/24/outline";
 import { signIn } from "next-auth/react";
 import Link from "next/link";
 import { FormProvider, SubmitHandler, useForm } from "react-hook-form";
-import { toast, Toast, Toaster } from "react-hot-toast";
-
-import Logo from "./logo";
+import { toast } from "react-hot-toast";
 
 type FormValues = {
   email: string;
