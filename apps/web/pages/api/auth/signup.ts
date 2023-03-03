@@ -34,7 +34,7 @@ async function postHandler(req: NextApiRequest, res: NextApiResponse) {
 
   const hashedPassword = await hashPassword(password);
 
-  const user = await prisma.user.upsert({
+  await prisma.user.upsert({
     where: { email: cleanEmail },
     update: {
       password: hashedPassword,
@@ -49,7 +49,7 @@ async function postHandler(req: NextApiRequest, res: NextApiResponse) {
     },
   });
 
-  res.status(201).json({ message: "Created user" });
+  res.status(201).end();
 }
 
 export default defaultHandler({
