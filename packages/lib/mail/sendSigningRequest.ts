@@ -10,7 +10,7 @@ export const sendSigningRequest = async (
   user: any
 ) => {
   await sendMail(
-    user.email,
+    recipient.email,
     `Please sign ${document.title}`,
     signingRequestTemplate(
       `${user.name} (${user.email}) has sent you a document to sign. `,
