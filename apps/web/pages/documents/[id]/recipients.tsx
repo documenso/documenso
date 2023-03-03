@@ -94,7 +94,9 @@ const RecipientsPage: NextPageWithLayout = (props: any) => {
               }}
               disabled={
                 (signers.length || 0) === 0 ||
-                !signers.some((r: any) => r.sendStatus === "NOT_SENT") ||
+                !signers.some(
+                  (r: any) => r.email && r.sendStatus === "NOT_SENT"
+                ) ||
                 loading
               }
             >
@@ -355,8 +357,9 @@ const RecipientsPage: NextPageWithLayout = (props: any) => {
                       <div className="mt-2">
                         <p className="text-sm text-gray-500">
                           {`"${props.document.title}" will be sent to ${
-                            signers.filter((s: any) => s.sendStatus != "SENT")
-                              .length
+                            signers.filter(
+                              (s: any) => s.email && s.sendStatus != "SENT"
+                            ).length
                           } recipients.`}
                         </p>
                       </div>
