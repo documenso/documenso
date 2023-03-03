@@ -1,13 +1,12 @@
 import { LockClosedIcon } from "@heroicons/react/20/solid";
 import Link from "next/link";
-import { FormProvider, SubmitHandler, useForm } from "react-hook-form";
+import { FormProvider, useForm } from "react-hook-form";
 
 import Logo from "./logo";
-import { getCsrfToken, signIn } from "next-auth/react";
-import { ErrorCode } from "@documenso/lib/auth";
+import { signIn } from "next-auth/react";
 import { useState } from "react";
 import { useRouter } from "next/router";
-import { toast, Toaster } from "react-hot-toast";
+import { toast } from "react-hot-toast";
 import { NEXT_PUBLIC_WEBAPP_URL } from "@documenso/lib/constants";
 import { Button } from "@documenso/ui";
 
