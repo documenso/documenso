@@ -12,6 +12,7 @@ import {
   PencilSquareIcon,
   TrashIcon,
   UserPlusIcon,
+  XMarkIcon,
 } from "@heroicons/react/24/outline";
 import { getUserFromToken } from "@documenso/lib/server";
 import { getDocument } from "@documenso/lib/query";
@@ -23,6 +24,16 @@ import {
   deleteRecipient,
   sendSigningRequests,
 } from "@documenso/lib/api";
+import {
+  FormProvider,
+  useFieldArray,
+  useForm,
+  useWatch,
+} from "react-hook-form";
+
+type FormValues = {
+  signers: { id: number; email: string; name: string }[];
+};
 
 const RecipientsPage: NextPageWithLayout = (props: any) => {
   const title: string =
@@ -46,11 +57,28 @@ const RecipientsPage: NextPageWithLayout = (props: any) => {
     },
   ];
 
-  const [signers, setSigners] = useState(props?.document?.Recipient);
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
-
+  const form = useForm<FormValues>({
+    defaultValues: { signers: props?.document?.Recipient },
+  });
+  const {
+    register,
+    trigger,
+    control,
+    formState: { errors },
+  } = form;
+  const { fields, append, remove } = useFieldArray({
+    keyName: "dieldArrayId",
+    name: "signers",
+    control,
+  });
+  const formValues = useWatch({ control, name: "signers" });
   const cancelButtonRef = useRef(null);
+  const hasEmailError = (formValue: any): boolean => {
+    const index = formValues.findIndex((e) => e.id === formValue.id);
+    return !!errors?.signers?.[index]?.email;
+  };
 
   return (
     <>
@@ -93,9 +121,10 @@ const RecipientsPage: NextPageWithLayout = (props: any) => {
                 setOpen(true);
               }}
               disabled={
-                (signers.length || 0) === 0 ||
-                !signers.some(
-                  (r: any) => r.email && r.sendStatus === "NOT_SENT"
+                (formValues.length || 0) === 0 ||
+                !formValues.some(
+                  (r: any) =>
+                    r.email && !hasEmailError(r) && r.sendStatus === "NOT_SENT"
                 ) ||
                 loading
               }
@@ -113,200 +142,222 @@ const RecipientsPage: NextPageWithLayout = (props: any) => {
               The people who will sign the document.
             </p>
           </div>
-          <ul role="list" className="divide-y divide-gray-200">
-            {signers.map((item: any, index: number) => (
-              <li
-                key={index}
-                className="px-0 py-4 w-full hover:bg-green-50 border-0 group"
-              >
-                <div id="container" className="flex w-full">
-                  <div
-                    className={classNames(
-                      "ml-3 w-[250px] rounded-md border border-gray-300 px-3 py-2 shadow-sm focus-within:border-neon focus-within:ring-1 focus-within:ring-neon",
-                      item.sendStatus === "SENT" ? "bg-gray-100" : ""
-                    )}
+          <FormProvider {...form}>
+            <form
+              onChange={() => {
+                trigger();
+              }}
+            >
+              <ul role="list" className="divide-y divide-gray-200">
+                {fields.map((item: any, index: number) => (
+                  <li
+                    key={index}
+                    className="px-0 py-4 w-full hover:bg-green-50 border-0 group"
                   >
-                    <label
-                      htmlFor="name"
-                      className="block text-xs font-medium text-gray-900"
-                    >
-                      Email
-                    </label>
-                    <input
-                      type="email"
-                      name="email"
-                      value={item.email}
-                      disabled={item.sendStatus === "SENT" || loading}
-                      onChange={(e) => {
-                        const updatedSigners = [...signers];
-                        updatedSigners[index].email = e.target.value;
-                        setSigners(updatedSigners);
-                      }}
-                      onBlur={() => {
-                        item.documentId = props.document.id;
-                        createOrUpdateRecipient(item);
-                      }}
-                      onKeyDown={(event: any) => {
-                        if (event.key === "Enter")
-                          createOrUpdateRecipient(item);
-                      }}
-                      className="block w-full border-0 p-0 text-gray-900 placeholder-gray-500 sm:text-sm outline-none bg-inherit"
-                      placeholder="john.dorian@loremipsum.com"
-                    />
-                  </div>
-                  <div
-                    className={classNames(
-                      "ml-3 w-[250px] rounded-md border border-gray-300 px-3 py-2 shadow-sm focus-within:border-neon focus-within:ring-1 focus-within:ring-neon",
-                      item.sendStatus === "SENT" ? "bg-gray-100" : ""
-                    )}
-                  >
-                    <label
-                      htmlFor="name"
-                      className="block text-xs font-medium text-gray-900"
-                    >
-                      Name (optional)
-                    </label>
-                    <input
-                      type="email"
-                      name="name"
-                      value={item.name}
-                      disabled={item.sendStatus === "SENT" || loading}
-                      onChange={(e) => {
-                        const updatedSigners = [...signers];
-                        updatedSigners[index].name = e.target.value;
-                        setSigners(updatedSigners);
-                      }}
-                      onBlur={() => {
-                        item.documentId = props.document.id;
-                        createOrUpdateRecipient(item);
-                      }}
-                      onKeyDown={(event: any) => {
-                        if (event.key === "Enter")
-                          createOrUpdateRecipient(item);
-                      }}
-                      className="block w-full border-0 p-0 text-gray-900 placeholder-gray-500 sm:text-sm outline-none bg-inherit"
-                      placeholder="John Dorian"
-                    />
-                  </div>
-                  <div className="ml-auto flex">
-                    <div key={item.id}>
-                      {item.sendStatus === "NOT_SENT" ? (
-                        <span
-                          id="sent_icon"
-                          className="inline-block flex-shrink-0 rounded-full bg-gray-200 px-2 py-0.5 text-xs font-medium text-gray-800"
+                    <div id="container" className="flex w-full">
+                      <div
+                        className={classNames(
+                          "ml-3 w-[250px] rounded-md border border-gray-300 px-3 py-2 shadow-sm focus-within:border-neon focus-within:ring-1 focus-within:ring-neon",
+                          item.sendStatus === "SENT" ? "bg-gray-100" : ""
+                        )}
+                      >
+                        <label
+                          htmlFor="name"
+                          className="block text-xs font-medium text-gray-900"
                         >
-                          Not Sent
-                        </span>
-                      ) : (
-                        ""
-                      )}
-                      {item.sendStatus === "SENT" &&
-                      item.readStatus !== "OPENED" ? (
-                        <span id="sent_icon">
-                          <span
-                            id="sent_icon"
-                            className="inline-block flex-shrink-0 rounded-full bg-yellow-200 px-2 py-0.5 text-xs font-medium text-gray-800"
+                          Email
+                        </label>
+                        <input
+                          type="email"
+                          {...register(`signers.${index}.email`, {
+                            pattern: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                          })}
+                          defaultValue={item.email}
+                          disabled={item.sendStatus === "SENT" || loading}
+                          onBlur={() => {
+                            if (!errors?.signers?.[index])
+                              createOrUpdateRecipient({
+                                ...formValues[index],
+                                documentId: props.document.id,
+                              });
+                          }}
+                          onKeyDown={(event: any) => {
+                            if (event.key === "Enter")
+                              if (!errors?.signers?.[index])
+                                createOrUpdateRecipient({
+                                  ...formValues[index],
+                                  documentId: props.document.id,
+                                });
+                          }}
+                          className="block w-full border-0 p-0 text-gray-900 placeholder-gray-500 sm:text-sm outline-none bg-inherit"
+                          placeholder="john.dorian@loremipsum.com"
+                        />
+                        {errors?.signers?.[index] ? (
+                          <p
+                            className="mt-2 text-sm text-red-600"
+                            id="email-error"
                           >
-                            <CheckIcon className="inline h-5 mr-1"></CheckIcon>{" "}
-                            Sent
-                          </span>
-                        </span>
-                      ) : (
-                        ""
-                      )}
-                      {item.readStatus === "OPENED" &&
-                      item.signingStatus === "NOT_SIGNED" ? (
-                        <span id="read_icon">
-                          <span
-                            id="sent_icon"
-                            className="inline-block flex-shrink-0 rounded-full bg-yellow-200 px-2 py-0.5 text-xs font-medium text-gray-800"
-                          >
-                            <CheckIcon className="inline h-5 -mr-2"></CheckIcon>
-                            <CheckIcon className="inline h-5 mr-1"></CheckIcon>
-                            Seen
-                          </span>
-                        </span>
-                      ) : (
-                        ""
-                      )}
-                      {item.signingStatus === "SIGNED" ? (
-                        <span id="signed_icon">
-                          <span
-                            id="sent_icon"
-                            className="inline-block flex-shrink-0 rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-800"
-                          >
-                            <CheckBadgeIcon className="inline h-5 mr-1"></CheckBadgeIcon>
-                            Signed
-                          </span>
-                        </span>
-                      ) : (
-                        ""
-                      )}
+                            <XMarkIcon className="inline h-5" /> Invalid Email
+                          </p>
+                        ) : (
+                          ""
+                        )}
+                      </div>
+                      <div
+                        className={classNames(
+                          "ml-3 w-[250px] rounded-md border border-gray-300 px-3 py-2 shadow-sm focus-within:border-neon focus-within:ring-1 focus-within:ring-neon",
+                          item.sendStatus === "SENT" ? "bg-gray-100" : ""
+                        )}
+                      >
+                        <label
+                          htmlFor="name"
+                          className="block text-xs font-medium text-gray-900"
+                        >
+                          Name (optional)
+                        </label>
+                        <input
+                          type="text"
+                          {...register(`signers.${index}.name`)}
+                          defaultValue={item.name}
+                          disabled={item.sendStatus === "SENT" || loading}
+                          onBlur={() => {
+                            if (!errors?.signers?.[index])
+                              createOrUpdateRecipient({
+                                ...formValues[index],
+                                documentId: props.document.id,
+                              });
+                          }}
+                          onKeyDown={(event: any) => {
+                            if (
+                              event.key === "Enter" &&
+                              !errors?.signers?.[index]
+                            )
+                              createOrUpdateRecipient({
+                                ...formValues[index],
+                                documentId: props.document.id,
+                              });
+                          }}
+                          className="block w-full border-0 p-0 text-gray-900 placeholder-gray-500 sm:text-sm outline-none bg-inherit"
+                          placeholder="John Dorian"
+                        />
+                      </div>
+                      <div className="ml-auto flex">
+                        <div key={item.id}>
+                          {item.sendStatus === "NOT_SENT" ? (
+                            <span
+                              id="sent_icon"
+                              className="inline-block mt-3 flex-shrink-0 rounded-full bg-gray-200 px-2 py-0.5 text-xs font-medium text-gray-800"
+                            >
+                              Not Sent
+                            </span>
+                          ) : (
+                            ""
+                          )}
+                          {item.sendStatus === "SENT" &&
+                          item.readStatus !== "OPENED" ? (
+                            <span id="sent_icon">
+                              <span
+                                id="sent_icon"
+                                className="inline-block mt-3 flex-shrink-0 rounded-full bg-yellow-200 px-2 py-0.5 text-xs font-medium text-gray-800"
+                              >
+                                <CheckIcon className="inline h-5 mr-1"></CheckIcon>{" "}
+                                Sent
+                              </span>
+                            </span>
+                          ) : (
+                            ""
+                          )}
+                          {item.readStatus === "OPENED" &&
+                          item.signingStatus === "NOT_SIGNED" ? (
+                            <span id="read_icon">
+                              <span
+                                id="sent_icon"
+                                className="inline-block mt-3 flex-shrink-0 rounded-full bg-yellow-200 px-2 py-0.5 text-xs font-medium text-gray-800"
+                              >
+                                <CheckIcon className="inline h-5 -mr-2"></CheckIcon>
+                                <CheckIcon className="inline h-5 mr-1"></CheckIcon>
+                                Seen
+                              </span>
+                            </span>
+                          ) : (
+                            ""
+                          )}
+                          {item.signingStatus === "SIGNED" ? (
+                            <span id="signed_icon">
+                              <span
+                                id="sent_icon"
+                                className="inline-block mt-3 flex-shrink-0 rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-800"
+                              >
+                                <CheckBadgeIcon className="inline h-5 mr-1"></CheckBadgeIcon>
+                                Signed
+                              </span>
+                            </span>
+                          ) : (
+                            ""
+                          )}
+                        </div>
+                      </div>
+                      <div className="ml-auto flex mr-1">
+                        <IconButton
+                          icon={PaperAirplaneIcon}
+                          disabled={
+                            !item.id ||
+                            item.sendStatus !== "SENT" ||
+                            item.signingStatus === "SIGNED" ||
+                            loading
+                          }
+                          color="secondary"
+                          className="mr-4 h-9 my-auto"
+                          onClick={() => {
+                            if (confirm("Resend this signing request?")) {
+                              setLoading(true);
+                              sendSigningRequests(props.document, [
+                                item.id,
+                              ]).finally(() => {
+                                setLoading(false);
+                              });
+                            }
+                          }}
+                        >
+                          Resend
+                        </IconButton>
+                        <IconButton
+                          icon={TrashIcon}
+                          disabled={
+                            !item.id || item.sendStatus === "SENT" || loading
+                          }
+                          onClick={() => {
+                            const removedItem = { ...fields }[index];
+                            remove(index);
+                            deleteRecipient(item)?.catch((err) => {
+                              append(removedItem);
+                            });
+                          }}
+                          className="group-hover:text-neon-dark group-hover:disabled:text-gray-400"
+                        />
+                      </div>
                     </div>
-                  </div>
-                  <div className="ml-auto flex mr-1">
-                    <IconButton
-                      icon={PaperAirplaneIcon}
-                      disabled={
-                        !item.id ||
-                        item.sendStatus !== "SENT" ||
-                        item.signingStatus === "SIGNED" ||
-                        loading
-                      }
-                      color="secondary"
-                      className="mr-4 h-9 my-auto"
-                      onClick={() => {
-                        if (confirm("Resend this signing request?")) {
-                          setLoading(true);
-                          sendSigningRequests(props.document, [
-                            item.id,
-                          ]).finally(() => {
-                            setLoading(false);
-                          });
-                        }
-                      }}
-                    >
-                      Resend
-                    </IconButton>
-                    <IconButton
-                      icon={TrashIcon}
-                      disabled={
-                        !item.id || item.sendStatus === "SENT" || loading
-                      }
-                      onClick={() => {
-                        const signersWithoutIndex = [...signers];
-                        const removedItem = signersWithoutIndex.splice(
-                          index,
-                          1
-                        );
-                        setSigners(signersWithoutIndex);
-                        deleteRecipient(item)?.catch((err) => {
-                          setSigners(signersWithoutIndex.concat(removedItem));
-                        });
-                      }}
-                      className="group-hover:text-neon-dark group-hover:disabled:text-gray-400"
-                    />
-                  </div>
-                </div>
-              </li>
-            ))}
-          </ul>
-          <Button
-            icon={UserPlusIcon}
-            className="mt-3"
-            onClick={() => {
-              createOrUpdateRecipient({
-                id: "",
-                email: "",
-                name: "",
-                documentId: props.document.id,
-              }).then((res) => {
-                setSigners(signers.concat(res));
-              });
-            }}
-          >
-            Add Signer
-          </Button>
+                  </li>
+                ))}
+              </ul>
+              <Button
+                icon={UserPlusIcon}
+                className="mt-3"
+                onClick={() => {
+                  createOrUpdateRecipient({
+                    id: "",
+                    email: "",
+                    name: "",
+                    documentId: props.document.id,
+                  }).then((res) => {
+                    append(res);
+                  });
+                }}
+              >
+                Add Signer
+              </Button>
+            </form>
+          </FormProvider>
         </div>
       </div>
       <Transition.Root show={open} as={Fragment}>
@@ -357,7 +408,7 @@ const RecipientsPage: NextPageWithLayout = (props: any) => {
                       <div className="mt-2">
                         <p className="text-sm text-gray-500">
                           {`"${props.document.title}" will be sent to ${
-                            signers.filter(
+                            formValues.filter(
                               (s: any) => s.email && s.sendStatus != "SENT"
                             ).length
                           } recipients.`}
