@@ -18,7 +18,11 @@ export const getDocument = async (
       userId: user.id,
     },
     include: {
-      Recipient: true,
+      Recipient: {
+        orderBy: {
+          id: "asc",
+        },
+      },
       Field: { include: { Recipient: true, Signature: true } },
     },
   });
