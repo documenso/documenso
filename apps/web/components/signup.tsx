@@ -14,12 +14,12 @@ type FormValues = {
 };
 
 export default function Signup(props: { source: string }) {
-  const methods = useForm<FormValues>({});
+  const form = useForm<FormValues>({});
   const {
     register,
     trigger,
     formState: { errors, isSubmitting },
-  } = methods;
+  } = form;
 
   const handleErrors = async (resp: Response) => {
     if (!resp.ok) {
@@ -52,7 +52,7 @@ export default function Signup(props: { source: string }) {
       )
       .catch((err) => {
         toast.dismiss();
-        methods.setError("apiError", { message: err.message });
+        form.setError("apiError", { message: err.message });
       });
   };
 
@@ -123,11 +123,11 @@ export default function Signup(props: { source: string }) {
           </div>
           {renderApiError()}
           {renderFormValidation()}
-          <FormProvider {...methods}>
+          <FormProvider {...form}>
             <form
-              onSubmit={methods.handleSubmit(signUp)}
+              onSubmit={form.handleSubmit(signUp)}
               onChange={() => {
-                methods.clearErrors();
+                form.clearErrors();
                 trigger();
               }}
               className="mt-8 space-y-6"
@@ -175,7 +175,7 @@ export default function Signup(props: { source: string }) {
               <Button
                 type="submit"
                 onClick={() => {
-                  methods.clearErrors();
+                  form.clearErrors();
                 }}
                 className="sgroup relative flex w-full"
               >
