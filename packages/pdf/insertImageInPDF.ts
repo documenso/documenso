@@ -12,7 +12,7 @@ export async function insertImageInPDF(
   const pages = pdfDoc.getPages();
   const pdfPage = pages[page];
   const pngImage = await pdfDoc.embedPng(image);
-  const drawSize = { width: 192, height: 96 };
+  const drawSize = { width: 192, height: 64 };
 
   pdfPage.drawImage(pngImage, {
     x: positionX,
