@@ -60,8 +60,7 @@ export default function PDFViewer(props) {
                 key={short.generate().toString()}
                 style={{
                   position: "relative",
-                  cursor:
-                    'url("https://place-hold.it/110x64/37f095/FFFFFF&text=Signature"), auto',
+                  ...props.style,
                 }}
                 className="mx-auto w-fit"
               >

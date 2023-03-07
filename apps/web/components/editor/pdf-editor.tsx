@@ -48,6 +48,9 @@ export default function PDFEditor(props: any) {
     <>
       <div>
         <PDFViewer
+          style={{
+            cursor: `url("https://place-hold.it/110x64/37f095/FFFFFF&text=${selectedFieldType}") 55 32, auto`,
+          }}
           readonly={false}
           document={props.document}
           fields={fields}
