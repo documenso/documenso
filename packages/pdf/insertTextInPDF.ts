@@ -24,10 +24,12 @@ export async function insertTextInPDF(
   const textSize = useHandwritingFont ? 50 : 15;
   const textWidth = customFont.widthOfTextAtSize(text, textSize);
   const textHeight = customFont.heightAtSize(textSize);
+  const fieldSize = { width: 192, height: 64 };
+  const invertedYPosition = pdfPage.getHeight() - positionY - fieldSize.height;
 
   pdfPage.drawText(text, {
     x: positionX,
-    y: pdfPage.getHeight() - positionY - textHeight / 2,
+    y: invertedYPosition,
     size: textSize,
     font: useHandwritingFont ? customFont : helveticaFont,
     color: rgb(0, 0, 0),
