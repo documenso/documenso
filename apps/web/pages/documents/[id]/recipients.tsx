@@ -117,7 +117,6 @@ const RecipientsPage: NextPageWithLayout = (props: any) => {
               color="primary"
               icon={PaperAirplaneIcon}
               onClick={() => {
-                setLoading(true);
                 setOpen(true);
               }}
               disabled={
@@ -361,12 +360,7 @@ const RecipientsPage: NextPageWithLayout = (props: any) => {
         </div>
       </div>
       <Transition.Root show={open} as={Fragment}>
-        <Dialog
-          as="div"
-          className="relative z-10"
-          initialFocus={cancelButtonRef}
-          onClose={setOpen}
-        >
+        <Dialog as="div" className="relative z-10" onClose={setOpen}>
           <Transition.Child
             as={Fragment}
             enter="ease-out duration-300"
@@ -417,16 +411,13 @@ const RecipientsPage: NextPageWithLayout = (props: any) => {
                     </div>
                   </div>
                   <div className="mt-5 sm:mt-6 sm:grid sm:grid-flow-row-dense sm:grid-cols-2 sm:gap-3">
-                    <Button
-                      color="secondary"
-                      onClick={() => setOpen(false)}
-                      ref={cancelButtonRef}
-                    >
+                    <Button color="secondary" onClick={() => setOpen(false)}>
                       Cancel
                     </Button>
                     <Button
                       onClick={() => {
                         setOpen(false);
+                        setLoading(true);
                         sendSigningRequests(props.document).finally(() => {
                           setLoading(false);
                         });

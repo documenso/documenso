@@ -43,26 +43,26 @@ export default function SignableField(props: FieldPropsType) {
           if (!field?.signature) props.onClick(props.field);
         }}
         ref={nodeRef}
-        className="cursor-pointer opacity-80 p-2 m-auto w-auto flex-row-reverse text-lg font-bold text-center absolute top-0 left-0 select-none hover:brightness-50"
+        className="cursor-pointer opacity-80 m-auto w-48 h-16 flex-row-reverse text-lg font-bold text-center absolute top-0 left-0 select-none hover:brightness-50"
         style={{
           background: stc(props.field.Recipient.email),
         }}
       >
-        <div
-          hidden={field?.signature}
-          className="m-auto w-auto flex-row-reverse font-medium text-center px-12 py-2"
-        >
+        <div hidden={field?.signature} className="font-medium my-4">
           {field.type === "SIGNATURE" ? "SIGN HERE" : ""}
         </div>
         <div
           hidden={!field?.signature}
           className="font-qwigley text-5xl m-auto w-auto flex-row-reverse font-medium text-center"
         >
-          {field?.signature?.type === "type"
-            ? field?.signature.typedSignature
-            : ""}
+          {field?.signature?.type === "type" ? (
+            <div className="my-4">{field?.signature.typedSignature}</div>
+          ) : (
+            ""
+          )}
+
           {field?.signature?.type === "draw" ? (
-            <img className="w-50 h-20" src={field?.signature?.signatureImage} />
+            <img className="w-48 h-16" src={field?.signature?.signatureImage} />
           ) : (
             ""
           )}
