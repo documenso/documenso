@@ -45,6 +45,8 @@ export default function PDFSigner(props: any) {
       return;
     }
 
+    if (!dialogResult) return;
+
     const signature = {
       fieldId: dialogField.id,
       type: dialogResult.type,
