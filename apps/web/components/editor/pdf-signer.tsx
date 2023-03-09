@@ -28,9 +28,9 @@ export default function PDFSigner(props: any) {
   const [signingDone, setSigningDone] = useState(false);
   const [localSignatures, setLocalSignatures] = useState<any[]>([]);
   const [fields, setFields] = useState<any[]>(props.fields);
-  const signatureFieldCount: number = fields.filter(
+  const signatureFields = fields.filter(
     (field) => field.type === FieldType.SIGNATURE
-  ).length;
+  );
   const [dialogField, setDialogField] = useState<any>();
 
   useEffect(() => {
@@ -114,7 +114,7 @@ export default function PDFSigner(props: any) {
           </div>
         </div>
       </div>
-      {signatureFieldCount === 0 ? (
+      {signatureFields.length === 0 ? (
         <div className="bg-yellow-50 p-4">
           <div className="flex">
             <div className="flex-shrink-0">
@@ -135,7 +135,7 @@ export default function PDFSigner(props: any) {
       <PDFViewer
         style={{
           cursor:
-            signatureFieldCount === 0
+            signatureFields === 0
               ? `url("https://place-hold.it/110x64/37f095/ffffff&text=Signature") 55 32, auto`
               : "",
         }}
@@ -145,8 +145,7 @@ export default function PDFSigner(props: any) {
         pdfUrl={`${NEXT_PUBLIC_WEBAPP_URL}/api/documents/${router.query.id}?token=${router.query.token}`}
         onClick={onClick}
         onMouseDown={function onMouseDown(e: any, page: number) {
-          if (signatureFieldCount === 0)
-            addFreeSignature(e, page, props.recipient);
+          if (signatureFields === 0) addFreeSignature(e, page, props.recipient);
         }}
         onMouseUp={() => {}}
         onDelete={onDeleteHandler}
@@ -156,9 +155,11 @@ export default function PDFSigner(props: any) {
 
   function checkIfSigningIsDone(): boolean {
     // Check if all fields are signed..
-    if (fields.length > 0) {
+    if (signatureFields.length > 0) {
       // If there are no fields to sign at least one signature is enough
-      return fields.every((field) => field.signature);
+      return fields
+        .filter((field) => field.type === FieldType.SIGNATURE)
+        .every((field) => field.signature);
     } else {
       return localSignatures.length > 0;
     }
