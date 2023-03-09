@@ -30,8 +30,6 @@ export default function Login() {
 
   // If not absolute URL, make it absolute
   if (!/^https?:\/\//.test(callbackUrl)) {
-    if (process.env.NODE_ENV !== "production") {
-    }
     callbackUrl = `${NEXT_PUBLIC_WEBAPP_URL}/${callbackUrl}`;
   }
 
@@ -58,12 +56,10 @@ export default function Login() {
       setErrorMessage("Error");
       toast.dismiss();
       toast.error("Something went wrong.");
-    }
-    else if (!res.error) {
+    } else if (!res.error) {
       // we're logged in, let's do a hard refresh to the original url
       router.push(callbackUrl);
-    }
-    else {
+    } else {
       toast.dismiss();
       if (res.status == 401) {
         toast.error("Invalid email or password.");
