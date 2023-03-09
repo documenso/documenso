@@ -26,7 +26,7 @@ export async function getUserFromToken(
   });
 
   if (!user) {
-    res.status(401).end();
+    if (res) res.status(401).end();
     return null;
   }
 
