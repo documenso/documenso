@@ -5,10 +5,8 @@ import SignableField from "./signable-field";
 import short from "short-uuid";
 
 export default function PDFViewer(props) {
-  const [file, setFile] = useState("");
   const [numPages, setNumPages] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [scrollPosition, setScrollPosition] = useState(0);
   const [pageHeight, setPageHeight] = useState(0);
 
   function onPositionChangedHandler(position, id) {
@@ -17,10 +15,6 @@ export default function PDFViewer(props) {
 
   function onDeleteHandler(id) {
     props.onDelete(id);
-  }
-
-  function onFileChange(event) {
-    setFile(event.target.files[0]);
   }
 
   function onDocumentLoadSuccess({ numPages: nextNumPages }) {
