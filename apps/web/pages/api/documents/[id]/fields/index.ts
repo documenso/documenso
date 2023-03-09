@@ -75,6 +75,7 @@ async function postHandler(req: NextApiRequest, res: NextApiResponse) {
       documentId: +documentId,
       type: body.type,
       page: +body.page,
+      inserted: false,
       positionX: +body.positionX,
       positionY: +body.positionY,
       customText: body.customText,

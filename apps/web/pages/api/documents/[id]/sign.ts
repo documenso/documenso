@@ -82,13 +82,26 @@ async function postHandler(req: NextApiRequest, res: NextApiResponse) {
     documentWithInserts = await insertTextInPDF(
       documentWithInserts,
       field.type === FieldType.DATE
-        ? new Date().toDateString()
+        ? new Intl.DateTimeFormat("en-US", {
+            month: "long",
+            day: "numeric",
+            year: "numeric",
+          }).format(new Date())
         : field.customText || "",
       field.positionX,
       field.positionY,
       field.page,
       false
     );
+
+    await prisma.field.update({
+      where: {
+        id: field.id,
+      },
+      data: {
+        inserted: true,
+      },
+    });
   }
 
   await prisma.document.update({
