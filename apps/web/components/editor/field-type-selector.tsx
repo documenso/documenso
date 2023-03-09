@@ -25,7 +25,7 @@ export default function FieldTypeSelector(props: any) {
       onChange={(e: any) => {
         setSelectedFieldType(e);
       }}
-      onMouseDown={(e) => {
+      onMouseDown={(e: any) => {
         if (e.button === 0) props.setAdding(true);
       }}
     >
