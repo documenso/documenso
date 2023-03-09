@@ -28,7 +28,14 @@ export default function SignatureDialog(props: any) {
   return (
     <>
       <Transition.Root show={props.open} as={Fragment}>
-        <Dialog as="div" className="relative z-10" onClose={props.setOpen}>
+        <Dialog
+          as="div"
+          className="relative z-10"
+          onClose={() => {
+            props.setOpen(false);
+            setCurrent(tabs[0]);
+          }}
+        >
           <Transition.Child
             as={Fragment}
             enter="ease-out duration-300"
@@ -105,6 +112,7 @@ export default function SignatureDialog(props: any) {
                             onClick={() => {
                               props.onClose();
                               props.setOpen(false);
+                              setCurrent(tabs[0]);
                             }}
                           >
                             Cancel
@@ -159,6 +167,7 @@ export default function SignatureDialog(props: any) {
                             onClick={() => {
                               props.onClose();
                               props.setOpen(false);
+                              setCurrent(tabs[0]);
                             }}
                           >
                             Cancel
@@ -191,11 +200,11 @@ export default function SignatureDialog(props: any) {
     </>
   );
 
-  function isCurrentTab(tabName: string): boolean {
+      function isCurrentTab(tabName: string): boolean {
     return currentTab.name === tabName;
   }
 
-  function setCurrent(t: any) {
+        function setCurrent(t: any) {
     tabs.forEach((tab) => {
       tab.current = tab.name === t.name;
     });
