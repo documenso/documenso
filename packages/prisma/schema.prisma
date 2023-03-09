@@ -116,6 +116,7 @@ model Field {
   positionX   Int        @default(0)
   positionY   Int        @default(0)
   customText  String
+  inserted    Boolean
   Document    Document   @relation(fields: [documentId], references: [id], onDelete: Cascade)
   Recipient   Recipient? @relation(fields: [recipientId], references: [id], onDelete: Cascade)
   Signature   Signature?
