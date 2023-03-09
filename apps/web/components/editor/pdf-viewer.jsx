@@ -46,10 +46,10 @@ export default function PDFViewer(props) {
             <Fragment key={short.generate().toString()}>
               <div
                 onMouseDown={(e) => {
-                  props.onMouseDown(e, index);
+                  if (e.button === 0) props.onMouseDown(e, index);
                 }}
                 onMouseUp={(e) => {
-                  props.onMouseUp(e, index);
+                  if (e.button === 0) props.onMouseUp(e, index);
                 }}
                 key={short.generate().toString()}
                 style={{

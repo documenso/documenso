@@ -67,7 +67,7 @@ export default function PDFEditor(props: any) {
             }
           }}
           onMouseDown={(e: any, page: number) => {
-            addField(e, page);
+            if (e.button === 0) addField(e, page);
           }}
         ></PDFViewer>
         <div
