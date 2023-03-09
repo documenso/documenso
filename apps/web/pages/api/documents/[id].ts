@@ -10,15 +10,32 @@ import { getDocument } from "@documenso/lib/query";
 import { addDigitalSignature } from "@documenso/signing/addDigitalSignature";
 
 async function getHandler(req: NextApiRequest, res: NextApiResponse) {
-  const user = await getUserFromToken(req, res);
   const { id: documentId } = req.query;
-
-  if (!user) return;
+  const { token: recipientToken } = req.query;
 
   if (!documentId) {
-    res.status(400).send("Missing parameter documentId.");
-    return;
+    return res.status(400).send("Missing parameter documentId.");
   }
+
+  let user = null;
+
+  if (recipientToken) {
+    // Request from signing page without login
+    const recipient = await prisma.recipient.findFirst({
+      where: {
+        token: recipientToken?.toString(),
+      },
+      include: {
+        Document: { include: { User: true } },
+      },
+    });
+    user = recipient?.Document.User;
+  } else {
+    // Request from editor with valid user login
+    user = await getUserFromToken(req, res);
+  }
+
+  if (!user) return res.status(401).end();
 
   const document: PrismaDocument = await getDocument(+documentId, req, res);
 
