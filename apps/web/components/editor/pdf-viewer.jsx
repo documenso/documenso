@@ -45,7 +45,7 @@ export default function PDFViewer(props) {
           {Array.from({ length: numPages }, (_, index) => (
             <Fragment key={short.generate().toString()}>
               <div
-                onMouseDown={(e) => {
+                onMouseDown={(e: any) => {
                   if (e.button === 0) props.onMouseDown(e, index);
                 }}
                 onMouseUp={(e) => {

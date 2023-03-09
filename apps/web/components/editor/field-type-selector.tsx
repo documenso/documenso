@@ -32,7 +32,7 @@ export default function FieldTypeSelector(props: any) {
       <div className="space-y-4">
         {fieldTypes.map((fieldType) => (
           <RadioGroup.Option
-            onMouseDown={(e) => {
+            onMouseDown={(e: any) => {
               if (e.button === 0) setSelectedFieldType(fieldType.id);
             }}
             key={fieldType.id}
