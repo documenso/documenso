@@ -12,18 +12,23 @@ export async function getUserFromToken(
   const tokenEmail = token?.email?.toString();
 
   if (!token) {
-    res.status(401).send("No token found for request.");
+    res.status(401).send("No session token found for request.");
     return null;
   }
 
   if (!tokenEmail) {
-    res.status(400).send("No email found in token.");
+    res.status(400).send("No email found in session token.");
     return null;
   }
 
   const user = await prisma.user.findFirst({
     where: { email: tokenEmail },
   });
+
+  if (!user) {
+    res.status(401).end();
+    return null;
+  }
 
   return user;
 }
