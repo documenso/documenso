@@ -83,7 +83,7 @@ export default function PDFViewer(props) {
                       ></SignableField>
                     ) : (
                       <EditableField
-                        hidden={item.Signature}
+                        hidden={item.Signature || item.inserted}
                         key={item.id}
                         field={item}
                         className="absolute"

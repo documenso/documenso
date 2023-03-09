@@ -135,7 +135,7 @@ export default function PDFSigner(props: any) {
       <PDFViewer
         style={{
           cursor:
-            signatureFields === 0
+            signatureFields.length === 0
               ? `url("https://place-hold.it/110x64/37f095/ffffff&text=Signature") 55 32, auto`
               : "",
         }}
@@ -145,7 +145,8 @@ export default function PDFSigner(props: any) {
         pdfUrl={`${NEXT_PUBLIC_WEBAPP_URL}/api/documents/${router.query.id}?token=${router.query.token}`}
         onClick={onClick}
         onMouseDown={function onMouseDown(e: any, page: number) {
-          if (signatureFields === 0) addFreeSignature(e, page, props.recipient);
+          if (signatureFields.length === 0)
+            addFreeSignature(e, page, props.recipient);
         }}
         onMouseUp={() => {}}
         onDelete={onDeleteHandler}
