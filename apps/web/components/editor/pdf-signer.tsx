@@ -5,7 +5,10 @@ import dynamic from "next/dynamic";
 import SignatureDialog from "./signature-dialog";
 import { useEffect, useState } from "react";
 import { Button } from "@documenso/ui";
-import { CheckBadgeIcon } from "@heroicons/react/24/outline";
+import {
+  CheckBadgeIcon,
+  InformationCircleIcon,
+} from "@heroicons/react/24/outline";
 import toast from "react-hot-toast";
 import { FieldType } from "@prisma/client";
 import {
@@ -25,6 +28,9 @@ export default function PDFSigner(props: any) {
   const [signingDone, setSigningDone] = useState(false);
   const [localSignatures, setLocalSignatures] = useState<any[]>([]);
   const [fields, setFields] = useState<any[]>(props.fields);
+  const signatureFieldCount: number = fields.filter(
+    (field) => field.type === FieldType.SIGNATURE
+  ).length;
   const [dialogField, setDialogField] = useState<any>();
 
   useEffect(() => {
@@ -75,46 +81,71 @@ export default function PDFSigner(props: any) {
       <div className="bg-neon p-4">
         <div className="flex">
           <div className="flex-shrink-0">
-            <Logo className="inline w-10"></Logo>
+            <Logo className="h-12 w-12 -mt-2.5"></Logo>
           </div>
-          <div className="ml-3 flex-1 md:flex md:justify-between">
+          <div className="ml-3 flex-1 md:flex md:justify-between text-center justify-start items-center">
             <p className="text-lg text-slate-700">
-              Timur Ercan (timur.ercan31@gmail.com) would like you to sign this
-              document.
+              {props.document.User.name
+                ? `${props.document.User.name} (${props.document.User.email})`
+                : props.document.User.email}{" "}
+              would like you to sign this document.
             </p>
-            <Button
-              disabled={!signingDone}
-              color="secondary"
-              icon={CheckBadgeIcon}
-              className="float-right"
-              onClick={() => {
-                signDocument(
-                  props.document,
-                  localSignatures,
-                  `${router.query.token}`
-                ).then(() => {
-                  router.push(
-                    `/documents/${props.document.id}/signed?token=${router.query.token}`
-                  );
-                });
-              }}
-            >
-              Done
-            </Button>
+            <p className="mt-3 text-sm md:mt-0 md:ml-6">
+              <Button
+                disabled={!signingDone}
+                color="secondary"
+                icon={CheckBadgeIcon}
+                className="float-right"
+                onClick={() => {
+                  signDocument(
+                    props.document,
+                    localSignatures,
+                    `${router.query.token}`
+                  ).then(() => {
+                    router.push(
+                      `/documents/${props.document.id}/signed?token=${router.query.token}`
+                    );
+                  });
+                }}
+              >
+                Done
+              </Button>
+            </p>
           </div>
         </div>
       </div>
+      {signatureFieldCount === 0 ? (
+        <div className="bg-yellow-50 p-4">
+          <div className="flex">
+            <div className="flex-shrink-0">
+              <InformationCircleIcon
+                className="h-5 w-5 text-yellow-400"
+                aria-hidden="true"
+              />
+            </div>
+            <div className="ml-3 flex-1 md:flex md:justify-between">
+              <p className="text-sm text-yellow-700">
+                You can sign this document anywhere you like, but maybe look for
+                a signature line.
+              </p>
+            </div>
+          </div>
+        </div>
+      ) : null}
       <PDFViewer
+        style={{
+          cursor:
+            signatureFieldCount === 0
+              ? `url("https://place-hold.it/110x64/37f095/ffffff&text=Signature") 55 32, auto`
+              : "",
+        }}
         readonly={true}
         document={props.document}
         fields={fields}
         pdfUrl={`${NEXT_PUBLIC_WEBAPP_URL}/api/documents/${router.query.id}?token=${router.query.token}`}
         onClick={onClick}
         onMouseDown={function onMouseDown(e: any, page: number) {
-          if (
-            fields.filter((field) => field.type === FieldType.SIGNATURE)
-              .length === 0
-          )
+          if (signatureFieldCount === 0)
             addFreeSignature(e, page, props.recipient);
         }}
         onMouseUp={() => {}}
