@@ -442,7 +442,13 @@ RecipientsPage.getLayout = function getLayout(page: ReactElement) {
 
 export async function getServerSideProps(context: any) {
   const user = await getUserFromToken(context.req, context.res);
-  if (!user) return;
+  if (!user)
+    return {
+      redirect: {
+        destination: "/login",
+        permanent: false,
+      },
+    };
 
   const { id: documentId } = context.query;
   const document: PrismaDocument = await getDocument(

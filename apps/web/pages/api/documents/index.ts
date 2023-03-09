@@ -45,7 +45,7 @@ async function postHandler(req: NextApiRequest, res: NextApiResponse) {
 }
 
 async function getHandler(req: NextApiRequest, res: NextApiResponse) {
-  let user = await getUserFromToken(req, res);
+  const user = await getUserFromToken(req, res);
   if (!user) return;
 
   const documents = await getDocumentsForUserFromToken({ req: req, res: res });
