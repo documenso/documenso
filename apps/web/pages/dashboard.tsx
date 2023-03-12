@@ -90,7 +90,7 @@ const DashboardPage: NextPageWithLayout = (props: any) => {
           onClick={() => {
             document?.getElementById("fileUploadHelper")?.click();
           }}
-          className="relative block w-full rounded-lg border-2 border-dashed border-gray-300 p-12 text-center hover:border-neon focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+          className="cursor-pointer relative block w-full rounded-lg border-2 border-dashed border-gray-300 p-12 text-center hover:border-neon focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
         >
           <svg
             className="mx-auto h-12 w-12 text-gray-400"
