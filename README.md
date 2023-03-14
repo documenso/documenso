@@ -27,7 +27,7 @@
 Signing documents digitally is fast, easy and should be best practice for every document signed worldwide. This is technically quite easy today, but it also introduces a new party to every signature: The signing tool providers. While this is not a problem in itself, it should make us think about how we want these providers of trust to work. Documenso aims to be the world's most trusted document signing tool. This trust is built by empowering you to self-host Documenso and review how it works under the hood. Join us in creating the next generation of open trust infrastructure.
 
 ## Community and Next Steps 🎯
-The current project goal is to <b>release a production ready version</b> for self-hosting as soon as possible. If you want to help making that happen you can:
+The current project goal is to <b>[release a production ready version](https://github.com/documenso/documenso/milestone/1)</b> for self-hosting as soon as possible. If you want to help making that happen you can:
 
 - Check out the first source code release in this repository
 - Tell us what you think in the current [Discussions](https://github.com/documenso/documenso/discussions)
