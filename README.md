@@ -1,3 +1,33 @@
+<p align="center">
+  <a href="https://github.com/documenso/documenso.com">
+   <img width="250px" src="https://user-images.githubusercontent.com/1309312/224986248-5b8a5cdc-2dc1-46b9-a354-985bb6808ee0.png" alt="Documenso Logo">
+  </a>
+
+  <h3 align="center">Open Source Signing Infrastructure</h3>
+
+  <p align="center">
+    The open-source DocuSign alternative.
+    <br />
+    <a href="https://documenso.com"><strong>Learn more »</strong></a>
+    <br />
+    <br />
+    <a href="https://join.slack.com/t/documenso/shared_invite/zt-1qwxxsvli-nDyojjt~wakhgBGl9JRl2w">Slack</a>
+    ·
+    <a href="https://documenso.com">Website</a>
+    ·
+    <a href="https://github.com/documenso/documenso/issues">Issues</a>
+    ·
+    <a href="https://github.com/documenso/documenso/milestones">Roadmap</a>
+  </p>
+</p>
+
+<p align="center">
+   <a href="https://join.slack.com/t/documenso/shared_invite/zt-1qwxxsvli-nDyojjt~wakhgBGl9JRl2w"><img src="https://img.shields.io/badge/Slack-documenso.slack.com-%234A154B" alt="Join Documenso on Slack"></a> 
+   <a href="https://github.com/documenso/documenso/stargazers"><img src="https://img.shields.io/github/stars/documenso/documenso" alt="Github Stars"></a>
+   <a href="https://github.com/documenso/documenso/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-AGPLv3-purple" alt="License"></a>
+   <a href="https://github.com/documenso/documensom/pulse"><img src="https://img.shields.io/github/commit-activity/m/documenso/documenso" alt="Commits-per-month"></a>
+</p>
+
 # Documenso - The DocuSign Open Source Alternative.
 
 <div>
