@@ -27,5 +27,5 @@ You can build the project with:
 ```bash
 npm run build
 ```
-> **NOTE**
+> **Note**
 > Please be sure that you can make a full production build before pushing code or creating PRs.
