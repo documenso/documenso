@@ -6,7 +6,7 @@
   <h3 align="center">Open Source Signing Infrastructure</h3>
 
   <p align="center">
-    The open-source DocuSign alternative.
+    The DocuSign Open Source Alternative.
     <br />
     <a href="https://documenso.com"><strong>Learn more »</strong></a>
     <br />
