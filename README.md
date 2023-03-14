@@ -37,7 +37,7 @@ The current project goal is to <b>release a production ready version</b> for sel
 - Fix or create [issues](https://github.com/documenso/documenso/issues), that are needed for the first production release
 
 ## Contributing
-- To contribute please see our [contribution guide](https://github.com/documenso/documenso/blob/main/CONTRIBUTING.md)
+- To contribute please see our [contribution guide](https://github.com/documenso/documenso/blob/main/CONTRIBUTING.md).
 
 ## Tools
 
