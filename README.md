@@ -78,11 +78,6 @@ Follow these steps to setup documenso on you local machnine:
      ```sh
    git clone https://github.com/documenso/documenso
    ```
-- Create a new branch (include the issue id and somthing readable):
-
-   ```sh
-   git checkout -b doc-999-my-feature-or-fix
-   ```
 - Run <code>npm i</code> in root directory
 - Rename .env.example to .env
 - Set DATABASE_URL value in .env file
