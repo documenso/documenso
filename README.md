@@ -28,7 +28,7 @@
    <a href="https://github.com/documenso/documensom/pulse"><img src="https://img.shields.io/github/commit-activity/m/documenso/documenso" alt="Commits-per-month"></a>
 </p>
 
-# Documenso - The DocuSign Open Source Alternative.
+# Documenso 0.9 - Developer Preview
 
 <div>
   <img style="display: block; height: 120px; width: 24%"
