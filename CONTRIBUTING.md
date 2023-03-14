@@ -1,0 +1,2 @@
+- Select and issue from [here](https://github.com/documenso/documenso/issues) or create a new one
+- Consider the results from the discussion in the issue

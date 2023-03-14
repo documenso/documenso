@@ -26,16 +26,18 @@
 
 Signing documents digitally is fast, easy and should be best practice for every document signed worldwide. This is technically quite easy today, but it also introduces a new party to every signature: The signing tool providers. While this is not a problem in itself, it should make us think about how we want these providers of trust to work. Documenso aims to be the world's most trusted document signing tool. This trust is built by empowering you to self-host Documenso and review how it works under the hood. Join us in creating the next generation of open trust infrastructure.
 
-## Community
-
-If you want to be part of Documenso you can:
+## Community and Next Steps 🎯
+The current project goal is to <b>release a production ready version</b> for self-hosting as soon as possible. If you want to help making that happen you can:
 
 - Check out the first source code release in this repository
 - Tell us what you think in the current [Discussions](https://github.com/documenso/documenso/discussions)
 - Join the [Slack Channel](https://join.slack.com/t/documenso/shared_invite/zt-1qwxxsvli-nDyojjt~wakhgBGl9JRl2w) for any questions and getting to know to other community members
 - ⭐ the repository to help us raise awareness
-- Fix or create [issues](https://github.com/documenso/documenso/issues), that are needed for the first production release
 - Spread the word on Twitter, that Documenso is working towards a more open signing tool
+- Fix or create [issues](https://github.com/documenso/documenso/issues), that are needed for the first production release
+
+## Contributing
+- To contribute please see our [contribution guide](https://github.com/documenso/documenso/blob/main/CONTRIBUTING.md)
 
 ## Tools
 
@@ -72,7 +74,15 @@ To run Documenso locally you need
 
 Follow these steps to setup documenso on you local machnine:
 
-- Clone the repo: git clone https://github.com/documenso/documenso
+- [Clone the repository](https://help.github.com/articles/cloning-a-repository/) it to your local device.
+     ```sh
+   git clone https://github.com/documenso/documenso
+   ```
+- Create a new branch (include the issue id and somthing readable):
+
+   ```sh
+   git checkout -b doc-999-my-feature-or-fix
+   ```
 - Run <code>npm i</code> in root directory
 - Rename .env.example to .env
 - Set DATABASE_URL value in .env file
