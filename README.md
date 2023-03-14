@@ -95,6 +95,14 @@ Follow these steps to setup documenso on you local machnine:
   - A demo certificate is provided in /app/web/ressources/certificate.p12
   - To generate you own using these steps and a linux Terminal or Windows Linux Subsystem see **Create your own signging certificate**.
 
+## Updating
+- If you pull the newest version from main, using <code>git pull</code>, it may be neccessary to regenerate your database client
+- You can do this by running the generate command in /packages/prisma:
+   ```sh
+   npx prisma generate
+   ```
+- This is not neccessary on first clone
+
 # Creating your own signging certificate
 
 For the digital signature of you documents you need a signign certificate in .p12 formate (public and private key). You can buy one (not recommended for dev) or use the steps to create a self-signed one:
