@@ -59,7 +59,7 @@ Signing documents digitally is fast, easy and should be best practice for every 
 ## Community and Next Steps 🎯
 The current project goal is to <b>[release a production ready version](https://github.com/documenso/documenso/milestone/1)</b> for self-hosting as soon as possible. If you want to help making that happen you can:
 
-- Check out the first source code release in this repository
+- Check out the first source code release in this repository and test it
 - Tell us what you think in the current [Discussions](https://github.com/documenso/documenso/discussions)
 - Join the [Slack Channel](https://join.slack.com/t/documenso/shared_invite/zt-1qwxxsvli-nDyojjt~wakhgBGl9JRl2w) for any questions and getting to know to other community members
 - ⭐ the repository to help us raise awareness
