@@ -143,7 +143,8 @@ For the digital signature of you documents you need a signign certificate in .p1
 2. Generate a self-signed certificate using the private key. You can run the following command to generate a self-signed certificate:\
    <code>openssl req -new -x509 -key private.key -out certificate.crt -days 365</code> \
    This will prompt you to enter some information, such as the Common Name (CN) for the certificate. Make sure you enter the correct information. The -days parameter sets the number of days for which the certificate is valid.
-3. Combine the private key and the self-signed certificate to create the p12 certificate. You can run the following command to do this: \ <code>openssl pkcs12 -export -out certificate.p12 -inkey private.key -in certificate.crt</code>
+3. Combine the private key and the self-signed certificate to create the p12 certificate. You can run the following command to do this: \
+<code>openssl pkcs12 -export -out certificate.p12 -inkey private.key -in certificate.crt</code>
 4. You will be prompted to enter a password for the p12 file. Choose a strong password and remember it, as you will need it to use the certificate (**can be empty for dev certificates**)
 5. Place the certificate <code>/apps/web/ressource/certificate.p12</code>
 
