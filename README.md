@@ -1,4 +1,4 @@
-<p align="center">
+<p align="center" style="margin-top: 12px">
   <a href="https://github.com/documenso/documenso.com">
    <img width="250px" src="https://user-images.githubusercontent.com/1309312/224986248-5b8a5cdc-2dc1-46b9-a354-985bb6808ee0.png" alt="Documenso Logo">
   </a>
