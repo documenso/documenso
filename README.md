@@ -73,6 +73,7 @@ The current project goal is to <b>[release a production ready version](https://g
 
 - This repos uses 📝 https://gitmoji.dev/ for more expressive commit messages.
 - Use 🧹 for quality of code (eg remove comments, debug output, remove unused code)
+- This is of course optional, but quite efficient if you use an IDE plugin
 
 # Tech
 
