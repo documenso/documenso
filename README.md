@@ -25,7 +25,7 @@
    <a href="https://join.slack.com/t/documenso/shared_invite/zt-1qwxxsvli-nDyojjt~wakhgBGl9JRl2w"><img src="https://img.shields.io/badge/Slack-documenso.slack.com-%234A154B" alt="Join Documenso on Slack"></a> 
    <a href="https://github.com/documenso/documenso/stargazers"><img src="https://img.shields.io/github/stars/documenso/documenso" alt="Github Stars"></a>
    <a href="https://github.com/documenso/documenso/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-AGPLv3-purple" alt="License"></a>
-   <a href="https://github.com/documenso/documensom/pulse"><img src="https://img.shields.io/github/commit-activity/m/documenso/documenso" alt="Commits-per-month"></a>
+   <a href="https://github.com/documenso/documenso/pulse"><img src="https://img.shields.io/github/commit-activity/m/documenso/documenso" alt="Commits-per-month"></a>
 </p>
 
 # Documenso 0.9 - Developer Preview
@@ -70,10 +70,6 @@ The current project goal is to <b>[release a production ready version](https://g
 - To contribute please see our [contribution guide](https://github.com/documenso/documenso/blob/main/CONTRIBUTING.md).
 
 ## Tools
-
-- This repos uses 📝 https://gitmoji.dev/ for more expressive commit messages.
-- Use 🧹 for quality of code (eg remove comments, debug output, remove unused code)
-- This is of course optional, but quite efficient if you use an IDE plugin
 
 # Tech
 
