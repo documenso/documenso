@@ -57,11 +57,13 @@ async function getHandler(req: NextApiRequest, res: NextApiResponse) {
     },
   });
 
-  let signedDocumentAsBase64 = document.document;
+  let signedDocumentAsBase64 = document?.document || "";
 
   // No need to add a signature, if no one signed yet.
   if (signaturesCount > 0) {
-    signedDocumentAsBase64 = await addDigitalSignature(document.document);
+    signedDocumentAsBase64 = await addDigitalSignature(
+      document?.document || ""
+    );
   }
 
   const buffer: Buffer = Buffer.from(signedDocumentAsBase64, "base64");
@@ -69,7 +71,7 @@ async function getHandler(req: NextApiRequest, res: NextApiResponse) {
   res.setHeader("Content-Length", buffer.length);
   res.setHeader(
     "Content-Disposition",
-    `attachment; filename=${document.title}`
+    `attachment; filename=${document?.title}`
   );
 
   return res.status(200).send(buffer);
