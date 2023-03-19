@@ -119,7 +119,7 @@ export default function Setttings() {
               action="#"
               method="POST"
               hidden={
-                subNavigation.filter((e) => e.current)[0].name !==
+                subNavigation.filter((e) => e.current)[0]?.name !==
                 subNavigation[0].name
               }
             >
@@ -176,7 +176,7 @@ export default function Setttings() {
             </form>
             <div
               hidden={
-                subNavigation.filter((e) => e.current)[0].name !==
+                subNavigation.filter((e) => e.current)[0]?.name !==
                 subNavigation[1].name
               }
               className="divide-y divide-gray-200 lg:col-span-9 min-h-[251px]"
