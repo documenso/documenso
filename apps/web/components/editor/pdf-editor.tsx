@@ -17,7 +17,9 @@ export default function PDFEditor(props: any) {
   const [fields, setFields] = useState<any[]>(props.document.Field);
   const [selectedRecipient, setSelectedRecipient]: any = useState();
   const [selectedFieldType, setSelectedFieldType] = useState();
-  const noRecipients = props?.document.Recipient.length === 0;
+  const noRecipients =
+    props?.document.Recipient.length === 0 ||
+    props?.document.Recipient.every((e: any) => !e.email);
   const [adding, setAdding] = useState(false);
 
   function onPositionChangedHandler(position: any, id: any) {
@@ -84,6 +86,7 @@ export default function PDFEditor(props: any) {
             selectedRecipient={selectedRecipient}
             onChange={setSelectedFieldType}
           />
+          {fields.length}
         </div>
       </div>
     </>
