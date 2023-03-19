@@ -12,7 +12,7 @@ export async function getUserFromToken(
   const tokenEmail = token?.email?.toString();
 
   if (!token) {
-    if (res) res.status(401).send("No session token found for request.");
+    if (res.status) res.status(401).send("No session token found for request.");
     return null;
   }
 
