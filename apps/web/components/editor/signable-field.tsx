@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import Draggable from "react-draggable";
 import { IconButton } from "@documenso/ui";
 import { XCircleIcon } from "@heroicons/react/20/solid";
+import { classNames } from "@documenso/lib";
 const stc = require("string-to-color");
 
 type FieldPropsType = {
@@ -43,13 +44,19 @@ export default function SignableField(props: FieldPropsType) {
           if (!field?.signature) props.onClick(props.field);
         }}
         ref={nodeRef}
-        className="cursor-pointer opacity-80 m-auto w-48 h-16 flex-row-reverse text-lg font-bold text-center absolute top-0 left-0 select-none hover:brightness-50"
+        className={classNames(
+          "opacity-80 m-auto w-48 h-16 flex-row-reverse text-lg font-bold text-center absolute top-0 left-0 select-none",
+          field.type === "SIGNATURE"
+            ? "cursor-pointer hover:brightness-50"
+            : "cursor-not-allowed"
+        )}
         style={{
           background: stc(props.field.Recipient.email),
         }}
       >
         <div hidden={field?.signature} className="font-medium my-4">
           {field.type === "SIGNATURE" ? "SIGN HERE" : ""}
+          {field.type === "DATE" ? <small>Date (filled on sign)</small> : ""}
         </div>
         <div
           hidden={!field?.signature}
