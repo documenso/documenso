@@ -70,6 +70,8 @@ async function postHandler(req: NextApiRequest, res: NextApiResponse) {
     },
   });
 
+  // Don't check for inserted, because currently no "sign again" scenarios exist and
+  // this is probably the expected behaviour in unclean states.
   const nonSignatureFields = await prisma.field.findMany({
     where: {
       documentId: document.id,
