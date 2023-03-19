@@ -18,10 +18,10 @@ async function getHandler(req: NextApiRequest, res: NextApiResponse) {
   }
 
   let user = null;
-
+  let recipient = null;
   if (recipientToken) {
     // Request from signing page without login
-    const recipient = await prisma.recipient.findFirst({
+    recipient = await prisma.recipient.findFirst({
       where: {
         token: recipientToken?.toString(),
       },
@@ -37,7 +37,14 @@ async function getHandler(req: NextApiRequest, res: NextApiResponse) {
 
   if (!user) return res.status(401).end();
 
-  const document: PrismaDocument = await getDocument(+documentId, req, res);
+  let document: PrismaDocument | null = null;
+  if (recipientToken) {
+    document = await prisma.document.findFirst({
+      where: { id: recipient?.Document?.id },
+    });
+  } else {
+    document = await getDocument(+documentId, req, res);
+  }
 
   if (!document)
     res.status(404).end(`No document with id ${documentId} found.`);
@@ -45,7 +52,7 @@ async function getHandler(req: NextApiRequest, res: NextApiResponse) {
   const signaturesCount = await prisma.signature.count({
     where: {
       Field: {
-        documentId: document.id,
+        documentId: document?.id,
       },
     },
   });
