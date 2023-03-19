@@ -15,6 +15,15 @@ export default function SignupPage(props: { source: string }) {
 
 export async function getServerSideProps(context: any) {
   const signupSource: string = context.query["source"];
+
+  if (process.env.ALLOW_SIGNUP === "false")
+    return {
+      redirect: {
+        destination: "/login",
+        permanent: false,
+      },
+    };
+
   return {
     props: {
       source: signupSource ? signupSource : "",
