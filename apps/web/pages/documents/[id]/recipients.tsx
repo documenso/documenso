@@ -16,7 +16,7 @@ import {
 } from "@heroicons/react/24/outline";
 import { getUserFromToken } from "@documenso/lib/server";
 import { getDocument } from "@documenso/lib/query";
-import { Document as PrismaDocument } from "@prisma/client";
+import { Document as PrismaDocument, DocumentStatus } from "@prisma/client";
 import { Breadcrumb, Button, IconButton } from "@documenso/ui";
 import { Dialog, Transition } from "@headlessui/react";
 import {
@@ -97,20 +97,25 @@ const RecipientsPage: NextPageWithLayout = (props: any) => {
           </div>
           <div className="mt-4 flex flex-shrink-0 md:mt-0 md:ml-4">
             <Button
-              icon={PencilSquareIcon}
-              color="secondary"
-              className="mr-2"
-              href={breadcrumbItems[1].href}
-            >
-              Edit Document
-            </Button>
-            <Button
               icon={ArrowDownTrayIcon}
               color="secondary"
               className="mr-2"
               href={"/api/documents/" + props.document.id}
             >
               Download
+            </Button>
+            <Button
+              icon={PencilSquareIcon}
+              disabled={props.document.status === DocumentStatus.COMPLETED}
+              color={
+                props.document.status === DocumentStatus.COMPLETED
+                  ? "primary"
+                  : "secondary"
+              }
+              className="mr-2"
+              href={breadcrumbItems[1].href}
+            >
+              Edit Document
             </Button>
             <Button
               className="min-w-[125px]"
