@@ -69,7 +69,7 @@ export default function PDFSigner(props: any) {
     );
     const signedField = { ...dialogField };
     signedField.signature = signature;
-    setFields(fields.concat(signedField));
+    setFields((prevState) => [...prevState, signedField]);
     setOpen(false);
     setDialogField(null);
   }
@@ -174,7 +174,7 @@ export default function PDFSigner(props: any) {
     );
 
     createOrUpdateField(props.document, freeSignatureField).then((res) => {
-      setFields(fields.concat(res));
+      setFields((prevState) => [...prevState, res]);
       setDialogField(res);
       setOpen(true);
     });

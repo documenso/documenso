@@ -96,7 +96,7 @@ export default function PDFEditor(props: any) {
     );
 
     createOrUpdateField(props?.document, signatureField).then((res) => {
-      setFields(fields.concat(res));
+      setFields((prevState) => [...prevState, res]);
     });
   }
 }
