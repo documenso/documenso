@@ -86,7 +86,6 @@ export default function PDFEditor(props: any) {
             selectedRecipient={selectedRecipient}
             onChange={setSelectedFieldType}
           />
-          {fields.length}
         </div>
       </div>
     </>
