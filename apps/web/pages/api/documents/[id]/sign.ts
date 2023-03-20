@@ -1,8 +1,4 @@
-import {
-  defaultHandler,
-  defaultResponder,
-  getUserFromToken,
-} from "@documenso/lib/server";
+import { defaultHandler, defaultResponder } from "@documenso/lib/server";
 import prisma from "@documenso/prisma";
 import { NextApiRequest, NextApiResponse } from "next";
 import { SigningStatus, DocumentStatus } from "@prisma/client";
@@ -12,7 +8,6 @@ import { insertImageInPDF, insertTextInPDF } from "@documenso/pdf";
 import { sendSigningDoneMail } from "@documenso/lib/mail";
 
 async function postHandler(req: NextApiRequest, res: NextApiResponse) {
-  const existingUser = await getUserFromToken(req, res);
   const { token: recipientToken } = req.query;
   const { signatures: signaturesFromBody }: { signatures: any[] } = req.body;
 
@@ -29,11 +24,19 @@ async function postHandler(req: NextApiRequest, res: NextApiResponse) {
     return res.status(401).send("Recipient not found.");
   }
 
-  const document: PrismaDocument = await getDocument(
-    recipient.documentId,
-    req,
-    res
-  );
+  const document: PrismaDocument = await prisma.document.findFirstOrThrow({
+    where: {
+      id: recipient.documentId,
+    },
+    include: {
+      Recipient: {
+        orderBy: {
+          id: "asc",
+        },
+      },
+      Field: { include: { Recipient: true, Signature: true } },
+    },
+  });
 
   if (!document) res.status(404).end(`No document found.`);
 
