@@ -36,8 +36,10 @@ async function getHandler(req: NextApiRequest, res: NextApiResponse) {
 }
 
 async function postHandler(req: NextApiRequest, res: NextApiResponse) {
-  const user = await getUserFromToken(req, res);
-  const { id: documentId } = req.query;
+  const { token: recipientToken } = req.query;
+  let user = null;
+  if (!recipientToken) user = await getUserFromToken(req, res);
+  if (!user && !recipientToken) return res.status(401).end();
   const body: {
     id: number;
     type: FieldType;
@@ -48,18 +50,30 @@ async function postHandler(req: NextApiRequest, res: NextApiResponse) {
     customText: string;
   } = req.body;
 
-  if (!user) return;
-
+  const { id: documentId } = req.query;
   if (!documentId) {
-    res.status(400).send("Missing parameter documentId.");
-    return;
+    return res.status(400).send("Missing parameter documentId.");
   }
 
-  const document: PrismaDocument = await getDocument(+documentId, req, res);
+  if (recipientToken) {
+    const recipient = await prisma.recipient.findFirst({
+      where: { token: recipientToken?.toString() },
+    });
 
-  // todo entity ownerships checks
-  if (document.userId !== user.id) {
-    return res.status(401).send("User does not have access to this document.");
+    if (!recipient || recipient?.documentId !== +documentId)
+      return res
+        .status(401)
+        .send("Recipient does not have access to this document.");
+  }
+
+  if (user) {
+    const document: PrismaDocument = await getDocument(+documentId, req, res);
+    // todo entity ownerships checks
+    if (document.userId !== user.id) {
+      return res
+        .status(401)
+        .send("User does not have access to this document.");
+    }
   }
 
   const field = await prisma.field.upsert({
