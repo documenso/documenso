@@ -159,7 +159,17 @@ export default function Login(props: any) {
                     Create a new Account
                   </Link>
                 </p>
-              ) : null}
+              ) : (
+                <p className="mt-2 text-center text-sm text-gray-600">
+                  Like Documenso{" "}
+                  <Link
+                    href="https://documenso.com"
+                    className="font-medium text-neon hover:text-neon"
+                  >
+                    Hosted Documenso will be availible soon™
+                  </Link>
+                </p>
+              )}
             </form>
           </FormProvider>
         </div>
