@@ -173,7 +173,11 @@ export default function PDFSigner(props: any) {
       FieldType.FREE_SIGNATURE
     );
 
-    createOrUpdateField(props.document, freeSignatureField).then((res) => {
+    createOrUpdateField(
+      props.document,
+      freeSignatureField,
+      recipient.token
+    ).then((res) => {
       setFields(fields.concat(res));
       setDialogField(res);
       setOpen(true);
