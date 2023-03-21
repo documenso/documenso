@@ -78,7 +78,6 @@ async function postHandler(req: NextApiRequest, res: NextApiResponse) {
   const nonSignatureFields = await prisma.field.findMany({
     where: {
       documentId: document.id,
-      inserted: false,
       type: { in: [FieldType.DATE, FieldType.TEXT] },
     },
   });
