@@ -101,7 +101,7 @@ export default function TopNavigation() {
   return (
     <>
       <Disclosure as="nav" className="border-b border-gray-200 bg-white">
-        {({ open }) => (
+        {({ open, close }) => (
           <>
             <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
               <div className="flex h-16 justify-between">
@@ -217,6 +217,9 @@ export default function TopNavigation() {
                       "block pl-3 pr-4 py-2 border-l-4 text-base font-medium"
                     )}
                     aria-current={item.current ? "page" : undefined}
+                    onClick={() => {
+                      close();
+                    }}
                   >
                     {item.name}
                   </Link>
