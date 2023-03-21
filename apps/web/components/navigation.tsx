@@ -34,7 +34,7 @@ const navigation = [
   },
   {
     name: "Settings",
-    href: "/settings",
+    href: "/settings/profile",
     current: true,
     icon: WrenchIcon,
   },
@@ -151,10 +151,7 @@ export default function TopNavigation() {
                         <div
                           key={user?.email}
                           dangerouslySetInnerHTML={{
-                            __html: avatarFromInitials(
-                              user?.name || "" || "",
-                              40
-                            ),
+                            __html: avatarFromInitials(user?.name || "" || "", 40),
                           }}
                         />
                       </Menu.Button>
@@ -236,12 +233,8 @@ export default function TopNavigation() {
                     />
                   </div>
                   <div className="ml-3">
-                    <div className="text-base font-medium text-gray-800">
-                      {user?.name || ""}
-                    </div>
-                    <div className="text-sm font-medium text-gray-500">
-                      {user?.email}
-                    </div>
+                    <div className="text-base font-medium text-gray-800">{user?.name || ""}</div>
+                    <div className="text-sm font-medium text-gray-500">{user?.email}</div>
                   </div>
                 </div>
                 <div className="mt-3 space-y-1">
