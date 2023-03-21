@@ -6,7 +6,7 @@ import { Button, IconButton } from "@documenso/ui";
 import Link from "next/link";
 import { useRouter } from "next/router";
 
-const SignPage: NextPageWithLayout = (props: any) => {
+const Signed: NextPageWithLayout = (props: any) => {
   const router = useRouter();
   const allRecipientsSigned = props.document.Recipient?.every(
     (r: any) => r.signingStatus === "SIGNED"
@@ -47,7 +47,12 @@ const SignPage: NextPageWithLayout = (props: any) => {
             onClick={(event: any) => {
               event.preventDefault();
               event.stopPropagation();
-              router.push("/api/documents/" + props.document.id);
+              router.push(
+                "/api/documents/" +
+                  props.document.id +
+                  "?token=" +
+                  props.recipient.token
+              );
             }}
           >
             Download "{props.document.title}"
@@ -103,8 +108,9 @@ export async function getServerSideProps(context: any) {
     props: {
       document: JSON.parse(JSON.stringify(recipient.Document)),
       fields: JSON.parse(JSON.stringify(fields)),
+      recipient: JSON.parse(JSON.stringify(recipient)),
     },
   };
 }
 
-export default SignPage;
+export default Signed;

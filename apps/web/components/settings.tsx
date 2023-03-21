@@ -115,9 +115,13 @@ export default function Setttings() {
             </aside>
 
             <form
-              className="divide-y divide-gray-200 lg:col-span-9"
+              className="divide-y divide-gray-200 lg:col-span-9 min-h-[251px]"
               action="#"
               method="POST"
+              hidden={
+                subNavigation.filter((e) => e.current)[0]?.name !==
+                subNavigation[0].name
+              }
             >
               {/* Profile section */}
               <div className="py-6 px-4 sm:p-6 lg:pb-8">
@@ -170,6 +174,26 @@ export default function Setttings() {
                 <Button onClick={() => updateUser(user)}>Save</Button>
               </div>
             </form>
+            <div
+              hidden={
+                subNavigation.filter((e) => e.current)[0]?.name !==
+                subNavigation[1].name
+              }
+              className="divide-y divide-gray-200 lg:col-span-9 min-h-[251px]"
+            >
+              {/* Passwords section */}
+              <div className="py-6 px-4 sm:p-6 lg:pb-8">
+                <div>
+                  <h2 className="text-lg font-medium leading-6 text-gray-900">
+                    Password
+                  </h2>
+                  <p className="mt-1 text-sm text-gray-500">
+                    Forgot your passwort? Email <b>hi@documenso.com</b> to reset
+                    it.
+                  </p>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>

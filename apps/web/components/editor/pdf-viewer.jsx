@@ -3,6 +3,7 @@ import { Document, Page } from "react-pdf/dist/esm/entry.webpack5";
 import EditableField from "./editable-field";
 import SignableField from "./signable-field";
 import short from "short-uuid";
+import { FieldType } from "@prisma/client";
 
 export default function PDFViewer(props) {
   const [numPages, setNumPages] = useState(null);
@@ -71,21 +72,25 @@ export default function PDFViewer(props) {
                   onRenderError={() => setLoading(false)}
                 ></Page>
                 {props?.fields
-                  .filter((item) => item.page === index)
-                  .map((item) =>
+                  .filter((field) => field.page === index)
+                  .map((field) =>
                     props.readonly ? (
                       <SignableField
                         onClick={props.onClick}
-                        key={item.id}
-                        field={item}
+                        key={field.id}
+                        field={field}
                         className="absolute"
                         onDelete={onDeleteHandler}
                       ></SignableField>
                     ) : (
                       <EditableField
-                        hidden={item.Signature || item.inserted}
-                        key={item.id}
-                        field={item}
+                        hidden={
+                          field.Signature ||
+                          field.inserted ||
+                          field.type === FieldType.FREE_SIGNATURE
+                        }
+                        key={field.id}
+                        field={field}
                         className="absolute"
                         onPositionChanged={onPositionChangedHandler}
                         onDelete={onDeleteHandler}
