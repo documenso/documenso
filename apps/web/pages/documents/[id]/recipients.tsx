@@ -415,7 +415,7 @@ const RecipientsPage: NextPageWithLayout = (props: any) => {
                       </div>
                     </div>
                   </div>
-                  <div className="flex justify-end gap-3 mt-5 sm:mt-6 sm:grid sm:grid-flow-row-dense sm:grid-cols-2 sm:flex-none sm:jus">
+                  <div className="flex justify-end gap-3 mt-5 sm:mt-6 sm:grid sm:grid-flow-row-dense sm:grid-cols-2 sm:flex-none ">
                     <Button color="secondary" onClick={() => setOpen(false)}>
                       Cancel
                     </Button>
