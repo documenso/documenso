@@ -85,17 +85,17 @@ const RecipientsPage: NextPageWithLayout = (props: any) => {
       <Head>
         <title>{title}</title>
       </Head>
-      <div className="mt-10">
+      <div className="px-6 mt-10 sm:px-0">
         <div>
           <Breadcrumb document={props.document} items={breadcrumbItems} />
         </div>
         <div className="mt-2 md:flex md:items-center md:justify-between">
-          <div className="min-w-0 flex-1">
+          <div className="flex-1 min-w-0">
             <h2 className="text-2xl font-bold leading-7 text-gray-900 sm:truncate sm:text-3xl sm:tracking-tight">
               {props.document.title}
             </h2>
           </div>
-          <div className="mt-4 flex flex-shrink-0 md:mt-0 md:ml-4">
+          <div className="flex flex-shrink-0 mt-4 md:mt-0 md:ml-4">
             <Button
               icon={PencilSquareIcon}
               color="secondary"
@@ -132,12 +132,12 @@ const RecipientsPage: NextPageWithLayout = (props: any) => {
             </Button>
           </div>
         </div>
-        <div className="overflow-hidden rounded-md bg-white shadow mt-10 p-6">
-          <div className="border-b border-gray-200 pb-5">
-            <h3 className="text-lg font-medium leading-6 text-gray-900">
+        <div className="p-4 mt-10 overflow-hidden bg-white rounded-md shadow sm:p-6">
+          <div className="pb-3 border-b border-gray-200 sm:pb-5">
+            <h3 className="text-base font-medium leading-4 text-gray-900 sm:leading-6 sm:text-lg">
               Signers
             </h3>
-            <p className="mt-2 max-w-4xl text-sm text-gray-500">
+            <p className="max-w-4xl mt-2 text-sm text-gray-500">
               The people who will sign the document.
             </p>
           </div>
@@ -151,12 +151,15 @@ const RecipientsPage: NextPageWithLayout = (props: any) => {
                 {fields.map((item: any, index: number) => (
                   <li
                     key={index}
-                    className="px-0 py-4 w-full hover:bg-green-50 border-0 group"
+                    className="w-full px-2 py-3 border-0 hover:bg-green-50 group sm:py-4"
                   >
-                    <div id="container" className="flex w-full">
+                    <div
+                      id="container"
+                      className="block w-full space-y-2 sm:space-x-2 sm:space-y-0 sm:flex"
+                    >
                       <div
                         className={classNames(
-                          "ml-3 w-[250px] rounded-md border border-gray-300 px-3 py-2 shadow-sm focus-within:border-neon focus-within:ring-1 focus-within:ring-neon",
+                          "sm:w-[250px] rounded-md border border-gray-300 px-3 py-2 shadow-sm focus-within:border-neon focus-within:ring-1 focus-within:ring-neon",
                           item.sendStatus === "SENT" ? "bg-gray-100" : ""
                         )}
                       >
@@ -188,7 +191,7 @@ const RecipientsPage: NextPageWithLayout = (props: any) => {
                                   documentId: props.document.id,
                                 });
                           }}
-                          className="block w-full border-0 p-0 text-gray-900 placeholder-gray-500 sm:text-sm outline-none bg-inherit"
+                          className="block w-full p-0 text-gray-900 placeholder-gray-500 border-0 outline-none sm:text-sm bg-inherit"
                           placeholder="john.dorian@loremipsum.com"
                         />
                         {errors?.signers?.[index] ? (
@@ -204,7 +207,7 @@ const RecipientsPage: NextPageWithLayout = (props: any) => {
                       </div>
                       <div
                         className={classNames(
-                          "ml-3 w-[250px] rounded-md border border-gray-300 px-3 py-2 shadow-sm focus-within:border-neon focus-within:ring-1 focus-within:ring-neon",
+                          "sm:w-[250px] rounded-md border border-gray-300 px-3 py-2 shadow-sm focus-within:border-neon focus-within:ring-1 focus-within:ring-neon",
                           item.sendStatus === "SENT" ? "bg-gray-100" : ""
                         )}
                       >
@@ -236,12 +239,12 @@ const RecipientsPage: NextPageWithLayout = (props: any) => {
                                 documentId: props.document.id,
                               });
                           }}
-                          className="block w-full border-0 p-0 text-gray-900 placeholder-gray-500 sm:text-sm outline-none bg-inherit"
+                          className="block w-full p-0 text-gray-900 placeholder-gray-500 border-0 outline-none sm:text-sm bg-inherit"
                           placeholder="John Dorian"
                         />
                       </div>
-                      <div className="ml-auto flex">
-                        <div key={item.id}>
+                      <div className="flex mx-2 sm:ml-auto sm:mx-0">
+                        <div key={item.id} className="space-x-2 sm:space-x-0">
                           {item.sendStatus === "NOT_SENT" ? (
                             <span
                               id="sent_icon"
@@ -259,8 +262,7 @@ const RecipientsPage: NextPageWithLayout = (props: any) => {
                                 id="sent_icon"
                                 className="inline-block mt-3 flex-shrink-0 rounded-full bg-yellow-200 px-2 py-0.5 text-xs font-medium text-gray-800"
                               >
-                                <CheckIcon className="inline h-5 mr-1"></CheckIcon>{" "}
-                                Sent
+                                <CheckIcon className="inline h-5 mr-1" /> Sent
                               </span>
                             </span>
                           ) : (
@@ -296,7 +298,7 @@ const RecipientsPage: NextPageWithLayout = (props: any) => {
                           )}
                         </div>
                       </div>
-                      <div className="ml-auto flex mr-1">
+                      <div className="flex ml-auto mr-1">
                         <IconButton
                           icon={PaperAirplaneIcon}
                           disabled={
@@ -306,7 +308,7 @@ const RecipientsPage: NextPageWithLayout = (props: any) => {
                             loading
                           }
                           color="secondary"
-                          className="mr-4 h-9 my-auto"
+                          className="my-auto mr-4 h-9"
                           onClick={() => {
                             if (confirm("Resend this signing request?")) {
                               setLoading(true);
@@ -370,11 +372,11 @@ const RecipientsPage: NextPageWithLayout = (props: any) => {
             leaveFrom="opacity-100"
             leaveTo="opacity-0"
           >
-            <div className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" />
+            <div className="fixed inset-0 transition-opacity bg-gray-500 bg-opacity-75" />
           </Transition.Child>
 
           <div className="fixed inset-0 z-10 overflow-y-auto">
-            <div className="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
+            <div className="flex items-end justify-center min-h-full p-4 text-center sm:items-center sm:p-0">
               <Transition.Child
                 as={Fragment}
                 enter="ease-out duration-300"
@@ -384,11 +386,11 @@ const RecipientsPage: NextPageWithLayout = (props: any) => {
                 leaveFrom="opacity-100 translate-y-0 sm:scale-100"
                 leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
               >
-                <Dialog.Panel className="relative transform overflow-hidden rounded-lg bg-white px-4 pt-5 pb-4 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:p-6">
+                <Dialog.Panel className="relative px-4 pt-5 pb-4 overflow-hidden text-left transition-all transform bg-white rounded-lg shadow-xl sm:my-8 sm:w-full sm:max-w-lg sm:p-6">
                   <div>
-                    <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-green-100">
+                    <div className="flex items-center justify-center w-12 h-12 mx-auto bg-green-100 rounded-full">
                       <EnvelopeIcon
-                        className="h-6 w-6 text-green-600"
+                        className="w-6 h-6 text-green-600"
                         aria-hidden="true"
                       />
                     </div>
