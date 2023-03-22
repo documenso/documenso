@@ -139,7 +139,7 @@ const RecipientsPage: NextPageWithLayout = (props: any) => {
         </div>
         <div className="p-4 mt-10 overflow-hidden bg-white rounded-md shadow sm:p-6">
           <div className="pb-3 border-b border-gray-200 sm:pb-5">
-            <h3 className="text-base font-medium leading-4 text-gray-900 sm:leading-6 sm:text-lg">
+            <h3 className="text-lg font-medium leading-6 text-gray-900 ">
               Signers
             </h3>
             <p className="max-w-4xl mt-2 text-sm text-gray-500">
@@ -248,99 +248,101 @@ const RecipientsPage: NextPageWithLayout = (props: any) => {
                           placeholder="John Dorian"
                         />
                       </div>
-                      <div className="flex mx-2 sm:ml-auto sm:mx-0">
-                        <div key={item.id} className="space-x-2 sm:space-x-0">
-                          {item.sendStatus === "NOT_SENT" ? (
-                            <span
-                              id="sent_icon"
-                              className="inline-block mt-3 flex-shrink-0 rounded-full bg-gray-200 px-2 py-0.5 text-xs font-medium text-gray-800"
-                            >
-                              Not Sent
-                            </span>
-                          ) : (
-                            ""
-                          )}
-                          {item.sendStatus === "SENT" &&
-                          item.readStatus !== "OPENED" ? (
-                            <span id="sent_icon">
+                      <div className="flex items-center space-x-2">
+                        <div className="flex mb-2 mr-2 sm:ml-auto sm:mr-0">
+                          <div key={item.id} className="space-x-2">
+                            {item.sendStatus === "NOT_SENT" ? (
                               <span
                                 id="sent_icon"
-                                className="inline-block mt-3 flex-shrink-0 rounded-full bg-yellow-200 px-2 py-0.5 text-xs font-medium text-gray-800"
+                                className="inline-block mt-3 flex-shrink-0 rounded-full bg-gray-200 px-2 py-0.5 text-xs font-medium text-gray-800"
                               >
-                                <CheckIcon className="inline h-5 mr-1" /> Sent
+                                Not Sent
                               </span>
-                            </span>
-                          ) : (
-                            ""
-                          )}
-                          {item.readStatus === "OPENED" &&
-                          item.signingStatus === "NOT_SIGNED" ? (
-                            <span id="read_icon">
-                              <span
-                                id="sent_icon"
-                                className="inline-block mt-3 flex-shrink-0 rounded-full bg-yellow-200 px-2 py-0.5 text-xs font-medium text-gray-800"
-                              >
-                                <CheckIcon className="inline h-5 -mr-2"></CheckIcon>
-                                <CheckIcon className="inline h-5 mr-1"></CheckIcon>
-                                Seen
+                            ) : (
+                              ""
+                            )}
+                            {item.sendStatus === "SENT" &&
+                            item.readStatus !== "OPENED" ? (
+                              <span id="sent_icon">
+                                <span
+                                  id="sent_icon"
+                                  className="inline-block mt-3 flex-shrink-0 rounded-full bg-yellow-200 px-2 py-0.5 text-xs font-medium text-gray-800"
+                                >
+                                  <CheckIcon className="inline h-5 mr-1" /> Sent
+                                </span>
                               </span>
-                            </span>
-                          ) : (
-                            ""
-                          )}
-                          {item.signingStatus === "SIGNED" ? (
-                            <span id="signed_icon">
-                              <span
-                                id="sent_icon"
-                                className="inline-block mt-3 flex-shrink-0 rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-800"
-                              >
-                                <CheckBadgeIcon className="inline h-5 mr-1"></CheckBadgeIcon>
-                                Signed
+                            ) : (
+                              ""
+                            )}
+                            {item.readStatus === "OPENED" &&
+                            item.signingStatus === "NOT_SIGNED" ? (
+                              <span id="read_icon">
+                                <span
+                                  id="sent_icon"
+                                  className="inline-block mt-3 flex-shrink-0 rounded-full bg-yellow-200 px-2 py-0.5 text-xs font-medium text-gray-800"
+                                >
+                                  <CheckIcon className="inline h-5 -mr-2"></CheckIcon>
+                                  <CheckIcon className="inline h-5 mr-1"></CheckIcon>
+                                  Seen
+                                </span>
                               </span>
-                            </span>
-                          ) : (
-                            ""
-                          )}
+                            ) : (
+                              ""
+                            )}
+                            {item.signingStatus === "SIGNED" ? (
+                              <span id="signed_icon">
+                                <span
+                                  id="sent_icon"
+                                  className="inline-block mt-3 flex-shrink-0 rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-800"
+                                >
+                                  <CheckBadgeIcon className="inline h-5 mr-1"></CheckBadgeIcon>
+                                  Signed
+                                </span>
+                              </span>
+                            ) : (
+                              ""
+                            )}
+                          </div>
                         </div>
-                      </div>
-                      <div className="flex ml-auto mr-1">
-                        <IconButton
-                          icon={PaperAirplaneIcon}
-                          disabled={
-                            !item.id ||
-                            item.sendStatus !== "SENT" ||
-                            item.signingStatus === "SIGNED" ||
-                            loading
-                          }
-                          color="secondary"
-                          className="my-auto mr-4 h-9"
-                          onClick={() => {
-                            if (confirm("Resend this signing request?")) {
-                              setLoading(true);
-                              sendSigningRequests(props.document, [
-                                item.id,
-                              ]).finally(() => {
-                                setLoading(false);
-                              });
+                        <div className="mr-1 ">
+                          <IconButton
+                            icon={PaperAirplaneIcon}
+                            disabled={
+                              !item.id ||
+                              item.sendStatus !== "SENT" ||
+                              item.signingStatus === "SIGNED" ||
+                              loading
                             }
-                          }}
-                        >
-                          Resend
-                        </IconButton>
-                        <IconButton
-                          icon={TrashIcon}
-                          disabled={
-                            !item.id || item.sendStatus === "SENT" || loading
-                          }
-                          onClick={() => {
-                            const removedItem = { ...fields }[index];
-                            remove(index);
-                            deleteRecipient(item)?.catch((err) => {
-                              append(removedItem);
-                            });
-                          }}
-                          className="group-hover:text-neon-dark group-hover:disabled:text-gray-400"
-                        />
+                            color="secondary"
+                            className="my-auto mr-4 h-9"
+                            onClick={() => {
+                              if (confirm("Resend this signing request?")) {
+                                setLoading(true);
+                                sendSigningRequests(props.document, [
+                                  item.id,
+                                ]).finally(() => {
+                                  setLoading(false);
+                                });
+                              }
+                            }}
+                          >
+                            Resend
+                          </IconButton>
+                          <IconButton
+                            icon={TrashIcon}
+                            disabled={
+                              !item.id || item.sendStatus === "SENT" || loading
+                            }
+                            onClick={() => {
+                              const removedItem = { ...fields }[index];
+                              remove(index);
+                              deleteRecipient(item)?.catch((err) => {
+                                append(removedItem);
+                              });
+                            }}
+                            className="group-hover:text-neon-dark group-hover:disabled:text-gray-400"
+                          />
+                        </div>
                       </div>
                     </div>
                   </li>
