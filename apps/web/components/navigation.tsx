@@ -39,8 +39,13 @@ const navigation = [
     icon: WrenchIcon,
   },
 ];
+
 const userNavigation = [
-  { name: "Your Profile", href: "/settings/profile", icon: UserCircleIcon },
+  {
+    name: "Your Profile",
+    href: "/settings/profile",
+    icon: UserCircleIcon,
+  },
   {
     name: "Sign out",
     href: "",
@@ -244,7 +249,13 @@ export default function TopNavigation() {
                   {userNavigation.map((item) => (
                     <Link
                       key={item.name}
-                      onClick={item.click}
+                      onClick={
+                        item.href.includes("/settings/profile")
+                          ? () => {
+                              close();
+                            }
+                          : item.click
+                      }
                       href={item.href}
                       className="block px-4 py-2 text-base font-medium text-gray-500 hover:bg-gray-100 hover:text-gray-800"
                     >
