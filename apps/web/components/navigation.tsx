@@ -100,7 +100,9 @@ export default function TopNavigation() {
   }, [session]);
 
   navigation.forEach((element) => {
-    element.current = router.route.endsWith("/" + element.href.split("/")[1]);
+    element.current =
+      router.route.endsWith("/" + element.href.split("/")[1]) ||
+      router.route.includes(element.href.split("/")[1]);
   });
 
   return (
