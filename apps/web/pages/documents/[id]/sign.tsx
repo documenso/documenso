@@ -107,7 +107,6 @@ export async function getServerSideProps(context: any) {
     where: {
       documentId: recipient.Document.id,
       recipientId: recipient.id,
-      type: { in: [FieldType.SIGNATURE] },
       Signature: { is: null },
     },
     include: {

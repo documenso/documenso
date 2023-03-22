@@ -2,11 +2,12 @@ import toast from "react-hot-toast";
 
 export const createOrUpdateField = async (
   document: any,
-  field: any
+  field: any,
+  recipientToken: string = ""
 ): Promise<any> => {
   try {
     const created = await toast.promise(
-      fetch("/api/documents/" + document.id + "/fields", {
+      fetch("/api/documents/" + document.id + "/fields?token=" + recipientToken, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

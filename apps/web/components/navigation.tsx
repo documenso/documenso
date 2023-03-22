@@ -34,13 +34,18 @@ const navigation = [
   },
   {
     name: "Settings",
-    href: "/settings",
+    href: "/settings/profile",
     current: true,
     icon: WrenchIcon,
   },
 ];
+
 const userNavigation = [
-  { name: "Your Profile", href: "/settings/profile", icon: UserCircleIcon },
+  {
+    name: "Your Profile",
+    href: "/settings/profile",
+    icon: UserCircleIcon,
+  },
   {
     name: "Sign out",
     href: "",
@@ -101,7 +106,7 @@ export default function TopNavigation() {
   return (
     <>
       <Disclosure as="nav" className="border-b border-gray-200 bg-white">
-        {({ open }) => (
+        {({ open, close }) => (
           <>
             <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
               <div className="flex h-16 justify-between">
@@ -151,10 +156,7 @@ export default function TopNavigation() {
                         <div
                           key={user?.email}
                           dangerouslySetInnerHTML={{
-                            __html: avatarFromInitials(
-                              user?.name || "" || "",
-                              40
-                            ),
+                            __html: avatarFromInitials(user?.name || "" || "", 40),
                           }}
                         />
                       </Menu.Button>
@@ -220,6 +222,9 @@ export default function TopNavigation() {
                       "block pl-3 pr-4 py-2 border-l-4 text-base font-medium"
                     )}
                     aria-current={item.current ? "page" : undefined}
+                    onClick={() => {
+                      close();
+                    }}
                   >
                     {item.name}
                   </Link>
@@ -236,19 +241,21 @@ export default function TopNavigation() {
                     />
                   </div>
                   <div className="ml-3">
-                    <div className="text-base font-medium text-gray-800">
-                      {user?.name || ""}
-                    </div>
-                    <div className="text-sm font-medium text-gray-500">
-                      {user?.email}
-                    </div>
+                    <div className="text-base font-medium text-gray-800">{user?.name || ""}</div>
+                    <div className="text-sm font-medium text-gray-500">{user?.email}</div>
                   </div>
                 </div>
                 <div className="mt-3 space-y-1">
                   {userNavigation.map((item) => (
                     <Link
                       key={item.name}
-                      onClick={item.click}
+                      onClick={
+                        item.href.includes("/settings/profile")
+                          ? () => {
+                              close();
+                            }
+                          : item.click
+                      }
                       href={item.href}
                       className="block px-4 py-2 text-base font-medium text-gray-500 hover:bg-gray-100 hover:text-gray-800"
                     >

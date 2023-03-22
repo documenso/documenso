@@ -17,12 +17,11 @@ interface LoginValues {
   csrfToken: string;
 }
 
-export default function Login() {
+export default function Login(props: any) {
   const router = useRouter();
   const methods = useForm<LoginValues>();
   const { register, formState } = methods;
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-
   let callbackUrl =
     typeof router.query?.callbackUrl === "string"
       ? router.query.callbackUrl
@@ -117,7 +116,6 @@ export default function Login() {
                   />
                 </div>
               </div>
-
               <div className="flex items-center justify-between">
                 <div className="text-sm">
                   <a href="#" className="font-medium text-neon hover:text-neon">
@@ -125,7 +123,6 @@ export default function Login() {
                   </a>
                 </div>
               </div>
-
               <div>
                 <Button
                   type="submit"
@@ -152,15 +149,27 @@ export default function Login() {
                   <div className="relative flex justify-center"></div>
                 </div>
               </div>
-              <p className="mt-2 text-center text-sm text-gray-600">
-                Are you new here?{" "}
-                <Link
-                  href="/signup"
-                  className="font-medium text-neon hover:text-neon"
-                >
-                  Create a new Account
-                </Link>
-              </p>
+              {props.allowSignup ? (
+                <p className="mt-2 text-center text-sm text-gray-600">
+                  Are you new here?{" "}
+                  <Link
+                    href="/signup"
+                    className="font-medium text-neon hover:text-neon"
+                  >
+                    Create a new Account
+                  </Link>
+                </p>
+              ) : (
+                <p className="mt-2 text-center text-sm text-gray-600">
+                  Like Documenso{" "}
+                  <Link
+                    href="https://documenso.com"
+                    className="font-medium text-neon hover:text-neon"
+                  >
+                    Hosted Documenso will be availible soon™
+                  </Link>
+                </p>
+              )}
             </form>
           </FormProvider>
         </div>

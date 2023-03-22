@@ -9,7 +9,6 @@ import {
   CheckBadgeIcon,
   InformationCircleIcon,
 } from "@heroicons/react/24/outline";
-import toast from "react-hot-toast";
 import { FieldType } from "@prisma/client";
 import {
   createOrUpdateField,
@@ -70,7 +69,7 @@ export default function PDFSigner(props: any) {
     );
     const signedField = { ...dialogField };
     signedField.signature = signature;
-    setFields(fields.concat(signedField));
+    setFields((prevState) => [...prevState, signedField]);
     setOpen(false);
     setDialogField(null);
   }
@@ -174,8 +173,12 @@ export default function PDFSigner(props: any) {
       FieldType.FREE_SIGNATURE
     );
 
-    createOrUpdateField(props.document, freeSignatureField).then((res) => {
-      setFields(fields.concat(res));
+    createOrUpdateField(
+      props.document,
+      freeSignatureField,
+      recipient.token
+    ).then((res) => {
+      setFields((prevState) => [...prevState, res]);
       setDialogField(res);
       setOpen(true);
     });
