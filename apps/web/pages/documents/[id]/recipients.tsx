@@ -85,7 +85,7 @@ const RecipientsPage: NextPageWithLayout = (props: any) => {
       <Head>
         <title>{title}</title>
       </Head>
-      <div className="mt-10">
+      <div className="px-6 mt-10 sm:px-0">
         <div>
           <Breadcrumb document={props.document} items={breadcrumbItems} />
         </div>
@@ -137,9 +137,9 @@ const RecipientsPage: NextPageWithLayout = (props: any) => {
             </Button>
           </div>
         </div>
-        <div className="p-6 mt-10 overflow-hidden bg-white rounded-md shadow">
-          <div className="pb-5 border-b border-gray-200">
-            <h3 className="text-lg font-medium leading-6 text-gray-900">
+        <div className="p-4 mt-10 overflow-hidden bg-white rounded-md shadow sm:p-6">
+          <div className="pb-3 border-b border-gray-200 sm:pb-5">
+            <h3 className="text-lg font-medium leading-6 text-gray-900 ">
               Signers
             </h3>
             <p className="max-w-4xl mt-2 text-sm text-gray-500">
@@ -156,189 +156,196 @@ const RecipientsPage: NextPageWithLayout = (props: any) => {
                 {fields.map((item: any, index: number) => (
                   <li
                     key={index}
-                    className="w-full px-0 py-4 border-0 hover:bg-green-50 group"
+                    className="w-full px-2 py-3 border-0 hover:bg-green-50 group sm:py-4"
                   >
-                    <div id="container" className="flex w-full">
-                      <div
-                        className={classNames(
-                          "ml-3 w-[250px] rounded-md border border-gray-300 px-3 py-2 shadow-sm focus-within:border-neon focus-within:ring-1 focus-within:ring-neon",
-                          item.sendStatus === "SENT" ? "bg-gray-100" : ""
-                        )}
-                      >
-                        <label
-                          htmlFor="name"
-                          className="block text-xs font-medium text-gray-900"
+                    <div
+                      id="container"
+                      className="block w-full lg:flex lg:justify-between"
+                    >
+                      <div className="block space-y-2 md:space-x-2 md:space-y-0 md:flex">
+                        <div
+                          className={classNames(
+                            "md:w-[250px] rounded-md border border-gray-300 px-3 py-2 shadow-sm focus-within:border-neon focus-within:ring-1 focus-within:ring-neon",
+                            item.sendStatus === "SENT" ? "bg-gray-100" : ""
+                          )}
                         >
-                          Email
-                        </label>
-                        <input
-                          type="email"
-                          {...register(`signers.${index}.email`, {
-                            pattern: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                          })}
-                          defaultValue={item.email}
-                          disabled={item.sendStatus === "SENT" || loading}
-                          onBlur={() => {
-                            if (!errors?.signers?.[index])
-                              createOrUpdateRecipient({
-                                ...formValues[index],
-                                documentId: props.document.id,
-                              });
-                          }}
-                          onKeyDown={(event: any) => {
-                            if (event.key === "Enter")
+                          <label
+                            htmlFor="name"
+                            className="block text-xs font-medium text-gray-900"
+                          >
+                            Email
+                          </label>
+                          <input
+                            type="email"
+                            {...register(`signers.${index}.email`, {
+                              pattern:
+                                /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                            })}
+                            defaultValue={item.email}
+                            disabled={item.sendStatus === "SENT" || loading}
+                            onBlur={() => {
                               if (!errors?.signers?.[index])
                                 createOrUpdateRecipient({
                                   ...formValues[index],
                                   documentId: props.document.id,
                                 });
-                          }}
-                          className="block w-full p-0 text-gray-900 placeholder-gray-500 border-0 outline-none sm:text-sm bg-inherit"
-                          placeholder="john.dorian@loremipsum.com"
-                        />
-                        {errors?.signers?.[index] ? (
-                          <p
-                            className="mt-2 text-sm text-red-600"
-                            id="email-error"
-                          >
-                            <XMarkIcon className="inline h-5" /> Invalid Email
-                          </p>
-                        ) : (
-                          ""
-                        )}
-                      </div>
-                      <div
-                        className={classNames(
-                          "ml-3 w-[250px] rounded-md border border-gray-300 px-3 py-2 shadow-sm focus-within:border-neon focus-within:ring-1 focus-within:ring-neon",
-                          item.sendStatus === "SENT" ? "bg-gray-100" : ""
-                        )}
-                      >
-                        <label
-                          htmlFor="name"
-                          className="block text-xs font-medium text-gray-900"
-                        >
-                          Name (optional)
-                        </label>
-                        <input
-                          type="text"
-                          {...register(`signers.${index}.name`)}
-                          defaultValue={item.name}
-                          disabled={item.sendStatus === "SENT" || loading}
-                          onBlur={() => {
-                            if (!errors?.signers?.[index])
-                              createOrUpdateRecipient({
-                                ...formValues[index],
-                                documentId: props.document.id,
-                              });
-                          }}
-                          onKeyDown={(event: any) => {
-                            if (
-                              event.key === "Enter" &&
-                              !errors?.signers?.[index]
-                            )
-                              createOrUpdateRecipient({
-                                ...formValues[index],
-                                documentId: props.document.id,
-                              });
-                          }}
-                          className="block w-full p-0 text-gray-900 placeholder-gray-500 border-0 outline-none sm:text-sm bg-inherit"
-                          placeholder="John Dorian"
-                        />
-                      </div>
-                      <div className="flex ml-auto">
-                        <div key={item.id}>
-                          {item.sendStatus === "NOT_SENT" ? (
-                            <span
-                              id="sent_icon"
-                              className="inline-block mt-3 flex-shrink-0 rounded-full bg-gray-200 px-2 py-0.5 text-xs font-medium text-gray-800"
+                            }}
+                            onKeyDown={(event: any) => {
+                              if (event.key === "Enter")
+                                if (!errors?.signers?.[index])
+                                  createOrUpdateRecipient({
+                                    ...formValues[index],
+                                    documentId: props.document.id,
+                                  });
+                            }}
+                            className="block w-full p-0 text-gray-900 placeholder-gray-500 border-0 outline-none sm:text-sm bg-inherit"
+                            placeholder="john.dorian@loremipsum.com"
+                          />
+                          {errors?.signers?.[index] ? (
+                            <p
+                              className="mt-2 text-sm text-red-600"
+                              id="email-error"
                             >
-                              Not Sent
-                            </span>
-                          ) : (
-                            ""
-                          )}
-                          {item.sendStatus === "SENT" &&
-                          item.readStatus !== "OPENED" ? (
-                            <span id="sent_icon">
-                              <span
-                                id="sent_icon"
-                                className="inline-block mt-3 flex-shrink-0 rounded-full bg-yellow-200 px-2 py-0.5 text-xs font-medium text-gray-800"
-                              >
-                                <CheckIcon className="inline h-5 mr-1"></CheckIcon>{" "}
-                                Sent
-                              </span>
-                            </span>
-                          ) : (
-                            ""
-                          )}
-                          {item.readStatus === "OPENED" &&
-                          item.signingStatus === "NOT_SIGNED" ? (
-                            <span id="read_icon">
-                              <span
-                                id="sent_icon"
-                                className="inline-block mt-3 flex-shrink-0 rounded-full bg-yellow-200 px-2 py-0.5 text-xs font-medium text-gray-800"
-                              >
-                                <CheckIcon className="inline h-5 -mr-2"></CheckIcon>
-                                <CheckIcon className="inline h-5 mr-1"></CheckIcon>
-                                Seen
-                              </span>
-                            </span>
-                          ) : (
-                            ""
-                          )}
-                          {item.signingStatus === "SIGNED" ? (
-                            <span id="signed_icon">
-                              <span
-                                id="sent_icon"
-                                className="inline-block mt-3 flex-shrink-0 rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-800"
-                              >
-                                <CheckBadgeIcon className="inline h-5 mr-1"></CheckBadgeIcon>
-                                Signed
-                              </span>
-                            </span>
+                              <XMarkIcon className="inline h-5" /> Invalid Email
+                            </p>
                           ) : (
                             ""
                           )}
                         </div>
-                      </div>
-                      <div className="flex ml-auto mr-1">
-                        <IconButton
-                          icon={PaperAirplaneIcon}
-                          disabled={
-                            !item.id ||
-                            item.sendStatus !== "SENT" ||
-                            item.signingStatus === "SIGNED" ||
-                            loading
-                          }
-                          color="secondary"
-                          className="my-auto mr-4 h-9"
-                          onClick={() => {
-                            if (confirm("Resend this signing request?")) {
-                              setLoading(true);
-                              sendSigningRequests(props.document, [
-                                item.id,
-                              ]).finally(() => {
-                                setLoading(false);
-                              });
-                            }
-                          }}
+                        <div
+                          className={classNames(
+                            "md:w-[250px] rounded-md border border-gray-300 px-3 py-2 shadow-sm focus-within:border-neon focus-within:ring-1 focus-within:ring-neon",
+                            item.sendStatus === "SENT" ? "bg-gray-100" : ""
+                          )}
                         >
-                          Resend
-                        </IconButton>
-                        <IconButton
-                          icon={TrashIcon}
-                          disabled={
-                            !item.id || item.sendStatus === "SENT" || loading
-                          }
-                          onClick={() => {
-                            const removedItem = { ...fields }[index];
-                            remove(index);
-                            deleteRecipient(item)?.catch((err) => {
-                              append(removedItem);
-                            });
-                          }}
-                          className="group-hover:text-neon-dark group-hover:disabled:text-gray-400"
-                        />
+                          <label
+                            htmlFor="name"
+                            className="block text-xs font-medium text-gray-900"
+                          >
+                            Name (optional)
+                          </label>
+                          <input
+                            type="text"
+                            {...register(`signers.${index}.name`)}
+                            defaultValue={item.name}
+                            disabled={item.sendStatus === "SENT" || loading}
+                            onBlur={() => {
+                              if (!errors?.signers?.[index])
+                                createOrUpdateRecipient({
+                                  ...formValues[index],
+                                  documentId: props.document.id,
+                                });
+                            }}
+                            onKeyDown={(event: any) => {
+                              if (
+                                event.key === "Enter" &&
+                                !errors?.signers?.[index]
+                              )
+                                createOrUpdateRecipient({
+                                  ...formValues[index],
+                                  documentId: props.document.id,
+                                });
+                            }}
+                            className="block w-full p-0 text-gray-900 placeholder-gray-500 border-0 outline-none sm:text-sm bg-inherit"
+                            placeholder="John Dorian"
+                          />
+                        </div>
+                      </div>
+                      <div className="flex items-center space-x-2 lg:ml-2">
+                        <div className="flex mb-2 mr-2 lg:mr-0">
+                          <div key={item.id} className="space-x-2">
+                            {item.sendStatus === "NOT_SENT" ? (
+                              <span
+                                id="sent_icon"
+                                className="inline-block mt-3 flex-shrink-0 rounded-full bg-yellow-200 px-2 py-0.5 text-xs font-medium text-gray-800"
+                              >
+                                Not Sent
+                              </span>
+                            ) : (
+                              ""
+                            )}
+                            {item.sendStatus === "SENT" &&
+                            item.readStatus !== "OPENED" ? (
+                              <span id="sent_icon">
+                                <span
+                                  id="sent_icon"
+                                  className="inline-block mt-3 flex-shrink-0 rounded-full bg-yellow-200 px-2 py-0.5 text-xs font-medium text-gray-800 "
+                                >
+                                  <CheckIcon className="inline h-5 mr-1" /> Sent
+                                </span>
+                              </span>
+                            ) : (
+                              ""
+                            )}
+                            {item.readStatus === "OPENED" &&
+                            item.signingStatus === "NOT_SIGNED" ? (
+                              <span id="read_icon">
+                                <span
+                                  id="sent_icon"
+                                  className="inline-block mt-3 flex-shrink-0 rounded-full bg-yellow-200 px-2 py-0.5 text-xs font-medium text-gray-800"
+                                >
+                                  <CheckIcon className="inline h-5 -mr-2"></CheckIcon>
+                                  <CheckIcon className="inline h-5 mr-1"></CheckIcon>
+                                  Seen
+                                </span>
+                              </span>
+                            ) : (
+                              ""
+                            )}
+                            {item.signingStatus === "SIGNED" ? (
+                              <span id="signed_icon">
+                                <span
+                                  id="sent_icon"
+                                  className="inline-block mt-3 flex-shrink-0 rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-800"
+                                >
+                                  <CheckBadgeIcon className="inline h-5 mr-1"></CheckBadgeIcon>
+                                  Signed
+                                </span>
+                              </span>
+                            ) : (
+                              ""
+                            )}
+                          </div>
+                        </div>
+                        <div className="flex mr-1">
+                          <IconButton
+                            icon={PaperAirplaneIcon}
+                            disabled={
+                              !item.id ||
+                              item.sendStatus !== "SENT" ||
+                              item.signingStatus === "SIGNED" ||
+                              loading
+                            }
+                            color="secondary"
+                            className="my-auto mr-4 h-9"
+                            onClick={() => {
+                              if (confirm("Resend this signing request?")) {
+                                setLoading(true);
+                                sendSigningRequests(props.document, [
+                                  item.id,
+                                ]).finally(() => {
+                                  setLoading(false);
+                                });
+                              }
+                            }}
+                          >
+                            Resend
+                          </IconButton>
+                          <IconButton
+                            icon={TrashIcon}
+                            disabled={
+                              !item.id || item.sendStatus === "SENT" || loading
+                            }
+                            onClick={() => {
+                              const removedItem = { ...fields }[index];
+                              remove(index);
+                              deleteRecipient(item)?.catch((err) => {
+                                append(removedItem);
+                              });
+                            }}
+                            className="group-hover:text-neon-dark group-hover:disabled:text-gray-400"
+                          />
+                        </div>
                       </div>
                     </div>
                   </li>
