@@ -35,12 +35,12 @@ export default function SignableField(props: FieldPropsType) {
       defaultPosition={{ x: 0, y: 0 }}
       cancel="div"
       onMouseDown={(e: any) => {
-        e.preventDefault();
+        // e.preventDefault();
         e.stopPropagation();
       }}
     >
       <div
-        onClick={() => {
+        onClick={(e: any) => {
           if (!field?.signature) props.onClick(props.field);
         }}
         ref={nodeRef}
