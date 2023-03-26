@@ -80,6 +80,7 @@ const DashboardPage: NextPageWithLayout = (props: any) => {
           <input
             id="fileUploadHelper"
             type="file"
+            accept="application/pdf"
             onChange={(event: any) => {
               uploadDocument(event);
             }}

@@ -420,6 +420,7 @@ const DocumentsPage: NextPageWithLayout = (props: any) => {
           <input
             id="fileUploadHelper"
             type="file"
+            accept="application/pdf"
             onChange={(event: any) => {
               uploadDocument(event);
             }}
