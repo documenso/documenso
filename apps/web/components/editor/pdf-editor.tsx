@@ -6,6 +6,8 @@ import { createOrUpdateField, deleteField } from "@documenso/lib/api";
 import { createField } from "@documenso/features/editor";
 import RecipientSelector from "./recipient-selector";
 import FieldTypeSelector from "./field-type-selector";
+import { InformationCircleIcon } from "@heroicons/react/24/outline";
+import Link from "next/link";
 const stc = require("string-to-color");
 
 const PDFViewer = dynamic(() => import("./pdf-viewer"), {
@@ -48,6 +50,36 @@ export default function PDFEditor(props: any) {
   return (
     <>
       <div>
+        <div className="rounded-md bg-blue-50 p-4">
+          <div className="flex">
+            <div className="flex-shrink-0">
+              <InformationCircleIcon
+                className="h-5 w-5 text-blue-400"
+                aria-hidden="true"
+              />
+            </div>
+            <div className="ml-3 flex-1 md:flex md:justify-between">
+              <p className="text-sm text-blue-700">
+                This document does not have any recipients. Add recipient to
+                create fields.
+              </p>
+              <p className="mt-3 text-sm md:mt-0 md:ml-6">
+                <Link
+                  href={
+                    NEXT_PUBLIC_WEBAPP_URL +
+                    "/documents/" +
+                    props.document.id +
+                    "/recipients"
+                  }
+                  className="whitespace-nowrap font-medium text-blue-700 hover:text-blue-600"
+                >
+                  Add Recipients
+                  <span aria-hidden="true"> &rarr;</span>
+                </Link>
+              </p>
+            </div>
+          </div>
+        </div>
         <PDFViewer
           style={{
             cursor: `url("https://place-hold.it/110x64/37f095/FFFFFF&text=${selectedFieldType}") 55 32, auto`,
