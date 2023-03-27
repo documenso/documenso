@@ -167,7 +167,7 @@ export default function Setttings() {
                       name="first-name"
                       id="first-name"
                       autoComplete="given-name"
-                      className="mt-1 block w-full rounded-md border border-gray-300 py-2 px-3 shadow-sm focus:border-neon focus:outline-none focus:ring-neon sm:text-sm"
+                      className="mt-1 block w-full rounded-md border disabled:bg-neutral-100 border-gray-300 py-2 px-3 shadow-sm focus:border-neon focus:outline-none focus:ring-neon sm:text-sm"
                     />
                   </div>
                 </div>

@@ -198,7 +198,7 @@ const RecipientsPage: NextPageWithLayout = (props: any) => {
                                     documentId: props.document.id,
                                   });
                             }}
-                            className="block w-full p-0 text-gray-900 placeholder-gray-500 border-0 outline-none sm:text-sm bg-inherit"
+                            className="block w-full p-0  text-gray-900 placeholder-gray-500 disabled:bg-neutral-100 border-0 outline-none sm:text-sm bg-inherit"
                             placeholder="john.dorian@loremipsum.com"
                           />
                           {errors?.signers?.[index] ? (
@@ -246,7 +246,7 @@ const RecipientsPage: NextPageWithLayout = (props: any) => {
                                   documentId: props.document.id,
                                 });
                             }}
-                            className="block w-full p-0 text-gray-900 placeholder-gray-500 border-0 outline-none sm:text-sm bg-inherit"
+                            className="block w-full p-0 text-gray-900 placeholder-gray-500 disabled:bg-neutral-100 border-0 outline-none sm:text-sm bg-inherit"
                             placeholder="John Dorian"
                           />
                         </div>
