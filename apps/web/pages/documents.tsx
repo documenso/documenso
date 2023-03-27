@@ -415,7 +415,7 @@ const DocumentsPage: NextPageWithLayout = (props: any) => {
               document?.getElementById("fileUploadHelper")?.click();
             }}
           >
-            Upload Document
+            Add Document
           </Button>
           <input
             id="fileUploadHelper"

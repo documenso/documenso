@@ -108,7 +108,7 @@ const DashboardPage: NextPageWithLayout = (props: any) => {
           </svg>
 
           <span className="mt-2 block text-sm font-medium text-neon">
-            Upload a new PDF document
+            Add a new PDF document
           </span>
         </div>
       </div>
