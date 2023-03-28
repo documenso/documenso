@@ -11,6 +11,7 @@ import {
   PencilSquareIcon,
   TrashIcon,
   UserPlusIcon,
+  EnvelopeIcon,
   XMarkIcon,
 } from "@heroicons/react/24/outline";
 import { getUserFromToken } from "@documenso/lib/server";
@@ -329,11 +330,13 @@ const RecipientsPage: NextPageWithLayout = (props: any) => {
       </div>
 
       <Dialog
+        title="Ready to send"
         document={props.document}
         formValues={formValues}
         open={open}
         setLoading={setLoading}
         setOpen={setOpen}
+        icon={<EnvelopeIcon className="w-6 h-6 text-green-600" aria-hidden="true" />}
       />
     </>
   );

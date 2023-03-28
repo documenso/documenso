@@ -2,10 +2,13 @@ import React from "react";
 import { Transition, Dialog as DialogComponent } from "@headlessui/react";
 import { Fragment } from "react";
 import { Button } from "@documenso/ui";
-import { EnvelopeIcon } from "@heroicons/react/24/outline";
 import { sendSigningRequests } from "@documenso/lib/api";
 
-export function Dialog({ open, setOpen, document, formValues, setLoading }: any) {
+export function Dialog({ title, open, setOpen, document, formValues, setLoading, icon }: any) {
+  const unsentEmailsLength = formValues.filter(
+    (s: any) => s.email && s.sendStatus != "SENT"
+  ).length;
+
   return (
     <Transition.Root show={open} as={Fragment}>
       <DialogComponent as="div" className="relative z-10" onClose={setOpen}>
@@ -35,20 +38,18 @@ export function Dialog({ open, setOpen, document, formValues, setLoading }: any)
               <DialogComponent.Panel className="relative px-4 pt-5 pb-4 overflow-hidden text-left transition-all transform bg-white rounded-lg shadow-xl sm:my-8 sm:w-full sm:max-w-lg sm:p-6">
                 <div>
                   <div className="flex items-center justify-center w-12 h-12 mx-auto bg-green-100 rounded-full">
-                    <EnvelopeIcon className="w-6 h-6 text-green-600" aria-hidden="true" />
+                    {icon}
                   </div>
                   <div className="mt-3 text-center sm:mt-5">
                     <DialogComponent.Title
                       as="h3"
                       className="text-lg font-medium leading-6 text-gray-900"
                     >
-                      Ready to send
+                      {title}
                     </DialogComponent.Title>
                     <div className="mt-2">
                       <p className="text-sm text-gray-500">
-                        {`"${document.title}" will be sent to ${
-                          formValues.filter((s: any) => s.email && s.sendStatus != "SENT").length
-                        } recipients.`}
+                        {`"${document.title}" will be sent to ${unsentEmailsLength} recipients.`}
                       </p>
                     </div>
                   </div>
