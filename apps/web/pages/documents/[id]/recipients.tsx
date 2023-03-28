@@ -1,5 +1,5 @@
 import Head from "next/head";
-import { Fragment, ReactElement, useRef, useState } from "react";
+import { ReactElement, useRef, useState } from "react";
 import Layout from "../../../components/layout";
 import { NextPageWithLayout } from "../../_app";
 import { classNames, NEXT_PUBLIC_WEBAPP_URL } from "@documenso/lib";
@@ -7,37 +7,27 @@ import {
   ArrowDownTrayIcon,
   CheckBadgeIcon,
   CheckIcon,
-  EnvelopeIcon,
   PaperAirplaneIcon,
   PencilSquareIcon,
   TrashIcon,
   UserPlusIcon,
+  EnvelopeIcon,
   XMarkIcon,
 } from "@heroicons/react/24/outline";
 import { getUserFromToken } from "@documenso/lib/server";
 import { getDocument } from "@documenso/lib/query";
 import { Document as PrismaDocument, DocumentStatus } from "@prisma/client";
-import { Breadcrumb, Button, IconButton } from "@documenso/ui";
-import { Dialog, Transition } from "@headlessui/react";
-import {
-  createOrUpdateRecipient,
-  deleteRecipient,
-  sendSigningRequests,
-} from "@documenso/lib/api";
-import {
-  FormProvider,
-  useFieldArray,
-  useForm,
-  useWatch,
-} from "react-hook-form";
+import { Breadcrumb, Button, Dialog, IconButton } from "@documenso/ui";
+import { createOrUpdateRecipient, deleteRecipient, sendSigningRequests } from "@documenso/lib/api";
 
-type FormValues = {
+import { FormProvider, useFieldArray, useForm, useWatch } from "react-hook-form";
+
+export type FormValues = {
   signers: { id: number; email: string; name: string }[];
 };
 
 const RecipientsPage: NextPageWithLayout = (props: any) => {
-  const title: string =
-    `"` + props?.document?.title + `"` + "Recipients | Documenso";
+  const title: string = `"` + props?.document?.title + `"` + "Recipients | Documenso";
   const breadcrumbItems = [
     {
       title: "Documents",
@@ -49,11 +39,7 @@ const RecipientsPage: NextPageWithLayout = (props: any) => {
     },
     {
       title: "Recipients",
-      href:
-        NEXT_PUBLIC_WEBAPP_URL +
-        "/documents/" +
-        props.document.id +
-        "/recipients",
+      href: NEXT_PUBLIC_WEBAPP_URL + "/documents/" + props.document.id + "/recipients",
     },
   ];
 
@@ -107,11 +93,7 @@ const RecipientsPage: NextPageWithLayout = (props: any) => {
             <Button
               icon={PencilSquareIcon}
               disabled={props.document.status === DocumentStatus.COMPLETED}
-              color={
-                props.document.status === DocumentStatus.COMPLETED
-                  ? "primary"
-                  : "secondary"
-              }
+              color={props.document.status === DocumentStatus.COMPLETED ? "primary" : "secondary"}
               className="mr-2"
               href={breadcrumbItems[1].href}
             >
@@ -127,8 +109,7 @@ const RecipientsPage: NextPageWithLayout = (props: any) => {
               disabled={
                 (formValues.length || 0) === 0 ||
                 !formValues.some(
-                  (r: any) =>
-                    r.email && !hasEmailError(r) && r.sendStatus === "NOT_SENT"
+                  (r: any) => r.email && !hasEmailError(r) && r.sendStatus === "NOT_SENT"
                 ) ||
                 loading
               }
@@ -139,9 +120,7 @@ const RecipientsPage: NextPageWithLayout = (props: any) => {
         </div>
         <div className="p-4 mt-10 overflow-hidden bg-white rounded-md shadow sm:p-6">
           <div className="pb-3 border-b border-gray-200 sm:pb-5">
-            <h3 className="text-lg font-medium leading-6 text-gray-900 ">
-              Signers
-            </h3>
+            <h3 className="text-lg font-medium leading-6 text-gray-900 ">Signers</h3>
             <p className="max-w-4xl mt-2 text-sm text-gray-500">
               The people who will sign the document.
             </p>
@@ -158,10 +137,7 @@ const RecipientsPage: NextPageWithLayout = (props: any) => {
                     key={index}
                     className="w-full px-2 py-3 border-0 hover:bg-green-50 group sm:py-4"
                   >
-                    <div
-                      id="container"
-                      className="block w-full lg:flex lg:justify-between"
-                    >
+                    <div id="container" className="block w-full lg:flex lg:justify-between">
                       <div className="block space-y-2 md:space-x-2 md:space-y-0 md:flex">
                         <div
                           className={classNames(
@@ -169,17 +145,13 @@ const RecipientsPage: NextPageWithLayout = (props: any) => {
                             item.sendStatus === "SENT" ? "bg-gray-100" : ""
                           )}
                         >
-                          <label
-                            htmlFor="name"
-                            className="block text-xs font-medium text-gray-900"
-                          >
+                          <label htmlFor="name" className="block text-xs font-medium text-gray-900">
                             Email
                           </label>
                           <input
                             type="email"
                             {...register(`signers.${index}.email`, {
-                              pattern:
-                                /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                              pattern: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
                             })}
                             defaultValue={item.email}
                             disabled={item.sendStatus === "SENT" || loading}
@@ -202,10 +174,7 @@ const RecipientsPage: NextPageWithLayout = (props: any) => {
                             placeholder="john.dorian@loremipsum.com"
                           />
                           {errors?.signers?.[index] ? (
-                            <p
-                              className="mt-2 text-sm text-red-600"
-                              id="email-error"
-                            >
+                            <p className="mt-2 text-sm text-red-600" id="email-error">
                               <XMarkIcon className="inline h-5" /> Invalid Email
                             </p>
                           ) : (
@@ -218,10 +187,7 @@ const RecipientsPage: NextPageWithLayout = (props: any) => {
                             item.sendStatus === "SENT" ? "bg-gray-100" : ""
                           )}
                         >
-                          <label
-                            htmlFor="name"
-                            className="block text-xs font-medium text-gray-900"
-                          >
+                          <label htmlFor="name" className="block text-xs font-medium text-gray-900">
                             Name (optional)
                           </label>
                           <input
@@ -237,10 +203,7 @@ const RecipientsPage: NextPageWithLayout = (props: any) => {
                                 });
                             }}
                             onKeyDown={(event: any) => {
-                              if (
-                                event.key === "Enter" &&
-                                !errors?.signers?.[index]
-                              )
+                              if (event.key === "Enter" && !errors?.signers?.[index])
                                 createOrUpdateRecipient({
                                   ...formValues[index],
                                   documentId: props.document.id,
@@ -264,8 +227,7 @@ const RecipientsPage: NextPageWithLayout = (props: any) => {
                             ) : (
                               ""
                             )}
-                            {item.sendStatus === "SENT" &&
-                            item.readStatus !== "OPENED" ? (
+                            {item.sendStatus === "SENT" && item.readStatus !== "OPENED" ? (
                               <span id="sent_icon">
                                 <span
                                   id="sent_icon"
@@ -277,8 +239,7 @@ const RecipientsPage: NextPageWithLayout = (props: any) => {
                             ) : (
                               ""
                             )}
-                            {item.readStatus === "OPENED" &&
-                            item.signingStatus === "NOT_SIGNED" ? (
+                            {item.readStatus === "OPENED" && item.signingStatus === "NOT_SIGNED" ? (
                               <span id="read_icon">
                                 <span
                                   id="sent_icon"
@@ -321,9 +282,7 @@ const RecipientsPage: NextPageWithLayout = (props: any) => {
                             onClick={() => {
                               if (confirm("Resend this signing request?")) {
                                 setLoading(true);
-                                sendSigningRequests(props.document, [
-                                  item.id,
-                                ]).finally(() => {
+                                sendSigningRequests(props.document, [item.id]).finally(() => {
                                   setLoading(false);
                                 });
                               }
@@ -333,9 +292,7 @@ const RecipientsPage: NextPageWithLayout = (props: any) => {
                           </IconButton>
                           <IconButton
                             icon={TrashIcon}
-                            disabled={
-                              !item.id || item.sendStatus === "SENT" || loading
-                            }
+                            disabled={!item.id || item.sendStatus === "SENT" || loading}
                             onClick={() => {
                               const removedItem = { ...fields }[index];
                               remove(index);
@@ -371,79 +328,16 @@ const RecipientsPage: NextPageWithLayout = (props: any) => {
           </FormProvider>
         </div>
       </div>
-      <Transition.Root show={open} as={Fragment}>
-        <Dialog as="div" className="relative z-10" onClose={setOpen}>
-          <Transition.Child
-            as={Fragment}
-            enter="ease-out duration-300"
-            enterFrom="opacity-0"
-            enterTo="opacity-100"
-            leave="ease-in duration-200"
-            leaveFrom="opacity-100"
-            leaveTo="opacity-0"
-          >
-            <div className="fixed inset-0 transition-opacity bg-gray-500 bg-opacity-75" />
-          </Transition.Child>
 
-          <div className="fixed inset-0 z-10 overflow-y-auto">
-            <div className="flex items-end justify-center min-h-full p-4 text-center sm:items-center sm:p-0">
-              <Transition.Child
-                as={Fragment}
-                enter="ease-out duration-300"
-                enterFrom="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-                enterTo="opacity-100 translate-y-0 sm:scale-100"
-                leave="ease-in duration-200"
-                leaveFrom="opacity-100 translate-y-0 sm:scale-100"
-                leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-              >
-                <Dialog.Panel className="relative px-4 pt-5 pb-4 overflow-hidden text-left transition-all transform bg-white rounded-lg shadow-xl sm:my-8 sm:w-full sm:max-w-lg sm:p-6">
-                  <div>
-                    <div className="flex items-center justify-center w-12 h-12 mx-auto bg-green-100 rounded-full">
-                      <EnvelopeIcon
-                        className="w-6 h-6 text-green-600"
-                        aria-hidden="true"
-                      />
-                    </div>
-                    <div className="mt-3 text-center sm:mt-5">
-                      <Dialog.Title
-                        as="h3"
-                        className="text-lg font-medium leading-6 text-gray-900"
-                      >
-                        Ready to send
-                      </Dialog.Title>
-                      <div className="mt-2">
-                        <p className="text-sm text-gray-500">
-                          {`"${props.document.title}" will be sent to ${
-                            formValues.filter(
-                              (s: any) => s.email && s.sendStatus != "SENT"
-                            ).length
-                          } recipients.`}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="flex justify-end gap-3 mt-5 sm:mt-6 sm:grid sm:grid-flow-row-dense sm:grid-cols-2 sm:flex-none ">
-                    <Button color="secondary" onClick={() => setOpen(false)}>
-                      Cancel
-                    </Button>
-                    <Button
-                      onClick={() => {
-                        setOpen(false);
-                        setLoading(true);
-                        sendSigningRequests(props.document).finally(() => {
-                          setLoading(false);
-                        });
-                      }}
-                    >
-                      Send
-                    </Button>
-                  </div>
-                </Dialog.Panel>
-              </Transition.Child>
-            </div>
-          </div>
-        </Dialog>
-      </Transition.Root>
+      <Dialog
+        title="Ready to send"
+        document={props.document}
+        formValues={formValues}
+        open={open}
+        setLoading={setLoading}
+        setOpen={setOpen}
+        icon={<EnvelopeIcon className="w-6 h-6 text-green-600" aria-hidden="true" />}
+      />
     </>
   );
 };
@@ -463,11 +357,7 @@ export async function getServerSideProps(context: any) {
     };
 
   const { id: documentId } = context.query;
-  const document: PrismaDocument = await getDocument(
-    +documentId,
-    context.req,
-    context.res
-  );
+  const document: PrismaDocument = await getDocument(+documentId, context.req, context.res);
 
   return {
     props: {
