@@ -57,6 +57,7 @@
 Signing documents digitally is fast, easy and should be best practice for every document signed worldwide. This is technically quite easy today, but it also introduces a new party to every signature: The signing tool providers. While this is not a problem in itself, it should make us think about how we want these providers of trust to work. Documenso aims to be the world's most trusted document signing tool. This trust is built by empowering you to self-host Documenso and review how it works under the hood. Join us in creating the next generation of open trust infrastructure.
 
 ## Community and Next Steps 🎯
+
 The current project goal is to <b>[release a production ready version](https://github.com/documenso/documenso/milestone/1)</b> for self-hosting as soon as possible. If you want to help making that happen you can:
 
 - Check out the first source code release in this repository and test it
@@ -67,6 +68,7 @@ The current project goal is to <b>[release a production ready version](https://g
 - Fix or create [issues](https://github.com/documenso/documenso/issues), that are needed for the first production release
 
 ## Contributing
+
 - To contribute please see our [contribution guide](https://github.com/documenso/documenso/blob/main/CONTRIBUTING.md).
 
 ## Tools
@@ -102,9 +104,9 @@ To run Documenso locally you need
 Follow these steps to setup documenso on you local machnine:
 
 - [Clone the repository](https://help.github.com/articles/cloning-a-repository/) it to your local device.
-     ```sh
-   git clone https://github.com/documenso/documenso
-   ```
+  ```sh
+  git clone https://github.com/documenso/documenso
+  ```
 - Run <code>npm i</code> in root directory
 - Rename .env.example to .env
 - Set DATABASE_URL value in .env file
@@ -123,11 +125,12 @@ Follow these steps to setup documenso on you local machnine:
   - To generate you own using these steps and a linux Terminal or Windows Linux Subsystem see **Create your own signging certificate**.
 
 ## Updating
+
 - If you pull the newest version from main, using <code>git pull</code>, it may be neccessary to regenerate your database client
 - You can do this by running the generate command in /packages/prisma:
-   ```sh
-   npx prisma generate
-   ```
+  ```sh
+  npx prisma generate
+  ```
 - This is not neccessary on first clone
 
 # Creating your own signging certificate
@@ -141,7 +144,7 @@ For the digital signature of you documents you need a signign certificate in .p1
    <code>openssl req -new -x509 -key private.key -out certificate.crt -days 365</code> \
    This will prompt you to enter some information, such as the Common Name (CN) for the certificate. Make sure you enter the correct information. The -days parameter sets the number of days for which the certificate is valid.
 3. Combine the private key and the self-signed certificate to create the p12 certificate. You can run the following command to do this: \
-<code>openssl pkcs12 -export -out certificate.p12 -inkey private.key -in certificate.crt</code>
+   <code>openssl pkcs12 -export -out certificate.p12 -inkey private.key -in certificate.crt</code>
 4. You will be prompted to enter a password for the p12 file. Choose a strong password and remember it, as you will need it to use the certificate (**can be empty for dev certificates**)
 5. Place the certificate <code>/apps/web/ressource/certificate.p12</code>
 

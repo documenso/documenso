@@ -1,7 +1,7 @@
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
-  value: true
+  value: true,
 });
 exports.default = void 0;
 
@@ -17,9 +17,8 @@ PDFAbstractReference - abstract class for PDF reference
 */
 class PDFAbstractReference {
   toString() {
-    throw new Error('Must be implemented by subclasses');
+    throw new Error("Must be implemented by subclasses");
   }
-
 }
 
 var _default = PDFAbstractReference;

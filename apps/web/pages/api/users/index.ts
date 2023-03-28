@@ -1,11 +1,10 @@
+import type { NextApiRequest, NextApiResponse } from "next";
 import {
   defaultHandler,
   defaultResponder,
   getUserFromToken,
 } from "@documenso/lib/server";
 import prisma from "@documenso/prisma";
-
-import type { NextApiRequest, NextApiResponse } from "next";
 
 async function postHandler(req: NextApiRequest, res: NextApiResponse) {
   const { method, body } = req;

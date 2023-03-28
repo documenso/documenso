@@ -1,5 +1,5 @@
-import { NEXT_PUBLIC_WEBAPP_URL } from "../constants";
 import { Document as PrismaDocument } from "@prisma/client";
+import { NEXT_PUBLIC_WEBAPP_URL } from "../constants";
 
 export const baseEmailTemplate = (message: string, content: string) => {
   const html = `

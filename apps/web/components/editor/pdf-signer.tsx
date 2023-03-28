@@ -1,21 +1,21 @@
-import Logo from "../logo";
-import { NEXT_PUBLIC_WEBAPP_URL } from "@documenso/lib/constants";
-import { useRouter } from "next/router";
-import dynamic from "next/dynamic";
-import SignatureDialog from "./signature-dialog";
 import { useEffect, useState } from "react";
+import dynamic from "next/dynamic";
+import { useRouter } from "next/router";
+import { createField } from "@documenso/features/editor";
+import {
+  createOrUpdateField,
+  deleteField,
+  signDocument,
+} from "@documenso/lib/api";
+import { NEXT_PUBLIC_WEBAPP_URL } from "@documenso/lib/constants";
 import { Button } from "@documenso/ui";
 import {
   CheckBadgeIcon,
   InformationCircleIcon,
 } from "@heroicons/react/24/outline";
 import { FieldType } from "@prisma/client";
-import {
-  createOrUpdateField,
-  deleteField,
-  signDocument,
-} from "@documenso/lib/api";
-import { createField } from "@documenso/features/editor";
+import Logo from "../logo";
+import SignatureDialog from "./signature-dialog";
 
 const PDFViewer = dynamic(() => import("./pdf-viewer"), {
   ssr: false,
@@ -80,9 +80,9 @@ export default function PDFSigner(props: any) {
       <div className="bg-neon p-4">
         <div className="flex">
           <div className="flex-shrink-0">
-            <Logo className="h-12 w-12 -mt-2.5"></Logo>
+            <Logo className="-mt-2.5 h-12 w-12"></Logo>
           </div>
-          <div className="ml-3 flex-1 md:flex md:justify-between text-center justify-start items-center">
+          <div className="ml-3 flex-1 items-center justify-start text-center md:flex md:justify-between">
             <p className="text-lg text-slate-700">
               {props.document.User.name
                 ? `${props.document.User.name} (${props.document.User.email})`
@@ -105,8 +105,7 @@ export default function PDFSigner(props: any) {
                       `/documents/${props.document.id}/signed?token=${router.query.token}`
                     );
                   });
-                }}
-              >
+                }}>
                 Done
               </Button>
             </p>
@@ -148,8 +147,7 @@ export default function PDFSigner(props: any) {
             addFreeSignature(e, page, props.recipient);
         }}
         onMouseUp={() => {}}
-        onDelete={onDeleteHandler}
-      ></PDFViewer>
+        onDelete={onDeleteHandler}></PDFViewer>
     </>
   );
 

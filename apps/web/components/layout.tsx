@@ -1,8 +1,7 @@
 import { useEffect } from "react";
 import { useRouter } from "next/router";
-import { useSession } from "next-auth/react";
 import { NEXT_PUBLIC_WEBAPP_URL } from "@documenso/lib/constants";
-
+import { useSession } from "next-auth/react";
 import Navigation from "./navigation";
 
 function useRedirectToLoginIfUnauthenticated() {

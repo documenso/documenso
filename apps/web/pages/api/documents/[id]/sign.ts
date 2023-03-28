@@ -1,11 +1,11 @@
-import { defaultHandler, defaultResponder } from "@documenso/lib/server";
-import prisma from "@documenso/prisma";
 import { NextApiRequest, NextApiResponse } from "next";
-import { SigningStatus, DocumentStatus } from "@prisma/client";
-import { getDocument } from "@documenso/lib/query";
-import { Document as PrismaDocument, FieldType } from "@prisma/client";
-import { insertImageInPDF, insertTextInPDF } from "@documenso/pdf";
 import { sendSigningDoneMail } from "@documenso/lib/mail";
+import { getDocument } from "@documenso/lib/query";
+import { defaultHandler, defaultResponder } from "@documenso/lib/server";
+import { insertImageInPDF, insertTextInPDF } from "@documenso/pdf";
+import prisma from "@documenso/prisma";
+import { DocumentStatus, SigningStatus } from "@prisma/client";
+import { FieldType, Document as PrismaDocument } from "@prisma/client";
 
 async function postHandler(req: NextApiRequest, res: NextApiResponse) {
   const { token: recipientToken } = req.query;

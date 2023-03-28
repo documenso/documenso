@@ -1,24 +1,24 @@
-import Head from "next/head";
 import { ReactElement } from "react";
-import Layout from "../components/layout";
+import Head from "next/head";
 import Link from "next/link";
-import type { NextPageWithLayout } from "./_app";
+import { uploadDocument } from "@documenso/features";
+import { getDocumentsForUserFromToken } from "@documenso/lib/query";
+import { getUserFromToken } from "@documenso/lib/server";
 import {
   CheckBadgeIcon,
   DocumentIcon,
   ExclamationTriangleIcon,
   UsersIcon,
 } from "@heroicons/react/24/outline";
-import { uploadDocument } from "@documenso/features";
 import {
   DocumentStatus,
+  Document as PrismaDocument,
   SendStatus,
   SigningStatus,
-  Document as PrismaDocument,
 } from "@prisma/client";
-import { getUserFromToken } from "@documenso/lib/server";
-import { getDocumentsForUserFromToken } from "@documenso/lib/query";
 import { truncate } from "fs";
+import Layout from "../components/layout";
+import type { NextPageWithLayout } from "./_app";
 
 type FormValues = {
   document: File;
@@ -58,15 +58,14 @@ const DashboardPage: NextPageWithLayout = (props: any) => {
             Dashboard
           </h1>
         </header>
-        <dl className="mt-8 grid grid-cols-3 xs:grid-cols-2 gap-5">
+        <dl className="xs:grid-cols-2 mt-8 grid grid-cols-3 gap-5">
           {stats.map((item) => (
             <Link href={item.link} key={item.name}>
               <div className="overflow-hidden rounded-lg bg-white px-4 py-5 shadow sm:p-6 ">
                 <dt className="truncate text-sm font-medium text-gray-500 ">
                   <item.icon
-                    className="flex-shrink-0 mr-3 h-6 w-6 inline text-neon"
-                    aria-hidden="true"
-                  ></item.icon>
+                    className="text-neon mr-3 inline h-6 w-6 flex-shrink-0"
+                    aria-hidden="true"></item.icon>
                   {item.name}
                 </dt>
                 <dd className="mt-1 text-3xl font-semibold tracking-tight text-gray-900">
@@ -91,15 +90,13 @@ const DashboardPage: NextPageWithLayout = (props: any) => {
           onClick={() => {
             document?.getElementById("fileUploadHelper")?.click();
           }}
-          className="cursor-pointer relative block w-full rounded-lg border-2 border-dashed border-gray-300 p-12 text-center hover:border-neon focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-        >
+          className="hover:border-neon relative block w-full cursor-pointer rounded-lg border-2 border-dashed border-gray-300 p-12 text-center focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
           <svg
             className="mx-auto h-12 w-12 text-gray-400"
             stroke="currentColor"
             fill="none"
             viewBox="0 00 20 25"
-            aria-hidden="true"
-          >
+            aria-hidden="true">
             <path
               strokeLinecap="round"
               strokeLinejoin="round"
@@ -107,7 +104,7 @@ const DashboardPage: NextPageWithLayout = (props: any) => {
             />
           </svg>
 
-          <span className="mt-2 block text-sm font-medium text-neon">
+          <span className="text-neon mt-2 block text-sm font-medium">
             Add a new PDF document
           </span>
         </div>

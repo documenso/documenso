@@ -1,13 +1,14 @@
-import "../styles/tailwind.css";
+import { ReactElement, ReactNode } from "react";
+import { NextPage } from "next";
+import type { AppProps } from "next/app";
+import { SessionProvider } from "next-auth/react";
+import { Toaster } from "react-hot-toast";
+import "react-tooltip/dist/react-tooltip.css";
 import "../../../node_modules/placeholder-loading/src/scss/placeholder-loading.scss";
 import "../../../node_modules/react-resizable/css/styles.css";
-import "react-tooltip/dist/react-tooltip.css";
-import { ReactElement, ReactNode } from "react";
-import type { AppProps } from "next/app";
-import { NextPage } from "next";
-import { SessionProvider } from "next-auth/react";
+import "../styles/tailwind.css";
+
 export { coloredConsole } from "@documenso/lib";
-import { Toaster } from "react-hot-toast";
 
 export type NextPageWithLayout<P = {}, IP = P> = NextPage<P, IP> & {
   getLayout?: (page: ReactElement) => ReactNode;

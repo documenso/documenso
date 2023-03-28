@@ -5,14 +5,13 @@ module.exports = {
   jsxSingleQuote: false,
   trailingComma: "es5",
   semi: true,
-  printWidth: 110,
+  printWidth: 80,
   arrowParens: "always",
   importOrder: [
-    "^(react/(.*)$)|^(react$)",
-    "^(next/(.*)$)|^(next$)",
-    "^@documenso/(.*)$",
+    "(^react$|^react/(.*)$)",
+    "(^next$|^next/(.*)$)",
     "<THIRD_PARTY_MODULES>",
-    "",
+    "^~/(.*)$",
     "^[./]",
   ],
   importOrderSeparation: false,
@@ -22,5 +21,8 @@ module.exports = {
   importOrderMergeDuplicateImports: true,
   importOrderCombineTypeAndValueImports: true,
 
-  plugins: ["@trivago/prettier-plugin-sort-imports", "prettier-plugin-tailwindcss"],
+  plugins: [
+    "@trivago/prettier-plugin-sort-imports",
+    "prettier-plugin-tailwindcss",
+  ],
 };

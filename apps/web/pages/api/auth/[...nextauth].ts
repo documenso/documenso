@@ -1,9 +1,9 @@
-import NextAuth, { Session } from "next-auth";
-import GitHubProvider from "next-auth/providers/github";
-import CredentialsProvider from "next-auth/providers/credentials";
 import { ErrorCode } from "@documenso/lib/auth";
-import prisma from "@documenso/prisma";
 import { verifyPassword } from "@documenso/lib/auth";
+import prisma from "@documenso/prisma";
+import NextAuth, { Session } from "next-auth";
+import CredentialsProvider from "next-auth/providers/credentials";
+import GitHubProvider from "next-auth/providers/github";
 
 export default NextAuth({
   secret: process.env.AUTH_SECRET,

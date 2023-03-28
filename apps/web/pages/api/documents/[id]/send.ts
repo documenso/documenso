@@ -1,12 +1,12 @@
+import { NextApiRequest, NextApiResponse } from "next";
+import { sendSigningRequest } from "@documenso/lib/mail";
+import { getDocument } from "@documenso/lib/query";
 import {
   defaultHandler,
   defaultResponder,
   getUserFromToken,
 } from "@documenso/lib/server";
 import prisma from "@documenso/prisma";
-import { NextApiRequest, NextApiResponse } from "next";
-import { sendSigningRequest } from "@documenso/lib/mail";
-import { getDocument } from "@documenso/lib/query";
 import { Document as PrismaDocument, SendStatus } from "@prisma/client";
 
 async function postHandler(req: NextApiRequest, res: NextApiResponse) {

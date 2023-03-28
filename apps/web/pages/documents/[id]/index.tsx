@@ -1,20 +1,20 @@
 import { ReactElement } from "react";
-import Layout from "../../../components/layout";
-import { NextPageWithLayout } from "../../_app";
+import Link from "next/link";
 import { useRouter } from "next/router";
 import { NEXT_PUBLIC_WEBAPP_URL } from "@documenso/lib";
+import { getDocument } from "@documenso/lib/query";
 import { getUserFromToken } from "@documenso/lib/server";
-import Link from "next/link";
-import { DocumentStatus } from "@prisma/client";
+import { Breadcrumb, Button } from "@documenso/ui";
 import {
   InformationCircleIcon,
   PaperAirplaneIcon,
   UsersIcon,
 } from "@heroicons/react/24/outline";
-import { getDocument } from "@documenso/lib/query";
+import { DocumentStatus } from "@prisma/client";
 import { Document as PrismaDocument } from "@prisma/client";
-import { Button, Breadcrumb } from "@documenso/ui";
 import PDFEditor from "../../../components/editor/pdf-editor";
+import Layout from "../../../components/layout";
+import { NextPageWithLayout } from "../../_app";
 
 const DocumentsDetailPage: NextPageWithLayout = (props: any) => {
   const router = useRouter();
@@ -80,8 +80,7 @@ const DocumentsDetailPage: NextPageWithLayout = (props: any) => {
                   )
                 ) {
                 }
-              }}
-            >
+              }}>
               Prepare to Send
             </Button>
           </div>

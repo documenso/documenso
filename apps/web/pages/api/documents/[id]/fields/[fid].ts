@@ -1,13 +1,13 @@
+import { NextApiRequest, NextApiResponse } from "next";
+import { getDocument } from "@documenso/lib/query";
 import {
   defaultHandler,
   defaultResponder,
   getUserFromToken,
 } from "@documenso/lib/server";
 import prisma from "@documenso/prisma";
-import { NextApiRequest, NextApiResponse } from "next";
+import { FieldType, Document as PrismaDocument } from "@prisma/client";
 import short from "short-uuid";
-import { Document as PrismaDocument, FieldType } from "@prisma/client";
-import { getDocument } from "@documenso/lib/query";
 
 async function deleteHandler(req: NextApiRequest, res: NextApiResponse) {
   const user = await getUserFromToken(req, res);

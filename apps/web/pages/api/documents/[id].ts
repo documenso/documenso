@@ -1,13 +1,13 @@
+import { NextApiRequest, NextApiResponse } from "next";
+import { getDocument } from "@documenso/lib/query";
 import {
   defaultHandler,
   defaultResponder,
   getUserFromToken,
 } from "@documenso/lib/server";
 import prisma from "@documenso/prisma";
-import { NextApiRequest, NextApiResponse } from "next";
-import { Document as PrismaDocument } from "@prisma/client";
-import { getDocument } from "@documenso/lib/query";
 import { addDigitalSignature } from "@documenso/signing/addDigitalSignature";
+import { Document as PrismaDocument } from "@prisma/client";
 
 async function getHandler(req: NextApiRequest, res: NextApiResponse) {
   const { id: documentId } = req.query;

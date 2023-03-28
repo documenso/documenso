@@ -1,12 +1,11 @@
-import { compare, hash } from "bcryptjs";
 import type { NextApiRequest } from "next";
+import { HttpError } from "@documenso/lib/server";
+import { compare, hash } from "bcryptjs";
 import type { Session } from "next-auth";
 import {
-  getSession as getSessionInner,
   GetSessionParams,
+  getSession as getSessionInner,
 } from "next-auth/react";
-
-import { HttpError } from "@documenso/lib/server";
 
 export async function hashPassword(password: string) {
   const hashedPassword = await hash(password, 12);

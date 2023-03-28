@@ -1,6 +1,6 @@
-import { PDFDocument, rgb, StandardFonts } from "pdf-lib";
 import fontkit from "@pdf-lib/fontkit";
 import * as fs from "fs";
+import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
 
 export async function insertTextInPDF(
   pdfAsBase64: string,

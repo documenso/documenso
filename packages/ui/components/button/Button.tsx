@@ -1,6 +1,6 @@
-import { classNames } from "@documenso/lib";
-import Link from "next/link";
 import React from "react";
+import Link from "next/link";
+import { classNames } from "@documenso/lib";
 
 export function Button(props: any) {
   const isLink = typeof props.href !== "undefined" && !props.disabled;
@@ -20,13 +20,11 @@ export function Button(props: any) {
         color === "primary" ? primaryStyles : secondaryStyles,
         props.className
       )}
-      hidden={props.hidden}
-    >
+      hidden={props.hidden}>
       {props.icon ? (
         <props.icon
-          className="inline h-5 mr-1 text-inherit"
-          aria-hidden="true"
-        ></props.icon>
+          className="mr-1 inline h-5 text-inherit"
+          aria-hidden="true"></props.icon>
       ) : (
         ""
       )}
@@ -43,13 +41,11 @@ export function Button(props: any) {
       )}
       onClick={props.onClick}
       disabled={props.disabled || props.loading}
-      hidden={props.hidden}
-    >
+      hidden={props.hidden}>
       {props.icon ? (
         <props.icon
-          className="inline h-5 mr-1 text-inherit"
-          aria-hidden="true"
-        ></props.icon>
+          className="mr-1 inline h-5 text-inherit"
+          aria-hidden="true"></props.icon>
       ) : (
         ""
       )}

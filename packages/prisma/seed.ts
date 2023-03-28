@@ -1,7 +1,7 @@
-import prisma from "@documenso/prisma";
-import { hashPassword } from "@documenso/lib/auth";
-import { IdentityProvider } from "@prisma/client";
 import { coloredConsole } from "@documenso/lib";
+import { hashPassword } from "@documenso/lib/auth";
+import prisma from "@documenso/prisma";
+import { IdentityProvider } from "@prisma/client";
 
 async function createUser(userData: { email: string; password: string }) {
   try {

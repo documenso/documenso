@@ -1,9 +1,14 @@
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
-  value: true
+  value: true,
 });
-exports.default = exports.ERROR_VERIFY_SIGNATURE = exports.ERROR_TYPE_UNKNOWN = exports.ERROR_TYPE_PARSE = exports.ERROR_TYPE_INPUT = void 0;
+exports.default =
+  exports.ERROR_VERIFY_SIGNATURE =
+  exports.ERROR_TYPE_UNKNOWN =
+  exports.ERROR_TYPE_PARSE =
+  exports.ERROR_TYPE_INPUT =
+    void 0;
 const ERROR_TYPE_UNKNOWN = 1;
 exports.ERROR_TYPE_UNKNOWN = ERROR_TYPE_UNKNOWN;
 const ERROR_TYPE_INPUT = 2;
@@ -18,9 +23,7 @@ class SignPdfError extends Error {
     super(msg);
     this.type = type;
   }
-
 } // Shorthand
-
 
 SignPdfError.TYPE_UNKNOWN = ERROR_TYPE_UNKNOWN;
 SignPdfError.TYPE_INPUT = ERROR_TYPE_INPUT;

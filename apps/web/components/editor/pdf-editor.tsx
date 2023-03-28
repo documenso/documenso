@@ -1,13 +1,14 @@
-import { NEXT_PUBLIC_WEBAPP_URL } from "@documenso/lib/constants";
-import { useRouter } from "next/router";
-import dynamic from "next/dynamic";
 import { useState } from "react";
-import { createOrUpdateField, deleteField } from "@documenso/lib/api";
-import { createField } from "@documenso/features/editor";
-import RecipientSelector from "./recipient-selector";
-import FieldTypeSelector from "./field-type-selector";
-import { InformationCircleIcon } from "@heroicons/react/24/outline";
+import dynamic from "next/dynamic";
 import Link from "next/link";
+import { useRouter } from "next/router";
+import { createField } from "@documenso/features/editor";
+import { createOrUpdateField, deleteField } from "@documenso/lib/api";
+import { NEXT_PUBLIC_WEBAPP_URL } from "@documenso/lib/constants";
+import { InformationCircleIcon } from "@heroicons/react/24/outline";
+import FieldTypeSelector from "./field-type-selector";
+import RecipientSelector from "./recipient-selector";
+
 const stc = require("string-to-color");
 
 const PDFViewer = dynamic(() => import("./pdf-viewer"), {
@@ -71,8 +72,7 @@ export default function PDFEditor(props: any) {
                     props.document.id +
                     "/recipients"
                   }
-                  className="whitespace-nowrap font-medium text-blue-700 hover:text-blue-600"
-                >
+                  className="whitespace-nowrap font-medium text-blue-700 hover:text-blue-600">
                   Add Recipients
                   <span aria-hidden="true"> &rarr;</span>
                 </Link>
@@ -96,12 +96,10 @@ export default function PDFEditor(props: any) {
           }}
           onMouseDown={(e: any, page: number) => {
             if (e.button === 0) addField(e, page);
-          }}
-        ></PDFViewer>
+          }}></PDFViewer>
         <div
           hidden={noRecipients}
-          className="fixed left-0 top-1/3 max-w-xs border border-slate-300 bg-white py-4 pr-5 rounded-md"
-        >
+          className="fixed left-0 top-1/3 max-w-xs rounded-md border border-slate-300 bg-white py-4 pr-5">
           <RecipientSelector
             recipients={props?.document?.Recipient}
             onChange={setSelectedRecipient}

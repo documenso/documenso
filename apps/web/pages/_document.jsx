@@ -6,9 +6,8 @@ export default function Document(props) {
 
   return (
     <Html
-      className="h-full bg-gray-100 scroll-smooth font-normal antialiased"
-      lang="en"
-    >
+      className="h-full scroll-smooth bg-gray-100 font-normal antialiased"
+      lang="en">
       <Head>
         <meta name="color-scheme"></meta>
       </Head>

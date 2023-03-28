@@ -1,11 +1,11 @@
-import prisma from "@documenso/prisma";
 import Head from "next/head";
-import { NextPageWithLayout } from "../../_app";
-import { ReadStatus } from "@prisma/client";
-import PDFSigner from "../../../components/editor/pdf-signer";
 import Link from "next/link";
+import prisma from "@documenso/prisma";
 import { ClockIcon } from "@heroicons/react/24/outline";
-import { FieldType, DocumentStatus } from "@prisma/client";
+import { ReadStatus } from "@prisma/client";
+import { DocumentStatus, FieldType } from "@prisma/client";
+import PDFSigner from "../../../components/editor/pdf-signer";
+import { NextPageWithLayout } from "../../_app";
 
 const SignPage: NextPageWithLayout = (props: any) => {
   return (
@@ -22,8 +22,8 @@ const SignPage: NextPageWithLayout = (props: any) => {
       ) : (
         <>
           <div className="mx-auto w-fit px-4 py-16 sm:px-6 sm:py-24 lg:px-8">
-            <ClockIcon className="text-neon w-10 inline mr-1"></ClockIcon>
-            <h1 className="text-base font-medium text-neon inline align-middle">
+            <ClockIcon className="text-neon mr-1 inline w-10"></ClockIcon>
+            <h1 className="text-neon inline align-middle text-base font-medium">
               Time flies.
             </h1>
             <p className="mt-2 text-4xl font-bold tracking-tight">
@@ -36,14 +36,13 @@ const SignPage: NextPageWithLayout = (props: any) => {
                 : `the sender`}{" "}
               to resend it.
             </p>
-            <div className="mx-auto w-fit text-xl pt-20"></div>
+            <div className="mx-auto w-fit pt-20 text-xl"></div>
           </div>
           <div>
             <div className="relative mx-96">
               <div
                 className="absolute inset-0 flex items-center"
-                aria-hidden="true"
-              >
+                aria-hidden="true">
                 <div className="w-full border-t border-gray-300" />
               </div>
               <div className="relative flex justify-center"></div>
@@ -53,8 +52,7 @@ const SignPage: NextPageWithLayout = (props: any) => {
             Want to send of your own?{" "}
             <Link
               href="/signup?source=expired"
-              className="font-medium text-neon hover:text-neon"
-            >
+              className="text-neon hover:text-neon font-medium">
               Create your own Account
             </Link>
           </p>

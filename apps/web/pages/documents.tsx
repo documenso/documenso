@@ -1,7 +1,10 @@
 import { ReactElement, useEffect, useState } from "react";
-import Layout from "../components/layout";
-import type { NextPageWithLayout } from "./_app";
+import { NextPageContext } from "next";
 import Head from "next/head";
+import { useRouter } from "next/router";
+import { uploadDocument } from "@documenso/features";
+import { deleteDocument, getDocuments } from "@documenso/lib/api";
+import { Button, IconButton, SelectBox } from "@documenso/ui";
 import {
   ArrowDownTrayIcon,
   CheckBadgeIcon,
@@ -13,13 +16,10 @@ import {
   PlusIcon,
   TrashIcon,
 } from "@heroicons/react/24/outline";
-import { useRouter } from "next/router";
-import { uploadDocument } from "@documenso/features";
 import { DocumentStatus } from "@prisma/client";
 import { Tooltip as ReactTooltip } from "react-tooltip";
-import { Button, IconButton, SelectBox } from "@documenso/ui";
-import { NextPageContext } from "next";
-import { deleteDocument, getDocuments } from "@documenso/lib/api";
+import Layout from "../components/layout";
+import type { NextPageWithLayout } from "./_app";
 
 const DocumentsPage: NextPageWithLayout = (props: any) => {
   const router = useRouter();
@@ -114,7 +114,7 @@ const DocumentsPage: NextPageWithLayout = (props: any) => {
         <title>Documents | Documenso</title>
       </Head>
       <div className="px-4 sm:px-6 lg:px-8">
-        <div className="sm:flex sm:items-center mt-10">
+        <div className="mt-10 sm:flex sm:items-center">
           <div className="sm:flex-auto">
             <header>
               <h1 className="text-3xl font-bold leading-tight tracking-tight text-gray-900">
@@ -127,27 +127,26 @@ const DocumentsPage: NextPageWithLayout = (props: any) => {
               icon={DocumentPlusIcon}
               onClick={() => {
                 document?.getElementById("fileUploadHelper")?.click();
-              }}
-            >
+              }}>
               Add Document
             </Button>
           </div>
         </div>
         <div className="mt-3 mb-12">
-          <div className="w-fit block float-right ml-3 mt-7">
+          <div className="float-right ml-3 mt-7 block w-fit">
             {filteredDocuments.length != 1
               ? filteredDocuments.length + " Documents"
               : "1 Document"}
           </div>
           <SelectBox
-            className="w-1/4 block float-right"
+            className="float-right block w-1/4"
             label="Created"
             options={createdFilter}
             value={selectedCreatedFilter}
             onChange={setSelectedCreatedFilter}
           />
           <SelectBox
-            className="w-1/4 block float-right ml-3"
+            className="float-right ml-3 block w-1/4"
             label="Status"
             options={statusFilters}
             value={selectedStatusFilter}
@@ -173,12 +172,10 @@ const DocumentsPage: NextPageWithLayout = (props: any) => {
         </div>
         <div
           className="mt-28 flex flex-col"
-          hidden={!documents.length || loading}
-        >
+          hidden={!documents.length || loading}>
           <div
             className="-my-2 -mx-4 overflow-x-auto sm:-mx-6 lg:-mx-8"
-            hidden={!documents.length || loading}
-          >
+            hidden={!documents.length || loading}>
             <div className="inline-block min-w-full py-2 align-middle md:px-6 lg:px-8">
               <div className="overflow-hidden shadow ring-1 ring-black ring-opacity-5 md:rounded-lg">
                 <table className="min-w-full divide-y divide-gray-300">
@@ -186,32 +183,27 @@ const DocumentsPage: NextPageWithLayout = (props: any) => {
                     <tr>
                       <th
                         scope="col"
-                        className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
-                      >
+                        className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
                         Title
                       </th>
                       <th
                         scope="col"
-                        className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
-                      >
+                        className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
                         Recipients
                       </th>
                       <th
                         scope="col"
-                        className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
-                      >
+                        className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
                         Status
                       </th>
                       <th
                         scope="col"
-                        className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
-                      >
+                        className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
                         Created
                       </th>
                       <th
                         scope="col"
-                        className="relative py-3.5 pl-3 pr-4 sm:pr-6"
-                      >
+                        className="relative py-3.5 pl-3 pr-4 sm:pr-6">
                         <span className="sr-only">Delete</span>
                       </th>
                     </tr>
@@ -220,9 +212,8 @@ const DocumentsPage: NextPageWithLayout = (props: any) => {
                     {filteredDocuments.map((document: any, index: number) => (
                       <tr
                         key={document.id}
-                        className="hover:bg-gray-100 cursor-pointer"
-                        onClick={(event) => showDocument(document.id)}
-                      >
+                        className="cursor-pointer hover:bg-gray-100"
+                        onClick={(event) => showDocument(document.id)}>
                         <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
                           {document.title || "#" + document.id}
                         </td>
@@ -232,8 +223,7 @@ const DocumentsPage: NextPageWithLayout = (props: any) => {
                               {item.sendStatus === "NOT_SENT" ? (
                                 <span
                                   id="sent_icon"
-                                  className="inline-block flex-shrink-0 rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-800"
-                                >
+                                  className="inline-block flex-shrink-0 rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-800">
                                   {item.name
                                     ? item.name + " <" + item.email + ">"
                                     : item.email}
@@ -246,9 +236,8 @@ const DocumentsPage: NextPageWithLayout = (props: any) => {
                                 <span id="sent_icon">
                                   <span
                                     id="sent_icon"
-                                    className="inline-block flex-shrink-0 rounded-full bg-yellow-200 px-2 py-0.5 text-xs font-medium text-green-800"
-                                  >
-                                    <EnvelopeIcon className="inline h-5 mr-1"></EnvelopeIcon>
+                                    className="inline-block flex-shrink-0 rounded-full bg-yellow-200 px-2 py-0.5 text-xs font-medium text-green-800">
+                                    <EnvelopeIcon className="mr-1 inline h-5"></EnvelopeIcon>
                                     {item.name
                                       ? item.name + " <" + item.email + ">"
                                       : item.email}
@@ -262,10 +251,9 @@ const DocumentsPage: NextPageWithLayout = (props: any) => {
                                 <span id="read_icon">
                                   <span
                                     id="sent_icon"
-                                    className="inline-block flex-shrink-0 rounded-full bg-yellow-200 px-2 py-0.5 text-xs font-medium text-green-800"
-                                  >
-                                    <CheckIcon className="inline h-5 -mr-2"></CheckIcon>
-                                    <CheckIcon className="inline h-5 mr-1"></CheckIcon>
+                                    className="inline-block flex-shrink-0 rounded-full bg-yellow-200 px-2 py-0.5 text-xs font-medium text-green-800">
+                                    <CheckIcon className="-mr-2 inline h-5"></CheckIcon>
+                                    <CheckIcon className="mr-1 inline h-5"></CheckIcon>
                                     {item.name
                                       ? item.name + " <" + item.email + ">"
                                       : item.email}
@@ -277,7 +265,7 @@ const DocumentsPage: NextPageWithLayout = (props: any) => {
                               {item.signingStatus === "SIGNED" ? (
                                 <span id="signed_icon">
                                   <span className="inline-block flex-shrink-0 rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-800">
-                                    <CheckBadgeIcon className="inline h-5 mr-1"></CheckBadgeIcon>{" "}
+                                    <CheckBadgeIcon className="mr-1 inline h-5"></CheckBadgeIcon>{" "}
                                     {item.email}
                                   </span>
                                 </span>
@@ -364,8 +352,7 @@ const DocumentsPage: NextPageWithLayout = (props: any) => {
                                       loadDocuments();
                                     });
                                 }
-                              }}
-                            ></IconButton>
+                              }}></IconButton>
                             <span className="sr-only">, {document.name}</span>
                           </div>
                         </td>
@@ -376,9 +363,8 @@ const DocumentsPage: NextPageWithLayout = (props: any) => {
               </div>
               <div
                 hidden={filteredDocuments.length > 0}
-                className="mx-auto w-fit mt-12 p-3"
-              >
-                <FunnelIcon className="w-5 inline mr-1 align-middle" /> Nothing
+                className="mx-auto mt-12 w-fit p-3">
+                <FunnelIcon className="mr-1 inline w-5 align-middle" /> Nothing
                 here. Maybe try a different filter.
               </div>
             </div>
@@ -386,17 +372,15 @@ const DocumentsPage: NextPageWithLayout = (props: any) => {
         </div>
       </div>
       <div
-        className="text-center mt-24"
+        className="mt-24 text-center"
         id="empty"
-        hidden={documents.length > 0 || loading}
-      >
+        hidden={documents.length > 0 || loading}>
         <svg
           className="mx-auto h-12 w-12 text-gray-400"
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor"
-          aria-hidden="true"
-        >
+          aria-hidden="true">
           <path
             strokeLinecap="round"
             strokeLinejoin="round"
@@ -413,8 +397,7 @@ const DocumentsPage: NextPageWithLayout = (props: any) => {
             icon={PlusIcon}
             onClick={() => {
               document?.getElementById("fileUploadHelper")?.click();
-            }}
-          >
+            }}>
             Add Document
           </Button>
           <input
