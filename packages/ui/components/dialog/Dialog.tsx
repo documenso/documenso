@@ -3,8 +3,33 @@ import { Transition, Dialog as DialogComponent } from "@headlessui/react";
 import { Fragment } from "react";
 import { Button } from "@documenso/ui";
 import { sendSigningRequests } from "@documenso/lib/api";
+import { Document as PrismaDocument } from "@prisma/client";
 
-export function Dialog({ title, open, setOpen, document, formValues, setLoading, icon }: any) {
+type FormValue = {
+  id: number;
+  email: string;
+  name: string;
+};
+
+type DialogProps = {
+  title: string;
+  open: boolean;
+  setOpen: (open: boolean) => void;
+  document: PrismaDocument;
+  formValues: FormValue[];
+  setLoading: (loading: boolean) => void;
+  icon: React.ReactNode;
+};
+
+export function Dialog({
+  title,
+  open,
+  setOpen,
+  document,
+  formValues,
+  setLoading,
+  icon,
+}: DialogProps) {
   const unsentEmailsLength = formValues.filter(
     (s: any) => s.email && s.sendStatus != "SENT"
   ).length;

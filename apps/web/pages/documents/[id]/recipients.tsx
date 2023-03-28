@@ -22,7 +22,7 @@ import { createOrUpdateRecipient, deleteRecipient, sendSigningRequests } from "@
 
 import { FormProvider, useFieldArray, useForm, useWatch } from "react-hook-form";
 
-type FormValues = {
+export type FormValues = {
   signers: { id: number; email: string; name: string }[];
 };
 
