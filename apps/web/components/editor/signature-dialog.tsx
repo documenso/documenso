@@ -41,8 +41,9 @@ export default function SignatureDialog({ open, setOpen, onClose }: SignatureDia
   const [signatureEmpty, setSignatureEmpty] = useState(true);
   let signCanvasRef: any | undefined;
 
+  // TODO: Consider `useSyncExternalStore` to avoid the need for this effect
   useEffect(() => {
-    setTypedSignature(localStorage.getItem("typedSignature") || "");
+    setTypedSignature(localStorage.getItem("typedSignature") || '');
   }, []);
 
   return (

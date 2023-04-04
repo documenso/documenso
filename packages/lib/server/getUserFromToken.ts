@@ -8,7 +8,6 @@ export async function getUserFromToken(
   res: NextApiResponse | GetServerSidePropsContext['res']
 ): Promise<PrismaUser | null> {
   const token = await getToken({ req });
-  const tokenEmail = token?.email?.toString();
 
   if (!token) {
     if ('status' in res) {
@@ -18,7 +17,9 @@ export async function getUserFromToken(
     return null;
   }
 
-  if (!tokenEmail) {
+  const { email } = token;
+
+  if (!email) {
     if ('status' in res) {
       res.status(400).send("No email found in session token.");
     }
@@ -27,7 +28,7 @@ export async function getUserFromToken(
   }
 
   const user = await prisma.user.findFirst({
-    where: { email: tokenEmail },
+    where: { email },
   });
 
   if (!user) {
