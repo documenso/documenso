@@ -15,7 +15,9 @@ export default function Custom500() {
           <p className="inline-flex items-center text-3xl font-bold sm:text-5xl">
             500
             <span className="relative -top-1.5 px-3 font-thin sm:text-6xl">|</span>{" "}
-            <span className="align-middle text-base font-semibold sm:text-2xl">Something went wrong.</span>
+            <span className="align-middle text-base font-semibold sm:text-2xl">
+              Something went wrong.
+            </span>
           </p>
           <div className="mt-10 flex justify-center">
             <Button color="secondary" href="/" icon={ArrowSmallLeftIcon}>

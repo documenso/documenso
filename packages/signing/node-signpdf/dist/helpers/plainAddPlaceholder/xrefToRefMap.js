@@ -26,7 +26,10 @@ const xrefToRefMap = (xrefString) => {
     }
 
     if (expectedLines <= 0) {
-      throw new _SignPdfError.default("Too many lines in xref table.", _SignPdfError.default.TYPE_PARSE);
+      throw new _SignPdfError.default(
+        "Too many lines in xref table.",
+        _SignPdfError.default.TYPE_PARSE
+      );
     }
 
     expectedLines -= 1;

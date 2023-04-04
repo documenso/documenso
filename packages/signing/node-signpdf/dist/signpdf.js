@@ -102,9 +102,16 @@ class SignPdf {
     let actualByteRange = `/ByteRange [${byteRange.join(" ")}]`;
     actualByteRange += " ".repeat(byteRangePlaceholder.length - actualByteRange.length); // Replace the /ByteRange placeholder with the actual ByteRange
 
-    pdf = Buffer.concat([pdf.slice(0, byteRangePos), Buffer.from(actualByteRange), pdf.slice(byteRangeEnd)]); // Remove the placeholder signature
+    pdf = Buffer.concat([
+      pdf.slice(0, byteRangePos),
+      Buffer.from(actualByteRange),
+      pdf.slice(byteRangeEnd),
+    ]); // Remove the placeholder signature
 
-    pdf = Buffer.concat([pdf.slice(0, byteRange[1]), pdf.slice(byteRange[2], byteRange[2] + byteRange[3])]); // Convert Buffer P12 to a forge implementation.
+    pdf = Buffer.concat([
+      pdf.slice(0, byteRange[1]),
+      pdf.slice(byteRange[2], byteRange[2] + byteRange[3]),
+    ]); // Convert Buffer P12 to a forge implementation.
 
     const forgeCert = _nodeForge.default.util.createBuffer(p12Buffer.toString("binary"));
 
@@ -190,11 +197,15 @@ class SignPdf {
 
     this.lastSignature = signature; // Pad the signature with zeroes so the it is the same length as the placeholder
 
-    signature += Buffer.from(String.fromCharCode(0).repeat(placeholderLength / 2 - raw.length)).toString(
-      "hex"
-    ); // Place it in the document.
+    signature += Buffer.from(
+      String.fromCharCode(0).repeat(placeholderLength / 2 - raw.length)
+    ).toString("hex"); // Place it in the document.
 
-    pdf = Buffer.concat([pdf.slice(0, byteRange[1]), Buffer.from(`<${signature}>`), pdf.slice(byteRange[1])]); // Magic. Done.
+    pdf = Buffer.concat([
+      pdf.slice(0, byteRange[1]),
+      Buffer.from(`<${signature}>`),
+      pdf.slice(byteRange[1]),
+    ]); // Magic. Done.
 
     return pdf;
   }

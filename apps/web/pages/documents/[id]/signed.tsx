@@ -8,7 +8,9 @@ import { ArrowDownTrayIcon, CheckBadgeIcon } from "@heroicons/react/24/outline";
 
 const Signed: NextPageWithLayout = (props: any) => {
   const router = useRouter();
-  const allRecipientsSigned = props.document.Recipient?.every((r: any) => r.signingStatus === "SIGNED");
+  const allRecipientsSigned = props.document.Recipient?.every(
+    (r: any) => r.signingStatus === "SIGNED"
+  );
 
   return (
     <>
@@ -18,7 +20,9 @@ const Signed: NextPageWithLayout = (props: any) => {
       <div className="mx-auto w-fit px-4 py-16 sm:px-6 sm:py-24 lg:px-8">
         <CheckBadgeIcon className="text-neon mr-1 inline w-10"></CheckBadgeIcon>
         <h1 className="text-neon inline align-middle text-base font-medium">It's done!</h1>
-        <p className="mt-2 text-4xl font-bold tracking-tight">You signed "{props.document.title}"</p>
+        <p className="mt-2 text-4xl font-bold tracking-tight">
+          You signed "{props.document.title}"
+        </p>
         <p className="mt-2 max-w-sm text-base text-gray-500" hidden={allRecipientsSigned}>
           You will be notfied when all recipients have signed.
         </p>
@@ -32,7 +36,9 @@ const Signed: NextPageWithLayout = (props: any) => {
             onClick={(event: any) => {
               event.preventDefault();
               event.stopPropagation();
-              router.push("/api/documents/" + props.document.id + "?token=" + props.recipient.token);
+              router.push(
+                "/api/documents/" + props.document.id + "?token=" + props.recipient.token
+              );
             }}>
             Download "{props.document.title}"
           </Button>

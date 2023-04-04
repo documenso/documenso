@@ -22,8 +22,8 @@ const SignPage: NextPageWithLayout = (props: any) => {
             <h1 className="text-neon inline align-middle text-base font-medium">Time flies.</h1>
             <p className="mt-2 text-4xl font-bold tracking-tight">This signing link is expired.</p>
             <p className="mt-2 text-base text-gray-500">
-              Please ask {props.document.User.name ? `${props.document.User.name}` : `the sender`} to resend
-              it.
+              Please ask {props.document.User.name ? `${props.document.User.name}` : `the sender`}{" "}
+              to resend it.
             </p>
             <div className="mx-auto w-fit pt-20 text-xl"></div>
           </div>

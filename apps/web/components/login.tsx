@@ -148,7 +148,9 @@ export default function Login(props: any) {
               ) : (
                 <p className="mt-2 text-center text-sm text-gray-600">
                   Like Documenso{" "}
-                  <Link href="https://documenso.com" className="text-neon hover:text-neon font-medium">
+                  <Link
+                    href="https://documenso.com"
+                    className="text-neon hover:text-neon font-medium">
                     Hosted Documenso will be availible soon™
                   </Link>
                 </p>

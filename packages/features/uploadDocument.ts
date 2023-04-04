@@ -27,7 +27,9 @@ export const uploadDocument = async (event: any) => {
       )
       .then((response: Response) => {
         response.json().then((createdDocumentIdFromBody) => {
-          router.push(`${NEXT_PUBLIC_WEBAPP_URL}/documents/${createdDocumentIdFromBody}/recipients`);
+          router.push(
+            `${NEXT_PUBLIC_WEBAPP_URL}/documents/${createdDocumentIdFromBody}/recipients`
+          );
         });
       });
   }

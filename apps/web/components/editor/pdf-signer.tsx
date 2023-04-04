@@ -87,9 +87,13 @@ export default function PDFSigner(props: any) {
                 icon={CheckBadgeIcon}
                 className="float-right"
                 onClick={() => {
-                  signDocument(props.document, localSignatures, `${router.query.token}`).then(() => {
-                    router.push(`/documents/${props.document.id}/signed?token=${router.query.token}`);
-                  });
+                  signDocument(props.document, localSignatures, `${router.query.token}`).then(
+                    () => {
+                      router.push(
+                        `/documents/${props.document.id}/signed?token=${router.query.token}`
+                      );
+                    }
+                  );
                 }}>
                 Done
               </Button>
@@ -135,7 +139,9 @@ export default function PDFSigner(props: any) {
     // Check if all fields are signed..
     if (signatureFields.length > 0) {
       // If there are no fields to sign at least one signature is enough
-      return fields.filter((field) => field.type === FieldType.SIGNATURE).every((field) => field.signature);
+      return fields
+        .filter((field) => field.type === FieldType.SIGNATURE)
+        .every((field) => field.signature);
     } else {
       return localSignatures.length > 0;
     }

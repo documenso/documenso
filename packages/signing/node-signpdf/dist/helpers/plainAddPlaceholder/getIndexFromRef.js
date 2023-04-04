@@ -21,7 +21,10 @@ const getIndexFromRef = (refTable, ref) => {
   index = parseInt(index);
 
   if (!refTable.offsets.has(index)) {
-    throw new _SignPdfError.default(`Failed to locate object "${ref}".`, _SignPdfError.default.TYPE_PARSE);
+    throw new _SignPdfError.default(
+      `Failed to locate object "${ref}".`,
+      _SignPdfError.default.TYPE_PARSE
+    );
   }
 
   return index;

@@ -15,7 +15,9 @@ async function createUser(userData: { email: string; password: string }) {
 
     return user;
   } catch (error) {
-    console.info(`WARN: Could not create user "${userData.email}". Maybe the email is already taken?`);
+    console.info(
+      `WARN: Could not create user "${userData.email}". Maybe the email is already taken?`
+    );
   }
 }
 

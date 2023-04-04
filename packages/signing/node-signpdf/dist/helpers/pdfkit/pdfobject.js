@@ -87,7 +87,10 @@ class PDFObject {
       let string = `D:${pad(object.getUTCFullYear(), 4)}${pad(object.getUTCMonth() + 1, 2)}${pad(
         object.getUTCDate(),
         2
-      )}${pad(object.getUTCHours(), 2)}${pad(object.getUTCMinutes(), 2)}${pad(object.getUTCSeconds(), 2)}Z`; // Encrypt the string when necessary
+      )}${pad(object.getUTCHours(), 2)}${pad(object.getUTCMinutes(), 2)}${pad(
+        object.getUTCSeconds(),
+        2
+      )}Z`; // Encrypt the string when necessary
 
       if (encryptFn) {
         string = encryptFn(Buffer.from(string, "ascii")).toString("binary"); // Escape characters as required by the spec

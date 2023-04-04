@@ -105,7 +105,9 @@ const RecipientsPage: NextPageWithLayout = (props: any) => {
               }}
               disabled={
                 (formValues.length || 0) === 0 ||
-                !formValues.some((r: any) => r.email && !hasEmailError(r) && r.sendStatus === "NOT_SENT") ||
+                !formValues.some(
+                  (r: any) => r.email && !hasEmailError(r) && r.sendStatus === "NOT_SENT"
+                ) ||
                 loading
               }>
               Send
@@ -115,7 +117,9 @@ const RecipientsPage: NextPageWithLayout = (props: any) => {
         <div className="mt-10 overflow-hidden rounded-md bg-white p-4 shadow sm:p-6">
           <div className="border-b border-gray-200 pb-3 sm:pb-5">
             <h3 className="text-lg font-medium leading-6 text-gray-900 ">Signers</h3>
-            <p className="mt-2 max-w-4xl text-sm text-gray-500">The people who will sign the document.</p>
+            <p className="mt-2 max-w-4xl text-sm text-gray-500">
+              The people who will sign the document.
+            </p>
           </div>
           <FormProvider {...form}>
             <form
@@ -124,7 +128,9 @@ const RecipientsPage: NextPageWithLayout = (props: any) => {
               }}>
               <ul role="list" className="divide-y divide-gray-200">
                 {fields.map((item: any, index: number) => (
-                  <li key={index} className="group w-full border-0 px-2 py-3 hover:bg-green-50 sm:py-4">
+                  <li
+                    key={index}
+                    className="group w-full border-0 px-2 py-3 hover:bg-green-50 sm:py-4">
                     <div id="container" className="block w-full lg:flex lg:justify-between">
                       <div className="block space-y-2 md:flex md:space-x-2 md:space-y-0">
                         <div

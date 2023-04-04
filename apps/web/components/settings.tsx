@@ -77,7 +77,9 @@ export default function Setttings() {
           <h1 className="text-brown text-3xl font-bold leading-tight tracking-tight">Settings</h1>
         </div>
       </header>
-      <div className="mx-auto max-w-screen-xl px-4 pb-6 sm:px-6 lg:px-8 lg:pb-16" hidden={!user.email}>
+      <div
+        className="mx-auto max-w-screen-xl px-4 pb-6 sm:px-6 lg:px-8 lg:pb-16"
+        hidden={!user.email}>
         <div className="overflow-hidden rounded-lg bg-white shadow">
           <div className="divide-y divide-gray-200 lg:grid lg:grid-cols-12 lg:divide-y-0 lg:divide-x">
             <aside className="py-6 lg:col-span-3">

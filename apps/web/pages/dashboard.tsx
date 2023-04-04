@@ -12,7 +12,12 @@ import {
   ExclamationTriangleIcon,
   UsersIcon,
 } from "@heroicons/react/24/outline";
-import { DocumentStatus, Document as PrismaDocument, SendStatus, SigningStatus } from "@prisma/client";
+import {
+  DocumentStatus,
+  Document as PrismaDocument,
+  SendStatus,
+  SigningStatus,
+} from "@prisma/client";
 import { truncate } from "fs";
 import { Tooltip as ReactTooltip } from "react-tooltip";
 
@@ -50,7 +55,9 @@ const DashboardPage: NextPageWithLayout = (props: any) => {
 
       <div className="py-10 max-sm:px-4">
         <header>
-          <h1 className="text-3xl font-bold leading-tight tracking-tight text-gray-900">Dashboard</h1>
+          <h1 className="text-3xl font-bold leading-tight tracking-tight text-gray-900">
+            Dashboard
+          </h1>
         </header>
         <dl className="mt-8 grid gap-5 md:grid-cols-3 ">
           {stats.map((item) => (
@@ -143,7 +150,9 @@ export async function getServerSideProps(context: any) {
       e.Recipient.some((r: any) => r.signingStatus === SigningStatus.NOT_SIGNED)
   );
 
-  const completed: PrismaDocument[] = documents.filter((d) => d.status === DocumentStatus.COMPLETED);
+  const completed: PrismaDocument[] = documents.filter(
+    (d) => d.status === DocumentStatus.COMPLETED
+  );
 
   return {
     props: {

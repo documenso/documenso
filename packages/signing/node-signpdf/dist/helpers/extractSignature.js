@@ -40,7 +40,10 @@ const extractSignature = (pdf, signatureCount = 1) => {
   const byteRangePos = getSubstringIndex(pdf, "/ByteRange [", signatureCount);
 
   if (byteRangePos === -1) {
-    throw new _SignPdfError.default("Failed to locate ByteRange.", _SignPdfError.default.TYPE_PARSE);
+    throw new _SignPdfError.default(
+      "Failed to locate ByteRange.",
+      _SignPdfError.default.TYPE_PARSE
+    );
   }
 
   const byteRangeEnd = pdf.indexOf("]", byteRangePos);
@@ -56,7 +59,10 @@ const extractSignature = (pdf, signatureCount = 1) => {
   const matches = /\/ByteRange \[(\d+) +(\d+) +(\d+) +(\d+) *\]/.exec(byteRange);
 
   if (matches === null) {
-    throw new _SignPdfError.default("Failed to parse the ByteRange.", _SignPdfError.default.TYPE_PARSE);
+    throw new _SignPdfError.default(
+      "Failed to parse the ByteRange.",
+      _SignPdfError.default.TYPE_PARSE
+    );
   }
 
   const ByteRange = matches.slice(1).map(Number);

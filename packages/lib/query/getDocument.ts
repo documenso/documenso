@@ -2,7 +2,11 @@ import { getUserFromToken } from "@documenso/lib/server";
 import prisma from "@documenso/prisma";
 import { Document as PrismaDocument } from "@prisma/client";
 
-export const getDocument = async (documentId: number, req: any, res: any): Promise<PrismaDocument> => {
+export const getDocument = async (
+  documentId: number,
+  req: any,
+  res: any
+): Promise<PrismaDocument> => {
   const user = await getUserFromToken(req, res);
   if (!user) return Promise.reject("Invalid user or token.");
   if (!documentId) Promise.reject("No documentId");

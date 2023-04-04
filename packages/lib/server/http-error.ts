@@ -5,7 +5,13 @@ export class HttpError<TCode extends number = number> extends Error {
   public readonly url: string | undefined;
   public readonly method: string | undefined;
 
-  constructor(opts: { url?: string; method?: string; message?: string; statusCode: TCode; cause?: Error }) {
+  constructor(opts: {
+    url?: string;
+    method?: string;
+    message?: string;
+    statusCode: TCode;
+    cause?: Error;
+  }) {
     super(opts.message ?? `HTTP Error ${opts.statusCode} `);
 
     Object.setPrototypeOf(this, HttpError.prototype);

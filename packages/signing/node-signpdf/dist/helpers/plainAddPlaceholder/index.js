@@ -21,9 +21,13 @@ var _readPdf = _interopRequireDefault(require("./readPdf"));
 
 var _getPageRef = _interopRequireDefault(require("./getPageRef"));
 
-var _createBufferRootWithAcroform = _interopRequireDefault(require("./createBufferRootWithAcroform"));
+var _createBufferRootWithAcroform = _interopRequireDefault(
+  require("./createBufferRootWithAcroform")
+);
 
-var _createBufferPageWithAnnotation = _interopRequireDefault(require("./createBufferPageWithAnnotation"));
+var _createBufferPageWithAnnotation = _interopRequireDefault(
+  require("./createBufferPageWithAnnotation")
+);
 
 var _createBufferTrailer = _interopRequireDefault(require("./createBufferTrailer"));
 

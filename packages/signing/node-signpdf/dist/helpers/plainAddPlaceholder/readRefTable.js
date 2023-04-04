@@ -3,7 +3,11 @@
 Object.defineProperty(exports, "__esModule", {
   value: true,
 });
-exports.getXref = exports.getLastTrailerPosition = exports.getFullXrefTable = exports.default = void 0;
+exports.getXref =
+  exports.getLastTrailerPosition =
+  exports.getFullXrefTable =
+  exports.default =
+    void 0;
 
 var _SignPdfError = _interopRequireDefault(require("../../SignPdfError"));
 
@@ -16,7 +20,9 @@ function _interopRequireDefault(obj) {
 const getLastTrailerPosition = (pdf) => {
   const trailerStart = pdf.lastIndexOf(Buffer.from("trailer", "utf8"));
   const trailer = pdf.slice(trailerStart, pdf.length - 6);
-  const xRefPosition = trailer.slice(trailer.lastIndexOf(Buffer.from("startxref", "utf8")) + 10).toString();
+  const xRefPosition = trailer
+    .slice(trailer.lastIndexOf(Buffer.from("startxref", "utf8")) + 10)
+    .toString();
   return parseInt(xRefPosition);
 };
 
@@ -63,13 +69,19 @@ const getXref = (pdf, position) => {
   let size = refTable.toString().split("/Size")[1];
 
   if (!size) {
-    throw new _SignPdfError.default("Size not found in xref table.", _SignPdfError.default.TYPE_PARSE);
+    throw new _SignPdfError.default(
+      "Size not found in xref table.",
+      _SignPdfError.default.TYPE_PARSE
+    );
   }
 
   size = /^\s*(\d+)/.exec(size);
 
   if (size === null) {
-    throw new _SignPdfError.default("Failed to parse size of xref table.", _SignPdfError.default.TYPE_PARSE);
+    throw new _SignPdfError.default(
+      "Failed to parse size of xref table.",
+      _SignPdfError.default.TYPE_PARSE
+    );
   }
 
   size = parseInt(size[1]);

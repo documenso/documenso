@@ -13,7 +13,9 @@ export function SelectBox(props: any) {
         }}>
         {({ open }) => (
           <>
-            <Listbox.Label className="block text-sm font-medium text-gray-700">{props.label}</Listbox.Label>
+            <Listbox.Label className="block text-sm font-medium text-gray-700">
+              {props.label}
+            </Listbox.Label>
             <div className="relative mt-1">
               <Listbox.Button className="focus:border-neon focus:ring-neon relative w-full cursor-default rounded-md border border-gray-300 bg-white py-2 pl-3 pr-10 text-left shadow-sm focus:outline-none focus:ring-1 sm:text-sm">
                 <span className="block truncate">{props?.value?.label}</span>

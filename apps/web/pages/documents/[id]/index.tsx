@@ -40,7 +40,10 @@ const DocumentsDetailPage: NextPageWithLayout = (props: any) => {
             </h2>
             <div className="mt-1 flex flex-col sm:mt-0 sm:flex-row sm:flex-wrap sm:space-x-6">
               <div className="mt-2 flex items-center text-sm text-gray-500">
-                <UsersIcon className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400" aria-hidden="true" />
+                <UsersIcon
+                  className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"
+                  aria-hidden="true"
+                />
 
                 <Link href={`/documents/${props.document.id}/recipients`}>
                   {props?.document?.Recipient?.length} Recipients
@@ -61,7 +64,9 @@ const DocumentsDetailPage: NextPageWithLayout = (props: any) => {
               className="ml-3"
               href={NEXT_PUBLIC_WEBAPP_URL + "/documents/" + props.document.id + "/recipients"}
               onClick={() => {
-                if (confirm(`Send document out to ${props?.document?.Recipient?.length} recipients?`)) {
+                if (
+                  confirm(`Send document out to ${props?.document?.Recipient?.length} recipients?`)
+                ) {
                 }
               }}>
               Prepare to Send

@@ -107,7 +107,9 @@ const DocumentsPage: NextPageWithLayout = (props: any) => {
         <div className="mt-10 sm:flex sm:items-center">
           <div className="sm:flex-auto">
             <header>
-              <h1 className="text-3xl font-bold leading-tight tracking-tight text-gray-900">Documents</h1>
+              <h1 className="text-3xl font-bold leading-tight tracking-tight text-gray-900">
+                Documents
+              </h1>
             </header>
           </div>
           <div className="mt-4 sm:mt-0 sm:ml-16 sm:flex-none">
@@ -165,16 +167,24 @@ const DocumentsPage: NextPageWithLayout = (props: any) => {
                 <table className="min-w-full divide-y divide-gray-300">
                   <thead className="bg-gray-50">
                     <tr>
-                      <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
+                      <th
+                        scope="col"
+                        className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
                         Title
                       </th>
-                      <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
+                      <th
+                        scope="col"
+                        className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
                         Recipients
                       </th>
-                      <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
+                      <th
+                        scope="col"
+                        className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
                         Status
                       </th>
-                      <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
+                      <th
+                        scope="col"
+                        className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
                         Created
                       </th>
                       <th scope="col" className="relative py-3.5 pl-3 pr-4 sm:pr-6">
@@ -215,7 +225,8 @@ const DocumentsPage: NextPageWithLayout = (props: any) => {
                               ) : (
                                 ""
                               )}
-                              {item.readStatus === "OPENED" && item.signingStatus === "NOT_SIGNED" ? (
+                              {item.readStatus === "OPENED" &&
+                              item.signingStatus === "NOT_SIGNED" ? (
                                 <span id="read_icon">
                                   <span
                                     id="sent_icon"
@@ -231,7 +242,8 @@ const DocumentsPage: NextPageWithLayout = (props: any) => {
                               {item.signingStatus === "SIGNED" ? (
                                 <span id="signed_icon">
                                   <span className="inline-block flex-shrink-0 rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-800">
-                                    <CheckBadgeIcon className="mr-1 inline h-5"></CheckBadgeIcon> {item.email}
+                                    <CheckBadgeIcon className="mr-1 inline h-5"></CheckBadgeIcon>{" "}
+                                    {item.email}
                                   </span>
                                 </span>
                               ) : (
@@ -260,8 +272,8 @@ const DocumentsPage: NextPageWithLayout = (props: any) => {
                           {formatDocumentStatus(document.status)}
                           <p>
                             <small hidden={document.Recipient.length === 0}>
-                              {document.Recipient.filter((r: any) => r.signingStatus === "SIGNED").length ||
-                                0}
+                              {document.Recipient.filter((r: any) => r.signingStatus === "SIGNED")
+                                .length || 0}
                               /{document.Recipient.length || 0}
                             </small>
                           </p>
@@ -317,8 +329,8 @@ const DocumentsPage: NextPageWithLayout = (props: any) => {
                 </table>
               </div>
               <div hidden={filteredDocuments.length > 0} className="mx-auto mt-12 w-fit p-3">
-                <FunnelIcon className="mr-1 inline w-5 align-middle" /> Nothing here. Maybe try a different
-                filter.
+                <FunnelIcon className="mr-1 inline w-5 align-middle" /> Nothing here. Maybe try a
+                different filter.
               </div>
             </div>
           </div>
@@ -339,7 +351,9 @@ const DocumentsPage: NextPageWithLayout = (props: any) => {
         </svg>
 
         <h3 className="mt-2 text-sm font-medium text-gray-900">No documents</h3>
-        <p className="mt-1 text-sm text-gray-500">Get started by adding a document. Any PDF will do.</p>
+        <p className="mt-1 text-sm text-gray-500">
+          Get started by adding a document. Any PDF will do.
+        </p>
         <div className="mt-6">
           <Button
             icon={PlusIcon}
@@ -359,7 +373,11 @@ const DocumentsPage: NextPageWithLayout = (props: any) => {
           />
         </div>
       </div>
-      <ReactTooltip anchorId="empty" place="bottom" content="No preparation needed. Any PDF will do." />
+      <ReactTooltip
+        anchorId="empty"
+        place="bottom"
+        content="No preparation needed. Any PDF will do."
+      />
     </>
   );
 };

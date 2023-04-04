@@ -92,9 +92,15 @@ export default function PDFEditor(props: any) {
         <div
           hidden={noRecipients}
           className="fixed left-0 top-1/3 max-w-xs rounded-md border border-slate-300 bg-white py-4 pr-5">
-          <RecipientSelector recipients={props?.document?.Recipient} onChange={setSelectedRecipient} />
+          <RecipientSelector
+            recipients={props?.document?.Recipient}
+            onChange={setSelectedRecipient}
+          />
           <hr className="m-3 border-slate-300"></hr>
-          <FieldTypeSelector selectedRecipient={selectedRecipient} onChange={setSelectedFieldType} />
+          <FieldTypeSelector
+            selectedRecipient={selectedRecipient}
+            onChange={setSelectedFieldType}
+          />
         </div>
       </div>
     </>

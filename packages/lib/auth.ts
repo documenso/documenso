@@ -62,7 +62,9 @@ export function isPasswordValid(password: string, breakdown?: boolean, strict?: 
   return errors;
 }
 
-type CtxOrReq = { req: NextApiRequest; ctx?: never } | { ctx: { req: NextApiRequest }; req?: never };
+type CtxOrReq =
+  | { req: NextApiRequest; ctx?: never }
+  | { ctx: { req: NextApiRequest }; req?: never };
 
 export const ensureSession = async (ctxOrReq: CtxOrReq) => {
   const session = await getSession(ctxOrReq);

@@ -30,7 +30,10 @@ export default function PDFViewer(props) {
 
   return (
     <>
-      <div hidden={loading} onMouseUp={props.onMouseUp} style={{ height: numPages * pageHeight + 1000 }}>
+      <div
+        hidden={loading}
+        onMouseUp={props.onMouseUp}
+        style={{ height: numPages * pageHeight + 1000 }}>
         <div className="mt-6 max-w-xs"></div>
         <Document
           file={props.pdfUrl}
@@ -76,7 +79,11 @@ export default function PDFViewer(props) {
                         onDelete={onDeleteHandler}></SignableField>
                     ) : (
                       <EditableField
-                        hidden={field.Signature || field.inserted || field.type === FieldType.FREE_SIGNATURE}
+                        hidden={
+                          field.Signature ||
+                          field.inserted ||
+                          field.type === FieldType.FREE_SIGNATURE
+                        }
                         key={field.id}
                         field={field}
                         className="absolute"

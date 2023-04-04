@@ -21,8 +21,18 @@ type DialogProps = {
   icon: React.ReactNode;
 };
 
-export function Dialog({ title, open, setOpen, document, formValues, setLoading, icon }: DialogProps) {
-  const unsentEmailsLength = formValues.filter((s: any) => s.email && s.sendStatus != "SENT").length;
+export function Dialog({
+  title,
+  open,
+  setOpen,
+  document,
+  formValues,
+  setLoading,
+  icon,
+}: DialogProps) {
+  const unsentEmailsLength = formValues.filter(
+    (s: any) => s.email && s.sendStatus != "SENT"
+  ).length;
 
   return (
     <Transition.Root show={open} as={Fragment}>
@@ -54,7 +64,9 @@ export function Dialog({ title, open, setOpen, document, formValues, setLoading,
                     {icon}
                   </div>
                   <div className="mt-3 text-center sm:mt-5">
-                    <DialogComponent.Title as="h3" className="text-lg font-medium leading-6 text-gray-900">
+                    <DialogComponent.Title
+                      as="h3"
+                      className="text-lg font-medium leading-6 text-gray-900">
                       {title}
                     </DialogComponent.Title>
                     <div className="mt-2">
