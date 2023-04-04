@@ -110,6 +110,7 @@ Follow these steps to setup documenso on you local machnine:
 - Set DATABASE_URL value in .env file
   - You can use the provided test database url (may be wiped at any point)
   - Or setup a local postgres sql instance (recommened)
+- Create the database scheme by running <code>db-migrate:dev</code>
 - Set SENDGRID_API_KEY value in .env file
   - You need SendGrid account, which you can create [here](https://signup.sendgrid.com/).
   - Documenso uses [Nodemailer](https://nodemailer.com/about/) so you can easily use your own smtp server
