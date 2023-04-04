@@ -50,16 +50,16 @@ export default function PDFEditor(props: any) {
   return (
     <>
       <div>
-        <div className="rounded-md bg-blue-50 p-4">
+        <div hidden={!noRecipients} className="rounded-md bg-yellow-50 p-4">
           <div className="flex">
             <div className="flex-shrink-0">
               <InformationCircleIcon
-                className="h-5 w-5 text-blue-400"
+                className="h-5 w-5 text-yellow-400"
                 aria-hidden="true"
               />
             </div>
             <div className="ml-3 flex-1 md:flex md:justify-between">
-              <p className="text-sm text-blue-700">
+              <p className="text-sm text-yellow-700">
                 This document does not have any recipients. Add recipients to
                 create fields.
               </p>
@@ -71,7 +71,7 @@ export default function PDFEditor(props: any) {
                     props.document.id +
                     "/recipients"
                   }
-                  className="whitespace-nowrap font-medium text-blue-700 hover:text-blue-600"
+                  className="whitespace-nowrap font-medium text-yellow-700 hover:text-yellow-600"
                 >
                   Add Recipients
                   <span aria-hidden="true"> &rarr;</span>
@@ -82,7 +82,9 @@ export default function PDFEditor(props: any) {
         </div>
         <PDFViewer
           style={{
-            cursor: `url("https://place-hold.it/110x64/37f095/FFFFFF&text=${selectedFieldType}") 55 32, auto`,
+            cursor: !noRecipients
+              ? `url("https://place-hold.it/110x64/37f095/FFFFFF&text=${selectedFieldType}") 55 32, auto`
+              : "",
           }}
           readonly={false}
           document={props.document}
@@ -119,6 +121,7 @@ export default function PDFEditor(props: any) {
   function addField(e: any, page: number) {
     if (!selectedRecipient) return;
     if (!selectedFieldType) return;
+    if (noRecipients) return;
 
     const signatureField = createField(
       e,
