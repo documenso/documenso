@@ -1,7 +1,12 @@
 import { createField } from "@documenso/features/editor";
 import { createOrUpdateField, deleteField } from "@documenso/lib/api";
 import { NEXT_PUBLIC_WEBAPP_URL } from "@documenso/lib/constants";
-import { Document, Field, Recipient } from "@documenso/prisma/client";
+import {
+  Document,
+  Field,
+  FieldType,
+  Recipient,
+} from "@documenso/prisma/client";
 import { InformationCircleIcon } from "@heroicons/react/24/outline";
 import dynamic from "next/dynamic";
 import Link from "next/link";
@@ -17,7 +22,7 @@ const PDFViewer = dynamic(() => import("./pdf-viewer"), {
 export interface PDFEditorProps {
   document: Document & {
     Recipient: Recipient[];
-    Field: Field[]
+    Field: Field[];
   };
 }
 
@@ -25,9 +30,11 @@ export default function PDFEditor({ document }: PDFEditorProps) {
   const router = useRouter();
 
   const [fields, setFields] = useState<any[]>(document.Field);
-  const [selectedRecipient, setSelectedRecipient]: any = useState();
-  const [selectedFieldType, setSelectedFieldType] = useState();
-  
+  const [selectedRecipient, setSelectedRecipient] = useState(document.Recipient[0]);
+  const [selectedFieldType, setSelectedFieldType] = useState<
+    FieldType | undefined
+  >(undefined);
+
   const noRecipients =
     document.Recipient.length === 0 ||
     document.Recipient.every((e: any) => !e.email);
