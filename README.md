@@ -117,6 +117,15 @@ Follow these steps to setup documenso on you local machnine:
   - Set <code>SENDGRID_API_KEY</code> value in .env file
   - You need a SendGrid account, which you can create [here](https://signup.sendgrid.com/).
   - Documenso uses [Nodemailer](https://nodemailer.com/about/) so you can easily use your own SMTP server by setting the <code>SMTP\_\* varibles</code> in your .env
+- Optional: Setup InBucket for local smtp and email
+  - Run ` docker run -d --name inbucket -p 9001:9000 -p 9002:2500 inbucket/inbucket`
+  - Add the following credentials to your .env file
+    - SMTP_HOST="localhost"
+    - SMTP_PORT=9002
+    - SMTP_USER="test"
+    - SMTP_PASSWORD="password"
+  - Access the web interface at http://localhost:9001 and monitor for incoming emails.
+  - When you want to stop the mail server run `docker stop inbucket`
 - Run <code>npm run dev</code> root directory to start
 - Register a new user at http://localhost:3000/signup
 
