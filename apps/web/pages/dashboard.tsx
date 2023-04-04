@@ -19,6 +19,7 @@ import {
 import { getUserFromToken } from "@documenso/lib/server";
 import { getDocumentsForUserFromToken } from "@documenso/lib/query";
 import { truncate } from "fs";
+import { Tooltip as ReactTooltip } from "react-tooltip";
 
 type FormValues = {
   document: File;
@@ -107,10 +108,18 @@ const DashboardPage: NextPageWithLayout = (props: any) => {
             />
           </svg>
 
-          <span className="mt-2 block text-sm font-medium text-neon">
-            Add a new PDF document
+          <span
+            id="add_document"
+            className="mt-2 block text-sm font-medium text-neon"
+          >
+            Add a new PDF document.
           </span>
         </div>
+        <ReactTooltip
+          anchorId="add_document"
+          place="bottom"
+          content="No preparation needed. Any PDF will do."
+        />
       </div>
     </>
   );

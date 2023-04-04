@@ -16,10 +16,10 @@ import {
 import { useRouter } from "next/router";
 import { uploadDocument } from "@documenso/features";
 import { DocumentStatus } from "@prisma/client";
-import { Tooltip as ReactTooltip } from "react-tooltip";
 import { Button, IconButton, SelectBox } from "@documenso/ui";
 import { NextPageContext } from "next";
 import { deleteDocument, getDocuments } from "@documenso/lib/api";
+import { Tooltip as ReactTooltip } from "react-tooltip";
 
 const DocumentsPage: NextPageWithLayout = (props: any) => {
   const router = useRouter();
@@ -406,7 +406,7 @@ const DocumentsPage: NextPageWithLayout = (props: any) => {
 
         <h3 className="mt-2 text-sm font-medium text-gray-900">No documents</h3>
         <p className="mt-1 text-sm text-gray-500">
-          Get started by adding a document.
+          Get started by adding a document. Any PDF will do.
         </p>
         <div className="mt-6">
           <Button
@@ -428,6 +428,11 @@ const DocumentsPage: NextPageWithLayout = (props: any) => {
           />
         </div>
       </div>
+      <ReactTooltip
+        anchorId="empty"
+        place="bottom"
+        content="No preparation needed. Any PDF will do."
+      />
     </>
   );
 };
