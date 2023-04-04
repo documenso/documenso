@@ -60,7 +60,7 @@ export default function PDFEditor(props: any) {
             </div>
             <div className="ml-3 flex-1 md:flex md:justify-between">
               <p className="text-sm text-blue-700">
-                This document does not have any recipients. Add recipient to
+                This document does not have any recipients. Add recipients to
                 create fields.
               </p>
               <p className="mt-3 text-sm md:mt-0 md:ml-6">
