@@ -1,34 +1,43 @@
-import { useState } from "react";
-import dynamic from "next/dynamic";
-import Link from "next/link";
-import { useRouter } from "next/router";
 import { createField } from "@documenso/features/editor";
 import { createOrUpdateField, deleteField } from "@documenso/lib/api";
 import { NEXT_PUBLIC_WEBAPP_URL } from "@documenso/lib/constants";
+import { Document, Field, Recipient } from "@documenso/prisma/client";
+import { InformationCircleIcon } from "@heroicons/react/24/outline";
+import dynamic from "next/dynamic";
+import Link from "next/link";
+import { useRouter } from "next/router";
+import { useState } from "react";
 import FieldTypeSelector from "./field-type-selector";
 import RecipientSelector from "./recipient-selector";
-import { InformationCircleIcon } from "@heroicons/react/24/outline";
-
-const stc = require("string-to-color");
 
 const PDFViewer = dynamic(() => import("./pdf-viewer"), {
   ssr: false,
 });
 
-export default function PDFEditor(props: any) {
+export interface PDFEditorProps {
+  document: Document & {
+    Recipient: Recipient[];
+    Field: Field[]
+  };
+}
+
+export default function PDFEditor({ document }: PDFEditorProps) {
   const router = useRouter();
-  const [fields, setFields] = useState<any[]>(props.document.Field);
+
+  const [fields, setFields] = useState<any[]>(document.Field);
   const [selectedRecipient, setSelectedRecipient]: any = useState();
   const [selectedFieldType, setSelectedFieldType] = useState();
+  
   const noRecipients =
-    props?.document.Recipient.length === 0 || props?.document.Recipient.every((e: any) => !e.email);
+    document.Recipient.length === 0 ||
+    document.Recipient.every((e: any) => !e.email);
 
   function onPositionChangedHandler(position: any, id: any) {
     if (!position) return;
     const movedField = fields.find((e) => e.id == id);
     movedField.positionX = position.x.toFixed(0);
     movedField.positionY = position.y.toFixed(0);
-    createOrUpdateField(props.document, movedField);
+    createOrUpdateField(document, movedField);
 
     // no instant redraw neccessary, postion information for saving or later rerender is enough
     // setFields(newFields);
@@ -61,8 +70,14 @@ export default function PDFEditor(props: any) {
               </p>
               <p className="mt-3 text-sm md:mt-0 md:ml-6">
                 <Link
-                  href={NEXT_PUBLIC_WEBAPP_URL + "/documents/" + props.document.id + "/recipients"}
-                  className="whitespace-nowrap font-medium text-yellow-700 hover:text-yellow-600">
+                  href={
+                    NEXT_PUBLIC_WEBAPP_URL +
+                    "/documents/" +
+                    document.id +
+                    "/recipients"
+                  }
+                  className="whitespace-nowrap font-medium text-yellow-700 hover:text-yellow-600"
+                >
                   Add Recipients
                   <span aria-hidden="true"> &rarr;</span>
                 </Link>
@@ -77,7 +92,7 @@ export default function PDFEditor(props: any) {
               : "",
           }}
           readonly={false}
-          document={props.document}
+          document={document}
           fields={fields}
           onPositionChanged={onPositionChangedHandler}
           onDelete={onDeleteHandler}
@@ -93,7 +108,7 @@ export default function PDFEditor(props: any) {
           hidden={noRecipients}
           className="fixed left-0 top-1/3 max-w-xs rounded-md border border-slate-300 bg-white py-4 pr-5">
           <RecipientSelector
-            recipients={props?.document?.Recipient}
+            recipients={document.Recipient}
             onChange={setSelectedRecipient}
           />
           <hr className="m-3 border-slate-300"></hr>
@@ -113,7 +128,7 @@ export default function PDFEditor(props: any) {
 
     const signatureField = createField(e, page, selectedRecipient, selectedFieldType);
 
-    createOrUpdateField(props?.document, signatureField).then((res) => {
+    createOrUpdateField(document, signatureField).then((res) => {
       setFields((prevState) => [...prevState, res]);
     });
   }
