@@ -1,6 +1,6 @@
+import { NextApiRequest, NextApiResponse } from "next";
 import prisma from "@documenso/prisma";
 import { User as PrismaUser } from "@prisma/client";
-import { NextApiRequest, NextApiResponse } from "next";
 import { getToken } from "next-auth/jwt";
 import { signOut } from "next-auth/react";
 

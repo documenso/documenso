@@ -1,17 +1,10 @@
+import { PDFDocument, PDFHexString, PDFName, PDFNumber, PDFString } from "pdf-lib";
+
 const fs = require("fs");
 // Local copy of Node SignPDF because https://github.com/vbuch/node-signpdf/pull/187 was not published in NPM yet. Can be switched to npm packge.
 const signer = require("./node-signpdf/dist/signpdf");
-import {
-  PDFDocument,
-  PDFName,
-  PDFNumber,
-  PDFHexString,
-  PDFString,
-} from "pdf-lib";
 
-export const addDigitalSignature = async (
-  documentAsBase64: string
-): Promise<string> => {
+export const addDigitalSignature = async (documentAsBase64: string): Promise<string> => {
   // Custom code to add Byterange to PDF
   const PDFArrayCustom = require("./PDFArrayCustom");
   const pdfBuffer = Buffer.from(documentAsBase64, "base64");

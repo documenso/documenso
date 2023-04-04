@@ -1,14 +1,13 @@
-import { LockClosedIcon } from "@heroicons/react/20/solid";
-import Link from "next/link";
-import { FormProvider, useForm } from "react-hook-form";
-
-import Logo from "./logo";
-import { signIn } from "next-auth/react";
 import { useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/router";
-import { toast } from "react-hot-toast";
 import { NEXT_PUBLIC_WEBAPP_URL } from "@documenso/lib/constants";
 import { Button } from "@documenso/ui";
+import Logo from "./logo";
+import { LockClosedIcon } from "@heroicons/react/20/solid";
+import { signIn } from "next-auth/react";
+import { FormProvider, useForm } from "react-hook-form";
+import { toast } from "react-hot-toast";
 
 interface LoginValues {
   email: string;
@@ -22,10 +21,7 @@ export default function Login(props: any) {
   const methods = useForm<LoginValues>();
   const { register, formState } = methods;
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  let callbackUrl =
-    typeof router.query?.callbackUrl === "string"
-      ? router.query.callbackUrl
-      : "";
+  let callbackUrl = typeof router.query?.callbackUrl === "string" ? router.query.callbackUrl : "";
 
   // If not absolute URL, make it absolute
   if (!/^https?:\/\//.test(callbackUrl)) {
@@ -79,10 +75,7 @@ export default function Login(props: any) {
             </h2>
           </div>
           <FormProvider {...methods}>
-            <form
-              className="mt-8 space-y-6"
-              onSubmit={methods.handleSubmit(onSubmit)}
-            >
+            <form className="mt-8 space-y-6" onSubmit={methods.handleSubmit(onSubmit)}>
               <input type="hidden" name="remember" defaultValue="true" />
               <div className="-space-y-px rounded-md shadow-sm">
                 <div>
@@ -96,7 +89,7 @@ export default function Login(props: any) {
                     type="email"
                     autoComplete="email"
                     required
-                    className="relative block w-full appearance-none rounded-none rounded-t-md border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-500 focus:z-10 focus:border-neon focus:outline-none focus:ring-neon sm:text-sm"
+                    className="focus:border-neon focus:ring-neon relative block w-full appearance-none rounded-none rounded-t-md border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-500 focus:z-10 focus:outline-none sm:text-sm"
                     placeholder="Email"
                   />
                 </div>
@@ -111,14 +104,14 @@ export default function Login(props: any) {
                     type="password"
                     autoComplete="current-password"
                     required
-                    className="relative block w-full appearance-none rounded-none rounded-b-md border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-500 focus:z-10 focus:border-neon focus:outline-none focus:ring-neon sm:text-sm"
+                    className="focus:border-neon focus:ring-neon relative block w-full appearance-none rounded-none rounded-b-md border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-500 focus:z-10 focus:outline-none sm:text-sm"
                     placeholder="Password"
                   />
                 </div>
               </div>
               <div className="flex items-center justify-between">
                 <div className="text-sm">
-                  <a href="#" className="font-medium text-neon hover:text-neon">
+                  <a href="#" className="text-neon hover:text-neon font-medium">
                     Forgot your password?
                   </a>
                 </div>
@@ -127,11 +120,10 @@ export default function Login(props: any) {
                 <Button
                   type="submit"
                   disabled={formState.isSubmitting}
-                  className="group relative flex w-full"
-                >
+                  className="group relative flex w-full">
                   <span className="absolute inset-y-0 left-0 flex items-center pl-3">
                     <LockClosedIcon
-                      className="h-5 w-5 text-neon-dark group-hover:text-neon disabled:group-hover:bg-gray-600 disabled:disabled:bg-gray-600"
+                      className="text-neon-dark group-hover:text-neon h-5 w-5 disabled:disabled:bg-gray-600 disabled:group-hover:bg-gray-600"
                       aria-hidden="true"
                     />
                   </span>
@@ -140,10 +132,7 @@ export default function Login(props: any) {
               </div>
               <div>
                 <div className="relative">
-                  <div
-                    className="absolute inset-0 flex items-center"
-                    aria-hidden="true"
-                  >
+                  <div className="absolute inset-0 flex items-center" aria-hidden="true">
                     <div className="w-full border-t border-gray-300" />
                   </div>
                   <div className="relative flex justify-center"></div>
@@ -152,20 +141,14 @@ export default function Login(props: any) {
               {props.allowSignup ? (
                 <p className="mt-2 text-center text-sm text-gray-600">
                   Are you new here?{" "}
-                  <Link
-                    href="/signup"
-                    className="font-medium text-neon hover:text-neon"
-                  >
+                  <Link href="/signup" className="text-neon hover:text-neon font-medium">
                     Create a new Account
                   </Link>
                 </p>
               ) : (
                 <p className="mt-2 text-center text-sm text-gray-600">
                   Like Documenso{" "}
-                  <Link
-                    href="https://documenso.com"
-                    className="font-medium text-neon hover:text-neon"
-                  >
+                  <Link href="https://documenso.com" className="text-neon hover:text-neon font-medium">
                     Hosted Documenso will be availible soon™
                   </Link>
                 </p>

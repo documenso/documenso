@@ -1,8 +1,8 @@
-import prisma from "@documenso/prisma";
-import { sendMail } from "./sendMail";
-import { SendStatus, ReadStatus, DocumentStatus } from "@prisma/client";
-import { NEXT_PUBLIC_WEBAPP_URL } from "../constants";
 import { signingRequestTemplate } from "@documenso/lib/mail";
+import prisma from "@documenso/prisma";
+import { NEXT_PUBLIC_WEBAPP_URL } from "../constants";
+import { sendMail } from "./sendMail";
+import { DocumentStatus, ReadStatus, SendStatus } from "@prisma/client";
 
 export const sendSigningRequest = async (recipient: any, document: any, user: any) => {
   const signingRequestMessage = user.name

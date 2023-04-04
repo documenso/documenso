@@ -1,13 +1,14 @@
-import "../styles/tailwind.css";
+import { ReactElement, ReactNode } from "react";
+import { NextPage } from "next";
+import type { AppProps } from "next/app";
 import "../../../node_modules/placeholder-loading/src/scss/placeholder-loading.scss";
 import "../../../node_modules/react-resizable/css/styles.css";
-import "react-tooltip/dist/react-tooltip.css";
-import { ReactElement, ReactNode } from "react";
-import type { AppProps } from "next/app";
-import { NextPage } from "next";
+import "../styles/tailwind.css";
 import { SessionProvider } from "next-auth/react";
-export { coloredConsole } from "@documenso/lib";
 import { Toaster } from "react-hot-toast";
+import "react-tooltip/dist/react-tooltip.css";
+
+export { coloredConsole } from "@documenso/lib";
 
 export type NextPageWithLayout<P = {}, IP = P> = NextPage<P, IP> & {
   getLayout?: (page: ReactElement) => ReactNode;
@@ -17,10 +18,7 @@ type AppPropsWithLayout = AppProps & {
   Component: NextPageWithLayout;
 };
 
-export default function App({
-  Component,
-  pageProps: { session, ...pageProps },
-}: AppPropsWithLayout) {
+export default function App({ Component, pageProps: { session, ...pageProps } }: AppPropsWithLayout) {
   const getLayout = Component.getLayout || ((page: any) => page);
   return (
     <SessionProvider session={session}>

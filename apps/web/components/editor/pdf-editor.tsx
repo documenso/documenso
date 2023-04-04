@@ -1,13 +1,14 @@
-import { NEXT_PUBLIC_WEBAPP_URL } from "@documenso/lib/constants";
-import { useRouter } from "next/router";
-import dynamic from "next/dynamic";
 import { useState } from "react";
-import { createOrUpdateField, deleteField } from "@documenso/lib/api";
-import { createField } from "@documenso/features/editor";
-import RecipientSelector from "./recipient-selector";
-import FieldTypeSelector from "./field-type-selector";
-import { InformationCircleIcon } from "@heroicons/react/24/outline";
+import dynamic from "next/dynamic";
 import Link from "next/link";
+import { useRouter } from "next/router";
+import { createField } from "@documenso/features/editor";
+import { createOrUpdateField, deleteField } from "@documenso/lib/api";
+import { NEXT_PUBLIC_WEBAPP_URL } from "@documenso/lib/constants";
+import FieldTypeSelector from "./field-type-selector";
+import RecipientSelector from "./recipient-selector";
+import { InformationCircleIcon } from "@heroicons/react/24/outline";
+
 const stc = require("string-to-color");
 
 const PDFViewer = dynamic(() => import("./pdf-viewer"), {
@@ -20,8 +21,7 @@ export default function PDFEditor(props: any) {
   const [selectedRecipient, setSelectedRecipient]: any = useState();
   const [selectedFieldType, setSelectedFieldType] = useState();
   const noRecipients =
-    props?.document.Recipient.length === 0 ||
-    props?.document.Recipient.every((e: any) => !e.email);
+    props?.document.Recipient.length === 0 || props?.document.Recipient.every((e: any) => !e.email);
 
   function onPositionChangedHandler(position: any, id: any) {
     if (!position) return;
@@ -53,26 +53,16 @@ export default function PDFEditor(props: any) {
         <div hidden={!noRecipients} className="rounded-md bg-yellow-50 p-4">
           <div className="flex">
             <div className="flex-shrink-0">
-              <InformationCircleIcon
-                className="h-5 w-5 text-yellow-400"
-                aria-hidden="true"
-              />
+              <InformationCircleIcon className="h-5 w-5 text-yellow-400" aria-hidden="true" />
             </div>
             <div className="ml-3 flex-1 md:flex md:justify-between">
               <p className="text-sm text-yellow-700">
-                This document does not have any recipients. Add recipients to
-                create fields.
+                This document does not have any recipients. Add recipients to create fields.
               </p>
               <p className="mt-3 text-sm md:mt-0 md:ml-6">
                 <Link
-                  href={
-                    NEXT_PUBLIC_WEBAPP_URL +
-                    "/documents/" +
-                    props.document.id +
-                    "/recipients"
-                  }
-                  className="whitespace-nowrap font-medium text-yellow-700 hover:text-yellow-600"
-                >
+                  href={NEXT_PUBLIC_WEBAPP_URL + "/documents/" + props.document.id + "/recipients"}
+                  className="whitespace-nowrap font-medium text-yellow-700 hover:text-yellow-600">
                   Add Recipients
                   <span aria-hidden="true"> &rarr;</span>
                 </Link>
@@ -98,21 +88,13 @@ export default function PDFEditor(props: any) {
           }}
           onMouseDown={(e: any, page: number) => {
             if (e.button === 0) addField(e, page);
-          }}
-        ></PDFViewer>
+          }}></PDFViewer>
         <div
           hidden={noRecipients}
-          className="fixed left-0 top-1/3 max-w-xs border border-slate-300 bg-white py-4 pr-5 rounded-md"
-        >
-          <RecipientSelector
-            recipients={props?.document?.Recipient}
-            onChange={setSelectedRecipient}
-          />
+          className="fixed left-0 top-1/3 max-w-xs rounded-md border border-slate-300 bg-white py-4 pr-5">
+          <RecipientSelector recipients={props?.document?.Recipient} onChange={setSelectedRecipient} />
           <hr className="m-3 border-slate-300"></hr>
-          <FieldTypeSelector
-            selectedRecipient={selectedRecipient}
-            onChange={setSelectedFieldType}
-          />
+          <FieldTypeSelector selectedRecipient={selectedRecipient} onChange={setSelectedFieldType} />
         </div>
       </div>
     </>
@@ -123,12 +105,7 @@ export default function PDFEditor(props: any) {
     if (!selectedFieldType) return;
     if (noRecipients) return;
 
-    const signatureField = createField(
-      e,
-      page,
-      selectedRecipient,
-      selectedFieldType
-    );
+    const signatureField = createField(e, page, selectedRecipient, selectedFieldType);
 
     createOrUpdateField(props?.document, signatureField).then((res) => {
       setFields((prevState) => [...prevState, res]);

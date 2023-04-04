@@ -1,11 +1,11 @@
-import { defaultHandler, defaultResponder } from "@documenso/lib/server";
-import prisma from "@documenso/prisma";
 import { NextApiRequest, NextApiResponse } from "next";
-import { SigningStatus, DocumentStatus } from "@prisma/client";
-import { getDocument } from "@documenso/lib/query";
-import { Document as PrismaDocument, FieldType } from "@prisma/client";
-import { insertImageInPDF, insertTextInPDF } from "@documenso/pdf";
 import { sendSigningDoneMail } from "@documenso/lib/mail";
+import { getDocument } from "@documenso/lib/query";
+import { defaultHandler, defaultResponder } from "@documenso/lib/server";
+import { insertImageInPDF, insertTextInPDF } from "@documenso/pdf";
+import prisma from "@documenso/prisma";
+import { DocumentStatus, SigningStatus } from "@prisma/client";
+import { FieldType, Document as PrismaDocument } from "@prisma/client";
 
 async function postHandler(req: NextApiRequest, res: NextApiResponse) {
   const { token: recipientToken } = req.query;
@@ -115,10 +115,7 @@ async function postHandler(req: NextApiRequest, res: NextApiResponse) {
     },
     data: {
       document: documentWithInserts,
-      status:
-        unsignedRecipients.length > 0
-          ? DocumentStatus.PENDING
-          : DocumentStatus.COMPLETED,
+      status: unsignedRecipients.length > 0 ? DocumentStatus.PENDING : DocumentStatus.COMPLETED,
     },
   });
 
@@ -129,8 +126,7 @@ async function postHandler(req: NextApiRequest, res: NextApiResponse) {
     });
 
     document.document = documentWithInserts;
-    if (documentOwner)
-      await sendSigningDoneMail(recipient, document, documentOwner);
+    if (documentOwner) await sendSigningDoneMail(recipient, document, documentOwner);
   }
 
   return res.status(200).end();
@@ -139,9 +135,7 @@ async function postHandler(req: NextApiRequest, res: NextApiResponse) {
     if (signedField?.Signature?.signatureImageAsBase64) {
       documentWithInserts = await insertImageInPDF(
         documentWithInserts,
-        signedField.Signature
-          ? signedField.Signature?.signatureImageAsBase64
-          : "",
+        signedField.Signature ? signedField.Signature?.signatureImageAsBase64 : "",
         signedField.positionX,
         signedField.positionY,
         signedField.page
@@ -169,12 +163,8 @@ async function postHandler(req: NextApiRequest, res: NextApiResponse) {
       create: {
         recipientId: recipient.id,
         fieldId: signature.fieldId,
-        signatureImageAsBase64: signature.signatureImage
-          ? signature.signatureImage
-          : null,
-        typedSignature: signature.typedSignature
-          ? signature.typedSignature
-          : null,
+        signatureImageAsBase64: signature.signatureImage ? signature.signatureImage : null,
+        typedSignature: signature.typedSignature ? signature.typedSignature : null,
       },
     });
   }

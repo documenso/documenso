@@ -1,13 +1,15 @@
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
-  value: true
+  value: true,
 });
 exports.default = void 0;
 
 var _abstract_reference = _interopRequireDefault(require("./abstract_reference"));
 
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+function _interopRequireDefault(obj) {
+  return obj && obj.__esModule ? obj : { default: obj };
+}
 
 /*
 PDFObject by Devon Govett used below.
@@ -20,26 +22,26 @@ Modifications may have been applied for the purposes of node-signpdf.
 PDFObject - converts JavaScript types into their corresponding PDF types.
 By Devon Govett
 */
-const pad = (str, length) => (Array(length + 1).join('0') + str).slice(-length);
+const pad = (str, length) => (Array(length + 1).join("0") + str).slice(-length);
 
 const escapableRe = /[\n\r\t\b\f()\\]/g;
 const escapable = {
-  '\n': '\\n',
-  '\r': '\\r',
-  '\t': '\\t',
-  '\b': '\\b',
-  '\f': '\\f',
-  '\\': '\\\\',
-  '(': '\\(',
-  ')': '\\)'
+  "\n": "\\n",
+  "\r": "\\r",
+  "\t": "\\t",
+  "\b": "\\b",
+  "\f": "\\f",
+  "\\": "\\\\",
+  "(": "\\(",
+  ")": "\\)",
 }; // Convert little endian UTF-16 to big endian
 
-const swapBytes = buff => buff.swap16();
+const swapBytes = (buff) => buff.swap16();
 
 class PDFObject {
   static convert(object, encryptFn = null) {
     // String literals are converted to the PDF name type
-    if (typeof object === 'string') {
+    if (typeof object === "string") {
       return `/${object}`; // String objects are converted to PDF strings (UTF-16)
     }
 
@@ -55,29 +57,26 @@ class PDFObject {
         }
       } // If so, encode it as big endian UTF-16
 
-
       let stringBuffer;
 
       if (isUnicode) {
-        stringBuffer = swapBytes(Buffer.from(`\ufeff${string}`, 'utf16le'));
+        stringBuffer = swapBytes(Buffer.from(`\ufeff${string}`, "utf16le"));
       } else {
-        stringBuffer = Buffer.from(string, 'ascii');
+        stringBuffer = Buffer.from(string, "ascii");
       } // Encrypt the string when necessary
 
-
       if (encryptFn) {
-        string = encryptFn(stringBuffer).toString('binary');
+        string = encryptFn(stringBuffer).toString("binary");
       } else {
-        string = stringBuffer.toString('binary');
+        string = stringBuffer.toString("binary");
       } // Escape characters as required by the spec
 
-
-      string = string.replace(escapableRe, c => escapable[c]);
+      string = string.replace(escapableRe, (c) => escapable[c]);
       return `(${string})`; // Buffers are converted to PDF hex strings
     }
 
     if (Buffer.isBuffer(object)) {
-      return `<${object.toString('hex')}>`;
+      return `<${object.toString("hex")}>`;
     }
 
     if (object instanceof _abstract_reference.default) {
@@ -85,51 +84,54 @@ class PDFObject {
     }
 
     if (object instanceof Date) {
-      let string = `D:${pad(object.getUTCFullYear(), 4)}${pad(object.getUTCMonth() + 1, 2)}${pad(object.getUTCDate(), 2)}${pad(object.getUTCHours(), 2)}${pad(object.getUTCMinutes(), 2)}${pad(object.getUTCSeconds(), 2)}Z`; // Encrypt the string when necessary
+      let string = `D:${pad(object.getUTCFullYear(), 4)}${pad(object.getUTCMonth() + 1, 2)}${pad(
+        object.getUTCDate(),
+        2
+      )}${pad(object.getUTCHours(), 2)}${pad(object.getUTCMinutes(), 2)}${pad(object.getUTCSeconds(), 2)}Z`; // Encrypt the string when necessary
 
       if (encryptFn) {
-        string = encryptFn(Buffer.from(string, 'ascii')).toString('binary'); // Escape characters as required by the spec
+        string = encryptFn(Buffer.from(string, "ascii")).toString("binary"); // Escape characters as required by the spec
 
-        string = string.replace(escapableRe, c => escapable[c]);
+        string = string.replace(escapableRe, (c) => escapable[c]);
       }
 
       return `(${string})`;
     }
 
     if (Array.isArray(object)) {
-      const items = object.map(e => PDFObject.convert(e, encryptFn)).join(' ');
+      const items = object.map((e) => PDFObject.convert(e, encryptFn)).join(" ");
       return `[${items}]`;
     }
 
-    if ({}.toString.call(object) === '[object Object]') {
-      const out = ['<<'];
+    if ({}.toString.call(object) === "[object Object]") {
+      const out = ["<<"];
       let streamData; // @todo this can probably be refactored into a reduce
 
       Object.entries(object).forEach(([key, val]) => {
-        let checkedValue = '';
+        let checkedValue = "";
 
-        if (val.toString().indexOf('<<') !== -1) {
+        if (val.toString().indexOf("<<") !== -1) {
           checkedValue = val;
         } else {
           checkedValue = PDFObject.convert(val, encryptFn);
         }
 
-        if (key === 'stream') {
+        if (key === "stream") {
           streamData = `${key}\n${val}\nendstream`;
         } else {
           out.push(`/${key} ${checkedValue}`);
         }
       });
-      out.push('>>');
+      out.push(">>");
 
       if (streamData) {
         out.push(streamData);
       }
 
-      return out.join('\n');
+      return out.join("\n");
     }
 
-    if (typeof object === 'number') {
+    if (typeof object === "number") {
       return PDFObject.number(object);
     }
 
@@ -143,7 +145,6 @@ class PDFObject {
 
     throw new Error(`unsupported number: ${n}`);
   }
-
 }
 
 exports.default = PDFObject;

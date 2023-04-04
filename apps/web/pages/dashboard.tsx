@@ -1,7 +1,10 @@
-import Head from "next/head";
 import { ReactElement } from "react";
-import Layout from "../components/layout";
+import Head from "next/head";
 import Link from "next/link";
+import { uploadDocument } from "@documenso/features";
+import { getDocumentsForUserFromToken } from "@documenso/lib/query";
+import { getUserFromToken } from "@documenso/lib/server";
+import Layout from "../components/layout";
 import type { NextPageWithLayout } from "./_app";
 import {
   CheckBadgeIcon,
@@ -9,15 +12,7 @@ import {
   ExclamationTriangleIcon,
   UsersIcon,
 } from "@heroicons/react/24/outline";
-import { uploadDocument } from "@documenso/features";
-import {
-  DocumentStatus,
-  SendStatus,
-  SigningStatus,
-  Document as PrismaDocument,
-} from "@prisma/client";
-import { getUserFromToken } from "@documenso/lib/server";
-import { getDocumentsForUserFromToken } from "@documenso/lib/query";
+import { DocumentStatus, Document as PrismaDocument, SendStatus, SigningStatus } from "@prisma/client";
 import { truncate } from "fs";
 import { Tooltip as ReactTooltip } from "react-tooltip";
 
@@ -55,19 +50,16 @@ const DashboardPage: NextPageWithLayout = (props: any) => {
 
       <div className="py-10 max-sm:px-4">
         <header>
-          <h1 className="text-3xl font-bold leading-tight tracking-tight text-gray-900">
-            Dashboard
-          </h1>
+          <h1 className="text-3xl font-bold leading-tight tracking-tight text-gray-900">Dashboard</h1>
         </header>
-        <dl className="grid gap-5 mt-8 md:grid-cols-3 ">
+        <dl className="mt-8 grid gap-5 md:grid-cols-3 ">
           {stats.map((item) => (
             <Link href={item.link} key={item.name}>
-              <div className="px-4 py-3 overflow-hidden bg-white rounded-lg shadow md:p-6 sm:py-5">
-                <dt className="text-sm font-medium text-gray-500 truncate ">
+              <div className="overflow-hidden rounded-lg bg-white px-4 py-3 shadow sm:py-5 md:p-6">
+                <dt className="truncate text-sm font-medium text-gray-500 ">
                   <item.icon
-                    className="flex-shrink-0 inline w-5 h-5 mr-3 text-neon sm:w-6 sm:h-6"
-                    aria-hidden="true"
-                  ></item.icon>
+                    className="text-neon mr-3 inline h-5 w-5 flex-shrink-0 sm:h-6 sm:w-6"
+                    aria-hidden="true"></item.icon>
                   {item.name}
                 </dt>
                 <dd className="mt-1 text-2xl font-semibold tracking-tight text-gray-900 sm:text-3xl">
@@ -92,25 +84,20 @@ const DashboardPage: NextPageWithLayout = (props: any) => {
           onClick={() => {
             document?.getElementById("fileUploadHelper")?.click();
           }}
-          className="relative block w-full p-12 text-center border-2 border-gray-300 border-dashed rounded-lg cursor-pointer hover:border-neon focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-        >
+          className="hover:border-neon relative block w-full cursor-pointer rounded-lg border-2 border-dashed border-gray-300 p-12 text-center focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
           <svg
-            className="w-12 h-12 mx-auto text-gray-400"
+            className="mx-auto h-12 w-12 text-gray-400"
             stroke="currentColor"
             fill="none"
             viewBox="0 00 20 25"
-            aria-hidden="true"
-          >
+            aria-hidden="true">
             <path
               strokeLinecap="round"
               strokeLinejoin="round"
               d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m3.75 9v6m3-3H9m1.5-12H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"
             />
           </svg>
-          <span
-            id="add_document"
-            className="mt-2 block text-sm font-medium text-neon"
-          >
+          <span id="add_document" className="text-neon mt-2 block text-sm font-medium">
             Add a new PDF document.
           </span>
         </div>
@@ -147,9 +134,7 @@ export async function getServerSideProps(context: any) {
 
   const documents: any[] = await getDocumentsForUserFromToken(context);
 
-  const drafts: PrismaDocument[] = documents.filter(
-    (d) => d.status === DocumentStatus.DRAFT
-  );
+  const drafts: PrismaDocument[] = documents.filter((d) => d.status === DocumentStatus.DRAFT);
 
   const waiting: any[] = documents.filter(
     (e) =>
@@ -158,9 +143,7 @@ export async function getServerSideProps(context: any) {
       e.Recipient.some((r: any) => r.signingStatus === SigningStatus.NOT_SIGNED)
   );
 
-  const completed: PrismaDocument[] = documents.filter(
-    (d) => d.status === DocumentStatus.COMPLETED
-  );
+  const completed: PrismaDocument[] = documents.filter((d) => d.status === DocumentStatus.COMPLETED);
 
   return {
     props: {

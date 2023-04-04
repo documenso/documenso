@@ -1,9 +1,9 @@
-import NextAuth, { Session } from "next-auth";
-import GitHubProvider from "next-auth/providers/github";
-import CredentialsProvider from "next-auth/providers/credentials";
 import { ErrorCode } from "@documenso/lib/auth";
-import prisma from "@documenso/prisma";
 import { verifyPassword } from "@documenso/lib/auth";
+import prisma from "@documenso/prisma";
+import NextAuth, { Session } from "next-auth";
+import CredentialsProvider from "next-auth/providers/credentials";
+import GitHubProvider from "next-auth/providers/github";
 
 export default NextAuth({
   secret: process.env.AUTH_SECRET,
@@ -27,8 +27,7 @@ export default NextAuth({
         password: {
           label: "Password",
           type: "password",
-          placeholder:
-            "Select a password. Here is some inspiration: https://xkcd.com/936/",
+          placeholder: "Select a password. Here is some inspiration: https://xkcd.com/936/",
         },
       },
       async authorize(credentials: any) {
@@ -57,10 +56,7 @@ export default NextAuth({
           throw new Error(ErrorCode.UserMissingPassword);
         }
 
-        const isCorrectPassword = await verifyPassword(
-          credentials.password,
-          user.password
-        );
+        const isCorrectPassword = await verifyPassword(credentials.password, user.password);
 
         if (!isCorrectPassword) {
           throw new Error(ErrorCode.IncorrectPassword);

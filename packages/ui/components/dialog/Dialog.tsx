@@ -1,8 +1,8 @@
 import React from "react";
-import { Transition, Dialog as DialogComponent } from "@headlessui/react";
 import { Fragment } from "react";
-import { Button } from "@documenso/ui";
 import { sendSigningRequests } from "@documenso/lib/api";
+import { Button } from "@documenso/ui";
+import { Dialog as DialogComponent, Transition } from "@headlessui/react";
 import { Document as PrismaDocument } from "@prisma/client";
 
 type FormValue = {
@@ -21,18 +21,8 @@ type DialogProps = {
   icon: React.ReactNode;
 };
 
-export function Dialog({
-  title,
-  open,
-  setOpen,
-  document,
-  formValues,
-  setLoading,
-  icon,
-}: DialogProps) {
-  const unsentEmailsLength = formValues.filter(
-    (s: any) => s.email && s.sendStatus != "SENT"
-  ).length;
+export function Dialog({ title, open, setOpen, document, formValues, setLoading, icon }: DialogProps) {
+  const unsentEmailsLength = formValues.filter((s: any) => s.email && s.sendStatus != "SENT").length;
 
   return (
     <Transition.Root show={open} as={Fragment}>
@@ -44,13 +34,12 @@ export function Dialog({
           enterTo="opacity-100"
           leave="ease-in duration-200"
           leaveFrom="opacity-100"
-          leaveTo="opacity-0"
-        >
-          <div className="fixed inset-0 transition-opacity bg-gray-500 bg-opacity-75" />
+          leaveTo="opacity-0">
+          <div className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" />
         </Transition.Child>
 
         <div className="fixed inset-0 z-10 overflow-y-auto">
-          <div className="flex items-end justify-center min-h-full p-4 text-center sm:items-center sm:p-0">
+          <div className="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
             <Transition.Child
               as={Fragment}
               enter="ease-out duration-300"
@@ -58,18 +47,14 @@ export function Dialog({
               enterTo="opacity-100 translate-y-0 sm:scale-100"
               leave="ease-in duration-200"
               leaveFrom="opacity-100 translate-y-0 sm:scale-100"
-              leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-            >
-              <DialogComponent.Panel className="relative px-4 pt-5 pb-4 overflow-hidden text-left transition-all transform bg-white rounded-lg shadow-xl sm:my-8 sm:w-full sm:max-w-lg sm:p-6">
+              leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95">
+              <DialogComponent.Panel className="relative transform overflow-hidden rounded-lg bg-white px-4 pt-5 pb-4 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:p-6">
                 <div>
-                  <div className="flex items-center justify-center w-12 h-12 mx-auto bg-green-100 rounded-full">
+                  <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-green-100">
                     {icon}
                   </div>
                   <div className="mt-3 text-center sm:mt-5">
-                    <DialogComponent.Title
-                      as="h3"
-                      className="text-lg font-medium leading-6 text-gray-900"
-                    >
+                    <DialogComponent.Title as="h3" className="text-lg font-medium leading-6 text-gray-900">
                       {title}
                     </DialogComponent.Title>
                     <div className="mt-2">
@@ -79,7 +64,7 @@ export function Dialog({
                     </div>
                   </div>
                 </div>
-                <div className="flex justify-end gap-3 mt-5 sm:mt-6 sm:grid sm:grid-flow-row-dense sm:grid-cols-2 sm:flex-none ">
+                <div className="mt-5 flex justify-end gap-3 sm:mt-6 sm:grid sm:flex-none sm:grid-flow-row-dense sm:grid-cols-2 ">
                   <Button color="secondary" onClick={() => setOpen(false)}>
                     Cancel
                   </Button>
@@ -90,8 +75,7 @@ export function Dialog({
                       sendSigningRequests(document).finally(() => {
                         setLoading(false);
                       });
-                    }}
-                  >
+                    }}>
                     Send
                   </Button>
                 </div>

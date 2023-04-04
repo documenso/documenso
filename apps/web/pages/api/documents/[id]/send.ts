@@ -1,12 +1,8 @@
-import {
-  defaultHandler,
-  defaultResponder,
-  getUserFromToken,
-} from "@documenso/lib/server";
-import prisma from "@documenso/prisma";
 import { NextApiRequest, NextApiResponse } from "next";
 import { sendSigningRequest } from "@documenso/lib/mail";
 import { getDocument } from "@documenso/lib/query";
+import { defaultHandler, defaultResponder, getUserFromToken } from "@documenso/lib/server";
+import prisma from "@documenso/prisma";
 import { Document as PrismaDocument, SendStatus } from "@prisma/client";
 
 async function postHandler(req: NextApiRequest, res: NextApiResponse) {
@@ -23,8 +19,7 @@ async function postHandler(req: NextApiRequest, res: NextApiResponse) {
 
   const document: PrismaDocument = await getDocument(+documentId, req, res);
 
-  if (!document)
-    res.status(404).end(`No document with id ${documentId} found.`);
+  if (!document) res.status(404).end(`No document with id ${documentId} found.`);
 
   let recipientCondition: any = {
     documentId: +documentId,

@@ -1,6 +1,6 @@
 import router from "next/router";
-import toast from "react-hot-toast";
 import { NEXT_PUBLIC_WEBAPP_URL } from "../lib/constants";
+import toast from "react-hot-toast";
 
 export const uploadDocument = async (event: any) => {
   if (event.target.files && event.target.files[0]) {
@@ -27,9 +27,7 @@ export const uploadDocument = async (event: any) => {
       )
       .then((response: Response) => {
         response.json().then((createdDocumentIdFromBody) => {
-          router.push(
-            `${NEXT_PUBLIC_WEBAPP_URL}/documents/${createdDocumentIdFromBody}/recipients`
-          );
+          router.push(`${NEXT_PUBLIC_WEBAPP_URL}/documents/${createdDocumentIdFromBody}/recipients`);
         });
       });
   }

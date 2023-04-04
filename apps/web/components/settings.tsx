@@ -1,12 +1,12 @@
 import { ChangeEvent, useEffect, useState } from "react";
-import { KeyIcon, UserCircleIcon } from "@heroicons/react/24/outline";
-import { useRouter } from "next/router";
-import Link from "next/link";
 import Head from "next/head";
-import { useSession } from "next-auth/react";
+import Link from "next/link";
+import { useRouter } from "next/router";
 import { updateUser } from "@documenso/features";
-import { Button } from "@documenso/ui";
 import { getUser } from "@documenso/lib/api";
+import { Button } from "@documenso/ui";
+import { KeyIcon, UserCircleIcon } from "@heroicons/react/24/outline";
+import { useSession } from "next-auth/react";
 
 const subNavigation = [
   {
@@ -74,15 +74,10 @@ export default function Setttings() {
       </Head>
       <header className="py-10">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <h1 className="text-3xl font-bold leading-tight tracking-tight text-brown">
-            Settings
-          </h1>
+          <h1 className="text-brown text-3xl font-bold leading-tight tracking-tight">Settings</h1>
         </div>
       </header>
-      <div
-        className="mx-auto max-w-screen-xl px-4 pb-6 sm:px-6 lg:px-8 lg:pb-16"
-        hidden={!user.email}
-      >
+      <div className="mx-auto max-w-screen-xl px-4 pb-6 sm:px-6 lg:px-8 lg:pb-16" hidden={!user.email}>
         <div className="overflow-hidden rounded-lg bg-white shadow">
           <div className="divide-y divide-gray-200 lg:grid lg:grid-cols-12 lg:divide-y-0 lg:divide-x">
             <aside className="py-6 lg:col-span-3">
@@ -93,18 +88,17 @@ export default function Setttings() {
                     href={item.href}
                     className={classNames(
                       item.current
-                        ? "bg-teal-50 border-neon-dark text-teal-700 hover:bg-teal-50 hover:text-teal-700"
+                        ? "border-neon-dark bg-teal-50 text-teal-700 hover:bg-teal-50 hover:text-teal-700"
                         : "border-transparent text-gray-900 hover:bg-gray-50 hover:text-gray-900",
-                      "group border-l-4 px-3 py-2 flex items-center text-sm font-medium"
+                      "group flex items-center border-l-4 px-3 py-2 text-sm font-medium"
                     )}
-                    aria-current={item.current ? "page" : undefined}
-                  >
+                    aria-current={item.current ? "page" : undefined}>
                     <item.icon
                       className={classNames(
                         item.current
                           ? "text-teal-500 group-hover:text-teal-500"
                           : "text-gray-400 group-hover:text-gray-500",
-                        "flex-shrink-0 -ml-1 mr-3 h-6 w-6"
+                        "-ml-1 mr-3 h-6 w-6 flex-shrink-0"
                       )}
                       aria-hidden="true"
                     />
@@ -115,20 +109,14 @@ export default function Setttings() {
             </aside>
 
             <form
-              className="divide-y divide-gray-200 lg:col-span-9 min-h-[251px]"
+              className="min-h-[251px] divide-y divide-gray-200 lg:col-span-9"
               action="#"
               method="POST"
-              hidden={
-                subNavigation.filter((e) => e.current)[0]?.name !==
-                subNavigation[0].name
-              }
-            >
+              hidden={subNavigation.filter((e) => e.current)[0]?.name !== subNavigation[0].name}>
               {/* Profile section */}
               <div className="py-6 px-4 sm:p-6 lg:pb-8">
                 <div>
-                  <h2 className="text-lg font-medium leading-6 text-gray-900">
-                    Profile
-                  </h2>
+                  <h2 className="text-lg font-medium leading-6 text-gray-900">Profile</h2>
                   <p className="mt-1 text-sm text-gray-500">
                     Let people know who they are dealing with builds trust.
                   </p>
@@ -136,10 +124,7 @@ export default function Setttings() {
 
                 <div className="my-6 grid grid-cols-12 gap-6">
                   <div className="col-span-12 sm:col-span-6">
-                    <label
-                      htmlFor="first-name"
-                      className="block text-sm font-medium text-gray-700"
-                    >
+                    <label htmlFor="first-name" className="block text-sm font-medium text-gray-700">
                       Full Name
                     </label>
                     <input
@@ -150,14 +135,11 @@ export default function Setttings() {
                       onChange={(e) => handleNameChange(e)}
                       onKeyDown={handleKeyPress}
                       autoComplete="given-name"
-                      className="mt-1 block w-full rounded-md border border-gray-300 py-2 px-3 shadow-sm focus:border-neon focus:outline-none focus:ring-neon sm:text-sm"
+                      className="focus:border-neon focus:ring-neon mt-1 block w-full rounded-md border border-gray-300 py-2 px-3 shadow-sm focus:outline-none sm:text-sm"
                     />
                   </div>
                   <div className="col-span-12 sm:col-span-6">
-                    <label
-                      htmlFor="first-name"
-                      className="block text-sm font-medium text-gray-700"
-                    >
+                    <label htmlFor="first-name" className="block text-sm font-medium text-gray-700">
                       Email
                     </label>
                     <input
@@ -167,7 +149,7 @@ export default function Setttings() {
                       name="first-name"
                       id="first-name"
                       autoComplete="given-name"
-                      className="mt-1 block w-full rounded-md border disabled:bg-neutral-100 border-gray-300 py-2 px-3 shadow-sm focus:border-neon focus:outline-none focus:ring-neon sm:text-sm"
+                      className="focus:border-neon focus:ring-neon mt-1 block w-full rounded-md border border-gray-300 py-2 px-3 shadow-sm focus:outline-none disabled:bg-neutral-100 sm:text-sm"
                     />
                   </div>
                 </div>
@@ -175,21 +157,14 @@ export default function Setttings() {
               </div>
             </form>
             <div
-              hidden={
-                subNavigation.filter((e) => e.current)[0]?.name !==
-                subNavigation[1].name
-              }
-              className="divide-y divide-gray-200 lg:col-span-9 min-h-[251px]"
-            >
+              hidden={subNavigation.filter((e) => e.current)[0]?.name !== subNavigation[1].name}
+              className="min-h-[251px] divide-y divide-gray-200 lg:col-span-9">
               {/* Passwords section */}
               <div className="py-6 px-4 sm:p-6 lg:pb-8">
                 <div>
-                  <h2 className="text-lg font-medium leading-6 text-gray-900">
-                    Password
-                  </h2>
+                  <h2 className="text-lg font-medium leading-6 text-gray-900">Password</h2>
                   <p className="mt-1 text-sm text-gray-500">
-                    Forgot your passwort? Email <b>hi@documenso.com</b> to reset
-                    it.
+                    Forgot your passwort? Email <b>hi@documenso.com</b> to reset it.
                   </p>
                 </div>
               </div>

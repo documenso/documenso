@@ -1,9 +1,8 @@
-import { IdentityProvider } from "@prisma/client";
 import { NextApiRequest, NextApiResponse } from "next";
-
-import prisma from "@documenso/prisma";
 import { hashPassword } from "@documenso/lib/auth";
 import { defaultHandler, defaultResponder } from "@documenso/lib/server";
+import prisma from "@documenso/prisma";
+import { IdentityProvider } from "@prisma/client";
 
 async function postHandler(req: NextApiRequest, res: NextApiResponse) {
   const { email, password, source } = req.body;

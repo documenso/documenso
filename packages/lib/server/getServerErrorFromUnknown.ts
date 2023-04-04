@@ -1,9 +1,5 @@
-import {
-  PrismaClientKnownRequestError,
-  NotFoundError,
-} from "@prisma/client/runtime";
-
 import { HttpError } from "@documenso/lib/server";
+import { NotFoundError, PrismaClientKnownRequestError } from "@prisma/client/runtime";
 
 export function getServerErrorFromUnknown(cause: unknown): HttpError {
   // Error was manually thrown and does not need to be parsed.

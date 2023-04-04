@@ -1,13 +1,15 @@
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
-  value: true
+  value: true,
 });
 exports.default = void 0;
 
 var _SignPdfError = _interopRequireDefault(require("../../SignPdfError"));
 
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+function _interopRequireDefault(obj) {
+  return obj && obj.__esModule ? obj : { default: obj };
+}
 
 /**
  * @param {object} refTable
@@ -15,7 +17,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * @returns {number}
  */
 const getIndexFromRef = (refTable, ref) => {
-  let [index] = ref.split(' ');
+  let [index] = ref.split(" ");
   index = parseInt(index);
 
   if (!refTable.offsets.has(index)) {

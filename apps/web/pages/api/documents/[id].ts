@@ -1,13 +1,9 @@
-import {
-  defaultHandler,
-  defaultResponder,
-  getUserFromToken,
-} from "@documenso/lib/server";
-import prisma from "@documenso/prisma";
 import { NextApiRequest, NextApiResponse } from "next";
-import { Document as PrismaDocument } from "@prisma/client";
 import { getDocument } from "@documenso/lib/query";
+import { defaultHandler, defaultResponder, getUserFromToken } from "@documenso/lib/server";
+import prisma from "@documenso/prisma";
 import { addDigitalSignature } from "@documenso/signing/addDigitalSignature";
+import { Document as PrismaDocument } from "@prisma/client";
 
 async function getHandler(req: NextApiRequest, res: NextApiResponse) {
   const { id: documentId } = req.query;
@@ -46,8 +42,7 @@ async function getHandler(req: NextApiRequest, res: NextApiResponse) {
     document = await getDocument(+documentId, req, res);
   }
 
-  if (!document)
-    res.status(404).end(`No document with id ${documentId} found.`);
+  if (!document) res.status(404).end(`No document with id ${documentId} found.`);
 
   const signaturesCount = await prisma.signature.count({
     where: {
@@ -61,18 +56,13 @@ async function getHandler(req: NextApiRequest, res: NextApiResponse) {
 
   // No need to add a signature, if no one signed yet.
   if (signaturesCount > 0) {
-    signedDocumentAsBase64 = await addDigitalSignature(
-      document?.document || ""
-    );
+    signedDocumentAsBase64 = await addDigitalSignature(document?.document || "");
   }
 
   const buffer: Buffer = Buffer.from(signedDocumentAsBase64, "base64");
   res.setHeader("Content-Type", "application/pdf");
   res.setHeader("Content-Length", buffer.length);
-  res.setHeader(
-    "Content-Disposition",
-    `attachment; filename=${document?.title}`
-  );
+  res.setHeader("Content-Disposition", `attachment; filename=${document?.title}`);
 
   return res.status(200).send(buffer);
 }
