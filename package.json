@@ -5,6 +5,7 @@
     "dev": "cd apps && cd web && next dev",
     "build": "npm i && cd apps && cd web && npm i && next build",
     "start": "cd apps && cd web && next start",
+    "db-migrate:dev": "prisma migrate dev",
     "db-seed": "prisma db seed",
     "db-studio": "prisma studio"
   },
