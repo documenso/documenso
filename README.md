@@ -116,6 +116,7 @@ Follow these steps to setup documenso on you local machnine:
   - Documenso uses [Nodemailer](https://nodemailer.com/about/) so you can easily use your own smtp server
 - Run <code>npm run dev</code> root directory to start
 - Register a new user at http://localhost:3000/signup
+- Optional: Sign <code>apps\web\ressources\example.pdf</code> to test your setup
 
 ---
 
