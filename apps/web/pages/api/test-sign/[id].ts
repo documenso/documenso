@@ -1,9 +1,4 @@
-import {
-  defaultHandler,
-  defaultResponder,
-  getUserFromToken,
-} from "@documenso/lib/server";
-import prisma from "@documenso/prisma";
+import { defaultHandler, defaultResponder } from "@documenso/lib/server";
 import { NextApiRequest, NextApiResponse } from "next";
 import { Document as PrismaDocument } from "@prisma/client";
 import { getDocument } from "@documenso/lib/query";
