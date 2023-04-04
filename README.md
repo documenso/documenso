@@ -108,17 +108,21 @@ Follow these steps to setup documenso on you local machnine:
   git clone https://github.com/documenso/documenso
   ```
 - Run <code>npm i</code> in root directory
-- Rename .env.example to .env
+- Rename <code>.env.example</code> to <code>.env</code>
 - Set DATABASE_URL value in .env file
   - You can use the provided test database url (may be wiped at any point)
   - Or setup a local postgres sql instance (recommened)
-- Set SENDGRID_API_KEY value in .env file
-  - You need SendGrid account, which you can create [here](https://signup.sendgrid.com/).
-  - Documenso uses [Nodemailer](https://nodemailer.com/about/) so you can easily use your own smtp server
+- Create the database scheme by running <code>db-migrate:dev</code>
+- Setup your mail provider
+  - Set <code>SENDGRID_API_KEY</code> value in .env file
+  - You need a SendGrid account, which you can create [here](https://signup.sendgrid.com/).
+  - Documenso uses [Nodemailer](https://nodemailer.com/about/) so you can easily use your own SMTP server by setting the <code>SMTP\_\* varibles</code> in your .env
 - Run <code>npm run dev</code> root directory to start
 - Register a new user at http://localhost:3000/signup
 
 ---
+- Optional: Seed the database using <code>npm run db-seed</code> to create a test user and document
+- Optional: Upload and sign <code>apps\web\ressources\example.pdf</code> manually to test your setup
 
 - Optional: Create your own signing certificate
   - A demo certificate is provided in /app/web/ressources/certificate.p12

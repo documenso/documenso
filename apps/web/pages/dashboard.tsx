@@ -19,6 +19,7 @@ import {
 import { truncate } from "fs";
 import Layout from "../components/layout";
 import type { NextPageWithLayout } from "./_app";
+import { Tooltip as ReactTooltip } from "react-tooltip";
 
 type FormValues = {
   document: File;
@@ -61,14 +62,14 @@ const DashboardPage: NextPageWithLayout = (props: any) => {
         <dl className="xs:grid-cols-2 mt-8 grid grid-cols-3 gap-5">
           {stats.map((item) => (
             <Link href={item.link} key={item.name}>
-              <div className="overflow-hidden rounded-lg bg-white px-4 py-5 shadow sm:p-6 ">
-                <dt className="truncate text-sm font-medium text-gray-500 ">
+              <div className="px-4 py-3 overflow-hidden bg-white rounded-lg shadow md:p-6 sm:py-5">
+                <dt className="text-sm font-medium text-gray-500 truncate ">
                   <item.icon
                     className="text-neon mr-3 inline h-6 w-6 flex-shrink-0"
                     aria-hidden="true"></item.icon>
                   {item.name}
                 </dt>
-                <dd className="mt-1 text-3xl font-semibold tracking-tight text-gray-900">
+                <dd className="mt-1 text-2xl font-semibold tracking-tight text-gray-900 sm:text-3xl">
                   {getStat(item.name, props)}
                 </dd>
               </div>
@@ -92,7 +93,7 @@ const DashboardPage: NextPageWithLayout = (props: any) => {
           }}
           className="hover:border-neon relative block w-full cursor-pointer rounded-lg border-2 border-dashed border-gray-300 p-12 text-center focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
           <svg
-            className="mx-auto h-12 w-12 text-gray-400"
+            className="w-12 h-12 mx-auto text-gray-400"
             stroke="currentColor"
             fill="none"
             viewBox="0 00 20 25"
@@ -108,6 +109,11 @@ const DashboardPage: NextPageWithLayout = (props: any) => {
             Add a new PDF document
           </span>
         </div>
+        <ReactTooltip
+          anchorId="add_document"
+          place="bottom"
+          content="No preparation needed. Any PDF will do."
+        />
       </div>
     </>
   );
