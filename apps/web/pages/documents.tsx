@@ -406,7 +406,7 @@ const DocumentsPage: NextPageWithLayout = (props: any) => {
 
         <h3 className="mt-2 text-sm font-medium text-gray-900">No documents</h3>
         <p className="mt-1 text-sm text-gray-500">
-          Get started by creating a new document.
+          Get started by adding a document.
         </p>
         <div className="mt-6">
           <Button
