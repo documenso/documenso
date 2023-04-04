@@ -1,10 +1,8 @@
-import React, { useState } from "react";
 import { IconButton } from "@documenso/ui";
-import Logo from "../logo";
 import { XCircleIcon } from "@heroicons/react/20/solid";
+import React, { useState } from "react";
 import Draggable from "react-draggable";
-
-const stc = require("string-to-color");
+import stc from "string-to-color";
 
 type FieldPropsType = {
   field: {

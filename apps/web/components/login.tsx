@@ -16,7 +16,13 @@ interface LoginValues {
   csrfToken: string;
 }
 
-export default function Login(props: any) {
+export interface LoginProps {
+  allowSignup?: boolean;
+}
+
+export default function Login({
+  allowSignup,
+}: LoginProps) {
   const router = useRouter();
   const methods = useForm<LoginValues>();
   const { register, formState } = methods;
@@ -138,7 +144,7 @@ export default function Login(props: any) {
                   <div className="relative flex justify-center"></div>
                 </div>
               </div>
-              {props.allowSignup ? (
+              {allowSignup ? (
                 <p className="mt-2 text-center text-sm text-gray-600">
                   Are you new here?{" "}
                   <Link href="/signup" className="text-neon hover:text-neon font-medium">

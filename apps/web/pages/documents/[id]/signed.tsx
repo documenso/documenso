@@ -1,10 +1,11 @@
+import { dirtyClone } from "@documenso/lib/dirtyClone";
+import prisma from "@documenso/prisma";
+import { Button } from "@documenso/ui";
+import { ArrowDownTrayIcon, CheckBadgeIcon } from "@heroicons/react/24/outline";
 import Head from "next/head";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import prisma from "@documenso/prisma";
-import { Button, IconButton } from "@documenso/ui";
 import { NextPageWithLayout } from "../../_app";
-import { ArrowDownTrayIcon, CheckBadgeIcon } from "@heroicons/react/24/outline";
 
 const Signed: NextPageWithLayout = (props: any) => {
   const router = useRouter();
@@ -85,9 +86,9 @@ export async function getServerSideProps(context: any) {
 
   return {
     props: {
-      document: JSON.parse(JSON.stringify(recipient.Document)),
-      fields: JSON.parse(JSON.stringify(fields)),
-      recipient: JSON.parse(JSON.stringify(recipient)),
+      document: dirtyClone(recipient.Document),
+      fields: dirtyClone(fields),
+      recipient: dirtyClone(recipient),
     },
   };
 }

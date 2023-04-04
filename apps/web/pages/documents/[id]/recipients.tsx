@@ -20,6 +20,7 @@ import {
 } from "@heroicons/react/24/outline";
 import { DocumentStatus, Document as PrismaDocument } from "@prisma/client";
 import { FormProvider, useFieldArray, useForm, useWatch } from "react-hook-form";
+import { dirtyClone } from "@documenso/lib/dirtyClone";
 
 export type FormValues = {
   signers: { id: number; email: string; name: string }[];
@@ -354,7 +355,7 @@ export async function getServerSideProps(context: any) {
 
   return {
     props: {
-      document: JSON.parse(JSON.stringify({ ...document, document: "" })),
+      document: dirtyClone({ ...document, document: "" }),
     },
   };
 }
