@@ -12,27 +12,36 @@ export async function insertTextInPDF(
 ): Promise<string> {
   const fontBytes = fs.readFileSync("public/fonts/Qwigley-Regular.ttf");
 
-  const existingPdfBytes = pdfAsBase64;
+  const pdfDoc = await PDFDocument.load(pdfAsBase64);
 
-  const pdfDoc = await PDFDocument.load(existingPdfBytes);
   pdfDoc.registerFontkit(fontkit);
-  const customFont = await pdfDoc.embedFont(fontBytes);
-  const helveticaFont = await pdfDoc.embedFont(StandardFonts.Helvetica);
+
+  const font = await pdfDoc.embedFont(useHandwritingFont ? fontBytes : StandardFonts.Helvetica);
 
   const pages = pdfDoc.getPages();
   const pdfPage = pages[page];
+
   const textSize = useHandwritingFont ? 50 : 15;
-  const textWidth = customFont.widthOfTextAtSize(text, textSize);
-  const textHeight = customFont.heightAtSize(textSize);
+  const textWidth = font.widthOfTextAtSize(text, textSize);
+  const textHeight = font.heightAtSize(textSize);
   const fieldSize = { width: 192, height: 64 };
-  const invertedYPosition = pdfPage.getHeight() - positionY - fieldSize.height;
+
+  // Because pdf-lib use a bottom-left coordinate system, we need to invert the y position
+  // we then center the text in the middle by adding half the height of the text
+  // plus the height of the field and divide the result by 2
+  const invertedYPosition =
+    pdfPage.getHeight() - positionY - (fieldSize.height + textHeight / 2) / 2;
+
+  // We center the text by adding the width of the field, subtracting the width of the text
+  // and dividing the result by 2
+  const centeredXPosition = positionX + (fieldSize.width - textWidth) / 2;
 
   pdfPage.drawText(text, {
-    x: positionX,
+    x: centeredXPosition,
     y: invertedYPosition,
     size: textSize,
-    font: useHandwritingFont ? customFont : helveticaFont,
     color: rgb(0, 0, 0),
+    font,
   });
 
   const pdfAsUint8Array = await pdfDoc.save();
