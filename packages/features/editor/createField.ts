@@ -14,10 +14,8 @@ export const createField = (
   if (newFieldX < 0) newFieldX = 0;
   if (newFieldY < 0) newFieldY = 0;
 
-  if (newFieldX + fieldSize.width > rect.width)
-    newFieldX = rect.width - fieldSize.width;
-  if (newFieldY + fieldSize.height > rect.height)
-    newFieldY = rect.height - fieldSize.height;
+  if (newFieldX + fieldSize.width > rect.width) newFieldX = rect.width - fieldSize.width;
+  if (newFieldY + fieldSize.height > rect.height) newFieldY = rect.height - fieldSize.height;
 
   const signatureField = {
     id: -1,

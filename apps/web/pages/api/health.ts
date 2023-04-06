@@ -1,5 +1,4 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-
 import { defaultHandler, defaultResponder } from "@documenso/lib/server";
 import prisma from "@documenso/prisma";
 

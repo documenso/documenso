@@ -1,7 +1,7 @@
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
-  value: true
+  value: true,
 });
 exports.default = void 0;
 
@@ -21,18 +21,24 @@ var _readPdf = _interopRequireDefault(require("./readPdf"));
 
 var _getPageRef = _interopRequireDefault(require("./getPageRef"));
 
-var _createBufferRootWithAcroform = _interopRequireDefault(require("./createBufferRootWithAcroform"));
+var _createBufferRootWithAcroform = _interopRequireDefault(
+  require("./createBufferRootWithAcroform")
+);
 
-var _createBufferPageWithAnnotation = _interopRequireDefault(require("./createBufferPageWithAnnotation"));
+var _createBufferPageWithAnnotation = _interopRequireDefault(
+  require("./createBufferPageWithAnnotation")
+);
 
 var _createBufferTrailer = _interopRequireDefault(require("./createBufferTrailer"));
 
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+function _interopRequireDefault(obj) {
+  return obj && obj.__esModule ? obj : { default: obj };
+}
 
-const isContainBufferRootWithAcroform = pdf => {
+const isContainBufferRootWithAcroform = (pdf) => {
   const bufferRootWithAcroformRefRegex = /\/AcroForm\s+(\d+\s\d+\sR)/g;
   const match = bufferRootWithAcroformRefRegex.exec(pdf.toString());
-  return match != null && match[1] != null && match[1] !== '';
+  return match != null && match[1] != null && match[1] !== "";
 };
 /**
  * Adds a signature placeholder to a PDF Buffer.
@@ -44,15 +50,14 @@ const isContainBufferRootWithAcroform = pdf => {
  * not only on a freshly created through PDFKit one.
  */
 
-
 const plainAddPlaceholder = ({
   pdfBuffer,
   reason,
-  contactInfo = 'emailfromp1289@gmail.com',
-  name = 'Name from p12',
-  location = 'Location from p12',
+  contactInfo = "emailfromp1289@gmail.com",
+  name = "Name from p12",
+  location = "Location from p12",
   signatureLength = _const.DEFAULT_SIGNATURE_LENGTH,
-  subFilter = _const.SUBFILTER_ADOBE_PKCS7_DETACHED
+  subFilter = _const.SUBFILTER_ADOBE_PKCS7_DETACHED,
 }) => {
   let pdf = (0, _removeTrailingNewLine.default)(pdfBuffer);
   const info = (0, _readPdf.default)(pdf);
@@ -65,24 +70,27 @@ const plainAddPlaceholder = ({
       const index = additionalIndex != null ? additionalIndex : info.xref.maxIndex;
       addedReferences.set(index, pdf.length + 1); // + 1 new line
 
-      pdf = Buffer.concat([pdf, Buffer.from('\n'), Buffer.from(`${index} 0 obj\n`), Buffer.from(_pdfobject.default.convert(input)), Buffer.from('\nendobj\n')]);
+      pdf = Buffer.concat([
+        pdf,
+        Buffer.from("\n"),
+        Buffer.from(`${index} 0 obj\n`),
+        Buffer.from(_pdfobject.default.convert(input)),
+        Buffer.from("\nendobj\n"),
+      ]);
       return new _pdfkitReferenceMock.default(info.xref.maxIndex);
     },
     page: {
       dictionary: new _pdfkitReferenceMock.default(pageIndex, {
         data: {
-          Annots: []
-        }
-      })
+          Annots: [],
+        },
+      }),
     },
     _root: {
-      data: {}
-    }
+      data: {},
+    },
   };
-  const {
-    form,
-    widget
-  } = (0, _pdfkitAddPlaceholder.default)({
+  const { form, widget } = (0, _pdfkitAddPlaceholder.default)({
     pdf: pdfKitMock,
     pdfBuffer,
     reason,
@@ -90,18 +98,30 @@ const plainAddPlaceholder = ({
     name,
     location,
     signatureLength,
-    subFilter
+    subFilter,
   });
 
   if (!isContainBufferRootWithAcroform(pdf)) {
     const rootIndex = (0, _getIndexFromRef.default)(info.xref, info.rootRef);
     addedReferences.set(rootIndex, pdf.length + 1);
-    pdf = Buffer.concat([pdf, Buffer.from('\n'), (0, _createBufferRootWithAcroform.default)(pdf, info, form)]);
+    pdf = Buffer.concat([
+      pdf,
+      Buffer.from("\n"),
+      (0, _createBufferRootWithAcroform.default)(pdf, info, form),
+    ]);
   }
 
   addedReferences.set(pageIndex, pdf.length + 1);
-  pdf = Buffer.concat([pdf, Buffer.from('\n'), (0, _createBufferPageWithAnnotation.default)(pdf, info, pageRef, widget)]);
-  pdf = Buffer.concat([pdf, Buffer.from('\n'), (0, _createBufferTrailer.default)(pdf, info, addedReferences)]);
+  pdf = Buffer.concat([
+    pdf,
+    Buffer.from("\n"),
+    (0, _createBufferPageWithAnnotation.default)(pdf, info, pageRef, widget),
+  ]);
+  pdf = Buffer.concat([
+    pdf,
+    Buffer.from("\n"),
+    (0, _createBufferTrailer.default)(pdf, info, addedReferences),
+  ]);
   return pdf;
 };
 

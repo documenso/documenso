@@ -1,21 +1,14 @@
-import Logo from "../logo";
-import { NEXT_PUBLIC_WEBAPP_URL } from "@documenso/lib/constants";
-import { useRouter } from "next/router";
-import dynamic from "next/dynamic";
-import SignatureDialog from "./signature-dialog";
 import { useEffect, useState } from "react";
-import { Button } from "@documenso/ui";
-import {
-  CheckBadgeIcon,
-  InformationCircleIcon,
-} from "@heroicons/react/24/outline";
-import { FieldType } from "@prisma/client";
-import {
-  createOrUpdateField,
-  deleteField,
-  signDocument,
-} from "@documenso/lib/api";
+import dynamic from "next/dynamic";
+import { useRouter } from "next/router";
 import { createField } from "@documenso/features/editor";
+import { createOrUpdateField, deleteField, signDocument } from "@documenso/lib/api";
+import { NEXT_PUBLIC_WEBAPP_URL } from "@documenso/lib/constants";
+import { Button } from "@documenso/ui";
+import Logo from "../logo";
+import SignatureDialog from "./signature-dialog";
+import { CheckBadgeIcon, InformationCircleIcon } from "@heroicons/react/24/outline";
+import { FieldType } from "@prisma/client";
 
 const PDFViewer = dynamic(() => import("./pdf-viewer"), {
   ssr: false,
@@ -27,9 +20,7 @@ export default function PDFSigner(props: any) {
   const [signingDone, setSigningDone] = useState(false);
   const [localSignatures, setLocalSignatures] = useState<any[]>([]);
   const [fields, setFields] = useState<any[]>(props.fields);
-  const signatureFields = fields.filter(
-    (field) => field.type === FieldType.SIGNATURE
-  );
+  const signatureFields = fields.filter((field) => field.type === FieldType.SIGNATURE);
   const [dialogField, setDialogField] = useState<any>();
 
   useEffect(() => {
@@ -80,9 +71,9 @@ export default function PDFSigner(props: any) {
       <div className="bg-neon p-4">
         <div className="flex">
           <div className="flex-shrink-0">
-            <Logo className="h-12 w-12 -mt-2.5"></Logo>
+            <Logo className="-mt-2.5 h-12 w-12"></Logo>
           </div>
-          <div className="ml-3 flex-1 md:flex md:justify-between text-center justify-start items-center">
+          <div className="ml-3 flex-1 items-center justify-start text-center md:flex md:justify-between">
             <p className="text-lg text-slate-700">
               {props.document.User.name
                 ? `${props.document.User.name} (${props.document.User.email})`
@@ -96,17 +87,14 @@ export default function PDFSigner(props: any) {
                 icon={CheckBadgeIcon}
                 className="float-right"
                 onClick={() => {
-                  signDocument(
-                    props.document,
-                    localSignatures,
-                    `${router.query.token}`
-                  ).then(() => {
-                    router.push(
-                      `/documents/${props.document.id}/signed?token=${router.query.token}`
-                    );
-                  });
-                }}
-              >
+                  signDocument(props.document, localSignatures, `${router.query.token}`).then(
+                    () => {
+                      router.push(
+                        `/documents/${props.document.id}/signed?token=${router.query.token}`
+                      );
+                    }
+                  );
+                }}>
                 Done
               </Button>
             </p>
@@ -117,15 +105,11 @@ export default function PDFSigner(props: any) {
         <div className="bg-yellow-50 p-4">
           <div className="flex">
             <div className="flex-shrink-0">
-              <InformationCircleIcon
-                className="h-5 w-5 text-yellow-400"
-                aria-hidden="true"
-              />
+              <InformationCircleIcon className="h-5 w-5 text-yellow-400" aria-hidden="true" />
             </div>
             <div className="ml-3 flex-1 md:flex md:justify-between">
               <p className="text-sm text-yellow-700">
-                You can sign this document anywhere you like, but maybe look for
-                a signature line.
+                You can sign this document anywhere you like, but maybe look for a signature line.
               </p>
             </div>
           </div>
@@ -144,12 +128,10 @@ export default function PDFSigner(props: any) {
         pdfUrl={`${NEXT_PUBLIC_WEBAPP_URL}/api/documents/${router.query.id}?token=${router.query.token}`}
         onClick={onClick}
         onMouseDown={function onMouseDown(e: any, page: number) {
-          if (signatureFields.length === 0)
-            addFreeSignature(e, page, props.recipient);
+          if (signatureFields.length === 0) addFreeSignature(e, page, props.recipient);
         }}
         onMouseUp={() => {}}
-        onDelete={onDeleteHandler}
-      ></PDFViewer>
+        onDelete={onDeleteHandler}></PDFViewer>
     </>
   );
 
@@ -166,18 +148,9 @@ export default function PDFSigner(props: any) {
   }
 
   function addFreeSignature(e: any, page: number, recipient: any): any {
-    const freeSignatureField = createField(
-      e,
-      page,
-      recipient,
-      FieldType.FREE_SIGNATURE
-    );
+    const freeSignatureField = createField(e, page, recipient, FieldType.FREE_SIGNATURE);
 
-    createOrUpdateField(
-      props.document,
-      freeSignatureField,
-      recipient.token
-    ).then((res) => {
+    createOrUpdateField(props.document, freeSignatureField, recipient.token).then((res) => {
       setFields((prevState) => [...prevState, res]);
       setDialogField(res);
       setOpen(true);

@@ -1,8 +1,9 @@
 import React, { useState } from "react";
-import Draggable from "react-draggable";
-import Logo from "../logo";
 import { IconButton } from "@documenso/ui";
+import Logo from "../logo";
 import { XCircleIcon } from "@heroicons/react/20/solid";
+import Draggable from "react-draggable";
+
 const stc = require("string-to-color");
 
 type FieldPropsType = {
@@ -51,21 +52,19 @@ export default function EditableField(props: FieldPropsType) {
       onMouseDown={(e: any) => {
         e.preventDefault();
         e.stopPropagation();
-      }}
-    >
+      }}>
       {/* width: 192 height 96 */}
       <div
         hidden={props.hidden}
         ref={nodeRef}
-        className="cursor-move opacity-80 p-2 m-auto w-48 h-16 flex-row-reverse text-lg font-bold text-center absolute top-0 left-0 select-none"
+        className="absolute top-0 left-0 m-auto h-16 w-48 cursor-move select-none flex-row-reverse p-2 text-center text-lg font-bold opacity-80"
         style={{
           background: stc(props.field.Recipient.email),
-        }}
-      >
-        <div className="m-auto overflow-hidden flex-row-reverse text-lg font-bold text-center">
+        }}>
+        <div className="m-auto flex-row-reverse overflow-hidden text-center text-lg font-bold">
           {field.type}
           {field.type === "SIGNATURE" ? (
-            <div className="text-xs text-center">
+            <div className="text-center text-xs">
               {`${props.field.Recipient?.name} <${props.field.Recipient?.email}>`}
             </div>
           ) : (
@@ -79,8 +78,7 @@ export default function EditableField(props: FieldPropsType) {
             icon={XCircleIcon}
             onClick={(event: any) => {
               props.onDelete(props.field.id);
-            }}
-          ></IconButton>
+            }}></IconButton>
         </strong>
       </div>
     </Draggable>

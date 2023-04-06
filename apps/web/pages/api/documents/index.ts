@@ -1,9 +1,9 @@
-import { defaultHandler, defaultResponder } from "@documenso/lib/server";
-import prisma from "@documenso/prisma";
 import { NextApiRequest, NextApiResponse } from "next";
-import { getUserFromToken } from "@documenso/lib/server";
-import formidable from "formidable";
 import { getDocumentsForUserFromToken } from "@documenso/lib/query";
+import { defaultHandler, defaultResponder } from "@documenso/lib/server";
+import { getUserFromToken } from "@documenso/lib/server";
+import prisma from "@documenso/prisma";
+import formidable from "formidable";
 
 export const config = {
   api: {

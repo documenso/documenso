@@ -1,12 +1,8 @@
-import { compare, hash } from "bcryptjs";
 import type { NextApiRequest } from "next";
-import type { Session } from "next-auth";
-import {
-  getSession as getSessionInner,
-  GetSessionParams,
-} from "next-auth/react";
-
 import { HttpError } from "@documenso/lib/server";
+import { compare, hash } from "bcryptjs";
+import type { Session } from "next-auth";
+import { GetSessionParams, getSession as getSessionInner } from "next-auth/react";
 
 export async function hashPassword(password: string) {
   const hashedPassword = await hash(password, 12);
@@ -28,9 +24,7 @@ export function validPassword(password: string) {
   return true;
 }
 
-export async function getSession(
-  options: GetSessionParams
-): Promise<Session | null> {
+export async function getSession(options: GetSessionParams): Promise<Session | null> {
   const session = await getSessionInner(options);
 
   // that these are equal are ensured in `[...nextauth]`'s callback
@@ -43,11 +37,7 @@ export function isPasswordValid(
   breakdown: boolean,
   strict?: boolean
 ): { caplow: boolean; num: boolean; min: boolean; admin_min: boolean };
-export function isPasswordValid(
-  password: string,
-  breakdown?: boolean,
-  strict?: boolean
-) {
+export function isPasswordValid(password: string, breakdown?: boolean, strict?: boolean) {
   let cap = false, // Has uppercase characters
     low = false, // Has lowercase characters
     num = false, // At least one number
@@ -63,8 +53,7 @@ export function isPasswordValid(
     }
   }
 
-  if (!breakdown)
-    return cap && low && num && min && (strict ? admin_min : true);
+  if (!breakdown) return cap && low && num && min && (strict ? admin_min : true);
 
   let errors: Record<string, boolean> = { caplow: cap && low, num, min };
   // Only return the admin key if strict mode is enabled.
@@ -79,8 +68,7 @@ type CtxOrReq =
 
 export const ensureSession = async (ctxOrReq: CtxOrReq) => {
   const session = await getSession(ctxOrReq);
-  if (!session?.user)
-    throw new HttpError({ statusCode: 401, message: "Unauthorized" });
+  if (!session?.user) throw new HttpError({ statusCode: 401, message: "Unauthorized" });
   return session;
 };
 

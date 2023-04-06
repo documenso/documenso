@@ -1,20 +1,16 @@
 import { ReactElement } from "react";
-import Layout from "../../../components/layout";
-import { NextPageWithLayout } from "../../_app";
+import Link from "next/link";
 import { useRouter } from "next/router";
 import { NEXT_PUBLIC_WEBAPP_URL } from "@documenso/lib";
-import { getUserFromToken } from "@documenso/lib/server";
-import Link from "next/link";
-import { DocumentStatus } from "@prisma/client";
-import {
-  InformationCircleIcon,
-  PaperAirplaneIcon,
-  UsersIcon,
-} from "@heroicons/react/24/outline";
 import { getDocument } from "@documenso/lib/query";
-import { Document as PrismaDocument } from "@prisma/client";
-import { Button, Breadcrumb } from "@documenso/ui";
+import { getUserFromToken } from "@documenso/lib/server";
+import { Breadcrumb, Button } from "@documenso/ui";
 import PDFEditor from "../../../components/editor/pdf-editor";
+import Layout from "../../../components/layout";
+import { NextPageWithLayout } from "../../_app";
+import { InformationCircleIcon, PaperAirplaneIcon, UsersIcon } from "@heroicons/react/24/outline";
+import { DocumentStatus } from "@prisma/client";
+import { Document as PrismaDocument } from "@prisma/client";
 
 const DocumentsDetailPage: NextPageWithLayout = (props: any) => {
   const router = useRouter();
@@ -32,8 +28,7 @@ const DocumentsDetailPage: NextPageWithLayout = (props: any) => {
               },
               {
                 title: props.document.title,
-                href:
-                  NEXT_PUBLIC_WEBAPP_URL + "/documents/" + props.document.id,
+                href: NEXT_PUBLIC_WEBAPP_URL + "/documents/" + props.document.id,
               },
             ]}
           />
@@ -67,21 +62,13 @@ const DocumentsDetailPage: NextPageWithLayout = (props: any) => {
             <Button
               icon={PaperAirplaneIcon}
               className="ml-3"
-              href={
-                NEXT_PUBLIC_WEBAPP_URL +
-                "/documents/" +
-                props.document.id +
-                "/recipients"
-              }
+              href={NEXT_PUBLIC_WEBAPP_URL + "/documents/" + props.document.id + "/recipients"}
               onClick={() => {
                 if (
-                  confirm(
-                    `Send document out to ${props?.document?.Recipient?.length} recipients?`
-                  )
+                  confirm(`Send document out to ${props?.document?.Recipient?.length} recipients?`)
                 ) {
                 }
-              }}
-            >
+              }}>
               Prepare to Send
             </Button>
           </div>
@@ -120,11 +107,7 @@ export async function getServerSideProps(context: any) {
   const { id: documentId } = context.query;
 
   try {
-    const document: PrismaDocument = await getDocument(
-      +documentId,
-      context.req,
-      context.res
-    );
+    const document: PrismaDocument = await getDocument(+documentId, context.req, context.res);
 
     return {
       props: {

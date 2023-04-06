@@ -1,9 +1,6 @@
 import toast from "react-hot-toast";
 
-export const sendSigningRequests = async (
-  document: any,
-  resendTo: number[] = []
-) => {
+export const sendSigningRequests = async (document: any, resendTo: number[] = []) => {
   if (!document || !document.id) return;
   try {
     const sent = await toast.promise(

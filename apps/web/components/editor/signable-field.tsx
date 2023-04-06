@@ -1,8 +1,9 @@
 import React, { useState } from "react";
-import Draggable from "react-draggable";
+import { classNames } from "@documenso/lib";
 import { IconButton } from "@documenso/ui";
 import { XCircleIcon } from "@heroicons/react/20/solid";
-import { classNames } from "@documenso/lib";
+import Draggable from "react-draggable";
+
 const stc = require("string-to-color");
 
 type FieldPropsType = {
@@ -37,31 +38,26 @@ export default function SignableField(props: FieldPropsType) {
       onMouseDown={(e: any) => {
         // e.preventDefault();
         e.stopPropagation();
-      }}
-    >
+      }}>
       <div
         onClick={(e: any) => {
           if (!field?.signature) props.onClick(props.field);
         }}
         ref={nodeRef}
         className={classNames(
-          "opacity-80 m-auto w-48 h-16 flex-row-reverse text-lg font-bold text-center absolute top-0 left-0 select-none",
-          field.type === "SIGNATURE"
-            ? "cursor-pointer hover:brightness-50"
-            : "cursor-not-allowed"
+          "absolute top-0 left-0 m-auto h-16 w-48 select-none flex-row-reverse text-center text-lg font-bold opacity-80",
+          field.type === "SIGNATURE" ? "cursor-pointer hover:brightness-50" : "cursor-not-allowed"
         )}
         style={{
           background: stc(props.field.Recipient.email),
-        }}
-      >
-        <div hidden={field?.signature} className="font-medium my-4">
+        }}>
+        <div hidden={field?.signature} className="my-4 font-medium">
           {field.type === "SIGNATURE" ? "SIGN HERE" : ""}
           {field.type === "DATE" ? <small>Date (filled on sign)</small> : ""}
         </div>
         <div
           hidden={!field?.signature}
-          className="font-qwigley text-5xl m-auto w-auto flex-row-reverse font-medium text-center"
-        >
+          className="font-qwigley m-auto w-auto flex-row-reverse text-center text-5xl font-medium">
           {field?.signature?.type === "type" ? (
             <div className="my-4">{field?.signature.typedSignature}</div>
           ) : (
@@ -69,7 +65,7 @@ export default function SignableField(props: FieldPropsType) {
           )}
 
           {field?.signature?.type === "draw" ? (
-            <img className="w-48 h-16" src={field?.signature?.signatureImage} />
+            <img className="h-16 w-48" src={field?.signature?.signatureImage} />
           ) : (
             ""
           )}

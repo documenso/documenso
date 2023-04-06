@@ -1,13 +1,15 @@
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
-  value: true
+  value: true,
 });
 exports.default = void 0;
 
 var _SignPdfError = _interopRequireDefault(require("../SignPdfError"));
 
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+function _interopRequireDefault(obj) {
+  return obj && obj.__esModule ? obj : { default: obj };
+}
 
 const sliceLastChar = (pdf, character) => {
   const lastChar = pdf.slice(pdf.length - 1).toString();
@@ -26,19 +28,21 @@ const sliceLastChar = (pdf, character) => {
  * @returns {Buffer}
  */
 
-
-const removeTrailingNewLine = pdf => {
+const removeTrailingNewLine = (pdf) => {
   if (!(pdf instanceof Buffer)) {
-    throw new _SignPdfError.default('PDF expected as Buffer.', _SignPdfError.default.TYPE_INPUT);
+    throw new _SignPdfError.default("PDF expected as Buffer.", _SignPdfError.default.TYPE_INPUT);
   }
 
   let output = pdf;
-  output = sliceLastChar(output, '\n');
-  output = sliceLastChar(output, '\r');
+  output = sliceLastChar(output, "\n");
+  output = sliceLastChar(output, "\r");
   const lastLine = output.slice(output.length - 6).toString();
 
-  if (lastLine !== '\n%%EOF') {
-    throw new _SignPdfError.default('A PDF file must end with an EOF line.', _SignPdfError.default.TYPE_PARSE);
+  if (lastLine !== "\n%%EOF") {
+    throw new _SignPdfError.default(
+      "A PDF file must end with an EOF line.",
+      _SignPdfError.default.TYPE_PARSE
+    );
   }
 
   return output;

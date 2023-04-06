@@ -1,14 +1,10 @@
+import { Fragment, useEffect, useState } from "react";
 import { classNames } from "@documenso/lib";
+import { localStorage } from "@documenso/lib";
 import { Button, IconButton } from "@documenso/ui";
 import { Dialog, Transition } from "@headlessui/react";
-import {
-  LanguageIcon,
-  PencilIcon,
-  TrashIcon,
-} from "@heroicons/react/24/outline";
-import { Fragment, useEffect, useState } from "react";
+import { LanguageIcon, PencilIcon, TrashIcon } from "@heroicons/react/24/outline";
 import SignatureCanvas from "react-signature-canvas";
-import { localStorage } from "@documenso/lib";
 
 const tabs = [
   { name: "Type", icon: LanguageIcon, current: true },
@@ -34,8 +30,7 @@ export default function SignatureDialog(props: any) {
           onClose={() => {
             props.setOpen(false);
             setCurrent(tabs[0]);
-          }}
-        >
+          }}>
           <Transition.Child
             as={Fragment}
             enter="ease-out duration-300"
@@ -43,8 +38,7 @@ export default function SignatureDialog(props: any) {
             enterTo="opacity-100"
             leave="ease-in duration-200"
             leaveFrom="opacity-100"
-            leaveTo="opacity-0"
-          >
+            leaveTo="opacity-0">
             <div className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" />
           </Transition.Child>
 
@@ -57,11 +51,10 @@ export default function SignatureDialog(props: any) {
                 enterTo="opacity-100 translate-y-0 sm:scale-100"
                 leave="ease-in duration-200"
                 leaveFrom="opacity-100 translate-y-0 sm:scale-100"
-                leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-              >
-                <Dialog.Panel className="min-h-[350px] relative transform overflow-hidden rounded-lg bg-white px-4 pt-5 pb-4 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-sm sm:p-6">
+                leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95">
+                <Dialog.Panel className="relative min-h-[350px] transform overflow-hidden rounded-lg bg-white px-4 pt-5 pb-4 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-sm sm:p-6">
                   <div className="">
-                    <div className="border-b border-gray-200 mb-3">
+                    <div className="mb-3 border-b border-gray-200">
                       <nav className="-mb-px flex space-x-8" aria-label="Tabs">
                         {tabs.map((tab) => (
                           <a
@@ -72,11 +65,10 @@ export default function SignatureDialog(props: any) {
                             className={classNames(
                               tab.current
                                 ? "border-neon text-neon"
-                                : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300",
-                              "group inline-flex items-center py-4 px-1 border-b-2 font-medium text-sm cursor-pointer"
+                                : "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700",
+                              "group inline-flex cursor-pointer items-center border-b-2 py-4 px-1 text-sm font-medium"
                             )}
-                            aria-current={tab.current ? "page" : undefined}
-                          >
+                            aria-current={tab.current ? "page" : undefined}>
                             <tab.icon
                               className={classNames(
                                 tab.current
@@ -93,7 +85,7 @@ export default function SignatureDialog(props: any) {
                     </div>
                     {isCurrentTab("Type") ? (
                       <div>
-                        <div className="my-8 border-b border-gray-300 mb-3">
+                        <div className="my-8 mb-3 border-b border-gray-300">
                           <input
                             value={typedSignature}
                             onChange={(e) => {
@@ -101,7 +93,7 @@ export default function SignatureDialog(props: any) {
                             }}
                             className={classNames(
                               typedSignature ? "font-qwigley text-4xl" : "",
-                              "leading-none h-10 align-bottom mt-14 text-center block w-full focus:border-neon focus:ring-neon text-2xl"
+                              "focus:border-neon focus:ring-neon mt-14 block h-10 w-full text-center align-bottom text-2xl leading-none"
                             )}
                             placeholder="Kindly type your name"
                           />
@@ -113,24 +105,19 @@ export default function SignatureDialog(props: any) {
                               props.onClose();
                               props.setOpen(false);
                               setCurrent(tabs[0]);
-                            }}
-                          >
+                            }}>
                             Cancel
                           </Button>
                           <Button
                             className="ml-3"
                             disabled={!typedSignature}
                             onClick={() => {
-                              localStorage.setItem(
-                                "typedSignature",
-                                typedSignature
-                              );
+                              localStorage.setItem("typedSignature", typedSignature);
                               props.onClose({
                                 type: "type",
                                 typedSignature: typedSignature,
                               });
-                            }}
-                          >
+                            }}>
                             Sign
                           </Button>
                         </div>
@@ -145,8 +132,7 @@ export default function SignatureDialog(props: any) {
                             signCanvasRef = ref;
                           }}
                           canvasProps={{
-                            className:
-                              "sigCanvas border-b b-2 border-slate w-full h-full mb-3",
+                            className: "sigCanvas border-b b-2 border-slate w-full h-full mb-3",
                           }}
                           clearOnResize={true}
                           onEnd={() => {
@@ -154,22 +140,20 @@ export default function SignatureDialog(props: any) {
                           }}
                         />
                         <IconButton
-                          className="block float-left"
+                          className="float-left block"
                           icon={TrashIcon}
                           onClick={() => {
                             signCanvasRef?.clear();
                             setSignatureEmpty(signCanvasRef?.isEmpty());
-                          }}
-                        ></IconButton>
-                        <div className="mt-10 float-right">
+                          }}></IconButton>
+                        <div className="float-right mt-10">
                           <Button
                             color="secondary"
                             onClick={() => {
                               props.onClose();
                               props.setOpen(false);
                               setCurrent(tabs[0]);
-                            }}
-                          >
+                            }}>
                             Cancel
                           </Button>
                           <Button
@@ -177,12 +161,10 @@ export default function SignatureDialog(props: any) {
                             onClick={() => {
                               props.onClose({
                                 type: "draw",
-                                signatureImage:
-                                  signCanvasRef.toDataURL("image/png"),
+                                signatureImage: signCanvasRef.toDataURL("image/png"),
                               });
                             }}
-                            disabled={signatureEmpty}
-                          >
+                            disabled={signatureEmpty}>
                             Sign
                           </Button>
                         </div>
@@ -200,11 +182,11 @@ export default function SignatureDialog(props: any) {
     </>
   );
 
-      function isCurrentTab(tabName: string): boolean {
+  function isCurrentTab(tabName: string): boolean {
     return currentTab.name === tabName;
   }
 
-        function setCurrent(t: any) {
+  function setCurrent(t: any) {
     tabs.forEach((tab) => {
       tab.current = tab.name === t.name;
     });

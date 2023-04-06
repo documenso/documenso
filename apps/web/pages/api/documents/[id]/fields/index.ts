@@ -1,12 +1,8 @@
-import {
-  defaultHandler,
-  defaultResponder,
-  getUserFromToken,
-} from "@documenso/lib/server";
-import prisma from "@documenso/prisma";
 import { NextApiRequest, NextApiResponse } from "next";
-import { Document as PrismaDocument, FieldType } from "@prisma/client";
 import { getDocument } from "@documenso/lib/query";
+import { defaultHandler, defaultResponder, getUserFromToken } from "@documenso/lib/server";
+import prisma from "@documenso/prisma";
+import { FieldType, Document as PrismaDocument } from "@prisma/client";
 
 async function getHandler(req: NextApiRequest, res: NextApiResponse) {
   const user = await getUserFromToken(req, res);
@@ -61,18 +57,14 @@ async function postHandler(req: NextApiRequest, res: NextApiResponse) {
     });
 
     if (!recipient || recipient?.documentId !== +documentId)
-      return res
-        .status(401)
-        .send("Recipient does not have access to this document.");
+      return res.status(401).send("Recipient does not have access to this document.");
   }
 
   if (user) {
     const document: PrismaDocument = await getDocument(+documentId, req, res);
     // todo entity ownerships checks
     if (document.userId !== user.id) {
-      return res
-        .status(401)
-        .send("User does not have access to this document.");
+      return res.status(401).send("User does not have access to this document.");
     }
   }
 

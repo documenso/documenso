@@ -1,6 +1,6 @@
 import router from "next/router";
-import toast from "react-hot-toast";
 import { NEXT_PUBLIC_WEBAPP_URL } from "../lib/constants";
+import toast from "react-hot-toast";
 
 export const uploadDocument = async (event: any) => {
   if (event.target.files && event.target.files[0]) {

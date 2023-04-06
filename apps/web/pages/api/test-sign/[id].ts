@@ -1,8 +1,9 @@
-import { defaultHandler, defaultResponder } from "@documenso/lib/server";
 import { NextApiRequest, NextApiResponse } from "next";
-import { Document as PrismaDocument } from "@prisma/client";
 import { getDocument } from "@documenso/lib/query";
+import { defaultHandler, defaultResponder, getUserFromToken } from "@documenso/lib/server";
+import prisma from "@documenso/prisma";
 import { addDigitalSignature } from "@documenso/signing/addDigitalSignature";
+import { Document as PrismaDocument } from "@prisma/client";
 
 // todo remove before launch
 
@@ -12,10 +13,7 @@ async function getHandler(req: NextApiRequest, res: NextApiResponse) {
   const signedDocument = await addDigitalSignature(document.document);
   res.setHeader("Content-Type", "application/pdf");
   res.setHeader("Content-Length", signedDocument.length);
-  res.setHeader(
-    "Content-Disposition",
-    `attachment; filename=${document.title}`
-  );
+  res.setHeader("Content-Disposition", `attachment; filename=${document.title}`);
 
   return res.status(200).send(signedDocument);
 }

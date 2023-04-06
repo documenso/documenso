@@ -1,23 +1,22 @@
 import { Fragment, useEffect, useState } from "react";
-import { Disclosure, Menu, Transition } from "@headlessui/react";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { signOut, useSession } from "next-auth/react";
-import avatarFromInitials from "avatar-from-initials";
-import { toast } from "react-hot-toast";
-
+import { getUser } from "@documenso/lib/api";
+import Logo from "./logo";
+import { Disclosure, Menu, Transition } from "@headlessui/react";
 import {
+  ArrowRightOnRectangleIcon,
   Bars3Icon,
   BellIcon,
-  XMarkIcon,
-  UserCircleIcon,
-  ArrowRightOnRectangleIcon,
-  DocumentTextIcon,
   ChartBarIcon,
+  DocumentTextIcon,
+  UserCircleIcon,
   WrenchIcon,
+  XMarkIcon,
 } from "@heroicons/react/24/outline";
-import Logo from "./logo";
-import { getUser } from "@documenso/lib/api";
+import avatarFromInitials from "avatar-from-initials";
+import { signOut, useSession } from "next-auth/react";
+import { toast } from "react-hot-toast";
 
 const navigation = [
   {
@@ -125,14 +124,12 @@ export default function TopNavigation() {
                           item.current
                             ? "border-neon text-brown"
                             : "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700",
-                          "inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium"
+                          "inline-flex items-center border-b-2 px-1 pt-1 text-sm font-medium"
                         )}
-                        aria-current={item.current ? "page" : undefined}
-                      >
+                        aria-current={item.current ? "page" : undefined}>
                         <item.icon
-                          className="flex-shrink-0 -ml-1 mr-3 h-6 w-6 inline"
-                          aria-hidden="true"
-                        ></item.icon>
+                          className="-ml-1 mr-3 inline h-6 w-6 flex-shrink-0"
+                          aria-hidden="true"></item.icon>
                         {item.name}
                       </Link>
                     ))}
@@ -142,8 +139,7 @@ export default function TopNavigation() {
                   onClick={() => {
                     document?.getElementById("mb")?.click();
                   }}
-                  className="hidden sm:ml-6 sm:flex sm:items-center hover:bg-gray-200 px-3 cursor-pointer"
-                >
+                  className="hidden cursor-pointer px-3 hover:bg-gray-200 sm:ml-6 sm:flex sm:items-center">
                   <span className="text-sm">
                     <p className="font-bold">{user?.name || ""}</p>
                     <p>{user?.email}</p>
@@ -152,8 +148,7 @@ export default function TopNavigation() {
                     <div>
                       <Menu.Button
                         id="mb"
-                        className="flex max-w-xs items-center rounded-full bg-white text-sm"
-                      >
+                        className="flex max-w-xs items-center rounded-full bg-white text-sm">
                         <span className="sr-only">Open user menu</span>
                         <div
                           key={user?.email}
@@ -170,8 +165,7 @@ export default function TopNavigation() {
                       enterTo="transform opacity-100 scale-100"
                       leave="transition ease-in duration-75"
                       leaveFrom="transform opacity-100 scale-100"
-                      leaveTo="transform opacity-0 scale-95"
-                    >
+                      leaveTo="transform opacity-0 scale-95">
                       <Menu.Items className="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
                         {userNavigation.map((item) => (
                           <Menu.Item key={item.name}>
@@ -182,12 +176,10 @@ export default function TopNavigation() {
                                 className={classNames(
                                   active ? "bg-gray-100" : "",
                                   "block px-4 py-2 text-sm text-gray-700"
-                                )}
-                              >
+                                )}>
                                 <item.icon
-                                  className="flex-shrink-0 -ml-1 mr-3 h-6 w-6 inline"
-                                  aria-hidden="true"
-                                ></item.icon>
+                                  className="-ml-1 mr-3 inline h-6 w-6 flex-shrink-0"
+                                  aria-hidden="true"></item.icon>
                                 {item.name}
                               </Link>
                             )}
@@ -219,15 +211,14 @@ export default function TopNavigation() {
                     href={item.href}
                     className={classNames(
                       item.current
-                        ? "bg-teal-50 border-teal-500 text-teal-700"
-                        : "border-transparent text-gray-600 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-800",
-                      "block pl-3 pr-4 py-2 border-l-4 text-base font-medium"
+                        ? "border-teal-500 bg-teal-50 text-teal-700"
+                        : "border-transparent text-gray-600 hover:border-gray-300 hover:bg-gray-50 hover:text-gray-800",
+                      "block border-l-4 py-2 pl-3 pr-4 text-base font-medium"
                     )}
                     aria-current={item.current ? "page" : undefined}
                     onClick={() => {
                       close();
-                    }}
-                  >
+                    }}>
                     {item.name}
                   </Link>
                 ))}
@@ -259,8 +250,7 @@ export default function TopNavigation() {
                           : item.click
                       }
                       href={item.href}
-                      className="block px-4 py-2 text-base font-medium text-gray-500 hover:bg-gray-100 hover:text-gray-800"
-                    >
+                      className="block px-4 py-2 text-base font-medium text-gray-500 hover:bg-gray-100 hover:text-gray-800">
                       {item.name}
                     </Link>
                   ))}

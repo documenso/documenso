@@ -1,6 +1,6 @@
 import { NEXT_PUBLIC_WEBAPP_URL } from "../constants";
-import { Document as PrismaDocument } from "@prisma/client";
 import { baseEmailTemplate } from "./baseTemplate";
+import { Document as PrismaDocument } from "@prisma/client";
 
 export const signingRequestTemplate = (
   message: string,

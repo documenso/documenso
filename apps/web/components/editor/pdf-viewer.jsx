@@ -1,9 +1,9 @@
 import { Fragment, useState } from "react";
-import { Document, Page } from "react-pdf/dist/esm/entry.webpack5";
 import EditableField from "./editable-field";
 import SignableField from "./signable-field";
-import short from "short-uuid";
 import { FieldType } from "@prisma/client";
+import { Document, Page } from "react-pdf/dist/esm/entry.webpack5";
+import short from "short-uuid";
 
 export default function PDFViewer(props) {
   const [numPages, setNumPages] = useState(null);
@@ -33,16 +33,14 @@ export default function PDFViewer(props) {
       <div
         hidden={loading}
         onMouseUp={props.onMouseUp}
-        style={{ height: numPages * pageHeight + 1000 }}
-      >
-        <div className="max-w-xs mt-6"></div>
+        style={{ height: numPages * pageHeight + 1000 }}>
+        <div className="mt-6 max-w-xs"></div>
         <Document
           file={props.pdfUrl}
           onLoadSuccess={onDocumentLoadSuccess}
           options={options}
           renderMode="canvas"
-          className="absolute w-auto mx-auto left-0 right-0"
-        >
+          className="absolute left-0 right-0 mx-auto w-auto">
           {Array.from({ length: numPages }, (_, index) => (
             <Fragment key={short.generate().toString()}>
               <div
@@ -57,8 +55,7 @@ export default function PDFViewer(props) {
                   position: "relative",
                   ...props.style,
                 }}
-                className="mx-auto w-fit"
-              >
+                className="mx-auto w-fit">
                 <Page
                   className="mt-5"
                   key={`page_${index + 1}`}
@@ -69,8 +66,7 @@ export default function PDFViewer(props) {
                     if (e.height) setPageHeight(e.height);
                     setLoading(false);
                   }}
-                  onRenderError={() => setLoading(false)}
-                ></Page>
+                  onRenderError={() => setLoading(false)}></Page>
                 {props?.fields
                   .filter((field) => field.page === index)
                   .map((field) =>
@@ -80,8 +76,7 @@ export default function PDFViewer(props) {
                         key={field.id}
                         field={field}
                         className="absolute"
-                        onDelete={onDeleteHandler}
-                      ></SignableField>
+                        onDelete={onDeleteHandler}></SignableField>
                     ) : (
                       <EditableField
                         hidden={
@@ -93,8 +88,7 @@ export default function PDFViewer(props) {
                         field={field}
                         className="absolute"
                         onPositionChanged={onPositionChangedHandler}
-                        onDelete={onDeleteHandler}
-                      ></EditableField>
+                        onDelete={onDeleteHandler}></EditableField>
                     )
                   )}
               </div>

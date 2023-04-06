@@ -121,6 +121,7 @@ Follow these steps to setup documenso on you local machnine:
 - Register a new user at http://localhost:3000/signup
 
 ---
+
 - Optional: Seed the database using <code>npm run db-seed</code> to create a test user and document
 - Optional: Upload and sign <code>apps\web\ressources\example.pdf</code> manually to test your setup
 
