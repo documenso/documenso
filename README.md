@@ -99,6 +99,29 @@ To run Documenso locally you need
 - Node Package Manger NPM - included in Node.js
 - [PostgreSQL (local or remote)](https://www.postgresql.org/download/)
 
+## Developer Quickstart
+
+> **Note**: This is a quickstart for developers. It assumes that you have both [docker](https://docs.docker.com/get-docker/) and [docker-compose](https://docs.docker.com/compose/) installed on your machine.
+
+Want to get up and running quickly? Follow these steps:
+
+- [Clone the repository](https://help.github.com/articles/cloning-a-repository/) it to your local device.
+
+  ```sh
+  git clone https://github.com/documenso/documenso
+  ```
+
+- Set up your .env file using the recommendations in the .env.example file.
+- Run `npm run dx` in the root directory
+  - This will spin up a postgres database and inbucket mail server in docker containers.
+- Run `npm run dev` in the root directory
+
+That's it! You should now be able to access the app at http://localhost:3000
+
+Incoming mail will be available at http://localhost:9000
+
+Your database will also be available on port `5432`. You can connect to it using your favorite database client.
+
 ## Developer Setup
 
 Follow these steps to setup documenso on you local machnine:
@@ -152,6 +175,15 @@ For the digital signature of you documents you need a signign certificate in .p1
    <code>openssl pkcs12 -export -out certificate.p12 -inkey private.key -in certificate.crt</code>
 4. You will be prompted to enter a password for the p12 file. Choose a strong password and remember it, as you will need it to use the certificate (**can be empty for dev certificates**)
 5. Place the certificate <code>/apps/web/ressource/certificate.p12</code>
+
+# Docker
+
+> We are still working on the publishing of docker images, in the meantime you can follow the steps below to create a production ready docker image.
+
+Want to create a production ready docker image? Follow these steps:
+
+- Run `./docker/build.sh` in the root directory.
+- Publish the image to your docker registry of choice.
 
 # Deploying - Coming Soon™
 
