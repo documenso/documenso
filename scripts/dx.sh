@@ -28,6 +28,12 @@ pushd "$MONOREPO_ROOT" >/dev/null
 # On failure popd back to the original directory
 trap "popd >/dev/null" EXIT
 
+# If we have received the -down or -d flag, stop the containers
+if [ "$1" = "-down" ] || [ "$1" = "-d" ]; then
+    docker-compose -f "$MONOREPO_ROOT/docker/compose-without-app.yml" down
+    exit 0
+fi
+
 docker-compose -f "$MONOREPO_ROOT/docker/compose-without-app.yml" up -d
 
 # Install dependencies
