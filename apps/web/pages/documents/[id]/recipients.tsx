@@ -227,7 +227,7 @@ const RecipientsPage: NextPageWithLayout = (props: any) => {
                                 Not Sent
                               </span>
                             ) : (
-                              ""
+                              <></>
                             )}
                             {item.sendStatus === "SENT" && item.readStatus !== "OPENED" ? (
                               <span id="sent_icon">
@@ -238,7 +238,7 @@ const RecipientsPage: NextPageWithLayout = (props: any) => {
                                 </span>
                               </span>
                             ) : (
-                              ""
+                              <></>
                             )}
                             {item.readStatus === "OPENED" && item.signingStatus === "NOT_SIGNED" ? (
                               <span id="read_icon">
@@ -251,19 +251,19 @@ const RecipientsPage: NextPageWithLayout = (props: any) => {
                                 </span>
                               </span>
                             ) : (
-                              ""
+                              <></>
                             )}
                             {item.signingStatus === "SIGNED" ? (
                               <span id="signed_icon">
                                 <span
                                   id="sent_icon"
-                                  className={`mt-3  inline-block flex-shrink-0 rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium  text-green-800`}>
+                                  className="mt-3  inline-block flex-shrink-0 rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium  text-green-800">
                                   <CheckBadgeIcon className="mr-1 inline h-5"></CheckBadgeIcon>
                                   Signed
                                 </span>
                               </span>
                             ) : (
-                              ""
+                              <></>
                             )}
                           </div>
                         </div>
