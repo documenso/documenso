@@ -34,7 +34,10 @@ const RecipientsPage: NextPageWithLayout = (props: any) => {
     },
     {
       title: props.document.title,
-      href: NEXT_PUBLIC_WEBAPP_URL + "/documents/" + props.document.id,
+      href:
+        props.document.status !== DocumentStatus.COMPLETED
+          ? NEXT_PUBLIC_WEBAPP_URL + "/documents/" + props.document.id
+          : NEXT_PUBLIC_WEBAPP_URL + "/documents/" + props.document.id + "/recipients",
     },
     {
       title: "Recipients",
