@@ -24,7 +24,7 @@ async function createUser(userData: { email: string; password: string }) {
 async function main() {
   console.info("Start seeding...");
   const password = "123456789";
-  const email = "example6@documenso.com";
+  const email = "example@documenso.com";
   const user = await createUser({
     email: email,
     password: await hashPassword(password),

@@ -88,30 +88,36 @@ const RecipientsPage: NextPageWithLayout = (props: any) => {
               href={"/api/documents/" + props.document.id}>
               Download
             </Button>
-            <Button
-              icon={PencilSquareIcon}
-              disabled={props.document.status === DocumentStatus.COMPLETED}
-              color={props.document.status === DocumentStatus.COMPLETED ? "primary" : "secondary"}
-              className="mr-2"
-              href={breadcrumbItems[1].href}>
-              Edit Document
-            </Button>
-            <Button
-              className="min-w-[125px]"
-              color="primary"
-              icon={PaperAirplaneIcon}
-              onClick={() => {
-                setOpen(true);
-              }}
-              disabled={
-                (formValues.length || 0) === 0 ||
-                !formValues.some(
-                  (r: any) => r.email && !hasEmailError(r) && r.sendStatus === "NOT_SENT"
-                ) ||
-                loading
-              }>
-              Send
-            </Button>
+            {props.document.status !== DocumentStatus.COMPLETED && (
+              <>
+                <Button
+                  icon={PencilSquareIcon}
+                  disabled={props.document.status === DocumentStatus.COMPLETED}
+                  color={
+                    props.document.status === DocumentStatus.COMPLETED ? "primary" : "secondary"
+                  }
+                  className="mr-2"
+                  href={breadcrumbItems[1].href}>
+                  Edit Document
+                </Button>
+                <Button
+                  className="min-w-[125px]"
+                  color="primary"
+                  icon={PaperAirplaneIcon}
+                  onClick={() => {
+                    setOpen(true);
+                  }}
+                  disabled={
+                    (formValues.length || 0) === 0 ||
+                    !formValues.some(
+                      (r: any) => r.email && !hasEmailError(r) && r.sendStatus === "NOT_SENT"
+                    ) ||
+                    loading
+                  }>
+                  Send
+                </Button>
+              </>
+            )}
           </div>
         </div>
         <div className="mt-10 overflow-hidden rounded-md bg-white p-4 shadow sm:p-6">
@@ -246,7 +252,7 @@ const RecipientsPage: NextPageWithLayout = (props: any) => {
                               <span id="signed_icon">
                                 <span
                                   id="sent_icon"
-                                  className="mt-3 inline-block flex-shrink-0 rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-800">
+                                  className={`mt-3  inline-block flex-shrink-0 rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium  text-green-800`}>
                                   <CheckBadgeIcon className="mr-1 inline h-5"></CheckBadgeIcon>
                                   Signed
                                 </span>
@@ -256,60 +262,64 @@ const RecipientsPage: NextPageWithLayout = (props: any) => {
                             )}
                           </div>
                         </div>
-                        <div className="mr-1 flex">
-                          <IconButton
-                            icon={PaperAirplaneIcon}
-                            disabled={
-                              !item.id ||
-                              item.sendStatus !== "SENT" ||
-                              item.signingStatus === "SIGNED" ||
-                              loading
-                            }
-                            color="secondary"
-                            className="my-auto mr-4 h-9"
-                            onClick={() => {
-                              if (confirm("Resend this signing request?")) {
-                                setLoading(true);
-                                sendSigningRequests(props.document, [item.id]).finally(() => {
-                                  setLoading(false);
-                                });
+                        {props.document.status !== DocumentStatus.COMPLETED && (
+                          <div className="mr-1 flex">
+                            <IconButton
+                              icon={PaperAirplaneIcon}
+                              disabled={
+                                !item.id ||
+                                item.sendStatus !== "SENT" ||
+                                item.signingStatus === "SIGNED" ||
+                                loading
                               }
-                            }}>
-                            Resend
-                          </IconButton>
-                          <IconButton
-                            icon={TrashIcon}
-                            disabled={!item.id || item.sendStatus === "SENT" || loading}
-                            onClick={() => {
-                              const removedItem = { ...fields }[index];
-                              remove(index);
-                              deleteRecipient(item)?.catch((err) => {
-                                append(removedItem);
-                              });
-                            }}
-                            className="group-hover:text-neon-dark group-hover:disabled:text-gray-400"
-                          />
-                        </div>
+                              color="secondary"
+                              className="my-auto mr-4 h-9"
+                              onClick={() => {
+                                if (confirm("Resend this signing request?")) {
+                                  setLoading(true);
+                                  sendSigningRequests(props.document, [item.id]).finally(() => {
+                                    setLoading(false);
+                                  });
+                                }
+                              }}>
+                              Resend
+                            </IconButton>
+                            <IconButton
+                              icon={TrashIcon}
+                              disabled={!item.id || item.sendStatus === "SENT" || loading}
+                              onClick={() => {
+                                const removedItem = { ...fields }[index];
+                                remove(index);
+                                deleteRecipient(item)?.catch((err) => {
+                                  append(removedItem);
+                                });
+                              }}
+                              className="group-hover:text-neon-dark group-hover:disabled:text-gray-400"
+                            />
+                          </div>
+                        )}
                       </div>
                     </div>
                   </li>
                 ))}
               </ul>
-              <Button
-                icon={UserPlusIcon}
-                className="mt-3"
-                onClick={() => {
-                  createOrUpdateRecipient({
-                    id: "",
-                    email: "",
-                    name: "",
-                    documentId: props.document.id,
-                  }).then((res) => {
-                    append(res);
-                  });
-                }}>
-                Add Signer
-              </Button>
+              {props.document.status !== "COMPLETED" && (
+                <Button
+                  icon={UserPlusIcon}
+                  className="mt-3"
+                  onClick={() => {
+                    createOrUpdateRecipient({
+                      id: "",
+                      email: "",
+                      name: "",
+                      documentId: props.document.id,
+                    }).then((res) => {
+                      append(res);
+                    });
+                  }}>
+                  Add Signer
+                </Button>
+              )}
             </form>
           </FormProvider>
         </div>
