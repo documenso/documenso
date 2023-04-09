@@ -26,7 +26,7 @@ fi
 pushd "$MONOREPO_ROOT" >/dev/null
 
 # On failure popd back to the original directory
-trap "popd >/dev/null" EXIT
+trap "popd" EXIT
 
 # If we have received the -down or -d flag, stop the containers
 if [ "$1" = "-down" ] || [ "$1" = "-d" ]; then
@@ -43,6 +43,3 @@ npm ci
 npm run db-migrate:dev
 
 echo "All done! You can now start the app with: npm run dev"
-
-# Return to the original directory
-popd >/dev/null
