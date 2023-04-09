@@ -124,7 +124,9 @@ const RecipientsPage: NextPageWithLayout = (props: any) => {
           <div className="border-b border-gray-200 pb-3 sm:pb-5">
             <h3 className="text-lg font-medium leading-6 text-gray-900 ">Signers</h3>
             <p className="mt-2 max-w-4xl text-sm text-gray-500">
-              The people who will sign the document.
+              {props.document.status !== DocumentStatus.COMPLETED
+                ? "The people who will sign the document."
+                : "The people who signed the document."}
             </p>
           </div>
           <FormProvider {...form}>
