@@ -226,9 +226,7 @@ const RecipientsPage: NextPageWithLayout = (props: any) => {
                                 className="mt-3 inline-block flex-shrink-0 rounded-full bg-yellow-200 px-2 py-0.5 text-xs font-medium text-gray-800">
                                 Not Sent
                               </span>
-                            ) : (
-                              <></>
-                            )}
+                            ) : null}
                             {item.sendStatus === "SENT" && item.readStatus !== "OPENED" ? (
                               <span id="sent_icon">
                                 <span
@@ -237,9 +235,7 @@ const RecipientsPage: NextPageWithLayout = (props: any) => {
                                   <CheckIcon className="mr-1 inline h-5" /> Sent
                                 </span>
                               </span>
-                            ) : (
-                              <></>
-                            )}
+                            ) : null}
                             {item.readStatus === "OPENED" && item.signingStatus === "NOT_SIGNED" ? (
                               <span id="read_icon">
                                 <span
@@ -250,9 +246,7 @@ const RecipientsPage: NextPageWithLayout = (props: any) => {
                                   Seen
                                 </span>
                               </span>
-                            ) : (
-                              <></>
-                            )}
+                            ) : null}
                             {item.signingStatus === "SIGNED" ? (
                               <span id="signed_icon">
                                 <span
@@ -262,9 +256,7 @@ const RecipientsPage: NextPageWithLayout = (props: any) => {
                                   Signed
                                 </span>
                               </span>
-                            ) : (
-                              <></>
-                            )}
+                            ) : null}
                           </div>
                         </div>
                         {props.document.status !== DocumentStatus.COMPLETED && (
