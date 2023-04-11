@@ -3,7 +3,7 @@ import { addDigitalSignature } from "@documenso/signing/addDigitalSignature";
 import { sendMail } from "./sendMail";
 import { Document as PrismaDocument } from "@prisma/client";
 
-export const sendSigningDoneMail = async (recipient: any, document: PrismaDocument, user: any) => {
+export const sendSigningDoneMail = async (document: PrismaDocument, user: any) => {
   await sendMail(
     user.email,
     `Completed: "${document.title}"`,

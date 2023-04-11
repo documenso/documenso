@@ -73,6 +73,13 @@ async function postHandler(req: NextApiRequest, res: NextApiResponse) {
     },
   });
 
+  const signedRecipients = await prisma.recipient.findMany({
+    where: {
+      documentId: recipient.documentId,
+      signingStatus: SigningStatus.SIGNED,
+    },
+  });
+
   // Don't check for inserted, because currently no "sign again" scenarios exist and
   // this is probably the expected behaviour in unclean states.
   const nonSignatureFields = await prisma.field.findMany({
@@ -126,7 +133,11 @@ async function postHandler(req: NextApiRequest, res: NextApiResponse) {
     });
 
     document.document = documentWithInserts;
-    if (documentOwner) await sendSigningDoneMail(recipient, document, documentOwner);
+    if (documentOwner) await sendSigningDoneMail(document, documentOwner);
+
+    for (const signer of signedRecipients) {
+      await sendSigningDoneMail(document, signer);
+    }
   }
 
   return res.status(200).end();
