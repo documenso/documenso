@@ -130,6 +130,6 @@ model Signature {
   signatureImageAsBase64 String?
   typedSignature         String?
 
-  Recipient Recipient @relation(fields: [recipientId], references: [id], onDelete: Restrict)
+  Recipient Recipient @relation(fields: [recipientId], references: [id], onDelete: Cascade)
   Field     Field     @relation(fields: [fieldId], references: [id], onDelete: Restrict)
 }
