@@ -66,7 +66,7 @@ export default function RecipientSelector(props: any) {
                             selected ? "font-semibold" : "font-normal",
                             "ml-3 block truncate"
                           )}>
-                          {`${selectedRecipient?.name} <${selectedRecipient?.email}>`}
+                          {`${recipient?.name} <${recipient?.email}>`}
                         </span>
                       </div>
 

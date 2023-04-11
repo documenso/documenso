@@ -291,6 +291,7 @@ const DocumentsPage: NextPageWithLayout = (props: any) => {
                                 event.stopPropagation();
                                 router.push("/documents/" + document.id);
                               }}
+                              disabled={document.status === "COMPLETED"}
                             />
                             <IconButton
                               icon={ArrowDownTrayIcon}
