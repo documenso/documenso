@@ -112,8 +112,8 @@ const RecipientsPage: NextPageWithLayout = (props: any) => {
                   }}
                   disabled={
                     (formValues.length || 0) === 0 ||
-                    !formValues.some(
-                      (r: any) => r.email && !hasEmailError(r) && r.sendStatus === "NOT_SENT"
+                    formValues.some(
+                      (r: any) => r.email && hasEmailError(r) && r.sendStatus === "NOT_SENT"
                     ) ||
                     loading
                   }>
