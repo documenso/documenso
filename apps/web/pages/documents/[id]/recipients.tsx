@@ -68,6 +68,20 @@ const RecipientsPage: NextPageWithLayout = (props: any) => {
     return !!errors?.signers?.[index]?.email;
   };
 
+  const deleteEmptyFields = () => {
+    let counter = 0;
+    formValues.forEach((item: any, index) => {
+      if (!item.email && item.sendStatus === "NOT_SENT") {
+        remove(index - counter);
+        counter += 1;
+        deleteRecipient(item)?.catch((err) => {
+          append(item);
+          counter -= 1;
+        });
+      }
+    });
+  };
+
   return (
     <>
       <Head>
@@ -109,6 +123,7 @@ const RecipientsPage: NextPageWithLayout = (props: any) => {
                   icon={PaperAirplaneIcon}
                   onClick={() => {
                     setOpen(true);
+                    deleteEmptyFields();
                   }}
                   disabled={
                     (formValues.length || 0) === 0 ||
