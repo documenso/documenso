@@ -134,7 +134,7 @@ const DocumentsPage: NextPageWithLayout = (props: any) => {
             onChange={setSelectedCreatedFilter}
           />
           <SelectBox
-            className="float-right ml-3 block w-1/4"
+            className="float-right mr-3 block w-1/4"
             label="Status"
             options={statusFilters}
             value={selectedStatusFilter}
