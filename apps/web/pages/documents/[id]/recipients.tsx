@@ -21,6 +21,7 @@ import {
 } from "@heroicons/react/24/outline";
 import { DocumentStatus, Document as PrismaDocument } from "@prisma/client";
 import { FormProvider, useFieldArray, useForm, useWatch } from "react-hook-form";
+import { toast } from "react-hot-toast";
 
 export type FormValues = {
   signers: { id: number; email: string; name: string }[];
@@ -290,9 +291,13 @@ const RecipientsPage: NextPageWithLayout = (props: any) => {
                               onClick={(e: any) => {
                                 e.preventDefault();
 
-                                const signLink = `${NEXT_PUBLIC_WEBAPP_URL}/documents/${item.id}/sign?token=${item.token}`;
+                                navigator.clipboard.writeText(
+                                  `${NEXT_PUBLIC_WEBAPP_URL}/documents/${item.id}/sign?token=${item.token}`
+                                );
 
-                                navigator.clipboard.writeText(signLink);
+                                toast("Copied to clipboard", {
+                                  icon: "📋",
+                                });
                               }}
                               color="secondary"
                               className="mx-2 group-hover:text-gray-600 group-hover:disabled:text-gray-400"
