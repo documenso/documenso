@@ -207,7 +207,7 @@ const DocumentsPage: NextPageWithLayout = (props: any) => {
                               {item.sendStatus === "NOT_SENT" ? (
                                 <span
                                   id="sent_icon"
-                                  className="inline-block flex-shrink-0 rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-800">
+                                  className="my-0.5 inline-block flex-shrink-0 rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-800">
                                   {item.name ? item.name + " <" + item.email + ">" : item.email}
                                 </span>
                               ) : (
@@ -217,7 +217,7 @@ const DocumentsPage: NextPageWithLayout = (props: any) => {
                                 <span id="sent_icon">
                                   <span
                                     id="sent_icon"
-                                    className="inline-block flex-shrink-0 rounded-full bg-yellow-200 px-2 py-0.5 text-xs font-medium text-green-800">
+                                    className="my-0.5 inline-block flex-shrink-0 rounded-full bg-yellow-200 px-2 py-0.5 text-xs font-medium text-green-800">
                                     <EnvelopeIcon className="mr-1 inline h-5"></EnvelopeIcon>
                                     {item.name ? item.name + " <" + item.email + ">" : item.email}
                                   </span>
@@ -230,7 +230,7 @@ const DocumentsPage: NextPageWithLayout = (props: any) => {
                                 <span id="read_icon">
                                   <span
                                     id="sent_icon"
-                                    className="inline-block flex-shrink-0 rounded-full bg-yellow-200 px-2 py-0.5 text-xs font-medium text-green-800">
+                                    className="my-0.5 inline-block flex-shrink-0 rounded-full bg-yellow-200 px-2 py-0.5 text-xs font-medium text-green-800">
                                     <CheckIcon className="-mr-2 inline h-5"></CheckIcon>
                                     <CheckIcon className="mr-1 inline h-5"></CheckIcon>
                                     {item.name ? item.name + " <" + item.email + ">" : item.email}
@@ -241,7 +241,7 @@ const DocumentsPage: NextPageWithLayout = (props: any) => {
                               )}
                               {item.signingStatus === "SIGNED" ? (
                                 <span id="signed_icon">
-                                  <span className="inline-block flex-shrink-0 rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-800">
+                                  <span className="my-0.5 inline-block flex-shrink-0 rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-800">
                                     <CheckBadgeIcon className="mr-1 inline h-5"></CheckBadgeIcon>{" "}
                                     {item.email}
                                   </span>
