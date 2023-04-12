@@ -59,15 +59,16 @@ enum DocumentStatus {
 }
 
 model Document {
-  id        Int            @id @default(autoincrement())
-  created   DateTime       @default(now())
-  userId    Int
-  User      User           @relation(fields: [userId], references: [id], onDelete: Cascade)
-  title     String
-  status    DocumentStatus @default(DRAFT)
-  document  String
-  Recipient Recipient[]
-  Field     Field[]
+  id            Int            @id @default(autoincrement())
+  created       DateTime       @default(now())
+  userId        Int
+  User          User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title         String
+  status        DocumentStatus @default(DRAFT)
+  document      String
+  completedDate DateTime?
+  Recipient     Recipient[]
+  Field         Field[]
 }
 
 enum ReadStatus {
