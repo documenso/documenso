@@ -11,6 +11,7 @@ import {
   ArrowDownTrayIcon,
   CheckBadgeIcon,
   CheckIcon,
+  ClipboardDocumentIcon,
   EnvelopeIcon,
   PaperAirplaneIcon,
   PencilSquareIcon,
@@ -27,6 +28,7 @@ export type FormValues = {
 
 const RecipientsPage: NextPageWithLayout = (props: any) => {
   const title: string = `"` + props?.document?.title + `"` + "Recipients | Documenso";
+
   const breadcrumbItems = [
     {
       title: "Documents",
@@ -281,6 +283,21 @@ const RecipientsPage: NextPageWithLayout = (props: any) => {
                               }}>
                               Resend
                             </IconButton>
+
+                            <IconButton
+                              icon={ClipboardDocumentIcon}
+                              disabled={!item.id || loading}
+                              onClick={(e: any) => {
+                                e.preventDefault();
+
+                                const signLink = `${NEXT_PUBLIC_WEBAPP_URL}/documents/${item.id}/sign?token=${item.token}`;
+
+                                navigator.clipboard.writeText(signLink);
+                              }}
+                              color="secondary"
+                              className="mx-2 group-hover:text-gray-600 group-hover:disabled:text-gray-400"
+                            />
+
                             <IconButton
                               icon={TrashIcon}
                               disabled={!item.id || item.sendStatus === "SENT" || loading}
@@ -321,7 +338,6 @@ const RecipientsPage: NextPageWithLayout = (props: any) => {
           </FormProvider>
         </div>
       </div>
-
       <Dialog
         title="Ready to send"
         document={props.document}
