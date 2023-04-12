@@ -85,11 +85,11 @@ const RecipientsPage: NextPageWithLayout = (props: any) => {
             </h2>
             <p className="mt-1 text-gray-600">
               Completed on{" "}
-              <time dateTime="2021-03-22" className="text-base font-semibold text-gray-600">
+              <time dateTime="2021-03-22" className="text-base font-medium text-gray-600">
                 {formatDate(new Date(props.document.completedDate))}
               </time>{" "}
               at{" "}
-              <time dateTime="2021-03-22" className="text-base font-semibold text-gray-600">
+              <time dateTime="2021-03-22" className="text-base font-medium text-gray-600">
                 {formatTime(new Date(props.document.completedDate))}
               </time>
             </p>
