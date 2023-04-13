@@ -6,7 +6,7 @@ services:
       - POSTGRES_PASSWORD=password
       - POSTGRES_DB=documenso
     ports:
-      - 5432:5432
+      - 54320:5432
 
   inbucket:
     image: inbucket/inbucket
