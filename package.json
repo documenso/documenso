@@ -8,7 +8,10 @@
     "db-migrate:dev": "prisma migrate dev",
     "db-seed": "prisma db seed",
     "db-studio": "prisma studio",
-    "dx": "./scripts/dx.sh"
+    "docker:compose": "docker-compose -f ./docker/compose-without-app.yml",
+    "docker:compose-up": "npm run docker:compose -- up -d",
+    "docker:compose-down": "npm run docker:compose -- down",
+    "dx": "npm install && run-s docker:compose-up db-migrate:dev"
   },
   "workspaces": [
     "apps/*",
@@ -47,6 +50,7 @@
   },
   "devDependencies": {
     "@trivago/prettier-plugin-sort-imports": "^4.1.1",
+    "npm-run-all": "^4.1.5",
     "prettier": "^2.8.7",
     "prettier-plugin-tailwindcss": "^0.2.5"
   }
