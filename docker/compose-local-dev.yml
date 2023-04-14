@@ -7,19 +7,18 @@ services:
       - POSTGRES_DB=documenso
     ports:
       - 5432:5432
+
   inbucket:
     image: inbucket/inbucket
     ports:
       - 9000:9000
       - 2500:2500
       - 1100:1100
+
   documenso:
-    image: documenso
-    build:
-      context: ../
-      dockerfile: ./docker/Dockerfile
-      args:
-        - NEXT_PUBLIC_WEBAPP_URL=http://localhost:3000
+    image: node:18
+    working_dir: /app
+    command: ./docker/compose-entrypoint.sh
     depends_on:
       - database
       - inbucket
@@ -37,3 +36,5 @@ services:
       - ALLOW_SIGNUP=true
     ports:
       - 3000:3000
+    volumes:
+      - ../:/app
