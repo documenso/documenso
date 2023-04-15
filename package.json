@@ -11,7 +11,8 @@
     "docker:compose": "docker-compose -f ./docker/compose-without-app.yml",
     "docker:compose-up": "npm run docker:compose -- up -d",
     "docker:compose-down": "npm run docker:compose -- down",
-    "dx": "npm install && run-s docker:compose-up db-migrate:dev"
+    "dx": "npm install && run-s docker:compose-up db-migrate:dev",
+    "d": "npm install && run-s docker:compose-up db-migrate:dev && npm run db-seed && npm run dev"
   },
   "workspaces": [
     "apps/*",

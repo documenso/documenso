@@ -115,6 +115,10 @@ Want to get up and running quickly? Follow these steps:
 - Run `npm run dx` in the root directory
   - This will spin up a postgres database and inbucket mail server in docker containers.
 - Run `npm run dev` in the root directory
+- Want it even faster? Just use
+    ```sh
+  npm run d
+  ```
 
 That's it! You should now be able to access the app at http://localhost:3000
 
