@@ -1,6 +1,6 @@
+import React, { useState } from "react";
 import { IconButton } from "@documenso/ui";
 import { XCircleIcon } from "@heroicons/react/20/solid";
-import React, { useState } from "react";
 import Draggable from "react-draggable";
 import stc from "string-to-color";
 

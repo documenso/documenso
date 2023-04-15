@@ -2,6 +2,7 @@ import { ReactElement, useRef, useState } from "react";
 import Head from "next/head";
 import { NEXT_PUBLIC_WEBAPP_URL, classNames } from "@documenso/lib";
 import { createOrUpdateRecipient, deleteRecipient, sendSigningRequests } from "@documenso/lib/api";
+import { dirtyClone } from "@documenso/lib/dirtyClone";
 import { getDocument } from "@documenso/lib/query";
 import { getUserFromToken } from "@documenso/lib/server";
 import { Breadcrumb, Button, Dialog, IconButton } from "@documenso/ui";
@@ -20,7 +21,6 @@ import {
 } from "@heroicons/react/24/outline";
 import { DocumentStatus, Document as PrismaDocument } from "@prisma/client";
 import { FormProvider, useFieldArray, useForm, useWatch } from "react-hook-form";
-import { dirtyClone } from "@documenso/lib/dirtyClone";
 
 export type FormValues = {
   signers: { id: number; email: string; name: string }[];

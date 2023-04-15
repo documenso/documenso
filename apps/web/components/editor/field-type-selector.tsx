@@ -1,7 +1,7 @@
+import { useState } from "react";
 import { classNames } from "@documenso/lib";
 import { FieldType, Recipient } from "@documenso/prisma/client";
 import { RadioGroup } from "@headlessui/react";
-import { useState } from "react";
 import stc from "string-to-color";
 
 const FIELD_TYPES = [
@@ -17,18 +17,13 @@ export interface FieldTypeSelectorProps {
   onChange: (fieldType: FieldType) => void;
 }
 
-export default function FieldTypeSelector({
-  onChange,
-  selectedRecipient,
-}: FieldTypeSelectorProps) {
-  const [selectedFieldType, setSelectedFieldType] = useState<FieldType>(
-    FIELD_TYPES[0].id
-  );
+export default function FieldTypeSelector({ onChange, selectedRecipient }: FieldTypeSelectorProps) {
+  const [selectedFieldType, setSelectedFieldType] = useState<FieldType>(FIELD_TYPES[0].id);
 
   const onSelectedFieldTypeChange = (type: FieldType) => {
     setSelectedFieldType(type);
     onChange(type);
-  }
+  };
 
   return (
     <RadioGroup
@@ -41,8 +36,7 @@ export default function FieldTypeSelector({
         // We are keeping this though as we may change the
         // implementation to use the onChange handler in the future.
         onSelectedFieldTypeChange(e);
-      }}
-    >
+      }}>
       <div className="space-y-4">
         {FIELD_TYPES.map((fieldType) => (
           <RadioGroup.Option
@@ -50,7 +44,7 @@ export default function FieldTypeSelector({
               // Prevent dragging
               if (e.button === 0) {
                 onSelectedFieldTypeChange(fieldType.id);
-              };
+              }
             }}
             key={fieldType.id}
             value={fieldType.id}
@@ -59,8 +53,7 @@ export default function FieldTypeSelector({
                 checked ? "border-neon border-2" : "border-transparent",
                 "relative block cursor-pointer select-none rounded-lg border bg-white px-3 py-2 hover:bg-slate-100 focus:outline-none sm:flex sm:justify-between"
               )
-            }
-          >
+            }>
             {() => (
               <>
                 <span className="flex items-center">
@@ -73,10 +66,7 @@ export default function FieldTypeSelector({
                         }}
                       />
                       <span className="align-middle">
-                        {
-                          FIELD_TYPES.filter((e) => e.id === fieldType.id)[0]
-                            .name
-                        }
+                        {FIELD_TYPES.filter((e) => e.id === fieldType.id)[0].name}
                       </span>
                     </RadioGroup.Label>
                   </span>

@@ -4,9 +4,7 @@ import Login from "../components/login";
 
 export type LoginPageProps = InferGetServerSidePropsType<typeof getServerSideProps>;
 
-export default function LoginPage({
-  ALLOW_SIGNUP
-}: LoginPageProps) {
+export default function LoginPage({ ALLOW_SIGNUP }: LoginPageProps) {
   return (
     <>
       <Head>

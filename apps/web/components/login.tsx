@@ -20,9 +20,7 @@ export interface LoginProps {
   allowSignup?: boolean;
 }
 
-export default function Login({
-  allowSignup,
-}: LoginProps) {
+export default function Login({ allowSignup }: LoginProps) {
   const router = useRouter();
   const methods = useForm<LoginValues>();
   const { register, formState } = methods;

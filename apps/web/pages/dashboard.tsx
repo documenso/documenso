@@ -1,21 +1,21 @@
+import { ReactElement } from "react";
+import { GetServerSidePropsContext, InferGetServerSidePropsType } from "next";
+import Head from "next/head";
+import Link from "next/link";
 import { uploadDocument } from "@documenso/features";
 import { getDocumentsForUserFromToken } from "@documenso/lib/query";
 import { getUserFromToken } from "@documenso/lib/server";
 import {
-  Document, DocumentStatus, Recipient, SendStatus,
-  SigningStatus
+  Document,
+  DocumentStatus,
+  Recipient,
+  SendStatus,
+  SigningStatus,
 } from "@documenso/prisma/client";
-import {
-  CheckBadgeIcon,
-  DocumentIcon, UsersIcon
-} from "@heroicons/react/24/outline";
-import { GetServerSidePropsContext, InferGetServerSidePropsType } from "next";
-import Head from "next/head";
-import Link from "next/link";
-import { ReactElement } from "react";
-import { Tooltip as ReactTooltip } from "react-tooltip";
 import Layout from "../components/layout";
 import type { NextPageWithLayout } from "./_app";
+import { CheckBadgeIcon, DocumentIcon, UsersIcon } from "@heroicons/react/24/outline";
+import { Tooltip as ReactTooltip } from "react-tooltip";
 
 const STATS = [
   {
@@ -35,7 +35,9 @@ const STATS = [
   },
 ];
 
-const DashboardPage: NextPageWithLayout<InferGetServerSidePropsType<typeof getServerSideProps>> = (props) => {
+const DashboardPage: NextPageWithLayout<InferGetServerSidePropsType<typeof getServerSideProps>> = (
+  props
+) => {
   return (
     <>
       <Head>
@@ -48,13 +50,13 @@ const DashboardPage: NextPageWithLayout<InferGetServerSidePropsType<typeof getSe
             Dashboard
           </h1>
         </header>
-        <dl className="grid gap-5 mt-8 md:grid-cols-3 ">
+        <dl className="mt-8 grid gap-5 md:grid-cols-3 ">
           {STATS.map((item) => (
             <Link href={item.link} key={item.name}>
               <div className="overflow-hidden rounded-lg bg-white px-4 py-3 shadow sm:py-5 md:p-6">
                 <dt className="truncate text-sm font-medium text-gray-500 ">
                   <item.icon
-                    className="flex-shrink-0 inline w-5 h-5 mr-3 text-neon sm:w-6 sm:h-6"
+                    className="text-neon mr-3 inline h-5 w-5 flex-shrink-0 sm:h-6 sm:w-6"
                     aria-hidden="true"
                   />
                   {item.name}
@@ -130,13 +132,13 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
       },
     };
 
-  const documents: Array<Document & {
-    Recipient: Recipient[]
-  }> = await getDocumentsForUserFromToken(context);
+  const documents: Array<
+    Document & {
+      Recipient: Recipient[];
+    }
+  > = await getDocumentsForUserFromToken(context);
 
-  const drafts = documents.filter(
-    (d) => d.status === DocumentStatus.DRAFT
-  );
+  const drafts = documents.filter((d) => d.status === DocumentStatus.DRAFT);
 
   const waiting = documents.filter(
     (e) =>
@@ -145,9 +147,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
       e.Recipient.some((r) => r.signingStatus === SigningStatus.NOT_SIGNED)
   );
 
-  const completed = documents.filter(
-    (d) => d.status === DocumentStatus.COMPLETED
-  );
+  const completed = documents.filter((d) => d.status === DocumentStatus.COMPLETED);
 
   return {
     props: {

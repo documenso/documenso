@@ -1,6 +1,12 @@
+import { ReactElement, useEffect, useState } from "react";
+import { NextPageContext } from "next";
+import Head from "next/head";
+import { useRouter } from "next/router";
 import { uploadDocument } from "@documenso/features";
 import { deleteDocument, getDocuments } from "@documenso/lib/api";
 import { Button, IconButton, SelectBox } from "@documenso/ui";
+import Layout from "../components/layout";
+import type { NextPageWithLayout } from "./_app";
 import {
   ArrowDownTrayIcon,
   CheckBadgeIcon,
@@ -10,31 +16,25 @@ import {
   FunnelIcon,
   PencilSquareIcon,
   PlusIcon,
-  TrashIcon
+  TrashIcon,
 } from "@heroicons/react/24/outline";
 import { DocumentStatus } from "@prisma/client";
-import { NextPageContext } from "next";
-import Head from "next/head";
-import { useRouter } from "next/router";
-import { ReactElement, useEffect, useState } from "react";
 import { Tooltip as ReactTooltip } from "react-tooltip";
-import Layout from "../components/layout";
-import type { NextPageWithLayout } from "./_app";
 
 const STATUS_FILTERS = [
-    { label: "All", value: "ALL" },
-    { label: "Draft", value: "DRAFT" },
-    { label: "Waiting for others", value: "PENDING" },
-    { label: "Completed", value: "COMPLETED" },
+  { label: "All", value: "ALL" },
+  { label: "Draft", value: "DRAFT" },
+  { label: "Waiting for others", value: "PENDING" },
+  { label: "Completed", value: "COMPLETED" },
 ] as const;
 
-type StatusFilter = typeof STATUS_FILTERS[number];
-type StatusFilterValue = typeof STATUS_FILTERS[number]['value'];
+type StatusFilter = (typeof STATUS_FILTERS)[number];
+type StatusFilterValue = (typeof STATUS_FILTERS)[number]["value"];
 
 const isStatusFilterValue = (value: any): value is StatusFilterValue => {
   return STATUS_FILTERS.some((filter) => filter.value === value);
 };
-  
+
 const CREATED_FILTERS = [
   { label: "All Time", value: -1 },
   { label: "Last 24 hours", value: 1 },
@@ -44,36 +44,33 @@ const CREATED_FILTERS = [
   { label: "Last 12 months", value: 366 },
 ] as const;
 
-type CreatedFilter = typeof CREATED_FILTERS[number];
-type CreatedFilterValue = typeof CREATED_FILTERS[number]['value'];
+type CreatedFilter = (typeof CREATED_FILTERS)[number];
+type CreatedFilterValue = (typeof CREATED_FILTERS)[number]["value"];
 
 const isCreatedFilterValue = (value: any): value is CreatedFilterValue => {
   return CREATED_FILTERS.some((filter) => filter.value === value);
 };
 
-const DocumentsPage: NextPageWithLayout<{filter: StatusFilter}> = (props) => {
+const DocumentsPage: NextPageWithLayout<{ filter: StatusFilter }> = (props) => {
   const router = useRouter();
   const [documents, setDocuments]: any[] = useState([]);
   const [filteredDocuments, setFilteredDocuments] = useState([]);
 
   const [loading, setLoading] = useState(true);
-  
 
-  const [selectedStatusFilter, setSelectedStatusFilter] = useState<StatusFilter>(
-    props.filter
-  );
-  
+  const [selectedStatusFilter, setSelectedStatusFilter] = useState<StatusFilter>(props.filter);
+
   const [selectedCreatedFilter, setSelectedCreatedFilter] = useState<CreatedFilter>(
     CREATED_FILTERS[0]
   );
 
-  const onSelectedStatusFilterChange = (filter: StatusFilter) => { 
+  const onSelectedStatusFilterChange = (filter: StatusFilter) => {
     setSelectedStatusFilter(filter);
 
     router.push({
       query: {
         filter: filter.value,
-      }
+      },
     });
   };
 
@@ -89,9 +86,7 @@ const DocumentsPage: NextPageWithLayout<{filter: StatusFilter}> = (props) => {
 
   useEffect(() => {
     loadDocuments().finally(() => {
-      setSelectedStatusFilter(
-        props.filter,
-      );
+      setSelectedStatusFilter(props.filter);
     });
   }, []);
 
@@ -395,7 +390,7 @@ const DocumentsPage: NextPageWithLayout<{filter: StatusFilter}> = (props) => {
             }}>
             Add Document
           </Button>
-          
+
           <input
             id="fileUploadHelper"
             type="file"
@@ -430,13 +425,14 @@ function formatDocumentStatus(status: DocumentStatus) {
 }
 
 export async function getServerSideProps(context: NextPageContext) {
-  const filter = typeof context.query["filter"] === 'string' ? context.query["filter"].toUpperCase() : undefined;
+  const filter =
+    typeof context.query["filter"] === "string" ? context.query["filter"].toUpperCase() : undefined;
 
   const selectedFilter = isStatusFilterValue(filter) ? filter : "ALL";
 
   return {
     props: {
-      filter: STATUS_FILTERS.find(f => f.value === selectedFilter) ?? STATUS_FILTERS[0],
+      filter: STATUS_FILTERS.find((f) => f.value === selectedFilter) ?? STATUS_FILTERS[0],
     },
   };
 }
