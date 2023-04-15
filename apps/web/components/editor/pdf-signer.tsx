@@ -27,6 +27,9 @@ export interface PDFSignerProps {
   };
   fields: Array<Field & {
     Signature: Signature,
+    // TODO: find all the code that depends on this and replace it
+    // TODO: with `Signature`.
+    signature: unknown,
   }>;
   recipient: Recipient;
 }
@@ -175,7 +178,7 @@ export default function PDFSigner({
       // If there are no fields to sign at least one signature is enough
       return fields
         .filter((field) => field.type === FieldType.SIGNATURE)
-        .every((field) => field.Signature);
+        .every((field) => field.signature);
     } else {
       return localSignatures.length > 0;
     }
