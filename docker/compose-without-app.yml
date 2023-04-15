@@ -1,0 +1,16 @@
+services:
+  database:
+    image: postgres:15
+    environment:
+      - POSTGRES_USER=documenso
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=documenso
+    ports:
+      - 54320:5432
+
+  inbucket:
+    image: inbucket/inbucket
+    ports:
+      - 9000:9000
+      - 2500:2500
+      - 1100:1100
