@@ -1,52 +1,43 @@
 import { ReactElement } from "react";
+import { GetServerSidePropsContext, InferGetServerSidePropsType } from "next";
 import Head from "next/head";
 import Link from "next/link";
 import { uploadDocument } from "@documenso/features";
 import { getDocumentsForUserFromToken } from "@documenso/lib/query";
 import { getUserFromToken } from "@documenso/lib/server";
-import Layout from "../components/layout";
-import type { NextPageWithLayout } from "./_app";
 import {
-  CheckBadgeIcon,
-  DocumentIcon,
-  ExclamationTriangleIcon,
-  UsersIcon,
-} from "@heroicons/react/24/outline";
-import {
+  Document,
   DocumentStatus,
-  Document as PrismaDocument,
+  Recipient,
   SendStatus,
   SigningStatus,
-} from "@prisma/client";
-import { truncate } from "fs";
+} from "@documenso/prisma/client";
+import Layout from "../components/layout";
+import type { NextPageWithLayout } from "./_app";
+import { CheckBadgeIcon, DocumentIcon, UsersIcon } from "@heroicons/react/24/outline";
 import { Tooltip as ReactTooltip } from "react-tooltip";
 
-type FormValues = {
-  document: File;
-};
+const STATS = [
+  {
+    name: "Draft",
+    icon: DocumentIcon,
+    link: "/documents?filter=DRAFT",
+  },
+  {
+    name: "Waiting for others",
+    icon: UsersIcon,
+    link: "/documents?filter=PENDING",
+  },
+  {
+    name: "Completed",
+    icon: CheckBadgeIcon,
+    link: "/documents?filter=COMPLETED",
+  },
+];
 
-const DashboardPage: NextPageWithLayout = (props: any) => {
-  const stats = [
-    {
-      name: "Draft",
-      stat: "0",
-      icon: DocumentIcon,
-      link: "/documents?filter=DRAFT",
-    },
-    {
-      name: "Waiting for others",
-      stat: "0",
-      icon: UsersIcon,
-      link: "/documents?filter=PENDING",
-    },
-    {
-      name: "Completed",
-      stat: "0",
-      icon: CheckBadgeIcon,
-      link: "/documents?filter=COMPLETED",
-    },
-  ];
-
+const DashboardPage: NextPageWithLayout<InferGetServerSidePropsType<typeof getServerSideProps>> = (
+  props
+) => {
   return (
     <>
       <Head>
@@ -60,13 +51,14 @@ const DashboardPage: NextPageWithLayout = (props: any) => {
           </h1>
         </header>
         <dl className="mt-8 grid gap-5 md:grid-cols-3 ">
-          {stats.map((item) => (
+          {STATS.map((item) => (
             <Link href={item.link} key={item.name}>
               <div className="overflow-hidden rounded-lg bg-white px-4 py-3 shadow sm:py-5 md:p-6">
                 <dt className="truncate text-sm font-medium text-gray-500 ">
                   <item.icon
                     className="text-neon mr-3 inline h-5 w-5 flex-shrink-0 sm:h-6 sm:w-6"
-                    aria-hidden="true"></item.icon>
+                    aria-hidden="true"
+                  />
                   {item.name}
                 </dt>
                 <dd className="mt-1 text-2xl font-semibold tracking-tight text-gray-900 sm:text-3xl">
@@ -122,14 +114,15 @@ DashboardPage.getLayout = function getLayout(page: ReactElement) {
   return <Layout>{page}</Layout>;
 };
 
-function getStat(name: string, props: any) {
+function getStat(name: string, props: InferGetServerSidePropsType<typeof getServerSideProps>) {
   if (name === "Draft") return props.dashboard.drafts;
   if (name === "Waiting for others") return props.dashboard.waiting;
   if (name === "Completed") return props.dashboard.completed;
+
   return 0;
 }
 
-export async function getServerSideProps(context: any) {
+export async function getServerSideProps(context: GetServerSidePropsContext) {
   const user = await getUserFromToken(context.req, context.res);
   if (!user)
     return {
@@ -139,20 +132,22 @@ export async function getServerSideProps(context: any) {
       },
     };
 
-  const documents: any[] = await getDocumentsForUserFromToken(context);
+  const documents: Array<
+    Document & {
+      Recipient: Recipient[];
+    }
+  > = await getDocumentsForUserFromToken(context);
 
-  const drafts: PrismaDocument[] = documents.filter((d) => d.status === DocumentStatus.DRAFT);
+  const drafts = documents.filter((d) => d.status === DocumentStatus.DRAFT);
 
-  const waiting: any[] = documents.filter(
+  const waiting = documents.filter(
     (e) =>
       e.Recipient.length > 0 &&
-      e.Recipient.some((r: any) => r.sendStatus === SendStatus.SENT) &&
-      e.Recipient.some((r: any) => r.signingStatus === SigningStatus.NOT_SIGNED)
+      e.Recipient.some((r) => r.sendStatus === SendStatus.SENT) &&
+      e.Recipient.some((r) => r.signingStatus === SigningStatus.NOT_SIGNED)
   );
 
-  const completed: PrismaDocument[] = documents.filter(
-    (d) => d.status === DocumentStatus.COMPLETED
-  );
+  const completed = documents.filter((d) => d.status === DocumentStatus.COMPLETED);
 
   return {
     props: {

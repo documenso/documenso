@@ -1,4 +1,3 @@
-import { useRouter } from "next/router";
 import toast from "react-hot-toast";
 
 export const signDocument = (document: any, signatures: any[], token: string): Promise<any> => {

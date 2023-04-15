@@ -20,6 +20,7 @@
     "../../packages/types/*.d.ts",
     "../../packages/types/next-auth.d.ts",
     "**/*.ts",
+    "**/*.d.ts",
     "**/*.tsx"
   ],
   "exclude": ["node_modules"]

@@ -1,26 +1,46 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import dynamic from "next/dynamic";
 import { useRouter } from "next/router";
 import { createField } from "@documenso/features/editor";
 import { createOrUpdateField, deleteField, signDocument } from "@documenso/lib/api";
 import { NEXT_PUBLIC_WEBAPP_URL } from "@documenso/lib/constants";
+import { Document, Field, FieldType, Recipient, Signature, User } from "@documenso/prisma/client";
 import { Button } from "@documenso/ui";
 import Logo from "../logo";
-import SignatureDialog from "./signature-dialog";
+import SignatureDialog, { SignatureDialogOnCloseHandler } from "./signature-dialog";
 import { CheckBadgeIcon, InformationCircleIcon } from "@heroicons/react/24/outline";
-import { FieldType } from "@prisma/client";
 
 const PDFViewer = dynamic(() => import("./pdf-viewer"), {
   ssr: false,
 });
 
-export default function PDFSigner(props: any) {
+export interface PDFSignerProps {
+  document: Document & {
+    User: User;
+  };
+  fields: Array<
+    Field & {
+      Signature: Signature;
+      // TODO: find all the code that depends on this and replace it
+      // TODO: with `Signature`.
+      signature: unknown;
+    }
+  >;
+  recipient: Recipient;
+}
+
+export default function PDFSigner({ document, fields: documentFields, recipient }: PDFSignerProps) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [signingDone, setSigningDone] = useState(false);
   const [localSignatures, setLocalSignatures] = useState<any[]>([]);
-  const [fields, setFields] = useState<any[]>(props.fields);
-  const signatureFields = fields.filter((field) => field.type === FieldType.SIGNATURE);
+  const [fields, setFields] = useState(documentFields);
+
+  const signatureFields = useMemo(
+    () => fields.filter((field) => field.type === FieldType.SIGNATURE),
+    [fields]
+  );
+
   const [dialogField, setDialogField] = useState<any>();
 
   useEffect(() => {
@@ -34,8 +54,9 @@ export default function PDFSigner(props: any) {
     }
   }
 
-  function onDialogClose(dialogResult: any) {
-    // todo handle signature removed from field, remove free field if dialogresult is empty (or the id )
+  const onDialogClose: SignatureDialogOnCloseHandler = (dialogResult) => {
+    // TODO: handle signature removed from field, remove free field if dialogresult is empty (or the id )
+    // This looks like it's never used any more as the SignatureDialog doesn't emit an event matching this signature
     if (!dialogResult && dialogField.type === "FREE_SIGNATURE") {
       onDeleteHandler(dialogField.id);
       return;
@@ -46,8 +67,8 @@ export default function PDFSigner(props: any) {
     const signature = {
       fieldId: dialogField.id,
       type: dialogResult.type,
-      typedSignature: dialogResult.typedSignature,
-      signatureImage: dialogResult.signatureImage,
+      typedSignature: "typedSignature" in dialogResult ? dialogResult.typedSignature : undefined,
+      signatureImage: "signatureImage" in dialogResult ? dialogResult.signatureImage : undefined,
     };
 
     setLocalSignatures(localSignatures.concat(signature));
@@ -58,16 +79,18 @@ export default function PDFSigner(props: any) {
       }),
       1
     );
+
     const signedField = { ...dialogField };
     signedField.signature = signature;
     setFields((prevState) => [...prevState, signedField]);
     setOpen(false);
     setDialogField(null);
-  }
+  };
 
   return (
     <>
       <SignatureDialog open={open} setOpen={setOpen} onClose={onDialogClose} />
+
       <div className="bg-neon p-4">
         <div className="flex">
           <div className="flex-shrink-0">
@@ -75,11 +98,12 @@ export default function PDFSigner(props: any) {
           </div>
           <div className="ml-3 flex-1 items-center justify-start text-center md:flex md:justify-between">
             <p className="text-lg text-slate-700">
-              {props.document.User.name
-                ? `${props.document.User.name} (${props.document.User.email})`
-                : props.document.User.email}{" "}
+              {document.User.name
+                ? `${document.User.name} (${document.User.email})`
+                : document.User.email}{" "}
               would like you to sign this document.
             </p>
+
             <p className="mt-3 text-sm md:mt-0 md:ml-6">
               <Button
                 disabled={!signingDone}
@@ -87,13 +111,9 @@ export default function PDFSigner(props: any) {
                 icon={CheckBadgeIcon}
                 className="float-right"
                 onClick={() => {
-                  signDocument(props.document, localSignatures, `${router.query.token}`).then(
-                    () => {
-                      router.push(
-                        `/documents/${props.document.id}/signed?token=${router.query.token}`
-                      );
-                    }
-                  );
+                  signDocument(document, localSignatures, `${router.query.token}`).then(() => {
+                    router.push(`/documents/${document.id}/signed?token=${router.query.token}`);
+                  });
                 }}>
                 Done
               </Button>
@@ -101,6 +121,7 @@ export default function PDFSigner(props: any) {
           </div>
         </div>
       </div>
+
       {signatureFields.length === 0 ? (
         <div className="bg-yellow-50 p-4">
           <div className="flex">
@@ -123,12 +144,12 @@ export default function PDFSigner(props: any) {
               : "",
         }}
         readonly={true}
-        document={props.document}
+        document={document}
         fields={fields}
         pdfUrl={`${NEXT_PUBLIC_WEBAPP_URL}/api/documents/${router.query.id}?token=${router.query.token}`}
         onClick={onClick}
         onMouseDown={function onMouseDown(e: any, page: number) {
-          if (signatureFields.length === 0) addFreeSignature(e, page, props.recipient);
+          if (signatureFields.length === 0) addFreeSignature(e, page, recipient);
         }}
         onMouseUp={() => {}}
         onDelete={onDeleteHandler}></PDFViewer>
@@ -150,7 +171,7 @@ export default function PDFSigner(props: any) {
   function addFreeSignature(e: any, page: number, recipient: any): any {
     const freeSignatureField = createField(e, page, recipient, FieldType.FREE_SIGNATURE);
 
-    createOrUpdateField(props.document, freeSignatureField, recipient.token).then((res) => {
+    createOrUpdateField(document, freeSignatureField, recipient.token).then((res) => {
       setFields((prevState) => [...prevState, res]);
       setDialogField(res);
       setOpen(true);
@@ -176,7 +197,7 @@ export default function PDFSigner(props: any) {
       );
 
       setLocalSignatures(signaturesWithoutRemoved);
-      deleteField(field).catch((err) => {
+      deleteField(field).catch((_err) => {
         setFields(fieldWithoutRemoved.concat(removedField));
         setLocalSignatures(signaturesWithoutRemoved.concat(removedSignature));
       });

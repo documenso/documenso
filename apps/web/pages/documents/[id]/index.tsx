@@ -2,6 +2,7 @@ import { ReactElement } from "react";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { NEXT_PUBLIC_WEBAPP_URL } from "@documenso/lib";
+import { dirtyClone } from "@documenso/lib/dirtyClone";
 import { getDocument } from "@documenso/lib/query";
 import { getUserFromToken } from "@documenso/lib/server";
 import { Breadcrumb, Button } from "@documenso/ui";
@@ -9,8 +10,7 @@ import PDFEditor from "../../../components/editor/pdf-editor";
 import Layout from "../../../components/layout";
 import { NextPageWithLayout } from "../../_app";
 import { InformationCircleIcon, PaperAirplaneIcon, UsersIcon } from "@heroicons/react/24/outline";
-import { DocumentStatus } from "@prisma/client";
-import { Document as PrismaDocument } from "@prisma/client";
+import { DocumentStatus, Document as PrismaDocument } from "@prisma/client";
 
 const DocumentsDetailPage: NextPageWithLayout = (props: any) => {
   const router = useRouter();
@@ -111,7 +111,7 @@ export async function getServerSideProps(context: any) {
 
     return {
       props: {
-        document: JSON.parse(JSON.stringify({ ...document, document: "" })),
+        document: dirtyClone({ ...document, document: "" }),
       },
     };
   } catch (error) {

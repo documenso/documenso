@@ -1,35 +1,60 @@
 import { Fragment, useEffect, useState } from "react";
-import { classNames } from "@documenso/lib";
-import { localStorage } from "@documenso/lib";
+import { classNames, localStorage } from "@documenso/lib";
+import { FieldType } from "@documenso/prisma/client";
 import { Button, IconButton } from "@documenso/ui";
 import { Dialog, Transition } from "@headlessui/react";
 import { LanguageIcon, PencilIcon, TrashIcon } from "@heroicons/react/24/outline";
 import SignatureCanvas from "react-signature-canvas";
 
-const tabs = [
+const TABS = [
   { name: "Type", icon: LanguageIcon, current: true },
   { name: "Draw", icon: PencilIcon, current: false },
 ];
 
-export default function SignatureDialog(props: any) {
-  const [currentTab, setCurrentTab] = useState(tabs[0]);
+export type SignatureDialogOnCloseHandler = (
+  _result?:
+    | {
+        id: string;
+        type: FieldType;
+      }
+    | {
+        type: string;
+        typedSignature: string;
+        signatureImage?: string;
+      }
+    | {
+        type: string;
+        typedSignature?: string;
+        signatureImage: string;
+      }
+) => void;
+
+export interface SignatureDialogProps {
+  open: boolean;
+  setOpen: (_open: boolean) => void;
+  onClose: SignatureDialogOnCloseHandler;
+}
+
+export default function SignatureDialog({ open, setOpen, onClose }: SignatureDialogProps) {
+  const [currentTab, setCurrentTab] = useState(TABS[0]);
   const [typedSignature, setTypedSignature] = useState("");
   const [signatureEmpty, setSignatureEmpty] = useState(true);
   let signCanvasRef: any | undefined;
 
+  // TODO: Consider `useSyncExternalStore` to avoid the need for this effect
   useEffect(() => {
     setTypedSignature(localStorage.getItem("typedSignature") || "");
   }, []);
 
   return (
     <>
-      <Transition.Root show={props.open} as={Fragment}>
+      <Transition.Root show={open} as={Fragment}>
         <Dialog
           as="div"
           className="relative z-10"
           onClose={() => {
-            props.setOpen(false);
-            setCurrent(tabs[0]);
+            setOpen(false);
+            setCurrent(TABS[0]);
           }}>
           <Transition.Child
             as={Fragment}
@@ -56,7 +81,7 @@ export default function SignatureDialog(props: any) {
                   <div className="">
                     <div className="mb-3 border-b border-gray-200">
                       <nav className="-mb-px flex space-x-8" aria-label="Tabs">
-                        {tabs.map((tab) => (
+                        {TABS.map((tab) => (
                           <a
                             key={tab.name}
                             onClick={() => {
@@ -102,9 +127,9 @@ export default function SignatureDialog(props: any) {
                           <Button
                             color="secondary"
                             onClick={() => {
-                              props.onClose();
-                              props.setOpen(false);
-                              setCurrent(tabs[0]);
+                              onClose();
+                              setOpen(false);
+                              setCurrent(TABS[0]);
                             }}>
                             Cancel
                           </Button>
@@ -113,7 +138,7 @@ export default function SignatureDialog(props: any) {
                             disabled={!typedSignature}
                             onClick={() => {
                               localStorage.setItem("typedSignature", typedSignature);
-                              props.onClose({
+                              onClose({
                                 type: "type",
                                 typedSignature: typedSignature,
                               });
@@ -150,16 +175,16 @@ export default function SignatureDialog(props: any) {
                           <Button
                             color="secondary"
                             onClick={() => {
-                              props.onClose();
-                              props.setOpen(false);
-                              setCurrent(tabs[0]);
+                              onClose();
+                              setOpen(false);
+                              setCurrent(TABS[0]);
                             }}>
                             Cancel
                           </Button>
                           <Button
                             className="ml-3"
                             onClick={() => {
-                              props.onClose({
+                              onClose({
                                 type: "draw",
                                 signatureImage: signCanvasRef.toDataURL("image/png"),
                               });
@@ -187,7 +212,7 @@ export default function SignatureDialog(props: any) {
   }
 
   function setCurrent(t: any) {
-    tabs.forEach((tab) => {
+    TABS.forEach((tab) => {
       tab.current = tab.name === t.name;
     });
     setCurrentTab(t);

@@ -1,11 +1,11 @@
 import Head from "next/head";
 import Link from "next/link";
+import { dirtyClone } from "@documenso/lib/dirtyClone";
 import prisma from "@documenso/prisma";
 import PDFSigner from "../../../components/editor/pdf-signer";
 import { NextPageWithLayout } from "../../_app";
 import { ClockIcon } from "@heroicons/react/24/outline";
-import { ReadStatus } from "@prisma/client";
-import { DocumentStatus, FieldType } from "@prisma/client";
+import { DocumentStatus, FieldType, ReadStatus } from "@prisma/client";
 
 const SignPage: NextPageWithLayout = (props: any) => {
   return (
@@ -100,9 +100,9 @@ export async function getServerSideProps(context: any) {
 
   return {
     props: {
-      recipient: JSON.parse(JSON.stringify(recipient)),
-      document: JSON.parse(JSON.stringify({ ...recipient.Document, document: "" })),
-      fields: JSON.parse(JSON.stringify(unsignedFields)),
+      recipient: dirtyClone(recipient),
+      document: dirtyClone({ ...recipient.Document, document: "" }),
+      fields: dirtyClone(unsignedFields),
       expired: recipient.expired ? new Date(recipient.expired) < new Date() : false,
     },
   };

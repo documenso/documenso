@@ -2,22 +2,31 @@ import { Fragment, useEffect, useState } from "react";
 import { classNames } from "@documenso/lib";
 import { Listbox, Transition } from "@headlessui/react";
 import { CheckIcon, ChevronUpDownIcon } from "@heroicons/react/24/outline";
+import { classNames } from "@documenso/lib";
+import { Recipient } from "@documenso/prisma/client";
+import stc from "string-to-color";
 
-const stc = require("string-to-color");
+export interface RecipientSelectorProps { 
+  recipients: Recipient[],
+  onChange: (recipient: Recipient) => void;
+}
 
-export default function RecipientSelector(props: any) {
-  const [selectedRecipient, setSelectedRecipient]: any = useState(props?.recipients[0]);
-
-  useEffect(() => {
-    props.onChange(selectedRecipient);
-  }, [selectedRecipient]);
+export default function RecipientSelector({
+  recipients,
+  onChange,
+}: RecipientSelectorProps) {
+  const [selectedRecipient, setSelectedRecipient] = useState(
+    recipients[0]
+  );
 
   return (
     <Listbox
       value={selectedRecipient}
-      onChange={(e: any) => {
+      onChange={(e) => {
         setSelectedRecipient(e);
-      }}>
+        onChange(e);
+      }}
+    >
       {({ open }) => (
         <div className="relative mt-1 mb-2">
           <Listbox.Button className="focus:border-neon focus:ring-neon relative w-full cursor-default select-none rounded-md border border-gray-300 bg-white py-2 pl-3 pr-10 text-left focus:outline-none focus:ring-1 sm:text-sm">
@@ -42,7 +51,7 @@ export default function RecipientSelector(props: any) {
             leaveFrom="opacity-100"
             leaveTo="opacity-0">
             <Listbox.Options className="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
-              {props?.recipients.map((recipient: any) => (
+              {recipients.map((recipient: any) => (
                 <Listbox.Option
                   key={recipient?.id}
                   className={({ active }) =>
@@ -65,8 +74,9 @@ export default function RecipientSelector(props: any) {
                           className={classNames(
                             selected ? "font-semibold" : "font-normal",
                             "ml-3 block truncate"
-                          )}>
-                          {`${recipient?.name} <${recipient?.email}>`}
+                          )}
+                        >
+                          {`${recipient.name} <${recipient.email}>`}
                         </span>
                       </div>
 
