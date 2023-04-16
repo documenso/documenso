@@ -20,6 +20,7 @@ import {
 } from "@heroicons/react/24/outline";
 import { DocumentStatus, Document as PrismaDocument } from "@prisma/client";
 import { FormProvider, useFieldArray, useForm, useWatch } from "react-hook-form";
+import { toast } from "react-hot-toast";
 
 export type FormValues = {
   signers: { id: number; email: string; name: string }[];
@@ -108,7 +109,9 @@ const RecipientsPage: NextPageWithLayout = (props: any) => {
                   color="primary"
                   icon={PaperAirplaneIcon}
                   onClick={() => {
-                    setOpen(true);
+                    formValues.some((r: any) => r.email && hasEmailError(r))
+                      ? toast.error("Please enter a valid email address.", { id: "invalid email" })
+                      : setOpen(true);
                   }}
                   disabled={
                     (formValues.length || 0) === 0 ||
