@@ -90,7 +90,7 @@ export default function Setttings() {
                     href={item.href}
                     className={classNames(
                       item.current
-                        ? "border-neon-dark bg-teal-50 text-teal-700 hover:bg-teal-50 hover:text-teal-700"
+                        ? "border-zinc-800-dark bg-teal-50 text-teal-700 hover:bg-teal-50 hover:text-teal-700"
                         : "border-transparent text-gray-900 hover:bg-gray-50 hover:text-gray-900",
                       "group flex items-center border-l-4 px-3 py-2 text-sm font-medium"
                     )}
@@ -137,7 +137,7 @@ export default function Setttings() {
                       onChange={(e) => handleNameChange(e)}
                       onKeyDown={handleKeyPress}
                       autoComplete="given-name"
-                      className="focus:border-neon focus:ring-neon mt-1 block w-full rounded-md border border-gray-300 py-2 px-3 shadow-sm focus:outline-none sm:text-sm"
+                      className="mt-1 block w-full rounded-md border border-gray-300 py-2 px-3 shadow-sm focus:border-zinc-800 focus:outline-none focus:ring-zinc-800 sm:text-sm"
                     />
                   </div>
                   <div className="col-span-12 sm:col-span-6">
@@ -151,7 +151,7 @@ export default function Setttings() {
                       name="first-name"
                       id="first-name"
                       autoComplete="given-name"
-                      className="focus:border-neon focus:ring-neon mt-1 block w-full rounded-md border border-gray-300 py-2 px-3 shadow-sm focus:outline-none disabled:bg-neutral-100 sm:text-sm"
+                      className="mt-1 block w-full rounded-md border border-gray-300 py-2 px-3 shadow-sm focus:border-zinc-800 focus:outline-none focus:ring-zinc-800 disabled:bg-neutral-100 sm:text-sm"
                     />
                   </div>
                 </div>

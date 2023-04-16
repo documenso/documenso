@@ -143,7 +143,7 @@ export default function Signup(props: { source: string }) {
                     type="email"
                     autoComplete="email"
                     required
-                    className="focus:border-neon focus:ring-neon relative block w-full appearance-none rounded-none rounded-t-md border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-500 focus:z-10 focus:outline-none sm:text-sm"
+                    className="relative block w-full appearance-none rounded-none rounded-t-md border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-500 focus:z-10 focus:border-zinc-800 focus:outline-none focus:ring-zinc-800 sm:text-sm"
                     placeholder="Email"
                   />
                 </div>
@@ -163,7 +163,7 @@ export default function Signup(props: { source: string }) {
                     type="password"
                     autoComplete="current-password"
                     required
-                    className="focus:border-neon focus:ring-neon relative block w-full appearance-none rounded-none rounded-b-md border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-500 focus:z-10 focus:outline-none sm:text-sm"
+                    className="relative block w-full appearance-none rounded-none rounded-b-md border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-500 focus:z-10 focus:border-zinc-800 focus:outline-none focus:ring-zinc-800 sm:text-sm"
                     placeholder="Password"
                   />
                 </div>
@@ -187,7 +187,7 @@ export default function Signup(props: { source: string }) {
               </div>
               <p className="mt-2 text-center text-sm text-gray-600">
                 Already have an account?{" "}
-                <Link href="/login" className="text-neon hover:text-neon font-medium">
+                <Link href="/login" className="font-medium text-zinc-800 hover:text-zinc-800">
                   Sign In
                 </Link>
               </p>

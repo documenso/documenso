@@ -64,7 +64,7 @@ export default function SignatureDialog(props: any) {
                             }}
                             className={classNames(
                               tab.current
-                                ? "border-neon text-neon"
+                                ? "border-zinc-800 text-zinc-800"
                                 : "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700",
                               "group inline-flex cursor-pointer items-center border-b-2 py-4 px-1 text-sm font-medium"
                             )}
@@ -72,7 +72,7 @@ export default function SignatureDialog(props: any) {
                             <tab.icon
                               className={classNames(
                                 tab.current
-                                  ? "text-neon"
+                                  ? "text-zinc-800"
                                   : "text-gray-400 group-hover:text-gray-500",
                                 "-ml-0.5 mr-2 h-5 w-5"
                               )}
@@ -93,7 +93,7 @@ export default function SignatureDialog(props: any) {
                             }}
                             className={classNames(
                               typedSignature ? "font-qwigley text-4xl" : "",
-                              "focus:border-neon focus:ring-neon mt-14 block h-10 w-full text-center align-bottom text-2xl leading-none"
+                              "mt-14 block h-10 w-full text-center align-bottom text-2xl leading-none focus:border-zinc-800 focus:ring-zinc-800"
                             )}
                             placeholder="Kindly type your name"
                           />

@@ -65,7 +65,7 @@ const DashboardPage: NextPageWithLayout = (props: any) => {
               <div className="overflow-hidden rounded-lg bg-white px-4 py-3 shadow sm:py-5 md:p-6">
                 <dt className="truncate text-sm font-medium text-gray-500 ">
                   <item.icon
-                    className="text-neon mr-3 inline h-5 w-5 flex-shrink-0 sm:h-6 sm:w-6"
+                    className="mr-3 inline h-5 w-5 flex-shrink-0 text-zinc-800 sm:h-6 sm:w-6"
                     aria-hidden="true"></item.icon>
                   {item.name}
                 </dt>
@@ -91,7 +91,7 @@ const DashboardPage: NextPageWithLayout = (props: any) => {
           onClick={() => {
             document?.getElementById("fileUploadHelper")?.click();
           }}
-          className="hover:border-neon relative block w-full cursor-pointer rounded-lg border-2 border-dashed border-gray-300 p-12 text-center focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+          className="relative block w-full cursor-pointer rounded-lg border-2 border-dashed border-gray-300 p-12 text-center hover:border-zinc-800 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
           <svg
             className="mx-auto h-12 w-12 text-gray-400"
             stroke="currentColor"
@@ -104,7 +104,7 @@ const DashboardPage: NextPageWithLayout = (props: any) => {
               d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m3.75 9v6m3-3H9m1.5-12H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"
             />
           </svg>
-          <span id="add_document" className="text-neon mt-2 block text-sm font-medium">
+          <span id="add_document" className="mt-2 block text-sm font-medium text-zinc-800">
             Add a new PDF document.
           </span>
         </div>

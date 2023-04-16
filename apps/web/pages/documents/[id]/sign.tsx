@@ -18,8 +18,8 @@ const SignPage: NextPageWithLayout = (props: any) => {
       ) : (
         <>
           <div className="mx-auto w-fit px-4 py-16 sm:px-6 sm:py-24 lg:px-8">
-            <ClockIcon className="text-neon mr-1 inline w-10"></ClockIcon>
-            <h1 className="text-neon inline align-middle text-base font-medium">Time flies.</h1>
+            <ClockIcon className="mr-1 inline w-10 text-zinc-800"></ClockIcon>
+            <h1 className="inline align-middle text-base font-medium text-zinc-800">Time flies.</h1>
             <p className="mt-2 text-4xl font-bold tracking-tight">This signing link is expired.</p>
             <p className="mt-2 text-base text-gray-500">
               Please ask {props.document.User.name ? `${props.document.User.name}` : `the sender`}{" "}
@@ -37,7 +37,9 @@ const SignPage: NextPageWithLayout = (props: any) => {
           </div>
           <p className="mt-4 text-center text-sm text-gray-600">
             Want to send of your own?{" "}
-            <Link href="/signup?source=expired" className="text-neon hover:text-neon font-medium">
+            <Link
+              href="/signup?source=expired"
+              className="font-medium text-zinc-800 hover:text-zinc-800">
               Create your own Account
             </Link>
           </p>

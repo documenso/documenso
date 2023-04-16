@@ -17,7 +17,7 @@ export function SelectBox(props: any) {
               {props.label}
             </Listbox.Label>
             <div className="relative mt-1">
-              <Listbox.Button className="focus:border-neon focus:ring-neon relative w-full cursor-default rounded-md border border-gray-300 bg-white py-2 pl-3 pr-10 text-left shadow-sm focus:outline-none focus:ring-1 sm:text-sm">
+              <Listbox.Button className="relative w-full cursor-default rounded-md border border-gray-300 bg-white py-2 pl-3 pr-10 text-left shadow-sm focus:border-zinc-800 focus:outline-none focus:ring-1 focus:ring-zinc-800 sm:text-sm">
                 <span className="block truncate">{props?.value?.label}</span>
                 <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
                   <ChevronUpDownIcon className="h-5 w-5 text-gray-400" aria-hidden="true" />
@@ -36,7 +36,7 @@ export function SelectBox(props: any) {
                       key={option.value}
                       className={({ active }) =>
                         classNames(
-                          active ? "bg-neon text-white" : "text-gray-900",
+                          active ? "bg-zinc-800 text-white" : "text-gray-900",
                           "relative cursor-default select-none py-2 pl-3 pr-9"
                         )
                       }
@@ -54,7 +54,7 @@ export function SelectBox(props: any) {
                           {option.value === props.value.value ? (
                             <span
                               className={classNames(
-                                active ? "text-white" : "text-neon",
+                                active ? "text-white" : "text-zinc-800",
                                 "absolute inset-y-0 right-0 flex items-center pr-4"
                               )}>
                               <CheckIcon className="h-5 w-5" aria-hidden="true" />

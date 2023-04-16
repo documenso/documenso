@@ -89,7 +89,7 @@ export default function Login(props: any) {
                     type="email"
                     autoComplete="email"
                     required
-                    className="focus:border-neon focus:ring-neon relative block w-full appearance-none rounded-none rounded-t-md border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-500 focus:z-10 focus:outline-none sm:text-sm"
+                    className="relative block w-full appearance-none rounded-none rounded-t-md border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-500 focus:z-10 focus:border-zinc-800 focus:outline-none focus:ring-zinc-800 sm:text-sm"
                     placeholder="Email"
                   />
                 </div>
@@ -104,14 +104,14 @@ export default function Login(props: any) {
                     type="password"
                     autoComplete="current-password"
                     required
-                    className="focus:border-neon focus:ring-neon relative block w-full appearance-none rounded-none rounded-b-md border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-500 focus:z-10 focus:outline-none sm:text-sm"
+                    className="relative block w-full appearance-none rounded-none rounded-b-md border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-500 focus:z-10 focus:border-zinc-800 focus:outline-none focus:ring-zinc-800 sm:text-sm"
                     placeholder="Password"
                   />
                 </div>
               </div>
               <div className="flex items-center justify-between">
                 <div className="text-sm">
-                  <a href="#" className="text-neon hover:text-neon font-medium">
+                  <a href="#" className="font-medium text-zinc-800 hover:text-zinc-800">
                     Forgot your password?
                   </a>
                 </div>
@@ -123,7 +123,7 @@ export default function Login(props: any) {
                   className="group relative flex w-full">
                   <span className="absolute inset-y-0 left-0 flex items-center pl-3">
                     <LockClosedIcon
-                      className="text-neon-dark group-hover:text-neon h-5 w-5 disabled:disabled:bg-gray-600 disabled:group-hover:bg-gray-600"
+                      className="text-zinc-800-dark h-5 w-5 disabled:disabled:bg-gray-600 group-hover:text-zinc-800 disabled:group-hover:bg-gray-600"
                       aria-hidden="true"
                     />
                   </span>
@@ -141,7 +141,7 @@ export default function Login(props: any) {
               {props.allowSignup ? (
                 <p className="mt-2 text-center text-sm text-gray-600">
                   Are you new here?{" "}
-                  <Link href="/signup" className="text-neon hover:text-neon font-medium">
+                  <Link href="/signup" className="font-medium text-zinc-800 hover:text-zinc-800">
                     Create a new Account
                   </Link>
                 </p>
@@ -150,7 +150,7 @@ export default function Login(props: any) {
                   Like Documenso{" "}
                   <Link
                     href="https://documenso.com"
-                    className="text-neon hover:text-neon font-medium">
+                    className="font-medium text-zinc-800 hover:text-zinc-800">
                     Hosted Documenso will be availible soon™
                   </Link>
                 </p>

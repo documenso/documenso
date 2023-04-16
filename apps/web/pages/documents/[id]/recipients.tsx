@@ -146,7 +146,7 @@ const RecipientsPage: NextPageWithLayout = (props: any) => {
                       <div className="block space-y-2 md:flex md:space-x-2 md:space-y-0">
                         <div
                           className={classNames(
-                            "focus-within:border-neon focus-within:ring-neon rounded-md border border-gray-300 px-3 py-2 shadow-sm focus-within:ring-1 md:w-[250px]",
+                            "rounded-md border border-gray-300 px-3 py-2 shadow-sm focus-within:border-zinc-800 focus-within:ring-1 focus-within:ring-zinc-800 md:w-[250px]",
                             item.sendStatus === "SENT" ? "bg-gray-100" : ""
                           )}>
                           <label htmlFor="name" className="block text-xs font-medium text-gray-900">
@@ -187,7 +187,7 @@ const RecipientsPage: NextPageWithLayout = (props: any) => {
                         </div>
                         <div
                           className={classNames(
-                            "focus-within:border-neon focus-within:ring-neon rounded-md border border-gray-300 px-3 py-2 shadow-sm focus-within:ring-1 md:w-[250px]",
+                            "rounded-md border border-gray-300 px-3 py-2 shadow-sm focus-within:border-zinc-800 focus-within:ring-1 focus-within:ring-zinc-800 md:w-[250px]",
                             item.sendStatus === "SENT" ? "bg-gray-100" : ""
                           )}>
                           <label htmlFor="name" className="block text-xs font-medium text-gray-900">
@@ -291,7 +291,7 @@ const RecipientsPage: NextPageWithLayout = (props: any) => {
                                   append(removedItem);
                                 });
                               }}
-                              className="group-hover:text-neon-dark group-hover:disabled:text-gray-400"
+                              className="group-hover:text-zinc-800-dark group-hover:disabled:text-gray-400"
                             />
                           </div>
                         )}

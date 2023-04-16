@@ -36,7 +36,7 @@ export default function FieldTypeSelector(props: any) {
             value={fieldType.id}
             className={({ checked, active }) =>
               classNames(
-                checked ? "border-neon border-2" : "border-transparent",
+                checked ? "border-2 border-zinc-800" : "border-transparent",
                 "relative block cursor-pointer select-none rounded-lg border bg-white px-3 py-2 hover:bg-slate-100 focus:outline-none sm:flex sm:justify-between"
               )
             }>

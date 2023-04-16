@@ -18,8 +18,8 @@ const Signed: NextPageWithLayout = (props: any) => {
         <title>Sign | Documenso</title>
       </Head>
       <div className="mx-auto w-fit px-4 py-16 sm:px-6 sm:py-24 lg:px-8">
-        <CheckBadgeIcon className="text-neon mr-1 inline w-10"></CheckBadgeIcon>
-        <h1 className="text-neon inline align-middle text-base font-medium">It's done!</h1>
+        <CheckBadgeIcon className="mr-1 inline w-10 text-zinc-800"></CheckBadgeIcon>
+        <h1 className="inline align-middle text-base font-medium text-zinc-800">It's done!</h1>
         <p className="mt-2 text-4xl font-bold tracking-tight">
           You signed "{props.document.title}"
         </p>
@@ -54,7 +54,9 @@ const Signed: NextPageWithLayout = (props: any) => {
       </div>
       <p className="mt-4 text-center text-sm text-gray-600">
         Want to send slick signing links like this one?{" "}
-        <Link href="https://documenso.com" className="text-neon hover:text-neon font-medium">
+        <Link
+          href="https://documenso.com"
+          className="font-medium text-zinc-800 hover:text-zinc-800">
           Hosted Documenso is coming soon™
         </Link>
       </p>

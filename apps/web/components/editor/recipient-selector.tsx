@@ -20,7 +20,7 @@ export default function RecipientSelector(props: any) {
       }}>
       {({ open }) => (
         <div className="relative mt-1 mb-2">
-          <Listbox.Button className="focus:border-neon focus:ring-neon relative w-full cursor-default select-none rounded-md border border-gray-300 bg-white py-2 pl-3 pr-10 text-left focus:outline-none focus:ring-1 sm:text-sm">
+          <Listbox.Button className="relative w-full cursor-default select-none rounded-md border border-gray-300 bg-white py-2 pl-3 pr-10 text-left focus:border-zinc-800 focus:outline-none focus:ring-1 focus:ring-zinc-800 sm:text-sm">
             <span className="flex items-center">
               <span
                 className="inline-block h-4 w-4 flex-shrink-0 rounded-full"
@@ -47,7 +47,7 @@ export default function RecipientSelector(props: any) {
                   key={recipient?.id}
                   className={({ active }) =>
                     classNames(
-                      active ? "bg-neon-dark text-white" : "text-gray-900",
+                      active ? "bg-zinc-800-dark text-white" : "text-gray-900",
                       "relative cursor-default select-none py-2 pl-3 pr-9"
                     )
                   }
@@ -73,7 +73,7 @@ export default function RecipientSelector(props: any) {
                       {selected ? (
                         <span
                           className={classNames(
-                            active ? "text-white" : "text-neon-dark",
+                            active ? "text-white" : "text-zinc-800-dark",
                             "absolute inset-y-0 right-0 flex items-center pr-4"
                           )}>
                           <CheckIcon className="h-5 w-5" aria-hidden="true" />

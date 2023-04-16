@@ -122,7 +122,7 @@ export default function TopNavigation() {
                         href={item.href}
                         className={classNames(
                           item.current
-                            ? "border-neon text-brown"
+                            ? "text-brown border-zinc-800"
                             : "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700",
                           "inline-flex items-center border-b-2 px-1 pt-1 text-sm font-medium"
                         )}

@@ -68,7 +68,7 @@ export default function PDFSigner(props: any) {
   return (
     <>
       <SignatureDialog open={open} setOpen={setOpen} onClose={onDialogClose} />
-      <div className="bg-neon p-4">
+      <div className="bg-zinc-800 p-4">
         <div className="flex">
           <div className="flex-shrink-0">
             <Logo className="-mt-2.5 h-12 w-12"></Logo>
