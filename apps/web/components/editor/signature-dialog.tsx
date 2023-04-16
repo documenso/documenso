@@ -98,7 +98,7 @@ export default function SignatureDialog(props: any) {
                             placeholder="Kindly type your name"
                           />
                         </div>
-                        <div className="float-right">
+                        <div className="flex justify-end">
                           <Button
                             color="secondary"
                             onClick={() => {
