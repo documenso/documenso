@@ -3,6 +3,7 @@ import { NextPageContext } from "next";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import { uploadDocument } from "@documenso/features";
+import { formatDate } from "@documenso/lib";
 import { deleteDocument, getDocuments } from "@documenso/lib/api";
 import { Button, IconButton, SelectBox } from "@documenso/ui";
 import Layout from "../components/layout";
@@ -187,14 +188,6 @@ const DocumentsPage: NextPageWithLayout = (props: any) => {
                         className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
                         Created
                       </th>
-                      {selectedStatusFilter.value === "COMPLETED" ||
-                        (selectedStatusFilter.value === "ALL" && (
-                          <th
-                            scope="col"
-                            className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
-                            Completed
-                          </th>
-                        ))}
                       <th scope="col" className="relative py-3.5 pl-3 pr-4 sm:pr-6">
                         <span className="sr-only">Delete</span>
                       </th>
@@ -276,7 +269,13 @@ const DocumentsPage: NextPageWithLayout = (props: any) => {
                             content="Document was signed by the recipient."
                           />
                         </td>
-                        <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+
+                        <td
+                          className="whitespace-nowrap px-3 py-4 text-sm text-gray-500"
+                          data-tooltip-id="completed_icon"
+                          data-tooltip-content={`Completed on ${formatDate(
+                            new Date(document.completedDate)
+                          )}`}>
                           {formatDocumentStatus(document.status)}
                           <p>
                             <small hidden={document.Recipient.length === 0}>
@@ -289,14 +288,6 @@ const DocumentsPage: NextPageWithLayout = (props: any) => {
                         <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
                           {new Date(document.created).toLocaleDateString()}
                         </td>
-                        {selectedStatusFilter.value === "COMPLETED" ||
-                          (selectedStatusFilter.value === "ALL" && (
-                            <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                              {document.completedDate
-                                ? new Date(document.completedDate).toLocaleDateString()
-                                : "-"}
-                            </td>
-                          ))}
                         <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
                           <div>
                             <IconButton
@@ -395,6 +386,7 @@ const DocumentsPage: NextPageWithLayout = (props: any) => {
         place="bottom"
         content="No preparation needed. Any PDF will do."
       />
+      <ReactTooltip id="completed_icon" place="top" />
     </>
   );
 };

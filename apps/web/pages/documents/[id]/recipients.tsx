@@ -83,7 +83,7 @@ const RecipientsPage: NextPageWithLayout = (props: any) => {
             <h2 className="text-2xl font-bold leading-7 text-gray-900 sm:truncate sm:text-3xl sm:tracking-tight">
               {props.document.title}
             </h2>
-            {props.date.completedDate && (
+            {props.document.completedDate ? (
               <p className="mt-1 text-gray-600">
                 Completed on{" "}
                 <time dateTime="2021-03-22" className="text-base font-medium text-gray-600">
@@ -94,7 +94,7 @@ const RecipientsPage: NextPageWithLayout = (props: any) => {
                   {formatTime(new Date(props.document.completedDate))}
                 </time>
               </p>
-            )}
+            ) : null}
           </div>
           <div className="mt-4 flex flex-shrink-0 md:mt-0 md:ml-4">
             <Button
