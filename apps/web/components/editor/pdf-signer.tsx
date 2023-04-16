@@ -68,10 +68,10 @@ export default function PDFSigner(props: any) {
   return (
     <>
       <SignatureDialog open={open} setOpen={setOpen} onClose={onDialogClose} />
-      <div className="bg-zinc-800 p-4">
-        <div className="flex">
+      <div className="bg-neon p-4">
+        <div className="flex items-center">
           <div className="flex-shrink-0">
-            <Logo className="-mt-2.5 h-12 w-12"></Logo>
+            <Logo className="h-12 w-12"></Logo>
           </div>
           <div className="ml-3 flex-1 items-center justify-start text-center md:flex md:justify-between">
             <p className="text-lg text-slate-700">
@@ -85,7 +85,6 @@ export default function PDFSigner(props: any) {
                 disabled={!signingDone}
                 color="secondary"
                 icon={CheckBadgeIcon}
-                className="float-right"
                 onClick={() => {
                   signDocument(props.document, localSignatures, `${router.query.token}`).then(
                     () => {
