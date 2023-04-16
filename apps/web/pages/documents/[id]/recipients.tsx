@@ -223,7 +223,7 @@ const RecipientsPage: NextPageWithLayout = (props: any) => {
                       <div className="flex items-center space-x-2 lg:ml-2">
                         <div className="mb-2 mr-2 flex lg:mr-0">
                           <div key={item.id} className="space-x-2">
-                            {item.sendStatus === "NOT_SENT" ? (
+                            {item.sendStatus === "NOT_SENT" && item.readStatus !== "OPENED" ? (
                               <span
                                 id="sent_icon"
                                 className="mt-3 inline-block flex-shrink-0 rounded-full bg-yellow-200 px-2 py-0.5 text-xs font-medium text-gray-800">
