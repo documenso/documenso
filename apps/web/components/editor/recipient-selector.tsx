@@ -45,10 +45,11 @@ export default function RecipientSelector(props: any) {
               {props?.recipients.map((recipient: any) => (
                 <Listbox.Option
                   key={recipient?.id}
+                  disabled={!recipient?.email}
                   className={({ active }) =>
                     classNames(
                       active ? "bg-neon-dark text-white" : "text-gray-900",
-                      "relative cursor-default select-none py-2 pl-3 pr-9"
+                      "relative cursor-default select-none py-2 pl-3 pr-9 aria-disabled:opacity-50 aria-disabled:cursor-not-allowed"
                     )
                   }
                   value={recipient}>
@@ -66,7 +67,7 @@ export default function RecipientSelector(props: any) {
                             selected ? "font-semibold" : "font-normal",
                             "ml-3 block truncate"
                           )}>
-                          {`${recipient?.name} <${recipient?.email}>`}
+                          {`${recipient?.name} <${recipient?.email || 'unknown'}>`}
                         </span>
                       </div>
 
@@ -76,7 +77,7 @@ export default function RecipientSelector(props: any) {
                             active ? "text-white" : "text-neon-dark",
                             "absolute inset-y-0 right-0 flex items-center pr-4"
                           )}>
-                          <CheckIcon className="h-5 w-5" aria-hidden="true" />
+                          <CheckIcon className="h-5 w-5" strokeWidth={3} aria-hidden="true" />
                         </span>
                       ) : null}
                     </>
