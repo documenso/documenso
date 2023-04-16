@@ -207,67 +207,40 @@ const DocumentsPage: NextPageWithLayout = (props: any) => {
                             <div key={item.id}>
                               {item.sendStatus === "NOT_SENT" ? (
                                 <span
-                                  id="sent_icon"
+                                  data-tooltip-id="sent_icon"
                                   className="my-0.5 inline-block flex-shrink-0 rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-800">
                                   {item.name ? item.name + " <" + item.email + ">" : item.email}
                                 </span>
-                              ) : (
-                                ""
-                              )}
+                              ) : null}
                               {item.sendStatus === "SENT" && item.readStatus !== "OPENED" ? (
-                                <span id="sent_icon">
-                                  <span
-                                    id="sent_icon"
-                                    className="my-0.5 inline-block flex-shrink-0 rounded-full bg-yellow-200 px-2 py-0.5 text-xs font-medium text-green-800">
-                                    <EnvelopeIcon className="mr-1 inline h-5"></EnvelopeIcon>
-                                    {item.name ? item.name + " <" + item.email + ">" : item.email}
-                                  </span>
+                                <span
+                                  data-tooltip-id="sent_icon"
+                                  className="my-0.5 inline-block flex-shrink-0 rounded-full bg-yellow-200 px-2 py-0.5 text-xs font-medium text-green-800">
+                                  <EnvelopeIcon className="mr-1 inline h-5"></EnvelopeIcon>
+                                  {item.name ? item.name + " <" + item.email + ">" : item.email}
                                 </span>
-                              ) : (
-                                ""
-                              )}
+                              ) : null}
                               {item.readStatus === "OPENED" &&
                               item.signingStatus === "NOT_SIGNED" ? (
-                                <span id="read_icon">
-                                  <span
-                                    id="sent_icon"
-                                    className="my-0.5 inline-block flex-shrink-0 rounded-full bg-yellow-200 px-2 py-0.5 text-xs font-medium text-green-800">
-                                    <CheckIcon className="-mr-2 inline h-5"></CheckIcon>
-                                    <CheckIcon className="mr-1 inline h-5"></CheckIcon>
-                                    {item.name ? item.name + " <" + item.email + ">" : item.email}
-                                  </span>
+                                <span
+                                  data-tooltip-id="read_icon"
+                                  className="my-0.5 inline-block flex-shrink-0 rounded-full bg-yellow-200 px-2 py-0.5 text-xs font-medium text-green-800">
+                                  <CheckIcon className="-mr-2 inline h-5"></CheckIcon>
+                                  <CheckIcon className="mr-1 inline h-5"></CheckIcon>
+                                  {item.name ? item.name + " <" + item.email + ">" : item.email}
                                 </span>
-                              ) : (
-                                ""
-                              )}
+                              ) : null}
                               {item.signingStatus === "SIGNED" ? (
-                                <span id="signed_icon">
+                                <span data-tooltip-id="signed_icon">
                                   <span className="my-0.5 inline-block flex-shrink-0 rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-800">
                                     <CheckBadgeIcon className="mr-1 inline h-5"></CheckBadgeIcon>{" "}
                                     {item.email}
                                   </span>
                                 </span>
-                              ) : (
-                                ""
-                              )}
+                              ) : null}
                             </div>
                           ))}
                           {document.Recipient.length === 0 ? "-" : null}
-                          <ReactTooltip
-                            anchorId="sent_icon"
-                            place="bottom"
-                            content="Document was sent to recipient."
-                          />
-                          <ReactTooltip
-                            anchorId="read_icon"
-                            place="bottom"
-                            content="Document was opened but not signed yet."
-                          />
-                          <ReactTooltip
-                            anchorId="signed_icon"
-                            place="bottom"
-                            content="Document was signed by the recipient."
-                          />
                         </td>
 
                         <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
@@ -345,7 +318,10 @@ const DocumentsPage: NextPageWithLayout = (props: any) => {
           </div>
         </div>
       </div>
-      <div className="mt-24 text-center" id="empty" hidden={documents.length > 0 || loading}>
+      <div
+        className="mt-24 text-center"
+        data-tooltip-id="empty"
+        hidden={documents.length > 0 || loading}>
         <svg
           className="mx-auto h-12 w-12 text-gray-400"
           fill="none"
@@ -382,10 +358,17 @@ const DocumentsPage: NextPageWithLayout = (props: any) => {
           />
         </div>
       </div>
+      <ReactTooltip id="empty" place="bottom" content="No preparation needed. Any PDF will do." />
+      <ReactTooltip id="sent_icon" place="bottom" content="Document was sent to recipient." />
       <ReactTooltip
-        anchorId="empty"
+        id="read_icon"
         place="bottom"
-        content="No preparation needed. Any PDF will do."
+        content="Document was opened but not signed yet."
+      />
+      <ReactTooltip
+        id="signed_icon"
+        place="bottom"
+        content="Document was signed by the recipient."
       />
       <ReactTooltip id="completed_icon" place="top" />
     </>
