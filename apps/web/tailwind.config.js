@@ -16,8 +16,6 @@ module.exports = {
         qwigley: ["Qwigley", "serif"],
       },
       colors: {
-        neon: "#37f095",
-        "neon-dark": "#2CC077",
         brown: "#353434",
       },
       borderRadius: {
