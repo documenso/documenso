@@ -211,7 +211,7 @@ export default function TopNavigation() {
                     href={item.href}
                     className={classNames(
                       item.current
-                        ? "border-teal-500 bg-teal-50 text-teal-700"
+                        ? "border-zinc-500 bg-zinc-50 text-zinc-700"
                         : "border-transparent text-gray-600 hover:border-gray-300 hover:bg-gray-50 hover:text-gray-800",
                       "block border-l-4 py-2 pl-3 pr-4 text-base font-medium"
                     )}
