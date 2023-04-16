@@ -6,8 +6,8 @@ export function IconButton(props: any) {
   const isLink = typeof props.href !== "undefined";
   const { color = "primary", icon, disabled, onClick } = props;
   const baseStyles = "disabled:text-gray-300";
-  const primaryStyles = "text-zinc-800 hover:text-zinc-800-dark";
-  const secondaryStyles = "text-gray-700 hover:text-zinc-800-dark";
+  const primaryStyles = "text-zinc-800 hover:text-zinc-900";
+  const secondaryStyles = "text-gray-700 hover:text-zinc-900";
 
   return isLink ? (
     <Link

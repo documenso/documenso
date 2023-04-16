@@ -291,7 +291,7 @@ const RecipientsPage: NextPageWithLayout = (props: any) => {
                                   append(removedItem);
                                 });
                               }}
-                              className="group-hover:text-zinc-800-dark group-hover:disabled:text-gray-400"
+                              className="group-hover:text-zinc-900 group-hover:disabled:text-gray-400"
                             />
                           </div>
                         )}

@@ -123,7 +123,7 @@ export default function Login(props: any) {
                   className="group relative flex w-full">
                   <span className="absolute inset-y-0 left-0 flex items-center pl-3">
                     <LockClosedIcon
-                      className="text-zinc-800-dark h-5 w-5 disabled:disabled:bg-gray-600 group-hover:text-zinc-800 disabled:group-hover:bg-gray-600"
+                      className="h-5 w-5 text-zinc-900 disabled:disabled:bg-gray-600 group-hover:text-zinc-800 disabled:group-hover:bg-gray-600"
                       aria-hidden="true"
                     />
                   </span>

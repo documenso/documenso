@@ -47,7 +47,7 @@ export default function RecipientSelector(props: any) {
                   key={recipient?.id}
                   className={({ active }) =>
                     classNames(
-                      active ? "bg-zinc-800-dark text-white" : "text-gray-900",
+                      active ? "bg-zinc-900 text-white" : "text-gray-900",
                       "relative cursor-default select-none py-2 pl-3 pr-9"
                     )
                   }
@@ -73,7 +73,7 @@ export default function RecipientSelector(props: any) {
                       {selected ? (
                         <span
                           className={classNames(
-                            active ? "text-white" : "text-zinc-800-dark",
+                            active ? "text-white" : "text-zinc-900",
                             "absolute inset-y-0 right-0 flex items-center pr-4"
                           )}>
                           <CheckIcon className="h-5 w-5" aria-hidden="true" />
