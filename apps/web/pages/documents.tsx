@@ -270,20 +270,21 @@ const DocumentsPage: NextPageWithLayout = (props: any) => {
                           />
                         </td>
 
-                        <td
-                          className="whitespace-nowrap px-3 py-4 text-sm text-gray-500"
-                          data-tooltip-id="completed_icon"
-                          data-tooltip-content={`Completed on ${formatDate(
-                            new Date(document.completedDate)
-                          )}`}>
-                          {formatDocumentStatus(document.status)}
-                          <p>
-                            <small hidden={document.Recipient.length === 0}>
-                              {document.Recipient.filter((r: any) => r.signingStatus === "SIGNED")
-                                .length || 0}
-                              /{document.Recipient.length || 0}
-                            </small>
-                          </p>
+                        <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                          <span
+                            data-tooltip-id={document.completedDate && "completed_icon"}
+                            data-tooltip-content={`Completed on ${formatDate(
+                              new Date(document.completedDate)
+                            )}`}>
+                            {formatDocumentStatus(document.status)}
+                            <p>
+                              <small hidden={document.Recipient.length === 0}>
+                                {document.Recipient.filter((r: any) => r.signingStatus === "SIGNED")
+                                  .length || 0}
+                                /{document.Recipient.length || 0}
+                              </small>
+                            </p>
+                          </span>
                         </td>
                         <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
                           {new Date(document.created).toLocaleDateString()}
