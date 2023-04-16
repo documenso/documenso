@@ -122,24 +122,26 @@ const DocumentsPage: NextPageWithLayout = (props: any) => {
             </Button>
           </div>
         </div>
-        <div className="mt-3 mb-12">
-          <div className="float-right ml-3 mt-7 block w-fit">
+        <div className="mt-3 mb-12 w-full justify-between sm:flex">
+          <div className="my-7 block w-full">
             {filteredDocuments.length != 1 ? filteredDocuments.length + " Documents" : "1 Document"}
           </div>
-          <SelectBox
-            className="float-right block w-1/4"
-            label="Created"
-            options={createdFilter}
-            value={selectedCreatedFilter}
-            onChange={setSelectedCreatedFilter}
-          />
-          <SelectBox
-            className="float-right ml-3 block w-1/4"
-            label="Status"
-            options={statusFilters}
-            value={selectedStatusFilter}
-            onChange={setSelectedStatusFilter}
-          />
+          <div className="flex min-w-min space-x-2">
+            <SelectBox
+              className="min-w-[140px]"
+              label="Created"
+              options={createdFilter}
+              value={selectedCreatedFilter}
+              onChange={setSelectedCreatedFilter}
+            />
+            <SelectBox
+              className="min-w-[140px]"
+              label="Status"
+              options={statusFilters}
+              value={selectedStatusFilter}
+              onChange={setSelectedStatusFilter}
+            />
+          </div>
         </div>
         <div className="mt-20 max-w-[1100px]" hidden={!loading}>
           <div className="ph-item">
