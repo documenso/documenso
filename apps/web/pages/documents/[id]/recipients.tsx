@@ -175,7 +175,6 @@ const RecipientsPage: NextPageWithLayout = (props: any) => {
                                   });
                             }}
                             className="block w-full border-0  bg-inherit p-0 text-gray-900 placeholder-gray-500 outline-none disabled:bg-neutral-100 sm:text-sm"
-                            placeholder="john.dorian@loremipsum.com"
                           />
                           {errors?.signers?.[index] ? (
                             <p className="mt-2 text-sm text-red-600" id="email-error">
@@ -213,7 +212,6 @@ const RecipientsPage: NextPageWithLayout = (props: any) => {
                                 });
                             }}
                             className="block w-full border-0 bg-inherit p-0 text-gray-900 placeholder-gray-500 outline-none disabled:bg-neutral-100 sm:text-sm"
-                            placeholder="John Dorian"
                           />
                         </div>
                       </div>
