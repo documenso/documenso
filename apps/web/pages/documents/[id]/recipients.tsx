@@ -18,13 +18,15 @@ import {
   UserPlusIcon,
   XMarkIcon,
 } from "@heroicons/react/24/outline";
-import { DocumentStatus, Document as PrismaDocument } from "@prisma/client";
+import { DocumentStatus, Document as PrismaDocument, Recipient } from "@prisma/client";
 import { FormProvider, useFieldArray, useForm, useWatch } from "react-hook-form";
 import { toast } from "react-hot-toast";
 
 export type FormValues = {
-  signers: { id: number; email: string; name: string }[];
+  signers: Array<Pick<Recipient, 'id' | 'email' | 'name' | 'sendStatus' | 'readStatus' | 'signingStatus'>>;
 };
+
+type FormSigner = FormValues["signers"][number];
 
 const RecipientsPage: NextPageWithLayout = (props: any) => {
   const title: string = `"` + props?.document?.title + `"` + "Recipients | Documenso";
@@ -64,7 +66,7 @@ const RecipientsPage: NextPageWithLayout = (props: any) => {
   });
   const formValues = useWatch({ control, name: "signers" });
   const cancelButtonRef = useRef(null);
-  const hasEmailError = (formValue: any): boolean => {
+  const hasEmailError = (formValue: FormSigner): boolean => {
     const index = formValues.findIndex((e) => e.id === formValue.id);
     return !!errors?.signers?.[index]?.email;
   };
@@ -109,14 +111,14 @@ const RecipientsPage: NextPageWithLayout = (props: any) => {
                   color="primary"
                   icon={PaperAirplaneIcon}
                   onClick={() => {
-                    formValues.some((r: any) => r.email && hasEmailError(r))
+                    formValues.some((r) => r.email && hasEmailError(r))
                       ? toast.error("Please enter a valid email address.", { id: "invalid email" })
                       : setOpen(true);
                   }}
                   disabled={
                     (formValues.length || 0) === 0 ||
                     !formValues.some(
-                      (r: any) => r.email && !hasEmailError(r) && r.sendStatus === "NOT_SENT"
+                      (r) => r.email && !hasEmailError(r) && r.sendStatus === "NOT_SENT"
                     ) ||
                     loading
                   }>
@@ -141,7 +143,7 @@ const RecipientsPage: NextPageWithLayout = (props: any) => {
                 trigger();
               }}>
               <ul role="list" className="divide-y divide-gray-200">
-                {fields.map((item: any, index: number) => (
+                {fields.map((item, index) => (
                   <li
                     key={index}
                     className="group w-full border-0 px-2 py-3 hover:bg-green-50 sm:py-4">
