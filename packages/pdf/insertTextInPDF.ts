@@ -8,7 +8,8 @@ export async function insertTextInPDF(
   positionX: number,
   positionY: number,
   page: number = 0,
-  useHandwritingFont = true
+  useHandwritingFont = true,
+  fontSize = 15
 ): Promise<string> {
   const fontBytes = fs.readFileSync("public/fonts/Qwigley-Regular.ttf");
 
@@ -21,7 +22,7 @@ export async function insertTextInPDF(
   const pages = pdfDoc.getPages();
   const pdfPage = pages[page];
 
-  const textSize = useHandwritingFont ? 50 : 15;
+  const textSize = useHandwritingFont ? 50 : fontSize;
   const textWidth = font.widthOfTextAtSize(text, textSize);
   const textHeight = font.heightAtSize(textSize);
   const fieldSize = { width: 192, height: 64 };

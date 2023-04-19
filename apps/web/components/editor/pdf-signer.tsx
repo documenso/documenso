@@ -6,6 +6,7 @@ import { createOrUpdateField, deleteField, signDocument } from "@documenso/lib/a
 import { NEXT_PUBLIC_WEBAPP_URL } from "@documenso/lib/constants";
 import { Button } from "@documenso/ui";
 import Logo from "../logo";
+import NameDialog from "./name-dialog";
 import SignatureDialog from "./signature-dialog";
 import { CheckBadgeIcon, InformationCircleIcon } from "@heroicons/react/24/outline";
 import { FieldType } from "@prisma/client";
@@ -16,11 +17,12 @@ const PDFViewer = dynamic(() => import("./pdf-viewer"), {
 
 export default function PDFSigner(props: any) {
   const router = useRouter();
-  const [open, setOpen] = useState(false);
+  const [signatureDialogOpen, setSignatureDialogOpen] = useState(false);
+  const [nameDialogOpen, setNameDialogOpen] = useState(false);
   const [signingDone, setSigningDone] = useState(false);
   const [localSignatures, setLocalSignatures] = useState<any[]>([]);
   const [fields, setFields] = useState<any[]>(props.fields);
-  const signatureFields = fields.filter((field) => field.type === FieldType.SIGNATURE);
+  const signatureFields = fields.filter((field) => [FieldType.SIGNATURE].includes(field.type));
   const [dialogField, setDialogField] = useState<any>();
 
   useEffect(() => {
@@ -28,9 +30,14 @@ export default function PDFSigner(props: any) {
   }, [fields]);
 
   function onClick(item: any) {
-    if (item.type === "SIGNATURE") {
+    if (item.type === FieldType.SIGNATURE) {
       setDialogField(item);
-      setOpen(true);
+      setSignatureDialogOpen(true);
+    }
+
+    if (item.type === FieldType.NAME) {
+      setDialogField(item);
+      setNameDialogOpen(true);
     }
   }
 
@@ -61,13 +68,25 @@ export default function PDFSigner(props: any) {
     const signedField = { ...dialogField };
     signedField.signature = signature;
     setFields((prevState) => [...prevState, signedField]);
-    setOpen(false);
+    setSignatureDialogOpen(false);
+    setNameDialogOpen(false);
     setDialogField(null);
   }
 
   return (
     <>
-      <SignatureDialog open={open} setOpen={setOpen} onClose={onDialogClose} />
+      <SignatureDialog
+        open={signatureDialogOpen}
+        setOpen={setSignatureDialogOpen}
+        onClose={onDialogClose}
+      />
+      <NameDialog
+        open={nameDialogOpen}
+        setOpen={setNameDialogOpen}
+        onClose={onDialogClose}
+        defaultName={props.recipient?.name ?? ""}
+      />
+
       <div className="bg-neon p-4">
         <div className="flex">
           <div className="flex-shrink-0">
@@ -153,7 +172,7 @@ export default function PDFSigner(props: any) {
     createOrUpdateField(props.document, freeSignatureField, recipient.token).then((res) => {
       setFields((prevState) => [...prevState, res]);
       setDialogField(res);
-      setOpen(true);
+      setSignatureDialogOpen(true);
     });
 
     return freeSignatureField;

@@ -157,7 +157,11 @@ async function postHandler(req: NextApiRequest, res: NextApiResponse) {
         signedField.Signature.typedSignature,
         signedField.positionX,
         signedField.positionY,
-        signedField.page
+        signedField.page,
+        // useHandwritingFont only for typed signatures
+        signedField.type === FieldType.SIGNATURE,
+        // fontSize only for name field
+        signedField.type === FieldType.NAME ? 30 : undefined
       );
     } else {
       documentWithInserts = document.document;

@@ -101,6 +101,7 @@ model Recipient {
 }
 
 enum FieldType {
+  NAME
   SIGNATURE
   FREE_SIGNATURE
   DATE

@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { classNames } from "@documenso/lib";
 import { IconButton } from "@documenso/ui";
 import { XCircleIcon } from "@heroicons/react/20/solid";
+import { FieldType } from "@prisma/client";
 import Draggable from "react-draggable";
 
 const stc = require("string-to-color");
@@ -46,7 +47,9 @@ export default function SignableField(props: FieldPropsType) {
         ref={nodeRef}
         className={classNames(
           "absolute top-0 left-0 m-auto h-16 w-48 select-none flex-row-reverse text-center text-lg font-bold opacity-80",
-          field.type === "SIGNATURE" ? "cursor-pointer hover:brightness-50" : "cursor-not-allowed"
+          [FieldType.SIGNATURE, FieldType.NAME].includes(field.type)
+            ? "cursor-pointer hover:brightness-50"
+            : "cursor-not-allowed"
         )}
         style={{
           background: stc(props.field.Recipient.email),
@@ -54,10 +57,15 @@ export default function SignableField(props: FieldPropsType) {
         <div hidden={field?.signature} className="my-4 font-medium">
           {field.type === "SIGNATURE" ? "SIGN HERE" : ""}
           {field.type === "DATE" ? <small>Date (filled on sign)</small> : ""}
+          {field.type === "NAME" ? "ENTER NAME HERE" : ""}
         </div>
         <div
           hidden={!field?.signature}
-          className="font-qwigley m-auto w-auto flex-row-reverse text-center text-5xl font-medium">
+          className={classNames(
+            "m-auto w-auto flex-row-reverse text-center font-medium",
+            field.type === FieldType.SIGNATURE && "font-qwigley text-5xl",
+            field.type === FieldType.NAME && "font-sans text-3xl"
+          )}>
           {field?.signature?.type === "type" ? (
             <div className="my-4">{field?.signature.typedSignature}</div>
           ) : (
