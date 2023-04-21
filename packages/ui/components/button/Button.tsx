@@ -6,7 +6,7 @@ export function Button(props: any) {
   const isLink = typeof props.href !== "undefined" && !props.disabled;
   const { color = "primary", icon, disabled, onClick } = props;
   const baseStyles =
-    "inline-flex gap-x-2 items-center justify-center min-w-[80px] rounded-md border border-transparent px-4 py-2 text-sm font-medium shadow-sm disabled:bg-gray-300";
+    "inline-flex gap-x-2 items-center justify-center min-w-[80px] rounded-md border border-transparent px-4 py-2 text-sm font-medium shadow-sm disabled:bg-gray-300 duration-200";
   const primaryStyles = "text-gray-900 bg-neon hover:bg-neon-dark";
   const secondaryStyles = "border-gray-300 bg-white text-gray-700 hover:bg-gray-50";
 
