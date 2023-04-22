@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import dynamic from "next/dynamic";
 import { useRouter } from "next/router";
 import { createField } from "@documenso/features/editor";
@@ -22,7 +22,10 @@ export default function PDFSigner(props: any) {
   const [signingDone, setSigningDone] = useState(false);
   const [localSignatures, setLocalSignatures] = useState<any[]>([]);
   const [fields, setFields] = useState<any[]>(props.fields);
-  const signatureFields = fields.filter((field) => [FieldType.SIGNATURE].includes(field.type));
+  const signatureFields = useMemo(
+    () => fields.filter((field) => [FieldType.SIGNATURE].includes(field.type)),
+    [fields]
+  );
   const [dialogField, setDialogField] = useState<any>();
 
   function signField(options: {
@@ -102,7 +105,11 @@ export default function PDFSigner(props: any) {
         .filter((field) => field.type === FieldType.SIGNATURE)
         .every((field) => field.signature);
     } else {
-      return localSignatures.length > 0;
+      // If we don't have a signature field, we need at least one free signature
+      // to be able to complete signing
+      const freeSignatureFields = fields.filter((field) => field.type === FieldType.FREE_SIGNATURE);
+
+      return freeSignatureFields.length > 0 && freeSignatureFields.every((field) => field.signature);
     }
   }
 
