@@ -62,7 +62,7 @@ export default function NameDialog(props: any) {
                     />
                   </div>
 
-                  <div className="float-right">
+                  <div className="flex flex-row-reverse items-center gap-x-4">
                     <Button
                       color="secondary"
                       onClick={() => {
