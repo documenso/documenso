@@ -27,7 +27,13 @@ const DocumentsPage: NextPageWithLayout = (props: any) => {
   const [filteredDocuments, setFilteredDocuments] = useState([]);
 
   const [loading, setLoading] = useState(true);
-  const statusFilters = [
+
+  type statusFilterType = {
+    label: string;
+    value: DocumentStatus | "ALL";
+  };
+
+  const statusFilters: statusFilterType[] = [
     { label: "All", value: "ALL" },
     { label: "Draft", value: "DRAFT" },
     { label: "Waiting for others", value: "PENDING" },
@@ -83,7 +89,7 @@ const DocumentsPage: NextPageWithLayout = (props: any) => {
     return filteredDocuments;
   }
 
-  function handleSetSelectedStatusFilter(status: any) {
+  function handleSetSelectedStatusFilter(status: statusFilterType) {
     router.replace(
       {
         pathname: router.pathname,
