@@ -128,7 +128,7 @@ Your database will also be available on port `5432`. You can connect to it using
 
 ## Developer Setup
 
-Follow these steps to setup documenso on you local machnine:
+Follow these steps to setup documenso on you local machine:
 
 - [Clone the repository](https://help.github.com/articles/cloning-a-repository/) it to your local device.
   ```sh
