@@ -154,7 +154,7 @@ Follow these steps to setup documenso on you local machnine:
 
 - Optional: Create your own signing certificate
   - A demo certificate is provided in /app/web/ressources/certificate.p12
-  - To generate you own using these steps and a linux Terminal or Windows Linux Subsystem see **Create your own signging certificate**.
+  - To generate you own using these steps and a linux Terminal or Windows Linux Subsystem see **Create your own signing certificate**.
 
 ## Updating
 
@@ -165,7 +165,7 @@ Follow these steps to setup documenso on you local machnine:
   ```
 - This is not neccessary on first clone
 
-# Creating your own signging certificate
+# Creating your own signing certificate
 
 For the digital signature of you documents you need a signign certificate in .p12 formate (public and private key). You can buy one (not recommended for dev) or use the steps to create a self-signed one:
 
