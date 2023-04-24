@@ -83,6 +83,20 @@ const DocumentsPage: NextPageWithLayout = (props: any) => {
     return filteredDocuments;
   }
 
+  function handleSetSelectedStatusFilter(status: any) {
+    router.replace(
+      {
+        pathname: router.pathname,
+        query: { filter: status.value },
+      },
+      undefined,
+      {
+        shallow: true, // Perform a shallow update, without reloading the page
+      }
+    );
+    setSelectedStatusFilter(status);
+  }
+
   function wasXDaysAgoOrLess(documentDate: Date, lastXDays: number): boolean {
     if (lastXDays < 0) return true;
 
@@ -138,7 +152,7 @@ const DocumentsPage: NextPageWithLayout = (props: any) => {
             label="Status"
             options={statusFilters}
             value={selectedStatusFilter}
-            onChange={setSelectedStatusFilter}
+            onChange={handleSetSelectedStatusFilter}
           />
         </div>
         <div className="mt-20 max-w-[1100px]" hidden={!loading}>
