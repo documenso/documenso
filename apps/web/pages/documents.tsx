@@ -89,7 +89,7 @@ const DocumentsPage: NextPageWithLayout = (props: any) => {
     return filteredDocuments;
   }
 
-  function handleSetSelectedStatusFilter(status: statusFilterType) {
+  function handleStatusFilterChange(status: statusFilterType) {
     router.replace(
       {
         pathname: router.pathname,
@@ -158,7 +158,7 @@ const DocumentsPage: NextPageWithLayout = (props: any) => {
             label="Status"
             options={statusFilters}
             value={selectedStatusFilter}
-            onChange={handleSetSelectedStatusFilter}
+            onChange={handleStatusFilterChange}
           />
         </div>
         <div className="mt-20 max-w-[1100px]" hidden={!loading}>
