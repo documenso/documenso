@@ -78,7 +78,7 @@ The current project goal is to <b>[release a production ready version](https://g
 Documenso is built using awesome open source tech including:
 
 - [Typescript](https://www.typescriptlang.org/)
-- [Javascript (when neccessary)](https://developer.mozilla.org/en-US/docs/Web/JavaScript)
+- [Javascript (when necessary)](https://developer.mozilla.org/en-US/docs/Web/JavaScript)
 - [NextJS (JS Fullstack Framework)](https://nextjs.org/)
 - [Postgres SQL (Database)](https://www.postgresql.org/)
 - [Prisma (ORM - Object-relational mapping)](https://www.prisma.io/)
@@ -96,7 +96,7 @@ Documenso is built using awesome open source tech including:
 To run Documenso locally you need
 
 - [Node.js (Version: >=18.x)](https://nodejs.org/en/download/)
-- Node Package Manger NPM - included in Node.js
+- Node Package Manager NPM - included in Node.js
 - [PostgreSQL (local or remote)](https://www.postgresql.org/download/)
 
 ## Developer Quickstart
@@ -128,7 +128,7 @@ Your database will also be available on port `5432`. You can connect to it using
 
 ## Developer Setup
 
-Follow these steps to setup documenso on you local machnine:
+Follow these steps to setup documenso on you local machine:
 
 - [Clone the repository](https://help.github.com/articles/cloning-a-repository/) it to your local device.
   ```sh
@@ -138,12 +138,12 @@ Follow these steps to setup documenso on you local machnine:
 - Rename <code>.env.example</code> to <code>.env</code>
 - Set DATABASE_URL value in .env file
   - You can use the provided test database url (may be wiped at any point)
-  - Or setup a local postgres sql instance (recommened)
+  - Or setup a local postgres sql instance (recommended)
 - Create the database scheme by running <code>db-migrate:dev</code>
 - Setup your mail provider
   - Set <code>SENDGRID_API_KEY</code> value in .env file
   - You need a SendGrid account, which you can create [here](https://signup.sendgrid.com/).
-  - Documenso uses [Nodemailer](https://nodemailer.com/about/) so you can easily use your own SMTP server by setting the <code>SMTP\_\* varibles</code> in your .env
+  - Documenso uses [Nodemailer](https://nodemailer.com/about/) so you can easily use your own SMTP server by setting the <code>SMTP\_\* variables</code> in your .env
 - Run <code>npm run dev</code> root directory to start
 - Register a new user at http://localhost:3000/signup
 
@@ -154,20 +154,20 @@ Follow these steps to setup documenso on you local machnine:
 
 - Optional: Create your own signing certificate
   - A demo certificate is provided in /app/web/ressources/certificate.p12
-  - To generate you own using these steps and a linux Terminal or Windows Linux Subsystem see **Create your own signging certificate**.
+  - To generate your own using these steps and a linux Terminal or Windows Linux Subsystem see **Create your own signing certificate**.
 
 ## Updating
 
-- If you pull the newest version from main, using <code>git pull</code>, it may be neccessary to regenerate your database client
+- If you pull the newest version from main, using <code>git pull</code>, it may be necessary to regenerate your database client
 - You can do this by running the generate command in /packages/prisma:
   ```sh
   npx prisma generate
   ```
-- This is not neccessary on first clone
+- This is not necessary on first clone
 
-# Creating your own signging certificate
+# Creating your own signing certificate
 
-For the digital signature of you documents you need a signign certificate in .p12 formate (public and private key). You can buy one (not recommended for dev) or use the steps to create a self-signed one:
+For the digital signature of your documents you need a signing certificate in .p12 formate (public and private key). You can buy one (not recommended for dev) or use the steps to create a self-signed one:
 
 1. Generate a private key using the OpenSSL command. You can run the following command to generate a 2048-bit RSA key:\
    <code>openssl genrsa -out private.key 2048</code>
