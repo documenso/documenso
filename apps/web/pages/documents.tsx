@@ -27,7 +27,13 @@ const DocumentsPage: NextPageWithLayout = (props: any) => {
   const [filteredDocuments, setFilteredDocuments] = useState([]);
 
   const [loading, setLoading] = useState(true);
-  const statusFilters = [
+
+  type statusFilterType = {
+    label: string;
+    value: DocumentStatus | "ALL";
+  };
+
+  const statusFilters: statusFilterType[] = [
     { label: "All", value: "ALL" },
     { label: "Draft", value: "DRAFT" },
     { label: "Waiting for others", value: "PENDING" },
@@ -81,6 +87,20 @@ const DocumentsPage: NextPageWithLayout = (props: any) => {
     );
 
     return filteredDocuments;
+  }
+
+  function handleStatusFilterChange(status: statusFilterType) {
+    router.replace(
+      {
+        pathname: router.pathname,
+        query: { filter: status.value },
+      },
+      undefined,
+      {
+        shallow: true, // Perform a shallow update, without reloading the page
+      }
+    );
+    setSelectedStatusFilter(status);
   }
 
   function wasXDaysAgoOrLess(documentDate: Date, lastXDays: number): boolean {
@@ -138,7 +158,7 @@ const DocumentsPage: NextPageWithLayout = (props: any) => {
             label="Status"
             options={statusFilters}
             value={selectedStatusFilter}
-            onChange={setSelectedStatusFilter}
+            onChange={handleStatusFilterChange}
           />
         </div>
         <div className="mt-20 max-w-[1100px]" hidden={!loading}>
