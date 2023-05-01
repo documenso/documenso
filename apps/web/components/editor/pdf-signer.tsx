@@ -80,12 +80,11 @@ export default function PDFSigner(props: any) {
                 : props.document.User.email}{" "}
               would like you to sign this document.
             </p>
-            <p className="mt-3 text-sm md:mt-0 md:ml-6">
+            <p className="mt-3 text-sm md:mt-0 md:ml-6 text-right md:text-inherit">
               <Button
                 disabled={!signingDone}
                 color="secondary"
                 icon={CheckBadgeIcon}
-                className="float-right"
                 onClick={() => {
                   signDocument(props.document, localSignatures, `${router.query.token}`).then(
                     () => {

@@ -63,6 +63,7 @@ async function postHandler(req: NextApiRequest, res: NextApiResponse) {
     },
     data: {
       signingStatus: SigningStatus.SIGNED,
+      signedAt: new Date(),
     },
   });
 
@@ -86,7 +87,11 @@ async function postHandler(req: NextApiRequest, res: NextApiResponse) {
     where: {
       documentId: document.id,
       type: { in: [FieldType.DATE, FieldType.TEXT] },
+      recipientId: { in: signedRecipients.map((r) => r.id) },
     },
+    include: {
+      Recipient: true,
+    }
   });
 
   // Insert fields other than signatures
@@ -98,7 +103,7 @@ async function postHandler(req: NextApiRequest, res: NextApiResponse) {
             month: "long",
             day: "numeric",
             year: "numeric",
-          }).format(new Date())
+          }).format(field.Recipient?.signedAt ?? new Date())
         : field.customText || "",
       field.positionX,
       field.positionY,

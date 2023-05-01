@@ -1,4 +1,4 @@
-import { ReactElement } from "react";
+import { ChangeEvent, ReactElement } from "react";
 import Head from "next/head";
 import Link from "next/link";
 import { uploadDocument } from "@documenso/features";
@@ -62,26 +62,27 @@ const DashboardPage: NextPageWithLayout = (props: any) => {
         <dl className="mt-8 grid gap-5 md:grid-cols-3 ">
           {stats.map((item) => (
             <Link href={item.link} key={item.name}>
-              <div className="overflow-hidden rounded-lg bg-white px-4 py-3 shadow sm:py-5 md:p-6">
-                <dt className="truncate text-sm font-medium text-gray-500 ">
+              <div className="overflow-hidden rounded-lg bg-white px-4 py-3 shadow hover:shadow-lg duration-300 sm:py-5 md:p-6">
+                <dt className="truncate text-sm font-medium text-gray-700 ">
                   <item.icon
-                    className="text-neon mr-3 inline h-5 w-5 flex-shrink-0 sm:h-6 sm:w-6"
+                    className="text-neon-600 mr-3 inline h-5 w-5 flex-shrink-0 sm:h-6 sm:w-6"
                     aria-hidden="true"></item.icon>
                   {item.name}
                 </dt>
-                <dd className="mt-1 text-2xl font-semibold tracking-tight text-gray-900 sm:text-3xl">
+                <dd className="mt-3 text-2xl font-semibold tracking-tight text-gray-900 sm:text-3xl">
                   {getStat(item.name, props)}
                 </dd>
               </div>
             </Link>
           ))}
         </dl>
+
         <div className="mt-12">
           <input
             id="fileUploadHelper"
             type="file"
             accept="application/pdf"
-            onChange={(event: any) => {
+            onChange={(event: ChangeEvent) => {
               uploadDocument(event);
             }}
             hidden
@@ -91,9 +92,10 @@ const DashboardPage: NextPageWithLayout = (props: any) => {
           onClick={() => {
             document?.getElementById("fileUploadHelper")?.click();
           }}
-          className="hover:border-neon relative block w-full cursor-pointer rounded-lg border-2 border-dashed border-gray-300 p-12 text-center focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+          className="group hover:border-neon-600 duration-200 relative block w-full cursor-pointer rounded-lg border-2 border-dashed border-gray-300 p-12 text-center focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+          
           <svg
-            className="mx-auto h-12 w-12 text-gray-400"
+            className="mx-auto h-12 w-12 text-gray-400 group-hover:text-gray-700 duration-200"
             stroke="currentColor"
             fill="none"
             viewBox="0 00 20 25"
@@ -104,7 +106,8 @@ const DashboardPage: NextPageWithLayout = (props: any) => {
               d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m3.75 9v6m3-3H9m1.5-12H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"
             />
           </svg>
-          <span id="add_document" className="text-neon mt-2 block text-sm font-medium">
+
+          <span id="add_document" className="text-gray-500 group-hover:text-neon-700 mt-2 block text-sm font-medium duration-200">
             Add a new PDF document.
           </span>
         </div>
