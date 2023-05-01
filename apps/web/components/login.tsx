@@ -111,7 +111,7 @@ export default function Login(props: any) {
               </div>
               <div className="flex items-center justify-between">
                 <div className="text-sm">
-                  <a href="#" className="text-neon hover:text-neon font-medium">
+                  <a href="#" className="text-gray-500 hover:text-neon-700 font-medium">
                     Forgot your password?
                   </a>
                 </div>
@@ -123,7 +123,7 @@ export default function Login(props: any) {
                   className="group relative flex w-full">
                   <span className="absolute inset-y-0 left-0 flex items-center pl-3">
                     <LockClosedIcon
-                      className="text-neon-dark group-hover:text-neon h-5 w-5 disabled:disabled:bg-gray-600 disabled:group-hover:bg-gray-600"
+                      className="text-neon-700 group-hover:text-neon-dark-700 h-5 w-5 disabled:disabled:bg-gray-600 disabled:group-hover:bg-gray-600 duration-200"
                       aria-hidden="true"
                     />
                   </span>
@@ -141,7 +141,7 @@ export default function Login(props: any) {
               {props.allowSignup ? (
                 <p className="mt-2 text-center text-sm text-gray-600">
                   Are you new here?{" "}
-                  <Link href="/signup" className="text-neon hover:text-neon font-medium">
+                  <Link href="/signup" className="text-gray-500 hover:text-neon-700 duration-200 font-medium">
                     Create a new Account
                   </Link>
                 </p>

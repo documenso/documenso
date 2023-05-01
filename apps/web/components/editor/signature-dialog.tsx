@@ -89,7 +89,7 @@ export default function SignatureDialog(props: any) {
                     </div>
                     {isCurrentTab("Type") ? (
                       <div>
-                        <div className="my-8 mb-3 border-b border-gray-300">
+                        <div className="my-7 mb-3 border-b border-gray-300">
                           <input
                             value={typedSignature}
                             onChange={(e) => {
@@ -102,7 +102,7 @@ export default function SignatureDialog(props: any) {
                             placeholder="Kindly type your name"
                           />
                         </div>
-                        <div className="float-right">
+                        <div className="flex flex-row-reverse items-center gap-x-3">
                           <Button
                             color="secondary"
                             onClick={() => {
@@ -145,34 +145,40 @@ export default function SignatureDialog(props: any) {
                             }}
                           />
                         )}
-                        <IconButton
-                          className="float-left block"
-                          icon={TrashIcon}
-                          onClick={() => {
-                            signCanvasRef?.clear();
-                            setSignatureEmpty(signCanvasRef?.isEmpty());
-                          }}></IconButton>
-                        <div className="float-right mt-10">
-                          <Button
-                            color="secondary"
+                        
+                        <div className="flex items-center justify-between">
+                          <IconButton
+                            className="block"
+                            icon={TrashIcon}
                             onClick={() => {
-                              props.onClose();
-                              props.setOpen(false);
-                              setCurrent(tabs[0]);
-                            }}>
-                            Cancel
-                          </Button>
-                          <Button
-                            className="ml-3"
-                            onClick={() => {
-                              props.onClose({
-                                type: "draw",
-                                signatureImage: signCanvasRef.toDataURL("image/png"),
-                              });
+                              signCanvasRef?.clear();
+                              setSignatureEmpty(signCanvasRef?.isEmpty());
                             }}
-                            disabled={signatureEmpty}>
-                            Sign
-                          </Button>
+                          />
+
+                          <div className="flex flex-row-reverse items-center gap-x-3">
+                            <Button
+                              color="secondary"
+                              onClick={() => {
+                                props.onClose();
+                                props.setOpen(false);
+                                setCurrent(tabs[0]);
+                              }}>
+                              Cancel
+                            </Button>
+
+                            <Button
+                              className="ml-3"
+                              onClick={() => {
+                                props.onClose({
+                                  type: "draw",
+                                  signatureImage: signCanvasRef.toDataURL("image/png"),
+                                });
+                              }}
+                              disabled={signatureEmpty}>
+                              Sign
+                            </Button>
+                          </div>
                         </div>
                       </div>
                     ) : (

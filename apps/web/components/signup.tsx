@@ -187,7 +187,7 @@ export default function Signup(props: { source: string }) {
               </div>
               <p className="mt-2 text-center text-sm text-gray-600">
                 Already have an account?{" "}
-                <Link href="/login" className="text-neon hover:text-neon font-medium">
+                <Link href="/login" className="text-gray-500 hover:text-neon-700 font-medium">
                   Sign In
                 </Link>
               </p>
