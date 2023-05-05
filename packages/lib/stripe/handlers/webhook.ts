@@ -1,0 +1,155 @@
+import prisma from "@documenso/prisma";
+import { SubscriptionStatus } from "@prisma/client";
+import { NextApiRequest, NextApiResponse } from "next";
+import Stripe from "stripe";
+import { stripe } from "../index";
+
+export const webhookHandler = async (req: NextApiRequest, res: NextApiResponse) => {
+  if (!process.env.NEXT_PUBLIC_ALLOW_SUBSCRIPTIONS) {
+    return res.status(500).json({
+      success: false,
+      message: "Subscriptions are not enabled",
+    });
+  }
+
+  const sig =
+    typeof req.headers["stripe-signature"] === "string" ? req.headers["stripe-signature"] : "";
+
+  if (!sig) {
+    return res.status(400).json({
+      success: false,
+      message: "No signature found in request",
+    });
+  }
+
+  const event = stripe.webhooks.constructEvent(req.body, sig, process.env.STRIPE_WEBHOOK_SECRET!);
+
+  if (event.type === "checkout.session.completed") {
+    const session = event.data.object as Stripe.Checkout.Session;
+
+    const subscription = await stripe.subscriptions.retrieve(session.subscription as string);
+
+    const customerId =
+      typeof subscription.customer === "string" ? subscription.customer : subscription.customer?.id;
+
+    await prisma.subscription.upsert({
+      where: {
+        customerId,
+      },
+      create: {
+        customerId,
+        status: SubscriptionStatus.ACTIVE,
+        planId: subscription.id,
+        priceId: subscription.items.data[0].price.id,
+        periodEnd: new Date(subscription.current_period_end * 1000),
+        userId: Number(session.client_reference_id as string),
+      },
+      update: {
+        customerId,
+        status: SubscriptionStatus.ACTIVE,
+        planId: subscription.id,
+        priceId: subscription.items.data[0].price.id,
+        periodEnd: new Date(subscription.current_period_end * 1000),
+      },
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: "Webhook received",
+    });
+  }
+
+  if (event.type === "invoice.payment_succeeded") {
+    const invoice = event.data.object as Stripe.Invoice;
+
+    const customerId =
+      typeof invoice.customer === "string" ? invoice.customer : invoice.customer?.id;
+
+    const subscription = await stripe.subscriptions.retrieve(invoice.subscription as string);
+
+    await prisma.subscription.update({
+      where: {
+        customerId,
+      },
+      data: {
+        status: SubscriptionStatus.ACTIVE,
+        planId: subscription.id,
+        priceId: subscription.items.data[0].price.id,
+        periodEnd: new Date(subscription.current_period_end * 1000),
+      },
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: "Webhook received",
+    });
+  }
+
+  if (event.type === "invoice.payment_failed") {
+    const failedInvoice = event.data.object as Stripe.Invoice;
+
+    const customerId = failedInvoice.customer as string;
+
+    await prisma.subscription.update({
+      where: {
+        customerId,
+      },
+      data: {
+        status: SubscriptionStatus.PAST_DUE,
+      },
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: "Webhook received",
+    });
+  }
+
+  if (event.type === "customer.subscription.updated") {
+    const updatedSubscription = event.data.object as Stripe.Subscription;
+
+    const customerId = updatedSubscription.customer as string;
+
+    await prisma.subscription.update({
+      where: {
+        customerId,
+      },
+      data: {
+        status: SubscriptionStatus.ACTIVE,
+        planId: updatedSubscription.id,
+        priceId: updatedSubscription.items.data[0].price.id,
+        periodEnd: new Date(updatedSubscription.current_period_end * 1000),
+      },
+    })
+
+    return res.status(200).json({
+      success: true,
+      message: "Webhook received",
+    });
+  }
+
+  if (event.type === "customer.subscription.deleted") {
+    const deletedSubscription = event.data.object as Stripe.Subscription;
+
+    const customerId = deletedSubscription.customer as string;
+
+    await prisma.subscription.update({
+      where: {
+        customerId,
+      },
+      data: {
+        status: SubscriptionStatus.INACTIVE,
+      },
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: "Webhook received",
+    });
+  }
+
+  return res.status(400).json({
+    success: false,
+    message: "Unhandled webhook event",
+  });
+};

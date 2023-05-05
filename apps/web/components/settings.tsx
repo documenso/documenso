@@ -5,7 +5,7 @@ import { useRouter } from "next/router";
 import { updateUser } from "@documenso/features";
 import { getUser } from "@documenso/lib/api";
 import { Button } from "@documenso/ui";
-import { KeyIcon, UserCircleIcon } from "@heroicons/react/24/outline";
+import { CreditCardIcon, KeyIcon, UserCircleIcon } from "@heroicons/react/24/outline";
 import { useSession } from "next-auth/react";
 
 const subNavigation = [
@@ -21,6 +21,12 @@ const subNavigation = [
     icon: KeyIcon,
     current: false,
   },
+  {
+    name: "Billing",
+    href: "/settings/billing",
+    icon: CreditCardIcon,
+    current: false,
+  },
 ];
 
 function classNames(...classes: any) {
@@ -33,7 +39,6 @@ export default function Setttings() {
     email: "",
     name: "",
   });
-
   useEffect(() => {
     getUser().then((res: any) => {
       res.json().then((j: any) => {
@@ -158,6 +163,7 @@ export default function Setttings() {
                 <Button onClick={() => updateUser(user)}>Save</Button>
               </div>
             </form>
+
             <div
               hidden={subNavigation.filter((e) => e.current)[0]?.name !== subNavigation[1].name}
               className="min-h-[251px] divide-y divide-gray-200 lg:col-span-9">
@@ -171,9 +177,33 @@ export default function Setttings() {
                 </div>
               </div>
             </div>
+
+            <div
+              hidden={subNavigation.filter((e) => e.current)[0]?.name !== subNavigation?.[2]?.name}
+              className="min-h-[251px] divide-y divide-gray-200 lg:col-span-9">
+              {/* Billing section */}
+              <div className="py-6 px-4 sm:p-6 lg:pb-8">
+                <div>
+                  <h2 className="text-lg font-medium leading-6 text-gray-900">Billing</h2>
+                  <p className="mt-1 text-sm text-gray-500">
+                    Your subscription is currently <strong>{user?.subscription ? 'Active' : 'Inactive'}</strong>.
+                  </p>
+
+                  <p className="mt-1 text-sm text-gray-500">
+                    We use Stripe to process payments. Your card details are never stored on our
+                    servers.
+                  </p>
+
+                  <div className="mt-8">
+                    <Button onClick={() => {}}>Manage my subscription</Button>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
+
       <div className="mt-10 max-w-[1100px]" hidden={!!user.email}>
         <div className="ph-item">
           <div className="ph-col-12">
