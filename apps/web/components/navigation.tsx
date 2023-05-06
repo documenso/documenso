@@ -1,7 +1,7 @@
 import { Fragment, useEffect, useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { getUser } from "@documenso/lib/api";
 import Logo from "./logo";
 import { Disclosure, Menu, Transition } from "@headlessui/react";
 import {
@@ -75,26 +75,20 @@ function classNames(...classes: any) {
   return classes.filter(Boolean).join(" ");
 }
 
-type UserType = {
-  id?: number | undefined;
-  name?: string | null;
-  email?: string | null;
-  image?: string | null;
-};
-
 export default function TopNavigation() {
   const router = useRouter();
   const session = useSession();
   const [user, setUser] = useState({
     email: "",
     name: "",
+    image: "",
   });
 
   useEffect(() => {
-    getUser().then((res) => {
-      res.json().then((j: any) => {
-        setUser(j);
-      });
+    setUser({
+      email: session.data?.user.email || "",
+      name: session.data?.user.name || "",
+      image: session.data?.user.image || "",
     });
   }, [session]);
 
@@ -150,12 +144,23 @@ export default function TopNavigation() {
                         id="mb"
                         className="flex max-w-xs items-center rounded-full bg-white text-sm">
                         <span className="sr-only">Open user menu</span>
-                        <div
-                          key={user?.email}
-                          dangerouslySetInnerHTML={{
-                            __html: avatarFromInitials(user?.name || "" || "", 40),
-                          }}
-                        />
+
+                        {user.image ? (
+                          <Image
+                            alt="Profile"
+                            src={user.image}
+                            className="h-11 w-11 rounded-full"
+                            width={40}
+                            height={40}
+                          />
+                        ) : (
+                          <div
+                            key={user?.email}
+                            dangerouslySetInnerHTML={{
+                              __html: avatarFromInitials(user?.name || "" || "", 40),
+                            }}
+                          />
+                        )}
                       </Menu.Button>
                     </div>
                     <Transition

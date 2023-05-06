@@ -4,6 +4,14 @@ require("dotenv").config({ path: "../../.env" });
 const nextConfig = {
   reactStrictMode: true,
   swcMinify: false,
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "*.googleusercontent.com",
+      },
+    ],
+  },
 };
 
 const withTM = require("next-transpile-modules")([
