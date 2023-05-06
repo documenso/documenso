@@ -2,6 +2,7 @@ import { ChangeEvent, ReactElement } from "react";
 import Head from "next/head";
 import Link from "next/link";
 import { uploadDocument } from "@documenso/features";
+import { getSession } from "@documenso/lib/auth";
 import { getDocumentsForUserFromToken } from "@documenso/lib/query";
 import { getUserFromToken } from "@documenso/lib/server";
 import Layout from "../components/layout";
@@ -62,7 +63,7 @@ const DashboardPage: NextPageWithLayout = (props: any) => {
         <dl className="mt-8 grid gap-5 md:grid-cols-3 ">
           {stats.map((item) => (
             <Link href={item.link} key={item.name}>
-              <div className="overflow-hidden rounded-lg bg-white px-4 py-3 shadow hover:shadow-lg duration-300 sm:py-5 md:p-6">
+              <div className="overflow-hidden rounded-lg bg-white px-4 py-3 shadow duration-300 hover:shadow-lg sm:py-5 md:p-6">
                 <dt className="truncate text-sm font-medium text-gray-700 ">
                   <item.icon
                     className="text-neon-600 mr-3 inline h-5 w-5 flex-shrink-0 sm:h-6 sm:w-6"
@@ -92,10 +93,9 @@ const DashboardPage: NextPageWithLayout = (props: any) => {
           onClick={() => {
             document?.getElementById("fileUploadHelper")?.click();
           }}
-          className="group hover:border-neon-600 duration-200 relative block w-full cursor-pointer rounded-lg border-2 border-dashed border-gray-300 p-12 text-center focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
-          
+          className="hover:border-neon-600 group relative block w-full cursor-pointer rounded-lg border-2 border-dashed border-gray-300 p-12 text-center duration-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
           <svg
-            className="mx-auto h-12 w-12 text-gray-400 group-hover:text-gray-700 duration-200"
+            className="mx-auto h-12 w-12 text-gray-400 duration-200 group-hover:text-gray-700"
             stroke="currentColor"
             fill="none"
             viewBox="0 00 20 25"
@@ -107,7 +107,9 @@ const DashboardPage: NextPageWithLayout = (props: any) => {
             />
           </svg>
 
-          <span id="add_document" className="text-gray-500 group-hover:text-neon-700 mt-2 block text-sm font-medium duration-200">
+          <span
+            id="add_document"
+            className="group-hover:text-neon-700 mt-2 block text-sm font-medium text-gray-500 duration-200">
             Add a new PDF document.
           </span>
         </div>

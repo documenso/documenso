@@ -82,11 +82,12 @@ export default NextAuth({
         ...token,
       };
     },
-    async session({ session, token }) {
+    async session({ session, token, user }) {
       const documensoSession: Session = {
         ...session,
         user: {
           ...session.user,
+          id: +user.id,
         },
       };
 
