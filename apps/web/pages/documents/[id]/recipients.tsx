@@ -21,6 +21,7 @@ import {
 import { DocumentStatus, Document as PrismaDocument, Recipient } from "@prisma/client";
 import { FormProvider, useFieldArray, useForm, useWatch } from "react-hook-form";
 import { toast } from "react-hot-toast";
+import { useSubscription } from "@documenso/lib/stripe";
 
 export type FormValues = {
   signers: Array<Pick<Recipient, 'id' | 'email' | 'name' | 'sendStatus' | 'readStatus' | 'signingStatus'>>;
@@ -29,6 +30,7 @@ export type FormValues = {
 type FormSigner = FormValues["signers"][number];
 
 const RecipientsPage: NextPageWithLayout = (props: any) => {
+  const { hasSubscription } = useSubscription();
   const title: string = `"` + props?.document?.title + `"` + "Recipients | Documenso";
   const breadcrumbItems = [
     {
@@ -116,6 +118,7 @@ const RecipientsPage: NextPageWithLayout = (props: any) => {
                       : setOpen(true);
                   }}
                   disabled={
+                    !hasSubscription || 
                     (formValues.length || 0) === 0 ||
                     !formValues.some(
                       (r) => r.email && !hasEmailError(r) && r.sendStatus === "NOT_SENT"

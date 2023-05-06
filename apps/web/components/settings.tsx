@@ -4,9 +4,18 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import { updateUser } from "@documenso/features";
 import { getUser } from "@documenso/lib/api";
+import {
+  STRIPE_PLANS,
+  fetchCheckoutSession,
+  fetchPortalSession,
+  isSubscriptionsEnabled,
+  useSubscription,
+} from "@documenso/lib/stripe";
+import { SubscriptionStatus } from '@prisma/client'
 import { Button } from "@documenso/ui";
 import { CreditCardIcon, KeyIcon, UserCircleIcon } from "@heroicons/react/24/outline";
 import { useSession } from "next-auth/react";
+import { BillingPlans } from "./billing-plans";
 
 const subNavigation = [
   {
@@ -35,6 +44,7 @@ function classNames(...classes: any) {
 
 export default function Setttings() {
   const session = useSession();
+  const { subscription, hasSubscription } = useSubscription();
   const [user, setUser] = useState({
     email: "",
     name: "",
@@ -179,24 +189,63 @@ export default function Setttings() {
             </div>
 
             <div
-              hidden={subNavigation.filter((e) => e.current)[0]?.name !== subNavigation?.[2]?.name}
+              hidden={
+                subNavigation.find((e) => e.current)?.name !== subNavigation?.[2]?.name
+              }
               className="min-h-[251px] divide-y divide-gray-200 lg:col-span-9">
               {/* Billing section */}
               <div className="py-6 px-4 sm:p-6 lg:pb-8">
                 <div>
                   <h2 className="text-lg font-medium leading-6 text-gray-900">Billing</h2>
+
+                  {!isSubscriptionsEnabled() && (
+                    <p className="mt-2 text-sm text-gray-500">
+                      Subscriptions are not enabled on this instance, you have nothing to do here.
+                    </p>
+                  )}
+
+                  {isSubscriptionsEnabled() && <>
                   <p className="mt-1 text-sm text-gray-500">
-                    Your subscription is currently <strong>{user?.subscription ? 'Active' : 'Inactive'}</strong>.
+                    Your subscription is currently{" "}
+                    <strong>{subscription?.status && subscription?.status !== SubscriptionStatus.INACTIVE ? "Active" : "Inactive"}</strong>.
                   </p>
 
+                  {subscription?.status === SubscriptionStatus.PAST_DUE && (
+                    <p className="mt-1 text-sm text-red-500">
+                      Your subscription is past due. Please update your payment details to continue
+                      using the service without interruption.
+                    </p>
+                  )}
+
                   <p className="mt-1 text-sm text-gray-500">
-                    We use Stripe to process payments. Your card details are never stored on our
-                    servers.
+                    Lorem ipsum dolor sit amet consectetur adipisicing elit. Est consectetur magnam
+                    illo aperiam expedita porro eos eum nam sapiente.
                   </p>
 
-                  <div className="mt-8">
-                    <Button onClick={() => {}}>Manage my subscription</Button>
-                  </div>
+                    <div className="mt-8">
+                      <div className="grid grid-cols-1 lg:grid-cols-2">
+
+                    <BillingPlans />
+                      </div>
+
+                    {subscription && (
+                      <Button
+                        onClick={() => {
+                          if (isSubscriptionsEnabled() && subscription?.customerId) {
+                            fetchPortalSession({
+                              id: subscription.customerId,
+                            }).then((res) => {
+                              if (res.success) {
+                                window.location.href = res.url;
+                              }
+                            });
+                          }
+                        }}>
+                        Manage my subscription
+                      </Button>
+                    )}
+                    </div>
+                    </>}
                 </div>
               </div>
             </div>
