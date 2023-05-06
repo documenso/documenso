@@ -1,5 +1,6 @@
 import { NextApiRequest, NextApiResponse } from "next";
-import { stripe } from "../index";
+import { stripe } from "../client";
+
 
 export type PortalSessionRequest = {
   body: {
@@ -43,7 +44,7 @@ export const portalSessionHandler = async (req: NextApiRequest, res: NextApiResp
 
   const session = await stripe.billingPortal.sessions.create({
     customer: id,
-    return_url: `${process.env.NEXT_PUBLIC_BASE_URL}/settings/billing`,
+    return_url: `${process.env.NEXT_PUBLIC_WEBAPP_URL}/settings/billing`,
   });
 
   return res.status(200).json({

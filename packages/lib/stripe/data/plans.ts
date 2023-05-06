@@ -1,12 +1,14 @@
 export const STRIPE_PLANS = [
   {
-    name: "Community Plan",
+    name: "Community Plan (Monthly)",
     period: "monthly",
-    priceId: process.env.STRIPE_COMMUNITY_PLAN_MONTHLY_PRICE_ID ?? "",
+    price: 30,
+    priceId: process.env.NEXT_PUBLIC_STRIPE_COMMUNITY_PLAN_MONTHLY_PRICE_ID ?? "",
   },
   {
-    name: "Community Plan",
+    name: "Community Plan (Yearly)",
     period: "yearly",
-    priceId: process.env.STRIPE_COMMUNITY_PLAN_YEARLY_PRICE_ID ?? "",
+    price: 300,
+    priceId: process.env.NEXT_PUBLIC_STRIPE_COMMUNITY_PLAN_YEARLY_PRICE_ID ?? "",
   },
 ];

@@ -1,11 +1,11 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import prisma from "@documenso/prisma";
-import { stripe } from "../index";
+import { stripe } from "../client";
 import { getToken } from "next-auth/jwt";
 
 export type CheckoutSessionRequest = {
   body: {
-    id: string;
+    id?: string;
     priceId: string;
   };
 };
@@ -61,7 +61,7 @@ export const checkoutSessionHandler = async (req: NextApiRequest, res: NextApiRe
 
   const { id, priceId } = req.body;
 
-  if (typeof id !== "string" || typeof priceId !== "string") {
+  if (typeof priceId !== "string") {
     return res.status(400).json({
       success: false,
       message: "No id or priceId found in request",
@@ -70,6 +70,7 @@ export const checkoutSessionHandler = async (req: NextApiRequest, res: NextApiRe
 
   const session = await stripe.checkout.sessions.create({
     customer: id,
+    customer_email: user.email,
     client_reference_id: String(user.id),
     payment_method_types: ["card"],
     line_items: [
@@ -80,8 +81,8 @@ export const checkoutSessionHandler = async (req: NextApiRequest, res: NextApiRe
     ],
     mode: "subscription",
     allow_promotion_codes: true,
-    success_url: `${process.env.NEXT_PUBLIC_BASE_URL}/settings/billing?success=true`,
-    cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL}/settings/billing?canceled=true`,
+    success_url: `${process.env.NEXT_PUBLIC_WEBAPP_URL}/settings/billing?success=true`,
+    cancel_url: `${process.env.NEXT_PUBLIC_WEBAPP_URL}/settings/billing?canceled=true`,
   });
 
   return res.status(200).json({

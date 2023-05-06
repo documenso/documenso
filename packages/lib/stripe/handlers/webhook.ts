@@ -1,8 +1,11 @@
-import prisma from "@documenso/prisma";
-import { SubscriptionStatus } from "@prisma/client";
 import { NextApiRequest, NextApiResponse } from "next";
+import prisma from "@documenso/prisma";
+import { stripe } from "../client";
+import { SubscriptionStatus } from "@prisma/client";
+import { buffer } from "micro";
 import Stripe from "stripe";
-import { stripe } from "../index";
+
+const log = (...args: any[]) => console.log("[stripe]", ...args);
 
 export const webhookHandler = async (req: NextApiRequest, res: NextApiResponse) => {
   if (!process.env.NEXT_PUBLIC_ALLOW_SUBSCRIPTIONS) {
@@ -22,7 +25,12 @@ export const webhookHandler = async (req: NextApiRequest, res: NextApiResponse) 
     });
   }
 
-  const event = stripe.webhooks.constructEvent(req.body, sig, process.env.STRIPE_WEBHOOK_SECRET!);
+  log("constructing body...")
+  const body = await buffer(req);
+  log("constructed body")
+
+  const event = stripe.webhooks.constructEvent(body, sig, process.env.STRIPE_WEBHOOK_SECRET!);
+  log("event-type:", event.type);
 
   if (event.type === "checkout.session.completed") {
     const session = event.data.object as Stripe.Checkout.Session;
@@ -120,7 +128,7 @@ export const webhookHandler = async (req: NextApiRequest, res: NextApiResponse) 
         priceId: updatedSubscription.items.data[0].price.id,
         periodEnd: new Date(updatedSubscription.current_period_end * 1000),
       },
-    })
+    });
 
     return res.status(200).json({
       success: true,
@@ -148,6 +156,7 @@ export const webhookHandler = async (req: NextApiRequest, res: NextApiResponse) 
     });
   }
 
+  log("Unhandled webhook event", event.type);
   return res.status(400).json({
     success: false,
     message: "Unhandled webhook event",
