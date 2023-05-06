@@ -13,6 +13,7 @@ import {
   CheckBadgeIcon,
   CheckIcon,
   ClipboardDocumentIcon,
+  ClipboardIcon,
   EnvelopeIcon,
   PaperAirplaneIcon,
   PencilSquareIcon,
@@ -242,6 +243,15 @@ const RecipientsPage: NextPageWithLayout = (props: any) => {
                                   id="sent_icon"
                                   className="mt-3 inline-block flex-shrink-0 rounded-full bg-yellow-200 px-2 py-0.5 text-xs font-medium text-gray-800 ">
                                   <CheckIcon className="mr-1 inline h-5" /> Sent
+                                </span>
+                              </span>
+                            ) : null}
+                            {item.sendStatus === "LINK_COPIED" && item.readStatus !== "OPENED" ? (
+                              <span id="sent_icon">
+                                <span
+                                  id="sent_icon"
+                                  className="mt-3 inline-block flex-shrink-0 rounded-full bg-yellow-200 px-2 py-0.5 text-xs font-medium text-gray-800 ">
+                                  Link Copied
                                 </span>
                               </span>
                             ) : null}
