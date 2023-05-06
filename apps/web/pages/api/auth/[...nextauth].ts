@@ -1,12 +1,13 @@
 import { ErrorCode } from "@documenso/lib/auth";
 import { verifyPassword } from "@documenso/lib/auth";
 import prisma from "@documenso/prisma";
+import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import NextAuth, { Session } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
-import GitHubProvider from "next-auth/providers/github";
+import GoogleProvider from "next-auth/providers/google";
 
 export default NextAuth({
-  secret: process.env.AUTH_SECRET,
+  secret: process.env.NEXTAUTH_SECRET,
   pages: {
     signIn: "/login",
     signOut: "/login",
@@ -69,6 +70,10 @@ export default NextAuth({
         };
       },
     }),
+    GoogleProvider({
+      clientId: process.env.GOOGLE_CLIENT_ID!,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+    }),
   ],
   callbacks: {
     async jwt({ token, user, account }) {
@@ -87,5 +92,10 @@ export default NextAuth({
       documensoSession.expires;
       return documensoSession;
     },
+    async signIn({ user, account, profile, email, credentials }) {
+      console.log(user);
+      return true;
+    },
   },
+  adapter: PrismaAdapter(prisma),
 });
