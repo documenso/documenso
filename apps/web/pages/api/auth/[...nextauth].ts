@@ -2,6 +2,7 @@ import { ErrorCode } from "@documenso/lib/auth";
 import { verifyPassword } from "@documenso/lib/auth";
 import prisma from "@documenso/prisma";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
+import { IdentityProvider } from "@prisma/client";
 import NextAuth, { Session } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
@@ -92,8 +93,22 @@ export default NextAuth({
       documensoSession.expires;
       return documensoSession;
     },
-    async signIn({ user, account, profile, email, credentials }) {
-      console.log(user);
+    async signIn({ user, account }) {
+      if (account?.provider === "google") {
+        await prisma.user
+          .update({
+            where: {
+              email: user.email!,
+            },
+            data: {
+              identityProvider: IdentityProvider.GOOGLE,
+            },
+          })
+          .then(() => {
+            return true;
+          });
+      }
+
       return true;
     },
   },

@@ -143,7 +143,9 @@ export default function Login(props: any) {
                 <Button
                   color="secondary"
                   disabled={formState.isSubmitting}
-                  onClick={() => signIn("google")}
+                  onClick={() =>
+                    signIn("google", { callbackUrl: `${NEXT_PUBLIC_WEBAPP_URL}/dashboard` })
+                  }
                   className="group relative mt-2 flex w-full ">
                   <span>
                     <svg
