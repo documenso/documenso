@@ -78,6 +78,7 @@ enum ReadStatus {
 enum SendStatus {
   NOT_SENT
   SENT
+  LINK_COPIED
 }
 
 enum SigningStatus {

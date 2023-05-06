@@ -2,6 +2,7 @@ import { ReactElement, useRef, useState } from "react";
 import Head from "next/head";
 import { NEXT_PUBLIC_WEBAPP_URL, classNames } from "@documenso/lib";
 import { createOrUpdateRecipient, deleteRecipient, sendSigningRequests } from "@documenso/lib/api";
+import { setCopiedField } from "@documenso/lib/api/";
 import { getDocument } from "@documenso/lib/query";
 import { getUserFromToken } from "@documenso/lib/server";
 import { Breadcrumb, Button, Dialog, IconButton } from "@documenso/ui";
@@ -24,7 +25,12 @@ import { FormProvider, useFieldArray, useForm, useWatch } from "react-hook-form"
 import { toast } from "react-hot-toast";
 
 export type FormValues = {
-  signers: Array<Pick<Recipient, 'id' | 'email' | 'name' | 'sendStatus' | 'readStatus' | 'signingStatus'>>;
+  signers: Array<
+    Pick<
+      Recipient,
+      "id" | "email" | "name" | "sendStatus" | "readStatus" | "signingStatus" | "token"
+    >
+  >;
 };
 
 type FormSigner = FormValues["signers"][number];
@@ -62,7 +68,7 @@ const RecipientsPage: NextPageWithLayout = (props: any) => {
     formState: { errors },
   } = form;
   const { fields, append, remove } = useFieldArray({
-    keyName: "dieldArrayId",
+    keyName: "fieldArrayId",
     name: "signers",
     control,
   });
@@ -187,9 +193,7 @@ const RecipientsPage: NextPageWithLayout = (props: any) => {
                             <p className="mt-2 text-sm text-red-600" id="email-error">
                               <XMarkIcon className="inline h-5" /> Invalid Email
                             </p>
-                          ) : (
-                            ""
-                          )}
+                          ) : null}
                         </div>
                         <div
                           className={classNames(
@@ -290,12 +294,14 @@ const RecipientsPage: NextPageWithLayout = (props: any) => {
                             <IconButton
                               icon={ClipboardDocumentIcon}
                               disabled={!item.id || loading}
-                              onClick={(e: any) => {
+                              onClick={async (e: any) => {
                                 e.preventDefault();
 
                                 navigator.clipboard.writeText(
                                   `${NEXT_PUBLIC_WEBAPP_URL}/documents/${item.id}/sign?token=${item.token}`
                                 );
+
+                                await setCopiedField(item);
 
                                 toast("Copied to clipboard", {
                                   icon: "📋",
