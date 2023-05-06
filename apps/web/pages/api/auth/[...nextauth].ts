@@ -4,10 +4,11 @@ import prisma from "@documenso/prisma";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import { IdentityProvider } from "@prisma/client";
 import NextAuth, { Session } from "next-auth";
+import type { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
 
-export default NextAuth({
+export const authOptions: NextAuthOptions = {
   secret: process.env.NEXTAUTH_SECRET,
   pages: {
     signIn: "/login",
@@ -114,4 +115,6 @@ export default NextAuth({
     },
   },
   adapter: PrismaAdapter(prisma),
-});
+};
+
+export default NextAuth(authOptions);
