@@ -2,24 +2,17 @@ import { ChangeEvent, ReactElement } from "react";
 import Head from "next/head";
 import Link from "next/link";
 import { uploadDocument } from "@documenso/features";
-import { getSession } from "@documenso/lib/auth";
 import { getDocumentsForUserFromToken } from "@documenso/lib/query";
 import { getUserFromToken } from "@documenso/lib/server";
 import Layout from "../components/layout";
 import type { NextPageWithLayout } from "./_app";
-import {
-  CheckBadgeIcon,
-  DocumentIcon,
-  ExclamationTriangleIcon,
-  UsersIcon,
-} from "@heroicons/react/24/outline";
+import { CheckBadgeIcon, DocumentIcon, UsersIcon } from "@heroicons/react/24/outline";
 import {
   DocumentStatus,
   Document as PrismaDocument,
   SendStatus,
   SigningStatus,
 } from "@prisma/client";
-import { truncate } from "fs";
 import { Tooltip as ReactTooltip } from "react-tooltip";
 
 type FormValues = {

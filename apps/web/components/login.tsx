@@ -30,6 +30,7 @@ export default function Login(props: any) {
 
   const onSubmit = async (values: LoginValues) => {
     setErrorMessage(null);
+
     const res = await toast.promise(
       signIn<"credentials">("credentials", {
         ...values,
@@ -142,7 +143,6 @@ export default function Login(props: any) {
 
                 <Button
                   color="secondary"
-                  disabled={formState.isSubmitting}
                   onClick={() =>
                     signIn("google", { callbackUrl: `${NEXT_PUBLIC_WEBAPP_URL}/dashboard` })
                   }

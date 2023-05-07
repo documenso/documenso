@@ -10,6 +10,9 @@ import GoogleProvider from "next-auth/providers/google";
 
 export const authOptions: NextAuthOptions = {
   secret: process.env.NEXTAUTH_SECRET,
+  session: {
+    strategy: "jwt",
+  },
   pages: {
     signIn: "/login",
     signOut: "/login",
@@ -88,7 +91,7 @@ export const authOptions: NextAuthOptions = {
         ...session,
         user: {
           ...session.user,
-          id: +user.id,
+          id: Number(token.sub),
         },
       };
 

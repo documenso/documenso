@@ -2,7 +2,7 @@ import { NextPageContext } from "next";
 import { getSession } from "next-auth/react";
 
 function RedirectPage() {
-  return;
+  return <></>;
 }
 
 export async function getServerSideProps(context: NextPageContext) {
