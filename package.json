@@ -29,7 +29,6 @@
     "avatar-from-initials": "^1.0.3",
     "bcryptjs": "^2.4.3",
     "next": "13.2.4",
-    "next-auth": "^4.22.1",
     "pdf-lib": "^1.17.1",
     "react": "18.2.0",
     "react-dom": "18.2.0",

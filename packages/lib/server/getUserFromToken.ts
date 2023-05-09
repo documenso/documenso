@@ -3,18 +3,11 @@ import prisma from "@documenso/prisma";
 import { authOptions } from "../../../apps/web/pages/api/auth/[...nextauth]";
 import { User as PrismaUser } from "@prisma/client";
 import { getToken } from "next-auth/jwt";
-import { getServerSession } from "next-auth/next";
 
 export async function getUserFromToken(
   req: NextApiRequest,
   res: NextApiResponse
 ): Promise<PrismaUser | null> {
-  const oauthUser = await getServerSession(req, res, authOptions);
-
-  if (oauthUser) {
-    return oauthUser.user as PrismaUser;
-  }
-
   const token = await getToken({ req });
   const tokenEmail = token?.email?.toString();
 
