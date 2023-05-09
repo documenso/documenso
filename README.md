@@ -71,7 +71,7 @@ The current project goal is to <b>[release a production ready version](https://g
 
 - To contribute please see our [contribution guide](https://github.com/documenso/documenso/blob/main/CONTRIBUTING.md).
 
-## Tools
+
 
 # Tech
 
@@ -86,7 +86,7 @@ Documenso is built using awesome open source tech including:
 - [Node SignPDF (Digital Signature)](https://github.com/vbuch/node-signpdf)
 - [React-PDF for viewing PDFs](https://github.com/wojtekmaj/react-pdf)
 - [PDF-Lib for PDF manipulation](https://github.com/Hopding/pdf-lib)
-- Check out /packages.json and /apps/web/package.json for more
+- Check out `/package.json` and `/apps/web/package.json` for more
 - Support for [opensignpdf (requires Java on server)](https://github.com/open-pdf-sign) is currently planned.
 
 # Getting Started
@@ -111,7 +111,7 @@ Want to get up and running quickly? Follow these steps:
   git clone https://github.com/documenso/documenso
   ```
 
-- Set up your .env file using the recommendations in the .env.example file.
+- Set up your `.env` file using the recommendations in the `.env.example` file.
 - Run `npm run dx` in the root directory
   - This will spin up a postgres database and inbucket mail server in docker containers.
 - Run `npm run dev` in the root directory
@@ -124,7 +124,7 @@ That's it! You should now be able to access the app at http://localhost:3000
 
 Incoming mail will be available at http://localhost:9000
 
-Your database will also be available on port `5432`. You can connect to it using your favorite database client.
+Your database will also be available on port `54320`. You can connect to it using your favorite database client.
 
 ## Developer Setup
 
@@ -150,24 +150,24 @@ Follow these steps to setup documenso on you local machine:
 ---
 
 - Optional: Seed the database using <code>npm run db-seed</code> to create a test user and document
-- Optional: Upload and sign <code>apps\web\ressources\example.pdf</code> manually to test your setup
+- Optional: Upload and sign <code>apps/web/ressources/example.pdf</code> manually to test your setup
 
 - Optional: Create your own signing certificate
-  - A demo certificate is provided in /app/web/ressources/certificate.p12
-  - To generate your own using these steps and a linux Terminal or Windows Linux Subsystem see **Create your own signing certificate**.
+  - A demo certificate is provided in `/app/web/ressources/certificate.p12`
+  - To generate your own using these steps and a Linux Terminal or Windows Subsystem for Linux (WSL) see **[Create your own signing certificate](#creating-your-own-signing-certificate)**.
 
 ## Updating
 
 - If you pull the newest version from main, using <code>git pull</code>, it may be necessary to regenerate your database client
-- You can do this by running the generate command in /packages/prisma:
+- You can do this by running the generate command in `/packages/prisma`:
   ```sh
   npx prisma generate
   ```
-- This is not necessary on first clone
+- This is not necessary on first clone.
 
 # Creating your own signing certificate
 
-For the digital signature of your documents you need a signing certificate in .p12 formate (public and private key). You can buy one (not recommended for dev) or use the steps to create a self-signed one:
+For the digital signature of your documents you need a signing certificate in .p12 format (public and private key). You can buy one (not recommended for dev) or use the steps to create a self-signed one:
 
 1. Generate a private key using the OpenSSL command. You can run the following command to generate a 2048-bit RSA key:\
    <code>openssl genrsa -out private.key 2048</code>
