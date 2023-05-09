@@ -86,7 +86,7 @@ Documenso is built using awesome open source tech including:
 - [Node SignPDF (Digital Signature)](https://github.com/vbuch/node-signpdf)
 - [React-PDF for viewing PDFs](https://github.com/wojtekmaj/react-pdf)
 - [PDF-Lib for PDF manipulation](https://github.com/Hopding/pdf-lib)
-- Check out `/packages.json` and `/apps/web/package.json` for more
+- Check out `/package.json` and `/apps/web/package.json` for more
 - Support for [opensignpdf (requires Java on server)](https://github.com/open-pdf-sign) is currently planned.
 
 # Getting Started
