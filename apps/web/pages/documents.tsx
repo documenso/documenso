@@ -143,7 +143,7 @@ const DocumentsPage: NextPageWithLayout = (props: any) => {
           </div>
         </div>
         <div className="mt-3 mb-12 flex flex-row-reverse items-center gap-x-4">
-          <div className="pt-5 block w-fit">
+          <div className="block w-fit pt-5">
             {filteredDocuments.length != 1 ? filteredDocuments.length + " Documents" : "1 Document"}
           </div>
           <SelectBox
@@ -221,13 +221,13 @@ const DocumentsPage: NextPageWithLayout = (props: any) => {
                         <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
                           {document.title || "#" + document.id}
                         </td>
-                        <td className="whitespace-nowrap inline-flex py-3 gap-x-2 gap-y-1 flex-wrap max-w-[250px] text-sm text-gray-500">
+                        <td className="inline-flex max-w-[250px] flex-wrap gap-x-2 gap-y-1 whitespace-nowrap py-3 text-sm text-gray-500">
                           {document.Recipient.map((item: any) => (
                             <div key={item.id}>
                               {item.sendStatus === "NOT_SENT" ? (
                                 <span
                                   id="sent_icon"
-                                  className="flex-shrink-0 h-6 inline-flex items-center rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-800">
+                                  className="inline-flex h-6 flex-shrink-0 items-center rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-800">
                                   {item.name ? item.name + " <" + item.email + ">" : item.email}
                                 </span>
                               ) : (
@@ -237,7 +237,7 @@ const DocumentsPage: NextPageWithLayout = (props: any) => {
                                 <span id="sent_icon">
                                   <span
                                     id="sent_icon"
-                                    className="flex-shrink-0 h-6 inline-flex items-center rounded-full bg-yellow-200 px-2 py-0.5 text-xs font-medium text-yellow-800">
+                                    className="inline-flex h-6 flex-shrink-0 items-center rounded-full bg-yellow-200 px-2 py-0.5 text-xs font-medium text-yellow-800">
                                     <EnvelopeIcon className="mr-1 inline h-4"></EnvelopeIcon>
                                     {item.name ? item.name + " <" + item.email + ">" : item.email}
                                   </span>
@@ -250,7 +250,7 @@ const DocumentsPage: NextPageWithLayout = (props: any) => {
                                 <span id="read_icon">
                                   <span
                                     id="sent_icon"
-                                    className="flex-shrink-0 h-6 inline-flex items-center rounded-full bg-yellow-200 px-2 py-0.5 text-xs font-medium text-yellow-800">
+                                    className="inline-flex h-6 flex-shrink-0 items-center rounded-full bg-yellow-200 px-2 py-0.5 text-xs font-medium text-yellow-800">
                                     <CheckIcon className="-mr-2 inline h-4"></CheckIcon>
                                     <CheckIcon className="mr-1 inline h-4"></CheckIcon>
                                     {item.name ? item.name + " <" + item.email + ">" : item.email}
@@ -261,7 +261,7 @@ const DocumentsPage: NextPageWithLayout = (props: any) => {
                               )}
                               {item.signingStatus === "SIGNED" ? (
                                 <span id="signed_icon">
-                                  <span className="flex-shrink-0 h-6 inline-flex items-center rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-800">
+                                  <span className="inline-flex h-6 flex-shrink-0 items-center rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-800">
                                     <CheckBadgeIcon className="mr-1 inline h-5"></CheckBadgeIcon>{" "}
                                     {item.email}
                                   </span>
