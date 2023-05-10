@@ -71,7 +71,9 @@ export function Dialog({
                     </DialogComponent.Title>
                     <div className="mt-2">
                       <p className="text-sm text-gray-500">
-                        {`"${document.title}" will be sent to ${unsentEmailsLength} recipients.`}
+                        {`"${document.title.length > 20 ? document.title.substring(0, 7) + "..." +
+                          document.title.substring(document.title.length - 7) : document.title}" 
+                            will be sent to ${unsentEmailsLength} recipients.`}
                       </p>
                     </div>
                   </div>
