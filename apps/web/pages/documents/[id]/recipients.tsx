@@ -4,7 +4,7 @@ import { NEXT_PUBLIC_WEBAPP_URL, classNames } from "@documenso/lib";
 import { createOrUpdateRecipient, deleteRecipient, sendSigningRequests } from "@documenso/lib/api";
 import { getDocument } from "@documenso/lib/query";
 import { getUserFromToken } from "@documenso/lib/server";
-import { Breadcrumb, Button, Dialog, IconButton } from "@documenso/ui";
+import { Breadcrumb, Button, Dialog, IconButton, Tooltip } from "@documenso/ui";
 import Layout from "../../../components/layout";
 import { NextPageWithLayout } from "../../_app";
 import {
@@ -264,38 +264,46 @@ const RecipientsPage: NextPageWithLayout = (props: any) => {
                         </div>
                         {props.document.status !== DocumentStatus.COMPLETED && (
                           <div className="mr-1 flex">
-                            <IconButton
-                              icon={PaperAirplaneIcon}
-                              disabled={
-                                !item.id ||
-                                item.sendStatus !== "SENT" ||
-                                item.signingStatus === "SIGNED" ||
-                                loading
-                              }
-                              color="secondary"
-                              className="my-auto mr-4 h-9"
-                              onClick={() => {
-                                if (confirm("Resend this signing request?")) {
-                                  setLoading(true);
-                                  sendSigningRequests(props.document, [item.id]).finally(() => {
-                                    setLoading(false);
-                                  });
+                            <Tooltip label="Resend">
+                              <IconButton
+                                icon={PaperAirplaneIcon}
+                                disabled={
+                                  !item.id ||
+                                  item.sendStatus !== "SENT" ||
+                                  item.signingStatus === "SIGNED" ||
+                                  loading
                                 }
-                              }}>
-                              Resend
-                            </IconButton>
-                            <IconButton
-                              icon={TrashIcon}
-                              disabled={!item.id || item.sendStatus === "SENT" || loading}
-                              onClick={() => {
-                                const removedItem = { ...fields }[index];
-                                remove(index);
-                                deleteRecipient(item)?.catch((err) => {
-                                  append(removedItem);
-                                });
-                              }}
-                              className="group-hover:text-neon-dark group-hover:disabled:text-gray-400"
-                            />
+                                className="my-auto mr-4 h-9"
+                                onClick={(event: any) => {
+                                  event.preventDefault();
+                                  event.stopPropagation();
+                                  if (confirm("Resend this signing request?")) {
+                                    setLoading(true);
+                                    sendSigningRequests(props.document, [item.id]).finally(() => {
+                                      setLoading(false);
+                                    });
+                                  }
+                                }}>
+                              </IconButton>
+                            </Tooltip>
+                            <Tooltip label="Delete">
+                              <IconButton
+                                icon={TrashIcon}
+                                disabled={!item.id || item.sendStatus === "SENT" || loading}
+                                onClick={(event: any) => {
+                                  event.preventDefault();
+                                  event.stopPropagation();
+                                  if (confirm("Delete this signing request?")) {
+                                    const removedItem = { ...fields }[index];
+                                    remove(index);
+                                    deleteRecipient(item)?.catch((err) => {
+                                      append(removedItem);
+                                    });
+                                  }
+                                }}
+                                className="group-hover:text-neon-dark group-hover:disabled:text-gray-400"
+                              />
+                            </Tooltip>
                           </div>
                         )}
                       </div>
