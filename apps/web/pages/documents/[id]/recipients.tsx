@@ -273,7 +273,6 @@ const RecipientsPage: NextPageWithLayout = (props: any) => {
                                   item.signingStatus === "SIGNED" ||
                                   loading
                                 }
-                                className="my-auto mr-4 h-9"
                                 onClick={(event: any) => {
                                   event.preventDefault();
                                   event.stopPropagation();
@@ -283,8 +282,9 @@ const RecipientsPage: NextPageWithLayout = (props: any) => {
                                       setLoading(false);
                                     });
                                   }
-                                }}>
-                              </IconButton>
+                                }}
+                                className="mx-1 group-hover:text-neon-dark group-hover:disabled:text-gray-400"
+                              />
                             </Tooltip>
                             <Tooltip label="Delete">
                               <IconButton
@@ -301,7 +301,7 @@ const RecipientsPage: NextPageWithLayout = (props: any) => {
                                     });
                                   }
                                 }}
-                                className="group-hover:text-neon-dark group-hover:disabled:text-gray-400"
+                                className="mx-1 group-hover:text-neon-dark group-hover:disabled:text-gray-400"
                               />
                             </Tooltip>
                           </div>
