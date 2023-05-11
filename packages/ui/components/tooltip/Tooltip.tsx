@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { classNames } from "@documenso/lib";
 
 export function Tooltip(props: any) {
   let timeout: NodeJS.Timeout;
@@ -16,19 +17,18 @@ export function Tooltip(props: any) {
   };
 
   return (
-    <div
-      className="relative"
-      onPointerEnter={showTip}
-      onPointerLeave={hideTip}
-    >
+    <div className="relative" onPointerEnter={showTip} onPointerLeave={hideTip}>
       {props.children}
-      {active && (
-        <div className="absolute left-1/4 -translate-x-1/2 bottom-9 transform px-4">
-          <span className="text-xs inline-block py-1 px-2 rounded text-neon-800 bg-neon-200">
-            {props.label}
-          </span>
-        </div>
-      )}
+      <div
+        className={classNames(
+          "absolute left-1/4 -translate-x-1/2 transform px-4 transition-all delay-50 duration-120",
+          active && "bottom-9 opacity-100",
+          !active && "pointer-events-none bottom-6 opacity-0"
+        )}>
+        <span className="text-neon-800 bg-neon-200 inline-block rounded py-1 px-2 text-xs">
+          {props.label}
+        </span>
+      </div>
     </div>
   );
 };

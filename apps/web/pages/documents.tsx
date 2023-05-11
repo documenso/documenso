@@ -303,17 +303,16 @@ const DocumentsPage: NextPageWithLayout = (props: any) => {
                         </td>
                         <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
                           <div>
-                            {document.status !== "COMPLETED" && (
-                              <IconButton
-                                icon={PencilSquareIcon}
-                                className="mr-2"
-                                onClick={(event: any) => {
-                                  event.preventDefault();
-                                  event.stopPropagation();
-                                  router.push("/documents/" + document.id);
-                                }}
-                              />
-                            )}
+                            <IconButton
+                              icon={PencilSquareIcon}
+                              className="mr-2"
+                              onClick={(event: any) => {
+                                event.preventDefault();
+                                event.stopPropagation();
+                                router.push("/documents/" + document.id);
+                              }}
+                              disabled={document.status === "COMPLETED"}
+                            />
                             <IconButton
                               icon={ArrowDownTrayIcon}
                               className="mr-2"
