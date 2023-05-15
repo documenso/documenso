@@ -19,6 +19,7 @@ type DialogProps = {
   formValues: FormValue[];
   setLoading: (loading: boolean) => void;
   icon: React.ReactNode;
+  trunate: boolean;
 };
 
 export function Dialog({
@@ -29,10 +30,16 @@ export function Dialog({
   formValues,
   setLoading,
   icon,
+  trunate = true,
 }: DialogProps) {
   const unsentEmailsLength = formValues.filter(
     (s: any) => s.email && s.sendStatus != "SENT"
   ).length;
+
+  if (trunate && document.title.length > 20) {
+    document.title = document.title.substring(0, 7) + "..." +
+      document.title.substring(document.title.length - 7);
+  }
 
   return (
     <Transition.Root show={open} as={Fragment}>
@@ -71,9 +78,7 @@ export function Dialog({
                     </DialogComponent.Title>
                     <div className="mt-2">
                       <p className="text-sm text-gray-500">
-                        {`"${document.title.length > 20 ? document.title.substring(0, 7) + "..." +
-                          document.title.substring(document.title.length - 7) : document.title}" 
-                            will be sent to ${unsentEmailsLength} recipients.`}
+                        {`"${document.title}" will be sent to ${unsentEmailsLength} recipients.`}
                       </p>
                     </div>
                   </div>
