@@ -19,7 +19,7 @@ type DialogProps = {
   formValues: FormValue[];
   setLoading: (loading: boolean) => void;
   icon: React.ReactNode;
-  trunate: boolean;
+  trunateTitle: boolean;
 };
 
 export function Dialog({
@@ -30,13 +30,13 @@ export function Dialog({
   formValues,
   setLoading,
   icon,
-  trunate = true,
+  trunateTitle = true,
 }: DialogProps) {
   const unsentEmailsLength = formValues.filter(
     (s: any) => s.email && s.sendStatus != "SENT"
   ).length;
 
-  if (trunate && document.title.length > 20) {
+  if (trunateTitle && document.title.length > 20) {
     document.title = document.title.substring(0, 7) + "..." +
       document.title.substring(document.title.length - 7);
   }
