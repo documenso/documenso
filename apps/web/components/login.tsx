@@ -151,7 +151,7 @@ export default function Login(props: any) {
                   <Link
                     href="https://documenso.com"
                     className="text-neon hover:text-neon font-medium">
-                    Hosted Documenso will be availible soon™
+                    Hosted Documenso will be available soon™
                   </Link>
                 </p>
               )}
