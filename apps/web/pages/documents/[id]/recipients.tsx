@@ -4,7 +4,7 @@ import { NEXT_PUBLIC_WEBAPP_URL, classNames } from "@documenso/lib";
 import { createOrUpdateRecipient, deleteRecipient, sendSigningRequests } from "@documenso/lib/api";
 import { getDocument } from "@documenso/lib/query";
 import { getUserFromToken } from "@documenso/lib/server";
-import { Breadcrumb, Button, Dialog, IconButton } from "@documenso/ui";
+import { Breadcrumb, Button, Dialog, IconButton, Tooltip } from "@documenso/ui";
 import Layout from "../../../components/layout";
 import { NextPageWithLayout } from "../../_app";
 import {
@@ -18,12 +18,15 @@ import {
   UserPlusIcon,
   XMarkIcon,
 } from "@heroicons/react/24/outline";
-import { DocumentStatus, Document as PrismaDocument } from "@prisma/client";
+import { DocumentStatus, Document as PrismaDocument, Recipient } from "@prisma/client";
 import { FormProvider, useFieldArray, useForm, useWatch } from "react-hook-form";
+import { toast } from "react-hot-toast";
 
 export type FormValues = {
-  signers: { id: number; email: string; name: string }[];
+  signers: Array<Pick<Recipient, 'id' | 'email' | 'name' | 'sendStatus' | 'readStatus' | 'signingStatus'>>;
 };
+
+type FormSigner = FormValues["signers"][number];
 
 const RecipientsPage: NextPageWithLayout = (props: any) => {
   const title: string = `"` + props?.document?.title + `"` + "Recipients | Documenso";
@@ -63,7 +66,7 @@ const RecipientsPage: NextPageWithLayout = (props: any) => {
   });
   const formValues = useWatch({ control, name: "signers" });
   const cancelButtonRef = useRef(null);
-  const hasEmailError = (formValue: any): boolean => {
+  const hasEmailError = (formValue: FormSigner): boolean => {
     const index = formValues.findIndex((e) => e.id === formValue.id);
     return !!errors?.signers?.[index]?.email;
   };
@@ -108,12 +111,14 @@ const RecipientsPage: NextPageWithLayout = (props: any) => {
                   color="primary"
                   icon={PaperAirplaneIcon}
                   onClick={() => {
-                    setOpen(true);
+                    formValues.some((r) => r.email && hasEmailError(r))
+                      ? toast.error("Please enter a valid email address.", { id: "invalid email" })
+                      : setOpen(true);
                   }}
                   disabled={
                     (formValues.length || 0) === 0 ||
                     !formValues.some(
-                      (r: any) => r.email && !hasEmailError(r) && r.sendStatus === "NOT_SENT"
+                      (r) => r.email && !hasEmailError(r) && r.sendStatus === "NOT_SENT"
                     ) ||
                     loading
                   }>
@@ -138,7 +143,7 @@ const RecipientsPage: NextPageWithLayout = (props: any) => {
                 trigger();
               }}>
               <ul role="list" className="divide-y divide-gray-200">
-                {fields.map((item: any, index: number) => (
+                {fields.map((item, index) => (
                   <li
                     key={index}
                     className="group w-full border-0 px-2 py-3 hover:bg-green-50 sm:py-4">
@@ -175,7 +180,6 @@ const RecipientsPage: NextPageWithLayout = (props: any) => {
                                   });
                             }}
                             className="block w-full border-0  bg-inherit p-0 text-gray-900 placeholder-gray-500 outline-none disabled:bg-neutral-100 sm:text-sm"
-                            placeholder="john.dorian@loremipsum.com"
                           />
                           {errors?.signers?.[index] ? (
                             <p className="mt-2 text-sm text-red-600" id="email-error">
@@ -213,7 +217,6 @@ const RecipientsPage: NextPageWithLayout = (props: any) => {
                                 });
                             }}
                             className="block w-full border-0 bg-inherit p-0 text-gray-900 placeholder-gray-500 outline-none disabled:bg-neutral-100 sm:text-sm"
-                            placeholder="John Dorian"
                           />
                         </div>
                       </div>
@@ -261,38 +264,46 @@ const RecipientsPage: NextPageWithLayout = (props: any) => {
                         </div>
                         {props.document.status !== DocumentStatus.COMPLETED && (
                           <div className="mr-1 flex">
-                            <IconButton
-                              icon={PaperAirplaneIcon}
-                              disabled={
-                                !item.id ||
-                                item.sendStatus !== "SENT" ||
-                                item.signingStatus === "SIGNED" ||
-                                loading
-                              }
-                              color="secondary"
-                              className="my-auto mr-4 h-9"
-                              onClick={() => {
-                                if (confirm("Resend this signing request?")) {
-                                  setLoading(true);
-                                  sendSigningRequests(props.document, [item.id]).finally(() => {
-                                    setLoading(false);
-                                  });
+                            <Tooltip label="Resend">
+                              <IconButton
+                                icon={PaperAirplaneIcon}
+                                disabled={
+                                  !item.id ||
+                                  item.sendStatus !== "SENT" ||
+                                  item.signingStatus === "SIGNED" ||
+                                  loading
                                 }
-                              }}>
-                              Resend
-                            </IconButton>
-                            <IconButton
-                              icon={TrashIcon}
-                              disabled={!item.id || item.sendStatus === "SENT" || loading}
-                              onClick={() => {
-                                const removedItem = { ...fields }[index];
-                                remove(index);
-                                deleteRecipient(item)?.catch((err) => {
-                                  append(removedItem);
-                                });
-                              }}
-                              className="group-hover:text-neon-dark group-hover:disabled:text-gray-400"
-                            />
+                                onClick={(event: any) => {
+                                  event.preventDefault();
+                                  event.stopPropagation();
+                                  if (confirm("Resend this signing request?")) {
+                                    setLoading(true);
+                                    sendSigningRequests(props.document, [item.id]).finally(() => {
+                                      setLoading(false);
+                                    });
+                                  }
+                                }}
+                                className="mx-1 group-hover:text-neon-dark group-hover:disabled:text-gray-400"
+                              />
+                            </Tooltip>
+                            <Tooltip label="Delete">
+                              <IconButton
+                                icon={TrashIcon}
+                                disabled={!item.id || item.sendStatus === "SENT" || loading}
+                                onClick={(event: any) => {
+                                  event.preventDefault();
+                                  event.stopPropagation();
+                                  if (confirm("Delete this signing request?")) {
+                                    const removedItem = { ...fields }[index];
+                                    remove(index);
+                                    deleteRecipient(item)?.catch((err) => {
+                                      append(removedItem);
+                                    });
+                                  }
+                                }}
+                                className="mx-1 group-hover:text-neon-dark group-hover:disabled:text-gray-400"
+                              />
+                            </Tooltip>
                           </div>
                         )}
                       </div>

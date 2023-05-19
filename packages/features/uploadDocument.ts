@@ -1,9 +1,10 @@
 import router from "next/router";
 import { NEXT_PUBLIC_WEBAPP_URL } from "../lib/constants";
 import toast from "react-hot-toast";
+import { ChangeEvent } from "react";
 
-export const uploadDocument = async (event: any) => {
-  if (event.target.files && event.target.files[0]) {
+export const uploadDocument = async (event: ChangeEvent) => {
+  if (event.target instanceof HTMLInputElement && event.target?.files && event.target.files[0]) {
     const body = new FormData();
     const document = event.target.files[0];
     const fileName: string = event.target.files[0].name;
@@ -12,8 +13,10 @@ export const uploadDocument = async (event: any) => {
       toast.error("Non-PDF documents are not supported yet.");
       return;
     }
+
     body.append("document", document || "");
-    const response: any = await toast
+
+    await toast
       .promise(
         fetch("/api/documents", {
           method: "POST",
