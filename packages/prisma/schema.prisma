@@ -92,6 +92,7 @@ model Recipient {
   name          String        @default("") @db.VarChar(255)
   token         String
   expired       DateTime?
+  signedAt      DateTime?
   readStatus    ReadStatus    @default(NOT_OPENED)
   signingStatus SigningStatus @default(NOT_SIGNED)
   sendStatus    SendStatus    @default(NOT_SENT)
