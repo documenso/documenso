@@ -1,7 +1,7 @@
+import { ChangeEvent } from "react";
 import router from "next/router";
 import { NEXT_PUBLIC_WEBAPP_URL } from "../lib/constants";
 import toast from "react-hot-toast";
-import { ChangeEvent } from "react";
 
 export const uploadDocument = async (event: ChangeEvent) => {
   if (event.target instanceof HTMLInputElement && event.target?.files && event.target.files[0]) {

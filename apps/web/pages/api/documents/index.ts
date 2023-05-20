@@ -5,6 +5,8 @@ import { getUserFromToken } from "@documenso/lib/server";
 import prisma from "@documenso/prisma";
 import formidable from "formidable";
 
+const regex = /’/;
+
 export const config = {
   api: {
     bodyParser: false,
@@ -20,7 +22,8 @@ async function postHandler(req: NextApiRequest, res: NextApiResponse) {
     if (err) throw err;
 
     const uploadedDocument: any = files["document"];
-    const title = uploadedDocument[0].originalFilename;
+    const fileName: string = uploadedDocument[0].originalFilename;
+    const title = fileName.match(regex) ? fileName.replace(/’/g, "'") : fileName;
     const path = uploadedDocument[0].filepath;
     const fs = require("fs");
     const buffer = fs.readFileSync(path);
