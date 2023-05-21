@@ -73,7 +73,7 @@ export async function getServerSideProps(context: any) {
     return {
       redirect: {
         permanent: false,
-        destination: `/documents/${recipient.Document.id}/signed`,
+        destination: `/documents/${recipient.Document.id}/signed?token=${recipientToken}`,
       },
     };
   }
