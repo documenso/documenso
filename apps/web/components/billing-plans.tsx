@@ -1,11 +1,11 @@
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { classNames } from "@documenso/lib";
 import { STRIPE_PLANS, fetchCheckoutSession, useSubscription } from "@documenso/lib/stripe";
 import { Button } from "@documenso/ui";
 import { Switch } from "@headlessui/react";
 
 export const BillingPlans = () => {
-  const { subscription, hasSubscription, isLoading } = useSubscription();
+  const { subscription, isLoading } = useSubscription();
   const [isAnnual, setIsAnnual] = useState(true);
 
   return (
@@ -22,7 +22,7 @@ export const BillingPlans = () => {
                   onChange={setIsAnnual}
                   className={classNames(
                     isAnnual ? "bg-neon-600" : "bg-gray-200",
-                    "relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-neon-600 focus:ring-offset-2"
+                    "focus:ring-neon-600 relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2"
                   )}>
                   <span
                     aria-hidden="true"

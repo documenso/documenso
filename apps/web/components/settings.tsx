@@ -4,18 +4,12 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import { updateUser } from "@documenso/features";
 import { getUser } from "@documenso/lib/api";
-import {
-  STRIPE_PLANS,
-  fetchCheckoutSession,
-  fetchPortalSession,
-  isSubscriptionsEnabled,
-  useSubscription,
-} from "@documenso/lib/stripe";
-import { SubscriptionStatus } from '@prisma/client'
+import { fetchPortalSession, isSubscriptionsEnabled, useSubscription } from "@documenso/lib/stripe";
 import { Button } from "@documenso/ui";
-import { CreditCardIcon, KeyIcon, UserCircleIcon } from "@heroicons/react/24/outline";
-import { useSession } from "next-auth/react";
 import { BillingPlans } from "./billing-plans";
+import { CreditCardIcon, KeyIcon, UserCircleIcon } from "@heroicons/react/24/outline";
+import { SubscriptionStatus } from "@prisma/client";
+import { useSession } from "next-auth/react";
 
 const subNavigation = [
   {
@@ -29,14 +23,17 @@ const subNavigation = [
     href: "/settings/password",
     icon: KeyIcon,
     current: false,
-  },
-  {
+  }
+];
+
+if (process.env.NEXT_PUBLIC_ALLOW_SUBSCRIPTIONS === "true") {
+  subNavigation.push({
     name: "Billing",
     href: "/settings/billing",
     icon: CreditCardIcon,
     current: false,
-  },
-];
+  });
+}
 
 function classNames(...classes: any) {
   return classes.filter(Boolean).join(" ");
@@ -189,9 +186,7 @@ export default function Setttings() {
             </div>
 
             <div
-              hidden={
-                subNavigation.find((e) => e.current)?.name !== subNavigation?.[2]?.name
-              }
+              hidden={!subNavigation.at(2) || subNavigation.find((e) => e.current)?.name !== subNavigation.at(2)?.name}
               className="min-h-[251px] divide-y divide-gray-200 lg:col-span-9">
               {/* Billing section */}
               <div className="py-6 px-4 sm:p-6 lg:pb-8">
@@ -204,48 +199,50 @@ export default function Setttings() {
                     </p>
                   )}
 
-                  {isSubscriptionsEnabled() && <>
-                  <p className="mt-1 text-sm text-gray-500">
-                    Your subscription is currently{" "}
-                    <strong>{subscription?.status && subscription?.status !== SubscriptionStatus.INACTIVE ? "Active" : "Inactive"}</strong>.
-                  </p>
+                  {isSubscriptionsEnabled() && (
+                    <>
+                      <p className="mt-1 text-sm text-gray-500">
+                        Your subscription is currently{" "}
+                        <strong>
+                          {subscription?.status &&
+                          subscription?.status !== SubscriptionStatus.INACTIVE
+                            ? "Active"
+                            : "Inactive"}
+                        </strong>
+                        .
+                      </p>
 
-                  {subscription?.status === SubscriptionStatus.PAST_DUE && (
-                    <p className="mt-1 text-sm text-red-500">
-                      Your subscription is past due. Please update your payment details to continue
-                      using the service without interruption.
-                    </p>
-                  )}
+                      {subscription?.status === SubscriptionStatus.PAST_DUE && (
+                        <p className="mt-1 text-sm text-red-500">
+                          Your subscription is past due. Please update your payment details to
+                          continue using the service without interruption.
+                        </p>
+                      )}
 
-                  <p className="mt-1 text-sm text-gray-500">
-                    Lorem ipsum dolor sit amet consectetur adipisicing elit. Est consectetur magnam
-                    illo aperiam expedita porro eos eum nam sapiente.
-                  </p>
+                      <div className="mt-8">
+                        <div className="grid grid-cols-1 lg:grid-cols-2">
+                          <BillingPlans />
+                        </div>
 
-                    <div className="mt-8">
-                      <div className="grid grid-cols-1 lg:grid-cols-2">
-
-                    <BillingPlans />
-                      </div>
-
-                    {subscription && (
-                      <Button
-                        onClick={() => {
-                          if (isSubscriptionsEnabled() && subscription?.customerId) {
-                            fetchPortalSession({
-                              id: subscription.customerId,
-                            }).then((res) => {
-                              if (res.success) {
-                                window.location.href = res.url;
+                        {subscription && (
+                          <Button
+                            onClick={() => {
+                              if (isSubscriptionsEnabled() && subscription?.customerId) {
+                                fetchPortalSession({
+                                  id: subscription.customerId,
+                                }).then((res) => {
+                                  if (res.success) {
+                                    window.location.href = res.url;
+                                  }
+                                });
                               }
-                            });
-                          }
-                        }}>
-                        Manage my subscription
-                      </Button>
-                    )}
-                    </div>
-                    </>}
+                            }}>
+                            Manage my subscription
+                          </Button>
+                        )}
+                      </div>
+                    </>
+                  )}
                 </div>
               </div>
             </div>
