@@ -6,7 +6,7 @@ import { Switch } from "@headlessui/react";
 
 export const BillingPlans = () => {
   const { subscription, isLoading } = useSubscription();
-  const [isAnnual, setIsAnnual] = useState(true);
+  const [isAnnual, setIsAnnual] = useState(false);
 
   return (
     <div>
@@ -45,10 +45,8 @@ export const BillingPlans = () => {
             </p>
 
             <p className="mt-4 text-center text-sm text-gray-500">
-              Lorem ipsum dolor sit amet consectetur, adipisicing elit. Corrupti voluptates delectus
-              doloremque hic vel!
+              All you need for easy signing. <br></br>Includes everthing we build this year.
             </p>
-
             <div className="mt-4">
               <Button
                 className="w-full"
