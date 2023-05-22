@@ -20,9 +20,11 @@ import {
 } from "@heroicons/react/24/outline";
 import { DocumentStatus } from "@prisma/client";
 import { Tooltip as ReactTooltip } from "react-tooltip";
+import { useSubscription } from "@documenso/lib/stripe";
 
 const DocumentsPage: NextPageWithLayout = (props: any) => {
   const router = useRouter();
+  const { hasSubscription } = useSubscription();
   const [documents, setDocuments]: any[] = useState([]);
   const [filteredDocuments, setFilteredDocuments] = useState([]);
 
@@ -135,6 +137,7 @@ const DocumentsPage: NextPageWithLayout = (props: any) => {
           <div className="mt-4 sm:mt-0 sm:ml-16 sm:flex-none">
             <Button
               icon={DocumentPlusIcon}
+              disabled={!hasSubscription}
               onClick={() => {
                 document?.getElementById("fileUploadHelper")?.click();
               }}>
