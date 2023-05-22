@@ -2,6 +2,7 @@ import { NextPageContext } from "next";
 import Head from "next/head";
 import { getUserFromToken } from "@documenso/lib/server";
 import Signup from "../components/signup";
+import { env } from "../env.mjs";
 
 export default function SignupPage(props: { source: string }) {
   return (
@@ -15,7 +16,7 @@ export default function SignupPage(props: { source: string }) {
 }
 
 export async function getServerSideProps(context: any) {
-  if (process.env.NEXT_PUBLIC_ALLOW_SIGNUP !== "true")
+  if (env.NEXT_PUBLIC_ALLOW_SIGNUP !== "true")
     return {
       redirect: {
         destination: "/login",

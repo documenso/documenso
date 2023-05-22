@@ -1,6 +1,7 @@
 import Head from "next/head";
 import { getUserFromToken } from "@documenso/lib/server";
 import Login from "../components/login";
+import {env} from '../env.mjs'
 
 export default function LoginPage(props: any) {
   return (
@@ -24,7 +25,7 @@ export async function getServerSideProps(context: any) {
       },
     };
 
-  const ALLOW_SIGNUP = process.env.NEXT_PUBLIC_ALLOW_SIGNUP === "true";
+  const ALLOW_SIGNUP = env.NEXT_PUBLIC_ALLOW_SIGNUP === 'true';
 
   return {
     props: {

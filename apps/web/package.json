@@ -18,6 +18,7 @@
     "@headlessui/react": "^1.7.4",
     "@heroicons/react": "^2.0.13",
     "@pdf-lib/fontkit": "^1.1.1",
+    "@t3-oss/env-core": "^0.3.1",
     "avatar-from-initials": "^1.0.3",
     "base64-arraybuffer": "^1.0.2",
     "bcryptjs": "^2.4.3",
@@ -38,7 +39,8 @@
     "react-resizable": "^3.0.4",
     "react-tooltip": "^5.7.2",
     "short-uuid": "^4.2.2",
-    "string-to-color": "^2.2.2"
+    "string-to-color": "^2.2.2",
+    "zod": "^3.21.4"
   },
   "devDependencies": {
     "@tailwindcss/forms": "^0.5.3",

@@ -10,6 +10,7 @@ import { BillingPlans } from "./billing-plans";
 import { CreditCardIcon, KeyIcon, UserCircleIcon } from "@heroicons/react/24/outline";
 import { SubscriptionStatus } from "@prisma/client";
 import { useSession } from "next-auth/react";
+import { env } from "../env.mjs";
 
 const subNavigation = [
   {
@@ -26,7 +27,7 @@ const subNavigation = [
   }
 ];
 
-if (process.env.NEXT_PUBLIC_ALLOW_SUBSCRIPTIONS === "true") {
+if (env.NEXT_PUBLIC_ALLOW_SUBSCRIPTIONS === "true") {
   subNavigation.push({
     name: "Billing",
     href: "/settings/billing",
