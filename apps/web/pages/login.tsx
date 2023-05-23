@@ -24,11 +24,11 @@ export async function getServerSideProps(context: any) {
       },
     };
 
-  const ALLOW_SIGNUP = process.env.ALLOW_SIGNUP === "true";
+  const ALLOW_SIGNUP = process.env.NEXT_PUBLIC_ALLOW_SIGNUP === "true";
 
   return {
     props: {
-      ALLOW_SIGNUP: ALLOW_SIGNUP,
+      ALLOW_SIGNUP,
     },
   };
 }

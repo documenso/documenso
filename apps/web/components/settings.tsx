@@ -4,8 +4,11 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import { updateUser } from "@documenso/features";
 import { getUser } from "@documenso/lib/api";
+import { fetchPortalSession, isSubscriptionsEnabled, useSubscription } from "@documenso/lib/stripe";
 import { Button } from "@documenso/ui";
-import { KeyIcon, UserCircleIcon } from "@heroicons/react/24/outline";
+import { BillingPlans } from "./billing-plans";
+import { CreditCardIcon, KeyIcon, UserCircleIcon } from "@heroicons/react/24/outline";
+import { SubscriptionStatus } from "@prisma/client";
 import { useSession } from "next-auth/react";
 
 const subNavigation = [
@@ -20,8 +23,17 @@ const subNavigation = [
     href: "/settings/password",
     icon: KeyIcon,
     current: false,
-  },
+  }
 ];
+
+if (process.env.NEXT_PUBLIC_ALLOW_SUBSCRIPTIONS === "true") {
+  subNavigation.push({
+    name: "Billing",
+    href: "/settings/billing",
+    icon: CreditCardIcon,
+    current: false,
+  });
+}
 
 function classNames(...classes: any) {
   return classes.filter(Boolean).join(" ");
@@ -29,11 +41,11 @@ function classNames(...classes: any) {
 
 export default function Setttings() {
   const session = useSession();
+  const { subscription, hasSubscription } = useSubscription();
   const [user, setUser] = useState({
     email: "",
     name: "",
   });
-
   useEffect(() => {
     getUser().then((res: any) => {
       res.json().then((j: any) => {
@@ -158,6 +170,7 @@ export default function Setttings() {
                 <Button onClick={() => updateUser(user)}>Save</Button>
               </div>
             </form>
+
             <div
               hidden={subNavigation.filter((e) => e.current)[0]?.name !== subNavigation[1].name}
               className="min-h-[251px] divide-y divide-gray-200 lg:col-span-9">
@@ -171,9 +184,72 @@ export default function Setttings() {
                 </div>
               </div>
             </div>
+
+            <div
+              hidden={!subNavigation.at(2) || subNavigation.find((e) => e.current)?.name !== subNavigation.at(2)?.name}
+              className="min-h-[251px] divide-y divide-gray-200 lg:col-span-9">
+              {/* Billing section */}
+              <div className="py-6 px-4 sm:p-6 lg:pb-8">
+                <div>
+                  <h2 className="text-lg font-medium leading-6 text-gray-900">Billing</h2>
+
+                  {!isSubscriptionsEnabled() && (
+                    <p className="mt-2 text-sm text-gray-500">
+                      Subscriptions are not enabled on this instance, you have nothing to do here.
+                    </p>
+                  )}
+
+                  {isSubscriptionsEnabled() && (
+                    <>
+                      <p className="mt-1 text-sm text-gray-500">
+                        Your subscription is currently{" "}
+                        <strong>
+                          {subscription?.status &&
+                          subscription?.status !== SubscriptionStatus.INACTIVE
+                            ? "Active"
+                            : "Inactive"}
+                        </strong>
+                        .
+                      </p>
+
+                      {subscription?.status === SubscriptionStatus.PAST_DUE && (
+                        <p className="mt-1 text-sm text-red-500">
+                          Your subscription is past due. Please update your payment details to
+                          continue using the service without interruption.
+                        </p>
+                      )}
+
+                      <div className="mt-8">
+                        <div className="grid grid-cols-1 lg:grid-cols-2">
+                          <BillingPlans />
+                        </div>
+
+                        {subscription && (
+                          <Button
+                            onClick={() => {
+                              if (isSubscriptionsEnabled() && subscription?.customerId) {
+                                fetchPortalSession({
+                                  id: subscription.customerId,
+                                }).then((res) => {
+                                  if (res.success) {
+                                    window.location.href = res.url;
+                                  }
+                                });
+                              }
+                            }}>
+                            Manage my subscription
+                          </Button>
+                        )}
+                      </div>
+                    </>
+                  )}
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
+
       <div className="mt-10 max-w-[1100px]" hidden={!!user.email}>
         <div className="ph-item">
           <div className="ph-col-12">

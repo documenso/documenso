@@ -1,6 +1,7 @@
 import { ReactElement, ReactNode } from "react";
 import { NextPage } from "next";
 import type { AppProps } from "next/app";
+import { SubscriptionProvider } from "@documenso/lib/stripe/providers/subscription-provider";
 import "../../../node_modules/placeholder-loading/src/scss/placeholder-loading.scss";
 import "../../../node_modules/react-resizable/css/styles.css";
 import "../styles/tailwind.css";
@@ -20,13 +21,15 @@ type AppPropsWithLayout = AppProps & {
 
 export default function App({
   Component,
-  pageProps: { session, ...pageProps },
+  pageProps: { session, initialSubscription, ...pageProps },
 }: AppPropsWithLayout) {
   const getLayout = Component.getLayout || ((page: any) => page);
   return (
     <SessionProvider session={session}>
-      <Toaster position="top-center"></Toaster>
-      {getLayout(<Component {...pageProps} />)}
+      <SubscriptionProvider initialSubscription={initialSubscription}>
+        <Toaster position="top-center" />
+        {getLayout(<Component {...pageProps} />)}
+      </SubscriptionProvider>
     </SessionProvider>
   );
 }

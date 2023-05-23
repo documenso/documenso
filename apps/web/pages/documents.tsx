@@ -21,9 +21,11 @@ import {
 } from "@heroicons/react/24/outline";
 import { DocumentStatus } from "@prisma/client";
 import { Tooltip as ReactTooltip } from "react-tooltip";
+import { useSubscription } from "@documenso/lib/stripe";
 
 const DocumentsPage: NextPageWithLayout = (props: any) => {
   const router = useRouter();
+  const { hasSubscription } = useSubscription();
   const [documents, setDocuments]: any[] = useState([]);
   const [filteredDocuments, setFilteredDocuments] = useState([]);
 
@@ -136,6 +138,7 @@ const DocumentsPage: NextPageWithLayout = (props: any) => {
           <div className="mt-4 sm:mt-0 sm:ml-16 sm:flex-none">
             <Button
               icon={DocumentPlusIcon}
+              disabled={!hasSubscription}
               onClick={() => {
                 document?.getElementById("fileUploadHelper")?.click();
               }}>
@@ -143,26 +146,26 @@ const DocumentsPage: NextPageWithLayout = (props: any) => {
             </Button>
           </div>
         </div>
-        <div className="mt-3 mb-12">
-          <div className="float-right ml-3 mt-7 block w-fit">
+        <div className="mt-3 mb-12 flex flex-row-reverse items-center gap-x-4">
+          <div className="pt-5 block w-fit">
             {filteredDocuments.length != 1 ? filteredDocuments.length + " Documents" : "1 Document"}
           </div>
           <SelectBox
-            className="float-right block w-1/4"
+            className="block w-1/4"
             label="Created"
             options={createdFilter}
             value={selectedCreatedFilter}
             onChange={setSelectedCreatedFilter}
           />
           <SelectBox
-            className="float-right mr-3 block w-1/4"
+            className="block w-1/4"
             label="Status"
             options={statusFilters}
             value={selectedStatusFilter}
             onChange={handleStatusFilterChange}
           />
         </div>
-        <div className="mt-20 max-w-[1100px]" hidden={!loading}>
+        <div className="mt-8 max-w-[1100px]" hidden={!loading}>
           <div className="ph-item">
             <div className="ph-col-12">
               <div className="ph-picture"></div>
@@ -179,7 +182,7 @@ const DocumentsPage: NextPageWithLayout = (props: any) => {
             </div>
           </div>
         </div>
-        <div className="mt-28 flex flex-col" hidden={!documents.length || loading}>
+        <div className="mt-8 flex flex-col" hidden={!documents.length || loading}>
           <div
             className="-my-2 -mx-4 overflow-x-auto sm:-mx-6 lg:-mx-8"
             hidden={!documents.length || loading}>
@@ -222,7 +225,7 @@ const DocumentsPage: NextPageWithLayout = (props: any) => {
                         <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
                           {document.title || "#" + document.id}
                         </td>
-                        <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                        <td className="whitespace-nowrap inline-flex py-3 gap-x-2 gap-y-1 flex-wrap max-w-[250px] text-sm text-gray-500">
                           {document.Recipient.map((item: any) => (
                             <div key={item.id}>
                               {item.sendStatus === "NOT_SENT" ? (
