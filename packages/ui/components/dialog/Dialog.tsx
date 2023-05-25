@@ -1,6 +1,7 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { Fragment } from "react";
 import { sendSigningRequests } from "@documenso/lib/api";
+import { truncate } from "@documenso/lib/helpers";
 import { Button } from "@documenso/ui";
 import { Dialog as DialogComponent, Transition } from "@headlessui/react";
 import { Document as PrismaDocument } from "@prisma/client";
@@ -19,7 +20,7 @@ type DialogProps = {
   formValues: FormValue[];
   setLoading: (loading: boolean) => void;
   icon: React.ReactNode;
-  trunateTitle: boolean;
+  truncateTitle: boolean;
 };
 
 export function Dialog({
@@ -30,16 +31,13 @@ export function Dialog({
   formValues,
   setLoading,
   icon,
-  trunateTitle = true,
+  truncateTitle = true,
 }: DialogProps) {
   const unsentEmailsLength = formValues.filter(
     (s: any) => s.email && s.sendStatus != "SENT"
   ).length;
 
-  if (trunateTitle && document.title.length > 20) {
-    document.title = document.title.substring(0, 7) + "..." +
-      document.title.substring(document.title.length - 7);
-  }
+  const documentTitle = truncate(document.title)
 
   return (
     <Transition.Root show={open} as={Fragment}>
@@ -78,7 +76,7 @@ export function Dialog({
                     </DialogComponent.Title>
                     <div className="mt-2">
                       <p className="text-sm text-gray-500">
-                        {`"${document.title}" will be sent to ${unsentEmailsLength} recipients.`}
+                        {`"${documentTitle}" will be sent to ${unsentEmailsLength} recipients.`}
                       </p>
                     </div>
                   </div>
