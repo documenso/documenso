@@ -61,7 +61,7 @@ export const addDigitalSignature = async (documentAsBase64: string): Promise<str
 
   const signObj = new signer.SignPdf();
   const signedPdfBuffer: Buffer = signObj.sign(modifiedPdfBuffer, p12Buffer, {
-    passphrase: "",
+    passphrase: process.env.CERT_PASSPHRASE || "",
   });
 
   return signedPdfBuffer.toString("base64");
