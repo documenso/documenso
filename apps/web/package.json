@@ -7,9 +7,11 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "db-studio": "prisma db studio"
+    "db-studio": "prisma db studio",
+    "stripe:listen": "stripe listen --forward-to localhost:3000/api/stripe/webhook"
   },
   "dependencies": {
+    "@documenso/lib": "*",
     "@documenso/pdf": "*",
     "@documenso/prisma": "*",
     "@documenso/ui": "*",
@@ -42,11 +44,11 @@
     "@tailwindcss/forms": "^0.5.3",
     "@types/bcryptjs": "^2.4.2",
     "@types/filesystem": "^0.0.32",
-    "@types/react-dom": "18.0.9",
     "@types/formidable": "^2.0.5",
     "@types/node": "^18.11.18",
     "@types/nodemailer": "^6.4.7",
     "@types/nodemailer-sendgrid": "^1.0.0",
+    "@types/react-dom": "18.0.9",
     "@types/react-pdf": "^6.2.0",
     "@types/react-resizable": "^3.0.3",
     "autoprefixer": "^10.4.13",
@@ -57,6 +59,7 @@
     "next-transpile-modules": "^10.0.0",
     "postcss": "^8.4.19",
     "sass": "^1.57.1",
+    "stripe-cli": "^0.1.0",
     "tailwindcss": "^3.2.4",
     "typescript": "4.8.4"
   }

@@ -15,7 +15,7 @@ export default function SignupPage(props: { source: string }) {
 }
 
 export async function getServerSideProps(context: any) {
-  if (process.env.ALLOW_SIGNUP !== "true")
+  if (process.env.NEXT_PUBLIC_ALLOW_SIGNUP !== "true")
     return {
       redirect: {
         destination: "/login",

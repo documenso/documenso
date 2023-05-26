@@ -4,6 +4,7 @@ import { defaultHandler, defaultResponder } from "@documenso/lib/server";
 import { getUserFromToken } from "@documenso/lib/server";
 import prisma from "@documenso/prisma";
 import formidable from "formidable";
+import { isSubscribedServer } from "@documenso/lib/stripe";
 
 export const config = {
   api: {
@@ -15,7 +16,17 @@ async function postHandler(req: NextApiRequest, res: NextApiResponse) {
   const form = formidable();
 
   const user = await getUserFromToken(req, res);
-  if (!user) return;
+  if (!user) {
+    return res.status(401).end();
+  };
+
+  const isSubscribed = await isSubscribedServer(req);
+
+  if (!isSubscribed) {
+    throw new Error("User is not subscribed.");
+  }
+
+
   form.parse(req, async (err, fields, files) => {
     if (err) throw err;
 

@@ -1,6 +1,6 @@
-/** @type {import('next').NextConfig} */
 require("dotenv").config({ path: "../../.env" });
 
+/** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
   swcMinify: false,
@@ -10,7 +10,7 @@ const nextConfig = {
   },
 };
 
-const withTM = require("next-transpile-modules")([
+const transpileModules = require("next-transpile-modules")([
   "@documenso/prisma",
   "@documenso/lib",
   "@documenso/ui",
@@ -19,8 +19,10 @@ const withTM = require("next-transpile-modules")([
   "@documenso/signing",
   "react-signature-canvas",
 ]);
-const plugins = [];
-plugins.push(withTM);
+
+const plugins = [
+  transpileModules
+];
 
 const moduleExports = () => plugins.reduce((acc, next) => next(acc), nextConfig);
 

@@ -23,6 +23,30 @@ model User {
   accounts         Account[]
   sessions         Session[]
   Document         Document[]
+  Subscription     Subscription[]
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  PAST_DUE
+  INACTIVE
+}
+
+model Subscription {
+  id         Int                @id @default(autoincrement())
+  status     SubscriptionStatus @default(INACTIVE)
+  planId     String?
+  priceId    String?
+  customerId String?
+  periodEnd  DateTime?
+  userId     Int
+  createdAt  DateTime           @default(now())
+  updatedAt  DateTime           @updatedAt
+
+  User User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([customerId])
+  @@index([userId])
 }
 
 model Account {
