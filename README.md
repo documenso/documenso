@@ -3,7 +3,7 @@
 
 <p align="center" style="margin-top: 12px">
   <a href="https://github.com/documenso/documenso.com">
-   <img width="250px" src="https://user-images.githubusercontent.com/1309312/224986248-5b8a5cdc-2dc1-46b9-a354-985bb6808ee0.png" alt="Documenso Logo">
+   <img width="250px" src="https://github.com/documenso/documenso/assets/1309312/cd7823ec-4baa-40b9-be78-4acb3b1c73cb" alt="Documenso Logo">
   </a>
 
   <h3 align="center">Open Source Signing Infrastructure</h3>
