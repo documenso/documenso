@@ -1,4 +1,4 @@
-import { PDFAcroSignature, PDFDocument, PDFHexString, PDFName, PDFNumber, PDFSignature, PDFString } from "pdf-lib";
+import { PDFDocument, PDFHexString, PDFName, PDFNumber, PDFString } from "pdf-lib";
 
 
 const fs = require("fs");
