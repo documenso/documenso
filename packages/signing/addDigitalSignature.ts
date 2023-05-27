@@ -9,9 +9,8 @@ export const addDigitalSignature = async (documentAsBase64: string): Promise<str
   const PDFArrayCustom = require("./PDFArrayCustom");
   const pdfBuffer = Buffer.from(documentAsBase64, "base64");
   const p12Buffer = Buffer.from(
-    fs.readFileSync(process.env.CERT_FILE_PATH || "ressources/certificate.p12", {
-      encoding: (process.env.CERT_FILE_ENCODING as BufferEncoding) || null,
-    })
+    fs.readFileSync(process.env.CERT_FILE_PATH || "ressources/certificate.p12").toString(),
+    (process.env.CERT_FILE_ENCODING as BufferEncoding) || undefined
   );
   const SIGNATURE_LENGTH = 12000;
 
