@@ -1,0 +1,1 @@
+export { portalSessionHandler as default } from "@documenso/lib/stripe/handlers/portal-session";

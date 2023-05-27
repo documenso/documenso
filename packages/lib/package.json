@@ -4,6 +4,10 @@
   "private": true,
   "main": "index.ts",
   "dependencies": {
-    "bcryptjs": "^2.4.3"
+    "@documenso/prisma": "*",
+    "@prisma/client": "^4.8.1",
+    "bcryptjs": "^2.4.3",
+    "micro": "^10.0.1",
+    "stripe": "^12.4.0"
   }
 }
