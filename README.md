@@ -1,4 +1,4 @@
-> We are launching on Product Hunt soon! Sign up to support the launch: 
+> <strong>We are launching TOMORROW on Product Hunt soon! Sign up to support the launch: </strong>
 > <center><a href="https://dub.sh/documenso-launch"><img src="https://img.shields.io/badge/Documenso%20on%20Product%20Hunt-Notify%20Me-orange" alt="Product Hunt"></a></center>
 
 <p align="center" style="margin-top: 12px">
