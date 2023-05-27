@@ -14,6 +14,12 @@
     "source.removeUnusedImports": false
   },
   "typescript.tsdk": "node_modules/typescript/lib",
-  "spellright.language": ["de"],
-  "spellright.documentTypes": ["markdown", "latex", "plaintext"]
+  "spellright.language": [
+    "de"
+  ],
+  "spellright.documentTypes": [
+    "markdown",
+    "latex",
+    "plaintext"
+  ]
 }

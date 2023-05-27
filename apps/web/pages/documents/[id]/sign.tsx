@@ -59,7 +59,7 @@ export async function getServerSideProps(context: any) {
     },
   });
 
-  const recipient = await prisma.recipient.findFirstOrThrow({
+  const recipient = await prisma.recipient.findFirst({
     where: {
       token: recipientToken,
     },
@@ -67,6 +67,15 @@ export async function getServerSideProps(context: any) {
       Document: { include: { User: true } },
     },
   });
+
+  if (!recipient) {
+    return {
+      redirect: {
+        permanent: false,
+        destination: "/404",
+      },
+    };
+  }
 
   // Document is already signed
   if (recipient.Document.status === DocumentStatus.COMPLETED) {
