@@ -381,6 +381,7 @@ const DocumentsPage: NextPageWithLayout = (props: any) => {
         <div className="mt-6">
           <Button
             icon={PlusIcon}
+            disabled={!hasSubscription}
             onClick={() => {
               document?.getElementById("fileUploadHelper")?.click();
             }}>
