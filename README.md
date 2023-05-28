@@ -1,7 +1,11 @@
-We are LIVE on Product Hunt 🚨 Come say hi :)
+<div align="center" style="margin-top: 12px; margin-bottom: 3332px;">
+  <p>
+    We are LIVE on Product Hunt. Come say hi..
+  </p>
 <a href="https://www.producthunt.com/posts/documenso?utm_source=badge-featured&utm_medium=badge&utm_souce=badge-documenso" target="_blank"><img src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=395047&theme=light" alt="Documenso - The&#0032;Open&#0032;Source&#0032;DocuSign&#0032;Alternative&#0046; | Product Hunt" style="width: 250px; height: 54px;" width="250" height="54" /></a>
-
-<p align="center" style="margin-top: 12px">
+</div>
+<br>
+<p align="center" style="margin-top: 120px">
   <a href="https://github.com/documenso/documenso.com">
    <img width="250px" src="https://github.com/documenso/documenso/assets/1309312/cd7823ec-4baa-40b9-be78-4acb3b1c73cb" alt="Documenso Logo">
   </a>
