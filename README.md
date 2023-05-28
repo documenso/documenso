@@ -1,5 +1,5 @@
-> <strong>We are launching TOMORROW on Product Hunt soon! Sign up to support the launch: </strong>
-> <center><a href="https://dub.sh/documenso-launch"><img src="https://img.shields.io/badge/Documenso%20on%20Product%20Hunt-Notify%20Me-orange" alt="Product Hunt"></a></center>
+We are LIVE on Product Hunt 🚨 Come say hi :)
+<a href="https://www.producthunt.com/posts/documenso?utm_source=badge-featured&utm_medium=badge&utm_souce=badge-documenso" target="_blank"><img src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=395047&theme=light" alt="Documenso - The&#0032;Open&#0032;Source&#0032;DocuSign&#0032;Alternative&#0046; | Product Hunt" style="width: 250px; height: 54px;" width="250" height="54" /></a>
 
 <p align="center" style="margin-top: 12px">
   <a href="https://github.com/documenso/documenso.com">
