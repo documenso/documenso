@@ -17,7 +17,7 @@ export const signingCompleteTemplate = (message: string) => {
     A copy of the signed document has been attached to this email.
   </p>
   <p style="margin-top: 14px;">
-    <small>Like Documenso? <a href="https://documenso.com">Hosted Documenso is coming soon™</a>.</small>
+    <small>Like Documenso? <a href="https://documenso.com">Hosted Documenso is here!</a>.</small>
   </p>`;
 
   const html = baseEmailTemplate(message, customContent);
