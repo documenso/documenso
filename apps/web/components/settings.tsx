@@ -23,7 +23,7 @@ const subNavigation = [
     href: "/settings/password",
     icon: KeyIcon,
     current: false,
-  }
+  },
 ];
 
 if (process.env.NEXT_PUBLIC_ALLOW_SUBSCRIPTIONS === "true") {
@@ -60,6 +60,7 @@ export default function Setttings() {
   });
 
   const [savingTimeout, setSavingTimeout] = useState<any>();
+  const [password, setPassword] = useState("");
   function handleNameChange(e: ChangeEvent<HTMLInputElement>): void {
     let u = { ...user };
     u.name = e.target.value;
@@ -177,16 +178,40 @@ export default function Setttings() {
               {/* Passwords section */}
               <div className="py-6 px-4 sm:p-6 lg:pb-8">
                 <div>
-                  <h2 className="text-lg font-medium leading-6 text-gray-900">Password</h2>
-                  <p className="mt-1 text-sm text-gray-500">
-                    Forgot your passwort? Email <b>hi@documenso.com</b> to reset it.
-                  </p>
+                  <h2 className="text-lg font-medium leading-6 text-gray-900">Update Password</h2>
+
+                  <div className="my-6 grid grid-cols-12 gap-6">
+                    <div className="col-span-12 sm:col-span-6">
+                      <label
+                        htmlFor="first-name"
+                        className="block text-sm font-medium text-gray-700">
+                        New Password
+                      </label>
+
+                      <input
+                        type="password"
+                        name="password"
+                        id="password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        className="focus:border-neon focus:ring-neon mt-1 block w-full rounded-md border border-gray-300 py-2 px-3 shadow-sm focus:outline-none sm:text-sm"
+                      />
+                    </div>
+                  </div>
+                  <Button
+                    disabled={password.length < 6}
+                    onClick={() => updateUser({ ...user, password })}>
+                    Save
+                  </Button>
                 </div>
               </div>
             </div>
 
             <div
-              hidden={!subNavigation.at(2) || subNavigation.find((e) => e.current)?.name !== subNavigation.at(2)?.name}
+              hidden={
+                !subNavigation.at(2) ||
+                subNavigation.find((e) => e.current)?.name !== subNavigation.at(2)?.name
+              }
               className="min-h-[251px] divide-y divide-gray-200 lg:col-span-9">
               {/* Billing section */}
               <div className="py-6 px-4 sm:p-6 lg:pb-8">
