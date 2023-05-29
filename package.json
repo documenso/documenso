@@ -2,9 +2,9 @@
   "name": "documenso-monorepo",
   "version": "0.0.0",
   "scripts": {
-    "dev": "npm run dev -w apps/web",
-    "build": "npm i && cd apps && cd web && npm i && next build",
-    "start": "cd apps && cd web && next start",
+    "dev": "turbo run dev --filter=web",
+    "build": "turbo run build --filter=web",
+    "start": "turbo run start --filter=web",
     "db-migrate:dev": "prisma migrate dev",
     "db-seed": "prisma db seed",
     "db-studio": "prisma studio",
