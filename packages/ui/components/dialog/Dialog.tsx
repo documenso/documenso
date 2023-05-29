@@ -37,7 +37,7 @@ export function Dialog({
     (s: any) => s.email && s.sendStatus != "SENT"
   ).length;
 
-  const documentTitle = truncate(document.title)
+  const documentTitle = truncateTitle ? truncate(document.title) : document.title;
 
   return (
     <Transition.Root show={open} as={Fragment}>
