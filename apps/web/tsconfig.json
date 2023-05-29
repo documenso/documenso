@@ -21,6 +21,6 @@
     "../../packages/types/next-auth.d.ts",
     "**/*.ts",
     "**/*.tsx"
-  ],
+, "../../packages/lib/process-env.d.ts"  ],
   "exclude": ["node_modules"]
 }

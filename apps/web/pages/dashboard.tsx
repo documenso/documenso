@@ -4,6 +4,7 @@ import Link from "next/link";
 import { uploadDocument } from "@documenso/features";
 import { getDocumentsForUserFromToken } from "@documenso/lib/query";
 import { getUserFromToken } from "@documenso/lib/server";
+import { useSubscription } from "@documenso/lib/stripe";
 import Layout from "../components/layout";
 import type { NextPageWithLayout } from "./_app";
 import { CheckBadgeIcon, DocumentIcon, UsersIcon } from "@heroicons/react/24/outline";
@@ -20,6 +21,8 @@ type FormValues = {
 };
 
 const DashboardPage: NextPageWithLayout = (props: any) => {
+  const { hasSubscription } = useSubscription();
+
   const stats = [
     {
       name: "Draft",
@@ -84,9 +87,12 @@ const DashboardPage: NextPageWithLayout = (props: any) => {
         </div>
         <div
           onClick={() => {
-            document?.getElementById("fileUploadHelper")?.click();
+            if (hasSubscription) {
+              document?.getElementById("fileUploadHelper")?.click();
+            }
           }}
-          className="hover:border-neon-600 group relative block w-full cursor-pointer rounded-lg border-2 border-dashed border-gray-300 p-12 text-center duration-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+          aria-disabled={!hasSubscription}
+          className="hover:border-neon-600 group relative block w-full cursor-pointer rounded-lg border-2 border-dashed border-gray-300 p-12 text-center duration-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 aria-disabled:pointer-events-none aria-disabled:opacity-50">
           <svg
             className="mx-auto h-12 w-12 text-gray-400 duration-200 group-hover:text-gray-700"
             stroke="currentColor"

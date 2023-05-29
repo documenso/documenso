@@ -7,9 +7,11 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "db-studio": "prisma db studio"
+    "db-studio": "prisma db studio",
+    "stripe:listen": "stripe listen --forward-to localhost:3000/api/stripe/webhook"
   },
   "dependencies": {
+    "@documenso/lib": "*",
     "@documenso/pdf": "*",
     "@documenso/prisma": "*",
     "@documenso/ui": "*",
@@ -60,6 +62,7 @@
     "postcss": "^8.4.19",
     "prisma": "^4.13.0",
     "sass": "^1.57.1",
+    "stripe-cli": "^0.1.0",
     "tailwindcss": "^3.2.4",
     "typescript": "4.8.4"
   }

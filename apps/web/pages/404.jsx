@@ -1,14 +1,16 @@
 import { Button } from "@documenso/ui";
 import Logo from "../components/logo";
 import { ArrowSmallLeftIcon } from "@heroicons/react/20/solid";
+import Link from "next/link";
 
 export default function Custom404() {
   return (
     <>
       <main className="relative isolate min-h-full bg-gray-100">
-        <div className="absolute top-10 left-10">
-          <Logo className="w-10 md:w-20" />
-        </div>
+        <Link href="/" className="absolute top-10 left-10 flex gap-x-2 items-center">
+          <Logo className="w-10" />
+          <h2 className="text-2xl font-semibold">Documenso</h2>
+        </Link>
 
         <div className="mx-auto max-w-7xl px-6 py-48 text-center sm:py-40 lg:px-8">
           <p className="text-brown text-base font-semibold leading-8">404</p>

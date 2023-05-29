@@ -1,4 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from "next";
+import { hashPassword } from "@documenso/lib/auth";
 import { defaultHandler, defaultResponder, getUserFromToken } from "@documenso/lib/server";
 import prisma from "@documenso/prisma";
 
@@ -24,6 +25,13 @@ async function patchHandler(req: NextApiRequest, res: NextApiResponse) {
   if (!user) return;
 
   const updatedUser = req.body;
+
+  let password: string | undefined = undefined;
+
+  if (typeof updatedUser.password === "string" && updatedUser.password.length >= 6) {
+    password = await hashPassword(updatedUser.password);
+  }
+
   await prisma.user
     .update({
       where: {
@@ -31,6 +39,7 @@ async function patchHandler(req: NextApiRequest, res: NextApiResponse) {
       },
       data: {
         name: updatedUser.name,
+        password,
       },
     })
     .then(() => {
