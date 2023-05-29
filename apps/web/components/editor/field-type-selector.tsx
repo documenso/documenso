@@ -8,10 +8,17 @@ const stc = require("string-to-color");
 export default function FieldTypeSelector(props: any) {
   const fieldTypes = [
     {
-      name: "Signature",
       id: FieldType.SIGNATURE,
+      name: "Signature",
     },
-    { name: "Date", id: FieldType.DATE },
+    {
+      id: FieldType.NAME,
+      name: "Name",
+    },
+    {
+      id: FieldType.DATE,
+      name: "Date",
+    },
   ];
 
   const [selectedFieldType, setSelectedFieldType] = useState(fieldTypes[0].id);

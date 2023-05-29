@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import dynamic from "next/dynamic";
 import { useRouter } from "next/router";
 import { createField } from "@documenso/features/editor";
@@ -6,6 +6,7 @@ import { createOrUpdateField, deleteField, signDocument } from "@documenso/lib/a
 import { NEXT_PUBLIC_WEBAPP_URL } from "@documenso/lib/constants";
 import { Button } from "@documenso/ui";
 import Logo from "../logo";
+import NameDialog from "./name-dialog";
 import SignatureDialog from "./signature-dialog";
 import { CheckBadgeIcon, InformationCircleIcon } from "@heroicons/react/24/outline";
 import { FieldType } from "@prisma/client";
@@ -16,21 +17,62 @@ const PDFViewer = dynamic(() => import("./pdf-viewer"), {
 
 export default function PDFSigner(props: any) {
   const router = useRouter();
-  const [open, setOpen] = useState(false);
+  const [signatureDialogOpen, setSignatureDialogOpen] = useState(false);
+  const [nameDialogOpen, setNameDialogOpen] = useState(false);
   const [signingDone, setSigningDone] = useState(false);
   const [localSignatures, setLocalSignatures] = useState<any[]>([]);
   const [fields, setFields] = useState<any[]>(props.fields);
-  const signatureFields = fields.filter((field) => field.type === FieldType.SIGNATURE);
+  const signatureFields = useMemo(
+    () => fields.filter((field) => [FieldType.SIGNATURE].includes(field.type)),
+    [fields]
+  );
   const [dialogField, setDialogField] = useState<any>();
 
-  useEffect(() => {
-    setSigningDone(checkIfSigningIsDone());
-  }, [fields]);
+  function signField(options: {
+    fieldId: string;
+    type: string;
+    typedSignature?: string;
+    signatureImage?: string;
+  }) {
+    const { fieldId, type, typedSignature, signatureImage } = options;
+
+    const signature = {
+      fieldId,
+      type,
+      typedSignature,
+      signatureImage,
+    };
+
+    const field = fields.find((e) => e.id == fieldId);
+
+    if (!field) {
+      return;
+    }
+
+    setLocalSignatures((s) => [...s.filter((e) => e.fieldId !== fieldId), signature]);
+
+    setFields((prevState) => {
+      const newState = [...prevState];
+      const index = newState.findIndex((e) => e.id == fieldId);
+
+      newState[index] = {
+        ...newState[index],
+        signature,
+      };
+
+      return newState;
+    });
+  }
 
   function onClick(item: any) {
-    if (item.type === "SIGNATURE") {
+    if (item.type === FieldType.SIGNATURE) {
       setDialogField(item);
-      setOpen(true);
+      setSignatureDialogOpen(true);
+    }
+
+    if (item.type === FieldType.NAME) {
+      setDialogField(item);
+      setNameDialogOpen(true);
     }
   }
 
@@ -43,31 +85,107 @@ export default function PDFSigner(props: any) {
 
     if (!dialogResult) return;
 
-    const signature = {
+    signField({
       fieldId: dialogField.id,
       type: dialogResult.type,
       typedSignature: dialogResult.typedSignature,
       signatureImage: dialogResult.signatureImage,
-    };
+    });
 
-    setLocalSignatures(localSignatures.concat(signature));
-
-    fields.splice(
-      fields.findIndex(function (i) {
-        return i.id === signature.fieldId;
-      }),
-      1
-    );
-    const signedField = { ...dialogField };
-    signedField.signature = signature;
-    setFields((prevState) => [...prevState, signedField]);
-    setOpen(false);
+    setSignatureDialogOpen(false);
+    setNameDialogOpen(false);
     setDialogField(null);
   }
 
+  function checkIfSigningIsDone(): boolean {
+    // Check if all fields are signed..
+    if (signatureFields.length > 0) {
+      // If there are no fields to sign at least one signature is enough
+      return fields
+        .filter((field) => field.type === FieldType.SIGNATURE)
+        .every((field) => field.signature);
+    } else {
+      // If we don't have a signature field, we need at least one free signature
+      // to be able to complete signing
+      const freeSignatureFields = fields.filter((field) => field.type === FieldType.FREE_SIGNATURE);
+
+      return freeSignatureFields.length > 0 && freeSignatureFields.every((field) => field.signature);
+    }
+  }
+
+  function addFreeSignature(e: any, page: number, recipient: any): any {
+    const freeSignatureField = createField(e, page, recipient, FieldType.FREE_SIGNATURE);
+
+    createOrUpdateField(props.document, freeSignatureField, recipient.token).then((res) => {
+      setFields((prevState) => [...prevState, res]);
+      setDialogField(res);
+      setSignatureDialogOpen(true);
+    });
+
+    return freeSignatureField;
+  }
+
+  function onDeleteHandler(id: any) {
+    const field = fields.find((e) => e.id == id);
+    const fieldIndex = fields.map((item) => item.id).indexOf(id);
+    if (fieldIndex > -1) {
+      const fieldWithoutRemoved = [...fields];
+      const removedField = fieldWithoutRemoved.splice(fieldIndex, 1);
+      setFields(fieldWithoutRemoved);
+
+      const signaturesWithoutRemoved = [...localSignatures];
+      const removedSignature = signaturesWithoutRemoved.splice(
+        signaturesWithoutRemoved.findIndex(function (i) {
+          return i.fieldId === id;
+        }),
+        1
+      );
+
+      setLocalSignatures(signaturesWithoutRemoved);
+      deleteField(field).catch((err) => {
+        setFields(fieldWithoutRemoved.concat(removedField));
+        setLocalSignatures(signaturesWithoutRemoved.concat(removedSignature));
+      });
+    }
+  }
+
+  useEffect(() => {
+    setSigningDone(checkIfSigningIsDone());
+  }, [fields]);
+
+  useEffect(() => {
+    const nameFields = fields.filter((field) => field.type === FieldType.NAME);
+
+    if (nameFields.length > 0) {
+      nameFields.forEach((field) => {
+        if (!field.signature && props.recipient?.name) {
+          signField({
+            fieldId: field.id,
+            type: "type",
+            typedSignature: props.recipient.name,
+          });
+        }
+      });
+    }
+    // We are intentionally not specifying deps here
+    // because we want to run this effect on the initial render
+  }, []);
+
   return (
     <>
-      <SignatureDialog open={open} setOpen={setOpen} onClose={onDialogClose} />
+      <SignatureDialog
+        open={signatureDialogOpen}
+        setOpen={setSignatureDialogOpen}
+        onClose={onDialogClose}
+      />
+
+      <NameDialog
+        open={nameDialogOpen}
+        setOpen={setNameDialogOpen}
+        onClose={onDialogClose}
+        defaultName={props.recipient?.name ?? ""}
+      />
+
       <div className="bg-neon p-4">
         <div className="flex">
           <div className="flex-shrink-0 flex gap-x-2 items-center">
@@ -135,52 +253,4 @@ export default function PDFSigner(props: any) {
         onDelete={onDeleteHandler}></PDFViewer>
     </>
   );
-
-  function checkIfSigningIsDone(): boolean {
-    // Check if all fields are signed..
-    if (signatureFields.length > 0) {
-      // If there are no fields to sign at least one signature is enough
-      return fields
-        .filter((field) => field.type === FieldType.SIGNATURE)
-        .every((field) => field.signature);
-    } else {
-      return localSignatures.length > 0;
-    }
-  }
-
-  function addFreeSignature(e: any, page: number, recipient: any): any {
-    const freeSignatureField = createField(e, page, recipient, FieldType.FREE_SIGNATURE);
-
-    createOrUpdateField(props.document, freeSignatureField, recipient.token).then((res) => {
-      setFields((prevState) => [...prevState, res]);
-      setDialogField(res);
-      setOpen(true);
-    });
-
-    return freeSignatureField;
-  }
-
-  function onDeleteHandler(id: any) {
-    const field = fields.find((e) => e.id == id);
-    const fieldIndex = fields.map((item) => item.id).indexOf(id);
-    if (fieldIndex > -1) {
-      const fieldWithoutRemoved = [...fields];
-      const removedField = fieldWithoutRemoved.splice(fieldIndex, 1);
-      setFields(fieldWithoutRemoved);
-
-      const signaturesWithoutRemoved = [...localSignatures];
-      const removedSignature = signaturesWithoutRemoved.splice(
-        signaturesWithoutRemoved.findIndex(function (i) {
-          return i.fieldId === id;
-        }),
-        1
-      );
-
-      setLocalSignatures(signaturesWithoutRemoved);
-      deleteField(field).catch((err) => {
-        setFields(fieldWithoutRemoved.concat(removedField));
-        setLocalSignatures(signaturesWithoutRemoved.concat(removedSignature));
-      });
-    }
-  }
 }

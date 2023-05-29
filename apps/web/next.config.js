@@ -4,6 +4,10 @@ require("dotenv").config({ path: "../../.env" });
 const nextConfig = {
   reactStrictMode: true,
   swcMinify: false,
+  env: {
+    IS_PULL_REQUEST: process.env.IS_PULL_REQUEST,
+    RENDER_EXTERNAL_URL: process.env.RENDER_EXTERNAL_URL,
+  },
 };
 
 const transpileModules = require("next-transpile-modules")([
