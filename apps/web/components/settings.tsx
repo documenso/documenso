@@ -5,7 +5,7 @@ import { useRouter } from "next/router";
 import { updateUser } from "@documenso/features";
 import { getUser } from "@documenso/lib/api";
 import { fetchPortalSession, isSubscriptionsEnabled, useSubscription } from "@documenso/lib/stripe";
-import { Button } from "@documenso/ui";
+import { Button, Input } from "@documenso/ui";
 import { BillingPlans } from "./billing-plans";
 import { CreditCardIcon, KeyIcon, UserCircleIcon } from "@heroicons/react/24/outline";
 import { SubscriptionStatus } from "@prisma/client";
@@ -139,33 +139,17 @@ export default function Setttings() {
 
                 <div className="my-6 grid grid-cols-12 gap-6">
                   <div className="col-span-12 sm:col-span-6">
-                    <label htmlFor="first-name" className="block text-sm font-medium text-gray-700">
-                      Full Name
-                    </label>
-                    <input
+                    <Input
+                      label="Full Name"
                       type="text"
-                      name="first-name"
-                      id="first-name"
                       value={user?.name || ""}
                       onChange={(e) => handleNameChange(e)}
                       onKeyDown={handleKeyPress}
                       autoComplete="given-name"
-                      className="focus:border-neon focus:ring-neon mt-1 block w-full rounded-md border border-gray-300 py-2 px-3 shadow-sm focus:outline-none sm:text-sm"
                     />
                   </div>
                   <div className="col-span-12 sm:col-span-6">
-                    <label htmlFor="first-name" className="block text-sm font-medium text-gray-700">
-                      Email
-                    </label>
-                    <input
-                      disabled
-                      value={user?.email!}
-                      type="text"
-                      name="first-name"
-                      id="first-name"
-                      autoComplete="given-name"
-                      className="focus:border-neon focus:ring-neon mt-1 block w-full rounded-md border border-gray-300 py-2 px-3 shadow-sm focus:outline-none disabled:bg-neutral-100 sm:text-sm"
-                    />
+                    <Input label="Email" type="email" disabled value={user?.email!} />
                   </div>
                 </div>
                 <Button onClick={() => updateUser(user)}>Save</Button>
