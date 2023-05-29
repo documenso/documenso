@@ -69,7 +69,7 @@ export default function Login(props: any) {
       <div className="flex min-h-full items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
         <div className="w-full max-w-md space-y-8">
           <div>
-            <Logo className="mx-auto h-10 w-auto"></Logo>
+            <Logo className="mx-auto h-20 w-auto"></Logo>
             <h2 className="mt-6 text-center text-3xl font-bold tracking-tight text-gray-900">
               Sign in to your account
             </h2>
@@ -111,7 +111,7 @@ export default function Login(props: any) {
               </div>
               <div className="flex items-center justify-between">
                 <div className="text-sm">
-                  <a href="#" className="text-gray-500 hover:text-neon-700 font-medium">
+                  <a href="#" className="hover:text-neon-700 font-medium text-gray-500">
                     Forgot your password?
                   </a>
                 </div>
@@ -123,7 +123,7 @@ export default function Login(props: any) {
                   className="group relative flex w-full">
                   <span className="absolute inset-y-0 left-0 flex items-center pl-3">
                     <LockClosedIcon
-                      className="text-neon-700 group-hover:text-neon-dark-700 h-5 w-5 disabled:disabled:bg-gray-600 disabled:group-hover:bg-gray-600 duration-200"
+                      className="text-neon-700 group-hover:text-neon-dark-700 h-5 w-5 duration-200 disabled:disabled:bg-gray-600 disabled:group-hover:bg-gray-600"
                       aria-hidden="true"
                     />
                   </span>
@@ -141,7 +141,9 @@ export default function Login(props: any) {
               {props.allowSignup ? (
                 <p className="mt-2 text-center text-sm text-gray-600">
                   Are you new here?{" "}
-                  <Link href="/signup" className="text-gray-500 hover:text-neon-700 duration-200 font-medium">
+                  <Link
+                    href="/signup"
+                    className="hover:text-neon-700 font-medium text-gray-500 duration-200">
                     Create a new Account
                   </Link>
                 </p>
@@ -151,7 +153,7 @@ export default function Login(props: any) {
                   <Link
                     href="https://documenso.com"
                     className="text-neon hover:text-neon font-medium">
-                    Hosted Documenso will be available soon™
+                    Hosted Documenso is here!
                   </Link>
                 </p>
               )}

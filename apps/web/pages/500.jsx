@@ -2,14 +2,16 @@ import { Button } from "@documenso/ui";
 import Logo from "../components/logo";
 import { ArrowSmallLeftIcon } from "@heroicons/react/20/solid";
 import { EllipsisVerticalIcon } from "@heroicons/react/20/solid";
+import Link from "next/link";
 
 export default function Custom500() {
   return (
     <>
       <div className="relative flex min-h-full flex-col items-center justify-center bg-black text-white">
-        <div className="absolute top-10 left-10">
-          <Logo dark className="w-10 md:w-20" />
-        </div>
+        <Link href="/" className="absolute top-10 left-10 flex gap-x-2 items-center invert">
+          <Logo className="w-10" />
+          <h2 className="text-2xl font-semibold text-black">Documenso</h2>
+        </Link>
 
         <div className="mt-20 max-w-7xl px-4 py-10">
           <p className="inline-flex items-center text-3xl font-bold sm:text-5xl">

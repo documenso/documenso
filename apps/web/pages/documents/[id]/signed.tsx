@@ -55,7 +55,7 @@ const Signed: NextPageWithLayout = (props: any) => {
       <p className="mt-4 text-center text-sm text-gray-600">
         Want to send slick signing links like this one?{" "}
         <Link href="https://documenso.com" className="text-neon hover:text-neon font-medium">
-          Hosted Documenso is coming soon™
+          Hosted Documenso is here!
         </Link>
       </p>
     </>
