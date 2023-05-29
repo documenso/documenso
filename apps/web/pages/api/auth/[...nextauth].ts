@@ -82,10 +82,18 @@ export const authOptions: NextAuthOptions = {
   ],
   callbacks: {
     async jwt({ token, user, account }) {
+      if (user) {
+        token = {
+          ...token,
+          provider: account?.provider,
+        };
+      }
+
       return {
         ...token,
       };
     },
+
     async session({ session, token, user }) {
       const documensoSession: Session = {
         ...session,
@@ -97,24 +105,6 @@ export const authOptions: NextAuthOptions = {
 
       documensoSession.expires;
       return documensoSession;
-    },
-    async signIn({ user, account }) {
-      if (account?.provider === "google") {
-        await prisma.user
-          .update({
-            where: {
-              email: user.email!,
-            },
-            data: {
-              identityProvider: IdentityProvider.GOOGLE,
-            },
-          })
-          .then(() => {
-            return true;
-          });
-      }
-
-      return true;
     },
   },
   adapter: PrismaAdapter(prisma),
