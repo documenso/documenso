@@ -70,10 +70,12 @@ export default function PDFSigner(props: any) {
       <SignatureDialog open={open} setOpen={setOpen} onClose={onDialogClose} />
       <div className="bg-neon p-4">
         <div className="flex">
-          <div className="flex-shrink-0">
-            <Logo className="-mt-2.5 h-12 w-12"></Logo>
+          <div className="flex-shrink-0 flex gap-x-2 items-center">
+            <Logo className="h-8 w-8" />
+            <h2 className="text-2xl font-semibold">Documenso</h2>
           </div>
-          <div className="ml-3 flex-1 items-center justify-start text-center md:flex md:justify-between">
+
+          <div className="mx-3 flex-1 items-center justify-start text-center md:flex md:justify-between">
             <p className="text-lg text-slate-700">
               {props.document.User.name
                 ? `${props.document.User.name} (${props.document.User.email})`

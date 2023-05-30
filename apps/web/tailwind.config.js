@@ -12,8 +12,8 @@ module.exports = {
   theme: {
     extend: {
       fontFamily: {
-        monteserrat: ["Monteserrat", "serif"],
-        qwigley: ["Qwigley", "serif"],
+        sans: ["var(--font-sans)", ...defaultTheme.fontFamily.sans],
+        qwigley: ["var(--font-qwigley)", "serif"],
       },
       colors: {
         neon: {
@@ -57,6 +57,19 @@ module.exports = {
           800: "#000000",
           900: "#000000",
           950: "#000000",
+        },
+        brand: {
+          DEFAULT: "#A2E771",
+          100: "#F4FCEE",
+          200: "#E8F9DC",
+          300: "#D1F3B9",
+          400: "#BBED96",
+          500: "#A2E771",
+          600: "#8DE151",
+          700: "#76DC2E",
+          800: "#63C021",
+          900: "#519D1B",
+          950: "#488C18",
         },
       },
       borderRadius: {

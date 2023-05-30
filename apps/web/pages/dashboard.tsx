@@ -20,12 +20,15 @@ import {
 } from "@prisma/client";
 import { truncate } from "fs";
 import { Tooltip as ReactTooltip } from "react-tooltip";
+import { useSubscription } from "@documenso/lib/stripe";
 
 type FormValues = {
   document: File;
 };
 
 const DashboardPage: NextPageWithLayout = (props: any) => {
+  const { hasSubscription } = useSubscription();
+
   const stats = [
     {
       name: "Draft",
@@ -90,9 +93,12 @@ const DashboardPage: NextPageWithLayout = (props: any) => {
         </div>
         <div
           onClick={() => {
-            document?.getElementById("fileUploadHelper")?.click();
+            if (hasSubscription) {
+              document?.getElementById("fileUploadHelper")?.click();
+            }
           }}
-          className="group hover:border-neon-600 duration-200 relative block w-full cursor-pointer rounded-lg border-2 border-dashed border-gray-300 p-12 text-center focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+          aria-disabled={!hasSubscription}
+          className="group hover:border-neon-600 duration-200 relative block w-full cursor-pointer rounded-lg border-2 border-dashed border-gray-300 p-12 text-center focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 aria-disabled:opacity-50 aria-disabled:pointer-events-none">
           
           <svg
             className="mx-auto h-12 w-12 text-gray-400 group-hover:text-gray-700 duration-200"
