@@ -12,8 +12,8 @@ module.exports = {
   theme: {
     extend: {
       fontFamily: {
-        monteserrat: ["Monteserrat", "serif"],
-        qwigley: ["Qwigley", "serif"],
+        sans: ["var(--font-sans)", ...defaultTheme.fontFamily.sans],
+        qwigley: ["var(--font-qwigley)", "serif"],
       },
       colors: {
         neon: {
