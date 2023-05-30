@@ -42,10 +42,10 @@ export default function App({
   return (
     <SessionProvider session={session}>
       <SubscriptionProvider initialSubscription={initialSubscription}>
-        <div className={`${montserrat.variable} font-sans`}>
+        <main className={`${montserrat.variable} h-full font-sans`}>
           <Toaster position="top-center" />
           {getLayout(<Component {...pageProps} />)}
-        </div>
+        </main>
       </SubscriptionProvider>
     </SessionProvider>
   );
