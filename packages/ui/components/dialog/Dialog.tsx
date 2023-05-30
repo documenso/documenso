@@ -20,7 +20,7 @@ type DialogProps = {
   formValues: FormValue[];
   setLoading: (loading: boolean) => void;
   icon: React.ReactNode;
-  truncateTitle: boolean;
+  truncateTitle?: boolean;
 };
 
 export function Dialog({
