@@ -10,7 +10,7 @@ export const addDigitalSignature = async (documentAsBase64: string): Promise<str
   const pdfBuffer = Buffer.from(documentAsBase64, "base64");
   const p12Buffer = Buffer.from(
     fs
-      .readFileSync(process.env.CERT_FILE_PATH || "ressources/certificate.p12")
+      .readFileSync(process.env.CERT_FILE_PATH || "resources/certificate.p12")
       .toString(process.env.CERT_FILE_ENCODING ? undefined : "binary"),
     (process.env.CERT_FILE_ENCODING as BufferEncoding) || "binary"
   );
