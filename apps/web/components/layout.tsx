@@ -1,13 +1,28 @@
 import { useEffect } from "react";
+import { Montserrat, Qwigley } from "next/font/google";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { NEXT_PUBLIC_WEBAPP_URL } from "@documenso/lib/constants";
 import { useSubscription } from "@documenso/lib/stripe";
+import { BillingWarning } from "./billing-warning";
 import Navigation from "./navigation";
 import { PaperAirplaneIcon } from "@heroicons/react/24/outline";
 import { SubscriptionStatus } from "@prisma/client";
 import { useSession } from "next-auth/react";
-import { BillingWarning } from "./billing-warning";
+
+const montserrat = Montserrat({
+  subsets: ["latin"],
+  weight: ["400", "700"],
+  display: "swap",
+  variable: "--font-sans",
+});
+
+const qwigley = Qwigley({
+  subsets: ["latin"],
+  weight: ["400"],
+  display: "swap",
+  variable: "--font-qwigley",
+});
 
 function useRedirectToLoginIfUnauthenticated() {
   const { data: session, status } = useSession();
@@ -39,7 +54,7 @@ export default function Layout({ children }: any) {
 
   return (
     <>
-      <div className="min-h-full">
+      <div className={`${montserrat.variable} min-h-full font-sans`}>
         <Navigation />
 
         <main>
