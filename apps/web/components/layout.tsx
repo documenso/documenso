@@ -3,11 +3,11 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import { NEXT_PUBLIC_WEBAPP_URL } from "@documenso/lib/constants";
 import { useSubscription } from "@documenso/lib/stripe";
+import { BillingWarning } from "./billing-warning";
 import Navigation from "./navigation";
 import { PaperAirplaneIcon } from "@heroicons/react/24/outline";
 import { SubscriptionStatus } from "@prisma/client";
 import { useSession } from "next-auth/react";
-import { BillingWarning } from "./billing-warning";
 
 function useRedirectToLoginIfUnauthenticated() {
   const { data: session, status } = useSession();

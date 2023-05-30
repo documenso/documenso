@@ -78,8 +78,6 @@ The current project goal is to <b>[release a production ready version](https://g
 
 - To contribute please see our [contribution guide](https://github.com/documenso/documenso/blob/main/CONTRIBUTING.md).
 
-
-
 # Tech
 
 Documenso is built using awesome open source tech including:
@@ -123,7 +121,7 @@ Want to get up and running quickly? Follow these steps:
   - This will spin up a postgres database and inbucket mail server in docker containers.
 - Run `npm run dev` in the root directory
 - Want it even faster? Just use
-    ```sh
+  ```sh
   npm run d
   ```
 
@@ -157,10 +155,10 @@ Follow these steps to setup documenso on you local machine:
 ---
 
 - Optional: Seed the database using <code>npm run db-seed</code> to create a test user and document
-- Optional: Upload and sign <code>apps/web/ressources/example.pdf</code> manually to test your setup
+- Optional: Upload and sign <code>apps/web/resources/example.pdf</code> manually to test your setup
 
 - Optional: Create your own signing certificate
-  - A demo certificate is provided in `/app/web/ressources/certificate.p12`
+  - A demo certificate is provided in `/app/web/resources/certificate.p12`
   - To generate your own using these steps and a Linux Terminal or Windows Subsystem for Linux (WSL) see **[Create your own signing certificate](#creating-your-own-signing-certificate)**.
 
 ## Updating
@@ -185,7 +183,7 @@ For the digital signature of your documents you need a signing certificate in .p
 3. Combine the private key and the self-signed certificate to create the p12 certificate. You can run the following command to do this: \
    <code>openssl pkcs12 -export -out certificate.p12 -inkey private.key -in certificate.crt</code>
 4. You will be prompted to enter a password for the p12 file. Choose a strong password and remember it, as you will need it to use the certificate (**can be empty for dev certificates**)
-5. Place the certificate <code>/apps/web/ressource/certificate.p12</code>
+5. Place the certificate <code>/apps/web/resources/certificate.p12</code>
 
 # Docker
 
