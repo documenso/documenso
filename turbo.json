@@ -1,0 +1,38 @@
+{
+  "$schema": "https://turbo.build/schema.json",
+  "globalEnv": [
+    "DATABASE_URL",
+    "NEXT_PUBLIC_WEBAPP_URL",
+    "NEXTAUTH_SECRET",
+    "NEXTAUTH_URL",
+    "CERT_FILE_PATH",
+    "CERT_PASSPHRASE",
+    "CERT_FILE_ENCODING",
+    "SENDGRID_API_KEY",
+    "SMTP_MAIL_HOST",
+    "SMTP_MAIL_PORT",
+    "SMTP_MAIL_USER",
+    "SMTP_MAIL_PASSWORD",
+    "MAIL_FROM",
+    "STRIPE_API_KEY",
+    "STRIPE_WEBHOOK_SECRET",
+    "NEXT_PUBLIC_STRIPE_COMMUNITY_PLAN_MONTHLY_PRICE_ID",
+    "NEXT_PUBLIC_STRIPE_COMMUNITY_PLAN_YEARLY_PRICE_ID",
+    "NEXT_PUBLIC_ALLOW_SIGNUP",
+    "NEXT_PUBLIC_ALLOW_SUBSCRIPTIONS"
+  ],
+  "pipeline": {
+    "build": {
+      "outputs": [".next/**", "!.next/cache/**"]
+    },
+    "start": {
+      "dependsOn": ["build"],
+      "cache": false,
+      "persistent": true
+    },
+    "dev": {
+      "cache": false,
+      "persistent": true
+    }
+  }
+}
