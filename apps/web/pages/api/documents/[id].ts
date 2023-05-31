@@ -90,6 +90,6 @@ async function deleteHandler(req: NextApiRequest, res: NextApiResponse) {
 }
 
 export default defaultHandler({
-  GET: Promise.resolve({ default: defaultResponder(getHandler) }),
-  DELETE: Promise.resolve({ default: defaultResponder(deleteHandler) }),
+  GET: Promise.resolve({ default: defaultResponder(getHandler as any) }),
+  DELETE: Promise.resolve({ default: defaultResponder(deleteHandler as any) }),
 });

@@ -52,5 +52,5 @@ async function postHandler(req: NextApiRequest, res: NextApiResponse) {
 }
 
 export default defaultHandler({
-  POST: Promise.resolve({ default: defaultResponder(postHandler) }),
+  POST: Promise.resolve({ default: defaultResponder(postHandler as any) }),
 });
