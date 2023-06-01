@@ -42,6 +42,7 @@ COPY --from=production_deps --chown=nextjs:nodejs /app/package-lock.json ./packa
 COPY --from=builder --chown=nextjs:nodejs /app/apps/web/package.json ./package.json
 COPY --from=builder --chown=nextjs:nodejs /app/apps/web/public ./public
 COPY --from=builder --chown=nextjs:nodejs /app/apps/web/.next ./.next
+COPY --from=builder --chown=nextjs:nodejs /app/apps/web/dist ./dist
 
 EXPOSE 3000
 
