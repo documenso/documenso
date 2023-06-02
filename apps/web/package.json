@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build && tsc --project tsconfig.server.json",
-    "start": "node ./dist/index.js",
+    "start": "node dist/index.js",
     "lint": "next lint",
     "db-studio": "prisma db studio",
     "stripe:listen": "stripe listen --forward-to localhost:3000/api/stripe/webhook"
