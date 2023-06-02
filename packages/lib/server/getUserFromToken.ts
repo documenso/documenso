@@ -2,7 +2,6 @@ import { NextApiRequest, NextApiResponse } from "next";
 import prisma from "@documenso/prisma";
 import { User as PrismaUser } from "@prisma/client";
 import { getToken } from "next-auth/jwt";
-import { signOut } from "next-auth/react";
 
 export async function getUserFromToken(
   req: NextApiRequest,

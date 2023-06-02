@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React from "react";
 import { Fragment } from "react";
 import { sendSigningRequests } from "@documenso/lib/api";
 import { truncate } from "@documenso/lib/helpers";

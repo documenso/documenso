@@ -1,4 +1,4 @@
-import { GetServerSideProps, GetServerSidePropsContext, NextApiRequest } from "next";
+import { GetServerSidePropsContext, NextApiRequest } from "next";
 import { SubscriptionStatus } from "@prisma/client";
 import { getToken } from "next-auth/jwt";
 
