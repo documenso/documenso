@@ -4,6 +4,7 @@ import { useRouter } from "next/router";
 import { NEXT_PUBLIC_WEBAPP_URL } from "@documenso/lib";
 import { getDocument } from "@documenso/lib/query";
 import { getUserFromToken } from "@documenso/lib/server";
+import { useSubscription } from "@documenso/lib/stripe";
 import { Breadcrumb, Button } from "@documenso/ui";
 import PDFEditor from "../../../components/editor/pdf-editor";
 import Layout from "../../../components/layout";
@@ -14,6 +15,7 @@ import { Document as PrismaDocument } from "@prisma/client";
 
 const DocumentsDetailPage: NextPageWithLayout = (props: any) => {
   const router = useRouter();
+  const { hasSubscription } = useSubscription();
 
   return (
     <div className="mt-4">

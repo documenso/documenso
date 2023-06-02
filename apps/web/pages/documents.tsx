@@ -20,14 +20,22 @@ import {
 } from "@heroicons/react/24/outline";
 import { DocumentStatus } from "@prisma/client";
 import { Tooltip as ReactTooltip } from "react-tooltip";
+import { useSubscription } from "@documenso/lib/stripe";
 
 const DocumentsPage: NextPageWithLayout = (props: any) => {
   const router = useRouter();
+  const { hasSubscription } = useSubscription();
   const [documents, setDocuments]: any[] = useState([]);
   const [filteredDocuments, setFilteredDocuments] = useState([]);
 
   const [loading, setLoading] = useState(true);
-  const statusFilters = [
+
+  type statusFilterType = {
+    label: string;
+    value: DocumentStatus | "ALL";
+  };
+
+  const statusFilters: statusFilterType[] = [
     { label: "All", value: "ALL" },
     { label: "Draft", value: "DRAFT" },
     { label: "Waiting for others", value: "PENDING" },
@@ -83,6 +91,20 @@ const DocumentsPage: NextPageWithLayout = (props: any) => {
     return filteredDocuments;
   }
 
+  function handleStatusFilterChange(status: statusFilterType) {
+    router.replace(
+      {
+        pathname: router.pathname,
+        query: { filter: status.value },
+      },
+      undefined,
+      {
+        shallow: true, // Perform a shallow update, without reloading the page
+      }
+    );
+    setSelectedStatusFilter(status);
+  }
+
   function wasXDaysAgoOrLess(documentDate: Date, lastXDays: number): boolean {
     if (lastXDays < 0) return true;
 
@@ -115,6 +137,7 @@ const DocumentsPage: NextPageWithLayout = (props: any) => {
           <div className="mt-4 sm:mt-0 sm:ml-16 sm:flex-none">
             <Button
               icon={DocumentPlusIcon}
+              disabled={!hasSubscription}
               onClick={() => {
                 document?.getElementById("fileUploadHelper")?.click();
               }}>
@@ -122,26 +145,26 @@ const DocumentsPage: NextPageWithLayout = (props: any) => {
             </Button>
           </div>
         </div>
-        <div className="mt-3 mb-12">
-          <div className="float-right ml-3 mt-7 block w-fit">
+        <div className="mt-3 mb-12 flex flex-row-reverse items-center gap-x-4">
+          <div className="pt-5 block w-fit">
             {filteredDocuments.length != 1 ? filteredDocuments.length + " Documents" : "1 Document"}
           </div>
           <SelectBox
-            className="float-right block w-1/4"
+            className="block w-1/4"
             label="Created"
             options={createdFilter}
             value={selectedCreatedFilter}
             onChange={setSelectedCreatedFilter}
           />
           <SelectBox
-            className="float-right ml-3 block w-1/4"
+            className="block w-1/4"
             label="Status"
             options={statusFilters}
             value={selectedStatusFilter}
-            onChange={setSelectedStatusFilter}
+            onChange={handleStatusFilterChange}
           />
         </div>
-        <div className="mt-20 max-w-[1100px]" hidden={!loading}>
+        <div className="mt-8 max-w-[1100px]" hidden={!loading}>
           <div className="ph-item">
             <div className="ph-col-12">
               <div className="ph-picture"></div>
@@ -158,7 +181,7 @@ const DocumentsPage: NextPageWithLayout = (props: any) => {
             </div>
           </div>
         </div>
-        <div className="mt-28 flex flex-col" hidden={!documents.length || loading}>
+        <div className="mt-8 flex flex-col" hidden={!documents.length || loading}>
           <div
             className="-my-2 -mx-4 overflow-x-auto sm:-mx-6 lg:-mx-8"
             hidden={!documents.length || loading}>
@@ -201,13 +224,13 @@ const DocumentsPage: NextPageWithLayout = (props: any) => {
                         <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
                           {document.title || "#" + document.id}
                         </td>
-                        <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                        <td className="whitespace-nowrap inline-flex py-3 gap-x-2 gap-y-1 flex-wrap max-w-[250px] text-sm text-gray-500">
                           {document.Recipient.map((item: any) => (
                             <div key={item.id}>
                               {item.sendStatus === "NOT_SENT" ? (
                                 <span
                                   id="sent_icon"
-                                  className="inline-block flex-shrink-0 rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-800">
+                                  className="flex-shrink-0 h-6 inline-flex items-center rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-800">
                                   {item.name ? item.name + " <" + item.email + ">" : item.email}
                                 </span>
                               ) : (
@@ -217,8 +240,8 @@ const DocumentsPage: NextPageWithLayout = (props: any) => {
                                 <span id="sent_icon">
                                   <span
                                     id="sent_icon"
-                                    className="inline-block flex-shrink-0 rounded-full bg-yellow-200 px-2 py-0.5 text-xs font-medium text-green-800">
-                                    <EnvelopeIcon className="mr-1 inline h-5"></EnvelopeIcon>
+                                    className="flex-shrink-0 h-6 inline-flex items-center rounded-full bg-yellow-200 px-2 py-0.5 text-xs font-medium text-yellow-800">
+                                    <EnvelopeIcon className="mr-1 inline h-4"></EnvelopeIcon>
                                     {item.name ? item.name + " <" + item.email + ">" : item.email}
                                   </span>
                                 </span>
@@ -230,9 +253,9 @@ const DocumentsPage: NextPageWithLayout = (props: any) => {
                                 <span id="read_icon">
                                   <span
                                     id="sent_icon"
-                                    className="inline-block flex-shrink-0 rounded-full bg-yellow-200 px-2 py-0.5 text-xs font-medium text-green-800">
-                                    <CheckIcon className="-mr-2 inline h-5"></CheckIcon>
-                                    <CheckIcon className="mr-1 inline h-5"></CheckIcon>
+                                    className="flex-shrink-0 h-6 inline-flex items-center rounded-full bg-yellow-200 px-2 py-0.5 text-xs font-medium text-yellow-800">
+                                    <CheckIcon className="-mr-2 inline h-4"></CheckIcon>
+                                    <CheckIcon className="mr-1 inline h-4"></CheckIcon>
                                     {item.name ? item.name + " <" + item.email + ">" : item.email}
                                   </span>
                                 </span>
@@ -241,7 +264,7 @@ const DocumentsPage: NextPageWithLayout = (props: any) => {
                               )}
                               {item.signingStatus === "SIGNED" ? (
                                 <span id="signed_icon">
-                                  <span className="inline-block flex-shrink-0 rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-800">
+                                  <span className="flex-shrink-0 h-6 inline-flex items-center rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-800">
                                     <CheckBadgeIcon className="mr-1 inline h-5"></CheckBadgeIcon>{" "}
                                     {item.email}
                                   </span>
@@ -358,6 +381,7 @@ const DocumentsPage: NextPageWithLayout = (props: any) => {
         <div className="mt-6">
           <Button
             icon={PlusIcon}
+            disabled={!hasSubscription}
             onClick={() => {
               document?.getElementById("fileUploadHelper")?.click();
             }}>

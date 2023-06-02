@@ -22,7 +22,7 @@ echo "Git SHA: $GIT_SHA"
 
 docker build -f "$SCRIPT_DIR/Dockerfile" \
     --progress=plain \
-    -t "documentso:latest" \
+    -t "documenso:latest" \
     -t "documenso:$GIT_SHA" \
     -t "documenso:$APP_VERSION" \
     "$MONOREPO_ROOT"

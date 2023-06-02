@@ -1,6 +1,13 @@
-<p align="center" style="margin-top: 12px">
+<div align="center" style="margin-top: 12px; margin-bottom: 3332px;">
+  <p>
+    We are LIVE on Product Hunt. Come say hi..
+  </p>
+<a href="https://www.producthunt.com/posts/documenso?utm_source=badge-featured&utm_medium=badge&utm_souce=badge-documenso" target="_blank"><img src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=395047&theme=light" alt="Documenso - The&#0032;Open&#0032;Source&#0032;DocuSign&#0032;Alternative&#0046; | Product Hunt" style="width: 250px; height: 54px;" width="250" height="54" /></a>
+</div>
+<br>
+<p align="center" style="margin-top: 120px">
   <a href="https://github.com/documenso/documenso.com">
-   <img width="250px" src="https://user-images.githubusercontent.com/1309312/224986248-5b8a5cdc-2dc1-46b9-a354-985bb6808ee0.png" alt="Documenso Logo">
+   <img width="250px" src="https://github.com/documenso/documenso/assets/1309312/cd7823ec-4baa-40b9-be78-4acb3b1c73cb" alt="Documenso Logo">
   </a>
 
   <h3 align="center">Open Source Signing Infrastructure</h3>
@@ -71,14 +78,12 @@ The current project goal is to <b>[release a production ready version](https://g
 
 - To contribute please see our [contribution guide](https://github.com/documenso/documenso/blob/main/CONTRIBUTING.md).
 
-## Tools
-
 # Tech
 
 Documenso is built using awesome open source tech including:
 
 - [Typescript](https://www.typescriptlang.org/)
-- [Javascript (when neccessary)](https://developer.mozilla.org/en-US/docs/Web/JavaScript)
+- [Javascript (when necessary)](https://developer.mozilla.org/en-US/docs/Web/JavaScript)
 - [NextJS (JS Fullstack Framework)](https://nextjs.org/)
 - [Postgres SQL (Database)](https://www.postgresql.org/)
 - [Prisma (ORM - Object-relational mapping)](https://www.prisma.io/)
@@ -86,7 +91,7 @@ Documenso is built using awesome open source tech including:
 - [Node SignPDF (Digital Signature)](https://github.com/vbuch/node-signpdf)
 - [React-PDF for viewing PDFs](https://github.com/wojtekmaj/react-pdf)
 - [PDF-Lib for PDF manipulation](https://github.com/Hopding/pdf-lib)
-- Check out /packages.json and /apps/web/package.json for more
+- Check out `/package.json` and `/apps/web/package.json` for more
 - Support for [opensignpdf (requires Java on server)](https://github.com/open-pdf-sign) is currently planned.
 
 # Getting Started
@@ -96,7 +101,7 @@ Documenso is built using awesome open source tech including:
 To run Documenso locally you need
 
 - [Node.js (Version: >=18.x)](https://nodejs.org/en/download/)
-- Node Package Manger NPM - included in Node.js
+- Node Package Manager NPM - included in Node.js
 - [PostgreSQL (local or remote)](https://www.postgresql.org/download/)
 
 ## Developer Quickstart
@@ -111,12 +116,12 @@ Want to get up and running quickly? Follow these steps:
   git clone https://github.com/documenso/documenso
   ```
 
-- Set up your .env file using the recommendations in the .env.example file.
+- Set up your `.env` file using the recommendations in the `.env.example` file.
 - Run `npm run dx` in the root directory
   - This will spin up a postgres database and inbucket mail server in docker containers.
 - Run `npm run dev` in the root directory
 - Want it even faster? Just use
-    ```sh
+  ```sh
   npm run d
   ```
 
@@ -124,11 +129,11 @@ That's it! You should now be able to access the app at http://localhost:3000
 
 Incoming mail will be available at http://localhost:9000
 
-Your database will also be available on port `5432`. You can connect to it using your favorite database client.
+Your database will also be available on port `54320`. You can connect to it using your favorite database client.
 
 ## Developer Setup
 
-Follow these steps to setup documenso on you local machnine:
+Follow these steps to setup documenso on you local machine:
 
 - [Clone the repository](https://help.github.com/articles/cloning-a-repository/) it to your local device.
   ```sh
@@ -138,36 +143,36 @@ Follow these steps to setup documenso on you local machnine:
 - Rename <code>.env.example</code> to <code>.env</code>
 - Set DATABASE_URL value in .env file
   - You can use the provided test database url (may be wiped at any point)
-  - Or setup a local postgres sql instance (recommened)
+  - Or setup a local postgres sql instance (recommended)
 - Create the database scheme by running <code>db-migrate:dev</code>
 - Setup your mail provider
   - Set <code>SENDGRID_API_KEY</code> value in .env file
   - You need a SendGrid account, which you can create [here](https://signup.sendgrid.com/).
-  - Documenso uses [Nodemailer](https://nodemailer.com/about/) so you can easily use your own SMTP server by setting the <code>SMTP\_\* varibles</code> in your .env
+  - Documenso uses [Nodemailer](https://nodemailer.com/about/) so you can easily use your own SMTP server by setting the <code>SMTP\_\* variables</code> in your .env
 - Run <code>npm run dev</code> root directory to start
 - Register a new user at http://localhost:3000/signup
 
 ---
 
 - Optional: Seed the database using <code>npm run db-seed</code> to create a test user and document
-- Optional: Upload and sign <code>apps\web\ressources\example.pdf</code> manually to test your setup
+- Optional: Upload and sign <code>apps/web/resources/example.pdf</code> manually to test your setup
 
 - Optional: Create your own signing certificate
-  - A demo certificate is provided in /app/web/ressources/certificate.p12
-  - To generate you own using these steps and a linux Terminal or Windows Linux Subsystem see **Create your own signging certificate**.
+  - A demo certificate is provided in `/app/web/resources/certificate.p12`
+  - To generate your own using these steps and a Linux Terminal or Windows Subsystem for Linux (WSL) see **[Create your own signing certificate](#creating-your-own-signing-certificate)**.
 
 ## Updating
 
-- If you pull the newest version from main, using <code>git pull</code>, it may be neccessary to regenerate your database client
-- You can do this by running the generate command in /packages/prisma:
+- If you pull the newest version from main, using <code>git pull</code>, it may be necessary to regenerate your database client
+- You can do this by running the generate command in `/packages/prisma`:
   ```sh
   npx prisma generate
   ```
-- This is not neccessary on first clone
+- This is not necessary on first clone.
 
-# Creating your own signging certificate
+# Creating your own signing certificate
 
-For the digital signature of you documents you need a signign certificate in .p12 formate (public and private key). You can buy one (not recommended for dev) or use the steps to create a self-signed one:
+For the digital signature of your documents you need a signing certificate in .p12 format (public and private key). You can buy one (not recommended for dev) or use the steps to create a self-signed one:
 
 1. Generate a private key using the OpenSSL command. You can run the following command to generate a 2048-bit RSA key:\
    <code>openssl genrsa -out private.key 2048</code>
@@ -178,7 +183,7 @@ For the digital signature of you documents you need a signign certificate in .p1
 3. Combine the private key and the self-signed certificate to create the p12 certificate. You can run the following command to do this: \
    <code>openssl pkcs12 -export -out certificate.p12 -inkey private.key -in certificate.crt</code>
 4. You will be prompted to enter a password for the p12 file. Choose a strong password and remember it, as you will need it to use the certificate (**can be empty for dev certificates**)
-5. Place the certificate <code>/apps/web/ressource/certificate.p12</code>
+5. Place the certificate <code>/apps/web/resources/certificate.p12</code>
 
 # Docker
 
@@ -193,3 +198,32 @@ Want to create a production ready docker image? Follow these steps:
 
 - Docker support
 - One-Click-Deploy on Render.com Deploy
+
+# Troubleshooting
+
+## Support IPv6
+
+In case you are deploying to a cluster that uses only IPv6. You can use a custom command to pass a parameter to the NextJS start command
+
+For local docker run
+
+```bash
+docker run -it documenso:latest npm run start -- -H ::
+```
+
+For k8s or docker-compose
+
+```yaml
+containers:
+  - name: documenso
+    image: documenso:latest
+    imagePullPolicy: IfNotPresent
+    command:
+      - npm
+    args:
+      - run
+      - start
+      - --
+      - -H
+      - '::'
+```

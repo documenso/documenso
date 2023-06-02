@@ -5,6 +5,7 @@ import { Button, IconButton } from "@documenso/ui";
 import { Dialog, Transition } from "@headlessui/react";
 import { LanguageIcon, PencilIcon, TrashIcon } from "@heroicons/react/24/outline";
 import SignatureCanvas from "react-signature-canvas";
+import { useDebouncedValue } from "../../hooks/use-debounced-value";
 
 const tabs = [
   { name: "Type", icon: LanguageIcon, current: true },
@@ -15,6 +16,9 @@ export default function SignatureDialog(props: any) {
   const [currentTab, setCurrentTab] = useState(tabs[0]);
   const [typedSignature, setTypedSignature] = useState("");
   const [signatureEmpty, setSignatureEmpty] = useState(true);
+  // This is a workaround to prevent the canvas from being rendered when the dialog is closed
+  // we also need the debounce to avoid rendering while transitions are occuring.
+  const showCanvas = useDebouncedValue<boolean>(props.open, 1);
   let signCanvasRef: any | undefined;
 
   useEffect(() => {
@@ -85,7 +89,7 @@ export default function SignatureDialog(props: any) {
                     </div>
                     {isCurrentTab("Type") ? (
                       <div>
-                        <div className="my-8 mb-3 border-b border-gray-300">
+                        <div className="my-7 mb-3 border-b border-gray-300">
                           <input
                             value={typedSignature}
                             onChange={(e) => {
@@ -98,7 +102,7 @@ export default function SignatureDialog(props: any) {
                             placeholder="Kindly type your name"
                           />
                         </div>
-                        <div className="float-right">
+                        <div className="flex flex-row-reverse items-center gap-x-3">
                           <Button
                             color="secondary"
                             onClick={() => {
@@ -126,47 +130,55 @@ export default function SignatureDialog(props: any) {
                       ""
                     )}
                     {isCurrentTab("Draw") ? (
-                      <div className="">
-                        <SignatureCanvas
-                          ref={(ref) => {
-                            signCanvasRef = ref;
-                          }}
-                          canvasProps={{
-                            className: "sigCanvas border-b b-2 border-slate w-full h-full mb-3",
-                          }}
-                          clearOnResize={true}
-                          onEnd={() => {
-                            setSignatureEmpty(signCanvasRef?.isEmpty());
-                          }}
-                        />
-                        <IconButton
-                          className="float-left block"
-                          icon={TrashIcon}
-                          onClick={() => {
-                            signCanvasRef?.clear();
-                            setSignatureEmpty(signCanvasRef?.isEmpty());
-                          }}></IconButton>
-                        <div className="float-right mt-10">
-                          <Button
-                            color="secondary"
-                            onClick={() => {
-                              props.onClose();
-                              props.setOpen(false);
-                              setCurrent(tabs[0]);
-                            }}>
-                            Cancel
-                          </Button>
-                          <Button
-                            className="ml-3"
-                            onClick={() => {
-                              props.onClose({
-                                type: "draw",
-                                signatureImage: signCanvasRef.toDataURL("image/png"),
-                              });
+                      <div className="" key={props.open ? "closed" : "open"}>
+                        {showCanvas && (
+                          <SignatureCanvas
+                            ref={(ref) => {
+                              signCanvasRef = ref;
                             }}
-                            disabled={signatureEmpty}>
-                            Sign
-                          </Button>
+                            canvasProps={{
+                              className: "sigCanvas border-b b-2 border-slate w-full h-full mb-3",
+                            }}
+                            clearOnResize={true}
+                            onEnd={() => {
+                              setSignatureEmpty(signCanvasRef?.isEmpty());
+                            }}
+                          />
+                        )}
+                        
+                        <div className="flex items-center justify-between">
+                          <IconButton
+                            className="block"
+                            icon={TrashIcon}
+                            onClick={() => {
+                              signCanvasRef?.clear();
+                              setSignatureEmpty(signCanvasRef?.isEmpty());
+                            }}
+                          />
+
+                          <div className="flex flex-row-reverse items-center gap-x-3">
+                            <Button
+                              color="secondary"
+                              onClick={() => {
+                                props.onClose();
+                                props.setOpen(false);
+                                setCurrent(tabs[0]);
+                              }}>
+                              Cancel
+                            </Button>
+
+                            <Button
+                              className="ml-3"
+                              onClick={() => {
+                                props.onClose({
+                                  type: "draw",
+                                  signatureImage: signCanvasRef.toDataURL("image/png"),
+                                });
+                              }}
+                              disabled={signatureEmpty}>
+                              Sign
+                            </Button>
+                          </div>
                         </div>
                       </div>
                     ) : (

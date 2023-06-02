@@ -59,7 +59,7 @@ export async function getServerSideProps(context: any) {
     },
   });
 
-  const recipient = await prisma.recipient.findFirstOrThrow({
+  const recipient = await prisma.recipient.findFirst({
     where: {
       token: recipientToken,
     },
@@ -68,12 +68,21 @@ export async function getServerSideProps(context: any) {
     },
   });
 
+  if (!recipient) {
+    return {
+      redirect: {
+        permanent: false,
+        destination: "/404",
+      },
+    };
+  }
+
   // Document is already signed
   if (recipient.Document.status === DocumentStatus.COMPLETED) {
     return {
       redirect: {
         permanent: false,
-        destination: `/documents/${recipient.Document.id}/signed`,
+        destination: `/documents/${recipient.Document.id}/signed?token=${recipientToken}`,
       },
     };
   }

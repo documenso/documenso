@@ -1,4 +1,5 @@
 import Head from "next/head";
+import { getUserFromToken } from "@documenso/lib/server";
 import Login from "../components/login";
 
 export default function LoginPage(props: any) {
@@ -13,11 +14,21 @@ export default function LoginPage(props: any) {
 }
 
 export async function getServerSideProps(context: any) {
-  const ALLOW_SIGNUP = process.env.ALLOW_SIGNUP === "true";
+  const user = await getUserFromToken(context.req, context.res);
+  if (user)
+    return {
+      redirect: {
+        source: "/login",
+        destination: "/dashboard",
+        permanent: false,
+      },
+    };
+
+  const ALLOW_SIGNUP = process.env.NEXT_PUBLIC_ALLOW_SIGNUP === "true";
 
   return {
     props: {
-      ALLOW_SIGNUP: ALLOW_SIGNUP,
+      ALLOW_SIGNUP,
     },
   };
 }
