@@ -1,7 +1,6 @@
 import { Button } from "@documenso/ui";
 import Logo from "../components/logo";
 import { ArrowSmallLeftIcon } from "@heroicons/react/20/solid";
-import { EllipsisVerticalIcon } from "@heroicons/react/20/solid";
 import Link from "next/link";
 
 export default function Custom500() {

@@ -2,7 +2,7 @@ import Head from "next/head";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import prisma from "@documenso/prisma";
-import { Button, IconButton } from "@documenso/ui";
+import { Button } from "@documenso/ui";
 import { NextPageWithLayout } from "../../_app";
 import { ArrowDownTrayIcon, CheckBadgeIcon } from "@heroicons/react/24/outline";
 import { truncate } from "@documenso/lib/helpers";

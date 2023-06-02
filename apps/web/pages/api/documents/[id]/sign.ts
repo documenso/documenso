@@ -1,6 +1,5 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { sendSigningDoneMail } from "@documenso/lib/mail";
-import { getDocument } from "@documenso/lib/query";
 import { defaultHandler, defaultResponder } from "@documenso/lib/server";
 import { insertImageInPDF, insertTextInPDF } from "@documenso/pdf";
 import prisma from "@documenso/prisma";

@@ -1,6 +1,3 @@
-import Link from "next/link";
-import { classNames } from "@documenso/lib";
-
 export default function Logo(props: any) {
   return (
     <>

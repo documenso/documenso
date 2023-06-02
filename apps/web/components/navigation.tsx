@@ -7,7 +7,6 @@ import { Disclosure, Menu, Transition } from "@headlessui/react";
 import {
   ArrowRightOnRectangleIcon,
   Bars3Icon,
-  BellIcon,
   ChartBarIcon,
   DocumentTextIcon,
   UserCircleIcon,

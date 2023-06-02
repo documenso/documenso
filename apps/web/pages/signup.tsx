@@ -1,4 +1,3 @@
-import { NextPageContext } from "next";
 import Head from "next/head";
 import { getUserFromToken } from "@documenso/lib/server";
 import Signup from "../components/signup";
