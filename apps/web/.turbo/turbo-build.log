@@ -1,0 +1,122 @@
+
+> @documenso/web@0.1.0 build
+> next build
+
+- info Creating an optimized production build...
+- info Compiled successfully
+- info Linting and checking validity of types...
+
+./pages/documents.tsx
+72:6  Warning: React Hook useEffect has missing dependencies: 'loadDocuments', 'props.filter', and 'statusFilters'. Either include them or remove the dependency array. If 'setSelectedStatusFilter' needs the current value of 'props.filter', you can also switch to useReducer instead of useState and read 'props.filter' in the reducer.  react-hooks/exhaustive-deps
+76:6  Warning: React Hook useEffect has a missing dependency: 'filterDocumentes'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
+
+./components/editor/field-type-selector.tsx
+21:6  Warning: React Hook useEffect has a missing dependency: 'props'. Either include it or remove the dependency array. However, 'props' will change when *any* prop changes, so the preferred fix is to destructure the 'props' object outside of the useEffect call and refer to those specific props inside useEffect.  react-hooks/exhaustive-deps
+
+./components/editor/pdf-signer.tsx
+28:6  Warning: React Hook useEffect has a missing dependency: 'checkIfSigningIsDone'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
+
+./components/editor/recipient-selector.tsx
+13:6  Warning: React Hook useEffect has a missing dependency: 'props'. Either include it or remove the dependency array. However, 'props' will change when *any* prop changes, so the preferred fix is to destructure the 'props' object outside of the useEffect call and refer to those specific props inside useEffect.  react-hooks/exhaustive-deps
+
+./components/editor/signable-field.tsx
+68:13  Warning: Do not use `<img>` element. Use `<Image />` from `next/image` instead. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+68:13  Warning: img elements must have an alt prop, either with meaningful text, or an empty string for decorative images.  jsx-a11y/alt-text
+
+info  - Need to disable some ESLint rules? Learn more here: https://nextjs.org/docs/basic-features/eslint#disabling-rules
+- info Collecting page data...
+- info Generating static pages (0/7)
+{
+  'process.env.NEXT_PUBLIC_ALLOW_SUBSCRIPTIONS': 'false',
+  enabled: false,
+  'subscription.status': undefined,
+  'subscription.periodEnd': undefined
+}
+- info Generating static pages (1/7)
+{
+  'process.env.NEXT_PUBLIC_ALLOW_SUBSCRIPTIONS': 'false',
+  enabled: false,
+  'subscription.status': undefined,
+  'subscription.periodEnd': undefined
+}
+{
+  'process.env.NEXT_PUBLIC_ALLOW_SUBSCRIPTIONS': 'false',
+  enabled: false,
+  'subscription.status': undefined,
+  'subscription.periodEnd': undefined
+}
+- info Generating static pages (3/7)
+{
+  'process.env.NEXT_PUBLIC_ALLOW_SUBSCRIPTIONS': 'false',
+  enabled: false,
+  'subscription.status': undefined,
+  'subscription.periodEnd': undefined
+}
+{
+  'process.env.NEXT_PUBLIC_ALLOW_SUBSCRIPTIONS': 'false',
+  enabled: false,
+  'subscription.status': undefined,
+  'subscription.periodEnd': undefined
+}
+- info Generating static pages (5/7)
+{
+  'process.env.NEXT_PUBLIC_ALLOW_SUBSCRIPTIONS': 'false',
+  enabled: false,
+  'subscription.status': undefined,
+  'subscription.periodEnd': undefined
+}
+{
+  'process.env.NEXT_PUBLIC_ALLOW_SUBSCRIPTIONS': 'false',
+  enabled: false,
+  'subscription.status': undefined,
+  'subscription.periodEnd': undefined
+}
+- info Generating static pages (7/7)
+- info Finalizing page optimization...
+
+Route (pages)                              Size     First Load JS
+┌ λ /                                      244 B          90.8 kB
+├   /_app                                  0 B            90.6 kB
+├ ○ /404                                   5.16 kB         119 kB
+├ ○ /500                                   5.11 kB         119 kB
+├ λ /api/auth/[...nextauth]                0 B            90.6 kB
+├ λ /api/auth/signup                       0 B            90.6 kB
+├ λ /api/documents                         0 B            90.6 kB
+├ λ /api/documents/[id]                    0 B            90.6 kB
+├ λ /api/documents/[id]/fields             0 B            90.6 kB
+├ λ /api/documents/[id]/fields/[fid]       0 B            90.6 kB
+├ λ /api/documents/[id]/recipients         0 B            90.6 kB
+├ λ /api/documents/[id]/recipients/[rid]   0 B            90.6 kB
+├ λ /api/documents/[id]/send               0 B            90.6 kB
+├ λ /api/documents/[id]/sign               0 B            90.6 kB
+├ λ /api/health                            0 B            90.6 kB
+├ λ /api/stripe/checkout-session           0 B            90.6 kB
+├ λ /api/stripe/portal-session             0 B            90.6 kB
+├ λ /api/stripe/subscription               0 B            90.6 kB
+├ λ /api/stripe/webhook                    0 B            90.6 kB
+├ λ /api/test-sign/[id]                    0 B            90.6 kB
+├ λ /api/users                             0 B            90.6 kB
+├ λ /api/users/me                          0 B            90.6 kB
+├ λ /dashboard                             3 kB            170 kB
+├ λ /documents                             4.36 kB         185 kB
+├ λ /documents/[id]                        7.86 kB         180 kB
+├ λ /documents/[id]/recipients             3.72 kB         184 kB
+├ λ /documents/[id]/sign                   15.3 kB         145 kB
+├ λ /documents/[id]/signed                 1.51 kB         116 kB
+├ λ /login                                 6.24 kB         129 kB
+├ ○ /settings                              222 B           177 kB
+├ ○ /settings/account                      261 B           177 kB
+├ ○ /settings/billing                      268 B           177 kB
+├ ○ /settings/password                     262 B           177 kB
+├ ○ /settings/profile                      261 B           177 kB
+└ λ /signup                                2.29 kB         125 kB
++ First Load JS shared by all              98.8 kB
+  ├ chunks/framework-25cb315fa3c61a79.js   45.3 kB
+  ├ chunks/main-2324ff1d8f14b74b.js        27.8 kB
+  ├ chunks/pages/_app-e0c4133317461815.js  15.5 kB
+  ├ chunks/webpack-77aaf8191d94da09.js     2.04 kB
+  └ css/42b4b9137f81990f.css               8.2 kB
+
+λ  (Server)  server-side renders at runtime (uses getInitialProps or getServerSideProps)
+○  (Static)  automatically rendered as static HTML (uses no initial props)
+
