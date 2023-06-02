@@ -198,3 +198,32 @@ Want to create a production ready docker image? Follow these steps:
 
 - Docker support
 - One-Click-Deploy on Render.com Deploy
+
+# Troubleshooting
+
+## Support IPv6
+
+In case you are deploying to a cluster that uses only IPv6. You can use a custom command to pass a parameter to the NextJS start command
+
+For local docker run
+
+```bash
+docker run -it documenso:latest npm run start -- -H ::
+```
+
+For k8s or docker-compose
+
+```yaml
+containers:
+  - name: documenso
+    image: documenso:latest
+    imagePullPolicy: IfNotPresent
+    command:
+      - npm
+    args:
+      - run
+      - start
+      - --
+      - -H
+      - '::'
+```
