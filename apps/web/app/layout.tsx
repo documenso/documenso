@@ -1,6 +1,7 @@
 import { Metadata } from "next";
 import { Montserrat, Qwigley } from "next/font/google";
 import { cn } from "../lib/utils";
+import "../styles/tailwind.css";
 
 export const metadata: Metadata = {
   title: {
