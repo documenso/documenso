@@ -25,12 +25,16 @@ async function postHandler(req: NextApiRequest, res: NextApiResponse) {
     return res.status(404).json({ message: "Invalid token." });
   }
 
+  const now = new Date();
+
+  if (now > foundToken.expiry) {
+    return res.status(400).json({ message: "Token has expired" });
+  }
+
   const isSamePassword = await verifyPassword(password, foundToken.User.password!);
 
   if (isSamePassword) {
-    return res
-      .status(400)
-      .json({ message: "New password must be different from the current password." });
+    return res.status(400).json({ message: "New password must be different" });
   }
 
   const hashedPassword = await hashPassword(password);

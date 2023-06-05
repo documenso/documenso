@@ -27,7 +27,7 @@ export default function ForgotPassword() {
       }),
       {
         loading: "Sending...",
-        success: `Reset link sent. `,
+        success: "Reset link sent.",
         error: "Could not send reset link :/",
       }
     );

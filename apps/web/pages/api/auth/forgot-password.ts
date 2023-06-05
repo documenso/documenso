@@ -20,7 +20,7 @@ async function postHandler(req: NextApiRequest, res: NextApiResponse) {
   });
 
   if (!user) {
-    return res.status(404).json({ message: "No user found with this email." });
+    return res.status(404).json({ message: "No user found with this email" });
   }
 
   const existingToken = await prisma.passwordResetToken.findFirst({
@@ -33,23 +33,24 @@ async function postHandler(req: NextApiRequest, res: NextApiResponse) {
   });
 
   if (existingToken) {
-    return res
-      .status(400)
-      .json({ message: "A password reset has already been requested. Please check your email." });
+    return res.status(400).json({ message: "Password reset requested." });
   }
 
   const token = crypto.randomBytes(64).toString("hex");
+  const expiry = new Date();
+  expiry.setHours(expiry.getHours() + 1); // Set expiry to one hour from now
 
   let passwordResetToken;
   try {
     passwordResetToken = await prisma.passwordResetToken.create({
       data: {
         token,
+        expiry,
         userId: user.id,
       },
     });
   } catch (error) {
-    return res.status(500).json({ message: "Error saving token." });
+    return res.status(500).json({ message: "Something went wrong" });
   }
 
   await sendResetPassword(user, passwordResetToken.token);
