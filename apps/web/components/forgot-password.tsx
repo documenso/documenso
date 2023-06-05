@@ -3,6 +3,7 @@ import { Button } from "@documenso/ui";
 import Logo from "./logo";
 import { ArrowLeftIcon } from "@heroicons/react/24/outline";
 import { FormProvider, useForm } from "react-hook-form";
+import { toast } from "react-hot-toast";
 
 interface IResetPassword {
   email: string;
@@ -13,6 +14,21 @@ export default function ForgotPassword(props: any) {
   const { register, formState, resetField } = methods;
 
   const onSubmit = async (values: IResetPassword) => {
+    await toast.promise(
+      fetch(`/api/auth/forgot-password`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(values),
+      }),
+      {
+        loading: "Sending...",
+        success: `Reset link sent. `,
+        error: "Could not send reset link :/",
+      }
+    );
+
     resetField("email");
 
     console.log(values);
