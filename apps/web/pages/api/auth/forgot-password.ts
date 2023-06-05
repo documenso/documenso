@@ -24,7 +24,6 @@ async function postHandler(req: NextApiRequest, res: NextApiResponse) {
   }
 
   const token = crypto.randomBytes(64).toString("hex");
-
   const passwordResetToken = await prisma.passwordResetToken.create({
     data: {
       token,
@@ -34,7 +33,7 @@ async function postHandler(req: NextApiRequest, res: NextApiResponse) {
 
   await sendResetPassword(user, passwordResetToken.token);
 
-  res.status(201).end();
+  res.status(200).json({ message: "Password reset email sent." });
 }
 
 export default defaultHandler({

@@ -1,6 +1,6 @@
 import Head from "next/head";
 import { getUserFromToken } from "@documenso/lib/server";
-import ResetPassword from "../../components/reset-password";
+import ResetPassword from "../../../components/reset-password";
 
 export default function ResetPasswordPage(props: any) {
   return (

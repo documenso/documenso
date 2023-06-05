@@ -1,40 +1,53 @@
 import { NextApiRequest, NextApiResponse } from "next";
+import { hashPassword } from "@documenso/lib/auth";
 import { sendResetPassword } from "@documenso/lib/mail";
 import { defaultHandler, defaultResponder } from "@documenso/lib/server";
 import prisma from "@documenso/prisma";
-import crypto from "crypto";
 
 async function postHandler(req: NextApiRequest, res: NextApiResponse) {
-  const { email } = req.body;
-  const cleanEmail = email.toLowerCase();
+  const { token, password } = req.body;
 
-  if (!cleanEmail || !cleanEmail.includes("@")) {
-    res.status(422).json({ message: "Invalid email" });
+  if (!token) {
+    res.status(422).json({ message: "Invalid token" });
     return;
   }
 
-  const user = await prisma.user.findFirst({
+  const foundToken = await prisma.passwordResetToken.findUnique({
     where: {
-      email: cleanEmail,
+      token,
+    },
+    include: {
+      User: true,
     },
   });
 
-  if (!user) {
-    return res.status(400).json({ message: "No user found with this email." });
+  if (!foundToken) {
+    return res.status(400).json({ message: "Invalid token." });
   }
 
-  const token = crypto.randomBytes(64).toString("hex");
+  const hashedPassword = await hashPassword(password);
 
-  const passwordResetToken = await prisma.passwordResetToken.create({
-    data: {
-      token,
-      userId: user.id,
-    },
-  });
+  const transaction = await prisma.$transaction([
+    prisma.user.update({
+      where: {
+        id: foundToken.userId,
+      },
+      data: {
+        password: hashedPassword,
+      },
+    }),
+    prisma.passwordResetToken.delete({
+      where: {
+        token,
+      },
+    }),
+  ]);
 
-  await sendResetPassword(user, passwordResetToken.token);
+  if (!transaction) {
+    return res.status(500).json({ message: "Error resetting password." });
+  }
 
-  res.status(201).end();
+  res.status(200).json({ message: "Password reset successful." });
 }
 
 export default defaultHandler({

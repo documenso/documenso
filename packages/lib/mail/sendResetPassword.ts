@@ -7,10 +7,7 @@ export const sendResetPassword = async (user: User, token: string) => {
   await sendMail(
     user.email,
     "Forgot password?",
-    resetPasswordTemplate(
-      `${NEXT_PUBLIC_WEBAPP_URL}/api/auth/reset/${token}`,
-      "Reset Your Password"
-    )
+    resetPasswordTemplate(`${NEXT_PUBLIC_WEBAPP_URL}/auth/reset/${token}`, "Reset Your Password")
   ).catch((err) => {
     throw err;
   });
