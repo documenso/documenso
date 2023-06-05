@@ -1,3 +1,4 @@
+import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { Button } from "@documenso/ui";
@@ -19,8 +20,10 @@ export default function ResetPassword(props: any) {
   const { register, formState, watch } = methods;
   const password = watch("password", "");
 
+  const [resetSuccessful, setResetSuccessful] = useState(false);
+
   const onSubmit = async (values: IResetPassword) => {
-    await toast.promise(
+    const response = await toast.promise(
       fetch(`/api/auth/reset-password`, {
         method: "POST",
         headers: {
@@ -35,7 +38,12 @@ export default function ResetPassword(props: any) {
       }
     );
 
-    console.log(values);
+    if (response.ok) {
+      setResetSuccessful(true);
+      setTimeout(() => {
+        router.push("/login");
+      }, 2000);
+    }
   };
 
   if (!token) {
@@ -50,6 +58,22 @@ export default function ResetPassword(props: any) {
             <p className="mt-2 text-center text-sm text-gray-600">
               The token you provided is invalid. Please try again.
             </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (resetSuccessful) {
+    return (
+      <div className="flex min-h-full items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+        <div className="w-full max-w-md space-y-8">
+          <div>
+            <Logo className="mx-auto h-20 w-auto"></Logo>
+            <h2 className="mt-6 text-center text-3xl font-bold tracking-tight text-gray-900">
+              Reset Password
+            </h2>
+            <p className="mt-2 text-center text-sm text-gray-600">Your password has been reset.</p>
           </div>
         </div>
       </div>
