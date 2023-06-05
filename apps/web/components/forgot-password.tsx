@@ -1,3 +1,4 @@
+import { useState } from "react";
 import Link from "next/link";
 import { Button } from "@documenso/ui";
 import Logo from "./logo";
@@ -9,12 +10,14 @@ interface IForgotPassword {
   email: string;
 }
 
-export default function ForgotPassword(props: any) {
+export default function ForgotPassword() {
   const methods = useForm<IForgotPassword>();
   const { register, formState, resetField } = methods;
 
+  const [resetSuccessful, setResetSuccessful] = useState(false);
+
   const onSubmit = async (values: IForgotPassword) => {
-    await toast.promise(
+    const response = await toast.promise(
       fetch(`/api/auth/forgot-password`, {
         method: "POST",
         headers: {
@@ -29,10 +32,38 @@ export default function ForgotPassword(props: any) {
       }
     );
 
-    resetField("email");
+    if (response.ok) {
+      setResetSuccessful(true);
+    }
 
-    console.log(values);
+    resetField("email");
   };
+
+  if (resetSuccessful) {
+    return (
+      <div className="flex min-h-full items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+        <div className="w-full max-w-md space-y-8">
+          <div>
+            <Logo className="mx-auto h-20 w-auto"></Logo>
+            <h2 className="mt-6 text-center text-3xl font-bold tracking-tight text-gray-900">
+              Reset Password
+            </h2>
+            <p className="mt-2 text-center text-sm text-gray-600">
+              Please check your email for reset instructions.
+            </p>
+          </div>
+          <div>
+            <Link href="/login">
+              <div className="relative mt-10 flex items-center justify-center gap-2 text-sm text-gray-500 hover:cursor-pointer hover:text-gray-900">
+                <ArrowLeftIcon className="h-4 w-4" />
+                Back to log in
+              </div>
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <>
