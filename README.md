@@ -1,10 +1,3 @@
-<div align="center" style="margin-top: 12px; margin-bottom: 3332px;">
-  <p>
-    We are LIVE on Product Hunt. Come say hi..
-  </p>
-<a href="https://www.producthunt.com/posts/documenso?utm_source=badge-featured&utm_medium=badge&utm_souce=badge-documenso" target="_blank"><img src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=395047&theme=light" alt="Documenso - The&#0032;Open&#0032;Source&#0032;DocuSign&#0032;Alternative&#0046; | Product Hunt" style="width: 250px; height: 54px;" width="250" height="54" /></a>
-</div>
-<br>
 <p align="center" style="margin-top: 120px">
   <a href="https://github.com/documenso/documenso.com">
    <img width="250px" src="https://github.com/documenso/documenso/assets/1309312/cd7823ec-4baa-40b9-be78-4acb3b1c73cb" alt="Documenso Logo">
@@ -62,6 +55,13 @@
 ## About this project
 
 Signing documents digitally is fast, easy and should be best practice for every document signed worldwide. This is technically quite easy today, but it also introduces a new party to every signature: The signing tool providers. While this is not a problem in itself, it should make us think about how we want these providers of trust to work. Documenso aims to be the world's most trusted document signing tool. This trust is built by empowering you to self-host Documenso and review how it works under the hood. Join us in creating the next generation of open trust infrastructure.
+
+## Recognition
+
+
+<a href="https://www.producthunt.com/posts/documenso?utm_source=badge-top-post-badge&utm_medium=badge&utm_souce=badge-documenso" target="_blank"><img src="https://api.producthunt.com/widgets/embed-image/v1/top-post-badge.svg?post_id=395047&theme=light&period=daily" alt="Documenso - The&#0032;open&#0032;source&#0032;DocuSign&#0032;alternative | Product Hunt" style="width: 250px; height: 54px;" width="250" height="54" /></a>
+<a href="https://www.producthunt.com/posts/documenso?utm_source=badge-featured&utm_medium=badge&utm_souce=badge-documenso" target="_blank"><img src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=395047&theme=light" alt="Documenso - The&#0032;Open&#0032;Source&#0032;DocuSign&#0032;Alternative&#0046; | Product Hunt" style="width: 250px; height: 54px;" width="250" height="54" /></a>
+
 
 ## Community and Next Steps 🎯
 
