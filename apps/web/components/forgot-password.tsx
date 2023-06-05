@@ -29,19 +29,18 @@ export default function ForgotPassword() {
         loading: "Sending...",
         success: `Reset link sent. `,
         error: "Could not send reset link :/",
-      },
-      {
-        style: {
-          minWidth: "200px",
-        },
       }
     );
 
     if (!response.ok) {
       toast.dismiss();
 
-      if (response.status == 400 || response.status == 404) {
+      if (response.status == 404) {
         toast.error("Email address not found.");
+      }
+
+      if (response.status == 400) {
+        toast.error("Password reset requested.");
       }
 
       if (response.status == 500) {

@@ -4,7 +4,7 @@ import { useRouter } from "next/router";
 import { Button } from "@documenso/ui";
 import Logo from "./logo";
 import { ArrowLeftIcon } from "@heroicons/react/24/outline";
-import { FormProvider, useForm, useWatch } from "react-hook-form";
+import { FormProvider, useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
 
 interface IResetPassword {

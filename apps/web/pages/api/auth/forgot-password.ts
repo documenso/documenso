@@ -23,10 +23,24 @@ async function postHandler(req: NextApiRequest, res: NextApiResponse) {
     return res.status(404).json({ message: "No user found with this email." });
   }
 
+  const existingToken = await prisma.passwordResetToken.findFirst({
+    where: {
+      userId: user.id,
+      createdAt: {
+        gte: new Date(Date.now() - 1000 * 60 * 60),
+      },
+    },
+  });
+
+  if (existingToken) {
+    return res
+      .status(400)
+      .json({ message: "A password reset has already been requested. Please check your email." });
+  }
+
   const token = crypto.randomBytes(64).toString("hex");
 
   let passwordResetToken;
-
   try {
     passwordResetToken = await prisma.passwordResetToken.create({
       data: {
