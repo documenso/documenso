@@ -20,16 +20,23 @@ async function postHandler(req: NextApiRequest, res: NextApiResponse) {
   });
 
   if (!user) {
-    return res.status(400).json({ message: "No user found with this email." });
+    return res.status(404).json({ message: "No user found with this email." });
   }
 
   const token = crypto.randomBytes(64).toString("hex");
-  const passwordResetToken = await prisma.passwordResetToken.create({
-    data: {
-      token,
-      userId: user.id,
-    },
-  });
+
+  let passwordResetToken;
+
+  try {
+    passwordResetToken = await prisma.passwordResetToken.create({
+      data: {
+        token,
+        userId: user.id,
+      },
+    });
+  } catch (error) {
+    return res.status(500).json({ message: "Error saving token." });
+  }
 
   await sendResetPassword(user, passwordResetToken.token);
 
