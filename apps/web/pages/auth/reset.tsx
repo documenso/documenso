@@ -1,14 +1,14 @@
 import Head from "next/head";
 import { getUserFromToken } from "@documenso/lib/server";
-import ForgotPassword from "../components/forgot-password";
+import ResetPassword from "../../components/reset-password";
 
-export default function ForgotPasswordPage(props: any) {
+export default function ResetPasswordPage(props: any) {
   return (
     <>
       <Head>
-        <title>Forgot Password | Documenso</title>
+        <title>Reset Password | Documenso</title>
       </Head>
-      <ForgotPassword allowSignup={props.ALLOW_SIGNUP}></ForgotPassword>
+      <ResetPassword allowSignup={props.ALLOW_SIGNUP}></ResetPassword>
     </>
   );
 }
