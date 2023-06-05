@@ -1,5 +1,5 @@
 import { NextApiRequest, NextApiResponse } from "next";
-import { sendResetPassword } from "@documenso/lib/mail";
+import { sendResetPassword, sendResetPasswordSuccessMail } from "@documenso/lib/mail";
 import { defaultHandler, defaultResponder } from "@documenso/lib/server";
 import prisma from "@documenso/prisma";
 import crypto from "crypto";

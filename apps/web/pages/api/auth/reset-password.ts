@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { hashPassword } from "@documenso/lib/auth";
-import { sendResetPassword } from "@documenso/lib/mail";
+import { sendResetPasswordSuccessMail } from "@documenso/lib/mail";
 import { defaultHandler, defaultResponder } from "@documenso/lib/server";
 import prisma from "@documenso/prisma";
 
@@ -46,6 +46,8 @@ async function postHandler(req: NextApiRequest, res: NextApiResponse) {
   if (!transaction) {
     return res.status(500).json({ message: "Error resetting password." });
   }
+
+  await sendResetPasswordSuccessMail(foundToken.User);
 
   res.status(200).json({ message: "Password reset successful." });
 }
