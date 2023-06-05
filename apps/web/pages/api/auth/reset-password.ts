@@ -48,9 +48,9 @@ async function postHandler(req: NextApiRequest, res: NextApiResponse) {
         password: hashedPassword,
       },
     }),
-    prisma.passwordResetToken.delete({
+    prisma.passwordResetToken.deleteMany({
       where: {
-        token,
+        userId: foundToken.userId,
       },
     }),
   ]);
