@@ -1,4 +1,5 @@
 import { NextApiRequest, NextApiResponse } from "next";
+import { sendResetPassword } from "@documenso/lib/mail";
 import { defaultHandler, defaultResponder } from "@documenso/lib/server";
 import prisma from "@documenso/prisma";
 import crypto from "crypto";
@@ -31,9 +32,7 @@ async function postHandler(req: NextApiRequest, res: NextApiResponse) {
     },
   });
 
-  console.log(passwordResetToken);
-
-  // TODO: Send token to user via email
+  await sendResetPassword(user, passwordResetToken.token);
 
   res.status(201).end();
 }

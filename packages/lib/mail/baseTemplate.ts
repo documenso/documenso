@@ -1,10 +1,9 @@
 import { NEXT_PUBLIC_WEBAPP_URL } from "../constants";
-import { Document as PrismaDocument } from "@prisma/client";
 
 export const baseEmailTemplate = (message: string, content: string) => {
   const html = `
     <div style="background-color: #eaeaea; padding: 2%;">
-      <div style="text-align:center; margin: auto; font-size: 14px; font-color: #353434; max-width: 500px; border-radius: 0.375rem; background: white; padding: 50px">
+      <div style="text-align:center; margin: auto; font-size: 14px; color: #353434; max-width: 500px; border-radius: 0.375rem; background: white; padding: 50px">
         <img src="${NEXT_PUBLIC_WEBAPP_URL}/logo_h.png" alt="Documenso Logo" style="width: 180px; display: block; margin: auto; margin-bottom: 14px;">
         ${message} 
         ${content}
