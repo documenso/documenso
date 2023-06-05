@@ -38,6 +38,24 @@ export default function ResetPassword(props: any) {
       }
     );
 
+    if (!response.ok) {
+      toast.dismiss();
+
+      if (response.status == 404) {
+        toast.error("Invalid Token");
+      }
+
+      if (response.status == 400) {
+        toast.error("New password must be different");
+      }
+
+      if (response.status == 500) {
+        toast.error("Something went wrong.");
+      }
+
+      return;
+    }
+
     if (response.ok) {
       setResetSuccessful(true);
       setTimeout(() => {

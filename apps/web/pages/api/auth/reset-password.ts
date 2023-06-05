@@ -1,5 +1,5 @@
 import { NextApiRequest, NextApiResponse } from "next";
-import { hashPassword } from "@documenso/lib/auth";
+import { hashPassword, verifyPassword } from "@documenso/lib/auth";
 import { sendResetPasswordSuccessMail } from "@documenso/lib/mail";
 import { defaultHandler, defaultResponder } from "@documenso/lib/server";
 import prisma from "@documenso/prisma";
@@ -22,7 +22,15 @@ async function postHandler(req: NextApiRequest, res: NextApiResponse) {
   });
 
   if (!foundToken) {
-    return res.status(400).json({ message: "Invalid token." });
+    return res.status(404).json({ message: "Invalid token." });
+  }
+
+  const isSamePassword = await verifyPassword(password, foundToken.User.password!);
+
+  if (isSamePassword) {
+    return res
+      .status(400)
+      .json({ message: "New password must be different from the current password." });
   }
 
   const hashedPassword = await hashPassword(password);
