@@ -30,7 +30,7 @@ export default function PDFEditor(props: any) {
     movedField.positionY = position.y.toFixed(0);
     createOrUpdateField(props.document, movedField);
 
-    // no instant redraw neccessary, postion information for saving or later rerender is enough
+    // no instant redraw neccessary, position information for saving or later rerender is enough
     // setFields(newFields);
   }
 
