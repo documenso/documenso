@@ -7,7 +7,7 @@ import { ArrowLeftIcon } from "@heroicons/react/24/outline";
 import { FormProvider, useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
 
-interface IResetPassword {
+interface ForgotPasswordForm {
   password: string;
   confirmPassword: string;
 }
@@ -16,13 +16,13 @@ export default function ResetPassword(props: any) {
   const router = useRouter();
   const { token } = router.query;
 
-  const methods = useForm<IResetPassword>();
+  const methods = useForm<ForgotPasswordForm>();
   const { register, formState, watch } = methods;
   const password = watch("password", "");
 
   const [resetSuccessful, setResetSuccessful] = useState(false);
 
-  const onSubmit = async (values: IResetPassword) => {
+  const onSubmit = async (values: ForgotPasswordForm) => {
     const response = await toast.promise(
       fetch(`/api/auth/reset-password`, {
         method: "POST",
