@@ -11,7 +11,7 @@
     <a href="https://documenso.com"><strong>Learn more »</strong></a>
     <br />
     <br />
-    <a href="https://join.slack.com/t/documenso/shared_invite/zt-1qwxxsvli-nDyojjt~wakhgBGl9JRl2w">Slack</a>
+    <a href="https://documen.so/slack">Slack</a>
     ·
     <a href="https://documenso.com">Website</a>
     ·
@@ -22,7 +22,7 @@
 </p>
 
 <p align="center">
-   <a href="https://join.slack.com/t/documenso/shared_invite/zt-1qwxxsvli-nDyojjt~wakhgBGl9JRl2w"><img src="https://img.shields.io/badge/Slack-documenso.slack.com-%234A154B" alt="Join Documenso on Slack"></a> 
+   <a href="https://documen.so/slack"><img src="https://img.shields.io/badge/Slack-documenso.slack.com-%234A154B" alt="Join Documenso on Slack"></a> 
    <a href="https://github.com/documenso/documenso/stargazers"><img src="https://img.shields.io/github/stars/documenso/documenso" alt="Github Stars"></a>
    <a href="https://github.com/documenso/documenso/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-AGPLv3-purple" alt="License"></a>
    <a href="https://github.com/documenso/documenso/pulse"><img src="https://img.shields.io/github/commit-activity/m/documenso/documenso" alt="Commits-per-month"></a>
@@ -58,10 +58,8 @@ Signing documents digitally is fast, easy and should be best practice for every 
 
 ## Recognition
 
-
 <a href="https://www.producthunt.com/posts/documenso?utm_source=badge-top-post-badge&utm_medium=badge&utm_souce=badge-documenso" target="_blank"><img src="https://api.producthunt.com/widgets/embed-image/v1/top-post-badge.svg?post_id=395047&theme=light&period=daily" alt="Documenso - The&#0032;open&#0032;source&#0032;DocuSign&#0032;alternative | Product Hunt" style="width: 250px; height: 54px;" width="250" height="54" /></a>
 <a href="https://www.producthunt.com/posts/documenso?utm_source=badge-featured&utm_medium=badge&utm_souce=badge-documenso" target="_blank"><img src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=395047&theme=light" alt="Documenso - The&#0032;Open&#0032;Source&#0032;DocuSign&#0032;Alternative&#0046; | Product Hunt" style="width: 250px; height: 54px;" width="250" height="54" /></a>
-
 
 ## Community and Next Steps 🎯
 
@@ -69,7 +67,7 @@ The current project goal is to <b>[release a production ready version](https://g
 
 - Check out the first source code release in this repository and test it
 - Tell us what you think in the current [Discussions](https://github.com/documenso/documenso/discussions)
-- Join the [Slack Channel](https://join.slack.com/t/documenso/shared_invite/zt-1qwxxsvli-nDyojjt~wakhgBGl9JRl2w) for any questions and getting to know to other community members
+- Join the [Slack Channel](https://documen.so/slack) for any questions and getting to know to other community members
 - ⭐ the repository to help us raise awareness
 - Spread the word on Twitter, that Documenso is working towards a more open signing tool
 - Fix or create [issues](https://github.com/documenso/documenso/issues), that are needed for the first production release
@@ -225,5 +223,5 @@ containers:
       - start
       - --
       - -H
-      - '::'
+      - "::"
 ```
