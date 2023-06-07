@@ -98,7 +98,6 @@ export default function ForgotPassword() {
           </div>
           <FormProvider {...methods}>
             <form className="mt-8 space-y-6" onSubmit={methods.handleSubmit(onSubmit)}>
-              <input type="hidden" name="remember" defaultValue="true" />
               <div className="-space-y-px rounded-md shadow-sm">
                 <div>
                   <label htmlFor="email-address" className="sr-only">
