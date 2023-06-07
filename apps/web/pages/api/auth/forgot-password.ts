@@ -38,7 +38,7 @@ async function postHandler(req: NextApiRequest, res: NextApiResponse) {
 
   const token = crypto.randomBytes(64).toString("hex");
   const expiry = new Date();
-  expiry.setHours(expiry.getHours() + 1); // Set expiry to one hour from now
+  expiry.setHours(expiry.getHours() + 24); // Set expiry to one hour from now
 
   let passwordResetToken;
   try {
