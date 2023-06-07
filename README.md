@@ -11,7 +11,7 @@
     <a href="https://documenso.com"><strong>Learn more »</strong></a>
     <br />
     <br />
-    <a href="https://join.slack.com/t/documenso/shared_invite/zt-1wrwmi601-Zcn1GpVOagcakE842fVCBQ">Slack</a>
+    <a href="https://documen.so/slack">Slack</a>
     ·
     <a href="https://documenso.com">Website</a>
     ·
@@ -22,7 +22,7 @@
 </p>
 
 <p align="center">
-   <a href="https://join.slack.com/t/documenso/shared_invite/zt-1wrwmi601-Zcn1GpVOagcakE842fVCBQ"><img src="https://img.shields.io/badge/Slack-documenso.slack.com-%234A154B" alt="Join Documenso on Slack"></a> 
+   <a href="https://documen.so/slack"><img src="https://img.shields.io/badge/Slack-documenso.slack.com-%234A154B" alt="Join Documenso on Slack"></a> 
    <a href="https://github.com/documenso/documenso/stargazers"><img src="https://img.shields.io/github/stars/documenso/documenso" alt="Github Stars"></a>
    <a href="https://github.com/documenso/documenso/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-AGPLv3-purple" alt="License"></a>
    <a href="https://github.com/documenso/documenso/pulse"><img src="https://img.shields.io/github/commit-activity/m/documenso/documenso" alt="Commits-per-month"></a>
@@ -67,7 +67,7 @@ The current project goal is to <b>[release a production ready version](https://g
 
 - Check out the first source code release in this repository and test it
 - Tell us what you think in the current [Discussions](https://github.com/documenso/documenso/discussions)
-- Join the [Slack Channel](https://join.slack.com/t/documenso/shared_invite/zt-1wrwmi601-Zcn1GpVOagcakE842fVCBQ) for any questions and getting to know to other community members
+- Join the [Slack Channel](https://documen.so/slack) for any questions and getting to know to other community members
 - ⭐ the repository to help us raise awareness
 - Spread the word on Twitter, that Documenso is working towards a more open signing tool
 - Fix or create [issues](https://github.com/documenso/documenso/issues), that are needed for the first production release
