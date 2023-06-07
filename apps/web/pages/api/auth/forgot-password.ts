@@ -20,7 +20,7 @@ async function postHandler(req: NextApiRequest, res: NextApiResponse) {
   });
 
   if (!user) {
-    return res.status(404).json({ message: "No user found with this email" });
+    return res.status(200).json({ message: "A password reset email has been sent." });
   }
 
   const existingToken = await prisma.passwordResetToken.findFirst({
@@ -33,7 +33,7 @@ async function postHandler(req: NextApiRequest, res: NextApiResponse) {
   });
 
   if (existingToken) {
-    return res.status(400).json({ message: "Password reset requested." });
+    return res.status(200).json({ message: "A password reset email has been sent." });
   }
 
   const token = crypto.randomBytes(64).toString("hex");
@@ -55,7 +55,7 @@ async function postHandler(req: NextApiRequest, res: NextApiResponse) {
 
   await sendResetPassword(user, passwordResetToken.token);
 
-  res.status(200).json({ message: "Password reset email sent." });
+  return res.status(200).json({ message: "A password reset email has been sent." });
 }
 
 export default defaultHandler({
