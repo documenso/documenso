@@ -12,7 +12,7 @@ interface ResetPasswordForm {
   confirmPassword: string;
 }
 
-export default function ResetPassword(props: any) {
+export default function ResetPassword() {
   const router = useRouter();
   const { token } = router.query;
 
@@ -48,7 +48,7 @@ export default function ResetPassword(props: any) {
       setResetSuccessful(true);
       setTimeout(() => {
         router.push("/login");
-      }, 2000);
+      }, 3000);
     }
   };
 

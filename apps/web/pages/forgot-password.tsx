@@ -2,13 +2,13 @@ import Head from "next/head";
 import { getUserFromToken } from "@documenso/lib/server";
 import ForgotPassword from "../components/forgot-password";
 
-export default function ForgotPasswordPage(props: any) {
+export default function ForgotPasswordPage() {
   return (
     <>
       <Head>
         <title>Forgot Password | Documenso</title>
       </Head>
-      <ForgotPassword allowSignup={props.ALLOW_SIGNUP}></ForgotPassword>
+      <ForgotPassword />
     </>
   );
 }
@@ -24,11 +24,7 @@ export async function getServerSideProps(context: any) {
       },
     };
 
-  const ALLOW_SIGNUP = process.env.NEXT_PUBLIC_ALLOW_SIGNUP === "true";
-
   return {
-    props: {
-      ALLOW_SIGNUP,
-    },
+    props: {},
   };
 }
