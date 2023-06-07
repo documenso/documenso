@@ -4,21 +4,35 @@ import { useRouter } from "next/router";
 import { Button } from "@documenso/ui";
 import Logo from "./logo";
 import { ArrowLeftIcon } from "@heroicons/react/24/outline";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { FormProvider, useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
+import * as z from "zod";
 
-interface ResetPasswordForm {
-  password: string;
-  confirmPassword: string;
-}
+const schema = z
+  .object({
+    password: z.string().min(8, { message: "Password must be at least 8 characters" }),
+    confirmPassword: z.string().min(8, { message: "Password must be at least 8 characters" }),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    path: ["confirmPassword"],
+    message: "Password don't match",
+  });
+
+type ResetPasswordForm = z.infer<typeof schema>;
 
 export default function ResetPassword() {
   const router = useRouter();
   const { token } = router.query;
 
-  const methods = useForm<ResetPasswordForm>();
-  const { register, formState, watch } = methods;
-  const password = watch("password", "");
+  const methods = useForm<ResetPasswordForm>({
+    resolver: zodResolver(schema),
+  });
+  const {
+    register,
+    formState: { errors, isSubmitting },
+    handleSubmit,
+  } = methods;
 
   const [resetSuccessful, setResetSuccessful] = useState(false);
 
@@ -67,7 +81,7 @@ export default function ResetPassword() {
           </div>
           {resetSuccessful ? null : (
             <FormProvider {...methods}>
-              <form className="mt-8 space-y-6" onSubmit={methods.handleSubmit(onSubmit)}>
+              <form className="mt-8 space-y-6" onSubmit={handleSubmit(onSubmit)}>
                 <div className="-space-y-px rounded-md shadow-sm">
                   <div>
                     <label htmlFor="password" className="sr-only">
@@ -89,10 +103,7 @@ export default function ResetPassword() {
                       Password
                     </label>
                     <input
-                      {...register("confirmPassword", {
-                        required: "Please confirm password",
-                        validate: (value) => value === password || "The passwords do not match",
-                      })}
+                      {...register("confirmPassword")}
                       id="confirmPassword"
                       name="confirmPassword"
                       type="password"
@@ -103,10 +114,14 @@ export default function ResetPassword() {
                   </div>
                 </div>
 
+                {errors && (
+                  <span className="text-xs text-red-500">{errors.confirmPassword?.message}</span>
+                )}
+
                 <div>
                   <Button
                     type="submit"
-                    disabled={formState.isSubmitting}
+                    disabled={isSubmitting}
                     className="group relative flex w-full">
                     Reset password
                   </Button>
