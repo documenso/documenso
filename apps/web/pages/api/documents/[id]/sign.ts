@@ -128,6 +128,7 @@ async function postHandler(req: NextApiRequest, res: NextApiResponse) {
     data: {
       document: documentWithInserts,
       status: unsignedRecipients.length > 0 ? DocumentStatus.PENDING : DocumentStatus.COMPLETED,
+      completedDate: unsignedRecipients.length === 0 ? new Date() : null,
     },
   });
 
