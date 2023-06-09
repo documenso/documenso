@@ -1,1 +1,0 @@
-export { checkoutSessionHandler as default } from '@documenso/lib/stripe/handlers/checkout-session'

@@ -1,1 +1,0 @@
-export { signDocument } from "./signDocument";

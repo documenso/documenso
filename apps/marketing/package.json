@@ -1,0 +1,37 @@
+{
+  "name": "@documenso/marketing",
+  "version": "0.1.0",
+  "private": true,
+  "license": "AGPL-3.0",
+  "scripts": {
+    "dev": "PORT=3001 next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@documenso/lib": "*",
+    "@documenso/tailwind-config": "*",
+    "@documenso/trpc": "*",
+    "@documenso/ui": "*",
+    "@hookform/resolvers": "^3.1.0",
+    "framer-motion": "^10.12.8",
+    "lucide-react": "^0.214.0",
+    "micro": "^10.0.1",
+    "next": "13.4.1",
+    "next-auth": "^4.22.1",
+    "next-plausible": "^3.7.2",
+    "perfect-freehand": "^1.2.0",
+    "react": "18.2.0",
+    "react-dom": "18.2.0",
+    "react-hook-form": "^7.43.9",
+    "react-icons": "^4.8.0",
+    "typescript": "5.0.4",
+    "zod": "^3.21.4"
+  },
+  "devDependencies": {
+    "@types/node": "20.1.0",
+    "@types/react": "18.2.6",
+    "@types/react-dom": "18.2.4"
+  }
+}

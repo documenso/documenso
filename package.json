@@ -1,63 +1,24 @@
 {
-  "name": "documenso-monorepo",
-  "version": "0.0.0",
+  "private": true,
   "scripts": {
-    "changeset": "changeset",
-    "publish": "changeset publish",
-    "version": "changeset version",
-    "dev": "turbo run dev --filter=web",
-    "build": "turbo run build --filter=web",
-    "start": "turbo run start --filter=web",
-    "db-migrate:dev": "prisma migrate dev",
-    "db-seed": "prisma db seed",
-    "db-studio": "prisma studio",
-    "docker:compose-up": "docker compose -p documenso -f ./docker/compose-without-app.yml up -d || docker-compose -p documenso -f ./docker/compose-without-app.yml up -d",
-    "docker:compose-down": "docker compose -p documenso -f ./docker/compose-without-app.yml down || docker-compose -p documenso -f ./docker/compose-without-app.yml down",
-    "stripe:listen": "stripe listen --forward-to localhost:3000/api/stripe/webhook",
-    "dx": "npm install && run-s docker:compose-up db-migrate:dev",
-    "d": "npm install && run-s docker:compose-up db-migrate:dev && npm run db-seed && npm run dev"
+    "build": "turbo run build",
+    "dev": "turbo run dev --filter=@documenso/{web,marketing}",
+    "start": "cd apps && cd web && next start",
+    "lint": "turbo run lint",
+    "format": "prettier --write \"**/*.{ts,tsx,md}\""
   },
+  "devDependencies": {
+    "dotenv": "^16.0.3",
+    "dotenv-cli": "^7.2.1",
+    "eslint": "^7.32.0",
+    "eslint-config-custom": "*",
+    "prettier": "^2.5.1",
+    "turbo": "^1.9.3"
+  },
+  "name": "documenso.next",
+  "packageManager": "npm@8.19.2",
   "workspaces": [
     "apps/*",
     "packages/*"
-  ],
-  "prisma": {
-    "schema": "packages/prisma/schema.prisma",
-    "seed": "ts-node --transpile-only ./packages/prisma/seed.ts"
-  },
-  "dependencies": {
-    "@documenso/prisma": "*",
-    "@headlessui/react": "^1.7.4",
-    "@heroicons/react": "^2.0.13",
-    "@hookform/resolvers": "^3.1.0",
-    "avatar-from-initials": "^1.0.3",
-    "bcryptjs": "^2.4.3",
-    "next": "13.2.4",
-    "next-auth": ">=4.20.1",
-    "pdf-lib": "^1.17.1",
-    "react": "18.2.0",
-    "react-dom": "18.2.0",
-    "react-hook-form": "^7.41.5",
-    "react-hot-toast": "^2.4.0",
-    "react-signature-canvas": "^1.0.6",
-    "zod": "^3.21.4"
-  },
-  "devDependencies": {
-    "@changesets/cli": "^2.26.2",
-    "@tailwindcss/forms": "^0.5.3",
-    "@trivago/prettier-plugin-sort-imports": "^4.1.1",
-    "@types/bcryptjs": "^2.4.2",
-    "@types/node": "18.11.9",
-    "@types/react-dom": "18.0.9",
-    "@types/react-signature-canvas": "^1.0.2",
-    "dotenv": "^16.0.3",
-    "eslint": "8.27.0",
-    "eslint-config-next": "13.0.3",
-    "next-transpile-modules": "^10.0.0",
-    "npm-run-all": "^4.1.5",
-    "prettier": "^2.8.7",
-    "prettier-plugin-tailwindcss": "^0.2.5",
-    "turbo": "^1.9.9",
-    "typescript": "4.8.4"
-  }
+  ]
 }

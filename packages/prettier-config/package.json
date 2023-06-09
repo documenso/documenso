@@ -1,0 +1,13 @@
+{
+  "name": "@documenso/prettier-config",
+  "version": "0.0.0",
+  "main": "./index.cjs",
+  "license": "MIT",
+  "dependencies": {
+    "@trivago/prettier-plugin-sort-imports": "^4.1.1",
+    "prettier": "^2.8.8",
+    "prettier-plugin-sql": "^0.14.0",
+    "prettier-plugin-tailwindcss": "^0.2.8"
+  },
+  "devDependencies": {}
+}

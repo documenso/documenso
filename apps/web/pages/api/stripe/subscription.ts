@@ -1,1 +1,0 @@
-export { getSubscriptionHandler as default } from '@documenso/lib/stripe/handlers/get-subscription'
