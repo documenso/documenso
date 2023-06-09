@@ -1,0 +1,17 @@
+{
+  "name": "@documenso/tailwind-config",
+  "version": "0.0.0",
+  "main": "index.cjs",
+  "license": "MIT",
+  "dependencies": {
+    "autoprefixer": "^10.4.13",
+    "eslint": "7.32.0",
+    "postcss": "^8.4.21",
+    "tailwindcss": "^3.2.7",
+    "tailwindcss-animate": "^1.0.5"
+  },
+  "devDependencies": {},
+  "publishConfig": {
+    "access": "public"
+  }
+}
