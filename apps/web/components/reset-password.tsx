@@ -25,14 +25,13 @@ export default function ResetPassword() {
   const router = useRouter();
   const { token } = router.query;
 
-  const methods = useForm<ResetPasswordForm>({
-    resolver: zodResolver(schema),
-  });
   const {
     register,
     formState: { errors, isSubmitting },
     handleSubmit,
-  } = methods;
+  } = useForm<ResetPasswordForm>({
+    resolver: zodResolver(schema),
+  });
 
   const [resetSuccessful, setResetSuccessful] = useState(false);
 
@@ -79,55 +78,53 @@ export default function ResetPassword() {
               {resetSuccessful ? "Your password has been reset." : "Please chose your new password"}
             </p>
           </div>
-          {resetSuccessful ? null : (
-            <FormProvider {...methods}>
-              <form className="mt-8 space-y-6" onSubmit={handleSubmit(onSubmit)}>
-                <div className="-space-y-px rounded-md shadow-sm">
-                  <div>
-                    <label htmlFor="password" className="sr-only">
-                      Password
-                    </label>
-                    <input
-                      {...register("password", { required: "Password is required" })}
-                      id="password"
-                      name="password"
-                      type="password"
-                      autoComplete="current-password"
-                      required
-                      className="focus:border-neon focus:ring-neon relative block w-full appearance-none rounded-none rounded-t-md border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-500 focus:z-10 focus:outline-none sm:text-sm"
-                      placeholder="New password"
-                    />
-                  </div>
-                  <div>
-                    <label htmlFor="confirmPassword" className="sr-only">
-                      Password
-                    </label>
-                    <input
-                      {...register("confirmPassword")}
-                      id="confirmPassword"
-                      name="confirmPassword"
-                      type="password"
-                      required
-                      className="focus:border-neon focus:ring-neon relative block w-full appearance-none rounded-none rounded-b-md border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-500 focus:z-10 focus:outline-none sm:text-sm"
-                      placeholder="Confirm new password"
-                    />
-                  </div>
-                </div>
-
-                {errors && (
-                  <span className="text-xs text-red-500">{errors.confirmPassword?.message}</span>
-                )}
-
+          {!resetSuccessful && (
+            <form className="mt-8 space-y-6" onSubmit={handleSubmit(onSubmit)}>
+              <div className="-space-y-px rounded-md shadow-sm">
                 <div>
-                  <Button
-                    type="submit"
-                    disabled={isSubmitting}
-                    className="group relative flex w-full">
-                    Reset password
-                  </Button>
+                  <label htmlFor="password" className="sr-only">
+                    Password
+                  </label>
+                  <input
+                    {...register("password", { required: "Password is required" })}
+                    id="password"
+                    name="password"
+                    type="password"
+                    autoComplete="current-password"
+                    required
+                    className="focus:border-neon focus:ring-neon relative block w-full appearance-none rounded-none rounded-t-md border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-500 focus:z-10 focus:outline-none sm:text-sm"
+                    placeholder="New password"
+                  />
                 </div>
-              </form>
-            </FormProvider>
+                <div>
+                  <label htmlFor="confirmPassword" className="sr-only">
+                    Password
+                  </label>
+                  <input
+                    {...register("confirmPassword")}
+                    id="confirmPassword"
+                    name="confirmPassword"
+                    type="password"
+                    required
+                    className="focus:border-neon focus:ring-neon relative block w-full appearance-none rounded-none rounded-b-md border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-500 focus:z-10 focus:outline-none sm:text-sm"
+                    placeholder="Confirm new password"
+                  />
+                </div>
+              </div>
+
+              {errors && (
+                <span className="text-xs text-red-500">{errors.confirmPassword?.message}</span>
+              )}
+
+              <div>
+                <Button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="group relative flex w-full">
+                  Reset password
+                </Button>
+              </div>
+            </form>
           )}
           <div>
             <Link href="/login">

@@ -11,9 +11,7 @@ interface ForgotPasswordForm {
 }
 
 export default function ForgotPassword() {
-  const methods = useForm<ForgotPasswordForm>();
-  const { register, formState, resetField } = methods;
-
+  const { register, formState, resetField, handleSubmit } = useForm<ForgotPasswordForm>();
   const [resetSuccessful, setResetSuccessful] = useState(false);
 
   const onSubmit = async (values: ForgotPasswordForm) => {
@@ -72,37 +70,35 @@ export default function ForgotPassword() {
                 : "No worries, we'll send you reset instructions."}
             </p>
           </div>
-          {resetSuccessful ? null : (
-            <FormProvider {...methods}>
-              <form className="mt-8 space-y-6" onSubmit={methods.handleSubmit(onSubmit)}>
-                <div className="-space-y-px rounded-md shadow-sm">
-                  <div>
-                    <label htmlFor="email-address" className="sr-only">
-                      Email
-                    </label>
-                    <input
-                      {...register("email")}
-                      id="email-address"
-                      name="email"
-                      type="email"
-                      autoComplete="email"
-                      required
-                      className="focus:border-neon focus:ring-neon relative block w-full appearance-none rounded-md border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-500 focus:z-10 focus:outline-none sm:text-sm"
-                      placeholder="Email"
-                    />
-                  </div>
-                </div>
-
+          {!resetSuccessful && (
+            <form className="mt-8 space-y-6" onSubmit={handleSubmit(onSubmit)}>
+              <div className="-space-y-px rounded-md shadow-sm">
                 <div>
-                  <Button
-                    type="submit"
-                    disabled={formState.isSubmitting}
-                    className="group relative flex w-full">
-                    Reset password
-                  </Button>
+                  <label htmlFor="email-address" className="sr-only">
+                    Email
+                  </label>
+                  <input
+                    {...register("email")}
+                    id="email-address"
+                    name="email"
+                    type="email"
+                    autoComplete="email"
+                    required
+                    className="focus:border-neon focus:ring-neon relative block w-full appearance-none rounded-md border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-500 focus:z-10 focus:outline-none sm:text-sm"
+                    placeholder="Email"
+                  />
                 </div>
-              </form>
-            </FormProvider>
+              </div>
+
+              <div>
+                <Button
+                  type="submit"
+                  disabled={formState.isSubmitting}
+                  className="group relative flex w-full">
+                  Reset password
+                </Button>
+              </div>
+            </form>
           )}
           <div>
             <Link href="/login">

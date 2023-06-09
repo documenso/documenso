@@ -8,7 +8,7 @@ async function postHandler(req: NextApiRequest, res: NextApiResponse) {
   const { token, password } = req.body;
 
   if (!token) {
-    res.status(422).json({ message: "Invalid token" });
+    res.status(400).json({ message: "Invalid token" });
     return;
   }
 

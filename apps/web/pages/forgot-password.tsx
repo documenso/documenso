@@ -1,3 +1,4 @@
+import { GetServerSideProps, GetServerSidePropsContext } from "next";
 import Head from "next/head";
 import { getUserFromToken } from "@documenso/lib/server";
 import ForgotPassword from "../components/forgot-password";
@@ -13,8 +14,9 @@ export default function ForgotPasswordPage() {
   );
 }
 
-export async function getServerSideProps(context: any) {
-  const user = await getUserFromToken(context.req, context.res);
+export async function getServerSideProps({ req }: GetServerSidePropsContext) {
+  const user = await getUserFromToken(req);
+
   if (user)
     return {
       redirect: {
