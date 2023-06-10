@@ -30,7 +30,7 @@ export default async function DashboardPage() {
     findDocuments({
       userId: session.id,
       perPage: 10,
-    }).then((r) => ({ ...r, data: [] })),
+    }),
   ]);
 
   return (

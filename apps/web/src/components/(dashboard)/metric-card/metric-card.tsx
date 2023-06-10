@@ -13,7 +13,7 @@ export type CardMetricProps = {
 
 export const CardMetric = ({ icon: Icon, title, value, className }: CardMetricProps) => {
   return (
-    <div className={cn('overflow-hidden rounded-lg border border-slate-200 bg-white')}>
+    <div className={cn('overflow-hidden rounded-lg border border-slate-200 bg-white', className)}>
       <div className="px-4 pb-6 pt-4 sm:px-4 sm:pb-8 sm:pt-4">
         <div className="flex items-start">
           {Icon && <Icon className="mr-2 h-4 w-4 text-slate-500" />}
