@@ -111,7 +111,7 @@ export const ProfileForm = ({ className, user }: ProfileFormProps) => {
             name="signature"
             render={({ field: { onChange } }) => (
               <SignaturePad
-                className="bg-background h-44 w-full rounded-lg border backdrop-blur-sm"
+                className="h-44 w-full rounded-lg border bg-white backdrop-blur-sm dark:border-[#e2d7c5] dark:bg-[#fcf8ee]"
                 onChange={(v) => onChange(v ?? '')}
               />
             )}
