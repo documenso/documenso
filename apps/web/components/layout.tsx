@@ -13,7 +13,6 @@ function useRedirectToLoginIfUnauthenticated() {
   const { data: session, status } = useSession();
   const loading = status === "loading";
   const router = useRouter();
-
   useEffect(() => {
     if (!loading && !session) {
       router.replace({

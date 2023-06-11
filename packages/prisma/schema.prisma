@@ -24,6 +24,7 @@ model User {
   sessions         Session[]
   Document         Document[]
   Subscription     Subscription[]
+  isAdmin          Boolean?
 }
 
 enum SubscriptionStatus {

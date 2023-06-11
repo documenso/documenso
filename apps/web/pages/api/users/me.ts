@@ -14,6 +14,7 @@ async function getHandler(req: NextApiRequest, res: NextApiResponse) {
     select: {
       email: true,
       name: true,
+      password: true,
     },
   });
 }
