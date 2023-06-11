@@ -192,7 +192,7 @@ export const SignaturePad = ({ className, onChange, ...props }: SignaturePadProp
     <div className="relative block">
       <canvas
         ref={$el}
-        className={cn('relative block', className)}
+        className={cn('relative block dark:invert', className)}
         style={{ touchAction: 'none' }}
         onPointerMove={(event) => onMouseMove(event)}
         onPointerDown={(event) => onMouseDown(event)}
