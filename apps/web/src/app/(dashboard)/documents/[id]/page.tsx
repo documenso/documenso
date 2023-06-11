@@ -45,7 +45,7 @@ export default async function DocumentPage({ params }: DocumentPageProps) {
         className="mt-4 max-w-xs truncate text-2xl font-semibold md:text-3xl"
         title={document.title}
       >
-        Document.pdf
+        {document.title}
       </h1>
 
       <EditDocumentForm className="mt-8" document={document} user={session} />

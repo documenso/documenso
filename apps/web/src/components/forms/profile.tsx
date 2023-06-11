@@ -87,7 +87,7 @@ export const ProfileForm = ({ className, user }: ProfileFormProps) => {
           Full Name
         </Label>
 
-        <Input id="full-name" type="text" className="mt-2 bg-white" {...register('name')} />
+        <Input id="full-name" type="text" className="bg-background mt-2" {...register('name')} />
 
         <FormErrorMessage className="mt-1.5" error={errors.name} />
       </div>
@@ -97,7 +97,7 @@ export const ProfileForm = ({ className, user }: ProfileFormProps) => {
           Email
         </Label>
 
-        <Input id="email" type="email" className="mt-2 bg-white" value={user.email} disabled />
+        <Input id="email" type="email" className="bg-muted mt-2" value={user.email} disabled />
       </div>
 
       <div>
@@ -111,7 +111,7 @@ export const ProfileForm = ({ className, user }: ProfileFormProps) => {
             name="signature"
             render={({ field: { onChange } }) => (
               <SignaturePad
-                className="h-44 w-full rounded-lg border bg-white backdrop-blur-sm"
+                className="bg-background h-44 w-full rounded-lg border backdrop-blur-sm"
                 onChange={(v) => onChange(v ?? '')}
               />
             )}

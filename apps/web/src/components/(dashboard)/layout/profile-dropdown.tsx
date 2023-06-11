@@ -2,8 +2,18 @@
 
 import Link from 'next/link';
 
-import { CreditCard, Github, Key, LogOut, User as LucideUser } from 'lucide-react';
+import {
+  CreditCard,
+  Github,
+  Key,
+  LogOut,
+  User as LucideUser,
+  Monitor,
+  Moon,
+  Sun,
+} from 'lucide-react';
 import { signOut } from 'next-auth/react';
+import { useTheme } from 'next-themes';
 
 import { IS_SUBSCRIPTIONS_ENABLED } from '@documenso/lib/constants/features';
 import { User } from '@documenso/prisma/client';
@@ -26,9 +36,11 @@ export const ProfileDropdown = ({ user }: ProfileDropdownProps) => {
   const initials =
     user.name
       ?.split(' ')
-      .map((name) => name.slice(0, 1).toUpperCase())
+      .map((name: string) => name.slice(0, 1).toUpperCase())
       .slice(0, 2)
       .join('') ?? 'UK';
+
+  const { theme, setTheme } = useTheme();
 
   return (
     <DropdownMenu>
@@ -63,6 +75,28 @@ export const ProfileDropdown = ({ user }: ProfileDropdownProps) => {
               <CreditCard className="mr-2 h-4 w-4" />
               Billing
             </Link>
+          </DropdownMenuItem>
+        )}
+
+        <DropdownMenuSeparator />
+
+        {theme === 'light' ? null : (
+          <DropdownMenuItem onClick={() => setTheme('light')}>
+            <Sun className="mr-2 h-4 w-4" />
+            Light Mode
+          </DropdownMenuItem>
+        )}
+        {theme === 'dark' ? null : (
+          <DropdownMenuItem onClick={() => setTheme('dark')}>
+            <Moon className="mr-2 h-4 w-4" />
+            Dark Mode
+          </DropdownMenuItem>
+        )}
+
+        {theme === 'system' ? null : (
+          <DropdownMenuItem onClick={() => setTheme('system')}>
+            <Monitor className="mr-2 h-4 w-4" />
+            System Theme
           </DropdownMenuItem>
         )}
 

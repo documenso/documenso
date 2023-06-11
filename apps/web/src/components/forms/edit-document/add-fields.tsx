@@ -34,6 +34,7 @@ export type AddFieldsFormProps = {
   watch: UseFormWatch<TEditDocumentFormSchema>;
   errors: FieldErrors<TEditDocumentFormSchema>;
   isSubmitting: boolean;
+  theme: string;
 };
 
 export const AddFieldsFormPartial = ({
@@ -42,6 +43,7 @@ export const AddFieldsFormPartial = ({
   watch,
   errors: _errors,
   isSubmitting: _isSubmitting,
+  theme,
 }: AddFieldsFormProps) => {
   const signers = watch('signers');
 
@@ -51,7 +53,9 @@ export const AddFieldsFormPartial = ({
     <div className={cn('flex flex-col', className)}>
       <h3 className="text-2xl font-semibold">Edit Document</h3>
 
-      <p className="mt-2 text-sm text-black/30">Add all relevant fields for each recipient.</p>
+      <p className="text-muted-foreground mt-2 text-sm">
+        Add all relevant fields for each recipient.
+      </p>
 
       <hr className="mb-8 mt-4" />
 
@@ -60,7 +64,7 @@ export const AddFieldsFormPartial = ({
           <Button
             variant="outline"
             role="combobox"
-            className="justify-between bg-white font-normal text-slate-500"
+            className="bg-background text-muted-foreground justify-between font-normal"
           >
             {selectedSigner.name && (
               <span>
@@ -103,56 +107,80 @@ export const AddFieldsFormPartial = ({
       </Popover>
 
       <div className="-mx-2 mt-8 flex-1 overflow-y-scroll px-2">
-        <div className="grid grid-cols-2 gap-x-4 gap-y-8">
+        <div className="mt-4 grid grid-cols-2 gap-x-4 gap-y-8">
           <button className="group h-full w-full">
-            <Card className="group-focus:border-primary h-full w-full cursor-pointer">
+            <Card
+              className="group-focus:border-documenso h-full w-full cursor-pointer"
+              lightMode={theme === 'light'}
+            >
               <CardContent className="flex flex-col items-center justify-center px-6 py-4">
                 <p
                   className={cn(
-                    'text-3xl font-medium text-slate-500 group-focus:text-slate-900',
+                    'text-muted-foreground group-focus:text-foreground text-3xl font-medium',
                     fontCaveat.className,
                   )}
                 >
                   {selectedSigner.name || 'Signature'}
                 </p>
 
-                <p className="mt-2 text-center text-xs text-slate-500">Signature</p>
+                <p className="text-muted-foreground mt-2 text-center text-xs">Signature</p>
               </CardContent>
             </Card>
           </button>
 
           <button className="group h-full w-full">
-            <Card className="group-focus:border-primary h-full w-full cursor-pointer">
+            <Card
+              className="group-focus:border-documenso h-full w-full cursor-pointer"
+              lightMode={theme === 'light'}
+            >
               <CardContent className="flex flex-col items-center justify-center px-6 py-4">
-                <p className={cn('text-xl font-medium text-slate-500 group-focus:text-slate-900')}>
+                <p
+                  className={cn(
+                    'text-muted-foreground group-focus:text-foreground text-xl font-medium',
+                  )}
+                >
                   {'Email'}
                 </p>
 
-                <p className="mt-2 text-xs text-slate-500">Email</p>
+                <p className="text-muted-foreground mt-2 text-xs">Email</p>
               </CardContent>
             </Card>
           </button>
 
           <button className="group h-full w-full">
-            <Card className="group-focus:border-primary h-full w-full cursor-pointer">
+            <Card
+              className="group-focus:border-documenso h-full w-full cursor-pointer"
+              lightMode={theme === 'light'}
+            >
               <CardContent className="flex flex-col items-center justify-center px-6 py-4">
-                <p className={cn('text-xl font-medium text-slate-500 group-focus:text-slate-900')}>
+                <p
+                  className={cn(
+                    'text-muted-foreground group-focus:text-foreground text-xl font-medium',
+                  )}
+                >
                   {'Name'}
                 </p>
 
-                <p className="mt-2 text-xs text-slate-500">Name</p>
+                <p className="text-muted-foreground mt-2 text-xs">Name</p>
               </CardContent>
             </Card>
           </button>
 
           <button className="group h-full w-full">
-            <Card className="group-focus:border-primary h-full w-full cursor-pointer">
+            <Card
+              className="group-focus:border-documenso h-full w-full cursor-pointer"
+              lightMode={theme === 'light'}
+            >
               <CardContent className="flex flex-col items-center justify-center px-6 py-4">
-                <p className={cn('text-xl font-medium text-slate-500 group-focus:text-slate-900')}>
+                <p
+                  className={cn(
+                    'text-muted-foreground group-focus:text-foreground text-xl font-medium',
+                  )}
+                >
                   {'Date'}
                 </p>
 
-                <p className="mt-2 text-xs text-slate-500">Date</p>
+                <p className="text-muted-foreground mt-2 text-xs">Date</p>
               </CardContent>
             </Card>
           </button>
