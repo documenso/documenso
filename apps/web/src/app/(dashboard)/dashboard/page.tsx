@@ -48,7 +48,7 @@ export default async function DashboardPage() {
 
         <h2 className="mt-8 text-2xl font-semibold">Recent Documents</h2>
 
-        <div className="mt-8 overflow-x-auto rounded-lg border border-slate-200">
+        <div className="border-border mt-8 overflow-x-auto rounded-lg border">
           <Table>
             <TableHeader>
               <TableRow>
@@ -65,7 +65,7 @@ export default async function DashboardPage() {
                   <TableCell>
                     <Link
                       href={`/documents/${document.id}`}
-                      className="font-medium hover:underline"
+                      className="focus-visible:ring-ring ring-offset-background rounded-md font-medium hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
                     >
                       {document.title}
                     </Link>

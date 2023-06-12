@@ -132,7 +132,7 @@ export const PDFViewer = ({ className, document, onPageClick, ...props }: PDFVie
           .map((_, i) => (
             <div
               key={i}
-              className="border-primary/50 my-8 overflow-hidden rounded border first:mt-0 last:mb-0"
+              className="border-border my-8 overflow-hidden rounded border first:mt-0 last:mb-0"
             >
               <PDFPage
                 pageNumber={i + 1}

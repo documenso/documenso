@@ -79,44 +79,49 @@ export const SignUpForm = ({ className }: SignUpFormProps) => {
       onSubmit={handleSubmit(onFormSubmit)}
     >
       <div>
-        <Label htmlFor="name" className="text-slate-500">
+        <Label htmlFor="name" className="text-muted-foreground">
           Name
         </Label>
 
-        <Input id="name" type="text" className="mt-2 bg-white" {...register('name')} />
+        <Input id="name" type="text" className="bg-background mt-2" {...register('name')} />
 
         {errors.name && <span className="mt-1 text-xs text-red-500">{errors.name.message}</span>}
       </div>
 
       <div>
-        <Label htmlFor="email" className="text-slate-500">
+        <Label htmlFor="email" className="text-muted-foreground">
           Email
         </Label>
 
-        <Input id="email" type="email" className="mt-2 bg-white" {...register('email')} />
+        <Input id="email" type="email" className="bg-background mt-2" {...register('email')} />
 
         {errors.email && <span className="mt-1 text-xs text-red-500">{errors.email.message}</span>}
       </div>
 
       <div>
-        <Label htmlFor="password" className="text-slate-500">
+        <Label htmlFor="password" className="text-muted-foreground">
           Password
         </Label>
 
-        <Input id="password" type="password" className="mt-2 bg-white" {...register('password')} />
+        <Input
+          id="password"
+          type="password"
+          className="bg-background mt-2"
+          {...register('password')}
+        />
       </div>
 
       <div>
-        <Label htmlFor="password" className="text-slate-500">
+        <Label htmlFor="password" className="text-muted-foreground">
           Sign Here
         </Label>
 
         <div>
-          <SignaturePad className="mt-2 h-36 w-full rounded-lg border bg-white" />
+          <SignaturePad className="mt-2 h-36 w-full rounded-lg border bg-white dark:border-[#e2d7c5] dark:bg-[#fcf8ee]" />
         </div>
       </div>
 
-      <Button size="lg" disabled={isSubmitting}>
+      <Button size="lg" disabled={isSubmitting} className="dark:bg-documenso dark:hover:opacity-90">
         {isSubmitting && <Loader className="mr-2 h-5 w-5 animate-spin" />}
         Sign Up
       </Button>

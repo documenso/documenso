@@ -37,11 +37,13 @@ export const AddSignersFormPartial = ({
 
   return (
     <div className={cn('flex flex-col', className)}>
-      <h3 className="text-2xl font-semibold">Add Signers</h3>
+      <h3 className="text-foreground text-2xl font-semibold">Add Signers</h3>
 
-      <p className="mt-2 text-sm text-black/30">Add the people who will sign the document.</p>
+      <p className="text-muted-foreground mt-2 text-sm">
+        Add the people who will sign the document.
+      </p>
 
-      <hr className="mb-8 mt-4" />
+      <hr className="border-border mb-8 mt-4" />
 
       <div className="-mx-2 flex flex-1 flex-col overflow-y-scroll px-2">
         <div className="flex w-full flex-col gap-y-4">
@@ -58,7 +60,7 @@ export const AddSignersFormPartial = ({
                       <Input
                         id={`signer-${index}-email`}
                         type="email"
-                        className="mt-2 bg-white"
+                        className="bg-background mt-2"
                         disabled={isSubmitting}
                         {...field}
                       />
@@ -76,7 +78,7 @@ export const AddSignersFormPartial = ({
                       <Input
                         id={`signer-${index}-name`}
                         type="text"
-                        className="mt-2 bg-white"
+                        className="bg-background mt-2"
                         disabled={isSubmitting}
                         {...field}
                       />

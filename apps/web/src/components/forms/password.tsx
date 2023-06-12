@@ -89,7 +89,12 @@ export const PasswordForm = ({ className }: PasswordFormProps) => {
           Password
         </Label>
 
-        <Input id="password" type="password" className="mt-2 bg-white" {...register('password')} />
+        <Input
+          id="password"
+          type="password"
+          className="bg-background mt-2"
+          {...register('password')}
+        />
 
         <FormErrorMessage className="mt-1.5" error={errors.password} />
       </div>
@@ -102,7 +107,7 @@ export const PasswordForm = ({ className }: PasswordFormProps) => {
         <Input
           id="repeated-password"
           type="password"
-          className="mt-2 bg-white"
+          className="bg-background mt-2"
           {...register('repeatedPassword')}
         />
 

@@ -192,7 +192,7 @@ export const SignaturePad = ({ className, onChange, ...props }: SignaturePadProp
     <div className="relative block">
       <canvas
         ref={$el}
-        className={cn('relative block', className)}
+        className={cn('relative block dark:invert', className)}
         style={{ touchAction: 'none' }}
         onPointerMove={(event) => onMouseMove(event)}
         onPointerDown={(event) => onMouseDown(event)}
@@ -205,7 +205,7 @@ export const SignaturePad = ({ className, onChange, ...props }: SignaturePadProp
       <div className="absolute bottom-2 right-2">
         <button
           type="button"
-          className="rounded-full p-2 text-xs text-slate-500"
+          className="focus-visible:ring-ring ring-offset-background rounded-full p-2 text-xs text-slate-500 focus-visible:outline-none focus-visible:ring-2"
           onClick={() => onClearClick()}
         >
           Clear Signature

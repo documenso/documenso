@@ -3,6 +3,7 @@ import { Inter } from 'next/font/google';
 import { TrpcProvider } from '@documenso/trpc/react';
 import { Toaster } from '@documenso/ui/primitives/toaster';
 
+import { ThemeProvider } from '~/providers/next-theme';
 import { PlausibleProvider } from '~/providers/plausible';
 
 import './globals.css';
@@ -45,7 +46,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
       <body>
         <PlausibleProvider>
-          <TrpcProvider>{children}</TrpcProvider>
+          <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+            <TrpcProvider>{children}</TrpcProvider>
+          </ThemeProvider>
         </PlausibleProvider>
         <Toaster />
       </body>

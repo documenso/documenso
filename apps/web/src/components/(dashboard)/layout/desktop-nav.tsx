@@ -16,17 +16,23 @@ export const DesktopNav = ({ className, ...props }: DesktopNavProps) => {
     <div className={cn('ml-8 hidden flex-1 gap-x-6 md:flex', className)} {...props}>
       <Link
         href="/dashboard"
-        className={cn('font-medium leading-5 text-[#A1A1AA] hover:opacity-80', {
-          'text-primary-foreground': pathname?.startsWith('/dashboard'),
-        })}
+        className={cn(
+          'text-muted-foreground focus-visible:ring-ring ring-offset-background rounded-md font-medium leading-5 hover:opacity-80 focus-visible:outline-none focus-visible:ring-2',
+          {
+            'text-foreground': pathname?.startsWith('/dashboard'),
+          },
+        )}
       >
         Dashboard
       </Link>
       <Link
         href="/documents"
-        className={cn('font-medium leading-5 text-[#A1A1AA] hover:opacity-80', {
-          'text-primary-foreground': pathname?.startsWith('/documents'),
-        })}
+        className={cn(
+          'text-muted-foreground focus-visible:ring-ring ring-offset-background rounded-md font-medium leading-5 hover:opacity-80 focus-visible:outline-none focus-visible:ring-2 ',
+          {
+            'text-foreground': pathname?.startsWith('/documents'),
+          },
+        )}
       >
         Documents
       </Link>

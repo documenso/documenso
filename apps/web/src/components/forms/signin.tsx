@@ -86,7 +86,7 @@ export const SignInForm = ({ className }: SignInFormProps) => {
           Email
         </Label>
 
-        <Input id="email" type="email" className="mt-2 bg-white" {...register('email')} />
+        <Input id="email" type="email" className="bg-background mt-2" {...register('email')} />
 
         {errors.email && <span className="mt-1 text-xs text-red-500">{errors.email.message}</span>}
       </div>
@@ -96,29 +96,34 @@ export const SignInForm = ({ className }: SignInFormProps) => {
           Password
         </Label>
 
-        <Input id="password" type="password" className="mt-2 bg-white" {...register('password')} />
+        <Input
+          id="password"
+          type="password"
+          className="bg-background mt-2"
+          {...register('password')}
+        />
 
         {errors.password && (
           <span className="mt-1 text-xs text-red-500">{errors.password.message}</span>
         )}
       </div>
 
-      <Button size="lg" disabled={isSubmitting}>
+      <Button size="lg" disabled={isSubmitting} className="dark:bg-documenso dark:hover:opacity-90">
         {isSubmitting && <Loader className="mr-2 h-5 w-5 animate-spin" />}
         Sign In
       </Button>
 
       <div className="relative flex items-center justify-center gap-x-4 py-2 text-xs uppercase">
-        <div className="h-px flex-1 bg-slate-300" />
-        <span className="bg-transparent text-slate-500">Or continue with</span>
-        <div className="h-px flex-1 bg-slate-300" />
+        <div className="bg-border h-px flex-1" />
+        <span className="text-muted-foreground bg-transparent">Or continue with</span>
+        <div className="bg-border h-px flex-1" />
       </div>
 
       <Button
         type="button"
         size="lg"
         variant={'outline'}
-        className="border bg-white text-slate-500"
+        className="bg-background text-muted-foreground border"
         disabled={isSubmitting}
         onClick={onSignInWithGoogleClick}
       >
