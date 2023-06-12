@@ -97,7 +97,7 @@ export const ProfileForm = ({ className, user }: ProfileFormProps) => {
           Email
         </Label>
 
-        <Input id="email" type="email" className="mt-2 bg-white" value={user.email} disabled />
+        <Input id="email" type="email" className="mt-2 bg-white" value={user.email!} disabled />
       </div>
 
       <div>

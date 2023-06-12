@@ -5,7 +5,7 @@ import { prisma } from '@documenso/prisma';
 import { SALT_ROUNDS } from '../../constants/auth';
 
 export type UpdatePasswordOptions = {
-  userId: number;
+  userId: string;
   password: string;
 };
 

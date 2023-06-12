@@ -1,7 +1,7 @@
 import { prisma } from '@documenso/prisma';
 
 export type UpdateProfileOptions = {
-  userId: number;
+  userId: string;
   name: string;
   signature: string;
 };
