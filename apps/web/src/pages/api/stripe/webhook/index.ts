@@ -60,7 +60,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     if (session.metadata?.source === 'landing') {
       const user = await prisma.user.findFirst({
         where: {
-          id: Number(session.client_reference_id),
+          id: session.client_reference_id!,
         },
       });
 
@@ -97,7 +97,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       const recipient = await prisma.recipient.create({
         data: {
           name: user.name ?? '',
-          email: user.email,
+          email: user.email ?? '',
           token: randomBytes(16).toString('hex'),
           signedAt: now,
           readStatus: ReadStatus.OPENED,

@@ -5,10 +5,7 @@ import { redirect } from 'next/navigation';
 import { getServerSession } from 'next-auth';
 
 import { NEXT_AUTH_OPTIONS } from '@documenso/lib/next-auth/auth-options';
-import {
-  getRequiredServerComponentSession,
-  getServerComponentSession,
-} from '@documenso/lib/next-auth/get-server-session';
+import { getRequiredServerComponentSession } from '@documenso/lib/next-auth/get-server-session';
 
 import { Header } from '~/components/(dashboard)/layout/header';
 import { NextAuthProvider } from '~/providers/next-auth';

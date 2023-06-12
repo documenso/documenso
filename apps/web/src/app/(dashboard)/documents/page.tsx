@@ -1,6 +1,6 @@
 import Link from 'next/link';
 
-import { CheckCircle, Clock, Plus } from 'lucide-react';
+import { Plus } from 'lucide-react';
 
 import { getRequiredServerComponentSession } from '@documenso/lib/next-auth/get-server-session';
 import { findDocuments } from '@documenso/lib/server-only/document/find-documents';

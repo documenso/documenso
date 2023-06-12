@@ -2,7 +2,7 @@ import { prisma } from '@documenso/prisma';
 import { DocumentStatus } from '@documenso/prisma/client';
 
 export type GetStatsInput = {
-  userId: number;
+  userId: string;
 };
 
 export const getStats = async ({ userId }: GetStatsInput) => {

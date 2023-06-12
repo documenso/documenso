@@ -4,7 +4,7 @@ import { Document, DocumentStatus, Prisma } from '@documenso/prisma/client';
 import { FindResultSet } from '../../types/find-result-set';
 
 export interface FindDocumentsOptions {
-  userId: number;
+  userId: string;
   term?: string;
   status?: DocumentStatus;
   page?: number;

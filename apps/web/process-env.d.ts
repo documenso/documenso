@@ -11,5 +11,8 @@ declare namespace NodeJS {
     NEXT_PRIVATE_STRIPE_WEBHOOK_SECRET: string;
 
     NEXT_PUBLIC_SUBSCRIPTIONS_ENABLED: string;
+
+    NEXT_PRIVATE_GOOGLE_CLIENT_ID: string;
+    NEXT_PRIVATE_GOOGLE_CLIENT_SECRET: string;
   }
 }

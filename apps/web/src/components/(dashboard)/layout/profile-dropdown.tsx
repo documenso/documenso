@@ -7,7 +7,7 @@ import { signOut } from 'next-auth/react';
 
 import { IS_SUBSCRIPTIONS_ENABLED } from '@documenso/lib/constants/features';
 import { User } from '@documenso/prisma/client';
-import { Avatar, AvatarFallback } from '@documenso/ui/primitives/avatar';
+import { Avatar, AvatarFallback, AvatarImage } from '@documenso/ui/primitives/avatar';
 import { Button } from '@documenso/ui/primitives/button';
 import {
   DropdownMenu,
@@ -35,6 +35,7 @@ export const ProfileDropdown = ({ user }: ProfileDropdownProps) => {
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" className="relative h-10 w-10 rounded-full">
           <Avatar className="h-10 w-10">
+            {user.image && user.name ? <AvatarImage src={user.image} alt={user.name} /> : null}
             <AvatarFallback>{initials}</AvatarFallback>
           </Avatar>
         </Button>
