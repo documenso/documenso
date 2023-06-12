@@ -61,8 +61,8 @@ export const SignInForm = ({ className }: SignInFormProps) => {
 
   const onSignInWithGoogleClick = async () => {
     try {
-      // await signIn('google', { callbackUrl: '/dashboard' });
-      throw new Error('Not implemented');
+      await signIn('google', { callbackUrl: '/dashboard' });
+      // throw new Error('Not implemented');
     } catch (err) {
       toast({
         title: 'An unknown error occurred',
