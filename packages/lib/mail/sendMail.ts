@@ -1,4 +1,3 @@
-import { ReadStream } from "fs";
 import nodemailer from "nodemailer";
 import nodemailerSendgrid from "nodemailer-sendgrid";
 
