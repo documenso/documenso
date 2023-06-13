@@ -2,12 +2,12 @@
   "name": "@documenso/email-templates",
   "version": "0.1.0",
   "private": true,
+  "main": "index.ts",
   "scripts": {
     "dev": "email dev --port 3001",
     "export": "email export"
   },
   "dependencies": {
-    "@documenso/lib": "*",
     "@react-email/components": "0.0.6",
     "react-email": "1.9.3"
   },
