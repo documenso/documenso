@@ -1,8 +1,9 @@
-import { signingRequestTemplate } from "@documenso/lib/mail";
+import { SigningRequestTemplate } from "@documenso/email-templates";
 import prisma from "@documenso/prisma";
 import { NEXT_PUBLIC_WEBAPP_URL } from "../constants";
 import { sendMail } from "./sendMail";
 import { DocumentStatus, ReadStatus, SendStatus } from "@prisma/client";
+import { render } from "@react-email/render";
 
 export const sendSigningRequest = async (recipient: any, document: any, user: any) => {
   const signingRequestMessage = user.name
@@ -12,13 +13,15 @@ export const sendSigningRequest = async (recipient: any, document: any, user: an
   await sendMail(
     recipient.email,
     `Please sign ${document.title}`,
-    signingRequestTemplate(
-      signingRequestMessage,
-      document,
-      recipient,
-      `${NEXT_PUBLIC_WEBAPP_URL}/documents/${document.id}/sign?token=${recipient.token}`,
-      `Sign Document`,
-      user
+    render(
+      SigningRequestTemplate({
+        ctaLabel: "Sign Document",
+        ctaLink: `${NEXT_PUBLIC_WEBAPP_URL}/documents/${document.id}/sign?token=${recipient.token}`,
+        message: signingRequestMessage,
+        title: document.title,
+        userName: user.name,
+        publicUrl: NEXT_PUBLIC_WEBAPP_URL ?? "http:localhost:3000",
+      })
     )
   ).catch((err) => {
     throw err;

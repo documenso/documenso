@@ -6,9 +6,11 @@ import { Body, Container, Head, Html, Preview, Tailwind } from "@react-email/com
 export const BaseLayout = ({
   children,
   message,
+  publicUrl,
 }: {
   children: React.ReactNode;
   message: string;
+  publicUrl: string;
 }) => {
   return (
     <Html>
@@ -16,7 +18,7 @@ export const BaseLayout = ({
       <Preview>{message}</Preview>
       <Tailwind>
         <Body className="my-auto mx-auto bg-[#eaeaea] p-12 font-sans">
-          <Logo />
+          <Logo publicUrl={publicUrl} />
           <Container className="text-center">
             <p className="my-2 text-[#bdc1c6]">{message}</p>
           </Container>

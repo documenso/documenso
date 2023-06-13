@@ -27,7 +27,7 @@ export const baseEmailTemplate = (message: string, content: string) => {
         <div style="text-align: center">
           <small>Easy and beautiful document signing by Documenso.</small>
         </div>
-      </div>
+      </div> 
     </div>
       `;
 

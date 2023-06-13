@@ -8,6 +8,7 @@ interface Props {
   title: string;
   userName: string;
   message: string;
+  publicUrl: string;
 }
 
 export const SigningRequestEmail = (props: Props) => {
@@ -17,11 +18,12 @@ export const SigningRequestEmail = (props: Props) => {
     title = "invoice-EC430263-0004.pdf",
     userName = "john doe",
     message = "example@documenso.com has sent you a document to sign. ",
+    publicUrl = "http://localhost:3000",
   } = props;
   return (
-    <BaseLayout message={message}>
+    <BaseLayout publicUrl={publicUrl} message={message}>
       <Container className="pb-14 text-center">
-        <Section className="text-[#bdc1c6]">
+        <Section className="text-center text-[#bdc1c6]">
           <Button
             pX={18}
             pY={10}
