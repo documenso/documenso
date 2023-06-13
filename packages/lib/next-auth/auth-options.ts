@@ -1,7 +1,8 @@
 import { PrismaAdapter } from '@next-auth/prisma-adapter';
 import { compare } from 'bcrypt';
-import { AuthOptions, User } from 'next-auth';
+import { AuthOptions, Session, User } from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
+import GoogleProvider from 'next-auth/providers/google';
 
 import { prisma } from '@documenso/prisma';
 
@@ -44,16 +45,59 @@ export const NEXT_AUTH_OPTIONS: AuthOptions = {
           id: String(user.id) as any,
           email: user.email,
           name: user.name,
-          image: '',
         } satisfies User;
       },
     }),
+    GoogleProvider({
+      clientId: process.env.NEXT_PRIVATE_GOOGLE_CLIENT_ID ?? '',
+      clientSecret: process.env.NEXT_PRIVATE_GOOGLE_CLIENT_SECRET ?? '',
+      allowDangerousEmailAccountLinking: true,
+      profile(profile) {
+        return {
+          id: profile.sub as any,
+          name: profile.name,
+          email: profile.email,
+        };
+      },
+    }),
   ],
-  // callbacks: {
-  //   jwt: async ({ token, user: _user }) => {
-  //     return {
-  //       ...token,
-  //     };
-  //   },
-  // },
+  callbacks: {
+    async jwt({ token, user, account, profile }) {
+      console.log('jwt', { token, user, account, profile });
+      const dbUser = await prisma.user.findFirst({
+        where: {
+          email: token.email as string,
+        },
+      });
+
+      if (!dbUser) {
+        if (user) {
+          token.id = user?.id;
+        }
+        return token;
+      }
+
+      return {
+        id: dbUser.id,
+        name: dbUser.name,
+        email: dbUser.email,
+      };
+    },
+    async session({ token, session }) {
+      console.log('session', { token, session });
+      if (token) {
+        const documensoSession = {
+          ...session,
+          user: {
+            id: Number(token.id),
+            name: token.name,
+            email: token.email,
+          },
+        } as Session;
+
+        return documensoSession;
+      }
+      return session;
+    },
+  },
 };
