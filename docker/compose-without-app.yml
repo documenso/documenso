@@ -1,4 +1,3 @@
-name: documenso
 services:
   database:
     image: postgres:15
