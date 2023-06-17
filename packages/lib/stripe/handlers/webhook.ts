@@ -25,9 +25,7 @@ export const webhookHandler = async (req: NextApiRequest, res: NextApiResponse) 
     });
   }
 
-  log("constructing body...")
   const body = await buffer(req);
-  log("constructed body")
 
   const event = stripe.webhooks.constructEvent(body, sig, process.env.STRIPE_WEBHOOK_SECRET!);
   log("event-type:", event.type);
@@ -70,22 +68,37 @@ export const webhookHandler = async (req: NextApiRequest, res: NextApiResponse) 
   if (event.type === "invoice.payment_succeeded") {
     const invoice = event.data.object as Stripe.Invoice;
 
+    if (invoice.billing_reason !== "subscription_cycle") {
+      return res.status(200).json({
+        success: true,
+        message: "Webhook received",
+      });
+    }
+
     const customerId =
       typeof invoice.customer === "string" ? invoice.customer : invoice.customer?.id;
 
     const subscription = await stripe.subscriptions.retrieve(invoice.subscription as string);
 
-    await prisma.subscription.update({
+    const hasSubscription = await prisma.subscription.findFirst({
       where: {
         customerId,
       },
-      data: {
-        status: SubscriptionStatus.ACTIVE,
-        planId: subscription.id,
-        priceId: subscription.items.data[0].price.id,
-        periodEnd: new Date(subscription.current_period_end * 1000),
-      },
     });
+
+    if (hasSubscription) {
+      await prisma.subscription.update({
+        where: {
+          customerId,
+        },
+        data: {
+          status: SubscriptionStatus.ACTIVE,
+          planId: subscription.id,
+          priceId: subscription.items.data[0].price.id,
+          periodEnd: new Date(subscription.current_period_end * 1000),
+        },
+      });
+    }
 
     return res.status(200).json({
       success: true,
@@ -98,14 +111,22 @@ export const webhookHandler = async (req: NextApiRequest, res: NextApiResponse) 
 
     const customerId = failedInvoice.customer as string;
 
-    await prisma.subscription.update({
+    const hasSubscription = await prisma.subscription.findFirst({
       where: {
         customerId,
       },
-      data: {
-        status: SubscriptionStatus.PAST_DUE,
-      },
     });
+
+    if (hasSubscription) {
+      await prisma.subscription.update({
+        where: {
+          customerId,
+        },
+        data: {
+          status: SubscriptionStatus.PAST_DUE,
+        },
+      });
+    }
 
     return res.status(200).json({
       success: true,
@@ -118,17 +139,25 @@ export const webhookHandler = async (req: NextApiRequest, res: NextApiResponse) 
 
     const customerId = updatedSubscription.customer as string;
 
-    await prisma.subscription.update({
+    const hasSubscription = await prisma.subscription.findFirst({
       where: {
         customerId,
       },
-      data: {
-        status: SubscriptionStatus.ACTIVE,
-        planId: updatedSubscription.id,
-        priceId: updatedSubscription.items.data[0].price.id,
-        periodEnd: new Date(updatedSubscription.current_period_end * 1000),
-      },
     });
+
+    if (hasSubscription) {
+      await prisma.subscription.update({
+        where: {
+          customerId,
+        },
+        data: {
+          status: SubscriptionStatus.ACTIVE,
+          planId: updatedSubscription.id,
+          priceId: updatedSubscription.items.data[0].price.id,
+          periodEnd: new Date(updatedSubscription.current_period_end * 1000),
+        },
+      });
+    }
 
     return res.status(200).json({
       success: true,
@@ -141,14 +170,22 @@ export const webhookHandler = async (req: NextApiRequest, res: NextApiResponse) 
 
     const customerId = deletedSubscription.customer as string;
 
-    await prisma.subscription.update({
+    const hasSubscription = await prisma.subscription.findFirst({
       where: {
         customerId,
       },
-      data: {
-        status: SubscriptionStatus.INACTIVE,
-      },
     });
+
+    if (hasSubscription) {
+      await prisma.subscription.update({
+        where: {
+          customerId,
+        },
+        data: {
+          status: SubscriptionStatus.INACTIVE,
+        },
+      });
+    }
 
     return res.status(200).json({
       success: true,

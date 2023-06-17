@@ -8,8 +8,8 @@
     "db-migrate:dev": "prisma migrate dev",
     "db-seed": "prisma db seed",
     "db-studio": "prisma studio",
-    "docker:compose-up": "docker compose -f ./docker/compose-without-app.yml up -d || docker-compose -f ./docker/compose-without-app.yml up -d",
-    "docker:compose-down": "docker compose -f ./docker/compose-without-app.yml down || docker-compose -f ./docker/compose-without-app.yml down",
+    "docker:compose-up": "docker compose -p documenso -f ./docker/compose-without-app.yml up -d || docker-compose -p documenso -f ./docker/compose-without-app.yml up -d",
+    "docker:compose-down": "docker compose -p documenso -f ./docker/compose-without-app.yml down || docker-compose -p documenso -f ./docker/compose-without-app.yml down",
     "stripe:listen": "stripe listen --forward-to localhost:3000/api/stripe/webhook",
     "dx": "npm install && run-s docker:compose-up db-migrate:dev",
     "d": "npm install && run-s docker:compose-up db-migrate:dev && npm run db-seed && npm run dev"
@@ -26,6 +26,7 @@
     "@documenso/prisma": "*",
     "@headlessui/react": "^1.7.4",
     "@heroicons/react": "^2.0.13",
+    "@hookform/resolvers": "^3.1.0",
     "avatar-from-initials": "^1.0.3",
     "bcryptjs": "^2.4.3",
     "next": "13.2.4",
@@ -35,7 +36,8 @@
     "react-dom": "18.2.0",
     "react-hook-form": "^7.41.5",
     "react-hot-toast": "^2.4.0",
-    "react-signature-canvas": "^1.0.6"
+    "react-signature-canvas": "^1.0.6",
+    "zod": "^3.21.4"
   },
   "devDependencies": {
     "@tailwindcss/forms": "^0.5.3",
