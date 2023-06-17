@@ -145,16 +145,16 @@ const DocumentsPage: NextPageWithLayout = (props: any) => {
             </Button>
           </div>
         </div>
-        <div className="mt-3 mb-12 flex items-center justify-start gap-x-4 md:justify-end">
+        <div className="mt-3 mb-12 flex flex-wrap items-center justify-start gap-x-4 md:justify-end gap-y-4">
           <SelectBox
-            className="block w-1/4"
+            className="block flex-1 md:flex-none md:w-1/4"
             label="Status"
             options={statusFilters}
             value={selectedStatusFilter}
             onChange={handleStatusFilterChange}
           />
           <SelectBox
-            className="block w-1/4"
+            className="block flex-1 md:flex-none md:w-1/4"
             label="Created"
             options={createdFilter}
             value={selectedCreatedFilter}
