@@ -9,7 +9,7 @@ async function postHandler(req: NextApiRequest, res: NextApiResponse) {
   const cleanEmail = email.toLowerCase();
 
   if (!cleanEmail || !/.+@.+/.test(cleanEmail)) {
-    res.status(422).json({ message: "Invalid email" });
+    res.status(400).json({ message: "Invalid email" });
     return;
   }
 

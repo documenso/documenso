@@ -20,7 +20,7 @@ export const resetPasswordSuccessTemplate = (user: User) => {
         </p>
 
         <p style="margin-top: 15px">
-            If you did not ask to change your password we are here to help you secure your account, just <a href="https://documenso.com">contact us</a>.
+            Didn't request a password change? We are here to help you secure your account, just <a href="https://documenso.com">contact us</a>.
         </p>
 
         <p style="margin-top: 15px">

@@ -5,11 +5,11 @@ import { Button } from "@documenso/ui";
 import Logo from "./logo";
 import { ArrowLeftIcon } from "@heroicons/react/24/outline";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { FormProvider, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
 import * as z from "zod";
 
-const schema = z
+const ZResetPasswordFormSchema = z
   .object({
     password: z.string().min(8, { message: "Password must be at least 8 characters" }),
     confirmPassword: z.string().min(8, { message: "Password must be at least 8 characters" }),
@@ -19,7 +19,7 @@ const schema = z
     message: "Password don't match",
   });
 
-type ResetPasswordForm = z.infer<typeof schema>;
+type TResetPasswordFormSchema = z.infer<typeof ZResetPasswordFormSchema>;
 
 export default function ResetPassword() {
   const router = useRouter();
@@ -29,20 +29,20 @@ export default function ResetPassword() {
     register,
     formState: { errors, isSubmitting },
     handleSubmit,
-  } = useForm<ResetPasswordForm>({
-    resolver: zodResolver(schema),
+  } = useForm<TResetPasswordFormSchema>({
+    resolver: zodResolver(ZResetPasswordFormSchema),
   });
 
   const [resetSuccessful, setResetSuccessful] = useState(false);
 
-  const onSubmit = async (values: ResetPasswordForm) => {
+  const onSubmit = async ({ password }: TResetPasswordFormSchema) => {
     const response = await toast.promise(
       fetch(`/api/auth/reset-password`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ password: values.password, token }),
+        body: JSON.stringify({ password, token }),
       }),
       {
         loading: "Resetting...",
@@ -96,6 +96,7 @@ export default function ResetPassword() {
                     placeholder="New password"
                   />
                 </div>
+
                 <div>
                   <label htmlFor="confirmPassword" className="sr-only">
                     Password
@@ -126,6 +127,7 @@ export default function ResetPassword() {
               </div>
             </form>
           )}
+
           <div>
             <Link href="/login">
               <div className="relative mt-10 flex items-center justify-center gap-2 text-sm text-gray-500 hover:cursor-pointer hover:text-gray-900">

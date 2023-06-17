@@ -9,12 +9,12 @@ async function postHandler(req: NextApiRequest, res: NextApiResponse) {
   const cleanEmail = email.toLowerCase();
 
   if (!cleanEmail || !/.+@.+/.test(cleanEmail)) {
-    res.status(422).json({ message: "Invalid email" });
+    res.status(400).json({ message: "Invalid email" });
     return;
   }
 
   if (!password || password.trim().length < 7) {
-    return res.status(422).json({
+    return res.status(400).json({
       message: "Password should be at least 7 characters long.",
     });
   }
