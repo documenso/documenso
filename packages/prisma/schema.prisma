@@ -13,17 +13,18 @@ enum IdentityProvider {
 }
 
 model User {
-  id               Int              @id @default(autoincrement())
-  name             String?
-  email            String           @unique
-  emailVerified    DateTime?
-  password         String?
-  source           String?
-  identityProvider IdentityProvider @default(DOCUMENSO)
-  accounts         Account[]
-  sessions         Session[]
-  Document         Document[]
-  Subscription     Subscription[]
+  id                 Int                  @id @default(autoincrement())
+  name               String?
+  email              String               @unique
+  emailVerified      DateTime?
+  password           String?
+  source             String?
+  identityProvider   IdentityProvider     @default(DOCUMENSO)
+  accounts           Account[]
+  sessions           Session[]
+  Document           Document[]
+  Subscription       Subscription[]
+  PasswordResetToken PasswordResetToken[]
 }
 
 enum SubscriptionStatus {
@@ -157,4 +158,13 @@ model Signature {
 
   Recipient Recipient @relation(fields: [recipientId], references: [id], onDelete: Cascade)
   Field     Field     @relation(fields: [fieldId], references: [id], onDelete: Restrict)
+}
+
+model PasswordResetToken {
+  id        Int      @id @default(autoincrement())
+  token     String   @unique
+  createdAt DateTime @default(now())
+  expiry    DateTime
+  userId    Int
+  User      User     @relation(fields: [userId], references: [id])
 }

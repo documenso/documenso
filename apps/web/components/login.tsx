@@ -111,9 +111,11 @@ export default function Login(props: any) {
               </div>
               <div className="flex items-center justify-between">
                 <div className="text-sm">
-                  <a href="#" className="hover:text-neon-700 font-medium text-gray-500">
+                  <Link
+                    href="/forgot-password"
+                    className="hover:text-neon-700 font-medium text-gray-500">
                     Forgot your password?
-                  </a>
+                  </Link>
                 </div>
               </div>
               <div>

@@ -17,7 +17,7 @@ The development branch is <code>main</code>. All pull request should be made aga
    [clone](https://help.github.com/articles/cloning-a-repository/) it to your local device.
 2. Create a new branch:
 
-- Create a new branch (include the issue id and somthing readable):
+- Create a new branch (include the issue id and something readable):
 
   ```sh
   git checkout -b doc-999-my-feature-or-fix
