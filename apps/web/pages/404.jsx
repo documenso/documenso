@@ -8,7 +8,7 @@ export default function Custom404() {
     <>
       <main className="relative isolate min-h-full bg-gray-100">
         <Link href="/" className="absolute top-10 left-10 flex gap-x-2 items-center">
-          <Logo className="w-10" />
+          <Logo className="w-10 text-black" />
           <h2 className="text-2xl font-semibold">Documenso</h2>
         </Link>
 
