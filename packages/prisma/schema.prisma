@@ -25,6 +25,7 @@ model User {
   Document         Document[]
   Subscription     Subscription[]
   isAdmin          Boolean?
+  role             String?
 }
 
 enum SubscriptionStatus {

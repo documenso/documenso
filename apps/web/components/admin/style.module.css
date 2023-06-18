@@ -1,0 +1,35 @@
+.sidebar {
+  width: 20%;
+  height: 100vh;
+  position: fixed;
+  /* top: 0; */
+  left: -200px;
+  background-color: #e7e5e5;
+  animation: slideIn 0.7s ease-in-out forwards;
+}
+
+@keyframes slideIn {
+  0% {
+    left: -200px;
+  }
+  100% {
+    left: 0;
+  }
+}
+
+.sidebarExit {
+  width: 20%;
+  height: 100vh;
+  position: fixed;
+  left: 0;
+  animation: slideOut 0.3s ease-in-out forwards;
+}
+
+@keyframes slideOut {
+  0% {
+    left: 0;
+  }
+  100% {
+    left: -200px;
+  }
+}

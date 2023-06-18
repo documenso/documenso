@@ -1,30 +1,11 @@
-import Head from "next/head";
-import type { NextPageWithLayout } from "./_app";
-import { ReactElement, useEffect, useState } from "react";
-import Layout from "../components/layout";
-import { getAllUsers } from "@documenso/lib/api/admin/index";
+// in src/pages/admin.tsx
+import type { NextPage } from "next";
+import dynamic from "next/dynamic";
 
-const AdminPage: NextPageWithLayout = (props: any) => {
-  const [users, setUsers] = useState([]);
+const AdminPage = dynamic(() => import("../components/admin"), { ssr: false });
 
-  useEffect(() => {
-    getAllUsers().then((res) => {
-      console.log(res);
-      setUsers(res); // Store the users in the state
-    });
-  }, []);
-
-  return (
-    <>
-      <Head>
-        <title>Admin | Documenso</title>
-      </Head>
-          {/* Render your component using the users data */}
-    </>
-  );
+const Admin: NextPage = () => {
+  return <AdminPage />;
 };
 
-AdminPage.getLayout = function getLayout(page: ReactElement) {
-  return <Layout>{page}</Layout>;
-};
-export default AdminPage;
+export default Admin;
