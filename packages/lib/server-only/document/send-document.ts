@@ -1,6 +1,8 @@
 import nodemailer from 'nodemailer';
 import nodemailerSendgrid from 'nodemailer-sendgrid';
 
+import { emailHtml, emailText } from '../../mail/template';
+
 export const sendMail = async ({ email }: { email: string }) => {
   let transporter;
 
@@ -33,7 +35,7 @@ export const sendMail = async ({ email }: { email: string }) => {
     from: 'Documenso <hi@documenso.com>',
     to: email,
     subject: 'Welcome to Documenso!',
-    text: 'Welcome to Documenso!',
-    html: '<p>Welcome to Documenso!</p>',
+    text: emailText,
+    html: emailHtml,
   });
 };
