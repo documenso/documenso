@@ -5,13 +5,17 @@
     "dev": "turbo run dev --filter=@documenso/{web,marketing}",
     "start": "cd apps && cd web && next start",
     "lint": "turbo run lint",
-    "format": "prettier --write \"**/*.{ts,tsx,md}\""
+    "format": "prettier --write \"**/*.{ts,tsx,md}\"",
+    "db:migrate": "prisma migrate dev",
+    "docker:compose-up": "docker-compose -p documenso -f ./docker/compose-without-app.yml up -d",
+    "dx": "npm install && run-s docker:compose-up db:migrate && npm run dev"
   },
   "devDependencies": {
     "dotenv": "^16.0.3",
     "dotenv-cli": "^7.2.1",
     "eslint": "^7.32.0",
     "eslint-config-custom": "*",
+    "npm-run-all": "^4.1.5",
     "prettier": "^2.5.1",
     "turbo": "^1.9.3"
   },
@@ -20,5 +24,8 @@
   "workspaces": [
     "apps/*",
     "packages/*"
-  ]
+  ],
+  "prisma": {
+    "schema": "packages/prisma/schema.prisma"
+  }
 }
