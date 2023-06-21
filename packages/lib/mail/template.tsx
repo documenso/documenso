@@ -5,7 +5,6 @@ import {
   Button,
   Container,
   Head,
-  Heading,
   Html,
   Img,
   Link,
@@ -16,75 +15,157 @@ import {
   render,
 } from '@react-email/components';
 
-interface DocumensoSigningInviteEmailProps {
-  username?: string;
-  userImage?: string;
-  invitedByUsername?: string;
-  invitedByEmail?: string;
-  teamName?: string;
-  teamImage?: string;
-  signingLink?: string;
-  inviteFromIp?: string;
-  inviteFromLocation?: string;
+interface DocumensoEmailProps {
+  email?: string;
+  name?: string;
+  firstName?: string;
+  documentSigningLink?: string;
+  documentName?: string;
+  downloadLink?: string;
+  reviewLink?: string;
+  numberOfSigners?: number;
+  type: 'invite' | 'signed' | 'completed';
 }
 
-export const DocumensoSigningInviteEmail = ({
-  signingLink = 'https://documenso.com',
-}: DocumensoSigningInviteEmailProps) => {
+export const DocumensoEmail = ({
+  documentSigningLink = 'https://documenso.com',
+  downloadLink = 'https://documenso.com',
+  reviewLink = 'https://documenso.com',
+  email = 'duncan@documenso.com',
+  name = 'Ephraim Atta-Duncan',
+  firstName = 'Ephraim',
+  documentName = 'Open Source Pledge.pdf',
+  numberOfSigners = 2,
+  type = 'signed',
+}: DocumensoEmailProps) => {
+  const previewText = type === 'completed' ? 'Completed Document' : `Sign Document`;
+
   return (
     <Html>
       <Head />
-      <Preview>Sign Document</Preview>
+      <Preview>{previewText}</Preview>
       <Tailwind>
-        <Body className="mx-auto my-auto font-sans">
+        <Body className="mx-auto my-auto ml-auto mr-auto font-sans">
           <Section className="bg-white">
-            <Container className="mx-auto mb-[10px] mt-[40px] w-[600px] rounded-lg border-2 border-solid border-[#eaeaea] p-[20px] backdrop-blur-sm">
+            <Container
+              style={{
+                border: '2px solid #eaeaea',
+              }}
+              className="mx-auto mb-[10px] ml-auto mr-auto mt-[40px] w-[600px] rounded-lg p-[10px] backdrop-blur-sm"
+            >
               <Section>
-                <Section>
-                  <Img
-                    src={`http://localhost:3000/static/logo.png`}
-                    alt="Documenso Logo"
-                    width={120}
-                  />
-                </Section>
+                <Img
+                  src={`http://localhost:3000/static/logo.png`}
+                  alt="Documenso Logo"
+                  width={120}
+                />
 
-                <Section className="mt-4 flex items-center justify-center">
-                  <Section className="flex justify-center">
-                    <Img src={`http://localhost:3000/static/document.png`} alt="Documenso" />
-                  </Section>
+                <Section className="mt-4 flex-row items-center justify-center">
+                  <div className="my-3 flex items-center justify-center">
+                    <Img
+                      className="ml-[160px]" // Works on most of the email clients
+                      src={`http://localhost:3000/static/document.png`}
+                      alt="Documenso"
+                    />
+                  </div>
 
-                  <Heading className="mx-0 mb-0 text-center text-[18px] font-semibold text-[#27272A]">
-                    Thilo Konzok has invited you to sign “Document.pdf”
-                  </Heading>
+                  {type === 'completed' && (
+                    <Text className="mb-4 text-center text-[16px] font-semibold text-[#7AC455]">
+                      <Img
+                        src="http://localhost:3000/static/completed.png"
+                        className="-mb-0.5 mr-1.5 inline"
+                      />
+                      Completed
+                    </Text>
+                  )}
+
+                  {type === 'signed' && (
+                    <Text className="mb-4 text-center text-[16px] font-semibold text-[#3879C5]">
+                      <Img
+                        src="http://localhost:3000/static/clock.png"
+                        className="-mb-0.5 mr-1.5 inline"
+                      />
+                      Waiting for {numberOfSigners} {numberOfSigners === 1 ? 'person' : 'people'} to
+                      sign
+                    </Text>
+                  )}
+
+                  <Text className="mx-0 mb-0 text-center text-[18px] font-semibold text-[#27272A]">
+                    {type === 'invite'
+                      ? `${name} has invited you to sign “${documentName}”`
+                      : `“${documentName}” was signed by ${name}`}
+                  </Text>
                   <Text className="my-1 text-center text-[16px] text-[#AFAFAF]">
-                    Continue by signing the document.
+                    {type === 'invite'
+                      ? 'Continue by signing the document.'
+                      : 'Continue by downloading or reviewing the document.'}
                   </Text>
                   <Section className="mb-[24px] mt-[32px] text-center">
-                    <Button
-                      pX={20}
-                      pY={12}
-                      className="rounded bg-[#A2E771] px-10 text-center text-[14px] font-medium text-black no-underline"
-                      href={signingLink}
-                    >
-                      Sign Document
-                    </Button>
+                    {type === 'invite' && (
+                      <Button
+                        pX={20}
+                        pY={12}
+                        className="rounded bg-[#A2E771] px-10 text-center text-[14px] font-medium text-black no-underline"
+                        href={documentSigningLink}
+                      >
+                        Sign Document
+                      </Button>
+                    )}
+
+                    {type !== 'invite' && (
+                      <Section>
+                        <Button
+                          pX={18}
+                          pY={10}
+                          style={{
+                            border: '1px solid #E9E9E9',
+                          }}
+                          className="mr-4 rounded-lg text-center text-[14px] font-medium text-black no-underline"
+                          href={reviewLink}
+                        >
+                          <Img
+                            src="http://localhost:3000/static/review.png"
+                            className="-mb-0.5 mr-1 inline"
+                          />
+                          Review
+                        </Button>
+                        <Button
+                          pX={18}
+                          pY={10}
+                          style={{
+                            border: '1px solid #E9E9E9',
+                          }}
+                          className="rounded-lg text-center text-[14px] font-medium text-black no-underline"
+                          href={downloadLink}
+                        >
+                          <Img
+                            src="http://localhost:3000/static/download.png"
+                            className="-mb-0.5 mr-1 inline"
+                          />
+                          Download
+                        </Button>
+                      </Section>
+                    )}
                   </Section>
                 </Section>
               </Section>
             </Container>
-            <Container className="mx-auto w-[600px]">
+            <Container className="mx-auto ml-auto mr-auto w-[600px]">
               <Section>
-                <Text className="text-[18px] leading-[24px] text-black">
-                  Thilo Konzok{' '}
-                  <span className="font-semibold text-[#AFAFAF]">(thilo@konzok.com)</span>
-                </Text>
-                <Text className="mb-[80px] text-[16px] leading-[28px] text-[#AFAFAF]">
-                  Hi,
-                  <br />
-                  Please sign the attached document. Magna magna adipisicing dolore minim et aliquip
-                  ipsum esse ut nulla ad sint irure.
-                  <br /> - Thilo
-                </Text>
+                {type === 'invite' && (
+                  <>
+                    <Text className="text-[18px] leading-[24px] text-black">
+                      {name} <span className="font-semibold text-[#AFAFAF]">({email})</span>
+                    </Text>
+                    <Text className="mb-[40px] text-[16px] leading-[28px] text-[#AFAFAF]">
+                      Hi,
+                      <br />
+                      Please sign the attached document. Magna magna adipisicing dolore minim et
+                      aliquip ipsum esse ut nulla ad sint irure.
+                      <br /> - {firstName}
+                    </Text>
+                  </>
+                )}
 
                 <Text className="my-[40px] text-[14px] text-[#AFAFAF]">
                   This document was sent using{' '}
@@ -107,9 +188,12 @@ export const DocumensoSigningInviteEmail = ({
   );
 };
 
-export default DocumensoSigningInviteEmail;
+export const emailHtml = (props: DocumensoEmailProps) =>
+  render(<DocumensoEmail {...props} />, {
+    pretty: true,
+  });
 
-export const emailHtml = render(<DocumensoSigningInviteEmail />);
-export const emailText = render(<DocumensoSigningInviteEmail />, {
-  plainText: true,
-});
+export const emailText = (props: DocumensoEmailProps) =>
+  render(<DocumensoEmail {...props} />, {
+    plainText: true,
+  });

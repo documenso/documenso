@@ -31,11 +31,25 @@ export const sendMail = async ({ email }: { email: string }) => {
     );
   }
 
+  const html = emailHtml({
+    email: 'lucas@documenso.com',
+    name: 'Lucas Smith',
+    documentName: 'NDA.pdf',
+    firstName: 'Lucas',
+    type: 'signed',
+  });
+
   await transporter.sendMail({
     from: 'Documenso <hi@documenso.com>',
     to: email,
     subject: 'Welcome to Documenso!',
-    text: emailText,
-    html: emailHtml,
+    text: emailText({
+      email: 'lucas@documenso.com',
+      name: 'Lucas Smith',
+      documentName: 'NDA.pdf',
+      firstName: 'Lucas',
+      type: 'completed',
+    }),
+    html,
   });
 };

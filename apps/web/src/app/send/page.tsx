@@ -15,6 +15,8 @@ export default function Send() {
           console.log('clicked');
 
           await sendMail({ email: 'duncan@documenso.com' });
+
+          alert('sent');
         }}
       >
         Send
