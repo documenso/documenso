@@ -1,11 +1,10 @@
 import { AnimatePresence, motion } from 'framer-motion';
-import { FieldError } from 'react-hook-form';
 
 import { cn } from '@documenso/ui/lib/utils';
 
 export type FormErrorMessageProps = {
   className?: string;
-  error: FieldError | undefined;
+  error: { message?: string } | undefined;
 };
 
 export const FormErrorMessage = ({ error, className }: FormErrorMessageProps) => {

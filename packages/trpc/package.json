@@ -7,6 +7,8 @@
   "scripts": {
   },
   "dependencies": {
+    "@documenso/lib": "*",
+    "@documenso/prisma": "*",
     "@tanstack/react-query": "^4.29.5",
     "@trpc/client": "^10.25.1",
     "@trpc/next": "^10.25.1",

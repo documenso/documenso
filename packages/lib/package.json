@@ -19,6 +19,7 @@
     "@upstash/redis": "^1.20.6",
     "bcrypt": "^5.1.0",
     "pdf-lib": "^1.17.1",
+    "nanoid": "^4.0.2",
     "next": "13.4.1",
     "next-auth": "^4.22.1",
     "stripe": "^12.7.0"

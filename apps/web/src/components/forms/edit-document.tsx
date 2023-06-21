@@ -1,21 +1,22 @@
 'use client';
 
-import { useState } from 'react';
+import { useId, useState } from 'react';
 
 import dynamic from 'next/dynamic';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Loader } from 'lucide-react';
-import { useTheme } from 'next-themes';
 import { useForm } from 'react-hook-form';
 
-import { Document, User } from '@documenso/prisma/client';
+import { Document, Field, Recipient, User } from '@documenso/prisma/client';
+import { trpc } from '@documenso/trpc/react';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
 import { Card, CardContent } from '@documenso/ui/primitives/card';
 
 import { AddFieldsFormPartial } from './edit-document/add-fields';
 import { AddSignersFormPartial } from './edit-document/add-signers';
+import { AddSubjectFormPartial } from './edit-document/add-subject';
 import { TEditDocumentFormSchema, ZEditDocumentFormSchema } from './edit-document/types';
 
 const PDFViewer = dynamic(async () => import('~/components/(dashboard)/pdf-viewer/pdf-viewer'), {
@@ -35,57 +36,143 @@ export type EditDocumentFormProps = {
   className?: string;
   user: User;
   document: Document;
+  recipients: Recipient[];
+  fields: Field[];
 };
 
-export const EditDocumentForm = ({ className, document, user: _user }: EditDocumentFormProps) => {
-  const documentUrl = `data:application/pdf;base64,${document.document}`;
+export const EditDocumentForm = ({
+  className,
+  document,
+  recipients,
+  fields,
+  user: _user,
+}: EditDocumentFormProps) => {
+  const initialId = useId();
 
   const [step, setStep] = useState(0);
+  const [nextStepLoading, setNextStepLoading] = useState(false);
+
+  const documentUrl = `data:application/pdf;base64,${document.document}`;
+  const defaultSigners =
+    recipients.length > 0
+      ? recipients.map((recipient) => ({
+          nativeId: recipient.id,
+          formId: `${recipient.id}-${recipient.documentId}`,
+          name: recipient.name,
+          email: recipient.email,
+        }))
+      : [
+          {
+            formId: initialId,
+            name: '',
+            email: '',
+          },
+        ];
+
+  const defaultFields = fields.map((field) => ({
+    nativeId: field.id,
+    formId: `${field.id}-${field.documentId}`,
+    pageNumber: field.page,
+    type: field.type,
+    pageX: Number(field.positionX),
+    pageY: Number(field.positionY),
+    pageWidth: Number(field.width),
+    pageHeight: Number(field.height),
+    signerEmail: recipients.find((recipient) => recipient.id === field.recipientId)?.email ?? '',
+  }));
+
+  const { mutateAsync: setRecipientsForDocument } =
+    trpc.document.setRecipientsForDocument.useMutation();
+
+  const { mutateAsync: setFieldsForDocument } = trpc.document.setFieldsForDocument.useMutation();
 
   const {
     control,
-    // handleSubmit,
+    handleSubmit,
     watch,
-    formState: { errors, isSubmitting, isValid },
+    trigger,
+    formState: { errors, isSubmitting },
   } = useForm<TEditDocumentFormSchema>({
     mode: 'onBlur',
     defaultValues: {
-      signers: [
-        {
-          name: '',
-          email: '',
-        },
-      ],
+      signers: defaultSigners,
+      fields: defaultFields,
+      email: {
+        subject: '',
+        message: '',
+      },
     },
     resolver: zodResolver(ZEditDocumentFormSchema),
   });
 
-  const { theme } = useTheme();
+  const signersFormValue = watch('signers');
+  const fieldsFormValue = watch('fields');
+
+  console.log({ state: watch(), errors });
 
   const canGoBack = step > 0;
-  const canGoNext = isValid && step < MAX_STEP;
+  const canGoNext = step < MAX_STEP;
 
   const onGoBackClick = () => setStep((prev) => Math.max(0, prev - 1));
-  const onGoNextClick = () => setStep((prev) => Math.min(MAX_STEP, prev + 1));
+  const onGoNextClick = async () => {
+    setNextStepLoading(true);
+
+    const passes = await trigger();
+
+    if (step === 0) {
+      await setRecipientsForDocument({
+        documentId: document.id,
+        recipients: signersFormValue.map((signer) => ({
+          id: signer.nativeId ?? undefined,
+          name: signer.name,
+          email: signer.email,
+        })),
+      }).catch((err: unknown) => console.error(err));
+    }
+
+    if (step === 1) {
+      await setFieldsForDocument({
+        documentId: document.id,
+        fields: fieldsFormValue.map((field) => ({
+          id: field.nativeId ?? undefined,
+          type: field.type,
+          signerEmail: field.signerEmail,
+          pageNumber: field.pageNumber,
+          pageX: field.pageX,
+          pageY: field.pageY,
+          pageWidth: field.pageWidth,
+          pageHeight: field.pageHeight,
+        })),
+      }).catch((err: unknown) => console.error(err));
+    }
+
+    if (passes) {
+      setStep((prev) => Math.min(MAX_STEP, prev + 1));
+    }
+
+    console.log({ passes });
+
+    setNextStepLoading(false);
+  };
 
   return (
     <div className={cn('grid w-full grid-cols-12 gap-x-8', className)}>
-      <Card
-        className="col-span-7 rounded-xl before:rounded-xl"
-        gradient
-        lightMode={theme === 'light'}
-      >
+      <Card className="col-span-7 rounded-xl before:rounded-xl" gradient>
         <CardContent className="p-2">
           <PDFViewer document={documentUrl} />
         </CardContent>
       </Card>
 
-      <div className="relative col-span-5">
-        <div className="dark:bg-background border-border sticky top-20 flex h-[calc(100vh-6rem)] max-h-screen flex-col rounded-xl border bg-[hsl(var(--widget))] px-4 py-6">
+      <div className="col-span-5">
+        <form
+          className="dark:bg-background border-border sticky top-20 flex h-[calc(100vh-6rem)] max-h-screen flex-col rounded-xl border bg-[hsl(var(--widget))] px-4 py-6"
+          onSubmit={handleSubmit(console.log)}
+        >
           {step === 0 && (
             <AddSignersFormPartial
               className="-mx-2 flex-1 overflow-y-hidden px-2"
               control={control}
+              watch={watch}
               errors={errors}
               isSubmitting={isSubmitting}
             />
@@ -98,7 +185,16 @@ export const EditDocumentForm = ({ className, document, user: _user }: EditDocum
               watch={watch}
               errors={errors}
               isSubmitting={isSubmitting}
-              theme={theme || 'dark'}
+            />
+          )}
+
+          {step === 2 && (
+            <AddSubjectFormPartial
+              className="-mx-2 flex-1 overflow-y-hidden px-2"
+              control={control}
+              watch={watch}
+              errors={errors}
+              isSubmitting={isSubmitting}
             />
           )}
 
@@ -118,6 +214,7 @@ export const EditDocumentForm = ({ className, document, user: _user }: EditDocum
 
             <div className="mt-4 flex gap-x-4">
               <Button
+                type="button"
                 className="dark:bg-muted dark:hover:bg-muted/80 flex-1 bg-black/5 hover:bg-black/10"
                 size="lg"
                 variant="secondary"
@@ -127,17 +224,27 @@ export const EditDocumentForm = ({ className, document, user: _user }: EditDocum
                 Go Back
               </Button>
 
-              <Button
-                className="bg-documenso flex-1"
-                size="lg"
-                disabled={!canGoNext}
-                onClick={onGoNextClick}
-              >
-                Continue
-              </Button>
+              {step < MAX_STEP && (
+                <Button
+                  type="button"
+                  className="bg-documenso flex-1"
+                  size="lg"
+                  disabled={!canGoNext}
+                  onClick={onGoNextClick}
+                >
+                  {nextStepLoading && <Loader className="mr-2 h-5 w-5 animate-spin" />}
+                  Continue
+                </Button>
+              )}
+
+              {step === MAX_STEP && (
+                <Button type="submit" className="bg-documenso flex-1" size="lg">
+                  Complete
+                </Button>
+              )}
             </div>
           </div>
-        </div>
+        </form>
       </div>
     </div>
   );

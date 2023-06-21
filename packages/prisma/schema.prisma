@@ -1,5 +1,6 @@
 generator client {
   provider = "prisma-client-js"
+  previewFeatures = ["extendedWhereUnique"]
 }
 
 datasource db {
@@ -124,11 +125,15 @@ model Recipient {
   Document      Document      @relation(fields: [documentId], references: [id], onDelete: Cascade)
   Field         Field[]
   Signature     Signature[]
+
+  @@unique([documentId, email])
 }
 
 enum FieldType {
   SIGNATURE
   FREE_SIGNATURE
+  NAME
+  EMAIL
   DATE
   TEXT
 }
@@ -139,8 +144,10 @@ model Field {
   recipientId Int?
   type        FieldType
   page        Int
-  positionX   Int        @default(0)
-  positionY   Int        @default(0)
+  positionX   Decimal        @default(0)
+  positionY   Decimal        @default(0)
+  width       Decimal        @default(-1)
+  height      Decimal        @default(-1)
   customText  String
   inserted    Boolean
   Document    Document   @relation(fields: [documentId], references: [id], onDelete: Cascade)
