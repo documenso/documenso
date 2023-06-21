@@ -41,16 +41,16 @@ export const Callout = () => {
         </span>
       </Button>
 
-      <Link
-        href="https://github.com/documenso/documenso"
-        target="_blank"
-        onClick={() => event('view-github')}
-      >
-        <Button variant="outline" className="rounded-full bg-transparent backdrop-blur-sm">
+      <Button variant="outline" className="rounded-full bg-transparent backdrop-blur-sm" asChild>
+        <Link
+          href="https://github.com/documenso/documenso"
+          target="_blank"
+          onClick={() => event('view-github')}
+        >
           <Github className="mr-2 h-5 w-5" />
           Star on Github
-        </Button>
-      </Link>
+        </Link>
+      </Button>
     </div>
   );
 };
