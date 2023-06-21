@@ -110,7 +110,7 @@ export const DocumentDropzone = ({ className, onDrop, ...props }: DocumentDropzo
         )}
         gradient={true}
         degrees={120}
-        lightMode={theme === 'light'}
+
         {...getRootProps()}
         {...props}
       >

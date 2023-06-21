@@ -67,16 +67,6 @@ export const PDFViewer = ({ className, document, onPageClick, ...props }: PDFVie
     const pageX = event.clientX - left;
     const pageY = event.clientY - top;
 
-    console.log({
-      pageNumber,
-      numPages,
-      originalEvent: event,
-      pageHeight: height,
-      pageWidth: width,
-      pageX,
-      pageY,
-    });
-
     if (onPageClick) {
       onPageClick({
         pageNumber,
@@ -137,6 +127,8 @@ export const PDFViewer = ({ className, document, onPageClick, ...props }: PDFVie
               <PDFPage
                 pageNumber={i + 1}
                 width={width}
+                renderAnnotationLayer={false}
+                renderTextLayer={false}
                 onClick={(e) => onDocumentPageClick(e, i + 1)}
               />
             </div>
