@@ -5,7 +5,7 @@ import React from 'react';
 import { trpc } from '@documenso/trpc/react';
 
 export default function Send() {
-  const { mutateAsync: sendMail } = trpc.document.sendEmail.useMutation();
+  const { mutateAsync: sendMail } = trpc.mail.send.useMutation();
 
   return (
     <div className="p-20">
