@@ -90,12 +90,12 @@ export const DocumensoEmail = ({
                     </Text>
                   )}
 
-                  <Text className="mx-0 mb-0 text-center text-[18px] font-semibold text-[#27272A]">
+                  <Text className="mx-0 mb-0 text-center text-[16px] font-semibold text-[#27272A]">
                     {type === 'invite'
                       ? `${name} has invited you to sign “${documentName}”`
                       : `“${documentName}” was signed by ${name}`}
                   </Text>
-                  <Text className="my-1 text-center text-[16px] text-[#AFAFAF]">
+                  <Text className="my-1 text-center text-[14px] text-[#AFAFAF]">
                     {type === 'invite'
                       ? 'Continue by signing the document.'
                       : 'Continue by downloading or reviewing the document.'}
@@ -105,7 +105,7 @@ export const DocumensoEmail = ({
                       <Button
                         pX={20}
                         pY={12}
-                        className="rounded bg-[#A2E771] px-10 text-center text-[14px] font-medium text-black no-underline"
+                        className="rounded bg-[#A2E771] text-center text-[14px] font-medium text-black no-underline"
                         href={documentSigningLink}
                       >
                         Sign Document

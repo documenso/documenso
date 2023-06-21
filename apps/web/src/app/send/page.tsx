@@ -14,7 +14,13 @@ export default function Send() {
         onClick={async () => {
           console.log('clicked');
 
-          await sendMail({ email: 'duncan@documenso.com' });
+          await sendMail({
+            email: 'duncan@documenso.com',
+            type: 'invite',
+            documentName: 'Documsenso Salary Invoice.pdf',
+            name: 'Mark Cuban',
+            firstName: 'Mark',
+          });
 
           alert('sent');
         }}

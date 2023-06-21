@@ -1,9 +1,19 @@
 import nodemailer from 'nodemailer';
 import nodemailerSendgrid from 'nodemailer-sendgrid';
 
+import { TSendMailMutationSchema } from '@documenso/trpc/server/mail-router/schema';
+
 import { emailHtml, emailText } from '../../mail/template';
 
-export const sendMail = async ({ email }: { email: string }) => {
+interface SendMail {
+  template: TSendMailMutationSchema;
+  mail: {
+    from: string;
+    subject: string;
+  };
+}
+
+export const sendMail = async ({ template, mail }: SendMail) => {
   let transporter;
 
   if (process.env.NEXT_PRIVATE_SENDGRID_API_KEY) {
@@ -31,25 +41,11 @@ export const sendMail = async ({ email }: { email: string }) => {
     );
   }
 
-  const html = emailHtml({
-    email: 'lucas@documenso.com',
-    name: 'Lucas Smith',
-    documentName: 'NDA.pdf',
-    firstName: 'Lucas',
-    type: 'signed',
-  });
-
   await transporter.sendMail({
-    from: 'Documenso <hi@documenso.com>',
-    to: email,
-    subject: 'Welcome to Documenso!',
-    text: emailText({
-      email: 'lucas@documenso.com',
-      name: 'Lucas Smith',
-      documentName: 'NDA.pdf',
-      firstName: 'Lucas',
-      type: 'completed',
-    }),
-    html,
+    from: mail.from,
+    to: template.email,
+    subject: mail.subject,
+    text: emailText({ ...template }),
+    html: emailHtml({ ...template }),
   });
 };

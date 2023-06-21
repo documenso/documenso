@@ -8,9 +8,13 @@ import { ZSendMailMutationSchema } from './schema';
 export const mailRouter = router({
   send: authenticatedProcedure.input(ZSendMailMutationSchema).mutation(async ({ input }) => {
     try {
-      const { email } = input;
-
-      return await sendMail({ email });
+      return await sendMail({
+        template: input,
+        mail: {
+          from: '<hi@documenso>',
+          subject: 'Documeso Invite',
+        },
+      });
     } catch (err) {
       console.error(err);
 
