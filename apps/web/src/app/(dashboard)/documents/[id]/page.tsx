@@ -5,6 +5,8 @@ import { ChevronLeft } from 'lucide-react';
 
 import { getRequiredServerComponentSession } from '@documenso/lib/next-auth/get-server-session';
 import { getDocumentById } from '@documenso/lib/server-only/document/get-document-by-id';
+import { getFieldsForDocument } from '@documenso/lib/server-only/field/get-fields-for-document';
+import { getRecipientsForDocument } from '@documenso/lib/server-only/recipient/get-recipients-for-document';
 
 import { EditDocumentForm } from '~/components/forms/edit-document';
 
@@ -34,6 +36,17 @@ export default async function DocumentPage({ params }: DocumentPageProps) {
     redirect('/documents');
   }
 
+  const [recipients, fields] = await Promise.all([
+    await getRecipientsForDocument({
+      documentId,
+      userId: session.id,
+    }),
+    await getFieldsForDocument({
+      documentId,
+      userId: session.id,
+    }),
+  ]);
+
   return (
     <div className="mx-auto -mt-4 w-full max-w-screen-xl px-4 md:px-8">
       <Link href="/documents" className="flex items-center text-[#7AC455] hover:opacity-80">
@@ -48,7 +61,13 @@ export default async function DocumentPage({ params }: DocumentPageProps) {
         {document.title}
       </h1>
 
-      <EditDocumentForm className="mt-8" document={document} user={session} />
+      <EditDocumentForm
+        className="mt-8"
+        document={document}
+        user={session}
+        recipients={recipients}
+        fields={fields}
+      />
     </div>
   );
 }
