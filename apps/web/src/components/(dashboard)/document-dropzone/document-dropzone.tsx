@@ -116,7 +116,7 @@ export const DocumentDropzone = ({ className, onDrop, ...props }: DocumentDropzo
             <motion.div
               className="border-muted-foreground/20 group-hover:border-documenso/80 dark:bg-muted/80 z-10 flex aspect-[3/4] w-24 origin-top-right -rotate-[22deg] flex-col gap-y-1 rounded-lg border bg-white/80 px-2 py-4 backdrop-blur-sm"
               variants={DocumentDropzoneCardLeftVariants}
-              transition={{ duration: 0.3 }}
+              transition={{ duration: 0.2 }}
             >
               <div className="bg-muted-foreground/20 group-hover:bg-documenso h-2 w-full rounded-[2px]" />
               <div className="bg-muted-foreground/20 group-hover:bg-documenso h-2 w-5/6 rounded-[2px]" />
@@ -126,7 +126,7 @@ export const DocumentDropzone = ({ className, onDrop, ...props }: DocumentDropzo
             <motion.div
               className="border-muted-foreground/20 group-hover:border-documenso/80 dark:bg-muted/80 z-20 flex aspect-[3/4] w-24 flex-col items-center justify-center gap-y-1 rounded-lg border bg-white/80 px-2 py-4 backdrop-blur-sm"
               variants={DocumentDropzoneCardCenterVariants}
-              transition={{ duration: 0.3 }}
+              transition={{ duration: 0.2 }}
             >
               <Plus
                 strokeWidth="2px"
@@ -137,7 +137,7 @@ export const DocumentDropzone = ({ className, onDrop, ...props }: DocumentDropzo
             <motion.div
               className="border-muted-foreground/20 group-hover:border-documenso/80 dark:bg-muted/80 z-10 flex aspect-[3/4] w-24 origin-top-left rotate-[22deg] flex-col gap-y-1 rounded-lg border bg-white/80 px-2 py-4 backdrop-blur-sm"
               variants={DocumentDropzoneCardRightVariants}
-              transition={{ duration: 0.3 }}
+              transition={{ duration: 0.2 }}
             >
               <div className="bg-muted-foreground/20 group-hover:bg-documenso h-2 w-full rounded-[2px]" />
               <div className="bg-muted-foreground/20 group-hover:bg-documenso h-2 w-5/6 rounded-[2px]" />
