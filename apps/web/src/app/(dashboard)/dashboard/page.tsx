@@ -38,9 +38,15 @@ export default async function DashboardPage() {
       <h1 className="text-4xl font-semibold">Dashboard</h1>
 
       <div className="mt-8 grid grid-cols-1 gap-4 md:grid-cols-3">
-        <CardMetric icon={FileCheck} title="Completed" value={stats.COMPLETED} />
-        <CardMetric icon={File} title="Drafts" value={stats.DRAFT} />
-        <CardMetric icon={Clock} title="Pending" value={stats.PENDING} />
+        <Link href={'/documents?status=COMPLETED'} passHref>
+          <CardMetric icon={FileCheck} title="Completed" value={stats.COMPLETED} />
+        </Link>
+        <Link href={'/documents?status=DRAFT'} passHref>
+          <CardMetric icon={File} title="Drafts" value={stats.DRAFT} />
+        </Link>
+        <Link href={'/documents?status=PENDING'} passHref>
+          <CardMetric icon={Clock} title="Pending" value={stats.PENDING} />
+        </Link>
       </div>
 
       <div className="mt-12">
