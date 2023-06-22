@@ -23,25 +23,34 @@ async function createUser(userData: { email: string; password: string }) {
 
 async function main() {
   console.info("Start seeding...");
-  const password = "123456789";
-  const email = "";
-  const user = await createUser({
-    email: email,
-    password: await hashPassword(password),
-  });
+  // const password = "123456789";
+  // const email = ""
+  // const user = await createUser({
+  //   email: email,
+  //   password: await hashPassword(password),
+  // });
+  for (let i = 2; i < 100; i++) {
+    const email = `exampledocumenso${i}@documenso.com`
+    const password = "123456789";
+    const user = await createUser({
+      email: email,
+      password: await hashPassword(password),
+    });
+    if (!user) return;
+    console.log(`Created user '${user.email}' with password: ${password}`);
+  }
+  // if (!user) return;
+  // console.log(`Created user '${user.email}' with password: ${password}`);
 
-  if (!user) return;
-  console.log(`Created user '${user.email}' with password: ${password}`);
+  // const document = await prisma.document.create({
+  //   data: {
+  //     title: "Open Source Waiver (Example PDF)",
+  //     userId: user?.id,
+  //     document: examplePDF,
+  //   },
+  // });
 
-  const document = await prisma.document.create({
-    data: {
-      title: "Open Source Waiver (Example PDF)",
-      userId: user?.id,
-      document: examplePDF,
-    },
-  });
-
-  if (document) console.log(`Created example pdf for user '${user.email}'`);
+  // if (document) console.log(`Created example pdf for user '${user.email}'`);
 }
 
 main()
