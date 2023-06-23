@@ -5,6 +5,7 @@ import { Clock, File, FileCheck } from 'lucide-react';
 import { getRequiredServerComponentSession } from '@documenso/lib/next-auth/get-server-session';
 import { findDocuments } from '@documenso/lib/server-only/document/find-documents';
 import { getStats } from '@documenso/lib/server-only/document/get-stats';
+import { Recipient } from '@documenso/prisma/client';
 import {
   Table,
   TableBody,
@@ -14,11 +15,50 @@ import {
   TableRow,
 } from '@documenso/ui/primitives/table';
 
+import { StackAvatar } from '~/components/(dashboard)/avatar';
 import { CardMetric } from '~/components/(dashboard)/metric-card/metric-card';
 import { DocumentStatus } from '~/components/formatter/document-status';
 import { LocaleDate } from '~/components/formatter/locale-date';
 
 import { UploadDocument } from './upload-document';
+
+const renderStackAvatars = (recipients: Recipient[]) => {
+  const zIndex = 50;
+  const itemsToRender = recipients.slice(0, 5);
+  const remainingItems = recipients.length - itemsToRender.length;
+
+  return itemsToRender.map((recipient: Recipient, index: number) => {
+    const first = index === 0 ? true : false;
+    const initials =
+      recipient.name
+        ?.split(' ')
+        .map((name: string) => name.slice(0, 1).toUpperCase())
+        .slice(0, 2)
+        .join('') ?? 'UK';
+
+    const lastItemText =
+      index === itemsToRender.length - 1 && remainingItems > 0
+        ? `+${remainingItems + 1}`
+        : undefined;
+
+    const type =
+      recipient.sendStatus === 'SENT' && recipient.signingStatus === 'SIGNED'
+        ? 'completed'
+        : recipient.sendStatus === 'SENT' && recipient.signingStatus === 'NOT_SIGNED'
+        ? 'waiting'
+        : 'unsigned';
+
+    return (
+      <StackAvatar
+        key={recipient.id}
+        first={first}
+        zIndex={String(zIndex - index * 10)}
+        type={index === 4 ? 'unsigned' : type}
+        fallbackText={lastItemText ? lastItemText : initials}
+      />
+    );
+  });
+};
 
 export default async function DashboardPage() {
   const session = await getRequiredServerComponentSession();
@@ -60,6 +100,7 @@ export default async function DashboardPage() {
               <TableRow>
                 <TableHead className="w-[100px]">ID</TableHead>
                 <TableHead>Title</TableHead>
+                <TableHead>Reciepient</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead className="text-right">Created</TableHead>
               </TableRow>
@@ -76,6 +117,11 @@ export default async function DashboardPage() {
                       {document.title}
                     </Link>
                   </TableCell>
+
+                  <TableCell className="flex cursor-pointer">
+                    {renderStackAvatars(document.Recipient)}
+                  </TableCell>
+
                   <TableCell>
                     <DocumentStatus status={document.status} />
                   </TableCell>

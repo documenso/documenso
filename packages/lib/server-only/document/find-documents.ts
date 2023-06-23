@@ -1,5 +1,5 @@
 import { prisma } from '@documenso/prisma';
-import { Document, DocumentStatus, Prisma } from '@documenso/prisma/client';
+import { Document, DocumentStatus, Prisma, Recipient } from '@documenso/prisma/client';
 
 import { FindResultSet } from '../../types/find-result-set';
 
@@ -15,6 +15,10 @@ export interface FindDocumentsOptions {
   };
 }
 
+export type DocumentWithReciepient = Document & {
+  Recipient: Recipient[];
+};
+
 export const findDocuments = async ({
   userId,
   term,
@@ -22,7 +26,7 @@ export const findDocuments = async ({
   page = 1,
   perPage = 10,
   orderBy,
-}: FindDocumentsOptions): Promise<FindResultSet<Document>> => {
+}: FindDocumentsOptions): Promise<FindResultSet<DocumentWithReciepient>> => {
   const orderByColumn = orderBy?.column ?? 'created';
   const orderByDirection = orderBy?.direction ?? 'desc';
 
@@ -47,6 +51,9 @@ export const findDocuments = async ({
       take: perPage,
       orderBy: {
         [orderByColumn]: orderByDirection,
+      },
+      include: {
+        Recipient: true,
       },
     }),
     prisma.document.count({

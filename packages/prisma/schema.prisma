@@ -1,6 +1,6 @@
 generator client {
-  provider = "prisma-client-js"
-  previewFeatures = ["extendedWhereUnique", "jsonProtocol"]
+  provider        = "prisma-client-js"
+  previewFeatures = ["extendedWhereUnique"]
 }
 
 datasource db {
@@ -144,10 +144,10 @@ model Field {
   recipientId Int?
   type        FieldType
   page        Int
-  positionX   Decimal        @default(0)
-  positionY   Decimal        @default(0)
-  width       Decimal        @default(-1)
-  height      Decimal        @default(-1)
+  positionX   Decimal    @default(0)
+  positionY   Decimal    @default(0)
+  width       Decimal    @default(-1)
+  height      Decimal    @default(-1)
   customText  String
   inserted    Boolean
   Document    Document   @relation(fields: [documentId], references: [id], onDelete: Cascade)
