@@ -14,6 +14,12 @@ import {
   TableHeader,
   TableRow,
 } from '@documenso/ui/primitives/table';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@documenso/ui/primitives/tooltip';
 
 import { StackAvatar } from '~/components/(dashboard)/avatar';
 import { CardMetric } from '~/components/(dashboard)/metric-card/metric-card';
@@ -58,6 +64,24 @@ const renderStackAvatars = (recipients: Recipient[]) => {
       />
     );
   });
+};
+
+const renderAvatar = (recipient: Recipient) => {
+  const initials =
+    recipient.name
+      ?.split(' ')
+      .map((name: string) => name.slice(0, 1).toUpperCase())
+      .slice(0, 2)
+      .join('') ?? 'UK';
+
+  const type =
+    recipient.sendStatus === 'SENT' && recipient.signingStatus === 'SIGNED'
+      ? 'completed'
+      : recipient.sendStatus === 'SENT' && recipient.signingStatus === 'NOT_SIGNED'
+      ? 'waiting'
+      : 'unsigned';
+
+  return <StackAvatar first={true} key={recipient.id} type={type} fallbackText={initials} />;
 };
 
 export default async function DashboardPage() {
@@ -106,30 +130,107 @@ export default async function DashboardPage() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {results.data.map((document) => (
-                <TableRow key={document.id}>
-                  <TableCell className="font-medium">{document.id}</TableCell>
-                  <TableCell>
-                    <Link
-                      href={`/documents/${document.id}`}
-                      className="focus-visible:ring-ring ring-offset-background rounded-md font-medium hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
-                    >
-                      {document.title}
-                    </Link>
-                  </TableCell>
+              {results.data.map((document) => {
+                const waitingRecipients = document.Recipient.filter(
+                  (recipient) =>
+                    recipient.sendStatus === 'SENT' && recipient.signingStatus === 'NOT_SIGNED',
+                );
 
-                  <TableCell className="flex cursor-pointer">
-                    {renderStackAvatars(document.Recipient)}
-                  </TableCell>
+                const completedRecipients = document.Recipient.filter(
+                  (recipient) =>
+                    recipient.sendStatus === 'SENT' && recipient.signingStatus === 'SIGNED',
+                );
 
-                  <TableCell>
-                    <DocumentStatus status={document.status} />
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <LocaleDate date={document.created} />
-                  </TableCell>
-                </TableRow>
-              ))}
+                const uncompletedRecipients = document.Recipient.filter(
+                  (recipient) =>
+                    recipient.sendStatus === 'NOT_SENT' && recipient.signingStatus === 'NOT_SIGNED',
+                );
+
+                return (
+                  <TableRow key={document.id}>
+                    <TableCell className="font-medium">{document.id}</TableCell>
+                    <TableCell>
+                      <Link
+                        href={`/documents/${document.id}`}
+                        className="focus-visible:ring-ring ring-offset-background rounded-md font-medium hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
+                      >
+                        {document.title}
+                      </Link>
+                    </TableCell>
+
+                    <TableCell>
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger className="flex cursor-pointer">
+                            {renderStackAvatars(document.Recipient)}
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <div className="flex flex-col gap-y-5 p-1">
+                              {completedRecipients.length > 0 && (
+                                <div>
+                                  <h1 className="text-base font-medium">Completed</h1>
+                                  {completedRecipients.map((recipient: Recipient) => (
+                                    <div
+                                      key={recipient.id}
+                                      className="my-1 flex items-center gap-2"
+                                    >
+                                      {renderAvatar(recipient)}
+                                      <span className="text-sm text-gray-500">
+                                        {recipient.email}
+                                      </span>
+                                    </div>
+                                  ))}
+                                </div>
+                              )}
+
+                              {waitingRecipients.length > 0 && (
+                                <div>
+                                  <h1 className="text-base font-medium">Waiting</h1>
+                                  {waitingRecipients.map((recipient: Recipient) => (
+                                    <div
+                                      key={recipient.id}
+                                      className="my-1 flex items-center gap-2"
+                                    >
+                                      {renderAvatar(recipient)}
+                                      <span className="text-sm text-gray-500">
+                                        {recipient.email}
+                                      </span>
+                                    </div>
+                                  ))}
+                                </div>
+                              )}
+
+                              {uncompletedRecipients.length > 0 && (
+                                <div>
+                                  <h1 className="text-base font-medium">Uncompleted</h1>
+                                  {uncompletedRecipients.map((recipient: Recipient) => (
+                                    <div
+                                      key={recipient.id}
+                                      className="my-1 flex items-center gap-2"
+                                    >
+                                      {renderAvatar(recipient)}
+                                      <span className="text-sm text-gray-500">
+                                        {recipient.email}
+                                      </span>
+                                    </div>
+                                  ))}
+                                </div>
+                              )}
+                            </div>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                    </TableCell>
+
+                    <TableCell>
+                      <DocumentStatus status={document.status} />
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <LocaleDate date={document.created} />
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
               {results.data.length === 0 && (
                 <TableRow>
                   <TableCell colSpan={4} className="h-24 text-center">
