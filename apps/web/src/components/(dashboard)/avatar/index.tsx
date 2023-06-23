@@ -11,7 +11,7 @@ export const StackAvatar = ({ first, zIndex, fallbackText, type }: StackAvatarPr
   let classes = '';
   switch (type) {
     case 'unsigned':
-      classes = 'bg-dawn-400 text-dawn-900';
+      classes = 'bg-dawn-200 text-dawn-900';
       break;
     case 'waiting':
       classes = 'bg-water text-water-700';
