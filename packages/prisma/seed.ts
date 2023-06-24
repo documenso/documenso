@@ -3,13 +3,14 @@ import { hashPassword } from "@documenso/lib/auth";
 import prisma from "@documenso/prisma";
 import { IdentityProvider } from "@prisma/client";
 
-async function createUser(userData: { email: string; password: string }) {
+async function createUser(userData: { email: string; password: string,name: string }) {
   try {
     const user = await prisma.user.create({
       data: {
         email: userData.email,
         password: userData.password,
         identityProvider: IdentityProvider.DOCUMENSO,
+        name: userData.name
       },
     });
 
@@ -29,12 +30,14 @@ async function main() {
   //   email: email,
   //   password: await hashPassword(password),
   // });
-  for (let i = 2; i < 100; i++) {
+  for (let i = 2; i < 80; i++) {
     const email = `exampledocumenso${i}@documenso.com`
     const password = "123456789";
+    const name = `User${i}`
     const user = await createUser({
       email: email,
       password: await hashPassword(password),
+      name: name
     });
     if (!user) return;
     console.log(`Created user '${user.email}' with password: ${password}`);

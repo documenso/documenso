@@ -1,8 +1,17 @@
+/* eslint-disable react-hooks/rules-of-hooks */
 import React, { useEffect, useState } from "react";
+import { Button } from "@documenso/ui";
+import Dropdown from "../Dropdown";
 import AdminPageWrapper from "./AdminPageWrapper";
-import Dropdown from '../Dropdown'
+import UserRow from "./UserRow";
+import { Listbox } from "@headlessui/react";
+
 type Props = {
-  users: User[]
+  allUsers: User[];
+  totalPages: number;
+  entries: number;
+  currentPage: number | null;
+  onEntriesChange: (value: number) => void;
 };
 type User = {
   id: number;
@@ -13,34 +22,65 @@ type User = {
 };
 
 const index = (props: Props) => {
-  const [allUsers, setAllUsers] = useState(null)
+  const [allUsers, setAllUsers] = useState<User[]>(null);
+
   useEffect(() => {
-    setAllUsers([...props.users])
-  }, [props.users])
+    setAllUsers([...props.allUsers]);
+  }, [props.allUsers]);
   const sortAscending = () => {
-    const newSet = [...allUsers].sort((a, b) => a.id - b.id)
+    const newSet = [...allUsers].sort((a, b) => a.id - b.id);
     setAllUsers(newSet);
   };
+
   return (
     <AdminPageWrapper>
-      <div className="flex flex-col justify-center items-center">
-        <div className="flex justify-between p-3 border w-3/4 text-slate-500">
+      <div className="flex flex-col items-center justify-center">
+        <div className="flex w-3/4 justify-between border p-3 text-slate-500">
           <div>
             Show Entries
-            <Dropdown placeholder='25' />
+            <Dropdown
+              placeholder="Select entrys"
+              value={props.entries}
+              options={[
+                { text: "10", value: 10 },
+                { text: "25", value: 25 },
+                { text: "50", value: 50 },
+                { text: "75", value: 75 },
+                { text: "100", value: 100 },
+              ]}
+              onChange={(value: number) => {
+                props.onEntriesChange(value);
+              }}
+            />
+          </div>
+          <div className="flex justify-between">
+            <Button className="m-1" disabled={true}>
+              Previous
+            </Button>
+            <Button className="m-1">Next</Button>
           </div>
           <div className="w-1/2">
-            <input placeholder="Search" className="p-3 w-full  rounded-md " />
+            <input
+              placeholder="Enter email"
+              className="w-full rounded-md  p-3 "
+              onChange={(e) => onSearchChange(e.target.value)}
+            />
           </div>
         </div>
-        <table id="basic-data-table" className="table table-auto w-3/4 shadow-lg m-4 rounded-xl">
+        <table
+          id="basic-data-table"
+          className="m-4 table w-3/4 table-auto rounded-xl shadow-lg duration-500">
           <thead>
             <tr>
-              <th className="px-4 py-2 text-center flex justify-evenly  ">Id
-                <img src='https://img.icons8.com/?size=512&id=44296&format=png'
+              <th className="flex justify-evenly px-4 py-2 text-center  ">
+                Id
+                <img
+                  src="https://img.icons8.com/?size=512&id=44296&format=png"
                   onClick={() => {
-                    sortAscending()
-                  }} className="h-3 w-3 cursor-pointer right-1" />
+                    sortAscending();
+                  }}
+                  className="right-1 h-3 w-3 cursor-pointer"
+                />
               </th>
               <th className="px-4 py-2">Name</th>
               <th className="px-4 py-2">email</th>
@@ -49,24 +89,14 @@ const index = (props: Props) => {
             </tr>
           </thead>
           <tbody>
-            {allUsers?.map(user => (
-              <tr key={user.id}>
-                <td className="border px-4 py-2 text-center">{user.id}</td>
-                <td className="border px-4 py-2 text-center">{user.name}</td>
-                <td className="border px-4 py-2 text-center text-blue-500 cursor-pointer">{user.email}s</td>
-                <td className="border px-4 py-2 text-center">{user.emailVerified}</td>
-                <td className="border px-4 py-2 text-center">{user.isAdmin}</td>
-              </tr>
+            {allUsers?.map((user) => (
+              <UserRow user={user} key={user.id} />
             ))}
-
-
           </tbody>
         </table>
       </div>
-
-
     </AdminPageWrapper>
-  )
+  );
 };
 
 export default index;
