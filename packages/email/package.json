@@ -1,0 +1,22 @@
+{
+  "name": "@documenso/email",
+  "version": "1.0.0",
+  "main": "./index.ts",
+  "types": "./index.ts",
+  "license": "MIT",
+  "files": [
+    "templates/"
+  ],
+  "scripts": {
+    "dev": "email dev --port 3002 --dir templates"
+  },
+  "dependencies": {
+    "@documenso/tsconfig": "*",
+    "@documenso/tailwind-config": "*",
+    "@documenso/ui": "*",
+    "@react-email/components": "^0.0.7"
+  },
+  "devDependencies": {
+    "react-email": "^1.9.4"
+  }
+}
