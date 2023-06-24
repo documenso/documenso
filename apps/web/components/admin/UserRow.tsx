@@ -10,15 +10,15 @@ const UserRow = (props: {
     emailVerified: boolean | null;
     isAdmin: boolean;
   };
+  setShowPopup: (val: boolean) => void;
 }) => {
   const { user } = props;
-  const [showCTA, setShowCta] = useState(false);
   return (
     <>
       <tr
         key={user.id}
         className="hover:bg-neon-100 cursor-pointer"
-        onClick={() => setShowCta(true)}>
+        onClick={() => props.setShowPopup(true)}>
         <td className="border px-4 py-2 text-center">{user.id}</td>
         <td className="border px-4 py-2 text-center">{user.name}</td>
         <td className="cursor-pointer border px-4 py-2 text-center text-blue-500">{user.email}s</td>

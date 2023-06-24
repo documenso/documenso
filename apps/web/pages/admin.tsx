@@ -13,16 +13,16 @@ const Admin: NextPage = () => {
     currentPage: number | null;
   }
   const initialState = {
-    entries: 25,
+    entries: 10,
     allUsers: [],
     totalPages: 0,
     currentPage: 1,
   };
-  const [state, setState] = useState(initialState);
+  const [state, setState] = useState<StateType>(initialState);
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const data = await getAllUsers(state.entries);
+        const data = await getAllUsers(state.currentPage, state.entries);
         setState((prevstate) => ({
           ...prevstate,
           allUsers: data.users,
@@ -34,15 +34,16 @@ const Admin: NextPage = () => {
       }
     };
     fetchData();
-  }, [state.entries]);
-  const setEntries = (value: number) => {
+  }, [state.entries, state.currentPage]);
+
+  const onChangeState = (key, value: number) => {
     setState((prevState) => ({
       ...prevState,
-      entries: value,
+      [key]: value,
     }));
   };
   console.log(state, "adminState");
-  return <AdminPage {...state} onEntriesChange={setEntries} />;
+  return <AdminPage {...state} onEntriesChange={onChangeState} />;
 };
 
 export default Admin;

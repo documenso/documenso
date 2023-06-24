@@ -1,8 +1,8 @@
 import toast from 'react-hot-toast'
-export const getAllUsers = async (entries: number): Promise<any> => {
+export const getAllUsers = async (page: number,entries: number): Promise<any> => {
     try {
         const documensoUsers = await toast.promise(
-            fetch(`/api/admin/users?page=1&limit=${entries}`).then(res => {
+            fetch(`/api/admin/users?page=${page}&limit=${entries}`).then(res => {
                 if (!res.ok) {
                     throw new Error(res.status.toString())
                 }
