@@ -1,6 +1,6 @@
 import * as React from "react";
 import { BaseLayout } from "../components";
-import { Button, Container, Hr, Link, Section, Text } from "@react-email/components";
+import { Button, Container, Hr, Link, Section } from "@react-email/components";
 
 interface Props {
   ctaLink: string;
