@@ -115,7 +115,7 @@ export default function TopNavigation() {
                   <Link
                     href="/dashboard"
                     className="flex flex-shrink-0 items-center gap-x-2 self-center overflow-hidden">
-                    <Logo className="h-8 w-8" />
+                    <Logo className="h-8 w-8 text-black" />
                   </Link>
 
                   <div className="hidden sm:-my-px sm:ml-6 sm:flex sm:space-x-8">

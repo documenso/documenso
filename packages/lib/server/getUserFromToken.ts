@@ -1,23 +1,17 @@
-import { NextApiRequest, NextApiResponse } from "next";
+import { GetServerSidePropsContext, NextApiRequest, NextApiResponse } from "next";
+import { NextRequest } from "next/server";
 import prisma from "@documenso/prisma";
 import { User as PrismaUser } from "@prisma/client";
 import { getToken } from "next-auth/jwt";
-import { signOut } from "next-auth/react";
 
 export async function getUserFromToken(
-  req: NextApiRequest,
-  res: NextApiResponse
+  req: GetServerSidePropsContext["req"] | NextRequest | NextApiRequest,
+  res?: NextApiResponse // TODO: Remove this optional parameter
 ): Promise<PrismaUser | null> {
   const token = await getToken({ req });
   const tokenEmail = token?.email?.toString();
 
-  if (!token) {
-    if (res.status) res.status(401).send("No session token found for request.");
-    return null;
-  }
-
-  if (!tokenEmail) {
-    res.status(400).send("No email found in session token.");
+  if (!token || !tokenEmail) {
     return null;
   }
 
@@ -26,7 +20,6 @@ export async function getUserFromToken(
   });
 
   if (!user) {
-    if (res && res.status) res.status(401).end();
     return null;
   }
 
