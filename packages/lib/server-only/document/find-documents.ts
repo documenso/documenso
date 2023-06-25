@@ -1,6 +1,7 @@
 import { prisma } from '@documenso/prisma';
-import { Document, DocumentStatus, Prisma, Recipient } from '@documenso/prisma/client';
+import { Document, DocumentStatus, Prisma } from '@documenso/prisma/client';
 
+import { DocumentWithReciepient } from '../../types/document-with-recipient';
 import { FindResultSet } from '../../types/find-result-set';
 
 export interface FindDocumentsOptions {
@@ -14,10 +15,6 @@ export interface FindDocumentsOptions {
     direction: 'asc' | 'desc';
   };
 }
-
-export type DocumentWithReciepient = Document & {
-  Recipient: Recipient[];
-};
 
 export const findDocuments = async ({
   userId,
