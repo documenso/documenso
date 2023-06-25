@@ -11,6 +11,7 @@ const UserRow = (props: {
     isAdmin: boolean;
   };
   setShowPopup: (val: boolean) => void;
+  setUser: (id: number) => void;
 }) => {
   const { user } = props;
   return (
@@ -18,7 +19,10 @@ const UserRow = (props: {
       <tr
         key={user.id}
         className="hover:bg-neon-100 cursor-pointer"
-        onClick={() => props.setShowPopup(true)}>
+        onClick={() => {
+          props.setShowPopup(true);
+          props.setUser(user.id);
+        }}>
         <td className="border px-4 py-2 text-center">{user.id}</td>
         <td className="border px-4 py-2 text-center">{user.name}</td>
         <td className="cursor-pointer border px-4 py-2 text-center text-blue-500">{user.email}s</td>

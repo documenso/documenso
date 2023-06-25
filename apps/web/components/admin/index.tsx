@@ -31,7 +31,7 @@ const index = (props: Props) => {
     const newSet = [...allUsers].sort((a, b) => a.id - b.id);
     setAllUsers(newSet);
   };
-  const [user, setUser] = useState(null);
+  const [userId, setUserId] = useState<number | null>(null);
   const [showPopup, setShowPopup] = useState(false);
   return (
     <AdminPageWrapper>
@@ -139,7 +139,7 @@ const index = (props: Props) => {
           </thead>
           <tbody>
             {allUsers?.map((user) => (
-              <UserRow user={user} key={user.id} setShowPopup={setShowPopup} />
+              <UserRow user={user} key={user.id} setShowPopup={setShowPopup} setUser={setUserId} />
             ))}
           </tbody>
         </table>
