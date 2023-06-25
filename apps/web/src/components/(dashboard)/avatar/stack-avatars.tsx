@@ -4,7 +4,7 @@ import { initials } from '@documenso/lib/client-only/recipient-initials';
 import { type } from '@documenso/lib/client-only/recipient-type';
 import { Recipient } from '@documenso/prisma/client';
 
-import { StackAvatar } from '.';
+import { StackAvatar } from './stack-avatar';
 
 export function StackAvatars({ recipients }: { recipients: Recipient[] }) {
   const renderStackAvatars = (recipients: Recipient[]) => {

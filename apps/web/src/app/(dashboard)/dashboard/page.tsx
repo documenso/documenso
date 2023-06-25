@@ -2,12 +2,9 @@ import Link from 'next/link';
 
 import { Clock, File, FileCheck } from 'lucide-react';
 
-import { initials } from '@documenso/lib/client-only/recipient-initials';
-import { type } from '@documenso/lib/client-only/recipient-type';
 import { getRequiredServerComponentSession } from '@documenso/lib/next-auth/get-server-session';
 import { findDocuments } from '@documenso/lib/server-only/document/find-documents';
 import { getStats } from '@documenso/lib/server-only/document/get-stats';
-import { Recipient } from '@documenso/prisma/client';
 import {
   Table,
   TableBody,
@@ -16,15 +13,8 @@ import {
   TableHeader,
   TableRow,
 } from '@documenso/ui/primitives/table';
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from '@documenso/ui/primitives/tooltip';
 
-import { StackAvatar } from '~/components/(dashboard)/avatar';
-import { StackAvatars } from '~/components/(dashboard)/avatar/stack-avatars';
+import { StackAvatarsWithTooltip } from '~/components/(dashboard)/avatar/stack-avatars-with-tooltip';
 import { CardMetric } from '~/components/(dashboard)/metric-card/metric-card';
 import { DocumentStatus } from '~/components/formatter/document-status';
 import { LocaleDate } from '~/components/formatter/locale-date';
@@ -78,21 +68,6 @@ export default async function DashboardPage() {
             </TableHeader>
             <TableBody>
               {results.data.map((document) => {
-                const waitingRecipients = document.Recipient.filter(
-                  (recipient) =>
-                    recipient.sendStatus === 'SENT' && recipient.signingStatus === 'NOT_SIGNED',
-                );
-
-                const completedRecipients = document.Recipient.filter(
-                  (recipient) =>
-                    recipient.sendStatus === 'SENT' && recipient.signingStatus === 'SIGNED',
-                );
-
-                const uncompletedRecipients = document.Recipient.filter(
-                  (recipient) =>
-                    recipient.sendStatus === 'NOT_SENT' && recipient.signingStatus === 'NOT_SIGNED',
-                );
-
                 return (
                   <TableRow key={document.id}>
                     <TableCell className="font-medium">{document.id}</TableCell>
@@ -106,82 +81,7 @@ export default async function DashboardPage() {
                     </TableCell>
 
                     <TableCell>
-                      <TooltipProvider>
-                        <Tooltip>
-                          <TooltipTrigger className="flex cursor-pointer">
-                            <StackAvatars recipients={document.Recipient} />
-                          </TooltipTrigger>
-                          <TooltipContent>
-                            <div className="flex flex-col gap-y-5 p-1">
-                              {completedRecipients.length > 0 && (
-                                <div>
-                                  <h1 className="text-base font-medium">Completed</h1>
-                                  {completedRecipients.map((recipient: Recipient) => (
-                                    <div
-                                      key={recipient.id}
-                                      className="my-1 flex items-center gap-2"
-                                    >
-                                      <StackAvatar
-                                        first={true}
-                                        key={recipient.id}
-                                        type={type(recipient)}
-                                        fallbackText={initials(recipient.name)}
-                                      />
-                                      <span className="text-sm text-gray-500">
-                                        {recipient.email}
-                                      </span>
-                                    </div>
-                                  ))}
-                                </div>
-                              )}
-
-                              {waitingRecipients.length > 0 && (
-                                <div>
-                                  <h1 className="text-base font-medium">Waiting</h1>
-                                  {waitingRecipients.map((recipient: Recipient) => (
-                                    <div
-                                      key={recipient.id}
-                                      className="my-1 flex items-center gap-2"
-                                    >
-                                      <StackAvatar
-                                        first={true}
-                                        key={recipient.id}
-                                        type={type(recipient)}
-                                        fallbackText={initials(recipient.name)}
-                                      />
-                                      <span className="text-sm text-gray-500">
-                                        {recipient.email}
-                                      </span>
-                                    </div>
-                                  ))}
-                                </div>
-                              )}
-
-                              {uncompletedRecipients.length > 0 && (
-                                <div>
-                                  <h1 className="text-base font-medium">Uncompleted</h1>
-                                  {uncompletedRecipients.map((recipient: Recipient) => (
-                                    <div
-                                      key={recipient.id}
-                                      className="my-1 flex items-center gap-2"
-                                    >
-                                      <StackAvatar
-                                        first={true}
-                                        key={recipient.id}
-                                        type={type(recipient)}
-                                        fallbackText={initials(recipient.name)}
-                                      />
-                                      <span className="text-sm text-gray-500">
-                                        {recipient.email}
-                                      </span>
-                                    </div>
-                                  ))}
-                                </div>
-                              )}
-                            </div>
-                          </TooltipContent>
-                        </Tooltip>
-                      </TooltipProvider>
+                      <StackAvatarsWithTooltip recipients={document.Recipient} />
                     </TableCell>
 
                     <TableCell>
