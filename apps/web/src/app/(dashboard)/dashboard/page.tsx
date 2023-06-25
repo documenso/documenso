@@ -2,6 +2,8 @@ import Link from 'next/link';
 
 import { Clock, File, FileCheck } from 'lucide-react';
 
+import { initials } from '@documenso/lib/client-only/recipient-initials';
+import { type } from '@documenso/lib/client-only/recipient-type';
 import { getRequiredServerComponentSession } from '@documenso/lib/next-auth/get-server-session';
 import { findDocuments } from '@documenso/lib/server-only/document/find-documents';
 import { getStats } from '@documenso/lib/server-only/document/get-stats';
@@ -22,67 +24,12 @@ import {
 } from '@documenso/ui/primitives/tooltip';
 
 import { StackAvatar } from '~/components/(dashboard)/avatar';
+import { StackAvatars } from '~/components/(dashboard)/avatar/stack-avatars';
 import { CardMetric } from '~/components/(dashboard)/metric-card/metric-card';
 import { DocumentStatus } from '~/components/formatter/document-status';
 import { LocaleDate } from '~/components/formatter/locale-date';
 
 import { UploadDocument } from './upload-document';
-
-const renderStackAvatars = (recipients: Recipient[]) => {
-  const zIndex = 50;
-  const itemsToRender = recipients.slice(0, 5);
-  const remainingItems = recipients.length - itemsToRender.length;
-
-  return itemsToRender.map((recipient: Recipient, index: number) => {
-    const first = index === 0 ? true : false;
-    const initials =
-      recipient.name
-        ?.split(' ')
-        .map((name: string) => name.slice(0, 1).toUpperCase())
-        .slice(0, 2)
-        .join('') ?? 'UK';
-
-    const lastItemText =
-      index === itemsToRender.length - 1 && remainingItems > 0
-        ? `+${remainingItems + 1}`
-        : undefined;
-
-    const type =
-      recipient.sendStatus === 'SENT' && recipient.signingStatus === 'SIGNED'
-        ? 'completed'
-        : recipient.sendStatus === 'SENT' && recipient.signingStatus === 'NOT_SIGNED'
-        ? 'waiting'
-        : 'unsigned';
-
-    return (
-      <StackAvatar
-        key={recipient.id}
-        first={first}
-        zIndex={String(zIndex - index * 10)}
-        type={index === 4 ? 'unsigned' : type}
-        fallbackText={lastItemText ? lastItemText : initials}
-      />
-    );
-  });
-};
-
-const renderAvatar = (recipient: Recipient) => {
-  const initials =
-    recipient.name
-      ?.split(' ')
-      .map((name: string) => name.slice(0, 1).toUpperCase())
-      .slice(0, 2)
-      .join('') ?? 'UK';
-
-  const type =
-    recipient.sendStatus === 'SENT' && recipient.signingStatus === 'SIGNED'
-      ? 'completed'
-      : recipient.sendStatus === 'SENT' && recipient.signingStatus === 'NOT_SIGNED'
-      ? 'waiting'
-      : 'unsigned';
-
-  return <StackAvatar first={true} key={recipient.id} type={type} fallbackText={initials} />;
-};
 
 export default async function DashboardPage() {
   const session = await getRequiredServerComponentSession();
@@ -162,7 +109,7 @@ export default async function DashboardPage() {
                       <TooltipProvider>
                         <Tooltip>
                           <TooltipTrigger className="flex cursor-pointer">
-                            {renderStackAvatars(document.Recipient)}
+                            <StackAvatars recipients={document.Recipient} />
                           </TooltipTrigger>
                           <TooltipContent>
                             <div className="flex flex-col gap-y-5 p-1">
@@ -174,7 +121,12 @@ export default async function DashboardPage() {
                                       key={recipient.id}
                                       className="my-1 flex items-center gap-2"
                                     >
-                                      {renderAvatar(recipient)}
+                                      <StackAvatar
+                                        first={true}
+                                        key={recipient.id}
+                                        type={type(recipient)}
+                                        fallbackText={initials(recipient.name)}
+                                      />
                                       <span className="text-sm text-gray-500">
                                         {recipient.email}
                                       </span>
@@ -191,7 +143,12 @@ export default async function DashboardPage() {
                                       key={recipient.id}
                                       className="my-1 flex items-center gap-2"
                                     >
-                                      {renderAvatar(recipient)}
+                                      <StackAvatar
+                                        first={true}
+                                        key={recipient.id}
+                                        type={type(recipient)}
+                                        fallbackText={initials(recipient.name)}
+                                      />
                                       <span className="text-sm text-gray-500">
                                         {recipient.email}
                                       </span>
@@ -208,7 +165,12 @@ export default async function DashboardPage() {
                                       key={recipient.id}
                                       className="my-1 flex items-center gap-2"
                                     >
-                                      {renderAvatar(recipient)}
+                                      <StackAvatar
+                                        first={true}
+                                        key={recipient.id}
+                                        type={type(recipient)}
+                                        fallbackText={initials(recipient.name)}
+                                      />
                                       <span className="text-sm text-gray-500">
                                         {recipient.email}
                                       </span>
