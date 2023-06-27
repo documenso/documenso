@@ -1,11 +1,11 @@
 /* eslint-disable react-hooks/rules-of-hooks */
 import React, { useEffect, useState } from "react";
-import { Fragment } from "react";
 import { Button } from "@documenso/ui";
 import Dropdown from "../Dropdown";
 import AdminPageWrapper from "./AdminPageWrapper";
 import UserRow from "./UserRow";
-import { Dialog, Transition } from "@headlessui/react";
+import { getUserDetails } from "@documenso/lib/api/admin/"
+import UserDetailPopup from './UserDetailPopup'
 
 type Props = {
   allUsers: User[];
@@ -27,56 +27,31 @@ const index = (props: Props) => {
   useEffect(() => {
     setAllUsers([...props.allUsers]);
   }, [props.allUsers]);
+  const [userId, setUserId] = useState<number | null>(null);
+  const [userDetails, setUserDetails] = useState([])
+  useEffect(() => {
+    if (!userId) {
+      return
+    }
+    getUserDetails(userId).then(res => {
+      setUserDetails(res)
+    })
+  }, [userId])
   const sortAscending = () => {
     const newSet = [...allUsers].sort((a, b) => a.id - b.id);
     setAllUsers(newSet);
   };
-  const [userId, setUserId] = useState<number | null>(null);
   const [showPopup, setShowPopup] = useState(false);
   return (
     <AdminPageWrapper>
       <div className="flex flex-col items-center justify-center">
         <div className="flex w-3/4 justify-between border p-3 text-slate-500">
-          <Transition.Root show={showPopup} as={Fragment}>
-            <Dialog
-              as="div"
-              className=" relative"
-              onClose={() => {
-                setShowPopup(false);
-              }}>
-              <Transition.Child
-                as={Fragment}
-                enter="ease-out duration-300"
-                enterFrom="opacity-0"
-                enterTo="opacity-100"
-                leave="ease-in duration-200"
-                leaveFrom="opacity-100"
-                leaveTo="opacity-0">
-                <div className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" />
-              </Transition.Child>
-              <div className="fixed inset-0 z-10 overflow-y-auto">
-                <div className="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
-                  <Transition.Child
-                    as={Fragment}
-                    enter="ease-out duration-300"
-                    enterFrom="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-                    enterTo="opacity-100 translate-y-0 sm:scale-100"
-                    leave="ease-in duration-200"
-                    leaveFrom="opacity-100 translate-y-0 sm:scale-100"
-                    leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95">
-                    <Dialog.Panel className="relative transform overflow-hidden rounded-lg bg-white px-4 pt-5 pb-4 text-left font-mono shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:p-6">
-                      <div className="flex justify-start">
-                        <Dialog.Title className="text-lg font-semibold">User Details</Dialog.Title>
-                      </div>
-                      <Dialog.Description>
-                        <input value="user1" className="p-1" />
-                      </Dialog.Description>
-                    </Dialog.Panel>
-                  </Transition.Child>
-                </div>
-              </div>
-            </Dialog>
-          </Transition.Root>
+          <UserDetailPopup
+            showPopup={showPopup}
+            setShowPopup={setShowPopup}
+            userDetails={userDetails}
+            setUserDetails={setUserDetails}
+          />
           <div>
             Show Entries
             <Dropdown
