@@ -56,7 +56,6 @@
     "eslint": "8.27.0",
     "eslint-config-next": "13.0.3",
     "file-loader": "^6.2.0",
-    "next-transpile-modules": "^10.0.0",
     "postcss": "^8.4.19",
     "sass": "^1.57.1",
     "stripe-cli": "^0.1.0",

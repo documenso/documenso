@@ -5,6 +5,7 @@ import prisma from "@documenso/prisma";
 import { Button, IconButton } from "@documenso/ui";
 import { NextPageWithLayout } from "../../_app";
 import { ArrowDownTrayIcon, CheckBadgeIcon } from "@heroicons/react/24/outline";
+import { truncate } from "@documenso/lib/helpers";
 
 const Signed: NextPageWithLayout = (props: any) => {
   const router = useRouter();
@@ -21,7 +22,7 @@ const Signed: NextPageWithLayout = (props: any) => {
         <CheckBadgeIcon className="text-neon mr-1 inline w-10"></CheckBadgeIcon>
         <h1 className="text-neon inline align-middle text-base font-medium">It's done!</h1>
         <p className="mt-2 text-4xl font-bold tracking-tight">
-          You signed "{props.document.title}"
+          You signed "{truncate(props.document.title)}"
         </p>
         <p className="mt-2 max-w-sm text-base text-gray-500" hidden={allRecipientsSigned}>
           You will be notfied when all recipients have signed.

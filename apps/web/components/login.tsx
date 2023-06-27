@@ -69,7 +69,7 @@ export default function Login(props: any) {
       <div className="flex min-h-full items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
         <div className="w-full max-w-md space-y-8">
           <div>
-            <Logo className="mx-auto h-20 w-auto"></Logo>
+            <Logo className="mx-auto h-20 w-auto text-black"></Logo>
             <h2 className="mt-6 text-center text-3xl font-bold tracking-tight text-gray-900">
               Sign in to your account
             </h2>
@@ -111,9 +111,11 @@ export default function Login(props: any) {
               </div>
               <div className="flex items-center justify-between">
                 <div className="text-sm">
-                  <a href="#" className="hover:text-neon-700 font-medium text-gray-500">
+                  <Link
+                    href="/forgot-password"
+                    className="hover:text-neon-700 font-medium text-gray-500">
                     Forgot your password?
-                  </a>
+                  </Link>
                 </div>
               </div>
               <div>

@@ -6,53 +6,62 @@ import prisma from "@documenso/prisma";
 import { Document as PrismaDocument, SendStatus } from "@prisma/client";
 
 async function postHandler(req: NextApiRequest, res: NextApiResponse) {
-  const user = await getUserFromToken(req, res);
-  const { id: documentId } = req.query;
-  const { resendTo: resendTo = [] } = req.body;
+  try {
+    const user = await getUserFromToken(req, res);
+    const { id: documentId } = req.query;
+    const { resendTo: resendTo = [] } = req.body;
 
-  if (!user) return;
+    if (!user) {
+      return res.status(401).send("Unauthorized");
+    }
 
-  if (!documentId) {
-    res.status(400).send("Missing parameter documentId.");
-    return;
-  }
+    if (!documentId) {
+      return res.status(400).send("Missing parameter documentId.");
+    }
 
-  const document: PrismaDocument = await getDocument(+documentId, req, res);
+    const document: PrismaDocument = await getDocument(+documentId, req, res);
 
-  if (!document) res.status(404).end(`No document with id ${documentId} found.`);
+    if (!document) {
+      res.status(404).end(`No document with id ${documentId} found.`);
+    }
 
-  let recipientCondition: any = {
-    documentId: +documentId,
-    sendStatus: SendStatus.NOT_SENT,
-  };
-
-  if (resendTo.length) {
-    recipientCondition = {
+    let recipientCondition: any = {
       documentId: +documentId,
-      id: { in: resendTo },
+      sendStatus: SendStatus.NOT_SENT,
     };
-  }
 
-  const recipients = await prisma.recipient.findMany({
-    where: {
-      ...recipientCondition,
-    },
-  });
+    if (resendTo.length) {
+      recipientCondition = {
+        documentId: +documentId,
+        id: { in: resendTo },
+      };
+    }
 
-  if (!recipients.length) return res.status(200).send(recipients.length);
-
-  let sentRequests = 0;
-  recipients.forEach(async (recipient) => {
-    await sendSigningRequest(recipient, document, user).catch((err) => {
-      console.log(err);
-      return res.status(502).end("Coud not send request for signing.");
+    const recipients = await prisma.recipient.findMany({
+      where: {
+        ...recipientCondition,
+      },
     });
 
-    sentRequests++;
+    if (!recipients.length) {
+      return res.status(200).send(recipients.length);
+    }
+
+    let sentRequests = 0;
+    recipients.forEach(async (recipient) => {
+      await sendSigningRequest(recipient, document, user);
+
+      sentRequests++;
+    });
+
     if (sentRequests === recipients.length) {
       return res.status(200).send(recipients.length);
     }
-  });
+
+    return res.status(502).end("Coud not send request for signing.");
+  } catch (err) {
+    return res.status(502).end("Coud not send request for signing.");
+  }
 }
 
 export default defaultHandler({

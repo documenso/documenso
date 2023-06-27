@@ -1,6 +1,5 @@
 import { NEXT_PUBLIC_WEBAPP_URL } from "../constants";
 import { baseEmailTemplate } from "./baseTemplate";
-import { Document as PrismaDocument } from "@prisma/client";
 
 export const signingCompleteTemplate = (message: string) => {
   const customContent = `
