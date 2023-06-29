@@ -1,8 +1,8 @@
 import { Fragment, useEffect } from "react";
+import { updateUserDetails } from "@documenso/lib/api/admin/";
 import { Button } from "@documenso/ui";
 import { Dialog, Transition } from "@headlessui/react";
 import { FormProvider, useForm } from "react-hook-form";
-import { updateUserDetails } from "@documenso/lib/api/admin/"
 
 type User = {
   id: number;
@@ -15,33 +15,36 @@ type Props = {
   setShowPopup: (val: boolean) => void;
   showPopup: boolean;
   userDetails: User;
-  setUserDetails: (val: User) => void
+  setUserDetails: (val: User) => void;
 };
 interface UserValues {
-  id: number,
+  id: number;
   name: string;
   email: string;
   emailVerified: string;
-  isAdmin: boolean
+  isAdmin: boolean;
 }
 const UserDetailPopup = (props: Props) => {
   const { userDetails } = props;
   const methods = useForm<UserValues>({
-    defaultValues: userDetails
+    defaultValues: userDetails,
   });
-  const { register, formState, reset, formState: { isDirty } } = methods;
+  const {
+    register,
+    formState,
+    reset,
+    formState: { isDirty },
+  } = methods;
 
   useEffect(() => {
     reset(userDetails);
   }, [reset, userDetails]);
   const onSubmit = async (values: UserValues) => {
     try {
-      const updatedData = await updateUserDetails(values)
-      props.setUserDetails(updatedData)
-    } catch (err) {
-
-    }
-  }
+      const updatedData = await updateUserDetails(values);
+      props.setUserDetails(updatedData);
+    } catch (err) {}
+  };
   return (
     <Transition.Root show={props.showPopup} as={Fragment}>
       <Dialog
@@ -78,11 +81,12 @@ const UserDetailPopup = (props: Props) => {
                 </div>
                 <FormProvider {...methods}>
                   <form className="mt-8 space-y-2" onSubmit={methods.handleSubmit(onSubmit)}>
-                    <label htmlFor="email-address" className="font-semibold">Name</label>
+                    <label htmlFor="email-address" className="font-semibold">
+                      Name
+                    </label>
                     <input
                       {...register("name")}
                       id="email-address"
-
                       defaultValue={userDetails?.name}
                       className="focus:border-neon focus:ring-neon relative block w-full appearance-none rounded-none rounded-t-md border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-500 focus:z-10 focus:outline-none sm:text-sm"
                     />
@@ -92,11 +96,30 @@ const UserDetailPopup = (props: Props) => {
                       defaultValue={userDetails?.email}
                       className="focus:border-neon focus:ring-neon relative block w-full appearance-none rounded-none rounded-t-md border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-500 focus:z-10 focus:outline-none sm:text-sm"
                     />
+                    <div>
+                      <input
+                        type="checkbox"
+                        id="admin_check"
+                        checked={methods.getValues().isAdmin}
+                        className="hidden"
+                      />
+                      <label htmlFor="admin_check">
+                        <span className="mb-4 flex h-20 w-56 rounded bg-white p-2 shadow">
+                          <span
+                            className={`block h-full w-1/2 transform rounded transition duration-300 ease-in-out ${
+                              methods.getValues().isAdmin
+                                ? "translate-x-full bg-green-500"
+                                : "bg-red-500"
+                            }`}></span>
+                        </span>
+                      </label>
+                    </div>
                     <div className="m-1 flex justify-end">
-                      <Button type="submit" disabled={!isDirty}>Save</Button>
+                      <Button type="submit" disabled={!isDirty}>
+                        Save
+                      </Button>
                     </div>
                   </form>
-
                 </FormProvider>
               </Dialog.Panel>
             </Transition.Child>
