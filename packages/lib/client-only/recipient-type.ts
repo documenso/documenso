@@ -1,8 +1,13 @@
 import { Recipient } from '@documenso/prisma/client';
 
-export const type = (recipient: Recipient) =>
-  recipient.sendStatus === 'SENT' && recipient.signingStatus === 'SIGNED'
-    ? 'completed'
-    : recipient.sendStatus === 'SENT' && recipient.signingStatus === 'NOT_SIGNED'
-    ? 'waiting'
-    : 'unsigned';
+export const getRecipientType = (recipient: Recipient) => {
+  if (recipient.sendStatus === 'SENT' && recipient.signingStatus === 'SIGNED') {
+    return 'completed';
+  }
+
+  if (recipient.sendStatus === 'SENT' && recipient.signingStatus === 'NOT_SIGNED') {
+    return 'waiting';
+  }
+
+  return 'unsigned';
+};
