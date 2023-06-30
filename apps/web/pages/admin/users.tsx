@@ -4,7 +4,7 @@ import type { NextPage } from "next";
 import dynamic from "next/dynamic";
 import { getAllUsers } from "@documenso/lib/api/admin/";
 
-const AdminPage = dynamic(() => import("../components/admin"), { ssr: false });
+const UserAdminPage = dynamic(() => import("../../components/admin"), { ssr: false });
 
 const Admin: NextPage = () => {
   interface StateType {
@@ -43,7 +43,7 @@ const Admin: NextPage = () => {
     }));
   };
   console.log(state, "adminState");
-  return <AdminPage {...state} onEntriesChange={onChangeState} />;
+  return <UserAdminPage {...state} onEntriesChange={onChangeState} />;
 };
 
 export default Admin;

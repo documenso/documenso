@@ -3,14 +3,14 @@ import { hashPassword } from "@documenso/lib/auth";
 import prisma from "@documenso/prisma";
 import { IdentityProvider } from "@prisma/client";
 
-async function createUser(userData: { email: string; password: string,name: string }) {
+async function createUser(userData: { email: string; password: string; name: string }) {
   try {
     const user = await prisma.user.create({
       data: {
         email: userData.email,
         password: userData.password,
         identityProvider: IdentityProvider.DOCUMENSO,
-        name: userData.name
+        name: userData.name,
       },
     });
 
@@ -24,36 +24,36 @@ async function createUser(userData: { email: string; password: string,name: stri
 
 async function main() {
   console.info("Start seeding...");
-  // const password = "123456789";
-  // const email = ""
-  // const user = await createUser({
-  //   email: email,
-  //   password: await hashPassword(password),
-  // });
-  for (let i = 2; i < 80; i++) {
-    const email = `exampledocumenso${i}@documenso.com`
-    const password = "123456789";
-    const name = `User${i}`
-    const user = await createUser({
-      email: email,
-      password: await hashPassword(password),
-      name: name
-    });
-    if (!user) return;
-    console.log(`Created user '${user.email}' with password: ${password}`);
-  }
-  // if (!user) return;
-  // console.log(`Created user '${user.email}' with password: ${password}`);
+  const password = "123456789";
+  const email = "123@documenso.com";
+  const user = await createUser({
+    email: email,
+    password: await hashPassword(password),
+  });
+  // for (let i = 2; i < 80; i++) {
+  //   const email = `exampledocumenso${i}@documenso.com`
+  //   const password = "123456789";
+  //   const name = `User${i}`
+  //   const user = await createUser({
+  //     email: email,
+  //     password: await hashPassword(password),
+  //     name: name
+  //   });
+  //   if (!user) return;
+  //   console.log(`Created user '${user.email}' with password: ${password}`);
+  // }
+  if (!user) return;
+  console.log(`Created user '${user.email}' with password: ${password}`);
 
-  // const document = await prisma.document.create({
-  //   data: {
-  //     title: "Open Source Waiver (Example PDF)",
-  //     userId: user?.id,
-  //     document: examplePDF,
-  //   },
-  // });
+  const document = await prisma.document.create({
+    data: {
+      title: "Open Source Waiver (Example PDF)",
+      userId: user?.id,
+      document: examplePDF,
+    },
+  });
 
-  // if (document) console.log(`Created example pdf for user '${user.email}'`);
+  if (document) console.log(`Created example pdf for user '${user.email}'`);
 }
 
 main()

@@ -10,6 +10,13 @@ type User = {
   email: string;
   emailVerified: boolean | null;
   isAdmin: boolean;
+  Document?: Document[];
+};
+type Document = {
+  document: string;
+  id: number;
+  title: string;
+  status: string;
 };
 type Props = {
   setShowPopup: (val: boolean) => void;
@@ -43,7 +50,7 @@ const UserDetailPopup = (props: Props) => {
     try {
       const updatedData = await updateUserDetails(values);
       props.setUserDetails(updatedData);
-    } catch (err) {}
+    } catch (err) { }
   };
   return (
     <Transition.Root show={props.showPopup} as={Fragment}>
@@ -107,14 +114,28 @@ const UserDetailPopup = (props: Props) => {
                         isAdmin
                         <span className="mb-4 flex h-10 w-28 cursor-pointer rounded bg-white p-2 shadow">
                           <span
-                            className={`block h-full w-1/2 transform rounded transition duration-300 ease-in-out ${
-                              methods.getValues().isAdmin
-                                ? "translate-x-full bg-green-500"
-                                : "bg-red-500"
-                            }`}></span>
+                            className={`block h-full w-1/2 transform rounded transition duration-300 ease-in-out ${methods.getValues().isAdmin
+                              ? "translate-x-full bg-green-500"
+                              : "bg-red-500"
+                              }`}></span>
                         </span>
                       </label>
                     </div>
+                    {userDetails?.Document?.length > 0 && (
+                      <div>
+                        <span className="font-semibold flex flex-col">
+                          Documents
+                          {userDetails?.Document && userDetails?.Document?.map((document: Document) => (
+                            <div className='flex items-center justify-between' key={document.id}>
+                              <span className='font-normal'>{document.title}</span>
+                              <span className='bg-green-300 p-1 rounded-lg font-normal lowercase'>{document.status}</span>
+
+                            </div>
+                          ))}
+                        </span>
+                      </div>
+                    )}
+
                     <div className="m-1 flex justify-end">
                       <Button type="submit" disabled={!isDirty}>
                         Save
