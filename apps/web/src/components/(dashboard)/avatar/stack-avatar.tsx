@@ -9,6 +9,9 @@ export type StackAvatarProps = {
 
 export const StackAvatar = ({ first, zIndex, fallbackText, type }: StackAvatarProps) => {
   let classes = '';
+  let zIndexClass = '';
+  const firstClass = first ? '' : '-ml-3';
+
   switch (type) {
     case 'unsigned':
       classes = 'bg-dawn-200 text-dawn-900';
@@ -23,12 +26,32 @@ export const StackAvatar = ({ first, zIndex, fallbackText, type }: StackAvatarPr
       break;
   }
 
+  switch (zIndex) {
+    case '10':
+      zIndexClass = 'z-10';
+      break;
+    case '20':
+      zIndexClass = 'z-20';
+      break;
+    case '30':
+      zIndexClass = 'z-30';
+      break;
+    case '40':
+      zIndexClass = 'z-40';
+      break;
+    case '50':
+      zIndexClass = 'z-50';
+      break;
+    default:
+      break;
+  }
+
   return (
     <Avatar
       className={`
-        ${zIndex && `z-${zIndex}`} 
-        ${!first && '-ml-3'} 
-        h-10 w-10 border-2 border-solid border-white `}
+        ${zIndexClass}
+        ${firstClass}
+        h-10 w-10 border-2 border-solid border-white`}
     >
       <AvatarFallback className={classes}>{fallbackText ?? 'UK'}</AvatarFallback>
     </Avatar>
