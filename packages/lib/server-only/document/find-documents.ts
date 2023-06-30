@@ -1,7 +1,7 @@
 import { prisma } from '@documenso/prisma';
 import { Document, DocumentStatus, Prisma } from '@documenso/prisma/client';
+import { DocumentWithReciepient } from '@documenso/prisma/types/document-with-recipient';
 
-import { DocumentWithReciepient } from '../../types/document-with-recipient';
 import { FindResultSet } from '../../types/find-result-set';
 
 export interface FindDocumentsOptions {

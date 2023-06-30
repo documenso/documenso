@@ -7,8 +7,8 @@ import Link from 'next/link';
 import { Loader } from 'lucide-react';
 
 import { useUpdateSearchParams } from '@documenso/lib/client-only/hooks/use-update-search-params';
-import { DocumentWithReciepient } from '@documenso/lib/types/document-with-recipient';
 import { FindResultSet } from '@documenso/lib/types/find-result-set';
+import { DocumentWithReciepient } from '@documenso/prisma/types/document-with-recipient';
 import { DataTable } from '@documenso/ui/primitives/data-table';
 import { DataTablePagination } from '@documenso/ui/primitives/data-table-pagination';
 

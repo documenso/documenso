@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { initials } from '@documenso/lib/client-only/recipient-initials';
-import { type } from '@documenso/lib/client-only/recipient-type';
+import { getRecipientType } from '@documenso/lib/client-only/recipient-type';
 import { Recipient } from '@documenso/prisma/client';
 
 import { StackAvatar } from './stack-avatar';
@@ -25,7 +25,7 @@ export function StackAvatars({ recipients }: { recipients: Recipient[] }) {
           key={recipient.id}
           first={first}
           zIndex={String(zIndex - index * 10)}
-          type={lastItemText && index === 4 ? 'unsigned' : type(recipient)}
+          type={lastItemText && index === 4 ? 'unsigned' : getRecipientType(recipient)}
           fallbackText={lastItemText ? lastItemText : initials(recipient.name)}
         />
       );

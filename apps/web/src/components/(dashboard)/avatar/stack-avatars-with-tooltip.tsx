@@ -1,5 +1,5 @@
 import { initials } from '@documenso/lib/client-only/recipient-initials';
-import { type } from '@documenso/lib/client-only/recipient-type';
+import { getRecipientType } from '@documenso/lib/client-only/recipient-type';
 import { Recipient } from '@documenso/prisma/client';
 import {
   Tooltip,
@@ -40,7 +40,7 @@ export const StackAvatarsWithTooltip = ({ recipients }: { recipients: Recipient[
                     <StackAvatar
                       first={true}
                       key={recipient.id}
-                      type={type(recipient)}
+                      type={getRecipientType(recipient)}
                       fallbackText={initials(recipient.name)}
                     />
                     <span className="text-sm text-gray-500">{recipient.email}</span>
@@ -57,7 +57,7 @@ export const StackAvatarsWithTooltip = ({ recipients }: { recipients: Recipient[
                     <StackAvatar
                       first={true}
                       key={recipient.id}
-                      type={type(recipient)}
+                      type={getRecipientType(recipient)}
                       fallbackText={initials(recipient.name)}
                     />
                     <span className="text-sm text-gray-500">{recipient.email}</span>
@@ -74,7 +74,7 @@ export const StackAvatarsWithTooltip = ({ recipients }: { recipients: Recipient[
                     <StackAvatar
                       first={true}
                       key={recipient.id}
-                      type={type(recipient)}
+                      type={getRecipientType(recipient)}
                       fallbackText={initials(recipient.name)}
                     />
                     <span className="text-sm text-gray-500">{recipient.email}</span>
