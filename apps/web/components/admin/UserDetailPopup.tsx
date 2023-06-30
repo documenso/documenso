@@ -100,11 +100,12 @@ const UserDetailPopup = (props: Props) => {
                       <input
                         type="checkbox"
                         id="admin_check"
-                        checked={methods.getValues().isAdmin}
+                        {...register("isAdmin")}
                         className="hidden"
                       />
-                      <label htmlFor="admin_check">
-                        <span className="mb-4 flex h-20 w-56 rounded bg-white p-2 shadow">
+                      <label htmlFor="admin_check" className="font-semibold">
+                        isAdmin
+                        <span className="mb-4 flex h-10 w-28 cursor-pointer rounded bg-white p-2 shadow">
                           <span
                             className={`block h-full w-1/2 transform rounded transition duration-300 ease-in-out ${
                               methods.getValues().isAdmin

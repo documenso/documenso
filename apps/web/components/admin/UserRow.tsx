@@ -25,9 +25,9 @@ const UserRow = (props: {
         }}>
         <td className="border px-4 py-2 text-center">{user.id}</td>
         <td className="border px-4 py-2 text-center">{user.name}</td>
-        <td className="cursor-pointer border px-4 py-2 text-center text-blue-500">{user.email}s</td>
+        <td className="cursor-pointer border px-4 py-2 text-center text-blue-500">{user.email}</td>
         <td className="border px-4 py-2 text-center">{user.emailVerified}</td>
-        <td className="border px-4 py-2 text-center">{user.isAdmin}</td>
+        <td className="border px-4 py-2 text-center">{user.isAdmin ? "true" : "false"}</td>
       </tr>
     </>
   );
