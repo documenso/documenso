@@ -63,7 +63,7 @@ export const DocumentsDataTable = ({ results }: DocumentsDataTableProps) => {
           {
             header: 'Actions',
             accessorKey: 'actions',
-            cell: () => <ActionButtons />,
+            cell: ({ row }) => <ActionButtons documentId={row.original.id} />,
           },
         ]}
         data={results.data}

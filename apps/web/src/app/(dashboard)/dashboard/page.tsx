@@ -84,8 +84,8 @@ export default async function DashboardPage() {
                   <TableCell>
                     <LocaleDate date={document.created} />
                   </TableCell>
-                  <TableCell>
-                    <ActionButtons />
+                  <TableCell className="flex cursor-pointer gap-6">
+                    <ActionButtons documentId={document.id} />
                   </TableCell>
                 </TableRow>
               ))}
