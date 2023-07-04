@@ -12,6 +12,7 @@ import { Document } from '@documenso/prisma/client';
 import { DataTable } from '@documenso/ui/primitives/data-table';
 import { DataTablePagination } from '@documenso/ui/primitives/data-table-pagination';
 
+import { ActionButtons } from '~/components/(dashboard)/table/actions-component';
 import { DocumentStatus } from '~/components/formatter/document-status';
 import { LocaleDate } from '~/components/formatter/locale-date';
 
@@ -58,6 +59,11 @@ export const DocumentsDataTable = ({ results }: DocumentsDataTableProps) => {
             header: 'Created',
             accessorKey: 'created',
             cell: ({ row }) => <LocaleDate date={row.getValue('created')} />,
+          },
+          {
+            header: 'Actions',
+            accessorKey: 'actions',
+            cell: () => <ActionButtons />,
           },
         ]}
         data={results.data}
