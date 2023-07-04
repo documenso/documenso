@@ -10,7 +10,7 @@ export const LocaleDate = ({ className, date, ...props }: LocaleDateProps) => {
   const [localeDate, setLocaleDate] = useState(() => new Date(date).toISOString());
 
   useEffect(() => {
-    setLocaleDate(new Date(date).toLocaleString());
+    setLocaleDate(new Date(date).toLocaleDateString());
   }, [date]);
 
   return (
