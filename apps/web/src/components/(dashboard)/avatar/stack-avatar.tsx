@@ -1,5 +1,13 @@
 import { Avatar, AvatarFallback } from '@documenso/ui/primitives/avatar';
 
+const ZIndexes: { [key: string]: string } = {
+  '10': 'z-10',
+  '20': 'z-20',
+  '30': 'z-30',
+  '40': 'z-40',
+  '50': 'z-50',
+};
+
 export type StackAvatarProps = {
   first?: boolean;
   zIndex?: string;
@@ -12,6 +20,10 @@ export const StackAvatar = ({ first, zIndex, fallbackText, type }: StackAvatarPr
   let zIndexClass = '';
   const firstClass = first ? '' : '-ml-3';
 
+  if (zIndex) {
+    zIndexClass = ZIndexes[zIndex] ?? '';
+  }
+
   switch (type) {
     case 'unsigned':
       classes = 'bg-dawn-200 text-dawn-900';
@@ -21,26 +33,6 @@ export const StackAvatar = ({ first, zIndex, fallbackText, type }: StackAvatarPr
       break;
     case 'completed':
       classes = 'bg-documenso-200 text-documenso-800';
-      break;
-    default:
-      break;
-  }
-
-  switch (zIndex) {
-    case '10':
-      zIndexClass = 'z-10';
-      break;
-    case '20':
-      zIndexClass = 'z-20';
-      break;
-    case '30':
-      zIndexClass = 'z-30';
-      break;
-    case '40':
-      zIndexClass = 'z-40';
-      break;
-    case '50':
-      zIndexClass = 'z-50';
       break;
     default:
       break;
