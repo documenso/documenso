@@ -8,15 +8,16 @@ import { Loader } from 'lucide-react';
 
 import { useUpdateSearchParams } from '@documenso/lib/client-only/hooks/use-update-search-params';
 import { FindResultSet } from '@documenso/lib/types/find-result-set';
-import { Document } from '@documenso/prisma/client';
+import { DocumentWithReciepient } from '@documenso/prisma/types/document-with-recipient';
 import { DataTable } from '@documenso/ui/primitives/data-table';
 import { DataTablePagination } from '@documenso/ui/primitives/data-table-pagination';
 
+import { StackAvatarsWithTooltip } from '~/components/(dashboard)/avatar/stack-avatars-with-tooltip';
 import { DocumentStatus } from '~/components/formatter/document-status';
 import { LocaleDate } from '~/components/formatter/locale-date';
 
 export type DocumentsDataTableProps = {
-  results: FindResultSet<Document>;
+  results: FindResultSet<DocumentWithReciepient>;
 };
 
 export const DocumentsDataTable = ({ results }: DocumentsDataTableProps) => {
@@ -48,6 +49,13 @@ export const DocumentsDataTable = ({ results }: DocumentsDataTableProps) => {
                 {row.original.title}
               </Link>
             ),
+          },
+          {
+            header: 'Recipient',
+            accessorKey: 'recipient',
+            cell: ({ row }) => {
+              return <StackAvatarsWithTooltip recipients={row.original.Recipient} />;
+            },
           },
           {
             header: 'Status',

@@ -2,7 +2,6 @@
 
 import { Variants, motion } from 'framer-motion';
 import { Plus } from 'lucide-react';
-import { useTheme } from 'next-themes';
 import { useDropzone } from 'react-dropzone';
 
 import { cn } from '@documenso/ui/lib/utils';
@@ -92,8 +91,6 @@ export const DocumentDropzone = ({ className, onDrop, ...props }: DocumentDropzo
     },
   });
 
-  const { theme } = useTheme();
-
   return (
     <motion.div
       className={cn('flex', className)}
@@ -110,7 +107,6 @@ export const DocumentDropzone = ({ className, onDrop, ...props }: DocumentDropzo
         )}
         gradient={true}
         degrees={120}
-
         {...getRootProps()}
         {...props}
       >
