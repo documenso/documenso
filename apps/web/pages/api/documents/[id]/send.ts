@@ -48,11 +48,14 @@ async function postHandler(req: NextApiRequest, res: NextApiResponse) {
     }
 
     let sentRequests = 0;
-    recipients.forEach(async (recipient) => {
-      await sendSigningRequest(recipient, document, user);
 
-      sentRequests++;
-    });
+    await Promise.all(
+      recipients.map(async (recipient) => {
+        await sendSigningRequest(recipient, document, user);
+
+        sentRequests++;
+      })
+    );
 
     if (sentRequests === recipients.length) {
       return res.status(200).send(recipients.length);

@@ -76,6 +76,13 @@ We're currently working on a redesign of the application including a revamp of t
 
 - To contribute please see our [contribution guide](https://github.com/documenso/documenso/blob/main/CONTRIBUTING.md).
 
+
+## Contact us
+
+Contact us if you are interested in our Enterprise plan for large organizations that need extra flexibility and control.
+
+<a href="https://cal.com/timurercan/enterprise-customers?utm_source=banner&utm_campaign=oss"><img alt="Book us with Cal.com" src="https://cal.com/book-with-cal-dark.svg" /></a>
+
 # Tech
 
 Documenso is built using awesome open source tech including:
