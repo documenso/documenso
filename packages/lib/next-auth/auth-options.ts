@@ -31,7 +31,6 @@ export const NEXT_AUTH_OPTIONS: AuthOptions = {
         const user = await getUserByEmail({ email }).catch(() => null);
 
         if (!user || !user.password) {
-          console.log('no user');
           return null;
         }
 
@@ -42,7 +41,7 @@ export const NEXT_AUTH_OPTIONS: AuthOptions = {
         }
 
         return {
-          id: String(user.id) as any,
+          id: String(user.id),
           email: user.email,
           name: user.name,
         } satisfies User;
@@ -57,6 +56,7 @@ export const NEXT_AUTH_OPTIONS: AuthOptions = {
           id: profile.sub as any,
           name: profile.name,
           email: profile.email,
+          image: profile.picture,
         };
       },
     }),
@@ -83,7 +83,6 @@ export const NEXT_AUTH_OPTIONS: AuthOptions = {
       };
     },
     async session({ token, session }) {
-      console.log('session', { token, session });
       if (token) {
         const documensoSession = {
           ...session,
@@ -91,6 +90,7 @@ export const NEXT_AUTH_OPTIONS: AuthOptions = {
             id: Number(token.id),
             name: token.name,
             email: token.email,
+            image: token.image,
           },
         } as Session;
 
