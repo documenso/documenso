@@ -8,3 +8,4 @@ export { deleteDocument } from "./deleteDocument";
 export { deleteRecipient } from "./deleteRecipient";
 export { createOrUpdateRecipient } from "./createOrUpdateRecipient";
 export { sendSigningRequests } from "./sendSigningRequests";
+export { setCopiedField } from "./setCopiedField";

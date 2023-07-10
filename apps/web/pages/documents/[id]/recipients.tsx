@@ -2,8 +2,10 @@ import { ReactElement, useRef, useState } from "react";
 import Head from "next/head";
 import { NEXT_PUBLIC_WEBAPP_URL, classNames } from "@documenso/lib";
 import { createOrUpdateRecipient, deleteRecipient, sendSigningRequests } from "@documenso/lib/api";
+import { setCopiedField } from "@documenso/lib/api/";
 import { getDocument } from "@documenso/lib/query";
 import { getUserFromToken } from "@documenso/lib/server";
+import { useSubscription } from "@documenso/lib/stripe";
 import { Breadcrumb, Button, Dialog, IconButton, Tooltip } from "@documenso/ui";
 import Layout from "../../../components/layout";
 import { NextPageWithLayout } from "../../_app";
@@ -11,6 +13,8 @@ import {
   ArrowDownTrayIcon,
   CheckBadgeIcon,
   CheckIcon,
+  ClipboardDocumentIcon,
+  ClipboardIcon,
   EnvelopeIcon,
   PaperAirplaneIcon,
   PencilSquareIcon,
@@ -21,10 +25,14 @@ import {
 import { DocumentStatus, Document as PrismaDocument, Recipient } from "@prisma/client";
 import { FormProvider, useFieldArray, useForm, useWatch } from "react-hook-form";
 import { toast } from "react-hot-toast";
-import { useSubscription } from "@documenso/lib/stripe";
 
 export type FormValues = {
-  signers: Array<Pick<Recipient, 'id' | 'email' | 'name' | 'sendStatus' | 'readStatus' | 'signingStatus'>>;
+  signers: Array<
+    Pick<
+      Recipient,
+      "id" | "email" | "name" | "sendStatus" | "readStatus" | "signingStatus" | "token"
+    >
+  >;
 };
 
 type FormSigner = FormValues["signers"][number];
@@ -32,6 +40,7 @@ type FormSigner = FormValues["signers"][number];
 const RecipientsPage: NextPageWithLayout = (props: any) => {
   const { hasSubscription } = useSubscription();
   const title: string = `"` + props?.document?.title + `"` + "Recipients | Documenso";
+
   const breadcrumbItems = [
     {
       title: "Documents",
@@ -62,7 +71,7 @@ const RecipientsPage: NextPageWithLayout = (props: any) => {
     formState: { errors },
   } = form;
   const { fields, append, remove } = useFieldArray({
-    keyName: "dieldArrayId",
+    keyName: "fieldArrayId",
     name: "signers",
     control,
   });
@@ -118,7 +127,7 @@ const RecipientsPage: NextPageWithLayout = (props: any) => {
                       : setOpen(true);
                   }}
                   disabled={
-                    !hasSubscription || 
+                    !hasSubscription ||
                     (formValues.length || 0) === 0 ||
                     !formValues.some(
                       (r) => r.email && !hasEmailError(r) && r.sendStatus === "NOT_SENT"
@@ -188,9 +197,7 @@ const RecipientsPage: NextPageWithLayout = (props: any) => {
                             <p className="mt-2 text-sm text-red-600" id="email-error">
                               <XMarkIcon className="inline h-5" /> Invalid Email
                             </p>
-                          ) : (
-                            ""
-                          )}
+                          ) : null}
                         </div>
                         <div
                           className={classNames(
@@ -226,7 +233,7 @@ const RecipientsPage: NextPageWithLayout = (props: any) => {
                       <div className="flex items-center space-x-2 lg:ml-2">
                         <div className="mb-2 mr-2 flex lg:mr-0">
                           <div key={item.id} className="space-x-2">
-                            {item.sendStatus === "NOT_SENT" ? (
+                            {item.sendStatus === "NOT_SENT" && item.readStatus !== "OPENED" ? (
                               <span
                                 id="sent_icon"
                                 className="mt-3 inline-block flex-shrink-0 rounded-full bg-yellow-200 px-2 py-0.5 text-xs font-medium text-gray-800">
@@ -239,6 +246,15 @@ const RecipientsPage: NextPageWithLayout = (props: any) => {
                                   id="sent_icon"
                                   className="mt-3 inline-block flex-shrink-0 rounded-full bg-yellow-200 px-2 py-0.5 text-xs font-medium text-gray-800 ">
                                   <CheckIcon className="mr-1 inline h-5" /> Sent
+                                </span>
+                              </span>
+                            ) : null}
+                            {item.sendStatus === "LINK_COPIED" && item.readStatus !== "OPENED" ? (
+                              <span id="sent_icon">
+                                <span
+                                  id="sent_icon"
+                                  className="mt-3 inline-block flex-shrink-0 rounded-full bg-yellow-200 px-2 py-0.5 text-xs font-medium text-gray-800 ">
+                                  Link Copied
                                 </span>
                               </span>
                             ) : null}
@@ -286,9 +302,30 @@ const RecipientsPage: NextPageWithLayout = (props: any) => {
                                     });
                                   }
                                 }}
-                                className="mx-1 group-hover:text-neon-dark group-hover:disabled:text-gray-400"
+                                className="group-hover:text-neon-dark mx-1 group-hover:disabled:text-gray-400"
                               />
                             </Tooltip>
+
+                            <Tooltip label="Copy">
+                              <IconButton
+                                icon={ClipboardDocumentIcon}
+                                disabled={!item.id || loading}
+                                onClick={async (e: any) => {
+                                  e.preventDefault();
+                                  navigator.clipboard.writeText(
+                                    `${NEXT_PUBLIC_WEBAPP_URL}/documents/${item.id}/sign?token=${item.token}`
+                                  );
+
+                                  await setCopiedField(item);
+                                  toast("Copied to clipboard", {
+                                    icon: "📋",
+                                  });
+                                }}
+                                color="secondary"
+                                className="mx-2 group-hover:text-gray-600 group-hover:disabled:text-gray-400"
+                              />
+                            </Tooltip>
+
                             <Tooltip label="Delete">
                               <IconButton
                                 icon={TrashIcon}
@@ -304,7 +341,7 @@ const RecipientsPage: NextPageWithLayout = (props: any) => {
                                     });
                                   }
                                 }}
-                                className="mx-1 group-hover:text-neon-dark group-hover:disabled:text-gray-400"
+                                className="group-hover:text-neon-dark mx-1 group-hover:disabled:text-gray-400"
                               />
                             </Tooltip>
                           </div>
@@ -335,7 +372,6 @@ const RecipientsPage: NextPageWithLayout = (props: any) => {
           </FormProvider>
         </div>
       </div>
-
       <Dialog
         title="Ready to send"
         document={props.document}

@@ -27,6 +27,7 @@ export const sendSigningRequest = async (recipient: any, document: any, user: an
   const expiryDate = new Date();
   expiryDate.setDate(expiryDate.getDate() + 60);
 
+  // Update on Link Copied
   await prisma.recipient.update({
     where: {
       id: recipient.id,
