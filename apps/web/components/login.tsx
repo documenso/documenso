@@ -2,7 +2,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { NEXT_PUBLIC_WEBAPP_URL } from "@documenso/lib/constants";
-import { Button } from "@documenso/ui";
+import { Button, Input } from "@documenso/ui";
 import Logo from "./logo";
 import { LockClosedIcon } from "@heroicons/react/20/solid";
 import { signIn } from "next-auth/react";
@@ -79,33 +79,25 @@ export default function Login(props: any) {
               <input type="hidden" name="remember" defaultValue="true" />
               <div className="-space-y-px rounded-md shadow-sm">
                 <div>
-                  <label htmlFor="email-address" className="sr-only">
-                    Email
-                  </label>
-                  <input
-                    {...register("email")}
-                    id="email-address"
-                    name="email"
+                  <Input
+                    label="Email"
                     type="email"
-                    autoComplete="email"
-                    required
-                    className="focus:border-neon focus:ring-neon relative block w-full appearance-none rounded-none rounded-t-md border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-500 focus:z-10 focus:outline-none sm:text-sm"
                     placeholder="Email"
+                    {...register("email")}
+                    className="rounded-none rounded-t-md"
+                    required
+                    labelSrOnly
                   />
                 </div>
                 <div>
-                  <label htmlFor="password" className="sr-only">
-                    Password
-                  </label>
-                  <input
-                    {...register("password")}
-                    id="password"
-                    name="password"
+                  <Input
+                    label="Password"
                     type="password"
-                    autoComplete="current-password"
-                    required
-                    className="focus:border-neon focus:ring-neon relative block w-full appearance-none rounded-none rounded-b-md border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-500 focus:z-10 focus:outline-none sm:text-sm"
                     placeholder="Password"
+                    {...register("password")}
+                    className="rounded-none rounded-b-md"
+                    required
+                    labelSrOnly
                   />
                 </div>
               </div>

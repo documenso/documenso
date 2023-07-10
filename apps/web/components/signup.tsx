@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { signup } from "@documenso/lib/api";
 import { NEXT_PUBLIC_WEBAPP_URL } from "@documenso/lib/constants";
-import { Button } from "@documenso/ui";
+import { Button, Input } from "@documenso/ui";
 import { XCircleIcon } from "@heroicons/react/24/outline";
 import { signIn } from "next-auth/react";
 import { FormProvider, SubmitHandler, useForm } from "react-hook-form";
@@ -133,38 +133,32 @@ export default function Signup(props: { source: string }) {
               <input type="hidden" name="remember" defaultValue="true" />
               <div className="-space-y-px rounded-md shadow-sm">
                 <div>
-                  <label htmlFor="email-address" className="sr-only">
-                    Email
-                  </label>
-                  <input
-                    {...register("email")}
-                    id="email-address"
-                    name="email"
+                  <Input
+                    label="Email"
                     type="email"
-                    autoComplete="email"
-                    required
-                    className="focus:border-neon focus:ring-neon relative block w-full appearance-none rounded-none rounded-t-md border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-500 focus:z-10 focus:outline-none sm:text-sm"
                     placeholder="Email"
+                    {...register("email")}
+                    className="rounded-none rounded-t-md"
+                    required
+                    labelSrOnly
+                    autoComplete="email"
                   />
                 </div>
                 <div>
-                  <label htmlFor="password" className="sr-only">
-                    Password
-                  </label>
-                  <input
+                  <Input
+                    label="Password"
+                    type="password"
+                    placeholder="Password"
                     {...register("password", {
                       minLength: {
                         value: 7,
                         message: "Your password has to be at least 7 characters long.",
                       },
                     })}
-                    id="password"
-                    name="password"
-                    type="password"
+                    className="rounded-none rounded-b-md"
                     autoComplete="current-password"
                     required
-                    className="focus:border-neon focus:ring-neon relative block w-full appearance-none rounded-none rounded-b-md border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-500 focus:z-10 focus:outline-none sm:text-sm"
-                    placeholder="Password"
+                    labelSrOnly
                   />
                 </div>
               </div>
@@ -187,7 +181,7 @@ export default function Signup(props: { source: string }) {
               </div>
               <p className="mt-2 text-center text-sm text-gray-600">
                 Already have an account?{" "}
-                <Link href="/login" className="text-gray-500 hover:text-neon-700 font-medium">
+                <Link href="/login" className="hover:text-neon-700 font-medium text-gray-500">
                   Sign In
                 </Link>
               </p>
