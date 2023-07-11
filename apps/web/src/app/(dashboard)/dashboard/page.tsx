@@ -15,6 +15,7 @@ import {
 } from '@documenso/ui/primitives/table';
 
 import { CardMetric } from '~/components/(dashboard)/metric-card/metric-card';
+import { ActionButtons } from '~/components/(dashboard)/table/actions-component';
 import { DocumentStatus } from '~/components/formatter/document-status';
 import { LocaleDate } from '~/components/formatter/locale-date';
 
@@ -61,7 +62,8 @@ export default async function DashboardPage() {
                 <TableHead className="w-[100px]">ID</TableHead>
                 <TableHead>Title</TableHead>
                 <TableHead>Status</TableHead>
-                <TableHead className="text-right">Created</TableHead>
+                <TableHead>Created</TableHead>
+                <TableHead>Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -79,14 +81,17 @@ export default async function DashboardPage() {
                   <TableCell>
                     <DocumentStatus status={document.status} />
                   </TableCell>
-                  <TableCell className="text-right">
+                  <TableCell>
                     <LocaleDate date={document.created} />
+                  </TableCell>
+                  <TableCell className="flex cursor-pointer gap-6">
+                    <ActionButtons documentId={document.id} />
                   </TableCell>
                 </TableRow>
               ))}
               {results.data.length === 0 && (
                 <TableRow>
-                  <TableCell colSpan={4} className="h-24 text-center">
+                  <TableCell colSpan={5} className="h-24 text-center">
                     No results.
                   </TableCell>
                 </TableRow>
