@@ -23,7 +23,7 @@ If you plan to contribute to Documenso, please take a moment to feel awesome ✨
 - Create a new branch (include the issue id and something readable):
 
   ```sh
-  git checkout -b doc-999-feat-somefeature-that-rocks
+  git checkout -b feat/doc-999-somefeature-that-rocks
   ```
 
 3. See the [Developer Setup](https://github.com/documenso/documenso/blob/main/README.md#developer-setup) for more setup details.
