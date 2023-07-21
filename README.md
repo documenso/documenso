@@ -4,7 +4,7 @@
   </a>
 
   <p align="center">
-  The DocuSign Open Source Alternative.
+  The Open Source DocuSign Alternative.
   <br>
     <a href="https://documenso.com"><strong>Learn more »</strong></a>
     <br />
