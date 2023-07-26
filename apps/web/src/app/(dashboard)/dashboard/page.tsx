@@ -14,6 +14,7 @@ import {
   TableRow,
 } from '@documenso/ui/primitives/table';
 
+import { StackAvatarsWithTooltip } from '~/components/(dashboard)/avatar/stack-avatars-with-tooltip';
 import { CardMetric } from '~/components/(dashboard)/metric-card/metric-card';
 import { DocumentStatus } from '~/components/formatter/document-status';
 import { LocaleDate } from '~/components/formatter/locale-date';
@@ -60,30 +61,38 @@ export default async function DashboardPage() {
               <TableRow>
                 <TableHead className="w-[100px]">ID</TableHead>
                 <TableHead>Title</TableHead>
+                <TableHead>Reciepient</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead className="text-right">Created</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {results.data.map((document) => (
-                <TableRow key={document.id}>
-                  <TableCell className="font-medium">{document.id}</TableCell>
-                  <TableCell>
-                    <Link
-                      href={`/documents/${document.id}`}
-                      className="focus-visible:ring-ring ring-offset-background rounded-md font-medium hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
-                    >
-                      {document.title}
-                    </Link>
-                  </TableCell>
-                  <TableCell>
-                    <DocumentStatus status={document.status} />
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <LocaleDate date={document.created} />
-                  </TableCell>
-                </TableRow>
-              ))}
+              {results.data.map((document) => {
+                return (
+                  <TableRow key={document.id}>
+                    <TableCell className="font-medium">{document.id}</TableCell>
+                    <TableCell>
+                      <Link
+                        href={`/documents/${document.id}`}
+                        className="focus-visible:ring-ring ring-offset-background rounded-md font-medium hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
+                      >
+                        {document.title}
+                      </Link>
+                    </TableCell>
+
+                    <TableCell>
+                      <StackAvatarsWithTooltip recipients={document.Recipient} />
+                    </TableCell>
+
+                    <TableCell>
+                      <DocumentStatus status={document.status} />
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <LocaleDate date={document.created} />
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
               {results.data.length === 0 && (
                 <TableRow>
                   <TableCell colSpan={4} className="h-24 text-center">
