@@ -36,3 +36,9 @@ export const ZSetFieldsForDocumentMutationSchema = z.object({
 export type TSetFieldsForDocumentMutationSchema = z.infer<
   typeof ZSetFieldsForDocumentMutationSchema
 >;
+
+export const ZSendDocumentMutationSchema = z.object({
+  documentId: z.number(),
+});
+
+export type TSendDocumentMutationSchema = z.infer<typeof ZSendDocumentMutationSchema>;

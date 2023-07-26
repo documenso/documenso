@@ -48,23 +48,21 @@ export const setFieldsForDocument = async ({
       ),
   );
 
-  const linkedFields = fields.map((field) => {
-    const existing = existingFields.find((existingField) => existingField.id === field.id);
+  const linkedFields = fields
+    .map((field) => {
+      const existing = existingFields.find((existingField) => existingField.id === field.id);
 
-    return {
-      ...field,
-      ...existing,
-    };
-  });
-
-  for (const field of linkedFields) {
-    if (
-      field.Recipient?.sendStatus === SendStatus.SENT ||
-      field.Recipient?.signingStatus === SigningStatus.SIGNED
-    ) {
-      throw new Error('Cannot modify fields after sending');
-    }
-  }
+      return {
+        ...field,
+        ...existing,
+      };
+    })
+    .filter((field) => {
+      return (
+        field.Recipient?.sendStatus !== SendStatus.SENT &&
+        field.Recipient?.signingStatus !== SigningStatus.SIGNED
+      );
+    });
 
   const persistedFields = await prisma.$transaction(
     linkedFields.map((field) =>

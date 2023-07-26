@@ -1,6 +1,4 @@
-import React from 'react';
-
-import { LucideIcon } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react/dist/lucide-react';
 
 import { cn } from '@documenso/ui/lib/utils';
 
@@ -15,7 +13,7 @@ export const CardMetric = ({ icon: Icon, title, value, className }: CardMetricPr
   return (
     <div
       className={cn(
-        'border-border bg-background overflow-hidden rounded-lg border shadow shadow-transparent duration-200 hover:shadow-slate-100',
+        'border-border bg-background hover:shadow-border/80 overflow-hidden rounded-lg border shadow shadow-transparent duration-200',
         className,
       )}
     >

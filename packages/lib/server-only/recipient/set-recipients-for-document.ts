@@ -43,26 +43,23 @@ export const setRecipientsForDocument = async ({
       ),
   );
 
-  const linkedRecipients = recipients.map((recipient) => {
-    const existing = existingRecipients.find(
-      (existingRecipient) =>
-        existingRecipient.id === recipient.id || existingRecipient.email === recipient.email,
-    );
+  const linkedRecipients = recipients
+    .map((recipient) => {
+      const existing = existingRecipients.find(
+        (existingRecipient) =>
+          existingRecipient.id === recipient.id || existingRecipient.email === recipient.email,
+      );
 
-    return {
-      ...recipient,
-      ...existing,
-    };
-  });
-
-  for (const recipient of linkedRecipients) {
-    if (
-      recipient.sendStatus === SendStatus.SENT ||
-      recipient.signingStatus === SigningStatus.SIGNED
-    ) {
-      throw new Error('Cannot modify recipients after sending');
-    }
-  }
+      return {
+        ...recipient,
+        ...existing,
+      };
+    })
+    .filter((recipient) => {
+      return (
+        recipient.sendStatus !== SendStatus.SENT && recipient.signingStatus !== SigningStatus.SIGNED
+      );
+    });
 
   const persistedRecipients = await prisma.$transaction(
     linkedRecipients.map((recipient) =>

@@ -16,7 +16,7 @@ export type LoadablePDFCard = PDFViewerProps & {
 const PDFViewer = dynamic(async () => import('~/components/(dashboard)/pdf-viewer/pdf-viewer'), {
   ssr: false,
   loading: () => (
-    <div className="flex min-h-[80vh] flex-col items-center justify-center bg-white/50">
+    <div className="flex-col flex min-h-[80vh] items-center justify-center bg-white/50">
       <Loader className="h-12 w-12 animate-spin text-slate-500" />
 
       <p className="mt-4 text-slate-500">Loading document...</p>

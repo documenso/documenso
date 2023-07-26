@@ -44,6 +44,10 @@ module.exports = {
           DEFAULT: 'hsl(var(--card))',
           foreground: 'hsl(var(--card-foreground))',
         },
+        widget: {
+          DEFAULT: 'hsl(var(--widget))',
+          // foreground: 'hsl(var(--widget-foreground))',
+        },
         documenso: {
           DEFAULT: '#A2E771',
           50: '#FFFFFF',

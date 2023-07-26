@@ -81,7 +81,7 @@ export const PasswordForm = ({ className }: PasswordFormProps) => {
 
   return (
     <form
-      className={cn('flex w-full flex-col gap-y-4', className)}
+      className={cn('flex-col flex w-full gap-y-4', className)}
       onSubmit={handleSubmit(onFormSubmit)}
     >
       <div>

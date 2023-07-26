@@ -22,7 +22,7 @@
     "lucide-react": "^0.214.0",
     "micro": "^10.0.1",
     "nanoid": "^4.0.2",
-    "next": "13.4.1",
+    "next": "13.4.9",
     "next-auth": "^4.22.1",
     "next-plausible": "^3.7.2",
     "next-themes": "^0.2.1",
