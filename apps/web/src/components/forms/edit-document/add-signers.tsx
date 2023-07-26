@@ -1,35 +1,76 @@
 'use client';
 
-import React from 'react';
+import React, { useId } from 'react';
+
+import { useRouter } from 'next/navigation';
 
 import { AnimatePresence, motion } from 'framer-motion';
 import { Plus, Trash } from 'lucide-react';
 import { nanoid } from 'nanoid';
-import { Control, Controller, FieldErrors, UseFormWatch, useFieldArray } from 'react-hook-form';
+import { Controller, useFieldArray, useForm } from 'react-hook-form';
 
-import { cn } from '@documenso/ui/lib/utils';
+import { Document, Field, Recipient, SendStatus } from '@documenso/prisma/client';
 import { Button } from '@documenso/ui/primitives/button';
 import { Input } from '@documenso/ui/primitives/input';
 import { Label } from '@documenso/ui/primitives/label';
+import { useToast } from '@documenso/ui/primitives/use-toast';
 
 import { FormErrorMessage } from '~/components/form/form-error-message';
 
-import { TEditDocumentFormSchema } from './types';
+import { addSigners } from './add-signers.action';
+import { TAddSignersFormSchema } from './add-signers.types';
+import {
+  EditDocumentFormContainer,
+  EditDocumentFormContainerActions,
+  EditDocumentFormContainerContent,
+  EditDocumentFormContainerFooter,
+  EditDocumentFormContainerStep,
+} from './container';
 
 export type AddSignersFormProps = {
-  className?: string;
-  control: Control<TEditDocumentFormSchema>;
-  watch: UseFormWatch<TEditDocumentFormSchema>;
-  errors: FieldErrors<TEditDocumentFormSchema>;
-  isSubmitting: boolean;
+  recipients: Recipient[];
+  fields: Field[];
+  document: Document;
+  onContinue?: () => void;
+  onGoBack?: () => void;
 };
 
 export const AddSignersFormPartial = ({
-  className,
-  control,
-  errors,
-  isSubmitting,
+  recipients,
+  fields: _fields,
+  document: document,
+  onContinue,
+  onGoBack,
 }: AddSignersFormProps) => {
+  const { toast } = useToast();
+  const router = useRouter();
+
+  const initialId = useId();
+
+  const {
+    control,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm<TAddSignersFormSchema>({
+    defaultValues: {
+      signers:
+        recipients.length > 0
+          ? recipients.map((recipient) => ({
+              nativeId: recipient.id,
+              formId: String(recipient.id),
+              name: recipient.name,
+              email: recipient.email,
+            }))
+          : [
+              {
+                formId: initialId,
+                name: '',
+                email: '',
+              },
+            ],
+    },
+  });
+
   const {
     append: appendSigner,
     fields: signers,
@@ -39,10 +80,15 @@ export const AddSignersFormPartial = ({
     name: 'signers',
   });
 
-  const { remove: removeField, fields: fields } = useFieldArray({
-    name: 'fields',
-    control,
-  });
+  const hasBeenSentToRecipientId = (id?: number) => {
+    if (!id) {
+      return false;
+    }
+
+    return recipients.some(
+      (recipient) => recipient.id === id && recipient.sendStatus === SendStatus.SENT,
+    );
+  };
 
   const onAddSigner = () => {
     appendSigner({
@@ -55,17 +101,17 @@ export const AddSignersFormPartial = ({
   const onRemoveSigner = (index: number) => {
     const signer = signers[index];
 
+    if (hasBeenSentToRecipientId(signer.nativeId)) {
+      toast({
+        title: 'Cannot remove signer',
+        description: 'This signer has already received the document.',
+        variant: 'destructive',
+      });
+
+      return;
+    }
+
     removeSigner(index);
-
-    const fieldsToRemove: number[] = [];
-
-    fields.forEach((field, fieldIndex) => {
-      if (field.signerEmail === signer.email) {
-        fieldsToRemove.push(fieldIndex);
-      }
-    });
-
-    removeField(fieldsToRemove);
   };
 
   const onKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
@@ -74,21 +120,42 @@ export const AddSignersFormPartial = ({
     }
   };
 
+  const onFormSubmit = handleSubmit(async (data: TAddSignersFormSchema) => {
+    try {
+      // Custom invocation server action
+      await addSigners({
+        documentId: document.id,
+        signers: data.signers,
+      });
+
+      router.refresh();
+
+      onContinue?.();
+    } catch (err) {
+      console.error(err);
+
+      toast({
+        title: 'Error',
+        description: 'An error occurred while adding signers.',
+        variant: 'destructive',
+      });
+    }
+  });
+
   return (
-    <div className={cn('flex flex-col', className)}>
-      <h3 className="text-foreground text-2xl font-semibold">Add Signers</h3>
-
-      <p className="text-muted-foreground mt-2 text-sm">
-        Add the people who will sign the document.
-      </p>
-
-      <hr className="border-border mb-8 mt-4" />
-
-      <div className="-mx-2 flex flex-1 flex-col overflow-y-auto px-2">
-        <div className="flex w-full flex-col gap-y-4">
+    <EditDocumentFormContainer onSubmit={onFormSubmit}>
+      <EditDocumentFormContainerContent
+        title="Add Signers"
+        description="Add the people who will sign the document."
+      >
+        <div className="flex-col flex w-full gap-y-4">
           <AnimatePresence>
             {signers.map((signer, index) => (
-              <motion.div key={signer.formId} className="flex flex-wrap items-end gap-x-4">
+              <motion.div
+                key={signer.formId}
+                data-native-id={signer.nativeId}
+                className="flex flex-wrap items-end gap-x-4"
+              >
                 <div className="flex-1">
                   <Label htmlFor={`signer-${signer.formId}-email`}>
                     Email
@@ -103,7 +170,7 @@ export const AddSignersFormPartial = ({
                         id={`signer-${signer.formId}-email`}
                         type="email"
                         className="bg-background mt-2"
-                        disabled={isSubmitting}
+                        disabled={isSubmitting || hasBeenSentToRecipientId(signer.nativeId)}
                         onKeyDown={onKeyDown}
                         {...field}
                       />
@@ -122,7 +189,7 @@ export const AddSignersFormPartial = ({
                         id={`signer-${signer.formId}-name`}
                         type="text"
                         className="bg-background mt-2"
-                        disabled={isSubmitting}
+                        disabled={isSubmitting || hasBeenSentToRecipientId(signer.nativeId)}
                         onKeyDown={onKeyDown}
                         {...field}
                       />
@@ -134,7 +201,11 @@ export const AddSignersFormPartial = ({
                   <button
                     type="button"
                     className="inline-flex h-10 w-10 items-center justify-center text-slate-500 hover:opacity-80 disabled:cursor-not-allowed disabled:opacity-50"
-                    disabled={isSubmitting || signers.length === 1}
+                    disabled={
+                      isSubmitting ||
+                      hasBeenSentToRecipientId(signer.nativeId) ||
+                      signers.length === 1
+                    }
                     onClick={() => onRemoveSigner(index)}
                   >
                     <Trash className="h-5 w-5" />
@@ -158,7 +229,18 @@ export const AddSignersFormPartial = ({
             Add Signer
           </Button>
         </div>
-      </div>
-    </div>
+      </EditDocumentFormContainerContent>
+
+      <EditDocumentFormContainerFooter>
+        <EditDocumentFormContainerStep title="Add Signers" step={1} maxStep={3} />
+
+        <EditDocumentFormContainerActions
+          loading={isSubmitting}
+          disabled={isSubmitting}
+          onGoNextClick={() => onFormSubmit()}
+          onGoBackClick={onGoBack}
+        />
+      </EditDocumentFormContainerFooter>
+    </EditDocumentFormContainer>
   );
 };

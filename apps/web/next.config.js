@@ -7,9 +7,23 @@ const { parsed: env } = require('dotenv').config({
 
 /** @type {import('next').NextConfig} */
 const config = {
+  experimental: {
+    serverActions: true,
+  },
   reactStrictMode: true,
-  transpilePackages: ['@documenso/lib', '@documenso/prisma', '@documenso/trpc', '@documenso/ui'],
+  transpilePackages: [
+    '@documenso/lib',
+    '@documenso/prisma',
+    '@documenso/trpc',
+    '@documenso/ui',
+    '@documenso/email',
+  ],
   env,
+  modularizeImports: {
+    'lucide-react': {
+      transform: 'lucide-react/dist/esm/icons/{{ kebabCase member }}',
+    },
+  },
 };
 
 module.exports = config;

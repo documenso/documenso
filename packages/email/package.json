@@ -5,18 +5,26 @@
   "types": "./index.ts",
   "license": "MIT",
   "files": [
-    "templates/"
+    "templates/",
+    "transports/",
+    "mailer.ts",
+    "render.ts",
+    "index.ts"
   ],
   "scripts": {
-    "dev": "email dev --port 3002 --dir templates"
+    "dev": "email dev --port 3002 --dir templates",
+    "worker:test": "tsup worker/index.ts --format esm"
   },
   "dependencies": {
     "@documenso/tsconfig": "*",
     "@documenso/tailwind-config": "*",
     "@documenso/ui": "*",
-    "@react-email/components": "^0.0.7"
+    "@react-email/components": "^0.0.7",
+    "nodemailer": "^6.9.3"
   },
   "devDependencies": {
-    "react-email": "^1.9.4"
+    "@types/nodemailer": "^6.4.8",
+    "react-email": "^1.9.4",
+    "tsup": "^7.1.0"
   }
 }
