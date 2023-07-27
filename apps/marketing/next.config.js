@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 const path = require('path');
+const { withContentlayer } = require('next-contentlayer');
 
 const { parsed: env } = require('dotenv').config({
   path: path.join(__dirname, '../../.env.local'),
@@ -12,4 +13,4 @@ const config = {
   env,
 };
 
-module.exports = config;
+module.exports = withContentlayer(config);
