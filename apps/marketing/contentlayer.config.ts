@@ -18,9 +18,9 @@ export const BlogPost = defineDocumentType(() => ({
   },
 }));
 
-export const Privacy = defineDocumentType(() => ({
-  name: 'Privacy',
-  filePathPattern: 'privacy.mdx',
+export const GenericPage = defineDocumentType(() => ({
+  name: 'GenericPage',
+  filePathPattern: '**/*.mdx',
   contentType: 'mdx',
   fields: {
     title: { type: 'string', required: true },
@@ -30,4 +30,4 @@ export const Privacy = defineDocumentType(() => ({
   },
 }));
 
-export default makeSource({ contentDirPath: 'content', documentTypes: [BlogPost, Privacy] });
+export default makeSource({ contentDirPath: 'content', documentTypes: [BlogPost, GenericPage] });
