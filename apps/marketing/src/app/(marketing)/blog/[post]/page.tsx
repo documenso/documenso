@@ -1,7 +1,9 @@
 import Image from 'next/image';
+import Link from 'next/link';
 import { notFound } from 'next/navigation';
 
 import { allBlogPosts } from 'contentlayer/generated';
+import { ChevronLeft } from 'lucide-react';
 import type { MDXComponents } from 'mdx/types';
 import { useMDXComponent } from 'next-contentlayer/hooks';
 
@@ -54,8 +56,8 @@ export default function BlogPostPage({ params }: { params: { post: string } }) {
           </div>
 
           <div className="text-sm leading-6">
-            <p className="text-left font-semibold text-gray-900">{post.authorName}</p>
-            <p className="text-gray-600">{post.authorRole}</p>
+            <p className="text-foreground text-left font-semibold">{post.authorName}</p>
+            <p className="text-muted-foreground">{post.authorRole}</p>
           </div>
         </div>
       </div>
@@ -67,13 +69,20 @@ export default function BlogPostPage({ params }: { params: { post: string } }) {
           {post.tags.map((tag, i) => (
             <li
               key={`tag-${i}`}
-              className="relative z-10 whitespace-nowrap rounded-full bg-gray-50 px-3 py-1.5 font-medium text-gray-600 hover:bg-gray-100"
+              className="bg-muted hover:bg-muted/60 text-foreground relative z-10 whitespace-nowrap rounded-full px-3 py-1.5 text-sm font-medium"
             >
               {tag}
             </li>
           ))}
         </ul>
       )}
+
+      <hr />
+
+      <Link href="/blog" className="text-muted-foreground flex items-center hover:opacity-60">
+        <ChevronLeft className="mr-2 h-6 w-6" />
+        Back to all posts
+      </Link>
     </article>
   );
 }
