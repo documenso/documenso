@@ -3,11 +3,9 @@
    <img width="250px" src="https://github.com/documenso/documenso/assets/1309312/cd7823ec-4baa-40b9-be78-4acb3b1c73cb" alt="Documenso Logo">
   </a>
 
-  <h3 align="center">Open Source Signing Infrastructure</h3>
-
   <p align="center">
-    The DocuSign Open Source Alternative.
-    <br />
+  The Open Source DocuSign Alternative.
+  <br>
     <a href="https://documenso.com"><strong>Learn more »</strong></a>
     <br />
     <br />
@@ -75,7 +73,6 @@ We're currently working on a redesign of the application including a revamp of t
 ## Contributing
 
 - To contribute please see our [contribution guide](https://github.com/documenso/documenso/blob/main/CONTRIBUTING.md).
-
 
 ## Contact us
 
