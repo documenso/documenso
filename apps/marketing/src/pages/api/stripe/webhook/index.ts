@@ -124,16 +124,16 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         document.document = await insertImageInPDF(
           document.document,
           signatureDataUrl,
-          field.positionX,
-          field.positionY,
+          Number(field.positionX),
+          Number(field.positionY),
           field.page,
         );
       } else {
         document.document = await insertTextInPDF(
           document.document,
           signatureText ?? '',
-          field.positionX,
-          field.positionY,
+          Number(field.positionX),
+          Number(field.positionY),
           field.page,
         );
       }
