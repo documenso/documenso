@@ -9,21 +9,21 @@ export default function BlogPage() {
   });
 
   return (
-    <div className="mt-12">
+    <div className="mt-6 sm:mt-12">
       <div className="text-center">
         <h1 className="text-3xl font-bold lg:text-5xl">From the blog</h1>
 
-        <p className="mt-4 text-lg leading-normal text-[#31373D]">
+        <p className="mx-auto mt-4 max-w-xl text-center text-lg leading-normal text-[#31373D]">
           Get the latest news from Documenso, including product updates, team announcements and
           more!
         </p>
       </div>
 
-      <div className="mt-10 space-y-16 divide-y divide-gray-100 border-t border-gray-200 ">
+      <div className="mt-10 divide-y divide-gray-100 border-t border-gray-200 ">
         {blogPosts.map((post, i) => (
           <article
             key={`blog-${i}`}
-            className="mx-auto flex max-w-xl flex-col items-start justify-between pt-10 first:pt-0 sm:mt-16 sm:pt-16"
+            className="mx-auto mt-8 flex max-w-xl flex-col items-start justify-between pt-8 first:pt-0 sm:mt-16 sm:pt-16"
           >
             <div className="flex items-center gap-x-4 text-xs">
               <time dateTime={post.date} className="text-gray-500">
