@@ -38,5 +38,9 @@ export default function ContentPage({ params }: { params: { content: string } })
 
   const MDXContent = useMDXComponent(post.body.code);
 
-  return <MDXContent components={mdxComponents} />;
+  return (
+    <article className="prose prose-slate mx-auto">
+      <MDXContent components={mdxComponents} />
+    </article>
+  );
 }
