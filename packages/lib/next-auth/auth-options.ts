@@ -2,7 +2,7 @@ import { PrismaAdapter } from '@next-auth/prisma-adapter';
 import { compare } from 'bcrypt';
 import { AuthOptions, Session, User } from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
-import GoogleProvider from 'next-auth/providers/google';
+import GoogleProvider, { GoogleProfile } from 'next-auth/providers/google';
 
 import { prisma } from '@documenso/prisma';
 
@@ -41,20 +41,20 @@ export const NEXT_AUTH_OPTIONS: AuthOptions = {
         }
 
         return {
-          id: String(user.id) as any,
+          id: Number(user.id),
           email: user.email,
           name: user.name,
         } satisfies User;
       },
     }),
-    GoogleProvider({
+    GoogleProvider<GoogleProfile>({
       clientId: process.env.NEXT_PRIVATE_GOOGLE_CLIENT_ID ?? '',
       clientSecret: process.env.NEXT_PRIVATE_GOOGLE_CLIENT_SECRET ?? '',
       allowDangerousEmailAccountLinking: true,
       profile(profile) {
         return {
-          id: profile.sub as any,
-          name: profile.name,
+          id: Number(profile.sub),
+          name: profile.name || `${profile.given_name} ${profile.family_name}`.trim(),
           email: profile.email,
         };
       },
@@ -62,39 +62,42 @@ export const NEXT_AUTH_OPTIONS: AuthOptions = {
   ],
   callbacks: {
     async jwt({ token, user }) {
-      const dbUser = await prisma.user.findFirst({
+      if (!token.email) {
+        throw new Error('No email in token');
+      }
+
+      const retrievedUser = await prisma.user.findFirst({
         where: {
-          email: token.email as string,
+          email: token.email,
         },
       });
 
-      if (!dbUser) {
-        if (user) {
-          token.id = user?.id;
-        }
-        return token;
+      if (!retrievedUser) {
+        return {
+          ...token,
+          id: user.id,
+        };
       }
 
       return {
-        id: dbUser.id,
-        name: dbUser.name,
-        email: dbUser.email,
+        id: retrievedUser.id,
+        name: retrievedUser.name,
+        email: retrievedUser.email,
       };
     },
+
     async session({ token, session }) {
-      console.log('session', { token, session });
-      if (token) {
-        const documensoSession = {
+      if (token && token.email) {
+        return {
           ...session,
           user: {
             id: Number(token.id),
             name: token.name,
             email: token.email,
           },
-        } as Session;
-
-        return documensoSession;
+        } satisfies Session;
       }
+
       return session;
     },
   },
