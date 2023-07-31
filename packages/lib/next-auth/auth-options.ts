@@ -31,7 +31,6 @@ export const NEXT_AUTH_OPTIONS: AuthOptions = {
         const user = await getUserByEmail({ email }).catch(() => null);
 
         if (!user || !user.password) {
-          console.log('no user');
           return null;
         }
 

@@ -1,6 +1,7 @@
 import { HTMLAttributes } from 'react';
 
-import { CheckCircle2, Clock, File, LucideIcon } from 'lucide-react';
+import { CheckCircle2, Clock, File } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react/dist/lucide-react';
 
 import { DocumentStatus as InternalDocumentStatus } from '@documenso/prisma/client';
 import { cn } from '@documenso/ui/lib/utils';
@@ -31,14 +32,24 @@ const FRIENDLY_STATUS_MAP: Record<InternalDocumentStatus, FriendlyStatus> = {
 
 export type DocumentStatusProps = HTMLAttributes<HTMLSpanElement> & {
   status: InternalDocumentStatus;
+  inheritColor?: boolean;
 };
 
-export const DocumentStatus = ({ className, status, ...props }: DocumentStatusProps) => {
+export const DocumentStatus = ({
+  className,
+  status,
+  inheritColor,
+  ...props
+}: DocumentStatusProps) => {
   const { label, icon: Icon, color } = FRIENDLY_STATUS_MAP[status];
 
   return (
     <span className={cn('flex items-center', className)} {...props}>
-      <Icon className={cn('mr-2 inline-block h-4 w-4', color)} />
+      <Icon
+        className={cn('mr-2 inline-block h-4 w-4', {
+          [color]: !inheritColor,
+        })}
+      />
       {label}
     </span>
   );

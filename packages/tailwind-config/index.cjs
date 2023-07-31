@@ -44,6 +44,10 @@ module.exports = {
           DEFAULT: 'hsl(var(--card))',
           foreground: 'hsl(var(--card-foreground))',
         },
+        widget: {
+          DEFAULT: 'hsl(var(--widget))',
+          // foreground: 'hsl(var(--widget-foreground))',
+        },
         documenso: {
           DEFAULT: '#A2E771',
           50: '#FFFFFF',
@@ -72,6 +76,20 @@ module.exports = {
           900: '#52514a',
           950: '#2a2925',
         },
+        water: {
+          DEFAULT: '#d7e4f3',
+          50: '#f3f6fb',
+          100: '#e3ebf6',
+          200: '#d7e4f3',
+          300: '#abc7e5',
+          400: '#82abd8',
+          500: '#658ecc',
+          600: '#5175bf',
+          700: '#4764ae',
+          800: '#3e538f',
+          900: '#364772',
+          950: '#252d46',
+        },
       },
       backgroundImage: {
         'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
@@ -98,5 +116,5 @@ module.exports = {
       },
     },
   },
-  plugins: [require('tailwindcss-animate')],
+  plugins: [require('tailwindcss-animate'), require('@tailwindcss/typography')],
 };

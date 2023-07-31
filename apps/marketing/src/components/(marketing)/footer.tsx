@@ -46,6 +46,10 @@ export const Footer = ({ className, ...props }: FooterProps) => {
         </div>
 
         <div className="flex flex-wrap items-center gap-x-4 gap-y-2.5">
+          <Link href="/blog" className="flex-shrink-0 text-sm text-[#8D8D8D] hover:text-[#6D6D6D]">
+            Blog
+          </Link>
+
           <Link
             href="/pricing"
             className="flex-shrink-0 text-sm text-[#8D8D8D] hover:text-[#6D6D6D]"
@@ -68,12 +72,12 @@ export const Footer = ({ className, ...props }: FooterProps) => {
             Support
           </Link>
 
-          {/* <Link
+          <Link
             href="/privacy"
             className="flex-shrink-0 text-sm text-[#8D8D8D] hover:text-[#6D6D6D]"
           >
             Privacy
-          </Link> */}
+          </Link>
         </div>
       </div>
       <div className="mx-auto mt-4 w-full max-w-screen-xl px-8 md:mt-12 lg:mt-24">

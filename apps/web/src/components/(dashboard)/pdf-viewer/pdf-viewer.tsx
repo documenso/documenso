@@ -67,16 +67,6 @@ export const PDFViewer = ({ className, document, onPageClick, ...props }: PDFVie
     const pageX = event.clientX - left;
     const pageY = event.clientY - top;
 
-    console.log({
-      pageNumber,
-      numPages,
-      originalEvent: event,
-      pageHeight: height,
-      pageWidth: width,
-      pageX,
-      pageY,
-    });
-
     if (onPageClick) {
       onPageClick({
         pageNumber,
@@ -120,10 +110,10 @@ export const PDFViewer = ({ className, document, onPageClick, ...props }: PDFVie
         onLoadSuccess={(d) => onDocumentLoaded(d)}
         externalLinkTarget="_blank"
         loading={
-          <div className="flex min-h-[80vh] flex-col items-center justify-center bg-white/50">
-            <Loader className="h-12 w-12 animate-spin text-slate-500" />
+          <div className="dark:bg-background flex min-h-[80vh] flex-col items-center justify-center bg-white/50">
+            <Loader className="text-documenso h-12 w-12 animate-spin" />
 
-            <p className="mt-4 text-slate-500">Loading document...</p>
+            <p className="text-muted-foreground mt-4">Loading document...</p>
           </div>
         }
       >
@@ -137,6 +127,8 @@ export const PDFViewer = ({ className, document, onPageClick, ...props }: PDFVie
               <PDFPage
                 pageNumber={i + 1}
                 width={width}
+                renderAnnotationLayer={false}
+                renderTextLayer={false}
                 onClick={(e) => onDocumentPageClick(e, i + 1)}
               />
             </div>

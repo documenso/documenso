@@ -93,14 +93,15 @@ export const PricingTable = ({ className, ...props }: PricingTableProps) => {
             For small teams and individuals who need a simple solution
           </p>
 
-          <Link
-            href="https://github.com/documenso/documenso"
-            target="_blank"
-            className="mt-6"
-            onClick={() => event('view-github')}
-          >
-            <Button className="rounded-full text-base">View on Github</Button>
-          </Link>
+          <Button className="mt-6 rounded-full text-base">
+            <Link
+              href="https://github.com/documenso/documenso"
+              target="_blank"
+              onClick={() => event('view-github')}
+            >
+              View on Github
+            </Link>
+          </Button>
 
           <div className="mt-8 flex w-full flex-col divide-y">
             <p className="py-4 font-medium text-slate-900">Host your own instance</p>
