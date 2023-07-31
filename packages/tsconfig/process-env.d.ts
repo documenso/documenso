@@ -2,6 +2,9 @@ declare namespace NodeJS {
   export interface ProcessEnv {
     NEXT_PUBLIC_SITE_URL?: string;
 
+    NEXT_PRIVATE_GOOGLE_CLIENT_ID?: string;
+    NEXT_PRIVATE_GOOGLE_CLIENT_SECRET?: string;
+
     NEXT_PRIVATE_DATABASE_URL: string;
 
     NEXT_PUBLIC_STRIPE_COMMUNITY_PLAN_MONTHLY_PRICE_ID: string;
