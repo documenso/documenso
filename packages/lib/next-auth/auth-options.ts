@@ -1,7 +1,8 @@
 import { PrismaAdapter } from '@next-auth/prisma-adapter';
 import { compare } from 'bcrypt';
-import { AuthOptions, User } from 'next-auth';
+import { AuthOptions, Session, User } from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
+import GoogleProvider, { GoogleProfile } from 'next-auth/providers/google';
 
 import { prisma } from '@documenso/prisma';
 
@@ -40,19 +41,64 @@ export const NEXT_AUTH_OPTIONS: AuthOptions = {
         }
 
         return {
-          id: String(user.id) as any,
+          id: Number(user.id),
           email: user.email,
           name: user.name,
-          image: '',
         } satisfies User;
       },
     }),
+    GoogleProvider<GoogleProfile>({
+      clientId: process.env.NEXT_PRIVATE_GOOGLE_CLIENT_ID ?? '',
+      clientSecret: process.env.NEXT_PRIVATE_GOOGLE_CLIENT_SECRET ?? '',
+      allowDangerousEmailAccountLinking: true,
+      profile(profile) {
+        return {
+          id: Number(profile.sub),
+          name: profile.name || `${profile.given_name} ${profile.family_name}`.trim(),
+          email: profile.email,
+        };
+      },
+    }),
   ],
-  // callbacks: {
-  //   jwt: async ({ token, user: _user }) => {
-  //     return {
-  //       ...token,
-  //     };
-  //   },
-  // },
+  callbacks: {
+    async jwt({ token, user }) {
+      if (!token.email) {
+        throw new Error('No email in token');
+      }
+
+      const retrievedUser = await prisma.user.findFirst({
+        where: {
+          email: token.email,
+        },
+      });
+
+      if (!retrievedUser) {
+        return {
+          ...token,
+          id: user.id,
+        };
+      }
+
+      return {
+        id: retrievedUser.id,
+        name: retrievedUser.name,
+        email: retrievedUser.email,
+      };
+    },
+
+    async session({ token, session }) {
+      if (token && token.email) {
+        return {
+          ...session,
+          user: {
+            id: Number(token.id),
+            name: token.name,
+            email: token.email,
+          },
+        } satisfies Session;
+      }
+
+      return session;
+    },
+  },
 };
