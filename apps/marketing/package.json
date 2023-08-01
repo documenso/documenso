@@ -19,21 +19,21 @@
     "framer-motion": "^10.12.8",
     "lucide-react": "^0.214.0",
     "micro": "^10.0.1",
-    "next": "13.4.9",
-    "next-auth": "^4.22.1",
+    "next": "13.4.12",
+    "next-auth": "4.22.3",
     "next-contentlayer": "^0.3.4",
-    "next-plausible": "^3.7.2",
+    "next-plausible": "^3.10.1",
     "perfect-freehand": "^1.2.0",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-hook-form": "^7.43.9",
     "react-icons": "^4.8.0",
-    "typescript": "5.0.4",
+    "typescript": "5.1.6",
     "zod": "^3.21.4"
   },
   "devDependencies": {
     "@types/node": "20.1.0",
-    "@types/react": "18.2.6",
-    "@types/react-dom": "18.2.4"
+    "@types/react": "18.2.18",
+    "@types/react-dom": "18.2.7"
   }
 }

@@ -148,7 +148,7 @@ export const AddSignersFormPartial = ({
         title="Add Signers"
         description="Add the people who will sign the document."
       >
-        <div className="flex-col flex w-full gap-y-4">
+        <div className="flex w-full flex-col gap-y-4">
           <AnimatePresence>
             {signers.map((signer, index) => (
               <motion.div

@@ -9,10 +9,18 @@
       }
     ],
     "paths": {
-      "~/*": ["./src/*"],
-      "contentlayer/generated": ["./.contentlayer/generated"]
+      "~/*": [
+        "./src/*"
+      ],
+      "contentlayer/generated": [
+        "./.contentlayer/generated"
+      ]
     },
-    "strictNullChecks": true
+    "types": [
+      "@documenso/lib/types/next-auth.d.ts"
+    ],
+    "strictNullChecks": true,
+    "incremental": false
   },
   "include": [
     "next-env.d.ts",
@@ -21,5 +29,7 @@
     ".next/types/**/*.ts",
     ".contentlayer/generated"
   ],
-  "exclude": ["node_modules"]
+  "exclude": [
+    "node_modules"
+  ]
 }

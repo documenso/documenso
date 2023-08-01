@@ -28,8 +28,8 @@ export const FieldItem = ({
   field,
   passive,
   disabled,
-  minHeight,
-  minWidth,
+  minHeight: _minHeight,
+  minWidth: _minWidth,
   onResize,
   onMove,
   onRemove,
@@ -62,24 +62,6 @@ export const FieldItem = ({
 
     const pageHeight = (field.pageHeight / 100) * height;
     const pageWidth = (field.pageWidth / 100) * width;
-
-    console.log(
-      structuredClone({
-        field,
-        top,
-        left,
-        height,
-        width,
-        pageX: coords.pageX,
-        pageY: coords.pageY,
-        pageHeight: coords.pageHeight,
-        pageWidth: coords.pageWidth,
-        newPageX: pageX,
-        newPageY: pageY,
-        newPageHeight: pageHeight,
-        newPageWidth: pageWidth,
-      }),
-    );
 
     setCoords({
       pageX: pageX,

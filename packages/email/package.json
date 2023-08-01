@@ -24,7 +24,6 @@
   },
   "devDependencies": {
     "@types/nodemailer": "^6.4.8",
-    "react-email": "^1.9.4",
     "tsup": "^7.1.0"
   }
 }

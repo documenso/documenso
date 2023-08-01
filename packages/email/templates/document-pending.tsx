@@ -11,7 +11,7 @@ import {
   Text,
 } from '@react-email/components';
 
-import * as config from '@documenso/tailwind-config';
+import config from '@documenso/tailwind-config';
 
 interface DocumentPendingEmailTemplateProps {
   documentName?: string;

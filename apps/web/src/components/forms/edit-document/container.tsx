@@ -19,12 +19,12 @@ export const EditDocumentFormContainer = ({
     <form
       id={id}
       className={cn(
-        'dark:bg-background border-border bg-widget flex-col sticky top-20 flex h-[calc(100vh-6rem)] max-h-screen rounded-xl border px-4 py-6',
+        'dark:bg-background border-border bg-widget sticky top-20 flex h-[calc(100vh-6rem)] max-h-screen flex-col rounded-xl border px-4 py-6',
         className,
       )}
       {...props}
     >
-      <div className={cn('flex-col -mx-2 flex flex-1 overflow-hidden px-2')}>{children}</div>
+      <div className={cn('-mx-2 flex flex-1 flex-col overflow-hidden px-2')}>{children}</div>
     </form>
   );
 };
@@ -43,14 +43,14 @@ export const EditDocumentFormContainerContent = ({
   ...props
 }: EditDocumentFormContainerContentProps) => {
   return (
-    <div className={cn('flex-col flex flex-1', className)} {...props}>
+    <div className={cn('flex flex-1 flex-col', className)} {...props}>
       <h3 className="text-foreground text-2xl font-semibold">{title}</h3>
 
       <p className="text-muted-foreground mt-2 text-sm">{description}</p>
 
       <hr className="border-border mb-8 mt-4" />
 
-      <div className="flex-col -mx-2 flex flex-1 overflow-y-auto px-2">{children}</div>
+      <div className="-mx-2 flex flex-1 flex-col overflow-y-auto px-2">{children}</div>
     </div>
   );
 };

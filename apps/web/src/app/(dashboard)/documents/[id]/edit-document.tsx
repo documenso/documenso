@@ -17,7 +17,7 @@ import { AddSubjectFormPartial } from '~/components/forms/edit-document/add-subj
 const PDFViewer = dynamic(async () => import('~/components/(dashboard)/pdf-viewer/pdf-viewer'), {
   ssr: false,
   loading: () => (
-    <div className="dark:bg-background flex-col flex min-h-[80vh] items-center justify-center bg-white/50">
+    <div className="dark:bg-background flex min-h-[80vh] flex-col items-center justify-center bg-white/50">
       <Loader className="text-documenso h-12 w-12 animate-spin" />
 
       <p className="text-muted-foreground mt-4">Loading document...</p>

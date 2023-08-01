@@ -362,7 +362,7 @@ export const AddFieldsFormPartial = ({
         title="Add Fields"
         description="Add all relevant fields for each recipient."
       >
-        <div className="flex-col flex">
+        <div className="flex flex-col">
           {selectedField && visible && (
             <Card
               className="border-primary pointer-events-none fixed z-50 cursor-pointer bg-white"
@@ -477,7 +477,7 @@ export const AddFieldsFormPartial = ({
                 data-selected={selectedField === FieldType.SIGNATURE ? true : undefined}
               >
                 <Card className="group-data-[selected]:border-documenso h-full w-full cursor-pointer group-disabled:opacity-50">
-                  <CardContent className="flex-col flex items-center justify-center px-6 py-4">
+                  <CardContent className="flex flex-col items-center justify-center px-6 py-4">
                     <p
                       className={cn(
                         'text-muted-foreground group-data-[selected]:text-foreground text-3xl font-medium',
@@ -500,7 +500,7 @@ export const AddFieldsFormPartial = ({
                 data-selected={selectedField === FieldType.EMAIL ? true : undefined}
               >
                 <Card className="group-data-[selected]:border-documenso h-full w-full cursor-pointer group-disabled:opacity-50">
-                  <CardContent className="flex-col flex items-center justify-center px-6 py-4">
+                  <CardContent className="flex flex-col items-center justify-center px-6 py-4">
                     <p
                       className={cn(
                         'text-muted-foreground group-data-[selected]:text-foreground text-xl font-medium',
@@ -522,7 +522,7 @@ export const AddFieldsFormPartial = ({
                 data-selected={selectedField === FieldType.NAME ? true : undefined}
               >
                 <Card className="group-data-[selected]:border-documenso h-full w-full cursor-pointer group-disabled:opacity-50">
-                  <CardContent className="flex-col flex items-center justify-center px-6 py-4">
+                  <CardContent className="flex flex-col items-center justify-center px-6 py-4">
                     <p
                       className={cn(
                         'text-muted-foreground group-data-[selected]:text-foreground text-xl font-medium',
@@ -544,7 +544,7 @@ export const AddFieldsFormPartial = ({
                 data-selected={selectedField === FieldType.DATE ? true : undefined}
               >
                 <Card className="group-data-[selected]:border-documenso h-full w-full cursor-pointer group-disabled:opacity-50">
-                  <CardContent className="flex-col flex items-center justify-center px-6 py-4">
+                  <CardContent className="flex flex-col items-center justify-center px-6 py-4">
                     <p
                       className={cn(
                         'text-muted-foreground group-data-[selected]:text-foreground text-xl font-medium',
