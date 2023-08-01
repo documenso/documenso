@@ -204,10 +204,11 @@ Want to create a production ready docker image? Follow these steps:
 - Run `./docker/build.sh` in the root directory.
 - Publish the image to your docker registry of choice.
 
-# Deploying - Coming Soon™
+# Deployment
 
-- Docker support
-- One-Click-Deploy on Render.com
+## Railway
+
+[![Deploy on Railway](https://railway.app/button.svg)](https://railway.app/template/DjrRRX)
 
 # Troubleshooting
 
