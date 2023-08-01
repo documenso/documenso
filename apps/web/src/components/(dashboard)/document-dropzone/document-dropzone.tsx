@@ -102,7 +102,7 @@ export const DocumentDropzone = ({ className, onDrop, ...props }: DocumentDropzo
       <Card
         role="button"
         className={cn(
-          'focus-visible:ring-ring ring-offset-background flex-col flex flex-1 cursor-pointer items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2',
+          'focus-visible:ring-ring ring-offset-background flex flex-1 cursor-pointer flex-col items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2',
           className,
         )}
         gradient={true}
@@ -110,11 +110,11 @@ export const DocumentDropzone = ({ className, onDrop, ...props }: DocumentDropzo
         {...getRootProps()}
         {...props}
       >
-        <CardContent className="text-muted-foreground/40 flex-col flex items-center justify-center p-6">
+        <CardContent className="text-muted-foreground/40 flex flex-col items-center justify-center p-6">
           {/* <FilePlus strokeWidth="1px" className="h-16 w-16"/> */}
           <div className="flex">
             <motion.div
-              className="border-muted-foreground/20 group-hover:border-documenso/80 dark:bg-muted/80 flex-col z-10 flex aspect-[3/4] w-24 origin-top-right -rotate-[22deg] gap-y-1 rounded-lg border bg-white/80 px-2 py-4 backdrop-blur-sm"
+              className="border-muted-foreground/20 group-hover:border-documenso/80 dark:bg-muted/80 z-10 flex aspect-[3/4] w-24 origin-top-right -rotate-[22deg] flex-col gap-y-1 rounded-lg border bg-white/80 px-2 py-4 backdrop-blur-sm"
               variants={DocumentDropzoneCardLeftVariants}
             >
               <div className="bg-muted-foreground/20 group-hover:bg-documenso h-2 w-full rounded-[2px]" />
@@ -123,7 +123,7 @@ export const DocumentDropzone = ({ className, onDrop, ...props }: DocumentDropzo
             </motion.div>
 
             <motion.div
-              className="border-muted-foreground/20 group-hover:border-documenso/80 dark:bg-muted/80 flex-col z-20 flex aspect-[3/4] w-24 items-center justify-center gap-y-1 rounded-lg border bg-white/80 px-2 py-4 backdrop-blur-sm"
+              className="border-muted-foreground/20 group-hover:border-documenso/80 dark:bg-muted/80 z-20 flex aspect-[3/4] w-24 flex-col items-center justify-center gap-y-1 rounded-lg border bg-white/80 px-2 py-4 backdrop-blur-sm"
               variants={DocumentDropzoneCardCenterVariants}
             >
               <Plus
@@ -133,7 +133,7 @@ export const DocumentDropzone = ({ className, onDrop, ...props }: DocumentDropzo
             </motion.div>
 
             <motion.div
-              className="border-muted-foreground/20 group-hover:border-documenso/80 dark:bg-muted/80 flex-col z-10 flex aspect-[3/4] w-24 origin-top-left rotate-[22deg] gap-y-1 rounded-lg border bg-white/80 px-2 py-4 backdrop-blur-sm"
+              className="border-muted-foreground/20 group-hover:border-documenso/80 dark:bg-muted/80 z-10 flex aspect-[3/4] w-24 origin-top-left rotate-[22deg] flex-col gap-y-1 rounded-lg border bg-white/80 px-2 py-4 backdrop-blur-sm"
               variants={DocumentDropzoneCardRightVariants}
             >
               <div className="bg-muted-foreground/20 group-hover:bg-documenso h-2 w-full rounded-[2px]" />

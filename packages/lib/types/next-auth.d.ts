@@ -8,8 +8,8 @@ declare module 'next-auth' {
 
   interface User extends Omit<DefaultUser, 'id' | 'image'> {
     id: PrismaUser['id'];
-    email?: PrismaUser['email'];
     name?: PrismaUser['name'];
+    email?: PrismaUser['email'];
     emailVerified?: PrismaUser['emailVerified'];
   }
 }

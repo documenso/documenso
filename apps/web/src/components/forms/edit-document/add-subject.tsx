@@ -85,8 +85,8 @@ export const AddSubjectFormPartial = ({
         title="Add Subject"
         description="Add the subject and message you wish to send to signers."
       >
-        <div className="flex-col flex">
-          <div className="flex-col flex gap-y-4">
+        <div className="flex flex-col">
+          <div className="flex flex-col gap-y-4">
             <div>
               <Label htmlFor="subject">
                 Subject <span className="text-muted-foreground">(Optional)</span>
@@ -128,7 +128,7 @@ export const AddSubjectFormPartial = ({
                 You can use the following variables in your message:
               </p>
 
-              <ul className="flex-col mt-2 flex list-inside list-disc gap-y-2 text-sm">
+              <ul className="mt-2 flex list-inside list-disc flex-col gap-y-2 text-sm">
                 <li className="text-muted-foreground">
                   <code className="text-muted-foreground bg-muted-foreground/20 rounded p-1 text-sm">
                     {'{signer.name}'}

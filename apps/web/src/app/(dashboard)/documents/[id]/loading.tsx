@@ -4,7 +4,7 @@ import { ChevronLeft, Loader } from 'lucide-react';
 
 export default function Loading() {
   return (
-    <div className="flex-col mx-auto -mt-4 flex w-full max-w-screen-xl px-4 md:px-8">
+    <div className="mx-auto -mt-4 flex w-full max-w-screen-xl flex-col px-4 md:px-8">
       <Link href="/documents" className="flex grow-0 items-center text-[#7AC455] hover:opacity-80">
         <ChevronLeft className="mr-2 inline-block h-5 w-5" />
         Documents
@@ -14,7 +14,7 @@ export default function Loading() {
       </h1>
       <div className="mt-8 grid min-h-[80vh] w-full grid-cols-12 gap-x-8">
         <div className="dark:bg-background border-border col-span-12 rounded-xl border-2 bg-white/50 p-2 before:rounded-xl lg:col-span-6 xl:col-span-7">
-          <div className="flex-col flex min-h-[80vh] items-center justify-center">
+          <div className="flex min-h-[80vh] flex-col items-center justify-center">
             <Loader className="text-documenso h-12 w-12 animate-spin" />
 
             <p className="text-muted-foreground mt-4">Loading document...</p>

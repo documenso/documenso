@@ -19,7 +19,6 @@
   "packageManager": "npm@8.19.2",
   "workspaces": [
     "apps/*",
-    "packages/*",
-    "packages/email/.react-email"
+    "packages/*"
   ]
 }

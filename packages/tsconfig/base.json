@@ -16,8 +16,8 @@
     "preserveWatchOutput": true,
     "skipLibCheck": true,
     "strict": true,
-    "target": "ES2018",
-    "types": ["@documenso/tsconfig/process-env.d.ts"]
+    "target": "ES2018"
   },
+  "include": ["**/*.ts", "**/*.tsx", "**/.d.ts"],
   "exclude": ["node_modules"]
 }
