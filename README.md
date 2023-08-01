@@ -206,6 +206,8 @@ Want to create a production ready docker image? Follow these steps:
 
 # Deployment
 
+We support a variety of deployment methods, and are actively working on adding more. Stay tuned for updates!
+
 ## Railway
 
 [![Deploy on Railway](https://railway.app/button.svg)](https://railway.app/template/DjrRRX)
