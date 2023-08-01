@@ -7,7 +7,12 @@ import { usePlausible } from 'next-plausible';
 
 import { Button } from '@documenso/ui/primitives/button';
 
-export const Callout = () => {
+export type CalloutProps = {
+  starCount?: number;
+  [key: string]: unknown;
+};
+
+export const Callout = ({ starCount }: CalloutProps) => {
   const event = usePlausible();
 
   const onSignUpClick = () => {
@@ -36,21 +41,26 @@ export const Callout = () => {
         onClick={onSignUpClick}
       >
         Get the Community Plan
-        <span className="bg-primary -mr-2 ml-2.5 rounded-full px-2 py-1.5 text-xs">
+        <span className="bg-primary -mr-2.5 ml-2.5 rounded-full px-2 py-1.5 text-xs">
           $30/mo. forever!
         </span>
       </Button>
 
-      <Button variant="outline" className="rounded-full bg-transparent backdrop-blur-sm" asChild>
-        <Link
-          href="https://github.com/documenso/documenso"
-          target="_blank"
-          onClick={() => event('view-github')}
-        >
+      <Link
+        href="https://github.com/documenso/documenso"
+        target="_blank"
+        onClick={() => event('view-github')}
+      >
+        <Button variant="outline" className="rounded-full bg-transparent backdrop-blur-sm">
           <Github className="mr-2 h-5 w-5" />
           Star on Github
-        </Link>
-      </Button>
+          {starCount && starCount > 0 && (
+            <span className="bg-primary -mr-2.5 ml-2.5 rounded-full px-2 py-1.5 text-xs">
+              {starCount.toLocaleString('en-US')}
+            </span>
+          )}
+        </Button>
+      </Link>
     </div>
   );
 };

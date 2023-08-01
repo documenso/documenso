@@ -9,6 +9,8 @@ import { Hero } from '~/components/(marketing)/hero';
 import { OpenBuildTemplateBento } from '~/components/(marketing)/open-build-template-bento';
 import { ShareConnectPaidWidgetBento } from '~/components/(marketing)/share-connect-paid-widget-bento';
 
+export const revalidate = 600;
+
 const fontCaveat = Caveat({
   weight: ['500'],
   subsets: ['latin'],
@@ -17,15 +19,24 @@ const fontCaveat = Caveat({
 });
 
 export default async function IndexPage() {
+  const starCount = await fetch('https://api.github.com/repos/documenso/documenso', {
+    headers: {
+      accept: 'application/vnd.github.v3+json',
+    },
+  })
+    .then((res) => res.json())
+    .then((res) => (typeof res.stargazers_count === 'number' ? res.stargazers_count : undefined))
+    .catch(() => undefined);
+
   return (
     <div className={cn('mt-12', fontCaveat.variable)}>
-      <Hero />
+      <Hero starCount={starCount} />
 
       <FasterSmarterBeautifulBento className="my-48" />
       <ShareConnectPaidWidgetBento className="my-48" />
       <OpenBuildTemplateBento className="my-48" />
 
-      <Callout />
+      <Callout starCount={starCount} />
     </div>
   );
 }
