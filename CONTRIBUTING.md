@@ -10,10 +10,7 @@ If you plan to contribute to Documenso, please take a moment to feel awesome ✨
 
 ## Developing
 
-- The development branch is <code>main</code>. All pull request should be made against this branch.
-- If you need help getting started, [join us on Discord](https://documen.so/discord).
-- Use [Conventional Commits](https://www.conventionalcommits.org/) to keep everything nice and clean.
-- Choose your branch name using the issue you are working on and a coventional commit type.
+The development branch is <code>main</code>. All pull request should be made against this branch. If you need help getting started, [join us on Discord](https://documen.so/discord).
 
 1. [Fork](https://help.github.com/articles/fork-a-repo/) this repository to your
    own GitHub account and then
