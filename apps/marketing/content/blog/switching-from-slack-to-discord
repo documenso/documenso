@@ -28,7 +28,7 @@ In this post, we won’t debate *why* we’re switching — Slack vs. Discord is
 
 Instead, we’ll focus on *how* we plan to make the switch.
 
-## ## Who is this story for?
+## Who is this story for?
 
 First, we wrote this post for the team so we’re ready for the switch. Then we post it online because we value transparency and thought it might help the community.
 
@@ -47,15 +47,15 @@ The detailed plan goes like this:
 - 2023-08-02 `t+8`: We announce to the community the upcoming changes in the different channels — GitHub, Twitter, and Slack.
 
     - **GitHub**
-        - [ ] Create new Pull Request
-            - [ ] Add story to the blog
-            - [ ] Update link to the community
+        - Create new Pull Request
+            - Add story to the blog
+            - Update link to the community
                 
             ```
             https://documen.so/discord
             ```
                 
-        - [ ] Start a new Discussion
+        - Start a new Discussion
             
             ```markdown
             Happy Wednesday!
@@ -73,9 +73,9 @@ The detailed plan goes like this:
             ```
             
     - **Twitter**
-        - [ ]  Tweet the announcement
-        - [ ]  Pin Tweet
-        - [ ]  Update link in bio
+        - [Tweet the announcement](https://twitter.com/documenso/status/1686719482096766977)
+        - Pin Tweet
+        - Update link in bio
             
             ```
             The Open Source DocuSign Alternative.
@@ -87,7 +87,7 @@ The detailed plan goes like this:
             ```
             
     - **Slack**
-        - [ ] Post message in `#general`
+        - Post message in `#general`
             
             ```markdown
             Happy Wednesday!
@@ -104,18 +104,18 @@ The detailed plan goes like this:
             Flo
             ```
             
-        - [ ] Pin post
-        - [ ] Set topic and description
+        - Pin post
+        - Set topic and description
             
             ```
             We're switching to Discord. Join the fun: https://documen.so/discord
             ```
             
-        - [ ] Archive channels: `#code-review` `#how-to` `#meet-and-greet` `#random-memes` `#self-hosting` `#support`
+        - Archive channels: `#code-review` `#how-to` `#meet-and-greet` `#random-memes` `#self-hosting` `#support`
         
 - 2023-08-09 `t+15`: 7 days later, we send a reminder on Slack.
     - **Slack**
-        - [ ]  Schedule reminder in `#general` (Flo)
+        - Schedule reminder in `#general`
             
             ```
             Friendly reminder: we're switching to Discord and will soon disconnect this Slack workspace.
@@ -125,8 +125,8 @@ The detailed plan goes like this:
             
 - 2023-08-16 `t+22`: 15 days later, we’re making the final edits to the Slack workspace.
     - **Slack**
-        - [ ] [Edit posting permissions](https://app.slack.com/slackhelp/en-US/360004635551) in `#general`
-        - [ ] Disconnect Slack
+        - [Edit posting permissions](https://app.slack.com/slackhelp/en-US/360004635551) in `#general`
+        - Disconnect Slack
 
 ## Final thoughts
 
