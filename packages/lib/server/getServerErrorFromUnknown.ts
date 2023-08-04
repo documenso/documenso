@@ -31,7 +31,7 @@ export function getServerErrorFromUnknown(cause: unknown): HttpError {
     return new Error(cause, { cause });
   }
 
-  // Catch-All if none of the above triggered and something (even more) unexpected happend
+  // Catch-All if none of the above triggered and something (even more) unexpected happened
   return new HttpError({
     statusCode: 500,
     message: `Unhandled error of type '${typeof cause}'. Please reach out for our customer support.`,
