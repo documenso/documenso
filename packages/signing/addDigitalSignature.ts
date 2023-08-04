@@ -1,7 +1,7 @@
 import fs from "fs";
 import { PDFDocument, PDFHexString, PDFName, PDFNumber, PDFString } from "pdf-lib";
 
-// Local copy of Node SignPDF because https://github.com/vbuch/node-signpdf/pull/187 was not published in NPM yet. Can be switched to npm packge.
+// Local copy of Node SignPDF because https://github.com/vbuch/node-signpdf/pull/187 was not published in NPM yet. Can be switched to npm package.
 const signer = require("./node-signpdf/dist/signpdf");
 
 export const addDigitalSignature = async (documentAsBase64: string): Promise<string> => {

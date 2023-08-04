@@ -44,7 +44,7 @@ async function postHandler(req: NextApiRequest, res: NextApiResponse) {
   for (const signature of signaturesFromBody) {
     if (!signature.signatureImage && !signature.typedSignature) {
       documentWithInserts = document.document;
-      throw new Error("Cant't save invalid signature.");
+      throw new Error("Can't save invalid signature.");
     }
 
     await saveSignature(signature);
