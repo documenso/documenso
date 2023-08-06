@@ -93,3 +93,18 @@ export const SALARY_BANDS = [
     salary: 80_000,
   },
 ];
+
+export const CAP_TABLE = [
+  {
+    shareholder: 'Founders',
+    percentage: '75.5',
+  },
+  {
+    shareholder: 'Investors',
+    percentage: '14.5',
+  },
+  {
+    shareholder: 'Team Pool',
+    percentage: '10',
+  },
+];

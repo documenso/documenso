@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { MetricCard } from '~/app/(marketing)/open/metric-card';
 import { SalaryBands } from '~/app/(marketing)/open/salary-bands';
 
+import { CapTable } from './cap-table';
 import { FundingRaised } from './funding-raised';
 import { TeamMembers } from './team-members';
 
@@ -84,6 +85,8 @@ export default async function OpenPage() {
         <SalaryBands className="col-span-12 lg:col-span-6" />
 
         <FundingRaised className="col-span-12 lg:col-span-6" />
+
+        <CapTable className="col-span-12" />
 
         <div className="col-span-12 mt-12 flex flex-col items-center justify-center">
           <h2 className="text-2xl font-bold">Where's the rest?</h2>
