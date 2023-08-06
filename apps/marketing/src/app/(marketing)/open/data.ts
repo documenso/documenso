@@ -95,16 +95,7 @@ export const SALARY_BANDS = [
 ];
 
 export const CAP_TABLE = [
-  {
-    shareholder: 'Founders',
-    percentage: '75.5',
-  },
-  {
-    shareholder: 'Investors',
-    percentage: '14.5',
-  },
-  {
-    shareholder: 'Team Pool',
-    percentage: '10',
-  },
+  { name: 'Founders', percentage: 75.5 },
+  { name: 'Investors', percentage: 14.5 },
+  { name: 'Team Pool', percentage: 10 },
 ];
