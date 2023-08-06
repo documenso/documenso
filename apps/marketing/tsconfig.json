@@ -9,16 +9,10 @@
       }
     ],
     "paths": {
-      "~/*": [
-        "./src/*"
-      ],
-      "contentlayer/generated": [
-        "./.contentlayer/generated"
-      ]
+      "~/*": ["./src/*"],
+      "contentlayer/generated": ["./.contentlayer/generated"]
     },
-    "types": [
-      "@documenso/lib/types/next-auth.d.ts"
-    ],
+    "types": ["@documenso/lib/types/next-auth.d.ts"],
     "strictNullChecks": true,
     "incremental": false
   },
@@ -29,7 +23,5 @@
     ".next/types/**/*.ts",
     ".contentlayer/generated"
   ],
-  "exclude": [
-    "node_modules"
-  ]
+  "exclude": ["node_modules"]
 }
