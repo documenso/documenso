@@ -9,9 +9,24 @@ import { cn } from '@documenso/ui/lib/utils';
 import { CAP_TABLE } from './data';
 
 const COLORS = ['#7fd843', '#a2e771', '#c6f2a4'];
-
 const RADIAN = Math.PI / 180;
-const renderCustomizedLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent, index }) => {
+
+export type LabelRenderProps = {
+  cx: number;
+  cy: number;
+  midAngle: number;
+  innerRadius: number;
+  outerRadius: number;
+  percent: number;
+};
+const renderCustomizedLabel = ({
+  cx,
+  cy,
+  midAngle,
+  innerRadius,
+  outerRadius,
+  percent,
+}: LabelRenderProps) => {
   const radius = innerRadius + (outerRadius - innerRadius) * 0.25;
   const x = cx + radius * Math.cos(-midAngle * RADIAN);
   const y = cy + radius * Math.sin(-midAngle * RADIAN);
@@ -22,6 +37,7 @@ const renderCustomizedLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, per
     </text>
   );
 };
+
 export type CapTableProps = HTMLAttributes<HTMLDivElement>;
 
 export const CapTable = ({ className, ...props }: CapTableProps) => {
