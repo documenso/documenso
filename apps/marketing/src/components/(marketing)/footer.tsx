@@ -37,7 +37,7 @@ export const Footer = ({ className, ...props }: FooterProps) => {
             </Link>
 
             <Link
-              href="https://documenso.slack.com"
+              href="https://documen.so/discord"
               target="_blank"
               className="hover:text-[#6D6D6D]"
             >
