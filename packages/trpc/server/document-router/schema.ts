@@ -2,6 +2,19 @@ import { z } from 'zod';
 
 import { FieldType } from '@documenso/prisma/client';
 
+export const ZSearchInboxDocumentsParamsSchema = z.object({
+  filter: z
+    .union([z.literal('SIGNED'), z.literal('NOT_SIGNED'), z.undefined()])
+    .catch(() => undefined),
+  cursor: z.number().default(1),
+  query: z
+    .string()
+    .optional()
+    .catch(() => undefined),
+});
+
+export type TSearchInboxDocumentsParamsSchema = z.infer<typeof ZSearchInboxDocumentsParamsSchema>;
+
 export const ZSetRecipientsForDocumentMutationSchema = z.object({
   documentId: z.number(),
   recipients: z.array(
