@@ -7,5 +7,6 @@ module.exports = {
   content: [
     ...baseConfig.content,
     `${path.join(require.resolve('@documenso/ui'), '..')}/**/*.{ts,tsx}`,
+    `${path.join(require.resolve('@documenso/email'), '..')}/**/*.{ts,tsx}`,
   ],
 };
