@@ -25,8 +25,8 @@ export const TeamMembers = ({ className, ...props }: TeamMembersProps) => {
             <TableRow>
               <TableHead className="">Name</TableHead>
               <TableHead>Role</TableHead>
-              {/* <TableHead>Status</TableHead> */}
               <TableHead>Salary</TableHead>
+              <TableHead>Engagement</TableHead>
               <TableHead>Location</TableHead>
               <TableHead className="w-[100px] text-right">Join Date</TableHead>
             </TableRow>
@@ -36,7 +36,7 @@ export const TeamMembers = ({ className, ...props }: TeamMembersProps) => {
               <TableRow key={member.name}>
                 <TableCell className="font-medium">{member.name}</TableCell>
                 <TableCell>{member.role}</TableCell>
-                {/* <TableCell>{teamMember.employmentStatus}</TableCell> */}
+
                 <TableCell>
                   {member.salary.toLocaleString('en-US', {
                     style: 'currency',
@@ -44,6 +44,7 @@ export const TeamMembers = ({ className, ...props }: TeamMembersProps) => {
                     maximumFractionDigits: 0,
                   })}
                 </TableCell>
+                <TableCell>{member.engagement}</TableCell>
                 <TableCell>{member.location}</TableCell>
                 <TableCell className="text-right">{member.joinDate}</TableCell>
               </TableRow>

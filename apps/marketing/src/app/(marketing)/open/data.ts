@@ -4,6 +4,7 @@ export const TEAM_MEMBERS = [
     role: 'Co-Founder, CEO',
     salary: 95_000,
     location: 'Germany',
+    engagement: 'Full-Time',
     joinDate: 'November 14th, 2022',
   },
   {
@@ -11,13 +12,15 @@ export const TEAM_MEMBERS = [
     role: 'Co-Founder, CTO',
     salary: 95_000,
     location: 'Australia',
+    engagement: 'Full-Time',
     joinDate: 'April 19th, 2023',
   },
   {
     name: 'Ephraim Atta-Duncan',
-    role: 'Software Engineer - Intern (Part-Time)',
+    role: 'Software Engineer - Intern',
     salary: 15_000,
     location: 'Ghana',
+    engagement: 'Part-Time',
     joinDate: 'June 6th, 2023',
   },
   {
@@ -25,6 +28,7 @@ export const TEAM_MEMBERS = [
     role: 'Marketer - III',
     salary: 80_000,
     location: 'France',
+    engagement: 'Full-Time',
     joinDate: 'July 10th, 2023',
   },
   {
@@ -32,6 +36,7 @@ export const TEAM_MEMBERS = [
     role: 'Software Engineer - III',
     salary: 100_000,
     location: 'Australia',
+    engagement: 'Full-Time',
     joinDate: 'July 26th, 2023',
   },
 ];
