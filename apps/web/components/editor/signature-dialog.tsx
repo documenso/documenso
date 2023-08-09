@@ -17,7 +17,7 @@ export default function SignatureDialog(props: any) {
   const [typedSignature, setTypedSignature] = useState("");
   const [signatureEmpty, setSignatureEmpty] = useState(true);
   // This is a workaround to prevent the canvas from being rendered when the dialog is closed
-  // we also need the debounce to avoid rendering while transitions are occuring.
+  // we also need the debounce to avoid rendering while transitions are occurring.
   const showCanvas = useDebouncedValue<boolean>(props.open, 1);
   let signCanvasRef: any | undefined;
 

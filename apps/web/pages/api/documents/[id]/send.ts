@@ -61,9 +61,9 @@ async function postHandler(req: NextApiRequest, res: NextApiResponse) {
       return res.status(200).send(recipients.length);
     }
 
-    return res.status(502).end("Coud not send request for signing.");
+    return res.status(502).end("Could not send request for signing.");
   } catch (err) {
-    return res.status(502).end("Coud not send request for signing.");
+    return res.status(502).end("Could not send request for signing.");
   }
 }
 

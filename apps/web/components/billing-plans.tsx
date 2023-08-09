@@ -45,7 +45,7 @@ export const BillingPlans = () => {
             </p>
 
             <p className="mt-4 text-center text-sm text-gray-500">
-              All you need for easy signing. <br></br>Includes everthing we build this year.
+              All you need for easy signing. <br></br>Includes everything we build this year.
             </p>
             <div className="mt-4">
               <Button
