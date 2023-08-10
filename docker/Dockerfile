@@ -1,7 +1,14 @@
+ARG NEXT_PUBLIC_WEBAPP_URL=http://localhost:3000
+ARG NEXT_PUBLIC_ALLOW_SIGNUP=true
+ARG NEXT_PUBLIC_ALLOW_SUBSCRIPTIONS=false
+ARG NEXT_PUBLIC_STRIPE_COMMUNITY_PLAN_MONTHLY_PRICE_ID
+ARG NEXT_PUBLIC_STRIPE_COMMUNITY_PLAN_YEARLY_PRICE_ID
+
 FROM node:18-alpine AS base
 
 # Install dependencies only when needed
 FROM base AS production_deps
+
 WORKDIR /app
 
 # Check https://github.com/nodejs/docker-node/tree/b4117f9333da4138b03a546ec926ef50a31506c3#nodealpine to understand why libc6-compat might be needed.
@@ -14,6 +21,13 @@ RUN npm ci --production
 
 # Install dependencies only when needed
 FROM base AS builder
+
+ARG NEXT_PUBLIC_WEBAPP_URL
+ARG NEXT_PUBLIC_ALLOW_SIGNUP
+ARG NEXT_PUBLIC_ALLOW_SUBSCRIPTIONS
+ARG NEXT_PUBLIC_STRIPE_COMMUNITY_PLAN_MONTHLY_PRICE_ID
+ARG NEXT_PUBLIC_STRIPE_COMMUNITY_PLAN_YEARLY_PRICE_ID
+
 WORKDIR /app
 
 # Check https://github.com/nodejs/docker-node/tree/b4117f9333da4138b03a546ec926ef50a31506c3#nodealpine to understand why libc6-compat might be needed.
@@ -28,6 +42,7 @@ RUN npm run build --workspaces
 
 # Production image, copy all the files and run next
 FROM base AS runner
+
 WORKDIR /app
 
 ENV NODE_ENV production
