@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start",
+    "start": "next start -p $PORT",
     "lint": "next lint",
     "db-studio": "prisma db studio",
     "stripe:listen": "stripe listen --forward-to localhost:3000/api/stripe/webhook"
