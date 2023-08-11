@@ -39,7 +39,6 @@ ports:
   - name: Database Studio
     port: 5555
     visibility: public
-    onOpen: open-browser
 
   - port: 1100
     visibility: private
