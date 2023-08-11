@@ -2,6 +2,7 @@
   <a href="https://github.com/documenso/documenso.com">
    <img width="250px" src="https://github.com/documenso/documenso/assets/1309312/cd7823ec-4baa-40b9-be78-4acb3b1c73cb" alt="Documenso Logo">
   </a>
+  
 
   <p align="center">
   The Open Source DocuSign Alternative.
