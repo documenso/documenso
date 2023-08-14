@@ -4,35 +4,10 @@ import { HTMLAttributes } from 'react';
 
 import { Bar, BarChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 
+import { formatMonth } from '@documenso/lib/client-only/format-month';
 import { cn } from '@documenso/ui/lib/utils';
 
-type StargazersType = {
-  [key: string]: {
-    stars?: number;
-    forks?: number;
-    mergedPRs?: number;
-    openIssues?: number;
-  };
-};
-
-function formatMonth(monthStr: string) {
-  const [year, month] = monthStr.split('-');
-  const monthNames = [
-    'January',
-    'February',
-    'March',
-    'April',
-    'May',
-    'June',
-    'July',
-    'August',
-    'September',
-    'October',
-    'November',
-    'December',
-  ];
-  return `${monthNames[parseInt(month, 10) - 1]} ${year}`;
-}
+import { StargazersType } from './page';
 
 export type GithubStarsProps = HTMLAttributes<HTMLDivElement> & { data: StargazersType };
 
