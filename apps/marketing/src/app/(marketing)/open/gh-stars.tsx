@@ -15,45 +15,6 @@ type StargazersType = {
   };
 };
 
-const data: StargazersType = {
-  '2023-8': {
-    stars: 2483,
-    forks: 155,
-    mergedPRs: 87,
-    openIssues: 67,
-  },
-  '2023-7': {
-    stars: 2250,
-    forks: 0,
-    mergedPRs: 0,
-    openIssues: 0,
-  },
-  '2023-6': {
-    stars: 2070,
-    forks: 0,
-    mergedPRs: 0,
-    openIssues: 0,
-  },
-  '2023-5': {
-    stars: 1260,
-    forks: 0,
-    mergedPRs: 0,
-    openIssues: 0,
-  },
-  '2023-4': {
-    stars: 90,
-    forks: 0,
-    mergedPRs: 0,
-    openIssues: 0,
-  },
-  '2023-3': {
-    stars: 0,
-    forks: 0,
-    mergedPRs: 0,
-    openIssues: 0,
-  },
-};
-
 function formatMonth(monthStr: string) {
   const [year, month] = monthStr.split('-');
   const monthNames = [
@@ -73,16 +34,16 @@ function formatMonth(monthStr: string) {
   return `${monthNames[parseInt(month, 10) - 1]} ${year}`;
 }
 
-const formattedData = Object.keys(data)
-  .map((key) => ({
-    month: formatMonth(key),
-    stars: data[key].stars,
-  }))
-  .reverse();
+export type GithubStarsProps = HTMLAttributes<HTMLDivElement> & { data: StargazersType };
 
-export type GithubStarsProps = HTMLAttributes<HTMLDivElement>;
+export const GithubStars = ({ className, data, ...props }: GithubStarsProps) => {
+  const formattedData = Object.keys(data)
+    .map((key) => ({
+      month: formatMonth(key),
+      stars: data[key].stars,
+    }))
+    .reverse();
 
-export const GithubStars = ({ className, ...props }: GithubStarsProps) => {
   return (
     <div className={cn('flex flex-col', className)} {...props}>
       <h3 className="px-4 text-lg font-semibold">Github Monthly Stars</h3>
