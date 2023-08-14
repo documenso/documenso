@@ -5,6 +5,7 @@ import { SalaryBands } from '~/app/(marketing)/open/salary-bands';
 
 import { CapTable } from './cap-table';
 import { FundingRaised } from './funding-raised';
+import { GithubStars } from './gh-stars';
 import { TeamMembers } from './team-members';
 
 export const revalidate = 86400;
@@ -86,7 +87,8 @@ export default async function OpenPage() {
 
         <FundingRaised className="col-span-12 lg:col-span-6" />
 
-        <CapTable className="col-span-12" />
+        <CapTable className="col-span-12 lg:col-span-6" />
+        <GithubStars className="col-span-12 lg:col-span-6" />
 
         <div className="col-span-12 mt-12 flex flex-col items-center justify-center">
           <h2 className="text-2xl font-bold">Where's the rest?</h2>
