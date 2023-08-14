@@ -20,6 +20,17 @@ const ZMergedPullRequestsResponse = z.object({
   total_count: z.number(),
 });
 
+const ZStargazersLiveResponse = z.record(
+  z.object({
+    stars: z.number(),
+    forks: z.number(),
+    mergedPRs: z.number(),
+    openIssues: z.number(),
+  }),
+);
+
+export type StargazersType = z.infer<typeof ZStargazersLiveResponse>;
+
 // const ZOpenPullRequestsResponse = ZMergedPullRequestsResponse;
 
 export default async function OpenPage() {
@@ -45,6 +56,14 @@ export default async function OpenPage() {
   )
     .then((res) => res.json())
     .then((res) => ZMergedPullRequestsResponse.parse(res));
+
+  const STARGAZERS_DATA = await fetch('https://stargrazer-live.onrender.com/api/stats', {
+    headers: {
+      accept: 'application/json',
+    },
+  })
+    .then((res) => res.json())
+    .then((res) => ZStargazersLiveResponse.parse(res));
 
   return (
     <div className="mx-auto mt-12 max-w-screen-lg">
@@ -88,7 +107,7 @@ export default async function OpenPage() {
         <FundingRaised className="col-span-12 lg:col-span-6" />
 
         <CapTable className="col-span-12 lg:col-span-6" />
-        <GithubStars className="col-span-12 lg:col-span-6" />
+        <GithubStars className="col-span-12 lg:col-span-6" data={STARGAZERS_DATA} />
 
         <div className="col-span-12 mt-12 flex flex-col items-center justify-center">
           <h2 className="text-2xl font-bold">Where's the rest?</h2>
