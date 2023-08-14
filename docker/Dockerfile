@@ -36,6 +36,9 @@ RUN apk add --no-cache libc6-compat
 # Copy our current monorepo
 COPY . .
 
+# Disable husky from installing hooks
+ENV HUSKY 0
+
 RUN npm ci
 
 RUN npm run build --workspaces
