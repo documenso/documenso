@@ -26,10 +26,19 @@ export const TEAM_MEMBERS = [
   {
     name: 'Florent Merian',
     role: 'Marketer - III',
-    salary: 80_000,
+    salary: 'Project-Based',
     location: 'France',
     engagement: 'Full-Time',
     joinDate: 'July 10th, 2023',
+  },
+  ,
+  {
+    name: 'Thilo Konzok',
+    role: 'Designer',
+    salary: 'Project-Based',
+    location: 'Germany',
+    engagement: 'Full-Time',
+    joinDate: 'April 26th, 2023',
   },
   {
     name: 'David Nguyen',
@@ -43,16 +52,16 @@ export const TEAM_MEMBERS = [
 
 export const FUNDING_RAISED = [
   {
-    date: '2023-05-20',
+    date: '2023-04',
     amount: 0,
   },
   {
-    date: '2023-05-20',
+    date: '2023-05',
     amount: 300_000,
   },
   {
-    date: '2023-07-25',
-    amount: 1_250_000,
+    date: '2023-07',
+    amount: 1_550_000,
   },
 ];
 
@@ -79,6 +88,16 @@ export const SALARY_BANDS = [
   },
   {
     title: 'Software Engineer - IV',
+    seniority: 'Principal',
+    salary: 120_000,
+  },
+  {
+    title: 'Designer - III',
+    seniority: 'Senior',
+    salary: 100_000,
+  },
+  {
+    title: 'Designer - IV',
     seniority: 'Principal',
     salary: 120_000,
   },

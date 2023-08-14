@@ -13,7 +13,7 @@ export type FundingRaisedProps = HTMLAttributes<HTMLDivElement>;
 export const FundingRaised = ({ className, ...props }: FundingRaisedProps) => {
   return (
     <div className={cn('flex flex-col', className)} {...props}>
-      <h3 className="px-4 text-lg font-semibold">Funding Raised</h3>
+      <h3 className="px-4 text-lg font-semibold">Total Funding Raised</h3>
 
       <div className="border-border mt-2.5 flex flex-1 flex-col items-center justify-center rounded-2xl border p-4 shadow-sm hover:shadow">
         <ResponsiveContainer width="100%" height={400}>
