@@ -31,7 +31,6 @@ export const TEAM_MEMBERS = [
     engagement: 'Full-Time',
     joinDate: 'July 10th, 2023',
   },
-  ,
   {
     name: 'Thilo Konzok',
     role: 'Designer',
