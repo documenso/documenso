@@ -15,7 +15,7 @@ export const GithubForks = ({ className, data, ...props }: GithubForksProps) => 
   const formattedData = Object.keys(data)
     .map((key) => ({
       month: formatMonth(key),
-      stars: data[key].forks,
+      forks: data[key].forks,
     }))
     .reverse();
 
@@ -24,18 +24,18 @@ export const GithubForks = ({ className, data, ...props }: GithubForksProps) => 
       <h3 className="px-4 text-lg font-semibold">Github: Forks</h3>
 
       <div className="border-border mt-2.5 flex flex-1 items-center justify-center rounded-2xl border shadow-sm hover:shadow">
-        <ResponsiveContainer width="100%" height={400}>
-          <BarChart data={formattedData} margin={{ top: 40, right: 40, bottom: 20, left: 40 }}>
+        <ResponsiveContainer width="100%" height={300}>
+          <BarChart data={formattedData} margin={{ top: 40, right: 20 }}>
             <XAxis dataKey="month" />
             <YAxis />
             <Tooltip
               itemStyle={{
                 color: 'hsl(var(--primary-foreground))',
               }}
-              formatter={(value) => [Number(value), 'Stars']}
+              formatter={(value) => [Number(value), 'Forks']}
               cursor={{ fill: 'hsl(var(--primary) / 10%)' }}
             />
-            <Bar dataKey="stars" fill="hsl(var(--primary))" label="Stars" />
+            <Bar dataKey="forks" fill="hsl(var(--primary))" label="Forks" />
           </BarChart>
         </ResponsiveContainer>
       </div>
