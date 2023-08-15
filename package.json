@@ -23,10 +23,5 @@
   "workspaces": [
     "apps/*",
     "packages/*"
-  ],
-  "lint-staged": {
-    "**/*.{ts,tsx,md}": [
-      "prettier --write"
-    ]
-  }
+  ]
 }
