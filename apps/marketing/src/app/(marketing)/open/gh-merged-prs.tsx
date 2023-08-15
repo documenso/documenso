@@ -9,19 +9,19 @@ import { cn } from '@documenso/ui/lib/utils';
 
 import { StargazersType } from './page';
 
-export type GithubStarsProps = HTMLAttributes<HTMLDivElement> & { data: StargazersType };
+export type GithubMergedPrsProps = HTMLAttributes<HTMLDivElement> & { data: StargazersType };
 
-export const GithubStars = ({ className, data, ...props }: GithubStarsProps) => {
+export const GithubMergedPrs = ({ className, data, ...props }: GithubMergedPrsProps) => {
   const formattedData = Object.keys(data)
     .map((key) => ({
       month: formatMonth(key),
-      stars: data[key].stars,
+      stars: data[key].mergedPRs,
     }))
     .reverse();
 
   return (
     <div className={cn('flex flex-col', className)} {...props}>
-      <h3 className="px-4 text-lg font-semibold">Github: Stars</h3>
+      <h3 className="px-4 text-lg font-semibold">Github: Merged PRs</h3>
 
       <div className="border-border mt-2.5 flex flex-1 items-center justify-center rounded-2xl border shadow-sm hover:shadow">
         <ResponsiveContainer width="100%" height={400}>
