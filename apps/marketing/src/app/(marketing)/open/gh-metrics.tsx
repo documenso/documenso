@@ -11,11 +11,13 @@ import { StargazersType } from './page';
 
 export type GithubMetricProps = HTMLAttributes<HTMLDivElement> & {
   data: StargazersType;
-  metricKey: keyof StargazersType;
+  metricKey: MetricsDataKey;
   title: string;
   label: string;
   chartHeight?: number;
 };
+
+export type MetricsDataKey = 'stars' | 'forks' | 'mergedPRs' | 'openIssues';
 
 export const GithubMetric = ({
   className,
