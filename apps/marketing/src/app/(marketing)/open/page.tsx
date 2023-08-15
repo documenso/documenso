@@ -5,6 +5,9 @@ import { SalaryBands } from '~/app/(marketing)/open/salary-bands';
 
 import { CapTable } from './cap-table';
 import { FundingRaised } from './funding-raised';
+import { GithubForks } from './gh-forks';
+import { GithubMergedPrs } from './gh-merged-prs';
+import { GithubOpenIssues } from './gh-open-issues';
 import { GithubStars } from './gh-stars';
 import { TeamMembers } from './team-members';
 
@@ -108,6 +111,9 @@ export default async function OpenPage() {
 
         <CapTable className="col-span-12 lg:col-span-6" />
         <GithubStars className="col-span-12 lg:col-span-6" data={STARGAZERS_DATA} />
+        <GithubForks className="col-span-12 lg:col-span-4" data={STARGAZERS_DATA} />
+        <GithubMergedPrs className="col-span-12 lg:col-span-4" data={STARGAZERS_DATA} />
+        <GithubOpenIssues className="col-span-12 lg:col-span-4 " data={STARGAZERS_DATA} />
 
         <div className="col-span-12 mt-12 flex flex-col items-center justify-center">
           <h2 className="text-2xl font-bold">Where's the rest?</h2>
