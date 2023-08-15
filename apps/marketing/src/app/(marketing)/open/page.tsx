@@ -5,10 +5,7 @@ import { SalaryBands } from '~/app/(marketing)/open/salary-bands';
 
 import { CapTable } from './cap-table';
 import { FundingRaised } from './funding-raised';
-import { GithubForks } from './gh-forks';
-import { GithubMergedPrs } from './gh-merged-prs';
-import { GithubOpenIssues } from './gh-open-issues';
-import { GithubStars } from './gh-stars';
+import { GithubMetric } from './gh-metrics';
 import { TeamMembers } from './team-members';
 
 export const revalidate = 86400;
@@ -110,10 +107,38 @@ export default async function OpenPage() {
         <FundingRaised className="col-span-12 lg:col-span-6" />
 
         <CapTable className="col-span-12 lg:col-span-6" />
-        <GithubStars className="col-span-12 lg:col-span-6" data={STARGAZERS_DATA} />
-        <GithubForks className="col-span-12 lg:col-span-4" data={STARGAZERS_DATA} />
-        <GithubMergedPrs className="col-span-12 lg:col-span-4" data={STARGAZERS_DATA} />
-        <GithubOpenIssues className="col-span-12 lg:col-span-4 " data={STARGAZERS_DATA} />
+        <GithubMetric
+          data={STARGAZERS_DATA}
+          metricKey="stars"
+          title="Github: Stars"
+          label="Stars"
+          className="col-span-12 lg:col-span-6"
+        />
+
+        <GithubMetric
+          data={STARGAZERS_DATA}
+          metricKey="mergedPRs"
+          title="Github: Merged PRs"
+          label="Merged PRs"
+          chartHeight={300}
+          className="col-span-12 lg:col-span-4"
+        />
+        <GithubMetric
+          data={STARGAZERS_DATA}
+          metricKey="forks"
+          title="Github: Forks"
+          label="Forks"
+          chartHeight={300}
+          className="col-span-12 lg:col-span-4"
+        />
+        <GithubMetric
+          data={STARGAZERS_DATA}
+          metricKey="openIssues"
+          title="Github: Open Issues"
+          label="Open Issues"
+          chartHeight={300}
+          className="col-span-12 lg:col-span-4"
+        />
 
         <div className="col-span-12 mt-12 flex flex-col items-center justify-center">
           <h2 className="text-2xl font-bold">Where's the rest?</h2>
