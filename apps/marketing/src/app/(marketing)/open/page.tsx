@@ -110,7 +110,7 @@ export default async function OpenPage() {
         <GithubMetric
           data={STARGAZERS_DATA}
           metricKey="stars"
-          title="Github: Stars"
+          title="Github: Total Stars"
           label="Stars"
           className="col-span-12 lg:col-span-6"
         />
@@ -118,7 +118,7 @@ export default async function OpenPage() {
         <GithubMetric
           data={STARGAZERS_DATA}
           metricKey="mergedPRs"
-          title="Github: Merged PRs"
+          title="Github: Total Merged PRs"
           label="Merged PRs"
           chartHeight={300}
           className="col-span-12 lg:col-span-4"
@@ -126,7 +126,7 @@ export default async function OpenPage() {
         <GithubMetric
           data={STARGAZERS_DATA}
           metricKey="forks"
-          title="Github: Forks"
+          title="Github: Total Forks"
           label="Forks"
           chartHeight={300}
           className="col-span-12 lg:col-span-4"
@@ -134,7 +134,7 @@ export default async function OpenPage() {
         <GithubMetric
           data={STARGAZERS_DATA}
           metricKey="openIssues"
-          title="Github: Open Issues"
+          title="Github: Total Open Issues"
           label="Open Issues"
           chartHeight={300}
           className="col-span-12 lg:col-span-4"
