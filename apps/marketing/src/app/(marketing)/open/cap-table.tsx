@@ -1,6 +1,6 @@
 'use client';
 
-import { HTMLAttributes } from 'react';
+import { HTMLAttributes, useEffect, useState } from 'react';
 
 import { Cell, Pie, PieChart, Tooltip } from 'recharts';
 
@@ -41,33 +41,40 @@ const renderCustomizedLabel = ({
 export type CapTableProps = HTMLAttributes<HTMLDivElement>;
 
 export const CapTable = ({ className, ...props }: CapTableProps) => {
+  const [isSSR, setIsSSR] = useState(true);
+
+  useEffect(() => {
+    setIsSSR(false);
+  }, []);
   return (
     <div className={cn('flex flex-col', className)} {...props}>
       <h3 className="px-4 text-lg font-semibold">Cap Table</h3>
 
       <div className="border-border mt-2.5 flex flex-1 items-center justify-center rounded-2xl border shadow-sm hover:shadow">
-        <PieChart width={400} height={400}>
-          <Pie
-            data={CAP_TABLE}
-            cx="50%"
-            cy="50%"
-            labelLine={false}
-            label={renderCustomizedLabel}
-            outerRadius={180}
-            innerRadius={100}
-            fill="#8884d8"
-            dataKey="percentage"
-          >
-            {CAP_TABLE.map((entry, index) => (
-              <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-            ))}
-          </Pie>
-          <Tooltip
-            formatter={(percent: number, name, props) => {
-              return [`${percent}%`, name || props['name'] || props['payload']['name']];
-            }}
-          />
-        </PieChart>
+        {!isSSR && (
+          <PieChart width={400} height={400}>
+            <Pie
+              data={CAP_TABLE}
+              cx="50%"
+              cy="50%"
+              labelLine={false}
+              label={renderCustomizedLabel}
+              outerRadius={180}
+              innerRadius={100}
+              fill="#8884d8"
+              dataKey="percentage"
+            >
+              {CAP_TABLE.map((entry, index) => (
+                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+              ))}
+            </Pie>
+            <Tooltip
+              formatter={(percent: number, name, props) => {
+                return [`${percent}%`, name || props['name'] || props['payload']['name']];
+              }}
+            />
+          </PieChart>
+        )}
       </div>
     </div>
   );

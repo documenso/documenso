@@ -9,6 +9,7 @@ import { cn } from '@documenso/ui/lib/utils';
 
 import { StargazersType } from './page';
 
+export type MetricsDataKey = 'stars' | 'forks' | 'mergedPRs' | 'openIssues';
 export type GithubMetricProps = HTMLAttributes<HTMLDivElement> & {
   data: StargazersType;
   metricKey: MetricsDataKey;
@@ -16,8 +17,6 @@ export type GithubMetricProps = HTMLAttributes<HTMLDivElement> & {
   label: string;
   chartHeight?: number;
 };
-
-export type MetricsDataKey = 'stars' | 'forks' | 'mergedPRs' | 'openIssues';
 
 export const GithubMetric = ({
   className,
@@ -39,9 +38,9 @@ export const GithubMetric = ({
     <div className={cn('flex flex-col', className)} {...props}>
       <h3 className="px-4 text-lg font-semibold">{title}</h3>
 
-      <div className="border-border mt-2.5 flex flex-1 items-center justify-center rounded-2xl border shadow-sm hover:shadow">
+      <div className="border-border mt-2.5 flex flex-1 items-center justify-center rounded-2xl border pr-2 shadow-sm hover:shadow">
         <ResponsiveContainer width="100%" height={chartHeight}>
-          <BarChart data={formattedData} margin={{ top: 40, right: 20 }}>
+          <BarChart data={formattedData} margin={{ top: 30, right: 20 }}>
             <XAxis dataKey="month" />
             <YAxis />
             <Tooltip
