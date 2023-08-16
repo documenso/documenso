@@ -2,7 +2,7 @@
 
 import { HTMLAttributes, useEffect, useState } from 'react';
 
-import { Cell, Pie, PieChart, Tooltip } from 'recharts';
+import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip } from 'recharts';
 
 import { cn } from '@documenso/ui/lib/utils';
 
@@ -53,28 +53,30 @@ export const CapTable = ({ className, ...props }: CapTableProps) => {
 
       <div className="border-border mt-2.5 flex flex-1 items-center justify-center rounded-2xl border shadow-sm hover:shadow">
         {!isSSR && (
-          <PieChart width={400} height={400}>
-            <Pie
-              data={CAP_TABLE}
-              cx="50%"
-              cy="50%"
-              labelLine={false}
-              label={renderCustomizedLabel}
-              outerRadius={180}
-              innerRadius={100}
-              fill="#8884d8"
-              dataKey="percentage"
-            >
-              {CAP_TABLE.map((entry, index) => (
-                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-              ))}
-            </Pie>
-            <Tooltip
-              formatter={(percent: number, name, props) => {
-                return [`${percent}%`, name || props['name'] || props['payload']['name']];
-              }}
-            />
-          </PieChart>
+          <ResponsiveContainer width="100%" height={400}>
+            <PieChart>
+              <Pie
+                data={CAP_TABLE}
+                cx="50%"
+                cy="50%"
+                labelLine={false}
+                label={renderCustomizedLabel}
+                outerRadius={160}
+                innerRadius={80}
+                fill="#8884d8"
+                dataKey="percentage"
+              >
+                {CAP_TABLE.map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                ))}
+              </Pie>
+              <Tooltip
+                formatter={(percent: number, name, props) => {
+                  return [`${percent}%`, name || props['name'] || props['payload']['name']];
+                }}
+              />
+            </PieChart>
+          </ResponsiveContainer>
         )}
       </div>
     </div>
