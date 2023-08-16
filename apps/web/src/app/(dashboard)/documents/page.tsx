@@ -78,7 +78,6 @@ export default async function DocumentsPage({ searchParams = {} }: DocumentsPage
       <div className="mt-8 flex flex-wrap gap-x-4 gap-y-6">
         <Tabs defaultValue={status}>
           <TabsList>
-
             <TabsTrigger className="min-w-[60px]" value={InternalDocumentStatus.PENDING} asChild>
               <Link href={getTabHref(InternalDocumentStatus.PENDING)}>
                 <DocumentStatus status={InternalDocumentStatus.PENDING} />
@@ -121,12 +120,7 @@ export default async function DocumentsPage({ searchParams = {} }: DocumentsPage
       </div>
 
       <div className="mt-8">
-        {/* If we're viewing all documents for all time and there's nuffin we should should show an add document component instead */}
-        {isNoResults ? (
-          <DocumentDropzone className="min-h-[60vh] md:min-h-[40vh]" />
-        ) : (
-          <DocumentsDataTable results={results} />
-        )}
+        <DocumentsDataTable results={results} />
       </div>
     </div>
   );
