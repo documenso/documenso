@@ -70,9 +70,12 @@ export default async function OpenPage() {
       <div className="flex flex-col items-center justify-center">
         <h1 className="text-3xl font-bold lg:text-5xl">Open Startup</h1>
 
-        <p className="text-muted-foreground mt-4 max-w-[55ch] text-center text-lg leading-normal">
+        <p className="text-muted-foreground mt-4 max-w-[60ch] text-center text-lg leading-normal">
           All our metrics, finances, and learnings are public. We believe in transparency and want
-          to share our journey with you.
+          to share our journey with you. You can read more about why here:{' '}
+          <a className="font-bold" href="https://documenso.com//blog/preseed" target="_blank">
+            Announcing Open Metrics
+          </a>
         </p>
       </div>
 
