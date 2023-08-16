@@ -5,7 +5,7 @@
     "dev": "turbo run dev --filter=@documenso/{web,marketing}",
     "start": "cd apps && cd web && next start",
     "lint": "turbo run lint",
-    "format": "prettier --write \"**/*.{ts,tsx,md}\"",
+    "format": "prettier --write \"**/*.{js,jsx,cjs,mjs,ts,tsx,cts,mts,mdx}\"",
     "prepare": "husky install"
   },
   "devDependencies": {
