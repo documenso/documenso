@@ -13,11 +13,6 @@ type FriendlyStatus = {
 };
 
 const FRIENDLY_STATUS_MAP: Record<InternalDocumentStatus, FriendlyStatus> = {
-  DRAFT: {
-    label: 'Draft',
-    icon: File,
-    color: 'text-yellow-500',
-  },
   PENDING: {
     label: 'Pending',
     icon: Clock,
@@ -27,6 +22,11 @@ const FRIENDLY_STATUS_MAP: Record<InternalDocumentStatus, FriendlyStatus> = {
     label: 'Completed',
     icon: CheckCircle2,
     color: 'text-green-500',
+  },
+  DRAFT: {
+    label: 'Draft',
+    icon: File,
+    color: 'text-yellow-500',
   },
 };
 

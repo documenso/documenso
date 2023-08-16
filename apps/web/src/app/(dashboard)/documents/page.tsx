@@ -78,19 +78,6 @@ export default async function DocumentsPage({ searchParams = {} }: DocumentsPage
       <div className="mt-8 flex flex-wrap gap-x-4 gap-y-6">
         <Tabs defaultValue={status}>
           <TabsList>
-            <TabsTrigger className="min-w-[60px]" value="ALL" asChild>
-              <Link href={getTabHref('ALL')}>All</Link>
-            </TabsTrigger>
-
-            <TabsTrigger className="min-w-[60px]" value={InternalDocumentStatus.DRAFT} asChild>
-              <Link href={getTabHref(InternalDocumentStatus.DRAFT)}>
-                <DocumentStatus status={InternalDocumentStatus.DRAFT} />
-
-                <span className="ml-1 hidden opacity-50 md:inline-block">
-                  {Math.min(stats.DRAFT, 99)}
-                </span>
-              </Link>
-            </TabsTrigger>
 
             <TabsTrigger className="min-w-[60px]" value={InternalDocumentStatus.PENDING} asChild>
               <Link href={getTabHref(InternalDocumentStatus.PENDING)}>
@@ -110,6 +97,20 @@ export default async function DocumentsPage({ searchParams = {} }: DocumentsPage
                   {Math.min(stats.COMPLETED, 99)}
                 </span>
               </Link>
+            </TabsTrigger>
+
+            <TabsTrigger className="min-w-[60px]" value={InternalDocumentStatus.DRAFT} asChild>
+              <Link href={getTabHref(InternalDocumentStatus.DRAFT)}>
+                <DocumentStatus status={InternalDocumentStatus.DRAFT} />
+
+                <span className="ml-1 hidden opacity-50 md:inline-block">
+                  {Math.min(stats.DRAFT, 99)}
+                </span>
+              </Link>
+            </TabsTrigger>
+
+            <TabsTrigger className="min-w-[60px]" value="ALL" asChild>
+              <Link href={getTabHref('ALL')}>All</Link>
             </TabsTrigger>
           </TabsList>
         </Tabs>
