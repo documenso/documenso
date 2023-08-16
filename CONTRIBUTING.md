@@ -7,10 +7,11 @@ If you plan to contribute to Documenso, please take a moment to feel awesome ✨
 - Before jumping into a PR be sure to search [existing PRs](https://github.com/documenso/documenso/pulls) or [issues](https://github.com/documenso/documenso/issues) for an open or closed item that relates to your submission.
 - Select and issue from [here](https://github.com/documenso/documenso/issues) or create a new one
 - Consider the results from the discussion in the issue
+- Accept the [Contributor License Agreement](https://documen.so/cla) to ensure we can accept your contributions.
 
 ## Developing
 
-The development branch is <code>main</code>. All pull request should be made against this branch. If you need help getting started, [join us on Slack](https://join.slack.com/t/documenso/shared_invite/zt-1qwxxsvli-nDyojjt~wakhgBGl9JRl2w).
+The development branch is <code>main</code>. All pull request should be made against this branch. If you need help getting started, [join us on Discord](https://documen.so/discord).
 
 1. [Fork](https://help.github.com/articles/fork-a-repo/) this repository to your
    own GitHub account and then
