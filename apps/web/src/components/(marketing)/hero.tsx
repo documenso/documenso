@@ -16,6 +16,7 @@ import { Widget } from './widget';
 
 export type HeroProps = {
   className?: string;
+  starCount?: number;
   [key: string]: unknown;
 };
 
@@ -48,7 +49,7 @@ const HeroTitleVariants: Variants = {
   },
 };
 
-export const Hero = ({ className, ...props }: HeroProps) => {
+export const Hero = ({ className, starCount, ...props }: HeroProps) => {
   const event = usePlausible();
 
   const onSignUpClick = () => {
@@ -109,43 +110,43 @@ export const Hero = ({ className, ...props }: HeroProps) => {
             onClick={onSignUpClick}
           >
             Get the Community Plan
-            <span className="bg-primary -mr-2 ml-2.5 rounded-full px-2 py-1.5 text-xs">
+            <span className="bg-primary -mr-2.5 ml-2.5 rounded-full px-2 py-1.5 text-xs">
               $30/mo. forever!
             </span>
           </Button>
 
-          <Button
-            variant="outline"
-            className="rounded-full bg-transparent backdrop-blur-sm"
-            asChild
-          >
-            <Link
-              href="https://github.com/documenso/documenso"
-              onClick={() => event('view-github')}
-            >
+          <Link href="https://github.com/documenso/documenso" onClick={() => event('view-github')}>
+            <Button variant="outline" className="rounded-full bg-transparent backdrop-blur-sm">
               <Github className="mr-2 h-5 w-5" />
               Star on Github
-            </Link>
-          </Button>
-        </motion.div>
-
-        <motion.div
-          variants={HeroTitleVariants}
-          initial="initial"
-          animate="animate"
-          className="mt-8 flex flex-col items-center justify-center gap-x-6 gap-y-4"
-        >
-          <Link
-            href="https://www.producthunt.com/posts/documenso?utm_source=badge-top-post-badge&utm_medium=badge&utm_souce=badge-documenso"
-            target="_blank"
-          >
-            <img
-              src="https://api.producthunt.com/widgets/embed-image/v1/top-post-badge.svg?post_id=395047&theme=light&period=daily"
-              alt="Documenso - The open source DocuSign alternative | Product Hunt"
-              style={{ width: '250px', height: '54px' }}
-            />
+              {starCount && starCount > 0 && (
+                <span className="bg-primary -mr-2.5 ml-2.5 rounded-full px-2 py-1.5 text-xs">
+                  {starCount.toLocaleString('en-US')}
+                </span>
+              )}
+            </Button>
           </Link>
         </motion.div>
+
+        <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-6">
+          <motion.div
+            variants={HeroTitleVariants}
+            initial="initial"
+            animate="animate"
+            className="mt-8 flex flex-col items-center justify-center gap-x-6 gap-y-4"
+          >
+            <Link
+              href="https://www.producthunt.com/posts/documenso?utm_source=badge-top-post-badge&utm_medium=badge&utm_souce=badge-documenso"
+              target="_blank"
+            >
+              <img
+                src="https://api.producthunt.com/widgets/embed-image/v1/top-post-badge.svg?post_id=395047&theme=light&period=daily"
+                alt="Documenso - The open source DocuSign alternative | Product Hunt"
+                style={{ width: '250px', height: '54px' }}
+              />
+            </Link>
+          </motion.div>
+        </div>
 
         <motion.div
           className="mt-12"
