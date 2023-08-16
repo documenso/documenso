@@ -18,6 +18,7 @@ import {
 } from '~/components/(dashboard)/period-selector/types';
 import { DocumentStatus } from '~/components/formatter/document-status';
 
+import { UploadDocument } from '../dashboard/upload-document';
 import { DocumentsDataTable } from './data-table';
 
 export type DocumentsPageProps = {
@@ -72,8 +73,8 @@ export default async function DocumentsPage({ searchParams = {} }: DocumentsPage
 
   return (
     <div className="mx-auto w-full max-w-screen-xl px-4 md:px-8">
-      <h1 className="text-4xl font-semibold">All Documents</h1>
-
+      <UploadDocument />
+      <h1 className="mt-12 text-4xl font-semibold">Documents</h1>
       <div className="mt-8 flex flex-wrap gap-x-4 gap-y-6">
         <Tabs defaultValue={status}>
           <TabsList>
@@ -115,16 +116,11 @@ export default async function DocumentsPage({ searchParams = {} }: DocumentsPage
 
         <div className="flex flex-1 flex-wrap items-center justify-between gap-x-2 gap-y-4">
           <PeriodSelector />
-
-          <Button>
-            <Plus className="-ml-1 mr-2 h-5 w-5" />
-            Add Document
-          </Button>
         </div>
       </div>
 
       <div className="mt-8">
-        {/* If we're viewing all documents for all time and there's nuffin we should should an add document component instead */}
+        {/* If we're viewing all documents for all time and there's nuffin we should should show an add document component instead */}
         {isNoResults ? (
           <DocumentDropzone className="min-h-[60vh] md:min-h-[40vh]" />
         ) : (
