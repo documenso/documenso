@@ -44,7 +44,7 @@ export const SignInForm = ({ className }: SignInFormProps) => {
       await signIn('credentials', {
         email,
         password,
-        callbackUrl: '/dashboard',
+        callbackUrl: '/documents',
       }).catch((err) => {
         console.error(err);
       });
