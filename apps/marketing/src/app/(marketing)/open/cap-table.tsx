@@ -19,6 +19,7 @@ export type LabelRenderProps = {
   outerRadius: number;
   percent: number;
 };
+
 const renderCustomizedLabel = ({
   cx,
   cy,
