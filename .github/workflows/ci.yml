@@ -38,4 +38,4 @@ jobs:
         if: steps.cache.outputs.cache-hit != 'true'
         run: npm ci
       - name: Build
-        run: npm run build --workspaces
+        run: npm run build
