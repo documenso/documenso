@@ -2,7 +2,7 @@
 
 import { HTMLAttributes, useEffect, useState } from 'react';
 
-import { Cell, Pie, PieChart, Tooltip } from 'recharts';
+import { Cell, Legend, Pie, PieChart, Tooltip } from 'recharts';
 
 import { cn } from '@documenso/ui/lib/utils';
 
@@ -69,6 +69,7 @@ export const CapTable = ({ className, ...props }: CapTableProps) => {
                 <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
               ))}
             </Pie>
+            <Legend />
             <Tooltip
               formatter={(percent: number, name, props) => {
                 return [`${percent}%`, name || props['name'] || props['payload']['name']];
