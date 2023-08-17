@@ -69,7 +69,11 @@ export const CapTable = ({ className, ...props }: CapTableProps) => {
                 <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
               ))}
             </Pie>
-            <Legend />
+            <Legend
+              formatter={(value) => {
+                return <span className="text-sm text-black">{value}</span>;
+              }}
+            />
             <Tooltip
               formatter={(percent: number, name, props) => {
                 return [`${percent}%`, name || props['name'] || props['payload']['name']];
