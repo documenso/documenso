@@ -13,15 +13,19 @@ import { StackAvatars } from './stack-avatars';
 
 export const StackAvatarsWithTooltip = ({ recipients }: { recipients: Recipient[] }) => {
   const waitingRecipients = recipients.filter(
-    (recipient) => recipient.sendStatus === 'SENT' && recipient.signingStatus === 'NOT_SIGNED',
+    (recipient) => getRecipientType(recipient) === 'waiting',
+  );
+
+  const openedRecipients = recipients.filter(
+    (recipient) => getRecipientType(recipient) === 'opened',
   );
 
   const completedRecipients = recipients.filter(
-    (recipient) => recipient.sendStatus === 'SENT' && recipient.signingStatus === 'SIGNED',
+    (recipient) => getRecipientType(recipient) === 'completed',
   );
 
   const uncompletedRecipients = recipients.filter(
-    (recipient) => recipient.sendStatus === 'NOT_SENT' && recipient.signingStatus === 'NOT_SIGNED',
+    (recipient) => getRecipientType(recipient) === 'unsigned',
   );
 
   return (
@@ -53,6 +57,23 @@ export const StackAvatarsWithTooltip = ({ recipients }: { recipients: Recipient[
               <div>
                 <h1 className="text-base font-medium">Waiting</h1>
                 {waitingRecipients.map((recipient: Recipient) => (
+                  <div key={recipient.id} className="my-1 flex items-center gap-2">
+                    <StackAvatar
+                      first={true}
+                      key={recipient.id}
+                      type={getRecipientType(recipient)}
+                      fallbackText={initials(recipient.name)}
+                    />
+                    <span className="text-sm text-gray-500">{recipient.email}</span>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {openedRecipients.length > 0 && (
+              <div>
+                <h1 className="text-base font-medium">Opened</h1>
+                {openedRecipients.map((recipient: Recipient) => (
                   <div key={recipient.id} className="my-1 flex items-center gap-2">
                     <StackAvatar
                       first={true}

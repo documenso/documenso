@@ -12,7 +12,7 @@ export type StackAvatarProps = {
   first?: boolean;
   zIndex?: string;
   fallbackText?: string;
-  type: 'unsigned' | 'waiting' | 'completed';
+  type: 'unsigned' | 'waiting' | 'opened' | 'completed';
 };
 
 export const StackAvatar = ({ first, zIndex, fallbackText, type }: StackAvatarProps) => {
@@ -27,6 +27,9 @@ export const StackAvatar = ({ first, zIndex, fallbackText, type }: StackAvatarPr
   switch (type) {
     case 'unsigned':
       classes = 'bg-dawn-200 text-dawn-900';
+      break;
+    case 'opened':
+      classes = 'bg-yellow-200 text-yellow-700';
       break;
     case 'waiting':
       classes = 'bg-water text-water-700';
