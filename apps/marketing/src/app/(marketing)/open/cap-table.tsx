@@ -60,8 +60,8 @@ export const CapTable = ({ className, ...props }: CapTableProps) => {
               cy="50%"
               labelLine={false}
               label={renderCustomizedLabel}
-              outerRadius={180}
-              innerRadius={100}
+              outerRadius={160}
+              innerRadius={80}
               fill="#8884d8"
               dataKey="percentage"
             >
