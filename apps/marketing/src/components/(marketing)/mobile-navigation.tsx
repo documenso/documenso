@@ -1,0 +1,153 @@
+'use client';
+
+import Image from 'next/image';
+import Link from 'next/link';
+
+import { Variants, motion } from 'framer-motion';
+import { Github, Slack, Twitter } from 'lucide-react';
+
+import { cn } from '@documenso/ui/lib/utils';
+
+import backgroundPattern from '~/assets/background-pattern.png';
+
+export type MobileNavigationProps = {
+  isMenuOpen: boolean;
+  className?: string;
+};
+
+const itemVariants: Variants = {
+  open: {
+    opacity: 1,
+    y: 0,
+    x: 0,
+    transition: { type: 'spring', stiffness: 300, damping: 24 },
+  },
+  closed: { opacity: 0, y: 0, x: 60, transition: { duration: 0.2 } },
+  exit: {
+    opacity: 0,
+    y: 0,
+    x: 60,
+    transition: { duration: 0.2 },
+  },
+};
+
+export const MobileNavigation = ({ isMenuOpen }: MobileNavigationProps) => {
+  // used for testing alternate animations
+  // const vertical = `${!isMenuOpen ? '-translate-y-full' : 'translate-y-0'}`;
+  const horizontal = `${!isMenuOpen ? 'translate-x-full' : 'translate-x-0'}`;
+
+  return (
+    <motion.div
+      animate={isMenuOpen ? 'open' : 'closed'}
+      className={cn(
+        horizontal,
+        'bg-secondary fixed left-0 right-0 top-16 z-10 flex h-[94dvh] w-full transform flex-col items-start justify-start gap-4 shadow-md backdrop-blur-lg transition duration-500 ease-in-out md:hidden',
+      )}
+      variants={{
+        open: {
+          transition: {
+            type: 'spring',
+            bounce: 0,
+            duration: 0.7,
+            delayChildren: 0.3,
+            staggerChildren: 0.05,
+          },
+        },
+        closed: {
+          transition: {
+            type: 'spring',
+            bounce: 0,
+            duration: 0.3,
+          },
+        },
+        exit: {
+          transition: {
+            type: 'spring',
+            bounce: 0,
+            duration: 0.3,
+          },
+        },
+      }}
+    >
+      <motion.div className="flex w-full flex-col items-start gap-y-2 px-8 pt-12">
+        <Link
+          passHref
+          href="/blog"
+          className="text-4xl font-semibold text-[#8D8D8D] hover:text-[#6D6D6D]"
+        >
+          <motion.p variants={itemVariants}>Blog</motion.p>
+        </Link>
+
+        <Link
+          href="/pricing"
+          className="text-4xl font-semibold text-[#8D8D8D] hover:text-[#6D6D6D]"
+        >
+          <motion.p variants={itemVariants}>Pricing</motion.p>
+        </Link>
+
+        <Link
+          href="https://status.documenso.com"
+          target="_blank"
+          className="text-4xl font-semibold text-[#8D8D8D] hover:text-[#6D6D6D]"
+        >
+          <motion.p variants={itemVariants}>Status</motion.p>
+        </Link>
+
+        <Link
+          href="mailto:support@documenso.com"
+          className="text-4xl font-semibold text-[#8D8D8D] hover:text-[#6D6D6D]"
+        >
+          <motion.p variants={itemVariants}>Support</motion.p>
+        </Link>
+
+        <Link
+          href="/privacy"
+          className="text-4xl font-semibold text-[#8D8D8D] hover:text-[#6D6D6D]"
+        >
+          <motion.p variants={itemVariants}>Privacy</motion.p>
+        </Link>
+
+        <Link
+          href="https://app.documenso.com/login"
+          target="_blank"
+          className="text-4xl font-semibold text-[#8D8D8D] hover:text-[#6D6D6D]"
+        >
+          <motion.p variants={itemVariants}>Sign in</motion.p>
+        </Link>
+      </motion.div>
+
+      <div className="mx-auto mt-8 flex w-full flex-wrap items-center justify-center gap-x-4 gap-y-4 ">
+        <Link
+          href="https://twitter.com/documenso"
+          target="_blank"
+          className="text-[#8D8D8D] hover:text-[#6D6D6D]"
+        >
+          <Twitter className="h-8 w-8" />
+        </Link>
+
+        <Link
+          href="https://github.com/documenso/documenso"
+          target="_blank"
+          className="text-[#8D8D8D] hover:text-[#6D6D6D]"
+        >
+          <Github className="h-8 w-8" />
+        </Link>
+
+        <Link
+          href="https://documenso.slack.com"
+          target="_blank"
+          className="text-[#8D8D8D] hover:text-[#6D6D6D]"
+        >
+          <Slack className="h-8 w-8" />
+        </Link>
+      </div>
+      <div className="absolute inset-0 -z-10 flex items-start justify-center">
+        <Image
+          src={backgroundPattern}
+          alt="background pattern"
+          className="-mr-[15vw] -mt-[15vh] h-full max-h-[150vh] scale-125 object-cover md:-mr-[50vw] md:scale-150 lg:scale-[175%]"
+        />
+      </div>
+    </motion.div>
+  );
+};
