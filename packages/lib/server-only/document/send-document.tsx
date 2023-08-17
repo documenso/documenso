@@ -48,12 +48,15 @@ export const sendDocument = async ({ documentId, userId }: SendDocumentOptions) 
         return;
       }
 
+      const assetBaseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
+      const signDocumentLink = `${process.env.NEXT_PUBLIC_SITE_URL}/sign/${recipient.token}`;
+
       const template = createElement(DocumentInviteEmailTemplate, {
         documentName: document.title,
-        assetBaseUrl: process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000',
         inviterName: user.name || undefined,
         inviterEmail: user.email,
-        signDocumentLink: 'https://example.com',
+        assetBaseUrl,
+        signDocumentLink,
       });
 
       mailer.sendMail({
