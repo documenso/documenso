@@ -5,17 +5,20 @@ import { HTMLAttributes, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 
-import { Menu, X } from 'lucide-react';
-
 import { cn } from '@documenso/ui/lib/utils';
-import { Button } from '@documenso/ui/primitives/button';
 
+import { HamburgerMenu } from './mobile-hamburger';
 import { MobileNavigation } from './mobile-navigation';
 
 export type HeaderProps = HTMLAttributes<HTMLElement>;
 
 export const Header = ({ className, ...props }: HeaderProps) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState<boolean>(false);
+
+  const handleMenuToggle = () => {
+    setIsMobileMenuOpen(!isMobileMenuOpen);
+  };
+
   return (
     <header className={cn('flex items-center justify-between', className)} {...props}>
       <Link href="/">
@@ -40,15 +43,7 @@ export const Header = ({ className, ...props }: HeaderProps) => {
         </Link>
       </div>
 
-      <div className="flex md:hidden">
-        <Button
-          variant="default"
-          className="z-20 w-10 p-0"
-          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-        >
-          {isMobileMenuOpen ? <X /> : <Menu />}
-        </Button>
-      </div>
+      <HamburgerMenu menuToggle={handleMenuToggle} isMenuOpen={isMobileMenuOpen} />
       <MobileNavigation isMenuOpen={isMobileMenuOpen} />
     </header>
   );
