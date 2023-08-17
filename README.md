@@ -65,7 +65,7 @@ We're currently working on a redesign of the application including a revamp of t
 
 - Check out the first source code release in this repository and test it
 - Tell us what you think in the current [Discussions](https://github.com/documenso/documenso/discussions)
-- Join the [Slack Channel](https://documen.so/slack) for any questions and getting to know to other community members
+- Join the [Discord server](https://documen.so/discord) for any questions and getting to know to other community members
 - ⭐ the repository to help us raise awareness
 - Spread the word on Twitter, that Documenso is working towards a more open signing tool
 - Fix or create [issues](https://github.com/documenso/documenso/issues), that are needed for the first production release
