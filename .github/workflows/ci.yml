@@ -22,20 +22,8 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: 18
-      - name: Get npm cache directory
-        shell: bash
-        run: |
-          echo "CACHE_PATH=$(npm config get cache)" >> $GITHUB_ENV
-      - name: Setup npm cache
-        id: cache
-        uses: actions/cache@v3
-        with:
-          path: ${{ env.CACHE_PATH }}
-          key: ${{ runner.os }}-npm-cache-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-npm-cache-
+          cache: npm
       - name: Install dependencies
-        if: steps.cache.outputs.cache-hit != 'true'
         run: npm ci
       - name: Build
         run: npm run build
