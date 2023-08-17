@@ -15,12 +15,16 @@ export const Header = ({ className, ...props }: HeaderProps) => {
       </Link>
 
       <div className="flex items-center gap-x-6">
-        <Link href="/blog" className="text-sm font-semibold text-[#8D8D8D] hover:text-[#6D6D6D]">
+        <Link href="/pricing" className="flex-shrink-0 text-sm text-[#8D8D8D] hover:text-[#6D6D6D]">
+          Pricing
+        </Link>
+
+        <Link href="/blog" className="flex-shrink-0 text-sm text-[#8D8D8D] hover:text-[#6D6D6D]">
           Blog
         </Link>
 
-        <Link href="/pricing" className="text-sm font-semibold text-[#8D8D8D] hover:text-[#6D6D6D]">
-          Pricing
+        <Link href="/open" className="flex-shrink-0 text-sm text-[#8D8D8D] hover:text-[#6D6D6D]">
+          Open
         </Link>
 
         <Link
