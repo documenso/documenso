@@ -3,6 +3,8 @@
   "version": "0.0.0",
   "scripts": {
     "changeset": "changeset",
+    "publish": "changeset publish",
+    "version": "changeset version",
     "dev": "turbo run dev --filter=web",
     "build": "turbo run build --filter=web",
     "start": "turbo run start --filter=web",
