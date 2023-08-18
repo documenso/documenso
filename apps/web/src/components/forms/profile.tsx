@@ -1,5 +1,7 @@
 'use client';
 
+import { useRouter } from 'next/navigation';
+
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Loader } from 'lucide-react';
 import { Controller, useForm } from 'react-hook-form';
@@ -30,6 +32,8 @@ export type ProfileFormProps = {
 };
 
 export const ProfileForm = ({ className, user }: ProfileFormProps) => {
+  const router = useRouter();
+
   const { toast } = useToast();
 
   const {
@@ -59,6 +63,8 @@ export const ProfileForm = ({ className, user }: ProfileFormProps) => {
         description: 'Your profile has been updated successfully.',
         duration: 5000,
       });
+
+      router.refresh();
     } catch (err) {
       if (err instanceof TRPCClientError && err.data?.code === 'BAD_REQUEST') {
         toast({

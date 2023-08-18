@@ -8,6 +8,7 @@ import { NEXT_AUTH_OPTIONS } from '@documenso/lib/next-auth/auth-options';
 import { getRequiredServerComponentSession } from '@documenso/lib/next-auth/get-server-session';
 
 import { Header } from '~/components/(dashboard)/layout/header';
+import { RefreshOnFocus } from '~/components/(dashboard)/refresh-on-focus/refresh-on-focus';
 import { NextAuthProvider } from '~/providers/next-auth';
 
 export type AuthenticatedDashboardLayoutProps = {
@@ -30,6 +31,8 @@ export default async function AuthenticatedDashboardLayout({
       <Header user={user} />
 
       <main className="mt-8 pb-8 md:mt-12 md:pb-12">{children}</main>
+
+      <RefreshOnFocus />
     </NextAuthProvider>
   );
 }
