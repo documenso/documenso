@@ -6,19 +6,25 @@ import { Menu, X } from 'lucide-react';
 
 import { Button } from '@documenso/ui/primitives/button';
 
+import { useWindowSize } from '~/hooks/use-window-size';
+
 export interface HamburgerMenuProps {
   isMenuOpen: boolean;
   menuToggle: () => void;
 }
 
 export const HamburgerMenu = ({ isMenuOpen, menuToggle }: HamburgerMenuProps) => {
+  const { width } = useWindowSize();
+
   useEffect(() => {
     // Update document.body.style.overflow based on the menu state
-    // and check that the window width is less than 768px
-    // if (window.innerWidth < 768) {
-    // document.body.style.overflow = isMenuOpen ? 'hidden' : 'auto';
-    // }
-  }, [isMenuOpen]);
+    // If the window width is less than 768px, we want to prevent scrolling when the menu is open
+    if (width < 768 && isMenuOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'auto';
+    }
+  }, [isMenuOpen, width]);
 
   return (
     <div className="flex md:hidden">
