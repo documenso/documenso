@@ -5,13 +5,19 @@
     "dev": "turbo run dev --filter=@documenso/{web,marketing}",
     "start": "cd apps && cd web && next start",
     "lint": "turbo run lint",
-    "format": "prettier --write \"**/*.{ts,tsx,md}\""
+    "format": "prettier --write \"**/*.{js,jsx,cjs,mjs,ts,tsx,cts,mts,mdx}\"",
+    "prepare": "husky install",
+    "commitlint": "commitlint --edit"
   },
   "devDependencies": {
+    "@commitlint/cli": "^17.7.1",
+    "@commitlint/config-conventional": "^17.7.0",
     "dotenv": "^16.0.3",
     "dotenv-cli": "^7.2.1",
     "eslint": "^7.32.0",
     "eslint-config-custom": "*",
+    "husky": "^8.0.0",
+    "lint-staged": "^14.0.0",
     "prettier": "^2.5.1",
     "turbo": "^1.9.3"
   },
@@ -20,5 +26,8 @@
   "workspaces": [
     "apps/*",
     "packages/*"
-  ]
+  ],
+  "dependencies": {
+    "recharts": "^2.7.2"
+  }
 }

@@ -1,6 +1,7 @@
-import { Inter } from 'next/font/google';
+import { Caveat, Inter } from 'next/font/google';
 
 import { TrpcProvider } from '@documenso/trpc/react';
+import { cn } from '@documenso/ui/lib/utils';
 import { Toaster } from '@documenso/ui/primitives/toaster';
 import { TooltipProvider } from '@documenso/ui/primitives/tooltip';
 
@@ -10,6 +11,7 @@ import { PlausibleProvider } from '~/providers/plausible';
 import './globals.css';
 
 const fontInter = Inter({ subsets: ['latin'], variable: '--font-sans' });
+const fontCaveat = Caveat({ subsets: ['latin'], variable: '--font-signature' });
 
 export const metadata = {
   title: 'Documenso - The Open Source DocuSign Alternative',
@@ -37,7 +39,11 @@ export const metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={fontInter.variable} suppressHydrationWarning>
+    <html
+      lang="en"
+      className={cn(fontInter.variable, fontCaveat.variable)}
+      suppressHydrationWarning
+    >
       <head>
         <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
         <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />

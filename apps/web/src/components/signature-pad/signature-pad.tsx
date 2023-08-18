@@ -24,7 +24,12 @@ export type SignaturePadProps = Omit<HTMLAttributes<HTMLCanvasElement>, 'onChang
   onChange?: (_signatureDataUrl: string | null) => void;
 };
 
-export const SignaturePad = ({ className, onChange, ...props }: SignaturePadProps) => {
+export const SignaturePad = ({
+  className,
+  defaultValue,
+  onChange,
+  ...props
+}: SignaturePadProps) => {
   const $el = useRef<HTMLCanvasElement>(null);
 
   const [isPressed, setIsPressed] = useState(false);
@@ -127,7 +132,7 @@ export const SignaturePad = ({ className, onChange, ...props }: SignaturePadProp
       setPoints(newPoints);
     }
 
-    if ($el.current) {
+    if ($el.current && newPoints.length > 0) {
       const ctx = $el.current.getContext('2d');
 
       if (ctx) {
@@ -188,6 +193,23 @@ export const SignaturePad = ({ className, onChange, ...props }: SignaturePadProp
     }
   }, []);
 
+  useEffect(() => {
+    console.log({ defaultValue });
+    if ($el.current && typeof defaultValue === 'string') {
+      const ctx = $el.current.getContext('2d');
+
+      const { width, height } = $el.current;
+
+      const img = new Image();
+
+      img.onload = () => {
+        ctx?.drawImage(img, 0, 0, Math.min(width, img.width), Math.min(height, img.height));
+      };
+
+      img.src = defaultValue;
+    }
+  }, [defaultValue]);
+
   return (
     <div className="relative block">
       <canvas
@@ -202,10 +224,10 @@ export const SignaturePad = ({ className, onChange, ...props }: SignaturePadProp
         {...props}
       />
 
-      <div className="absolute bottom-2 right-2">
+      <div className="absolute bottom-4 right-4">
         <button
           type="button"
-          className="focus-visible:ring-ring ring-offset-background rounded-full p-2 text-xs text-slate-500 focus-visible:outline-none focus-visible:ring-2"
+          className="focus-visible:ring-ring ring-offset-background rounded-full p-0 text-xs text-slate-500 focus-visible:outline-none focus-visible:ring-2"
           onClick={() => onClearClick()}
         >
           Clear Signature
