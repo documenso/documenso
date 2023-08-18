@@ -2,6 +2,7 @@
   "name": "documenso-monorepo",
   "version": "0.0.0",
   "scripts": {
+    "changeset": "changeset",
     "dev": "turbo run dev --filter=web",
     "build": "turbo run build --filter=web",
     "start": "turbo run start --filter=web",
@@ -23,6 +24,7 @@
     "seed": "ts-node --transpile-only ./packages/prisma/seed.ts"
   },
   "dependencies": {
+    "@changesets/cli": "^2.26.2",
     "@documenso/prisma": "*",
     "@headlessui/react": "^1.7.4",
     "@heroicons/react": "^2.0.13",
