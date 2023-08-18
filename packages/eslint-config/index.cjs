@@ -29,7 +29,7 @@ module.exports = {
   rules: {
     'react/no-unescaped-entities': 'off',
 
-    'no-unused-vars': ['warn', { argsIgnorePattern: '^_' }],
+    'no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
     '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
 
     // We never want to use `as` but are required to on occasion to handle
