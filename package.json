@@ -43,7 +43,6 @@
     "zod": "^3.21.4"
   },
   "devDependencies": {
-    "@changesets/changelog-github": "^0.4.8",
     "@changesets/cli": "^2.26.2",
     "@tailwindcss/forms": "^0.5.3",
     "@trivago/prettier-plugin-sort-imports": "^4.1.1",
