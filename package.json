@@ -9,6 +9,8 @@
     "prepare": "husky install"
   },
   "devDependencies": {
+    "@commitlint/cli": "^17.7.1",
+    "@commitlint/config-conventional": "^17.7.0",
     "dotenv": "^16.0.3",
     "dotenv-cli": "^7.2.1",
     "eslint": "^7.32.0",
