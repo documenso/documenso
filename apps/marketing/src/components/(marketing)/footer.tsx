@@ -46,15 +46,19 @@ export const Footer = ({ className, ...props }: FooterProps) => {
         </div>
 
         <div className="flex flex-wrap items-center gap-x-4 gap-y-2.5">
-          <Link href="/blog" className="flex-shrink-0 text-sm text-[#8D8D8D] hover:text-[#6D6D6D]">
-            Blog
-          </Link>
-
           <Link
             href="/pricing"
             className="flex-shrink-0 text-sm text-[#8D8D8D] hover:text-[#6D6D6D]"
           >
             Pricing
+          </Link>
+
+          <Link href="/blog" className="flex-shrink-0 text-sm text-[#8D8D8D] hover:text-[#6D6D6D]">
+            Blog
+          </Link>
+
+          <Link href="/open" className="flex-shrink-0 text-sm text-[#8D8D8D] hover:text-[#6D6D6D]">
+            Open
           </Link>
 
           <Link
