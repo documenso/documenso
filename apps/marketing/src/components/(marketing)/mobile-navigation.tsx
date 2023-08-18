@@ -12,11 +12,47 @@ import backgroundPattern from '~/assets/background-pattern.png';
 
 export type MobileNavigationProps = {
   isMenuOpen: boolean;
-  className?: string;
+  menuToggle: () => void;
 };
 
-export const MobileNavigation = ({ isMenuOpen }: MobileNavigationProps) => {
+export interface MenuNavigationLinksProps {
+  href: string;
+  text: string;
+}
+
+export const MenuNavigationLinks = [
+  {
+    href: '/blog',
+    text: 'Blog',
+  },
+  {
+    href: '/pricing',
+    text: 'Pricing',
+  },
+  {
+    href: 'https://status.documenso.com',
+    text: 'Status',
+  },
+  {
+    href: 'mailto:support@documenso.com',
+    text: 'Support',
+  },
+  {
+    href: '/privacy',
+    text: 'Privacy',
+  },
+  {
+    href: 'https://app.documenso.com/login',
+    text: 'Sign in',
+  },
+];
+
+export const MobileNavigation = ({ isMenuOpen, menuToggle }: MobileNavigationProps) => {
   const shouldReduceMotion = useReducedMotion();
+
+  const handleMenuItemClick = () => {
+    menuToggle();
+  };
 
   const itemVariants: Variants = {
     open: {
@@ -71,51 +107,18 @@ export const MobileNavigation = ({ isMenuOpen }: MobileNavigationProps) => {
         },
       }}
     >
-      <motion.div className="flex w-full flex-col items-center gap-y-2 px-8 pt-12">
-        <Link
-          passHref
-          href="/blog"
-          className="text-4xl font-semibold text-[#6D6D6D] hover:text-[#6D6D6D]"
-        >
-          <motion.p variants={itemVariants}>Blog</motion.p>
-        </Link>
-
-        <Link
-          href="/pricing"
-          className="text-4xl font-semibold text-[#6D6D6D] hover:text-[#6D6D6D]"
-        >
-          <motion.p variants={itemVariants}>Pricing</motion.p>
-        </Link>
-
-        <Link
-          href="https://status.documenso.com"
-          target="_blank"
-          className="text-4xl font-semibold text-[#6D6D6D] hover:text-[#6D6D6D]"
-        >
-          <motion.p variants={itemVariants}>Status</motion.p>
-        </Link>
-
-        <Link
-          href="mailto:support@documenso.com"
-          className="text-4xl font-semibold text-[#6D6D6D] hover:text-[#6D6D6D]"
-        >
-          <motion.p variants={itemVariants}>Support</motion.p>
-        </Link>
-
-        <Link
-          href="/privacy"
-          className="text-4xl font-semibold text-[#6D6D6D] hover:text-[#6D6D6D]"
-        >
-          <motion.p variants={itemVariants}>Privacy</motion.p>
-        </Link>
-
-        <Link
-          href="https://app.documenso.com/login"
-          target="_blank"
-          className="text-4xl font-semibold text-[#6D6D6D] hover:text-[#6D6D6D]"
-        >
-          <motion.p variants={itemVariants}>Sign in</motion.p>
-        </Link>
+      <motion.div className="flex w-full flex-col items-center gap-y-4 px-8 pt-12">
+        {MenuNavigationLinks.map((link: MenuNavigationLinksProps) => (
+          <Link
+            key={link.href}
+            passHref
+            onClick={() => handleMenuItemClick()}
+            href={link.href}
+            className="text-4xl font-semibold text-[#8D8D8D] hover:text-[#6D6D6D]"
+          >
+            <motion.p variants={itemVariants}>{link.text}</motion.p>
+          </Link>
+        ))}
       </motion.div>
 
       <div className="mx-auto mt-8 flex w-full flex-wrap items-center justify-center gap-x-4 gap-y-4 ">
@@ -147,7 +150,7 @@ export const MobileNavigation = ({ isMenuOpen }: MobileNavigationProps) => {
         <Image
           src={backgroundPattern}
           alt="background pattern"
-          className="-mr-[15vw] -mt-[15vh] h-full max-h-[150vh] scale-125 object-cover md:-mr-[50vw] md:scale-150 lg:scale-[175%]"
+          className="-mr-[15vw] mt-[12vh] h-full max-h-[150vh] scale-125 object-cover md:-mr-[50vw] md:scale-150 lg:scale-[175%]"
         />
       </div>
     </motion.div>

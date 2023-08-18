@@ -13,15 +13,15 @@ import { MobileNavigation } from './mobile-navigation';
 export type HeaderProps = HTMLAttributes<HTMLElement>;
 
 export const Header = ({ className, ...props }: HeaderProps) => {
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState<boolean>(false);
+  const [isMobileOpen, setIsMobileOpen] = useState<boolean>(false);
 
   const handleMenuToggle = () => {
-    setIsMobileMenuOpen(!isMobileMenuOpen);
+    setIsMobileOpen(!isMobileOpen);
   };
 
   return (
     <header className={cn('flex items-center justify-between', className)} {...props}>
-      <Link href="/">
+      <Link href="/" className="z-10" onClick={() => isMobileOpen && handleMenuToggle()}>
         <Image src="/logo.png" alt="Documenso Logo" width={170} height={0}></Image>
       </Link>
 
@@ -43,8 +43,8 @@ export const Header = ({ className, ...props }: HeaderProps) => {
         </Link>
       </div>
 
-      <HamburgerMenu menuToggle={handleMenuToggle} isMenuOpen={isMobileMenuOpen} />
-      <MobileNavigation isMenuOpen={isMobileMenuOpen} />
+      <HamburgerMenu menuToggle={handleMenuToggle} isMenuOpen={isMobileOpen} />
+      <MobileNavigation isMenuOpen={isMobileOpen} menuToggle={handleMenuToggle} />
     </header>
   );
 };
