@@ -6,7 +6,8 @@
     "start": "cd apps && cd web && next start",
     "lint": "turbo run lint",
     "format": "prettier --write \"**/*.{js,jsx,cjs,mjs,ts,tsx,cts,mts,mdx}\"",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "commitlint": "commitlint --edit"
   },
   "devDependencies": {
     "@commitlint/cli": "^17.7.1",
