@@ -1,15 +1,17 @@
 import { redirect } from 'next/navigation';
 
-import { IS_SUBSCRIPTIONS_ENABLED } from '@documenso/lib/constants/features';
 import { getRequiredServerComponentSession } from '@documenso/lib/next-auth/get-server-session';
 
 import { PasswordForm } from '~/components/forms/password';
+import { getServerComponentFlag } from '~/helpers/get-server-component-feature-flag';
 
 export default async function BillingSettingsPage() {
   const user = await getRequiredServerComponentSession();
 
+  const isBillingEnabled = await getServerComponentFlag('billing');
+
   // Redirect if subscriptions are not enabled.
-  if (!IS_SUBSCRIPTIONS_ENABLED) {
+  if (!isBillingEnabled) {
     redirect('/settings/profile');
   }
 

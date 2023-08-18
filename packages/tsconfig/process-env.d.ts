@@ -13,8 +13,6 @@ declare namespace NodeJS {
     NEXT_PRIVATE_STRIPE_API_KEY: string;
     NEXT_PRIVATE_STRIPE_WEBHOOK_SECRET: string;
 
-    NEXT_PUBLIC_SUBSCRIPTIONS_ENABLED: string;
-
     NEXT_PRIVATE_SMTP_TRANSPORT?: 'mailchannels' | 'smtp-auth' | 'smtp-api';
 
     NEXT_PRIVATE_MAILCHANNELS_API_KEY?: string;
