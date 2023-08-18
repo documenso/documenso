@@ -1,6 +1,8 @@
 import { isENVProd } from "@documenso/lib";
 import { Document, PrismaClient, User } from "@prisma/client";
 
+import { sanitizeDocumentTitleMiddleware } from "./middleware";
+
 declare global {
   var client: PrismaClient | undefined;
 }
@@ -12,5 +14,8 @@ const prisma = globalThis.client || new PrismaClient();
 if (!isENVProd) {
   globalThis.client = prisma;
 }
+
+// If any change on middleware, server restart is required
+sanitizeDocumentTitleMiddleware(prisma);
 
 export default prisma;
