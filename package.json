@@ -2,6 +2,9 @@
   "name": "documenso-monorepo",
   "version": "0.0.0",
   "scripts": {
+    "changeset": "changeset",
+    "publish": "changeset publish",
+    "version": "changeset version",
     "dev": "turbo run dev --filter=web",
     "build": "turbo run build --filter=web",
     "start": "turbo run start --filter=web",
@@ -40,6 +43,7 @@
     "zod": "^3.21.4"
   },
   "devDependencies": {
+    "@changesets/cli": "^2.26.2",
     "@tailwindcss/forms": "^0.5.3",
     "@trivago/prettier-plugin-sort-imports": "^4.1.1",
     "@types/bcryptjs": "^2.4.2",
