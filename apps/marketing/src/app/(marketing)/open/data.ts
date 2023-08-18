@@ -56,11 +56,11 @@ export const FUNDING_RAISED = [
   },
   {
     date: '2023-05',
-    amount: 300_000,
+    amount: 290_000,
   },
   {
     date: '2023-07',
-    amount: 1_550_000,
+    amount: 1_540_000,
   },
 ];
 
