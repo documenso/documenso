@@ -2,8 +2,13 @@
   "$schema": "https://turbo.build/schema.json",
   "pipeline": {
     "build": {
-      "dependsOn": ["^build"],
-      "outputs": [".next/**", "!.next/cache/**"]
+      "dependsOn": [
+        "^build"
+      ],
+      "outputs": [
+        ".next/**",
+        "!.next/cache/**"
+      ]
     },
     "lint": {},
     "dev": {
@@ -11,14 +16,20 @@
       "persistent": true
     }
   },
-  "globalDependencies": ["**/.env.*local"],
+  "globalDependencies": [
+    "**/.env.*local"
+  ],
   "globalEnv": [
     "NEXTAUTH_URL",
     "NEXTAUTH_SECRET",
     "NEXT_PUBLIC_SITE_URL",
+    "NEXT_PUBLIC_POSTHOG_KEY",
+    "NEXT_PUBLIC_POSTHOG_HOST",
+    "NEXT_PUBLIC_FEATURE_BILLING_ENABLED",
     "NEXT_PRIVATE_DATABASE_URL",
     "NEXT_PRIVATE_NEXT_AUTH_SECRET",
-    "NEXT_PUBLIC_SUBSCRIPTIONS_ENABLED",
+    "NEXT_PRIVATE_GOOGLE_CLIENT_ID",
+    "NEXT_PRIVATE_GOOGLE_CLIENT_SECRET",
     "NEXT_PRIVATE_SMTP_TRANSPORT",
     "NEXT_PRIVATE_MAILCHANNELS_API_KEY",
     "NEXT_PRIVATE_MAILCHANNELS_ENDPOINT",

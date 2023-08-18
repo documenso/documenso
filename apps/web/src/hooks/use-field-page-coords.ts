@@ -3,7 +3,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { Field } from '@documenso/prisma/client';
 
 import { PDF_VIEWER_PAGE_SELECTOR } from '~/components/(dashboard)/pdf-viewer/types';
-import { getBoundingClientRect } from '~/helpers/getBoundingClientRect';
+import { getBoundingClientRect } from '~/helpers/get-bounding-client-rect';
 
 export const useFieldPageCoords = (field: Field) => {
   const [coords, setCoords] = useState({

@@ -1,3 +1,5 @@
+import { Suspense } from 'react';
+
 import { Caveat, Inter } from 'next/font/google';
 
 import { TrpcProvider } from '@documenso/trpc/react';
@@ -5,8 +7,11 @@ import { cn } from '@documenso/ui/lib/utils';
 import { Toaster } from '@documenso/ui/primitives/toaster';
 import { TooltipProvider } from '@documenso/ui/primitives/tooltip';
 
+import { getServerComponentAllFlags } from '~/helpers/get-server-component-feature-flag';
+import { FeatureFlagProvider } from '~/providers/feature-flag';
 import { ThemeProvider } from '~/providers/next-theme';
 import { PlausibleProvider } from '~/providers/plausible';
+import { PostHogPageview } from '~/providers/posthog';
 
 import './globals.css';
 
@@ -37,7 +42,9 @@ export const metadata = {
   },
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const flags = await getServerComponentAllFlags();
+
   return (
     <html
       lang="en"
@@ -51,15 +58,21 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <link rel="manifest" href="/site.webmanifest" />
       </head>
 
+      <Suspense>
+        <PostHogPageview />
+      </Suspense>
+
       <body>
-        <PlausibleProvider>
-          <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-            <TooltipProvider>
-              <TrpcProvider>{children}</TrpcProvider>
-            </TooltipProvider>
-          </ThemeProvider>
-        </PlausibleProvider>
-        <Toaster />
+        <FeatureFlagProvider initialFlags={flags}>
+          <PlausibleProvider>
+            <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+              <TooltipProvider>
+                <TrpcProvider>{children}</TrpcProvider>
+              </TooltipProvider>
+            </ThemeProvider>
+          </PlausibleProvider>
+          <Toaster />
+        </FeatureFlagProvider>
       </body>
     </html>
   );

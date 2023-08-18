@@ -25,7 +25,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@documenso/ui/primitive
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
 import { PDF_VIEWER_PAGE_SELECTOR } from '~/components/(dashboard)/pdf-viewer/types';
-import { getBoundingClientRect } from '~/helpers/getBoundingClientRect';
+import { getBoundingClientRect } from '~/helpers/get-bounding-client-rect';
 
 import { addFields } from './add-fields.action';
 import { TAddFieldsFormSchema } from './add-fields.types';

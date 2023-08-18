@@ -7,14 +7,19 @@ import { usePathname } from 'next/navigation';
 
 import { CreditCard, Key, User } from 'lucide-react';
 
-import { IS_SUBSCRIPTIONS_ENABLED } from '@documenso/lib/constants/features';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
+
+import { useFeatureFlags } from '~/providers/feature-flag';
 
 export type MobileNavProps = HTMLAttributes<HTMLDivElement>;
 
 export const MobileNav = ({ className, ...props }: MobileNavProps) => {
   const pathname = usePathname();
+
+  const { getFlag } = useFeatureFlags();
+
+  const isBillingEnabled = getFlag('billing');
 
   return (
     <div
@@ -47,7 +52,7 @@ export const MobileNav = ({ className, ...props }: MobileNavProps) => {
         </Button>
       </Link>
 
-      {IS_SUBSCRIPTIONS_ENABLED && (
+      {isBillingEnabled && (
         <Link href="/settings/billing">
           <Button
             variant="ghost"

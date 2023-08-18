@@ -15,7 +15,6 @@ import {
 import { signOut } from 'next-auth/react';
 import { useTheme } from 'next-themes';
 
-import { IS_SUBSCRIPTIONS_ENABLED } from '@documenso/lib/constants/features';
 import { User } from '@documenso/prisma/client';
 import { Avatar, AvatarFallback } from '@documenso/ui/primitives/avatar';
 import { Button } from '@documenso/ui/primitives/button';
@@ -28,19 +27,25 @@ import {
   DropdownMenuTrigger,
 } from '@documenso/ui/primitives/dropdown-menu';
 
+import { useFeatureFlags } from '~/providers/feature-flag';
+
 export type ProfileDropdownProps = {
   user: User;
 };
 
 export const ProfileDropdown = ({ user }: ProfileDropdownProps) => {
+  const { theme, setTheme } = useTheme();
+
+  const { getFlag } = useFeatureFlags();
+
+  const isBillingEnabled = getFlag('billing');
+
   const initials =
     user.name
       ?.split(' ')
       .map((name: string) => name.slice(0, 1).toUpperCase())
       .slice(0, 2)
       .join('') ?? 'UK';
-
-  const { theme, setTheme } = useTheme();
 
   return (
     <DropdownMenu>
@@ -69,7 +74,7 @@ export const ProfileDropdown = ({ user }: ProfileDropdownProps) => {
           </Link>
         </DropdownMenuItem>
 
-        {IS_SUBSCRIPTIONS_ENABLED && (
+        {isBillingEnabled && (
           <DropdownMenuItem asChild>
             <Link href="/settings/billing" className="cursor-pointer">
               <CreditCard className="mr-2 h-4 w-4" />
