@@ -3,7 +3,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 
-import { Variants, motion } from 'framer-motion';
+import { Variants, motion, useReducedMotion } from 'framer-motion';
 import { Github, Slack, Twitter } from 'lucide-react';
 
 import { cn } from '@documenso/ui/lib/utils';
@@ -15,23 +15,25 @@ export type MobileNavigationProps = {
   className?: string;
 };
 
-const itemVariants: Variants = {
-  open: {
-    opacity: 1,
-    y: 0,
-    x: 0,
-    transition: { type: 'spring', stiffness: 300, damping: 24 },
-  },
-  closed: { opacity: 0, y: 0, x: 60, transition: { duration: 0.2 } },
-  exit: {
-    opacity: 0,
-    y: 0,
-    x: 60,
-    transition: { duration: 0.2 },
-  },
-};
-
 export const MobileNavigation = ({ isMenuOpen }: MobileNavigationProps) => {
+  const shouldReduceMotion = useReducedMotion();
+
+  const itemVariants: Variants = {
+    open: {
+      opacity: 1,
+      y: 0,
+      x: 0,
+      transition: { type: 'spring', stiffness: 300, damping: 24 },
+    },
+    closed: { opacity: 0, y: 0, x: shouldReduceMotion ? 0 : 60, transition: { duration: 0.2 } },
+    exit: {
+      opacity: 0,
+      y: 0,
+      x: shouldReduceMotion ? 0 : 60,
+      transition: { duration: 0.2 },
+    },
+  };
+
   // used for testing alternate animations
   // const vertical = `${!isMenuOpen ? '-translate-y-full' : 'translate-y-0'}`;
   const horizontal = `${!isMenuOpen ? 'translate-x-full' : 'translate-x-0'}`;
@@ -41,46 +43,46 @@ export const MobileNavigation = ({ isMenuOpen }: MobileNavigationProps) => {
       animate={isMenuOpen ? 'open' : 'closed'}
       className={cn(
         horizontal,
-        'bg-secondary fixed left-0 right-0 top-16 z-10 flex h-[94dvh] w-full transform flex-col items-start justify-start gap-4 shadow-md backdrop-blur-lg transition duration-500 ease-in-out md:hidden',
+        'bg-secondary fixed left-0 right-0 top-16 z-10 flex h-[94dvh] w-full transform flex-col items-center justify-start gap-4 shadow-md backdrop-blur-lg transition duration-500 ease-in-out md:hidden',
       )}
       variants={{
         open: {
           transition: {
             type: 'spring',
             bounce: 0,
-            duration: 0.7,
-            delayChildren: 0.3,
-            staggerChildren: 0.05,
+            duration: shouldReduceMotion ? 0 : 0.7,
+            delayChildren: shouldReduceMotion ? 0 : 0.3,
+            staggerChildren: shouldReduceMotion ? 0 : 0.05,
           },
         },
         closed: {
           transition: {
             type: 'spring',
             bounce: 0,
-            duration: 0.3,
+            duration: shouldReduceMotion ? 0 : 0.3,
           },
         },
         exit: {
           transition: {
             type: 'spring',
             bounce: 0,
-            duration: 0.3,
+            duration: shouldReduceMotion ? 0 : 0.3,
           },
         },
       }}
     >
-      <motion.div className="flex w-full flex-col items-start gap-y-2 px-8 pt-12">
+      <motion.div className="flex w-full flex-col items-center gap-y-2 px-8 pt-12">
         <Link
           passHref
           href="/blog"
-          className="text-4xl font-semibold text-[#8D8D8D] hover:text-[#6D6D6D]"
+          className="text-4xl font-semibold text-[#6D6D6D] hover:text-[#6D6D6D]"
         >
           <motion.p variants={itemVariants}>Blog</motion.p>
         </Link>
 
         <Link
           href="/pricing"
-          className="text-4xl font-semibold text-[#8D8D8D] hover:text-[#6D6D6D]"
+          className="text-4xl font-semibold text-[#6D6D6D] hover:text-[#6D6D6D]"
         >
           <motion.p variants={itemVariants}>Pricing</motion.p>
         </Link>
@@ -88,21 +90,21 @@ export const MobileNavigation = ({ isMenuOpen }: MobileNavigationProps) => {
         <Link
           href="https://status.documenso.com"
           target="_blank"
-          className="text-4xl font-semibold text-[#8D8D8D] hover:text-[#6D6D6D]"
+          className="text-4xl font-semibold text-[#6D6D6D] hover:text-[#6D6D6D]"
         >
           <motion.p variants={itemVariants}>Status</motion.p>
         </Link>
 
         <Link
           href="mailto:support@documenso.com"
-          className="text-4xl font-semibold text-[#8D8D8D] hover:text-[#6D6D6D]"
+          className="text-4xl font-semibold text-[#6D6D6D] hover:text-[#6D6D6D]"
         >
           <motion.p variants={itemVariants}>Support</motion.p>
         </Link>
 
         <Link
           href="/privacy"
-          className="text-4xl font-semibold text-[#8D8D8D] hover:text-[#6D6D6D]"
+          className="text-4xl font-semibold text-[#6D6D6D] hover:text-[#6D6D6D]"
         >
           <motion.p variants={itemVariants}>Privacy</motion.p>
         </Link>
@@ -110,7 +112,7 @@ export const MobileNavigation = ({ isMenuOpen }: MobileNavigationProps) => {
         <Link
           href="https://app.documenso.com/login"
           target="_blank"
-          className="text-4xl font-semibold text-[#8D8D8D] hover:text-[#6D6D6D]"
+          className="text-4xl font-semibold text-[#6D6D6D] hover:text-[#6D6D6D]"
         >
           <motion.p variants={itemVariants}>Sign in</motion.p>
         </Link>
