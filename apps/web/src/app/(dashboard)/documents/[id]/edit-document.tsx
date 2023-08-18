@@ -2,28 +2,14 @@
 
 import { useState } from 'react';
 
-import dynamic from 'next/dynamic';
-
-import { Loader } from 'lucide-react';
-
 import { Document, Field, Recipient, User } from '@documenso/prisma/client';
 import { cn } from '@documenso/ui/lib/utils';
 import { Card, CardContent } from '@documenso/ui/primitives/card';
 
+import { LazyPDFViewer } from '~/components/(dashboard)/pdf-viewer/lazy-pdf-viewer';
 import { AddFieldsFormPartial } from '~/components/forms/edit-document/add-fields';
 import { AddSignersFormPartial } from '~/components/forms/edit-document/add-signers';
 import { AddSubjectFormPartial } from '~/components/forms/edit-document/add-subject';
-
-const PDFViewer = dynamic(async () => import('~/components/(dashboard)/pdf-viewer/pdf-viewer'), {
-  ssr: false,
-  loading: () => (
-    <div className="dark:bg-background flex min-h-[80vh] flex-col items-center justify-center bg-white/50">
-      <Loader className="text-documenso h-12 w-12 animate-spin" />
-
-      <p className="text-muted-foreground mt-4">Loading document...</p>
-    </div>
-  ),
-});
 
 export type EditDocumentFormProps = {
   className?: string;
@@ -71,7 +57,7 @@ export const EditDocumentForm = ({
         gradient
       >
         <CardContent className="p-2">
-          <PDFViewer document={documentUrl} />
+          <LazyPDFViewer document={documentUrl} />
         </CardContent>
       </Card>
 
