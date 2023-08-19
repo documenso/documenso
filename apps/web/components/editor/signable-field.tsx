@@ -4,7 +4,7 @@ import { IconButton } from "@documenso/ui";
 import { XCircleIcon } from "@heroicons/react/20/solid";
 import Draggable from "react-draggable";
 
-const stc = require("string-to-color");
+import stc from "string-to-color";
 
 type FieldPropsType = {
   field: {
@@ -18,6 +18,7 @@ type FieldPropsType = {
   };
   onClick: any;
   onDelete: any;
+  className?: string;
 };
 
 export default function SignableField(props: FieldPropsType) {
@@ -45,7 +46,7 @@ export default function SignableField(props: FieldPropsType) {
         }}
         ref={nodeRef}
         className={classNames(
-          "absolute top-0 left-0 m-auto h-16 w-48 select-none flex-row-reverse text-center text-lg font-bold opacity-80",
+          `absolute top-0 left-0 m-auto h-16 w-48 select-none flex-row-reverse text-center text-lg font-bold opacity-80 ${props.className}`,
           field.type === "SIGNATURE" ? "cursor-pointer hover:brightness-50" : "cursor-not-allowed"
         )}
         style={{

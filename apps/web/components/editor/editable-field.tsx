@@ -4,7 +4,7 @@ import Logo from "../logo";
 import { XCircleIcon } from "@heroicons/react/20/solid";
 import Draggable from "react-draggable";
 
-const stc = require("string-to-color");
+import stc from "string-to-color";
 
 type FieldPropsType = {
   field: {
@@ -19,6 +19,7 @@ type FieldPropsType = {
   onPositionChanged: any;
   onDelete: any;
   hidden: boolean;
+  className?: string;
 };
 
 export default function EditableField(props: FieldPropsType) {
@@ -57,7 +58,7 @@ export default function EditableField(props: FieldPropsType) {
       <div
         hidden={props.hidden}
         ref={nodeRef}
-        className="absolute top-0 left-0 m-auto h-16 w-48 cursor-move select-none flex-row-reverse p-2 text-center text-lg font-bold opacity-80"
+        className={`absolute top-0 left-0 m-auto h-16 w-48 cursor-move select-none flex-row-reverse p-2 text-center text-lg font-bold opacity-80 ${props.className}`}
         style={{
           background: stc(props.field.Recipient.email),
         }}>
