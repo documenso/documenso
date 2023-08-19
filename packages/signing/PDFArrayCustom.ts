@@ -7,7 +7,6 @@ const { PDFArray, CharCodes, PDFContext } = require("pdf-lib");
  *  /ByteRange [ 0 /********** /********** /********** ]
  */
 
-
 type PDFArrayCustom = typeof PDFArray & {
   clone(context: typeof PDFContext): PDFArrayCustom;
   toString(): string;
