@@ -62,6 +62,14 @@ export const Footer = ({ className, ...props }: FooterProps) => {
           </Link>
 
           <Link
+            href="https://shop.documenso.com"
+            target="_blank"
+            className="flex-shrink-0 text-sm text-[#8D8D8D] hover:text-[#6D6D6D]"
+          >
+            Shop
+          </Link>
+
+          <Link
             href="https://status.documenso.com"
             target="_blank"
             className="flex-shrink-0 text-sm text-[#8D8D8D] hover:text-[#6D6D6D]"
