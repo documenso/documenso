@@ -9,7 +9,7 @@ import posthog from 'posthog-js';
 
 import { extractPostHogConfig } from '@documenso/lib/constants/feature-flags';
 
-export function PostHogPageview(): JSX.Element {
+export function PostHogPageview() {
   const postHogConfig = extractPostHogConfig();
 
   const pathname = usePathname();
@@ -18,6 +18,7 @@ export function PostHogPageview(): JSX.Element {
   if (typeof window !== 'undefined' && postHogConfig) {
     posthog.init(postHogConfig.key, {
       api_host: postHogConfig.host,
+      disable_session_recording: true,
       loaded: () => {
         getSession()
           .then((session) => {
@@ -48,5 +49,5 @@ export function PostHogPageview(): JSX.Element {
     });
   }, [pathname, searchParams, postHogConfig]);
 
-  return <></>;
+  return null;
 }

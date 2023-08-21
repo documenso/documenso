@@ -2,6 +2,8 @@
 
 import { createContext, useCallback, useContext, useEffect, useState } from 'react';
 
+import { z } from 'zod';
+
 import {
   FEATURE_FLAG_POLL_INTERVAL,
   LOCAL_FEATURE_FLAGS,
@@ -10,10 +12,17 @@ import {
 
 import { getAllFlags } from '~/helpers/get-feature-flag';
 
-export type FeatureFlagValue = boolean | string | number | undefined;
+export const ZFeatureFlagValueSchema = z.union([
+  z.boolean(),
+  z.string(),
+  z.number(),
+  z.undefined(),
+]);
+
+export type TFeatureFlagValue = z.infer<typeof ZFeatureFlagValueSchema>;
 
 export type FeatureFlagContextValue = {
-  getFlag: (_key: string) => FeatureFlagValue;
+  getFlag: (_key: string) => TFeatureFlagValue;
 };
 
 export const FeatureFlagContext = createContext<FeatureFlagContextValue | null>(null);
@@ -33,7 +42,7 @@ export function FeatureFlagProvider({
   initialFlags,
 }: {
   children: React.ReactNode;
-  initialFlags: Record<string, FeatureFlagValue>;
+  initialFlags: Record<string, TFeatureFlagValue>;
 }) {
   const [flags, setFlags] = useState(initialFlags);
 
