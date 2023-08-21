@@ -1,20 +1,27 @@
-import { HTMLAttributes } from 'react';
+'use client';
+
+import { HTMLAttributes, useState } from 'react';
 
 import Image from 'next/image';
 import Link from 'next/link';
 
 import { cn } from '@documenso/ui/lib/utils';
 
+import { HamburgerMenu } from './mobile-hamburger';
+import { MobileNavigation } from './mobile-navigation';
+
 export type HeaderProps = HTMLAttributes<HTMLElement>;
 
 export const Header = ({ className, ...props }: HeaderProps) => {
+  const [isHamburgerMenuOpen, setIsHamburgerMenuOpen] = useState(false);
+
   return (
     <header className={cn('flex items-center justify-between', className)} {...props}>
-      <Link href="/">
-        <Image src="/logo.png" alt="Documenso Logo" width={170} height={0}></Image>
+      <Link href="/" className="z-10" onClick={() => setIsHamburgerMenuOpen(false)}>
+        <Image src="/logo.png" alt="Documenso Logo" width={170} height={25} />
       </Link>
 
-      <div className="flex items-center gap-x-6">
+      <div className="hidden items-center gap-x-6 md:flex">
         <Link href="/pricing" className="text-sm font-semibold text-[#8D8D8D] hover:text-[#6D6D6D]">
           Pricing
         </Link>
@@ -35,6 +42,15 @@ export const Header = ({ className, ...props }: HeaderProps) => {
           Sign in
         </Link>
       </div>
+
+      <HamburgerMenu
+        onToggleMenuOpen={() => setIsHamburgerMenuOpen((v) => !v)}
+        isMenuOpen={isHamburgerMenuOpen}
+      />
+      <MobileNavigation
+        isMenuOpen={isHamburgerMenuOpen}
+        onMenuOpenChange={setIsHamburgerMenuOpen}
+      />
     </header>
   );
 };

@@ -3,7 +3,7 @@ import { HTMLAttributes } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 
-import { Github, Slack, Twitter } from 'lucide-react';
+import { Github, MessagesSquare, Twitter } from 'lucide-react';
 
 import { cn } from '@documenso/ui/lib/utils';
 
@@ -36,11 +36,11 @@ export const Footer = ({ className, ...props }: FooterProps) => {
             </Link>
 
             <Link
-              href="https://documenso.slack.com"
+              href="https://documen.so/discord"
               target="_blank"
               className="hover:text-[#6D6D6D]"
             >
-              <Slack className="h-6 w-6" />
+              <MessagesSquare className="h-6 w-6" />
             </Link>
           </div>
         </div>
