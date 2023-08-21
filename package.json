@@ -30,6 +30,7 @@
     "@headlessui/react": "^1.7.4",
     "@heroicons/react": "^2.0.13",
     "@hookform/resolvers": "^3.1.0",
+    "@radix-ui/react-avatar": "^1.0.3",
     "avatar-from-initials": "^1.0.3",
     "bcryptjs": "^2.4.3",
     "next": "13.2.4",

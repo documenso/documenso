@@ -2,12 +2,21 @@
  * Truncates a title to a given max length substituting the middle with an ellipsis.
  */
 export const truncate = (str: string, maxLength: number = 20) => {
-    if (str.length <= maxLength) {
-        return str;
-    }
-    
-    const startLength = Math.ceil((maxLength - 3) / 2);
-    const endLength = Math.floor((maxLength - 3) / 2);
-    
-    return `${str.slice(0, startLength)}...${str.slice(-endLength)}`;
+  if (str.length <= maxLength) {
+    return str;
+  }
+
+  const startLength = Math.ceil((maxLength - 3) / 2);
+  const endLength = Math.floor((maxLength - 3) / 2);
+
+  return `${str.slice(0, startLength)}...${str.slice(-endLength)}`;
+};
+
+/**
+ *  Returns initials for given name / any text.
+ */
+export const getInitials = (name: string): string => {
+  const names = name.split(" ");
+  const initials = names.map((part) => part.charAt(0).toUpperCase()).join("");
+  return initials.length > 1 ? initials : name.substring(0, 2).toUpperCase();
 };

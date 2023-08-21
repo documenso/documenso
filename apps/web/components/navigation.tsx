@@ -2,6 +2,7 @@ import { Fragment, useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { getUser } from "@documenso/lib/api";
+import { UserAvatar } from "@documenso/ui";
 import Logo from "./logo";
 import { Disclosure, Menu, Transition } from "@headlessui/react";
 import {
@@ -14,7 +15,6 @@ import {
   WrenchIcon,
   XMarkIcon,
 } from "@heroicons/react/24/outline";
-import avatarFromInitials from "avatar-from-initials";
 import { signOut, useSession } from "next-auth/react";
 import { toast } from "react-hot-toast";
 
@@ -153,12 +153,8 @@ export default function TopNavigation() {
                         id="mb"
                         className="flex max-w-xs items-center rounded-full bg-white text-sm">
                         <span className="sr-only">Open user menu</span>
-                        <div
-                          key={user?.email}
-                          dangerouslySetInnerHTML={{
-                            __html: avatarFromInitials(user?.name || "" || "", 40),
-                          }}
-                        />
+                        <div key={user?.email} />
+                        <UserAvatar fallbackText={user?.name} />
                       </Menu.Button>
                     </div>
                     <Transition
@@ -229,12 +225,8 @@ export default function TopNavigation() {
               <div className="border-t border-gray-200 pt-4 pb-3">
                 <div className="flex items-center px-4">
                   <div className="flex-shrink-0">
-                    <div
-                      key={user?.email}
-                      dangerouslySetInnerHTML={{
-                        __html: avatarFromInitials(user?.name || "" || "", 40),
-                      }}
-                    />
+                    <div key={user?.email} />
+                    <UserAvatar fallbackText={user?.name} />
                   </div>
                   <div className="ml-3">
                     <div className="text-base font-medium text-gray-800">{user?.name || ""}</div>
