@@ -2,7 +2,7 @@ import { z } from 'zod';
 
 import { LOCAL_FEATURE_FLAGS, isFeatureFlagEnabled } from '@documenso/lib/constants/feature-flags';
 
-import { TFeatureFlagValue } from '~/providers/feature-flag';
+import { TFeatureFlagValue, ZFeatureFlagValueSchema } from '~/providers/feature-flag';
 
 /**
  * Evaluate whether a flag is enabled for the current user.
@@ -33,7 +33,7 @@ export const getFlag = async (
     },
   })
     .then((res) => res.json())
-    .then((res) => z.union([z.boolean(), z.string()]).parse(res))
+    .then((res) => ZFeatureFlagValueSchema.parse(res))
     .catch(() => false);
 
   return response;
@@ -65,7 +65,7 @@ export const getAllFlags = async (
     },
   })
     .then((res) => res.json())
-    .then((res) => z.record(z.string(), z.union([z.boolean(), z.string()])).parse(res))
+    .then((res) => z.record(z.string(), ZFeatureFlagValueSchema).parse(res))
     .catch(() => LOCAL_FEATURE_FLAGS);
 };
 
