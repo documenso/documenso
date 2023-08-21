@@ -1,0 +1,37 @@
+name: "Dependabot Updates"
+version: 2
+
+on:
+  push:
+    branches: [ "feat/refresh" ]
+  pull_request:
+    branches: [ "feat/refresh" ]
+  workflow_dispatch:
+
+updates:
+  - package-ecosystem: 'github-actions'
+    directory: '/'
+    schedule:
+      interval: "weekly"
+    target-branch: "feat/refresh"
+    labels:
+      - "ci dependencies"
+      - "ci"
+
+  - package-ecosystem: "npm"
+    directory: "/apps/marketing"
+    schedule:
+      interval: "weekly"
+    target-branch: "feat/refresh"
+    labels:
+      - "npm dependencies"
+      - "frontend"
+
+  - package-ecosystem: "npm"
+    directory: "/apps/web"
+    schedule:
+      interval: "weekly"
+    target-branch: "feat/refresh"
+    labels:
+      - "npm dependencies"
+      - "frontend"
