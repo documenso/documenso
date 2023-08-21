@@ -26,6 +26,10 @@
    <a href="https://github.com/documenso/documenso/pulse"><img src="https://img.shields.io/github/commit-activity/m/documenso/documenso" alt="Commits-per-month"></a>
 </p>
 
+> **🚧 We're currently working on a large scale refactor which can be found on the [feat/refresh](https://github.com/documenso/documenso/tree/feat/refresh) branch.**
+>
+> **[Read more on why 👀](https://documenso.com/blog/why-were-doing-a-rewrite)**
+
 # Documenso 0.9 - Developer Preview
 
 <div>
