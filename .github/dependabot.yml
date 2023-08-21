@@ -1,4 +1,3 @@
-name: "Dependabot Updates"
 version: 2
 
 on:
@@ -17,6 +16,7 @@ updates:
     labels:
       - "ci dependencies"
       - "ci"
+    open-pull-requests-limit: 10
 
   - package-ecosystem: "npm"
     directory: "/apps/marketing"
@@ -26,6 +26,7 @@ updates:
     labels:
       - "npm dependencies"
       - "frontend"
+    open-pull-requests-limit: 10
 
   - package-ecosystem: "npm"
     directory: "/apps/web"
@@ -35,3 +36,4 @@ updates:
     labels:
       - "npm dependencies"
       - "frontend"
+    open-pull-requests-limit: 10
