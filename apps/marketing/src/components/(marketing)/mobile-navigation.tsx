@@ -3,24 +3,17 @@
 import Image from 'next/image';
 import Link from 'next/link';
 
-import { Variants, motion, useReducedMotion } from 'framer-motion';
-import { Github, Slack, Twitter } from 'lucide-react';
+import { motion, useReducedMotion } from 'framer-motion';
+import { Github, MessagesSquare, Twitter } from 'lucide-react';
 
-import { cn } from '@documenso/ui/lib/utils';
-
-import backgroundPattern from '~/assets/background-pattern.png';
+import { Sheet, SheetContent } from '@documenso/ui/primitives/sheet';
 
 export type MobileNavigationProps = {
   isMenuOpen: boolean;
-  menuToggle: () => void;
+  onMenuOpenChange?: (_value: boolean) => void;
 };
 
-export interface MenuNavigationLinksProps {
-  href: string;
-  text: string;
-}
-
-export const MenuNavigationLinks = [
+export const MENU_NAVIGATION_LINKS = [
   {
     href: '/blog',
     text: 'Blog',
@@ -47,112 +40,82 @@ export const MenuNavigationLinks = [
   },
 ];
 
-export const MobileNavigation = ({ isMenuOpen, menuToggle }: MobileNavigationProps) => {
+export const MobileNavigation = ({ isMenuOpen, onMenuOpenChange }: MobileNavigationProps) => {
   const shouldReduceMotion = useReducedMotion();
 
   const handleMenuItemClick = () => {
-    menuToggle();
+    onMenuOpenChange?.(false);
   };
-
-  const itemVariants: Variants = {
-    open: {
-      opacity: 1,
-      y: 0,
-      x: 0,
-      transition: { type: 'spring', stiffness: 300, damping: 24 },
-    },
-    closed: { opacity: 0, y: 0, x: shouldReduceMotion ? 0 : 60, transition: { duration: 0.2 } },
-    exit: {
-      opacity: 0,
-      y: 0,
-      x: shouldReduceMotion ? 0 : 60,
-      transition: { duration: 0.2 },
-    },
-  };
-
-  // used for testing alternate animations
-  // const vertical = `${!isMenuOpen ? '-translate-y-full' : 'translate-y-0'}`;
-  const horizontal = `${!isMenuOpen ? 'translate-x-full' : 'translate-x-0'}`;
 
   return (
-    <motion.div
-      animate={isMenuOpen ? 'open' : 'closed'}
-      className={cn(
-        horizontal,
-        'bg-secondary fixed left-0 right-0 top-16 z-10 flex h-[94dvh] w-full transform flex-col items-center justify-start gap-4 shadow-md backdrop-blur-lg transition duration-500 ease-in-out md:hidden',
-      )}
-      variants={{
-        open: {
-          transition: {
-            type: 'spring',
-            bounce: 0,
-            duration: shouldReduceMotion ? 0 : 0.7,
-            delayChildren: shouldReduceMotion ? 0 : 0.3,
-            staggerChildren: shouldReduceMotion ? 0 : 0.05,
-          },
-        },
-        closed: {
-          transition: {
-            type: 'spring',
-            bounce: 0,
-            duration: shouldReduceMotion ? 0 : 0.3,
-          },
-        },
-        exit: {
-          transition: {
-            type: 'spring',
-            bounce: 0,
-            duration: shouldReduceMotion ? 0 : 0.3,
-          },
-        },
-      }}
-    >
-      <motion.div className="flex w-full flex-col items-center gap-y-4 px-8 pt-12">
-        {MenuNavigationLinks.map((link: MenuNavigationLinksProps) => (
+    <Sheet open={isMenuOpen} onOpenChange={onMenuOpenChange}>
+      <SheetContent className="w-full max-w-[400px]">
+        <Link href="/" className="z-10" onClick={handleMenuItemClick}>
+          <Image src="/logo.png" alt="Documenso Logo" width={170} height={25} />
+        </Link>
+
+        <motion.div
+          className="mt-12 flex w-full flex-col items-start gap-y-4"
+          initial="initial"
+          animate="animate"
+          transition={{
+            staggerChildren: 0.2,
+          }}
+        >
+          {MENU_NAVIGATION_LINKS.map(({ href, text }) => (
+            <motion.div
+              key={href}
+              variants={{
+                initial: {
+                  opacity: 0,
+                  x: shouldReduceMotion ? 0 : 100,
+                },
+                animate: {
+                  opacity: 1,
+                  x: 0,
+                  transition: {
+                    duration: 0.5,
+                  },
+                },
+              }}
+            >
+              <Link
+                className="text-2xl font-semibold text-[#8D8D8D] hover:text-[#6D6D6D]"
+                href={href}
+                onClick={() => handleMenuItemClick()}
+              >
+                {text}
+              </Link>
+            </motion.div>
+          ))}
+        </motion.div>
+
+        <div className="mx-auto mt-8 flex w-full flex-wrap items-center gap-x-4 gap-y-4 ">
           <Link
-            key={link.href}
-            passHref
-            onClick={() => handleMenuItemClick()}
-            href={link.href}
-            className="text-4xl font-semibold text-[#8D8D8D] hover:text-[#6D6D6D]"
+            href="https://twitter.com/documenso"
+            target="_blank"
+            className="text-[#8D8D8D] hover:text-[#6D6D6D]"
           >
-            <motion.p variants={itemVariants}>{link.text}</motion.p>
+            <Twitter className="h-6 w-6" />
           </Link>
-        ))}
-      </motion.div>
 
-      <div className="mx-auto mt-8 flex w-full flex-wrap items-center justify-center gap-x-4 gap-y-4 ">
-        <Link
-          href="https://twitter.com/documenso"
-          target="_blank"
-          className="text-[#8D8D8D] hover:text-[#6D6D6D]"
-        >
-          <Twitter className="h-8 w-8" />
-        </Link>
+          <Link
+            href="https://github.com/documenso/documenso"
+            target="_blank"
+            className="text-[#8D8D8D] hover:text-[#6D6D6D]"
+          >
+            <Github className="h-6 w-6" />
+          </Link>
 
-        <Link
-          href="https://github.com/documenso/documenso"
-          target="_blank"
-          className="text-[#8D8D8D] hover:text-[#6D6D6D]"
-        >
-          <Github className="h-8 w-8" />
-        </Link>
-
-        <Link
-          href="https://documenso.slack.com"
-          target="_blank"
-          className="text-[#8D8D8D] hover:text-[#6D6D6D]"
-        >
-          <Slack className="h-8 w-8" />
-        </Link>
-      </div>
-      <div className="absolute inset-0 -z-10 flex items-start justify-center">
-        <Image
-          src={backgroundPattern}
-          alt="background pattern"
-          className="-mr-[15vw] mt-[12vh] h-full max-h-[150vh] scale-125 object-cover md:-mr-[50vw] md:scale-150 lg:scale-[175%]"
-        />
-      </div>
-    </motion.div>
+          <Link
+            href="https://documen.so/discord"
+            target="_blank"
+            className="text-[#8D8D8D] hover:text-[#6D6D6D]"
+          >
+            <MessagesSquare className="h-6 w-6" />
+          </Link>
+        </div>
+      </SheetContent>
+    </Sheet>
   );
 };
