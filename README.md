@@ -104,6 +104,7 @@ Documenso is built using awesome open source tech including:
 - [Zod for schema declaration and validation](https://zod.dev/)
 - [Lucide React for icons in React app](https://lucide.dev/)
 - [Framer Motion for motion library](https://www.framer.com/motion/)
+- [Radix UI for component library](https://www.radix-ui.com/)
 - Check out `/package.json` and `/apps/web/package.json` for more
 - Support for [opensignpdf (requires Java on server)](https://github.com/open-pdf-sign) is currently planned.
 
