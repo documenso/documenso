@@ -19,7 +19,7 @@ export const MobileNav = ({ className, ...props }: MobileNavProps) => {
 
   const { getFlag } = useFeatureFlags();
 
-  const isBillingEnabled = getFlag('billing');
+  const isBillingEnabled = getFlag('app_billing');
 
   return (
     <div

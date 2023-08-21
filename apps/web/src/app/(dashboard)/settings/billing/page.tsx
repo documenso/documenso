@@ -8,7 +8,7 @@ import { getServerComponentFlag } from '~/helpers/get-server-component-feature-f
 export default async function BillingSettingsPage() {
   const user = await getRequiredServerComponentSession();
 
-  const isBillingEnabled = await getServerComponentFlag('billing');
+  const isBillingEnabled = await getServerComponentFlag('app_billing');
 
   // Redirect if subscriptions are not enabled.
   if (!isBillingEnabled) {

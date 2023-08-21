@@ -38,7 +38,7 @@ export const ProfileDropdown = ({ user }: ProfileDropdownProps) => {
 
   const { getFlag } = useFeatureFlags();
 
-  const isBillingEnabled = getFlag('billing');
+  const isBillingEnabled = getFlag('app_billing');
 
   const initials =
     user.name

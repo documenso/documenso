@@ -92,7 +92,7 @@ export const mapJwtToFlagProperties = (
  *
  * @param jwt The JWT of the current user.
  * @param request Request potentially containing a PostHog `distinct_id` cookie.
- * @returns
+ * @returns A distinct user ID.
  */
 export const extractDistinctUserId = (jwt: JWT | null, request: NextRequest): string => {
   const config = extractPostHogConfig();

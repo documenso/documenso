@@ -2,7 +2,7 @@ import { z } from 'zod';
 
 import { LOCAL_FEATURE_FLAGS, isFeatureFlagEnabled } from '@documenso/lib/constants/feature-flags';
 
-import { FeatureFlagValue } from '~/providers/feature-flag';
+import { TFeatureFlagValue } from '~/providers/feature-flag';
 
 /**
  * Evaluate whether a flag is enabled for the current user.
@@ -14,7 +14,7 @@ import { FeatureFlagValue } from '~/providers/feature-flag';
 export const getFlag = async (
   flag: string,
   options?: GetFlagOptions,
-): Promise<FeatureFlagValue> => {
+): Promise<TFeatureFlagValue> => {
   const requestHeaders = options?.requestHeaders ?? {};
 
   if (!isFeatureFlagEnabled()) {
@@ -47,7 +47,7 @@ export const getFlag = async (
  */
 export const getAllFlags = async (
   options?: GetFlagOptions,
-): Promise<Record<string, FeatureFlagValue>> => {
+): Promise<Record<string, TFeatureFlagValue>> => {
   const requestHeaders = options?.requestHeaders ?? {};
 
   if (!isFeatureFlagEnabled()) {

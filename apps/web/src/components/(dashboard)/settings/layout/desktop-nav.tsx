@@ -19,7 +19,7 @@ export const DesktopNav = ({ className, ...props }: DesktopNavProps) => {
 
   const { getFlag } = useFeatureFlags();
 
-  const isBillingEnabled = getFlag('billing');
+  const isBillingEnabled = getFlag('app_billing');
 
   return (
     <div className={cn('flex flex-col gap-y-2', className)} {...props}>
