@@ -34,7 +34,7 @@ jobs:
       run: npm ci
       
     - name: Build Documenso
-      run: npm build
+      run: npm run build
 
     - name: Initialize CodeQL
       uses: github/codeql-action/init@v2
