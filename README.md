@@ -139,6 +139,8 @@ Your database will also be available on port `54320`. You can connect to it usin
 
 ## Developer Setup
 
+### Manual Setup
+
 Follow these steps to setup documenso on you local machine:
 
 - [Clone the repository](https://help.github.com/articles/cloning-a-repository/) it to your local device.
@@ -168,6 +170,12 @@ Follow these steps to setup documenso on you local machine:
 - Optional: Create your own signing certificate
   - A demo certificate is provided in `/app/web/resources/certificate.p12`
   - To generate your own using these steps and a Linux Terminal or Windows Subsystem for Linux (WSL) see **[Create your own signing certificate](#creating-your-own-signing-certificate)**.
+
+### Run in Gitpod
+
+- Click below to launch a ready-to-use Gitpod workspace in your browser.
+
+[![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/#https://github.com/documenso/documenso)
 
 ## Updating
 
