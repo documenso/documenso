@@ -1,21 +1,14 @@
 import Link from 'next/link';
 
-import { Plus } from 'lucide-react';
-
 import { getRequiredServerComponentSession } from '@documenso/lib/next-auth/get-server-session';
 import { findDocuments } from '@documenso/lib/server-only/document/find-documents';
 import { getStats } from '@documenso/lib/server-only/document/get-stats';
 import { isDocumentStatus } from '@documenso/lib/types/is-document-status';
 import { DocumentStatus as InternalDocumentStatus } from '@documenso/prisma/client';
-import { Button } from '@documenso/ui/primitives/button';
 import { Tabs, TabsList, TabsTrigger } from '@documenso/ui/primitives/tabs';
 
-import { DocumentDropzone } from '~/components/(dashboard)/document-dropzone/document-dropzone';
 import { PeriodSelector } from '~/components/(dashboard)/period-selector/period-selector';
-import {
-  PeriodSelectorValue,
-  isPeriodSelectorValue,
-} from '~/components/(dashboard)/period-selector/types';
+import { PeriodSelectorValue } from '~/components/(dashboard)/period-selector/types';
 import { DocumentStatus } from '~/components/formatter/document-status';
 
 import { UploadDocument } from '../dashboard/upload-document';
@@ -38,9 +31,11 @@ export default async function DocumentsPage({ searchParams = {} }: DocumentsPage
   });
 
   const status = isDocumentStatus(searchParams.status) ? searchParams.status : 'ALL';
-  const period = isPeriodSelectorValue(searchParams.period) ? searchParams.period : '';
+  // const period = isPeriodSelectorValue(searchParams.period) ? searchParams.period : '';
   const page = Number(searchParams.page) || 1;
   const perPage = Number(searchParams.perPage) || 20;
+
+  const shouldDefaultToPending = status === 'ALL' && stats.PENDING > 0;
 
   const results = await findDocuments({
     userId: session.id,
@@ -52,8 +47,6 @@ export default async function DocumentsPage({ searchParams = {} }: DocumentsPage
     page,
     perPage,
   });
-
-  const isNoResults = status === 'ALL' && period === '' && results.data.length === 0;
 
   const getTabHref = (value: typeof status) => {
     const params = new URLSearchParams(searchParams);
@@ -74,9 +67,11 @@ export default async function DocumentsPage({ searchParams = {} }: DocumentsPage
   return (
     <div className="mx-auto w-full max-w-screen-xl px-4 md:px-8">
       <UploadDocument />
+
       <h1 className="mt-12 text-4xl font-semibold">Documents</h1>
+
       <div className="mt-8 flex flex-wrap gap-x-4 gap-y-6">
-        <Tabs defaultValue={status}>
+        <Tabs defaultValue={shouldDefaultToPending ? InternalDocumentStatus.PENDING : status}>
           <TabsList>
             <TabsTrigger className="min-w-[60px]" value={InternalDocumentStatus.PENDING} asChild>
               <Link href={getTabHref(InternalDocumentStatus.PENDING)}>
