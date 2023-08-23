@@ -3,21 +3,19 @@
 import React, { useEffect, useRef, useState } from 'react';
 
 import { Loader } from 'lucide-react';
+import { PDFDocumentProxy } from 'pdfjs-dist';
 import { Document as PDFDocument, Page as PDFPage, pdfjs } from 'react-pdf';
 import 'react-pdf/dist/esm/Page/AnnotationLayer.css';
 import 'react-pdf/dist/esm/Page/TextLayer.css';
 
 import { cn } from '@documenso/ui/lib/utils';
 
-type LoadedPDFDocument = pdfjs.PDFDocumentProxy;
+export type LoadedPDFDocument = PDFDocumentProxy;
 
 /**
  * This imports the worker from the `pdfjs-dist` package.
  */
-pdfjs.GlobalWorkerOptions.workerSrc = new URL(
-  'pdfjs-dist/build/pdf.worker.min.js',
-  import.meta.url,
-).toString();
+pdfjs.GlobalWorkerOptions.workerSrc = `/pdf.worker.min.js`;
 
 export type OnPDFViewerPageClick = (_event: {
   pageNumber: number;

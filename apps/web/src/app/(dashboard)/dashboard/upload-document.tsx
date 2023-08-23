@@ -5,10 +5,10 @@ import { useRouter } from 'next/navigation';
 import { Loader } from 'lucide-react';
 
 import { cn } from '@documenso/ui/lib/utils';
+import { DocumentDropzone } from '@documenso/ui/primitives/document-dropzone';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
 import { useCreateDocument } from '~/api/document/create/fetcher';
-import { DocumentDropzone } from '~/components/(dashboard)/document-dropzone/document-dropzone';
 
 export type UploadDocumentProps = {
   className?: string;

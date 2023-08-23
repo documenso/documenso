@@ -1,9 +1,8 @@
 import { useCallback, useEffect, useState } from 'react';
 
+import { getBoundingClientRect } from '@documenso/lib/client-only/get-bounding-client-rect';
+import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
 import { Field } from '@documenso/prisma/client';
-
-import { PDF_VIEWER_PAGE_SELECTOR } from '~/components/(dashboard)/pdf-viewer/types';
-import { getBoundingClientRect } from '~/helpers/get-bounding-client-rect';
 
 export const useFieldPageCoords = (field: Field) => {
   const [coords, setCoords] = useState({

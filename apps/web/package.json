@@ -7,7 +7,8 @@
     "dev": "PORT=3000 next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "copy:pdfjs": "node ../../scripts/copy-pdfjs.cjs"
   },
   "dependencies": {
     "@documenso/lib": "*",
@@ -34,7 +35,6 @@
     "react-dropzone": "^14.2.3",
     "react-hook-form": "^7.43.9",
     "react-icons": "^4.8.0",
-    "react-pdf": "^7.1.1",
     "react-rnd": "^10.4.1",
     "ts-pattern": "^5.0.5",
     "typescript": "5.1.6",

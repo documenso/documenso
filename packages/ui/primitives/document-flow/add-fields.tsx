@@ -3,12 +3,13 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { Caveat } from 'next/font/google';
-import { useRouter } from 'next/navigation';
 
 import { Check, ChevronsUpDown, Info } from 'lucide-react';
 import { nanoid } from 'nanoid';
 import { useFieldArray, useForm } from 'react-hook-form';
 
+import { getBoundingClientRect } from '@documenso/lib/client-only/get-bounding-client-rect';
+import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
 import { Document, Field, FieldType, Recipient, SendStatus } from '@documenso/prisma/client';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
@@ -22,20 +23,15 @@ import {
 } from '@documenso/ui/primitives/command';
 import { Popover, PopoverContent, PopoverTrigger } from '@documenso/ui/primitives/popover';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@documenso/ui/primitives/tooltip';
-import { useToast } from '@documenso/ui/primitives/use-toast';
 
-import { PDF_VIEWER_PAGE_SELECTOR } from '~/components/(dashboard)/pdf-viewer/types';
-import { getBoundingClientRect } from '~/helpers/get-bounding-client-rect';
-
-import { addFields } from './add-fields.action';
 import { TAddFieldsFormSchema } from './add-fields.types';
 import {
-  EditDocumentFormContainer,
-  EditDocumentFormContainerActions,
-  EditDocumentFormContainerContent,
-  EditDocumentFormContainerFooter,
-  EditDocumentFormContainerStep,
-} from './container';
+  DocumentFlowFormContainer,
+  DocumentFlowFormContainerActions,
+  DocumentFlowFormContainerContent,
+  DocumentFlowFormContainerFooter,
+  DocumentFlowFormContainerStep,
+} from './document-flow-root';
 import { FieldItem } from './field-item';
 import { FRIENDLY_FIELD_TYPE } from './types';
 
@@ -58,18 +54,15 @@ export type AddFieldsFormProps = {
   document: Document;
   onContinue?: () => void;
   onGoBack?: () => void;
+  onSubmit: (_data: TAddFieldsFormSchema) => void;
 };
 
 export const AddFieldsFormPartial = ({
   recipients,
   fields,
-  document,
-  onContinue,
   onGoBack,
+  onSubmit,
 }: AddFieldsFormProps) => {
-  const { toast } = useToast();
-  const router = useRouter();
-
   const {
     control,
     handleSubmit,
@@ -303,28 +296,6 @@ export const AddFieldsFormPartial = ({
     [localFields, update],
   );
 
-  const onFormSubmit = handleSubmit(async (data: TAddFieldsFormSchema) => {
-    try {
-      // Custom invocation server action
-      await addFields({
-        documentId: document.id,
-        fields: data.fields,
-      });
-
-      router.refresh();
-
-      onContinue?.();
-    } catch (err) {
-      console.error(err);
-
-      toast({
-        title: 'Error',
-        description: 'An error occurred while adding signers.',
-        variant: 'destructive',
-      });
-    }
-  });
-
   useEffect(() => {
     if (selectedField) {
       window.addEventListener('mousemove', onMouseMove);
@@ -357,8 +328,8 @@ export const AddFieldsFormPartial = ({
   }, [recipients]);
 
   return (
-    <EditDocumentFormContainer>
-      <EditDocumentFormContainerContent
+    <DocumentFlowFormContainer>
+      <DocumentFlowFormContainerContent
         title="Add Fields"
         description="Add all relevant fields for each recipient."
       >
@@ -560,18 +531,18 @@ export const AddFieldsFormPartial = ({
             </div>
           </div>
         </div>
-      </EditDocumentFormContainerContent>
+      </DocumentFlowFormContainerContent>
 
-      <EditDocumentFormContainerFooter>
-        <EditDocumentFormContainerStep title="Add Fields" step={2} maxStep={3} />
+      <DocumentFlowFormContainerFooter>
+        <DocumentFlowFormContainerStep title="Add Fields" step={2} maxStep={3} />
 
-        <EditDocumentFormContainerActions
+        <DocumentFlowFormContainerActions
           loading={isSubmitting}
           disabled={isSubmitting}
-          onGoNextClick={() => onFormSubmit()}
+          onGoNextClick={() => handleSubmit(onSubmit)()}
           onGoBackClick={onGoBack}
         />
-      </EditDocumentFormContainerFooter>
-    </EditDocumentFormContainer>
+      </DocumentFlowFormContainerFooter>
+    </DocumentFlowFormContainer>
   );
 };
