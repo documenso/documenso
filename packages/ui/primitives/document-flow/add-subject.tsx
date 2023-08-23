@@ -1,26 +1,22 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
-
 import { useForm } from 'react-hook-form';
 
 import { Document, DocumentStatus, Field, Recipient } from '@documenso/prisma/client';
 import { Input } from '@documenso/ui/primitives/input';
 import { Label } from '@documenso/ui/primitives/label';
 import { Textarea } from '@documenso/ui/primitives/textarea';
-import { useToast } from '@documenso/ui/primitives/use-toast';
 
 import { FormErrorMessage } from '~/components/form/form-error-message';
 
-import { completeDocument } from './add-subject.action';
 import { TAddSubjectFormSchema } from './add-subject.types';
 import {
-  EditDocumentFormContainer,
-  EditDocumentFormContainerActions,
-  EditDocumentFormContainerContent,
-  EditDocumentFormContainerFooter,
-  EditDocumentFormContainerStep,
-} from './container';
+  DocumentFlowFormContainer,
+  DocumentFlowFormContainerActions,
+  DocumentFlowFormContainerContent,
+  DocumentFlowFormContainerFooter,
+  DocumentFlowFormContainerStep,
+} from './document-flow-root';
 
 export type AddSubjectFormProps = {
   recipients: Recipient[];
@@ -28,18 +24,16 @@ export type AddSubjectFormProps = {
   document: Document;
   onContinue?: () => void;
   onGoBack?: () => void;
+  onSubmit: (_data: TAddSubjectFormSchema) => void;
 };
 
 export const AddSubjectFormPartial = ({
   recipients: _recipients,
   fields: _fields,
   document,
-  onContinue,
   onGoBack,
+  onSubmit,
 }: AddSubjectFormProps) => {
-  const { toast } = useToast();
-  const router = useRouter();
-
   const {
     register,
     handleSubmit,
@@ -53,35 +47,9 @@ export const AddSubjectFormPartial = ({
     },
   });
 
-  const onFormSubmit = handleSubmit(async (data: TAddSubjectFormSchema) => {
-    const { subject, message } = data.email;
-
-    try {
-      await completeDocument({
-        documentId: document.id,
-        email: {
-          subject,
-          message,
-        },
-      });
-
-      router.refresh();
-
-      onContinue?.();
-    } catch (err) {
-      console.error(err);
-
-      toast({
-        title: 'Error',
-        description: 'An error occurred while sending the document.',
-        variant: 'destructive',
-      });
-    }
-  });
-
   return (
-    <EditDocumentFormContainer>
-      <EditDocumentFormContainerContent
+    <DocumentFlowFormContainer>
+      <DocumentFlowFormContainerContent
         title="Add Subject"
         description="Add the subject and message you wish to send to signers."
       >
@@ -151,19 +119,19 @@ export const AddSubjectFormPartial = ({
             </div>
           </div>
         </div>
-      </EditDocumentFormContainerContent>
+      </DocumentFlowFormContainerContent>
 
-      <EditDocumentFormContainerFooter>
-        <EditDocumentFormContainerStep title="Add Subject" step={3} maxStep={3} />
+      <DocumentFlowFormContainerFooter>
+        <DocumentFlowFormContainerStep title="Add Subject" step={3} maxStep={3} />
 
-        <EditDocumentFormContainerActions
+        <DocumentFlowFormContainerActions
           loading={isSubmitting}
           disabled={isSubmitting}
           goNextLabel={document.status === DocumentStatus.DRAFT ? 'Send' : 'Update'}
-          onGoNextClick={() => onFormSubmit()}
+          onGoNextClick={() => handleSubmit(onSubmit)()}
           onGoBackClick={onGoBack}
         />
-      </EditDocumentFormContainerFooter>
-    </EditDocumentFormContainer>
+      </DocumentFlowFormContainerFooter>
+    </DocumentFlowFormContainer>
   );
 };

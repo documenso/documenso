@@ -6,14 +6,13 @@ import { Trash } from 'lucide-react';
 import { createPortal } from 'react-dom';
 import { Rnd } from 'react-rnd';
 
+import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
 import { cn } from '@documenso/ui/lib/utils';
 import { Card, CardContent } from '@documenso/ui/primitives/card';
 
-import { PDF_VIEWER_PAGE_SELECTOR } from '~/components/(dashboard)/pdf-viewer/types';
+import { FRIENDLY_FIELD_TYPE, TDocumentFlowFormSchema } from './types';
 
-import { FRIENDLY_FIELD_TYPE, TEditDocumentFormSchema } from './types';
-
-type Field = TEditDocumentFormSchema['fields'][0];
+type Field = TDocumentFlowFormSchema['fields'][0];
 
 export type FieldItemProps = {
   field: Field;

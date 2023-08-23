@@ -2,14 +2,23 @@
 
 import { useState } from 'react';
 
+import { useRouter } from 'next/navigation';
+
 import { Document, Field, Recipient, User } from '@documenso/prisma/client';
 import { cn } from '@documenso/ui/lib/utils';
 import { Card, CardContent } from '@documenso/ui/primitives/card';
+import { AddFieldsFormPartial } from '@documenso/ui/primitives/document-flow/add-fields';
+import { TAddFieldsFormSchema } from '@documenso/ui/primitives/document-flow/add-fields.types';
+import { AddSignersFormPartial } from '@documenso/ui/primitives/document-flow/add-signers';
+import { TAddSignersFormSchema } from '@documenso/ui/primitives/document-flow/add-signers.types';
+import { AddSubjectFormPartial } from '@documenso/ui/primitives/document-flow/add-subject';
+import { TAddSubjectFormSchema } from '@documenso/ui/primitives/document-flow/add-subject.types';
+import { LazyPDFViewer } from '@documenso/ui/primitives/lazy-pdf-viewer';
+import { useToast } from '@documenso/ui/primitives/use-toast';
 
-import { LazyPDFViewer } from '~/components/(dashboard)/pdf-viewer/lazy-pdf-viewer';
-import { AddFieldsFormPartial } from '~/components/forms/edit-document/add-fields';
-import { AddSignersFormPartial } from '~/components/forms/edit-document/add-signers';
-import { AddSubjectFormPartial } from '~/components/forms/edit-document/add-subject';
+import { addFields } from '~/components/forms/edit-document/add-fields.action';
+import { addSigners } from '~/components/forms/edit-document/add-signers.action';
+import { completeDocument } from '~/components/forms/edit-document/add-subject.action';
 
 export type EditDocumentFormProps = {
   className?: string;
@@ -26,6 +35,9 @@ export const EditDocumentForm = ({
   fields,
   user: _user,
 }: EditDocumentFormProps) => {
+  const { toast } = useToast();
+  const router = useRouter();
+
   const [step, setStep] = useState<'signers' | 'fields' | 'subject'>('signers');
 
   const documentUrl = `data:application/pdf;base64,${document.document}`;
@@ -50,6 +62,76 @@ export const EditDocumentForm = ({
     }
   };
 
+  const onAddSignersFormSubmit = async (data: TAddSignersFormSchema) => {
+    try {
+      // Custom invocation server action
+      await addSigners({
+        documentId: document.id,
+        signers: data.signers,
+      });
+
+      router.refresh();
+
+      onNextStep();
+    } catch (err) {
+      console.error(err);
+
+      toast({
+        title: 'Error',
+        description: 'An error occurred while adding signers.',
+        variant: 'destructive',
+      });
+    }
+  };
+
+  const onAddFieldsFormSubmit = async (data: TAddFieldsFormSchema) => {
+    try {
+      // Custom invocation server action
+      await addFields({
+        documentId: document.id,
+        fields: data.fields,
+      });
+
+      router.refresh();
+
+      onNextStep();
+    } catch (err) {
+      console.error(err);
+
+      toast({
+        title: 'Error',
+        description: 'An error occurred while adding signers.',
+        variant: 'destructive',
+      });
+    }
+  };
+
+  const onAddSubjectFormSubmit = async (data: TAddSubjectFormSchema) => {
+    const { subject, message } = data.email;
+
+    try {
+      await completeDocument({
+        documentId: document.id,
+        email: {
+          subject,
+          message,
+        },
+      });
+
+      router.refresh();
+
+      onNextStep();
+    } catch (err) {
+      console.error(err);
+
+      toast({
+        title: 'Error',
+        description: 'An error occurred while sending the document.',
+        variant: 'destructive',
+      });
+    }
+  };
+
   return (
     <div className={cn('grid w-full grid-cols-12 gap-8', className)}>
       <Card
@@ -69,6 +151,7 @@ export const EditDocumentForm = ({
             document={document}
             onContinue={onNextStep}
             onGoBack={onPreviousStep}
+            onSubmit={onAddSignersFormSubmit}
           />
         )}
 
@@ -79,6 +162,7 @@ export const EditDocumentForm = ({
             document={document}
             onContinue={onNextStep}
             onGoBack={onPreviousStep}
+            onSubmit={onAddFieldsFormSubmit}
           />
         )}
 
@@ -89,6 +173,7 @@ export const EditDocumentForm = ({
             document={document}
             onContinue={onNextStep}
             onGoBack={onPreviousStep}
+            onSubmit={onAddSubjectFormSubmit}
           />
         )}
       </div>

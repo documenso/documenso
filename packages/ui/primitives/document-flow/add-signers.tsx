@@ -2,8 +2,6 @@
 
 import React, { useId } from 'react';
 
-import { useRouter } from 'next/navigation';
-
 import { AnimatePresence, motion } from 'framer-motion';
 import { Plus, Trash } from 'lucide-react';
 import { nanoid } from 'nanoid';
@@ -11,21 +9,19 @@ import { Controller, useFieldArray, useForm } from 'react-hook-form';
 
 import { Document, Field, Recipient, SendStatus } from '@documenso/prisma/client';
 import { Button } from '@documenso/ui/primitives/button';
+import { FormErrorMessage } from '@documenso/ui/primitives/form/form-error-message';
 import { Input } from '@documenso/ui/primitives/input';
 import { Label } from '@documenso/ui/primitives/label';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
-import { FormErrorMessage } from '~/components/form/form-error-message';
-
-import { addSigners } from './add-signers.action';
 import { TAddSignersFormSchema } from './add-signers.types';
 import {
-  EditDocumentFormContainer,
-  EditDocumentFormContainerActions,
-  EditDocumentFormContainerContent,
-  EditDocumentFormContainerFooter,
-  EditDocumentFormContainerStep,
-} from './container';
+  DocumentFlowFormContainer,
+  DocumentFlowFormContainerActions,
+  DocumentFlowFormContainerContent,
+  DocumentFlowFormContainerFooter,
+  DocumentFlowFormContainerStep,
+} from './document-flow-root';
 
 export type AddSignersFormProps = {
   recipients: Recipient[];
@@ -33,17 +29,16 @@ export type AddSignersFormProps = {
   document: Document;
   onContinue?: () => void;
   onGoBack?: () => void;
+  onSubmit: (_data: TAddSignersFormSchema) => void;
 };
 
 export const AddSignersFormPartial = ({
   recipients,
   fields: _fields,
-  document: document,
-  onContinue,
   onGoBack,
+  onSubmit,
 }: AddSignersFormProps) => {
   const { toast } = useToast();
-  const router = useRouter();
 
   const initialId = useId();
 
@@ -120,31 +115,9 @@ export const AddSignersFormPartial = ({
     }
   };
 
-  const onFormSubmit = handleSubmit(async (data: TAddSignersFormSchema) => {
-    try {
-      // Custom invocation server action
-      await addSigners({
-        documentId: document.id,
-        signers: data.signers,
-      });
-
-      router.refresh();
-
-      onContinue?.();
-    } catch (err) {
-      console.error(err);
-
-      toast({
-        title: 'Error',
-        description: 'An error occurred while adding signers.',
-        variant: 'destructive',
-      });
-    }
-  });
-
   return (
-    <EditDocumentFormContainer onSubmit={onFormSubmit}>
-      <EditDocumentFormContainerContent
+    <DocumentFlowFormContainer onSubmit={handleSubmit(onSubmit)}>
+      <DocumentFlowFormContainerContent
         title="Add Signers"
         description="Add the people who will sign the document."
       >
@@ -229,18 +202,18 @@ export const AddSignersFormPartial = ({
             Add Signer
           </Button>
         </div>
-      </EditDocumentFormContainerContent>
+      </DocumentFlowFormContainerContent>
 
-      <EditDocumentFormContainerFooter>
-        <EditDocumentFormContainerStep title="Add Signers" step={1} maxStep={3} />
+      <DocumentFlowFormContainerFooter>
+        <DocumentFlowFormContainerStep title="Add Signers" step={1} maxStep={3} />
 
-        <EditDocumentFormContainerActions
+        <DocumentFlowFormContainerActions
           loading={isSubmitting}
           disabled={isSubmitting}
-          onGoNextClick={() => onFormSubmit()}
+          onGoNextClick={() => handleSubmit(onSubmit)()}
           onGoBackClick={onGoBack}
         />
-      </EditDocumentFormContainerFooter>
-    </EditDocumentFormContainer>
+      </DocumentFlowFormContainerFooter>
+    </DocumentFlowFormContainer>
   );
 };

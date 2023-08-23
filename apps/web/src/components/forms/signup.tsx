@@ -12,9 +12,8 @@ import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
 import { Input } from '@documenso/ui/primitives/input';
 import { Label } from '@documenso/ui/primitives/label';
+import { SignaturePad } from '@documenso/ui/primitives/signature-pad';
 import { useToast } from '@documenso/ui/primitives/use-toast';
-
-import { SignaturePad } from '../signature-pad';
 
 export const ZSignUpFormSchema = z.object({
   name: z.string().min(1),

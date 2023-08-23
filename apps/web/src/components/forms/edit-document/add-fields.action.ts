@@ -2,8 +2,7 @@
 
 import { getRequiredServerComponentSession } from '@documenso/lib/next-auth/get-server-session';
 import { setFieldsForDocument } from '@documenso/lib/server-only/field/set-fields-for-document';
-
-import { TAddFieldsFormSchema } from './add-fields.types';
+import { TAddFieldsFormSchema } from '@documenso/ui/primitives/document-flow/add-fields.types';
 
 export type AddFieldsActionInput = TAddFieldsFormSchema & {
   documentId: number;

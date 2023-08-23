@@ -2,6 +2,7 @@ import { notFound } from 'next/navigation';
 
 import { match } from 'ts-pattern';
 
+import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
 import { getDocumentAndSenderByToken } from '@documenso/lib/server-only/document/get-document-by-token';
 import { viewedDocument } from '@documenso/lib/server-only/document/viewed-document';
 import { getFieldsForToken } from '@documenso/lib/server-only/field/get-fields-for-token';
@@ -9,9 +10,7 @@ import { getRecipientByToken } from '@documenso/lib/server-only/recipient/get-re
 import { FieldType } from '@documenso/prisma/client';
 import { Card, CardContent } from '@documenso/ui/primitives/card';
 import { ElementVisible } from '@documenso/ui/primitives/element-visible';
-
-import { LazyPDFViewer } from '~/components/(dashboard)/pdf-viewer/lazy-pdf-viewer';
-import { PDF_VIEWER_PAGE_SELECTOR } from '~/components/(dashboard)/pdf-viewer/types';
+import { LazyPDFViewer } from '@documenso/ui/primitives/lazy-pdf-viewer';
 
 import { DateField } from './date-field';
 import { SigningForm } from './form';

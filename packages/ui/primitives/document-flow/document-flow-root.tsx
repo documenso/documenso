@@ -7,16 +7,16 @@ import { Loader } from 'lucide-react';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
 
-export type EditDocumentFormContainerProps = HTMLAttributes<HTMLFormElement> & {
+export type DocumentFlowFormContainerProps = HTMLAttributes<HTMLFormElement> & {
   children?: React.ReactNode;
 };
 
-export const EditDocumentFormContainer = ({
+export const DocumentFlowFormContainer = ({
   children,
   id = 'edit-document-form',
   className,
   ...props
-}: EditDocumentFormContainerProps) => {
+}: DocumentFlowFormContainerProps) => {
   return (
     <form
       id={id}
@@ -31,19 +31,19 @@ export const EditDocumentFormContainer = ({
   );
 };
 
-export type EditDocumentFormContainerContentProps = HTMLAttributes<HTMLDivElement> & {
+export type DocumentFlowFormContainerContentProps = HTMLAttributes<HTMLDivElement> & {
   title: string;
   description: string;
   children?: React.ReactNode;
 };
 
-export const EditDocumentFormContainerContent = ({
+export const DocumentFlowFormContainerContent = ({
   children,
   title,
   description,
   className,
   ...props
-}: EditDocumentFormContainerContentProps) => {
+}: DocumentFlowFormContainerContentProps) => {
   return (
     <div className={cn('flex flex-1 flex-col', className)} {...props}>
       <h3 className="text-foreground text-2xl font-semibold">{title}</h3>
@@ -57,15 +57,15 @@ export const EditDocumentFormContainerContent = ({
   );
 };
 
-export type EditDocumentFormContainerFooterProps = HTMLAttributes<HTMLDivElement> & {
+export type DocumentFlowFormContainerFooterProps = HTMLAttributes<HTMLDivElement> & {
   children?: React.ReactNode;
 };
 
-export const EditDocumentFormContainerFooter = ({
+export const DocumentFlowFormContainerFooter = ({
   children,
   className,
   ...props
-}: EditDocumentFormContainerFooterProps) => {
+}: DocumentFlowFormContainerFooterProps) => {
   return (
     <div className={cn('mt-4 flex-shrink-0', className)} {...props}>
       {children}
@@ -73,17 +73,17 @@ export const EditDocumentFormContainerFooter = ({
   );
 };
 
-export type EditDocumentFormContainerStepProps = {
+export type DocumentFlowFormContainerStepProps = {
   title: string;
   step: number;
   maxStep: number;
 };
 
-export const EditDocumentFormContainerStep = ({
+export const DocumentFlowFormContainerStep = ({
   title,
   step,
   maxStep,
-}: EditDocumentFormContainerStepProps) => {
+}: DocumentFlowFormContainerStepProps) => {
   return (
     <div>
       <p className="text-muted-foreground text-sm">
@@ -105,7 +105,7 @@ export const EditDocumentFormContainerStep = ({
   );
 };
 
-export type EditDocumentFormContainerActionsProps = {
+export type DocumentFlowFormContainerActionsProps = {
   canGoBack?: boolean;
   canGoNext?: boolean;
   goNextLabel?: string;
@@ -116,7 +116,7 @@ export type EditDocumentFormContainerActionsProps = {
   disabled?: boolean;
 };
 
-export const EditDocumentFormContainerActions = ({
+export const DocumentFlowFormContainerActions = ({
   canGoBack = true,
   canGoNext = true,
   goNextLabel = 'Continue',
@@ -125,7 +125,7 @@ export const EditDocumentFormContainerActions = ({
   onGoNextClick,
   loading,
   disabled,
-}: EditDocumentFormContainerActionsProps) => {
+}: DocumentFlowFormContainerActionsProps) => {
   return (
     <div className="mt-4 flex gap-x-4">
       <Button
