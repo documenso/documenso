@@ -2,7 +2,7 @@ import { z } from 'zod';
 
 import { FieldType } from '@documenso/prisma/client';
 
-export const ZEditDocumentFormSchema = z.object({
+export const ZDocumentFlowFormSchema = z.object({
   signers: z
     .array(
       z.object({
@@ -37,7 +37,7 @@ export const ZEditDocumentFormSchema = z.object({
   }),
 });
 
-export type TEditDocumentFormSchema = z.infer<typeof ZEditDocumentFormSchema>;
+export type TDocumentFlowFormSchema = z.infer<typeof ZDocumentFlowFormSchema>;
 
 export const FRIENDLY_FIELD_TYPE: Record<FieldType, string> = {
   [FieldType.SIGNATURE]: 'Signature',

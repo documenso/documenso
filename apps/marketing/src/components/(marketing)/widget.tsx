@@ -21,12 +21,12 @@ import {
   DialogTitle,
 } from '@documenso/ui/primitives/dialog';
 import { Input } from '@documenso/ui/primitives/input';
+import { SignaturePad } from '@documenso/ui/primitives/signature-pad';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
 import { claimPlan } from '~/api/claim-plan/fetcher';
 
 import { FormErrorMessage } from '../form/form-error-message';
-import { SignaturePad } from '../signature-pad';
 
 const ZWidgetFormSchema = z
   .object({

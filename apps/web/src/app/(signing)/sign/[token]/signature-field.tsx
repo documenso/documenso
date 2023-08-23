@@ -12,9 +12,8 @@ import { trpc } from '@documenso/trpc/react';
 import { Button } from '@documenso/ui/primitives/button';
 import { Dialog, DialogContent, DialogFooter, DialogTitle } from '@documenso/ui/primitives/dialog';
 import { Label } from '@documenso/ui/primitives/label';
+import { SignaturePad } from '@documenso/ui/primitives/signature-pad';
 import { useToast } from '@documenso/ui/primitives/use-toast';
-
-import { SignaturePad } from '~/components/signature-pad';
 
 import { useRequiredSigningContext } from './provider';
 import { SigningFieldContainer } from './signing-field-container';
