@@ -3,35 +3,35 @@
 import { useForm } from 'react-hook-form';
 
 import { Document, DocumentStatus, Field, Recipient } from '@documenso/prisma/client';
+import { FormErrorMessage } from '@documenso/ui/primitives/form/form-error-message';
 import { Input } from '@documenso/ui/primitives/input';
 import { Label } from '@documenso/ui/primitives/label';
 import { Textarea } from '@documenso/ui/primitives/textarea';
 
-import { FormErrorMessage } from '~/components/form/form-error-message';
-
 import { TAddSubjectFormSchema } from './add-subject.types';
 import {
-  DocumentFlowFormContainer,
   DocumentFlowFormContainerActions,
   DocumentFlowFormContainerContent,
   DocumentFlowFormContainerFooter,
   DocumentFlowFormContainerStep,
 } from './document-flow-root';
+import { DocumentFlowStep } from './types';
 
 export type AddSubjectFormProps = {
+  documentFlow: DocumentFlowStep;
   recipients: Recipient[];
   fields: Field[];
   document: Document;
-  onContinue?: () => void;
-  onGoBack?: () => void;
+  numberOfSteps: number;
   onSubmit: (_data: TAddSubjectFormSchema) => void;
 };
 
 export const AddSubjectFormPartial = ({
+  documentFlow,
   recipients: _recipients,
   fields: _fields,
   document,
-  onGoBack,
+  numberOfSteps,
   onSubmit,
 }: AddSubjectFormProps) => {
   const {
@@ -48,11 +48,8 @@ export const AddSubjectFormPartial = ({
   });
 
   return (
-    <DocumentFlowFormContainer>
-      <DocumentFlowFormContainerContent
-        title="Add Subject"
-        description="Add the subject and message you wish to send to signers."
-      >
+    <>
+      <DocumentFlowFormContainerContent>
         <div className="flex flex-col">
           <div className="flex flex-col gap-y-4">
             <div>
@@ -122,16 +119,20 @@ export const AddSubjectFormPartial = ({
       </DocumentFlowFormContainerContent>
 
       <DocumentFlowFormContainerFooter>
-        <DocumentFlowFormContainerStep title="Add Subject" step={3} maxStep={3} />
+        <DocumentFlowFormContainerStep
+          title={documentFlow.title}
+          step={documentFlow.stepIndex}
+          maxStep={numberOfSteps}
+        />
 
         <DocumentFlowFormContainerActions
           loading={isSubmitting}
           disabled={isSubmitting}
           goNextLabel={document.status === DocumentStatus.DRAFT ? 'Send' : 'Update'}
+          onGoBackClick={documentFlow.onBackStep}
           onGoNextClick={() => handleSubmit(onSubmit)()}
-          onGoBackClick={onGoBack}
         />
       </DocumentFlowFormContainerFooter>
-    </DocumentFlowFormContainer>
+    </>
   );
 };

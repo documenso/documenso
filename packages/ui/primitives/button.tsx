@@ -2,6 +2,7 @@ import * as React from 'react';
 
 import { Slot } from '@radix-ui/react-slot';
 import { VariantProps, cva } from 'class-variance-authority';
+import { Loader } from 'lucide-react';
 
 import { cn } from '../lib/utils';
 
@@ -30,17 +31,51 @@ const buttonVariants = cva(
   },
 );
 
+const loaderVariants = cva('mr-2 animate-spin', {
+  variants: {
+    size: {
+      default: 'h-5 w-5',
+      sm: 'h-4 w-4',
+      lg: 'h-5 w-5',
+    },
+  },
+  defaultVariants: {
+    size: 'default',
+  },
+});
+
 export interface ButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement>,
     VariantProps<typeof buttonVariants> {
   asChild?: boolean;
+
+  /**
+   * Will display the loading spinner and disable the button.
+   */
+  loading?: boolean;
 }
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   ({ className, variant, size, asChild = false, ...props }, ref) => {
-    const Comp = asChild ? Slot : 'button';
+    if (asChild) {
+      return (
+        <Slot className={cn(buttonVariants({ variant, size, className }))} ref={ref} {...props} />
+      );
+    }
+
+    const showLoader = props.loading === true;
+    const isDisabled = props.disabled || showLoader;
+
     return (
-      <Comp className={cn(buttonVariants({ variant, size, className }))} ref={ref} {...props} />
+      <button
+        className={cn(buttonVariants({ variant, size, className }))}
+        ref={ref}
+        {...props}
+        disabled={isDisabled}
+      >
+        {showLoader && <Loader className={cn('mr-2 animate-spin', loaderVariants({ size }))} />}
+        {props.children}
+      </button>
     );
   },
 );

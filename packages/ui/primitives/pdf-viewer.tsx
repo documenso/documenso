@@ -104,11 +104,13 @@ export const PDFViewer = ({ className, document, onPageClick, ...props }: PDFVie
     <div ref={$el} className={cn('overflow-hidden', className)} {...props}>
       <PDFDocument
         file={document}
-        className="w-full overflow-hidden rounded"
+        className={cn('w-full overflow-hidden rounded', {
+          'h-[80vh] max-h-[60rem]': numPages === 0,
+        })}
         onLoadSuccess={(d) => onDocumentLoaded(d)}
         externalLinkTarget="_blank"
         loading={
-          <div className="dark:bg-background flex min-h-[80vh] flex-col items-center justify-center bg-white/50">
+          <div className="dark:bg-background flex h-[80vh] max-h-[60rem] flex-col items-center justify-center bg-white/50">
             <Loader className="text-documenso h-12 w-12 animate-spin" />
 
             <p className="text-muted-foreground mt-4">Loading document...</p>

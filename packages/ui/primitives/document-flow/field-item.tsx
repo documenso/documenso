@@ -91,9 +91,10 @@ export const FieldItem = ({
   return createPortal(
     <Rnd
       key={coords.pageX + coords.pageY + coords.pageHeight + coords.pageWidth}
-      className={cn('absolute z-20', {
+      className={cn(' z-20', {
         'pointer-events-none': passive,
-        'pointer-events-none z-10 opacity-75': disabled,
+        'pointer-events-none opacity-75': disabled,
+        'z-10': !active || disabled,
       })}
       // minHeight={minHeight}
       // minWidth={minWidth}
@@ -117,7 +118,7 @@ export const FieldItem = ({
     >
       {!disabled && (
         <button
-          className="text-muted-foreground/50 hover:text-muted-foreground/80 absolute -right-2 -top-2 z-[9999] flex h-8 w-8 items-center justify-center rounded-full border bg-white shadow-[0_0_0_2px_theme(colors.gray.100/70%)]"
+          className="text-muted-foreground/50 hover:text-muted-foreground/80 absolute -right-2 -top-2 z-20 flex h-8 w-8 items-center justify-center rounded-full border bg-white shadow-[0_0_0_2px_theme(colors.gray.100/70%)]"
           onClick={() => onRemove?.()}
         >
           <Trash className="h-4 w-4" />

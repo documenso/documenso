@@ -13,6 +13,11 @@ import { AddSignersFormPartial } from '@documenso/ui/primitives/document-flow/ad
 import { TAddSignersFormSchema } from '@documenso/ui/primitives/document-flow/add-signers.types';
 import { AddSubjectFormPartial } from '@documenso/ui/primitives/document-flow/add-subject';
 import { TAddSubjectFormSchema } from '@documenso/ui/primitives/document-flow/add-subject.types';
+import {
+  DocumentFlowFormContainer,
+  DocumentFlowFormContainerHeader,
+} from '@documenso/ui/primitives/document-flow/document-flow-root';
+import { DocumentFlowStep } from '@documenso/ui/primitives/document-flow/types';
 import { LazyPDFViewer } from '@documenso/ui/primitives/lazy-pdf-viewer';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
@@ -28,6 +33,8 @@ export type EditDocumentFormProps = {
   fields: Field[];
 };
 
+type EditDocumentStep = 'signers' | 'fields' | 'subject';
+
 export const EditDocumentForm = ({
   className,
   document,
@@ -38,29 +45,34 @@ export const EditDocumentForm = ({
   const { toast } = useToast();
   const router = useRouter();
 
-  const [step, setStep] = useState<'signers' | 'fields' | 'subject'>('signers');
+  const [step, setStep] = useState<EditDocumentStep>('signers');
 
   const documentUrl = `data:application/pdf;base64,${document.document}`;
 
-  const onNextStep = () => {
-    if (step === 'signers') {
-      setStep('fields');
-    }
-
-    if (step === 'fields') {
-      setStep('subject');
-    }
+  const documentFlow: Record<EditDocumentStep, DocumentFlowStep> = {
+    signers: {
+      title: 'Add Signers',
+      description: 'Add the people who will sign the document.',
+      stepIndex: 1,
+      onSubmit: () => onAddSignersFormSubmit,
+    },
+    fields: {
+      title: 'Add Fields',
+      description: 'Add all relevant fields for each recipient.',
+      stepIndex: 2,
+      onBackStep: () => setStep('signers'),
+      onSubmit: () => onAddFieldsFormSubmit,
+    },
+    subject: {
+      title: 'Add Subject',
+      description: 'Add the subject and message you wish to send to signers.',
+      stepIndex: 3,
+      onBackStep: () => setStep('fields'),
+      onSubmit: () => onAddSubjectFormSubmit,
+    },
   };
 
-  const onPreviousStep = () => {
-    if (step === 'fields') {
-      setStep('signers');
-    }
-
-    if (step === 'subject') {
-      setStep('fields');
-    }
-  };
+  const currentDocumentFlow = documentFlow[step];
 
   const onAddSignersFormSubmit = async (data: TAddSignersFormSchema) => {
     try {
@@ -72,7 +84,7 @@ export const EditDocumentForm = ({
 
       router.refresh();
 
-      onNextStep();
+      setStep('fields');
     } catch (err) {
       console.error(err);
 
@@ -94,7 +106,7 @@ export const EditDocumentForm = ({
 
       router.refresh();
 
-      onNextStep();
+      setStep('subject');
     } catch (err) {
       console.error(err);
 
@@ -119,8 +131,6 @@ export const EditDocumentForm = ({
       });
 
       router.refresh();
-
-      onNextStep();
     } catch (err) {
       console.error(err);
 
@@ -144,38 +154,43 @@ export const EditDocumentForm = ({
       </Card>
 
       <div className="col-span-12 lg:col-span-6 xl:col-span-5">
-        {step === 'signers' && (
-          <AddSignersFormPartial
-            recipients={recipients}
-            fields={fields}
-            document={document}
-            onContinue={onNextStep}
-            onGoBack={onPreviousStep}
-            onSubmit={onAddSignersFormSubmit}
+        <DocumentFlowFormContainer onSubmit={(e) => e.preventDefault()}>
+          <DocumentFlowFormContainerHeader
+            title={currentDocumentFlow.title}
+            description={currentDocumentFlow.description}
           />
-        )}
 
-        {step === 'fields' && (
-          <AddFieldsFormPartial
-            recipients={recipients}
-            fields={fields}
-            document={document}
-            onContinue={onNextStep}
-            onGoBack={onPreviousStep}
-            onSubmit={onAddFieldsFormSubmit}
-          />
-        )}
+          {step === 'signers' && (
+            <AddSignersFormPartial
+              documentFlow={documentFlow.signers}
+              recipients={recipients}
+              fields={fields}
+              numberOfSteps={Object.keys(documentFlow).length}
+              onSubmit={onAddSignersFormSubmit}
+            />
+          )}
 
-        {step === 'subject' && (
-          <AddSubjectFormPartial
-            recipients={recipients}
-            fields={fields}
-            document={document}
-            onContinue={onNextStep}
-            onGoBack={onPreviousStep}
-            onSubmit={onAddSubjectFormSubmit}
-          />
-        )}
+          {step === 'fields' && (
+            <AddFieldsFormPartial
+              documentFlow={documentFlow.fields}
+              recipients={recipients}
+              fields={fields}
+              numberOfSteps={Object.keys(documentFlow).length}
+              onSubmit={onAddFieldsFormSubmit}
+            />
+          )}
+
+          {step === 'subject' && (
+            <AddSubjectFormPartial
+              documentFlow={documentFlow.subject}
+              document={document}
+              recipients={recipients}
+              fields={fields}
+              numberOfSteps={Object.keys(documentFlow).length}
+              onSubmit={onAddSubjectFormSubmit}
+            />
+          )}
+        </DocumentFlowFormContainer>
       </div>
     </div>
   );
