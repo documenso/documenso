@@ -226,6 +226,7 @@ export const Widget = ({ className, children, ...props }: WidgetProps) => {
                           className="bg-primary h-full w-14 rounded"
                           disabled={!field.value || !!errors.email?.message}
                           onClick={() => onNextStepClick()}
+                          aria-label="Next"
                         >
                           Next
                         </Button>
@@ -283,6 +284,7 @@ export const Widget = ({ className, children, ...props }: WidgetProps) => {
                             className="bg-primary h-full w-14 rounded"
                             disabled={!field.value || !!errors.name?.message}
                             onClick={() => onNextStepClick()}
+                            aria-label="Next"
                           >
                             Next
                           </Button>
@@ -357,6 +359,7 @@ export const Widget = ({ className, children, ...props }: WidgetProps) => {
                     type="submit"
                     className="h-8 disabled:bg-[#ECEEED] disabled:text-[#C6C6C6] disabled:hover:bg-[#ECEEED]"
                     disabled={!isValid || isSubmitting}
+                    aria-label="Sign"
                   >
                     {isSubmitting && <Loader className="mr-2 h-4 w-4 animate-spin" />}
                     Sign
@@ -387,11 +390,13 @@ export const Widget = ({ className, children, ...props }: WidgetProps) => {
           />
 
           <DialogFooter>
-            <Button variant="ghost" onClick={() => setShowSigningDialog(false)}>
+            <Button variant="ghost" onClick={() => setShowSigningDialog(false)} aria-label="Cancel">
               Cancel
             </Button>
 
-            <Button onClick={() => onSignatureConfirmClick()}>Confirm</Button>
+            <Button onClick={() => onSignatureConfirmClick()} aria-label="Confirm">
+              Confirm
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

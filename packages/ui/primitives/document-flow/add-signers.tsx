@@ -197,7 +197,12 @@ export const AddSignersFormPartial = ({
         <FormErrorMessage className="mt-2" error={errors.signers} />
 
         <div className="mt-4">
-          <Button type="button" disabled={isSubmitting} onClick={() => onAddSigner()}>
+          <Button
+            type="button"
+            disabled={isSubmitting}
+            onClick={() => onAddSigner()}
+            aria-label="Add Signer"
+          >
             <Plus className="-ml-1 mr-2 h-5 w-5" />
             Add Signer
           </Button>

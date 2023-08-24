@@ -13,7 +13,7 @@ export const HamburgerMenu = ({ isMenuOpen, onToggleMenuOpen }: HamburgerMenuPro
   return (
     <div className="flex md:hidden">
       <Button variant="outline" className="z-20 w-10 p-0" onClick={onToggleMenuOpen}>
-        {isMenuOpen ? <X /> : <Menu />}
+        {isMenuOpen ? <X aria-label="close" /> : <Menu aria-label="menu" />}
       </Button>
     </div>
   );

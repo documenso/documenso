@@ -41,7 +41,12 @@ export const Header = ({ className, user, ...props }: HeaderProps) => {
         <div className="flex gap-x-4">
           <ProfileDropdown user={user} />
 
-          <Button variant="outline" size="sm" className="h-10 w-10 p-0.5 md:hidden">
+          <Button
+            variant="outline"
+            size="sm"
+            className="h-10 w-10 p-0.5 md:hidden"
+            aria-label="Menu"
+          >
             <Menu className="h-6 w-6" />
           </Button>
         </div>

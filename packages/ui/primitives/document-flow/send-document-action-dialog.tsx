@@ -55,12 +55,13 @@ export const SendDocumentActionDialog = ({
             type="button"
             variant="secondary"
             onClick={() => setOpen(false)}
+            aria-label="Cancel"
           >
             Cancel
           </Button>
 
           {/* We would use DialogAction here but it interrupts the submit action */}
-          <Button className={className} {...props}>
+          <Button className={className} {...props} aria-label="Send">
             {loading && <Loader className="mr-2 h-5 w-5 animate-spin" />}
             Send
           </Button>

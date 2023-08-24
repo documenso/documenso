@@ -135,6 +135,7 @@ export const DocumentFlowFormContainerActions = ({
         variant="secondary"
         disabled={disabled || loading || !canGoBack}
         onClick={onGoBackClick}
+        aria-label={goBackLabel}
       >
         {goBackLabel}
       </Button>
@@ -145,6 +146,7 @@ export const DocumentFlowFormContainerActions = ({
         size="lg"
         disabled={disabled || loading || !canGoNext}
         onClick={onGoNextClick}
+        aria-label={goNextLabel}
       >
         {loading && <Loader className="mr-2 h-5 w-5 animate-spin" />}
         {goNextLabel}

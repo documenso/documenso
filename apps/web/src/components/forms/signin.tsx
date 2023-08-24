@@ -126,6 +126,7 @@ export const SignInForm = ({ className }: SignInFormProps) => {
         className="bg-background text-muted-foreground border"
         disabled={isSubmitting}
         onClick={onSignInWithGoogleClick}
+        aria-label="Google"
       >
         <FcGoogle className="mr-2 h-5 w-5" />
         Google

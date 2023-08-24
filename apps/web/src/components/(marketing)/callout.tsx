@@ -39,6 +39,7 @@ export const Callout = ({ starCount }: CalloutProps) => {
         variant="outline"
         className="rounded-full bg-transparent backdrop-blur-sm"
         onClick={onSignUpClick}
+        aria-label="Get the Community Plan for $30 per month forever"
       >
         Get the Community Plan
         <span className="bg-primary -mr-2.5 ml-2.5 rounded-full px-2 py-1.5 text-xs">
@@ -51,7 +52,11 @@ export const Callout = ({ starCount }: CalloutProps) => {
         target="_blank"
         onClick={() => event('view-github')}
       >
-        <Button variant="outline" className="rounded-full bg-transparent backdrop-blur-sm">
+        <Button
+          variant="outline"
+          className="rounded-full bg-transparent backdrop-blur-sm"
+          aria-label="Star on Github"
+        >
           <Github className="mr-2 h-5 w-5" />
           Star on Github
           {starCount && starCount > 0 && (

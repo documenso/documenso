@@ -104,6 +104,7 @@ export const SigningForm = ({ document, recipient, fields }: SigningFormProps) =
                 className="dark:bg-muted dark:hover:bg-muted/80 flex-1 bg-black/5 hover:bg-black/10"
                 variant="secondary"
                 size="lg"
+                aria-label="Cancel"
               >
                 Cancel
               </Button>
@@ -113,6 +114,7 @@ export const SigningForm = ({ document, recipient, fields }: SigningFormProps) =
                 className="flex-1"
                 size="lg"
                 disabled={!isComplete || isSubmitting}
+                aria-label="Complete"
               >
                 {isSubmitting && <Loader className="mr-2 h-5 w-5 animate-spin" />}
                 Complete

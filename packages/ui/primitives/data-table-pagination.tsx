@@ -47,6 +47,7 @@ export function DataTablePagination<TData>({ table }: DataTablePaginationProps<T
             className="hidden h-8 w-8 p-0 lg:flex"
             onClick={() => table.setPageIndex(0)}
             disabled={!table.getCanPreviousPage()}
+            aria-label="Go to first page"
           >
             <span className="sr-only">Go to first page</span>
             <ChevronsLeft className="h-4 w-4" />
@@ -56,6 +57,7 @@ export function DataTablePagination<TData>({ table }: DataTablePaginationProps<T
             className="h-8 w-8 p-0"
             onClick={() => table.previousPage()}
             disabled={!table.getCanPreviousPage()}
+            aria-label="Go to previous page"
           >
             <span className="sr-only">Go to previous page</span>
             <ChevronLeft className="h-4 w-4" />
@@ -65,6 +67,7 @@ export function DataTablePagination<TData>({ table }: DataTablePaginationProps<T
             className="h-8 w-8 p-0"
             onClick={() => table.nextPage()}
             disabled={!table.getCanNextPage()}
+            aria-label="Go to next page"
           >
             <span className="sr-only">Go to next page</span>
             <ChevronRight className="h-4 w-4" />
@@ -74,6 +77,7 @@ export function DataTablePagination<TData>({ table }: DataTablePaginationProps<T
             className="hidden h-8 w-8 p-0 lg:flex"
             onClick={() => table.setPageIndex(table.getPageCount() - 1)}
             disabled={!table.getCanNextPage()}
+            aria-label="Go to last page"
           >
             <span className="sr-only">Go to last page</span>
             <ChevronsRight className="h-4 w-4" />

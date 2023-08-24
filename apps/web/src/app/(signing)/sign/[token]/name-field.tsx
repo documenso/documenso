@@ -139,6 +139,7 @@ export const NameField = ({ field, recipient }: NameFieldProps) => {
                   setShowFullNameModal(false);
                   setLocalFullName('');
                 }}
+                aria-label="Cancel"
               >
                 Cancel
               </Button>
@@ -151,6 +152,7 @@ export const NameField = ({ field, recipient }: NameFieldProps) => {
                   setShowFullNameModal(false);
                   onSign('local');
                 }}
+                aria-label="Sign"
               >
                 Sign
               </Button>

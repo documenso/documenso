@@ -98,6 +98,7 @@ export const PricingTable = ({ className, ...props }: PricingTableProps) => {
               href="https://github.com/documenso/documenso"
               target="_blank"
               onClick={() => event('view-github')}
+              aria-label="View on Github"
             >
               View on Github
             </Link>
@@ -130,7 +131,9 @@ export const PricingTable = ({ className, ...props }: PricingTableProps) => {
           </p>
 
           <ClaimPlanDialog planId={planId}>
-            <Button className="mt-6 rounded-full text-base">Signup Now</Button>
+            <Button className="mt-6 rounded-full text-base" aria-label="Signup Now">
+              Signup Now
+            </Button>
           </ClaimPlanDialog>
 
           <div className="mt-8 flex w-full flex-col divide-y">
@@ -162,7 +165,9 @@ export const PricingTable = ({ className, ...props }: PricingTableProps) => {
             className="mt-6"
             onClick={() => event('enterprise-contact')}
           >
-            <Button className="rounded-full text-base">Contact Us</Button>
+            <Button className="rounded-full text-base" aria-label="Contact Us">
+              Contact Us
+            </Button>
           </Link>
 
           <div className="mt-8 flex w-full flex-col divide-y">

@@ -133,7 +133,12 @@ export const ClaimPlanDialog = ({ className, planId, children }: ClaimPlanDialog
             <FormErrorMessage className="mt-1" error={errors.email} />
           </div>
 
-          <Button type="submit" size="lg" disabled={isSubmitting}>
+          <Button
+            type="submit"
+            size="lg"
+            disabled={isSubmitting}
+            aria-label="Claim the community plan"
+          >
             {isSubmitting && <Loader className="mr-2 h-4 w-4 animate-spin" />}
             Claim the Community Plan ({/* eslint-disable-next-line turbo/no-undeclared-env-vars */}
             {planId === process.env.NEXT_PUBLIC_STRIPE_COMMUNITY_PLAN_MONTHLY_PRICE_ID

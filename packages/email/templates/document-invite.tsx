@@ -76,6 +76,7 @@ export const DocumentInviteEmailTemplate = ({
                     <Button
                       className="bg-documenso-500 inline-flex items-center justify-center rounded-lg px-6 py-3 text-center text-sm font-medium text-black no-underline"
                       href={signDocumentLink}
+                      aria-label="Sign Document"
                     >
                       Sign Document
                     </Button>

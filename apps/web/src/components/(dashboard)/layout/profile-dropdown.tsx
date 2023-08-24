@@ -50,7 +50,11 @@ export const ProfileDropdown = ({ user }: ProfileDropdownProps) => {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" className="relative h-10 w-10 rounded-full">
+        <Button
+          variant="ghost"
+          className="relative h-10 w-10 rounded-full"
+          aria-label={`${initials}-avatar`}
+        >
           <Avatar className="h-10 w-10">
             <AvatarFallback>{initials}</AvatarFallback>
           </Avatar>

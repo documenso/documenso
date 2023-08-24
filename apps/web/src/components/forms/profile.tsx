@@ -126,7 +126,7 @@ export const ProfileForm = ({ className, user }: ProfileFormProps) => {
       </div>
 
       <div className="mt-4">
-        <Button type="submit" disabled={isSubmitting}>
+        <Button type="submit" disabled={isSubmitting} aria-label="Update profile">
           {isSubmitting && <Loader className="mr-2 h-5 w-5 animate-spin" />}
           Update profile
         </Button>

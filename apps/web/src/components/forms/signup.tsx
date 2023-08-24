@@ -120,7 +120,12 @@ export const SignUpForm = ({ className }: SignUpFormProps) => {
         </div>
       </div>
 
-      <Button size="lg" disabled={isSubmitting} className="dark:bg-documenso dark:hover:opacity-90">
+      <Button
+        size="lg"
+        disabled={isSubmitting}
+        className="dark:bg-documenso dark:hover:opacity-90"
+        aria-label="Sign Up"
+      >
         {isSubmitting && <Loader className="mr-2 h-5 w-5 animate-spin" />}
         Sign Up
       </Button>

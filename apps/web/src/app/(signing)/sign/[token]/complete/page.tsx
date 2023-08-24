@@ -83,7 +83,7 @@ export default async function CompletedSigningPage({
 
       <div className="mt-8 flex w-full max-w-sm items-center justify-center gap-4">
         {/* TODO: Hook this up */}
-        <Button variant="outline" className="flex-1">
+        <Button variant="outline" className="flex-1" aria-label="Share">
           <Share className="mr-2 h-5 w-5" />
           Share
         </Button>

@@ -81,6 +81,7 @@ export const DocumentCompletedEmailTemplate = ({
                     <Button
                       className="mr-4 inline-flex items-center justify-center rounded-lg border border-solid border-slate-200 px-4 py-2 text-center text-sm font-medium text-black no-underline"
                       href={reviewLink}
+                      aria-label="Review"
                     >
                       <Img
                         src={getAssetUrl('/static/review.png')}
@@ -91,6 +92,7 @@ export const DocumentCompletedEmailTemplate = ({
                     <Button
                       className="inline-flex items-center justify-center rounded-lg border border-solid border-slate-200 px-4 py-2 text-center text-sm font-medium text-black no-underline"
                       href={downloadLink}
+                      aria-label="Download"
                     >
                       <Img
                         src={getAssetUrl('/static/download.png')}

@@ -30,6 +30,7 @@ export const DesktopNav = ({ className, ...props }: DesktopNavProps) => {
             'w-full justify-start',
             pathname?.startsWith('/settings/profile') && 'bg-secondary',
           )}
+          aria-label="Profile"
         >
           <User className="mr-2 h-5 w-5" />
           Profile
@@ -43,6 +44,7 @@ export const DesktopNav = ({ className, ...props }: DesktopNavProps) => {
             'w-full justify-start',
             pathname?.startsWith('/settings/password') && 'bg-secondary',
           )}
+          aria-label="Password"
         >
           <Key className="mr-2 h-5 w-5" />
           Password
@@ -57,6 +59,7 @@ export const DesktopNav = ({ className, ...props }: DesktopNavProps) => {
               'w-full justify-start',
               pathname?.startsWith('/settings/billing') && 'bg-secondary',
             )}
+            aria-label="Billing"
           >
             <CreditCard className="mr-2 h-5 w-5" />
             Billing

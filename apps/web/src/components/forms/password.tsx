@@ -115,7 +115,7 @@ export const PasswordForm = ({ className }: PasswordFormProps) => {
       </div>
 
       <div className="mt-4">
-        <Button type="submit" disabled={isSubmitting}>
+        <Button type="submit" disabled={isSubmitting} aria-label="Update password">
           {isSubmitting && <Loader className="mr-2 h-5 w-5 animate-spin" />}
           Update password
         </Button>

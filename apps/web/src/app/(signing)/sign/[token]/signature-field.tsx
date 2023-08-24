@@ -172,6 +172,7 @@ export const SignatureField = ({ field, recipient }: SignatureFieldProps) => {
                   setShowSignatureModal(false);
                   setLocalSignature(null);
                 }}
+                aria-label="Cancel"
               >
                 Cancel
               </Button>
@@ -184,6 +185,7 @@ export const SignatureField = ({ field, recipient }: SignatureFieldProps) => {
                   setShowSignatureModal(false);
                   onSign('local');
                 }}
+                aria-label="Sign"
               >
                 Sign
               </Button>

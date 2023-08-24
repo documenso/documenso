@@ -60,6 +60,7 @@ export const DownloadButton = ({
       disabled={disabled || !document}
       onClick={onDownloadClick}
       {...props}
+      aria-label="Download"
     >
       <Download className="mr-2 h-5 w-5" />
       Download
