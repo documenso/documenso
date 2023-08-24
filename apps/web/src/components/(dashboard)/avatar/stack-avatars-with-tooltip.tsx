@@ -11,7 +11,17 @@ import {
 import { StackAvatar } from './stack-avatar';
 import { StackAvatars } from './stack-avatars';
 
-export const StackAvatarsWithTooltip = ({ recipients }: { recipients: Recipient[] }) => {
+export type StackAvatarsWithTooltipProps = {
+  recipients: Recipient[];
+  position?: 'top' | 'bottom';
+  children?: React.ReactNode;
+};
+
+export const StackAvatarsWithTooltip = ({
+  recipients,
+  position,
+  children,
+}: StackAvatarsWithTooltipProps) => {
   const waitingRecipients = recipients.filter(
     (recipient) => getRecipientType(recipient) === 'waiting',
   );
@@ -32,9 +42,10 @@ export const StackAvatarsWithTooltip = ({ recipients }: { recipients: Recipient[
     <TooltipProvider>
       <Tooltip>
         <TooltipTrigger className="flex cursor-pointer">
-          <StackAvatars recipients={recipients} />
+          {children || <StackAvatars recipients={recipients} />}
         </TooltipTrigger>
-        <TooltipContent>
+
+        <TooltipContent side={position}>
           <div className="flex flex-col gap-y-5 p-1">
             {completedRecipients.length > 0 && (
               <div>
