@@ -1,12 +1,5 @@
 version: 2
 
-on:
-  push:
-    branches: [ "feat/refresh" ]
-  pull_request:
-    branches: [ "feat/refresh" ]
-  workflow_dispatch:
-
 updates:
   - package-ecosystem: 'github-actions'
     directory: '/'
