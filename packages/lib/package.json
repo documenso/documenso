@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "./index.ts",
   "types": "./index.ts",
-  "license": "MIT",
+  "license": "SEE LICENSE IN LICENSE.md",
   "files": [
     "client-only/",
     "server-only/",
