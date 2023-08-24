@@ -224,6 +224,10 @@ We support a variety of deployment methods, and are actively working on adding m
 
 [![Deploy on Railway](https://railway.app/button.svg)](https://railway.app/template/DjrRRX)
 
+## Render
+
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/documenso/documenso)
+
 # Troubleshooting
 
 ## I'm not receiving any emails when using the developer quickstart

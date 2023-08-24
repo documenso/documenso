@@ -1,0 +1,63 @@
+services:
+  - type: web
+    name: documenso-app
+    env: node
+    plan: free
+    buildCommand: npm i turbo && npm install --package-lock-only && npm ci && npm run build
+    startCommand: npx prisma migrate deploy; npm run start
+    healthCheckPath: /api/health
+
+    envVars:
+      - key: NODE_VERSION
+        value: 18.17.0
+
+      - key: DATABASE_URL
+        fromDatabase:
+          name: documenso-db
+          property: connectionString
+
+      - key: NEXT_PUBLIC_WEBAPP_URL
+        fromService:
+          name: documenso-app
+          type: web
+          envVarKey: RENDER_EXTERNAL_URL
+
+      - key: NEXTAUTH_SECRET
+        generateValue: true
+
+      - key: NEXTAUTH_URL
+        fromService:
+          name: documenso-app
+          type: web
+          envVarKey: RENDER_EXTERNAL_URL
+
+      - key: SENDGRID_API_KEY
+        sync: false
+      - key: SMTP_MAIL_HOST
+        sync: false
+      - key: SMTP_MAIL_PORT
+        sync: false
+      - key: SMTP_MAIL_USER
+        sync: false
+      - key: SMTP_MAIL_PASSWORD
+        sync: false
+      - key: MAIL_FROM
+        sync: false
+
+      - key: NEXT_PUBLIC_ALLOW_SUBSCRIPTIONS
+        value: false
+      - key: STRIPE_API_KEY
+        sync: false
+      - key: STRIPE_WEBHOOK_SECRET
+        sync: false
+      - key: NEXT_PUBLIC_STRIPE_COMMUNITY_PLAN_MONTHLY_PRICE_ID
+        sync: false
+      - key: NEXT_PUBLIC_STRIPE_COMMUNITY_PLAN_YEARLY_PRICE_ID
+        sync: false
+
+      - key: NEXT_PUBLIC_ALLOW_SIGNUP
+        value: true
+
+databases:
+  - name: documenso-db
+    plan: free
