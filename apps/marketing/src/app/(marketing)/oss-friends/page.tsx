@@ -183,7 +183,7 @@ export default function OSSFriendsPage() {
 
                 <div className="mt-8">
                   <Link target="_blank" href={friend.href}>
-                    <Button>Learn more</Button>
+                    <Button aria-label="Learn more">Learn more</Button>
                   </Link>
                 </div>
               </CardContent>

@@ -27,8 +27,15 @@ export const SendDocumentActionDialog = ({
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button type="button" className={className}>
-          {loading && <Loader className="text-documenso mr-2 h-5 w-5 animate-spin" />}
+        <Button type="button" className={className} aria-label="Send">
+          {loading && (
+            <Loader
+              className="text-documenso mr-2 h-5 w-5 animate-spin"
+              aria-busy="true"
+              aria-live="polite"
+              role="status"
+            />
+          )}
           Send
         </Button>
       </DialogTrigger>

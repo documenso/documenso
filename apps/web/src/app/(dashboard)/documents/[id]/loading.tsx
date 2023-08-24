@@ -16,7 +16,13 @@ export default function Loading() {
       <div className="mt-8 grid min-h-[80vh] w-full grid-cols-12 gap-x-8">
         <div className="dark:bg-background border-border col-span-12 rounded-xl border-2 bg-white/50 p-2 before:rounded-xl lg:col-span-6 xl:col-span-7">
           <div className="flex min-h-[80vh] flex-col items-center justify-center">
-            <Loader className="text-documenso h-12 w-12 animate-spin" />
+            <Loader
+              className="text-documenso h-12 w-12 animate-spin"
+              aria-busy="true"
+              aria-label="Loading"
+              role="status"
+              aria-live="polite"
+            />
 
             <p className="text-muted-foreground mt-4">Loading document...</p>
           </div>

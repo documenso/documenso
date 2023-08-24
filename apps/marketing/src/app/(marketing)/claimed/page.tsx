@@ -162,7 +162,7 @@ export default async function ClaimedPlanPage({ searchParams = {} }: ClaimedPlan
           target="_blank"
           className="mt-4 block"
         >
-          <Button size="lg" className="text-base">
+          <Button size="lg" className="text-base" aria-label="Let's get started">
             Let's get started!
             <ArrowRight className="ml-2 h-5 w-5" />
           </Button>
