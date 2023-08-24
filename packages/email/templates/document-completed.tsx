@@ -51,7 +51,6 @@ export const DocumentCompletedEmailTemplate = ({
             <Container className="mx-auto mb-2 mt-8 max-w-xl rounded-lg border border-solid border-slate-200 p-2 backdrop-blur-sm">
               <Section className="p-2">
                 <Img src={getAssetUrl('/static/logo.png')} alt="Documenso Logo" className="h-6" />
-
                 <Section className="mt-4 flex-row items-center justify-center">
                   <div className="flex items-center justify-center p-4">
                     <Img
@@ -65,6 +64,7 @@ export const DocumentCompletedEmailTemplate = ({
                     <Img
                       src={getAssetUrl('/static/completed.png')}
                       className="-mb-0.5 mr-2 inline h-7 w-7"
+                      alt="Completed"
                     />
                     Completed
                   </Text>
@@ -86,6 +86,7 @@ export const DocumentCompletedEmailTemplate = ({
                       <Img
                         src={getAssetUrl('/static/review.png')}
                         className="-mb-1 mr-2 inline h-5 w-5"
+                        alt="Review"
                       />
                       Review
                     </Button>
@@ -97,6 +98,7 @@ export const DocumentCompletedEmailTemplate = ({
                       <Img
                         src={getAssetUrl('/static/download.png')}
                         className="-mb-1 mr-2 inline h-5 w-5"
+                        alt="Download"
                       />
                       Download
                     </Button>

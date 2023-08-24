@@ -60,6 +60,7 @@ export const DocumentPendingEmailTemplate = ({
                     <Img
                       src={getAssetUrl('/static/clock.png')}
                       className="-mb-0.5 mr-2 inline h-7 w-7"
+                      alt="Waiting"
                     />
                     Waiting for others
                   </Text>

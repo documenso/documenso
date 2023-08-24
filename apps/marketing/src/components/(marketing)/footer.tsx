@@ -24,7 +24,7 @@ export const Footer = ({ className, ...props }: FooterProps) => {
               target="_blank"
               className="hover:text-[#6D6D6D]"
             >
-              <Twitter className="h-6 w-6" />
+              <Twitter className="h-6 w-6" aria-label="Twitter" />
             </Link>
 
             <Link
@@ -32,7 +32,7 @@ export const Footer = ({ className, ...props }: FooterProps) => {
               target="_blank"
               className="hover:text-[#6D6D6D]"
             >
-              <Github className="h-6 w-6" />
+              <Github className="h-6 w-6" aria-label="GitHub" />
             </Link>
 
             <Link
@@ -40,7 +40,7 @@ export const Footer = ({ className, ...props }: FooterProps) => {
               target="_blank"
               className="hover:text-[#6D6D6D]"
             >
-              <MessagesSquare className="h-6 w-6" />
+              <MessagesSquare className="h-6 w-6" aria-label="Discord" />
             </Link>
           </div>
         </div>

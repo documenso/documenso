@@ -49,6 +49,7 @@ export const PricingTable = ({ className, ...props }: PricingTableProps) => {
               'hover:text-slate-900/80': period !== 'MONTHLY',
             })}
             onClick={() => setPeriod('MONTHLY')}
+            aria-label="Monthly"
           >
             Monthly
             {period === 'MONTHLY' && (
@@ -66,6 +67,7 @@ export const PricingTable = ({ className, ...props }: PricingTableProps) => {
               'hover:text-slate-900/80': period !== 'YEARLY',
             })}
             onClick={() => setPeriod('YEARLY')}
+            aria-label="Yearly Save $60"
           >
             Yearly
             <div className="block rounded-full bg-slate-200 px-2 py-0.5 text-xs text-slate-700">
@@ -93,12 +95,11 @@ export const PricingTable = ({ className, ...props }: PricingTableProps) => {
             For small teams and individuals who need a simple solution
           </p>
 
-          <Button className="mt-6 rounded-full text-base">
+          <Button className="mt-6 rounded-full text-base" aria-label="View on Github">
             <Link
               href="https://github.com/documenso/documenso"
               target="_blank"
               onClick={() => event('view-github')}
-              aria-label="View on Github"
             >
               View on Github
             </Link>

@@ -49,6 +49,7 @@ export const PricingTable = ({ className, ...props }: PricingTableProps) => {
               'hover:text-slate-900/80': period !== 'MONTHLY',
             })}
             onClick={() => setPeriod('MONTHLY')}
+            aria-label="Monthly"
           >
             Monthly
             {period === 'MONTHLY' && (
@@ -66,6 +67,7 @@ export const PricingTable = ({ className, ...props }: PricingTableProps) => {
               'hover:text-slate-900/80': period !== 'YEARLY',
             })}
             onClick={() => setPeriod('YEARLY')}
+            aria-label="Yearly Save $60"
           >
             Yearly
             <div className="block rounded-full bg-slate-200 px-2 py-0.5 text-xs text-slate-700">

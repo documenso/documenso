@@ -50,7 +50,7 @@ export const Footer = ({ className, ...props }: FooterProps) => {
             href="/pricing"
             className="flex-shrink-0 text-sm text-[#8D8D8D] hover:text-[#6D6D6D]"
           >
-            Pricing
+            Pricingcommi
           </Link>
 
           <Link

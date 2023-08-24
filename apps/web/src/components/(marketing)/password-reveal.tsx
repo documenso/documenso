@@ -26,6 +26,7 @@ export const PasswordReveal = ({ password }: PasswordRevealProps) => {
       type="button"
       className="px-2 blur-sm hover:opacity-50 hover:blur-none"
       onClick={onCopyClick}
+      aria-label="Copy password"
     >
       {password}
     </button>

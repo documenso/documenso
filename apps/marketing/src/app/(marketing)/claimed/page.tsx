@@ -115,7 +115,7 @@ export default async function ClaimedPlanPage({ searchParams = {} }: ClaimedPlan
 
           <div className="flex flex-1 flex-col justify-end gap-y-4 border-r px-4 last:border-r-0 md:px-8 lg:flex-none">
             {signatureDataUrl && (
-              <img src={signatureDataUrl} alt="your-signature" className="max-w-[172px]" />
+              <img src={signatureDataUrl} alt="your signature" className="max-w-[172px]" />
             )}
             {!signatureDataUrl && (
               <p
