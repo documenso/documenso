@@ -9,8 +9,9 @@ import { nanoid } from 'nanoid';
 import { useFieldArray, useForm } from 'react-hook-form';
 
 import { getBoundingClientRect } from '@documenso/lib/client-only/get-bounding-client-rect';
+import { useDocumentElement } from '@documenso/lib/client-only/hooks/use-document-element';
 import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
-import { Document, Field, FieldType, Recipient, SendStatus } from '@documenso/prisma/client';
+import { Field, FieldType, Recipient, SendStatus } from '@documenso/prisma/client';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
 import { Card, CardContent } from '@documenso/ui/primitives/card';
@@ -26,14 +27,13 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@documenso/ui/primitive
 
 import { TAddFieldsFormSchema } from './add-fields.types';
 import {
-  DocumentFlowFormContainer,
   DocumentFlowFormContainerActions,
   DocumentFlowFormContainerContent,
   DocumentFlowFormContainerFooter,
   DocumentFlowFormContainerStep,
 } from './document-flow-root';
 import { FieldItem } from './field-item';
-import { FRIENDLY_FIELD_TYPE } from './types';
+import { DocumentFlowStep, FRIENDLY_FIELD_TYPE } from './types';
 
 const fontCaveat = Caveat({
   weight: ['500'],
@@ -49,20 +49,24 @@ const MIN_HEIGHT_PX = 60;
 const MIN_WIDTH_PX = 200;
 
 export type AddFieldsFormProps = {
+  documentFlow: DocumentFlowStep;
+  hideRecipients?: boolean;
   recipients: Recipient[];
   fields: Field[];
-  document: Document;
-  onContinue?: () => void;
-  onGoBack?: () => void;
+  numberOfSteps: number;
   onSubmit: (_data: TAddFieldsFormSchema) => void;
 };
 
 export const AddFieldsFormPartial = ({
+  documentFlow,
+  hideRecipients = false,
   recipients,
   fields,
-  onGoBack,
+  numberOfSteps,
   onSubmit,
 }: AddFieldsFormProps) => {
+  const { isWithinPageBounds, getFieldPosition, getPage } = useDocumentElement();
+
   const {
     control,
     handleSubmit,
@@ -99,7 +103,7 @@ export const AddFieldsFormPartial = ({
 
   const hasSelectedSignerBeenSent = selectedSigner?.sendStatus === SendStatus.SENT;
 
-  const [visible, setVisible] = useState(false);
+  const [isFieldWithinBounds, setIsFieldWithinBounds] = useState(false);
   const [coords, setCoords] = useState({
     x: 0,
     y: 0,
@@ -110,86 +114,17 @@ export const AddFieldsFormPartial = ({
     width: 0,
   });
 
-  /**
-   * Given a mouse event, find the nearest pdf page element.
-   */
-  const getPage = (event: MouseEvent) => {
-    if (!(event.target instanceof HTMLElement)) {
-      return null;
-    }
-
-    const target = event.target;
-
-    const $page =
-      target.closest<HTMLElement>(PDF_VIEWER_PAGE_SELECTOR) ??
-      target.querySelector<HTMLElement>(PDF_VIEWER_PAGE_SELECTOR);
-
-    if (!$page) {
-      return null;
-    }
-
-    return $page;
-  };
-
-  /**
-   * Provided a page and a field, calculate the position of the field
-   * as a percentage of the page width and height.
-   */
-  const getFieldPosition = (page: HTMLElement, field: HTMLElement) => {
-    const {
-      top: pageTop,
-      left: pageLeft,
-      height: pageHeight,
-      width: pageWidth,
-    } = getBoundingClientRect(page);
-
-    const {
-      top: fieldTop,
-      left: fieldLeft,
-      height: fieldHeight,
-      width: fieldWidth,
-    } = getBoundingClientRect(field);
-
-    return {
-      x: ((fieldLeft - pageLeft) / pageWidth) * 100,
-      y: ((fieldTop - pageTop) / pageHeight) * 100,
-      width: (fieldWidth / pageWidth) * 100,
-      height: (fieldHeight / pageHeight) * 100,
-    };
-  };
-
-  /**
-   * Given a mouse event, determine if the mouse is within the bounds of the
-   * nearest pdf page element.
-   */
-  const isWithinPageBounds = useCallback((event: MouseEvent) => {
-    const $page = getPage(event);
-
-    if (!$page) {
-      return false;
-    }
-
-    const { top, left, height, width } = $page.getBoundingClientRect();
-
-    if (event.clientY > top + height || event.clientY < top) {
-      return false;
-    }
-
-    if (event.clientX > left + width || event.clientX < left) {
-      return false;
-    }
-
-    return true;
-  }, []);
-
   const onMouseMove = useCallback(
     (event: MouseEvent) => {
-      if (!isWithinPageBounds(event)) {
-        setVisible(false);
-        return;
-      }
+      setIsFieldWithinBounds(
+        isWithinPageBounds(
+          event,
+          PDF_VIEWER_PAGE_SELECTOR,
+          fieldBounds.current.width,
+          fieldBounds.current.height,
+        ),
+      );
 
-      setVisible(true);
       setCoords({
         x: event.clientX - fieldBounds.current.width / 2,
         y: event.clientY - fieldBounds.current.height / 2,
@@ -204,9 +139,18 @@ export const AddFieldsFormPartial = ({
         return;
       }
 
-      const $page = getPage(event);
+      const $page = getPage(event, PDF_VIEWER_PAGE_SELECTOR);
 
-      if (!$page || !isWithinPageBounds(event)) {
+      if (
+        !$page ||
+        !isWithinPageBounds(
+          event,
+          PDF_VIEWER_PAGE_SELECTOR,
+          fieldBounds.current.width,
+          fieldBounds.current.height,
+        )
+      ) {
+        setSelectedField(null);
         return;
       }
 
@@ -237,10 +181,10 @@ export const AddFieldsFormPartial = ({
         signerEmail: selectedSigner.email,
       });
 
-      setVisible(false);
+      setIsFieldWithinBounds(false);
       setSelectedField(null);
     },
-    [append, isWithinPageBounds, selectedField, selectedSigner],
+    [append, isWithinPageBounds, selectedField, selectedSigner, getPage],
   );
 
   const onFieldResize = useCallback(
@@ -270,7 +214,7 @@ export const AddFieldsFormPartial = ({
         pageHeight,
       });
     },
-    [localFields, update],
+    [getFieldPosition, localFields, update],
   );
 
   const onFieldMove = useCallback(
@@ -293,7 +237,7 @@ export const AddFieldsFormPartial = ({
         pageY,
       });
     },
-    [localFields, update],
+    [getFieldPosition, localFields, update],
   );
 
   useEffect(() => {
@@ -328,15 +272,18 @@ export const AddFieldsFormPartial = ({
   }, [recipients]);
 
   return (
-    <DocumentFlowFormContainer>
-      <DocumentFlowFormContainerContent
-        title="Add Fields"
-        description="Add all relevant fields for each recipient."
-      >
+    <>
+      <DocumentFlowFormContainerContent>
         <div className="flex flex-col">
-          {selectedField && visible && (
+          {selectedField && (
             <Card
-              className="border-primary pointer-events-none fixed z-50 cursor-pointer bg-white"
+              className={cn(
+                'pointer-events-none fixed z-50 cursor-pointer bg-white transition-opacity',
+                {
+                  'border-primary': isFieldWithinBounds,
+                  'opacity-50': !isFieldWithinBounds,
+                },
+              )}
               style={{
                 top: coords.y,
                 left: coords.x,
@@ -357,94 +304,100 @@ export const AddFieldsFormPartial = ({
               disabled={selectedSigner?.email !== field.signerEmail || hasSelectedSignerBeenSent}
               minHeight={fieldBounds.current.height}
               minWidth={fieldBounds.current.width}
-              passive={visible && !!selectedField}
+              passive={isFieldWithinBounds && !!selectedField}
               onResize={(options) => onFieldResize(options, index)}
               onMove={(options) => onFieldMove(options, index)}
               onRemove={() => remove(index)}
             />
           ))}
 
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button
-                type="button"
-                variant="outline"
-                role="combobox"
-                className="bg-background text-muted-foreground justify-between font-normal"
-              >
-                {selectedSigner?.email && (
-                  <span className="flex-1 truncate text-left">
-                    {selectedSigner?.email} ({selectedSigner?.email})
-                  </span>
-                )}
+          {!hideRecipients && (
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  type="button"
+                  variant="outline"
+                  role="combobox"
+                  className="bg-background text-muted-foreground mb-12 justify-between font-normal"
+                >
+                  {selectedSigner?.email && (
+                    <span className="flex-1 truncate text-left">
+                      {selectedSigner?.email} ({selectedSigner?.email})
+                    </span>
+                  )}
 
-                {!selectedSigner?.email && (
-                  <span className="flex-1 truncate text-left">{selectedSigner?.email}</span>
-                )}
+                  {!selectedSigner?.email && (
+                    <span className="flex-1 truncate text-left">{selectedSigner?.email}</span>
+                  )}
 
-                <ChevronsUpDown className="ml-2 h-4 w-4" />
-              </Button>
-            </PopoverTrigger>
+                  <ChevronsUpDown className="ml-2 h-4 w-4" />
+                </Button>
+              </PopoverTrigger>
 
-            <PopoverContent className="p-0" align="start">
-              <Command>
-                <CommandInput />
-                <CommandEmpty />
+              <PopoverContent className="p-0" align="start">
+                <Command>
+                  <CommandInput />
+                  <CommandEmpty />
 
-                <CommandGroup>
-                  {recipients.map((recipient, index) => (
-                    <CommandItem
-                      key={index}
-                      className={cn({
-                        'text-muted-foreground': recipient.sendStatus === SendStatus.SENT,
-                      })}
-                      onSelect={() => setSelectedSigner(recipient)}
-                    >
-                      {recipient.sendStatus !== SendStatus.SENT ? (
-                        <Check
-                          aria-hidden={recipient !== selectedSigner}
-                          className={cn('mr-2 h-4 w-4 flex-shrink-0', {
-                            'opacity-0': recipient !== selectedSigner,
-                            'opacity-100': recipient === selectedSigner,
-                          })}
-                        />
-                      ) : (
-                        <Tooltip>
-                          <TooltipTrigger>
-                            <Info className="mr-2 h-4 w-4" />
-                          </TooltipTrigger>
-                          <TooltipContent className="max-w-xs">
-                            This document has already been sent to this recipient. You can no longer
-                            edit this recipient.
-                          </TooltipContent>
-                        </Tooltip>
-                      )}
+                  <CommandGroup>
+                    {recipients.map((recipient, index) => (
+                      <CommandItem
+                        key={index}
+                        className={cn({
+                          'text-muted-foreground': recipient.sendStatus === SendStatus.SENT,
+                        })}
+                        onSelect={() => setSelectedSigner(recipient)}
+                      >
+                        {recipient.sendStatus !== SendStatus.SENT ? (
+                          <Check
+                            aria-hidden={recipient !== selectedSigner}
+                            className={cn('mr-2 h-4 w-4 flex-shrink-0', {
+                              'opacity-0': recipient !== selectedSigner,
+                              'opacity-100': recipient === selectedSigner,
+                            })}
+                          />
+                        ) : (
+                          <Tooltip>
+                            <TooltipTrigger>
+                              <Info className="mr-2 h-4 w-4" />
+                            </TooltipTrigger>
+                            <TooltipContent className="max-w-xs">
+                              This document has already been sent to this recipient. You can no
+                              longer edit this recipient.
+                            </TooltipContent>
+                          </Tooltip>
+                        )}
 
-                      {recipient.name && (
-                        <span className="truncate" title={`${recipient.name} (${recipient.email})`}>
-                          {recipient.name} ({recipient.email})
-                        </span>
-                      )}
+                        {recipient.name && (
+                          <span
+                            className="truncate"
+                            title={`${recipient.name} (${recipient.email})`}
+                          >
+                            {recipient.name} ({recipient.email})
+                          </span>
+                        )}
 
-                      {!recipient.name && (
-                        <span className="truncate" title={recipient.email}>
-                          {recipient.email}
-                        </span>
-                      )}
-                    </CommandItem>
-                  ))}
-                </CommandGroup>
-              </Command>
-            </PopoverContent>
-          </Popover>
+                        {!recipient.name && (
+                          <span className="truncate" title={recipient.email}>
+                            {recipient.email}
+                          </span>
+                        )}
+                      </CommandItem>
+                    ))}
+                  </CommandGroup>
+                </Command>
+              </PopoverContent>
+            </Popover>
+          )}
 
-          <div className="-mx-2 mt-8 flex-1 overflow-y-scroll px-2">
-            <div className="mt-4 grid grid-cols-2 gap-x-4 gap-y-8">
+          <div className="-mx-2 flex-1 overflow-y-scroll px-2">
+            <div className="grid grid-cols-2 gap-x-4 gap-y-8">
               <button
                 type="button"
                 className="group h-full w-full"
                 disabled={!selectedSigner || selectedSigner?.sendStatus === SendStatus.SENT}
-                onClick={() => setSelectedField(FieldType.SIGNATURE)}
+                onClick={(e) => e.stopPropagation()}
+                onMouseDown={() => setSelectedField(FieldType.SIGNATURE)}
                 data-selected={selectedField === FieldType.SIGNATURE ? true : undefined}
               >
                 <Card className="group-data-[selected]:border-documenso h-full w-full cursor-pointer group-disabled:opacity-50">
@@ -467,7 +420,8 @@ export const AddFieldsFormPartial = ({
                 type="button"
                 className="group h-full w-full"
                 disabled={!selectedSigner || selectedSigner?.sendStatus === SendStatus.SENT}
-                onClick={() => setSelectedField(FieldType.EMAIL)}
+                onClick={(e) => e.stopPropagation()}
+                onMouseDown={() => setSelectedField(FieldType.EMAIL)}
                 data-selected={selectedField === FieldType.EMAIL ? true : undefined}
               >
                 <Card className="group-data-[selected]:border-documenso h-full w-full cursor-pointer group-disabled:opacity-50">
@@ -489,7 +443,8 @@ export const AddFieldsFormPartial = ({
                 type="button"
                 className="group h-full w-full"
                 disabled={!selectedSigner || selectedSigner?.sendStatus === SendStatus.SENT}
-                onClick={() => setSelectedField(FieldType.NAME)}
+                onClick={(e) => e.stopPropagation()}
+                onMouseDown={() => setSelectedField(FieldType.NAME)}
                 data-selected={selectedField === FieldType.NAME ? true : undefined}
               >
                 <Card className="group-data-[selected]:border-documenso h-full w-full cursor-pointer group-disabled:opacity-50">
@@ -511,7 +466,8 @@ export const AddFieldsFormPartial = ({
                 type="button"
                 className="group h-full w-full"
                 disabled={!selectedSigner || selectedSigner?.sendStatus === SendStatus.SENT}
-                onClick={() => setSelectedField(FieldType.DATE)}
+                onClick={(e) => e.stopPropagation()}
+                onMouseDown={() => setSelectedField(FieldType.DATE)}
                 data-selected={selectedField === FieldType.DATE ? true : undefined}
               >
                 <Card className="group-data-[selected]:border-documenso h-full w-full cursor-pointer group-disabled:opacity-50">
@@ -534,15 +490,19 @@ export const AddFieldsFormPartial = ({
       </DocumentFlowFormContainerContent>
 
       <DocumentFlowFormContainerFooter>
-        <DocumentFlowFormContainerStep title="Add Fields" step={2} maxStep={3} />
+        <DocumentFlowFormContainerStep
+          title={documentFlow.title}
+          step={documentFlow.stepIndex}
+          maxStep={numberOfSteps}
+        />
 
         <DocumentFlowFormContainerActions
           loading={isSubmitting}
           disabled={isSubmitting}
+          onGoBackClick={documentFlow.onBackStep}
           onGoNextClick={() => handleSubmit(onSubmit)()}
-          onGoBackClick={onGoBack}
         />
       </DocumentFlowFormContainerFooter>
-    </DocumentFlowFormContainer>
+    </>
   );
 };

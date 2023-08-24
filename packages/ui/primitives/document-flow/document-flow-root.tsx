@@ -2,7 +2,7 @@
 
 import React, { HTMLAttributes } from 'react';
 
-import { Loader } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
@@ -21,7 +21,7 @@ export const DocumentFlowFormContainer = ({
     <form
       id={id}
       className={cn(
-        'dark:bg-background border-border bg-widget sticky top-20 flex h-[calc(100vh-6rem)] max-h-screen flex-col rounded-xl border px-4 py-6',
+        'dark:bg-background border-border bg-widget sticky top-20 flex h-full max-h-[80rem] flex-col rounded-xl border px-4 py-6',
         className,
       )}
       {...props}
@@ -31,27 +31,37 @@ export const DocumentFlowFormContainer = ({
   );
 };
 
-export type DocumentFlowFormContainerContentProps = HTMLAttributes<HTMLDivElement> & {
+export type DocumentFlowFormContainerHeaderProps = {
   title: string;
   description: string;
-  children?: React.ReactNode;
 };
 
-export const DocumentFlowFormContainerContent = ({
-  children,
+export const DocumentFlowFormContainerHeader = ({
   title,
   description,
-  className,
-  ...props
-}: DocumentFlowFormContainerContentProps) => {
+}: DocumentFlowFormContainerHeaderProps) => {
   return (
-    <div className={cn('flex flex-1 flex-col', className)} {...props}>
+    <>
       <h3 className="text-foreground text-2xl font-semibold">{title}</h3>
 
       <p className="text-muted-foreground mt-2 text-sm">{description}</p>
 
       <hr className="border-border mb-8 mt-4" />
+    </>
+  );
+};
 
+export type DocumentFlowFormContainerContentProps = HTMLAttributes<HTMLDivElement> & {
+  children?: React.ReactNode;
+};
+
+export const DocumentFlowFormContainerContent = ({
+  children,
+  className,
+  ...props
+}: DocumentFlowFormContainerContentProps) => {
+  return (
+    <div className={cn('flex flex-1 flex-col', className)} {...props}>
       <div className="-mx-2 flex flex-1 flex-col overflow-y-auto px-2">{children}</div>
     </div>
   );
@@ -94,7 +104,9 @@ export const DocumentFlowFormContainerStep = ({
       </p>
 
       <div className="bg-muted relative mt-4 h-[2px] rounded-md">
-        <div
+        <motion.div
+          layout="size"
+          layoutId="document-flow-container-step"
           className="bg-documenso absolute inset-y-0 left-0"
           style={{
             width: `${(100 / maxStep) * step}%`,
@@ -133,20 +145,19 @@ export const DocumentFlowFormContainerActions = ({
         className="dark:bg-muted dark:hover:bg-muted/80 flex-1 bg-black/5 hover:bg-black/10"
         size="lg"
         variant="secondary"
-        disabled={disabled || loading || !canGoBack}
+        disabled={disabled || loading || !canGoBack || !onGoBackClick}
         onClick={onGoBackClick}
       >
         {goBackLabel}
       </Button>
 
       <Button
-        type="button"
+        type="submit"
         className="bg-documenso flex-1"
         size="lg"
         disabled={disabled || loading || !canGoNext}
         onClick={onGoNextClick}
       >
-        {loading && <Loader className="mr-2 h-5 w-5 animate-spin" />}
         {goNextLabel}
       </Button>
     </div>

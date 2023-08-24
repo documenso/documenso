@@ -2,40 +2,41 @@
 
 import React, { useId } from 'react';
 
+import { zodResolver } from '@hookform/resolvers/zod';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Plus, Trash } from 'lucide-react';
 import { nanoid } from 'nanoid';
 import { Controller, useFieldArray, useForm } from 'react-hook-form';
 
-import { Document, Field, Recipient, SendStatus } from '@documenso/prisma/client';
+import { Field, Recipient, SendStatus } from '@documenso/prisma/client';
 import { Button } from '@documenso/ui/primitives/button';
 import { FormErrorMessage } from '@documenso/ui/primitives/form/form-error-message';
 import { Input } from '@documenso/ui/primitives/input';
 import { Label } from '@documenso/ui/primitives/label';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
-import { TAddSignersFormSchema } from './add-signers.types';
+import { TAddSignersFormSchema, ZAddSignersFormSchema } from './add-signers.types';
 import {
-  DocumentFlowFormContainer,
   DocumentFlowFormContainerActions,
   DocumentFlowFormContainerContent,
   DocumentFlowFormContainerFooter,
   DocumentFlowFormContainerStep,
 } from './document-flow-root';
+import { DocumentFlowStep } from './types';
 
 export type AddSignersFormProps = {
+  documentFlow: DocumentFlowStep;
   recipients: Recipient[];
   fields: Field[];
-  document: Document;
-  onContinue?: () => void;
-  onGoBack?: () => void;
+  numberOfSteps: number;
   onSubmit: (_data: TAddSignersFormSchema) => void;
 };
 
 export const AddSignersFormPartial = ({
+  documentFlow,
+  numberOfSteps,
   recipients,
   fields: _fields,
-  onGoBack,
   onSubmit,
 }: AddSignersFormProps) => {
   const { toast } = useToast();
@@ -47,6 +48,7 @@ export const AddSignersFormPartial = ({
     handleSubmit,
     formState: { errors, isSubmitting },
   } = useForm<TAddSignersFormSchema>({
+    resolver: zodResolver(ZAddSignersFormSchema),
     defaultValues: {
       signers:
         recipients.length > 0
@@ -116,11 +118,8 @@ export const AddSignersFormPartial = ({
   };
 
   return (
-    <DocumentFlowFormContainer onSubmit={handleSubmit(onSubmit)}>
-      <DocumentFlowFormContainerContent
-        title="Add Signers"
-        description="Add the people who will sign the document."
-      >
+    <>
+      <DocumentFlowFormContainerContent>
         <div className="flex w-full flex-col gap-y-4">
           <AnimatePresence>
             {signers.map((signer, index) => (
@@ -205,15 +204,19 @@ export const AddSignersFormPartial = ({
       </DocumentFlowFormContainerContent>
 
       <DocumentFlowFormContainerFooter>
-        <DocumentFlowFormContainerStep title="Add Signers" step={1} maxStep={3} />
+        <DocumentFlowFormContainerStep
+          title={documentFlow.title}
+          step={documentFlow.stepIndex}
+          maxStep={numberOfSteps}
+        />
 
         <DocumentFlowFormContainerActions
           loading={isSubmitting}
           disabled={isSubmitting}
+          onGoBackClick={documentFlow.onBackStep}
           onGoNextClick={() => handleSubmit(onSubmit)()}
-          onGoBackClick={onGoBack}
         />
       </DocumentFlowFormContainerFooter>
-    </DocumentFlowFormContainer>
+    </>
   );
 };

@@ -5,7 +5,7 @@ import React, { useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Info, Loader } from 'lucide-react';
+import { Info } from 'lucide-react';
 import { usePlausible } from 'next-plausible';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
@@ -85,7 +85,7 @@ export const ClaimPlanDialog = ({ className, planId, children }: ClaimPlanDialog
   };
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={open} onOpenChange={(value) => !isSubmitting && setOpen(value)}>
       <DialogTrigger asChild>{children}</DialogTrigger>
 
       <DialogContent>
@@ -97,50 +97,49 @@ export const ClaimPlanDialog = ({ className, planId, children }: ClaimPlanDialog
           </DialogDescription>
         </DialogHeader>
 
-        <form
-          className={cn('flex flex-col gap-y-4', className)}
-          onSubmit={handleSubmit(onFormSubmit)}
-        >
-          {params?.get('cancelled') === 'true' && (
-            <div className="rounded-lg border border-yellow-400 bg-yellow-50 p-4">
-              <div className="flex">
-                <div className="flex-shrink-0">
-                  <Info className="h-5 w-5 text-yellow-400" />
-                </div>
-                <div className="ml-3">
-                  <p className="text-sm leading-5 text-yellow-700">
-                    You have cancelled the payment process. If you didn't mean to do this, please
-                    try again.
-                  </p>
+        <form onSubmit={handleSubmit(onFormSubmit)}>
+          <fieldset disabled={isSubmitting} className={cn('flex flex-col gap-y-4', className)}>
+            {params?.get('cancelled') === 'true' && (
+              <div className="rounded-lg border border-yellow-400 bg-yellow-50 p-4">
+                <div className="flex">
+                  <div className="flex-shrink-0">
+                    <Info className="h-5 w-5 text-yellow-400" />
+                  </div>
+                  <div className="ml-3">
+                    <p className="text-sm leading-5 text-yellow-700">
+                      You have cancelled the payment process. If you didn't mean to do this, please
+                      try again.
+                    </p>
+                  </div>
                 </div>
               </div>
+            )}
+
+            <div>
+              <Label className="text-slate-500">Name</Label>
+
+              <Input type="text" className="mt-2" {...register('name')} autoFocus />
+
+              <FormErrorMessage className="mt-1" error={errors.name} />
             </div>
-          )}
 
-          <div>
-            <Label className="text-slate-500">Name</Label>
+            <div>
+              <Label className="text-slate-500">Email</Label>
 
-            <Input type="text" className="mt-2" {...register('name')} autoFocus />
+              <Input type="email" className="mt-2" {...register('email')} />
 
-            <FormErrorMessage className="mt-1" error={errors.name} />
-          </div>
+              <FormErrorMessage className="mt-1" error={errors.email} />
+            </div>
 
-          <div>
-            <Label className="text-slate-500">Email</Label>
-
-            <Input type="email" className="mt-2" {...register('email')} />
-
-            <FormErrorMessage className="mt-1" error={errors.email} />
-          </div>
-
-          <Button type="submit" size="lg" disabled={isSubmitting}>
-            {isSubmitting && <Loader className="mr-2 h-4 w-4 animate-spin" />}
-            Claim the Community Plan ({/* eslint-disable-next-line turbo/no-undeclared-env-vars */}
-            {planId === process.env.NEXT_PUBLIC_STRIPE_COMMUNITY_PLAN_MONTHLY_PRICE_ID
-              ? 'Monthly'
-              : 'Yearly'}
-            )
-          </Button>
+            <Button type="submit" size="lg" loading={isSubmitting}>
+              Claim the Community Plan (
+              {/* eslint-disable-next-line turbo/no-undeclared-env-vars */}
+              {planId === process.env.NEXT_PUBLIC_STRIPE_COMMUNITY_PLAN_MONTHLY_PRICE_ID
+                ? 'Monthly'
+                : 'Yearly'}
+              )
+            </Button>
+          </fieldset>
         </form>
       </DialogContent>
     </Dialog>
