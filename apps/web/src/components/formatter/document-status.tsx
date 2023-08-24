@@ -3,16 +3,17 @@ import { HTMLAttributes } from 'react';
 import { CheckCircle2, Clock, File } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react/dist/lucide-react';
 
-import { DocumentStatus as InternalDocumentStatus } from '@documenso/prisma/client';
+import { ExtendedDocumentStatus } from '@documenso/prisma/types/extended-document-status';
+import { SignatureIcon } from '@documenso/ui/icons/signature';
 import { cn } from '@documenso/ui/lib/utils';
 
 type FriendlyStatus = {
   label: string;
-  icon: LucideIcon;
+  icon?: LucideIcon;
   color: string;
 };
 
-const FRIENDLY_STATUS_MAP: Record<InternalDocumentStatus, FriendlyStatus> = {
+const FRIENDLY_STATUS_MAP: Record<ExtendedDocumentStatus, FriendlyStatus> = {
   PENDING: {
     label: 'Pending',
     icon: Clock,
@@ -28,10 +29,19 @@ const FRIENDLY_STATUS_MAP: Record<InternalDocumentStatus, FriendlyStatus> = {
     icon: File,
     color: 'text-yellow-500',
   },
+  INBOX: {
+    label: 'Inbox',
+    icon: SignatureIcon,
+    color: 'text-muted-foreground',
+  },
+  ALL: {
+    label: 'All',
+    color: 'text-muted-foreground',
+  },
 };
 
 export type DocumentStatusProps = HTMLAttributes<HTMLSpanElement> & {
-  status: InternalDocumentStatus;
+  status: ExtendedDocumentStatus;
   inheritColor?: boolean;
 };
 
@@ -45,11 +55,13 @@ export const DocumentStatus = ({
 
   return (
     <span className={cn('flex items-center', className)} {...props}>
-      <Icon
-        className={cn('mr-2 inline-block h-4 w-4', {
-          [color]: !inheritColor,
-        })}
-      />
+      {Icon && (
+        <Icon
+          className={cn('mr-2 inline-block h-4 w-4', {
+            [color]: !inheritColor,
+          })}
+        />
+      )}
       {label}
     </span>
   );

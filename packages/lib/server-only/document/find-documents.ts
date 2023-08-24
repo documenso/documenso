@@ -1,14 +1,17 @@
+import { match } from 'ts-pattern';
+
 import { prisma } from '@documenso/prisma';
-import { Document, DocumentStatus, Prisma, SigningStatus } from '@documenso/prisma/client';
+import { Document, Prisma, SigningStatus } from '@documenso/prisma/client';
 import { DocumentWithRecipientAndSender } from '@documenso/prisma/types/document';
 import { DocumentWithReciepient } from '@documenso/prisma/types/document-with-recipient';
+import { ExtendedDocumentStatus } from '@documenso/prisma/types/extended-document-status';
 
 import { FindResultSet } from '../../types/find-result-set';
 
 export interface FindDocumentsOptions {
   userId: number;
   term?: string;
-  status?: DocumentStatus;
+  status?: ExtendedDocumentStatus;
   page?: number;
   perPage?: number;
   orderBy?: {
@@ -20,29 +23,102 @@ export interface FindDocumentsOptions {
 export const findDocuments = async ({
   userId,
   term,
-  status,
+  status = ExtendedDocumentStatus.ALL,
   page = 1,
   perPage = 10,
   orderBy,
 }: FindDocumentsOptions): Promise<FindResultSet<DocumentWithReciepient>> => {
+  const user = await prisma.user.findFirstOrThrow({
+    where: {
+      id: userId,
+    },
+  });
+
   const orderByColumn = orderBy?.column ?? 'created';
   const orderByDirection = orderBy?.direction ?? 'desc';
 
-  const filters: Prisma.DocumentWhereInput = {
-    status,
-    userId,
-  };
+  const termFilters = !term
+    ? undefined
+    : ({
+        title: {
+          contains: term,
+          mode: 'insensitive',
+        },
+      } as const);
 
-  if (term) {
-    filters.title = {
-      contains: term,
-      mode: 'insensitive',
-    };
-  }
+  const filters = match<ExtendedDocumentStatus, Prisma.DocumentWhereInput>(status)
+    .with(ExtendedDocumentStatus.ALL, () => ({
+      OR: [
+        {
+          userId,
+        },
+        {
+          status: {
+            not: ExtendedDocumentStatus.DRAFT,
+          },
+          Recipient: {
+            some: {
+              email: user.email,
+            },
+          },
+        },
+      ],
+    }))
+    .with(ExtendedDocumentStatus.INBOX, () => ({
+      status: {
+        not: ExtendedDocumentStatus.DRAFT,
+      },
+      Recipient: {
+        some: {
+          email: user.email,
+          signingStatus: SigningStatus.NOT_SIGNED,
+        },
+      },
+    }))
+    .with(ExtendedDocumentStatus.DRAFT, () => ({
+      userId,
+      status: ExtendedDocumentStatus.DRAFT,
+    }))
+    .with(ExtendedDocumentStatus.PENDING, () => ({
+      OR: [
+        {
+          userId,
+          status: ExtendedDocumentStatus.PENDING,
+        },
+        {
+          status: ExtendedDocumentStatus.PENDING,
+
+          Recipient: {
+            some: {
+              email: user.email,
+              signingStatus: SigningStatus.SIGNED,
+            },
+          },
+        },
+      ],
+    }))
+    .with(ExtendedDocumentStatus.COMPLETED, () => ({
+      OR: [
+        {
+          userId,
+          status: ExtendedDocumentStatus.COMPLETED,
+        },
+        {
+          status: ExtendedDocumentStatus.COMPLETED,
+          Recipient: {
+            some: {
+              email: user.email,
+            },
+          },
+        },
+      ],
+    }))
+    .exhaustive();
 
   const [data, count] = await Promise.all([
     prisma.document.findMany({
       where: {
+        ...termFilters,
         ...filters,
       },
       skip: Math.max(page - 1, 0) * perPage,
@@ -51,11 +127,19 @@ export const findDocuments = async ({
         [orderByColumn]: orderByDirection,
       },
       include: {
+        User: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+          },
+        },
         Recipient: true,
       },
     }),
     prisma.document.count({
       where: {
+        ...termFilters,
         ...filters,
       },
     }),
