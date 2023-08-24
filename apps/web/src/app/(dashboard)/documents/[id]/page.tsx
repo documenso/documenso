@@ -7,8 +7,11 @@ import { getRequiredServerComponentSession } from '@documenso/lib/next-auth/get-
 import { getDocumentById } from '@documenso/lib/server-only/document/get-document-by-id';
 import { getFieldsForDocument } from '@documenso/lib/server-only/field/get-fields-for-document';
 import { getRecipientsForDocument } from '@documenso/lib/server-only/recipient/get-recipients-for-document';
+import { DocumentStatus as InternalDocumentStatus } from '@documenso/prisma/client';
+import { LazyPDFViewer } from '@documenso/ui/primitives/lazy-pdf-viewer';
 
 import { EditDocumentForm } from '~/app/(dashboard)/documents/[id]/edit-document';
+import { StackAvatarsWithTooltip } from '~/components/(dashboard)/avatar/stack-avatars-with-tooltip';
 import { DocumentStatus } from '~/components/formatter/document-status';
 
 export type DocumentPageProps = {
@@ -69,18 +72,28 @@ export default async function DocumentPage({ params }: DocumentPageProps) {
           <div className="text-muted-foreground flex items-center">
             <Users2 className="mr-2 h-5 w-5" />
 
-            <span>{recipients.length} Recipient(s)</span>
+            <StackAvatarsWithTooltip recipients={recipients} position="bottom">
+              <span>{recipients.length} Recipient(s)</span>
+            </StackAvatarsWithTooltip>
           </div>
         )}
       </div>
 
-      <EditDocumentForm
-        className="mt-8"
-        document={document}
-        user={session}
-        recipients={recipients}
-        fields={fields}
-      />
+      {document.status !== InternalDocumentStatus.COMPLETED && (
+        <EditDocumentForm
+          className="mt-8"
+          document={document}
+          user={session}
+          recipients={recipients}
+          fields={fields}
+        />
+      )}
+
+      {document.status === InternalDocumentStatus.COMPLETED && (
+        <div className="mx-auto mt-12 max-w-2xl">
+          <LazyPDFViewer document={`data:application/pdf;base64,${document.document}`} />
+        </div>
+      )}
     </div>
   );
 }
