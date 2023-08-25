@@ -50,7 +50,7 @@ export const SigningForm = ({ document, recipient, fields }: SigningFormProps) =
   return (
     <form
       className={cn(
-        'dark:bg-background border-border bg-widget sticky top-20 flex h-[calc(100vh-6rem)] max-h-screen flex-col rounded-xl border px-4 py-6',
+        'dark:bg-background border-border bg-widget sticky top-20 flex h-full max-h-[80rem] flex-col rounded-xl border px-4 py-6',
       )}
       onSubmit={handleSubmit(onFormSubmit)}
     >

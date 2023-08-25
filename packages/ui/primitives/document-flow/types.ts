@@ -47,3 +47,12 @@ export const FRIENDLY_FIELD_TYPE: Record<FieldType, string> = {
   [FieldType.EMAIL]: 'Email',
   [FieldType.NAME]: 'Name',
 };
+
+export interface DocumentFlowStep {
+  title: string;
+  description: string;
+  stepIndex: number;
+  onSubmit?: () => void;
+  onBackStep?: () => void;
+  onNextStep?: () => void;
+}
