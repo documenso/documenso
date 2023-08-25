@@ -59,7 +59,7 @@ export const sendDocument = async ({ documentId, userId }: SendDocumentOptions) 
         signDocumentLink,
       });
 
-      mailer.sendMail({
+      await mailer.sendMail({
         to: {
           address: email,
           name,
