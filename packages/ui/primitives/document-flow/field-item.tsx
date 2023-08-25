@@ -91,7 +91,7 @@ export const FieldItem = ({
   return createPortal(
     <Rnd
       key={coords.pageX + coords.pageY + coords.pageHeight + coords.pageWidth}
-      className={cn(' z-20', {
+      className={cn('z-20', {
         'pointer-events-none': passive,
         'pointer-events-none opacity-75': disabled,
         'z-10': !active || disabled,
