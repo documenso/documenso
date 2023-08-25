@@ -1,11 +1,11 @@
 generator client {
-  provider        = "prisma-client-js"
-  previewFeatures = ["extendedWhereUnique"]
+  provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("NEXT_PRIVATE_DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("NEXT_PRIVATE_DATABASE_URL")
+  directUrl = env("NEXT_PRIVATE_DIRECT_DATABASE_URL")
 }
 
 enum IdentityProvider {
