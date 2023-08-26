@@ -64,7 +64,7 @@ export const SigningForm = ({ document, recipient, fields }: SigningFormProps) =
 
           <hr className="border-border mb-8 mt-4" />
 
-          <div className="-mx-2 flex flex-1 flex-col overflow-y-auto px-2">
+          <div className="-mx-2 flex flex-1 flex-col gap-4 overflow-y-auto px-2">
             <div className="flex flex-1 flex-col gap-y-4">
               <div>
                 <Label htmlFor="full-name">Full Name</Label>
@@ -98,10 +98,10 @@ export const SigningForm = ({ document, recipient, fields }: SigningFormProps) =
               </div>
             </div>
 
-            <div className="flex gap-4">
+            <div className="flex flex-col gap-4 md:flex-row">
               <Button
                 type="button"
-                className="dark:bg-muted dark:hover:bg-muted/80 flex-1 bg-black/5 hover:bg-black/10"
+                className="dark:bg-muted dark:hover:bg-muted/80 w-full  bg-black/5 hover:bg-black/10"
                 variant="secondary"
                 size="lg"
               >
@@ -109,8 +109,8 @@ export const SigningForm = ({ document, recipient, fields }: SigningFormProps) =
               </Button>
 
               <Button
+                className="w-full"
                 type="submit"
-                className="flex-1"
                 size="lg"
                 disabled={!isComplete || isSubmitting}
               >
