@@ -58,6 +58,12 @@ export default async function DocumentsPage({ searchParams = {} }: DocumentsPage
     return `/documents?${params.toString()}`;
   };
 
+  const documentStatuses = [
+    InternalDocumentStatus.PENDING,
+    InternalDocumentStatus.COMPLETED,
+    InternalDocumentStatus.DRAFT,
+  ];
+
   return (
     <div className="mx-auto w-full max-w-screen-xl px-4 md:px-8">
       <UploadDocument />
@@ -67,25 +73,21 @@ export default async function DocumentsPage({ searchParams = {} }: DocumentsPage
       <div className="mt-8 flex flex-wrap gap-x-4 gap-y-6">
         <Tabs defaultValue={status} className="overflow-x-auto">
           <TabsList>
-            {[
-              ExtendedDocumentStatus.INBOX,
-              ExtendedDocumentStatus.PENDING,
-              ExtendedDocumentStatus.COMPLETED,
-              ExtendedDocumentStatus.DRAFT,
-              ExtendedDocumentStatus.ALL,
-            ].map((value) => (
-              <TabsTrigger key={value} className="min-w-[60px]" value={value} asChild>
-                <Link href={getTabHref(value)} scroll={false}>
-                  <DocumentStatus status={value} />
+            {documentStatuses.map((status) => (
+              <TabsTrigger key={status} className="min-w-[60px]" value={status} asChild>
+                <Link href={getTabHref(status)}>
+                  <DocumentStatus status={status} />
 
-                  {value !== ExtendedDocumentStatus.ALL && (
-                    <span className="ml-1 hidden opacity-50 md:inline-block">
-                      {Math.min(stats[value], 99)}
-                    </span>
-                  )}
+                  <span className="ml-1 hidden opacity-50 md:inline-block">
+                    {Math.min(stats[status], 99)}
+                  </span>
                 </Link>
               </TabsTrigger>
             ))}
+
+            <TabsTrigger className="min-w-[60px]" value="ALL" asChild>
+              <Link href={getTabHref('ALL')}>All</Link>
+            </TabsTrigger>
           </TabsList>
         </Tabs>
 
