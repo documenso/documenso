@@ -104,6 +104,7 @@ export const SignInForm = ({ className }: SignInFormProps) => {
           type="password"
           minLength={6}
           maxLength={72}
+          autoComplete="current-password"
           className="bg-background mt-2"
           {...register('password')}
         />
