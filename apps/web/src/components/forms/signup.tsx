@@ -18,7 +18,7 @@ import { useToast } from '@documenso/ui/primitives/use-toast';
 export const ZSignUpFormSchema = z.object({
   name: z.string().min(1),
   email: z.string().email().min(1),
-  password: z.string().min(1),
+  password: z.string().min(6).max(72),
 });
 
 export type TSignUpFormSchema = z.infer<typeof ZSignUpFormSchema>;
@@ -105,6 +105,8 @@ export const SignUpForm = ({ className }: SignUpFormProps) => {
         <Input
           id="password"
           type="password"
+          minLength={6}
+          maxLength={72}
           className="bg-background mt-2"
           {...register('password')}
         />

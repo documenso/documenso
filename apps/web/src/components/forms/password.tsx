@@ -18,8 +18,8 @@ import { FormErrorMessage } from '../form/form-error-message';
 
 export const ZPasswordFormSchema = z
   .object({
-    password: z.string().min(6),
-    repeatedPassword: z.string().min(6),
+    password: z.string().min(6).max(72),
+    repeatedPassword: z.string().min(6).max(72),
   })
   .refine((data) => data.password === data.repeatedPassword, {
     message: 'Passwords do not match',
@@ -92,6 +92,8 @@ export const PasswordForm = ({ className }: PasswordFormProps) => {
         <Input
           id="password"
           type="password"
+          minLength={6}
+          maxLength={72}
           className="bg-background mt-2"
           {...register('password')}
         />
@@ -107,6 +109,8 @@ export const PasswordForm = ({ className }: PasswordFormProps) => {
         <Input
           id="repeated-password"
           type="password"
+          minLength={6}
+          maxLength={72}
           className="bg-background mt-2"
           {...register('repeatedPassword')}
         />
