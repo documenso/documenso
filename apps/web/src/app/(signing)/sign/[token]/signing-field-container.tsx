@@ -60,19 +60,16 @@ export const SigningFieldContainer = ({
             'text-foreground hover:shadow-primary-foreground group flex h-full w-full flex-col items-center justify-center p-2',
           )}
         >
-          {!field.inserted && !loading && (
-            <button type="submit" className="absolute inset-0 z-10" onClick={onSignFieldClick} />
-          )}
-
-          {field.inserted && !loading && (
-            <button
-              className="text-destructive bg-background/40 absolute inset-0 z-10 flex items-center justify-center rounded-md text-sm opacity-0 backdrop-blur-sm duration-200 group-hover:opacity-100"
-              onClick={onRemoveSignedFieldClick}
-            >
-              Remove
-            </button>
-          )}
-
+          <button
+            type="submit"
+            className={`
+              absolute inset-0 z-10 ${field.inserted ? 'text-destructive bg-background/40' : ''}
+            `}
+            onClick={field.inserted ? onRemoveSignedFieldClick : onSignFieldClick}
+            disabled={loading}
+          >
+            {field.inserted ? 'Remove' : ''}
+          </button>
           {children}
         </CardContent>
       </Card>

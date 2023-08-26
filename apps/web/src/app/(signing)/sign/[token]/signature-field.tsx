@@ -139,9 +139,9 @@ export const SignatureField = ({ field, recipient }: SignatureFieldProps) => {
         />
       )}
 
-      {state === 'signed-text' && (
+      {state === 'signed-text' && signature?.typedSignature && (
         <p className="font-signature text-muted-foreground text-lg duration-200 sm:text-xl md:text-2xl lg:text-3xl">
-          {signature?.typedSignature}
+          {signature.typedSignature}
         </p>
       )}
 
