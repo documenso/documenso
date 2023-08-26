@@ -1,7 +1,9 @@
 'use client';
 
+import { useState } from 'react';
+
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Loader } from 'lucide-react';
+import { Eye, EyeOff, Loader } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
@@ -35,6 +37,8 @@ export type PasswordFormProps = {
 
 export const PasswordForm = ({ className }: PasswordFormProps) => {
   const { toast } = useToast();
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const {
     register,
@@ -79,6 +83,14 @@ export const PasswordForm = ({ className }: PasswordFormProps) => {
     }
   };
 
+  const onShowPassword = () => {
+    setShowPassword(!showPassword);
+  };
+
+  const onShowConfirmPassword = () => {
+    setShowConfirmPassword(!showConfirmPassword);
+  };
+
   return (
     <form
       className={cn('flex w-full flex-col gap-y-4', className)}
@@ -89,12 +101,28 @@ export const PasswordForm = ({ className }: PasswordFormProps) => {
           Password
         </Label>
 
-        <Input
-          id="password"
-          type="password"
-          className="bg-background mt-2"
-          {...register('password')}
-        />
+        <div className="relative">
+          <Input
+            id="password"
+            type={showPassword ? 'text' : 'password'}
+            className="bg-background mt-2"
+            {...register('password')}
+          />
+
+          <Button
+            variant="link"
+            type="button"
+            className="absolute right-0 top-0 flex h-full items-center justify-center"
+            aria-label={showPassword ? 'Mask password' : 'Reveal password'}
+            onClick={onShowPassword}
+          >
+            {showPassword ? (
+              <EyeOff className="text-slate-500" />
+            ) : (
+              <Eye className="text-slate-500" />
+            )}
+          </Button>
+        </div>
 
         <FormErrorMessage className="mt-1.5" error={errors.password} />
       </div>
@@ -104,12 +132,28 @@ export const PasswordForm = ({ className }: PasswordFormProps) => {
           Repeat Password
         </Label>
 
-        <Input
-          id="repeated-password"
-          type="password"
-          className="bg-background mt-2"
-          {...register('repeatedPassword')}
-        />
+        <div className="relative">
+          <Input
+            id="repeated-password"
+            type={showConfirmPassword ? 'text' : 'password'}
+            className="bg-background mt-2"
+            {...register('repeatedPassword')}
+          />
+
+          <Button
+            variant="link"
+            type="button"
+            className="absolute right-0 top-0 flex h-full items-center justify-center"
+            aria-label={showConfirmPassword ? 'Mask password' : 'Reveal password'}
+            onClick={onShowConfirmPassword}
+          >
+            {showConfirmPassword ? (
+              <EyeOff className="text-slate-500" />
+            ) : (
+              <Eye className="text-slate-500" />
+            )}
+          </Button>
+        </div>
 
         <FormErrorMessage className="mt-1.5" error={errors.repeatedPassword} />
       </div>
