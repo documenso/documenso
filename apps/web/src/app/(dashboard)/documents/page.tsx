@@ -70,11 +70,14 @@ export default async function DocumentsPage({ searchParams = {} }: DocumentsPage
 
       <h1 className="mt-12 text-4xl font-semibold">Documents</h1>
 
-      <div className="mt-8 flex flex-wrap gap-x-4 gap-y-6">
-        <Tabs defaultValue={shouldDefaultToPending ? InternalDocumentStatus.PENDING : status}>
+      <div className="mt-8 flex flex-wrap gap-x-4 gap-y-6 ">
+        <Tabs
+          className="overflow-auto"
+          defaultValue={shouldDefaultToPending ? InternalDocumentStatus.PENDING : status}
+        >
           <TabsList>
             <TabsTrigger className="min-w-[60px]" value={InternalDocumentStatus.PENDING} asChild>
-              <Link href={getTabHref(InternalDocumentStatus.PENDING)}>
+              <Link href={getTabHref(InternalDocumentStatus.PENDING)} scroll={false}>
                 <DocumentStatus status={InternalDocumentStatus.PENDING} />
 
                 <span className="ml-1 hidden opacity-50 md:inline-block">
@@ -84,7 +87,7 @@ export default async function DocumentsPage({ searchParams = {} }: DocumentsPage
             </TabsTrigger>
 
             <TabsTrigger className="min-w-[60px]" value={InternalDocumentStatus.COMPLETED} asChild>
-              <Link href={getTabHref(InternalDocumentStatus.COMPLETED)}>
+              <Link href={getTabHref(InternalDocumentStatus.COMPLETED)} scroll={false}>
                 <DocumentStatus status={InternalDocumentStatus.COMPLETED} />
 
                 <span className="ml-1 hidden opacity-50 md:inline-block">
@@ -94,7 +97,7 @@ export default async function DocumentsPage({ searchParams = {} }: DocumentsPage
             </TabsTrigger>
 
             <TabsTrigger className="min-w-[60px]" value={InternalDocumentStatus.DRAFT} asChild>
-              <Link href={getTabHref(InternalDocumentStatus.DRAFT)}>
+              <Link href={getTabHref(InternalDocumentStatus.DRAFT)} scroll={false}>
                 <DocumentStatus status={InternalDocumentStatus.DRAFT} />
 
                 <span className="ml-1 hidden opacity-50 md:inline-block">
@@ -104,7 +107,9 @@ export default async function DocumentsPage({ searchParams = {} }: DocumentsPage
             </TabsTrigger>
 
             <TabsTrigger className="min-w-[60px]" value="ALL" asChild>
-              <Link href={getTabHref('ALL')}>All</Link>
+              <Link href={getTabHref('ALL')} scroll={false}>
+                All
+              </Link>
             </TabsTrigger>
           </TabsList>
         </Tabs>
