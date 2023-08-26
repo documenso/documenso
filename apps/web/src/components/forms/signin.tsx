@@ -17,7 +17,7 @@ import { useToast } from '@documenso/ui/primitives/use-toast';
 
 export const ZSignInFormSchema = z.object({
   email: z.string().email().min(1),
-  password: z.string().min(1),
+  password: z.string().min(6).max(72),
 });
 
 export type TSignInFormSchema = z.infer<typeof ZSignInFormSchema>;
@@ -99,28 +99,14 @@ export const SignInForm = ({ className }: SignInFormProps) => {
           Password
         </Label>
 
-        <div className="relative">
-          <Input
-            id="password"
-            type={showPassword ? 'text' : 'password'}
-            className="bg-background mt-2 pr-10"
-            {...register('password')}
-          />
-
-          <Button
-            variant="link"
-            type="button"
-            className="absolute right-0 top-0 flex h-full items-center justify-center pr-3"
-            aria-label={showPassword ? 'Mask password' : 'Reveal password'}
-            onClick={() => setShowPassword((showPassword) => !showPassword)}
-          >
-            {showPassword ? (
-              <EyeOff className="h-5 w-5 text-slate-500" />
-            ) : (
-              <Eye className="h-5 w-5 text-slate-500" />
-            )}
-          </Button>
-        </div>
+        <Input
+          id="password"
+          type="password"
+          minLength={6}
+          maxLength={72}
+          className="bg-background mt-2"
+          {...register('password')}
+        />
 
         {errors.password && (
           <span className="mt-1 text-xs text-red-500">{errors.password.message}</span>
