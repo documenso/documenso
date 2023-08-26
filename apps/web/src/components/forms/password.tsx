@@ -94,6 +94,7 @@ export const PasswordForm = ({ className }: PasswordFormProps) => {
           type="password"
           minLength={6}
           maxLength={72}
+          autoComplete="new-password"
           className="bg-background mt-2"
           {...register('password')}
         />
@@ -111,6 +112,7 @@ export const PasswordForm = ({ className }: PasswordFormProps) => {
           type="password"
           minLength={6}
           maxLength={72}
+          autoComplete="new-password"
           className="bg-background mt-2"
           {...register('repeatedPassword')}
         />
