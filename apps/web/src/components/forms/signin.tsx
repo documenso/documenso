@@ -115,9 +115,9 @@ export const SignInForm = ({ className }: SignInFormProps) => {
             onClick={() => setShowPassword((showPassword) => !showPassword)}
           >
             {showPassword ? (
-              <EyeOff className="text-slate-500" />
+              <EyeOff className="h-5 w-5 text-slate-500" />
             ) : (
-              <Eye className="text-slate-500" />
+              <Eye className="h-5 w-5 text-slate-500" />
             )}
           </Button>
         </div>
