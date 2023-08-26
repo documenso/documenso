@@ -75,10 +75,6 @@ export const SignUpForm = ({ className }: SignUpFormProps) => {
     }
   };
 
-  const onShowPassword = () => {
-    setShowPassword(!showPassword);
-  };
-
   return (
     <form
       className={cn('flex w-full flex-col gap-y-4', className)}
@@ -113,16 +109,16 @@ export const SignUpForm = ({ className }: SignUpFormProps) => {
           <Input
             id="password"
             type={showPassword ? 'text' : 'password'}
-            className="bg-background mt-2"
+            className="bg-background mt-2 pr-10"
             {...register('password')}
           />
 
           <Button
             variant="link"
             type="button"
-            className="absolute right-0 top-0 flex h-full items-center justify-center"
+            className="absolute right-0 top-0 flex h-full items-center justify-center pr-3"
             aria-label={showPassword ? 'Mask password' : 'Reveal password'}
-            onClick={onShowPassword}
+            onClick={() => setShowPassword((showPassword) => !showPassword)}
           >
             {showPassword ? (
               <EyeOff className="text-slate-500" />
