@@ -38,7 +38,8 @@
     "react-rnd": "^10.4.1",
     "ts-pattern": "^5.0.5",
     "typescript": "5.1.6",
-    "zod": "^3.21.4"
+    "zod": "^3.21.4",
+    "sharp": "0.32.5"
   },
   "devDependencies": {
     "@types/formidable": "^2.0.6",
