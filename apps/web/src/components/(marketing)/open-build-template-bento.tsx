@@ -13,6 +13,22 @@ import cardTemplateFigure from '~/assets/card-template-figure.png';
 export type OpenBuildTemplateBentoProps = HTMLAttributes<HTMLDivElement>;
 
 export const OpenBuildTemplateBento = ({ className, ...props }: OpenBuildTemplateBentoProps) => {
+  const cardData = [
+    {
+      title: 'Build on top.',
+      description: 'Make it your own through advanced customization and adjustability.',
+      image: cardBuildFigure,
+      imageSize: 'max-w-xs',
+    },
+    {
+      title: 'Template Store (Soon).',
+      description:
+        'Choose a template from the community app store. Or submit your own template for others to use.',
+      image: cardTemplateFigure,
+      imageSize: 'max-w-sm',
+    },
+  ];
+
   return (
     <div className={cn('relative', className)} {...props}>
       <div className="absolute inset-0 -z-10 flex items-center justify-center">
@@ -42,32 +58,19 @@ export const OpenBuildTemplateBento = ({ className, ...props }: OpenBuildTemplat
           </CardContent>
         </Card>
 
-        <Card className="col-span-2 lg:col-span-1" spotlight>
-          <CardContent className="grid grid-cols-1 gap-8 p-6">
-            <p className="leading-relaxed text-[#555E67]">
-              <strong className="block">Build on top.</strong>
-              Make it your own through advanced customization and adjustability.
-            </p>
-
-            <div className="flex items-center justify-center p-8">
-              <Image src={cardBuildFigure} alt="its fast" className="w-full max-w-xs" />
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="col-span-2 lg:col-span-1" spotlight>
-          <CardContent className="grid grid-cols-1 gap-8 p-6">
-            <p className="leading-relaxed text-[#555E67]">
-              <strong className="block">Template Store (Soon).</strong>
-              Choose a template from the community app store. Or submit your own template for others
-              to use.
-            </p>
-
-            <div className="flex items-center justify-center p-8">
-              <Image src={cardTemplateFigure} alt="its fast" className="w-full max-w-sm" />
-            </div>
-          </CardContent>
-        </Card>
+        {cardData.map((card, index) => (
+          <Card key={index} className="col-span-2 lg:col-span-1" spotlight>
+            <CardContent className="grid grid-cols-1 gap-8 p-6">
+              <p className="leading-relaxed text-[#555E67]">
+                <strong className="block">{card.title}</strong>
+                {card.description}
+              </p>
+              <div className="flex items-center justify-center p-8">
+                <Image src={card.image} alt="Its fast" className={`w-full ${card.imageSize}`} />
+              </div>
+            </CardContent>
+          </Card>
+        ))}
       </div>
     </div>
   );
