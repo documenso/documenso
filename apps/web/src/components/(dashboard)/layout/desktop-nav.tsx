@@ -13,7 +13,7 @@ export const DesktopNav = ({ className, ...props }: DesktopNavProps) => {
       {/* <Link
         href="/documents"
         className={cn(
-          'text-muted-foreground focus-visible:ring-ring ring-offset-background rounded-md font-medium leading-5 hover:opacity-80 focus-visible:outline-none focus-visible:ring-2 ',
+          'text-muted-foreground focus-visible:ring-ring ring-offset-background rounded-md font-medium leading-5 hover:opacity-80 focus-visible:outline-none focus-visible:ring-2',
           {
             'text-foreground': pathname?.startsWith('/documents'),
           },
