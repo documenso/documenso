@@ -72,7 +72,7 @@ export default async function DocumentsPage({ searchParams = {} }: DocumentsPage
 
       <div className="mt-8 flex flex-wrap gap-x-4 gap-y-6 ">
         <Tabs
-          className="overflow-auto"
+          className="overflow-x-auto"
           defaultValue={shouldDefaultToPending ? InternalDocumentStatus.PENDING : status}
         >
           <TabsList>
