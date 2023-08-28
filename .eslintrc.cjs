@@ -10,4 +10,10 @@ module.exports = {
       rootDir: ['apps/*/'],
     },
   },
+  overrides: [
+    {
+      files: ['**/*.ts*'],
+      excludedFiles: '../packages/eslint-config/index.cjs',
+    },
+  ],
 };

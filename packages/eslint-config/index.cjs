@@ -24,7 +24,7 @@ module.exports = {
 
   parserOptions: {
     tsconfigRootDir: __dirname,
-    project: ['../../apps/*/tsconfig.json'],
+    project: ['../../apps/*/tsconfig.json', '../../packages/*/tsconfig.json'],
     ecmaVersion: 2022,
     ecmaFeatures: {
       jsx: true,
