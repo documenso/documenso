@@ -17,29 +17,6 @@ export const ShareConnectPaidWidgetBento = ({
   className,
   ...props
 }: ShareConnectPaidWidgetBentoProps) => {
-  const cardData = [
-    {
-      title: 'Connections (Soon).',
-      description:
-        'Create connections and automations with Zapier and more to integrate with your favorite tools.',
-      image: cardConnectionsFigure,
-      imageSize: 'max-w-sm',
-    },
-    {
-      title: 'Get paid (Soon).',
-      description: 'Integrated payments with stripe so you don’t have to worry about getting paid.',
-      image: cardPaidFigure,
-      imageSize: 'max-w-[14rem]',
-    },
-    {
-      title: 'React Widget (Soon).',
-      description:
-        'Easily embed Documenso into your product. Simply copy and paste our react widget into your application.',
-      image: cardWidgetFigure,
-      imageSize: 'max-w-xs',
-    },
-  ];
-
   return (
     <div className={cn('relative', className)} {...props}>
       <div className="absolute inset-0 -z-10 flex items-center justify-center">
@@ -68,19 +45,46 @@ export const ShareConnectPaidWidgetBento = ({
           </CardContent>
         </Card>
 
-        {cardData.map((card, index) => (
-          <Card key={index} className="col-span-2 lg:col-span-1" gradient={index === 0} spotlight>
-            <CardContent className="grid grid-cols-1 gap-8 p-6">
-              <p className="leading-relaxed text-[#555E67]">
-                <strong className="block">{card.title}</strong>
-                {card.description}
-              </p>
-              <div className="flex items-center justify-center p-8">
-                <Image src={card.image} alt="Its fast" className={`w-full ${card.imageSize}`} />
-              </div>
-            </CardContent>
-          </Card>
-        ))}
+        <Card className="col-span-2 lg:col-span-1" spotlight>
+          <CardContent className="grid grid-cols-1 gap-8 p-6">
+            <p className="leading-relaxed text-[#555E67]">
+              <strong className="block">Connections (Soon).</strong>
+              Create connections and automations with Zapier and more to integrate with your
+              favorite tools.
+            </p>
+
+            <div className="flex items-center justify-center p-8">
+              <Image src={cardConnectionsFigure} alt="its fast" className="w-full max-w-sm" />
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="col-span-2 lg:col-span-1" spotlight>
+          <CardContent className="grid grid-cols-1 gap-8 p-6">
+            <p className="leading-relaxed text-[#555E67]">
+              <strong className="block">Get paid (Soon).</strong>
+              Integrated payments with stripe so you don’t have to worry about getting paid.
+            </p>
+
+            <div className="flex items-center justify-center p-8">
+              <Image src={cardPaidFigure} alt="its fast" className="w-full max-w-[14rem]" />
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="col-span-2 lg:col-span-1" spotlight>
+          <CardContent className="grid grid-cols-1 gap-8 p-6">
+            <p className="leading-relaxed text-[#555E67]">
+              <strong className="block">React Widget (Soon).</strong>
+              Easily embed Documenso into your product. Simply copy and paste our react widget into
+              your application.
+            </p>
+
+            <div className="flex items-center justify-center p-8">
+              <Image src={cardWidgetFigure} alt="its fast" className="w-full max-w-xs" />
+            </div>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );

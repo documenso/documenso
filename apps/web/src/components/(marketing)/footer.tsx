@@ -9,13 +9,13 @@ import { cn } from '@documenso/ui/lib/utils';
 
 export type FooterProps = HTMLAttributes<HTMLDivElement>;
 
-export const Footer = ({ className, ...props }: FooterProps) => {
-  const socialLinks = [
-    { href: 'https://twitter.com/documenso', icon: <Twitter className="h-6 w-6" /> },
-    { href: 'https://github.com/documenso/documenso', icon: <Github className="h-6 w-6" /> },
-    { href: 'https://documenso.slack.com', icon: <Slack className="h-6 w-6" /> },
-  ];
+const SOCIAL_LINKS = [
+  { href: 'https://twitter.com/documenso', icon: <Twitter className="h-6 w-6" /> },
+  { href: 'https://github.com/documenso/documenso', icon: <Github className="h-6 w-6" /> },
+  { href: 'https://documenso.slack.com', icon: <Slack className="h-6 w-6" /> },
+];
 
+export const Footer = ({ className, ...props }: FooterProps) => {
   const footerLinks = [
     { href: '/pricing', text: 'Pricing' },
     { href: 'https://status.documenso.com', text: 'Status', target: '_blank' },
@@ -32,7 +32,7 @@ export const Footer = ({ className, ...props }: FooterProps) => {
           </Link>
 
           <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-4 text-[#8D8D8D]">
-            {socialLinks.map((link, index) => (
+            {SOCIAL_LINKS.map((link, index) => (
               <Link key={index} href={link.href} target="_blank" className="hover:text-[#6D6D6D]">
                 {link.icon}
               </Link>

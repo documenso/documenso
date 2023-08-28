@@ -82,17 +82,13 @@ export const DateField = ({ field, recipient }: DateFieldProps) => {
         </div>
       )}
 
-      <p
-        className={`
-          ${
-            !field.inserted
-              ? 'group-hover:text-primary text-muted-foreground text-lg duration-200'
-              : 'text-muted-foreground text-sm duration-200'
-          }
-        `}
-      >
-        {field.inserted ? field.customText : 'Date'}
-      </p>
+      {!field.inserted && (
+        <p className="group-hover:text-primary text-muted-foreground text-lg duration-200">Date</p>
+      )}
+
+      {field.inserted && (
+        <p className="text-muted-foreground text-sm duration-200">{field.customText}</p>
+      )}
     </SigningFieldContainer>
   );
 };
