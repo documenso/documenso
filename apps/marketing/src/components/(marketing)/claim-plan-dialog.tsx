@@ -63,7 +63,9 @@ export const ClaimPlanDialog = ({ className, planId, children }: ClaimPlanDialog
 
   const onFormSubmit = async ({ name, email }: TClaimPlanDialogFormSchema) => {
     try {
-      const delay = new Promise<void>((resolve) => setTimeout(resolve, 1000));
+      const delay = new Promise<void>((resolve) => {
+        setTimeout(resolve, 1000);
+      });
 
       const [redirectUrl] = await Promise.all([
         claimPlan({ name, email, planId, signatureText: name, signatureDataUrl: null }),
@@ -97,7 +99,7 @@ export const ClaimPlanDialog = ({ className, planId, children }: ClaimPlanDialog
           </DialogDescription>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit(onFormSubmit)}>
+        <form onSubmit={() => handleSubmit(onFormSubmit)}>
           <fieldset disabled={isSubmitting} className={cn('flex flex-col gap-y-4', className)}>
             {params?.get('cancelled') === 'true' && (
               <div className="rounded-lg border border-yellow-400 bg-yellow-50 p-4">

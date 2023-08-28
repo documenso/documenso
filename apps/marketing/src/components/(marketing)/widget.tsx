@@ -120,11 +120,11 @@ export const Widget = ({ className, children, ...props }: WidgetProps) => {
     };
   };
 
-  const onSignatureConfirmClick = () => {
+  const onSignatureConfirmClick = async () => {
     setValue('signatureDataUrl', draftSignatureDataUrl);
     setValue('signatureText', '');
 
-    trigger('signatureDataUrl');
+    await trigger('signatureDataUrl');
     setShowSigningDialog(false);
   };
 
@@ -135,7 +135,9 @@ export const Widget = ({ className, children, ...props }: WidgetProps) => {
     signatureText,
   }: TWidgetFormSchema) => {
     try {
-      const delay = new Promise<void>((resolve) => setTimeout(resolve, 1000));
+      const delay = new Promise<void>((resolve) => {
+        setTimeout(resolve, 1000);
+      });
 
       // eslint-disable-next-line turbo/no-undeclared-env-vars
       const planId = process.env.NEXT_PUBLIC_STRIPE_COMMUNITY_PLAN_MONTHLY_PRICE_ID;
@@ -145,7 +147,7 @@ export const Widget = ({ className, children, ...props }: WidgetProps) => {
             name,
             email,
             planId,
-            signatureDataUrl: signatureDataUrl!,
+            signatureDataUrl: signatureDataUrl,
             signatureText: null,
           }
         : {
@@ -186,7 +188,7 @@ export const Widget = ({ className, children, ...props }: WidgetProps) => {
 
           <form
             className="col-span-12 flex flex-col rounded-2xl bg-[#F7F7F7] p-6 lg:col-span-5"
-            onSubmit={handleSubmit(onFormSubmit)}
+            onSubmit={() => handleSubmit(onFormSubmit)}
           >
             <h3 className="text-2xl font-semibold">Sign up for the community plan</h3>
             <p className="mt-2 text-xs text-[#AFAFAF]">
@@ -345,7 +347,7 @@ export const Widget = ({ className, children, ...props }: WidgetProps) => {
                     placeholder="Draw or type name here"
                     disabled={isSubmitting}
                     {...register('signatureText', {
-                      onChange: (e) => {
+                      onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
                         if (e.target.value !== '') {
                           setValue('signatureDataUrl', null);
                         }
@@ -391,7 +393,7 @@ export const Widget = ({ className, children, ...props }: WidgetProps) => {
               Cancel
             </Button>
 
-            <Button onClick={() => onSignatureConfirmClick()}>Confirm</Button>
+            <Button onClick={() => onSignatureConfirmClick}>Confirm</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
