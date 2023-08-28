@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 export const ZCreateDocumentRequestSchema = z.object({
-  file: z.instanceof(File),
+  file: z.custom<File>((v) => v instanceof File),
 });
 
 export type TCreateDocumentRequestSchema = z.infer<typeof ZCreateDocumentRequestSchema>;

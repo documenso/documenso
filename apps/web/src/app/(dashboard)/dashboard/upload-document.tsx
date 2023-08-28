@@ -1,5 +1,7 @@
 'use client';
 
+import { useTransition } from 'react';
+
 import { useRouter } from 'next/navigation';
 
 import { Loader } from 'lucide-react';
@@ -17,6 +19,7 @@ export type UploadDocumentProps = {
 export const UploadDocument = ({ className }: UploadDocumentProps) => {
   const { toast } = useToast();
   const router = useRouter();
+  const startTransition = useTransition()[1];
 
   const { isLoading, mutateAsync: createDocument } = useCreateDocument();
 
@@ -26,12 +29,15 @@ export const UploadDocument = ({ className }: UploadDocumentProps) => {
         file: file,
       });
 
+      startTransition(() => {
+        router.refresh();
+      });
+
       toast({
         title: 'Document uploaded',
         description: 'Your document has been uploaded successfully.',
         duration: 5000,
       });
-
       router.push(`/documents/${id}`);
     } catch (error) {
       console.error(error);
