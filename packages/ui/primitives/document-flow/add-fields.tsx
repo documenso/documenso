@@ -500,7 +500,7 @@ export const AddFieldsFormPartial = ({
           loading={isSubmitting}
           disabled={isSubmitting}
           onGoBackClick={documentFlow.onBackStep}
-          onGoNextClick={() => handleSubmit(onSubmit)()}
+          onGoNextClick={() => handleSubmit(onSubmit)}
         />
       </DocumentFlowFormContainerFooter>
     </>

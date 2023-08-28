@@ -44,7 +44,7 @@ export const PDFViewer = ({ className, document, onPageClick, ...props }: PDFVie
     setNumPages(doc.numPages);
   };
 
-  const onDocumentPageClick = (
+  const onDocumentPageClick = async (
     event: React.MouseEvent<HTMLDivElement, MouseEvent>,
     pageNumber: number,
   ) => {
@@ -66,7 +66,7 @@ export const PDFViewer = ({ className, document, onPageClick, ...props }: PDFVie
     const pageY = event.clientY - top;
 
     if (onPageClick) {
-      onPageClick({
+      await onPageClick({
         pageNumber,
         numPages,
         originalEvent: event,
@@ -129,7 +129,11 @@ export const PDFViewer = ({ className, document, onPageClick, ...props }: PDFVie
                 width={width}
                 renderAnnotationLayer={false}
                 renderTextLayer={false}
-                onClick={(e) => onDocumentPageClick(e, i + 1)}
+                onClick={(e) => {
+                  void (async () => {
+                    await onDocumentPageClick(e, i + 1);
+                  })();
+                }}
               />
             </div>
           ))}

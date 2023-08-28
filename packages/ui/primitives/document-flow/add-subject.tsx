@@ -130,7 +130,7 @@ export const AddSubjectFormPartial = ({
           disabled={isSubmitting}
           goNextLabel={document.status === DocumentStatus.DRAFT ? 'Send' : 'Update'}
           onGoBackClick={documentFlow.onBackStep}
-          onGoNextClick={() => handleSubmit(onSubmit)()}
+          onGoNextClick={() => handleSubmit(onSubmit)}
         />
       </DocumentFlowFormContainerFooter>
     </>

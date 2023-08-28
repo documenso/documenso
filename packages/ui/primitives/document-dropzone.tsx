@@ -86,6 +86,7 @@ export const DocumentDropzone = ({ className, onDrop, ...props }: DocumentDropzo
     multiple: false,
     onDrop: ([acceptedFile]) => {
       if (acceptedFile && onDrop) {
+        // eslint-disable-next-line @typescript-eslint/no-floating-promises
         onDrop(acceptedFile);
       }
     },
