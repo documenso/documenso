@@ -1,7 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 
-import formidable from 'formidable';
-import { type File } from 'formidable';
+import formidable, { type File } from 'formidable';
 import { readFileSync } from 'fs';
 
 import { getServerSession } from '@documenso/lib/next-auth/get-server-session';
