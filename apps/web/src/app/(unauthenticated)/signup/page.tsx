@@ -14,6 +14,7 @@ export default function SignUpPage() {
             src={backgroundPattern}
             alt="background pattern"
             className="dark:brightness-95 dark:invert dark:sepia"
+            priority={true}
           />
         </div>
 
