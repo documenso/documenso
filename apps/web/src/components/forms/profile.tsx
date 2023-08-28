@@ -86,7 +86,7 @@ export const ProfileForm = ({ className, user }: ProfileFormProps) => {
   return (
     <form
       className={cn('flex w-full flex-col gap-y-4', className)}
-      onSubmit={handleSubmit(onFormSubmit)}
+      onSubmit={() => handleSubmit(onFormSubmit)}
     >
       <div>
         <Label htmlFor="full-name" className="text-slate-500">

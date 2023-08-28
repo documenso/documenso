@@ -52,7 +52,7 @@ export const SigningForm = ({ document, recipient, fields }: SigningFormProps) =
       className={cn(
         'dark:bg-background border-border bg-widget sticky top-20 flex h-full max-h-[80rem] flex-col rounded-xl border px-4 py-6',
       )}
-      onSubmit={handleSubmit(onFormSubmit)}
+      onSubmit={() => handleSubmit(onFormSubmit)}
     >
       <div className={cn('-mx-2 flex flex-1 flex-col overflow-hidden px-2')}>
         <div className={cn('flex flex-1 flex-col')}>

@@ -67,7 +67,11 @@ export function FeatureFlagProvider({
 
     const interval = setInterval(() => {
       if (document.hasFocus()) {
-        getAllFlags().then((newFlags) => setFlags(newFlags));
+        getAllFlags()
+          .then((newFlags) => setFlags(newFlags))
+          .catch((e) => {
+            console.log(e);
+          });
       }
     }, FEATURE_FLAG_POLL_INTERVAL);
 
@@ -84,11 +88,19 @@ export function FeatureFlagProvider({
       return;
     }
 
-    const onFocus = () => getAllFlags().then((newFlags) => setFlags(newFlags));
-
+    const onFocus = async () =>
+      getAllFlags()
+        .then((newFlags) => {
+          setFlags(newFlags);
+        })
+        .catch((e) => {
+          console.log(e);
+        });
+    // eslint-disable-next-line @typescript-eslint/no-misused-promises
     window.addEventListener('focus', onFocus);
 
     return () => {
+      // eslint-disable-next-line @typescript-eslint/no-misused-promises
       window.removeEventListener('focus', onFocus);
     };
   }, []);

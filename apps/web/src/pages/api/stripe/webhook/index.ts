@@ -1,3 +1,10 @@
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
+
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+
+/* eslint-disable @typescript-eslint/no-unsafe-call */
 import { NextApiRequest, NextApiResponse } from 'next';
 
 import { randomBytes } from 'crypto';
@@ -17,6 +24,7 @@ import {
   SigningStatus,
 } from '@documenso/prisma/client';
 
+// eslint-disable-next-line @typescript-eslint/no-unsafe-argument
 const log = (...args: any[]) => console.log('[stripe]', ...args);
 
 export const config = {
@@ -50,11 +58,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     body,
     sig,
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion, turbo/no-undeclared-env-vars
-    process.env.NEXT_PRIVATE_STRIPE_WEBHOOK_SECRET!,
+    process.env.NEXT_PRIVATE_STRIPE_WEBHOOK_SECRET,
   );
   log('event-type:', event.type);
 
   if (event.type === 'checkout.session.completed') {
+    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
     const session = event.data.object as Stripe.Checkout.Session;
 
     if (session.metadata?.source === 'landing') {

@@ -117,11 +117,13 @@ export const ProfileDropdown = ({ user }: ProfileDropdownProps) => {
         <DropdownMenuSeparator />
 
         <DropdownMenuItem
-          onSelect={() =>
+          onSelect={() => {
             signOut({
               callbackUrl: '/',
-            })
-          }
+            }).catch((e) => {
+              console.log(e);
+            });
+          }}
         >
           <LogOut className="mr-2 h-4 w-4" />
           Sign Out

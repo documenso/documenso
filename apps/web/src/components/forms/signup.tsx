@@ -75,7 +75,7 @@ export const SignUpForm = ({ className }: SignUpFormProps) => {
   return (
     <form
       className={cn('flex w-full flex-col gap-y-4', className)}
-      onSubmit={handleSubmit(onFormSubmit)}
+      onSubmit={() => handleSubmit(onFormSubmit)}
     >
       <div>
         <Label htmlFor="name" className="text-muted-foreground">

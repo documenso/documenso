@@ -78,7 +78,7 @@ export const SignInForm = ({ className }: SignInFormProps) => {
       className={cn('flex w-full flex-col gap-y-4', className)}
       onSubmit={(e) => {
         e.preventDefault();
-        handleSubmit(onFormSubmit)();
+        handleSubmit(onFormSubmit);
       }}
     >
       <div>
@@ -128,7 +128,7 @@ export const SignInForm = ({ className }: SignInFormProps) => {
         variant={'outline'}
         className="bg-background text-muted-foreground border"
         disabled={isSubmitting}
-        onClick={onSignInWithGoogleClick}
+        onClick={() => onSignInWithGoogleClick}
       >
         <FcGoogle className="mr-2 h-5 w-5" />
         Google

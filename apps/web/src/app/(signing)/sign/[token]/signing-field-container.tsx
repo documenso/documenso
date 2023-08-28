@@ -61,13 +61,17 @@ export const SigningFieldContainer = ({
           )}
         >
           {!field.inserted && !loading && (
-            <button type="submit" className="absolute inset-0 z-10" onClick={onSignFieldClick} />
+            <button
+              type="submit"
+              className="absolute inset-0 z-10"
+              onClick={() => onSignFieldClick}
+            />
           )}
 
           {field.inserted && !loading && (
             <button
               className="text-destructive bg-background/40 absolute inset-0 z-10 flex items-center justify-center rounded-md text-sm opacity-0 backdrop-blur-sm duration-200 group-hover:opacity-100"
-              onClick={onRemoveSignedFieldClick}
+              onClick={() => onRemoveSignedFieldClick}
             >
               Remove
             </button>

@@ -82,7 +82,7 @@ export const PasswordForm = ({ className }: PasswordFormProps) => {
   return (
     <form
       className={cn('flex w-full flex-col gap-y-4', className)}
-      onSubmit={handleSubmit(onFormSubmit)}
+      onSubmit={() => handleSubmit(onFormSubmit)}
     >
       <div>
         <Label htmlFor="password" className="text-slate-500">

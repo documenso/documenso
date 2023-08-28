@@ -5,6 +5,7 @@ import { useCallback, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 
 export const RefreshOnFocus = () => {
+  // eslint-disable-next-line @typescript-eslint/unbound-method
   const { refresh } = useRouter();
 
   const onFocus = useCallback(() => {

@@ -9,7 +9,7 @@ import { getAllFlags, getFlag } from './get-feature-flag';
  * @returns Whether the flag is enabled, or the variant value of the flag.
  */
 export const getServerComponentFlag = async (flag: string) => {
-  return await getFlag(flag, {
+  return getFlag(flag, {
     requestHeaders: Object.fromEntries(headers().entries()),
   });
 };
@@ -20,7 +20,7 @@ export const getServerComponentFlag = async (flag: string) => {
  * @returns A record of flags and their values for the user derived from the headers.
  */
 export const getServerComponentAllFlags = async () => {
-  return await getAllFlags({
+  return getAllFlags({
     requestHeaders: Object.fromEntries(headers().entries()),
   });
 };

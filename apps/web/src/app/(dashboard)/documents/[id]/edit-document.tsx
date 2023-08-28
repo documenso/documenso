@@ -166,7 +166,7 @@ export const EditDocumentForm = ({
               recipients={recipients}
               fields={fields}
               numberOfSteps={Object.keys(documentFlow).length}
-              onSubmit={onAddSignersFormSubmit}
+              onSubmit={() => onAddSignersFormSubmit}
             />
           )}
 
@@ -176,7 +176,7 @@ export const EditDocumentForm = ({
               recipients={recipients}
               fields={fields}
               numberOfSteps={Object.keys(documentFlow).length}
-              onSubmit={onAddFieldsFormSubmit}
+              onSubmit={() => onAddFieldsFormSubmit}
             />
           )}
 
@@ -187,7 +187,7 @@ export const EditDocumentForm = ({
               recipients={recipients}
               fields={fields}
               numberOfSteps={Object.keys(documentFlow).length}
-              onSubmit={onAddSubjectFormSubmit}
+              onSubmit={() => onAddSubjectFormSubmit}
             />
           )}
         </DocumentFlowFormContainer>
