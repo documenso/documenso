@@ -34,23 +34,22 @@ export default async function DashboardPage() {
     }),
   ]);
 
-  const cardData = [
-    { icon: FileCheck, title: 'Completed', status: stats.COMPLETED },
-    { icon: File, title: 'Drafts', status: stats.DRAFT },
-    { icon: Clock, title: 'Pending', status: stats.PENDING },
-  ];
-
   return (
     <div className="mx-auto w-full max-w-screen-xl px-4 md:px-8">
       <h1 className="text-4xl font-semibold">Dashboard</h1>
+
       <div className="mt-8 grid grid-cols-1 gap-4 md:grid-cols-3">
-        {cardData.map((card) => (
-          <Link key={card.status} href={`/documents?status=${card.status}`} passHref>
-            <CardMetric icon={card.icon} title={card.title} value={card.status} />
-          </Link>
-        ))}
+        <Link href={'/documents?status=COMPLETED'} passHref>
+          <CardMetric icon={FileCheck} title="Completed" value={stats.COMPLETED} />
+        </Link>
+        <Link href={'/documents?status=DRAFT'} passHref>
+          <CardMetric icon={File} title="Drafts" value={stats.DRAFT} />
+        </Link>
+        <Link href={'/documents?status=PENDING'} passHref>
+          <CardMetric icon={Clock} title="Pending" value={stats.PENDING} />
+        </Link>
       </div>
-      ;
+
       <div className="mt-12">
         <UploadDocument />
 

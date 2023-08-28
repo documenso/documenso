@@ -16,21 +16,6 @@ export const FasterSmarterBeautifulBento = ({
   className,
   ...props
 }: FasterSmarterBeautifulBentoProps) => {
-  const featureCards = [
-    {
-      title: 'Beautiful.',
-      description:
-        'Because signing should be celebrated. That’s why we care about the smallest detail in our product.',
-      image: cardBeautifulFigure,
-    },
-    {
-      title: 'Smart.',
-      description:
-        'Our custom templates come with smart rules that can help you save time and energy.',
-      image: cardSmartFigure,
-    },
-  ];
-
   return (
     <div className={cn('relative', className)} {...props}>
       <div className="absolute inset-0 -z-10 flex items-center justify-center">
@@ -60,19 +45,32 @@ export const FasterSmarterBeautifulBento = ({
           </CardContent>
         </Card>
 
-        {featureCards.map((card, index) => (
-          <Card key={index} className="col-span-2 lg:col-span-1" spotlight>
-            <CardContent className="grid grid-cols-1 gap-8 p-6">
-              <p className="leading-relaxed text-[#555E67]">
-                <strong className="block">{card.title}</strong>
-                {card.description}
-              </p>
-              <div className="flex items-center justify-center p-8">
-                <Image src={card.image} alt="Its fast" className="w-full max-w-[16rem]" />
-              </div>
-            </CardContent>
-          </Card>
-        ))}
+        <Card className="col-span-2 lg:col-span-1" spotlight>
+          <CardContent className="grid grid-cols-1 gap-8 p-6">
+            <p className="leading-relaxed text-[#555E67]">
+              <strong className="block">Beautiful.</strong>
+              Because signing should be celebrated. That’s why we care about the smallest detail in
+              our product.
+            </p>
+
+            <div className="flex items-center justify-center p-8">
+              <Image src={cardBeautifulFigure} alt="its fast" className="w-full max-w-xs" />
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="col-span-2 lg:col-span-1" spotlight>
+          <CardContent className="grid grid-cols-1 gap-8 p-6">
+            <p className="leading-relaxed text-[#555E67]">
+              <strong className="block">Smart.</strong>
+              Our custom templates come with smart rules that can help you save time and energy.
+            </p>
+
+            <div className="flex items-center justify-center p-8">
+              <Image src={cardSmartFigure} alt="its fast" className="w-full max-w-[16rem]" />
+            </div>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );
