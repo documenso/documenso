@@ -72,6 +72,7 @@ export const SigningFieldContainer = ({
               Remove
             </button>
           )}
+
           {children}
         </CardContent>
       </Card>
