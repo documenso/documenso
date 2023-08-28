@@ -12,7 +12,7 @@ module.exports = {
   },
   overrides: [
     {
-      files: ['**/*.ts*'],
+      files: ['**/*.js*', '**/*.ts*'],
       excludedFiles: '../packages/eslint-config/index.cjs',
     },
   ],
