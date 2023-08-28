@@ -7,10 +7,9 @@ module.exports = {
     'plugin:@typescript-eslint/recommended',
     'plugin:prettier/recommended',
     'plugin:package-json/recommended',
-    'plugin:import/recommended',
   ],
 
-  plugins: ['prettier', 'package-json', 'import', 'simple-import-sort'],
+  plugins: ['prettier', 'package-json', 'simple-import-sort'],
 
   env: {
     node: true,
@@ -52,9 +51,6 @@ module.exports = {
         },
       },
     ],
-    'import/named': 'error',
-    'import/no-named-as-default': 'off',
-    'import/namespace': 'off',
     'no-duplicate-imports': 'error',
   },
 };
