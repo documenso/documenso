@@ -6,9 +6,11 @@ module.exports = {
     'eslint:recommended',
     'plugin:@typescript-eslint/recommended',
     'plugin:prettier/recommended',
+    'plugin:package-json/recommended',
+    'plugin:import/recommended',
   ],
 
-  plugins: ['prettier'],
+  plugins: ['prettier', 'package-json', 'import', 'simple-import-sort'],
 
   env: {
     node: true,
@@ -38,5 +40,21 @@ module.exports = {
     // To handle this we want this rule to catch usages and highlight them as
     // warnings so we can write appropriate interfaces and guards later.
     '@typescript-eslint/consistent-type-assertions': ['warn', { assertionStyle: 'never' }],
+    'no-multi-spaces': [
+      'error',
+      {
+        ignoreEOLComments: false,
+        exceptions: {
+          BinaryExpression: false,
+          VariableDeclarator: false,
+          ImportDeclaration: false,
+          Property: false,
+        },
+      },
+    ],
+    'import/named': 'error',
+    'import/no-named-as-default': 'off',
+    'import/namespace': 'off',
+    'no-duplicate-imports': 'error',
   },
 };
