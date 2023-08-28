@@ -8,7 +8,7 @@ import { FundingRaised } from './funding-raised';
 import { GithubMetric } from './gh-metrics';
 import { TeamMembers } from './team-members';
 
-export const revalidate = 86400;
+export const revalidate = 3600;
 
 const ZGithubStatsResponse = z.object({
   stargazers_count: z.number(),
