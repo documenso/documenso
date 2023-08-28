@@ -17,7 +17,7 @@ import { useToast } from '@documenso/ui/primitives/use-toast';
 
 export const ZSignInFormSchema = z.object({
   email: z.string().email().min(1),
-  password: z.string().min(1),
+  password: z.string().min(6).max(72),
 });
 
 export type TSignInFormSchema = z.infer<typeof ZSignInFormSchema>;
@@ -103,6 +103,9 @@ export const SignInForm = ({ className }: SignInFormProps) => {
           <Input
             id="password"
             type={showPassword ? 'text' : 'password'}
+            minLength={6}
+            maxLength={72}
+            autoComplete="current-password"
             className="bg-background mt-2 pr-10"
             {...register('password')}
           />

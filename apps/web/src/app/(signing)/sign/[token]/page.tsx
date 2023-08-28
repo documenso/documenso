@@ -57,7 +57,7 @@ export default async function SigningPage({ params: { token } }: SigningPageProp
           </p>
         </div>
 
-        <div className="mt-8 grid grid-cols-12 gap-8">
+        <div className="mt-8 grid grid-cols-12 gap-y-8 lg:gap-x-8 lg:gap-y-0">
           <Card
             className="col-span-12 rounded-xl before:rounded-xl lg:col-span-7 xl:col-span-8"
             gradient
