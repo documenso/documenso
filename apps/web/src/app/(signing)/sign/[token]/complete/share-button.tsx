@@ -15,7 +15,7 @@ export type ShareButtonProps = HTMLAttributes<HTMLButtonElement> & {
 };
 
 export const ShareButton = ({ recipientId, documentId }: ShareButtonProps) => {
-  const { mutateAsync: createShareId } = trpc.share.create.useMutation();
+  const { mutateAsync: createShareId, isLoading } = trpc.share.create.useMutation();
 
   const router = useRouter();
 
@@ -23,14 +23,18 @@ export const ShareButton = ({ recipientId, documentId }: ShareButtonProps) => {
     <Button
       variant="outline"
       className="flex-1"
+      disabled={!recipientId || !documentId || isLoading}
       onClick={async () => {
-        // redirect to the share page
-        // create link once and dont allow a user to create the link
+        console.log('Signing Clicked');
+
         const response = await createShareId({
           recipientId,
           documentId,
         });
 
+        console.log('response', response);
+
+        // TODO: Router delaying...
         return router.push(`/share/${response.link}`);
       }}
     >
