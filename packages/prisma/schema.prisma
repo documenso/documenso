@@ -93,6 +93,7 @@ model Document {
   document  String
   Recipient Recipient[]
   Field     Field[]
+  Share     Share[]
 }
 
 enum ReadStatus {
@@ -124,6 +125,7 @@ model Recipient {
   Document      Document      @relation(fields: [documentId], references: [id], onDelete: Cascade)
   Field         Field[]
   Signature     Signature[]
+  Share         Share[]
 
   @@unique([documentId, email])
 }
@@ -164,4 +166,15 @@ model Signature {
 
   Recipient Recipient @relation(fields: [recipientId], references: [id], onDelete: Cascade)
   Field     Field     @relation(fields: [fieldId], references: [id], onDelete: Restrict)
+}
+
+model Share {
+  id          Int       @id @default(autoincrement())
+  recipientId Int
+  recipent    Recipient @relation(fields: [recipientId], references: [id])
+  link        String    @unique
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  document    Document? @relation(fields: [documentId], references: [id])
+  documentId  Int?
 }
