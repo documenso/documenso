@@ -25,7 +25,7 @@
     "prettier": "^2.5.1",
     "turbo": "^1.9.3"
   },
-  "name": "documenso.next",
+  "name": "@documenso/root",
   "packageManager": "npm@8.19.2",
   "workspaces": [
     "apps/*",
