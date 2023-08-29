@@ -86,7 +86,7 @@ export const DocumentDropzone = ({ className, onDrop, ...props }: DocumentDropzo
     multiple: false,
     onDrop: ([acceptedFile]) => {
       if (acceptedFile && onDrop) {
-        onDrop(acceptedFile);
+        void onDrop(acceptedFile);
       }
     },
   });

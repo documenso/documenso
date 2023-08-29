@@ -10,7 +10,7 @@ const t = initTRPC.context<TrpcContext>().create({
 /**
  * Middlewares
  */
-export const authenticatedMiddleware = t.middleware(({ ctx, next }) => {
+export const authenticatedMiddleware = t.middleware(async ({ ctx, next }) => {
   if (!ctx.session) {
     throw new TRPCError({
       code: 'UNAUTHORIZED',
@@ -18,7 +18,7 @@ export const authenticatedMiddleware = t.middleware(({ ctx, next }) => {
     });
   }
 
-  return next({
+  return await next({
     ctx: {
       ...ctx,
 

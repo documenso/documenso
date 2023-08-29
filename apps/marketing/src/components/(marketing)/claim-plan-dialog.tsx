@@ -63,7 +63,9 @@ export const ClaimPlanDialog = ({ className, planId, children }: ClaimPlanDialog
 
   const onFormSubmit = async ({ name, email }: TClaimPlanDialogFormSchema) => {
     try {
-      const delay = new Promise<void>((resolve) => setTimeout(resolve, 1000));
+      const delay = new Promise<void>((resolve) => {
+        setTimeout(resolve, 1000);
+      });
 
       const [redirectUrl] = await Promise.all([
         claimPlan({ name, email, planId, signatureText: name, signatureDataUrl: null }),

@@ -5,7 +5,7 @@ import { allDocuments } from 'contentlayer/generated';
 import type { MDXComponents } from 'mdx/types';
 import { useMDXComponent } from 'next-contentlayer/hooks';
 
-export const generateStaticParams = async () =>
+export const generateStaticParams = () =>
   allDocuments.map((post) => ({ post: post._raw.flattenedPath }));
 
 export const generateMetadata = ({ params }: { params: { content: string } }) => {
