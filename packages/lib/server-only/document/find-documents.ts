@@ -3,7 +3,6 @@ import { match } from 'ts-pattern';
 import { prisma } from '@documenso/prisma';
 import { Document, Prisma, SigningStatus } from '@documenso/prisma/client';
 import { DocumentWithRecipientAndSender } from '@documenso/prisma/types/document';
-import { DocumentWithReciepient } from '@documenso/prisma/types/document-with-recipient';
 import { ExtendedDocumentStatus } from '@documenso/prisma/types/extended-document-status';
 
 import { FindResultSet } from '../../types/find-result-set';
@@ -27,7 +26,7 @@ export const findDocuments = async ({
   page = 1,
   perPage = 10,
   orderBy,
-}: FindDocumentsOptions): Promise<FindResultSet<DocumentWithReciepient>> => {
+}: FindDocumentsOptions) => {
   const user = await prisma.user.findFirstOrThrow({
     where: {
       id: userId,
@@ -145,13 +144,21 @@ export const findDocuments = async ({
     }),
   ]);
 
+  const maskedData = data.map((doc) => ({
+    ...doc,
+    Recipient: doc.Recipient.map((recipient) => ({
+      ...recipient,
+      token: recipient.email === user.email ? recipient.token : '',
+    })),
+  }));
+
   return {
-    data,
+    data: maskedData,
     count,
     currentPage: Math.max(page, 1),
     perPage,
     totalPages: Math.ceil(count / perPage),
-  };
+  } satisfies FindResultSet<typeof maskedData>;
 };
 
 export interface FindDocumentsWithRecipientAndSenderOptions {
