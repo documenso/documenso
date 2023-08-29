@@ -31,14 +31,13 @@ const ZStargazersLiveResponse = z.record(
 
 export type StargazersType = z.infer<typeof ZStargazersLiveResponse>;
 
-// const ZOpenPullRequestsResponse = ZMergedPullRequestsResponse;
-
 export default async function OpenPage() {
+  const randomQueryParam = `?${Math.random()}`;
   const {
     forks_count: forksCount,
     open_issues: openIssues,
     stargazers_count: stargazersCount,
-  } = await fetch('https://api.github.com/repos/documenso/documenso', {
+  } = await fetch(`https://api.github.com/repos/documenso/documenso${randomQueryParam}`, {
     headers: {
       accept: 'application/vnd.github.v3+json',
     },
@@ -73,7 +72,11 @@ export default async function OpenPage() {
         <p className="text-muted-foreground mt-4 max-w-[60ch] text-center text-lg leading-normal">
           All our metrics, finances, and learnings are public. We believe in transparency and want
           to share our journey with you. You can read more about why here:{' '}
-          <a className="font-bold" href="https://documenso.com/blog/pre-seed" target="_blank">
+          <a
+            className="font-bold hover:underline"
+            href="https://documenso.com/blog/pre-seed"
+            target="_blank"
+          >
             Announcing Open Metrics
           </a>
         </p>
@@ -113,7 +116,7 @@ export default async function OpenPage() {
         <GithubMetric
           data={STARGAZERS_DATA}
           metricKey="stars"
-          title="Github: Total Stars"
+          title="GitHub: Total Stars"
           label="Stars"
           className="col-span-12 lg:col-span-6"
         />
@@ -121,7 +124,7 @@ export default async function OpenPage() {
         <GithubMetric
           data={STARGAZERS_DATA}
           metricKey="mergedPRs"
-          title="Github: Total Merged PRs"
+          title="GitHub: Total Merged PRs"
           label="Merged PRs"
           chartHeight={300}
           className="col-span-12 lg:col-span-4"
@@ -129,7 +132,7 @@ export default async function OpenPage() {
         <GithubMetric
           data={STARGAZERS_DATA}
           metricKey="forks"
-          title="Github: Total Forks"
+          title="GitHub: Total Forks"
           label="Forks"
           chartHeight={300}
           className="col-span-12 lg:col-span-4"
@@ -137,7 +140,7 @@ export default async function OpenPage() {
         <GithubMetric
           data={STARGAZERS_DATA}
           metricKey="openIssues"
-          title="Github: Total Open Issues"
+          title="GitHub: Total Open Issues"
           label="Open Issues"
           chartHeight={300}
           className="col-span-12 lg:col-span-4"

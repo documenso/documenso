@@ -19,11 +19,15 @@ const fontCaveat = Caveat({
 });
 
 export default async function IndexPage() {
-  const starCount = await fetch('https://api.github.com/repos/documenso/documenso', {
-    headers: {
-      accept: 'application/vnd.github.v3+json',
+  const randomQueryParam = `?${Math.random()}`;
+  const starCount = await fetch(
+    `https://api.github.com/repos/documenso/documenso${randomQueryParam}`,
+    {
+      headers: {
+        accept: 'application/vnd.github.v3+json',
+      },
     },
-  })
+  )
     .then((res) => res.json())
     .then((res) => (typeof res.stargazers_count === 'number' ? res.stargazers_count : undefined))
     .catch(() => undefined);
