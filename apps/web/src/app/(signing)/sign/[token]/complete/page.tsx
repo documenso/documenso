@@ -1,16 +1,16 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 
-import { CheckCircle2, Clock8, Share } from 'lucide-react';
+import { CheckCircle2, Clock8 } from 'lucide-react';
 import { match } from 'ts-pattern';
 
 import { getDocumentAndSenderByToken } from '@documenso/lib/server-only/document/get-document-by-token';
 import { getFieldsForToken } from '@documenso/lib/server-only/field/get-fields-for-token';
 import { getRecipientByToken } from '@documenso/lib/server-only/recipient/get-recipient-by-token';
 import { DocumentStatus, FieldType } from '@documenso/prisma/client';
-import { Button } from '@documenso/ui/primitives/button';
 
 import { DownloadButton } from './download-button';
+import { ShareButton } from './share-button';
 import { SigningCard } from './signing-card';
 
 export type CompletedSigningPageProps = {
@@ -88,11 +88,7 @@ export default async function CompletedSigningPage({
         ))}
 
       <div className="mt-8 flex w-full max-w-sm items-center justify-center gap-4">
-        {/* TODO: Hook this up */}
-        <Button variant="outline" className="flex-1">
-          <Share className="mr-2 h-5 w-5" />
-          Share
-        </Button>
+        <ShareButton documentId={document.id} recipientId={recipient.id} />
 
         <DownloadButton
           className="flex-1"

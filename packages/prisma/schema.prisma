@@ -101,33 +101,16 @@ enum DocumentStatus {
 }
 
 model Document {
-  id             Int            @id @default(autoincrement())
-  userId         Int
-  User           User           @relation(fields: [userId], references: [id], onDelete: Cascade)
-  title          String
-  status         DocumentStatus @default(DRAFT)
-  Recipient      Recipient[]
-  Field          Field[]
-  documentDataId String
-  documentData   DocumentData   @relation(fields: [documentDataId], references: [id], onDelete: Cascade)
-  createdAt      DateTime       @default(now())
-  updatedAt      DateTime       @default(now()) @updatedAt
-
-  @@unique([documentDataId])
-}
-
-enum DocumentDataType {
-  S3_PATH
-  BYTES
-  BYTES_64
-}
-
-model DocumentData {
-  id          String           @id @default(cuid())
-  type        DocumentDataType
-  data        String
-  initialData String
-  Document    Document?
+  id        Int            @id @default(autoincrement())
+  created   DateTime       @default(now())
+  userId    Int
+  User      User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title     String
+  status    DocumentStatus @default(DRAFT)
+  document  String
+  Recipient Recipient[]
+  Field     Field[]
+  Share     Share[]
 }
 
 enum ReadStatus {
@@ -159,6 +142,7 @@ model Recipient {
   Document      Document      @relation(fields: [documentId], references: [id], onDelete: Cascade)
   Field         Field[]
   Signature     Signature[]
+  Share         Share[]
 
   @@unique([documentId, email])
 }
@@ -201,11 +185,13 @@ model Signature {
   Field     Field     @relation(fields: [fieldId], references: [id], onDelete: Restrict)
 }
 
-model PasswordResetToken {
-  id        Int      @id @default(autoincrement())
-  token     String   @unique
-  createdAt DateTime @default(now())
-  expiry    DateTime
-  userId    Int
-  User      User     @relation(fields: [userId], references: [id])
+model Share {
+  id          Int       @id @default(autoincrement())
+  recipientId Int
+  recipent    Recipient @relation(fields: [recipientId], references: [id])
+  link        String    @unique
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  document    Document? @relation(fields: [documentId], references: [id])
+  documentId  Int?
 }
