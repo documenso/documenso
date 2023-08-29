@@ -5,7 +5,7 @@ If you plan to contribute to Documenso, please take a moment to feel awesome ✨
 ## Before getting started
 
 - Before jumping into a PR be sure to search [existing PRs](https://github.com/documenso/documenso/pulls) or [issues](https://github.com/documenso/documenso/issues) for an open or closed item that relates to your submission.
-- Select and issue from [here](https://github.com/documenso/documenso/issues) or create a new one
+- Select an issue from [here](https://github.com/documenso/documenso/issues) or create a new one
 - Consider the results from the discussion in the issue
 
 ## Developing
