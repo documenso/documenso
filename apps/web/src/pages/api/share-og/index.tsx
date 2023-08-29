@@ -1,10 +1,13 @@
-import { ImageResponse } from 'next/server';
+import { ImageResponse, NextRequest } from 'next/server';
 
 export const config = {
   runtime: 'edge',
 };
 
-export default async function handler() {
+export default async function handler(req: NextRequest) {
+  const { searchParams } = new URL(req.url);
+  const signature = searchParams.get('signature') || 'Timur';
+
   const [imageData, CaveatFontData, InterFontData] = await Promise.all([
     fetch(new URL('../../../assets/background-pattern-og.png', import.meta.url)).then((res) =>
       res.arrayBuffer(),
@@ -35,7 +38,7 @@ export default async function handler() {
         }}
       >
         <div tw="flex px-20 py-12 bg-gray-100 rounded-md border-solid border-4 border-zinc-200 shadow-md">
-          <div tw="text-[#64748B99] text-7xl">Duncan</div>
+          <div tw="text-[#64748B99] text-7xl">{signature}</div>
         </div>
         <div tw="text-black text-3xl my-8 text-gray-600" style={{ fontFamily: 'Inter' }}>
           You signed with Documenso
