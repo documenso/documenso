@@ -13,7 +13,7 @@ export const PasswordReveal = ({ password }: PasswordRevealProps) => {
   const [, copy] = useCopyToClipboard();
 
   const onCopyClick = () => {
-    copy(password).then(() => {
+    void copy(password).then(() => {
       toast({
         title: 'Copied to clipboard',
         description: 'Your password has been copied to your clipboard.',

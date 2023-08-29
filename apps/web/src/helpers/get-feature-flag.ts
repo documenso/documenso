@@ -32,7 +32,7 @@ export const getFlag = async (
       revalidate: 60,
     },
   })
-    .then((res) => res.json())
+    .then(async (res) => res.json())
     .then((res) => ZFeatureFlagValueSchema.parse(res))
     .catch(() => false);
 
@@ -64,7 +64,7 @@ export const getAllFlags = async (
       revalidate: 60,
     },
   })
-    .then((res) => res.json())
+    .then(async (res) => res.json())
     .then((res) => z.record(z.string(), ZFeatureFlagValueSchema).parse(res))
     .catch(() => LOCAL_FEATURE_FLAGS);
 };
