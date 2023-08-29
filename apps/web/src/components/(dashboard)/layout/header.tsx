@@ -4,11 +4,8 @@ import { HTMLAttributes } from 'react';
 
 import Link from 'next/link';
 
-import { Menu } from 'lucide-react';
-
 import { User } from '@documenso/prisma/client';
 import { cn } from '@documenso/ui/lib/utils';
-import { Button } from '@documenso/ui/primitives/button';
 
 import { Logo } from '~/components/branding/logo';
 
@@ -23,7 +20,7 @@ export const Header = ({ className, user, ...props }: HeaderProps) => {
   return (
     <header
       className={cn(
-        'supports-backdrop-blur:bg-background/60 bg-background/95 sticky top-0 z-40 flex h-16 w-full items-center border-b backdrop-blur',
+        'supports-backdrop-blur:bg-background/60 bg-background/95 sticky top-0 z-50 flex h-16 w-full items-center border-b backdrop-blur',
         className,
       )}
       {...props}
@@ -41,9 +38,9 @@ export const Header = ({ className, user, ...props }: HeaderProps) => {
         <div className="flex gap-x-4">
           <ProfileDropdown user={user} />
 
-          <Button variant="outline" size="sm" className="h-10 w-10 p-0.5 md:hidden">
+          {/* <Button variant="outline" size="sm" className="h-10 w-10 p-0.5 md:hidden">
             <Menu className="h-6 w-6" />
-          </Button>
+          </Button> */}
         </div>
       </div>
     </header>

@@ -1,45 +1,17 @@
 import { TRPCError } from '@trpc/server';
 
-import { findDocumentsWithRecipientAndSender } from '@documenso/lib/server-only/document/find-documents';
 import { sendDocument } from '@documenso/lib/server-only/document/send-document';
 import { setFieldsForDocument } from '@documenso/lib/server-only/field/set-fields-for-document';
 import { setRecipientsForDocument } from '@documenso/lib/server-only/recipient/set-recipients-for-document';
 
 import { authenticatedProcedure, router } from '../trpc';
 import {
-  ZSearchInboxDocumentsParamsSchema,
   ZSendDocumentMutationSchema,
   ZSetFieldsForDocumentMutationSchema,
   ZSetRecipientsForDocumentMutationSchema,
 } from './schema';
 
 export const documentRouter = router({
-  searchInboxDocuments: authenticatedProcedure
-    .input(ZSearchInboxDocumentsParamsSchema)
-    .query(async ({ input, ctx }) => {
-      try {
-        const { filter, query, cursor: page } = input;
-
-        return await findDocumentsWithRecipientAndSender({
-          email: ctx.session.email,
-          query,
-          signingStatus: filter,
-          orderBy: {
-            column: 'created',
-            direction: 'desc',
-          },
-          page,
-        });
-      } catch (err) {
-        console.error(err);
-
-        throw new TRPCError({
-          code: 'BAD_REQUEST',
-          message: 'Something went wrong. Please try again later.',
-        });
-      }
-    }),
-
   setRecipientsForDocument: authenticatedProcedure
     .input(ZSetRecipientsForDocumentMutationSchema)
     .mutation(async ({ input, ctx }) => {
