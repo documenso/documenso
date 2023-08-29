@@ -84,6 +84,10 @@ Contact us if you are interested in our Enterprise plan for large organizations 
 
 <a href="https://cal.com/timurercan/enterprise-customers?utm_source=banner&utm_campaign=oss"><img alt="Book us with Cal.com" src="https://cal.com/book-with-cal-dark.svg" /></a>
 
+## Activity
+
+![Repository Activity](https://repobeats.axiom.co/api/embed/622a2e9aa709696f7226304b5b7178a5741b3868.svg)
+
 # Tech
 
 Documenso is built using awesome open source tech including:
