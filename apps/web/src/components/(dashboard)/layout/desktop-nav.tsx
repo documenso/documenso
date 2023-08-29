@@ -2,19 +2,17 @@
 
 import { HTMLAttributes } from 'react';
 
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-
 import { cn } from '@documenso/ui/lib/utils';
 
 export type DesktopNavProps = HTMLAttributes<HTMLDivElement>;
 
 export const DesktopNav = ({ className, ...props }: DesktopNavProps) => {
-  const pathname = usePathname();
+  // const pathname = usePathname();
 
   return (
     <div className={cn('ml-8 hidden flex-1 gap-x-6 md:flex', className)} {...props}>
-      <Link
+      {/* We have no other subpaths rn */}
+      {/* <Link
         href="/documents"
         className={cn(
           'text-muted-foreground focus-visible:ring-ring ring-offset-background rounded-md font-medium leading-5 hover:opacity-80 focus-visible:outline-none focus-visible:ring-2',
@@ -24,19 +22,7 @@ export const DesktopNav = ({ className, ...props }: DesktopNavProps) => {
         )}
       >
         Documents
-      </Link>
-
-      <Link
-        href="/inbox"
-        className={cn(
-          'text-muted-foreground focus-visible:ring-ring ring-offset-background rounded-md font-medium leading-5 hover:opacity-80 focus-visible:outline-none focus-visible:ring-2 ',
-          {
-            'text-foreground': pathname?.startsWith('/inbox'),
-          },
-        )}
-      >
-        Inbox
-      </Link>
+      </Link> */}
     </div>
   );
 };
