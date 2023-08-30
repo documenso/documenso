@@ -11,6 +11,7 @@
     "copy:pdfjs": "node ../../scripts/copy-pdfjs.cjs"
   },
   "dependencies": {
+    "@documenso/ee": "*",
     "@documenso/lib": "*",
     "@documenso/prisma": "*",
     "@documenso/tailwind-config": "*",
