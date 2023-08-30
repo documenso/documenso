@@ -118,7 +118,7 @@ export const ProfileDropdown = ({ user }: ProfileDropdownProps) => {
 
         <DropdownMenuItem
           onSelect={() =>
-            signOut({
+            void signOut({
               callbackUrl: '/',
             })
           }

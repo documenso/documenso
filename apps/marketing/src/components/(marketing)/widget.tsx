@@ -124,7 +124,7 @@ export const Widget = ({ className, children, ...props }: WidgetProps) => {
     setValue('signatureDataUrl', draftSignatureDataUrl);
     setValue('signatureText', '');
 
-    trigger('signatureDataUrl');
+    void trigger('signatureDataUrl');
     setShowSigningDialog(false);
   };
 
@@ -135,7 +135,9 @@ export const Widget = ({ className, children, ...props }: WidgetProps) => {
     signatureText,
   }: TWidgetFormSchema) => {
     try {
-      const delay = new Promise<void>((resolve) => setTimeout(resolve, 1000));
+      const delay = new Promise<void>((resolve) => {
+        setTimeout(resolve, 1000);
+      });
 
       // eslint-disable-next-line turbo/no-undeclared-env-vars
       const planId = process.env.NEXT_PUBLIC_STRIPE_COMMUNITY_PLAN_MONTHLY_PRICE_ID;

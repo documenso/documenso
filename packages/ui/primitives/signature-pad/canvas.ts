@@ -302,8 +302,8 @@ export class Canvas {
   /**
    * Retrieves the signature as an image blob.
    */
-  public toBlob(type?: string, quality?: number): Promise<Blob> {
-    return new Promise((resolve, reject) => {
+  public async toBlob(type?: string, quality?: number): Promise<Blob> {
+    const promise = new Promise<Blob>((resolve, reject) => {
       this.$canvas.toBlob(
         (blob) => {
           if (!blob) {
@@ -317,5 +317,7 @@ export class Canvas {
         quality,
       );
     });
+
+    return await promise;
   }
 }

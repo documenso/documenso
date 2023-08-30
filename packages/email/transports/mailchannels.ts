@@ -110,9 +110,10 @@ export class MailChannelsTransport implements Transport<SentMessageInfo> {
           });
         }
 
-        res.json().then((data) => {
-          return callback(new Error(`MailChannels error: ${data.message}`), null);
-        });
+        res
+          .json()
+          .then((data) => callback(new Error(`MailChannels error: ${data.message}`), null))
+          .catch((err) => callback(err, null));
       })
       .catch((err) => {
         return callback(err, null);

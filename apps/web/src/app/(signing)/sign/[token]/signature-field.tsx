@@ -182,7 +182,7 @@ export const SignatureField = ({ field, recipient }: SignatureFieldProps) => {
                 disabled={!localSignature}
                 onClick={() => {
                   setShowSignatureModal(false);
-                  onSign('local');
+                  void onSign('local');
                 }}
               >
                 Sign

@@ -22,14 +22,14 @@ import { LocaleDate } from '~/components/formatter/locale-date';
 import { UploadDocument } from './upload-document';
 
 export default async function DashboardPage() {
-  const session = await getRequiredServerComponentSession();
+  const user = await getRequiredServerComponentSession();
 
   const [stats, results] = await Promise.all([
     getStats({
-      userId: session.id,
+      user,
     }),
     findDocuments({
-      userId: session.id,
+      userId: user.id,
       perPage: 10,
     }),
   ]);
