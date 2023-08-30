@@ -43,6 +43,7 @@ export const PasswordForm = ({ className }: PasswordFormProps) => {
   const {
     register,
     handleSubmit,
+    reset,
     formState: { errors, isSubmitting },
   } = useForm<TPasswordFormSchema>({
     values: {
@@ -59,6 +60,8 @@ export const PasswordForm = ({ className }: PasswordFormProps) => {
       await updatePassword({
         password,
       });
+
+      reset();
 
       toast({
         title: 'Password updated',
