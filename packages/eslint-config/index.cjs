@@ -6,9 +6,10 @@ module.exports = {
     'eslint:recommended',
     'plugin:@typescript-eslint/recommended',
     'plugin:prettier/recommended',
+    'plugin:package-json/recommended',
   ],
 
-  plugins: ['prettier'],
+  plugins: ['prettier', 'package-json'],
 
   env: {
     node: true,
@@ -33,6 +34,20 @@ module.exports = {
 
     'no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
     '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
+
+    'no-duplicate-imports': 'error',
+    'no-multi-spaces': [
+      'error',
+      {
+        ignoreEOLComments: false,
+        exceptions: {
+          BinaryExpression: false,
+          VariableDeclarator: false,
+          ImportDeclaration: false,
+          Property: false,
+        },
+      },
+    ],
 
     // Safety with promises so we aren't running with scissors
     'no-promise-executor-return': 'error',
