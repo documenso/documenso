@@ -57,7 +57,7 @@ export const SigningFieldContainer = ({
       >
         <CardContent
           className={cn(
-            'text-foreground hover:shadow-primary-foreground group flex h-full w-full flex-col items-center justify-center p-2',
+            'text-foreground hover:shadow-primary-foreground group flex h-full w-full flex-col items-center justify-center p-2 dark:invert',
           )}
         >
           {!field.inserted && !loading && (
