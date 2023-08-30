@@ -149,7 +149,7 @@ export const NameField = ({ field, recipient }: NameFieldProps) => {
                 disabled={!localFullName}
                 onClick={() => {
                   setShowFullNameModal(false);
-                  onSign('local');
+                  void onSign('local');
                 }}
               >
                 Sign
