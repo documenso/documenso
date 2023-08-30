@@ -7,9 +7,11 @@ import { cn } from '@documenso/ui/lib/utils';
 export type DesktopNavProps = HTMLAttributes<HTMLDivElement>;
 
 export const DesktopNav = ({ className, ...props }: DesktopNavProps) => {
+  // const pathname = usePathname();
+
   return (
     <div className={cn('ml-8 hidden flex-1 gap-x-6 md:flex', className)} {...props}>
-      {/* No Nav tabs while there is only one main page */}
+      {/* We have no other subpaths rn */}
       {/* <Link
         href="/documents"
         className={cn(
