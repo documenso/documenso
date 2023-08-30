@@ -145,7 +145,9 @@ export default async function handler(req: NextRequest) {
           />
         </svg>
 
-        <h1 tw="text-6xl mt-4 w-3/5 font-bold text-center">{title}</h1>
+        <h1 tw="text-6xl flex justify-center items-center mt-8 -mb-6 w-3/5 font-bold text-center mx-auto">
+          {title}
+        </h1>
       </div>
     ),
     {
