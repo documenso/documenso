@@ -80,7 +80,7 @@ export const PasswordForm = ({ className }: PasswordFormProps) => {
           title: 'An unknown error occurred',
           variant: 'destructive',
           description:
-            'We encountered an unknown error while attempting to sign you In. Please try again later.',
+            'We encountered an unknown error while attempting to update your password. Please try again later.',
         });
       }
     }
