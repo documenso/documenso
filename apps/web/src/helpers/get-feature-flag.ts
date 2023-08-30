@@ -2,7 +2,7 @@ import { z } from 'zod';
 
 import { LOCAL_FEATURE_FLAGS, isFeatureFlagEnabled } from '@documenso/lib/constants/feature-flags';
 
-import { TFeatureFlagValue, ZFeatureFlagValueSchema } from '~/providers/feature-flag';
+import { TFeatureFlagValue, ZFeatureFlagValueSchema } from '~/providers/feature-flag.types';
 
 /**
  * Evaluate whether a flag is enabled for the current user.
