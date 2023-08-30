@@ -17,7 +17,12 @@ export const generateMetadata = ({ params }: { params: { post: string } }) => {
     notFound();
   }
 
-  return { title: `Documenso - ${blogPost.title}` };
+  return {
+    title: `Documenso - ${blogPost.title}`,
+    openGraph: {
+      images: [`/api/blog-og?title=${blogPost.title}`],
+    },
+  };
 };
 
 const mdxComponents: MDXComponents = {
