@@ -47,7 +47,7 @@ export default async function BlogPostOpenGraphImage({ params }: BlogPostOpenGra
 
         <img src={logoImage} alt="logo" tw="h-8" />
 
-        <h1 tw="mt-8 text-6xl text-center w-full max-w-[800px] font-bold text-center mx-auto">
+        <h1 tw="mt-8 text-6xl text-center flex items-center justify-center w-full max-w-[800px] font-bold text-center mx-auto">
           {blogPost.title}
         </h1>
 
