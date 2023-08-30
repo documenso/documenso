@@ -1,4 +1,4 @@
-import { hash } from 'bcrypt';
+import { compare, hash } from 'bcrypt';
 
 import { prisma } from '@documenso/prisma';
 
@@ -11,13 +11,20 @@ export type UpdatePasswordOptions = {
 
 export const updatePassword = async ({ userId, password }: UpdatePasswordOptions) => {
   // Existence check
-  await prisma.user.findFirstOrThrow({
+  const user = await prisma.user.findFirstOrThrow({
     where: {
       id: userId,
     },
   });
 
   const hashedPassword = await hash(password, SALT_ROUNDS);
+
+  // Compare the new password with the old password
+  const isSamePassword = await compare(password, user.password as string);
+
+  if (isSamePassword) {
+    throw new Error('You cannot use the same password as your current password.');
+  }
 
   const updatedUser = await prisma.user.update({
     where: {
