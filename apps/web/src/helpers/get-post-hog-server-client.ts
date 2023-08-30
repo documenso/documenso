@@ -11,6 +11,6 @@ export default function PostHogServerClient() {
 
   return new PostHog(postHogConfig.key, {
     host: postHogConfig.host,
-    fetch: (...args) => fetch(...args),
+    fetch: async (...args) => fetch(...args),
   });
 }

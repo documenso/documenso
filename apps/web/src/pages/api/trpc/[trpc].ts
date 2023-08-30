@@ -4,7 +4,7 @@ import { appRouter } from '@documenso/trpc/server/router';
 
 export default trpcNext.createNextApiHandler({
   router: appRouter,
-  createContext: ({ req, res }) => createTrpcContext({ req, res }),
+  createContext: async ({ req, res }) => createTrpcContext({ req, res }),
 });
 
 // export default async function handler(_req: NextApiRequest, res: NextApiResponse) {

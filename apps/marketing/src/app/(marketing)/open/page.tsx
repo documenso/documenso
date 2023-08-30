@@ -8,7 +8,7 @@ import { FundingRaised } from './funding-raised';
 import { GithubMetric } from './gh-metrics';
 import { TeamMembers } from './team-members';
 
-export const revalidate = 86400;
+export const revalidate = 3600;
 
 const ZGithubStatsResponse = z.object({
   stargazers_count: z.number(),
@@ -43,7 +43,7 @@ export default async function OpenPage() {
       accept: 'application/vnd.github.v3+json',
     },
   })
-    .then((res) => res.json())
+    .then(async (res) => res.json())
     .then((res) => ZGithubStatsResponse.parse(res));
 
   const { total_count: mergedPullRequests } = await fetch(
@@ -54,7 +54,7 @@ export default async function OpenPage() {
       },
     },
   )
-    .then((res) => res.json())
+    .then(async (res) => res.json())
     .then((res) => ZMergedPullRequestsResponse.parse(res));
 
   const STARGAZERS_DATA = await fetch('https://stargrazer-live.onrender.com/api/stats', {
@@ -62,7 +62,7 @@ export default async function OpenPage() {
       accept: 'application/json',
     },
   })
-    .then((res) => res.json())
+    .then(async (res) => res.json())
     .then((res) => ZStargazersLiveResponse.parse(res));
 
   return (

@@ -1,9 +1,6 @@
 import { GetServerSidePropsContext, NextApiRequest, NextApiResponse } from 'next';
-import { headers } from 'next/headers';
-import { NextRequest } from 'next/server';
 
 import { getServerSession as getNextAuthServerSession } from 'next-auth';
-import { getToken } from 'next-auth/jwt';
 
 import { prisma } from '@documenso/prisma';
 
@@ -28,18 +25,6 @@ export const getServerSession = async ({ req, res }: GetServerSessionOptions) =>
   });
 
   return user;
-};
-
-export const getServerComponentToken = async () => {
-  const requestHeaders = Object.fromEntries(headers().entries());
-
-  const req = new NextRequest('http://example.com', {
-    headers: requestHeaders,
-  });
-
-  const token = await getToken({
-    req,
-  });
 };
 
 export const getServerComponentSession = async () => {

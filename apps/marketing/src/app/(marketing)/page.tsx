@@ -24,7 +24,7 @@ export default async function IndexPage() {
       accept: 'application/vnd.github.v3+json',
     },
   })
-    .then((res) => res.json())
+    .then(async (res) => res.json())
     .then((res) => (typeof res.stargazers_count === 'number' ? res.stargazers_count : undefined))
     .catch(() => undefined);
 

@@ -1,6 +1,5 @@
 import {
   Body,
-  Button,
   Container,
   Head,
   Hr,
@@ -15,13 +14,13 @@ import {
 
 import config from '@documenso/tailwind-config';
 
-interface DocumentInviteEmailTemplateProps {
-  inviterName?: string;
-  inviterEmail?: string;
-  documentName?: string;
-  signDocumentLink?: string;
-  assetBaseUrl?: string;
-}
+import {
+  TemplateDocumentInvite,
+  TemplateDocumentInviteProps,
+} from '../template-components/template-document-invite';
+import TemplateFooter from '../template-components/template-footer';
+
+export type DocumentInviteEmailTemplateProps = Partial<TemplateDocumentInviteProps>;
 
 export const DocumentInviteEmailTemplate = ({
   inviterName = 'Lucas Smith',
@@ -51,36 +50,21 @@ export const DocumentInviteEmailTemplate = ({
       >
         <Body className="mx-auto my-auto bg-white font-sans">
           <Section>
-            <Container className="mx-auto mb-2 mt-8 max-w-xl rounded-lg border border-solid border-slate-200 p-2 backdrop-blur-sm">
-              <Section className="p-2">
-                <Img src={getAssetUrl('/static/logo.png')} alt="Documenso Logo" className="h-6" />
+            <Container className="mx-auto mb-2 mt-8 max-w-xl rounded-lg border border-solid border-slate-200 p-4 backdrop-blur-sm">
+              <Section>
+                <Img
+                  src={getAssetUrl('/static/logo.png')}
+                  alt="Documenso Logo"
+                  className="mb-4 h-6"
+                />
 
-                <Section className="mt-4 flex-row items-center justify-center">
-                  <div className="flex items-center justify-center p-4">
-                    <Img
-                      className="h-42"
-                      src={getAssetUrl('/static/document.png')}
-                      alt="Documenso"
-                    />
-                  </div>
-
-                  <Text className="text-primary mx-auto mb-0 max-w-[80%] text-center text-lg font-semibold">
-                    {inviterName} has invited you to sign "{documentName}"
-                  </Text>
-
-                  <Text className="my-1 text-center text-base text-slate-400">
-                    Continue by signing the document.
-                  </Text>
-
-                  <Section className="mb-6 mt-8 text-center">
-                    <Button
-                      className="bg-documenso-500 inline-flex items-center justify-center rounded-lg px-6 py-3 text-center text-sm font-medium text-black no-underline"
-                      href={signDocumentLink}
-                    >
-                      Sign Document
-                    </Button>
-                  </Section>
-                </Section>
+                <TemplateDocumentInvite
+                  inviterName={inviterName}
+                  inviterEmail={inviterEmail}
+                  documentName={documentName}
+                  signDocumentLink={signDocumentLink}
+                  assetBaseUrl={assetBaseUrl}
+                />
               </Section>
             </Container>
 
@@ -102,20 +86,7 @@ export const DocumentInviteEmailTemplate = ({
             <Hr className="mx-auto mt-12 max-w-xl" />
 
             <Container className="mx-auto max-w-xl">
-              <Section>
-                <Text className="my-4 text-base text-slate-400">
-                  This document was sent using{' '}
-                  <Link className="text-[#7AC455]" href="https://documenso.com">
-                    Documenso.
-                  </Link>
-                </Text>
-
-                <Text className="my-8 text-sm text-slate-400">
-                  Documenso
-                  <br />
-                  2261 Market Street, #5211, San Francisco, CA 94114, USA
-                </Text>
-              </Section>
+              <TemplateFooter />
             </Container>
           </Section>
         </Body>

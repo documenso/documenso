@@ -67,7 +67,7 @@ export function FeatureFlagProvider({
 
     const interval = setInterval(() => {
       if (document.hasFocus()) {
-        getAllFlags().then((newFlags) => setFlags(newFlags));
+        void getAllFlags().then((newFlags) => setFlags(newFlags));
       }
     }, FEATURE_FLAG_POLL_INTERVAL);
 
@@ -84,7 +84,7 @@ export function FeatureFlagProvider({
       return;
     }
 
-    const onFocus = () => getAllFlags().then((newFlags) => setFlags(newFlags));
+    const onFocus = () => void getAllFlags().then((newFlags) => setFlags(newFlags));
 
     window.addEventListener('focus', onFocus);
 
