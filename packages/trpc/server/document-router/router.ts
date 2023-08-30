@@ -18,9 +18,6 @@ export const documentRouter = router({
       try {
         const { documentId, recipients } = input;
 
-        console.log('documentId', documentId);
-        console.log('recipients', recipients);
-
         return await setRecipientsForDocument({
           userId: ctx.user.id,
           documentId,
