@@ -11,6 +11,13 @@ export const size = {
 
 export const contentType = 'image/png';
 
+const OG_IMAGE_ASSETS = [
+  './../../../../assets/inter-bold.ttf',
+  './../../../../assets/inter-regular.ttf',
+  './../../../../assets/background-blog-og.png',
+  './../../../../../public/logo.png',
+];
+
 type BlogPostOpenGraphImageProps = {
   params: { post: string };
 };
@@ -22,29 +29,19 @@ export default async function BlogPostOpenGraphImage({ params }: BlogPostOpenGra
     return null;
   }
 
-  const [interBold, interRegular, backgroundImage, logoImage] = await Promise.all([
-    fetch(new URL('./../../../../assets/inter-bold.ttf', import.meta.url)).then(async (res) =>
-      res.arrayBuffer(),
+  const [interBold, interRegular, backgroundImage, logoImage] = await Promise.all(
+    OG_IMAGE_ASSETS.map(async (asset) =>
+      fetch(new URL(asset, import.meta.url)).then(async (res) => res.arrayBuffer()),
     ),
-    fetch(new URL('./../../../../assets/inter-regular.ttf', import.meta.url)).then(async (res) =>
-      res.arrayBuffer(),
-    ),
-    fetch(new URL('./../../../../assets/background-blog-og.png', import.meta.url)).then(
-      async (res) => res.arrayBuffer(),
-    ),
-    fetch(new URL('./../../../../../public/logo.png', import.meta.url)).then(async (res) =>
-      res.arrayBuffer(),
-    ),
-  ]);
+  );
 
   return new ImageResponse(
     (
-      <div
-        tw="relative h-full w-full flex flex-col items-center justify-center text-center"
-        // style={{ display: 'flex' }}
-      >
+      <div tw="relative h-full w-full flex flex-col items-center justify-center text-center">
+        {/* @ts-expect-error Lack of typing from ImageResponse */}
         <img src={backgroundImage} alt="og-background" tw="absolute inset-0 w-full h-full" />
 
+        {/* @ts-expect-error Lack of typing from ImageResponse */}
         <img src={logoImage} alt="logo" tw="h-8" />
 
         <h1 tw="mt-8 text-6xl text-center flex items-center justify-center w-full max-w-[800px] font-bold text-center mx-auto">
