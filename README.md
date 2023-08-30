@@ -76,7 +76,7 @@ We're currently working on a redesign of the application including a revamp of t
 
 ## Contributing
 
-- To contribute please see our [contribution guide](https://github.com/documenso/documenso/blob/main/CONTRIBUTING.md).
+- To contribute, please see our [contribution guide](https://github.com/documenso/documenso/blob/main/CONTRIBUTING.md).
 
 ## Contact us
 
