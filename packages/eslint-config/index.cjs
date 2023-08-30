@@ -9,7 +9,7 @@ module.exports = {
     'plugin:package-json/recommended',
   ],
 
-  plugins: ['prettier', 'package-json', 'simple-import-sort'],
+  plugins: ['prettier', 'package-json'],
 
   env: {
     node: true,
@@ -35,6 +35,20 @@ module.exports = {
     'no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
     '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
 
+    'no-duplicate-imports': 'error',
+    'no-multi-spaces': [
+      'error',
+      {
+        ignoreEOLComments: false,
+        exceptions: {
+          BinaryExpression: false,
+          VariableDeclarator: false,
+          ImportDeclaration: false,
+          Property: false,
+        },
+      },
+    ],
+
     // Safety with promises so we aren't running with scissors
     'no-promise-executor-return': 'error',
     'prefer-promise-reject-errors': 'error',
@@ -53,18 +67,5 @@ module.exports = {
     // To handle this we want this rule to catch usages and highlight them as
     // warnings so we can write appropriate interfaces and guards later.
     '@typescript-eslint/consistent-type-assertions': ['warn', { assertionStyle: 'never' }],
-    'no-multi-spaces': [
-      'error',
-      {
-        ignoreEOLComments: false,
-        exceptions: {
-          BinaryExpression: false,
-          VariableDeclarator: false,
-          ImportDeclaration: false,
-          Property: false,
-        },
-      },
-    ],
-    'no-duplicate-imports': 'error',
   },
 };
