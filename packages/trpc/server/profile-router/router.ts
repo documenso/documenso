@@ -40,12 +40,16 @@ export const profileRouter = router({
           password,
         });
       } catch (err) {
-        console.error(err);
+        let message =
+          'We were unable to update your profile. Please review the information you provided and try again.';
+
+        if (err instanceof Error) {
+          message = err.message;
+        }
 
         throw new TRPCError({
           code: 'BAD_REQUEST',
-          message:
-            'We were unable to update your profile. Please review the information you provided and try again.',
+          message,
         });
       }
     }),
