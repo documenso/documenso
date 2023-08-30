@@ -19,9 +19,6 @@ export const generateMetadata = ({ params }: { params: { post: string } }) => {
 
   return {
     title: `Documenso - ${blogPost.title}`,
-    openGraph: {
-      images: [`/api/blog-og?title=${blogPost.title}`],
-    },
   };
 };
 
