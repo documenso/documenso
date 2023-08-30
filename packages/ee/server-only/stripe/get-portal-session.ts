@@ -1,6 +1,6 @@
 'use server';
 
-import { stripe } from '../../server-only/stripe';
+import { stripe } from '@documenso/lib/server-only/stripe';
 
 export type GetPortalSessionOptions = {
   customerId: string;

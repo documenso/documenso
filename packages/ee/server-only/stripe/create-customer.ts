@@ -1,8 +1,7 @@
+import { stripe } from '@documenso/lib/server-only/stripe';
+import { getSubscriptionByUserId } from '@documenso/lib/server-only/subscription/get-subscription-by-user-id';
 import { prisma } from '@documenso/prisma';
 import { User } from '@documenso/prisma/client';
-
-import { stripe } from '../../server-only/stripe';
-import { getSubscriptionByUserId } from '../../server-only/subscription/get-subscription-by-user-id';
 
 export type CreateCustomerOptions = {
   user: User;
