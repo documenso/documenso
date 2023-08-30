@@ -1,4 +1,3 @@
-import 'zod';
 import { z } from 'zod';
 
 export const ZSignUpMutationSchema = z.object({
