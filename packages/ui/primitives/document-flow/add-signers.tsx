@@ -68,6 +68,8 @@ export const AddSignersFormPartial = ({
     },
   });
 
+  const onFormSubmit = handleSubmit(onSubmit);
+
   const {
     append: appendSigner,
     fields: signers,
@@ -214,7 +216,7 @@ export const AddSignersFormPartial = ({
           loading={isSubmitting}
           disabled={isSubmitting}
           onGoBackClick={documentFlow.onBackStep}
-          onGoNextClick={() => handleSubmit(onSubmit)()}
+          onGoNextClick={() => void onFormSubmit()}
         />
       </DocumentFlowFormContainerFooter>
     </>

@@ -79,10 +79,7 @@ export const SignInForm = ({ className }: SignInFormProps) => {
   return (
     <form
       className={cn('flex w-full flex-col gap-y-4', className)}
-      onSubmit={(e) => {
-        e.preventDefault();
-        handleSubmit(onFormSubmit)();
-      }}
+      onSubmit={handleSubmit(onFormSubmit)}
     >
       <div>
         <Label htmlFor="email" className="text-slate-500">

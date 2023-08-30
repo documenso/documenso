@@ -89,7 +89,7 @@ export const NEXT_AUTH_OPTIONS: AuthOptions = {
       };
     },
 
-    async session({ token, session }) {
+    session({ token, session }) {
       if (token && token.email) {
         return {
           ...session,

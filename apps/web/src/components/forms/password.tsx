@@ -43,6 +43,7 @@ export const PasswordForm = ({ className }: PasswordFormProps) => {
   const {
     register,
     handleSubmit,
+    reset,
     formState: { errors, isSubmitting },
   } = useForm<TPasswordFormSchema>({
     values: {
@@ -59,6 +60,8 @@ export const PasswordForm = ({ className }: PasswordFormProps) => {
       await updatePassword({
         password,
       });
+
+      reset();
 
       toast({
         title: 'Password updated',
@@ -77,7 +80,7 @@ export const PasswordForm = ({ className }: PasswordFormProps) => {
           title: 'An unknown error occurred',
           variant: 'destructive',
           description:
-            'We encountered an unknown error while attempting to sign you In. Please try again later.',
+            'We encountered an unknown error while attempting to update your password. Please try again later.',
         });
       }
     }
