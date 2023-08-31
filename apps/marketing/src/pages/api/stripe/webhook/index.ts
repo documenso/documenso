@@ -17,14 +17,13 @@ import {
   SigningStatus,
 } from '@documenso/prisma/client';
 
-const log = (...args: any[]) => console.log('[stripe]', ...args);
+const log = (...args: unknown[]) => console.log('[stripe]', ...args);
 
 export const config = {
   api: { bodyParser: false },
 };
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  // eslint-disable-next-line turbo/no-undeclared-env-vars
   // if (!process.env.NEXT_PUBLIC_ALLOW_SUBSCRIPTIONS) {
   //   return res.status(500).json({
   //     success: false,
@@ -55,6 +54,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   log('event-type:', event.type);
 
   if (event.type === 'checkout.session.completed') {
+    // This typecast is required since we don't want to create a guard for every event type
+    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
     const session = event.data.object as Stripe.Checkout.Session;
 
     if (session.metadata?.source === 'landing') {
