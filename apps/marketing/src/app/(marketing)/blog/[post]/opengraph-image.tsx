@@ -11,13 +11,6 @@ export const size = {
 
 export const contentType = 'image/png';
 
-const OG_IMAGE_ASSETS = [
-  './../../../../assets/inter-bold.ttf',
-  './../../../../assets/inter-regular.ttf',
-  './../../../../assets/background-blog-og.png',
-  './../../../../../public/logo.png',
-];
-
 type BlogPostOpenGraphImageProps = {
   params: { post: string };
 };
@@ -29,11 +22,22 @@ export default async function BlogPostOpenGraphImage({ params }: BlogPostOpenGra
     return null;
   }
 
-  const [interBold, interRegular, backgroundImage, logoImage] = await Promise.all(
-    OG_IMAGE_ASSETS.map(async (asset) =>
-      fetch(new URL(asset, import.meta.url)).then(async (res) => res.arrayBuffer()),
+  // The long urls are needed for a compiler optimisation on the Next.js side, lifting this up
+  // to a constant will break og image generation.
+  const [interBold, interRegular, backgroundImage, logoImage] = await Promise.all([
+    fetch(new URL('./../../../../assets/inter-bold.ttf', import.meta.url)).then(async (res) =>
+      res.arrayBuffer(),
     ),
-  );
+    fetch(new URL('./../../../../assets/inter-regular.ttf', import.meta.url)).then(async (res) =>
+      res.arrayBuffer(),
+    ),
+    fetch(new URL('./../../../../assets/background-blog-og.png', import.meta.url)).then(
+      async (res) => res.arrayBuffer(),
+    ),
+    fetch(new URL('./../../../../../public/logo.png', import.meta.url)).then(async (res) =>
+      res.arrayBuffer(),
+    ),
+  ]);
 
   return new ImageResponse(
     (
