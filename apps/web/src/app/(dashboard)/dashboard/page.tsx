@@ -5,6 +5,7 @@ import { Clock, File, FileCheck } from 'lucide-react';
 import { getRequiredServerComponentSession } from '@documenso/lib/next-auth/get-server-session';
 import { findDocuments } from '@documenso/lib/server-only/document/find-documents';
 import { getStats } from '@documenso/lib/server-only/document/get-stats';
+import { DocumentStatus as InternalDocumentStatus } from '@documenso/prisma/client';
 import {
   Table,
   TableBody,
@@ -21,15 +22,33 @@ import { LocaleDate } from '~/components/formatter/locale-date';
 
 import { UploadDocument } from './upload-document';
 
+const CARD_DATA = [
+  {
+    icon: FileCheck,
+    title: 'Completed',
+    status: InternalDocumentStatus.COMPLETED,
+  },
+  {
+    icon: File,
+    title: 'Drafts',
+    status: InternalDocumentStatus.DRAFT,
+  },
+  {
+    icon: Clock,
+    title: 'Pending',
+    status: InternalDocumentStatus.PENDING,
+  },
+];
+
 export default async function DashboardPage() {
-  const session = await getRequiredServerComponentSession();
+  const user = await getRequiredServerComponentSession();
 
   const [stats, results] = await Promise.all([
     getStats({
-      userId: session.id,
+      user,
     }),
     findDocuments({
-      userId: session.id,
+      userId: user.id,
       perPage: 10,
     }),
   ]);
@@ -39,15 +58,11 @@ export default async function DashboardPage() {
       <h1 className="text-4xl font-semibold">Dashboard</h1>
 
       <div className="mt-8 grid grid-cols-1 gap-4 md:grid-cols-3">
-        <Link href={'/documents?status=COMPLETED'} passHref>
-          <CardMetric icon={FileCheck} title="Completed" value={stats.COMPLETED} />
-        </Link>
-        <Link href={'/documents?status=DRAFT'} passHref>
-          <CardMetric icon={File} title="Drafts" value={stats.DRAFT} />
-        </Link>
-        <Link href={'/documents?status=PENDING'} passHref>
-          <CardMetric icon={Clock} title="Pending" value={stats.PENDING} />
-        </Link>
+        {CARD_DATA.map((card) => (
+          <Link key={card.status} href={`/documents?status=${card.status}`}>
+            <CardMetric icon={card.icon} title={card.title} value={stats[card.status]} />
+          </Link>
+        ))}
       </div>
 
       <div className="mt-12">

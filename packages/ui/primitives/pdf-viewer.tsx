@@ -66,7 +66,7 @@ export const PDFViewer = ({ className, document, onPageClick, ...props }: PDFVie
     const pageY = event.clientY - top;
 
     if (onPageClick) {
-      onPageClick({
+      void onPageClick({
         pageNumber,
         numPages,
         originalEvent: event,

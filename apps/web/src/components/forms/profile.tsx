@@ -21,7 +21,7 @@ import { FormErrorMessage } from '../form/form-error-message';
 
 export const ZProfileFormSchema = z.object({
   name: z.string().min(1),
-  signature: z.string().min(1),
+  signature: z.string().min(1, 'Signature Pad cannot be empty'),
 });
 
 export type TProfileFormSchema = z.infer<typeof ZProfileFormSchema>;
@@ -122,6 +122,7 @@ export const ProfileForm = ({ className, user }: ProfileFormProps) => {
               />
             )}
           />
+          <FormErrorMessage className="mt-1.5" error={errors.signature} />
         </div>
       </div>
 

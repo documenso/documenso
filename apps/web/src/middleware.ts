@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 
+import { getToken } from 'next-auth/jwt';
+
 export default async function middleware(req: NextRequest) {
   if (req.nextUrl.pathname === '/') {
     const redirectUrl = new URL('/documents', req.url);
@@ -7,19 +9,15 @@ export default async function middleware(req: NextRequest) {
     return NextResponse.redirect(redirectUrl);
   }
 
-  // if (req.nextUrl.pathname.startsWith('/dashboard')) {
-  //   const token = await getToken({ req });
+  if (req.nextUrl.pathname.startsWith('/signin')) {
+    const token = await getToken({ req });
 
-  //   console.log('token', token);
+    if (token) {
+      const redirectUrl = new URL('/documents', req.url);
 
-  //   if (!token) {
-  //     console.log('has no token', req.url);
-  //     const redirectUrl = new URL('/signin', req.url);
-  //     redirectUrl.searchParams.set('callbackUrl', req.url);
-
-  //     return NextResponse.redirect(redirectUrl);
-  //   }
-  // }
+      return NextResponse.redirect(redirectUrl);
+    }
+  }
 
   return NextResponse.next();
 }

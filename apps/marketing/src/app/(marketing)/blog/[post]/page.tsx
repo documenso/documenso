@@ -7,7 +7,7 @@ import { ChevronLeft } from 'lucide-react';
 import type { MDXComponents } from 'mdx/types';
 import { useMDXComponent } from 'next-contentlayer/hooks';
 
-export const generateStaticParams = async () =>
+export const generateStaticParams = () =>
   allBlogPosts.map((post) => ({ post: post._raw.flattenedPath }));
 
 export const generateMetadata = ({ params }: { params: { post: string } }) => {
@@ -17,7 +17,9 @@ export const generateMetadata = ({ params }: { params: { post: string } }) => {
     notFound();
   }
 
-  return { title: `Documenso - ${blogPost.title}` };
+  return {
+    title: `Documenso - ${blogPost.title}`,
+  };
 };
 
 const mdxComponents: MDXComponents = {

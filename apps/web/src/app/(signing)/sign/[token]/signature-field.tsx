@@ -63,11 +63,6 @@ export const SignatureField = ({ field, recipient }: SignatureFieldProps) => {
 
   const onSign = async (source: 'local' | 'provider' = 'provider') => {
     try {
-      console.log({
-        providedSignature,
-        localSignature,
-      });
-
       if (!providedSignature && !localSignature) {
         setShowSignatureModal(true);
         return;
@@ -141,6 +136,7 @@ export const SignatureField = ({ field, recipient }: SignatureFieldProps) => {
 
       {state === 'signed-text' && (
         <p className="font-signature text-muted-foreground text-lg duration-200 sm:text-xl md:text-2xl lg:text-3xl">
+          {/* This optional chaining is intentional, we don't want to move the check into the condition above */}
           {signature?.typedSignature}
         </p>
       )}
@@ -182,7 +178,7 @@ export const SignatureField = ({ field, recipient }: SignatureFieldProps) => {
                 disabled={!localSignature}
                 onClick={() => {
                   setShowSignatureModal(false);
-                  onSign('local');
+                  void onSign('local');
                 }}
               >
                 Sign

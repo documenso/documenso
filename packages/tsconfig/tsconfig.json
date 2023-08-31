@@ -1,0 +1,8 @@
+{
+  "extends": "./base.json",
+  "compilerOptions": {
+    "noEmit": true,
+  },
+  "include": ["**/*.ts", "**/*.tsx", "**/*.d.ts", "**/*.json"],
+  "exclude": ["dist", "build", "node_modules"]
+}

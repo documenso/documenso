@@ -2,8 +2,6 @@
 
 import { createContext, useCallback, useContext, useEffect, useState } from 'react';
 
-import { z } from 'zod';
-
 import {
   FEATURE_FLAG_POLL_INTERVAL,
   LOCAL_FEATURE_FLAGS,
@@ -12,14 +10,7 @@ import {
 
 import { getAllFlags } from '~/helpers/get-feature-flag';
 
-export const ZFeatureFlagValueSchema = z.union([
-  z.boolean(),
-  z.string(),
-  z.number(),
-  z.undefined(),
-]);
-
-export type TFeatureFlagValue = z.infer<typeof ZFeatureFlagValueSchema>;
+import { TFeatureFlagValue } from './feature-flag.types';
 
 export type FeatureFlagContextValue = {
   getFlag: (_key: string) => TFeatureFlagValue;
@@ -67,7 +58,7 @@ export function FeatureFlagProvider({
 
     const interval = setInterval(() => {
       if (document.hasFocus()) {
-        getAllFlags().then((newFlags) => setFlags(newFlags));
+        void getAllFlags().then((newFlags) => setFlags(newFlags));
       }
     }, FEATURE_FLAG_POLL_INTERVAL);
 
@@ -84,7 +75,7 @@ export function FeatureFlagProvider({
       return;
     }
 
-    const onFocus = () => getAllFlags().then((newFlags) => setFlags(newFlags));
+    const onFocus = () => void getAllFlags().then((newFlags) => setFlags(newFlags));
 
     window.addEventListener('focus', onFocus);
 
