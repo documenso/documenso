@@ -1,12 +1,13 @@
 'use client';
 
-import React from 'react';
+import { useEffect } from 'react';
 
 export default function Redirect() {
-  React.useEffect(() => {
+  useEffect(() => {
     const timer = setTimeout(() => {
       window.location.href = 'https://www.documenso.com';
     }, 3000);
+
     return () => clearTimeout(timer);
   }, []);
 
