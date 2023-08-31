@@ -22,7 +22,6 @@ export const PricingTable = ({ className, ...props }: PricingTableProps) => {
   const event = usePlausible();
 
   const [period, setPeriod] = useState<'MONTHLY' | 'YEARLY'>(() =>
-    // eslint-disable-next-line turbo/no-undeclared-env-vars
     params?.get('planId') === process.env.NEXT_PUBLIC_STRIPE_COMMUNITY_PLAN_YEARLY_PRICE_ID
       ? 'YEARLY'
       : 'MONTHLY',
@@ -30,11 +29,9 @@ export const PricingTable = ({ className, ...props }: PricingTableProps) => {
 
   const planId = useMemo(() => {
     if (period === 'MONTHLY') {
-      // eslint-disable-next-line turbo/no-undeclared-env-vars
       return process.env.NEXT_PUBLIC_STRIPE_COMMUNITY_PLAN_MONTHLY_PRICE_ID;
     }
 
-    // eslint-disable-next-line turbo/no-undeclared-env-vars
     return process.env.NEXT_PUBLIC_STRIPE_COMMUNITY_PLAN_YEARLY_PRICE_ID;
   }, [period]);
 

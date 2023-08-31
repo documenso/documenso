@@ -139,7 +139,6 @@ export const Widget = ({ className, children, ...props }: WidgetProps) => {
         setTimeout(resolve, 1000);
       });
 
-      // eslint-disable-next-line turbo/no-undeclared-env-vars
       const planId = process.env.NEXT_PUBLIC_STRIPE_COMMUNITY_PLAN_MONTHLY_PRICE_ID;
 
       const claimPlanInput = signatureDataUrl
@@ -147,7 +146,7 @@ export const Widget = ({ className, children, ...props }: WidgetProps) => {
             name,
             email,
             planId,
-            signatureDataUrl: signatureDataUrl!,
+            signatureDataUrl: signatureDataUrl,
             signatureText: null,
           }
         : {
@@ -155,7 +154,7 @@ export const Widget = ({ className, children, ...props }: WidgetProps) => {
             email,
             planId,
             signatureDataUrl: null,
-            signatureText: signatureText!,
+            signatureText: signatureText ?? '',
           };
 
       const [result] = await Promise.all([claimPlan(claimPlanInput), delay]);

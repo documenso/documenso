@@ -1,5 +1,5 @@
 export type FindResultSet<T> = {
-  data: T extends Array<any> ? T : T[];
+  data: T extends Array<unknown> ? T : T[];
   count: number;
   currentPage: number;
   perPage: number;

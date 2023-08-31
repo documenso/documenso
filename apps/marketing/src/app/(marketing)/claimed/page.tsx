@@ -27,7 +27,11 @@ export type ClaimedPlanPageProps = {
 export default async function ClaimedPlanPage({ searchParams = {} }: ClaimedPlanPageProps) {
   const { sessionId } = searchParams;
 
-  const session = await stripe.checkout.sessions.retrieve(sessionId as string);
+  if (typeof sessionId !== 'string') {
+    redirect('/');
+  }
+
+  const session = await stripe.checkout.sessions.retrieve(sessionId);
 
   const user = await prisma.user.findFirst({
     where: {
@@ -157,7 +161,6 @@ export default async function ClaimedPlanPage({ searchParams = {} }: ClaimedPlan
         </p>
 
         <Link
-          // eslint-disable-next-line turbo/no-undeclared-env-vars
           href={`${process.env.NEXT_PUBLIC_APP_URL}/login`}
           target="_blank"
           className="mt-4 block"
