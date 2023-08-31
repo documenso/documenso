@@ -87,9 +87,6 @@ export const SigningForm = ({ document, recipient, fields }: SigningFormProps) =
                       className="h-44 w-full"
                       defaultValue={signature ?? undefined}
                       onChange={(value) => {
-                        console.log({
-                          signpadValue: value,
-                        });
                         setSignature(value);
                       }}
                     />
