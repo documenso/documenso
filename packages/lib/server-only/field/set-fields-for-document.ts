@@ -84,6 +84,8 @@ export const setFieldsForDocument = async ({
           })
         : prisma.field.create({
             data: {
+              // TODO: Rewrite this entire transaction because this is a mess
+              // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
               type: field.type!,
               page: field.pageNumber,
               positionX: field.pageX,

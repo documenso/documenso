@@ -19,11 +19,13 @@ export const updatePassword = async ({ userId, password }: UpdatePasswordOptions
 
   const hashedPassword = await hash(password, SALT_ROUNDS);
 
-  // Compare the new password with the old password
-  const isSamePassword = await compare(password, user.password as string);
+  if (user.password) {
+    // Compare the new password with the old password
+    const isSamePassword = await compare(password, user.password);
 
-  if (isSamePassword) {
-    throw new Error('Your new password cannot be the same as your old password.');
+    if (isSamePassword) {
+      throw new Error('Your new password cannot be the same as your old password.');
+    }
   }
 
   const updatedUser = await prisma.user.update({
