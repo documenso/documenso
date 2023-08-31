@@ -130,7 +130,13 @@ export const EditDocumentForm = ({
         },
       });
 
-      router.refresh();
+      toast({
+        title: 'Document sent',
+        description: 'Your document has been sent successfully.',
+        duration: 5000,
+      });
+
+      router.push('/dashboard');
     } catch (err) {
       console.error(err);
 

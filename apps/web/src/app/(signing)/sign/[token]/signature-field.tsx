@@ -63,11 +63,6 @@ export const SignatureField = ({ field, recipient }: SignatureFieldProps) => {
 
   const onSign = async (source: 'local' | 'provider' = 'provider') => {
     try {
-      console.log({
-        providedSignature,
-        localSignature,
-      });
-
       if (!providedSignature && !localSignature) {
         setShowSignatureModal(true);
         return;
