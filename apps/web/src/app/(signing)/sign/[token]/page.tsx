@@ -34,11 +34,11 @@ export default async function SigningPage({ params: { token } }: SigningPageProp
       token,
     }).catch(() => null),
     getFieldsForToken({ token }),
-    getRecipientByToken({ token }),
-    viewedDocument({ token }),
+    getRecipientByToken({ token }).catch(() => null),
+    viewedDocument({ token }).catch(() => null),
   ]);
 
-  if (!document) {
+  if (!document || !recipient) {
     return notFound();
   }
 
