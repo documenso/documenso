@@ -5,6 +5,7 @@ import { Clock, File, FileCheck } from 'lucide-react';
 import { getRequiredServerComponentSession } from '@documenso/lib/next-auth/get-server-session';
 import { findDocuments } from '@documenso/lib/server-only/document/find-documents';
 import { getStats } from '@documenso/lib/server-only/document/get-stats';
+import { DocumentStatus as InternalDocumentStatus } from '@documenso/prisma/client';
 import {
   Table,
   TableBody,
@@ -21,6 +22,24 @@ import { LocaleDate } from '~/components/formatter/locale-date';
 
 import { UploadDocument } from './upload-document';
 
+const CARD_DATA = [
+  {
+    icon: FileCheck,
+    title: 'Completed',
+    status: InternalDocumentStatus.COMPLETED,
+  },
+  {
+    icon: File,
+    title: 'Drafts',
+    status: InternalDocumentStatus.DRAFT,
+  },
+  {
+    icon: Clock,
+    title: 'Pending',
+    status: InternalDocumentStatus.PENDING,
+  },
+];
+
 export default async function DashboardPage() {
   const user = await getRequiredServerComponentSession();
 
@@ -34,20 +53,14 @@ export default async function DashboardPage() {
     }),
   ]);
 
-  const cardData = [
-    { icon: FileCheck, title: 'Completed', status: stats.COMPLETED },
-    { icon: File, title: 'Drafts', status: stats.DRAFT },
-    { icon: Clock, title: 'Pending', status: stats.PENDING },
-  ];
-
   return (
     <div className="mx-auto w-full max-w-screen-xl px-4 md:px-8">
       <h1 className="text-4xl font-semibold">Dashboard</h1>
 
       <div className="mt-8 grid grid-cols-1 gap-4 md:grid-cols-3">
-        {cardData.map((card) => (
+        {CARD_DATA.map((card) => (
           <Link key={card.status} href={`/documents?status=${card.status}`}>
-            <CardMetric icon={card.icon} title={card.title} value={card.status} />
+            <CardMetric icon={card.icon} title={card.title} value={stats[card.status]} />
           </Link>
         ))}
       </div>
