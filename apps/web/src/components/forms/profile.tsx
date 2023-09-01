@@ -118,6 +118,7 @@ export const ProfileForm = ({ className, user }: ProfileFormProps) => {
             render={({ field: { onChange } }) => (
               <SignaturePad
                 className="h-44 w-full rounded-lg border bg-white backdrop-blur-sm dark:border-[#e2d7c5] dark:bg-[#fcf8ee]"
+                defaultValue={user.signature ?? undefined}
                 onChange={(v) => onChange(v ?? '')}
               />
             )}
