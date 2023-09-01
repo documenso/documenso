@@ -5,13 +5,14 @@ import { useState } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Eye, EyeOff, Loader } from 'lucide-react';
 import { signIn } from 'next-auth/react';
-import { useForm } from 'react-hook-form';
+import { Controller, useForm } from 'react-hook-form';
 import { z } from 'zod';
 
 import { TRPCClientError } from '@documenso/trpc/client';
 import { trpc } from '@documenso/trpc/react';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
+import { FormErrorMessage } from '@documenso/ui/primitives/form/form-error-message';
 import { Input } from '@documenso/ui/primitives/input';
 import { Label } from '@documenso/ui/primitives/label';
 import { SignaturePad } from '@documenso/ui/primitives/signature-pad';
@@ -21,6 +22,7 @@ export const ZSignUpFormSchema = z.object({
   name: z.string().min(1),
   email: z.string().email().min(1),
   password: z.string().min(6).max(72),
+  signature: z.string().min(1, { message: 'We need your signature to sign documents' }),
 });
 
 export type TSignUpFormSchema = z.infer<typeof ZSignUpFormSchema>;
@@ -34,6 +36,7 @@ export const SignUpForm = ({ className }: SignUpFormProps) => {
   const [showPassword, setShowPassword] = useState(false);
 
   const {
+    control,
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
@@ -42,15 +45,16 @@ export const SignUpForm = ({ className }: SignUpFormProps) => {
       name: '',
       email: '',
       password: '',
+      signature: '',
     },
     resolver: zodResolver(ZSignUpFormSchema),
   });
 
   const { mutateAsync: signup } = trpc.auth.signup.useMutation();
 
-  const onFormSubmit = async ({ name, email, password }: TSignUpFormSchema) => {
+  const onFormSubmit = async ({ name, email, password, signature }: TSignUpFormSchema) => {
     try {
-      await signup({ name, email, password });
+      await signup({ name, email, password, signature });
 
       await signIn('credentials', {
         email,
@@ -122,8 +126,19 @@ export const SignUpForm = ({ className }: SignUpFormProps) => {
         </Label>
 
         <div>
-          <SignaturePad className="mt-2 h-36 w-full rounded-lg border bg-white dark:border-[#e2d7c5] dark:bg-[#fcf8ee]" />
+          <Controller
+            control={control}
+            name="signature"
+            render={({ field: { onChange } }) => (
+              <SignaturePad
+                className="mt-2 h-36 w-full rounded-lg border bg-white dark:border-[#e2d7c5] dark:bg-[#fcf8ee]"
+                onChange={(v) => onChange(v ?? '')}
+              />
+            )}
+          />
         </div>
+
+        <FormErrorMessage className="mt-1.5" error={errors.signature} />
       </div>
 
       <Button size="lg" disabled={isSubmitting} className="dark:bg-documenso dark:hover:opacity-90">
