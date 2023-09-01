@@ -28,9 +28,9 @@ export const useRequiredSigningContext = () => {
 };
 
 export interface SigningProviderProps {
-  fullName?: string;
-  email?: string;
-  signature?: string;
+  fullName?: string | null;
+  email?: string | null;
+  signature?: string | null;
   children: React.ReactNode;
 }
 

@@ -14,18 +14,18 @@ enum IdentityProvider {
 }
 
 model User {
-  id                 Int                  @id @default(autoincrement())
-  name               String?
-  email              String               @unique
-  emailVerified      DateTime?
-  password           String?
-  source             String?
-  identityProvider   IdentityProvider     @default(DOCUMENSO)
-  accounts           Account[]
-  sessions           Session[]
-  Document           Document[]
-  Subscription       Subscription[]
-  PasswordResetToken PasswordResetToken[]
+  id               Int              @id @default(autoincrement())
+  name             String?
+  email            String           @unique
+  emailVerified    DateTime?
+  password         String?
+  source           String?
+  signature        String?
+  identityProvider IdentityProvider @default(DOCUMENSO)
+  accounts         Account[]
+  sessions         Session[]
+  Document         Document[]
+  Subscription     Subscription[]
 }
 
 enum SubscriptionStatus {
