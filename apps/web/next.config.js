@@ -7,6 +7,7 @@ const { parsed: env } = require('dotenv').config({
 
 /** @type {import('next').NextConfig} */
 const config = {
+  output: process.env.DOCKER_OUTPUT ? 'standalone' : undefined,
   experimental: {
     serverActions: true,
   },
