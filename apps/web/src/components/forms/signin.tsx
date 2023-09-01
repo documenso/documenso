@@ -94,7 +94,7 @@ export const SignInForm = ({ className }: SignInFormProps) => {
 
             <AlertDescription>
               {ErrorMessages[searchParams?.get('error') as keyof typeof ErrorMessages] ??
-                'an unknown error occured'}
+                'an unknown error occurred'}
             </AlertDescription>
           </Alert>
         </div>
