@@ -9,7 +9,8 @@
     "format": "prisma format",
     "prisma:generate": "prisma generate",
     "prisma:migrate-dev": "prisma migrate dev",
-    "prisma:migrate-deploy": "prisma migrate deploy"
+    "prisma:migrate-deploy": "prisma migrate deploy",
+    "post-install": "prisma generate"
   },
   "dependencies": {
     "@prisma/client": "5.0.0",
