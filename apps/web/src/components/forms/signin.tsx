@@ -58,6 +58,7 @@ export const SignInForm = ({ className }: SignInFormProps) => {
     const error = searchParams?.get('error');
     if (error) {
       timer.current = setTimeout(() => {
+        // FIXME: Toast not firing without the TimeOut
         toast({
           variant: 'destructive',
           description:
