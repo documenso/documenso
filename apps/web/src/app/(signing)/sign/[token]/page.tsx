@@ -48,8 +48,6 @@ export default async function SigningPage({ params: { token } }: SigningPageProp
 
   const documentUrl = `data:application/pdf;base64,${document.document}`;
 
-  console.log(fields);
-
   return (
     <SigningProvider email={recipient.email} fullName={recipient.name} signature={user?.signature}>
       <div className="mx-auto w-full max-w-screen-xl px-4 md:px-8">
