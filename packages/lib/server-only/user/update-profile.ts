@@ -6,12 +6,7 @@ export type UpdateProfileOptions = {
   signature: string;
 };
 
-export const updateProfile = async ({
-  userId,
-  name,
-  // TODO: Actually use signature
-  signature: _signature,
-}: UpdateProfileOptions) => {
+export const updateProfile = async ({ userId, name, signature }: UpdateProfileOptions) => {
   // Existence check
   await prisma.user.findFirstOrThrow({
     where: {
@@ -25,7 +20,7 @@ export const updateProfile = async ({
     },
     data: {
       name,
-      // signature,
+      signature,
     },
   });
 

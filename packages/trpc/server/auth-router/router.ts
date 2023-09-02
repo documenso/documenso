@@ -8,9 +8,9 @@ import { ZSignUpMutationSchema } from './schema';
 export const authRouter = router({
   signup: procedure.input(ZSignUpMutationSchema).mutation(async ({ input }) => {
     try {
-      const { name, email, password } = input;
+      const { name, email, password, signature } = input;
 
-      return await createUser({ name, email, password });
+      return await createUser({ name, email, password, signature });
     } catch (err) {
       console.error(err);
 

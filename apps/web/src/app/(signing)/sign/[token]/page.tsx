@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation';
 import { match } from 'ts-pattern';
 
 import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
+import { getServerComponentSession } from '@documenso/lib/next-auth/get-server-session';
 import { getDocumentAndSenderByToken } from '@documenso/lib/server-only/document/get-document-by-token';
 import { viewedDocument } from '@documenso/lib/server-only/document/viewed-document';
 import { getFieldsForToken } from '@documenso/lib/server-only/field/get-fields-for-token';
@@ -42,10 +43,12 @@ export default async function SigningPage({ params: { token } }: SigningPageProp
     return notFound();
   }
 
+  const user = await getServerComponentSession();
+
   const documentUrl = `data:application/pdf;base64,${document.document}`;
 
   return (
-    <SigningProvider email={recipient.email} fullName={recipient.name}>
+    <SigningProvider email={recipient.email} fullName={recipient.name} signature={user?.signature}>
       <div className="mx-auto w-full max-w-screen-xl px-4 md:px-8">
         <h1 className="mt-4 truncate text-2xl font-semibold md:text-3xl" title={document.title}>
           {document.title}
