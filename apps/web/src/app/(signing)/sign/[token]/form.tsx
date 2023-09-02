@@ -1,5 +1,7 @@
 'use client';
 
+import { useState } from 'react';
+
 import { useRouter } from 'next/navigation';
 
 import { Loader } from 'lucide-react';
@@ -10,6 +12,12 @@ import { Document, Field, Recipient } from '@documenso/prisma/client';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
 import { Card, CardContent } from '@documenso/ui/primitives/card';
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogTrigger,
+} from '@documenso/ui/primitives/dialog';
 import { Input } from '@documenso/ui/primitives/input';
 import { Label } from '@documenso/ui/primitives/label';
 import { SignaturePad } from '@documenso/ui/primitives/signature-pad';
@@ -27,6 +35,8 @@ export const SigningForm = ({ document, recipient, fields }: SigningFormProps) =
 
   const { fullName, signature, setFullName, setSignature } = useRequiredSigningContext();
 
+  const [showConfirmSignatureDialog, setShowConfirmSignatureDialog] = useState(false);
+
   const {
     handleSubmit,
     formState: { isSubmitting },
@@ -34,17 +44,12 @@ export const SigningForm = ({ document, recipient, fields }: SigningFormProps) =
 
   const isComplete = fields.every((f) => f.inserted);
 
-  const onFormSubmit = async () => {
+  const onFormSubmit = () => {
     if (!isComplete) {
       return;
     }
 
-    await completeDocumentWithToken({
-      token: recipient.token,
-      documentId: document.id,
-    });
-
-    router.push(`/sign/${recipient.token}/complete`);
+    console.log('User is signing form');
   };
 
   return (
@@ -105,15 +110,61 @@ export const SigningForm = ({ document, recipient, fields }: SigningFormProps) =
                 Cancel
               </Button>
 
-              <Button
-                className="w-full"
-                type="submit"
-                size="lg"
-                disabled={!isComplete || isSubmitting}
+              <Dialog
+                open={showConfirmSignatureDialog}
+                onOpenChange={setShowConfirmSignatureDialog}
               >
-                {isSubmitting && <Loader className="mr-2 h-5 w-5 animate-spin" />}
-                Complete
-              </Button>
+                <DialogTrigger asChild>
+                  <Button
+                    className="w-full"
+                    type="submit"
+                    size="lg"
+                    disabled={!isComplete || isSubmitting}
+                  >
+                    {isSubmitting && <Loader className="mr-2 h-5 w-5 animate-spin" />}
+                    Complete
+                  </Button>
+                </DialogTrigger>
+                <DialogContent>
+                  <div className="text-center">
+                    <div className="text-xl font-semibold text-neutral-800">Sign Document</div>
+                    <div className="mx-auto w-72 py-2 text-center text-neutral-400">
+                      You are about to finish signing {document.title}. Are you sure you?
+                    </div>
+                  </div>
+
+                  <DialogFooter>
+                    <div className="flex w-full flex-1 flex-nowrap gap-4">
+                      <Button
+                        type="button"
+                        className="dark:bg-muted dark:hover:bg-muted/80 flex-1  bg-black/5 hover:bg-black/10"
+                        variant="secondary"
+                        onClick={() => {
+                          setShowConfirmSignatureDialog(false);
+                        }}
+                      >
+                        Cancel
+                      </Button>
+
+                      <Button
+                        type="button"
+                        className="flex-1"
+                        disabled={!isComplete}
+                        onClick={async () => {
+                          await completeDocumentWithToken({
+                            token: recipient.token,
+                            documentId: document.id,
+                          });
+
+                          router.push(`/sign/${recipient.token}/complete`);
+                        }}
+                      >
+                        Sign
+                      </Button>
+                    </div>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
             </div>
           </div>
         </div>
