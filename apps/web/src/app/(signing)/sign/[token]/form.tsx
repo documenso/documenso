@@ -117,7 +117,7 @@ export const SigningForm = ({ document, recipient, fields }: SigningFormProps) =
                 <DialogTrigger asChild>
                   <Button
                     className="w-full"
-                    type="submit"
+                    type="button"
                     size="lg"
                     disabled={!isComplete || isSubmitting}
                   >
@@ -128,8 +128,8 @@ export const SigningForm = ({ document, recipient, fields }: SigningFormProps) =
                 <DialogContent>
                   <div className="text-center">
                     <div className="text-xl font-semibold text-neutral-800">Sign Document</div>
-                    <div className="mx-auto w-72 py-2 text-center text-neutral-400">
-                      You are about to finish signing {document.title}. Are you sure you?
+                    <div className="text-muted-foreground mx-auto w-4/5 py-2 text-center">
+                      You are about to finish signing "{document.title}". Are you sure you?
                     </div>
                   </div>
 
@@ -149,7 +149,7 @@ export const SigningForm = ({ document, recipient, fields }: SigningFormProps) =
                       <Button
                         type="button"
                         className="flex-1"
-                        disabled={!isComplete}
+                        disabled={!isComplete || isSubmitting}
                         onClick={async () => {
                           await completeDocumentWithToken({
                             token: recipient.token,
@@ -159,6 +159,7 @@ export const SigningForm = ({ document, recipient, fields }: SigningFormProps) =
                           router.push(`/sign/${recipient.token}/complete`);
                         }}
                       >
+                        {isSubmitting && <Loader className="mr-2 h-5 w-5 animate-spin" />}
                         Sign
                       </Button>
                     </div>
