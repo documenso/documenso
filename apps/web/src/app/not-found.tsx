@@ -31,7 +31,7 @@ export default function NotFound() {
       </div>
       <div className="container mx-auto flex min-h-screen items-center px-6 py-12">
         <div>
-          <p className="font-medium leading-relaxed text-[#555E67]">404 Error</p>
+          <p className="font-medium leading-relaxed text-[#555E67]">404 Page not found</p>
           <h1 className="mt-3 text-2xl font-semibold text-gray-800 dark:text-white md:text-3xl">
             Oops! You found a secret page
           </h1>
