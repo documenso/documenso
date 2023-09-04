@@ -35,15 +35,6 @@ export const insertFieldInPDF = async (pdf: PDFDocument, field: FieldWithSignatu
   const fieldX = pageWidth * (Number(field.positionX) / 100);
   const fieldY = pageHeight * (Number(field.positionY) / 100);
 
-  console.log({
-    fieldWidth,
-    fieldHeight,
-    fieldX,
-    fieldY,
-    pageWidth,
-    pageHeight,
-  });
-
   const font = await pdf.embedFont(isSignatureField ? fontCaveat : StandardFonts.Helvetica);
 
   if (field.type === FieldType.SIGNATURE || field.type === FieldType.FREE_SIGNATURE) {
@@ -75,15 +66,6 @@ export const insertFieldInPDF = async (pdf: PDFDocument, field: FieldWithSignatu
     // Invert the Y axis since PDFs use a bottom-left coordinate system
     imageY = pageHeight - imageY - imageHeight;
 
-    console.log({
-      initialDimensions,
-      scalingFactor,
-      imageWidth,
-      imageHeight,
-      imageX,
-      imageY,
-    });
-
     page.drawImage(image, {
       x: imageX,
       y: imageY,
@@ -106,17 +88,6 @@ export const insertFieldInPDF = async (pdf: PDFDocument, field: FieldWithSignatu
 
     const textX = fieldX + (fieldWidth - textWidth) / 2;
     let textY = fieldY + (fieldHeight - textHeight) / 2;
-
-    console.log({
-      initialDimensions,
-      scalingFactor,
-      textWidth,
-      textHeight,
-      textX,
-      textY,
-      pageWidth,
-      pageHeight,
-    });
 
     // Invert the Y axis since PDFs use a bottom-left coordinate system
     textY = pageHeight - textY - textHeight;
