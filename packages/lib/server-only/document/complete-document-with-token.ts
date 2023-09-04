@@ -83,8 +83,6 @@ export const completeDocumentWithToken = async ({
     },
   });
 
-  console.log('documents', documents);
-
   if (documents.count > 0) {
     await sealDocument({ documentId: document.id });
   }
