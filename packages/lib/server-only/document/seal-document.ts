@@ -53,10 +53,6 @@ export const sealDocument = async ({ documentId }: SealDocumentOptions) => {
   const doc = await PDFDocument.load(pdfData);
 
   for (const field of fields) {
-    console.log('inserting field', {
-      ...field,
-      Signature: null,
-    });
     await insertFieldInPDF(doc, field);
   }
 
