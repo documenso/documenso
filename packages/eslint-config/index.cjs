@@ -8,7 +8,7 @@ module.exports = {
     'plugin:package-json/recommended',
   ],
 
-  plugins: ['prettier', 'package-json', 'unused-imports', '@typescript-eslint'],
+  plugins: ['prettier', 'package-json', 'unused-imports'],
 
   env: {
     node: true,
