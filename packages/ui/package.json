@@ -12,7 +12,8 @@
     "index.tsx"
   ],
   "scripts": {
-    "lint": "eslint \"**/*.ts*\""
+    "lint": "eslint . --ext .ts,.tsx",
+    "lint:fix": "eslint . --ext .ts,.js,.tsx,.jsx --fix"
   },
   "devDependencies": {
     "@documenso/tsconfig": "*",

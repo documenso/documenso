@@ -10,7 +10,10 @@
     "universal/",
     "next-auth/"
   ],
-  "scripts": {},
+  "scripts": {
+    "lint": "eslint . --ext .ts,.tsx",
+    "lint:fix": "eslint . --ext .ts,.js,.tsx,.jsx --fix"
+  },
   "dependencies": {
     "@documenso/email": "*",
     "@documenso/prisma": "*",

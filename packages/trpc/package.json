@@ -5,6 +5,8 @@
   "types": "./index.ts",
   "license": "MIT",
   "scripts": {
+    "lint": "eslint . --ext .ts,.tsx",
+    "lint:fix": "eslint . --ext .ts,.js,.tsx,.jsx --fix"
   },
   "dependencies": {
     "@documenso/lib": "*",
