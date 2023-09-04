@@ -44,7 +44,7 @@ export const ProfileForm = ({ className, user }: ProfileFormProps) => {
   } = useForm<TProfileFormSchema>({
     values: {
       name: user.name ?? '',
-      signature: user.signature ? user.signature : '',
+      signature: user.signature || '',
     },
     resolver: zodResolver(ZProfileFormSchema),
   });
