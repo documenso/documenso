@@ -2,14 +2,13 @@ module.exports = {
   extends: [
     'next',
     'turbo',
-    'prettier',
     'eslint:recommended',
     'plugin:@typescript-eslint/recommended',
     'plugin:prettier/recommended',
     'plugin:package-json/recommended',
   ],
 
-  plugins: ['prettier', 'package-json'],
+  plugins: ['prettier', 'package-json', 'unused-imports', '@typescript-eslint'],
 
   env: {
     node: true,
@@ -30,12 +29,22 @@ module.exports = {
   },
 
   rules: {
+    '@next/next/no-html-link-for-pages': 'off',
     'react/no-unescaped-entities': 'off',
 
-    'no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
-    '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
+    '@typescript-eslint/no-unused-vars': 'off',
+    'unused-imports/no-unused-imports': 'error',
+    'unused-imports/no-unused-vars': [
+      'warn',
+      {
+        vars: 'all',
+        varsIgnorePattern: '^_',
+        args: 'after-used',
+        argsIgnorePattern: '^_',
+        destructuredArrayIgnorePattern: '^_',
+      },
+    ],
 
-    'no-duplicate-imports': 'error',
     'no-multi-spaces': [
       'error',
       {
