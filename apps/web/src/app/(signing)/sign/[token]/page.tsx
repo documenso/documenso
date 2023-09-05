@@ -1,4 +1,4 @@
-import { notFound } from 'next/navigation';
+import { notFound, redirect } from 'next/navigation';
 
 import { match } from 'ts-pattern';
 
@@ -42,6 +42,10 @@ export default async function SigningPage({ params: { token } }: SigningPageProp
 
   if (!document) {
     return notFound();
+  }
+
+  if (document?.status === 'COMPLETED') {
+    redirect(`/sign/${token}/complete`);
   }
 
   const user = await getServerComponentSession();
