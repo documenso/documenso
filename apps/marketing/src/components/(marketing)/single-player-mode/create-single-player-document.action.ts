@@ -1,11 +1,17 @@
 'use server';
 
+import { createElement } from 'react';
+
 import { DateTime } from 'luxon';
 import { nanoid } from 'nanoid';
 import { PDFDocument } from 'pdf-lib';
 import { z } from 'zod';
 
+import { mailer } from '@documenso/email/mailer';
+import { render } from '@documenso/email/render';
+import { DocumentSelfSignedEmailTemplate } from '@documenso/email/templates/document-self-signed';
 import { SERVICE_USER_EMAIL } from '@documenso/lib/constants/app';
+import { FROM_ADDRESS, FROM_NAME } from '@documenso/lib/constants/email';
 import { insertFieldInPDF } from '@documenso/lib/server-only/pdf/insert-field-in-pdf';
 import { prisma } from '@documenso/prisma';
 import {
@@ -82,7 +88,7 @@ export const createSinglePlayerDocument = async (
 
   const pdfBytes = await doc.save();
 
-  return await prisma.$transaction(async (tx) => {
+  const documentToken = await prisma.$transaction(async (tx) => {
     const documentToken = nanoid();
 
     // Fetch service user who will be the owner of the document.
@@ -145,6 +151,31 @@ export const createSinglePlayerDocument = async (
 
     return documentToken;
   });
+
+  // Todo: Handle `downloadLink` and `reviewLink`.
+  const template = createElement(DocumentSelfSignedEmailTemplate, {
+    downloadLink: 'https://documenso.com',
+    reviewLink: 'https://documenso.com',
+    documentName: documentName,
+    assetBaseUrl: process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000',
+  });
+
+  // Send email to signer.
+  await mailer.sendMail({
+    to: {
+      address: signer.email,
+      name: signer.name,
+    },
+    from: {
+      name: FROM_NAME,
+      address: FROM_ADDRESS,
+    },
+    subject: 'Document signed',
+    html: render(template),
+    text: render(template, { plainText: true }),
+  });
+
+  return documentToken;
 };
 
 /**
