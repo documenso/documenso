@@ -5,7 +5,7 @@ import { notFound } from 'next/navigation';
 
 import { getSharingId } from '@documenso/lib/server-only/share/get-share-id';
 
-import Redirect from './redirect';
+// import Redirect from './redirect';
 
 type MetadataProps = {
   params: { shareId: string };
@@ -18,9 +18,6 @@ export async function generateMetadata({ params }: MetadataProps): Promise<Metad
 
   return {
     title: 'Documenso - Share',
-    openGraph: {
-      images: [`/api/share-og?signature=${signature}`],
-    },
   };
 }
 
@@ -45,7 +42,7 @@ export default async function SharePage({ params: { shareId } }: SharePageProps)
     <div className="flex h-screen flex-col items-center justify-center">
       <h1 className="my-2 text-4xl font-semibold">Share Page</h1>
       <p className="my-2 text-xl">Redirecting...</p>
-      <Redirect />
+      {/* <Redirect /> */}
     </div>
   );
 }
