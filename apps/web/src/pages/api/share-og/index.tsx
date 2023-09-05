@@ -1,7 +1,5 @@
 import { ImageResponse, NextRequest } from 'next/server';
 
-import { cn } from '@documenso/ui/lib/utils';
-
 export const config = {
   runtime: 'edge',
 };
