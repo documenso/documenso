@@ -8,6 +8,10 @@ const { parsed: env } = require('dotenv').config({
 
 /** @type {import('next').NextConfig} */
 const config = {
+  experimental: {
+    serverActions: true,
+    serverActionsBodySizeLimit: '10mb',
+  },
   reactStrictMode: true,
   transpilePackages: ['@documenso/lib', '@documenso/prisma', '@documenso/trpc', '@documenso/ui'],
   env,

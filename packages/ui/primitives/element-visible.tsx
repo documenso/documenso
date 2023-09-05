@@ -27,6 +27,10 @@ export const ElementVisible = ({ target, children }: ElementVisibleProps) => {
     };
   }, [target]);
 
+  useEffect(() => {
+    setVisible(!!document.querySelector(target));
+  }, [target]);
+
   if (!visible) {
     return null;
   }

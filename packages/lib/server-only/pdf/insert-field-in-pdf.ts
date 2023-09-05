@@ -2,12 +2,15 @@ import fontkit from '@pdf-lib/fontkit';
 import { readFileSync } from 'fs';
 import { PDFDocument, StandardFonts } from 'pdf-lib';
 
+import {
+  DEFAULT_HANDWRITING_FONT_SIZE,
+  DEFAULT_STANDARD_FONT_SIZE,
+  MIN_HANDWRITING_FONT_SIZE,
+  MIN_STANDARD_FONT_SIZE,
+} from '@documenso/lib/constants/pdf';
 import { FieldType } from '@documenso/prisma/client';
 import { isSignatureFieldType } from '@documenso/prisma/guards/is-signature-field';
 import { FieldWithSignature } from '@documenso/prisma/types/field-with-signature';
-
-const DEFAULT_STANDARD_FONT_SIZE = 15;
-const DEFAULT_HANDWRITING_FONT_SIZE = 50;
 
 export const insertFieldInPDF = async (pdf: PDFDocument, field: FieldWithSignature) => {
   const isSignatureField = isSignatureFieldType(field.type);
@@ -18,8 +21,9 @@ export const insertFieldInPDF = async (pdf: PDFDocument, field: FieldWithSignatu
 
   const pages = pdf.getPages();
 
+  const minFontSize = isSignatureField ? MIN_HANDWRITING_FONT_SIZE : MIN_STANDARD_FONT_SIZE;
   const maxFontSize = isSignatureField ? DEFAULT_HANDWRITING_FONT_SIZE : DEFAULT_STANDARD_FONT_SIZE;
-  let fontSize = isSignatureField ? DEFAULT_HANDWRITING_FONT_SIZE : DEFAULT_STANDARD_FONT_SIZE;
+  let fontSize = maxFontSize;
 
   const page = pages.at(field.page - 1);
 
@@ -101,7 +105,7 @@ export const insertFieldInPDF = async (pdf: PDFDocument, field: FieldWithSignatu
 
     const scalingFactor = Math.min(fieldWidth / textWidth, fieldHeight / textHeight, 1);
 
-    fontSize = Math.max(fontSize * scalingFactor, maxFontSize);
+    fontSize = Math.max(Math.min(fontSize * scalingFactor, maxFontSize), minFontSize);
     textWidth = font.widthOfTextAtSize(field.customText, fontSize);
 
     const textX = fieldX + (fieldWidth - textWidth) / 2;

@@ -17,9 +17,18 @@ export const Header = ({ className, ...props }: HeaderProps) => {
 
   return (
     <header className={cn('flex items-center justify-between', className)} {...props}>
-      <Link href="/" className="z-10" onClick={() => setIsHamburgerMenuOpen(false)}>
-        <Image src="/logo.png" alt="Documenso Logo" width={170} height={25} />
-      </Link>
+      <div className="flex items-center space-x-4">
+        <Link href="/" className="z-10" onClick={() => setIsHamburgerMenuOpen(false)}>
+          <Image src="/logo.png" alt="Documenso Logo" width={170} height={25} />
+        </Link>
+
+        <Link
+          href="/single-player-mode"
+          className="bg-primary rounded-full px-2 py-1 text-xs font-semibold sm:px-3"
+        >
+          Try now!
+        </Link>
+      </div>
 
       <div className="hidden items-center gap-x-6 md:flex">
         <Link href="/pricing" className="text-sm font-semibold text-[#8D8D8D] hover:text-[#6D6D6D]">
