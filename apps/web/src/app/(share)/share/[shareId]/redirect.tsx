@@ -2,10 +2,14 @@
 
 import { useEffect } from 'react';
 
+import { useRouter } from 'next/navigation';
+
 export default function Redirect() {
+  const router = useRouter();
+
   useEffect(() => {
     const timer = setTimeout(() => {
-      window.location.href = 'https://www.documenso.com';
+      router.push('/');
     }, 3000);
 
     return () => clearTimeout(timer);
