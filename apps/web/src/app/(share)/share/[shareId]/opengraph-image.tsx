@@ -1,30 +1,38 @@
-import { ImageResponse, NextRequest } from 'next/server';
+import { ImageResponse } from 'next/server';
 
-export const config = {
-  runtime: 'edge',
-};
+export const runtime = 'edge';
 
 const CARD_OFFSET_TOP = 152;
 const CARD_OFFSET_LEFT = 350;
 const CARD_WIDTH = 500;
 const CARD_HEIGHT = 250;
 
-export default async function handler(req: NextRequest) {
-  const { searchParams } = new URL(req.url);
+const size = {
+  width: 1200,
+  height: 630,
+};
 
-  const signature = searchParams.get('signature') || 'Timur';
+type SharePageOpenGraphImageProps = {
+  params: { shareId: string };
+};
+
+export default async function Image({ params: { shareId } }: SharePageOpenGraphImageProps) {
+  // Cannot use trpc here and prisma does not work in the browser so I cannot fetch the client
+  // const { data } = trpc.share.get.useQuery({ shareId });
+
+  const signature = shareId;
 
   const [interSemiBold, interRegular, caveatRegular, shareFrameImage] = await Promise.all([
-    fetch(new URL('./../../../assets/inter-semibold.ttf', import.meta.url)).then(async (res) =>
+    fetch(new URL('./../../../../assets/inter-semibold.ttf', import.meta.url)).then(async (res) =>
       res.arrayBuffer(),
     ),
-    fetch(new URL('./../../../assets/inter-regular.ttf', import.meta.url)).then(async (res) =>
+    fetch(new URL('./../../../../assets/inter-regular.ttf', import.meta.url)).then(async (res) =>
       res.arrayBuffer(),
     ),
-    fetch(new URL('./../../../assets/caveat-regular.ttf', import.meta.url)).then(async (res) =>
+    fetch(new URL('./../../../../assets/caveat-regular.ttf', import.meta.url)).then(async (res) =>
       res.arrayBuffer(),
     ),
-    fetch(new URL('./../../../assets/og-share-frame.png', import.meta.url)).then(async (res) =>
+    fetch(new URL('./../../../../assets/og-share-frame.png', import.meta.url)).then(async (res) =>
       res.arrayBuffer(),
     ),
   ]);
@@ -68,8 +76,7 @@ export default async function handler(req: NextRequest) {
       </div>
     ),
     {
-      width: 1200,
-      height: 630,
+      ...size,
       fonts: [
         {
           name: 'Caveat',
