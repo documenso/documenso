@@ -55,6 +55,9 @@ export default function SinglePlayerModePage() {
 
   const currentDocumentFlow = documentFlow[step];
 
+  /**
+   * Insert the selected fields into the local state.
+   */
   const onFieldsSubmit = (data: TAddFieldsFormSchema) => {
     if (!uploadedFile) {
       return;
@@ -79,27 +82,37 @@ export default function SinglePlayerModePage() {
     documentFlow.fields.onNextStep?.();
   };
 
+  /**
+   * Create, sign and send the document.
+   */
   const onSignSubmit = async (data: TAddSignatureFormSchema) => {
     if (!uploadedFile) {
       return;
     }
 
-    // Create and send document.
-    const documentToken = await createSinglePlayerDocument({
-      document: uploadedFile.file,
-      documentName: uploadedFile.name,
-      signer: data,
-      fields: fields.map((field) => ({
-        page: field.page,
-        type: field.type,
-        positionX: field.positionX.toNumber(),
-        positionY: field.positionY.toNumber(),
-        width: field.width.toNumber(),
-        height: field.height.toNumber(),
-      })),
-    });
+    try {
+      const documentToken = await createSinglePlayerDocument({
+        document: uploadedFile.file,
+        documentName: uploadedFile.name,
+        signer: data,
+        fields: fields.map((field) => ({
+          page: field.page,
+          type: field.type,
+          positionX: field.positionX.toNumber(),
+          positionY: field.positionY.toNumber(),
+          width: field.width.toNumber(),
+          height: field.height.toNumber(),
+        })),
+      });
 
-    router.push(`/single-player-mode/${documentToken}/success`);
+      router.push(`/single-player-mode/${documentToken}/success`);
+    } catch {
+      toast({
+        title: 'Something went wrong',
+        description: 'Please try again later.',
+        variant: 'destructive',
+      });
+    }
   };
 
   const placeholderRecipient: Recipient = {

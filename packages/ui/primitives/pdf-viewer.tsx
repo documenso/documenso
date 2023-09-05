@@ -31,11 +31,18 @@ export type OnPDFViewerPageClick = (_event: {
 export type PDFViewerProps = {
   className?: string;
   document: string;
+  onDocumentLoad?: (_doc: LoadedPDFDocument) => void;
   onPageClick?: OnPDFViewerPageClick;
   [key: string]: unknown;
 } & Omit<React.HTMLAttributes<HTMLDivElement>, 'onPageClick'>;
 
-export const PDFViewer = ({ className, document, onPageClick, ...props }: PDFViewerProps) => {
+export const PDFViewer = ({
+  className,
+  document,
+  onDocumentLoad,
+  onPageClick,
+  ...props
+}: PDFViewerProps) => {
   const $el = useRef<HTMLDivElement>(null);
 
   const [width, setWidth] = useState(0);
@@ -44,6 +51,7 @@ export const PDFViewer = ({ className, document, onPageClick, ...props }: PDFVie
 
   const onDocumentLoaded = (doc: LoadedPDFDocument) => {
     setNumPages(doc.numPages);
+    onDocumentLoad?.(doc);
   };
 
   const onDocumentPageClick = (
@@ -153,6 +161,7 @@ export const PDFViewer = ({ className, document, onPageClick, ...props }: PDFVie
                 width={width}
                 renderAnnotationLayer={false}
                 renderTextLayer={false}
+                loading={() => ''}
                 onClick={(e) => onDocumentPageClick(e, i + 1)}
               />
             </div>

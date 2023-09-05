@@ -36,7 +36,7 @@ export type AddSignatureFormProps = {
   documentFlow: DocumentFlowStep;
   fields: FieldWithSignature[];
   numberOfSteps: number;
-  onSubmit: (_data: TAddSignatureFormSchema) => void;
+  onSubmit: (_data: TAddSignatureFormSchema) => Promise<void> | void;
   requireName?: boolean;
   requireSignature?: boolean;
 };
@@ -260,7 +260,7 @@ export const AddSignatureFormPartial = ({
             loading={form.formState.isSubmitting}
             disabled={form.formState.isSubmitting}
             onGoBackClick={documentFlow.onBackStep}
-            onGoNextClick={async () => form.handleSubmit(onSubmit)()}
+            onGoNextClick={async () => await form.handleSubmit(onSubmit)()}
           />
         </DocumentFlowFormContainerFooter>
       </fieldset>

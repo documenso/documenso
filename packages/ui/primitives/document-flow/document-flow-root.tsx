@@ -156,6 +156,7 @@ export const DocumentFlowFormContainerActions = ({
         className="bg-documenso flex-1"
         size="lg"
         disabled={disabled || loading || !canGoNext}
+        loading={loading}
         onClick={onGoNextClick}
       >
         {goNextLabel}
