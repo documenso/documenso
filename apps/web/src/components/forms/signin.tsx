@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect } from 'react';
 
 import { useSearchParams } from 'next/navigation';
 
@@ -11,7 +11,7 @@ import { useForm } from 'react-hook-form';
 import { FcGoogle } from 'react-icons/fc';
 import { z } from 'zod';
 
-import { ErrorCodes } from '@documenso/lib/next-auth/error-codes';
+import { ErrorCode, isErrorCode } from '@documenso/lib/next-auth/error-codes';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
 import { Input } from '@documenso/ui/primitives/input';
@@ -19,9 +19,10 @@ import { Label } from '@documenso/ui/primitives/label';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
 const ErrorMessages = {
-  [ErrorCodes.CredentialsNotFound]: 'Credentials not found',
-  [ErrorCodes.IncorrectEmailPassword]: 'Incorrect email or password',
-  [ErrorCodes.UserMissingPassword]: 'User is missing password',
+  [ErrorCode.CREDENTIALS_NOT_FOUND]: 'The email or password provided is incorrect',
+  [ErrorCode.INCORRECT_EMAIL_PASSWORD]: 'The email or password provided is incorrect',
+  [ErrorCode.USER_MISSING_PASSWORD]:
+    'This account appears to be using a social login method, please sign in using that method',
 };
 
 export const ZSignInFormSchema = z.object({
@@ -36,9 +37,8 @@ export type SignInFormProps = {
 };
 
 export const SignInForm = ({ className }: SignInFormProps) => {
-  const searchParams = useSearchParams();
   const { toast } = useToast();
-  const [showPassword, setShowPassword] = useState(false);
+  const searchParams = useSearchParams();
 
   const {
     register,
@@ -52,30 +52,26 @@ export const SignInForm = ({ className }: SignInFormProps) => {
     resolver: zodResolver(ZSignInFormSchema),
   });
 
-  const timer = useRef<NodeJS.Timeout | null>(null);
+  const errorCode = searchParams?.get('error');
 
   useEffect(() => {
-    const error = searchParams?.get('error');
-    if (error) {
-      timer.current = setTimeout(() => {
-        // FIXME: Toast not firing without the TimeOut
+    const timeout: NodeJS.Timeout | null = null;
+
+    if (isErrorCode(errorCode)) {
+      setTimeout(() => {
         toast({
           variant: 'destructive',
-          description:
-            // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-            ErrorMessages[searchParams?.get('error') as keyof typeof ErrorMessages] ??
-            'an unknown error occurred',
+          description: ErrorMessages[errorCode] ?? 'An unknown error occurred',
         });
-      }, 100);
+      }, 0);
     }
+
     return () => {
-      if (timer.current) {
-        clearInterval(timer.current);
+      if (timeout) {
+        clearTimeout(timeout);
       }
-      timer.current = null;
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [errorCode, toast]);
 
   const onFormSubmit = async ({ email, password }: TSignInFormSchema) => {
     try {
