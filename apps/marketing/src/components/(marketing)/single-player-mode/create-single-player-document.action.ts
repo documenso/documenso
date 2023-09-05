@@ -10,8 +10,7 @@ import { z } from 'zod';
 import { mailer } from '@documenso/email/mailer';
 import { render } from '@documenso/email/render';
 import { DocumentSelfSignedEmailTemplate } from '@documenso/email/templates/document-self-signed';
-import { SERVICE_USER_EMAIL } from '@documenso/lib/constants/app';
-import { FROM_ADDRESS, FROM_NAME } from '@documenso/lib/constants/email';
+import { FROM_ADDRESS, FROM_NAME, SERVICE_USER_EMAIL } from '@documenso/lib/constants/email';
 import { insertFieldInPDF } from '@documenso/lib/server-only/pdf/insert-field-in-pdf';
 import { prisma } from '@documenso/prisma';
 import {

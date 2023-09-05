@@ -4,15 +4,15 @@ import { getDocumentAndRecipientByToken } from '@documenso/lib/server-only/docum
 
 import SinglePlayerModeSuccess from '~/components/(marketing)/single-player-mode/single-player-mode-success';
 
-export type SinglePlayerModeTokenSuccessPageProps = {
+export type SinglePlayerModeSuccessPageProps = {
   params: {
     token?: string;
   };
 };
 
-export default async function SinglePlayerModeTokenSuccessPage({
+export default async function SinglePlayerModeSuccessPage({
   params: { token },
-}: SinglePlayerModeTokenSuccessPageProps) {
+}: SinglePlayerModeSuccessPageProps) {
   if (!token) {
     return notFound();
   }

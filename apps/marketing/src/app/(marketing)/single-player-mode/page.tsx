@@ -208,16 +208,14 @@ export default function SinglePlayerModePage() {
 
             {/* Enter user details and signature. */}
             {step === 'sign' && (
-              <>
-                <AddSignatureFormPartial
-                  documentFlow={documentFlow.sign}
-                  numberOfSteps={Object.keys(documentFlow).length}
-                  fields={fields}
-                  onSubmit={onSignSubmit}
-                  requireName={Boolean(fields.find((field) => field.type === 'NAME'))}
-                  requireSignature={Boolean(fields.find((field) => field.type === 'SIGNATURE'))}
-                />
-              </>
+              <AddSignatureFormPartial
+                documentFlow={documentFlow.sign}
+                numberOfSteps={Object.keys(documentFlow).length}
+                fields={fields}
+                onSubmit={onSignSubmit}
+                requireName={Boolean(fields.find((field) => field.type === 'NAME'))}
+                requireSignature={Boolean(fields.find((field) => field.type === 'SIGNATURE'))}
+              />
             )}
           </DocumentFlowFormContainer>
         </div>
