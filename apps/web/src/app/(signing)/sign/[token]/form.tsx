@@ -50,6 +50,14 @@ export const SigningForm = ({ document, recipient, fields }: SigningFormProps) =
     }
   };
 
+  const onSigningComplete = async () => {
+    await completeDocumentWithToken({
+      token: recipient.token,
+      documentId: document.id,
+    });
+
+    router.push(`/sign/${recipient.token}/complete`);
+  };
   return (
     <form
       className={cn(
@@ -127,7 +135,9 @@ export const SigningForm = ({ document, recipient, fields }: SigningFormProps) =
                   <div className="text-center">
                     <div className="text-xl font-semibold text-neutral-800">Sign Document</div>
                     <div className="text-muted-foreground mx-auto w-4/5 py-2 text-center">
-                      You are about to finish signing "{document.title}". Are you sure?
+                      You are about to finish signing "{document.title}".
+                      <br />
+                      Are you sure?
                     </div>
                   </div>
 
@@ -148,14 +158,7 @@ export const SigningForm = ({ document, recipient, fields }: SigningFormProps) =
                         type="button"
                         className="flex-1"
                         disabled={!isComplete || isSubmitting}
-                        onClick={async () => {
-                          await completeDocumentWithToken({
-                            token: recipient.token,
-                            documentId: document.id,
-                          });
-
-                          router.push(`/sign/${recipient.token}/complete`);
-                        }}
+                        onClick={onSigningComplete}
                       >
                         {isSubmitting && <Loader className="mr-2 h-5 w-5 animate-spin" />}
                         Sign
