@@ -55,10 +55,10 @@ export const SignInForm = ({ className }: SignInFormProps) => {
   const errorCode = searchParams?.get('error');
 
   useEffect(() => {
-    const timeout: NodeJS.Timeout | null = null;
+    let timeout: NodeJS.Timeout | null = null;
 
     if (isErrorCode(errorCode)) {
-      setTimeout(() => {
+      timeout = setTimeout(() => {
         toast({
           variant: 'destructive',
           description: ErrorMessages[errorCode] ?? 'An unknown error occurred',
