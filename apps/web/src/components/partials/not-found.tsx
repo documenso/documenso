@@ -1,7 +1,6 @@
 'use client';
 
 import Image from 'next/image';
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
 import { motion } from 'framer-motion';
@@ -12,7 +11,11 @@ import { Button } from '@documenso/ui/primitives/button';
 
 import backgroundPattern from '~/assets/background-pattern.png';
 
-export default function NotFound() {
+export type NotFoundPartialProps = {
+  children?: React.ReactNode;
+};
+
+export default function NotFoundPartial({ children }: NotFoundPartialProps) {
   const router = useRouter();
 
   return (
@@ -54,9 +57,7 @@ export default function NotFound() {
               Go Back
             </Button>
 
-            <Button className="w-32" asChild>
-              <Link href="/">Home</Link>
-            </Button>
+            {children}
           </div>
         </div>
       </div>
