@@ -5,6 +5,7 @@ import { createElement } from 'react';
 import { DateTime } from 'luxon';
 import { nanoid } from 'nanoid';
 import { PDFDocument } from 'pdf-lib';
+import { match } from 'ts-pattern';
 import { z } from 'zod';
 
 import { mailer } from '@documenso/email/mailer';
@@ -190,21 +191,11 @@ const mapFields = (
   field: TCreateSinglePlayerDocumentSchema['fields'][number],
   signer: TCreateSinglePlayerDocumentSchema['signer'],
 ) => {
-  let customText = '';
-
-  switch (field.type) {
-    case FieldType.DATE:
-      customText = DateTime.now().toFormat('yyyy-MM-dd hh:mm a');
-      break;
-
-    case FieldType.EMAIL:
-      customText = signer.email;
-      break;
-
-    case FieldType.NAME:
-      customText = signer.name;
-      break;
-  }
+  const customText = match(field.type)
+    .with(FieldType.DATE, () => DateTime.now().toFormat('yyyy-MM-dd hh:mm a'))
+    .with(FieldType.EMAIL, () => signer.email)
+    .with(FieldType.NAME, () => signer.name)
+    .otherwise(() => '');
 
   return {
     type: field.type,
