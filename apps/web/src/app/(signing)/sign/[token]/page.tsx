@@ -14,6 +14,7 @@ import { ElementVisible } from '@documenso/ui/primitives/element-visible';
 import { LazyPDFViewer } from '@documenso/ui/primitives/lazy-pdf-viewer';
 
 import { DateField } from './date-field';
+import { EmailField } from './email-field';
 import { SigningForm } from './form';
 import { NameField } from './name-field';
 import { SigningProvider } from './provider';
@@ -86,6 +87,9 @@ export default async function SigningPage({ params: { token } }: SigningPageProp
               ))
               .with(FieldType.DATE, () => (
                 <DateField key={field.id} field={field} recipient={recipient} />
+              ))
+              .with(FieldType.EMAIL, () => (
+                <EmailField key={field.id} field={field} recipient={recipient} />
               ))
               .otherwise(() => null),
           )}
