@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "description": "This module can be used to add payments feature in other apps",
   "main": "index.ts",
+  "dependemcies": {
+    "@documenso/lib": "*"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
