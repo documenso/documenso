@@ -1,6 +1,10 @@
 import { ArrowRight, CheckCircle2 } from 'lucide-react';
 
-export default function EmptyDocumentState({ status }: { status: string }) {
+import { ExtendedDocumentStatus } from '@documenso/prisma/types/extended-document-status';
+
+export type EmptyDocumentProps = { status: ExtendedDocumentStatus };
+
+export default function EmptyDocumentState({ status }: EmptyDocumentProps) {
   let headerText = 'All done';
   let bodyText = 'All documents signed for now.';
   let extraText = '';
