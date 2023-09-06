@@ -36,12 +36,14 @@ export const SigningCard3D = ({ name, signingCelebrationImage }: SigningCardProp
   // Should use % based dimensions by calculating the window height/width.
   const boundary = 400;
 
-  const [mouseInBoundary, setMouseInBoundary] = useState(false);
+  const [trackMouse, setTrackMouse] = useState(false);
+
+  const timeoutRef = useRef<NodeJS.Timeout>();
 
   const cardX = useMotionValue(0);
   const cardY = useMotionValue(0);
-  const rotateX = useTransform(cardY, [-300, 300], [8, -8]);
-  const rotateY = useTransform(cardX, [-300, 300], [-8, 8]);
+  const rotateX = useTransform(cardY, [-600, 600], [8, -8]);
+  const rotateY = useTransform(cardX, [-600, 600], [-8, 8]);
 
   const diagonalMovement = useTransform<number, number>(
     [rotateX, rotateY],
@@ -53,7 +55,7 @@ export const SigningCard3D = ({ name, signingCelebrationImage }: SigningCardProp
   const sheenGradient = useMotionTemplate`linear-gradient(
     30deg,
     transparent,
-    rgba(200 200 200 / ${mouseInBoundary ? sheenOpacity : 0}) ${sheenPosition}%,
+    rgba(200 200 200 / ${trackMouse ? sheenOpacity : 0}) ${sheenPosition}%,
     transparent)`;
 
   const cardRef = useRef<HTMLDivElement>(null);
@@ -75,27 +77,32 @@ export const SigningCard3D = ({ name, signingCelebrationImage }: SigningCardProp
       const offsetX = event.clientX - x;
       const offsetY = event.clientY - y;
 
-      // Mouse leaves exit boundary.
-      if (Math.abs(offsetX) > boundary || Math.abs(offsetY) > boundary) {
-        if (mouseInBoundary) {
-          void animate(cardX, 0, { duration: 0.4 });
-          void animate(cardY, 0, { duration: 0.4 });
-
-          setMouseInBoundary(false);
-        }
-
-        return;
-      }
+      // Calculate distance between the mouse pointer and center of the card.
+      const distance = Math.sqrt(offsetX * offsetX + offsetY * offsetY);
 
       // Mouse enters enter boundary.
-      if (Math.abs(offsetX) < boundary && Math.abs(offsetY) < boundary && !mouseInBoundary) {
-        setMouseInBoundary(true);
+      if (distance <= boundary && !trackMouse) {
+        setTrackMouse(true);
+      }
+
+      if (!trackMouse) {
+        return;
       }
 
       void animate(cardX, offsetX, { duration: 0.125 });
       void animate(cardY, offsetY, { duration: 0.125 });
+
+      clearTimeout(timeoutRef.current);
+
+      // Revert the card back to the center position after the mouse stops moving.
+      timeoutRef.current = setTimeout(() => {
+        void animate(cardX, 0, { duration: 2, ease: 'backInOut' });
+        void animate(cardY, 0, { duration: 2, ease: 'backInOut' });
+
+        setTrackMouse(false);
+      }, 1000);
     },
-    [cardX, cardY, cardCenterPosition, mouseInBoundary],
+    [cardX, cardY, cardCenterPosition, trackMouse],
   );
 
   useEffect(() => {

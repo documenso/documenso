@@ -2,6 +2,8 @@
 
 import { useState } from 'react';
 
+import Link from 'next/link';
+
 import { Share } from 'lucide-react';
 
 import { useIsMounted } from '@documenso/lib/client-only/hooks/use-is-mounted';
@@ -34,12 +36,15 @@ export default function SinglePlayerModeSuccess({
   }
 
   return (
-    <div className="flex min-h-[calc(100vh-13rem)] flex-col items-center justify-center">
+    <div className="flex min-h-[calc(100vh-10rem)] flex-col items-center justify-center sm:min-h-[calc(100vh-13rem)]">
       <ConfettiScreen duration={3000} gravity={0.075} initialVelocityY={50} wind={0.005} />
 
-      <h2 className="mb-6 max-w-[35ch] text-center text-2xl font-semibold leading-normal md:text-3xl lg:text-4xl">
-        You have signed "{document.title}"
+      <h2 className="text-center text-2xl font-semibold leading-normal md:text-3xl lg:mb-1 lg:text-4xl">
+        You have signed
       </h2>
+      <h3 className="text-foreground/80 mb-6 text-center text-lg font-semibold md:text-xl lg:mb-8 lg:text-3xl">
+        {document.title}
+      </h3>
 
       <SigningCard3D
         name={document.Recipient.name || document.Recipient.email}
@@ -68,6 +73,17 @@ export default function SinglePlayerModeSuccess({
           </div>
         </div>
       </div>
+
+      <p className="text-muted-foreground/60 mt-36 text-center text-sm">
+        Want to send slick signing links like this one?{' '}
+        <Link
+          href="https://documenso.com"
+          target="_blank"
+          className="text-documenso-700 hover:text-documenso-600 whitespace-nowrap"
+        >
+          Check out Documenso.
+        </Link>
+      </p>
 
       <DocumentDialog
         document={document.document}
