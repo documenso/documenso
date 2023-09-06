@@ -1,5 +1,9 @@
 'use client';
 
+import { useEffect } from 'react';
+
+import { useSearchParams } from 'next/navigation';
+
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Loader } from 'lucide-react';
 import { signIn } from 'next-auth/react';
@@ -7,11 +11,19 @@ import { useForm } from 'react-hook-form';
 import { FcGoogle } from 'react-icons/fc';
 import { z } from 'zod';
 
+import { ErrorCode, isErrorCode } from '@documenso/lib/next-auth/error-codes';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
 import { Input } from '@documenso/ui/primitives/input';
 import { Label } from '@documenso/ui/primitives/label';
 import { useToast } from '@documenso/ui/primitives/use-toast';
+
+const ErrorMessages = {
+  [ErrorCode.CREDENTIALS_NOT_FOUND]: 'The email or password provided is incorrect',
+  [ErrorCode.INCORRECT_EMAIL_PASSWORD]: 'The email or password provided is incorrect',
+  [ErrorCode.USER_MISSING_PASSWORD]:
+    'This account appears to be using a social login method, please sign in using that method',
+};
 
 export const ZSignInFormSchema = z.object({
   email: z.string().email().min(1),
@@ -26,6 +38,7 @@ export type SignInFormProps = {
 
 export const SignInForm = ({ className }: SignInFormProps) => {
   const { toast } = useToast();
+  const searchParams = useSearchParams();
 
   const {
     register,
@@ -38,6 +51,27 @@ export const SignInForm = ({ className }: SignInFormProps) => {
     },
     resolver: zodResolver(ZSignInFormSchema),
   });
+
+  const errorCode = searchParams?.get('error');
+
+  useEffect(() => {
+    let timeout: NodeJS.Timeout | null = null;
+
+    if (isErrorCode(errorCode)) {
+      timeout = setTimeout(() => {
+        toast({
+          variant: 'destructive',
+          description: ErrorMessages[errorCode] ?? 'An unknown error occurred',
+        });
+      }, 0);
+    }
+
+    return () => {
+      if (timeout) {
+        clearTimeout(timeout);
+      }
+    };
+  }, [errorCode, toast]);
 
   const onFormSubmit = async ({ email, password }: TSignInFormSchema) => {
     try {
