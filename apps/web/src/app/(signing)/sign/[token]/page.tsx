@@ -45,10 +45,6 @@ export default async function SigningPage({ params: { token } }: SigningPageProp
     return notFound();
   }
 
-  if (document?.status === 'COMPLETED') {
-    redirect(`/sign/${token}/complete`);
-  }
-
   const user = await getServerComponentSession();
 
   const documentDataUrl = await getFile(documentData)
