@@ -1,5 +1,7 @@
 import Link from 'next/link';
 
+import { CheckCircle2 } from 'lucide-react';
+
 import { getRequiredServerComponentSession } from '@documenso/lib/next-auth/get-server-session';
 import { findDocuments } from '@documenso/lib/server-only/document/find-documents';
 import { getStats } from '@documenso/lib/server-only/document/get-stats';
@@ -89,8 +91,21 @@ export default async function DocumentsPage({ searchParams = {} }: DocumentsPage
       </div>
 
       <div className="mt-8">
-        <DocumentsDataTable results={results} />
+        {results.count > 0 && <DocumentsDataTable results={results} />}
+        {results.count === 0 && <EmptyDocumentState />}
       </div>
     </div>
   );
 }
+
+const EmptyDocumentState = () => {
+  return (
+    <div className="text-muted-foreground/50 flex h-96 flex-col items-center justify-center space-y-3">
+      <CheckCircle2 className="text-muted-foreground/50 h-14 w-14" />
+      <div className="text-center">
+        <h3 className="text-lg font-semibold">All done</h3>
+        <p>All documents signed for now.</p>
+      </div>
+    </div>
+  );
+};
