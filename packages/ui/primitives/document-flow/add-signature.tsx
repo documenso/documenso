@@ -83,33 +83,82 @@ export const AddSignatureFormPartial = ({
    */
   const [localFields, setLocalFields] = useState(
     fields.map((field) => {
-      let inserted = field.inserted;
       let customText = field.customText;
 
-      switch (field.type) {
-        case FieldType.NAME:
-          inserted = form.getValues('name').length > 0;
-          break;
-        case FieldType.EMAIL:
-          inserted = form.getValues('email').length > 0;
-          break;
-        case FieldType.SIGNATURE:
-          inserted = form.getValues('signature').length > 0;
-          break;
-        case FieldType.DATE:
-          inserted = true;
-
-          // Todo: Extract.
-          customText = DateTime.now().toFormat('yyyy-MM-dd hh:mm a');
-          break;
-        default:
-          inserted = true;
-          break;
+      if (field.type === FieldType.DATE) {
+        customText = DateTime.now().toFormat('yyyy-MM-dd hh:mm a');
       }
+
+      const inserted = match(field.type)
+        .with(FieldType.DATE, () => true)
+        .with(FieldType.NAME, () => form.getValues('name').length > 0)
+        .with(FieldType.EMAIL, () => form.getValues('email').length > 0)
+        .with(FieldType.SIGNATURE, () => form.getValues('signature').length > 0)
+        .otherwise(() => true);
 
       return { ...field, inserted, customText };
     }),
   );
+
+  const onEmailInputBlur = () => {
+    setLocalFields((prev) =>
+      prev.map((field) => {
+        if (field.type !== FieldType.EMAIL) {
+          return field;
+        }
+
+        const value = form.getValues('email');
+
+        return {
+          ...field,
+          customText: value,
+          inserted: value.length > 0,
+        };
+      }),
+    );
+  };
+
+  const onNameInputBlur = () => {
+    setLocalFields((prev) =>
+      prev.map((field) => {
+        if (field.type !== FieldType.NAME) {
+          return field;
+        }
+
+        const value = form.getValues('name');
+
+        return {
+          ...field,
+          customText: value,
+          inserted: value.length > 0,
+        };
+      }),
+    );
+  };
+
+  const onSignatureInputChange = (value: string) => {
+    setLocalFields((prev) =>
+      prev.map((field) => {
+        if (field.type !== FieldType.SIGNATURE) {
+          return field;
+        }
+
+        return {
+          ...field,
+          value: value ?? '',
+          inserted: true,
+          Signature: {
+            id: -1,
+            recipientId: -1,
+            fieldId: -1,
+            created: new Date(),
+            signatureImageAsBase64: value,
+            typedSignature: null,
+          },
+        };
+      }),
+    );
+  };
 
   return (
     <Form {...form}>
@@ -130,22 +179,7 @@ export const AddSignatureFormPartial = ({
                       {...field}
                       onBlur={() => {
                         field.onBlur();
-
-                        setLocalFields((prev) => {
-                          return prev.map((field) => {
-                            if (field.type !== FieldType.EMAIL) {
-                              return field;
-                            }
-
-                            const value = form.getValues('email');
-
-                            return {
-                              ...field,
-                              customText: value,
-                              inserted: value.length > 0,
-                            };
-                          });
-                        });
+                        onEmailInputBlur();
                       }}
                     />
                   </FormControl>
@@ -167,22 +201,7 @@ export const AddSignatureFormPartial = ({
                         {...field}
                         onBlur={() => {
                           field.onBlur();
-
-                          setLocalFields((prev) => {
-                            return prev.map((field) => {
-                              if (field.type !== FieldType.NAME) {
-                                return field;
-                              }
-
-                              const value = form.getValues('name');
-
-                              return {
-                                ...field,
-                                customText: value,
-                                inserted: value.length > 0,
-                              };
-                            });
-                          });
+                          onNameInputBlur();
                         }}
                       />
                     </FormControl>
@@ -214,28 +233,7 @@ export const AddSignatureFormPartial = ({
                             defaultValue={field.value}
                             onChange={(value) => {
                               field.onChange(value ?? '');
-
-                              setLocalFields((prev) => {
-                                return prev.map((field) => {
-                                  if (field.type !== FieldType.SIGNATURE) {
-                                    return field;
-                                  }
-
-                                  return {
-                                    ...field,
-                                    value: value ?? '',
-                                    inserted: true,
-                                    Signature: {
-                                      id: -1,
-                                      created: new Date(),
-                                      recipientId: -1,
-                                      fieldId: -1,
-                                      signatureImageAsBase64: value,
-                                      typedSignature: null,
-                                    },
-                                  };
-                                });
-                              });
+                              onSignatureInputChange(value ?? '');
                             }}
                           />
                         </CardContent>

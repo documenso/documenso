@@ -67,7 +67,7 @@ export const createSinglePlayerDocument = async (
     const isSignatureField = field.type === FieldType.SIGNATURE;
 
     await insertFieldInPDF(doc, {
-      ...mapFields(field, signer),
+      ...mapField(field, signer),
       Signature: isSignatureField
         ? {
             created: createdAt,
@@ -98,7 +98,7 @@ export const createSinglePlayerDocument = async (
       },
     });
 
-    // Create document and recipient.
+    // Create document.
     const document = await tx.document.create({
       data: {
         title: documentName,
@@ -106,56 +106,53 @@ export const createSinglePlayerDocument = async (
         userId: serviceUser.id,
         document: Buffer.from(pdfBytes).toString('base64'),
         created: createdAt,
-        Recipient: {
-          create: {
-            name: signer.name,
-            email: signer.email,
-            token: documentToken,
-            signedAt: createdAt,
-            readStatus: ReadStatus.OPENED,
-            signingStatus: SigningStatus.SIGNED,
-            sendStatus: SendStatus.SENT,
-          },
-        },
+      },
+    });
+
+    // Create recipient.
+    const recipient = await tx.recipient.create({
+      data: {
+        documentId: document.id,
+        name: signer.name,
+        email: signer.email,
+        token: documentToken,
+        signedAt: createdAt,
+        readStatus: ReadStatus.OPENED,
+        signingStatus: SigningStatus.SIGNED,
+        sendStatus: SendStatus.SENT,
       },
     });
 
     // Create fields and signatures.
     await Promise.all(
-      fields.map((field) =>
-        tx.field.create({
+      fields.map(async (field) => {
+        const insertedField = await tx.field.create({
           data: {
             documentId: document.id,
-            ...mapFields(field, signer),
-            Signature:
-              field.type === FieldType.SIGNATURE
-                ? {
-                    create: {
-                      Recipient: {
-                        connect: {
-                          documentId_email: {
-                            email: signer.email,
-                            documentId: document.id,
-                          },
-                        },
-                      },
-                      signatureImageAsBase64: signatureImageAsBase64,
-                      typedSignature,
-                    },
-                  }
-                : undefined,
+            recipientId: recipient.id,
+            ...mapField(field, signer),
           },
-        }),
-      ),
+        });
+
+        if (field.type === FieldType.SIGNATURE || field.type === FieldType.FREE_SIGNATURE) {
+          await tx.signature.create({
+            data: {
+              fieldId: insertedField.id,
+              signatureImageAsBase64,
+              typedSignature,
+              recipientId: recipient.id,
+            },
+          });
+        }
+      }),
     );
 
     return documentToken;
   });
 
-  // Todo: Handle `downloadLink` and `reviewLink`.
+  // Todo: Handle `downloadLink`
   const template = createElement(DocumentSelfSignedEmailTemplate, {
     downloadLink: 'https://documenso.com',
-    reviewLink: 'https://documenso.com',
     documentName: documentName,
     assetBaseUrl: process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000',
   });
@@ -187,7 +184,7 @@ export const createSinglePlayerDocument = async (
  * @param signer The details of the person who is signing this document.
  * @returns A field compatible with Prisma.
  */
-const mapFields = (
+const mapField = (
   field: TCreateSinglePlayerDocumentSchema['fields'][number],
   signer: TCreateSinglePlayerDocumentSchema['signer'],
 ) => {

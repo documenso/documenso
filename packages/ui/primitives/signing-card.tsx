@@ -6,6 +6,7 @@ import Image, { StaticImageData } from 'next/image';
 
 import { animate, motion, useMotionTemplate, useMotionValue, useTransform } from 'framer-motion';
 
+import { cn } from '@documenso/ui/lib/utils';
 import { Card, CardContent } from '@documenso/ui/primitives/card';
 
 export type SigningCardProps = {
@@ -118,7 +119,7 @@ export const SigningCard3D = ({ name, signingCelebrationImage }: SigningCardProp
           rotateY,
         }}
       >
-        <SigningCardContent name={name} />
+        <SigningCardContent className="bg-transparent" name={name} />
       </motion.div>
 
       {signingCelebrationImage && (
@@ -130,12 +131,16 @@ export const SigningCard3D = ({ name, signingCelebrationImage }: SigningCardProp
 
 type SigningCardContentProps = {
   name: string;
+  className?: string;
 };
 
-const SigningCardContent = ({ name }: SigningCardContentProps) => {
+const SigningCardContent = ({ className, name }: SigningCardContentProps) => {
   return (
     <Card
-      className="group mx-auto flex aspect-[21/9] w-full items-center justify-center"
+      className={cn(
+        'group mx-auto flex aspect-[21/9] w-full items-center justify-center',
+        className,
+      )}
       degrees={-145}
       gradient
     >

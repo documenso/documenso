@@ -8,13 +8,14 @@ import { createPortal } from 'react-dom';
 import { useIsMounted } from '@documenso/lib/client-only/hooks/use-is-mounted';
 import { useWindowSize } from '@documenso/lib/client-only/hooks/use-window-size';
 
-export default function ConfettiScreen(
-  props: React.ComponentPropsWithoutRef<typeof Confetti> & { duration?: number },
-) {
-  const { width, height } = useWindowSize();
+export default function ConfettiScreen({
+  numberOfPieces: numberOfPiecesProp = 200,
+  ...props
+}: React.ComponentPropsWithoutRef<typeof Confetti> & { duration?: number }) {
   const isMounted = useIsMounted();
+  const { width, height } = useWindowSize();
 
-  const [numberOfPieces, setNumberOfPieces] = useState(props.numberOfPieces ?? 200);
+  const [numberOfPieces, setNumberOfPieces] = useState(numberOfPiecesProp);
 
   useEffect(() => {
     if (!props.duration) {

@@ -7,8 +7,8 @@ import { X } from 'lucide-react';
 
 import { cn } from '@documenso/ui/lib/utils';
 
-import { Dialog, DialogOverlay, DialogPortal } from './dialog';
-import { LazyPDFViewerNoLoader } from './lazy-pdf-viewer';
+import { Dialog, DialogOverlay, DialogPortal } from '../../primitives/dialog';
+import { LazyPDFViewerNoLoader } from '../../primitives/lazy-pdf-viewer';
 
 export type DocumentDialogProps = {
   document: string;

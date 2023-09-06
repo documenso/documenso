@@ -47,7 +47,7 @@ export const PDFViewer = ({
 
   const [width, setWidth] = useState(0);
   const [numPages, setNumPages] = useState(0);
-  const [pdfError, setPdfError] = useState<boolean>(false);
+  const [pdfError, setPdfError] = useState(false);
 
   const onDocumentLoaded = (doc: LoadedPDFDocument) => {
     setNumPages(doc.numPages);

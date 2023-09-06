@@ -128,31 +128,15 @@ export default function SinglePlayerModePage() {
     sendStatus: 'NOT_SENT',
   };
 
-  const onFileDrop = (file: File) => {
+  const onFileDrop = async (file: File) => {
     try {
-      const fileReader = new FileReader();
+      const arrayBuffer = await file.arrayBuffer();
+      const base64String = Buffer.from(arrayBuffer).toString('base64');
 
-      fileReader.readAsDataURL(file);
-
-      fileReader.onload = function () {
-        if (typeof fileReader.result !== 'string') {
-          toast({
-            title: 'This file is not supported.',
-            variant: 'destructive',
-          });
-
-          return;
-        }
-
-        setUploadedFile({
-          name: file.name,
-          file: fileReader.result,
-        });
-      };
-
-      fileReader.onerror = function (e) {
-        throw e;
-      };
+      setUploadedFile({
+        name: file.name,
+        file: `data:application/pdf;base64,${base64String}`,
+      });
     } catch {
       toast({
         title: 'Something went wrong',

@@ -8,8 +8,8 @@ import { getDocumentAndSenderByToken } from '@documenso/lib/server-only/document
 import { getFieldsForToken } from '@documenso/lib/server-only/field/get-fields-for-token';
 import { getRecipientByToken } from '@documenso/lib/server-only/recipient/get-recipient-by-token';
 import { DocumentStatus, FieldType } from '@documenso/prisma/client';
+import { DocumentDownloadButton } from '@documenso/ui/components/document/document-download-button';
 import { Button } from '@documenso/ui/primitives/button';
-import { DocumentDownloadButton } from '@documenso/ui/primitives/document-download-button';
 import { SigningCard } from '@documenso/ui/primitives/signing-card';
 
 import signingCelebration from '~/assets/signing-celebration.png';

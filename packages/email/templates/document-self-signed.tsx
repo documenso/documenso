@@ -21,7 +21,6 @@ export type DocumentSelfSignedTemplateProps = TemplateDocumentSelfSignedProps;
 
 export const DocumentSelfSignedEmailTemplate = ({
   downloadLink = 'https://documenso.com',
-  reviewLink = 'https://documenso.com',
   documentName = 'Open Source Pledge.pdf',
   assetBaseUrl = 'http://localhost:3002',
 }: DocumentSelfSignedTemplateProps) => {
@@ -56,7 +55,6 @@ export const DocumentSelfSignedEmailTemplate = ({
 
                 <TemplateDocumentSelfSigned
                   downloadLink={downloadLink}
-                  reviewLink={reviewLink}
                   documentName={documentName}
                   assetBaseUrl={assetBaseUrl}
                 />
