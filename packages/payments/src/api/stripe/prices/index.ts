@@ -1,1 +1,1 @@
-export * from './get-stripe-products';
+export * from './get-stripe-prices';
