@@ -82,14 +82,14 @@ export const DataTableActionDropdown = ({ row }: DataTableActionDropdownProps) =
       <DropdownMenuContent className="w-52" align="start" forceMount>
         <DropdownMenuLabel>Action</DropdownMenuLabel>
 
-        <DropdownMenuItem disabled={!recipient} asChild>
+        <DropdownMenuItem disabled={!recipient || isComplete} asChild>
           <Link href={`/sign/${recipient?.token}`}>
             <Pencil className="mr-2 h-4 w-4" />
             Sign
           </Link>
         </DropdownMenuItem>
 
-        <DropdownMenuItem disabled={!isOwner} asChild>
+        <DropdownMenuItem disabled={!isOwner || isComplete} asChild>
           <Link href={`/documents/${row.id}`}>
             <Edit className="mr-2 h-4 w-4" />
             Edit
