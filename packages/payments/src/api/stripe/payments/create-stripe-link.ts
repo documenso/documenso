@@ -5,13 +5,18 @@
 /* eslint-disable @typescript-eslint/no-misused-promises */
 import { stripeProvider } from '../../../providers';
 
+export interface stripeLink {
+  id: string;
+  url: string;
+}
+
 /**
  * Generate stripe payment link
  * @param priceId `id` of the `price` object return by stripe
  * @param qty quantity of `product` to charge for
  * @returns Promise which resolves into stripes `payment` object
  */
-export const createStripeLink = (priceId: string, qty: number) => {
+export const createStripeLink = (priceId: string, qty: number): Promise<stripeLink> => {
   return new Promise(async (resolve, reject) => {
     try {
       const link = await stripeProvider.paymentLinks.create({

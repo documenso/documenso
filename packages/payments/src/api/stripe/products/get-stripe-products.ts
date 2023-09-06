@@ -5,10 +5,6 @@
 /* eslint-disable @typescript-eslint/no-misused-promises */
 import { stripeProvider } from '../../../providers';
 
-export interface stripeProductsResponse {
-  data: [stripeProduct];
-}
-
 export interface stripeProduct {
   id: string;
   name: string;
@@ -17,9 +13,7 @@ export interface stripeProduct {
 /**
  * Retrieve all `product` objects from stripe
  * @returns Promise which resolves into array of stripe's `product` objects
- */ export interface stripeProductsResponse {
-  data: [stripeProduct];
-}
+ */
 export const getStripeProduct = (): Promise<stripeProduct[]> => {
   return new Promise(async (resolve, reject) => {
     try {
