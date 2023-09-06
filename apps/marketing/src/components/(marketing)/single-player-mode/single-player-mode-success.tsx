@@ -8,9 +8,9 @@ import { useIsMounted } from '@documenso/lib/client-only/hooks/use-is-mounted';
 import { DocumentWithRecipient } from '@documenso/prisma/types/document-with-recipient';
 import DocumentDialog from '@documenso/ui/components/document/document-dialog';
 import { DocumentDownloadButton } from '@documenso/ui/components/document/document-download-button';
+import { SigningCard3D } from '@documenso/ui/components/signing-card';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
-import { SigningCard3D } from '@documenso/ui/primitives/signing-card';
 
 import signingCelebration from '~/assets/signing-celebration.png';
 import ConfettiScreen from '~/components/(marketing)/confetti-screen';
