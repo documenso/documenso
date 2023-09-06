@@ -3,7 +3,8 @@ import Link from "next/link";
 import { Button } from "@documenso/ui";
 import Logo from "./logo";
 import { ArrowLeftIcon } from "@heroicons/react/24/outline";
-import { FormProvider, useForm } from "react-hook-form";
+import XCircleIcon from "@heroicons/react/24/outline/XCircleIcon";
+import { useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
 
 interface ForgotPasswordForm {
@@ -11,7 +12,15 @@ interface ForgotPasswordForm {
 }
 
 export default function ForgotPassword() {
-  const { register, formState, resetField, handleSubmit } = useForm<ForgotPasswordForm>();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+    reset,
+  } = useForm<ForgotPasswordForm>({
+    criteriaMode: "all",
+  });
+
   const [resetSuccessful, setResetSuccessful] = useState(false);
 
   const onSubmit = async (values: ForgotPasswordForm) => {
@@ -50,9 +59,8 @@ export default function ForgotPassword() {
 
     if (response.ok) {
       setResetSuccessful(true);
+      reset();
     }
-
-    resetField("email");
   };
 
   return (
@@ -70,6 +78,20 @@ export default function ForgotPassword() {
                 : "No worries, we'll send you reset instructions."}
             </p>
           </div>
+
+          {errors.email && (
+            <div className="rounded-md bg-red-50 p-4">
+              <div className="flex">
+                <div className="flex-shrink-0">
+                  <XCircleIcon className="h-5 w-5 text-red-400" aria-hidden="true" />
+                </div>
+                <div className="ml-3">
+                  <h3 className="text-sm font-medium text-red-800">{errors.email.message}</h3>
+                </div>
+              </div>
+            </div>
+          )}
+
           {!resetSuccessful && (
             <form className="mt-8 space-y-6" onSubmit={handleSubmit(onSubmit)}>
               <div className="-space-y-px rounded-md shadow-sm">
@@ -78,7 +100,13 @@ export default function ForgotPassword() {
                     Email
                   </label>
                   <input
-                    {...register("email")}
+                    {...register("email", {
+                      required: "Email is required",
+                      pattern: {
+                        value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                        message: "Invalid email address",
+                      },
+                    })}
                     id="email-address"
                     name="email"
                     type="email"
@@ -93,13 +121,14 @@ export default function ForgotPassword() {
               <div>
                 <Button
                   type="submit"
-                  disabled={formState.isSubmitting}
+                  disabled={isSubmitting}
                   className="group relative flex w-full">
                   Reset password
                 </Button>
               </div>
             </form>
           )}
+
           <div>
             <Link href="/login">
               <div className="relative mt-10 flex items-center justify-center gap-2 text-sm text-gray-500 hover:cursor-pointer hover:text-gray-900">
