@@ -2,6 +2,18 @@ import { z } from 'zod';
 
 import { FieldType } from '@documenso/prisma/client';
 
+export const ZGetDocumentByIdQuerySchema = z.object({
+  id: z.number().min(1),
+});
+
+export type TGetDocumentByIdQuerySchema = z.infer<typeof ZGetDocumentByIdQuerySchema>;
+
+export const ZGetDocumentByTokenQuerySchema = z.object({
+  token: z.string().min(1),
+});
+
+export type TGetDocumentByTokenQuerySchema = z.infer<typeof ZGetDocumentByTokenQuerySchema>;
+
 export const ZSetRecipientsForDocumentMutationSchema = z.object({
   documentId: z.number(),
   recipients: z.array(

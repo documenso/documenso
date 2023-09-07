@@ -18,7 +18,14 @@ export const sealDocument = async ({ documentId }: SealDocumentOptions) => {
     where: {
       id: documentId,
     },
+    include: {
+      documentData: true,
+    },
   });
+
+  if (!document.documentData) {
+    throw new Error(`Document ${document.id} has no document data`);
+  }
 
   if (document.status !== DocumentStatus.COMPLETED) {
     throw new Error(`Document ${document.id} has not been completed`);
@@ -48,7 +55,7 @@ export const sealDocument = async ({ documentId }: SealDocumentOptions) => {
   }
 
   // !: Need to write the fields onto the document as a hard copy
-  const { document: pdfData } = document;
+  const { data: pdfData } = document.documentData;
 
   const doc = await PDFDocument.load(pdfData);
 
@@ -64,7 +71,11 @@ export const sealDocument = async ({ documentId }: SealDocumentOptions) => {
       status: DocumentStatus.COMPLETED,
     },
     data: {
-      document: Buffer.from(pdfBytes).toString('base64'),
+      documentData: {
+        update: {
+          data: Buffer.from(pdfBytes).toString('base64'),
+        },
+      },
     },
   });
 };

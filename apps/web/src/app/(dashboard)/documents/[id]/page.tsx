@@ -36,9 +36,11 @@ export default async function DocumentPage({ params }: DocumentPageProps) {
     userId: session.id,
   }).catch(() => null);
 
-  if (!document) {
+  if (!document || !document.documentData) {
     redirect('/documents');
   }
+
+  const { documentData } = document;
 
   const [recipients, fields] = await Promise.all([
     await getRecipientsForDocument({
@@ -91,7 +93,7 @@ export default async function DocumentPage({ params }: DocumentPageProps) {
 
       {document.status === InternalDocumentStatus.COMPLETED && (
         <div className="mx-auto mt-12 max-w-2xl">
-          <LazyPDFViewer document={`data:application/pdf;base64,${document.document}`} />
+          <LazyPDFViewer document={`data:application/pdf;base64,${documentData.data}`} />
         </div>
       )}
     </div>

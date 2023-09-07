@@ -4,7 +4,8 @@ import { useState } from 'react';
 
 import { useRouter } from 'next/navigation';
 
-import { Document, Field, Recipient, User } from '@documenso/prisma/client';
+import { Field, Recipient, User } from '@documenso/prisma/client';
+import { DocumentWithData } from '@documenso/prisma/types/document-with-data';
 import { cn } from '@documenso/ui/lib/utils';
 import { Card, CardContent } from '@documenso/ui/primitives/card';
 import { AddFieldsFormPartial } from '@documenso/ui/primitives/document-flow/add-fields';
@@ -28,7 +29,7 @@ import { completeDocument } from '~/components/forms/edit-document/add-subject.a
 export type EditDocumentFormProps = {
   className?: string;
   user: User;
-  document: Document;
+  document: DocumentWithData;
   recipients: Recipient[];
   fields: Field[];
 };
@@ -45,9 +46,11 @@ export const EditDocumentForm = ({
   const { toast } = useToast();
   const router = useRouter();
 
+  const { documentData } = document;
+
   const [step, setStep] = useState<EditDocumentStep>('signers');
 
-  const documentUrl = `data:application/pdf;base64,${document.document}`;
+  const documentUrl = `data:application/pdf;base64,${documentData?.data}`;
 
   const documentFlow: Record<EditDocumentStep, DocumentFlowStep> = {
     signers: {

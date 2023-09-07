@@ -14,8 +14,17 @@ import {
   XCircle,
 } from 'lucide-react';
 import { useSession } from 'next-auth/react';
+import { match } from 'ts-pattern';
 
-import { Document, DocumentStatus, Recipient, User } from '@documenso/prisma/client';
+import {
+  Document,
+  DocumentDataType,
+  DocumentStatus,
+  Recipient,
+  User,
+} from '@documenso/prisma/client';
+import { DocumentWithData } from '@documenso/prisma/types/document-with-data';
+import { trpc } from '@documenso/trpc/client';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -47,17 +56,42 @@ export const DataTableActionDropdown = ({ row }: DataTableActionDropdownProps) =
   const isComplete = row.status === DocumentStatus.COMPLETED;
   // const isSigned = recipient?.signingStatus === SigningStatus.SIGNED;
 
-  const onDownloadClick = () => {
-    let decodedDocument = row.document;
+  const onDownloadClick = async () => {
+    let document: DocumentWithData | null = null;
 
-    try {
-      decodedDocument = atob(decodedDocument);
-    } catch (err) {
-      // We're just going to ignore this error and try to download the document
-      console.error(err);
+    if (!recipient) {
+      document = await trpc.document.getDocumentById.query({
+        id: row.id,
+      });
+    } else {
+      document = await trpc.document.getDocumentByToken.query({
+        token: recipient.token,
+      });
     }
 
-    const documentBytes = Uint8Array.from(decodedDocument.split('').map((c) => c.charCodeAt(0)));
+    const documentData = document?.documentData;
+
+    if (!documentData) {
+      return;
+    }
+
+    const documentBytes = await match(documentData.type)
+      .with(DocumentDataType.BYTES, () =>
+        Uint8Array.from(documentData.data, (c) => c.charCodeAt(0)),
+      )
+      .with(DocumentDataType.BYTES_64, () =>
+        Uint8Array.from(
+          atob(documentData.data)
+            .split('')
+            .map((c) => c.charCodeAt(0)),
+        ),
+      )
+      .with(DocumentDataType.S3_PATH, async () =>
+        fetch(documentData.data)
+          .then(async (res) => res.arrayBuffer())
+          .then((buffer) => new Uint8Array(buffer)),
+      )
+      .exhaustive();
 
     const blob = new Blob([documentBytes], {
       type: 'application/pdf',
