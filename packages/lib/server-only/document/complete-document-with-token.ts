@@ -4,6 +4,7 @@ import { prisma } from '@documenso/prisma';
 import { DocumentStatus, SigningStatus } from '@documenso/prisma/client';
 
 import { sealDocument } from './seal-document';
+import { sendPendingEmail } from './send-recipient-signed-email';
 
 export type CompleteDocumentWithTokenOptions = {
   token: string;
@@ -68,6 +69,8 @@ export const completeDocumentWithToken = async ({
       signedAt: new Date(),
     },
   });
+
+  await sendPendingEmail({ document, recipient });
 
   const documents = await prisma.document.updateMany({
     where: {
