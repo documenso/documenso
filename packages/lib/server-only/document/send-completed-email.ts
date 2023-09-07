@@ -48,7 +48,7 @@ export const sendCompletedEmail = async ({ documentId }: SendDocumentOptions) =>
           name: process.env.NEXT_PRIVATE_SMTP_FROM_NAME || 'Documenso',
           address: process.env.NEXT_PRIVATE_SMTP_FROM_ADDRESS || 'noreply@documenso.com',
         },
-        subject: 'Everyone has signed!',
+        subject: 'Signing Complete!',
         html: render(template),
         text: render(template, { plainText: true }),
       });
