@@ -6,6 +6,7 @@ import { prisma } from '@documenso/prisma';
 import { DocumentStatus, SigningStatus } from '@documenso/prisma/client';
 
 import { insertFieldInPDF } from '../pdf/insert-field-in-pdf';
+import { sendCompletedEmail } from './send-completed-email';
 
 export type SealDocumentOptions = {
   documentId: number;
@@ -67,4 +68,6 @@ export const sealDocument = async ({ documentId }: SealDocumentOptions) => {
       document: Buffer.from(pdfBytes).toString('base64'),
     },
   });
+
+  await sendCompletedEmail({ documentId });
 };
