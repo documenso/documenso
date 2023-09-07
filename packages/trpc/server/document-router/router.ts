@@ -1,17 +1,63 @@
 import { TRPCError } from '@trpc/server';
 
+import { getDocumentById } from '@documenso/lib/server-only/document/get-document-by-id';
+import { getDocumentAndSenderByToken } from '@documenso/lib/server-only/document/get-document-by-token';
 import { sendDocument } from '@documenso/lib/server-only/document/send-document';
 import { setFieldsForDocument } from '@documenso/lib/server-only/field/set-fields-for-document';
 import { setRecipientsForDocument } from '@documenso/lib/server-only/recipient/set-recipients-for-document';
 
-import { authenticatedProcedure, router } from '../trpc';
+import { authenticatedProcedure, procedure, router } from '../trpc';
 import {
+  ZGetDocumentByIdQuerySchema,
+  ZGetDocumentByTokenQuerySchema,
   ZSendDocumentMutationSchema,
   ZSetFieldsForDocumentMutationSchema,
   ZSetRecipientsForDocumentMutationSchema,
 } from './schema';
 
 export const documentRouter = router({
+  getDocumentById: authenticatedProcedure
+    .input(ZGetDocumentByIdQuerySchema)
+    .query(async ({ input, ctx }) => {
+      try {
+        const { id } = input;
+
+        console.log({
+          id,
+          userId: ctx.user.id,
+        });
+
+        return await getDocumentById({
+          id,
+          userId: ctx.user.id,
+        });
+      } catch (err) {
+        console.error(err);
+
+        throw new TRPCError({
+          code: 'BAD_REQUEST',
+          message: 'We were unable to find this document. Please try again later.',
+        });
+      }
+    }),
+
+  getDocumentByToken: procedure.input(ZGetDocumentByTokenQuerySchema).query(async ({ input }) => {
+    try {
+      const { token } = input;
+
+      return await getDocumentAndSenderByToken({
+        token,
+      });
+    } catch (err) {
+      console.error(err);
+
+      throw new TRPCError({
+        code: 'BAD_REQUEST',
+        message: 'We were unable to find this document. Please try again later.',
+      });
+    }
+  }),
+
   setRecipientsForDocument: authenticatedProcedure
     .input(ZSetRecipientsForDocumentMutationSchema)
     .mutation(async ({ input, ctx }) => {

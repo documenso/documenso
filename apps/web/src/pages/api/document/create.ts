@@ -5,7 +5,7 @@ import { readFileSync } from 'fs';
 
 import { getServerSession } from '@documenso/lib/next-auth/get-server-session';
 import { prisma } from '@documenso/prisma';
-import { DocumentStatus } from '@documenso/prisma/client';
+import { DocumentDataType, DocumentStatus } from '@documenso/prisma/client';
 
 import {
   TCreateDocumentRequestSchema,
@@ -55,12 +55,20 @@ export default async function handler(
 
     const fileBuffer = readFileSync(file.filepath);
 
+    const bytes64 = fileBuffer.toString('base64');
+
     const document = await prisma.document.create({
       data: {
         title: file.originalFilename ?? file.newFilename,
         status: DocumentStatus.DRAFT,
         userId: user.id,
-        document: fileBuffer.toString('base64'),
+        documentData: {
+          create: {
+            type: DocumentDataType.BYTES_64,
+            data: bytes64,
+            initialData: bytes64,
+          },
+        },
         created: new Date(),
       },
     });

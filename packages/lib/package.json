@@ -12,6 +12,8 @@
   ],
   "scripts": {},
   "dependencies": {
+    "@aws-sdk/s3-request-presigner": "^3.405.0",
+    "@aws-sdk/client-s3": "^3.405.0",
     "@documenso/email": "*",
     "@documenso/prisma": "*",
     "@next-auth/prisma-adapter": "1.0.7",

@@ -40,13 +40,15 @@ export default async function SigningPage({ params: { token } }: SigningPageProp
     viewedDocument({ token }),
   ]);
 
-  if (!document) {
+  if (!document || !document.documentData) {
     return notFound();
   }
 
+  const { documentData } = document;
+
   const user = await getServerComponentSession();
 
-  const documentUrl = `data:application/pdf;base64,${document.document}`;
+  const documentUrl = `data:application/pdf;base64,${documentData.data}`;
 
   return (
     <SigningProvider email={recipient.email} fullName={recipient.name} signature={user?.signature}>
