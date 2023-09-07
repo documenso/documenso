@@ -3,14 +3,42 @@ import { createElement } from 'react';
 import { mailer } from '@documenso/email/mailer';
 import { render } from '@documenso/email/render';
 import { DocumentPendingEmailTemplate } from '@documenso/email/templates/document-pending';
-import { Document, Recipient } from '@documenso/prisma/client';
+import { prisma } from '@documenso/prisma';
 
 export interface SendPendingEmailOptions {
-  document: Document;
-  recipient: Recipient;
+  documentId: number;
+  recipientId: number;
 }
 
-export const sendPendingEmail = async ({ document, recipient }: SendPendingEmailOptions) => {
+export const sendPendingEmail = async ({ documentId, recipientId }: SendPendingEmailOptions) => {
+  const document = await prisma.document.findFirst({
+    where: {
+      id: documentId,
+      Recipient: {
+        some: {
+          id: recipientId,
+        },
+      },
+    },
+    include: {
+      Recipient: {
+        where: {
+          id: recipientId,
+        },
+      },
+    },
+  });
+
+  if (!document) {
+    throw new Error('Document not found');
+  }
+
+  if (document.Recipient.length === 0) {
+    throw new Error('Document has no recipients');
+  }
+
+  const [recipient] = document.Recipient;
+
   const { email, name } = recipient;
 
   const assetBaseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
