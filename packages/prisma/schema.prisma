@@ -26,6 +26,7 @@ model User {
   sessions         Session[]
   Document         Document[]
   Subscription     Subscription[]
+  Template         Template[]
 }
 
 enum SubscriptionStatus {
@@ -165,4 +166,28 @@ model Signature {
 
   Recipient Recipient @relation(fields: [recipientId], references: [id], onDelete: Cascade)
   Field     Field     @relation(fields: [fieldId], references: [id], onDelete: Restrict)
+}
+
+enum TemplateType {
+  PRIVATE
+  PUBLIC
+}
+
+model Template {
+  id         Int             @id @default(autoincrement())
+  name       String
+  slug       String          @unique
+  kind       TemplateType
+  ownerId    Int
+  owner      User            @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  documentId Int
+  document   DocumentContent @relation(fields: [documentId], references: [id], onDelete: Cascade)
+
+  @@index([ownerId])
+}
+
+model DocumentContent {
+  id        Int        @id @default(autoincrement())
+  content   String
+  templates Template[]
 }
