@@ -9,6 +9,7 @@ import { DocumentStatus, SigningStatus } from '@documenso/prisma/client';
 import { getFile } from '../../universal/upload/get-file';
 import { putFile } from '../../universal/upload/put-file';
 import { insertFieldInPDF } from '../pdf/insert-field-in-pdf';
+import { sendCompletedEmail } from './send-completed-email';
 
 export type SealDocumentOptions = {
   documentId: number;
@@ -86,4 +87,6 @@ export const sealDocument = async ({ documentId }: SealDocumentOptions) => {
       data: newData,
     },
   });
+
+  await sendCompletedEmail({ documentId });
 };

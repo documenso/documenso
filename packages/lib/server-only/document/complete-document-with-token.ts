@@ -70,6 +70,7 @@ export const completeDocumentWithToken = async ({
     },
   });
 
+  // TODO: Send email to documents with two or more recipients
   await sendPendingEmail({ document, recipient });
 
   const documents = await prisma.document.updateMany({
