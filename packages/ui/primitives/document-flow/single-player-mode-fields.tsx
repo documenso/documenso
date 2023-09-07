@@ -78,6 +78,14 @@ export function SinglePlayerModeFieldCardContainer({
 }
 
 export function SinglePlayerModeSignatureField({ field }: { field: FieldWithSignature }) {
+  const fontVariable = '--font-signature';
+  const fontVariableValue = getComputedStyle(document.documentElement).getPropertyValue(
+    fontVariable,
+  );
+
+  const minFontSize = MIN_HANDWRITING_FONT_SIZE;
+  const maxFontSize = DEFAULT_HANDWRITING_FONT_SIZE;
+
   if (!isSignatureFieldType(field.type)) {
     throw new Error('Invalid field type');
   }
@@ -92,10 +100,10 @@ export function SinglePlayerModeSignatureField({ field }: { field: FieldWithSign
       width,
     },
     $paragraphEl,
+    maxFontSize,
+    fontVariableValue,
   );
 
-  const minFontSize = MIN_HANDWRITING_FONT_SIZE;
-  const maxFontSize = DEFAULT_HANDWRITING_FONT_SIZE;
   const fontSize = maxFontSize * scalingFactor;
 
   const insertedBase64Signature = field.inserted && field.Signature?.signatureImageAsBase64;
@@ -130,6 +138,7 @@ export function SinglePlayerModeSignatureField({ field }: { field: FieldWithSign
               ref={$paragraphEl}
               style={{
                 fontSize: `clamp(${minFontSize}px, ${fontSize}px, ${maxFontSize}px)`,
+                fontFamily: `var(${fontVariable})`,
               }}
               className="font-signature"
             >
@@ -145,6 +154,14 @@ export function SinglePlayerModeSignatureField({ field }: { field: FieldWithSign
 }
 
 export function SinglePlayerModeCustomTextField({ field }: { field: Field }) {
+  const fontVariable = '--font-sans';
+  const fontVariableValue = getComputedStyle(document.documentElement).getPropertyValue(
+    fontVariable,
+  );
+
+  const minFontSize = MIN_STANDARD_FONT_SIZE;
+  const maxFontSize = DEFAULT_STANDARD_FONT_SIZE;
+
   if (isSignatureFieldType(field.type)) {
     throw new Error('Invalid field type');
   }
@@ -159,10 +176,10 @@ export function SinglePlayerModeCustomTextField({ field }: { field: Field }) {
       width,
     },
     $paragraphEl,
+    maxFontSize,
+    fontVariableValue,
   );
 
-  const minFontSize = MIN_STANDARD_FONT_SIZE;
-  const maxFontSize = DEFAULT_STANDARD_FONT_SIZE;
   const fontSize = maxFontSize * scalingFactor;
 
   return (
@@ -172,8 +189,8 @@ export function SinglePlayerModeCustomTextField({ field }: { field: Field }) {
           ref={$paragraphEl}
           style={{
             fontSize: `clamp(${minFontSize}px, ${fontSize}px, ${maxFontSize}px)`,
+            fontFamily: `var(${fontVariable})`,
           }}
-          className="duration-200"
         >
           {field.customText}
         </p>
