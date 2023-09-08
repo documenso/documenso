@@ -1,8 +1,11 @@
 import { z } from 'zod';
 
+import {
+  TFeatureFlagValue,
+  ZFeatureFlagValueSchema,
+} from '@documenso/lib/client-only/providers/feature-flag.types';
+import { appBaseUrl } from '@documenso/lib/constants/app';
 import { LOCAL_FEATURE_FLAGS, isFeatureFlagEnabled } from '@documenso/lib/constants/feature-flags';
-
-import { TFeatureFlagValue, ZFeatureFlagValueSchema } from '~/providers/feature-flag.types';
 
 /**
  * Evaluate whether a flag is enabled for the current user.
@@ -21,7 +24,7 @@ export const getFlag = async (
     return LOCAL_FEATURE_FLAGS[flag] ?? true;
   }
 
-  const url = new URL(`${process.env.NEXT_PUBLIC_SITE_URL}/api/feature-flag/get`);
+  const url = new URL(`${appBaseUrl}/api/feature-flag/get`);
   url.searchParams.set('flag', flag);
 
   const response = await fetch(url, {
@@ -54,7 +57,7 @@ export const getAllFlags = async (
     return LOCAL_FEATURE_FLAGS;
   }
 
-  const url = new URL(`${process.env.NEXT_PUBLIC_SITE_URL}/api/feature-flag/all`);
+  const url = new URL(`${appBaseUrl}/api/feature-flag/all`);
 
   return fetch(url, {
     headers: {

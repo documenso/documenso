@@ -1,6 +1,6 @@
 import { headers } from 'next/headers';
 
-import { getAllFlags, getFlag } from './get-feature-flag';
+import { getAllFlags, getFlag } from '@documenso/lib/universal/get-feature-flag';
 
 /**
  * Evaluate whether a flag is enabled for the current user in a server component.

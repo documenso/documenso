@@ -4,12 +4,12 @@ import { redirect } from 'next/navigation';
 import { createCustomer } from '@documenso/ee/server-only/stripe/create-customer';
 import { getPortalSession } from '@documenso/ee/server-only/stripe/get-portal-session';
 import { getRequiredServerComponentSession } from '@documenso/lib/next-auth/get-server-session';
+import { getServerComponentFlag } from '@documenso/lib/server-only/feature-flags/get-server-component-feature-flag';
 import { getSubscriptionByUserId } from '@documenso/lib/server-only/subscription/get-subscription-by-user-id';
 import { SubscriptionStatus } from '@documenso/prisma/client';
 import { Button } from '@documenso/ui/primitives/button';
 
 import { LocaleDate } from '~/components/formatter/locale-date';
-import { getServerComponentFlag } from '~/helpers/get-server-component-feature-flag';
 
 export default async function BillingSettingsPage() {
   const user = await getRequiredServerComponentSession();

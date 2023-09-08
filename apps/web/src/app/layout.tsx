@@ -2,13 +2,13 @@ import { Suspense } from 'react';
 
 import { Caveat, Inter } from 'next/font/google';
 
+import { FeatureFlagProvider } from '@documenso/lib/client-only/providers/feature-flag';
+import { getServerComponentAllFlags } from '@documenso/lib/server-only/feature-flags/get-server-component-feature-flag';
 import { TrpcProvider } from '@documenso/trpc/react';
 import { cn } from '@documenso/ui/lib/utils';
 import { Toaster } from '@documenso/ui/primitives/toaster';
 import { TooltipProvider } from '@documenso/ui/primitives/tooltip';
 
-import { getServerComponentAllFlags } from '~/helpers/get-server-component-feature-flag';
-import { FeatureFlagProvider } from '~/providers/feature-flag';
 import { ThemeProvider } from '~/providers/next-theme';
 import { PlausibleProvider } from '~/providers/plausible';
 import { PostHogPageview } from '~/providers/posthog';

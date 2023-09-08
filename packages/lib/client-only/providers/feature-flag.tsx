@@ -7,8 +7,7 @@ import {
   LOCAL_FEATURE_FLAGS,
   isFeatureFlagEnabled,
 } from '@documenso/lib/constants/feature-flags';
-
-import { getAllFlags } from '~/helpers/get-feature-flag';
+import { getAllFlags } from '@documenso/lib/universal/get-feature-flag';
 
 import { TFeatureFlagValue } from './feature-flag.types';
 

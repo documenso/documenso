@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -58,6 +58,14 @@ export default function SinglePlayerModePage() {
   };
 
   const currentDocumentFlow = documentFlow[step];
+
+  useEffect(() => {
+    analytics.startSessionRecording('marketing_session_recording_spm');
+
+    return () => {
+      analytics.stopSessionRecording();
+    };
+  }, [analytics]);
 
   /**
    * Insert the selected fields into the local state.

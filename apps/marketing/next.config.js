@@ -14,7 +14,10 @@ const config = {
   },
   reactStrictMode: true,
   transpilePackages: ['@documenso/lib', '@documenso/prisma', '@documenso/trpc', '@documenso/ui'],
-  env,
+  env: {
+    NEXT_PUBLIC_APP: 'marketing',
+    ...env,
+  },
 };
 
 module.exports = withContentlayer(config);

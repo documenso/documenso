@@ -1,4 +1,9 @@
 /**
+ * The flag name for global session recording feature flag.
+ */
+export const FEATURE_FLAG_GLOBAL_SESSION_RECORDING = 'global_session_recording';
+
+/**
  * How frequent to poll for new feature flags in milliseconds.
  */
 export const FEATURE_FLAG_POLL_INTERVAL = 30000;

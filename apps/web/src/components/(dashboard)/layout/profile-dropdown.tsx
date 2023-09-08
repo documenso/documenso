@@ -15,6 +15,7 @@ import {
 import { signOut } from 'next-auth/react';
 import { useTheme } from 'next-themes';
 
+import { useFeatureFlags } from '@documenso/lib/client-only/providers/feature-flag';
 import { User } from '@documenso/prisma/client';
 import { Avatar, AvatarFallback } from '@documenso/ui/primitives/avatar';
 import { Button } from '@documenso/ui/primitives/button';
@@ -26,8 +27,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@documenso/ui/primitives/dropdown-menu';
-
-import { useFeatureFlags } from '~/providers/feature-flag';
 
 export type ProfileDropdownProps = {
   user: User;
