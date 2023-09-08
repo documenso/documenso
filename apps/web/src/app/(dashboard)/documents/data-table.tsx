@@ -4,11 +4,12 @@ import { useTransition } from 'react';
 
 import Link from 'next/link';
 
-import { Loader } from 'lucide-react';
+import { ArrowUpDown, Loader } from 'lucide-react';
 
 import { useUpdateSearchParams } from '@documenso/lib/client-only/hooks/use-update-search-params';
 import { FindResultSet } from '@documenso/lib/types/find-result-set';
 import { Document, Recipient, User } from '@documenso/prisma/client';
+import { Button } from '@documenso/ui/primitives/button';
 import { DataTable } from '@documenso/ui/primitives/data-table';
 import { DataTablePagination } from '@documenso/ui/primitives/data-table-pagination';
 
@@ -51,7 +52,16 @@ export const DocumentsDataTable = ({ results }: DocumentsDataTableProps) => {
             accessorKey: 'id',
           },
           {
-            header: 'Title',
+            accessorKey: 'title',
+            header: ({ column }) => (
+              <Button
+                variant="ghost"
+                onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+              >
+                Title
+                <ArrowUpDown className="ml-2 h-4 w-4" />
+              </Button>
+            ),
             cell: ({ row }) => (
               <Link
                 href={`/documents/${row.original.id}`}
@@ -64,7 +74,7 @@ export const DocumentsDataTable = ({ results }: DocumentsDataTableProps) => {
           },
           {
             header: 'Recipient',
-            accessorKey: 'recipient',
+            accessorKey: 'Recipient',
             cell: ({ row }) => {
               return <StackAvatarsWithTooltip recipients={row.original.Recipient} />;
             },
@@ -75,7 +85,15 @@ export const DocumentsDataTable = ({ results }: DocumentsDataTableProps) => {
             cell: ({ row }) => <DocumentStatus status={row.getValue('status')} />,
           },
           {
-            header: 'Created',
+            header: ({ column }) => (
+              <Button
+                variant="ghost"
+                onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+              >
+                Created
+                <ArrowUpDown className="ml-2 h-4 w-4" />
+              </Button>
+            ),
             accessorKey: 'created',
             cell: ({ row }) => <LocaleDate date={row.getValue('created')} />,
           },

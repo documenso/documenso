@@ -5,10 +5,12 @@ import React, { useMemo } from 'react';
 import {
   ColumnDef,
   PaginationState,
+  SortingState,
   Table as TTable,
   Updater,
   flexRender,
   getCoreRowModel,
+  getSortedRowModel,
   useReactTable,
 } from '@tanstack/react-table';
 
@@ -35,6 +37,8 @@ export function DataTable<TData, TValue>({
   onPaginationChange,
   children,
 }: DataTableProps<TData, TValue>) {
+  const [sorting, setSorting] = React.useState<SortingState>([]);
+
   const pagination = useMemo<PaginationState>(() => {
     if (currentPage !== undefined && perPage !== undefined) {
       return {
@@ -65,8 +69,11 @@ export function DataTable<TData, TValue>({
     data,
     columns,
     getCoreRowModel: getCoreRowModel(),
+    onSortingChange: setSorting,
+    getSortedRowModel: getSortedRowModel(),
     state: {
       pagination: manualPagination ? pagination : undefined,
+      sorting,
     },
     manualPagination,
     pageCount: totalPages,
