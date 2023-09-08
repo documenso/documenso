@@ -37,9 +37,9 @@ type TCardData = {
     | 'NOT_SIGNED'
     | 'SENT'
     | 'NOT_SENT';
-}[];
+};
 
-const CARD_DATA: TCardData = [
+const CARD_DATA: TCardData[] = [
   {
     icon: UserSquare2,
     title: 'Total recipients in the database',

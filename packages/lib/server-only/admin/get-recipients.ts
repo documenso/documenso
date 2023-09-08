@@ -7,14 +7,21 @@ export const getRecipientsStats = async () => {
     _count: true,
   });
 
-  return {
-    TOTAL_RECIPIENTS: results.length,
-    [ReadStatus.OPENED]: results.filter((r) => r.readStatus === 'OPENED')?.[0]?._count ?? 0,
-    [ReadStatus.NOT_OPENED]: results.filter((r) => r.readStatus === 'NOT_OPENED')?.[0]?._count ?? 0,
-    [SigningStatus.SIGNED]: results.filter((r) => r.signingStatus === 'SIGNED')?.[0]?._count ?? 0,
-    [SigningStatus.NOT_SIGNED]:
-      results.filter((r) => r.signingStatus === 'NOT_SIGNED')?.[0]?._count ?? 0,
-    [SendStatus.SENT]: results.filter((r) => r.sendStatus === 'SENT')?.[0]?._count ?? 0,
-    [SendStatus.NOT_SENT]: results.filter((r) => r.sendStatus === 'NOT_SENT')?.[0]?._count ?? 0,
+  const stats = {
+    TOTAL_RECIPIENTS: 0,
+    [ReadStatus.OPENED]: 0,
+    [ReadStatus.NOT_OPENED]: 0,
+    [SigningStatus.SIGNED]: 0,
+    [SigningStatus.NOT_SIGNED]: 0,
+    [SendStatus.SENT]: 0,
+    [SendStatus.NOT_SENT]: 0,
   };
+  results.forEach((result) => {
+    const { readStatus, signingStatus, sendStatus, _count } = result;
+    stats[readStatus] += _count;
+    stats[signingStatus] += _count;
+    stats[sendStatus] += _count;
+    stats.TOTAL_RECIPIENTS += _count;
+  });
+  return stats;
 };
