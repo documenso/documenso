@@ -39,7 +39,7 @@ export default function SinglePlayerModeSuccess({
     <div className="flex min-h-[calc(100vh-10rem)] flex-col items-center justify-center sm:min-h-[calc(100vh-13rem)]">
       <ConfettiScreen duration={3000} gravity={0.075} initialVelocityY={50} wind={0.005} />
 
-      <h2 className="text-center text-2xl font-semibold leading-normal md:text-3xl lg:mb-1 lg:text-4xl">
+      <h2 className="text-center text-2xl font-semibold leading-normal md:text-3xl lg:mb-2 lg:text-4xl">
         You have signed
       </h2>
       <h3 className="text-foreground/80 mb-6 text-center text-lg font-semibold md:text-xl lg:mb-8 lg:text-3xl">
@@ -75,14 +75,15 @@ export default function SinglePlayerModeSuccess({
       </div>
 
       <p className="text-muted-foreground/60 mt-36 text-center text-sm">
-        Want to send slick signing links like this one?{' '}
+        View the{' '}
         <Link
-          href="https://documenso.com"
+          href="/pricing"
           target="_blank"
           className="text-documenso-700 hover:text-documenso-600 whitespace-nowrap"
         >
-          Check out Documenso.
-        </Link>
+          community plan
+        </Link>{' '}
+        to access the full range of features provided by Documenso
       </p>
 
       <DocumentDialog

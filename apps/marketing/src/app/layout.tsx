@@ -1,9 +1,12 @@
+import { Suspense } from 'react';
+
 import { Caveat, Inter } from 'next/font/google';
 
 import { cn } from '@documenso/ui/lib/utils';
 import { Toaster } from '@documenso/ui/primitives/toaster';
 
 import { PlausibleProvider } from '~/providers/plausible';
+import { PostHogPageview } from '~/providers/posthog';
 
 import './globals.css';
 
@@ -47,6 +50,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
         <link rel="manifest" href="/site.webmanifest" />
       </head>
+
+      <Suspense>
+        <PostHogPageview />
+      </Suspense>
 
       <body>
         <PlausibleProvider>{children}</PlausibleProvider>

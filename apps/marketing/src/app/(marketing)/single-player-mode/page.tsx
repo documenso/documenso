@@ -2,8 +2,10 @@
 
 import { useState } from 'react';
 
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
+import { useAnalytics } from '@documenso/lib/client-only/hooks/use-analytics';
 import { Field, Prisma, Recipient } from '@documenso/prisma/client';
 import { Card, CardContent } from '@documenso/ui/primitives/card';
 import { DocumentDropzone } from '@documenso/ui/primitives/document-dropzone';
@@ -24,8 +26,10 @@ import { createSinglePlayerDocument } from '~/components/(marketing)/single-play
 type SinglePlayerModeStep = 'fields' | 'sign';
 
 export default function SinglePlayerModePage() {
-  const { toast } = useToast();
+  const analytics = useAnalytics();
   const router = useRouter();
+
+  const { toast } = useToast();
 
   const [uploadedFile, setUploadedFile] = useState<{ name: string; file: string } | null>();
 
@@ -79,6 +83,8 @@ export default function SinglePlayerModePage() {
       })),
     );
 
+    analytics.capture('Marketing: SPM - Fields added');
+
     documentFlow.fields.onNextStep?.();
   };
 
@@ -103,6 +109,10 @@ export default function SinglePlayerModePage() {
           width: field.width.toNumber(),
           height: field.height.toNumber(),
         })),
+      });
+
+      analytics.capture('Marketing: SPM - Document signed', {
+        signer: data.email,
       });
 
       router.push(`/single-player-mode/${documentToken}/success`);
@@ -137,6 +147,8 @@ export default function SinglePlayerModePage() {
         name: file.name,
         file: `data:application/pdf;base64,${base64String}`,
       });
+
+      analytics.capture('Marketing: SPM - Document uploaded');
     } catch {
       toast({
         title: 'Something went wrong',
@@ -149,10 +161,18 @@ export default function SinglePlayerModePage() {
   return (
     <div className="mt-6 sm:mt-12">
       <div className="text-center">
-        <h1 className="text-3xl font-bold lg:text-5xl">Give it a go</h1>
+        <h1 className="text-3xl font-bold lg:text-5xl">Single Player Mode</h1>
 
         <p className="mt-4 text-lg leading-normal text-[#31373D]">
-          Upload a document to get started!
+          View our{' '}
+          <Link
+            href={'/pricing'}
+            target="_blank"
+            className="font-semibold transition-colors hover:text-[#31373D]/80"
+          >
+            community plan
+          </Link>{' '}
+          for exclusive features, including the ability to collaborate with multiple signers.
         </p>
       </div>
 

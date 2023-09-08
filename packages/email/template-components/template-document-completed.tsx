@@ -42,7 +42,7 @@ export const TemplateDocumentCompleted = ({
         </Text>
 
         <Text className="my-1 text-center text-base text-slate-400">
-          Continue by downloading or reviewing the document.
+          Continue by downloading the document.
         </Text>
 
         <Section className="mb-6 mt-8 text-center">

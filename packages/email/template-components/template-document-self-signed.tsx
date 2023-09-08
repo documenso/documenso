@@ -32,22 +32,27 @@ export const TemplateDocumentSelfSigned = ({
           <Img className="h-42" src={getAssetUrl('/static/document.png')} alt="Documenso" />
         </div>
 
+        <Text className="mb-4 flex items-center justify-center text-center text-base font-semibold text-[#7AC455]">
+          <Img src={getAssetUrl('/static/completed.png')} className="-mb-0.5 mr-2 inline h-7 w-7" />
+          Completed
+        </Text>
+
         <Text className="text-primary mb-0 text-center text-lg font-semibold">
           You have signed “{documentName}”
         </Text>
 
         <Text className="my-1 text-center text-base text-slate-400">
-          Continue by downloading or reviewing the document.
+          Check out our plans to access the full suite of features.
         </Text>
 
         <Section className="mb-6 mt-8 text-center">
-          {/* <Button
+          <Button
             className="mr-4 inline-flex items-center justify-center rounded-lg border border-solid border-slate-200 px-4 py-2 text-center text-sm font-medium text-black no-underline"
-            href={reviewLink}
+            href="https://documenso.com/pricing"
           >
             <Img src={getAssetUrl('/static/review.png')} className="-mb-1 mr-2 inline h-5 w-5" />
-            Review
-          </Button> */}
+            View plans
+          </Button>
           <Button
             className="inline-flex items-center justify-center rounded-lg border border-solid border-slate-200 px-4 py-2 text-center text-sm font-medium text-black no-underline"
             href={downloadLink}
