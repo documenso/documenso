@@ -38,7 +38,7 @@ export type ProfileDropdownProps = {
 export const ProfileDropdown = ({ user }: ProfileDropdownProps) => {
   const { theme, setTheme } = useTheme();
   const { getFlag } = useFeatureFlags();
-  const userIsAdmin = isAdmin(user);
+  const isUserAdmin = isAdmin(user);
 
   const isBillingEnabled = getFlag('app_billing');
 
@@ -69,7 +69,7 @@ export const ProfileDropdown = ({ user }: ProfileDropdownProps) => {
           </Link>
         </DropdownMenuItem>
 
-        {userIsAdmin && (
+        {isUserAdmin && (
           <DropdownMenuItem asChild>
             <Link href="/admin" className="cursor-pointer">
               <UserCog className="mr-2 h-4 w-4" />
