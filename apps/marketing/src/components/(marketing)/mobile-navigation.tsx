@@ -23,6 +23,10 @@ export const MENU_NAVIGATION_LINKS = [
     text: 'Pricing',
   },
   {
+    href: '/open',
+    text: 'Open',
+  },
+  {
     href: 'https://status.documenso.com',
     text: 'Status',
   },
@@ -59,7 +63,7 @@ export const MobileNavigation = ({ isMenuOpen, onMenuOpenChange }: MobileNavigat
           initial="initial"
           animate="animate"
           transition={{
-            staggerChildren: 0.2,
+            staggerChildren: 0.03,
           }}
         >
           {MENU_NAVIGATION_LINKS.map(({ href, text }) => (
@@ -75,6 +79,7 @@ export const MobileNavigation = ({ isMenuOpen, onMenuOpenChange }: MobileNavigat
                   x: 0,
                   transition: {
                     duration: 0.5,
+                    ease: 'backInOut',
                   },
                 },
               }}
