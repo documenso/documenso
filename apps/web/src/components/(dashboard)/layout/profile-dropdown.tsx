@@ -16,7 +16,7 @@ import {
 import { signOut } from 'next-auth/react';
 import { useTheme } from 'next-themes';
 
-import { isAdmin } from '@documenso/lib/';
+import { isAdmin } from '@documenso/lib/next-auth/guards/is-admin';
 import { User } from '@documenso/prisma/client';
 import { Avatar, AvatarFallback } from '@documenso/ui/primitives/avatar';
 import { Button } from '@documenso/ui/primitives/button';

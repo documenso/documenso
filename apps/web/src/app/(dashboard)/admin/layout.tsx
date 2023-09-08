@@ -1,7 +1,7 @@
 import { redirect } from 'next/navigation';
 
-import { isAdmin } from '@documenso/lib/';
 import { getRequiredServerComponentSession } from '@documenso/lib/next-auth/get-server-session';
+import { isAdmin } from '@documenso/lib/next-auth/guards/is-admin';
 
 export type AdminLayoutProps = {
   children: React.ReactNode;
