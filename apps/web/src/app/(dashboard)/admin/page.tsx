@@ -12,12 +12,12 @@ import {
   UserSquare2,
 } from 'lucide-react';
 
-import { getDocsCount } from '@documenso/lib/server-only/admin/get-documents';
-import { getRecipientsStats } from '@documenso/lib/server-only/admin/get-recipients';
+import { getDocsCount } from '@documenso/lib/server-only/admin/get-documents-stats';
+import { getRecipientsStats } from '@documenso/lib/server-only/admin/get-recipients-stats';
 import {
   getUsersCount,
   getUsersWithSubscriptionsCount,
-} from '@documenso/lib/server-only/admin/get-users';
+} from '@documenso/lib/server-only/admin/get-users-stats';
 import {
   ReadStatus as InternalReadStatus,
   SendStatus as InternalSendStatus,
