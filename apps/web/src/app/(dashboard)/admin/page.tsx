@@ -42,37 +42,37 @@ type TCardData = {
 const CARD_DATA: TCardData[] = [
   {
     icon: UserSquare2,
-    title: 'Total recipients in the database',
+    title: 'Recipients in the database',
     status: 'TOTAL_RECIPIENTS',
   },
   {
     icon: MailOpen,
-    title: 'Total recipients with opened count',
+    title: 'Opened documents',
     status: InternalReadStatus.OPENED,
   },
   {
     icon: Mail,
-    title: 'Total recipients with unopened count',
+    title: 'Unopened documents',
     status: InternalReadStatus.NOT_OPENED,
   },
   {
     icon: Send,
-    title: 'Total recipients with sent count',
+    title: 'Sent documents',
     status: InternalSendStatus.SENT,
   },
   {
     icon: Archive,
-    title: 'Total recipients with unsent count',
+    title: 'Unsent documents',
     status: InternalSendStatus.NOT_SENT,
   },
   {
     icon: PenTool,
-    title: 'Total recipients with signed count',
+    title: 'Signed documents',
     status: InternalSigningStatus.SIGNED,
   },
   {
     icon: FileX2,
-    title: 'Total recipients with unsigned count',
+    title: 'Unsigned documents',
     status: InternalSigningStatus.NOT_SIGNED,
   },
 ];
@@ -87,15 +87,22 @@ export default async function Admin() {
 
   return (
     <div className="mx-auto w-full max-w-screen-xl px-4 md:px-8">
-      <h1 className="text-4xl font-semibold">Documenso instance metrics</h1>
-      <div className="mt-8 grid grid-cols-1 gap-4 md:grid-cols-3">
+      <h2 className="text-4xl font-semibold">Instance metrics</h2>
+      <div className="mt-8 grid flex-1 grid-cols-1 gap-4 md:grid-cols-2">
         <CardMetric icon={LucideUser} title={'Total users in the database'} value={usersCount} />
         <CardMetric
           icon={UserPlus2}
           title={'Users with an active subscription'}
           value={usersWithSubscriptionsCount}
         />
+      </div>
+      <h2 className="my-8 text-4xl font-semibold">Document metrics</h2>
+      <div className="mt-8 grid flex-1 grid-cols-1 gap-4 md:grid-cols-2">
         <CardMetric icon={File} title={'Total documents in the database'} value={docsCount} />
+      </div>
+
+      <h2 className="my-8 text-4xl font-semibold">Recipients metrics</h2>
+      <div className="mt-8 grid flex-1 grid-cols-1 gap-4 md:grid-cols-3">
         {CARD_DATA.map((card) => (
           <div key={card.status}>
             <CardMetric icon={card.icon} title={card.title} value={recipientsStats[card.status]} />
