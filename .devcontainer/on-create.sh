@@ -16,6 +16,3 @@ set +a
 
 # Run the migrations
 npm run -w @documenso/prisma prisma:migrate-dev
-
-# Start the app
-npm run dev
