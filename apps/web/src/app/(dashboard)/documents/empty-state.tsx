@@ -1,4 +1,4 @@
-import { ArrowRight, CheckCircle2 } from 'lucide-react';
+import { ArrowRight, Bird, CheckCircle2 } from 'lucide-react';
 import { match } from 'ts-pattern';
 
 import { ExtendedDocumentStatus } from '@documenso/prisma/types/extended-document-status';
@@ -6,43 +6,44 @@ import { ExtendedDocumentStatus } from '@documenso/prisma/types/extended-documen
 export type EmptyDocumentProps = { status: ExtendedDocumentStatus };
 
 export default function EmptyDocumentState({ status }: EmptyDocumentProps) {
-  const { headerText, bodyText, extraText, showArrow } = match(status)
+  const {
+    title,
+    message,
+    icon: Icon,
+  } = match(status)
     .with(ExtendedDocumentStatus.COMPLETED, () => ({
-      headerText: 'Nothing here',
-      bodyText: 'There are no signed documents yet.',
-      extraText: 'Start by adding a document',
-      showArrow: true,
+      title: 'Nothing to do',
+      message:
+        'There are no completed documents yet. Documents that you have created or received that become completed will appear here later.',
+      icon: CheckCircle2,
     }))
     .with(ExtendedDocumentStatus.DRAFT, () => ({
-      headerText: 'Nothing here',
-      bodyText: 'There are no drafts yet.',
-      extraText: 'Start by adding a document',
-      showArrow: true,
+      title: 'No active drafts',
+      message:
+        'There are no active drafts at then current moment. You can upload a document to start drafting.',
+      icon: CheckCircle2,
     }))
     .with(ExtendedDocumentStatus.ALL, () => ({
-      headerText: 'Nothing here',
-      bodyText: 'There are no documents yet.',
-      extraText: 'Start by adding a document',
-      showArrow: true,
+      title: "We're all empty",
+      message:
+        'You have not yet created or received any documents. To create a document please upload one.',
+      icon: Bird,
     }))
     .otherwise(() => ({
-      headerText: 'All done',
-      bodyText: 'All documents signed for now.',
-      extraText: '',
-      showArrow: false,
+      title: 'Nothing to do',
+      message:
+        'All documents are currently actioned. Any new documents are sent or recieved they will start to appear here.',
+      icon: CheckCircle2,
     }));
 
   return (
-    <div className="text-muted-foreground/50 flex h-96 flex-col items-center justify-center space-y-3">
-      <CheckCircle2 className="text-muted-foreground/50 h-12 w-12" strokeWidth={1.5} />
+    <div className="text-muted-foreground/60 flex h-60 flex-col items-center justify-center gap-y-4">
+      <Icon className="h-12 w-12" strokeWidth={1.5} />
+
       <div className="text-center">
-        <h3 className="text-lg font-semibold">{headerText}</h3>
-        <p>{bodyText}</p>
-        {extraText && (
-          <p>
-            {extraText} {showArrow && <ArrowRight className="inline h-4 w-4" />}
-          </p>
-        )}
+        <h3 className="text-lg font-semibold">{title}</h3>
+
+        <p className="mt-2 max-w-[60ch]">{message}</p>
       </div>
     </div>
   );
