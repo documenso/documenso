@@ -22,7 +22,12 @@ import {
   CommandInput,
   CommandItem,
 } from '@documenso/ui/primitives/command';
-import { Popover, PopoverContent, PopoverTrigger } from '@documenso/ui/primitives/popover';
+import {
+  Popover,
+  PopoverClose,
+  PopoverContent,
+  PopoverTrigger,
+} from '@documenso/ui/primitives/popover';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@documenso/ui/primitives/tooltip';
 
 import { TAddFieldsFormSchema } from './add-fields.types';
@@ -324,7 +329,7 @@ export const AddFieldsFormPartial = ({
                 >
                   {selectedSigner?.email && (
                     <span className="flex-1 truncate text-left">
-                      {selectedSigner?.email} ({selectedSigner?.email})
+                      {selectedSigner?.name} ({selectedSigner?.email})
                     </span>
                   )}
 
@@ -345,45 +350,49 @@ export const AddFieldsFormPartial = ({
                     {recipients.map((recipient, index) => (
                       <CommandItem
                         key={index}
-                        className={cn({
-                          'text-muted-foreground': recipient.sendStatus === SendStatus.SENT,
-                        })}
+                        className="p-0"
                         onSelect={() => setSelectedSigner(recipient)}
                       >
-                        {recipient.sendStatus !== SendStatus.SENT ? (
-                          <Check
-                            aria-hidden={recipient !== selectedSigner}
-                            className={cn('mr-2 h-4 w-4 flex-shrink-0', {
-                              'opacity-0': recipient !== selectedSigner,
-                              'opacity-100': recipient === selectedSigner,
-                            })}
-                          />
-                        ) : (
-                          <Tooltip>
-                            <TooltipTrigger>
-                              <Info className="mr-2 h-4 w-4" />
-                            </TooltipTrigger>
-                            <TooltipContent className="max-w-xs">
-                              This document has already been sent to this recipient. You can no
-                              longer edit this recipient.
-                            </TooltipContent>
-                          </Tooltip>
-                        )}
+                        <PopoverClose
+                          className={cn('flex w-full px-1 py-2', {
+                            'text-muted-foreground': recipient.sendStatus === SendStatus.SENT,
+                          })}
+                        >
+                          {recipient.sendStatus !== SendStatus.SENT ? (
+                            <Check
+                              aria-hidden={recipient !== selectedSigner}
+                              className={cn('mr-2 h-4 w-4 flex-shrink-0', {
+                                'opacity-0': recipient !== selectedSigner,
+                                'opacity-100': recipient === selectedSigner,
+                              })}
+                            />
+                          ) : (
+                            <Tooltip>
+                              <TooltipTrigger>
+                                <Info className="mr-2 h-4 w-4" />
+                              </TooltipTrigger>
+                              <TooltipContent className="max-w-xs">
+                                This document has already been sent to this recipient. You can no
+                                longer edit this recipient.
+                              </TooltipContent>
+                            </Tooltip>
+                          )}
 
-                        {recipient.name && (
-                          <span
-                            className="truncate"
-                            title={`${recipient.name} (${recipient.email})`}
-                          >
-                            {recipient.name} ({recipient.email})
-                          </span>
-                        )}
+                          {recipient.name && (
+                            <span
+                              className="truncate"
+                              title={`${recipient.name} (${recipient.email})`}
+                            >
+                              {recipient.name} ({recipient.email})
+                            </span>
+                          )}
 
-                        {!recipient.name && (
-                          <span className="truncate" title={recipient.email}>
-                            {recipient.email}
-                          </span>
-                        )}
+                          {!recipient.name && (
+                            <span className="truncate" title={recipient.email}>
+                              {recipient.email}
+                            </span>
+                          )}
+                        </PopoverClose>
                       </CommandItem>
                     ))}
                   </CommandGroup>
