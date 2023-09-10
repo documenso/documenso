@@ -219,7 +219,7 @@ Want to create a production ready docker image? Follow these steps:
 
 - cd into `docker` directory
 - Make `build.sh` executable by running `chmod +x build.sh`
-- Run `./docker/build.sh` in the root directory.
+- Run `./build.sh` to start building the docker image.
 - Publish the image to your docker registry of choice (or) If you prefer running the image from local, run the below command
 
 ```
