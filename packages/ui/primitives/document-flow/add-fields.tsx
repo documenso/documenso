@@ -102,6 +102,7 @@ export const AddFieldsFormPartial = ({
 
   const [selectedField, setSelectedField] = useState<FieldType | null>(null);
   const [selectedSigner, setSelectedSigner] = useState<Recipient | null>(null);
+  const [showRecipientsSelector, setShowRecipientsSelector] = useState(false);
 
   const hasSelectedSignerBeenSent = selectedSigner?.sendStatus === SendStatus.SENT;
 
@@ -325,7 +326,7 @@ export const AddFieldsFormPartial = ({
           ))}
 
           {!hideRecipients && (
-            <Popover>
+            <Popover open={showRecipientsSelector} onOpenChange={setShowRecipientsSelector}>
               <PopoverTrigger asChild>
                 <Button
                   type="button"
@@ -335,7 +336,7 @@ export const AddFieldsFormPartial = ({
                 >
                   {selectedSigner?.email && (
                     <span className="flex-1 truncate text-left">
-                      {selectedSigner?.email} ({selectedSigner?.email})
+                      {selectedSigner?.name} ({selectedSigner?.email})
                     </span>
                   )}
 
@@ -359,7 +360,10 @@ export const AddFieldsFormPartial = ({
                         className={cn({
                           'text-muted-foreground': recipient.sendStatus === SendStatus.SENT,
                         })}
-                        onSelect={() => setSelectedSigner(recipient)}
+                        onSelect={() => {
+                          setSelectedSigner(recipient);
+                          setShowRecipientsSelector(false);
+                        }}
                       >
                         {recipient.sendStatus !== SendStatus.SENT ? (
                           <Check
