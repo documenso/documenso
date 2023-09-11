@@ -35,7 +35,7 @@ export type InferApiRoute<U extends (..._args: any) => any> = Awaited<
   ? T
   : never;
 
-type APIResponse<T> = TSuccessAPIResponse<T> | TErroredAPIResponse;
+type APIResponse<T> = TSuccessAPIResponse<NonNullable<T>> | TErroredAPIResponse;
 
 export const returnResponse = <T>(data: APIResponse<T>) => data;
 
@@ -68,12 +68,11 @@ const builder = <Context>(context: Context) => ({
                 const isZodError = error instanceof ZodError;
 
                 return NextResponse.json(
-                  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
                   returnResponse({
                     message: isZodError ? fromZodError(error).message : 'An unknown error occurred',
                     success: false,
                     data: null,
-                  }) as TErroredAPIResponse,
+                  }),
                   {
                     status: 500,
                   },
@@ -89,12 +88,11 @@ const builder = <Context>(context: Context) => ({
                 const isZodError = error instanceof ZodError;
 
                 return NextResponse.json(
-                  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
                   returnResponse({
                     message: isZodError ? fromZodError(error).message : 'An unknown error occurred',
                     success: false,
                     data: null,
-                  }) as TErroredAPIResponse,
+                  }),
                   {
                     status: 500,
                   },
@@ -105,6 +103,7 @@ const builder = <Context>(context: Context) => ({
             return await procedureFn({
               req,
               context,
+              // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
               input: { query: parsedQuery as T, body: parsedBody as V },
               res: NextResponse,
             });

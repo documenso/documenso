@@ -1,4 +1,4 @@
-import { TClaimPlanRequestSchema, ZClaimPlanResponseSchema } from './types';
+import type { ClaimPlanPostResponse, TClaimPlanRequestSchema } from '~/app/api/claim-plan/route';
 
 export const claimPlan = async ({
   name,
@@ -21,21 +21,15 @@ export const claimPlan = async ({
     },
   });
 
-  const body = await response.json();
+  const body = (await response.json()) as ClaimPlanPostResponse;
 
   if (response.status !== 200) {
     throw new Error('Failed to claim plan');
   }
 
-  const safeBody = ZClaimPlanResponseSchema.safeParse(body);
-
-  if (!safeBody.success) {
-    throw new Error('Failed to claim plan');
+  if (!body.success) {
+    throw new Error(`Failed to claim plan: ${body.message}`);
   }
 
-  if ('error' in safeBody.data) {
-    throw new Error(safeBody.data.error);
-  }
-
-  return safeBody.data.redirectUrl;
+  return body.data.redirectUrl;
 };
