@@ -87,7 +87,7 @@ export default async function Admin() {
 
   return (
     <div className="mx-auto w-full max-w-screen-xl px-4 md:px-8">
-      <h2 className="text-4xl font-semibold">Instance metrics</h2>
+      <h2 className="text-4xl font-semibold">Instance version: {process.env.APP_VERSION}</h2>
       <div className="mt-8 grid flex-1 grid-cols-1 gap-4 md:grid-cols-2">
         <CardMetric icon={LucideUser} title={'Total users in the database'} value={usersCount} />
         <CardMetric
