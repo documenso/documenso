@@ -16,7 +16,7 @@ import {
 import { signOut } from 'next-auth/react';
 import { useTheme } from 'next-themes';
 
-import { isAdmin } from '@documenso/lib/next-auth/guards/is-admin';
+import { initials } from '@documenso/lib/client-only/recipient-initials';
 import { User } from '@documenso/prisma/client';
 import { Avatar, AvatarFallback } from '@documenso/ui/primitives/avatar';
 import { Button } from '@documenso/ui/primitives/button';
@@ -42,19 +42,14 @@ export const ProfileDropdown = ({ user }: ProfileDropdownProps) => {
 
   const isBillingEnabled = getFlag('app_billing');
 
-  const initials =
-    user.name
-      ?.split(' ')
-      .map((name: string) => name.slice(0, 1).toUpperCase())
-      .slice(0, 2)
-      .join('') ?? 'UK';
+  const avatarFallback = user.name ? initials(user.name) : user.email.slice(0, 1).toUpperCase();
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" className="relative h-10 w-10 rounded-full">
           <Avatar className="h-10 w-10">
-            <AvatarFallback>{initials}</AvatarFallback>
+            <AvatarFallback>{avatarFallback}</AvatarFallback>
           </Avatar>
         </Button>
       </DropdownMenuTrigger>

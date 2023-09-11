@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { initials } from '@documenso/lib/client-only/recipient-initials';
+import { recipientAvatarFallback } from '@documenso/lib/client-only/recipient-avatar-fallback';
 import { getRecipientType } from '@documenso/lib/client-only/recipient-type';
 import { Recipient } from '@documenso/prisma/client';
 
@@ -26,7 +26,7 @@ export function StackAvatars({ recipients }: { recipients: Recipient[] }) {
           first={first}
           zIndex={String(zIndex - index * 10)}
           type={lastItemText && index === 4 ? 'unsigned' : getRecipientType(recipient)}
-          fallbackText={lastItemText ? lastItemText : initials(recipient.name)}
+          fallbackText={lastItemText ? lastItemText : recipientAvatarFallback(recipient)}
         />
       );
     });

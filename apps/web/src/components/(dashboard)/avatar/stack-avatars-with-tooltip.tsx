@@ -1,4 +1,4 @@
-import { initials } from '@documenso/lib/client-only/recipient-initials';
+import { recipientAvatarFallback } from '@documenso/lib/client-only/recipient-avatar-fallback';
 import { getRecipientType } from '@documenso/lib/client-only/recipient-type';
 import { Recipient } from '@documenso/prisma/client';
 import {
@@ -56,7 +56,7 @@ export const StackAvatarsWithTooltip = ({
                       first={true}
                       key={recipient.id}
                       type={getRecipientType(recipient)}
-                      fallbackText={initials(recipient.name)}
+                      fallbackText={recipientAvatarFallback(recipient)}
                     />
                     <span className="text-sm text-gray-500">{recipient.email}</span>
                   </div>
@@ -73,7 +73,7 @@ export const StackAvatarsWithTooltip = ({
                       first={true}
                       key={recipient.id}
                       type={getRecipientType(recipient)}
-                      fallbackText={initials(recipient.name)}
+                      fallbackText={recipientAvatarFallback(recipient)}
                     />
                     <span className="text-sm text-gray-500">{recipient.email}</span>
                   </div>
@@ -90,7 +90,7 @@ export const StackAvatarsWithTooltip = ({
                       first={true}
                       key={recipient.id}
                       type={getRecipientType(recipient)}
-                      fallbackText={initials(recipient.name)}
+                      fallbackText={recipientAvatarFallback(recipient)}
                     />
                     <span className="text-sm text-gray-500">{recipient.email}</span>
                   </div>
@@ -107,7 +107,7 @@ export const StackAvatarsWithTooltip = ({
                       first={true}
                       key={recipient.id}
                       type={getRecipientType(recipient)}
-                      fallbackText={initials(recipient.name)}
+                      fallbackText={recipientAvatarFallback(recipient)}
                     />
                     <span className="text-sm text-gray-500">{recipient.email}</span>
                   </div>
