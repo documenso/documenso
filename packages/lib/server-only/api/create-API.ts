@@ -9,7 +9,7 @@ type Config<Context> = {
   createContext(): Context;
 };
 
-type QueryFn<Context, Result, T, U> = (_data: {
+type ProcedureFn<Context, Result, T, U> = (_data: {
   req: Request;
   res: typeof NextResponse;
   context: Context;
@@ -27,6 +27,13 @@ interface TSuccessAPIResponse<T> {
   data: T;
   message: null;
 }
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type InferApiRoute<U extends (..._args: any) => any> = Awaited<
+  ReturnType<U>
+> extends NextResponse<infer T>
+  ? T
+  : never;
 
 type APIResponse<T> = TSuccessAPIResponse<T> | TErroredAPIResponse;
 
@@ -47,7 +54,9 @@ const builder = <Context>(context: Context) => ({
     return {
       input<T, V>(schema: { query?: ZodType<T>; body?: ZodType<V> } | undefined) {
         return {
-          async query<Result>(queryFn: QueryFn<Context, Result, ZodType<T>, ZodType<V>>) {
+          async procedure<Result>(
+            procedureFn: ProcedureFn<Context, Result, ZodType<T>, ZodType<V>>,
+          ) {
             const { searchParams } = new URL(req.url);
             let parsedQuery;
             let parsedBody;
@@ -59,11 +68,15 @@ const builder = <Context>(context: Context) => ({
                 const isZodError = error instanceof ZodError;
 
                 return NextResponse.json(
+                  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
                   returnResponse({
                     message: isZodError ? fromZodError(error).message : 'An unknown error occurred',
                     success: false,
                     data: null,
-                  }),
+                  }) as TErroredAPIResponse,
+                  {
+                    status: 500,
+                  },
                 );
               }
             }
@@ -76,16 +89,20 @@ const builder = <Context>(context: Context) => ({
                 const isZodError = error instanceof ZodError;
 
                 return NextResponse.json(
+                  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
                   returnResponse({
                     message: isZodError ? fromZodError(error).message : 'An unknown error occurred',
                     success: false,
                     data: null,
-                  }),
+                  }) as TErroredAPIResponse,
+                  {
+                    status: 500,
+                  },
                 );
               }
             }
 
-            return await queryFn({
+            return await procedureFn({
               req,
               context,
               input: { query: parsedQuery as T, body: parsedBody as V },
