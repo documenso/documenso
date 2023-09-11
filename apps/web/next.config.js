@@ -18,7 +18,9 @@ const config = {
     '@documenso/ui',
     '@documenso/email',
   ],
-  env,
+  env: {
+    APP_VERSION: process.env.npm_package_version,
+  },
   modularizeImports: {
     'lucide-react': {
       transform: 'lucide-react/dist/esm/icons/{{ kebabCase member }}',
