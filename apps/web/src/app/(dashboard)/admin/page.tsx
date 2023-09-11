@@ -3,11 +3,11 @@ import {
   File,
   FileX2,
   LucideIcon,
-  User as LucideUser,
   Mail,
   MailOpen,
   PenTool,
   Send,
+  User as UserIcon,
   UserPlus2,
   UserSquare2,
 } from 'lucide-react';
@@ -26,7 +26,7 @@ import {
 
 import { CardMetric } from '~/components/(dashboard)/metric-card/metric-card';
 
-type TCardData = {
+type CardData = {
   icon: LucideIcon;
   title: string;
   status:
@@ -39,7 +39,7 @@ type TCardData = {
     | 'NOT_SENT';
 };
 
-const CARD_DATA: TCardData[] = [
+const CARD_DATA: CardData[] = [
   {
     icon: UserSquare2,
     title: 'Recipients in the database',
@@ -89,7 +89,7 @@ export default async function Admin() {
     <div className="mx-auto w-full max-w-screen-xl px-4 md:px-8">
       <h2 className="text-4xl font-semibold">Instance version: {process.env.APP_VERSION}</h2>
       <div className="mt-8 grid flex-1 grid-cols-1 gap-4 md:grid-cols-2">
-        <CardMetric icon={LucideUser} title={'Total users in the database'} value={usersCount} />
+        <CardMetric icon={UserIcon} title={'Total users in the database'} value={usersCount} />
         <CardMetric
           icon={UserPlus2}
           title={'Users with an active subscription'}

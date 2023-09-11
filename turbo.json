@@ -13,6 +13,7 @@
   },
   "globalDependencies": ["**/.env.*local"],
   "globalEnv": [
+    "APP_VERSION",
     "NEXTAUTH_URL",
     "NEXTAUTH_SECRET",
     "NEXT_PUBLIC_APP_URL",
@@ -41,7 +42,6 @@
     "NEXT_PRIVATE_SMTP_SECURE",
     "NEXT_PRIVATE_SMTP_FROM_NAME",
     "NEXT_PRIVATE_SMTP_FROM_ADDRESS",
-    "NEXT_PRIVATE_STRIPE_API_KEY",
-    "APP_VERSION"
+    "NEXT_PRIVATE_STRIPE_API_KEY"
   ]
 }
