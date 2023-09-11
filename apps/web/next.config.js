@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 const path = require('path');
+const { version } = require('./package.json');
 
 const { parsed: env } = require('dotenv').config({
   path: path.join(__dirname, '../../.env.local'),
@@ -19,7 +20,8 @@ const config = {
     '@documenso/email',
   ],
   env: {
-    APP_VERSION: process.env.npm_package_version,
+    ...env,
+    APP_VERSION: version,
   },
   modularizeImports: {
     'lucide-react': {
