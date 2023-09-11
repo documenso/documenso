@@ -174,20 +174,22 @@ enum TemplateType {
 }
 
 model Template {
-  id         Int             @id @default(autoincrement())
-  name       String
-  slug       String          @unique
-  kind       TemplateType
-  ownerId    Int
-  owner      User            @relation(fields: [ownerId], references: [id], onDelete: Cascade)
-  documentId Int
-  document   DocumentContent @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  id          Int             @id @default(autoincrement())
+  name        String
+  slug        String          @unique
+  description String?
+  kind        TemplateType    @default(PRIVATE)
+  ownerId     Int
+  owner       User            @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  documentId  Int
+  document    DocumentContent @relation(fields: [documentId], references: [id], onDelete: Cascade)
 
   @@index([ownerId])
 }
 
 model DocumentContent {
   id        Int        @id @default(autoincrement())
+  name      String
   content   String
   templates Template[]
 }

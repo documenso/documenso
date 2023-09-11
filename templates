@@ -1,0 +1,10 @@
+Plan
+
+Take the document
+Take the details of the template
+Take the fields
+---??? Store it in the database with a templates schema
+
+Issues?
+
+Persist template details information.

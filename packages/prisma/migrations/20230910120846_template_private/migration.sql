@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "Template" ALTER COLUMN "kind" SET DEFAULT 'PRIVATE';
