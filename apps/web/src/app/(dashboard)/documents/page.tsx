@@ -11,8 +11,8 @@ import { PeriodSelector } from '~/components/(dashboard)/period-selector/period-
 import { PeriodSelectorValue } from '~/components/(dashboard)/period-selector/types';
 import { DocumentStatus } from '~/components/formatter/document-status';
 
-import { UploadDocument } from '../dashboard/upload-document';
 import { DocumentsDataTable } from './data-table';
+import { UploadDocument } from './upload-document';
 
 export type DocumentsPageProps = {
   searchParams?: {
@@ -71,35 +71,15 @@ export default async function DocumentsPage({ searchParams = {} }: DocumentsPage
               <Link href={getTabHref(InternalDocumentStatus.PENDING)}>
                 <DocumentStatus status={InternalDocumentStatus.PENDING} />
 
-                <span className="ml-1 hidden opacity-50 md:inline-block">
-                  {Math.min(stats.PENDING, 99)}
-                </span>
-              </Link>
-            </TabsTrigger>
-
-            <TabsTrigger className="min-w-[60px]" value={InternalDocumentStatus.COMPLETED} asChild>
-              <Link href={getTabHref(InternalDocumentStatus.COMPLETED)}>
-                <DocumentStatus status={InternalDocumentStatus.COMPLETED} />
-
-                <span className="ml-1 hidden opacity-50 md:inline-block">
-                  {Math.min(stats.COMPLETED, 99)}
-                </span>
-              </Link>
-            </TabsTrigger>
-
-            <TabsTrigger className="min-w-[60px]" value={InternalDocumentStatus.DRAFT} asChild>
-              <Link href={getTabHref(InternalDocumentStatus.DRAFT)}>
-                <DocumentStatus status={InternalDocumentStatus.DRAFT} />
-
-                <span className="ml-1 hidden opacity-50 md:inline-block">
-                  {Math.min(stats.DRAFT, 99)}
-                </span>
-              </Link>
-            </TabsTrigger>
-
-            <TabsTrigger className="min-w-[60px]" value="ALL" asChild>
-              <Link href={getTabHref('ALL')}>All</Link>
-            </TabsTrigger>
+                  {value !== ExtendedDocumentStatus.ALL && (
+                    <span className="ml-1 hidden opacity-50 md:inline-block">
+                      {Math.min(stats[value], 99)}
+                      {stats[value] > 99 && '+'}
+                    </span>
+                  )}
+                </Link>
+              </TabsTrigger>
+            ))}
           </TabsList>
         </Tabs>
 

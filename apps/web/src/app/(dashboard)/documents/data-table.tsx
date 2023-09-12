@@ -52,8 +52,9 @@ export const DocumentsDataTable = ({ results }: DocumentsDataTableProps) => {
       <DataTable
         columns={[
           {
-            header: 'ID',
-            accessorKey: 'id',
+            header: 'Created',
+            accessorKey: 'created',
+            cell: ({ row }) => <LocaleDate date={row.getValue('created')} />,
           },
           {
             header: 'Title',
@@ -72,11 +73,6 @@ export const DocumentsDataTable = ({ results }: DocumentsDataTableProps) => {
             cell: ({ row }) => <DocumentStatus status={row.getValue('status')} />,
           },
           {
-            header: 'Created',
-            accessorKey: 'created',
-            cell: ({ row }) => <LocaleDate date={row.getValue('created')} />,
-          },
-          {
             header: 'Actions',
             cell: ({ row }) => (
               <div className="flex items-center gap-x-4">
@@ -92,7 +88,7 @@ export const DocumentsDataTable = ({ results }: DocumentsDataTableProps) => {
         totalPages={results.totalPages}
         onPaginationChange={onPaginationChange}
       >
-        {(table) => <DataTablePagination table={table} />}
+        {(table) => <DataTablePagination additionalInformation="VisibleCount" table={table} />}
       </DataTable>
 
       {isPending && (
