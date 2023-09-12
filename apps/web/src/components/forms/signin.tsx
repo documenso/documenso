@@ -18,12 +18,14 @@ import { Input } from '@documenso/ui/primitives/input';
 import { Label } from '@documenso/ui/primitives/label';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
-const ErrorMessages = {
+const ERROR_MESSAGES = {
   [ErrorCode.CREDENTIALS_NOT_FOUND]: 'The email or password provided is incorrect',
   [ErrorCode.INCORRECT_EMAIL_PASSWORD]: 'The email or password provided is incorrect',
   [ErrorCode.USER_MISSING_PASSWORD]:
     'This account appears to be using a social login method, please sign in using that method',
 };
+
+const LOGIN_REDIRECT_PATH = '/documents';
 
 export const ZSignInFormSchema = z.object({
   email: z.string().email().min(1),
@@ -37,8 +39,9 @@ export type SignInFormProps = {
 };
 
 export const SignInForm = ({ className }: SignInFormProps) => {
-  const { toast } = useToast();
   const searchParams = useSearchParams();
+
+  const { toast } = useToast();
 
   const {
     register,
@@ -61,7 +64,7 @@ export const SignInForm = ({ className }: SignInFormProps) => {
       timeout = setTimeout(() => {
         toast({
           variant: 'destructive',
-          description: ErrorMessages[errorCode] ?? 'An unknown error occurred',
+          description: ERROR_MESSAGES[errorCode] ?? 'An unknown error occurred',
         });
       }, 0);
     }
@@ -78,12 +81,10 @@ export const SignInForm = ({ className }: SignInFormProps) => {
       await signIn('credentials', {
         email,
         password,
-        callbackUrl: '/documents',
+        callbackUrl: LOGIN_REDIRECT_PATH,
       }).catch((err) => {
         console.error(err);
       });
-
-      // throw new Error('Not implemented');
     } catch (err) {
       toast({
         title: 'An unknown error occurred',
@@ -95,8 +96,7 @@ export const SignInForm = ({ className }: SignInFormProps) => {
 
   const onSignInWithGoogleClick = async () => {
     try {
-      await signIn('google', { callbackUrl: '/dashboard' });
-      // throw new Error('Not implemented');
+      await signIn('google', { callbackUrl: LOGIN_REDIRECT_PATH });
     } catch (err) {
       toast({
         title: 'An unknown error occurred',

@@ -136,7 +136,7 @@ export const EditDocumentForm = ({
         duration: 5000,
       });
 
-      router.push('/dashboard');
+      router.push('/documents');
     } catch (err) {
       console.error(err);
 

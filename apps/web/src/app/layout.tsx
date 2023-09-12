@@ -2,6 +2,8 @@ import { Suspense } from 'react';
 
 import { Caveat, Inter } from 'next/font/google';
 
+import { LocaleProvider } from '@documenso/lib/client-only/providers/locale';
+import { getLocale } from '@documenso/lib/server-only/headers/get-locale';
 import { TrpcProvider } from '@documenso/trpc/react';
 import { cn } from '@documenso/ui/lib/utils';
 import { Toaster } from '@documenso/ui/primitives/toaster';
@@ -45,6 +47,8 @@ export const metadata = {
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const flags = await getServerComponentAllFlags();
 
+  const locale = getLocale();
+
   return (
     <html
       lang="en"
@@ -63,16 +67,18 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       </Suspense>
 
       <body>
-        <FeatureFlagProvider initialFlags={flags}>
-          <PlausibleProvider>
-            <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-              <TooltipProvider>
-                <TrpcProvider>{children}</TrpcProvider>
-              </TooltipProvider>
-            </ThemeProvider>
-          </PlausibleProvider>
-          <Toaster />
-        </FeatureFlagProvider>
+        <LocaleProvider locale={locale}>
+          <FeatureFlagProvider initialFlags={flags}>
+            <PlausibleProvider>
+              <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+                <TooltipProvider>
+                  <TrpcProvider>{children}</TrpcProvider>
+                </TooltipProvider>
+              </ThemeProvider>
+            </PlausibleProvider>
+            <Toaster />
+          </FeatureFlagProvider>
+        </LocaleProvider>
       </body>
     </html>
   );
