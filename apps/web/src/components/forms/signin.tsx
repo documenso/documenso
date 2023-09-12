@@ -37,8 +37,9 @@ export type SignInFormProps = {
 };
 
 export const SignInForm = ({ className }: SignInFormProps) => {
-  const { toast } = useToast();
   const searchParams = useSearchParams();
+
+  const { toast } = useToast();
 
   const {
     register,
@@ -53,6 +54,8 @@ export const SignInForm = ({ className }: SignInFormProps) => {
   });
 
   const errorCode = searchParams?.get('error');
+
+  const loginRedirectPath = '/documents';
 
   useEffect(() => {
     let timeout: NodeJS.Timeout | null = null;
@@ -78,12 +81,10 @@ export const SignInForm = ({ className }: SignInFormProps) => {
       await signIn('credentials', {
         email,
         password,
-        callbackUrl: '/documents',
+        callbackUrl: loginRedirectPath,
       }).catch((err) => {
         console.error(err);
       });
-
-      // throw new Error('Not implemented');
     } catch (err) {
       toast({
         title: 'An unknown error occurred',
@@ -95,8 +96,7 @@ export const SignInForm = ({ className }: SignInFormProps) => {
 
   const onSignInWithGoogleClick = async () => {
     try {
-      await signIn('google', { callbackUrl: '/dashboard' });
-      // throw new Error('Not implemented');
+      await signIn('google', { callbackUrl: loginRedirectPath });
     } catch (err) {
       toast({
         title: 'An unknown error occurred',
