@@ -2,9 +2,8 @@
 
 import { useTransition } from 'react';
 
-import Link from 'next/link';
-
 import { Loader } from 'lucide-react';
+import { useSession } from 'next-auth/react';
 
 import { useUpdateSearchParams } from '@documenso/lib/client-only/hooks/use-update-search-params';
 import { FindResultSet } from '@documenso/lib/types/find-result-set';
@@ -18,6 +17,7 @@ import { LocaleDate } from '~/components/formatter/locale-date';
 
 import { DataTableActionButton } from './data-table-action-button';
 import { DataTableActionDropdown } from './data-table-action-dropdown';
+import { DataTableTitle } from './data-table-title';
 
 export type DocumentsDataTableProps = {
   results: FindResultSet<
@@ -29,6 +29,7 @@ export type DocumentsDataTableProps = {
 };
 
 export const DocumentsDataTable = ({ results }: DocumentsDataTableProps) => {
+  const { data: session } = useSession();
   const [isPending, startTransition] = useTransition();
 
   const updateSearchParams = useUpdateSearchParams();
@@ -42,6 +43,10 @@ export const DocumentsDataTable = ({ results }: DocumentsDataTableProps) => {
     });
   };
 
+  if (!session) {
+    return null;
+  }
+
   return (
     <div className="relative">
       <DataTable
@@ -52,15 +57,7 @@ export const DocumentsDataTable = ({ results }: DocumentsDataTableProps) => {
           },
           {
             header: 'Title',
-            cell: ({ row }) => (
-              <Link
-                href={`/documents/${row.original.id}`}
-                title={row.original.title}
-                className="block max-w-[10rem] truncate font-medium hover:underline md:max-w-[20rem]"
-              >
-                {row.original.title}
-              </Link>
-            ),
+            cell: ({ row }) => <DataTableTitle row={row.original} />,
           },
           {
             header: 'Recipient',
