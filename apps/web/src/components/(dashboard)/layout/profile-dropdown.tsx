@@ -16,7 +16,7 @@ import {
 import { signOut } from 'next-auth/react';
 import { useTheme } from 'next-themes';
 
-import { initials } from '@documenso/lib/client-only/recipient-initials';
+import { recipientInitials } from '@documenso/lib/utils/recipient-formatter';
 import { User } from '@documenso/prisma/client';
 import { Avatar, AvatarFallback } from '@documenso/ui/primitives/avatar';
 import { Button } from '@documenso/ui/primitives/button';
@@ -42,7 +42,9 @@ export const ProfileDropdown = ({ user }: ProfileDropdownProps) => {
 
   const isBillingEnabled = getFlag('app_billing');
 
-  const avatarFallback = user.name ? initials(user.name) : user.email.slice(0, 1).toUpperCase();
+  const avatarFallback = user.name
+    ? recipientInitials(user.name)
+    : user.email.slice(0, 1).toUpperCase();
 
   return (
     <DropdownMenu>
