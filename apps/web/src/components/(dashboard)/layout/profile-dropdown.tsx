@@ -62,21 +62,25 @@ export const ProfileDropdown = ({ user }: ProfileDropdownProps) => {
       <DropdownMenuContent className="w-56" align="end" forceMount>
         <DropdownMenuLabel>Account</DropdownMenuLabel>
 
+        {isUserAdmin && (
+          <>
+            <DropdownMenuItem asChild>
+              <Link href="/admin" className="cursor-pointer">
+                <UserCog className="mr-2 h-4 w-4" />
+                Admin
+              </Link>
+            </DropdownMenuItem>
+
+            <DropdownMenuSeparator />
+          </>
+        )}
+
         <DropdownMenuItem asChild>
           <Link href="/settings/profile" className="cursor-pointer">
             <LucideUser className="mr-2 h-4 w-4" />
             Profile
           </Link>
         </DropdownMenuItem>
-
-        {isUserAdmin && (
-          <DropdownMenuItem asChild>
-            <Link href="/admin" className="cursor-pointer">
-              <UserCog className="mr-2 h-4 w-4" />
-              Admin
-            </Link>
-          </DropdownMenuItem>
-        )}
 
         <DropdownMenuItem asChild>
           <Link href="/settings/password" className="cursor-pointer">
