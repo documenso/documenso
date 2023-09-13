@@ -3,6 +3,7 @@ import { readFileSync } from 'fs';
 import { PDFDocument, StandardFonts } from 'pdf-lib';
 
 import {
+  CAVEAT_FONT_PATH,
   DEFAULT_HANDWRITING_FONT_SIZE,
   DEFAULT_STANDARD_FONT_SIZE,
   MIN_HANDWRITING_FONT_SIZE,
@@ -17,7 +18,9 @@ export const insertFieldInPDF = async (pdf: PDFDocument, field: FieldWithSignatu
 
   pdf.registerFontkit(fontkit);
 
-  const fontCaveat = readFileSync('./public/fonts/caveat.ttf');
+  const fileURL = new URL(`../../../../${CAVEAT_FONT_PATH}`, import.meta.url);
+
+  const fontCaveat = readFileSync(fileURL);
 
   const pages = pdf.getPages();
 

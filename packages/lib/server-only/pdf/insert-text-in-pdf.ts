@@ -2,6 +2,8 @@ import fontkit from '@pdf-lib/fontkit';
 import * as fs from 'fs';
 import { PDFDocument, StandardFonts, rgb } from 'pdf-lib';
 
+import { CAVEAT_FONT_PATH } from '../../constants/pdf';
+
 export async function insertTextInPDF(
   pdfAsBase64: string,
   text: string,
@@ -10,8 +12,9 @@ export async function insertTextInPDF(
   page = 0,
   useHandwritingFont = true,
 ): Promise<string> {
-  const fontBytes = fs.readFileSync('./public/fonts/caveat.ttf');
+  const fileURL = new URL(`../../../../${CAVEAT_FONT_PATH}`, import.meta.url);
 
+  const fontBytes = fs.readFileSync(fileURL);
   const pdfDoc = await PDFDocument.load(pdfAsBase64);
 
   pdfDoc.registerFontkit(fontkit);
