@@ -217,8 +217,21 @@ For the digital signature of your documents you need a signing certificate in .p
 
 Want to create a production ready docker image? Follow these steps:
 
-- Run `./docker/build.sh` in the root directory.
-- Publish the image to your docker registry of choice.
+- cd into `docker` directory
+- Make `build.sh` executable by running `chmod +x build.sh`
+- Run `./build.sh` to start building the docker image.
+- Publish the image to your docker registry of choice (or) If you prefer running the image from local, run the below command
+
+```
+docker run -d --restart=unless-stopped -p 3000:3000 -v documenso:/app/data --name documenso documenso:latest
+```
+
+Command Breakdown:
+- `-d` - Let's you run the container in background
+- `-p` - Passes down which ports to use. First half is the host port, Second half is the app port. You can change the first half anything you want and reverse proxy to that port.
+- `-v` - Volume let's you persist the data
+- `--name` - Name of the container
+- `documenso:latest` -  Image you have built
 
 # Deployment
 
