@@ -11,10 +11,12 @@ import {
   Monitor,
   Moon,
   Sun,
+  UserCog,
 } from 'lucide-react';
 import { signOut } from 'next-auth/react';
 import { useTheme } from 'next-themes';
 
+import { isAdmin } from '@documenso/lib/next-auth/guards/is-admin';
 import { recipientInitials } from '@documenso/lib/utils/recipient-formatter';
 import { User } from '@documenso/prisma/client';
 import { Avatar, AvatarFallback } from '@documenso/ui/primitives/avatar';
@@ -36,8 +38,8 @@ export type ProfileDropdownProps = {
 
 export const ProfileDropdown = ({ user }: ProfileDropdownProps) => {
   const { theme, setTheme } = useTheme();
-
   const { getFlag } = useFeatureFlags();
+  const isUserAdmin = isAdmin(user);
 
   const isBillingEnabled = getFlag('app_billing');
 
@@ -57,6 +59,19 @@ export const ProfileDropdown = ({ user }: ProfileDropdownProps) => {
 
       <DropdownMenuContent className="w-56" align="end" forceMount>
         <DropdownMenuLabel>Account</DropdownMenuLabel>
+
+        {isUserAdmin && (
+          <>
+            <DropdownMenuItem asChild>
+              <Link href="/admin" className="cursor-pointer">
+                <UserCog className="mr-2 h-4 w-4" />
+                Admin
+              </Link>
+            </DropdownMenuItem>
+
+            <DropdownMenuSeparator />
+          </>
+        )}
 
         <DropdownMenuItem asChild>
           <Link href="/settings/profile" className="cursor-pointer">
