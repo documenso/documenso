@@ -20,7 +20,7 @@
 </p>
 
 <p align="center">
-   <a href="https://documen.so/slack"><img src="https://img.shields.io/badge/Slack-documenso.slack.com-%234A154B" alt="Join Documenso on Slack"></a>
+   <a href="https://documen.so/discord"><img src="https://img.shields.io/badge/Discord-documen.so/discord-%235865F2" alt="Join Documenso on Discord"></a> 
    <a href="https://github.com/documenso/documenso/stargazers"><img src="https://img.shields.io/github/stars/documenso/documenso" alt="Github Stars"></a>
    <a href="https://github.com/documenso/documenso/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-AGPLv3-purple" alt="License"></a>
    <a href="https://github.com/documenso/documenso/pulse"><img src="https://img.shields.io/github/commit-activity/m/documenso/documenso" alt="Commits-per-month"></a>
@@ -101,10 +101,6 @@ Documenso is built using awesome open source tech including:
 - [Node SignPDF (Digital Signature)](https://github.com/vbuch/node-signpdf)
 - [React-PDF for viewing PDFs](https://github.com/wojtekmaj/react-pdf)
 - [PDF-Lib for PDF manipulation](https://github.com/Hopding/pdf-lib)
-- [Zod for schema declaration and validation](https://zod.dev/)
-- [Lucide React for icons in React app](https://lucide.dev/)
-- [Framer Motion for motion library](https://www.framer.com/motion/)
-- [Radix UI for component library](https://www.radix-ui.com/)
 - Check out `/package.json` and `/apps/web/package.json` for more
 - Support for [opensignpdf (requires Java on server)](https://github.com/open-pdf-sign) is currently planned.
 
@@ -248,12 +244,6 @@ We support a variety of deployment methods, and are actively working on adding m
 ## Render
 
 [![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/documenso/documenso)
-
-## Docker Compose
-
-Clone the repo and run the following command from `documenso` folder:
-
-> docker compose -f docker/compose.yml up 
 
 # Troubleshooting
 
