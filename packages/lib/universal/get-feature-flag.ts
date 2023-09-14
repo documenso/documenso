@@ -72,6 +72,28 @@ export const getAllFlags = async (
     .catch(() => LOCAL_FEATURE_FLAGS);
 };
 
+/**
+ * Get all feature flags for anonymous users.
+ *
+ * @returns A record of flags and their values.
+ */
+export const getAllAnonymousFlags = async (): Promise<Record<string, TFeatureFlagValue>> => {
+  if (!isFeatureFlagEnabled()) {
+    return LOCAL_FEATURE_FLAGS;
+  }
+
+  const url = new URL(`${APP_BASE_URL}/api/feature-flag/all`);
+
+  return fetch(url, {
+    next: {
+      revalidate: 60,
+    },
+  })
+    .then(async (res) => res.json())
+    .then((res) => z.record(z.string(), ZFeatureFlagValueSchema).parse(res))
+    .catch(() => LOCAL_FEATURE_FLAGS);
+};
+
 interface GetFlagOptions {
   /**
    * The headers to attach to the request to evaluate flags.

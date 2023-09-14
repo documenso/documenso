@@ -19,8 +19,8 @@ const config = {
     '@documenso/email',
   ],
   env: {
-    NEXT_PUBLIC_APP: 'web',
     ...env,
+    NEXT_PUBLIC_APP: 'web',
   },
   modularizeImports: {
     'lucide-react': {
