@@ -103,7 +103,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           title: 'Documenso Supporter Pledge.pdf',
           status: DocumentStatus.COMPLETED,
           userId: user.id,
-          created: now,
           documentDataId,
         },
         include: {
