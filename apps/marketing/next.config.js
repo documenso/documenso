@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 const path = require('path');
 const { withContentlayer } = require('next-contentlayer');
+const { remapVercelEnv } = require('../../scripts/remap-vercel-env.cjs');
 
 const { parsed: env } = require('dotenv').config({
   path: path.join(__dirname, '../../.env.local'),
