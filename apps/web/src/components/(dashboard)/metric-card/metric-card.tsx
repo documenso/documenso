@@ -18,10 +18,10 @@ export const CardMetric = ({ icon: Icon, title, value, className }: CardMetricPr
       )}
     >
       <div className="px-4 pb-6 pt-4 sm:px-4 sm:pb-8 sm:pt-4">
-        <div className="flex items-start">
-          {Icon && <Icon className="mr-2 h-4 w-4 text-slate-500" />}
+        <div className="flex items-center">
+          {Icon && <Icon className="text-muted-foreground mr-2 h-4 w-4" />}
 
-          <h3 className="flex items-end text-sm font-medium text-slate-500">{title}</h3>
+          <h3 className="text-primary-forground flex items-end text-sm font-medium">{title}</h3>
         </div>
 
         <p className="text-foreground mt-6 text-4xl font-semibold leading-8 md:mt-8">
