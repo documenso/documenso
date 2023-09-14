@@ -7,6 +7,7 @@ import { Download } from 'lucide-react';
 import { getFile } from '@documenso/lib/universal/upload/get-file';
 import { DocumentData } from '@documenso/prisma/client';
 import { Button } from '@documenso/ui/primitives/button';
+import { useToast } from '@documenso/ui/primitives/use-toast';
 
 export type DownloadButtonProps = HTMLAttributes<HTMLButtonElement> & {
   disabled?: boolean;
@@ -21,6 +22,8 @@ export const DownloadButton = ({
   disabled,
   ...props
 }: DownloadButtonProps) => {
+  const { toast } = useToast();
+
   const [isLoading, setIsLoading] = useState(false);
 
   const onDownloadClick = async () => {
@@ -47,6 +50,12 @@ export const DownloadButton = ({
       window.URL.revokeObjectURL(link.href);
     } catch (err) {
       console.error(err);
+
+      toast({
+        title: 'Error',
+        description: 'An error occurred while downloading your document.',
+        variant: 'destructive',
+      });
     } finally {
       setIsLoading(false);
     }

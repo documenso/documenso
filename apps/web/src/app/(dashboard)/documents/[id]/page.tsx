@@ -47,8 +47,6 @@ export default async function DocumentPage({ params }: DocumentPageProps) {
     .then((buffer) => Buffer.from(buffer).toString('base64'))
     .then((data) => `data:application/pdf;base64,${data}`);
 
-  console.log({ documentDataUrl: documentDataUrl.slice(0, 40) });
-
   const [recipients, fields] = await Promise.all([
     await getRecipientsForDocument({
       documentId,
