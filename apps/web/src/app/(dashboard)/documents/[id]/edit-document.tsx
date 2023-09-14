@@ -32,6 +32,7 @@ export type EditDocumentFormProps = {
   document: DocumentWithData;
   recipients: Recipient[];
   fields: Field[];
+  dataUrl: string;
 };
 
 type EditDocumentStep = 'signers' | 'fields' | 'subject';
@@ -42,15 +43,12 @@ export const EditDocumentForm = ({
   recipients,
   fields,
   user: _user,
+  dataUrl,
 }: EditDocumentFormProps) => {
   const { toast } = useToast();
   const router = useRouter();
 
-  const { documentData } = document;
-
   const [step, setStep] = useState<EditDocumentStep>('signers');
-
-  const documentUrl = `data:application/pdf;base64,${documentData?.data}`;
 
   const documentFlow: Record<EditDocumentStep, DocumentFlowStep> = {
     signers: {
@@ -154,11 +152,11 @@ export const EditDocumentForm = ({
   return (
     <div className={cn('grid w-full grid-cols-12 gap-8', className)}>
       <Card
-        className="col-span-12 rounded-xl before:rounded-xl lg:col-span-6 xl:col-span-7"
+        className="relative col-span-12 rounded-xl before:rounded-xl lg:col-span-6 xl:col-span-7"
         gradient
       >
         <CardContent className="p-2">
-          <LazyPDFViewer document={documentUrl} />
+          <LazyPDFViewer document={dataUrl} />
         </CardContent>
       </Card>
 

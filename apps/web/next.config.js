@@ -10,6 +10,7 @@ const { parsed: env } = require('dotenv').config({
 const config = {
   experimental: {
     serverActions: true,
+    serverActionsBodySizeLimit: '50mb',
   },
   reactStrictMode: true,
   transpilePackages: [
@@ -19,10 +20,6 @@ const config = {
     '@documenso/ui',
     '@documenso/email',
   ],
-  env: {
-    ...env,
-    APP_VERSION: version,
-  },
   modularizeImports: {
     'lucide-react': {
       transform: 'lucide-react/dist/esm/icons/{{ kebabCase member }}',

@@ -88,19 +88,21 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
       const bytes64 = readFileSync('./public/documenso-supporter-pledge.pdf').toString('base64');
 
+      const { id: documentDataId } = await prisma.documentData.create({
+        data: {
+          type: DocumentDataType.BYTES_64,
+          data: bytes64,
+          initialData: bytes64,
+        },
+      });
+
       const document = await prisma.document.create({
         data: {
           title: 'Documenso Supporter Pledge.pdf',
           status: DocumentStatus.COMPLETED,
           userId: user.id,
           created: now,
-          documentData: {
-            create: {
-              type: DocumentDataType.BYTES_64,
-              data: bytes64,
-              initialData: bytes64,
-            },
-          },
+          documentDataId,
         },
         include: {
           documentData: true,

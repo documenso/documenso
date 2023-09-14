@@ -8,6 +8,8 @@ import { insertImageInPDF } from '@documenso/lib/server-only/pdf/insert-image-in
 import { insertTextInPDF } from '@documenso/lib/server-only/pdf/insert-text-in-pdf';
 import { redis } from '@documenso/lib/server-only/redis';
 import { Stripe, stripe } from '@documenso/lib/server-only/stripe';
+import { getFile } from '@documenso/lib/universal/upload/get-file';
+import { updateFile } from '@documenso/lib/universal/upload/update-file';
 import { prisma } from '@documenso/prisma';
 import {
   DocumentDataType,
@@ -88,19 +90,21 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
       const bytes64 = readFileSync('./public/documenso-supporter-pledge.pdf').toString('base64');
 
+      const { id: documentDataId } = await prisma.documentData.create({
+        data: {
+          type: DocumentDataType.BYTES_64,
+          data: bytes64,
+          initialData: bytes64,
+        },
+      });
+
       const document = await prisma.document.create({
         data: {
           title: 'Documenso Supporter Pledge.pdf',
           status: DocumentStatus.COMPLETED,
           userId: user.id,
           created: now,
-          documentData: {
-            create: {
-              type: DocumentDataType.BYTES_64,
-              data: bytes64,
-              initialData: bytes64,
-            },
-          },
+          documentDataId,
         },
         include: {
           documentData: true,
@@ -139,23 +143,33 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         },
       });
 
+      let pdfData = await getFile(documentData).then((data) =>
+        Buffer.from(data).toString('base64'),
+      );
+
       if (signatureDataUrl) {
-        documentData.data = await insertImageInPDF(
-          documentData.data,
+        pdfData = await insertImageInPDF(
+          pdfData,
           signatureDataUrl,
           Number(field.positionX),
           Number(field.positionY),
           field.page,
         );
       } else {
-        documentData.data = await insertTextInPDF(
-          documentData.data,
+        pdfData = await insertTextInPDF(
+          pdfData,
           signatureText ?? '',
           Number(field.positionX),
           Number(field.positionY),
           field.page,
         );
       }
+
+      const { data: newData } = await updateFile({
+        type: documentData.type,
+        oldData: documentData.initialData,
+        newData: Buffer.from(pdfData, 'base64').toString('binary'),
+      });
 
       await Promise.all([
         prisma.signature.create({
@@ -166,16 +180,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             typedSignature: signatureDataUrl ? '' : signatureText,
           },
         }),
-        prisma.document.update({
+        prisma.documentData.update({
           where: {
-            id: document.id,
+            id: documentData.id,
           },
           data: {
-            documentData: {
-              update: {
-                data: documentData.data,
-              },
-            },
+            data: newData,
           },
         }),
       ]);

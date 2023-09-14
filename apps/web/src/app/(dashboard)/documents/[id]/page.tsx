@@ -7,6 +7,7 @@ import { getRequiredServerComponentSession } from '@documenso/lib/next-auth/get-
 import { getDocumentById } from '@documenso/lib/server-only/document/get-document-by-id';
 import { getFieldsForDocument } from '@documenso/lib/server-only/field/get-fields-for-document';
 import { getRecipientsForDocument } from '@documenso/lib/server-only/recipient/get-recipients-for-document';
+import { getFile } from '@documenso/lib/universal/upload/get-file';
 import { DocumentStatus as InternalDocumentStatus } from '@documenso/prisma/client';
 import { LazyPDFViewer } from '@documenso/ui/primitives/lazy-pdf-viewer';
 
@@ -41,6 +42,12 @@ export default async function DocumentPage({ params }: DocumentPageProps) {
   }
 
   const { documentData } = document;
+
+  const documentDataUrl = await getFile(documentData)
+    .then((buffer) => Buffer.from(buffer).toString('base64'))
+    .then((data) => `data:application/pdf;base64,${data}`);
+
+  console.log({ documentDataUrl: documentDataUrl.slice(0, 40) });
 
   const [recipients, fields] = await Promise.all([
     await getRecipientsForDocument({
@@ -88,12 +95,13 @@ export default async function DocumentPage({ params }: DocumentPageProps) {
           user={session}
           recipients={recipients}
           fields={fields}
+          dataUrl={documentDataUrl}
         />
       )}
 
       {document.status === InternalDocumentStatus.COMPLETED && (
         <div className="mx-auto mt-12 max-w-2xl">
-          <LazyPDFViewer document={`data:application/pdf;base64,${documentData.data}`} />
+          <LazyPDFViewer document={documentDataUrl} />
         </div>
       )}
     </div>

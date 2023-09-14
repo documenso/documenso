@@ -91,17 +91,20 @@ enum DocumentStatus {
 }
 
 model Document {
-  id           Int            @id @default(autoincrement())
-  created      DateTime       @default(now())
-  userId       Int
-  User         User           @relation(fields: [userId], references: [id], onDelete: Cascade)
-  title        String
-  status       DocumentStatus @default(DRAFT)
-  Recipient    Recipient[]
-  Field        Field[]
-  documentData DocumentData?
-  createdAt    DateTime       @default(now())
-  updatedAt    DateTime       @updatedAt @default(now())
+  id             Int            @id @default(autoincrement())
+  created        DateTime       @default(now())
+  userId         Int
+  User           User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title          String
+  status         DocumentStatus @default(DRAFT)
+  Recipient      Recipient[]
+  Field          Field[]
+  documentDataId String
+  documentData   DocumentData   @relation(fields: [documentDataId], references: [id], onDelete: Cascade)
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @default(now()) @updatedAt
+
+  @@unique([documentDataId])
 }
 
 enum DocumentDataType {
@@ -115,11 +118,7 @@ model DocumentData {
   type        DocumentDataType
   data        String
   initialData String
-  documentId  Int
-
-  Document Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
-
-  @@unique([documentId])
+  Document    Document?
 }
 
 enum ReadStatus {

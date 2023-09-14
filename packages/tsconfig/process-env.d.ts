@@ -13,7 +13,7 @@ declare namespace NodeJS {
     NEXT_PRIVATE_STRIPE_API_KEY: string;
     NEXT_PRIVATE_STRIPE_WEBHOOK_SECRET: string;
 
-    NEXT_PRIVATE_UPLOAD_TRANSPORT?: 'database' | 's3';
+    NEXT_PUBLIC_UPLOAD_TRANSPORT?: 'database' | 's3';
     NEXT_PRIVATE_UPLOAD_ENDPOINT?: string;
     NEXT_PRIVATE_UPLOAD_REGION?: string;
     NEXT_PRIVATE_UPLOAD_BUCKET?: string;
