@@ -39,7 +39,7 @@ export default async function DocumentsPage({ searchParams = {} }: DocumentsPage
     userId: user.id,
     status,
     orderBy: {
-      column: 'created',
+      column: 'createdAt',
       direction: 'desc',
     },
     page,
