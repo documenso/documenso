@@ -42,10 +42,14 @@ const updateFileWithBytes64 = (data: string) => {
 const updateFileWithS3 = async (key: string, data: string) => {
   const { url } = await getAbsolutePresignPostUrl(key);
 
-  await fetch(url, {
+  const response = await fetch(url, {
     method: 'PUT',
     body: data,
   });
+
+  if (!response.ok) {
+    throw new Error(`Failed to update file "${key}", failed with status code ${response.status}`);
+  }
 
   return {
     type: DocumentDataType.S3_PATH,

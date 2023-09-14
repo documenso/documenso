@@ -35,9 +35,15 @@ const getFileFromBytes64 = (data: string) => {
 const getFileFromS3 = async (key: string) => {
   const { url } = await getPresignGetUrl(key);
 
-  const buffer = await fetch(url, {
+  const response = await fetch(url, {
     method: 'GET',
-  }).then(async (res) => res.arrayBuffer());
+  });
+
+  if (!response.ok) {
+    throw new Error(`Failed to get file "${key}", failed with status code ${response.status}`);
+  }
+
+  const buffer = await response.arrayBuffer();
 
   const binaryData = new Uint8Array(buffer);
 

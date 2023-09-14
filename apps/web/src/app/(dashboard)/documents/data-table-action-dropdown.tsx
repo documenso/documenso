@@ -14,15 +14,9 @@ import {
   XCircle,
 } from 'lucide-react';
 import { useSession } from 'next-auth/react';
-import { match } from 'ts-pattern';
 
-import {
-  Document,
-  DocumentDataType,
-  DocumentStatus,
-  Recipient,
-  User,
-} from '@documenso/prisma/client';
+import { getFile } from '@documenso/lib/universal/upload/get-file';
+import { Document, DocumentStatus, Recipient, User } from '@documenso/prisma/client';
 import { DocumentWithData } from '@documenso/prisma/types/document-with-data';
 import { trpc } from '@documenso/trpc/client';
 import {
@@ -75,23 +69,7 @@ export const DataTableActionDropdown = ({ row }: DataTableActionDropdownProps) =
       return;
     }
 
-    const documentBytes = await match(documentData.type)
-      .with(DocumentDataType.BYTES, () =>
-        Uint8Array.from(documentData.data, (c) => c.charCodeAt(0)),
-      )
-      .with(DocumentDataType.BYTES_64, () =>
-        Uint8Array.from(
-          atob(documentData.data)
-            .split('')
-            .map((c) => c.charCodeAt(0)),
-        ),
-      )
-      .with(DocumentDataType.S3_PATH, async () =>
-        fetch(documentData.data)
-          .then(async (res) => res.arrayBuffer())
-          .then((buffer) => new Uint8Array(buffer)),
-      )
-      .exhaustive();
+    const documentBytes = await getFile(documentData);
 
     const blob = new Blob([documentBytes], {
       type: 'application/pdf',
