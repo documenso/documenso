@@ -11,8 +11,8 @@ import { PeriodSelector } from '~/components/(dashboard)/period-selector/period-
 import { PeriodSelectorValue } from '~/components/(dashboard)/period-selector/types';
 import { DocumentStatus } from '~/components/formatter/document-status';
 
-import { UploadDocument } from '../dashboard/upload-document';
 import { DocumentsDataTable } from './data-table';
+import { UploadDocument } from './upload-document';
 
 export type DocumentsPageProps = {
   searchParams?: {
@@ -81,6 +81,7 @@ export default async function DocumentsPage({ searchParams = {} }: DocumentsPage
                   {value !== ExtendedDocumentStatus.ALL && (
                     <span className="ml-1 hidden opacity-50 md:inline-block">
                       {Math.min(stats[value], 99)}
+                      {stats[value] > 99 && '+'}
                     </span>
                   )}
                 </Link>

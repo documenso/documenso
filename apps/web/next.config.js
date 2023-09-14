@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 const path = require('path');
+const { version } = require('./package.json');
 
 const { parsed: env } = require('dotenv').config({
   path: path.join(__dirname, '../../.env.local'),
@@ -18,7 +19,10 @@ const config = {
     '@documenso/ui',
     '@documenso/email',
   ],
-  env,
+  env: {
+    ...env,
+    APP_VERSION: version,
+  },
   modularizeImports: {
     'lucide-react': {
       transform: 'lucide-react/dist/esm/icons/{{ kebabCase member }}',
