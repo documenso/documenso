@@ -1,13 +1,11 @@
 <p align="center" style="margin-top: 120px">
-  <a href="https://github.com/documenso/documenso.com">
+  <a href="https://github.com/documenso/documenso">
    <img width="250px" src="https://github.com/documenso/documenso/assets/1309312/cd7823ec-4baa-40b9-be78-4acb3b1c73cb" alt="Documenso Logo">
   </a>
 
-  <h3 align="center">Open Source Signing Infrastructure</h3>
-
   <p align="center">
-    The DocuSign Open Source Alternative.
-    <br />
+  The Open Source DocuSign Alternative.
+  <br>
     <a href="https://documenso.com"><strong>Learn more »</strong></a>
     <br />
     <br />
@@ -22,11 +20,15 @@
 </p>
 
 <p align="center">
-   <a href="https://documen.so/discord"><img src="https://img.shields.io/badge/Discord-documen.so/discord-%235865F2" alt="Join Documenso on Discord"></a>
+   <a href="https://documen.so/discord"><img src="https://img.shields.io/badge/Discord-documen.so/discord-%235865F2" alt="Join Documenso on Discord"></a> 
    <a href="https://github.com/documenso/documenso/stargazers"><img src="https://img.shields.io/github/stars/documenso/documenso" alt="Github Stars"></a>
    <a href="https://github.com/documenso/documenso/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-AGPLv3-purple" alt="License"></a>
    <a href="https://github.com/documenso/documenso/pulse"><img src="https://img.shields.io/github/commit-activity/m/documenso/documenso" alt="Commits-per-month"></a>
 </p>
+
+> **🚧 We're currently working on a large scale refactor which can be found on the [feat/refresh](https://github.com/documenso/documenso/tree/feat/refresh) branch.**
+>
+> **[Read more on why 👀](https://documenso.com/blog/why-were-doing-a-rewrite)**
 
 # Documenso 0.9 - Developer Preview
 
@@ -63,18 +65,28 @@ Signing documents digitally is fast, easy and should be best practice for every 
 
 ## Community and Next Steps 🎯
 
-The current project goal is to <b>[release a production ready version](https://github.com/documenso/documenso/milestone/1)</b> for self-hosting as soon as possible. If you want to help making that happen you can:
+We're currently working on a redesign of the application including a revamp of the codebase so Documenso can be more intuitive to use and robust to develop upon.
 
 - Check out the first source code release in this repository and test it
 - Tell us what you think in the current [Discussions](https://github.com/documenso/documenso/discussions)
-- Join the [Slack Channel](https://documen.so/slack) for any questions and getting to know to other community members
+- Join the [Discord server](https://documen.so/discord) for any questions and getting to know to other community members
 - ⭐ the repository to help us raise awareness
 - Spread the word on Twitter, that Documenso is working towards a more open signing tool
 - Fix or create [issues](https://github.com/documenso/documenso/issues), that are needed for the first production release
 
 ## Contributing
 
-- To contribute please see our [contribution guide](https://github.com/documenso/documenso/blob/main/CONTRIBUTING.md).
+- To contribute, please see our [contribution guide](https://github.com/documenso/documenso/blob/main/CONTRIBUTING.md).
+
+## Contact us
+
+Contact us if you are interested in our Enterprise plan for large organizations that need extra flexibility and control.
+
+<a href="https://cal.com/timurercan/enterprise-customers?utm_source=banner&utm_campaign=oss"><img alt="Book us with Cal.com" src="https://cal.com/book-with-cal-dark.svg" /></a>
+
+## Activity
+
+![Repository Activity](https://repobeats.axiom.co/api/embed/622a2e9aa709696f7226304b5b7178a5741b3868.svg)
 
 # Tech
 
@@ -89,10 +101,6 @@ Documenso is built using awesome open source tech including:
 - [Node SignPDF (Digital Signature)](https://github.com/vbuch/node-signpdf)
 - [React-PDF for viewing PDFs](https://github.com/wojtekmaj/react-pdf)
 - [PDF-Lib for PDF manipulation](https://github.com/Hopding/pdf-lib)
-- [Zod for schema declaration and validation](https://zod.dev/)
-- [Lucide React for icons in React app](https://lucide.dev/)
-- [Framer Motion for motion library](https://www.framer.com/motion/)
-- [Radix UI for component library](https://www.radix-ui.com/)
 - Check out `/package.json` and `/apps/web/package.json` for more
 - Support for [opensignpdf (requires Java on server)](https://github.com/open-pdf-sign) is currently planned.
 
@@ -135,37 +143,47 @@ Your database will also be available on port `54320`. You can connect to it usin
 
 ## Developer Setup
 
+### Manual Setup
+
 Follow these steps to setup documenso on you local machine:
 
 - [Clone the repository](https://help.github.com/articles/cloning-a-repository/) it to your local device.
   ```sh
   git clone https://github.com/documenso/documenso
   ```
-- Run <code>npm i</code> in root directory
-- Rename <code>.env.example</code> to <code>.env</code>
+- Run `npm i` in root directory
+- Rename `.env.example` to `.env`
 - Set DATABASE_URL value in .env file
   - You can use the provided test database url (may be wiped at any point)
   - Or setup a local postgres sql instance (recommended)
-- Create the database scheme by running <code>db-migrate:dev</code>
+- Create the database scheme by running `db-migrate:dev`
 - Setup your mail provider
-  - Set <code>SENDGRID_API_KEY</code> value in .env file
+  - Set `SENDGRID_API_KEY` value in .env file
   - You need a SendGrid account, which you can create [here](https://signup.sendgrid.com/).
-  - Documenso uses [Nodemailer](https://nodemailer.com/about/) so you can easily use your own SMTP server by setting the <code>SMTP\_\* variables</code> in your .env
-- Run <code>npm run dev</code> root directory to start
+  - Documenso uses [Nodemailer](https://nodemailer.com/about/) so you can easily use your own SMTP server by setting the `SMTP
+    \_
+  * variables` in your .env
+- Run `npm run dev` root directory to start
 - Register a new user at http://localhost:3000/signup
 
 ---
 
-- Optional: Seed the database using <code>npm run db-seed</code> to create a test user and document
-- Optional: Upload and sign <code>apps/web/resources/example.pdf</code> manually to test your setup
+- Optional: Seed the database using `npm run db-seed` to create a test user and document
+- Optional: Upload and sign `apps/web/resources/example.pdf` manually to test your setup
 
 - Optional: Create your own signing certificate
   - A demo certificate is provided in `/app/web/resources/certificate.p12`
   - To generate your own using these steps and a Linux Terminal or Windows Subsystem for Linux (WSL) see **[Create your own signing certificate](#creating-your-own-signing-certificate)**.
 
+### Run in Gitpod
+
+- Click below to launch a ready-to-use Gitpod workspace in your browser.
+
+[![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/#https://github.com/documenso/documenso)
+
 ## Updating
 
-- If you pull the newest version from main, using <code>git pull</code>, it may be necessary to regenerate your database client
+- If you pull the newest version from main, using `git pull`, it may be necessary to regenerate your database client
 - You can do this by running the generate command in `/packages/prisma`:
   ```sh
   npx prisma generate
@@ -176,16 +194,22 @@ Follow these steps to setup documenso on you local machine:
 
 For the digital signature of your documents you need a signing certificate in .p12 format (public and private key). You can buy one (not recommended for dev) or use the steps to create a self-signed one:
 
-1. Generate a private key using the OpenSSL command. You can run the following command to generate a 2048-bit RSA key:\
-   <code>openssl genrsa -out private.key 2048</code>
+1. Generate a private key using the OpenSSL command. You can run the following command to generate a 2048-bit RSA key:
 
-2. Generate a self-signed certificate using the private key. You can run the following command to generate a self-signed certificate:\
-   <code>openssl req -new -x509 -key private.key -out certificate.crt -days 365</code> \
+   `openssl genrsa -out private.key 2048`
+
+2. Generate a self-signed certificate using the private key. You can run the following command to generate a self-signed certificate:
+
+   `openssl req -new -x509 -key private.key -out certificate.crt -days 365`
+
    This will prompt you to enter some information, such as the Common Name (CN) for the certificate. Make sure you enter the correct information. The -days parameter sets the number of days for which the certificate is valid.
-3. Combine the private key and the self-signed certificate to create the p12 certificate. You can run the following command to do this: \
-   <code>openssl pkcs12 -export -out certificate.p12 -inkey private.key -in certificate.crt</code>
+
+3. Combine the private key and the self-signed certificate to create the p12 certificate. You can run the following command to do this:
+
+   `openssl pkcs12 -export -out certificate.p12 -inkey private.key -in certificate.crt`
+
 4. You will be prompted to enter a password for the p12 file. Choose a strong password and remember it, as you will need it to use the certificate (**can be empty for dev certificates**)
-5. Place the certificate <code>/apps/web/resources/certificate.p12</code>
+5. Place the certificate `/apps/web/resources/certificate.p12`
 
 # Docker
 
@@ -193,15 +217,41 @@ For the digital signature of your documents you need a signing certificate in .p
 
 Want to create a production ready docker image? Follow these steps:
 
-- Run `./docker/build.sh` in the root directory.
-- Publish the image to your docker registry of choice.
+- cd into `docker` directory
+- Make `build.sh` executable by running `chmod +x build.sh`
+- Run `./build.sh` to start building the docker image.
+- Publish the image to your docker registry of choice (or) If you prefer running the image from local, run the below command
 
-# Deploying - Coming Soon™
+```
+docker run -d --restart=unless-stopped -p 3000:3000 -v documenso:/app/data --name documenso documenso:latest
+```
 
-- Docker support
-- One-Click-Deploy on Render.com Deploy
+Command Breakdown:
+- `-d` - Let's you run the container in background
+- `-p` - Passes down which ports to use. First half is the host port, Second half is the app port. You can change the first half anything you want and reverse proxy to that port.
+- `-v` - Volume let's you persist the data
+- `--name` - Name of the container
+- `documenso:latest` -  Image you have built
+
+# Deployment
+
+We support a variety of deployment methods, and are actively working on adding more. Stay tuned for updates!
+
+## Railway
+
+[![Deploy on Railway](https://railway.app/button.svg)](https://railway.app/template/DjrRRX)
+
+## Render
+
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/documenso/documenso)
 
 # Troubleshooting
+
+## I'm not receiving any emails when using the developer quickstart
+
+When using the developer quickstart an [Inbucket](https://inbucket.org/) server will be spun up in a docker container that will store all outgoing email locally for you to view.
+
+The Web UI can be found at http://localhost:9000 while the SMTP port will be on localhost:2500.
 
 ## Support IPv6
 
