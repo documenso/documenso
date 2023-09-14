@@ -1,5 +1,6 @@
 import { TRPCError } from '@trpc/server';
 
+import { createDocument } from '@documenso/lib/server-only/document/create-document';
 import { getDocumentById } from '@documenso/lib/server-only/document/get-document-by-id';
 import { getDocumentAndSenderByToken } from '@documenso/lib/server-only/document/get-document-by-token';
 import { sendDocument } from '@documenso/lib/server-only/document/send-document';
@@ -8,6 +9,7 @@ import { setRecipientsForDocument } from '@documenso/lib/server-only/recipient/s
 
 import { authenticatedProcedure, procedure, router } from '../trpc';
 import {
+  ZCreateDocumentMutationSchema,
   ZGetDocumentByIdQuerySchema,
   ZGetDocumentByTokenQuerySchema,
   ZSendDocumentMutationSchema,
@@ -21,11 +23,6 @@ export const documentRouter = router({
     .query(async ({ input, ctx }) => {
       try {
         const { id } = input;
-
-        console.log({
-          id,
-          userId: ctx.user.id,
-        });
 
         return await getDocumentById({
           id,
@@ -57,6 +54,27 @@ export const documentRouter = router({
       });
     }
   }),
+
+  createDocument: authenticatedProcedure
+    .input(ZCreateDocumentMutationSchema)
+    .mutation(async ({ input, ctx }) => {
+      try {
+        const { title, documentDataId } = input;
+
+        return await createDocument({
+          userId: ctx.user.id,
+          title,
+          documentDataId,
+        });
+      } catch (err) {
+        console.error(err);
+
+        throw new TRPCError({
+          code: 'BAD_REQUEST',
+          message: 'We were unable to create this document. Please try again later.',
+        });
+      }
+    }),
 
   setRecipientsForDocument: authenticatedProcedure
     .input(ZSetRecipientsForDocumentMutationSchema)

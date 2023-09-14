@@ -1,10 +1,19 @@
 'use server';
 
+import { prisma } from '@documenso/prisma';
+
 export type CreateDocumentOptions = {
+  title: string;
   userId: number;
-  fileName: string;
+  documentDataId: string;
 };
 
-export const createDocument = () => {
-  //
+export const createDocument = async ({ userId, title, documentDataId }: CreateDocumentOptions) => {
+  return await prisma.document.create({
+    data: {
+      title,
+      documentDataId,
+      userId,
+    },
+  });
 };
