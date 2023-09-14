@@ -2,9 +2,20 @@ import { signingRequestTemplate } from "@documenso/lib/mail";
 import prisma from "@documenso/prisma";
 import { NEXT_PUBLIC_WEBAPP_URL } from "../constants";
 import { sendMail } from "./sendMail";
-import { DocumentStatus, ReadStatus, SendStatus } from "@prisma/client";
+import {
+  DocumentStatus,
+  Document as PrismaDocument,
+  ReadStatus,
+  Recipient,
+  SendStatus,
+  User,
+} from "@prisma/client";
 
-export const sendSigningRequest = async (recipient: any, document: any, user: any) => {
+export const sendSigningRequest = async (
+  recipient: Recipient,
+  document: PrismaDocument,
+  user: User
+) => {
   const signingRequestMessage = user.name
     ? `${user.name} (${user.email}) has sent you a document to sign. `
     : `${user.email} has sent you a document to sign. `;

@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { classNames } from "@documenso/lib";
 
-export default function Logo(props: any) {
+export default function Logo(props: JSX.IntrinsicElements['svg']) {
   return (
     <>
       <svg viewBox="0 0 64 64" {...props}>

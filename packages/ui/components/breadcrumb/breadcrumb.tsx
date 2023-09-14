@@ -1,8 +1,17 @@
 import React from "react";
 import Link from "next/link";
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/20/solid";
+import { Document as PrismaDocument } from "@prisma/client";
 
-export function Breadcrumb(props: any) {
+interface Props {
+  document: PrismaDocument;
+  items: {
+    title: string;
+    href: string;
+  }[];
+}
+
+export function Breadcrumb(props: Props) {
   return (
     <>
       <nav className="sm:hidden" aria-label="Back">

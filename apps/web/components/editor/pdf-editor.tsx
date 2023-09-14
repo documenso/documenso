@@ -8,6 +8,7 @@ import { NEXT_PUBLIC_WEBAPP_URL } from "@documenso/lib/constants";
 import FieldTypeSelector from "./field-type-selector";
 import RecipientSelector from "./recipient-selector";
 import { InformationCircleIcon } from "@heroicons/react/24/outline";
+import { Field, Recipient } from "@prisma/client";
 
 const stc = require("string-to-color");
 
@@ -17,8 +18,8 @@ const PDFViewer = dynamic(() => import("./pdf-viewer"), {
 
 export default function PDFEditor(props: any) {
   const router = useRouter();
-  const [fields, setFields] = useState<any[]>(props.document.Field);
-  const [selectedRecipient, setSelectedRecipient]: any = useState();
+  const [fields, setFields] = useState<Field[]>(props.document.Field);
+  const [selectedRecipient, setSelectedRecipient] = useState<Recipient>();
   const [selectedFieldType, setSelectedFieldType] = useState();
   const noRecipients =
     props?.document.Recipient.length === 0 || props?.document.Recipient.every((e: any) => !e.email);
@@ -26,16 +27,16 @@ export default function PDFEditor(props: any) {
   function onPositionChangedHandler(position: any, id: any) {
     if (!position) return;
     const movedField = fields.find((e) => e.id == id);
-    movedField.positionX = position.x.toFixed(0);
-    movedField.positionY = position.y.toFixed(0);
-    createOrUpdateField(props.document, movedField);
+    movedField!.positionX = position.x.toFixed(0);
+    movedField!.positionY = position.y.toFixed(0);
+    createOrUpdateField(props.document, movedField!);
 
     // no instant redraw necessary, position information for saving or later rerender is enough
     // setFields(newFields);
   }
 
-  function onDeleteHandler(id: any) {
-    const field = fields.find((e) => e.id == id);
+  function onDeleteHandler(id: number) {
+    const field = fields.find((e) => e.id == id)!;
     const fieldIndex = fields.map((item) => item.id).indexOf(id);
     if (fieldIndex > -1) {
       const fieldWithoutRemoved = [...fields];
@@ -82,11 +83,11 @@ export default function PDFEditor(props: any) {
           onPositionChanged={onPositionChangedHandler}
           onDelete={onDeleteHandler}
           pdfUrl={`${NEXT_PUBLIC_WEBAPP_URL}/api/documents/${router.query.id}`}
-          onMouseUp={(e: any, page: number) => {
+          onMouseUp={(e: React.MouseEvent<HTMLDivElement>, page: number) => {
             e.preventDefault();
             e.stopPropagation();
           }}
-          onMouseDown={(e: any, page: number) => {
+          onMouseDown={(e: React.MouseEvent<HTMLDivElement>, page: number) => {
             if (e.button === 0) addField(e, page);
           }}></PDFViewer>
         <div
@@ -106,14 +107,14 @@ export default function PDFEditor(props: any) {
     </>
   );
 
-  function addField(e: any, page: number) {
+  function addField(e: React.MouseEvent<HTMLDivElement>, page: number) {
     if (!selectedRecipient) return;
     if (!selectedFieldType) return;
     if (noRecipients) return;
 
     const signatureField = createField(e, page, selectedRecipient, selectedFieldType);
 
-    createOrUpdateField(props?.document, signatureField).then((res) => {
+    createOrUpdateField(props?.document, signatureField as unknown as Field).then((res: any) => {
       setFields((prevState) => [...prevState, res]);
     });
   }

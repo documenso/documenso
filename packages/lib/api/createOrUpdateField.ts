@@ -1,10 +1,11 @@
+import { Field, Document as PrismaDocument } from "@prisma/client";
 import toast from "react-hot-toast";
 
 export const createOrUpdateField = async (
-  document: any,
-  field: any,
+  document: PrismaDocument,
+  field: Field,
   recipientToken: string = ""
-): Promise<any> => {
+): Promise<Response> => {
   try {
     const created = await toast.promise(
       fetch("/api/documents/" + document.id + "/fields?token=" + recipientToken, {
@@ -32,5 +33,7 @@ export const createOrUpdateField = async (
       }
     );
     return created;
-  } catch (error) {}
+  } catch (error) {
+    throw error;
+  }
 };

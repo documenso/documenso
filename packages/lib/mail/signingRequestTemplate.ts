@@ -1,14 +1,14 @@
 import { NEXT_PUBLIC_WEBAPP_URL } from "../constants";
 import { baseEmailTemplate } from "./baseTemplate";
-import { Document as PrismaDocument } from "@prisma/client";
+import { Document as PrismaDocument, Recipient, User } from "@prisma/client";
 
 export const signingRequestTemplate = (
   message: string,
-  document: any,
-  recipient: any,
+  document: PrismaDocument,
+  recipient: Recipient,
   ctaLink: string,
   ctaLabel: string,
-  user: any
+  user: User
 ) => {
   const customContent = `
   <p style="margin: 30px 0px; text-align: center">

@@ -10,12 +10,11 @@ async function postHandler(req: NextApiRequest, res: NextApiResponse) {
     return res.status(400).json({ message: "Email cannot be empty." });
   }
 
-  let newUser: any;
-  newUser = await prisma.user
+  await prisma.user
     .create({
       data: { email: body.email },
     })
-    .then(async () => {
+    .then(async (newUser) => {
       return res.status(201).send(newUser);
     });
 }

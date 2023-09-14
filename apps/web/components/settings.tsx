@@ -3,12 +3,14 @@ import Head from "next/head";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { updateUser } from "@documenso/features";
+import { classNames } from "@documenso/lib";
 import { getUser } from "@documenso/lib/api";
 import { fetchPortalSession, isSubscriptionsEnabled, useSubscription } from "@documenso/lib/stripe";
 import { Button } from "@documenso/ui";
 import { BillingPlans } from "./billing-plans";
 import { CreditCardIcon, KeyIcon, UserCircleIcon } from "@heroicons/react/24/outline";
 import { SubscriptionStatus } from "@prisma/client";
+import { User } from "@prisma/client";
 import { useSession } from "next-auth/react";
 
 const subNavigation = [
@@ -35,20 +37,16 @@ if (process.env.NEXT_PUBLIC_ALLOW_SUBSCRIPTIONS === "true") {
   });
 }
 
-function classNames(...classes: any) {
-  return classes.filter(Boolean).join(" ");
-}
-
 export default function Setttings() {
   const session = useSession();
   const { subscription, hasSubscription } = useSubscription();
-  const [user, setUser] = useState({
+  const [user, setUser] = useState<Pick<User, "email" | "name">>({
     email: "",
     name: "",
   });
   useEffect(() => {
-    getUser().then((res: any) => {
-      res.json().then((j: any) => {
+    getUser().then((res) => {
+      res.json().then((j: User) => {
         setUser(j);
       });
     });
@@ -67,16 +65,16 @@ export default function Setttings() {
     setUser(u);
     clearTimeout(savingTimeout);
     const t = setTimeout(() => {
-      updateUser(u);
+      updateUser(u as User);
     }, 1000);
 
     setSavingTimeout(t);
   }
 
-  const handleKeyPress = (event: any) => {
+  const handleKeyPress = (event: React.KeyboardEvent<HTMLInputElement>) => {
     if (event.key === "Enter") {
       clearTimeout(savingTimeout);
-      updateUser(user);
+      updateUser(user as User);
     }
   };
 
@@ -168,7 +166,7 @@ export default function Setttings() {
                     />
                   </div>
                 </div>
-                <Button onClick={() => updateUser(user)}>Save</Button>
+                <Button onClick={() => updateUser(user as User)}>Save</Button>
               </div>
             </form>
 
@@ -200,7 +198,7 @@ export default function Setttings() {
                   </div>
                   <Button
                     disabled={password.length < 6}
-                    onClick={() => updateUser({ ...user, password })}>
+                    onClick={() => updateUser({ ...user, password } as User)}>
                     Save
                   </Button>
                 </div>

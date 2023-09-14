@@ -5,7 +5,7 @@ import { SubscriptionStatus } from "@prisma/client";
 import { buffer } from "micro";
 import Stripe from "stripe";
 
-const log = (...args: any[]) => console.log("[stripe]", ...args);
+const log = <T>(...args: T[]) => console.log("[stripe]", ...args);
 
 export const webhookHandler = async (req: NextApiRequest, res: NextApiResponse) => {
   if (!process.env.NEXT_PUBLIC_ALLOW_SUBSCRIPTIONS) {

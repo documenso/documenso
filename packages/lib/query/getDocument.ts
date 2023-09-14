@@ -1,18 +1,19 @@
+import type { NextApiRequest, NextApiResponse } from "next";
 import { getUserFromToken } from "@documenso/lib/server";
 import prisma from "@documenso/prisma";
-import { Document as PrismaDocument } from "@prisma/client";
+import { DocumentWithRecipientAndField } from "../types";
 
 export const getDocument = async (
   documentId: number,
-  req: any,
-  res: any
-): Promise<PrismaDocument> => {
+  req: NextApiRequest,
+  res: NextApiResponse
+): Promise<DocumentWithRecipientAndField> => {
   const user = await getUserFromToken(req, res);
   if (!user) return Promise.reject("Invalid user or token.");
   if (!documentId) Promise.reject("No documentId");
   if (!req || !res) Promise.reject("No res or req");
 
-  const document: PrismaDocument = await prisma.document.findFirstOrThrow({
+  const document: DocumentWithRecipientAndField = await prisma.document.findFirstOrThrow({
     where: {
       id: documentId,
       userId: user.id,

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { ComponentProps, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { NEXT_PUBLIC_WEBAPP_URL } from "@documenso/lib/constants";
@@ -16,7 +16,11 @@ interface LoginValues {
   csrfToken: string;
 }
 
-export default function Login(props: any) {
+interface Props {
+  allowSignup: boolean;
+}
+
+export default function Login(props: Props) {
   const router = useRouter();
   const methods = useForm<LoginValues>();
   const { register, formState } = methods;
@@ -29,7 +33,7 @@ export default function Login(props: any) {
   }
 
   const onSubmit = async (values: LoginValues) => {
-    setErrorMessage(null);
+        setErrorMessage(null);
     const res = await toast.promise(
       signIn<"credentials">("credentials", {
         ...values,
@@ -47,7 +51,7 @@ export default function Login(props: any) {
         },
       }
     );
-    if (!res) {
+        if (!res) {
       setErrorMessage("Error");
       toast.dismiss();
       toast.error("Something went wrong.");

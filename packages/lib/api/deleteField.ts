@@ -1,6 +1,7 @@
+import { Field } from "@prisma/client";
 import toast from "react-hot-toast";
 
-export const deleteField = async (field: any) => {
+export const deleteField = async (field: Field) => {
   if (!field.id) {
     return;
   }

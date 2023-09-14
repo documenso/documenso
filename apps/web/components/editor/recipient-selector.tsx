@@ -1,12 +1,16 @@
-import { Fragment, useEffect, useState } from "react";
+import React, { Fragment, useEffect, useState } from "react";
 import { classNames } from "@documenso/lib";
 import { Listbox, Transition } from "@headlessui/react";
 import { CheckIcon, ChevronUpDownIcon } from "@heroicons/react/24/outline";
+import { Recipient } from "@prisma/client";
 
 const stc = require("string-to-color");
 
-export default function RecipientSelector(props: any) {
-  const [selectedRecipient, setSelectedRecipient]: any = useState(props?.recipients[0]);
+export default function RecipientSelector(props: {
+  recipients: Recipient[];
+  onChange: (value: Recipient) => void;
+}) {
+  const [selectedRecipient, setSelectedRecipient] = useState<Recipient>(props?.recipients[0]);
 
   useEffect(() => {
     props.onChange(selectedRecipient);
@@ -15,7 +19,7 @@ export default function RecipientSelector(props: any) {
   return (
     <Listbox
       value={selectedRecipient}
-      onChange={(e: any) => {
+      onChange={(e: Recipient) => {
         setSelectedRecipient(e);
       }}>
       {({ open }) => (
@@ -42,14 +46,14 @@ export default function RecipientSelector(props: any) {
             leaveFrom="opacity-100"
             leaveTo="opacity-0">
             <Listbox.Options className="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
-              {props?.recipients.map((recipient: any) => (
+              {props?.recipients.map((recipient) => (
                 <Listbox.Option
                   key={recipient?.id}
                   disabled={!recipient?.email}
                   className={({ active }) =>
                     classNames(
                       active ? "bg-neon-dark text-white" : "text-gray-900",
-                      "relative cursor-default select-none py-2 pl-3 pr-9 aria-disabled:opacity-50 aria-disabled:cursor-not-allowed"
+                      "relative cursor-default select-none py-2 pl-3 pr-9 aria-disabled:cursor-not-allowed aria-disabled:opacity-50"
                     )
                   }
                   value={recipient}>
@@ -67,7 +71,7 @@ export default function RecipientSelector(props: any) {
                             selected ? "font-semibold" : "font-normal",
                             "ml-3 block truncate"
                           )}>
-                          {`${recipient?.name} <${recipient?.email || 'unknown'}>`}
+                          {`${recipient?.name} <${recipient?.email || "unknown"}>`}
                         </span>
                       </div>
 

@@ -1,6 +1,7 @@
 import { Fragment, useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/router";
+import { classNames } from "@documenso/lib";
 import { getUser } from "@documenso/lib/api";
 import Logo from "./logo";
 import { Disclosure, Menu, Transition } from "@headlessui/react";
@@ -14,6 +15,7 @@ import {
   WrenchIcon,
   XMarkIcon,
 } from "@heroicons/react/24/outline";
+import { User } from "@prisma/client";
 import avatarFromInitials from "avatar-from-initials";
 import { signOut, useSession } from "next-auth/react";
 import { toast } from "react-hot-toast";
@@ -48,7 +50,7 @@ const userNavigation = [
   {
     name: "Sign out",
     href: "",
-    click: async (e: any) => {
+    click: async (e: React.MouseEvent<HTMLButtonElement | HTMLAnchorElement>) => {
       e.preventDefault();
       const res: any = await toast.promise(
         signOut({ callbackUrl: "/login" }),
@@ -71,10 +73,6 @@ const userNavigation = [
   },
 ];
 
-function classNames(...classes: any) {
-  return classes.filter(Boolean).join(" ");
-}
-
 type UserType = {
   id?: number | undefined;
   name?: string | null;
@@ -85,14 +83,14 @@ type UserType = {
 export default function TopNavigation() {
   const router = useRouter();
   const session = useSession();
-  const [user, setUser] = useState({
+  const [user, setUser] = useState<Pick<User, "email" | "name">>({
     email: "",
     name: "",
   });
 
   useEffect(() => {
     getUser().then((res) => {
-      res.json().then((j: any) => {
+      res.json().then((j: User) => {
         setUser(j);
       });
     });

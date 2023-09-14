@@ -3,7 +3,15 @@ import { classNames } from "@documenso/lib";
 import { Listbox, Transition } from "@headlessui/react";
 import { CheckIcon, ChevronUpDownIcon } from "@heroicons/react/24/outline";
 
-export function SelectBox(props: any) {
+interface Props {
+  className: string;
+  value: any;
+  label: string;
+  onChange: (e: any) => void;
+  options: any[];
+}
+
+export function SelectBox(props: Props) {
   return (
     <div className={props.className}>
       <Listbox

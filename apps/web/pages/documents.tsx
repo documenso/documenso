@@ -1,10 +1,11 @@
-import { ReactElement, useEffect, useState } from "react";
-import { NextPageContext } from "next";
+import React, { ReactElement, useEffect, useState } from "react";
+import { InferGetServerSidePropsType, NextPageContext } from "next";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import { uploadDocument } from "@documenso/features";
 import { deleteDocument, getDocuments } from "@documenso/lib/api";
 import { useSubscription } from "@documenso/lib/stripe";
+import { DocumentWithRecipient } from "@documenso/lib/types";
 import { Button, IconButton, SelectBox } from "@documenso/ui";
 import Layout from "../components/layout";
 import type { NextPageWithLayout } from "./_app";
@@ -22,11 +23,13 @@ import {
 import { DocumentStatus } from "@prisma/client";
 import { Tooltip as ReactTooltip } from "react-tooltip";
 
-const DocumentsPage: NextPageWithLayout = (props: any) => {
+const DocumentsPage: NextPageWithLayout<InferGetServerSidePropsType<typeof getServerSideProps>> = ({
+  filter,
+}: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const router = useRouter();
   const { hasSubscription } = useSubscription();
-  const [documents, setDocuments]: any[] = useState([]);
-  const [filteredDocuments, setFilteredDocuments] = useState([]);
+  const [documents, setDocuments] = useState<DocumentWithRecipient[]>([]);
+  const [filteredDocuments, setFilteredDocuments] = useState<DocumentWithRecipient[]>([]);
 
   const [loading, setLoading] = useState(true);
 
@@ -55,8 +58,8 @@ const DocumentsPage: NextPageWithLayout = (props: any) => {
 
   const loadDocuments = async () => {
     if (!documents.length) setLoading(true);
-    getDocuments().then((res: any) => {
-      res.json().then((j: any) => {
+    getDocuments().then((res) => {
+      res.json().then((j: DocumentWithRecipient[]) => {
         setDocuments(j);
         setLoading(false);
       });
@@ -66,25 +69,25 @@ const DocumentsPage: NextPageWithLayout = (props: any) => {
   useEffect(() => {
     loadDocuments().finally(() => {
       setSelectedStatusFilter(
-        statusFilters.filter((status) => status.value === props.filter.toUpperCase())[0]
+        statusFilters.filter((status) => status.value === filter.toUpperCase())[0]
       );
     });
   }, []);
 
   useEffect(() => {
-    setFilteredDocuments(filterDocumentes(documents));
+    setFilteredDocuments(filterDocuments(documents));
   }, [documents, selectedStatusFilter, selectedCreatedFilter]);
 
   function showDocument(documentId: number) {
     router.push(`/documents/${documentId}/recipients`);
   }
 
-  function filterDocumentes(documents: []): any {
+  function filterDocuments(documents: DocumentWithRecipient[]) {
     let filteredDocuments = documents.filter(
-      (d: any) => d.status === selectedStatusFilter.value || selectedStatusFilter.value === "ALL"
+      (d) => d.status === selectedStatusFilter.value || selectedStatusFilter.value === "ALL"
     );
 
-    filteredDocuments = filteredDocuments.filter((document: any) =>
+    filteredDocuments = filteredDocuments.filter((document) =>
       wasXDaysAgoOrLess(new Date(document.created), selectedCreatedFilter.value)
     );
 
@@ -145,16 +148,16 @@ const DocumentsPage: NextPageWithLayout = (props: any) => {
             </Button>
           </div>
         </div>
-        <div className="mt-3 mb-12 flex flex-wrap items-center justify-start gap-x-4 md:justify-end gap-y-4">
+        <div className="mt-3 mb-12 flex flex-wrap items-center justify-start gap-x-4 gap-y-4 md:justify-end">
           <SelectBox
-            className="block flex-1 md:flex-none md:w-1/4"
+            className="block flex-1 md:w-1/4 md:flex-none"
             label="Status"
             options={statusFilters}
             value={selectedStatusFilter}
             onChange={handleStatusFilterChange}
           />
           <SelectBox
-            className="block flex-1 md:flex-none md:w-1/4"
+            className="block flex-1 md:w-1/4 md:flex-none"
             label="Created"
             options={createdFilter}
             value={selectedCreatedFilter}
@@ -216,7 +219,7 @@ const DocumentsPage: NextPageWithLayout = (props: any) => {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-200 bg-white">
-                    {filteredDocuments.map((document: any, index: number) => (
+                    {filteredDocuments.map((document, index: number) => (
                       <tr
                         key={document.id}
                         className="cursor-pointer hover:bg-gray-100"
@@ -225,7 +228,7 @@ const DocumentsPage: NextPageWithLayout = (props: any) => {
                           {document.title || "#" + document.id}
                         </td>
                         <td className="inline-flex max-w-[250px] flex-wrap gap-x-2 gap-y-1 whitespace-nowrap py-3 text-sm text-gray-500">
-                          {document.Recipient.map((item: any) => (
+                          {document.Recipient.map((item) => (
                             <div key={item.id}>
                               {item.sendStatus === "NOT_SENT" ? (
                                 <span
@@ -295,7 +298,7 @@ const DocumentsPage: NextPageWithLayout = (props: any) => {
                           {formatDocumentStatus(document.status)}
                           <p>
                             <small hidden={document.Recipient.length === 0}>
-                              {document.Recipient.filter((r: any) => r.signingStatus === "SIGNED")
+                              {document.Recipient.filter((r) => r.signingStatus === "SIGNED")
                                 .length || 0}
                               /{document.Recipient.length || 0}
                             </small>
@@ -309,7 +312,7 @@ const DocumentsPage: NextPageWithLayout = (props: any) => {
                             <IconButton
                               icon={PencilSquareIcon}
                               className="mr-2"
-                              onClick={(event: any) => {
+                              onClick={(event: React.MouseEvent<HTMLButtonElement>) => {
                                 event.preventDefault();
                                 event.stopPropagation();
                                 router.push("/documents/" + document.id);
@@ -319,7 +322,7 @@ const DocumentsPage: NextPageWithLayout = (props: any) => {
                             <IconButton
                               icon={ArrowDownTrayIcon}
                               className="mr-2"
-                              onClick={(event: any) => {
+                              onClick={(event: React.MouseEvent<HTMLButtonElement>) => {
                                 event.preventDefault();
                                 event.stopPropagation();
                                 router.push("/api/documents/" + document.id);
@@ -327,16 +330,16 @@ const DocumentsPage: NextPageWithLayout = (props: any) => {
                             />
                             <IconButton
                               icon={TrashIcon}
-                              onClick={(event: any) => {
+                              onClick={(event: React.MouseEvent<HTMLButtonElement>) => {
                                 event.preventDefault();
                                 event.stopPropagation();
                                 if (confirm("Are you sure you want to delete this document")) {
                                   const documentsWithoutIndex = [...documents];
-                                  const removedItem: any = documentsWithoutIndex.splice(index, 1);
+                                  const removedItem = documentsWithoutIndex.splice(index, 1);
                                   setDocuments(documentsWithoutIndex);
                                   deleteDocument(document.id)
                                     .catch((err) => {
-                                      documentsWithoutIndex.splice(index, 0, removedItem);
+                                      documentsWithoutIndex.splice(index, 0, ...removedItem);
                                       setDocuments(documentsWithoutIndex);
                                     })
                                     .then(() => {
@@ -344,7 +347,7 @@ const DocumentsPage: NextPageWithLayout = (props: any) => {
                                     });
                                 }
                               }}></IconButton>
-                            <span className="sr-only">, {document.name}</span>
+                            <span className="sr-only">, {document.title}</span>
                           </div>
                         </td>
                       </tr>
@@ -391,7 +394,7 @@ const DocumentsPage: NextPageWithLayout = (props: any) => {
             id="fileUploadHelper"
             type="file"
             accept="application/pdf"
-            onChange={(event: any) => {
+            onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
               uploadDocument(event);
             }}
             hidden
@@ -421,7 +424,7 @@ function formatDocumentStatus(status: DocumentStatus) {
 }
 
 export async function getServerSideProps(context: NextPageContext) {
-  const filter = context.query["filter"];
+  const filter = context.query["filter"] as string;
 
   return {
     props: {

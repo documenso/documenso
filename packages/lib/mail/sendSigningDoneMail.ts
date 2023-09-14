@@ -1,9 +1,9 @@
 import { signingCompleteTemplate } from "@documenso/lib/mail";
 import { addDigitalSignature } from "@documenso/signing/addDigitalSignature";
 import { sendMail } from "./sendMail";
-import { Document as PrismaDocument } from "@prisma/client";
+import { Document as PrismaDocument, Recipient, User } from "@prisma/client";
 
-export const sendSigningDoneMail = async (document: PrismaDocument, user: any) => {
+export const sendSigningDoneMail = async (document: PrismaDocument, user: User | Recipient) => {
   await sendMail(
     user.email,
     `Completed: "${document.title}"`,

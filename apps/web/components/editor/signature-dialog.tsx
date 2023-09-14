@@ -1,13 +1,20 @@
 import { Fragment, useEffect, useState } from "react";
 import { classNames } from "@documenso/lib";
 import { localStorage } from "@documenso/lib";
+import { SVGComponent } from "@documenso/lib/types";
 import { Button, IconButton } from "@documenso/ui";
+import { useDebouncedValue } from "../../hooks/use-debounced-value";
 import { Dialog, Transition } from "@headlessui/react";
 import { LanguageIcon, PencilIcon, TrashIcon } from "@heroicons/react/24/outline";
 import SignatureCanvas from "react-signature-canvas";
-import { useDebouncedValue } from "../../hooks/use-debounced-value";
 
-const tabs = [
+interface Tab {
+  name: string;
+  icon: SVGComponent;
+  current: boolean;
+}
+
+const tabs: Tab[] = [
   { name: "Type", icon: LanguageIcon, current: true },
   { name: "Draw", icon: PencilIcon, current: false },
 ];
@@ -145,7 +152,7 @@ export default function SignatureDialog(props: any) {
                             }}
                           />
                         )}
-                        
+
                         <div className="flex items-center justify-between">
                           <IconButton
                             className="block"
@@ -198,7 +205,7 @@ export default function SignatureDialog(props: any) {
     return currentTab.name === tabName;
   }
 
-  function setCurrent(t: any) {
+  function setCurrent(t: Tab) {
     tabs.forEach((tab) => {
       tab.current = tab.name === t.name;
     });
