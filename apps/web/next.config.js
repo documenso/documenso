@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 const path = require('path');
+const { version } = require('./package.json');
 
 const { parsed: env } = require('dotenv').config({
   path: path.join(__dirname, '../../.env.local'),
@@ -20,6 +21,7 @@ const config = {
   ],
   env: {
     ...env,
+    APP_VERSION: version,
     NEXT_PUBLIC_APP: 'web',
   },
   modularizeImports: {

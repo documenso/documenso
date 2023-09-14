@@ -21,16 +21,18 @@ export default async function BillingSettingsPage() {
     redirect('/settings/profile');
   }
 
-  let subscription = await getSubscriptionByUserId({ userId: user.id });
+  const subscription = await getSubscriptionByUserId({ userId: user.id }).then(async (sub) => {
+    if (sub) {
+      return sub;
+    }
 
-  // If we don't have a customer record, create one as well as an empty subscription.
-  if (!subscription?.customerId) {
-    subscription = await createCustomer({ user });
-  }
+    // If we don't have a customer record, create one as well as an empty subscription.
+    return createCustomer({ user });
+  });
 
   let billingPortalUrl = '';
 
-  if (subscription?.customerId) {
+  if (subscription.customerId) {
     billingPortalUrl = await getPortalSession({
       customerId: subscription.customerId,
       returnUrl: `${process.env.NEXT_PUBLIC_SITE_URL}/settings/billing`,

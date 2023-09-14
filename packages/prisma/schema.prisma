@@ -13,6 +13,11 @@ enum IdentityProvider {
   GOOGLE
 }
 
+enum Role {
+  ADMIN
+  USER
+}
+
 model User {
   id               Int              @id @default(autoincrement())
   name             String?
@@ -21,6 +26,7 @@ model User {
   password         String?
   source           String?
   signature        String?
+  roles            Role[]           @default([USER])
   identityProvider IdentityProvider @default(DOCUMENSO)
   accounts         Account[]
   sessions         Session[]
