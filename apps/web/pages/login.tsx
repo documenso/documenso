@@ -1,8 +1,10 @@
 import Head from "next/head";
 import { getUserFromToken } from "@documenso/lib/server";
 import Login from "../components/login";
+import { InferGetServerSidePropsType } from "next";
 
-export default function LoginPage(props: any) {
+
+export default function LoginPage(props: InferGetServerSidePropsType<typeof getServerSideProps>) {
   return (
     <>
       <Head>

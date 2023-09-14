@@ -1,7 +1,11 @@
-import { useRouter } from "next/router";
+import { Document as PrismaDocument, Signature } from "@prisma/client";
 import toast from "react-hot-toast";
 
-export const signDocument = (document: any, signatures: any[], token: string): Promise<any> => {
+export const signDocument = (
+  document: PrismaDocument,
+  signatures: Signature[],
+  token: string
+): Promise<Response> => {
   const body = { documentId: document.id, signatures };
 
   return toast.promise(

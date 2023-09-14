@@ -1,9 +1,12 @@
 import { ReactElement, useRef, useState } from "react";
+import { InferGetServerSidePropsType } from "next";
 import Head from "next/head";
 import { NEXT_PUBLIC_WEBAPP_URL, classNames } from "@documenso/lib";
 import { createOrUpdateRecipient, deleteRecipient, sendSigningRequests } from "@documenso/lib/api";
 import { getDocument } from "@documenso/lib/query";
 import { getUserFromToken } from "@documenso/lib/server";
+import { useSubscription } from "@documenso/lib/stripe";
+import { DocumentWithRecipientAndField } from "@documenso/lib/types";
 import { Breadcrumb, Button, Dialog, IconButton, Tooltip } from "@documenso/ui";
 import Layout from "../../../components/layout";
 import { NextPageWithLayout } from "../../_app";
@@ -21,15 +24,18 @@ import {
 import { DocumentStatus, Document as PrismaDocument, Recipient } from "@prisma/client";
 import { FormProvider, useFieldArray, useForm, useWatch } from "react-hook-form";
 import { toast } from "react-hot-toast";
-import { useSubscription } from "@documenso/lib/stripe";
 
 export type FormValues = {
-  signers: Array<Pick<Recipient, 'id' | 'email' | 'name' | 'sendStatus' | 'readStatus' | 'signingStatus'>>;
+  signers: Array<
+    Pick<Recipient, "id" | "email" | "name" | "sendStatus" | "readStatus" | "signingStatus">
+  >;
 };
 
 type FormSigner = FormValues["signers"][number];
 
-const RecipientsPage: NextPageWithLayout = (props: any) => {
+const RecipientsPage: NextPageWithLayout<InferGetServerSidePropsType<typeof getServerSideProps>> = (
+  props: InferGetServerSidePropsType<typeof getServerSideProps>
+) => {
   const { hasSubscription } = useSubscription();
   const title: string = `"` + props?.document?.title + `"` + "Recipients | Documenso";
   const breadcrumbItems = [
@@ -100,9 +106,11 @@ const RecipientsPage: NextPageWithLayout = (props: any) => {
               <>
                 <Button
                   icon={PencilSquareIcon}
-                  disabled={props.document.status === DocumentStatus.COMPLETED}
+                  disabled={(props.document.status as DocumentStatus) === DocumentStatus.COMPLETED}
                   color={
-                    props.document.status === DocumentStatus.COMPLETED ? "primary" : "secondary"
+                    (props.document.status as DocumentStatus) === DocumentStatus.COMPLETED
+                      ? "primary"
+                      : "secondary"
                   }
                   className="mr-2"
                   href={breadcrumbItems[1].href}>
@@ -118,7 +126,7 @@ const RecipientsPage: NextPageWithLayout = (props: any) => {
                       : setOpen(true);
                   }}
                   disabled={
-                    !hasSubscription || 
+                    !hasSubscription ||
                     (formValues.length || 0) === 0 ||
                     !formValues.some(
                       (r) => r.email && !hasEmailError(r) && r.sendStatus === "NOT_SENT"
@@ -172,15 +180,15 @@ const RecipientsPage: NextPageWithLayout = (props: any) => {
                                 createOrUpdateRecipient({
                                   ...formValues[index],
                                   documentId: props.document.id,
-                                });
+                                } as Recipient);
                             }}
-                            onKeyDown={(event: any) => {
+                            onKeyDown={(event: React.KeyboardEvent<HTMLInputElement>) => {
                               if (event.key === "Enter")
                                 if (!errors?.signers?.[index])
                                   createOrUpdateRecipient({
                                     ...formValues[index],
                                     documentId: props.document.id,
-                                  });
+                                  } as Recipient);
                             }}
                             className="block w-full border-0  bg-inherit p-0 text-gray-900 placeholder-gray-500 outline-none disabled:bg-neutral-100 sm:text-sm"
                           />
@@ -210,14 +218,14 @@ const RecipientsPage: NextPageWithLayout = (props: any) => {
                                 createOrUpdateRecipient({
                                   ...formValues[index],
                                   documentId: props.document.id,
-                                });
+                                } as Recipient);
                             }}
-                            onKeyDown={(event: any) => {
+                            onKeyDown={(event: React.KeyboardEvent<HTMLInputElement>) => {
                               if (event.key === "Enter" && !errors?.signers?.[index])
                                 createOrUpdateRecipient({
                                   ...formValues[index],
                                   documentId: props.document.id,
-                                });
+                                } as Recipient);
                             }}
                             className="block w-full border-0 bg-inherit p-0 text-gray-900 placeholder-gray-500 outline-none disabled:bg-neutral-100 sm:text-sm"
                           />
@@ -276,7 +284,7 @@ const RecipientsPage: NextPageWithLayout = (props: any) => {
                                   item.signingStatus === "SIGNED" ||
                                   loading
                                 }
-                                onClick={(event: any) => {
+                                onClick={(event: React.MouseEvent<HTMLButtonElement>) => {
                                   event.preventDefault();
                                   event.stopPropagation();
                                   if (confirm("Resend this signing request?")) {
@@ -286,25 +294,25 @@ const RecipientsPage: NextPageWithLayout = (props: any) => {
                                     });
                                   }
                                 }}
-                                className="mx-1 group-hover:text-neon-dark group-hover:disabled:text-gray-400"
+                                className="group-hover:text-neon-dark mx-1 group-hover:disabled:text-gray-400"
                               />
                             </Tooltip>
                             <Tooltip label="Delete">
                               <IconButton
                                 icon={TrashIcon}
                                 disabled={!item.id || item.sendStatus === "SENT" || loading}
-                                onClick={(event: any) => {
+                                onClick={(event: React.MouseEvent<HTMLButtonElement>) => {
                                   event.preventDefault();
                                   event.stopPropagation();
                                   if (confirm("Delete this signing request?")) {
                                     const removedItem = { ...fields }[index];
                                     remove(index);
-                                    deleteRecipient(item)?.catch((err) => {
+                                    deleteRecipient(item as unknown as Recipient)?.catch((err) => {
                                       append(removedItem);
                                     });
                                   }
                                 }}
-                                className="mx-1 group-hover:text-neon-dark group-hover:disabled:text-gray-400"
+                                className="group-hover:text-neon-dark mx-1 group-hover:disabled:text-gray-400"
                               />
                             </Tooltip>
                           </div>
@@ -324,7 +332,7 @@ const RecipientsPage: NextPageWithLayout = (props: any) => {
                       email: "",
                       name: "",
                       documentId: props.document.id,
-                    }).then((res) => {
+                    } as unknown as Recipient).then((res) => {
                       append(res);
                     });
                   }}>
@@ -364,11 +372,17 @@ export async function getServerSideProps(context: any) {
     };
 
   const { id: documentId } = context.query;
-  const document: PrismaDocument = await getDocument(+documentId, context.req, context.res);
+  const document: DocumentWithRecipientAndField = await getDocument(
+    +documentId,
+    context.req,
+    context.res
+  );
 
   return {
     props: {
-      document: JSON.parse(JSON.stringify({ ...document, document: "" })),
+      document: JSON.parse(
+        JSON.stringify({ ...document, document: "" })
+      ) as DocumentWithRecipientAndField,
     },
   };
 }

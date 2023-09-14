@@ -2,10 +2,11 @@ import { NextApiRequest, NextApiResponse } from "next";
 import { sendSigningDoneMail } from "@documenso/lib/mail";
 import { getDocument } from "@documenso/lib/query";
 import { defaultHandler, defaultResponder } from "@documenso/lib/server";
+import { FieldWithSignature } from "@documenso/lib/types";
 import { insertImageInPDF, insertTextInPDF } from "@documenso/pdf";
 import prisma from "@documenso/prisma";
 import { DocumentStatus, SigningStatus } from "@prisma/client";
-import { FieldType, Document as PrismaDocument } from "@prisma/client";
+import { FieldType, Document as PrismaDocument, User } from "@prisma/client";
 
 async function postHandler(req: NextApiRequest, res: NextApiResponse) {
   const { token: recipientToken } = req.query;
@@ -49,7 +50,7 @@ async function postHandler(req: NextApiRequest, res: NextApiResponse) {
 
     await saveSignature(signature);
 
-    const signedField = await prisma.field.findFirstOrThrow({
+    const signedField: FieldWithSignature = await prisma.field.findFirstOrThrow({
       where: { id: signature.fieldId },
       include: { Signature: true },
     });
@@ -91,7 +92,7 @@ async function postHandler(req: NextApiRequest, res: NextApiResponse) {
     },
     include: {
       Recipient: true,
-    }
+    },
   });
 
   // Insert fields other than signatures
@@ -132,10 +133,10 @@ async function postHandler(req: NextApiRequest, res: NextApiResponse) {
   });
 
   if (unsignedRecipients.length === 0) {
-    const documentOwner = await prisma.user.findFirstOrThrow({
+    const documentOwner = (await prisma.user.findFirstOrThrow({
       where: { id: document.userId },
       select: { email: true, name: true },
-    });
+    })) as User;
 
     document.document = documentWithInserts;
     if (documentOwner) await sendSigningDoneMail(document, documentOwner);
@@ -147,7 +148,7 @@ async function postHandler(req: NextApiRequest, res: NextApiResponse) {
 
   return res.status(200).end();
 
-  async function insertSignatureInDocument(signedField: any) {
+  async function insertSignatureInDocument(signedField: FieldWithSignature) {
     if (signedField?.Signature?.signatureImageAsBase64) {
       documentWithInserts = await insertImageInPDF(
         documentWithInserts,

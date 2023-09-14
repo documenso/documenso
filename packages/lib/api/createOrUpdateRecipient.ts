@@ -1,6 +1,7 @@
+import { Recipient } from "@prisma/client";
 import toast from "react-hot-toast";
 
-export const createOrUpdateRecipient = async (recipient: any): Promise<any> => {
+export const createOrUpdateRecipient = async (recipient: Recipient): Promise<any> => {
   try {
     const created = await toast.promise(
       fetch("/api/documents/" + recipient.documentId + "/recipients", {

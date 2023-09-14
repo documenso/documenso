@@ -1,5 +1,5 @@
 import { isENVProd } from "@documenso/lib";
-import { Document, PrismaClient, User } from "@prisma/client";
+import { PrismaClient } from "@prisma/client";
 
 declare global {
   var client: PrismaClient | undefined;

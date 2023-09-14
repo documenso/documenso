@@ -1,10 +1,23 @@
-import React from "react";
+import React, { PropsWithChildren } from "react";
 import Link from "next/link";
 import { classNames } from "@documenso/lib";
+import { SVGComponent } from "@documenso/lib/types";
+import { URL } from "url";
 
-export function IconButton(props: any) {
+interface Props {
+  id?: string;
+  href?: string;
+  disabled?: boolean;
+  color?: string;
+  icon?: SVGComponent;
+  onClick?: (event: React.MouseEvent<HTMLButtonElement>) => void;
+  hidden?: boolean;
+  className?: string;
+}
+
+export function IconButton(props: PropsWithChildren<Props>) {
   const isLink = typeof props.href !== "undefined";
-  const { color = "primary", icon, disabled, onClick } = props;
+  const { color = "primary" } = props;
   const baseStyles = "disabled:text-gray-300";
   const primaryStyles = "text-neon hover:text-neon-dark";
   const secondaryStyles = "text-gray-700 hover:text-neon-dark";
@@ -12,7 +25,7 @@ export function IconButton(props: any) {
   return isLink ? (
     <Link
       id={props.id}
-      href={props.href}
+      href={props.href as unknown as URL}
       className={classNames(
         baseStyles,
         color === "primary" ? primaryStyles : secondaryStyles,

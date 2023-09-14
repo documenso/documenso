@@ -1,10 +1,25 @@
-import React from "react";
+import React, { ButtonHTMLAttributes } from "react";
 import Link from "next/link";
 import { classNames } from "@documenso/lib";
+import { SVGComponent } from "@documenso/lib/types";
+import { Url } from "url";
 
-export function Button(props: any) {
+interface Props {
+  id?: string;
+  href?: string;
+  disabled?: boolean;
+  loading?: boolean;
+  color?: string;
+  icon?: SVGComponent;
+  onClick?: (event: React.MouseEvent<HTMLButtonElement>) => void;
+  hidden?: boolean;
+  className?: string;
+  type?: ButtonHTMLAttributes<HTMLButtonElement>["type"];
+}
+
+export function Button(props: React.PropsWithChildren<Props>) {
+  const { color = "primary" } = props;
   const isLink = typeof props.href !== "undefined" && !props.disabled;
-  const { color = "primary", icon, disabled, onClick } = props;
   const baseStyles =
     "inline-flex gap-x-2 items-center justify-center min-w-[80px] rounded-md border border-transparent px-4 py-2 text-sm font-medium shadow-sm disabled:bg-gray-300 duration-200";
   const primaryStyles = "text-gray-900 bg-neon hover:bg-neon-dark";
@@ -13,7 +28,7 @@ export function Button(props: any) {
   return isLink ? (
     <Link
       id={props.id}
-      href={props.href}
+      href={props.href as unknown as Url}
       className={classNames(
         baseStyles,
         color === "primary" ? primaryStyles : secondaryStyles,

@@ -1,17 +1,22 @@
+import { InferGetServerSidePropsType, NextPageContext } from "next";
 import Head from "next/head";
 import Link from "next/link";
 import { useRouter } from "next/router";
+import { truncate } from "@documenso/lib/helpers";
+import { DocumentWithRecipient } from "@documenso/lib/types";
 import prisma from "@documenso/prisma";
-import { Button, IconButton } from "@documenso/ui";
+import { Button } from "@documenso/ui";
 import { NextPageWithLayout } from "../../_app";
 import { ArrowDownTrayIcon, CheckBadgeIcon } from "@heroicons/react/24/outline";
-import { truncate } from "@documenso/lib/helpers";
+import { Field, Recipient } from "@prisma/client";
 
-const Signed: NextPageWithLayout = (props: any) => {
+const Signed: NextPageWithLayout<InferGetServerSidePropsType<typeof getServerSideProps>> = ({
+  document,
+  fields,
+  recipient,
+}: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const router = useRouter();
-  const allRecipientsSigned = props.document.Recipient?.every(
-    (r: any) => r.signingStatus === "SIGNED"
-  );
+  const allRecipientsSigned = document.Recipient?.every((r) => r.signingStatus === "SIGNED");
 
   return (
     <>
@@ -22,7 +27,7 @@ const Signed: NextPageWithLayout = (props: any) => {
         <CheckBadgeIcon className="text-neon mr-1 inline w-10"></CheckBadgeIcon>
         <h1 className="text-neon inline align-middle text-base font-medium">It's done!</h1>
         <p className="mt-2 text-4xl font-bold tracking-tight">
-          You signed "{truncate(props.document.title)}"
+          You signed "{truncate(document.title)}"
         </p>
         <p className="mt-2 max-w-sm text-base text-gray-500" hidden={allRecipientsSigned}>
           You will be notfied when all recipients have signed.
@@ -34,14 +39,12 @@ const Signed: NextPageWithLayout = (props: any) => {
           <Button
             icon={ArrowDownTrayIcon}
             color="secondary"
-            onClick={(event: any) => {
+            onClick={(event: React.MouseEvent<HTMLButtonElement>) => {
               event.preventDefault();
               event.stopPropagation();
-              router.push(
-                "/api/documents/" + props.document.id + "?token=" + props.recipient.token
-              );
+              router.push("/api/documents/" + document.id + "?token=" + recipient.token);
             }}>
-            Download "{props.document.title}"
+            Download "{document.title}"
           </Button>
         </div>
       </div>
@@ -63,8 +66,8 @@ const Signed: NextPageWithLayout = (props: any) => {
   );
 };
 
-export async function getServerSideProps(context: any) {
-  const recipientToken: string = context.query["token"];
+export async function getServerSideProps(context: NextPageContext) {
+  const recipientToken: string = context.query["token"] as string;
 
   const recipient = await prisma.recipient.findFirstOrThrow({
     where: {
@@ -86,9 +89,9 @@ export async function getServerSideProps(context: any) {
 
   return {
     props: {
-      document: JSON.parse(JSON.stringify(recipient.Document)),
-      fields: JSON.parse(JSON.stringify(fields)),
-      recipient: JSON.parse(JSON.stringify(recipient)),
+      document: JSON.parse(JSON.stringify(recipient.Document)) as DocumentWithRecipient,
+      fields: JSON.parse(JSON.stringify(fields)) as Field,
+      recipient: JSON.parse(JSON.stringify(recipient)) as Recipient,
     },
   };
 }

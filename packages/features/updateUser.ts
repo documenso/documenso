@@ -1,6 +1,7 @@
+import { User } from "@prisma/client";
 import toast from "react-hot-toast";
 
-export const updateUser = async (user: any) => {
+export const updateUser = async (user: User) => {
   if (!user) return;
   toast.promise(
     fetch("/api/users", {

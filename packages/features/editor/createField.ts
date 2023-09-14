@@ -1,13 +1,22 @@
-import { FieldType } from "@prisma/client";
+import React from "react";
+import { FieldType, Recipient } from "@prisma/client";
 
 export const createField = (
-  e: any,
+  e: React.MouseEvent<HTMLElement>,
   page: number,
-  selectedRecipient: any,
+  selectedRecipient: Recipient,
   type: FieldType = FieldType.SIGNATURE,
   customText = ""
-): any => {
-  var rect = e.target.getBoundingClientRect();
+): {
+  id: number;
+  page: number;
+  type: FieldType;
+  positionX: string;
+  positionY: string;
+  Recipient: Recipient;
+  customText: string;
+} => {
+  var rect = (e.target as HTMLElement).getBoundingClientRect();
   const fieldSize = { width: 192, height: 64 };
   var newFieldX = e.clientX - rect.left - fieldSize.width / 2; //x position within the element.
   var newFieldY = e.clientY - rect.top - fieldSize.height / 2; //y position within the element.

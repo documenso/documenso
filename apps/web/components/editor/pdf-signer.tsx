@@ -8,7 +8,7 @@ import { Button } from "@documenso/ui";
 import Logo from "../logo";
 import SignatureDialog from "./signature-dialog";
 import { CheckBadgeIcon, InformationCircleIcon } from "@heroicons/react/24/outline";
-import { FieldType } from "@prisma/client";
+import { FieldType, Field, Recipient } from "@prisma/client";
 
 const PDFViewer = dynamic(() => import("./pdf-viewer"), {
   ssr: false,
@@ -128,7 +128,7 @@ export default function PDFSigner(props: any) {
         fields={fields}
         pdfUrl={`${NEXT_PUBLIC_WEBAPP_URL}/api/documents/${router.query.id}?token=${router.query.token}`}
         onClick={onClick}
-        onMouseDown={function onMouseDown(e: any, page: number) {
+        onMouseDown={function onMouseDown(e: React.MouseEvent<HTMLDivElement>, page: number) {
           if (signatureFields.length === 0) addFreeSignature(e, page, props.recipient);
         }}
         onMouseUp={() => {}}
@@ -148,10 +148,10 @@ export default function PDFSigner(props: any) {
     }
   }
 
-  function addFreeSignature(e: any, page: number, recipient: any): any {
+  function addFreeSignature(e: React.MouseEvent<HTMLDivElement>, page: number, recipient: Recipient): any {
     const freeSignatureField = createField(e, page, recipient, FieldType.FREE_SIGNATURE);
 
-    createOrUpdateField(props.document, freeSignatureField, recipient.token).then((res) => {
+    createOrUpdateField(props.document, freeSignatureField as unknown as Field, recipient.token).then((res) => {
       setFields((prevState) => [...prevState, res]);
       setDialogField(res);
       setOpen(true);

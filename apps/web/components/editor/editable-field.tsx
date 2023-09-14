@@ -3,26 +3,19 @@ import { IconButton } from "@documenso/ui";
 import Logo from "../logo";
 import { XCircleIcon } from "@heroicons/react/20/solid";
 import Draggable from "react-draggable";
+import { FieldWithRecipient } from "@documenso/lib/types";
 
 const stc = require("string-to-color");
 
 type FieldPropsType = {
-  field: {
-    color: string;
-    type: string;
-    position: any;
-    positionX: number;
-    positionY: number;
-    id: string;
-    Recipient: { name: ""; email: "" };
-  };
-  onPositionChanged: any;
+  field: FieldWithRecipient;
+  onPositionChanged: (e: any, id: any) => void;
   onDelete: any;
   hidden: boolean;
 };
 
 export default function EditableField(props: FieldPropsType) {
-  const [field, setField]: any = useState(props.field);
+  const [field, setField] = useState<FieldWithRecipient>(props.field);
   const [position, setPosition]: any = useState({
     x: props.field.positionX,
     y: props.field.positionY,
@@ -49,7 +42,7 @@ export default function EditableField(props: FieldPropsType) {
       onStop={onDragStop}
       defaultPosition={{ x: 0, y: 0 }}
       cancel="strong"
-      onMouseDown={(e: any) => {
+      onMouseDown={(e: MouseEvent) => {
         e.preventDefault();
         e.stopPropagation();
       }}>
@@ -59,7 +52,7 @@ export default function EditableField(props: FieldPropsType) {
         ref={nodeRef}
         className="absolute top-0 left-0 m-auto h-16 w-48 cursor-move select-none flex-row-reverse p-2 text-center text-lg font-bold opacity-80"
         style={{
-          background: stc(props.field.Recipient.email),
+          background: stc(props.field.Recipient?.email),
         }}>
         <div className="m-auto flex-row-reverse overflow-hidden text-center text-lg font-bold">
           {field.type}
@@ -76,7 +69,7 @@ export default function EditableField(props: FieldPropsType) {
             className="absolute top-0 right-0 -m-5"
             color="secondary"
             icon={XCircleIcon}
-            onClick={(event: any) => {
+            onClick={(event: React.MouseEvent<HTMLButtonElement>) => {
               props.onDelete(props.field.id);
             }}></IconButton>
         </strong>

@@ -35,7 +35,7 @@ export default function SignableField(props: FieldPropsType) {
       position={position}
       defaultPosition={{ x: 0, y: 0 }}
       cancel="div"
-      onMouseDown={(e: any) => {
+      onMouseDown={(e: MouseEvent) => {
         // e.preventDefault();
         e.stopPropagation();
       }}>
@@ -73,7 +73,7 @@ export default function SignableField(props: FieldPropsType) {
             icon={XCircleIcon}
             color="secondary"
             className="absolute top-0 right-0 -m-5"
-            onClick={(event: any) => {
+            onClick={(event: React.MouseEvent<HTMLButtonElement>) => {
               event.preventDefault();
               event.stopPropagation();
               const newField = { ...field };

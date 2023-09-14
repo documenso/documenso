@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { classNames } from "@documenso/lib";
 import { RadioGroup } from "@headlessui/react";
 import { FieldType } from "@prisma/client";
@@ -14,7 +14,7 @@ export default function FieldTypeSelector(props: any) {
     { name: "Date", id: FieldType.DATE },
   ];
 
-  const [selectedFieldType, setSelectedFieldType] = useState(fieldTypes[0].id);
+  const [selectedFieldType, setSelectedFieldType] = useState<FieldType>(fieldTypes[0].id);
 
   useEffect(() => {
     props.onChange(selectedFieldType);
@@ -23,13 +23,13 @@ export default function FieldTypeSelector(props: any) {
   return (
     <RadioGroup
       value={selectedFieldType}
-      onChange={(e: any) => {
+      onChange={(e: FieldType) => {
         setSelectedFieldType(e);
       }}>
       <div className="space-y-4">
         {fieldTypes.map((fieldType) => (
           <RadioGroup.Option
-            onMouseDown={(e: any) => {
+            onMouseDown={(e: React.MouseEvent<HTMLInputElement>) => {
               if (e.button === 0) setSelectedFieldType(fieldType.id);
             }}
             key={fieldType.id}

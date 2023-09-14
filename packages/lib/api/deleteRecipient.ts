@@ -1,6 +1,7 @@
+import { Recipient } from "@prisma/client";
 import toast from "react-hot-toast";
 
-export const deleteRecipient = (recipient: any) => {
+export const deleteRecipient = (recipient: Recipient) => {
   if (!recipient.id) {
     return;
   }
