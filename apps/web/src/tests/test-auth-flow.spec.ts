@@ -1,12 +1,12 @@
-import { expect, test } from '@playwright/test';
+import { type Page, expect, test } from '@playwright/test';
 
 test.use({ storageState: { cookies: [], origins: [] } });
 
-test('sign up with email and password', async ({ page }) => {
-  await page.goto('http://localhost:3000/signup');
-  await page.getByLabel('Name').fill('John Doe');
-  await page.getByLabel('Email').fill('johndoe2023@documenso.com');
-  await page.getByLabel('Password').fill('my_secure_password');
+test('user can sign up with email and password', async ({ page }: { page: Page }) => {
+  await page.goto('/signup');
+  await page.getByLabel('Name').fill(process.env.E2E_TEST_USERNAME);
+  await page.getByLabel('Email').fill(process.env.E2E_TEST_USER_EMAIL);
+  await page.getByLabel('Password').fill(process.env.E2E_TEST_USER_PASSWORD);
 
   const canvas = page.locator('canvas');
   const box = await canvas.boundingBox();
@@ -21,11 +21,11 @@ test('sign up with email and password', async ({ page }) => {
   await page.getByRole('button', { name: 'Sign Up' }).click();
 });
 
-test('user can login with user and password', async ({ page }) => {
-  await page.goto('http://localhost:3000/signin');
-  await page.getByLabel('Email').fill('johndoe2023@documenso.com');
-  await page.getByLabel('Password').fill('my_secure_password');
+test('user can login with user and password', async ({ page }: { page: Page }) => {
+  await page.goto('/signin');
+  await page.getByLabel('Email').fill(process.env.E2E_TEST_USER_EMAIL);
+  await page.getByLabel('Password').fill(process.env.E2E_TEST_USER_PASSWORD);
   await page.getByRole('button', { name: 'Sign In' }).click();
 
-  await expect(page).toHaveURL('http://localhost:3000/documents');
+  await expect(page).toHaveURL('/documents');
 });
