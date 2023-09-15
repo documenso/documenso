@@ -6,8 +6,7 @@ import { addDigitalSignature } from "@documenso/signing/addDigitalSignature";
 import { Document as PrismaDocument } from "@prisma/client";
 
 async function getHandler(req: NextApiRequest, res: NextApiResponse) {
-  const { id: documentId } = req.query;
-  const { token: recipientToken } = req.query;
+  const { id: documentId, token: recipientToken } = req.query;
 
   if (!documentId) {
     return res.status(400).send("Missing parameter documentId.");
