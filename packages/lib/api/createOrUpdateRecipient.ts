@@ -3,7 +3,7 @@ import toast from "react-hot-toast";
 export const createOrUpdateRecipient = async (recipient: any): Promise<any> => {
   try {
     const created = await toast.promise(
-      fetch("/api/documents/" + recipient.documentId + "/recipients", {
+      fetch(`/api/documents/${recipient.documentId}/recipients`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

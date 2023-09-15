@@ -7,17 +7,8 @@ export const deleteField = async (field: any) => {
 
   try {
     const deleted = toast.promise(
-      fetch("/api/documents/" + 0 + "/fields/" + field.id, {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(field),
-      }).then((res) => {
-        if (!res.ok) {
-          throw new Error(res.status.toString());
-        }
-        return res;
+      fetch(`/api/documents/${field.documentId}/fields/${field.id}`, {
+        method: "DELETE"
       }),
       {
         loading: "Deleting...",

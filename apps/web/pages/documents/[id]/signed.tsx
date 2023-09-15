@@ -38,7 +38,7 @@ const Signed: NextPageWithLayout = (props: any) => {
               event.preventDefault();
               event.stopPropagation();
               router.push(
-                "/api/documents/" + props.document.id + "?token=" + props.recipient.token
+                `/api/documents/${props.document.id}?token=${props.recipient.token}`
               );
             }}>
             Download "{props.document.title}"

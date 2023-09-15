@@ -31,7 +31,7 @@ type FormSigner = FormValues["signers"][number];
 
 const RecipientsPage: NextPageWithLayout = (props: any) => {
   const { hasSubscription } = useSubscription();
-  const title: string = `"` + props?.document?.title + `"` + "Recipients | Documenso";
+  const title: string = `"` + props?.document?.title + `" ` + "Recipients | Documenso";
   const breadcrumbItems = [
     {
       title: "Documents",
@@ -41,12 +41,12 @@ const RecipientsPage: NextPageWithLayout = (props: any) => {
       title: props.document.title,
       href:
         props.document.status !== DocumentStatus.COMPLETED
-          ? NEXT_PUBLIC_WEBAPP_URL + "/documents/" + props.document.id
-          : NEXT_PUBLIC_WEBAPP_URL + "/documents/" + props.document.id + "/recipients",
+          ? `${NEXT_PUBLIC_WEBAPP_URL}/documents/${props.document.id}`
+          : `${NEXT_PUBLIC_WEBAPP_URL}/documents/${props.document.id}/recipients`,
     },
     {
       title: "Recipients",
-      href: NEXT_PUBLIC_WEBAPP_URL + "/documents/" + props.document.id + "/recipients",
+      href: `${NEXT_PUBLIC_WEBAPP_URL}/documents/${props.document.id}/recipients`,
     },
   ];
 
@@ -93,7 +93,7 @@ const RecipientsPage: NextPageWithLayout = (props: any) => {
               icon={ArrowDownTrayIcon}
               color="secondary"
               className="mr-2"
-              href={"/api/documents/" + props.document.id}>
+              href={`/api/documents/${props.document.id}`}>
               Download
             </Button>
             {props.document.status !== DocumentStatus.COMPLETED && (

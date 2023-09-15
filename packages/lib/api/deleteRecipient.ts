@@ -6,12 +6,8 @@ export const deleteRecipient = (recipient: any) => {
   }
 
   return toast.promise(
-    fetch("/api/documents/" + recipient.documentId + "/recipients/" + recipient.id, {
-      method: "DELETE",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(recipient),
+    fetch(`/api/documents/${recipient.documentId}/recipients/${recipient.id}`, {
+      method: "DELETE"
     }),
     {
       loading: "Deleting...",
