@@ -35,13 +35,11 @@ export default function PDFEditor(props: any) {
   }
 
   function onDeleteHandler(id: any) {
-    const field = fields.find((e) => e.id == id);
-    const fieldIndex = fields.map((item) => item.id).indexOf(id);
+    const fieldIndex = fields.findIndex((field) => field.id === id);
     if (fieldIndex > -1) {
       const fieldWithoutRemoved = [...fields];
       const removedField = fieldWithoutRemoved.splice(fieldIndex, 1);
-      setFields(fieldWithoutRemoved);
-      deleteField(field).catch((err) => {
+      deleteField(removedField).then(() => setFields(fieldWithoutRemoved)).catch((err) => {
         setFields(fieldWithoutRemoved.concat(removedField));
       });
     }
@@ -61,7 +59,7 @@ export default function PDFEditor(props: any) {
               </p>
               <p className="mt-3 text-sm md:mt-0 md:ml-6">
                 <Link
-                  href={NEXT_PUBLIC_WEBAPP_URL + "/documents/" + props.document.id + "/recipients"}
+                  href={`${NEXT_PUBLIC_WEBAPP_URL}/documents/${props.document.id}/recipients`}
                   className="whitespace-nowrap font-medium text-yellow-700 hover:text-yellow-600">
                   Add Recipients
                   <span aria-hidden="true"> &rarr;</span>
