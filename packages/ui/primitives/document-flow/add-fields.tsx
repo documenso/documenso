@@ -5,12 +5,12 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { Caveat } from 'next/font/google';
 
 import { Check, ChevronsUpDown, Info } from 'lucide-react';
-import { nanoid } from 'nanoid';
 import { useFieldArray, useForm } from 'react-hook-form';
 
 import { getBoundingClientRect } from '@documenso/lib/client-only/get-bounding-client-rect';
 import { useDocumentElement } from '@documenso/lib/client-only/hooks/use-document-element';
 import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
+import { nanoid } from '@documenso/lib/universal/id';
 import { Field, FieldType, Recipient, SendStatus } from '@documenso/prisma/client';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';

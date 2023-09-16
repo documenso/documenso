@@ -32,7 +32,7 @@ export const findDocuments = async ({
     },
   });
 
-  const orderByColumn = orderBy?.column ?? 'created';
+  const orderByColumn = orderBy?.column ?? 'createdAt';
   const orderByDirection = orderBy?.direction ?? 'desc';
 
   const termFilters = !term

@@ -4,7 +4,8 @@ import { useState } from 'react';
 
 import { useRouter } from 'next/navigation';
 
-import { Document, Field, Recipient, User } from '@documenso/prisma/client';
+import { Field, Recipient, User } from '@documenso/prisma/client';
+import { DocumentWithData } from '@documenso/prisma/types/document-with-data';
 import { cn } from '@documenso/ui/lib/utils';
 import { Card, CardContent } from '@documenso/ui/primitives/card';
 import { AddFieldsFormPartial } from '@documenso/ui/primitives/document-flow/add-fields';
@@ -28,9 +29,10 @@ import { completeDocument } from '~/components/forms/edit-document/add-subject.a
 export type EditDocumentFormProps = {
   className?: string;
   user: User;
-  document: Document;
+  document: DocumentWithData;
   recipients: Recipient[];
   fields: Field[];
+  dataUrl: string;
 };
 
 type EditDocumentStep = 'signers' | 'fields' | 'subject';
@@ -41,13 +43,12 @@ export const EditDocumentForm = ({
   recipients,
   fields,
   user: _user,
+  dataUrl,
 }: EditDocumentFormProps) => {
   const { toast } = useToast();
   const router = useRouter();
 
   const [step, setStep] = useState<EditDocumentStep>('signers');
-
-  const documentUrl = `data:application/pdf;base64,${document.document}`;
 
   const documentFlow: Record<EditDocumentStep, DocumentFlowStep> = {
     signers: {
@@ -151,11 +152,11 @@ export const EditDocumentForm = ({
   return (
     <div className={cn('grid w-full grid-cols-12 gap-8', className)}>
       <Card
-        className="col-span-12 rounded-xl before:rounded-xl lg:col-span-6 xl:col-span-7"
+        className="relative col-span-12 rounded-xl before:rounded-xl lg:col-span-6 xl:col-span-7"
         gradient
       >
         <CardContent className="p-2">
-          <LazyPDFViewer document={documentUrl} />
+          <LazyPDFViewer document={dataUrl} />
         </CardContent>
       </Card>
 
