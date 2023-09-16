@@ -12,6 +12,7 @@ import { NextPageWithLayout } from "../../_app";
 import { InformationCircleIcon, PaperAirplaneIcon, UsersIcon } from "@heroicons/react/24/outline";
 import { DocumentStatus } from "@prisma/client";
 import { Document as PrismaDocument } from "@prisma/client";
+import { makeSerializable } from "@documenso/lib/helpers";
 
 const DocumentsDetailPage: NextPageWithLayout = (props: any) => {
   const router = useRouter();
@@ -112,7 +113,7 @@ export async function getServerSideProps(context: any) {
     const document: PrismaDocument = await getDocument(+documentId, context.req, context.res);
     return {
       props: {
-        document: JSON.parse(JSON.stringify({ ...document, document: "" })),
+        document: makeSerializable({ ...document, document: "" }),
       },
     };
   } catch (error) {

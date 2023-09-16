@@ -1,27 +1,19 @@
 import { ReactElement, useRef, useState } from "react";
 import Head from "next/head";
 import { NEXT_PUBLIC_WEBAPP_URL, classNames } from "@documenso/lib";
+import { makeSerializable } from "@documenso/lib/helpers";
 import { createOrUpdateRecipient, deleteRecipient, sendSigningRequests } from "@documenso/lib/api";
 import { getDocument } from "@documenso/lib/query";
 import { getUserFromToken } from "@documenso/lib/server";
+import { useSubscription } from "@documenso/lib/stripe";
 import { Breadcrumb, Button, Dialog, IconButton, Tooltip } from "@documenso/ui";
 import Layout from "../../../components/layout";
 import { NextPageWithLayout } from "../../_app";
-import {
-  ArrowDownTrayIcon,
-  CheckBadgeIcon,
-  CheckIcon,
-  EnvelopeIcon,
-  PaperAirplaneIcon,
-  PencilSquareIcon,
-  TrashIcon,
-  UserPlusIcon,
-  XMarkIcon,
-} from "@heroicons/react/24/outline";
+import { ArrowDownTrayIcon, CheckBadgeIcon, CheckIcon, EnvelopeIcon, PaperAirplaneIcon, PencilSquareIcon, TrashIcon, UserPlusIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import { DocumentStatus, Document as PrismaDocument, Recipient } from "@prisma/client";
 import { FormProvider, useFieldArray, useForm, useWatch } from "react-hook-form";
 import { toast } from "react-hot-toast";
-import { useSubscription } from "@documenso/lib/stripe";
+
 
 export type FormValues = {
   signers: Array<Pick<Recipient, 'id' | 'email' | 'name' | 'sendStatus' | 'readStatus' | 'signingStatus'>>;
@@ -368,7 +360,7 @@ export async function getServerSideProps(context: any) {
 
   return {
     props: {
-      document: JSON.parse(JSON.stringify({ ...document, document: "" })),
+      document: makeSerializable({ ...document, document: "" }),
     },
   };
 }

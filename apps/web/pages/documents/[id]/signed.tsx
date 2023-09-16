@@ -1,11 +1,11 @@
 import Head from "next/head";
 import Link from "next/link";
 import { useRouter } from "next/router";
+import { makeSerializable, truncate } from "@documenso/lib/helpers";
 import prisma from "@documenso/prisma";
 import { Button, IconButton } from "@documenso/ui";
 import { NextPageWithLayout } from "../../_app";
 import { ArrowDownTrayIcon, CheckBadgeIcon } from "@heroicons/react/24/outline";
-import { truncate } from "@documenso/lib/helpers";
 
 const Signed: NextPageWithLayout = (props: any) => {
   const router = useRouter();
@@ -37,9 +37,7 @@ const Signed: NextPageWithLayout = (props: any) => {
             onClick={(event: any) => {
               event.preventDefault();
               event.stopPropagation();
-              router.push(
-                `/api/documents/${props.document.id}?token=${props.recipient.token}`
-              );
+              router.push(`/api/documents/${props.document.id}?token=${props.recipient.token}`);
             }}>
             Download "{props.document.title}"
           </Button>
@@ -86,9 +84,9 @@ export async function getServerSideProps(context: any) {
 
   return {
     props: {
-      document: JSON.parse(JSON.stringify(recipient.Document)),
-      fields: JSON.parse(JSON.stringify(fields)),
-      recipient: JSON.parse(JSON.stringify(recipient)),
+      document: makeSerializable(recipient.Document),
+      fields: makeSerializable(fields),
+      recipient: makeSerializable(recipient),
     },
   };
 }
