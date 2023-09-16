@@ -8,12 +8,6 @@ import short from "short-uuid";
 async function deleteHandler(req: NextApiRequest, res: NextApiResponse) {
   const user = await getUserFromToken(req, res);
   const { fid: fieldId } = req.query;
-  const body: {
-    id: number;
-    type: FieldType;
-    page: number;
-    position: { x: number; y: number };
-  } = req.body;
 
   if (!user) return;
 

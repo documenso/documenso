@@ -12,6 +12,7 @@ import { NextPageWithLayout } from "../../_app";
 import { InformationCircleIcon, PaperAirplaneIcon, UsersIcon } from "@heroicons/react/24/outline";
 import { DocumentStatus } from "@prisma/client";
 import { Document as PrismaDocument } from "@prisma/client";
+import { makeSerializable } from "@documenso/lib/helpers";
 
 const DocumentsDetailPage: NextPageWithLayout = (props: any) => {
   const router = useRouter();
@@ -30,7 +31,7 @@ const DocumentsDetailPage: NextPageWithLayout = (props: any) => {
               },
               {
                 title: props.document.title,
-                href: NEXT_PUBLIC_WEBAPP_URL + "/documents/" + props.document.id,
+                href: `${NEXT_PUBLIC_WEBAPP_URL}/documents/${props.document.id}`,
               },
             ]}
           />
@@ -64,7 +65,7 @@ const DocumentsDetailPage: NextPageWithLayout = (props: any) => {
             <Button
               icon={PaperAirplaneIcon}
               className="ml-3"
-              href={NEXT_PUBLIC_WEBAPP_URL + "/documents/" + props.document.id + "/recipients"}
+              href={`${NEXT_PUBLIC_WEBAPP_URL}/documents/${props.document.id}/recipients`}
               onClick={() => {
                 if (
                   confirm(`Send document out to ${props?.document?.Recipient?.length} recipients?`)
@@ -110,10 +111,9 @@ export async function getServerSideProps(context: any) {
 
   try {
     const document: PrismaDocument = await getDocument(+documentId, context.req, context.res);
-
     return {
       props: {
-        document: JSON.parse(JSON.stringify({ ...document, document: "" })),
+        document: makeSerializable({ ...document, document: "" }),
       },
     };
   } catch (error) {

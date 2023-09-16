@@ -145,23 +145,23 @@ const DocumentsPage: NextPageWithLayout = (props: any) => {
             </Button>
           </div>
         </div>
-        <div className="mt-3 mb-12 flex flex-wrap items-center justify-start gap-x-4 md:justify-end gap-y-4">
+        <div className="mt-3 mb-12 flex flex-wrap items-center justify-start gap-x-4 gap-y-4 md:justify-end">
           <SelectBox
-            className="block flex-1 md:flex-none md:w-1/4"
+            className="block flex-1 md:w-1/4 md:flex-none"
             label="Status"
             options={statusFilters}
             value={selectedStatusFilter}
             onChange={handleStatusFilterChange}
           />
           <SelectBox
-            className="block flex-1 md:flex-none md:w-1/4"
+            className="block flex-1 md:w-1/4 md:flex-none"
             label="Created"
             options={createdFilter}
             value={selectedCreatedFilter}
             onChange={setSelectedCreatedFilter}
           />
           <div className="block w-fit pt-5">
-            {filteredDocuments.length != 1 ? filteredDocuments.length + " Documents" : "1 Document"}
+            {filteredDocuments.length != 1 ? `${filteredDocuments.length} Documents` : "1 Document"}
           </div>
         </div>
         <div className="mt-8 max-w-[1100px]" hidden={!loading}>
@@ -222,7 +222,7 @@ const DocumentsPage: NextPageWithLayout = (props: any) => {
                         className="cursor-pointer hover:bg-gray-100"
                         onClick={(event) => showDocument(document.id)}>
                         <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                          {document.title || "#" + document.id}
+                          {document.title || `#${document.id}`}
                         </td>
                         <td className="inline-flex max-w-[250px] flex-wrap gap-x-2 gap-y-1 whitespace-nowrap py-3 text-sm text-gray-500">
                           {document.Recipient.map((item: any) => (
@@ -231,7 +231,7 @@ const DocumentsPage: NextPageWithLayout = (props: any) => {
                                 <span
                                   id="sent_icon"
                                   className="inline-flex h-6 flex-shrink-0 items-center rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-800">
-                                  {item.name ? item.name + " <" + item.email + ">" : item.email}
+                                  {item.name ? `${item.name} <${item.email}>` : item.email}
                                 </span>
                               ) : (
                                 ""
@@ -242,7 +242,7 @@ const DocumentsPage: NextPageWithLayout = (props: any) => {
                                     id="sent_icon"
                                     className="inline-flex h-6 flex-shrink-0 items-center rounded-full bg-yellow-200 px-2 py-0.5 text-xs font-medium text-yellow-800">
                                     <EnvelopeIcon className="mr-1 inline h-4"></EnvelopeIcon>
-                                    {item.name ? item.name + " <" + item.email + ">" : item.email}
+                                    {item.name ? `${item.name} <${item.email}>` : item.email}
                                   </span>
                                 </span>
                               ) : (
@@ -256,7 +256,7 @@ const DocumentsPage: NextPageWithLayout = (props: any) => {
                                     className="inline-flex h-6 flex-shrink-0 items-center rounded-full bg-yellow-200 px-2 py-0.5 text-xs font-medium text-yellow-800">
                                     <CheckIcon className="-mr-2 inline h-4"></CheckIcon>
                                     <CheckIcon className="mr-1 inline h-4"></CheckIcon>
-                                    {item.name ? item.name + " <" + item.email + ">" : item.email}
+                                    {item.name ? `${item.name} <${item.email}>` : item.email}
                                   </span>
                                 </span>
                               ) : (
@@ -276,17 +276,17 @@ const DocumentsPage: NextPageWithLayout = (props: any) => {
                           ))}
                           {document.Recipient.length === 0 ? "-" : null}
                           <ReactTooltip
-                            anchorId="sent_icon"
+                            anchorSelect="#sent_icon"
                             place="bottom"
                             content="Document was sent to recipient."
                           />
                           <ReactTooltip
-                            anchorId="read_icon"
+                            anchorSelect="#read_icon"
                             place="bottom"
                             content="Document was opened but not signed yet."
                           />
                           <ReactTooltip
-                            anchorId="signed_icon"
+                            anchorSelect="#signed_icon"
                             place="bottom"
                             content="Document was signed by the recipient."
                           />
@@ -312,7 +312,7 @@ const DocumentsPage: NextPageWithLayout = (props: any) => {
                               onClick={(event: any) => {
                                 event.preventDefault();
                                 event.stopPropagation();
-                                router.push("/documents/" + document.id);
+                                router.push(`/documents/${document.id}`);
                               }}
                               disabled={document.status === "COMPLETED"}
                             />
@@ -322,7 +322,7 @@ const DocumentsPage: NextPageWithLayout = (props: any) => {
                               onClick={(event: any) => {
                                 event.preventDefault();
                                 event.stopPropagation();
-                                router.push("/api/documents/" + document.id);
+                                router.push(`/api/documents/${document.id}`);
                               }}
                             />
                             <IconButton
@@ -343,8 +343,8 @@ const DocumentsPage: NextPageWithLayout = (props: any) => {
                                       loadDocuments();
                                     });
                                 }
-                              }}></IconButton>
-                            <span className="sr-only">, {document.name}</span>
+                              }}
+                            />
                           </div>
                         </td>
                       </tr>
@@ -399,7 +399,7 @@ const DocumentsPage: NextPageWithLayout = (props: any) => {
         </div>
       </div>
       <ReactTooltip
-        anchorId="empty"
+        anchorSelect="#empty"
         place="bottom"
         content="No preparation needed. Any PDF will do."
       />

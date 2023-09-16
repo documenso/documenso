@@ -7,7 +7,7 @@ export const createOrUpdateField = async (
 ): Promise<any> => {
   try {
     const created = await toast.promise(
-      fetch("/api/documents/" + document.id + "/fields?token=" + recipientToken, {
+      fetch(`/api/documents/${document.id}/fields?token="${recipientToken}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
