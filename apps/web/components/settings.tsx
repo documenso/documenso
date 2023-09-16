@@ -61,24 +61,24 @@ export default function Setttings() {
 
   const [savingTimeout, setSavingTimeout] = useState<any>();
   const [password, setPassword] = useState("");
-  function handleNameChange(e: ChangeEvent<HTMLInputElement>): void {
-    let u = { ...user };
-    u.name = e.target.value;
-    setUser(u);
+
+  function updateUserDebounce(newUser: typeof user, debounceTime: number) {
     clearTimeout(savingTimeout);
     const t = setTimeout(() => {
-      updateUser(u);
-    }, 1000);
+      updateUser(newUser);
+    }, debounceTime);
 
     setSavingTimeout(t);
   }
 
-  const handleKeyPress = (event: any) => {
-    if (event.key === "Enter") {
-      clearTimeout(savingTimeout);
-      updateUser(user);
-    }
-  };
+  function handleNameChange(e: ChangeEvent<HTMLInputElement>): void {
+    let u = { ...user };
+    u.name = e.target.value;
+    setUser(u);
+    updateUserDebounce(u, 1000);
+  }
+
+  const handleKeyPress = (event: any) => event.key === "Enter" && updateUserDebounce(user, 300);
 
   return (
     <div>
