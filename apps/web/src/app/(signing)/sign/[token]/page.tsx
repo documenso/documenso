@@ -8,6 +8,7 @@ import { getDocumentAndSenderByToken } from '@documenso/lib/server-only/document
 import { viewedDocument } from '@documenso/lib/server-only/document/viewed-document';
 import { getFieldsForToken } from '@documenso/lib/server-only/field/get-fields-for-token';
 import { getRecipientByToken } from '@documenso/lib/server-only/recipient/get-recipient-by-token';
+import { getFile } from '@documenso/lib/universal/upload/get-file';
 import { DocumentStatus, FieldType, SigningStatus } from '@documenso/prisma/client';
 import { Card, CardContent } from '@documenso/ui/primitives/card';
 import { ElementVisible } from '@documenso/ui/primitives/element-visible';
@@ -36,13 +37,21 @@ export default async function SigningPage({ params: { token } }: SigningPageProp
       token,
     }).catch(() => null),
     getFieldsForToken({ token }),
-    getRecipientByToken({ token }),
+    getRecipientByToken({ token }).catch(() => null),
     viewedDocument({ token }),
   ]);
 
-  if (!document) {
+  if (!document || !document.documentData || !recipient) {
     return notFound();
   }
+
+  const { documentData } = document;
+
+  const documentDataUrl = await getFile(documentData)
+    .then((buffer) => Buffer.from(buffer).toString('base64'))
+    .then((data) => `data:application/pdf;base64,${data}`);
+
+  const user = await getServerComponentSession();
 
   if (
     document.status === DocumentStatus.COMPLETED ||
@@ -50,10 +59,6 @@ export default async function SigningPage({ params: { token } }: SigningPageProp
   ) {
     redirect(`/sign/${token}/complete`);
   }
-
-  const user = await getServerComponentSession();
-
-  const documentUrl = `data:application/pdf;base64,${document.document}`;
 
   return (
     <SigningProvider email={recipient.email} fullName={recipient.name} signature={user?.signature}>
@@ -74,7 +79,7 @@ export default async function SigningPage({ params: { token } }: SigningPageProp
             gradient
           >
             <CardContent className="p-2">
-              <LazyPDFViewer document={documentUrl} />
+              <LazyPDFViewer document={documentDataUrl} />
             </CardContent>
           </Card>
 
