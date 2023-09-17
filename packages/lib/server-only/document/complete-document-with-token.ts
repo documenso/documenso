@@ -73,6 +73,9 @@ export const completeDocumentWithToken = async ({
   const numberOfRecipients = await prisma.recipient.count({
     where: {
       documentId: document.id,
+      signingStatus: {
+        not: SigningStatus.SIGNED,
+      },
     },
   });
 
