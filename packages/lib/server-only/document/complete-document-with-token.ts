@@ -4,7 +4,7 @@ import { prisma } from '@documenso/prisma';
 import { DocumentStatus, SigningStatus } from '@documenso/prisma/client';
 
 import { sealDocument } from './seal-document';
-import { sendPendingEmail } from './send-recipient-signed-email';
+import { sendPendingEmail } from './send-pending-email';
 
 export type CompleteDocumentWithTokenOptions = {
   token: string;
