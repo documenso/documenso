@@ -2,6 +2,7 @@
 
 import { useEffect } from 'react';
 
+import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -123,8 +124,11 @@ export const SignInForm = ({ className }: SignInFormProps) => {
       </div>
 
       <div>
-        <Label htmlFor="password" className="text-slate-500">
-          Password
+        <Label htmlFor="password" className="flex justify-between text-slate-500">
+          <span>Password</span>
+          <Link className="text-xs text-slate-500" href="/forgot-password">
+            Forgot?
+          </Link>
         </Label>
 
         <Input
