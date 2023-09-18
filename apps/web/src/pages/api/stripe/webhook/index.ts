@@ -212,7 +212,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
 const handleCustomerSubscriptionUpdated = async (subscription: Stripe.Subscription) => {
   // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-  const plan = (subscription as unknown as Stripe.SubscriptionItem).plan;
+  const { plan } = subscription as unknown as Stripe.SubscriptionItem;
 
   const customerId =
     typeof subscription.customer === 'string' ? subscription.customer : subscription.customer.id;
