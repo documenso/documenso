@@ -1,27 +1,16 @@
 'use client';
 
-import { useEffect } from 'react';
-
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Loader } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
-import { ErrorCode, isErrorCode } from '@documenso/lib/next-auth/error-codes';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
 import { Input } from '@documenso/ui/primitives/input';
 import { Label } from '@documenso/ui/primitives/label';
-import { useToast } from '@documenso/ui/primitives/use-toast';
-
-const ERROR_MESSAGES = {
-  [ErrorCode.CREDENTIALS_NOT_FOUND]: 'No account found with that email address.',
-  [ErrorCode.INCORRECT_EMAIL_PASSWORD]: 'No account found with that email address.',
-  [ErrorCode.USER_MISSING_PASSWORD]:
-    'This account appears to be using a social login method, please sign in using that method',
-};
 
 export const ZResetPasswordFormSchema = z
   .object({
@@ -40,10 +29,7 @@ export type ResetPasswordFormProps = {
 };
 
 export const ResetPasswordForm = ({ className }: ResetPasswordFormProps) => {
-  const searchParams = useSearchParams();
   const router = useRouter();
-
-  const { toast } = useToast();
 
   const {
     register,
@@ -56,27 +42,6 @@ export const ResetPasswordForm = ({ className }: ResetPasswordFormProps) => {
     },
     resolver: zodResolver(ZResetPasswordFormSchema),
   });
-
-  const errorCode = searchParams?.get('error');
-
-  useEffect(() => {
-    let timeout: NodeJS.Timeout | null = null;
-
-    if (isErrorCode(errorCode)) {
-      timeout = setTimeout(() => {
-        toast({
-          variant: 'destructive',
-          description: ERROR_MESSAGES[errorCode] ?? 'An unknown error occurred',
-        });
-      }, 0);
-    }
-
-    return () => {
-      if (timeout) {
-        clearTimeout(timeout);
-      }
-    };
-  }, [errorCode, toast]);
 
   const onFormSubmit = ({ password, repeatedPassword }: TResetPasswordFormSchema) => {
     console.log(password, repeatedPassword);
@@ -111,7 +76,7 @@ export const ResetPasswordForm = ({ className }: ResetPasswordFormProps) => {
 
       <div>
         <Label htmlFor="repeatedPassword" className="flex justify-between text-slate-500">
-          <span>Confirm Password</span>
+          <span>Repeat Password</span>
         </Label>
 
         <Input
