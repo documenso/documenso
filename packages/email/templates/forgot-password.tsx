@@ -17,13 +17,13 @@ import {
   TemplateForgotPasswordProps,
 } from '../template-components/template-forgot-password';
 
-export type DocumentForgotPasswordTemplateProps = Partial<TemplateForgotPasswordProps>;
+export type ForgotPasswordTemplateProps = Partial<TemplateForgotPasswordProps>;
 
-export const DocumentForgotPasswordTemplate = ({
+export const ForgotPasswordTemplate = ({
   resetPasswordLink = 'https://documenso.com',
   assetBaseUrl = 'http://localhost:3002',
-}: DocumentForgotPasswordTemplateProps) => {
-  const previewText = `Completed Document`;
+}: ForgotPasswordTemplateProps) => {
+  const previewText = `Password Reset Requested`;
 
   const getAssetUrl = (path: string) => {
     return new URL(path, assetBaseUrl).toString();
@@ -71,4 +71,4 @@ export const DocumentForgotPasswordTemplate = ({
   );
 };
 
-export default DocumentForgotPasswordTemplate;
+export default ForgotPasswordTemplate;
