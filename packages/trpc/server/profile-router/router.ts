@@ -1,10 +1,15 @@
 import { TRPCError } from '@trpc/server';
 
+import { forgotPassword } from '@documenso/lib/server-only/user/forgot-password';
 import { updatePassword } from '@documenso/lib/server-only/user/update-password';
 import { updateProfile } from '@documenso/lib/server-only/user/update-profile';
 
-import { authenticatedProcedure, router } from '../trpc';
-import { ZUpdatePasswordMutationSchema, ZUpdateProfileMutationSchema } from './schema';
+import { authenticatedProcedure, procedure, router } from '../trpc';
+import {
+  ZForgotPasswordFormSchema,
+  ZUpdatePasswordMutationSchema,
+  ZUpdateProfileMutationSchema,
+} from './schema';
 
 export const profileRouter = router({
   updateProfile: authenticatedProcedure
@@ -53,4 +58,22 @@ export const profileRouter = router({
         });
       }
     }),
+
+  forgotPassword: procedure.input(ZForgotPasswordFormSchema).mutation(async ({ input }) => {
+    try {
+      const { email } = input;
+
+      return await forgotPassword({
+        email,
+      });
+    } catch (err) {
+      console.error(err);
+
+      throw new TRPCError({
+        code: 'BAD_REQUEST',
+        message:
+          'We were unable to update your profile. Please review the information you provided and try again.',
+      });
+    }
+  }),
 });

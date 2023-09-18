@@ -5,10 +5,14 @@ export const ZUpdateProfileMutationSchema = z.object({
   signature: z.string(),
 });
 
-export type TUpdateProfileMutationSchema = z.infer<typeof ZUpdateProfileMutationSchema>;
-
 export const ZUpdatePasswordMutationSchema = z.object({
   password: z.string().min(6),
 });
 
+export const ZForgotPasswordFormSchema = z.object({
+  email: z.string().email().min(1),
+});
+
+export type TUpdateProfileMutationSchema = z.infer<typeof ZUpdateProfileMutationSchema>;
 export type TUpdatePasswordMutationSchema = z.infer<typeof ZUpdatePasswordMutationSchema>;
+export type TForgotPasswordFormSchema = z.infer<typeof ZForgotPasswordFormSchema>;
