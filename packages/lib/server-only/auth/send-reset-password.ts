@@ -10,6 +10,8 @@ export interface SendResetPasswordOptions {
 }
 
 export const sendResetPassword = async ({ userId }: SendResetPasswordOptions) => {
+  // TODO: Better Error Handling
+
   const user = await prisma.user.findFirstOrThrow({
     where: {
       id: userId,

@@ -7,6 +7,7 @@ import { Loader } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
+import { TRPCClientError } from '@documenso/trpc/client';
 import { trpc } from '@documenso/trpc/react';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
@@ -51,24 +52,38 @@ export const ResetPasswordForm = ({ className, token }: ResetPasswordFormProps) 
 
   const { mutateAsync: resetPassword } = trpc.profile.resetPassword.useMutation();
 
-  const onFormSubmit = async ({ password, repeatedPassword }: TResetPasswordFormSchema) => {
-    // TODO: Handle error with try/catch
-    console.log(password, repeatedPassword, token);
+  const onFormSubmit = async ({ password }: Omit<TResetPasswordFormSchema, 'repeatedPassword'>) => {
+    try {
+      await resetPassword({
+        password,
+        token,
+      });
 
-    await resetPassword({
-      password,
-      token,
-    });
+      reset();
 
-    reset();
+      toast({
+        title: 'Password updated',
+        description: 'Your password has been updated successfully.',
+        duration: 5000,
+      });
 
-    toast({
-      title: 'Password updated',
-      description: 'Your password has been updated successfully.',
-      duration: 5000,
-    });
-
-    router.push('/signin');
+      router.push('/signin');
+    } catch (err) {
+      if (err instanceof TRPCClientError && err.data?.code === 'BAD_REQUEST') {
+        toast({
+          title: 'An error occurred',
+          description: err.message,
+          variant: 'destructive',
+        });
+      } else {
+        toast({
+          title: 'An unknown error occurred',
+          variant: 'destructive',
+          description:
+            'We encountered an unknown error while attempting to reset your password. Please try again later.',
+        });
+      }
+    }
   };
 
   return (

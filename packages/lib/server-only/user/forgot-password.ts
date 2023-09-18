@@ -6,14 +6,19 @@ import { TForgotPasswordFormSchema } from '@documenso/trpc/server/profile-router
 import { sendForgotPassword } from '../auth/send-forgot-password';
 
 export const forgotPassword = async ({ email }: TForgotPasswordFormSchema) => {
-  const user = await prisma.user.findFirstOrThrow({
-    where: {
-      email: email.toLowerCase(),
-    },
-  });
+  let user;
+  try {
+    user = await prisma.user.findFirstOrThrow({
+      where: {
+        email: email.toLowerCase(),
+      },
+    });
+  } catch (error) {
+    throw new Error('No account found with that email address.');
+  }
 
   if (!user) {
-    throw new Error('A password reset email has been sent.');
+    throw new Error('No account found with that email address.');
   }
 
   const existingToken = await prisma.passwordResetToken.findFirst({
@@ -42,7 +47,7 @@ export const forgotPassword = async ({ email }: TForgotPasswordFormSchema) => {
       },
     });
   } catch (error) {
-    throw new Error('Something went wrong');
+    throw new Error('We were unable to send your email. Please try again.');
   }
 
   return await sendForgotPassword({

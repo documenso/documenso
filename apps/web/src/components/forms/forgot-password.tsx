@@ -7,6 +7,7 @@ import { Loader } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
+import { TRPCClientError } from '@documenso/trpc/client';
 import { trpc } from '@documenso/trpc/react';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
@@ -43,23 +44,33 @@ export const ForgotPasswordForm = ({ className }: ForgotPasswordFormProps) => {
   const { mutateAsync: forgotPassword } = trpc.profile.forgotPassword.useMutation();
 
   const onFormSubmit = async ({ email }: TForgotPasswordFormSchema) => {
-    //  TODO: Handle error with try/catch
-    await forgotPassword({
-      email,
-    });
+    try {
+      await forgotPassword({ email });
 
-    toast({
-      title: 'Password updated',
-      description: 'Your password has been updated successfully.',
-      duration: 5000,
-    });
+      toast({
+        title: 'Reset email sent',
+        description: 'Your password reset mail has been sent successfully.',
+        duration: 5000,
+      });
 
-    await new Promise((resolve) => {
-      setTimeout(resolve, 2000);
-    });
-
-    reset();
-    router.push('/check-email');
+      reset();
+      router.push('/check-email');
+    } catch (err) {
+      if (err instanceof TRPCClientError && err.data?.code === 'BAD_REQUEST') {
+        toast({
+          title: 'An error occurred',
+          description: err.message,
+          variant: 'destructive',
+        });
+      } else {
+        toast({
+          title: 'An unknown error occurred',
+          variant: 'destructive',
+          description:
+            'We encountered an unknown error while attempting to send your email. Please try again later.',
+        });
+      }
+    }
   };
 
   return (
