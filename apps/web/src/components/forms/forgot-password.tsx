@@ -7,10 +7,12 @@ import { Loader } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
+import { trpc } from '@documenso/trpc/react';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
 import { Input } from '@documenso/ui/primitives/input';
 import { Label } from '@documenso/ui/primitives/label';
+import { useToast } from '@documenso/ui/primitives/use-toast';
 
 export const ZForgotPasswordFormSchema = z.object({
   email: z.string().email().min(1),
@@ -24,10 +26,12 @@ export type ForgotPasswordFormProps = {
 
 export const ForgotPasswordForm = ({ className }: ForgotPasswordFormProps) => {
   const router = useRouter();
+  const { toast } = useToast();
 
   const {
     register,
     handleSubmit,
+    reset,
     formState: { errors, isSubmitting },
   } = useForm<TForgotPasswordFormSchema>({
     values: {
@@ -36,12 +40,29 @@ export const ForgotPasswordForm = ({ className }: ForgotPasswordFormProps) => {
     resolver: zodResolver(ZForgotPasswordFormSchema),
   });
 
-  const onFormSubmit = ({ email }: TForgotPasswordFormSchema) => {
+  const { mutateAsync: forgotPassword } = trpc.profile.forgotPassword.useMutation();
+
+  const onFormSubmit = async ({ email }: TForgotPasswordFormSchema) => {
     // check if the email is available
     // if not, throw an error
     // if the email is available, create a password reset token and send an email
 
-    console.log(email);
+    await forgotPassword({
+      email,
+    });
+
+    reset();
+
+    toast({
+      title: 'Password updated',
+      description: 'Your password has been updated successfully.',
+      duration: 5000,
+    });
+
+    await new Promise((resolve) => {
+      setTimeout(resolve, 2000);
+    });
+
     router.push('/check-email');
   };
 
