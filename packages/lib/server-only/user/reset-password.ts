@@ -12,7 +12,7 @@ export type ResetPasswordOptions = {
 
 export const resetPassword = async ({ token, password }: ResetPasswordOptions) => {
   if (!token) {
-    throw new Error('Invalid Token');
+    throw new Error('Invalid token provided. Please try again.');
   }
 
   const foundToken = await prisma.passwordResetToken.findFirstOrThrow({
@@ -25,13 +25,13 @@ export const resetPassword = async ({ token, password }: ResetPasswordOptions) =
   });
 
   if (!foundToken) {
-    throw new Error('Invalid Token');
+    throw new Error('Invalid token provided. Please try again.');
   }
 
   const now = new Date();
 
   if (now > foundToken.expiry) {
-    throw new Error('Token has expired');
+    throw new Error('Token has expired. Please try again.');
   }
 
   const isSamePassword = await compare(password, foundToken.User.password!);
@@ -59,7 +59,7 @@ export const resetPassword = async ({ token, password }: ResetPasswordOptions) =
   ]);
 
   if (!transactions) {
-    throw new Error('Unable to update password');
+    throw new Error('We were unable to reset your password. Please try again.');
   }
 
   await sendResetPassword({ userId: foundToken.userId });

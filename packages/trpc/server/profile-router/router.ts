@@ -69,8 +69,7 @@ export const profileRouter = router({
         email,
       });
     } catch (err) {
-      let message =
-        'We were unable to update your profile. Please review the information you provided and try again.';
+      let message = 'We were unable to send your email. Please try again.';
 
       if (err instanceof Error) {
         message = err.message;
@@ -92,8 +91,7 @@ export const profileRouter = router({
         password,
       });
     } catch (err) {
-      let message =
-        'We were unable to update your profile. Please review the information you provided and try again.';
+      let message = 'We were unable to reset your password. Please try again.';
 
       if (err instanceof Error) {
         message = err.message;
