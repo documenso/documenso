@@ -7,10 +7,12 @@ import { Loader } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
+import { trpc } from '@documenso/trpc/react';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
 import { Input } from '@documenso/ui/primitives/input';
 import { Label } from '@documenso/ui/primitives/label';
+import { useToast } from '@documenso/ui/primitives/use-toast';
 
 export const ZResetPasswordFormSchema = z
   .object({
@@ -26,13 +28,17 @@ export type TResetPasswordFormSchema = z.infer<typeof ZResetPasswordFormSchema>;
 
 export type ResetPasswordFormProps = {
   className?: string;
+  token: string;
 };
 
-export const ResetPasswordForm = ({ className }: ResetPasswordFormProps) => {
+export const ResetPasswordForm = ({ className, token }: ResetPasswordFormProps) => {
   const router = useRouter();
+
+  const { toast } = useToast();
 
   const {
     register,
+    reset,
     handleSubmit,
     formState: { errors, isSubmitting },
   } = useForm<TResetPasswordFormSchema>({
@@ -43,8 +49,24 @@ export const ResetPasswordForm = ({ className }: ResetPasswordFormProps) => {
     resolver: zodResolver(ZResetPasswordFormSchema),
   });
 
-  const onFormSubmit = ({ password, repeatedPassword }: TResetPasswordFormSchema) => {
-    console.log(password, repeatedPassword);
+  const { mutateAsync: resetPassword } = trpc.profile.resetPassword.useMutation();
+
+  const onFormSubmit = async ({ password, repeatedPassword }: TResetPasswordFormSchema) => {
+    // TODO: Handle error with try/catch
+    console.log(password, repeatedPassword, token);
+
+    await resetPassword({
+      password,
+      token,
+    });
+
+    reset();
+
+    toast({
+      title: 'Password updated',
+      description: 'Your password has been updated successfully.',
+      duration: 5000,
+    });
 
     router.push('/signin');
   };
