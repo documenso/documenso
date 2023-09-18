@@ -19,6 +19,7 @@ export const generateMetadata = ({ params }: { params: { post: string } }) => {
 
   return {
     title: `Documenso - ${blogPost.title}`,
+    description: blogPost.description,
   };
 };
 
