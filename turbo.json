@@ -2,8 +2,13 @@
   "$schema": "https://turbo.build/schema.json",
   "pipeline": {
     "build": {
-      "dependsOn": ["^build"],
-      "outputs": [".next/**", "!.next/cache/**"]
+      "dependsOn": [
+        "^build"
+      ],
+      "outputs": [
+        ".next/**",
+        "!.next/cache/**"
+      ]
     },
     "lint": {},
     "dev": {
@@ -11,7 +16,9 @@
       "persistent": true
     }
   },
-  "globalDependencies": ["**/.env.*local"],
+  "globalDependencies": [
+    "**/.env.*local"
+  ],
   "globalEnv": [
     "APP_VERSION",
     "NEXTAUTH_URL",
@@ -23,6 +30,7 @@
     "NEXT_PUBLIC_FEATURE_BILLING_ENABLED",
     "NEXT_PUBLIC_STRIPE_COMMUNITY_PLAN_YEARLY_PRICE_ID",
     "NEXT_PUBLIC_STRIPE_COMMUNITY_PLAN_MONTHLY_PRICE_ID",
+    "NEXT_PUBLIC_STRIPE_FREE_PLAN_ID",
     "NEXT_PRIVATE_DATABASE_URL",
     "NEXT_PRIVATE_NEXT_AUTH_SECRET",
     "NEXT_PRIVATE_GOOGLE_CLIENT_ID",
