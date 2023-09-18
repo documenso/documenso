@@ -1,12 +1,14 @@
 import { TRPCError } from '@trpc/server';
 
 import { forgotPassword } from '@documenso/lib/server-only/user/forgot-password';
+import { resetPassword } from '@documenso/lib/server-only/user/reset-password';
 import { updatePassword } from '@documenso/lib/server-only/user/update-password';
 import { updateProfile } from '@documenso/lib/server-only/user/update-profile';
 
 import { authenticatedProcedure, procedure, router } from '../trpc';
 import {
   ZForgotPasswordFormSchema,
+  ZResetPasswordFormSchema,
   ZUpdatePasswordMutationSchema,
   ZUpdateProfileMutationSchema,
 } from './schema';
@@ -69,10 +71,34 @@ export const profileRouter = router({
     } catch (err) {
       console.error(err);
 
+      // TODO: Handle this error better
       throw new TRPCError({
         code: 'BAD_REQUEST',
         message:
           'We were unable to update your profile. Please review the information you provided and try again.',
+      });
+    }
+  }),
+
+  resetPassword: procedure.input(ZResetPasswordFormSchema).mutation(async ({ input }) => {
+    try {
+      const { password, token } = input;
+
+      return await resetPassword({
+        token,
+        password,
+      });
+    } catch (err) {
+      let message =
+        'We were unable to update your profile. Please review the information you provided and try again.';
+
+      if (err instanceof Error) {
+        message = err.message;
+      }
+
+      throw new TRPCError({
+        code: 'BAD_REQUEST',
+        message,
       });
     }
   }),
