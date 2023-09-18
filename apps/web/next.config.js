@@ -10,6 +10,7 @@ const { parsed: env } = require('dotenv').config({
 const config = {
   experimental: {
     serverActions: true,
+    serverActionsBodySizeLimit: '50mb',
   },
   reactStrictMode: true,
   transpilePackages: [
@@ -20,7 +21,6 @@ const config = {
     '@documenso/email',
   ],
   env: {
-    ...env,
     APP_VERSION: version,
   },
   modularizeImports: {
