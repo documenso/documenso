@@ -40,10 +40,10 @@ export const createBillingPortal = async () => {
     });
   }
 
-  const stripeCustomerSubsriptions = stripeCustomer.subscriptions?.data ?? [];
+  const stripeCustomerSubscriptions = stripeCustomer.subscriptions?.data ?? [];
 
   // Create a free subscription for user if it does not exist.
-  if (!existingSubscription && stripeCustomerSubsriptions.length === 0) {
+  if (!existingSubscription && stripeCustomerSubscriptions.length === 0) {
     const newSubscription = await stripe.subscriptions.create({
       customer: stripeCustomer.id,
       items: [
