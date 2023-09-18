@@ -51,8 +51,6 @@ export const ForgotPasswordForm = ({ className }: ForgotPasswordFormProps) => {
       email,
     });
 
-    reset();
-
     toast({
       title: 'Password updated',
       description: 'Your password has been updated successfully.',
@@ -63,6 +61,7 @@ export const ForgotPasswordForm = ({ className }: ForgotPasswordFormProps) => {
       setTimeout(resolve, 2000);
     });
 
+    reset();
     router.push('/check-email');
   };
 
