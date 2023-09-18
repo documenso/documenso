@@ -47,7 +47,7 @@ yarn-error.log*
 !.vscode/tasks.json
 !.vscode/launch.json
 !.vscode/extensions.json
-/test-results/
+**/test-results/
 /playwright-report/
 /playwright/.cache/
 

@@ -14,7 +14,7 @@ export const STORAGE_STATE = 'playwright/.auth/user.json';
  * See https://playwright.dev/docs/test-configuration.
  */
 export default defineConfig({
-  testDir: './apps/web/src/tests',
+  testDir: './apps/web/src/tests/e2e',
   /* Run tests in files in parallel */
   fullyParallel: true,
   /* Fail the build on CI if you accidentally left test.only in the source code. */
@@ -36,35 +36,43 @@ export default defineConfig({
 
   /* Configure projects for major browsers */
   projects: [
-    { name: 'setup', testMatch: /.*\.setup\.ts/ },
+    { name: 'setup', testMatch: '**/*.setup.ts' },
     {
       name: 'Authenticated User Tests',
-      testMatch: /.*\.spec\.ts/,
-      testIgnore: /test-auth-flow\.spec\.ts/,
+      testMatch: '*.authenticated.spec.ts',
       dependencies: ['setup'],
       use: {
+        ...devices['Desktop Chrome'],
         storageState: STORAGE_STATE,
       },
     },
     {
-      name: 'chromium',
+      name: 'Unauthenticated User Tests',
       use: {
         ...devices['Desktop Chrome'],
       },
+      testMatch: '*.unauthenticated.spec.ts',
+      testIgnore: ['*.setup.ts', '*.authenticated.spec.ts'],
     },
+    // {
+    //   name: 'chromium',
+    //   use: {
+    //     ...devices['Desktop Chrome'],
+    //   },
+    // },
 
-    {
-      name: 'firefox',
-      use: {
-        ...devices['Desktop Firefox'],
-      },
-    },
-    {
-      name: 'webkit',
-      use: {
-        ...devices['Desktop Safari'],
-      },
-    },
+    // {
+    //   name: 'firefox',
+    //   use: {
+    //     ...devices['Desktop Firefox'],
+    //   },
+    // },
+    // {
+    //   name: 'webkit',
+    //   use: {
+    //     ...devices['Desktop Safari'],
+    //   },
+    // },
   ],
 
   /* Test against mobile viewports. */
