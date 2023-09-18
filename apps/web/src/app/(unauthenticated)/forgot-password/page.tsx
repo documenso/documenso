@@ -5,6 +5,7 @@ import backgroundPattern from '~/assets/background-pattern.png';
 import { ForgotPasswordForm } from '~/components/forms/forgot-password';
 
 export default function ForgotPasswordPage() {
+  // TODO: Fix width reducing with screen size
   return (
     <main className="bg-sand-100 relative flex min-h-screen flex-col items-center justify-center overflow-hidden  px-4 py-12 md:p-12 lg:p-24">
       <div className="relative flex w-1/5 items-center gap-x-24">

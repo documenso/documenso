@@ -23,9 +23,8 @@ import {
 export type ResetPasswordTemplateProps = Partial<TemplateResetPasswordProps>;
 
 export const ResetPasswordTemplate = ({
-  inviterName = 'Lucas Smith',
-  inviterEmail = 'lucas@documenso.com',
-
+  userName = 'Lucas Smith',
+  userEmail = 'lucas@documenso.com',
   assetBaseUrl = 'http://localhost:3002',
 }: ResetPasswordTemplateProps) => {
   const previewText = `Password Reset Successful`;
@@ -58,8 +57,8 @@ export const ResetPasswordTemplate = ({
                 />
 
                 <TemplateResetPassword
-                  inviterName={inviterName}
-                  inviterEmail={inviterEmail}
+                  userName={userName}
+                  userEmail={userEmail}
                   assetBaseUrl={assetBaseUrl}
                 />
               </Section>
@@ -68,9 +67,9 @@ export const ResetPasswordTemplate = ({
             <Container className="mx-auto mt-12 max-w-xl">
               <Section>
                 <Text className="my-4 text-base font-semibold">
-                  Hi, {inviterName}{' '}
-                  <Link className="font-normal text-slate-400" href="mailto:{inviterEmail}">
-                    ({inviterEmail})
+                  Hi, {userName}{' '}
+                  <Link className="font-normal text-slate-400" href="mailto:{userEmail}">
+                    ({userEmail})
                   </Link>
                 </Text>
 
