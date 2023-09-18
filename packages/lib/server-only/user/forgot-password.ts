@@ -3,6 +3,8 @@ import crypto from 'crypto';
 import { prisma } from '@documenso/prisma';
 import { TForgotPasswordFormSchema } from '@documenso/trpc/server/profile-router/schema';
 
+import { sendForgotPassword } from '../auth/send-forgot-password';
+
 export const forgotPassword = async ({ email }: TForgotPasswordFormSchema) => {
   const user = await prisma.user.findFirstOrThrow({
     where: {
@@ -31,10 +33,8 @@ export const forgotPassword = async ({ email }: TForgotPasswordFormSchema) => {
   const expiry = new Date();
   expiry.setHours(expiry.getHours() + 24); // Set expiry to one hour from now
 
-  let passwordResetToken;
-
   try {
-    passwordResetToken = await prisma.passwordResetToken.create({
+    await prisma.passwordResetToken.create({
       data: {
         token,
         expiry,
@@ -45,8 +45,7 @@ export const forgotPassword = async ({ email }: TForgotPasswordFormSchema) => {
     throw new Error('Something went wrong');
   }
 
-  console.log('Password reset token: ', passwordResetToken);
-  // send an email to user with password token
-
-  return passwordResetToken;
+  return await sendForgotPassword({
+    userId: user.id,
+  });
 };
