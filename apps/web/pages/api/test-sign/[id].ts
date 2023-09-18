@@ -19,5 +19,5 @@ async function getHandler(req: NextApiRequest, res: NextApiResponse) {
 }
 
 export default defaultHandler({
-  GET: Promise.resolve({ default: defaultResponder(getHandler) }),
+  GET: { default: defaultResponder(getHandler) },
 });

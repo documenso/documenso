@@ -48,6 +48,6 @@ async function patchHandler(req: NextApiRequest, res: NextApiResponse) {
 }
 
 export default defaultHandler({
-  POST: Promise.resolve({ default: defaultResponder(postHandler) }),
-  PATCH: Promise.resolve({ default: defaultResponder(patchHandler) }),
+  POST: { default: defaultResponder(postHandler) },
+  PATCH: { default: defaultResponder(patchHandler) },
 });

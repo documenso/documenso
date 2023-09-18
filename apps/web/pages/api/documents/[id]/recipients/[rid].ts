@@ -25,5 +25,5 @@ async function deleteHandler(req: NextApiRequest, res: NextApiResponse) {
 }
 
 export default defaultHandler({
-  DELETE: Promise.resolve({ default: defaultResponder(deleteHandler) }),
+  DELETE: { default: defaultResponder(deleteHandler) },
 });
