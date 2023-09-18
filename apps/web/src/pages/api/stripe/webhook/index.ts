@@ -3,6 +3,7 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import { randomBytes } from 'crypto';
 import { readFileSync } from 'fs';
 import { buffer } from 'micro';
+import { match } from 'ts-pattern';
 
 import { insertImageInPDF } from '@documenso/lib/server-only/pdf/insert-image-in-pdf';
 import { insertTextInPDF } from '@documenso/lib/server-only/pdf/insert-text-in-pdf';
@@ -16,6 +17,7 @@ import {
   ReadStatus,
   SendStatus,
   SigningStatus,
+  SubscriptionStatus,
 } from '@documenso/prisma/client';
 
 const log = (...args: unknown[]) => console.log('[stripe]', ...args);
@@ -53,6 +55,18 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     process.env.NEXT_PRIVATE_STRIPE_WEBHOOK_SECRET!,
   );
   log('event-type:', event.type);
+
+  if (event.type === 'customer.subscription.updated') {
+    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+    const subscription = event.data.object as Stripe.Subscription;
+
+    await handleCustomerSubscriptionUpdated(subscription);
+
+    return res.status(200).json({
+      success: true,
+      message: 'Webhook received',
+    });
+  }
 
   if (event.type === 'checkout.session.completed') {
     // This is required since we don't want to create a guard for every event type
@@ -195,3 +209,29 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     message: 'Unhandled webhook event',
   });
 }
+
+const handleCustomerSubscriptionUpdated = async (subscription: Stripe.Subscription) => {
+  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+  const plan = (subscription as unknown as Stripe.SubscriptionItem).plan;
+
+  const customerId =
+    typeof subscription.customer === 'string' ? subscription.customer : subscription.customer.id;
+
+  const status = match(subscription.status)
+    .with('active', () => SubscriptionStatus.ACTIVE)
+    .with('past_due', () => SubscriptionStatus.PAST_DUE)
+    .otherwise(() => SubscriptionStatus.INACTIVE);
+
+  await prisma.subscription.update({
+    where: {
+      customerId: customerId,
+    },
+    data: {
+      planId: plan.id,
+      status,
+      cancelAtPeriodEnd: subscription.cancel_at_period_end,
+      periodEnd: new Date(subscription.current_period_end * 1000),
+      updatedAt: new Date(),
+    },
+  });
+};

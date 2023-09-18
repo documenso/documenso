@@ -1,15 +1,14 @@
-import Link from 'next/link';
 import { redirect } from 'next/navigation';
 
-import { createCustomer } from '@documenso/ee/server-only/stripe/create-customer';
-import { getPortalSession } from '@documenso/ee/server-only/stripe/get-portal-session';
+import { match } from 'ts-pattern';
+
 import { getRequiredServerComponentSession } from '@documenso/lib/next-auth/get-server-session';
-import { getServerComponentFlag } from '@documenso/lib/server-only/feature-flags/get-server-component-feature-flag';
+import { Stripe, stripe } from '@documenso/lib/server-only/stripe';
 import { getSubscriptionByUserId } from '@documenso/lib/server-only/subscription/get-subscription-by-user-id';
-import { SubscriptionStatus } from '@documenso/prisma/client';
-import { Button } from '@documenso/ui/primitives/button';
 
 import { LocaleDate } from '~/components/formatter/locale-date';
+
+import BillingPortalButton from './billing-portal-button';
 
 export default async function BillingSettingsPage() {
   const { user } = await getRequiredServerComponentSession();
@@ -21,57 +20,74 @@ export default async function BillingSettingsPage() {
     redirect('/settings/profile');
   }
 
-  const subscription = await getSubscriptionByUserId({ userId: user.id }).then(async (sub) => {
-    if (sub) {
-      return sub;
-    }
+  const subscription = await getSubscriptionByUserId({ userId: user.id });
 
-    // If we don't have a customer record, create one as well as an empty subscription.
-    return createCustomer({ user });
-  });
+  let subscriptionProduct: Stripe.Product | null = null;
 
-  let billingPortalUrl = '';
+  if (subscription?.planId) {
+    const foundSubscriptionProduct = (await stripe.products.list()).data.find(
+      (item) => item.default_price === subscription.planId,
+    );
 
-  if (subscription.customerId) {
-    billingPortalUrl = await getPortalSession({
-      customerId: subscription.customerId,
-      returnUrl: `${process.env.NEXT_PUBLIC_WEBAPP_URL}/settings/billing`,
-    });
+    subscriptionProduct = foundSubscriptionProduct ?? null;
   }
+
+  const isMissingOrInactiveOrFreePlan =
+    !subscription ||
+    subscription.status === 'INACTIVE' ||
+    subscription?.planId === process.env.NEXT_PUBLIC_STRIPE_FREE_PLAN_ID;
 
   return (
     <div>
       <h3 className="text-lg font-medium">Billing</h3>
 
-      <p className="text-muted-foreground mt-2 text-sm">
-        Your subscription is{' '}
-        {subscription.status !== SubscriptionStatus.INACTIVE ? 'active' : 'inactive'}.
-        {subscription?.periodEnd && (
-          <>
-            {' '}
-            Your next payment is due on{' '}
-            <span className="font-semibold">
-              <LocaleDate date={subscription.periodEnd} />
-            </span>
-            .
-          </>
+      <div className="mt-2 text-sm text-slate-500">
+        {isMissingOrInactiveOrFreePlan && (
+          <p>
+            You are currently on the <span className="font-semibold">Free Plan</span>.
+          </p>
         )}
-      </p>
+
+        {!isMissingOrInactiveOrFreePlan &&
+          match(subscription.status)
+            .with('ACTIVE', () => (
+              <p>
+                {subscriptionProduct ? (
+                  <span>
+                    You are currently subscribed to{' '}
+                    <span className="font-semibold">{subscriptionProduct.name}</span>
+                  </span>
+                ) : (
+                  <span>You currently have an active plan</span>
+                )}
+                {subscription.periodEnd && (
+                  <span>
+                    {' '}
+                    which is set to{' '}
+                    {subscription.cancelAtPeriodEnd ? (
+                      <span>
+                        end on{' '}
+                        <LocaleDate className="font-semibold" date={subscription.periodEnd} />.
+                      </span>
+                    ) : (
+                      <span>
+                        automatically renew on{' '}
+                        <LocaleDate className="font-semibold" date={subscription.periodEnd} />.
+                      </span>
+                    )}
+                  </span>
+                )}
+              </p>
+            ))
+            .with('PAST_DUE', () => (
+              <p>Your current plan is past due. Please update your payment information.</p>
+            ))
+            .otherwise(() => null)}
+      </div>
 
       <hr className="my-4" />
 
-      {billingPortalUrl && (
-        <Button asChild>
-          <Link href={billingPortalUrl}>Manage Subscription</Link>
-        </Button>
-      )}
-
-      {!billingPortalUrl && (
-        <p className="text-muted-foreground max-w-[60ch] text-base">
-          You do not currently have a customer record, this should not happen. Please contact
-          support for assistance.
-        </p>
-      )}
+      <BillingPortalButton />
     </div>
   );
 }
