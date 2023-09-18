@@ -3,6 +3,7 @@ import { compare, hash } from 'bcrypt';
 import { prisma } from '@documenso/prisma';
 
 import { SALT_ROUNDS } from '../../constants/auth';
+import { sendResetPassword } from '../auth/send-reset-password';
 
 export type ResetPasswordOptions = {
   token: string;
@@ -61,6 +62,6 @@ export const resetPassword = async ({ token, password }: ResetPasswordOptions) =
     throw new Error('Unable to update password');
   }
 
-  // await sendResetPasswordSuccessMail(foundToken.User);
+  await sendResetPassword({ userId: foundToken.userId });
   return transactions;
 };

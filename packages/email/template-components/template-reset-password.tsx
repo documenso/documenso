@@ -3,8 +3,8 @@ import { Img, Section, Tailwind, Text } from '@react-email/components';
 import * as config from '@documenso/tailwind-config';
 
 export interface TemplateResetPasswordProps {
-  inviterName: string;
-  inviterEmail: string;
+  userName: string;
+  userEmail: string;
   assetBaseUrl: string;
 }
 

@@ -43,10 +43,7 @@ export const ForgotPasswordForm = ({ className }: ForgotPasswordFormProps) => {
   const { mutateAsync: forgotPassword } = trpc.profile.forgotPassword.useMutation();
 
   const onFormSubmit = async ({ email }: TForgotPasswordFormSchema) => {
-    // check if the email is available
-    // if not, throw an error
-    // if the email is available, create a password reset token and send an email
-
+    //  TODO: Handle error with try/catch
     await forgotPassword({
       email,
     });
