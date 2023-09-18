@@ -20,15 +20,15 @@ import {
   TemplateResetPasswordProps,
 } from '../template-components/template-reset-password';
 
-export type DocumentResetPasswordTemplateProps = Partial<TemplateResetPasswordProps>;
+export type ResetPasswordTemplateProps = Partial<TemplateResetPasswordProps>;
 
-export const DocumentResetPasswordTemplate = ({
+export const ResetPasswordTemplate = ({
   inviterName = 'Lucas Smith',
   inviterEmail = 'lucas@documenso.com',
 
   assetBaseUrl = 'http://localhost:3002',
-}: DocumentResetPasswordTemplateProps) => {
-  const previewText = `Completed Document`;
+}: ResetPasswordTemplateProps) => {
+  const previewText = `Password Reset Successful`;
 
   const getAssetUrl = (path: string) => {
     return new URL(path, assetBaseUrl).toString();
@@ -100,4 +100,4 @@ export const DocumentResetPasswordTemplate = ({
   );
 };
 
-export default DocumentResetPasswordTemplate;
+export default ResetPasswordTemplate;
