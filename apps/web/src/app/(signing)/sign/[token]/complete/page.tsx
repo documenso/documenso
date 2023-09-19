@@ -31,14 +31,20 @@ export default async function CompletedSigningPage({
     token,
   }).catch(() => null);
 
-  if (!document) {
+  if (!document || !document.documentData) {
     return notFound();
   }
 
+  const { documentData } = document;
+
   const [fields, recipient] = await Promise.all([
     getFieldsForToken({ token }),
-    getRecipientByToken({ token }),
+    getRecipientByToken({ token }).catch(() => null),
   ]);
+
+  if (!recipient) {
+    return notFound();
+  }
 
   const recipientName =
     recipient.name ||
@@ -92,7 +98,7 @@ export default async function CompletedSigningPage({
         <DocumentDownloadButton
           className="flex-1"
           fileName={document.title}
-          document={document.status === DocumentStatus.COMPLETED ? document.document : undefined}
+          documentData={documentData}
           disabled={document.status !== DocumentStatus.COMPLETED}
         />
       </div>

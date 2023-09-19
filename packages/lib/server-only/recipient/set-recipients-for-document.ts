@@ -1,7 +1,7 @@
-import { nanoid } from 'nanoid';
-
 import { prisma } from '@documenso/prisma';
 import { SendStatus, SigningStatus } from '@documenso/prisma/client';
+
+import { nanoid } from '../../universal/id';
 
 export interface SetRecipientsForDocumentOptions {
   userId: number;

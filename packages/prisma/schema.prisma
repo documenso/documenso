@@ -91,15 +91,33 @@ enum DocumentStatus {
 }
 
 model Document {
-  id        Int            @id @default(autoincrement())
-  created   DateTime       @default(now())
-  userId    Int
-  User      User           @relation(fields: [userId], references: [id], onDelete: Cascade)
-  title     String
-  status    DocumentStatus @default(DRAFT)
-  document  String
-  Recipient Recipient[]
-  Field     Field[]
+  id             Int            @id @default(autoincrement())
+  userId         Int
+  User           User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title          String
+  status         DocumentStatus @default(DRAFT)
+  Recipient      Recipient[]
+  Field          Field[]
+  documentDataId String
+  documentData   DocumentData   @relation(fields: [documentDataId], references: [id], onDelete: Cascade)
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @default(now()) @updatedAt
+
+  @@unique([documentDataId])
+}
+
+enum DocumentDataType {
+  S3_PATH
+  BYTES
+  BYTES_64
+}
+
+model DocumentData {
+  id          String           @id @default(cuid())
+  type        DocumentDataType
+  data        String
+  initialData String
+  Document    Document?
 }
 
 enum ReadStatus {

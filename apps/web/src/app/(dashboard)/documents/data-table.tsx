@@ -53,8 +53,8 @@ export const DocumentsDataTable = ({ results }: DocumentsDataTableProps) => {
         columns={[
           {
             header: 'Created',
-            accessorKey: 'created',
-            cell: ({ row }) => <LocaleDate date={row.getValue('created')} />,
+            accessorKey: 'createdAt',
+            cell: ({ row }) => <LocaleDate date={row.original.createdAt} />,
           },
           {
             header: 'Title',

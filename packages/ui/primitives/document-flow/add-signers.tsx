@@ -5,9 +5,9 @@ import React, { useId } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Plus, Trash } from 'lucide-react';
-import { nanoid } from 'nanoid';
 import { Controller, useFieldArray, useForm } from 'react-hook-form';
 
+import { nanoid } from '@documenso/lib/universal/id';
 import { Field, Recipient, SendStatus } from '@documenso/prisma/client';
 import { Button } from '@documenso/ui/primitives/button';
 import { FormErrorMessage } from '@documenso/ui/primitives/form/form-error-message';

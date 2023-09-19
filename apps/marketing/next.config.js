@@ -18,6 +18,11 @@ const config = {
     ...env,
     NEXT_PUBLIC_APP: 'marketing',
   },
+  modularizeImports: {
+    'lucide-react': {
+      transform: 'lucide-react/dist/esm/icons/{{ kebabCase member }}',
+    },
+  },
 };
 
 module.exports = withContentlayer(config);
