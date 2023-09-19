@@ -2,11 +2,21 @@ import { type Page, expect, test } from '@playwright/test';
 
 test.use({ storageState: { cookies: [], origins: [] } });
 
+/* 
+  Using them sequentially so the 2nd test
+  uses the details from the 1st (registration) test
+*/
+test.describe.configure({ mode: 'serial' });
+
+const username = process.env.E2E_TEST_USERNAME || '';
+const email = process.env.E2E_TEST_USER_EMAIL || '';
+const password = process.env.E2E_TEST_USER_PASSWORD || '';
+
 test('user can sign up with email and password', async ({ page }: { page: Page }) => {
   await page.goto('/signup');
-  await page.getByLabel('Name').fill(process.env.E2E_TEST_USERNAME);
-  await page.getByLabel('Email').fill(process.env.E2E_TEST_USER_EMAIL);
-  await page.getByLabel('Password').fill(process.env.E2E_TEST_USER_PASSWORD);
+  await page.getByLabel('Name').fill(username);
+  await page.getByLabel('Email').fill(email);
+  await page.getByLabel('Password').fill(password);
 
   const canvas = page.locator('canvas');
   const box = await canvas.boundingBox();
@@ -23,8 +33,8 @@ test('user can sign up with email and password', async ({ page }: { page: Page }
 
 test('user can login with user and password', async ({ page }: { page: Page }) => {
   await page.goto('/signin');
-  await page.getByLabel('Email').fill(process.env.E2E_TEST_USER_EMAIL);
-  await page.getByLabel('Password').fill(process.env.E2E_TEST_USER_PASSWORD);
+  await page.getByLabel('Email').fill(email);
+  await page.getByLabel('Password').fill(password);
   await page.getByRole('button', { name: 'Sign In' }).click();
 
   await expect(page).toHaveURL('/documents');
