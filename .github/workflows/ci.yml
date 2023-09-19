@@ -22,12 +22,18 @@ jobs:
         uses: actions/checkout@v3
         with:
           fetch-depth: 2
+
       - name: Install Node.js
         uses: actions/setup-node@v3
         with:
           node-version: 18
           cache: npm
+
       - name: Install dependencies
         run: npm ci
+
+      - name: Copy env
+        run: cp .env.example .env
+
       - name: Build
         run: npm run build
