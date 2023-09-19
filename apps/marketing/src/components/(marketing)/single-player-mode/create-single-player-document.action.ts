@@ -165,7 +165,7 @@ export const createSinglePlayerDocument = async (
   const template = createElement(DocumentSelfSignedEmailTemplate, {
     downloadLink: 'https://documenso.com',
     documentName: documentName,
-    assetBaseUrl: process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000',
+    assetBaseUrl: process.env.NEXT_PUBLIC_WEBAPP_URL || 'http://localhost:3000',
   });
 
   // Send email to signer.
