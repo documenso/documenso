@@ -1,5 +1,7 @@
 'use client';
 
+import { useState } from 'react';
+
 import Link from 'next/link';
 
 import {
@@ -8,7 +10,6 @@ import {
   Key,
   LogOut,
   User as LucideUser,
-  Monitor,
   Moon,
   Sun,
   UserCog,
@@ -25,9 +26,17 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
+  DropdownMenuPortal,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
   DropdownMenuSeparator,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from '@documenso/ui/primitives/dropdown-menu';
+import { Label } from '@documenso/ui/primitives/label';
+import { Switch } from '@documenso/ui/primitives/switch';
 
 import { useFeatureFlags } from '~/providers/feature-flag';
 
@@ -36,10 +45,15 @@ export type ProfileDropdownProps = {
 };
 
 export const ProfileDropdown = ({ user }: ProfileDropdownProps) => {
-  const { theme, setTheme } = useTheme();
   const { getFlag } = useFeatureFlags();
+  const { theme, setTheme } = useTheme();
   const isUserAdmin = isAdmin(user);
+  const [isDarkMode, setIsDarkMode] = useState(theme === 'dark');
 
+  const toggleDarkMode = () => {
+    setIsDarkMode(!isDarkMode);
+    setTheme(isDarkMode ? 'light' : 'dark');
+  };
   const isBillingEnabled = getFlag('app_billing');
 
   const avatarFallback = user.name
@@ -97,28 +111,19 @@ export const ProfileDropdown = ({ user }: ProfileDropdownProps) => {
 
         <DropdownMenuSeparator />
 
-        {theme === 'light' ? null : (
-          <DropdownMenuItem onClick={() => setTheme('light')}>
-            <Sun className="mr-2 h-4 w-4" />
-            Light Mode
-          </DropdownMenuItem>
-        )}
-        {theme === 'dark' ? null : (
-          <DropdownMenuItem onClick={() => setTheme('dark')}>
-            <Moon className="mr-2 h-4 w-4" />
-            Dark Mode
-          </DropdownMenuItem>
-        )}
-
-        {theme === 'system' ? null : (
-          <DropdownMenuItem onClick={() => setTheme('system')}>
-            <Monitor className="mr-2 h-4 w-4" />
-            System Theme
-          </DropdownMenuItem>
-        )}
-
+        <DropdownMenuSub>
+          <DropdownMenuSubTrigger>Themes</DropdownMenuSubTrigger>
+          <DropdownMenuPortal>
+            <DropdownMenuSubContent>
+              <DropdownMenuRadioGroup value={theme} onValueChange={setTheme}>
+                <DropdownMenuRadioItem value="light">Light</DropdownMenuRadioItem>
+                <DropdownMenuRadioItem value="dark">Dark</DropdownMenuRadioItem>
+                <DropdownMenuRadioItem value="system">System</DropdownMenuRadioItem>
+              </DropdownMenuRadioGroup>
+            </DropdownMenuSubContent>
+          </DropdownMenuPortal>
+        </DropdownMenuSub>
         <DropdownMenuSeparator />
-
         <DropdownMenuItem asChild>
           <Link href="https://github.com/documenso/documenso" className="cursor-pointer">
             <Github className="mr-2 h-4 w-4" />
