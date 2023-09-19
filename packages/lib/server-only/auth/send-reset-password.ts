@@ -10,19 +10,15 @@ export interface SendResetPasswordOptions {
 }
 
 export const sendResetPassword = async ({ userId }: SendResetPasswordOptions) => {
-  // TODO: Better Error Handling
-
   const user = await prisma.user.findFirstOrThrow({
     where: {
       id: userId,
     },
   });
 
-  if (!user) {
-    throw new Error('User not found');
-  }
+  const assetBaseUrl = process.env.NEXT_PUBLIC_WEBAPP_URL || 'http://localhost:3000';
 
-  const assetBaseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
+  console.log({ assetBaseUrl });
 
   const template = createElement(ResetPasswordTemplate, {
     assetBaseUrl,

@@ -69,16 +69,7 @@ export const profileRouter = router({
         email,
       });
     } catch (err) {
-      let message = 'We were unable to send your email. Please try again.';
-
-      if (err instanceof Error) {
-        message = err.message;
-      }
-
-      throw new TRPCError({
-        code: 'BAD_REQUEST',
-        message,
-      });
+      console.error(err);
     }
   }),
 

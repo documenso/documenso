@@ -14,18 +14,18 @@
   "customizations": {
     "vscode": {
       "extensions": [
+        "GitHub.vscode-pull-request-github",
+        "GitHub.copilot-labs",
+        "GitHub.copilot-chat",
+        "GitHub.copilot",
         "aaron-bond.better-comments",
+        "mikestead.dotenv",
+        "VisualStudioExptTeam.vscodeintellicode",
+        "Prisma.prisma",
         "bradlc.vscode-tailwindcss",
         "dbaeumer.vscode-eslint",
-        "esbenp.prettier-vscode",
-        "mikestead.dotenv",
         "unifiedjs.vscode-mdx",
-        "GitHub.copilot-chat",
-        "GitHub.copilot-labs",
-        "GitHub.copilot",
-        "GitHub.vscode-pull-request-github",
-        "Prisma.prisma",
-        "VisualStudioExptTeam.vscodeintellicode",
+        "esbenp.prettier-vscode"
       ]
     }
   }

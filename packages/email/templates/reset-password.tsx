@@ -68,7 +68,7 @@ export const ResetPasswordTemplate = ({
               <Section>
                 <Text className="my-4 text-base font-semibold">
                   Hi, {userName}{' '}
-                  <Link className="font-normal text-slate-400" href="mailto:{userEmail}">
+                  <Link className="font-normal text-slate-400" href={`mailto:${userEmail}`}>
                     ({userEmail})
                   </Link>
                 </Text>
