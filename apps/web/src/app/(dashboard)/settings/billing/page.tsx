@@ -35,7 +35,7 @@ export default async function BillingSettingsPage() {
   if (subscription.customerId) {
     billingPortalUrl = await getPortalSession({
       customerId: subscription.customerId,
-      returnUrl: `${process.env.NEXT_PUBLIC_SITE_URL}/settings/billing`,
+      returnUrl: `${process.env.NEXT_PUBLIC_WEBAPP_URL}/settings/billing`,
     });
   }
 
