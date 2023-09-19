@@ -62,7 +62,7 @@ export const ForgotPasswordTemplate = ({
             <div className="mx-auto mt-12 max-w-xl" />
 
             <Container className="mx-auto max-w-xl">
-              <TemplateFooter />
+              <TemplateFooter isDocument={false} />
             </Container>
           </Section>
         </Body>
