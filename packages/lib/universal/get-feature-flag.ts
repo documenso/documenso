@@ -57,7 +57,7 @@ export const getAllFlags = async (
     return LOCAL_FEATURE_FLAGS;
   }
 
-  const url = new URL(`${process.env.NEXT_PUBLIC_WEBAPP_URL}/api/feature-flag/all`);
+  const url = new URL(`${APP_BASE_URL}/api/feature-flag/all`);
 
   return fetch(url, {
     headers: {
