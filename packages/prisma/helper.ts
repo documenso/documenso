@@ -39,7 +39,7 @@ export const getDatabaseUrl = () => {
   if (url.hostname.endsWith('neon.tech')) {
     const [projectId, ...rest] = url.hostname.split('.');
 
-    if (!projectId.endsWith('-bouncer')) {
+    if (!projectId.endsWith('-pooler')) {
       url.hostname = `${projectId}-pooler.${rest.join('.')}`;
     }
 
