@@ -15,7 +15,7 @@ export const resetPassword = async ({ token, password }: ResetPasswordOptions) =
     throw new Error('Invalid token provided. Please try again.');
   }
 
-  const foundToken = await prisma.passwordResetToken.findFirstOrThrow({
+  const foundToken = await prisma.passwordResetToken.findFirst({
     where: {
       token,
     },
@@ -34,7 +34,7 @@ export const resetPassword = async ({ token, password }: ResetPasswordOptions) =
     throw new Error('Token has expired. Please try again.');
   }
 
-  const isSamePassword = await compare(password, foundToken.User.password!);
+  const isSamePassword = await compare(password, foundToken.User.password || '');
 
   if (isSamePassword) {
     throw new Error('Your new password cannot be the same as your old password.');
@@ -42,7 +42,7 @@ export const resetPassword = async ({ token, password }: ResetPasswordOptions) =
 
   const hashedPassword = await hash(password, SALT_ROUNDS);
 
-  const transactions = await prisma.$transaction([
+  await prisma.$transaction([
     prisma.user.update({
       where: {
         id: foundToken.userId,
@@ -58,10 +58,5 @@ export const resetPassword = async ({ token, password }: ResetPasswordOptions) =
     }),
   ]);
 
-  if (!transactions) {
-    throw new Error('We were unable to reset your password. Please try again.');
-  }
-
   await sendResetPassword({ userId: foundToken.userId });
-  return transactions;
 };

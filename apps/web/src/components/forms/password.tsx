@@ -88,7 +88,7 @@ export const PasswordForm = ({ className }: PasswordFormProps) => {
       onSubmit={handleSubmit(onFormSubmit)}
     >
       <div>
-        <Label htmlFor="password" className="text-slate-500">
+        <Label htmlFor="password" className="text-muted-foreground">
           Password
         </Label>
 
@@ -106,7 +106,7 @@ export const PasswordForm = ({ className }: PasswordFormProps) => {
       </div>
 
       <div>
-        <Label htmlFor="repeated-password" className="text-slate-500">
+        <Label htmlFor="repeated-password" className="text-muted-foreground">
           Repeat Password
         </Label>
 

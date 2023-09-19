@@ -3,54 +3,51 @@ import crypto from 'crypto';
 import { prisma } from '@documenso/prisma';
 import { TForgotPasswordFormSchema } from '@documenso/trpc/server/profile-router/schema';
 
+import { ONE_DAY, ONE_HOUR } from '../../constants/time';
 import { sendForgotPassword } from '../auth/send-forgot-password';
 
 export const forgotPassword = async ({ email }: TForgotPasswordFormSchema) => {
-  let user;
-  try {
-    user = await prisma.user.findFirstOrThrow({
-      where: {
-        email: email.toLowerCase(),
+  const user = await prisma.user.findFirst({
+    where: {
+      email: {
+        equals: email,
+        mode: 'insensitive',
       },
-    });
-  } catch (error) {
-    throw new Error('No account found with that email address.');
-  }
+    },
+  });
 
   if (!user) {
-    throw new Error('No account found with that email address.');
+    return;
   }
 
+  // Find a token that was created in the last day and hasn't expired
   const existingToken = await prisma.passwordResetToken.findFirst({
     where: {
       userId: user.id,
+      expiry: {
+        lt: new Date(),
+      },
       createdAt: {
-        gte: new Date(Date.now() - 1000 * 60 * 60),
+        gt: new Date(Date.now() - ONE_HOUR),
       },
     },
   });
 
   if (existingToken) {
-    throw new Error('A password reset email has been sent.');
+    return;
   }
 
-  const token = crypto.randomBytes(64).toString('hex');
-  const expiry = new Date();
-  expiry.setHours(expiry.getHours() + 24); // Set expiry to one hour from now
+  const token = crypto.randomBytes(18).toString('hex');
 
-  try {
-    await prisma.passwordResetToken.create({
-      data: {
-        token,
-        expiry,
-        userId: user.id,
-      },
-    });
-  } catch (error) {
-    throw new Error('We were unable to send your email. Please try again.');
-  }
-
-  return await sendForgotPassword({
-    userId: user.id,
+  await prisma.passwordResetToken.create({
+    data: {
+      token,
+      expiry: new Date(Date.now() + ONE_DAY),
+      userId: user.id,
+    },
   });
+
+  await sendForgotPassword({
+    userId: user.id,
+  }).catch((err) => console.error(err));
 };

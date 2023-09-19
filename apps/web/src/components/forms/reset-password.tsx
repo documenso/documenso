@@ -3,7 +3,6 @@
 import { useRouter } from 'next/navigation';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Loader } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
@@ -11,6 +10,7 @@ import { TRPCClientError } from '@documenso/trpc/client';
 import { trpc } from '@documenso/trpc/react';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
+import { FormErrorMessage } from '@documenso/ui/primitives/form/form-error-message';
 import { Input } from '@documenso/ui/primitives/input';
 import { Label } from '@documenso/ui/primitives/label';
 import { useToast } from '@documenso/ui/primitives/use-toast';
@@ -22,7 +22,7 @@ export const ZResetPasswordFormSchema = z
   })
   .refine((data) => data.password === data.repeatedPassword, {
     path: ['repeatedPassword'],
-    message: "Password don't match",
+    message: "Passwords don't match",
   });
 
 export type TResetPasswordFormSchema = z.infer<typeof ZResetPasswordFormSchema>;
@@ -92,7 +92,7 @@ export const ResetPasswordForm = ({ className, token }: ResetPasswordFormProps) 
       onSubmit={handleSubmit(onFormSubmit)}
     >
       <div>
-        <Label htmlFor="password" className="flex justify-between text-slate-500">
+        <Label htmlFor="password" className="text-muted-foreground">
           <span>Password</span>
         </Label>
 
@@ -106,13 +106,11 @@ export const ResetPasswordForm = ({ className, token }: ResetPasswordFormProps) 
           {...register('password')}
         />
 
-        {errors.password && (
-          <span className="mt-1 text-xs text-red-500">{errors.password.message}</span>
-        )}
+        <FormErrorMessage className="mt-1.5" error={errors.password} />
       </div>
 
       <div>
-        <Label htmlFor="repeatedPassword" className="flex justify-between text-slate-500">
+        <Label htmlFor="repeatedPassword" className="text-muted-foreground">
           <span>Repeat Password</span>
         </Label>
 
@@ -126,13 +124,10 @@ export const ResetPasswordForm = ({ className, token }: ResetPasswordFormProps) 
           {...register('repeatedPassword')}
         />
 
-        {errors.repeatedPassword && (
-          <span className="mt-1 text-xs text-red-500">{errors.repeatedPassword.message}</span>
-        )}
+        <FormErrorMessage className="mt-1.5" error={errors.repeatedPassword} />
       </div>
 
-      <Button size="lg" disabled={isSubmitting} className="dark:bg-documenso dark:hover:opacity-90">
-        {isSubmitting && <Loader className="mr-2 h-5 w-5 animate-spin" />}
+      <Button size="lg" loading={isSubmitting}>
         Reset Password
       </Button>
     </form>
