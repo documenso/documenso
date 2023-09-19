@@ -75,6 +75,6 @@ export const createBillingPortal = async () => {
 
   return getPortalSession({
     customerId: stripeCustomer.id,
-    returnUrl: `${process.env.NEXT_PUBLIC_APP_URL}/settings/billing`,
+    returnUrl: `${process.env.NEXT_PUBLIC_WEBAPP_URL}/settings/billing`,
   });
 };
