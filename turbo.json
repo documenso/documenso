@@ -2,8 +2,13 @@
   "$schema": "https://turbo.build/schema.json",
   "pipeline": {
     "build": {
-      "dependsOn": ["^build"],
-      "outputs": [".next/**", "!.next/cache/**"]
+      "dependsOn": [
+        "^build"
+      ],
+      "outputs": [
+        ".next/**",
+        "!.next/cache/**"
+      ]
     },
     "lint": {},
     "dev": {
@@ -11,20 +16,22 @@
       "persistent": true
     }
   },
-  "globalDependencies": ["**/.env.*local"],
+  "globalDependencies": [
+    "**/.env.*local"
+  ],
   "globalEnv": [
     "APP_VERSION",
     "NEXTAUTH_URL",
     "NEXTAUTH_SECRET",
-    "NEXT_PUBLIC_APP_URL",
-    "NEXT_PUBLIC_SITE_URL",
+    "NEXT_PUBLIC_WEBAPP_URL",
+    "NEXT_PUBLIC_MARKETING_URL",
     "NEXT_PUBLIC_POSTHOG_KEY",
     "NEXT_PUBLIC_POSTHOG_HOST",
     "NEXT_PUBLIC_FEATURE_BILLING_ENABLED",
     "NEXT_PUBLIC_STRIPE_COMMUNITY_PLAN_YEARLY_PRICE_ID",
     "NEXT_PUBLIC_STRIPE_COMMUNITY_PLAN_MONTHLY_PRICE_ID",
     "NEXT_PRIVATE_DATABASE_URL",
-    "NEXT_PRIVATE_NEXT_AUTH_SECRET",
+    "NEXT_PRIVATE_DIRECT_DATABASE_URL",
     "NEXT_PRIVATE_GOOGLE_CLIENT_ID",
     "NEXT_PRIVATE_GOOGLE_CLIENT_SECRET",
     "NEXT_PUBLIC_UPLOAD_TRANSPORT",
@@ -48,6 +55,15 @@
     "NEXT_PRIVATE_SMTP_SECURE",
     "NEXT_PRIVATE_SMTP_FROM_NAME",
     "NEXT_PRIVATE_SMTP_FROM_ADDRESS",
-    "NEXT_PRIVATE_STRIPE_API_KEY"
+    "NEXT_PRIVATE_STRIPE_API_KEY",
+
+    "VERCEL",
+    "VERCEL_ENV",
+    "VERCEL_URL",
+    "DEPLOYMENT_TARGET",
+    "POSTGRES_URL",
+    "DATABASE_URL",
+    "POSTGRES_PRISMA_URL",
+    "POSTGRES_URL_NON_POOLING"
   ]
 }
