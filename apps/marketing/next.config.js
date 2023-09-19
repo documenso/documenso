@@ -2,7 +2,7 @@
 const path = require('path');
 const { withContentlayer } = require('next-contentlayer');
 
-const { parsed: env } = require('dotenv').config({
+require('dotenv').config({
   path: path.join(__dirname, '../../.env.local'),
 });
 
@@ -15,7 +15,6 @@ const config = {
   reactStrictMode: true,
   transpilePackages: ['@documenso/lib', '@documenso/prisma', '@documenso/trpc', '@documenso/ui'],
   env: {
-    ...env,
     NEXT_PUBLIC_APP: 'marketing',
   },
   modularizeImports: {

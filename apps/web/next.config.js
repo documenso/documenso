@@ -2,7 +2,7 @@
 const path = require('path');
 const { version } = require('./package.json');
 
-const { parsed: env } = require('dotenv').config({
+require('dotenv').config({
   path: path.join(__dirname, '../../.env.local'),
 });
 
