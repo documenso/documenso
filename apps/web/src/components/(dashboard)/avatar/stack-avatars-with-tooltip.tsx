@@ -1,5 +1,5 @@
-import { initials } from '@documenso/lib/client-only/recipient-initials';
 import { getRecipientType } from '@documenso/lib/client-only/recipient-type';
+import { recipientAbbreviation } from '@documenso/lib/utils/recipient-formatter';
 import { Recipient } from '@documenso/prisma/client';
 import {
   Tooltip,
@@ -56,7 +56,7 @@ export const StackAvatarsWithTooltip = ({
                       first={true}
                       key={recipient.id}
                       type={getRecipientType(recipient)}
-                      fallbackText={initials(recipient.name)}
+                      fallbackText={recipientAbbreviation(recipient)}
                     />
                     <span className="text-sm text-gray-500">{recipient.email}</span>
                   </div>
@@ -73,7 +73,7 @@ export const StackAvatarsWithTooltip = ({
                       first={true}
                       key={recipient.id}
                       type={getRecipientType(recipient)}
-                      fallbackText={initials(recipient.name)}
+                      fallbackText={recipientAbbreviation(recipient)}
                     />
                     <span className="text-sm text-gray-500">{recipient.email}</span>
                   </div>
@@ -90,7 +90,7 @@ export const StackAvatarsWithTooltip = ({
                       first={true}
                       key={recipient.id}
                       type={getRecipientType(recipient)}
-                      fallbackText={initials(recipient.name)}
+                      fallbackText={recipientAbbreviation(recipient)}
                     />
                     <span className="text-sm text-gray-500">{recipient.email}</span>
                   </div>
@@ -107,7 +107,7 @@ export const StackAvatarsWithTooltip = ({
                       first={true}
                       key={recipient.id}
                       type={getRecipientType(recipient)}
-                      fallbackText={initials(recipient.name)}
+                      fallbackText={recipientAbbreviation(recipient)}
                     />
                     <span className="text-sm text-gray-500">{recipient.email}</span>
                   </div>

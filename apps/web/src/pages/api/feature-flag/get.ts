@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-import { nanoid } from 'nanoid';
 import { JWT, getToken } from 'next-auth/jwt';
 
 import { LOCAL_FEATURE_FLAGS, extractPostHogConfig } from '@documenso/lib/constants/feature-flags';
+import { nanoid } from '@documenso/lib/universal/id';
 
 import PostHogServerClient from '~/helpers/get-post-hog-server-client';
 

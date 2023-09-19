@@ -21,7 +21,7 @@ export const getFlag = async (
     return LOCAL_FEATURE_FLAGS[flag] ?? true;
   }
 
-  const url = new URL(`${process.env.NEXT_PUBLIC_SITE_URL}/api/feature-flag/get`);
+  const url = new URL(`${process.env.NEXT_PUBLIC_WEBAPP_URL}/api/feature-flag/get`);
   url.searchParams.set('flag', flag);
 
   const response = await fetch(url, {
@@ -54,7 +54,7 @@ export const getAllFlags = async (
     return LOCAL_FEATURE_FLAGS;
   }
 
-  const url = new URL(`${process.env.NEXT_PUBLIC_SITE_URL}/api/feature-flag/all`);
+  const url = new URL(`${process.env.NEXT_PUBLIC_WEBAPP_URL}/api/feature-flag/all`);
 
   return fetch(url, {
     headers: {
