@@ -26,8 +26,10 @@ export const createBillingPortal = async () => {
     }
   }
 
-  // Fallback to check if a Stripe customer already exists for the current user.
-  stripeCustomer = await getStripeCustomerByEmail(user.email);
+  // Fallback to check if a Stripe customer already exists for the current user email.
+  if (!stripeCustomer) {
+    stripeCustomer = await getStripeCustomerByEmail(user.email);
+  }
 
   // Create a Stripe customer if it does not exist for the current user.
   if (!stripeCustomer) {
