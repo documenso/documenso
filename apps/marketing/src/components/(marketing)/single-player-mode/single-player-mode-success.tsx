@@ -1,12 +1,11 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import Link from 'next/link';
 
 import { Share } from 'lucide-react';
 
-import { useIsMounted } from '@documenso/lib/client-only/hooks/use-is-mounted';
 import { getFile } from '@documenso/lib/universal/upload/get-file';
 import { DocumentWithRecipient } from '@documenso/prisma/types/document-with-recipient';
 import DocumentDialog from '@documenso/ui/components/document/document-dialog';
@@ -34,13 +33,7 @@ export default function SinglePlayerModeSuccess({
   const [isFetchingDocumentFile, setIsFetchingDocumentFile] = useState(false);
   const [documentFile, setDocumentFile] = useState<string | null>(null);
 
-  const isMounted = useIsMounted();
-
   const { toast } = useToast();
-
-  if (isMounted) {
-    window.scrollTo({ top: 0 });
-  }
 
   const handleShowDocumentDialog = async () => {
     if (isFetchingDocumentFile) {
@@ -66,6 +59,10 @@ export default function SinglePlayerModeSuccess({
 
     setIsFetchingDocumentFile(false);
   };
+
+  useEffect(() => {
+    window.scrollTo({ top: 0 });
+  }, []);
 
   return (
     <div className="flex min-h-[calc(100vh-10rem)] flex-col items-center justify-center sm:min-h-[calc(100vh-13rem)]">
