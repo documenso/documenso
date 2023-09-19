@@ -20,12 +20,12 @@ export const forgotPassword = async ({ email }: TForgotPasswordFormSchema) => {
     return;
   }
 
-  // Find a token that was created in the last day and hasn't expired
+  // Find a token that was created in the last hour and hasn't expired
   const existingToken = await prisma.passwordResetToken.findFirst({
     where: {
       userId: user.id,
       expiry: {
-        lt: new Date(),
+        gt: new Date(),
       },
       createdAt: {
         gt: new Date(Date.now() - ONE_HOUR),
