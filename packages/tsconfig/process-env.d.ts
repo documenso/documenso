@@ -1,6 +1,7 @@
 declare namespace NodeJS {
   export interface ProcessEnv {
-    NEXT_PUBLIC_SITE_URL?: string;
+    NEXT_PUBLIC_WEBAPP_URL?: string;
+    NEXT_PUBLIC_MARKETING_URL?: string;
 
     NEXT_PRIVATE_GOOGLE_CLIENT_ID?: string;
     NEXT_PRIVATE_GOOGLE_CLIENT_SECRET?: string;
@@ -40,5 +41,19 @@ declare namespace NodeJS {
 
     NEXT_PRIVATE_SMTP_FROM_NAME?: string;
     NEXT_PRIVATE_SMTP_FROM_ADDRESS?: string;
+
+    /**
+     * Vercel environment variables
+     */
+    VERCEL?: string;
+    VERCEL_ENV?: 'production' | 'development' | 'preview';
+    VERCEL_URL?: string;
+
+    DEPLOYMENT_TARGET?: 'webapp' | 'marketing';
+
+    POSTGRES_URL?: string;
+    DATABASE_URL?: string;
+    POSTGRES_PRISMA_URL?: string;
+    POSTGRES_URL_NON_POOLING?: string;
   }
 }
