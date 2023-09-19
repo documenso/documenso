@@ -8,11 +8,12 @@ export const getResetTokenValidity = async ({ token }: GetResetTokenValidityOpti
   const found = await prisma.passwordResetToken.findFirst({
     select: {
       id: true,
+      expiry: true,
     },
     where: {
       token,
     },
   });
 
-  return !!found;
+  return !!found && found.expiry > new Date();
 };
