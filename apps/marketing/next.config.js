@@ -15,7 +15,7 @@ const config = {
   reactStrictMode: true,
   transpilePackages: ['@documenso/lib', '@documenso/prisma', '@documenso/trpc', '@documenso/ui'],
   env: {
-    NEXT_PUBLIC_APP: 'marketing',
+    NEXT_PUBLIC_PROJECT: 'marketing',
   },
   modularizeImports: {
     'lucide-react': {

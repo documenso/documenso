@@ -22,7 +22,7 @@ const config = {
   ],
   env: {
     APP_VERSION: version,
-    NEXT_PUBLIC_APP: 'web',
+    NEXT_PUBLIC_PROJECT: 'web',
   },
   modularizeImports: {
     'lucide-react': {
