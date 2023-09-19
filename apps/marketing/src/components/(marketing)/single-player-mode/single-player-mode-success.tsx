@@ -7,12 +7,14 @@ import Link from 'next/link';
 import { Share } from 'lucide-react';
 
 import { useIsMounted } from '@documenso/lib/client-only/hooks/use-is-mounted';
+import { getFile } from '@documenso/lib/universal/upload/get-file';
 import { DocumentWithRecipient } from '@documenso/prisma/types/document-with-recipient';
 import DocumentDialog from '@documenso/ui/components/document/document-dialog';
 import { DocumentDownloadButton } from '@documenso/ui/components/document/document-download-button';
 import { SigningCard3D } from '@documenso/ui/components/signing-card';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
+import { useToast } from '@documenso/ui/primitives/use-toast';
 
 import signingCelebration from '~/assets/signing-celebration.png';
 import ConfettiScreen from '~/components/(marketing)/confetti-screen';
@@ -28,12 +30,42 @@ export default function SinglePlayerModeSuccess({
   className,
   document,
 }: SinglePlayerModeSuccessProps) {
-  const [showDocument, setShowDocument] = useState(false);
+  const [showDocumentDialog, setShowDocumentDialog] = useState(false);
+  const [isFetchingDocumentFile, setIsFetchingDocumentFile] = useState(false);
+  const [documentFile, setDocumentFile] = useState<string | null>(null);
+
   const isMounted = useIsMounted();
+
+  const { toast } = useToast();
 
   if (isMounted) {
     window.scrollTo({ top: 0 });
   }
+
+  const handleShowDocumentDialog = async () => {
+    if (isFetchingDocumentFile) {
+      return;
+    }
+
+    setIsFetchingDocumentFile(true);
+
+    try {
+      const data = await getFile(document.documentData);
+
+      setDocumentFile(Buffer.from(data).toString('base64'));
+
+      setShowDocumentDialog(true);
+    } catch {
+      toast({
+        title: 'Something went wrong.',
+        description: 'We were unable to retrieve the document at this time. Please try again.',
+        variant: 'destructive',
+        duration: 7500,
+      });
+    }
+
+    setIsFetchingDocumentFile(false);
+  };
 
   return (
     <div className="flex min-h-[calc(100vh-10rem)] flex-col items-center justify-center sm:min-h-[calc(100vh-13rem)]">
@@ -63,11 +95,15 @@ export default function SinglePlayerModeSuccess({
             <DocumentDownloadButton
               className="flex-1"
               fileName={document.title}
-              document={document.document}
+              documentData={document.documentData}
               disabled={document.status !== DocumentStatus.COMPLETED}
             />
 
-            <Button onClick={() => setShowDocument(true)} className="col-span-2">
+            <Button
+              onClick={async () => handleShowDocumentDialog()}
+              loading={isFetchingDocumentFile}
+              className="col-span-2"
+            >
               Show document
             </Button>
           </div>
@@ -87,9 +123,9 @@ export default function SinglePlayerModeSuccess({
       </p>
 
       <DocumentDialog
-        document={document.document}
-        open={showDocument}
-        onOpenChange={setShowDocument}
+        document={documentFile ?? ''}
+        open={showDocumentDialog}
+        onOpenChange={setShowDocumentDialog}
       />
     </div>
   );

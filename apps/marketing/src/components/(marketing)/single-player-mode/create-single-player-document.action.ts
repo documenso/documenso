@@ -15,6 +15,7 @@ import { FROM_ADDRESS, FROM_NAME, SERVICE_USER_EMAIL } from '@documenso/lib/cons
 import { insertFieldInPDF } from '@documenso/lib/server-only/pdf/insert-field-in-pdf';
 import { prisma } from '@documenso/prisma';
 import {
+  DocumentDataType,
   DocumentStatus,
   FieldType,
   Prisma,
@@ -98,14 +99,24 @@ export const createSinglePlayerDocument = async (
       },
     });
 
+    const documentDataBytes = Buffer.from(pdfBytes).toString('base64');
+
+    const { id: documentDataId } = await tx.documentData.create({
+      data: {
+        type: DocumentDataType.BYTES_64,
+        data: documentDataBytes,
+        initialData: documentDataBytes,
+      },
+    });
+
     // Create document.
     const document = await tx.document.create({
       data: {
         title: documentName,
         status: DocumentStatus.COMPLETED,
+        documentDataId,
         userId: serviceUser.id,
-        document: Buffer.from(pdfBytes).toString('base64'),
-        created: createdAt,
+        createdAt,
       },
     });
 

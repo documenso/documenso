@@ -59,6 +59,7 @@ export const getDocumentAndRecipientByToken = async ({
     },
     include: {
       Recipient: true,
+      documentData: true,
     },
   });
 
