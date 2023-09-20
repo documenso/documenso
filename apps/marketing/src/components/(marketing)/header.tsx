@@ -5,6 +5,7 @@ import { HTMLAttributes, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 
+import { useFeatureFlags } from '@documenso/lib/client-only/providers/feature-flag';
 import { cn } from '@documenso/ui/lib/utils';
 
 import { HamburgerMenu } from './mobile-hamburger';
@@ -15,17 +16,26 @@ export type HeaderProps = HTMLAttributes<HTMLElement>;
 export const Header = ({ className, ...props }: HeaderProps) => {
   const [isHamburgerMenuOpen, setIsHamburgerMenuOpen] = useState(false);
 
+  const { getFlag } = useFeatureFlags();
+
+  const isSinglePlayerModeMarketingEnabled = getFlag('marketing_header_single_player_mode');
+
   return (
     <header className={cn('flex items-center justify-between', className)} {...props}>
-      <Link href="/" className="z-10" onClick={() => setIsHamburgerMenuOpen(false)}>
-        <Image
-          src="/logo.png"
-          alt="Documenso Logo"
-          className="dark:invert"
-          width={170}
-          height={25}
-        />
-      </Link>
+      <div className="flex items-center space-x-4">
+        <Link href="/" className="z-10" onClick={() => setIsHamburgerMenuOpen(false)}>
+          <Image src="/logo.png" alt="Documenso Logo" width={170} height={25} />
+        </Link>
+
+        {isSinglePlayerModeMarketingEnabled && (
+          <Link
+            href="/single-player-mode"
+            className="bg-primary rounded-full px-2 py-1 text-xs font-semibold sm:px-3"
+          >
+            Try now!
+          </Link>
+        )}
+      </div>
 
       <div className="hidden items-center gap-x-6 md:flex">
         <Link

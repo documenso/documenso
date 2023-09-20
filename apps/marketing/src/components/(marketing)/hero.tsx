@@ -6,7 +6,9 @@ import Link from 'next/link';
 import { Variants, motion } from 'framer-motion';
 import { Github } from 'lucide-react';
 import { usePlausible } from 'next-plausible';
+import { match } from 'ts-pattern';
 
+import { useFeatureFlags } from '@documenso/lib/client-only/providers/feature-flag';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
 
@@ -50,6 +52,10 @@ const HeroTitleVariants: Variants = {
 
 export const Hero = ({ className, ...props }: HeroProps) => {
   const event = usePlausible();
+
+  const { getFlag } = useFeatureFlags();
+
+  const heroMarketingCTA = getFlag('marketing_landing_hero_cta');
 
   const onSignUpClick = () => {
     const el = document.getElementById('email');
@@ -122,23 +128,40 @@ export const Hero = ({ className, ...props }: HeroProps) => {
           </Link>
         </motion.div>
 
-        <motion.div
-          variants={HeroTitleVariants}
-          initial="initial"
-          animate="animate"
-          className="mt-8 flex flex-col items-center justify-center gap-x-6 gap-y-4"
-        >
-          <Link
-            href="https://www.producthunt.com/posts/documenso?utm_source=badge-top-post-badge&utm_medium=badge&utm_souce=badge-documenso"
-            target="_blank"
-          >
-            <img
-              src="https://api.producthunt.com/widgets/embed-image/v1/top-post-badge.svg?post_id=395047&theme=light&period=daily"
-              alt="Documenso - The open source DocuSign alternative | Product Hunt"
-              style={{ width: '250px', height: '54px' }}
-            />
-          </Link>
-        </motion.div>
+        {match(heroMarketingCTA)
+          .with('spm', () => (
+            <motion.div
+              variants={HeroTitleVariants}
+              initial="initial"
+              animate="animate"
+              className="border-primary mx-auto mt-8 w-fit rounded-xl border-2 bg-white transition-colors hover:bg-slate-50/60"
+            >
+              <Link href="/single-player-mode" className="block px-4 py-2 text-center">
+                <h2 className="text-xs font-semibold text-[#727272]">Single Player Mode</h2>
+                <h1 className="font-semibold leading-5 text-[#606060]">Self sign documents here</h1>
+              </Link>
+            </motion.div>
+          ))
+          .with('productHunt', () => (
+            <motion.div
+              variants={HeroTitleVariants}
+              initial="initial"
+              animate="animate"
+              className="mt-8 flex flex-col items-center justify-center gap-x-6 gap-y-4"
+            >
+              <Link
+                href="https://www.producthunt.com/posts/documenso?utm_source=badge-top-post-badge&utm_medium=badge&utm_souce=badge-documenso"
+                target="_blank"
+              >
+                <img
+                  src="https://api.producthunt.com/widgets/embed-image/v1/top-post-badge.svg?post_id=395047&theme=light&period=daily"
+                  alt="Documenso - The open source DocuSign alternative | Product Hunt"
+                  style={{ width: '250px', height: '54px' }}
+                />
+              </Link>
+            </motion.div>
+          ))
+          .otherwise(() => null)}
 
         <motion.div
           className="mt-12"

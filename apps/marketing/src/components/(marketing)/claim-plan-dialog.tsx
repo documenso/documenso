@@ -10,6 +10,7 @@ import { usePlausible } from 'next-plausible';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
+import { useAnalytics } from '@documenso/lib/client-only/hooks/use-analytics';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
 import {
@@ -43,8 +44,10 @@ export type ClaimPlanDialogProps = {
 
 export const ClaimPlanDialog = ({ className, planId, children }: ClaimPlanDialogProps) => {
   const params = useSearchParams();
-  const { toast } = useToast();
+  const analytics = useAnalytics();
   const event = usePlausible();
+
+  const { toast } = useToast();
 
   const [open, setOpen] = useState(() => params?.get('cancelled') === 'true');
 
@@ -73,10 +76,12 @@ export const ClaimPlanDialog = ({ className, planId, children }: ClaimPlanDialog
       ]);
 
       event('claim-plan-pricing');
+      analytics.capture('Marketing: Claim plan', { planId, email });
 
       window.location.href = redirectUrl;
     } catch (error) {
       event('claim-plan-failed');
+      analytics.capture('Marketing: Claim plan failure', { planId, email });
 
       toast({
         title: 'Something went wrong',

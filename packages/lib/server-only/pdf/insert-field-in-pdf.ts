@@ -1,25 +1,31 @@
 import fontkit from '@pdf-lib/fontkit';
-import { readFileSync } from 'fs';
 import { PDFDocument, StandardFonts } from 'pdf-lib';
 
+import {
+  CAVEAT_FONT_PATH,
+  DEFAULT_HANDWRITING_FONT_SIZE,
+  DEFAULT_STANDARD_FONT_SIZE,
+  MIN_HANDWRITING_FONT_SIZE,
+  MIN_STANDARD_FONT_SIZE,
+} from '@documenso/lib/constants/pdf';
 import { FieldType } from '@documenso/prisma/client';
 import { isSignatureFieldType } from '@documenso/prisma/guards/is-signature-field';
 import { FieldWithSignature } from '@documenso/prisma/types/field-with-signature';
 
-const DEFAULT_STANDARD_FONT_SIZE = 15;
-const DEFAULT_HANDWRITING_FONT_SIZE = 50;
-
 export const insertFieldInPDF = async (pdf: PDFDocument, field: FieldWithSignature) => {
+  // Fetch the font file from the public URL.
+  const fontResponse = await fetch(CAVEAT_FONT_PATH);
+  const fontCaveat = await fontResponse.arrayBuffer();
+
   const isSignatureField = isSignatureFieldType(field.type);
 
   pdf.registerFontkit(fontkit);
 
-  const fontCaveat = readFileSync('./public/fonts/caveat.ttf');
-
   const pages = pdf.getPages();
 
+  const minFontSize = isSignatureField ? MIN_HANDWRITING_FONT_SIZE : MIN_STANDARD_FONT_SIZE;
   const maxFontSize = isSignatureField ? DEFAULT_HANDWRITING_FONT_SIZE : DEFAULT_STANDARD_FONT_SIZE;
-  let fontSize = isSignatureField ? DEFAULT_HANDWRITING_FONT_SIZE : DEFAULT_STANDARD_FONT_SIZE;
+  let fontSize = maxFontSize;
 
   const page = pages.at(field.page - 1);
 
@@ -50,11 +56,6 @@ export const insertFieldInPDF = async (pdf: PDFDocument, field: FieldWithSignatu
     let imageWidth = image.width;
     let imageHeight = image.height;
 
-    // const initialDimensions = {
-    //   width: imageWidth,
-    //   height: imageHeight,
-    // };
-
     const scalingFactor = Math.min(fieldWidth / imageWidth, fieldHeight / imageHeight, 1);
 
     imageWidth = imageWidth * scalingFactor;
@@ -76,14 +77,9 @@ export const insertFieldInPDF = async (pdf: PDFDocument, field: FieldWithSignatu
     let textWidth = font.widthOfTextAtSize(field.customText, fontSize);
     const textHeight = font.heightAtSize(fontSize);
 
-    // const initialDimensions = {
-    //   width: textWidth,
-    //   height: textHeight,
-    // };
-
     const scalingFactor = Math.min(fieldWidth / textWidth, fieldHeight / textHeight, 1);
 
-    fontSize = Math.max(fontSize * scalingFactor, maxFontSize);
+    fontSize = Math.max(Math.min(fontSize * scalingFactor, maxFontSize), minFontSize);
     textWidth = font.widthOfTextAtSize(field.customText, fontSize);
 
     const textX = fieldX + (fieldWidth - textWidth) / 2;

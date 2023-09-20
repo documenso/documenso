@@ -83,7 +83,7 @@ export default async function OpenPage() {
     .then((res) => ZEarlyAdoptersResponse.parse(res));
 
   return (
-    <div className="mx-auto mt-12 max-w-screen-lg">
+    <div className="mx-auto mt-6 max-w-screen-lg sm:mt-12">
       <div className="flex flex-col items-center justify-center">
         <h1 className="text-3xl font-bold lg:text-5xl">Open Startup</h1>
 

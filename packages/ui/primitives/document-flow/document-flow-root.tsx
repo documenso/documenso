@@ -13,7 +13,7 @@ export type DocumentFlowFormContainerProps = HTMLAttributes<HTMLFormElement> & {
 
 export const DocumentFlowFormContainer = ({
   children,
-  id = 'edit-document-form',
+  id = 'document-flow-form-container',
   className,
   ...props
 }: DocumentFlowFormContainerProps) => {
@@ -152,10 +152,11 @@ export const DocumentFlowFormContainerActions = ({
       </Button>
 
       <Button
-        type="submit"
+        type="button"
         className="bg-documenso flex-1"
         size="lg"
         disabled={disabled || loading || !canGoNext}
+        loading={loading}
         onClick={onGoNextClick}
       >
         {goNextLabel}

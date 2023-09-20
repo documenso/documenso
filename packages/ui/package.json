@@ -18,12 +18,14 @@
   "devDependencies": {
     "@documenso/tailwind-config": "*",
     "@documenso/tsconfig": "*",
+    "@types/luxon": "^3.3.2",
     "@types/react": "18.2.18",
     "@types/react-dom": "18.2.7",
     "react": "18.2.0",
     "typescript": "^5.1.6"
   },
   "dependencies": {
+    "@hookform/resolvers": "^3.3.0",
     "@documenso/lib": "*",
     "@radix-ui/react-accordion": "^1.1.1",
     "@radix-ui/react-alert-dialog": "^1.0.3",
@@ -45,6 +47,7 @@
     "@radix-ui/react-select": "^1.2.1",
     "@radix-ui/react-separator": "^1.0.2",
     "@radix-ui/react-slider": "^1.1.1",
+    "@radix-ui/react-slot": "^1.0.2",
     "@radix-ui/react-switch": "^1.0.2",
     "@radix-ui/react-tabs": "^1.0.3",
     "@radix-ui/react-toast": "^1.1.3",
@@ -55,11 +58,14 @@
     "clsx": "^1.2.1",
     "cmdk": "^0.2.0",
     "framer-motion": "^10.12.8",
-    "lucide-react": "^0.279.0",
+    "lucide-react": "^0.277.0",
+    "luxon": "^3.4.2",
     "next": "13.4.19",
     "pdfjs-dist": "3.6.172",
     "react-day-picker": "^8.7.1",
+    "react-hook-form": "^7.45.4",
     "react-pdf": "^7.3.3",
+    "react-rnd": "^10.4.1",
     "tailwind-merge": "^1.12.0",
     "tailwindcss-animate": "^1.0.5"
   }

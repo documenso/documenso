@@ -2,11 +2,10 @@
 
 import React from 'react';
 
+import { useFieldPageCoords } from '@documenso/lib/client-only/hooks/use-field-page-coords';
 import { FieldWithSignature } from '@documenso/prisma/types/field-with-signature';
 import { cn } from '@documenso/ui/lib/utils';
 import { Card, CardContent } from '@documenso/ui/primitives/card';
-
-import { useFieldPageCoords } from '~/hooks/use-field-page-coords';
 
 export type SignatureFieldProps = {
   field: FieldWithSignature;

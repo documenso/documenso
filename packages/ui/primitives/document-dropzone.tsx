@@ -73,7 +73,7 @@ const DocumentDropzoneCardCenterVariants: Variants = {
 };
 
 export type DocumentDropzoneProps = {
-  className: string;
+  className?: string;
   onDrop?: (_file: File) => void | Promise<void>;
   [key: string]: unknown;
 };

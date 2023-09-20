@@ -14,3 +14,10 @@ export const LazyPDFViewer = dynamic(async () => import('./pdf-viewer'), {
     </div>
   ),
 });
+
+/**
+ * LazyPDFViewer variant with no loader.
+ */
+export const LazyPDFViewerNoLoader = dynamic(async () => import('./pdf-viewer'), {
+  ssr: false,
+});

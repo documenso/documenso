@@ -2,7 +2,7 @@
 const path = require('path');
 const { version } = require('./package.json');
 
-const { parsed: env } = require('dotenv').config({
+require('dotenv').config({
   path: path.join(__dirname, '../../.env.local'),
 });
 
@@ -20,6 +20,10 @@ const config = {
     '@documenso/ui',
     '@documenso/email',
   ],
+  env: {
+    APP_VERSION: version,
+    NEXT_PUBLIC_PROJECT: 'web',
+  },
   modularizeImports: {
     'lucide-react': {
       transform: 'lucide-react/dist/esm/icons/{{ kebabCase member }}',
