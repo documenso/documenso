@@ -10,6 +10,7 @@ import {
   User as LucideUser,
   Monitor,
   Moon,
+  Palette,
   Sun,
   UserCog,
 } from 'lucide-react';
@@ -104,7 +105,10 @@ export const ProfileDropdown = ({ user }: ProfileDropdownProps) => {
         <DropdownMenuSeparator />
 
         <DropdownMenuSub>
-          <DropdownMenuSubTrigger>Themes</DropdownMenuSubTrigger>
+          <DropdownMenuSubTrigger>
+            <Palette className="mr-2 h-4 w-4" />
+            Themes
+          </DropdownMenuSubTrigger>
           <DropdownMenuPortal>
             <DropdownMenuSubContent>
               <DropdownMenuRadioGroup value={theme} onValueChange={setTheme}>
