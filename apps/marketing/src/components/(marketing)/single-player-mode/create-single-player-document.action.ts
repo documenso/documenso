@@ -89,77 +89,83 @@ export const createSinglePlayerDocument = async (
 
   const pdfBytes = await doc.save();
 
-  const documentToken = await prisma.$transaction(async (tx) => {
-    const documentToken = nanoid();
+  const documentToken = await prisma.$transaction(
+    async (tx) => {
+      const documentToken = nanoid();
 
-    // Fetch service user who will be the owner of the document.
-    const serviceUser = await tx.user.findFirstOrThrow({
-      where: {
-        email: SERVICE_USER_EMAIL,
-      },
-    });
+      // Fetch service user who will be the owner of the document.
+      const serviceUser = await tx.user.findFirstOrThrow({
+        where: {
+          email: SERVICE_USER_EMAIL,
+        },
+      });
 
-    const documentDataBytes = Buffer.from(pdfBytes).toString('base64');
+      const documentDataBytes = Buffer.from(pdfBytes).toString('base64');
 
-    const { id: documentDataId } = await tx.documentData.create({
-      data: {
-        type: DocumentDataType.BYTES_64,
-        data: documentDataBytes,
-        initialData: documentDataBytes,
-      },
-    });
+      const { id: documentDataId } = await tx.documentData.create({
+        data: {
+          type: DocumentDataType.BYTES_64,
+          data: documentDataBytes,
+          initialData: documentDataBytes,
+        },
+      });
 
-    // Create document.
-    const document = await tx.document.create({
-      data: {
-        title: documentName,
-        status: DocumentStatus.COMPLETED,
-        documentDataId,
-        userId: serviceUser.id,
-        createdAt,
-      },
-    });
+      // Create document.
+      const document = await tx.document.create({
+        data: {
+          title: documentName,
+          status: DocumentStatus.COMPLETED,
+          documentDataId,
+          userId: serviceUser.id,
+          createdAt,
+        },
+      });
 
-    // Create recipient.
-    const recipient = await tx.recipient.create({
-      data: {
-        documentId: document.id,
-        name: signer.name,
-        email: signer.email,
-        token: documentToken,
-        signedAt: createdAt,
-        readStatus: ReadStatus.OPENED,
-        signingStatus: SigningStatus.SIGNED,
-        sendStatus: SendStatus.SENT,
-      },
-    });
+      // Create recipient.
+      const recipient = await tx.recipient.create({
+        data: {
+          documentId: document.id,
+          name: signer.name,
+          email: signer.email,
+          token: documentToken,
+          signedAt: createdAt,
+          readStatus: ReadStatus.OPENED,
+          signingStatus: SigningStatus.SIGNED,
+          sendStatus: SendStatus.SENT,
+        },
+      });
 
-    // Create fields and signatures.
-    await Promise.all(
-      fields.map(async (field) => {
-        const insertedField = await tx.field.create({
-          data: {
-            documentId: document.id,
-            recipientId: recipient.id,
-            ...mapField(field, signer),
-          },
-        });
-
-        if (field.type === FieldType.SIGNATURE || field.type === FieldType.FREE_SIGNATURE) {
-          await tx.signature.create({
+      // Create fields and signatures.
+      await Promise.all(
+        fields.map(async (field) => {
+          const insertedField = await tx.field.create({
             data: {
-              fieldId: insertedField.id,
-              signatureImageAsBase64,
-              typedSignature,
+              documentId: document.id,
               recipientId: recipient.id,
+              ...mapField(field, signer),
             },
           });
-        }
-      }),
-    );
 
-    return documentToken;
-  });
+          if (field.type === FieldType.SIGNATURE || field.type === FieldType.FREE_SIGNATURE) {
+            await tx.signature.create({
+              data: {
+                fieldId: insertedField.id,
+                signatureImageAsBase64,
+                typedSignature,
+                recipientId: recipient.id,
+              },
+            });
+          }
+        }),
+      );
+
+      return documentToken;
+    },
+    {
+      maxWait: 5000,
+      timeout: 30000,
+    },
+  );
 
   // Todo: Handle `downloadLink`
   const template = createElement(DocumentSelfSignedEmailTemplate, {
