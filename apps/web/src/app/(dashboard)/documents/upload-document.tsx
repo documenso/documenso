@@ -68,7 +68,7 @@ export const UploadDocument = ({ className }: UploadDocumentProps) => {
 
       {isLoading && (
         <div className="absolute inset-0 flex items-center justify-center bg-white/50">
-          <Loader className="h-12 w-12 animate-spin text-slate-500" />
+          <Loader className="text-muted-foreground h-12 w-12 animate-spin" />
         </div>
       )}
     </div>
