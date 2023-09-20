@@ -144,7 +144,7 @@ export const SignInForm = ({ className }: SignInFormProps) => {
             type="button"
             className="absolute right-0 top-0 flex h-full items-center justify-center pr-3"
             aria-label={showPassword ? 'Mask password' : 'Reveal password'}
-            onClick={() => setShowPassword((showPassword) => !showPassword)}
+            onClick={() => setShowPassword((show) => !show)}
           >
             {showPassword ? (
               <EyeOff className="text-muted-foreground h-5 w-5" />

@@ -37,6 +37,7 @@ export type PasswordFormProps = {
 
 export const PasswordForm = ({ className }: PasswordFormProps) => {
   const { toast } = useToast();
+
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
@@ -112,7 +113,7 @@ export const PasswordForm = ({ className }: PasswordFormProps) => {
             type="button"
             className="absolute right-0 top-0 flex h-full items-center justify-center pr-3"
             aria-label={showPassword ? 'Mask password' : 'Reveal password'}
-            onClick={() => setShowPassword((showPassword) => !showPassword)}
+            onClick={() => setShowPassword((show) => !show)}
           >
             {showPassword ? (
               <EyeOff className="text-muted-foreground h-5 w-5" />
@@ -146,7 +147,7 @@ export const PasswordForm = ({ className }: PasswordFormProps) => {
             type="button"
             className="absolute right-0 top-0 flex h-full items-center justify-center pr-3"
             aria-label={showConfirmPassword ? 'Mask password' : 'Reveal password'}
-            onClick={() => setShowConfirmPassword((showConfirmPassword) => !showConfirmPassword)}
+            onClick={() => setShowConfirmPassword((show) => !show)}
           >
             {showConfirmPassword ? (
               <EyeOff className="text-muted-foreground h-5 w-5" />
