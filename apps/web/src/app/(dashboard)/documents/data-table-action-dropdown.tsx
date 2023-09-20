@@ -15,7 +15,10 @@ import {
 } from 'lucide-react';
 import { useSession } from 'next-auth/react';
 
+import { getFile } from '@documenso/lib/universal/upload/get-file';
 import { Document, DocumentStatus, Recipient, User } from '@documenso/prisma/client';
+import { DocumentWithData } from '@documenso/prisma/types/document-with-data';
+import { trpc } from '@documenso/trpc/client';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -47,17 +50,26 @@ export const DataTableActionDropdown = ({ row }: DataTableActionDropdownProps) =
   const isComplete = row.status === DocumentStatus.COMPLETED;
   // const isSigned = recipient?.signingStatus === SigningStatus.SIGNED;
 
-  const onDownloadClick = () => {
-    let decodedDocument = row.document;
+  const onDownloadClick = async () => {
+    let document: DocumentWithData | null = null;
 
-    try {
-      decodedDocument = atob(decodedDocument);
-    } catch (err) {
-      // We're just going to ignore this error and try to download the document
-      console.error(err);
+    if (!recipient) {
+      document = await trpc.document.getDocumentById.query({
+        id: row.id,
+      });
+    } else {
+      document = await trpc.document.getDocumentByToken.query({
+        token: recipient.token,
+      });
     }
 
-    const documentBytes = Uint8Array.from(decodedDocument.split('').map((c) => c.charCodeAt(0)));
+    const documentData = document?.documentData;
+
+    if (!documentData) {
+      return;
+    }
+
+    const documentBytes = await getFile(documentData);
 
     const blob = new Blob([documentBytes], {
       type: 'application/pdf',
@@ -82,14 +94,14 @@ export const DataTableActionDropdown = ({ row }: DataTableActionDropdownProps) =
       <DropdownMenuContent className="w-52" align="start" forceMount>
         <DropdownMenuLabel>Action</DropdownMenuLabel>
 
-        <DropdownMenuItem disabled={!recipient} asChild>
+        <DropdownMenuItem disabled={!recipient || isComplete} asChild>
           <Link href={`/sign/${recipient?.token}`}>
             <Pencil className="mr-2 h-4 w-4" />
             Sign
           </Link>
         </DropdownMenuItem>
 
-        <DropdownMenuItem disabled={!isOwner} asChild>
+        <DropdownMenuItem disabled={!isOwner || isComplete} asChild>
           <Link href={`/documents/${row.id}`}>
             <Edit className="mr-2 h-4 w-4" />
             Edit

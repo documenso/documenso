@@ -13,18 +13,35 @@ enum IdentityProvider {
   GOOGLE
 }
 
+enum Role {
+  ADMIN
+  USER
+}
+
 model User {
-  id               Int              @id @default(autoincrement())
-  name             String?
-  email            String           @unique
-  emailVerified    DateTime?
-  password         String?
-  source           String?
-  identityProvider IdentityProvider @default(DOCUMENSO)
-  accounts         Account[]
-  sessions         Session[]
-  Document         Document[]
-  Subscription     Subscription[]
+  id                 Int                  @id @default(autoincrement())
+  name               String?
+  email              String               @unique
+  emailVerified      DateTime?
+  password           String?
+  source             String?
+  signature          String?
+  roles              Role[]               @default([USER])
+  identityProvider   IdentityProvider     @default(DOCUMENSO)
+  accounts           Account[]
+  sessions           Session[]
+  Document           Document[]
+  Subscription       Subscription[]
+  PasswordResetToken PasswordResetToken[]
+}
+
+model PasswordResetToken {
+  id        Int      @id @default(autoincrement())
+  token     String   @unique
+  createdAt DateTime @default(now())
+  expiry    DateTime
+  userId    Int
+  User      User     @relation(fields: [userId], references: [id])
 }
 
 enum SubscriptionStatus {
@@ -84,16 +101,34 @@ enum DocumentStatus {
 }
 
 model Document {
-  id        Int            @id @default(autoincrement())
-  created   DateTime       @default(now())
-  userId    Int
-  User      User           @relation(fields: [userId], references: [id], onDelete: Cascade)
-  title     String
-  status    DocumentStatus @default(DRAFT)
-  document  String
-  Recipient Recipient[]
-  Field     Field[]
+  id             Int            @id @default(autoincrement())
+  userId         Int
+  User           User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title          String
+  status         DocumentStatus @default(DRAFT)
+  Recipient      Recipient[]
+  Field          Field[]
   Share     Share[]
+  documentDataId String
+  documentData   DocumentData   @relation(fields: [documentDataId], references: [id], onDelete: Cascade)
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @default(now()) @updatedAt
+
+  @@unique([documentDataId])
+}
+
+enum DocumentDataType {
+  S3_PATH
+  BYTES
+  BYTES_64
+}
+
+model DocumentData {
+  id          String           @id @default(cuid())
+  type        DocumentDataType
+  data        String
+  initialData String
+  Document    Document?
 }
 
 enum ReadStatus {

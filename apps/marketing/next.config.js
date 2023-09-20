@@ -8,9 +8,50 @@ const { parsed: env } = require('dotenv').config({
 
 /** @type {import('next').NextConfig} */
 const config = {
+  experimental: {
+    serverActions: true,
+  },
   reactStrictMode: true,
   transpilePackages: ['@documenso/lib', '@documenso/prisma', '@documenso/trpc', '@documenso/ui'],
-  env,
+  modularizeImports: {
+    'lucide-react': {
+      transform: 'lucide-react/dist/esm/icons/{{ kebabCase member }}',
+    },
+  },
+  async headers() {
+    return [
+      {
+        source: '/:path*',
+        headers: [
+          {
+            key: 'x-dns-prefetch-control',
+            value: 'on',
+          },
+          {
+            key: 'strict-transport-security',
+            value: 'max-age=31536000; includeSubDomains; preload',
+          },
+          {
+            key: 'x-frame-options',
+            value: 'SAMEORIGIN',
+          },
+          {
+            key: 'x-content-type-options',
+            value: 'nosniff',
+          },
+          {
+            key: 'referrer-policy',
+            value: 'strict-origin-when-cross-origin',
+          },
+          {
+            key: 'permissions-policy',
+            value:
+              'accelerometer=(), camera=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), payment=(), usb=()',
+          },
+        ],
+      },
+    ];
+  },
 };
 
 module.exports = withContentlayer(config);

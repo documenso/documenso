@@ -44,7 +44,7 @@ export const ProfileForm = ({ className, user }: ProfileFormProps) => {
   } = useForm<TProfileFormSchema>({
     values: {
       name: user.name ?? '',
-      signature: '',
+      signature: user.signature || '',
     },
     resolver: zodResolver(ZProfileFormSchema),
   });
@@ -89,7 +89,7 @@ export const ProfileForm = ({ className, user }: ProfileFormProps) => {
       onSubmit={handleSubmit(onFormSubmit)}
     >
       <div>
-        <Label htmlFor="full-name" className="text-slate-500">
+        <Label htmlFor="full-name" className="text-muted-foreground">
           Full Name
         </Label>
 
@@ -99,7 +99,7 @@ export const ProfileForm = ({ className, user }: ProfileFormProps) => {
       </div>
 
       <div>
-        <Label htmlFor="email" className="text-slate-500">
+        <Label htmlFor="email" className="text-muted-foreground">
           Email
         </Label>
 
@@ -107,7 +107,7 @@ export const ProfileForm = ({ className, user }: ProfileFormProps) => {
       </div>
 
       <div>
-        <Label htmlFor="signature" className="text-slate-500">
+        <Label htmlFor="signature" className="text-muted-foreground">
           Signature
         </Label>
 
@@ -118,6 +118,7 @@ export const ProfileForm = ({ className, user }: ProfileFormProps) => {
             render={({ field: { onChange } }) => (
               <SignaturePad
                 className="h-44 w-full rounded-lg border bg-white backdrop-blur-sm dark:border-[#e2d7c5] dark:bg-[#fcf8ee]"
+                defaultValue={user.signature ?? undefined}
                 onChange={(v) => onChange(v ?? '')}
               />
             )}

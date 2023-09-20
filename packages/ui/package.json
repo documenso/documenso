@@ -15,6 +15,7 @@
     "lint": "eslint \"**/*.ts*\""
   },
   "devDependencies": {
+    "@documenso/tailwind-config": "*",
     "@documenso/tsconfig": "*",
     "@types/react": "18.2.18",
     "@types/react-dom": "18.2.7",
@@ -22,6 +23,7 @@
     "typescript": "^5.1.6"
   },
   "dependencies": {
+    "@documenso/lib": "*",
     "@radix-ui/react-accordion": "^1.1.1",
     "@radix-ui/react-alert-dialog": "^1.0.3",
     "@radix-ui/react-aspect-ratio": "^1.0.2",
@@ -51,7 +53,6 @@
     "class-variance-authority": "^0.6.0",
     "clsx": "^1.2.1",
     "cmdk": "^0.2.0",
-    "date-fns": "^2.30.0",
     "framer-motion": "^10.12.8",
     "lucide-react": "^0.214.0",
     "next": "13.4.12",
