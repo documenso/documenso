@@ -8,7 +8,7 @@ export type CompleteDocumentActionInput = TAddSubjectFormSchema & {
   documentId: number;
 };
 
-export const completeDocument = async ({ documentId }: CompleteDocumentActionInput) => {
+export const completeDocument = async ({ documentId, email }: CompleteDocumentActionInput) => {
   'use server';
 
   const { id: userId } = await getRequiredServerComponentSession();
@@ -16,5 +16,6 @@ export const completeDocument = async ({ documentId }: CompleteDocumentActionInp
   await sendDocument({
     userId,
     documentId,
+    email,
   });
 };
