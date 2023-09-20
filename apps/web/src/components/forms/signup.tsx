@@ -109,15 +109,31 @@ export const SignUpForm = ({ className }: SignUpFormProps) => {
           Password
         </Label>
 
-        <Input
-          id="password"
-          type="password"
-          minLength={6}
-          maxLength={72}
-          autoComplete="new-password"
-          className="bg-background mt-2"
-          {...register('password')}
-        />
+        <div className="relative">
+          <Input
+            id="password"
+            type={showPassword ? 'text' : 'password'}
+            minLength={6}
+            maxLength={72}
+            autoComplete="new-password"
+            className="bg-background mt-2 pr-10"
+            {...register('password')}
+          />
+
+          <Button
+            variant="link"
+            type="button"
+            className="absolute right-0 top-0 flex h-full items-center justify-center pr-3"
+            aria-label={showPassword ? 'Mask password' : 'Reveal password'}
+            onClick={() => setShowPassword((showPassword) => !showPassword)}
+          >
+            {showPassword ? (
+              <EyeOff className="text-muted-foreground h-5 w-5" />
+            ) : (
+              <Eye className="text-muted-foreground h-5 w-5" />
+            )}
+          </Button>
+        </div>
       </div>
 
       <div>
