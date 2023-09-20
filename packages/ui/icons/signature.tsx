@@ -1,12 +1,13 @@
-import type { LucideIcon } from 'lucide-react/dist/lucide-react';
+import type { LucideIcon, LucideProps } from 'lucide-react/dist/lucide-react';
 
-export const SignatureIcon: LucideIcon = ({
+// eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+export const SignatureIcon = (({
   size = 24,
   color = 'currentColor',
   strokeWidth = 1.33,
   absoluteStrokeWidth,
   ...props
-}) => {
+}: LucideProps) => {
   return (
     <svg
       width={size}
@@ -25,4 +26,4 @@ export const SignatureIcon: LucideIcon = ({
       />
     </svg>
   );
-};
+}) as LucideIcon;

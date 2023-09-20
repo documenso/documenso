@@ -3,6 +3,7 @@ import { createElement } from 'react';
 import { mailer } from '@documenso/email/mailer';
 import { render } from '@documenso/email/render';
 import { DocumentInviteEmailTemplate } from '@documenso/email/templates/document-invite';
+import { FROM_ADDRESS, FROM_NAME } from '@documenso/lib/constants/email';
 import { prisma } from '@documenso/prisma';
 import { DocumentStatus, SendStatus } from '@documenso/prisma/client';
 
@@ -65,8 +66,8 @@ export const sendDocument = async ({ documentId, userId }: SendDocumentOptions) 
           name,
         },
         from: {
-          name: process.env.NEXT_PRIVATE_SMTP_FROM_NAME || 'Documenso',
-          address: process.env.NEXT_PRIVATE_SMTP_FROM_ADDRESS || 'noreply@documenso.com',
+          name: FROM_NAME,
+          address: FROM_ADDRESS,
         },
         subject: 'Please sign this document',
         html: render(template),

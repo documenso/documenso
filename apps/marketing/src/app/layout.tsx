@@ -1,12 +1,19 @@
-import { Inter } from 'next/font/google';
+import { Suspense } from 'react';
 
+import { Caveat, Inter } from 'next/font/google';
+
+import { FeatureFlagProvider } from '@documenso/lib/client-only/providers/feature-flag';
+import { getAllAnonymousFlags } from '@documenso/lib/universal/get-feature-flag';
+import { cn } from '@documenso/ui/lib/utils';
 import { Toaster } from '@documenso/ui/primitives/toaster';
 
 import { PlausibleProvider } from '~/providers/plausible';
+import { PostHogPageview } from '~/providers/posthog';
 
 import './globals.css';
 
 const fontInter = Inter({ subsets: ['latin'], variable: '--font-sans' });
+const fontCaveat = Caveat({ subsets: ['latin'], variable: '--font-signature' });
 
 export const metadata = {
   title: 'Documenso - The Open Source DocuSign Alternative',
@@ -32,9 +39,15 @@ export const metadata = {
   },
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const flags = await getAllAnonymousFlags();
+
   return (
-    <html lang="en" className={fontInter.variable} suppressHydrationWarning>
+    <html
+      lang="en"
+      className={cn(fontInter.variable, fontCaveat.variable)}
+      suppressHydrationWarning
+    >
       <head>
         <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
         <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
@@ -42,9 +55,15 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <link rel="manifest" href="/site.webmanifest" />
       </head>
 
+      <Suspense>
+        <PostHogPageview />
+      </Suspense>
+
       <body>
-        <PlausibleProvider>{children}</PlausibleProvider>
-        <Toaster />
+        <FeatureFlagProvider initialFlags={flags}>
+          <PlausibleProvider>{children}</PlausibleProvider>
+          <Toaster />
+        </FeatureFlagProvider>
       </body>
     </html>
   );

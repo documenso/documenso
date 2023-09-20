@@ -8,10 +8,11 @@ import { getDocumentAndSenderByToken } from '@documenso/lib/server-only/document
 import { getFieldsForToken } from '@documenso/lib/server-only/field/get-fields-for-token';
 import { getRecipientByToken } from '@documenso/lib/server-only/recipient/get-recipient-by-token';
 import { DocumentStatus, FieldType } from '@documenso/prisma/client';
+import { DocumentDownloadButton } from '@documenso/ui/components/document/document-download-button';
+import { SigningCard } from '@documenso/ui/components/signing-card';
 import { Button } from '@documenso/ui/primitives/button';
 
-import { DownloadButton } from './download-button';
-import { SigningCard } from './signing-card';
+import signingCelebration from '~/assets/signing-celebration.png';
 
 export type CompletedSigningPageProps = {
   params: {
@@ -53,7 +54,7 @@ export default async function CompletedSigningPage({
   return (
     <div className="flex flex-col items-center pt-24">
       {/* Card with recipient */}
-      <SigningCard name={recipientName} />
+      <SigningCard name={recipientName} signingCelebrationImage={signingCelebration} />
 
       <div className="mt-6">
         {match(document.status)
@@ -94,7 +95,7 @@ export default async function CompletedSigningPage({
           Share
         </Button>
 
-        <DownloadButton
+        <DocumentDownloadButton
           className="flex-1"
           fileName={document.title}
           documentData={documentData}
@@ -103,7 +104,7 @@ export default async function CompletedSigningPage({
       </div>
 
       <p className="text-muted-foreground/60 mt-36 text-sm">
-        Want so send slick signing links like this one?{' '}
+        Want to send slick signing links like this one?{' '}
         <Link href="https://documenso.com" className="text-documenso-700 hover:text-documenso-600">
           Check out Documenso.
         </Link>
