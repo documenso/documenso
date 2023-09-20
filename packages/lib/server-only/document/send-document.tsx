@@ -3,6 +3,7 @@ import { createElement } from 'react';
 import { mailer } from '@documenso/email/mailer';
 import { render } from '@documenso/email/render';
 import { DocumentInviteEmailTemplate } from '@documenso/email/templates/document-invite';
+import { renderCustomEmailTemplate } from '@documenso/lib/utils/render-custom-email-template';
 import { prisma } from '@documenso/prisma';
 import { DocumentStatus, SendStatus } from '@documenso/prisma/client';
 
@@ -47,6 +48,12 @@ export const sendDocument = async ({ documentId, userId }: SendDocumentOptions) 
     document.Recipient.map(async (recipient) => {
       const { email, name } = recipient;
 
+      const customEmailTemplate = {
+        'signer.name': name,
+        'signer.email': email,
+        'document.name': document.title,
+      };
+
       if (recipient.sendStatus === SendStatus.SENT) {
         return;
       }
@@ -60,7 +67,10 @@ export const sendDocument = async ({ documentId, userId }: SendDocumentOptions) 
         inviterEmail: user.email,
         assetBaseUrl,
         signDocumentLink,
-        customBody: customEmail?.customEmailBody || '',
+        customBody: renderCustomEmailTemplate(
+          customEmail?.customEmailBody || '',
+          customEmailTemplate,
+        ),
       });
 
       await mailer.sendMail({
@@ -73,7 +83,7 @@ export const sendDocument = async ({ documentId, userId }: SendDocumentOptions) 
           address: process.env.NEXT_PRIVATE_SMTP_FROM_ADDRESS || 'noreply@documenso.com',
         },
         subject: customEmail?.customEmailSubject
-          ? customEmail.customEmailSubject
+          ? renderCustomEmailTemplate(customEmail.customEmailSubject, customEmailTemplate)
           : 'Please sign this document',
         html: render(template),
         text: render(template, { plainText: true }),
