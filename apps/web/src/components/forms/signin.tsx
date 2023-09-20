@@ -14,6 +14,7 @@ import { z } from 'zod';
 import { ErrorCode, isErrorCode } from '@documenso/lib/next-auth/error-codes';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
+import { FormErrorMessage } from '@documenso/ui/primitives/form/form-error-message';
 import { Input } from '@documenso/ui/primitives/input';
 import { Label } from '@documenso/ui/primitives/label';
 import { useToast } from '@documenso/ui/primitives/use-toast';
@@ -113,18 +114,18 @@ export const SignInForm = ({ className }: SignInFormProps) => {
       onSubmit={handleSubmit(onFormSubmit)}
     >
       <div>
-        <Label htmlFor="email" className="text-slate-500">
+        <Label htmlFor="email" className="text-muted-forground">
           Email
         </Label>
 
         <Input id="email" type="email" className="bg-background mt-2" {...register('email')} />
 
-        {errors.email && <span className="mt-1 text-xs text-red-500">{errors.email.message}</span>}
+        <FormErrorMessage className="mt-1.5" error={errors.email} />
       </div>
 
       <div>
-        <Label htmlFor="password" className="text-slate-500">
-          Password
+        <Label htmlFor="password" className="text-muted-forground">
+          <span>Password</span>
         </Label>
 
         <Input
@@ -137,9 +138,7 @@ export const SignInForm = ({ className }: SignInFormProps) => {
           {...register('password')}
         />
 
-        {errors.password && (
-          <span className="mt-1 text-xs text-red-500">{errors.password.message}</span>
-        )}
+        <FormErrorMessage className="mt-1.5" error={errors.password} />
       </div>
 
       <Button size="lg" disabled={isSubmitting} className="dark:bg-documenso dark:hover:opacity-90">

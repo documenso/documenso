@@ -1,60 +1,62 @@
 'use client';
 
+import { useRouter } from 'next/navigation';
+
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Loader } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
-import { User } from '@documenso/prisma/client';
 import { TRPCClientError } from '@documenso/trpc/client';
 import { trpc } from '@documenso/trpc/react';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
+import { FormErrorMessage } from '@documenso/ui/primitives/form/form-error-message';
 import { Input } from '@documenso/ui/primitives/input';
 import { Label } from '@documenso/ui/primitives/label';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
-import { FormErrorMessage } from '../form/form-error-message';
-
-export const ZPasswordFormSchema = z
+export const ZResetPasswordFormSchema = z
   .object({
     password: z.string().min(6).max(72),
     repeatedPassword: z.string().min(6).max(72),
   })
   .refine((data) => data.password === data.repeatedPassword, {
-    message: 'Passwords do not match',
     path: ['repeatedPassword'],
+    message: "Passwords don't match",
   });
 
-export type TPasswordFormSchema = z.infer<typeof ZPasswordFormSchema>;
+export type TResetPasswordFormSchema = z.infer<typeof ZResetPasswordFormSchema>;
 
-export type PasswordFormProps = {
+export type ResetPasswordFormProps = {
   className?: string;
-  user: User;
+  token: string;
 };
 
-export const PasswordForm = ({ className }: PasswordFormProps) => {
+export const ResetPasswordForm = ({ className, token }: ResetPasswordFormProps) => {
+  const router = useRouter();
+
   const { toast } = useToast();
 
   const {
     register,
-    handleSubmit,
     reset,
+    handleSubmit,
     formState: { errors, isSubmitting },
-  } = useForm<TPasswordFormSchema>({
+  } = useForm<TResetPasswordFormSchema>({
     values: {
       password: '',
       repeatedPassword: '',
     },
-    resolver: zodResolver(ZPasswordFormSchema),
+    resolver: zodResolver(ZResetPasswordFormSchema),
   });
 
-  const { mutateAsync: updatePassword } = trpc.profile.updatePassword.useMutation();
+  const { mutateAsync: resetPassword } = trpc.profile.resetPassword.useMutation();
 
-  const onFormSubmit = async ({ password }: TPasswordFormSchema) => {
+  const onFormSubmit = async ({ password }: Omit<TResetPasswordFormSchema, 'repeatedPassword'>) => {
     try {
-      await updatePassword({
+      await resetPassword({
         password,
+        token,
       });
 
       reset();
@@ -64,6 +66,8 @@ export const PasswordForm = ({ className }: PasswordFormProps) => {
         description: 'Your password has been updated successfully.',
         duration: 5000,
       });
+
+      router.push('/signin');
     } catch (err) {
       if (err instanceof TRPCClientError && err.data?.code === 'BAD_REQUEST') {
         toast({
@@ -76,7 +80,7 @@ export const PasswordForm = ({ className }: PasswordFormProps) => {
           title: 'An unknown error occurred',
           variant: 'destructive',
           description:
-            'We encountered an unknown error while attempting to update your password. Please try again later.',
+            'We encountered an unknown error while attempting to reset your password. Please try again later.',
         });
       }
     }
@@ -89,7 +93,7 @@ export const PasswordForm = ({ className }: PasswordFormProps) => {
     >
       <div>
         <Label htmlFor="password" className="text-muted-foreground">
-          Password
+          <span>Password</span>
         </Label>
 
         <Input
@@ -97,7 +101,7 @@ export const PasswordForm = ({ className }: PasswordFormProps) => {
           type="password"
           minLength={6}
           maxLength={72}
-          autoComplete="new-password"
+          autoComplete="current-password"
           className="bg-background mt-2"
           {...register('password')}
         />
@@ -106,16 +110,16 @@ export const PasswordForm = ({ className }: PasswordFormProps) => {
       </div>
 
       <div>
-        <Label htmlFor="repeated-password" className="text-muted-foreground">
-          Repeat Password
+        <Label htmlFor="repeatedPassword" className="text-muted-foreground">
+          <span>Repeat Password</span>
         </Label>
 
         <Input
-          id="repeated-password"
+          id="repeatedPassword"
           type="password"
           minLength={6}
           maxLength={72}
-          autoComplete="new-password"
+          autoComplete="current-password"
           className="bg-background mt-2"
           {...register('repeatedPassword')}
         />
@@ -123,12 +127,9 @@ export const PasswordForm = ({ className }: PasswordFormProps) => {
         <FormErrorMessage className="mt-1.5" error={errors.repeatedPassword} />
       </div>
 
-      <div className="mt-4">
-        <Button type="submit" disabled={isSubmitting}>
-          {isSubmitting && <Loader className="mr-2 h-5 w-5 animate-spin" />}
-          Update password
-        </Button>
-      </div>
+      <Button size="lg" loading={isSubmitting}>
+        Reset Password
+      </Button>
     </form>
   );
 };
