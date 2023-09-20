@@ -5,16 +5,13 @@ import { render } from '@documenso/email/render';
 import { DocumentInviteEmailTemplate } from '@documenso/email/templates/document-invite';
 import { prisma } from '@documenso/prisma';
 import { DocumentStatus, SendStatus } from '@documenso/prisma/client';
-import { TAddSubjectFormSchema } from '@documenso/ui/primitives/document-flow/add-subject.types';
 
-export type SendDocumentOptions = TAddSubjectFormSchema & {
+export type SendDocumentOptions = {
   documentId: number;
   userId: number;
 };
 
-export const sendDocument = async ({ documentId, userId, email }: SendDocumentOptions) => {
-  const customEmail = email;
-
+export const sendDocument = async ({ documentId, userId }: SendDocumentOptions) => {
   const user = await prisma.user.findFirstOrThrow({
     where: {
       id: userId,
@@ -28,8 +25,11 @@ export const sendDocument = async ({ documentId, userId, email }: SendDocumentOp
     },
     include: {
       Recipient: true,
+      DocumentMeta: true,
     },
   });
+
+  const customEmail = document?.DocumentMeta;
 
   if (!document) {
     throw new Error('Document not found');
@@ -71,7 +71,9 @@ export const sendDocument = async ({ documentId, userId, email }: SendDocumentOp
           name: process.env.NEXT_PRIVATE_SMTP_FROM_NAME || 'Documenso',
           address: process.env.NEXT_PRIVATE_SMTP_FROM_ADDRESS || 'noreply@documenso.com',
         },
-        subject: customEmail.subject ? customEmail.subject : 'Please sign this document',
+        subject: customEmail?.customEmailSubject
+          ? customEmail.customEmailSubject
+          : 'Please sign this document',
         html: render(template),
         text: render(template, { plainText: true }),
       });
