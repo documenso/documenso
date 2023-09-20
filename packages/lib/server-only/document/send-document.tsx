@@ -60,6 +60,7 @@ export const sendDocument = async ({ documentId, userId }: SendDocumentOptions) 
         inviterEmail: user.email,
         assetBaseUrl,
         signDocumentLink,
+        customBody: customEmail?.customEmailBody || '',
       });
 
       await mailer.sendMail({

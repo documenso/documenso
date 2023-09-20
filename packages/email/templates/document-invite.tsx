@@ -20,7 +20,9 @@ import {
 } from '../template-components/template-document-invite';
 import TemplateFooter from '../template-components/template-footer';
 
-export type DocumentInviteEmailTemplateProps = Partial<TemplateDocumentInviteProps>;
+export type DocumentInviteEmailTemplateProps = Partial<TemplateDocumentInviteProps> & {
+  customBody?: string;
+};
 
 export const DocumentInviteEmailTemplate = ({
   inviterName = 'Lucas Smith',
@@ -28,6 +30,7 @@ export const DocumentInviteEmailTemplate = ({
   documentName = 'Open Source Pledge.pdf',
   signDocumentLink = 'https://documenso.com',
   assetBaseUrl = 'http://localhost:3002',
+  customBody,
 }: DocumentInviteEmailTemplateProps) => {
   const previewText = `Completed Document`;
 
@@ -78,7 +81,9 @@ export const DocumentInviteEmailTemplate = ({
                 </Text>
 
                 <Text className="mt-2 text-base text-slate-400">
-                  {inviterName} has invited you to sign the document "{documentName}".
+                  {customBody
+                    ? customBody
+                    : `${inviterName} has invited you to sign the document "${documentName}".`}
                 </Text>
               </Section>
             </Container>
