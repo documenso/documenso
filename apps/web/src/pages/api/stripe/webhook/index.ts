@@ -10,6 +10,7 @@ import { redis } from '@documenso/lib/server-only/redis';
 import { Stripe, stripe } from '@documenso/lib/server-only/stripe';
 import { prisma } from '@documenso/prisma';
 import {
+  DocumentDataType,
   DocumentStatus,
   FieldType,
   ReadStatus,
@@ -17,14 +18,13 @@ import {
   SigningStatus,
 } from '@documenso/prisma/client';
 
-const log = (...args: any[]) => console.log('[stripe]', ...args);
+const log = (...args: unknown[]) => console.log('[stripe]', ...args);
 
 export const config = {
   api: { bodyParser: false },
 };
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  // eslint-disable-next-line turbo/no-undeclared-env-vars
   // if (!process.env.NEXT_PUBLIC_ALLOW_SUBSCRIPTIONS) {
   //   return res.status(500).json({
   //     success: false,
@@ -55,6 +55,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   log('event-type:', event.type);
 
   if (event.type === 'checkout.session.completed') {
+    // This is required since we don't want to create a guard for every event type
+    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
     const session = event.data.object as Stripe.Checkout.Session;
 
     if (session.metadata?.source === 'landing') {
@@ -84,15 +86,33 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
       const now = new Date();
 
+      const bytes64 = readFileSync('./public/documenso-supporter-pledge.pdf').toString('base64');
+
+      const { id: documentDataId } = await prisma.documentData.create({
+        data: {
+          type: DocumentDataType.BYTES_64,
+          data: bytes64,
+          initialData: bytes64,
+        },
+      });
+
       const document = await prisma.document.create({
         data: {
           title: 'Documenso Supporter Pledge.pdf',
           status: DocumentStatus.COMPLETED,
           userId: user.id,
-          document: readFileSync('./public/documenso-supporter-pledge.pdf').toString('base64'),
-          created: now,
+          documentDataId,
+        },
+        include: {
+          documentData: true,
         },
       });
+
+      const { documentData } = document;
+
+      if (!documentData) {
+        throw new Error(`Document ${document.id} has no document data`);
+      }
 
       const recipient = await prisma.recipient.create({
         data: {
@@ -121,16 +141,16 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       });
 
       if (signatureDataUrl) {
-        document.document = await insertImageInPDF(
-          document.document,
+        documentData.data = await insertImageInPDF(
+          documentData.data,
           signatureDataUrl,
           field.positionX.toNumber(),
           field.positionY.toNumber(),
           field.page,
         );
       } else {
-        document.document = await insertTextInPDF(
-          document.document,
+        documentData.data = await insertTextInPDF(
+          documentData.data,
           signatureText ?? '',
           field.positionX.toNumber(),
           field.positionY.toNumber(),
@@ -152,7 +172,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             id: document.id,
           },
           data: {
-            document: document.document,
+            documentData: {
+              update: {
+                data: documentData.data,
+              },
+            },
           },
         }),
       ]);

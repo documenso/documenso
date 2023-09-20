@@ -32,7 +32,10 @@ jobs:
 
     - name: Install Dependencies
       run: npm ci
-      
+
+    - name: Copy env
+      run: cp .env.example .env
+
     - name: Build Documenso
       run: npm run build
 

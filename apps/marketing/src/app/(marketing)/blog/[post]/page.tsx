@@ -17,7 +17,10 @@ export const generateMetadata = ({ params }: { params: { post: string } }) => {
     notFound();
   }
 
-  return { title: `Documenso - ${blogPost.title}` };
+  return {
+    title: `Documenso - ${blogPost.title}`,
+    description: blogPost.description,
+  };
 };
 
 const mdxComponents: MDXComponents = {

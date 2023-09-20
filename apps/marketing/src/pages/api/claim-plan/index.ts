@@ -43,8 +43,7 @@ export default async function handler(
 
     if (user && user.Subscription.length > 0) {
       return res.status(200).json({
-        // eslint-disable-next-line turbo/no-undeclared-env-vars
-        redirectUrl: `${process.env.NEXT_PUBLIC_APP_URL}/login`,
+        redirectUrl: `${process.env.NEXT_PUBLIC_WEBAPP_URL}/login`,
       });
     }
 
@@ -104,9 +103,8 @@ export default async function handler(
       mode: 'subscription',
       metadata,
       allow_promotion_codes: true,
-      // eslint-disable-next-line turbo/no-undeclared-env-vars
-      success_url: `${process.env.NEXT_PUBLIC_SITE_URL}/claimed?sessionId={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${process.env.NEXT_PUBLIC_SITE_URL}/pricing?email=${encodeURIComponent(
+      success_url: `${process.env.NEXT_PUBLIC_MARKETING_URL}/claimed?sessionId={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${process.env.NEXT_PUBLIC_MARKETING_URL}/pricing?email=${encodeURIComponent(
         email,
       )}&name=${encodeURIComponent(name)}&planId=${planId}&cancelled=true`,
     });

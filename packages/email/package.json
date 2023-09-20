@@ -16,13 +16,12 @@
     "worker:test": "tsup worker/index.ts --format esm"
   },
   "dependencies": {
-    "@documenso/tsconfig": "*",
-    "@documenso/tailwind-config": "*",
-    "@documenso/ui": "*",
     "@react-email/components": "^0.0.7",
     "nodemailer": "^6.9.3"
   },
   "devDependencies": {
+    "@documenso/tsconfig": "*",
+    "@documenso/tailwind-config": "*",
     "@types/nodemailer": "^6.4.8",
     "tsup": "^7.1.0"
   }
