@@ -1,3 +1,5 @@
+TEST
+
 <p align="center" style="margin-top: 120px">
   <a href="https://github.com/documenso/documenso">
    <img width="250px" src="https://github.com/documenso/documenso/assets/1309312/cd7823ec-4baa-40b9-be78-4acb3b1c73cb" alt="Documenso Logo">
@@ -20,7 +22,7 @@
 </p>
 
 <p align="center">
-   <a href="https://documen.so/discord"><img src="https://img.shields.io/badge/Discord-documen.so/discord-%235865F2" alt="Join Documenso on Discord"></a> 
+   <a href="https://documen.so/discord"><img src="https://img.shields.io/badge/Discord-documen.so/discord-%235865F2" alt="Join Documenso on Discord"></a>
    <a href="https://github.com/documenso/documenso/stargazers"><img src="https://img.shields.io/github/stars/documenso/documenso" alt="Github Stars"></a>
    <a href="https://github.com/documenso/documenso/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-AGPLv3-purple" alt="License"></a>
    <a href="https://github.com/documenso/documenso/pulse"><img src="https://img.shields.io/github/commit-activity/m/documenso/documenso" alt="Commits-per-month"></a>
@@ -227,11 +229,12 @@ docker run -d --restart=unless-stopped -p 3000:3000 -v documenso:/app/data --nam
 ```
 
 Command Breakdown:
+
 - `-d` - Let's you run the container in background
 - `-p` - Passes down which ports to use. First half is the host port, Second half is the app port. You can change the first half anything you want and reverse proxy to that port.
 - `-v` - Volume let's you persist the data
 - `--name` - Name of the container
-- `documenso:latest` -  Image you have built
+- `documenso:latest` - Image you have built
 
 # Deployment
 
@@ -277,5 +280,5 @@ containers:
       - start
       - --
       - -H
-      - "::"
+      - '::'
 ```
