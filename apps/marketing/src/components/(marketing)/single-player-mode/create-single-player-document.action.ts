@@ -13,6 +13,7 @@ import { render } from '@documenso/email/render';
 import { DocumentSelfSignedEmailTemplate } from '@documenso/email/templates/document-self-signed';
 import { FROM_ADDRESS, FROM_NAME, SERVICE_USER_EMAIL } from '@documenso/lib/constants/email';
 import { insertFieldInPDF } from '@documenso/lib/server-only/pdf/insert-field-in-pdf';
+import { getFile } from '@documenso/lib/universal/upload/get-file';
 import { prisma } from '@documenso/prisma';
 import {
   DocumentDataType,
@@ -25,7 +26,10 @@ import {
 } from '@documenso/prisma/client';
 
 const ZCreateSinglePlayerDocumentSchema = z.object({
-  document: z.string(),
+  documentData: z.object({
+    data: z.string(),
+    type: z.nativeEnum(DocumentDataType),
+  }),
   documentName: z.string(),
   signer: z.object({
     email: z.string().email().min(1),
@@ -54,7 +58,13 @@ export type TCreateSinglePlayerDocumentSchema = z.infer<typeof ZCreateSinglePlay
 export const createSinglePlayerDocument = async (
   value: TCreateSinglePlayerDocumentSchema,
 ): Promise<string> => {
-  const { signer, fields, document, documentName } = ZCreateSinglePlayerDocumentSchema.parse(value);
+  const { signer, fields, documentData, documentName } =
+    ZCreateSinglePlayerDocumentSchema.parse(value);
+
+  const document = await getFile({
+    data: documentData.data,
+    type: documentData.type,
+  });
 
   const doc = await PDFDocument.load(document);
   const createdAt = new Date();
