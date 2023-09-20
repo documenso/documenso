@@ -81,9 +81,11 @@ export const DocumentInviteEmailTemplate = ({
                 </Text>
 
                 <Text className="mt-2 text-base text-slate-400">
-                  {customBody
-                    ? customBody
-                    : `${inviterName} has invited you to sign the document "${documentName}".`}
+                  {customBody ? (
+                    <pre className="font-sans text-base text-slate-400">{customBody}</pre>
+                  ) : (
+                    `${inviterName} has invited you to sign the document "${documentName}".`
+                  )}
                 </Text>
               </Section>
             </Container>
