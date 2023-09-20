@@ -15,23 +15,28 @@ export const completeDocument = async ({ documentId, email }: CompleteDocumentAc
 
   const { id: userId } = await getRequiredServerComponentSession();
 
+  if (!email.message && !email.subject) {
+    return await sendDocument({
+      userId,
+      documentId,
+    });
+  }
+
   const createDocumentMetaResponse = await createDocumentMeta({
     emailBody: email.message,
     emailSubject: email.subject,
   });
 
-  if (createDocumentMetaResponse) {
-    await updateDocument({
-      documentId,
-      data: {
-        DocumentMeta: {
-          connect: {
-            id: createDocumentMetaResponse.id,
-          },
+  await updateDocument({
+    documentId,
+    data: {
+      DocumentMeta: {
+        connect: {
+          id: createDocumentMetaResponse.id,
         },
       },
-    });
-  }
+    },
+  });
 
   await sendDocument({
     userId,

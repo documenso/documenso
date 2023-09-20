@@ -11,26 +11,23 @@ export const createDocumentMeta = async ({
   emailBody,
   emailSubject,
 }: CreateDocumentMetaOptions) => {
-  const documentMeta = await prisma.documentMeta.findFirst();
+  const emailData = {
+    customEmailBody: emailBody,
+    customEmailSubject: emailSubject,
+  };
 
-  if (!documentMeta) {
-    return await prisma.documentMeta.create({
-      data: {
-        customEmailBody: emailBody,
-        customEmailSubject: emailSubject,
-      },
-    });
-  }
+  const existingDocumentMeta = await prisma.documentMeta.findFirst({
+    where: emailData,
+  });
 
-  if (emailBody && emailSubject) {
+  if (existingDocumentMeta) {
     return await prisma.documentMeta.update({
-      where: {
-        id: documentMeta.id,
-      },
-      data: {
-        customEmailBody: emailBody,
-        customEmailSubject: emailSubject,
-      },
+      where: { id: existingDocumentMeta.id },
+      data: emailData,
+    });
+  } else {
+    return await prisma.documentMeta.create({
+      data: emailData,
     });
   }
 };
