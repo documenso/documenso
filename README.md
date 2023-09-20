@@ -245,6 +245,12 @@ We support a variety of deployment methods, and are actively working on adding m
 
 [![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/documenso/documenso)
 
+## Docker Compose
+
+Clone the repo and run the following command from `documenso` folder:
+
+> docker compose -f docker/compose.yml up 
+
 # Troubleshooting
 
 ## I'm not receiving any emails when using the developer quickstart
