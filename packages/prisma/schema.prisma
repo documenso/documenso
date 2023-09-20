@@ -118,6 +118,7 @@ model Document {
   DocumentMeta   DocumentMeta? @relation(fields: [documentMetaId], references: [id], onDelete: Cascade)
 
   @@unique([documentDataId])
+  @@unique([documentMetaId])
 }
 
 enum DocumentDataType {
@@ -135,10 +136,10 @@ model DocumentData {
 }
 
 model DocumentMeta {
-  id                 String     @id @default(cuid())
+  id                 String    @id @default(cuid())
   customEmailSubject String?
   customEmailBody    String?
-  Document           Document[]
+  Document           Document?
 }
 
 enum ReadStatus {
