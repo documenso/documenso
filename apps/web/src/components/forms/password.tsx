@@ -1,7 +1,9 @@
 'use client';
 
+import { useState } from 'react';
+
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Loader } from 'lucide-react';
+import { Eye, EyeOff, Loader } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
@@ -35,6 +37,9 @@ export type PasswordFormProps = {
 
 export const PasswordForm = ({ className }: PasswordFormProps) => {
   const { toast } = useToast();
+
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const {
     register,
@@ -92,15 +97,31 @@ export const PasswordForm = ({ className }: PasswordFormProps) => {
           Password
         </Label>
 
-        <Input
-          id="password"
-          type="password"
-          minLength={6}
-          maxLength={72}
-          autoComplete="new-password"
-          className="bg-background mt-2"
-          {...register('password')}
-        />
+        <div className="relative">
+          <Input
+            id="password"
+            type={showPassword ? 'text' : 'password'}
+            minLength={6}
+            maxLength={72}
+            autoComplete="new-password"
+            className="bg-background mt-2 pr-10"
+            {...register('password')}
+          />
+
+          <Button
+            variant="link"
+            type="button"
+            className="absolute right-0 top-0 flex h-full items-center justify-center pr-3"
+            aria-label={showPassword ? 'Mask password' : 'Reveal password'}
+            onClick={() => setShowPassword((show) => !show)}
+          >
+            {showPassword ? (
+              <EyeOff className="text-muted-foreground h-5 w-5" />
+            ) : (
+              <Eye className="text-muted-foreground h-5 w-5" />
+            )}
+          </Button>
+        </div>
 
         <FormErrorMessage className="mt-1.5" error={errors.password} />
       </div>
@@ -110,15 +131,31 @@ export const PasswordForm = ({ className }: PasswordFormProps) => {
           Repeat Password
         </Label>
 
-        <Input
-          id="repeated-password"
-          type="password"
-          minLength={6}
-          maxLength={72}
-          autoComplete="new-password"
-          className="bg-background mt-2"
-          {...register('repeatedPassword')}
-        />
+        <div className="relative">
+          <Input
+            id="repeated-password"
+            type={showConfirmPassword ? 'text' : 'password'}
+            minLength={6}
+            maxLength={72}
+            autoComplete="new-password"
+            className="bg-background mt-2 pr-10"
+            {...register('repeatedPassword')}
+          />
+
+          <Button
+            variant="link"
+            type="button"
+            className="absolute right-0 top-0 flex h-full items-center justify-center pr-3"
+            aria-label={showConfirmPassword ? 'Mask password' : 'Reveal password'}
+            onClick={() => setShowConfirmPassword((show) => !show)}
+          >
+            {showConfirmPassword ? (
+              <EyeOff className="text-muted-foreground h-5 w-5" />
+            ) : (
+              <Eye className="text-muted-foreground h-5 w-5" />
+            )}
+          </Button>
+        </div>
 
         <FormErrorMessage className="mt-1.5" error={errors.repeatedPassword} />
       </div>
