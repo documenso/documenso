@@ -114,6 +114,9 @@ model Document {
   createdAt      DateTime            @default(now())
   updatedAt      DateTime            @default(now()) @updatedAt
 
+  documentMetaId String?
+  DocumentMeta   DocumentMeta? @relation(fields: [documentMetaId], references: [id], onDelete: Cascade)
+
   @@unique([documentDataId])
 }
 
@@ -129,6 +132,13 @@ model DocumentData {
   data        String
   initialData String
   Document    Document?
+}
+
+model DocumentMeta {
+  id                 String     @id @default(cuid())
+  customEmailSubject String?
+  customEmailBody    String?
+  Document           Document[]
 }
 
 enum ReadStatus {
