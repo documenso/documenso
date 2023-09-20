@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
 import { useAnalytics } from '@documenso/lib/client-only/hooks/use-analytics';
+import { putFile } from '@documenso/lib/universal/upload/put-file';
 import { Field, Prisma, Recipient } from '@documenso/prisma/client';
 import { Card, CardContent } from '@documenso/ui/primitives/card';
 import { DocumentDropzone } from '@documenso/ui/primitives/document-dropzone';
@@ -31,7 +32,7 @@ export default function SinglePlayerModePage() {
 
   const { toast } = useToast();
 
-  const [uploadedFile, setUploadedFile] = useState<{ name: string; file: string } | null>();
+  const [uploadedFile, setUploadedFile] = useState<{ file: File; fileBase64: string } | null>();
 
   const [step, setStep] = useState<SinglePlayerModeStep>('fields');
   const [fields, setFields] = useState<Field[]>([]);
@@ -97,7 +98,7 @@ export default function SinglePlayerModePage() {
   };
 
   /**
-   * Create, sign and send the document.
+   * Upload, create, sign and send the document.
    */
   const onSignSubmit = async (data: TAddSignatureFormSchema) => {
     if (!uploadedFile) {
@@ -105,9 +106,14 @@ export default function SinglePlayerModePage() {
     }
 
     try {
+      const putFileData = await putFile(uploadedFile.file);
+
       const documentToken = await createSinglePlayerDocument({
-        document: uploadedFile.file,
-        documentName: uploadedFile.name,
+        documentData: {
+          type: putFileData.type,
+          data: putFileData.data,
+        },
+        documentName: uploadedFile.file.name,
         signer: data,
         fields: fields.map((field) => ({
           page: field.page,
@@ -152,8 +158,8 @@ export default function SinglePlayerModePage() {
       const base64String = Buffer.from(arrayBuffer).toString('base64');
 
       setUploadedFile({
-        name: file.name,
-        file: `data:application/pdf;base64,${base64String}`,
+        file,
+        fileBase64: `data:application/pdf;base64,${base64String}`,
       });
 
       analytics.capture('Marketing: SPM - Document uploaded');
@@ -189,7 +195,7 @@ export default function SinglePlayerModePage() {
           {uploadedFile ? (
             <Card gradient>
               <CardContent className="p-2">
-                <LazyPDFViewer document={uploadedFile.file} />
+                <LazyPDFViewer document={uploadedFile.fileBase64} />
               </CardContent>
             </Card>
           ) : (
