@@ -2,18 +2,10 @@
 
 import { useEffect } from 'react';
 
-import { useRouter } from 'next/navigation';
-
-export default function Redirect() {
-  const { push } = useRouter();
-
+export const Redirect = () => {
   useEffect(() => {
-    const timer = setTimeout(() => {
-      push('/');
-    }, 3000);
+    window.location.href = process.env.NEXT_PUBLIC_MARKETING_URL ?? 'http://localhost:3001';
+  }, []);
 
-    return () => clearTimeout(timer);
-  }, [push]);
-
-  return <div></div>;
-}
+  return null;
+};
