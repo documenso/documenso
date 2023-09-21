@@ -1,6 +1,6 @@
 import { type Page, expect, test as setup } from '@playwright/test';
 
-import { STORAGE_STATE } from '../../../../../playwright.config';
+import { STORAGE_STATE } from '../../../playwright.config';
 
 const username = process.env.E2E_TEST_USERNAME || '';
 const email = process.env.E2E_TEST_USER_EMAIL || '';

@@ -27,7 +27,7 @@ test.describe('Document upload test', () => {
     await page
       .getByText('Add a documentDrag & drop your document here.')
       .locator('input[type=file]')
-      .setInputFiles('./apps/web/src/tests/e2e/documenso.pdf');
+      .setInputFiles('./src/tests/e2e/documenso.pdf');
   });
 
   test('user can see /documents page', async ({ page }: { page: Page }) => {

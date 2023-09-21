@@ -43,6 +43,7 @@
     "zod": "^3.21.4"
   },
   "devDependencies": {
+    "@playwright/test": "^1.38.0",
     "@types/formidable": "^2.0.6",
     "@types/luxon": "^3.3.1",
     "@types/node": "20.1.0",
