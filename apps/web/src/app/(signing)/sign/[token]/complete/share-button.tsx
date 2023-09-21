@@ -10,12 +10,13 @@ import { trpc } from '@documenso/trpc/react';
 import { Button } from '@documenso/ui/primitives/button';
 
 export type ShareButtonProps = HTMLAttributes<HTMLButtonElement> & {
-  recipientId: number;
+  token: string;
   documentId: number;
 };
 
-export const ShareButton = ({ recipientId, documentId }: ShareButtonProps) => {
-  const { mutateAsync: createShareId, isLoading } = trpc.share.create.useMutation();
+export const ShareButton = ({ token, documentId }: ShareButtonProps) => {
+  const { mutateAsync: createOrGetShareLink, isLoading } =
+    trpc.shareLink.createOrGetShareLink.useMutation();
 
   const router = useRouter();
 
@@ -23,19 +24,17 @@ export const ShareButton = ({ recipientId, documentId }: ShareButtonProps) => {
     <Button
       variant="outline"
       className="flex-1"
-      disabled={!recipientId || !documentId || isLoading}
+      disabled={!token || !documentId || isLoading}
       onClick={async () => {
         console.log('Signing Clicked');
 
-        const response = await createShareId({
-          recipientId,
+        const { slug } = await createOrGetShareLink({
+          token,
           documentId,
         });
 
-        console.log('response', response);
-
         // TODO: Router delaying...
-        return router.push(`/share/${response.link}`);
+        return router.push(`/share/${slug}`);
       }}
     >
       <Share className="mr-2 h-5 w-5" />

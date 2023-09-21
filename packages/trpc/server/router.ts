@@ -3,7 +3,7 @@ import { authRouter } from './auth-router/router';
 import { documentRouter } from './document-router/router';
 import { fieldRouter } from './field-router/router';
 import { profileRouter } from './profile-router/router';
-import { shareRouter } from './share-router/router';
+import { shareLinkRouter } from './share-link-router/router';
 import { procedure, router } from './trpc';
 
 export const appRouter = router({
@@ -12,7 +12,7 @@ export const appRouter = router({
   profile: profileRouter,
   document: documentRouter,
   field: fieldRouter,
-  share: shareRouter,
+  shareLink: shareLinkRouter,
 });
 
 export type AppRouter = typeof appRouter;

@@ -3,7 +3,7 @@ import React from 'react';
 import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 
-import { getSharingId } from '@documenso/lib/server-only/share/get-share-id';
+import { getShareLinkBySlug } from '@documenso/lib/server-only/share/get-share-link-by-slug';
 
 import Redirect from './redirect';
 
@@ -13,16 +13,16 @@ export const metadata: Metadata = {
 
 export type SharePageProps = {
   params: {
-    shareId?: string;
+    slug?: string;
   };
 };
 
-export default async function SharePage({ params: { shareId } }: SharePageProps) {
-  if (!shareId) {
+export default async function SharePage({ params: { slug } }: SharePageProps) {
+  if (!slug) {
     return notFound();
   }
 
-  const share = await getSharingId({ shareId });
+  const share = await getShareLinkBySlug({ slug }).catch(() => null);
 
   if (!share) {
     return notFound();
