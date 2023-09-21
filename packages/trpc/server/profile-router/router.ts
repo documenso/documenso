@@ -1,6 +1,8 @@
 import { TRPCError } from '@trpc/server';
 
+import { isAdmin } from '@documenso/lib/next-auth/guards/is-admin';
 import { forgotPassword } from '@documenso/lib/server-only/user/forgot-password';
+import { getUserById } from '@documenso/lib/server-only/user/get-user-by-id';
 import { resetPassword } from '@documenso/lib/server-only/user/reset-password';
 import { updatePassword } from '@documenso/lib/server-only/user/update-password';
 import { updateProfile } from '@documenso/lib/server-only/user/update-profile';
@@ -9,11 +11,36 @@ import { authenticatedProcedure, procedure, router } from '../trpc';
 import {
   ZForgotPasswordFormSchema,
   ZResetPasswordFormSchema,
+  ZRetrieveUserByIdQuerySchema,
   ZUpdatePasswordMutationSchema,
   ZUpdateProfileMutationSchema,
 } from './schema';
 
 export const profileRouter = router({
+  getUser: authenticatedProcedure
+    .input(ZRetrieveUserByIdQuerySchema)
+    .query(async ({ input, ctx }) => {
+      const isUserAdmin = isAdmin(ctx.user);
+
+      if (!isUserAdmin) {
+        throw new TRPCError({
+          code: 'UNAUTHORIZED',
+          message: 'Not authorized to perform this action.',
+        });
+      }
+
+      try {
+        const { id } = input;
+
+        return await getUserById({ id });
+      } catch (err) {
+        throw new TRPCError({
+          code: 'BAD_REQUEST',
+          message: 'We were unable to retrieve the specified account. Please try again.',
+        });
+      }
+    }),
+
   updateProfile: authenticatedProcedure
     .input(ZUpdateProfileMutationSchema)
     .mutation(async ({ input, ctx }) => {
