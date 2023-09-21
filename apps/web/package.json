@@ -24,7 +24,7 @@
     "lucide-react": "^0.214.0",
     "luxon": "^3.4.0",
     "micro": "^10.0.1",
-    "next": "13.4.12",
+    "next": "13.5.2",
     "next-auth": "4.22.3",
     "next-plausible": "^3.10.1",
     "next-themes": "^0.2.1",

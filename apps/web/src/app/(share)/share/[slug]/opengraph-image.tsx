@@ -4,7 +4,8 @@ import { P, match } from 'ts-pattern';
 
 import { getRecipientOrSenderByShareLinkSlug } from '@documenso/lib/server-only/share/get-recipient-or-sender-by-share-link-slug';
 
-export const runtime = 'edge';
+import { Logo } from '~/components/branding/logo';
+import { getAssetBuffer } from '~/helpers/get-asset-buffer';
 
 const CARD_OFFSET_TOP = 152;
 const CARD_OFFSET_LEFT = 350;
@@ -21,11 +22,20 @@ type SharePageOpenGraphImageProps = {
 };
 
 export default async function Image({ params: { slug } }: SharePageOpenGraphImageProps) {
+  const [interSemiBold, interRegular, caveatRegular, shareFrameImage] = await Promise.all([
+    getAssetBuffer('/fonts/inter-semibold.ttf'),
+    getAssetBuffer('/fonts/inter-regular.ttf'),
+    getAssetBuffer('/fonts/caveat-regular.ttf'),
+    getAssetBuffer('/static/og-share-frame.png'),
+  ]);
+
   const recipientOrSender = await getRecipientOrSenderByShareLinkSlug({ slug }).catch(() => null);
 
   if (!recipientOrSender) {
     return null;
   }
+
+  const isRecipient = 'Signature' in recipientOrSender;
 
   const signatureImage = match(recipientOrSender)
     .with({ Signature: P.array(P._) }, (recipient) => {
@@ -43,30 +53,20 @@ export default async function Image({ params: { slug } }: SharePageOpenGraphImag
       return sender.name || sender.email;
     });
 
-  const [interSemiBold, interRegular, caveatRegular, shareFrameImage] = await Promise.all([
-    fetch(new URL('./../../../../assets/inter-semibold.ttf', import.meta.url)).then(async (res) =>
-      res.arrayBuffer(),
-    ),
-    fetch(new URL('./../../../../assets/inter-regular.ttf', import.meta.url)).then(async (res) =>
-      res.arrayBuffer(),
-    ),
-    fetch(new URL('./../../../../assets/caveat-regular.ttf', import.meta.url)).then(async (res) =>
-      res.arrayBuffer(),
-    ),
-    fetch(new URL('./../../../../assets/og-share-frame.png', import.meta.url)).then(async (res) =>
-      res.arrayBuffer(),
-    ),
-  ]);
-
   return new ImageResponse(
     (
       <div tw="relative flex h-full w-full">
         {/* @ts-expect-error Lack of typing from ImageResponse */}
         <img src={shareFrameImage} alt="og-share-frame" tw="absolute inset-0 w-full h-full" />
 
+        <div tw="absolute top-20 flex w-full items-center justify-center">
+          {/* @ts-expect-error Lack of typing from ImageResponse */}
+          <Logo tw="h-8 w-60" />
+        </div>
+
         {signatureImage ? (
           <div
-            tw="absolute py-6 px-12 -mt-2 flex items-center justify-center text-center"
+            tw="absolute py-6 px-12 flex items-center justify-center text-center"
             style={{
               top: `${CARD_OFFSET_TOP}px`,
               left: `${CARD_OFFSET_LEFT}px`,
@@ -74,11 +74,11 @@ export default async function Image({ params: { slug } }: SharePageOpenGraphImag
               height: `${CARD_HEIGHT}px`,
             }}
           >
-            <img src={signatureImage} alt="signature" tw="w-full h-full" />
+            <img src={signatureImage} alt="signature" tw="opacity-60 h-full max-w-[100%]" />
           </div>
         ) : (
           <p
-            tw="absolute py-6 px-12 -mt-2 flex items-center justify-center text-center"
+            tw="absolute py-6 px-12 -mt-2 flex items-center justify-center text-center text-slate-500"
             style={{
               fontFamily: 'Caveat',
               fontSize: `${Math.max(
@@ -95,20 +95,34 @@ export default async function Image({ params: { slug } }: SharePageOpenGraphImag
           </p>
         )}
 
+        {/* <div
+          tw="absolute flex items-center justify-center text-slate-500"
+          style={{
+            top: `${CARD_OFFSET_TOP + CARD_HEIGHT - 45}px`,
+            left: `${CARD_OFFSET_LEFT}`,
+            width: `${CARD_WIDTH}px`,
+            fontSize: '30px',
+          }}
+        >
+          {signatureName}
+        </div> */}
+
         <div
-          tw="absolute absolute flex flex-col items-center justify-center pt-2.5 w-full"
+          tw="absolute flex flex-col items-center justify-center pt-12 w-full"
           style={{
             top: `${CARD_OFFSET_TOP + CARD_HEIGHT}px`,
           }}
         >
           <h2
-            tw="text-2xl text-slate-900/60"
+            tw="text-3xl text-slate-500"
             style={{
               fontFamily: 'Inter',
               fontWeight: 600,
             }}
           >
-            I just signed with Documenso
+            {isRecipient
+              ? 'I just signed with Documenso and you can too!'
+              : 'I just sent a document with Documenso and you can too!'}
           </h2>
         </div>
       </div>
