@@ -10,7 +10,9 @@
     "universal/",
     "next-auth/"
   ],
-  "scripts": {},
+  "scripts": {
+    "clean": "rimraf node_modules"
+  },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.410.0",
     "@aws-sdk/s3-request-presigner": "^3.410.0",
@@ -25,7 +27,7 @@
     "bcrypt": "^5.1.0",
     "luxon": "^3.4.0",
     "nanoid": "^4.0.2",
-    "next": "13.5.2",
+    "next": "13.4.19",
     "next-auth": "4.22.3",
     "pdf-lib": "^1.17.1",
     "react": "18.2.0",

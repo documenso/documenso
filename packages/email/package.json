@@ -13,6 +13,7 @@
   ],
   "scripts": {
     "dev": "email dev --port 3002 --dir templates",
+    "clean": "rimraf node_modules",
     "worker:test": "tsup worker/index.ts --format esm"
   },
   "dependencies": {
