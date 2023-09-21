@@ -10,6 +10,7 @@ import {
   User as LucideUser,
   Monitor,
   Moon,
+  Palette,
   Sun,
   UserCog,
 } from 'lucide-react';
@@ -26,7 +27,13 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
+  DropdownMenuPortal,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
   DropdownMenuSeparator,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from '@documenso/ui/primitives/dropdown-menu';
 
@@ -37,8 +44,8 @@ export type ProfileDropdownProps = {
 };
 
 export const ProfileDropdown = ({ user }: ProfileDropdownProps) => {
-  const { theme, setTheme } = useTheme();
   const { getFlag } = useFeatureFlags();
+  const { theme, setTheme } = useTheme();
   const isUserAdmin = isAdmin(user);
 
   const isBillingEnabled = getFlag('app_billing');
@@ -98,28 +105,30 @@ export const ProfileDropdown = ({ user }: ProfileDropdownProps) => {
 
         <DropdownMenuSeparator />
 
-        {theme === 'light' ? null : (
-          <DropdownMenuItem onClick={() => setTheme('light')}>
-            <Sun className="mr-2 h-4 w-4" />
-            Light Mode
-          </DropdownMenuItem>
-        )}
-        {theme === 'dark' ? null : (
-          <DropdownMenuItem onClick={() => setTheme('dark')}>
-            <Moon className="mr-2 h-4 w-4" />
-            Dark Mode
-          </DropdownMenuItem>
-        )}
-
-        {theme === 'system' ? null : (
-          <DropdownMenuItem onClick={() => setTheme('system')}>
-            <Monitor className="mr-2 h-4 w-4" />
-            System Theme
-          </DropdownMenuItem>
-        )}
-
+        <DropdownMenuSub>
+          <DropdownMenuSubTrigger>
+            <Palette className="mr-2 h-4 w-4" />
+            Themes
+          </DropdownMenuSubTrigger>
+          <DropdownMenuPortal>
+            <DropdownMenuSubContent>
+              <DropdownMenuRadioGroup value={theme} onValueChange={setTheme}>
+                <DropdownMenuRadioItem value="light">
+                  <Sun className="mr-2 h-4 w-4" /> Light
+                </DropdownMenuRadioItem>
+                <DropdownMenuRadioItem value="dark">
+                  <Moon className="mr-2 h-4 w-4" />
+                  Dark
+                </DropdownMenuRadioItem>
+                <DropdownMenuRadioItem value="system">
+                  <Monitor className="mr-2 h-4 w-4" />
+                  System
+                </DropdownMenuRadioItem>
+              </DropdownMenuRadioGroup>
+            </DropdownMenuSubContent>
+          </DropdownMenuPortal>
+        </DropdownMenuSub>
         <DropdownMenuSeparator />
-
         <DropdownMenuItem asChild>
           <Link href="https://github.com/documenso/documenso" className="cursor-pointer">
             <Github className="mr-2 h-4 w-4" />
