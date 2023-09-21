@@ -37,10 +37,12 @@ export const AdminNav = ({ className, ...props }: AdminNavProps) => {
           'justify-start md:w-full',
           pathname?.startsWith('/admin/users') && 'bg-secondary',
         )}
-        disabled
+        asChild
       >
-        <User2 className="mr-2 h-5 w-5" />
-        Users (Coming Soon)
+        <Link href="/admin/users">
+          <User2 className="mr-2 h-5 w-5" />
+          Users
+        </Link>
       </Button>
     </div>
   );
