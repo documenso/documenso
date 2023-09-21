@@ -7,6 +7,7 @@ import {
   Download,
   Edit,
   History,
+  Loader,
   MoreHorizontal,
   Pencil,
   Share,
@@ -18,7 +19,8 @@ import { useSession } from 'next-auth/react';
 import { getFile } from '@documenso/lib/universal/upload/get-file';
 import { Document, DocumentStatus, Recipient, User } from '@documenso/prisma/client';
 import { DocumentWithData } from '@documenso/prisma/types/document-with-data';
-import { trpc } from '@documenso/trpc/client';
+import { trpc as trpcClient } from '@documenso/trpc/client';
+import { trpc as trpcReact } from '@documenso/trpc/react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -26,6 +28,9 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from '@documenso/ui/primitives/dropdown-menu';
+import { useToast } from '@documenso/ui/primitives/use-toast';
+
+import { useCopyToClipboard } from '~/hooks/use-copy-to-clipboard';
 
 export type DataTableActionDropdownProps = {
   row: Document & {
@@ -36,10 +41,15 @@ export type DataTableActionDropdownProps = {
 
 export const DataTableActionDropdown = ({ row }: DataTableActionDropdownProps) => {
   const { data: session } = useSession();
+  const { toast } = useToast();
+  const [, copyToClipboard] = useCopyToClipboard();
 
   if (!session) {
     return null;
   }
+
+  const { mutateAsync: createOrGetShareLink, isLoading: isCreatingShareLink } =
+    trpcReact.shareLink.createOrGetShareLink.useMutation();
 
   const recipient = row.Recipient.find((recipient) => recipient.email === session.user.email);
 
@@ -50,15 +60,29 @@ export const DataTableActionDropdown = ({ row }: DataTableActionDropdownProps) =
   const isComplete = row.status === DocumentStatus.COMPLETED;
   // const isSigned = recipient?.signingStatus === SigningStatus.SIGNED;
 
+  const onShareClick = async () => {
+    const { slug } = await createOrGetShareLink({
+      token: recipient?.token,
+      documentId: row.id,
+    });
+
+    await copyToClipboard(`${window.location.origin}/share/${slug}`).catch(() => null);
+
+    toast({
+      title: 'Copied to clipboard',
+      description: 'The sharing link has been copied to your clipboard.',
+    });
+  };
+
   const onDownloadClick = async () => {
     let document: DocumentWithData | null = null;
 
     if (!recipient) {
-      document = await trpc.document.getDocumentById.query({
+      document = await trpcClient.document.getDocumentById.query({
         id: row.id,
       });
     } else {
-      document = await trpc.document.getDocumentByToken.query({
+      document = await trpcClient.document.getDocumentByToken.query({
         token: recipient.token,
       });
     }
@@ -135,8 +159,12 @@ export const DataTableActionDropdown = ({ row }: DataTableActionDropdownProps) =
           Resend
         </DropdownMenuItem>
 
-        <DropdownMenuItem disabled>
-          <Share className="mr-2 h-4 w-4" />
+        <DropdownMenuItem onClick={onShareClick}>
+          {isCreatingShareLink ? (
+            <Loader className="mr-2 h-4 w-4" />
+          ) : (
+            <Share className="mr-2 h-4 w-4" />
+          )}
           Share
         </DropdownMenuItem>
       </DropdownMenuContent>

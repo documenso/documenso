@@ -88,7 +88,7 @@ export default async function CompletedSigningPage({
         ))}
 
       <div className="mt-8 flex w-full max-w-sm items-center justify-center gap-4">
-        <ShareButton documentId={document.id} recipientId={recipient.id} />
+        <ShareButton documentId={document.id} token={recipient.token} />
 
         <DownloadButton
           className="flex-1"

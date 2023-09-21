@@ -5,15 +5,15 @@ import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 
 export default function Redirect() {
-  const router = useRouter();
+  const { push } = useRouter();
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      router.push('/');
+      push('/');
     }, 3000);
 
     return () => clearTimeout(timer);
-  }, []);
+  }, [push]);
 
   return <div></div>;
 }
