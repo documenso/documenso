@@ -4,8 +4,5 @@ const path = require('path');
 
 module.exports = {
   ...baseConfig,
-  content: [
-    `templates/**/*.{ts,tsx}`,
-    `${path.join(require.resolve('@documenso/ui'), '..')}/**/*.{ts,tsx}`,
-  ],
+  content: [`templates/**/*.{ts,tsx}`],
 };

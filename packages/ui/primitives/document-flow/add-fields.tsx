@@ -5,12 +5,12 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { Caveat } from 'next/font/google';
 
 import { Check, ChevronsUpDown, Info } from 'lucide-react';
-import { nanoid } from 'nanoid';
 import { useFieldArray, useForm } from 'react-hook-form';
 
 import { getBoundingClientRect } from '@documenso/lib/client-only/get-bounding-client-rect';
 import { useDocumentElement } from '@documenso/lib/client-only/hooks/use-document-element';
 import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
+import { nanoid } from '@documenso/lib/universal/id';
 import { Field, FieldType, Recipient, SendStatus } from '@documenso/prisma/client';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
@@ -102,6 +102,7 @@ export const AddFieldsFormPartial = ({
 
   const [selectedField, setSelectedField] = useState<FieldType | null>(null);
   const [selectedSigner, setSelectedSigner] = useState<Recipient | null>(null);
+  const [showRecipientsSelector, setShowRecipientsSelector] = useState(false);
 
   const hasSelectedSignerBeenSent = selectedSigner?.sendStatus === SendStatus.SENT;
 
@@ -314,7 +315,7 @@ export const AddFieldsFormPartial = ({
           ))}
 
           {!hideRecipients && (
-            <Popover>
+            <Popover open={showRecipientsSelector} onOpenChange={setShowRecipientsSelector}>
               <PopoverTrigger asChild>
                 <Button
                   type="button"
@@ -324,7 +325,7 @@ export const AddFieldsFormPartial = ({
                 >
                   {selectedSigner?.email && (
                     <span className="flex-1 truncate text-left">
-                      {selectedSigner?.email} ({selectedSigner?.email})
+                      {selectedSigner?.name} ({selectedSigner?.email})
                     </span>
                   )}
 
@@ -348,7 +349,10 @@ export const AddFieldsFormPartial = ({
                         className={cn({
                           'text-muted-foreground': recipient.sendStatus === SendStatus.SENT,
                         })}
-                        onSelect={() => setSelectedSigner(recipient)}
+                        onSelect={() => {
+                          setSelectedSigner(recipient);
+                          setShowRecipientsSelector(false);
+                        }}
                       >
                         {recipient.sendStatus !== SendStatus.SENT ? (
                           <Check

@@ -1,55 +1,64 @@
 'use client';
 
-import { HTMLAttributes } from 'react';
+import { HTMLAttributes, useState } from 'react';
 
 import { Download } from 'lucide-react';
 
+import { getFile } from '@documenso/lib/universal/upload/get-file';
+import { DocumentData } from '@documenso/prisma/client';
 import { Button } from '@documenso/ui/primitives/button';
+import { useToast } from '@documenso/ui/primitives/use-toast';
 
 export type DownloadButtonProps = HTMLAttributes<HTMLButtonElement> & {
   disabled?: boolean;
   fileName?: string;
-  document?: string;
+  documentData?: DocumentData;
 };
 
 export const DownloadButton = ({
   className,
   fileName,
-  document,
+  documentData,
   disabled,
   ...props
 }: DownloadButtonProps) => {
-  /**
-   * Convert the document from base64 to a blob and download it.
-   */
-  const onDownloadClick = () => {
-    if (!document) {
-      return;
-    }
+  const { toast } = useToast();
 
-    let decodedDocument = document;
+  const [isLoading, setIsLoading] = useState(false);
 
+  const onDownloadClick = async () => {
     try {
-      decodedDocument = atob(document);
+      setIsLoading(true);
+
+      if (!documentData) {
+        return;
+      }
+
+      const bytes = await getFile(documentData);
+
+      const blob = new Blob([bytes], {
+        type: 'application/pdf',
+      });
+
+      const link = window.document.createElement('a');
+
+      link.href = window.URL.createObjectURL(blob);
+      link.download = fileName || 'document.pdf';
+
+      link.click();
+
+      window.URL.revokeObjectURL(link.href);
     } catch (err) {
-      // We're just going to ignore this error and try to download the document
       console.error(err);
+
+      toast({
+        title: 'Error',
+        description: 'An error occurred while downloading your document.',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsLoading(false);
     }
-
-    const documentBytes = Uint8Array.from(decodedDocument.split('').map((c) => c.charCodeAt(0)));
-
-    const blob = new Blob([documentBytes], {
-      type: 'application/pdf',
-    });
-
-    const link = window.document.createElement('a');
-
-    link.href = window.URL.createObjectURL(blob);
-    link.download = fileName || 'document.pdf';
-
-    link.click();
-
-    window.URL.revokeObjectURL(link.href);
   };
 
   return (
@@ -57,8 +66,9 @@ export const DownloadButton = ({
       type="button"
       variant="outline"
       className={className}
-      disabled={disabled || !document}
+      disabled={disabled || !documentData}
       onClick={onDownloadClick}
+      loading={isLoading}
       {...props}
     >
       <Download className="mr-2 h-5 w-5" />

@@ -9,7 +9,7 @@ export default async function ProfileSettingsPage() {
     <div>
       <h3 className="text-lg font-medium">Profile</h3>
 
-      <p className="mt-2 text-sm text-slate-500">Here you can edit your personal details.</p>
+      <p className="text-muted-foreground mt-2 text-sm">Here you can edit your personal details.</p>
 
       <hr className="my-4" />
 
