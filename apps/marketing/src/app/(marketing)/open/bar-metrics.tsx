@@ -7,18 +7,15 @@ import { Bar, BarChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recha
 import { formatMonth } from '@documenso/lib/client-only/format-month';
 import { cn } from '@documenso/ui/lib/utils';
 
-import { StargazersType } from './page';
-
-export type MetricsDataKey = keyof StargazersType[string];
-export type GithubMetricProps = HTMLAttributes<HTMLDivElement> & {
-  data: StargazersType;
-  metricKey: MetricsDataKey;
+export type BarMetricProps<T extends Record<string, unknown>> = HTMLAttributes<HTMLDivElement> & {
+  data: T;
+  metricKey: keyof T[string];
   title: string;
   label: string;
   chartHeight?: number;
 };
 
-export const GithubMetric = ({
+export const BarMetric = <T extends Record<string, Record<keyof T[string], unknown>>>({
   className,
   data,
   metricKey,
@@ -26,7 +23,7 @@ export const GithubMetric = ({
   label,
   chartHeight = 400,
   ...props
-}: GithubMetricProps) => {
+}: BarMetricProps<T>) => {
   const formattedData = Object.keys(data)
     .map((key) => ({
       month: formatMonth(key),
@@ -50,7 +47,7 @@ export const GithubMetric = ({
               formatter={(value) => [Number(value), label]}
               cursor={{ fill: 'hsl(var(--primary) / 10%)' }}
             />
-            <Bar dataKey={metricKey} fill="hsl(var(--primary))" label={label} />
+            <Bar dataKey={metricKey as string} fill="hsl(var(--primary))" label={label} />{' '}
           </BarChart>
         </ResponsiveContainer>
       </div>
