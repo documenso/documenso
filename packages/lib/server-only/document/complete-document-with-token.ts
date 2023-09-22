@@ -70,7 +70,7 @@ export const completeDocumentWithToken = async ({
     },
   });
 
-  const numberOfRecipients = await prisma.recipient.count({
+  const pendingRecipients = await prisma.recipient.count({
     where: {
       documentId: document.id,
       signingStatus: {
@@ -79,7 +79,7 @@ export const completeDocumentWithToken = async ({
     },
   });
 
-  if (numberOfRecipients > 1) {
+  if (pendingRecipients > 0) {
     await sendPendingEmail({ documentId, recipientId: recipient.id });
   }
 
