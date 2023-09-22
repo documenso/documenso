@@ -29,14 +29,14 @@ export const sendCompletedEmail = async ({ documentId }: SendDocumentOptions) =>
 
   await Promise.all([
     document.Recipient.map(async (recipient) => {
-      const { email, name } = recipient;
+      const { email, name, token } = recipient;
 
-      const assetBaseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
+      const assetBaseUrl = process.env.NEXT_PUBLIC_WEBAPP_URL || 'http://localhost:3000';
 
       const template = createElement(DocumentCompletedEmailTemplate, {
         documentName: document.title,
         assetBaseUrl,
-        downloadLink: 'https://documenso.com',
+        downloadLink: `${process.env.NEXT_PUBLIC_WEBAPP_URL}/sign/${token}/complete`,
       });
 
       await mailer.sendMail({

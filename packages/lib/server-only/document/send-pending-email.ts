@@ -41,7 +41,7 @@ export const sendPendingEmail = async ({ documentId, recipientId }: SendPendingE
 
   const { email, name } = recipient;
 
-  const assetBaseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
+  const assetBaseUrl = process.env.NEXT_PUBLIC_WEBAPP_URL || 'http://localhost:3000';
 
   const template = createElement(DocumentPendingEmailTemplate, {
     documentName: document.title,
@@ -57,7 +57,7 @@ export const sendPendingEmail = async ({ documentId, recipientId }: SendPendingE
       name: process.env.NEXT_PRIVATE_SMTP_FROM_NAME || 'Documenso',
       address: process.env.NEXT_PRIVATE_SMTP_FROM_ADDRESS || 'noreply@documenso.com',
     },
-    subject: 'You are done signing.',
+    subject: 'Waiting for others to complete signing.',
     html: render(template),
     text: render(template, { plainText: true }),
   });
