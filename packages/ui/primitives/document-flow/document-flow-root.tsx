@@ -21,7 +21,7 @@ export const DocumentFlowFormContainer = ({
     <form
       id={id}
       className={cn(
-        'dark:bg-background border-border bg-widget sticky top-20 flex h-full max-h-[80rem] flex-col rounded-xl border px-4 py-6',
+        'dark:bg-background border-border bg-widget sticky top-20 flex h-full max-h-[64rem] flex-col rounded-xl border px-4 py-6',
         className,
       )}
       {...props}

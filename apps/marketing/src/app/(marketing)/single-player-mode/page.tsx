@@ -204,7 +204,7 @@ export default function SinglePlayerModePage() {
         </div>
 
         <div className="col-span-12 lg:col-span-6 xl:col-span-5">
-          <DocumentFlowFormContainer onSubmit={(e) => e.preventDefault()}>
+          <DocumentFlowFormContainer className="top-24" onSubmit={(e) => e.preventDefault()}>
             <DocumentFlowFormContainerHeader
               title={currentDocumentFlow.title}
               description={currentDocumentFlow.description}

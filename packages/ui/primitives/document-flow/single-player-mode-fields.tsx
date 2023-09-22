@@ -28,6 +28,13 @@ export type FieldContainerPortalProps = {
 export type SinglePlayerModeFieldContainerProps = {
   field: FieldWithSignature;
   children: React.ReactNode;
+  validateUninsertedField?: boolean;
+};
+
+export type SinglePlayerModeFieldProps<T> = {
+  field: T;
+  onClick?: () => void;
+  validateUninsertedField?: boolean;
 };
 
 export function FieldContainerPortal({
@@ -56,20 +63,35 @@ export function FieldContainerPortal({
 export function SinglePlayerModeFieldCardContainer({
   field,
   children,
+  validateUninsertedField = false,
 }: SinglePlayerModeFieldContainerProps) {
   return (
     <FieldContainerPortal field={field}>
       <motion.div className="h-full w-full" animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
         <Card
-          className="bg-background relative z-20 h-full w-full"
+          id={`field-${field.id}`}
+          className={cn('bg-background relative z-20 h-full w-full transition-all', {
+            'border-orange-300 ring-1 ring-orange-300': !field.inserted && validateUninsertedField,
+          })}
           data-inserted={field.inserted ? 'true' : 'false'}
         >
-          <CardContent
-            className={cn(
-              'text-foreground hover:shadow-primary-foreground group flex h-full w-full flex-col items-center justify-center p-2',
-            )}
-          >
-            {children}
+          <CardContent className="text-foreground hover:shadow-primary-foreground group flex h-full w-full flex-col items-center justify-center p-2">
+            <AnimatePresence mode="wait" initial={false}>
+              <motion.div
+                key={field.inserted ? 'inserted' : 'not-inserted'}
+                initial={{ opacity: 0 }}
+                animate={{
+                  opacity: 1,
+                }}
+                exit={{ opacity: 0 }}
+                transition={{
+                  duration: 0.2,
+                  ease: 'easeIn',
+                }}
+              >
+                {children}
+              </motion.div>
+            </AnimatePresence>
           </CardContent>
         </Card>
       </motion.div>
@@ -77,7 +99,11 @@ export function SinglePlayerModeFieldCardContainer({
   );
 }
 
-export function SinglePlayerModeSignatureField({ field }: { field: FieldWithSignature }) {
+export function SinglePlayerModeSignatureField({
+  field,
+  validateUninsertedField,
+  onClick,
+}: SinglePlayerModeFieldProps<FieldWithSignature>) {
   const fontVariable = '--font-signature';
   const fontVariableValue = getComputedStyle(document.documentElement).getPropertyValue(
     fontVariable,
@@ -110,50 +136,44 @@ export function SinglePlayerModeSignatureField({ field }: { field: FieldWithSign
   const insertedTypeSignature = field.inserted && field.Signature?.typedSignature;
 
   return (
-    <SinglePlayerModeFieldCardContainer field={field}>
-      <AnimatePresence mode="wait" initial={false}>
-        <motion.div
-          key={
-            (insertedBase64Signature && 'base64Signature') ||
-            (insertedTypeSignature && 'typedSignature') ||
-            'not-inserted'
-          }
-          initial={{ opacity: 0 }}
-          animate={{
-            opacity: 1,
-            transition: {
-              duration: 0.3,
-            },
+    <SinglePlayerModeFieldCardContainer
+      validateUninsertedField={validateUninsertedField}
+      field={field}
+    >
+      {insertedBase64Signature ? (
+        <img
+          src={insertedBase64Signature}
+          alt="Your signature"
+          className="h-full w-full object-contain"
+        />
+      ) : insertedTypeSignature ? (
+        <p
+          ref={$paragraphEl}
+          style={{
+            fontSize: `clamp(${minFontSize}px, ${fontSize}px, ${maxFontSize}px)`,
+            fontFamily: `var(${fontVariable})`,
           }}
-          exit={{ opacity: 0 }}
+          className="font-signature"
         >
-          {insertedBase64Signature ? (
-            <img
-              src={insertedBase64Signature}
-              alt="Your signature"
-              className="h-full w-full object-contain"
-            />
-          ) : insertedTypeSignature ? (
-            <p
-              ref={$paragraphEl}
-              style={{
-                fontSize: `clamp(${minFontSize}px, ${fontSize}px, ${maxFontSize}px)`,
-                fontFamily: `var(${fontVariable})`,
-              }}
-              className="font-signature"
-            >
-              {insertedTypeSignature}
-            </p>
-          ) : (
-            <p className="group-hover:text-primary text-muted-foreground duration-200">Signature</p>
-          )}
-        </motion.div>
-      </AnimatePresence>
+          {insertedTypeSignature}
+        </p>
+      ) : (
+        <button
+          onClick={() => onClick?.()}
+          className="group-hover:text-primary text-muted-foreground absolute inset-0 duration-200"
+        >
+          Signature
+        </button>
+      )}
     </SinglePlayerModeFieldCardContainer>
   );
 }
 
-export function SinglePlayerModeCustomTextField({ field }: { field: Field }) {
+export function SinglePlayerModeCustomTextField({
+  field,
+  validateUninsertedField,
+  onClick,
+}: SinglePlayerModeFieldProps<Field>) {
   const fontVariable = '--font-sans';
   const fontVariableValue = getComputedStyle(document.documentElement).getPropertyValue(
     fontVariable,
@@ -183,7 +203,10 @@ export function SinglePlayerModeCustomTextField({ field }: { field: Field }) {
   const fontSize = maxFontSize * scalingFactor;
 
   return (
-    <SinglePlayerModeFieldCardContainer key="not-inserted" field={field}>
+    <SinglePlayerModeFieldCardContainer
+      validateUninsertedField={validateUninsertedField}
+      field={field}
+    >
       {field.inserted ? (
         <p
           ref={$paragraphEl}
@@ -195,14 +218,17 @@ export function SinglePlayerModeCustomTextField({ field }: { field: Field }) {
           {field.customText}
         </p>
       ) : (
-        <p className="group-hover:text-primary text-muted-foreground text-lg duration-200">
+        <button
+          onClick={() => onClick?.()}
+          className="group-hover:text-primary text-muted-foreground absolute inset-0 text-lg duration-200"
+        >
           {match(field.type)
             .with(FieldType.DATE, () => 'Date')
             .with(FieldType.NAME, () => 'Name')
             .with(FieldType.EMAIL, () => 'Email')
             .with(FieldType.SIGNATURE, FieldType.FREE_SIGNATURE, () => 'Signature')
             .otherwise(() => '')}
-        </p>
+        </button>
       )}
     </SinglePlayerModeFieldCardContainer>
   );
