@@ -35,7 +35,7 @@ export default async function BillingSettingsPage() {
   if (subscription.customerId) {
     billingPortalUrl = await getPortalSession({
       customerId: subscription.customerId,
-      returnUrl: `${process.env.NEXT_PUBLIC_SITE_URL}/settings/billing`,
+      returnUrl: `${process.env.NEXT_PUBLIC_WEBAPP_URL}/settings/billing`,
     });
   }
 
@@ -43,7 +43,7 @@ export default async function BillingSettingsPage() {
     <div>
       <h3 className="text-lg font-medium">Billing</h3>
 
-      <p className="mt-2 text-sm text-slate-500">
+      <p className="text-muted-foreground mt-2 text-sm">
         Your subscription is{' '}
         {subscription.status !== SubscriptionStatus.INACTIVE ? 'active' : 'inactive'}.
         {subscription?.periodEnd && (
@@ -67,7 +67,7 @@ export default async function BillingSettingsPage() {
       )}
 
       {!billingPortalUrl && (
-        <p className="max-w-[60ch] text-base text-slate-500">
+        <p className="text-muted-foreground max-w-[60ch] text-base">
           You do not currently have a customer record, this should not happen. Please contact
           support for assistance.
         </p>

@@ -1,11 +1,11 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 import { useSearchParams } from 'next/navigation';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Loader } from 'lucide-react';
+import { Eye, EyeOff, Loader } from 'lucide-react';
 import { signIn } from 'next-auth/react';
 import { useForm } from 'react-hook-form';
 import { FcGoogle } from 'react-icons/fc';
@@ -14,6 +14,7 @@ import { z } from 'zod';
 import { ErrorCode, isErrorCode } from '@documenso/lib/next-auth/error-codes';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
+import { FormErrorMessage } from '@documenso/ui/primitives/form/form-error-message';
 import { Input } from '@documenso/ui/primitives/input';
 import { Label } from '@documenso/ui/primitives/label';
 import { useToast } from '@documenso/ui/primitives/use-toast';
@@ -42,6 +43,7 @@ export const SignInForm = ({ className }: SignInFormProps) => {
   const searchParams = useSearchParams();
 
   const { toast } = useToast();
+  const [showPassword, setShowPassword] = useState(false);
 
   const {
     register,
@@ -113,33 +115,47 @@ export const SignInForm = ({ className }: SignInFormProps) => {
       onSubmit={handleSubmit(onFormSubmit)}
     >
       <div>
-        <Label htmlFor="email" className="text-slate-500">
+        <Label htmlFor="email" className="text-muted-forground">
           Email
         </Label>
 
         <Input id="email" type="email" className="bg-background mt-2" {...register('email')} />
 
-        {errors.email && <span className="mt-1 text-xs text-red-500">{errors.email.message}</span>}
+        <FormErrorMessage className="mt-1.5" error={errors.email} />
       </div>
 
       <div>
-        <Label htmlFor="password" className="text-slate-500">
-          Password
+        <Label htmlFor="password" className="text-muted-forground">
+          <span>Password</span>
         </Label>
 
-        <Input
-          id="password"
-          type="password"
-          minLength={6}
-          maxLength={72}
-          autoComplete="current-password"
-          className="bg-background mt-2"
-          {...register('password')}
-        />
+        <div className="relative">
+          <Input
+            id="password"
+            type={showPassword ? 'text' : 'password'}
+            minLength={6}
+            maxLength={72}
+            autoComplete="current-password"
+            className="bg-background mt-2 pr-10"
+            {...register('password')}
+          />
 
-        {errors.password && (
-          <span className="mt-1 text-xs text-red-500">{errors.password.message}</span>
-        )}
+          <Button
+            variant="link"
+            type="button"
+            className="absolute right-0 top-0 flex h-full items-center justify-center pr-3"
+            aria-label={showPassword ? 'Mask password' : 'Reveal password'}
+            onClick={() => setShowPassword((show) => !show)}
+          >
+            {showPassword ? (
+              <EyeOff className="text-muted-foreground h-5 w-5" />
+            ) : (
+              <Eye className="text-muted-foreground h-5 w-5" />
+            )}
+          </Button>
+        </div>
+
+        <FormErrorMessage className="mt-1.5" error={errors.password} />
       </div>
 
       <Button size="lg" disabled={isSubmitting} className="dark:bg-documenso dark:hover:opacity-90">

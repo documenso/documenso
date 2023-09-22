@@ -12,6 +12,7 @@ import { PeriodSelectorValue } from '~/components/(dashboard)/period-selector/ty
 import { DocumentStatus } from '~/components/formatter/document-status';
 
 import { DocumentsDataTable } from './data-table';
+import { EmptyDocumentState } from './empty-state';
 import { UploadDocument } from './upload-document';
 
 export type DocumentsPageProps = {
@@ -96,7 +97,8 @@ export default async function DocumentsPage({ searchParams = {} }: DocumentsPage
       </div>
 
       <div className="mt-8">
-        <DocumentsDataTable results={results} />
+        {results.count > 0 && <DocumentsDataTable results={results} />}
+        {results.count === 0 && <EmptyDocumentState status={status} />}
       </div>
     </div>
   );
