@@ -4,6 +4,7 @@ import { MetricCard } from '~/app/(marketing)/open/metric-card';
 import { SalaryBands } from '~/app/(marketing)/open/salary-bands';
 
 import { CapTable } from './cap-table';
+import { EarlyAdopterMetrics } from './early-adopter-metrics';
 import { FundingRaised } from './funding-raised';
 import { GithubMetric } from './gh-metrics';
 import { TeamMembers } from './team-members';
@@ -29,7 +30,16 @@ const ZStargazersLiveResponse = z.record(
   }),
 );
 
+const ZEarlyAdoptersResponse = z.record(
+  z.object({
+    id: z.number(),
+    time: z.string().datetime(),
+    earlyAdopters: z.number(),
+  }),
+);
+
 export type StargazersType = z.infer<typeof ZStargazersLiveResponse>;
+export type EarlyAdoptersType = z.infer<typeof ZEarlyAdoptersResponse>;
 
 // const ZOpenPullRequestsResponse = ZMergedPullRequestsResponse;
 
@@ -64,6 +74,14 @@ export default async function OpenPage() {
   })
     .then(async (res) => res.json())
     .then((res) => ZStargazersLiveResponse.parse(res));
+
+  const EARLY_ADOPTERS_DATA = await fetch('https://stargrazer-live.onrender.com/api/stats/stripe', {
+    headers: {
+      accept: 'application/json',
+    },
+  })
+    .then(async (res) => res.json())
+    .then((res) => ZEarlyAdoptersResponse.parse(res));
 
   return (
     <div className="mx-auto mt-12 max-w-screen-lg">
@@ -110,6 +128,15 @@ export default async function OpenPage() {
         <FundingRaised className="col-span-12 lg:col-span-6" />
 
         <CapTable className="col-span-12 lg:col-span-6" />
+
+        <EarlyAdopterMetrics
+          data={EARLY_ADOPTERS_DATA}
+          metricKey="earlyAdopters"
+          title="Early Adopters"
+          label="Early Adopters"
+          className="col-span-12 lg:col-span-6"
+        />
+
         <GithubMetric
           data={STARGAZERS_DATA}
           metricKey="stars"
@@ -124,7 +151,7 @@ export default async function OpenPage() {
           title="Github: Total Merged PRs"
           label="Merged PRs"
           chartHeight={300}
-          className="col-span-12 lg:col-span-4"
+          className="col-span-12 lg:col-span-6"
         />
         <GithubMetric
           data={STARGAZERS_DATA}
@@ -132,7 +159,7 @@ export default async function OpenPage() {
           title="Github: Total Forks"
           label="Forks"
           chartHeight={300}
-          className="col-span-12 lg:col-span-4"
+          className="col-span-12 lg:col-span-6"
         />
         <GithubMetric
           data={STARGAZERS_DATA}
@@ -140,7 +167,7 @@ export default async function OpenPage() {
           title="Github: Total Open Issues"
           label="Open Issues"
           chartHeight={300}
-          className="col-span-12 lg:col-span-4"
+          className="col-span-12 lg:col-span-6"
         />
 
         <div className="col-span-12 mt-12 flex flex-col items-center justify-center">

@@ -7,18 +7,18 @@ import { Bar, BarChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recha
 import { formatMonth } from '@documenso/lib/client-only/format-month';
 import { cn } from '@documenso/ui/lib/utils';
 
-import { StargazersType } from './page';
+import { EarlyAdoptersType } from './page';
 
-export type MetricsDataKey = keyof StargazersType[string];
-export type GithubMetricProps = HTMLAttributes<HTMLDivElement> & {
-  data: StargazersType;
+export type MetricsDataKey = keyof Omit<EarlyAdoptersType[string], 'id'>;
+export type EarlyAdopterMetricsProps = HTMLAttributes<HTMLDivElement> & {
+  data: EarlyAdoptersType;
   metricKey: MetricsDataKey;
   title: string;
   label: string;
   chartHeight?: number;
 };
 
-export const GithubMetric = ({
+export const EarlyAdopterMetrics = ({
   className,
   data,
   metricKey,
@@ -26,7 +26,7 @@ export const GithubMetric = ({
   label,
   chartHeight = 400,
   ...props
-}: GithubMetricProps) => {
+}: EarlyAdopterMetricsProps) => {
   const formattedData = Object.keys(data)
     .map((key) => ({
       month: formatMonth(key),
