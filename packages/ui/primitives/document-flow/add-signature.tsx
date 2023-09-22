@@ -8,8 +8,10 @@ import { useForm } from 'react-hook-form';
 import { match } from 'ts-pattern';
 
 import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
+import { sortFieldsByPosition, validateFieldsInserted } from '@documenso/lib/utils/fields';
 import { Field, FieldType } from '@documenso/prisma/client';
 import { FieldWithSignature } from '@documenso/prisma/types/field-with-signature';
+import { FieldToolTip } from '@documenso/ui/components/field/field-tooltip';
 import { cn } from '@documenso/ui/lib/utils';
 import { Card, CardContent } from '@documenso/ui/primitives/card';
 import { TAddSignatureFormSchema } from '@documenso/ui/primitives/document-flow/add-signature.types';
@@ -24,7 +26,6 @@ import { ElementVisible } from '@documenso/ui/primitives/element-visible';
 import { Input } from '@documenso/ui/primitives/input';
 import { SignaturePad } from '@documenso/ui/primitives/signature-pad';
 
-import { FieldToolTip } from '../field/field-tooltip';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '../form/form';
 import { ZAddSignatureFormSchema } from './add-signature.types';
 import {
@@ -89,40 +90,14 @@ export const AddSignatureFormPartial = ({
   const uninsertedFields = useMemo(() => {
     const fields = localFields.filter((field) => !field.inserted);
 
-    return fields.sort((a, b) => {
-      if (a.page < b.page) {
-        return -1;
-      }
-
-      if (a.page > b.page) {
-        return 1;
-      }
-
-      const aTop = a.positionY;
-      const bTop = b.positionY;
-
-      if (aTop < bTop) {
-        return -1;
-      }
-
-      if (aTop > bTop) {
-        return 1;
-      }
-
-      return 0;
-    });
+    return sortFieldsByPosition(fields);
   }, [localFields]);
 
   const onValidateFields = async (values: TAddSignatureFormSchema) => {
     setValidateUninsertedFields(true);
+    const isFieldsValid = validateFieldsInserted(localFields);
 
-    const firstUninsertedField = uninsertedFields[0];
-
-    const firstUninsertedFieldElement =
-      firstUninsertedField && document.getElementById(`field-${firstUninsertedField.id}`);
-
-    if (firstUninsertedFieldElement) {
-      firstUninsertedFieldElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    if (!isFieldsValid) {
       return;
     }
 
@@ -212,6 +187,24 @@ export const AddSignatureFormPartial = ({
     );
   };
 
+  /**
+   * When a form value changes, reset all the corresponding fields to be uninserted.
+   */
+  const onFormValueChange = (fieldType: FieldType) => {
+    setLocalFields((fields) =>
+      fields.map((field) => {
+        if (field.type !== fieldType) {
+          return field;
+        }
+
+        return {
+          ...field,
+          inserted: false,
+        };
+      }),
+    );
+  };
+
   return (
     <Form {...form}>
       <fieldset className="flex h-full flex-col" disabled={form.formState.isSubmitting}>
@@ -224,7 +217,16 @@ export const AddSignatureFormPartial = ({
                 <FormItem>
                   <FormLabel required>Email</FormLabel>
                   <FormControl>
-                    <Input className="bg-background" type="email" autoComplete="email" {...field} />
+                    <Input
+                      className="bg-background"
+                      type="email"
+                      autoComplete="email"
+                      {...field}
+                      onChange={(value) => {
+                        onFormValueChange(FieldType.EMAIL);
+                        field.onChange(value);
+                      }}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -239,7 +241,14 @@ export const AddSignatureFormPartial = ({
                   <FormItem>
                     <FormLabel required={requireName}>Name</FormLabel>
                     <FormControl>
-                      <Input className="bg-background" {...field} />
+                      <Input
+                        className="bg-background"
+                        {...field}
+                        onChange={(value) => {
+                          onFormValueChange(FieldType.NAME);
+                          field.onChange(value);
+                        }}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -267,7 +276,11 @@ export const AddSignatureFormPartial = ({
                           <SignaturePad
                             className="h-44 w-full"
                             defaultValue={field.value}
-                            {...field}
+                            onBlur={field.onBlur}
+                            onChange={(value) => {
+                              onFormValueChange(FieldType.SIGNATURE);
+                              field.onChange(value);
+                            }}
                           />
                         </CardContent>
                       </Card>
@@ -309,7 +322,6 @@ export const AddSignatureFormPartial = ({
               return (
                 <SinglePlayerModeCustomTextField
                   onClick={insertField(field)}
-                  validateUninsertedField={validateUninsertedFields}
                   key={field.id}
                   field={field}
                 />
@@ -318,7 +330,6 @@ export const AddSignatureFormPartial = ({
             .with(FieldType.SIGNATURE, () => (
               <SinglePlayerModeSignatureField
                 onClick={insertField(field)}
-                validateUninsertedField={validateUninsertedFields}
                 key={field.id}
                 field={field}
               />
