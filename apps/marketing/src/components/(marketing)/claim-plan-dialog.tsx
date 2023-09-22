@@ -134,7 +134,7 @@ export const ClaimPlanDialog = ({ className, planId, children }: ClaimPlanDialog
             </div>
 
             <Button type="submit" size="lg" loading={isSubmitting}>
-              Claim the Community Plan (
+              Claim the early adopters Plan (
               {/* eslint-disable-next-line turbo/no-undeclared-env-vars */}
               {planId === process.env.NEXT_PUBLIC_STRIPE_COMMUNITY_PLAN_MONTHLY_PRICE_ID
                 ? 'Monthly'

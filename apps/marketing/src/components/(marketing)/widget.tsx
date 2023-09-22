@@ -189,7 +189,7 @@ export const Widget = ({ className, children, ...props }: WidgetProps) => {
             className="col-span-12 flex flex-col rounded-2xl bg-[#F7F7F7] p-6 lg:col-span-5"
             onSubmit={handleSubmit(onFormSubmit)}
           >
-            <h3 className="text-2xl font-semibold">Sign up for the community plan</h3>
+            <h3 className="text-2xl font-semibold">Sign up for the early adopters plan</h3>
             <p className="mt-2 text-xs text-[#AFAFAF]">
               with Timur Ercan & Lucas Smith from Documenso
             </p>
