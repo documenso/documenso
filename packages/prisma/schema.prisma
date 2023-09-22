@@ -110,6 +110,7 @@ model Document {
   Field          Field[]
   documentDataId String
   documentData   DocumentData   @relation(fields: [documentDataId], references: [id], onDelete: Cascade)
+  documentMeta   DocumentMeta?
   createdAt      DateTime       @default(now())
   updatedAt      DateTime       @default(now()) @updatedAt
 
@@ -128,6 +129,14 @@ model DocumentData {
   data        String
   initialData String
   Document    Document?
+}
+
+model DocumentMeta {
+  id       String    @id @default(cuid())
+  subject  String?
+  message  String?
+  documentId Int @unique
+  document Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
 }
 
 enum ReadStatus {
