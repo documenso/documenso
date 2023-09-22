@@ -5,7 +5,7 @@ import { ExtendedDocumentStatus } from '@documenso/prisma/types/extended-documen
 
 export type EmptyDocumentProps = { status: ExtendedDocumentStatus };
 
-export default function EmptyDocumentState({ status }: EmptyDocumentProps) {
+export const EmptyDocumentState = ({ status }: EmptyDocumentProps) => {
   const {
     title,
     message,
