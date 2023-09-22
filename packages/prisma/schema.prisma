@@ -110,14 +110,11 @@ model Document {
   Field          Field[]
   documentDataId String
   documentData   DocumentData   @relation(fields: [documentDataId], references: [id], onDelete: Cascade)
+  documentMeta   DocumentMeta?
   createdAt      DateTime       @default(now())
   updatedAt      DateTime       @default(now()) @updatedAt
 
-  documentMetaId String?
-  DocumentMeta   DocumentMeta? @relation(fields: [documentMetaId], references: [id], onDelete: Cascade)
-
   @@unique([documentDataId])
-  @@unique([documentMetaId])
 }
 
 enum DocumentDataType {
@@ -135,10 +132,11 @@ model DocumentData {
 }
 
 model DocumentMeta {
-  id                 String    @id @default(cuid())
-  customEmailSubject String?
-  customEmailBody    String?
-  Document           Document?
+  id       String    @id @default(cuid())
+  subject  String?
+  message  String?
+  documentId Int @unique
+  document Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
 }
 
 enum ReadStatus {

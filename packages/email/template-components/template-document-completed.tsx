@@ -1,4 +1,4 @@
-import { Button, Img, Section, Tailwind, Text } from '@react-email/components';
+import { Button, Column, Img, Row, Section, Tailwind, Text } from '@react-email/components';
 
 import * as config from '@documenso/tailwind-config';
 
@@ -29,11 +29,23 @@ export const TemplateDocumentCompleted = ({
         },
       }}
     >
-      <Section className="flex-row items-center justify-center">
-        <div className="flex items-center justify-center p-4">
-          <Img className="h-42" src={getAssetUrl('/static/document.png')} alt="Documenso" />
-        </div>
+      <Section>
+        <Row className="table-fixed">
+          <Column />
 
+          <Column>
+            <Img
+              className="h-42 mx-auto"
+              src={getAssetUrl('/static/document.png')}
+              alt="Documenso"
+            />
+          </Column>
+
+          <Column />
+        </Row>
+      </Section>
+
+      <Section>
         <Text className="mb-4 flex items-center justify-center text-center text-base font-semibold text-[#7AC455]">
           <Img src={getAssetUrl('/static/completed.png')} className="-mb-0.5 mr-2 inline h-7 w-7" />
           Completed
