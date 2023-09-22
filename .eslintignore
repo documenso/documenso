@@ -5,3 +5,4 @@
 # Statically hosted javascript files
 apps/*/public/*.js
 apps/*/public/*.cjs
+scripts/

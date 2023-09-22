@@ -89,7 +89,7 @@ export const ProfileForm = ({ className, user }: ProfileFormProps) => {
       onSubmit={handleSubmit(onFormSubmit)}
     >
       <div>
-        <Label htmlFor="full-name" className="text-slate-500">
+        <Label htmlFor="full-name" className="text-muted-foreground">
           Full Name
         </Label>
 
@@ -99,7 +99,7 @@ export const ProfileForm = ({ className, user }: ProfileFormProps) => {
       </div>
 
       <div>
-        <Label htmlFor="email" className="text-slate-500">
+        <Label htmlFor="email" className="text-muted-foreground">
           Email
         </Label>
 
@@ -107,7 +107,7 @@ export const ProfileForm = ({ className, user }: ProfileFormProps) => {
       </div>
 
       <div>
-        <Label htmlFor="signature" className="text-slate-500">
+        <Label htmlFor="signature" className="text-muted-foreground">
           Signature
         </Label>
 
