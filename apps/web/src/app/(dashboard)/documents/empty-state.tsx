@@ -1,4 +1,4 @@
-import { ArrowRight, Bird, CheckCircle2 } from 'lucide-react';
+import { Bird, CheckCircle2 } from 'lucide-react';
 import { match } from 'ts-pattern';
 
 import { ExtendedDocumentStatus } from '@documenso/prisma/types/extended-document-status';
