@@ -1,66 +1,42 @@
-import { type Page, expect, test } from '@playwright/test';
+import path from 'path';
 
-/* 
-  There was a bit of code duplication because each test starts from the first step - which is uploading a document.
-  Then each subsequent test adds a new step. So, for each test we repeat the steps from the previous tests.
+import { expect, test } from '../test-fixtures/documents-page/documents-page';
 
-  I extracted the most common steps into functions and then I call them in each test.
-  Also, the document upload is used in all tests, so I added it to the beforeEach hook.
-*/
-const addSigner = async (page: Page) => {
-  await page.getByLabel('Email*').fill('example@email.com');
-  await page.getByLabel('Name').fill('User');
-  await page.getByRole('button', { name: 'Continue' }).click();
-};
+const signer_name = process.env.E2E_TEST_SIGNER_NAME;
+const signer_email = process.env.E2E_TEST_SIGNER_EMAIL;
+const signing_subject = process.env.E2E_TEST_SIGNING_SUBJECT;
+const signing_message = process.env.E2E_TEST_SIGNING_MESSAGE;
 
-const addSignatureField = async (page: Page) => {
-  await page.getByRole('button', { name: 'User Signature' }).dragTo(page.locator('canvas'));
-  await page.getByRole('button', { name: 'Continue' }).click();
-};
+if (!signer_name || !signer_email || !signing_subject || !signing_message) {
+  throw new Error('Required environment variables for tests are not defined');
+}
 
 test.describe('Document upload test', () => {
-  test.beforeEach(async ({ page }: { page: Page }) => {
-    await page.goto('/');
-
-    await expect(page).toHaveTitle('Documenso - The Open Source DocuSign Alternative');
-
-    await page
-      .getByText('Add a documentDrag & drop your document here.')
-      .locator('input[type=file]')
-      .setInputFiles('./src/tests/e2e/documenso.pdf');
+  test.beforeEach(async ({ documentsPage }) => {
+    await documentsPage.uploadDocument(path.join(__dirname, './documenso.pdf'));
   });
 
-  test('user can see /documents page', async ({ page }: { page: Page }) => {
-    await page.goto('/');
-
+  test('user can see /documents page', async ({ page, documentsPage }) => {
+    await documentsPage.goToDocumentsPage();
     await expect(page).toHaveTitle('Documenso - The Open Source DocuSign Alternative');
   });
 
-  test('user can add 1 signer', async ({ page }: { page: Page }) => {
-    await addSigner(page);
+  test('user can upload a document succesfully', async ({ page }) => {
+    await expect(page.locator('canvas')).toBeVisible();
   });
 
-  test('user can add signature field', async ({ page }: { page: Page }) => {
-    await addSigner(page);
-
-    await addSignatureField(page);
+  test('user can add 1 signer', async ({ documentsPage }) => {
+    await documentsPage.addSigner(signer_email, signer_name);
   });
 
-  test('user can add subject and message', async ({ page }: { page: Page }) => {
-    await addSigner(page);
+  test('user can add signature field', async ({ documentsPage }) => {
+    await documentsPage.addSigner(signer_email, signer_name);
+    await documentsPage.addSignatureField(signer_name);
+  });
 
-    await addSignatureField(page);
-
-    await page
-      .locator('div')
-      .filter({ hasText: /^Subject \(Optional\)$/ })
-      .locator('input')
-      .fill('New document');
-    await page
-      .locator('div')
-      .filter({ hasText: /^Message \(Optional\)$/ })
-      .locator('textarea')
-      .fill('Please sign it in and send it back to me.');
-    await page.getByRole('button', { name: 'Send' }).click();
+  test('user can add subject and message', async ({ documentsPage }) => {
+    await documentsPage.addSigner(signer_email, signer_name);
+    await documentsPage.addSignatureField(signer_name);
+    await documentsPage.addSubjectAndMessage(signing_subject, signing_message);
   });
 });
