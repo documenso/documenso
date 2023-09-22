@@ -26,11 +26,11 @@ export const sendDocument = async ({ documentId, userId }: SendDocumentOptions) 
     },
     include: {
       Recipient: true,
-      DocumentMeta: true,
+      documentMeta: true,
     },
   });
 
-  const customEmail = document?.DocumentMeta;
+  const customEmail = document?.documentMeta;
 
   if (!document) {
     throw new Error('Document not found');
@@ -67,10 +67,7 @@ export const sendDocument = async ({ documentId, userId }: SendDocumentOptions) 
         inviterEmail: user.email,
         assetBaseUrl,
         signDocumentLink,
-        customBody: renderCustomEmailTemplate(
-          customEmail?.customEmailBody || '',
-          customEmailTemplate,
-        ),
+        customBody: renderCustomEmailTemplate(customEmail?.message || '', customEmailTemplate),
       });
 
       await mailer.sendMail({
@@ -82,8 +79,8 @@ export const sendDocument = async ({ documentId, userId }: SendDocumentOptions) 
           name: process.env.NEXT_PRIVATE_SMTP_FROM_NAME || 'Documenso',
           address: process.env.NEXT_PRIVATE_SMTP_FROM_ADDRESS || 'noreply@documenso.com',
         },
-        subject: customEmail?.customEmailSubject
-          ? renderCustomEmailTemplate(customEmail.customEmailSubject, customEmailTemplate)
+        subject: customEmail?.subject
+          ? renderCustomEmailTemplate(customEmail.subject, customEmailTemplate)
           : 'Please sign this document',
         html: render(template),
         text: render(template, { plainText: true }),
