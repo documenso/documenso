@@ -8,12 +8,14 @@ import { getDocumentAndSenderByToken } from '@documenso/lib/server-only/document
 import { viewedDocument } from '@documenso/lib/server-only/document/viewed-document';
 import { getFieldsForToken } from '@documenso/lib/server-only/field/get-fields-for-token';
 import { getRecipientByToken } from '@documenso/lib/server-only/recipient/get-recipient-by-token';
+import { getFile } from '@documenso/lib/universal/upload/get-file';
 import { FieldType } from '@documenso/prisma/client';
 import { Card, CardContent } from '@documenso/ui/primitives/card';
 import { ElementVisible } from '@documenso/ui/primitives/element-visible';
 import { LazyPDFViewer } from '@documenso/ui/primitives/lazy-pdf-viewer';
 
 import { DateField } from './date-field';
+import { EmailField } from './email-field';
 import { SigningForm } from './form';
 import { NameField } from './name-field';
 import { SigningProvider } from './provider';
@@ -35,17 +37,21 @@ export default async function SigningPage({ params: { token } }: SigningPageProp
       token,
     }).catch(() => null),
     getFieldsForToken({ token }),
-    getRecipientByToken({ token }),
+    getRecipientByToken({ token }).catch(() => null),
     viewedDocument({ token }),
   ]);
 
-  if (!document) {
+  if (!document || !document.documentData || !recipient) {
     return notFound();
   }
 
-  const user = await getServerComponentSession();
+  const { documentData } = document;
 
-  const documentUrl = `data:application/pdf;base64,${document.document}`;
+  const documentDataUrl = await getFile(documentData)
+    .then((buffer) => Buffer.from(buffer).toString('base64'))
+    .then((data) => `data:application/pdf;base64,${data}`);
+
+  const user = await getServerComponentSession();
 
   return (
     <SigningProvider email={recipient.email} fullName={recipient.name} signature={user?.signature}>
@@ -66,7 +72,7 @@ export default async function SigningPage({ params: { token } }: SigningPageProp
             gradient
           >
             <CardContent className="p-2">
-              <LazyPDFViewer document={documentUrl} />
+              <LazyPDFViewer document={documentDataUrl} />
             </CardContent>
           </Card>
 
@@ -86,6 +92,9 @@ export default async function SigningPage({ params: { token } }: SigningPageProp
               ))
               .with(FieldType.DATE, () => (
                 <DateField key={field.id} field={field} recipient={recipient} />
+              ))
+              .with(FieldType.EMAIL, () => (
+                <EmailField key={field.id} field={field} recipient={recipient} />
               ))
               .otherwise(() => null),
           )}
