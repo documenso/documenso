@@ -39,7 +39,7 @@ export function FieldToolTip({ children, color, className = '', field }: FieldTo
 
   return createPortal(
     <div
-      className={cn('absolute', className)}
+      className={cn('absolute')}
       style={{
         top: `${coords.y}px`,
         left: `${coords.x}px`,
@@ -49,7 +49,7 @@ export function FieldToolTip({ children, color, className = '', field }: FieldTo
     >
       <TooltipProvider>
         <Tooltip delayDuration={0} open={!field.inserted}>
-          <TooltipTrigger className="absolute top-0 w-full"></TooltipTrigger>
+          <TooltipTrigger className="absolute inset-0 w-full"></TooltipTrigger>
 
           <TooltipContent className={tooltipVariants({ color, className })} sideOffset={2}>
             {children}
