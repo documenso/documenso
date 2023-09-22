@@ -113,7 +113,7 @@ export const PricingTable = ({ className, ...props }: PricingTableProps) => {
           data-plan="community"
           className="border-primary flex flex-col items-center justify-center rounded-lg border-2 bg-white px-8 py-12 shadow-[0px_0px_0px_4px_#E3E3E380] shadow-slate-900/5"
         >
-          <p className="text-4xl font-medium text-slate-900">Community</p>
+          <p className="text-4xl font-medium text-slate-900">Early Adopters</p>
           <div className="text-primary mt-2.5 text-xl font-medium">
             <AnimatePresence mode="wait">
               {period === 'MONTHLY' && <motion.div layoutId="pricing">$30</motion.div>}
@@ -130,12 +130,20 @@ export const PricingTable = ({ className, ...props }: PricingTableProps) => {
           </ClaimPlanDialog>
 
           <div className="mt-8 flex w-full flex-col divide-y">
-            <p className="py-4 font-medium text-slate-900">Documenso Early Adopter Deal:</p>
+            <p className="py-4 font-medium text-slate-900">
+              <a href="https://documens.so/early" target="_blank">
+                Documenso Early Adopter Deal
+              </a>
+            </p>
             <p className="py-4 text-slate-900">Join the movement</p>
             <p className="py-4 text-slate-900">Simple signing solution</p>
             <p className="py-4 text-slate-900">Email and Slack assistance</p>
             <p className="py-4 text-slate-900">
-              <strong>Includes all upcoming features</strong>
+              <strong>
+                <a href="https://documens.so/early" target="_blank">
+                  Includes all upcoming features
+                </a>
+              </strong>
             </p>
             <p className="py-4 text-slate-900">Fixed, straightforward pricing</p>
           </div>
@@ -162,7 +170,7 @@ export const PricingTable = ({ className, ...props }: PricingTableProps) => {
           </Link>
 
           <div className="mt-8 flex w-full flex-col divide-y">
-            <p className="py-4 font-medium text-slate-900">Everything in Community, plus:</p>
+            <p className="py-4 font-medium text-slate-900">Everything in Early Adopters, plus:</p>
             <p className="py-4 text-slate-900">Custom Subdomain</p>
             <p className="py-4 text-slate-900">Compliance Check</p>
             <p className="py-4 text-slate-900">Guaranteed Uptime</p>

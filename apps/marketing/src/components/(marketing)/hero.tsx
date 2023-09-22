@@ -108,7 +108,7 @@ export const Hero = ({ className, ...props }: HeroProps) => {
             className="rounded-full bg-transparent backdrop-blur-sm"
             onClick={onSignUpClick}
           >
-            Get the Community Plan
+            Get the Early Adopters Plan
             <span className="bg-primary -mr-2 ml-2.5 rounded-full px-2 py-1.5 text-xs">
               $30/mo. forever!
             </span>
