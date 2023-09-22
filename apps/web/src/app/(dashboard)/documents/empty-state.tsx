@@ -47,4 +47,4 @@ export const EmptyDocumentState = ({ status }: EmptyDocumentProps) => {
       </div>
     </div>
   );
-}
+};
