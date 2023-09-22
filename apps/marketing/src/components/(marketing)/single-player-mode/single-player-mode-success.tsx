@@ -107,16 +107,16 @@ export default function SinglePlayerModeSuccess({
         </div>
       </div>
 
-      <p className="text-muted-foreground/60 mt-36 text-center text-sm">
-        View the{' '}
+      <p className="text-muted-foreground/60 mt-16 text-center text-sm">
+        Create a{' '}
         <Link
-          href="/pricing"
+          href={`${process.env.NEXT_PUBLIC_WEBAPP_URL}/signup`}
           target="_blank"
           className="text-documenso-700 hover:text-documenso-600 whitespace-nowrap"
         >
-          community plan
+          free account
         </Link>{' '}
-        to access the full range of features provided by Documenso
+        to access your signed documents at any time
       </p>
 
       <DocumentDialog
