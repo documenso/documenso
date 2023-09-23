@@ -17,7 +17,7 @@ async function postHandler(req: NextApiRequest, res: NextApiResponse) {
     return;
   }
 
-  const document: PrismaDocument = await getDocument(+documentId, req, res);
+  const document: PrismaDocument = await getDocument(documentId.toString(), req, res);
 
   // todo entity ownerships checks
   if (document.userId !== user.id) {
@@ -33,7 +33,7 @@ async function postHandler(req: NextApiRequest, res: NextApiResponse) {
       name: body.name.toString(),
     },
     create: {
-      documentId: +documentId,
+      documentId: documentId.toString(),
       email: body.email.toString(),
       name: body.name.toString(),
       token: short.generate().toString(),

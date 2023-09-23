@@ -24,7 +24,7 @@ async function getHandler(req: NextApiRequest, res: NextApiResponse) {
   // todo entity ownerships checks
 
   const fields = await prisma.field.findMany({
-    where: { documentId: +documentId },
+    where: { documentId: documentId.toString() },
     include: { Recipient: true },
   });
 
@@ -56,12 +56,12 @@ async function postHandler(req: NextApiRequest, res: NextApiResponse) {
       where: { token: recipientToken?.toString() },
     });
 
-    if (!recipient || recipient?.documentId !== +documentId)
+    if (!recipient || recipient?.documentId !== documentId)
       return res.status(401).send("Recipient does not have access to this document.");
   }
 
   if (user) {
-    const document: PrismaDocument = await getDocument(+documentId, req, res);
+    const document: PrismaDocument = await getDocument(documentId.toString(), req, res);
     // todo entity ownerships checks
     if (document.userId !== user.id) {
       return res.status(401).send("User does not have access to this document.");
@@ -78,7 +78,7 @@ async function postHandler(req: NextApiRequest, res: NextApiResponse) {
       customText: body.customText,
     },
     create: {
-      documentId: +documentId,
+      documentId: documentId.toString(),
       type: body.type,
       page: +body.page,
       inserted: false,

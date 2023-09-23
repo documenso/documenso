@@ -75,7 +75,7 @@ const DocumentsPage: NextPageWithLayout = (props: any) => {
     setFilteredDocuments(filterDocumentes(documents));
   }, [documents, selectedStatusFilter, selectedCreatedFilter]);
 
-  function showDocument(documentId: number) {
+  function showDocument(documentId: string) {
     router.push(`/documents/${documentId}/recipients`);
   }
 
@@ -145,16 +145,16 @@ const DocumentsPage: NextPageWithLayout = (props: any) => {
             </Button>
           </div>
         </div>
-        <div className="mt-3 mb-12 flex flex-wrap items-center justify-start gap-x-4 md:justify-end gap-y-4">
+        <div className="mt-3 mb-12 flex flex-wrap items-center justify-start gap-x-4 gap-y-4 md:justify-end">
           <SelectBox
-            className="block flex-1 md:flex-none md:w-1/4"
+            className="block flex-1 md:w-1/4 md:flex-none"
             label="Status"
             options={statusFilters}
             value={selectedStatusFilter}
             onChange={handleStatusFilterChange}
           />
           <SelectBox
-            className="block flex-1 md:flex-none md:w-1/4"
+            className="block flex-1 md:w-1/4 md:flex-none"
             label="Created"
             options={createdFilter}
             value={selectedCreatedFilter}
@@ -392,7 +392,9 @@ const DocumentsPage: NextPageWithLayout = (props: any) => {
             type="file"
             accept="application/pdf"
             onChange={(event: any) => {
-              uploadDocument(event);
+              uploadDocument(event).then(() => {
+                loadDocuments();
+              });
             }}
             hidden
           />

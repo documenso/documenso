@@ -109,7 +109,7 @@ export async function getServerSideProps(context: any) {
   const { id: documentId } = context.query;
 
   try {
-    const document: PrismaDocument = await getDocument(+documentId, context.req, context.res);
+    const document: PrismaDocument = await getDocument(documentId, context.req, context.res);
 
     return {
       props: {

@@ -4,6 +4,7 @@ import { NEXT_PUBLIC_WEBAPP_URL, classNames } from "@documenso/lib";
 import { createOrUpdateRecipient, deleteRecipient, sendSigningRequests } from "@documenso/lib/api";
 import { getDocument } from "@documenso/lib/query";
 import { getUserFromToken } from "@documenso/lib/server";
+import { useSubscription } from "@documenso/lib/stripe";
 import { Breadcrumb, Button, Dialog, IconButton, Tooltip } from "@documenso/ui";
 import Layout from "../../../components/layout";
 import { NextPageWithLayout } from "../../_app";
@@ -21,10 +22,11 @@ import {
 import { DocumentStatus, Document as PrismaDocument, Recipient } from "@prisma/client";
 import { FormProvider, useFieldArray, useForm, useWatch } from "react-hook-form";
 import { toast } from "react-hot-toast";
-import { useSubscription } from "@documenso/lib/stripe";
 
 export type FormValues = {
-  signers: Array<Pick<Recipient, 'id' | 'email' | 'name' | 'sendStatus' | 'readStatus' | 'signingStatus'>>;
+  signers: Array<
+    Pick<Recipient, "id" | "email" | "name" | "sendStatus" | "readStatus" | "signingStatus">
+  >;
 };
 
 type FormSigner = FormValues["signers"][number];
@@ -118,7 +120,7 @@ const RecipientsPage: NextPageWithLayout = (props: any) => {
                       : setOpen(true);
                   }}
                   disabled={
-                    !hasSubscription || 
+                    !hasSubscription ||
                     (formValues.length || 0) === 0 ||
                     !formValues.some(
                       (r) => r.email && !hasEmailError(r) && r.sendStatus === "NOT_SENT"
@@ -286,7 +288,7 @@ const RecipientsPage: NextPageWithLayout = (props: any) => {
                                     });
                                   }
                                 }}
-                                className="mx-1 group-hover:text-neon-dark group-hover:disabled:text-gray-400"
+                                className="group-hover:text-neon-dark mx-1 group-hover:disabled:text-gray-400"
                               />
                             </Tooltip>
                             <Tooltip label="Delete">
@@ -304,7 +306,7 @@ const RecipientsPage: NextPageWithLayout = (props: any) => {
                                     });
                                   }
                                 }}
-                                className="mx-1 group-hover:text-neon-dark group-hover:disabled:text-gray-400"
+                                className="group-hover:text-neon-dark mx-1 group-hover:disabled:text-gray-400"
                               />
                             </Tooltip>
                           </div>
@@ -364,7 +366,7 @@ export async function getServerSideProps(context: any) {
     };
 
   const { id: documentId } = context.query;
-  const document: PrismaDocument = await getDocument(+documentId, context.req, context.res);
+  const document: PrismaDocument = await getDocument(documentId, context.req, context.res);
 
   return {
     props: {

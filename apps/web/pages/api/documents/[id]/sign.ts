@@ -26,7 +26,7 @@ async function postHandler(req: NextApiRequest, res: NextApiResponse) {
 
   const document: PrismaDocument = await prisma.document.findFirstOrThrow({
     where: {
-      id: recipient.documentId,
+      id: recipient.documentId as string,
     },
     include: {
       Recipient: {

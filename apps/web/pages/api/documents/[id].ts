@@ -39,7 +39,7 @@ async function getHandler(req: NextApiRequest, res: NextApiResponse) {
       where: { id: recipient?.Document?.id },
     });
   } else {
-    document = await getDocument(+documentId, req, res);
+    document = await getDocument(documentId.toString(), req, res);
   }
 
   if (!document) res.status(404).end(`No document with id ${documentId} found.`);
@@ -81,7 +81,7 @@ async function deleteHandler(req: NextApiRequest, res: NextApiResponse) {
   await prisma.document
     .delete({
       where: {
-        id: +documentId,
+        id: documentId as string,
       },
     })
     .then(() => {

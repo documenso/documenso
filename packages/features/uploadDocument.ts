@@ -16,28 +16,31 @@ export const uploadDocument = async (event: ChangeEvent) => {
 
     body.append("document", document || "");
 
-    await toast.promise(
-      fetch("/api/documents", {
-        method: "POST",
-        body,
-      }).then((response: Response) => {
-        if (!response.ok) {
-          throw new Error("Could not upload document");
-        }
+    await toast
+      .promise(
+        fetch("/api/documents", {
+          method: "POST",
+          body,
+        }).then((response: Response) => {
+          if (!response.ok) {
+            throw new Error("Could not upload document");
+          }
 
-        response.json().then((createdDocumentIdFromBody) => {
-          router.push(
-            `${NEXT_PUBLIC_WEBAPP_URL}/documents/${createdDocumentIdFromBody}/recipients`
-          );
-        });
-      }),
-      {
-        loading: "Uploading document...",
-        success: `${fileName} uploaded successfully.`,
-        error: "Could not upload document :/",
-      }
-    ).catch((_err) => {
-      // Do nothing
-    });
+          response.json().then((createdDocumentIdFromBody) => {
+            router.push(
+              `${NEXT_PUBLIC_WEBAPP_URL}/documents/${createdDocumentIdFromBody}/recipients`
+            );
+          });
+        }),
+        {
+          loading: "Uploading document...",
+          success: `${fileName} uploaded successfully.`,
+          error: "Could not upload document :/",
+        }
+      )
+      .catch((_err) => {
+        // Do nothing
+        console.log(_err);
+      });
   }
 };

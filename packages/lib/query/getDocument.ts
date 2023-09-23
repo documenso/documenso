@@ -3,7 +3,7 @@ import prisma from "@documenso/prisma";
 import { Document as PrismaDocument } from "@prisma/client";
 
 export const getDocument = async (
-  documentId: number,
+  documentId: string,
   req: any,
   res: any
 ): Promise<PrismaDocument> => {

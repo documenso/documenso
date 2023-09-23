@@ -9,7 +9,7 @@ import { Document as PrismaDocument } from "@prisma/client";
 
 async function getHandler(req: NextApiRequest, res: NextApiResponse) {
   const documentId = req.query.id || 1;
-  const document: PrismaDocument = await getDocument(+documentId, req, res);
+  const document: PrismaDocument = await getDocument(documentId.toString(), req, res);
   const signedDocument = await addDigitalSignature(document.document);
   res.setHeader("Content-Type", "application/pdf");
   res.setHeader("Content-Length", signedDocument.length);

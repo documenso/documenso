@@ -84,7 +84,7 @@ enum DocumentStatus {
 }
 
 model Document {
-  id        Int            @id @default(autoincrement())
+  id        String         @id @default(dbgenerated("gen_random_uuid()"))
   created   DateTime       @default(now())
   userId    Int
   User      User           @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -112,7 +112,7 @@ enum SigningStatus {
 
 model Recipient {
   id            Int           @id @default(autoincrement())
-  documentId    Int
+  documentId    String
   email         String        @db.VarChar(255)
   name          String        @default("") @db.VarChar(255)
   token         String
@@ -135,7 +135,7 @@ enum FieldType {
 
 model Field {
   id          Int        @id @default(autoincrement())
-  documentId  Int
+  documentId  String
   recipientId Int?
   type        FieldType
   page        Int

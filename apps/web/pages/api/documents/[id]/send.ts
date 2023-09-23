@@ -19,20 +19,20 @@ async function postHandler(req: NextApiRequest, res: NextApiResponse) {
       return res.status(400).send("Missing parameter documentId.");
     }
 
-    const document: PrismaDocument = await getDocument(+documentId, req, res);
+    const document: PrismaDocument = await getDocument(documentId.toString(), req, res);
 
     if (!document) {
       res.status(404).end(`No document with id ${documentId} found.`);
     }
 
     let recipientCondition: any = {
-      documentId: +documentId,
+      documentId: documentId,
       sendStatus: SendStatus.NOT_SENT,
     };
 
     if (resendTo.length) {
       recipientCondition = {
-        documentId: +documentId,
+        documentId: documentId,
         id: { in: resendTo },
       };
     }
