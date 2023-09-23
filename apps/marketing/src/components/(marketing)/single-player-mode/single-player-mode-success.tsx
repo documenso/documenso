@@ -6,6 +6,7 @@ import Link from 'next/link';
 
 import { Share } from 'lucide-react';
 
+import { useFeatureFlags } from '@documenso/lib/client-only/providers/feature-flag';
 import { getFile } from '@documenso/lib/universal/upload/get-file';
 import { DocumentWithRecipient } from '@documenso/prisma/types/document-with-recipient';
 import DocumentDialog from '@documenso/ui/components/document/document-dialog';
@@ -29,6 +30,10 @@ export default function SinglePlayerModeSuccess({
   className,
   document,
 }: SinglePlayerModeSuccessProps) {
+  const { getFlag } = useFeatureFlags();
+
+  const isConfettiEnabled = getFlag('marketing_spm_confetti');
+
   const [showDocumentDialog, setShowDocumentDialog] = useState(false);
   const [isFetchingDocumentFile, setIsFetchingDocumentFile] = useState(false);
   const [documentFile, setDocumentFile] = useState<string | null>(null);
@@ -66,7 +71,9 @@ export default function SinglePlayerModeSuccess({
 
   return (
     <div className="flex min-h-[calc(100vh-10rem)] flex-col items-center justify-center sm:min-h-[calc(100vh-13rem)]">
-      <ConfettiScreen duration={3000} gravity={0.075} initialVelocityY={50} wind={0.005} />
+      {isConfettiEnabled && (
+        <ConfettiScreen duration={3000} gravity={0.075} initialVelocityY={50} wind={0.005} />
+      )}
 
       <h2 className="text-center text-2xl font-semibold leading-normal md:text-3xl lg:mb-2 lg:text-4xl">
         You have signed

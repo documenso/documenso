@@ -110,7 +110,7 @@ export function SinglePlayerModeSignatureField({
       ) : (
         <button
           onClick={() => onClick?.()}
-          className="group-hover:text-primary text-muted-foreground absolute inset-0 duration-200"
+          className="group-hover:text-primary text-muted-foreground absolute inset-0 h-full w-full duration-200"
         >
           Signature
         </button>
@@ -166,7 +166,7 @@ export function SinglePlayerModeCustomTextField({
       ) : (
         <button
           onClick={() => onClick?.()}
-          className="group-hover:text-primary text-muted-foreground absolute inset-0 text-lg duration-200"
+          className="group-hover:text-primary text-muted-foreground absolute inset-0 h-full w-full text-lg duration-200"
         >
           {match(field.type)
             .with(FieldType.DATE, () => 'Date')
