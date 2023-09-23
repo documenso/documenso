@@ -50,10 +50,10 @@ export const insertFieldInPDF = async (pdf: PDFDocument, field: FieldWithSignatu
     let imageWidth = image.width;
     let imageHeight = image.height;
 
-    const initialDimensions = {
-      width: imageWidth,
-      height: imageHeight,
-    };
+    // const initialDimensions = {
+    //   width: imageWidth,
+    //   height: imageHeight,
+    // };
 
     const scalingFactor = Math.min(fieldWidth / imageWidth, fieldHeight / imageHeight, 1);
 
@@ -76,10 +76,10 @@ export const insertFieldInPDF = async (pdf: PDFDocument, field: FieldWithSignatu
     let textWidth = font.widthOfTextAtSize(field.customText, fontSize);
     const textHeight = font.heightAtSize(fontSize);
 
-    const initialDimensions = {
-      width: textWidth,
-      height: textHeight,
-    };
+    // const initialDimensions = {
+    //   width: textWidth,
+    //   height: textHeight,
+    // };
 
     const scalingFactor = Math.min(fieldWidth / textWidth, fieldHeight / textHeight, 1);
 
