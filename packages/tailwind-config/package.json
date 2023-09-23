@@ -3,6 +3,9 @@
   "version": "0.0.0",
   "main": "index.cjs",
   "license": "MIT",
+  "scripts": {
+    "clean": "rimraf node_modules"
+  },
   "dependencies": {
     "autoprefixer": "^10.4.13",
     "postcss": "^8.4.21",
