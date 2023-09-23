@@ -13,6 +13,7 @@ export type BarMetricProps<T extends Record<string, unknown>> = HTMLAttributes<H
   title: string;
   label: string;
   chartHeight?: number;
+  extraInfo?: JSX.Element;
 };
 
 export const BarMetric = <T extends Record<string, Record<keyof T[string], unknown>>>({
@@ -22,6 +23,7 @@ export const BarMetric = <T extends Record<string, Record<keyof T[string], unkno
   title,
   label,
   chartHeight = 400,
+  extraInfo,
   ...props
 }: BarMetricProps<T>) => {
   const formattedData = Object.keys(data)
@@ -33,7 +35,10 @@ export const BarMetric = <T extends Record<string, Record<keyof T[string], unkno
 
   return (
     <div className={cn('flex flex-col', className)} {...props}>
-      <h3 className="px-4 text-lg font-semibold">{title}</h3>
+      <div className="flex items-center px-4">
+        <h3 className="text-lg font-semibold">{title}</h3>
+        <span>{extraInfo}</span>
+      </div>
 
       <div className="border-border mt-2.5 flex flex-1 items-center justify-center rounded-2xl border pr-2 shadow-sm hover:shadow">
         <ResponsiveContainer width="100%" height={chartHeight}>
