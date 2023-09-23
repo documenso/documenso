@@ -8,6 +8,7 @@ import { BarMetric } from './bar-metrics';
 import { CapTable } from './cap-table';
 import { FundingRaised } from './funding-raised';
 import { TeamMembers } from './team-members';
+import { OpenPageTooltip } from './tooltip';
 
 export const revalidate = 3600;
 
@@ -133,6 +134,7 @@ export default async function OpenPage() {
           title="Early Adopters"
           label="Early Adopters"
           className="col-span-12 lg:col-span-6"
+          extraInfo={<OpenPageTooltip />}
         />
 
         <BarMetric<StargazersType>
