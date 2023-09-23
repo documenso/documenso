@@ -101,6 +101,7 @@ export const SigningForm = ({ document, recipient, fields }: SigningFormProps) =
                 className="dark:bg-muted dark:hover:bg-muted/80 w-full  bg-black/5 hover:bg-black/10"
                 variant="secondary"
                 size="lg"
+                onClick={() => router.back()}
               >
                 Cancel
               </Button>
