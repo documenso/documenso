@@ -36,6 +36,7 @@ export function SinglePlayerModeFieldCardContainer({
       <AnimatePresence mode="wait" initial={false}>
         <motion.div
           key={field.inserted ? 'inserted' : 'not-inserted'}
+          className="flex items-center justify-center p-2"
           initial={{ opacity: 0 }}
           animate={{
             opacity: 1,
@@ -94,7 +95,7 @@ export function SinglePlayerModeSignatureField({
         <img
           src={insertedBase64Signature}
           alt="Your signature"
-          className="h-full w-full object-contain"
+          className="h-full max-w-full object-contain dark:invert"
         />
       ) : insertedTypeSignature ? (
         <p
