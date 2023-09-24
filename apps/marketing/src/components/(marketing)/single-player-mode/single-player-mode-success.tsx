@@ -77,12 +77,11 @@ export default function SinglePlayerModeSuccess({
 
       <h2 className="text-center text-2xl font-semibold leading-normal md:text-3xl lg:mb-2 lg:text-4xl">
         You have signed
+        <span className="mt-2 block">{document.title}</span>
       </h2>
-      <h3 className="text-foreground/80 mb-6 text-center text-lg font-semibold md:text-xl lg:mb-8 lg:text-3xl">
-        {document.title}
-      </h3>
 
       <SigningCard3D
+        className="mt-8"
         name={document.Recipient.name || document.Recipient.email}
         signingCelebrationImage={signingCelebration}
       />

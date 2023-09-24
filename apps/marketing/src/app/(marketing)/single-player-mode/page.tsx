@@ -177,12 +177,12 @@ export default function SinglePlayerModePage() {
       <div className="text-center">
         <h1 className="text-3xl font-bold lg:text-5xl">Single Player Mode</h1>
 
-        <p className="mt-4 text-lg leading-normal text-[#31373D]">
+        <p className="text-foreground mx-auto mt-4 max-w-[50ch] text-lg leading-normal">
           View our{' '}
           <Link
             href={'/pricing'}
             target="_blank"
-            className="font-semibold transition-colors hover:text-[#31373D]/80"
+            className="hover:text-foreground/80 font-semibold transition-colors"
           >
             community plan
           </Link>{' '}

@@ -10,6 +10,7 @@ import { cn } from '@documenso/ui/lib/utils';
 import { Card, CardContent } from '@documenso/ui/primitives/card';
 
 export type SigningCardProps = {
+  className?: string;
   name: string;
   signingCelebrationImage?: StaticImageData;
 };
@@ -17,9 +18,9 @@ export type SigningCardProps = {
 /**
  * 2D signing card.
  */
-export const SigningCard = ({ name, signingCelebrationImage }: SigningCardProps) => {
+export const SigningCard = ({ className, name, signingCelebrationImage }: SigningCardProps) => {
   return (
-    <div className="relative w-full max-w-xs md:max-w-sm">
+    <div className={cn('relative w-full max-w-xs md:max-w-sm', className)}>
       <SigningCardContent name={name} />
 
       {signingCelebrationImage && (
@@ -32,7 +33,7 @@ export const SigningCard = ({ name, signingCelebrationImage }: SigningCardProps)
 /**
  * 3D signing card that follows the mouse movement within a certain range.
  */
-export const SigningCard3D = ({ name, signingCelebrationImage }: SigningCardProps) => {
+export const SigningCard3D = ({ className, name, signingCelebrationImage }: SigningCardProps) => {
   // Should use % based dimensions by calculating the window height/width.
   const boundary = 400;
 
@@ -55,7 +56,7 @@ export const SigningCard3D = ({ name, signingCelebrationImage }: SigningCardProp
   const sheenGradient = useMotionTemplate`linear-gradient(
     30deg,
     transparent,
-    rgba(200 200 200 / ${trackMouse ? sheenOpacity : 0}) ${sheenPosition}%,
+    rgba(var(--sheen-color) / ${trackMouse ? sheenOpacity : 0}) ${sheenPosition}%,
     transparent)`;
 
   const cardRef = useRef<HTMLDivElement>(null);
@@ -83,14 +84,12 @@ export const SigningCard3D = ({ name, signingCelebrationImage }: SigningCardProp
       // Mouse enters enter boundary.
       if (distance <= boundary && !trackMouse) {
         setTrackMouse(true);
-      }
-
-      if (!trackMouse) {
+      } else if (!trackMouse) {
         return;
       }
 
-      void animate(cardX, offsetX, { duration: 0.125 });
-      void animate(cardY, offsetY, { duration: 0.125 });
+      cardX.set(offsetX);
+      cardY.set(offsetY);
 
       clearTimeout(timeoutRef.current);
 
@@ -114,9 +113,12 @@ export const SigningCard3D = ({ name, signingCelebrationImage }: SigningCardProp
   }, [onMouseMove]);
 
   return (
-    <div className="relative w-full max-w-xs md:max-w-sm" style={{ perspective: 800 }}>
+    <div
+      className={cn('relative w-full max-w-xs md:max-w-sm', className)}
+      style={{ perspective: 800 }}
+    >
       <motion.div
-        className="bg-background w-full"
+        className="bg-background w-full [--sheen-color:180_180_180] dark:[--sheen-color:200_200_200]"
         ref={cardRef}
         style={{
           perspective: '800',
@@ -124,6 +126,7 @@ export const SigningCard3D = ({ name, signingCelebrationImage }: SigningCardProp
           transformStyle: 'preserve-3d',
           rotateX,
           rotateY,
+          // willChange: 'transform background-image',
         }}
       >
         <SigningCardContent className="bg-transparent" name={name} />
@@ -194,7 +197,7 @@ const SigningCardImage = ({ signingCelebrationImage }: SigningCardImageProps) =>
       <Image
         src={signingCelebrationImage}
         alt="background pattern"
-        className="w-full"
+        className="w-full dark:invert dark:sepia"
         style={{
           mask: 'radial-gradient(rgba(255, 255, 255, 1) 0%, transparent 67%)',
           WebkitMask: 'radial-gradient(rgba(255, 255, 255, 1) 0%, transparent 67%)',
