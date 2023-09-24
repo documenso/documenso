@@ -37,7 +37,7 @@ export default async function OSSFriendsPage() {
         <Image
           src={backgroundPattern}
           alt="background pattern"
-          className="-mr-[15vw] -mt-[15vh] h-full max-h-[150vh] scale-125 object-cover dark:invert dark:sepia md:-mr-[50vw] md:scale-150 lg:scale-[175%]"
+          className="-mr-[15vw] -mt-[15vh] h-full max-h-[150vh] scale-125 object-cover dark:contrast-[70%] dark:invert dark:sepia md:-mr-[50vw] md:scale-150 lg:scale-[175%]"
         />
       </div>
     </div>
