@@ -44,7 +44,7 @@
     "zod": "^3.21.4"
   },
   "devDependencies": {
-    "@types/formidable": "^2.0.6",
+    "@types/formidable": "^3.4.3",
     "@types/luxon": "^3.3.1",
     "@types/node": "20.1.0",
     "@types/react": "18.2.18",
