@@ -54,6 +54,18 @@ export default async function handleFeatureFlagGet(req: Request) {
 
   res.headers.set('Cache-Control', 'public, s-maxage=60, stale-while-revalidate=300');
 
+  const origin = req.headers.get('Origin');
+
+  if (origin) {
+    if (origin.startsWith(process.env.NEXT_PUBLIC_WEBAPP_URL ?? 'http://localhost:3000')) {
+      res.headers.set('Access-Control-Allow-Origin', origin);
+    }
+
+    if (origin.startsWith(process.env.NEXT_PUBLIC_MARKETING_URL ?? 'http://localhost:3001')) {
+      res.headers.set('Access-Control-Allow-Origin', origin);
+    }
+  }
+
   return res;
 }
 

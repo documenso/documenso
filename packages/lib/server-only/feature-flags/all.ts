@@ -35,5 +35,22 @@ export default async function handlerFeatureFlagAll(req: Request) {
 
   res.headers.set('Cache-Control', 'public, s-maxage=60, stale-while-revalidate=300');
 
+  const origin = req.headers.get('origin');
+
+  console.log({ origin });
+
+  if (origin) {
+    if (origin.startsWith(process.env.NEXT_PUBLIC_WEBAPP_URL ?? 'http://localhost:3000')) {
+      res.headers.set('Access-Control-Allow-Origin', origin);
+    }
+
+    console.log('marketing url', process.env.NEXT_PUBLIC_MARKETING_URL);
+
+    if (origin.startsWith(process.env.NEXT_PUBLIC_MARKETING_URL ?? 'http://localhost:3001')) {
+      console.log('setting marketing origin');
+      res.headers.set('Access-Control-Allow-Origin', origin);
+    }
+  }
+
   return res;
 }
