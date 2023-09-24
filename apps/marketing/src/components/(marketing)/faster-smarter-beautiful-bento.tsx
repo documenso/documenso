@@ -22,7 +22,7 @@ export const FasterSmarterBeautifulBento = ({
         <Image
           src={backgroundPattern}
           alt="background pattern"
-          className="h-full scale-125 object-cover md:scale-150 lg:scale-[175%]"
+          className="h-full scale-125 object-cover dark:invert dark:sepia md:scale-150 lg:scale-[175%]"
         />
       </div>
       <h2 className="px-0 text-[22px] font-semibold md:px-12 md:text-4xl lg:px-24">
@@ -33,41 +33,53 @@ export const FasterSmarterBeautifulBento = ({
       <div className="mt-6 grid grid-cols-2 gap-8 md:mt-8">
         <Card className="col-span-2" degrees={45} gradient>
           <CardContent className="grid grid-cols-12 gap-8 overflow-hidden p-6 lg:aspect-[2.5/1]">
-            <p className="col-span-12 leading-relaxed text-[#555E67] lg:col-span-6">
+            <p className="text-foreground/80 col-span-12 leading-relaxed lg:col-span-6">
               <strong className="block">Fast.</strong>
               When it comes to sending or receiving a contract, you can count on lightning-fast
               speeds.
             </p>
 
             <div className="col-span-12 -my-6 -mr-6 flex items-end justify-end pt-12 lg:col-span-6">
-              <Image src={cardFastFigure} alt="its fast" className="max-w-[80%] lg:max-w-none" />
+              <Image
+                src={cardFastFigure}
+                alt="its fast"
+                className="max-w-[80%] dark:contrast-[70%] dark:hue-rotate-180 dark:invert lg:max-w-none"
+              />
             </div>
           </CardContent>
         </Card>
 
         <Card className="col-span-2 lg:col-span-1" spotlight>
           <CardContent className="grid grid-cols-1 gap-8 p-6">
-            <p className="leading-relaxed text-[#555E67]">
+            <p className="text-foreground/80 leading-relaxed">
               <strong className="block">Beautiful.</strong>
               Because signing should be celebrated. That’s why we care about the smallest detail in
               our product.
             </p>
 
             <div className="flex items-center justify-center p-8">
-              <Image src={cardBeautifulFigure} alt="its fast" className="w-full max-w-xs" />
+              <Image
+                src={cardBeautifulFigure}
+                alt="its fast"
+                className="w-full max-w-xs dark:contrast-[70%] dark:hue-rotate-180 dark:invert"
+              />
             </div>
           </CardContent>
         </Card>
 
         <Card className="col-span-2 lg:col-span-1" spotlight>
           <CardContent className="grid grid-cols-1 gap-8 p-6">
-            <p className="leading-relaxed text-[#555E67]">
+            <p className="text-foreground/80 leading-relaxed">
               <strong className="block">Smart.</strong>
               Our custom templates come with smart rules that can help you save time and energy.
             </p>
 
             <div className="flex items-center justify-center p-8">
-              <Image src={cardSmartFigure} alt="its fast" className="w-full max-w-[16rem]" />
+              <Image
+                src={cardSmartFigure}
+                alt="its fast"
+                className="w-full max-w-[16rem] dark:contrast-[70%] dark:hue-rotate-180 dark:invert"
+              />
             </div>
           </CardContent>
         </Card>

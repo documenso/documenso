@@ -6,7 +6,7 @@ export type GetSubscriptionByUserIdOptions = {
   userId: number;
 };
 
-export const getSubscriptionByUserId = ({ userId }: GetSubscriptionByUserIdOptions) => {
+export const getSubscriptionByUserId = async ({ userId }: GetSubscriptionByUserIdOptions) => {
   return prisma.subscription.findFirst({
     where: {
       userId,

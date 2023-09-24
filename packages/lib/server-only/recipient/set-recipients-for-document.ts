@@ -29,6 +29,11 @@ export const setRecipientsForDocument = async ({
     throw new Error('Document not found');
   }
 
+  const normalizedRecipients = recipients.map((recipient) => ({
+    ...recipient,
+    email: recipient.email.toLowerCase(),
+  }));
+
   const existingRecipients = await prisma.recipient.findMany({
     where: {
       documentId,
@@ -37,13 +42,13 @@ export const setRecipientsForDocument = async ({
 
   const removedRecipients = existingRecipients.filter(
     (existingRecipient) =>
-      !recipients.find(
+      !normalizedRecipients.find(
         (recipient) =>
           recipient.id === existingRecipient.id || recipient.email === existingRecipient.email,
       ),
   );
 
-  const linkedRecipients = recipients
+  const linkedRecipients = normalizedRecipients
     .map((recipient) => {
       const existing = existingRecipients.find(
         (existingRecipient) =>
@@ -62,27 +67,26 @@ export const setRecipientsForDocument = async ({
     });
 
   const persistedRecipients = await prisma.$transaction(
+    // Disabling as wrapping promises here causes type issues
+    // eslint-disable-next-line @typescript-eslint/promise-function-async
     linkedRecipients.map((recipient) =>
-      recipient.id
-        ? prisma.recipient.update({
-            where: {
-              id: recipient.id,
-              documentId,
-            },
-            data: {
-              name: recipient.name,
-              email: recipient.email,
-              documentId,
-            },
-          })
-        : prisma.recipient.create({
-            data: {
-              name: recipient.name,
-              email: recipient.email,
-              token: nanoid(),
-              documentId,
-            },
-          }),
+      prisma.recipient.upsert({
+        where: {
+          id: recipient.id ?? -1,
+          documentId,
+        },
+        update: {
+          name: recipient.name,
+          email: recipient.email,
+          documentId,
+        },
+        create: {
+          name: recipient.name,
+          email: recipient.email,
+          token: nanoid(),
+          documentId,
+        },
+      }),
     ),
   );
 

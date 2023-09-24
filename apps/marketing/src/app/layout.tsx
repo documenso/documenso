@@ -7,6 +7,7 @@ import { getAllAnonymousFlags } from '@documenso/lib/universal/get-feature-flag'
 import { cn } from '@documenso/ui/lib/utils';
 import { Toaster } from '@documenso/ui/primitives/toaster';
 
+import { ThemeProvider } from '~/providers/next-theme';
 import { PlausibleProvider } from '~/providers/plausible';
 import { PostHogPageview } from '~/providers/posthog';
 
@@ -61,9 +62,12 @@ export default async function RootLayout({ children }: { children: React.ReactNo
 
       <body>
         <FeatureFlagProvider initialFlags={flags}>
-          <PlausibleProvider>{children}</PlausibleProvider>
-          <Toaster />
+          <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+            <PlausibleProvider>{children}</PlausibleProvider>
+          </ThemeProvider>
         </FeatureFlagProvider>
+
+        <Toaster />
       </body>
     </html>
   );
