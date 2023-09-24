@@ -18,26 +18,41 @@ export const Header = ({ className, ...props }: HeaderProps) => {
   return (
     <header className={cn('flex items-center justify-between', className)} {...props}>
       <Link href="/" className="z-10" onClick={() => setIsHamburgerMenuOpen(false)}>
-        <Image src="/logo.png" alt="Documenso Logo" width={170} height={25} />
+        <Image
+          src="/logo.png"
+          alt="Documenso Logo"
+          className="dark:invert"
+          width={170}
+          height={25}
+        />
       </Link>
 
       <div className="hidden items-center gap-x-6 md:flex">
-        <Link href="/pricing" className="text-sm font-semibold text-[#8D8D8D] hover:text-[#6D6D6D]">
+        <Link
+          href="/pricing"
+          className="text-muted-foreground hover:text-muted-foreground/80 text-sm font-semibold"
+        >
           Pricing
         </Link>
 
-        <Link href="/blog" className="text-sm font-semibold text-[#8D8D8D] hover:text-[#6D6D6D]">
+        <Link
+          href="/blog"
+          className="text-muted-foreground hover:text-muted-foreground/80 text-sm font-semibold"
+        >
           Blog
         </Link>
 
-        <Link href="/open" className="text-sm font-semibold text-[#8D8D8D] hover:text-[#6D6D6D]">
+        <Link
+          href="/open"
+          className="text-muted-foreground hover:text-muted-foreground/80 text-sm font-semibold"
+        >
           Open
         </Link>
 
         <Link
           href="https://app.documenso.com/login"
           target="_blank"
-          className="text-sm font-semibold text-[#8D8D8D] hover:text-[#6D6D6D]"
+          className="text-muted-foreground hover:text-muted-foreground/80 text-sm font-semibold"
         >
           Sign in
         </Link>

@@ -118,7 +118,7 @@ export const ClaimPlanDialog = ({ className, planId, children }: ClaimPlanDialog
             )}
 
             <div>
-              <Label className="text-slate-500">Name</Label>
+              <Label className="text-muted-foreground">Name</Label>
 
               <Input type="text" className="mt-2" {...register('name')} autoFocus />
 
@@ -126,7 +126,7 @@ export const ClaimPlanDialog = ({ className, planId, children }: ClaimPlanDialog
             </div>
 
             <div>
-              <Label className="text-slate-500">Email</Label>
+              <Label className="text-muted-foreground">Email</Label>
 
               <Input type="email" className="mt-2" {...register('email')} />
 

@@ -281,7 +281,7 @@ export const AddFieldsFormPartial = ({
           {selectedField && (
             <Card
               className={cn(
-                'pointer-events-none fixed z-50 cursor-pointer bg-white transition-opacity',
+                'bg-background pointer-events-none fixed z-50 cursor-pointer transition-opacity',
                 {
                   'border-primary': isFieldWithinBounds,
                   'opacity-50': !isFieldWithinBounds,

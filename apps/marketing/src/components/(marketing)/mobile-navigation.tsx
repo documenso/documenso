@@ -55,7 +55,13 @@ export const MobileNavigation = ({ isMenuOpen, onMenuOpenChange }: MobileNavigat
     <Sheet open={isMenuOpen} onOpenChange={onMenuOpenChange}>
       <SheetContent className="w-full max-w-[400px]">
         <Link href="/" className="z-10" onClick={handleMenuItemClick}>
-          <Image src="/logo.png" alt="Documenso Logo" width={170} height={25} />
+          <Image
+            src="/logo.png"
+            alt="Documenso Logo"
+            className="dark:invert"
+            width={170}
+            height={25}
+          />
         </Link>
 
         <motion.div
@@ -85,7 +91,7 @@ export const MobileNavigation = ({ isMenuOpen, onMenuOpenChange }: MobileNavigat
               }}
             >
               <Link
-                className="text-2xl font-semibold text-[#8D8D8D] hover:text-[#6D6D6D]"
+                className="text-foreground hover:text-foreground/80 text-2xl font-semibold"
                 href={href}
                 onClick={() => handleMenuItemClick()}
               >
@@ -99,7 +105,7 @@ export const MobileNavigation = ({ isMenuOpen, onMenuOpenChange }: MobileNavigat
           <Link
             href="https://twitter.com/documenso"
             target="_blank"
-            className="text-[#8D8D8D] hover:text-[#6D6D6D]"
+            className="text-foreground hover:text-foreground/80"
           >
             <Twitter className="h-6 w-6" />
           </Link>
@@ -107,7 +113,7 @@ export const MobileNavigation = ({ isMenuOpen, onMenuOpenChange }: MobileNavigat
           <Link
             href="https://github.com/documenso/documenso"
             target="_blank"
-            className="text-[#8D8D8D] hover:text-[#6D6D6D]"
+            className="text-foreground hover:text-foreground/80"
           >
             <Github className="h-6 w-6" />
           </Link>
@@ -115,7 +121,7 @@ export const MobileNavigation = ({ isMenuOpen, onMenuOpenChange }: MobileNavigat
           <Link
             href="https://documen.so/discord"
             target="_blank"
-            className="text-[#8D8D8D] hover:text-[#6D6D6D]"
+            className="text-foreground hover:text-foreground/80"
           >
             <MessagesSquare className="h-6 w-6" />
           </Link>

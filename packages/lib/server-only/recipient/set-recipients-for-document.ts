@@ -67,27 +67,26 @@ export const setRecipientsForDocument = async ({
     });
 
   const persistedRecipients = await prisma.$transaction(
+    // Disabling as wrapping promises here causes type issues
+    // eslint-disable-next-line @typescript-eslint/promise-function-async
     linkedRecipients.map((recipient) =>
-      recipient.id
-        ? prisma.recipient.update({
-            where: {
-              id: recipient.id,
-              documentId,
-            },
-            data: {
-              name: recipient.name,
-              email: recipient.email,
-              documentId,
-            },
-          })
-        : prisma.recipient.create({
-            data: {
-              name: recipient.name,
-              email: recipient.email,
-              token: nanoid(),
-              documentId,
-            },
-          }),
+      prisma.recipient.upsert({
+        where: {
+          id: recipient.id ?? -1,
+          documentId,
+        },
+        update: {
+          name: recipient.name,
+          email: recipient.email,
+          documentId,
+        },
+        create: {
+          name: recipient.name,
+          email: recipient.email,
+          token: nanoid(),
+          documentId,
+        },
+      }),
     ),
   );
 

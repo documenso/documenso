@@ -26,7 +26,7 @@ export default function NotFound() {
           <Image
             src={backgroundPattern}
             alt="background pattern"
-            className="-mr-[50vw] -mt-[15vh] h-full scale-100 object-cover md:scale-100 lg:scale-[100%]"
+            className="-mr-[50vw] -mt-[15vh] h-full scale-100 object-cover dark:invert dark:sepia md:scale-100 lg:scale-[100%]"
             priority
           />
         </motion.div>

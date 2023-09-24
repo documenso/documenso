@@ -169,6 +169,7 @@ export const EditDocumentForm = ({
 
           {step === 'signers' && (
             <AddSignersFormPartial
+              key={recipients.length}
               documentFlow={documentFlow.signers}
               recipients={recipients}
               fields={fields}
@@ -179,6 +180,7 @@ export const EditDocumentForm = ({
 
           {step === 'fields' && (
             <AddFieldsFormPartial
+              key={fields.length}
               documentFlow={documentFlow.fields}
               recipients={recipients}
               fields={fields}
