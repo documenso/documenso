@@ -29,6 +29,11 @@ export const setRecipientsForDocument = async ({
     throw new Error('Document not found');
   }
 
+  const normalizedRecipients = recipients.map((recipient) => ({
+    ...recipient,
+    email: recipient.email.toLowerCase(),
+  }));
+
   const existingRecipients = await prisma.recipient.findMany({
     where: {
       documentId,
@@ -37,13 +42,13 @@ export const setRecipientsForDocument = async ({
 
   const removedRecipients = existingRecipients.filter(
     (existingRecipient) =>
-      !recipients.find(
+      !normalizedRecipients.find(
         (recipient) =>
           recipient.id === existingRecipient.id || recipient.email === existingRecipient.email,
       ),
   );
 
-  const linkedRecipients = recipients
+  const linkedRecipients = normalizedRecipients
     .map((recipient) => {
       const existing = existingRecipients.find(
         (existingRecipient) =>
