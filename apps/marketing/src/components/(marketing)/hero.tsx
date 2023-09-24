@@ -86,7 +86,7 @@ export const Hero = ({ className, ...props }: HeroProps) => {
           <Image
             src={backgroundPattern}
             alt="background pattern"
-            className="-mr-[50vw] -mt-[15vh] h-full scale-125 object-cover dark:invert dark:sepia md:scale-150 lg:scale-[175%]"
+            className="-mr-[50vw] -mt-[15vh] h-full scale-125 object-cover dark:contrast-[70%] dark:invert dark:sepia md:scale-150 lg:scale-[175%]"
           />
         </motion.div>
       </div>
@@ -115,7 +115,7 @@ export const Hero = ({ className, ...props }: HeroProps) => {
             onClick={onSignUpClick}
           >
             Get the Community Plan
-            <span className="bg-primary dark:text-background -mr-2 ml-2.5 rounded-full px-2 py-1.5 text-xs">
+            <span className="bg-primary dark:text-background -mr-2.5 ml-2.5 rounded-full px-2 py-1.5 text-xs">
               $30/mo. forever!
             </span>
           </Button>
@@ -134,11 +134,16 @@ export const Hero = ({ className, ...props }: HeroProps) => {
               variants={HeroTitleVariants}
               initial="initial"
               animate="animate"
-              className="border-primary mx-auto mt-8 w-fit rounded-xl border-2 bg-white transition-colors hover:bg-slate-50/60"
+              className="border-primary bg-background hover:bg-muted mx-auto mt-8 w-60 rounded-xl border transition duration-300"
             >
               <Link href="/single-player-mode" className="block px-4 py-2 text-center">
-                <h2 className="text-xs font-semibold text-[#727272]">Single Player Mode</h2>
-                <h1 className="font-semibold leading-5 text-[#606060]">Self sign documents here</h1>
+                <h2 className="text-muted-foreground text-xs font-semibold">
+                  Introducing Single Player Mode
+                </h2>
+
+                <h1 className="text-foreground mt-1.5 font-medium leading-5">
+                  Self sign for free!
+                </h1>
               </Link>
             </motion.div>
           ))
