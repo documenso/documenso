@@ -67,7 +67,7 @@ export const UploadDocument = ({ className }: UploadDocumentProps) => {
       <DocumentDropzone className="min-h-[40vh]" onDrop={onFileDrop} />
 
       {isLoading && (
-        <div className="absolute inset-0 flex items-center justify-center bg-white/50">
+        <div className="bg-background/50 absolute inset-0 flex items-center justify-center">
           <Loader className="text-muted-foreground h-12 w-12 animate-spin" />
         </div>
       )}

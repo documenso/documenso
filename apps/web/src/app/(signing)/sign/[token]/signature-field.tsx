@@ -130,7 +130,7 @@ export const SignatureField = ({ field, recipient }: SignatureFieldProps) => {
         <img
           src={signature.signatureImageAsBase64}
           alt={`Signature for ${recipient.name}`}
-          className="h-full w-full object-contain"
+          className="h-full w-full object-contain dark:invert"
         />
       )}
 

@@ -40,8 +40,8 @@ export const Callout = ({ starCount }: CalloutProps) => {
         className="rounded-full bg-transparent backdrop-blur-sm"
         onClick={onSignUpClick}
       >
-        Get the Early Adopters Plan
-        <span className="bg-primary -mr-2.5 ml-2.5 rounded-full px-2 py-1.5 text-xs">
+        Get the Community Plan
+        <span className="bg-primary dark:text-background -mr-2.5 ml-2.5 rounded-full px-2 py-1.5 text-xs">
           $30/mo. forever!
         </span>
       </Button>
@@ -55,7 +55,7 @@ export const Callout = ({ starCount }: CalloutProps) => {
           <Github className="mr-2 h-5 w-5" />
           Star on Github
           {starCount && starCount > 0 && (
-            <span className="bg-primary -mr-2.5 ml-2.5 rounded-full px-2 py-1.5 text-xs">
+            <span className="bg-primary dark:text-background -mr-2.5 ml-2.5 rounded-full px-2 py-1.5 text-xs">
               {starCount.toLocaleString('en-US')}
             </span>
           )}

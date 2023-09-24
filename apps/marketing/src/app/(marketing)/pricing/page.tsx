@@ -24,10 +24,10 @@ export default function PricingPage() {
       <div className="text-center">
         <h1 className="text-3xl font-bold lg:text-5xl">Pricing</h1>
 
-        <p className="mt-4 text-lg leading-normal text-[#31373D]">
+        <p className="text-foreground mt-4 text-lg leading-normal">
           Designed for every stage of your journey.
         </p>
-        <p className="text-lg leading-normal text-[#31373D]">Get started today.</p>
+        <p className="text-foreground text-lg leading-normal">Get started today.</p>
       </div>
 
       <div className="mt-12">
@@ -45,7 +45,7 @@ export default function PricingPage() {
               What is the difference between the plans?
             </AccordionTrigger>
 
-            <AccordionContent className="max-w-prose text-sm leading-relaxed text-slate-500">
+            <AccordionContent className="text-muted-foreground max-w-prose text-sm leading-relaxed">
               You can self-host Documenso for free or use our ready-to-use hosted version. The
               hosted version comes with additional support, painless scalability and more. Early
               adopters will get access to all features we build this year, for no additional cost!
@@ -59,7 +59,7 @@ export default function PricingPage() {
               How do you handle my data?
             </AccordionTrigger>
 
-            <AccordionContent className="max-w-prose text-sm leading-relaxed text-slate-500">
+            <AccordionContent className="text-muted-foreground max-w-prose text-sm leading-relaxed">
               Securely. Our data centers are located in Frankfurt (Germany), giving us the best
               local privacy laws. We are very aware of the sensitive nature of our data and follow
               best practices to ensure the security and integrity of the data entrusted to us.
@@ -71,7 +71,7 @@ export default function PricingPage() {
               Why should I use your hosting service?
             </AccordionTrigger>
 
-            <AccordionContent className="max-w-prose text-sm leading-relaxed text-slate-500">
+            <AccordionContent className="text-muted-foreground max-w-prose text-sm leading-relaxed">
               Using our hosted version is the easiest way to get started, you can simply subscribe
               and start signing your documents. We take care of the infrastructure, so you can focus
               on your business. Additionally, when using our hosted version you benefit from our
@@ -84,7 +84,7 @@ export default function PricingPage() {
               How can I contribute?
             </AccordionTrigger>
 
-            <AccordionContent className="max-w-prose text-sm leading-relaxed text-slate-500">
+            <AccordionContent className="text-muted-foreground max-w-prose text-sm leading-relaxed">
               That's awesome. You can take a look at the current{' '}
               <Link
                 className="text-documenso-700 font-bold"
@@ -111,7 +111,7 @@ export default function PricingPage() {
               Can I use Documenso commercially?
             </AccordionTrigger>
 
-            <AccordionContent className="max-w-prose text-sm leading-relaxed text-slate-500">
+            <AccordionContent className="text-muted-foreground max-w-prose text-sm leading-relaxed">
               Yes! Documenso is offered under the GNU AGPL V3 open source license. This means you
               can use it for free and even modify it to fit your needs, as long as you publish your
               changes under the same license.
@@ -123,7 +123,7 @@ export default function PricingPage() {
               Why should I prefer Documenso over DocuSign or some other signing tool?
             </AccordionTrigger>
 
-            <AccordionContent className="max-w-prose text-sm leading-relaxed text-slate-500">
+            <AccordionContent className="text-muted-foreground max-w-prose text-sm leading-relaxed">
               Documenso is a community effort to create an open and vibrant ecosystem around a tool,
               everybody is free to use and adapt. By being truly open we want to create trusted
               infrastructure for the future of the internet.
@@ -135,7 +135,7 @@ export default function PricingPage() {
               Where can I get support?
             </AccordionTrigger>
 
-            <AccordionContent className="max-w-prose text-sm leading-relaxed text-slate-500">
+            <AccordionContent className="text-muted-foreground max-w-prose text-sm leading-relaxed">
               We are happy to assist you at{' '}
               <Link
                 className="text-documenso-700 font-bold"

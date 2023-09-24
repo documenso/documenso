@@ -76,6 +76,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
                 </TooltipProvider>
               </ThemeProvider>
             </PlausibleProvider>
+
             <Toaster />
           </FeatureFlagProvider>
         </LocaleProvider>

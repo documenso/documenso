@@ -63,29 +63,38 @@ export default async function DocumentsPage({ searchParams = {} }: DocumentsPage
     <div className="mx-auto w-full max-w-screen-xl px-4 md:px-8">
       <UploadDocument />
 
-      <h1 className="mt-12 text-4xl font-semibold">Documents</h1>
+      <div className="mt-12 flex flex-wrap items-center justify-between gap-x-4 gap-y-8">
+        <h1 className="text-4xl font-semibold">Documents</h1>
 
-      <div className="mt-8 flex flex-wrap gap-x-4 gap-y-6">
-        <Tabs defaultValue={status} className="overflow-x-auto">
-          <TabsList>
-            <TabsTrigger className="min-w-[60px]" value={InternalDocumentStatus.PENDING} asChild>
-              <Link href={getTabHref(InternalDocumentStatus.PENDING)}>
-                <DocumentStatus status={InternalDocumentStatus.PENDING} />
+        <div className="flex flex-wrap gap-x-4 gap-y-6 overflow-hidden">
+          <Tabs defaultValue={status} className="overflow-x-auto">
+            <TabsList>
+              {[
+                ExtendedDocumentStatus.INBOX,
+                ExtendedDocumentStatus.PENDING,
+                ExtendedDocumentStatus.COMPLETED,
+                ExtendedDocumentStatus.DRAFT,
+                ExtendedDocumentStatus.ALL,
+              ].map((value) => (
+                <TabsTrigger key={value} className="min-w-[60px]" value={value} asChild>
+                  <Link href={getTabHref(value)} scroll={false}>
+                    <DocumentStatus status={value} />
 
-                  {value !== ExtendedDocumentStatus.ALL && (
-                    <span className="ml-1 hidden opacity-50 md:inline-block">
-                      {Math.min(stats[value], 99)}
-                      {stats[value] > 99 && '+'}
-                    </span>
-                  )}
-                </Link>
-              </TabsTrigger>
-            ))}
-          </TabsList>
-        </Tabs>
+                    {value !== ExtendedDocumentStatus.ALL && (
+                      <span className="ml-1 hidden opacity-50 md:inline-block">
+                        {Math.min(stats[value], 99)}
+                        {stats[value] > 99 && '+'}
+                      </span>
+                    )}
+                  </Link>
+                </TabsTrigger>
+              ))}
+            </TabsList>
+          </Tabs>
 
-        <div className="flex flex-1 flex-wrap items-center justify-between gap-x-2 gap-y-4">
-          <PeriodSelector />
+          <div className="flex w-48 flex-wrap items-center justify-between gap-x-2 gap-y-4">
+            <PeriodSelector />
+          </div>
         </div>
       </div>
 
