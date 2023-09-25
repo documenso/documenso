@@ -15,6 +15,10 @@ export type MobileNavigationProps = {
 
 export const MENU_NAVIGATION_LINKS = [
   {
+    href: '/single-player-mode',
+    text: 'Single Player Mode',
+  },
+  {
     href: '/blog',
     text: 'Blog',
   },

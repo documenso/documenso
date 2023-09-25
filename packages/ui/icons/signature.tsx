@@ -30,3 +30,5 @@ export const SignatureIcon: LucideIcon = forwardRef(
     );
   },
 );
+
+SignatureIcon.displayName = 'SignatureIcon';

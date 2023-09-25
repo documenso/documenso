@@ -256,17 +256,28 @@ export const AddFieldsFormPartial = ({
   }, [onMouseClick, onMouseMove, selectedField]);
 
   useEffect(() => {
-    const $page = window.document.querySelector(PDF_VIEWER_PAGE_SELECTOR);
+    const observer = new MutationObserver((_mutations) => {
+      const $page = document.querySelector(PDF_VIEWER_PAGE_SELECTOR);
 
-    if (!$page) {
-      return;
-    }
+      if (!$page) {
+        return;
+      }
 
-    const { height, width } = $page.getBoundingClientRect();
+      const { height, width } = $page.getBoundingClientRect();
 
-    fieldBounds.current = {
-      height: Math.max(height * (DEFAULT_HEIGHT_PERCENT / 100), MIN_HEIGHT_PX),
-      width: Math.max(width * (DEFAULT_WIDTH_PERCENT / 100), MIN_WIDTH_PX),
+      fieldBounds.current = {
+        height: Math.max(height * (DEFAULT_HEIGHT_PERCENT / 100), MIN_HEIGHT_PX),
+        width: Math.max(width * (DEFAULT_WIDTH_PERCENT / 100), MIN_WIDTH_PX),
+      };
+    });
+
+    observer.observe(document.body, {
+      childList: true,
+      subtree: true,
+    });
+
+    return () => {
+      observer.disconnect();
     };
   }, []);
 
@@ -396,7 +407,7 @@ export const AddFieldsFormPartial = ({
             </Popover>
           )}
 
-          <div className="-mx-2 flex-1 overflow-y-scroll px-2">
+          <div className="-mx-2 flex-1 overflow-y-auto px-2">
             <div className="grid grid-cols-2 gap-x-4 gap-y-8">
               <button
                 type="button"
@@ -505,7 +516,10 @@ export const AddFieldsFormPartial = ({
         <DocumentFlowFormContainerActions
           loading={isSubmitting}
           disabled={isSubmitting}
-          onGoBackClick={documentFlow.onBackStep}
+          onGoBackClick={() => {
+            documentFlow.onBackStep?.();
+            remove();
+          }}
           onGoNextClick={() => void onFormSubmit()}
         />
       </DocumentFlowFormContainerFooter>

@@ -20,7 +20,7 @@ export type PricingPageProps = {
 
 export default function PricingPage() {
   return (
-    <div className="mt-12">
+    <div className="mt-6 sm:mt-12">
       <div className="text-center">
         <h1 className="text-3xl font-bold lg:text-5xl">Pricing</h1>
 

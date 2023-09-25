@@ -6,7 +6,9 @@ import Link from 'next/link';
 import { Variants, motion } from 'framer-motion';
 import { Github } from 'lucide-react';
 import { usePlausible } from 'next-plausible';
+import { match } from 'ts-pattern';
 
+import { useFeatureFlags } from '@documenso/lib/client-only/providers/feature-flag';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
 
@@ -51,6 +53,10 @@ const HeroTitleVariants: Variants = {
 export const Hero = ({ className, ...props }: HeroProps) => {
   const event = usePlausible();
 
+  const { getFlag } = useFeatureFlags();
+
+  const heroMarketingCTA = getFlag('marketing_landing_hero_cta');
+
   const onSignUpClick = () => {
     const el = document.getElementById('email');
 
@@ -80,7 +86,7 @@ export const Hero = ({ className, ...props }: HeroProps) => {
           <Image
             src={backgroundPattern}
             alt="background pattern"
-            className="-mr-[50vw] -mt-[15vh] h-full scale-125 object-cover dark:invert dark:sepia md:scale-150 lg:scale-[175%]"
+            className="-mr-[50vw] -mt-[15vh] h-full scale-125 object-cover dark:contrast-[70%] dark:invert dark:sepia md:scale-150 lg:scale-[175%]"
           />
         </motion.div>
       </div>
@@ -109,7 +115,7 @@ export const Hero = ({ className, ...props }: HeroProps) => {
             onClick={onSignUpClick}
           >
             Get the Community Plan
-            <span className="bg-primary dark:text-background -mr-2 ml-2.5 rounded-full px-2 py-1.5 text-xs">
+            <span className="bg-primary dark:text-background -mr-2.5 ml-2.5 rounded-full px-2 py-1.5 text-xs">
               $30/mo. forever!
             </span>
           </Button>
@@ -122,23 +128,45 @@ export const Hero = ({ className, ...props }: HeroProps) => {
           </Link>
         </motion.div>
 
-        <motion.div
-          variants={HeroTitleVariants}
-          initial="initial"
-          animate="animate"
-          className="mt-8 flex flex-col items-center justify-center gap-x-6 gap-y-4"
-        >
-          <Link
-            href="https://www.producthunt.com/posts/documenso?utm_source=badge-top-post-badge&utm_medium=badge&utm_souce=badge-documenso"
-            target="_blank"
-          >
-            <img
-              src="https://api.producthunt.com/widgets/embed-image/v1/top-post-badge.svg?post_id=395047&theme=light&period=daily"
-              alt="Documenso - The open source DocuSign alternative | Product Hunt"
-              style={{ width: '250px', height: '54px' }}
-            />
-          </Link>
-        </motion.div>
+        {match(heroMarketingCTA)
+          .with('spm', () => (
+            <motion.div
+              variants={HeroTitleVariants}
+              initial="initial"
+              animate="animate"
+              className="border-primary bg-background hover:bg-muted mx-auto mt-8 w-60 rounded-xl border transition duration-300"
+            >
+              <Link href="/single-player-mode" className="block px-4 py-2 text-center">
+                <h2 className="text-muted-foreground text-xs font-semibold">
+                  Introducing Single Player Mode
+                </h2>
+
+                <h1 className="text-foreground mt-1.5 font-medium leading-5">
+                  Self sign for free!
+                </h1>
+              </Link>
+            </motion.div>
+          ))
+          .with('productHunt', () => (
+            <motion.div
+              variants={HeroTitleVariants}
+              initial="initial"
+              animate="animate"
+              className="mt-8 flex flex-col items-center justify-center gap-x-6 gap-y-4"
+            >
+              <Link
+                href="https://www.producthunt.com/posts/documenso?utm_source=badge-top-post-badge&utm_medium=badge&utm_souce=badge-documenso"
+                target="_blank"
+              >
+                <img
+                  src="https://api.producthunt.com/widgets/embed-image/v1/top-post-badge.svg?post_id=395047&theme=light&period=daily"
+                  alt="Documenso - The open source DocuSign alternative | Product Hunt"
+                  style={{ width: '250px', height: '54px' }}
+                />
+              </Link>
+            </motion.div>
+          ))
+          .otherwise(() => null)}
 
         <motion.div
           className="mt-12"

@@ -20,6 +20,7 @@ const SOCIAL_LINKS = [
 
 const FOOTER_LINKS = [
   { href: '/pricing', text: 'Pricing' },
+  { href: '/single-player-mode', text: 'Single Player Mode' },
   { href: '/blog', text: 'Blog' },
   { href: '/open', text: 'Open' },
   { href: 'https://shop.documenso.com', text: 'Shop', target: '_blank' },
