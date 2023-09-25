@@ -7,6 +7,7 @@ import Link from 'next/link';
 import { Share } from 'lucide-react';
 
 import { useFeatureFlags } from '@documenso/lib/client-only/providers/feature-flag';
+import { base64 } from '@documenso/lib/universal/base64';
 import { getFile } from '@documenso/lib/universal/upload/get-file';
 import { DocumentWithRecipient } from '@documenso/prisma/types/document-with-recipient';
 import DocumentDialog from '@documenso/ui/components/document/document-dialog';
@@ -47,7 +48,7 @@ export const SinglePlayerModeSuccess = ({ className, document }: SinglePlayerMod
     try {
       const data = await getFile(document.documentData);
 
-      setDocumentFile(Buffer.from(data).toString('base64'));
+      setDocumentFile(base64.encode(data));
 
       setShowDocumentDialog(true);
     } catch {
