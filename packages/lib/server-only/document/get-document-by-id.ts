@@ -13,6 +13,7 @@ export const getDocumentById = async ({ id, userId }: GetDocumentByIdOptions) =>
     },
     include: {
       documentData: true,
+      documentMeta: true,
     },
   });
 };

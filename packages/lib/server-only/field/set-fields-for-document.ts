@@ -1,11 +1,12 @@
 import { prisma } from '@documenso/prisma';
-import { SendStatus, SigningStatus } from '@documenso/prisma/client';
+import { FieldType, SendStatus, SigningStatus } from '@documenso/prisma/client';
 
 export interface SetFieldsForDocumentOptions {
   userId: number;
   documentId: number;
   fields: {
     id?: number | null;
+    type: FieldType;
     signerEmail: string;
     pageNumber: number;
     pageX: number;
@@ -54,62 +55,56 @@ export const setFieldsForDocument = async ({
 
       return {
         ...field,
-        ...existing,
+        _persisted: existing,
       };
     })
     .filter((field) => {
       return (
-        field.Recipient?.sendStatus !== SendStatus.SENT &&
-        field.Recipient?.signingStatus !== SigningStatus.SIGNED
+        field._persisted?.Recipient?.sendStatus !== SendStatus.SENT &&
+        field._persisted?.Recipient?.signingStatus !== SigningStatus.SIGNED
       );
     });
 
   const persistedFields = await prisma.$transaction(
+    // Disabling as wrapping promises here causes type issues
+    // eslint-disable-next-line @typescript-eslint/promise-function-async
     linkedFields.map((field) =>
-      field.id
-        ? prisma.field.update({
-            where: {
-              id: field.id,
-              recipientId: field.recipientId,
-              documentId,
+      prisma.field.upsert({
+        where: {
+          id: field._persisted?.id ?? -1,
+          documentId,
+        },
+        update: {
+          page: field.pageNumber,
+          positionX: field.pageX,
+          positionY: field.pageY,
+          width: field.pageWidth,
+          height: field.pageHeight,
+        },
+        create: {
+          type: field.type,
+          page: field.pageNumber,
+          positionX: field.pageX,
+          positionY: field.pageY,
+          width: field.pageWidth,
+          height: field.pageHeight,
+          customText: '',
+          inserted: false,
+          Document: {
+            connect: {
+              id: documentId,
             },
-            data: {
-              type: field.type,
-              page: field.pageNumber,
-              positionX: field.pageX,
-              positionY: field.pageY,
-              width: field.pageWidth,
-              height: field.pageHeight,
-            },
-          })
-        : prisma.field.create({
-            data: {
-              // TODO: Rewrite this entire transaction because this is a mess
-              // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-              type: field.type!,
-              page: field.pageNumber,
-              positionX: field.pageX,
-              positionY: field.pageY,
-              width: field.pageWidth,
-              height: field.pageHeight,
-              customText: '',
-              inserted: false,
-
-              Document: {
-                connect: {
-                  id: document.id,
-                },
-              },
-              Recipient: {
-                connect: {
-                  documentId_email: {
-                    documentId: document.id,
-                    email: field.signerEmail,
-                  },
-                },
+          },
+          Recipient: {
+            connect: {
+              documentId_email: {
+                documentId,
+                email: field.signerEmail.toLowerCase(),
               },
             },
-          }),
+          },
+        },
+      }),
     ),
   );
 

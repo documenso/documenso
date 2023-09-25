@@ -38,7 +38,7 @@ export default async function SigningPage({ params: { token } }: SigningPageProp
     }).catch(() => null),
     getFieldsForToken({ token }),
     getRecipientByToken({ token }).catch(() => null),
-    viewedDocument({ token }),
+    viewedDocument({ token }).catch(() => null),
   ]);
 
   if (!document || !document.documentData || !recipient) {

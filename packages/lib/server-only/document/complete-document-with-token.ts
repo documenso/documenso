@@ -4,6 +4,7 @@ import { prisma } from '@documenso/prisma';
 import { DocumentStatus, SigningStatus } from '@documenso/prisma/client';
 
 import { sealDocument } from './seal-document';
+import { sendPendingEmail } from './send-pending-email';
 
 export type CompleteDocumentWithTokenOptions = {
   token: string;
@@ -68,6 +69,19 @@ export const completeDocumentWithToken = async ({
       signedAt: new Date(),
     },
   });
+
+  const pendingRecipients = await prisma.recipient.count({
+    where: {
+      documentId: document.id,
+      signingStatus: {
+        not: SigningStatus.SIGNED,
+      },
+    },
+  });
+
+  if (pendingRecipients > 0) {
+    await sendPendingEmail({ documentId, recipientId: recipient.id });
+  }
 
   const documents = await prisma.document.updateMany({
     where: {

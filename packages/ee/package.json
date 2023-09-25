@@ -9,7 +9,9 @@
     "server-only/",
     "universal/"
   ],
-  "scripts": {},
+  "scripts": {
+    "clean": "rimraf node_modules"
+  },
   "dependencies": {
     "@documenso/lib": "*",
     "@documenso/prisma": "*"
