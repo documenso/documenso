@@ -3,7 +3,6 @@
 import { createElement } from 'react';
 
 import { DateTime } from 'luxon';
-import { nanoid } from 'nanoid';
 import { PDFDocument } from 'pdf-lib';
 import { match } from 'ts-pattern';
 import { z } from 'zod';
@@ -13,6 +12,7 @@ import { render } from '@documenso/email/render';
 import { DocumentSelfSignedEmailTemplate } from '@documenso/email/templates/document-self-signed';
 import { FROM_ADDRESS, FROM_NAME, SERVICE_USER_EMAIL } from '@documenso/lib/constants/email';
 import { insertFieldInPDF } from '@documenso/lib/server-only/pdf/insert-field-in-pdf';
+import { alphaid } from '@documenso/lib/universal/id';
 import { getFile } from '@documenso/lib/universal/upload/get-file';
 import { prisma } from '@documenso/prisma';
 import {
@@ -101,7 +101,7 @@ export const createSinglePlayerDocument = async (
 
   const documentToken = await prisma.$transaction(
     async (tx) => {
-      const documentToken = nanoid();
+      const documentToken = alphaid();
 
       // Fetch service user who will be the owner of the document.
       const serviceUser = await tx.user.findFirstOrThrow({
@@ -179,7 +179,7 @@ export const createSinglePlayerDocument = async (
 
   // Todo: Handle `downloadLink`
   const template = createElement(DocumentSelfSignedEmailTemplate, {
-    downloadLink: 'https://documenso.com',
+    downloadLink: `${process.env.NEXT_PUBLIC_MARKETING_URL}/single-player-mode/${documentToken}`,
     documentName: documentName,
     assetBaseUrl: process.env.NEXT_PUBLIC_WEBAPP_URL || 'http://localhost:3000',
   });
