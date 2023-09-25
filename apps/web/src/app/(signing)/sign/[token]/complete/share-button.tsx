@@ -4,6 +4,7 @@ import { HTMLAttributes } from 'react';
 
 import { Copy, Share, Twitter } from 'lucide-react';
 
+import { generateTwitterIntent } from '@documenso/lib/universal/generate-twitter-intent';
 import { trpc } from '@documenso/trpc/react';
 import { Button } from '@documenso/ui/primitives/button';
 import {
@@ -19,12 +20,6 @@ import { useCopyToClipboard } from '~/hooks/use-copy-to-clipboard';
 export type ShareButtonProps = HTMLAttributes<HTMLButtonElement> & {
   token: string;
   documentId: number;
-};
-
-const generateTwitterIntent = (text: string, shareUrl: string) => {
-  return `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}%0A${encodeURIComponent(
-    shareUrl,
-  )}`;
 };
 
 export const ShareButton = ({ token, documentId }: ShareButtonProps) => {
