@@ -21,7 +21,7 @@ const FOOTER_LINKS = [
   { href: '/open', text: 'Open' },
   { href: 'https://shop.documenso.com', text: 'Shop', target: '_blank' },
   { href: 'https://status.documenso.com', text: 'Status', target: '_blank' },
-  { href: '/design-system', text: 'Design System' },
+  { href: '/design-system', text: 'Design' },
   { href: 'mailto:support@documenso.com', text: 'Support' },
   { href: '/privacy', text: 'Privacy' },
 ];
