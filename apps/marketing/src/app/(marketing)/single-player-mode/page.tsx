@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
 import { useAnalytics } from '@documenso/lib/client-only/hooks/use-analytics';
+import { base64 } from '@documenso/lib/universal/base64';
 import { putFile } from '@documenso/lib/universal/upload/put-file';
 import { Field, Prisma, Recipient } from '@documenso/prisma/client';
 import { Card, CardContent } from '@documenso/ui/primitives/card';
@@ -155,7 +156,7 @@ export default function SinglePlayerModePage() {
   const onFileDrop = async (file: File) => {
     try {
       const arrayBuffer = await file.arrayBuffer();
-      const base64String = Buffer.from(arrayBuffer).toString('base64');
+      const base64String = base64.encode(new Uint8Array(arrayBuffer));
 
       setUploadedFile({
         file,

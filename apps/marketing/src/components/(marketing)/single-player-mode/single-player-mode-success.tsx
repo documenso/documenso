@@ -26,10 +26,7 @@ interface SinglePlayerModeSuccessProps {
   document: DocumentWithRecipient;
 }
 
-export default function SinglePlayerModeSuccess({
-  className,
-  document,
-}: SinglePlayerModeSuccessProps) {
+export const SinglePlayerModeSuccess = ({ className, document }: SinglePlayerModeSuccessProps) => {
   const { getFlag } = useFeatureFlags();
 
   const isConfettiEnabled = getFlag('marketing_spm_confetti');
@@ -40,7 +37,7 @@ export default function SinglePlayerModeSuccess({
 
   const { toast } = useToast();
 
-  const handleShowDocumentDialog = async () => {
+  const onShowDocumentClick = async () => {
     if (isFetchingDocumentFile) {
       return;
     }
@@ -103,7 +100,7 @@ export default function SinglePlayerModeSuccess({
             />
 
             <Button
-              onClick={async () => handleShowDocumentDialog()}
+              onClick={async () => onShowDocumentClick()}
               loading={isFetchingDocumentFile}
               className="col-span-2"
             >
@@ -132,4 +129,4 @@ export default function SinglePlayerModeSuccess({
       />
     </div>
   );
-}
+};
