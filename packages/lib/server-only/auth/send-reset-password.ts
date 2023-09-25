@@ -18,8 +18,6 @@ export const sendResetPassword = async ({ userId }: SendResetPasswordOptions) =>
 
   const assetBaseUrl = process.env.NEXT_PUBLIC_WEBAPP_URL || 'http://localhost:3000';
 
-  console.log({ assetBaseUrl });
-
   const template = createElement(ResetPasswordTemplate, {
     assetBaseUrl,
     userEmail: user.email,
