@@ -21,6 +21,12 @@ declare namespace NodeJS {
     NEXT_PRIVATE_UPLOAD_ACCESS_KEY_ID?: string;
     NEXT_PRIVATE_UPLOAD_SECRET_ACCESS_KEY?: string;
 
+    NEXT_PRIVATE_SIGNING_TRANSPORT?: 'local' | 'http' | 'gcloud-hsm';
+    NEXT_PRIVATE_SIGNING_PASSPHRASE?: string;
+    NEXT_PRIVATE_SIGNING_LOCAL_FILE_PATH?: string;
+    NEXT_PRIVATE_SIGNING_LOCAL_FILE_CONTENTS?: string;
+    NEXT_PRIVATE_SIGNING_LOCAL_FILE_ENCODING?: string;
+
     NEXT_PRIVATE_SMTP_TRANSPORT?: 'mailchannels' | 'smtp-auth' | 'smtp-api';
 
     NEXT_PRIVATE_MAILCHANNELS_API_KEY?: string;
