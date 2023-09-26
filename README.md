@@ -26,37 +26,30 @@
    <a href="https://github.com/documenso/documenso/pulse"><img src="https://img.shields.io/github/commit-activity/m/documenso/documenso" alt="Commits-per-month"></a>
 </p>
 
-> **🚧 We're currently working on a large scale refactor which can be found on the [feat/refresh](https://github.com/documenso/documenso/tree/feat/refresh) branch.**
+> 🦺 Documenso 1.0 is deployed to our <a href="https://documen.so/staging" target="_blank">Staging Environment</a>.
 >
-> **[Read more on why 👀](https://documenso.com/blog/why-were-doing-a-rewrite)**
+> The code be found on the [feat/refresh](https://github.com/documenso/documenso/tree/feat/refresh) branch.
+> 
+> The new Version will be release after the current testing phase.
 
-# Documenso 0.9 - Developer Preview
 
+# Join us in testing Documenso 1.0 during [MALFUNCTION MANIA](https://documenso.com/blog/manfunction-mania)
 <div>
   <img style="display: block; height: 120px; width: 24%"
-    src="https://user-images.githubusercontent.com/1309312/224570645-167128ee-3e39-4578-85d2-5394d9a0379c.png">
+    src="https://github.com/documenso/documenso/assets/1309312/67e08c98-c153-4115-aa2d-77979bb12c94)">
   <img style="display: block; height: 120px; width: 24%"
-    src="https://user-images.githubusercontent.com/1309312/224570651-0afd12f8-cfe3-49d1-805e-e495af963d91.png">
+    src="https://github.com/documenso/documenso/assets/1309312/040cfbae-3438-4ca3-87f2-ce52c793dcaf">
   <img style="display: block; height: 120px; width: 24%"
-    src="https://user-images.githubusercontent.com/1309312/224570655-328d2279-058d-4a3e-b5c3-5cbd8a1f4e05.png">
+    src="https://github.com/documenso/documenso/assets/1309312/72d445be-41e5-4936-bdba-87ef8e70fa09">
   <img style="display: block; height: 120px; width: 24%"
-    src="https://user-images.githubusercontent.com/1309312/224571617-1f3c2811-c1ac-4d7d-b9b0-4ab183731405.png">
+    src="https://github.com/documenso/documenso/assets/1309312/d7b86c0f-a755-4476-a022-a608db2c4633">
   <img style="display: block; height: 120px; width: 24%"
-    src="https://user-images.githubusercontent.com/1309312/224570322-b2c76ea8-7482-4043-ad97-f1221220c591.png">
-  <img style="display: block; height: 120px; width: 24%"
-    src="https://user-images.githubusercontent.com/1309312/224570325-a8055f24-9826-4a23-b116-4fbb0577581a.png">
-  <img style="display: block; height: 120px; width: 24%"
-    src="https://user-images.githubusercontent.com/1309312/224570318-f724bbd9-c394-4bdc-bace-2d78af92de44.png">
-      <img style="display: block; height: 120px; width: 24%"
-    src="https://user-images.githubusercontent.com/1309312/224571539-f019b860-f613-4b20-86e8-4437c5784265.png">
+    src=https://github.com/documenso/documenso/assets/1309312/c0f55116-ab82-433f-a266-f3fc8571d69f">
 </div>
-
-> **Note**
-> This project is currently under community review and will publish it's first production release soon™.
 
 ## About this project
 
-Signing documents digitally is fast, easy and should be best practice for every document signed worldwide. This is technically quite easy today, but it also introduces a new party to every signature: The signing tool providers. While this is not a problem in itself, it should make us think about how we want these providers of trust to work. Documenso aims to be the world's most trusted document signing tool. This trust is built by empowering you to self-host Documenso and review how it works under the hood. Join us in creating the next generation of open trust infrastructure.
+Signing documents digitally is fast and easy and should be the best practice for every document signed worldwide. This is technically quite easy today, but it also introduces a new party to every signature: The signing tool providers. While this is not a problem in itself, it should make us think about how we want these providers of trust to work. Documenso aims to be the world's most trusted document-signing tool. This trust is built by empowering you to self-host Documenso and review how it works under the hood. Join us in creating the next generation of open trust infrastructure.
 
 ## Recognition
 
@@ -65,13 +58,13 @@ Signing documents digitally is fast, easy and should be best practice for every 
 
 ## Community and Next Steps 🎯
 
-We're currently working on a redesign of the application including a revamp of the codebase so Documenso can be more intuitive to use and robust to develop upon.
+We're currently working on a redesign of the application, including a revamp of the codebase so Documenso can be more intuitive to use and robust to develop upon.
 
 - Check out the first source code release in this repository and test it
 - Tell us what you think in the current [Discussions](https://github.com/documenso/documenso/discussions)
 - Join the [Discord server](https://documen.so/discord) for any questions and getting to know to other community members
 - ⭐ the repository to help us raise awareness
-- Spread the word on Twitter, that Documenso is working towards a more open signing tool
+- Spread the word on Twitter that Documenso is working towards a more open signing tool
 - Fix or create [issues](https://github.com/documenso/documenso/issues), that are needed for the first production release
 
 ## Contributing
