@@ -178,4 +178,6 @@ export const env = createEnv({
     // APP
     APP_VERSION,
   },
+  // eslint-disable-next-line turbo/no-undeclared-env-vars
+  skipValidation: !!process.env.CI || !!process.env.SKIP_ENV_VALIDATION,
 });
