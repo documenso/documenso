@@ -1,6 +1,8 @@
-import { Column, Img, Row, Section, Tailwind, Text } from '@react-email/components';
+import { Column, Img, Section, Tailwind, Text } from '@react-email/components';
 
 import * as config from '@documenso/tailwind-config';
+
+import TemplateDocumentImage from './template-document-image';
 
 export interface TemplateDocumentPendingProps {
   documentName: string;
@@ -25,27 +27,20 @@ export const TemplateDocumentPending = ({
         },
       }}
     >
-      <Section>
-        <Row className="table-fixed">
-          <Column />
+      <TemplateDocumentImage className="mt-6" assetBaseUrl={assetBaseUrl} />
 
-          <Column>
-            <Img
-              className="h-42 mx-auto"
-              src={getAssetUrl('/static/document.png')}
-              alt="Documenso"
-            />
+      <Section>
+        <Section className="mb-4">
+          <Column align="center">
+            <Text className="text-base font-semibold text-blue-500">
+              <Img
+                src={getAssetUrl('/static/clock.png')}
+                className="-mt-0.5 mr-2 inline h-7 w-7 align-middle"
+              />
+              Waiting for others
+            </Text>
           </Column>
-
-          <Column />
-        </Row>
-      </Section>
-
-      <Section>
-        <Text className="mb-4 flex items-center justify-center text-center text-base font-semibold text-blue-500">
-          <Img src={getAssetUrl('/static/clock.png')} className="-mb-0.5 mr-2 inline h-7 w-7" />
-          Waiting for others
-        </Text>
+        </Section>
 
         <Text className="text-primary mb-0 text-center text-lg font-semibold">
           “{documentName}” has been signed

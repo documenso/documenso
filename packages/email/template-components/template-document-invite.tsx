@@ -1,6 +1,8 @@
-import { Button, Column, Img, Row, Section, Tailwind, Text } from '@react-email/components';
+import { Button, Section, Tailwind, Text } from '@react-email/components';
 
 import * as config from '@documenso/tailwind-config';
+
+import TemplateDocumentImage from './template-document-image';
 
 export interface TemplateDocumentInviteProps {
   inviterName: string;
@@ -16,10 +18,6 @@ export const TemplateDocumentInvite = ({
   signDocumentLink,
   assetBaseUrl,
 }: TemplateDocumentInviteProps) => {
-  const getAssetUrl = (path: string) => {
-    return new URL(path, assetBaseUrl).toString();
-  };
-
   return (
     <Tailwind
       config={{
@@ -30,21 +28,7 @@ export const TemplateDocumentInvite = ({
         },
       }}
     >
-      <Section className="mt-4">
-        <Row className="table-fixed">
-          <Column />
-
-          <Column>
-            <Img
-              className="h-42 mx-auto"
-              src={getAssetUrl('/static/document.png')}
-              alt="Documenso"
-            />
-          </Column>
-
-          <Column />
-        </Row>
-      </Section>
+      <TemplateDocumentImage className="mt-6" assetBaseUrl={assetBaseUrl} />
 
       <Section>
         <Text className="text-primary mx-auto mb-0 max-w-[80%] text-center text-lg font-semibold">

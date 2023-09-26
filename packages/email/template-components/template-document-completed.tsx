@@ -1,6 +1,8 @@
-import { Button, Column, Img, Row, Section, Tailwind, Text } from '@react-email/components';
+import { Button, Column, Img, Section, Tailwind, Text } from '@react-email/components';
 
 import * as config from '@documenso/tailwind-config';
+
+import TemplateDocumentImage from './template-document-image';
 
 export interface TemplateDocumentCompletedProps {
   downloadLink: string;
@@ -27,27 +29,20 @@ export const TemplateDocumentCompleted = ({
         },
       }}
     >
-      <Section>
-        <Row className="table-fixed">
-          <Column />
+      <TemplateDocumentImage className="mt-6" assetBaseUrl={assetBaseUrl} />
 
-          <Column>
-            <Img
-              className="h-42 mx-auto"
-              src={getAssetUrl('/static/document.png')}
-              alt="Documenso"
-            />
+      <Section>
+        <Section className="mb-4">
+          <Column align="center">
+            <Text className="text-base font-semibold text-[#7AC455]">
+              <Img
+                src={getAssetUrl('/static/completed.png')}
+                className="-mt-0.5 mr-2 inline h-7 w-7 align-middle"
+              />
+              Completed
+            </Text>
           </Column>
-
-          <Column />
-        </Row>
-      </Section>
-
-      <Section>
-        <Text className="mb-4 flex items-center justify-center text-center text-base font-semibold text-[#7AC455]">
-          <Img src={getAssetUrl('/static/completed.png')} className="-mb-0.5 mr-2 inline h-7 w-7" />
-          Completed
-        </Text>
+        </Section>
 
         <Text className="text-primary mb-0 text-center text-lg font-semibold">
           “{documentName}” was signed by all signers
@@ -66,10 +61,13 @@ export const TemplateDocumentCompleted = ({
             Review
           </Button> */}
           <Button
-            className="inline-flex items-center justify-center rounded-lg border border-solid border-slate-200 px-4 py-2 text-center text-sm font-medium text-black no-underline"
+            className="rounded-lg border border-solid border-slate-200 px-4 py-2 text-center text-sm font-medium text-black no-underline"
             href={downloadLink}
           >
-            <Img src={getAssetUrl('/static/download.png')} className="-mb-1 mr-2 inline h-5 w-5" />
+            <Img
+              src={getAssetUrl('/static/download.png')}
+              className="mb-0.5 mr-2 inline h-5 w-5 align-middle"
+            />
             Download
           </Button>
         </Section>
