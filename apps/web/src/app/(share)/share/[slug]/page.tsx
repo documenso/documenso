@@ -13,10 +13,16 @@ export function generateMetadata({ params: { slug } }: SharePageProps) {
     title: 'Documenso - Share',
     description: 'I just signed a document with Documenso!',
     openGraph: {
-      images: [`${APP_BASE_URL}/share/${slug}/opengraph`],
+      title: 'Documenso - Join the open source signing revolution',
+      description: 'I just signed with Documenso!',
+      type: 'website',
+      images: [`${process.env.NEXT_PUBLIC_WEBAPP_URL}/share/${slug}/opengraph`],
     },
     twitter: {
-      images: [`${APP_BASE_URL}/share/${slug}/opengraph`],
+      site: '@documenso',
+      card: 'summary_large_image',
+      images: [`${process.env.NEXT_PUBLIC_WEBAPP_URL}/share/${slug}/opengraph`],
+      description: 'I just signed with Documenso!',
     },
   } satisfies Metadata;
 }
