@@ -19,6 +19,7 @@ import {
 } from '@documenso/lib/server-only/admin/get-users-stats';
 
 import { CardMetric } from '~/components/(dashboard)/metric-card/metric-card';
+import { env } from '~/env.mjs';
 
 export default async function AdminStatsPage() {
   const [usersCount, usersWithSubscriptionsCount, docStats, recipientStats] = await Promise.all([
@@ -40,7 +41,7 @@ export default async function AdminStatsPage() {
           title="Active Subscriptions"
           value={usersWithSubscriptionsCount}
         />
-        <CardMetric icon={UserPlus2} title="App Version" value={`v${process.env.APP_VERSION}`} />
+        <CardMetric icon={UserPlus2} title="App Version" value={`v${env.APP_VERSION}`} />
       </div>
 
       <div className="mt-16 grid grid-cols-1 gap-8 md:grid-cols-2">

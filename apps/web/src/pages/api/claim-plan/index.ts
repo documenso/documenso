@@ -8,6 +8,7 @@ import { stripe } from '@documenso/lib/server-only/stripe';
 import { prisma } from '@documenso/prisma';
 
 import { TClaimPlanResponseSchema, ZClaimPlanRequestSchema } from '~/api/claim-plan/types';
+import { env } from '~/env.mjs';
 
 export default async function handler(
   req: NextApiRequest,
@@ -43,7 +44,7 @@ export default async function handler(
 
     if (user && user.Subscription.length > 0) {
       return res.status(200).json({
-        redirectUrl: `${process.env.NEXT_PUBLIC_WEBAPP_URL}/login`,
+        redirectUrl: `${env.NEXT_PUBLIC_WEBAPP_URL}/login`,
       });
     }
 
@@ -103,8 +104,8 @@ export default async function handler(
       mode: 'subscription',
       metadata,
       allow_promotion_codes: true,
-      success_url: `${process.env.NEXT_PUBLIC_MARKETING_URL}/claimed?sessionId={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${process.env.NEXT_PUBLIC_MARKETING_URL}/pricing?email=${encodeURIComponent(
+      success_url: `${env.NEXT_PUBLIC_MARKETING_URL}/claimed?sessionId={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${env.NEXT_PUBLIC_MARKETING_URL}/pricing?email=${encodeURIComponent(
         email,
       )}&name=${encodeURIComponent(name)}&planId=${planId}&cancelled=true`,
     });
