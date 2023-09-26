@@ -1,8 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-
-import { useSearchParams } from 'next/navigation';
+import { useState } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Loader } from 'lucide-react';
@@ -40,8 +38,6 @@ export type SignInFormProps = {
 };
 
 export const SignInForm = ({ className }: SignInFormProps) => {
-  const searchParams = useSearchParams();
-
   const { toast } = useToast();
 
   const {
@@ -56,36 +52,29 @@ export const SignInForm = ({ className }: SignInFormProps) => {
     resolver: zodResolver(ZSignInFormSchema),
   });
 
-  const errorCode = searchParams?.get('error');
-
-  useEffect(() => {
-    let timeout: NodeJS.Timeout | null = null;
-
-    if (isErrorCode(errorCode)) {
-      timeout = setTimeout(() => {
-        toast({
-          variant: 'destructive',
-          description: ERROR_MESSAGES[errorCode] ?? 'An unknown error occurred',
-        });
-      }, 0);
-    }
-
-    return () => {
-      if (timeout) {
-        clearTimeout(timeout);
-      }
-    };
-  }, [errorCode, toast]);
-
   const onFormSubmit = async ({ email, password }: TSignInFormSchema) => {
     try {
-      await signIn('credentials', {
+      const result = await signIn('credentials', {
         email,
         password,
         callbackUrl: LOGIN_REDIRECT_PATH,
-      }).catch((err) => {
-        console.error(err);
+        redirect: false,
       });
+
+      if (result?.error && isErrorCode(result.error)) {
+        toast({
+          variant: 'destructive',
+          description: ERROR_MESSAGES[result.error],
+        });
+
+        return;
+      }
+
+      if (!result?.url) {
+        throw new Error('An unknown error occurred');
+      }
+
+      window.location.href = result.url;
     } catch (err) {
       toast({
         title: 'An unknown error occurred',
