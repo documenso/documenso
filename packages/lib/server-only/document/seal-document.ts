@@ -5,10 +5,12 @@ import { PDFDocument } from 'pdf-lib';
 
 import { prisma } from '@documenso/prisma';
 import { DocumentStatus, SigningStatus } from '@documenso/prisma/client';
+import { signPdf } from '@documenso/signing';
 
 import { getFile } from '../../universal/upload/get-file';
 import { putFile } from '../../universal/upload/put-file';
 import { insertFieldInPDF } from '../pdf/insert-field-in-pdf';
+import { sendCompletedEmail } from './send-completed-email';
 
 export type SealDocumentOptions = {
   documentId: number;
@@ -70,12 +72,14 @@ export const sealDocument = async ({ documentId }: SealDocumentOptions) => {
 
   const pdfBytes = await doc.save();
 
+  const pdfBuffer = await signPdf({ pdf: Buffer.from(pdfBytes) });
+
   const { name, ext } = path.parse(document.title);
 
   const { data: newData } = await putFile({
     name: `${name}_signed${ext}`,
     type: 'application/pdf',
-    arrayBuffer: async () => Promise.resolve(Buffer.from(pdfBytes)),
+    arrayBuffer: async () => Promise.resolve(pdfBuffer),
   });
 
   await prisma.documentData.update({
@@ -86,4 +90,6 @@ export const sealDocument = async ({ documentId }: SealDocumentOptions) => {
       data: newData,
     },
   });
+
+  await sendCompletedEmail({ documentId });
 };

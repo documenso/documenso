@@ -55,21 +55,18 @@ export const EditDocumentForm = ({
       title: 'Add Signers',
       description: 'Add the people who will sign the document.',
       stepIndex: 1,
-      onSubmit: () => onAddSignersFormSubmit,
     },
     fields: {
       title: 'Add Fields',
       description: 'Add all relevant fields for each recipient.',
       stepIndex: 2,
       onBackStep: () => setStep('signers'),
-      onSubmit: () => onAddFieldsFormSubmit,
     },
     subject: {
       title: 'Add Subject',
       description: 'Add the subject and message you wish to send to signers.',
       stepIndex: 3,
       onBackStep: () => setStep('fields'),
-      onSubmit: () => onAddSubjectFormSubmit,
     },
   };
 
@@ -169,6 +166,7 @@ export const EditDocumentForm = ({
 
           {step === 'signers' && (
             <AddSignersFormPartial
+              key={recipients.length}
               documentFlow={documentFlow.signers}
               recipients={recipients}
               fields={fields}
@@ -179,6 +177,7 @@ export const EditDocumentForm = ({
 
           {step === 'fields' && (
             <AddFieldsFormPartial
+              key={fields.length}
               documentFlow={documentFlow.fields}
               recipients={recipients}
               fields={fields}

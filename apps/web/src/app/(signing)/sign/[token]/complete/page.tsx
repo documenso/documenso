@@ -1,17 +1,19 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 
-import { CheckCircle2, Clock8, Share } from 'lucide-react';
+import { CheckCircle2, Clock8 } from 'lucide-react';
 import { match } from 'ts-pattern';
 
 import { getDocumentAndSenderByToken } from '@documenso/lib/server-only/document/get-document-by-token';
 import { getFieldsForToken } from '@documenso/lib/server-only/field/get-fields-for-token';
 import { getRecipientByToken } from '@documenso/lib/server-only/recipient/get-recipient-by-token';
 import { DocumentStatus, FieldType } from '@documenso/prisma/client';
-import { Button } from '@documenso/ui/primitives/button';
+import { DocumentDownloadButton } from '@documenso/ui/components/document/document-download-button';
+import { SigningCard } from '@documenso/ui/components/signing-card';
 
-import { DownloadButton } from './download-button';
-import { SigningCard } from './signing-card';
+import signingCelebration from '~/assets/signing-celebration.png';
+
+import { ShareButton } from './share-button';
 
 export type CompletedSigningPageProps = {
   params: {
@@ -53,7 +55,7 @@ export default async function CompletedSigningPage({
   return (
     <div className="flex flex-col items-center pt-24">
       {/* Card with recipient */}
-      <SigningCard name={recipientName} />
+      <SigningCard name={recipientName} signingCelebrationImage={signingCelebration} />
 
       <div className="mt-6">
         {match(document.status)
@@ -88,13 +90,9 @@ export default async function CompletedSigningPage({
         ))}
 
       <div className="mt-8 flex w-full max-w-sm items-center justify-center gap-4">
-        {/* TODO: Hook this up */}
-        <Button variant="outline" className="flex-1">
-          <Share className="mr-2 h-5 w-5" />
-          Share
-        </Button>
+        <ShareButton documentId={document.id} token={recipient.token} />
 
-        <DownloadButton
+        <DocumentDownloadButton
           className="flex-1"
           fileName={document.title}
           documentData={documentData}
@@ -103,7 +101,7 @@ export default async function CompletedSigningPage({
       </div>
 
       <p className="text-muted-foreground/60 mt-36 text-sm">
-        Want so send slick signing links like this one?{' '}
+        Want to send slick signing links like this one?{' '}
         <Link href="https://documenso.com" className="text-documenso-700 hover:text-documenso-600">
           Check out Documenso.
         </Link>

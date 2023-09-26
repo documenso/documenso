@@ -8,9 +8,10 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "copy:pdfjs": "node ../../scripts/copy-pdfjs.cjs",
     "dev:test": "playwright test",
-    "e2e:test": "start-server-and-test \"npm run start\" http://localhost:3000 \"playwright test\""
+    "e2e:test": "start-server-and-test \"npm run start\" http://localhost:3000 \"playwright test\"",
+    "clean": "rimraf .next && rimraf node_modules",
+    "copy:pdfjs": "node ../../scripts/copy-pdfjs.cjs"
   },
   "dependencies": {
     "@documenso/ee": "*",
@@ -23,10 +24,10 @@
     "@tanstack/react-query": "^4.29.5",
     "formidable": "^2.1.1",
     "framer-motion": "^10.12.8",
-    "lucide-react": "^0.214.0",
+    "lucide-react": "^0.279.0",
     "luxon": "^3.4.0",
     "micro": "^10.0.1",
-    "next": "13.4.12",
+    "next": "13.4.19",
     "next-auth": "4.22.3",
     "next-plausible": "^3.10.1",
     "next-themes": "^0.2.1",

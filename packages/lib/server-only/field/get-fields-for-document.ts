@@ -13,6 +13,9 @@ export const getFieldsForDocument = async ({ documentId, userId }: GetFieldsForD
         userId,
       },
     },
+    orderBy: {
+      id: 'asc',
+    },
   });
 
   return fields;
