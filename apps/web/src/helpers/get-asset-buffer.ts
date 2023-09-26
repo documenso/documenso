@@ -7,8 +7,10 @@
  *
  * @param path The path to the asset, relative to the `public` folder.
  */
+import { env } from '~/env.mjs';
+
 export const getAssetBuffer = async (path: string) => {
-  const baseUrl = process.env.NEXT_PUBLIC_WEBAPP_URL || 'http://localhost:3000';
+  const baseUrl = env.NEXT_PUBLIC_WEBAPP_URL;
 
   return fetch(new URL(path, baseUrl)).then(async (res) => res.arrayBuffer());
 };
