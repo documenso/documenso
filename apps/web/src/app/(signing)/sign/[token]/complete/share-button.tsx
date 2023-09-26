@@ -115,7 +115,7 @@ export const ShareButton = ({ token, documentId }: ShareButtonProps) => {
 
         <div className="flex w-full flex-col">
           <div className="rounded-md border p-4">
-            I just signed a document with{' '}
+            I just {token ? 'signed' : 'sent'} a document with{' '}
             <span className="font-medium text-blue-400">@documenso</span>
             . Check it out!
             <span className="mt-2 block" />
