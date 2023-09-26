@@ -1,6 +1,6 @@
 'use client';
 
-import { HTMLAttributes } from 'react';
+import { HTMLAttributes, useState } from 'react';
 
 import { Copy, Share, Twitter } from 'lucide-react';
 
@@ -8,11 +8,13 @@ import { generateTwitterIntent } from '@documenso/lib/universal/generate-twitter
 import { trpc } from '@documenso/trpc/react';
 import { Button } from '@documenso/ui/primitives/button';
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@documenso/ui/primitives/dropdown-menu';
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@documenso/ui/primitives/dialog';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
 import { useCopyToClipboard } from '~/hooks/use-copy-to-clipboard';
@@ -26,14 +28,36 @@ export const ShareButton = ({ token, documentId }: ShareButtonProps) => {
   const { toast } = useToast();
   const [, copyToClipboard] = useCopyToClipboard();
 
-  const { mutateAsync: createOrGetShareLink, isLoading } =
-    trpc.shareLink.createOrGetShareLink.useMutation();
+  const [isOpen, setIsOpen] = useState(false);
+
+  const {
+    mutateAsync: createOrGetShareLink,
+    data: shareLink,
+    isLoading,
+  } = trpc.shareLink.createOrGetShareLink.useMutation();
+
+  const onOpenChange = (nextOpen: boolean) => {
+    if (nextOpen) {
+      void createOrGetShareLink({
+        token,
+        documentId,
+      });
+    }
+
+    setIsOpen(nextOpen);
+  };
 
   const onCopyClick = async () => {
-    const { slug } = await createOrGetShareLink({
-      token: token,
-      documentId,
-    });
+    let { slug = '' } = shareLink || {};
+
+    if (!slug) {
+      const result = await createOrGetShareLink({
+        token,
+        documentId,
+      });
+
+      slug = result.slug;
+    }
 
     await copyToClipboard(`${window.location.origin}/share/${slug}`).catch(() => null);
 
@@ -41,26 +65,36 @@ export const ShareButton = ({ token, documentId }: ShareButtonProps) => {
       title: 'Copied to clipboard',
       description: 'The sharing link has been copied to your clipboard.',
     });
+
+    setIsOpen(false);
   };
 
   const onTweetClick = async () => {
-    const { slug } = await createOrGetShareLink({
-      token: token,
-      documentId,
-    });
+    let { slug = '' } = shareLink || {};
+
+    if (!slug) {
+      const result = await createOrGetShareLink({
+        token,
+        documentId,
+      });
+
+      slug = result.slug;
+    }
 
     window.open(
       generateTwitterIntent(
-        'I just signed a document with @documenso. Check it out!',
+        `I just ${token ? 'signed' : 'sent'} a document with @documenso. Check it out!`,
         `${window.location.origin}/share/${slug}`,
       ),
       '_blank',
     );
+
+    setIsOpen(false);
   };
 
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
+    <Dialog open={isOpen} onOpenChange={onOpenChange}>
+      <DialogTrigger asChild>
         <Button
           variant="outline"
           disabled={!token || !documentId}
@@ -70,21 +104,43 @@ export const ShareButton = ({ token, documentId }: ShareButtonProps) => {
           {!isLoading && <Share className="mr-2 h-5 w-5" />}
           Share
         </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent>
-        <DropdownMenuItem className="px-10 py-3" asChild>
-          <div className="border-0" onClick={onCopyClick}>
-            <Copy className="mr-2 h-5 w-5" />
-            Copy Link
+      </DialogTrigger>
+
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Share</DialogTitle>
+
+          <DialogDescription className="mt-4">Share your signing experience!</DialogDescription>
+        </DialogHeader>
+
+        <div className="flex w-full flex-col">
+          <div className="rounded-md border p-4">
+            I just signed a document with{' '}
+            <span className="font-medium text-blue-400">@documenso</span>
+            . Check it out!
+            <span className="mt-2 block" />
+            <span className="font-medium text-blue-400">
+              {window.location.origin}/share/{shareLink?.slug || '...'}
+            </span>
           </div>
-        </DropdownMenuItem>
-        <DropdownMenuItem className="px-10 py-3" asChild>
-          <div onClick={onTweetClick}>
-            <Twitter className="mr-2 h-5 w-5" />
+
+          <Button variant="outline" className="mt-4" onClick={onTweetClick}>
+            <Twitter className="mr-2 h-4 w-4" />
             Tweet
+          </Button>
+
+          <div className="relative flex items-center justify-center gap-x-4 py-4 text-xs uppercase">
+            <div className="bg-border h-px flex-1" />
+            <span className="text-muted-foreground bg-transparent">Or</span>
+            <div className="bg-border h-px flex-1" />
           </div>
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
+
+          <Button variant="outline" onClick={onCopyClick}>
+            <Copy className="mr-2 h-4 w-4" />
+            Copy Link
+          </Button>
+        </div>
+      </DialogContent>
+    </Dialog>
   );
 };
