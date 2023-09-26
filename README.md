@@ -28,12 +28,12 @@
 
 > 🦺 Documenso 1.0 is deployed to our <a href="https://documen.so/staging" target="_blank">Staging Environment</a>.
 >
-> The code be found on the [feat/refresh](https://github.com/documenso/documenso/tree/feat/refresh) branch.
+> The code can be found on the [feat/refresh](https://github.com/documenso/documenso/tree/feat/refresh) branch.
 > 
-> The new Version will be release after the current testing phase.
+> The new Version will be released after the current testing phase.
 
 
-# Join us in testing Documenso 1.0 during [MALFUNCTION MANIA](https://documenso.com/blog/manfunction-mania)
+# Join us in testing Documenso 1.0 during [MALFUNCTION MANIA](https://documenso.com/blog/malfunction-mania)
 <div>
   <img style="display: block; height: 120px; width: 24%"
     src="https://github.com/documenso/documenso/assets/1309312/67e08c98-c153-4115-aa2d-77979bb12c94)">
