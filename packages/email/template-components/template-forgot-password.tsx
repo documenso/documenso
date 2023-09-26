@@ -1,6 +1,8 @@
-import { Button, Img, Section, Tailwind, Text } from '@react-email/components';
+import { Button, Section, Tailwind, Text } from '@react-email/components';
 
 import * as config from '@documenso/tailwind-config';
+
+import TemplateDocumentImage from './template-document-image';
 
 export type TemplateForgotPasswordProps = {
   resetPasswordLink: string;
@@ -11,10 +13,6 @@ export const TemplateForgotPassword = ({
   resetPasswordLink,
   assetBaseUrl,
 }: TemplateForgotPasswordProps) => {
-  const getAssetUrl = (path: string) => {
-    return new URL(path, assetBaseUrl).toString();
-  };
-
   return (
     <Tailwind
       config={{
@@ -25,11 +23,9 @@ export const TemplateForgotPassword = ({
         },
       }}
     >
-      <Section className="mt-4 flex-row items-center justify-center">
-        <div className="flex items-center justify-center p-4">
-          <Img className="h-42" src={getAssetUrl('/static/document.png')} alt="Documenso" />
-        </div>
+      <TemplateDocumentImage className="mt-6" assetBaseUrl={assetBaseUrl} />
 
+      <Section className="flex-row items-center justify-center">
         <Text className="text-primary mx-auto mb-0 max-w-[80%] text-center text-lg font-semibold">
           Forgot your password?
         </Text>
