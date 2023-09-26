@@ -32,7 +32,7 @@ export default defineConfig({
 
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: 'on-first-retry',
-    video: 'retain-on-failure',
+    navigationTimeout: 60 * 1000,
   },
 
   /* Configure projects for major browsers */
@@ -41,7 +41,7 @@ export default defineConfig({
     {
       name: 'Authenticated User Tests',
       testMatch: '*.authenticated.spec.ts',
-      dependencies: ['setup'],
+      dependencies: ['setup', 'cleanup db'],
       use: {
         ...devices['Desktop Chrome'],
         storageState: STORAGE_STATE,
@@ -49,6 +49,7 @@ export default defineConfig({
     },
     {
       name: 'Unauthenticated User Tests',
+      dependencies: ['cleanup db'],
       use: {
         ...devices['Desktop Chrome'],
       },

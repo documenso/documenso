@@ -29,6 +29,9 @@ test('user can sign up with email and password', async ({ page }: { page: Page }
   }
 
   await page.getByRole('button', { name: 'Sign Up' }).click();
+  await page.waitForURL('/documents');
+
+  await expect(page).toHaveURL('/documents');
 });
 
 test('user can login with user and password', async ({ page }: { page: Page }) => {
@@ -37,5 +40,6 @@ test('user can login with user and password', async ({ page }: { page: Page }) =
   await page.getByLabel('Password').fill(password);
   await page.getByRole('button', { name: 'Sign In' }).click();
 
+  await page.waitForURL('/documents');
   await expect(page).toHaveURL('/documents');
 });
