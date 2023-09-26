@@ -9,6 +9,7 @@
     "start": "next start",
     "lint": "next lint",
     "copy:pdfjs": "node ../../scripts/copy-pdfjs.cjs",
+    "dev:test": "playwright test",
     "e2e:test": "start-server-and-test \"npm run start\" http://localhost:3000 \"playwright test\""
   },
   "dependencies": {
