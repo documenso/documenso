@@ -9,6 +9,9 @@
     "dev": {
       "cache": false,
       "persistent": true
+    },
+    "e2e:test": {
+      "dependsOn": ["^build"]
     }
   },
   "globalDependencies": ["**/.env.*local"],
@@ -17,6 +20,10 @@
     "E2E_TEST_USERNAME",
     "E2E_TEST_USER_EMAIL",
     "E2E_TEST_USER_PASSWORD",
+    "E2E_TEST_SIGNER_NAME",
+    "E2E_TEST_SIGNER_EMAIL",
+    "E2E_TEST_SIGNING_SUBJECT",
+    "E2E_TEST_SIGNING_MESSAGE",
     "NEXTAUTH_URL",
     "NEXTAUTH_SECRET",
     "NEXT_PUBLIC_WEBAPP_URL",

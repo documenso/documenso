@@ -8,7 +8,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "copy:pdfjs": "node ../../scripts/copy-pdfjs.cjs"
+    "copy:pdfjs": "node ../../scripts/copy-pdfjs.cjs",
+    "e2e:test": "start-server-and-test \"npm run start\" http://localhost:3000 \"playwright test\""
   },
   "dependencies": {
     "@documenso/ee": "*",
@@ -40,7 +41,8 @@
     "sharp": "0.32.5",
     "ts-pattern": "^5.0.5",
     "typescript": "5.1.6",
-    "zod": "^3.21.4"
+    "zod": "^3.21.4",
+    "start-server-and-test": "^2.0.1"
   },
   "devDependencies": {
     "@playwright/test": "^1.38.0",

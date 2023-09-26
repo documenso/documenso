@@ -25,18 +25,14 @@ test.describe('Document upload test', () => {
     await expect(page.locator('canvas')).toBeVisible();
   });
 
-  test('user can add 1 signer', async ({ documentsPage }) => {
-    await documentsPage.addSigner(signer_email, signer_name);
-  });
-
-  test('user can add signature field', async ({ documentsPage }) => {
-    await documentsPage.addSigner(signer_email, signer_name);
-    await documentsPage.addSignatureField(signer_name);
-  });
-
-  test('user can add subject and message', async ({ documentsPage }) => {
+  test('user can send the document for signing succesfully', async ({ documentsPage, page }) => {
     await documentsPage.addSigner(signer_email, signer_name);
     await documentsPage.addSignatureField(signer_name);
     await documentsPage.addSubjectAndMessage(signing_subject, signing_message);
+
+    await expect(page).toHaveURL('/documents');
+    await expect(page.getByRole('status').locator('div').nth(2)).toHaveText(
+      'Your document has been sent successfully.',
+    );
   });
 });

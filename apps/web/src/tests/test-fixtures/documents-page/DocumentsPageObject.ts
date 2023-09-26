@@ -5,6 +5,7 @@ export class DocumentsPage {
   private readonly subject: Locator;
   private readonly message: Locator;
 
+  // eslint-disable-next-line no-unused-vars
   constructor(public readonly page: Page) {
     this.fileInput = this.page.locator('input[type=file]');
     this.subject = this.page
