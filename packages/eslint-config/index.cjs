@@ -1,3 +1,4 @@
+/** @type {import("eslint").Linter.Config} */
 module.exports = {
   extends: [
     'next',
@@ -68,4 +69,12 @@ module.exports = {
     // warnings so we can write appropriate interfaces and guards later.
     '@typescript-eslint/consistent-type-assertions': ['warn', { assertionStyle: 'never' }],
   },
+  overrides: [
+    {
+      files: ['apps/web/**/*.{tsx,ts}'],
+      rules: {
+        'no-process-env': 'error',
+      },
+    },
+  ],
 };

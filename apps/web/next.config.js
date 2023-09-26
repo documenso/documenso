@@ -6,6 +6,8 @@ require('dotenv').config({
   path: path.join(__dirname, '../../.env.local'),
 });
 
+import('./src/env.mjs');
+
 /** @type {import('next').NextConfig} */
 const config = {
   experimental: {

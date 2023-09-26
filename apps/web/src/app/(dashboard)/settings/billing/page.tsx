@@ -10,6 +10,7 @@ import { SubscriptionStatus } from '@documenso/prisma/client';
 import { Button } from '@documenso/ui/primitives/button';
 
 import { LocaleDate } from '~/components/formatter/locale-date';
+import { env } from '~/env.mjs';
 
 export default async function BillingSettingsPage() {
   const user = await getRequiredServerComponentSession();
@@ -35,7 +36,7 @@ export default async function BillingSettingsPage() {
   if (subscription.customerId) {
     billingPortalUrl = await getPortalSession({
       customerId: subscription.customerId,
-      returnUrl: `${process.env.NEXT_PUBLIC_WEBAPP_URL}/settings/billing`,
+      returnUrl: `${env.NEXT_PUBLIC_WEBAPP_URL}/settings/billing`,
     });
   }
 
