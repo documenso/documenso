@@ -45,13 +45,16 @@ const {
   NEXT_PUBLIC_STRIPE_COMMUNITY_PLAN_YEARLY_PRICE_ID,
 
   // URLS
-  NEXT_PUBLIC_SITE_URL,
-  NEXT_PUBLIC_APP_URL,
+  NEXT_PUBLIC_WEBAPP_URL,
+  NEXT_PUBLIC_MARKETING_URL,
 
   // FEATURES
   NEXT_PUBLIC_POSTHOG_KEY,
   NEXT_PUBLIC_POSTHOG_HOST,
   NEXT_PUBLIC_FEATURE_BILLING_ENABLED,
+
+  // APP
+  APP_VERSION,
 } = process.env;
 
 export const env = createEnv({
@@ -95,6 +98,9 @@ export const env = createEnv({
     // STRIPE
     NEXT_PRIVATE_STRIPE_API_KEY: z.string().optional(),
     NEXT_PRIVATE_STRIPE_WEBHOOK_SECRET: z.string().optional(),
+
+    // APP
+    APP_VERSION: z.string().optional(),
   },
   /**
    * Specify your client-side environment variables schema here.
@@ -102,8 +108,8 @@ export const env = createEnv({
    */
   client: {
     // URLS
-    NEXT_PUBLIC_SITE_URL: z.string(),
-    NEXT_PUBLIC_APP_URL: z.string(),
+    NEXT_PUBLIC_MARKETING_URL: z.string().url().min(1),
+    NEXT_PUBLIC_WEBAPP_URL: z.string().url().min(1),
 
     // STORAGE
     NEXT_PUBLIC_UPLOAD_TRANSPORT: z.enum(['database', 's3']),
@@ -161,12 +167,15 @@ export const env = createEnv({
     NEXT_PUBLIC_STRIPE_COMMUNITY_PLAN_YEARLY_PRICE_ID,
 
     // URLS
-    NEXT_PUBLIC_SITE_URL,
-    NEXT_PUBLIC_APP_URL,
+    NEXT_PUBLIC_MARKETING_URL,
+    NEXT_PUBLIC_WEBAPP_URL,
 
     // FEATURES
     NEXT_PUBLIC_POSTHOG_KEY,
     NEXT_PUBLIC_POSTHOG_HOST,
     NEXT_PUBLIC_FEATURE_BILLING_ENABLED,
+
+    // APP
+    APP_VERSION,
   },
 });
