@@ -15,6 +15,9 @@ export function generateMetadata({ params: { slug } }: SharePageProps) {
     openGraph: {
       images: [`${APP_BASE_URL}/share/${slug}/opengraph`],
     },
+    twitter: {
+      images: [`${APP_BASE_URL}/share/${slug}/opengraph`],
+    },
   } satisfies Metadata;
 }
 
