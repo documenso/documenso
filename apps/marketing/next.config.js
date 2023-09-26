@@ -2,7 +2,7 @@
 const path = require('path');
 const { withContentlayer } = require('next-contentlayer');
 
-const { parsed: env } = require('dotenv').config({
+require('dotenv').config({
   path: path.join(__dirname, '../../.env.local'),
 });
 
@@ -10,9 +10,13 @@ const { parsed: env } = require('dotenv').config({
 const config = {
   experimental: {
     serverActions: true,
+    serverActionsBodySizeLimit: '10mb',
   },
   reactStrictMode: true,
   transpilePackages: ['@documenso/lib', '@documenso/prisma', '@documenso/trpc', '@documenso/ui'],
+  env: {
+    NEXT_PUBLIC_PROJECT: 'marketing',
+  },
   modularizeImports: {
     'lucide-react': {
       transform: 'lucide-react/dist/esm/icons/{{ kebabCase member }}',

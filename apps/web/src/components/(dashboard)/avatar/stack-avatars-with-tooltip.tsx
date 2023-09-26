@@ -58,7 +58,7 @@ export const StackAvatarsWithTooltip = ({
                       type={getRecipientType(recipient)}
                       fallbackText={recipientAbbreviation(recipient)}
                     />
-                    <span className="text-sm text-gray-500">{recipient.email}</span>
+                    <span className="text-muted-foreground text-sm">{recipient.email}</span>
                   </div>
                 ))}
               </div>
@@ -75,7 +75,7 @@ export const StackAvatarsWithTooltip = ({
                       type={getRecipientType(recipient)}
                       fallbackText={recipientAbbreviation(recipient)}
                     />
-                    <span className="text-sm text-gray-500">{recipient.email}</span>
+                    <span className="text-muted-foreground text-sm">{recipient.email}</span>
                   </div>
                 ))}
               </div>
@@ -92,7 +92,7 @@ export const StackAvatarsWithTooltip = ({
                       type={getRecipientType(recipient)}
                       fallbackText={recipientAbbreviation(recipient)}
                     />
-                    <span className="text-sm text-gray-500">{recipient.email}</span>
+                    <span className="text-muted-foreground text-sm">{recipient.email}</span>
                   </div>
                 ))}
               </div>
@@ -109,7 +109,7 @@ export const StackAvatarsWithTooltip = ({
                       type={getRecipientType(recipient)}
                       fallbackText={recipientAbbreviation(recipient)}
                     />
-                    <span className="text-sm text-gray-500">{recipient.email}</span>
+                    <span className="text-muted-foreground text-sm">{recipient.email}</span>
                   </div>
                 ))}
               </div>

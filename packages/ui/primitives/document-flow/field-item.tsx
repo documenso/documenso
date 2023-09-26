@@ -118,7 +118,7 @@ export const FieldItem = ({
     >
       {!disabled && (
         <button
-          className="text-muted-foreground/50 hover:text-muted-foreground/80 absolute -right-2 -top-2 z-20 flex h-8 w-8 items-center justify-center rounded-full border bg-white shadow-[0_0_0_2px_theme(colors.gray.100/70%)]"
+          className="text-muted-foreground/50 hover:text-muted-foreground/80 bg-background absolute -right-2 -top-2 z-20 flex h-8 w-8 items-center justify-center rounded-full border"
           onClick={() => onRemove?.()}
         >
           <Trash className="h-4 w-4" />
@@ -126,7 +126,7 @@ export const FieldItem = ({
       )}
 
       <Card
-        className={cn('h-full w-full bg-white', {
+        className={cn('bg-background h-full w-full', {
           'border-primary': !disabled,
           'border-primary/80': active,
         })}

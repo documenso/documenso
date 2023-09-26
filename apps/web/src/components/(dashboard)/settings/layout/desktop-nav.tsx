@@ -7,10 +7,9 @@ import { usePathname } from 'next/navigation';
 
 import { CreditCard, Key, User } from 'lucide-react';
 
+import { useFeatureFlags } from '@documenso/lib/client-only/providers/feature-flag';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
-
-import { useFeatureFlags } from '~/providers/feature-flag';
 
 export type DesktopNavProps = HTMLAttributes<HTMLDivElement>;
 

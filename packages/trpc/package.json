@@ -5,6 +5,7 @@
   "types": "./index.ts",
   "license": "MIT",
   "scripts": {
+    "clean": "rimraf node_modules"
   },
   "dependencies": {
     "@documenso/lib": "*",
