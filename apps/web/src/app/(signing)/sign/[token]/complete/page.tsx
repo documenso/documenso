@@ -9,8 +9,7 @@ import { getFieldsForToken } from '@documenso/lib/server-only/field/get-fields-f
 import { getRecipientByToken } from '@documenso/lib/server-only/recipient/get-recipient-by-token';
 import { DocumentStatus, FieldType } from '@documenso/prisma/client';
 import { DocumentDownloadButton } from '@documenso/ui/components/document/document-download-button';
-import { SigningCard } from '@documenso/ui/components/signing-card';
-import { Button } from '@documenso/ui/primitives/button';
+import { SigningCard3D } from '@documenso/ui/components/signing-card';
 
 import signingCelebration from '~/assets/signing-celebration.png';
 
@@ -54,7 +53,7 @@ export default async function CompletedSigningPage({
   return (
     <div className="flex flex-col items-center pt-24">
       {/* Card with recipient */}
-      <SigningCard name={recipientName} signingCelebrationImage={signingCelebration} />
+      <SigningCard3D name={recipientName} signingCelebrationImage={signingCelebration} />
 
       <div className="mt-6">
         {match(document.status)
