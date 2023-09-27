@@ -15,7 +15,7 @@ import {
   TemplateDocumentSelfSigned,
   TemplateDocumentSelfSignedProps,
 } from '../template-components/template-document-self-signed';
-import TemplateFooter from '../template-components/template-footer';
+import { TemplateFooter } from '../template-components/template-footer';
 
 export type DocumentSelfSignedTemplateProps = TemplateDocumentSelfSignedProps;
 

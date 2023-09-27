@@ -14,7 +14,7 @@ import {
 
 import config from '@documenso/tailwind-config';
 
-import TemplateFooter from '../template-components/template-footer';
+import { TemplateFooter } from '../template-components/template-footer';
 import {
   TemplateResetPassword,
   TemplateResetPasswordProps,
