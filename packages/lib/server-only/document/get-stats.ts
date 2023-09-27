@@ -40,7 +40,7 @@ export const getStats = async ({ user }: GetStatsInput) => {
       },
       where: {
         status: {
-          not: ExtendedDocumentStatus.DRAFT,
+          in: [ExtendedDocumentStatus.DRAFT, ExtendedDocumentStatus.PENDING],
         },
         Recipient: {
           some: {
