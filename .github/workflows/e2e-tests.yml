@@ -13,6 +13,7 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: 18
+      - uses: ./.github/actions/docker-compose
       - name: Generate package-lock.json
         run: npm install
       - name: Install dependencies
@@ -31,3 +32,5 @@ jobs:
           name: playwright-report
           path: playwright-report/
           retention-days: 30
+    env:
+      DATABASE_URL: postgres://myuser:documenso@localhost:5432/postgres
