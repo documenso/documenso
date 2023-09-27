@@ -13,6 +13,8 @@ export const TemplateDocumentSelfSigned = ({
   documentName,
   assetBaseUrl,
 }: TemplateDocumentSelfSignedProps) => {
+  const signUpUrl = `${process.env.NEXT_PUBLIC_WEBAPP_URL ?? 'http://localhost:3000'}/signup`;
+
   const getAssetUrl = (path: string) => {
     return new URL(path, assetBaseUrl).toString();
   };
@@ -49,7 +51,7 @@ export const TemplateDocumentSelfSigned = ({
         <Text className="mx-auto mb-6 mt-1 max-w-[80%] text-center text-base text-slate-400">
           Create a{' '}
           <Link
-            href={`${process.env.NEXT_PUBLIC_WEBAPP_URL ?? 'http://localhost:3000'}/signup`}
+            href={signUpUrl}
             target="_blank"
             className="text-documenso-700 hover:text-documenso-600 whitespace-nowrap"
           >
@@ -59,7 +61,10 @@ export const TemplateDocumentSelfSigned = ({
         </Text>
 
         <Section className="mb-6 mt-8 text-center">
-          <Button className="mr-4 rounded-lg border border-solid border-slate-200 px-4 py-2 text-center text-sm font-medium text-black no-underline">
+          <Button
+            href={signUpUrl}
+            className="mr-4 rounded-lg border border-solid border-slate-200 px-4 py-2 text-center text-sm font-medium text-black no-underline"
+          >
             <Img
               src={getAssetUrl('/static/user-plus.png')}
               className="mb-0.5 mr-2 inline h-5 w-5 align-middle"
