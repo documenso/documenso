@@ -51,11 +51,11 @@ export default async function CompletedSigningPage({
     recipient.email;
 
   return (
-    <div className="flex flex-col items-center pt-24">
+    <div className="flex flex-col items-center pt-24 lg:pt-36 xl:pt-44">
       {/* Card with recipient */}
       <SigningCard3D name={recipientName} signingCelebrationImage={signingCelebration} />
 
-      <div className="mt-6">
+      <div className="relative mt-6 flex w-full flex-col items-center">
         {match(document.status)
           .with(DocumentStatus.COMPLETED, () => (
             <div className="text-documenso-700 flex items-center text-center">
@@ -69,41 +69,44 @@ export default async function CompletedSigningPage({
               <span className="text-sm">Waiting for others to sign</span>
             </div>
           ))}
+
+        <h2 className="mt-6 max-w-[35ch] text-center text-2xl font-semibold leading-normal md:text-3xl lg:text-4xl">
+          You have signed "{document.title}"
+        </h2>
+
+        {match(document.status)
+          .with(DocumentStatus.COMPLETED, () => (
+            <p className="text-muted-foreground/60 mt-2.5 max-w-[60ch] text-center text-sm font-medium md:text-base">
+              Everyone has signed! You will receive an Email copy of the signed document.
+            </p>
+          ))
+          .otherwise(() => (
+            <p className="text-muted-foreground/60 mt-2.5 max-w-[60ch] text-center text-sm font-medium md:text-base">
+              You will receive an Email copy of the signed document once everyone has signed.
+            </p>
+          ))}
+
+        <div className="mt-8 flex w-full max-w-sm items-center justify-center gap-4">
+          <ShareButton documentId={document.id} token={recipient.token} />
+
+          <DocumentDownloadButton
+            className="flex-1"
+            fileName={document.title}
+            documentData={documentData}
+            disabled={document.status !== DocumentStatus.COMPLETED}
+          />
+        </div>
+
+        <p className="text-muted-foreground/60 mt-36 text-sm">
+          Want to send slick signing links like this one?{' '}
+          <Link
+            href="https://documenso.com"
+            className="text-documenso-700 hover:text-documenso-600"
+          >
+            Check out Documenso.
+          </Link>
+        </p>
       </div>
-
-      <h2 className="mt-6 max-w-[35ch] text-center text-2xl font-semibold leading-normal md:text-3xl lg:text-4xl">
-        You have signed "{document.title}"
-      </h2>
-
-      {match(document.status)
-        .with(DocumentStatus.COMPLETED, () => (
-          <p className="text-muted-foreground/60 mt-2.5 max-w-[60ch] text-center text-sm font-medium md:text-base">
-            Everyone has signed! You will receive an Email copy of the signed document.
-          </p>
-        ))
-        .otherwise(() => (
-          <p className="text-muted-foreground/60 mt-2.5 max-w-[60ch] text-center text-sm font-medium md:text-base">
-            You will receive an Email copy of the signed document once everyone has signed.
-          </p>
-        ))}
-
-      <div className="mt-8 flex w-full max-w-sm items-center justify-center gap-4">
-        <ShareButton documentId={document.id} token={recipient.token} />
-
-        <DocumentDownloadButton
-          className="flex-1"
-          fileName={document.title}
-          documentData={documentData}
-          disabled={document.status !== DocumentStatus.COMPLETED}
-        />
-      </div>
-
-      <p className="text-muted-foreground/60 mt-36 text-sm">
-        Want to send slick signing links like this one?{' '}
-        <Link href="https://documenso.com" className="text-documenso-700 hover:text-documenso-600">
-          Check out Documenso.
-        </Link>
-      </p>
     </div>
   );
 }
