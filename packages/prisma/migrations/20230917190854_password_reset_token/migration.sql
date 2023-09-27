@@ -1,3 +1,5 @@
+DROP TABLE IF EXISTS "PasswordResetToken" CASCADE;
+
 -- CreateTable
 CREATE TABLE "PasswordResetToken" (
     "id" SERIAL NOT NULL,
