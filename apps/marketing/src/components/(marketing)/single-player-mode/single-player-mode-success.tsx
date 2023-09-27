@@ -73,7 +73,7 @@ export const SinglePlayerModeSuccess = ({ className, document }: SinglePlayerMod
         <ConfettiScreen duration={3000} gravity={0.075} initialVelocityY={50} wind={0.005} />
       )}
 
-      <h2 className="text-center text-2xl font-semibold leading-normal md:text-3xl lg:mb-2 lg:text-4xl">
+      <h2 className="relative z-10 text-center text-2xl font-semibold leading-normal md:text-3xl lg:mb-2 lg:text-4xl">
         You have signed
         <span className="mt-2 block">{document.title}</span>
       </h2>
@@ -84,17 +84,17 @@ export const SinglePlayerModeSuccess = ({ className, document }: SinglePlayerMod
         signingCelebrationImage={signingCelebration}
       />
 
-      <div className="mt-8 w-full">
+      <div className="relative mt-8 w-full">
         <div className={cn('flex flex-col items-center', className)}>
           <div className="grid w-full max-w-sm grid-cols-2 gap-4">
             {/* TODO: Hook this up */}
-            <Button variant="outline" className="flex-1" disabled>
+            <Button variant="outline" className="flex-1 bg-transparent backdrop-blur-sm" disabled>
               <Share className="mr-2 h-5 w-5" />
               Share
             </Button>
 
             <DocumentDownloadButton
-              className="flex-1"
+              className="flex-1 bg-transparent backdrop-blur-sm"
               fileName={document.title}
               documentData={document.documentData}
               disabled={document.status !== DocumentStatus.COMPLETED}

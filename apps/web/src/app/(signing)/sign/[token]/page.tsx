@@ -1,4 +1,4 @@
-import { notFound } from 'next/navigation';
+import { notFound, redirect } from 'next/navigation';
 
 import { match } from 'ts-pattern';
 
@@ -9,7 +9,7 @@ import { viewedDocument } from '@documenso/lib/server-only/document/viewed-docum
 import { getFieldsForToken } from '@documenso/lib/server-only/field/get-fields-for-token';
 import { getRecipientByToken } from '@documenso/lib/server-only/recipient/get-recipient-by-token';
 import { getFile } from '@documenso/lib/universal/upload/get-file';
-import { FieldType } from '@documenso/prisma/client';
+import { DocumentStatus, FieldType, SigningStatus } from '@documenso/prisma/client';
 import { Card, CardContent } from '@documenso/ui/primitives/card';
 import { ElementVisible } from '@documenso/ui/primitives/element-visible';
 import { LazyPDFViewer } from '@documenso/ui/primitives/lazy-pdf-viewer';
@@ -52,6 +52,13 @@ export default async function SigningPage({ params: { token } }: SigningPageProp
     .then((data) => `data:application/pdf;base64,${data}`);
 
   const user = await getServerComponentSession();
+
+  if (
+    document.status === DocumentStatus.COMPLETED ||
+    recipient.signingStatus === SigningStatus.SIGNED
+  ) {
+    redirect(`/sign/${token}/complete`);
+  }
 
   return (
     <SigningProvider email={recipient.email} fullName={recipient.name} signature={user?.signature}>
