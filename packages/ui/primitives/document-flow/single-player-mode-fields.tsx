@@ -145,7 +145,7 @@ export function SinglePlayerModeCustomTextField({
       height,
       width,
     },
-    $paragraphEl,
+    field.customText,
     maxFontSize,
     fontVariableValue,
   );

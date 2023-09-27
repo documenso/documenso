@@ -25,7 +25,7 @@ export default function MarketingLayout({ children }: MarketingLayoutProps) {
   }, []);
 
   return (
-    <div className="relative max-w-[100vw] overflow-y-auto overflow-x-hidden pt-20 md:pt-28">
+    <div className="relative max-w-[100vw] pt-20 md:pt-28">
       <div
         className={cn('fixed left-0 top-0 z-50 w-full bg-transparent', {
           'bg-background/50 backdrop-blur-md': scrollY > 5,
