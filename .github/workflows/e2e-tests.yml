@@ -13,7 +13,7 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: 18
-      - uses: ./actions/docker-compose
+      - uses: ./.github/workflows/actions/docker-compose
       - name: Generate package-lock.json
         run: npm install
       - name: Install dependencies
