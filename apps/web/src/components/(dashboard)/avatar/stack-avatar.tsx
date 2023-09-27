@@ -15,7 +15,7 @@ export type StackAvatarProps = {
   type: 'unsigned' | 'waiting' | 'opened' | 'completed';
 };
 
-export const StackAvatar = ({ first, zIndex, fallbackText, type }: StackAvatarProps) => {
+export const StackAvatar = ({ first, zIndex, fallbackText = '', type }: StackAvatarProps) => {
   let classes = '';
   let zIndexClass = '';
   const firstClass = first ? '' : '-ml-3';
@@ -48,7 +48,7 @@ export const StackAvatar = ({ first, zIndex, fallbackText, type }: StackAvatarPr
         ${firstClass}
         dark:border-border h-10 w-10 border-2 border-solid border-white`}
     >
-      <AvatarFallback className={classes}>{fallbackText ?? 'UK'}</AvatarFallback>
+      <AvatarFallback className={classes}>{fallbackText}</AvatarFallback>
     </Avatar>
   );
 };

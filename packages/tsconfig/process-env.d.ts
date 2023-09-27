@@ -1,6 +1,7 @@
 declare namespace NodeJS {
   export interface ProcessEnv {
-    NEXT_PUBLIC_SITE_URL?: string;
+    NEXT_PUBLIC_WEBAPP_URL?: string;
+    NEXT_PUBLIC_MARKETING_URL?: string;
 
     NEXT_PRIVATE_GOOGLE_CLIENT_ID?: string;
     NEXT_PRIVATE_GOOGLE_CLIENT_SECRET?: string;
@@ -12,6 +13,19 @@ declare namespace NodeJS {
 
     NEXT_PRIVATE_STRIPE_API_KEY: string;
     NEXT_PRIVATE_STRIPE_WEBHOOK_SECRET: string;
+
+    NEXT_PUBLIC_UPLOAD_TRANSPORT?: 'database' | 's3';
+    NEXT_PRIVATE_UPLOAD_ENDPOINT?: string;
+    NEXT_PRIVATE_UPLOAD_REGION?: string;
+    NEXT_PRIVATE_UPLOAD_BUCKET?: string;
+    NEXT_PRIVATE_UPLOAD_ACCESS_KEY_ID?: string;
+    NEXT_PRIVATE_UPLOAD_SECRET_ACCESS_KEY?: string;
+
+    NEXT_PRIVATE_SIGNING_TRANSPORT?: 'local' | 'http' | 'gcloud-hsm';
+    NEXT_PRIVATE_SIGNING_PASSPHRASE?: string;
+    NEXT_PRIVATE_SIGNING_LOCAL_FILE_PATH?: string;
+    NEXT_PRIVATE_SIGNING_LOCAL_FILE_CONTENTS?: string;
+    NEXT_PRIVATE_SIGNING_LOCAL_FILE_ENCODING?: string;
 
     NEXT_PRIVATE_SMTP_TRANSPORT?: 'mailchannels' | 'smtp-auth' | 'smtp-api';
 
@@ -33,5 +47,19 @@ declare namespace NodeJS {
 
     NEXT_PRIVATE_SMTP_FROM_NAME?: string;
     NEXT_PRIVATE_SMTP_FROM_ADDRESS?: string;
+
+    /**
+     * Vercel environment variables
+     */
+    VERCEL?: string;
+    VERCEL_ENV?: 'production' | 'development' | 'preview';
+    VERCEL_URL?: string;
+
+    DEPLOYMENT_TARGET?: 'webapp' | 'marketing';
+
+    POSTGRES_URL?: string;
+    DATABASE_URL?: string;
+    POSTGRES_PRISMA_URL?: string;
+    POSTGRES_URL_NON_POOLING?: string;
   }
 }

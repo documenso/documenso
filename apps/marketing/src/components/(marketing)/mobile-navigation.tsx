@@ -15,12 +15,20 @@ export type MobileNavigationProps = {
 
 export const MENU_NAVIGATION_LINKS = [
   {
+    href: '/single-player-mode',
+    text: 'Single Player Mode',
+  },
+  {
     href: '/blog',
     text: 'Blog',
   },
   {
     href: '/pricing',
     text: 'Pricing',
+  },
+  {
+    href: '/open',
+    text: 'Open',
   },
   {
     href: 'https://status.documenso.com',
@@ -51,7 +59,13 @@ export const MobileNavigation = ({ isMenuOpen, onMenuOpenChange }: MobileNavigat
     <Sheet open={isMenuOpen} onOpenChange={onMenuOpenChange}>
       <SheetContent className="w-full max-w-[400px]">
         <Link href="/" className="z-10" onClick={handleMenuItemClick}>
-          <Image src="/logo.png" alt="Documenso Logo" width={170} height={25} />
+          <Image
+            src="/logo.png"
+            alt="Documenso Logo"
+            className="dark:invert"
+            width={170}
+            height={25}
+          />
         </Link>
 
         <motion.div
@@ -59,7 +73,7 @@ export const MobileNavigation = ({ isMenuOpen, onMenuOpenChange }: MobileNavigat
           initial="initial"
           animate="animate"
           transition={{
-            staggerChildren: 0.2,
+            staggerChildren: 0.03,
           }}
         >
           {MENU_NAVIGATION_LINKS.map(({ href, text }) => (
@@ -75,12 +89,13 @@ export const MobileNavigation = ({ isMenuOpen, onMenuOpenChange }: MobileNavigat
                   x: 0,
                   transition: {
                     duration: 0.5,
+                    ease: 'backInOut',
                   },
                 },
               }}
             >
               <Link
-                className="text-2xl font-semibold text-[#8D8D8D] hover:text-[#6D6D6D]"
+                className="text-foreground hover:text-foreground/80 text-2xl font-semibold"
                 href={href}
                 onClick={() => handleMenuItemClick()}
               >
@@ -94,7 +109,7 @@ export const MobileNavigation = ({ isMenuOpen, onMenuOpenChange }: MobileNavigat
           <Link
             href="https://twitter.com/documenso"
             target="_blank"
-            className="text-[#8D8D8D] hover:text-[#6D6D6D]"
+            className="text-foreground hover:text-foreground/80"
           >
             <Twitter className="h-6 w-6" />
           </Link>
@@ -102,7 +117,7 @@ export const MobileNavigation = ({ isMenuOpen, onMenuOpenChange }: MobileNavigat
           <Link
             href="https://github.com/documenso/documenso"
             target="_blank"
-            className="text-[#8D8D8D] hover:text-[#6D6D6D]"
+            className="text-foreground hover:text-foreground/80"
           >
             <Github className="h-6 w-6" />
           </Link>
@@ -110,7 +125,7 @@ export const MobileNavigation = ({ isMenuOpen, onMenuOpenChange }: MobileNavigat
           <Link
             href="https://documen.so/discord"
             target="_blank"
-            className="text-[#8D8D8D] hover:text-[#6D6D6D]"
+            className="text-foreground hover:text-foreground/80"
           >
             <MessagesSquare className="h-6 w-6" />
           </Link>

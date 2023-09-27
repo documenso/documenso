@@ -4,12 +4,12 @@ import { redirect } from 'next/navigation';
 import { createCustomer } from '@documenso/ee/server-only/stripe/create-customer';
 import { getPortalSession } from '@documenso/ee/server-only/stripe/get-portal-session';
 import { getRequiredServerComponentSession } from '@documenso/lib/next-auth/get-server-session';
+import { getServerComponentFlag } from '@documenso/lib/server-only/feature-flags/get-server-component-feature-flag';
 import { getSubscriptionByUserId } from '@documenso/lib/server-only/subscription/get-subscription-by-user-id';
 import { SubscriptionStatus } from '@documenso/prisma/client';
 import { Button } from '@documenso/ui/primitives/button';
 
 import { LocaleDate } from '~/components/formatter/locale-date';
-import { getServerComponentFlag } from '~/helpers/get-server-component-feature-flag';
 
 export default async function BillingSettingsPage() {
   const user = await getRequiredServerComponentSession();
@@ -21,19 +21,21 @@ export default async function BillingSettingsPage() {
     redirect('/settings/profile');
   }
 
-  let subscription = await getSubscriptionByUserId({ userId: user.id });
+  const subscription = await getSubscriptionByUserId({ userId: user.id }).then(async (sub) => {
+    if (sub) {
+      return sub;
+    }
 
-  // If we don't have a customer record, create one as well as an empty subscription.
-  if (!subscription?.customerId) {
-    subscription = await createCustomer({ user });
-  }
+    // If we don't have a customer record, create one as well as an empty subscription.
+    return createCustomer({ user });
+  });
 
   let billingPortalUrl = '';
 
-  if (subscription?.customerId) {
+  if (subscription.customerId) {
     billingPortalUrl = await getPortalSession({
       customerId: subscription.customerId,
-      returnUrl: `${process.env.NEXT_PUBLIC_SITE_URL}/settings/billing`,
+      returnUrl: `${process.env.NEXT_PUBLIC_WEBAPP_URL}/settings/billing`,
     });
   }
 
@@ -41,7 +43,7 @@ export default async function BillingSettingsPage() {
     <div>
       <h3 className="text-lg font-medium">Billing</h3>
 
-      <p className="mt-2 text-sm text-slate-500">
+      <p className="text-muted-foreground mt-2 text-sm">
         Your subscription is{' '}
         {subscription.status !== SubscriptionStatus.INACTIVE ? 'active' : 'inactive'}.
         {subscription?.periodEnd && (
@@ -65,7 +67,7 @@ export default async function BillingSettingsPage() {
       )}
 
       {!billingPortalUrl && (
-        <p className="max-w-[60ch] text-base text-slate-500">
+        <p className="text-muted-foreground max-w-[60ch] text-base">
           You do not currently have a customer record, this should not happen. Please contact
           support for assistance.
         </p>

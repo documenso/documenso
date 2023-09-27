@@ -7,7 +7,7 @@ import GoogleProvider, { GoogleProfile } from 'next-auth/providers/google';
 import { prisma } from '@documenso/prisma';
 
 import { getUserByEmail } from '../server-only/user/get-user-by-email';
-import { ErrorCodes } from './error-codes';
+import { ErrorCode } from './error-codes';
 
 export const NEXT_AUTH_OPTIONS: AuthOptions = {
   adapter: PrismaAdapter(prisma),
@@ -24,23 +24,23 @@ export const NEXT_AUTH_OPTIONS: AuthOptions = {
       },
       authorize: async (credentials, _req) => {
         if (!credentials) {
-          throw new Error(ErrorCodes.CredentialsNotFound);
+          throw new Error(ErrorCode.CREDENTIALS_NOT_FOUND);
         }
 
         const { email, password } = credentials;
 
         const user = await getUserByEmail({ email }).catch(() => {
-          throw new Error(ErrorCodes.IncorrectEmailPassword);
+          throw new Error(ErrorCode.INCORRECT_EMAIL_PASSWORD);
         });
 
         if (!user.password) {
-          throw new Error(ErrorCodes.UserMissingPassword);
+          throw new Error(ErrorCode.USER_MISSING_PASSWORD);
         }
 
         const isPasswordsSame = await compare(password, user.password);
 
         if (!isPasswordsSame) {
-          throw new Error(ErrorCodes.IncorrectEmailPassword);
+          throw new Error(ErrorCode.INCORRECT_EMAIL_PASSWORD);
         }
 
         return {

@@ -2,12 +2,13 @@
   "private": true,
   "scripts": {
     "build": "turbo run build",
-    "dev": "turbo run dev --filter=@documenso/{web,marketing}",
+    "dev": "turbo run dev --filter=@documenso/web --filter=@documenso/marketing",
     "start": "cd apps && cd web && next start",
     "lint": "turbo run lint",
     "format": "prettier --write \"**/*.{js,jsx,cjs,mjs,ts,tsx,cts,mts,mdx}\"",
     "prepare": "husky install",
-    "commitlint": "commitlint --edit"
+    "commitlint": "commitlint --edit",
+    "clean": "turbo run clean && rimraf node_modules"
   },
   "engines": {
     "npm": ">=8.6.0",
@@ -23,6 +24,7 @@
     "husky": "^8.0.0",
     "lint-staged": "^14.0.0",
     "prettier": "^2.5.1",
+    "rimraf": "^5.0.1",
     "turbo": "^1.9.3"
   },
   "name": "@documenso/root",

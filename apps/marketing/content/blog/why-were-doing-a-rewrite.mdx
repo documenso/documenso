@@ -1,0 +1,113 @@
+---
+title: Why we're doing a rewrite
+description: As we move beyond MVP and onto creating the open signing infrastructure we all deserve we need to take a quick pit-stop.
+authorName: 'Lucas Smith'
+authorImage: '/blog/blog-author-lucas.png'
+authorRole: 'Co-Founder'
+date: 2023-08-05
+tags:
+  - Community
+  - Development
+---
+
+<figure>
+  <MdxNextImage
+    src="/blog/blog-banner-rewrite.png"
+    width="1260"
+    height="630"
+    alt="Next generation documenso"
+  />
+
+  <figcaption className="text-center">
+    The next generation of Documenso and signing infrastructure.
+  </figcaption>
+</figure>
+
+> TLDR; We're rewriting Documenso to move on from our MVP foundations and create an even better base for the project. This rewrite will provide us the opportunity to fix a few things within the project while enabling a faster development process moving forward.
+
+# Introduction
+
+At Documenso, we're building the next generation of signing infrastructure with a focus on making it inclusive and accessible for all. To do this we need to ensure that the software we write is also inclusive and accessible and for this reason we’ve decided to take a step back and perform a _quick_ rewrite.
+
+Although we've achieved validated MVP status and gained paying customers, we're still quite far from our goal of creating a trusted, open signing experience. To move closer to that future, we need to step back and focus on the project's foundations to ensure we can solve all the items we set out to on our current homepage.
+
+Fortunately, this wasn't a case of someone joining the team and proposing a rewrite due to a lack of understanding of the codebase and context surrounding it. Prior to joining Documenso as a co-founder, I had spent an extensive amount of time within the Documenso codebase and had a fairly intimate understanding of what was happening for the most part. This knowledge allowed me to make the fair and simultaneously hard call to take a quick pause so we can rebuild our current foundations to enable accessibility and a faster delivery time in the future.
+
+# The Reasoning: TypeScript
+
+Our primary reason for the rewrite is to better leverage the tools and technologies we've already chosen, namely TypeScript. While Documenso currently uses TypeScript, it's not fully taking advantage of its safety features, such as generics and type guards.
+
+The codebase currently has several instances of `any` types, which is expected when working in an unknown domain where object models aren't fully understood before exploration and experimentation. These `any`s initially sped up development, but have since become a hindrance due to the lack of type information, combined with prop drilling. As a result, it's necessary to go through a lot of context to understand the root of any given issue.
+
+The rewrite is using TypeScript to its full potential, ensuring that every interaction is strongly typed, both through general TypeScript tooling and the introduction of [Zod](https://github.com/colinhacks/zod), a validation library with excellent TypeScript support. With these choices, we can ensure that the codebase is robust to various inputs and states, as most issues will be caught during compile time and flagged within a developer's IDE.
+
+# The Reasoning: Stronger API contracts
+
+In line with our pattern of creating strongly typed contracts, we've decided to use [tRPC](https://github.com/trpc/trpc) for our internal API. This enables us to share types between our frontend and backend and establish a solid contract for interactions between the two. This is in contrast to the currently untyped API endpoints in Documenso, which are accessed using the `fetch` API that is itself untyped.
+
+Using tRPC drastically reduces the chance of failures resulting from mundane things like argument or response shape changes during updates and upgrades. We made this decision easily because tRPC is a mature technology with no signs of losing momentum any time soon.
+
+Additionally, many of our open-source friends have made the same choice for similar reasons.
+
+# The Reasoning: Choosing exciting technologies
+
+Although we already work with what I consider to be a fun stack that includes Next.js, Prisma, Tailwind, and more, it's no secret that contributors enjoy working with new technologies that benefit them in their own careers and projects.
+
+To take advantage of this, we have decided to use Next.js 13 and React's new server component and actions architecture. Server components are currently popular among developers, with many loving and hating them at the same time.
+
+I have personally worked with server components and actions since they were first released in October 2022 and have dealt with most of the hiccups and limitations along the way. Now, in July 2023, I believe they are in a much more stable place and are ready to be adopted, with their benefits being recognised by many.
+
+By choosing to use server components and actions, we hope to encourage the community to participate more than they otherwise might. However, we are only choosing this because it has become more mature and stable. We will not choose things that are less likely to become the de-facto solution in the future, as we do not wish to inherit a pile of tech debt later on.
+
+# The Reasoning: Allowing concurrent work
+
+Another compelling reason for the rewrite was to effectively modularise code so we can work on features concurrently and without issue. This means extracting as much as possible out of components, API handlers and more and into a set of methods and functions that attempt to focus on just one thing.
+
+In performing this work we should be able to easily make refactors and other changes to various parts of the code without stepping on each others feet, this also grants us the ability to upgrade or deprecate items as required by sticking to the contract of the previous method.
+
+Additionally, this makes testing a much easier task as we can focus more on units of work rather than extensive end to end testing although we aim to have both, just not straight away.
+
+# The Reasoning: Licensing of work
+
+Another major reasoning for the rewrite is to ensure that all work performed on the project by both our internal team and external contributors is licensed in a way that benefits the project long-term. Prior to the rewrite contributors would create pull requests that would be merged in without any further process outside of the common code-review and testing cycles.
+
+This was fine for the most part since we were simply working on the MVP but now as we move towards an infrastructure focus we intend on taking on enterprise clients who will have a need for a non-GPLv3 license since interpretations of it can be quite harmful to private hosting, to facilitate this we will require contributors to sign a contributor license agreement (CLA) prior to their changes being merged which will assign a perpetual license for us to use their code and relicense it as required such as for the use-case above.
+
+While some might cringe at the idea of signing a CLA, we want to offer a compelling enterprise offering through means of dual-licensing. Great enterprise adoption is one of the cornerstones of our strategy and will be key to funding community and product development long-term.
+
+_Do note that the above does not mean that we will ever go closed-source, it’s a point in our investor agreements that [https://github.com/documenso/documenso](https://github.com/documenso/documenso) will always remain available and open-source._
+
+# Goals and Non-Goals
+
+Rewriting an application is a monumental task that I have taken on and rejected many times in my career. As I get older, I become more hesitant to perform these rewrites because I understand that systems carry a lot of context and history. This makes them better suited for piecemeal refactoring instead, which avoids learning the lessons of the past all over again during the launch of the rewrite.
+
+To ensure that we aren't just jumping off the deep end, I have set out a list of goals and non-goals to keep this rewrite lean and affordable.
+
+### Goals
+
+- Provide a clean design and interface for the newly rewritten application that creates a sense of trust and security at first glance.
+- Create a stable foundation and architecture that will allow for growth into our future roadmap items (teams, automation, workflows, etc.).
+- Create a robust system that requires minimal context through strong contracts and typing.
+
+### Non-Goals
+
+- Change the database schema (we don't want to make migration harder than it needs to be, thus all changes must be additive).
+- Add too many features that weren't in the system prior to the rewrite.
+- Remove any features that were in the older version of Documenso, such as free signatures (signatures that have no corresponding field).
+
+# Rollout Plan
+
+Thanks to the constraints listed above our rollout will hopefully be fairly painless, still to be safe we plan on doing the following.
+
+1.  In the current [testing environment](https://test.documenso.com), create and sign a number of documents leaving many in varying states of completion.
+2.  Deploy the rewrite to the testing environment and verify that all existing documents and information is retrievable and modifiable without any issue.
+3.  Create another set of documents using the new rewrite and verify that all interactions between authoring and signing work as expected.
+4.  Repeat this until we reach a general confidence level (expectation of two weeks).
+
+Once we’ve reached the desired confidence level with our testing environment we will look to deploy the rewrite to the production environment ensuring that we’ve performed all the required backups in the event of a catastrophic failure.
+
+# Want to help out?
+
+We’re currently working on the **[feat/refresh](https://github.com/documenso/documenso/tree/feat/refresh)** branch on GitHub, we aim to have a CLA available to sign in the coming days so we can start accepting external contributions asap. While we’re nearing the end-stage of the rewrite we will be throwing up a couple of bounties shortly for things like [Husky](https://github.com/typicode/husky) and [Changesets](https://github.com/changesets/changesets).
+
+Keep an eye on our [GitHub issues](https://github.com/documenso/documenso/issues) to stay up to date!

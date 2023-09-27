@@ -1,13 +1,15 @@
 'use client';
 
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 
 import { useRouter } from 'next/navigation';
 
 import { useForm } from 'react-hook-form';
 
 import { completeDocumentWithToken } from '@documenso/lib/server-only/document/complete-document-with-token';
+import { sortFieldsByPosition, validateFieldsInserted } from '@documenso/lib/utils/fields';
 import { Document, Field, Recipient } from '@documenso/prisma/client';
+import { FieldToolTip } from '@documenso/ui/components/field/field-tooltip';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
 import { Card, CardContent } from '@documenso/ui/primitives/card';
@@ -30,16 +32,22 @@ export const SigningForm = ({ document, recipient, fields }: SigningFormProps) =
   const { fullName, signature, setFullName, setSignature } = useRequiredSigningContext();
 
   const [showConfirmSignatureDialog, setShowConfirmSignatureDialog] = useState(false);
+  const [validateUninsertedFields, setValidateUninsertedFields] = useState(false);
 
   const {
     handleSubmit,
     formState: { isSubmitting },
   } = useForm();
 
-  const isComplete = fields.every((f) => f.inserted);
+  const uninsertedFields = useMemo(() => {
+    return sortFieldsByPosition(fields.filter((field) => !field.inserted));
+  }, [fields]);
 
   const onFormSubmit = () => {
-    if (!isComplete) {
+    setValidateUninsertedFields(true);
+    const isFieldsValid = validateFieldsInserted(fields);
+
+    if (!isFieldsValid) {
       return;
     }
   };
@@ -60,7 +68,16 @@ export const SigningForm = ({ document, recipient, fields }: SigningFormProps) =
       )}
       onSubmit={handleSubmit(onFormSubmit)}
     >
-      <div className={cn('-mx-2 flex flex-1 flex-col overflow-hidden px-2')}>
+      {validateUninsertedFields && uninsertedFields[0] && (
+        <FieldToolTip key={uninsertedFields[0].id} field={uninsertedFields[0]} color="warning">
+          Click to insert field
+        </FieldToolTip>
+      )}
+
+      <fieldset
+        disabled={isSubmitting}
+        className={cn('-mx-2 flex flex-1 flex-col overflow-hidden px-2')}
+      >
         <div className={cn('flex flex-1 flex-col')}>
           <h3 className="text-foreground text-2xl font-semibold">Sign Document</h3>
 
@@ -107,6 +124,7 @@ export const SigningForm = ({ document, recipient, fields }: SigningFormProps) =
                 className="dark:bg-muted dark:hover:bg-muted/80 w-full  bg-black/5 hover:bg-black/10"
                 variant="secondary"
                 size="lg"
+                onClick={() => router.back()}
               >
                 Cancel
               </Button>
@@ -122,7 +140,7 @@ export const SigningForm = ({ document, recipient, fields }: SigningFormProps) =
             </div>
           </div>
         </div>
-      </div>
+      </fieldset>
     </form>
   );
 };
