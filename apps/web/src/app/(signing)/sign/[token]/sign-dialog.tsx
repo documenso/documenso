@@ -24,7 +24,6 @@ export type SignDialogProps = {
 export default function SignDialog({
   isSubmitting,
   showConfirmSignatureDialog,
-
   onSignatureComplete,
   setShowConfirmSignatureDialog,
   document,
@@ -36,8 +35,6 @@ export default function SignDialog({
     const isComplete = fields.every((f) => f.inserted);
     setIsComplete(isComplete);
   }, [fields]);
-
-  console.log('iscomplete', isComplete);
 
   return (
     <Dialog open={showConfirmSignatureDialog} onOpenChange={setShowConfirmSignatureDialog}>
