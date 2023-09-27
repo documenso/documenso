@@ -148,7 +148,7 @@ const SigningCardContent = ({ className, name }: SigningCardContentProps) => {
   return (
     <Card
       className={cn(
-        'group mx-auto flex aspect-[21/9] w-full items-center justify-center',
+        'group z-10 mx-auto flex aspect-[21/9] w-full items-center justify-center',
         className,
       )}
       degrees={-145}
@@ -180,14 +180,14 @@ type SigningCardImageProps = {
 const SigningCardImage = ({ signingCelebrationImage }: SigningCardImageProps) => {
   return (
     <motion.div
-      className="pointer-events-none absolute -inset-32 -z-10 flex items-center justify-center md:-inset-44 xl:-inset-60 2xl:-inset-80"
+      className="pointer-events-none absolute -inset-32 -z-50 flex items-center justify-center md:-inset-44 xl:-inset-60 2xl:-inset-80"
       initial={{
         opacity: 0,
-        scale: 0.8,
+        scale: 0.6,
       }}
       animate={{
         scale: 1,
-        opacity: 0.5,
+        opacity: 0.6,
       }}
       transition={{
         delay: 0.5,
@@ -197,7 +197,7 @@ const SigningCardImage = ({ signingCelebrationImage }: SigningCardImageProps) =>
       <Image
         src={signingCelebrationImage}
         alt="background pattern"
-        className="w-full dark:invert dark:sepia"
+        className="w-full dark:brightness-150 dark:contrast-[70%] dark:invert dark:sepia"
         style={{
           mask: 'radial-gradient(rgba(255, 255, 255, 1) 0%, transparent 67%)',
           WebkitMask: 'radial-gradient(rgba(255, 255, 255, 1) 0%, transparent 67%)',

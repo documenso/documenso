@@ -40,7 +40,7 @@ export const StackAvatarsWithTooltip = ({
 
   return (
     <TooltipProvider>
-      <Tooltip>
+      <Tooltip delayDuration={200}>
         <TooltipTrigger className="flex cursor-pointer">
           {children || <StackAvatars recipients={recipients} />}
         </TooltipTrigger>
