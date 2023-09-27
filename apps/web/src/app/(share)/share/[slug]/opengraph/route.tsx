@@ -1,4 +1,4 @@
-import { ImageResponse } from 'next/server';
+import { ImageResponse, NextResponse } from 'next/server';
 
 import { P, match } from 'ts-pattern';
 
@@ -21,7 +21,7 @@ type SharePageOpenGraphImageProps = {
   params: { slug: string };
 };
 
-export default async function Image({ params: { slug } }: SharePageOpenGraphImageProps) {
+export async function GET(_request: Request, { params: { slug } }: SharePageOpenGraphImageProps) {
   const [interSemiBold, interRegular, caveatRegular, shareFrameImage] = await Promise.all([
     getAssetBuffer('/fonts/inter-semibold.ttf'),
     getAssetBuffer('/fonts/inter-regular.ttf'),
@@ -32,7 +32,7 @@ export default async function Image({ params: { slug } }: SharePageOpenGraphImag
   const recipientOrSender = await getRecipientOrSenderByShareLinkSlug({ slug }).catch(() => null);
 
   if (!recipientOrSender) {
-    return null;
+    return NextResponse.json({ error: 'Not found' }, { status: 404 });
   }
 
   const isRecipient = 'Signature' in recipientOrSender;
