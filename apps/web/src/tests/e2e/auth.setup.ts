@@ -29,6 +29,7 @@ setup('authenticate', async ({ page }: { page: Page }) => {
   await page.getByLabel('Password', { exact: true }).fill(password);
   await page.getByRole('button', { name: 'Sign In' }).click();
 
+  await page.waitForURL('/documents');
   await expect(page).toHaveURL('/documents');
   await page.context().storageState({ path: STORAGE_STATE });
 });

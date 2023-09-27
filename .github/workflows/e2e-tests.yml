@@ -19,6 +19,8 @@ jobs:
         run: npm ci
       - name: Copy env
         run: cp .env.example .env
+      - name: Build Documenso
+        run: npm run build
       - name: Install Playwright Browsers
         run: npx playwright install --with-deps
       - name: Run Playwright tests
