@@ -18,7 +18,7 @@ import {
   TemplateDocumentInvite,
   TemplateDocumentInviteProps,
 } from '../template-components/template-document-invite';
-import TemplateFooter from '../template-components/template-footer';
+import { TemplateFooter } from '../template-components/template-footer';
 
 export type DocumentInviteEmailTemplateProps = Partial<TemplateDocumentInviteProps> & {
   customBody?: string;

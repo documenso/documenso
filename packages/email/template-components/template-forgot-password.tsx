@@ -2,7 +2,7 @@ import { Button, Section, Tailwind, Text } from '@react-email/components';
 
 import * as config from '@documenso/tailwind-config';
 
-import TemplateDocumentImage from './template-document-image';
+import { TemplateDocumentImage } from './template-document-image';
 
 export type TemplateForgotPasswordProps = {
   resetPasswordLink: string;

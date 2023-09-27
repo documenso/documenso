@@ -2,7 +2,7 @@ import { Button, Column, Img, Link, Section, Tailwind, Text } from '@react-email
 
 import * as config from '@documenso/tailwind-config';
 
-import TemplateDocumentImage from './template-document-image';
+import { TemplateDocumentImage } from './template-document-image';
 
 export interface TemplateDocumentSelfSignedProps {
   documentName: string;
@@ -49,7 +49,7 @@ export const TemplateDocumentSelfSigned = ({
         <Text className="mx-auto mb-6 mt-1 max-w-[80%] text-center text-base text-slate-400">
           Create a{' '}
           <Link
-            href={`${process.env.NEXT_PUBLIC_WEBAPP_URL}/signup`}
+            href={`${process.env.NEXT_PUBLIC_WEBAPP_URL ?? 'http://localhost:3000'}/signup`}
             target="_blank"
             className="text-documenso-700 hover:text-documenso-600 whitespace-nowrap"
           >
