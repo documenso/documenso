@@ -20,7 +20,7 @@
 </p>
 
 <p align="center">
-   <a href="https://documen.so/discord"><img src="https://img.shields.io/badge/Discord-documen.so/discord-%235865F2" alt="Join Documenso on Discord"></a> 
+   <a href="https://documen.so/discord"><img src="https://img.shields.io/badge/Discord-documen.so/discord-%235865F2" alt="Join Documenso on Discord"></a>
    <a href="https://github.com/documenso/documenso/stargazers"><img src="https://img.shields.io/github/stars/documenso/documenso" alt="Github Stars"></a>
    <a href="https://github.com/documenso/documenso/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-AGPLv3-purple" alt="License"></a>
    <a href="https://github.com/documenso/documenso/pulse"><img src="https://img.shields.io/github/commit-activity/m/documenso/documenso" alt="Commits-per-month"></a>
@@ -29,7 +29,7 @@
 > 🦺 Documenso 1.0 is deployed to our <a href="https://documen.so/staging" target="_blank">Staging Environment</a>.
 >
 > The code can be found on the [feat/refresh](https://github.com/documenso/documenso/tree/feat/refresh) branch.
-> 
+>
 > The new Version will be released after the current testing phase.
 
 
@@ -107,8 +107,9 @@ To run Documenso locally you need
 - Node Package Manager NPM - included in Node.js
 - [PostgreSQL (local or remote)](https://www.postgresql.org/download/)
 
-## Developer Quickstart
+## Development
 
+### Quick Start
 > **Note**: This is a quickstart for developers. It assumes that you have both [docker](https://docs.docker.com/get-docker/) and [docker-compose](https://docs.docker.com/compose/) installed on your machine.
 
 Want to get up and running quickly? Follow these steps:
@@ -119,7 +120,8 @@ Want to get up and running quickly? Follow these steps:
   git clone https://github.com/documenso/documenso
   ```
 
-- Set up your `.env` file using the recommendations in the `.env.example` file.
+- Run `cp .env.example .env` to create a copy of .env file.
+- Open and edit the recommended env contents
 - Run `npm run dx` in the root directory
   - This will spin up a postgres database and inbucket mail server in docker containers.
 - Run `npm run dev` in the root directory
@@ -134,8 +136,7 @@ Incoming mail will be available at http://localhost:9000
 
 Your database will also be available on port `54320`. You can connect to it using your favorite database client.
 
-## Developer Setup
-
+---
 ### Manual Setup
 
 Follow these steps to setup documenso on you local machine:
@@ -145,7 +146,7 @@ Follow these steps to setup documenso on you local machine:
   git clone https://github.com/documenso/documenso
   ```
 - Run `npm i` in root directory
-- Rename `.env.example` to `.env`
+- Now run `cp .env.example .env` to create a copy of .env file.
 - Set DATABASE_URL value in .env file
   - You can use the provided test database url (may be wiped at any point)
   - Or setup a local postgres sql instance (recommended)
@@ -242,7 +243,7 @@ We support a variety of deployment methods, and are actively working on adding m
 
 ## I'm not receiving any emails when using the developer quickstart
 
-When using the developer quickstart an [Inbucket](https://inbucket.org/) server will be spun up in a docker container that will store all outgoing email locally for you to view.
+When using the development (quickstart) an [Inbucket](https://inbucket.org/) server will be spun up in a docker container that will store all outgoing email locally for you to view.
 
 The Web UI can be found at http://localhost:9000 while the SMTP port will be on localhost:2500.
 
