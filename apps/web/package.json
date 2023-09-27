@@ -8,8 +8,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "dev:test": "playwright test",
-    "e2e:test": "start-server-and-test \"npm run start\" http://localhost:3000 \"playwright test\"",
+    "test:dev": "playwright test",
+    "test:e2e": "start-server-and-test \"npm run start\" http://localhost:3000 \"playwright test\"",
     "clean": "rimraf .next && rimraf node_modules",
     "copy:pdfjs": "node ../../scripts/copy-pdfjs.cjs"
   },

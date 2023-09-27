@@ -16,7 +16,7 @@ test('user can sign up with email and password', async ({ page }: { page: Page }
   await page.goto('/signup');
   await page.getByLabel('Name').fill(username);
   await page.getByLabel('Email').fill(email);
-  await page.getByLabel('Password').fill(password);
+  await page.getByLabel('Password', { exact: true }).fill(password);
 
   const canvas = page.locator('canvas');
   const box = await canvas.boundingBox();
@@ -37,7 +37,7 @@ test('user can sign up with email and password', async ({ page }: { page: Page }
 test('user can login with user and password', async ({ page }: { page: Page }) => {
   await page.goto('/signin');
   await page.getByLabel('Email').fill(email);
-  await page.getByLabel('Password').fill(password);
+  await page.getByLabel('Password', { exact: true }).fill(password);
   await page.getByRole('button', { name: 'Sign In' }).click();
 
   await page.waitForURL('/documents');

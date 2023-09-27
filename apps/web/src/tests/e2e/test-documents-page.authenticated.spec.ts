@@ -22,7 +22,7 @@ test.describe('Document upload test', () => {
   });
 
   test('user can upload a document succesfully', async ({ page }) => {
-    await expect(page.locator('canvas')).toBeVisible();
+    await expect(page.getByText('Drag & drop your document here.')).toBeVisible();
   });
 
   test('user can send the document for signing succesfully', async ({ documentsPage, page }) => {

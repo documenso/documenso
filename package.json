@@ -4,12 +4,12 @@
     "build": "turbo run build",
     "dev": "turbo run dev --filter=@documenso/web --filter=@documenso/marketing",
     "start": "cd apps && cd web && next start",
-    "test": "cd apps && cd web && npm run test",
+    "test": "cd apps && cd web && npm run test:e2e",
     "lint": "turbo run lint",
     "format": "prettier --write \"**/*.{js,jsx,cjs,mjs,ts,tsx,cts,mts,mdx}\"",
     "prepare": "husky install",
     "commitlint": "commitlint --edit",
-    "ci": "turbo run build e2e:test lint",
+    "ci": "turbo run build test:e2e lint",
     "clean": "turbo run clean && rimraf node_modules"
   },
   "engines": {

@@ -13,7 +13,7 @@
       "cache": false,
       "persistent": true
     },
-    "e2e:test": {
+    "test:e2e": {
       "dependsOn": ["^build"]
     }
   },
