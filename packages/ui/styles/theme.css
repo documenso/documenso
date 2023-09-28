@@ -93,3 +93,14 @@
   mask-composite: exclude;
   -webkit-mask-composite: xor;
 }
+
+.hide-scrollbar::-webkit-scrollbar {
+      display: none;
+  }
+
+.hide-scrollbar {
+    /* IE and Edge */
+    -ms-overflow-style: none;
+    /* Firefox */
+    scrollbar-width: none;
+}
