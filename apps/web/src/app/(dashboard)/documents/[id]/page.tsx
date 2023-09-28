@@ -65,10 +65,7 @@ export default async function DocumentPage({ params }: DocumentPageProps) {
         Documents
       </Link>
 
-      <h1
-        className="mt-4 max-w-xs truncate text-2xl font-semibold md:text-3xl"
-        title={document.title}
-      >
+      <h1 className="mt-4 truncate text-2xl font-semibold md:text-3xl" title={document.title}>
         {document.title}
       </h1>
 
