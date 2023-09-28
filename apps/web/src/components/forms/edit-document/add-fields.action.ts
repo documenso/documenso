@@ -11,10 +11,10 @@ export type AddFieldsActionInput = TAddFieldsFormSchema & {
 export const addFields = async ({ documentId, fields }: AddFieldsActionInput) => {
   'use server';
 
-  const { id: userId } = await getRequiredServerComponentSession();
+  const { user } = await getRequiredServerComponentSession();
 
   await setFieldsForDocument({
-    userId,
+    userId: user.id,
     documentId,
     fields: fields.map((field) => ({
       id: field.nativeId,
