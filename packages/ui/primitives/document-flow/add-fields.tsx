@@ -351,7 +351,11 @@ export const AddFieldsFormPartial = ({
               <PopoverContent className="p-0" align="start">
                 <Command>
                   <CommandInput />
-                  <CommandEmpty />
+                  <CommandEmpty>
+                    <span className="text-muted-foreground inline-block px-4">
+                      No recipient matching this description was found.
+                    </span>
+                  </CommandEmpty>
 
                   <CommandGroup>
                     {recipients.map((recipient, index) => (
