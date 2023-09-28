@@ -56,6 +56,14 @@ const config = {
       },
     ];
   },
+  async rewrites() {
+    return [
+      {
+        source: '/ingest/:path*',
+        destination: 'https://eu.posthog.com/:path*',
+      },
+    ];
+  },
 };
 
 module.exports = withContentlayer(config);
