@@ -1,6 +1,7 @@
 import { createTransport } from 'nodemailer';
 
 import { MailChannelsTransport } from './transports/mailchannels';
+import { ResendTransport } from './transports/resend';
 
 const getTransport = () => {
   const transport = process.env.NEXT_PRIVATE_SMTP_TRANSPORT ?? 'smtp-auth';
@@ -10,6 +11,14 @@ const getTransport = () => {
       MailChannelsTransport.makeTransport({
         apiKey: process.env.NEXT_PRIVATE_MAILCHANNELS_API_KEY,
         endpoint: process.env.NEXT_PRIVATE_MAILCHANNELS_ENDPOINT,
+      }),
+    );
+  }
+
+  if (transport === 'resend') {
+    return createTransport(
+      ResendTransport.makeTransport({
+        apiKey: process.env.NEXT_PRIVATE_RESEND_API_KEY || '',
       }),
     );
   }

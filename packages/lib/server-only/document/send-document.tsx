@@ -3,13 +3,15 @@ import { createElement } from 'react';
 import { mailer } from '@documenso/email/mailer';
 import { render } from '@documenso/email/render';
 import { DocumentInviteEmailTemplate } from '@documenso/email/templates/document-invite';
+import { FROM_ADDRESS, FROM_NAME } from '@documenso/lib/constants/email';
+import { renderCustomEmailTemplate } from '@documenso/lib/utils/render-custom-email-template';
 import { prisma } from '@documenso/prisma';
 import { DocumentStatus, SendStatus } from '@documenso/prisma/client';
 
-export interface SendDocumentOptions {
+export type SendDocumentOptions = {
   documentId: number;
   userId: number;
-}
+};
 
 export const sendDocument = async ({ documentId, userId }: SendDocumentOptions) => {
   const user = await prisma.user.findFirstOrThrow({
@@ -25,8 +27,11 @@ export const sendDocument = async ({ documentId, userId }: SendDocumentOptions) 
     },
     include: {
       Recipient: true,
+      documentMeta: true,
     },
   });
+
+  const customEmail = document?.documentMeta;
 
   if (!document) {
     throw new Error('Document not found');
@@ -44,6 +49,12 @@ export const sendDocument = async ({ documentId, userId }: SendDocumentOptions) 
     document.Recipient.map(async (recipient) => {
       const { email, name } = recipient;
 
+      const customEmailTemplate = {
+        'signer.name': name,
+        'signer.email': email,
+        'document.name': document.title,
+      };
+
       if (recipient.sendStatus === SendStatus.SENT) {
         return;
       }
@@ -57,6 +68,7 @@ export const sendDocument = async ({ documentId, userId }: SendDocumentOptions) 
         inviterEmail: user.email,
         assetBaseUrl,
         signDocumentLink,
+        customBody: renderCustomEmailTemplate(customEmail?.message || '', customEmailTemplate),
       });
 
       await mailer.sendMail({
@@ -65,10 +77,12 @@ export const sendDocument = async ({ documentId, userId }: SendDocumentOptions) 
           name,
         },
         from: {
-          name: process.env.NEXT_PRIVATE_SMTP_FROM_NAME || 'Documenso',
-          address: process.env.NEXT_PRIVATE_SMTP_FROM_ADDRESS || 'noreply@documenso.com',
+          name: FROM_NAME,
+          address: FROM_ADDRESS,
         },
-        subject: 'Please sign this document',
+        subject: customEmail?.subject
+          ? renderCustomEmailTemplate(customEmail.subject, customEmailTemplate)
+          : 'Please sign this document',
         html: render(template),
         text: render(template, { plainText: true }),
       });

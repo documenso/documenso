@@ -100,7 +100,7 @@ export const NameField = ({ field, recipient }: NameFieldProps) => {
   return (
     <SigningFieldContainer field={field} onSign={onSign} onRemove={onRemove}>
       {isLoading && (
-        <div className="bg-background absolute inset-0 flex items-center justify-center">
+        <div className="bg-background absolute inset-0 flex items-center justify-center rounded-md">
           <Loader className="text-primary h-5 w-5 animate-spin md:h-8 md:w-8" />
         </div>
       )}

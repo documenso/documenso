@@ -12,7 +12,7 @@ export type AdminSectionLayoutProps = {
 };
 
 export default async function AdminSectionLayout({ children }: AdminSectionLayoutProps) {
-  const user = await getRequiredServerComponentSession();
+  const { user } = await getRequiredServerComponentSession();
 
   if (!isAdmin(user)) {
     redirect('/documents');

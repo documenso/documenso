@@ -1,4 +1,4 @@
-import { Button, Img, Section, Tailwind, Text } from '@react-email/components';
+import { Button, Column, Img, Row, Section, Tailwind, Text } from '@react-email/components';
 
 import * as config from '@documenso/tailwind-config';
 
@@ -30,13 +30,26 @@ export const TemplateDocumentInvite = ({
         },
       }}
     >
-      <Section className="mt-4 flex-row items-center justify-center">
-        <div className="flex items-center justify-center p-4">
-          <Img className="h-42" src={getAssetUrl('/static/document.png')} alt="Documenso" />
-        </div>
+      <Section className="mt-4">
+        <Row className="table-fixed">
+          <Column />
 
+          <Column>
+            <Img
+              className="h-42 mx-auto"
+              src={getAssetUrl('/static/document.png')}
+              alt="Documenso"
+            />
+          </Column>
+
+          <Column />
+        </Row>
+      </Section>
+
+      <Section>
         <Text className="text-primary mx-auto mb-0 max-w-[80%] text-center text-lg font-semibold">
-          {inviterName} has invited you to sign "{documentName}"
+          {inviterName} has invited you to sign
+          <br />"{documentName}"
         </Text>
 
         <Text className="my-1 text-center text-base text-slate-400">

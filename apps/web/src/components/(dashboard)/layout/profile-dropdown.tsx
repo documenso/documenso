@@ -17,6 +17,7 @@ import {
 import { signOut } from 'next-auth/react';
 import { useTheme } from 'next-themes';
 
+import { useFeatureFlags } from '@documenso/lib/client-only/providers/feature-flag';
 import { isAdmin } from '@documenso/lib/next-auth/guards/is-admin';
 import { recipientInitials } from '@documenso/lib/utils/recipient-formatter';
 import { User } from '@documenso/prisma/client';
@@ -36,8 +37,6 @@ import {
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from '@documenso/ui/primitives/dropdown-menu';
-
-import { useFeatureFlags } from '~/providers/feature-flag';
 
 export type ProfileDropdownProps = {
   user: User;
