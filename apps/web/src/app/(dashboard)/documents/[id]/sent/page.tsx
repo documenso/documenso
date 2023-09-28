@@ -10,7 +10,7 @@ export default function DocumentSentPage() {
         Documents
       </Link>
 
-      <h1 className="mt-4 max-w-xs grow-0 truncate text-2xl font-semibold md:text-3xl">
+      <h1 className="mt-4 grow-0 truncate text-2xl font-semibold md:text-3xl">
         Loading Document...
       </h1>
     </div>

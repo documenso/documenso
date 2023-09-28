@@ -25,7 +25,7 @@ export type DocumentsPageProps = {
 };
 
 export default async function DocumentsPage({ searchParams = {} }: DocumentsPageProps) {
-  const user = await getRequiredServerComponentSession();
+  const { user } = await getRequiredServerComponentSession();
 
   const stats = await getStats({
     user,
