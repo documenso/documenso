@@ -119,7 +119,7 @@ export const PricingTable = ({ className, ...props }: PricingTableProps) => {
           data-plan="community"
           className="border-primary bg-background shadow-foreground/5 flex flex-col items-center justify-center rounded-lg border-2 px-8 py-12 shadow-[0px_0px_0px_4px_#E3E3E380]"
         >
-          <p className="text-foreground text-4xl font-medium">Community</p>
+          <p className="text-foreground text-4xl font-medium">Early Adopters</p>
           <div className="text-primary mt-2.5 text-xl font-medium">
             <AnimatePresence mode="wait">
               {period === 'MONTHLY' && <motion.div layoutId="pricing">$30</motion.div>}
@@ -136,12 +136,22 @@ export const PricingTable = ({ className, ...props }: PricingTableProps) => {
           </ClaimPlanDialog>
 
           <div className="mt-8 flex w-full flex-col divide-y">
-            <p className="text-foreground py-4 font-medium">Documenso Early Adopter Deal:</p>
+            <p className="text-foreground py-4 font-medium">
+              {' '}
+              <a href="https://documenso.com/blog/early-adopters" target="_blank">
+                The Early Adopter Deal:
+              </a>
+            </p>
             <p className="text-foreground py-4">Join the movement</p>
             <p className="text-foreground py-4">Simple signing solution</p>
-            <p className="text-foreground py-4">Email and Slack assistance</p>
+            <p className="text-foreground py-4">Email, Discord and Slack assistance</p>
             <p className="text-foreground py-4">
-              <strong>Includes all upcoming features</strong>
+              <strong>
+                {' '}
+                <a href="https://documenso.com/blog/early-adopters" target="_blank">
+                  Includes all upcoming features
+                </a>
+              </strong>
             </p>
             <p className="text-foreground py-4">Fixed, straightforward pricing</p>
           </div>
@@ -168,7 +178,7 @@ export const PricingTable = ({ className, ...props }: PricingTableProps) => {
           </Link>
 
           <div className="mt-8 flex w-full flex-col divide-y">
-            <p className="text-foreground py-4 font-medium">Everything in Community, plus:</p>
+            <p className="text-foreground py-4 font-medium">Everything in Early Adopters, plus:</p>
             <p className="text-foreground py-4">Custom Subdomain</p>
             <p className="text-foreground py-4">Compliance Check</p>
             <p className="text-foreground py-4">Guaranteed Uptime</p>
