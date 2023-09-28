@@ -7,14 +7,14 @@ import { Bar, BarChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recha
 import { formatMonth } from '@documenso/lib/client-only/format-month';
 import { cn } from '@documenso/ui/lib/utils';
 
-import { FUNDING_RAISED } from '~/app/(marketing)/open/data';
+export type FundingRaisedProps = HTMLAttributes<HTMLDivElement> & {
+  data: Record<string, string | number>[];
+};
 
-export type FundingRaisedProps = HTMLAttributes<HTMLDivElement>;
-
-export const FundingRaised = ({ className, ...props }: FundingRaisedProps) => {
-  const formattedData = FUNDING_RAISED.map((item) => ({
+export const FundingRaised = ({ className, data, ...props }: FundingRaisedProps) => {
+  const formattedData = data.map((item) => ({
     amount: Number(item.amount),
-    date: formatMonth(item.date),
+    date: formatMonth(item.date as string),
   }));
 
   return (

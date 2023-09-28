@@ -7,26 +7,25 @@ import { Bar, BarChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recha
 import { formatMonth } from '@documenso/lib/client-only/format-month';
 import { cn } from '@documenso/ui/lib/utils';
 
-import { StargazersType } from './page';
-
-export type MetricsDataKey = 'stars' | 'forks' | 'mergedPRs' | 'openIssues';
-export type GithubMetricProps = HTMLAttributes<HTMLDivElement> & {
-  data: StargazersType;
-  metricKey: MetricsDataKey;
+export type BarMetricProps<T extends Record<string, unknown>> = HTMLAttributes<HTMLDivElement> & {
+  data: T;
+  metricKey: keyof T[string];
   title: string;
   label: string;
   chartHeight?: number;
+  extraInfo?: JSX.Element;
 };
 
-export const GithubMetric = ({
+export const BarMetric = <T extends Record<string, Record<keyof T[string], unknown>>>({
   className,
   data,
   metricKey,
   title,
   label,
   chartHeight = 400,
+  extraInfo,
   ...props
-}: GithubMetricProps) => {
+}: BarMetricProps<T>) => {
   const formattedData = Object.keys(data)
     .map((key) => ({
       month: formatMonth(key),
@@ -36,7 +35,10 @@ export const GithubMetric = ({
 
   return (
     <div className={cn('flex flex-col', className)} {...props}>
-      <h3 className="px-4 text-lg font-semibold">{title}</h3>
+      <div className="flex items-center px-4">
+        <h3 className="text-lg font-semibold">{title}</h3>
+        <span>{extraInfo}</span>
+      </div>
 
       <div className="border-border mt-2.5 flex flex-1 items-center justify-center rounded-2xl border pr-2 shadow-sm hover:shadow">
         <ResponsiveContainer width="100%" height={chartHeight}>
@@ -50,7 +52,7 @@ export const GithubMetric = ({
               formatter={(value) => [Number(value), label]}
               cursor={{ fill: 'hsl(var(--primary) / 10%)' }}
             />
-            <Bar dataKey={metricKey} fill="hsl(var(--primary))" label={label} />
+            <Bar dataKey={metricKey as string} fill="hsl(var(--primary))" label={label} />{' '}
           </BarChart>
         </ResponsiveContainer>
       </div>
