@@ -68,7 +68,7 @@ export const DocumentFlowFormContainerContent = ({
       )}
       {...props}
     >
-      <div className="-mx-2 flex flex-1 flex-col overflow-y-auto px-2">{children}</div>
+      <div className="-mx-2 flex flex-1 flex-col px-2">{children}</div>
     </div>
   );
 };
