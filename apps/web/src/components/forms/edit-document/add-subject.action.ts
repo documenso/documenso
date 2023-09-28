@@ -12,7 +12,7 @@ export type CompleteDocumentActionInput = TAddSubjectFormSchema & {
 export const completeDocument = async ({ documentId, email }: CompleteDocumentActionInput) => {
   'use server';
 
-  const { id: userId } = await getRequiredServerComponentSession();
+  const { user } = await getRequiredServerComponentSession();
 
   if (email.message || email.subject) {
     await upsertDocumentMeta({
@@ -23,7 +23,7 @@ export const completeDocument = async ({ documentId, email }: CompleteDocumentAc
   }
 
   return await sendDocument({
-    userId,
+    userId: user.id,
     documentId,
   });
 };
