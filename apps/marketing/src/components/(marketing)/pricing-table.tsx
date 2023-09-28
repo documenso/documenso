@@ -136,12 +136,22 @@ export const PricingTable = ({ className, ...props }: PricingTableProps) => {
           </ClaimPlanDialog>
 
           <div className="mt-8 flex w-full flex-col divide-y">
-            <p className="text-foreground py-4 font-medium">Documenso Early Adopter Deal:</p>
+            <p className="text-foreground py-4 font-medium">
+              {' '}
+              <a href="https://documenso.com/blog/early-adopters" target="_blank">
+                The Early Adopter Deal:
+              </a>
+            </p>
             <p className="text-foreground py-4">Join the movement</p>
             <p className="text-foreground py-4">Simple signing solution</p>
             <p className="text-foreground py-4">Email and Slack assistance</p>
             <p className="text-foreground py-4">
-              <strong>Includes all upcoming features</strong>
+              <strong>
+                {' '}
+                <a href="https://documenso.com/blog/early-adopters" target="_blank">
+                  Includes all upcoming features
+                </a>
+              </strong>
             </p>
             <p className="text-foreground py-4">Fixed, straightforward pricing</p>
           </div>
