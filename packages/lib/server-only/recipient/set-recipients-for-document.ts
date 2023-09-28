@@ -57,12 +57,13 @@ export const setRecipientsForDocument = async ({
 
       return {
         ...recipient,
-        ...existing,
+        _persisted: existing,
       };
     })
     .filter((recipient) => {
       return (
-        recipient.sendStatus !== SendStatus.SENT && recipient.signingStatus !== SigningStatus.SIGNED
+        recipient._persisted?.sendStatus !== SendStatus.SENT &&
+        recipient._persisted?.signingStatus !== SigningStatus.SIGNED
       );
     });
 
@@ -72,7 +73,7 @@ export const setRecipientsForDocument = async ({
     linkedRecipients.map((recipient) =>
       prisma.recipient.upsert({
         where: {
-          id: recipient.id ?? -1,
+          id: recipient._persisted?.id ?? -1,
           documentId,
         },
         update: {
