@@ -11,7 +11,8 @@
     "prisma:generate": "prisma generate",
     "prisma:migrate-dev": "prisma migrate dev",
     "prisma:migrate-deploy": "prisma migrate deploy",
-    "prisma:seed": "prisma db seed"
+    "prisma:seed": "prisma db seed",
+    "prisma:studio": "prisma studio"
   },
   "prisma": {
     "seed": "ts-node --transpileOnly --skipProject ./seed-database.ts"

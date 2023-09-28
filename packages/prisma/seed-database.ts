@@ -73,7 +73,11 @@ const seedDatabase = async () => {
 
 seedDatabase()
   .then(() => {
-    console.log('Database seeded');
+    console.log(`
+✅ Database seeded
+    
+Email: example@documenso.com
+Password: password`);
     process.exit(0);
   })
   .catch((error) => {
