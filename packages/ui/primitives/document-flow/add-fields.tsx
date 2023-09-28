@@ -352,7 +352,9 @@ export const AddFieldsFormPartial = ({
                 <Command>
                   <CommandInput />
                   <CommandEmpty>
-                    <span>No Recipient matching this description was found.</span>
+                    <span className="text-muted-foreground inline-block px-4">
+                      No recipient matching this description was found.
+                    </span>
                   </CommandEmpty>
 
                   <CommandGroup>
