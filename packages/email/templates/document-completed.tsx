@@ -15,7 +15,7 @@ import {
   TemplateDocumentCompleted,
   TemplateDocumentCompletedProps,
 } from '../template-components/template-document-completed';
-import TemplateFooter from '../template-components/template-footer';
+import { TemplateFooter } from '../template-components/template-footer';
 
 export type DocumentCompletedEmailTemplateProps = Partial<TemplateDocumentCompletedProps>;
 

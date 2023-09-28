@@ -15,12 +15,11 @@ import {
   TemplateDocumentSelfSigned,
   TemplateDocumentSelfSignedProps,
 } from '../template-components/template-document-self-signed';
-import TemplateFooter from '../template-components/template-footer';
+import { TemplateFooter } from '../template-components/template-footer';
 
 export type DocumentSelfSignedTemplateProps = TemplateDocumentSelfSignedProps;
 
 export const DocumentSelfSignedEmailTemplate = ({
-  downloadLink = 'https://documenso.com',
   documentName = 'Open Source Pledge.pdf',
   assetBaseUrl = 'http://localhost:3002',
 }: DocumentSelfSignedTemplateProps) => {
@@ -54,7 +53,6 @@ export const DocumentSelfSignedEmailTemplate = ({
                 />
 
                 <TemplateDocumentSelfSigned
-                  downloadLink={downloadLink}
                   documentName={documentName}
                   assetBaseUrl={assetBaseUrl}
                 />
