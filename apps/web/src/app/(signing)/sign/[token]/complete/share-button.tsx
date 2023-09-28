@@ -106,7 +106,7 @@ export const ShareButton = ({ token, documentId }: ShareButtonProps) => {
         </Button>
       </DialogTrigger>
 
-      <DialogContent>
+      <DialogContent position="end">
         <DialogHeader>
           <DialogTitle>Share</DialogTitle>
 
@@ -119,7 +119,7 @@ export const ShareButton = ({ token, documentId }: ShareButtonProps) => {
             <span className="font-medium text-blue-400">@documenso</span>
             . Check it out!
             <span className="mt-2 block" />
-            <span className="font-medium text-blue-400">
+            <span className="break-all font-medium text-blue-400">
               {window.location.origin}/share/{shareLink?.slug || '...'}
             </span>
           </div>

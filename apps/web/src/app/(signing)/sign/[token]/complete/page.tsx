@@ -51,7 +51,7 @@ export default async function CompletedSigningPage({
     recipient.email;
 
   return (
-    <div className="flex flex-col items-center pt-24 lg:pt-36 xl:pt-44">
+    <div className="-mx-4 flex max-w-[100vw] flex-col items-center overflow-x-hidden px-4 pt-24 md:-mx-8 md:px-8 lg:pt-36 xl:pt-44">
       {/* Card with recipient */}
       <SigningCard3D name={recipientName} signingCelebrationImage={signingCelebration} />
 

@@ -24,7 +24,7 @@ export default async function AuthenticatedDashboardLayout({
     redirect('/signin');
   }
 
-  const user = await getRequiredServerComponentSession();
+  const { user } = await getRequiredServerComponentSession();
 
   return (
     <NextAuthProvider session={session}>

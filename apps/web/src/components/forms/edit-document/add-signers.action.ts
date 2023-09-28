@@ -11,10 +11,10 @@ export type AddSignersActionInput = TAddSignersFormSchema & {
 export const addSigners = async ({ documentId, signers }: AddSignersActionInput) => {
   'use server';
 
-  const { id: userId } = await getRequiredServerComponentSession();
+  const { user } = await getRequiredServerComponentSession();
 
   await setRecipientsForDocument({
-    userId,
+    userId: user.id,
     documentId,
     recipients: signers.map((signer) => ({
       id: signer.nativeId,

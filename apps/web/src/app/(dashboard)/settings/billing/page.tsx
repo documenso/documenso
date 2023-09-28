@@ -12,7 +12,7 @@ import { Button } from '@documenso/ui/primitives/button';
 import { LocaleDate } from '~/components/formatter/locale-date';
 
 export default async function BillingSettingsPage() {
-  const user = await getRequiredServerComponentSession();
+  const { user } = await getRequiredServerComponentSession();
 
   const isBillingEnabled = await getServerComponentFlag('app_billing');
 

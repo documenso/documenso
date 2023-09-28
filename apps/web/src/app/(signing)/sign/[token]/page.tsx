@@ -44,6 +44,14 @@ export default async function SigningPage({ params: { token } }: SigningPageProp
     return notFound();
   }
 
+  const { documentData } = document;
+
+  const documentDataUrl = await getFile(documentData)
+    .then((buffer) => Buffer.from(buffer).toString('base64'))
+    .then((data) => `data:application/pdf;base64,${data}`);
+
+  const { user } = await getServerComponentSession();
+
   if (
     document.status === DocumentStatus.COMPLETED ||
     recipient.signingStatus === SigningStatus.SIGNED
@@ -61,7 +69,7 @@ export default async function SigningPage({ params: { token } }: SigningPageProp
 
   return (
     <SigningProvider email={recipient.email} fullName={recipient.name} signature={user?.signature}>
-      <div className="mx-auto w-full max-w-screen-xl px-4 md:px-8">
+      <div className="mx-auto w-full max-w-screen-xl">
         <h1 className="mt-4 truncate text-2xl font-semibold md:text-3xl" title={document.title}>
           {document.title}
         </h1>
