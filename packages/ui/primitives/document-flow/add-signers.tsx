@@ -126,12 +126,12 @@ export const AddSignersFormPartial = ({
           <AnimatePresence>
             {signers.map((signer, index) => (
               <motion.div
-                key={signer.formId}
+                key={signer.id}
                 data-native-id={signer.nativeId}
                 className="flex flex-wrap items-end gap-x-4"
               >
                 <div className="flex-1">
-                  <Label htmlFor={`signer-${signer.formId}-email`}>
+                  <Label htmlFor={`signer-${signer.id}-email`}>
                     Email
                     <span className="text-destructive ml-1 inline-block font-medium">*</span>
                   </Label>
@@ -141,7 +141,7 @@ export const AddSignersFormPartial = ({
                     name={`signers.${index}.email`}
                     render={({ field }) => (
                       <Input
-                        id={`signer-${signer.formId}-email`}
+                        id={`signer-${signer.id}-email`}
                         type="email"
                         className="bg-background mt-2"
                         disabled={isSubmitting || hasBeenSentToRecipientId(signer.nativeId)}
@@ -153,14 +153,14 @@ export const AddSignersFormPartial = ({
                 </div>
 
                 <div className="flex-1">
-                  <Label htmlFor={`signer-${signer.formId}-name`}>Name</Label>
+                  <Label htmlFor={`signer-${signer.id}-name`}>Name</Label>
 
                   <Controller
                     control={control}
                     name={`signers.${index}.name`}
                     render={({ field }) => (
                       <Input
-                        id={`signer-${signer.formId}-name`}
+                        id={`signer-${signer.id}-name`}
                         type="text"
                         className="bg-background mt-2"
                         disabled={isSubmitting || hasBeenSentToRecipientId(signer.nativeId)}
@@ -195,7 +195,11 @@ export const AddSignersFormPartial = ({
           </AnimatePresence>
         </div>
 
-        <FormErrorMessage className="mt-2" error={errors.signers} />
+        <FormErrorMessage
+          className="mt-2"
+          // Dirty hack to handle errors when .root is populated for an array type
+          error={'signers__root' in errors && errors['signers__root']}
+        />
 
         <div className="mt-4">
           <Button type="button" disabled={isSubmitting} onClick={() => onAddSigner()}>
