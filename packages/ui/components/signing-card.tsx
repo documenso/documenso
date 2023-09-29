@@ -118,7 +118,7 @@ export const SigningCard3D = ({ className, name, signingCelebrationImage }: Sign
       style={{ perspective: 800 }}
     >
       <motion.div
-        className="bg-background w-full [--sheen-color:180_180_180] dark:[--sheen-color:200_200_200]"
+        className="bg-background w-full rounded-lg [--sheen-color:180_180_180] dark:[--sheen-color:200_200_200]"
         ref={cardRef}
         style={{
           perspective: '800',
