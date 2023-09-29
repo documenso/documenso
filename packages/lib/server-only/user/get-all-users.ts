@@ -23,6 +23,11 @@ export const findUsers = async ({ page = 1, perPage = 10 }: getAllUsersProps) =>
             periodEnd: true,
           },
         },
+        Document: {
+          select: {
+            id: true,
+          },
+        },
       },
       skip: Math.max(page - 1, 0) * perPage,
       take: perPage,
