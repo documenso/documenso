@@ -18,6 +18,7 @@ interface User {
   email: string;
   roles: Role[];
   Subscription: Subscription[];
+  Document: Document[];
 }
 
 interface Subscription {
@@ -36,10 +37,13 @@ type UsersDataTableProps = {
   totalPages: number;
 };
 
+type Document = {
+  id: number;
+};
+
 export const UsersDataTable = ({ users, perPage, page, totalPages }: UsersDataTableProps) => {
   const [isPending, startTransition] = useTransition();
   const updateSearchParams = useUpdateSearchParams();
-  console.log(users);
 
   const onPaginationChange = (page: number, perPage: number) => {
     startTransition(() => {
@@ -75,9 +79,9 @@ export const UsersDataTable = ({ users, perPage, page, totalPages }: UsersDataTa
             cell: ({ row }) => {
               return (
                 <>
-                  {row.original.roles.map((role: string, idx: number) => {
+                  {row.original.roles.map((role: string, i: number) => {
                     return (
-                      <span key={idx}>
+                      <span key={i}>
                         {role} {}
                       </span>
                     );
@@ -87,15 +91,32 @@ export const UsersDataTable = ({ users, perPage, page, totalPages }: UsersDataTa
             },
           },
           {
-            header: 'Subscription status',
+            header: 'Subscription',
             accessorKey: 'subscription',
             cell: ({ row }) => {
+              if (row.original.Subscription && row.original.Subscription.length > 0) {
+                return (
+                  <>
+                    {row.original.Subscription.map((subscription: Subscription, i: number) => {
+                      return <span key={i}>{subscription.status}</span>;
+                    })}
+                  </>
+                );
+              } else {
+                return <span>NONE</span>;
+              }
+            },
+          },
+          {
+            header: 'Documents',
+            accessorKey: 'documents',
+            cell: ({ row }) => {
               return (
-                <>
-                  {row.original.Subscription.map((subscription: Subscription, idx: number) => {
-                    return <span key={idx}>{subscription.status}</span>;
-                  })}
-                </>
+                <div>
+                  <Link href={`/admin/users/${row.original.id}/documents`}>
+                    {row.original.Document.length}
+                  </Link>
+                </div>
               );
             },
           },
