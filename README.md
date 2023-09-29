@@ -1,10 +1,6 @@
-<img src="https://user-images.githubusercontent.com/55143799/271409733-a3e20961-9726-4359-9946-c6b2559390d3.png" alt="Documenso Logo">
+<img src="https://github.com/documenso/documenso/assets/13398220/a643571f-0239-46a6-a73e-6bef38d1228b" alt="Documenso Logo">
 
 <p align="center" style="margin-top: 20px">
-  <!-- <a href="https://github.com/documenso/documenso">
-  <img width="250px" src="https://github.com/documenso/documenso/assets/1309312/ea8de2d0-8e33-4527-8a5c-40780142a2ed" alt="Documenso Logo">
-  </a> -->
-
   <p align="center">
   The Open Source DocuSign Alternative.
   <br>
@@ -18,14 +14,19 @@
     <a href="https://github.com/documenso/documenso/issues">Issues</a>
     ·
     <a href="https://github.com/documenso/documenso/milestones">Roadmap</a>
+    ·
+    <a href="https://documen.so/launches">Upcoming Launches</a>
   </p>
 </p>
 
 <p align="center">
-   <a href="https://documen.so/discord"><img src="https://img.shields.io/badge/Discord-documen.so/discord-%235865F2" alt="Join Documenso on Discord"></a> 
+   <a href="https://documen.so/discord"><img src="https://img.shields.io/badge/Discord-documen.so/discord-%235865F2" alt="Join Documenso on Discord"></a>
    <a href="https://github.com/documenso/documenso/stargazers"><img src="https://img.shields.io/github/stars/documenso/documenso" alt="Github Stars"></a>
    <a href="https://github.com/documenso/documenso/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-AGPLv3-purple" alt="License"></a>
    <a href="https://github.com/documenso/documenso/pulse"><img src="https://img.shields.io/github/commit-activity/m/documenso/documenso" alt="Commits-per-month"></a>
+   <a href="https://vscode.dev/redirect?url=vscode://ms-vscode-remote.remote-containers/cloneInVolume?url=https://github.com/documenso/documenso">
+   <img alt="open in devcontainer" src="https://img.shields.io/static/v1?label=Dev%20Containers&message=Enabled&color=blue&logo=visualstudiocode" />
+   </a>
 </p>
 
 > 🦺 Documenso 1.0 is deployed to our <a href="https://documen.so/staging" target="_blank">Staging Environment</a>.
@@ -51,12 +52,20 @@
 
 ## About this project
 
-Signing documents digitally is fast and easy and should be the best practice for every document signed worldwide. This is technically quite easy today, but it also introduces a new party to every signature: The signing tool providers. While this is not a problem in itself, it should make us think about how we want these providers of trust to work. Documenso aims to be the world's most trusted document-signing tool. This trust is built by empowering you to self-host Documenso and review how it works under the hood. Join us in creating the next generation of open trust infrastructure.
+Signing documents digitally should be fast and easy and should be the best practice for every document signed worldwide.
+
+This is technically quite easy today, but it also introduces a new party to every signature: The signing tool providers. While this is not a problem in itself, it should make us think about how we want these providers of trust to work.
+
+Documenso aims to be the world's most trusted document-signing tool. This trust is built by empowering you to self-host Documenso and review how it works under the hood.
+
+Join us in creating the next generation of open trust infrastructure.
 
 ## Recognition
 
-<a href="https://www.producthunt.com/posts/documenso?utm_source=badge-top-post-badge&utm_medium=badge&utm_souce=badge-documenso" target="_blank"><img src="https://api.producthunt.com/widgets/embed-image/v1/top-post-badge.svg?post_id=395047&theme=light&period=daily" alt="Documenso - The&#0032;open&#0032;source&#0032;DocuSign&#0032;alternative | Product Hunt" style="width: 250px; height: 54px;" width="250" height="54" /></a>
-<a href="https://www.producthunt.com/posts/documenso?utm_source=badge-featured&utm_medium=badge&utm_souce=badge-documenso" target="_blank"><img src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=395047&theme=light" alt="Documenso - The&#0032;Open&#0032;Source&#0032;DocuSign&#0032;Alternative&#0046; | Product Hunt" style="width: 250px; height: 54px;" width="250" height="54" /></a>
+<p align="center">
+  <a href="https://www.producthunt.com/posts/documenso?utm_source=badge-top-post-badge&utm_medium=badge&utm_souce=badge-documenso" target="_blank"><img src="https://api.producthunt.com/widgets/embed-image/v1/top-post-badge.svg?post_id=395047&theme=light&period=daily" alt="Documenso - The&#0032;open&#0032;source&#0032;DocuSign&#0032;alternative | Product Hunt" style="width: 250px; height: 54px;" width="250" height="54" /></a>
+  <a href="https://www.producthunt.com/posts/documenso?utm_source=badge-featured&utm_medium=badge&utm_souce=badge-documenso" target="_blank"><img src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=395047&theme=light" alt="Documenso - The&#0032;Open&#0032;Source&#0032;DocuSign&#0032;Alternative&#0046; | Product Hunt" style="width: 250px; height: 54px;" width="250" height="54" /></a>
+</p>
 
 ## Community and Next Steps 🎯
 
@@ -101,7 +110,7 @@ Contact us if you are interested in our Enterprise plan for large organizations 
 
 ### Requirements
 
-To run Documenso locally you need
+To run Documenso locally you will need
 
 - Node.js
 - Postgres SQL Database
@@ -119,12 +128,16 @@ Want to get up and running quickly? Follow these steps:
 git clone https://github.com/documenso/documenso
 ```
 
-2. Set up your `.env` file using the recommendations in the `.env.example` file.
+2. Set up your `.env` file using the recommendations in the `.env.example` file. Alternatively just run `cp .env.example .env` to get started with our handpicked defaults.
+
+
 3. Run `npm run dx` in the root directory
 
    - This will spin up a postgres database and inbucket mailserver in a docker container.
 
 4. Run `npm run dev` in the root directory
+
+
 5. Want it even faster? Just use
 
 ```sh
@@ -154,28 +167,27 @@ git clone https://github.com/documenso/documenso
 
 2. Run `npm i` in root directory
 
-3. Generate your `.env` from the `.env.example`
+3. Create your `.env` from the `.env.example`. You can use `cp .env.example .env` to get started with our handpicked defaults.
 
-4. Set DATABASE_URL value in .env file
+4. Set the following environement variables.
+    - NEXTAUTH_URL
+    - NEXTAUTH_SECRET
+    - NEXT_PUBLIC_WEBAPP_URL
+    - NEXT_PUBLIC_MARKETING_URL
+    - NEXT_PRIVATE_DATABASE_URL
+    - NEXT_PRIVATE_DIRECT_DATABASE_URL
+    - NEXT_PRIVATE_SMTP_FROM_NAME
+    - NEXT_PRIVATE_SMTP_FROM_ADDRESS
 
-   - You can use the provided test database url (may be wiped at any point)
-   - Or setup a local postgres sql instance (recommended)
+5. Create the database schema by running `npm run prisma:migrate-dev -w @documenso/prisma`
 
-5. Create the database scheme by running `db:migrate-dev`
+6. Run `npm run dev` root directory to start
 
-6. Setup your mail provider
-
-   - Set `SENDGRID_API_KEY` value in .env file
-   - You need a SendGrid account, which you can create [here](https://signup.sendgrid.com/)
-   - Documenso uses [Nodemailer](https://nodemailer.com/about/) so you can easily use your own SMTP server by setting the `SMTP` variables in your .env
-
-7. Run `npm run dev` root directory to start
-
-8. Register a new user at http://localhost:3000/signup
+7. Register a new user at http://localhost:3000/signup
 
 ---
 
-- Optional: Seed the database using `npm run db:seed` to create a test user and document
+- Optional: Seed the database using `npm run prisma:seed -w @documenso/prisma` to create a test user and document
 - Optional: Create your own signing certificate
   - To generate your own using these steps and a Linux Terminal or Windows Subsystem for Linux (WSL) see **[Create your own signing certificate](./SIGNING.md)**.
 
@@ -185,24 +197,19 @@ git clone https://github.com/documenso/documenso
 
 [![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/#https://github.com/documenso/documenso)
 
+### Run in DevContainer
+
+We support DevContainers for VSCode. [Click here to get started.](https://vscode.dev/redirect?url=vscode://ms-vscode-remote.remote-containers/cloneInVolume?url=https://github.com/documenso/documenso)
+
 ## Docker
 
-> We are still working on the publishing of docker images, in the meantime you can follow the steps below to create a production ready docker image.
-
-Want to create a production ready docker image? Follow these steps:
-
-1. cd into `docker` directory
-2. Make `build.sh` executable by running `chmod +x build.sh`
-3. Run `./build.sh` to start building the docker image.
-4. Publish the image to your docker registry of choice (or) if you prefer running the image from local, run the below command
-
-```
-docker run -d --restart=unless-stopped -p 3000:3000 -v documenso:/app/data --name documenso documenso:latest
-```
+🚧 Docker containers and images are current in progress. We are actively working on bringing a simple docker build and publish pipeline for Documenso.
 
 ## Self Hosting
 
 We support a variety of deployment methods, and are actively working on adding more. Stay tuned for updates!
+
+> Please note the below deployment methods are for v0.9, we will update these to v1.0 once it has been released.
 
 ### Railway
 
