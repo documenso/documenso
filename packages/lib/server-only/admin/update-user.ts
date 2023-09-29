@@ -2,23 +2,23 @@ import { prisma } from '@documenso/prisma';
 import { Role } from '@documenso/prisma/client';
 
 export type UpdateUserOptions = {
-  userId: number;
+  id: number;
   name: string;
   email: string;
   roles: Role[];
 };
 
-export const updateUser = async ({ userId, name, email, roles }: UpdateUserOptions) => {
+export const updateUser = async ({ id, name, email, roles }: UpdateUserOptions) => {
   console.log('wtf');
   await prisma.user.findFirstOrThrow({
     where: {
-      id: userId,
+      id,
     },
   });
 
   const updatedUser = await prisma.user.update({
     where: {
-      id: userId,
+      id,
     },
     data: {
       name,
