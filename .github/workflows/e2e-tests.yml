@@ -35,6 +35,8 @@ jobs:
         run: npm ci
       - name: Copy env
         run: cp .env.example .env
+      - name: Load environment variables
+        run: set -a; source .env
       - name: Build Documenso
         run: npm run build
       - name: Install Playwright Browsers
