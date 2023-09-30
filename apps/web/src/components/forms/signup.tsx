@@ -163,7 +163,7 @@ export const SignUpForm = ({ className }: SignUpFormProps) => {
         disabled={isSubmitting}
         className="dark:bg-documenso dark:hover:opacity-90"
       >
-        {isSubmitting ? 'Signing up...' : 'Sign up'}
+        {isSubmitting ? 'Signing up...' : 'Sign Up'}
       </Button>
     </form>
   );
