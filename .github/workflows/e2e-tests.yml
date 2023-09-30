@@ -8,12 +8,26 @@ jobs:
   e2e_tests:
     timeout-minutes: 60
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+    env:
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/documenso
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
         with:
           node-version: 18
-      - uses: ./.github/workflows/actions/docker-compose
       - name: Generate package-lock.json
         run: npm install
       - name: Install dependencies
@@ -24,6 +38,8 @@ jobs:
         run: npm run build
       - name: Install Playwright Browsers
         run: npx playwright install --with-deps
+      - name: Create the database
+        run: npx prisma migrate deploy
       - name: Run Playwright tests
         run: npm run ci
       - uses: actions/upload-artifact@v3
@@ -32,5 +48,3 @@ jobs:
           name: playwright-report
           path: playwright-report/
           retention-days: 30
-    env:
-      DATABASE_URL: postgres://myuser:documenso@localhost:5432/postgres
