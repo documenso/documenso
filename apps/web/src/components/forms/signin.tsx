@@ -146,9 +146,13 @@ export const SignInForm = ({ className }: SignInFormProps) => {
         <FormErrorMessage className="mt-1.5" error={errors.password} />
       </div>
 
-      <Button size="lg" disabled={isSubmitting} className="dark:bg-documenso dark:hover:opacity-90">
-        {isSubmitting && <Loader className="mr-2 h-5 w-5 animate-spin" />}
-        Sign In
+      <Button
+        size="lg"
+        loading={isSubmitting}
+        disabled={isSubmitting}
+        className="dark:bg-documenso dark:hover:opacity-90"
+      >
+        {isSubmitting ? 'Signing in...' : 'Sign in'}
       </Button>
 
       <div className="relative flex items-center justify-center gap-x-4 py-2 text-xs uppercase">

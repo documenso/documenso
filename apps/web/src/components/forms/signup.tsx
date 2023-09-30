@@ -157,9 +157,13 @@ export const SignUpForm = ({ className }: SignUpFormProps) => {
         <FormErrorMessage className="mt-1.5" error={errors.signature} />
       </div>
 
-      <Button size="lg" disabled={isSubmitting} className="dark:bg-documenso dark:hover:opacity-90">
-        {isSubmitting && <Loader className="mr-2 h-5 w-5 animate-spin" />}
-        Sign Up
+      <Button
+        size="lg"
+        loading={isSubmitting}
+        disabled={isSubmitting}
+        className="dark:bg-documenso dark:hover:opacity-90"
+      >
+        {isSubmitting ? 'Signing up...' : 'Sign up'}
       </Button>
     </form>
   );
