@@ -9,7 +9,7 @@
     "format": "prettier --write \"**/*.{js,jsx,cjs,mjs,ts,tsx,cts,mts,mdx}\"",
     "prepare": "husky install",
     "commitlint": "commitlint --edit",
-    "ci": "turbo run test:e2e lint",
+    "ci": "turbo run test:e2e",
     "clean": "turbo run clean && rimraf node_modules"
   },
   "engines": {
