@@ -30,13 +30,11 @@ jobs:
         with:
           node-version: 18
       - name: Generate package-lock.json
-        run: npm install
+        run: npm cache clean --force && npm install
       - name: Install dependencies
         run: npm ci
       - name: Copy env
         run: cp .env.example .env
-      - name: Load environment variables
-        run: set -a; source .env
       - name: Build Documenso
         run: npm run build
       - name: Install Playwright Browsers
