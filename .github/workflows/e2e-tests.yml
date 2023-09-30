@@ -22,7 +22,8 @@ jobs:
         ports:
           - 5432:5432
     env:
-      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/documenso
+      NEXT_PRIVATE_DATABASE_URL: postgresql://postgres:postgres@localhost:5432/documenso
+      NEXT_PRIVATE_DIRECT_DATABASE_URL: postgresql://postgres:postgres@localhost:5432/documenso
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
@@ -40,6 +41,8 @@ jobs:
         run: npx playwright install --with-deps
       - name: Install Prisma Client
         run: npm install @prisma/client
+      - name: Generate Prisma Client
+        run: npm run prisma:generate -w @documenso/prisma
       - name: Create the database
         run: npm run prisma:migrate-dev -w @documenso/prisma
       - name: Run Playwright tests
