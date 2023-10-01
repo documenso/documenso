@@ -84,6 +84,8 @@ export const SignaturePad = ({
 
         if (ctx) {
           ctx.clearRect(0, 0, $el.current.width, $el.current.height);
+          ctx.imageSmoothingEnabled = true;
+          ctx.imageSmoothingQuality = 'high';
 
           lines.forEach((line) => {
             const pathData = new Path2D(
