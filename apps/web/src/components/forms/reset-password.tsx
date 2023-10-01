@@ -166,7 +166,7 @@ export const ResetPasswordForm = ({ className, token }: ResetPasswordFormProps) 
       </div>
 
       <Button size="lg" loading={isSubmitting}>
-        Reset Password
+        {isSubmitting ? 'Resetting Password...' : 'Reset Password'}
       </Button>
     </form>
   );
