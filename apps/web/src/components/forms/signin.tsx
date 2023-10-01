@@ -3,7 +3,7 @@
 import { useState } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Loader } from 'lucide-react';
+import { Eye, EyeOff } from 'lucide-react';
 import { signIn } from 'next-auth/react';
 import { useForm } from 'react-hook-form';
 import { FcGoogle } from 'react-icons/fc';

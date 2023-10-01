@@ -3,7 +3,7 @@
 import { useState } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Eye, EyeOff, Loader } from 'lucide-react';
+import { Eye, EyeOff } from 'lucide-react';
 import { signIn } from 'next-auth/react';
 import { Controller, useForm } from 'react-hook-form';
 import { z } from 'zod';
