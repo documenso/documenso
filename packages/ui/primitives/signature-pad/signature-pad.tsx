@@ -60,7 +60,7 @@ export const SignaturePad = ({
     setIsPressed(true);
 
     const point = Point.fromEvent(event, DPI, $el.current);
-
+    
     setCurrentLine([point]);
   };
 
@@ -127,6 +127,9 @@ export const SignaturePad = ({
       if (ctx) {
         ctx.clearRect(0, 0, $el.current.width, $el.current.height);
 
+        ctx.imageSmoothingEnabled = true;
+        ctx.imageSmoothingQuality = 'high';
+        
         newLines.forEach((line) => {
           const pathData = new Path2D(
             getSvgPathFromStroke(getStroke(line, perfectFreehandOptions)),
