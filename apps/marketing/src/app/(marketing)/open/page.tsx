@@ -22,6 +22,10 @@ const ZMergedPullRequestsResponse = z.object({
   total_count: z.number(),
 });
 
+const ZOpenIssuesResponse = z.object({
+  total_count: z.number(),
+});
+
 const ZStargazersLiveResponse = z.record(
   z.object({
     stars: z.number(),
@@ -43,17 +47,27 @@ export type StargazersType = z.infer<typeof ZStargazersLiveResponse>;
 export type EarlyAdoptersType = z.infer<typeof ZEarlyAdoptersResponse>;
 
 export default async function OpenPage() {
-  const {
-    forks_count: forksCount,
-    open_issues: openIssues,
-    stargazers_count: stargazersCount,
-  } = await fetch('https://api.github.com/repos/documenso/documenso', {
-    headers: {
-      accept: 'application/vnd.github.v3+json',
+  const { forks_count: forksCount, stargazers_count: stargazersCount } = await fetch(
+    'https://api.github.com/repos/documenso/documenso',
+    {
+      headers: {
+        accept: 'application/vnd.github.v3+json',
+      },
     },
-  })
+  )
     .then(async (res) => res.json())
     .then((res) => ZGithubStatsResponse.parse(res));
+
+  const { total_count: openIssues } = await fetch(
+    'https://api.github.com/search/issues?q=repo:documenso/documenso+type:issue+state:open&page=0&per_page=1',
+    {
+      headers: {
+        accept: 'application/vnd.github.v3+json',
+      },
+    },
+  )
+    .then(async (res) => res.json())
+    .then((res) => ZOpenIssuesResponse.parse(res));
 
   const { total_count: mergedPullRequests } = await fetch(
     'https://api.github.com/search/issues?q=repo:documenso/documenso/+is:pr+merged:>=2010-01-01&page=0&per_page=1',
