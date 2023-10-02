@@ -3,13 +3,12 @@ import { Role } from '@documenso/prisma/client';
 
 export type UpdateUserOptions = {
   id: number;
-  name: string;
-  email: string;
-  roles: Role[];
+  name: string | null | undefined;
+  email: string | undefined;
+  roles: Role[] | undefined;
 };
 
 export const updateUser = async ({ id, name, email, roles }: UpdateUserOptions) => {
-  console.log('wtf');
   await prisma.user.findFirstOrThrow({
     where: {
       id,

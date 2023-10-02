@@ -2,6 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 
+import { zodResolver } from '@hookform/resolvers/zod';
 import { Loader } from 'lucide-react';
 import { Controller, useForm } from 'react-hook-form';
 
@@ -10,10 +11,13 @@ import { Button } from '@documenso/ui/primitives/button';
 import { Combobox } from '@documenso/ui/primitives/combobox';
 import { Input } from '@documenso/ui/primitives/input';
 import { Label } from '@documenso/ui/primitives/label';
-import { SignaturePad } from '@documenso/ui/primitives/signature-pad';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
 import { FormErrorMessage } from '../../../../../components/form/form-error-message';
+import {
+  TUserFormSchema,
+  ZUserFormSchema,
+} from '../../../../../providers/admin-user-profile-update.types';
 
 export default function UserPage({ params }: { params: { id: number } }) {
   const { toast } = useToast();
@@ -28,7 +32,9 @@ export default function UserPage({ params }: { params: { id: number } }) {
     },
   );
 
-  const roles = result.data?.roles;
+  const user = result.data;
+
+  const roles = user?.roles;
   let rolesArr: string[] = [];
 
   if (roles) {
@@ -42,29 +48,22 @@ export default function UserPage({ params }: { params: { id: number } }) {
     control,
     handleSubmit,
     formState: { errors, isSubmitting },
-  } = useForm();
+  } = useForm<TUserFormSchema>({
+    resolver: zodResolver(ZUserFormSchema),
+    values: {
+      name: user?.name ?? '',
+      email: user?.email ?? '',
+      roles: user?.roles ?? [],
+    },
+  });
 
-  const onSubmit = async (data) => {
-    console.log(data);
-
-    // const submittedRoles = data.roles
-    //   .split(',')
-    //   .map((role: string) => role.trim())
-    //   .map((role: string) => role.toUpperCase());
-
-    // const dbRoles = JSON.stringify(Role);
-
-    // const roleExists = submittedRoles.some((role: string) => dbRoles.includes(role));
-    // console.log('roleExists', roleExists);
-
-    // console.log('db roles', dbRoles);
-
+  const onSubmit = async ({ name, email, roles }: TUserFormSchema) => {
     try {
       await updateUserMutation({
-        id: Number(result.data?.id),
-        name: data.name,
-        email: data.email,
-        roles: data.roles,
+        id: Number(user?.id),
+        name,
+        email,
+        roles,
       });
 
       router.refresh();
@@ -86,20 +85,20 @@ export default function UserPage({ params }: { params: { id: number } }) {
 
   return (
     <div>
-      <h2 className="text-4xl font-semibold">Manage {result.data?.name}'s profile</h2>
+      <h2 className="text-4xl font-semibold">Manage {user?.name}'s profile</h2>
       <form className="mt-6 flex w-full flex-col gap-y-4" onSubmit={handleSubmit(onSubmit)}>
         <div>
           <Label htmlFor="name" className="text-muted-foreground">
             Name
           </Label>
-          <Input placeholder={result.data?.name} type="text" {...register('name')} />
+          <Input defaultValue={user?.name ?? ''} type="text" {...register('name')} />
           <FormErrorMessage className="mt-1.5" error={errors.name} />
         </div>
         <div>
           <Label htmlFor="email" className="text-muted-foreground">
             Email
           </Label>
-          <Input placeholder={result.data?.email} {...register('email')} />
+          <Input defaultValue={user?.email} type="email" {...register('email')} />
           <FormErrorMessage className="mt-1.5" error={errors.email} />
         </div>
         <div className="flex flex-col gap-2">
@@ -115,26 +114,6 @@ export default function UserPage({ params }: { params: { id: number } }) {
           />
           <FormErrorMessage className="mt-1.5" error={errors.roles} />
         </div>
-        {/* <div>
-          <Label htmlFor="signature" className="text-muted-foreground">
-            Signature
-          </Label>
-
-          <div className="mt-2">
-            <Controller
-              control={control}
-              name="signature"
-              render={({ field: { onChange } }) => (
-                <SignaturePad
-                  className="h-44 w-full rounded-lg border bg-white backdrop-blur-sm dark:border-[#e2d7c5] dark:bg-[#fcf8ee]"
-                  defaultValue={result.data?.signature ?? undefined}
-                  onChange={(v) => onChange(v ?? '')}
-                />
-              )}
-            />
-            <FormErrorMessage className="mt-1.5" error={errors.signature} />
-          </div>
-        </div> */}
 
         <div className="mt-4">
           <Button type="submit" disabled={isSubmitting}>
