@@ -425,7 +425,7 @@ export const AddFieldsFormPartial = ({
                   <CardContent className="flex flex-col items-center justify-center px-6 py-4">
                     <p
                       className={cn(
-                        'text-muted-foreground group-data-[selected]:text-foreground text-3xl font-medium',
+                        'text-muted-foreground group-data-[selected]:text-foreground w-full truncate text-3xl font-medium',
                         fontCaveat.className,
                       )}
                     >
