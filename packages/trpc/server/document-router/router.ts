@@ -1,6 +1,7 @@
 import { TRPCError } from '@trpc/server';
 
 import { createDocument } from '@documenso/lib/server-only/document/create-document';
+import { deleteDocument } from '@documenso/lib/server-only/document/delete-document';
 import { getDocumentById } from '@documenso/lib/server-only/document/get-document-by-id';
 import { getDocumentAndSenderByToken } from '@documenso/lib/server-only/document/get-document-by-token';
 import { sendDocument } from '@documenso/lib/server-only/document/send-document';
@@ -72,6 +73,25 @@ export const documentRouter = router({
         throw new TRPCError({
           code: 'BAD_REQUEST',
           message: 'We were unable to create this document. Please try again later.',
+        });
+      }
+    }),
+
+  deleteDocument: authenticatedProcedure
+    .input(ZGetDocumentByIdQuerySchema)
+    .mutation(async ({ input, ctx }) => {
+      try {
+        const { id } = input;
+
+        const userId = ctx.user.id;
+
+        return await deleteDocument({ id, userId });
+      } catch (err) {
+        console.error(err);
+
+        throw new TRPCError({
+          code: 'BAD_REQUEST',
+          message: 'We were unable to delete this document. Please try again later.',
         });
       }
     }),
