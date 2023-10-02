@@ -3,9 +3,9 @@ import z from 'zod';
 
 export const ZUpdateProfileMutationByAdminSchema = z.object({
   id: z.number().min(1),
-  name: z.string(),
-  email: z.string().email(),
-  roles: z.array(z.nativeEnum(Role)),
+  name: z.string().nullish(),
+  email: z.string().email().optional(),
+  roles: z.array(z.nativeEnum(Role)).optional(),
 });
 
 export type TUpdateProfileMutationByAdminSchema = z.infer<
