@@ -4,6 +4,7 @@ import { HTMLAttributes, useState } from 'react';
 
 import { Copy, Share, Twitter } from 'lucide-react';
 
+import { useCopyShareLink } from '@documenso/lib/client-only/hooks/use-copy-share-link';
 import { generateTwitterIntent } from '@documenso/lib/universal/generate-twitter-intent';
 import { trpc } from '@documenso/trpc/react';
 import { Button } from '@documenso/ui/primitives/button';
@@ -15,9 +16,6 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@documenso/ui/primitives/dialog';
-import { useToast } from '@documenso/ui/primitives/use-toast';
-
-import { useCopyToClipboard } from '~/hooks/use-copy-to-clipboard';
 
 export type ShareButtonProps = HTMLAttributes<HTMLButtonElement> & {
   token: string;
@@ -25,8 +23,7 @@ export type ShareButtonProps = HTMLAttributes<HTMLButtonElement> & {
 };
 
 export const ShareButton = ({ token, documentId }: ShareButtonProps) => {
-  const { toast } = useToast();
-  const [, copyToClipboard] = useCopyToClipboard();
+  const { copyShareLink, isCopyingShareLink } = useCopyShareLink();
 
   const [isOpen, setIsOpen] = useState(false);
 
@@ -48,23 +45,14 @@ export const ShareButton = ({ token, documentId }: ShareButtonProps) => {
   };
 
   const onCopyClick = async () => {
-    let { slug = '' } = shareLink || {};
+    const copyToClipboardValue = shareLink
+      ? `${window.location.origin}/share/${shareLink.slug}`
+      : {
+          token,
+          documentId,
+        };
 
-    if (!slug) {
-      const result = await createOrGetShareLink({
-        token,
-        documentId,
-      });
-
-      slug = result.slug;
-    }
-
-    await copyToClipboard(`${window.location.origin}/share/${slug}`).catch(() => null);
-
-    toast({
-      title: 'Copied to clipboard',
-      description: 'The sharing link has been copied to your clipboard.',
-    });
+    await copyShareLink(copyToClipboardValue);
 
     setIsOpen(false);
   };
@@ -99,9 +87,9 @@ export const ShareButton = ({ token, documentId }: ShareButtonProps) => {
           variant="outline"
           disabled={!token || !documentId}
           className="flex-1"
-          loading={isLoading}
+          loading={isLoading || isCopyingShareLink}
         >
-          {!isLoading && <Share className="mr-2 h-5 w-5" />}
+          {!isLoading && !isCopyingShareLink && <Share className="mr-2 h-5 w-5" />}
           Share
         </Button>
       </DialogTrigger>
