@@ -24,22 +24,6 @@ export const TEAM_MEMBERS = [
     joinDate: 'June 6th, 2023',
   },
   {
-    name: 'Florent Merian',
-    role: 'Marketer - III',
-    salary: 'Project-Based',
-    location: 'France',
-    engagement: 'Full-Time',
-    joinDate: 'July 10th, 2023',
-  },
-  {
-    name: 'Thilo Konzok',
-    role: 'Designer',
-    salary: 'Project-Based',
-    location: 'Germany',
-    engagement: 'Full-Time',
-    joinDate: 'April 26th, 2023',
-  },
-  {
     name: 'David Nguyen',
     role: 'Software Engineer - III',
     salary: 100_000,
