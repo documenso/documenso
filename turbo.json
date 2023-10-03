@@ -2,13 +2,8 @@
   "$schema": "https://turbo.build/schema.json",
   "pipeline": {
     "build": {
-      "dependsOn": [
-        "^build"
-      ],
-      "outputs": [
-        ".next/**",
-        "!.next/cache/**"
-      ]
+      "dependsOn": ["^build"],
+      "outputs": [".next/**", "!.next/cache/**"]
     },
     "lint": {},
     "clean": {
@@ -17,11 +12,15 @@
     "dev": {
       "cache": false,
       "persistent": true
+    },
+    "dev:test": {
+      "cache": false
+    },
+    "test:e2e": {
+      "dependsOn": ["^build"]
     }
   },
-  "globalDependencies": [
-    "**/.env.*local"
-  ],
+  "globalDependencies": ["**/.env.*local"],
   "globalEnv": [
     "APP_VERSION",
     "NEXTAUTH_URL",
