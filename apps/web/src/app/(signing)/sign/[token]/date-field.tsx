@@ -11,6 +11,7 @@ import { FieldWithSignature } from '@documenso/prisma/types/field-with-signature
 import { trpc } from '@documenso/trpc/react';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
+import { useRequiredSigningContext } from './provider';
 import { SigningFieldContainer } from './signing-field-container';
 
 export type DateFieldProps = {
@@ -24,6 +25,8 @@ export const DateField = ({ field, recipient }: DateFieldProps) => {
   const { toast } = useToast();
 
   const [isPending, startTransition] = useTransition();
+
+  const { dateFormat } = useRequiredSigningContext();
 
   const { mutateAsync: signFieldWithToken, isLoading: isSignFieldWithTokenLoading } =
     trpc.field.signFieldWithToken.useMutation();
@@ -40,7 +43,7 @@ export const DateField = ({ field, recipient }: DateFieldProps) => {
       await signFieldWithToken({
         token: recipient.token,
         fieldId: field.id,
-        value: '',
+        value: dateFormat,
       });
 
       startTransition(() => router.refresh());

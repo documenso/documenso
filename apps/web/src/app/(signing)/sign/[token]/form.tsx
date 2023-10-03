@@ -16,6 +16,13 @@ import { Button } from '@documenso/ui/primitives/button';
 import { Card, CardContent } from '@documenso/ui/primitives/card';
 import { Input } from '@documenso/ui/primitives/input';
 import { Label } from '@documenso/ui/primitives/label';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@documenso/ui/primitives/select';
 import { SignaturePad } from '@documenso/ui/primitives/signature-pad';
 
 import { useRequiredSigningContext } from './provider';
@@ -30,7 +37,8 @@ export const SigningForm = ({ document, recipient, fields }: SigningFormProps) =
   const router = useRouter();
   const { data: session } = useSession();
 
-  const { fullName, signature, setFullName, setSignature } = useRequiredSigningContext();
+  const { fullName, signature, setFullName, setSignature, dateFormat, setDateFormat } =
+    useRequiredSigningContext();
 
   const [validateUninsertedFields, setValidateUninsertedFields] = useState(false);
 
@@ -101,6 +109,25 @@ export const SigningForm = ({ document, recipient, fields }: SigningFormProps) =
                   value={fullName}
                   onChange={(e) => setFullName(e.target.value)}
                 />
+              </div>
+
+              <div>
+                <Label htmlFor="date-format">Date Format</Label>
+
+                <Select
+                  onValueChange={(value) => {
+                    setDateFormat(value);
+                  }}
+                  defaultValue={dateFormat}
+                >
+                  <SelectTrigger className="bg-background mt-2">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="yyyy-MM-dd hh:mm a">YYYY-MM-DD</SelectItem>
+                    <SelectItem value="dd/MM/yyyy hh:mm a">DD/MM/YYYY</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
 
               <div>

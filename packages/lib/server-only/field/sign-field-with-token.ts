@@ -58,7 +58,7 @@ export const signFieldWithToken = async ({
   const typedSignature = isSignatureField && !isBase64 ? value : undefined;
 
   if (field.type === FieldType.DATE) {
-    customText = DateTime.now().toFormat('yyyy-MM-dd hh:mm a');
+    customText = DateTime.now().toFormat(value);
   }
 
   await prisma.field.update({
