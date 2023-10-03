@@ -1,2 +1,3 @@
 -- AlterEnum
-ALTER TYPE "FieldType" ADD VALUE 'NAME';
+ALTER TYPE "FieldType"
+ADD VALUE 'NAME';

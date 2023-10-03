@@ -1,2 +1,3 @@
 -- AlterTable
-ALTER TABLE "Recipient" ADD COLUMN     "signedAt" TIMESTAMP(3);
+ALTER TABLE "Recipient"
+ADD COLUMN "signedAt" TIMESTAMP(3);

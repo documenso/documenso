@@ -1,7 +1,7 @@
 INSERT INTO
   "DocumentData" ("id", "type", "data", "initialData", "documentId") (
     SELECT
-      CAST(gen_random_uuid() AS TEXT),
+      CAST(gen_random_uuid () AS TEXT),
       'BYTES_64',
       d."document",
       d."document",

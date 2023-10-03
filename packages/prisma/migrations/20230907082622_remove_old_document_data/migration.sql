@@ -1,8 +1,9 @@
 /*
-  Warnings:
+Warnings:
 
-  - You are about to drop the column `document` on the `Document` table. All the data in the column will be lost.
+- You are about to drop the column `document` on the `Document` table. All the data in the column will be lost.
 
 */
 -- AlterTable
-ALTER TABLE "Document" DROP COLUMN "document";
+ALTER TABLE "Document"
+DROP COLUMN "document";

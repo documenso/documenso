@@ -130,13 +130,11 @@ git clone https://github.com/documenso/documenso
 
 2. Set up your `.env` file using the recommendations in the `.env.example` file. Alternatively just run `cp .env.example .env` to get started with our handpicked defaults.
 
-
 3. Run `npm run dx` in the root directory
 
    - This will spin up a postgres database and inbucket mailserver in a docker container.
 
 4. Run `npm run dev` in the root directory
-
 
 5. Want it even faster? Just use
 
@@ -170,14 +168,15 @@ git clone https://github.com/documenso/documenso
 3. Create your `.env` from the `.env.example`. You can use `cp .env.example .env` to get started with our handpicked defaults.
 
 4. Set the following environement variables.
-    - NEXTAUTH_URL
-    - NEXTAUTH_SECRET
-    - NEXT_PUBLIC_WEBAPP_URL
-    - NEXT_PUBLIC_MARKETING_URL
-    - NEXT_PRIVATE_DATABASE_URL
-    - NEXT_PRIVATE_DIRECT_DATABASE_URL
-    - NEXT_PRIVATE_SMTP_FROM_NAME
-    - NEXT_PRIVATE_SMTP_FROM_ADDRESS
+
+   - NEXTAUTH_URL
+   - NEXTAUTH_SECRET
+   - NEXT_PUBLIC_WEBAPP_URL
+   - NEXT_PUBLIC_MARKETING_URL
+   - NEXT_PRIVATE_DATABASE_URL
+   - NEXT_PRIVATE_DIRECT_DATABASE_URL
+   - NEXT_PRIVATE_SMTP_FROM_NAME
+   - NEXT_PRIVATE_SMTP_FROM_ADDRESS
 
 5. Create the database schema by running `npm run prisma:migrate-dev -w @documenso/prisma`
 

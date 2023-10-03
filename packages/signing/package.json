@@ -8,8 +8,7 @@
     "transports/",
     "index.ts"
   ],
-  "scripts": {
-  },
+  "scripts": {},
   "dependencies": {
     "@documenso/tsconfig": "*",
     "node-forge": "^1.3.1",

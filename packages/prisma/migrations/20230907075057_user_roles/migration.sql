@@ -1,5 +1,6 @@
 -- CreateEnum
-CREATE TYPE "Role" AS ENUM ('ADMIN', 'USER');
+CREATE TYPE "Role" AS ENUM('ADMIN', 'USER');
 
 -- AlterTable
-ALTER TABLE "User" ADD COLUMN     "roles" "Role"[] DEFAULT ARRAY['USER']::"Role"[];
+ALTER TABLE "User"
+ADD COLUMN "roles" "Role" [] DEFAULT ARRAY['USER']::"Role" [];

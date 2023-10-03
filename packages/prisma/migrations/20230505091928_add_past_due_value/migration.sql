@@ -1,2 +1,3 @@
 -- AlterEnum
-ALTER TYPE "SubscriptionStatus" ADD VALUE 'PAST_DUE';
+ALTER TYPE "SubscriptionStatus"
+ADD VALUE 'PAST_DUE';
