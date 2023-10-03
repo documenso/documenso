@@ -3,7 +3,7 @@ on:
   push:
     branches: [feat/refresh, feat/add-e2e-testing-playwright]
   pull_request:
-    branches: [feat/refresh, feat/add-e2e-testing-playwright]
+    branches: [feat/refresh]
 jobs:
   e2e_tests:
     timeout-minutes: 60
@@ -33,7 +33,7 @@ jobs:
         run: npm cache clean --force && npm install
       - name: Install dependencies
         run: npm ci
-        - name: Copy env
+      - name: Copy env
         run: cp .env.example .env
       - name: Install Playwright Browsers
         run: npx playwright install --with-deps
