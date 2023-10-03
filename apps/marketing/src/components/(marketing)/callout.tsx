@@ -2,8 +2,8 @@
 
 import Link from 'next/link';
 
-import { Github } from 'lucide-react';
 import { usePlausible } from 'next-plausible';
+import { LuGithub } from 'react-icons/lu';
 
 import { Button } from '@documenso/ui/primitives/button';
 
@@ -52,7 +52,7 @@ export const Callout = ({ starCount }: CalloutProps) => {
         onClick={() => event('view-github')}
       >
         <Button variant="outline" className="rounded-full bg-transparent backdrop-blur-sm">
-          <Github className="mr-2 h-5 w-5" />
+          <LuGithub className="mr-2 h-5 w-5" />
           Star on Github
           {starCount && starCount > 0 && (
             <span className="bg-primary dark:text-background -mr-2.5 ml-2.5 rounded-full px-2 py-1.5 text-xs">
