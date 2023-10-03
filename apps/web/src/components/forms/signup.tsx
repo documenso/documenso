@@ -3,7 +3,7 @@
 import { useState } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Eye, EyeOff, Loader } from 'lucide-react';
+import { Eye, EyeOff } from 'lucide-react';
 import { signIn } from 'next-auth/react';
 import { Controller, useForm } from 'react-hook-form';
 import { z } from 'zod';
@@ -157,9 +157,13 @@ export const SignUpForm = ({ className }: SignUpFormProps) => {
         <FormErrorMessage className="mt-1.5" error={errors.signature} />
       </div>
 
-      <Button size="lg" disabled={isSubmitting} className="dark:bg-documenso dark:hover:opacity-90">
-        {isSubmitting && <Loader className="mr-2 h-5 w-5 animate-spin" />}
-        Sign Up
+      <Button
+        size="lg"
+        loading={isSubmitting}
+        disabled={isSubmitting}
+        className="dark:bg-documenso dark:hover:opacity-90"
+      >
+        {isSubmitting ? 'Signing up...' : 'Sign Up'}
       </Button>
     </form>
   );

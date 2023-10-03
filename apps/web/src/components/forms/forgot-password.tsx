@@ -73,7 +73,7 @@ export const ForgotPasswordForm = ({ className }: ForgotPasswordFormProps) => {
       </div>
 
       <Button size="lg" loading={isSubmitting}>
-        Reset Password
+        {isSubmitting ? 'Sending Reset Email...' : 'Reset Password'}
       </Button>
     </form>
   );
