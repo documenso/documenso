@@ -123,11 +123,12 @@ export const documentRouter = router({
     .input(ZSendDocumentMutationSchema)
     .mutation(async ({ input, ctx }) => {
       try {
-        const { documentId } = input;
+        const { documentId, shouldResend } = input;
 
         return await sendDocument({
           userId: ctx.user.id,
           documentId,
+          shouldResend,
         });
       } catch (err) {
         console.error(err);

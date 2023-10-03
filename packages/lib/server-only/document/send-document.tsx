@@ -11,9 +11,14 @@ import { DocumentStatus, SendStatus } from '@documenso/prisma/client';
 export type SendDocumentOptions = {
   documentId: number;
   userId: number;
+  shouldResend?: boolean;
 };
 
-export const sendDocument = async ({ documentId, userId }: SendDocumentOptions) => {
+export const sendDocument = async ({
+  documentId,
+  userId,
+  shouldResend = false,
+}: SendDocumentOptions) => {
   const user = await prisma.user.findFirstOrThrow({
     where: {
       id: userId,
@@ -55,7 +60,7 @@ export const sendDocument = async ({ documentId, userId }: SendDocumentOptions) 
         'document.name': document.title,
       };
 
-      if (recipient.sendStatus === SendStatus.SENT) {
+      if (recipient.sendStatus === SendStatus.SENT && !shouldResend) {
         return;
       }
 
