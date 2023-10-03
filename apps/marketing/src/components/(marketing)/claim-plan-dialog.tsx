@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import { useSearchParams } from 'next/navigation';
 
@@ -55,8 +55,8 @@ export const ClaimPlanDialog = ({ className, planId, children }: ClaimPlanDialog
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
+    reset,
   } = useForm<TClaimPlanDialogFormSchema>({
-    mode: 'onBlur',
     defaultValues: {
       name: params?.get('name') ?? '',
       email: params?.get('email') ?? '',
@@ -90,6 +90,12 @@ export const ClaimPlanDialog = ({ className, planId, children }: ClaimPlanDialog
       });
     }
   };
+
+  useEffect(() => {
+    if (!isSubmitting && !open) {
+      reset();
+    }
+  }, [open]);
 
   return (
     <Dialog open={open} onOpenChange={(value) => !isSubmitting && setOpen(value)}>
