@@ -65,11 +65,16 @@ export const profileRouter = router({
     try {
       const { email } = input;
 
-      return await forgotPassword({
+      const response = await forgotPassword({
         email,
       });
+      if (response === undefined) {
+        throw new Error('Incorrect Email');
+      }
+      return;
     } catch (err) {
       console.error(err);
+      throw err;
     }
   }),
 

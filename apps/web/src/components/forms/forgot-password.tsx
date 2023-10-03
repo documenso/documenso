@@ -1,5 +1,7 @@
 'use client';
 
+import { useState } from 'react';
+
 import { useRouter } from 'next/navigation';
 
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -28,6 +30,9 @@ export const ForgotPasswordForm = ({ className }: ForgotPasswordFormProps) => {
   const router = useRouter();
   const { toast } = useToast();
 
+  // Add a state variable to track errors
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
   const {
     register,
     handleSubmit,
@@ -43,18 +48,24 @@ export const ForgotPasswordForm = ({ className }: ForgotPasswordFormProps) => {
   const { mutateAsync: forgotPassword } = trpc.profile.forgotPassword.useMutation();
 
   const onFormSubmit = async ({ email }: TForgotPasswordFormSchema) => {
-    await forgotPassword({ email }).catch(() => null);
+    try {
+      // Try to call forgotPassword
+      await forgotPassword({ email });
 
-    toast({
-      title: 'Reset email sent',
-      description:
-        'A password reset email has been sent, if you have an account you should see it in your inbox shortly.',
-      duration: 5000,
-    });
+      toast({
+        title: 'Reset email sent',
+        description:
+          'A password reset email has been sent, if you have an account you should see it in your inbox shortly.',
+        duration: 5000,
+      });
 
-    reset();
+      reset();
 
-    router.push('/check-email');
+      router.push('/check-email');
+    } catch (err) {
+      // If an error is caught, set the error message state
+      setErrorMessage(err.message);
+    }
   };
 
   return (
@@ -75,6 +86,10 @@ export const ForgotPasswordForm = ({ className }: ForgotPasswordFormProps) => {
       <Button size="lg" loading={isSubmitting}>
         {isSubmitting ? 'Sending Reset Email...' : 'Reset Password'}
       </Button>
+
+      {errorMessage && (
+        <div className="mt-2 rounded-md bg-red-500 p-1 text-center text-white">{errorMessage}</div>
+      )}
     </form>
   );
 };
