@@ -51,6 +51,16 @@ export const DataTableActionDropdown = ({ row }: DataTableActionDropdownProps) =
   const { mutateAsync: createOrGetShareLink, isLoading: isCreatingShareLink } =
     trpcReact.shareLink.createOrGetShareLink.useMutation();
 
+  const { mutateAsync: sendDocument } = trpcReact.document.sendDocument.useMutation({
+    onSuccess: () => {
+      toast({
+        title: 'Document re-sent',
+        description: 'Your document has been re-sent successfully.',
+        duration: 5000,
+      });
+    },
+  });
+
   const recipient = row.Recipient.find((recipient) => recipient.email === session.user.email);
 
   const isOwner = row.User.id === session.user.id;
@@ -109,6 +119,9 @@ export const DataTableActionDropdown = ({ row }: DataTableActionDropdownProps) =
     window.URL.revokeObjectURL(link.href);
   };
 
+  const handleResend = async () => {
+    await sendDocument({ documentId: row.id, shouldResend: true });
+  };
   return (
     <DropdownMenu>
       <DropdownMenuTrigger>
@@ -154,7 +167,7 @@ export const DataTableActionDropdown = ({ row }: DataTableActionDropdownProps) =
 
         <DropdownMenuLabel>Share</DropdownMenuLabel>
 
-        <DropdownMenuItem disabled>
+        <DropdownMenuItem onClick={handleResend}>
           <History className="mr-2 h-4 w-4" />
           Resend
         </DropdownMenuItem>
