@@ -3,7 +3,7 @@ on:
   push:
     branches: [feat/refresh, feat/add-e2e-testing-playwright]
   pull_request:
-    branches: [feat/refresh]
+    branches: [feat/refresh, feat/add-e2e-testing-playwright]
 jobs:
   e2e_tests:
     timeout-minutes: 60
