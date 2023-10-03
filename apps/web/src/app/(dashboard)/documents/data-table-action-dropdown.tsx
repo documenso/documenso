@@ -6,7 +6,6 @@ import {
   Copy,
   Download,
   Edit,
-  History,
   Loader,
   MoreHorizontal,
   Pencil,
@@ -32,6 +31,8 @@ import { useToast } from '@documenso/ui/primitives/use-toast';
 
 import { useCopyToClipboard } from '~/hooks/use-copy-to-clipboard';
 
+import { ResendEmailMenuItem } from './resend-email-menu-item';
+
 export type DataTableActionDropdownProps = {
   row: Document & {
     User: Pick<User, 'id' | 'name' | 'email'>;
@@ -50,16 +51,6 @@ export const DataTableActionDropdown = ({ row }: DataTableActionDropdownProps) =
 
   const { mutateAsync: createOrGetShareLink, isLoading: isCreatingShareLink } =
     trpcReact.shareLink.createOrGetShareLink.useMutation();
-
-  const { mutateAsync: sendDocument } = trpcReact.document.sendDocument.useMutation({
-    onSuccess: () => {
-      toast({
-        title: 'Document re-sent',
-        description: 'Your document has been re-sent successfully.',
-        duration: 5000,
-      });
-    },
-  });
 
   const recipient = row.Recipient.find((recipient) => recipient.email === session.user.email);
 
@@ -119,9 +110,7 @@ export const DataTableActionDropdown = ({ row }: DataTableActionDropdownProps) =
     window.URL.revokeObjectURL(link.href);
   };
 
-  const handleResend = async () => {
-    await sendDocument({ documentId: row.id, shouldResend: true });
-  };
+  const nonSignedRecipients = row.Recipient.filter((item) => item.signingStatus !== 'SIGNED');
   return (
     <DropdownMenu>
       <DropdownMenuTrigger>
@@ -167,10 +156,7 @@ export const DataTableActionDropdown = ({ row }: DataTableActionDropdownProps) =
 
         <DropdownMenuLabel>Share</DropdownMenuLabel>
 
-        <DropdownMenuItem onClick={handleResend}>
-          <History className="mr-2 h-4 w-4" />
-          Resend
-        </DropdownMenuItem>
+        <ResendEmailMenuItem documentId={row.id} recipients={nonSignedRecipients} />
 
         <DropdownMenuItem onClick={onShareClick}>
           {isCreatingShareLink ? (
