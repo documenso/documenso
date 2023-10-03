@@ -16,6 +16,8 @@ import { Input } from '@documenso/ui/primitives/input';
 import { Label } from '@documenso/ui/primitives/label';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
+import { ErrorNotify } from '../ui/error-notify';
+
 export const ZForgotPasswordFormSchema = z.object({
   email: z.string().email().min(1),
 });
@@ -88,7 +90,7 @@ export const ForgotPasswordForm = ({ className }: ForgotPasswordFormProps) => {
       </Button>
 
       {errorMessage && (
-        <div className="mt-2 rounded-md bg-red-500 p-1 text-center text-white">{errorMessage}</div>
+        <ErrorNotify errorMessage={errorMessage} setErrorMessage={setErrorMessage} />
       )}
     </form>
   );

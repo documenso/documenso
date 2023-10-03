@@ -69,7 +69,7 @@ export const profileRouter = router({
         email,
       });
       if (response === undefined) {
-        throw new Error('Incorrect Email');
+        throw new Error('Email Not Found');
       }
       return;
     } catch (err) {
