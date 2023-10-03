@@ -90,11 +90,13 @@ export const ClaimPlanDialog = ({ className, planId, children }: ClaimPlanDialog
       });
     }
   };
+
   useEffect(() => {
     if (!isSubmitting && !open) {
       reset();
     }
   }, [open]);
+
   return (
     <Dialog open={open} onOpenChange={(value) => !isSubmitting && setOpen(value)}>
       <DialogTrigger asChild>{children}</DialogTrigger>
