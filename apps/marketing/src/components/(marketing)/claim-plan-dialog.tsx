@@ -129,7 +129,7 @@ export const ClaimPlanDialog = ({ className, planId, children }: ClaimPlanDialog
             <div>
               <Label className="text-muted-foreground">Name</Label>
 
-              <Input type="text" className="mt-2" {...register('name')} disabled={isSubmitting} />
+              <Input type="text" className="mt-2" {...register('name')} autoFocus />
 
               <FormErrorMessage className="mt-1" error={errors.name} />
             </div>
