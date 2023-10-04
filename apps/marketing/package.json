@@ -31,7 +31,7 @@
     "react-confetti": "^6.1.0",
     "react-dom": "18.2.0",
     "react-hook-form": "^7.43.9",
-    "react-icons": "^4.8.0",
+    "react-icons": "^4.11.0",
     "recharts": "^2.7.2",
     "sharp": "0.32.5",
     "typescript": "5.1.6",
