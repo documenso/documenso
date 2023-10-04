@@ -11,7 +11,8 @@
     "commitlint": "commitlint --edit",
     "clean": "turbo run clean && rimraf node_modules",
     "d": "npm run dx && npm run dev",
-    "dx": "npm i && npm run dx:up && npm run prisma:migrate-dev -w @documenso/prisma",
+    "envprisma": "npm run prisma:migrate-dev -w @documenso/prisma",
+    "dx": "npm i && npm run dx:up && dotenv -e .env npm run envprisma",
     "dx:up": "docker compose -f docker/compose-services.yml up -d",
     "dx:down": "docker compose -f docker/compose-services.yml down"
   },
@@ -22,8 +23,8 @@
   "devDependencies": {
     "@commitlint/cli": "^17.7.1",
     "@commitlint/config-conventional": "^17.7.0",
-    "dotenv": "^16.0.3",
-    "dotenv-cli": "^7.2.1",
+    "dotenv": "^16.3.1",
+    "dotenv-cli": "^7.3.0",
     "eslint": "^8.40.0",
     "eslint-config-custom": "*",
     "husky": "^8.0.0",
