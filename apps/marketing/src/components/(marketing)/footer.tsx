@@ -71,7 +71,7 @@ export const Footer = ({ className, ...props }: FooterProps) => {
               target={link.target}
               className="text-muted-foreground hover:text-muted-foreground/80 flex-shrink-0 text-sm"
             >
-              {link.text}
+              {link.text} <span className="invisible ml-2 max-[425px]:visible">|</span>
             </Link>
           ))}
         </div>

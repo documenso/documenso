@@ -37,11 +37,11 @@ export const Callout = ({ starCount }: CalloutProps) => {
       <Button
         type="button"
         variant="outline"
-        className="rounded-full bg-transparent backdrop-blur-sm"
+        className="rounded-full bg-transparent backdrop-blur-sm max-[320px]:h-auto max-[320px]:flex-col max-[320px]:gap-1"
         onClick={onSignUpClick}
       >
         Get the Early Adopters Plan
-        <span className="bg-primary dark:text-background -mr-2.5 ml-2.5 rounded-full px-2 py-1.5 text-xs">
+        <span className="bg-primary dark:text-background rounded-full px-2 py-1.5 text-xs max-[320px]:w-full min-[375px]:-mr-2.5 min-[375px]:ml-2.5">
           $30/mo. forever!
         </span>
       </Button>

@@ -30,7 +30,7 @@ export const OpenBuildTemplateBento = ({ className, ...props }: OpenBuildTemplat
       <div className="mt-6 grid grid-cols-2 gap-8 md:mt-8">
         <Card className="col-span-2" degrees={45} gradient>
           <CardContent className="grid grid-cols-12 gap-8 overflow-hidden p-6 lg:aspect-[2.5/1]">
-            <p className="text-foreground/80 col-span-12 leading-relaxed lg:col-span-6">
+            <p className="text-foreground/80 col-span-10 leading-relaxed max-[320px]:mr-4 sm:col-span-12 lg:col-span-6">
               <strong className="block">Open Source or Hosted.</strong>
               It’s up to you. Either clone our repository or rely on our easy to use hosting
               solution.
