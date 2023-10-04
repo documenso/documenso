@@ -18,6 +18,7 @@
   },
   "dependencies": {
     "@prisma/client": "5.3.1",
+    "dotenv": "^16.3.1",
     "prisma": "5.3.1"
   },
   "devDependencies": {
