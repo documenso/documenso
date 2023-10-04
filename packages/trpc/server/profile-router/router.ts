@@ -67,11 +67,12 @@ export const profileRouter = router({
     .input(ZUpdatePasswordMutationSchema)
     .mutation(async ({ input, ctx }) => {
       try {
-        const { password } = input;
+        const { password, currentPassword } = input;
 
         return await updatePassword({
           userId: ctx.user.id,
           password,
+          currentPassword,
         });
       } catch (err) {
         let message =
