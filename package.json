@@ -2,6 +2,7 @@
   "private": true,
   "scripts": {
     "build": "turbo run build",
+    "build:web": "turbo run build --filter=@documenso/web",
     "dev": "turbo run dev --filter=@documenso/web --filter=@documenso/marketing",
     "start": "cd apps && cd web && next start",
     "lint": "turbo run lint",

@@ -7,7 +7,9 @@ import { shareLinkRouter } from './share-link-router/router';
 import { procedure, router } from './trpc';
 
 export const appRouter = router({
-  hello: procedure.query(() => 'Hello, world!'),
+  health: procedure.query(() => {
+    return { status: 'ok' };
+  }),
   auth: authRouter,
   profile: profileRouter,
   document: documentRouter,
