@@ -28,7 +28,7 @@ export const updatePassword = async ({
 
   const isCurrentPasswordValid = await compare(currentPassword, user.password);
   if (!isCurrentPasswordValid) {
-    throw new Error('Current password is Incorrect.');
+    throw new Error('Current password is incorrect.');
   }
 
   // Compare the new password with the old password
