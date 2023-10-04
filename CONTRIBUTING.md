@@ -9,6 +9,22 @@ If you plan to contribute to Documenso, please take a moment to feel awesome ✨
 - Consider the results from the discussion in the issue
 - Accept the [Contributor License Agreement](https://documen.so/cla) to ensure we can accept your contributions.
 
+## Taking issues
+
+Before taking an issue, ensure that:
+
+- The issue has been assigned the public label
+- The issue is clearly defined and understood
+- No one has been assigned to the issue
+- No one has expressed intention to work on it
+
+You can then:
+
+1. Comment on the issue with your intention to work on it
+2. Begin work on the issue
+
+Always feel free to ask questions or seek clarification on the issue.
+
 ## Developing
 
 The development branch is <code>main</code>. All pull request should be made against this branch. If you need help getting started, [join us on Discord](https://documen.so/discord).
