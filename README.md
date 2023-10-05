@@ -27,6 +27,7 @@
    <a href="https://vscode.dev/redirect?url=vscode://ms-vscode-remote.remote-containers/cloneInVolume?url=https://github.com/documenso/documenso">
    <img alt="open in devcontainer" src="https://img.shields.io/static/v1?label=Dev%20Containers&message=Enabled&color=blue&logo=visualstudiocode" />
    </a>
+   <a href="code_of_conduct.md"><img src="https://img.shields.io/badge/Contributor%20Covenant-2.1-4baaaa.svg" alt="Contributor Covenant"></a>
 </p>
 
 > 🦺 Documenso 1.0 is deployed to our <a href="https://documen.so/staging" target="_blank">Staging Environment</a>.
@@ -130,13 +131,11 @@ git clone https://github.com/documenso/documenso
 
 2. Set up your `.env` file using the recommendations in the `.env.example` file. Alternatively just run `cp .env.example .env` to get started with our handpicked defaults.
 
-
 3. Run `npm run dx` in the root directory
 
    - This will spin up a postgres database and inbucket mailserver in a docker container.
 
 4. Run `npm run dev` in the root directory
-
 
 5. Want it even faster? Just use
 
@@ -170,14 +169,15 @@ git clone https://github.com/documenso/documenso
 3. Create your `.env` from the `.env.example`. You can use `cp .env.example .env` to get started with our handpicked defaults.
 
 4. Set the following environement variables.
-    - NEXTAUTH_URL
-    - NEXTAUTH_SECRET
-    - NEXT_PUBLIC_WEBAPP_URL
-    - NEXT_PUBLIC_MARKETING_URL
-    - NEXT_PRIVATE_DATABASE_URL
-    - NEXT_PRIVATE_DIRECT_DATABASE_URL
-    - NEXT_PRIVATE_SMTP_FROM_NAME
-    - NEXT_PRIVATE_SMTP_FROM_ADDRESS
+
+   - NEXTAUTH_URL
+   - NEXTAUTH_SECRET
+   - NEXT_PUBLIC_WEBAPP_URL
+   - NEXT_PUBLIC_MARKETING_URL
+   - NEXT_PRIVATE_DATABASE_URL
+   - NEXT_PRIVATE_DIRECT_DATABASE_URL
+   - NEXT_PRIVATE_SMTP_FROM_NAME
+   - NEXT_PRIVATE_SMTP_FROM_ADDRESS
 
 5. Create the database schema by running `npm run prisma:migrate-dev -w @documenso/prisma`
 
