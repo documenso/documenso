@@ -81,9 +81,11 @@ export const ResendEmailMenuItem = (props: ResendEmailMenuItemProps) => {
             Resend
           </Button>
         </DialogTrigger>
-        <DialogContent className="sm:max-w-[425px]">
+        <DialogContent className="sm:max-w-[400px]" hideClose>
           <DialogHeader>
-            <DialogTitle>Who do you want to remind?</DialogTitle>
+            <DialogTitle>
+              <h1 className="text-center text-xl">Who do you want to remind?</h1>
+            </DialogTitle>
 
             <Form {...form}>
               <form onSubmit={form.handleSubmit(onSubmit)} id="remainder-email" className="pt-5">
@@ -121,13 +123,22 @@ export const ResendEmailMenuItem = (props: ResendEmailMenuItemProps) => {
               </form>
             </Form>
           </DialogHeader>
+
           <DialogFooter>
-            <DialogClose asChild>
-              <Button variant="secondary">Cancel</Button>
-            </DialogClose>
-            <Button loading={isLoading} type="submit" form="remainder-email">
-              Send reminder
-            </Button>
+            <div className="flex w-full flex-1 flex-nowrap gap-4">
+              <DialogClose asChild>
+                <Button
+                  type="button"
+                  className="dark:bg-muted dark:hover:bg-muted/80 flex-1  bg-black/5 hover:bg-black/10"
+                  variant="secondary"
+                >
+                  Cancel
+                </Button>
+              </DialogClose>
+              <Button className="flex-1" loading={isLoading} type="submit" form="remainder-email">
+                Send reminder
+              </Button>
+            </div>
           </DialogFooter>
         </DialogContent>
       </Dialog>
