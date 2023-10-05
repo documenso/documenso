@@ -391,7 +391,7 @@ export const Widget = ({ className, children, ...props }: WidgetProps) => {
 
           <SignaturePad
             className="aspect-video w-full rounded-md border"
-            defaultValue={draftSignatureDataUrl || ''}
+            defaultValue={signatureDataUrl || ''}
             onChange={setDraftSignatureDataUrl}
           />
 
