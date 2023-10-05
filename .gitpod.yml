@@ -1,48 +1,30 @@
 tasks:
-  - name: Dependencies & Database
-    init: |
-      npm install &&
-      npm run docker:compose-up &&
-      cp .env.gitpod .env &&
-      next_auth_secret=$(openssl rand -base64 32) &&
-      sed -i -e "s|^NEXTAUTH_SECRET=.*|NEXTAUTH_SECRET=$next_auth_secret|" .env &&
-      sed -i "s|NEXTAUTH_URL=\"\"|NEXTAUTH_URL=https://3000-${HOSTNAME}.${GITPOD_WORKSPACE_CLUSTER_HOST}|" .env && 
-      sed -i "s|NEXT_PUBLIC_WEBAPP_URL=\"\"|NEXT_PUBLIC_WEBAPP_URL=https://3000-${HOSTNAME}.${GITPOD_WORKSPACE_CLUSTER_HOST}|" .env
-    command: npm run d
-
-  - name: Database Studio
-    command: |
-      gp ports await 3000
-      npm run db-studio
+  - init: |
+      cp .env.example .env &&
+      set -a; source .env &&
+      npm run dx &&
+      sed -i -e "s|http://localhost:3000|$(gp url 3000)|" .env \
+             -e "s|http://localhost:3001|$(gp url 3001)|" .env \
+             -e "s|http://localhost:9000|$(gp url 9000)|" .env 
+    command: npm run dev
 
 ports:
-  - name: App
-    port: 3000
+  - port: 3000
     visibility: public
-    onOpen: open-browser
-
-  - name: Mailbox
-    port: 9000
+    onOpen: open-preview
+  - port: 3001
     visibility: public
-    onOpen: open-browser
-
-  - name: Database
-    port: 54320
-    visibility: private
+    onOpen: open-preview
+  - port: 9000
+    visibility: public
     onOpen: ignore
-
-  - name: Mailserver
-    port: 2500
-    visibility: private
-    onOpen: ignore
-
-  - name: Database Studio
-    port: 5555
-    visibility: public
-
   - port: 1100
     visibility: private
     onOpen: ignore
+  - port: 2500
+    visibility: private
+    onOpen: ignore
+
 
 github:
   prebuilds:
@@ -55,6 +37,4 @@ github:
 
 vscode:
   extensions:
-    - esbenp.prettier-vscode
     - bradlc.vscode-tailwindcss
-    - Prisma.prisma
