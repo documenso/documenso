@@ -4,7 +4,9 @@ import Image from 'next/image';
 import Link from 'next/link';
 
 import { motion, useReducedMotion } from 'framer-motion';
-import { Github, MessagesSquare, Twitter } from 'lucide-react';
+import { FaXTwitter } from 'react-icons/fa6';
+import { LiaDiscord } from 'react-icons/lia';
+import { LuGithub } from 'react-icons/lu';
 
 import { Sheet, SheetContent } from '@documenso/ui/primitives/sheet';
 
@@ -111,7 +113,7 @@ export const MobileNavigation = ({ isMenuOpen, onMenuOpenChange }: MobileNavigat
             target="_blank"
             className="text-foreground hover:text-foreground/80"
           >
-            <Twitter className="h-6 w-6" />
+            <FaXTwitter className="h-6 w-6" />
           </Link>
 
           <Link
@@ -119,7 +121,7 @@ export const MobileNavigation = ({ isMenuOpen, onMenuOpenChange }: MobileNavigat
             target="_blank"
             className="text-foreground hover:text-foreground/80"
           >
-            <Github className="h-6 w-6" />
+            <LuGithub className="h-6 w-6" />
           </Link>
 
           <Link
@@ -127,7 +129,7 @@ export const MobileNavigation = ({ isMenuOpen, onMenuOpenChange }: MobileNavigat
             target="_blank"
             className="text-foreground hover:text-foreground/80"
           >
-            <MessagesSquare className="h-6 w-6" />
+            <LiaDiscord className="h-7 w-7" />
           </Link>
         </div>
       </SheetContent>

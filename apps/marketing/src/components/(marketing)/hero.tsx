@@ -4,8 +4,8 @@ import Image from 'next/image';
 import Link from 'next/link';
 
 import { Variants, motion } from 'framer-motion';
-import { Github } from 'lucide-react';
 import { usePlausible } from 'next-plausible';
+import { LuGithub } from 'react-icons/lu';
 import { match } from 'ts-pattern';
 
 import { useFeatureFlags } from '@documenso/lib/client-only/providers/feature-flag';
@@ -122,7 +122,7 @@ export const Hero = ({ className, ...props }: HeroProps) => {
 
           <Link href="https://github.com/documenso/documenso" onClick={() => event('view-github')}>
             <Button variant="outline" className="rounded-full bg-transparent backdrop-blur-sm">
-              <Github className="mr-2 h-5 w-5" />
+              <LuGithub className="mr-2 h-5 w-5" />
               Star on Github
             </Button>
           </Link>

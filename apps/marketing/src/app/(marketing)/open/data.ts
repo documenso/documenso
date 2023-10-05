@@ -31,6 +31,22 @@ export const TEAM_MEMBERS = [
     engagement: 'Full-Time',
     joinDate: 'July 26th, 2023',
   },
+  {
+    name: 'Catalin-Marinel Pit',
+    role: 'Software Engineer - II',
+    salary: 80_000,
+    location: 'Romania',
+    engagement: 'Full-Time',
+    joinDate: 'September 4th, 2023',
+  },
+  {
+    name: 'Gowdhama Rajan B',
+    role: 'Designer - III',
+    salary: 100_000,
+    location: 'India',
+    engagement: 'Full-Time',
+    joinDate: 'October 9th, 2023',
+  },
 ];
 
 export const FUNDING_RAISED = [
