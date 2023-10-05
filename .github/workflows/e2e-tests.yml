@@ -21,9 +21,6 @@ jobs:
           --health-retries 5
         ports:
           - 5432:5432
-    env:
-      NEXT_PRIVATE_DATABASE_URL: postgresql://postgres:postgres@localhost:5432/documenso
-      NEXT_PRIVATE_DIRECT_DATABASE_URL: postgresql://postgres:postgres@localhost:5432/documenso
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
@@ -51,3 +48,8 @@ jobs:
           name: playwright-report
           path: playwright-report/
           retention-days: 30
+    env:
+      NEXT_PRIVATE_DATABASE_URL: postgresql://postgres:postgres@localhost:5432/documenso
+      NEXT_PRIVATE_DIRECT_DATABASE_URL: postgresql://postgres:postgres@localhost:5432/documenso
+      TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
+      TURBO_TEAM: ${{ vars.TURBO_TEAM }}
