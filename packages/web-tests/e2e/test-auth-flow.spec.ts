@@ -1,6 +1,6 @@
 import { type Page, expect, test } from '@playwright/test';
 
-import { deleteUserAndItsData } from '@documenso/lib/server-only/user/delete-user-and-data';
+import { deleteUser } from '@documenso/lib/server-only/user/delete-user';
 
 test.use({ storageState: { cookies: [], origins: [] } });
 
@@ -10,9 +10,9 @@ test.use({ storageState: { cookies: [], origins: [] } });
 */
 test.describe.configure({ mode: 'serial' });
 
-const username = E2E_TEST_AUTHENTICATE_USERNAME;
-const email = E2E_TEST_AUTHENTICATE_USER_EMAIL;
-const password = E2E_TEST_AUTHENTICATE_USER_PASSWORD;
+const username = 'testuser';
+const email = 'test-user@documenso.com';
+const password = 'password';
 
 test('user can sign up with email and password', async ({ page }: { page: Page }) => {
   await page.goto('/signup');
@@ -48,7 +48,7 @@ test('user can login with user and password', async ({ page }: { page: Page }) =
 
 test.afterAll('Teardown', async () => {
   try {
-    await deleteUserAndItsData(username);
+    await deleteUser(username);
   } catch (e) {
     throw new Error(`Error deleting user: ${e}`);
   }
