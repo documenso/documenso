@@ -10,9 +10,9 @@ test.use({ storageState: { cookies: [], origins: [] } });
 */
 test.describe.configure({ mode: 'serial' });
 
-const username = 'Test user';
-const email = 'testuser@gmail.com';
-const password = '12345678910';
+const username = E2E_TEST_AUTHENTICATE_USERNAME;
+const email = E2E_TEST_AUTHENTICATE_USER_EMAIL;
+const password = E2E_TEST_AUTHENTICATE_USER_PASSWORD;
 
 test('user can sign up with email and password', async ({ page }: { page: Page }) => {
   await page.goto('/signup');
