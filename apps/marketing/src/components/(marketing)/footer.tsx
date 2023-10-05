@@ -33,7 +33,7 @@ const FOOTER_LINKS = [
 ];
 
 export const Footer = ({ className, ...props }: FooterProps) => {
-  const { setTheme } = useTheme();
+  const { theme, setTheme } = useTheme();
 
   return (
     <div className={cn('border-t py-12', className)} {...props}>
@@ -81,15 +81,26 @@ export const Footer = ({ className, ...props }: FooterProps) => {
           © {new Date().getFullYear()} Documenso, Inc. All rights reserved.
         </p>
 
-        <div className="flex flex-wrap items-center gap-x-4 gap-y-2.5">
-          <button type="button" className="text-muted-foreground" onClick={() => setTheme('light')}>
-            <Sun className="h-5 w-5" />
-            <span className="sr-only">Light</span>
-          </button>
-
-          <button type="button" className="text-muted-foreground" onClick={() => setTheme('dark')}>
-            <Moon className="h-5 w-5" />
-            <span className="sr-only">Dark</span>
+        <div className="flex flex-wrap">
+          <button
+            type="button"
+            className="text-muted-foreground"
+            onClick={() => {
+              setTheme(theme === 'light' ? 'dark' : 'light');
+            }}
+            aria-label="Theme change"
+          >
+            {theme === 'light' ? (
+              <>
+                <Sun className="h-5 w-5" />
+                <span className="sr-only">Light</span>
+              </>
+            ) : (
+              <>
+                <Moon className="h-5 w-5" />
+                <span className="sr-only">Dark</span>
+              </>
+            )}
           </button>
         </div>
       </div>
