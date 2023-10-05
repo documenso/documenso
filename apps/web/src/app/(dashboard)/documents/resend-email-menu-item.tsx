@@ -11,6 +11,7 @@ import { getRecipientType } from '@documenso/lib/client-only/recipient-type';
 import { recipientAbbreviation } from '@documenso/lib/utils/recipient-formatter';
 import { Recipient } from '@documenso/prisma/client';
 import { trpc as trpcReact } from '@documenso/trpc/react';
+import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
 import { Checkbox } from '@documenso/ui/primitives/checkbox';
 import {
@@ -103,7 +104,11 @@ export const ResendEmailMenuItem = (props: ResendEmailMenuItemProps) => {
                         key={recipient.id}
                         className="flex flex-row items-center justify-between gap-x-3"
                       >
-                        <FormLabel className="my-2 flex items-center gap-2 font-normal">
+                        <FormLabel
+                          className={cn('my-2 flex items-center gap-2 font-normal', {
+                            'opacity-50': !field.value?.includes(recipient.email),
+                          })}
+                        >
                           <StackAvatar
                             key={recipient.id}
                             type={getRecipientType(recipient)}
