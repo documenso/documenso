@@ -31,7 +31,7 @@ import { useToast } from '@documenso/ui/primitives/use-toast';
 
 import { useCopyToClipboard } from '~/hooks/use-copy-to-clipboard';
 
-import { ResendEmailMenuItem } from './resend-email-menu-item';
+import { ResendEmailMenuItem } from './resend-dialog';
 
 export type DataTableActionDropdownProps = {
   row: Document & {
