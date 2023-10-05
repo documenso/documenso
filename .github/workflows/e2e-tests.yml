@@ -26,18 +26,12 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: 18
-      - name: Generate package-lock.json
-        run: npm cache clean --force && npm install
       - name: Install dependencies
         run: npm ci
       - name: Copy env
         run: cp .env.example .env
       - name: Install Playwright Browsers
         run: npx playwright install --with-deps
-      - name: Install Prisma
-        run: npm install prisma
-      - name: Install Prisma Client
-        run: npm install @prisma/client
       - name: Generate Prisma Client
         run: npm run prisma:generate -w @documenso/prisma
       - name: Create the database
