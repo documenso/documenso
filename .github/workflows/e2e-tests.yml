@@ -41,7 +41,7 @@ jobs:
       - name: Generate Prisma Client
         run: npx prisma generate --schema packages/prisma/schema.prisma
       - name: Create the database
-        run: npx prisma migrate dev
+        run: npx prisma migrate dev --schema packages/prisma/schema.prisma
       - name: Run Playwright tests
         run: npm run ci
       - uses: actions/upload-artifact@v3
