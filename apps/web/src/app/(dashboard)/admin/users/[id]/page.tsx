@@ -74,7 +74,6 @@ export default function UserPage({ params }: { params: { id: number } }) {
         duration: 5000,
       });
     } catch (e) {
-      console.log(e);
       toast({
         title: 'Error',
         description: 'An error occurred while updating your profile.',
