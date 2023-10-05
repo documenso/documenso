@@ -20,6 +20,7 @@ import { FormErrorMessage } from '../form/form-error-message';
 
 export const ZPasswordFormSchema = z
   .object({
+    currentPassword: z.string().min(6).max(72),
     password: z.string().min(6).max(72),
     repeatedPassword: z.string().min(6).max(72),
   })
@@ -40,6 +41,7 @@ export const PasswordForm = ({ className }: PasswordFormProps) => {
 
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
 
   const {
     register,
@@ -48,6 +50,7 @@ export const PasswordForm = ({ className }: PasswordFormProps) => {
     formState: { errors, isSubmitting },
   } = useForm<TPasswordFormSchema>({
     values: {
+      currentPassword: '',
       password: '',
       repeatedPassword: '',
     },
@@ -56,9 +59,10 @@ export const PasswordForm = ({ className }: PasswordFormProps) => {
 
   const { mutateAsync: updatePassword } = trpc.profile.updatePassword.useMutation();
 
-  const onFormSubmit = async ({ password }: TPasswordFormSchema) => {
+  const onFormSubmit = async ({ currentPassword, password }: TPasswordFormSchema) => {
     try {
       await updatePassword({
+        currentPassword,
         password,
       });
 
@@ -92,6 +96,39 @@ export const PasswordForm = ({ className }: PasswordFormProps) => {
       className={cn('flex w-full flex-col gap-y-4', className)}
       onSubmit={handleSubmit(onFormSubmit)}
     >
+      <div>
+        <Label htmlFor="current-password" className="text-muted-foreground">
+          Current Password
+        </Label>
+
+        <div className="relative">
+          <Input
+            id="current-password"
+            type={showCurrentPassword ? 'text' : 'password'}
+            minLength={6}
+            maxLength={72}
+            autoComplete="current-password"
+            className="bg-background mt-2 pr-10"
+            {...register('currentPassword')}
+          />
+
+          <Button
+            variant="link"
+            type="button"
+            className="absolute right-0 top-0 flex h-full items-center justify-center pr-3"
+            aria-label={showCurrentPassword ? 'Mask password' : 'Reveal password'}
+            onClick={() => setShowCurrentPassword((show) => !show)}
+          >
+            {showCurrentPassword ? (
+              <EyeOff className="text-muted-foreground h-5 w-5" />
+            ) : (
+              <Eye className="text-muted-foreground h-5 w-5" />
+            )}
+          </Button>
+        </div>
+
+        <FormErrorMessage className="mt-1.5" error={errors.currentPassword} />
+      </div>
       <div>
         <Label htmlFor="password" className="text-muted-foreground">
           Password
