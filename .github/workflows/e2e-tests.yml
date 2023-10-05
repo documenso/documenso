@@ -1,7 +1,7 @@
 name: Playwright Tests
 on:
   push:
-    branches: [feat/refresh, feat/add-e2e-testing-playwright]
+    branches: [feat/refresh]
   pull_request:
     branches: [feat/refresh]
 jobs:
