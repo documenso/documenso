@@ -1,5 +1,4 @@
 /// <reference types="@documenso/tsconfig/process-env.d.ts" />
-require('dotenv').config();
 
 export const getDatabaseUrl = () => {
   if (process.env.NEXT_PRIVATE_DATABASE_URL) {
