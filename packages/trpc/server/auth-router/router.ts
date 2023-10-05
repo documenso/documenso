@@ -12,18 +12,17 @@ export const authRouter = router({
 
       return await createUser({ name, email, password, signature });
     } catch (err) {
+      let message =
+        'We were unable to create your account. Please review the information you provided and try again.';
+
       if (err instanceof Error && err.message === 'User already exists') {
-        throw new TRPCError({
-          code: 'BAD_REQUEST',
-          message: 'User with this email already exists. Please use a different email address.',
-        });
-      } else {
-        throw new TRPCError({
-          code: 'BAD_REQUEST',
-          message:
-            'We were unable to create your account. Please review the information you provided and try again.',
-        });
+        message = 'User with this email already exists. Please use a different email address.';
       }
+
+      throw new TRPCError({
+        code: 'BAD_REQUEST',
+        message,
+      });
     }
   }),
 });
