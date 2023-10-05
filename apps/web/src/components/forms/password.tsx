@@ -20,9 +20,18 @@ import { FormErrorMessage } from '../form/form-error-message';
 
 export const ZPasswordFormSchema = z
   .object({
-    currentPassword: z.string().min(6).max(72),
-    password: z.string().min(6).max(72),
-    repeatedPassword: z.string().min(6).max(72),
+    currentPassword: z.string().min(8).max(72),
+    password: z
+      .string()
+      .regex(new RegExp('.*[A-Z].*'), { message: 'One uppercase character' })
+      .regex(new RegExp('.*[a-z].*'), { message: 'One lowercase character' })
+      .regex(new RegExp('.*\\d.*'), { message: 'One number' })
+      .regex(new RegExp('.*[`~<>?,./!@#$%^&*()\\-_+="\'|{}\\[\\];:\\\\].*'), {
+        message: 'One special character is required',
+      })
+      .min(8, { message: 'Must be at least 8 characters in length' })
+      .max(72, { message: 'Cannot be more than 72 characters in length' }),
+    repeatedPassword: z.string().min(8).max(72),
   })
   .refine((data) => data.password === data.repeatedPassword, {
     message: 'Passwords do not match',
@@ -105,7 +114,7 @@ export const PasswordForm = ({ className }: PasswordFormProps) => {
           <Input
             id="current-password"
             type={showCurrentPassword ? 'text' : 'password'}
-            minLength={6}
+            minLength={8}
             maxLength={72}
             autoComplete="current-password"
             className="bg-background mt-2 pr-10"
@@ -138,7 +147,7 @@ export const PasswordForm = ({ className }: PasswordFormProps) => {
           <Input
             id="password"
             type={showPassword ? 'text' : 'password'}
-            minLength={6}
+            minLength={8}
             maxLength={72}
             autoComplete="new-password"
             className="bg-background mt-2 pr-10"
@@ -172,7 +181,7 @@ export const PasswordForm = ({ className }: PasswordFormProps) => {
           <Input
             id="repeated-password"
             type={showConfirmPassword ? 'text' : 'password'}
-            minLength={6}
+            minLength={8}
             maxLength={72}
             autoComplete="new-password"
             className="bg-background mt-2 pr-10"
