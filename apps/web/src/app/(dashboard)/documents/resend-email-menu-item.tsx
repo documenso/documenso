@@ -7,6 +7,8 @@ import { History } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
 
+import { getRecipientType } from '@documenso/lib/client-only/recipient-type';
+import { recipientAbbreviation } from '@documenso/lib/utils/recipient-formatter';
 import { Recipient } from '@documenso/prisma/client';
 import { trpc as trpcReact } from '@documenso/trpc/react';
 import { Button } from '@documenso/ui/primitives/button';
@@ -28,6 +30,8 @@ import {
   FormLabel,
 } from '@documenso/ui/primitives/form/form';
 import { useToast } from '@documenso/ui/primitives/use-toast';
+
+import { StackAvatar } from '~/components/(dashboard)/avatar/stack-avatar';
 
 interface ResendEmailMenuItemProps {
   recipients: Recipient[];
@@ -81,48 +85,54 @@ export const ResendEmailMenuItem = (props: ResendEmailMenuItemProps) => {
             Resend
           </Button>
         </DialogTrigger>
-        <DialogContent className="sm:max-w-[400px]" hideClose>
+        <DialogContent className="sm:max-w-[350px]" hideClose>
           <DialogHeader>
             <DialogTitle>
               <h1 className="text-center text-xl">Who do you want to remind?</h1>
             </DialogTitle>
-
-            <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} id="remainder-email" className="pt-5">
-                <FormField
-                  control={form.control}
-                  name="emails"
-                  render={({ field }) => (
-                    <>
-                      {recipients.map((item) => (
-                        <FormItem
-                          key={item.id}
-                          className="flex flex-row items-center justify-between gap-x-3"
-                        >
-                          <FormLabel className="break-all text-sm font-normal">
-                            {item.email}
-                          </FormLabel>
-                          <FormControl>
-                            <Checkbox
-                              value={item.email}
-                              checked={field.value?.includes(item.email)}
-                              onCheckedChange={(checked: boolean) => {
-                                return checked
-                                  ? field.onChange([...field.value, item.email])
-                                  : field.onChange(
-                                      field.value?.filter((value) => value !== item.email),
-                                    );
-                              }}
-                            />
-                          </FormControl>
-                        </FormItem>
-                      ))}
-                    </>
-                  )}
-                />
-              </form>
-            </Form>
           </DialogHeader>
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} id="remainder-email" className="px-3">
+              <FormField
+                control={form.control}
+                name="emails"
+                render={({ field }) => (
+                  <>
+                    {recipients.map((recipient) => (
+                      <FormItem
+                        key={recipient.id}
+                        className="flex flex-row items-center justify-between gap-x-3"
+                      >
+                        <FormLabel className="my-2 flex items-center gap-2 font-normal">
+                          <StackAvatar
+                            key={recipient.id}
+                            type={getRecipientType(recipient)}
+                            fallbackText={recipientAbbreviation(recipient)}
+                          />
+                          {recipient.email}
+                        </FormLabel>
+                        <FormControl>
+                          <Checkbox
+                            className="h-5 w-5 rounded-full data-[state=checked]:border-black data-[state=checked]:bg-black "
+                            checkClassName="text-white"
+                            value={recipient.email}
+                            checked={field.value?.includes(recipient.email)}
+                            onCheckedChange={(checked: boolean) => {
+                              return checked
+                                ? field.onChange([...field.value, recipient.email])
+                                : field.onChange(
+                                    field.value?.filter((value) => value !== recipient.email),
+                                  );
+                            }}
+                          />
+                        </FormControl>
+                      </FormItem>
+                    ))}
+                  </>
+                )}
+              />
+            </form>
+          </Form>
 
           <DialogFooter>
             <div className="flex w-full flex-1 flex-nowrap gap-4">
