@@ -34,18 +34,23 @@ export function useCopyToClipboard(): [CopiedValue, CopyFn] {
   /**
    * Handle copying values to the clipboard using the ClipboardItem API.
    *
-   * Allows us to copy async values for Safari. Does not work in FireFox.
+   * Works in all browsers except FireFox.
    *
    * https://caniuse.com/mdn-api_clipboarditem
    */
   const handleClipboardApiCopy = async (value: CopyValue, blobType = 'text/plain') => {
-    await navigator.clipboard.write([new ClipboardItem({ [blobType]: value })]);
+    try {
+      await navigator.clipboard.write([new ClipboardItem({ [blobType]: value })]);
+    } catch (e) {
+      // Fallback to attempt.
+      await handleWriteTextCopy(value);
+    }
   };
 
   /**
    * Handle copying values to the clipboard using `writeText`.
    *
-   * Will not work in Safari for async values.
+   * Works in all browsers except Safari for async values.
    */
   const handleWriteTextCopy = async (value: CopyValue) => {
     await navigator.clipboard.writeText(await value);
