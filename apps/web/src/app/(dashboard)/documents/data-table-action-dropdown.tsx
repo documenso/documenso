@@ -99,6 +99,7 @@ export const DataTableActionDropdown = ({ row }: DataTableActionDropdownProps) =
   };
 
   const nonSignedRecipients = row.Recipient.filter((item) => item.signingStatus !== 'SIGNED');
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger>
@@ -127,7 +128,7 @@ export const DataTableActionDropdown = ({ row }: DataTableActionDropdownProps) =
           Download
         </DropdownMenuItem>
 
-        <DropdownMenuItem onClick={() => setDuplicateDialogOpen(true)}>
+        <DropdownMenuItem disabled>
           <Copy className="mr-2 h-4 w-4" />
           Duplicate
         </DropdownMenuItem>

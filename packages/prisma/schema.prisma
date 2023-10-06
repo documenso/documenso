@@ -40,6 +40,7 @@ model User {
   twoFactorEnabled     Boolean              @default(false)
   twoFactorBackupCodes String?
   VerificationToken    VerificationToken[]
+  Template           Template[]
 
   @@index([email])
 }
@@ -154,6 +155,7 @@ model DocumentData {
   data        String
   initialData String
   Document    Document?
+  Template    Template?
 }
 
 model DocumentMeta {
@@ -180,22 +182,27 @@ enum SigningStatus {
 }
 
 model Recipient {
-  id            Int           @id @default(autoincrement())
-  documentId    Int
-  email         String        @db.VarChar(255)
-  name          String        @default("") @db.VarChar(255)
+  id            Int            @id @default(autoincrement())
+  documentId    Int?
+  templateId    Int?
+  email         String         @db.VarChar(255)
+  name          String         @default("") @db.VarChar(255)
   token         String
+  templateToken String?
   expired       DateTime?
   signedAt      DateTime?
-  readStatus    ReadStatus    @default(NOT_OPENED)
-  signingStatus SigningStatus @default(NOT_SIGNED)
-  sendStatus    SendStatus    @default(NOT_SENT)
-  Document      Document      @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  readStatus    ReadStatus?    @default(NOT_OPENED)
+  signingStatus SigningStatus? @default(NOT_SIGNED)
+  sendStatus    SendStatus?    @default(NOT_SENT)
+  Document      Document?      @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  Template      Template?      @relation(fields: [templateId], references: [id], onDelete: Cascade)
   Field         Field[]
   Signature     Signature[]
 
   @@unique([documentId, email])
+  @@unique([templateId, email])
   @@index([documentId])
+  @@index([templateId])
   @@index([token])
 }
 
@@ -210,7 +217,8 @@ enum FieldType {
 
 model Field {
   id          Int        @id @default(autoincrement())
-  documentId  Int
+  documentId  Int?
+  templateId  Int?
   recipientId Int?
   type        FieldType
   page        Int
@@ -220,11 +228,13 @@ model Field {
   height      Decimal    @default(-1)
   customText  String
   inserted    Boolean
-  Document    Document   @relation(fields: [documentId], references: [id], onDelete: Cascade)
-  Recipient   Recipient? @relation(fields: [recipientId], references: [id], onDelete: Cascade)
+  Document    Document?  @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  Template    Template?  @relation(fields: [templateId], references: [id], onDelete: Cascade)
+  Recipient   Recipient? @relation(fields: [recipientId], references: [id])
   Signature   Signature?
 
   @@index([documentId])
+  @@index([templateId])
   @@index([recipientId])
 }
 
@@ -253,4 +263,25 @@ model DocumentShareLink {
   document Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
 
   @@unique([documentId, email])
+}
+
+enum TemplateType {
+  PUBLIC
+  PRIVATE
+}
+
+model Template {
+  id                     Int          @id @default(autoincrement())
+  userId                 Int
+  User                   User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title                  String
+  type                   TemplateType @default(PRIVATE)
+  templateDocumentDataId String
+  templateDocumentData   DocumentData @relation(fields: [templateDocumentDataId], references: [id], onDelete: Cascade)
+  createdAt              DateTime     @default(now())
+  updatedAt              DateTime     @default(now()) @updatedAt
+  Recipient              Recipient[]
+  Field                  Field[]
+
+  @@unique([templateDocumentDataId])
 }
