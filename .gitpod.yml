@@ -1,12 +1,13 @@
 tasks:
   - init: |
+      npm i &&
+      npm run dx:up &&
       cp .env.example .env &&
       set -a; source .env &&
-      npm run dx &&
       sed -i -e "s|http://localhost:3000|$(gp url 3000)|" .env \
              -e "s|http://localhost:3001|$(gp url 3001)|" .env \
              -e "s|http://localhost:9000|$(gp url 9000)|" .env 
-    command: npm run dev
+    command: npm run d
 
 ports:
   - port: 3000
@@ -38,3 +39,6 @@ github:
 vscode:
   extensions:
     - bradlc.vscode-tailwindcss
+    - esbenp.prettier-vscode
+    - Prisma.prisma
+    
