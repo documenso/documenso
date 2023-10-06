@@ -10,10 +10,10 @@ import { useSession } from 'next-auth/react';
 import { useUpdateSearchParams } from '@documenso/lib/client-only/hooks/use-update-search-params';
 import { FindResultSet } from '@documenso/lib/types/find-result-set';
 import { Document, Recipient, User } from '@documenso/prisma/client';
+import { Avatar, AvatarFallback } from '@documenso/ui/primitives/avatar';
 import { DataTable } from '@documenso/ui/primitives/data-table';
 import { DataTablePagination } from '@documenso/ui/primitives/data-table-pagination';
 
-import { StackAvatarsWithTooltip } from '~/components/(dashboard)/avatar/stack-avatars-with-tooltip';
 import { DocumentStatus } from '~/components/formatter/document-status';
 import { LocaleDate } from '~/components/formatter/locale-date';
 
@@ -68,15 +68,11 @@ export const DocumentsDataTable = ({ results }: DocumentsDataTableProps) => {
             cell: ({ row }) => {
               return (
                 <Link href={`/admin/users/${row.original.User.id}`}>
-                  <StackAvatarsWithTooltip
-                    recipients={[
-                      {
-                        id: row.original.User.id,
-                        email: row.original.User.email,
-                        name: row.original.User.name,
-                      },
-                    ]}
-                  />
+                  <Avatar className="dark:border-border h-12 w-12 border-2 border-solid border-white">
+                    <AvatarFallback className="text-gray-400">
+                      <span className="text-xs">{row.original.User.name}</span>
+                    </AvatarFallback>
+                  </Avatar>
                 </Link>
               );
             },

@@ -1,11 +1,37 @@
+import { Prisma } from '@prisma/client';
+
 import { prisma } from '@documenso/prisma';
 
 type getAllUsersProps = {
+  username: string;
+  email: string;
   page: number;
   perPage: number;
 };
 
-export const findUsers = async ({ page = 1, perPage = 10 }: getAllUsersProps) => {
+export const findUsers = async ({
+  username = '',
+  email = '',
+  page = 1,
+  perPage = 10,
+}: getAllUsersProps) => {
+  const whereClause = Prisma.validator<Prisma.UserWhereInput>()({
+    OR: [
+      {
+        name: {
+          contains: username,
+          mode: 'insensitive',
+        },
+      },
+      {
+        email: {
+          contains: email,
+          mode: 'insensitive',
+        },
+      },
+    ],
+  });
+
   const [users, count] = await Promise.all([
     await prisma.user.findMany({
       select: {
@@ -29,10 +55,13 @@ export const findUsers = async ({ page = 1, perPage = 10 }: getAllUsersProps) =>
           },
         },
       },
+      where: whereClause,
       skip: Math.max(page - 1, 0) * perPage,
       take: perPage,
     }),
-    await prisma.user.count(),
+    await prisma.user.count({
+      where: whereClause,
+    }),
   ]);
 
   return {
