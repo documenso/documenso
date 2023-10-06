@@ -11,6 +11,7 @@ import { setRecipientsForDocument } from '@documenso/lib/server-only/recipient/s
 import { authenticatedProcedure, procedure, router } from '../trpc';
 import {
   ZCreateDocumentMutationSchema,
+  ZDeleteMutationSchema,
   ZGetDocumentByIdQuerySchema,
   ZGetDocumentByTokenQuerySchema,
   ZSendDocumentMutationSchema,
@@ -78,7 +79,7 @@ export const documentRouter = router({
     }),
 
   deleteDocument: authenticatedProcedure
-    .input(ZGetDocumentByIdQuerySchema)
+    .input(ZDeleteMutationSchema)
     .mutation(async ({ input, ctx }) => {
       try {
         const { id } = input;

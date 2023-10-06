@@ -1,7 +1,6 @@
 'use client';
 
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 
 import {
   Copy,
@@ -41,7 +40,6 @@ export type DataTableActionDropdownProps = {
 };
 
 export const DataTableActionDropdown = ({ row }: DataTableActionDropdownProps) => {
-  const router = useRouter();
   const { data: session } = useSession();
   const { toast } = useToast();
   const [, copyToClipboard] = useCopyToClipboard();
@@ -52,13 +50,6 @@ export const DataTableActionDropdown = ({ row }: DataTableActionDropdownProps) =
 
   const { mutateAsync: createOrGetShareLink, isLoading: isCreatingShareLink } =
     trpcReact.shareLink.createOrGetShareLink.useMutation();
-
-  const { mutateAsync: deleteDocument } = trpcReact.document.deleteDocument.useMutation({
-    onSuccess: () => {
-      router.refresh();
-      toast({ title: 'Document deleted successfully' });
-    },
-  });
 
   const recipient = row.Recipient.find((recipient) => recipient.email === session.user.email);
 
@@ -118,10 +109,6 @@ export const DataTableActionDropdown = ({ row }: DataTableActionDropdownProps) =
     window.URL.revokeObjectURL(link.href);
   };
 
-  const handleDelete = async () => {
-    await deleteDocument({ id: row.id });
-  };
-
   return (
     <DropdownMenu>
       <DropdownMenuTrigger>
@@ -160,9 +147,11 @@ export const DataTableActionDropdown = ({ row }: DataTableActionDropdownProps) =
           Void
         </DropdownMenuItem>
 
-        <DropdownMenuItem onClick={handleDelete} disabled={row.status !== 'DRAFT'}>
-          <Trash2 className="mr-2 h-4 w-4" />
-          Delete
+        <DropdownMenuItem disabled={row.status !== 'DRAFT'} asChild>
+          <Link href={`/documents/delete/${row.id}`}>
+            <Trash2 className="mr-2 h-4 w-4" />
+            Delete
+          </Link>
         </DropdownMenuItem>
 
         <DropdownMenuLabel>Share</DropdownMenuLabel>
