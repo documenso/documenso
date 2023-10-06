@@ -11,12 +11,10 @@ export type DocumentsPageProps = {
 };
 
 export default async function Documents({ searchParams = {} }: DocumentsPageProps) {
-  const user = await getRequiredServerComponentSession();
   const page = Number(searchParams.page) || 1;
   const perPage = Number(searchParams.perPage) || 20;
 
   const results = await findDocuments({
-    userId: user.id,
     orderBy: {
       column: 'createdAt',
       direction: 'desc',

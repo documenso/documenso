@@ -7,7 +7,7 @@ import Link from 'next/link';
 import { Edit, Loader } from 'lucide-react';
 
 import { useUpdateSearchParams } from '@documenso/lib/client-only/hooks/use-update-search-params';
-import { Role } from '@documenso/prisma/client';
+import { Document, Role, Subscription } from '@documenso/prisma/client';
 import { Button } from '@documenso/ui/primitives/button';
 import { DataTable } from '@documenso/ui/primitives/data-table';
 import { DataTablePagination } from '@documenso/ui/primitives/data-table-pagination';
@@ -17,28 +17,22 @@ interface User {
   name: string | null;
   email: string;
   roles: Role[];
-  Subscription: Subscription[];
-  Document: Document[];
+  Subscription: SubscriptionLite[];
+  Document: DocumentLite[];
 }
 
-interface Subscription {
-  id: number;
-  status: string;
-  planId: string | null;
-  priceId: string | null;
-  createdAt: Date | null;
-  periodEnd: Date | null;
-}
+type SubscriptionLite = Pick<
+  Subscription,
+  'id' | 'status' | 'planId' | 'priceId' | 'createdAt' | 'periodEnd'
+>;
+
+type DocumentLite = Pick<Document, 'id'>;
 
 type UsersDataTableProps = {
   users: User[];
   perPage: number;
   page: number;
   totalPages: number;
-};
-
-type Document = {
-  id: number;
 };
 
 export const UsersDataTable = ({ users, perPage, page, totalPages }: UsersDataTableProps) => {
@@ -97,7 +91,7 @@ export const UsersDataTable = ({ users, perPage, page, totalPages }: UsersDataTa
               if (row.original.Subscription && row.original.Subscription.length > 0) {
                 return (
                   <>
-                    {row.original.Subscription.map((subscription: Subscription, i: number) => {
+                    {row.original.Subscription.map((subscription: SubscriptionLite, i: number) => {
                       return <span key={i}>{subscription.status}</span>;
                     })}
                   </>
