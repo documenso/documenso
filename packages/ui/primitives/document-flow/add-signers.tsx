@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useId } from 'react';
+import React, { useId, useState } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { AnimatePresence, motion } from 'framer-motion';
@@ -32,13 +32,20 @@ export type AddSignersFormProps = {
   onSubmit: (_data: TAddSignersFormSchema) => void;
 };
 
+export type DocumentCreatorEN = {
+  creatorEmail: string;
+  creatorName: string;
+};
+
 export const AddSignersFormPartial = ({
   documentFlow,
   numberOfSteps,
   recipients,
   fields: _fields,
   onSubmit,
-}: AddSignersFormProps) => {
+  creatorEmail,
+  creatorName,
+}: AddSignersFormProps & DocumentCreatorEN) => {
   const { toast } = useToast();
 
   const initialId = useId();
@@ -97,6 +104,14 @@ export const AddSignersFormPartial = ({
     });
   };
 
+  const onAddSelfSigner = async () => {
+    appendSigner({
+      formId: nanoid(12),
+      name: creatorName,
+      email: creatorEmail,
+    });
+  };
+
   const onRemoveSigner = (index: number) => {
     const signer = signers[index];
 
@@ -123,6 +138,10 @@ export const AddSignersFormPartial = ({
     <>
       <DocumentFlowFormContainerContent>
         <div className="flex w-full flex-col gap-y-4">
+          <Button type="button" disabled={isSubmitting} onClick={() => onAddSelfSigner()}>
+            <Plus className="-ml-1 mr-2 h-5 w-5" />
+            Add Self Signer
+          </Button>
           <AnimatePresence>
             {signers.map((signer, index) => (
               <motion.div
@@ -144,7 +163,11 @@ export const AddSignersFormPartial = ({
                         id={`signer-${signer.id}-email`}
                         type="email"
                         className="bg-background mt-2"
-                        disabled={isSubmitting || hasBeenSentToRecipientId(signer.nativeId)}
+                        disabled={
+                          isSubmitting ||
+                          hasBeenSentToRecipientId(signer.nativeId) ||
+                          signer.email === creatorEmail
+                        }
                         onKeyDown={onKeyDown}
                         {...field}
                       />
@@ -163,7 +186,11 @@ export const AddSignersFormPartial = ({
                         id={`signer-${signer.id}-name`}
                         type="text"
                         className="bg-background mt-2"
-                        disabled={isSubmitting || hasBeenSentToRecipientId(signer.nativeId)}
+                        disabled={
+                          isSubmitting ||
+                          hasBeenSentToRecipientId(signer.nativeId) ||
+                          signer.name === creatorName
+                        }
                         onKeyDown={onKeyDown}
                         {...field}
                       />

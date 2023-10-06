@@ -1,16 +1,20 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { useRouter } from 'next/navigation';
 
+import { getServerComponentSession } from '@documenso/lib/next-auth/get-server-session';
 import { Field, Recipient, User } from '@documenso/prisma/client';
 import { DocumentWithData } from '@documenso/prisma/types/document-with-data';
 import { cn } from '@documenso/ui/lib/utils';
 import { Card, CardContent } from '@documenso/ui/primitives/card';
 import { AddFieldsFormPartial } from '@documenso/ui/primitives/document-flow/add-fields';
 import { TAddFieldsFormSchema } from '@documenso/ui/primitives/document-flow/add-fields.types';
-import { AddSignersFormPartial } from '@documenso/ui/primitives/document-flow/add-signers';
+import {
+  AddSignersFormPartial,
+  DocumentCreatorEN,
+} from '@documenso/ui/primitives/document-flow/add-signers';
 import { TAddSignersFormSchema } from '@documenso/ui/primitives/document-flow/add-signers.types';
 import { AddSubjectFormPartial } from '@documenso/ui/primitives/document-flow/add-subject';
 import { TAddSubjectFormSchema } from '@documenso/ui/primitives/document-flow/add-subject.types';
@@ -49,6 +53,10 @@ export const EditDocumentForm = ({
   const router = useRouter();
 
   const [step, setStep] = useState<EditDocumentStep>('signers');
+  const [creatorDetails, setCreatorDetails] = useState<DocumentCreatorEN>({
+    creatorEmail: '',
+    creatorName: '',
+  });
 
   const documentFlow: Record<EditDocumentStep, DocumentFlowStep> = {
     signers: {
@@ -146,6 +154,16 @@ export const EditDocumentForm = ({
     }
   };
 
+  useEffect(() => {
+    const getCreatorDetails = async () => {
+      const { user } = await getServerComponentSession();
+      if (user && user.email && user.name) {
+        setCreatorDetails({ creatorEmail: user.email, creatorName: user.name });
+      }
+    };
+    getCreatorDetails();
+  }, []);
+
   return (
     <div className={cn('grid w-full grid-cols-12 gap-8', className)}>
       <Card
@@ -172,6 +190,8 @@ export const EditDocumentForm = ({
               fields={fields}
               numberOfSteps={Object.keys(documentFlow).length}
               onSubmit={onAddSignersFormSubmit}
+              creatorEmail={creatorDetails.creatorEmail}
+              creatorName={creatorDetails.creatorName}
             />
           )}
 
