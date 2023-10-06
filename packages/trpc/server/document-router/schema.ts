@@ -58,7 +58,17 @@ export type TSetFieldsForDocumentMutationSchema = z.infer<
 
 export const ZSendDocumentMutationSchema = z.object({
   documentId: z.number(),
-  resendEmails: z.array(z.string()).optional(),
+});
+
+export const ZReSendDocumentMutationSchema = z.object({
+  documentId: z.number(),
+  resendEmails: z.array(z.string()).min(1),
+  email: z
+    .object({
+      subject: z.string(),
+      message: z.string(),
+    })
+    .optional(),
 });
 
 export type TSendDocumentMutationSchema = z.infer<typeof ZSendDocumentMutationSchema>;

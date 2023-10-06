@@ -3,7 +3,7 @@ import { TRPCError } from '@trpc/server';
 import { createDocument } from '@documenso/lib/server-only/document/create-document';
 import { getDocumentById } from '@documenso/lib/server-only/document/get-document-by-id';
 import { getDocumentAndSenderByToken } from '@documenso/lib/server-only/document/get-document-by-token';
-import { sendDocument } from '@documenso/lib/server-only/document/send-document';
+import { resendDocument, sendDocument } from '@documenso/lib/server-only/document/send-document';
 import { setFieldsForDocument } from '@documenso/lib/server-only/field/set-fields-for-document';
 import { setRecipientsForDocument } from '@documenso/lib/server-only/recipient/set-recipients-for-document';
 
@@ -12,6 +12,7 @@ import {
   ZCreateDocumentMutationSchema,
   ZGetDocumentByIdQuerySchema,
   ZGetDocumentByTokenQuerySchema,
+  ZReSendDocumentMutationSchema,
   ZSendDocumentMutationSchema,
   ZSetFieldsForDocumentMutationSchema,
   ZSetRecipientsForDocumentMutationSchema,
@@ -123,12 +124,11 @@ export const documentRouter = router({
     .input(ZSendDocumentMutationSchema)
     .mutation(async ({ input, ctx }) => {
       try {
-        const { documentId, resendEmails } = input;
+        const { documentId } = input;
 
         return await sendDocument({
           userId: ctx.user.id,
           documentId,
-          resendEmails,
         });
       } catch (err) {
         console.error(err);
@@ -136,6 +136,28 @@ export const documentRouter = router({
         throw new TRPCError({
           code: 'BAD_REQUEST',
           message: 'We were unable to send this document. Please try again later.',
+        });
+      }
+    }),
+
+  reSendDocument: authenticatedProcedure
+    .input(ZReSendDocumentMutationSchema)
+    .mutation(async ({ input, ctx }) => {
+      try {
+        const { documentId, resendEmails, email } = input;
+
+        return await resendDocument({
+          userId: ctx.user.id,
+          documentId,
+          resendEmails,
+          email,
+        });
+      } catch (err) {
+        console.error(err);
+
+        throw new TRPCError({
+          code: 'BAD_REQUEST',
+          message: 'We were unable to resend this document. Please try again later.',
         });
       }
     }),

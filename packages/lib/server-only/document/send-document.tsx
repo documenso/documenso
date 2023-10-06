@@ -8,13 +8,31 @@ import { renderCustomEmailTemplate } from '@documenso/lib/utils/render-custom-em
 import { prisma } from '@documenso/prisma';
 import { DocumentStatus, SendStatus } from '@documenso/prisma/client';
 
+import { upsertDocumentMeta } from '../document-meta/upsert-document-meta';
+
 export type SendDocumentOptions = {
   documentId: number;
   userId: number;
-  resendEmails?: string[];
 };
 
-export const sendDocument = async ({ documentId, userId, resendEmails }: SendDocumentOptions) => {
+type CustomEmail = {
+  email?: {
+    subject: string;
+    message: string;
+  };
+};
+
+export type resendDocumentOptions = {
+  resendEmails: string[];
+} & SendDocumentOptions &
+  CustomEmail;
+
+type getSendableDocumentOptions = {
+  userId: number;
+  documentId: number;
+} & CustomEmail;
+
+async function getSendableDocument({ documentId, userId, email }: getSendableDocumentOptions) {
   const user = await prisma.user.findFirstOrThrow({
     where: {
       id: userId,
@@ -32,8 +50,6 @@ export const sendDocument = async ({ documentId, userId, resendEmails }: SendDoc
     },
   });
 
-  const customEmail = document?.documentMeta;
-
   if (!document) {
     throw new Error('Document not found');
   }
@@ -45,7 +61,26 @@ export const sendDocument = async ({ documentId, userId, resendEmails }: SendDoc
   if (document.status === DocumentStatus.COMPLETED) {
     throw new Error('Can not send completed document');
   }
+  let customEmail = document?.documentMeta;
 
+  if (email) {
+    customEmail = await upsertDocumentMeta({
+      documentId,
+      message: email.message,
+      subject: email.subject,
+    });
+  }
+
+  return { document, user, customEmail };
+}
+
+type TGetSendableDocument = Awaited<ReturnType<typeof getSendableDocument>>;
+
+type SendDocumentsOptions = {
+  resendEmails?: string[];
+} & TGetSendableDocument;
+
+async function mailDocuments({ customEmail, document, resendEmails, user }: SendDocumentsOptions) {
   await Promise.all([
     document.Recipient.map(async (recipient) => {
       const { email, name } = recipient;
@@ -56,10 +91,12 @@ export const sendDocument = async ({ documentId, userId, resendEmails }: SendDoc
         'document.name': document.title,
       };
 
+      // If the email has been sent and we don't want to resend emails, skip it
       if (recipient.sendStatus === SendStatus.SENT && !resendEmails) {
         return;
       }
 
+      // If we're resending emails and this email is not in the list, skip it
       if (resendEmails && !resendEmails.includes(email)) {
         return;
       }
@@ -102,7 +139,9 @@ export const sendDocument = async ({ documentId, userId, resendEmails }: SendDoc
       });
     }),
   ]);
+}
 
+async function setDocumentPending(documentId: number) {
   const updatedDocument = await prisma.document.update({
     where: {
       id: documentId,
@@ -113,4 +152,25 @@ export const sendDocument = async ({ documentId, userId, resendEmails }: SendDoc
   });
 
   return updatedDocument;
+}
+
+export const resendDocument = async ({
+  documentId,
+  userId,
+  resendEmails,
+  email,
+}: resendDocumentOptions) => {
+  const { document, user, customEmail } = await getSendableDocument({ userId, documentId, email });
+
+  await mailDocuments({ document, user, customEmail, resendEmails });
+
+  return await setDocumentPending(documentId);
+};
+
+export const sendDocument = async ({ documentId, userId }: SendDocumentOptions) => {
+  const { document, user, customEmail } = await getSendableDocument({ userId, documentId });
+
+  await mailDocuments({ document, user, customEmail });
+
+  return await setDocumentPending(documentId);
 };

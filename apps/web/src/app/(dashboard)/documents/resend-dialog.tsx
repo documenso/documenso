@@ -51,7 +51,7 @@ export const ResendEmailMenuItem = (props: ResendEmailMenuItemProps) => {
   const { recipients, documentId } = props;
   const [isOpen, setIsOpen] = useState(false);
   const { toast } = useToast();
-  const { mutateAsync: sendDocument, isLoading } = trpcReact.document.sendDocument.useMutation({
+  const { mutateAsync: sendDocument, isLoading } = trpcReact.document.reSendDocument.useMutation({
     onSuccess: () => {
       toast({
         title: 'Document re-sent',
