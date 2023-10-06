@@ -25,6 +25,9 @@ ports:
   - port: 2500
     visibility: private
     onOpen: ignore
+  - port: 54320
+    visibility: private
+    onOpen: ignore
 
 
 github:
