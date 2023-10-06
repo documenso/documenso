@@ -13,22 +13,26 @@ export function useCopyShareLink() {
     trpc.shareLink.createOrGetShareLink.useMutation();
 
   /**
+   * Copy a newly created, or pre-existing share link to the user's clipboard.
+   *
+   * @param payload The payload to create or get a share link.
+   */
+  const createAndCopyShareLink = async (payload: TCreateOrGetShareLinkMutationSchema) => {
+    const valueToCopy = createOrGetShareLink(payload).then(
+      (result) => `${window.location.origin}/share/${result.slug}`,
+    );
+
+    await copyShareLink(valueToCopy);
+  };
+
+  /**
    * Copy a share link to the user's clipboard.
    *
-   * Will create or get a share link if one is not provided.
-   *
-   * @param payload Either the share link itself or the input to create a new share link.
+   * @param shareLink Either the share link itself or a promise that returns a shared link.
    */
-  const copyShareLink = async (payload: TCreateOrGetShareLinkMutationSchema | string) => {
-    const valueToCopy =
-      typeof payload === 'string'
-        ? payload
-        : createOrGetShareLink(payload).then(
-            (result) => `${window.location.origin}/share/${result.slug}`,
-          );
-
+  const copyShareLink = async (shareLink: Promise<string> | string) => {
     try {
-      const isCopySuccess = await copyToClipboard(valueToCopy);
+      const isCopySuccess = await copyToClipboard(shareLink);
       if (!isCopySuccess) {
         throw new Error('Copy to clipboard failed');
       }
@@ -48,7 +52,8 @@ export function useCopyShareLink() {
   };
 
   return {
-    isCopyingShareLink: isCreatingShareLink,
+    createAndCopyShareLink,
     copyShareLink,
+    isCopyingShareLink: isCreatingShareLink,
   };
 }

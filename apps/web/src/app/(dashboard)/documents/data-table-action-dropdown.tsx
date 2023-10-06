@@ -39,7 +39,7 @@ export type DataTableActionDropdownProps = {
 export const DataTableActionDropdown = ({ row }: DataTableActionDropdownProps) => {
   const { data: session } = useSession();
 
-  const { copyShareLink, isCopyingShareLink } = useCopyShareLink();
+  const { createAndCopyShareLink, isCopyingShareLink } = useCopyShareLink();
 
   if (!session) {
     return null;
@@ -140,12 +140,12 @@ export const DataTableActionDropdown = ({ row }: DataTableActionDropdownProps) =
         </DropdownMenuItem>
 
         <DropdownMenuItem
-          onClick={() => {
-            void copyShareLink({
+          onClick={async () =>
+            createAndCopyShareLink({
               token: recipient?.token,
               documentId: row.id,
-            });
-          }}
+            })
+          }
         >
           {isCopyingShareLink ? (
             <Loader className="mr-2 h-4 w-4" />

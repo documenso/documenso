@@ -24,7 +24,7 @@ export type ShareButtonProps = HTMLAttributes<HTMLButtonElement> & {
 };
 
 export const ShareButton = ({ token, documentId }: ShareButtonProps) => {
-  const { copyShareLink, isCopyingShareLink } = useCopyShareLink();
+  const { copyShareLink, createAndCopyShareLink, isCopyingShareLink } = useCopyShareLink();
 
   const [isOpen, setIsOpen] = useState(false);
 
@@ -46,14 +46,14 @@ export const ShareButton = ({ token, documentId }: ShareButtonProps) => {
   };
 
   const onCopyClick = async () => {
-    const copyToClipboardValue = shareLink
-      ? `${window.location.origin}/share/${shareLink.slug}`
-      : {
-          token,
-          documentId,
-        };
-
-    await copyShareLink(copyToClipboardValue);
+    if (shareLink) {
+      await copyShareLink(`${window.location.origin}/share/${shareLink.slug}`);
+    } else {
+      await createAndCopyShareLink({
+        token,
+        documentId,
+      });
+    }
 
     setIsOpen(false);
   };

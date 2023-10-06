@@ -20,7 +20,7 @@ export type DataTableActionButtonProps = {
 export const DataTableActionButton = ({ row }: DataTableActionButtonProps) => {
   const { data: session } = useSession();
 
-  const { copyShareLink, isCopyingShareLink } = useCopyShareLink();
+  const { createAndCopyShareLink, isCopyingShareLink } = useCopyShareLink();
 
   if (!session) {
     return null;
@@ -63,12 +63,12 @@ export const DataTableActionButton = ({ row }: DataTableActionButtonProps) => {
       <Button
         className="w-24"
         loading={isCopyingShareLink}
-        onClick={() => {
-          void copyShareLink({
+        onClick={async () =>
+          createAndCopyShareLink({
             token: recipient?.token,
             documentId: row.id,
-          });
-        }}
+          })
+        }
       >
         {!isCopyingShareLink && <Share className="-ml-1 mr-2 h-4 w-4" />}
         Share
