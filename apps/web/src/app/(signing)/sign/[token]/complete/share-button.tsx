@@ -2,7 +2,8 @@
 
 import { HTMLAttributes, useState } from 'react';
 
-import { Copy, Share, Twitter } from 'lucide-react';
+import { Copy, Share } from 'lucide-react';
+import { FaXTwitter } from 'react-icons/fa6';
 
 import { useCopyShareLink } from '@documenso/lib/client-only/hooks/use-copy-share-link';
 import { generateTwitterIntent } from '@documenso/lib/universal/generate-twitter-intent';
@@ -113,7 +114,7 @@ export const ShareButton = ({ token, documentId }: ShareButtonProps) => {
           </div>
 
           <Button variant="outline" className="mt-4" onClick={onTweetClick}>
-            <Twitter className="mr-2 h-4 w-4" />
+            <FaXTwitter className="mr-2 h-4 w-4" />
             Tweet
           </Button>
 
