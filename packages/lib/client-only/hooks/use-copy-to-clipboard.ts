@@ -42,7 +42,7 @@ export function useCopyToClipboard(): [CopiedValue, CopyFn] {
     try {
       await navigator.clipboard.write([new ClipboardItem({ [blobType]: value })]);
     } catch (e) {
-      // Fallback to attempt.
+      // Fallback attempt.
       await handleWriteTextCopy(value);
     }
   };
