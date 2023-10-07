@@ -6,7 +6,7 @@ import { ExtendedDocumentStatus } from '@documenso/prisma/types/extended-documen
 
 import { FindResultSet } from '../../types/find-result-set';
 
-export interface FindDocumentsOptions {
+export type FindDocumentsOptions = {
   userId: number;
   term?: string;
   status?: ExtendedDocumentStatus;
@@ -16,7 +16,7 @@ export interface FindDocumentsOptions {
     column: keyof Omit<Document, 'document'>;
     direction: 'asc' | 'desc';
   };
-}
+};
 
 export const findDocuments = async ({
   userId,

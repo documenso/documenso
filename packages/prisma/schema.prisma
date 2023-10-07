@@ -240,7 +240,7 @@ model Template {
   documentName   String
   User           User            @relation(fields: [userId], references: [id], onDelete: Cascade)
   templateDataId String          @unique
-  templateData   DocumentData    @relation(fields: [templateDataId], references: [id], onDelete: Cascade)
+  TemplateData   DocumentData    @relation(fields: [templateDataId], references: [id], onDelete: Cascade)
   TemplateField  TemplateField[]
 }
 
