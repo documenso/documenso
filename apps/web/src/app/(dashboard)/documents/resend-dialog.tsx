@@ -34,10 +34,10 @@ import { useToast } from '@documenso/ui/primitives/use-toast';
 
 import { StackAvatar } from '~/components/(dashboard)/avatar/stack-avatar';
 
-interface ResendEmailMenuItemProps {
+type ResendEmailMenuItemProps = {
   recipients: Recipient[];
   documentId: number;
-}
+};
 
 const FormSchema = z.object({
   emails: z.array(z.string()).refine((value) => value.some((item) => item), {
@@ -51,7 +51,7 @@ export const ResendEmailMenuItem = (props: ResendEmailMenuItemProps) => {
   const { recipients, documentId } = props;
   const [isOpen, setIsOpen] = useState(false);
   const { toast } = useToast();
-  const { mutateAsync: sendDocument, isLoading } = trpcReact.document.reSendDocument.useMutation({
+  const { mutateAsync: sendDocument, isLoading } = trpcReact.document.resendDocument.useMutation({
     onSuccess: () => {
       toast({
         title: 'Document re-sent',
@@ -70,7 +70,7 @@ export const ResendEmailMenuItem = (props: ResendEmailMenuItemProps) => {
   });
 
   const onSubmit = async (data: TFormSchema) => {
-    await sendDocument({ documentId, resendEmails: data.emails });
+    await sendDocument({ documentId, recipientsEmail: data.emails });
   };
   return (
     <>

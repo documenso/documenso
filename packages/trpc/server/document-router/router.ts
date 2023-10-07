@@ -12,7 +12,7 @@ import {
   ZCreateDocumentMutationSchema,
   ZGetDocumentByIdQuerySchema,
   ZGetDocumentByTokenQuerySchema,
-  ZReSendDocumentMutationSchema,
+  ZResendDocumentMutationSchema,
   ZSendDocumentMutationSchema,
   ZSetFieldsForDocumentMutationSchema,
   ZSetRecipientsForDocumentMutationSchema,
@@ -140,16 +140,16 @@ export const documentRouter = router({
       }
     }),
 
-  reSendDocument: authenticatedProcedure
-    .input(ZReSendDocumentMutationSchema)
+  resendDocument: authenticatedProcedure
+    .input(ZResendDocumentMutationSchema)
     .mutation(async ({ input, ctx }) => {
       try {
-        const { documentId, resendEmails, email } = input;
+        const { documentId, recipientsEmail, email } = input;
 
         return await resendDocument({
           userId: ctx.user.id,
           documentId,
-          resendEmails,
+          recipientsEmail,
           email,
         });
       } catch (err) {

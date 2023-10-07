@@ -60,9 +60,9 @@ export const ZSendDocumentMutationSchema = z.object({
   documentId: z.number(),
 });
 
-export const ZReSendDocumentMutationSchema = z.object({
+export const ZResendDocumentMutationSchema = z.object({
   documentId: z.number(),
-  resendEmails: z.array(z.string()).min(1),
+  recipientsEmail: z.array(z.string()).min(1),
   email: z
     .object({
       subject: z.string(),

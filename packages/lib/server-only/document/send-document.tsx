@@ -22,17 +22,23 @@ type CustomEmail = {
   };
 };
 
-export type resendDocumentOptions = {
-  resendEmails: string[];
+export type ResendDocumentOptions = {
+  recipientsEmail: string[];
 } & SendDocumentOptions &
   CustomEmail;
 
-type getSendableDocumentOptions = {
+type GetSendableDocumentOptions = {
   userId: number;
   documentId: number;
 } & CustomEmail;
 
-async function getSendableDocument({ documentId, userId, email }: getSendableDocumentOptions) {
+type TGetSendableDocument = Awaited<ReturnType<typeof getSendableDocument>>;
+
+type MailDocumentsOptions = {
+  recipientsEmail?: string[];
+} & TGetSendableDocument;
+
+async function getSendableDocument({ documentId, userId, email }: GetSendableDocumentOptions) {
   const user = await prisma.user.findFirstOrThrow({
     where: {
       id: userId,
@@ -74,13 +80,12 @@ async function getSendableDocument({ documentId, userId, email }: getSendableDoc
   return { document, user, customEmail };
 }
 
-type TGetSendableDocument = Awaited<ReturnType<typeof getSendableDocument>>;
-
-type SendDocumentsOptions = {
-  resendEmails?: string[];
-} & TGetSendableDocument;
-
-async function mailDocuments({ customEmail, document, resendEmails, user }: SendDocumentsOptions) {
+async function mailDocuments({
+  customEmail,
+  document,
+  recipientsEmail,
+  user,
+}: MailDocumentsOptions) {
   await Promise.all([
     document.Recipient.map(async (recipient) => {
       const { email, name } = recipient;
@@ -92,12 +97,12 @@ async function mailDocuments({ customEmail, document, resendEmails, user }: Send
       };
 
       // If the email has been sent and we don't want to resend emails, skip it
-      if (recipient.sendStatus === SendStatus.SENT && !resendEmails) {
+      if (recipient.sendStatus === SendStatus.SENT && !recipientsEmail) {
         return;
       }
 
       // If we're resending emails and this email is not in the list, skip it
-      if (resendEmails && !resendEmails.includes(email)) {
+      if (recipientsEmail && !recipientsEmail.includes(email)) {
         return;
       }
 
@@ -157,12 +162,12 @@ async function setDocumentPending(documentId: number) {
 export const resendDocument = async ({
   documentId,
   userId,
-  resendEmails,
+  recipientsEmail,
   email,
-}: resendDocumentOptions) => {
+}: ResendDocumentOptions) => {
   const { document, user, customEmail } = await getSendableDocument({ userId, documentId, email });
 
-  await mailDocuments({ document, user, customEmail, resendEmails });
+  await mailDocuments({ document, user, customEmail, recipientsEmail });
 
   return await setDocumentPending(documentId);
 };
