@@ -11,10 +11,10 @@ import { putFile } from '@documenso/lib/universal/upload/put-file';
 import { Field, Prisma, Recipient } from '@documenso/prisma/client';
 import { Card, CardContent } from '@documenso/ui/primitives/card';
 import { DocumentDropzone } from '@documenso/ui/primitives/document-dropzone';
-import { AddFieldsFormPartial } from '@documenso/ui/primitives/document-flow/add-fields';
-import { TAddFieldsFormSchema } from '@documenso/ui/primitives/document-flow/add-fields.types';
 import { AddTemplateDetailsFormPartial } from '@documenso/ui/primitives/document-flow/add-template-details';
 import { TAddTemplateDetailsFormSchema } from '@documenso/ui/primitives/document-flow/add-template-details.types';
+import { AddTemplateFieldsFormPartial } from '@documenso/ui/primitives/document-flow/add-template-fields';
+import { TAddTemplateFieldsFormSchema } from '@documenso/ui/primitives/document-flow/add-template-fields.types';
 import {
   DocumentFlowFormContainer,
   DocumentFlowFormContainerHeader,
@@ -28,7 +28,7 @@ import { createTemplate } from '../create-template.action';
 type TemplateModeStep = 'fields' | 'details';
 
 export default function TemplatePage() {
-  const [uploadedFile, setUploadedFile] = useState<{ file: File; fileBase64: string } | null>();
+  const [uploadedFile, setUploadedFile] = useState<UploadedDocument | null>();
   const [step, setStep] = useState<TemplateModeStep>('fields');
   const [fields, setFields] = useState<Field[]>([]);
 
@@ -75,7 +75,7 @@ export default function TemplatePage() {
     }
   };
 
-  const onFieldsSubmit = (data: TAddFieldsFormSchema) => {
+  const onFieldsSubmit = (data: TAddTemplateFieldsFormSchema) => {
     if (!uploadedFile) {
       return;
     }
@@ -189,7 +189,7 @@ export default function TemplatePage() {
 
             {step === 'fields' && (
               <fieldset disabled={!uploadedFile} className="flex h-full flex-col">
-                <AddFieldsFormPartial
+                <AddTemplateFieldsFormPartial
                   documentFlow={documentFlow.fields}
                   hideRecipients={true}
                   recipients={uploadedFile ? [placeholderRecipient] : []}
@@ -206,6 +206,7 @@ export default function TemplatePage() {
                 fields={fields}
                 numberOfSteps={Object.keys(documentFlow).length}
                 onSubmit={onAddSubjectFormSubmit}
+                uploadedDocument={uploadedFile}
               />
             )}
           </DocumentFlowFormContainer>

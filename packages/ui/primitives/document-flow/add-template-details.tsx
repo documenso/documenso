@@ -3,7 +3,6 @@
 import { useForm } from 'react-hook-form';
 
 import { Field, Recipient } from '@documenso/prisma/client';
-import { DocumentWithData } from '@documenso/prisma/types/document-with-data';
 import { FormErrorMessage } from '@documenso/ui/primitives/form/form-error-message';
 import { Input } from '@documenso/ui/primitives/input';
 import { Label } from '@documenso/ui/primitives/label';
@@ -18,11 +17,13 @@ import {
 } from './document-flow-root';
 import { DocumentFlowStep } from './types';
 
+export type UploadedDocument = { file: File; fileBase64: string };
+
 export type AddTemplateDetailsFormProps = {
   documentFlow: DocumentFlowStep;
   recipients?: Recipient[];
   fields?: Field[];
-  document?: DocumentWithData;
+  uploadedDocument: UploadedDocument;
   numberOfSteps: number;
   onSubmit: (_data: TAddTemplateDetailsFormSchema) => void;
 };
@@ -31,7 +32,7 @@ export const AddTemplateDetailsFormPartial = ({
   documentFlow,
   recipients: _recipients,
   fields: _fields,
-  document,
+  uploadedDocument,
   numberOfSteps,
   onSubmit,
 }: AddTemplateDetailsFormProps) => {
@@ -42,8 +43,8 @@ export const AddTemplateDetailsFormPartial = ({
   } = useForm<TAddTemplateDetailsFormSchema>({
     defaultValues: {
       template: {
-        title: document ? document.documentMeta?.subject ?? '' : '',
-        description: document ? document.documentMeta?.message ?? '' : '',
+        title: uploadedDocument.file.name,
+        description: '',
       },
     },
   });
@@ -56,7 +57,7 @@ export const AddTemplateDetailsFormPartial = ({
         <div className="flex flex-col">
           <div className="flex flex-col gap-y-4">
             <div>
-              <Label htmlFor="subject">Title</Label>
+              <Label htmlFor="subject">Name</Label>
 
               <Input
                 id="subject"
