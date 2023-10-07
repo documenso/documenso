@@ -33,6 +33,7 @@ model User {
   Document           Document[]
   Subscription       Subscription[]
   PasswordResetToken PasswordResetToken[]
+  Template           Template[]
 }
 
 model PasswordResetToken {
@@ -110,10 +111,10 @@ model Document {
   Field          Field[]
   ShareLink      DocumentShareLink[]
   documentDataId String
-  documentData   DocumentData   @relation(fields: [documentDataId], references: [id], onDelete: Cascade)
+  documentData   DocumentData        @relation(fields: [documentDataId], references: [id], onDelete: Cascade)
   documentMeta   DocumentMeta?
-  createdAt      DateTime       @default(now())
-  updatedAt      DateTime       @default(now()) @updatedAt
+  createdAt      DateTime            @default(now())
+  updatedAt      DateTime            @default(now()) @updatedAt
 
   @@unique([documentDataId])
 }
@@ -130,14 +131,15 @@ model DocumentData {
   data        String
   initialData String
   Document    Document?
+  Template    Template?
 }
 
 model DocumentMeta {
-  id       String    @id @default(cuid())
-  subject  String?
-  message  String?
-  documentId Int @unique
-  document Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  id         String   @id @default(cuid())
+  subject    String?
+  message    String?
+  documentId Int      @unique
+  document   Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
 }
 
 enum ReadStatus {
@@ -222,4 +224,35 @@ model DocumentShareLink {
   document Document @relation(fields: [documentId], references: [id])
 
   @@unique([documentId, email])
+}
+
+enum TemplateType {
+  PUBLIC
+  PRIVATE
+}
+
+model Template {
+  id             Int             @id @default(autoincrement())
+  userId         Int
+  title          String
+  description    String?
+  status         TemplateType    @default(PRIVATE)
+  documentName   String
+  User           User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  templateDataId String          @unique
+  templateData   DocumentData    @relation(fields: [templateDataId], references: [id], onDelete: Cascade)
+  TemplateField  TemplateField[]
+}
+
+model TemplateField {
+  id         Int       @id @default(autoincrement())
+  templateId Int
+  type       FieldType
+  page       Int
+  positionX  Decimal   @default(0)
+  positionY  Decimal   @default(0)
+  width      Decimal   @default(-1)
+  height     Decimal   @default(-1)
+  customText String
+  Template   Template  @relation(fields: [templateId], references: [id], onDelete: Cascade)
 }
