@@ -2,15 +2,19 @@
 
 import { useTransition } from 'react';
 
-import Link from 'next/link';
-
-import { Edit, Loader } from 'lucide-react';
+import { Loader, Plus } from 'lucide-react';
 
 import { useUpdateSearchParams } from '@documenso/lib/client-only/hooks/use-update-search-params';
 import { Template } from '@documenso/prisma/client';
 import { Button } from '@documenso/ui/primitives/button';
 import { DataTable } from '@documenso/ui/primitives/data-table';
 import { DataTablePagination } from '@documenso/ui/primitives/data-table-pagination';
+
+import { LocaleDate } from '~/components/formatter/locale-date';
+import { TemplateType } from '~/components/formatter/template-status';
+
+import { DataTableActionDropdown } from './data-table-action-dropdown';
+import { DataTableTitle } from './data-table-title';
 
 type TemplatesDataTableProps = {
   templates: Template[];
@@ -42,27 +46,32 @@ export const TemplatesDataTable = ({
       <DataTable
         columns={[
           {
-            header: 'ID',
-            accessorKey: 'id',
-            cell: ({ row }) => <div>{row.original.id}</div>,
+            header: 'Created',
+            accessorKey: 'createdAt',
+            cell: ({ row }) => <LocaleDate date={row.original.createdAt} />,
           },
           {
             header: 'Title',
-            accessorKey: 'name',
-            cell: ({ row }) => <div>{row.original.title}</div>,
+            cell: ({ row }) => <DataTableTitle row={row.original} />,
           },
           {
-            header: 'Edit',
-            accessorKey: 'edit',
+            header: 'Status',
+            accessorKey: 'status',
+            cell: ({ row }) => <TemplateType type={row.original.status} />,
+          },
+          {
+            header: 'Actions',
+            accessorKey: 'actions',
             cell: ({ row }) => {
               return (
-                <div>
-                  <Button variant={'secondary'} className="w-24" asChild>
-                    <Link href={`/admin/users/${row.original.id}`}>
-                      <Edit className="-ml-1 mr-2 h-4 w-4" />
-                      Edit
-                    </Link>
+                <div className="flex items-center gap-x-4">
+                  <Button className="w-24">
+                    <>
+                      <Plus className="-ml-1 mr-2 h-4 w-4" />
+                      Use
+                    </>
                   </Button>
+                  <DataTableActionDropdown row={row.original} />
                 </div>
               );
             },

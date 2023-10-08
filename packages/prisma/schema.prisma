@@ -238,6 +238,8 @@ model Template {
   description    String?
   status         TemplateType    @default(PRIVATE)
   documentName   String
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
   User           User            @relation(fields: [userId], references: [id], onDelete: Cascade)
   templateDataId String          @unique
   TemplateData   DocumentData    @relation(fields: [templateDataId], references: [id], onDelete: Cascade)
