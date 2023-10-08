@@ -20,6 +20,7 @@ import { useToast } from '@documenso/ui/primitives/use-toast';
 import signingCelebration from '~/assets/signing-celebration.png';
 import ConfettiScreen from '~/components/(marketing)/confetti-screen';
 
+// TODO: @documenso/prisma/client
 import { DocumentStatus } from '.prisma/client';
 
 interface SinglePlayerModeSuccessProps {
