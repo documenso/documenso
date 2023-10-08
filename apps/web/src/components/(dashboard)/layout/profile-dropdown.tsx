@@ -4,6 +4,7 @@ import Link from 'next/link';
 
 import {
   CreditCard,
+  FileSpreadsheet,
   Key,
   LogOut,
   User as LucideUser,
@@ -102,6 +103,13 @@ export const ProfileDropdown = ({ user }: ProfileDropdownProps) => {
           </DropdownMenuItem>
         )}
 
+        <DropdownMenuSeparator />
+        <DropdownMenuItem asChild>
+          <Link href="/templates" className="cursor-pointer">
+            <FileSpreadsheet className="mr-2 h-4 w-4" />
+            Templates
+          </Link>
+        </DropdownMenuItem>
         <DropdownMenuSeparator />
 
         <DropdownMenuSub>
