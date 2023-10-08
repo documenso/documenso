@@ -55,8 +55,8 @@ export const TemplatesDataTable = ({
             cell: ({ row }) => <DataTableTitle row={row.original} />,
           },
           {
-            header: 'Status',
-            accessorKey: 'status',
+            header: 'Type',
+            accessorKey: 'type',
             cell: ({ row }) => <TemplateType type={row.original.status} />,
           },
           {
