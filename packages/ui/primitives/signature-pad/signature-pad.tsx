@@ -24,8 +24,6 @@ export type SignaturePadProps = Omit<HTMLAttributes<HTMLCanvasElement>, 'onChang
   onChange?: (_signatureDataUrl: string | null) => void;
 };
 
-// ... (import statements and other code)
-
 export const SignaturePad = ({
   className,
   defaultValue,
@@ -49,7 +47,7 @@ export const SignaturePad = ({
       end: {
         taper: size * 2,
       },
-    } as StrokeOptions;
+    } satisfies StrokeOptions;
   }, []);
 
   const onMouseDown = (event: MouseEvent | PointerEvent | TouchEvent) => {
@@ -174,23 +172,25 @@ export const SignaturePad = ({
   };
 
   const onUndoClick = () => {
-    if (lines.length > 0) {
-      const newLines = [...lines];
-      newLines.pop(); // Remove the last line
-      setLines(newLines);
+    if (lines.length === 0) {
+      return;
+    }
 
-      // Clear the canvas
-      if ($el.current) {
-        const ctx = $el.current.getContext('2d');
-        ctx?.clearRect(0, 0, $el.current.width, $el.current.height);
+    const newLines = [...lines];
+    newLines.pop(); // Remove the last line
+    setLines(newLines);
 
-        newLines.forEach((line) => {
-          const pathData = new Path2D(
-            getSvgPathFromStroke(getStroke(line, perfectFreehandOptions)),
-          );
-          ctx?.fill(pathData);
-        });
-      }
+    // Clear the canvas
+    if ($el.current) {
+      const ctx = $el.current.getContext('2d');
+      ctx?.clearRect(0, 0, $el.current.width, $el.current.height);
+
+      newLines.forEach((line) => {
+        const pathData = new Path2D(
+          getSvgPathFromStroke(getStroke(line, perfectFreehandOptions)),
+        );
+        ctx?.fill(pathData);
+      });
     }
   };
 
@@ -232,14 +232,7 @@ export const SignaturePad = ({
       />
 
       <div className="absolute bottom-4 right-4 flex gap-2">
-        <button
-          type="button"
-          className="bg-primary hover:bg-secondary rounded-full px-3 py-1 text-xs text-slate-500 transition duration-300 hover:text-white focus:outline-none"
-          onClick={() => onClearClick()}
-        >
-          Clear Signature
-        </button>
-        {lines.length > 0 && (
+      {lines.length > 0 && (
           <button
             type="button"
             className="bg-secondary hover:bg-secondary-foreground rounded-full px-3 py-1 text-xs text-white transition duration-300 hover:text-slate-500 focus:outline-none"
@@ -248,6 +241,13 @@ export const SignaturePad = ({
             Undo
           </button>
         )}
+        <button
+          type="button"
+          className="bg-primary hover:bg-secondary rounded-full px-3 py-1 text-xs text-slate-500 transition duration-300 hover:text-white focus:outline-none"
+          onClick={() => onClearClick()}
+        >
+          Clear Signature
+        </button>
       </div>
     </div>
   );
