@@ -1,4 +1,3 @@
-import { getRequiredServerComponentSession } from '@documenso/lib/next-auth/get-server-session';
 import { findDocuments } from '@documenso/lib/server-only/admin/get-all-documents';
 
 import { DocumentsDataTable } from './data-table';
@@ -15,10 +14,6 @@ export default async function Documents({ searchParams = {} }: DocumentsPageProp
   const perPage = Number(searchParams.perPage) || 20;
 
   const results = await findDocuments({
-    orderBy: {
-      column: 'createdAt',
-      direction: 'desc',
-    },
     page,
     perPage,
   });

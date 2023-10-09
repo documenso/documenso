@@ -105,13 +105,7 @@ export const UsersDataTable = ({ users, perPage, page, totalPages }: UsersDataTa
             header: 'Documents',
             accessorKey: 'documents',
             cell: ({ row }) => {
-              return (
-                <div>
-                  <Link href={`/admin/users/${row.original.id}/documents`}>
-                    {row.original.Document.length}
-                  </Link>
-                </div>
-              );
+              return <div>{row.original.Document.length}</div>;
             },
           },
           {
