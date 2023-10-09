@@ -16,7 +16,8 @@
     "dx:down": "docker compose -f docker/compose-services.yml down",
     "prisma:migrate-dev": "npm run with:env -- npm run prisma:migrate-dev -w @documenso/prisma",
     "prisma:migrate-deploy": "npm run with:env -- npm run prisma:migrate-deploy -w @documenso/prisma",
-    "with:env": "dotenv -e .env -e .env.local --"
+    "with:env": "dotenv -e .env -e .env.local --",
+    "precommit": "npm install && git add package.json package-lock.json"
   },
   "engines": {
     "npm": ">=8.6.0",
