@@ -26,7 +26,7 @@
     "luxon": "^3.4.0",
     "micro": "^10.0.1",
     "next": "13.4.19",
-    "next-auth": "4.22.3",
+    "next-auth": "4.23.2",
     "next-plausible": "^3.10.1",
     "next-themes": "^0.2.1",
     "perfect-freehand": "^1.2.0",
