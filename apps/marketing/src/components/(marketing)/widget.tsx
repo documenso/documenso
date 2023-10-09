@@ -377,7 +377,7 @@ export const Widget = ({ className, children, ...props }: WidgetProps) => {
       </Card>
 
       <Dialog open={showSigningDialog} onOpenChange={setShowSigningDialog}>
-        <DialogContent>
+        <DialogContent position="center">
           <DialogHeader>
             <DialogTitle>Add your signature</DialogTitle>
           </DialogHeader>
@@ -391,6 +391,7 @@ export const Widget = ({ className, children, ...props }: WidgetProps) => {
 
           <SignaturePad
             className="aspect-video w-full rounded-md border"
+            defaultValue={signatureDataUrl || ''}
             onChange={setDraftSignatureDataUrl}
           />
 

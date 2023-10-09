@@ -97,10 +97,7 @@ export const DocumentFlowFormContainerStep = ({
   return (
     <div>
       <p className="text-muted-foreground text-sm">
-        {title}{' '}
-        <span>
-          ({step}/{maxStep})
-        </span>
+        Step <span>{`${step} of ${maxStep}`}</span>
       </p>
 
       <div className="bg-muted relative mt-4 h-[2px] rounded-md">
