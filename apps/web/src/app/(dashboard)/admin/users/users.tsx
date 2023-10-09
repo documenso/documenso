@@ -1,10 +1,14 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useTransition } from 'react';
+
+import { Loader } from 'lucide-react';
 
 import { Document, Role, Subscription } from '@documenso/prisma/client';
 import { Button } from '@documenso/ui/primitives/button';
 import { Input } from '@documenso/ui/primitives/input';
+
+import { useDebouncedValue } from '~/hooks/use-debounced-value';
 
 import { UsersDataTable } from './data-table-users';
 
@@ -24,7 +28,7 @@ export type User = {
 };
 
 export type UsersProps = {
-  search: (search: string) => Promise<{ users: User[]; totalPages: number }>;
+  search: (_search: string) => Promise<{ users: User[]; totalPages: number }>;
   perPage: number;
   page: number;
 };
@@ -32,13 +36,14 @@ export type UsersProps = {
 export const Users = ({ search, perPage, page }: UsersProps) => {
   const [data, setData] = useState<User[]>([]);
   const [totalPages, setTotalPages] = useState<number>(0);
-
+  const [isPending, startTransition] = useTransition();
   const [searchString, setSearchString] = useState('');
+  const debouncedSearchString = useDebouncedValue(searchString, 500);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const result = await search(searchString);
+        const result = await search(debouncedSearchString);
         setData(result.users);
         setTotalPages(result.totalPages);
       } catch (err) {
@@ -47,12 +52,14 @@ export const Users = ({ search, perPage, page }: UsersProps) => {
     };
 
     fetchData();
-  }, [searchString, search]);
+  }, [debouncedSearchString, search]);
 
-  const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const result = await search(searchString);
-    setData(result.users);
+    startTransition(async () => {
+      const result = await search(debouncedSearchString);
+      setData(result.users);
+    });
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -71,7 +78,13 @@ export const Users = ({ search, perPage, page }: UsersProps) => {
         <Button type="submit">Search</Button>
       </form>
       <div className="mt-8">
-        <UsersDataTable users={data} perPage={perPage} page={page} totalPages={totalPages} />
+        {data.length === 0 || isPending ? (
+          <div className="absolute inset-0 flex items-center justify-center bg-white/50">
+            <Loader className="h-8 w-8 animate-spin text-gray-500" />
+          </div>
+        ) : (
+          <UsersDataTable users={data} perPage={perPage} page={page} totalPages={totalPages} />
+        )}
       </div>
     </>
   );
