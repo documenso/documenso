@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useId, useState } from 'react';
+import React, { useEffect, useId, useState } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { AnimatePresence, motion } from 'framer-motion';
@@ -30,9 +30,6 @@ export type AddSignersFormProps = {
   fields: Field[];
   numberOfSteps: number;
   onSubmit: (_data: TAddSignersFormSchema) => void;
-};
-
-export type DocumentCreatorEN = {
   creatorEmail: string;
   creatorName: string;
 };
@@ -45,8 +42,10 @@ export const AddSignersFormPartial = ({
   onSubmit,
   creatorEmail,
   creatorName,
-}: AddSignersFormProps & DocumentCreatorEN) => {
+}: AddSignersFormProps) => {
   const { toast } = useToast();
+
+  const [selfSignEnabled, setSelfSignEnabled] = useState<boolean>(false);
 
   const initialId = useId();
 
@@ -110,6 +109,8 @@ export const AddSignersFormPartial = ({
       name: creatorName,
       email: creatorEmail,
     });
+
+    setSelfSignEnabled(true);
   };
 
   const onRemoveSigner = (index: number) => {
@@ -125,6 +126,10 @@ export const AddSignersFormPartial = ({
       return;
     }
 
+    if (signer.email === creatorEmail && signer.name === creatorName) {
+      setSelfSignEnabled(false);
+    }
+
     removeSigner(index);
   };
 
@@ -138,7 +143,11 @@ export const AddSignersFormPartial = ({
     <>
       <DocumentFlowFormContainerContent>
         <div className="flex w-full flex-col gap-y-4">
-          <Button type="button" disabled={isSubmitting} onClick={() => onAddSelfSigner()}>
+          <Button
+            type="button"
+            disabled={isSubmitting || selfSignEnabled}
+            onClick={() => onAddSelfSigner()}
+          >
             <Plus className="-ml-1 mr-2 h-5 w-5" />
             Add Self Signer
           </Button>

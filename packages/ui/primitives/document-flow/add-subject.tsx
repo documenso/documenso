@@ -1,5 +1,7 @@
 'use client';
 
+import { useEffect } from 'react';
+
 import { useForm } from 'react-hook-form';
 
 import { DocumentStatus, Field, Recipient } from '@documenso/prisma/client';

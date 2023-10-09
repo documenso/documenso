@@ -4,17 +4,13 @@ import { useEffect, useState } from 'react';
 
 import { useRouter } from 'next/navigation';
 
-import { getServerComponentSession } from '@documenso/lib/next-auth/get-server-session';
 import { Field, Recipient, User } from '@documenso/prisma/client';
 import { DocumentWithData } from '@documenso/prisma/types/document-with-data';
 import { cn } from '@documenso/ui/lib/utils';
 import { Card, CardContent } from '@documenso/ui/primitives/card';
 import { AddFieldsFormPartial } from '@documenso/ui/primitives/document-flow/add-fields';
 import { TAddFieldsFormSchema } from '@documenso/ui/primitives/document-flow/add-fields.types';
-import {
-  AddSignersFormPartial,
-  DocumentCreatorEN,
-} from '@documenso/ui/primitives/document-flow/add-signers';
+import { AddSignersFormPartial } from '@documenso/ui/primitives/document-flow/add-signers';
 import { TAddSignersFormSchema } from '@documenso/ui/primitives/document-flow/add-signers.types';
 import { AddSubjectFormPartial } from '@documenso/ui/primitives/document-flow/add-subject';
 import { TAddSubjectFormSchema } from '@documenso/ui/primitives/document-flow/add-subject.types';
@@ -26,6 +22,7 @@ import { DocumentFlowStep } from '@documenso/ui/primitives/document-flow/types';
 import { LazyPDFViewer } from '@documenso/ui/primitives/lazy-pdf-viewer';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
+import { getCreatorDetails } from '~/components/forms/edit-document/add-creator';
 import { addFields } from '~/components/forms/edit-document/add-fields.action';
 import { addSigners } from '~/components/forms/edit-document/add-signers.action';
 import { completeDocument } from '~/components/forms/edit-document/add-subject.action';
@@ -37,6 +34,11 @@ export type EditDocumentFormProps = {
   recipients: Recipient[];
   fields: Field[];
   dataUrl: string;
+};
+
+type CreatorDetails = {
+  creatorEmail: string;
+  creatorName: string;
 };
 
 type EditDocumentStep = 'signers' | 'fields' | 'subject';
@@ -53,10 +55,11 @@ export const EditDocumentForm = ({
   const router = useRouter();
 
   const [step, setStep] = useState<EditDocumentStep>('signers');
-  const [creatorDetails, setCreatorDetails] = useState<DocumentCreatorEN>({
+  const [creatorDetails, setCreatorDetails] = useState<CreatorDetails>({
     creatorEmail: '',
     creatorName: '',
   });
+  const [selfSign, setSelfSign] = useState<boolean>(false);
 
   const documentFlow: Record<EditDocumentStep, DocumentFlowStep> = {
     signers: {
@@ -82,14 +85,20 @@ export const EditDocumentForm = ({
 
   const onAddSignersFormSubmit = async (data: TAddSignersFormSchema) => {
     try {
-      // Custom invocation server action
+      const selfSigner = data.signers.filter(
+        (signer) =>
+          signer.email === creatorDetails.creatorEmail &&
+          signer.name === creatorDetails.creatorName,
+      );
+
+      setSelfSign(selfSigner.length > 0);
+
       await addSigners({
         documentId: document.id,
         signers: data.signers,
       });
 
       router.refresh();
-
       setStep('fields');
     } catch (err) {
       console.error(err);
@@ -104,21 +113,28 @@ export const EditDocumentForm = ({
 
   const onAddFieldsFormSubmit = async (data: TAddFieldsFormSchema) => {
     try {
-      // Custom invocation server action
       await addFields({
         documentId: document.id,
         fields: data.fields,
       });
 
-      router.refresh();
+      if (selfSign && recipients.length === 1) {
+        await completeDocument({
+          documentId: document.id,
+          email: { subject: '', message: '' },
+        });
+        router.push(`/sign/${recipients[0].token}`);
+      } else {
+        router.refresh();
 
-      setStep('subject');
+        setStep('subject');
+      }
     } catch (err) {
       console.error(err);
 
       toast({
         title: 'Error',
-        description: 'An error occurred while adding signers.',
+        description: 'An error occurred while adding fields.',
         variant: 'destructive',
       });
     }
@@ -128,21 +144,31 @@ export const EditDocumentForm = ({
     const { subject, message } = data.email;
 
     try {
+      const emailData = { subject, message };
       await completeDocument({
         documentId: document.id,
-        email: {
-          subject,
-          message,
-        },
+        email: emailData,
       });
+
+      if (selfSign) {
+        const selfSigner = recipients.find(
+          (recipient) =>
+            recipient.name === creatorDetails.creatorName &&
+            recipient.email === creatorDetails.creatorEmail,
+        );
+
+        if (selfSigner) {
+          router.push(`/sign/${selfSigner.token}`);
+        }
+      } else {
+        router.push('/documents');
+      }
 
       toast({
         title: 'Document sent',
         description: 'Your document has been sent successfully.',
         duration: 5000,
       });
-
-      router.push('/documents');
     } catch (err) {
       console.error(err);
 
@@ -155,13 +181,16 @@ export const EditDocumentForm = ({
   };
 
   useEffect(() => {
-    const getCreatorDetails = async () => {
-      const { user } = await getServerComponentSession();
-      if (user && user.email && user.name) {
-        setCreatorDetails({ creatorEmail: user.email, creatorName: user.name });
+    const getDetails = async () => {
+      try {
+        const { email, name } = await getCreatorDetails();
+        setCreatorDetails({ creatorEmail: email, creatorName: name });
+      } catch (error) {
+        // Handle errors if necessary
+        console.error('Error fetching details:', error);
       }
     };
-    getCreatorDetails();
+    void getDetails();
   }, []);
 
   return (
