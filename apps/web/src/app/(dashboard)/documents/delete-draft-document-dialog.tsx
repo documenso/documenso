@@ -16,11 +16,11 @@ import { useToast } from '@documenso/ui/primitives/use-toast';
 
 type DeleteDraftDocumentDialogProps = {
   id: number;
+  open: boolean;
 };
 
-export const DeleteDraftDocumentDialog = ({ id }: DeleteDraftDocumentDialogProps) => {
+export const DeleteDraftDocumentDialog = ({ id, open }: DeleteDraftDocumentDialogProps) => {
   const router = useRouter();
-
   const { toast } = useToast();
 
   const { mutateAsync: deleteDocument } = trpcReact.document.deleteDraftDocument.useMutation({
@@ -32,20 +32,22 @@ export const DeleteDraftDocumentDialog = ({ id }: DeleteDraftDocumentDialogProps
   });
 
   const onClose = () => {
-    router.back();
+    router.push('/documents');
   };
 
   const onDraftDelete = async () => {
+    console.log({ id });
+
     await deleteDocument({ id });
   };
   return (
-    <Dialog open={true} onOpenChange={onClose}>
+    <Dialog open={open} onOpenChange={onClose}>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Do you want to delete this document?</DialogTitle>
           <DialogDescription>
-            This action cannot be undone. This will permanently delete your document from our
-            servers.
+            Please note that this action is irreversible. Once confirmed, your document will be
+            permanently deleted.
           </DialogDescription>
         </DialogHeader>
         <DialogFooter>

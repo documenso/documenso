@@ -148,7 +148,7 @@ export const DataTableActionDropdown = ({ row }: DataTableActionDropdownProps) =
         </DropdownMenuItem>
 
         <DropdownMenuItem disabled={row.status !== 'DRAFT'} asChild>
-          <Link href={`/documents/delete/${row.id}`}>
+          <Link href={`/documents?delete=${row.id}`}>
             <Trash2 className="mr-2 h-4 w-4" />
             Delete
           </Link>

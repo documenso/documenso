@@ -12,6 +12,7 @@ import { PeriodSelectorValue } from '~/components/(dashboard)/period-selector/ty
 import { DocumentStatus } from '~/components/formatter/document-status';
 
 import { DocumentsDataTable } from './data-table';
+import { DeleteDraftDocumentDialog } from './delete-draft-document-dialog';
 import { EmptyDocumentState } from './empty-state';
 import { UploadDocument } from './upload-document';
 
@@ -21,6 +22,7 @@ export type DocumentsPageProps = {
     period?: PeriodSelectorValue;
     page?: string;
     perPage?: string;
+    delete?: string;
   };
 };
 
@@ -35,6 +37,7 @@ export default async function DocumentsPage({ searchParams = {} }: DocumentsPage
   // const period = isPeriodSelectorValue(searchParams.period) ? searchParams.period : '';
   const page = Number(searchParams.page) || 1;
   const perPage = Number(searchParams.perPage) || 20;
+  const deleteId = Number(searchParams.delete) || -1;
 
   const results = await findDocuments({
     userId: user.id,
@@ -46,6 +49,9 @@ export default async function DocumentsPage({ searchParams = {} }: DocumentsPage
     page,
     perPage,
   });
+
+  const isDeleteIdPresent = !!results.data.find((data) => data.id === deleteId);
+  const isDeleteModalOpen = deleteId >= 0 && isDeleteIdPresent;
 
   const getTabHref = (value: typeof status) => {
     const params = new URLSearchParams(searchParams);
@@ -102,6 +108,7 @@ export default async function DocumentsPage({ searchParams = {} }: DocumentsPage
         {results.count > 0 && <DocumentsDataTable results={results} />}
         {results.count === 0 && <EmptyDocumentState status={status} />}
       </div>
+      <DeleteDraftDocumentDialog open={isDeleteModalOpen} id={deleteId} />
     </div>
   );
 }
