@@ -1,25 +1,12 @@
 import { prisma } from '@documenso/prisma';
-import { Document } from '@documenso/prisma/client';
 
 export interface FindDocumentsOptions {
   term?: string;
   page?: number;
   perPage?: number;
-  orderBy?: {
-    column: keyof Omit<Document, 'document'>;
-    direction: 'asc' | 'desc';
-  };
 }
 
-export const findDocuments = async ({
-  term,
-  page = 1,
-  perPage = 10,
-  orderBy,
-}: FindDocumentsOptions) => {
-  const orderByColumn = orderBy?.column ?? 'createdAt';
-  const orderByDirection = orderBy?.direction ?? 'desc';
-
+export const findDocuments = async ({ term, page = 1, perPage = 10 }: FindDocumentsOptions) => {
   const termFilters = !term
     ? undefined
     : ({
@@ -37,7 +24,7 @@ export const findDocuments = async ({
       skip: Math.max(page - 1, 0) * perPage,
       take: perPage,
       orderBy: {
-        [orderByColumn]: orderByDirection,
+        createdAt: 'desc',
       },
       include: {
         User: {

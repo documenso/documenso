@@ -1,18 +1,6 @@
 'use client';
 
-import Link from 'next/link';
-
-import {
-  Copy,
-  Download,
-  Edit,
-  History,
-  MoreHorizontal,
-  Pencil,
-  Share,
-  Trash2,
-  XCircle,
-} from 'lucide-react';
+import { Copy, Download, History, MoreHorizontal, Trash2, XCircle } from 'lucide-react';
 import { useSession } from 'next-auth/react';
 
 import { getFile } from '@documenso/lib/universal/upload/get-file';
@@ -42,8 +30,6 @@ export const DataTableActionDropdown = ({ row }: DataTableActionDropdownProps) =
   }
 
   const recipient = row.Recipient.find((recipient) => recipient.email === session.user.email);
-
-  const isOwner = row.User.id === session.user.id;
   // const isRecipient = !!recipient;
   // const isDraft = row.status === DocumentStatus.DRAFT;
   // const isPending = row.status === DocumentStatus.PENDING;

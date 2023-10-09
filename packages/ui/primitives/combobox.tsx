@@ -16,7 +16,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@documenso/ui/primitive
 
 type ComboboxProps = {
   listValues: string[];
-  onChange: (values: string[]) => void;
+  onChange: (_values: string[]) => void;
 };
 
 const Combobox = ({ listValues, onChange }: ComboboxProps) => {
