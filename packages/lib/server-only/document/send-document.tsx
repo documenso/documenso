@@ -2,6 +2,10 @@ import { createElement } from 'react';
 
 import { mailer } from '@documenso/email/mailer';
 import { render } from '@documenso/email/render';
+import {
+  SelfSignInvitationMessage,
+  SelfSignInvitationSubject,
+} from '@documenso/email/self-sign-email';
 import { DocumentInviteEmailTemplate } from '@documenso/email/templates/document-invite';
 import { FROM_ADDRESS, FROM_NAME } from '@documenso/lib/constants/email';
 import { renderCustomEmailTemplate } from '@documenso/lib/utils/render-custom-email-template';
@@ -48,6 +52,7 @@ export const sendDocument = async ({ documentId, userId }: SendDocumentOptions) 
   await Promise.all([
     document.Recipient.map(async (recipient) => {
       const { email, name } = recipient;
+      let SelfRecipient: boolean = false;
 
       const customEmailTemplate = {
         'signer.name': name,
@@ -59,6 +64,10 @@ export const sendDocument = async ({ documentId, userId }: SendDocumentOptions) 
         return;
       }
 
+      if (recipient.email === user.email && recipient.name === user.name) {
+        SelfRecipient = true;
+      }
+
       const assetBaseUrl = process.env.NEXT_PUBLIC_WEBAPP_URL || 'http://localhost:3000';
       const signDocumentLink = `${process.env.NEXT_PUBLIC_WEBAPP_URL}/sign/${recipient.token}`;
 
@@ -68,7 +77,10 @@ export const sendDocument = async ({ documentId, userId }: SendDocumentOptions) 
         inviterEmail: user.email,
         assetBaseUrl,
         signDocumentLink,
-        customBody: renderCustomEmailTemplate(customEmail?.message || '', customEmailTemplate),
+        customBody: renderCustomEmailTemplate(
+          SelfRecipient ? SelfSignInvitationMessage : customEmail?.message || '',
+          customEmailTemplate,
+        ),
       });
 
       await mailer.sendMail({
@@ -81,7 +93,10 @@ export const sendDocument = async ({ documentId, userId }: SendDocumentOptions) 
           address: FROM_ADDRESS,
         },
         subject: customEmail?.subject
-          ? renderCustomEmailTemplate(customEmail.subject, customEmailTemplate)
+          ? renderCustomEmailTemplate(
+              SelfRecipient ? SelfSignInvitationSubject : customEmail.subject,
+              customEmailTemplate,
+            )
           : 'Please sign this document',
         html: render(template),
         text: render(template, { plainText: true }),
