@@ -14,16 +14,16 @@ import {
 } from '@documenso/ui/primitives/dialog';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
-interface DeleteDocumentModalProps {
+type DeleteDraftDocumentDialogProps = {
   id: number;
-}
+};
 
-export const DeleteDocumentModal = ({ id }: DeleteDocumentModalProps) => {
+export const DeleteDraftDocumentDialog = ({ id }: DeleteDraftDocumentDialogProps) => {
   const router = useRouter();
 
   const { toast } = useToast();
 
-  const { mutateAsync: deleteDocument } = trpcReact.document.deleteDocument.useMutation({
+  const { mutateAsync: deleteDocument } = trpcReact.document.deleteDraftDocument.useMutation({
     onSuccess: () => {
       onClose();
       toast({ title: 'Document deleted successfully' });
