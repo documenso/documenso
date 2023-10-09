@@ -1,3 +1,4 @@
 export const SelfSignInvitationSubject = 'PLease Sign The Document';
-export const SelfSignInvitationMessage =
-  'Hey {signer.name}! You have created a document for signature. If you have not been redirected to signature screen yet, then please Click following Button to sign the document.';
+export const SelfSignInvitationMessage = `Dear {signer.name},
+You have initiated a document that requires your signature. If you haven't already been redirected to the signature screen, please click the following button to sign the document.
+Thank you.`;

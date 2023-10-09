@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 import { useRouter } from 'next/navigation';
 
@@ -22,7 +22,6 @@ import { DocumentFlowStep } from '@documenso/ui/primitives/document-flow/types';
 import { LazyPDFViewer } from '@documenso/ui/primitives/lazy-pdf-viewer';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
-import { getCreatorDetails } from '~/components/forms/edit-document/add-creator';
 import { addFields } from '~/components/forms/edit-document/add-fields.action';
 import { addSigners } from '~/components/forms/edit-document/add-signers.action';
 import { completeDocument } from '~/components/forms/edit-document/add-subject.action';
@@ -34,11 +33,9 @@ export type EditDocumentFormProps = {
   recipients: Recipient[];
   fields: Field[];
   dataUrl: string;
-};
-
-type CreatorDetails = {
-  creatorEmail: string;
   creatorName: string;
+  creatorEmail: string;
+  selfSignExist: boolean;
 };
 
 type EditDocumentStep = 'signers' | 'fields' | 'subject';
@@ -50,16 +47,15 @@ export const EditDocumentForm = ({
   fields,
   user: _user,
   dataUrl,
+  creatorEmail,
+  creatorName,
+  selfSignExist,
 }: EditDocumentFormProps) => {
   const { toast } = useToast();
   const router = useRouter();
 
   const [step, setStep] = useState<EditDocumentStep>('signers');
-  const [creatorDetails, setCreatorDetails] = useState<CreatorDetails>({
-    creatorEmail: '',
-    creatorName: '',
-  });
-  const [selfSign, setSelfSign] = useState<boolean>(false);
+  const [selfSign, setSelfSign] = useState<boolean>(selfSignExist);
 
   const documentFlow: Record<EditDocumentStep, DocumentFlowStep> = {
     signers: {
@@ -86,9 +82,7 @@ export const EditDocumentForm = ({
   const onAddSignersFormSubmit = async (data: TAddSignersFormSchema) => {
     try {
       const selfSigner = data.signers.filter(
-        (signer) =>
-          signer.email === creatorDetails.creatorEmail &&
-          signer.name === creatorDetails.creatorName,
+        (signer) => signer.email === creatorEmail && signer.name === creatorName,
       );
 
       setSelfSign(selfSigner.length > 0);
@@ -152,9 +146,7 @@ export const EditDocumentForm = ({
 
       if (selfSign) {
         const selfSigner = recipients.find(
-          (recipient) =>
-            recipient.name === creatorDetails.creatorName &&
-            recipient.email === creatorDetails.creatorEmail,
+          (recipient) => recipient.name === creatorName && recipient.email === creatorEmail,
         );
 
         if (selfSigner) {
@@ -179,19 +171,6 @@ export const EditDocumentForm = ({
       });
     }
   };
-
-  useEffect(() => {
-    const getDetails = async () => {
-      try {
-        const { email, name } = await getCreatorDetails();
-        setCreatorDetails({ creatorEmail: email, creatorName: name });
-      } catch (error) {
-        // Handle errors if necessary
-        console.error('Error fetching details:', error);
-      }
-    };
-    void getDetails();
-  }, []);
 
   return (
     <div className={cn('grid w-full grid-cols-12 gap-8', className)}>
@@ -219,8 +198,9 @@ export const EditDocumentForm = ({
               fields={fields}
               numberOfSteps={Object.keys(documentFlow).length}
               onSubmit={onAddSignersFormSubmit}
-              creatorEmail={creatorDetails.creatorEmail}
-              creatorName={creatorDetails.creatorName}
+              creatorEmail={creatorEmail}
+              creatorName={creatorName}
+              selfSign={selfSign}
             />
           )}
 

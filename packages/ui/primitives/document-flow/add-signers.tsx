@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useId, useState } from 'react';
+import React, { useId, useState } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { AnimatePresence, motion } from 'framer-motion';
@@ -32,6 +32,7 @@ export type AddSignersFormProps = {
   onSubmit: (_data: TAddSignersFormSchema) => void;
   creatorEmail: string;
   creatorName: string;
+  selfSign: boolean;
 };
 
 export const AddSignersFormPartial = ({
@@ -42,10 +43,11 @@ export const AddSignersFormPartial = ({
   onSubmit,
   creatorEmail,
   creatorName,
+  selfSign,
 }: AddSignersFormProps) => {
   const { toast } = useToast();
 
-  const [selfSignEnabled, setSelfSignEnabled] = useState<boolean>(false);
+  const [selfSignEnabled, setSelfSignEnabled] = useState<boolean>(selfSign);
 
   const initialId = useId();
 
