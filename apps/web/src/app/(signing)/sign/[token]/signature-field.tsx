@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState, useTransition } from 'react';
+import { useEffect, useMemo, useState, useTransition } from 'react';
 
 import { useRouter } from 'next/navigation';
 
@@ -48,7 +48,7 @@ export const SignatureField = ({ field, recipient }: SignatureFieldProps) => {
 
   const [showSignatureModal, setShowSignatureModal] = useState(false);
   const [localSignature, setLocalSignature] = useState<string | null>(null);
-
+  const [isDocumentSigned, setIsDocumentSigned] = useState(false);
   const state = useMemo<SignatureFieldState>(() => {
     if (!field.inserted) {
       return 'empty';
@@ -61,9 +61,16 @@ export const SignatureField = ({ field, recipient }: SignatureFieldProps) => {
     return 'signed-text';
   }, [field.inserted, signature?.signatureImageAsBase64]);
 
+  useEffect(() => {
+    if (showSignatureModal == false && isDocumentSigned == false) {
+      setLocalSignature(null);
+      return;
+    }
+  }, [showSignatureModal]);
   const onSign = async (source: 'local' | 'provider' = 'provider') => {
     try {
       if (!providedSignature && !localSignature) {
+        setIsDocumentSigned(false);
         setShowSignatureModal(true);
         return;
       }
@@ -178,6 +185,7 @@ export const SignatureField = ({ field, recipient }: SignatureFieldProps) => {
                 disabled={!localSignature}
                 onClick={() => {
                   setShowSignatureModal(false);
+                  setIsDocumentSigned(true);
                   void onSign('local');
                 }}
               >
