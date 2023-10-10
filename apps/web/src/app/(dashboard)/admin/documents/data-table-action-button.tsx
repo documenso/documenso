@@ -5,14 +5,11 @@ import Link from 'next/link';
 import { Edit } from 'lucide-react';
 import { useSession } from 'next-auth/react';
 
-import { Document, Recipient, User } from '@documenso/prisma/client';
+import { Document } from '@documenso/prisma/client';
 import { Button } from '@documenso/ui/primitives/button';
 
 export type DataTableActionButtonProps = {
-  row: Document & {
-    User: Pick<User, 'id' | 'name' | 'email'>;
-    Recipient: Recipient[];
-  };
+  row: Pick<Document, 'id'>;
 };
 
 export const DataTableActionButton = ({ row }: DataTableActionButtonProps) => {

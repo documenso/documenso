@@ -18,7 +18,6 @@ import {
 export type DataTableActionDropdownProps = {
   row: Document & {
     User: Pick<User, 'id' | 'name' | 'email'>;
-    Recipient: Recipient[];
   };
 };
 
@@ -29,7 +28,6 @@ export const DataTableActionDropdown = ({ row }: DataTableActionDropdownProps) =
     return null;
   }
 
-  const recipient = row.Recipient.find((recipient) => recipient.email === session.user.email);
   // const isRecipient = !!recipient;
   // const isDraft = row.status === DocumentStatus.DRAFT;
   // const isPending = row.status === DocumentStatus.PENDING;
@@ -39,15 +37,9 @@ export const DataTableActionDropdown = ({ row }: DataTableActionDropdownProps) =
   const onDownloadClick = async () => {
     let document: DocumentWithData | null = null;
 
-    if (!recipient) {
-      document = await trpc.document.getDocumentById.query({
-        id: row.id,
-      });
-    } else {
-      document = await trpc.document.getDocumentByToken.query({
-        token: recipient.token,
-      });
-    }
+    document = await trpc.document.getDocumentById.query({
+      id: row.id,
+    });
 
     const documentData = document?.documentData;
 
