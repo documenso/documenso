@@ -1,7 +1,6 @@
 'use client';
 
 import { Copy, Download, History, MoreHorizontal, Trash2, XCircle } from 'lucide-react';
-import { useSession } from 'next-auth/react';
 
 import { getFile } from '@documenso/lib/universal/upload/get-file';
 import { Document, DocumentStatus, User } from '@documenso/prisma/client';
@@ -22,12 +21,6 @@ export type DataTableActionDropdownProps = {
 };
 
 export const DataTableActionDropdown = ({ row }: DataTableActionDropdownProps) => {
-  const { data: session } = useSession();
-
-  if (!session) {
-    return null;
-  }
-
   // const isRecipient = !!recipient;
   // const isDraft = row.status === DocumentStatus.DRAFT;
   // const isPending = row.status === DocumentStatus.PENDING;
