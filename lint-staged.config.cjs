@@ -3,5 +3,5 @@ module.exports = {
 };
 
 module.exports = {
-  '*.json': ['npm run precommit'],
+  '**/*/package.json': ['npm run precommit'],
 };
