@@ -1,5 +1,3 @@
-'use client';
-
 import { useRouter } from 'next/navigation';
 
 import { trpc as trpcReact } from '@documenso/trpc/react';
@@ -17,47 +15,71 @@ import { useToast } from '@documenso/ui/primitives/use-toast';
 type DeleteDraftDocumentDialogProps = {
   id: number;
   open: boolean;
+  onOpenChange: (_open: boolean) => void;
 };
 
-export const DeleteDraftDocumentDialog = ({ id, open }: DeleteDraftDocumentDialogProps) => {
+export const DeleteDraftDocumentDialog = ({
+  id,
+  open,
+  onOpenChange,
+}: DeleteDraftDocumentDialogProps) => {
   const router = useRouter();
+
   const { toast } = useToast();
 
-  const { mutateAsync: deleteDocument } = trpcReact.document.deleteDraftDocument.useMutation({
-    onSuccess: () => {
-      onClose();
-      toast({ title: 'Document deleted successfully' });
-      router.refresh();
-    },
-  });
+  const { mutateAsync: deleteDocument, isLoading } =
+    trpcReact.document.deleteDraftDocument.useMutation({
+      onSuccess: () => {
+        router.refresh();
 
-  const onClose = () => {
-    router.push('/documents');
-  };
+        toast({
+          title: 'Document deleted',
+          description: 'Your document has been successfully deleted.',
+          duration: 5000,
+        });
+
+        onOpenChange(false);
+      },
+    });
 
   const onDraftDelete = async () => {
-    console.log({ id });
-
-    await deleteDocument({ id });
+    try {
+      await deleteDocument({ id });
+    } catch {
+      toast({
+        title: 'Something went wrong',
+        description: 'This document could not be deleted at this time. Please try again.',
+        variant: 'destructive',
+        duration: 7500,
+      });
+    }
   };
+
   return (
-    <Dialog open={open} onOpenChange={onClose}>
+    <Dialog open={open} onOpenChange={(value) => !isLoading && onOpenChange(value)}>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Do you want to delete this document?</DialogTitle>
+
           <DialogDescription>
             Please note that this action is irreversible. Once confirmed, your document will be
             permanently deleted.
           </DialogDescription>
         </DialogHeader>
+
         <DialogFooter>
-          <div className="flex w-full items-center justify-end gap-2">
-            <Button type="button" variant="secondary" onClick={onClose} size="sm">
+          <div className="flex w-full flex-1 flex-nowrap gap-4">
+            <Button
+              type="button"
+              variant="secondary"
+              onClick={() => onOpenChange(false)}
+              className="flex-1"
+            >
               Cancel
             </Button>
 
-            <Button onClick={onDraftDelete} size="sm" type="button">
-              Continue
+            <Button type="button" loading={isLoading} onClick={onDraftDelete} className="flex-1">
+              Delete
             </Button>
           </div>
         </DialogFooter>

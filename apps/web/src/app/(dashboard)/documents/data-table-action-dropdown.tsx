@@ -1,5 +1,7 @@
 'use client';
 
+import { useState } from 'react';
+
 import Link from 'next/link';
 
 import {
@@ -32,6 +34,8 @@ import { useToast } from '@documenso/ui/primitives/use-toast';
 
 import { useCopyToClipboard } from '~/hooks/use-copy-to-clipboard';
 
+import { DeleteDraftDocumentDialog } from './delete-draft-document-dialog';
+
 export type DataTableActionDropdownProps = {
   row: Document & {
     User: Pick<User, 'id' | 'name' | 'email'>;
@@ -43,6 +47,8 @@ export const DataTableActionDropdown = ({ row }: DataTableActionDropdownProps) =
   const { data: session } = useSession();
   const { toast } = useToast();
   const [, copyToClipboard] = useCopyToClipboard();
+
+  const [isDeleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
   if (!session) {
     return null;
@@ -59,6 +65,7 @@ export const DataTableActionDropdown = ({ row }: DataTableActionDropdownProps) =
   // const isPending = row.status === DocumentStatus.PENDING;
   const isComplete = row.status === DocumentStatus.COMPLETED;
   // const isSigned = recipient?.signingStatus === SigningStatus.SIGNED;
+  const isDocumentDeletable = isOwner && row.status === DocumentStatus.DRAFT;
 
   const onShareClick = async () => {
     const { slug } = await createOrGetShareLink({
@@ -147,11 +154,9 @@ export const DataTableActionDropdown = ({ row }: DataTableActionDropdownProps) =
           Void
         </DropdownMenuItem>
 
-        <DropdownMenuItem disabled={row.status !== 'DRAFT'} asChild>
-          <Link href={`/documents?delete=${row.id}`}>
-            <Trash2 className="mr-2 h-4 w-4" />
-            Delete
-          </Link>
+        <DropdownMenuItem onClick={() => setDeleteDialogOpen(true)} disabled={!isDocumentDeletable}>
+          <Trash2 className="mr-2 h-4 w-4" />
+          Delete
         </DropdownMenuItem>
 
         <DropdownMenuLabel>Share</DropdownMenuLabel>
@@ -170,6 +175,14 @@ export const DataTableActionDropdown = ({ row }: DataTableActionDropdownProps) =
           Share
         </DropdownMenuItem>
       </DropdownMenuContent>
+
+      {isDocumentDeletable && (
+        <DeleteDraftDocumentDialog
+          id={row.id}
+          open={isDeleteDialogOpen}
+          onOpenChange={setDeleteDialogOpen}
+        />
+      )}
     </DropdownMenu>
   );
 };
