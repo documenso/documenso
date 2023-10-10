@@ -58,16 +58,6 @@ export default async function DocumentPage({ params }: DocumentPageProps) {
     }),
   ]);
 
-  let selfSign = false;
-
-  const selfSigner = recipients.find(
-    (recipient) => recipient.name === user.name && recipient.email === user.email,
-  );
-
-  if (selfSigner) {
-    selfSign = true;
-  }
-
   return (
     <div className="mx-auto -mt-4 w-full max-w-screen-xl px-4 md:px-8">
       <Link href="/documents" className="flex items-center text-[#7AC455] hover:opacity-80">
@@ -101,9 +91,6 @@ export default async function DocumentPage({ params }: DocumentPageProps) {
           recipients={recipients}
           fields={fields}
           dataUrl={documentDataUrl}
-          creatorName={user.name}
-          creatorEmail={user.email}
-          selfSignExist={selfSign}
         />
       )}
 

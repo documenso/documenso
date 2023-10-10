@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useId, useState } from 'react';
+import React, { useId, useMemo } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { AnimatePresence, motion } from 'framer-motion';
@@ -47,8 +47,6 @@ export const AddSignersFormPartial = ({
 }: AddSignersFormProps) => {
   const { toast } = useToast();
 
-  const [selfSignEnabled, setSelfSignEnabled] = useState<boolean>(selfSign);
-
   const initialId = useId();
 
   const {
@@ -87,6 +85,18 @@ export const AddSignersFormPartial = ({
     name: 'signers',
   });
 
+  const selfSignEnabled = useMemo(() => {
+    if (!signers || signers.length === 0 || !creatorEmail || !creatorName) {
+      return false;
+    }
+
+    const selfSigner = signers.some(
+      (signer) => signer.email === creatorEmail && signer.name === creatorName,
+    );
+
+    return selfSigner;
+  }, [signers, creatorEmail, creatorName]);
+
   const hasBeenSentToRecipientId = (id?: number) => {
     if (!id) {
       return false;
@@ -111,8 +121,6 @@ export const AddSignersFormPartial = ({
       name: creatorName,
       email: creatorEmail,
     });
-
-    setSelfSignEnabled(true);
   };
 
   const onRemoveSigner = (index: number) => {
@@ -126,10 +134,6 @@ export const AddSignersFormPartial = ({
       });
 
       return;
-    }
-
-    if (signer.email === creatorEmail && signer.name === creatorName) {
-      setSelfSignEnabled(false);
     }
 
     removeSigner(index);
@@ -151,7 +155,7 @@ export const AddSignersFormPartial = ({
             onClick={() => onAddSelfSigner()}
           >
             <Plus className="-ml-1 mr-2 h-5 w-5" />
-            Add Self Signer
+            Add My Self
           </Button>
           <AnimatePresence>
             {signers.map((signer, index) => (

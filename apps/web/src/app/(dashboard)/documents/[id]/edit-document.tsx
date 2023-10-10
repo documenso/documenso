@@ -1,8 +1,10 @@
 'use client';
 
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 
 import { useRouter } from 'next/navigation';
+
+import { useSession } from 'next-auth/react';
 
 import { Field, Recipient, User } from '@documenso/prisma/client';
 import { DocumentWithData } from '@documenso/prisma/types/document-with-data';
@@ -33,9 +35,6 @@ export type EditDocumentFormProps = {
   recipients: Recipient[];
   fields: Field[];
   dataUrl: string;
-  creatorName: string;
-  creatorEmail: string;
-  selfSignExist: boolean;
 };
 
 type EditDocumentStep = 'signers' | 'fields' | 'subject';
@@ -47,15 +46,37 @@ export const EditDocumentForm = ({
   fields,
   user: _user,
   dataUrl,
-  creatorEmail,
-  creatorName,
-  selfSignExist,
 }: EditDocumentFormProps) => {
   const { toast } = useToast();
   const router = useRouter();
+  const { data: session } = useSession();
+
+  if (!session) {
+    router.push('/');
+
+    toast({
+      title: 'Error',
+      description: 'You are not authorized, Please Login first.',
+      variant: 'destructive',
+    });
+  }
 
   const [step, setStep] = useState<EditDocumentStep>('signers');
-  const [selfSign, setSelfSign] = useState<boolean>(selfSignExist);
+
+  const creatorName = session?.user.name;
+  const creatorEmail = session?.user.email;
+
+  const selfSign = useMemo(() => {
+    if (!recipients || recipients.length === 0 || !creatorEmail || !creatorName) {
+      return false;
+    }
+
+    const selfSigner = recipients.some(
+      (signer) => signer.email === creatorEmail && signer.name === creatorName,
+    );
+
+    return selfSigner;
+  }, [recipients, creatorEmail, creatorName]);
 
   const documentFlow: Record<EditDocumentStep, DocumentFlowStep> = {
     signers: {
@@ -81,12 +102,6 @@ export const EditDocumentForm = ({
 
   const onAddSignersFormSubmit = async (data: TAddSignersFormSchema) => {
     try {
-      const selfSigner = data.signers.filter(
-        (signer) => signer.email === creatorEmail && signer.name === creatorName,
-      );
-
-      setSelfSign(selfSigner.length > 0);
-
       await addSigners({
         documentId: document.id,
         signers: data.signers,
@@ -198,8 +213,8 @@ export const EditDocumentForm = ({
               fields={fields}
               numberOfSteps={Object.keys(documentFlow).length}
               onSubmit={onAddSignersFormSubmit}
-              creatorEmail={creatorEmail}
-              creatorName={creatorName}
+              creatorEmail={creatorEmail ?? ''}
+              creatorName={creatorName ?? ''}
               selfSign={selfSign}
             />
           )}
