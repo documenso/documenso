@@ -19,7 +19,6 @@ import { LocaleDate } from '~/components/formatter/locale-date';
 
 import { DataTableActionButton } from './data-table-action-button';
 import { DataTableActionDropdown } from './data-table-action-dropdown';
-import { DataTableTitle } from './data-table-title';
 
 export type DocumentsDataTableProps = {
   results: FindResultSet<
@@ -60,7 +59,18 @@ export const DocumentsDataTable = ({ results }: DocumentsDataTableProps) => {
           },
           {
             header: 'Title',
-            cell: ({ row }) => <DataTableTitle row={row.original} />,
+            accessorKey: 'title',
+            cell: ({ row }) => {
+              return (
+                <Link
+                  title={row.original.title}
+                  className="block max-w-[10rem] truncate font-medium hover:underline md:max-w-[20rem]"
+                  href={`/documents/${row.original.id}`}
+                >
+                  {row.original.title}
+                </Link>
+              );
+            },
           },
           {
             header: 'Owner',
