@@ -4,7 +4,7 @@ import { Copy, Download, History, MoreHorizontal, Trash2, XCircle } from 'lucide
 import { useSession } from 'next-auth/react';
 
 import { getFile } from '@documenso/lib/universal/upload/get-file';
-import { Document, DocumentStatus, Recipient, User } from '@documenso/prisma/client';
+import { Document, DocumentStatus, User } from '@documenso/prisma/client';
 import { DocumentWithData } from '@documenso/prisma/types/document-with-data';
 import { trpc } from '@documenso/trpc/client';
 import {

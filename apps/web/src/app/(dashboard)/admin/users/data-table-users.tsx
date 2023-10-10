@@ -6,6 +6,7 @@ import Link from 'next/link';
 
 import { Edit, Loader } from 'lucide-react';
 
+import { useDebouncedValue } from '@documenso/lib/client-only/hooks/use-debounced-value';
 import { useUpdateSearchParams } from '@documenso/lib/client-only/hooks/use-update-search-params';
 import { Document, Role, Subscription } from '@documenso/prisma/client';
 import { Button } from '@documenso/ui/primitives/button';
@@ -13,8 +14,6 @@ import { DataTable } from '@documenso/ui/primitives/data-table';
 import { DataTablePagination } from '@documenso/ui/primitives/data-table-pagination';
 import { Input } from '@documenso/ui/primitives/input';
 import { useToast } from '@documenso/ui/primitives/use-toast';
-
-import { useDebouncedValue } from '~/hooks/use-debounced-value';
 
 import { search } from './fetch-users.actions';
 
