@@ -1,6 +1,6 @@
 'use client';
 
-import { useTransition } from 'react';
+import { useEffect, useState, useTransition } from 'react';
 
 import Link from 'next/link';
 
@@ -11,6 +11,12 @@ import { Document, Role, Subscription } from '@documenso/prisma/client';
 import { Button } from '@documenso/ui/primitives/button';
 import { DataTable } from '@documenso/ui/primitives/data-table';
 import { DataTablePagination } from '@documenso/ui/primitives/data-table-pagination';
+import { Input } from '@documenso/ui/primitives/input';
+import { useToast } from '@documenso/ui/primitives/use-toast';
+
+import { useDebouncedValue } from '~/hooks/use-debounced-value';
+
+import { search } from './fetch-users.actions';
 
 interface User {
   id: number;
@@ -29,15 +35,19 @@ type SubscriptionLite = Pick<
 type DocumentLite = Pick<Document, 'id'>;
 
 type UsersDataTableProps = {
-  users: User[];
   perPage: number;
   page: number;
-  totalPages: number;
 };
 
-export const UsersDataTable = ({ users, perPage, page, totalPages }: UsersDataTableProps) => {
+export const UsersDataTable = ({ perPage, page }: UsersDataTableProps) => {
+  const { toast } = useToast();
+
   const [isPending, startTransition] = useTransition();
   const updateSearchParams = useUpdateSearchParams();
+  const [data, setData] = useState<User[]>([]);
+  const [searchString, setSearchString] = useState('');
+  const [totalPages, setTotalPages] = useState<number>(0);
+  const debouncedSearchString = useDebouncedValue(searchString, 500);
 
   const onPaginationChange = (page: number, perPage: number) => {
     startTransition(() => {
@@ -48,8 +58,48 @@ export const UsersDataTable = ({ users, perPage, page, totalPages }: UsersDataTa
     });
   };
 
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const result = await search(debouncedSearchString, page, perPage);
+        setData(result.users);
+        setTotalPages(result.totalPages);
+
+        if (result.totalPages < page) {
+          startTransition(() => {
+            updateSearchParams({
+              page: 1,
+              perPage,
+            });
+          });
+        }
+      } catch (err) {
+        throw new Error(err);
+      }
+    };
+
+    fetchData().catch(() => {
+      toast({
+        title: 'Something went wrong',
+        description: 'Please try again',
+        variant: 'destructive',
+      });
+    });
+  }, [debouncedSearchString, page, perPage]);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchString(e.target.value);
+  };
+
   return (
     <div className="relative">
+      <Input
+        className="my-6 flex flex-row gap-4"
+        type="text"
+        placeholder="Search by name or email"
+        value={searchString}
+        onChange={handleChange}
+      />
       <DataTable
         columns={[
           {
@@ -125,7 +175,7 @@ export const UsersDataTable = ({ users, perPage, page, totalPages }: UsersDataTa
             },
           },
         ]}
-        data={users}
+        data={data}
         perPage={perPage}
         currentPage={page}
         totalPages={totalPages}
