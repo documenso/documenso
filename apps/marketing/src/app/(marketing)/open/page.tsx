@@ -1,12 +1,14 @@
 import { z } from 'zod';
 
+import { FUNDING_RAISED } from '~/app/(marketing)/open/data';
 import { MetricCard } from '~/app/(marketing)/open/metric-card';
 import { SalaryBands } from '~/app/(marketing)/open/salary-bands';
 
+import { BarMetric } from './bar-metrics';
 import { CapTable } from './cap-table';
 import { FundingRaised } from './funding-raised';
-import { GithubMetric } from './gh-metrics';
 import { TeamMembers } from './team-members';
+import { OpenPageTooltip } from './tooltip';
 
 export const revalidate = 3600;
 
@@ -29,9 +31,16 @@ const ZStargazersLiveResponse = z.record(
   }),
 );
 
-export type StargazersType = z.infer<typeof ZStargazersLiveResponse>;
+const ZEarlyAdoptersResponse = z.record(
+  z.object({
+    id: z.number(),
+    time: z.string().datetime(),
+    earlyAdopters: z.number(),
+  }),
+);
 
-// const ZOpenPullRequestsResponse = ZMergedPullRequestsResponse;
+export type StargazersType = z.infer<typeof ZStargazersLiveResponse>;
+export type EarlyAdoptersType = z.infer<typeof ZEarlyAdoptersResponse>;
 
 export default async function OpenPage() {
   const {
@@ -65,8 +74,16 @@ export default async function OpenPage() {
     .then(async (res) => res.json())
     .then((res) => ZStargazersLiveResponse.parse(res));
 
+  const EARLY_ADOPTERS_DATA = await fetch('https://stargrazer-live.onrender.com/api/stats/stripe', {
+    headers: {
+      accept: 'application/json',
+    },
+  })
+    .then(async (res) => res.json())
+    .then((res) => ZEarlyAdoptersResponse.parse(res));
+
   return (
-    <div className="mx-auto mt-12 max-w-screen-lg">
+    <div className="mx-auto mt-6 max-w-screen-lg sm:mt-12">
       <div className="flex flex-col items-center justify-center">
         <h1 className="text-3xl font-bold lg:text-5xl">Open Startup</h1>
 
@@ -107,10 +124,20 @@ export default async function OpenPage() {
 
         <SalaryBands className="col-span-12 lg:col-span-6" />
 
-        <FundingRaised className="col-span-12 lg:col-span-6" />
+        <FundingRaised data={FUNDING_RAISED} className="col-span-12 lg:col-span-6" />
 
         <CapTable className="col-span-12 lg:col-span-6" />
-        <GithubMetric
+
+        <BarMetric<EarlyAdoptersType>
+          data={EARLY_ADOPTERS_DATA}
+          metricKey="earlyAdopters"
+          title="Early Adopters"
+          label="Early Adopters"
+          className="col-span-12 lg:col-span-6"
+          extraInfo={<OpenPageTooltip />}
+        />
+
+        <BarMetric<StargazersType>
           data={STARGAZERS_DATA}
           metricKey="stars"
           title="Github: Total Stars"
@@ -118,29 +145,31 @@ export default async function OpenPage() {
           className="col-span-12 lg:col-span-6"
         />
 
-        <GithubMetric
+        <BarMetric<StargazersType>
           data={STARGAZERS_DATA}
           metricKey="mergedPRs"
           title="Github: Total Merged PRs"
           label="Merged PRs"
           chartHeight={300}
-          className="col-span-12 lg:col-span-4"
+          className="col-span-12 lg:col-span-6"
         />
-        <GithubMetric
+
+        <BarMetric<StargazersType>
           data={STARGAZERS_DATA}
           metricKey="forks"
           title="Github: Total Forks"
           label="Forks"
           chartHeight={300}
-          className="col-span-12 lg:col-span-4"
+          className="col-span-12 lg:col-span-6"
         />
-        <GithubMetric
+
+        <BarMetric<StargazersType>
           data={STARGAZERS_DATA}
           metricKey="openIssues"
           title="Github: Total Open Issues"
           label="Open Issues"
           chartHeight={300}
-          className="col-span-12 lg:col-span-4"
+          className="col-span-12 lg:col-span-6"
         />
 
         <div className="col-span-12 mt-12 flex flex-col items-center justify-center">

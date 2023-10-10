@@ -30,11 +30,11 @@ export default async function DocumentPage({ params }: DocumentPageProps) {
     redirect('/documents');
   }
 
-  const session = await getRequiredServerComponentSession();
+  const { user } = await getRequiredServerComponentSession();
 
   const document = await getDocumentById({
     id: documentId,
-    userId: session.id,
+    userId: user.id,
   }).catch(() => null);
 
   if (!document || !document.documentData) {
@@ -50,11 +50,11 @@ export default async function DocumentPage({ params }: DocumentPageProps) {
   const [recipients, fields] = await Promise.all([
     await getRecipientsForDocument({
       documentId,
-      userId: session.id,
+      userId: user.id,
     }),
     await getFieldsForDocument({
       documentId,
-      userId: session.id,
+      userId: user.id,
     }),
   ]);
 
@@ -65,10 +65,7 @@ export default async function DocumentPage({ params }: DocumentPageProps) {
         Documents
       </Link>
 
-      <h1
-        className="mt-4 max-w-xs truncate text-2xl font-semibold md:text-3xl"
-        title={document.title}
-      >
+      <h1 className="mt-4 truncate text-2xl font-semibold md:text-3xl" title={document.title}>
         {document.title}
       </h1>
 
@@ -90,7 +87,7 @@ export default async function DocumentPage({ params }: DocumentPageProps) {
         <EditDocumentForm
           className="mt-8"
           document={document}
-          user={session}
+          user={user}
           recipients={recipients}
           fields={fields}
           dataUrl={documentDataUrl}

@@ -1,3 +1,10 @@
+import { APP_BASE_URL } from './app';
+
+/**
+ * The flag name for global session recording feature flag.
+ */
+export const FEATURE_FLAG_GLOBAL_SESSION_RECORDING = 'global_session_recording';
+
 /**
  * How frequent to poll for new feature flags in milliseconds.
  */
@@ -10,6 +17,7 @@ export const FEATURE_FLAG_POLL_INTERVAL = 30000;
  */
 export const LOCAL_FEATURE_FLAGS: Record<string, boolean> = {
   app_billing: process.env.NEXT_PUBLIC_FEATURE_BILLING_ENABLED === 'true',
+  marketing_header_single_player_mode: false,
 } as const;
 
 /**
@@ -17,7 +25,7 @@ export const LOCAL_FEATURE_FLAGS: Record<string, boolean> = {
  */
 export function extractPostHogConfig(): { key: string; host: string } | null {
   const postHogKey = process.env.NEXT_PUBLIC_POSTHOG_KEY;
-  const postHogHost = process.env.NEXT_PUBLIC_POSTHOG_HOST;
+  const postHogHost = `${APP_BASE_URL}/ingest`;
 
   if (!postHogKey || !postHogHost) {
     return null;

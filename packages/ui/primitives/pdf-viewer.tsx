@@ -8,6 +8,7 @@ import { Document as PDFDocument, Page as PDFPage, pdfjs } from 'react-pdf';
 import 'react-pdf/dist/esm/Page/AnnotationLayer.css';
 import 'react-pdf/dist/esm/Page/TextLayer.css';
 
+import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
 import { cn } from '@documenso/ui/lib/utils';
 
 export type LoadedPDFDocument = PDFDocumentProxy;
@@ -30,18 +31,27 @@ export type OnPDFViewerPageClick = (_event: {
 export type PDFViewerProps = {
   className?: string;
   document: string;
+  onDocumentLoad?: (_doc: LoadedPDFDocument) => void;
   onPageClick?: OnPDFViewerPageClick;
   [key: string]: unknown;
-};
+} & Omit<React.HTMLAttributes<HTMLDivElement>, 'onPageClick'>;
 
-export const PDFViewer = ({ className, document, onPageClick, ...props }: PDFViewerProps) => {
+export const PDFViewer = ({
+  className,
+  document,
+  onDocumentLoad,
+  onPageClick,
+  ...props
+}: PDFViewerProps) => {
   const $el = useRef<HTMLDivElement>(null);
 
   const [width, setWidth] = useState(0);
   const [numPages, setNumPages] = useState(0);
+  const [pdfError, setPdfError] = useState(false);
 
   const onDocumentLoaded = (doc: LoadedPDFDocument) => {
     setNumPages(doc.numPages);
+    onDocumentLoad?.(doc);
   };
 
   const onDocumentPageClick = (
@@ -54,7 +64,7 @@ export const PDFViewer = ({ className, document, onPageClick, ...props }: PDFVie
       return;
     }
 
-    const $page = $el.closest('.react-pdf__Page');
+    const $page = $el.closest(PDF_VIEWER_PAGE_SELECTOR);
 
     if (!$page) {
       return;
@@ -108,12 +118,34 @@ export const PDFViewer = ({ className, document, onPageClick, ...props }: PDFVie
           'h-[80vh] max-h-[60rem]': numPages === 0,
         })}
         onLoadSuccess={(d) => onDocumentLoaded(d)}
+        // Uploading a invalid document causes an error which doesn't appear to be handled by the `error` prop.
+        // Therefore we add some additional custom error handling.
+        onSourceError={() => {
+          setPdfError(true);
+        }}
         externalLinkTarget="_blank"
         loading={
           <div className="dark:bg-background flex h-[80vh] max-h-[60rem] flex-col items-center justify-center bg-white/50">
-            <Loader className="text-documenso h-12 w-12 animate-spin" />
+            {pdfError ? (
+              <div className="text-muted-foreground text-center">
+                <p>Something went wrong while loading the document.</p>
+                <p className="mt-1 text-sm">Please try again or contact our support.</p>
+              </div>
+            ) : (
+              <>
+                <Loader className="text-documenso h-12 w-12 animate-spin" />
 
-            <p className="text-muted-foreground mt-4">Loading document...</p>
+                <p className="text-muted-foreground mt-4">Loading document...</p>
+              </>
+            )}
+          </div>
+        }
+        error={
+          <div className="dark:bg-background flex h-[80vh] max-h-[60rem] flex-col items-center justify-center bg-white/50">
+            <div className="text-muted-foreground text-center">
+              <p>Something went wrong while loading the document.</p>
+              <p className="mt-1 text-sm">Please try again or contact our support.</p>
+            </div>
           </div>
         }
       >
@@ -129,6 +161,7 @@ export const PDFViewer = ({ className, document, onPageClick, ...props }: PDFVie
                 width={width}
                 renderAnnotationLayer={false}
                 renderTextLayer={false}
+                loading={() => ''}
                 onClick={(e) => onDocumentPageClick(e, i + 1)}
               />
             </div>

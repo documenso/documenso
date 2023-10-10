@@ -1,11 +1,9 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-
-import { useSearchParams } from 'next/navigation';
+import { useState } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Eye, EyeOff, Loader } from 'lucide-react';
+import { Eye, EyeOff } from 'lucide-react';
 import { signIn } from 'next-auth/react';
 import { useForm } from 'react-hook-form';
 import { FcGoogle } from 'react-icons/fc';
@@ -40,8 +38,6 @@ export type SignInFormProps = {
 };
 
 export const SignInForm = ({ className }: SignInFormProps) => {
-  const searchParams = useSearchParams();
-
   const { toast } = useToast();
   const [showPassword, setShowPassword] = useState(false);
 
@@ -57,36 +53,29 @@ export const SignInForm = ({ className }: SignInFormProps) => {
     resolver: zodResolver(ZSignInFormSchema),
   });
 
-  const errorCode = searchParams?.get('error');
-
-  useEffect(() => {
-    let timeout: NodeJS.Timeout | null = null;
-
-    if (isErrorCode(errorCode)) {
-      timeout = setTimeout(() => {
-        toast({
-          variant: 'destructive',
-          description: ERROR_MESSAGES[errorCode] ?? 'An unknown error occurred',
-        });
-      }, 0);
-    }
-
-    return () => {
-      if (timeout) {
-        clearTimeout(timeout);
-      }
-    };
-  }, [errorCode, toast]);
-
   const onFormSubmit = async ({ email, password }: TSignInFormSchema) => {
     try {
-      await signIn('credentials', {
+      const result = await signIn('credentials', {
         email,
         password,
         callbackUrl: LOGIN_REDIRECT_PATH,
-      }).catch((err) => {
-        console.error(err);
+        redirect: false,
       });
+
+      if (result?.error && isErrorCode(result.error)) {
+        toast({
+          variant: 'destructive',
+          description: ERROR_MESSAGES[result.error],
+        });
+
+        return;
+      }
+
+      if (!result?.url) {
+        throw new Error('An unknown error occurred');
+      }
+
+      window.location.href = result.url;
     } catch (err) {
       toast({
         title: 'An unknown error occurred',
@@ -158,9 +147,13 @@ export const SignInForm = ({ className }: SignInFormProps) => {
         <FormErrorMessage className="mt-1.5" error={errors.password} />
       </div>
 
-      <Button size="lg" disabled={isSubmitting} className="dark:bg-documenso dark:hover:opacity-90">
-        {isSubmitting && <Loader className="mr-2 h-5 w-5 animate-spin" />}
-        Sign In
+      <Button
+        size="lg"
+        loading={isSubmitting}
+        disabled={isSubmitting}
+        className="dark:bg-documenso dark:hover:opacity-90"
+      >
+        {isSubmitting ? 'Signing in...' : 'Sign In'}
       </Button>
 
       <div className="relative flex items-center justify-center gap-x-4 py-2 text-xs uppercase">

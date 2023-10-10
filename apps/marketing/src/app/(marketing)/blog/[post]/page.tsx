@@ -39,21 +39,21 @@ export default function BlogPostPage({ params }: { params: { post: string } }) {
   const MDXContent = useMDXComponent(post.body.code);
 
   return (
-    <article className="prose prose-slate mx-auto py-8">
+    <article className="prose dark:prose-invert mx-auto py-8">
       <div className="mb-6 text-center">
-        <time dateTime={post.date} className="mb-1 text-xs text-gray-600">
+        <time dateTime={post.date} className="text-muted-foreground mb-1 text-xs">
           {new Date(post.date).toLocaleDateString()}
         </time>
 
         <h1 className="text-3xl font-bold">{post.title}</h1>
 
         <div className="not-prose relative -mt-2 flex items-center gap-x-4 border-b border-t py-4">
-          <div className="h-10 w-10 rounded-full bg-gray-50">
+          <div className="bg-foreground h-10 w-10 rounded-full">
             {post.authorImage && (
               <img
                 src={post.authorImage}
                 alt={`Image of ${post.authorName}`}
-                className="h-10 w-10 rounded-full bg-gray-50"
+                className="bg-foreground/10 h-10 w-10 rounded-full"
               />
             )}
           </div>

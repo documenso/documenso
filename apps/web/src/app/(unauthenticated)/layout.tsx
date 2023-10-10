@@ -16,7 +16,7 @@ export default function UnauthenticatedLayout({ children }: UnauthenticatedLayou
           <Image
             src={backgroundPattern}
             alt="background pattern"
-            className="dark:brightness-95 dark:invert dark:sepia"
+            className="dark:brightness-95 dark:contrast-[70%] dark:invert dark:sepia"
           />
         </div>
 

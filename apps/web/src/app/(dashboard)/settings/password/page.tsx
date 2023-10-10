@@ -3,7 +3,7 @@ import { getRequiredServerComponentSession } from '@documenso/lib/next-auth/get-
 import { PasswordForm } from '~/components/forms/password';
 
 export default async function PasswordSettingsPage() {
-  const user = await getRequiredServerComponentSession();
+  const { user } = await getRequiredServerComponentSession();
 
   return (
     <div>

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import { useSearchParams } from 'next/navigation';
 
@@ -10,6 +10,7 @@ import { usePlausible } from 'next-plausible';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
+import { useAnalytics } from '@documenso/lib/client-only/hooks/use-analytics';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
 import {
@@ -43,8 +44,10 @@ export type ClaimPlanDialogProps = {
 
 export const ClaimPlanDialog = ({ className, planId, children }: ClaimPlanDialogProps) => {
   const params = useSearchParams();
-  const { toast } = useToast();
+  const analytics = useAnalytics();
   const event = usePlausible();
+
+  const { toast } = useToast();
 
   const [open, setOpen] = useState(() => params?.get('cancelled') === 'true');
 
@@ -52,8 +55,8 @@ export const ClaimPlanDialog = ({ className, planId, children }: ClaimPlanDialog
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
+    reset,
   } = useForm<TClaimPlanDialogFormSchema>({
-    mode: 'onBlur',
     defaultValues: {
       name: params?.get('name') ?? '',
       email: params?.get('email') ?? '',
@@ -73,10 +76,12 @@ export const ClaimPlanDialog = ({ className, planId, children }: ClaimPlanDialog
       ]);
 
       event('claim-plan-pricing');
+      analytics.capture('Marketing: Claim plan', { planId, email });
 
       window.location.href = redirectUrl;
     } catch (error) {
       event('claim-plan-failed');
+      analytics.capture('Marketing: Claim plan failure', { planId, email });
 
       toast({
         title: 'Something went wrong',
@@ -85,6 +90,12 @@ export const ClaimPlanDialog = ({ className, planId, children }: ClaimPlanDialog
       });
     }
   };
+
+  useEffect(() => {
+    if (!isSubmitting && !open) {
+      reset();
+    }
+  }, [open]);
 
   return (
     <Dialog open={open} onOpenChange={(value) => !isSubmitting && setOpen(value)}>
@@ -118,7 +129,7 @@ export const ClaimPlanDialog = ({ className, planId, children }: ClaimPlanDialog
             )}
 
             <div>
-              <Label className="text-slate-500">Name</Label>
+              <Label className="text-muted-foreground">Name</Label>
 
               <Input type="text" className="mt-2" {...register('name')} autoFocus />
 
@@ -126,7 +137,7 @@ export const ClaimPlanDialog = ({ className, planId, children }: ClaimPlanDialog
             </div>
 
             <div>
-              <Label className="text-slate-500">Email</Label>
+              <Label className="text-muted-foreground">Email</Label>
 
               <Input type="email" className="mt-2" {...register('email')} />
 
@@ -134,7 +145,7 @@ export const ClaimPlanDialog = ({ className, planId, children }: ClaimPlanDialog
             </div>
 
             <Button type="submit" size="lg" loading={isSubmitting}>
-              Claim the Community Plan (
+              Claim the early adopters Plan (
               {/* eslint-disable-next-line turbo/no-undeclared-env-vars */}
               {planId === process.env.NEXT_PUBLIC_STRIPE_COMMUNITY_PLAN_MONTHLY_PRICE_ID
                 ? 'Monthly'
