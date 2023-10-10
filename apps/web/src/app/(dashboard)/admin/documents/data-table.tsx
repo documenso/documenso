@@ -4,33 +4,30 @@ import { useTransition } from 'react';
 
 import Link from 'next/link';
 
-import { Loader } from 'lucide-react';
-import { useSession } from 'next-auth/react';
+import { Edit, Loader } from 'lucide-react';
 
 import { useUpdateSearchParams } from '@documenso/lib/client-only/hooks/use-update-search-params';
 import { FindResultSet } from '@documenso/lib/types/find-result-set';
-import { Document, Recipient, User } from '@documenso/prisma/client';
+import { Document, User } from '@documenso/prisma/client';
 import { Avatar, AvatarFallback } from '@documenso/ui/primitives/avatar';
+import { Button } from '@documenso/ui/primitives/button';
 import { DataTable } from '@documenso/ui/primitives/data-table';
 import { DataTablePagination } from '@documenso/ui/primitives/data-table-pagination';
 
 import { DocumentStatus } from '~/components/formatter/document-status';
 import { LocaleDate } from '~/components/formatter/locale-date';
 
-import { DataTableActionButton } from './data-table-action-button';
 import { DataTableActionDropdown } from './data-table-action-dropdown';
 
 export type DocumentsDataTableProps = {
   results: FindResultSet<
     Document & {
-      Recipient: Recipient[];
       User: Pick<User, 'id' | 'name' | 'email'>;
     }
   >;
 };
 
 export const DocumentsDataTable = ({ results }: DocumentsDataTableProps) => {
-  const { data: session } = useSession();
   const [isPending, startTransition] = useTransition();
 
   const updateSearchParams = useUpdateSearchParams();
@@ -43,10 +40,6 @@ export const DocumentsDataTable = ({ results }: DocumentsDataTableProps) => {
       });
     });
   };
-
-  if (!session) {
-    return null;
-  }
 
   return (
     <div className="relative">
@@ -65,7 +58,13 @@ export const DocumentsDataTable = ({ results }: DocumentsDataTableProps) => {
                 <Link
                   title={row.original.title}
                   className="block max-w-[10rem] truncate font-medium hover:underline md:max-w-[20rem]"
-                  href={`/documents/${row.original.id}`}
+                  href={{
+                    pathname: `/admin/documents/${row.original.id}`,
+                    query: {
+                      userId: row.original.User.id,
+                      documentId: row.original.id,
+                    },
+                  }}
                 >
                   {row.original.title}
                 </Link>
@@ -90,13 +89,18 @@ export const DocumentsDataTable = ({ results }: DocumentsDataTableProps) => {
           {
             header: 'Status',
             accessorKey: 'status',
-            cell: ({ row }) => <DocumentStatus status={row.getValue('status')} />,
+            cell: ({ row }) => <DocumentStatus status={row.original.status} />,
           },
           {
             header: 'Actions',
             cell: ({ row }) => (
               <div className="flex items-center gap-x-4">
-                <DataTableActionButton row={row.original} />
+                <Button className="w-24" asChild>
+                  <Link href={`/documents/${row.original.id}`}>
+                    <Edit className="-ml-1 mr-2 h-4 w-4" />
+                    Edit
+                  </Link>
+                </Button>
                 <DataTableActionDropdown row={row.original} />
               </div>
             ),
