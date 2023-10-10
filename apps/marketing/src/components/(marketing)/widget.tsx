@@ -377,7 +377,7 @@ export const Widget = ({ className, children, ...props }: WidgetProps) => {
       </Card>
 
       <Dialog open={showSigningDialog} onOpenChange={setShowSigningDialog}>
-        <DialogContent>
+        <DialogContent position="center">
           <DialogHeader>
             <DialogTitle>Add your signature</DialogTitle>
           </DialogHeader>

@@ -72,3 +72,9 @@ export const ZResendDocumentMutationSchema = z.object({
 });
 
 export type TSendDocumentMutationSchema = z.infer<typeof ZSendDocumentMutationSchema>;
+
+export const ZDeleteDraftDocumentMutationSchema = z.object({
+  id: z.number().min(1),
+});
+
+export type TDeleteDraftDocumentMutationSchema = z.infer<typeof ZDeleteDraftDocumentMutationSchema>;

@@ -18,12 +18,13 @@ const DialogPortal = ({
   children,
   position = 'start',
   ...props
-}: DialogPrimitive.DialogPortalProps & { position?: 'start' | 'end' }) => (
+}: DialogPrimitive.DialogPortalProps & { position?: 'start' | 'end' | 'center' }) => (
   <DialogPrimitive.Portal className={cn(className)} {...props}>
     <div
       className={cn('fixed inset-0 z-50 flex justify-center sm:items-center', {
         'items-start': position === 'start',
         'items-end': position === 'end',
+        'items-center': position === 'center',
       })}
     >
       {children}
@@ -52,7 +53,7 @@ DialogOverlay.displayName = DialogPrimitive.Overlay.displayName;
 const DialogContent = React.forwardRef<
   React.ElementRef<typeof DialogPrimitive.Content>,
   React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content> & {
-    position?: 'start' | 'end';
+    position?: 'start' | 'end' | 'center';
     hideClose?: boolean;
   }
 >(({ className, children, position = 'start', hideClose = false, ...props }, ref) => (

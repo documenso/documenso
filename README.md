@@ -179,7 +179,7 @@ git clone https://github.com/documenso/documenso
    - NEXT_PRIVATE_SMTP_FROM_NAME
    - NEXT_PRIVATE_SMTP_FROM_ADDRESS
 
-5. Create the database schema by running `npm run prisma:migrate-dev -w @documenso/prisma`
+5. Create the database schema by running `npm run prisma:migrate-dev`
 
 6. Run `npm run dev` root directory to start
 
@@ -253,6 +253,22 @@ containers:
       - -H
       - '::'
 ```
+
+### I can't see environment variables in my package scripts
+
+Wrap your package script with the `with:env` script like such:
+
+```
+npm run with:env -- npm run myscript
+```
+
+The same can be done when using `npx` for one of bin scripts:
+
+```
+npm run with:env -- npx myscript
+```
+
+This will load environment variables from your `.env` and `.env.local` files.
 
 ## Repo Activity
 
