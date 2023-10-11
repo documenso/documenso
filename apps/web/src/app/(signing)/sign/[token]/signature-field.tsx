@@ -48,7 +48,7 @@ export const SignatureField = ({ field, recipient }: SignatureFieldProps) => {
 
   const [showSignatureModal, setShowSignatureModal] = useState(false);
   const [localSignature, setLocalSignature] = useState<string | null>(null);
-  const [isDocumentSigned, setIsDocumentSigned] = useState(false);
+  const [isLocalSignatureSet, setIsLocalSignatureSet] = useState(false);
   const state = useMemo<SignatureFieldState>(() => {
     if (!field.inserted) {
       return 'empty';
@@ -62,15 +62,15 @@ export const SignatureField = ({ field, recipient }: SignatureFieldProps) => {
   }, [field.inserted, signature?.signatureImageAsBase64]);
 
   useEffect(() => {
-    if (showSignatureModal == false && isDocumentSigned == false) {
+    if (!showSignatureModal && !isLocalSignatureSet) {
       setLocalSignature(null);
-      return;
     }
-  }, [showSignatureModal]);
+  }, [showSignatureModal, isLocalSignatureSet]);
+
   const onSign = async (source: 'local' | 'provider' = 'provider') => {
     try {
       if (!providedSignature && !localSignature) {
-        setIsDocumentSigned(false);
+        setIsLocalSignatureSet(false);
         setShowSignatureModal(true);
         return;
       }
@@ -185,7 +185,7 @@ export const SignatureField = ({ field, recipient }: SignatureFieldProps) => {
                 disabled={!localSignature}
                 onClick={() => {
                   setShowSignatureModal(false);
-                  setIsDocumentSigned(true);
+                  setIsLocalSignatureSet(true);
                   void onSign('local');
                 }}
               >
