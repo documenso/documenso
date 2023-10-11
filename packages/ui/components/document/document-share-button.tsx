@@ -5,8 +5,10 @@ import { HTMLAttributes, useState } from 'react';
 import { Copy, Share } from 'lucide-react';
 import { FaXTwitter } from 'react-icons/fa6';
 
+import { useCopyToClipboard } from '@documenso/lib/client-only/hooks/use-copy-to-clipboard';
 import { generateTwitterIntent } from '@documenso/lib/universal/generate-twitter-intent';
 import { trpc } from '@documenso/trpc/react';
+import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
 import {
   Dialog,
@@ -18,14 +20,12 @@ import {
 } from '@documenso/ui/primitives/dialog';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
-import { useCopyToClipboard } from '~/hooks/use-copy-to-clipboard';
-
-export type ShareButtonProps = HTMLAttributes<HTMLButtonElement> & {
+export type DocumentShareButtonProps = HTMLAttributes<HTMLButtonElement> & {
   token: string;
   documentId: number;
 };
 
-export const ShareButton = ({ token, documentId }: ShareButtonProps) => {
+export const DocumentShareButton = ({ token, documentId, className }: DocumentShareButtonProps) => {
   const { toast } = useToast();
   const [, copyToClipboard] = useCopyToClipboard();
 
@@ -99,7 +99,7 @@ export const ShareButton = ({ token, documentId }: ShareButtonProps) => {
         <Button
           variant="outline"
           disabled={!token || !documentId}
-          className="flex-1"
+          className={cn('flex-1', className)}
           loading={isLoading}
         >
           {!isLoading && <Share className="mr-2 h-5 w-5" />}

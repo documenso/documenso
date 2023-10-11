@@ -6,12 +6,11 @@ import { Edit, Pencil, Share } from 'lucide-react';
 import { useSession } from 'next-auth/react';
 import { match } from 'ts-pattern';
 
+import { useCopyToClipboard } from '@documenso/lib/client-only/hooks/use-copy-to-clipboard';
 import { Document, DocumentStatus, Recipient, SigningStatus, User } from '@documenso/prisma/client';
 import { trpc } from '@documenso/trpc/react';
 import { Button } from '@documenso/ui/primitives/button';
 import { useToast } from '@documenso/ui/primitives/use-toast';
-
-import { useCopyToClipboard } from '~/hooks/use-copy-to-clipboard';
 
 export type DataTableActionButtonProps = {
   row: Document & {

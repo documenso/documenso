@@ -18,6 +18,7 @@ import {
 } from 'lucide-react';
 import { useSession } from 'next-auth/react';
 
+import { useCopyToClipboard } from '@documenso/lib/client-only/hooks/use-copy-to-clipboard';
 import { getFile } from '@documenso/lib/universal/upload/get-file';
 import { Document, DocumentStatus, Recipient, User } from '@documenso/prisma/client';
 import { DocumentWithData } from '@documenso/prisma/types/document-with-data';
@@ -31,8 +32,6 @@ import {
   DropdownMenuTrigger,
 } from '@documenso/ui/primitives/dropdown-menu';
 import { useToast } from '@documenso/ui/primitives/use-toast';
-
-import { useCopyToClipboard } from '~/hooks/use-copy-to-clipboard';
 
 import { DeleteDraftDocumentDialog } from './delete-draft-document-dialog';
 
