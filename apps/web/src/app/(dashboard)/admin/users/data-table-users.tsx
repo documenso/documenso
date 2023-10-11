@@ -13,9 +13,6 @@ import { Button } from '@documenso/ui/primitives/button';
 import { DataTable } from '@documenso/ui/primitives/data-table';
 import { DataTablePagination } from '@documenso/ui/primitives/data-table-pagination';
 import { Input } from '@documenso/ui/primitives/input';
-import { useToast } from '@documenso/ui/primitives/use-toast';
-
-import { search } from './fetch-users.actions';
 
 interface User {
   id: number;
@@ -34,19 +31,27 @@ type SubscriptionLite = Pick<
 type DocumentLite = Pick<Document, 'id'>;
 
 type UsersDataTableProps = {
+  users: User[];
+  totalPages: number;
   perPage: number;
   page: number;
 };
 
-export const UsersDataTable = ({ perPage, page }: UsersDataTableProps) => {
-  const { toast } = useToast();
-
+export const UsersDataTable = ({ users, totalPages, perPage, page }: UsersDataTableProps) => {
   const [isPending, startTransition] = useTransition();
   const updateSearchParams = useUpdateSearchParams();
-  const [data, setData] = useState<User[]>([]);
   const [searchString, setSearchString] = useState('');
-  const [totalPages, setTotalPages] = useState<number>(0);
-  const debouncedSearchString = useDebouncedValue(searchString, 500);
+  const debouncedSearchString = useDebouncedValue(searchString, 1000);
+
+  useEffect(() => {
+    startTransition(() => {
+      updateSearchParams({
+        search: debouncedSearchString,
+        page: 1,
+        perPage,
+      });
+    });
+  }, [debouncedSearchString]);
 
   const onPaginationChange = (page: number, perPage: number) => {
     startTransition(() => {
@@ -56,35 +61,6 @@ export const UsersDataTable = ({ perPage, page }: UsersDataTableProps) => {
       });
     });
   };
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const result = await search(debouncedSearchString, page, perPage);
-        setData(result.users);
-        setTotalPages(result.totalPages);
-
-        if (result.totalPages < page) {
-          startTransition(() => {
-            updateSearchParams({
-              page: 1,
-              perPage,
-            });
-          });
-        }
-      } catch (err) {
-        throw new Error(err);
-      }
-    };
-
-    fetchData().catch(() => {
-      toast({
-        title: 'Something went wrong',
-        description: 'Please try again',
-        variant: 'destructive',
-      });
-    });
-  }, [debouncedSearchString, page, perPage]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchString(e.target.value);
@@ -174,7 +150,7 @@ export const UsersDataTable = ({ perPage, page }: UsersDataTableProps) => {
             },
           },
         ]}
-        data={data}
+        data={users}
         perPage={perPage}
         currentPage={page}
         totalPages={totalPages}
