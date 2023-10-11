@@ -1,0 +1,8 @@
+{
+  "extends": "@documenso/tsconfig/react-library.json",
+  "compilerOptions": {
+    "types": ["@documenso/tsconfig/process-env.d.ts", "@types/node"]
+  },
+  "include": ["**/*.ts", "**/*.tsx", "**/*.d.ts", "**/*.json"],
+  "exclude": ["dist", "build", "node_modules"]
+}

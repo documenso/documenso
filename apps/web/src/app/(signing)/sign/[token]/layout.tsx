@@ -10,11 +10,11 @@ export type SigningLayoutProps = {
 };
 
 export default async function SigningLayout({ children }: SigningLayoutProps) {
-  const user = await getServerComponentSession();
+  const { user, session } = await getServerComponentSession();
 
   return (
-    <NextAuthProvider>
-      <div className="min-h-screen overflow-hidden">
+    <NextAuthProvider session={session}>
+      <div className="min-h-screen">
         {user && <AuthenticatedHeader user={user} />}
 
         <main className="mb-8 mt-8 px-4 md:mb-12 md:mt-12 md:px-8">{children}</main>

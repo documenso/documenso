@@ -19,19 +19,29 @@ enum Role {
 }
 
 model User {
-  id               Int              @id @default(autoincrement())
-  name             String?
-  email            String           @unique
-  emailVerified    DateTime?
-  password         String?
-  source           String?
-  signature        String?
-  roles            Role[]           @default([USER])
-  identityProvider IdentityProvider @default(DOCUMENSO)
-  accounts         Account[]
-  sessions         Session[]
-  Document         Document[]
-  Subscription     Subscription[]
+  id                 Int                  @id @default(autoincrement())
+  name               String?
+  email              String               @unique
+  emailVerified      DateTime?
+  password           String?
+  source             String?
+  signature          String?
+  roles              Role[]               @default([USER])
+  identityProvider   IdentityProvider     @default(DOCUMENSO)
+  accounts           Account[]
+  sessions           Session[]
+  Document           Document[]
+  Subscription       Subscription[]
+  PasswordResetToken PasswordResetToken[]
+}
+
+model PasswordResetToken {
+  id        Int      @id @default(autoincrement())
+  token     String   @unique
+  createdAt DateTime @default(now())
+  expiry    DateTime
+  userId    Int
+  User      User     @relation(fields: [userId], references: [id])
 }
 
 enum SubscriptionStatus {
@@ -92,15 +102,17 @@ enum DocumentStatus {
 }
 
 model Document {
-  id             Int            @id @default(autoincrement())
+  id             Int                 @id @default(autoincrement())
   userId         Int
-  User           User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  User           User                @relation(fields: [userId], references: [id], onDelete: Cascade)
   title          String
-  status         DocumentStatus @default(DRAFT)
+  status         DocumentStatus      @default(DRAFT)
   Recipient      Recipient[]
   Field          Field[]
+  ShareLink      DocumentShareLink[]
   documentDataId String
   documentData   DocumentData   @relation(fields: [documentDataId], references: [id], onDelete: Cascade)
+  documentMeta   DocumentMeta?
   createdAt      DateTime       @default(now())
   updatedAt      DateTime       @default(now()) @updatedAt
 
@@ -119,6 +131,14 @@ model DocumentData {
   data        String
   initialData String
   Document    Document?
+}
+
+model DocumentMeta {
+  id       String    @id @default(cuid())
+  subject  String?
+  message  String?
+  documentId Int @unique
+  document Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
 }
 
 enum ReadStatus {
@@ -190,4 +210,17 @@ model Signature {
 
   Recipient Recipient @relation(fields: [recipientId], references: [id], onDelete: Cascade)
   Field     Field     @relation(fields: [fieldId], references: [id], onDelete: Restrict)
+}
+
+model DocumentShareLink {
+  id         Int      @id @default(autoincrement())
+  email      String
+  slug       String   @unique
+  documentId Int
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  document Document @relation(fields: [documentId], references: [id])
+
+  @@unique([documentId, email])
 }

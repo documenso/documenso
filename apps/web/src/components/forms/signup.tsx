@@ -1,7 +1,9 @@
 'use client';
 
+import { useState } from 'react';
+
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Loader } from 'lucide-react';
+import { Eye, EyeOff } from 'lucide-react';
 import { signIn } from 'next-auth/react';
 import { Controller, useForm } from 'react-hook-form';
 import { z } from 'zod';
@@ -31,6 +33,7 @@ export type SignUpFormProps = {
 
 export const SignUpForm = ({ className }: SignUpFormProps) => {
   const { toast } = useToast();
+  const [showPassword, setShowPassword] = useState(false);
 
   const {
     control,
@@ -106,15 +109,31 @@ export const SignUpForm = ({ className }: SignUpFormProps) => {
           Password
         </Label>
 
-        <Input
-          id="password"
-          type="password"
-          minLength={6}
-          maxLength={72}
-          autoComplete="new-password"
-          className="bg-background mt-2"
-          {...register('password')}
-        />
+        <div className="relative">
+          <Input
+            id="password"
+            type={showPassword ? 'text' : 'password'}
+            minLength={6}
+            maxLength={72}
+            autoComplete="new-password"
+            className="bg-background mt-2 pr-10"
+            {...register('password')}
+          />
+
+          <Button
+            variant="link"
+            type="button"
+            className="absolute right-0 top-0 flex h-full items-center justify-center pr-3"
+            aria-label={showPassword ? 'Mask password' : 'Reveal password'}
+            onClick={() => setShowPassword((show) => !show)}
+          >
+            {showPassword ? (
+              <EyeOff className="text-muted-foreground h-5 w-5" />
+            ) : (
+              <Eye className="text-muted-foreground h-5 w-5" />
+            )}
+          </Button>
+        </div>
       </div>
 
       <div>
@@ -138,9 +157,13 @@ export const SignUpForm = ({ className }: SignUpFormProps) => {
         <FormErrorMessage className="mt-1.5" error={errors.signature} />
       </div>
 
-      <Button size="lg" disabled={isSubmitting} className="dark:bg-documenso dark:hover:opacity-90">
-        {isSubmitting && <Loader className="mr-2 h-5 w-5 animate-spin" />}
-        Sign Up
+      <Button
+        size="lg"
+        loading={isSubmitting}
+        disabled={isSubmitting}
+        className="dark:bg-documenso dark:hover:opacity-90"
+      >
+        {isSubmitting ? 'Signing up...' : 'Sign Up'}
       </Button>
     </form>
   );

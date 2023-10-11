@@ -1,10 +1,17 @@
 import { TRPCError } from '@trpc/server';
 
+import { forgotPassword } from '@documenso/lib/server-only/user/forgot-password';
+import { resetPassword } from '@documenso/lib/server-only/user/reset-password';
 import { updatePassword } from '@documenso/lib/server-only/user/update-password';
 import { updateProfile } from '@documenso/lib/server-only/user/update-profile';
 
-import { authenticatedProcedure, router } from '../trpc';
-import { ZUpdatePasswordMutationSchema, ZUpdateProfileMutationSchema } from './schema';
+import { authenticatedProcedure, procedure, router } from '../trpc';
+import {
+  ZForgotPasswordFormSchema,
+  ZResetPasswordFormSchema,
+  ZUpdatePasswordMutationSchema,
+  ZUpdateProfileMutationSchema,
+} from './schema';
 
 export const profileRouter = router({
   updateProfile: authenticatedProcedure
@@ -33,11 +40,12 @@ export const profileRouter = router({
     .input(ZUpdatePasswordMutationSchema)
     .mutation(async ({ input, ctx }) => {
       try {
-        const { password } = input;
+        const { password, currentPassword } = input;
 
         return await updatePassword({
           userId: ctx.user.id,
           password,
+          currentPassword,
         });
       } catch (err) {
         let message =
@@ -53,4 +61,38 @@ export const profileRouter = router({
         });
       }
     }),
+
+  forgotPassword: procedure.input(ZForgotPasswordFormSchema).mutation(async ({ input }) => {
+    try {
+      const { email } = input;
+
+      return await forgotPassword({
+        email,
+      });
+    } catch (err) {
+      console.error(err);
+    }
+  }),
+
+  resetPassword: procedure.input(ZResetPasswordFormSchema).mutation(async ({ input }) => {
+    try {
+      const { password, token } = input;
+
+      return await resetPassword({
+        token,
+        password,
+      });
+    } catch (err) {
+      let message = 'We were unable to reset your password. Please try again.';
+
+      if (err instanceof Error) {
+        message = err.message;
+      }
+
+      throw new TRPCError({
+        code: 'BAD_REQUEST',
+        message,
+      });
+    }
+  }),
 });

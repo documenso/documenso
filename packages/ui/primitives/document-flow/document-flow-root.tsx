@@ -13,7 +13,7 @@ export type DocumentFlowFormContainerProps = HTMLAttributes<HTMLFormElement> & {
 
 export const DocumentFlowFormContainer = ({
   children,
-  id = 'edit-document-form',
+  id = 'document-flow-form-container',
   className,
   ...props
 }: DocumentFlowFormContainerProps) => {
@@ -21,7 +21,7 @@ export const DocumentFlowFormContainer = ({
     <form
       id={id}
       className={cn(
-        'dark:bg-background border-border bg-widget sticky top-20 flex h-full max-h-[80rem] flex-col rounded-xl border px-4 py-6',
+        'dark:bg-background border-border bg-widget sticky top-20 flex h-full max-h-[64rem] flex-col rounded-xl border px-4 py-6',
         className,
       )}
       {...props}
@@ -97,10 +97,7 @@ export const DocumentFlowFormContainerStep = ({
   return (
     <div>
       <p className="text-muted-foreground text-sm">
-        {title}{' '}
-        <span>
-          ({step}/{maxStep})
-        </span>
+        Step <span>{`${step} of ${maxStep}`}</span>
       </p>
 
       <div className="bg-muted relative mt-4 h-[2px] rounded-md">
@@ -152,10 +149,11 @@ export const DocumentFlowFormContainerActions = ({
       </Button>
 
       <Button
-        type="submit"
+        type="button"
         className="bg-documenso flex-1"
         size="lg"
         disabled={disabled || loading || !canGoNext}
+        loading={loading}
         onClick={onGoNextClick}
       >
         {goNextLabel}

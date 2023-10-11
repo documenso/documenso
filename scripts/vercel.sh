@@ -13,7 +13,8 @@ function log() {
 
 function build_webapp() {
   log "Building webapp for $VERCEL_ENV"
-  
+
+  remap_webapp_env
   remap_database_integration
 
   npm run prisma:generate --workspace=@documenso/prisma
@@ -39,7 +40,8 @@ function remap_webapp_env() {
 
 function build_marketing() {
   log "Building marketing for $VERCEL_ENV"
-  
+
+  remap_marketing_env
   remap_database_integration
 
   npm run prisma:generate --workspace=@documenso/prisma
@@ -72,7 +74,6 @@ function remap_database_integration() {
     export NEXT_PRIVATE_DIRECT_DATABASE_URL="$POSTGRES_URL_NON_POOLING"
   fi
 
-  
   if [[ "$NEXT_PRIVATE_DATABASE_URL" == *"neon.tech"* ]]; then
     log "Remapping for Neon integration"
 

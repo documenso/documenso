@@ -17,7 +17,7 @@ import { alphaid } from '../id';
 export const getPresignPostUrl = async (fileName: string, contentType: string) => {
   const client = getS3Client();
 
-  const user = await getServerComponentSession();
+  const { user } = await getServerComponentSession();
 
   // Get the basename and extension for the file
   const { name, ext } = path.parse(fileName);

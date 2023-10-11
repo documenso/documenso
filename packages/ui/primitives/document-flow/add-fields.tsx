@@ -256,17 +256,28 @@ export const AddFieldsFormPartial = ({
   }, [onMouseClick, onMouseMove, selectedField]);
 
   useEffect(() => {
-    const $page = window.document.querySelector(PDF_VIEWER_PAGE_SELECTOR);
+    const observer = new MutationObserver((_mutations) => {
+      const $page = document.querySelector(PDF_VIEWER_PAGE_SELECTOR);
 
-    if (!$page) {
-      return;
-    }
+      if (!$page) {
+        return;
+      }
 
-    const { height, width } = $page.getBoundingClientRect();
+      const { height, width } = $page.getBoundingClientRect();
 
-    fieldBounds.current = {
-      height: Math.max(height * (DEFAULT_HEIGHT_PERCENT / 100), MIN_HEIGHT_PX),
-      width: Math.max(width * (DEFAULT_WIDTH_PERCENT / 100), MIN_WIDTH_PX),
+      fieldBounds.current = {
+        height: Math.max(height * (DEFAULT_HEIGHT_PERCENT / 100), MIN_HEIGHT_PX),
+        width: Math.max(width * (DEFAULT_WIDTH_PERCENT / 100), MIN_WIDTH_PX),
+      };
+    });
+
+    observer.observe(document.body, {
+      childList: true,
+      subtree: true,
+    });
+
+    return () => {
+      observer.disconnect();
     };
   }, []);
 
@@ -281,7 +292,7 @@ export const AddFieldsFormPartial = ({
           {selectedField && (
             <Card
               className={cn(
-                'pointer-events-none fixed z-50 cursor-pointer bg-white transition-opacity',
+                'bg-background pointer-events-none fixed z-50 cursor-pointer transition-opacity',
                 {
                   'border-primary': isFieldWithinBounds,
                   'opacity-50': !isFieldWithinBounds,
@@ -340,7 +351,11 @@ export const AddFieldsFormPartial = ({
               <PopoverContent className="p-0" align="start">
                 <Command>
                   <CommandInput />
-                  <CommandEmpty />
+                  <CommandEmpty>
+                    <span className="text-muted-foreground inline-block px-4">
+                      No recipient matching this description was found.
+                    </span>
+                  </CommandEmpty>
 
                   <CommandGroup>
                     {recipients.map((recipient, index) => (
@@ -396,7 +411,7 @@ export const AddFieldsFormPartial = ({
             </Popover>
           )}
 
-          <div className="-mx-2 flex-1 overflow-y-scroll px-2">
+          <div className="-mx-2 flex-1 overflow-y-auto px-2">
             <div className="grid grid-cols-2 gap-x-4 gap-y-8">
               <button
                 type="button"
@@ -410,7 +425,7 @@ export const AddFieldsFormPartial = ({
                   <CardContent className="flex flex-col items-center justify-center px-6 py-4">
                     <p
                       className={cn(
-                        'text-muted-foreground group-data-[selected]:text-foreground text-3xl font-medium',
+                        'text-muted-foreground group-data-[selected]:text-foreground w-full truncate text-3xl font-medium',
                         fontCaveat.className,
                       )}
                     >
@@ -505,7 +520,10 @@ export const AddFieldsFormPartial = ({
         <DocumentFlowFormContainerActions
           loading={isSubmitting}
           disabled={isSubmitting}
-          onGoBackClick={documentFlow.onBackStep}
+          onGoBackClick={() => {
+            documentFlow.onBackStep?.();
+            remove();
+          }}
           onGoNextClick={() => void onFormSubmit()}
         />
       </DocumentFlowFormContainerFooter>

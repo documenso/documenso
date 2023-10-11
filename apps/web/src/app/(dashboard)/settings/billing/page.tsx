@@ -4,15 +4,15 @@ import { match } from 'ts-pattern';
 
 import { getRequiredServerComponentSession } from '@documenso/lib/next-auth/get-server-session';
 import { Stripe, stripe } from '@documenso/lib/server-only/stripe';
+import { getServerComponentFlag } from '@documenso/lib/server-only/feature-flags/get-server-component-feature-flag';
 import { getSubscriptionByUserId } from '@documenso/lib/server-only/subscription/get-subscription-by-user-id';
 
 import { LocaleDate } from '~/components/formatter/locale-date';
-import { getServerComponentFlag } from '~/helpers/get-server-component-feature-flag';
 
 import BillingPortalButton from './billing-portal-button';
 
 export default async function BillingSettingsPage() {
-  const user = await getRequiredServerComponentSession();
+  const { user } = await getRequiredServerComponentSession();
 
   const isBillingEnabled = await getServerComponentFlag('app_billing');
 

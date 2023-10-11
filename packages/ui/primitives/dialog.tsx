@@ -11,9 +11,20 @@ const Dialog = DialogPrimitive.Root;
 
 const DialogTrigger = DialogPrimitive.Trigger;
 
-const DialogPortal = ({ className, children, ...props }: DialogPrimitive.DialogPortalProps) => (
+const DialogPortal = ({
+  className,
+  children,
+  position = 'start',
+  ...props
+}: DialogPrimitive.DialogPortalProps & { position?: 'start' | 'end' | 'center' }) => (
   <DialogPrimitive.Portal className={cn(className)} {...props}>
-    <div className="fixed inset-0 z-50 flex items-start justify-center sm:items-center">
+    <div
+      className={cn('fixed inset-0 z-50 flex justify-center sm:items-center', {
+        'items-start': position === 'start',
+        'items-end': position === 'end',
+        'items-center': position === 'center',
+      })}
+    >
       {children}
     </div>
   </DialogPrimitive.Portal>
@@ -39,14 +50,16 @@ DialogOverlay.displayName = DialogPrimitive.Overlay.displayName;
 
 const DialogContent = React.forwardRef<
   React.ElementRef<typeof DialogPrimitive.Content>,
-  React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content>
->(({ className, children, ...props }, ref) => (
-  <DialogPortal>
+  React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content> & {
+    position?: 'start' | 'end' | 'center';
+  }
+>(({ className, children, position = 'start', ...props }, ref) => (
+  <DialogPortal position={position}>
     <DialogOverlay />
     <DialogPrimitive.Content
       ref={ref}
       className={cn(
-        'bg-background animate-in data-[state=open]:fade-in-90 data-[state=open]:slide-in-from-bottom-10 sm:zoom-in-90 data-[state=open]:sm:slide-in-from-bottom-0 fixed z-50 grid w-full gap-4 rounded-b-lg border p-6 shadow-lg sm:max-w-lg sm:rounded-lg',
+        'bg-background animate-in data-[state=open]:fade-in-90 sm:zoom-in-90 data-[state=open]:slide-in-from-bottom-10 data-[state=open]:sm:slide-in-from-bottom-0 fixed z-50 grid w-full gap-4 rounded-b-lg border p-6 shadow-lg sm:max-w-lg sm:rounded-lg',
         className,
       )}
       {...props}
@@ -109,6 +122,8 @@ export {
   DialogContent,
   DialogHeader,
   DialogFooter,
+  DialogOverlay,
   DialogTitle,
   DialogDescription,
+  DialogPortal,
 };
