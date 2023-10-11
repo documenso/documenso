@@ -2,7 +2,7 @@ import { Prisma } from '@prisma/client';
 
 import { prisma } from '@documenso/prisma';
 
-type getAllUsersProps = {
+type GetAllUsersProps = {
   username: string;
   email: string;
   page: number;
@@ -14,7 +14,7 @@ export const findUsers = async ({
   email = '',
   page = 1,
   perPage = 10,
-}: getAllUsersProps) => {
+}: GetAllUsersProps) => {
   const whereClause = Prisma.validator<Prisma.UserWhereInput>()({
     OR: [
       {

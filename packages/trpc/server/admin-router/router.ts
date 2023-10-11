@@ -1,24 +1,14 @@
 import { TRPCError } from '@trpc/server';
 
-import { isAdmin } from '@documenso/lib/next-auth/guards/is-admin';
 import { updateUser } from '@documenso/lib/server-only/admin/update-user';
 
-import { authenticatedProcedure, router } from '../trpc';
+import { adminProcedure, router } from '../trpc';
 import { ZUpdateProfileMutationByAdminSchema } from './schema';
 
 export const adminRouter = router({
-  updateUser: authenticatedProcedure
+  updateUser: adminProcedure
     .input(ZUpdateProfileMutationByAdminSchema)
-    .mutation(async ({ input, ctx }) => {
-      const isUserAdmin = isAdmin(ctx.user);
-
-      if (!isUserAdmin) {
-        throw new TRPCError({
-          code: 'UNAUTHORIZED',
-          message: 'Not authorized to perform this action.',
-        });
-      }
-
+    .mutation(async ({ input }) => {
       const { id, name, email, roles } = input;
 
       try {

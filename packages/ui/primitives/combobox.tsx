@@ -44,40 +44,38 @@ const Combobox = ({ listValues, onChange }: ComboboxProps) => {
   };
 
   return (
-    <>
-      <Popover open={open} onOpenChange={setOpen}>
-        <PopoverTrigger asChild>
-          <Button
-            variant="outline"
-            role="combobox"
-            aria-expanded={open}
-            className="w-[200px] justify-between"
-          >
-            {selectedValues.length > 0 ? selectedValues.join(', ') : 'Select values...'}
-            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-          </Button>
-        </PopoverTrigger>
-        <PopoverContent className="w-[200px] p-0">
-          <Command>
-            <CommandInput placeholder={selectedValues.join(', ')} />
-            <CommandEmpty>No value found.</CommandEmpty>
-            <CommandGroup>
-              {allRoles.map((value: string, i: number) => (
-                <CommandItem key={i} onSelect={() => handleSelect(value)}>
-                  <Check
-                    className={cn(
-                      'mr-2 h-4 w-4',
-                      selectedValues.includes(value) ? 'opacity-100' : 'opacity-0',
-                    )}
-                  />
-                  {value}
-                </CommandItem>
-              ))}
-            </CommandGroup>
-          </Command>
-        </PopoverContent>
-      </Popover>
-    </>
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
+        <Button
+          variant="outline"
+          role="combobox"
+          aria-expanded={open}
+          className="w-[200px] justify-between"
+        >
+          {selectedValues.length > 0 ? selectedValues.join(', ') : 'Select values...'}
+          <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent className="w-[200px] p-0">
+        <Command>
+          <CommandInput placeholder={selectedValues.join(', ')} />
+          <CommandEmpty>No value found.</CommandEmpty>
+          <CommandGroup>
+            {allRoles.map((value: string, i: number) => (
+              <CommandItem key={i} onSelect={() => handleSelect(value)}>
+                <Check
+                  className={cn(
+                    'mr-2 h-4 w-4',
+                    selectedValues.includes(value) ? 'opacity-100' : 'opacity-0',
+                  )}
+                />
+                {value}
+              </CommandItem>
+            ))}
+          </CommandGroup>
+        </Command>
+      </PopoverContent>
+    </Popover>
   );
 };
 
