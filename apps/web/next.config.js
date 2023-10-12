@@ -29,6 +29,11 @@ const config = {
       transform: 'lucide-react/dist/esm/icons/{{ kebabCase member }}',
     },
   },
+  webpack: (config) => {
+    // fixes: Module not found: Can’t resolve ‘../build/Release/canvas.node’
+    config.resolve.alias.canvas = false;
+    return config;
+  },
   async rewrites() {
     return [
       {
@@ -36,10 +41,6 @@ const config = {
         destination: 'https://eu.posthog.com/:path*',
       },
     ];
-  },
-  webpack: (config) => {
-    config.resolve.alias.canvas = false;
-    return config;
   },
 };
 
