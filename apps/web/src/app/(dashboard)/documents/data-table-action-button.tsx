@@ -46,7 +46,7 @@ export const DataTableActionButton = ({ row }: DataTableActionButtonProps) => {
       documentId: row.id,
     });
 
-    await copyToClipboard(`${window.location.origin}/share/${slug}`).catch(() => null);
+    await copyToClipboard(`${process.env.NEXT_PUBLIC_WEBAPP_URL}/share/${slug}`).catch(() => null);
 
     toast({
       title: 'Copied to clipboard',

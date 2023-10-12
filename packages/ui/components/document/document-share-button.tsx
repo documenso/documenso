@@ -60,7 +60,7 @@ export const DocumentShareButton = ({ token, documentId, className }: DocumentSh
       slug = result.slug;
     }
 
-    await copyToClipboard(`${window.location.origin}/share/${slug}`).catch(() => null);
+    await copyToClipboard(`${process.env.NEXT_PUBLIC_WEBAPP_URL}/share/${slug}`).catch(() => null);
 
     toast({
       title: 'Copied to clipboard',
@@ -120,8 +120,12 @@ export const DocumentShareButton = ({ token, documentId, className }: DocumentSh
             <span className="font-medium text-blue-400">@documenso</span>
             . Check it out!
             <span className="mt-2 block" />
-            <span className="break-all font-medium text-blue-400">
-              {window.location.origin}/share/{shareLink?.slug || '...'}
+            <span
+              className={cn('break-all font-medium text-blue-400', {
+                'animate-pulse': !shareLink?.slug,
+              })}
+            >
+              {process.env.NEXT_PUBLIC_WEBAPP_URL}/share/{shareLink?.slug || '...'}
             </span>
           </div>
 
