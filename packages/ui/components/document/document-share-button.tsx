@@ -85,7 +85,7 @@ export const DocumentShareButton = ({ token, documentId, className }: DocumentSh
     window.open(
       generateTwitterIntent(
         `I just ${token ? 'signed' : 'sent'} a document with @documenso. Check it out!`,
-        `${window.location.origin}/share/${slug}`,
+        `${process.env.NEXT_PUBLIC_WEBAPP_URL}/share/${slug}`,
       ),
       '_blank',
     );
