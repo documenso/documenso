@@ -10,9 +10,9 @@ test.use({ storageState: { cookies: [], origins: [] } });
 */
 test.describe.configure({ mode: 'serial' });
 
-const username = 'testuser';
-const email = 'test-user@documenso.com';
-const password = 'password';
+const username = process.env.E2E_TEST_AUTHENTICATE_USERNAME;
+const email = process.env.E2E_TEST_AUTHENTICATE_USER_EMAIL;
+const password = process.env.E2E_TEST_AUTHENTICATE_USER_PASSWORD;
 
 test('user can sign up with email and password', async ({ page }: { page: Page }) => {
   await page.goto('/signup');
