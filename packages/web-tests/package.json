@@ -1,6 +1,7 @@
 {
-  "name": "web-tests",
+  "name": "@documenso/app-tests",
   "version": "1.0.0",
+  "license": "to-update",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -9,7 +10,6 @@
   },
   "keywords": [],
   "author": "",
-  "license": "ISC",
   "devDependencies": {
     "@playwright/test": "^1.18.1",
     "@types/node": "^20.8.2",
