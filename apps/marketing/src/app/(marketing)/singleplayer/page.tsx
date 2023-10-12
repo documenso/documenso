@@ -130,7 +130,7 @@ export default function SinglePlayerModePage() {
         signer: data.email,
       });
 
-      router.push(`/single-player-mode/${documentToken}/success`);
+      router.push(`/singleplayer/${documentToken}/success`);
     } catch {
       toast({
         title: 'Something went wrong',
