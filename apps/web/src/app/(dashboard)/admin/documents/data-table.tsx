@@ -4,20 +4,17 @@ import { useTransition } from 'react';
 
 import Link from 'next/link';
 
-import { Edit, Loader } from 'lucide-react';
+import { Loader } from 'lucide-react';
 
 import { useUpdateSearchParams } from '@documenso/lib/client-only/hooks/use-update-search-params';
 import { FindResultSet } from '@documenso/lib/types/find-result-set';
 import { Document, User } from '@documenso/prisma/client';
 import { Avatar, AvatarFallback } from '@documenso/ui/primitives/avatar';
-import { Button } from '@documenso/ui/primitives/button';
 import { DataTable } from '@documenso/ui/primitives/data-table';
 import { DataTablePagination } from '@documenso/ui/primitives/data-table-pagination';
 
 import { DocumentStatus } from '~/components/formatter/document-status';
 import { LocaleDate } from '~/components/formatter/locale-date';
-
-import { DataTableActionDropdown } from './data-table-action-dropdown';
 
 export type DocumentsDataTableProps = {
   results: FindResultSet<
@@ -54,21 +51,7 @@ export const DocumentsDataTable = ({ results }: DocumentsDataTableProps) => {
             header: 'Title',
             accessorKey: 'title',
             cell: ({ row }) => {
-              return (
-                <Link
-                  title={row.original.title}
-                  className="block max-w-[10rem] truncate font-medium hover:underline md:max-w-[20rem]"
-                  href={{
-                    pathname: `/admin/documents/${row.original.id}`,
-                    query: {
-                      userId: row.original.User.id,
-                      documentId: row.original.id,
-                    },
-                  }}
-                >
-                  {row.original.title}
-                </Link>
-              );
+              return <div>{row.original.title}</div>;
             },
           },
           {
@@ -87,23 +70,14 @@ export const DocumentsDataTable = ({ results }: DocumentsDataTableProps) => {
             },
           },
           {
+            header: 'Last updated',
+            accessorKey: 'updatedAt',
+            cell: ({ row }) => <LocaleDate date={row.original.updatedAt} />,
+          },
+          {
             header: 'Status',
             accessorKey: 'status',
             cell: ({ row }) => <DocumentStatus status={row.original.status} />,
-          },
-          {
-            header: 'Actions',
-            cell: ({ row }) => (
-              <div className="flex items-center gap-x-4">
-                <Button className="w-24" asChild>
-                  <Link href={`/documents/${row.original.id}`}>
-                    <Edit className="-ml-1 mr-2 h-4 w-4" />
-                    Edit
-                  </Link>
-                </Button>
-                <DataTableActionDropdown row={row.original} />
-              </div>
-            ),
           },
         ]}
         data={results.data}

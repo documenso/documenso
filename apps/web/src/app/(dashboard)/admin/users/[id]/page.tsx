@@ -85,9 +85,7 @@ export default function UserPage({ params }: { params: { id: number } }) {
               name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel required className="text-muted-foreground">
-                    Name
-                  </FormLabel>
+                  <FormLabel className="text-muted-foreground">Name</FormLabel>
                   <FormControl>
                     <Input type="text" {...field} value={field.value ?? ''} />
                   </FormControl>
@@ -100,9 +98,7 @@ export default function UserPage({ params }: { params: { id: number } }) {
               name="email"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel required className="text-muted-foreground">
-                    Email
-                  </FormLabel>
+                  <FormLabel className="text-muted-foreground">Email</FormLabel>
                   <FormControl>
                     <Input type="text" {...field} />
                   </FormControl>
@@ -117,9 +113,7 @@ export default function UserPage({ params }: { params: { id: number } }) {
               render={({ field: { onChange } }) => (
                 <FormItem>
                   <fieldset className="flex flex-col gap-2">
-                    <FormLabel required className="text-muted-foreground">
-                      Roles
-                    </FormLabel>
+                    <FormLabel className="text-muted-foreground">Roles</FormLabel>
                     <FormControl>
                       <Combobox
                         listValues={roles}
