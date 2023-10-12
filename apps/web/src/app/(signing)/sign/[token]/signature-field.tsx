@@ -49,6 +49,7 @@ export const SignatureField = ({ field, recipient }: SignatureFieldProps) => {
   const [showSignatureModal, setShowSignatureModal] = useState(false);
   const [localSignature, setLocalSignature] = useState<string | null>(null);
   const [isLocalSignatureSet, setIsLocalSignatureSet] = useState(false);
+
   const state = useMemo<SignatureFieldState>(() => {
     if (!field.inserted) {
       return 'empty';
