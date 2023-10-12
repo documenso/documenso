@@ -1,16 +1,16 @@
 import { prisma } from '@documenso/prisma';
 
-export const deleteUser = async (name: string) => {
+export const deleteUser = async (email: string) => {
   const user = await prisma.user.findFirst({
     where: {
-      name: {
-        contains: name,
+      email: {
+        contains: email,
       },
     },
   });
 
   if (!user) {
-    throw new Error(`User with name ${name} not found`);
+    throw new Error(`User with email ${email} not found`);
   }
 
   return await prisma.user.delete({
