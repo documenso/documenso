@@ -29,7 +29,7 @@ export const Header = ({ className, ...props }: HeaderProps) => {
 
         {isSinglePlayerModeMarketingEnabled && (
           <Link
-            href="/single-player-mode"
+            href="/singleplayer"
             className="bg-primary dark:text-background rounded-full px-2 py-1 text-xs font-semibold sm:px-3"
           >
             Try now!
