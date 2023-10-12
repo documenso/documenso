@@ -48,7 +48,7 @@ test('user can login with user and password', async ({ page }: { page: Page }) =
 
 test.afterAll('Teardown', async () => {
   try {
-    await deleteUser(username);
+    await deleteUser(email);
   } catch (e) {
     throw new Error(`Error deleting user: ${e}`);
   }
