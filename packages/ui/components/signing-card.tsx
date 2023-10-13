@@ -56,7 +56,7 @@ export const SigningCard3D = ({ className, name, signingCelebrationImage }: Sign
   const sheenGradient = useMotionTemplate`linear-gradient(
     30deg,
     transparent,
-    rgba(var(--sheen-color) / ${trackMouse ? sheenOpacity : 0}) ${sheenPosition}%,
+    rgba(var(--sheen-color) / ${sheenOpacity}) ${sheenPosition}%,
     transparent)`;
 
   const cardRef = useRef<HTMLDivElement>(null);
@@ -98,10 +98,12 @@ export const SigningCard3D = ({ className, name, signingCelebrationImage }: Sign
         void animate(cardX, 0, { duration: 2, ease: 'backInOut' });
         void animate(cardY, 0, { duration: 2, ease: 'backInOut' });
 
+        void animate(sheenOpacity, 0, { duration: 2, ease: 'backInOut' });
+
         setTrackMouse(false);
       }, 1000);
     },
-    [cardX, cardY, cardCenterPosition, trackMouse],
+    [cardX, cardY, cardCenterPosition, trackMouse, sheenOpacity],
   );
 
   useEffect(() => {
@@ -126,7 +128,6 @@ export const SigningCard3D = ({ className, name, signingCelebrationImage }: Sign
           transformStyle: 'preserve-3d',
           rotateX,
           rotateY,
-          // willChange: 'transform background-image',
         }}
       >
         <SigningCardContent className="bg-transparent" name={name} />
