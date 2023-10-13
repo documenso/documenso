@@ -18,6 +18,7 @@ import {
 } from 'lucide-react';
 import { useSession } from 'next-auth/react';
 
+import { useCopyToClipboard } from '@documenso/lib/client-only/hooks/use-copy-to-clipboard';
 import { getFile } from '@documenso/lib/universal/upload/get-file';
 import { Document, DocumentStatus, Recipient, User } from '@documenso/prisma/client';
 import { DocumentWithData } from '@documenso/prisma/types/document-with-data';
@@ -31,8 +32,6 @@ import {
   DropdownMenuTrigger,
 } from '@documenso/ui/primitives/dropdown-menu';
 import { useToast } from '@documenso/ui/primitives/use-toast';
-
-import { useCopyToClipboard } from '~/hooks/use-copy-to-clipboard';
 
 import { DeleteDraftDocumentDialog } from './delete-draft-document-dialog';
 
@@ -73,7 +72,7 @@ export const DataTableActionDropdown = ({ row }: DataTableActionDropdownProps) =
       documentId: row.id,
     });
 
-    await copyToClipboard(`${window.location.origin}/share/${slug}`).catch(() => null);
+    await copyToClipboard(`${process.env.NEXT_PUBLIC_WEBAPP_URL}/share/${slug}`).catch(() => null);
 
     toast({
       title: 'Copied to clipboard',
