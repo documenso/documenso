@@ -35,7 +35,7 @@ jobs:
       - name: Generate Prisma Client
         run: npm run prisma:generate -w @documenso/prisma
       - name: Create the database
-        run: npm run prisma:migrate-dev -w @documenso/prisma
+        run: npm run prisma:migrate-dev
       - name: Run Playwright tests
         run: npm run ci
       - uses: actions/upload-artifact@v3
