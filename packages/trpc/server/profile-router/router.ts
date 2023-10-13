@@ -20,9 +20,15 @@ export const profileRouter = router({
       try {
         const { name, signature } = input;
 
+        if (name.trim().length < 1)
+          throw new TRPCError({
+            code: 'BAD_REQUEST',
+            message: 'Please provide a valid name',
+          });
+
         return await updateProfile({
           userId: ctx.user.id,
-          name,
+          name: name.trim(),
           signature,
         });
       } catch (err) {

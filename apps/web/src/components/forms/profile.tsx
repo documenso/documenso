@@ -53,6 +53,14 @@ export const ProfileForm = ({ className, user }: ProfileFormProps) => {
 
   const onFormSubmit = async ({ name, signature }: TProfileFormSchema) => {
     try {
+      if (!name || name?.trim().length === 0) {
+        return toast({
+          title: 'An error occurred',
+          description: 'Your name cannot be empty.',
+          variant: 'destructive',
+        });
+      }
+
       await updateProfile({
         name,
         signature,
