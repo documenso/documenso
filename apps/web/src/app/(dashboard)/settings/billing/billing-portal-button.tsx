@@ -7,7 +7,7 @@ import { useToast } from '@documenso/ui/primitives/use-toast';
 
 import { createBillingPortal } from './create-billing-portal.action';
 
-export default function BillingPortalButton() {
+export const BillingPortalButton = () => {
   const { toast } = useToast();
 
   const [isFetchingPortalUrl, setIsFetchingPortalUrl] = useState(false);
@@ -52,4 +52,4 @@ export default function BillingPortalButton() {
       Manage Subscription
     </Button>
   );
-}
+};

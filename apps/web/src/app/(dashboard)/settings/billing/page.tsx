@@ -11,7 +11,7 @@ import { getSubscriptionByUserId } from '@documenso/lib/server-only/subscription
 import { LocaleDate } from '~/components/formatter/locale-date';
 
 import { BillingPlans } from './billing-plans';
-import BillingPortalButton from './billing-portal-button';
+import { BillingPortalButton } from './billing-portal-button';
 
 export default async function BillingSettingsPage() {
   const { user } = await getRequiredServerComponentSession();
