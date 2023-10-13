@@ -9,6 +9,7 @@ import { getFieldsForToken } from '@documenso/lib/server-only/field/get-fields-f
 import { getRecipientByToken } from '@documenso/lib/server-only/recipient/get-recipient-by-token';
 import { DocumentStatus, FieldType } from '@documenso/prisma/client';
 import { DocumentDownloadButton } from '@documenso/ui/components/document/document-download-button';
+import { DocumentShareButton } from '@documenso/ui/components/document/document-share-button';
 import { SigningCard3D } from '@documenso/ui/components/signing-card';
 
 import signingCelebration from '~/assets/signing-celebration.png';
@@ -87,7 +88,7 @@ export default async function CompletedSigningPage({
           ))}
 
         <div className="mt-8 flex w-full max-w-sm items-center justify-center gap-4">
-          <ShareButton documentId={document.id} token={recipient.token} />
+          <DocumentShareButton documentId={document.id} token={recipient.token} />
 
           <DocumentDownloadButton
             className="flex-1"
