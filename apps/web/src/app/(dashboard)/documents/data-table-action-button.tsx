@@ -6,12 +6,11 @@ import { Edit, Pencil, Share } from 'lucide-react';
 import { useSession } from 'next-auth/react';
 import { match } from 'ts-pattern';
 
+import { useCopyToClipboard } from '@documenso/lib/client-only/hooks/use-copy-to-clipboard';
 import { Document, DocumentStatus, Recipient, SigningStatus, User } from '@documenso/prisma/client';
 import { trpc } from '@documenso/trpc/react';
 import { Button } from '@documenso/ui/primitives/button';
 import { useToast } from '@documenso/ui/primitives/use-toast';
-
-import { useCopyToClipboard } from '~/hooks/use-copy-to-clipboard';
 
 export type DataTableActionButtonProps = {
   row: Document & {
@@ -47,7 +46,7 @@ export const DataTableActionButton = ({ row }: DataTableActionButtonProps) => {
       documentId: row.id,
     });
 
-    await copyToClipboard(`${window.location.origin}/share/${slug}`).catch(() => null);
+    await copyToClipboard(`${process.env.NEXT_PUBLIC_WEBAPP_URL}/share/${slug}`).catch(() => null);
 
     toast({
       title: 'Copied to clipboard',

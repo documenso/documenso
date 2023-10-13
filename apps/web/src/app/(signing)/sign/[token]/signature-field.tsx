@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState, useTransition } from 'react';
+import { useEffect, useMemo, useState, useTransition } from 'react';
 
 import { useRouter } from 'next/navigation';
 
@@ -48,6 +48,7 @@ export const SignatureField = ({ field, recipient }: SignatureFieldProps) => {
 
   const [showSignatureModal, setShowSignatureModal] = useState(false);
   const [localSignature, setLocalSignature] = useState<string | null>(null);
+  const [isLocalSignatureSet, setIsLocalSignatureSet] = useState(false);
 
   const state = useMemo<SignatureFieldState>(() => {
     if (!field.inserted) {
@@ -61,9 +62,16 @@ export const SignatureField = ({ field, recipient }: SignatureFieldProps) => {
     return 'signed-text';
   }, [field.inserted, signature?.signatureImageAsBase64]);
 
+  useEffect(() => {
+    if (!showSignatureModal && !isLocalSignatureSet) {
+      setLocalSignature(null);
+    }
+  }, [showSignatureModal, isLocalSignatureSet]);
+
   const onSign = async (source: 'local' | 'provider' = 'provider') => {
     try {
       if (!providedSignature && !localSignature) {
+        setIsLocalSignatureSet(false);
         setShowSignatureModal(true);
         return;
       }
@@ -178,6 +186,7 @@ export const SignatureField = ({ field, recipient }: SignatureFieldProps) => {
                 disabled={!localSignature}
                 onClick={() => {
                   setShowSignatureModal(false);
+                  setIsLocalSignatureSet(true);
                   void onSign('local');
                 }}
               >

@@ -219,7 +219,7 @@ model DocumentShareLink {
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 
-  document Document @relation(fields: [documentId], references: [id])
+  document Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
 
   @@unique([documentId, email])
 }

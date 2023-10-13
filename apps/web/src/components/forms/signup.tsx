@@ -147,7 +147,8 @@ export const SignUpForm = ({ className }: SignUpFormProps) => {
             name="signature"
             render={({ field: { onChange } }) => (
               <SignaturePad
-                className="mt-2 h-36 w-full rounded-lg border bg-white dark:border-[#e2d7c5] dark:bg-[#fcf8ee]"
+                className="h-36 w-full"
+                containerClassName="mt-2 rounded-lg border bg-background"
                 onChange={(v) => onChange(v ?? '')}
               />
             )}
