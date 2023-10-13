@@ -33,21 +33,8 @@ export const findUsers = async ({
 
   const [users, count] = await Promise.all([
     await prisma.user.findMany({
-      select: {
-        id: true,
-        name: true,
-        email: true,
-        roles: true,
-        Subscription: {
-          select: {
-            id: true,
-            status: true,
-            planId: true,
-            priceId: true,
-            createdAt: true,
-            periodEnd: true,
-          },
-        },
+      include: {
+        Subscription: true,
         Document: {
           select: {
             id: true,
