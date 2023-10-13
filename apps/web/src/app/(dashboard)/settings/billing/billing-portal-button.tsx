@@ -21,6 +21,7 @@ export default function BillingPortalButton() {
 
     try {
       const sessionUrl = await createBillingPortal();
+
       if (!sessionUrl) {
         throw new Error('NO_SESSION');
       }

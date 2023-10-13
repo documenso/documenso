@@ -1,5 +1,6 @@
 'use server';
 
+import { getCheckoutSession } from '@documenso/ee/server-only/stripe/get-checkout-session';
 import {
   getStripeCustomerByEmail,
   getStripeCustomerById,
@@ -9,7 +10,11 @@ import { getRequiredServerComponentSession } from '@documenso/lib/next-auth/get-
 import { Stripe, stripe } from '@documenso/lib/server-only/stripe';
 import { getSubscriptionByUserId } from '@documenso/lib/server-only/subscription/get-subscription-by-user-id';
 
-export const createBillingPortal = async () => {
+export type CreateCheckoutOptions = {
+  priceId: string;
+};
+
+export const createCheckout = async ({ priceId }: CreateCheckoutOptions) => {
   const { user } = await getRequiredServerComponentSession();
 
   const existingSubscription = await getSubscriptionByUserId({ userId: user.id });
@@ -23,6 +28,11 @@ export const createBillingPortal = async () => {
     if (!stripeCustomer) {
       throw new Error('Missing Stripe customer for subscription');
     }
+
+    return getPortalSession({
+      customerId: stripeCustomer.id,
+      returnUrl: `${process.env.NEXT_PUBLIC_WEBAPP_URL}/settings/billing`,
+    });
   }
 
   // Fallback to check if a Stripe customer already exists for the current user email.
@@ -41,8 +51,9 @@ export const createBillingPortal = async () => {
     });
   }
 
-  return getPortalSession({
+  return getCheckoutSession({
     customerId: stripeCustomer.id,
+    priceId,
     returnUrl: `${process.env.NEXT_PUBLIC_WEBAPP_URL}/settings/billing`,
   });
 };
