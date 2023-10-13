@@ -1,4 +1,5 @@
 import { prisma } from '@documenso/prisma';
+import { Prisma } from '@documenso/prisma/client';
 
 export interface FindDocumentsOptions {
   term?: string;
@@ -7,14 +8,14 @@ export interface FindDocumentsOptions {
 }
 
 export const findDocuments = async ({ term, page = 1, perPage = 10 }: FindDocumentsOptions) => {
-  const termFilters = !term
+  const termFilters: Prisma.DocumentWhereInput | undefined = !term
     ? undefined
-    : ({
+    : {
         title: {
           contains: term,
           mode: 'insensitive',
         },
-      } as const);
+      };
 
   const [data, count] = await Promise.all([
     prisma.document.findMany({
