@@ -95,19 +95,7 @@ export const UsersDataTable = ({ users, totalPages, perPage, page }: UsersDataTa
           {
             header: 'Roles',
             accessorKey: 'roles',
-            cell: ({ row }) => {
-              return (
-                <>
-                  {row.original.roles.map((role: string, i: number) => {
-                    return (
-                      <span key={i}>
-                        {role} {}
-                      </span>
-                    );
-                  })}
-                </>
-              );
-            },
+            cell: ({ row }) => row.original.roles.join(', '),
           },
           {
             header: 'Subscription',
@@ -134,18 +122,16 @@ export const UsersDataTable = ({ users, totalPages, perPage, page }: UsersDataTa
             },
           },
           {
-            header: 'Edit',
+            header: '',
             accessorKey: 'edit',
             cell: ({ row }) => {
               return (
-                <div>
-                  <Button className="w-24" asChild>
-                    <Link href={`/admin/users/${row.original.id}`}>
-                      <Edit className="-ml-1 mr-2 h-4 w-4" />
-                      Edit
-                    </Link>
-                  </Button>
-                </div>
+                <Button className="w-24" asChild>
+                  <Link href={`/admin/users/${row.original.id}`}>
+                    <Edit className="-ml-1 mr-2 h-4 w-4" />
+                    Edit
+                  </Link>
+                </Button>
               );
             },
           },
