@@ -8,6 +8,7 @@ import { FaXTwitter } from 'react-icons/fa6';
 import { useCopyShareLink } from '@documenso/lib/client-only/hooks/use-copy-share-link';
 import { generateTwitterIntent } from '@documenso/lib/universal/generate-twitter-intent';
 import { trpc } from '@documenso/trpc/react';
+import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
 import {
   Dialog,
@@ -18,12 +19,12 @@ import {
   DialogTrigger,
 } from '@documenso/ui/primitives/dialog';
 
-export type ShareButtonProps = HTMLAttributes<HTMLButtonElement> & {
+export type DocumentShareButtonProps = HTMLAttributes<HTMLButtonElement> & {
   token: string;
   documentId: number;
 };
 
-export const ShareButton = ({ token, documentId }: ShareButtonProps) => {
+export const DocumentShareButton = ({ token, documentId, className }: DocumentShareButtonProps) => {
   const { copyShareLink, createAndCopyShareLink, isCopyingShareLink } = useCopyShareLink();
 
   const [isOpen, setIsOpen] = useState(false);
@@ -73,7 +74,7 @@ export const ShareButton = ({ token, documentId }: ShareButtonProps) => {
     window.open(
       generateTwitterIntent(
         `I just ${token ? 'signed' : 'sent'} a document with @documenso. Check it out!`,
-        `${window.location.origin}/share/${slug}`,
+        `${process.env.NEXT_PUBLIC_WEBAPP_URL}/share/${slug}`,
       ),
       '_blank',
     );
@@ -87,7 +88,7 @@ export const ShareButton = ({ token, documentId }: ShareButtonProps) => {
         <Button
           variant="outline"
           disabled={!token || !documentId}
-          className="flex-1"
+          className={cn('flex-1', className)}
           loading={isLoading || isCopyingShareLink}
         >
           {!isLoading && !isCopyingShareLink && <Share className="mr-2 h-5 w-5" />}
@@ -108,8 +109,12 @@ export const ShareButton = ({ token, documentId }: ShareButtonProps) => {
             <span className="font-medium text-blue-400">@documenso</span>
             . Check it out!
             <span className="mt-2 block" />
-            <span className="break-all font-medium text-blue-400">
-              {window.location.origin}/share/{shareLink?.slug || '...'}
+            <span
+              className={cn('break-all font-medium text-blue-400', {
+                'animate-pulse': !shareLink?.slug,
+              })}
+            >
+              {process.env.NEXT_PUBLIC_WEBAPP_URL}/share/{shareLink?.slug || '...'}
             </span>
           </div>
 
