@@ -110,10 +110,10 @@ model Document {
   Field          Field[]
   ShareLink      DocumentShareLink[]
   documentDataId String
-  documentData   DocumentData        @relation(fields: [documentDataId], references: [id], onDelete: Cascade)
+  documentData   DocumentData   @relation(fields: [documentDataId], references: [id], onDelete: Cascade)
   documentMeta   DocumentMeta?
-  createdAt      DateTime            @default(now())
-  updatedAt      DateTime            @default(now()) @updatedAt
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @default(now()) @updatedAt
 
   @@unique([documentDataId])
 }
@@ -133,11 +133,11 @@ model DocumentData {
 }
 
 model DocumentMeta {
-  id         String   @id @default(cuid())
-  subject    String?
-  message    String?
-  documentId Int      @unique
-  document   Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  id       String    @id @default(cuid())
+  subject  String?
+  message  String?
+  documentId Int @unique
+  document Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
 }
 
 enum ReadStatus {

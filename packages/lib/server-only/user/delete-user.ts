@@ -1,6 +1,10 @@
 import { prisma } from '@documenso/prisma';
 
-export const deleteUser = async (email: string) => {
+export type DeleteUserOptions = {
+  email: string;
+}
+
+export const deleteUser = async ({ email }: DeleteUserOptions) => {
   const user = await prisma.user.findFirst({
     where: {
       email: {
