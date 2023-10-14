@@ -8,10 +8,12 @@ import { Loader } from 'lucide-react';
 
 import { useUpdateSearchParams } from '@documenso/lib/client-only/hooks/use-update-search-params';
 import { FindResultSet } from '@documenso/lib/types/find-result-set';
+import { recipientInitials } from '@documenso/lib/utils/recipient-formatter';
 import { Document, User } from '@documenso/prisma/client';
 import { Avatar, AvatarFallback } from '@documenso/ui/primitives/avatar';
 import { DataTable } from '@documenso/ui/primitives/data-table';
 import { DataTablePagination } from '@documenso/ui/primitives/data-table-pagination';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@documenso/ui/primitives/tooltip';
 
 import { DocumentStatus } from '~/components/formatter/document-status';
 import { LocaleDate } from '~/components/formatter/locale-date';
@@ -58,14 +60,24 @@ export const DocumentsDataTable = ({ results }: DocumentsDataTableProps) => {
             header: 'Owner',
             accessorKey: 'owner',
             cell: ({ row }) => {
+              const avatarFallback = row.original.User.name
+                ? recipientInitials(row.original.User.name)
+                : row.original.User.email.slice(0, 1).toUpperCase();
               return (
-                <Link href={`/admin/users/${row.original.User.id}`}>
-                  <Avatar className="dark:border-border h-12 w-12 border-2 border-solid border-white">
-                    <AvatarFallback className="text-gray-400">
-                      <span className="text-xs">{row.original.User.name}</span>
-                    </AvatarFallback>
-                  </Avatar>
-                </Link>
+                <Tooltip>
+                  <TooltipTrigger>
+                    <Link href={`/admin/users/${row.original.User.id}`}>
+                      <Avatar className="dark:border-border h-12 w-12 border-2 border-solid border-white">
+                        <AvatarFallback className="text-gray-400">
+                          <span className="text-xs">{avatarFallback}</span>
+                        </AvatarFallback>
+                      </Avatar>
+                    </Link>
+                  </TooltipTrigger>
+                  <TooltipContent className="max-w-xs">
+                    {row.original.User.name ?? row.original.User.email}
+                  </TooltipContent>
+                </Tooltip>
               );
             },
           },
