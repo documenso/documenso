@@ -61,8 +61,8 @@ export const DocumentFlowFormContainerContent = ({
   ...props
 }: DocumentFlowFormContainerContentProps) => {
   return (
-    <div className={cn('flex flex-1 flex-col', className)} {...props}>
-      <div className="-mx-2 flex flex-1 flex-col overflow-y-auto px-2">{children}</div>
+    <div className={cn('flex max-h-full flex-1 flex-col overflow-y-auto', className)} {...props}>
+      <div className="flex flex-1 flex-col px-2">{children}</div>
     </div>
   );
 };
