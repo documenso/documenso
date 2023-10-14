@@ -14,9 +14,14 @@ export type AdminNavProps = HTMLAttributes<HTMLDivElement>;
 
 export const AdminNav = ({ className, ...props }: AdminNavProps) => {
   const pathname = usePathname();
-
   return (
-    <div className={cn('flex gap-x-2.5 gap-y-2 md:flex-col', className)} {...props}>
+    <div
+      className={cn(
+        'flex gap-x-2.5 gap-y-2 overflow-hidden overflow-x-auto  md:flex-col',
+        className,
+      )}
+      {...props}
+    >
       <Button
         variant="ghost"
         className={cn(
