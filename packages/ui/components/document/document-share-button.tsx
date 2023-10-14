@@ -49,25 +49,37 @@ export const DocumentShareButton = ({ token, documentId, className }: DocumentSh
   };
 
   const onCopyClick = async () => {
-    let { slug = '' } = shareLink || {};
+    try {
+      let { slug = '' } = shareLink || {};
 
-    if (!slug) {
-      const result = await createOrGetShareLink({
-        token,
-        documentId,
+      if (!slug) {
+        const result = await createOrGetShareLink({
+          token,
+          documentId,
+        });
+
+        slug = result.slug;
+      }
+
+      await copyToClipboard(`${process.env.NEXT_PUBLIC_WEBAPP_URL}/share/${slug}`).catch(
+        () => null,
+      );
+
+      toast({
+        title: 'Copied to clipboard',
+        description: 'The sharing link has been copied to your clipboard.',
       });
+    } catch (err) {
+      console.log(err);
 
-      slug = result.slug;
+      toast({
+        title: 'Something went wrong',
+        description: 'Please try again later.',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsOpen(false);
     }
-
-    await copyToClipboard(`${process.env.NEXT_PUBLIC_WEBAPP_URL}/share/${slug}`).catch(() => null);
-
-    toast({
-      title: 'Copied to clipboard',
-      description: 'The sharing link has been copied to your clipboard.',
-    });
-
-    setIsOpen(false);
   };
 
   const onTweetClick = async () => {
