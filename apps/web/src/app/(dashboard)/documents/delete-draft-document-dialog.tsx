@@ -37,7 +37,15 @@ export const DeleteDraftDocumentDialog = ({
           description: 'Your document has been successfully deleted.',
           duration: 5000,
         });
-
+      },
+      onError: () => {
+        toast({
+          title: 'Something went wrong',
+          description: 'Please try again later.',
+          variant: 'destructive',
+        });
+      },
+      onSettled: () => {
         onOpenChange(false);
       },
     });

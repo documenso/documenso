@@ -67,52 +67,71 @@ export const DataTableActionDropdown = ({ row }: DataTableActionDropdownProps) =
   const isDocumentDeletable = isOwner && row.status === DocumentStatus.DRAFT;
 
   const onShareClick = async () => {
-    const { slug } = await createOrGetShareLink({
-      token: recipient?.token,
-      documentId: row.id,
-    });
+    try {
+      const { slug } = await createOrGetShareLink({
+        token: recipient?.token,
+        documentId: row.id,
+      });
 
-    await copyToClipboard(`${process.env.NEXT_PUBLIC_WEBAPP_URL}/share/${slug}`).catch(() => null);
+      await copyToClipboard(`${process.env.NEXT_PUBLIC_WEBAPP_URL}/share/${slug}`).catch(
+        () => null,
+      );
 
-    toast({
-      title: 'Copied to clipboard',
-      description: 'The sharing link has been copied to your clipboard.',
-    });
+      toast({
+        title: 'Copied to clipboard',
+        description: 'The sharing link has been copied to your clipboard.',
+      });
+    } catch (err) {
+      toast({
+        title: 'Something went wrong',
+        description: 'Please try again later.',
+        variant: 'destructive',
+      });
+      console.log(err);
+    }
   };
 
   const onDownloadClick = async () => {
-    let document: DocumentWithData | null = null;
+    try {
+      let document: DocumentWithData | null = null;
 
-    if (!recipient) {
-      document = await trpcClient.document.getDocumentById.query({
-        id: row.id,
+      if (!recipient) {
+        document = await trpcClient.document.getDocumentById.query({
+          id: row.id,
+        });
+      } else {
+        document = await trpcClient.document.getDocumentByToken.query({
+          token: recipient.token,
+        });
+      }
+
+      const documentData = document?.documentData;
+
+      if (!documentData) {
+        return;
+      }
+
+      const documentBytes = await getFile(documentData);
+
+      const blob = new Blob([documentBytes], {
+        type: 'application/pdf',
       });
-    } else {
-      document = await trpcClient.document.getDocumentByToken.query({
-        token: recipient.token,
+
+      const link = window.document.createElement('a');
+
+      link.href = window.URL.createObjectURL(blob);
+      link.download = row.title || 'document.pdf';
+
+      link.click();
+
+      window.URL.revokeObjectURL(link.href);
+    } catch (err) {
+      toast({
+        title: 'Something went wrong',
+        description: 'Please try again later.',
+        variant: 'destructive',
       });
     }
-
-    const documentData = document?.documentData;
-
-    if (!documentData) {
-      return;
-    }
-
-    const documentBytes = await getFile(documentData);
-
-    const blob = new Blob([documentBytes], {
-      type: 'application/pdf',
-    });
-
-    const link = window.document.createElement('a');
-
-    link.href = window.URL.createObjectURL(blob);
-    link.download = row.title || 'document.pdf';
-
-    link.click();
-
-    window.URL.revokeObjectURL(link.href);
   };
 
   return (
