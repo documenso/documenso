@@ -8,10 +8,19 @@ type PriceWithProduct = Stripe.Price & { product: Stripe.Product };
 export type PriceIntervals = Record<Stripe.Price.Recurring.Interval, PriceWithProduct[]>;
 
 export const getPricesByInterval = async () => {
-  const { data: prices } = await stripe.prices.search({
+  let { data: prices } = await stripe.prices.search({
     query: `active:'true' type:'recurring'`,
     expand: ['data.product'],
     limit: 100,
+  });
+
+  prices = prices.filter((price) => {
+    // We use `expand` to get the product, but it's not typed as part of the Price type.
+    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+    const product = price.product as Stripe.Product;
+
+    // Filter out prices for products that are not active.
+    return product.active;
   });
 
   const intervals: PriceIntervals = {
