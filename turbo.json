@@ -2,13 +2,8 @@
   "$schema": "https://turbo.build/schema.json",
   "pipeline": {
     "build": {
-      "dependsOn": [
-        "^build"
-      ],
-      "outputs": [
-        ".next/**",
-        "!.next/cache/**"
-      ]
+      "dependsOn": ["^build"],
+      "outputs": [".next/**", "!.next/cache/**"]
     },
     "lint": {},
     "clean": {
@@ -17,11 +12,15 @@
     "dev": {
       "cache": false,
       "persistent": true
+    },
+    "dev:test": {
+      "cache": false
+    },
+    "test:e2e": {
+      "dependsOn": ["^build"]
     }
   },
-  "globalDependencies": [
-    "**/.env.*local"
-  ],
+  "globalDependencies": ["**/.env.*local"],
   "globalEnv": [
     "APP_VERSION",
     "NEXTAUTH_URL",
@@ -34,6 +33,7 @@
     "NEXT_PUBLIC_FEATURE_BILLING_ENABLED",
     "NEXT_PUBLIC_STRIPE_COMMUNITY_PLAN_YEARLY_PRICE_ID",
     "NEXT_PUBLIC_STRIPE_COMMUNITY_PLAN_MONTHLY_PRICE_ID",
+    "NEXT_PUBLIC_STRIPE_FREE_PLAN_ID",
     "NEXT_PRIVATE_DATABASE_URL",
     "NEXT_PRIVATE_DIRECT_DATABASE_URL",
     "NEXT_PRIVATE_GOOGLE_CLIENT_ID",
@@ -73,6 +73,9 @@
     "POSTGRES_URL",
     "DATABASE_URL",
     "POSTGRES_PRISMA_URL",
-    "POSTGRES_URL_NON_POOLING"
+    "POSTGRES_URL_NON_POOLING",
+    "E2E_TEST_AUTHENTICATE_USERNAME",
+    "E2E_TEST_AUTHENTICATE_USER_EMAIL",
+    "E2E_TEST_AUTHENTICATE_USER_PASSWORD"
   ]
 }
