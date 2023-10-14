@@ -51,15 +51,16 @@ enum SubscriptionStatus {
 }
 
 model Subscription {
-  id         Int                @id @default(autoincrement())
-  status     SubscriptionStatus @default(INACTIVE)
-  planId     String?
-  priceId    String?
-  customerId String?
-  periodEnd  DateTime?
-  userId     Int
-  createdAt  DateTime           @default(now())
-  updatedAt  DateTime           @updatedAt
+  id                Int                @id @default(autoincrement())
+  status            SubscriptionStatus @default(INACTIVE)
+  planId            String?
+  priceId           String?
+  customerId        String
+  periodEnd         DateTime?
+  userId            Int                @unique
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+  cancelAtPeriodEnd Boolean            @default(false)
 
   User User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
