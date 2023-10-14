@@ -71,7 +71,7 @@ export const CapTable = ({ className, ...props }: CapTableProps) => {
             </Pie>
             <Legend
               formatter={(value) => {
-                return <span className="text-sm text-black">{value}</span>;
+                return <span className="text-foreground text-sm">{value}</span>;
               }}
             />
             <Tooltip
