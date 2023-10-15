@@ -22,9 +22,11 @@ const config = {
       transform: 'lucide-react/dist/esm/icons/{{ kebabCase member }}',
     },
   },
-  webpack: (config) => {
+  webpack: (config, { isServer }) => {
     // fixes: Module not found: Can’t resolve ‘../build/Release/canvas.node’
-    config.resolve.alias.canvas = false;
+    if (!isServer) {
+      config.resolve.alias.canvas = false;
+    }
     return config;
   },
   async headers() {
