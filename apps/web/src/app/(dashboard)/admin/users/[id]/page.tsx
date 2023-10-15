@@ -21,9 +21,9 @@ import {
 import { Input } from '@documenso/ui/primitives/input';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
-export const ZUserFormSchema = ZUpdateProfileMutationByAdminSchema.omit({ id: true });
+const ZUserFormSchema = ZUpdateProfileMutationByAdminSchema.omit({ id: true });
 
-export type TUserFormSchema = z.infer<typeof ZUserFormSchema>;
+type TUserFormSchema = z.infer<typeof ZUserFormSchema>;
 
 export default function UserPage({ params }: { params: { id: number } }) {
   const { toast } = useToast();
