@@ -6,7 +6,3 @@ export default trpcNext.createNextApiHandler({
   router: appRouter,
   createContext: async ({ req, res }) => createTrpcContext({ req, res }),
 });
-
-// export default async function handler(_req: NextApiRequest, res: NextApiResponse) {
-//   res.json({ hello: 'world' });
-// }
