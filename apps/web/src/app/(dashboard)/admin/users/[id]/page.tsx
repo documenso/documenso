@@ -4,8 +4,10 @@ import { useRouter } from 'next/navigation';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
+import { z } from 'zod';
 
 import { trpc } from '@documenso/trpc/react';
+import { ZUpdateProfileMutationByAdminSchema } from '@documenso/trpc/server/admin-router/schema';
 import { Button } from '@documenso/ui/primitives/button';
 import { Combobox } from '@documenso/ui/primitives/combobox';
 import {
@@ -19,7 +21,9 @@ import {
 import { Input } from '@documenso/ui/primitives/input';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
-import { TUserFormSchema, ZUserFormSchema } from '~/providers/admin-user-profile-update.types';
+export const ZUserFormSchema = ZUpdateProfileMutationByAdminSchema.omit({ id: true });
+
+export type TUserFormSchema = z.infer<typeof ZUserFormSchema>;
 
 export default function UserPage({ params }: { params: { id: number } }) {
   const { toast } = useToast();

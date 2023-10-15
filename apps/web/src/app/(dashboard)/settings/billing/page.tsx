@@ -3,9 +3,10 @@ import { redirect } from 'next/navigation';
 import { match } from 'ts-pattern';
 
 import { getPricesByInterval } from '@documenso/ee/server-only/stripe/get-prices-by-interval';
+import { getProductByPriceId } from '@documenso/ee/server-only/stripe/get-product-by-price-id';
 import { getRequiredServerComponentSession } from '@documenso/lib/next-auth/get-server-session';
 import { getServerComponentFlag } from '@documenso/lib/server-only/feature-flags/get-server-component-feature-flag';
-import { Stripe, stripe } from '@documenso/lib/server-only/stripe';
+import { Stripe } from '@documenso/lib/server-only/stripe';
 import { getSubscriptionByUserId } from '@documenso/lib/server-only/subscription/get-subscription-by-user-id';
 
 import { LocaleDate } from '~/components/formatter/locale-date';
@@ -30,12 +31,10 @@ export default async function BillingSettingsPage() {
 
   let subscriptionProduct: Stripe.Product | null = null;
 
-  if (subscription?.planId) {
-    const foundSubscriptionProduct = (await stripe.products.list()).data.find(
-      (item) => item.default_price === subscription.planId,
+  if (subscription?.priceId) {
+    subscriptionProduct = await getProductByPriceId({ priceId: subscription.priceId }).catch(
+      () => null,
     );
-
-    subscriptionProduct = foundSubscriptionProduct ?? null;
   }
 
   const isMissingOrInactiveOrFreePlan = !subscription || subscription.status === 'INACTIVE';
