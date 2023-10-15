@@ -21,7 +21,17 @@ import { useToast } from '@documenso/ui/primitives/use-toast';
 export const ZSignUpFormSchema = z.object({
   name: z.string().min(1),
   email: z.string().email().min(1),
-  password: z.string().min(6).max(72),
+  password: z
+    .string()
+    .min(6)
+    .max(72)
+    .refine((value) => {
+      const hasUpperCase = /[A-Z]/.test(value); // check if it has any uppercase letters
+      const hasLowerCase = /[a-z]/.test(value); // check if it has any lowercase letters
+      const hasNumbers = /[0-9]/.test(value); // check if it has any numbers
+      const hasSymbols = /[^A-Za-z0-9]/.test(value); // check if it has any symbols
+      return hasUpperCase && hasLowerCase && hasNumbers && hasSymbols;
+    }, 'Password must contain at least an uppercase, a lowercase, a symbol, and a number'),
   signature: z.string().min(1, { message: 'We need your signature to sign documents' }),
 });
 
@@ -101,7 +111,7 @@ export const SignUpForm = ({ className }: SignUpFormProps) => {
 
         <Input id="email" type="email" className="bg-background mt-2" {...register('email')} />
 
-        {errors.email && <span className="mt-1 text-xs text-red-500">{errors.email.message}</span>}
+        {errors.email && <span className="mt-2 text-xs text-red-500">{errors.email.message}</span>}
       </div>
 
       <div>
@@ -134,8 +144,15 @@ export const SignUpForm = ({ className }: SignUpFormProps) => {
             )}
           </Button>
         </div>
+        {!errors.password && (
+          <div className="mt-2 text-sm text-gray-500">
+            Password must contain uppercase, lowercase, number, symbol.
+          </div>
+        )}
+        {errors.password && (
+          <span className="mt-2 text-xs text-red-500">{errors.password.message}</span>
+        )}
       </div>
-
       <div>
         <Label htmlFor="password" className="text-muted-foreground">
           Sign Here
