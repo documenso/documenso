@@ -70,10 +70,10 @@ Join us in creating the next generation of open trust infrastructure.
 
 ## Community and Next Steps 🎯
 
-We're currently working on a redesign of the application, including a revamp of the codebase so Documenso can be more intuitive to use and robust to develop upon.
+We're currently working on a redesign of the application, including a revamp of the codebase, so Documenso can be more intuitive to use and robust to develop upon.
 
 - Check out the first source code release in this repository and test it
-- Tell us what you think in the [Discussions](https://github.com/documenso/documenso/discussions)
+- Tell us what you think in the [Discussions](https://github.com/documenso/documenso/discussions).
 - Join the [Discord server](https://documen.so/discord) for any questions and getting to know to other community members
 - ⭐ the repository to help us raise awareness
 - Spread the word on Twitter that Documenso is working towards a more open signing tool
@@ -111,7 +111,7 @@ Contact us if you are interested in our Enterprise plan for large organizations 
 
 ### Requirements
 
-To run Documenso locally you will need
+To run Documenso locally, you will need
 
 - Node.js
 - Postgres SQL Database
@@ -119,17 +119,17 @@ To run Documenso locally you will need
 
 ### Developer Quickstart
 
-> **Note**: This is a quickstart for developers. It assumes that you have both [docker](https://docs.docker.com/get-docker/) and [docker-compose](https://docs.docker.com/compose/) installed on your machine.
+> **Note**: This is a quickstart for developers. It assumes that you have both [docker](https://docs.docker.com/get-docker/), and [docker-compose](https://docs.docker.com/compose/) installed on your machine.
 
 Want to get up and running quickly? Follow these steps:
 
-1. [Clone the repository](https://help.github.com/articles/cloning-a-repository/) it to your local device.
+1. [Clone the repository](https://help.github.com/articles/cloning-a-repository/) on your local device.
 
 ```sh
 git clone https://github.com/documenso/documenso
 ```
 
-2. Set up your `.env` file using the recommendations in the `.env.example` file. Alternatively just run `cp .env.example .env` to get started with our handpicked defaults.
+2. Set up your `.env` file using the recommendations in the `.env.example` file. Alternatively, just run `cp .env.example .env` to get started with our handpicked defaults.
 
 3. Run `npm run dx` in the root directory
 
@@ -156,7 +156,7 @@ npm run d
 
 ### Manual Setup
 
-Follow these steps to setup documenso on you local machine:
+Follow these steps to setup documenso on your local machine:
 
 1. [Clone the repository](https://help.github.com/articles/cloning-a-repository/) it to your local device.
 
@@ -203,13 +203,13 @@ We support DevContainers for VSCode. [Click here to get started.](https://vscode
 
 ## Docker
 
-🚧 Docker containers and images are current in progress. We are actively working on bringing a simple docker build and publish pipeline for Documenso.
+🚧 Docker containers and images are currently in progress. We are actively working on bringing a simple docker build and publish pipeline for Documenso.
 
 ## Self Hosting
 
 We support a variety of deployment methods, and are actively working on adding more. Stay tuned for updates!
 
-> Please note the below deployment methods are for v0.9, we will update these to v1.0 once it has been released.
+> Please note the below deployment methods are for v0.9, we will update them to v1.0 once it has been released.
 
 ### Railway
 
@@ -229,7 +229,7 @@ The Web UI can be found at http://localhost:9000 while the SMTP port will be on 
 
 ### Support IPv6
 
-In case you are deploying to a cluster that uses only IPv6. You can use a custom command to pass a parameter to the Next.js start command
+In case you are deploying to a cluster that uses only IPv6,You can use a custom command to pass a parameter to the Next.js start command
 
 For local docker run
 
