@@ -246,13 +246,11 @@ export const AddFieldsFormPartial = ({
   useEffect(() => {
     if (selectedField) {
       window.addEventListener('mousemove', onMouseMove);
-      window.addEventListener('click', onMouseClick);
       window.addEventListener('mouseup', onMouseClick);
     }
 
     return () => {
       window.removeEventListener('mousemove', onMouseMove);
-      window.removeEventListener('click', onMouseClick);
       window.removeEventListener('mouseup', onMouseClick);
     };
   }, [onMouseClick, onMouseMove, selectedField]);
@@ -419,10 +417,7 @@ export const AddFieldsFormPartial = ({
                 type="button"
                 className="group h-full w-full"
                 disabled={!selectedSigner || selectedSigner?.sendStatus === SendStatus.SENT}
-                onClick={(e) => {
-                  setSelectedField(FieldType.SIGNATURE);
-                  e.stopPropagation();
-                }}
+                onClick={() => setSelectedField(FieldType.SIGNATURE)}
                 onMouseDown={() => setSelectedField(FieldType.SIGNATURE)}
                 data-selected={selectedField === FieldType.SIGNATURE ? true : undefined}
               >
@@ -446,10 +441,7 @@ export const AddFieldsFormPartial = ({
                 type="button"
                 className="group h-full w-full"
                 disabled={!selectedSigner || selectedSigner?.sendStatus === SendStatus.SENT}
-                onClick={(e) => {
-                  setSelectedField(FieldType.EMAIL);
-                  e.stopPropagation();
-                }}
+                onClick={() => setSelectedField(FieldType.EMAIL)}
                 onMouseDown={() => setSelectedField(FieldType.EMAIL)}
                 data-selected={selectedField === FieldType.EMAIL ? true : undefined}
               >
@@ -472,10 +464,7 @@ export const AddFieldsFormPartial = ({
                 type="button"
                 className="group h-full w-full"
                 disabled={!selectedSigner || selectedSigner?.sendStatus === SendStatus.SENT}
-                onClick={(e) => {
-                  setSelectedField(FieldType.NAME);
-                  e.stopPropagation();
-                }}
+                onClick={() => setSelectedField(FieldType.NAME)}
                 onMouseDown={() => setSelectedField(FieldType.NAME)}
                 data-selected={selectedField === FieldType.NAME ? true : undefined}
               >
@@ -498,10 +487,7 @@ export const AddFieldsFormPartial = ({
                 type="button"
                 className="group h-full w-full"
                 disabled={!selectedSigner || selectedSigner?.sendStatus === SendStatus.SENT}
-                onClick={(e) => {
-                  setSelectedField(FieldType.DATE);
-                  e.stopPropagation();
-                }}
+                onClick={() => setSelectedField(FieldType.DATE)}
                 onMouseDown={() => setSelectedField(FieldType.DATE)}
                 data-selected={selectedField === FieldType.DATE ? true : undefined}
               >
