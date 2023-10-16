@@ -8,6 +8,7 @@ import { Loader } from 'lucide-react';
 
 import { useUpdateSearchParams } from '@documenso/lib/client-only/hooks/use-update-search-params';
 import { FindResultSet } from '@documenso/lib/types/find-result-set';
+import { recipientInitials } from '@documenso/lib/utils/recipient-formatter';
 import { Document, User } from '@documenso/prisma/client';
 import { Avatar, AvatarFallback } from '@documenso/ui/primitives/avatar';
 import { DataTable } from '@documenso/ui/primitives/data-table';
@@ -62,7 +63,9 @@ export const DocumentsDataTable = ({ results }: DocumentsDataTableProps) => {
                 <Link href={`/admin/users/${row.original.User.id}`}>
                   <Avatar className="dark:border-border h-12 w-12 border-2 border-solid border-white">
                     <AvatarFallback className="text-gray-400">
-                      <span className="text-xs">{row.original.User.name}</span>
+                      <span className="text-sm">
+                        {recipientInitials(row.original.User.name ?? '')}
+                      </span>
                     </AvatarFallback>
                   </Avatar>
                 </Link>
