@@ -65,7 +65,7 @@ export const DataTableActionDropdown = ({ row }: DataTableActionDropdownProps) =
 
   const isOwner = row.User.id === session.user.id;
   // const isRecipient = !!recipient;
-  // const isDraft = row.status === DocumentStatus.DRAFT;
+  const isDraft = row.status === DocumentStatus.DRAFT;
   // const isPending = row.status === DocumentStatus.PENDING;
   const isComplete = row.status === DocumentStatus.COMPLETED;
   // const isSigned = recipient?.signingStatus === SigningStatus.SIGNED;
@@ -157,6 +157,7 @@ export const DataTableActionDropdown = ({ row }: DataTableActionDropdownProps) =
         </DropdownMenuItem>
 
         <DropdownMenuItem
+          disabled={isDraft}
           onClick={async () =>
             createAndCopyShareLink({
               token: recipient?.token,
