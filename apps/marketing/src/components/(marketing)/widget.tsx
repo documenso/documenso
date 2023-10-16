@@ -31,7 +31,7 @@ import { FormErrorMessage } from '../form/form-error-message';
 const ZWidgetFormSchema = z
   .object({
     email: z.string().email({ message: 'Please enter a valid email address.' }),
-    name: z.string().min(3, { message: 'Please enter a valid name.' }),
+    name: z.string().trim().min(3, { message: 'Please enter a valid name.' }),
   })
   .and(
     z.union([
@@ -41,7 +41,7 @@ const ZWidgetFormSchema = z
       }),
       z.object({
         signatureDataUrl: z.null().or(z.string().max(0)),
-        signatureText: z.string().min(1),
+        signatureText: z.string().trim().min(1),
       }),
     ]),
   );
