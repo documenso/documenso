@@ -1,12 +1,14 @@
 import { trpc } from '@documenso/trpc/react';
 import { TCreateOrGetShareLinkMutationSchema } from '@documenso/trpc/server/share-link-router/schema';
-import { useToast } from '@documenso/ui/primitives/use-toast';
 
 import { useCopyToClipboard } from './use-copy-to-clipboard';
 
-export function useCopyShareLink() {
-  const { toast } = useToast();
+export type UseCopyShareLinkOptions = {
+  onSuccess?: () => void;
+  onError?: () => void;
+};
 
+export function useCopyShareLink({ onSuccess, onError }: UseCopyShareLinkOptions) {
   const [, copyToClipboard] = useCopyToClipboard();
 
   const { mutateAsync: createOrGetShareLink, isLoading: isCreatingShareLink } =
@@ -37,17 +39,9 @@ export function useCopyShareLink() {
         throw new Error('Copy to clipboard failed');
       }
 
-      toast({
-        title: 'Copied to clipboard',
-        description: 'The sharing link has been copied to your clipboard.',
-      });
-    } catch {
-      toast({
-        variant: 'destructive',
-        title: 'Something went wrong',
-        description: 'The sharing link could not be created at this time. Please try again.',
-        duration: 5000,
-      });
+      onSuccess?.();
+    } catch (e) {
+      onError?.();
     }
   };
 

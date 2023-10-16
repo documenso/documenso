@@ -6,6 +6,10 @@ import { Copy, Share } from 'lucide-react';
 import { FaXTwitter } from 'react-icons/fa6';
 
 import { useCopyShareLink } from '@documenso/lib/client-only/hooks/use-copy-share-link';
+import {
+  TOAST_DOCUMENT_SHARE_ERROR,
+  TOAST_DOCUMENT_SHARE_SUCCESS,
+} from '@documenso/lib/constants/toast';
 import { generateTwitterIntent } from '@documenso/lib/universal/generate-twitter-intent';
 import { trpc } from '@documenso/trpc/react';
 import { cn } from '@documenso/ui/lib/utils';
@@ -18,6 +22,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@documenso/ui/primitives/dialog';
+import { useToast } from '@documenso/ui/primitives/use-toast';
 
 export type DocumentShareButtonProps = HTMLAttributes<HTMLButtonElement> & {
   token: string;
@@ -25,7 +30,12 @@ export type DocumentShareButtonProps = HTMLAttributes<HTMLButtonElement> & {
 };
 
 export const DocumentShareButton = ({ token, documentId, className }: DocumentShareButtonProps) => {
-  const { copyShareLink, createAndCopyShareLink, isCopyingShareLink } = useCopyShareLink();
+  const { toast } = useToast();
+
+  const { copyShareLink, createAndCopyShareLink, isCopyingShareLink } = useCopyShareLink({
+    onSuccess: () => toast(TOAST_DOCUMENT_SHARE_SUCCESS),
+    onError: () => toast(TOAST_DOCUMENT_SHARE_ERROR),
+  });
 
   const [isOpen, setIsOpen] = useState(false);
 

@@ -19,6 +19,10 @@ import {
 import { useSession } from 'next-auth/react';
 
 import { useCopyShareLink } from '@documenso/lib/client-only/hooks/use-copy-share-link';
+import {
+  TOAST_DOCUMENT_SHARE_ERROR,
+  TOAST_DOCUMENT_SHARE_SUCCESS,
+} from '@documenso/lib/constants/toast';
 import { getFile } from '@documenso/lib/universal/upload/get-file';
 import { Document, DocumentStatus, Recipient, User } from '@documenso/prisma/client';
 import { DocumentWithData } from '@documenso/prisma/types/document-with-data';
@@ -30,6 +34,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from '@documenso/ui/primitives/dropdown-menu';
+import { useToast } from '@documenso/ui/primitives/use-toast';
 
 import { DeleteDraftDocumentDialog } from './delete-draft-document-dialog';
 
@@ -43,7 +48,12 @@ export type DataTableActionDropdownProps = {
 export const DataTableActionDropdown = ({ row }: DataTableActionDropdownProps) => {
   const { data: session } = useSession();
 
-  const { createAndCopyShareLink, isCopyingShareLink } = useCopyShareLink();
+  const { toast } = useToast();
+
+  const { createAndCopyShareLink, isCopyingShareLink } = useCopyShareLink({
+    onSuccess: () => toast(TOAST_DOCUMENT_SHARE_SUCCESS),
+    onError: () => toast(TOAST_DOCUMENT_SHARE_ERROR),
+  });
 
   const [isDeleteDialogOpen, setDeleteDialogOpen] = useState(false);
 

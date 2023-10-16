@@ -7,8 +7,13 @@ import { useSession } from 'next-auth/react';
 import { match } from 'ts-pattern';
 
 import { useCopyShareLink } from '@documenso/lib/client-only/hooks/use-copy-share-link';
+import {
+  TOAST_DOCUMENT_SHARE_ERROR,
+  TOAST_DOCUMENT_SHARE_SUCCESS,
+} from '@documenso/lib/constants/toast';
 import { Document, DocumentStatus, Recipient, SigningStatus, User } from '@documenso/prisma/client';
 import { Button } from '@documenso/ui/primitives/button';
+import { useToast } from '@documenso/ui/primitives/use-toast';
 
 export type DataTableActionButtonProps = {
   row: Document & {
@@ -20,7 +25,12 @@ export type DataTableActionButtonProps = {
 export const DataTableActionButton = ({ row }: DataTableActionButtonProps) => {
   const { data: session } = useSession();
 
-  const { createAndCopyShareLink, isCopyingShareLink } = useCopyShareLink();
+  const { toast } = useToast();
+
+  const { createAndCopyShareLink, isCopyingShareLink } = useCopyShareLink({
+    onSuccess: () => toast(TOAST_DOCUMENT_SHARE_SUCCESS),
+    onError: () => toast(TOAST_DOCUMENT_SHARE_ERROR),
+  });
 
   if (!session) {
     return null;
