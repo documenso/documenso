@@ -14,6 +14,7 @@ export type AdminNavProps = HTMLAttributes<HTMLDivElement>;
 
 export const AdminNav = ({ className, ...props }: AdminNavProps) => {
   const pathname = usePathname();
+
   return (
     <div
       className={cn(

@@ -60,22 +60,35 @@ export const DocumentsDataTable = ({ results }: DocumentsDataTableProps) => {
             header: 'Owner',
             accessorKey: 'owner',
             cell: ({ row }) => {
-              const avatarFallback = row.original.User.name
+              const avatarFallbackText = row.original.User.name
                 ? recipientInitials(row.original.User.name)
                 : row.original.User.email.slice(0, 1).toUpperCase();
               return (
-                <Tooltip>
+                <Tooltip delayDuration={200}>
                   <TooltipTrigger>
                     <Link href={`/admin/users/${row.original.User.id}`}>
                       <Avatar className="dark:border-border h-12 w-12 border-2 border-solid border-white">
                         <AvatarFallback className="text-gray-400">
-                          <span className="text-xs">{avatarFallback}</span>
+                          <span className="text-xs">{avatarFallbackText}</span>
                         </AvatarFallback>
                       </Avatar>
                     </Link>
                   </TooltipTrigger>
-                  <TooltipContent className="max-w-xs">
-                    {row.original.User.name ?? row.original.User.email}
+                  <TooltipContent className="flex max-w-xs items-center gap-2">
+                    <Avatar className="dark:border-border h-12 w-12 border-2 border-solid border-white">
+                      <AvatarFallback className="text-gray-400">
+                        <span className="text-xs">{avatarFallbackText}</span>
+                      </AvatarFallback>
+                    </Avatar>
+
+                    <div className="flex flex-col">
+                      <span className="text-muted-foreground text-sm">
+                        {row.original.User.name}
+                      </span>
+                      <span className="text-muted-foreground text-sm">
+                        {row.original.User.email}
+                      </span>
+                    </div>
                   </TooltipContent>
                 </Tooltip>
               );

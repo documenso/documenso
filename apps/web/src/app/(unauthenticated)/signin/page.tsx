@@ -1,17 +1,8 @@
 import Link from 'next/link';
-import { redirect } from 'next/navigation';
-
-import { getServerComponentSession } from '@documenso/lib/next-auth/get-server-session';
 
 import { SignInForm } from '~/components/forms/signin';
 
-export default async function SignInPage() {
-  const { session } = await getServerComponentSession();
-
-  if (session) {
-    redirect('/');
-  }
-
+export default function SignInPage() {
   return (
     <div>
       <h1 className="text-4xl font-semibold">Sign in to your account</h1>
