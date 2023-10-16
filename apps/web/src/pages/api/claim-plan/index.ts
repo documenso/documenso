@@ -41,7 +41,7 @@ export default async function handler(
       },
     });
 
-    if (user && user.Subscription.length > 0) {
+    if (user && user.Subscription) {
       return res.status(200).json({
         redirectUrl: `${process.env.NEXT_PUBLIC_WEBAPP_URL}/login`,
       });
