@@ -4,6 +4,7 @@ import { Caveat, Inter } from 'next/font/google';
 
 import { FeatureFlagProvider } from '@documenso/lib/client-only/providers/feature-flag';
 import { getAllAnonymousFlags } from '@documenso/lib/universal/get-feature-flag';
+import { TrpcProvider } from '@documenso/trpc/react';
 import { cn } from '@documenso/ui/lib/utils';
 import { Toaster } from '@documenso/ui/primitives/toaster';
 
@@ -63,7 +64,9 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       <body>
         <FeatureFlagProvider initialFlags={flags}>
           <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-            <PlausibleProvider>{children}</PlausibleProvider>
+            <PlausibleProvider>
+              <TrpcProvider>{children}</TrpcProvider>
+            </PlausibleProvider>
           </ThemeProvider>
         </FeatureFlagProvider>
 

@@ -4,14 +4,13 @@ import { useEffect, useState } from 'react';
 
 import Link from 'next/link';
 
-import { Share } from 'lucide-react';
-
 import { useFeatureFlags } from '@documenso/lib/client-only/providers/feature-flag';
 import { base64 } from '@documenso/lib/universal/base64';
 import { getFile } from '@documenso/lib/universal/upload/get-file';
 import { DocumentWithRecipient } from '@documenso/prisma/types/document-with-recipient';
 import DocumentDialog from '@documenso/ui/components/document/document-dialog';
 import { DocumentDownloadButton } from '@documenso/ui/components/document/document-download-button';
+import { DocumentShareButton } from '@documenso/ui/components/document/document-share-button';
 import { SigningCard3D } from '@documenso/ui/components/signing-card';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
@@ -87,11 +86,11 @@ export const SinglePlayerModeSuccess = ({ className, document }: SinglePlayerMod
       <div className="relative mt-8 w-full">
         <div className={cn('flex flex-col items-center', className)}>
           <div className="grid w-full max-w-sm grid-cols-2 gap-4">
-            {/* TODO: Hook this up */}
-            <Button variant="outline" className="flex-1 bg-transparent backdrop-blur-sm" disabled>
-              <Share className="mr-2 h-5 w-5" />
-              Share
-            </Button>
+            <DocumentShareButton
+              documentId={document.id}
+              token={document.Recipient.token}
+              className="flex-1 bg-transparent backdrop-blur-sm"
+            />
 
             <DocumentDownloadButton
               className="flex-1 bg-transparent backdrop-blur-sm"
@@ -103,7 +102,7 @@ export const SinglePlayerModeSuccess = ({ className, document }: SinglePlayerMod
             <Button
               onClick={async () => onShowDocumentClick()}
               loading={isFetchingDocumentFile}
-              className="col-span-2"
+              className="z-10 col-span-2"
             >
               Show document
             </Button>
