@@ -8,7 +8,7 @@ import { Plus, Trash } from 'lucide-react';
 import { Controller, useFieldArray, useForm } from 'react-hook-form';
 
 import { nanoid } from '@documenso/lib/universal/id';
-import { Field, Recipient, SendStatus } from '@documenso/prisma/client';
+import { Field, Recipient, SendStatus, User } from '@documenso/prisma/client';
 import { Button } from '@documenso/ui/primitives/button';
 import { FormErrorMessage } from '@documenso/ui/primitives/form/form-error-message';
 import { Input } from '@documenso/ui/primitives/input';
@@ -30,9 +30,7 @@ export type AddSignersFormProps = {
   fields: Field[];
   numberOfSteps: number;
   onSubmit: (_data: TAddSignersFormSchema) => void;
-  creatorEmail: string;
-  creatorName: string;
-  selfSign: boolean;
+  user: User;
 };
 
 export const AddSignersFormPartial = ({
@@ -41,9 +39,7 @@ export const AddSignersFormPartial = ({
   recipients,
   fields: _fields,
   onSubmit,
-  creatorEmail,
-  creatorName,
-  selfSign,
+  user,
 }: AddSignersFormProps) => {
   const { toast } = useToast();
 
@@ -86,16 +82,16 @@ export const AddSignersFormPartial = ({
   });
 
   const selfSignEnabled = useMemo(() => {
-    if (!signers || signers.length === 0 || !creatorEmail || !creatorName) {
+    if (!signers || signers.length === 0 || !user.email || !user.name) {
       return false;
     }
 
     const selfSigner = signers.some(
-      (signer) => signer.email === creatorEmail && signer.name === creatorName,
+      (signer) => signer.email === user.email && signer.name === user.name,
     );
 
     return selfSigner;
-  }, [signers, creatorEmail, creatorName]);
+  }, [signers, user.email, user.name]);
 
   const hasBeenSentToRecipientId = (id?: number) => {
     if (!id) {
@@ -116,10 +112,14 @@ export const AddSignersFormPartial = ({
   };
 
   const onAddSelfSigner = async () => {
+    if (!user.name) {
+      return;
+    }
+
     appendSigner({
       formId: nanoid(12),
-      name: creatorName,
-      email: creatorEmail,
+      name: user.name,
+      email: user.email,
     });
   };
 
@@ -149,14 +149,6 @@ export const AddSignersFormPartial = ({
     <>
       <DocumentFlowFormContainerContent>
         <div className="flex w-full flex-col gap-y-4">
-          <Button
-            type="button"
-            disabled={isSubmitting || selfSignEnabled}
-            onClick={() => onAddSelfSigner()}
-          >
-            <Plus className="-ml-1 mr-2 h-5 w-5" />
-            Add My Self
-          </Button>
           <AnimatePresence>
             {signers.map((signer, index) => (
               <motion.div
@@ -181,7 +173,7 @@ export const AddSignersFormPartial = ({
                         disabled={
                           isSubmitting ||
                           hasBeenSentToRecipientId(signer.nativeId) ||
-                          signer.email === creatorEmail
+                          signer.email === user.email
                         }
                         onKeyDown={onKeyDown}
                         {...field}
@@ -204,7 +196,7 @@ export const AddSignersFormPartial = ({
                         disabled={
                           isSubmitting ||
                           hasBeenSentToRecipientId(signer.nativeId) ||
-                          signer.name === creatorName
+                          signer.name === user.name
                         }
                         onKeyDown={onKeyDown}
                         {...field}
@@ -244,9 +236,22 @@ export const AddSignersFormPartial = ({
         />
 
         <div className="mt-4">
-          <Button type="button" disabled={isSubmitting} onClick={() => onAddSigner()}>
+          <Button
+            className="mr-4"
+            type="button"
+            disabled={isSubmitting}
+            onClick={() => onAddSigner()}
+          >
             <Plus className="-ml-1 mr-2 h-5 w-5" />
             Add Signer
+          </Button>
+          <Button
+            type="button"
+            disabled={isSubmitting || selfSignEnabled}
+            onClick={() => onAddSelfSigner()}
+          >
+            <Plus className="-ml-1 mr-2 h-5 w-5" />
+            Add Myself
           </Button>
         </div>
       </DocumentFlowFormContainerContent>

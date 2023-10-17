@@ -4,8 +4,6 @@ import { useMemo, useState } from 'react';
 
 import { useRouter } from 'next/navigation';
 
-import { useSession } from 'next-auth/react';
-
 import { Field, Recipient, User } from '@documenso/prisma/client';
 import { DocumentWithData } from '@documenso/prisma/types/document-with-data';
 import { cn } from '@documenso/ui/lib/utils';
@@ -44,39 +42,25 @@ export const EditDocumentForm = ({
   document,
   recipients,
   fields,
-  user: _user,
+  user,
   dataUrl,
 }: EditDocumentFormProps) => {
   const { toast } = useToast();
   const router = useRouter();
-  const { data: session } = useSession();
-
-  if (!session) {
-    router.push('/');
-
-    toast({
-      title: 'Error',
-      description: 'You are not authorized, Please Login first.',
-      variant: 'destructive',
-    });
-  }
 
   const [step, setStep] = useState<EditDocumentStep>('signers');
 
-  const creatorName = session?.user.name;
-  const creatorEmail = session?.user.email;
-
   const selfSign = useMemo(() => {
-    if (!recipients || recipients.length === 0 || !creatorEmail || !creatorName) {
+    if (!recipients || recipients.length === 0 || !user.email || !user.name) {
       return false;
     }
 
     const selfSigner = recipients.some(
-      (signer) => signer.email === creatorEmail && signer.name === creatorName,
+      (signer) => signer.email === user.email && signer.name === user.name,
     );
 
     return selfSigner;
-  }, [recipients, creatorEmail, creatorName]);
+  }, [recipients, user.email, user.name]);
 
   const documentFlow: Record<EditDocumentStep, DocumentFlowStep> = {
     signers: {
@@ -108,6 +92,7 @@ export const EditDocumentForm = ({
       });
 
       router.refresh();
+
       setStep('fields');
     } catch (err) {
       console.error(err);
@@ -161,7 +146,7 @@ export const EditDocumentForm = ({
 
       if (selfSign) {
         const selfSigner = recipients.find(
-          (recipient) => recipient.name === creatorName && recipient.email === creatorEmail,
+          (recipient) => recipient.name === user.name && recipient.email === user.email,
         );
 
         if (selfSigner) {
@@ -213,9 +198,7 @@ export const EditDocumentForm = ({
               fields={fields}
               numberOfSteps={Object.keys(documentFlow).length}
               onSubmit={onAddSignersFormSubmit}
-              creatorEmail={creatorEmail ?? ''}
-              creatorName={creatorName ?? ''}
-              selfSign={selfSign}
+              user={user}
             />
           )}
 
