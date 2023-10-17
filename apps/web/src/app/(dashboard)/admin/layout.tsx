@@ -21,9 +21,11 @@ export default async function AdminSectionLayout({ children }: AdminSectionLayou
   return (
     <div className="mx-auto mt-16 w-full max-w-screen-xl px-4 md:px-8">
       <div className="grid grid-cols-12 gap-x-8 md:mt-8">
-        <AdminNav className="col-span-10 sm:col-span-12 md:col-span-3 md:flex" />
+        <AdminNav className="col-span-10 min-[345px]:col-span-11 min-[375px]:col-span-12 md:col-span-3 md:flex" />
 
-        <div className="col-span-10 mt-12 sm:col-span-12 md:col-span-9 md:mt-0">{children}</div>
+        <div className="col-span-10 mt-12 min-[345px]:col-span-11 min-[375px]:col-span-12 md:col-span-9 md:mt-0">
+          {children}
+        </div>
       </div>
     </div>
   );
