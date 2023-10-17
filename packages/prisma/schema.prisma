@@ -232,29 +232,41 @@ enum TemplateType {
 }
 
 model Template {
-  id             Int             @id @default(autoincrement())
-  userId         Int
-  title          String
-  description    String?
-  status         TemplateType    @default(PRIVATE)
-  documentName   String
-  createdAt      DateTime        @default(now())
-  updatedAt      DateTime        @updatedAt
-  User           User            @relation(fields: [userId], references: [id], onDelete: Cascade)
-  templateDataId String          @unique
-  TemplateData   DocumentData    @relation(fields: [templateDataId], references: [id], onDelete: Cascade)
-  TemplateField  TemplateField[]
+  id                    Int                 @id @default(autoincrement())
+  userId                Int
+  User                  User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title                 String
+  type                  TemplateType        @default(PRIVATE)
+  TemplateRecipient     TemplateRecipient[]
+  TemplateField         TemplateField[]
+  tempateDocumentDataId String
+  templateDocumentData  DocumentData        @relation(fields: [tempateDocumentDataId], references: [id], onDelete: Cascade)
+  createdAt             DateTime            @default(now())
+  updatedAt             DateTime            @default(now()) @updatedAt
+
+  @@unique([tempateDocumentDataId])
+}
+
+model TemplateRecipient {
+  id            Int             @id @default(autoincrement())
+  templateId    Int
+  placeholder   String          @db.VarChar(255) // Placeholder name for this recipient
+  Template      Template        @relation(fields: [templateId], references: [id], onDelete: Cascade)
+  TemplateField TemplateField[]
 }
 
 model TemplateField {
-  id         Int       @id @default(autoincrement())
-  templateId Int
-  type       FieldType
-  page       Int
-  positionX  Decimal   @default(0)
-  positionY  Decimal   @default(0)
-  width      Decimal   @default(-1)
-  height     Decimal   @default(-1)
-  customText String
-  Template   Template  @relation(fields: [templateId], references: [id], onDelete: Cascade)
+  id                Int                @id @default(autoincrement())
+  templateId        Int
+  recipientId       Int?
+  type              FieldType
+  page              Int
+  positionX         Decimal            @default(0)
+  positionY         Decimal            @default(0)
+  width             Decimal            @default(-1)
+  height            Decimal            @default(-1)
+  customText        String
+  inserted          Boolean
+  Template          Template           @relation(fields: [templateId], references: [id], onDelete: Cascade)
+  TemplateRecipient TemplateRecipient? @relation(fields: [recipientId], references: [id], onDelete: Cascade)
 }
