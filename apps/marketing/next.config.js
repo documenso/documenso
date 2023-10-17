@@ -24,9 +24,10 @@ const config = {
   },
   webpack: (config, { isServer }) => {
     // fixes: Module not found: Can’t resolve ‘../build/Release/canvas.node’
-    if (!isServer) {
+    if (isServer) {
       config.resolve.alias.canvas = false;
     }
+
     return config;
   },
   async headers() {
