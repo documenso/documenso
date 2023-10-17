@@ -4,6 +4,7 @@ import { redirect } from 'next/navigation';
 
 import { getServerSession } from 'next-auth';
 
+import { LimitsProvider } from '@documenso/ee/server-only/limits/provider/server';
 import { NEXT_AUTH_OPTIONS } from '@documenso/lib/next-auth/auth-options';
 import { getRequiredServerComponentSession } from '@documenso/lib/next-auth/get-server-session';
 
@@ -28,11 +29,13 @@ export default async function AuthenticatedDashboardLayout({
 
   return (
     <NextAuthProvider session={session}>
-      <Header user={user} />
+      <LimitsProvider>
+        <Header user={user} />
 
-      <main className="mt-8 pb-8 md:mt-12 md:pb-12">{children}</main>
+        <main className="mt-8 pb-8 md:mt-12 md:pb-12">{children}</main>
 
-      <RefreshOnFocus />
+        <RefreshOnFocus />
+      </LimitsProvider>
     </NextAuthProvider>
   );
 }
