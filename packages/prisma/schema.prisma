@@ -232,19 +232,19 @@ enum TemplateType {
 }
 
 model Template {
-  id                    Int                 @id @default(autoincrement())
-  userId                Int
-  User                  User                @relation(fields: [userId], references: [id], onDelete: Cascade)
-  title                 String
-  type                  TemplateType        @default(PRIVATE)
-  TemplateRecipient     TemplateRecipient[]
-  TemplateField         TemplateField[]
-  tempateDocumentDataId String
-  templateDocumentData  DocumentData        @relation(fields: [tempateDocumentDataId], references: [id], onDelete: Cascade)
-  createdAt             DateTime            @default(now())
-  updatedAt             DateTime            @default(now()) @updatedAt
+  id                     Int                 @id @default(autoincrement())
+  userId                 Int
+  User                   User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title                  String
+  type                   TemplateType        @default(PRIVATE)
+  TemplateRecipient      TemplateRecipient[]
+  TemplateField          TemplateField[]
+  templateDocumentDataId String
+  templateDocumentData   DocumentData        @relation(fields: [templateDocumentDataId], references: [id], onDelete: Cascade)
+  createdAt              DateTime            @default(now())
+  updatedAt              DateTime            @default(now()) @updatedAt
 
-  @@unique([tempateDocumentDataId])
+  @@unique([templateDocumentDataId])
 }
 
 model TemplateRecipient {
