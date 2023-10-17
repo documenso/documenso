@@ -20,7 +20,7 @@ import { useToast } from '@documenso/ui/primitives/use-toast';
 import { FormErrorMessage } from '../form/form-error-message';
 
 export const ZProfileFormSchema = z.object({
-  name: z.string().min(1),
+  name: z.string().trim().min(1, { message: 'Please enter a valid name.' }),
   signature: z.string().min(1, 'Signature Pad cannot be empty'),
 });
 

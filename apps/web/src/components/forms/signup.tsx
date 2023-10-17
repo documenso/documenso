@@ -19,7 +19,7 @@ import { SignaturePad } from '@documenso/ui/primitives/signature-pad';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
 export const ZSignUpFormSchema = z.object({
-  name: z.string().min(1),
+  name: z.string().trim().min(1, { message: 'Please enter a valid name.' }),
   email: z.string().email().min(1),
   password: z.string().min(6).max(72),
   signature: z.string().min(1, { message: 'We need your signature to sign documents' }),

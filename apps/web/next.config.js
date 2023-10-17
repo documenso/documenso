@@ -44,6 +44,32 @@ const config = {
       },
     ];
   },
+  async redirects() {
+    return [
+      {
+        permanent: true,
+        source: '/documents/:id/sign',
+        destination: '/sign/:token',
+        has: [
+          {
+            type: 'query',
+            key: 'token',
+          },
+        ],
+      },
+      {
+        permanent: true,
+        source: '/documents/:id/signed',
+        destination: '/sign/:token',
+        has: [
+          {
+            type: 'query',
+            key: 'token',
+          },
+        ],
+      },
+    ];
+  },
 };
 
 module.exports = config;
