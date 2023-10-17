@@ -5,7 +5,11 @@ import { HTMLAttributes, useState } from 'react';
 import { Copy, Share } from 'lucide-react';
 import { FaXTwitter } from 'react-icons/fa6';
 
-import { useCopyToClipboard } from '@documenso/lib/client-only/hooks/use-copy-to-clipboard';
+import { useCopyShareLink } from '@documenso/lib/client-only/hooks/use-copy-share-link';
+import {
+  TOAST_DOCUMENT_SHARE_ERROR,
+  TOAST_DOCUMENT_SHARE_SUCCESS,
+} from '@documenso/lib/constants/toast';
 import { generateTwitterIntent } from '@documenso/lib/universal/generate-twitter-intent';
 import { trpc } from '@documenso/trpc/react';
 import { cn } from '@documenso/ui/lib/utils';
@@ -27,7 +31,11 @@ export type DocumentShareButtonProps = HTMLAttributes<HTMLButtonElement> & {
 
 export const DocumentShareButton = ({ token, documentId, className }: DocumentShareButtonProps) => {
   const { toast } = useToast();
-  const [, copyToClipboard] = useCopyToClipboard();
+
+  const { copyShareLink, createAndCopyShareLink, isCopyingShareLink } = useCopyShareLink({
+    onSuccess: () => toast(TOAST_DOCUMENT_SHARE_SUCCESS),
+    onError: () => toast(TOAST_DOCUMENT_SHARE_ERROR),
+  });
 
   const [isOpen, setIsOpen] = useState(false);
 
@@ -49,23 +57,14 @@ export const DocumentShareButton = ({ token, documentId, className }: DocumentSh
   };
 
   const onCopyClick = async () => {
-    let { slug = '' } = shareLink || {};
-
-    if (!slug) {
-      const result = await createOrGetShareLink({
+    if (shareLink) {
+      await copyShareLink(`${window.location.origin}/share/${shareLink.slug}`);
+    } else {
+      await createAndCopyShareLink({
         token,
         documentId,
       });
-
-      slug = result.slug;
     }
-
-    await copyToClipboard(`${process.env.NEXT_PUBLIC_WEBAPP_URL}/share/${slug}`).catch(() => null);
-
-    toast({
-      title: 'Copied to clipboard',
-      description: 'The sharing link has been copied to your clipboard.',
-    });
 
     setIsOpen(false);
   };
@@ -100,9 +99,9 @@ export const DocumentShareButton = ({ token, documentId, className }: DocumentSh
           variant="outline"
           disabled={!token || !documentId}
           className={cn('flex-1', className)}
-          loading={isLoading}
+          loading={isLoading || isCopyingShareLink}
         >
-          {!isLoading && <Share className="mr-2 h-5 w-5" />}
+          {!isLoading && !isCopyingShareLink && <Share className="mr-2 h-5 w-5" />}
           Share
         </Button>
       </DialogTrigger>
