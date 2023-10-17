@@ -19,7 +19,7 @@ interface User {
   name: string | null;
   email: string;
   roles: Role[];
-  Subscription: SubscriptionLite[];
+  Subscription?: SubscriptionLite | null;
   Document: DocumentLite[];
 }
 
@@ -100,19 +100,7 @@ export const UsersDataTable = ({ users, totalPages, perPage, page }: UsersDataTa
           {
             header: 'Subscription',
             accessorKey: 'subscription',
-            cell: ({ row }) => {
-              if (row.original.Subscription && row.original.Subscription.length > 0) {
-                return (
-                  <>
-                    {row.original.Subscription.map((subscription: SubscriptionLite, i: number) => {
-                      return <span key={i}>{subscription.status}</span>;
-                    })}
-                  </>
-                );
-              } else {
-                return <span>NONE</span>;
-              }
-            },
+            cell: ({ row }) => row.original.Subscription?.status ?? 'NONE',
           },
           {
             header: 'Documents',

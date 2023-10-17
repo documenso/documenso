@@ -2,7 +2,7 @@ import { prisma } from '@documenso/prisma';
 
 export type DeleteUserOptions = {
   email: string;
-}
+};
 
 export const deleteUser = async ({ email }: DeleteUserOptions) => {
   const user = await prisma.user.findFirst({
