@@ -34,23 +34,24 @@ export const ZPasswordFormSchema = z
     currentPassword: z.string().min(8).max(72),
     password: z
       .string()
-      .refine((value) => !commonPasswords.includes(value), {
-        message: 'Password is too common',
+      .regex(new RegExp('.*[A-Z].*'), { message: 'One uppercase character' })
+      .regex(new RegExp('.*[a-z].*'), { message: 'One lowercase character' })
+      .regex(new RegExp('.*\\d.*'), { message: 'One number' })
+      .regex(new RegExp('.*[`~<>?,./!@#$%^&*()\\-_+="\'|{}\\[\\];:\\\\].*'), {
+        message: 'One special character is required',
       })
-      .and(
-        z
-          .string()
-          .regex(new RegExp('.*[A-Z].*'), { message: 'One uppercase character' })
-          .regex(new RegExp('.*[a-z].*'), { message: 'One lowercase character' })
-          .regex(new RegExp('.*\\d.*'), { message: 'One number' })
-          .regex(new RegExp('.*[`~<>?,./!@#$%^&*()\\-_+="\'|{}\\[\\];:\\\\].*'), {
-            message: 'One special character is required',
-          })
-          .min(8, { message: 'Must be at least 8 characters in length' })
-          .max(72, { message: 'Cannot be more than 72 characters in length' }),
-      ),
+      .min(8, { message: 'Must be at least 8 characters in length' })
+      .max(72, { message: 'Cannot be more than 72 characters in length' }),
     repeatedPassword: z.string().min(8).max(72),
   })
+  .refine(
+    (data) => {
+      return !commonPasswords.includes(data.password);
+    },
+    {
+      message: 'Password should not be common',
+    },
+  )
   .refine((data) => data.password === data.repeatedPassword, {
     message: 'Passwords do not match',
     path: ['repeatedPassword'],

@@ -29,28 +29,35 @@ const commonPasswords = [
   'qwerty@123',
 ];
 
-export const ZSignUpFormSchema = z.object({
-  name: z.string().trim().min(1, { message: 'Please enter a valid name.' }),
-  email: z.string().email().min(1),
-  password: z
-    .string()
-    .refine((value) => !commonPasswords.includes(value), {
-      message: 'Password is too common',
-    })
-    .and(
-      z
-        .string()
-        .regex(new RegExp('.*[A-Z].*'), { message: 'One uppercase character' })
-        .regex(new RegExp('.*[a-z].*'), { message: 'One lowercase character' })
-        .regex(new RegExp('.*\\d.*'), { message: 'One number' })
-        .regex(new RegExp('.*[`~<>?,./!@#$%^&*()\\-_+="\'|{}\\[\\];:\\\\].*'), {
-          message: 'One special character is required',
-        })
-        .min(8, { message: 'Must be at least 8 characters in length' })
-        .max(72, { message: 'Cannot be more than 72 characters in length' }),
-    ),
-  signature: z.string().min(1, { message: 'We need your signature to sign documents' }),
-});
+export const ZSignUpFormSchema = z
+  .object({
+    name: z.string().trim().min(1, { message: 'Please enter a valid name.' }),
+    email: z.string().email().min(1),
+    password: z
+      .string()
+      .regex(new RegExp('.*[A-Z].*'), { message: 'One uppercase character' })
+      .regex(new RegExp('.*[a-z].*'), { message: 'One lowercase character' })
+      .regex(new RegExp('.*\\d.*'), { message: 'One number' })
+      .regex(new RegExp('.*[`~<>?,./!@#$%^&*()\\-_+="\'|{}\\[\\];:\\\\].*'), {
+        message: 'One special character is required',
+      })
+      .min(8, { message: 'Must be at least 8 characters in length' })
+      .max(72, { message: 'Cannot be more than 72 characters in length' }),
+    signature: z.string().min(1, { message: 'We need your signature to sign documents' }),
+  })
+  .refine(
+    (data) => {
+      const { name, email, password } = data;
+      return (
+        !commonPasswords.includes(password) &&
+        !password.includes(name) &&
+        !password.includes(email.split('@')[0])
+      );
+    },
+    {
+      message: 'Password should not be common or based on personal information',
+    },
+  );
 
 export type TSignUpFormSchema = z.infer<typeof ZSignUpFormSchema>;
 
