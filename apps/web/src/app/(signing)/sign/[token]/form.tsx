@@ -25,6 +25,8 @@ import {
 } from '@documenso/ui/primitives/select';
 import { SignaturePad } from '@documenso/ui/primitives/signature-pad';
 
+import { DATE_FORMATS } from '~/helpers/constants';
+
 import { useRequiredSigningContext } from './provider';
 
 export type SigningFormProps = {
@@ -124,8 +126,11 @@ export const SigningForm = ({ document, recipient, fields }: SigningFormProps) =
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="yyyy-MM-dd hh:mm a">YYYY-MM-DD</SelectItem>
-                    <SelectItem value="dd/MM/yyyy hh:mm a">DD/MM/YYYY</SelectItem>
+                    {DATE_FORMATS.map((format) => (
+                      <SelectItem key={format.key} value={format.value}>
+                        {format.label}
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </div>
