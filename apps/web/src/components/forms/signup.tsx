@@ -18,19 +18,37 @@ import { Label } from '@documenso/ui/primitives/label';
 import { SignaturePad } from '@documenso/ui/primitives/signature-pad';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
+const commonPasswords = [
+  'password',
+  '12345678',
+  'password123',
+  'admin',
+  'qwerty',
+  'poiuyt',
+  'qwerty123',
+  'qwerty@123',
+];
+
 export const ZSignUpFormSchema = z.object({
   name: z.string().trim().min(1, { message: 'Please enter a valid name.' }),
   email: z.string().email().min(1),
   password: z
     .string()
-    .regex(new RegExp('.*[A-Z].*'), { message: 'One uppercase character' })
-    .regex(new RegExp('.*[a-z].*'), { message: 'One lowercase character' })
-    .regex(new RegExp('.*\\d.*'), { message: 'One number' })
-    .regex(new RegExp('.*[`~<>?,./!@#$%^&*()\\-_+="\'|{}\\[\\];:\\\\].*'), {
-      message: 'One special character is required',
+    .refine((value) => !commonPasswords.includes(value), {
+      message: 'Password is too common',
     })
-    .min(8, { message: 'Must be at least 8 characters in length' })
-    .max(72, { message: 'Cannot be more than 72 characters in length' }),
+    .and(
+      z
+        .string()
+        .regex(new RegExp('.*[A-Z].*'), { message: 'One uppercase character' })
+        .regex(new RegExp('.*[a-z].*'), { message: 'One lowercase character' })
+        .regex(new RegExp('.*\\d.*'), { message: 'One number' })
+        .regex(new RegExp('.*[`~<>?,./!@#$%^&*()\\-_+="\'|{}\\[\\];:\\\\].*'), {
+          message: 'One special character is required',
+        })
+        .min(8, { message: 'Must be at least 8 characters in length' })
+        .max(72, { message: 'Cannot be more than 72 characters in length' }),
+    ),
   signature: z.string().min(1, { message: 'We need your signature to sign documents' }),
 });
 
