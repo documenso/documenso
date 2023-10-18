@@ -59,7 +59,6 @@ export const SignaturePad = ({
     setIsPressed(true);
 
     const point = Point.fromEvent(event, DPI, $el.current);
-
     const newPoints = [...points, point];
 
     setPoints(newPoints);
@@ -125,6 +124,7 @@ export const SignaturePad = ({
     setIsPressed(false);
 
     const point = Point.fromEvent(event, DPI, $el.current);
+
     const newPoints = [...points];
 
     if (addPoint) {
@@ -225,13 +225,6 @@ export const SignaturePad = ({
       />
 
       <div className="absolute bottom-4 right-4">
-        <button
-          type="button"
-          className="focus-visible:ring-ring ring-offset-background text-muted-foreground rounded-full p-0 text-xs focus-visible:outline-none focus-visible:ring-2"
-          onClick={() => {}}
-        >
-          Undo
-        </button>
         <button
           type="button"
           className="focus-visible:ring-ring ring-offset-background text-muted-foreground rounded-full p-0 text-xs focus-visible:outline-none focus-visible:ring-2"
