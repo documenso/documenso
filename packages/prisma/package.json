@@ -14,7 +14,7 @@
     "prisma:seed": "prisma db seed"
   },
   "prisma": {
-    "seed": "ts-node --transpileOnly --skipProject ./seed-database.ts"
+    "seed": "ts-node --transpileOnly --project ./tsconfig.seed.json ./seed-database.ts"
   },
   "dependencies": {
     "@prisma/client": "5.4.2",
