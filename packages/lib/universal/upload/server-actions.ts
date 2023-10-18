@@ -6,7 +6,6 @@ import {
   PutObjectCommand,
   S3Client,
 } from '@aws-sdk/client-s3';
-import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import slugify from '@sindresorhus/slugify';
 import path from 'node:path';
 
@@ -16,6 +15,8 @@ import { alphaid } from '../id';
 
 export const getPresignPostUrl = async (fileName: string, contentType: string) => {
   const client = getS3Client();
+
+  const { getSignedUrl } = await import('@aws-sdk/s3-request-presigner');
 
   const { user } = await getServerComponentSession();
 
@@ -44,6 +45,8 @@ export const getPresignPostUrl = async (fileName: string, contentType: string) =
 export const getAbsolutePresignPostUrl = async (key: string) => {
   const client = getS3Client();
 
+  const { getSignedUrl } = await import('@aws-sdk/s3-request-presigner');
+
   const putObjectCommand = new PutObjectCommand({
     Bucket: process.env.NEXT_PRIVATE_UPLOAD_BUCKET,
     Key: key,
@@ -58,6 +61,8 @@ export const getAbsolutePresignPostUrl = async (key: string) => {
 
 export const getPresignGetUrl = async (key: string) => {
   const client = getS3Client();
+
+  const { getSignedUrl } = await import('@aws-sdk/s3-request-presigner');
 
   const getObjectCommand = new GetObjectCommand({
     Bucket: process.env.NEXT_PRIVATE_UPLOAD_BUCKET,
