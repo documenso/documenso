@@ -13,7 +13,7 @@ export const getTemplates = async ({ userId, page = 1, perPage = 10 }: GetTempla
         userId: userId,
       },
       include: {
-        TemplateData: true,
+        templateDocumentData: true,
         TemplateField: true,
       },
       skip: Math.max(page - 1, 0) * perPage,

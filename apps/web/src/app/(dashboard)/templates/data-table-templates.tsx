@@ -11,7 +11,7 @@ import { DataTable } from '@documenso/ui/primitives/data-table';
 import { DataTablePagination } from '@documenso/ui/primitives/data-table-pagination';
 
 import { LocaleDate } from '~/components/formatter/locale-date';
-import { TemplateType } from '~/components/formatter/template-status';
+import { TemplateType } from '~/components/formatter/template-type';
 
 import { DataTableActionDropdown } from './data-table-action-dropdown';
 import { DataTableTitle } from './data-table-title';
@@ -57,7 +57,7 @@ export const TemplatesDataTable = ({
           {
             header: 'Type',
             accessorKey: 'type',
-            cell: ({ row }) => <TemplateType type={row.original.status} />,
+            cell: ({ row }) => <TemplateType type={row.original.type} />,
           },
           {
             header: 'Actions',
