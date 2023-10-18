@@ -2,8 +2,12 @@
 const path = require('path');
 const { withContentlayer } = require('next-contentlayer');
 
-require('dotenv').config({
-  path: path.join(__dirname, '../../.env'),
+const ENV_FILES = ['.env', '.env.local', `.env.${process.env.NODE_ENV || 'development'}`];
+
+ENV_FILES.forEach((file) => {
+  require('dotenv').config({
+    path: path.join(__dirname, `../../${file}`),
+  });
 });
 
 /** @type {import('next').NextConfig} */
