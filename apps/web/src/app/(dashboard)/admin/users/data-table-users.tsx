@@ -14,14 +14,14 @@ import { DataTable } from '@documenso/ui/primitives/data-table';
 import { DataTablePagination } from '@documenso/ui/primitives/data-table-pagination';
 import { Input } from '@documenso/ui/primitives/input';
 
-interface User {
+type UserData = {
   id: number;
   name: string | null;
   email: string;
   roles: Role[];
   Subscription?: SubscriptionLite | null;
   Document: DocumentLite[];
-}
+};
 
 type SubscriptionLite = Pick<
   Subscription,
@@ -31,7 +31,7 @@ type SubscriptionLite = Pick<
 type DocumentLite = Pick<Document, 'id'>;
 
 type UsersDataTableProps = {
-  users: User[];
+  users: UserData[];
   totalPages: number;
   perPage: number;
   page: number;
