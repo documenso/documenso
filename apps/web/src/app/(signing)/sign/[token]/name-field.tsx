@@ -45,32 +45,26 @@ export const NameField = ({ field, recipient }: NameFieldProps) => {
 
   const [showFullNameModal, setShowFullNameModal] = useState(false);
   const [localFullName, setLocalFullName] = useState('');
-  const [trimmedFullName, setTrimmedFullName] = useState('');
-  const [isNameValid, setIsNameValid] = useState(false);
 
   const onSign = async (source: 'local' | 'provider' = 'provider') => {
     try {
-      if (!providedFullName && !trimmedFullName) {
-        setIsNameValid(true);
+      if (!providedFullName && !localFullName) {
         setShowFullNameModal(true);
         return;
       }
 
-      setIsNameValid(false);
-
       await signFieldWithToken({
         token: recipient.token,
         fieldId: field.id,
-        value: source === 'local' ? trimmedFullName : providedFullName ?? '',
+        value: source === 'local' && localFullName ? localFullName : providedFullName ?? '',
         isBase64: false,
       });
 
       if (source === 'local' && !providedFullName) {
-        setProvidedFullName(trimmedFullName);
+        setProvidedFullName(localFullName);
       }
 
       setLocalFullName('');
-      setTrimmedFullName('');
 
       startTransition(() => router.refresh());
     } catch (err) {
@@ -131,17 +125,8 @@ export const NameField = ({ field, recipient }: NameFieldProps) => {
               type="text"
               className="mt-2"
               value={localFullName}
-              onChange={(e) => {
-                const value = e.target.value;
-                const trimmedValue = value.trim();
-                setLocalFullName(value);
-                setTrimmedFullName(trimmedValue);
-                setIsNameValid(!!trimmedValue);
-              }}
+              onChange={(e) => setLocalFullName(e.target.value.trimStart())}
             />
-            {!isNameValid && (
-              <p className="pt-2 text-xs text-red-600">Please enter a valid name.</p>
-            )}
           </div>
 
           <DialogFooter>
@@ -161,7 +146,7 @@ export const NameField = ({ field, recipient }: NameFieldProps) => {
               <Button
                 type="button"
                 className="flex-1"
-                disabled={!isNameValid}
+                disabled={!localFullName}
                 onClick={() => {
                   setShowFullNameModal(false);
                   void onSign('local');
