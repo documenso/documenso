@@ -52,7 +52,11 @@ export const DocumentsDataTable = ({ results }: DocumentsDataTableProps) => {
             header: 'Title',
             accessorKey: 'title',
             cell: ({ row }) => {
-              return <div>{row.original.title}</div>;
+              return (
+                <div className="block max-w-[5rem] truncate font-medium md:max-w-[10rem]">
+                  {row.original.title}
+                </div>
+              );
             },
           },
           {
