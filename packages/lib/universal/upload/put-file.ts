@@ -4,7 +4,6 @@ import { match } from 'ts-pattern';
 import { DocumentDataType } from '@documenso/prisma/client';
 
 import { createDocumentData } from '../../server-only/document-data/create-document-data';
-import { getPresignPostUrl } from './server-actions';
 
 type File = {
   name: string;
@@ -34,6 +33,8 @@ const putFileInDatabase = async (file: File) => {
 };
 
 const putFileInS3 = async (file: File) => {
+  const { getPresignPostUrl } = await import('./server-actions');
+
   const { url, key } = await getPresignPostUrl(file.name, file.type);
 
   const body = await file.arrayBuffer();
