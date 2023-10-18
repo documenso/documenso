@@ -3,7 +3,7 @@ const path = require('path');
 const { version } = require('./package.json');
 
 require('dotenv').config({
-  path: path.join(__dirname, '../../.env.local'),
+  path: path.join(__dirname, '../../.env'),
 });
 
 /** @type {import('next').NextConfig} */
