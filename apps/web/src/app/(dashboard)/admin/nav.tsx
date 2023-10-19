@@ -18,7 +18,7 @@ export const AdminNav = ({ className, ...props }: AdminNavProps) => {
   return (
     <div
       className={cn(
-        'no-scrollbar flex gap-x-2.5 gap-y-2 overflow-hidden overflow-x-auto md:flex-col',
+        'flex gap-x-2.5 gap-y-2 overflow-hidden overflow-x-auto md:flex-col',
         className,
       )}
       {...props}
