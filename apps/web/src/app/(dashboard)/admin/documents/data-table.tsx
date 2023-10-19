@@ -63,31 +63,28 @@ export const DocumentsDataTable = ({ results }: DocumentsDataTableProps) => {
               const avatarFallbackText = row.original.User.name
                 ? recipientInitials(row.original.User.name)
                 : row.original.User.email.slice(0, 1).toUpperCase();
+
               return (
                 <Tooltip delayDuration={200}>
                   <TooltipTrigger>
                     <Link href={`/admin/users/${row.original.User.id}`}>
                       <Avatar className="dark:border-border h-12 w-12 border-2 border-solid border-white">
-                        <AvatarFallback className="text-gray-400">
-                          <span className="text-xs">{avatarFallbackText}</span>
+                        <AvatarFallback className="text-xs text-gray-400">
+                          {avatarFallbackText}
                         </AvatarFallback>
                       </Avatar>
                     </Link>
                   </TooltipTrigger>
                   <TooltipContent className="flex max-w-xs items-center gap-2">
                     <Avatar className="dark:border-border h-12 w-12 border-2 border-solid border-white">
-                      <AvatarFallback className="text-gray-400">
-                        <span className="text-xs">{avatarFallbackText}</span>
+                      <AvatarFallback className="text-xs text-gray-400">
+                        {avatarFallbackText}
                       </AvatarFallback>
                     </Avatar>
 
-                    <div className="flex flex-col">
-                      <span className="text-muted-foreground text-sm">
-                        {row.original.User.name}
-                      </span>
-                      <span className="text-muted-foreground text-sm">
-                        {row.original.User.email}
-                      </span>
+                    <div className="text-muted-foreground flex flex-col text-sm">
+                      <span>{row.original.User.name}</span>
+                      <span>{row.original.User.email}</span>
                     </div>
                   </TooltipContent>
                 </Tooltip>

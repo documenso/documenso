@@ -30,7 +30,7 @@ export const CardMetric = ({ icon: Icon, title, value, className }: CardMetricPr
           </h3>
         </div>
 
-        <p className="text-foreground  mt-auto text-4xl font-semibold leading-8">
+        <p className="text-foreground mt-auto text-4xl font-semibold leading-8">
           {typeof value === 'number' ? value.toLocaleString('en-US') : value}
         </p>
       </div>
