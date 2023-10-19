@@ -16,6 +16,6 @@
     "@trpc/react-query": "^10.36.0",
     "@trpc/server": "^10.36.0",
     "superjson": "^1.13.1",
-    "zod": "^3.21.4"
+    "zod": "^3.22.4"
   }
 }
