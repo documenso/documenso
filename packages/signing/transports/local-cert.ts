@@ -1,4 +1,5 @@
-import signer from 'node-signpdf';
+import { P12Signer } from '@signpdf/signer-p12';
+import signpdf from '@signpdf/signpdf';
 import fs from 'node:fs';
 
 import { addSigningPlaceholder } from '../helpers/addSigningPlaceholder';
@@ -22,11 +23,13 @@ export const signWithLocalCert = async ({ pdf }: SignWithLocalCertOptions) => {
     );
   }
 
+  let signer = new P12Signer(p12Cert);
+
   if (process.env.NEXT_PRIVATE_SIGNING_PASSPHRASE) {
-    return signer.sign(pdfWithPlaceholder, p12Cert, {
-      passphrase: process.env.NEXT_PRIVATE_SIGNING_PASSPHRASE,
-    });
+    signer = new P12Signer(p12Cert, { passphrase: process.env.NEXT_PRIVATE_SIGNING_PASSPHRASE });
   }
 
-  return signer.sign(pdfWithPlaceholder, p12Cert);
+  const signedPdf = await signpdf.sign(pdfWithPlaceholder, signer);
+
+  return signedPdf;
 };
