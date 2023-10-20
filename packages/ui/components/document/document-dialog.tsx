@@ -5,8 +5,9 @@ import { useState } from 'react';
 import * as DialogPrimitive from '@radix-ui/react-dialog';
 import { X } from 'lucide-react';
 
-import { cn } from '@documenso/ui/lib/utils';
+import { DocumentDataType } from '@documenso/prisma/client';
 
+import { cn } from '../../lib/utils';
 import { Dialog, DialogOverlay, DialogPortal } from '../../primitives/dialog';
 import { LazyPDFViewerNoLoader } from '../../primitives/lazy-pdf-viewer';
 
@@ -40,7 +41,12 @@ export default function DocumentDialog({ document, ...props }: DocumentDialogPro
         >
           <LazyPDFViewerNoLoader
             className="mx-auto w-full max-w-3xl xl:max-w-5xl"
-            document={`data:application/pdf;base64,${document}`}
+            documentData={{
+              id: '',
+              data: document,
+              initialData: document,
+              type: DocumentDataType.BYTES_64,
+            }}
             onClick={(e) => e.stopPropagation()}
             onDocumentLoad={onDocumentLoad}
           />

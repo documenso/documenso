@@ -4,7 +4,7 @@ import { useState } from 'react';
 
 import { useRouter } from 'next/navigation';
 
-import { Field, Recipient, User } from '@documenso/prisma/client';
+import { DocumentData, Field, Recipient, User } from '@documenso/prisma/client';
 import { DocumentWithData } from '@documenso/prisma/types/document-with-data';
 import { cn } from '@documenso/ui/lib/utils';
 import { Card, CardContent } from '@documenso/ui/primitives/card';
@@ -32,7 +32,7 @@ export type EditDocumentFormProps = {
   document: DocumentWithData;
   recipients: Recipient[];
   fields: Field[];
-  dataUrl: string;
+  documentData: DocumentData;
 };
 
 type EditDocumentStep = 'signers' | 'fields' | 'subject';
@@ -43,7 +43,7 @@ export const EditDocumentForm = ({
   recipients,
   fields,
   user: _user,
-  dataUrl,
+  documentData,
 }: EditDocumentFormProps) => {
   const { toast } = useToast();
   const router = useRouter();
@@ -153,7 +153,7 @@ export const EditDocumentForm = ({
         gradient
       >
         <CardContent className="p-2">
-          <LazyPDFViewer document={dataUrl} />
+          <LazyPDFViewer documentData={documentData} />
         </CardContent>
       </Card>
 
