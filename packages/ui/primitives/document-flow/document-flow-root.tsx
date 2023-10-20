@@ -63,7 +63,7 @@ export const DocumentFlowFormContainerContent = ({
   return (
     <div
       className={cn(
-        `hide-scrollbar flex flex-1 flex-col overflow-y-auto overflow-x-hidden`,
+        `hide-scrollbar flex flex-1 flex-col overflow-y-auto overflow-x-hidden px-1`,
         className,
       )}
       {...props}
