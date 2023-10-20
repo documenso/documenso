@@ -52,7 +52,31 @@ export const stripeWebhookHandler = async (
         // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
         const session = event.data.object as Stripe.Checkout.Session;
 
-        const userId = Number(session.client_reference_id);
+        const customerId =
+          typeof session.customer === 'string' ? session.customer : session.customer?.id;
+
+        let userId = Number(session.client_reference_id);
+
+        if (!userId && customerId) {
+          const result = await prisma.subscription.findFirst({
+            select: {
+              userId: true,
+            },
+            where: {
+              customerId,
+            },
+          });
+
+          if (!result?.userId) {
+            return res.status(500).json({
+              success: false,
+              message: 'User not found',
+            });
+          }
+
+          userId = result.userId;
+        }
+
         const subscriptionId =
           typeof session.subscription === 'string'
             ? session.subscription
