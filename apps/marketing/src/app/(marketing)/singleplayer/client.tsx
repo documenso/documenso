@@ -8,7 +8,7 @@ import { useRouter } from 'next/navigation';
 import { useAnalytics } from '@documenso/lib/client-only/hooks/use-analytics';
 import { base64 } from '@documenso/lib/universal/base64';
 import { putFile } from '@documenso/lib/universal/upload/put-file';
-import { Field, Prisma, Recipient } from '@documenso/prisma/client';
+import { DocumentDataType, Field, Prisma, Recipient } from '@documenso/prisma/client';
 import { Card, CardContent } from '@documenso/ui/primitives/card';
 import { DocumentDropzone } from '@documenso/ui/primitives/document-dropzone';
 import { AddFieldsFormPartial } from '@documenso/ui/primitives/document-flow/add-fields';
@@ -199,7 +199,14 @@ export const SinglePlayerClient = () => {
           {uploadedFile ? (
             <Card gradient>
               <CardContent className="p-2">
-                <LazyPDFViewer document={uploadedFile.fileBase64} />
+                <LazyPDFViewer
+                  documentData={{
+                    id: '',
+                    data: uploadedFile.fileBase64,
+                    initialData: uploadedFile.fileBase64,
+                    type: DocumentDataType.BYTES_64,
+                  }}
+                />
               </CardContent>
             </Card>
           ) : (

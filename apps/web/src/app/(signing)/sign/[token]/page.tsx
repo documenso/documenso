@@ -46,10 +46,6 @@ export default async function SigningPage({ params: { token } }: SigningPageProp
 
   const { documentData } = document;
 
-  const documentDataUrl = await getFile(documentData)
-    .then((buffer) => Buffer.from(buffer).toString('base64'))
-    .then((data) => `data:application/pdf;base64,${data}`);
-
   const { user } = await getServerComponentSession();
 
   if (
@@ -86,7 +82,7 @@ export default async function SigningPage({ params: { token } }: SigningPageProp
             gradient
           >
             <CardContent className="p-2">
-              <LazyPDFViewer document={documentDataUrl} />
+              <LazyPDFViewer documentData={documentData} />
             </CardContent>
           </Card>
 

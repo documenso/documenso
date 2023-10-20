@@ -9,7 +9,11 @@ import 'react-pdf/dist/esm/Page/AnnotationLayer.css';
 import 'react-pdf/dist/esm/Page/TextLayer.css';
 
 import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
+import { getFile } from '@documenso/lib/universal/upload/get-file';
+import { DocumentData } from '@documenso/prisma/client';
 import { cn } from '@documenso/ui/lib/utils';
+
+import { useToast } from './use-toast';
 
 export type LoadedPDFDocument = PDFDocumentProxy;
 
@@ -28,9 +32,17 @@ export type OnPDFViewerPageClick = (_event: {
   pageY: number;
 }) => void | Promise<void>;
 
+const PDFLoader = () => (
+  <>
+    <Loader className="text-documenso h-12 w-12 animate-spin" />
+
+    <p className="text-muted-foreground mt-4">Loading document...</p>
+  </>
+);
+
 export type PDFViewerProps = {
   className?: string;
-  document: string;
+  documentData: DocumentData;
   onDocumentLoad?: (_doc: LoadedPDFDocument) => void;
   onPageClick?: OnPDFViewerPageClick;
   [key: string]: unknown;
@@ -38,12 +50,17 @@ export type PDFViewerProps = {
 
 export const PDFViewer = ({
   className,
-  document,
+  documentData,
   onDocumentLoad,
   onPageClick,
   ...props
 }: PDFViewerProps) => {
+  const { toast } = useToast();
+
   const $el = useRef<HTMLDivElement>(null);
+
+  const [isDocumentBytesLoading, setIsDocumentBytesLoading] = useState(false);
+  const [documentBytes, setDocumentBytes] = useState<Uint8Array | null>(null);
 
   const [width, setWidth] = useState(0);
   const [numPages, setNumPages] = useState(0);
@@ -110,63 +127,89 @@ export const PDFViewer = ({
     }
   }, []);
 
+  useEffect(() => {
+    const fetchDocumentBytes = async () => {
+      try {
+        setIsDocumentBytesLoading(true);
+
+        const bytes = await getFile(documentData);
+
+        setDocumentBytes(bytes);
+
+        setIsDocumentBytesLoading(false);
+      } catch (err) {
+        console.error(err);
+
+        toast({
+          title: 'Error',
+          description: 'An error occurred while loading the document.',
+          variant: 'destructive',
+        });
+      }
+    };
+
+    void fetchDocumentBytes();
+  }, [documentData, toast]);
+
   return (
     <div ref={$el} className={cn('overflow-hidden', className)} {...props}>
-      <PDFDocument
-        file={document}
-        className={cn('w-full overflow-hidden rounded', {
-          'h-[80vh] max-h-[60rem]': numPages === 0,
-        })}
-        onLoadSuccess={(d) => onDocumentLoaded(d)}
-        // Uploading a invalid document causes an error which doesn't appear to be handled by the `error` prop.
-        // Therefore we add some additional custom error handling.
-        onSourceError={() => {
-          setPdfError(true);
-        }}
-        externalLinkTarget="_blank"
-        loading={
-          <div className="dark:bg-background flex h-[80vh] max-h-[60rem] flex-col items-center justify-center bg-white/50">
-            {pdfError ? (
+      {isDocumentBytesLoading ? (
+        <div className={cn('h-[80vh] max-h-[60rem] w-full overflow-hidden rounded')}>
+          <PDFLoader />
+        </div>
+      ) : (
+        <PDFDocument
+          file={documentBytes}
+          className={cn('w-full overflow-hidden rounded', {
+            'h-[80vh] max-h-[60rem]': numPages === 0,
+          })}
+          onLoadSuccess={(d) => onDocumentLoaded(d)}
+          // Uploading a invalid document causes an error which doesn't appear to be handled by the `error` prop.
+          // Therefore we add some additional custom error handling.
+          onSourceError={() => {
+            setPdfError(true);
+          }}
+          externalLinkTarget="_blank"
+          loading={
+            <div className="dark:bg-background flex h-[80vh] max-h-[60rem] flex-col items-center justify-center bg-white/50">
+              {pdfError ? (
+                <div className="text-muted-foreground text-center">
+                  <p>Something went wrong while loading the document.</p>
+                  <p className="mt-1 text-sm">Please try again or contact our support.</p>
+                </div>
+              ) : (
+                <PDFLoader />
+              )}
+            </div>
+          }
+          error={
+            <div className="dark:bg-background flex h-[80vh] max-h-[60rem] flex-col items-center justify-center bg-white/50">
               <div className="text-muted-foreground text-center">
                 <p>Something went wrong while loading the document.</p>
                 <p className="mt-1 text-sm">Please try again or contact our support.</p>
               </div>
-            ) : (
-              <>
-                <Loader className="text-documenso h-12 w-12 animate-spin" />
-
-                <p className="text-muted-foreground mt-4">Loading document...</p>
-              </>
-            )}
-          </div>
-        }
-        error={
-          <div className="dark:bg-background flex h-[80vh] max-h-[60rem] flex-col items-center justify-center bg-white/50">
-            <div className="text-muted-foreground text-center">
-              <p>Something went wrong while loading the document.</p>
-              <p className="mt-1 text-sm">Please try again or contact our support.</p>
             </div>
-          </div>
-        }
-      >
-        {Array(numPages)
-          .fill(null)
-          .map((_, i) => (
-            <div
-              key={i}
-              className="border-border my-8 overflow-hidden rounded border first:mt-0 last:mb-0"
-            >
-              <PDFPage
-                pageNumber={i + 1}
-                width={width}
-                renderAnnotationLayer={false}
-                renderTextLayer={false}
-                loading={() => ''}
-                onClick={(e) => onDocumentPageClick(e, i + 1)}
-              />
-            </div>
-          ))}
-      </PDFDocument>
+          }
+        >
+          {Array(numPages)
+            .fill(null)
+            .map((_, i) => (
+              <div
+                key={i}
+                className="border-border my-8 overflow-hidden rounded border first:mt-0 last:mb-0"
+              >
+                <PDFPage
+                  pageNumber={i + 1}
+                  width={width}
+                  renderAnnotationLayer={false}
+                  renderTextLayer={false}
+                  loading={() => ''}
+                  onClick={(e) => onDocumentPageClick(e, i + 1)}
+                />
+              </div>
+            ))}
+        </PDFDocument>
+      )}
     </div>
   );
 };
