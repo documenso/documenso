@@ -66,6 +66,8 @@ export const PDFViewer = ({
   const [numPages, setNumPages] = useState(0);
   const [pdfError, setPdfError] = useState(false);
 
+  const isLoading = isDocumentBytesLoading || !documentBytes;
+
   const onDocumentLoaded = (doc: LoadedPDFDocument) => {
     setNumPages(doc.numPages);
     onDocumentLoad?.(doc);
@@ -153,13 +155,17 @@ export const PDFViewer = ({
 
   return (
     <div ref={$el} className={cn('overflow-hidden', className)} {...props}>
-      {isDocumentBytesLoading ? (
-        <div className={cn('h-[80vh] max-h-[60rem] w-full overflow-hidden rounded')}>
+      {isLoading ? (
+        <div
+          className={cn(
+            'flex h-[80vh] max-h-[60rem] w-full flex-col items-center justify-center overflow-hidden rounded',
+          )}
+        >
           <PDFLoader />
         </div>
       ) : (
         <PDFDocument
-          file={documentBytes}
+          file={documentBytes.buffer}
           className={cn('w-full overflow-hidden rounded', {
             'h-[80vh] max-h-[60rem]': numPages === 0,
           })}

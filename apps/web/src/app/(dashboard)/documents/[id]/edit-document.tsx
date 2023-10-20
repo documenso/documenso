@@ -153,7 +153,7 @@ export const EditDocumentForm = ({
         gradient
       >
         <CardContent className="p-2">
-          <LazyPDFViewer documentData={documentData} />
+          <LazyPDFViewer key={documentData.id} documentData={documentData} />
         </CardContent>
       </Card>
 
