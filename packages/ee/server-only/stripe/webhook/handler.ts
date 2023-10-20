@@ -55,8 +55,19 @@ export const stripeWebhookHandler = async (
         const customerId =
           typeof session.customer === 'string' ? session.customer : session.customer?.id;
 
+        // Attempt to get the user ID from the client reference id.
         let userId = Number(session.client_reference_id);
 
+        // If the user ID is not found, attempt to get it from the Stripe customer metadata.
+        if (!userId && customerId) {
+          const customer = await stripe.customers.retrieve(customerId);
+
+          if (!customer.deleted) {
+            userId = Number(customer.metadata.userId);
+          }
+        }
+
+        // Finally, attempt to get the user ID from the subscription within the database.
         if (!userId && customerId) {
           const result = await prisma.subscription.findFirst({
             select: {
