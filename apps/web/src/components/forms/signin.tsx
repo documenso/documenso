@@ -10,6 +10,7 @@ import { FcGoogle } from 'react-icons/fc';
 import { z } from 'zod';
 
 import { ErrorCode, isErrorCode } from '@documenso/lib/next-auth/error-codes';
+import { ZPasswordSchema } from '@documenso/trpc/server/password';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
 import { FormErrorMessage } from '@documenso/ui/primitives/form/form-error-message';
@@ -28,7 +29,7 @@ const LOGIN_REDIRECT_PATH = '/documents';
 
 export const ZSignInFormSchema = z.object({
   email: z.string().email().min(1),
-  password: z.string().min(6).max(72),
+  password: ZPasswordSchema.min(6, { message: 'Must be at least 6 characters in length' }),
 });
 
 export type TSignInFormSchema = z.infer<typeof ZSignInFormSchema>;

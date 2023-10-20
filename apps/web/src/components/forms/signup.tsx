@@ -10,6 +10,7 @@ import { z } from 'zod';
 
 import { TRPCClientError } from '@documenso/trpc/client';
 import { trpc } from '@documenso/trpc/react';
+import { ZPasswordSchema } from '@documenso/trpc/server/password';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
 import { FormErrorMessage } from '@documenso/ui/primitives/form/form-error-message';
@@ -18,41 +19,17 @@ import { Label } from '@documenso/ui/primitives/label';
 import { SignaturePad } from '@documenso/ui/primitives/signature-pad';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
-const commonPasswords = [
-  'password',
-  '12345678',
-  'password123',
-  'admin',
-  'qwerty',
-  'poiuyt',
-  'qwerty123',
-  'qwerty@123',
-];
-
 export const ZSignUpFormSchema = z
   .object({
     name: z.string().trim().min(1, { message: 'Please enter a valid name.' }),
     email: z.string().email().min(1),
-    password: z
-      .string()
-      .regex(new RegExp('.*[A-Z].*'), { message: 'One uppercase character' })
-      .regex(new RegExp('.*[a-z].*'), { message: 'One lowercase character' })
-      .regex(new RegExp('.*\\d.*'), { message: 'One number' })
-      .regex(new RegExp('.*[`~<>?,./!@#$%^&*()\\-_+="\'|{}\\[\\];:\\\\].*'), {
-        message: 'One special character is required',
-      })
-      .min(8, { message: 'Must be at least 8 characters in length' })
-      .max(72, { message: 'Cannot be more than 72 characters in length' }),
+    password: ZPasswordSchema,
     signature: z.string().min(1, { message: 'We need your signature to sign documents' }),
   })
   .refine(
     (data) => {
       const { name, email, password } = data;
-      return (
-        !commonPasswords.includes(password) &&
-        !password.includes(name) &&
-        !password.includes(email.split('@')[0])
-      );
+      return !password.includes(name) && !password.includes(email.split('@')[0]);
     },
     {
       message: 'Password should not be common or based on personal information',
@@ -147,7 +124,7 @@ export const SignUpForm = ({ className }: SignUpFormProps) => {
           <Input
             id="password"
             type={showPassword ? 'text' : 'password'}
-            minLength={8}
+            minLength={6}
             maxLength={72}
             autoComplete="new-password"
             className="bg-background mt-2 pr-10"

@@ -10,6 +10,7 @@ import { z } from 'zod';
 import { User } from '@documenso/prisma/client';
 import { TRPCClientError } from '@documenso/trpc/client';
 import { trpc } from '@documenso/trpc/react';
+import { ZPasswordSchema } from '@documenso/trpc/server/password';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
 import { Input } from '@documenso/ui/primitives/input';
@@ -18,40 +19,12 @@ import { useToast } from '@documenso/ui/primitives/use-toast';
 
 import { FormErrorMessage } from '../form/form-error-message';
 
-const commonPasswords = [
-  'password',
-  '12345678',
-  'password123',
-  'admin',
-  'qwerty',
-  'poiuyt',
-  'qwerty123',
-  'qwerty@123',
-];
-
 export const ZPasswordFormSchema = z
   .object({
-    currentPassword: z.string().min(8).max(72),
-    password: z
-      .string()
-      .regex(new RegExp('.*[A-Z].*'), { message: 'One uppercase character' })
-      .regex(new RegExp('.*[a-z].*'), { message: 'One lowercase character' })
-      .regex(new RegExp('.*\\d.*'), { message: 'One number' })
-      .regex(new RegExp('.*[`~<>?,./!@#$%^&*()\\-_+="\'|{}\\[\\];:\\\\].*'), {
-        message: 'One special character is required',
-      })
-      .min(8, { message: 'Must be at least 8 characters in length' })
-      .max(72, { message: 'Cannot be more than 72 characters in length' }),
-    repeatedPassword: z.string().min(8).max(72),
+    currentPassword: ZPasswordSchema.min(6, { message: 'Must be at least 6 characters in length' }),
+    password: ZPasswordSchema,
+    repeatedPassword: ZPasswordSchema,
   })
-  .refine(
-    (data) => {
-      return !commonPasswords.includes(data.password);
-    },
-    {
-      message: 'Password should not be common',
-    },
-  )
   .refine((data) => data.password === data.repeatedPassword, {
     message: 'Passwords do not match',
     path: ['repeatedPassword'],
@@ -133,7 +106,7 @@ export const PasswordForm = ({ className }: PasswordFormProps) => {
           <Input
             id="current-password"
             type={showCurrentPassword ? 'text' : 'password'}
-            minLength={8}
+            minLength={6}
             maxLength={72}
             autoComplete="current-password"
             className="bg-background mt-2 pr-10"
@@ -166,7 +139,7 @@ export const PasswordForm = ({ className }: PasswordFormProps) => {
           <Input
             id="password"
             type={showPassword ? 'text' : 'password'}
-            minLength={8}
+            minLength={6}
             maxLength={72}
             autoComplete="new-password"
             className="bg-background mt-2 pr-10"
@@ -200,7 +173,7 @@ export const PasswordForm = ({ className }: PasswordFormProps) => {
           <Input
             id="repeated-password"
             type={showConfirmPassword ? 'text' : 'password'}
-            minLength={8}
+            minLength={6}
             maxLength={72}
             autoComplete="new-password"
             className="bg-background mt-2 pr-10"
