@@ -1,4 +1,3 @@
-// TODO: merge documentName and title into one
 import React from 'react';
 
 import { getRequiredServerComponentSession } from '@documenso/lib/next-auth/get-server-session';
@@ -23,8 +22,6 @@ export default async function TemplatesPage({ searchParams = {} }: AdminManageUs
     page: page,
     perPage: perPage,
   });
-
-  console.log(templates);
 
   return (
     <div className="mx-auto max-w-screen-xl px-4 md:px-8">

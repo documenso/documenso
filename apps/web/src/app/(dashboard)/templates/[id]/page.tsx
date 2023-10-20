@@ -4,11 +4,13 @@ import { redirect } from 'next/navigation';
 
 import { getRequiredServerComponentSession } from '@documenso/lib/next-auth/get-server-session';
 import { getFieldsForTemplate } from '@documenso/lib/server-only/field/get-fields-for-template';
+import { getRecipientsForTemplate } from '@documenso/lib/server-only/recipient/get-recipients-for-template';
 import { getTemplateById } from '@documenso/lib/server-only/template/get-template-by-id';
 import { getFile } from '@documenso/lib/universal/upload/get-file';
-import { LazyPDFViewer } from '@documenso/ui/primitives/lazy-pdf-viewer';
 
 import { TemplateType } from '~/components/formatter/template-type';
+
+import { EditTemplateForm } from './edit-template';
 
 export type TemplatePageProps = {
   params: {
@@ -42,7 +44,11 @@ export default async function TemplatePage({ params }: TemplatePageProps) {
     .then((buffer) => Buffer.from(buffer).toString('base64'))
     .then((data) => `data:application/pdf;base64,${data}`);
 
-  const [fields] = await Promise.all([
+  const [templateRecipients, templateFields] = await Promise.all([
+    await getRecipientsForTemplate({
+      templateId,
+      userId: user.id,
+    }),
     await getFieldsForTemplate({
       templateId,
       userId: user.id,
@@ -61,14 +67,14 @@ export default async function TemplatePage({ params }: TemplatePageProps) {
         <TemplateType inheritColor type={template.type} className="text-muted-foreground" />
       </div>
 
-      <div className="mx-auto mt-12 max-w-2xl">
-        <LazyPDFViewer document={templateDataUrl} />
-      </div>
-      {/* <div>
-        <pre>
-          <code>{JSON.stringify(template, null, 2)}</code>
-        </pre>
-      </div> */}
+      <EditTemplateForm
+        className="mt-8"
+        template={template}
+        user={user}
+        recipients={templateRecipients}
+        fields={templateFields}
+        dataUrl={templateDataUrl}
+      />
     </div>
   );
 }

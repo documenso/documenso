@@ -250,7 +250,9 @@ model Template {
 model TemplateRecipient {
   id            Int             @id @default(autoincrement())
   templateId    Int
-  placeholder   String          @db.VarChar(255) // Placeholder name for this recipient
+  placeholder   String          @db.VarChar(255)
+  email         String          @db.VarChar(255)
+  token         String
   Template      Template        @relation(fields: [templateId], references: [id], onDelete: Cascade)
   TemplateField TemplateField[]
 }
