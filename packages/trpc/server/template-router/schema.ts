@@ -5,4 +5,11 @@ export const ZCreateTemplateMutationSchema = z.object({
   templateDocumentDataId: z.string().min(1),
 });
 
+export const ZCreateDocumentFromTemplateMutationSchema = z.object({
+  templateId: z.number(),
+});
+
 export type TCreateTemplateMutationSchema = z.infer<typeof ZCreateTemplateMutationSchema>;
+export type TCreateDocumentFromTemplateMutationSchema = z.infer<
+  typeof ZCreateDocumentFromTemplateMutationSchema
+>;

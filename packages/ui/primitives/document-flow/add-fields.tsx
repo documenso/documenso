@@ -105,9 +105,11 @@ export const AddFieldsFormPartial = ({
         pageY: Number(field.positionY),
         pageWidth: Number(field.width),
         pageHeight: Number(field.height),
+        signerId: field.recipientId ?? -1,
         signerEmail:
           recipients.find((recipient) => recipient.id === field.recipientId)?.email ?? '',
-        signerId: field.recipientId ?? -1,
+        signerToken:
+          recipients.find((recipient) => recipient.id === field.recipientId)?.token ?? '',
       })),
     },
   });
@@ -210,6 +212,7 @@ export const AddFieldsFormPartial = ({
         pageHeight: fieldPageHeight,
         signerEmail: selectedSigner.email,
         signerId: selectedSigner.id,
+        signerToken: selectedSigner.token,
       });
 
       setIsFieldWithinBounds(false);
@@ -348,6 +351,8 @@ export const AddFieldsFormPartial = ({
               key={index}
               field={field}
               disabled={
+                !!(selectedSigner && selectedSigner.token !== field.signerToken) ||
+                !!(selectedSigner && selectedSigner.id !== field.signerId) ||
                 !!(selectedSigner && selectedSigner.email !== field.signerEmail) ||
                 !!hasSelectedSignerBeenSent
               }

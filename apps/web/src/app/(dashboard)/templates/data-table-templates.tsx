@@ -2,13 +2,17 @@
 
 import { useTransition } from 'react';
 
+import { useRouter } from 'next/navigation';
+
 import { Loader, Plus } from 'lucide-react';
 
 import { useUpdateSearchParams } from '@documenso/lib/client-only/hooks/use-update-search-params';
 import { Template } from '@documenso/prisma/client';
+import { trpc } from '@documenso/trpc/react';
 import { Button } from '@documenso/ui/primitives/button';
 import { DataTable } from '@documenso/ui/primitives/data-table';
 import { DataTablePagination } from '@documenso/ui/primitives/data-table-pagination';
+import { useToast } from '@documenso/ui/primitives/use-toast';
 
 import { LocaleDate } from '~/components/formatter/locale-date';
 import { TemplateType } from '~/components/formatter/template-type';
@@ -32,6 +36,13 @@ export const TemplatesDataTable = ({
   const [isPending, startTransition] = useTransition();
   const updateSearchParams = useUpdateSearchParams();
 
+  const router = useRouter();
+
+  const { toast } = useToast();
+
+  const { mutateAsync: createDocumentFromTemplate } =
+    trpc.template.createDocumentFromTempate.useMutation();
+
   const onPaginationChange = (page: number, perPage: number) => {
     startTransition(() => {
       updateSearchParams({
@@ -39,6 +50,30 @@ export const TemplatesDataTable = ({
         perPage,
       });
     });
+  };
+
+  const onUseButtonClick = async (templateId: number) => {
+    try {
+      const { id } = await createDocumentFromTemplate({
+        templateId,
+      });
+
+      toast({
+        title: 'Document created',
+        description: 'Your document has been created from the template successfully.',
+        duration: 5000,
+      });
+
+      router.push(`/documents/${id}`);
+    } catch (err) {
+      console.error(err);
+
+      toast({
+        title: 'Error',
+        description: 'An error occurred while creating document.',
+        variant: 'destructive',
+      });
+    }
   };
 
   return (
@@ -65,7 +100,7 @@ export const TemplatesDataTable = ({
             cell: ({ row }) => {
               return (
                 <div className="flex items-center gap-x-4">
-                  <Button className="w-24">
+                  <Button onClick={async () => onUseButtonClick(row.original.id)} className="w-24">
                     <>
                       <Plus className="-ml-1 mr-2 h-4 w-4" />
                       Use

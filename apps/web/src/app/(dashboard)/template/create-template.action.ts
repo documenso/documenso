@@ -65,6 +65,4 @@ export const createTemplate = async (value: TCreateTemplateActionInput) => {
       },
     },
   });
-
-  console.log(template);
 };

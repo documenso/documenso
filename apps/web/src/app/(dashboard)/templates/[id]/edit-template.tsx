@@ -90,8 +90,6 @@ export const EditTemplateForm = ({
   };
 
   const onAddFieldsFormSubmit = async (data: TAddFieldsFormSchema) => {
-    console.log(data.fields);
-
     try {
       // Custom invocation server action
       await addTemplateFields({
