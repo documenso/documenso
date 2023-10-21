@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 
 import { Loader } from 'lucide-react';
 import { PDFDocumentProxy } from 'pdfjs-dist';
@@ -65,6 +65,11 @@ export const PDFViewer = ({
   const [width, setWidth] = useState(0);
   const [numPages, setNumPages] = useState(0);
   const [pdfError, setPdfError] = useState(false);
+
+  const memoizedData = useMemo(
+    () => ({ type: documentData.type, data: documentData.data }),
+    [documentData.data, documentData.type],
+  );
 
   const isLoading = isDocumentBytesLoading || !documentBytes;
 
@@ -134,7 +139,7 @@ export const PDFViewer = ({
       try {
         setIsDocumentBytesLoading(true);
 
-        const bytes = await getFile(documentData);
+        const bytes = await getFile(memoizedData);
 
         setDocumentBytes(bytes);
 
@@ -151,7 +156,7 @@ export const PDFViewer = ({
     };
 
     void fetchDocumentBytes();
-  }, [documentData, toast]);
+  }, [memoizedData, toast]);
 
   return (
     <div ref={$el} className={cn('overflow-hidden', className)} {...props}>
