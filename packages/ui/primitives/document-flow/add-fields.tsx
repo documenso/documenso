@@ -61,6 +61,7 @@ export type AddFieldsFormProps = {
   recipients: (Recipient | TemplateRecipient)[];
   fields: (Field | TemplateField)[];
   numberOfSteps: number;
+  nextLabel?: string;
   onSubmit: (_data: TAddFieldsFormSchema) => void;
 };
 
@@ -70,6 +71,7 @@ export const AddFieldsFormPartial = ({
   recipients,
   fields,
   numberOfSteps,
+  nextLabel,
   onSubmit,
 }: AddFieldsFormProps) => {
   const normalizedRecipients = recipients.map((recipient) => {
@@ -571,6 +573,7 @@ export const AddFieldsFormPartial = ({
         <DocumentFlowFormContainerActions
           loading={isSubmitting}
           disabled={isSubmitting}
+          goNextLabel={nextLabel ? nextLabel : 'Continue'}
           onGoBackClick={() => {
             documentFlow.onBackStep?.();
             remove();

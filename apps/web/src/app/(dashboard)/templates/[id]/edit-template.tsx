@@ -62,12 +62,6 @@ export const EditTemplateForm = ({
       stepIndex: 2,
       onBackStep: () => setStep('signers'),
     },
-    // subject: {
-    //   title: 'Add Subject',
-    //   description: 'Add the subject and message you wish to send to signers.',
-    //   stepIndex: 3,
-    //   onBackStep: () => setStep('fields'),
-    // },
   };
 
   const currentDocumentFlow = documentFlow[step];
@@ -105,7 +99,13 @@ export const EditTemplateForm = ({
         fields: data.fields,
       });
 
-      router.refresh();
+      toast({
+        title: 'Template saved',
+        description: 'Your templates has been saved successfully.',
+        duration: 5000,
+      });
+
+      router.push('/templates');
     } catch (err) {
       console.error(err);
 
@@ -152,6 +152,7 @@ export const EditTemplateForm = ({
               documentFlow={documentFlow.fields}
               recipients={recipients}
               fields={fields}
+              nextLabel="Save Template"
               numberOfSteps={Object.keys(documentFlow).length}
               onSubmit={onAddFieldsFormSubmit}
             />
