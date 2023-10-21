@@ -1,5 +1,6 @@
 'use client';
 
+// TODO: Delete signers is not working
 import { useState } from 'react';
 
 import { useRouter } from 'next/navigation';
@@ -7,6 +8,8 @@ import { useRouter } from 'next/navigation';
 import { Template, TemplateField, TemplateRecipient, User } from '@documenso/prisma/client';
 import { cn } from '@documenso/ui/lib/utils';
 import { Card, CardContent } from '@documenso/ui/primitives/card';
+import { AddFieldsFormPartial } from '@documenso/ui/primitives/document-flow/add-fields';
+import { TAddFieldsFormSchema } from '@documenso/ui/primitives/document-flow/add-fields.types';
 import { AddTemplatePlaceholderRecipientsFormPartial } from '@documenso/ui/primitives/document-flow/add-template-placeholder-recipients';
 import { TAddTemplatePlacholderRecipientsFormSchema } from '@documenso/ui/primitives/document-flow/add-template-placeholder-recipients.types';
 import {
@@ -17,7 +20,7 @@ import { DocumentFlowStep } from '@documenso/ui/primitives/document-flow/types';
 import { LazyPDFViewer } from '@documenso/ui/primitives/lazy-pdf-viewer';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
-// import { addFields } from '~/components/forms/edit-document/add-fields.action';
+import { addTemplateFields } from '~/components/forms/edit-document/add-template-fields.action';
 import { addTemplatePlaceholders } from '~/components/forms/edit-document/add-template-placeholders.action';
 
 // import { completeDocument } from '~/components/forms/edit-document/add-subject.action';
@@ -92,57 +95,27 @@ export const EditTemplateForm = ({
     }
   };
 
-  //   const onAddFieldsFormSubmit = async (data: TAddFieldsFormSchema) => {
-  //     try {
-  //       // Custom invocation server action
-  //       await addFields({
-  //         documentId: document.id,
-  //         fields: data.fields,
-  //       });
+  const onAddFieldsFormSubmit = async (data: TAddFieldsFormSchema) => {
+    console.log(data.fields);
 
-  //       router.refresh();
+    try {
+      // Custom invocation server action
+      await addTemplateFields({
+        templateId: template.id,
+        fields: data.fields,
+      });
 
-  //       //   setStep('subject');
-  //     } catch (err) {
-  //       console.error(err);
+      router.refresh();
+    } catch (err) {
+      console.error(err);
 
-  //       toast({
-  //         title: 'Error',
-  //         description: 'An error occurred while adding signers.',
-  //         variant: 'destructive',
-  //       });
-  //     }
-  //   };
-
-  //   const onAddSubjectFormSubmit = async (data: TAddSubjectFormSchema) => {
-  //     const { subject, message } = data.email;
-
-  //     try {
-  //       await completeDocument({
-  //         documentId: document.id,
-  //         email: {
-  //           subject,
-  //           message,
-  //         },
-  //       });
-
-  //       toast({
-  //         title: 'Document sent',
-  //         description: 'Your document has been sent successfully.',
-  //         duration: 5000,
-  //       });
-
-  //       router.push('/documents');
-  //     } catch (err) {
-  //       console.error(err);
-
-  //       toast({
-  //         title: 'Error',
-  //         description: 'An error occurred while sending the document.',
-  //         variant: 'destructive',
-  //       });
-  //     }
-  //   };
+      toast({
+        title: 'Error',
+        description: 'An error occurred while adding signers.',
+        variant: 'destructive',
+      });
+    }
+  };
 
   return (
     <div className={cn('grid w-full grid-cols-12 gap-8', className)}>
@@ -173,9 +146,7 @@ export const EditTemplateForm = ({
             />
           )}
 
-          {step === 'fields' && <div>Fields</div>}
-
-          {/* {step === 'fields' && (
+          {step === 'fields' && (
             <AddFieldsFormPartial
               key={fields.length}
               documentFlow={documentFlow.fields}
@@ -184,18 +155,7 @@ export const EditTemplateForm = ({
               numberOfSteps={Object.keys(documentFlow).length}
               onSubmit={onAddFieldsFormSubmit}
             />
-          )} */}
-
-          {/* {step === 'subject' && (
-            <AddSubjectFormPartial
-              documentFlow={documentFlow.subject}
-              document={document}
-              recipients={recipients}
-              fields={fields}
-              numberOfSteps={Object.keys(documentFlow).length}
-              onSubmit={onAddSubjectFormSubmit}
-            />
-          )} */}
+          )}
         </DocumentFlowFormContainer>
       </div>
     </div>

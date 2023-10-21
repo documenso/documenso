@@ -11,7 +11,14 @@ import { getBoundingClientRect } from '@documenso/lib/client-only/get-bounding-c
 import { useDocumentElement } from '@documenso/lib/client-only/hooks/use-document-element';
 import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
 import { nanoid } from '@documenso/lib/universal/id';
-import { Field, FieldType, Recipient, SendStatus } from '@documenso/prisma/client';
+import {
+  Field,
+  FieldType,
+  Recipient,
+  SendStatus,
+  TemplateField,
+  TemplateRecipient,
+} from '@documenso/prisma/client';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
 import { Card, CardContent } from '@documenso/ui/primitives/card';
@@ -51,8 +58,8 @@ const MIN_WIDTH_PX = 200;
 export type AddFieldsFormProps = {
   documentFlow: DocumentFlowStep;
   hideRecipients?: boolean;
-  recipients: Recipient[];
-  fields: Field[];
+  recipients: (Recipient | TemplateRecipient)[];
+  fields: (Field | TemplateField)[];
   numberOfSteps: number;
   onSubmit: (_data: TAddFieldsFormSchema) => void;
 };
@@ -65,6 +72,17 @@ export const AddFieldsFormPartial = ({
   numberOfSteps,
   onSubmit,
 }: AddFieldsFormProps) => {
+  const normalizedRecipients = recipients.map((recipient) => {
+    if ('placeholder' in recipient) {
+      return {
+        ...recipient,
+        name: recipient.placeholder,
+      };
+    } else {
+      return recipient;
+    }
+  });
+
   const { isWithinPageBounds, getFieldPosition, getPage } = useDocumentElement();
 
   const {
@@ -75,7 +93,10 @@ export const AddFieldsFormPartial = ({
     defaultValues: {
       fields: fields.map((field) => ({
         nativeId: field.id,
-        formId: `${field.id}-${field.documentId}`,
+        formId:
+          'documentId' in field
+            ? `${field.id}-${field.documentId}`
+            : `${field.id}-${field.templateId}`,
         pageNumber: field.page,
         type: field.type,
         pageX: Number(field.positionX),
@@ -84,6 +105,7 @@ export const AddFieldsFormPartial = ({
         pageHeight: Number(field.height),
         signerEmail:
           recipients.find((recipient) => recipient.id === field.recipientId)?.email ?? '',
+        signerId: field.recipientId ?? -1,
       })),
     },
   });
@@ -101,10 +123,13 @@ export const AddFieldsFormPartial = ({
   });
 
   const [selectedField, setSelectedField] = useState<FieldType | null>(null);
-  const [selectedSigner, setSelectedSigner] = useState<Recipient | null>(null);
+  const [selectedSigner, setSelectedSigner] = useState<Recipient | TemplateRecipient | null>(null);
   const [showRecipientsSelector, setShowRecipientsSelector] = useState(false);
 
-  const hasSelectedSignerBeenSent = selectedSigner?.sendStatus === SendStatus.SENT;
+  const hasSelectedSignerBeenSent =
+    selectedSigner &&
+    'sendStatus' in selectedSigner &&
+    selectedSigner?.sendStatus === SendStatus.SENT;
 
   const [isFieldWithinBounds, setIsFieldWithinBounds] = useState(false);
   const [coords, setCoords] = useState({
@@ -182,6 +207,7 @@ export const AddFieldsFormPartial = ({
         pageWidth: fieldPageWidth,
         pageHeight: fieldPageHeight,
         signerEmail: selectedSigner.email,
+        signerId: selectedSigner.id,
       });
 
       setIsFieldWithinBounds(false);
@@ -282,7 +308,11 @@ export const AddFieldsFormPartial = ({
   }, []);
 
   useEffect(() => {
-    setSelectedSigner(recipients.find((r) => r.sendStatus !== SendStatus.SENT) ?? recipients[0]);
+    const signer =
+      recipients.find((r) => 'sendStatus' in r && r.sendStatus !== SendStatus.SENT) ??
+      recipients[0];
+
+    setSelectedSigner(signer);
   }, [recipients]);
 
   return (
@@ -315,7 +345,10 @@ export const AddFieldsFormPartial = ({
             <FieldItem
               key={index}
               field={field}
-              disabled={selectedSigner?.email !== field.signerEmail || hasSelectedSignerBeenSent}
+              disabled={
+                !!(selectedSigner && selectedSigner.email !== field.signerEmail) ||
+                !!hasSelectedSignerBeenSent
+              }
               minHeight={fieldBounds.current.height}
               minWidth={fieldBounds.current.width}
               passive={isFieldWithinBounds && !!selectedField}
@@ -336,7 +369,8 @@ export const AddFieldsFormPartial = ({
                 >
                   {selectedSigner?.email && (
                     <span className="flex-1 truncate text-left">
-                      {selectedSigner?.name} ({selectedSigner?.email})
+                      {'name' in selectedSigner ? selectedSigner.name : selectedSigner.placeholder}{' '}
+                      ({selectedSigner?.email})
                     </span>
                   )}
 
@@ -358,18 +392,19 @@ export const AddFieldsFormPartial = ({
                   </CommandEmpty>
 
                   <CommandGroup>
-                    {recipients.map((recipient, index) => (
+                    {normalizedRecipients.map((recipient, index) => (
                       <CommandItem
                         key={index}
                         className={cn({
-                          'text-muted-foreground': recipient.sendStatus === SendStatus.SENT,
+                          'text-muted-foreground':
+                            'sendStatus' in recipient && recipient.sendStatus === SendStatus.SENT,
                         })}
                         onSelect={() => {
                           setSelectedSigner(recipient);
                           setShowRecipientsSelector(false);
                         }}
                       >
-                        {recipient.sendStatus !== SendStatus.SENT ? (
+                        {'sendStatus' in recipient && recipient.sendStatus !== SendStatus.SENT ? (
                           <Check
                             aria-hidden={recipient !== selectedSigner}
                             className={cn('mr-2 h-4 w-4 flex-shrink-0', {
@@ -416,7 +451,10 @@ export const AddFieldsFormPartial = ({
               <button
                 type="button"
                 className="group h-full w-full"
-                disabled={!selectedSigner || selectedSigner?.sendStatus === SendStatus.SENT}
+                disabled={
+                  !selectedSigner ||
+                  ('sendStatus' in selectedSigner && selectedSigner.sendStatus === SendStatus.SENT)
+                }
                 onClick={(e) => e.stopPropagation()}
                 onMouseDown={() => setSelectedField(FieldType.SIGNATURE)}
                 data-selected={selectedField === FieldType.SIGNATURE ? true : undefined}
@@ -429,7 +467,11 @@ export const AddFieldsFormPartial = ({
                         fontCaveat.className,
                       )}
                     >
-                      {selectedSigner?.name || 'Signature'}
+                      {selectedSigner
+                        ? 'name' in selectedSigner
+                          ? selectedSigner.name
+                          : selectedSigner.placeholder || 'Signature'
+                        : 'Signature'}
                     </p>
 
                     <p className="text-muted-foreground mt-2 text-center text-xs">Signature</p>
@@ -440,7 +482,10 @@ export const AddFieldsFormPartial = ({
               <button
                 type="button"
                 className="group h-full w-full"
-                disabled={!selectedSigner || selectedSigner?.sendStatus === SendStatus.SENT}
+                disabled={
+                  !selectedSigner ||
+                  ('sendStatus' in selectedSigner && selectedSigner.sendStatus === SendStatus.SENT)
+                }
                 onClick={(e) => e.stopPropagation()}
                 onMouseDown={() => setSelectedField(FieldType.EMAIL)}
                 data-selected={selectedField === FieldType.EMAIL ? true : undefined}
@@ -463,7 +508,10 @@ export const AddFieldsFormPartial = ({
               <button
                 type="button"
                 className="group h-full w-full"
-                disabled={!selectedSigner || selectedSigner?.sendStatus === SendStatus.SENT}
+                disabled={
+                  !selectedSigner ||
+                  ('sendStatus' in selectedSigner && selectedSigner.sendStatus === SendStatus.SENT)
+                }
                 onClick={(e) => e.stopPropagation()}
                 onMouseDown={() => setSelectedField(FieldType.NAME)}
                 data-selected={selectedField === FieldType.NAME ? true : undefined}
@@ -486,7 +534,10 @@ export const AddFieldsFormPartial = ({
               <button
                 type="button"
                 className="group h-full w-full"
-                disabled={!selectedSigner || selectedSigner?.sendStatus === SendStatus.SENT}
+                disabled={
+                  !selectedSigner ||
+                  ('sendStatus' in selectedSigner && selectedSigner.sendStatus === SendStatus.SENT)
+                }
                 onClick={(e) => e.stopPropagation()}
                 onMouseDown={() => setSelectedField(FieldType.DATE)}
                 data-selected={selectedField === FieldType.DATE ? true : undefined}
