@@ -47,7 +47,7 @@ export const PasswordForm = ({ className }: PasswordFormProps) => {
     register,
     handleSubmit,
     reset,
-    formState: { errors, isSubmitting },
+    formState: { errors, isSubmitting, isDirty },
   } = useForm<TPasswordFormSchema>({
     values: {
       currentPassword: '',
@@ -58,6 +58,8 @@ export const PasswordForm = ({ className }: PasswordFormProps) => {
   });
 
   const { mutateAsync: updatePassword } = trpc.profile.updatePassword.useMutation();
+
+  const isDisabled = isSubmitting || !isDirty;
 
   const onFormSubmit = async ({ currentPassword, password }: TPasswordFormSchema) => {
     try {
@@ -198,7 +200,7 @@ export const PasswordForm = ({ className }: PasswordFormProps) => {
       </div>
 
       <div className="mt-4">
-        <Button type="submit" disabled={isSubmitting}>
+        <Button type="submit" disabled={isDisabled}>
           {isSubmitting && <Loader className="mr-2 h-5 w-5 animate-spin" />}
           Update password
         </Button>
