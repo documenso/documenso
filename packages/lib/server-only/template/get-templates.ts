@@ -10,7 +10,7 @@ export const getTemplates = async ({ userId, page = 1, perPage = 10 }: GetTempla
   const [templates, count] = await Promise.all([
     await prisma.template.findMany({
       where: {
-        userId: userId,
+        userId,
       },
       include: {
         templateDocumentData: true,
