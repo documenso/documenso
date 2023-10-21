@@ -1,5 +1,6 @@
 import { TRPCError } from '@trpc/server';
 
+import { nanoid } from '@documenso/lib/universal/id';
 import { prisma } from '@documenso/prisma';
 
 import { authenticatedProcedure, router } from '../trpc';
@@ -65,7 +66,8 @@ export const templateRouter = router({
               create: template.TemplateRecipient.map((recipient) => ({
                 email: recipient.email,
                 name: recipient.placeholder,
-                token: recipient.token,
+                token: nanoid(),
+                templateToken: recipient.templateToken,
               })),
             },
           },
@@ -82,7 +84,7 @@ export const templateRouter = router({
             );
 
             const documentRecipient = document.Recipient.find(
-              (doc) => doc.token === recipient?.token,
+              (doc) => doc.templateToken === recipient?.templateToken,
             );
 
             return {

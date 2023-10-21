@@ -77,6 +77,7 @@ export const setRecipientsForTemplate = async ({
           placeholder: recipient.placeholder,
           email: recipient.email,
           token: nanoid(),
+          templateToken: nanoid(),
           templateId,
         },
       }),

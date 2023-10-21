@@ -23,8 +23,6 @@ import { useToast } from '@documenso/ui/primitives/use-toast';
 import { addTemplateFields } from '~/components/forms/edit-document/add-template-fields.action';
 import { addTemplatePlaceholders } from '~/components/forms/edit-document/add-template-placeholders.action';
 
-// import { completeDocument } from '~/components/forms/edit-document/add-subject.action';
-
 export type EditTemplateFormProps = {
   className?: string;
   user: User;
@@ -34,7 +32,6 @@ export type EditTemplateFormProps = {
   dataUrl: string;
 };
 
-// type EditTemplateStep = 'signers' | 'fields' | 'subject';
 type EditTemplateStep = 'signers' | 'fields';
 
 export const EditTemplateForm = ({
@@ -52,8 +49,8 @@ export const EditTemplateForm = ({
 
   const documentFlow: Record<EditTemplateStep, DocumentFlowStep> = {
     signers: {
-      title: 'Add Signers',
-      description: 'Add the people who will sign the document.',
+      title: 'Add Placeholders',
+      description: 'Add all relevant placeholders for each recipient.',
       stepIndex: 1,
     },
     fields: {
