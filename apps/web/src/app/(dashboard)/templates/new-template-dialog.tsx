@@ -1,18 +1,33 @@
 'use client';
 
+import React, { useState } from 'react';
+
 import { useRouter } from 'next/navigation';
+
+import { FilePlus } from 'lucide-react';
 
 import { createDocumentData } from '@documenso/lib/server-only/document-data/create-document-data';
 import { putFile } from '@documenso/lib/universal/upload/put-file';
 import { trpc } from '@documenso/trpc/react';
+import { Button } from '@documenso/ui/primitives/button';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@documenso/ui/primitives/dialog';
 import { DocumentDropzone } from '@documenso/ui/primitives/document-dropzone';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
-export default function TemplatePage() {
+export const NewTemplateDialog = () => {
   const router = useRouter();
   const { toast } = useToast();
 
   const { mutateAsync: createTemplate } = trpc.template.createTemplate.useMutation();
+
+  const [showNewTemplateDialog, setShowNewTemplateDialog] = useState(false);
 
   const onFileDrop = async (file: File) => {
     try {
@@ -35,6 +50,8 @@ export default function TemplatePage() {
         duration: 5000,
       });
 
+      setShowNewTemplateDialog(false);
+
       void router.push(`/templates/${id}`);
     } catch {
       toast({
@@ -46,14 +63,23 @@ export default function TemplatePage() {
   };
 
   return (
-    <div className="mx-auto max-w-screen-xl px-4 md:px-8">
-      <h1 className="mb-5 mt-2 truncate text-2xl font-semibold md:text-3xl">Create Template</h1>
-
-      <div className="w-full gap-4">
-        <div className="rounded-xl before:rounded-xl ">
-          <DocumentDropzone className="h-[80vh] max-h-[60rem]" onDrop={onFileDrop} />
-        </div>
-      </div>
-    </div>
+    <Dialog open={showNewTemplateDialog} onOpenChange={setShowNewTemplateDialog}>
+      <DialogTrigger asChild>
+        <Button className="cursor-pointer">
+          <>
+            <FilePlus className="-ml-1 mr-2 h-4 w-4" />
+            New Template
+          </>
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="w-full max-w-xl">
+        <DialogHeader>
+          <DialogTitle className="mb-4">Upload Template Document</DialogTitle>
+        </DialogHeader>
+        <DialogDescription asChild>
+          <DocumentDropzone className="h-[30vh] max-h-[60rem]" onDrop={onFileDrop} />
+        </DialogDescription>
+      </DialogContent>
+    </Dialog>
   );
-}
+};

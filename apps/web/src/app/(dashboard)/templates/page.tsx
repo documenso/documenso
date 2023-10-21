@@ -4,6 +4,7 @@ import { getRequiredServerComponentSession } from '@documenso/lib/next-auth/get-
 import { getTemplates } from '@documenso/lib/server-only/template/get-templates';
 
 import { TemplatesDataTable } from './data-table-templates';
+import { NewTemplateDialog } from './new-template-dialog';
 
 type AdminManageUsersProps = {
   searchParams?: {
@@ -25,7 +26,10 @@ export default async function TemplatesPage({ searchParams = {} }: AdminManageUs
 
   return (
     <div className="mx-auto max-w-screen-xl px-4 md:px-8">
-      <h1 className="mb-5 mt-2 truncate text-2xl font-semibold md:text-3xl">Templates</h1>
+      <div className="flex items-center justify-between">
+        <h1 className="mb-5 mt-2 truncate text-2xl font-semibold md:text-3xl">Templates</h1>
+        <NewTemplateDialog />
+      </div>
 
       <div className="relative">
         <TemplatesDataTable

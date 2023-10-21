@@ -100,7 +100,7 @@ export const TemplatesDataTable = ({
             cell: ({ row }) => {
               return (
                 <div className="flex items-center gap-x-4">
-                  <Button onClick={async () => onUseButtonClick(row.original.id)} className="w-24">
+                  <Button onClick={async () => onUseButtonClick(row.original.id)}>
                     <>
                       <Plus className="-ml-1 mr-2 h-4 w-4" />
                       Use
