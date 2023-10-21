@@ -40,7 +40,7 @@ export const ProfileForm = ({ className, user }: ProfileFormProps) => {
     register,
     control,
     handleSubmit,
-    formState: { errors, isSubmitting },
+    formState: { errors, isSubmitting, isDirty },
   } = useForm<TProfileFormSchema>({
     values: {
       name: user.name ?? '',
@@ -50,6 +50,8 @@ export const ProfileForm = ({ className, user }: ProfileFormProps) => {
   });
 
   const { mutateAsync: updateProfile } = trpc.profile.updateProfile.useMutation();
+
+  const isDisabled = isSubmitting || !isDirty;
 
   const onFormSubmit = async ({ name, signature }: TProfileFormSchema) => {
     try {
@@ -129,7 +131,7 @@ export const ProfileForm = ({ className, user }: ProfileFormProps) => {
       </div>
 
       <div className="mt-4">
-        <Button type="submit" disabled={isSubmitting}>
+        <Button type="submit" disabled={isDisabled}>
           {isSubmitting && <Loader className="mr-2 h-5 w-5 animate-spin" />}
           Update profile
         </Button>
