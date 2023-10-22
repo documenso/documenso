@@ -44,6 +44,8 @@ export const SigningForm = ({ document, recipient, fields }: SigningFormProps) =
 
   const [validateUninsertedFields, setValidateUninsertedFields] = useState(false);
 
+  const hasDateField = fields.find((field) => field.type === 'DATE');
+
   const {
     handleSubmit,
     formState: { isSubmitting },
@@ -113,27 +115,29 @@ export const SigningForm = ({ document, recipient, fields }: SigningFormProps) =
                 />
               </div>
 
-              <div>
-                <Label htmlFor="date-format">Date Format</Label>
+              {hasDateField && (
+                <div>
+                  <Label htmlFor="date-format">Date Format</Label>
 
-                <Select
-                  onValueChange={(value) => {
-                    setDateFormat(value);
-                  }}
-                  defaultValue={dateFormat}
-                >
-                  <SelectTrigger className="bg-background mt-2">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {DATE_FORMATS.map((format) => (
-                      <SelectItem key={format.key} value={format.value}>
-                        {format.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
+                  <Select
+                    onValueChange={(value) => {
+                      setDateFormat(value);
+                    }}
+                    defaultValue={dateFormat}
+                  >
+                    <SelectTrigger className="bg-background mt-2">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {DATE_FORMATS.map((format) => (
+                        <SelectItem key={format.key} value={format.value}>
+                          {format.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
 
               <div>
                 <Label htmlFor="Signature">Signature</Label>
