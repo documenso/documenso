@@ -7,6 +7,7 @@ import { match } from 'ts-pattern';
 import { getDocumentAndSenderByToken } from '@documenso/lib/server-only/document/get-document-by-token';
 import { getFieldsForToken } from '@documenso/lib/server-only/field/get-fields-for-token';
 import { getRecipientByToken } from '@documenso/lib/server-only/recipient/get-recipient-by-token';
+import { getRecipientSignatures } from '@documenso/lib/server-only/recipient/get-recipient-signatures';
 import { DocumentStatus, FieldType } from '@documenso/prisma/client';
 import { DocumentDownloadButton } from '@documenso/ui/components/document/document-download-button';
 import { DocumentShareButton } from '@documenso/ui/components/document/document-share-button';
@@ -46,6 +47,8 @@ export default async function CompletedSigningPage({
     return notFound();
   }
 
+  const signatures = await getRecipientSignatures({ recipientId: recipient.id });
+
   const recipientName =
     recipient.name ||
     fields.find((field) => field.type === FieldType.NAME)?.customText ||
@@ -54,7 +57,11 @@ export default async function CompletedSigningPage({
   return (
     <div className="-mx-4 flex max-w-[100vw] flex-col items-center overflow-x-hidden px-4 pt-24 md:-mx-8 md:px-8 lg:pt-36 xl:pt-44">
       {/* Card with recipient */}
-      <SigningCard3D name={recipientName} signingCelebrationImage={signingCelebration} />
+      <SigningCard3D
+        name={recipientName}
+        signature={signatures.at(0)}
+        signingCelebrationImage={signingCelebration}
+      />
 
       <div className="relative mt-6 flex w-full flex-col items-center">
         {match(document.status)
@@ -72,7 +79,8 @@ export default async function CompletedSigningPage({
           ))}
 
         <h2 className="mt-6 max-w-[35ch] text-center text-2xl font-semibold leading-normal md:text-3xl lg:text-4xl">
-          You have signed "{document.title}"
+          You have signed
+          <span className="mt-1.5 block">"{document.title}"</span>
         </h2>
 
         {match(document.status)

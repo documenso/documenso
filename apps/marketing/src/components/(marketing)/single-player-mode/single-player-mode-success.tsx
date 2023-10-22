@@ -5,8 +5,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 
 import { useFeatureFlags } from '@documenso/lib/client-only/providers/feature-flag';
-import { base64 } from '@documenso/lib/universal/base64';
-import { getFile } from '@documenso/lib/universal/upload/get-file';
+import { DocumentStatus, Signature } from '@documenso/prisma/client';
 import { DocumentWithRecipient } from '@documenso/prisma/types/document-with-recipient';
 import DocumentDialog from '@documenso/ui/components/document/document-dialog';
 import { DocumentDownloadButton } from '@documenso/ui/components/document/document-download-button';
@@ -14,53 +13,28 @@ import { DocumentShareButton } from '@documenso/ui/components/document/document-
 import { SigningCard3D } from '@documenso/ui/components/signing-card';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
-import { useToast } from '@documenso/ui/primitives/use-toast';
 
 import signingCelebration from '~/assets/signing-celebration.png';
-import ConfettiScreen from '~/components/(marketing)/confetti-screen';
-
-import { DocumentStatus } from '.prisma/client';
+import { ConfettiScreen } from '~/components/(marketing)/confetti-screen';
 
 interface SinglePlayerModeSuccessProps {
   className?: string;
   document: DocumentWithRecipient;
+  signatures: Signature[];
 }
 
-export const SinglePlayerModeSuccess = ({ className, document }: SinglePlayerModeSuccessProps) => {
+export const SinglePlayerModeSuccess = ({
+  className,
+  document,
+  signatures,
+}: SinglePlayerModeSuccessProps) => {
   const { getFlag } = useFeatureFlags();
 
   const isConfettiEnabled = getFlag('marketing_spm_confetti');
 
   const [showDocumentDialog, setShowDocumentDialog] = useState(false);
-  const [isFetchingDocumentFile, setIsFetchingDocumentFile] = useState(false);
-  const [documentFile, setDocumentFile] = useState<string | null>(null);
 
-  const { toast } = useToast();
-
-  const onShowDocumentClick = async () => {
-    if (isFetchingDocumentFile) {
-      return;
-    }
-
-    setIsFetchingDocumentFile(true);
-
-    try {
-      const data = await getFile(document.documentData);
-
-      setDocumentFile(base64.encode(data));
-
-      setShowDocumentDialog(true);
-    } catch {
-      toast({
-        title: 'Something went wrong.',
-        description: 'We were unable to retrieve the document at this time. Please try again.',
-        variant: 'destructive',
-        duration: 7500,
-      });
-    }
-
-    setIsFetchingDocumentFile(false);
-  };
+  const { documentData } = document;
 
   useEffect(() => {
     window.scrollTo({ top: 0 });
@@ -80,6 +54,7 @@ export const SinglePlayerModeSuccess = ({ className, document }: SinglePlayerMod
       <SigningCard3D
         className="mt-8"
         name={document.Recipient.name || document.Recipient.email}
+        signature={signatures.at(0)}
         signingCelebrationImage={signingCelebration}
       />
 
@@ -99,11 +74,7 @@ export const SinglePlayerModeSuccess = ({ className, document }: SinglePlayerMod
               disabled={document.status !== DocumentStatus.COMPLETED}
             />
 
-            <Button
-              onClick={async () => onShowDocumentClick()}
-              loading={isFetchingDocumentFile}
-              className="z-10 col-span-2"
-            >
+            <Button onClick={() => setShowDocumentDialog(true)} className="z-10 col-span-2">
               Show document
             </Button>
           </div>
@@ -123,7 +94,7 @@ export const SinglePlayerModeSuccess = ({ className, document }: SinglePlayerMod
       </p>
 
       <DocumentDialog
-        document={documentFile ?? ''}
+        documentData={documentData}
         open={showDocumentDialog}
         onOpenChange={setShowDocumentDialog}
       />
