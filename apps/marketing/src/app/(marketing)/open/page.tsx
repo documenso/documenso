@@ -46,19 +46,18 @@ const ZEarlyAdoptersResponse = z.record(
 export type StargazersType = z.infer<typeof ZStargazersLiveResponse>;
 export type EarlyAdoptersType = z.infer<typeof ZEarlyAdoptersResponse>;
 
-export default async function OpenPage() {
-  const { forks_count: forksCount, stargazers_count: stargazersCount } = await fetch(
-    'https://api.github.com/repos/documenso/documenso',
-    {
-      headers: {
-        accept: 'application/vnd.github.v3+json',
-      },
+const fetchGithubStats = async () => {
+  return await fetch('https://api.github.com/repos/documenso/documenso', {
+    headers: {
+      accept: 'application/vnd.github.v3+json',
     },
-  )
+  })
     .then(async (res) => res.json())
     .then((res) => ZGithubStatsResponse.parse(res));
+};
 
-  const { total_count: openIssues } = await fetch(
+const fetchOpenIssues = async () => {
+  return await fetch(
     'https://api.github.com/search/issues?q=repo:documenso/documenso+type:issue+state:open&page=0&per_page=1',
     {
       headers: {
@@ -68,8 +67,10 @@ export default async function OpenPage() {
   )
     .then(async (res) => res.json())
     .then((res) => ZOpenIssuesResponse.parse(res));
+};
 
-  const { total_count: mergedPullRequests } = await fetch(
+const fetchMergedPullRequests = async () => {
+  return await fetch(
     'https://api.github.com/search/issues?q=repo:documenso/documenso/+is:pr+merged:>=2010-01-01&page=0&per_page=1',
     {
       headers: {
@@ -79,22 +80,42 @@ export default async function OpenPage() {
   )
     .then(async (res) => res.json())
     .then((res) => ZMergedPullRequestsResponse.parse(res));
+};
 
-  const STARGAZERS_DATA = await fetch('https://stargrazer-live.onrender.com/api/stats', {
+const fetchStargazers = async () => {
+  return await fetch('https://stargrazer-live.onrender.com/api/stats', {
     headers: {
       accept: 'application/json',
     },
   })
     .then(async (res) => res.json())
     .then((res) => ZStargazersLiveResponse.parse(res));
+};
 
-  const EARLY_ADOPTERS_DATA = await fetch('https://stargrazer-live.onrender.com/api/stats/stripe', {
+const fetchEarlyAdopters = async () => {
+  return await fetch('https://stargrazer-live.onrender.com/api/stats/stripe', {
     headers: {
       accept: 'application/json',
     },
   })
     .then(async (res) => res.json())
     .then((res) => ZEarlyAdoptersResponse.parse(res));
+};
+
+export default async function OpenPage() {
+  const [
+    { forks_count: forksCount, stargazers_count: stargazersCount },
+    { total_count: openIssues },
+    { total_count: mergedPullRequests },
+    STARGAZERS_DATA,
+    EARLY_ADOPTERS_DATA,
+  ] = await Promise.all([
+    fetchGithubStats(),
+    fetchOpenIssues(),
+    fetchMergedPullRequests(),
+    fetchStargazers(),
+    fetchEarlyAdopters(),
+  ]);
 
   return (
     <div className="mx-auto mt-6 max-w-screen-lg sm:mt-12">
