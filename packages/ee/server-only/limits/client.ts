@@ -16,13 +16,10 @@ export const getLimits = async ({ headers }: GetLimitsOptions = {}) => {
     headers: {
       ...requestHeaders,
     },
-    next: {
-      revalidate: 60,
-    },
   })
     .then(async (res) => res.json())
     .then((res) => ZLimitsResponseSchema.parse(res))
-    .catch(() => {
+    .catch((_err) => {
       return {
         quota: FREE_PLAN_LIMITS,
         remaining: FREE_PLAN_LIMITS,

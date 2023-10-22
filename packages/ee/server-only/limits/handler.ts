@@ -3,7 +3,6 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import { getToken } from 'next-auth/jwt';
 import { match } from 'ts-pattern';
 
-import { withStaleWhileRevalidate } from '@documenso/lib/server-only/http/with-swr';
 import { getFlag } from '@documenso/lib/universal/get-feature-flag';
 
 import { SELFHOSTED_PLAN_LIMITS } from './constants';
@@ -21,7 +20,7 @@ export const limitsHandler = async (
     const isBillingEnabled = await getFlag('app_billing');
 
     if (!isBillingEnabled) {
-      return withStaleWhileRevalidate<typeof res>(res).status(200).json({
+      return res.status(200).json({
         quota: SELFHOSTED_PLAN_LIMITS,
         remaining: SELFHOSTED_PLAN_LIMITS,
       });
@@ -33,7 +32,7 @@ export const limitsHandler = async (
 
     const limits = await getServerLimits({ email: token.email });
 
-    return withStaleWhileRevalidate<typeof res>(res).status(200).json(limits);
+    return res.status(200).json(limits);
   } catch (err) {
     console.error('error', err);
 
