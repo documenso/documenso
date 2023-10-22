@@ -2,6 +2,8 @@
 
 import { createContext, useContext, useEffect, useState } from 'react';
 
+import { equals } from 'remeda';
+
 import { getLimits } from '../client';
 import { FREE_PLAN_LIMITS } from '../constants';
 import { TLimitsResponseSchema } from '../schema';
@@ -33,13 +35,25 @@ export const LimitsProvider = ({ initialValue, children }: LimitsProviderProps) 
 
   const [limits, setLimits] = useState(() => initialValue ?? defaultValue);
 
+  const refreshLimits = async () => {
+    const newLimits = await getLimits();
+
+    setLimits((oldLimits) => {
+      if (equals(oldLimits, newLimits)) {
+        return oldLimits;
+      }
+
+      return newLimits;
+    });
+  };
+
   useEffect(() => {
-    void getLimits().then((limits) => setLimits(limits));
+    void refreshLimits();
   }, []);
 
   useEffect(() => {
     const onFocus = () => {
-      void getLimits().then((limits) => setLimits(limits));
+      void refreshLimits();
     };
 
     window.addEventListener('focus', onFocus);

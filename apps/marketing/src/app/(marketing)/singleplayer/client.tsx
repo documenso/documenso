@@ -8,7 +8,7 @@ import { useRouter } from 'next/navigation';
 import { useAnalytics } from '@documenso/lib/client-only/hooks/use-analytics';
 import { base64 } from '@documenso/lib/universal/base64';
 import { putFile } from '@documenso/lib/universal/upload/put-file';
-import { Field, Prisma, Recipient } from '@documenso/prisma/client';
+import { DocumentDataType, Field, Prisma, Recipient } from '@documenso/prisma/client';
 import { Card, CardContent } from '@documenso/ui/primitives/card';
 import { DocumentDropzone } from '@documenso/ui/primitives/document-dropzone';
 import { AddFieldsFormPartial } from '@documenso/ui/primitives/document-flow/add-fields';
@@ -159,11 +159,11 @@ export const SinglePlayerClient = () => {
   const onFileDrop = async (file: File) => {
     try {
       const arrayBuffer = await file.arrayBuffer();
-      const base64String = base64.encode(new Uint8Array(arrayBuffer));
+      const fileBase64 = base64.encode(new Uint8Array(arrayBuffer));
 
       setUploadedFile({
         file,
-        fileBase64: `data:application/pdf;base64,${base64String}`,
+        fileBase64,
       });
 
       analytics.capture('Marketing: SPM - Document uploaded');
@@ -182,7 +182,15 @@ export const SinglePlayerClient = () => {
         <h1 className="text-3xl font-bold lg:text-5xl">Single Player Mode</h1>
 
         <p className="text-foreground mx-auto mt-4 max-w-[50ch] text-lg leading-normal">
-          View our{' '}
+          Create a{' '}
+          <Link
+            href={`${process.env.NEXT_PUBLIC_WEBAPP_URL}/signup`}
+            target="_blank"
+            className="hover:text-foreground/80 font-semibold transition-colors"
+          >
+            free account
+          </Link>{' '}
+          or view our{' '}
           <Link
             href={'/pricing'}
             target="_blank"
@@ -199,7 +207,14 @@ export const SinglePlayerClient = () => {
           {uploadedFile ? (
             <Card gradient>
               <CardContent className="p-2">
-                <LazyPDFViewer document={uploadedFile.fileBase64} />
+                <LazyPDFViewer
+                  documentData={{
+                    id: '',
+                    data: uploadedFile.fileBase64,
+                    initialData: uploadedFile.fileBase64,
+                    type: DocumentDataType.BYTES_64,
+                  }}
+                />
               </CardContent>
             </Card>
           ) : (
