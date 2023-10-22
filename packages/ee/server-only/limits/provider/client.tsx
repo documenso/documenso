@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useContext, useEffect, useRef, useState } from 'react';
+import { createContext, useContext, useEffect, useState } from 'react';
 
 import { equals } from 'remeda';
 
@@ -33,17 +33,18 @@ export const LimitsProvider = ({ initialValue, children }: LimitsProviderProps) 
     remaining: FREE_PLAN_LIMITS,
   };
 
-  const $limits = useRef(initialValue ?? defaultValue);
-  const [limits, setLimits] = useState(() => $limits.current);
+  const [limits, setLimits] = useState(() => initialValue ?? defaultValue);
 
   const refreshLimits = async () => {
     const newLimits = await getLimits();
 
-    if (equals(newLimits, $limits.current)) {
-      return;
-    }
+    setLimits((oldLimits) => {
+      if (equals(oldLimits, newLimits)) {
+        return oldLimits;
+      }
 
-    setLimits(newLimits);
+      return newLimits;
+    });
   };
 
   useEffect(() => {
