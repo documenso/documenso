@@ -1,15 +1,17 @@
-import React, { FC } from 'react';
+import React from 'react';
 
 import { motion } from 'framer-motion';
 import { Monitor, MoonStar, Sun } from 'lucide-react';
 
-interface ThemeSwitcherProps {
+import { cn } from '@documenso/ui/lib/utils';
+
+type ThemeSwitcherProps = {
   theme?: string;
   // eslint-disable-next-line no-unused-vars
   setTheme: (theme: string) => void;
-}
+};
 
-const ThemeSwitcher: FC<ThemeSwitcherProps> = ({ theme, setTheme }) => {
+export const ThemeSwitcher = ({ theme, setTheme }: ThemeSwitcherProps) => {
   const variants = {
     light: { x: 0 },
     dark: { x: 'calc((2.15rem + 0.30rem) * 1)' },
@@ -21,9 +23,11 @@ const ThemeSwitcher: FC<ThemeSwitcherProps> = ({ theme, setTheme }) => {
 
   return (
     <div
-      className={`relative flex items-center rounded-full bg-gray-200 p-1 dark:bg-stone-700 ${
-        theme === 'dark' ? 'dark' : ''
-      }`}
+      className={cn(
+        `relative flex items-center rounded-full bg-gray-200 p-1 dark:bg-stone-700 ${
+          theme === 'dark' ? 'dark' : ''
+        }`,
+      )}
     >
       <motion.div
         className="absolute h-8 w-10 rounded-full bg-white shadow-sm dark:bg-stone-600"
@@ -33,25 +37,25 @@ const ThemeSwitcher: FC<ThemeSwitcherProps> = ({ theme, setTheme }) => {
         transition={{ duration: 0.2 }}
       ></motion.div>
       <button
-        className={`z-10 flex h-8 w-10 items-center justify-center rounded-full ${getIconColor(
-          'light',
-        )}`}
+        className={cn(
+          `z-10 flex h-8 w-10 items-center justify-center rounded-full ${getIconColor('light')}`,
+        )}
         onClick={() => setTheme('light')}
       >
         <Sun className="h-5 w-5" />
       </button>
       <button
-        className={`z-10 flex h-8 w-10 items-center justify-center rounded-full ${getIconColor(
-          'dark',
-        )}`}
+        className={cn(
+          `z-10 flex h-8 w-10 items-center justify-center rounded-full ${getIconColor('dark')}`,
+        )}
         onClick={() => setTheme('dark')}
       >
         <MoonStar className="h-5 w-5" />
       </button>
       <button
-        className={`z-10 flex h-8 w-10 items-center justify-center rounded-full ${getIconColor(
-          'system',
-        )}`}
+        className={cn(
+          `z-10 flex h-8 w-10 items-center justify-center rounded-full ${getIconColor('system')}`,
+        )}
         onClick={() => setTheme('system')}
       >
         <Monitor className="h-5 w-5" />
@@ -59,5 +63,3 @@ const ThemeSwitcher: FC<ThemeSwitcherProps> = ({ theme, setTheme }) => {
     </div>
   );
 };
-
-export default ThemeSwitcher;

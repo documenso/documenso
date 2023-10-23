@@ -11,7 +11,7 @@ import { LiaDiscord } from 'react-icons/lia';
 import { LuGithub } from 'react-icons/lu';
 
 import { cn } from '@documenso/ui/lib/utils';
-import ThemeSwitcher from '@documenso/ui/primitives/theme-switcher';
+import { ThemeSwitcher } from '@documenso/ui/primitives/theme-switcher';
 
 export type FooterProps = HTMLAttributes<HTMLDivElement>;
 
