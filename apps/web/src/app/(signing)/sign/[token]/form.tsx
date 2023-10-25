@@ -87,7 +87,7 @@ export const SigningForm = ({ document, recipient, fields }: SigningFormProps) =
             Please review the document before signing.
           </p>
 
-          <hr className="border-border mb-8 mt-4" />
+          <hr className="border-border mb-8 mt-4 h-8 w-full" />
 
           <div className="-mx-2 flex flex-1 flex-col gap-4 overflow-y-auto px-2">
             <div className="flex flex-1 flex-col gap-y-4">
