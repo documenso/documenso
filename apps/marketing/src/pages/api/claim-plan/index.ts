@@ -2,7 +2,7 @@ import { NextApiRequest, NextApiResponse } from 'next';
 
 import { randomUUID } from 'crypto';
 
-import { hashSync } from '@documenso/lib/server-only/auth/hash';
+import { TEarlyAdopterCheckoutMetadataSchema } from '@documenso/ee/server-only/stripe/webhook/early-adopter-checkout-metadata';
 import { redis } from '@documenso/lib/server-only/redis';
 import { stripe } from '@documenso/lib/server-only/stripe';
 import { prisma } from '@documenso/prisma';
@@ -36,64 +36,38 @@ export default async function handler(
       where: {
         email: email.toLowerCase(),
       },
-      include: {
-        Subscription: true,
-      },
     });
 
-    if (user && user.Subscription) {
+    if (user) {
       return res.status(200).json({
         redirectUrl: `${process.env.NEXT_PUBLIC_WEBAPP_URL}/login`,
       });
     }
 
-    const password = Math.random().toString(36).slice(2, 9);
-    const passwordHash = hashSync(password);
-
-    const { id: userId } = await prisma.user.upsert({
-      where: {
-        email: email.toLowerCase(),
-      },
-      create: {
-        email: email.toLowerCase(),
-        name,
-        password: passwordHash,
-      },
-      update: {
-        name,
-        password: passwordHash,
-      },
-    });
-
-    await redis.set(`user:${userId}:temp-password`, password, {
-      // expire in 24 hours
-      ex: 60 * 60 * 24,
-    });
-
-    const signatureDataUrlKey = randomUUID();
+    const clientReferenceId = randomUUID();
 
     if (signatureDataUrl) {
-      await redis.set(`signature:${signatureDataUrlKey}`, signatureDataUrl, {
+      await redis.set(`signature:${clientReferenceId}`, signatureDataUrl, {
         // expire in 7 days
         ex: 60 * 60 * 24 * 7,
       });
     }
 
-    const metadata: Record<string, string> = {
+    const metadata: TEarlyAdopterCheckoutMetadataSchema = {
       name,
       email,
       signatureText: signatureText || name,
-      source: 'landing',
+      source: 'marketing',
     };
 
     if (signatureDataUrl) {
-      metadata.signatureDataUrl = signatureDataUrlKey;
+      metadata.signatureDataUrl = clientReferenceId;
     }
 
     const checkout = await stripe.checkout.sessions.create({
       customer_email: email,
-      client_reference_id: userId.toString(),
-      payment_method_types: ['card'],
+      // Using the UUID here means our webhook will not try to use it as a user ID.
+      client_reference_id: clientReferenceId,
       line_items: [
         {
           price: planId,
@@ -104,9 +78,7 @@ export default async function handler(
       metadata,
       allow_promotion_codes: true,
       success_url: `${process.env.NEXT_PUBLIC_MARKETING_URL}/claimed?sessionId={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${process.env.NEXT_PUBLIC_MARKETING_URL}/pricing?email=${encodeURIComponent(
-        email,
-      )}&name=${encodeURIComponent(name)}&planId=${planId}&cancelled=true`,
+      cancel_url: `${process.env.NEXT_PUBLIC_MARKETING_URL}`,
     });
 
     if (!checkout.url) {
