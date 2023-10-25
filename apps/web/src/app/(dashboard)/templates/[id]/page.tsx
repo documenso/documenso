@@ -1,6 +1,9 @@
 import React from 'react';
 
+import Link from 'next/link';
 import { redirect } from 'next/navigation';
+
+import { ChevronLeft } from 'lucide-react';
 
 import { getRequiredServerComponentSession } from '@documenso/lib/next-auth/get-server-session';
 import { getFieldsForTemplate } from '@documenso/lib/server-only/field/get-fields-for-template';
@@ -57,7 +60,10 @@ export default async function TemplatePage({ params }: TemplatePageProps) {
 
   return (
     <div className="mx-auto max-w-screen-xl px-4 md:px-8">
-      <div> Template</div>
+      <Link href="/templates" className="flex items-center text-[#7AC455] hover:opacity-80">
+        <ChevronLeft className="mr-2 inline-block h-5 w-5" />
+        Templates
+      </Link>
 
       <h1 className="mt-4 truncate text-2xl font-semibold md:text-3xl" title={template.title}>
         {template.title}

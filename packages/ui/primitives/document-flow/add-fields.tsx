@@ -42,6 +42,8 @@ import {
 import { FieldItem } from './field-item';
 import { DocumentFlowStep, FRIENDLY_FIELD_TYPE } from './types';
 
+// TODO: Seperate Template and Document Add fields
+
 const fontCaveat = Caveat({
   weight: ['500'],
   subsets: ['latin'],

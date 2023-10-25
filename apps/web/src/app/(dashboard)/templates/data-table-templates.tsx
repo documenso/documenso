@@ -40,7 +40,7 @@ export const TemplatesDataTable = ({
 
   const { toast } = useToast();
 
-  const { mutateAsync: createDocumentFromTemplate } =
+  const { mutateAsync: createDocumentFromTemplate, isLoading: isCreatingDocumentFromTemplate } =
     trpc.template.createDocumentFromTempate.useMutation();
 
   const onPaginationChange = (page: number, perPage: number) => {
@@ -100,9 +100,16 @@ export const TemplatesDataTable = ({
             cell: ({ row }) => {
               return (
                 <div className="flex items-center gap-x-4">
-                  <Button onClick={async () => onUseButtonClick(row.original.id)}>
+                  <Button
+                    disabled={isCreatingDocumentFromTemplate}
+                    onClick={async () => onUseButtonClick(row.original.id)}
+                  >
                     <>
-                      <Plus className="-ml-1 mr-2 h-4 w-4" />
+                      {isCreatingDocumentFromTemplate ? (
+                        <Loader className="mr-2 h-4 w-4 animate-spin" />
+                      ) : (
+                        <Plus className="-ml-1 mr-2 h-4 w-4" />
+                      )}
                       Use
                     </>
                   </Button>
