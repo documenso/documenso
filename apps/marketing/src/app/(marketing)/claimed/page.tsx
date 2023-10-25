@@ -32,10 +32,21 @@ export default async function ClaimedPlanPage({ searchParams = {} }: ClaimedPlan
   }
 
   const session = await stripe.checkout.sessions.retrieve(sessionId);
+  const customerId = typeof session.customer === 'string' ? session.customer : session.customer?.id;
+
+  if (!customerId) {
+    redirect('/');
+  }
+
+  const customer = await stripe.customers.retrieve(customerId);
+
+  if (!customer || customer.deleted) {
+    redirect('/');
+  }
 
   const user = await prisma.user.findFirst({
     where: {
-      id: Number(session.client_reference_id),
+      id: Number(customer.metadata.userId),
     },
   });
 

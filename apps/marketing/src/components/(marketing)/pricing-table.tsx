@@ -1,6 +1,6 @@
 'use client';
 
-import { HTMLAttributes, useMemo, useState } from 'react';
+import { HTMLAttributes, useState } from 'react';
 
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
@@ -10,8 +10,6 @@ import { usePlausible } from 'next-plausible';
 
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
-
-import { ClaimPlanDialog } from './claim-plan-dialog';
 
 export type PricingTableProps = HTMLAttributes<HTMLDivElement>;
 
@@ -26,14 +24,6 @@ export const PricingTable = ({ className, ...props }: PricingTableProps) => {
       ? 'YEARLY'
       : 'MONTHLY',
   );
-
-  const planId = useMemo(() => {
-    if (period === 'MONTHLY') {
-      return process.env.NEXT_PUBLIC_STRIPE_COMMUNITY_PLAN_MONTHLY_PRICE_ID;
-    }
-
-    return process.env.NEXT_PUBLIC_STRIPE_COMMUNITY_PLAN_YEARLY_PRICE_ID;
-  }, [period]);
 
   return (
     <div className={cn('', className)} {...props}>
@@ -86,33 +76,33 @@ export const PricingTable = ({ className, ...props }: PricingTableProps) => {
 
       <div className="mt-12 grid grid-cols-1 gap-x-6 gap-y-12 md:grid-cols-2 lg:grid-cols-3">
         <div
-          data-plan="self-hosted"
+          data-plan="free"
           className="bg-background shadow-foreground/5 flex flex-col items-center justify-center rounded-lg border px-8 py-12 shadow-lg"
         >
-          <p className="text-foreground text-4xl font-medium">Self Hosted</p>
-          <p className="text-primary mt-2.5 text-xl font-medium">Free</p>
+          <p className="text-foreground text-4xl font-medium">Free Plan</p>
+          <p className="text-primary mt-2.5 text-xl font-medium">$0</p>
 
           <p className="text-foreground mt-4 max-w-[30ch] text-center">
-            For small teams and individuals who need a simple solution
+            For small teams and individuals with basic needs.
           </p>
 
-          <Link
-            href="https://github.com/documenso/documenso"
-            target="_blank"
-            className="mt-6"
-            onClick={() => event('view-github')}
-          >
-            <Button className="rounded-full text-base">View on Github</Button>
-          </Link>
+          <Button className="rounded-full text-base" asChild>
+            <Link
+              href={`${process.env.NEXT_PUBLIC_WEBAPP_URL}/signup`}
+              target="_blank"
+              className="mt-6"
+            >
+              Signup Now
+            </Link>
+          </Button>
 
           <div className="mt-8 flex w-full flex-col divide-y">
-            <p className="text-foreground py-4 font-medium">Host your own instance</p>
-            <p className="text-foreground py-4">Full Control</p>
-            <p className="text-foreground py-4">Customizability</p>
-            <p className="text-foreground py-4">Docker Ready</p>
-            <p className="text-foreground py-4">Community Support</p>
-            <p className="text-foreground py-4">Free, Forever</p>
+            <p className="text-foreground py-4">5 standard documents per month</p>
+            <p className="text-foreground py-4">Up to 10 recipients per document</p>
+            <p className="text-foreground py-4">No credit card required</p>
           </div>
+
+          <div className="flex-1" />
         </div>
 
         <div
@@ -131,9 +121,9 @@ export const PricingTable = ({ className, ...props }: PricingTableProps) => {
             For fast-growing companies that aim to scale across multiple teams.
           </p>
 
-          <ClaimPlanDialog planId={planId}>
-            <Button className="mt-6 rounded-full text-base">Signup Now</Button>
-          </ClaimPlanDialog>
+          <Button className="mt-6 rounded-full text-base" asChild>
+            <Link href={`${process.env.NEXT_PUBLIC_WEBAPP_URL}/signup`}>Signup Now</Link>
+          </Button>
 
           <div className="mt-8 flex w-full flex-col divide-y">
             <p className="text-foreground py-4 font-medium">
