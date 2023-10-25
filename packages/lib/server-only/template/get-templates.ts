@@ -17,6 +17,9 @@ export const getTemplates = async ({ userId, page = 1, perPage = 10 }: GetTempla
         TemplateField: true,
       },
       skip: Math.max(page - 1, 0) * perPage,
+      orderBy: {
+        createdAt: 'desc',
+      },
     }),
     await prisma.template.count({
       where: {
