@@ -1,6 +1,5 @@
 'use client';
 
-// TODO: Delete signers is not working
 import { useState } from 'react';
 
 import { useRouter } from 'next/navigation';
@@ -10,18 +9,18 @@ import { cn } from '@documenso/ui/lib/utils';
 import { Card, CardContent } from '@documenso/ui/primitives/card';
 import { AddFieldsFormPartial } from '@documenso/ui/primitives/document-flow/add-fields';
 import { TAddFieldsFormSchema } from '@documenso/ui/primitives/document-flow/add-fields.types';
-import { AddTemplatePlaceholderRecipientsFormPartial } from '@documenso/ui/primitives/document-flow/add-template-placeholder-recipients';
-import { TAddTemplatePlacholderRecipientsFormSchema } from '@documenso/ui/primitives/document-flow/add-template-placeholder-recipients.types';
 import {
   DocumentFlowFormContainer,
   DocumentFlowFormContainerHeader,
 } from '@documenso/ui/primitives/document-flow/document-flow-root';
 import { DocumentFlowStep } from '@documenso/ui/primitives/document-flow/types';
 import { LazyPDFViewer } from '@documenso/ui/primitives/lazy-pdf-viewer';
+import { AddTemplatePlaceholderRecipientsFormPartial } from '@documenso/ui/primitives/template-flow/add-template-placeholder-recipients';
+import { TAddTemplatePlacholderRecipientsFormSchema } from '@documenso/ui/primitives/template-flow/add-template-placeholder-recipients.types';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
-import { addTemplateFields } from '~/components/forms/edit-document/add-template-fields.action';
-import { addTemplatePlaceholders } from '~/components/forms/edit-document/add-template-placeholders.action';
+import { addTemplateFields } from '~/components/forms/edit-template/add-template-fields.action';
+import { addTemplatePlaceholders } from '~/components/forms/edit-template/add-template-placeholders.action';
 
 export type EditTemplateFormProps = {
   className?: string;

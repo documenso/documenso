@@ -15,16 +15,16 @@ import { Input } from '@documenso/ui/primitives/input';
 import { Label } from '@documenso/ui/primitives/label';
 
 import {
-  TAddTemplatePlacholderRecipientsFormSchema,
-  ZAddTemplatePlacholderRecipientsFormSchema,
-} from './add-template-placeholder-recipients.types';
-import {
   DocumentFlowFormContainerActions,
   DocumentFlowFormContainerContent,
   DocumentFlowFormContainerFooter,
   DocumentFlowFormContainerStep,
-} from './document-flow-root';
-import { DocumentFlowStep } from './types';
+} from '../document-flow/document-flow-root';
+import { DocumentFlowStep } from '../document-flow/types';
+import {
+  TAddTemplatePlacholderRecipientsFormSchema,
+  ZAddTemplatePlacholderRecipientsFormSchema,
+} from './add-template-placeholder-recipients.types';
 
 export type AddTemplatePlaceholderRecipientsFormProps = {
   documentFlow: DocumentFlowStep;

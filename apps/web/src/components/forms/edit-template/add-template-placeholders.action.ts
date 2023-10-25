@@ -2,7 +2,7 @@
 
 import { getRequiredServerComponentSession } from '@documenso/lib/next-auth/get-server-session';
 import { setRecipientsForTemplate } from '@documenso/lib/server-only/recipient/set-recipients-for-template';
-import { TAddTemplatePlacholderRecipientsFormSchema } from '@documenso/ui/primitives/document-flow/add-template-placeholder-recipients.types';
+import { TAddTemplatePlacholderRecipientsFormSchema } from '@documenso/ui/primitives/template-flow/add-template-placeholder-recipients.types';
 
 export type AddTemmplatePlaceholdersActionInput = TAddTemplatePlacholderRecipientsFormSchema & {
   templateId: number;
