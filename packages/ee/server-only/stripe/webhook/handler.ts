@@ -230,6 +230,11 @@ export const stripeWebhookHandler = async (
         }
 
         await onSubscriptionUpdated({ userId: result.userId, subscription });
+
+        return res.status(200).json({
+          success: true,
+          message: 'Webhook received',
+        });
       })
       .with('customer.subscription.deleted', async () => {
         // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
