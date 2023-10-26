@@ -5,6 +5,8 @@ import { render } from '@documenso/email/render';
 import { DocumentCompletedEmailTemplate } from '@documenso/email/templates/document-completed';
 import { prisma } from '@documenso/prisma';
 
+import { getFile } from '../../universal/upload/get-file';
+
 export interface SendDocumentOptions {
   documentId: number;
 }
@@ -15,6 +17,7 @@ export const sendCompletedEmail = async ({ documentId }: SendDocumentOptions) =>
       id: documentId,
     },
     include: {
+      documentData: true,
       Recipient: true,
     },
   });
@@ -26,6 +29,8 @@ export const sendCompletedEmail = async ({ documentId }: SendDocumentOptions) =>
   if (document.Recipient.length === 0) {
     throw new Error('Document has no recipients');
   }
+
+  const buffer = await getFile(document.documentData);
 
   await Promise.all([
     document.Recipient.map(async (recipient) => {
@@ -51,6 +56,12 @@ export const sendCompletedEmail = async ({ documentId }: SendDocumentOptions) =>
         subject: 'Signing Complete!',
         html: render(template),
         text: render(template, { plainText: true }),
+        attachments: [
+          {
+            filename: document.title,
+            content: Buffer.from(buffer),
+          },
+        ],
       });
     }),
   ]);
