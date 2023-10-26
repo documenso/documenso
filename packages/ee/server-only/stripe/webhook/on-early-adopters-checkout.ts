@@ -133,6 +133,6 @@ export const onEarlyAdoptersCheckout = async ({ session }: OnEarlyAdoptersChecko
     // We don't want to break the checkout process if something goes wrong here.
     // This is an additive experience for early adopters, breaking their ability
     // join would be far worse than not having a signed pledge.
-    console.error(error);
+    console.error('early-supporter-error', error);
   }
 };
