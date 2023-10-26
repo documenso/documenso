@@ -3,9 +3,6 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import { getToken } from 'next-auth/jwt';
 import { match } from 'ts-pattern';
 
-import { getFlag } from '@documenso/lib/universal/get-feature-flag';
-
-import { SELFHOSTED_PLAN_LIMITS } from './constants';
 import { ERROR_CODES } from './errors';
 import { TLimitsErrorResponseSchema, TLimitsResponseSchema } from './schema';
 import { getServerLimits } from './server';
@@ -17,20 +14,7 @@ export const limitsHandler = async (
   try {
     const token = await getToken({ req });
 
-    const isBillingEnabled = await getFlag('app_billing');
-
-    if (!isBillingEnabled) {
-      return res.status(200).json({
-        quota: SELFHOSTED_PLAN_LIMITS,
-        remaining: SELFHOSTED_PLAN_LIMITS,
-      });
-    }
-
-    if (!token?.email) {
-      throw new Error(ERROR_CODES.UNAUTHORIZED);
-    }
-
-    const limits = await getServerLimits({ email: token.email });
+    const limits = await getServerLimits({ email: token?.email });
 
     return res.status(200).json(limits);
   } catch (err) {
