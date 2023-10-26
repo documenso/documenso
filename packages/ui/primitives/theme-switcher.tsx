@@ -24,9 +24,8 @@ export const ThemeSwitcher = ({ theme, setTheme }: ThemeSwitcherProps) => {
   return (
     <div
       className={cn(
-        `relative flex items-center rounded-full bg-gray-200 p-1 dark:bg-stone-700 ${
-          theme === 'dark' ? 'dark' : ''
-        }`,
+        `relative flex items-center rounded-full bg-gray-200 p-1 dark:bg-stone-700 `,
+        theme === 'dark' ? 'dark' : '',
       )}
     >
       <motion.div
@@ -38,7 +37,8 @@ export const ThemeSwitcher = ({ theme, setTheme }: ThemeSwitcherProps) => {
       ></motion.div>
       <button
         className={cn(
-          `z-10 flex h-8 w-10 items-center justify-center rounded-full ${getIconColor('light')}`,
+          `z-10 flex h-8 w-10 items-center justify-center rounded-full`,
+          getIconColor('light'),
         )}
         onClick={() => setTheme('light')}
       >
@@ -46,7 +46,8 @@ export const ThemeSwitcher = ({ theme, setTheme }: ThemeSwitcherProps) => {
       </button>
       <button
         className={cn(
-          `z-10 flex h-8 w-10 items-center justify-center rounded-full ${getIconColor('dark')}`,
+          `z-10 flex h-8 w-10 items-center justify-center rounded-full`,
+          getIconColor('dark'),
         )}
         onClick={() => setTheme('dark')}
       >
@@ -54,7 +55,8 @@ export const ThemeSwitcher = ({ theme, setTheme }: ThemeSwitcherProps) => {
       </button>
       <button
         className={cn(
-          `z-10 flex h-8 w-10 items-center justify-center rounded-full ${getIconColor('system')}`,
+          `z-10 flex h-8 w-10 items-center justify-center rounded-full`,
+          getIconColor('system'),
         )}
         onClick={() => setTheme('system')}
       >
