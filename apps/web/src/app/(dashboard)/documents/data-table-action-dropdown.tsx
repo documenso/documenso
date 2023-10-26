@@ -18,11 +18,15 @@ import {
 } from 'lucide-react';
 import { useSession } from 'next-auth/react';
 
+import { useCopyShareLink } from '@documenso/lib/client-only/hooks/use-copy-share-link';
+import {
+  TOAST_DOCUMENT_SHARE_ERROR,
+  TOAST_DOCUMENT_SHARE_SUCCESS,
+} from '@documenso/lib/constants/toast';
 import { getFile } from '@documenso/lib/universal/upload/get-file';
 import { Document, DocumentStatus, Recipient, User } from '@documenso/prisma/client';
 import { DocumentWithData } from '@documenso/prisma/types/document-with-data';
 import { trpc as trpcClient } from '@documenso/trpc/client';
-import { trpc as trpcReact } from '@documenso/trpc/react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -31,8 +35,6 @@ import {
   DropdownMenuTrigger,
 } from '@documenso/ui/primitives/dropdown-menu';
 import { useToast } from '@documenso/ui/primitives/use-toast';
-
-import { useCopyToClipboard } from '~/hooks/use-copy-to-clipboard';
 
 import { DeleteDraftDocumentDialog } from './delete-draft-document-dialog';
 
@@ -45,8 +47,13 @@ export type DataTableActionDropdownProps = {
 
 export const DataTableActionDropdown = ({ row }: DataTableActionDropdownProps) => {
   const { data: session } = useSession();
+
   const { toast } = useToast();
-  const [, copyToClipboard] = useCopyToClipboard();
+
+  const { createAndCopyShareLink, isCopyingShareLink } = useCopyShareLink({
+    onSuccess: () => toast(TOAST_DOCUMENT_SHARE_SUCCESS),
+    onError: () => toast(TOAST_DOCUMENT_SHARE_ERROR),
+  });
 
   const [isDeleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
@@ -54,32 +61,15 @@ export const DataTableActionDropdown = ({ row }: DataTableActionDropdownProps) =
     return null;
   }
 
-  const { mutateAsync: createOrGetShareLink, isLoading: isCreatingShareLink } =
-    trpcReact.shareLink.createOrGetShareLink.useMutation();
-
   const recipient = row.Recipient.find((recipient) => recipient.email === session.user.email);
 
   const isOwner = row.User.id === session.user.id;
   // const isRecipient = !!recipient;
-  // const isDraft = row.status === DocumentStatus.DRAFT;
+  const isDraft = row.status === DocumentStatus.DRAFT;
   // const isPending = row.status === DocumentStatus.PENDING;
   const isComplete = row.status === DocumentStatus.COMPLETED;
   // const isSigned = recipient?.signingStatus === SigningStatus.SIGNED;
   const isDocumentDeletable = isOwner && row.status === DocumentStatus.DRAFT;
-
-  const onShareClick = async () => {
-    const { slug } = await createOrGetShareLink({
-      token: recipient?.token,
-      documentId: row.id,
-    });
-
-    await copyToClipboard(`${window.location.origin}/share/${slug}`).catch(() => null);
-
-    toast({
-      title: 'Copied to clipboard',
-      description: 'The sharing link has been copied to your clipboard.',
-    });
-  };
 
   const onDownloadClick = async () => {
     let document: DocumentWithData | null = null;
@@ -166,8 +156,16 @@ export const DataTableActionDropdown = ({ row }: DataTableActionDropdownProps) =
           Resend
         </DropdownMenuItem>
 
-        <DropdownMenuItem onClick={onShareClick}>
-          {isCreatingShareLink ? (
+        <DropdownMenuItem
+          disabled={isDraft}
+          onClick={async () =>
+            createAndCopyShareLink({
+              token: recipient?.token,
+              documentId: row.id,
+            })
+          }
+        >
+          {isCopyingShareLink ? (
             <Loader className="mr-2 h-4 w-4" />
           ) : (
             <Share className="mr-2 h-4 w-4" />

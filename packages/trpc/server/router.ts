@@ -1,3 +1,4 @@
+import { adminRouter } from './admin-router/router';
 import { authRouter } from './auth-router/router';
 import { documentRouter } from './document-router/router';
 import { fieldRouter } from './field-router/router';
@@ -13,6 +14,7 @@ export const appRouter = router({
   profile: profileRouter,
   document: documentRouter,
   field: fieldRouter,
+  admin: adminRouter,
   shareLink: shareLinkRouter,
 });
 

@@ -14,16 +14,16 @@
     "prisma:seed": "prisma db seed"
   },
   "prisma": {
-    "seed": "ts-node --transpileOnly --skipProject ./seed-database.ts"
+    "seed": "ts-node --transpileOnly --project ./tsconfig.seed.json ./seed-database.ts"
   },
   "dependencies": {
-    "@prisma/client": "5.3.1",
+    "@prisma/client": "5.4.2",
     "dotenv": "^16.3.1",
     "dotenv-cli": "^7.3.0",
-    "prisma": "5.3.1"
+    "prisma": "5.4.2"
   },
   "devDependencies": {
     "ts-node": "^10.9.1",
-    "typescript": "^5.1.6"
+    "typescript": "5.2.2"
   }
 }

@@ -1,0 +1,21 @@
+{
+  "name": "@documenso/app-tests",
+  "version": "1.0.0",
+  "license": "to-update",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test:dev": "playwright test",
+    "test:e2e": "start-server-and-test \"(cd ../../apps/web && npm run start)\" http://localhost:3000 \"playwright test\""
+  },
+  "keywords": [],
+  "author": "",
+  "devDependencies": {
+    "@playwright/test": "^1.18.1",
+    "@types/node": "^20.8.2",
+    "@documenso/web": "*"
+  },
+  "dependencies": {
+    "start-server-and-test": "^2.0.1"
+  }
+}

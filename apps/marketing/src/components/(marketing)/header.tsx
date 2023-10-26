@@ -35,7 +35,7 @@ export const Header = ({ className, ...props }: HeaderProps) => {
 
         {isSinglePlayerModeMarketingEnabled && (
           <Link
-            href="/single-player-mode"
+            href="/singleplayer"
             className="bg-primary dark:text-background rounded-full px-2 py-1 text-xs font-semibold sm:px-3"
           >
             Try now!
@@ -66,7 +66,7 @@ export const Header = ({ className, ...props }: HeaderProps) => {
         </Link>
 
         <Link
-          href="https://app.documenso.com/login"
+          href="https://app.documenso.com/signin"
           target="_blank"
           className="text-muted-foreground hover:text-muted-foreground/80 text-sm font-semibold"
         >

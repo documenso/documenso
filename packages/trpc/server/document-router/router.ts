@@ -1,5 +1,6 @@
 import { TRPCError } from '@trpc/server';
 
+import { getServerLimits } from '@documenso/ee/server-only/limits/server';
 import { createDocument } from '@documenso/lib/server-only/document/create-document';
 import { deleteDraftDocument } from '@documenso/lib/server-only/document/delete-draft-document';
 import { getDocumentById } from '@documenso/lib/server-only/document/get-document-by-id';
@@ -63,13 +64,25 @@ export const documentRouter = router({
       try {
         const { title, documentDataId } = input;
 
+        const { remaining } = await getServerLimits({ email: ctx.user.email });
+
+        if (remaining.documents <= 0) {
+          throw new TRPCError({
+            code: 'BAD_REQUEST',
+            message:
+              'You have reached your document limit for this month. Please upgrade your plan.',
+          });
+        }
+
         return await createDocument({
           userId: ctx.user.id,
           title,
           documentDataId,
         });
       } catch (err) {
-        console.error(err);
+        if (err instanceof TRPCError) {
+          throw err;
+        }
 
         throw new TRPCError({
           code: 'BAD_REQUEST',
