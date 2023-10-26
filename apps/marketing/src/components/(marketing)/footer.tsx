@@ -25,6 +25,7 @@ const FOOTER_LINKS = [
   { href: '/pricing', text: 'Pricing' },
   { href: '/singleplayer', text: 'Singleplayer' },
   { href: '/blog', text: 'Blog' },
+  { href: '/design-system', text: 'Design' },
   { href: '/open', text: 'Open' },
   { href: 'https://shop.documenso.com', text: 'Shop', target: '_blank' },
   { href: 'https://status.documenso.com', text: 'Status', target: '_blank' },
@@ -63,7 +64,7 @@ export const Footer = ({ className, ...props }: FooterProps) => {
           </div>
         </div>
 
-        <div className="flex flex-wrap items-center gap-x-4 gap-y-2.5">
+        <div className="grid max-w-xs flex-1 grid-cols-2 gap-x-4 gap-y-2">
           {FOOTER_LINKS.map((link, index) => (
             <Link
               key={index}
