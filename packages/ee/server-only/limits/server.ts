@@ -3,13 +3,14 @@ import { DateTime } from 'luxon';
 import { stripe } from '@documenso/lib/server-only/stripe';
 import { getFlag } from '@documenso/lib/universal/get-feature-flag';
 import { prisma } from '@documenso/prisma';
+import { SubscriptionStatus } from '@documenso/prisma/client';
 
 import { FREE_PLAN_LIMITS, SELFHOSTED_PLAN_LIMITS } from './constants';
 import { ERROR_CODES } from './errors';
 import { ZLimitsSchema } from './schema';
 
 export type GetServerLimitsOptions = {
-  email?: string;
+  email?: string | null;
 };
 
 export const getServerLimits = async ({ email }: GetServerLimitsOptions) => {
@@ -42,7 +43,8 @@ export const getServerLimits = async ({ email }: GetServerLimitsOptions) => {
   let quota = structuredClone(FREE_PLAN_LIMITS);
   let remaining = structuredClone(FREE_PLAN_LIMITS);
 
-  if (user.Subscription?.priceId) {
+  // Since we store details and allow for past due plans we need to check if the subscription is active.
+  if (user.Subscription?.status !== SubscriptionStatus.INACTIVE && user.Subscription?.priceId) {
     const { product } = await stripe.prices
       .retrieve(user.Subscription.priceId, {
         expand: ['product'],

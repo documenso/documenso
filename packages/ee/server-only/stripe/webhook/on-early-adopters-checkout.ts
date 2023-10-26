@@ -3,6 +3,7 @@ import Stripe from 'stripe';
 import { hashSync } from '@documenso/lib/server-only/auth/hash';
 import { sealDocument } from '@documenso/lib/server-only/document/seal-document';
 import { redis } from '@documenso/lib/server-only/redis';
+import { stripe } from '@documenso/lib/server-only/stripe';
 import { alphaid, nanoid } from '@documenso/lib/universal/id';
 import { putFile } from '@documenso/lib/universal/upload/put-file';
 import { prisma } from '@documenso/prisma';
@@ -50,6 +51,17 @@ export const onEarlyAdoptersCheckout = async ({ session }: OnEarlyAdoptersChecko
         signature: signatureDataUrlRef,
       },
     });
+
+    const customerId =
+      typeof session.customer === 'string' ? session.customer : session.customer?.id;
+
+    if (customerId) {
+      await stripe.customers.update(customerId, {
+        metadata: {
+          userId: newUser.id,
+        },
+      });
+    }
 
     await redis.set(`user:${newUser.id}:temp-password`, tempPassword, {
       // expire in 1 week
@@ -121,6 +133,6 @@ export const onEarlyAdoptersCheckout = async ({ session }: OnEarlyAdoptersChecko
     // We don't want to break the checkout process if something goes wrong here.
     // This is an additive experience for early adopters, breaking their ability
     // join would be far worse than not having a signed pledge.
-    console.error(error);
+    console.error('early-supporter-error', error);
   }
 };

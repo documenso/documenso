@@ -176,7 +176,7 @@ export default async function ClaimedPlanPage({ searchParams = {} }: ClaimedPlan
         </p>
 
         <Link
-          href={`${process.env.NEXT_PUBLIC_WEBAPP_URL}/login`}
+          href={`${process.env.NEXT_PUBLIC_WEBAPP_URL}/signin`}
           target="_blank"
           className="mt-4 block"
         >
