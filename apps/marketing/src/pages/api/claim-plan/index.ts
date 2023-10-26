@@ -40,7 +40,7 @@ export default async function handler(
 
     if (user) {
       return res.status(200).json({
-        redirectUrl: `${process.env.NEXT_PUBLIC_WEBAPP_URL}/login`,
+        redirectUrl: `${process.env.NEXT_PUBLIC_WEBAPP_URL}/signin`,
       });
     }
 
