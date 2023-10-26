@@ -7,6 +7,7 @@ import { Stripe, stripe } from '@documenso/lib/server-only/stripe';
 import { getFlag } from '@documenso/lib/universal/get-feature-flag';
 import { prisma } from '@documenso/prisma';
 
+import { onEarlyAdoptersCheckout } from './on-early-adopters-checkout';
 import { onSubscriptionDeleted } from './on-subscription-deleted';
 import { onSubscriptionUpdated } from './on-subscription-updated';
 
@@ -51,6 +52,10 @@ export const stripeWebhookHandler = async (
       .with('checkout.session.completed', async () => {
         // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
         const session = event.data.object as Stripe.Checkout.Session;
+
+        if (session.metadata?.source === 'marketing') {
+          await onEarlyAdoptersCheckout({ session });
+        }
 
         const customerId =
           typeof session.customer === 'string' ? session.customer : session.customer?.id;
@@ -230,6 +235,11 @@ export const stripeWebhookHandler = async (
         }
 
         await onSubscriptionUpdated({ userId: result.userId, subscription });
+
+        return res.status(200).json({
+          success: true,
+          message: 'Webhook received',
+        });
       })
       .with('customer.subscription.deleted', async () => {
         // eslint-disable-next-line @typescript-eslint/consistent-type-assertions

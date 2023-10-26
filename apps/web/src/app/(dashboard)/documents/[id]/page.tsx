@@ -91,7 +91,7 @@ export default async function DocumentPage({ params }: DocumentPageProps) {
 
       {document.status === InternalDocumentStatus.COMPLETED && (
         <div className="mx-auto mt-12 max-w-2xl">
-          <LazyPDFViewer documentData={documentData} />
+          <LazyPDFViewer key={documentData.id} documentData={documentData} />
         </div>
       )}
     </div>

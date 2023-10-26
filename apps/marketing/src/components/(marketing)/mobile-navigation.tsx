@@ -46,7 +46,7 @@ export const MENU_NAVIGATION_LINKS = [
     text: 'Privacy',
   },
   {
-    href: 'https://app.documenso.com/login',
+    href: 'https://app.documenso.com/signin',
     text: 'Sign in',
   },
 ];
