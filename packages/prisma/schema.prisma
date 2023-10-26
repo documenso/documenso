@@ -33,6 +33,7 @@ model User {
   Document           Document[]
   Subscription       Subscription?
   PasswordResetToken PasswordResetToken[]
+  VerificationToken  VerificationToken[]
 }
 
 model PasswordResetToken {
@@ -42,6 +43,16 @@ model PasswordResetToken {
   expiry    DateTime
   userId    Int
   User      User     @relation(fields: [userId], references: [id])
+}
+
+model VerificationToken {
+  id         Int      @id @default(autoincrement())
+  identifier String
+  token      String   @unique
+  expires    DateTime
+  createdAt  DateTime @default(now())
+  userId     Int
+  user       User     @relation(fields: [userId], references: [id])
 }
 
 enum SubscriptionStatus {
@@ -111,10 +122,10 @@ model Document {
   Field          Field[]
   ShareLink      DocumentShareLink[]
   documentDataId String
-  documentData   DocumentData   @relation(fields: [documentDataId], references: [id], onDelete: Cascade)
+  documentData   DocumentData        @relation(fields: [documentDataId], references: [id], onDelete: Cascade)
   documentMeta   DocumentMeta?
-  createdAt      DateTime       @default(now())
-  updatedAt      DateTime       @default(now()) @updatedAt
+  createdAt      DateTime            @default(now())
+  updatedAt      DateTime            @default(now()) @updatedAt
 
   @@unique([documentDataId])
 }
@@ -134,11 +145,11 @@ model DocumentData {
 }
 
 model DocumentMeta {
-  id       String    @id @default(cuid())
-  subject  String?
-  message  String?
-  documentId Int @unique
-  document Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  id         String   @id @default(cuid())
+  subject    String?
+  message    String?
+  documentId Int      @unique
+  document   Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
 }
 
 enum ReadStatus {
