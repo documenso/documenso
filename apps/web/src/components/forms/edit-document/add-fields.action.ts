@@ -13,7 +13,7 @@ export const addFields = async ({ documentId, fields }: AddFieldsActionInput) =>
 
   const { user } = await getRequiredServerComponentSession();
 
-  await setFieldsForDocument({
+  const documentFields = await setFieldsForDocument({
     userId: user.id,
     documentId,
     fields: fields.map((field) => ({
@@ -27,4 +27,6 @@ export const addFields = async ({ documentId, fields }: AddFieldsActionInput) =>
       pageHeight: field.pageHeight,
     })),
   });
+
+  return documentFields;
 };

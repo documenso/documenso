@@ -49,6 +49,8 @@ export const EditDocumentForm = ({
   const router = useRouter();
 
   const [step, setStep] = useState<EditDocumentStep>('signers');
+  const [recipientsState, setRecipientsState] = useState(recipients);
+  const [fieldsState, setFieldsState] = useState(fields);
 
   const documentFlow: Record<EditDocumentStep, DocumentFlowStep> = {
     signers: {
@@ -75,13 +77,12 @@ export const EditDocumentForm = ({
   const onAddSignersFormSubmit = async (data: TAddSignersFormSchema) => {
     try {
       // Custom invocation server action
-      await addSigners({
+      const signers = await addSigners({
         documentId: document.id,
         signers: data.signers,
       });
 
-      router.refresh();
-
+      setRecipientsState(signers);
       setStep('fields');
     } catch (err) {
       console.error(err);
@@ -97,13 +98,12 @@ export const EditDocumentForm = ({
   const onAddFieldsFormSubmit = async (data: TAddFieldsFormSchema) => {
     try {
       // Custom invocation server action
-      await addFields({
+      const fields = await addFields({
         documentId: document.id,
         fields: data.fields,
       });
 
-      router.refresh();
-
+      setFieldsState(fields);
       setStep('subject');
     } catch (err) {
       console.error(err);
@@ -166,10 +166,10 @@ export const EditDocumentForm = ({
 
           {step === 'signers' && (
             <AddSignersFormPartial
-              key={recipients.length}
+              key={recipientsState.length}
               documentFlow={documentFlow.signers}
-              recipients={recipients}
-              fields={fields}
+              recipients={recipientsState}
+              fields={fieldsState}
               numberOfSteps={Object.keys(documentFlow).length}
               onSubmit={onAddSignersFormSubmit}
             />
@@ -177,10 +177,10 @@ export const EditDocumentForm = ({
 
           {step === 'fields' && (
             <AddFieldsFormPartial
-              key={fields.length}
+              key={fieldsState.length}
               documentFlow={documentFlow.fields}
-              recipients={recipients}
-              fields={fields}
+              recipients={recipientsState}
+              fields={fieldsState}
               numberOfSteps={Object.keys(documentFlow).length}
               onSubmit={onAddFieldsFormSubmit}
             />
@@ -190,8 +190,8 @@ export const EditDocumentForm = ({
             <AddSubjectFormPartial
               documentFlow={documentFlow.subject}
               document={document}
-              recipients={recipients}
-              fields={fields}
+              recipients={recipientsState}
+              fields={fieldsState}
               numberOfSteps={Object.keys(documentFlow).length}
               onSubmit={onAddSubjectFormSubmit}
             />

@@ -13,7 +13,7 @@ export const addSigners = async ({ documentId, signers }: AddSignersActionInput)
 
   const { user } = await getRequiredServerComponentSession();
 
-  await setRecipientsForDocument({
+  const recipients = await setRecipientsForDocument({
     userId: user.id,
     documentId,
     recipients: signers.map((signer) => ({
@@ -22,4 +22,6 @@ export const addSigners = async ({ documentId, signers }: AddSignersActionInput)
       name: signer.name,
     })),
   });
+
+  return recipients;
 };
