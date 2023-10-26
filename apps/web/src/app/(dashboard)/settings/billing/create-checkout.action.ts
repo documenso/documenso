@@ -1,5 +1,6 @@
 'use server';
 
+import { createCustomer } from '@documenso/ee/server-only/stripe/create-customer';
 import { getCheckoutSession } from '@documenso/ee/server-only/stripe/get-checkout-session';
 import {
   getStripeCustomerByEmail,
@@ -7,7 +8,7 @@ import {
 } from '@documenso/ee/server-only/stripe/get-customer';
 import { getPortalSession } from '@documenso/ee/server-only/stripe/get-portal-session';
 import { getRequiredServerComponentSession } from '@documenso/lib/next-auth/get-server-session';
-import { Stripe, stripe } from '@documenso/lib/server-only/stripe';
+import { Stripe } from '@documenso/lib/server-only/stripe';
 import { getSubscriptionByUserId } from '@documenso/lib/server-only/subscription/get-subscription-by-user-id';
 
 export type CreateCheckoutOptions = {
@@ -42,13 +43,11 @@ export const createCheckout = async ({ priceId }: CreateCheckoutOptions) => {
 
   // Create a Stripe customer if it does not exist for the current user.
   if (!stripeCustomer) {
-    stripeCustomer = await stripe.customers.create({
-      name: user.name ?? undefined,
-      email: user.email,
-      metadata: {
-        userId: user.id,
-      },
+    await createCustomer({
+      user,
     });
+
+    stripeCustomer = await getStripeCustomerByEmail(user.email);
   }
 
   return getCheckoutSession({
