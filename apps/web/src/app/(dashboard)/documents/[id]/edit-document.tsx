@@ -49,8 +49,8 @@ export const EditDocumentForm = ({
   const router = useRouter();
 
   const [step, setStep] = useState<EditDocumentStep>('signers');
-  const [recipientsState, setRecipientsState] = useState(recipients);
-  const [fieldsState, setFieldsState] = useState(fields);
+  const [recipientsState, setRecipientsState] = useState<Recipient[]>(recipients);
+  const [fieldsState, setFieldsState] = useState<Field[]>(fields);
 
   const documentFlow: Record<EditDocumentStep, DocumentFlowStep> = {
     signers: {
