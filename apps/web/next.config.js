@@ -13,7 +13,6 @@ ENV_FILES.forEach((file) => {
 /** @type {import('next').NextConfig} */
 const config = {
   experimental: {
-    serverActions: true,
     serverActionsBodySizeLimit: '50mb',
   },
   reactStrictMode: true,
