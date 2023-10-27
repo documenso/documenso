@@ -8,9 +8,7 @@ export type PageProps = {
   };
 };
 
-export default async function Page({ searchParams = {} }: PageProps) {
-  const token = searchParams.token;
-
+export default async function Page({ searchParams: { token } }: PageProps) {
   if (!token) {
     return (
       <div className="w-full">

@@ -31,7 +31,7 @@ export const TemplateConfirmationEmail = ({
         </Text>
 
         <Text className="my-1 text-center text-base text-slate-400">
-          Before you get started, please confirm your email address by clicking the button below.
+          Before you get started, please confirm your email address by clicking the button below:
         </Text>
 
         <Section className="mb-6 mt-8 text-center">
@@ -42,8 +42,8 @@ export const TemplateConfirmationEmail = ({
             Confirm email
           </Button>
           <Text className="mt-8 text-center text-sm italic text-slate-400">
-            If the button doesn't work, you copy and paste this link into your browser:{' '}
-            {confirmationLink}
+            You can also copy and paste this link into your browser: {confirmationLink} (link
+            expires in 1 hour)
           </Text>
         </Section>
       </Section>

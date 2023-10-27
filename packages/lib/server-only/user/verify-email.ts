@@ -23,8 +23,6 @@ export const verifyEmail = async ({ token }: VerifyEmailProps) => {
   // check if the token is valid or expired
   const valid = dbToken.expires > new Date();
 
-  console.log('valid', valid);
-
   if (!valid) {
     // if the token is expired, generate a new token and send the email
     await generateConfirmationToken({ email: dbToken.user.email });
@@ -46,9 +44,6 @@ export const verifyEmail = async ({ token }: VerifyEmailProps) => {
       },
     }),
   ]);
-
-  console.log('dbToken', dbToken);
-  console.log('!!updatedUsers && !!deletedToken', !!updatedUsers && !!deletedToken);
 
   return !!updatedUsers && !!deletedToken;
 };
