@@ -14,13 +14,13 @@ export const EmptyDocumentState = ({ status }: EmptyDocumentProps) => {
     .with(ExtendedDocumentStatus.COMPLETED, () => ({
       title: 'Nothing to do',
       message:
-        'There are no completed documents yet. Documents that you have created or received that become completed will appear here later.',
+        'There are no completed documents yet. Documents that you have created or received will appear here once completed.',
       icon: CheckCircle2,
     }))
     .with(ExtendedDocumentStatus.DRAFT, () => ({
       title: 'No active drafts',
       message:
-        'There are no active drafts at then current moment. You can upload a document to start drafting.',
+        'There are no active drafts at the current moment. You can upload a document to start drafting.',
       icon: CheckCircle2,
     }))
     .with(ExtendedDocumentStatus.ALL, () => ({
@@ -32,7 +32,7 @@ export const EmptyDocumentState = ({ status }: EmptyDocumentProps) => {
     .otherwise(() => ({
       title: 'Nothing to do',
       message:
-        'All documents are currently actioned. Any new documents are sent or recieved they will start to appear here.',
+        'All documents have been processed. Any new documents that are sent or received will show here.',
       icon: CheckCircle2,
     }));
 
