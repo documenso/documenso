@@ -211,6 +211,73 @@ We support a variety of deployment methods, and are actively working on adding m
 
 > Please note the below deployment methods are for v0.9, we will update these to v1.0 once it has been released.
 
+### Fetch, configure and build
+
+First, clone the code from Github:
+
+```
+git clone https://github.com/documenso/documenso.git
+```
+
+Then, inside the `documenso` folder, copy the example env file:
+
+```
+cp .env.example .env
+```
+
+The following environement variables must be set:
+
+* `NEXTAUTH_URL`
+* `NEXTAUTH_SECRET`
+* `NEXT_PUBLIC_WEBAPP_URL`
+* `NEXT_PUBLIC_MARKETING_URL`
+* `NEXT_PRIVATE_DATABASE_URL`
+* `NEXT_PRIVATE_DIRECT_DATABASE_URL`
+* `NEXT_PRIVATE_SMTP_FROM_NAME`
+* `NEXT_PRIVATE_SMTP_FROM_ADDRESS`
+
+> If you are using a reverse proxy in front of Documenso, don't forget to provide the public URL for both `NEXTAUTH_URL` and `NEXT_PUBLIC_WEBAPP_URL` variables!
+
+Now you can install the dependencies and build it:
+
+```
+npm i
+npm run:build:web
+npm run prisma:migrate-deploy
+```
+
+Finally, you can start it with:
+
+```
+npm run start
+```
+
+This will start the server on `localhost:3000`. For now, any reverse proxy can then do the frontend and SSL termination.
+
+> If you want to run with another port than 3000, you can start the application with `next -p <ANY PORT>` from the `apps/web` folder.
+
+### Run as a service
+
+You can use a systemd service file to run the app. Here is a simple example with the service running on port 3500 (using 3000 by default):
+
+```bash
+[Unit]
+Description=documenso
+After=network.target
+
+[Service]
+Environment=PATH=/path/to/your/node/binaries
+Type=simple
+User=www-data
+WorkingDirectory=/var/www/documenso/apps/web
+ExecStart=/usr/bin/next start -p 3500
+TimeoutSec=15
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
+```
+
 ### Railway
 
 [![Deploy on Railway](https://railway.app/button.svg)](https://railway.app/template/DjrRRX)
