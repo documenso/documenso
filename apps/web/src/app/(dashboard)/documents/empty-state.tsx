@@ -32,7 +32,7 @@ export const EmptyDocumentState = ({ status }: EmptyDocumentProps) => {
     .otherwise(() => ({
       title: 'Nothing to do',
       message:
-        'All documents have been processed. Any new documents that are sent or received will start to appear here.',
+        'All documents have been processed. Any new documents that are sent or received will show here.',
       icon: CheckCircle2,
     }));
 
