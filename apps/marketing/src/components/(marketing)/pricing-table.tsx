@@ -134,7 +134,7 @@ export const PricingTable = ({ className, ...props }: PricingTableProps) => {
             </p>
             <p className="text-foreground py-4">Join the movement</p>
             <p className="text-foreground py-4">Simple signing solution</p>
-            <p className="text-foreground py-4">Email, Discord and Discord assistance</p>
+            <p className="text-foreground py-4">Email, Discord and Slack assistance</p>
             <p className="text-foreground py-4">
               <strong>
                 {' '}
