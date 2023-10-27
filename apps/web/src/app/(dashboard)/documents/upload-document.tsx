@@ -53,6 +53,7 @@ export const UploadDocument = ({ className }: UploadDocumentProps) => {
         duration: 5000,
       });
 
+      router.refresh();
       router.push(`/documents/${id}`);
     } catch (error) {
       console.error(error);
