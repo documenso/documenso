@@ -110,7 +110,13 @@ export const SigningForm = ({ document, recipient, fields }: SigningFormProps) =
                   <CardContent className="p-0">
                     <SignaturePad
                       className="h-44 w-full"
-                      defaultValue={signature ?? undefined}
+                      defaultValue={
+                        session
+                          ? session.user.email === recipient.email
+                            ? signature ?? undefined
+                            : undefined
+                          : undefined
+                      }
                       onChange={(value) => {
                         setSignature(value);
                       }}
