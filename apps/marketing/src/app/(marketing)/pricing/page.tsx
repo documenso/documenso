@@ -117,10 +117,10 @@ export default function PricingPage() {
               and join our{' '}
               <Link
                 className="text-documenso-700 font-bold"
-                href="https://join.slack.com/t/documenso/shared_invite/zt-1vibm8txi-DqsDFtdp44Hn2H5lc~RpPQ"
+                href="https://documen.so/discord"
                 target="_blank"
               >
-                Slack Community
+                Discord Community
               </Link>{' '}
               to keep up to date, on what the current priorities are. In any case, we are an open
               community and welcome all input, technical and non-technical ❤️
@@ -168,10 +168,10 @@ export default function PricingPage() {
               or{' '}
               <a
                 className="text-documenso-700 font-bold"
-                href="https://join.slack.com/t/documenso/shared_invite/zt-1vibm8txi-DqsDFtdp44Hn2H5lc~RpPQ"
+                href="https://documen.so/discord"
                 target="_blank"
               >
-                in our Slack-Support-Channel
+                in our Discord-Support-Channel
               </a>{' '}
               please message either Lucas or Timur to get added to the channel if you are not
               already a member.
