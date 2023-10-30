@@ -58,7 +58,7 @@ export const DocumentShareButton = ({ token, documentId, className }: DocumentSh
 
   const onCopyClick = async () => {
     if (shareLink) {
-      await copyShareLink(`${window.location.origin}/share/${shareLink.slug}`);
+      await copyShareLink(`${process.env.NEXT_PUBLIC_WEBAPP_URL}/share/${shareLink.slug}`);
     } else {
       await createAndCopyShareLink({
         token,
