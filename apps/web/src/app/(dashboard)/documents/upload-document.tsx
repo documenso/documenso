@@ -18,9 +18,10 @@ import { useToast } from '@documenso/ui/primitives/use-toast';
 
 export type UploadDocumentProps = {
   className?: string;
+  verifiedUser: boolean;
 };
 
-export const UploadDocument = ({ className }: UploadDocumentProps) => {
+export const UploadDocument = ({ className, verifiedUser }: UploadDocumentProps) => {
   const router = useRouter();
 
   const { toast } = useToast();
@@ -79,7 +80,7 @@ export const UploadDocument = ({ className }: UploadDocumentProps) => {
     <div className={cn('relative', className)}>
       <DocumentDropzone
         className="min-h-[40vh]"
-        disabled={remaining.documents === 0}
+        disabled={remaining.documents === 0 || !verifiedUser}
         onDrop={onFileDrop}
       />
 

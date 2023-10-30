@@ -8,7 +8,7 @@ export type PageProps = {
   };
 };
 
-export default async function Page({ searchParams: { token } }: PageProps) {
+export default async function VerifyEmailPage({ searchParams: { token } }: PageProps) {
   if (!token) {
     return (
       <div className="w-full">

@@ -61,7 +61,7 @@ export default async function DocumentsPage({ searchParams = {} }: DocumentsPage
 
   return (
     <div className="mx-auto w-full max-w-screen-xl px-4 md:px-8">
-      <UploadDocument />
+      <UploadDocument verifiedUser={!!user.emailVerified} />
 
       <div className="mt-12 flex flex-wrap items-center justify-between gap-x-4 gap-y-8">
         <h1 className="text-4xl font-semibold">Documents</h1>

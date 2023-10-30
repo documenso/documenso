@@ -45,5 +45,9 @@ export const verifyEmail = async ({ token }: VerifyEmailProps) => {
     }),
   ]);
 
+  if (!updatedUsers || !deletedToken) {
+    throw new Error('Something went wrong while verifying your email. Please try again.');
+  }
+
   return !!updatedUsers && !!deletedToken;
 };

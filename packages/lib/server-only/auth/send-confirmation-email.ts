@@ -24,9 +24,14 @@ export const sendConfirmationEmail = async ({ userId }: SendConfirmationEmailPro
     },
   });
 
-  const token = user.VerificationToken[0].token;
+  const token = user.VerificationToken[0]?.token;
+
+  if (!token) {
+    throw new Error('Verification token not found for the user');
+  }
+
   const assetBaseUrl = process.env.NEXT_PUBLIC_WEBAPP_URL || 'http://localhost:3000';
-  const confirmationLink = `${process.env.NEXT_PUBLIC_WEBAPP_URL}/confirm-email/?token=${token}`;
+  const confirmationLink = `${assetBaseUrl}/confirm-email/?token=${token}`;
   const senderName = process.env.NEXT_PRIVATE_SMTP_FROM_NAME || 'Documenso';
   const senderAdress = process.env.NEXT_PRIVATE_SMTP_FROM_ADDRESS || 'noreply@documenso.com';
 
@@ -35,7 +40,7 @@ export const sendConfirmationEmail = async ({ userId }: SendConfirmationEmailPro
     confirmationLink,
   });
 
-  return await mailer.sendMail({
+  return mailer.sendMail({
     to: {
       address: user.email,
       name: user.name || '',
