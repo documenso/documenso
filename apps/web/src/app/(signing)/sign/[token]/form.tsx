@@ -99,7 +99,7 @@ export const SigningForm = ({ document, recipient, fields }: SigningFormProps) =
                   id="full-name"
                   className="bg-background mt-2"
                   value={fullName}
-                  onChange={(e) => setFullName(e.target.value)}
+                  onChange={(e) => setFullName(e.target.value.trimStart())}
                 />
               </div>
 

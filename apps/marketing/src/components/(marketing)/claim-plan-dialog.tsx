@@ -30,7 +30,7 @@ import { claimPlan } from '~/api/claim-plan/fetcher';
 import { FormErrorMessage } from '../form/form-error-message';
 
 export const ZClaimPlanDialogFormSchema = z.object({
-  name: z.string().min(3),
+  name: z.string().trim().min(3, { message: 'Please enter a valid name.' }),
   email: z.string().email(),
 });
 

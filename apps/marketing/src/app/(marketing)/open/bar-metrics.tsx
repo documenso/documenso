@@ -46,6 +46,9 @@ export const BarMetric = <T extends Record<string, Record<keyof T[string], unkno
             <XAxis dataKey="month" />
             <YAxis />
             <Tooltip
+              labelStyle={{
+                color: 'hsl(var(--primary-foreground))',
+              }}
               itemStyle={{
                 color: 'hsl(var(--primary-foreground))',
               }}

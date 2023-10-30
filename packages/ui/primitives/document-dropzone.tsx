@@ -83,6 +83,7 @@ const DocumentDescription = {
 
 export type DocumentDropzoneProps = {
   className?: string;
+  disabled?: boolean;
   onDrop?: (_file: File) => void | Promise<void>;
   type?: 'document' | 'template';
   [key: string]: unknown;
@@ -92,6 +93,7 @@ export const DocumentDropzone = ({
   className,
   onDrop,
   type = 'document',
+  disabled,
   ...props
 }: DocumentDropzoneProps) => {
   const { getRootProps, getInputProps } = useDropzone({
@@ -99,6 +101,7 @@ export const DocumentDropzone = ({
       'application/pdf': ['.pdf'],
     },
     multiple: false,
+    disabled,
     onDrop: ([acceptedFile]) => {
       if (acceptedFile && onDrop) {
         void onDrop(acceptedFile);
@@ -117,11 +120,12 @@ export const DocumentDropzone = ({
       <Card
         role="button"
         className={cn(
-          'focus-visible:ring-ring ring-offset-background flex flex-1 cursor-pointer flex-col items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2',
+          'focus-visible:ring-ring ring-offset-background flex flex-1 cursor-pointer flex-col items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 aria-disabled:pointer-events-none aria-disabled:opacity-60',
           className,
         )}
         gradient={true}
         degrees={120}
+        aria-disabled={disabled}
         {...getRootProps()}
         {...props}
       >

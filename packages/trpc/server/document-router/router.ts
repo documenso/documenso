@@ -1,6 +1,8 @@
 import { TRPCError } from '@trpc/server';
 
+import { getServerLimits } from '@documenso/ee/server-only/limits/server';
 import { createDocument } from '@documenso/lib/server-only/document/create-document';
+import { deleteDraftDocument } from '@documenso/lib/server-only/document/delete-draft-document';
 import { getDocumentById } from '@documenso/lib/server-only/document/get-document-by-id';
 import { getDocumentAndSenderByToken } from '@documenso/lib/server-only/document/get-document-by-token';
 import { sendDocument } from '@documenso/lib/server-only/document/send-document';
@@ -10,6 +12,7 @@ import { setRecipientsForDocument } from '@documenso/lib/server-only/recipient/s
 import { authenticatedProcedure, procedure, router } from '../trpc';
 import {
   ZCreateDocumentMutationSchema,
+  ZDeleteDraftDocumentMutationSchema,
   ZGetDocumentByIdQuerySchema,
   ZGetDocumentByTokenQuerySchema,
   ZSendDocumentMutationSchema,
@@ -61,17 +64,48 @@ export const documentRouter = router({
       try {
         const { title, documentDataId } = input;
 
+        const { remaining } = await getServerLimits({ email: ctx.user.email });
+
+        if (remaining.documents <= 0) {
+          throw new TRPCError({
+            code: 'BAD_REQUEST',
+            message:
+              'You have reached your document limit for this month. Please upgrade your plan.',
+          });
+        }
+
         return await createDocument({
           userId: ctx.user.id,
           title,
           documentDataId,
         });
       } catch (err) {
-        console.error(err);
+        if (err instanceof TRPCError) {
+          throw err;
+        }
 
         throw new TRPCError({
           code: 'BAD_REQUEST',
           message: 'We were unable to create this document. Please try again later.',
+        });
+      }
+    }),
+
+  deleteDraftDocument: authenticatedProcedure
+    .input(ZDeleteDraftDocumentMutationSchema)
+    .mutation(async ({ input, ctx }) => {
+      try {
+        const { id } = input;
+
+        const userId = ctx.user.id;
+
+        return await deleteDraftDocument({ id, userId });
+      } catch (err) {
+        console.error(err);
+
+        throw new TRPCError({
+          code: 'BAD_REQUEST',
+          message: 'We were unable to delete this document. Please try again later.',
         });
       }
     }),
