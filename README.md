@@ -30,14 +30,6 @@
    <a href="code_of_conduct.md"><img src="https://img.shields.io/badge/Contributor%20Covenant-2.1-4baaaa.svg" alt="Contributor Covenant"></a>
 </p>
 
-> 🦺 Documenso 1.0 is deployed to our <a href="https://documen.so/staging" target="_blank">Staging Environment</a>.
->
-> The code can be found on the [feat/refresh](https://github.com/documenso/documenso/tree/feat/refresh) branch.
->
-> The new version will be released after the current testing phase.
-
-# Join us in testing Documenso 1.0 during [MALFUNCTION MANIA](https://documenso.com/blog/malfunction-mania)
-
 <div>
   <img style="display: block; height: 120px; width: 24%"
     src="https://github.com/documenso/documenso/assets/1309312/67e08c98-c153-4115-aa2d-77979bb12c94)">
