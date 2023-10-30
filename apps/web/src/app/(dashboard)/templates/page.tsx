@@ -25,8 +25,6 @@ export default async function TemplatesPage({ searchParams = {} }: AdminManageUs
     perPage: perPage,
   });
 
-  console.log(templates);
-
   return (
     <div className="mx-auto max-w-screen-xl px-4 md:px-8">
       <div className="flex items-center justify-between">
