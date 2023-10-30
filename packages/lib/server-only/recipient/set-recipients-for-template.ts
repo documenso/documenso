@@ -8,7 +8,7 @@ export interface SetRecipientsForTemplateOptions {
   recipients: {
     id?: number | null;
     email: string;
-    placeholder: string;
+    name: string;
   }[];
 }
 
@@ -69,12 +69,12 @@ export const setRecipientsForTemplate = async ({
           templateId,
         },
         update: {
-          placeholder: recipient.placeholder,
+          name: recipient.name,
           email: recipient.email,
           templateId,
         },
         create: {
-          placeholder: recipient.placeholder,
+          name: recipient.name,
           email: recipient.email,
           token: nanoid(),
           templateToken: nanoid(),

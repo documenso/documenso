@@ -4,14 +4,14 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { Caveat } from 'next/font/google';
 
-import { Check, ChevronsUpDown, Info } from 'lucide-react';
+import { ChevronsUpDown } from 'lucide-react';
 import { useFieldArray, useForm } from 'react-hook-form';
 
 import { getBoundingClientRect } from '@documenso/lib/client-only/get-bounding-client-rect';
 import { useDocumentElement } from '@documenso/lib/client-only/hooks/use-document-element';
 import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
 import { nanoid } from '@documenso/lib/universal/id';
-import { Field, FieldType, Recipient, SendStatus } from '@documenso/prisma/client';
+import { FieldType, TemplateField, TemplateRecipient } from '@documenso/prisma/client';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
 import { Card, CardContent } from '@documenso/ui/primitives/card';
@@ -22,18 +22,21 @@ import {
   CommandInput,
   CommandItem,
 } from '@documenso/ui/primitives/command';
-import { Popover, PopoverContent, PopoverTrigger } from '@documenso/ui/primitives/popover';
-import { Tooltip, TooltipContent, TooltipTrigger } from '@documenso/ui/primitives/tooltip';
-
-import { TAddFieldsFormSchema } from './add-fields.types';
 import {
   DocumentFlowFormContainerActions,
   DocumentFlowFormContainerContent,
   DocumentFlowFormContainerFooter,
   DocumentFlowFormContainerStep,
-} from './document-flow-root';
-import { FieldItem } from './field-item';
-import { DocumentFlowStep, FRIENDLY_FIELD_TYPE } from './types';
+} from '@documenso/ui/primitives/document-flow/document-flow-root';
+import { FieldItem } from '@documenso/ui/primitives/document-flow/field-item';
+import {
+  DocumentFlowStep,
+  FRIENDLY_FIELD_TYPE,
+} from '@documenso/ui/primitives/document-flow/types';
+import { Popover, PopoverContent, PopoverTrigger } from '@documenso/ui/primitives/popover';
+
+// import { Tooltip, TooltipContent, TooltipTrigger } from '@documenso/ui/primitives/tooltip';
+import { TAddTemplateFieldsFormSchema } from './add-template-fields.types';
 
 const fontCaveat = Caveat({
   weight: ['500'],
@@ -48,42 +51,45 @@ const DEFAULT_WIDTH_PERCENT = 15;
 const MIN_HEIGHT_PX = 60;
 const MIN_WIDTH_PX = 200;
 
-export type AddFieldsFormProps = {
+export type AddTemplateFieldsFormProps = {
   documentFlow: DocumentFlowStep;
   hideRecipients?: boolean;
-  recipients: Recipient[];
-  fields: Field[];
+  recipients: TemplateRecipient[];
+  fields: TemplateField[];
   numberOfSteps: number;
-  onSubmit: (_data: TAddFieldsFormSchema) => void;
+  onSubmit: (_data: TAddTemplateFieldsFormSchema) => void;
 };
 
-export const AddFieldsFormPartial = ({
+export const AddTemplateFieldsFormPartial = ({
   documentFlow,
   hideRecipients = false,
   recipients,
   fields,
   numberOfSteps,
   onSubmit,
-}: AddFieldsFormProps) => {
+}: AddTemplateFieldsFormProps) => {
   const { isWithinPageBounds, getFieldPosition, getPage } = useDocumentElement();
 
   const {
     control,
     handleSubmit,
     formState: { isSubmitting },
-  } = useForm<TAddFieldsFormSchema>({
+  } = useForm<TAddTemplateFieldsFormSchema>({
     defaultValues: {
       fields: fields.map((field) => ({
         nativeId: field.id,
-        formId: `${field.id}-${field.documentId}`,
+        formId: `${field.id}-${field.templateId}`,
         pageNumber: field.page,
         type: field.type,
         pageX: Number(field.positionX),
         pageY: Number(field.positionY),
         pageWidth: Number(field.width),
         pageHeight: Number(field.height),
+        signerId: field.recipientId ?? -1,
         signerEmail:
           recipients.find((recipient) => recipient.id === field.recipientId)?.email ?? '',
+        signerToken:
+          recipients.find((recipient) => recipient.id === field.recipientId)?.templateToken ?? '',
       })),
     },
   });
@@ -101,10 +107,8 @@ export const AddFieldsFormPartial = ({
   });
 
   const [selectedField, setSelectedField] = useState<FieldType | null>(null);
-  const [selectedSigner, setSelectedSigner] = useState<Recipient | null>(null);
+  const [selectedSigner, setSelectedSigner] = useState<TemplateRecipient | null>(null);
   const [showRecipientsSelector, setShowRecipientsSelector] = useState(false);
-
-  const hasSelectedSignerBeenSent = selectedSigner?.sendStatus === SendStatus.SENT;
 
   const [isFieldWithinBounds, setIsFieldWithinBounds] = useState(false);
   const [coords, setCoords] = useState({
@@ -182,6 +186,8 @@ export const AddFieldsFormPartial = ({
         pageWidth: fieldPageWidth,
         pageHeight: fieldPageHeight,
         signerEmail: selectedSigner.email,
+        signerId: selectedSigner.id,
+        signerToken: selectedSigner.templateToken ?? '',
       });
 
       setIsFieldWithinBounds(false);
@@ -282,7 +288,7 @@ export const AddFieldsFormPartial = ({
   }, []);
 
   useEffect(() => {
-    setSelectedSigner(recipients.find((r) => r.sendStatus !== SendStatus.SENT) ?? recipients[0]);
+    setSelectedSigner(recipients[0]);
   }, [recipients]);
 
   return (
@@ -315,7 +321,7 @@ export const AddFieldsFormPartial = ({
             <FieldItem
               key={index}
               field={field}
-              disabled={selectedSigner?.email !== field.signerEmail || hasSelectedSignerBeenSent}
+              disabled={selectedSigner?.email !== field.signerEmail}
               minHeight={fieldBounds.current.height}
               minWidth={fieldBounds.current.width}
               passive={isFieldWithinBounds && !!selectedField}
@@ -362,14 +368,14 @@ export const AddFieldsFormPartial = ({
                       <CommandItem
                         key={index}
                         className={cn({
-                          'text-muted-foreground': recipient.sendStatus === SendStatus.SENT,
+                          // 'text-muted-foreground': recipient.sendStatus === SendStatus.SENT,
                         })}
                         onSelect={() => {
                           setSelectedSigner(recipient);
                           setShowRecipientsSelector(false);
                         }}
                       >
-                        {recipient.sendStatus !== SendStatus.SENT ? (
+                        {/* {recipient.sendStatus !== SendStatus.SENT ? (
                           <Check
                             aria-hidden={recipient !== selectedSigner}
                             className={cn('mr-2 h-4 w-4 flex-shrink-0', {
@@ -387,7 +393,7 @@ export const AddFieldsFormPartial = ({
                               longer edit this recipient.
                             </TooltipContent>
                           </Tooltip>
-                        )}
+                        )} */}
 
                         {recipient.name && (
                           <span
@@ -416,7 +422,7 @@ export const AddFieldsFormPartial = ({
               <button
                 type="button"
                 className="group h-full w-full"
-                disabled={!selectedSigner || selectedSigner?.sendStatus === SendStatus.SENT}
+                disabled={!selectedSigner}
                 onClick={() => setSelectedField(FieldType.SIGNATURE)}
                 onMouseDown={() => setSelectedField(FieldType.SIGNATURE)}
                 data-selected={selectedField === FieldType.SIGNATURE ? true : undefined}
@@ -440,7 +446,7 @@ export const AddFieldsFormPartial = ({
               <button
                 type="button"
                 className="group h-full w-full"
-                disabled={!selectedSigner || selectedSigner?.sendStatus === SendStatus.SENT}
+                disabled={!selectedSigner}
                 onClick={() => setSelectedField(FieldType.EMAIL)}
                 onMouseDown={() => setSelectedField(FieldType.EMAIL)}
                 data-selected={selectedField === FieldType.EMAIL ? true : undefined}
@@ -463,7 +469,7 @@ export const AddFieldsFormPartial = ({
               <button
                 type="button"
                 className="group h-full w-full"
-                disabled={!selectedSigner || selectedSigner?.sendStatus === SendStatus.SENT}
+                disabled={!selectedSigner}
                 onClick={() => setSelectedField(FieldType.NAME)}
                 onMouseDown={() => setSelectedField(FieldType.NAME)}
                 data-selected={selectedField === FieldType.NAME ? true : undefined}
@@ -486,7 +492,7 @@ export const AddFieldsFormPartial = ({
               <button
                 type="button"
                 className="group h-full w-full"
-                disabled={!selectedSigner || selectedSigner?.sendStatus === SendStatus.SENT}
+                disabled={!selectedSigner}
                 onClick={() => setSelectedField(FieldType.DATE)}
                 onMouseDown={() => setSelectedField(FieldType.DATE)}
                 data-selected={selectedField === FieldType.DATE ? true : undefined}
@@ -520,6 +526,7 @@ export const AddFieldsFormPartial = ({
         <DocumentFlowFormContainerActions
           loading={isSubmitting}
           disabled={isSubmitting}
+          goNextLabel="Save Template"
           onGoBackClick={() => {
             documentFlow.onBackStep?.();
             remove();

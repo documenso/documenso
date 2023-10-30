@@ -82,8 +82,6 @@ export const NewTemplateDialog = () => {
   };
 
   const onSubmit = async (values: TCreateTemplateFormSchema) => {
-    console.log(values);
-
     if (!uploadedFile) {
       return;
     }
@@ -99,7 +97,7 @@ export const NewTemplateDialog = () => {
       });
 
       const { id } = await createTemplate({
-        title: file.name,
+        title: values.name ? values.name : file.name,
         templateDocumentDataId,
       });
 

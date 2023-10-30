@@ -22,7 +22,7 @@ export const addTemplatePlaceholders = async ({
     recipients: signers.map((signer) => ({
       id: signer.nativeId,
       email: signer.email,
-      placeholder: signer.name,
+      name: signer.name,
     })),
   });
 };

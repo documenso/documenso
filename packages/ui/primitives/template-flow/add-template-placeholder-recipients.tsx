@@ -56,7 +56,7 @@ export const AddTemplatePlaceholderRecipientsFormPartial = ({
           ? recipients.map((recipient) => ({
               nativeId: recipient.id,
               formId: String(recipient.id),
-              name: recipient.placeholder,
+              name: recipient.name,
               email: recipient.email,
             }))
           : [

@@ -39,7 +39,7 @@ export const createDocumentFromTempate = async ({
       Recipient: {
         create: template.TemplateRecipient.map((recipient) => ({
           email: recipient.email,
-          name: recipient.placeholder,
+          name: recipient.name,
           token: nanoid(),
           templateToken: recipient.templateToken,
         })),

@@ -251,7 +251,7 @@ model Template {
 model TemplateRecipient {
   id            Int             @id @default(autoincrement())
   templateId    Int
-  placeholder   String          @db.VarChar(255)
+  name          String          @db.VarChar(255)
   email         String          @db.VarChar(255)
   token         String
   templateToken String?

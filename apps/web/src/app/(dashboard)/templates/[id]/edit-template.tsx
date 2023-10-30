@@ -7,7 +7,6 @@ import { useRouter } from 'next/navigation';
 import { Template, TemplateField, TemplateRecipient, User } from '@documenso/prisma/client';
 import { cn } from '@documenso/ui/lib/utils';
 import { Card, CardContent } from '@documenso/ui/primitives/card';
-import { AddFieldsFormPartial } from '@documenso/ui/primitives/document-flow/add-fields';
 import { TAddFieldsFormSchema } from '@documenso/ui/primitives/document-flow/add-fields.types';
 import {
   DocumentFlowFormContainer,
@@ -15,6 +14,7 @@ import {
 } from '@documenso/ui/primitives/document-flow/document-flow-root';
 import { DocumentFlowStep } from '@documenso/ui/primitives/document-flow/types';
 import { LazyPDFViewer } from '@documenso/ui/primitives/lazy-pdf-viewer';
+import { AddTemplateFieldsFormPartial } from '@documenso/ui/primitives/template-flow/add-template-fields';
 import { AddTemplatePlaceholderRecipientsFormPartial } from '@documenso/ui/primitives/template-flow/add-template-placeholder-recipients';
 import { TAddTemplatePlacholderRecipientsFormSchema } from '@documenso/ui/primitives/template-flow/add-template-placeholder-recipients.types';
 import { useToast } from '@documenso/ui/primitives/use-toast';
@@ -141,12 +141,11 @@ export const EditTemplateForm = ({
           )}
 
           {step === 'fields' && (
-            <AddFieldsFormPartial
+            <AddTemplateFieldsFormPartial
               key={fields.length}
               documentFlow={documentFlow.fields}
               recipients={recipients}
               fields={fields}
-              nextLabel="Save Template"
               numberOfSteps={Object.keys(documentFlow).length}
               onSubmit={onAddFieldsFormSubmit}
             />
