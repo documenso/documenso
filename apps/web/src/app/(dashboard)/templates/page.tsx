@@ -4,6 +4,7 @@ import { getRequiredServerComponentSession } from '@documenso/lib/next-auth/get-
 import { getTemplates } from '@documenso/lib/server-only/template/get-templates';
 
 import { TemplatesDataTable } from './data-table-templates';
+import { EmptyTemplateState } from './empty-state';
 import { NewTemplateDialog } from './new-template-dialog';
 
 type AdminManageUsersProps = {
@@ -24,6 +25,8 @@ export default async function TemplatesPage({ searchParams = {} }: AdminManageUs
     perPage: perPage,
   });
 
+  console.log(templates);
+
   return (
     <div className="mx-auto max-w-screen-xl px-4 md:px-8">
       <div className="flex items-center justify-between">
@@ -32,12 +35,16 @@ export default async function TemplatesPage({ searchParams = {} }: AdminManageUs
       </div>
 
       <div className="relative">
-        <TemplatesDataTable
-          templates={templates}
-          page={page}
-          perPage={perPage}
-          totalPages={totalPages}
-        />
+        {templates.length > 0 && (
+          <TemplatesDataTable
+            templates={templates}
+            page={page}
+            perPage={perPage}
+            totalPages={totalPages}
+          />
+        )}
+
+        {templates.length < 1 && <EmptyTemplateState />}
       </div>
     </div>
   );
