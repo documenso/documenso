@@ -98,7 +98,7 @@ export const SigningForm = ({ document, recipient, fields }: SigningFormProps) =
                   type="text"
                   id="full-name"
                   className="bg-background mt-2"
-                  value={fullName}
+                  value={session && session.user.email === recipient.email ? fullName : undefined}
                   onChange={(e) => setFullName(e.target.value.trimStart())}
                 />
               </div>
@@ -111,10 +111,8 @@ export const SigningForm = ({ document, recipient, fields }: SigningFormProps) =
                     <SignaturePad
                       className="h-44 w-full"
                       defaultValue={
-                        session
-                          ? session.user.email === recipient.email
-                            ? signature ?? undefined
-                            : undefined
+                        session && session.user.email === recipient.email
+                          ? signature ?? undefined
                           : undefined
                       }
                       onChange={(value) => {
