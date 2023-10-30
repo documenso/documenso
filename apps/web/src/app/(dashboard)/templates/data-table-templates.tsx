@@ -1,6 +1,6 @@
 'use client';
 
-import { useTransition } from 'react';
+import { useState, useTransition } from 'react';
 
 import { useRouter } from 'next/navigation';
 
@@ -39,8 +39,9 @@ export const TemplatesDataTable = ({
   const router = useRouter();
 
   const { toast } = useToast();
+  const [loadingStates, setLoadingStates] = useState<{ [key: string]: boolean }>({});
 
-  const { mutateAsync: createDocumentFromTemplate, isLoading: isCreatingDocumentFromTemplate } =
+  const { mutateAsync: createDocumentFromTemplate } =
     trpc.template.createDocumentFromTempate.useMutation();
 
   const onPaginationChange = (page: number, perPage: number) => {
@@ -57,20 +58,18 @@ export const TemplatesDataTable = ({
       const { id } = await createDocumentFromTemplate({
         templateId,
       });
-
       toast({
         title: 'Document created',
         description: 'Your document has been created from the template successfully.',
         duration: 5000,
       });
-
       router.push(`/documents/${id}`);
     } catch (err) {
       console.error(err);
 
       toast({
         title: 'Error',
-        description: 'An error occurred while creating document.',
+        description: 'An error occurred while creating document from template.',
         variant: 'destructive',
       });
     }
@@ -98,20 +97,21 @@ export const TemplatesDataTable = ({
             header: 'Actions',
             accessorKey: 'actions',
             cell: ({ row }) => {
+              const isRowLoading = loadingStates[row.original.id];
+
               return (
                 <div className="flex items-center gap-x-4">
                   <Button
-                    disabled={isCreatingDocumentFromTemplate}
-                    onClick={async () => onUseButtonClick(row.original.id)}
+                    disabled={isRowLoading}
+                    loading={isRowLoading}
+                    onClick={async () => {
+                      setLoadingStates((prev) => ({ ...prev, [row.original.id]: true }));
+                      await onUseButtonClick(row.original.id);
+                      setLoadingStates((prev) => ({ ...prev, [row.original.id]: false }));
+                    }}
                   >
-                    <>
-                      {isCreatingDocumentFromTemplate ? (
-                        <Loader className="mr-2 h-4 w-4 animate-spin" />
-                      ) : (
-                        <Plus className="-ml-1 mr-2 h-4 w-4" />
-                      )}
-                      Use
-                    </>
+                    {!isRowLoading && <Plus className="-ml-1 mr-2 h-4 w-4" />}
+                    Use
                   </Button>
                   <DataTableActionDropdown row={row.original} />
                 </div>
