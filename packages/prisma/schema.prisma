@@ -36,6 +36,8 @@ model User {
   Document           Document[]
   Subscription       Subscription?
   PasswordResetToken PasswordResetToken[]
+
+  @@index([email])
 }
 
 model PasswordResetToken {
@@ -120,6 +122,8 @@ model Document {
   updatedAt      DateTime            @default(now()) @updatedAt
 
   @@unique([documentDataId])
+  @@index([userId])
+  @@index([status])
 }
 
 enum DocumentDataType {
@@ -175,6 +179,8 @@ model Recipient {
   Signature     Signature[]
 
   @@unique([documentId, email])
+  @@index([documentId])
+  @@index([token])
 }
 
 enum FieldType {
@@ -201,6 +207,9 @@ model Field {
   Document    Document   @relation(fields: [documentId], references: [id], onDelete: Cascade)
   Recipient   Recipient? @relation(fields: [recipientId], references: [id], onDelete: Cascade)
   Signature   Signature?
+
+  @@index([documentId])
+  @@index([recipientId])
 }
 
 model Signature {
@@ -213,6 +222,8 @@ model Signature {
 
   Recipient Recipient @relation(fields: [recipientId], references: [id], onDelete: Cascade)
   Field     Field     @relation(fields: [fieldId], references: [id], onDelete: Restrict)
+
+  @@index([recipientId])
 }
 
 model DocumentShareLink {
