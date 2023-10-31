@@ -1,5 +1,7 @@
 'use client';
 
+import { useState } from 'react';
+
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
@@ -17,12 +19,16 @@ import {
 } from '@documenso/ui/primitives/dropdown-menu';
 import { toast } from '@documenso/ui/primitives/use-toast';
 
+import { DeleteTemplateDialog } from './delete-template-dialog';
+
 export type DataTableActionDropdownProps = {
   row: Template;
 };
 
 export const DataTableActionDropdown = ({ row }: DataTableActionDropdownProps) => {
   const { data: session } = useSession();
+
+  const [isDeleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
   const router = useRouter();
 
@@ -79,11 +85,17 @@ export const DataTableActionDropdown = ({ row }: DataTableActionDropdownProps) =
           Duplicate
         </DropdownMenuItem>
 
-        <DropdownMenuItem disabled>
+        <DropdownMenuItem disabled={!isOwner} onClick={() => setDeleteDialogOpen(true)}>
           <Trash2 className="mr-2 h-4 w-4" />
           Delete
         </DropdownMenuItem>
       </DropdownMenuContent>
+
+      <DeleteTemplateDialog
+        id={row.id}
+        open={isDeleteDialogOpen}
+        onOpenChange={setDeleteDialogOpen}
+      />
     </DropdownMenu>
   );
 };

@@ -2,12 +2,14 @@ import { TRPCError } from '@trpc/server';
 
 import { createDocumentFromTempate } from '@documenso/lib/server-only/template/create-document-from-template';
 import { createTemplate } from '@documenso/lib/server-only/template/create-template';
+import { deleteTemplate } from '@documenso/lib/server-only/template/delete-template';
 import { duplicateTemplate } from '@documenso/lib/server-only/template/duplicate-template';
 
 import { authenticatedProcedure, router } from '../trpc';
 import {
   ZCreateDocumentFromTemplateMutationSchema,
   ZCreateTemplateMutationSchema,
+  ZDeleteTemplateMutationSchema,
   ZDuplicateTemplateMutationSchema,
 } from './schema';
 
@@ -28,7 +30,7 @@ export const templateRouter = router({
 
         throw new TRPCError({
           code: 'BAD_REQUEST',
-          message: 'We were unable to create this document. Please try again later.',
+          message: 'We were unable to create this template. Please try again later.',
         });
       }
     }),
@@ -68,7 +70,26 @@ export const templateRouter = router({
 
         throw new TRPCError({
           code: 'BAD_REQUEST',
-          message: 'We were unable to create this document. Please try again later.',
+          message: 'We were unable to duplicate the template. Please try again later.',
+        });
+      }
+    }),
+
+  deleteTemplate: authenticatedProcedure
+    .input(ZDeleteTemplateMutationSchema)
+    .mutation(async ({ input, ctx }) => {
+      try {
+        const { id } = input;
+
+        const userId = ctx.user.id;
+
+        return await deleteTemplate({ id, userId });
+      } catch (err) {
+        console.error(err);
+
+        throw new TRPCError({
+          code: 'BAD_REQUEST',
+          message: 'We were unable to delete this template. Please try again later.',
         });
       }
     }),
