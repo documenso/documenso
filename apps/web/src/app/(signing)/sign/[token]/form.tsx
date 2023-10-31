@@ -121,16 +121,17 @@ export const SigningForm = ({ document, recipient, fields }: SigningFormProps) =
             </div>
 
             <div className="flex flex-col gap-4 md:flex-row">
-              <Button
-                type="button"
-                className="dark:bg-muted dark:hover:bg-muted/80 w-full  bg-black/5 hover:bg-black/10"
-                variant="secondary"
-                size="lg"
-                disabled={typeof window !== 'undefined' && window.history.length <= 1}
-                onClick={() => router.back()}
-              >
-                Cancel
-              </Button>
+              {window.history.length > 1 && (
+                <Button
+                  type="button"
+                  className="dark:bg-muted dark:hover:bg-muted/80 w-full  bg-black/5 hover:bg-black/10"
+                  variant="secondary"
+                  size="lg"
+                  onClick={() => router.back()}
+                >
+                  Cancel
+                </Button>
+              )}
 
               <Button className="w-full" type="submit" size="lg" loading={isSubmitting}>
                 Complete
