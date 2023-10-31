@@ -149,6 +149,7 @@ export const SinglePlayerClient = () => {
     email: '',
     name: '',
     token: '',
+    templateToken: '',
     expired: null,
     signedAt: null,
     readStatus: 'OPENED',

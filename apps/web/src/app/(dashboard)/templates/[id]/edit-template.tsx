@@ -13,7 +13,6 @@ import {
 } from '@documenso/prisma/client';
 import { cn } from '@documenso/ui/lib/utils';
 import { Card, CardContent } from '@documenso/ui/primitives/card';
-import { TAddFieldsFormSchema } from '@documenso/ui/primitives/document-flow/add-fields.types';
 import {
   DocumentFlowFormContainer,
   DocumentFlowFormContainerHeader,
@@ -21,6 +20,7 @@ import {
 import { DocumentFlowStep } from '@documenso/ui/primitives/document-flow/types';
 import { LazyPDFViewer } from '@documenso/ui/primitives/lazy-pdf-viewer';
 import { AddTemplateFieldsFormPartial } from '@documenso/ui/primitives/template-flow/add-template-fields';
+import { TAddTemplateFieldsFormSchema } from '@documenso/ui/primitives/template-flow/add-template-fields.types';
 import { AddTemplatePlaceholderRecipientsFormPartial } from '@documenso/ui/primitives/template-flow/add-template-placeholder-recipients';
 import { TAddTemplatePlacholderRecipientsFormSchema } from '@documenso/ui/primitives/template-flow/add-template-placeholder-recipients.types';
 import { useToast } from '@documenso/ui/primitives/use-toast';
@@ -91,7 +91,7 @@ export const EditTemplateForm = ({
     }
   };
 
-  const onAddFieldsFormSubmit = async (data: TAddFieldsFormSchema) => {
+  const onAddFieldsFormSubmit = async (data: TAddTemplateFieldsFormSchema) => {
     try {
       // Custom invocation server action
       await addTemplateFields({
