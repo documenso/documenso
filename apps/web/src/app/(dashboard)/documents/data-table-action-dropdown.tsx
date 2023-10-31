@@ -166,7 +166,7 @@ export const DataTableActionDropdown = ({ row }: DataTableActionDropdownProps) =
           Download
         </DropdownMenuItem>
 
-        <DropdownMenuItem disabled={!isOwner} onClick={onSaveAsTemplateClick}>
+        <DropdownMenuItem disabled={!isOwner || isComplete} onClick={onSaveAsTemplateClick}>
           <Files className="mr-2 h-4 w-4" />
           Save as Template
         </DropdownMenuItem>
