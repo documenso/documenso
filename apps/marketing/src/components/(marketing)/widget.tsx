@@ -226,7 +226,7 @@ export const Widget = ({ className, children, ...props }: WidgetProps) => {
                           type="button"
                           className="bg-primary h-full w-14 rounded"
                           disabled={!field.value || !!errors.email?.message}
-                          onClick={() => onNextStepClick()}
+                          onClick={() => step === 'EMAIL' && onNextStepClick()}
                         >
                           Next
                         </Button>
@@ -303,7 +303,10 @@ export const Widget = ({ className, children, ...props }: WidgetProps) => {
             <div className="mt-12 flex-1" />
 
             <div className="flex items-center justify-between">
-              <p className="text-muted-foreground text-xs">{stepsRemaining} step(s) until signed</p>
+              <p className="text-muted-foreground text-xs">
+                {isValid ? 'Ready for Signing' : `${stepsRemaining} step(s) until signed`}
+              </p>
+
               <p className="text-muted-foreground block text-xs md:hidden">Minimise contract</p>
             </div>
 
@@ -313,6 +316,7 @@ export const Widget = ({ className, children, ...props }: WidgetProps) => {
                   'w-1/3': stepsRemaining === 3,
                   'w-2/3': stepsRemaining === 2,
                   'w-11/12': stepsRemaining === 1,
+                  'w-full': isValid,
                 })}
               />
             </div>
