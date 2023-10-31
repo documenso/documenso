@@ -27,6 +27,7 @@ import { getFile } from '@documenso/lib/universal/upload/get-file';
 import { Document, DocumentStatus, Recipient, User } from '@documenso/prisma/client';
 import { DocumentWithData } from '@documenso/prisma/types/document-with-data';
 import { trpc as trpcClient } from '@documenso/trpc/client';
+import { DocumentShareButton } from '@documenso/ui/components/document/document-share-button';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -173,6 +174,8 @@ export const DataTableActionDropdown = ({ row }: DataTableActionDropdownProps) =
           Share
         </DropdownMenuItem>
       </DropdownMenuContent>
+
+      <DocumentShareButton token={String(row.Recipient[0]?.token)} documentId={row.id} />
 
       {isDocumentDeletable && (
         <DeleteDraftDocumentDialog

@@ -71,7 +71,7 @@ export const DocumentShareButton = ({ token, documentId, className }: DocumentSh
 
   const onTweetClick = async () => {
     let { slug = '' } = shareLink || {};
-
+    await fetch(`${process.env.NEXT_PUBLIC_WEBAPP_URL}/share/${slug}/opengraph`);
     if (!slug) {
       const result = await createOrGetShareLink({
         token,
