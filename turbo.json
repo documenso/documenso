@@ -13,6 +13,11 @@
       "cache": false,
       "persistent": true
     },
+    "start": {
+      "dependsOn": ["^build"],
+      "cache": false,
+      "persistent": true
+    },
     "dev:test": {
       "cache": false
     },
@@ -44,6 +49,9 @@
     "NEXT_PRIVATE_UPLOAD_BUCKET",
     "NEXT_PRIVATE_UPLOAD_ACCESS_KEY_ID",
     "NEXT_PRIVATE_UPLOAD_SECRET_ACCESS_KEY",
+    "NEXT_PRIVATE_UPLOAD_DISTRIBUTION_DOMAIN",
+    "NEXT_PRIVATE_UPLOAD_DISTRIBUTION_KEY_ID",
+    "NEXT_PRIVATE_UPLOAD_DISTRIBUTION_KEY_CONTENTS",
     "NEXT_PRIVATE_SIGNING_TRANSPORT",
     "NEXT_PRIVATE_SIGNING_PASSPHRASE",
     "NEXT_PRIVATE_SIGNING_LOCAL_FILE_PATH",
