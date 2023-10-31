@@ -61,12 +61,12 @@ export const getAbsolutePresignPostUrl = async (key: string) => {
 
 export const getPresignGetUrl = async (key: string) => {
   if (process.env.NEXT_PRIVATE_UPLOAD_DISTRIBUTION_DOMAIN) {
-    const distributionUrl = `${process.env.NEXT_PRIVATE_UPLOAD_DISTRIBUTION_KEY_ID}/${key}`;
+    const distributionUrl = new URL(key, `${process.env.NEXT_PRIVATE_UPLOAD_DISTRIBUTION_DOMAIN}`);
 
     const { getSignedUrl: getCloudfrontSignedUrl } = await import('@aws-sdk/cloudfront-signer');
 
     const url = getCloudfrontSignedUrl({
-      url: distributionUrl,
+      url: distributionUrl.toString(),
       keyPairId: `${process.env.NEXT_PRIVATE_UPLOAD_DISTRIBUTION_KEY_ID}`,
       privateKey: `${process.env.NEXT_PRIVATE_UPLOAD_DISTRIBUTION_KEY_CONTENTS}`,
       dateLessThan: new Date(Date.now() + ONE_HOUR).toISOString(),
