@@ -9,7 +9,6 @@ import { getRequiredServerComponentSession } from '@documenso/lib/next-auth/get-
 import { getFieldsForTemplate } from '@documenso/lib/server-only/field/get-fields-for-template';
 import { getRecipientsForTemplate } from '@documenso/lib/server-only/recipient/get-recipients-for-template';
 import { getTemplateById } from '@documenso/lib/server-only/template/get-template-by-id';
-import { getFile } from '@documenso/lib/universal/upload/get-file';
 
 import { TemplateType } from '~/components/formatter/template-type';
 
@@ -43,10 +42,6 @@ export default async function TemplatePage({ params }: TemplatePageProps) {
 
   const { templateDocumentData } = template;
 
-  const templateDataUrl = await getFile(templateDocumentData)
-    .then((buffer) => Buffer.from(buffer).toString('base64'))
-    .then((data) => `data:application/pdf;base64,${data}`);
-
   const [templateRecipients, templateFields] = await Promise.all([
     await getRecipientsForTemplate({
       templateId,
@@ -79,7 +74,7 @@ export default async function TemplatePage({ params }: TemplatePageProps) {
         user={user}
         recipients={templateRecipients}
         fields={templateFields}
-        dataUrl={templateDataUrl}
+        documentData={templateDocumentData}
       />
     </div>
   );

@@ -4,7 +4,13 @@ import { useState } from 'react';
 
 import { useRouter } from 'next/navigation';
 
-import { Template, TemplateField, TemplateRecipient, User } from '@documenso/prisma/client';
+import {
+  DocumentData,
+  Template,
+  TemplateField,
+  TemplateRecipient,
+  User,
+} from '@documenso/prisma/client';
 import { cn } from '@documenso/ui/lib/utils';
 import { Card, CardContent } from '@documenso/ui/primitives/card';
 import { TAddFieldsFormSchema } from '@documenso/ui/primitives/document-flow/add-fields.types';
@@ -28,7 +34,7 @@ export type EditTemplateFormProps = {
   template: Template;
   recipients: TemplateRecipient[];
   fields: TemplateField[];
-  dataUrl: string;
+  documentData: DocumentData;
 };
 
 type EditTemplateStep = 'signers' | 'fields';
@@ -39,7 +45,7 @@ export const EditTemplateForm = ({
   recipients,
   fields,
   user: _user,
-  dataUrl,
+  documentData,
 }: EditTemplateFormProps) => {
   const { toast } = useToast();
   const router = useRouter();
@@ -118,7 +124,7 @@ export const EditTemplateForm = ({
         gradient
       >
         <CardContent className="p-2">
-          <LazyPDFViewer document={dataUrl} />
+          <LazyPDFViewer key={documentData.id} documentData={documentData} />
         </CardContent>
       </Card>
 
