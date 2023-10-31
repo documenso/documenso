@@ -3,11 +3,13 @@
 import { useState } from 'react';
 
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 import {
   Copy,
   Download,
   Edit,
+  Files,
   History,
   Loader,
   MoreHorizontal,
@@ -27,6 +29,7 @@ import { getFile } from '@documenso/lib/universal/upload/get-file';
 import { Document, DocumentStatus, Recipient, User } from '@documenso/prisma/client';
 import { DocumentWithData } from '@documenso/prisma/types/document-with-data';
 import { trpc as trpcClient } from '@documenso/trpc/client';
+import { trpc } from '@documenso/trpc/react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -49,6 +52,22 @@ export const DataTableActionDropdown = ({ row }: DataTableActionDropdownProps) =
   const { data: session } = useSession();
 
   const { toast } = useToast();
+
+  const router = useRouter();
+
+  const { mutateAsync: createTemplateFromDocument } =
+    trpc.template.createTemplateFromDocument.useMutation({
+      onSuccess: ({ id }) => {
+        router.refresh();
+        router.push(`/templates/${id}`);
+
+        toast({
+          title: 'Template created',
+          description: 'Your template has been created successfully.',
+          duration: 5000,
+        });
+      },
+    });
 
   const { createAndCopyShareLink, isCopyingShareLink } = useCopyShareLink({
     onSuccess: () => toast(TOAST_DOCUMENT_SHARE_SUCCESS),
@@ -106,6 +125,19 @@ export const DataTableActionDropdown = ({ row }: DataTableActionDropdownProps) =
     window.URL.revokeObjectURL(link.href);
   };
 
+  const onSaveAsTemplateClick = async () => {
+    try {
+      await createTemplateFromDocument({ documentId: row.id });
+    } catch {
+      toast({
+        title: 'Something went wrong',
+        description: 'This template could not be created at this time. Please try again.',
+        variant: 'destructive',
+        duration: 7500,
+      });
+    }
+  };
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger>
@@ -132,6 +164,11 @@ export const DataTableActionDropdown = ({ row }: DataTableActionDropdownProps) =
         <DropdownMenuItem disabled={!isComplete} onClick={onDownloadClick}>
           <Download className="mr-2 h-4 w-4" />
           Download
+        </DropdownMenuItem>
+
+        <DropdownMenuItem disabled={!isOwner} onClick={onSaveAsTemplateClick}>
+          <Files className="mr-2 h-4 w-4" />
+          Save as Template
         </DropdownMenuItem>
 
         <DropdownMenuItem disabled>

@@ -2,12 +2,14 @@ import { TRPCError } from '@trpc/server';
 
 import { createDocumentFromTempate } from '@documenso/lib/server-only/template/create-document-from-template';
 import { createTemplate } from '@documenso/lib/server-only/template/create-template';
+import { createTemplateFromDocument } from '@documenso/lib/server-only/template/create-template-from-document';
 import { deleteTemplate } from '@documenso/lib/server-only/template/delete-template';
 import { duplicateTemplate } from '@documenso/lib/server-only/template/duplicate-template';
 
 import { authenticatedProcedure, router } from '../trpc';
 import {
   ZCreateDocumentFromTemplateMutationSchema,
+  ZCreateTemplateFromDocumentMutationSchema,
   ZCreateTemplateMutationSchema,
   ZDeleteTemplateMutationSchema,
   ZDuplicateTemplateMutationSchema,
@@ -51,6 +53,26 @@ export const templateRouter = router({
         throw new TRPCError({
           code: 'BAD_REQUEST',
           message: 'We were unable to create this document. Please try again later.',
+        });
+      }
+    }),
+
+  createTemplateFromDocument: authenticatedProcedure
+    .input(ZCreateTemplateFromDocumentMutationSchema)
+    .mutation(async ({ input, ctx }) => {
+      try {
+        const { documentId } = input;
+
+        return await createTemplateFromDocument({
+          documentId,
+          userId: ctx.user.id,
+        });
+      } catch (err) {
+        console.error(err);
+
+        throw new TRPCError({
+          code: 'BAD_REQUEST',
+          message: 'We were unable to create this template. Please try again later.',
         });
       }
     }),
