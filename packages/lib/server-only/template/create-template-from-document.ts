@@ -1,3 +1,4 @@
+import { nanoid } from '@documenso/lib/universal/id';
 import { prisma } from '@documenso/prisma';
 
 export type CreateTemplateFromDocumentOptions = {
@@ -9,7 +10,6 @@ export const createTemplateFromDocument = async ({
   documentId,
   userId,
 }: CreateTemplateFromDocumentOptions) => {
-  // Fetch the document
   const document = await prisma.document.findUnique({
     where: { id: documentId, userId },
     include: {
@@ -23,7 +23,6 @@ export const createTemplateFromDocument = async ({
     throw new Error('Document not found.');
   }
 
-  // Create the templateDocumentData
   const templateDocumentData = await prisma.documentData.create({
     data: {
       type: document.documentData.type,
@@ -32,7 +31,6 @@ export const createTemplateFromDocument = async ({
     },
   });
 
-  // Create the template
   const template = await prisma.template.create({
     data: {
       userId,
@@ -42,7 +40,7 @@ export const createTemplateFromDocument = async ({
         create: document.Recipient.map((recipient) => ({
           email: recipient.email,
           name: recipient.name,
-          token: recipient.token, // This can be changed or generated anew
+          token: nanoid(),
           templateToken: recipient.templateToken,
         })),
       },
@@ -52,7 +50,6 @@ export const createTemplateFromDocument = async ({
     },
   });
 
-  // Create the TemplateField
   await prisma.templateField.createMany({
     data: document.Field.map((field) => {
       const recipient = document.Recipient.find((recipient) => recipient.id === field.recipientId);
