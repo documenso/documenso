@@ -12,7 +12,7 @@ export const verifyEmail = async ({ token }: VerifyEmailProps) => {
       user: true,
     },
     where: {
-      token: token,
+      token,
     },
   });
 
@@ -25,6 +25,7 @@ export const verifyEmail = async ({ token }: VerifyEmailProps) => {
 
   if (!valid) {
     // if the token is expired, generate a new token and send the email
+    // and return false
     await generateConfirmationToken({ email: dbToken.user.email });
     return valid;
   }
