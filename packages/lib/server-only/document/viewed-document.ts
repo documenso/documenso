@@ -14,7 +14,6 @@ export const viewedDocument = async ({ token }: ViewedDocumentOptions) => {
   });
 
   if (!recipient) {
-    console.warn(`No recipient found for token ${token}`);
     return;
   }
 

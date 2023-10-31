@@ -17,17 +17,17 @@ const FRIENDLY_STATUS_MAP: Record<ExtendedDocumentStatus, FriendlyStatus> = {
   PENDING: {
     label: 'Pending',
     icon: Clock,
-    color: 'text-blue-600',
+    color: 'text-blue-600 dark:text-blue-300',
   },
   COMPLETED: {
     label: 'Completed',
     icon: CheckCircle2,
-    color: 'text-green-500',
+    color: 'text-green-500 dark:text-green-300',
   },
   DRAFT: {
     label: 'Draft',
     icon: File,
-    color: 'text-yellow-500',
+    color: 'text-yellow-500 dark:text-yellow-200',
   },
   INBOX: {
     label: 'Inbox',

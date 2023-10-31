@@ -3,7 +3,7 @@ import { z } from 'zod';
 export const ZSignFieldWithTokenMutationSchema = z.object({
   token: z.string(),
   fieldId: z.number(),
-  value: z.string(),
+  value: z.string().trim(),
   isBase64: z.boolean().optional(),
 });
 

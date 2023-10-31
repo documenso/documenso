@@ -1,7 +1,7 @@
 import React from 'react';
 
-import { initials } from '@documenso/lib/client-only/recipient-initials';
 import { getRecipientType } from '@documenso/lib/client-only/recipient-type';
+import { recipientAbbreviation } from '@documenso/lib/utils/recipient-formatter';
 import { Recipient } from '@documenso/prisma/client';
 
 import { StackAvatar } from './stack-avatar';
@@ -26,7 +26,7 @@ export function StackAvatars({ recipients }: { recipients: Recipient[] }) {
           first={first}
           zIndex={String(zIndex - index * 10)}
           type={lastItemText && index === 4 ? 'unsigned' : getRecipientType(recipient)}
-          fallbackText={lastItemText ? lastItemText : initials(recipient.name)}
+          fallbackText={lastItemText ? lastItemText : recipientAbbreviation(recipient)}
         />
       );
     });

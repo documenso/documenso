@@ -1,18 +1,20 @@
-import { notFound } from 'next/navigation';
+import { notFound, redirect } from 'next/navigation';
 
 import { match } from 'ts-pattern';
 
 import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
+import { getServerComponentSession } from '@documenso/lib/next-auth/get-server-session';
 import { getDocumentAndSenderByToken } from '@documenso/lib/server-only/document/get-document-by-token';
 import { viewedDocument } from '@documenso/lib/server-only/document/viewed-document';
 import { getFieldsForToken } from '@documenso/lib/server-only/field/get-fields-for-token';
 import { getRecipientByToken } from '@documenso/lib/server-only/recipient/get-recipient-by-token';
-import { FieldType } from '@documenso/prisma/client';
+import { DocumentStatus, FieldType, SigningStatus } from '@documenso/prisma/client';
 import { Card, CardContent } from '@documenso/ui/primitives/card';
 import { ElementVisible } from '@documenso/ui/primitives/element-visible';
 import { LazyPDFViewer } from '@documenso/ui/primitives/lazy-pdf-viewer';
 
 import { DateField } from './date-field';
+import { EmailField } from './email-field';
 import { SigningForm } from './form';
 import { NameField } from './name-field';
 import { SigningProvider } from './provider';
@@ -34,19 +36,28 @@ export default async function SigningPage({ params: { token } }: SigningPageProp
       token,
     }).catch(() => null),
     getFieldsForToken({ token }),
-    getRecipientByToken({ token }),
-    viewedDocument({ token }),
+    getRecipientByToken({ token }).catch(() => null),
+    viewedDocument({ token }).catch(() => null),
   ]);
 
-  if (!document) {
+  if (!document || !document.documentData || !recipient) {
     return notFound();
   }
 
-  const documentUrl = `data:application/pdf;base64,${document.document}`;
+  const { documentData } = document;
+
+  const { user } = await getServerComponentSession();
+
+  if (
+    document.status === DocumentStatus.COMPLETED ||
+    recipient.signingStatus === SigningStatus.SIGNED
+  ) {
+    redirect(`/sign/${token}/complete`);
+  }
 
   return (
-    <SigningProvider email={recipient.email} fullName={recipient.name}>
-      <div className="mx-auto w-full max-w-screen-xl px-4 md:px-8">
+    <SigningProvider email={recipient.email} fullName={recipient.name} signature={user?.signature}>
+      <div className="mx-auto w-full max-w-screen-xl">
         <h1 className="mt-4 truncate text-2xl font-semibold md:text-3xl" title={document.title}>
           {document.title}
         </h1>
@@ -63,7 +74,7 @@ export default async function SigningPage({ params: { token } }: SigningPageProp
             gradient
           >
             <CardContent className="p-2">
-              <LazyPDFViewer document={documentUrl} />
+              <LazyPDFViewer key={documentData.id} documentData={documentData} />
             </CardContent>
           </Card>
 
@@ -83,6 +94,9 @@ export default async function SigningPage({ params: { token } }: SigningPageProp
               ))
               .with(FieldType.DATE, () => (
                 <DateField key={field.id} field={field} recipient={recipient} />
+              ))
+              .with(FieldType.EMAIL, () => (
+                <EmailField key={field.id} field={field} recipient={recipient} />
               ))
               .otherwise(() => null),
           )}

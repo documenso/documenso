@@ -15,7 +15,7 @@ export const getServerSession = async ({ req, res }: GetServerSessionOptions) =>
   const session = await getNextAuthServerSession(req, res, NEXT_AUTH_OPTIONS);
 
   if (!session || !session.user?.email) {
-    return null;
+    return { user: null, session: null };
   }
 
   const user = await prisma.user.findFirstOrThrow({
@@ -24,14 +24,14 @@ export const getServerSession = async ({ req, res }: GetServerSessionOptions) =>
     },
   });
 
-  return user;
+  return { user, session };
 };
 
 export const getServerComponentSession = async () => {
   const session = await getNextAuthServerSession(NEXT_AUTH_OPTIONS);
 
   if (!session || !session.user?.email) {
-    return null;
+    return { user: null, session: null };
   }
 
   const user = await prisma.user.findFirstOrThrow({
@@ -40,15 +40,15 @@ export const getServerComponentSession = async () => {
     },
   });
 
-  return user;
+  return { user, session };
 };
 
 export const getRequiredServerComponentSession = async () => {
-  const session = await getServerComponentSession();
+  const { user, session } = await getServerComponentSession();
 
-  if (!session) {
+  if (!user || !session) {
     throw new Error('No session found');
   }
 
-  return session;
+  return { user, session };
 };
