@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "next dev -p 3001",
     "build": "next build",
-    "start": "next start",
+    "start": "next start -p 3001",
     "lint": "next lint",
     "clean": "rimraf .next && rimraf node_modules",
     "copy:pdfjs": "node ../../scripts/copy-pdfjs.cjs"
@@ -21,8 +21,8 @@
     "framer-motion": "^10.12.8",
     "lucide-react": "^0.279.0",
     "micro": "^10.0.1",
-    "next": "13.5.4",
-    "next-auth": "4.22.3",
+    "next": "14.0.0",
+    "next-auth": "4.24.3",
     "next-contentlayer": "^0.3.4",
     "next-plausible": "^3.10.1",
     "perfect-freehand": "^1.2.0",

@@ -26,6 +26,9 @@ model User {
   password           String?
   source             String?
   signature          String?
+  createdAt          DateTime             @default(now())
+  updatedAt          DateTime             @default(now()) @updatedAt
+  lastSignedIn       DateTime             @default(now())
   roles              Role[]               @default([USER])
   identityProvider   IdentityProvider     @default(DOCUMENSO)
   accounts           Account[]
@@ -33,6 +36,8 @@ model User {
   Document           Document[]
   Subscription       Subscription?
   PasswordResetToken PasswordResetToken[]
+
+  @@index([email])
 }
 
 model PasswordResetToken {
@@ -111,12 +116,14 @@ model Document {
   Field          Field[]
   ShareLink      DocumentShareLink[]
   documentDataId String
-  documentData   DocumentData   @relation(fields: [documentDataId], references: [id], onDelete: Cascade)
+  documentData   DocumentData        @relation(fields: [documentDataId], references: [id], onDelete: Cascade)
   documentMeta   DocumentMeta?
-  createdAt      DateTime       @default(now())
-  updatedAt      DateTime       @default(now()) @updatedAt
+  createdAt      DateTime            @default(now())
+  updatedAt      DateTime            @default(now()) @updatedAt
 
   @@unique([documentDataId])
+  @@index([userId])
+  @@index([status])
 }
 
 enum DocumentDataType {
@@ -134,11 +141,11 @@ model DocumentData {
 }
 
 model DocumentMeta {
-  id       String    @id @default(cuid())
-  subject  String?
-  message  String?
-  documentId Int @unique
-  document Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  id         String   @id @default(cuid())
+  subject    String?
+  message    String?
+  documentId Int      @unique
+  document   Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
 }
 
 enum ReadStatus {
@@ -172,6 +179,8 @@ model Recipient {
   Signature     Signature[]
 
   @@unique([documentId, email])
+  @@index([documentId])
+  @@index([token])
 }
 
 enum FieldType {
@@ -198,6 +207,9 @@ model Field {
   Document    Document   @relation(fields: [documentId], references: [id], onDelete: Cascade)
   Recipient   Recipient? @relation(fields: [recipientId], references: [id], onDelete: Cascade)
   Signature   Signature?
+
+  @@index([documentId])
+  @@index([recipientId])
 }
 
 model Signature {
@@ -210,6 +222,8 @@ model Signature {
 
   Recipient Recipient @relation(fields: [recipientId], references: [id], onDelete: Cascade)
   Field     Field     @relation(fields: [fieldId], references: [id], onDelete: Restrict)
+
+  @@index([recipientId])
 }
 
 model DocumentShareLink {
