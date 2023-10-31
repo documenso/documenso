@@ -226,9 +226,7 @@ export const Widget = ({ className, children, ...props }: WidgetProps) => {
                           type="button"
                           className="bg-primary h-full w-14 rounded"
                           disabled={!field.value || !!errors.email?.message}
-                          onClick={() => {
-                            if (step === 'EMAIL') onNextStepClick();
-                          }}
+                          onClick={() => step === 'EMAIL' && onNextStepClick()}
                         >
                           Next
                         </Button>
