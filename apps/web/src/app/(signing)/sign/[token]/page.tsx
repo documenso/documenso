@@ -64,7 +64,11 @@ export default async function SigningPage({ params: { token } }: SigningPageProp
   const user = await getServerComponentSession();
 
   return (
-    <SigningProvider email={recipient.email} fullName={recipient.name} signature={user?.signature}>
+    <SigningProvider
+      email={recipient.email}
+      fullName={user?.email === recipient.email ? user.name : recipient.name}
+      signature={user?.email === recipient.email ? user.signature : undefined}
+    >
       <div className="mx-auto w-full max-w-screen-xl">
         <h1 className="mt-4 truncate text-2xl font-semibold md:text-3xl" title={document.title}>
           {document.title}
