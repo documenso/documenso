@@ -58,7 +58,7 @@ export default async function SigningPage({ params: { token } }: SigningPageProp
   return (
     <SigningProvider
       email={recipient.email}
-      fullName={user?.email === recipient.email ? recipient.name : undefined}
+      fullName={user?.email === recipient.email ? user.name : recipient.name}
       signature={user?.email === recipient.email ? user.signature : undefined}
     >
       <div className="mx-auto w-full max-w-screen-xl">
