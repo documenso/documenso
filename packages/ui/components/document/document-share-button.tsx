@@ -25,7 +25,7 @@ import {
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
 export type DocumentShareButtonProps = HTMLAttributes<HTMLButtonElement> & {
-  token: string;
+  token?: string;
   documentId: number;
 };
 

@@ -175,7 +175,7 @@ export const DataTableActionDropdown = ({ row }: DataTableActionDropdownProps) =
         </DropdownMenuItem>
       </DropdownMenuContent>
 
-      <DocumentShareButton token={recipient?.token ?? ''} documentId={row.id} />
+      <DocumentShareButton token={recipient?.token} documentId={row.id} />
 
       {isDocumentDeletable && (
         <DeleteDraftDocumentDialog
