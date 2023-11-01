@@ -3,7 +3,7 @@
 import { useState } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Eye, EyeOff, Loader } from 'lucide-react';
+import { Eye, EyeOff } from 'lucide-react';
 import { signIn } from 'next-auth/react';
 import { Controller, useForm } from 'react-hook-form';
 import { z } from 'zod';
@@ -19,7 +19,7 @@ import { SignaturePad } from '@documenso/ui/primitives/signature-pad';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
 export const ZSignUpFormSchema = z.object({
-  name: z.string().min(1),
+  name: z.string().trim().min(1, { message: 'Please enter a valid name.' }),
   email: z.string().email().min(1),
   password: z.string().min(6).max(72),
   signature: z.string().min(1, { message: 'We need your signature to sign documents' }),
@@ -147,7 +147,8 @@ export const SignUpForm = ({ className }: SignUpFormProps) => {
             name="signature"
             render={({ field: { onChange } }) => (
               <SignaturePad
-                className="mt-2 h-36 w-full rounded-lg border bg-white dark:border-[#e2d7c5] dark:bg-[#fcf8ee]"
+                className="h-36 w-full"
+                containerClassName="mt-2 rounded-lg border bg-background"
                 onChange={(v) => onChange(v ?? '')}
               />
             )}

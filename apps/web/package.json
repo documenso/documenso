@@ -25,8 +25,8 @@
     "lucide-react": "^0.279.0",
     "luxon": "^3.4.0",
     "micro": "^10.0.1",
-    "next": "13.4.19",
-    "next-auth": "4.22.3",
+    "next": "14.0.0",
+    "next-auth": "4.24.3",
     "next-plausible": "^3.10.1",
     "next-themes": "^0.2.1",
     "perfect-freehand": "^1.2.0",
@@ -36,12 +36,12 @@
     "react-dom": "18.2.0",
     "react-dropzone": "^14.2.3",
     "react-hook-form": "^7.43.9",
-    "react-icons": "^4.8.0",
+    "react-icons": "^4.11.0",
     "react-rnd": "^10.4.1",
     "sharp": "0.32.5",
     "ts-pattern": "^5.0.5",
-    "typescript": "5.1.6",
-    "zod": "^3.21.4"
+    "typescript": "5.2.2",
+    "zod": "^3.22.4"
   },
   "devDependencies": {
     "@types/formidable": "^2.0.6",

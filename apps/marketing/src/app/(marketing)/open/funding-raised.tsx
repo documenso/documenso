@@ -35,6 +35,9 @@ export const FundingRaised = ({ className, data, ...props }: FundingRaisedProps)
               }
             />
             <Tooltip
+              labelStyle={{
+                color: 'hsl(var(--primary-foreground))',
+              }}
               itemStyle={{
                 color: 'hsl(var(--primary-foreground))',
               }}

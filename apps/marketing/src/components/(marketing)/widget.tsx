@@ -31,7 +31,7 @@ import { FormErrorMessage } from '../form/form-error-message';
 const ZWidgetFormSchema = z
   .object({
     email: z.string().email({ message: 'Please enter a valid email address.' }),
-    name: z.string().min(3, { message: 'Please enter a valid name.' }),
+    name: z.string().trim().min(3, { message: 'Please enter a valid name.' }),
   })
   .and(
     z.union([
@@ -41,7 +41,7 @@ const ZWidgetFormSchema = z
       }),
       z.object({
         signatureDataUrl: z.null().or(z.string().max(0)),
-        signatureText: z.string().min(1),
+        signatureText: z.string().trim().min(1),
       }),
     ]),
   );
@@ -226,7 +226,7 @@ export const Widget = ({ className, children, ...props }: WidgetProps) => {
                           type="button"
                           className="bg-primary h-full w-14 rounded"
                           disabled={!field.value || !!errors.email?.message}
-                          onClick={() => onNextStepClick()}
+                          onClick={() => step === 'EMAIL' && onNextStepClick()}
                         >
                           Next
                         </Button>
@@ -303,7 +303,10 @@ export const Widget = ({ className, children, ...props }: WidgetProps) => {
             <div className="mt-12 flex-1" />
 
             <div className="flex items-center justify-between">
-              <p className="text-muted-foreground text-xs">{stepsRemaining} step(s) until signed</p>
+              <p className="text-muted-foreground text-xs">
+                {isValid ? 'Ready for Signing' : `${stepsRemaining} step(s) until signed`}
+              </p>
+
               <p className="text-muted-foreground block text-xs md:hidden">Minimise contract</p>
             </div>
 
@@ -313,6 +316,7 @@ export const Widget = ({ className, children, ...props }: WidgetProps) => {
                   'w-1/3': stepsRemaining === 3,
                   'w-2/3': stepsRemaining === 2,
                   'w-11/12': stepsRemaining === 1,
+                  'w-full': isValid,
                 })}
               />
             </div>
@@ -377,7 +381,7 @@ export const Widget = ({ className, children, ...props }: WidgetProps) => {
       </Card>
 
       <Dialog open={showSigningDialog} onOpenChange={setShowSigningDialog}>
-        <DialogContent>
+        <DialogContent position="center">
           <DialogHeader>
             <DialogTitle>Add your signature</DialogTitle>
           </DialogHeader>
@@ -391,6 +395,7 @@ export const Widget = ({ className, children, ...props }: WidgetProps) => {
 
           <SignaturePad
             className="aspect-video w-full rounded-md border"
+            defaultValue={signatureDataUrl || ''}
             onChange={setDraftSignatureDataUrl}
           />
 

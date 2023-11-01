@@ -7,6 +7,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { Plus, Trash } from 'lucide-react';
 import { Controller, useFieldArray, useForm } from 'react-hook-form';
 
+import { useLimits } from '@documenso/ee/server-only/limits/provider/client';
 import { nanoid } from '@documenso/lib/universal/id';
 import { Field, Recipient, SendStatus } from '@documenso/prisma/client';
 import { Button } from '@documenso/ui/primitives/button';
@@ -40,6 +41,7 @@ export const AddSignersFormPartial = ({
   onSubmit,
 }: AddSignersFormProps) => {
   const { toast } = useToast();
+  const { remaining } = useLimits();
 
   const initialId = useId();
 
@@ -202,7 +204,11 @@ export const AddSignersFormPartial = ({
         />
 
         <div className="mt-4">
-          <Button type="button" disabled={isSubmitting} onClick={() => onAddSigner()}>
+          <Button
+            type="button"
+            disabled={isSubmitting || signers.length >= remaining.recipients}
+            onClick={() => onAddSigner()}
+          >
             <Plus className="-ml-1 mr-2 h-5 w-5" />
             Add Signer
           </Button>
