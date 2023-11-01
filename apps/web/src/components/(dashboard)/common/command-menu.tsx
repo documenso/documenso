@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 
 import { useRouter } from 'next/navigation';
 
@@ -8,6 +8,10 @@ import { Monitor, Moon, Sun } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import { useHotkeys } from 'react-hotkeys-hook';
 
+import {
+  DOCUMENTS_PAGE_SHORTCUT,
+  SETTINGS_PAGE_SHORTCUT,
+} from '@documenso/lib/constants/keyboard-shortcuts';
 import {
   CommandDialog,
   CommandEmpty,
@@ -18,36 +22,57 @@ import {
   CommandShortcut,
 } from '@documenso/ui/primitives/command';
 
+const DOCUMENTS_PAGES = [
+  {
+    label: 'All documents',
+    path: '/documents?status=ALL',
+    shortcut: DOCUMENTS_PAGE_SHORTCUT.replace('+', ''),
+  },
+  { label: 'Draft documents', path: '/documents?status=DRAFT' },
+  { label: 'Completed documents', path: '/documents?status=COMPLETED' },
+  { label: 'Pending documents', path: '/documents?status=PENDING' },
+  { label: 'Inbox documents', path: '/documents?status=INBOX' },
+];
+
+const SETTINGS_PAGES = [
+  { label: 'Settings', path: '/settings', shortcut: SETTINGS_PAGE_SHORTCUT.replace('+', '') },
+  { label: 'Profile', path: '/settings/profile' },
+  { label: 'Password', path: '/settings/password' },
+];
+
 export function CommandMenu() {
   const { setTheme } = useTheme();
   const { push } = useRouter();
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState('');
   const [pages, setPages] = useState<string[]>([]);
-  const page = pages[pages.length - 1];
+  const currentPage = pages[pages.length - 1];
 
-  useHotkeys('ctrl+k', (e) => {
-    e.preventDefault();
+  const toggleOpen = () => {
     setOpen((open) => !open);
-  });
-  useHotkeys('n+s', () => push('/settings'));
-  useHotkeys('n+d', () => push('/documents?status=ALL'));
+  };
+
+  const goToSettings = useCallback(() => push(SETTINGS_PAGES[0].path), [push]);
+  const goToDocuments = useCallback(() => push(DOCUMENTS_PAGES[0].path), [push]);
+
+  useHotkeys('ctrl+k', toggleOpen);
+  useHotkeys(SETTINGS_PAGE_SHORTCUT, goToSettings);
+  useHotkeys(DOCUMENTS_PAGE_SHORTCUT, goToDocuments);
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    // Escape goes to previous page
+    // Backspace goes to previous page when search is empty
+    if (e.key === 'Escape' || (e.key === 'Backspace' && !search)) {
+      e.preventDefault();
+      if (currentPage === undefined) {
+        setOpen(false);
+      }
+      setPages((pages) => pages.slice(0, -1));
+    }
+  };
 
   return (
-    <CommandDialog
-      commandProps={{
-        onKeyDown: (e) => {
-          // Escape goes to previous page
-          // Backspace goes to previous page when search is empty
-          if (e.key === 'Escape' || (e.key === 'Backspace' && !search)) {
-            e.preventDefault();
-            setPages((pages) => pages.slice(0, -1));
-          }
-        },
-      }}
-      open={open}
-      onOpenChange={setOpen}
-    >
+    <CommandDialog commandProps={{ onKeyDown: handleKeyDown }} open={open} onOpenChange={setOpen}>
       <CommandInput
         value={search}
         onValueChange={setSearch}
@@ -55,58 +80,54 @@ export function CommandMenu() {
       />
       <CommandList>
         <CommandEmpty>No results found.</CommandEmpty>
-        {!page && (
+        {!currentPage && (
           <>
             <CommandGroup heading="Documents">
-              <CommandItem onSelect={() => push('/documents?status=ALL')}>
-                All documents
-                <CommandShortcut>ND</CommandShortcut>
-              </CommandItem>
-              <CommandItem onSelect={() => push('/documents?status=DRAFT')}>
-                Draft documents
-              </CommandItem>
-              <CommandItem onSelect={() => push('/documents?status=COMPLETED')}>
-                Completed documents
-              </CommandItem>
-              <CommandItem onSelect={() => push('/documents?status=PENDING')}>
-                Pending documents
-              </CommandItem>
-              <CommandItem onSelect={() => push('/documents?status=INBOX')}>
-                Inbox documents
-              </CommandItem>
+              <Commands push={push} pages={DOCUMENTS_PAGES} />
             </CommandGroup>
             <CommandGroup heading="Settings">
-              <CommandItem onSelect={() => push('/settings')}>
-                Settings
-                <CommandShortcut>NS</CommandShortcut>
-              </CommandItem>
-              <CommandItem onSelect={() => push('/settings/profile')}>Profile</CommandItem>
-              <CommandItem onSelect={() => push('/settings/password')}>Password</CommandItem>
+              <Commands push={push} pages={SETTINGS_PAGES} />
             </CommandGroup>
             <CommandGroup heading="Preferences">
               <CommandItem onSelect={() => setPages([...pages, 'theme'])}>Change theme</CommandItem>
             </CommandGroup>
           </>
         )}
-        {page === 'theme' && (
-          <>
-            <CommandItem onSelect={() => setTheme('light')}>
-              <Sun className="mr-2" />
-              Light Mode
-            </CommandItem>
-
-            <CommandItem onSelect={() => setTheme('dark')}>
-              <Moon className="mr-2" />
-              Dark Mode
-            </CommandItem>
-
-            <CommandItem onSelect={() => setTheme('system')}>
-              <Monitor className="mr-2" />
-              System Theme
-            </CommandItem>
-          </>
-        )}
+        {currentPage === 'theme' && <ThemeCommands setTheme={setTheme} />}
       </CommandList>
     </CommandDialog>
   );
 }
+
+const Commands = ({
+  push,
+  pages,
+}: {
+  push: (_path: string) => void;
+  pages: { label: string; path: string; shortcut?: string }[];
+}) => {
+  return pages.map((page) => (
+    <CommandItem key={page.path} onSelect={() => push(page.path)}>
+      {page.label}
+      {page.shortcut && <CommandShortcut>{page.shortcut}</CommandShortcut>}
+    </CommandItem>
+  ));
+};
+
+const ThemeCommands = ({ setTheme }: { setTheme: (_theme: string) => void }) => {
+  const THEMES = useMemo(
+    () => [
+      { label: 'Light Mode', theme: 'light', icon: Sun },
+      { label: 'Dark Mode', theme: 'dark', icon: Moon },
+      { label: 'System Theme', theme: 'system', icon: Monitor },
+    ],
+    [],
+  );
+
+  return THEMES.map((theme) => (
+    <CommandItem key={theme.theme} onSelect={() => setTheme(theme.theme)}>
+      <theme.icon className="mr-2" />
+      {theme.label}
+    </CommandItem>
+  ));
+};
