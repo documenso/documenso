@@ -7,6 +7,8 @@ import { ChevronLeft } from 'lucide-react';
 import type { MDXComponents } from 'mdx/types';
 import { useMDXComponent } from 'next-contentlayer/hooks';
 
+import { useTranslation } from '@documenso/ui/i18n/client';
+
 export const generateStaticParams = () =>
   allBlogPosts.map((post) => ({ post: post._raw.flattenedPath }));
 
@@ -29,8 +31,10 @@ const mdxComponents: MDXComponents = {
   ),
 };
 
-export default function BlogPostPage({ params }: { params: { post: string } }) {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export default function BlogPostPage({ params }: { params: { post: string; locale: any } }) {
   const post = allBlogPosts.find((post) => post._raw.flattenedPath === `blog/${params.post}`);
+  const { t } = useTranslation(params.locale, 'blog-post');
 
   if (!post) {
     notFound();
@@ -84,7 +88,7 @@ export default function BlogPostPage({ params }: { params: { post: string } }) {
 
       <Link href="/blog" className="text-muted-foreground flex items-center hover:opacity-60">
         <ChevronLeft className="mr-2 h-6 w-6" />
-        Back to all posts
+        {t(`back-to-all`)}
       </Link>
     </article>
   );

@@ -4,8 +4,12 @@ import { HTMLAttributes, useState } from 'react';
 
 import Image from 'next/image';
 import Link from 'next/link';
+import { useParams, usePathname } from 'next/navigation';
 
 import { useFeatureFlags } from '@documenso/lib/client-only/providers/feature-flag';
+import ChangeLocale from '@documenso/ui/components/ChangeLocale';
+import { useTranslation } from '@documenso/ui/i18n/client';
+import type { LocaleTypes } from '@documenso/ui/i18n/settings';
 import { cn } from '@documenso/ui/lib/utils';
 
 import { HamburgerMenu } from './mobile-hamburger';
@@ -15,7 +19,9 @@ export type HeaderProps = HTMLAttributes<HTMLElement>;
 
 export const Header = ({ className, ...props }: HeaderProps) => {
   const [isHamburgerMenuOpen, setIsHamburgerMenuOpen] = useState(false);
-
+  const pathName = usePathname();
+  const locale = useParams()?.locale as LocaleTypes;
+  const { t } = useTranslation(locale, 'common');
   const { getFlag } = useFeatureFlags();
 
   const isSinglePlayerModeMarketingEnabled = getFlag('marketing_header_single_player_mode');
@@ -38,40 +44,41 @@ export const Header = ({ className, ...props }: HeaderProps) => {
             href="/singleplayer"
             className="bg-primary dark:text-background rounded-full px-2 py-1 text-xs font-semibold sm:px-3"
           >
-            Try now!
+            {t(`try`)}
           </Link>
         )}
       </div>
 
       <div className="hidden items-center gap-x-6 md:flex">
         <Link
-          href="/pricing"
+          href={`${locale}/pricing`}
           className="text-muted-foreground hover:text-muted-foreground/80 text-sm font-semibold"
         >
           Pricing
         </Link>
 
         <Link
-          href="/blog"
+          href={`${locale}/blog`}
           className="text-muted-foreground hover:text-muted-foreground/80 text-sm font-semibold"
         >
           Blog
         </Link>
 
         <Link
-          href="/open"
+          href={`${locale}/open`}
           className="text-muted-foreground hover:text-muted-foreground/80 text-sm font-semibold"
         >
           Open
         </Link>
 
         <Link
-          href="https://app.documenso.com/signin"
+          href={`"https://app.documenso.com/${locale}/signin"`}
           target="_blank"
           className="text-muted-foreground hover:text-muted-foreground/80 text-sm font-semibold"
         >
           Sign in
         </Link>
+        <ChangeLocale />
       </div>
 
       <HamburgerMenu
