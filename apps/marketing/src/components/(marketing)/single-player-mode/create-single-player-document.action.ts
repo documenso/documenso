@@ -101,9 +101,12 @@ export const createSinglePlayerDocument = async (
 
   const pdfBytes = await doc.save();
 
-  const documentToken = await prisma.$transaction(
+  const {
+    document: { id: documentId },
+    token,
+  } = await prisma.$transaction(
     async (tx) => {
-      const documentToken = alphaid();
+      const token = alphaid();
 
       // Fetch service user who will be the owner of the document.
       const serviceUser = await tx.user.findFirstOrThrow({
@@ -139,7 +142,7 @@ export const createSinglePlayerDocument = async (
           documentId: document.id,
           name: signer.name,
           email: signer.email,
-          token: documentToken,
+          token,
           signedAt: createdAt,
           readStatus: ReadStatus.OPENED,
           signingStatus: SigningStatus.SIGNED,
@@ -171,7 +174,7 @@ export const createSinglePlayerDocument = async (
         }),
       );
 
-      return documentToken;
+      return { document, token };
     },
     {
       maxWait: 5000,
@@ -179,13 +182,10 @@ export const createSinglePlayerDocument = async (
     },
   );
 
-  if (documentToken) {
-    const unsealedDocument = await getDocumentAndSenderByToken({ token: documentToken });
-    await sealDocument({
-      documentId: unsealedDocument.id,
-      sendEmail: false,
-    });
-  }
+  await sealDocument({
+    documentId,
+    sendEmail: false,
+  });
 
   const template = createElement(DocumentSelfSignedEmailTemplate, {
     documentName: documentName,
@@ -208,7 +208,7 @@ export const createSinglePlayerDocument = async (
     attachments: [{ content: Buffer.from(pdfBytes), filename: documentName }],
   });
 
-  return documentToken;
+  return token;
 };
 
 /**
