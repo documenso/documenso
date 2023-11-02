@@ -47,7 +47,7 @@ export default async function AdminStatsPage() {
         <div>
           <h3 className="text-3xl font-semibold">Document metrics</h3>
 
-          <div className="mt-8 grid flex-1 grid-cols-2 gap-4">
+          <div className="mt-8 grid flex-1 gap-4 md:grid-cols-2">
             <CardMetric icon={File} title="Total Documents" value={docStats.ALL} />
             <CardMetric icon={FileEdit} title="Drafted Documents" value={docStats.DRAFT} />
             <CardMetric icon={FileClock} title="Pending Documents" value={docStats.PENDING} />
@@ -58,7 +58,7 @@ export default async function AdminStatsPage() {
         <div>
           <h3 className="text-3xl font-semibold">Recipients metrics</h3>
 
-          <div className="mt-8 grid flex-1 grid-cols-2 gap-4">
+          <div className="mt-8 grid flex-1 gap-4 md:grid-cols-2">
             <CardMetric
               icon={UserSquare2}
               title="Total Recipients"

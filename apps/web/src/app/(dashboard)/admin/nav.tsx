@@ -16,11 +16,11 @@ export const AdminNav = ({ className, ...props }: AdminNavProps) => {
   const pathname = usePathname();
 
   return (
-    <div className={cn('flex gap-x-2.5 gap-y-2 md:flex-col', className)} {...props}>
+    <div className={cn('flex gap-x-2.5 gap-y-2 overflow-x-auto md:flex-col', className)} {...props}>
       <Button
         variant="ghost"
         className={cn(
-          'justify-start md:w-full',
+          'w-full justify-start',
           pathname?.startsWith('/admin/stats') && 'bg-secondary',
         )}
         asChild
@@ -34,7 +34,7 @@ export const AdminNav = ({ className, ...props }: AdminNavProps) => {
       <Button
         variant="ghost"
         className={cn(
-          'justify-start md:w-full',
+          'w-full justify-start',
           pathname?.startsWith('/admin/users') && 'bg-secondary',
         )}
         asChild
@@ -48,7 +48,7 @@ export const AdminNav = ({ className, ...props }: AdminNavProps) => {
       <Button
         variant="ghost"
         className={cn(
-          'justify-start md:w-full',
+          'w-full justify-start',
           pathname?.startsWith('/admin/documents') && 'bg-secondary',
         )}
         asChild
@@ -62,7 +62,7 @@ export const AdminNav = ({ className, ...props }: AdminNavProps) => {
       <Button
         variant="ghost"
         className={cn(
-          'justify-start md:w-full',
+          'w-full justify-start',
           pathname?.startsWith('/admin/subscriptions') && 'bg-secondary',
         )}
         asChild
