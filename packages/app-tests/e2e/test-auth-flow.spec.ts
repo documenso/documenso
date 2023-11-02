@@ -1,6 +1,8 @@
-import { type Page, expect, test } from '@playwright/test';
+import { expect } from '@playwright/test';
 
 import { deleteUser } from '@documenso/lib/server-only/user/delete-user';
+
+import { test } from '../fixtures/fixtures';
 
 test.use({ storageState: { cookies: [], origins: [] } });
 
@@ -10,11 +12,11 @@ test.use({ storageState: { cookies: [], origins: [] } });
 */
 test.describe.configure({ mode: 'serial' });
 
-const username = process.env.E2E_TEST_AUTHENTICATE_USERNAME;
-const email = process.env.E2E_TEST_AUTHENTICATE_USER_EMAIL;
-const password = process.env.E2E_TEST_AUTHENTICATE_USER_PASSWORD;
+const username = 'Test User';
+const email = 'testuser@email.com';
+const password = 'test_password';
 
-test('user can sign up with email and password', async ({ page }: { page: Page }) => {
+test('user can sign up with email and password', async ({ page }) => {
   await page.goto('/signup');
   await page.getByLabel('Name').fill(username);
   await page.getByLabel('Email').fill(email);
@@ -36,7 +38,7 @@ test('user can sign up with email and password', async ({ page }: { page: Page }
   await expect(page).toHaveURL('/documents');
 });
 
-test('user can login with user and password', async ({ page }: { page: Page }) => {
+test('user can login with user and password', async ({ page }) => {
   await page.goto('/signin');
   await page.getByLabel('Email').fill(email);
   await page.getByLabel('Password', { exact: true }).fill(password);
