@@ -1,3 +1,4 @@
+import { DateTime } from 'luxon';
 import { match } from 'ts-pattern';
 
 import { prisma } from '@documenso/prisma';
@@ -16,6 +17,7 @@ export interface FindDocumentsOptions {
     column: keyof Omit<Document, 'document'>;
     direction: 'asc' | 'desc';
   };
+  period?: string;
 }
 
 export const findDocuments = async ({
@@ -25,6 +27,7 @@ export const findDocuments = async ({
   page = 1,
   perPage = 10,
   orderBy,
+  period,
 }: FindDocumentsOptions) => {
   const user = await prisma.user.findFirstOrThrow({
     where: {
@@ -113,12 +116,25 @@ export const findDocuments = async ({
     }))
     .exhaustive();
 
+  let whereClause = {
+    ...termFilters,
+    ...filters,
+  };
+
+  if (period) {
+    const daysAgo = parseInt(period);
+    const startOfPeriod = DateTime.local().minus({ days: daysAgo }).startOf('day');
+    whereClause = {
+      ...whereClause,
+      createdAt: {
+        gte: startOfPeriod.toJSDate(),
+      },
+    };
+  }
+
   const [data, count] = await Promise.all([
     prisma.document.findMany({
-      where: {
-        ...termFilters,
-        ...filters,
-      },
+      where: whereClause,
       skip: Math.max(page - 1, 0) * perPage,
       take: perPage,
       orderBy: {
