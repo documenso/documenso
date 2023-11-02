@@ -415,6 +415,7 @@ export const AddFieldsFormPartial = ({
             <div className="grid grid-cols-2 gap-x-4 gap-y-8">
               <button
                 type="button"
+                data-testid="signature-button"
                 className="group h-full w-full"
                 disabled={!selectedSigner || selectedSigner?.sendStatus === SendStatus.SENT}
                 onClick={() => setSelectedField(FieldType.SIGNATURE)}

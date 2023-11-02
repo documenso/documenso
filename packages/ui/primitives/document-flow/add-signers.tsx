@@ -145,6 +145,7 @@ export const AddSignersFormPartial = ({
                       <Input
                         id={`signer-${signer.id}-email`}
                         type="email"
+                        data-testid={`signer-email-${index}`}
                         className="bg-background mt-2"
                         disabled={isSubmitting || hasBeenSentToRecipientId(signer.nativeId)}
                         onKeyDown={onKeyDown}
@@ -176,6 +177,7 @@ export const AddSignersFormPartial = ({
                 <div>
                   <button
                     type="button"
+                    data-testid={`signer-delete-${index}`}
                     className="inline-flex h-10 w-10 items-center justify-center text-slate-500 hover:opacity-80 disabled:cursor-not-allowed disabled:opacity-50"
                     disabled={
                       isSubmitting ||
@@ -206,6 +208,7 @@ export const AddSignersFormPartial = ({
         <div className="mt-4">
           <Button
             type="button"
+            data-testid="signer-add"
             disabled={isSubmitting || signers.length >= remaining.recipients}
             onClick={() => onAddSigner()}
           >

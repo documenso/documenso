@@ -150,7 +150,7 @@ export const DocumentDropzone = ({
             </motion.div>
           </div>
 
-          <input {...getInputProps()} />
+          <input data-testid="document-dropzone" {...getInputProps()} />
 
           <p className="group-hover:text-foreground text-muted-foreground mt-8 font-medium">
             Add a document

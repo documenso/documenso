@@ -155,6 +155,7 @@ export const DocumentFlowFormContainerActions = ({
         disabled={disabled || loading || !canGoNext}
         loading={loading}
         onClick={onGoNextClick}
+        data-testid="document-flow-next"
       >
         {goNextLabel}
       </Button>
