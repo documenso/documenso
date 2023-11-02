@@ -11,7 +11,6 @@ import { mailer } from '@documenso/email/mailer';
 import { render } from '@documenso/email/render';
 import { DocumentSelfSignedEmailTemplate } from '@documenso/email/templates/document-self-signed';
 import { FROM_ADDRESS, FROM_NAME, SERVICE_USER_EMAIL } from '@documenso/lib/constants/email';
-import { getDocumentAndSenderByToken } from '@documenso/lib/server-only/document/get-document-by-token';
 import { sealDocument } from '@documenso/lib/server-only/document/seal-document';
 import { insertFieldInPDF } from '@documenso/lib/server-only/pdf/insert-field-in-pdf';
 import { alphaid } from '@documenso/lib/universal/id';
