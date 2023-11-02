@@ -1,6 +1,6 @@
 'use client';
 
-import { HTMLAttributes, useState } from 'react';
+import React, { HTMLAttributes, useState } from 'react';
 
 import { Copy, Share } from 'lucide-react';
 import { FaXTwitter } from 'react-icons/fa6';
@@ -27,9 +27,15 @@ import { useToast } from '@documenso/ui/primitives/use-toast';
 export type DocumentShareButtonProps = HTMLAttributes<HTMLButtonElement> & {
   token?: string;
   documentId: number;
+  trigger?: (_props: { loading: boolean; disabled: boolean }) => React.ReactNode;
 };
 
-export const DocumentShareButton = ({ token, documentId, className }: DocumentShareButtonProps) => {
+export const DocumentShareButton = ({
+  token,
+  documentId,
+  className,
+  trigger,
+}: DocumentShareButtonProps) => {
   const { toast } = useToast();
 
   const { copyShareLink, createAndCopyShareLink, isCopyingShareLink } = useCopyShareLink({
@@ -71,6 +77,7 @@ export const DocumentShareButton = ({ token, documentId, className }: DocumentSh
 
   const onTweetClick = async () => {
     let { slug = '' } = shareLink || {};
+
     if (!slug) {
       const result = await createOrGetShareLink({
         token,
@@ -80,7 +87,7 @@ export const DocumentShareButton = ({ token, documentId, className }: DocumentSh
       slug = result.slug;
     }
 
-    //prewarming the opengraph image for the Twitter
+    // Ensuring we've prewarmed the opengraph image for the Twitter
     await fetch(`${process.env.NEXT_PUBLIC_WEBAPP_URL}/share/${slug}/opengraph`);
 
     window.open(
@@ -96,16 +103,21 @@ export const DocumentShareButton = ({ token, documentId, className }: DocumentSh
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogTrigger asChild>
-        <Button
-          variant="outline"
-          disabled={!token || !documentId}
-          className={cn('flex-1', className)}
-          loading={isLoading || isCopyingShareLink}
-        >
-          {!isLoading && !isCopyingShareLink && <Share className="mr-2 h-5 w-5" />}
-          Share
-        </Button>
+      <DialogTrigger onClick={(e) => e.stopPropagation()} asChild>
+        {trigger?.({
+          disabled: !token || !documentId,
+          loading: isLoading || isCopyingShareLink,
+        }) || (
+          <Button
+            variant="outline"
+            disabled={!token || !documentId}
+            className={cn('flex-1', className)}
+            loading={isLoading || isCopyingShareLink}
+          >
+            {!isLoading && !isCopyingShareLink && <Share className="mr-2 h-5 w-5" />}
+            Share
+          </Button>
+        )}
       </DialogTrigger>
 
       <DialogContent position="end">
@@ -128,6 +140,19 @@ export const DocumentShareButton = ({ token, documentId, className }: DocumentSh
             >
               {process.env.NEXT_PUBLIC_WEBAPP_URL}/share/{shareLink?.slug || '...'}
             </span>
+            <div
+              className={cn('bg-muted/40 mt-4 aspect-video overflow-hidden rounded-lg border', {
+                'animate-pulse': !shareLink?.slug,
+              })}
+            >
+              {shareLink?.slug && (
+                <img
+                  src={`${process.env.NEXT_PUBLIC_WEBAPP_URL}/share/${shareLink.slug}/opengraph`}
+                  alt="sharing link"
+                  className="h-full w-full object-cover"
+                />
+              )}
+            </div>
           </div>
 
           <Button variant="outline" className="mt-4" onClick={onTweetClick}>
