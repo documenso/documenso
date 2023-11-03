@@ -1,16 +1,14 @@
 import { motion } from 'framer-motion';
 import { Monitor, MoonStar, Sun } from 'lucide-react';
+import { useTheme } from 'next-themes';
 
 import { useIsMounted } from '@documenso/lib/client-only/hooks/use-is-mounted';
 import { cn } from '@documenso/ui/lib/utils';
 
-type ThemeSwitcherProps = {
-  theme?: string;
-  setTheme: (_theme: string) => void;
-};
-
-export const ThemeSwitcher = ({ theme, setTheme }: ThemeSwitcherProps) => {
+export const ThemeSwitcher = () => {
   const isMounted = useIsMounted();
+
+  const { theme, setTheme } = useTheme();
 
   const variants = {
     light: { x: 0 },

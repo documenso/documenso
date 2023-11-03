@@ -5,7 +5,6 @@ import { HTMLAttributes } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 
-import { useTheme } from 'next-themes';
 import { FaXTwitter } from 'react-icons/fa6';
 import { LiaDiscord } from 'react-icons/lia';
 import { LuGithub } from 'react-icons/lu';
@@ -34,8 +33,6 @@ const FOOTER_LINKS = [
 ];
 
 export const Footer = ({ className, ...props }: FooterProps) => {
-  const { theme, setTheme } = useTheme();
-
   return (
     <div className={cn('border-t py-12', className)} {...props}>
       <div className="mx-auto flex w-full max-w-screen-xl flex-wrap items-start justify-between gap-8 px-8">
@@ -83,7 +80,7 @@ export const Footer = ({ className, ...props }: FooterProps) => {
         </p>
 
         <div className="flex flex-wrap">
-          <ThemeSwitcher theme={theme} setTheme={setTheme} />
+          <ThemeSwitcher />
         </div>
       </div>
     </div>
