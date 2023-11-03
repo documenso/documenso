@@ -1,5 +1,5 @@
 import { DateTime } from 'luxon';
-import { match } from 'ts-pattern';
+import { P, match } from 'ts-pattern';
 
 import { prisma } from '@documenso/prisma';
 import { Document, Prisma, SigningStatus } from '@documenso/prisma/client';
@@ -17,7 +17,7 @@ export interface FindDocumentsOptions {
     column: keyof Omit<Document, 'document'>;
     direction: 'asc' | 'desc';
   };
-  period?: string;
+  period?: '' | '7d' | '14d' | '30d';
 }
 
 export const findDocuments = async ({
@@ -38,14 +38,16 @@ export const findDocuments = async ({
   const orderByColumn = orderBy?.column ?? 'createdAt';
   const orderByDirection = orderBy?.direction ?? 'desc';
 
-  const termFilters = !term
-    ? undefined
-    : ({
+  const termFilters = match(term)
+    .with(P.string.minLength(1), () => {
+      return {
         title: {
           contains: term,
           mode: 'insensitive',
         },
-      } as const);
+      } as const;
+    })
+    .otherwise(() => undefined);
 
   const filters = match<ExtendedDocumentStatus, Prisma.DocumentWhereInput>(status)
     .with(ExtendedDocumentStatus.ALL, () => ({
@@ -116,19 +118,18 @@ export const findDocuments = async ({
     }))
     .exhaustive();
 
-  let whereClause = {
+  const whereClause = {
     ...termFilters,
     ...filters,
   };
 
   if (period) {
-    const daysAgo = parseInt(period);
-    const startOfPeriod = DateTime.local().minus({ days: daysAgo }).startOf('day');
-    whereClause = {
-      ...whereClause,
-      createdAt: {
-        gte: startOfPeriod.toJSDate(),
-      },
+    const daysAgo = parseInt(period.replace(/d$/, ''), 10);
+
+    const startOfPeriod = DateTime.now().minus({ days: daysAgo }).startOf('day');
+
+    whereClause.createdAt = {
+      gte: startOfPeriod.toJSDate(),
     };
   }
 
