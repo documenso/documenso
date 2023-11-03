@@ -10,7 +10,7 @@ body:
   - type: textarea
     attributes:
       label: Issue Description
-      description: Please provide a clear and concise description of the problem. 
+      description: Please provide a clear and concise description of the problem.
   - type: textarea
     attributes:
       label: Steps to Reproduce
@@ -45,3 +45,4 @@ body:
         - label: I have included relevant environment information.
         - label: I have included any relevant screenshots.
         - label: I understand that this is a voluntary contribution and that there is no guarantee of resolution.
+        - label: I want to work on creating a PR for this issue if approved
