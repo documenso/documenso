@@ -7,7 +7,7 @@ export type VerifyEmailProps = {
 };
 
 export const verifyEmail = async ({ token }: VerifyEmailProps) => {
-  const dbToken = await prisma.verificationToken.findFirst({
+  const verificationToken = await prisma.verificationToken.findFirst({
     include: {
       user: true,
     },
@@ -16,24 +16,24 @@ export const verifyEmail = async ({ token }: VerifyEmailProps) => {
     },
   });
 
-  if (!dbToken) {
-    throw new Error('Invalid token provided. Please try again.');
+  if (!verificationToken) {
+    return false;
   }
 
   // check if the token is valid or expired
-  const valid = dbToken.expires > new Date();
+  const valid = verificationToken.expires > new Date();
 
   if (!valid) {
     // if the token is expired, generate a new token and send the email
     // and return false
-    await generateConfirmationToken({ email: dbToken.user.email });
+    await generateConfirmationToken({ email: verificationToken.user.email });
     return valid;
   }
 
   const [updatedUsers, deletedToken] = await prisma.$transaction([
     prisma.user.update({
       where: {
-        id: dbToken.userId,
+        id: verificationToken.userId,
       },
       data: {
         emailVerified: new Date(),
@@ -41,7 +41,7 @@ export const verifyEmail = async ({ token }: VerifyEmailProps) => {
     }),
     prisma.verificationToken.deleteMany({
       where: {
-        userId: dbToken.userId,
+        userId: verificationToken.userId,
       },
     }),
   ]);

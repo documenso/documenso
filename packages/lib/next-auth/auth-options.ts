@@ -90,6 +90,16 @@ export const NEXT_AUTH_OPTIONS: AuthOptions = {
         merged.email = retrieved.email;
       }
 
+      if (!merged.emailVerified) {
+        const retrieved = await prisma.user.findFirst({
+          where: {
+            id: Number(merged.id ?? token.sub),
+          },
+        });
+
+        merged.emailVerified = retrieved?.emailVerified;
+      }
+
       if (
         !merged.lastSignedIn ||
         DateTime.fromISO(merged.lastSignedIn).plus({ hours: 1 }) <= DateTime.now()
@@ -111,6 +121,7 @@ export const NEXT_AUTH_OPTIONS: AuthOptions = {
         name: merged.name,
         email: merged.email,
         lastSignedIn: merged.lastSignedIn,
+        emailVerified: merged.emailVerified,
       };
     },
 
@@ -122,6 +133,8 @@ export const NEXT_AUTH_OPTIONS: AuthOptions = {
             id: Number(token.id),
             name: token.name,
             email: token.email,
+            emailVerified:
+              typeof token.emailVerified === 'string' ? new Date(token.emailVerified) : null,
           },
         } satisfies Session;
       }

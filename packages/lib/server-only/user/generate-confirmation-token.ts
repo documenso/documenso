@@ -8,10 +8,7 @@ import { sendConfirmationEmail } from '../auth/send-confirmation-email';
 const IDENTIFIER = 'confirmation-email';
 
 export const generateConfirmationToken = async ({ email }: { email: string }) => {
-  const now = new Date();
   const token = crypto.randomBytes(20).toString('hex');
-
-  const expirationDate = new Date(now.getTime() + ONE_HOUR);
 
   const user = await prisma.user.findFirst({
     where: {
@@ -28,7 +25,7 @@ export const generateConfirmationToken = async ({ email }: { email: string }) =>
       data: {
         identifier: IDENTIFIER,
         token: token,
-        expires: expirationDate,
+        expires: new Date(Date.now() + ONE_HOUR),
         user: {
           connect: {
             id: user.id,

@@ -10,7 +10,7 @@ type VerifyEmailLayoutProps = {
 
 export default function VerifyEmailLayout({ children }: VerifyEmailLayoutProps) {
   return (
-    <main className="bg-sand-100 relative flex min-h-screen flex-col items-center justify-center overflow-hidden  px-4 py-12 md:p-12 lg:p-24">
+    <main className="bg-background relative flex min-h-screen flex-col items-center justify-center overflow-hidden  px-4 py-12 md:p-12 lg:p-24">
       <div className="relative flex w-full max-w-lg items-center gap-x-24">
         <div className="absolute -inset-96 -z-[1] flex items-center justify-center opacity-50">
           <Image

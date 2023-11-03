@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
 import { Loader } from 'lucide-react';
+import { useSession } from 'next-auth/react';
 
 import { useLimits } from '@documenso/ee/server-only/limits/provider/client';
 import { createDocumentData } from '@documenso/lib/server-only/document-data/create-document-data';
@@ -18,11 +19,11 @@ import { useToast } from '@documenso/ui/primitives/use-toast';
 
 export type UploadDocumentProps = {
   className?: string;
-  verifiedUser: boolean;
 };
 
-export const UploadDocument = ({ className, verifiedUser }: UploadDocumentProps) => {
+export const UploadDocument = ({ className }: UploadDocumentProps) => {
   const router = useRouter();
+  const { data: session } = useSession();
 
   const { toast } = useToast();
 
@@ -80,7 +81,7 @@ export const UploadDocument = ({ className, verifiedUser }: UploadDocumentProps)
     <div className={cn('relative', className)}>
       <DocumentDropzone
         className="min-h-[40vh]"
-        disabled={remaining.documents === 0 || !verifiedUser}
+        disabled={remaining.documents === 0 || !session?.user.emailVerified}
         onDrop={onFileDrop}
       />
 
