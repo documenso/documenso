@@ -1,3 +1,5 @@
+🚨 We are launching our new free tier "Single Player Mode" on Product Hunt next monday: https://www.producthunt.com/products/documenso
+
 <img src="https://github.com/documenso/documenso/assets/13398220/a643571f-0239-46a6-a73e-6bef38d1228b" alt="Documenso Logo">
 
 <p align="center" style="margin-top: 20px">
@@ -29,14 +31,6 @@
    </a>
    <a href="code_of_conduct.md"><img src="https://img.shields.io/badge/Contributor%20Covenant-2.1-4baaaa.svg" alt="Contributor Covenant"></a>
 </p>
-
-> 🦺 Documenso 1.0 is deployed to our <a href="https://documen.so/staging" target="_blank">Staging Environment</a>.
->
-> The code can be found on the [feat/refresh](https://github.com/documenso/documenso/tree/feat/refresh) branch.
->
-> The new version will be released after the current testing phase.
-
-# Join us in testing Documenso 1.0 during [MALFUNCTION MANIA](https://documenso.com/blog/malfunction-mania)
 
 <div>
   <img style="display: block; height: 120px; width: 24%"
@@ -70,14 +64,14 @@ Join us in creating the next generation of open trust infrastructure.
 
 ## Community and Next Steps 🎯
 
-We're currently working on a redesign of the application, including a revamp of the codebase so Documenso can be more intuitive to use and robust to develop upon.
+We're currently working on a redesign of the application, including a revamp of the codebase, so Documenso can be more intuitive to use and robust to develop upon.
 
-- Check out the first source code release in this repository and test it
-- Tell us what you think in the [Discussions](https://github.com/documenso/documenso/discussions)
-- Join the [Discord server](https://documen.so/discord) for any questions and getting to know to other community members
-- ⭐ the repository to help us raise awareness
-- Spread the word on Twitter that Documenso is working towards a more open signing tool
-- Fix or create [issues](https://github.com/documenso/documenso/issues), that are needed for the first production release
+- Check out the first source code release in this repository and test it.
+- Tell us what you think in the [Discussions](https://github.com/documenso/documenso/discussions).
+- Join the [Discord server](https://documen.so/discord) for any questions and getting to know to other community members.
+- ⭐ the repository to help us raise awareness.
+- Spread the word on Twitter that Documenso is working towards a more open signing tool.
+- Fix or create [issues](https://github.com/documenso/documenso/issues), that are needed for the first production release.
 
 ## Contributing
 
@@ -111,7 +105,7 @@ Contact us if you are interested in our Enterprise plan for large organizations 
 
 ### Requirements
 
-To run Documenso locally you will need
+To run Documenso locally, you will need
 
 - Node.js
 - Postgres SQL Database
@@ -129,7 +123,7 @@ Want to get up and running quickly? Follow these steps:
 git clone https://github.com/documenso/documenso
 ```
 
-2. Set up your `.env` file using the recommendations in the `.env.example` file. Alternatively just run `cp .env.example .env` to get started with our handpicked defaults.
+2. Set up your `.env` file using the recommendations in the `.env.example` file. Alternatively, just run `cp .env.example .env` to get started with our handpicked defaults.
 
 3. Run `npm run dx` in the root directory
 
@@ -156,7 +150,7 @@ npm run d
 
 ### Manual Setup
 
-Follow these steps to setup documenso on you local machine:
+Follow these steps to setup Documenso on your local machine:
 
 1. [Clone the repository](https://help.github.com/articles/cloning-a-repository/) it to your local device.
 
@@ -164,11 +158,11 @@ Follow these steps to setup documenso on you local machine:
 git clone https://github.com/documenso/documenso
 ```
 
-2. Run `npm i` in root directory
+2. Run `npm i` in the root directory
 
 3. Create your `.env` from the `.env.example`. You can use `cp .env.example .env` to get started with our handpicked defaults.
 
-4. Set the following environement variables.
+4. Set the following environment variables:
 
    - NEXTAUTH_URL
    - NEXTAUTH_SECRET
@@ -181,15 +175,15 @@ git clone https://github.com/documenso/documenso
 
 5. Create the database schema by running `npm run prisma:migrate-dev`
 
-6. Run `npm run dev` root directory to start
+6. Run `npm run dev` in the root directory to start
 
 7. Register a new user at http://localhost:3000/signup
 
 ---
 
-- Optional: Seed the database using `npm run prisma:seed -w @documenso/prisma` to create a test user and document
-- Optional: Create your own signing certificate
-  - To generate your own using these steps and a Linux Terminal or Windows Subsystem for Linux (WSL) see **[Create your own signing certificate](./SIGNING.md)**.
+- Optional: Seed the database using `npm run prisma:seed -w @documenso/prisma` to create a test user and document.
+- Optional: Create your own signing certificate.
+  - To generate your own using these steps and a Linux Terminal or Windows Subsystem for Linux (WSL), see **[Create your own signing certificate](./SIGNING.md)**.
 
 ### Run in Gitpod
 
@@ -203,13 +197,80 @@ We support DevContainers for VSCode. [Click here to get started.](https://vscode
 
 ## Docker
 
-🚧 Docker containers and images are current in progress. We are actively working on bringing a simple docker build and publish pipeline for Documenso.
+🚧 Docker containers and images are current in progress. We are actively working on bringing a simple Docker build and publish pipeline for Documenso.
 
 ## Self Hosting
 
 We support a variety of deployment methods, and are actively working on adding more. Stay tuned for updates!
 
-> Please note the below deployment methods are for v0.9, we will update these to v1.0 once it has been released.
+> Please note that the below deployment methods are for v0.9, we will update these to v1.0 once it has been released.
+
+### Fetch, configure, and build
+
+First, clone the code from Github:
+
+```
+git clone https://github.com/documenso/documenso.git
+```
+
+Then, inside the `documenso` folder, copy the example env file:
+
+```
+cp .env.example .env
+```
+
+The following environement variables must be set:
+
+* `NEXTAUTH_URL`
+* `NEXTAUTH_SECRET`
+* `NEXT_PUBLIC_WEBAPP_URL`
+* `NEXT_PUBLIC_MARKETING_URL`
+* `NEXT_PRIVATE_DATABASE_URL`
+* `NEXT_PRIVATE_DIRECT_DATABASE_URL`
+* `NEXT_PRIVATE_SMTP_FROM_NAME`
+* `NEXT_PRIVATE_SMTP_FROM_ADDRESS`
+
+> If you are using a reverse proxy in front of Documenso, don't forget to provide the public URL for both `NEXTAUTH_URL` and `NEXT_PUBLIC_WEBAPP_URL` variables!
+
+Now you can install the dependencies and build it:
+
+```
+npm i
+npm run:build:web
+npm run prisma:migrate-deploy
+```
+
+Finally, you can start it with:
+
+```
+npm run start
+```
+
+This will start the server on `localhost:3000`. For now, any reverse proxy can then do the frontend and SSL termination.
+
+> If you want to run with another port than 3000, you can start the application with `next -p <ANY PORT>` from the `apps/web` folder.
+
+### Run as a service
+
+You can use a systemd service file to run the app. Here is a simple example of the service running on port 3500 (using 3000 by default):
+
+```bash
+[Unit]
+Description=documenso
+After=network.target
+
+[Service]
+Environment=PATH=/path/to/your/node/binaries
+Type=simple
+User=www-data
+WorkingDirectory=/var/www/documenso/apps/web
+ExecStart=/usr/bin/next start -p 3500
+TimeoutSec=15
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
+```
 
 ### Railway
 
@@ -221,15 +282,15 @@ We support a variety of deployment methods, and are actively working on adding m
 
 ## Troubleshooting
 
-### I'm not receiving any emails when using the developer quickstart
+### I'm not receiving any emails when using the developer quickstart.
 
-When using the developer quickstart an [Inbucket](https://inbucket.org/) server will be spun up in a docker container that will store all outgoing email locally for you to view.
+When using the developer quickstart, an [Inbucket](https://inbucket.org/) server will be spun up in a docker container that will store all outgoing emails locally for you to view.
 
-The Web UI can be found at http://localhost:9000 while the SMTP port will be on localhost:2500.
+The Web UI can be found at http://localhost:9000, while the SMTP port will be on localhost:2500.
 
 ### Support IPv6
 
-In case you are deploying to a cluster that uses only IPv6. You can use a custom command to pass a parameter to the Next.js start command
+If you are deploying to a cluster that uses only IPv6, You can use a custom command to pass a parameter to the Next.js start command
 
 For local docker run
 
@@ -254,7 +315,7 @@ containers:
       - '::'
 ```
 
-### I can't see environment variables in my package scripts
+### I can't see environment variables in my package scripts.
 
 Wrap your package script with the `with:env` script like such:
 
@@ -262,7 +323,7 @@ Wrap your package script with the `with:env` script like such:
 npm run with:env -- npm run myscript
 ```
 
-The same can be done when using `npx` for one of bin scripts:
+The same can be done when using `npx` for one of the bin scripts:
 
 ```
 npm run with:env -- npx myscript
