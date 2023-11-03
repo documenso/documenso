@@ -63,12 +63,12 @@ export const DocumentFlowFormContainerContent = ({
   return (
     <div
       className={cn(
-        `hide-scrollbar flex flex-1 flex-col overflow-y-auto overflow-x-hidden px-1`,
+        'custom-scrollbar -mx-2 flex flex-1 flex-col overflow-y-auto overflow-x-hidden px-2',
         className,
       )}
       {...props}
     >
-      <div className="-mx-2 flex flex-1 flex-col px-2">{children}</div>
+      <div className="flex flex-1 flex-col">{children}</div>
     </div>
   );
 };
@@ -96,7 +96,6 @@ export type DocumentFlowFormContainerStepProps = {
 };
 
 export const DocumentFlowFormContainerStep = ({
-  title,
   step,
   maxStep,
 }: DocumentFlowFormContainerStepProps) => {

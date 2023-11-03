@@ -94,23 +94,23 @@
   -webkit-mask-composite: xor;
 }
 
-.hide-scrollbar::-webkit-scrollbar {
+.custom-scrollbar::-webkit-scrollbar {
   width: 6px;
-  background : transparent;
+  background: transparent;
   border-radius: 10px;
-  scrollbar-gutter: stable; 
+  scrollbar-gutter: stable;
 }
 
-.hide-scrollbar::-webkit-scrollbar-track {
+.custom-scrollbar::-webkit-scrollbar-track {
   border-radius: 10px;
 }
 
-.hide-scrollbar::-webkit-scrollbar-thumb {
+.custom-scrollbar::-webkit-scrollbar-thumb {
   background: rgb(100 116 139 / 1);
   border-radius: 10px;
-  width : 8px;
+  width: 8px;
 }
 
-.hide-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: rgb(100 116 139 / 0.5); 
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgb(100 116 139 / 0.5);
 }
