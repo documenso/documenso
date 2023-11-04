@@ -26,5 +26,41 @@
     "happy-to-assist": "We are happy to assist you at",
     "in-discord": "in our Discord-Support-Channel",
     "FAQs": "FAQs",
-    "please-message": "please message either Lucas or Timur to get added to the channel if you are not already a member."
+    "please-message": "please message either Lucas or Timur to get added to the channel if you are not already a member.",
+
+    "yearly": "YEARLY",
+    "monthly": "MONTHLY",
+    "save": "Save $60",
+    "signup-now": "Signup Now",
+    "for-small-individual": "For small teams and individuals with basic needs.",
+    "free-plan": "Free Plan",
+    "zero": "$0",
+    "5-docs-per-month": "5 standard documents per month",
+    "10-recipients-per-month": "Up to 10 recipients per document",
+    "no-cc-required": "No credit card required",
+
+
+    "early-adopters": "Early Adopters",
+    "30": "$30",
+    "300": "$300",
+    "fast-growing": "For fast-growing companies that aim to scale across multiple teams.",
+    "early-adopter-deal": "The Early Adopter Deal:",
+    "join-movement": "Join the movement",
+    "simple-signin": "Simple signing solution",
+    "email-discord-slack": "Email, Discord and Slack assistance",
+    "includes-all": "Includes all upcoming features",
+
+    "fixed-pricing": "Fixed, straightforward pricing",
+    "enterprise": "Enterprise",
+    "pricing-on-request": "Pricing on request",
+    "for-large-corp": "For large organizations that need extra flexibility and control.",
+    "contact-us": "Contact Us",
+    "everything-early-plus": "Everything in Early Adopters, plus:",
+
+    "custom-subdomain": "Custom Subdomain",
+    "compliance-check": "Compliance Check",
+    "guaranteed-uptime": "Guaranteed Uptime",
+    "reporting-analysis": "Reporting & Analysis",
+    "24-support": "24/7 Support"
+
 }

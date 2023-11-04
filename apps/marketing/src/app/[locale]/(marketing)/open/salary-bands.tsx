@@ -10,7 +10,7 @@ import {
   TableRow,
 } from '@documenso/ui/primitives/table';
 
-import { SALARY_BANDS } from '~/app/(marketing)/open/data';
+import { SALARY_BANDS } from '~/app/[locale]/(marketing)/open/data';
 
 export type SalaryBandsProps = HTMLAttributes<HTMLDivElement>;
 

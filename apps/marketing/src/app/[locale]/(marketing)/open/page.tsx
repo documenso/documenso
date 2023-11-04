@@ -1,8 +1,8 @@
 import { z } from 'zod';
 
-import { FUNDING_RAISED } from '~/app/(marketing)/open/data';
-import { MetricCard } from '~/app/(marketing)/open/metric-card';
-import { SalaryBands } from '~/app/(marketing)/open/salary-bands';
+import { FUNDING_RAISED } from '~/app/[locale]/(marketing)/open/data';
+import { MetricCard } from '~/app/[locale]/(marketing)/open/metric-card';
+import { SalaryBands } from '~/app/[locale]/(marketing)/open/salary-bands';
 
 import { BarMetric } from './bar-metrics';
 import { CapTable } from './cap-table';

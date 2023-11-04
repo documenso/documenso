@@ -9,6 +9,7 @@ import { useAnalytics } from '@documenso/lib/client-only/hooks/use-analytics';
 import { base64 } from '@documenso/lib/universal/base64';
 import { putFile } from '@documenso/lib/universal/upload/put-file';
 import { DocumentDataType, Field, Prisma, Recipient } from '@documenso/prisma/client';
+import { createTranslation } from '@documenso/ui/i18n/server';
 import { Card, CardContent } from '@documenso/ui/primitives/card';
 import { DocumentDropzone } from '@documenso/ui/primitives/document-dropzone';
 import { AddFieldsFormPartial } from '@documenso/ui/primitives/document-flow/add-fields';
@@ -30,11 +31,12 @@ type SinglePlayerModeStep = 'fields' | 'sign';
 // !: This entire file is a hack to get around failed prerendering of
 // !: the Single Player Mode page. This regression was introduced during
 // !: the upgrade of Next.js to v13.5.x.
-export const SinglePlayerClient = () => {
+export const SinglePlayerClient = async ({ params: { locale } }) => {
   const analytics = useAnalytics();
   const router = useRouter();
 
   const { toast } = useToast();
+  const { t } = await createTranslation(locale, 'common');
 
   const [uploadedFile, setUploadedFile] = useState<{ file: File; fileBase64: string } | null>();
 
@@ -43,8 +45,8 @@ export const SinglePlayerClient = () => {
 
   const documentFlow: Record<SinglePlayerModeStep, DocumentFlowStep> = {
     fields: {
-      title: 'Add document',
-      description: 'Upload a document and add fields.',
+      title: t(`add-doc`),
+      description: t(`upload`),
       stepIndex: 1,
       onBackStep: uploadedFile
         ? () => {
@@ -55,8 +57,8 @@ export const SinglePlayerClient = () => {
       onNextStep: () => setStep('sign'),
     },
     sign: {
-      title: 'Sign',
-      description: 'Enter your details.',
+      title: t(`sign`),
+      description: t(`enter-details`),
       stepIndex: 2,
       onBackStep: () => setStep('fields'),
     },
@@ -136,8 +138,8 @@ export const SinglePlayerClient = () => {
       router.push(`/singleplayer/${documentToken}/success`);
     } catch {
       toast({
-        title: 'Something went wrong',
-        description: 'Please try again later.',
+        title: t('something-went-wrong'),
+        description: t('try-later'),
         variant: 'destructive',
       });
     }
@@ -169,8 +171,8 @@ export const SinglePlayerClient = () => {
       analytics.capture('Marketing: SPM - Document uploaded');
     } catch {
       toast({
-        title: 'Something went wrong',
-        description: 'Please try again later.',
+        title: t('something-went-wrong'),
+        description: t('try-later'),
         variant: 'destructive',
       });
     }
@@ -179,26 +181,26 @@ export const SinglePlayerClient = () => {
   return (
     <div className="mt-6 sm:mt-12">
       <div className="text-center">
-        <h1 className="text-3xl font-bold lg:text-5xl">Single Player Mode</h1>
+        <h1 className="text-3xl font-bold lg:text-5xl">{t(`single-player-mode`)}</h1>
 
         <p className="text-foreground mx-auto mt-4 max-w-[50ch] text-lg leading-normal">
-          Create a{' '}
+          {t('create-a')}{' '}
           <Link
             href={`${process.env.NEXT_PUBLIC_WEBAPP_URL}/signup`}
             target="_blank"
             className="hover:text-foreground/80 font-semibold transition-colors"
           >
-            free account
+            {t('free-account')}
           </Link>{' '}
-          or view our{' '}
+          {t('or-view-our')}{' '}
           <Link
             href={'/pricing'}
             target="_blank"
             className="hover:text-foreground/80 font-semibold transition-colors"
           >
-            community plan
+            {t('community-plan')}
           </Link>{' '}
-          for exclusive features, including the ability to collaborate with multiple signers.
+          {t('community-plan-deal')}
         </p>
       </div>
 

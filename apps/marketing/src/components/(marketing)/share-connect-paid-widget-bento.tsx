@@ -2,6 +2,7 @@ import { HTMLAttributes } from 'react';
 
 import Image from 'next/image';
 
+import { createTranslation } from '@documenso/ui/i18n/server';
 import { cn } from '@documenso/ui/lib/utils';
 import { Card, CardContent } from '@documenso/ui/primitives/card';
 
@@ -13,10 +14,12 @@ import cardWidgetFigure from '~/assets/card-widget-figure.png';
 
 export type ShareConnectPaidWidgetBentoProps = HTMLAttributes<HTMLDivElement>;
 
-export const ShareConnectPaidWidgetBento = ({
+export const ShareConnectPaidWidgetBento = async ({
   className,
   ...props
 }: ShareConnectPaidWidgetBentoProps) => {
+  const { t } = await createTranslation('en', 'paid-bento');
+
   return (
     <div className={cn('relative', className)} {...props}>
       <div className="absolute inset-0 -z-10 flex items-center justify-center">
@@ -27,16 +30,16 @@ export const ShareConnectPaidWidgetBento = ({
         />
       </div>
       <h2 className="px-0 text-[22px] font-semibold md:px-12 md:text-4xl lg:px-24">
-        Integrates with all your favourite tools.
-        <span className="block md:mt-0">Send, connect, receive and embed everywhere.</span>
+        {t(`integrates-tools`)}
+        <span className="block md:mt-0">{t(`send-connect`)}</span>
       </h2>
 
       <div className="mt-6 grid grid-cols-2 gap-8 md:mt-8">
         <Card className="col-span-2 lg:col-span-1" degrees={120} gradient>
           <CardContent className="grid grid-cols-1 gap-8 p-6">
             <p className="text-foreground/80 leading-relaxed">
-              <strong className="block">Easy Sharing (Soon).</strong>
-              Receive your personal link to share with everyone you care about.
+              <strong className="block">{t(`easy-sharing`)}</strong>
+              {t(`receive-link`)}
             </p>
 
             <div className="flex items-center justify-center p-8">
@@ -52,9 +55,8 @@ export const ShareConnectPaidWidgetBento = ({
         <Card className="col-span-2 lg:col-span-1" spotlight>
           <CardContent className="grid grid-cols-1 gap-8 p-6">
             <p className="text-foreground/80 leading-relaxed">
-              <strong className="block">Connections (Soon).</strong>
-              Create connections and automations with Zapier and more to integrate with your
-              favorite tools.
+              <strong className="block">{t(`connections`)}</strong>
+              {t(`create-automation`)}
             </p>
 
             <div className="flex items-center justify-center p-8">
@@ -70,8 +72,8 @@ export const ShareConnectPaidWidgetBento = ({
         <Card className="col-span-2 lg:col-span-1" spotlight>
           <CardContent className="grid grid-cols-1 gap-8 p-6">
             <p className="text-foreground/80 leading-relaxed">
-              <strong className="block">Get paid (Soon).</strong>
-              Integrated payments with stripe so you don’t have to worry about getting paid.
+              <strong className="block">{t(`get-paid`)}</strong>
+              {t(`integrated-payments`)}
             </p>
 
             <div className="flex items-center justify-center p-8">
@@ -87,9 +89,8 @@ export const ShareConnectPaidWidgetBento = ({
         <Card className="col-span-2 lg:col-span-1" spotlight>
           <CardContent className="grid grid-cols-1 gap-8 p-6">
             <p className="text-foreground/80 leading-relaxed">
-              <strong className="block">React Widget (Soon).</strong>
-              Easily embed Documenso into your product. Simply copy and paste our react widget into
-              your application.
+              <strong className="block">{t(`react-widget`)}</strong>
+              {t(`embed-widget`)}
             </p>
 
             <div className="flex items-center justify-center p-8">

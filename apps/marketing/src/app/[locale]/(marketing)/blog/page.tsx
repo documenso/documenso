@@ -1,21 +1,23 @@
 import { allBlogPosts } from 'contentlayer/generated';
 
-export default function BlogPage() {
+import { createTranslation } from '@documenso/ui/i18n/server';
+
+export default async function BlogPage({ params: { locale } }) {
   const blogPosts = allBlogPosts.sort((a, b) => {
     const dateA = new Date(a.date);
     const dateB = new Date(b.date);
 
     return dateB.getTime() - dateA.getTime();
   });
+  const { t } = await createTranslation(locale, 'blog');
 
   return (
     <div className="mt-6 sm:mt-12">
       <div className="text-center">
-        <h1 className="text-3xl font-bold lg:text-5xl">From the blog</h1>
+        <h1 className="text-3xl font-bold lg:text-5xl">{t(`from-the-blog`)}</h1>
 
         <p className="text-muted-foreground mx-auto mt-4 max-w-xl text-center text-lg leading-normal">
-          Get the latest news from Documenso, including product updates, team announcements and
-          more!
+          {t(`latest-news`)}
         </p>
       </div>
 
