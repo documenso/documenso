@@ -15,6 +15,7 @@ import { sealDocument } from '@documenso/lib/server-only/document/seal-document'
 import { insertFieldInPDF } from '@documenso/lib/server-only/pdf/insert-field-in-pdf';
 import { alphaid } from '@documenso/lib/universal/id';
 import { getFile } from '@documenso/lib/universal/upload/get-file';
+import { putFile } from '@documenso/lib/universal/upload/put-file';
 import { prisma } from '@documenso/prisma';
 import {
   DocumentDataType,
@@ -114,14 +115,12 @@ export const createSinglePlayerDocument = async (
         },
       });
 
-      const documentDataBytes = Buffer.from(pdfBytes).toString('base64');
+      const documentDataBytes = Buffer.from(pdfBytes);
 
-      const { id: documentDataId } = await tx.documentData.create({
-        data: {
-          type: DocumentDataType.BYTES_64,
-          data: documentDataBytes,
-          initialData: documentDataBytes,
-        },
+      const { id: documentDataId } = await putFile({
+        name: `${documentName}.pdf`,
+        type: 'application/pdf',
+        arrayBuffer: async () => Promise.resolve(documentDataBytes),
       });
 
       // Create document.
