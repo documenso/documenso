@@ -11,7 +11,6 @@ import { mailer } from '@documenso/email/mailer';
 import { render } from '@documenso/email/render';
 import { DocumentSelfSignedEmailTemplate } from '@documenso/email/templates/document-self-signed';
 import { FROM_ADDRESS, FROM_NAME, SERVICE_USER_EMAIL } from '@documenso/lib/constants/email';
-import { sealDocument } from '@documenso/lib/server-only/document/seal-document';
 import { insertFieldInPDF } from '@documenso/lib/server-only/pdf/insert-field-in-pdf';
 import { alphaid } from '@documenso/lib/universal/id';
 import { getFile } from '@documenso/lib/universal/upload/get-file';
@@ -26,6 +25,7 @@ import {
   SendStatus,
   SigningStatus,
 } from '@documenso/prisma/client';
+import { signPdf } from '@documenso/signing';
 
 const ZCreateSinglePlayerDocumentSchema = z.object({
   documentData: z.object({
@@ -99,12 +99,11 @@ export const createSinglePlayerDocument = async (
     });
   }
 
-  const pdfBytes = await doc.save();
+  const unsignedPdfBytes = await doc.save();
 
-  const {
-    document: { id: documentId },
-    token,
-  } = await prisma.$transaction(
+  const signedPdfBuffer = await signPdf({ pdf: Buffer.from(unsignedPdfBytes) });
+
+  const { token } = await prisma.$transaction(
     async (tx) => {
       const token = alphaid();
 
@@ -115,12 +114,10 @@ export const createSinglePlayerDocument = async (
         },
       });
 
-      const documentDataBytes = Buffer.from(pdfBytes);
-
       const { id: documentDataId } = await putFile({
         name: `${documentName}.pdf`,
         type: 'application/pdf',
-        arrayBuffer: async () => Promise.resolve(documentDataBytes),
+        arrayBuffer: async () => Promise.resolve(signedPdfBuffer),
       });
 
       // Create document.
@@ -180,11 +177,6 @@ export const createSinglePlayerDocument = async (
     },
   );
 
-  await sealDocument({
-    documentId,
-    sendEmail: false,
-  });
-
   const template = createElement(DocumentSelfSignedEmailTemplate, {
     documentName: documentName,
     assetBaseUrl: process.env.NEXT_PUBLIC_WEBAPP_URL || 'http://localhost:3000',
@@ -203,7 +195,7 @@ export const createSinglePlayerDocument = async (
     subject: 'Document signed',
     html: render(template),
     text: render(template, { plainText: true }),
-    attachments: [{ content: Buffer.from(pdfBytes), filename: documentName }],
+    attachments: [{ content: signedPdfBuffer, filename: documentName }],
   });
 
   return token;
