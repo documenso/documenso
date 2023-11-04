@@ -176,9 +176,9 @@ export const AddSignersFormPartial = ({
 
                 <div>
                   <button
-                    type="button"
                     data-testid={`signer-delete-${index}`}
-                    className="inline-flex h-10 w-10 items-center justify-center text-slate-500 hover:opacity-80 disabled:cursor-not-allowed disabled:opacity-50"
+                    type="button"
+                    className="justify-left inline-flex h-10 w-10 items-center text-slate-500 hover:opacity-80 disabled:cursor-not-allowed disabled:opacity-50"
                     disabled={
                       isSubmitting ||
                       hasBeenSentToRecipientId(signer.nativeId) ||

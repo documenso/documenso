@@ -1,3 +1,5 @@
+🚨 We are launching our new free tier "Single Player Mode" on Product Hunt next monday: https://www.producthunt.com/products/documenso
+
 <img src="https://github.com/documenso/documenso/assets/13398220/a643571f-0239-46a6-a73e-6bef38d1228b" alt="Documenso Logo">
 
 <p align="center" style="margin-top: 20px">
