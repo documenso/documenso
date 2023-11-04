@@ -149,6 +149,10 @@ export async function GET(_request: Request, { params: { slug } }: SharePageOpen
           weight: 600,
         },
       ],
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'GET, OPTIONS',
+      },
     },
   );
 }
