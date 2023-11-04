@@ -5,11 +5,11 @@ import path from 'node:path';
 
 import { createUsersFixture } from './user';
 
-interface Fixtures {
+type Fixtures = {
   page: Page;
   samplePdf: Buffer;
   users: ReturnType<typeof createUsersFixture>;
-}
+};
 
 export const test = base.extend<Fixtures>({
   samplePdf: async ({}, use) => {

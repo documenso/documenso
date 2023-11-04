@@ -9,12 +9,12 @@ type TUser = Awaited<ReturnType<typeof createUser>>;
 
 type TUserFixture = ReturnType<typeof createUserFixture>;
 
-interface loginUsingApiParams {
+type apiLoginParams = {
   page: Page;
   user: TUser;
-}
+};
 
-export async function apiLogin({ page, user: { email, name } }: loginUsingApiParams) {
+export async function apiLogin({ page, user: { email, name } }: apiLoginParams) {
   const password = name;
   const csrfToken = await page
     .context()
