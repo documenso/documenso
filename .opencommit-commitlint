@@ -1,0 +1,24 @@
+{
+  "hash": "2b5fa4d79f5da1fad78ba4c78230ee50405a9966c5c48134611031a8838cbb23",
+  "prompts": [
+    "There should always be a blank line at the beginning of the body.",
+    "Each line of the body should always have 100 characters or less.",
+    "There should always be a blank line at the beginning of the footer.",
+    "Each line of the footer should always have 100 characters or less.",
+    "The header should always have 100 characters or less.",
+    "The subject should never be in one of the following case: \n  - sentence-case\n  - start-case\n  - pascal-case\n  - upper-case.",
+    "The subject should never be empty.",
+    "The subject should never end with '.'.",
+    "The type should always be in lower-case case.",
+    "The type should never be empty.",
+    "The type should always be one of the following values: \n  - build (Changes that affect the build system or external dependencies (example scopes: gulp, broccoli, npm))\n  - chore (Other changes that don't modify src or test files)\n  - ci (Changes to our CI configuration files and scripts (example scopes: Travis, Circle, BrowserStack, SauceLabs))\n  - docs (Documentation only changes)\n  - feat (A new feature)\n  - fix (A bug fix)\n  - perf (A code change that improves performance)\n  - refactor (A code change that neither fixes a bug nor adds a feature)\n  - revert (Reverts a previous commit)\n  - style (Changes that do not affect the meaning of the code (white-space, formatting, missing semi-colons, etc))\n  - test (Adding missing tests or correcting existing tests)."
+  ],
+  "consistency": {
+    "english": {
+      "localLanguage": "english",
+      "commitFix": "fix(server): change port variable to uppercase",
+      "commitFeat": "feat(server): allow server to listen on specified port",
+      "commitDescription": "Change the variable 'port' to uppercase 'PORT' to fix a bug. Allow the server to listen on a port specified through the environment variable as a new feature."
+    }
+  }
+}

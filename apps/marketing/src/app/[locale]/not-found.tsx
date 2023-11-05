@@ -2,11 +2,13 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 
 import { motion } from 'framer-motion';
 import { ChevronLeft } from 'lucide-react';
 
+import { useTranslation } from '@documenso/ui/i18n/client';
+import { LocaleTypes } from '@documenso/ui/i18n/settings';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
 
@@ -14,6 +16,9 @@ import backgroundPattern from '~/assets/background-pattern.png';
 
 export default function NotFound() {
   const router = useRouter();
+  const locale = useParams()?.locale as LocaleTypes;
+
+  const { t } = useTranslation(locale, 'not-found');
 
   return (
     <div className={cn('relative max-w-[100vw] overflow-hidden')}>
@@ -34,13 +39,11 @@ export default function NotFound() {
 
       <div className="container mx-auto flex h-full min-h-screen items-center px-6 py-32">
         <div>
-          <p className="text-muted-foreground font-semibold">404 Page not found</p>
+          <p className="text-muted-foreground font-semibold">{t(`404`)}</p>
 
-          <h1 className="mt-3 text-2xl font-bold md:text-3xl">Oops! Something went wrong.</h1>
+          <h1 className="mt-3 text-2xl font-bold md:text-3xl">{t('oops')}</h1>
 
-          <p className="text-muted-foreground mt-4 text-sm">
-            The page you are looking for was moved, removed, renamed or might never have existed.
-          </p>
+          <p className="text-muted-foreground mt-4 text-sm">{t(`moved`)}</p>
 
           <div className="mt-6 flex gap-x-2.5 gap-y-4 md:items-center">
             <Button
@@ -51,11 +54,11 @@ export default function NotFound() {
               }}
             >
               <ChevronLeft className="mr-2 h-4 w-4" />
-              Go Back
+              {t(`back`)}
             </Button>
 
             <Button className="w-32" asChild>
-              <Link href="/">Home</Link>
+              <Link href="/">{t(`home`)}</Link>
             </Button>
           </div>
         </div>

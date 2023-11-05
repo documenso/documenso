@@ -11,6 +11,7 @@ import DocumentDialog from '@documenso/ui/components/document/document-dialog';
 import { DocumentDownloadButton } from '@documenso/ui/components/document/document-download-button';
 import { DocumentShareButton } from '@documenso/ui/components/document/document-share-button';
 import { SigningCard3D } from '@documenso/ui/components/signing-card';
+import { createTranslation } from '@documenso/ui/i18n/server';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
 
@@ -19,16 +20,19 @@ import { ConfettiScreen } from '~/components/(marketing)/confetti-screen';
 
 interface SinglePlayerModeSuccessProps {
   className?: string;
+  locale: any;
   document: DocumentWithRecipient;
   signatures: Signature[];
 }
 
-export const SinglePlayerModeSuccess = ({
+export const SinglePlayerModeSuccess = async ({
   className,
   document,
   signatures,
+  locale,
 }: SinglePlayerModeSuccessProps) => {
   const { getFlag } = useFeatureFlags();
+  const { t } = await createTranslation(locale, 'common');
 
   const isConfettiEnabled = getFlag('marketing_spm_confetti');
 
@@ -47,7 +51,7 @@ export const SinglePlayerModeSuccess = ({
       )}
 
       <h2 className="relative z-10 text-center text-2xl font-semibold leading-normal md:text-3xl lg:mb-2 lg:text-4xl">
-        You have signed
+        {t(`you-have-signed`)}
         <span className="mt-2 block">{document.title}</span>
       </h2>
 
@@ -75,22 +79,22 @@ export const SinglePlayerModeSuccess = ({
             />
 
             <Button onClick={() => setShowDocumentDialog(true)} className="z-10 col-span-2">
-              Show document
+              {t(`show-document`)}
             </Button>
           </div>
         </div>
       </div>
 
       <p className="text-muted-foreground/60 mt-16 text-center text-sm">
-        Create a{' '}
+        {t(`create-a`)}{' '}
         <Link
           href={`${process.env.NEXT_PUBLIC_WEBAPP_URL}/signup`}
           target="_blank"
           className="text-documenso-700 hover:text-documenso-600 whitespace-nowrap"
         >
-          free account
+          {t(`free account`)}
         </Link>{' '}
-        to access your signed documents at any time
+        {t(`access-your-doc`)}
       </p>
 
       <DocumentDialog

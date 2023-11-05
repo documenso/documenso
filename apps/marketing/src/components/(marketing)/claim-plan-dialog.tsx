@@ -11,6 +11,7 @@ import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
 import { useAnalytics } from '@documenso/lib/client-only/hooks/use-analytics';
+import { createTranslation } from '@documenso/ui/i18n/server';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
 import {
@@ -40,14 +41,21 @@ export type ClaimPlanDialogProps = {
   className?: string;
   planId: string;
   children: React.ReactNode;
+  locale: any;
 };
 
-export const ClaimPlanDialog = ({ className, planId, children }: ClaimPlanDialogProps) => {
+export const ClaimPlanDialog = async ({
+  className,
+  planId,
+  children,
+  locale,
+}: ClaimPlanDialogProps) => {
   const params = useSearchParams();
   const analytics = useAnalytics();
   const event = usePlausible();
 
   const { toast } = useToast();
+  const { t } = await createTranslation(locale, 'home');
 
   const [open, setOpen] = useState(() => params?.get('cancelled') === 'true');
 
@@ -103,11 +111,9 @@ export const ClaimPlanDialog = ({ className, planId, children }: ClaimPlanDialog
 
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Claim your plan</DialogTitle>
+          <DialogTitle>{t('claim')}</DialogTitle>
 
-          <DialogDescription className="mt-4">
-            We're almost there! Please enter your email address and name to claim your plan.
-          </DialogDescription>
+          <DialogDescription className="mt-4">{t('almost-done')}</DialogDescription>
         </DialogHeader>
 
         <form onSubmit={handleSubmit(onFormSubmit)}>
@@ -119,17 +125,14 @@ export const ClaimPlanDialog = ({ className, planId, children }: ClaimPlanDialog
                     <Info className="h-5 w-5 text-yellow-400" />
                   </div>
                   <div className="ml-3">
-                    <p className="text-sm leading-5 text-yellow-700">
-                      You have cancelled the payment process. If you didn't mean to do this, please
-                      try again.
-                    </p>
+                    <p className="text-sm leading-5 text-yellow-700">{t('cancelled')}</p>
                   </div>
                 </div>
               </div>
             )}
 
             <div>
-              <Label className="text-muted-foreground">Name</Label>
+              <Label className="text-muted-foreground">{t('name')}</Label>
 
               <Input type="text" className="mt-2" {...register('name')} autoFocus />
 
@@ -137,7 +140,7 @@ export const ClaimPlanDialog = ({ className, planId, children }: ClaimPlanDialog
             </div>
 
             <div>
-              <Label className="text-muted-foreground">Email</Label>
+              <Label className="text-muted-foreground">{t('email')}</Label>
 
               <Input type="email" className="mt-2" {...register('email')} />
 
@@ -145,11 +148,11 @@ export const ClaimPlanDialog = ({ className, planId, children }: ClaimPlanDialog
             </div>
 
             <Button type="submit" size="lg" loading={isSubmitting}>
-              Claim the early adopters Plan (
+              {t('claim-early-adopters')} (
               {/* eslint-disable-next-line turbo/no-undeclared-env-vars */}
               {planId === process.env.NEXT_PUBLIC_STRIPE_COMMUNITY_PLAN_MONTHLY_PRICE_ID
-                ? 'Monthly'
-                : 'Yearly'}
+                ? t('Monthly')
+                : t('Yearly')}
               )
             </Button>
           </fieldset>
