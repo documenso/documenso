@@ -43,6 +43,15 @@
     "subscribe": "Subscribe",
     "full-name": "Full Name",
     "email": "Email",
+    "light": "Light",
+    "dark": "Dark",
+    "system": "System",
+    "add-signers": "Add Signers",
+    "add-signers-desc": "Add the people who will sign the document.",
+    "add-signer": "Add Signer",
+    "go-back": "Go Back",
+    "name": "Name",
+    "continue": "Continue",
     "empty-caption": "You have not yet created or received any documents. To create a document please upload one."
 
 
