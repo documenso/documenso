@@ -71,6 +71,9 @@
 "status":"Status",
 "actions" : "Actions",
 "created": "Created",
+"showing" : "Showing",
+"document-sent": "Document sent",
+"document-sent-mess": "Your document has been sent successfully.",
 "you-can-use": "You can use the following variables in your message:",
     "empty-caption": "You have not yet created or received any documents. To create a document please upload one."
 
