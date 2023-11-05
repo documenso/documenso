@@ -30,7 +30,7 @@ const SignInPage = async ({ locale }) => {
           href="/forgot-password"
           className="text-muted-foreground text-sm duration-200 hover:opacity-70"
         >
-          Forgotten your password?
+          Forgot your password?
         </Link>
       </p>
     </div>

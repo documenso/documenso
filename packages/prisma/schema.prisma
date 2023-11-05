@@ -120,6 +120,7 @@ model Document {
   documentMeta   DocumentMeta?
   createdAt      DateTime            @default(now())
   updatedAt      DateTime            @default(now()) @updatedAt
+  completedAt    DateTime?
 
   @@unique([documentDataId])
   @@index([userId])
