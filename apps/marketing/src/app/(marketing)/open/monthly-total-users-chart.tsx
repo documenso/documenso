@@ -6,13 +6,13 @@ import { Bar, BarChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recha
 import { GetUserMonthlyGrowthResult } from '@documenso/lib/server-only/user/get-user-monthly-growth';
 import { cn } from '@documenso/ui/lib/utils';
 
-export type MonthlyUsersChartProps = {
+export type MonthlyTotalUsersChartProps = {
   className?: string;
   data: GetUserMonthlyGrowthResult;
 };
 
-export const MonthlyUsersChart = ({ className, data }: MonthlyUsersChartProps) => {
-  const formattedData = [...data].reverse().map(({ month, count }) => {
+export const MonthlyTotalUsersChart = ({ className, data }: MonthlyTotalUsersChartProps) => {
+  const formattedData = [...data].reverse().map(({ month, cume_count: count }) => {
     return {
       month: DateTime.fromFormat(month, 'yyyy-MM').toFormat('LLL'),
       count: Number(count),
@@ -22,7 +22,7 @@ export const MonthlyUsersChart = ({ className, data }: MonthlyUsersChartProps) =
   return (
     <div className={cn('flex flex-col', className)}>
       <div className="flex items-center px-4">
-        <h3 className="text-lg font-semibold">Monthly New Users</h3>
+        <h3 className="text-lg font-semibold">Monthly Total Users</h3>
       </div>
 
       <div className="border-border mt-2.5 flex flex-1 items-center justify-center rounded-2xl border p-6 pl-2 pt-12 shadow-sm hover:shadow">
@@ -41,7 +41,7 @@ export const MonthlyUsersChart = ({ className, data }: MonthlyUsersChartProps) =
               fill="hsl(var(--primary))"
               radius={[4, 4, 0, 0]}
               maxBarSize={60}
-              label="New Users"
+              label="Total Users"
             />
           </BarChart>
         </ResponsiveContainer>
