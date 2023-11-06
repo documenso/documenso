@@ -32,7 +32,6 @@
     "current-password": "Current Password",
     "repeat-password": "Repeat Password",
     "update-password": "Update Password",
-
     "signature": "Signature",
     "clear-signature": "Clear signature",
     "profile-page-desc": "Here you can edit your personal details.",
@@ -85,13 +84,14 @@
 "document-sent": "Document sent",
 "document-sent-mess": "Your document has been sent successfully.",
 "you-can-use": "You can use the following variables in your message:",
-    "empty-caption": "You have not yet created or received any documents. To create a document please upload one.",
-
-    "welcome-back": "Welcome back, we are lucky to have you.",
-    "forgot-password": "Forgot your password?",
-    "no-account": "Don't have an account?",
-    "sign-in-your-account": "Sign in to your account"
-
-
+"empty-caption": "You have not yet created or received any documents. To create a document please upload one.",
+"welcome-back": "Welcome back, we are lucky to have you.",
+"forgot-password": "Forgot your password?",
+"no-account": "Don't have an account?",
+"sign-in-your-account": "Sign in to your account",
+"create-account": "Create your account and start using state-of-the-art document signing. Open and beautiful. signing is within your grasp.",
+"create-new-account": "Create a new account",
+"already-have-an-account": "Already have an account?",
+"sign-in-instead": "Sign in instead"
 
 }
