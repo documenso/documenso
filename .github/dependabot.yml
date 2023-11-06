@@ -5,7 +5,7 @@ updates:
     directory: '/'
     schedule:
       interval: "weekly"
-    target-branch: "feat/refresh"
+    target-branch: "main"
     labels:
       - "ci dependencies"
       - "ci"
@@ -15,7 +15,7 @@ updates:
     directory: "/apps/marketing"
     schedule:
       interval: "weekly"
-    target-branch: "feat/refresh"
+    target-branch: "main"
     labels:
       - "npm dependencies"
       - "frontend"
@@ -25,7 +25,7 @@ updates:
     directory: "/apps/web"
     schedule:
       interval: "weekly"
-    target-branch: "feat/refresh"
+    target-branch: "main"
     labels:
       - "npm dependencies"
       - "frontend"

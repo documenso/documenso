@@ -2,9 +2,9 @@ name: "Continuous Integration"
 
 on:
   push:
-    branches: [ "feat/refresh" ]
+    branches: [ "main" ]
   pull_request:
-    branches: [ "feat/refresh" ]
+    branches: [ "main" ]
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
