@@ -1,9 +1,11 @@
 import { TRPCError } from '@trpc/server';
+import { compare } from 'bcrypt';
 
+import { ErrorCode } from '@documenso/lib/next-auth/error-codes';
 import { createUser } from '@documenso/lib/server-only/user/create-user';
 
-import { procedure, router } from '../trpc';
-import { ZSignUpMutationSchema } from './schema';
+import { authenticatedProcedure, procedure, router } from '../trpc';
+import { ZSignUpMutationSchema, ZVerifyPasswordMutationSchema } from './schema';
 
 export const authRouter = router({
   signup: procedure.input(ZSignUpMutationSchema).mutation(async ({ input }) => {
@@ -25,4 +27,13 @@ export const authRouter = router({
       });
     }
   }),
+  verifyPassword: authenticatedProcedure
+    .input(ZVerifyPasswordMutationSchema)
+    .mutation(async ({ input: { password }, ctx: { user } }) => {
+      if (!user.password) {
+        throw new Error(ErrorCode.USER_MISSING_PASSWORD);
+      }
+      const verified = await compare(password, user.password);
+      return { verified };
+    }),
 });
