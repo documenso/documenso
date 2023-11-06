@@ -16,7 +16,7 @@ export type CalloutProps = {
 
 export const Callout = async ({ starCount, locale }: CalloutProps) => {
   const event = usePlausible();
-  const { t } = await createTranslation(locale, 'common');
+  const { t } = await createTranslation(locale, 'marketing');
 
   const onSignUpClick = () => {
     const el = document.getElementById('email');

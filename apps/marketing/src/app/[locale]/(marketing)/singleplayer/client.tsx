@@ -36,7 +36,7 @@ export const SinglePlayerClient = async ({ params: { locale } }) => {
   const router = useRouter();
 
   const { toast } = useToast();
-  const { t } = await createTranslation(locale, 'common');
+  const { t } = await createTranslation(locale, 'marketing');
 
   const [uploadedFile, setUploadedFile] = useState<{ file: File; fileBase64: string } | null>();
 

@@ -85,13 +85,7 @@
 "document-sent": "Document sent",
 "document-sent-mess": "Your document has been sent successfully.",
 "you-can-use": "You can use the following variables in your message:",
-    "empty-caption": "You have not yet created or received any documents. To create a document please upload one.",
-
-    "welcome-back": "Welcome back, we are lucky to have you.",
-    "forgot-password": "Forgot your password?",
-    "no-account": "Don't have an account?",
-    "sign-in-your-account": "Sign in to your account"
-
+    "empty-caption": "You have not yet created or received any documents. To create a document please upload one."
 
 
 }

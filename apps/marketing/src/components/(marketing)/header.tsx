@@ -20,7 +20,7 @@ export type HeaderProps = HTMLAttributes<HTMLElement>;
 export const Header = ({ className, ...props }: HeaderProps) => {
   const locale = useParams()?.locale as LocaleTypes;
   const [isHamburgerMenuOpen, setIsHamburgerMenuOpen] = useState(false);
-  const { t } = useTranslation(locale, 'common');
+  const { t } = useTranslation(locale, 'marketing');
   const { getFlag } = useFeatureFlags();
   const isSinglePlayerModeMarketingEnabled = getFlag('marketing_header_single_player_mode');
 
