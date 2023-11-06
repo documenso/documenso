@@ -14,6 +14,7 @@ export const appRouter = router({
   profile: profileRouter,
   document: documentRouter,
   field: fieldRouter,
+  admin: adminRouter,
   shareLink: shareLinkRouter,
 });
 

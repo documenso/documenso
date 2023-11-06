@@ -44,5 +44,8 @@
   "workspaces": [
     "apps/*",
     "packages/*"
-  ]
+  ],
+  "dependencies": {
+    "recharts": "^2.7.2"
+  }
 }

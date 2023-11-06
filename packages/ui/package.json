@@ -58,7 +58,7 @@
     "clsx": "^1.2.1",
     "cmdk": "^0.2.0",
     "framer-motion": "^10.12.8",
-    "lucide-react": "^0.277.0",
+    "lucide-react": "^0.279.0",
     "luxon": "^3.4.2",
     "next": "14.0.0",
     "pdfjs-dist": "3.6.172",

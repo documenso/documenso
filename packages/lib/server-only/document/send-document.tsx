@@ -4,6 +4,7 @@ import { mailer } from '@documenso/email/mailer';
 import { render } from '@documenso/email/render';
 import { DocumentInviteEmailTemplate } from '@documenso/email/templates/document-invite';
 import { FROM_ADDRESS, FROM_NAME } from '@documenso/lib/constants/email';
+import { renderCustomEmailTemplate } from '@documenso/lib/utils/render-custom-email-template';
 import { prisma } from '@documenso/prisma';
 import { DocumentStatus, SendStatus } from '@documenso/prisma/client';
 

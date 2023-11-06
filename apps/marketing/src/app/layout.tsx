@@ -69,6 +69,8 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             </PlausibleProvider>
           </ThemeProvider>
         </FeatureFlagProvider>
+
+        <Toaster />
       </body>
     </html>
   );

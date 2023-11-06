@@ -52,11 +52,3 @@ You can build the project with:
 ```bash
 npm run build
 ```
-
-### Making a Pull Request
-
-When making a pull request, be sure to add a changeset when something has changed with Documenso.
-
-```shell
-npm run changeset
-```

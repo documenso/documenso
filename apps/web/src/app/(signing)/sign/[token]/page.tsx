@@ -1,4 +1,4 @@
-import { notFound } from 'next/navigation';
+import { notFound, redirect } from 'next/navigation';
 
 import { match } from 'ts-pattern';
 
@@ -40,7 +40,7 @@ export default async function SigningPage({ params: { token } }: SigningPageProp
     viewedDocument({ token }).catch(() => null),
   ]);
 
-  if (!document || !recipient) {
+  if (!document || !document.documentData || !recipient) {
     return notFound();
   }
 
@@ -54,14 +54,6 @@ export default async function SigningPage({ params: { token } }: SigningPageProp
   ) {
     redirect(`/sign/${token}/complete`);
   }
-
-  const user = await getServerComponentSession();
-
-  const documentDataUrl = await getFile(documentData)
-    .then((buffer) => Buffer.from(buffer).toString('base64'))
-    .then((data) => `data:application/pdf;base64,${data}`);
-
-  const user = await getServerComponentSession();
 
   return (
     <SigningProvider

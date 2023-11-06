@@ -39,6 +39,7 @@ export type SignInFormProps = {
 
 export const SignInForm = ({ className }: SignInFormProps) => {
   const { toast } = useToast();
+  const [showPassword, setShowPassword] = useState(false);
 
   const {
     register,
