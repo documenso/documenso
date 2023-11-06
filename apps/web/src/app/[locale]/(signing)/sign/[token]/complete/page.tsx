@@ -112,7 +112,7 @@ export default async function CompletedSigningPage({
             href="https://documenso.com"
             className="text-documenso-700 hover:text-documenso-600"
           >
-            Check out Documenso.
+            Check out Notario.
           </Link>
         </p>
       </div>
