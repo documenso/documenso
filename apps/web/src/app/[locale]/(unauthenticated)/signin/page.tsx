@@ -6,7 +6,7 @@ import { SignInForm } from '~/components/forms/signin';
 
 const SignInPage = async ({ locale }) => {
   // Make sure to use the correct namespace here.
-  const { t } = await createTranslation(locale, 'common');
+  const { t } = await createTranslation(locale, 'marketing');
 
   return (
     <div>
