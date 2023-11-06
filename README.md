@@ -219,7 +219,7 @@ Then, inside the `documenso` folder, copy the example env file:
 cp .env.example .env
 ```
 
-The following environement variables must be set:
+The following environment variables must be set:
 
 * `NEXTAUTH_URL`
 * `NEXTAUTH_SECRET`
