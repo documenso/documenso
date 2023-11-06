@@ -1,3 +1,4 @@
+import { decodeBase32 } from 'oslo/encoding';
 import { TOTPController } from 'oslo/otp';
 
 import { ErrorCode } from '@documenso/lib/next-auth/error-codes';
@@ -9,11 +10,6 @@ import { decryptSymmetric } from '../../universal/crypto';
 type enableTwoFactorAuthenticationOptions = {
   user: User;
   code: string;
-};
-
-const hexStringToArrayBuffer = (hexString: string) => {
-  const buffer = Buffer.from(hexString, 'hex');
-  return buffer.buffer.slice(buffer.byteOffset, buffer.byteOffset + buffer.byteLength);
 };
 
 export const enableTwoFactorAuthentication = async ({
@@ -42,7 +38,7 @@ export const enableTwoFactorAuthentication = async ({
 
   const otpController = new TOTPController();
 
-  const isValidToken = await otpController.verify(code, hexStringToArrayBuffer(secret));
+  const isValidToken = await otpController.verify(code, decodeBase32(secret));
 
   if (!isValidToken) {
     throw new Error(ErrorCode.INCORRECT_TWO_FACTOR_CODE);

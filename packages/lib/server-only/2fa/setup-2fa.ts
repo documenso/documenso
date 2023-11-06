@@ -1,6 +1,6 @@
 import { compare } from 'bcrypt';
 import crypto from 'crypto';
-import { HMAC } from 'oslo/crypto';
+import { encodeBase32 } from 'oslo/encoding';
 import { createTOTPKeyURI } from 'oslo/otp';
 import qrcode from 'qrcode';
 
@@ -41,12 +41,13 @@ export const setupTwoFactorAuthentication = async ({
     throw new Error(ErrorCode.INCORRECT_EMAIL_PASSWORD);
   }
 
-  const secret = await new HMAC('SHA-1').generateKey();
+  const secret = crypto.randomBytes(10);
   const backupCodes = Array.from(Array(10), () => crypto.randomBytes(5).toString('hex'));
 
   const accountName = user.email;
   const uri = createTOTPKeyURI(ISSUER, accountName, secret);
   const qr = await qrcode.toDataURL(uri);
+  const twoFactorSecret = encodeBase32(secret, { padding: false });
 
   await prisma.user.update({
     where: {
@@ -59,14 +60,14 @@ export const setupTwoFactorAuthentication = async ({
       }),
       twoFactorEnabled: false,
       twoFactorSecret: encryptSymmetric({
-        data: Buffer.from(secret).toString(),
+        data: twoFactorSecret,
         key: encryptionKey,
       }),
     },
   });
 
   return {
-    secret,
+    secret: twoFactorSecret,
     uri,
     qr,
   };
