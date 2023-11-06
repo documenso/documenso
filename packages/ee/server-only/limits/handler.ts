@@ -30,7 +30,7 @@ export const limitsHandler = async (
       });
     }
 
-    res.status(500).json({
+    return res.status(500).json({
       error: ERROR_CODES.UNKNOWN,
     });
   }

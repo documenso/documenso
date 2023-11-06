@@ -41,7 +41,7 @@ export default async function BlogPostOpenGraphImage({ params }: BlogPostOpenGra
 
   return new ImageResponse(
     (
-      <div tw="relative h-full w-full flex flex-col items-center justify-center text-center">
+      <div tw="relative h-full w-full flex flex-col items-center justify-center text-center bg-white">
         {/* @ts-expect-error Lack of typing from ImageResponse */}
         <img src={backgroundImage} alt="og-background" tw="absolute inset-0 w-full h-full" />
 

@@ -18,15 +18,11 @@ import {
 } from 'lucide-react';
 import { useSession } from 'next-auth/react';
 
-import { useCopyShareLink } from '@documenso/lib/client-only/hooks/use-copy-share-link';
-import {
-  TOAST_DOCUMENT_SHARE_ERROR,
-  TOAST_DOCUMENT_SHARE_SUCCESS,
-} from '@documenso/lib/constants/toast';
 import { getFile } from '@documenso/lib/universal/upload/get-file';
 import { Document, DocumentStatus, Recipient, User } from '@documenso/prisma/client';
 import { DocumentWithData } from '@documenso/prisma/types/document-with-data';
 import { trpc as trpcClient } from '@documenso/trpc/client';
+import { DocumentShareButton } from '@documenso/ui/components/document/document-share-button';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -34,7 +30,6 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from '@documenso/ui/primitives/dropdown-menu';
-import { useToast } from '@documenso/ui/primitives/use-toast';
 
 import { DeleteDraftDocumentDialog } from './delete-draft-document-dialog';
 
@@ -47,13 +42,6 @@ export type DataTableActionDropdownProps = {
 
 export const DataTableActionDropdown = ({ row }: DataTableActionDropdownProps) => {
   const { data: session } = useSession();
-
-  const { toast } = useToast();
-
-  const { createAndCopyShareLink, isCopyingShareLink } = useCopyShareLink({
-    onSuccess: () => toast(TOAST_DOCUMENT_SHARE_SUCCESS),
-    onError: () => toast(TOAST_DOCUMENT_SHARE_ERROR),
-  });
 
   const [isDeleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
@@ -156,22 +144,18 @@ export const DataTableActionDropdown = ({ row }: DataTableActionDropdownProps) =
           Resend
         </DropdownMenuItem>
 
-        <DropdownMenuItem
-          disabled={isDraft}
-          onClick={async () =>
-            createAndCopyShareLink({
-              token: recipient?.token,
-              documentId: row.id,
-            })
-          }
-        >
-          {isCopyingShareLink ? (
-            <Loader className="mr-2 h-4 w-4" />
-          ) : (
-            <Share className="mr-2 h-4 w-4" />
+        <DocumentShareButton
+          documentId={row.id}
+          token={recipient?.token}
+          trigger={({ loading, disabled }) => (
+            <DropdownMenuItem disabled={disabled || isDraft} onSelect={(e) => e.preventDefault()}>
+              <div className="flex items-center">
+                {loading ? <Loader className="mr-2 h-4 w-4" /> : <Share className="mr-2 h-4 w-4" />}
+                Share
+              </div>
+            </DropdownMenuItem>
           )}
-          Share
-        </DropdownMenuItem>
+        />
       </DropdownMenuContent>
 
       {isDocumentDeletable && (
