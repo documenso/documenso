@@ -1,8 +1,9 @@
+import { disableTwoFactorAuthentication } from '@documenso/lib/server-only/2fa/disable-2fa';
 import { enableTwoFactorAuthentication } from '@documenso/lib/server-only/2fa/enable-2fa';
 import { setupTwoFactorAuthentication } from '@documenso/lib/server-only/2fa/setup-2fa';
 
 import { authenticatedProcedure, router } from '../trpc';
-import { ZEnableMutation, ZSetupMutation } from './schema';
+import { ZDisableMutation, ZEnableMutation, ZSetupMutation } from './schema';
 
 export const twoFactorRouter = router({
   setup: authenticatedProcedure
@@ -14,5 +15,10 @@ export const twoFactorRouter = router({
     .input(ZEnableMutation)
     .mutation(async ({ ctx: { user }, input: { code } }) => {
       return await enableTwoFactorAuthentication({ user, code });
+    }),
+  disable: authenticatedProcedure
+    .input(ZDisableMutation)
+    .mutation(async ({ ctx: { user }, input: { code, password } }) => {
+      return await disableTwoFactorAuthentication({ user, code, password });
     }),
 });
