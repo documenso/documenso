@@ -31,7 +31,10 @@ export const authRouter = router({
     .input(ZVerifyPasswordMutationSchema)
     .mutation(async ({ input: { password }, ctx: { user } }) => {
       if (!user.password) {
-        throw new Error(ErrorCode.USER_MISSING_PASSWORD);
+        throw new TRPCError({
+          code: 'UNAUTHORIZED',
+          message: ErrorCode.INCORRECT_PASSWORD,
+        });
       }
       const verified = await compare(password, user.password);
       return { verified };

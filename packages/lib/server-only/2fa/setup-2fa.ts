@@ -1,3 +1,4 @@
+import { TRPCError } from '@trpc/server';
 import { compare } from 'bcrypt';
 import crypto from 'crypto';
 import { encodeBase32 } from 'oslo/encoding';
@@ -24,21 +25,32 @@ export const setupTwoFactorAuthentication = async ({
   const encryptionKey = process.env.DOCUMENSO_ENCRYPTION_KEY;
 
   if (!encryptionKey) {
-    throw new Error(ErrorCode.INTERNAL_SEVER_ERROR);
+    throw new TRPCError({
+      code: 'INTERNAL_SERVER_ERROR',
+      message: ErrorCode.MISSING_ENCRYPTION_KEY,
+    });
   }
 
   if (user.identityProvider !== 'DOCUMENSO') {
-    throw new Error(ErrorCode.CREDENTIALS_NOT_FOUND);
+    throw new TRPCError({
+      code: 'INTERNAL_SERVER_ERROR',
+      message: ErrorCode.INCORRECT_IDENTITY_PROVIDER,
+    });
   }
 
   if (!user.password) {
-    throw new Error(ErrorCode.USER_MISSING_PASSWORD);
+    throw new TRPCError({
+      code: 'INTERNAL_SERVER_ERROR',
+      message: ErrorCode.USER_MISSING_PASSWORD,
+    });
   }
-
   const isCorrectPassword = await compare(password, user.password);
 
   if (!isCorrectPassword) {
-    throw new Error(ErrorCode.INCORRECT_EMAIL_PASSWORD);
+    throw new TRPCError({
+      code: 'UNAUTHORIZED',
+      message: ErrorCode.INCORRECT_PASSWORD,
+    });
   }
 
   const secret = crypto.randomBytes(10);

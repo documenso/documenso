@@ -22,7 +22,7 @@ export const enableTwoFactorAuthentication = async ({
   if (!encryptionKey) {
     throw new TRPCError({
       code: 'INTERNAL_SERVER_ERROR',
-      message: ErrorCode.INTERNAL_SEVER_ERROR,
+      message: ErrorCode.MISSING_ENCRYPTION_KEY,
     });
   }
 
