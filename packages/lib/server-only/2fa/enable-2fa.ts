@@ -1,3 +1,4 @@
+import { TRPCError } from '@trpc/server';
 import { decodeBase32 } from 'oslo/encoding';
 import { TOTPController } from 'oslo/otp';
 
@@ -19,19 +20,31 @@ export const enableTwoFactorAuthentication = async ({
   const encryptionKey = process.env.DOCUMENSO_ENCRYPTION_KEY;
 
   if (!encryptionKey) {
-    throw new Error(ErrorCode.INTERNAL_SEVER_ERROR);
+    throw new TRPCError({
+      code: 'INTERNAL_SERVER_ERROR',
+      message: ErrorCode.INTERNAL_SEVER_ERROR,
+    });
   }
 
   if (user.identityProvider !== 'DOCUMENSO') {
-    throw new Error(ErrorCode.CREDENTIALS_NOT_FOUND);
+    throw new TRPCError({
+      code: 'INTERNAL_SERVER_ERROR',
+      message: ErrorCode.INCORRECT_IDENTITY_PROVIDER,
+    });
   }
 
   if (user.twoFactorEnabled) {
-    throw new Error(ErrorCode.TWO_FACTOR_ALREADY_ENABLED);
+    throw new TRPCError({
+      code: 'INTERNAL_SERVER_ERROR',
+      message: ErrorCode.TWO_FACTOR_ALREADY_ENABLED,
+    });
   }
 
   if (!user.twoFactorSecret) {
-    throw new Error(ErrorCode.TWO_FACTOR_SETUP_REQUIRED);
+    throw new TRPCError({
+      code: 'INTERNAL_SERVER_ERROR',
+      message: ErrorCode.TWO_FACTOR_SETUP_REQUIRED,
+    });
   }
 
   const secret = decryptSymmetric({ encryptedData: user.twoFactorSecret, key: encryptionKey });
@@ -41,7 +54,10 @@ export const enableTwoFactorAuthentication = async ({
   const isValidToken = await otpController.verify(code, decodeBase32(secret));
 
   if (!isValidToken) {
-    throw new Error(ErrorCode.INCORRECT_TWO_FACTOR_CODE);
+    throw new TRPCError({
+      code: 'UNAUTHORIZED',
+      message: ErrorCode.INCORRECT_TWO_FACTOR_CODE,
+    });
   }
 
   await prisma.user.update({
