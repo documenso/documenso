@@ -1,3 +1,4 @@
+import { TRPCError } from '@trpc/server';
 import { compare } from 'bcrypt';
 import { decodeBase32 } from 'oslo/encoding';
 import { TOTPController } from 'oslo/otp';
@@ -22,29 +23,47 @@ export const disableTwoFactorAuthentication = async ({
   const encryptionKey = process.env.DOCUMENSO_ENCRYPTION_KEY;
 
   if (!encryptionKey) {
-    throw new Error(ErrorCode.INTERNAL_SEVER_ERROR);
+    throw new TRPCError({
+      code: 'INTERNAL_SERVER_ERROR',
+      message: ErrorCode.INTERNAL_SEVER_ERROR,
+    });
   }
 
   if (user.identityProvider !== 'DOCUMENSO') {
-    throw new Error(ErrorCode.CREDENTIALS_NOT_FOUND);
+    throw new TRPCError({
+      code: 'INTERNAL_SERVER_ERROR',
+      message: ErrorCode.INCORRECT_IDENTITY_PROVIDER,
+    });
   }
 
   if (!user.password) {
-    throw new Error(ErrorCode.USER_MISSING_PASSWORD);
+    throw new TRPCError({
+      code: 'INTERNAL_SERVER_ERROR',
+      message: ErrorCode.USER_MISSING_PASSWORD,
+    });
+  }
+
+  if (!user.twoFactorEnabled) {
+    throw new TRPCError({
+      code: 'INTERNAL_SERVER_ERROR',
+      message: ErrorCode.TWO_FACTOR_SETUP_REQUIRED,
+    });
+  }
+
+  if (!user.twoFactorSecret) {
+    throw new TRPCError({
+      code: 'INTERNAL_SERVER_ERROR',
+      message: ErrorCode.TWO_FACTOR_MISSING_SECRET,
+    });
   }
 
   const isCorrectPassword = await compare(password, user.password);
 
   if (!isCorrectPassword) {
-    throw new Error(ErrorCode.INCORRECT_EMAIL_PASSWORD);
-  }
-
-  if (!user.twoFactorEnabled) {
-    throw new Error(ErrorCode.TWO_FACTOR_SETUP_REQUIRED);
-  }
-
-  if (!user.twoFactorSecret) {
-    throw new Error(ErrorCode.TWO_FACTOR_SETUP_REQUIRED);
+    throw new TRPCError({
+      code: 'UNAUTHORIZED',
+      message: ErrorCode.INCORRECT_PASSWORD,
+    });
   }
 
   if (code) {
@@ -55,7 +74,10 @@ export const disableTwoFactorAuthentication = async ({
     const isValidToken = await otpController.verify(code, decodeBase32(secret));
 
     if (!isValidToken) {
-      throw new Error(ErrorCode.INCORRECT_TWO_FACTOR_CODE);
+      throw new TRPCError({
+        code: 'UNAUTHORIZED',
+        message: ErrorCode.INCORRECT_TWO_FACTOR_CODE,
+      });
     }
 
     await prisma.user.update({
@@ -72,5 +94,8 @@ export const disableTwoFactorAuthentication = async ({
     return { message: '2fa disabled successfully' };
   }
 
-  throw new Error(ErrorCode.CREDENTIALS_NOT_FOUND);
+  throw new TRPCError({
+    code: 'INTERNAL_SERVER_ERROR',
+    message: ErrorCode.INTERNAL_SEVER_ERROR,
+  });
 };
