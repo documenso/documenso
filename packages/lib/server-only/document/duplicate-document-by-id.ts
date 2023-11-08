@@ -41,6 +41,7 @@ export const duplicateDocumentById = async ({ id, userId }: DuplicateDocumentByI
       documentData: {
         create: {
           ...document.documentData,
+          data: document.documentData.initialData,
         },
       },
       documentMeta: {
