@@ -18,16 +18,6 @@ type DuplicateDocumentDialogProps = {
   onOpenChange: (_open: boolean) => void;
 };
 
-export function Loading() {
-  return (
-    <div className="mx-auto -mt-4 flex w-full max-w-screen-xl flex-col px-4 md:px-8">
-      <h1 className="mt-4 grow-0 truncate text-2xl font-semibold md:text-3xl">
-        Loading Document...
-      </h1>
-    </div>
-  );
-}
-
 export const DuplicateDocumentDialog = ({
   id,
   open,
@@ -72,7 +62,11 @@ export const DuplicateDocumentDialog = ({
           <DialogTitle>Duplicate</DialogTitle>
         </DialogHeader>
         {!data?.documentData || isLoading ? (
-          <Loading></Loading>
+          <div className="mx-auto -mt-4 flex w-full max-w-screen-xl flex-col px-4 md:px-8">
+            <h1 className="mt-4 grow-0 truncate text-2xl font-semibold md:text-3xl">
+              Loading Document...
+            </h1>
+          </div>
         ) : (
           <div className="p-2 [&>div]:h-[50vh] [&>div]:overflow-y-scroll  ">
             <LazyPDFViewer key={data?.documentMeta?.documentId} documentData={data?.documentData} />
@@ -92,7 +86,7 @@ export const DuplicateDocumentDialog = ({
 
             <Button
               type="button"
-              disabled={isLoading}
+              disabled={isDuplicateLoading || isLoading}
               loading={isDuplicateLoading}
               onClick={onDuplicate}
               className="flex-1"

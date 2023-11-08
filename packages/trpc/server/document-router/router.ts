@@ -3,12 +3,12 @@ import { TRPCError } from '@trpc/server';
 import { getServerLimits } from '@documenso/ee/server-only/limits/server';
 import { createDocument } from '@documenso/lib/server-only/document/create-document';
 import { deleteDraftDocument } from '@documenso/lib/server-only/document/delete-draft-document';
+import { duplicateDocumentById } from '@documenso/lib/server-only/document/duplicate-document-by-id';
 import { getDocumentById } from '@documenso/lib/server-only/document/get-document-by-id';
 import { getDocumentAndSenderByToken } from '@documenso/lib/server-only/document/get-document-by-token';
 import { sendDocument } from '@documenso/lib/server-only/document/send-document';
 import { setFieldsForDocument } from '@documenso/lib/server-only/field/set-fields-for-document';
 import { setRecipientsForDocument } from '@documenso/lib/server-only/recipient/set-recipients-for-document';
-import { prisma } from '@documenso/prisma';
 
 import { authenticatedProcedure, procedure, router } from '../trpc';
 import {
@@ -179,54 +179,11 @@ export const documentRouter = router({
     .mutation(async ({ input, ctx }) => {
       try {
         const { id } = input;
-        const { user } = ctx;
 
-        const document = await prisma.document.findUniqueOrThrow({
-          where: {
-            id,
-            userId: user.id,
-          },
-          select: {
-            title: true,
-            userId: true,
-            documentData: {
-              select: {
-                data: true,
-                initialData: true,
-                type: true,
-              },
-            },
-            documentMeta: {
-              select: {
-                message: true,
-                subject: true,
-              },
-            },
-          },
+        return await duplicateDocumentById({
+          id,
+          userId: ctx.user.id,
         });
-
-        const createdDocument = await prisma.document.create({
-          data: {
-            title: document.title,
-            User: {
-              connect: {
-                id: document.userId,
-              },
-            },
-            documentData: {
-              create: {
-                ...document.documentData,
-              },
-            },
-            documentMeta: {
-              create: {
-                ...document.documentMeta,
-              },
-            },
-          },
-        });
-
-        return createdDocument.id;
       } catch (err) {
         console.log(err);
         throw new TRPCError({
