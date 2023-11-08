@@ -6,7 +6,6 @@ import { P, match } from 'ts-pattern';
 import { getRecipientOrSenderByShareLinkSlug } from '@documenso/lib/server-only/share/get-recipient-or-sender-by-share-link-slug';
 
 import { Logo } from '~/components/branding/logo';
-import { getAssetBuffer } from '~/helpers/get-asset-buffer';
 
 const CARD_OFFSET_TOP = 152;
 const CARD_OFFSET_LEFT = 350;
@@ -22,17 +21,33 @@ type SharePageOpenGraphImageProps = {
   params: { slug: string };
 };
 
+type APIResponse =
+  | Awaited<ReturnType<typeof getRecipientOrSenderByShareLinkSlug>>
+  | { error: 'Not found' };
+
 export async function GET(_request: Request, { params: { slug } }: SharePageOpenGraphImageProps) {
   const [interSemiBold, interRegular, caveatRegular, shareFrameImage] = await Promise.all([
-    getAssetBuffer('/fonts/inter-semibold.ttf'),
-    getAssetBuffer('/fonts/inter-regular.ttf'),
-    getAssetBuffer('/fonts/caveat-regular.ttf'),
-    getAssetBuffer('/static/og-share-frame.png'),
+    fetch(new URL('./../../../../../../public/fonts/inter-semibold.ttf', import.meta.url)).then(
+      async (res) => res.arrayBuffer(),
+    ),
+    fetch(new URL('./../../../../../../public/fonts/inter-regular.ttf', import.meta.url)).then(
+      async (res) => res.arrayBuffer(),
+    ),
+    fetch(new URL('./../../../../../../public/fonts/caveat-regular.ttf', import.meta.url)).then(
+      async (res) => res.arrayBuffer(),
+    ),
+    fetch(new URL('./../../../../../../public/static/og-share-frame.png', import.meta.url)).then(
+      async (res) => res.arrayBuffer(),
+    ),
   ]);
 
-  const recipientOrSender = await getRecipientOrSenderByShareLinkSlug({ slug }).catch(() => null);
+  const baseUrl = process.env.NEXT_PUBLIC_WEBAPP_URL || 'http://localhost:3000';
 
-  if (!recipientOrSender) {
+  const recipientOrSender: APIResponse = await fetch(
+    new URL(`${baseUrl}/api/share?id=${slug}`),
+  ).then(async (res) => res.json());
+
+  if ('error' in recipientOrSender) {
     return NextResponse.json({ error: 'Not found' }, { status: 404 });
   }
 
@@ -156,3 +171,5 @@ export async function GET(_request: Request, { params: { slug } }: SharePageOpen
     },
   );
 }
+
+export const runtime = 'edge';

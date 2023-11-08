@@ -7,6 +7,7 @@ import Link from 'next/link';
 import { useFeatureFlags } from '@documenso/lib/client-only/providers/feature-flag';
 import { DocumentStatus, Signature } from '@documenso/prisma/client';
 import { DocumentWithRecipient } from '@documenso/prisma/types/document-with-recipient';
+import signingCelebration from '@documenso/public-assets/images/signing-celebration.png';
 import DocumentDialog from '@documenso/ui/components/document/document-dialog';
 import { DocumentDownloadButton } from '@documenso/ui/components/document/document-download-button';
 import { DocumentShareButton } from '@documenso/ui/components/document/document-share-button';
@@ -14,7 +15,6 @@ import { SigningCard3D } from '@documenso/ui/components/signing-card';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
 
-import signingCelebration from '~/assets/signing-celebration.png';
 import { ConfettiScreen } from '~/components/(marketing)/confetti-screen';
 
 interface SinglePlayerModeSuccessProps {

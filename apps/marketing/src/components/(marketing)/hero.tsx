@@ -9,10 +9,9 @@ import { LuGithub } from 'react-icons/lu';
 import { match } from 'ts-pattern';
 
 import { useFeatureFlags } from '@documenso/lib/client-only/providers/feature-flag';
+import backgroundPattern from '@documenso/public-assets/images/background-pattern.png';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
-
-import backgroundPattern from '~/assets/background-pattern.png';
 
 import { Widget } from './widget';
 
