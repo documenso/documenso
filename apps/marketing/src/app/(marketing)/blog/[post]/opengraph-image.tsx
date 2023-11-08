@@ -31,9 +31,9 @@ export default async function BlogPostOpenGraphImage({ params }: BlogPostOpenGra
     fetch(new URL('./../../../../../public/fonts/inter-regular.ttf', import.meta.url)).then(
       async (res) => res.arrayBuffer(),
     ),
-    fetch(
-      new URL('./../../../../../public/images/background-pattern-og.png', import.meta.url),
-    ).then(async (res) => res.arrayBuffer()),
+    fetch(new URL('./../../../../../public/images/background-blog-og.png', import.meta.url)).then(
+      async (res) => res.arrayBuffer(),
+    ),
     fetch(new URL('./../../../../../public/logo.png', import.meta.url)).then(async (res) =>
       res.arrayBuffer(),
     ),
