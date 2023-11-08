@@ -15,7 +15,12 @@
     "@trpc/next": "^10.36.0",
     "@trpc/react-query": "^10.36.0",
     "@trpc/server": "^10.36.0",
+    "oslo": "^0.17.0",
+    "qrcode": "^1.5.3",
     "superjson": "^1.13.1",
     "zod": "^3.22.4"
+  },
+  "devDependencies": {
+    "@types/qrcode": "^1.5.4"
   }
 }
