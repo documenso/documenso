@@ -28,7 +28,7 @@ const LOGIN_REDIRECT_PATH = '/documents';
 
 export const ZSignInFormSchema = z.object({
   email: z.string().email().min(1),
-  password: z.string().min(6).max(72),
+  password: z.string().min(6, { message: 'Invalid password' }).max(72),
 });
 
 export type TSignInFormSchema = z.infer<typeof ZSignInFormSchema>;
