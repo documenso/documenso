@@ -1,0 +1,116 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 222.2 47.4% 11.2%;
+
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 47.4% 11.2%;
+
+    --card: 0 0% 100%;
+    --card-border: 214.3 31.8% 91.4%;
+    --card-border-tint: 112 205 159;
+    --card-foreground: 222.2 47.4% 11.2%;
+
+    --widget: 0 0% 97%;
+
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+
+    --primary: 95.08 71.08% 67.45%;
+    --primary-foreground: 95.08 71.08% 10%;
+
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 222.2 47.4% 11.2%;
+
+    --destructive: 0 100% 50%;
+    --destructive-foreground: 210 40% 98%;
+
+    --ring: 95.08 71.08% 67.45%;
+
+    --radius: 0.5rem;
+  }
+
+  .dark {
+    --background: 0 0% 14.9%;
+    --foreground: 0 0% 97%;
+
+    --muted: 0 0% 23.4%;
+    --muted-foreground: 0 0% 85%;
+
+    --popover: 0 0% 14.9%;
+    --popover-foreground: 0 0% 90%;
+
+    --card: 0 0% 14.9%;
+    --card-border: 0 0% 27.9%;
+    --card-border-tint: 112 205 159;
+    --card-foreground: 0 0% 95%;
+
+    --border: 0 0% 27.9%;
+    --input: 0 0% 27.9%;
+
+    --primary: 95.08 71.08% 67.45%;
+    --primary-foreground: 95.08 71.08% 10%;
+
+    --secondary: 0 0% 23.4%;
+    --secondary-foreground: 95.08 71.08% 67.45%;
+
+    --accent: 0 0% 27.9%;
+    --accent-foreground: 95.08 71.08% 67.45%;
+
+    --destructive: 0 87% 62%;
+    --destructive-foreground: 0 87% 19%;
+
+    --ring: 95.08 71.08% 67.45%;
+
+    --radius: 0.5rem;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: 'rlig' 1, 'calt' 1;
+  }
+}
+
+.gradient-border-mask::before {
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+  -webkit-mask-composite: xor;
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+  background: transparent;
+  border-radius: 10px;
+  scrollbar-gutter: stable;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  border-radius: 10px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgb(100 116 139 / 1);
+  border-radius: 10px;
+  width: 8px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgb(100 116 139 / 0.5);
+}

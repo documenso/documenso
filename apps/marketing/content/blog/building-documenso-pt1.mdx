@@ -1,0 +1,98 @@
+---
+title: 'Building Documenso — Part 1: Certificates'
+description: In today's fast-paced world, productivity and efficiency are crucial for success, both in personal and professional endeavors. We all strive to make the most of our time and energy to achieve our goals effectively. However, it's not always easy to stay on track and maintain peak performance. In this blog post, we'll explore 10 valuable tips to help you boost productivity and efficiency in your daily life.
+authorName: 'Timur Ercan'
+authorImage: '/blog/blog-author-timur.jpeg'
+authorRole: 'Co-Founder'
+date: 2023-06-23
+tags:
+  - Open Source
+  - Document Signature
+  - Certificates
+  - Signing
+---
+
+<figure>
+  <MdxNextImage
+    src="/blog/blog-banner-building-documenso.webp"
+    width="1200"
+    height="675"
+    alt="Building Documenso blog banner"
+  />
+
+  <figcaption className="text-center">
+    What actually is a signature?
+  </figcaption>
+</figure>
+
+> Disclaimer: I’m not a lawyer and this isn’t legal advice. We plan to publish a much more specific framework on the topic of signature validity.
+
+This is the first installment of the new Building Documenso series, where I describe the challenges and design choices that we make while building the world’s most open signing platform.
+
+As you may have heard, we launched the community-reviewed <a href="https://github.com/documenso/documenso" target="_blank">version 0.9 of Documenso on GitHub</a> recently and it’s now available through the early adopter’s plan. One of the most fundamental choices we had to make on this first release, was the choice of certificate. While it’s interesting to know what we opted for, this shall also serve as a guide for everyone facing the same choice for self-hosting Documenso.
+
+> Question: Why do I need a document signing certificate to self-host?
+>
+> Short Answer: Inserting the images of a signature into the document is only part of the signing process.
+
+To have an actual digitally signed document you need a document signing certificate that is used to create the digital signature that is inserted into the document, alongside the visible one¹.
+
+When hosting a signature service yourself, as we do, there are four main choices for handling the certificate: Not using a certificate, creating your own, buying a trusted certificate, and becoming and trusted service provider to issue your own trusted certificate.
+
+## 1\. No Certificate
+
+A lot of signing services actually don’t employ actual digital signatures besides the inserted image. The only insert and image of the signatures into the document you sign. This can be done and is legally acceptable in many cases. This option isn’t directly supported by Documenso without changing the code.
+
+## 2\. Create your own
+
+Since the cryptography behind certificates is freely available as open source you could generate your own using OpenSSL for example. Since it’s hardly more work than option 1 (using Documenso at least), this would be my minimum effort recommendation. Having a self-created (“self-signed”) certificate doesn’t add much in terms of regulation but it guarantees the document’s integrity, meaning no changes have been made after signing². What this doesn’t give you, is the famous green checkmark in Adobe Acrobat. Why? Because you aren’t on the list of providers Adobe “trusts”.³
+
+## 3\. Buy a “trusted” certificate.
+
+There are Certificate Authorities (CAs) that can sell you a certificate⁴. The service they provide is, that they validate your name (personal certificates) or your organization’s name (corporate certificate) before creating your certificate for you, just like you did in option 2. The difference is, that they are listed on the previously mentioned trust lists (e.g. Adobe’s) and thus the resulting signatures get a nice, green checkmark in Adobe Reader⁵
+
+## 4\. Becoming a Trusted Certificate Authority (CA) yourself and create your own certificate
+
+This option is an incredibly complex endeavour, requiring a lot of effort and skill. It can be done, as there are multiple CAs around the world. Is it worth the effort? That depends a lot on what you’re trying to accomplish.
+
+<center>.&nbsp;&nbsp;.&nbsp;&nbsp;.</center>
+
+## What we did
+
+Having briefly introduced the options, here is what we did: Since we aim to raise the bar on digital signature proliferation and trust, we opted to buy an “Advanced Personal Certificates for Companies/Organisations” from WiseKey. Thus, documents signed with Documenso’s hosted version look like this:
+
+<figure>
+  <MdxNextImage
+    src="/blog/blog-fig-building-documenso.webp"
+    width="1262"
+    height="481"
+    alt="Figure 1"
+  />
+
+  <figcaption className="text-center">The famous green checkmark: Signed by hosted Documenso</figcaption>
+</figure>
+
+There weren’t any deeper reasons we choose WiseKey, other than they offered what we needed and there wasn’t any reason to look much further. While I didn’t map the entire certificate market offering (yet), I’m pretty sure something similar could be found elsewhere. While we opted for option 3, choosing option 2 might be perfectly reasonable considering your use case.⁶
+
+> While this is our setup, for now, we have a bigger plan for this topic. While globally trusted SSL Certificates have been available for free, courtesy of Let’s Encrypt, for a while now, there is no such thing as document signing. And there should be. Not having free and trusted infrastructure for signing is blocking a completely new generation of signing products from being created. This is why we’ll start working on option 4 when the time is right.
+
+Do you have questions or thoughts about this? As always, let me know in the comments, on <a href="http://twitter.com/eltimuro" target="_blank">twitter.com/eltimuro</a>
+or directly: <a href="https://documen.so/timur" target="_blank">documen.so/timur</a>
+
+Join the self-hoster community here: <a href="https://documen.so/discord" target="_blank">https://documen.so/discord</a>
+
+Best from Hamburg
+
+Timur
+
+\[1\] There are different approaches to signing a document. For the sake of simplicity, here we talk about a document with X inserted signature images, that is afterward signed once the by signing service, i.e. Documenso. If each visual signature should have its own digital one (e.g. QES — eIDAS Level 3), the case is a bit more complex.
+
+\[2\] Of course, the signing service provider technically can change and resign the document, especially in the case mentioned in \[1\]. This can be countered by requiring actual digital signatures from each signer, that are bound to their identity/ account. Creating a completely trustless system in the context however is extremely hard to do and not the most pressing business need for the industry at this point, in my opinion. Though, this would be nice.
+
+\[3\] Adobe, like the EU, has a list of organizations they trust. The Adobe green checkmark is powered by the Adobe trust list, if you want to be trusted by EU standards here: <a href="https://ec.europa.eu/digital-building-blocks/DSS/webapp-demo/validation" target="_blank">https://ec.europa.eu/digital-building-blocks/DSS/webapp-demo/validation</a>, you need to be on the EU trust list. Getting on each list is possible, though the latter is much more work.
+
+\[4\] Technically, they sign your certificate creation request (created by you), containing your info with their certificate (which is trusted), making your certificate trusted. This way, everything you sign with your certificate is seen as trusted. They created their certificate just like you, the difference is they are on the lists, mentioned in \[3\]
+
+\[5\] Why does Adobe get to say, what is trusted? They simply happen to have the most used pdf viewer. And since everyone checks there, whom they consider trusted carries weight. If it should be like this, is a different matter.
+
+\[6\] Self-Signed signatures, even purely visual signatures, are fully legally binding. Why you use changes mainly your confidence in the signature and the burden of proof. Also, some industries require a certain level of signatures e.g. retail loans (QES/ eIDAS Level 3 in the EU).

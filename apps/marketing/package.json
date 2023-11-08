@@ -1,0 +1,46 @@
+{
+  "name": "@documenso/marketing",
+  "version": "0.1.0",
+  "private": true,
+  "license": "AGPL-3.0",
+  "scripts": {
+    "dev": "next dev -p 3001",
+    "build": "next build",
+    "start": "next start -p 3001",
+    "lint": "next lint",
+    "clean": "rimraf .next && rimraf node_modules",
+    "copy:pdfjs": "node ../../scripts/copy-pdfjs.cjs"
+  },
+  "dependencies": {
+    "@documenso/lib": "*",
+    "@documenso/tailwind-config": "*",
+    "@documenso/trpc": "*",
+    "@documenso/ui": "*",
+    "@hookform/resolvers": "^3.1.0",
+    "contentlayer": "^0.3.4",
+    "framer-motion": "^10.12.8",
+    "lucide-react": "^0.279.0",
+    "luxon": "^3.4.0",
+    "micro": "^10.0.1",
+    "next": "14.0.0",
+    "next-auth": "4.24.3",
+    "next-contentlayer": "^0.3.4",
+    "next-plausible": "^3.10.1",
+    "perfect-freehand": "^1.2.0",
+    "posthog-js": "^1.77.3",
+    "react": "18.2.0",
+    "react-confetti": "^6.1.0",
+    "react-dom": "18.2.0",
+    "react-hook-form": "^7.43.9",
+    "react-icons": "^4.11.0",
+    "recharts": "^2.7.2",
+    "sharp": "0.32.5",
+    "typescript": "5.2.2",
+    "zod": "^3.22.4"
+  },
+  "devDependencies": {
+    "@types/node": "20.1.0",
+    "@types/react": "18.2.18",
+    "@types/react-dom": "18.2.7"
+  }
+}
