@@ -32,6 +32,7 @@ import {
 } from '@documenso/ui/primitives/dropdown-menu';
 
 import { DeleteDraftDocumentDialog } from './delete-draft-document-dialog';
+import { DuplicateDocumentDialog } from './duplicate-document-dialog';
 
 export type DataTableActionDropdownProps = {
   row: Document & {
@@ -44,6 +45,7 @@ export const DataTableActionDropdown = ({ row }: DataTableActionDropdownProps) =
   const { data: session } = useSession();
 
   const [isDeleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [isDuplicateDialogOpen, setDuplicateDialogOpen] = useState(false);
 
   if (!session) {
     return null;
@@ -122,7 +124,7 @@ export const DataTableActionDropdown = ({ row }: DataTableActionDropdownProps) =
           Download
         </DropdownMenuItem>
 
-        <DropdownMenuItem disabled>
+        <DropdownMenuItem onClick={() => setDuplicateDialogOpen(true)}>
           <Copy className="mr-2 h-4 w-4" />
           Duplicate
         </DropdownMenuItem>
@@ -163,6 +165,13 @@ export const DataTableActionDropdown = ({ row }: DataTableActionDropdownProps) =
           id={row.id}
           open={isDeleteDialogOpen}
           onOpenChange={setDeleteDialogOpen}
+        />
+      )}
+      {isDuplicateDialogOpen && (
+        <DuplicateDocumentDialog
+          id={row.id}
+          open={isDuplicateDialogOpen}
+          onOpenChange={setDuplicateDialogOpen}
         />
       )}
     </DropdownMenu>
