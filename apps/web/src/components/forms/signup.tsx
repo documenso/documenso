@@ -21,7 +21,7 @@ import { useToast } from '@documenso/ui/primitives/use-toast';
 export const ZSignUpFormSchema = z.object({
   name: z.string().trim().min(1, { message: 'Please enter a valid name.' }),
   email: z.string().email().min(1),
-  password: z.string().min(6).max(72),
+  password: z.string().min(6, { message: 'Password should contain at least 6 characters' }).max(72),
   signature: z.string().min(1, { message: 'We need your signature to sign documents' }),
 });
 
@@ -134,6 +134,7 @@ export const SignUpForm = ({ className }: SignUpFormProps) => {
             )}
           </Button>
         </div>
+        <FormErrorMessage className="mt-1.5" error={errors.password} />
       </div>
 
       <div>
