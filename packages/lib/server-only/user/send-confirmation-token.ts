@@ -7,7 +7,7 @@ import { sendConfirmationEmail } from '../auth/send-confirmation-email';
 
 const IDENTIFIER = 'confirmation-email';
 
-export const generateConfirmationToken = async ({ email }: { email: string }) => {
+export const sendConfirmationToken = async ({ email }: { email: string }) => {
   const token = crypto.randomBytes(20).toString('hex');
 
   const user = await prisma.user.findFirst({
@@ -20,21 +20,21 @@ export const generateConfirmationToken = async ({ email }: { email: string }) =>
     throw new Error('User not found');
   }
 
-  try {
-    await prisma.verificationToken.create({
-      data: {
-        identifier: IDENTIFIER,
-        token: token,
-        expires: new Date(Date.now() + ONE_HOUR),
-        user: {
-          connect: {
-            id: user.id,
-          },
+  const createdToken = await prisma.verificationToken.create({
+    data: {
+      identifier: IDENTIFIER,
+      token: token,
+      expires: new Date(Date.now() + ONE_HOUR),
+      user: {
+        connect: {
+          id: user.id,
         },
       },
-    });
-  } catch (error) {
-    throw new Error(`Failed to create the verification token: ${error}`);
+    },
+  });
+
+  if (!createdToken) {
+    throw new Error(`Failed to create the verification token`);
   }
 
   return sendConfirmationEmail({ userId: user.id });

@@ -1,9 +1,9 @@
 import { TRPCError } from '@trpc/server';
 
 import { forgotPassword } from '@documenso/lib/server-only/user/forgot-password';
-import { generateConfirmationToken } from '@documenso/lib/server-only/user/generate-confirmation-token';
 import { getUserById } from '@documenso/lib/server-only/user/get-user-by-id';
 import { resetPassword } from '@documenso/lib/server-only/user/reset-password';
+import { sendConfirmationToken } from '@documenso/lib/server-only/user/send-confirmation-token';
 import { updatePassword } from '@documenso/lib/server-only/user/update-password';
 import { updateProfile } from '@documenso/lib/server-only/user/update-profile';
 
@@ -119,7 +119,7 @@ export const profileRouter = router({
       try {
         const { email } = input;
 
-        return generateConfirmationToken({ email });
+        return sendConfirmationToken({ email });
       } catch (err) {
         let message = 'We were unable to send a confirmation email. Please try again.';
 

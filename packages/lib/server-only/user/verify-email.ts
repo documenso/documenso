@@ -1,6 +1,6 @@
 import { prisma } from '@documenso/prisma';
 
-import { generateConfirmationToken } from './generate-confirmation-token';
+import { sendConfirmationToken } from './send-confirmation-token';
 
 export type VerifyEmailProps = {
   token: string;
@@ -26,7 +26,7 @@ export const verifyEmail = async ({ token }: VerifyEmailProps) => {
   if (!valid) {
     // if the token is expired, generate a new token and send the email
     // and return false
-    await generateConfirmationToken({ email: verificationToken.user.email });
+    await sendConfirmationToken({ email: verificationToken.user.email });
     return valid;
   }
 
