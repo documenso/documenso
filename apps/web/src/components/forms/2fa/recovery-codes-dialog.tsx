@@ -16,8 +16,6 @@ type RecoveryCodesDialogProps = {
   backupCodes: string[] | null;
 };
 
-const formatBackupCode = (code: string) => `${code.slice(0, 5)}-${code.slice(5, 10)}`;
-
 export const RecoveryCodesDialog = ({
   onOpenChange,
   open,
@@ -28,7 +26,7 @@ export const RecoveryCodesDialog = ({
 
   const handleDownload = () => {
     if (backupCodes) {
-      const textBlob = new Blob([backupCodes.map(formatBackupCode).join('\n')], {
+      const textBlob = new Blob([backupCodes.join('\n')], {
         type: 'text/plain',
       });
       const downloadLink = document.createElement('a');
@@ -45,7 +43,7 @@ export const RecoveryCodesDialog = ({
 
   const handleCopy = async () => {
     if (backupCodes) {
-      await copy(backupCodes.map(formatBackupCode).join('\n'));
+      await copy(backupCodes.join('\n'));
       toast({
         title: 'Copied to clipboard',
         description: 'Your backup codes has been copied to your clipboard.',
@@ -67,7 +65,7 @@ export const RecoveryCodesDialog = ({
         {backupCodes && (
           <div className="bg-secondary mt-5 grid grid-cols-2 gap-1 rounded-md py-2 text-center font-mono md:pl-10 md:pr-10">
             {backupCodes.map((code) => (
-              <div key={code}>{formatBackupCode(code)}</div>
+              <div key={code}>{code}</div>
             ))}
           </div>
         )}
