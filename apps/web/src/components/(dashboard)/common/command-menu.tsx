@@ -40,22 +40,61 @@ const SETTINGS_PAGES = [
   { label: 'Password', path: '/settings/password' },
 ];
 
-export function CommandMenu() {
+export type CommandMenuProps = {
+  open?: boolean;
+  onOpenChange?: (_open: boolean) => void;
+};
+
+export function CommandMenu({ open, onOpenChange }: CommandMenuProps) {
   const { setTheme } = useTheme();
-  const { push } = useRouter();
-  const [open, setOpen] = useState(false);
+  const router = useRouter();
+
+  const [isOpen, setIsOpen] = useState(() => open ?? false);
   const [search, setSearch] = useState('');
   const [pages, setPages] = useState<string[]>([]);
+
   const currentPage = pages[pages.length - 1];
 
   const toggleOpen = () => {
-    setOpen((open) => !open);
+    setIsOpen((isOpen) => !isOpen);
+    onOpenChange?.(!isOpen);
+
+    if (isOpen) {
+      setPages([]);
+      setSearch('');
+    }
+  };
+
+  const setOpen = useCallback(
+    (open: boolean) => {
+      setIsOpen(open);
+      onOpenChange?.(open);
+
+      if (!open) {
+        setPages([]);
+        setSearch('');
+      }
+    },
+    [onOpenChange],
+  );
+
+  const push = useCallback(
+    (path: string) => {
+      router.push(path);
+      setOpen(false);
+    },
+    [router, setOpen],
+  );
+
+  const addPage = (page: string) => {
+    setPages((pages) => [...pages, page]);
+    setSearch('');
   };
 
   const goToSettings = useCallback(() => push(SETTINGS_PAGES[0].path), [push]);
   const goToDocuments = useCallback(() => push(DOCUMENTS_PAGES[0].path), [push]);
 
-  useHotkeys('ctrl+k', toggleOpen);
+  useHotkeys(['ctrl+k', 'meta+k'], toggleOpen);
   useHotkeys(SETTINGS_PAGE_SHORTCUT, goToSettings);
   useHotkeys(DOCUMENTS_PAGE_SHORTCUT, goToDocuments);
 
@@ -64,9 +103,11 @@ export function CommandMenu() {
     // Backspace goes to previous page when search is empty
     if (e.key === 'Escape' || (e.key === 'Backspace' && !search)) {
       e.preventDefault();
+
       if (currentPage === undefined) {
         setOpen(false);
       }
+
       setPages((pages) => pages.slice(0, -1));
     }
   };
@@ -78,6 +119,7 @@ export function CommandMenu() {
         onValueChange={setSearch}
         placeholder="Type a command or search..."
       />
+
       <CommandList>
         <CommandEmpty>No results found.</CommandEmpty>
         {!currentPage && (
@@ -89,7 +131,7 @@ export function CommandMenu() {
               <Commands push={push} pages={SETTINGS_PAGES} />
             </CommandGroup>
             <CommandGroup heading="Preferences">
-              <CommandItem onSelect={() => setPages([...pages, 'theme'])}>Change theme</CommandItem>
+              <CommandItem onSelect={() => addPage('theme')}>Change theme</CommandItem>
             </CommandGroup>
           </>
         )}
