@@ -8,6 +8,7 @@ import GoogleProvider, { GoogleProfile } from 'next-auth/providers/google';
 import { prisma } from '@documenso/prisma';
 
 import { authenticateTwoFactorAuth } from '../server-only/2fa/authenticate-2fa';
+import { isTwoFactorAuthEnabled } from '../server-only/2fa/is-2fa-availble';
 import { getUserByEmail } from '../server-only/user/get-user-by-email';
 import { ErrorCode } from './error-codes';
 
@@ -45,7 +46,8 @@ export const NEXT_AUTH_OPTIONS: AuthOptions = {
           throw new Error(ErrorCode.USER_MISSING_PASSWORD);
         }
 
-        if (user.twoFactorEnabled && user.identityProvider === 'DOCUMENSO') {
+        const is2faEnabled = isTwoFactorAuthEnabled({ user });
+        if (is2faEnabled) {
           await authenticateTwoFactorAuth({ backupCode, totpCode, user });
         }
 

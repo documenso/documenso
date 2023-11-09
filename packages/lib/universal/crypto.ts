@@ -1,5 +1,7 @@
 import crypto from 'crypto';
 
+import { DOCUMENSO_ENCRYPTION_KEY } from '../constants/crypto';
+
 const ALGORITHM = 'aes-256-gcm';
 const INPUT_ENCODING = 'utf8';
 const OUTPUT_ENCODING = 'hex';
@@ -11,7 +13,7 @@ type encryptSymmetricOptions = {
 };
 
 export const getEncryptionKey = () => {
-  const encryptionKey = process.env.DOCUMENSO_ENCRYPTION_KEY;
+  const encryptionKey = DOCUMENSO_ENCRYPTION_KEY;
 
   if (!encryptionKey) {
     throw new Error('Missing encryption key');
