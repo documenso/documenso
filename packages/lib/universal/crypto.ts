@@ -10,6 +10,15 @@ type encryptSymmetricOptions = {
   key: string;
 };
 
+export const getEncryptionKey = () => {
+  const encryptionKey = process.env.DOCUMENSO_ENCRYPTION_KEY;
+
+  if (!encryptionKey) {
+    throw new Error('Missing encryption key');
+  }
+  return encryptionKey;
+};
+
 export const encryptSymmetric = ({ key, data }: encryptSymmetricOptions) => {
   const iv = crypto.randomBytes(BLOCK_SIZE_BYTES);
   const cipher = crypto.createCipheriv(ALGORITHM, Buffer.from(key), iv);
