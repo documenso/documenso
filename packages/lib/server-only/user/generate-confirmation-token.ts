@@ -3,6 +3,7 @@ import crypto from 'crypto';
 import { prisma } from '@documenso/prisma';
 
 import { ONE_HOUR } from '../../constants/time';
+import { sendConfirmationEmail } from '../auth/send-confirmation-email';
 
 const IDENTIFIER = 'confirmation-email';
 
@@ -36,5 +37,5 @@ export const generateConfirmationToken = async ({ email }: { email: string }) =>
     throw new Error(`Failed to create the verification token`);
   }
 
-  return createdToken;
+  return sendConfirmationEmail({ userId: user.id });
 };
