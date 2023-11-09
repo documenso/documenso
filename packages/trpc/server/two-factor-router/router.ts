@@ -18,7 +18,7 @@ export const twoFactorRouter = router({
     }),
   disable: authenticatedProcedure
     .input(ZDisableMutation)
-    .mutation(async ({ ctx: { user }, input: { code, password } }) => {
-      return await disableTwoFactorAuthentication({ user, code, password });
+    .mutation(async ({ ctx: { user }, input: { code, password, backupCode } }) => {
+      return await disableTwoFactorAuthentication({ user, code, password, backupCode });
     }),
 });
