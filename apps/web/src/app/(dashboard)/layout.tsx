@@ -31,7 +31,6 @@ export default async function AuthenticatedDashboardLayout({
   return (
     <NextAuthProvider session={session}>
       <LimitsProvider>
-        <CommandMenu />
         <Header user={user} />
 
         <main className="mt-8 pb-8 md:mt-12 md:pb-12">{children}</main>
