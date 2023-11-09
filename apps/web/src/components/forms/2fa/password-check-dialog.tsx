@@ -56,6 +56,7 @@ export const PasswordCheckDialog = ({
     const isVerified = (await verifyPassword(data)).verified;
     if (isVerified) {
       await onVerified(data.password);
+      form.reset();
     } else {
       form.setError('password', {
         message: 'invalid password',
