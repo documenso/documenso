@@ -31,7 +31,7 @@ export default async function AuthenticatedDashboardLayout({
   return (
     <NextAuthProvider session={session}>
       <LimitsProvider>
-        {user && !user.emailVerified && <VerifyEmailBanner user={user} />}
+        {user && !user.emailVerified && <VerifyEmailBanner userEmail={user.email} />}
         <Header user={user} />
 
         <main className="mt-8 pb-8 md:mt-12 md:pb-12">{children}</main>

@@ -5,13 +5,17 @@ import { useState } from 'react';
 import { trpc } from '@documenso/trpc/react';
 import { Button } from '@documenso/ui/primitives/button';
 
-export const VerifyEmailBanner = ({ user }) => {
+export type VerifyEmailBannerProps = {
+  userEmail: string;
+};
+
+export const VerifyEmailBanner = ({ userEmail }: VerifyEmailBannerProps) => {
   const [isButtonDisabled, setIsButtonDisabled] = useState(false);
   const { mutateAsync: sendConfirmationEmail } = trpc.profile.sendConfirmationEmail.useMutation();
 
   const onResendConfirmationEmail = async () => {
     setIsButtonDisabled(true);
-    await sendConfirmationEmail({ email: user.email });
+    await sendConfirmationEmail({ email: userEmail });
     setTimeout(() => setIsButtonDisabled(false), 20000);
   };
 
@@ -19,7 +23,7 @@ export const VerifyEmailBanner = ({ user }) => {
     <div className="relative isolate mb-4 flex items-center gap-x-6 overflow-hidden bg-yellow-400 px-6 py-4 sm:px-3.5 sm:before:flex-1">
       <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2">
         <p className="text-sm leading-6 text-gray-900">
-          <strong className="font-semibold">Hey, {user.name ?? user.email}</strong>
+          <strong className="font-semibold">Hey, {userEmail}</strong>
           <svg
             viewBox="0 0 2 2"
             className="mx-2 inline h-0.5 w-0.5 fill-current"
