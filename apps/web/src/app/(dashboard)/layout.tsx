@@ -8,7 +8,6 @@ import { LimitsProvider } from '@documenso/ee/server-only/limits/provider/server
 import { NEXT_AUTH_OPTIONS } from '@documenso/lib/next-auth/auth-options';
 import { getRequiredServerComponentSession } from '@documenso/lib/next-auth/get-server-session';
 
-import { CommandMenu } from '~/components/(dashboard)/common/command-menu';
 import { Header } from '~/components/(dashboard)/layout/header';
 import { RefreshOnFocus } from '~/components/(dashboard)/refresh-on-focus/refresh-on-focus';
 import { NextAuthProvider } from '~/providers/next-auth';
