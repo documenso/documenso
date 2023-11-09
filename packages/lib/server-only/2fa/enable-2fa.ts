@@ -1,12 +1,10 @@
 import { TRPCError } from '@trpc/server';
-import { decodeBase32 } from 'oslo/encoding';
-import { TOTPController } from 'oslo/otp';
 
 import { ErrorCode } from '@documenso/lib/next-auth/error-codes';
 import { prisma } from '@documenso/prisma';
 import { User } from '@documenso/prisma/client';
 
-import { decryptSymmetric } from '../../universal/crypto';
+import { verifyTwoFactor } from './verify-2fa';
 
 type enableTwoFactorAuthenticationOptions = {
   user: User;
@@ -47,11 +45,7 @@ export const enableTwoFactorAuthentication = async ({
     });
   }
 
-  const secret = decryptSymmetric({ encryptedData: user.twoFactorSecret, key: encryptionKey });
-
-  const otpController = new TOTPController();
-
-  const isValidToken = await otpController.verify(code, decodeBase32(secret));
+  const isValidToken = await verifyTwoFactor({ user, totpCode: code });
 
   if (!isValidToken) {
     throw new TRPCError({
