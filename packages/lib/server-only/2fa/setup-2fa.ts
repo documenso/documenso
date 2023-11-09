@@ -18,6 +18,8 @@ type setupTwoFactorAuthenticationOptions = {
 
 const ISSUER = 'Documenso';
 
+const formatBackupCode = (code: string) => `${code.slice(0, 5)}-${code.slice(5, 10)}`;
+
 export const setupTwoFactorAuthentication = async ({
   user,
   password,
@@ -54,7 +56,9 @@ export const setupTwoFactorAuthentication = async ({
   }
 
   const secret = crypto.randomBytes(10);
-  const backupCodes = Array.from(Array(10), () => crypto.randomBytes(5).toString('hex'));
+  const backupCodes = Array.from(Array(10), () => crypto.randomBytes(5).toString('hex')).map(
+    formatBackupCode,
+  );
 
   const accountName = user.email;
   const uri = createTOTPKeyURI(ISSUER, accountName, secret);
