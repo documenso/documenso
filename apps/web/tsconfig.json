@@ -1,26 +1,28 @@
 {
+  "extends": "@documenso/tsconfig/nextjs.json",
   "compilerOptions": {
-    "target": "es5",
-    "lib": ["dom", "dom.iterable", "esnext"],
+    "baseUrl": ".",
     "allowJs": true,
-    "skipLibCheck": true,
-    "strict": true,
-    "forceConsistentCasingInFileNames": true,
-    "noEmit": true,
-    "esModuleInterop": true,
-    "module": "esnext",
-    "moduleResolution": "node",
-    "resolveJsonModule": true,
-    "isolatedModules": true,
-    "jsx": "preserve",
-    "incremental": true
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ],
+    "paths": {
+      "~/*": ["./src/*"],
+      "contentlayer/generated": ["./.contentlayer/generated"]
+    },
+    "types": ["@documenso/lib/types/next-auth.d.ts"],
+    "strictNullChecks": true,
+    "incremental": false
   },
   "include": [
     "next-env.d.ts",
-    "../../packages/types/*.d.ts",
-    "../../packages/types/next-auth.d.ts",
     "**/*.ts",
-    "**/*.tsx"
-, "../../packages/lib/process-env.d.ts"  ],
+    "**/*.tsx",
+    "**/*.d.ts",
+    ".next/types/**/*.ts",
+    ".contentlayer/generated"
+  ],
   "exclude": ["node_modules"]
 }

@@ -1,0 +1,14 @@
+{
+  "name": "@documenso/tsconfig",
+  "version": "0.0.0",
+  "license": "MIT",
+  "private": true,
+  "scripts": {
+    "clean": "rimraf node_modules"
+  },
+  "files": [
+    "base.json",
+    "nextjs.json",
+    "react-library.json"
+  ]
+}

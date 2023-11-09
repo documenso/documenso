@@ -3,13 +3,19 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("NEXT_PRIVATE_DATABASE_URL")
+  directUrl = env("NEXT_PRIVATE_DIRECT_DATABASE_URL")
 }
 
 enum IdentityProvider {
   DOCUMENSO
   GOOGLE
+}
+
+enum Role {
+  ADMIN
+  USER
 }
 
 model User {
@@ -19,12 +25,28 @@ model User {
   emailVerified      DateTime?
   password           String?
   source             String?
+  signature          String?
+  createdAt          DateTime             @default(now())
+  updatedAt          DateTime             @default(now()) @updatedAt
+  lastSignedIn       DateTime             @default(now())
+  roles              Role[]               @default([USER])
   identityProvider   IdentityProvider     @default(DOCUMENSO)
   accounts           Account[]
   sessions           Session[]
   Document           Document[]
-  Subscription       Subscription[]
+  Subscription       Subscription?
   PasswordResetToken PasswordResetToken[]
+
+  @@index([email])
+}
+
+model PasswordResetToken {
+  id        Int      @id @default(autoincrement())
+  token     String   @unique
+  createdAt DateTime @default(now())
+  expiry    DateTime
+  userId    Int
+  User      User     @relation(fields: [userId], references: [id])
 }
 
 enum SubscriptionStatus {
@@ -34,15 +56,16 @@ enum SubscriptionStatus {
 }
 
 model Subscription {
-  id         Int                @id @default(autoincrement())
-  status     SubscriptionStatus @default(INACTIVE)
-  planId     String?
-  priceId    String?
-  customerId String?
-  periodEnd  DateTime?
-  userId     Int
-  createdAt  DateTime           @default(now())
-  updatedAt  DateTime           @updatedAt
+  id                Int                @id @default(autoincrement())
+  status            SubscriptionStatus @default(INACTIVE)
+  planId            String?
+  priceId           String?
+  customerId        String
+  periodEnd         DateTime?
+  userId            Int                @unique
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+  cancelAtPeriodEnd Boolean            @default(false)
 
   User User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -84,15 +107,46 @@ enum DocumentStatus {
 }
 
 model Document {
-  id        Int            @id @default(autoincrement())
-  created   DateTime       @default(now())
-  userId    Int
-  User      User           @relation(fields: [userId], references: [id], onDelete: Cascade)
-  title     String
-  status    DocumentStatus @default(DRAFT)
-  document  String
-  Recipient Recipient[]
-  Field     Field[]
+  id             Int                 @id @default(autoincrement())
+  userId         Int
+  User           User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title          String
+  status         DocumentStatus      @default(DRAFT)
+  Recipient      Recipient[]
+  Field          Field[]
+  ShareLink      DocumentShareLink[]
+  documentDataId String
+  documentData   DocumentData        @relation(fields: [documentDataId], references: [id], onDelete: Cascade)
+  documentMeta   DocumentMeta?
+  createdAt      DateTime            @default(now())
+  updatedAt      DateTime            @default(now()) @updatedAt
+  completedAt    DateTime?
+
+  @@unique([documentDataId])
+  @@index([userId])
+  @@index([status])
+}
+
+enum DocumentDataType {
+  S3_PATH
+  BYTES
+  BYTES_64
+}
+
+model DocumentData {
+  id          String           @id @default(cuid())
+  type        DocumentDataType
+  data        String
+  initialData String
+  Document    Document?
+}
+
+model DocumentMeta {
+  id         String   @id @default(cuid())
+  subject    String?
+  message    String?
+  documentId Int      @unique
+  document   Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
 }
 
 enum ReadStatus {
@@ -124,11 +178,17 @@ model Recipient {
   Document      Document      @relation(fields: [documentId], references: [id], onDelete: Cascade)
   Field         Field[]
   Signature     Signature[]
+
+  @@unique([documentId, email])
+  @@index([documentId])
+  @@index([token])
 }
 
 enum FieldType {
   SIGNATURE
   FREE_SIGNATURE
+  NAME
+  EMAIL
   DATE
   TEXT
 }
@@ -139,13 +199,18 @@ model Field {
   recipientId Int?
   type        FieldType
   page        Int
-  positionX   Int        @default(0)
-  positionY   Int        @default(0)
+  positionX   Decimal    @default(0)
+  positionY   Decimal    @default(0)
+  width       Decimal    @default(-1)
+  height      Decimal    @default(-1)
   customText  String
   inserted    Boolean
   Document    Document   @relation(fields: [documentId], references: [id], onDelete: Cascade)
   Recipient   Recipient? @relation(fields: [recipientId], references: [id], onDelete: Cascade)
   Signature   Signature?
+
+  @@index([documentId])
+  @@index([recipientId])
 }
 
 model Signature {
@@ -158,13 +223,19 @@ model Signature {
 
   Recipient Recipient @relation(fields: [recipientId], references: [id], onDelete: Cascade)
   Field     Field     @relation(fields: [fieldId], references: [id], onDelete: Restrict)
+
+  @@index([recipientId])
 }
 
-model PasswordResetToken {
-  id        Int      @id @default(autoincrement())
-  token     String   @unique
-  createdAt DateTime @default(now())
-  expiry    DateTime
-  userId    Int
-  User      User     @relation(fields: [userId], references: [id])
+model DocumentShareLink {
+  id         Int      @id @default(autoincrement())
+  email      String
+  slug       String   @unique
+  documentId Int
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  document Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+
+  @@unique([documentId, email])
 }

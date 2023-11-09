@@ -1,0 +1,32 @@
+version: 2
+
+updates:
+  - package-ecosystem: 'github-actions'
+    directory: '/'
+    schedule:
+      interval: "weekly"
+    target-branch: "main"
+    labels:
+      - "ci dependencies"
+      - "ci"
+    open-pull-requests-limit: 0
+
+  - package-ecosystem: "npm"
+    directory: "/apps/marketing"
+    schedule:
+      interval: "weekly"
+    target-branch: "main"
+    labels:
+      - "npm dependencies"
+      - "frontend"
+    open-pull-requests-limit: 0
+
+  - package-ecosystem: "npm"
+    directory: "/apps/web"
+    schedule:
+      interval: "weekly"
+    target-branch: "main"
+    labels:
+      - "npm dependencies"
+      - "frontend"
+    open-pull-requests-limit: 0

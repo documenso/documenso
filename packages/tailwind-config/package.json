@@ -1,0 +1,21 @@
+{
+  "name": "@documenso/tailwind-config",
+  "version": "0.0.0",
+  "main": "index.cjs",
+  "license": "MIT",
+  "scripts": {
+    "clean": "rimraf node_modules"
+  },
+  "dependencies": {
+    "autoprefixer": "^10.4.13",
+    "postcss": "^8.4.21",
+    "tailwindcss": "^3.2.7",
+    "tailwindcss-animate": "^1.0.5"
+  },
+  "devDependencies": {
+    "@tailwindcss/typography": "^0.5.9"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

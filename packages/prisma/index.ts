@@ -1,16 +1,21 @@
-import { isENVProd } from "@documenso/lib";
-import { Document, PrismaClient, User } from "@prisma/client";
+import { PrismaClient } from '@prisma/client';
+
+import { getDatabaseUrl } from './helper';
 
 declare global {
-  var client: PrismaClient | undefined;
+  // We need `var` to declare a global variable in TypeScript
+  // eslint-disable-next-line no-var
+  var prisma: PrismaClient | undefined;
 }
 
-// Instanciate new client if non exists
-const prisma = globalThis.client || new PrismaClient();
-
-// Save for reuse in dev environment to avoid many client instances in dev where restart and reloads
-if (!isENVProd) {
-  globalThis.client = prisma;
+if (!globalThis.prisma) {
+  globalThis.prisma = new PrismaClient({ datasourceUrl: getDatabaseUrl() });
 }
 
-export default prisma;
+export const prisma =
+  globalThis.prisma ||
+  new PrismaClient({
+    datasourceUrl: getDatabaseUrl(),
+  });
+
+export const getPrismaClient = () => prisma;

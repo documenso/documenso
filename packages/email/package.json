@@ -1,0 +1,32 @@
+{
+  "name": "@documenso/email",
+  "version": "1.0.0",
+  "main": "./index.ts",
+  "types": "./index.ts",
+  "license": "MIT",
+  "files": [
+    "templates/",
+    "transports/",
+    "mailer.ts",
+    "render.ts",
+    "index.ts"
+  ],
+  "scripts": {
+    "dev": "email dev --port 3002 --dir templates",
+    "clean": "rimraf node_modules",
+    "worker:test": "tsup worker/index.ts --format esm"
+  },
+  "dependencies": {
+    "@documenso/nodemailer-resend": "1.0.0",
+    "@react-email/components": "^0.0.7",
+    "nodemailer": "^6.9.3",
+    "react-email": "^1.9.4",
+    "resend": "^1.1.0"
+  },
+  "devDependencies": {
+    "@documenso/tailwind-config": "*",
+    "@documenso/tsconfig": "*",
+    "@types/nodemailer": "^6.4.8",
+    "tsup": "^7.1.0"
+  }
+}
