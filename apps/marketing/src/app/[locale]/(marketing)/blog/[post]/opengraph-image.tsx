@@ -2,7 +2,7 @@ import { ImageResponse } from 'next/og';
 
 import { allBlogPosts } from 'contentlayer/generated';
 
-export const runtime = 'edge';
+// export const runtime = 'edge';
 
 export const size = {
   width: 1200,
