@@ -17,7 +17,7 @@ export const verifyEmail = async ({ token }: VerifyEmailProps) => {
   });
 
   if (!verificationToken) {
-    return false;
+    return null;
   }
 
   // check if the token is valid or expired
@@ -30,7 +30,7 @@ export const verifyEmail = async ({ token }: VerifyEmailProps) => {
     return valid;
   }
 
-  const [updatedUsers, deletedToken] = await prisma.$transaction([
+  const [updatedUser, deletedToken] = await prisma.$transaction([
     prisma.user.update({
       where: {
         id: verificationToken.userId,
@@ -46,9 +46,9 @@ export const verifyEmail = async ({ token }: VerifyEmailProps) => {
     }),
   ]);
 
-  if (!updatedUsers || !deletedToken) {
+  if (!updatedUser || !deletedToken) {
     throw new Error('Something went wrong while verifying your email. Please try again.');
   }
 
-  return !!updatedUsers && !!deletedToken;
+  return !!updatedUser && !!deletedToken;
 };

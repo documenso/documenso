@@ -1,4 +1,4 @@
-import { UserCheck, XOctagon } from 'lucide-react';
+import { AlertCircle, UserCheck, XOctagon } from 'lucide-react';
 
 import { verifyEmail } from '@documenso/lib/server-only/user/verify-email';
 
@@ -25,6 +25,21 @@ export default async function VerifyEmailPage({ searchParams: { token } }: PageP
   }
 
   const verified = await verifyEmail({ token });
+
+  if (verified === null) {
+    return (
+      <div className="w-full">
+        <div className="mb-4 text-amber-300">
+          <AlertCircle />
+        </div>
+        <h2 className="text-4xl font-semibold">Something went wrong</h2>
+        <p className="text-muted-foreground mt-2 text-base">
+          We were unable to verify your email. If your email is not verified already, please try
+          again.
+        </p>
+      </div>
+    );
+  }
 
   if (!verified) {
     return (
