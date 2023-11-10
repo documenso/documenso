@@ -3,7 +3,6 @@
 import { useState } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Eye, EyeOff } from 'lucide-react';
 import { signIn } from 'next-auth/react';
 import { useForm } from 'react-hook-form';
 import { FcGoogle } from 'react-icons/fc';
@@ -13,7 +12,7 @@ import { ErrorCode, isErrorCode } from '@documenso/lib/next-auth/error-codes';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
 import { FormErrorMessage } from '@documenso/ui/primitives/form/form-error-message';
-import { Input } from '@documenso/ui/primitives/input';
+import { Input, PasswordInput } from '@documenso/ui/primitives/input';
 import { Label } from '@documenso/ui/primitives/label';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
@@ -43,7 +42,6 @@ export type SignInFormProps = {
 
 export const SignInForm = ({ className }: SignInFormProps) => {
   const { toast } = useToast();
-  const [showPassword, setShowPassword] = useState(false);
   const [totpEnabled, setTotpEnabled] = useState(false);
   const [credentials, setCredentials] = useState<TSignInFormSchema | null>(null);
 
@@ -133,31 +131,14 @@ export const SignInForm = ({ className }: SignInFormProps) => {
             <span>Password</span>
           </Label>
 
-          <div className="relative">
-            <Input
-              id="password"
-              type={showPassword ? 'text' : 'password'}
-              minLength={6}
-              maxLength={72}
-              autoComplete="current-password"
-              className="bg-background mt-2 pr-10"
-              {...register('password')}
-            />
-
-            <Button
-              variant="link"
-              type="button"
-              className="absolute right-0 top-0 flex h-full items-center justify-center pr-3"
-              aria-label={showPassword ? 'Mask password' : 'Reveal password'}
-              onClick={() => setShowPassword((show) => !show)}
-            >
-              {showPassword ? (
-                <EyeOff className="text-muted-foreground h-5 w-5" />
-              ) : (
-                <Eye className="text-muted-foreground h-5 w-5" />
-              )}
-            </Button>
-          </div>
+          <PasswordInput
+            id="password"
+            minLength={6}
+            maxLength={72}
+            className="mt-2"
+            autoComplete="current-password"
+            {...register('password')}
+          />
 
           <FormErrorMessage className="mt-1.5" error={errors.password} />
         </div>
