@@ -88,7 +88,10 @@ export const DocumentShareButton = ({
     }
 
     // Ensuring we've prewarmed the opengraph image for the Twitter
-    await fetch(`${process.env.NEXT_PUBLIC_WEBAPP_URL}/share/${slug}/opengraph`);
+    await fetch(`${process.env.NEXT_PUBLIC_WEBAPP_URL}/share/${slug}/opengraph`, {
+      // We don't care about the response, so we can use no-cors
+      mode: 'no-cors',
+    });
 
     window.open(
       generateTwitterIntent(
