@@ -39,7 +39,7 @@ export const Footer = ({ className, ...props }: FooterProps) => {
           <Link href="/">
             <Image
               src="/logo.png"
-              alt="Documenso Logo"
+              alt="Notario Logo"
               className="dark:invert"
               width={170}
               height={0}
@@ -75,7 +75,7 @@ export const Footer = ({ className, ...props }: FooterProps) => {
       </div>
       <div className="mx-auto mt-4 flex w-full max-w-screen-xl flex-wrap justify-between gap-4 px-8 md:mt-12 lg:mt-24">
         <p className="text-muted-foreground text-sm">
-          © {new Date().getFullYear()} Documenso, Inc. All rights reserved.
+          © {new Date().getFullYear()} Notario, Inc. All rights reserved.
         </p>
 
         <div className="flex flex-wrap items-center gap-x-4 gap-y-2.5">

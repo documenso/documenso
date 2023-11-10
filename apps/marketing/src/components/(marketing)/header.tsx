@@ -30,7 +30,7 @@ export const Header = ({ className, ...props }: HeaderProps) => {
         <Link href="/" className="z-10" onClick={() => setIsHamburgerMenuOpen(false)}>
           <Image
             src="/logo.png"
-            alt="Documenso Logo"
+            alt="Notario Logo"
             className="dark:invert"
             width={170}
             height={25}

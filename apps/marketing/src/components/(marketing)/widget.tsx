@@ -191,7 +191,7 @@ export const Widget = ({ className, children, ...props }: WidgetProps) => {
           >
             <h3 className="text-2xl font-semibold">Sign up for the early adopters plan</h3>
             <p className="text-muted-foreground mt-2 text-xs">
-              with Timur Ercan & Lucas Smith from Documenso
+              with Timur Ercan & Lucas Smith from Notario
             </p>
 
             <hr className="mb-6 mt-4" />
@@ -387,7 +387,7 @@ export const Widget = ({ className, children, ...props }: WidgetProps) => {
           </DialogHeader>
 
           <DialogDescription>
-            By signing you signal your support of Documenso's mission in a <br></br>
+            By signing you signal your support of Notario's mission in a <br></br>
             <strong>non-legally binding, but heartfelt way</strong>. <br></br>
             <br></br>You also unlock the option to purchase the early supporter plan including
             everything we build this year for fixed price.

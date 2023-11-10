@@ -50,7 +50,7 @@ export const sendCompletedEmail = async ({ documentId }: SendDocumentOptions) =>
           name,
         },
         from: {
-          name: process.env.NEXT_PRIVATE_SMTP_FROM_NAME || 'Documenso',
+          name: process.env.NEXT_PRIVATE_SMTP_FROM_NAME || 'Notario',
           address: process.env.NEXT_PRIVATE_SMTP_FROM_ADDRESS || 'noreply@documenso.com',
         },
         subject: 'Signing Complete!',
