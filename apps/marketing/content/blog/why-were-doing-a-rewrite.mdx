@@ -19,23 +19,23 @@ tags:
   />
 
   <figcaption className="text-center">
-    The next generation of Documenso and signing infrastructure.
+    The next generation of Notario and signing infrastructure.
   </figcaption>
 </figure>
 
-> TLDR; We're rewriting Documenso to move on from our MVP foundations and create an even better base for the project. This rewrite will provide us the opportunity to fix a few things within the project while enabling a faster development process moving forward.
+> TLDR; We're rewriting Notario to move on from our MVP foundations and create an even better base for the project. This rewrite will provide us the opportunity to fix a few things within the project while enabling a faster development process moving forward.
 
 # Introduction
 
-At Documenso, we're building the next generation of signing infrastructure with a focus on making it inclusive and accessible for all. To do this we need to ensure that the software we write is also inclusive and accessible and for this reason we’ve decided to take a step back and perform a _quick_ rewrite.
+At Notario, we're building the next generation of signing infrastructure with a focus on making it inclusive and accessible for all. To do this we need to ensure that the software we write is also inclusive and accessible and for this reason we’ve decided to take a step back and perform a _quick_ rewrite.
 
 Although we've achieved validated MVP status and gained paying customers, we're still quite far from our goal of creating a trusted, open signing experience. To move closer to that future, we need to step back and focus on the project's foundations to ensure we can solve all the items we set out to on our current homepage.
 
-Fortunately, this wasn't a case of someone joining the team and proposing a rewrite due to a lack of understanding of the codebase and context surrounding it. Prior to joining Documenso as a co-founder, I had spent an extensive amount of time within the Documenso codebase and had a fairly intimate understanding of what was happening for the most part. This knowledge allowed me to make the fair and simultaneously hard call to take a quick pause so we can rebuild our current foundations to enable accessibility and a faster delivery time in the future.
+Fortunately, this wasn't a case of someone joining the team and proposing a rewrite due to a lack of understanding of the codebase and context surrounding it. Prior to joining Notario as a co-founder, I had spent an extensive amount of time within the Notario codebase and had a fairly intimate understanding of what was happening for the most part. This knowledge allowed me to make the fair and simultaneously hard call to take a quick pause so we can rebuild our current foundations to enable accessibility and a faster delivery time in the future.
 
 # The Reasoning: TypeScript
 
-Our primary reason for the rewrite is to better leverage the tools and technologies we've already chosen, namely TypeScript. While Documenso currently uses TypeScript, it's not fully taking advantage of its safety features, such as generics and type guards.
+Our primary reason for the rewrite is to better leverage the tools and technologies we've already chosen, namely TypeScript. While Notario currently uses TypeScript, it's not fully taking advantage of its safety features, such as generics and type guards.
 
 The codebase currently has several instances of `any` types, which is expected when working in an unknown domain where object models aren't fully understood before exploration and experimentation. These `any`s initially sped up development, but have since become a hindrance due to the lack of type information, combined with prop drilling. As a result, it's necessary to go through a lot of context to understand the root of any given issue.
 
@@ -43,7 +43,7 @@ The rewrite is using TypeScript to its full potential, ensuring that every inter
 
 # The Reasoning: Stronger API contracts
 
-In line with our pattern of creating strongly typed contracts, we've decided to use [tRPC](https://github.com/trpc/trpc) for our internal API. This enables us to share types between our frontend and backend and establish a solid contract for interactions between the two. This is in contrast to the currently untyped API endpoints in Documenso, which are accessed using the `fetch` API that is itself untyped.
+In line with our pattern of creating strongly typed contracts, we've decided to use [tRPC](https://github.com/trpc/trpc) for our internal API. This enables us to share types between our frontend and backend and establish a solid contract for interactions between the two. This is in contrast to the currently untyped API endpoints in Notario, which are accessed using the `fetch` API that is itself untyped.
 
 Using tRPC drastically reduces the chance of failures resulting from mundane things like argument or response shape changes during updates and upgrades. We made this decision easily because tRPC is a mature technology with no signs of losing momentum any time soon.
 
@@ -93,7 +93,7 @@ To ensure that we aren't just jumping off the deep end, I have set out a list of
 
 - Change the database schema (we don't want to make migration harder than it needs to be, thus all changes must be additive).
 - Add too many features that weren't in the system prior to the rewrite.
-- Remove any features that were in the older version of Documenso, such as free signatures (signatures that have no corresponding field).
+- Remove any features that were in the older version of Notario, such as free signatures (signatures that have no corresponding field).
 
 # Rollout Plan
 

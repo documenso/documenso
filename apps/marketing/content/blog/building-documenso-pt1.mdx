@@ -1,5 +1,5 @@
 ---
-title: 'Building Documenso — Part 1: Certificates'
+title: 'Building Notario — Part 1: Certificates'
 description: In today's fast-paced world, productivity and efficiency are crucial for success, both in personal and professional endeavors. We all strive to make the most of our time and energy to achieve our goals effectively. However, it's not always easy to stay on track and maintain peak performance. In this blog post, we'll explore 10 valuable tips to help you boost productivity and efficiency in your daily life.
 authorName: 'Timur Ercan'
 authorImage: '/blog/blog-author-timur.jpeg'
@@ -17,7 +17,7 @@ tags:
     src="/blog/blog-banner-building-documenso.webp"
     width="1200"
     height="675"
-    alt="Building Documenso blog banner"
+    alt="Building Notario blog banner"
   />
 
   <figcaption className="text-center">
@@ -27,9 +27,9 @@ tags:
 
 > Disclaimer: I’m not a lawyer and this isn’t legal advice. We plan to publish a much more specific framework on the topic of signature validity.
 
-This is the first installment of the new Building Documenso series, where I describe the challenges and design choices that we make while building the world’s most open signing platform.
+This is the first installment of the new Building Notario series, where I describe the challenges and design choices that we make while building the world’s most open signing platform.
 
-As you may have heard, we launched the community-reviewed <a href="https://github.com/documenso/documenso" target="_blank">version 0.9 of Documenso on GitHub</a> recently and it’s now available through the early adopter’s plan. One of the most fundamental choices we had to make on this first release, was the choice of certificate. While it’s interesting to know what we opted for, this shall also serve as a guide for everyone facing the same choice for self-hosting Documenso.
+As you may have heard, we launched the community-reviewed <a href="https://github.com/documenso/documenso" target="_blank">version 0.9 of Notario on GitHub</a> recently and it’s now available through the early adopter’s plan. One of the most fundamental choices we had to make on this first release, was the choice of certificate. While it’s interesting to know what we opted for, this shall also serve as a guide for everyone facing the same choice for self-hosting Notario.
 
 > Question: Why do I need a document signing certificate to self-host?
 >
@@ -41,11 +41,11 @@ When hosting a signature service yourself, as we do, there are four main choices
 
 ## 1\. No Certificate
 
-A lot of signing services actually don’t employ actual digital signatures besides the inserted image. The only insert and image of the signatures into the document you sign. This can be done and is legally acceptable in many cases. This option isn’t directly supported by Documenso without changing the code.
+A lot of signing services actually don’t employ actual digital signatures besides the inserted image. The only insert and image of the signatures into the document you sign. This can be done and is legally acceptable in many cases. This option isn’t directly supported by Notario without changing the code.
 
 ## 2\. Create your own
 
-Since the cryptography behind certificates is freely available as open source you could generate your own using OpenSSL for example. Since it’s hardly more work than option 1 (using Documenso at least), this would be my minimum effort recommendation. Having a self-created (“self-signed”) certificate doesn’t add much in terms of regulation but it guarantees the document’s integrity, meaning no changes have been made after signing². What this doesn’t give you, is the famous green checkmark in Adobe Acrobat. Why? Because you aren’t on the list of providers Adobe “trusts”.³
+Since the cryptography behind certificates is freely available as open source you could generate your own using OpenSSL for example. Since it’s hardly more work than option 1 (using Notario at least), this would be my minimum effort recommendation. Having a self-created (“self-signed”) certificate doesn’t add much in terms of regulation but it guarantees the document’s integrity, meaning no changes have been made after signing². What this doesn’t give you, is the famous green checkmark in Adobe Acrobat. Why? Because you aren’t on the list of providers Adobe “trusts”.³
 
 ## 3\. Buy a “trusted” certificate.
 
@@ -59,7 +59,7 @@ This option is an incredibly complex endeavour, requiring a lot of effort and sk
 
 ## What we did
 
-Having briefly introduced the options, here is what we did: Since we aim to raise the bar on digital signature proliferation and trust, we opted to buy an “Advanced Personal Certificates for Companies/Organisations” from WiseKey. Thus, documents signed with Documenso’s hosted version look like this:
+Having briefly introduced the options, here is what we did: Since we aim to raise the bar on digital signature proliferation and trust, we opted to buy an “Advanced Personal Certificates for Companies/Organisations” from WiseKey. Thus, documents signed with Notario’s hosted version look like this:
 
 <figure>
   <MdxNextImage
@@ -69,7 +69,7 @@ Having briefly introduced the options, here is what we did: Since we aim to rais
     alt="Figure 1"
   />
 
-  <figcaption className="text-center">The famous green checkmark: Signed by hosted Documenso</figcaption>
+  <figcaption className="text-center">The famous green checkmark: Signed by hosted Notario</figcaption>
 </figure>
 
 There weren’t any deeper reasons we choose WiseKey, other than they offered what we needed and there wasn’t any reason to look much further. While I didn’t map the entire certificate market offering (yet), I’m pretty sure something similar could be found elsewhere. While we opted for option 3, choosing option 2 might be perfectly reasonable considering your use case.⁶
@@ -85,7 +85,7 @@ Best from Hamburg
 
 Timur
 
-\[1\] There are different approaches to signing a document. For the sake of simplicity, here we talk about a document with X inserted signature images, that is afterward signed once the by signing service, i.e. Documenso. If each visual signature should have its own digital one (e.g. QES — eIDAS Level 3), the case is a bit more complex.
+\[1\] There are different approaches to signing a document. For the sake of simplicity, here we talk about a document with X inserted signature images, that is afterward signed once the by signing service, i.e. Notario. If each visual signature should have its own digital one (e.g. QES — eIDAS Level 3), the case is a bit more complex.
 
 \[2\] Of course, the signing service provider technically can change and resign the document, especially in the case mentioned in \[1\]. This can be countered by requiring actual digital signatures from each signer, that are bound to their identity/ account. Creating a completely trustless system in the context however is extremely hard to do and not the most pressing business need for the industry at this point, in my opinion. Though, this would be nice.
 
