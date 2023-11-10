@@ -25,16 +25,16 @@ export default async function BlogPostOpenGraphImage({ params }: BlogPostOpenGra
   // The long urls are needed for a compiler optimisation on the Next.js side, lifting this up
   // to a constant will break og image generation.
   const [interBold, interRegular, backgroundImage, logoImage] = await Promise.all([
-    fetch(new URL('./../../../../assets/inter-bold.ttf', import.meta.url)).then(async (res) =>
+    fetch(new URL('./../../../../../assets/inter-bold.ttf', import.meta.url)).then(async (res) =>
       res.arrayBuffer(),
     ),
-    fetch(new URL('./../../../../assets/inter-regular.ttf', import.meta.url)).then(async (res) =>
+    fetch(new URL('./../../../../../assets/inter-regular.ttf', import.meta.url)).then(async (res) =>
       res.arrayBuffer(),
     ),
-    fetch(new URL('./../../../../assets/background-blog-og.png', import.meta.url)).then(
+    fetch(new URL('./../../../../../assets/background-blog-og.png', import.meta.url)).then(
       async (res) => res.arrayBuffer(),
     ),
-    fetch(new URL('./../../../../../public/logo.png', import.meta.url)).then(async (res) =>
+    fetch(new URL('./../../../../../../public/logo.png', import.meta.url)).then(async (res) =>
       res.arrayBuffer(),
     ),
   ]);
