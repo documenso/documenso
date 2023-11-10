@@ -10,7 +10,7 @@ export default function BlogPage({ params: { locale } }: { params: { locale: Loc
 
     return dateB.getTime() - dateA.getTime();
   });
-  const { t } = useTranslation(locale, 'blog');
+  const { t } = useTranslation(locale, 'marketing');
 
   return (
     <div className="mt-6 sm:mt-12">

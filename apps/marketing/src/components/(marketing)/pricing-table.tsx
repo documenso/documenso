@@ -22,7 +22,7 @@ export const PricingTable = ({ className, ...props }: PricingTableProps) => {
 
   const params = useSearchParams();
   const event = usePlausible();
-  const { t } = useTranslation(locale, 'pricing');
+  const { t } = useTranslation(locale, 'marketing');
 
   const [period, setPeriod] = useState<'MONTHLY' | 'YEARLY'>(() =>
     params?.get('planId') === process.env.NEXT_PUBLIC_STRIPE_COMMUNITY_PLAN_YEARLY_PRICE_ID

@@ -51,7 +51,7 @@ export const ClaimPlanDialog = ({ className, planId, children, locale }: ClaimPl
   const event = usePlausible();
 
   const { toast } = useToast();
-  const { t } = useTranslation(locale, 'home');
+  const { t } = useTranslation(locale, 'marketing');
 
   const [open, setOpen] = useState(() => params?.get('cancelled') === 'true');
 

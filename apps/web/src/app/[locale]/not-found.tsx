@@ -13,7 +13,7 @@ export default async function NotFound() {
   // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
   const locale = useParams()?.locale as LocaleTypes;
 
-  const { t } = useTranslation(locale, 'not-found');
+  const { t } = useTranslation(locale, 'dashboard');
   return (
     <NotFoundPartial>
       {session && (

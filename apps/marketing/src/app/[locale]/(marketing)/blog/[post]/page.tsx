@@ -39,7 +39,7 @@ export default function BlogPostPage({
   params: { post: string; locale: LocaleTypes };
 }) {
   const post = allBlogPosts.find((post) => post._raw.flattenedPath === `blog/${params.post}`);
-  const { t } = useTranslation(params.locale, 'blog-post');
+  const { t } = useTranslation(params.locale, 'marketing');
 
   if (!post) {
     notFound();

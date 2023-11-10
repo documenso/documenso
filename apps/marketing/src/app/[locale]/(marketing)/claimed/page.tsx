@@ -36,7 +36,7 @@ export default async function ClaimedPlanPage({ searchParams = {} }: ClaimedPlan
 
   const session = await stripe.checkout.sessions.retrieve(sessionId);
   const customerId = typeof session.customer === 'string' ? session.customer : session.customer?.id;
-  const { t } = useTranslation(locale, 'about');
+  const { t } = useTranslation(locale, 'marketing');
 
   if (!customerId) {
     redirect('/');

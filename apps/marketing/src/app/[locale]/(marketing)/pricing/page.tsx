@@ -26,7 +26,7 @@ export default async function PricingPage({
 }: {
   params: { locale: LocaleTypes };
 }) {
-  const { t } = await createTranslation(locale, 'pricing');
+  const { t } = await createTranslation(locale, 'marketing');
 
   return (
     <div className="mt-6 sm:mt-12">
