@@ -47,6 +47,7 @@
   ],
   "dependencies": {
     "recharts": "^2.7.2",
+    "react-hotkeys-hook": "^4.4.1",
     "@react-email/render": "0.0.9"
   },
   "overrides": {
