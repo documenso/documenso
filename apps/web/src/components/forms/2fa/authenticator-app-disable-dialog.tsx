@@ -24,7 +24,7 @@ import {
   FormLabel,
   FormMessage,
 } from '@documenso/ui/primitives/form/form';
-import { Input } from '@documenso/ui/primitives/input';
+import { Input, PasswordInput } from '@documenso/ui/primitives/input';
 import { Textarea } from '@documenso/ui/primitives/textarea';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
@@ -128,7 +128,7 @@ export const AuthenticatorAppDisableDialog = ({
                 <FormItem>
                   <FormLabel>Current Password</FormLabel>
                   <FormControl>
-                    <Input {...field} />
+                    <PasswordInput autoComplete="current-password" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -151,7 +151,13 @@ export const AuthenticatorAppDisableDialog = ({
                   <FormItem>
                     <FormLabel>Two-Factor Code</FormLabel>
                     <FormControl>
-                      <Input {...field} />
+                      <Input
+                        placeholder="xxxxxx"
+                        inputMode="numeric"
+                        autoComplete="one-time-code"
+                        pattern="\d{6}"
+                        {...field}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
