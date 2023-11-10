@@ -1,3 +1,5 @@
+import { cache } from 'react';
+
 import { GetServerSidePropsContext, NextApiRequest, NextApiResponse } from 'next';
 
 import { getServerSession as getNextAuthServerSession } from 'next-auth';
@@ -27,7 +29,7 @@ export const getServerSession = async ({ req, res }: GetServerSessionOptions) =>
   return { user, session };
 };
 
-export const getServerComponentSession = async () => {
+export const getServerComponentSession = cache(async () => {
   const session = await getNextAuthServerSession(NEXT_AUTH_OPTIONS);
 
   if (!session || !session.user?.email) {
@@ -41,9 +43,9 @@ export const getServerComponentSession = async () => {
   });
 
   return { user, session };
-};
+});
 
-export const getRequiredServerComponentSession = async () => {
+export const getRequiredServerComponentSession = cache(async () => {
   const { user, session } = await getServerComponentSession();
 
   if (!user || !session) {
@@ -51,4 +53,4 @@ export const getRequiredServerComponentSession = async () => {
   }
 
   return { user, session };
-};
+});
