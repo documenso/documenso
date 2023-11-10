@@ -8,7 +8,7 @@ import { createUsersFixture } from './user';
 
 type Fixtures = {
   page: Page;
-  samplePdf: Buffer;
+  samplePdf: { pdf: Buffer; pdfName: string };
   users: ReturnType<typeof createUsersFixture>;
   documents: ReturnType<typeof createDocumentsFixture>;
 };
@@ -16,7 +16,7 @@ type Fixtures = {
 export const test = base.extend<Fixtures>({
   samplePdf: async ({}, use) => {
     const examplePdf = fs.readFileSync(path.join(__dirname, '../../../assets/example.pdf'));
-    await use(examplePdf);
+    await use({ pdf: examplePdf, pdfName: 'example.pdf' });
   },
 
   users: async ({ page }, use, workerInfo) => {
