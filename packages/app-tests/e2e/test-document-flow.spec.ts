@@ -19,18 +19,12 @@ test.describe('test document flow', async () => {
   test.afterEach(async ({ users }) => users.deleteAll());
 
   test('user can upload documents', async ({ page, samplePdf, documents }) => {
-    await page.goto('/documents');
-    await expect(page).toHaveURL('/documents');
-
     await documents.upload({ pdf: samplePdf, pdfName: 'example.pdf' });
 
     await expect(page).toHaveURL(/\/documents\/\d+/);
   });
 
   test('user can add signers', async ({ page, samplePdf, documents }) => {
-    await page.goto('/documents');
-    await expect(page).toHaveURL('/documents');
-
     await documents.upload({ pdf: samplePdf, pdfName: 'example.pdf' });
 
     await expect(page).toHaveURL(/\/documents\/\d+/);
