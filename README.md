@@ -1,4 +1,4 @@
-🚨 We are launching our new free tier "Single Player Mode" on Product Hunt next monday: https://www.producthunt.com/products/documenso
+🚨 We are live on Product Hunt with Single Player Mode and the new free tier: [https://www.producthunt.com/products/documenso](https://www.producthunt.com/posts/documenso-singleplayer-mode)
 
 <img src="https://github.com/documenso/documenso/assets/13398220/a643571f-0239-46a6-a73e-6bef38d1228b" alt="Documenso Logo">
 
@@ -219,7 +219,7 @@ Then, inside the `documenso` folder, copy the example env file:
 cp .env.example .env
 ```
 
-The following environement variables must be set:
+The following environment variables must be set:
 
 * `NEXTAUTH_URL`
 * `NEXTAUTH_SECRET`

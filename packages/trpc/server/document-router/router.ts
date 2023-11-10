@@ -3,6 +3,7 @@ import { TRPCError } from '@trpc/server';
 import { getServerLimits } from '@documenso/ee/server-only/limits/server';
 import { createDocument } from '@documenso/lib/server-only/document/create-document';
 import { deleteDraftDocument } from '@documenso/lib/server-only/document/delete-draft-document';
+import { duplicateDocumentById } from '@documenso/lib/server-only/document/duplicate-document-by-id';
 import { getDocumentById } from '@documenso/lib/server-only/document/get-document-by-id';
 import { getDocumentAndSenderByToken } from '@documenso/lib/server-only/document/get-document-by-token';
 import { sendDocument } from '@documenso/lib/server-only/document/send-document';
@@ -169,6 +170,25 @@ export const documentRouter = router({
         throw new TRPCError({
           code: 'BAD_REQUEST',
           message: 'We were unable to send this document. Please try again later.',
+        });
+      }
+    }),
+
+  duplicateDocument: authenticatedProcedure
+    .input(ZGetDocumentByIdQuerySchema)
+    .mutation(async ({ input, ctx }) => {
+      try {
+        const { id } = input;
+
+        return await duplicateDocumentById({
+          id,
+          userId: ctx.user.id,
+        });
+      } catch (err) {
+        console.log(err);
+        throw new TRPCError({
+          code: 'BAD_REQUEST',
+          message: 'We are unable to duplicate this document. Please try again later.',
         });
       }
     }),

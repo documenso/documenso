@@ -9,7 +9,8 @@ import { SalaryBands } from '~/app/(marketing)/open/salary-bands';
 import { BarMetric } from './bar-metrics';
 import { CapTable } from './cap-table';
 import { FundingRaised } from './funding-raised';
-import { MonthlyUsersChart } from './monthly-users-chart';
+import { MonthlyNewUsersChart } from './monthly-new-users-chart';
+import { MonthlyTotalUsersChart } from './monthly-total-users-chart';
 import { TeamMembers } from './team-members';
 import { OpenPageTooltip } from './tooltip';
 
@@ -183,7 +184,8 @@ export default async function OpenPage() {
           className="col-span-12 lg:col-span-6"
         />
 
-        <MonthlyUsersChart data={MONTHLY_USERS} className="col-span-12 lg:col-span-6" />
+        <MonthlyTotalUsersChart data={MONTHLY_USERS} className="col-span-12 lg:col-span-6" />
+        <MonthlyNewUsersChart data={MONTHLY_USERS} className="col-span-12 lg:col-span-6" />
 
         <div className="col-span-12 mt-12 flex flex-col items-center justify-center">
           <h2 className="text-2xl font-bold">Where's the rest?</h2>
