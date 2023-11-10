@@ -3,11 +3,7 @@ import { allBlogPosts } from 'contentlayer/generated';
 import { useTranslation } from '@documenso/ui/i18n/client';
 import { LocaleTypes } from '@documenso/ui/i18n/settings';
 
-export interface BlogPageProps {
-  locale: LocaleTypes;
-}
-
-export const BlogPage = ({ locale }: BlogPageProps) => {
+export default function BlogPage({ params: { locale } }: { params: { locale: LocaleTypes } }) {
   const blogPosts = allBlogPosts.sort((a, b) => {
     const dateA = new Date(a.date);
     const dateB = new Date(b.date);
@@ -84,4 +80,4 @@ export const BlogPage = ({ locale }: BlogPageProps) => {
       </div>
     </div>
   );
-};
+}
