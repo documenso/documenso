@@ -1,5 +1,7 @@
 import { z } from 'zod';
 
+import { getUserMonthlyGrowth } from '@documenso/lib/server-only/user/get-user-monthly-growth';
+
 import { FUNDING_RAISED } from '~/app/[locale]/(marketing)/open/data';
 import { MetricCard } from '~/app/[locale]/(marketing)/open/metric-card';
 import { SalaryBands } from '~/app/[locale]/(marketing)/open/salary-bands';
@@ -7,10 +9,14 @@ import { SalaryBands } from '~/app/[locale]/(marketing)/open/salary-bands';
 import { BarMetric } from './bar-metrics';
 import { CapTable } from './cap-table';
 import { FundingRaised } from './funding-raised';
+import { MonthlyNewUsersChart } from './monthly-new-users-chart';
+import { MonthlyTotalUsersChart } from './monthly-total-users-chart';
 import { TeamMembers } from './team-members';
 import { OpenPageTooltip } from './tooltip';
 
 export const revalidate = 3600;
+
+export const dynamic = 'force-dynamic';
 
 const ZGithubStatsResponse = z.object({
   stargazers_count: z.number(),
@@ -43,14 +49,20 @@ export type StargazersType = z.infer<typeof ZStargazersLiveResponse>;
 export type EarlyAdoptersType = z.infer<typeof ZEarlyAdoptersResponse>;
 
 export default async function OpenPage() {
+  const GITHUB_HEADERS: Record<string, string> = {
+    accept: 'application/vnd.github.v3+json',
+  };
+
+  if (process.env.NEXT_PRIVATE_GITHUB_TOKEN) {
+    GITHUB_HEADERS.authorization = `Bearer ${process.env.NEXT_PRIVATE_GITHUB_TOKEN}`;
+  }
+
   const {
     forks_count: forksCount,
     open_issues: openIssues,
     stargazers_count: stargazersCount,
   } = await fetch('https://api.github.com/repos/documenso/documenso', {
-    headers: {
-      accept: 'application/vnd.github.v3+json',
-    },
+    headers: GITHUB_HEADERS,
   })
     .then(async (res) => res.json())
     .then((res) => ZGithubStatsResponse.parse(res));
@@ -58,9 +70,7 @@ export default async function OpenPage() {
   const { total_count: mergedPullRequests } = await fetch(
     'https://api.github.com/search/issues?q=repo:documenso/documenso/+is:pr+merged:>=2010-01-01&page=0&per_page=1',
     {
-      headers: {
-        accept: 'application/vnd.github.v3+json',
-      },
+      headers: GITHUB_HEADERS,
     },
   )
     .then(async (res) => res.json())
@@ -81,6 +91,8 @@ export default async function OpenPage() {
   })
     .then(async (res) => res.json())
     .then((res) => ZEarlyAdoptersResponse.parse(res));
+
+  const MONTHLY_USERS = await getUserMonthlyGrowth();
 
   return (
     <div className="mx-auto mt-6 max-w-screen-lg sm:mt-12">
@@ -122,7 +134,7 @@ export default async function OpenPage() {
 
         <TeamMembers className="col-span-12" />
 
-        <SalaryBands className="col-span-12 lg:col-span-6" />
+        <SalaryBands className="col-span-12" />
 
         <FundingRaised data={FUNDING_RAISED} className="col-span-12 lg:col-span-6" />
 
@@ -171,6 +183,9 @@ export default async function OpenPage() {
           chartHeight={300}
           className="col-span-12 lg:col-span-6"
         />
+
+        <MonthlyTotalUsersChart data={MONTHLY_USERS} className="col-span-12 lg:col-span-6" />
+        <MonthlyNewUsersChart data={MONTHLY_USERS} className="col-span-12 lg:col-span-6" />
 
         <div className="col-span-12 mt-12 flex flex-col items-center justify-center">
           <h2 className="text-2xl font-bold">Where's the rest?</h2>

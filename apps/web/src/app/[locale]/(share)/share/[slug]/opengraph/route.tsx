@@ -56,7 +56,7 @@ export async function GET(_request: Request, { params: { slug } }: SharePageOpen
 
   return new ImageResponse(
     (
-      <div tw="relative flex h-full w-full">
+      <div tw="relative flex h-full w-full bg-white">
         {/* @ts-expect-error Lack of typing from ImageResponse */}
         <img src={shareFrameImage} alt="og-share-frame" tw="absolute inset-0 w-full h-full" />
 
