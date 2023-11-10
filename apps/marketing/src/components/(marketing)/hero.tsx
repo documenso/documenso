@@ -4,8 +4,6 @@ import Image from 'next/image';
 import Link from 'next/link';
 
 import { Variants, motion } from 'framer-motion';
-import { usePlausible } from 'next-plausible';
-import { LuGithub } from 'react-icons/lu';
 import { match } from 'ts-pattern';
 
 import { useFeatureFlags } from '@documenso/lib/client-only/providers/feature-flag';
@@ -54,7 +52,6 @@ const HeroTitleVariants: Variants = {
 };
 
 export const Hero = ({ className, locale, ...props }: HeroProps) => {
-  const event = usePlausible();
   const { t } = useTranslation(locale ?? 'en', 'hero');
 
   const { getFlag } = useFeatureFlags();
@@ -124,13 +121,6 @@ export const Hero = ({ className, locale, ...props }: HeroProps) => {
               {t(`30-forever`)}
             </span>
           </Button>
-
-          <Link href="https://github.com/documenso/documenso" onClick={() => event('view-github')}>
-            <Button variant="outline" className="rounded-full bg-transparent backdrop-blur-sm">
-              <LuGithub className="mr-2 h-5 w-5" />
-              {t(`star-on-git`)}
-            </Button>
-          </Link>
         </motion.div>
 
         {match(heroMarketingCTA)
