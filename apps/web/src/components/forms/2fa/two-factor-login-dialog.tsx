@@ -132,7 +132,13 @@ export const TwoFactorLoginDialog = ({
                   <FormItem>
                     <FormLabel>Two-Factor Code</FormLabel>
                     <FormControl>
-                      <Input {...field} />
+                      <Input
+                        placeholder="xxxxxx"
+                        inputMode="numeric"
+                        autoComplete="one-time-code"
+                        pattern="\d{6}"
+                        {...field}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

@@ -122,7 +122,14 @@ export const AuthenticatorAppSetupDialog = ({
                   <FormItem>
                     <FormLabel> OTP code</FormLabel>
                     <FormControl>
-                      <Input disabled={isSubmitting} placeholder="xxxxxx" {...field} />
+                      <Input
+                        disabled={isSubmitting}
+                        placeholder="xxxxxx"
+                        inputMode="numeric"
+                        autoComplete="one-time-code"
+                        pattern="\d{6}"
+                        {...field}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -132,7 +139,7 @@ export const AuthenticatorAppSetupDialog = ({
           </Form>
         </div>
         <DialogFooter>
-          <Button type="submit" form="2fa-setup-form">
+          <Button type="submit" form="2fa-setup-form" disabled={form.formState.isSubmitting}>
             Submit
           </Button>
         </DialogFooter>
