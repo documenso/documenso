@@ -8,7 +8,7 @@ import { SignInForm } from '~/components/forms/signin';
 export interface SignInPageProps {
   locale: LocaleTypes;
 }
-const SignInPage = async ({ locale }: SignInPageProps) => {
+const SignInPage = ({ locale }: SignInPageProps) => {
   // Make sure to use the correct namespace here.
   const { t } = useTranslation(locale, 'dashboard');
 

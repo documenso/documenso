@@ -25,7 +25,7 @@ const SignUpPage = ({ locale }: SignUpPageProps) => {
       <p className="text-muted-foreground mt-6 text-center text-sm">
         Already have an account?{' '}
         <Link href="/signin" className="text-primary duration-200 hover:opacity-70">
-          Sign in instead
+          {t('sign-in-instead')}
         </Link>
       </p>
     </div>

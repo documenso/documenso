@@ -26,7 +26,7 @@ interface SinglePlayerModeSuccessProps {
   signatures: Signature[];
 }
 
-export const SinglePlayerModeSuccess = async ({
+export const SinglePlayerModeSuccess = ({
   className,
   document,
   signatures,

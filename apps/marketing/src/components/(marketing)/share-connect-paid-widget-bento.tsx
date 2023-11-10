@@ -14,11 +14,11 @@ import cardWidgetFigure from '~/assets/card-widget-figure.png';
 
 export type ShareConnectPaidWidgetBentoProps = HTMLAttributes<HTMLDivElement>;
 
-export const ShareConnectPaidWidgetBento = async ({
+export const ShareConnectPaidWidgetBento = ({
   className,
   ...props
 }: ShareConnectPaidWidgetBentoProps) => {
-  const { t } = await createTranslation('en', 'paid-bento');
+  const { t } = useTranslation('en', 'paid-bento');
 
   return (
     <div className={cn('relative', className)} {...props}>
