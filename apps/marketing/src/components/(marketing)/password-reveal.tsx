@@ -12,7 +12,7 @@ export type PasswordRevealProps = {
 export const PasswordReveal = async ({ password, locale }: PasswordRevealProps) => {
   const { toast } = useToast();
   const [, copy] = useCopyToClipboard();
-  const { t } = await createTranslation(locale, 'common');
+  const { t } = await createTranslation(locale, 'marketing');
 
   const onCopyClick = () => {
     void copy(password).then(() => {

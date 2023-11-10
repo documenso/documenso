@@ -32,7 +32,7 @@ export const SinglePlayerModeSuccess = async ({
   locale,
 }: SinglePlayerModeSuccessProps) => {
   const { getFlag } = useFeatureFlags();
-  const { t } = await createTranslation(locale, 'common');
+  const { t } = await createTranslation(locale, 'marketing');
 
   const isConfettiEnabled = getFlag('marketing_spm_confetti');
 

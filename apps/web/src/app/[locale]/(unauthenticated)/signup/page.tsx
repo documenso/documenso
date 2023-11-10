@@ -1,8 +1,12 @@
 import Link from 'next/link';
 
+import { createTranslation } from '@documenso/ui/i18n/server';
+
 import { SignUpForm } from '~/components/forms/signup';
 
-export default function SignUpPage() {
+export default async function SignUpPage({ locale }) {
+  const { t } = await createTranslation(locale, 'dashboard');
+
   return (
     <div>
       <h1 className="text-4xl font-semibold">Create a new account</h1>

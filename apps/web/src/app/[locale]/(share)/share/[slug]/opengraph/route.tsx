@@ -122,8 +122,8 @@ export async function GET(_request: Request, { params: { slug } }: SharePageOpen
             }}
           >
             {isRecipient
-              ? 'I just signed with Documenso and you can too!'
-              : 'I just sent a document with Documenso and you can too!'}
+              ? 'I just signed with Notario and you can too!'
+              : 'I just sent a document with Notario and you can too!'}
           </h2>
         </div>
       </div>
