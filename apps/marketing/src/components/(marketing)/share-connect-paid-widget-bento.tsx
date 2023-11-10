@@ -2,7 +2,7 @@ import { HTMLAttributes } from 'react';
 
 import Image from 'next/image';
 
-import { useTranslation } from '@documenso/ui/i18n/client';
+import { createTranslation } from '@documenso/ui/i18n/server';
 import { cn } from '@documenso/ui/lib/utils';
 import { Card, CardContent } from '@documenso/ui/primitives/card';
 
@@ -14,11 +14,11 @@ import cardWidgetFigure from '~/assets/card-widget-figure.png';
 
 export type ShareConnectPaidWidgetBentoProps = HTMLAttributes<HTMLDivElement>;
 
-export const ShareConnectPaidWidgetBento = ({
+export const ShareConnectPaidWidgetBento = async ({
   className,
   ...props
 }: ShareConnectPaidWidgetBentoProps) => {
-  const { t } = useTranslation('en', 'paid-bento');
+  const { t } = await createTranslation('en', 'marketing');
 
   return (
     <div className={cn('relative', className)} {...props}>
