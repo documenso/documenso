@@ -21,7 +21,7 @@ import { Widget } from './widget';
 export type HeroProps = {
   className?: string;
   [key: string]: unknown;
-  locale: LocaleTypes;
+  locale?: LocaleTypes;
 };
 
 const BackgroundPatternVariants: Variants = {
@@ -55,7 +55,7 @@ const HeroTitleVariants: Variants = {
 
 export const Hero = ({ className, locale, ...props }: HeroProps) => {
   const event = usePlausible();
-  const { t } = useTranslation(locale, 'hero');
+  const { t } = useTranslation(locale ?? 'en', 'hero');
 
   const { getFlag } = useFeatureFlags();
 

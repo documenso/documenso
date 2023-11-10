@@ -12,12 +12,12 @@ import { Button } from '@documenso/ui/primitives/button';
 export type CalloutProps = {
   starCount?: number;
   [key: string]: unknown;
-  locale: LocaleTypes;
+  locale?: LocaleTypes;
 };
 
 export const Callout = ({ starCount, locale }: CalloutProps) => {
   const event = usePlausible();
-  const { t } = useTranslation(locale, 'marketing');
+  const { t } = useTranslation(locale ?? 'en', 'marketing');
 
   const onSignUpClick = () => {
     const el = document.getElementById('email');
