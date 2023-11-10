@@ -20,7 +20,7 @@ const ChangeLocale = () => {
 
   return (
     <div>
-      <select onChange={handleLocaleChange} value={params.locale}>
+      <select onChange={handleLocaleChange} value={params?.locale}>
         <option value="en">🇺🇸</option>
         <option value="fr">🇫🇷</option>
         <option value="sv">🇸🇪</option>
