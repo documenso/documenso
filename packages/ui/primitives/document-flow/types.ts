@@ -52,7 +52,6 @@ export interface DocumentFlowStep {
   title: string;
   description: string;
   stepIndex: number;
-  onSubmit?: () => void;
   onBackStep?: () => void;
   onNextStep?: () => void;
 }

@@ -13,7 +13,7 @@ export type DocumentFlowFormContainerProps = HTMLAttributes<HTMLFormElement> & {
 
 export const DocumentFlowFormContainer = ({
   children,
-  id = 'edit-document-form',
+  id = 'document-flow-form-container',
   className,
   ...props
 }: DocumentFlowFormContainerProps) => {
@@ -21,7 +21,7 @@ export const DocumentFlowFormContainer = ({
     <form
       id={id}
       className={cn(
-        'dark:bg-background border-border bg-widget sticky top-20 flex h-full max-h-[80rem] flex-col rounded-xl border px-4 py-6',
+        'dark:bg-background border-border bg-widget sticky top-20 flex h-full max-h-[64rem] flex-col rounded-xl border px-4 py-6',
         className,
       )}
       {...props}
@@ -61,8 +61,14 @@ export const DocumentFlowFormContainerContent = ({
   ...props
 }: DocumentFlowFormContainerContentProps) => {
   return (
-    <div className={cn('flex flex-1 flex-col', className)} {...props}>
-      <div className="-mx-2 flex flex-1 flex-col overflow-y-auto px-2">{children}</div>
+    <div
+      className={cn(
+        'custom-scrollbar -mx-2 flex flex-1 flex-col overflow-y-auto overflow-x-hidden px-2',
+        className,
+      )}
+      {...props}
+    >
+      <div className="flex flex-1 flex-col">{children}</div>
     </div>
   );
 };
@@ -90,17 +96,13 @@ export type DocumentFlowFormContainerStepProps = {
 };
 
 export const DocumentFlowFormContainerStep = ({
-  title,
   step,
   maxStep,
 }: DocumentFlowFormContainerStepProps) => {
   return (
     <div>
       <p className="text-muted-foreground text-sm">
-        {title}{' '}
-        <span>
-          ({step}/{maxStep})
-        </span>
+        Step <span>{`${step} of ${maxStep}`}</span>
       </p>
 
       <div className="bg-muted relative mt-4 h-[2px] rounded-md">
@@ -152,10 +154,11 @@ export const DocumentFlowFormContainerActions = ({
       </Button>
 
       <Button
-        type="submit"
+        type="button"
         className="bg-documenso flex-1"
         size="lg"
         disabled={disabled || loading || !canGoNext}
+        loading={loading}
         onClick={onGoNextClick}
       >
         {goNextLabel}

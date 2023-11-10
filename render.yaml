@@ -1,0 +1,103 @@
+services:
+  - type: web
+    name: documenso-app
+    env: node
+    plan: free
+    buildCommand: npm i && npm run build:web
+    startCommand: npx prisma migrate deploy --schema packages/prisma/schema.prisma && npm run start
+    healthCheckPath: /api/trpc/health
+
+    envVars:
+      # Node Version
+      - key: NODE_VERSION
+        value: 18.17.0
+
+      - key: PORT
+        value: 10000
+
+      # Auth
+      - key: NEXTAUTH_URL
+        fromService:
+          name: documenso-app
+          type: web
+          envVarKey: RENDER_EXTERNAL_URL
+      - key: NEXTAUTH_SECRET
+        generateValue: true
+
+      # Database
+      - key: NEXT_PRIVATE_DATABASE_URL
+        fromDatabase:
+          name: documenso-db
+          property: connectionString
+
+      - key: NEXT_PRIVATE_DIRECT_DATABASE_URL
+        fromDatabase:
+          name: documenso-db
+          property: connectionString
+
+      # URLs
+      - key: NEXT_PUBLIC_WEBAPP_URL
+        fromService:
+          name: documenso-app
+          type: web
+          envVarKey: RENDER_EXTERNAL_URL
+      - key: NEXT_PUBLIC_MARKETING_URL
+        value: 'http://localhost:3001'
+
+      # SMTP
+      - key: NEXT_PRIVATE_SMTP_TRANSPORT
+        value: 'smtp-auth'
+      - key: NEXT_PRIVATE_SMTP_HOST
+        sync: false
+      - key: NEXT_PRIVATE_SMTP_PORT
+        sync: false
+      - key: NEXT_PRIVATE_SMTP_USERNAME
+        sync: false
+      - key: NEXT_PRIVATE_SMTP_PASSWORD
+        sync: false
+      - key: NEXT_PRIVATE_SMTP_FROM_NAME
+        sync: false
+      - key: NEXT_PRIVATE_SMTP_FROM_ADDRESS
+        sync: false
+
+      # Stripe
+      - key: NEXT_PRIVATE_STRIPE_API_KEY
+        sync: false
+      - key: NEXT_PRIVATE_STRIPE_WEBHOOK_SECRET
+        sync: false
+      - key: NEXT_PUBLIC_STRIPE_COMMUNITY_PLAN_MONTHLY_PRICE_ID
+        sync: false
+      - key: NEXT_PUBLIC_STRIPE_COMMUNITY_PLAN_YEARLY_PRICE_ID
+        sync: false
+
+      # Features
+      - key: NEXT_PUBLIC_POSTHOG_KEY
+        sync: false
+      - key: NEXT_PUBLIC_POSTHOG_HOST
+        value: 'https://eu.posthog.com'
+      - key: NEXT_PUBLIC_FEATURE_BILLING_ENABLED
+        sync: false
+
+      # Redis (Only required for marketing site, but added for completeness)
+      - key: NEXT_PRIVATE_REDIS_URL
+        sync: false
+      - key: NEXT_PRIVATE_REDIS_TOKEN
+        sync: false
+
+      # Storage
+      - key: NEXT_PUBLIC_UPLOAD_TRANSPORT
+        value: 'database'
+      - key: NEXT_PRIVATE_UPLOAD_ENDPOINT
+        sync: false
+      - key: NEXT_PRIVATE_UPLOAD_REGION
+        sync: false
+      - key: NEXT_PRIVATE_UPLOAD_BUCKET
+        sync: false
+      - key: NEXT_PRIVATE_UPLOAD_ACCESS_KEY_ID
+        sync: false
+      - key: NEXT_PRIVATE_UPLOAD_SECRET_ACCESS_KEY
+        sync: false
+
+databases:
+  - name: documenso-db
+    plan: free

@@ -1,4 +1,4 @@
-import { notFound } from 'next/navigation';
+import { notFound, redirect } from 'next/navigation';
 
 import { match } from 'ts-pattern';
 
@@ -8,7 +8,7 @@ import { getDocumentAndSenderByToken } from '@documenso/lib/server-only/document
 import { viewedDocument } from '@documenso/lib/server-only/document/viewed-document';
 import { getFieldsForToken } from '@documenso/lib/server-only/field/get-fields-for-token';
 import { getRecipientByToken } from '@documenso/lib/server-only/recipient/get-recipient-by-token';
-import { FieldType } from '@documenso/prisma/client';
+import { DocumentStatus, FieldType, SigningStatus } from '@documenso/prisma/client';
 import { Card, CardContent } from '@documenso/ui/primitives/card';
 import { ElementVisible } from '@documenso/ui/primitives/element-visible';
 import { LazyPDFViewer } from '@documenso/ui/primitives/lazy-pdf-viewer';
@@ -36,21 +36,32 @@ export default async function SigningPage({ params: { token } }: SigningPageProp
       token,
     }).catch(() => null),
     getFieldsForToken({ token }),
-    getRecipientByToken({ token }),
-    viewedDocument({ token }),
+    getRecipientByToken({ token }).catch(() => null),
+    viewedDocument({ token }).catch(() => null),
   ]);
 
-  if (!document) {
+  if (!document || !document.documentData || !recipient) {
     return notFound();
   }
 
-  const user = await getServerComponentSession();
+  const { documentData } = document;
 
-  const documentUrl = `data:application/pdf;base64,${document.document}`;
+  const { user } = await getServerComponentSession();
+
+  if (
+    document.status === DocumentStatus.COMPLETED ||
+    recipient.signingStatus === SigningStatus.SIGNED
+  ) {
+    redirect(`/sign/${token}/complete`);
+  }
 
   return (
-    <SigningProvider email={recipient.email} fullName={recipient.name} signature={user?.signature}>
-      <div className="mx-auto w-full max-w-screen-xl px-4 md:px-8">
+    <SigningProvider
+      email={recipient.email}
+      fullName={user?.email === recipient.email ? user.name : recipient.name}
+      signature={user?.email === recipient.email ? user.signature : undefined}
+    >
+      <div className="mx-auto w-full max-w-screen-xl">
         <h1 className="mt-4 truncate text-2xl font-semibold md:text-3xl" title={document.title}>
           {document.title}
         </h1>
@@ -67,7 +78,7 @@ export default async function SigningPage({ params: { token } }: SigningPageProp
             gradient
           >
             <CardContent className="p-2">
-              <LazyPDFViewer document={documentUrl} />
+              <LazyPDFViewer key={documentData.id} documentData={documentData} />
             </CardContent>
           </Card>
 

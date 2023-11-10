@@ -20,7 +20,7 @@ import { useToast } from '@documenso/ui/primitives/use-toast';
 import { FormErrorMessage } from '../form/form-error-message';
 
 export const ZProfileFormSchema = z.object({
-  name: z.string().min(1),
+  name: z.string().trim().min(1, { message: 'Please enter a valid name.' }),
   signature: z.string().min(1, 'Signature Pad cannot be empty'),
 });
 
@@ -89,7 +89,7 @@ export const ProfileForm = ({ className, user }: ProfileFormProps) => {
       onSubmit={handleSubmit(onFormSubmit)}
     >
       <div>
-        <Label htmlFor="full-name" className="text-slate-500">
+        <Label htmlFor="full-name" className="text-muted-foreground">
           Full Name
         </Label>
 
@@ -99,7 +99,7 @@ export const ProfileForm = ({ className, user }: ProfileFormProps) => {
       </div>
 
       <div>
-        <Label htmlFor="email" className="text-slate-500">
+        <Label htmlFor="email" className="text-muted-foreground">
           Email
         </Label>
 
@@ -107,7 +107,7 @@ export const ProfileForm = ({ className, user }: ProfileFormProps) => {
       </div>
 
       <div>
-        <Label htmlFor="signature" className="text-slate-500">
+        <Label htmlFor="signature" className="text-muted-foreground">
           Signature
         </Label>
 
@@ -117,7 +117,8 @@ export const ProfileForm = ({ className, user }: ProfileFormProps) => {
             name="signature"
             render={({ field: { onChange } }) => (
               <SignaturePad
-                className="h-44 w-full rounded-lg border bg-white backdrop-blur-sm dark:border-[#e2d7c5] dark:bg-[#fcf8ee]"
+                className="h-44 w-full"
+                containerClassName="rounded-lg border bg-background"
                 defaultValue={user.signature ?? undefined}
                 onChange={(v) => onChange(v ?? '')}
               />

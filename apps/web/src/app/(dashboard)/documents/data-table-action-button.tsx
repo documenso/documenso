@@ -7,6 +7,7 @@ import { useSession } from 'next-auth/react';
 import { match } from 'ts-pattern';
 
 import { Document, DocumentStatus, Recipient, SigningStatus, User } from '@documenso/prisma/client';
+import { DocumentShareButton } from '@documenso/ui/components/document/document-share-button';
 import { Button } from '@documenso/ui/primitives/button';
 
 export type DataTableActionButtonProps = {
@@ -57,9 +58,15 @@ export const DataTableActionButton = ({ row }: DataTableActionButtonProps) => {
       </Button>
     ))
     .otherwise(() => (
-      <Button className="w-24" disabled>
-        <Share className="-ml-1 mr-2 h-4 w-4" />
-        Share
-      </Button>
+      <DocumentShareButton
+        documentId={row.id}
+        token={recipient?.token}
+        trigger={({ loading }) => (
+          <Button className="w-24" loading={loading}>
+            {!loading && <Share className="-ml-1 mr-2 h-4 w-4" />}
+            Share
+          </Button>
+        )}
+      />
     ));
 };

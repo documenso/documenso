@@ -4,11 +4,11 @@ import { getBaseUrl } from '@documenso/lib/universal/get-base-url';
 
 export default function robots(): MetadataRoute.Robots {
   return {
-    rules: {
-      userAgent: '*',
-      allow: '/*',
-      disallow: ['/_next/*'],
-    },
+    rules: [
+      {
+        userAgent: '*',
+      },
+    ],
     sitemap: `${getBaseUrl()}/sitemap.xml`,
   };
 }
