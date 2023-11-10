@@ -1,12 +1,16 @@
 import Link from 'next/link';
 
-import { createTranslation } from '@documenso/ui/i18n/server';
+import { useTranslation } from '@documenso/ui/i18n/client';
+import { LocaleTypes } from '@documenso/ui/i18n/settings';
 
 import { SignInForm } from '~/components/forms/signin';
 
-const SignInPage = async ({ locale }) => {
+export interface SignInPageProps {
+  locale: LocaleTypes;
+}
+const SignInPage = async ({ locale }: SignInPageProps) => {
   // Make sure to use the correct namespace here.
-  const { t } = await createTranslation(locale, 'dashboard');
+  const { t } = useTranslation(locale, 'dashboard');
 
   return (
     <div>

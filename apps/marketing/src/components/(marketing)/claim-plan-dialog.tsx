@@ -11,7 +11,8 @@ import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
 import { useAnalytics } from '@documenso/lib/client-only/hooks/use-analytics';
-import { createTranslation } from '@documenso/ui/i18n/server';
+import { useTranslation } from '@documenso/ui/i18n/client';
+import { LocaleTypes } from '@documenso/ui/i18n/settings';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
 import {
@@ -41,21 +42,16 @@ export type ClaimPlanDialogProps = {
   className?: string;
   planId: string;
   children: React.ReactNode;
-  locale: any;
+  locale: LocaleTypes;
 };
 
-export const ClaimPlanDialog = async ({
-  className,
-  planId,
-  children,
-  locale,
-}: ClaimPlanDialogProps) => {
+export const ClaimPlanDialog = ({ className, planId, children, locale }: ClaimPlanDialogProps) => {
   const params = useSearchParams();
   const analytics = useAnalytics();
   const event = usePlausible();
 
   const { toast } = useToast();
-  const { t } = await createTranslation(locale, 'home');
+  const { t } = useTranslation(locale, 'home');
 
   const [open, setOpen] = useState(() => params?.get('cancelled') === 'true');
 

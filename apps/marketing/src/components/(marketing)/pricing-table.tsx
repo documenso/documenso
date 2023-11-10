@@ -8,7 +8,7 @@ import { useParams, useSearchParams } from 'next/navigation';
 import { AnimatePresence, motion } from 'framer-motion';
 import { usePlausible } from 'next-plausible';
 
-import { createTranslation } from '@documenso/ui/i18n/server';
+import { useTranslation } from '@documenso/ui/i18n/client';
 import { LocaleTypes } from '@documenso/ui/i18n/settings';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
@@ -17,12 +17,12 @@ export type PricingTableProps = HTMLAttributes<HTMLDivElement>;
 
 const SELECTED_PLAN_BAR_LAYOUT_ID = 'selected-plan-bar';
 
-export const PricingTable = async ({ className, ...props }: PricingTableProps) => {
+export const PricingTable = ({ className, ...props }: PricingTableProps) => {
   const locale = useParams()?.locale as LocaleTypes;
 
   const params = useSearchParams();
   const event = usePlausible();
-  const { t } = await createTranslation(locale, 'pricing');
+  const { t } = useTranslation(locale, 'pricing');
 
   const [period, setPeriod] = useState<'MONTHLY' | 'YEARLY'>(() =>
     params?.get('planId') === process.env.NEXT_PUBLIC_STRIPE_COMMUNITY_PLAN_YEARLY_PRICE_ID

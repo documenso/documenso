@@ -5,18 +5,19 @@ import Link from 'next/link';
 import { usePlausible } from 'next-plausible';
 import { LuGithub } from 'react-icons/lu';
 
-import { createTranslation } from '@documenso/ui/i18n/server';
+import { useTranslation } from '@documenso/ui/i18n/client';
+import { LocaleTypes } from '@documenso/ui/i18n/settings';
 import { Button } from '@documenso/ui/primitives/button';
 
 export type CalloutProps = {
   starCount?: number;
   [key: string]: unknown;
-  locale: any;
+  locale: LocaleTypes;
 };
 
-export const Callout = async ({ starCount, locale }: CalloutProps) => {
+export const Callout = ({ starCount, locale }: CalloutProps) => {
   const event = usePlausible();
-  const { t } = await createTranslation(locale, 'marketing');
+  const { t } = useTranslation(locale, 'marketing');
 
   const onSignUpClick = () => {
     const el = document.getElementById('email');

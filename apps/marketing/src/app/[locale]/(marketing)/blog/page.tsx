@@ -1,15 +1,20 @@
 import { allBlogPosts } from 'contentlayer/generated';
 
-import { createTranslation } from '@documenso/ui/i18n/server';
+import { useTranslation } from '@documenso/ui/i18n/client';
+import { LocaleTypes } from '@documenso/ui/i18n/settings';
 
-export default async function BlogPage({ params: { locale } }) {
+export interface BlogPageProps {
+  locale: LocaleTypes;
+}
+
+export const BlogPage = ({ locale }: BlogPageProps) => {
   const blogPosts = allBlogPosts.sort((a, b) => {
     const dateA = new Date(a.date);
     const dateB = new Date(b.date);
 
     return dateB.getTime() - dateA.getTime();
   });
-  const { t } = await createTranslation(locale, 'blog');
+  const { t } = useTranslation(locale, 'blog');
 
   return (
     <div className="mt-6 sm:mt-12">
@@ -79,4 +84,4 @@ export default async function BlogPage({ params: { locale } }) {
       </div>
     </div>
   );
-}
+};

@@ -1,6 +1,6 @@
 import Link from 'next/link';
 
-import { createTranslation } from '@documenso/ui/i18n/server';
+import { LocaleTypes } from '@documenso/ui/i18n/settings';
 import {
   Accordion,
   AccordionContent,
@@ -18,10 +18,11 @@ export type PricingPageProps = {
     name?: string;
     cancelled?: string;
   };
+  locale: LocaleTypes;
 };
 
-export default async function PricingPage({ params: { locale } }) {
-  const { t } = await createTranslation(locale, 'pricing');
+export default async function PricingPage({ locale }: PricingPageProps) {
+  const { t } = useTranslation(locale, 'pricing');
 
   return (
     <div className="mt-6 sm:mt-12">

@@ -9,7 +9,8 @@ import { LuGithub } from 'react-icons/lu';
 import { match } from 'ts-pattern';
 
 import { useFeatureFlags } from '@documenso/lib/client-only/providers/feature-flag';
-import { createTranslation } from '@documenso/ui/i18n/server';
+import { useTranslation } from '@documenso/ui/i18n/client';
+import { LocaleTypes } from '@documenso/ui/i18n/settings';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
 
@@ -20,7 +21,7 @@ import { Widget } from './widget';
 export type HeroProps = {
   className?: string;
   [key: string]: unknown;
-  locale: any;
+  locale: LocaleTypes;
 };
 
 const BackgroundPatternVariants: Variants = {
@@ -52,9 +53,9 @@ const HeroTitleVariants: Variants = {
   },
 };
 
-export const Hero = async ({ className, locale, ...props }: HeroProps) => {
+export const Hero = ({ className, locale, ...props }: HeroProps) => {
   const event = usePlausible();
-  const { t } = await createTranslation(locale, 'hero');
+  const { t } = useTranslation(locale, 'hero');
 
   const { getFlag } = useFeatureFlags();
 
