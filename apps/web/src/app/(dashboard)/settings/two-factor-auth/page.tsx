@@ -1,5 +1,6 @@
 import { redirect } from 'next/navigation';
 
+import { DOCUMENSO_ENCRYPTION_KEY } from '@documenso/lib/constants/crypto';
 import { getRequiredServerComponentSession } from '@documenso/lib/next-auth/get-server-session';
 
 import { TwoFactorAuthenticationForm } from '~/components/forms/2fa/two-factor-authentication';
@@ -7,7 +8,10 @@ import { TwoFactorAuthenticationForm } from '~/components/forms/2fa/two-factor-a
 export default async function TwoFactorAuthPage() {
   const { user } = await getRequiredServerComponentSession();
 
-  if (user.identityProvider !== 'DOCUMENSO' || !process.env.DOCUMENSO_ENCRYPTION_KEY) {
+  const isTwoFactorAuthEnabled =
+    user.identityProvider === 'DOCUMENSO' && typeof DOCUMENSO_ENCRYPTION_KEY === 'string';
+
+  if (!isTwoFactorAuthEnabled) {
     redirect('/settings/profile');
   }
   return (
