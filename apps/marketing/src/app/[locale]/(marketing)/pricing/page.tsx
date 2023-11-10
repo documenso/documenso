@@ -1,5 +1,6 @@
 import Link from 'next/link';
 
+import { useTranslation } from '@documenso/ui/i18n/client';
 import { LocaleTypes } from '@documenso/ui/i18n/settings';
 import {
   Accordion,
@@ -18,10 +19,9 @@ export type PricingPageProps = {
     name?: string;
     cancelled?: string;
   };
-  locale: LocaleTypes;
 };
 
-export default async function PricingPage({ locale }: PricingPageProps) {
+export default function PricingPage({ params: { locale } }: { params: { locale: LocaleTypes } }) {
   const { t } = useTranslation(locale, 'pricing');
 
   return (
