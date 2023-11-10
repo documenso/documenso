@@ -46,15 +46,15 @@ export const NEXT_AUTH_OPTIONS: AuthOptions = {
           throw new Error(ErrorCode.USER_MISSING_PASSWORD);
         }
 
-        const is2faEnabled = isTwoFactorAuthEnabled({ user });
-        if (is2faEnabled) {
-          await authenticateTwoFactorAuth({ backupCode, totpCode, user });
-        }
-
         const isPasswordsSame = await compare(password, user.password);
 
         if (!isPasswordsSame) {
           throw new Error(ErrorCode.INCORRECT_EMAIL_PASSWORD);
+        }
+
+        const is2faEnabled = isTwoFactorAuthEnabled({ user });
+        if (is2faEnabled) {
+          await authenticateTwoFactorAuth({ backupCode, totpCode, user });
         }
 
         return {
