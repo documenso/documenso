@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: documenso-app
+    name: notario-app
     env: node
     plan: free
     buildCommand: npm i && npm run build:web
@@ -18,7 +18,7 @@ services:
       # Auth
       - key: NEXTAUTH_URL
         fromService:
-          name: documenso-app
+          name: notario-app
           type: web
           envVarKey: RENDER_EXTERNAL_URL
       - key: NEXTAUTH_SECRET
@@ -27,18 +27,18 @@ services:
       # Database
       - key: NEXT_PRIVATE_DATABASE_URL
         fromDatabase:
-          name: documenso-db
+          name: notario-db
           property: connectionString
 
       - key: NEXT_PRIVATE_DIRECT_DATABASE_URL
         fromDatabase:
-          name: documenso-db
+          name: notario-db
           property: connectionString
 
       # URLs
       - key: NEXT_PUBLIC_WEBAPP_URL
         fromService:
-          name: documenso-app
+          name: notario-app
           type: web
           envVarKey: RENDER_EXTERNAL_URL
       - key: NEXT_PUBLIC_MARKETING_URL
@@ -99,5 +99,5 @@ services:
         sync: false
 
 databases:
-  - name: documenso-db
+  - name: notario-db
     plan: free
