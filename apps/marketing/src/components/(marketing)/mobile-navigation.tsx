@@ -66,7 +66,7 @@ export const MobileNavigation = ({ isMenuOpen, onMenuOpenChange }: MobileNavigat
             src="/logo.png"
             alt="Notario Logo"
             className="dark:invert"
-            width={170}
+            width={145}
             height={25}
           />
         </Link>

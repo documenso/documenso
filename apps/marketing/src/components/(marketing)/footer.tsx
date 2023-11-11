@@ -41,7 +41,7 @@ export const Footer = ({ className, ...props }: FooterProps) => {
               src="/logo.png"
               alt="Notario Logo"
               className="dark:invert"
-              width={170}
+              width={145}
               height={0}
             />
           </Link>

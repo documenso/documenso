@@ -32,7 +32,7 @@ export const Header = ({ className, ...props }: HeaderProps) => {
             src="/logo.png"
             alt="Notario Logo"
             className="dark:invert"
-            width={170}
+            width={145}
             height={25}
           />
         </Link>
