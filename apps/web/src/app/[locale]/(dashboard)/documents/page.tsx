@@ -80,7 +80,12 @@ export default async function DocumentsPage({ searchParams = {} }: DocumentsPage
                 ExtendedDocumentStatus.DRAFT,
                 ExtendedDocumentStatus.ALL,
               ].map((value) => (
-                <TabsTrigger key={value} className="min-w-[60px]" value={value} asChild>
+                <TabsTrigger
+                  key={value}
+                  className="min-w-[60px] hover:border-2 hover:border-solid hover:border-gray-600"
+                  value={value}
+                  asChild
+                >
                   <Link href={getTabHref(value)} scroll={false}>
                     <DocumentStatus status={value} />
 
