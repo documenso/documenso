@@ -20,24 +20,18 @@ export const MENU_NAVIGATION_LINKS = [
     href: '/singleplayer',
     text: 'Singleplayer',
   },
-  {
-    href: '/blog',
-    text: 'Blog',
-  },
+
   {
     href: '/pricing',
     text: 'Pricing',
   },
+
   {
-    href: '/open',
-    text: 'Open',
-  },
-  {
-    href: 'https://status.documenso.com',
+    href: 'https://status.notario.co',
     text: 'Status',
   },
   {
-    href: 'mailto:support@documenso.com',
+    href: 'mailto:notario@progiciel.co',
     text: 'Support',
     target: '_blank',
   },
@@ -46,7 +40,7 @@ export const MENU_NAVIGATION_LINKS = [
     text: 'Privacy',
   },
   {
-    href: 'https://app.documenso.com/signin',
+    href: 'https://app.notario.progiciel.co/signin/fr',
     text: 'Sign in',
   },
 ];
