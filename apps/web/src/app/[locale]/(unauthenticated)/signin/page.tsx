@@ -1,6 +1,5 @@
 import Link from 'next/link';
 
-import ChangeLocale from '@documenso/ui/components/ChangeLocale';
 import { LocaleTypes } from '@documenso/ui/i18n/settings';
 
 import { SignInForm } from '~/components/forms/signin';
