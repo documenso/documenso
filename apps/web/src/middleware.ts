@@ -2,8 +2,6 @@ import { NextRequest, NextResponse } from 'next/server';
 
 import { getToken } from 'next-auth/jwt';
 
-import { fallbackLng, locales } from '@documenso/ui/i18n/settings';
-
 export default async function middleware(req: NextRequest) {
   if (req.nextUrl.pathname === '/') {
     const redirectUrl = new URL('/en/signin', req.url);

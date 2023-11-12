@@ -21,8 +21,6 @@ export const Header = ({ className, ...props }: HeaderProps) => {
   const locale = useParams()?.locale as LocaleTypes;
   const [isHamburgerMenuOpen, setIsHamburgerMenuOpen] = useState(false);
   const { t } = useTranslation(locale, 'marketing');
-  const { getFlag } = useFeatureFlags();
-  const isSinglePlayerModeMarketingEnabled = getFlag('marketing_header_single_player_mode');
 
   return (
     <header className={cn('flex items-center justify-between', className)} {...props}>
@@ -37,14 +35,12 @@ export const Header = ({ className, ...props }: HeaderProps) => {
           />
         </Link>
 
-        {isSinglePlayerModeMarketingEnabled && (
-          <Link
-            href="/singleplayer"
-            className="bg-primary dark:text-background rounded-full px-2 py-1 text-xs font-semibold sm:px-3"
-          >
-            {t(`try`)}
-          </Link>
-        )}
+        <Link
+          href={`${locale}/singleplayer`}
+          className="bg-primary dark:text-background rounded-full px-2 py-1 text-xs font-semibold sm:px-3"
+        >
+          {t(`try`)}
+        </Link>
       </div>
 
       <div className="hidden items-center gap-x-6 md:flex">
