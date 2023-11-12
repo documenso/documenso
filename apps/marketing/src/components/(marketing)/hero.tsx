@@ -153,7 +153,7 @@ export const Hero = ({ className, locale, ...props }: HeroProps) => {
               >
                 <img
                   src="https://api.producthunt.com/widgets/embed-image/v1/top-post-badge.svg?post_id=395047&theme=light&period=daily"
-                  alt="Notario - The open source DocuSign alternative | Product Hunt"
+                  alt="Notario - Secure Your Documents, Simplify Your Signatures. | Product Hunt"
                   style={{ width: '250px', height: '54px' }}
                 />
               </Link>

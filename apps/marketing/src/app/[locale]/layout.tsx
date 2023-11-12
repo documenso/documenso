@@ -18,15 +18,15 @@ const fontInter = Inter({ subsets: ['latin'], variable: '--font-sans' });
 const fontCaveat = Caveat({ subsets: ['latin'], variable: '--font-signature' });
 
 export const metadata = {
-  title: 'Notario - The Open Source DocuSign Alternative',
+  title: 'Notario - Secure Your Documents, Simplify Your Signatures.',
   description:
     'Join Notario, the open signing infrastructure, and get a 10x better signing experience. Pricing starts at $30/mo. forever! Sign in now and enjoy a faster, smarter, and more beautiful document signing process. Integrates with your favorite tools, customizable, and expandable. Support our mission and become a part of our open-source community.',
   keywords:
-    'Notario, open source, DocuSign alternative, document signing, open signing infrastructure, open-source community, fast signing, beautiful signing, smart templates',
+    'Notario, DocuSign alternative, document signing, open signing infrastructure, fast signing, beautiful signing, smart templates',
   authors: { name: 'Notario, Inc.' },
   robots: 'index, follow',
   openGraph: {
-    title: 'Notario - The Open Source DocuSign Alternative',
+    title: 'Notario - Secure Your Documents, Simplify Your Signatures.',
     description:
       'Join Notario, the open signing infrastructure, and get a 10x better signing experience. Pricing starts at $30/mo. forever! Sign in now and enjoy a faster, smarter, and more beautiful document signing process. Integrates with your favorite tools, customizable, and expandable. Support our mission and become a part of our open-source community.',
     type: 'website',
