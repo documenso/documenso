@@ -119,16 +119,6 @@ export default async function PricingPage({
             </AccordionContent>
           </AccordionItem>
 
-          <AccordionItem value="can-i-use-documenso-commercially">
-            <AccordionTrigger className="text-left text-lg font-semibold">
-              {t(`can-sell`)}
-            </AccordionTrigger>
-
-            <AccordionContent className="text-muted-foreground max-w-prose text-sm leading-relaxed">
-              {t(`licence`)}
-            </AccordionContent>
-          </AccordionItem>
-
           <AccordionItem value="why-prefer-documenso">
             <AccordionTrigger className="text-left text-lg font-semibold">
               {t(`why-use`)}
@@ -149,19 +139,10 @@ export default async function PricingPage({
               <Link
                 className="text-documenso-700 font-bold"
                 target="_blank"
-                href="mailto:support@documenso.com"
+                href="mailto:info@progiciel.co"
               >
-                support@documenso.com
+                info@progiciel.co
               </Link>{' '}
-              {t(`or`)}{' '}
-              <a
-                className="text-documenso-700 font-bold"
-                href="https://documen.so/discord"
-                target="_blank"
-              >
-                {t(`in-discord`)}
-              </a>{' '}
-              {t(`please-message`)}
             </AccordionContent>
           </AccordionItem>
         </Accordion>
