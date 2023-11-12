@@ -8,6 +8,8 @@ import { getRecipientOrSenderByShareLinkSlug } from '@documenso/lib/server-only/
 import { Logo } from '~/components/branding/logo';
 import { getAssetBuffer } from '~/helpers/get-asset-buffer';
 
+export const runtime = 'edge';
+
 const CARD_OFFSET_TOP = 152;
 const CARD_OFFSET_LEFT = 350;
 const CARD_WIDTH = 500;
@@ -156,5 +158,3 @@ export async function GET(_request: Request, { params: { slug } }: SharePageOpen
     },
   );
 }
-
-export const runtime = 'edge';
