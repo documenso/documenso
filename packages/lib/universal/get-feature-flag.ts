@@ -4,7 +4,7 @@ import {
   TFeatureFlagValue,
   ZFeatureFlagValueSchema,
 } from '@documenso/lib/client-only/providers/feature-flag.types';
-import { APP_BASE_URL } from '@documenso/lib/constants/app';
+import { appBaseUrl } from '@documenso/lib/constants/app';
 import { LOCAL_FEATURE_FLAGS, isFeatureFlagEnabled } from '@documenso/lib/constants/feature-flags';
 
 /**
@@ -24,7 +24,7 @@ export const getFlag = async (
     return LOCAL_FEATURE_FLAGS[flag] ?? true;
   }
 
-  const url = new URL(`${APP_BASE_URL}/api/feature-flag/get`);
+  const url = new URL(`${appBaseUrl()}/api/feature-flag/get`);
   url.searchParams.set('flag', flag);
 
   const response = await fetch(url, {
@@ -57,7 +57,7 @@ export const getAllFlags = async (
     return LOCAL_FEATURE_FLAGS;
   }
 
-  const url = new URL(`${APP_BASE_URL}/api/feature-flag/all`);
+  const url = new URL(`${appBaseUrl()}/api/feature-flag/all`);
 
   return fetch(url, {
     headers: {
@@ -82,7 +82,7 @@ export const getAllAnonymousFlags = async (): Promise<Record<string, TFeatureFla
     return LOCAL_FEATURE_FLAGS;
   }
 
-  const url = new URL(`${APP_BASE_URL}/api/feature-flag/all`);
+  const url = new URL(`${appBaseUrl()}/api/feature-flag/all`);
 
   return fetch(url, {
     next: {

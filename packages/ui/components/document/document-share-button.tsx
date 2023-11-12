@@ -11,6 +11,7 @@ import {
   TOAST_DOCUMENT_SHARE_SUCCESS,
 } from '@documenso/lib/constants/toast';
 import { generateTwitterIntent } from '@documenso/lib/universal/generate-twitter-intent';
+import { useRuntimeEnv } from '@documenso/lib/universal/runtime-env/client';
 import { trpc } from '@documenso/trpc/react';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
@@ -37,6 +38,7 @@ export const DocumentShareButton = ({
   trigger,
 }: DocumentShareButtonProps) => {
   const { toast } = useToast();
+  const { NEXT_PUBLIC_WEBAPP_URL } = useRuntimeEnv();
 
   const { copyShareLink, createAndCopyShareLink, isCopyingShareLink } = useCopyShareLink({
     onSuccess: () => toast(TOAST_DOCUMENT_SHARE_SUCCESS),
@@ -64,7 +66,7 @@ export const DocumentShareButton = ({
 
   const onCopyClick = async () => {
     if (shareLink) {
-      await copyShareLink(`${process.env.NEXT_PUBLIC_WEBAPP_URL}/share/${shareLink.slug}`);
+      await copyShareLink(`${NEXT_PUBLIC_WEBAPP_URL}/share/${shareLink.slug}`);
     } else {
       await createAndCopyShareLink({
         token,
@@ -88,7 +90,7 @@ export const DocumentShareButton = ({
     }
 
     // Ensuring we've prewarmed the opengraph image for the Twitter
-    await fetch(`${process.env.NEXT_PUBLIC_WEBAPP_URL}/share/${slug}/opengraph`, {
+    await fetch(`${NEXT_PUBLIC_WEBAPP_URL}/share/${slug}/opengraph`, {
       // We don't care about the response, so we can use no-cors
       mode: 'no-cors',
     });
@@ -96,7 +98,7 @@ export const DocumentShareButton = ({
     window.open(
       generateTwitterIntent(
         `I just ${token ? 'signed' : 'sent'} a document with @documenso. Check it out!`,
-        `${process.env.NEXT_PUBLIC_WEBAPP_URL}/share/${slug}`,
+        `${NEXT_PUBLIC_WEBAPP_URL}/share/${slug}`,
       ),
       '_blank',
     );
@@ -141,7 +143,7 @@ export const DocumentShareButton = ({
                 'animate-pulse': !shareLink?.slug,
               })}
             >
-              {process.env.NEXT_PUBLIC_WEBAPP_URL}/share/{shareLink?.slug || '...'}
+              {NEXT_PUBLIC_WEBAPP_URL}/share/{shareLink?.slug || '...'}
             </span>
             <div
               className={cn('bg-muted/40 mt-4 aspect-video overflow-hidden rounded-lg border', {
@@ -150,7 +152,7 @@ export const DocumentShareButton = ({
             >
               {shareLink?.slug && (
                 <img
-                  src={`${process.env.NEXT_PUBLIC_WEBAPP_URL}/share/${shareLink.slug}/opengraph`}
+                  src={`${NEXT_PUBLIC_WEBAPP_URL}/share/${shareLink.slug}/opengraph`}
                   alt="sharing link"
                   className="h-full w-full object-cover"
                 />

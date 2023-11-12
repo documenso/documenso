@@ -4,6 +4,7 @@ import { match } from 'ts-pattern';
 import { DocumentDataType } from '@documenso/prisma/client';
 
 import { createDocumentData } from '../../server-only/document-data/create-document-data';
+import { getRuntimeEnv } from '../runtime-env/get-runtime-env';
 
 type File = {
   name: string;
@@ -12,7 +13,9 @@ type File = {
 };
 
 export const putFile = async (file: File) => {
-  const { type, data } = await match(process.env.NEXT_PUBLIC_UPLOAD_TRANSPORT)
+  const { NEXT_PUBLIC_UPLOAD_TRANSPORT } = getRuntimeEnv();
+
+  const { type, data } = await match(NEXT_PUBLIC_UPLOAD_TRANSPORT)
     .with('s3', async () => putFileInS3(file))
     .otherwise(async () => putFileInDatabase(file));
 

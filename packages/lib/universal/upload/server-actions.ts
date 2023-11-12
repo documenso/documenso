@@ -12,6 +12,7 @@ import path from 'node:path';
 import { ONE_HOUR, ONE_SECOND } from '../../constants/time';
 import { getServerComponentSession } from '../../next-auth/get-server-session';
 import { alphaid } from '../id';
+import { getRuntimeEnv } from '../runtime-env/get-runtime-env';
 
 export const getPresignPostUrl = async (fileName: string, contentType: string) => {
   const client = getS3Client();
@@ -103,7 +104,9 @@ export const deleteS3File = async (key: string) => {
 };
 
 const getS3Client = () => {
-  if (process.env.NEXT_PUBLIC_UPLOAD_TRANSPORT !== 's3') {
+  const { NEXT_PUBLIC_UPLOAD_TRANSPORT } = getRuntimeEnv();
+
+  if (NEXT_PUBLIC_UPLOAD_TRANSPORT !== 's3') {
     throw new Error('Invalid upload transport');
   }
 

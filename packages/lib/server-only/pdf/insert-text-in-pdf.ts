@@ -1,6 +1,7 @@
 import fontkit from '@pdf-lib/fontkit';
 import { PDFDocument, StandardFonts, rgb } from 'pdf-lib';
 
+import { appBaseUrl } from '../../constants/app';
 import { CAVEAT_FONT_PATH } from '../../constants/pdf';
 
 export async function insertTextInPDF(
@@ -12,7 +13,7 @@ export async function insertTextInPDF(
   useHandwritingFont = true,
 ): Promise<string> {
   // Fetch the font file from the public URL.
-  const fontResponse = await fetch(CAVEAT_FONT_PATH);
+  const fontResponse = await fetch(new URL(CAVEAT_FONT_PATH, appBaseUrl()));
   const fontCaveat = await fontResponse.arrayBuffer();
 
   const pdfDoc = await PDFDocument.load(pdfAsBase64);

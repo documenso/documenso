@@ -5,18 +5,22 @@ import { render } from '@documenso/email/render';
 import { ResetPasswordTemplate } from '@documenso/email/templates/reset-password';
 import { prisma } from '@documenso/prisma';
 
+import { getRuntimeEnv } from '../../universal/runtime-env/get-runtime-env';
+
 export interface SendResetPasswordOptions {
   userId: number;
 }
 
 export const sendResetPassword = async ({ userId }: SendResetPasswordOptions) => {
+  const { NEXT_PUBLIC_WEBAPP_URL } = getRuntimeEnv();
+
   const user = await prisma.user.findFirstOrThrow({
     where: {
       id: userId,
     },
   });
 
-  const assetBaseUrl = process.env.NEXT_PUBLIC_WEBAPP_URL || 'http://localhost:3000';
+  const assetBaseUrl = NEXT_PUBLIC_WEBAPP_URL || 'http://localhost:3000';
 
   const template = createElement(ResetPasswordTemplate, {
     assetBaseUrl,

@@ -8,12 +8,16 @@ import { renderCustomEmailTemplate } from '@documenso/lib/utils/render-custom-em
 import { prisma } from '@documenso/prisma';
 import { DocumentStatus, SendStatus } from '@documenso/prisma/client';
 
+import { getRuntimeEnv } from '../../universal/runtime-env/get-runtime-env';
+
 export type SendDocumentOptions = {
   documentId: number;
   userId: number;
 };
 
 export const sendDocument = async ({ documentId, userId }: SendDocumentOptions) => {
+  const { NEXT_PUBLIC_WEBAPP_URL } = getRuntimeEnv();
+
   const user = await prisma.user.findFirstOrThrow({
     where: {
       id: userId,
@@ -59,8 +63,8 @@ export const sendDocument = async ({ documentId, userId }: SendDocumentOptions) 
         return;
       }
 
-      const assetBaseUrl = process.env.NEXT_PUBLIC_WEBAPP_URL || 'http://localhost:3000';
-      const signDocumentLink = `${process.env.NEXT_PUBLIC_WEBAPP_URL}/sign/${recipient.token}`;
+      const assetBaseUrl = NEXT_PUBLIC_WEBAPP_URL || 'http://localhost:3000';
+      const signDocumentLink = `${NEXT_PUBLIC_WEBAPP_URL}/sign/${recipient.token}`;
 
       const template = createElement(DocumentInviteEmailTemplate, {
         documentName: document.title,

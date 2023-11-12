@@ -12,9 +12,11 @@ import { FieldType } from '@documenso/prisma/client';
 import { isSignatureFieldType } from '@documenso/prisma/guards/is-signature-field';
 import { FieldWithSignature } from '@documenso/prisma/types/field-with-signature';
 
+import { appBaseUrl } from '../../constants/app';
+
 export const insertFieldInPDF = async (pdf: PDFDocument, field: FieldWithSignature) => {
   // Fetch the font file from the public URL.
-  const fontResponse = await fetch(CAVEAT_FONT_PATH);
+  const fontResponse = await fetch(new URL(CAVEAT_FONT_PATH, appBaseUrl()));
   const fontCaveat = await fontResponse.arrayBuffer();
 
   const isSignatureField = isSignatureFieldType(field.type);
