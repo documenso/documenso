@@ -50,7 +50,7 @@ export default async function PricingPage({
 
         <div className="mt-4 flex justify-center">
           <Button variant="outline" size="lg" className="rounded-full hover:cursor-pointer" asChild>
-            <Link href="https://github.com/documenso/documenso" target="_blank">
+            <Link href="#" target="_blank">
               {t(`get-started`)}
             </Link>
           </Button>
@@ -97,26 +97,6 @@ export default async function PricingPage({
             <AccordionTrigger className="text-left text-lg font-semibold">
               {t(`contribution`)}
             </AccordionTrigger>
-
-            <AccordionContent className="text-muted-foreground max-w-prose text-sm leading-relaxed">
-              {t(`awesome`)}{' '}
-              <Link
-                className="text-documenso-700 font-bold"
-                href="https://github.com/documenso/documenso/milestones"
-                target="_blank"
-              >
-                {t(`issues`)}
-              </Link>{' '}
-              {t(`join-our`)}{' '}
-              <Link
-                className="text-documenso-700 font-bold"
-                href="https://documen.so/discord"
-                target="_blank"
-              >
-                {t(`discord-community`)}
-              </Link>{' '}
-              {t(`updates`)}
-            </AccordionContent>
           </AccordionItem>
 
           <AccordionItem value="why-prefer-documenso">

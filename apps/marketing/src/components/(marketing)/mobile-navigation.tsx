@@ -6,7 +6,6 @@ import Link from 'next/link';
 import { motion, useReducedMotion } from 'framer-motion';
 import { FaXTwitter } from 'react-icons/fa6';
 import { LiaDiscord } from 'react-icons/lia';
-import { LuGithub } from 'react-icons/lu';
 
 import { Sheet, SheetContent } from '@documenso/ui/primitives/sheet';
 
@@ -105,14 +104,6 @@ export const MobileNavigation = ({ isMenuOpen, onMenuOpenChange }: MobileNavigat
             className="text-foreground hover:text-foreground/80"
           >
             <FaXTwitter className="h-6 w-6" />
-          </Link>
-
-          <Link
-            href="https://github.com/documenso/documenso"
-            target="_blank"
-            className="text-foreground hover:text-foreground/80"
-          >
-            <LuGithub className="h-6 w-6" />
           </Link>
 
           <Link

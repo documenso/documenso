@@ -8,17 +8,17 @@ import Link from 'next/link';
 import { Moon, Sun } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import { FaXTwitter } from 'react-icons/fa6';
-import { LiaDiscord } from 'react-icons/lia';
-import { LuGithub } from 'react-icons/lu';
 
+// import { LiaDiscord } from 'react-icons/lia';
+// import { LuGithub } from 'react-icons/lu';
 import { cn } from '@documenso/ui/lib/utils';
 
 export type FooterProps = HTMLAttributes<HTMLDivElement>;
 
 const SOCIAL_LINKS = [
-  { href: 'https://twitter.com/documenso', icon: <FaXTwitter className="h-6 w-6" /> },
-  { href: 'https://github.com/documenso/documenso', icon: <LuGithub className="h-6 w-6" /> },
-  { href: 'https://documen.so/discord', icon: <LiaDiscord className="h-7 w-7" /> },
+  { href: 'https://twitter.com/notario', icon: <FaXTwitter className="h-6 w-6" /> },
+  // { href: 'https://github.com/documenso/documenso', icon: <LuGithub className="h-6 w-6" /> },
+  // { href: 'https://documen.so/discord', icon: <LiaDiscord className="h-7 w-7" /> },
 ];
 
 const FOOTER_LINKS = [
