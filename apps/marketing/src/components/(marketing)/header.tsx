@@ -6,7 +6,6 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 
-import { useFeatureFlags } from '@documenso/lib/client-only/providers/feature-flag';
 import ChangeLocale from '@documenso/ui/components/ChangeLocale';
 import { useTranslation } from '@documenso/ui/i18n/client';
 import { LocaleTypes } from '@documenso/ui/i18n/settings';
