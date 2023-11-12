@@ -83,7 +83,7 @@ export const ResetPasswordForm = ({ className, token }: ResetPasswordFormProps) 
         });
       } else {
         toast({
-          title: 'An unknown error occurred',
+          title: 't(`unknown-error`)',
           variant: 'destructive',
           description:
             'We encountered an unknown error while attempting to reset your password. Please try again later.',

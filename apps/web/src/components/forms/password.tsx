@@ -91,7 +91,7 @@ export const PasswordForm = ({ className }: PasswordFormProps) => {
         });
       } else {
         toast({
-          title: 'An unknown error occurred',
+          title: 't(`unknown-error`)',
           variant: 'destructive',
           description:
             'We encountered an unknown error while attempting to update your password. Please try again later.',

@@ -1,9 +1,13 @@
+import { useParams } from 'next/navigation';
+
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
 
 import { ErrorCode, isErrorCode } from '@documenso/lib/next-auth/error-codes';
 import { trpc } from '@documenso/trpc/react';
+import { useTranslation } from '@documenso/ui/i18n/client';
+import { LocaleTypes } from '@documenso/ui/i18n/settings';
 import { Button } from '@documenso/ui/primitives/button';
 import { CardDescription } from '@documenso/ui/primitives/card';
 import {
@@ -73,7 +77,7 @@ export const AuthenticatorAppSetupDialog = ({
       form.reset();
       toast({
         title: 'Success',
-        description: 'successfully configured 2fa',
+        description: t('enabled-2fa'),
         variant: 'default',
       });
     },
@@ -97,18 +101,14 @@ export const AuthenticatorAppSetupDialog = ({
     >
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Setup two-factor authentication</DialogTitle>
-          <DialogDescription>
-            Use an authenticator app or browser extension to scan the qr code.
-          </DialogDescription>
+          <DialogTitle>{t('setup-2fa')}</DialogTitle>
+          <DialogDescription>{t('setup-2fa-desc')}</DialogDescription>
         </DialogHeader>
         <div className="flex flex-col gap-y-2">
           <div>
             <img src={qr} alt="2fa qrcode" />
           </div>
-          <CardDescription>
-            Unable to scan? You can use the setup key to manually configure your authenticator app.
-          </CardDescription>
+          <CardDescription>{t('setup-2fa-card-desc')}</CardDescription>
 
           <div>
             <p>{secret}</p>
@@ -122,7 +122,7 @@ export const AuthenticatorAppSetupDialog = ({
                 name="code"
                 render={({ field, formState: { isSubmitting } }) => (
                   <FormItem>
-                    <FormLabel> OTP code</FormLabel>
+                    <FormLabel> {t('otp-codes')}</FormLabel>
                     <FormControl>
                       <Input
                         disabled={isSubmitting}
@@ -142,7 +142,7 @@ export const AuthenticatorAppSetupDialog = ({
         </div>
         <DialogFooter>
           <Button type="submit" form="2fa-setup-form" disabled={form.formState.isSubmitting}>
-            Submit
+            {t('submit')}
           </Button>
         </DialogFooter>
       </DialogContent>

@@ -2,9 +2,11 @@
 
 import { useState } from 'react';
 
-import { useRouter } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 
 import { trpc } from '@documenso/trpc/react';
+import { useTranslation } from '@documenso/ui/i18n/client';
+import { LocaleTypes } from '@documenso/ui/i18n/settings';
 import { Button } from '@documenso/ui/primitives/button';
 import { CardContent, CardDescription, CardHeader, CardTitle } from '@documenso/ui/primitives/card';
 
@@ -25,7 +27,8 @@ export const AuthenticatorApp = ({ isTwoFactorEnabled, backupCodes }: Authentica
   const { mutateAsync: setup } = trpc.twoFactor.setup.useMutation();
   const [modalState, setModalState] = useState<ModalState>(null);
   const [data, setData] = useState<Awaited<ReturnType<typeof setup>> | null>(null);
-
+  const locale = useParams()?.locale as LocaleTypes;
+  const { t } = useTranslation(locale, 'dashboard');
   const handleVerified = async (password: string) => {
     try {
       const data = await setup({ password });
@@ -51,12 +54,12 @@ export const AuthenticatorApp = ({ isTwoFactorEnabled, backupCodes }: Authentica
   return (
     <>
       <CardHeader>
-        <CardTitle>Two-factor methods</CardTitle>
+        <CardTitle>{t(`2fa-methods`)}</CardTitle>
       </CardHeader>
       <CardContent>
         <hr />
         <div className="flex items-center justify-between pt-4">
-          <h4>Authenticator app</h4>
+          <h4>{t('authenticator-app')}</h4>
 
           <Button
             onClick={() => {
@@ -70,10 +73,7 @@ export const AuthenticatorApp = ({ isTwoFactorEnabled, backupCodes }: Authentica
         </div>
 
         <div className="flex pt-2">
-          <CardDescription>
-            Create one-time passwords that serve as a secondary authentication method for confirming
-            your identity when requested during the sign-in process.
-          </CardDescription>
+          <CardDescription>{t('create-one-tine-password')}</CardDescription>
         </div>
       </CardContent>
 

@@ -2,6 +2,10 @@
 
 import { useState } from 'react';
 
+import { useParams } from 'next/navigation';
+
+import { useTranslation } from '@documenso/ui/i18n/client';
+import { LocaleTypes } from '@documenso/ui/i18n/settings';
 import { Button } from '@documenso/ui/primitives/button';
 import { CardContent, CardDescription, CardHeader, CardTitle } from '@documenso/ui/primitives/card';
 
@@ -17,16 +21,18 @@ type RecoveryCodesProps = {
 
 export const RecoveryCodes = ({ backupCodes, isTwoFactorEnabled }: RecoveryCodesProps) => {
   const [modalState, setModalState] = useState<ModalState>(null);
+  const locale = useParams()?.locale as LocaleTypes;
+  const { t } = useTranslation(locale, 'dashboard');
   return (
     <>
       <CardHeader>
-        <CardTitle>Recovery options</CardTitle>
+        <CardTitle>{t(`recovery-options`)}</CardTitle>
       </CardHeader>
 
       <CardContent>
         <hr />
         <div className="flex items-center justify-between pt-4">
-          <h4>Recovery codes</h4>
+          <h4>{t(`recovery-codes`)}</h4>
 
           <Button
             disabled={!isTwoFactorEnabled}
@@ -35,15 +41,12 @@ export const RecoveryCodes = ({ backupCodes, isTwoFactorEnabled }: RecoveryCodes
             }}
             size="sm"
           >
-            View
+            {t(`view`)}
           </Button>
         </div>
 
         <div className="flex pt-2">
-          <CardDescription>
-            In case you lose access to your device and are unable to receive two-factor
-            authentication codes, recovery codes provide a means to access your account.
-          </CardDescription>
+          <CardDescription>{t(`in-case`)}</CardDescription>
         </div>
       </CardContent>
 
@@ -56,7 +59,7 @@ export const RecoveryCodes = ({ backupCodes, isTwoFactorEnabled }: RecoveryCodes
         onVerified={async () => {
           setModalState('recover-codes');
         }}
-        title="View recovery code"
+        title={t(`view-recovery-code`)}
       />
 
       <RecoveryCodesDialog

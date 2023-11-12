@@ -1,4 +1,8 @@
+import { useParams } from 'next/navigation';
+
 import { useCopyToClipboard } from '@documenso/lib/client-only/hooks/use-copy-to-clipboard';
+import { useTranslation } from '@documenso/ui/i18n/client';
+import { LocaleTypes } from '@documenso/ui/i18n/settings';
 import { Button } from '@documenso/ui/primitives/button';
 import {
   Dialog,
@@ -23,7 +27,8 @@ export const RecoveryCodesDialog = ({
 }: RecoveryCodesDialogProps) => {
   const [, copy] = useCopyToClipboard();
   const { toast } = useToast();
-
+  const locale = useParams()?.locale as LocaleTypes;
+  const { t } = useTranslation(locale, 'dashboard');
   const handleDownload = () => {
     if (backupCodes) {
       const textBlob = new Blob([backupCodes.join('\n')], {
@@ -45,8 +50,8 @@ export const RecoveryCodesDialog = ({
     if (backupCodes) {
       await copy(backupCodes.join('\n'));
       toast({
-        title: 'Copied to clipboard',
-        description: 'Your backup codes has been copied to your clipboard.',
+        title: t(`copied-to-clipboard`),
+        description: t(`backup-copied-to-clipboard`),
       });
     }
   };
@@ -55,11 +60,8 @@ export const RecoveryCodesDialog = ({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Two-factor recovery codes</DialogTitle>
-          <DialogDescription>
-            In case you lose access to your device and are unable to receive two-factor
-            authentication codes, recovery codes can be employed to regain access to your account.
-          </DialogDescription>
+          <DialogTitle>{t(`2fa-recovery-codes`)}</DialogTitle>
+          <DialogDescription>{t(`in-case`)}</DialogDescription>
         </DialogHeader>
 
         {backupCodes && (
@@ -72,7 +74,7 @@ export const RecoveryCodesDialog = ({
 
         <DialogFooter>
           <Button variant="secondary" onClick={handleCopy}>
-            Copy
+            {t(`copy`)}{' '}
           </Button>
           <Button onClick={handleDownload}>Download</Button>
         </DialogFooter>

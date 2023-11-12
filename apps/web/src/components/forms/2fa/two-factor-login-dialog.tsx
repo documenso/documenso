@@ -1,10 +1,14 @@
 import { useState } from 'react';
 
+import { useParams } from 'next/navigation';
+
 import { signIn } from 'next-auth/react';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
 
 import { ErrorCode, isErrorCode } from '@documenso/lib/next-auth/error-codes';
+import { useTranslation } from '@documenso/ui/i18n/client';
+import { LocaleTypes } from '@documenso/ui/i18n/settings';
 import { Button } from '@documenso/ui/primitives/button';
 import {
   Dialog,
@@ -44,7 +48,7 @@ const FIELD_ERROR_MESSAGES: Partial<
 > = {
   [ErrorCode.INCORRECT_TWO_FACTOR_CODE]: { message: 'incorrect 2fa code', field: 'totpCode' },
   [ErrorCode.INCORRECT_TWO_FACTOR_BACKUP_CODE]: {
-    message: 'incorrect backup code',
+    message: 'incorrect {t(`backup-code`)}',
     field: 'backupCode',
   },
 };
@@ -56,6 +60,9 @@ export const TwoFactorLoginDialog = ({
 }: TwoFactorLoginDialogProps) => {
   const { toast } = useToast();
   const [credentialType, setCredentialType] = useState<'backup-code' | 'otp'>('otp');
+  const locale = useParams()?.locale as LocaleTypes;
+  const { t } = useTranslation(locale, 'dashboard');
+
   const form = useForm<TFormSchema>({
     defaultValues: {
       totpCode: '',
@@ -96,9 +103,8 @@ export const TwoFactorLoginDialog = ({
         window.location.href = result.url;
       } catch (err) {
         toast({
-          title: 'An unknown error occurred',
-          description:
-            'We encountered an unknown error while attempting to sign you In. Please try again later.',
+          title: t(`unknown-error`),
+          description: t(`we-encountered-an-unknown-error`),
         });
       }
     }
@@ -108,11 +114,8 @@ export const TwoFactorLoginDialog = ({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Two Factor Code</DialogTitle>
-          <DialogDescription>
-            Two-factor authentication enabled. Please enter the six-digit code from your
-            authenticator app.
-          </DialogDescription>
+          <DialogTitle>{t(`2fa-code`)}</DialogTitle>
+          <DialogDescription>{t(`enter-6-digits`)}</DialogDescription>
         </DialogHeader>
         <Form {...form}>
           <form id="2fa-login" onSubmit={form.handleSubmit(onSubmit)}>
@@ -124,13 +127,13 @@ export const TwoFactorLoginDialog = ({
                   minLength: 6,
                   maxLength: 6,
                   required: {
-                    message: 'this field is required',
+                    message: t(`this-field-is-required`),
                     value: true,
                   },
                 }}
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Two-Factor Code</FormLabel>
+                    <FormLabel>{t(`2fa-code`)}</FormLabel>
                     <FormControl>
                       <Input
                         placeholder="xxxxxx"
@@ -151,12 +154,12 @@ export const TwoFactorLoginDialog = ({
                 rules={{
                   required: {
                     value: true,
-                    message: 'this field is required',
+                    message: t(`this-field-is-required`),
                   },
                 }}
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Backup Code</FormLabel>
+                    <FormLabel>{t(`backup-code`)}</FormLabel>
                     <FormControl>
                       <Textarea {...field} />
                     </FormControl>
@@ -179,7 +182,7 @@ export const TwoFactorLoginDialog = ({
             </Button>
 
             <Button type="submit" form="2fa-login">
-              Submit
+              {t('submit')}
             </Button>
           </div>
         </DialogFooter>

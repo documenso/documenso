@@ -82,15 +82,14 @@ export const SignInForm = ({ className }: SignInFormProps) => {
       }
 
       if (!result?.url) {
-        throw new Error('An unknown error occurred');
+        throw new Error('t(`unknown-error`)');
       }
 
       window.location.href = result.url;
     } catch (err) {
       toast({
-        title: 'An unknown error occurred',
-        description:
-          'We encountered an unknown error while attempting to sign you In. Please try again later.',
+        title: 't(`unknown-error`)',
+        description: 't(`we-encountered-an-unknown-error`)',
       });
     }
   };
@@ -100,9 +99,8 @@ export const SignInForm = ({ className }: SignInFormProps) => {
       await signIn('google', { callbackUrl: LOGIN_REDIRECT_PATH });
     } catch (err) {
       toast({
-        title: 'An unknown error occurred',
-        description:
-          'We encountered an unknown error while attempting to sign you In. Please try again later.',
+        title: 't(`unknown-error`)',
+        description: 't(`we-encountered-an-unknown-error`)',
         variant: 'destructive',
       });
     }

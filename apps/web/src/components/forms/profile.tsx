@@ -74,10 +74,9 @@ export const ProfileForm = ({ className, user }: ProfileFormProps) => {
         });
       } else {
         toast({
-          title: 'An unknown error occurred',
+          title: 't(`unknown-error`)',
           variant: 'destructive',
-          description:
-            'We encountered an unknown error while attempting to sign you In. Please try again later.',
+          description: 't(`we-encountered-an-unknown-error`)',
         });
       }
     }

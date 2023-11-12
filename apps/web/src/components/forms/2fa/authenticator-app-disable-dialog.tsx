@@ -2,12 +2,16 @@
 
 import { useState } from 'react';
 
+import { useParams } from 'next/navigation';
+
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
 
 import { ErrorCode, isErrorCode } from '@documenso/lib/next-auth/error-codes';
 import { trpc } from '@documenso/trpc/react';
+import { useTranslation } from '@documenso/ui/i18n/client';
+import { LocaleTypes } from '@documenso/ui/i18n/settings';
 import { Button } from '@documenso/ui/primitives/button';
 import {
   Dialog,
@@ -78,7 +82,7 @@ export const AuthenticatorAppDisableDialog = ({
       form.reset();
       toast({
         title: 'Success',
-        description: 'successfully disabled 2fa',
+        description: t(`disabled-2fa`),
         variant: 'default',
       });
     },
@@ -114,7 +118,7 @@ export const AuthenticatorAppDisableDialog = ({
     >
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Disable two-factor authentication</DialogTitle>
+          <DialogTitle>{t('disable-2fa')}</DialogTitle>
         </DialogHeader>
 
         <Form {...form}>
@@ -128,9 +132,9 @@ export const AuthenticatorAppDisableDialog = ({
               name="password"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Current Password</FormLabel>
+                  <FormLabel>{t(`current-password`)}</FormLabel>
                   <FormControl>
-                    <PasswordInput autoComplete="current-password" {...field} />
+                    <PasswordInput autoComplete="Current Password" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -145,7 +149,7 @@ export const AuthenticatorAppDisableDialog = ({
                   minLength: 6,
                   maxLength: 6,
                   required: {
-                    message: 'this field is required',
+                    message: t(`this-field-is-required`),
                     value: true,
                   },
                 }}
@@ -200,7 +204,7 @@ export const AuthenticatorAppDisableDialog = ({
             </Button>
 
             <Button disabled={form.formState.isSubmitting} type="submit" form="disable-2fa">
-              Disable
+              {t(`disable`)}
             </Button>
           </div>
         </DialogFooter>

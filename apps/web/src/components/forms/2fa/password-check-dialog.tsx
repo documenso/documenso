@@ -1,10 +1,14 @@
 'use client';
 
+import { useParams } from 'next/navigation';
+
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
 
 import { trpc } from '@documenso/trpc/react';
+import { useTranslation } from '@documenso/ui/i18n/client';
+import { LocaleTypes } from '@documenso/ui/i18n/settings';
 import { Button } from '@documenso/ui/primitives/button';
 import {
   Dialog,
@@ -49,7 +53,8 @@ export const PasswordCheckDialog = ({
       password: '',
     },
   });
-
+  const locale = useParams()?.locale as LocaleTypes;
+  const { t } = useTranslation(locale, 'dashboard');
   const { mutateAsync: verifyPassword } = trpc.auth.verifyPassword.useMutation({});
 
   const onSubmit = async (data: TFormSchema) => {
@@ -75,7 +80,7 @@ export const PasswordCheckDialog = ({
       <DialogContent>
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
-          <DialogDescription>Confirm your current password to get started.</DialogDescription>
+          <DialogDescription>{t(`confirm-current-password`)}</DialogDescription>
         </DialogHeader>
 
         <Form {...form}>
@@ -85,7 +90,7 @@ export const PasswordCheckDialog = ({
               name="password"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Current Password</FormLabel>
+                  <FormLabel>{t(`current-password`)}</FormLabel>
                   <FormControl>
                     <PasswordInput autoComplete="current-password" {...field} />
                   </FormControl>
@@ -97,7 +102,7 @@ export const PasswordCheckDialog = ({
         </Form>
         <DialogFooter>
           <Button loading={form.formState.isSubmitting} form="password-check" type="submit">
-            Submit
+            {t('submit')}
           </Button>
         </DialogFooter>
       </DialogContent>

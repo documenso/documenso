@@ -25,7 +25,7 @@ export const NEXT_AUTH_OPTIONS: AuthOptions = {
         email: { label: 'Email', type: 'email' },
         password: { label: 'Password', type: 'password' },
         totpCode: {
-          label: 'Two-factor Code',
+          label: '{t(`2fa-code`)}',
           type: 'input',
           placeholder: 'Code from authenticator app',
         },
