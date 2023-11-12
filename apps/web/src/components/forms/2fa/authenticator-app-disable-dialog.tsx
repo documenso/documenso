@@ -63,6 +63,7 @@ export const AuthenticatorAppDisableDialog = ({
   onDisabled,
 }: AuthenticatorAppDisableDialogProps) => {
   const locale = useParams()?.locale as LocaleTypes;
+
   const { t } = useTranslation(locale, 'dashboard');
   const { toast } = useToast();
 

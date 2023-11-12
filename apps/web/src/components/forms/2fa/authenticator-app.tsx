@@ -23,11 +23,12 @@ type AuthenticatorAppProps = {
 };
 
 export const AuthenticatorApp = ({ isTwoFactorEnabled, backupCodes }: AuthenticatorAppProps) => {
+  const locale = useParams()?.locale as LocaleTypes;
+
   const router = useRouter();
   const { mutateAsync: setup } = trpc.twoFactor.setup.useMutation();
   const [modalState, setModalState] = useState<ModalState>(null);
   const [data, setData] = useState<Awaited<ReturnType<typeof setup>> | null>(null);
-  const locale = useParams()?.locale as LocaleTypes;
   const { t } = useTranslation(locale, 'dashboard');
   const handleVerified = async (password: string) => {
     try {
@@ -85,6 +86,7 @@ export const AuthenticatorApp = ({ isTwoFactorEnabled, backupCodes }: Authentica
       />
 
       <AuthenticatorAppSetupDialog
+        locale={locale}
         open={modalState === 'setup-2fa'}
         onOpenChange={() => setModalState(null)}
         onSetupComplete={onSetupComplete}
@@ -93,6 +95,7 @@ export const AuthenticatorApp = ({ isTwoFactorEnabled, backupCodes }: Authentica
       />
 
       <RecoveryCodesDialog
+        locale={locale}
         backupCodes={backupCodes}
         onOpenChange={() => setModalState(null)}
         open={modalState === 'backup-codes'}

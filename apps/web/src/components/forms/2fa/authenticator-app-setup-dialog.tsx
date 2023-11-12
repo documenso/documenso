@@ -1,5 +1,3 @@
-import { useParams } from 'next/navigation';
-
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
@@ -32,6 +30,7 @@ import { useToast } from '@documenso/ui/primitives/use-toast';
 type AuthenticatorAppSetupDialogProps = {
   secret?: string;
   qr?: string;
+  locale: LocaleTypes;
   onSetupComplete: () => void;
   open: boolean;
   onOpenChange: (_val: boolean) => void;
@@ -53,8 +52,8 @@ export const AuthenticatorAppSetupDialog = ({
   onSetupComplete,
   open,
   onOpenChange,
+  locale,
 }: AuthenticatorAppSetupDialogProps) => {
-  const locale = useParams()?.locale as LocaleTypes;
   const { t } = useTranslation(locale, 'dashboard');
   const { toast } = useToast();
 

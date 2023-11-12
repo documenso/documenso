@@ -54,6 +54,7 @@ export const PasswordCheckDialog = ({
     },
   });
   const locale = useParams()?.locale as LocaleTypes;
+
   const { t } = useTranslation(locale, 'dashboard');
   const { mutateAsync: verifyPassword } = trpc.auth.verifyPassword.useMutation({});
 

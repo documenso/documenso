@@ -22,6 +22,7 @@ type RecoveryCodesProps = {
 export const RecoveryCodes = ({ backupCodes, isTwoFactorEnabled }: RecoveryCodesProps) => {
   const [modalState, setModalState] = useState<ModalState>(null);
   const locale = useParams()?.locale as LocaleTypes;
+
   const { t } = useTranslation(locale, 'dashboard');
   return (
     <>
@@ -63,6 +64,7 @@ export const RecoveryCodes = ({ backupCodes, isTwoFactorEnabled }: RecoveryCodes
       />
 
       <RecoveryCodesDialog
+        locale={locale}
         open={modalState === 'recover-codes'}
         onOpenChange={() => {
           setModalState(null);

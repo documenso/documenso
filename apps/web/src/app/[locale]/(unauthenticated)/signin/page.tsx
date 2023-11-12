@@ -1,35 +1,35 @@
 import Link from 'next/link';
 
-import { useTranslation } from '@documenso/ui/i18n/client';
 import { LocaleTypes } from '@documenso/ui/i18n/settings';
 
 import { SignInForm } from '~/components/forms/signin';
 
 const SignInPage = ({ params: { locale } }: { params: { locale: LocaleTypes } }) => {
   // Make sure to use the correct namespace here.
-  const { t } = useTranslation(locale, 'dashboard');
+  // eslint-disable-next-line prettier/prettier
 
+  // const { t } = await createTranslation(locale, 'dashboard');
   return (
     <div>
-      <h1 className="text-4xl font-semibold">{t(`sign-in-your-account`)}</h1>
+      <h1 className="text-4xl font-semibold">Sign In to Your Account</h1>
 
-      <p className="text-muted-foreground/60 mt-2 text-sm">{t(`welcome-back`)}</p>
+      <p className="text-muted-foreground/60 mt-2 text-sm">Welcome Back</p>
 
       <SignInForm className="mt-4" />
 
       <p className="text-muted-foreground mt-6 text-center text-sm">
-        {t(`no-account`)}{' '}
-        <Link href="/signup" className="text-primary duration-200 hover:opacity-70">
-          {t('signup')}
+        No Account{' '}
+        <Link href={`/${locale}/signup`} className="text-primary duration-200 hover:opacity-70">
+          Sign Up
         </Link>
       </p>
 
       <p className="mt-2.5 text-center">
         <Link
-          href="/forgot-password"
+          href={`/${locale}/forgot-password`}
           className="text-muted-foreground text-sm duration-200 hover:opacity-70"
         >
-          {t(`forgot-password`)}
+          Forgot Password
         </Link>
       </p>
     </div>
