@@ -24,7 +24,6 @@ const SOCIAL_LINKS = [
 const FOOTER_LINKS = [
   { href: '/pricing', text: 'Pricing' },
   { href: '/singleplayer', text: 'Singleplayer' },
-  { href: 'https://status.documenso.com', text: 'Status', target: '_blank' },
   { href: 'mailto:support@documenso.com', text: 'Support', target: '_blank' },
   { href: '/privacy', text: 'Privacy' },
 ];

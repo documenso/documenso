@@ -25,11 +25,6 @@ export const MENU_NAVIGATION_LINKS = [
     href: '/pricing',
     text: 'Pricing',
   },
-
-  {
-    href: 'https://status.notario.co',
-    text: 'Status',
-  },
   {
     href: 'mailto:notario@progiciel.co',
     text: 'Support',
