@@ -4,8 +4,8 @@ generator client {
 
 datasource db {
   provider  = "postgresql"
-  url       = env("NEXT_PRIVATE_DATABASE_URL")
-  directUrl = env("NEXT_PRIVATE_DIRECT_DATABASE_URL")
+  url       = "postgres://postgres.xtnmvtxhrwdlmuwahrmr:wc3HLcgf89SuxOvS@aws-0-us-west-1.pooler.supabase.com:6543/postgres"
+  directUrl = "postgresql://postgres:wc3HLcgf89SuxOvS@db.xtnmvtxhrwdlmuwahrmr.supabase.co:5432/postgres"
 }
 
 enum IdentityProvider {
