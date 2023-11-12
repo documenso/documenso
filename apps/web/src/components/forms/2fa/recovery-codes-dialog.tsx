@@ -1,5 +1,3 @@
-import { useParams } from 'next/navigation';
-
 import { useCopyToClipboard } from '@documenso/lib/client-only/hooks/use-copy-to-clipboard';
 import { useTranslation } from '@documenso/ui/i18n/client';
 import { LocaleTypes } from '@documenso/ui/i18n/settings';
@@ -18,16 +16,17 @@ type RecoveryCodesDialogProps = {
   open: boolean;
   onOpenChange: (_val: boolean) => void;
   backupCodes: string[] | null;
+  locale: LocaleTypes;
 };
 
 export const RecoveryCodesDialog = ({
   onOpenChange,
   open,
   backupCodes,
+  locale,
 }: RecoveryCodesDialogProps) => {
   const [, copy] = useCopyToClipboard();
   const { toast } = useToast();
-  const locale = useParams()?.locale as LocaleTypes;
   const { t } = useTranslation(locale, 'dashboard');
   const handleDownload = () => {
     if (backupCodes) {

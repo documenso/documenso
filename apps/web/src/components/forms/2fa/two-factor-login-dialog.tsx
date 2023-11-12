@@ -1,7 +1,5 @@
 import { useState } from 'react';
 
-import { useParams } from 'next/navigation';
-
 import { signIn } from 'next-auth/react';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
@@ -32,6 +30,7 @@ import { useToast } from '@documenso/ui/primitives/use-toast';
 
 type TwoFactorLoginDialogProps = {
   open: boolean;
+  locale: LocaleTypes;
   onOpenChange: (_state: boolean) => void;
   credentials: { password: string; email: string } | null;
 };
@@ -57,10 +56,10 @@ export const TwoFactorLoginDialog = ({
   open,
   onOpenChange,
   credentials,
+  locale,
 }: TwoFactorLoginDialogProps) => {
   const { toast } = useToast();
   const [credentialType, setCredentialType] = useState<'backup-code' | 'otp'>('otp');
-  const locale = useParams()?.locale as LocaleTypes;
   const { t } = useTranslation(locale, 'dashboard');
 
   const form = useForm<TFormSchema>({

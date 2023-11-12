@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { useParams, useRouter } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 
 import { motion } from 'framer-motion';
 import { ChevronLeft } from 'lucide-react';
@@ -14,9 +14,8 @@ import { Button } from '@documenso/ui/primitives/button';
 
 import backgroundPattern from '~/assets/background-pattern.png';
 
-export default function NotFound() {
+export default function NotFound({ params: { locale } }: { params: { locale: LocaleTypes } }) {
   const router = useRouter();
-  const locale = useParams()?.locale as LocaleTypes;
 
   const { t } = useTranslation(locale, 'not-found');
 

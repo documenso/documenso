@@ -2,6 +2,8 @@
 
 import { useState } from 'react';
 
+import { useParams } from 'next/navigation';
+
 import { zodResolver } from '@hookform/resolvers/zod';
 import { signIn } from 'next-auth/react';
 import { useForm } from 'react-hook-form';
@@ -9,6 +11,8 @@ import { FcGoogle } from 'react-icons/fc';
 import { z } from 'zod';
 
 import { ErrorCode, isErrorCode } from '@documenso/lib/next-auth/error-codes';
+import { useTranslation } from '@documenso/ui/i18n/client';
+import { LocaleTypes } from '@documenso/ui/i18n/settings';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
 import { FormErrorMessage } from '@documenso/ui/primitives/form/form-error-message';
@@ -43,6 +47,9 @@ export const SignInForm = ({ className }: SignInFormProps) => {
   const { toast } = useToast();
   const [totpEnabled, setTotpEnabled] = useState(false);
   const [credentials, setCredentials] = useState<TSignInFormSchema | null>(null);
+  const locale = useParams()?.locale as LocaleTypes;
+  const { t } = useTranslation(locale, 'dashboard');
+
   const {
     register,
     handleSubmit,
@@ -82,14 +89,14 @@ export const SignInForm = ({ className }: SignInFormProps) => {
       }
 
       if (!result?.url) {
-        throw new Error('t(`unknown-error`)');
+        throw new Error(t(`unknown-error`));
       }
 
       window.location.href = result.url;
     } catch (err) {
       toast({
-        title: 't(`unknown-error`)',
-        description: 't(`we-encountered-an-unknown-error`)',
+        title: t(`unknown-error`),
+        description: t(`we-encountered-an-unknown-error`),
       });
     }
   };
@@ -99,8 +106,8 @@ export const SignInForm = ({ className }: SignInFormProps) => {
       await signIn('google', { callbackUrl: LOGIN_REDIRECT_PATH });
     } catch (err) {
       toast({
-        title: 't(`unknown-error`)',
-        description: 't(`we-encountered-an-unknown-error`)',
+        title: t(`unknown-error`),
+        description: t(`we-encountered-an-unknown-error`),
         variant: 'destructive',
       });
     }
@@ -138,7 +145,20 @@ export const SignInForm = ({ className }: SignInFormProps) => {
 
           <FormErrorMessage className="mt-1.5" error={errors.password} />
         </div>
+        <Button
+          size="lg"
+          loading={isSubmitting}
+          disabled={isSubmitting}
+          className="dark:bg-documenso dark:hover:opacity-90"
+        >
+          {isSubmitting ? 'Signing in...' : 'Sign In'}
+        </Button>
 
+        <div className="relative flex items-center justify-center gap-x-4 py-2 text-xs uppercase">
+          <div className="bg-border h-px flex-1" />
+          <span className="text-muted-foreground bg-transparent">Or continue with</span>
+          <div className="bg-border h-px flex-1" />
+        </div>
         <Button
           type="button"
           size="lg"
@@ -152,6 +172,7 @@ export const SignInForm = ({ className }: SignInFormProps) => {
         </Button>
       </form>
       <TwoFactorLoginDialog
+        locale={locale}
         open={totpEnabled}
         onOpenChange={(val) => {
           setTotpEnabled(val);
