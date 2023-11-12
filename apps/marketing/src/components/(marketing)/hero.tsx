@@ -52,7 +52,7 @@ const HeroTitleVariants: Variants = {
 };
 
 export const Hero = ({ className, locale, ...props }: HeroProps) => {
-  const { t } = useTranslation(locale ?? 'en', 'marketing');
+  const { t } = useTranslation(locale ?? 'fr', 'marketing');
 
   const { getFlag } = useFeatureFlags();
 

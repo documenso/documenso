@@ -17,7 +17,7 @@ export const FasterSmarterBeautifulBento = async ({
   className,
   ...props
 }: FasterSmarterBeautifulBentoProps) => {
-  const { t } = await createTranslation('en', 'marketing');
+  const { t } = await createTranslation('fr', 'marketing');
 
   return (
     <div className={cn('relative', className)} {...props}>
