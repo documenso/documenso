@@ -50,6 +50,8 @@ export const AuthenticatorAppSetupDialog = ({
   open,
   onOpenChange,
 }: AuthenticatorAppSetupDialogProps) => {
+  const locale = useParams()?.locale as LocaleTypes;
+  const { t } = useTranslation(locale, 'dashboard');
   const { toast } = useToast();
 
   const form = useForm<TFormSchema>({

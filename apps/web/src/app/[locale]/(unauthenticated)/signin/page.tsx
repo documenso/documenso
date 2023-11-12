@@ -5,10 +5,7 @@ import { LocaleTypes } from '@documenso/ui/i18n/settings';
 
 import { SignInForm } from '~/components/forms/signin';
 
-export interface SignInPageProps {
-  locale: LocaleTypes;
-}
-const SignInPage = ({ locale }: SignInPageProps) => {
+const SignInPage = ({ params: { locale } }: { params: { locale: LocaleTypes } }) => {
   // Make sure to use the correct namespace here.
   const { t } = useTranslation(locale, 'dashboard');
 

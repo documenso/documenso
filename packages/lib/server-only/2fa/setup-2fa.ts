@@ -16,7 +16,7 @@ type setupTwoFactorAuthenticationOptions = {
   password: string;
 };
 
-const ISSUER = 'Documenso';
+const ISSUER = 'Notario';
 
 const formatBackupCode = (code: string) => `${code.slice(0, 5)}-${code.slice(5, 10)}`;
 

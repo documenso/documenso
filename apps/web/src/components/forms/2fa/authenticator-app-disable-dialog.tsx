@@ -58,6 +58,8 @@ export const AuthenticatorAppDisableDialog = ({
   open,
   onDisabled,
 }: AuthenticatorAppDisableDialogProps) => {
+  const locale = useParams()?.locale as LocaleTypes;
+  const { t } = useTranslation(locale, 'dashboard');
   const { toast } = useToast();
 
   const [credentialType, setCredentialType] = useState<'backup-code' | 'otp'>('otp');

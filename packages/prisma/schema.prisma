@@ -19,23 +19,26 @@ enum Role {
 }
 
 model User {
-  id                 Int                  @id @default(autoincrement())
-  name               String?
-  email              String               @unique
-  emailVerified      DateTime?
-  password           String?
-  source             String?
-  signature          String?
-  createdAt          DateTime             @default(now())
-  updatedAt          DateTime             @default(now()) @updatedAt
-  lastSignedIn       DateTime             @default(now())
-  roles              Role[]               @default([USER])
-  identityProvider   IdentityProvider     @default(DOCUMENSO)
-  accounts           Account[]
-  sessions           Session[]
-  Document           Document[]
-  Subscription       Subscription?
-  PasswordResetToken PasswordResetToken[]
+  id                   Int                  @id @default(autoincrement())
+  name                 String?
+  email                String               @unique
+  emailVerified        DateTime?
+  password             String?
+  source               String?
+  signature            String?
+  createdAt            DateTime             @default(now())
+  updatedAt            DateTime             @default(now()) @updatedAt
+  lastSignedIn         DateTime             @default(now())
+  roles                Role[]               @default([USER])
+  identityProvider     IdentityProvider     @default(DOCUMENSO)
+  accounts             Account[]
+  sessions             Session[]
+  Document             Document[]
+  Subscription         Subscription?
+  PasswordResetToken   PasswordResetToken[]
+  twoFactorSecret      String?
+  twoFactorEnabled     Boolean              @default(false)
+  twoFactorBackupCodes String?
 
   @@index([email])
 }
