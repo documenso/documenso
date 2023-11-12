@@ -189,8 +189,6 @@ export const Hero = ({ className, locale, ...props }: HeroProps) => {
 
             <p className="w-full max-w-[70ch]">{t(`at`)}</p>
 
-            <p className="w-full max-w-[70ch]">{t(`we-understand`)}</p>
-
             <p className="w-full max-w-[70ch]">
               {t(`today-we-invite`)}{' '}
               <span className="bg-primary text-black">{t(`non-legally`)}</span> {t(`early-forever`)}
