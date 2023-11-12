@@ -70,7 +70,7 @@ export const SignUpForm = ({ className }: SignUpFormProps) => {
         });
       } else {
         toast({
-          title: 'An unknown error occurred',
+          title: 't(`unknown-error`)',
           description:
             'We encountered an unknown error while attempting to sign you up. Please try again later.',
           variant: 'destructive',

@@ -10,9 +10,10 @@ import { getRecipientsForDocument } from '@documenso/lib/server-only/recipient/g
 import { DocumentStatus as InternalDocumentStatus } from '@documenso/prisma/client';
 import { LazyPDFViewer } from '@documenso/ui/primitives/lazy-pdf-viewer';
 
-import { EditDocumentForm } from '~/app/(dashboard)/documents/[id]/edit-document';
 import { StackAvatarsWithTooltip } from '~/components/(dashboard)/avatar/stack-avatars-with-tooltip';
 import { DocumentStatus } from '~/components/formatter/document-status';
+
+import { EditDocumentForm } from './edit-document';
 
 export type DocumentPageProps = {
   params: {

@@ -7,6 +7,8 @@ import GoogleProvider, { GoogleProfile } from 'next-auth/providers/google';
 
 import { prisma } from '@documenso/prisma';
 
+import { authenticateTwoFactorAuth } from '../server-only/2fa/authenticate-2fa';
+import { isTwoFactorAuthEnabled } from '../server-only/2fa/is-2fa-availble';
 import { getUserByEmail } from '../server-only/user/get-user-by-email';
 import { ErrorCode } from './error-codes';
 
@@ -22,13 +24,19 @@ export const NEXT_AUTH_OPTIONS: AuthOptions = {
       credentials: {
         email: { label: 'Email', type: 'email' },
         password: { label: 'Password', type: 'password' },
+        totpCode: {
+          label: '{t(`2fa-code`)}',
+          type: 'input',
+          placeholder: 'Code from authenticator app',
+        },
+        backupCode: { label: 'Backup Code', type: 'input', placeholder: 'Two-factor backup code' },
       },
       authorize: async (credentials, _req) => {
         if (!credentials) {
           throw new Error(ErrorCode.CREDENTIALS_NOT_FOUND);
         }
 
-        const { email, password } = credentials;
+        const { email, password, backupCode, totpCode } = credentials;
 
         const user = await getUserByEmail({ email }).catch(() => {
           throw new Error(ErrorCode.INCORRECT_EMAIL_PASSWORD);
@@ -43,7 +51,10 @@ export const NEXT_AUTH_OPTIONS: AuthOptions = {
         if (!isPasswordsSame) {
           throw new Error(ErrorCode.INCORRECT_EMAIL_PASSWORD);
         }
-
+        const is2faEnabled = isTwoFactorAuthEnabled({ user });
+        if (is2faEnabled) {
+          await authenticateTwoFactorAuth({ backupCode, totpCode, user });
+        }
         return {
           id: Number(user.id),
           email: user.email,
