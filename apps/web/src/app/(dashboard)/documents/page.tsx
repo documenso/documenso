@@ -82,7 +82,7 @@ export default async function DocumentsPage({ searchParams = {} }: DocumentsPage
               ].map((value) => (
                 <TabsTrigger
                   key={value}
-                  className="min-w-[60px] hover:border-2 hover:border-solid hover:border-gray-600"
+                  className="min-w-[60px] hover:text-gray-100"
                   value={value}
                   asChild
                 >
