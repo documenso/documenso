@@ -1,0 +1,32 @@
+name: documenso_test
+services:
+  database:
+    image: postgres:15
+    environment:
+      - POSTGRES_USER=documenso
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=documenso
+    ports:
+      - 54322:5432
+
+  inbucket:
+    image: inbucket/inbucket
+    # ports:
+    #   - 9000:9000
+    #   - 2500:2500
+    #   - 1100:1100
+
+  documenso:
+    build:
+      context: ../
+      dockerfile: docker/Dockerfile
+    depends_on:
+      - database
+      - inbucket
+    env_file:
+      - ../.env.example
+    environment:
+      - NEXT_PRIVATE_DATABASE_URL=postgres://documenso:password@database:5432/documenso
+      - NEXT_PRIVATE_DIRECT_DATABASE_URL=postgres://documenso:password@database:5432/documenso
+    ports:
+      - 3000:3000

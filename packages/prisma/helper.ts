@@ -23,6 +23,11 @@ export const getDatabaseUrl = () => {
     process.env.NEXT_PRIVATE_DIRECT_DATABASE_URL = process.env.POSTGRES_URL_NON_POOLING;
   }
 
+  // If we don't have a database URL, we can't normalize it.
+  if (!process.env.NEXT_PRIVATE_DATABASE_URL) {
+    return undefined;
+  }
+
   // We change the protocol from `postgres:` to `https:` so we can construct a easily
   // mofifiable URL.
   const url = new URL(process.env.NEXT_PRIVATE_DATABASE_URL.replace('postgres://', 'https://'));
