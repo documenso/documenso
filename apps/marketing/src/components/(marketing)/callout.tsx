@@ -11,7 +11,7 @@ export type CalloutProps = {
 };
 
 export const Callout = ({ locale }: CalloutProps) => {
-  const { t } = useTranslation(locale ?? 'en', 'marketing');
+  const { t } = useTranslation(locale ?? 'fr', 'marketing');
 
   const onSignUpClick = () => {
     const el = document.getElementById('email');
