@@ -4,7 +4,7 @@
     "build": "turbo run build",
     "build:web": "turbo run build --filter=@documenso/web",
     "build:marketing": "turbo run build --filter=@documenso/marketing",
-    "dev": "turbo run dev --filter=@documenso/marketing",
+    "dev": "turbo run dev --filter=@documenso/web",
     "start": "cd apps && cd web && next start",
     "lint": "turbo run lint",
     "format": "prettier --write \"**/*.{js,jsx,cjs,mjs,ts,tsx,cts,mts,mdx}\"",
