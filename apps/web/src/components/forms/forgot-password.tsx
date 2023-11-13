@@ -1,12 +1,13 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
 import { trpc } from '@documenso/trpc/react';
+import { LocaleTypes } from '@documenso/ui/i18n/settings';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
 import { FormErrorMessage } from '@documenso/ui/primitives/form/form-error-message';
@@ -26,6 +27,8 @@ export type ForgotPasswordFormProps = {
 
 export const ForgotPasswordForm = ({ className }: ForgotPasswordFormProps) => {
   const router = useRouter();
+  const locale = useParams()?.locale as LocaleTypes;
+
   const { toast } = useToast();
 
   const {
@@ -54,7 +57,7 @@ export const ForgotPasswordForm = ({ className }: ForgotPasswordFormProps) => {
 
     reset();
 
-    router.push('/check-email');
+    router.push(`/${locale}/check-email`);
   };
 
   return (

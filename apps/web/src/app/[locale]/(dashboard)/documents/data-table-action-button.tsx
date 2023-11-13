@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { useParams } from 'next/navigation';
 
 import { Edit, Pencil, Share } from 'lucide-react';
 import { useSession } from 'next-auth/react';
@@ -8,6 +9,7 @@ import { match } from 'ts-pattern';
 
 import { Document, DocumentStatus, Recipient, SigningStatus, User } from '@documenso/prisma/client';
 import { DocumentShareButton } from '@documenso/ui/components/document/document-share-button';
+import { LocaleTypes } from '@documenso/ui/i18n/settings';
 import { Button } from '@documenso/ui/primitives/button';
 
 export type DataTableActionButtonProps = {
@@ -19,6 +21,7 @@ export type DataTableActionButtonProps = {
 
 export const DataTableActionButton = ({ row }: DataTableActionButtonProps) => {
   const { data: session } = useSession();
+  const locale = useParams()?.locale as LocaleTypes;
 
   if (!session) {
     return null;
@@ -43,7 +46,7 @@ export const DataTableActionButton = ({ row }: DataTableActionButtonProps) => {
   })
     .with({ isOwner: true, isDraft: true }, () => (
       <Button className="w-24" asChild>
-        <Link href={`/documents/${row.id}`}>
+        <Link href={`/${locale}/documents/${row.id}`}>
           <Edit className="-ml-1 mr-2 h-4 w-4" />
           Edit
         </Link>
@@ -51,7 +54,7 @@ export const DataTableActionButton = ({ row }: DataTableActionButtonProps) => {
     ))
     .with({ isRecipient: true, isPending: true, isSigned: false }, () => (
       <Button className="w-24" asChild>
-        <Link href={`/sign/${recipient?.token}`}>
+        <Link href={`/${locale}/sign/${recipient?.token}`}>
           <Pencil className="-ml-1 mr-2 h-4 w-4" />
           Sign
         </Link>

@@ -1,11 +1,13 @@
 'use client';
 
 import Link from 'next/link';
+import { useParams } from 'next/navigation';
 
 import { useSession } from 'next-auth/react';
 import { match } from 'ts-pattern';
 
 import { Document, Recipient, User } from '@documenso/prisma/client';
+import { LocaleTypes } from '@documenso/ui/i18n/settings';
 
 export type DataTableTitleProps = {
   row: Document & {
@@ -16,6 +18,7 @@ export type DataTableTitleProps = {
 
 export const DataTableTitle = ({ row }: DataTableTitleProps) => {
   const { data: session } = useSession();
+  const locale = useParams()?.locale as LocaleTypes;
 
   if (!session) {
     return null;
@@ -32,7 +35,7 @@ export const DataTableTitle = ({ row }: DataTableTitleProps) => {
   })
     .with({ isOwner: true }, () => (
       <Link
-        href={`/documents/${row.id}`}
+        href={`/${locale}/documents/${row.id}`}
         title={row.title}
         className="block max-w-[10rem] truncate font-medium hover:underline md:max-w-[20rem]"
       >
@@ -41,7 +44,7 @@ export const DataTableTitle = ({ row }: DataTableTitleProps) => {
     ))
     .with({ isRecipient: true }, () => (
       <Link
-        href={`/sign/${recipient?.token}`}
+        href={`/${locale}/sign/${recipient?.token}`}
         title={row.title}
         className="block max-w-[10rem] truncate font-medium hover:underline md:max-w-[20rem]"
       >

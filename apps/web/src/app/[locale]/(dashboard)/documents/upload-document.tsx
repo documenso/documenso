@@ -3,7 +3,7 @@
 import { useState } from 'react';
 
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 
 import { Loader } from 'lucide-react';
 
@@ -12,6 +12,7 @@ import { createDocumentData } from '@documenso/lib/server-only/document-data/cre
 import { putFile } from '@documenso/lib/universal/upload/put-file';
 import { TRPCClientError } from '@documenso/trpc/client';
 import { trpc } from '@documenso/trpc/react';
+import { LocaleTypes } from '@documenso/ui/i18n/settings';
 import { cn } from '@documenso/ui/lib/utils';
 import { DocumentDropzone } from '@documenso/ui/primitives/document-dropzone';
 import { useToast } from '@documenso/ui/primitives/use-toast';
@@ -24,6 +25,7 @@ export const UploadDocument = ({ className }: UploadDocumentProps) => {
   const router = useRouter();
 
   const { toast } = useToast();
+  const locale = useParams()?.locale as LocaleTypes;
 
   const { quota, remaining } = useLimits();
 
@@ -53,7 +55,7 @@ export const UploadDocument = ({ className }: UploadDocumentProps) => {
         duration: 5000,
       });
 
-      router.push(`/documents/${id}`);
+      router.push(`/${locale}/documents/${id}`);
     } catch (error) {
       console.error(error);
 
@@ -110,7 +112,7 @@ export const UploadDocument = ({ className }: UploadDocumentProps) => {
 
             <Link
               className="text-primary hover:text-primary/80 mt-6 block font-medium"
-              href="/settings/billing"
+              href={`/${locale}/settings/billing`}
             >
               Upgrade your account to upload more documents.
             </Link>

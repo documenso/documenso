@@ -3,6 +3,7 @@
 import { useState } from 'react';
 
 import Link from 'next/link';
+import { useParams } from 'next/navigation';
 
 import {
   Copy,
@@ -23,6 +24,7 @@ import { Document, DocumentStatus, Recipient, User } from '@documenso/prisma/cli
 import { DocumentWithData } from '@documenso/prisma/types/document-with-data';
 import { trpc as trpcClient } from '@documenso/trpc/client';
 import { DocumentShareButton } from '@documenso/ui/components/document/document-share-button';
+import { LocaleTypes } from '@documenso/ui/i18n/settings';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -43,6 +45,7 @@ export type DataTableActionDropdownProps = {
 
 export const DataTableActionDropdown = ({ row }: DataTableActionDropdownProps) => {
   const { data: session } = useSession();
+  const locale = useParams()?.locale as LocaleTypes;
 
   const [isDeleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [isDuplicateDialogOpen, setDuplicateDialogOpen] = useState(false);
@@ -106,14 +109,14 @@ export const DataTableActionDropdown = ({ row }: DataTableActionDropdownProps) =
         <DropdownMenuLabel>Action</DropdownMenuLabel>
 
         <DropdownMenuItem disabled={!recipient || isComplete} asChild>
-          <Link href={`/sign/${recipient?.token}`}>
+          <Link href={`/${locale}/sign/${recipient?.token}`}>
             <Pencil className="mr-2 h-4 w-4" />
             Sign
           </Link>
         </DropdownMenuItem>
 
         <DropdownMenuItem disabled={!isOwner || isComplete} asChild>
-          <Link href={`/documents/${row.id}`}>
+          <Link href={`/${locale}/documents/${row.id}`}>
             <Edit className="mr-2 h-4 w-4" />
             Edit
           </Link>

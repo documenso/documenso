@@ -3,10 +3,11 @@
 import { HTMLAttributes } from 'react';
 
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { useParams, usePathname } from 'next/navigation';
 
 import { BarChart3, FileStack, User2, Wallet2 } from 'lucide-react';
 
+import { LocaleTypes } from '@documenso/ui/i18n/settings';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
 
@@ -14,6 +15,7 @@ export type AdminNavProps = HTMLAttributes<HTMLDivElement>;
 
 export const AdminNav = ({ className, ...props }: AdminNavProps) => {
   const pathname = usePathname();
+  const locale = useParams()?.locale as LocaleTypes;
 
   return (
     <div
@@ -31,7 +33,7 @@ export const AdminNav = ({ className, ...props }: AdminNavProps) => {
         )}
         asChild
       >
-        <Link href="/admin/stats">
+        <Link href={`/${locale}/admin/stats`}>
           <BarChart3 className="mr-2 h-5 w-5" />
           Stats
         </Link>
@@ -45,7 +47,7 @@ export const AdminNav = ({ className, ...props }: AdminNavProps) => {
         )}
         asChild
       >
-        <Link href="/admin/users">
+        <Link href={`/${locale}/admin/users`}>
           <User2 className="mr-2 h-5 w-5" />
           Users
         </Link>
@@ -59,7 +61,7 @@ export const AdminNav = ({ className, ...props }: AdminNavProps) => {
         )}
         asChild
       >
-        <Link href="/admin/documents">
+        <Link href={`/${locale}/admin/documents`}>
           <FileStack className="mr-2 h-5 w-5" />
           Documents
         </Link>
@@ -73,7 +75,7 @@ export const AdminNav = ({ className, ...props }: AdminNavProps) => {
         )}
         asChild
       >
-        <Link href="/admin/subscriptions">
+        <Link href={`/${locale}/admin/subscriptions`}>
           <Wallet2 className="mr-2 h-5 w-5" />
           Subscriptions
         </Link>

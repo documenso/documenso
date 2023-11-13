@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { useParams } from 'next/navigation';
 
 import {
   CreditCard,
@@ -20,6 +21,7 @@ import { useFeatureFlags } from '@documenso/lib/client-only/providers/feature-fl
 import { isAdmin } from '@documenso/lib/next-auth/guards/is-admin';
 import { recipientInitials } from '@documenso/lib/utils/recipient-formatter';
 import { User } from '@documenso/prisma/client';
+import { LocaleTypes } from '@documenso/ui/i18n/settings';
 import { Avatar, AvatarFallback } from '@documenso/ui/primitives/avatar';
 import { Button } from '@documenso/ui/primitives/button';
 import {
@@ -45,6 +47,7 @@ export const ProfileDropdown = ({ user }: ProfileDropdownProps) => {
   const { getFlag } = useFeatureFlags();
   const { theme, setTheme } = useTheme();
   const isUserAdmin = isAdmin(user);
+  const locale = useParams()?.locale as LocaleTypes;
 
   const isBillingEnabled = getFlag('app_billing');
 
@@ -68,7 +71,7 @@ export const ProfileDropdown = ({ user }: ProfileDropdownProps) => {
         {isUserAdmin && (
           <>
             <DropdownMenuItem asChild>
-              <Link href="/admin" className="cursor-pointer">
+              <Link href={`/${locale}/admin`} className="cursor-pointer">
                 <UserCog className="mr-2 h-4 w-4" />
                 Admin
               </Link>

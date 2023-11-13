@@ -1,6 +1,7 @@
-import { useRouter } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 
 import { trpc as trpcReact } from '@documenso/trpc/react';
+import { LocaleTypes } from '@documenso/ui/i18n/settings';
 import { Button } from '@documenso/ui/primitives/button';
 import {
   Dialog,
@@ -28,10 +29,12 @@ export const DuplicateDocumentDialog = ({
   const { data, isLoading } = trpcReact.document.getDocumentById.useQuery({
     id,
   });
+  const locale = useParams()?.locale as LocaleTypes;
+
   const { mutateAsync: duplicateDocument, isLoading: isDuplicateLoading } =
     trpcReact.document.duplicateDocument.useMutation({
       onSuccess: (newId) => {
-        router.push(`/documents/${newId}`);
+        router.push(`/${locale}/documents/${newId}`);
         toast({
           title: 'Document Duplicated',
           description: 'Your document has been successfully duplicated.',

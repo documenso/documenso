@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 
-import { useRouter } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Eye, EyeOff } from 'lucide-react';
@@ -11,6 +11,7 @@ import { z } from 'zod';
 
 import { TRPCClientError } from '@documenso/trpc/client';
 import { trpc } from '@documenso/trpc/react';
+import { LocaleTypes } from '@documenso/ui/i18n/settings';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
 import { FormErrorMessage } from '@documenso/ui/primitives/form/form-error-message';
@@ -37,6 +38,7 @@ export type ResetPasswordFormProps = {
 
 export const ResetPasswordForm = ({ className, token }: ResetPasswordFormProps) => {
   const router = useRouter();
+  const locale = useParams()?.locale as LocaleTypes;
 
   const { toast } = useToast();
 
@@ -73,7 +75,7 @@ export const ResetPasswordForm = ({ className, token }: ResetPasswordFormProps) 
         duration: 5000,
       });
 
-      router.push('/signin');
+      router.push(`/${locale}/signin`);
     } catch (err) {
       if (err instanceof TRPCClientError && err.data?.code === 'BAD_REQUEST') {
         toast({

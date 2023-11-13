@@ -2,10 +2,11 @@
 
 import { useState } from 'react';
 
-import { useRouter } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 
 import { DocumentData, Field, Recipient, User } from '@documenso/prisma/client';
 import { DocumentWithData } from '@documenso/prisma/types/document-with-data';
+import { LocaleTypes } from '@documenso/ui/i18n/settings';
 import { cn } from '@documenso/ui/lib/utils';
 import { Card, CardContent } from '@documenso/ui/primitives/card';
 import { AddFieldsFormPartial } from '@documenso/ui/primitives/document-flow/add-fields';
@@ -47,6 +48,7 @@ export const EditDocumentForm = ({
 }: EditDocumentFormProps) => {
   const { toast } = useToast();
   const router = useRouter();
+  const locale = useParams()?.locale as LocaleTypes;
 
   const [step, setStep] = useState<EditDocumentStep>('signers');
 
@@ -134,7 +136,7 @@ export const EditDocumentForm = ({
         duration: 5000,
       });
 
-      router.push('/documents');
+      router.push(`/${locale}/documents`);
     } catch (err) {
       console.error(err);
 
