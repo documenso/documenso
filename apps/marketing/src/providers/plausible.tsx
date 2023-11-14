@@ -9,5 +9,5 @@ export type PlausibleProviderProps = {
 };
 
 export const PlausibleProvider = ({ children }: PlausibleProviderProps) => {
-  return <NextPlausibleProvider domain="notario.progiciel.co">{children}</NextPlausibleProvider>;
+  return <NextPlausibleProvider domain="progiciel.co">{children}</NextPlausibleProvider>;
 };
