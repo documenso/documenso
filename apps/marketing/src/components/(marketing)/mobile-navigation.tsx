@@ -7,11 +7,14 @@ import { motion, useReducedMotion } from 'framer-motion';
 import { FaXTwitter } from 'react-icons/fa6';
 import { LiaDiscord } from 'react-icons/lia';
 
+import { useTranslation } from '@documenso/ui/i18n/client';
+import { LocaleTypes } from '@documenso/ui/i18n/settings';
 import { Sheet, SheetContent } from '@documenso/ui/primitives/sheet';
 
 export type MobileNavigationProps = {
   isMenuOpen: boolean;
   onMenuOpenChange?: (_value: boolean) => void;
+  locale: LocaleTypes;
 };
 
 export const MENU_NAVIGATION_LINKS = [
@@ -39,8 +42,13 @@ export const MENU_NAVIGATION_LINKS = [
   },
 ];
 
-export const MobileNavigation = ({ isMenuOpen, onMenuOpenChange }: MobileNavigationProps) => {
+export const MobileNavigation = ({
+  isMenuOpen,
+  onMenuOpenChange,
+  locale,
+}: MobileNavigationProps) => {
   const shouldReduceMotion = useReducedMotion();
+  const { t } = useTranslation(locale, 'marketing');
 
   const handleMenuItemClick = () => {
     onMenuOpenChange?.(false);

@@ -133,8 +133,8 @@ export type DocumentFlowFormContainerActionsProps = {
 export const DocumentFlowFormContainerActions = ({
   canGoBack = true,
   canGoNext = true,
-  goNextLabel = 'Continue',
-  goBackLabel = 'Go Back',
+  goNextLabel = 'Suivant',
+  goBackLabel = 'Précendent',
   onGoBackClick,
   onGoNextClick,
   loading,

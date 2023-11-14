@@ -2,6 +2,8 @@ import { HTMLAttributes } from 'react';
 
 import Image from 'next/image';
 
+import { createTranslation } from '@documenso/ui/i18n/server';
+import { LocaleTypes } from '@documenso/ui/i18n/settings';
 import { cn } from '@documenso/ui/lib/utils';
 import { Card, CardContent } from '@documenso/ui/primitives/card';
 
@@ -10,9 +12,16 @@ import cardBuildFigure from '~/assets/card-build-figure.png';
 import cardOpenFigure from '~/assets/card-open-figure.png';
 import cardTemplateFigure from '~/assets/card-template-figure.png';
 
-export type OpenBuildTemplateBentoProps = HTMLAttributes<HTMLDivElement>;
+export type OpenBuildTemplateBentoProps = HTMLAttributes<HTMLDivElement> & {
+  locale: LocaleTypes;
+};
+export const OpenBuildTemplateBento = async ({
+  className,
+  locale,
+  ...props
+}: OpenBuildTemplateBentoProps) => {
+  const { t } = await createTranslation(locale, 'marketing');
 
-export const OpenBuildTemplateBento = ({ className, ...props }: OpenBuildTemplateBentoProps) => {
   return (
     <div className={cn('relative', className)} {...props}>
       <div className="absolute inset-0 -z-10 flex items-center justify-center">
@@ -23,17 +32,16 @@ export const OpenBuildTemplateBento = ({ className, ...props }: OpenBuildTemplat
         />
       </div>
       <h2 className="px-0 text-[22px] font-semibold md:px-12 md:text-4xl lg:px-24">
-        Truly your own.
-        <span className="block md:mt-0">Customise and expand.</span>
+        {t(`your-own`)}
+        <span className="block md:mt-0">{t(`customise`)}</span>
       </h2>
 
       <div className="mt-6 grid grid-cols-2 gap-8 md:mt-8">
         <Card className="col-span-2" degrees={45} gradient>
           <CardContent className="grid grid-cols-12 gap-8 overflow-hidden p-6 lg:aspect-[2.5/1]">
             <p className="text-foreground/80 col-span-12 leading-relaxed lg:col-span-6">
-              <strong className="block">Open Source or Hosted.</strong>
-              It’s up to you. Either clone our repository or rely on our easy to use hosting
-              solution.
+              <strong className="block">{t(`hosted`)}</strong>
+              {t(`up-to-you`)}
             </p>
 
             <div className="col-span-12 -my-6 -mr-6 flex items-end justify-end pt-12 lg:col-span-6">
@@ -49,8 +57,8 @@ export const OpenBuildTemplateBento = ({ className, ...props }: OpenBuildTemplat
         <Card className="col-span-2 lg:col-span-1" spotlight>
           <CardContent className="grid grid-cols-1 gap-8 p-6">
             <p className="text-foreground/80 leading-relaxed">
-              <strong className="block">Build on top.</strong>
-              Make it your own through advanced customization and adjustability.
+              <strong className="block">{t(`build-on-top`)}</strong>
+              {t(`make-it-ur-own`)}
             </p>
 
             <div className="flex items-center justify-center p-8">
@@ -66,9 +74,8 @@ export const OpenBuildTemplateBento = ({ className, ...props }: OpenBuildTemplat
         <Card className="col-span-2 lg:col-span-1" spotlight>
           <CardContent className="grid grid-cols-1 gap-8 p-6">
             <p className="text-foreground/80 leading-relaxed">
-              <strong className="block">Template Store (Soon).</strong>
-              Choose a template from the community app store. Or submit your own template for others
-              to use.
+              <strong className="block">{t(`template-store`)}</strong>
+              {t(`use-template`)}
             </p>
 
             <div className="flex items-center justify-center p-8">

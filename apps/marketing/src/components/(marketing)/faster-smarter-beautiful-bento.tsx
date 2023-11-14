@@ -3,6 +3,7 @@ import { HTMLAttributes } from 'react';
 import Image from 'next/image';
 
 import { createTranslation } from '@documenso/ui/i18n/server';
+import { LocaleTypes } from '@documenso/ui/i18n/settings';
 import { cn } from '@documenso/ui/lib/utils';
 import { Card, CardContent } from '@documenso/ui/primitives/card';
 
@@ -11,13 +12,15 @@ import cardBeautifulFigure from '~/assets/card-beautiful-figure.png';
 import cardFastFigure from '~/assets/card-fast-figure.png';
 import cardSmartFigure from '~/assets/card-smart-figure.png';
 
-export type FasterSmarterBeautifulBentoProps = HTMLAttributes<HTMLDivElement>;
-
+export type FasterSmarterBeautifulBentoProps = HTMLAttributes<HTMLDivElement> & {
+  locale: LocaleTypes;
+};
 export const FasterSmarterBeautifulBento = async ({
   className,
+  locale,
   ...props
 }: FasterSmarterBeautifulBentoProps) => {
-  const { t } = await createTranslation('fr', 'marketing');
+  const { t } = await createTranslation(locale, 'marketing');
 
   return (
     <div className={cn('relative', className)} {...props}>
