@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import { useSearchParams } from 'next/navigation';
 
@@ -30,7 +30,7 @@ import { claimPlan } from '~/api/claim-plan/fetcher';
 import { FormErrorMessage } from '../form/form-error-message';
 
 export const ZClaimPlanDialogFormSchema = z.object({
-  name: z.string().min(3),
+  name: z.string().trim().min(3, { message: 'Please enter a valid name.' }),
   email: z.string().email(),
 });
 
@@ -55,8 +55,8 @@ export const ClaimPlanDialog = ({ className, planId, children }: ClaimPlanDialog
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
+    reset,
   } = useForm<TClaimPlanDialogFormSchema>({
-    mode: 'onBlur',
     defaultValues: {
       name: params?.get('name') ?? '',
       email: params?.get('email') ?? '',
@@ -90,6 +90,12 @@ export const ClaimPlanDialog = ({ className, planId, children }: ClaimPlanDialog
       });
     }
   };
+
+  useEffect(() => {
+    if (!isSubmitting && !open) {
+      reset();
+    }
+  }, [open]);
 
   return (
     <Dialog open={open} onOpenChange={(value) => !isSubmitting && setOpen(value)}>

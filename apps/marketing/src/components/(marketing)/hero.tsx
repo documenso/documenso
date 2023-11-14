@@ -4,8 +4,8 @@ import Image from 'next/image';
 import Link from 'next/link';
 
 import { Variants, motion } from 'framer-motion';
-import { Github } from 'lucide-react';
 import { usePlausible } from 'next-plausible';
+import { LuGithub } from 'react-icons/lu';
 import { match } from 'ts-pattern';
 
 import { useFeatureFlags } from '@documenso/lib/client-only/providers/feature-flag';
@@ -122,7 +122,7 @@ export const Hero = ({ className, ...props }: HeroProps) => {
 
           <Link href="https://github.com/documenso/documenso" onClick={() => event('view-github')}>
             <Button variant="outline" className="rounded-full bg-transparent backdrop-blur-sm">
-              <Github className="mr-2 h-5 w-5" />
+              <LuGithub className="mr-2 h-5 w-5" />
               Star on Github
             </Button>
           </Link>
@@ -134,9 +134,9 @@ export const Hero = ({ className, ...props }: HeroProps) => {
               variants={HeroTitleVariants}
               initial="initial"
               animate="animate"
-              className="border-primary bg-background hover:bg-muted mx-auto mt-8 w-60 rounded-xl border transition duration-300"
+              className="border-primary bg-background hover:bg-muted mx-auto mt-8 w-60 rounded-xl border transition-colors duration-300"
             >
-              <Link href="/single-player-mode" className="block px-4 py-2 text-center">
+              <Link href="/singleplayer" className="block px-4 py-2 text-center">
                 <h2 className="text-muted-foreground text-xs font-semibold">
                   Introducing Single Player Mode
                 </h2>

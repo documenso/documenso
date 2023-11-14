@@ -4,6 +4,7 @@ import { Variants, motion } from 'framer-motion';
 import { Plus } from 'lucide-react';
 import { useDropzone } from 'react-dropzone';
 
+import { megabytesToBytes } from '@documenso/lib/universal/unit-convertions';
 import { cn } from '@documenso/ui/lib/utils';
 import { Card, CardContent } from '@documenso/ui/primitives/card';
 
@@ -74,21 +75,29 @@ const DocumentDropzoneCardCenterVariants: Variants = {
 
 export type DocumentDropzoneProps = {
   className?: string;
+  disabled?: boolean;
   onDrop?: (_file: File) => void | Promise<void>;
   [key: string]: unknown;
 };
 
-export const DocumentDropzone = ({ className, onDrop, ...props }: DocumentDropzoneProps) => {
+export const DocumentDropzone = ({
+  className,
+  onDrop,
+  disabled,
+  ...props
+}: DocumentDropzoneProps) => {
   const { getRootProps, getInputProps } = useDropzone({
     accept: {
       'application/pdf': ['.pdf'],
     },
     multiple: false,
+    disabled,
     onDrop: ([acceptedFile]) => {
       if (acceptedFile && onDrop) {
         void onDrop(acceptedFile);
       }
     },
+    maxSize: megabytesToBytes(50),
   });
 
   return (
@@ -102,11 +111,12 @@ export const DocumentDropzone = ({ className, onDrop, ...props }: DocumentDropzo
       <Card
         role="button"
         className={cn(
-          'focus-visible:ring-ring ring-offset-background flex flex-1 cursor-pointer flex-col items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2',
+          'focus-visible:ring-ring ring-offset-background flex flex-1 cursor-pointer flex-col items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 aria-disabled:pointer-events-none aria-disabled:opacity-60',
           className,
         )}
         gradient={true}
         degrees={120}
+        aria-disabled={disabled}
         {...getRootProps()}
         {...props}
       >

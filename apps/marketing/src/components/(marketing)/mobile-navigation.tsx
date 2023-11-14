@@ -4,7 +4,9 @@ import Image from 'next/image';
 import Link from 'next/link';
 
 import { motion, useReducedMotion } from 'framer-motion';
-import { Github, MessagesSquare, Twitter } from 'lucide-react';
+import { FaXTwitter } from 'react-icons/fa6';
+import { LiaDiscord } from 'react-icons/lia';
+import { LuGithub } from 'react-icons/lu';
 
 import { Sheet, SheetContent } from '@documenso/ui/primitives/sheet';
 
@@ -15,8 +17,8 @@ export type MobileNavigationProps = {
 
 export const MENU_NAVIGATION_LINKS = [
   {
-    href: '/single-player-mode',
-    text: 'Single Player Mode',
+    href: '/singleplayer',
+    text: 'Singleplayer',
   },
   {
     href: '/blog',
@@ -37,13 +39,14 @@ export const MENU_NAVIGATION_LINKS = [
   {
     href: 'mailto:support@documenso.com',
     text: 'Support',
+    target: '_blank',
   },
   {
     href: '/privacy',
     text: 'Privacy',
   },
   {
-    href: 'https://app.documenso.com/login',
+    href: 'https://app.documenso.com/signin',
     text: 'Sign in',
   },
 ];
@@ -76,7 +79,7 @@ export const MobileNavigation = ({ isMenuOpen, onMenuOpenChange }: MobileNavigat
             staggerChildren: 0.03,
           }}
         >
-          {MENU_NAVIGATION_LINKS.map(({ href, text }) => (
+          {MENU_NAVIGATION_LINKS.map(({ href, text, target }) => (
             <motion.div
               key={href}
               variants={{
@@ -98,6 +101,7 @@ export const MobileNavigation = ({ isMenuOpen, onMenuOpenChange }: MobileNavigat
                 className="text-foreground hover:text-foreground/80 text-2xl font-semibold"
                 href={href}
                 onClick={() => handleMenuItemClick()}
+                target={target}
               >
                 {text}
               </Link>
@@ -111,7 +115,7 @@ export const MobileNavigation = ({ isMenuOpen, onMenuOpenChange }: MobileNavigat
             target="_blank"
             className="text-foreground hover:text-foreground/80"
           >
-            <Twitter className="h-6 w-6" />
+            <FaXTwitter className="h-6 w-6" />
           </Link>
 
           <Link
@@ -119,7 +123,7 @@ export const MobileNavigation = ({ isMenuOpen, onMenuOpenChange }: MobileNavigat
             target="_blank"
             className="text-foreground hover:text-foreground/80"
           >
-            <Github className="h-6 w-6" />
+            <LuGithub className="h-6 w-6" />
           </Link>
 
           <Link
@@ -127,7 +131,7 @@ export const MobileNavigation = ({ isMenuOpen, onMenuOpenChange }: MobileNavigat
             target="_blank"
             className="text-foreground hover:text-foreground/80"
           >
-            <MessagesSquare className="h-6 w-6" />
+            <LiaDiscord className="h-7 w-7" />
           </Link>
         </div>
       </SheetContent>

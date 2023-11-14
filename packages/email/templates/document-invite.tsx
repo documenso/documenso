@@ -32,7 +32,7 @@ export const DocumentInviteEmailTemplate = ({
   assetBaseUrl = 'http://localhost:3002',
   customBody,
 }: DocumentInviteEmailTemplateProps) => {
-  const previewText = `Completed Document`;
+  const previewText = `${inviterName} has invited you to sign ${documentName}`;
 
   const getAssetUrl = (path: string) => {
     return new URL(path, assetBaseUrl).toString();

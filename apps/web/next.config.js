@@ -2,14 +2,18 @@
 const path = require('path');
 const { version } = require('./package.json');
 
-require('dotenv').config({
-  path: path.join(__dirname, '../../.env.local'),
+const ENV_FILES = ['.env', '.env.local', `.env.${process.env.NODE_ENV || 'development'}`];
+
+ENV_FILES.forEach((file) => {
+  require('dotenv').config({
+    path: path.join(__dirname, `../../${file}`),
+  });
 });
 
 /** @type {import('next').NextConfig} */
 const config = {
+  output: process.env.DOCKER_OUTPUT ? 'standalone' : undefined,
   experimental: {
-    serverActions: true,
     serverActionsBodySizeLimit: '50mb',
   },
   reactStrictMode: true,
@@ -29,11 +33,45 @@ const config = {
       transform: 'lucide-react/dist/esm/icons/{{ kebabCase member }}',
     },
   },
+  webpack: (config, { isServer }) => {
+    // fixes: Module not found: Can’t resolve ‘../build/Release/canvas.node’
+    if (isServer) {
+      config.resolve.alias.canvas = false;
+    }
+
+    return config;
+  },
   async rewrites() {
     return [
       {
         source: '/ingest/:path*',
         destination: 'https://eu.posthog.com/:path*',
+      },
+    ];
+  },
+  async redirects() {
+    return [
+      {
+        permanent: true,
+        source: '/documents/:id/sign',
+        destination: '/sign/:token',
+        has: [
+          {
+            type: 'query',
+            key: 'token',
+          },
+        ],
+      },
+      {
+        permanent: true,
+        source: '/documents/:id/signed',
+        destination: '/sign/:token',
+        has: [
+          {
+            type: 'query',
+            key: 'token',
+          },
+        ],
       },
     ];
   },
