@@ -12,7 +12,7 @@ import {
   Loader,
   MoreHorizontal,
   Pencil,
-  Share,
+  Sparkles,
   Trash2,
   XCircle,
 } from 'lucide-react';
@@ -152,8 +152,12 @@ export const DataTableActionDropdown = ({ row }: DataTableActionDropdownProps) =
           trigger={({ loading, disabled }) => (
             <DropdownMenuItem disabled={disabled || isDraft} onSelect={(e) => e.preventDefault()}>
               <div className="flex items-center">
-                {loading ? <Loader className="mr-2 h-4 w-4" /> : <Share className="mr-2 h-4 w-4" />}
-                Share
+                {loading ? (
+                  <Loader className="mr-2 h-4 w-4" />
+                ) : (
+                  <Sparkles className="mr-2 h-4 w-4" />
+                )}
+                Share Signature Card
               </div>
             </DropdownMenuItem>
           )}

@@ -2,7 +2,7 @@
 
 import React, { HTMLAttributes, useState } from 'react';
 
-import { Copy, Share } from 'lucide-react';
+import { Copy, Lock, Sparkles } from 'lucide-react';
 import { FaXTwitter } from 'react-icons/fa6';
 
 import { useCopyShareLink } from '@documenso/lib/client-only/hooks/use-copy-share-link';
@@ -95,7 +95,7 @@ export const DocumentShareButton = ({
 
     window.open(
       generateTwitterIntent(
-        `I just ${token ? 'signed' : 'sent'} a document with @documenso. Check it out!`,
+        `I just ${token ? 'signed' : 'sent'} a document in style with @documenso. Check it out!`,
         `${process.env.NEXT_PUBLIC_WEBAPP_URL}/share/${slug}`,
       ),
       '_blank',
@@ -114,25 +114,27 @@ export const DocumentShareButton = ({
           <Button
             variant="outline"
             disabled={!token || !documentId}
-            className={cn('flex-1', className)}
+            className={cn('flex-1 text-[11px]', className)}
             loading={isLoading || isCopyingShareLink}
           >
-            {!isLoading && !isCopyingShareLink && <Share className="mr-2 h-5 w-5" />}
-            Share
+            {!isLoading && !isCopyingShareLink && <Sparkles className="mr-2 h-5 w-5" />}
+            Share Signature Card
           </Button>
         )}
       </DialogTrigger>
 
       <DialogContent position="end">
         <DialogHeader>
-          <DialogTitle>Share</DialogTitle>
+          <DialogTitle>Share your signing experience!</DialogTitle>
 
-          <DialogDescription className="mt-4">Share your signing experience!</DialogDescription>
+          <DialogDescription className="mt-4">
+            Your document will not be shared <Lock className="-mt-1 mr-2 inline h-4 w-4" />
+          </DialogDescription>
         </DialogHeader>
 
         <div className="flex w-full flex-col">
           <div className="rounded-md border p-4">
-            I just {token ? 'signed' : 'sent'} a document with{' '}
+            I just {token ? 'signed' : 'sent'} a document in style with{' '}
             <span className="font-medium text-blue-400">@documenso</span>
             . Check it out!
             <span className="mt-2 block" />
