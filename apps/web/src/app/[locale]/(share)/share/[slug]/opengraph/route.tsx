@@ -3,11 +3,10 @@ import { NextResponse } from 'next/server';
 
 import { P, match } from 'ts-pattern';
 
-import { getRecipientOrSenderByShareLinkSlug } from '@documenso/lib/server-only/share/get-recipient-or-sender-by-share-link-slug';
-
 import { Logo } from '~/components/branding/logo';
-import { getAssetBuffer } from '~/helpers/get-asset-buffer';
+import { ShareHandlerAPIResponse } from '~/pages/api/share';
 
+export const runtime = 'edge';
 const CARD_OFFSET_TOP = 152;
 const CARD_OFFSET_LEFT = 350;
 const CARD_WIDTH = 500;
@@ -24,14 +23,29 @@ type SharePageOpenGraphImageProps = {
 
 export async function GET(_request: Request, { params: { slug } }: SharePageOpenGraphImageProps) {
   const [interSemiBold, interRegular, caveatRegular, shareFrameImage] = await Promise.all([
-    getAssetBuffer('/fonts/inter-semibold.ttf'),
-    getAssetBuffer('/fonts/inter-regular.ttf'),
-    getAssetBuffer('/fonts/caveat-regular.ttf'),
-    getAssetBuffer('/static/og-share-frame.png'),
+    fetch(new URL('@documenso/assets/fonts/inter-semibold.ttf', import.meta.url)).then(
+      async (res) => res.arrayBuffer(),
+    ),
+    fetch(new URL('@documenso/assets/fonts/inter-regular.ttf', import.meta.url)).then(async (res) =>
+      res.arrayBuffer(),
+    ),
+    fetch(new URL('@documenso/assets/fonts/caveat-regular.ttf', import.meta.url)).then(
+      async (res) => res.arrayBuffer(),
+    ),
+    fetch(new URL('@documenso/assets/static/og-share-frame.png', import.meta.url)).then(
+      async (res) => res.arrayBuffer(),
+    ),
   ]);
 
-  const recipientOrSender = await getRecipientOrSenderByShareLinkSlug({ slug }).catch(() => null);
+  const baseUrl = process.env.NEXT_PUBLIC_WEBAPP_URL || 'http://localhost:3000';
 
+  const recipientOrSender: ShareHandlerAPIResponse = await fetch(
+    new URL(`/api/share?slug=${slug}`, baseUrl),
+  ).then(async (res) => res.json());
+
+  if ('error' in recipientOrSender) {
+    return NextResponse.json({ error: 'Not found' }, { status: 404 });
+  }
   if (!recipientOrSender) {
     return NextResponse.json({ error: 'Not found' }, { status: 404 });
   }

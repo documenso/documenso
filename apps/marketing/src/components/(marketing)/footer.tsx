@@ -10,6 +10,7 @@ import { Moon, Sun } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import { FaXTwitter } from 'react-icons/fa6';
 
+import LogoImage from '@documenso/assets/logo.png';
 import { useTranslation } from '@documenso/ui/i18n/client';
 import { LocaleTypes } from '@documenso/ui/i18n/settings';
 // import { LiaDiscord } from 'react-icons/lia';
@@ -42,7 +43,7 @@ export const Footer = ({ className, ...props }: FooterProps) => {
         <div>
           <Link href="/">
             <Image
-              src="/logo.png"
+              src={LogoImage}
               alt="Notario Logo"
               className="dark:invert"
               width={145}

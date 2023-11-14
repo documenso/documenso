@@ -6,6 +6,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 
+import LogoImage from '@documenso/assets/logo.png';
 import ChangeLocale from '@documenso/ui/components/ChangeLocale';
 import { useTranslation } from '@documenso/ui/i18n/client';
 import { LocaleTypes } from '@documenso/ui/i18n/settings';
@@ -26,7 +27,7 @@ export const Header = ({ className, ...props }: HeaderProps) => {
       <div className="flex items-center space-x-4">
         <Link href="/" className="z-10" onClick={() => setIsHamburgerMenuOpen(false)}>
           <Image
-            src="/logo.png"
+            src={LogoImage}
             alt="Notario Logo"
             className="dark:invert"
             width={145}
@@ -51,7 +52,7 @@ export const Header = ({ className, ...props }: HeaderProps) => {
         </Link>
 
         <Link
-          href={`http://localhost:3000/signin`}
+          href={`https://app.progiciel.co/fr/signin`}
           target="_blank"
           className="text-muted-foreground hover:text-muted-foreground/80 text-sm font-semibold"
         >

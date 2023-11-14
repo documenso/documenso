@@ -7,6 +7,7 @@ import { motion, useReducedMotion } from 'framer-motion';
 import { FaXTwitter } from 'react-icons/fa6';
 import { LiaDiscord } from 'react-icons/lia';
 
+import LogoImage from '@documenso/assets/logo.png';
 import { useTranslation } from '@documenso/ui/i18n/client';
 import { LocaleTypes } from '@documenso/ui/i18n/settings';
 import { Sheet, SheetContent } from '@documenso/ui/primitives/sheet';
@@ -59,7 +60,7 @@ export const MobileNavigation = ({
       <SheetContent className="w-full max-w-[400px]">
         <Link href="/" className="z-10" onClick={handleMenuItemClick}>
           <Image
-            src="/logo.png"
+            src={LogoImage}
             alt="Notario Logo"
             className="dark:invert"
             width={145}

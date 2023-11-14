@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 
 import Link from 'next/link';
 
+import signingCelebration from '@documenso/assets/images/signing-celebration.png';
 import { useFeatureFlags } from '@documenso/lib/client-only/providers/feature-flag';
 import { DocumentStatus, Signature } from '@documenso/prisma/client';
 import { DocumentWithRecipient } from '@documenso/prisma/types/document-with-recipient';
@@ -16,7 +17,6 @@ import { LocaleTypes } from '@documenso/ui/i18n/settings';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
 
-import signingCelebration from '~/assets/signing-celebration.png';
 import { ConfettiScreen } from '~/components/(marketing)/confetti-screen';
 
 interface SinglePlayerModeSuccessProps {
