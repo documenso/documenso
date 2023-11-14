@@ -90,7 +90,7 @@ export const DocumentDropzone = ({ className, onDrop, ...props }: DocumentDropzo
         void onDrop(acceptedFile);
       }
     },
-    maxSize: megabytesToBytes(25),
+    maxSize: megabytesToBytes(50),
   });
 
   return (
