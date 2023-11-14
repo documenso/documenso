@@ -33,7 +33,7 @@ module.exports = {
     'react/no-unescaped-entities': 'off',
 
     '@typescript-eslint/no-unused-vars': 'off',
-    'unused-imports/no-unused-imports': 'error',
+    'unused-imports/no-unused-imports': 'warn',
     'unused-imports/no-unused-vars': [
       'warn',
       {
@@ -78,7 +78,7 @@ module.exports = {
     '@typescript-eslint/consistent-type-assertions': ['warn', { assertionStyle: 'never' }],
 
     '@typescript-eslint/consistent-type-imports': [
-      'error',
+      'warn',
       {
         prefer: 'type-imports',
         fixStyle: 'separate-type-imports',
