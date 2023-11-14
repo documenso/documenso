@@ -1,19 +1,19 @@
-"use client";
+'use client';
 
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 
-import { Loader } from "lucide-react";
-import { PDFDocumentProxy } from "pdfjs-dist";
-import { Document as PDFDocument, Page as PDFPage, pdfjs } from "react-pdf";
-import "react-pdf/dist/esm/Page/AnnotationLayer.css";
-import "react-pdf/dist/esm/Page/TextLayer.css";
+import { Loader } from 'lucide-react';
+import { PDFDocumentProxy } from 'pdfjs-dist';
+import { Document as PDFDocument, Page as PDFPage, pdfjs } from 'react-pdf';
+import 'react-pdf/dist/esm/Page/AnnotationLayer.css';
+import 'react-pdf/dist/esm/Page/TextLayer.css';
 
-import { PDF_VIEWER_PAGE_SELECTOR } from "@documenso/lib/constants/pdf-viewer";
-import { getFile } from "@documenso/lib/universal/upload/get-file";
-import { DocumentData } from "@documenso/prisma/client";
-import { cn } from "@documenso/ui/lib/utils";
+import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
+import { getFile } from '@documenso/lib/universal/upload/get-file';
+import { DocumentData } from '@documenso/prisma/client';
+import { cn } from '@documenso/ui/lib/utils';
 
-import { useToast } from "./use-toast";
+import { useToast } from './use-toast';
 
 export type LoadedPDFDocument = PDFDocumentProxy;
 
@@ -46,7 +46,7 @@ export type PDFViewerProps = {
   onDocumentLoad?: (_doc: LoadedPDFDocument) => void;
   onPageClick?: OnPDFViewerPageClick;
   [key: string]: unknown;
-} & Omit<React.HTMLAttributes<HTMLDivElement>, "onPageClick">;
+} & Omit<React.HTMLAttributes<HTMLDivElement>, 'onPageClick'>;
 
 export const PDFViewer = ({
   className,
@@ -68,7 +68,7 @@ export const PDFViewer = ({
 
   const memoizedData = useMemo(
     () => ({ type: documentData.type, data: documentData.data }),
-    [documentData.data, documentData.type]
+    [documentData.data, documentData.type],
   );
 
   const isLoading = isDocumentBytesLoading || !documentBytes;
@@ -80,7 +80,7 @@ export const PDFViewer = ({
 
   const onDocumentPageClick = (
     event: React.MouseEvent<HTMLDivElement, MouseEvent>,
-    pageNumber: number
+    pageNumber: number,
   ) => {
     const $el = event.target instanceof HTMLElement ? event.target : null;
 
@@ -126,10 +126,10 @@ export const PDFViewer = ({
         setWidth(width);
       };
 
-      window.addEventListener("resize", onResize);
+      window.addEventListener('resize', onResize);
 
       return () => {
-        window.removeEventListener("resize", onResize);
+        window.removeEventListener('resize', onResize);
       };
     }
   }, []);
@@ -148,9 +148,9 @@ export const PDFViewer = ({
         console.error(err);
 
         toast({
-          title: "Error",
-          description: "An error occurred while loading the document.",
-          variant: "destructive",
+          title: 'Error',
+          description: 'An error occurred while loading the document.',
+          variant: 'destructive',
         });
       }
     };
@@ -159,11 +159,11 @@ export const PDFViewer = ({
   }, [memoizedData, toast]);
 
   return (
-    <div ref={$el} className={cn("overflow-hidden", className)} {...props}>
+    <div ref={$el} className={cn('overflow-hidden', className)} {...props}>
       {isLoading ? (
         <div
           className={cn(
-            "flex h-[80vh] max-h-[60rem] w-full flex-col items-center justify-center overflow-hidden rounded"
+            'flex h-[80vh] max-h-[60rem] w-full flex-col items-center justify-center overflow-hidden rounded',
           )}
         >
           <PDFLoader />
@@ -171,8 +171,8 @@ export const PDFViewer = ({
       ) : (
         <PDFDocument
           file={documentBytes.buffer}
-          className={cn("w-full overflow-hidden rounded", {
-            "h-[80vh] max-h-[60rem]": numPages === 0,
+          className={cn('w-full overflow-hidden rounded', {
+            'h-[80vh] max-h-[60rem]': numPages === 0,
           })}
           onLoadSuccess={(d) => onDocumentLoaded(d)}
           // Uploading a invalid document causes an error which doesn't appear to be handled by the `error` prop.
@@ -186,9 +186,7 @@ export const PDFViewer = ({
               {pdfError ? (
                 <div className="text-muted-foreground text-center">
                   <p>Something went wrong while loading the document.</p>
-                  <p className="mt-1 text-sm">
-                    Please try again or contact our support.
-                  </p>
+                  <p className="mt-1 text-sm">Please try again or contact our support.</p>
                 </div>
               ) : (
                 <PDFLoader />
@@ -199,9 +197,7 @@ export const PDFViewer = ({
             <div className="dark:bg-background flex h-[80vh] max-h-[60rem] flex-col items-center justify-center bg-white/50">
               <div className="text-muted-foreground text-center">
                 <p>Something went wrong while loading the document.</p>
-                <p className="mt-1 text-sm">
-                  Please try again or contact our support.
-                </p>
+                <p className="mt-1 text-sm">Please try again or contact our support.</p>
               </div>
             </div>
           }
@@ -218,7 +214,7 @@ export const PDFViewer = ({
                   width={width}
                   renderAnnotationLayer={false}
                   renderTextLayer={false}
-                  loading={() => ""}
+                  loading={() => ''}
                   onClick={(e) => onDocumentPageClick(e, i + 1)}
                 />
               </div>
