@@ -32,8 +32,6 @@ export const SigningForm = ({ document, recipient, fields }: SigningFormProps) =
   const { data: session } = useSession();
 
   const { fullName, signature, setFullName, setSignature } = useRequiredSigningContext();
-
-  const [showConfirmSignatureDialog, setShowConfirmSignatureDialog] = useState(false);
   const [validateUninsertedFields, setValidateUninsertedFields] = useState(false);
 
   const {
@@ -45,16 +43,15 @@ export const SigningForm = ({ document, recipient, fields }: SigningFormProps) =
     return sortFieldsByPosition(fields.filter((field) => !field.inserted));
   }, [fields]);
 
-  const onFormSubmit = () => {
+  const onFormSubmit = async () => {
     setValidateUninsertedFields(true);
+
     const isFieldsValid = validateFieldsInserted(fields);
 
     if (!isFieldsValid) {
       return;
     }
-  };
 
-  const onSigningComplete = async () => {
     await completeDocumentWithToken({
       token: recipient.token,
       documentId: document.id,
@@ -138,9 +135,7 @@ export const SigningForm = ({ document, recipient, fields }: SigningFormProps) =
 
               <SignDialog
                 isSubmitting={isSubmitting}
-                showConfirmSignatureDialog={showConfirmSignatureDialog}
-                onSignatureComplete={onSigningComplete}
-                setShowConfirmSignatureDialog={setShowConfirmSignatureDialog}
+                onSignatureComplete={handleSubmit(onFormSubmit)}
                 document={document}
                 fields={fields}
               />

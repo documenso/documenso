@@ -1,6 +1,4 @@
-import React, { useEffect, useState } from 'react';
-
-import { Loader } from 'lucide-react';
+import { useState } from 'react';
 
 import { Document, Field } from '@documenso/prisma/client';
 import { Button } from '@documenso/ui/primitives/button';
@@ -13,34 +11,31 @@ import {
 
 export type SignDialogProps = {
   isSubmitting: boolean;
-  showConfirmSignatureDialog: boolean;
-  onSignatureComplete: () => void;
-  // eslint-disable-next-line no-unused-vars
-  setShowConfirmSignatureDialog: (show: boolean) => void;
   document: Document;
   fields: Field[];
+  onSignatureComplete: () => void | Promise<void>;
 };
 
 export default function SignDialog({
   isSubmitting,
-  showConfirmSignatureDialog,
-  onSignatureComplete,
-  setShowConfirmSignatureDialog,
   document,
   fields,
+  onSignatureComplete,
 }: SignDialogProps) {
-  const [isComplete, setIsComplete] = useState(false);
+  const [showDialog, setShowDialog] = useState(false);
 
-  useEffect(() => {
-    const isComplete = fields.every((f) => f.inserted);
-    setIsComplete(isComplete);
-  }, [fields]);
+  const isComplete = fields.every((field) => field.inserted);
 
   return (
-    <Dialog open={showConfirmSignatureDialog} onOpenChange={setShowConfirmSignatureDialog}>
+    <Dialog open={showDialog} onOpenChange={setShowDialog}>
       <DialogTrigger asChild>
-        <Button className="w-full" type="button" size="lg" disabled={!isComplete || isSubmitting}>
-          {isSubmitting && <Loader className="mr-2 h-5 w-5 animate-spin" />}
+        <Button
+          className="w-full"
+          type="button"
+          size="lg"
+          disabled={!isComplete}
+          loading={isSubmitting}
+        >
           Complete
         </Button>
       </DialogTrigger>
@@ -59,7 +54,7 @@ export default function SignDialog({
               className="dark:bg-muted dark:hover:bg-muted/80 flex-1  bg-black/5 hover:bg-black/10"
               variant="secondary"
               onClick={() => {
-                setShowConfirmSignatureDialog(false);
+                setShowDialog(false);
               }}
             >
               Cancel
@@ -68,10 +63,10 @@ export default function SignDialog({
             <Button
               type="button"
               className="flex-1"
-              disabled={!isComplete || isSubmitting}
+              disabled={!isComplete}
+              loading={isSubmitting}
               onClick={onSignatureComplete}
             >
-              {isSubmitting && <Loader className="mr-2 h-5 w-5 animate-spin" />}
               Sign
             </Button>
           </div>
