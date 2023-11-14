@@ -23,15 +23,15 @@ export const ZPasswordFormSchema = z
     currentPassword: z
       .string()
       .min(6, { message: 'Password should contain at least 6 characters' })
-      .max(72),
+      .max(72, { message: 'Password should not contain more than 72 characters' }),
     password: z
       .string()
       .min(6, { message: 'Password should contain at least 6 characters' })
-      .max(72),
+      .max(72, { message: 'Password should not contain more than 72 characters' }),
     repeatedPassword: z
       .string()
       .min(6, { message: 'Password should contain at least 6 characters' })
-      .max(72),
+      .max(72, { message: 'Password should not contain more than 72 characters' }),
   })
   .refine((data) => data.password === data.repeatedPassword, {
     message: 'Passwords do not match',

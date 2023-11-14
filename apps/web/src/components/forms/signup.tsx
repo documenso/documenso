@@ -21,7 +21,10 @@ import { useToast } from '@documenso/ui/primitives/use-toast';
 export const ZSignUpFormSchema = z.object({
   name: z.string().trim().min(1, { message: 'Please enter a valid name.' }),
   email: z.string().email().min(1),
-  password: z.string().min(6, { message: 'Password should contain at least 6 characters' }).max(72),
+  password: z
+    .string()
+    .min(6, { message: 'Password should contain at least 6 characters' })
+    .max(72, { message: 'Password should not contain more than 72 characters' }),
   signature: z.string().min(1, { message: 'We need your signature to sign documents' }),
 });
 
