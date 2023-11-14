@@ -81,8 +81,6 @@ export const EditTemplateForm = ({
 
       setStep('fields');
     } catch (err) {
-      console.error(err);
-
       toast({
         title: 'Error',
         description: 'An error occurred while adding signers.',
@@ -93,7 +91,6 @@ export const EditTemplateForm = ({
 
   const onAddFieldsFormSubmit = async (data: TAddTemplateFieldsFormSchema) => {
     try {
-      // Custom invocation server action
       await addTemplateFields({
         templateId: template.id,
         fields: data.fields,
@@ -107,8 +104,6 @@ export const EditTemplateForm = ({
 
       router.push('/templates');
     } catch (err) {
-      console.error(err);
-
       toast({
         title: 'Error',
         description: 'An error occurred while adding signers.',

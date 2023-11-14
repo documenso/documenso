@@ -67,6 +67,13 @@ export const DataTableActionDropdown = ({ row }: DataTableActionDropdownProps) =
           duration: 5000,
         });
       },
+      onError: () => {
+        toast({
+          title: 'Error',
+          description: 'An error occurred while creating template from document.',
+          variant: 'destructive',
+        });
+      },
     });
 
   const { createAndCopyShareLink, isCopyingShareLink } = useCopyShareLink({

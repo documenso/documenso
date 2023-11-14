@@ -4,14 +4,14 @@ import { getRequiredServerComponentSession } from '@documenso/lib/next-auth/get-
 import { setRecipientsForTemplate } from '@documenso/lib/server-only/recipient/set-recipients-for-template';
 import { TAddTemplatePlacholderRecipientsFormSchema } from '@documenso/ui/primitives/template-flow/add-template-placeholder-recipients.types';
 
-export type AddTemmplatePlaceholdersActionInput = TAddTemplatePlacholderRecipientsFormSchema & {
+export type AddTemplatePlaceholdersActionInput = TAddTemplatePlacholderRecipientsFormSchema & {
   templateId: number;
 };
 
 export const addTemplatePlaceholders = async ({
   templateId,
   signers,
-}: AddTemmplatePlaceholdersActionInput) => {
+}: AddTemplatePlaceholdersActionInput) => {
   'use server';
 
   const { user } = await getRequiredServerComponentSession();

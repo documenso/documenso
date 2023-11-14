@@ -52,8 +52,6 @@ export const DataTableActionDropdown = ({ row }: DataTableActionDropdownProps) =
 
       router.refresh();
     } catch (err) {
-      console.error(err);
-
       toast({
         title: 'Error',
         description: 'An error occurred while duplicating template.',

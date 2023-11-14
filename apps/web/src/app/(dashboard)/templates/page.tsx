@@ -7,14 +7,14 @@ import { TemplatesDataTable } from './data-table-templates';
 import { EmptyTemplateState } from './empty-state';
 import { NewTemplateDialog } from './new-template-dialog';
 
-type AdminManageUsersProps = {
+type TemplatesPageProps = {
   searchParams?: {
     page?: number;
     perPage?: number;
   };
 };
 
-export default async function TemplatesPage({ searchParams = {} }: AdminManageUsersProps) {
+export default async function TemplatesPage({ searchParams = {} }: TemplatesPageProps) {
   const { user } = await getRequiredServerComponentSession();
   const page = Number(searchParams.page) || 1;
   const perPage = Number(searchParams.perPage) || 10;
@@ -33,16 +33,16 @@ export default async function TemplatesPage({ searchParams = {} }: AdminManageUs
       </div>
 
       <div className="relative">
-        {templates.length > 0 && (
+        {templates.length > 0 ? (
           <TemplatesDataTable
             templates={templates}
             page={page}
             perPage={perPage}
             totalPages={totalPages}
           />
+        ) : (
+          <EmptyTemplateState />
         )}
-
-        {templates.length < 1 && <EmptyTemplateState />}
       </div>
     </div>
   );

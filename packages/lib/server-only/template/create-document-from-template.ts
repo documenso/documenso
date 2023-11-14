@@ -6,7 +6,7 @@ export type CreateDocumentFromTemplateOptions = TCreateDocumentFromTemplateMutat
   userId: number;
 };
 
-export const createDocumentFromTempate = async ({
+export const createDocumentFromTemplate = async ({
   templateId,
   userId,
 }: CreateDocumentFromTemplateOptions) => {

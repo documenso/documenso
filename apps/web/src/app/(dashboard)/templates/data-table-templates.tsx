@@ -42,7 +42,7 @@ export const TemplatesDataTable = ({
   const [loadingStates, setLoadingStates] = useState<{ [key: string]: boolean }>({});
 
   const { mutateAsync: createDocumentFromTemplate } =
-    trpc.template.createDocumentFromTempate.useMutation();
+    trpc.template.createDocumentFromTemplate.useMutation();
 
   const onPaginationChange = (page: number, perPage: number) => {
     startTransition(() => {
@@ -65,8 +65,6 @@ export const TemplatesDataTable = ({
       });
       router.push(`/documents/${id}`);
     } catch (err) {
-      console.error(err);
-
       toast({
         title: 'Error',
         description: 'An error occurred while creating document from template.',
