@@ -4,10 +4,10 @@ import { useEffect, useState } from 'react';
 
 import Link from 'next/link';
 
+import signingCelebration from '@documenso/assets/images/signing-celebration.png';
 import { useFeatureFlags } from '@documenso/lib/client-only/providers/feature-flag';
 import { DocumentStatus, Signature } from '@documenso/prisma/client';
 import { DocumentWithRecipient } from '@documenso/prisma/types/document-with-recipient';
-import signingCelebration from '@documenso/public-assets/images/signing-celebration.png';
 import DocumentDialog from '@documenso/ui/components/document/document-dialog';
 import { DocumentDownloadButton } from '@documenso/ui/components/document/document-download-button';
 import { DocumentShareButton } from '@documenso/ui/components/document/document-share-button';

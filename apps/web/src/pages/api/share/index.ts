@@ -2,16 +2,22 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 
 import { getRecipientOrSenderByShareLinkSlug } from '@documenso/lib/server-only/share/get-recipient-or-sender-by-share-link-slug';
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+export type ShareHandlerAPIResponse =
+  | Awaited<ReturnType<typeof getRecipientOrSenderByShareLinkSlug>>
+  | { error: string };
+
+export default async function shareHandler(req: NextApiRequest, res: NextApiResponse) {
   try {
-    console.log('sadsad', req.query.id);
+    if (typeof req.query.slug !== 'string') {
+      throw new Error('Invalid slug');
+    }
+
     const data = await getRecipientOrSenderByShareLinkSlug({
-      // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-      slug: req.query.id as string,
+      slug: req.query.slug,
     });
 
     return res.json(data);
   } catch (error) {
-    return res.json({ error: 'Not found' });
+    return res.status(404).json({ error: 'Not found' });
   }
 }

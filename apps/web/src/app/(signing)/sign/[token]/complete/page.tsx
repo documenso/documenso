@@ -4,12 +4,12 @@ import { notFound } from 'next/navigation';
 import { CheckCircle2, Clock8 } from 'lucide-react';
 import { match } from 'ts-pattern';
 
+import signingCelebration from '@documenso/assets/images/signing-celebration.png';
 import { getDocumentAndSenderByToken } from '@documenso/lib/server-only/document/get-document-by-token';
 import { getFieldsForToken } from '@documenso/lib/server-only/field/get-fields-for-token';
 import { getRecipientByToken } from '@documenso/lib/server-only/recipient/get-recipient-by-token';
 import { getRecipientSignatures } from '@documenso/lib/server-only/recipient/get-recipient-signatures';
 import { DocumentStatus, FieldType } from '@documenso/prisma/client';
-import signingCelebration from '@documenso/public-assets/images/signing-celebration.png';
 import { DocumentDownloadButton } from '@documenso/ui/components/document/document-download-button';
 import { DocumentShareButton } from '@documenso/ui/components/document/document-share-button';
 import { SigningCard3D } from '@documenso/ui/components/signing-card';

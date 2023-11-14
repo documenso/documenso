@@ -2,10 +2,10 @@ import { HTMLAttributes } from 'react';
 
 import Image from 'next/image';
 
-import backgroundPattern from '@documenso/public-assets/images/background-pattern.png';
-import cardBuildFigure from '@documenso/public-assets/images/card-build-figure.png';
-import cardOpenFigure from '@documenso/public-assets/images/card-open-figure.png';
-import cardTemplateFigure from '@documenso/public-assets/images/card-template-figure.png';
+import backgroundPattern from '@documenso/assets/images/background-pattern.png';
+import cardBuildFigure from '@documenso/assets/images/card-build-figure.png';
+import cardOpenFigure from '@documenso/assets/images/card-open-figure.png';
+import cardTemplateFigure from '@documenso/assets/images/card-template-figure.png';
 import { cn } from '@documenso/ui/lib/utils';
 import { Card, CardContent } from '@documenso/ui/primitives/card';
 

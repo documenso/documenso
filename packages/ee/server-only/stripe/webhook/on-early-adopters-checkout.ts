@@ -71,7 +71,7 @@ export const onEarlyAdoptersCheckout = async ({ session }: OnEarlyAdoptersChecko
     const signatureDataUrl = await redis.get<string>(`signature:${session.client_reference_id}`);
 
     const documentBuffer = await fetch(
-      `${process.env.NEXT_PUBLIC_WEBAPP_URL}/documenso-supporter-pledge.pdf`,
+      new URL('@documenso/assets/documenso-supporter-pledge.pdf', import.meta.url),
     ).then(async (res) => res.arrayBuffer());
 
     const { id: documentDataId } = await putFile({

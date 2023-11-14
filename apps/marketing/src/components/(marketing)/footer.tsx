@@ -11,6 +11,7 @@ import { FaXTwitter } from 'react-icons/fa6';
 import { LiaDiscord } from 'react-icons/lia';
 import { LuGithub } from 'react-icons/lu';
 
+import LogoImage from '@documenso/assets/logo.png';
 import { cn } from '@documenso/ui/lib/utils';
 
 export type FooterProps = HTMLAttributes<HTMLDivElement>;
@@ -42,7 +43,7 @@ export const Footer = ({ className, ...props }: FooterProps) => {
         <div>
           <Link href="/">
             <Image
-              src="/logo.png"
+              src={LogoImage}
               alt="Documenso Logo"
               className="dark:invert"
               width={170}

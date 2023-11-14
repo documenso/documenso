@@ -8,8 +8,8 @@ import { usePlausible } from 'next-plausible';
 import { LuGithub } from 'react-icons/lu';
 import { match } from 'ts-pattern';
 
+import backgroundPattern from '@documenso/assets/images/background-pattern.png';
 import { useFeatureFlags } from '@documenso/lib/client-only/providers/feature-flag';
-import backgroundPattern from '@documenso/public-assets/images/background-pattern.png';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
 

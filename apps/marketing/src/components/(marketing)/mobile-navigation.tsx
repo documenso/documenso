@@ -8,6 +8,7 @@ import { FaXTwitter } from 'react-icons/fa6';
 import { LiaDiscord } from 'react-icons/lia';
 import { LuGithub } from 'react-icons/lu';
 
+import LogoImage from '@documenso/assets/logo.png';
 import { Sheet, SheetContent } from '@documenso/ui/primitives/sheet';
 
 export type MobileNavigationProps = {
@@ -63,7 +64,7 @@ export const MobileNavigation = ({ isMenuOpen, onMenuOpenChange }: MobileNavigat
       <SheetContent className="w-full max-w-[400px]">
         <Link href="/" className="z-10" onClick={handleMenuItemClick}>
           <Image
-            src="/logo.png"
+            src={LogoImage}
             alt="Documenso Logo"
             className="dark:invert"
             width={170}
