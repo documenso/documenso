@@ -156,6 +156,18 @@
     "non-legally-binding": "non juridiquement contraignante, mais sincère",
     "add-your-signature": "Ajouter votre signature",
     "and-your-name": "et votre nom?",
-    "unlock-option": "Vous débloquez également l'option d'acheter le plan de supporteur précoce comprenant tout ce que nous construisons cette année pour un prix fixe."
-   
+    "unlock-option": "Vous débloquez également l'option d'acheter le plan de supporteur précoce comprenant tout ce que nous construisons cette année pour un prix fixe.",
+
+
+    
+        "your-own": "Entierement vôtre.",
+        "customise": "Personnalisez et développez.",
+        "hosted": "Cloud ou Hébergé.",
+        "build-on-top": "Intégrer via API.",
+        "make-it-ur-own": "Heberger sur vos serveurs pour une personnalisation avancée et à une adaptabilité.",
+        "template-store": "Template de documents (Bientôt)",
+        "up-to-you": "C'est à vous. Hebergez sur vos serveurs, soit comptez sur notre solution d'hébergement facile à utiliser.",
+        "use-template": "Choisissez un modèle dans la boutique de modèles communautaires. Ou soumettez votre propre modèle pour que d'autres puissent l'utiliser."
+    
+    
 }
