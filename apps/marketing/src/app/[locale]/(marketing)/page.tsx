@@ -1,6 +1,7 @@
 /* eslint-disable no-unused-vars, @typescript-eslint/no-unused-vars */
 import { Caveat } from 'next/font/google';
 
+import { LocaleTypes } from '@documenso/ui/i18n/settings';
 import { cn } from '@documenso/ui/lib/utils';
 
 import { Callout } from '~/components/(marketing)/callout';
@@ -18,7 +19,11 @@ const fontCaveat = Caveat({
   variable: '--font-caveat',
 });
 
-export default async function IndexPage() {
+export default async function IndexPage({
+  params: { locale },
+}: {
+  params: { locale: LocaleTypes };
+}) {
   const starCount = await fetch('https://api.github.com/repos/documenso/documenso', {
     headers: {
       accept: 'application/vnd.github.v3+json',
@@ -32,9 +37,9 @@ export default async function IndexPage() {
     <div className={cn('mt-12', fontCaveat.variable)}>
       <Hero starCount={starCount} />
 
-      <FasterSmarterBeautifulBento className="my-48" />
-      <ShareConnectPaidWidgetBento className="my-48" />
-      <OpenBuildTemplateBento className="my-48" />
+      <FasterSmarterBeautifulBento locale={locale} className="my-48" />
+      <ShareConnectPaidWidgetBento locale={locale} className="my-48" />
+      <OpenBuildTemplateBento locale={locale} className="my-48" />
 
       <Callout starCount={starCount} />
     </div>

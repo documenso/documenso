@@ -22,10 +22,10 @@ const SOCIAL_LINKS = [
 ];
 
 const FOOTER_LINKS = [
-  { href: '/pricing', text: 'Pricing' },
-  { href: '/singleplayer', text: 'Singleplayer' },
-  { href: 'mailto:support@documenso.com', text: 'Support', target: '_blank' },
-  { href: '/privacy', text: 'Privacy' },
+  { href: '/pricing', text: 'pricing' },
+  { href: '/singleplayer', text: 'single-player-mode' },
+  { href: 'mailto:support@documenso.com', text: 'support', target: '_blank' },
+  { href: '/privacy', text: 'privacy' },
 ];
 
 export const Footer = ({ className, ...props }: FooterProps) => {
@@ -67,7 +67,7 @@ export const Footer = ({ className, ...props }: FooterProps) => {
               target={link.target}
               className="text-muted-foreground hover:text-muted-foreground/80 flex-shrink-0 text-sm"
             >
-              {link.text}
+              {t(link.text)}
             </Link>
           ))}
         </div>

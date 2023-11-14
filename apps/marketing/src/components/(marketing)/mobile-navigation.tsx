@@ -20,25 +20,25 @@ export type MobileNavigationProps = {
 export const MENU_NAVIGATION_LINKS = [
   {
     href: '/singleplayer',
-    text: 'Singleplayer',
+    text: 'single-player-mode',
   },
 
   {
     href: '/pricing',
-    text: 'Pricing',
+    text: 'pricing',
   },
   {
     href: 'mailto:notario@progiciel.co',
-    text: 'Support',
+    text: 'support',
     target: '_blank',
   },
   {
     href: '/privacy',
-    text: 'Privacy',
+    text: 'privacy',
   },
   {
     href: 'https://app.notario.progiciel.co/signin/fr',
-    text: 'Sign in',
+    text: 'sign-in',
   },
 ];
 
@@ -99,7 +99,7 @@ export const MobileNavigation = ({
                 onClick={() => handleMenuItemClick()}
                 target={target}
               >
-                {text}
+                {t(text)}
               </Link>
             </motion.div>
           ))}
