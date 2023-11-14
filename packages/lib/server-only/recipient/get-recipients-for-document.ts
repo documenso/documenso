@@ -16,6 +16,9 @@ export const getRecipientsForDocument = async ({
         userId,
       },
     },
+    orderBy: {
+      id: 'asc',
+    },
   });
 
   return recipients;

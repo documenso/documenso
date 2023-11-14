@@ -1,19 +1,46 @@
 import { Table } from '@tanstack/react-table';
 import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-react';
+import { match } from 'ts-pattern';
 
 import { Button } from './button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './select';
 
 interface DataTablePaginationProps<TData> {
   table: Table<TData>;
+
+  /**
+   * The type of information to show on the left hand side of the pagination.
+   *
+   * Defaults to 'VisibleCount'.
+   */
+  additionalInformation?: 'SelectedCount' | 'VisibleCount' | 'None';
 }
 
-export function DataTablePagination<TData>({ table }: DataTablePaginationProps<TData>) {
+export function DataTablePagination<TData>({
+  table,
+  additionalInformation = 'VisibleCount',
+}: DataTablePaginationProps<TData>) {
   return (
     <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-4 px-2">
       <div className="text-muted-foreground flex-1 text-sm">
-        {table.getFilteredSelectedRowModel().rows.length} of{' '}
-        {table.getFilteredRowModel().rows.length} row(s) selected.
+        {match(additionalInformation)
+          .with('SelectedCount', () => (
+            <span>
+              {table.getFilteredSelectedRowModel().rows.length} of{' '}
+              {table.getFilteredRowModel().rows.length} row(s) selected.
+            </span>
+          ))
+          .with('VisibleCount', () => {
+            const visibleRows = table.getFilteredRowModel().rows.length;
+
+            return (
+              <span>
+                Showing {visibleRows} result{visibleRows > 1 && 's'}.
+              </span>
+            );
+          })
+          .with('None', () => null)
+          .exhaustive()}
       </div>
 
       <div className="flex items-center gap-x-2">

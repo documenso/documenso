@@ -3,17 +3,20 @@
   "version": "0.0.0",
   "main": "./index.cjs",
   "license": "MIT",
+  "scripts": {
+    "clean": "rimraf node_modules"
+  },
   "dependencies": {
-    "@typescript-eslint/eslint-plugin": "^6.5.0",
-    "@typescript-eslint/parser": "^6.5.0",
+    "@typescript-eslint/eslint-plugin": "6.8.0",
+    "@typescript-eslint/parser": "6.8.0",
     "eslint": "^8.40.0",
-    "eslint-config-next": "13.4.12",
+    "eslint-config-next": "13.4.19",
     "eslint-config-prettier": "^8.8.0",
     "eslint-config-turbo": "^1.9.3",
     "eslint-plugin-package-json": "^0.1.4",
     "eslint-plugin-prettier": "^4.2.1",
     "eslint-plugin-react": "^7.32.2",
     "eslint-plugin-unused-imports": "^3.0.0",
-    "typescript": "^5.1.6"
+    "typescript": "5.2.2"
   }
 }
