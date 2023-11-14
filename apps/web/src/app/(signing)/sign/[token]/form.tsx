@@ -19,7 +19,7 @@ import { Label } from '@documenso/ui/primitives/label';
 import { SignaturePad } from '@documenso/ui/primitives/signature-pad';
 
 import { useRequiredSigningContext } from './provider';
-import SignDialog from './sign-dialog';
+import { SignDialog } from './sign-dialog';
 
 export type SigningFormProps = {
   document: Document;

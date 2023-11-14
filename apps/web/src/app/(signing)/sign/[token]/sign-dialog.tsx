@@ -16,12 +16,12 @@ export type SignDialogProps = {
   onSignatureComplete: () => void | Promise<void>;
 };
 
-export default function SignDialog({
+export const SignDialog = ({
   isSubmitting,
   document,
   fields,
   onSignatureComplete,
-}: SignDialogProps) {
+}: SignDialogProps) => {
   const [showDialog, setShowDialog] = useState(false);
 
   const isComplete = fields.every((field) => field.inserted);
@@ -74,4 +74,4 @@ export default function SignDialog({
       </DialogContent>
     </Dialog>
   );
-}
+};
