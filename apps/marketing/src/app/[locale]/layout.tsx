@@ -33,7 +33,7 @@ export const metadata = {
     images: [`${process.env.NEXT_PUBLIC_MARKETING_URL}/opengraph-image.jpg`],
   },
   twitter: {
-    site: '@documenso',
+    site: '@notario',
     card: 'summary_large_image',
     images: [`${process.env.NEXT_PUBLIC_MARKETING_URL}/opengraph-image.jpg`],
     description:
