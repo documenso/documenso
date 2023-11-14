@@ -2,13 +2,12 @@ import { HTMLAttributes } from 'react';
 
 import Image from 'next/image';
 
+import backgroundPattern from '@documenso/assets/images/background-pattern.png';
+import cardBeautifulFigure from '@documenso/assets/images/card-beautiful-figure.png';
+import cardFastFigure from '@documenso/assets/images/card-fast-figure.png';
+import cardSmartFigure from '@documenso/assets/images/card-smart-figure.png';
 import { cn } from '@documenso/ui/lib/utils';
 import { Card, CardContent } from '@documenso/ui/primitives/card';
-
-import backgroundPattern from '~/assets/background-pattern.png';
-import cardBeautifulFigure from '~/assets/card-beautiful-figure.png';
-import cardFastFigure from '~/assets/card-fast-figure.png';
-import cardSmartFigure from '~/assets/card-smart-figure.png';
 
 export type FasterSmarterBeautifulBentoProps = HTMLAttributes<HTMLDivElement>;
 

@@ -14,6 +14,7 @@ ENV_FILES.forEach((file) => {
 const config = {
   experimental: {
     serverActionsBodySizeLimit: '10mb',
+    outputFileTracingRoot: path.join(__dirname, '../../'),
   },
   reactStrictMode: true,
   transpilePackages: ['@documenso/lib', '@documenso/prisma', '@documenso/trpc', '@documenso/ui'],

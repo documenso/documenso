@@ -32,6 +32,11 @@ export const getRecipientOrSenderByShareLinkSlug = async ({
       Document: { some: { id: documentId } },
       email,
     },
+    select: {
+      email: true,
+      name: true,
+      signature: true,
+    },
   });
 
   if (sender) {

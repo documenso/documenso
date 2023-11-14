@@ -2,7 +2,7 @@ import React from 'react';
 
 import Image from 'next/image';
 
-import backgroundPattern from '~/assets/background-pattern.png';
+import backgroundPattern from '@documenso/assets/images/background-pattern.png';
 
 type UnauthenticatedLayoutProps = {
   children: React.ReactNode;
