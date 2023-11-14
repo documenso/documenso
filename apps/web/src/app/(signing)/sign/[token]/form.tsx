@@ -4,6 +4,7 @@ import { useMemo, useState } from 'react';
 
 import { useRouter } from 'next/navigation';
 
+import { useSession } from 'next-auth/react';
 import { useForm } from 'react-hook-form';
 
 import { completeDocumentWithToken } from '@documenso/lib/server-only/document/complete-document-with-token';
@@ -28,6 +29,7 @@ export type SigningFormProps = {
 
 export const SigningForm = ({ document, recipient, fields }: SigningFormProps) => {
   const router = useRouter();
+  const { data: session } = useSession();
 
   const { fullName, signature, setFullName, setSignature } = useRequiredSigningContext();
 
@@ -64,7 +66,11 @@ export const SigningForm = ({ document, recipient, fields }: SigningFormProps) =
   return (
     <form
       className={cn(
-        'dark:bg-background border-border bg-widget sticky top-20 flex h-full max-h-[80rem] flex-col rounded-xl border px-4 py-6',
+        'dark:bg-background border-border bg-widget sticky flex h-full flex-col rounded-xl border px-4 py-6',
+        {
+          'top-20 max-h-[min(68rem,calc(100vh-6rem))]': session,
+          'top-4 max-h-[min(68rem,calc(100vh-2rem))]': !session,
+        },
       )}
       onSubmit={handleSubmit(onFormSubmit)}
     >
@@ -97,7 +103,7 @@ export const SigningForm = ({ document, recipient, fields }: SigningFormProps) =
                   id="full-name"
                   className="bg-background mt-2"
                   value={fullName}
-                  onChange={(e) => setFullName(e.target.value)}
+                  onChange={(e) => setFullName(e.target.value.trimStart())}
                 />
               </div>
 
@@ -124,6 +130,7 @@ export const SigningForm = ({ document, recipient, fields }: SigningFormProps) =
                 className="dark:bg-muted dark:hover:bg-muted/80 w-full  bg-black/5 hover:bg-black/10"
                 variant="secondary"
                 size="lg"
+                disabled={typeof window !== 'undefined' && window.history.length <= 1}
                 onClick={() => router.back()}
               >
                 Cancel

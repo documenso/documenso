@@ -6,7 +6,6 @@ import {
   PutObjectCommand,
   S3Client,
 } from '@aws-sdk/client-s3';
-import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import slugify from '@sindresorhus/slugify';
 import path from 'node:path';
 
@@ -17,7 +16,9 @@ import { alphaid } from '../id';
 export const getPresignPostUrl = async (fileName: string, contentType: string) => {
   const client = getS3Client();
 
-  const user = await getServerComponentSession();
+  const { getSignedUrl } = await import('@aws-sdk/s3-request-presigner');
+
+  const { user } = await getServerComponentSession();
 
   // Get the basename and extension for the file
   const { name, ext } = path.parse(fileName);
@@ -44,12 +45,14 @@ export const getPresignPostUrl = async (fileName: string, contentType: string) =
 export const getAbsolutePresignPostUrl = async (key: string) => {
   const client = getS3Client();
 
+  const { getSignedUrl: getS3SignedUrl } = await import('@aws-sdk/s3-request-presigner');
+
   const putObjectCommand = new PutObjectCommand({
     Bucket: process.env.NEXT_PRIVATE_UPLOAD_BUCKET,
     Key: key,
   });
 
-  const url = await getSignedUrl(client, putObjectCommand, {
+  const url = await getS3SignedUrl(client, putObjectCommand, {
     expiresIn: ONE_HOUR / ONE_SECOND,
   });
 
@@ -57,14 +60,31 @@ export const getAbsolutePresignPostUrl = async (key: string) => {
 };
 
 export const getPresignGetUrl = async (key: string) => {
+  if (process.env.NEXT_PRIVATE_UPLOAD_DISTRIBUTION_DOMAIN) {
+    const distributionUrl = new URL(key, `${process.env.NEXT_PRIVATE_UPLOAD_DISTRIBUTION_DOMAIN}`);
+
+    const { getSignedUrl: getCloudfrontSignedUrl } = await import('@aws-sdk/cloudfront-signer');
+
+    const url = getCloudfrontSignedUrl({
+      url: distributionUrl.toString(),
+      keyPairId: `${process.env.NEXT_PRIVATE_UPLOAD_DISTRIBUTION_KEY_ID}`,
+      privateKey: `${process.env.NEXT_PRIVATE_UPLOAD_DISTRIBUTION_KEY_CONTENTS}`,
+      dateLessThan: new Date(Date.now() + ONE_HOUR).toISOString(),
+    });
+
+    return { key, url };
+  }
+
   const client = getS3Client();
+
+  const { getSignedUrl: getS3SignedUrl } = await import('@aws-sdk/s3-request-presigner');
 
   const getObjectCommand = new GetObjectCommand({
     Bucket: process.env.NEXT_PRIVATE_UPLOAD_BUCKET,
     Key: key,
   });
 
-  const url = await getSignedUrl(client, getObjectCommand, {
+  const url = await getS3SignedUrl(client, getObjectCommand, {
     expiresIn: ONE_HOUR / ONE_SECOND,
   });
 

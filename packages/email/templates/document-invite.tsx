@@ -18,7 +18,7 @@ import {
   TemplateDocumentInvite,
   TemplateDocumentInviteProps,
 } from '../template-components/template-document-invite';
-import TemplateFooter from '../template-components/template-footer';
+import { TemplateFooter } from '../template-components/template-footer';
 
 export type DocumentInviteEmailTemplateProps = Partial<TemplateDocumentInviteProps> & {
   customBody?: string;
@@ -32,7 +32,7 @@ export const DocumentInviteEmailTemplate = ({
   assetBaseUrl = 'http://localhost:3002',
   customBody,
 }: DocumentInviteEmailTemplateProps) => {
-  const previewText = `Completed Document`;
+  const previewText = `${inviterName} has invited you to sign ${documentName}`;
 
   const getAssetUrl = (path: string) => {
     return new URL(path, assetBaseUrl).toString();

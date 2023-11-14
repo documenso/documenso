@@ -6,7 +6,7 @@ import { Button } from '@documenso/ui/primitives/button';
 import NotFoundPartial from '~/components/partials/not-found';
 
 export default async function NotFound() {
-  const session = await getServerComponentSession();
+  const { session } = await getServerComponentSession();
 
   return (
     <NotFoundPartial>

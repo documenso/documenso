@@ -14,9 +14,10 @@ import { sendCompletedEmail } from './send-completed-email';
 
 export type SealDocumentOptions = {
   documentId: number;
+  sendEmail?: boolean;
 };
 
-export const sealDocument = async ({ documentId }: SealDocumentOptions) => {
+export const sealDocument = async ({ documentId, sendEmail = true }: SealDocumentOptions) => {
   'use server';
 
   const document = await prisma.document.findFirstOrThrow({
@@ -91,5 +92,7 @@ export const sealDocument = async ({ documentId }: SealDocumentOptions) => {
     },
   });
 
-  await sendCompletedEmail({ documentId });
+  if (sendEmail) {
+    await sendCompletedEmail({ documentId });
+  }
 };

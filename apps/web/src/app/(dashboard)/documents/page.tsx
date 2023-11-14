@@ -8,7 +8,10 @@ import { ExtendedDocumentStatus } from '@documenso/prisma/types/extended-documen
 import { Tabs, TabsList, TabsTrigger } from '@documenso/ui/primitives/tabs';
 
 import { PeriodSelector } from '~/components/(dashboard)/period-selector/period-selector';
-import { PeriodSelectorValue } from '~/components/(dashboard)/period-selector/types';
+import {
+  PeriodSelectorValue,
+  isPeriodSelectorValue,
+} from '~/components/(dashboard)/period-selector/types';
 import { DocumentStatus } from '~/components/formatter/document-status';
 
 import { DocumentsDataTable } from './data-table';
@@ -25,14 +28,14 @@ export type DocumentsPageProps = {
 };
 
 export default async function DocumentsPage({ searchParams = {} }: DocumentsPageProps) {
-  const user = await getRequiredServerComponentSession();
+  const { user } = await getRequiredServerComponentSession();
 
   const stats = await getStats({
     user,
   });
 
   const status = isExtendedDocumentStatus(searchParams.status) ? searchParams.status : 'ALL';
-  // const period = isPeriodSelectorValue(searchParams.period) ? searchParams.period : '';
+  const period = isPeriodSelectorValue(searchParams.period) ? searchParams.period : '';
   const page = Number(searchParams.page) || 1;
   const perPage = Number(searchParams.perPage) || 20;
 
@@ -45,6 +48,7 @@ export default async function DocumentsPage({ searchParams = {} }: DocumentsPage
     },
     page,
     perPage,
+    period,
   });
 
   const getTabHref = (value: typeof status) => {
@@ -66,7 +70,7 @@ export default async function DocumentsPage({ searchParams = {} }: DocumentsPage
       <div className="mt-12 flex flex-wrap items-center justify-between gap-x-4 gap-y-8">
         <h1 className="text-4xl font-semibold">Documents</h1>
 
-        <div className="flex flex-wrap gap-x-4 gap-y-6 overflow-hidden">
+        <div className="-m-1 flex flex-wrap gap-x-4 gap-y-6 overflow-hidden p-1">
           <Tabs defaultValue={status} className="overflow-x-auto">
             <TabsList>
               {[

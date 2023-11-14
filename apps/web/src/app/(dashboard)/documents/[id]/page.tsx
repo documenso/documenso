@@ -7,7 +7,6 @@ import { getRequiredServerComponentSession } from '@documenso/lib/next-auth/get-
 import { getDocumentById } from '@documenso/lib/server-only/document/get-document-by-id';
 import { getFieldsForDocument } from '@documenso/lib/server-only/field/get-fields-for-document';
 import { getRecipientsForDocument } from '@documenso/lib/server-only/recipient/get-recipients-for-document';
-import { getFile } from '@documenso/lib/universal/upload/get-file';
 import { DocumentStatus as InternalDocumentStatus } from '@documenso/prisma/client';
 import { LazyPDFViewer } from '@documenso/ui/primitives/lazy-pdf-viewer';
 
@@ -30,11 +29,11 @@ export default async function DocumentPage({ params }: DocumentPageProps) {
     redirect('/documents');
   }
 
-  const session = await getRequiredServerComponentSession();
+  const { user } = await getRequiredServerComponentSession();
 
   const document = await getDocumentById({
     id: documentId,
-    userId: session.id,
+    userId: user.id,
   }).catch(() => null);
 
   if (!document || !document.documentData) {
@@ -43,18 +42,14 @@ export default async function DocumentPage({ params }: DocumentPageProps) {
 
   const { documentData } = document;
 
-  const documentDataUrl = await getFile(documentData)
-    .then((buffer) => Buffer.from(buffer).toString('base64'))
-    .then((data) => `data:application/pdf;base64,${data}`);
-
   const [recipients, fields] = await Promise.all([
     await getRecipientsForDocument({
       documentId,
-      userId: session.id,
+      userId: user.id,
     }),
     await getFieldsForDocument({
       documentId,
-      userId: session.id,
+      userId: user.id,
     }),
   ]);
 
@@ -65,10 +60,7 @@ export default async function DocumentPage({ params }: DocumentPageProps) {
         Documents
       </Link>
 
-      <h1
-        className="mt-4 max-w-xs truncate text-2xl font-semibold md:text-3xl"
-        title={document.title}
-      >
+      <h1 className="mt-4 truncate text-2xl font-semibold md:text-3xl" title={document.title}>
         {document.title}
       </h1>
 
@@ -90,16 +82,16 @@ export default async function DocumentPage({ params }: DocumentPageProps) {
         <EditDocumentForm
           className="mt-8"
           document={document}
-          user={session}
+          user={user}
           recipients={recipients}
           fields={fields}
-          dataUrl={documentDataUrl}
+          documentData={documentData}
         />
       )}
 
       {document.status === InternalDocumentStatus.COMPLETED && (
         <div className="mx-auto mt-12 max-w-2xl">
-          <LazyPDFViewer document={documentDataUrl} />
+          <LazyPDFViewer key={documentData.id} documentData={documentData} />
         </div>
       )}
     </div>

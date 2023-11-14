@@ -3,7 +3,7 @@ import { getRequiredServerComponentSession } from '@documenso/lib/next-auth/get-
 import { ProfileForm } from '~/components/forms/profile';
 
 export default async function ProfileSettingsPage() {
-  const user = await getRequiredServerComponentSession();
+  const { user } = await getRequiredServerComponentSession();
 
   return (
     <div>
