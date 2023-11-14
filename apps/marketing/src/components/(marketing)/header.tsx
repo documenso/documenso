@@ -65,6 +65,7 @@ export const Header = ({ className, ...props }: HeaderProps) => {
         isMenuOpen={isHamburgerMenuOpen}
       />
       <MobileNavigation
+        locale={locale}
         isMenuOpen={isHamburgerMenuOpen}
         onMenuOpenChange={setIsHamburgerMenuOpen}
       />

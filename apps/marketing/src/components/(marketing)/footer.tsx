@@ -4,11 +4,14 @@ import { HTMLAttributes } from 'react';
 
 import Image from 'next/image';
 import Link from 'next/link';
+import { useParams } from 'next/navigation';
 
 import { Moon, Sun } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import { FaXTwitter } from 'react-icons/fa6';
 
+import { useTranslation } from '@documenso/ui/i18n/client';
+import { LocaleTypes } from '@documenso/ui/i18n/settings';
 // import { LiaDiscord } from 'react-icons/lia';
 // import { LuGithub } from 'react-icons/lu';
 import { cn } from '@documenso/ui/lib/utils';
@@ -30,6 +33,8 @@ const FOOTER_LINKS = [
 
 export const Footer = ({ className, ...props }: FooterProps) => {
   const { setTheme } = useTheme();
+  const locale = useParams()?.locale as LocaleTypes;
+  const { t } = useTranslation(locale, 'marketing');
 
   return (
     <div className={cn('border-t py-12', className)} {...props}>
