@@ -2,7 +2,8 @@
 
 import { useForm } from 'react-hook-form';
 
-import { Document, DocumentStatus, Field, Recipient } from '@documenso/prisma/client';
+import { DocumentStatus, Field, Recipient } from '@documenso/prisma/client';
+import { DocumentWithData } from '@documenso/prisma/types/document-with-data';
 import { FormErrorMessage } from '@documenso/ui/primitives/form/form-error-message';
 import { Input } from '@documenso/ui/primitives/input';
 import { Label } from '@documenso/ui/primitives/label';
@@ -21,7 +22,7 @@ export type AddSubjectFormProps = {
   documentFlow: DocumentFlowStep;
   recipients: Recipient[];
   fields: Field[];
-  document: Document;
+  document: DocumentWithData;
   numberOfSteps: number;
   onSubmit: (_data: TAddSubjectFormSchema) => void;
 };
@@ -41,8 +42,8 @@ export const AddSubjectFormPartial = ({
   } = useForm<TAddSubjectFormSchema>({
     defaultValues: {
       email: {
-        subject: '',
-        message: '',
+        subject: document.documentMeta?.subject ?? '',
+        message: document.documentMeta?.message ?? '',
       },
     },
   });

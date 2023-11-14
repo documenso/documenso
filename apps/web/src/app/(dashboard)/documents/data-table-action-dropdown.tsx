@@ -1,5 +1,7 @@
 'use client';
 
+import { useState } from 'react';
+
 import Link from 'next/link';
 
 import {
@@ -7,6 +9,7 @@ import {
   Download,
   Edit,
   History,
+  Loader,
   MoreHorizontal,
   Pencil,
   Share,
@@ -15,7 +18,11 @@ import {
 } from 'lucide-react';
 import { useSession } from 'next-auth/react';
 
+import { getFile } from '@documenso/lib/universal/upload/get-file';
 import { Document, DocumentStatus, Recipient, User } from '@documenso/prisma/client';
+import { DocumentWithData } from '@documenso/prisma/types/document-with-data';
+import { trpc as trpcClient } from '@documenso/trpc/client';
+import { DocumentShareButton } from '@documenso/ui/components/document/document-share-button';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -23,6 +30,9 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from '@documenso/ui/primitives/dropdown-menu';
+
+import { DeleteDraftDocumentDialog } from './delete-draft-document-dialog';
+import { DuplicateDocumentDialog } from './duplicate-document-dialog';
 
 export type DataTableActionDropdownProps = {
   row: Document & {
@@ -34,6 +44,9 @@ export type DataTableActionDropdownProps = {
 export const DataTableActionDropdown = ({ row }: DataTableActionDropdownProps) => {
   const { data: session } = useSession();
 
+  const [isDeleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [isDuplicateDialogOpen, setDuplicateDialogOpen] = useState(false);
+
   if (!session) {
     return null;
   }
@@ -42,22 +55,32 @@ export const DataTableActionDropdown = ({ row }: DataTableActionDropdownProps) =
 
   const isOwner = row.User.id === session.user.id;
   // const isRecipient = !!recipient;
-  // const isDraft = row.status === DocumentStatus.DRAFT;
+  const isDraft = row.status === DocumentStatus.DRAFT;
   // const isPending = row.status === DocumentStatus.PENDING;
   const isComplete = row.status === DocumentStatus.COMPLETED;
   // const isSigned = recipient?.signingStatus === SigningStatus.SIGNED;
+  const isDocumentDeletable = isOwner && row.status === DocumentStatus.DRAFT;
 
-  const onDownloadClick = () => {
-    let decodedDocument = row.document;
+  const onDownloadClick = async () => {
+    let document: DocumentWithData | null = null;
 
-    try {
-      decodedDocument = atob(decodedDocument);
-    } catch (err) {
-      // We're just going to ignore this error and try to download the document
-      console.error(err);
+    if (!recipient) {
+      document = await trpcClient.document.getDocumentById.query({
+        id: row.id,
+      });
+    } else {
+      document = await trpcClient.document.getDocumentByToken.query({
+        token: recipient.token,
+      });
     }
 
-    const documentBytes = Uint8Array.from(decodedDocument.split('').map((c) => c.charCodeAt(0)));
+    const documentData = document?.documentData;
+
+    if (!documentData) {
+      return;
+    }
+
+    const documentBytes = await getFile(documentData);
 
     const blob = new Blob([documentBytes], {
       type: 'application/pdf',
@@ -76,20 +99,20 @@ export const DataTableActionDropdown = ({ row }: DataTableActionDropdownProps) =
   return (
     <DropdownMenu>
       <DropdownMenuTrigger>
-        <MoreHorizontal className="h-5 w-5 text-gray-500" />
+        <MoreHorizontal className="text-muted-foreground h-5 w-5" />
       </DropdownMenuTrigger>
 
       <DropdownMenuContent className="w-52" align="start" forceMount>
         <DropdownMenuLabel>Action</DropdownMenuLabel>
 
-        <DropdownMenuItem disabled={!recipient} asChild>
+        <DropdownMenuItem disabled={!recipient || isComplete} asChild>
           <Link href={`/sign/${recipient?.token}`}>
             <Pencil className="mr-2 h-4 w-4" />
             Sign
           </Link>
         </DropdownMenuItem>
 
-        <DropdownMenuItem disabled={!isOwner} asChild>
+        <DropdownMenuItem disabled={!isOwner || isComplete} asChild>
           <Link href={`/documents/${row.id}`}>
             <Edit className="mr-2 h-4 w-4" />
             Edit
@@ -101,7 +124,7 @@ export const DataTableActionDropdown = ({ row }: DataTableActionDropdownProps) =
           Download
         </DropdownMenuItem>
 
-        <DropdownMenuItem disabled>
+        <DropdownMenuItem onClick={() => setDuplicateDialogOpen(true)}>
           <Copy className="mr-2 h-4 w-4" />
           Duplicate
         </DropdownMenuItem>
@@ -111,7 +134,7 @@ export const DataTableActionDropdown = ({ row }: DataTableActionDropdownProps) =
           Void
         </DropdownMenuItem>
 
-        <DropdownMenuItem disabled>
+        <DropdownMenuItem onClick={() => setDeleteDialogOpen(true)} disabled={!isDocumentDeletable}>
           <Trash2 className="mr-2 h-4 w-4" />
           Delete
         </DropdownMenuItem>
@@ -123,11 +146,34 @@ export const DataTableActionDropdown = ({ row }: DataTableActionDropdownProps) =
           Resend
         </DropdownMenuItem>
 
-        <DropdownMenuItem disabled>
-          <Share className="mr-2 h-4 w-4" />
-          Share
-        </DropdownMenuItem>
+        <DocumentShareButton
+          documentId={row.id}
+          token={recipient?.token}
+          trigger={({ loading, disabled }) => (
+            <DropdownMenuItem disabled={disabled || isDraft} onSelect={(e) => e.preventDefault()}>
+              <div className="flex items-center">
+                {loading ? <Loader className="mr-2 h-4 w-4" /> : <Share className="mr-2 h-4 w-4" />}
+                Share
+              </div>
+            </DropdownMenuItem>
+          )}
+        />
       </DropdownMenuContent>
+
+      {isDocumentDeletable && (
+        <DeleteDraftDocumentDialog
+          id={row.id}
+          open={isDeleteDialogOpen}
+          onOpenChange={setDeleteDialogOpen}
+        />
+      )}
+      {isDuplicateDialogOpen && (
+        <DuplicateDocumentDialog
+          id={row.id}
+          open={isDuplicateDialogOpen}
+          onOpenChange={setDuplicateDialogOpen}
+        />
+      )}
     </DropdownMenu>
   );
 };

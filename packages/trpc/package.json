@@ -5,6 +5,9 @@
   "types": "./index.ts",
   "license": "MIT",
   "scripts": {
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "clean": "rimraf node_modules"
   },
   "dependencies": {
     "@documenso/lib": "*",
@@ -15,6 +18,6 @@
     "@trpc/react-query": "^10.36.0",
     "@trpc/server": "^10.36.0",
     "superjson": "^1.13.1",
-    "zod": "^3.21.4"
+    "zod": "^3.22.4"
   }
 }

@@ -13,13 +13,13 @@ export default function BlogPage() {
       <div className="text-center">
         <h1 className="text-3xl font-bold lg:text-5xl">From the blog</h1>
 
-        <p className="mx-auto mt-4 max-w-xl text-center text-lg leading-normal text-[#31373D]">
+        <p className="text-muted-foreground mx-auto mt-4 max-w-xl text-center text-lg leading-normal">
           Get the latest news from Documenso, including product updates, team announcements and
           more!
         </p>
       </div>
 
-      <div className="mt-10 divide-y divide-slate-100 border-t border-slate-200 ">
+      <div className="divide-muted-foreground/20 border-muted-foreground/20 mt-10 divide-y border-t">
         {blogPosts.map((post, i) => (
           <article
             key={`blog-${i}`}
@@ -57,12 +57,12 @@ export default function BlogPage() {
             </div>
 
             <div className="relative mt-4 flex items-center gap-x-4">
-              <div className="h-10 w-10 rounded-full bg-slate-50">
+              <div className="bg-foreground/5 h-10 w-10 rounded-full">
                 {post.authorImage && (
                   <img
                     src={post.authorImage}
                     alt={`Image of ${post.authorName}`}
-                    className="h-10 w-10 rounded-full bg-slate-50"
+                    className="bg-foreground/5 h-10 w-10 rounded-full"
                   />
                 )}
               </div>

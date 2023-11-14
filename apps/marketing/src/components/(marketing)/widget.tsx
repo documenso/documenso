@@ -31,7 +31,7 @@ import { FormErrorMessage } from '../form/form-error-message';
 const ZWidgetFormSchema = z
   .object({
     email: z.string().email({ message: 'Please enter a valid email address.' }),
-    name: z.string().min(3, { message: 'Please enter a valid name.' }),
+    name: z.string().trim().min(3, { message: 'Please enter a valid name.' }),
   })
   .and(
     z.union([
@@ -41,7 +41,7 @@ const ZWidgetFormSchema = z
       }),
       z.object({
         signatureDataUrl: z.null().or(z.string().max(0)),
-        signatureText: z.string().min(1),
+        signatureText: z.string().trim().min(1),
       }),
     ]),
   );
@@ -181,16 +181,16 @@ export const Widget = ({ className, children, ...props }: WidgetProps) => {
         {...props}
       >
         <div className="grid grid-cols-12 gap-y-8 overflow-hidden p-2 lg:gap-x-8">
-          <div className="col-span-12 flex flex-col gap-y-4 p-4 text-xs leading-relaxed text-[#727272] lg:col-span-7">
+          <div className="text-muted-foreground col-span-12 flex flex-col gap-y-4 p-4 text-xs leading-relaxed lg:col-span-7">
             {children}
           </div>
 
           <form
-            className="col-span-12 flex flex-col rounded-2xl bg-[#F7F7F7] p-6 lg:col-span-5"
+            className="bg-foreground/5 col-span-12 flex flex-col rounded-2xl p-6 lg:col-span-5"
             onSubmit={handleSubmit(onFormSubmit)}
           >
-            <h3 className="text-2xl font-semibold">Sign up for the community plan</h3>
-            <p className="mt-2 text-xs text-[#AFAFAF]">
+            <h3 className="text-2xl font-semibold">Sign up for the early adopters plan</h3>
+            <p className="text-muted-foreground mt-2 text-xs">
               with Timur Ercan & Lucas Smith from Documenso
             </p>
 
@@ -198,7 +198,7 @@ export const Widget = ({ className, children, ...props }: WidgetProps) => {
 
             <AnimatePresence>
               <motion.div key="email">
-                <label htmlFor="email" className="text-lg font-semibold text-slate-900 lg:text-xl">
+                <label htmlFor="email" className="text-foreground text-lg font-semibold lg:text-xl">
                   What’s your email?
                 </label>
 
@@ -211,7 +211,7 @@ export const Widget = ({ className, children, ...props }: WidgetProps) => {
                         id="email"
                         type="email"
                         placeholder=""
-                        className="w-full bg-white pr-16"
+                        className="bg-background w-full pr-16"
                         disabled={isSubmitting}
                         onKeyDown={(e) =>
                           field.value !== '' &&
@@ -226,7 +226,7 @@ export const Widget = ({ className, children, ...props }: WidgetProps) => {
                           type="button"
                           className="bg-primary h-full w-14 rounded"
                           disabled={!field.value || !!errors.email?.message}
-                          onClick={() => onNextStepClick()}
+                          onClick={() => step === 'EMAIL' && onNextStepClick()}
                         >
                           Next
                         </Button>
@@ -255,7 +255,10 @@ export const Widget = ({ className, children, ...props }: WidgetProps) => {
                     transform: 'translateX(25%)',
                   }}
                 >
-                  <label htmlFor="name" className="text-lg font-semibold text-slate-900 lg:text-xl">
+                  <label
+                    htmlFor="name"
+                    className="text-foreground text-lg font-semibold lg:text-xl"
+                  >
                     and your name?
                   </label>
 
@@ -268,7 +271,7 @@ export const Widget = ({ className, children, ...props }: WidgetProps) => {
                           id="name"
                           type="text"
                           placeholder=""
-                          className="w-full bg-white pr-16"
+                          className="bg-background w-full pr-16"
                           disabled={isSubmitting}
                           onKeyDown={(e) =>
                             field.value !== '' &&
@@ -300,16 +303,20 @@ export const Widget = ({ className, children, ...props }: WidgetProps) => {
             <div className="mt-12 flex-1" />
 
             <div className="flex items-center justify-between">
-              <p className="text-xs text-[#AFAFAF]">{stepsRemaining} step(s) until signed</p>
-              <p className="block text-xs text-[#AFAFAF] md:hidden">Minimise contract</p>
+              <p className="text-muted-foreground text-xs">
+                {isValid ? 'Ready for Signing' : `${stepsRemaining} step(s) until signed`}
+              </p>
+
+              <p className="text-muted-foreground block text-xs md:hidden">Minimise contract</p>
             </div>
 
-            <div className="relative mt-2.5 h-[2px] w-full bg-[#E9E9E9]">
+            <div className="bg-background relative mt-2.5 h-[2px] w-full">
               <div
                 className={cn('bg-primary/60 absolute inset-y-0 left-0 duration-200', {
                   'w-1/3': stepsRemaining === 3,
                   'w-2/3': stepsRemaining === 2,
                   'w-11/12': stepsRemaining === 1,
+                  'w-full': isValid,
                 })}
               />
             </div>
@@ -322,13 +329,17 @@ export const Widget = ({ className, children, ...props }: WidgetProps) => {
               >
                 <div className="flex h-28 items-center justify-center pb-6">
                   {!signatureText && signatureDataUrl && (
-                    <img src={signatureDataUrl} alt="user signature" className="h-full" />
+                    <img
+                      src={signatureDataUrl}
+                      alt="user signature"
+                      className="h-full dark:invert"
+                    />
                   )}
 
                   {signatureText && (
                     <p
                       className={cn(
-                        'text-4xl font-semibold text-slate-900 [font-family:var(--font-caveat)]',
+                        'text-foreground text-4xl font-semibold [font-family:var(--font-caveat)]',
                       )}
                     >
                       {signatureText}
@@ -342,7 +353,7 @@ export const Widget = ({ className, children, ...props }: WidgetProps) => {
                 >
                   <Input
                     id="signatureText"
-                    className="border-none p-0 text-sm text-slate-700 placeholder:text-[#D6D6D6] focus-visible:ring-0"
+                    className="text-foreground placeholder:text-muted-foreground border-none p-0 text-sm focus-visible:ring-0"
                     placeholder="Draw or type name here"
                     disabled={isSubmitting}
                     {...register('signatureText', {
@@ -356,7 +367,7 @@ export const Widget = ({ className, children, ...props }: WidgetProps) => {
 
                   <Button
                     type="submit"
-                    className="h-8 disabled:bg-[#ECEEED] disabled:text-[#C6C6C6] disabled:hover:bg-[#ECEEED]"
+                    className="disabled:bg-muted disabled:text-muted-foreground disabled:hover:bg-muted h-8"
                     disabled={!isValid || isSubmitting}
                   >
                     {isSubmitting && <Loader className="mr-2 h-4 w-4 animate-spin" />}
@@ -370,7 +381,7 @@ export const Widget = ({ className, children, ...props }: WidgetProps) => {
       </Card>
 
       <Dialog open={showSigningDialog} onOpenChange={setShowSigningDialog}>
-        <DialogContent>
+        <DialogContent position="center">
           <DialogHeader>
             <DialogTitle>Add your signature</DialogTitle>
           </DialogHeader>
@@ -384,6 +395,7 @@ export const Widget = ({ className, children, ...props }: WidgetProps) => {
 
           <SignaturePad
             className="aspect-video w-full rounded-md border"
+            defaultValue={signatureDataUrl || ''}
             onChange={setDraftSignatureDataUrl}
           />
 

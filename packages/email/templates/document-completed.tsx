@@ -15,13 +15,12 @@ import {
   TemplateDocumentCompleted,
   TemplateDocumentCompletedProps,
 } from '../template-components/template-document-completed';
-import TemplateFooter from '../template-components/template-footer';
+import { TemplateFooter } from '../template-components/template-footer';
 
 export type DocumentCompletedEmailTemplateProps = Partial<TemplateDocumentCompletedProps>;
 
 export const DocumentCompletedEmailTemplate = ({
   downloadLink = 'https://documenso.com',
-  reviewLink = 'https://documenso.com',
   documentName = 'Open Source Pledge.pdf',
   assetBaseUrl = 'http://localhost:3002',
 }: DocumentCompletedEmailTemplateProps) => {
@@ -56,7 +55,6 @@ export const DocumentCompletedEmailTemplate = ({
 
                 <TemplateDocumentCompleted
                   downloadLink={downloadLink}
-                  reviewLink={reviewLink}
                   documentName={documentName}
                   assetBaseUrl={assetBaseUrl}
                 />

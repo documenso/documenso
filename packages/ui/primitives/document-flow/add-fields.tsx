@@ -5,12 +5,12 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { Caveat } from 'next/font/google';
 
 import { Check, ChevronsUpDown, Info } from 'lucide-react';
-import { nanoid } from 'nanoid';
 import { useFieldArray, useForm } from 'react-hook-form';
 
 import { getBoundingClientRect } from '@documenso/lib/client-only/get-bounding-client-rect';
 import { useDocumentElement } from '@documenso/lib/client-only/hooks/use-document-element';
 import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
+import { nanoid } from '@documenso/lib/universal/id';
 import { Field, FieldType, Recipient, SendStatus } from '@documenso/prisma/client';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
@@ -102,6 +102,7 @@ export const AddFieldsFormPartial = ({
 
   const [selectedField, setSelectedField] = useState<FieldType | null>(null);
   const [selectedSigner, setSelectedSigner] = useState<Recipient | null>(null);
+  const [showRecipientsSelector, setShowRecipientsSelector] = useState(false);
 
   const hasSelectedSignerBeenSent = selectedSigner?.sendStatus === SendStatus.SENT;
 
@@ -245,27 +246,38 @@ export const AddFieldsFormPartial = ({
   useEffect(() => {
     if (selectedField) {
       window.addEventListener('mousemove', onMouseMove);
-      window.addEventListener('click', onMouseClick);
+      window.addEventListener('mouseup', onMouseClick);
     }
 
     return () => {
       window.removeEventListener('mousemove', onMouseMove);
-      window.removeEventListener('click', onMouseClick);
+      window.removeEventListener('mouseup', onMouseClick);
     };
   }, [onMouseClick, onMouseMove, selectedField]);
 
   useEffect(() => {
-    const $page = window.document.querySelector(PDF_VIEWER_PAGE_SELECTOR);
+    const observer = new MutationObserver((_mutations) => {
+      const $page = document.querySelector(PDF_VIEWER_PAGE_SELECTOR);
 
-    if (!$page) {
-      return;
-    }
+      if (!$page) {
+        return;
+      }
 
-    const { height, width } = $page.getBoundingClientRect();
+      const { height, width } = $page.getBoundingClientRect();
 
-    fieldBounds.current = {
-      height: Math.max(height * (DEFAULT_HEIGHT_PERCENT / 100), MIN_HEIGHT_PX),
-      width: Math.max(width * (DEFAULT_WIDTH_PERCENT / 100), MIN_WIDTH_PX),
+      fieldBounds.current = {
+        height: Math.max(height * (DEFAULT_HEIGHT_PERCENT / 100), MIN_HEIGHT_PX),
+        width: Math.max(width * (DEFAULT_WIDTH_PERCENT / 100), MIN_WIDTH_PX),
+      };
+    });
+
+    observer.observe(document.body, {
+      childList: true,
+      subtree: true,
+    });
+
+    return () => {
+      observer.disconnect();
     };
   }, []);
 
@@ -280,7 +292,7 @@ export const AddFieldsFormPartial = ({
           {selectedField && (
             <Card
               className={cn(
-                'pointer-events-none fixed z-50 cursor-pointer bg-white transition-opacity',
+                'bg-background pointer-events-none fixed z-50 cursor-pointer transition-opacity',
                 {
                   'border-primary': isFieldWithinBounds,
                   'opacity-50': !isFieldWithinBounds,
@@ -314,7 +326,7 @@ export const AddFieldsFormPartial = ({
           ))}
 
           {!hideRecipients && (
-            <Popover>
+            <Popover open={showRecipientsSelector} onOpenChange={setShowRecipientsSelector}>
               <PopoverTrigger asChild>
                 <Button
                   type="button"
@@ -324,7 +336,7 @@ export const AddFieldsFormPartial = ({
                 >
                   {selectedSigner?.email && (
                     <span className="flex-1 truncate text-left">
-                      {selectedSigner?.email} ({selectedSigner?.email})
+                      {selectedSigner?.name} ({selectedSigner?.email})
                     </span>
                   )}
 
@@ -339,7 +351,11 @@ export const AddFieldsFormPartial = ({
               <PopoverContent className="p-0" align="start">
                 <Command>
                   <CommandInput />
-                  <CommandEmpty />
+                  <CommandEmpty>
+                    <span className="text-muted-foreground inline-block px-4">
+                      No recipient matching this description was found.
+                    </span>
+                  </CommandEmpty>
 
                   <CommandGroup>
                     {recipients.map((recipient, index) => (
@@ -348,7 +364,10 @@ export const AddFieldsFormPartial = ({
                         className={cn({
                           'text-muted-foreground': recipient.sendStatus === SendStatus.SENT,
                         })}
-                        onSelect={() => setSelectedSigner(recipient)}
+                        onSelect={() => {
+                          setSelectedSigner(recipient);
+                          setShowRecipientsSelector(false);
+                        }}
                       >
                         {recipient.sendStatus !== SendStatus.SENT ? (
                           <Check
@@ -392,13 +411,13 @@ export const AddFieldsFormPartial = ({
             </Popover>
           )}
 
-          <div className="-mx-2 flex-1 overflow-y-scroll px-2">
+          <div className="-mx-2 flex-1 overflow-y-auto px-2">
             <div className="grid grid-cols-2 gap-x-4 gap-y-8">
               <button
                 type="button"
                 className="group h-full w-full"
                 disabled={!selectedSigner || selectedSigner?.sendStatus === SendStatus.SENT}
-                onClick={(e) => e.stopPropagation()}
+                onClick={() => setSelectedField(FieldType.SIGNATURE)}
                 onMouseDown={() => setSelectedField(FieldType.SIGNATURE)}
                 data-selected={selectedField === FieldType.SIGNATURE ? true : undefined}
               >
@@ -406,7 +425,7 @@ export const AddFieldsFormPartial = ({
                   <CardContent className="flex flex-col items-center justify-center px-6 py-4">
                     <p
                       className={cn(
-                        'text-muted-foreground group-data-[selected]:text-foreground text-3xl font-medium',
+                        'text-muted-foreground group-data-[selected]:text-foreground w-full truncate text-3xl font-medium',
                         fontCaveat.className,
                       )}
                     >
@@ -422,7 +441,7 @@ export const AddFieldsFormPartial = ({
                 type="button"
                 className="group h-full w-full"
                 disabled={!selectedSigner || selectedSigner?.sendStatus === SendStatus.SENT}
-                onClick={(e) => e.stopPropagation()}
+                onClick={() => setSelectedField(FieldType.EMAIL)}
                 onMouseDown={() => setSelectedField(FieldType.EMAIL)}
                 data-selected={selectedField === FieldType.EMAIL ? true : undefined}
               >
@@ -445,7 +464,7 @@ export const AddFieldsFormPartial = ({
                 type="button"
                 className="group h-full w-full"
                 disabled={!selectedSigner || selectedSigner?.sendStatus === SendStatus.SENT}
-                onClick={(e) => e.stopPropagation()}
+                onClick={() => setSelectedField(FieldType.NAME)}
                 onMouseDown={() => setSelectedField(FieldType.NAME)}
                 data-selected={selectedField === FieldType.NAME ? true : undefined}
               >
@@ -468,7 +487,7 @@ export const AddFieldsFormPartial = ({
                 type="button"
                 className="group h-full w-full"
                 disabled={!selectedSigner || selectedSigner?.sendStatus === SendStatus.SENT}
-                onClick={(e) => e.stopPropagation()}
+                onClick={() => setSelectedField(FieldType.DATE)}
                 onMouseDown={() => setSelectedField(FieldType.DATE)}
                 data-selected={selectedField === FieldType.DATE ? true : undefined}
               >
@@ -501,7 +520,10 @@ export const AddFieldsFormPartial = ({
         <DocumentFlowFormContainerActions
           loading={isSubmitting}
           disabled={isSubmitting}
-          onGoBackClick={documentFlow.onBackStep}
+          onGoBackClick={() => {
+            documentFlow.onBackStep?.();
+            remove();
+          }}
           onGoNextClick={() => void onFormSubmit()}
         />
       </DocumentFlowFormContainerFooter>

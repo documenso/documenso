@@ -22,10 +22,12 @@ const DPI = 2;
 
 export type SignaturePadProps = Omit<HTMLAttributes<HTMLCanvasElement>, 'onChange'> & {
   onChange?: (_signatureDataUrl: string | null) => void;
+  containerClassName?: string;
 };
 
 export const SignaturePad = ({
   className,
+  containerClassName,
   defaultValue,
   onChange,
   ...props
@@ -210,7 +212,7 @@ export const SignaturePad = ({
   }, [defaultValue]);
 
   return (
-    <div className="relative block">
+    <div className={cn('relative block', containerClassName)}>
       <canvas
         ref={$el}
         className={cn('relative block dark:invert', className)}
@@ -226,7 +228,7 @@ export const SignaturePad = ({
       <div className="absolute bottom-4 right-4">
         <button
           type="button"
-          className="focus-visible:ring-ring ring-offset-background rounded-full p-0 text-xs text-slate-500 focus-visible:outline-none focus-visible:ring-2"
+          className="focus-visible:ring-ring ring-offset-background text-muted-foreground rounded-full p-0 text-xs focus-visible:outline-none focus-visible:ring-2"
           onClick={() => onClearClick()}
         >
           Clear Signature

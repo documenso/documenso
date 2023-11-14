@@ -1,0 +1,32 @@
+{
+  "name": "Documenso",
+  "image": "mcr.microsoft.com/devcontainers/base:bullseye",
+  "features": {
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {
+      "version": "latest",
+      "enableNonRootDocker": "true",
+      "moby": "true"
+    },
+    "ghcr.io/devcontainers/features/node:1": {}
+  },
+  "onCreateCommand": "./.devcontainer/on-create.sh",
+  "forwardPorts": [3000, 54320, 9000, 2500, 1100],
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "aaron-bond.better-comments",
+        "bradlc.vscode-tailwindcss",
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode",
+        "mikestead.dotenv",
+        "unifiedjs.vscode-mdx",
+        "GitHub.copilot-chat",
+        "GitHub.copilot-labs",
+        "GitHub.copilot",
+        "GitHub.vscode-pull-request-github",
+        "Prisma.prisma",
+        "VisualStudioExptTeam.vscodeintellicode",
+      ]
+    }
+  }
+}
