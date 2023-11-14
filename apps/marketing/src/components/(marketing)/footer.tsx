@@ -27,7 +27,7 @@ const SOCIAL_LINKS = [
 const FOOTER_LINKS = [
   { href: '/pricing', text: 'pricing' },
   { href: '/singleplayer', text: 'single-player-mode' },
-  { href: 'mailto:support@documenso.com', text: 'support', target: '_blank' },
+  { href: 'mailto:info@progiciel.com', text: 'support', target: '_blank' },
   { href: '/privacy', text: 'privacy' },
 ];
 

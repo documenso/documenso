@@ -199,7 +199,7 @@ export const Hero = ({ className, locale, ...props }: HeroProps) => {
             </div>
 
             <div>
-              <strong>Timur Ercan & Lucas Smith</strong>
+              <strong>Serge</strong>
               <p className="mt-1">{t(`co-founders`)}</p>
             </div>
           </Widget>
