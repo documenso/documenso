@@ -6,6 +6,7 @@
     "dev": "turbo run dev --filter=@documenso/web --filter=@documenso/marketing",
     "start": "cd apps && cd web && next start",
     "lint": "turbo run lint",
+    "lint:fix": "turbo run lint:fix",
     "format": "prettier --write \"**/*.{js,jsx,cjs,mjs,ts,tsx,cts,mts,mdx}\"",
     "prepare": "husky install",
     "commitlint": "commitlint --edit",
