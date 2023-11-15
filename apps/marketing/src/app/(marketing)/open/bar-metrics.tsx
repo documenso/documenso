@@ -40,19 +40,28 @@ export const BarMetric = <T extends Record<string, Record<keyof T[string], unkno
         <span>{extraInfo}</span>
       </div>
 
-      <div className="border-border mt-2.5 flex flex-1 items-center justify-center rounded-2xl border pr-2 shadow-sm hover:shadow">
+      <div className="border-border mt-2.5 flex flex-1 items-center justify-center rounded-2xl border p-6 pl-2 pt-12 shadow-sm hover:shadow">
         <ResponsiveContainer width="100%" height={chartHeight}>
-          <BarChart data={formattedData} margin={{ top: 30, right: 20 }}>
+          <BarChart data={formattedData}>
             <XAxis dataKey="month" />
             <YAxis />
             <Tooltip
+              labelStyle={{
+                color: 'hsl(var(--primary-foreground))',
+              }}
               itemStyle={{
                 color: 'hsl(var(--primary-foreground))',
               }}
               formatter={(value) => [Number(value), label]}
               cursor={{ fill: 'hsl(var(--primary) / 10%)' }}
             />
-            <Bar dataKey={metricKey as string} fill="hsl(var(--primary))" label={label} />{' '}
+            <Bar
+              dataKey={metricKey as string}
+              maxBarSize={60}
+              fill="hsl(var(--primary))"
+              label={label}
+              radius={[4, 4, 0, 0]}
+            />
           </BarChart>
         </ResponsiveContainer>
       </div>

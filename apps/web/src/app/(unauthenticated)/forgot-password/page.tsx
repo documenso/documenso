@@ -5,7 +5,7 @@ import { ForgotPasswordForm } from '~/components/forms/forgot-password';
 export default function ForgotPasswordPage() {
   return (
     <div>
-      <h1 className="text-4xl font-semibold">Forgotten your password?</h1>
+      <h1 className="text-4xl font-semibold">Forgot your password?</h1>
 
       <p className="text-muted-foreground mt-2 text-sm">
         No worries, it happens! Enter your email and we'll email you a special link to reset your

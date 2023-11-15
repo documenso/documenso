@@ -5,23 +5,31 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import Image, { StaticImageData } from 'next/image';
 
 import { animate, motion, useMotionTemplate, useMotionValue, useTransform } from 'framer-motion';
+import { P, match } from 'ts-pattern';
 
+import { Signature } from '@documenso/prisma/client';
 import { cn } from '@documenso/ui/lib/utils';
 import { Card, CardContent } from '@documenso/ui/primitives/card';
 
 export type SigningCardProps = {
   className?: string;
   name: string;
+  signature?: Signature;
   signingCelebrationImage?: StaticImageData;
 };
 
 /**
  * 2D signing card.
  */
-export const SigningCard = ({ className, name, signingCelebrationImage }: SigningCardProps) => {
+export const SigningCard = ({
+  className,
+  name,
+  signature,
+  signingCelebrationImage,
+}: SigningCardProps) => {
   return (
     <div className={cn('relative w-full max-w-xs md:max-w-sm', className)}>
-      <SigningCardContent name={name} />
+      <SigningCardContent name={name} signature={signature} />
 
       {signingCelebrationImage && (
         <SigningCardImage signingCelebrationImage={signingCelebrationImage} />
@@ -33,7 +41,12 @@ export const SigningCard = ({ className, name, signingCelebrationImage }: Signin
 /**
  * 3D signing card that follows the mouse movement within a certain range.
  */
-export const SigningCard3D = ({ className, name, signingCelebrationImage }: SigningCardProps) => {
+export const SigningCard3D = ({
+  className,
+  name,
+  signature,
+  signingCelebrationImage,
+}: SigningCardProps) => {
   // Should use % based dimensions by calculating the window height/width.
   const boundary = 400;
 
@@ -56,7 +69,7 @@ export const SigningCard3D = ({ className, name, signingCelebrationImage }: Sign
   const sheenGradient = useMotionTemplate`linear-gradient(
     30deg,
     transparent,
-    rgba(var(--sheen-color) / ${trackMouse ? sheenOpacity : 0}) ${sheenPosition}%,
+    rgba(var(--sheen-color) / ${sheenOpacity}) ${sheenPosition}%,
     transparent)`;
 
   const cardRef = useRef<HTMLDivElement>(null);
@@ -98,10 +111,12 @@ export const SigningCard3D = ({ className, name, signingCelebrationImage }: Sign
         void animate(cardX, 0, { duration: 2, ease: 'backInOut' });
         void animate(cardY, 0, { duration: 2, ease: 'backInOut' });
 
+        void animate(sheenOpacity, 0, { duration: 2, ease: 'backInOut' });
+
         setTrackMouse(false);
       }, 1000);
     },
-    [cardX, cardY, cardCenterPosition, trackMouse],
+    [cardX, cardY, cardCenterPosition, trackMouse, sheenOpacity],
   );
 
   useEffect(() => {
@@ -126,10 +141,9 @@ export const SigningCard3D = ({ className, name, signingCelebrationImage }: Sign
           transformStyle: 'preserve-3d',
           rotateX,
           rotateY,
-          // willChange: 'transform background-image',
         }}
       >
-        <SigningCardContent className="bg-transparent" name={name} />
+        <SigningCardContent className="bg-transparent" name={name} signature={signature} />
       </motion.div>
 
       {signingCelebrationImage && (
@@ -141,10 +155,11 @@ export const SigningCard3D = ({ className, name, signingCelebrationImage }: Sign
 
 type SigningCardContentProps = {
   name: string;
+  signature?: Signature;
   className?: string;
 };
 
-const SigningCardContent = ({ className, name }: SigningCardContentProps) => {
+const SigningCardContent = ({ className, name, signature }: SigningCardContentProps) => {
   return (
     <Card
       className={cn(
@@ -160,14 +175,36 @@ const SigningCardContent = ({ className, name }: SigningCardContentProps) => {
           container: 'main',
         }}
       >
-        <span
-          className="text-muted-foreground/60 group-hover:text-primary/80 break-all font-semibold duration-300"
-          style={{
-            fontSize: `max(min(4rem, ${(100 / name.length / 2).toFixed(4)}cqw), 1.875rem)`,
-          }}
-        >
-          {name}
-        </span>
+        {match(signature)
+          .with({ signatureImageAsBase64: P.string }, (signature) => (
+            <img
+              src={signature.signatureImageAsBase64}
+              alt="signature"
+              className="h-full max-w-[100%] dark:invert"
+            />
+          ))
+          .with({ typedSignature: P.string }, (signature) => (
+            <span
+              className="text-muted-foreground/60 group-hover:text-primary/80 break-all font-semibold duration-300"
+              style={{
+                fontSize: `max(min(4rem, ${(100 / signature.typedSignature.length / 2).toFixed(
+                  4,
+                )}cqw), 1.875rem)`,
+              }}
+            >
+              {signature.typedSignature}
+            </span>
+          ))
+          .otherwise(() => (
+            <span
+              className="text-muted-foreground/60 group-hover:text-primary/80 break-all font-semibold duration-300"
+              style={{
+                fontSize: `max(min(4rem, ${(100 / name.length / 2).toFixed(4)}cqw), 1.875rem)`,
+              }}
+            >
+              {name}
+            </span>
+          ))}
       </CardContent>
     </Card>
   );

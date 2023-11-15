@@ -1,0 +1,35 @@
+name: "Feature Request"
+description: Suggest a new idea or enhancement for this project
+body:
+  - type: markdown
+    attributes:
+      value: Please provide a clear and concise title for your feature request 
+  - type: textarea
+    attributes:
+      label: Feature Description
+      description: Describe the feature you are requesting in detail. Explain what problem it solves or what value it adds to the project.
+  - type: textarea
+    attributes:
+      label: Use Case
+      description: Provide a scenario or use case where this feature would be beneficial. Explain how users would interact with this feature and why it's important.
+  - type: textarea
+    attributes:
+      label: Proposed Solution
+      description: If you have an idea of how this feature could be implemented, describe it here. Include any technical details, UI/UX considerations, or design suggestions.
+  - type: textarea
+    attributes:
+      label: Alternatives (optional)
+      description: Are there any alternative ways to achieve the same goal? Describe other approaches that could be considered if this feature is not implemented.
+  - type: textarea
+    attributes:
+      label: Additional Context
+      description: Add any additional context or information that might be relevant to the feature request.
+  - type: checkboxes
+    attributes:
+      label: Please check the boxes that apply to this feature request.
+      options:
+        - label: I have searched the existing feature requests to make sure this is not a duplicate.
+        - label: I have provided a detailed description of the requested feature.
+        - label: I have explained the use case or scenario for this feature.
+        - label: I have included any relevant technical details or design suggestions.
+        - label: I understand that this is a suggestion and that there is no guarantee of implementation.

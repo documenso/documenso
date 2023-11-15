@@ -125,7 +125,7 @@ export const NameField = ({ field, recipient }: NameFieldProps) => {
               type="text"
               className="mt-2"
               value={localFullName}
-              onChange={(e) => setLocalFullName(e.target.value)}
+              onChange={(e) => setLocalFullName(e.target.value.trimStart())}
             />
           </div>
 

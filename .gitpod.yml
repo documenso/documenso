@@ -1,0 +1,55 @@
+tasks:
+  - init: |
+      npm i &&
+      npm run dx:up &&
+      cp .env.example .env &&
+      set -a; source .env &&
+      export NEXTAUTH_URL="$(gp url 3000)" &&
+      export NEXT_PUBLIC_WEBAPP_URL="$(gp url 3000)" &&
+      export NEXT_PUBLIC_MARKETING_URL="$(gp url 3001)" 
+    command: npm run d
+
+ports:
+  - port: 3000
+    visibility: public
+    onOpen: open-preview
+  - port: 3001
+    visibility: public
+    onOpen: open-preview
+  - port: 9000
+    visibility: public
+    onOpen: ignore
+  - port: 1100
+    visibility: private
+    onOpen: ignore
+  - port: 2500
+    visibility: private
+    onOpen: ignore
+  - port: 54320 
+    visibility: private 
+    onOpen: ignore
+
+
+github:
+  prebuilds:
+    master: true
+    pullRequests: true
+    pullRequestsFromForks: true
+    addCheck: true
+    addComment: true
+    addBadge: true
+
+vscode:
+  extensions:
+    - aaron-bond.better-comments
+    - bradlc.vscode-tailwindcss
+    - dbaeumer.vscode-eslint
+    - esbenp.prettier-vscode
+    - mikestead.dotenv
+    - unifiedjs.vscode-mdx
+    - GitHub.copilot-chat
+    - GitHub.copilot-labs
+    - GitHub.copilot
+    - GitHub.vscode-pull-request-github
+    - Prisma.prisma
+    - VisualStudioExptTeam.vscodeintellicode

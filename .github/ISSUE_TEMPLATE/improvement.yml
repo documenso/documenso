@@ -1,0 +1,35 @@
+name: "General Improvement"
+description: Suggest a minor enhancement or improvement for this project
+body:
+  - type: markdown
+    attributes:
+      value: Please provide a clear and concise title for your improvement suggestion
+  - type: textarea
+    attributes:
+      label: Improvement Description
+      description: Describe the improvement you are suggesting in detail. Explain what specific aspect of the project it addresses or enhances.
+  - type: textarea
+    attributes:
+      label: Rationale
+      description: Explain why this improvement would be beneficial. Share any context, pain points, or reasons for suggesting this change.
+  - type: textarea
+    attributes:
+      label: Proposed Solution
+      description: If you have a suggestion for how this improvement could be implemented, describe it here. Include any technical details, design suggestions, or other relevant information.
+  - type: textarea
+    attributes:
+      label: Alternatives (optional)
+      description: Are there any alternative approaches to achieve the same improvement? Describe other ways to address the issue or enhance the project.
+  - type: textarea
+    attributes:
+      label: Additional Context
+      description: Add any additional context or information that might be relevant to the improvement suggestion.
+  - type: checkboxes
+    attributes:
+      label: Please check the boxes that apply to this improvement suggestion.
+      options:
+        - label: I have searched the existing issues and improvement suggestions to avoid duplication.
+        - label: I have provided a clear description of the improvement being suggested.
+        - label: I have explained the rationale behind this improvement.
+        - label: I have included any relevant technical details or design suggestions.
+        - label: I understand that this is a suggestion and that there is no guarantee of implementation.
