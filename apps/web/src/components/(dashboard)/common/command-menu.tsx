@@ -35,9 +35,9 @@ const DOCUMENTS_PAGES = [
 ];
 
 const SETTINGS_PAGES = [
-  { label: 'Réglages', path: '/settings', shortcut: SETTINGS_PAGE_SHORTCUT.replace('+', '') },
-  { label: 'Profile', path: '/settings/profile' },
-  { label: 'Mot de Passe', path: '/settings/password' },
+  { label: 'Réglages', path: '/fr/settings', shortcut: SETTINGS_PAGE_SHORTCUT.replace('+', '') },
+  { label: 'Profile', path: '/fr/settings/profile' },
+  { label: 'Mot de Passe', path: '/fr/settings/password' },
 ];
 
 export function CommandMenu() {

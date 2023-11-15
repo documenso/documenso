@@ -1,11 +1,16 @@
 'use client';
 
+import { useParams } from 'next/navigation';
+
 import { Variants, motion } from 'framer-motion';
 import { Plus } from 'lucide-react';
 import { useDropzone } from 'react-dropzone';
+import { useTranslation } from 'react-i18next';
 
 import { cn } from '@documenso/ui/lib/utils';
 import { Card, CardContent } from '@documenso/ui/primitives/card';
+
+import { LocaleTypes } from '../i18n/settings';
 
 const DocumentDropzoneContainerVariants: Variants = {
   initial: {
@@ -85,6 +90,8 @@ export const DocumentDropzone = ({
   disabled,
   ...props
 }: DocumentDropzoneProps) => {
+  const locale = useParams()?.locale as LocaleTypes;
+  const { t } = useTranslation(locale, 'dashboard');
   const { getRootProps, getInputProps } = useDropzone({
     accept: {
       'application/pdf': ['.pdf'],
@@ -153,10 +160,10 @@ export const DocumentDropzone = ({
           <input {...getInputProps()} />
 
           <p className="group-hover:text-foreground text-muted-foreground mt-8 font-medium">
-            Add a document
+            {t(`add-a-doc`)}
           </p>
 
-          <p className="text-muted-foreground/80 mt-1 text-sm ">Drag & drop your document here.</p>
+          <p className="text-muted-foreground/80 mt-1 text-sm "> {t(`add-a-doc`)}</p>
         </CardContent>
       </Card>
     </motion.div>

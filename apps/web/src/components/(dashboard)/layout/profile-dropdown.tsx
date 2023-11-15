@@ -48,7 +48,7 @@ export const ProfileDropdown = ({ user }: ProfileDropdownProps) => {
   const { theme, setTheme } = useTheme();
   const isUserAdmin = isAdmin(user);
   const locale = useParams()?.locale as LocaleTypes;
-
+  const { t } = useTranslation(locale, 'dashboard');
   const isBillingEnabled = getFlag('app_billing');
 
   const avatarFallback = user.name
@@ -66,14 +66,14 @@ export const ProfileDropdown = ({ user }: ProfileDropdownProps) => {
       </DropdownMenuTrigger>
 
       <DropdownMenuContent className="w-56" align="end" forceMount>
-        <DropdownMenuLabel>Account</DropdownMenuLabel>
+        <DropdownMenuLabel>{t(`account`)}</DropdownMenuLabel>
 
         {isUserAdmin && (
           <>
             <DropdownMenuItem asChild>
               <Link href={`/${locale}/admin`} className="cursor-pointer">
                 <UserCog className="mr-2 h-4 w-4" />
-                Admin
+                {t(`admin`)}
               </Link>
             </DropdownMenuItem>
 
@@ -82,24 +82,24 @@ export const ProfileDropdown = ({ user }: ProfileDropdownProps) => {
         )}
 
         <DropdownMenuItem asChild>
-          <Link href="/settings/profile" className="cursor-pointer">
+          <Link href={`/${locale}/settings/profile`} className="cursor-pointer">
             <LucideUser className="mr-2 h-4 w-4" />
-            Profile
+            {t(`profile`)}
           </Link>
         </DropdownMenuItem>
 
         <DropdownMenuItem asChild>
-          <Link href="/settings/password" className="cursor-pointer">
+          <Link href={`/${locale}/settings/password`} className="cursor-pointer">
             <Key className="mr-2 h-4 w-4" />
-            Password
+            {t(`password`)}
           </Link>
         </DropdownMenuItem>
 
         {isBillingEnabled && (
           <DropdownMenuItem asChild>
-            <Link href="/settings/billing" className="cursor-pointer">
+            <Link href={`/${locale}/settings/billing`} className="cursor-pointer">
               <CreditCard className="mr-2 h-4 w-4" />
-              Billing
+              {t(`billing`)}
             </Link>
           </DropdownMenuItem>
         )}
@@ -109,7 +109,7 @@ export const ProfileDropdown = ({ user }: ProfileDropdownProps) => {
         <DropdownMenuSub>
           <DropdownMenuSubTrigger>
             <Palette className="mr-2 h-4 w-4" />
-            Themes
+            {t(`themes`)}
           </DropdownMenuSubTrigger>
           <DropdownMenuPortal>
             <DropdownMenuSubContent>
@@ -141,7 +141,7 @@ export const ProfileDropdown = ({ user }: ProfileDropdownProps) => {
           }
         >
           <LogOut className="mr-2 h-4 w-4" />
-          Sign Out
+          {t(`sign-out`)}
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
