@@ -6,7 +6,7 @@ import { P, match } from 'ts-pattern';
 import { Logo } from '~/components/branding/logo';
 import { ShareHandlerAPIResponse } from '~/pages/api/share';
 
-export const runtime = 'edge';
+// export const runtime = 'edge';
 const CARD_OFFSET_TOP = 152;
 const CARD_OFFSET_LEFT = 350;
 const CARD_WIDTH = 500;
