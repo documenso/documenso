@@ -5,8 +5,8 @@ import { useParams } from 'next/navigation';
 import { Variants, motion } from 'framer-motion';
 import { Plus } from 'lucide-react';
 import { useDropzone } from 'react-dropzone';
-import { useTranslation } from 'react-i18next';
 
+import { useTranslation } from '@documenso/ui/i18n/client';
 import { cn } from '@documenso/ui/lib/utils';
 import { Card, CardContent } from '@documenso/ui/primitives/card';
 
