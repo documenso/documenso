@@ -38,7 +38,7 @@ export const MENU_NAVIGATION_LINKS = [
     text: 'privacy',
   },
   {
-    href: 'https://app.notario.progiciel.co/signin/fr',
+    href: `https://app.progiciel.co/fr/signin/`,
     text: 'sign-in',
   },
 ];
