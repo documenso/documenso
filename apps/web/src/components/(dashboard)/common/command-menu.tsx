@@ -24,20 +24,20 @@ import {
 
 const DOCUMENTS_PAGES = [
   {
-    label: 'All documents',
-    path: '/documents?status=ALL',
+    label: 'Documents',
+    path: '/fr/documents?status=ALL',
     shortcut: DOCUMENTS_PAGE_SHORTCUT.replace('+', ''),
   },
-  { label: 'Draft documents', path: '/documents?status=DRAFT' },
-  { label: 'Completed documents', path: '/documents?status=COMPLETED' },
-  { label: 'Pending documents', path: '/documents?status=PENDING' },
-  { label: 'Inbox documents', path: '/documents?status=INBOX' },
+  { label: 'Brouillon', path: '/fr/documents?status=DRAFT' },
+  { label: 'Signé', path: '/fr/documents?status=COMPLETED' },
+  { label: 'En Attente', path: '/fr/documents?status=PENDING' },
+  { label: 'Inbox', path: '/fr/documents?status=INBOX' },
 ];
 
 const SETTINGS_PAGES = [
-  { label: 'Settings', path: '/settings', shortcut: SETTINGS_PAGE_SHORTCUT.replace('+', '') },
+  { label: 'Réglages', path: '/settings', shortcut: SETTINGS_PAGE_SHORTCUT.replace('+', '') },
   { label: 'Profile', path: '/settings/profile' },
-  { label: 'Password', path: '/settings/password' },
+  { label: 'Mot de Passe', path: '/settings/password' },
 ];
 
 export function CommandMenu() {

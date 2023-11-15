@@ -60,7 +60,7 @@ export default async function DocumentsPage({ searchParams = {} }: DocumentsPage
       params.delete('page');
     }
 
-    return `/documents?${params.toString()}`;
+    return `/fr/documents?${params.toString()}`;
   };
 
   return (
