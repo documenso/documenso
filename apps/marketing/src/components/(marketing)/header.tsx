@@ -1,6 +1,7 @@
 'use client';
 
-import { HTMLAttributes, useState } from 'react';
+import type { HTMLAttributes } from 'react';
+import { useState } from 'react';
 
 import Image from 'next/image';
 import Link from 'next/link';
@@ -63,7 +64,7 @@ export const Header = ({ className, ...props }: HeaderProps) => {
           href="/open"
           className="text-muted-foreground hover:text-muted-foreground/80 text-sm font-semibold"
         >
-          Open
+          Open Startup
         </Link>
 
         <Link
