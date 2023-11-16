@@ -3,15 +3,14 @@ import { NextResponse } from 'next/server';
 
 import { P, match } from 'ts-pattern';
 
-import { Logo } from '~/components/branding/logo';
-import { ShareHandlerAPIResponse } from '~/pages/api/share';
+import type { ShareHandlerAPIResponse } from '~/pages/api/share';
 
 export const runtime = 'edge';
 
-const CARD_OFFSET_TOP = 152;
-const CARD_OFFSET_LEFT = 350;
-const CARD_WIDTH = 500;
-const CARD_HEIGHT = 250;
+const CARD_OFFSET_TOP = 173;
+const CARD_OFFSET_LEFT = 307;
+const CARD_WIDTH = 590;
+const CARD_HEIGHT = 337;
 
 const IMAGE_SIZE = {
   width: 1200,
@@ -33,7 +32,7 @@ export async function GET(_request: Request, { params: { slug } }: SharePageOpen
     fetch(new URL('@documenso/assets/fonts/caveat-regular.ttf', import.meta.url)).then(
       async (res) => res.arrayBuffer(),
     ),
-    fetch(new URL('@documenso/assets/static/og-share-frame.png', import.meta.url)).then(
+    fetch(new URL('@documenso/assets/static/og-share-frame2.png', import.meta.url)).then(
       async (res) => res.arrayBuffer(),
     ),
   ]);
@@ -72,11 +71,6 @@ export async function GET(_request: Request, { params: { slug } }: SharePageOpen
         {/* @ts-expect-error Lack of typing from ImageResponse */}
         <img src={shareFrameImage} alt="og-share-frame" tw="absolute inset-0 w-full h-full" />
 
-        <div tw="absolute top-20 flex w-full items-center justify-center">
-          {/* @ts-expect-error Lack of typing from ImageResponse */}
-          <Logo tw="h-8 w-60" />
-        </div>
-
         {signatureImage ? (
           <div
             tw="absolute py-6 px-12 flex items-center justify-center text-center"
@@ -109,21 +103,21 @@ export async function GET(_request: Request, { params: { slug } }: SharePageOpen
         )}
 
         <div
-          tw="absolute flex flex-col items-center justify-center pt-12 w-full"
+          tw="absolute flex w-full"
           style={{
-            top: `${CARD_OFFSET_TOP + CARD_HEIGHT}px`,
+            top: `${CARD_OFFSET_TOP - 78}px`,
+            left: `${CARD_OFFSET_LEFT}px`,
           }}
         >
           <h2
-            tw="text-3xl text-slate-500"
+            tw="text-xl"
             style={{
+              color: '#828282',
               fontFamily: 'Inter',
-              fontWeight: 600,
+              fontWeight: 700,
             }}
           >
-            {isRecipient
-              ? 'I just signed with Documenso and you can too!'
-              : 'I just sent a document with Documenso and you can too!'}
+            {isRecipient ? 'Document Signed!' : 'Document Sent!'}
           </h2>
         </div>
       </div>

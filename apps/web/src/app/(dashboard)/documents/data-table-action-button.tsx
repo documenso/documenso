@@ -7,8 +7,9 @@ import { useSession } from 'next-auth/react';
 import { match } from 'ts-pattern';
 
 import { getFile } from '@documenso/lib/universal/upload/get-file';
-import { Document, DocumentStatus, Recipient, SigningStatus, User } from '@documenso/prisma/client';
-import { DocumentWithData } from '@documenso/prisma/types/document-with-data';
+import type { Document, Recipient, User } from '@documenso/prisma/client';
+import { DocumentStatus, SigningStatus } from '@documenso/prisma/client';
+import type { DocumentWithData } from '@documenso/prisma/types/document-with-data';
 import { trpc as trpcClient } from '@documenso/trpc/client';
 import { Button } from '@documenso/ui/primitives/button';
 
