@@ -12,7 +12,9 @@ ENV_FILES.forEach((file) => {
 
 /** @type {import('next').NextConfig} */
 const config = {
+  output: process.env.DOCKER_OUTPUT ? 'standalone' : undefined,
   experimental: {
+    outputFileTracingRoot: path.join(__dirname, '../../'),
     serverActionsBodySizeLimit: '50mb',
   },
   reactStrictMode: true,

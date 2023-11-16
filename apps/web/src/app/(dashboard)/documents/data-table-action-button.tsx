@@ -2,12 +2,15 @@
 
 import Link from 'next/link';
 
-import { Edit, Pencil, Share } from 'lucide-react';
+import { Download, Edit, Pencil } from 'lucide-react';
 import { useSession } from 'next-auth/react';
 import { match } from 'ts-pattern';
 
-import { Document, DocumentStatus, Recipient, SigningStatus, User } from '@documenso/prisma/client';
-import { DocumentShareButton } from '@documenso/ui/components/document/document-share-button';
+import { getFile } from '@documenso/lib/universal/upload/get-file';
+import type { Document, Recipient, User } from '@documenso/prisma/client';
+import { DocumentStatus, SigningStatus } from '@documenso/prisma/client';
+import type { DocumentWithData } from '@documenso/prisma/types/document-with-data';
+import { trpc as trpcClient } from '@documenso/trpc/client';
 import { Button } from '@documenso/ui/primitives/button';
 
 export type DataTableActionButtonProps = {
@@ -33,6 +36,41 @@ export const DataTableActionButton = ({ row }: DataTableActionButtonProps) => {
   const isComplete = row.status === DocumentStatus.COMPLETED;
   const isSigned = recipient?.signingStatus === SigningStatus.SIGNED;
 
+  const onDownloadClick = async () => {
+    let document: DocumentWithData | null = null;
+
+    if (!recipient) {
+      document = await trpcClient.document.getDocumentById.query({
+        id: row.id,
+      });
+    } else {
+      document = await trpcClient.document.getDocumentByToken.query({
+        token: recipient.token,
+      });
+    }
+
+    const documentData = document?.documentData;
+
+    if (!documentData) {
+      return;
+    }
+
+    const documentBytes = await getFile(documentData);
+
+    const blob = new Blob([documentBytes], {
+      type: 'application/pdf',
+    });
+
+    const link = window.document.createElement('a');
+
+    link.href = window.URL.createObjectURL(blob);
+    link.download = row.title || 'document.pdf';
+
+    link.click();
+
+    window.URL.revokeObjectURL(link.href);
+  };
+
   return match({
     isOwner,
     isRecipient,
@@ -42,7 +80,7 @@ export const DataTableActionButton = ({ row }: DataTableActionButtonProps) => {
     isSigned,
   })
     .with({ isOwner: true, isDraft: true }, () => (
-      <Button className="w-24" asChild>
+      <Button className="w-32" asChild>
         <Link href={`/documents/${row.id}`}>
           <Edit className="-ml-1 mr-2 h-4 w-4" />
           Edit
@@ -50,23 +88,24 @@ export const DataTableActionButton = ({ row }: DataTableActionButtonProps) => {
       </Button>
     ))
     .with({ isRecipient: true, isPending: true, isSigned: false }, () => (
-      <Button className="w-24" asChild>
+      <Button className="w-32" asChild>
         <Link href={`/sign/${recipient?.token}`}>
           <Pencil className="-ml-1 mr-2 h-4 w-4" />
           Sign
         </Link>
       </Button>
     ))
-    .otherwise(() => (
-      <DocumentShareButton
-        documentId={row.id}
-        token={recipient?.token}
-        trigger={({ loading }) => (
-          <Button className="w-24" loading={loading}>
-            {!loading && <Share className="-ml-1 mr-2 h-4 w-4" />}
-            Share
-          </Button>
-        )}
-      />
-    ));
+    .with({ isPending: true, isSigned: true }, () => (
+      <Button className="w-32" disabled={true}>
+        <Pencil className="-ml-1 mr-2 inline h-4 w-4" />
+        Sign
+      </Button>
+    ))
+    .with({ isComplete: true }, () => (
+      <Button className="w-32" onClick={onDownloadClick}>
+        <Download className="-ml-1 mr-2 inline h-4 w-4" />
+        Download
+      </Button>
+    ))
+    .otherwise(() => <div></div>);
 };
