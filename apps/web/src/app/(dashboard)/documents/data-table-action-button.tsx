@@ -64,7 +64,7 @@ export const DataTableActionButton = ({ row }: DataTableActionButtonProps) => {
     const link = window.document.createElement('a');
 
     link.href = window.URL.createObjectURL(blob);
-    link.download = row.title || 'document.pdf';
+    link.download = row.title.split('.pdf')[0] + '_signed.pdf' || 'document.pdf';
 
     link.click();
 
