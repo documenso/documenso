@@ -12,6 +12,7 @@ import { DocumentStatus, SigningStatus } from '@documenso/prisma/client';
 import type { DocumentWithData } from '@documenso/prisma/types/document-with-data';
 import { trpc as trpcClient } from '@documenso/trpc/client';
 import { Button } from '@documenso/ui/primitives/button';
+import { toast } from '@documenso/ui/primitives/use-toast';
 
 export type DataTableActionButtonProps = {
   row: Document & {
@@ -37,38 +38,48 @@ export const DataTableActionButton = ({ row }: DataTableActionButtonProps) => {
   const isSigned = recipient?.signingStatus === SigningStatus.SIGNED;
 
   const onDownloadClick = async () => {
-    let document: DocumentWithData | null = null;
+    try {
+      let document: DocumentWithData | null = null;
 
-    if (!recipient) {
-      document = await trpcClient.document.getDocumentById.query({
-        id: row.id,
+      if (!recipient) {
+        document = await trpcClient.document.getDocumentById.query({
+          id: row.id,
+        });
+      } else {
+        document = await trpcClient.document.getDocumentByToken.query({
+          token: recipient.token,
+        });
+      }
+
+      const documentData = document?.documentData;
+
+      console.log(documentData);
+
+      if (!documentData) {
+        return;
+      }
+
+      const documentBytes = await getFile({ data: documentData.data, type: documentData.type });
+
+      const blob = new Blob([documentBytes], {
+        type: 'application/pdf',
       });
-    } else {
-      document = await trpcClient.document.getDocumentByToken.query({
-        token: recipient.token,
+
+      const link = window.document.createElement('a');
+
+      link.href = window.URL.createObjectURL(blob);
+      link.download = row.title || 'document.pdf';
+
+      link.click();
+
+      window.URL.revokeObjectURL(link.href);
+    } catch (error) {
+      toast({
+        title: 'Something went wrong',
+        description: 'An error occurred while trying to download file.',
+        variant: 'destructive',
       });
     }
-
-    const documentData = document?.documentData;
-
-    if (!documentData) {
-      return;
-    }
-
-    const documentBytes = await getFile(documentData);
-
-    const blob = new Blob([documentBytes], {
-      type: 'application/pdf',
-    });
-
-    const link = window.document.createElement('a');
-
-    link.href = window.URL.createObjectURL(blob);
-    link.download = row.title || 'document.pdf';
-
-    link.click();
-
-    window.URL.revokeObjectURL(link.href);
   };
 
   return match({
