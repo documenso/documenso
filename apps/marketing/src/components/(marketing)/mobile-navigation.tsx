@@ -17,8 +17,8 @@ export type MobileNavigationProps = {
 
 export const MENU_NAVIGATION_LINKS = [
   {
-    href: '/single-player-mode',
-    text: 'Single Player Mode',
+    href: '/singleplayer',
+    text: 'Singleplayer',
   },
   {
     href: '/blog',
@@ -39,13 +39,14 @@ export const MENU_NAVIGATION_LINKS = [
   {
     href: 'mailto:support@documenso.com',
     text: 'Support',
+    target: '_blank',
   },
   {
     href: '/privacy',
     text: 'Privacy',
   },
   {
-    href: 'https://app.documenso.com/login',
+    href: 'https://app.documenso.com/signin',
     text: 'Sign in',
   },
 ];
@@ -78,7 +79,7 @@ export const MobileNavigation = ({ isMenuOpen, onMenuOpenChange }: MobileNavigat
             staggerChildren: 0.03,
           }}
         >
-          {MENU_NAVIGATION_LINKS.map(({ href, text }) => (
+          {MENU_NAVIGATION_LINKS.map(({ href, text, target }) => (
             <motion.div
               key={href}
               variants={{
@@ -100,6 +101,7 @@ export const MobileNavigation = ({ isMenuOpen, onMenuOpenChange }: MobileNavigat
                 className="text-foreground hover:text-foreground/80 text-2xl font-semibold"
                 href={href}
                 onClick={() => handleMenuItemClick()}
+                target={target}
               >
                 {text}
               </Link>

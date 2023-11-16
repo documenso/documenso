@@ -8,7 +8,10 @@ import { ExtendedDocumentStatus } from '@documenso/prisma/types/extended-documen
 import { Tabs, TabsList, TabsTrigger } from '@documenso/ui/primitives/tabs';
 
 import { PeriodSelector } from '~/components/(dashboard)/period-selector/period-selector';
-import { PeriodSelectorValue } from '~/components/(dashboard)/period-selector/types';
+import {
+  PeriodSelectorValue,
+  isPeriodSelectorValue,
+} from '~/components/(dashboard)/period-selector/types';
 import { DocumentStatus } from '~/components/formatter/document-status';
 
 import { DocumentsDataTable } from './data-table';
@@ -32,7 +35,7 @@ export default async function DocumentsPage({ searchParams = {} }: DocumentsPage
   });
 
   const status = isExtendedDocumentStatus(searchParams.status) ? searchParams.status : 'ALL';
-  // const period = isPeriodSelectorValue(searchParams.period) ? searchParams.period : '';
+  const period = isPeriodSelectorValue(searchParams.period) ? searchParams.period : '';
   const page = Number(searchParams.page) || 1;
   const perPage = Number(searchParams.perPage) || 20;
 
@@ -45,6 +48,7 @@ export default async function DocumentsPage({ searchParams = {} }: DocumentsPage
     },
     page,
     perPage,
+    period,
   });
 
   const getTabHref = (value: typeof status) => {

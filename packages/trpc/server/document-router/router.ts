@@ -1,7 +1,9 @@
 import { TRPCError } from '@trpc/server';
 
+import { getServerLimits } from '@documenso/ee/server-only/limits/server';
 import { createDocument } from '@documenso/lib/server-only/document/create-document';
 import { deleteDraftDocument } from '@documenso/lib/server-only/document/delete-draft-document';
+import { duplicateDocumentById } from '@documenso/lib/server-only/document/duplicate-document-by-id';
 import { getDocumentById } from '@documenso/lib/server-only/document/get-document-by-id';
 import { getDocumentAndSenderByToken } from '@documenso/lib/server-only/document/get-document-by-token';
 import { resendDocument, sendDocument } from '@documenso/lib/server-only/document/send-document';
@@ -64,13 +66,25 @@ export const documentRouter = router({
       try {
         const { title, documentDataId } = input;
 
+        const { remaining } = await getServerLimits({ email: ctx.user.email });
+
+        if (remaining.documents <= 0) {
+          throw new TRPCError({
+            code: 'BAD_REQUEST',
+            message:
+              'You have reached your document limit for this month. Please upgrade your plan.',
+          });
+        }
+
         return await createDocument({
           userId: ctx.user.id,
           title,
           documentDataId,
         });
       } catch (err) {
-        console.error(err);
+        if (err instanceof TRPCError) {
+          throw err;
+        }
 
         throw new TRPCError({
           code: 'BAD_REQUEST',
@@ -179,6 +193,25 @@ export const documentRouter = router({
         throw new TRPCError({
           code: 'BAD_REQUEST',
           message: 'We were unable to resend this document. Please try again later.',
+        });
+      }
+    }),
+
+  duplicateDocument: authenticatedProcedure
+    .input(ZGetDocumentByIdQuerySchema)
+    .mutation(async ({ input, ctx }) => {
+      try {
+        const { id } = input;
+
+        return await duplicateDocumentById({
+          id,
+          userId: ctx.user.id,
+        });
+      } catch (err) {
+        console.log(err);
+        throw new TRPCError({
+          code: 'BAD_REQUEST',
+          message: 'We are unable to duplicate this document. Please try again later.',
         });
       }
     }),

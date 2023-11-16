@@ -14,12 +14,11 @@ const DialogTrigger = DialogPrimitive.Trigger;
 const DialogClose = DialogPrimitive.Close;
 
 const DialogPortal = ({
-  className,
   children,
   position = 'start',
   ...props
 }: DialogPrimitive.DialogPortalProps & { position?: 'start' | 'end' | 'center' }) => (
-  <DialogPrimitive.Portal className={cn(className)} {...props}>
+  <DialogPrimitive.Portal {...props}>
     <div
       className={cn('fixed inset-0 z-50 flex justify-center sm:items-center', {
         'items-start': position === 'start',
