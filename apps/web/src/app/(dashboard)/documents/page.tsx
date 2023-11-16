@@ -1,6 +1,6 @@
 import Link from 'next/link';
 
-import { getRequiredServerComponentSession } from '@documenso/lib/next-auth/get-server-session';
+import { getRequiredServerComponentSession } from '@documenso/lib/next-auth/get-server-component-session';
 import { findDocuments } from '@documenso/lib/server-only/document/find-documents';
 import { getStats } from '@documenso/lib/server-only/document/get-stats';
 import { isExtendedDocumentStatus } from '@documenso/prisma/guards/is-extended-document-status';
@@ -8,10 +8,8 @@ import { ExtendedDocumentStatus } from '@documenso/prisma/types/extended-documen
 import { Tabs, TabsList, TabsTrigger } from '@documenso/ui/primitives/tabs';
 
 import { PeriodSelector } from '~/components/(dashboard)/period-selector/period-selector';
-import {
-  PeriodSelectorValue,
-  isPeriodSelectorValue,
-} from '~/components/(dashboard)/period-selector/types';
+import type { PeriodSelectorValue } from '~/components/(dashboard)/period-selector/types';
+import { isPeriodSelectorValue } from '~/components/(dashboard)/period-selector/types';
 import { DocumentStatus } from '~/components/formatter/document-status';
 
 import { DocumentsDataTable } from './data-table';
