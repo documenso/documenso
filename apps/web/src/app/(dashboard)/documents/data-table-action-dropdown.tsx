@@ -18,8 +18,9 @@ import {
 import { useSession } from 'next-auth/react';
 
 import { getFile } from '@documenso/lib/universal/upload/get-file';
-import { Document, DocumentStatus, Recipient, User } from '@documenso/prisma/client';
-import { DocumentWithData } from '@documenso/prisma/types/document-with-data';
+import type { Document, Recipient, User } from '@documenso/prisma/client';
+import { DocumentStatus } from '@documenso/prisma/client';
+import type { DocumentWithData } from '@documenso/prisma/types/document-with-data';
 import { trpc as trpcClient } from '@documenso/trpc/client';
 import { DocumentShareButton } from '@documenso/ui/components/document/document-share-button';
 import {
@@ -30,9 +31,9 @@ import {
   DropdownMenuTrigger,
 } from '@documenso/ui/primitives/dropdown-menu';
 
+import { ResendDocumentActionItem } from './_action-items/resend-document';
 import { DeleteDraftDocumentDialog } from './delete-draft-document-dialog';
 import { DuplicateDocumentDialog } from './duplicate-document-dialog';
-import { ResendEmailMenuItem } from './resend-dialog';
 
 export type DataTableActionDropdownProps = {
   row: Document & {
@@ -142,7 +143,7 @@ export const DataTableActionDropdown = ({ row }: DataTableActionDropdownProps) =
 
         <DropdownMenuLabel>Share</DropdownMenuLabel>
 
-        <ResendEmailMenuItem documentId={row.id} recipients={nonSignedRecipients} />
+        <ResendDocumentActionItem document={row} recipients={nonSignedRecipients} />
 
         <DocumentShareButton
           documentId={row.id}

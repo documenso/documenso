@@ -6,14 +6,15 @@ import { DocumentInviteEmailTemplate } from '@documenso/email/templates/document
 import { FROM_ADDRESS, FROM_NAME } from '@documenso/lib/constants/email';
 import { renderCustomEmailTemplate } from '@documenso/lib/utils/render-custom-email-template';
 import { prisma } from '@documenso/prisma';
-import { DocumentStatus, SendStatus } from '@documenso/prisma/client';
+import { DocumentStatus, SigningStatus } from '@documenso/prisma/client';
 
-export type SendDocumentOptions = {
+export type ResendDocumentOptions = {
   documentId: number;
   userId: number;
+  recipients: number[];
 };
 
-export const sendDocument = async ({ documentId, userId }: SendDocumentOptions) => {
+export const resendDocument = async ({ documentId, userId, recipients }: ResendDocumentOptions) => {
   const user = await prisma.user.findFirstOrThrow({
     where: {
       id: userId,
@@ -26,7 +27,14 @@ export const sendDocument = async ({ documentId, userId }: SendDocumentOptions) 
       userId,
     },
     include: {
-      Recipient: true,
+      Recipient: {
+        where: {
+          id: {
+            in: recipients,
+          },
+          signingStatus: SigningStatus.NOT_SIGNED,
+        },
+      },
       documentMeta: true,
     },
   });
@@ -39,6 +47,10 @@ export const sendDocument = async ({ documentId, userId }: SendDocumentOptions) 
 
   if (document.Recipient.length === 0) {
     throw new Error('Document has no recipients');
+  }
+
+  if (document.status === DocumentStatus.DRAFT) {
+    throw new Error('Can not send draft document');
   }
 
   if (document.status === DocumentStatus.COMPLETED) {
@@ -54,10 +66,6 @@ export const sendDocument = async ({ documentId, userId }: SendDocumentOptions) 
         'signer.email': email,
         'document.name': document.title,
       };
-
-      if (recipient.sendStatus === SendStatus.SENT) {
-        return;
-      }
 
       const assetBaseUrl = process.env.NEXT_PUBLIC_WEBAPP_URL || 'http://localhost:3000';
       const signDocumentLink = `${process.env.NEXT_PUBLIC_WEBAPP_URL}/sign/${recipient.token}`;
@@ -86,26 +94,6 @@ export const sendDocument = async ({ documentId, userId }: SendDocumentOptions) 
         html: render(template),
         text: render(template, { plainText: true }),
       });
-
-      await prisma.recipient.update({
-        where: {
-          id: recipient.id,
-        },
-        data: {
-          sendStatus: SendStatus.SENT,
-        },
-      });
     }),
   ]);
-
-  const updatedDocument = await prisma.document.update({
-    where: {
-      id: documentId,
-    },
-    data: {
-      status: DocumentStatus.PENDING,
-    },
-  });
-
-  return updatedDocument;
 };

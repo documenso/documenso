@@ -6,7 +6,8 @@ import { deleteDraftDocument } from '@documenso/lib/server-only/document/delete-
 import { duplicateDocumentById } from '@documenso/lib/server-only/document/duplicate-document-by-id';
 import { getDocumentById } from '@documenso/lib/server-only/document/get-document-by-id';
 import { getDocumentAndSenderByToken } from '@documenso/lib/server-only/document/get-document-by-token';
-import { resendDocument, sendDocument } from '@documenso/lib/server-only/document/send-document';
+import { resendDocument } from '@documenso/lib/server-only/document/resend-document';
+import { sendDocument } from '@documenso/lib/server-only/document/send-document';
 import { setFieldsForDocument } from '@documenso/lib/server-only/field/set-fields-for-document';
 import { setRecipientsForDocument } from '@documenso/lib/server-only/recipient/set-recipients-for-document';
 
@@ -179,13 +180,12 @@ export const documentRouter = router({
     .input(ZResendDocumentMutationSchema)
     .mutation(async ({ input, ctx }) => {
       try {
-        const { documentId, recipientsEmail, email } = input;
+        const { documentId, recipients } = input;
 
         return await resendDocument({
           userId: ctx.user.id,
           documentId,
-          recipientsEmail,
-          email,
+          recipients,
         });
       } catch (err) {
         console.error(err);

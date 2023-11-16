@@ -1,8 +1,8 @@
 'use server';
 
-import { getRequiredServerComponentSession } from '@documenso/lib/next-auth/get-server-session';
+import { getRequiredServerComponentSession } from '@documenso/lib/next-auth/get-server-component-session';
 import { setRecipientsForDocument } from '@documenso/lib/server-only/recipient/set-recipients-for-document';
-import { TAddSignersFormSchema } from '@documenso/ui/primitives/document-flow/add-signers.types';
+import type { TAddSignersFormSchema } from '@documenso/ui/primitives/document-flow/add-signers.types';
 
 export type AddSignersActionInput = TAddSignersFormSchema & {
   documentId: number;
