@@ -1,6 +1,6 @@
 'use client';
 
-import { HTMLAttributes } from 'react';
+import type { HTMLAttributes } from 'react';
 
 import Image from 'next/image';
 import Link from 'next/link';
@@ -27,10 +27,11 @@ const FOOTER_LINKS = [
   { href: '/singleplayer', text: 'Singleplayer' },
   { href: '/blog', text: 'Blog' },
   { href: '/design-system', text: 'Design' },
-  { href: '/open', text: 'Open' },
+  { href: '/open', text: 'Open Startup' },
   { href: 'https://shop.documenso.com', text: 'Shop', target: '_blank' },
   { href: 'https://status.documenso.com', text: 'Status', target: '_blank' },
   { href: 'mailto:support@documenso.com', text: 'Support', target: '_blank' },
+  { href: '/oss-friends', text: 'OSS Friends' },
   { href: '/privacy', text: 'Privacy' },
 ];
 

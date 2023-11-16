@@ -31,7 +31,7 @@ export const MENU_NAVIGATION_LINKS = [
   },
   {
     href: '/open',
-    text: 'Open',
+    text: 'Open Startup',
   },
   {
     href: 'https://status.documenso.com',

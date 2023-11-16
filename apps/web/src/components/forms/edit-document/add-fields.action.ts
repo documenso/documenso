@@ -1,8 +1,8 @@
 'use server';
 
-import { getRequiredServerComponentSession } from '@documenso/lib/next-auth/get-server-session';
+import { getRequiredServerComponentSession } from '@documenso/lib/next-auth/get-server-component-session';
 import { setFieldsForDocument } from '@documenso/lib/server-only/field/set-fields-for-document';
-import { TAddFieldsFormSchema } from '@documenso/ui/primitives/document-flow/add-fields.types';
+import type { TAddFieldsFormSchema } from '@documenso/ui/primitives/document-flow/add-fields.types';
 
 export type AddFieldsActionInput = TAddFieldsFormSchema & {
   documentId: number;

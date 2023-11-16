@@ -26,14 +26,14 @@ export const DuplicateDocumentDialog = ({
   const router = useRouter();
   const { toast } = useToast();
 
-  const { data, isLoading } = trpcReact.document.getDocumentById.useQuery({
+  const { data: document, isLoading } = trpcReact.document.getDocumentById.useQuery({
     id,
   });
 
-  const documentData = data?.documentData
+  const documentData = document?.documentData
     ? {
-        ...data.documentData,
-        data: data.documentData.initialData,
+        ...document.documentData,
+        data: document.documentData.initialData,
       }
     : undefined;
 
@@ -78,7 +78,7 @@ export const DuplicateDocumentDialog = ({
           </div>
         ) : (
           <div className="p-2 [&>div]:h-[50vh] [&>div]:overflow-y-scroll  ">
-            <LazyPDFViewer key={data?.id} documentData={documentData} />
+            <LazyPDFViewer key={document?.id} documentData={documentData} />
           </div>
         )}
 
