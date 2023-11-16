@@ -1,8 +1,9 @@
 'use client';
 
-import React, { HTMLAttributes, useState } from 'react';
+import type { HTMLAttributes } from 'react';
+import React, { useState } from 'react';
 
-import { Copy, Share } from 'lucide-react';
+import { Copy, Sparkles } from 'lucide-react';
 import { FaXTwitter } from 'react-icons/fa6';
 
 import { useCopyShareLink } from '@documenso/lib/client-only/hooks/use-copy-share-link';
@@ -48,8 +49,10 @@ export const DocumentShareButton = ({
   const {
     mutateAsync: createOrGetShareLink,
     data: shareLink,
-    isLoading,
+    isLoading: isCreatingOrGettingShareLink,
   } = trpc.shareLink.createOrGetShareLink.useMutation();
+
+  const isLoading = isCreatingOrGettingShareLink || isCopyingShareLink;
 
   const onOpenChange = (nextOpen: boolean) => {
     if (nextOpen) {
@@ -95,7 +98,7 @@ export const DocumentShareButton = ({
 
     window.open(
       generateTwitterIntent(
-        `I just ${token ? 'signed' : 'sent'} a document with @documenso. Check it out!`,
+        `I just ${token ? 'signed' : 'sent'} a document in style with @documenso. Check it out!`,
         `${process.env.NEXT_PUBLIC_WEBAPP_URL}/share/${slug}`,
       ),
       '_blank',
@@ -108,31 +111,34 @@ export const DocumentShareButton = ({
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogTrigger onClick={(e) => e.stopPropagation()} asChild>
         {trigger?.({
-          disabled: !token || !documentId,
-          loading: isLoading || isCopyingShareLink,
+          disabled: !documentId,
+          loading: isLoading,
         }) || (
           <Button
             variant="outline"
             disabled={!token || !documentId}
-            className={cn('flex-1', className)}
-            loading={isLoading || isCopyingShareLink}
+            className={cn('flex-1 text-[11px]', className)}
+            loading={isLoading}
           >
-            {!isLoading && !isCopyingShareLink && <Share className="mr-2 h-5 w-5" />}
-            Share
+            {!isLoading && <Sparkles className="mr-2 h-5 w-5" />}
+            Share Signature Card
           </Button>
         )}
       </DialogTrigger>
 
       <DialogContent position="end">
         <DialogHeader>
-          <DialogTitle>Share</DialogTitle>
+          <DialogTitle>Share your signing experience!</DialogTitle>
 
-          <DialogDescription className="mt-4">Share your signing experience!</DialogDescription>
+          <DialogDescription className="mt-4">
+            Don't worry, the document you signed or sent wont be shared; only your signing
+            experience is. Share your signing card and showcase your signature!
+          </DialogDescription>
         </DialogHeader>
 
         <div className="flex w-full flex-col">
           <div className="rounded-md border p-4">
-            I just {token ? 'signed' : 'sent'} a document with{' '}
+            I just {token ? 'signed' : 'sent'} a document in style with{' '}
             <span className="font-medium text-blue-400">@documenso</span>
             . Check it out!
             <span className="mt-2 block" />
@@ -144,9 +150,12 @@ export const DocumentShareButton = ({
               {process.env.NEXT_PUBLIC_WEBAPP_URL}/share/{shareLink?.slug || '...'}
             </span>
             <div
-              className={cn('bg-muted/40 mt-4 aspect-video overflow-hidden rounded-lg border', {
-                'animate-pulse': !shareLink?.slug,
-              })}
+              className={cn(
+                'bg-muted/40 mt-4 aspect-[1200/630] overflow-hidden rounded-lg border',
+                {
+                  'animate-pulse': !shareLink?.slug,
+                },
+              )}
             >
               {shareLink?.slug && (
                 <img
@@ -158,21 +167,17 @@ export const DocumentShareButton = ({
             </div>
           </div>
 
-          <Button variant="outline" className="mt-4" onClick={onTweetClick}>
-            <FaXTwitter className="mr-2 h-4 w-4" />
-            Tweet
-          </Button>
+          <div className="mt-6 flex items-center gap-4">
+            <Button variant="outline" className="flex-1" onClick={onTweetClick}>
+              <FaXTwitter className="mr-2 h-4 w-4" />
+              Tweet
+            </Button>
 
-          <div className="relative flex items-center justify-center gap-x-4 py-4 text-xs uppercase">
-            <div className="bg-border h-px flex-1" />
-            <span className="text-muted-foreground bg-transparent">Or</span>
-            <div className="bg-border h-px flex-1" />
+            <Button variant="outline" className="flex-1" onClick={onCopyClick}>
+              <Copy className="mr-2 h-4 w-4" />
+              Copy Link
+            </Button>
           </div>
-
-          <Button variant="outline" onClick={onCopyClick}>
-            <Copy className="mr-2 h-4 w-4" />
-            Copy Link
-          </Button>
         </div>
       </DialogContent>
     </Dialog>

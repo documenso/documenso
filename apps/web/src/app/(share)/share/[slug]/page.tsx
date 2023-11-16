@@ -11,7 +11,7 @@ type SharePageProps = {
 export function generateMetadata({ params: { slug } }: SharePageProps) {
   return {
     title: 'Documenso - Share',
-    description: 'I just signed a document with Documenso!',
+    description: 'I just signed a document in style with Documenso!',
     openGraph: {
       title: 'Documenso - Join the open source signing revolution',
       description: 'I just signed with Documenso!',
