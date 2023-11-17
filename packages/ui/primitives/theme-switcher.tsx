@@ -3,45 +3,50 @@ import { Monitor, MoonStar, Sun } from 'lucide-react';
 import { useTheme } from 'next-themes';
 
 import { useIsMounted } from '@documenso/lib/client-only/hooks/use-is-mounted';
-import { cn } from '@documenso/ui/lib/utils';
 
 export const ThemeSwitcher = () => {
+  const { theme, setTheme } = useTheme();
   const isMounted = useIsMounted();
 
-  const { theme, setTheme } = useTheme();
-
-  const variants = {
-    light: { x: 0 },
-    dark: { x: 'calc((2.15rem + 0.30rem) * 1)' },
-    system: { x: 'calc((2rem + 0.5rem) * 2)' },
-  };
-
-  const getButtonClass = (currentTheme: 'light' | 'dark' | 'system') =>
-    cn('z-10 flex h-8 w-10 items-center justify-center rounded-full text-gray-400', {
-      'text-black dark:text-white': theme === currentTheme && isMounted,
-    });
-
   return (
-    <div className="relative flex items-center rounded-full bg-gray-200 p-1 dark:bg-stone-700">
-      {isMounted && (
-        <motion.div
-          className="absolute h-8 w-10 rounded-full bg-white shadow-sm dark:bg-stone-600"
-          initial={false}
-          animate={theme}
-          variants={variants}
-          transition={{ duration: 0.2, ease: 'backInOut' }}
-        ></motion.div>
-      )}
-
-      <button className={getButtonClass('light')} onClick={() => setTheme('light')}>
+    <div className="bg-muted flex items-center gap-x-1 rounded-full p-1">
+      <button
+        className="text-muted-foreground relative z-10 flex h-8 w-8 items-center justify-center rounded-full"
+        onClick={() => setTheme('light')}
+      >
+        {isMounted && theme === 'light' && (
+          <motion.div
+            className="bg-background absolute inset-0 rounded-full mix-blend-exclusion"
+            layoutId="selected-theme"
+          />
+        )}
         <Sun className="h-5 w-5" />
       </button>
 
-      <button className={getButtonClass('dark')} onClick={() => setTheme('dark')}>
+      <button
+        className="text-muted-foreground relative z-10 flex h-8 w-8 items-center justify-center rounded-full"
+        onClick={() => setTheme('dark')}
+      >
+        {isMounted && theme === 'dark' && (
+          <motion.div
+            className="bg-background absolute inset-0 rounded-full mix-blend-exclusion"
+            layoutId="selected-theme"
+          />
+        )}
+
         <MoonStar className="h-5 w-5" />
       </button>
 
-      <button className={getButtonClass('system')} onClick={() => setTheme('system')}>
+      <button
+        className="text-muted-foreground relative z-10 flex h-8 w-8 items-center justify-center rounded-full"
+        onClick={() => setTheme('system')}
+      >
+        {isMounted && theme === 'system' && (
+          <motion.div
+            className="bg-background absolute inset-0 rounded-full mix-blend-exclusion"
+            layoutId="selected-theme"
+          />
+        )}
         <Monitor className="h-5 w-5" />
       </button>
     </div>
