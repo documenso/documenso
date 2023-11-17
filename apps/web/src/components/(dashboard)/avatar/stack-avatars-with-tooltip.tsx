@@ -68,7 +68,7 @@ export const StackAvatarsWithTooltip = ({
             {waitingRecipients.length > 0 && (
               <div>
                 <h1 className="text-base font-medium">Waiting</h1>
-                {completedRecipients.map((recipient: Recipient) => (
+                {waitingRecipients.map((recipient: Recipient) => (
                   <div key={recipient.id} className="my-1 flex items-center gap-2">
                     <StackAvatar
                       first={true}
