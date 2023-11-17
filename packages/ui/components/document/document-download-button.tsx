@@ -1,11 +1,12 @@
 'use client';
 
-import { HTMLAttributes, useState } from 'react';
+import type { HTMLAttributes } from 'react';
+import { useState } from 'react';
 
 import { Download } from 'lucide-react';
 
 import { getFile } from '@documenso/lib/universal/upload/get-file';
-import { DocumentData } from '@documenso/prisma/client';
+import type { DocumentData } from '@documenso/prisma/client';
 import { Button } from '@documenso/ui/primitives/button';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
@@ -41,9 +42,10 @@ export const DocumentDownloadButton = ({
       });
 
       const link = window.document.createElement('a');
+      const baseTitle = fileName?.includes('.pdf') ? fileName.split('.pdf')[0] : fileName;
 
       link.href = window.URL.createObjectURL(blob);
-      link.download = fileName || 'document.pdf';
+      link.download = baseTitle ? `${baseTitle}_signed.pdf` : 'document.pdf';
 
       link.click();
 
