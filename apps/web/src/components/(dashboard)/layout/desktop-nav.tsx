@@ -1,6 +1,7 @@
 'use client';
 
-import { HTMLAttributes, useState } from 'react';
+import type { HTMLAttributes } from 'react';
+import { useState } from 'react';
 
 import { Search } from 'lucide-react';
 
@@ -14,6 +15,9 @@ export type DesktopNavProps = HTMLAttributes<HTMLDivElement>;
 export const DesktopNav = ({ className, ...props }: DesktopNavProps) => {
   // const pathname = usePathname();
   const [open, setOpen] = useState(false);
+
+  const isMacOS = /Macintosh|Mac\s+OS\s+X/i.test(navigator?.userAgent || 'unknown');
+  const modifierKey = isMacOS ? '⌘' : 'Ctrl';
 
   return (
     <div
@@ -34,7 +38,7 @@ export const DesktopNav = ({ className, ...props }: DesktopNavProps) => {
 
         <div>
           <div className="text-muted-foreground bg-muted rounded-md px-1.5 py-0.5 font-mono text-xs">
-            Ctrl+K
+            {modifierKey}+K
           </div>
         </div>
       </Button>
