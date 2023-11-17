@@ -2,10 +2,11 @@ import { DateTime } from 'luxon';
 import { P, match } from 'ts-pattern';
 
 import { prisma } from '@documenso/prisma';
-import { Document, Prisma, SigningStatus } from '@documenso/prisma/client';
+import type { Document, Prisma } from '@documenso/prisma/client';
+import { SigningStatus } from '@documenso/prisma/client';
 import { ExtendedDocumentStatus } from '@documenso/prisma/types/extended-document-status';
 
-import { FindResultSet } from '../../types/find-result-set';
+import type { FindResultSet } from '../../types/find-result-set';
 
 export interface FindDocumentsOptions {
   userId: number;
@@ -160,19 +161,11 @@ export const findDocuments = async ({
     }),
   ]);
 
-  const maskedData = data.map((doc) => ({
-    ...doc,
-    Recipient: doc.Recipient.map((recipient) => ({
-      ...recipient,
-      token: recipient.email === user.email ? recipient.token : '',
-    })),
-  }));
-
   return {
-    data: maskedData,
+    data,
     count,
     currentPage: Math.max(page, 1),
     perPage,
     totalPages: Math.ceil(count / perPage),
-  } satisfies FindResultSet<typeof maskedData>;
+  } satisfies FindResultSet<typeof data>;
 };
