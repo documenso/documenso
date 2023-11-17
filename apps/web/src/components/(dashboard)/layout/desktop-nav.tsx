@@ -16,7 +16,7 @@ export const DesktopNav = ({ className, ...props }: DesktopNavProps) => {
   // const pathname = usePathname();
   const [open, setOpen] = useState(false);
 
-  const platform = navigator?.userAgentData?.platform || navigator?.platform || 'unknown';
+  const platform = (typeof navigator !== 'undefined' && 'userAgentData' in navigator ? navigator?.userAgentData?.platform : navigator?.platform) || 'unknown';
   const modifierKey = platform.toLowerCase().includes('macos') || platform.toLowerCase().includes('macintel') ? '⌘' : 'Ctrl';
 
   return (
