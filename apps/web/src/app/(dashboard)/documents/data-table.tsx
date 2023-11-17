@@ -6,8 +6,8 @@ import { Loader } from 'lucide-react';
 import { useSession } from 'next-auth/react';
 
 import { useUpdateSearchParams } from '@documenso/lib/client-only/hooks/use-update-search-params';
-import { FindResultSet } from '@documenso/lib/types/find-result-set';
-import { Document, Recipient, User } from '@documenso/prisma/client';
+import type { FindResultSet } from '@documenso/lib/types/find-result-set';
+import type { Document, Recipient, User } from '@documenso/prisma/client';
 import { DataTable } from '@documenso/ui/primitives/data-table';
 import { DataTablePagination } from '@documenso/ui/primitives/data-table-pagination';
 
