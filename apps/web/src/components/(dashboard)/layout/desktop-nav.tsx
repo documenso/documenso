@@ -17,7 +17,7 @@ export const DesktopNav = ({ className, ...props }: DesktopNavProps) => {
   const [open, setOpen] = useState(false);
 
   const platform = navigator?.userAgentData?.platform || navigator?.platform || 'unknown';
-  const shortcutKey = platform === 'macOS' || platform === 'MacIntel' ? '⌘' : 'Ctrl';
+  const modifierKey = platform.toLowerCase().includes('macos') || platform.toLowerCase().includes('macintel') ? '⌘' : 'Ctrl';
 
   return (
     <div
@@ -38,7 +38,7 @@ export const DesktopNav = ({ className, ...props }: DesktopNavProps) => {
 
         <div>
           <div className="text-muted-foreground bg-muted rounded-md px-1.5 py-0.5 font-mono text-xs">
-            {shortcutKey}+K
+            {modifierKey}+K
           </div>
         </div>
       </Button>
