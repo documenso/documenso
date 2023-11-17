@@ -93,3 +93,24 @@
   mask-composite: exclude;
   -webkit-mask-composite: xor;
 }
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+  background: transparent;
+  border-radius: 10px;
+  scrollbar-gutter: stable;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  border-radius: 10px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgb(100 116 139 / 1);
+  border-radius: 10px;
+  width: 8px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgb(100 116 139 / 0.5);
+}

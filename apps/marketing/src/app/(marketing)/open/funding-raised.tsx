@@ -21,7 +21,7 @@ export const FundingRaised = ({ className, data, ...props }: FundingRaisedProps)
     <div className={cn('flex flex-col', className)} {...props}>
       <h3 className="px-4 text-lg font-semibold">Total Funding Raised</h3>
 
-      <div className="border-border mt-2.5 flex flex-1 flex-col items-center justify-center rounded-2xl border p-4 shadow-sm hover:shadow">
+      <div className="border-border mt-2.5 flex flex-1 flex-col items-center justify-center rounded-2xl border p-6 pl-2 pt-12 shadow-sm hover:shadow">
         <ResponsiveContainer width="100%" height={400}>
           <BarChart data={formattedData} margin={{ top: 40, right: 40, bottom: 20, left: 40 }}>
             <XAxis dataKey="date" />
@@ -51,7 +51,13 @@ export const FundingRaised = ({ className, data, ...props }: FundingRaisedProps)
               ]}
               cursor={{ fill: 'hsl(var(--primary) / 10%)' }}
             />
-            <Bar dataKey="amount" fill="hsl(var(--primary))" label="Amount Raised" />
+            <Bar
+              dataKey="amount"
+              fill="hsl(var(--primary))"
+              label="Amount Raised"
+              maxBarSize={60}
+              radius={[4, 4, 0, 0]}
+            />
           </BarChart>
         </ResponsiveContainer>
       </div>

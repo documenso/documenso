@@ -12,7 +12,8 @@
     "index.tsx"
   ],
   "scripts": {
-    "lint": "eslint \"**/*.ts*\"",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
     "clean": "rimraf node_modules"
   },
   "devDependencies": {

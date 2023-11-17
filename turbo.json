@@ -5,7 +5,12 @@
       "dependsOn": ["^build"],
       "outputs": [".next/**", "!.next/cache/**"]
     },
-    "lint": {},
+    "lint": {
+      "cache": false
+    },
+    "lint:fix": {
+      "cache": false
+    },
     "clean": {
       "cache": false
     },
@@ -75,6 +80,7 @@
     "NEXT_PRIVATE_SMTP_FROM_ADDRESS",
     "NEXT_PRIVATE_STRIPE_API_KEY",
     "NEXT_PRIVATE_STRIPE_WEBHOOK_SECRET",
+    "NEXT_PRIVATE_GITHUB_TOKEN",
     "VERCEL",
     "VERCEL_ENV",
     "VERCEL_URL",

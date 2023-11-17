@@ -91,8 +91,9 @@ export const NEXT_AUTH_OPTIONS: AuthOptions = {
       }
 
       if (
-        !merged.lastSignedIn ||
-        DateTime.fromISO(merged.lastSignedIn).plus({ hours: 1 }) <= DateTime.now()
+        merged.id &&
+        (!merged.lastSignedIn ||
+          DateTime.fromISO(merged.lastSignedIn).plus({ hours: 1 }) <= DateTime.now())
       ) {
         merged.lastSignedIn = new Date().toISOString();
 

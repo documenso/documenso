@@ -1,4 +1,4 @@
-import { getRequiredServerComponentSession } from '@documenso/lib/next-auth/get-server-session';
+import { getRequiredServerComponentSession } from '@documenso/lib/next-auth/get-server-component-session';
 
 import { ProfileForm } from '~/components/forms/profile';
 
