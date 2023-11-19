@@ -1,7 +1,7 @@
 import { redirect } from 'next/navigation';
 
 import { DOCUMENSO_ENCRYPTION_KEY } from '@documenso/lib/constants/crypto';
-import { getRequiredServerComponentSession } from '@documenso/lib/next-auth/get-server-session';
+import { getRequiredServerComponentSession } from '@documenso/lib/next-auth/get-server-component-session';
 
 import { TwoFactorAuthenticationForm } from '~/components/forms/2fa/two-factor-authentication';
 

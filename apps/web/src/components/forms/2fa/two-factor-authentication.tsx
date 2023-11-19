@@ -1,4 +1,4 @@
-import { getRequiredServerComponentSession } from '@documenso/lib/next-auth/get-server-session';
+import { getRequiredServerComponentSession } from '@documenso/lib/next-auth/get-server-component-session';
 import { getBackupCodes } from '@documenso/lib/server-only/2fa/get-backup-code';
 import { Card } from '@documenso/ui/primitives/card';
 

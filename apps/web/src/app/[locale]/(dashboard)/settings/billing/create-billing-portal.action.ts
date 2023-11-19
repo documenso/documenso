@@ -5,7 +5,7 @@ import {
   getStripeCustomerById,
 } from '@documenso/ee/server-only/stripe/get-customer';
 import { getPortalSession } from '@documenso/ee/server-only/stripe/get-portal-session';
-import { getRequiredServerComponentSession } from '@documenso/lib/next-auth/get-server-session';
+import { getRequiredServerComponentSession } from '@documenso/lib/next-auth/get-server-component-session';
 import { Stripe, stripe } from '@documenso/lib/server-only/stripe';
 import { getSubscriptionByUserId } from '@documenso/lib/server-only/subscription/get-subscription-by-user-id';
 

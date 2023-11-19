@@ -6,6 +6,7 @@ import { deleteDraftDocument } from '@documenso/lib/server-only/document/delete-
 import { duplicateDocumentById } from '@documenso/lib/server-only/document/duplicate-document-by-id';
 import { getDocumentById } from '@documenso/lib/server-only/document/get-document-by-id';
 import { getDocumentAndSenderByToken } from '@documenso/lib/server-only/document/get-document-by-token';
+import { resendDocument } from '@documenso/lib/server-only/document/resend-document';
 import { sendDocument } from '@documenso/lib/server-only/document/send-document';
 import { setFieldsForDocument } from '@documenso/lib/server-only/field/set-fields-for-document';
 import { setRecipientsForDocument } from '@documenso/lib/server-only/recipient/set-recipients-for-document';
@@ -16,6 +17,7 @@ import {
   ZDeleteDraftDocumentMutationSchema,
   ZGetDocumentByIdQuerySchema,
   ZGetDocumentByTokenQuerySchema,
+  ZResendDocumentMutationSchema,
   ZSendDocumentMutationSchema,
   ZSetFieldsForDocumentMutationSchema,
   ZSetRecipientsForDocumentMutationSchema,
@@ -170,6 +172,26 @@ export const documentRouter = router({
         throw new TRPCError({
           code: 'BAD_REQUEST',
           message: 'We were unable to send this document. Please try again later.',
+        });
+      }
+    }),
+  resendDocument: authenticatedProcedure
+    .input(ZResendDocumentMutationSchema)
+    .mutation(async ({ input, ctx }) => {
+      try {
+        const { documentId, recipients } = input;
+
+        return await resendDocument({
+          userId: ctx.user.id,
+          documentId,
+          recipients,
+        });
+      } catch (err) {
+        console.error(err);
+
+        throw new TRPCError({
+          code: 'BAD_REQUEST',
+          message: 'We were unable to resend this document. Please try again later.',
         });
       }
     }),

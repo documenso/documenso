@@ -1,4 +1,4 @@
-import { Stripe } from '@documenso/lib/server-only/stripe';
+import type { Stripe } from '@documenso/lib/server-only/stripe';
 import { prisma } from '@documenso/prisma';
 import { SubscriptionStatus } from '@documenso/prisma/client';
 

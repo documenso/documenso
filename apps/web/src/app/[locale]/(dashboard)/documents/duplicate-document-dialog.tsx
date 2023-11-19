@@ -26,9 +26,11 @@ export const DuplicateDocumentDialog = ({
 }: DuplicateDocumentDialogProps) => {
   const router = useRouter();
   const { toast } = useToast();
-  const { data, isLoading } = trpcReact.document.getDocumentById.useQuery({
+  const { data: document, isLoading } = trpcReact.document.getDocumentById.useQuery({
     id,
   });
+  const documentData = document?.documentData;
+
   const locale = useParams()?.locale as LocaleTypes;
 
   const { mutateAsync: duplicateDocument, isLoading: isDuplicateLoading } =
@@ -64,7 +66,7 @@ export const DuplicateDocumentDialog = ({
         <DialogHeader>
           <DialogTitle>Duplicate</DialogTitle>
         </DialogHeader>
-        {!data?.documentData || isLoading ? (
+        {!documentData || isLoading ? (
           <div className="mx-auto -mt-4 flex w-full max-w-screen-xl flex-col px-4 md:px-8">
             <h1 className="mt-4 grow-0 truncate text-2xl font-semibold md:text-3xl">
               Loading Document...
@@ -72,7 +74,7 @@ export const DuplicateDocumentDialog = ({
           </div>
         ) : (
           <div className="p-2 [&>div]:h-[50vh] [&>div]:overflow-y-scroll  ">
-            <LazyPDFViewer key={data?.documentMeta?.documentId} documentData={data?.documentData} />
+            <LazyPDFViewer key={document?.id} documentData={documentData} />
           </div>
         )}
 

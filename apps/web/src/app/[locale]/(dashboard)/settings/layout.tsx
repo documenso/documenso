@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { DOCUMENSO_ENCRYPTION_KEY } from '@documenso/lib/constants/crypto';
-import { getRequiredServerComponentSession } from '@documenso/lib/next-auth/get-server-session';
+import { getRequiredServerComponentSession } from '@documenso/lib/next-auth/get-server-component-session';
 
 import { DesktopNav } from '~/components/(dashboard)/settings/layout/desktop-nav';
 import { MobileNav } from '~/components/(dashboard)/settings/layout/mobile-nav';
