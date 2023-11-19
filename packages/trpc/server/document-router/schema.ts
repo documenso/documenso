@@ -21,6 +21,13 @@ export const ZCreateDocumentMutationSchema = z.object({
 
 export type TCreateDocumentMutationSchema = z.infer<typeof ZCreateDocumentMutationSchema>;
 
+export const ZSetTitleForDocumentMutationSchema = z.object({
+  documentId: z.number(),
+  title: z.string().min(1),
+});
+
+export type TSetTitleForDocumentMutationSchema = z.infer<typeof ZSetTitleForDocumentMutationSchema>;
+
 export const ZSetRecipientsForDocumentMutationSchema = z.object({
   documentId: z.number(),
   recipients: z.array(

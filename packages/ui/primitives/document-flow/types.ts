@@ -3,6 +3,8 @@ import { z } from 'zod';
 import { FieldType } from '@documenso/prisma/client';
 
 export const ZDocumentFlowFormSchema = z.object({
+  title: z.string().min(1),
+
   signers: z
     .array(
       z.object({
