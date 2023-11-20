@@ -12,7 +12,6 @@ import { Toaster } from '@documenso/ui/primitives/toaster';
 import { TooltipProvider } from '@documenso/ui/primitives/tooltip';
 
 import { ThemeProvider } from '~/providers/next-theme';
-import { PlausibleProvider } from '~/providers/plausible';
 import { PostHogPageview } from '~/providers/posthog';
 
 import './globals.css';
@@ -69,13 +68,11 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       <body>
         <LocaleProvider locale={locale}>
           <FeatureFlagProvider initialFlags={flags}>
-            <PlausibleProvider>
-              <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-                <TooltipProvider>
-                  <TrpcProvider>{children}</TrpcProvider>
-                </TooltipProvider>
-              </ThemeProvider>
-            </PlausibleProvider>
+            <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+              <TooltipProvider>
+                <TrpcProvider>{children}</TrpcProvider>
+              </TooltipProvider>
+            </ThemeProvider>
 
             <Toaster />
           </FeatureFlagProvider>

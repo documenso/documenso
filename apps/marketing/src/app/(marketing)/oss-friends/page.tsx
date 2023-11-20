@@ -2,7 +2,7 @@ import Image from 'next/image';
 
 import { z } from 'zod';
 
-import backgroundPattern from '~/assets/background-pattern.png';
+import backgroundPattern from '@documenso/assets/images/background-pattern.png';
 
 import { OSSFriendsContainer } from './container';
 import { TOSSFriendsSchema, ZOSSFriendsSchema } from './schema';

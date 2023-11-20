@@ -1,10 +1,12 @@
 'use client';
 
-import { HTMLAttributes, useState } from 'react';
+import type { HTMLAttributes } from 'react';
+import { useState } from 'react';
 
 import Image from 'next/image';
 import Link from 'next/link';
 
+import LogoImage from '@documenso/assets/logo.png';
 import { useFeatureFlags } from '@documenso/lib/client-only/providers/feature-flag';
 import { cn } from '@documenso/ui/lib/utils';
 
@@ -25,7 +27,7 @@ export const Header = ({ className, ...props }: HeaderProps) => {
       <div className="flex items-center space-x-4">
         <Link href="/" className="z-10" onClick={() => setIsHamburgerMenuOpen(false)}>
           <Image
-            src="/logo.png"
+            src={LogoImage}
             alt="Documenso Logo"
             className="dark:invert"
             width={170}
@@ -62,7 +64,7 @@ export const Header = ({ className, ...props }: HeaderProps) => {
           href="/open"
           className="text-muted-foreground hover:text-muted-foreground/80 text-sm font-semibold"
         >
-          Open
+          Open Startup
         </Link>
 
         <Link

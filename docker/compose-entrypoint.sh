@@ -7,6 +7,6 @@ cd "$MONOREPO_ROOT"
 
 npm ci
 
-npm run db-migrate:dev
+npm run prisma:migrate-dev
 
 npm run dev
