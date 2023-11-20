@@ -193,6 +193,12 @@ git clone https://github.com/documenso/documenso
 
 We support DevContainers for VSCode. [Click here to get started.](https://vscode.dev/redirect?url=vscode://ms-vscode-remote.remote-containers/cloneInVolume?url=https://github.com/documenso/documenso)
 
+### Video walkthrough
+
+If you're a visual learner and prefer to watch a video walkthrough of setting up Documenso locally, check out this video:
+
+[![Watch the video](https://img.youtube.com/vi/Y0ppIQrEnZs/hqdefault.jpg)](https://youtu.be/Y0ppIQrEnZs)
+
 ## Docker
 
 🚧 Docker containers and images are current in progress. We are actively working on bringing a simple Docker build and publish pipeline for Documenso.
