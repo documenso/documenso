@@ -279,7 +279,7 @@ export const AddSignatureFormPartial = ({
                             onBlur={field.onBlur}
                             onChange={(value) => {
                               onFormValueChange(FieldType.SIGNATURE);
-                              field.onChange(value);
+                              field.onChange(value ?? '');
                             }}
                           />
                         </CardContent>
