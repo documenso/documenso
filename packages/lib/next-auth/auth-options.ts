@@ -88,16 +88,7 @@ export const NEXT_AUTH_OPTIONS: AuthOptions = {
         merged.id = retrieved.id;
         merged.name = retrieved.name;
         merged.email = retrieved.email;
-      }
-
-      if (!merged.emailVerified) {
-        const retrieved = await prisma.user.findFirst({
-          where: {
-            id: Number(merged.id ?? token.sub),
-          },
-        });
-
-        merged.emailVerified = retrieved?.emailVerified;
+        merged.emailVerified = retrieved.emailVerified;
       }
 
       if (
