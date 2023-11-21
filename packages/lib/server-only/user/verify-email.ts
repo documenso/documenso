@@ -1,3 +1,5 @@
+import { DateTime } from 'luxon';
+
 import { prisma } from '@documenso/prisma';
 
 import { sendConfirmationToken } from './send-confirmation-token';
@@ -24,9 +26,23 @@ export const verifyEmail = async ({ token }: VerifyEmailProps) => {
   const valid = verificationToken.expires > new Date();
 
   if (!valid) {
-    // if the token is expired, generate a new token and send the email
-    // and return false
-    await sendConfirmationToken({ email: verificationToken.user.email });
+    const mostRecentToken = await prisma.verificationToken.findFirst({
+      where: {
+        userId: verificationToken.userId,
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+    });
+
+    // If there isn't a recent token or it's older than 1 hour, send a new token
+    if (
+      !mostRecentToken ||
+      DateTime.now().minus({ hours: 1 }).toJSDate() > mostRecentToken.createdAt
+    ) {
+      await sendConfirmationToken({ email: verificationToken.user.email });
+    }
+
     return valid;
   }
 

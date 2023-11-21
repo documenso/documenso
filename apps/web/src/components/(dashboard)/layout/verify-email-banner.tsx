@@ -1,48 +1,123 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
+import { AlertTriangle } from 'lucide-react';
+
+import { ONE_SECOND } from '@documenso/lib/constants/time';
 import { trpc } from '@documenso/trpc/react';
 import { Button } from '@documenso/ui/primitives/button';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogTitle,
+} from '@documenso/ui/primitives/dialog';
+import { useToast } from '@documenso/ui/primitives/use-toast';
 
 export type VerifyEmailBannerProps = {
-  userEmail: string;
+  email: string;
 };
 
-export const VerifyEmailBanner = ({ userEmail }: VerifyEmailBannerProps) => {
+const RESEND_CONFIRMATION_EMAIL_TIMEOUT = 20 * ONE_SECOND;
+
+export const VerifyEmailBanner = ({ email }: VerifyEmailBannerProps) => {
+  const { toast } = useToast();
+  const [isOpen, setIsOpen] = useState(false);
+
   const [isButtonDisabled, setIsButtonDisabled] = useState(false);
-  const { mutateAsync: sendConfirmationEmail } = trpc.profile.sendConfirmationEmail.useMutation();
+
+  const { mutateAsync: sendConfirmationEmail, isLoading } =
+    trpc.profile.sendConfirmationEmail.useMutation();
 
   const onResendConfirmationEmail = async () => {
-    setIsButtonDisabled(true);
-    await sendConfirmationEmail({ email: userEmail });
-    setTimeout(() => setIsButtonDisabled(false), 20000);
+    try {
+      setIsButtonDisabled(true);
+
+      await sendConfirmationEmail({ email: email });
+
+      toast({
+        title: 'Success',
+        description: 'Verification email sent successfully.',
+      });
+
+      setIsOpen(false);
+      setTimeout(() => setIsButtonDisabled(false), RESEND_CONFIRMATION_EMAIL_TIMEOUT);
+    } catch (err) {
+      setIsButtonDisabled(false);
+
+      toast({
+        title: 'Error',
+        description: 'Something went wrong while sending the confirmation email.',
+        variant: 'destructive',
+      });
+    }
   };
 
+  useEffect(() => {
+    // Check localStorage to see if we've recently automatically displayed the dialog
+    // if it was within the past 24 hours, don't show it again
+    // otherwise, show it again and update the localStorage timestamp
+    const emailVerificationDialogLastShown = localStorage.getItem(
+      'emailVerificationDialogLastShown',
+    );
+
+    if (emailVerificationDialogLastShown) {
+      const lastShownTimestamp = parseInt(emailVerificationDialogLastShown);
+
+      if (Date.now() - lastShownTimestamp < 24 * 60 * 60 * 1000) {
+        return;
+      }
+    }
+
+    setIsOpen(true);
+
+    localStorage.setItem('emailVerificationDialogLastShown', Date.now().toString());
+  }, []);
+
   return (
-    <div className="relative isolate mb-4 flex items-center gap-x-6 overflow-hidden bg-yellow-400 px-6 py-4 sm:px-3.5 sm:before:flex-1">
-      <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2">
-        <p className="text-sm leading-6 text-gray-900">
-          <strong className="font-semibold">Hey, {userEmail}</strong>
-          <svg
-            viewBox="0 0 2 2"
-            className="mx-2 inline h-0.5 w-0.5 fill-current"
-            aria-hidden="true"
-          >
-            <circle cx={1} cy={1} r={1} />
-          </svg>
-          It seems that you haven't confirmed your email yet. For complete access, please confirm
-          your email.
-        </p>
-        <Button
-          className="flex-none rounded-full bg-gray-900 px-3.5 py-1 text-sm font-semibold text-white shadow-sm hover:bg-gray-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-900"
-          onClick={onResendConfirmationEmail}
-          disabled={isButtonDisabled}
-        >
-          {isButtonDisabled ? 'Please check your email' : 'Resend confirmation email'}
-        </Button>
+    <>
+      <div className="bg-yellow-200 dark:bg-yellow-400">
+        <div className="mx-auto flex max-w-screen-xl items-center justify-center gap-x-4 px-4 py-2 text-sm font-medium text-yellow-900">
+          <div className="flex items-center">
+            <AlertTriangle className="mr-2.5 h-5 w-5" />
+            Verify your email address to unlock all features.
+          </div>
+
+          <div>
+            <Button
+              variant="ghost"
+              className="h-auto px-2.5 py-1.5 text-yellow-900 hover:bg-yellow-100 hover:text-yellow-900 dark:hover:bg-yellow-500"
+              disabled={isButtonDisabled}
+              onClick={() => setIsOpen(true)}
+              size="sm"
+            >
+              {isButtonDisabled ? 'Verification Email Sent' : 'Verify Now'}
+            </Button>
+          </div>
+        </div>
       </div>
-      <div className="flex flex-1 justify-end"></div>
-    </div>
+
+      <Dialog open={isOpen} onOpenChange={setIsOpen}>
+        <DialogContent>
+          <DialogTitle>Verify your email address</DialogTitle>
+
+          <DialogDescription>
+            We've sent a confirmation email to <strong>{email}</strong>. Please check your inbox and
+            click the link in the email to verify your account.
+          </DialogDescription>
+
+          <div>
+            <Button
+              disabled={isButtonDisabled}
+              loading={isLoading}
+              onClick={onResendConfirmationEmail}
+            >
+              {isLoading ? 'Sending...' : 'Resend Confirmation Email'}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 };

@@ -24,14 +24,14 @@ export const sendConfirmationEmail = async ({ userId }: SendConfirmationEmailPro
     },
   });
 
-  const token = user.VerificationToken[0]?.token;
+  const [verificationToken] = user.VerificationToken;
 
-  if (!token) {
+  if (!verificationToken?.token) {
     throw new Error('Verification token not found for the user');
   }
 
   const assetBaseUrl = process.env.NEXT_PUBLIC_WEBAPP_URL || 'http://localhost:3000';
-  const confirmationLink = `${assetBaseUrl}/confirm-email/?token=${token}`;
+  const confirmationLink = `${assetBaseUrl}/verify-email/${verificationToken.token}`;
   const senderName = process.env.NEXT_PRIVATE_SMTP_FROM_NAME || 'Documenso';
   const senderAdress = process.env.NEXT_PRIVATE_SMTP_FROM_ADDRESS || 'noreply@documenso.com';
 
