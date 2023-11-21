@@ -4,9 +4,9 @@ import { match } from 'ts-pattern';
 
 import { getPricesByInterval } from '@documenso/ee/server-only/stripe/get-prices-by-interval';
 import { getProductByPriceId } from '@documenso/ee/server-only/stripe/get-product-by-price-id';
-import { getRequiredServerComponentSession } from '@documenso/lib/next-auth/get-server-session';
+import { getRequiredServerComponentSession } from '@documenso/lib/next-auth/get-server-component-session';
 import { getServerComponentFlag } from '@documenso/lib/server-only/feature-flags/get-server-component-feature-flag';
-import { Stripe } from '@documenso/lib/server-only/stripe';
+import type { Stripe } from '@documenso/lib/server-only/stripe';
 import { getSubscriptionByUserId } from '@documenso/lib/server-only/subscription/get-subscription-by-user-id';
 
 import { LocaleDate } from '~/components/formatter/locale-date';
