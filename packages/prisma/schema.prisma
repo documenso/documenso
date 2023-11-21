@@ -36,7 +36,8 @@ model User {
   Document           Document[]
   Subscription       Subscription?
   PasswordResetToken PasswordResetToken[]
-
+  VerificationToken  VerificationToken[]
+  
   @@index([email])
 }
 
@@ -47,6 +48,16 @@ model PasswordResetToken {
   expiry    DateTime
   userId    Int
   User      User     @relation(fields: [userId], references: [id])
+}
+
+model VerificationToken {
+  id         Int      @id @default(autoincrement())
+  identifier String
+  token      String   @unique
+  expires    DateTime
+  createdAt  DateTime @default(now())
+  userId     Int
+  user       User     @relation(fields: [userId], references: [id])
 }
 
 enum SubscriptionStatus {

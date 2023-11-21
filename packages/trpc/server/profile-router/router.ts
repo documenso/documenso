@@ -3,11 +3,13 @@ import { TRPCError } from '@trpc/server';
 import { forgotPassword } from '@documenso/lib/server-only/user/forgot-password';
 import { getUserById } from '@documenso/lib/server-only/user/get-user-by-id';
 import { resetPassword } from '@documenso/lib/server-only/user/reset-password';
+import { sendConfirmationToken } from '@documenso/lib/server-only/user/send-confirmation-token';
 import { updatePassword } from '@documenso/lib/server-only/user/update-password';
 import { updateProfile } from '@documenso/lib/server-only/user/update-profile';
 
 import { adminProcedure, authenticatedProcedure, procedure, router } from '../trpc';
 import {
+  ZConfirmEmailMutationSchema,
   ZForgotPasswordFormSchema,
   ZResetPasswordFormSchema,
   ZRetrieveUserByIdQuerySchema,
@@ -110,4 +112,25 @@ export const profileRouter = router({
       });
     }
   }),
+
+  sendConfirmationEmail: procedure
+    .input(ZConfirmEmailMutationSchema)
+    .mutation(async ({ input }) => {
+      try {
+        const { email } = input;
+
+        return sendConfirmationToken({ email });
+      } catch (err) {
+        let message = 'We were unable to send a confirmation email. Please try again.';
+
+        if (err instanceof Error) {
+          message = err.message;
+        }
+
+        throw new TRPCError({
+          code: 'BAD_REQUEST',
+          message,
+        });
+      }
+    }),
 });
