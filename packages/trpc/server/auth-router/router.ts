@@ -1,6 +1,7 @@
 import { TRPCError } from '@trpc/server';
 
 import { createUser } from '@documenso/lib/server-only/user/create-user';
+import { sendConfirmationToken } from '@documenso/lib/server-only/user/send-confirmation-token';
 
 import { procedure, router } from '../trpc';
 import { ZSignUpMutationSchema } from './schema';
@@ -10,7 +11,11 @@ export const authRouter = router({
     try {
       const { name, email, password, signature } = input;
 
-      return await createUser({ name, email, password, signature });
+      const user = await createUser({ name, email, password, signature });
+
+      await sendConfirmationToken({ email: user.email });
+
+      return user;
     } catch (err) {
       let message =
         'We were unable to create your account. Please review the information you provided and try again.';
