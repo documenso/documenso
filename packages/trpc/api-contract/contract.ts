@@ -4,19 +4,19 @@ import { z } from 'zod';
 const c = initContract();
 
 const GetDocumentsQuery = z.object({
-  take: z.string().default('10'),
-  skip: z.string().default('0'),
+  page: z.string().optional(),
+  perPage: z.string().optional(),
 });
 
 const DocumentSchema = z.object({
-  id: z.string(),
+  id: z.number(),
   userId: z.number(),
   title: z.string(),
   status: z.string(),
   documentDataId: z.string(),
-  createdAt: z.string(),
-  updatedAt: z.string(),
-  completedAt: z.string(),
+  createdAt: z.date(),
+  updatedAt: z.date(),
+  completedAt: z.date().nullable(),
 });
 
 export const contract = c.router({
