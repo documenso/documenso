@@ -37,3 +37,15 @@ jobs:
 
       - name: Build
         run: npm run build
+  build_docker:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 2
+
+      - name: Build Docker Image
+        run: ./docker/build.sh
+

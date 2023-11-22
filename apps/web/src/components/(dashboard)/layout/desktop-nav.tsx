@@ -16,7 +16,9 @@ export const DesktopNav = ({ className, ...props }: DesktopNavProps) => {
   // const pathname = usePathname();
   const [open, setOpen] = useState(false);
 
-  const isMacOS = /Macintosh|Mac\s+OS\s+X/i.test(navigator?.userAgent || 'unknown');
+  const userAgent = typeof navigator !== 'undefined' ? navigator.userAgent : 'unknown';
+
+  const isMacOS = /Macintosh|Mac\s+OS\s+X/i.test(userAgent);
   const modifierKey = isMacOS ? '⌘' : 'Ctrl';
 
   return (

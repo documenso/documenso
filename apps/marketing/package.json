@@ -13,6 +13,7 @@
     "copy:pdfjs": "node ../../scripts/copy-pdfjs.cjs"
   },
   "dependencies": {
+    "@documenso/assets": "*",
     "@documenso/lib": "*",
     "@documenso/tailwind-config": "*",
     "@documenso/trpc": "*",
