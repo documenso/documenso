@@ -19,13 +19,18 @@ const DocumentSchema = z.object({
   completedAt: z.date().nullable(),
 });
 
+const SuccessfulResponse = z.object({
+  documents: DocumentSchema.array(),
+  totalPages: z.number(),
+});
+
 export const contract = c.router({
   getDocuments: {
     method: 'GET',
     path: '/documents',
     query: GetDocumentsQuery,
     responses: {
-      200: DocumentSchema.array(),
+      200: SuccessfulResponse,
     },
     summary: 'Get all documents for a user',
   },
