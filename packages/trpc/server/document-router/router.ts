@@ -121,6 +121,7 @@ export const documentRouter = router({
       const { documentId, title } = input;
 
       return await updateTitle({
+        userId: ctx.user.id,
         documentId,
         title,
       });

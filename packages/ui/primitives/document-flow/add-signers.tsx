@@ -226,11 +226,10 @@ export const AddSignersFormPartial = ({
         />
 
         <DocumentFlowFormContainerActions
+          canGoBack={document.status === DocumentStatus.DRAFT}
           loading={isSubmitting}
           disabled={isSubmitting}
-          onGoBackClick={
-            document.status === DocumentStatus.DRAFT ? documentFlow.onBackStep : undefined
-          }
+          onGoBackClick={documentFlow.onBackStep}
           onGoNextClick={() => void onFormSubmit()}
         />
       </DocumentFlowFormContainerFooter>

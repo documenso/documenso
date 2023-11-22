@@ -65,7 +65,7 @@ export const EditDocumentForm = ({
       title: 'Add Signers',
       description: 'Add the people who will sign the document.',
       stepIndex: 2,
-      onBackStep: () => setStep('title'),
+      onBackStep: () => (document.status === DocumentStatus.DRAFT ? setStep('title') : undefined),
     },
     fields: {
       title: 'Add Fields',

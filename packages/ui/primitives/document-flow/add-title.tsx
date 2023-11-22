@@ -2,7 +2,7 @@
 
 import { useForm } from 'react-hook-form';
 
-import type { Field, Recipient } from '@documenso/prisma/client';
+import { Field, Recipient } from '@documenso/prisma/client';
 import type { DocumentWithData } from '@documenso/prisma/types/document-with-data';
 import { FormErrorMessage } from '@documenso/ui/primitives/form/form-error-message';
 import { Input } from '@documenso/ui/primitives/input';
@@ -60,7 +60,7 @@ export const AddTitleFormPartial = ({
                 id="title"
                 className="bg-background mt-2"
                 disabled={isSubmitting}
-                {...register('title')}
+                {...register('title', { required: 'Title cannot be empty' })}
               />
 
               <FormErrorMessage className="mt-2" error={errors.title} />
