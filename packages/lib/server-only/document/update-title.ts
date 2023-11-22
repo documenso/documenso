@@ -12,10 +12,10 @@ export const updateTitle = async ({ userId, documentId, title }: UpdateTitleOpti
   return await prisma.document.update({
     where: {
       id: documentId,
+      userId,
     },
     data: {
       title: title,
-      userId,
     },
   });
 };
