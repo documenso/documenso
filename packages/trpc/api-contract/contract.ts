@@ -24,14 +24,29 @@ const SuccessfulResponse = z.object({
   totalPages: z.number(),
 });
 
-export const contract = c.router({
-  getDocuments: {
-    method: 'GET',
-    path: '/documents',
-    query: GetDocumentsQuery,
-    responses: {
-      200: SuccessfulResponse,
+export const contract = c.router(
+  {
+    getDocuments: {
+      method: 'GET',
+      path: '/documents',
+      query: GetDocumentsQuery,
+      responses: {
+        200: SuccessfulResponse,
+      },
+      summary: 'Get all documents',
     },
-    summary: 'Get all documents for a user',
+    getDocument: {
+      method: 'GET',
+      path: `/documents/:id`,
+      responses: {
+        200: DocumentSchema,
+      },
+      summary: 'Get a single document',
+    },
   },
-});
+  {
+    baseHeaders: z.object({
+      authorization: z.string(),
+    }),
+  },
+);
