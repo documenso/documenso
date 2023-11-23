@@ -37,7 +37,8 @@ model User {
   Subscription       Subscription?
   PasswordResetToken PasswordResetToken[]
   VerificationToken  VerificationToken[]
-  
+  ApiToken           ApiToken[]
+
   @@index([email])
 }
 
@@ -58,6 +59,21 @@ model VerificationToken {
   createdAt  DateTime @default(now())
   userId     Int
   user       User     @relation(fields: [userId], references: [id])
+}
+
+enum ApiTokenAlgorithm {
+  SHA512
+}
+
+model ApiToken {
+  id        Int               @id @default(autoincrement())
+  name      String
+  token     String            @unique
+  algorithm ApiTokenAlgorithm @default(SHA512)
+  expires   DateTime
+  createdAt DateTime          @default(now())
+  userId    Int
+  user      User              @relation(fields: [userId], references: [id])
 }
 
 enum SubscriptionStatus {
