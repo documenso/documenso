@@ -3,7 +3,11 @@ import { z } from 'zod';
 
 const c = initContract();
 
-const GetDocumentsQuery = z.object({
+/* 
+  These schemas should be moved from here probably.
+  It grows quickly.
+*/
+const GetDocumentsQuerySchema = z.object({
   page: z.string().optional(),
   perPage: z.string().optional(),
 });
@@ -19,9 +23,13 @@ const DocumentSchema = z.object({
   completedAt: z.date().nullable(),
 });
 
-const SuccessfulResponse = z.object({
+const SuccessfulResponseSchema = z.object({
   documents: DocumentSchema.array(),
   totalPages: z.number(),
+});
+
+const UnsuccessfulResponseSchema = z.object({
+  message: z.string(),
 });
 
 export const contract = c.router(
@@ -29,9 +37,9 @@ export const contract = c.router(
     getDocuments: {
       method: 'GET',
       path: '/documents',
-      query: GetDocumentsQuery,
+      query: GetDocumentsQuerySchema,
       responses: {
-        200: SuccessfulResponse,
+        200: SuccessfulResponseSchema,
       },
       summary: 'Get all documents',
     },
@@ -42,6 +50,16 @@ export const contract = c.router(
         200: DocumentSchema,
       },
       summary: 'Get a single document',
+    },
+    deleteDocument: {
+      method: 'DELETE',
+      path: `/documents/:id`,
+      body: z.string(),
+      responses: {
+        200: DocumentSchema,
+        404: UnsuccessfulResponseSchema,
+      },
+      summary: 'Delete a document',
     },
   },
   {
