@@ -15,7 +15,7 @@ export const updateTitle = async ({ userId, documentId, title }: UpdateTitleOpti
       userId,
     },
     data: {
-      title: title,
+      title,
     },
   });
 };

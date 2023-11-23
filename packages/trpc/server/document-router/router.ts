@@ -119,11 +119,13 @@ export const documentRouter = router({
     .input(ZSetTitleForDocumentMutationSchema)
     .mutation(async ({ input, ctx }) => {
       const { documentId, title } = input;
+      
+      const userId = ctx.user.id;
 
       return await updateTitle({
-        userId: ctx.user.id,
-        documentId,
         title,
+        userId,
+        documentId,
       });
     }),
 
