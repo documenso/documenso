@@ -54,6 +54,6 @@ export interface DocumentFlowStep {
   title: string;
   description: string;
   stepIndex: number;
-  onBackStep?: () => void;
-  onNextStep?: () => void;
+  onBackStep?: () => unknown;
+  onNextStep?: () => unknown;
 }
