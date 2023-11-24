@@ -1,9 +1,7 @@
 import { z } from 'zod';
 
-import {
-  TFeatureFlagValue,
-  ZFeatureFlagValueSchema,
-} from '@documenso/lib/client-only/providers/feature-flag.types';
+import type { TFeatureFlagValue } from '@documenso/lib/client-only/providers/feature-flag.types';
+import { ZFeatureFlagValueSchema } from '@documenso/lib/client-only/providers/feature-flag.types';
 import { APP_BASE_URL } from '@documenso/lib/constants/app';
 import { LOCAL_FEATURE_FLAGS, isFeatureFlagEnabled } from '@documenso/lib/constants/feature-flags';
 
@@ -19,6 +17,10 @@ export const getFlag = async (
   options?: GetFlagOptions,
 ): Promise<TFeatureFlagValue> => {
   const requestHeaders = options?.requestHeaders ?? {};
+
+  if (!LOCAL_FEATURE_FLAGS[flag]) {
+    return LOCAL_FEATURE_FLAGS[flag];
+  }
 
   if (!isFeatureFlagEnabled()) {
     return LOCAL_FEATURE_FLAGS[flag] ?? true;

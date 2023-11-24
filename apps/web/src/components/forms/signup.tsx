@@ -8,6 +8,7 @@ import { signIn } from 'next-auth/react';
 import { Controller, useForm } from 'react-hook-form';
 import { z } from 'zod';
 
+import { useAnalytics } from '@documenso/lib/client-only/hooks/use-analytics';
 import { TRPCClientError } from '@documenso/trpc/client';
 import { trpc } from '@documenso/trpc/react';
 import { cn } from '@documenso/ui/lib/utils';
@@ -33,6 +34,7 @@ export type SignUpFormProps = {
 
 export const SignUpForm = ({ className }: SignUpFormProps) => {
   const { toast } = useToast();
+  const analytics = useAnalytics();
   const [showPassword, setShowPassword] = useState(false);
 
   const {
@@ -60,6 +62,11 @@ export const SignUpForm = ({ className }: SignUpFormProps) => {
         email,
         password,
         callbackUrl: '/',
+      });
+
+      analytics.capture('App: User Sign Up', {
+        email,
+        timestamp: new Date().toISOString(),
       });
     } catch (err) {
       if (err instanceof TRPCClientError && err.data?.code === 'BAD_REQUEST') {

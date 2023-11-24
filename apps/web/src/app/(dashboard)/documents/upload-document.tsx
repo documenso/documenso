@@ -8,6 +8,7 @@ import { useRouter } from 'next/navigation';
 import { Loader } from 'lucide-react';
 
 import { useLimits } from '@documenso/ee/server-only/limits/provider/client';
+import { useAnalytics } from '@documenso/lib/client-only/hooks/use-analytics';
 import { createDocumentData } from '@documenso/lib/server-only/document-data/create-document-data';
 import { putFile } from '@documenso/lib/universal/upload/put-file';
 import { TRPCClientError } from '@documenso/trpc/client';
@@ -18,10 +19,12 @@ import { useToast } from '@documenso/ui/primitives/use-toast';
 
 export type UploadDocumentProps = {
   className?: string;
+  userId?: number;
 };
 
-export const UploadDocument = ({ className }: UploadDocumentProps) => {
+export const UploadDocument = ({ className, userId }: UploadDocumentProps) => {
   const router = useRouter();
+  const analytics = useAnalytics();
 
   const { toast } = useToast();
 
@@ -51,6 +54,12 @@ export const UploadDocument = ({ className }: UploadDocumentProps) => {
         title: 'Document uploaded',
         description: 'Your document has been uploaded successfully.',
         duration: 5000,
+      });
+
+      analytics.capture('App: Document Uploaded', {
+        userId,
+        documentId: id,
+        timestamp: new Date().toISOString(),
       });
 
       router.push(`/documents/${id}`);
