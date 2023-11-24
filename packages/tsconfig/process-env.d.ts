@@ -62,6 +62,7 @@ declare namespace NodeJS {
     VERCEL_URL?: string;
 
     DEPLOYMENT_TARGET?: 'webapp' | 'marketing';
+    FONT_CAVEAT_URI: string;
 
     POSTGRES_URL?: string;
     DATABASE_URL?: string;
