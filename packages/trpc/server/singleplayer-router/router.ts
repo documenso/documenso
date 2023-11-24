@@ -1,5 +1,3 @@
-'use server';
-
 import { createElement } from 'react';
 
 import { PDFDocument } from 'pdf-lib';
