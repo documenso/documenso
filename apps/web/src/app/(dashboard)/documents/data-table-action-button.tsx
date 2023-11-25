@@ -12,7 +12,7 @@ import { DocumentStatus, SigningStatus } from '@documenso/prisma/client';
 import type { DocumentWithData } from '@documenso/prisma/types/document-with-data';
 import { trpc as trpcClient } from '@documenso/trpc/client';
 import { Button } from '@documenso/ui/primitives/button';
-import { toast } from '@documenso/ui/primitives/use-toast';
+import { useToast } from '@documenso/ui/primitives/use-toast';
 
 export type DataTableActionButtonProps = {
   row: Document & {
@@ -23,6 +23,7 @@ export type DataTableActionButtonProps = {
 
 export const DataTableActionButton = ({ row }: DataTableActionButtonProps) => {
   const { data: session } = useSession();
+  const toast = useToast();
 
   if (!session) {
     return null;
@@ -52,8 +53,6 @@ export const DataTableActionButton = ({ row }: DataTableActionButtonProps) => {
       }
 
       const documentData = document?.documentData;
-
-      console.log(documentData);
 
       if (!documentData) {
         return;
