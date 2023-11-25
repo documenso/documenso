@@ -1,20 +1,8 @@
-import {
-  Body,
-  Container,
-  Head,
-  Html,
-  Img,
-  Preview,
-  Section,
-  Tailwind,
-} from '@react-email/components';
-
 import config from '@documenso/tailwind-config';
 
-import {
-  TemplateDocumentCompleted,
-  TemplateDocumentCompletedProps,
-} from '../template-components/template-document-completed';
+import { Body, Container, Head, Html, Img, Preview, Section, Tailwind } from '../components';
+import type { TemplateDocumentCompletedProps } from '../template-components/template-document-completed';
+import { TemplateDocumentCompleted } from '../template-components/template-document-completed';
 import { TemplateFooter } from '../template-components/template-footer';
 
 export type DocumentCompletedEmailTemplateProps = Partial<TemplateDocumentCompletedProps>;

@@ -33,6 +33,7 @@ const config = {
     '@documenso/tailwind-config',
     '@documenso/trpc',
     '@documenso/ui',
+    '@react-email/tailwind',
   ],
   env: {
     APP_VERSION: version,

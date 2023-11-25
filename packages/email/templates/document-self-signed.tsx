@@ -1,20 +1,8 @@
-import {
-  Body,
-  Container,
-  Head,
-  Html,
-  Img,
-  Preview,
-  Section,
-  Tailwind,
-} from '@react-email/components';
-
 import config from '@documenso/tailwind-config';
 
-import {
-  TemplateDocumentSelfSigned,
-  TemplateDocumentSelfSignedProps,
-} from '../template-components/template-document-self-signed';
+import { Body, Container, Head, Html, Img, Preview, Section, Tailwind } from '../components';
+import type { TemplateDocumentSelfSignedProps } from '../template-components/template-document-self-signed';
+import { TemplateDocumentSelfSigned } from '../template-components/template-document-self-signed';
 import { TemplateFooter } from '../template-components/template-footer';
 
 export type DocumentSelfSignedTemplateProps = TemplateDocumentSelfSignedProps;
