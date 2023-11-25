@@ -1,12 +1,19 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
-const fs = require('fs');
-const path = require('path');
-const { withContentlayer } = require('next-contentlayer');
+import dotenv from 'dotenv';
+import fs from 'fs';
+import million from 'million/compiler';
+import { withContentlayer } from 'next-contentlayer';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// eslint-disable-next-line turbo/no-undeclared-env-vars
 const ENV_FILES = ['.env', '.env.local', `.env.${process.env.NODE_ENV || 'development'}`];
 
 ENV_FILES.forEach((file) => {
-  require('dotenv').config({
+  dotenv.config({
     path: path.join(__dirname, `../../${file}`),
   });
 });
@@ -48,7 +55,7 @@ const config = {
 
     return config;
   },
-  async headers() {
+  headers() {
     return [
       {
         source: '/:path*',
@@ -82,7 +89,7 @@ const config = {
       },
     ];
   },
-  async rewrites() {
+  rewrites() {
     return [
       {
         source: '/ingest/:path*',
@@ -92,4 +99,8 @@ const config = {
   },
 };
 
-module.exports = withContentlayer(config);
+export default million.next(withContentlayer(config), {
+  auto: {
+    rsc: true,
+  },
+});

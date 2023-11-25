@@ -24,6 +24,7 @@
     "lucide-react": "^0.279.0",
     "luxon": "^3.4.0",
     "micro": "^10.0.1",
+    "million": "^2.6.4",
     "next": "14.0.0",
     "next-auth": "4.24.3",
     "next-contentlayer": "^0.3.4",
