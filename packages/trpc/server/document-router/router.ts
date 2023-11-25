@@ -1,6 +1,7 @@
 import { TRPCError } from '@trpc/server';
 
 import { getServerLimits } from '@documenso/ee/server-only/limits/server';
+import { upsertDocumentMeta } from '@documenso/lib/server-only/document-meta/upsert-document-meta';
 import { createDocument } from '@documenso/lib/server-only/document/create-document';
 import { deleteDraftDocument } from '@documenso/lib/server-only/document/delete-draft-document';
 import { duplicateDocumentById } from '@documenso/lib/server-only/document/duplicate-document-by-id';
@@ -8,8 +9,6 @@ import { getDocumentById } from '@documenso/lib/server-only/document/get-documen
 import { getDocumentAndSenderByToken } from '@documenso/lib/server-only/document/get-document-by-token';
 import { resendDocument } from '@documenso/lib/server-only/document/resend-document';
 import { sendDocument } from '@documenso/lib/server-only/document/send-document';
-import { setFieldsForDocument } from '@documenso/lib/server-only/field/set-fields-for-document';
-import { setRecipientsForDocument } from '@documenso/lib/server-only/recipient/set-recipients-for-document';
 
 import { authenticatedProcedure, procedure, router } from '../trpc';
 import {
@@ -19,8 +18,6 @@ import {
   ZGetDocumentByTokenQuerySchema,
   ZResendDocumentMutationSchema,
   ZSendDocumentMutationSchema,
-  ZSetFieldsForDocumentMutationSchema,
-  ZSetRecipientsForDocumentMutationSchema,
 } from './schema';
 
 export const documentRouter = router({
@@ -113,54 +110,19 @@ export const documentRouter = router({
       }
     }),
 
-  setRecipientsForDocument: authenticatedProcedure
-    .input(ZSetRecipientsForDocumentMutationSchema)
-    .mutation(async ({ input, ctx }) => {
-      try {
-        const { documentId, recipients } = input;
-
-        return await setRecipientsForDocument({
-          userId: ctx.user.id,
-          documentId,
-          recipients,
-        });
-      } catch (err) {
-        console.error(err);
-
-        throw new TRPCError({
-          code: 'BAD_REQUEST',
-          message:
-            'We were unable to set the recipients for this document. Please try again later.',
-        });
-      }
-    }),
-
-  setFieldsForDocument: authenticatedProcedure
-    .input(ZSetFieldsForDocumentMutationSchema)
-    .mutation(async ({ input, ctx }) => {
-      try {
-        const { documentId, fields } = input;
-
-        return await setFieldsForDocument({
-          userId: ctx.user.id,
-          documentId,
-          fields,
-        });
-      } catch (err) {
-        console.error(err);
-
-        throw new TRPCError({
-          code: 'BAD_REQUEST',
-          message: 'We were unable to set the fields for this document. Please try again later.',
-        });
-      }
-    }),
-
   sendDocument: authenticatedProcedure
     .input(ZSendDocumentMutationSchema)
     .mutation(async ({ input, ctx }) => {
       try {
-        const { documentId } = input;
+        const { documentId, email } = input;
+
+        if (email.message || email.subject) {
+          await upsertDocumentMeta({
+            documentId,
+            subject: email.subject,
+            message: email.message,
+          });
+        }
 
         return await sendDocument({
           userId: ctx.user.id,

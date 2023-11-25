@@ -62,7 +62,7 @@
     "framer-motion": "^10.12.8",
     "lucide-react": "^0.279.0",
     "luxon": "^3.4.2",
-    "next": "14.0.0",
+    "next": "14.0.3",
     "pdfjs-dist": "3.6.172",
     "react-day-picker": "^8.7.1",
     "react-hook-form": "^7.45.4",

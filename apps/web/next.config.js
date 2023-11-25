@@ -33,7 +33,6 @@ const config = {
     '@documenso/tailwind-config',
     '@documenso/trpc',
     '@documenso/ui',
-    '@react-email/tailwind',
   ],
   env: {
     APP_VERSION: version,
@@ -50,6 +49,8 @@ const config = {
     if (isServer) {
       config.resolve.alias.canvas = false;
     }
+
+    config.optimization.minimize = false
 
     return config;
   },
