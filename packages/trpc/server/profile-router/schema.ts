@@ -10,7 +10,7 @@ export const ZUpdateProfileMutationSchema = z.object({
 });
 
 export const ZUpdatePasswordMutationSchema = z.object({
-  currentPassword: z.string().min(6),
+  currentPassword: z.string().min(6).nullable(),
   password: z.string().min(6),
 });
 

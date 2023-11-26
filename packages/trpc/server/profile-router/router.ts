@@ -2,6 +2,7 @@ import { TRPCError } from '@trpc/server';
 
 import { forgotPassword } from '@documenso/lib/server-only/user/forgot-password';
 import { getUserById } from '@documenso/lib/server-only/user/get-user-by-id';
+import { isPasswordNull } from '@documenso/lib/server-only/user/is-password-null';
 import { resetPassword } from '@documenso/lib/server-only/user/reset-password';
 import { updatePassword } from '@documenso/lib/server-only/user/update-password';
 import { updateProfile } from '@documenso/lib/server-only/user/update-profile';
@@ -60,7 +61,7 @@ export const profileRouter = router({
         return await updatePassword({
           userId: ctx.user.id,
           password,
-          currentPassword,
+          currentPassword: currentPassword || undefined,
         });
       } catch (err) {
         let message =
@@ -107,6 +108,17 @@ export const profileRouter = router({
       throw new TRPCError({
         code: 'BAD_REQUEST',
         message,
+      });
+    }
+  }),
+  isPasswordNullUser: procedure.query(async ({ ctx }) => {
+    try {
+      const isUserPasswordNull = await isPasswordNull({ id: ctx.user?.id as number });
+      return isUserPasswordNull;
+    } catch (err) {
+      throw new TRPCError({
+        code: 'BAD_REQUEST',
+        message: 'An error occurred while checking the user existence. Please try again.',
       });
     }
   }),
