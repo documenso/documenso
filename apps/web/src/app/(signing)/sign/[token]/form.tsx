@@ -59,7 +59,7 @@ export const SigningForm = ({ document, recipient, fields }: SigningFormProps) =
       documentId: document.id,
     });
 
-    analytics.capture('App: Document Signing Complete', {
+    analytics.capture('App: Recipient has completed signing', {
       signerId: recipient.id,
       documentId: document.id,
       timestamp: new Date().toISOString(),
