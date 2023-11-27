@@ -1,7 +1,7 @@
 import { TRPCError } from '@trpc/server';
 
 import { createApiToken } from '@documenso/lib/server-only/public-api/create-api-token';
-import { deleteApiTokenById } from '@documenso/lib/server-only/public-api/delete-api-token-by-id';
+import { deleteTokenById } from '@documenso/lib/server-only/public-api/delete-api-token-by-id';
 import { getUserTokens } from '@documenso/lib/server-only/public-api/get-all-user-tokens';
 import { getApiTokenById } from '@documenso/lib/server-only/public-api/get-api-token-by-id';
 
@@ -62,7 +62,7 @@ export const apiTokenRouter = router({
       try {
         const { id } = input;
 
-        return await deleteApiTokenById({
+        return await deleteTokenById({
           id,
           userId: ctx.user.id,
         });
