@@ -63,11 +63,8 @@ export const PasswordForm = ({ className }: PasswordFormProps) => {
     resolver: zodResolver(ZPasswordFormSchema),
   });
 
-  console.log(errors, 'form errors');
-
   const { mutateAsync: updatePassword } = trpc.profile.updatePassword.useMutation();
   const isPasswordNull = trpc.profile.isPasswordNullUser.useQuery().data;
-  console.log(isPasswordNull);
 
   const onFormSubmit = async ({ currentPassword, password }: TPasswordFormSchema) => {
     try {
