@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 
-import { CheckCircle2, Clock8 } from 'lucide-react';
+import { CheckCircle2, ChevronLeft, Clock8 } from 'lucide-react';
 import { getServerSession } from 'next-auth';
 import { match } from 'ts-pattern';
 
@@ -110,7 +110,11 @@ export default async function CompletedSigningPage({
         </div>
 
         {isLoggedIn ? (
-          <Link href="/documents" className="text-documenso-700 hover:text-documenso-600 mt-36">
+          <Link
+            href="/documents"
+            className="text-documenso-700 hover:text-documenso-600 mt-36 flex items-center"
+          >
+            <ChevronLeft className="mr-2 inline-block h-5 w-5" />
             Return to Homepage
           </Link>
         ) : (
