@@ -13,8 +13,10 @@ ENV_FILES.forEach((file) => {
 /** @type {import('next').NextConfig} */
 const config = {
   experimental: {
-    serverActionsBodySizeLimit: '10mb',
     outputFileTracingRoot: path.join(__dirname, '../../'),
+    serverActions: {
+      bodySizeLimit: '50mb' 
+    },
   },
   reactStrictMode: true,
   transpilePackages: ['@documenso/lib', '@documenso/prisma', '@documenso/trpc', '@documenso/ui'],

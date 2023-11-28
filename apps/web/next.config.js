@@ -15,7 +15,9 @@ const config = {
   output: process.env.DOCKER_OUTPUT ? 'standalone' : undefined,
   experimental: {
     outputFileTracingRoot: path.join(__dirname, '../../'),
-    serverActions: { bodySizeLimit: '50mb' },
+    serverActions: {
+      bodySizeLimit: '50mb' 
+    },
   },
   reactStrictMode: true,
   transpilePackages: [
