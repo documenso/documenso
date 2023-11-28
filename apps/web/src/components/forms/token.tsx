@@ -1,8 +1,11 @@
 'use client';
 
+import { useState } from 'react';
+
 import { useRouter } from 'next/navigation';
 
 import { zodResolver } from '@hookform/resolvers/zod';
+import { Loader } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import type { z } from 'zod';
 
@@ -35,9 +38,14 @@ export const ApiTokenForm = ({ className }: ApiTokenFormProps) => {
   const router = useRouter();
   const [, copy] = useCopyToClipboard();
   const { toast } = useToast();
+  const [newlyCreatedToken, setNewlyCreatedToken] = useState('');
 
-  const { data: tokens } = trpc.apiToken.getTokens.useQuery();
-  const { mutateAsync: createTokenMutation } = trpc.apiToken.createToken.useMutation();
+  const { data: tokens, isLoading: isTokensLoading } = trpc.apiToken.getTokens.useQuery();
+  const { mutateAsync: createTokenMutation } = trpc.apiToken.createToken.useMutation({
+    onSuccess(data) {
+      setNewlyCreatedToken(data.token);
+    },
+  });
 
   const form = useForm<TCreateTokenMutationSchema>({
     resolver: zodResolver(ZCreateTokenMutationSchema),
@@ -91,48 +99,66 @@ export const ApiTokenForm = ({ className }: ApiTokenFormProps) => {
   return (
     <div className={cn(className)}>
       <h2 className="mt-6 text-xl">Your existing tokens</h2>
-      <ul className="mb-4 flex flex-col gap-2">
-        {tokens?.map((token) => (
-          <li
-            className="border-muted mb-4 mt-4 break-words  rounded-sm border-2 p-4"
-            key={token.id}
-          >
-            <div>
-              <p>
-                {token.name} <span className="text-sm italic">({token.algorithm})</span>
-              </p>
-              <p className="mb-4 mt-4 font-mono text-sm font-light">{token.token}</p>
-              <p className="text-sm">
-                Created:{' '}
-                {token.createdAt
-                  ? new Date(token.createdAt).toLocaleDateString(undefined, {
-                      weekday: 'long',
-                      year: 'numeric',
-                      month: 'long',
-                      day: 'numeric',
-                    })
-                  : 'N/A'}
-              </p>
-              <p className="text-sm">
-                Expires:{' '}
-                {token.expires
-                  ? new Date(token.expires).toLocaleDateString(undefined, {
-                      weekday: 'long',
-                      year: 'numeric',
-                      month: 'long',
-                      day: 'numeric',
-                    })
-                  : 'N/A'}
-              </p>
-              <DeleteTokenDialog tokenId={token.id} tokenName={token.name} />
-              <Button variant="outline" className="mt-4" onClick={() => copyToken(token.token)}>
-                Copy token
-              </Button>
-            </div>
-          </li>
-        ))}
-      </ul>
+      {!tokens && isTokensLoading ? (
+        <div className="absolute inset-0 flex items-center justify-center bg-white/50">
+          <Loader className="h-8 w-8 animate-spin text-gray-500" />
+        </div>
+      ) : (
+        <ul className="mb-4 flex flex-col gap-2">
+          {tokens?.map((token) => (
+            <li
+              className="border-muted mb-4 mt-4 break-words rounded-sm border-2 p-4"
+              key={token.id}
+            >
+              <div>
+                <p className="mb-4">
+                  {token.name} <span className="text-sm italic">({token.algorithm})</span>
+                </p>
+                {/* <p className="mb-4 mt-4 font-mono text-sm font-light">{token.token}</p> */}
+                <p className="text-sm">
+                  Created:{' '}
+                  {token.createdAt
+                    ? new Date(token.createdAt).toLocaleDateString(undefined, {
+                        weekday: 'long',
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric',
+                      })
+                    : 'N/A'}
+                </p>
+                <p className="mb-4 text-sm">
+                  Expires:{' '}
+                  {token.expires
+                    ? new Date(token.expires).toLocaleDateString(undefined, {
+                        weekday: 'long',
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric',
+                      })
+                    : 'N/A'}
+                </p>
+                <DeleteTokenDialog tokenId={token.id} tokenName={token.name} />
+              </div>
+            </li>
+          ))}
+        </ul>
+      )}
+      {newlyCreatedToken && (
+        <div className="border-primary mb-8 break-words rounded-sm border p-4">
+          <p className="text-muted-foreground mt-2 text-sm italic">
+            Your token was created successfully! Make sure to copy it because you won't be able to
+            see it again!
+          </p>
+          <p className="mb-4 mt-4 font-mono text-sm font-light">{newlyCreatedToken}</p>
+          <Button variant="outline" className="mt-4" onClick={() => copyToken(newlyCreatedToken)}>
+            Copy token
+          </Button>
+        </div>
+      )}
       <h2 className="text-xl">Create a new token</h2>
+      <p className="text-muted-foreground mt-2 text-sm italic">
+        Enter a representative name for your new token.
+      </p>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
           <fieldset className="mt-6 flex w-full flex-col gap-y-4">

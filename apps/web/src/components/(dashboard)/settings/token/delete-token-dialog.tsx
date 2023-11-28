@@ -125,8 +125,8 @@ export default function DeleteTokenDialog({ trigger, tokenId, tokenName }: Delet
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>
-                      Confirm by typing
-                      <span className="font-sm ml-2 font-mono tracking-widest">
+                      Confirm by typing:{' '}
+                      <span className="font-sm text-destructive font-semibold">
                         {deleteMessage}
                       </span>
                     </FormLabel>
