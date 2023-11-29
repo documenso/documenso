@@ -6,14 +6,13 @@ import { cn } from '../lib/utils';
 import { Button } from './button';
 import { Input, InputProps } from './input';
 
-const PasswordInput = React.forwardRef<HTMLInputElement, InputProps>(
+const PasswordInput = React.forwardRef<HTMLInputElement, Omit<InputProps, 'type'>>(
   ({ className, ...props }, ref) => {
     const [showPassword, setShowPassword] = React.useState(false);
 
     return (
       <div className="relative">
         <Input
-          id="password"
           type={showPassword ? 'text' : 'password'}
           className={cn('pr-10', className)}
           ref={ref}
