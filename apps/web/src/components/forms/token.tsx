@@ -55,6 +55,11 @@ export const ApiTokenForm = ({ className }: ApiTokenFormProps) => {
     },
   });
 
+  /* 
+    This method is called in "delete-token-dialog.tsx" after a successful mutation
+    to avoid deleting the snippet with the newly created token from the screen
+    when users delete any of their tokens except the newly created one.
+  */
   const onDelete = (tokenId: number) => {
     if (tokenId === newlyCreatedToken.id) {
       setShowNewToken((prev) => !prev);
@@ -107,6 +112,15 @@ export const ApiTokenForm = ({ className }: ApiTokenFormProps) => {
   return (
     <div className={cn(className)}>
       <h2 className="mt-6 text-xl">Your existing tokens</h2>
+      {tokens?.length === 0 ? (
+        <div className="mb-4">
+          <p className="text-muted-foreground mt-2 text-sm italic">
+            Your tokens will be shown here once you create them.
+          </p>
+        </div>
+      ) : (
+        <div></div>
+      )}
       {!tokens && isTokensLoading ? (
         <div className="absolute inset-0 flex items-center justify-center bg-white/50">
           <Loader className="h-8 w-8 animate-spin text-gray-500" />
