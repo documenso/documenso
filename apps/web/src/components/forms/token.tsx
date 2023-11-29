@@ -38,12 +38,13 @@ export const ApiTokenForm = ({ className }: ApiTokenFormProps) => {
   const router = useRouter();
   const [, copy] = useCopyToClipboard();
   const { toast } = useToast();
-  const [newlyCreatedToken, setNewlyCreatedToken] = useState('');
+  const [newlyCreatedToken, setNewlyCreatedToken] = useState({ id: 0, token: '' });
+  const [showNewToken, setShowNewToken] = useState(false);
 
   const { data: tokens, isLoading: isTokensLoading } = trpc.apiToken.getTokens.useQuery();
   const { mutateAsync: createTokenMutation } = trpc.apiToken.createToken.useMutation({
     onSuccess(data) {
-      setNewlyCreatedToken(data.token);
+      setNewlyCreatedToken({ id: data.id, token: data.token });
     },
   });
 
@@ -53,6 +54,12 @@ export const ApiTokenForm = ({ className }: ApiTokenFormProps) => {
       tokenName: '',
     },
   });
+
+  const onDelete = (tokenId: number) => {
+    if (tokenId === newlyCreatedToken.id) {
+      setShowNewToken((prev) => !prev);
+    }
+  };
 
   const copyToken = (token: string) => {
     void copy(token).then(() => {
@@ -75,6 +82,7 @@ export const ApiTokenForm = ({ className }: ApiTokenFormProps) => {
         duration: 5000,
       });
 
+      setShowNewToken(true);
       form.reset();
       router.refresh();
     } catch (error) {
@@ -114,7 +122,6 @@ export const ApiTokenForm = ({ className }: ApiTokenFormProps) => {
                 <p className="mb-4">
                   {token.name} <span className="text-sm italic">({token.algorithm})</span>
                 </p>
-                {/* <p className="mb-4 mt-4 font-mono text-sm font-light">{token.token}</p> */}
                 <p className="text-sm">
                   Created:{' '}
                   {token.createdAt
@@ -137,20 +144,28 @@ export const ApiTokenForm = ({ className }: ApiTokenFormProps) => {
                       })
                     : 'N/A'}
                 </p>
-                <DeleteTokenDialog tokenId={token.id} tokenName={token.name} />
+                <DeleteTokenDialog
+                  tokenId={token.id}
+                  tokenName={token.name}
+                  onDelete={() => onDelete(token.id)}
+                />
               </div>
             </li>
           ))}
         </ul>
       )}
-      {newlyCreatedToken && (
+      {newlyCreatedToken.token && showNewToken && (
         <div className="border-primary mb-8 break-words rounded-sm border p-4">
           <p className="text-muted-foreground mt-2 text-sm italic">
             Your token was created successfully! Make sure to copy it because you won't be able to
             see it again!
           </p>
-          <p className="mb-4 mt-4 font-mono text-sm font-light">{newlyCreatedToken}</p>
-          <Button variant="outline" className="mt-4" onClick={() => copyToken(newlyCreatedToken)}>
+          <p className="mb-4 mt-4 font-mono text-sm font-light">{newlyCreatedToken.token}</p>
+          <Button
+            variant="outline"
+            className="mt-4"
+            onClick={() => copyToken(newlyCreatedToken.token)}
+          >
             Copy token
           </Button>
         </div>

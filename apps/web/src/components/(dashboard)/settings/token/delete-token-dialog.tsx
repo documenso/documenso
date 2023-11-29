@@ -1,5 +1,3 @@
-'use client';
-
 import { useEffect, useState } from 'react';
 
 import { useRouter } from 'next/navigation';
@@ -34,9 +32,15 @@ export type DeleteTokenDialogProps = {
   trigger?: React.ReactNode;
   tokenId: number;
   tokenName: string;
+  onDelete: () => void;
 };
 
-export default function DeleteTokenDialog({ trigger, tokenId, tokenName }: DeleteTokenDialogProps) {
+export default function DeleteTokenDialog({
+  trigger,
+  tokenId,
+  tokenName,
+  onDelete,
+}: DeleteTokenDialogProps) {
   const router = useRouter();
   const { toast } = useToast();
   const [isOpen, setIsOpen] = useState(false);
@@ -51,7 +55,11 @@ export default function DeleteTokenDialog({ trigger, tokenId, tokenName }: Delet
 
   type TDeleteTokenByIdMutationSchema = z.infer<typeof ZDeleteTokenDialogSchema>;
 
-  const { mutateAsync: deleteTokenMutation } = trpc.apiToken.deleteTokenById.useMutation();
+  const { mutateAsync: deleteTokenMutation } = trpc.apiToken.deleteTokenById.useMutation({
+    onSuccess() {
+      onDelete();
+    },
+  });
 
   const form = useForm<TDeleteTokenByIdMutationSchema>({
     resolver: zodResolver(ZDeleteTokenDialogSchema),
