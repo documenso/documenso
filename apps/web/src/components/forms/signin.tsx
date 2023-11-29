@@ -1,9 +1,6 @@
 'use client';
 
-import { useState } from 'react';
-
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Eye, EyeOff } from 'lucide-react';
 import { signIn } from 'next-auth/react';
 import { useForm } from 'react-hook-form';
 import { FcGoogle } from 'react-icons/fc';
@@ -12,9 +9,16 @@ import { z } from 'zod';
 import { ErrorCode, isErrorCode } from '@documenso/lib/next-auth/error-codes';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
-import { FormErrorMessage } from '@documenso/ui/primitives/form/form-error-message';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@documenso/ui/primitives/form/form';
 import { Input } from '@documenso/ui/primitives/input';
-import { Label } from '@documenso/ui/primitives/label';
+import { PasswordInput } from '@documenso/ui/primitives/password-input';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
 const ERROR_MESSAGES = {
@@ -39,19 +43,16 @@ export type SignInFormProps = {
 
 export const SignInForm = ({ className }: SignInFormProps) => {
   const { toast } = useToast();
-  const [showPassword, setShowPassword] = useState(false);
 
-  const {
-    register,
-    handleSubmit,
-    formState: { errors, isSubmitting },
-  } = useForm<TSignInFormSchema>({
+  const form = useForm<TSignInFormSchema>({
     values: {
       email: '',
       password: '',
     },
     resolver: zodResolver(ZSignInFormSchema),
   });
+
+  const isSubmitting = form.formState.isSubmitting;
 
   const onFormSubmit = async ({ email, password }: TSignInFormSchema) => {
     try {
@@ -99,80 +100,67 @@ export const SignInForm = ({ className }: SignInFormProps) => {
   };
 
   return (
-    <form
-      className={cn('flex w-full flex-col gap-y-4', className)}
-      onSubmit={handleSubmit(onFormSubmit)}
-    >
-      <div>
-        <Label htmlFor="email" className="text-muted-forground">
-          Email
-        </Label>
+    <Form {...form}>
+      <form
+        className={cn('flex w-full flex-col gap-y-4', className)}
+        onSubmit={form.handleSubmit(onFormSubmit)}
+      >
+        <FormField
+          control={form.control}
+          name="email"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Email</FormLabel>
+              <FormControl>
+                <Input type="email" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
 
-        <Input id="email" type="email" className="bg-background mt-2" {...register('email')} />
+        <FormField
+          control={form.control}
+          name="password"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Password</FormLabel>
+              <FormControl>
+                <PasswordInput {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
 
-        <FormErrorMessage className="mt-1.5" error={errors.email} />
-      </div>
+        <Button
+          type="submit"
+          size="lg"
+          loading={isSubmitting}
+          disabled={isSubmitting}
+          className="dark:bg-documenso dark:hover:opacity-90"
+        >
+          {isSubmitting ? 'Signing in...' : 'Sign In'}
+        </Button>
 
-      <div>
-        <Label htmlFor="password" className="text-muted-forground">
-          <span>Password</span>
-        </Label>
-
-        <div className="relative">
-          <Input
-            id="password"
-            type={showPassword ? 'text' : 'password'}
-            minLength={6}
-            maxLength={72}
-            autoComplete="current-password"
-            className="bg-background mt-2 pr-10"
-            {...register('password')}
-          />
-
-          <Button
-            variant="link"
-            type="button"
-            className="absolute right-0 top-0 flex h-full items-center justify-center pr-3"
-            aria-label={showPassword ? 'Mask password' : 'Reveal password'}
-            onClick={() => setShowPassword((show) => !show)}
-          >
-            {showPassword ? (
-              <EyeOff className="text-muted-foreground h-5 w-5" />
-            ) : (
-              <Eye className="text-muted-foreground h-5 w-5" />
-            )}
-          </Button>
+        <div className="relative flex items-center justify-center gap-x-4 py-2 text-xs uppercase">
+          <div className="bg-border h-px flex-1" />
+          <span className="text-muted-foreground bg-transparent">Or continue with</span>
+          <div className="bg-border h-px flex-1" />
         </div>
 
-        <FormErrorMessage className="mt-1.5" error={errors.password} />
-      </div>
-
-      <Button
-        size="lg"
-        loading={isSubmitting}
-        disabled={isSubmitting}
-        className="dark:bg-documenso dark:hover:opacity-90"
-      >
-        {isSubmitting ? 'Signing in...' : 'Sign In'}
-      </Button>
-
-      <div className="relative flex items-center justify-center gap-x-4 py-2 text-xs uppercase">
-        <div className="bg-border h-px flex-1" />
-        <span className="text-muted-foreground bg-transparent">Or continue with</span>
-        <div className="bg-border h-px flex-1" />
-      </div>
-
-      <Button
-        type="button"
-        size="lg"
-        variant={'outline'}
-        className="bg-background text-muted-foreground border"
-        disabled={isSubmitting}
-        onClick={onSignInWithGoogleClick}
-      >
-        <FcGoogle className="mr-2 h-5 w-5" />
-        Google
-      </Button>
-    </form>
+        <Button
+          type="button"
+          size="lg"
+          variant={'outline'}
+          className="bg-background text-muted-foreground border"
+          disabled={isSubmitting}
+          onClick={onSignInWithGoogleClick}
+        >
+          <FcGoogle className="mr-2 h-5 w-5" />
+          Google
+        </Button>
+      </form>
+    </Form>
   );
 };
