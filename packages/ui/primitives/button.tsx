@@ -53,18 +53,23 @@ export interface ButtonProps
    * Will display the loading spinner and disable the button.
    */
   loading?: boolean;
+
+  /**
+   * The label to show in the button when `isLoading` is true
+   */
+  loadingText?: string;
 }
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ className, variant, size, asChild = false, loading, ...props }, ref) => {
+  ({ className, variant, size, asChild = false, loadingText, loading, ...props }, ref) => {
     if (asChild) {
       return (
         <Slot className={cn(buttonVariants({ variant, size, className }))} ref={ref} {...props} />
       );
     }
 
-    const showLoader = loading === true;
-    const isDisabled = props.disabled || showLoader;
+    const isLoading = loading === true;
+    const isDisabled = props.disabled || isLoading;
 
     return (
       <button
@@ -73,8 +78,8 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         {...props}
         disabled={isDisabled}
       >
-        {showLoader && <Loader className={cn('mr-2 animate-spin', loaderVariants({ size }))} />}
-        {props.children}
+        {isLoading && <Loader className={cn('mr-2 animate-spin', loaderVariants({ size }))} />}
+        {isLoading && loadingText ? loadingText : props.children}
       </button>
     );
   },
