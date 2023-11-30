@@ -88,75 +88,77 @@ export const SignUpForm = ({ className }: SignUpFormProps) => {
         className={cn('flex w-full flex-col gap-y-4', className)}
         onSubmit={form.handleSubmit(onFormSubmit)}
       >
-        <FormField
-          control={form.control}
-          name="name"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Name</FormLabel>
-              <FormControl>
-                <Input type="text" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+        <fieldset className="flex w-full flex-col gap-y-4" disabled={isSubmitting}>
+          <FormField
+            control={form.control}
+            name="name"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Name</FormLabel>
+                <FormControl>
+                  <Input type="text" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-        <FormField
-          control={form.control}
-          name="email"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Email</FormLabel>
-              <FormControl>
-                <Input type="email" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+          <FormField
+            control={form.control}
+            name="email"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Email</FormLabel>
+                <FormControl>
+                  <Input type="email" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-        <FormField
-          control={form.control}
-          name="password"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Password</FormLabel>
-              <FormControl>
-                <PasswordInput {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+          <FormField
+            control={form.control}
+            name="password"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Password</FormLabel>
+                <FormControl>
+                  <PasswordInput {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-        <FormField
-          control={form.control}
-          name="signature"
-          render={({ field: { onChange } }) => (
-            <FormItem>
-              <FormLabel> Sign Here</FormLabel>
-              <FormControl>
-                <SignaturePad
-                  className="h-36 w-full"
-                  containerClassName="mt-2 rounded-lg border bg-background"
-                  onChange={(v) => onChange(v ?? '')}
-                />
-              </FormControl>
+          <FormField
+            control={form.control}
+            name="signature"
+            render={({ field: { onChange } }) => (
+              <FormItem>
+                <FormLabel>Sign Here</FormLabel>
+                <FormControl>
+                  <SignaturePad
+                    className="h-36 w-full"
+                    containerClassName="mt-2 rounded-lg border bg-background"
+                    onChange={(v) => onChange(v ?? '')}
+                  />
+                </FormControl>
 
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </fieldset>
 
         <Button
           type="submit"
           size="lg"
           loading={isSubmitting}
-          disabled={isSubmitting}
+          loadingText="Signing up..."
           className="dark:bg-documenso dark:hover:opacity-90"
         >
-          {isSubmitting ? 'Signing up...' : 'Sign Up'}
+          Sign Up
         </Button>
       </form>
     </Form>
