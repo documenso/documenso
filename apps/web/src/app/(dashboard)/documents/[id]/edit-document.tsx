@@ -4,7 +4,7 @@ import { useState } from 'react';
 
 import { useRouter } from 'next/navigation';
 
-import { DocumentData, Field, Recipient, User } from '@documenso/prisma/client';
+import { DocumentData, DocumentStatus, Field, Recipient, User } from '@documenso/prisma/client';
 import { DocumentWithData } from '@documenso/prisma/types/document-with-data';
 import { cn } from '@documenso/ui/lib/utils';
 import { Card, CardContent } from '@documenso/ui/primitives/card';
@@ -14,6 +14,8 @@ import { AddSignersFormPartial } from '@documenso/ui/primitives/document-flow/ad
 import { TAddSignersFormSchema } from '@documenso/ui/primitives/document-flow/add-signers.types';
 import { AddSubjectFormPartial } from '@documenso/ui/primitives/document-flow/add-subject';
 import { TAddSubjectFormSchema } from '@documenso/ui/primitives/document-flow/add-subject.types';
+import { AddTitleFormPartial } from '@documenso/ui/primitives/document-flow/add-title';
+import { TAddTitleFormSchema } from '@documenso/ui/primitives/document-flow/add-title.types';
 import {
   DocumentFlowFormContainer,
   DocumentFlowFormContainerHeader,
@@ -25,6 +27,7 @@ import { useToast } from '@documenso/ui/primitives/use-toast';
 import { addFields } from '~/components/forms/edit-document/add-fields.action';
 import { addSigners } from '~/components/forms/edit-document/add-signers.action';
 import { completeDocument } from '~/components/forms/edit-document/add-subject.action';
+import { addTitle } from '~/components/forms/edit-document/add-title.action';
 
 export type EditDocumentFormProps = {
   className?: string;
@@ -35,7 +38,7 @@ export type EditDocumentFormProps = {
   documentData: DocumentData;
 };
 
-type EditDocumentStep = 'signers' | 'fields' | 'subject';
+type EditDocumentStep = 'title' | 'signers' | 'fields' | 'subject';
 
 export const EditDocumentForm = ({
   className,
@@ -48,29 +51,59 @@ export const EditDocumentForm = ({
   const { toast } = useToast();
   const router = useRouter();
 
-  const [step, setStep] = useState<EditDocumentStep>('signers');
+  const [step, setStep] = useState<EditDocumentStep>(
+    document.status === DocumentStatus.DRAFT ? 'title' : 'signers',
+  );
 
   const documentFlow: Record<EditDocumentStep, DocumentFlowStep> = {
+    title: {
+      title: 'Add Title',
+      description: 'Add the title to the document.',
+      stepIndex: 1,
+    },
     signers: {
       title: 'Add Signers',
       description: 'Add the people who will sign the document.',
-      stepIndex: 1,
+      stepIndex: 2,
+      onBackStep: () => document.status === DocumentStatus.DRAFT && setStep('title'),
     },
     fields: {
       title: 'Add Fields',
       description: 'Add all relevant fields for each recipient.',
-      stepIndex: 2,
+      stepIndex: 3,
       onBackStep: () => setStep('signers'),
     },
     subject: {
       title: 'Add Subject',
       description: 'Add the subject and message you wish to send to signers.',
-      stepIndex: 3,
+      stepIndex: 4,
       onBackStep: () => setStep('fields'),
     },
   };
 
   const currentDocumentFlow = documentFlow[step];
+
+  const onAddTitleFormSubmit = async (data: TAddTitleFormSchema) => {
+    try {
+      // Custom invocation server action
+      await addTitle({
+        documentId: document.id,
+        title: data.title,
+      });
+
+      router.refresh();
+
+      setStep('signers');
+    } catch (err) {
+      console.error(err);
+
+      toast({
+        title: 'Error',
+        description: 'An error occurred while updating title.',
+        variant: 'destructive',
+      });
+    }
+  };
 
   const onAddSignersFormSubmit = async (data: TAddSignersFormSchema) => {
     try {
@@ -164,10 +197,23 @@ export const EditDocumentForm = ({
             description={currentDocumentFlow.description}
           />
 
+          {step === 'title' && (
+            <AddTitleFormPartial
+              key={recipients.length}
+              documentFlow={documentFlow.title}
+              recipients={recipients}
+              fields={fields}
+              document={document}
+              numberOfSteps={Object.keys(documentFlow).length}
+              onSubmit={onAddTitleFormSubmit}
+            />
+          )}
+
           {step === 'signers' && (
             <AddSignersFormPartial
               key={recipients.length}
               documentFlow={documentFlow.signers}
+              document={document}
               recipients={recipients}
               fields={fields}
               numberOfSteps={Object.keys(documentFlow).length}

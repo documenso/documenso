@@ -8,22 +8,22 @@ import { useRouter } from 'next/navigation';
 import { useAnalytics } from '@documenso/lib/client-only/hooks/use-analytics';
 import { base64 } from '@documenso/lib/universal/base64';
 import { putFile } from '@documenso/lib/universal/upload/put-file';
-import { DocumentDataType, Field, Prisma, Recipient } from '@documenso/prisma/client';
+import type { Field, Recipient } from '@documenso/prisma/client';
+import { DocumentDataType, Prisma } from '@documenso/prisma/client';
+import { trpc } from '@documenso/trpc/react';
 import { Card, CardContent } from '@documenso/ui/primitives/card';
 import { DocumentDropzone } from '@documenso/ui/primitives/document-dropzone';
 import { AddFieldsFormPartial } from '@documenso/ui/primitives/document-flow/add-fields';
-import { TAddFieldsFormSchema } from '@documenso/ui/primitives/document-flow/add-fields.types';
+import type { TAddFieldsFormSchema } from '@documenso/ui/primitives/document-flow/add-fields.types';
 import { AddSignatureFormPartial } from '@documenso/ui/primitives/document-flow/add-signature';
-import { TAddSignatureFormSchema } from '@documenso/ui/primitives/document-flow/add-signature.types';
+import type { TAddSignatureFormSchema } from '@documenso/ui/primitives/document-flow/add-signature.types';
 import {
   DocumentFlowFormContainer,
   DocumentFlowFormContainerHeader,
 } from '@documenso/ui/primitives/document-flow/document-flow-root';
-import { DocumentFlowStep } from '@documenso/ui/primitives/document-flow/types';
+import type { DocumentFlowStep } from '@documenso/ui/primitives/document-flow/types';
 import { LazyPDFViewer } from '@documenso/ui/primitives/lazy-pdf-viewer';
 import { useToast } from '@documenso/ui/primitives/use-toast';
-
-import { createSinglePlayerDocument } from '~/components/(marketing)/single-player-mode/create-single-player-document.action';
 
 type SinglePlayerModeStep = 'fields' | 'sign';
 
@@ -40,6 +40,9 @@ export const SinglePlayerClient = () => {
 
   const [step, setStep] = useState<SinglePlayerModeStep>('fields');
   const [fields, setFields] = useState<Field[]>([]);
+
+  const { mutateAsync: createSinglePlayerDocument } =
+    trpc.singleplayer.createSinglePlayerDocument.useMutation();
 
   const documentFlow: Record<SinglePlayerModeStep, DocumentFlowStep> = {
     fields: {

@@ -1,7 +1,7 @@
 'use client';
 
 import type { HTMLAttributes } from 'react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { Search } from 'lucide-react';
 
@@ -15,9 +15,14 @@ export type DesktopNavProps = HTMLAttributes<HTMLDivElement>;
 export const DesktopNav = ({ className, ...props }: DesktopNavProps) => {
   // const pathname = usePathname();
   const [open, setOpen] = useState(false);
+  const [modifierKey, setModifierKey] = useState(() => 'Ctrl');
 
-  const isMacOS = /Macintosh|Mac\s+OS\s+X/i.test(navigator?.userAgent || 'unknown');
-  const modifierKey = isMacOS ? '⌘' : 'Ctrl';
+  useEffect(() => {
+    const userAgent = typeof navigator !== 'undefined' ? navigator.userAgent : 'unknown';
+    const isMacOS = /Macintosh|Mac\s+OS\s+X/i.test(userAgent);
+
+    setModifierKey(isMacOS ? '⌘' : 'Ctrl');
+  }, []);
 
   return (
     <div
@@ -37,7 +42,7 @@ export const DesktopNav = ({ className, ...props }: DesktopNavProps) => {
         </div>
 
         <div>
-          <div className="text-muted-foreground bg-muted rounded-md px-1.5 py-0.5 font-mono text-xs">
+          <div className="text-muted-foreground bg-muted flex items-center rounded-md px-1.5 py-0.5  text-xs tracking-wider">
             {modifierKey}+K
           </div>
         </div>

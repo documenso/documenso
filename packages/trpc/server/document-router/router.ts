@@ -8,6 +8,7 @@ import { getDocumentById } from '@documenso/lib/server-only/document/get-documen
 import { getDocumentAndSenderByToken } from '@documenso/lib/server-only/document/get-document-by-token';
 import { resendDocument } from '@documenso/lib/server-only/document/resend-document';
 import { sendDocument } from '@documenso/lib/server-only/document/send-document';
+import { updateTitle } from '@documenso/lib/server-only/document/update-title';
 import { setFieldsForDocument } from '@documenso/lib/server-only/field/set-fields-for-document';
 import { setRecipientsForDocument } from '@documenso/lib/server-only/recipient/set-recipients-for-document';
 
@@ -21,6 +22,7 @@ import {
   ZSendDocumentMutationSchema,
   ZSetFieldsForDocumentMutationSchema,
   ZSetRecipientsForDocumentMutationSchema,
+  ZSetTitleForDocumentMutationSchema,
 } from './schema';
 
 export const documentRouter = router({
@@ -111,6 +113,20 @@ export const documentRouter = router({
           message: 'We were unable to delete this document. Please try again later.',
         });
       }
+    }),
+
+  setTitleForDocument: authenticatedProcedure
+    .input(ZSetTitleForDocumentMutationSchema)
+    .mutation(async ({ input, ctx }) => {
+      const { documentId, title } = input;
+      
+      const userId = ctx.user.id;
+
+      return await updateTitle({
+        title,
+        userId,
+        documentId,
+      });
     }),
 
   setRecipientsForDocument: authenticatedProcedure

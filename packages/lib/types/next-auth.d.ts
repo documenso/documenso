@@ -6,11 +6,11 @@ declare module 'next-auth' {
     user: User;
   }
 
-  interface User extends Omit<DefaultUser, 'id' | 'image'> {
+  interface User extends Omit<DefaultUser, 'id' | 'image' | 'emailVerified'> {
     id: PrismaUser['id'];
     name?: PrismaUser['name'];
     email?: PrismaUser['email'];
-    emailVerified?: PrismaUser['emailVerified'];
+    emailVerified?: string | null;
   }
 }
 
@@ -19,6 +19,7 @@ declare module 'next-auth/jwt' {
     id: string | number;
     name?: string | null;
     email: string | null;
+    emailVerified?: string | null;
     lastSignedIn?: string | null;
   }
 }

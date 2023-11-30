@@ -9,7 +9,8 @@ import { Controller, useFieldArray, useForm } from 'react-hook-form';
 
 import { useLimits } from '@documenso/ee/server-only/limits/provider/client';
 import { nanoid } from '@documenso/lib/universal/id';
-import { Field, Recipient, SendStatus } from '@documenso/prisma/client';
+import { DocumentStatus, Field, Recipient, SendStatus } from '@documenso/prisma/client';
+import { DocumentWithData } from '@documenso/prisma/types/document-with-data';
 import { Button } from '@documenso/ui/primitives/button';
 import { FormErrorMessage } from '@documenso/ui/primitives/form/form-error-message';
 import { Input } from '@documenso/ui/primitives/input';
@@ -29,6 +30,7 @@ export type AddSignersFormProps = {
   documentFlow: DocumentFlowStep;
   recipients: Recipient[];
   fields: Field[];
+  document: DocumentWithData;
   numberOfSteps: number;
   onSubmit: (_data: TAddSignersFormSchema) => void;
 };
@@ -37,6 +39,7 @@ export const AddSignersFormPartial = ({
   documentFlow,
   numberOfSteps,
   recipients,
+  document,
   fields: _fields,
   onSubmit,
 }: AddSignersFormProps) => {
@@ -223,6 +226,7 @@ export const AddSignersFormPartial = ({
         />
 
         <DocumentFlowFormContainerActions
+          canGoBack={document.status === DocumentStatus.DRAFT}
           loading={isSubmitting}
           disabled={isSubmitting}
           onGoBackClick={documentFlow.onBackStep}
