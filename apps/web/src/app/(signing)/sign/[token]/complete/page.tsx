@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 
 import { CheckCircle2, Clock8 } from 'lucide-react';
+import { getServerSession } from 'next-auth';
 import { match } from 'ts-pattern';
 
 import signingCelebration from '@documenso/assets/images/signing-celebration.png';
@@ -52,6 +53,9 @@ export default async function CompletedSigningPage({
     recipient.name ||
     fields.find((field) => field.type === FieldType.NAME)?.customText ||
     recipient.email;
+
+  const sessionData = await getServerSession();
+  const isLoggedIn = !!sessionData?.user;
 
   return (
     <div className="-mx-4 flex max-w-[100vw] flex-col items-center overflow-x-hidden px-4 pt-24 md:-mx-8 md:px-8 lg:pt-36 xl:pt-44">
@@ -105,15 +109,21 @@ export default async function CompletedSigningPage({
           />
         </div>
 
-        <p className="text-muted-foreground/60 mt-36 text-sm">
-          Want to send slick signing links like this one?{' '}
-          <Link
-            href="https://documenso.com"
-            className="text-documenso-700 hover:text-documenso-600"
-          >
-            Check out Documenso.
+        {isLoggedIn ? (
+          <Link href="/documents" className="text-documenso-700 hover:text-documenso-600 mt-36">
+            Go Back Home
           </Link>
-        </p>
+        ) : (
+          <p className="text-muted-foreground/60 mt-36 text-sm">
+            Want to send slick signing links like this one?{' '}
+            <Link
+              href="https://documenso.com"
+              className="text-documenso-700 hover:text-documenso-600"
+            >
+              Check out Documenso.
+            </Link>
+          </p>
+        )}
       </div>
     </div>
   );
