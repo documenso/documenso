@@ -40,6 +40,8 @@ export const contract = c.router(
       query: GetDocumentsQuerySchema,
       responses: {
         200: SuccessfulResponseSchema,
+        401: UnsuccessfulResponseSchema,
+        404: UnsuccessfulResponseSchema,
       },
       summary: 'Get all documents',
     },
@@ -48,6 +50,8 @@ export const contract = c.router(
       path: `/documents/:id`,
       responses: {
         200: DocumentSchema,
+        401: UnsuccessfulResponseSchema,
+        404: UnsuccessfulResponseSchema,
       },
       summary: 'Get a single document',
     },
@@ -57,6 +61,7 @@ export const contract = c.router(
       body: z.string(),
       responses: {
         200: DocumentSchema,
+        401: UnsuccessfulResponseSchema,
         404: UnsuccessfulResponseSchema,
       },
       summary: 'Delete a document',
