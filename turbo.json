@@ -28,7 +28,7 @@
   "globalDependencies": ["**/.env.*local"],
   "globalEnv": [
     "APP_VERSION",
-    "DOCUMENSO_ENCRYPTION_KEY",
+    "NEXT_PRIVATE_ENCRYPTION_KEY",
     "NEXTAUTH_URL",
     "NEXTAUTH_SECRET",
     "NEXT_PUBLIC_PROJECT",

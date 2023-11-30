@@ -5,17 +5,15 @@ import { HTMLAttributes } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
-import { CreditCard, Key, User } from 'lucide-react';
+import { CreditCard, Lock, User } from 'lucide-react';
 
 import { useFeatureFlags } from '@documenso/lib/client-only/providers/feature-flag';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
 
-export type DesktopNavProps = HTMLAttributes<HTMLDivElement> & {
-  isTwoFactorAuthEnabled: boolean;
-};
+export type DesktopNavProps = HTMLAttributes<HTMLDivElement>;
 
-export const DesktopNav = ({ className, isTwoFactorAuthEnabled, ...props }: DesktopNavProps) => {
+export const DesktopNav = ({ className, ...props }: DesktopNavProps) => {
   const pathname = usePathname();
 
   const { getFlag } = useFeatureFlags();
@@ -37,33 +35,18 @@ export const DesktopNav = ({ className, isTwoFactorAuthEnabled, ...props }: Desk
         </Button>
       </Link>
 
-      <Link href="/settings/password">
+      <Link href="/settings/security">
         <Button
           variant="ghost"
           className={cn(
             'w-full justify-start',
-            pathname?.startsWith('/settings/password') && 'bg-secondary',
+            pathname?.startsWith('/settings/security') && 'bg-secondary',
           )}
         >
-          <Key className="mr-2 h-5 w-5" />
-          Password
+          <Lock className="mr-2 h-5 w-5" />
+          Security
         </Button>
       </Link>
-
-      {isTwoFactorAuthEnabled && (
-        <Link href="/settings/two-factor-auth">
-          <Button
-            variant="ghost"
-            className={cn(
-              'w-full justify-start',
-              pathname?.startsWith('/settings/two-factor-auth') && 'bg-secondary',
-            )}
-          >
-            <Key className="mr-2 h-5 w-5" />
-            Two factor auth
-          </Button>
-        </Link>
-      )}
 
       {isBillingEnabled && (
         <Link href="/settings/billing">

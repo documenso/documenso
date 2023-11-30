@@ -1,49 +1,36 @@
-import { TRPCError } from '@trpc/server';
 import { compare } from 'bcrypt';
 
 import { prisma } from '@documenso/prisma';
 import { User } from '@documenso/prisma/client';
 
 import { ErrorCode } from '../../next-auth/error-codes';
-import { authenticateTwoFactorAuth } from './authenticate-2fa';
+import { validateTwoFactorAuthentication } from './validate-2fa';
 
-type disableTwoFactorAuthenticationProps = {
+type DisableTwoFactorAuthenticationOptions = {
   user: User;
-  code?: string;
-  backupCode?: string;
+  backupCode: string;
   password: string;
 };
 
 export const disableTwoFactorAuthentication = async ({
-  code,
   backupCode,
   user,
   password,
-}: disableTwoFactorAuthenticationProps) => {
+}: DisableTwoFactorAuthenticationOptions) => {
   if (!user.password) {
-    throw new TRPCError({
-      code: 'INTERNAL_SERVER_ERROR',
-      message: ErrorCode.USER_MISSING_PASSWORD,
-    });
+    throw new Error(ErrorCode.USER_MISSING_PASSWORD);
   }
 
   const isCorrectPassword = await compare(password, user.password);
 
   if (!isCorrectPassword) {
-    throw new TRPCError({
-      code: 'UNAUTHORIZED',
-      message: ErrorCode.INCORRECT_PASSWORD,
-    });
+    throw new Error(ErrorCode.INCORRECT_PASSWORD);
   }
 
-  try {
-    await authenticateTwoFactorAuth({ backupCode, totpCode: code, user });
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  } catch (error: any) {
-    throw new TRPCError({
-      code: 'FORBIDDEN',
-      message: error?.message,
-    });
+  const isValid = await validateTwoFactorAuthentication({ backupCode, user });
+
+  if (!isValid) {
+    throw new Error(ErrorCode.INCORRECT_TWO_FACTOR_BACKUP_CODE);
   }
 
   await prisma.user.update({
@@ -57,5 +44,5 @@ export const disableTwoFactorAuthentication = async ({
     },
   });
 
-  return { message: '2fa disabled successfully' };
+  return true;
 };

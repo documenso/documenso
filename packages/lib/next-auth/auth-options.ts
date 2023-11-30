@@ -7,8 +7,8 @@ import GoogleProvider, { GoogleProfile } from 'next-auth/providers/google';
 
 import { prisma } from '@documenso/prisma';
 
-import { authenticateTwoFactorAuth } from '../server-only/2fa/authenticate-2fa';
-import { isTwoFactorAuthEnabled } from '../server-only/2fa/is-2fa-availble';
+import { isTwoFactorAuthenticationEnabled } from '../server-only/2fa/is-2fa-availble';
+import { validateTwoFactorAuthentication } from '../server-only/2fa/validate-2fa';
 import { getUserByEmail } from '../server-only/user/get-user-by-email';
 import { ErrorCode } from './error-codes';
 
@@ -52,9 +52,18 @@ export const NEXT_AUTH_OPTIONS: AuthOptions = {
           throw new Error(ErrorCode.INCORRECT_EMAIL_PASSWORD);
         }
 
-        const is2faEnabled = isTwoFactorAuthEnabled({ user });
+        const is2faEnabled = isTwoFactorAuthenticationEnabled({ user });
+
         if (is2faEnabled) {
-          await authenticateTwoFactorAuth({ backupCode, totpCode, user });
+          const isValid = await validateTwoFactorAuthentication({ backupCode, totpCode, user });
+
+          if (!isValid) {
+            throw new Error(
+              totpCode
+                ? ErrorCode.INCORRECT_TWO_FACTOR_CODE
+                : ErrorCode.INCORRECT_TWO_FACTOR_BACKUP_CODE,
+            );
+          }
         }
 
         return {

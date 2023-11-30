@@ -7,14 +7,12 @@ type VerifyBackupCodeParams = {
   backupCode: string;
 };
 
-export const verifyBackupCode = ({ user, backupCode }: VerifyBackupCodeParams) => {
-  const userBackupCodes = getBackupCodes({ user });
+export const verifyBackupCode = async ({ user, backupCode }: VerifyBackupCodeParams) => {
+  const userBackupCodes = await getBackupCodes({ user });
 
   if (!userBackupCodes) {
-    throw new Error('user missing 2fa backup code');
+    throw new Error('User has no backup codes');
   }
 
-  const formattedBackupCode = userBackupCodes.join('\n');
-
-  return formattedBackupCode === backupCode;
+  return userBackupCodes.includes(backupCode);
 };

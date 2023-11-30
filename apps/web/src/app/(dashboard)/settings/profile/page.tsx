@@ -7,7 +7,7 @@ export default async function ProfileSettingsPage() {
 
   return (
     <div>
-      <h3 className="text-lg font-medium">Profile</h3>
+      <h3 className="text-2xl font-semibold">Profile</h3>
 
       <p className="text-muted-foreground mt-2 text-sm">Here you can edit your personal details.</p>
 

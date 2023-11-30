@@ -3,68 +3,40 @@
 import { useState } from 'react';
 
 import { Button } from '@documenso/ui/primitives/button';
-import { CardContent, CardDescription, CardHeader, CardTitle } from '@documenso/ui/primitives/card';
 
-import { PasswordCheckDialog } from './password-check-dialog';
-import { RecoveryCodesDialog } from './recovery-codes-dialog';
-
-type ModalState = null | 'password' | 'recover-codes';
+import { ViewRecoveryCodesDialog } from './view-recovery-codes-dialog';
 
 type RecoveryCodesProps = {
-  backupCodes: string[] | null;
+  // backupCodes: string[] | null;
   isTwoFactorEnabled: boolean;
 };
 
-export const RecoveryCodes = ({ backupCodes, isTwoFactorEnabled }: RecoveryCodesProps) => {
-  const [modalState, setModalState] = useState<ModalState>(null);
+export const RecoveryCodes = ({ isTwoFactorEnabled }: RecoveryCodesProps) => {
+  const [isOpen, setIsOpen] = useState(false);
+
   return (
     <>
-      <CardHeader>
-        <CardTitle>Recovery options</CardTitle>
-      </CardHeader>
+      <div className="mt-4 flex flex-col justify-between gap-4 rounded-lg border p-4 md:flex-row md:items-center md:gap-8">
+        <div className="flex-1">
+          <p>Recovery Codes</p>
 
-      <CardContent>
-        <hr />
-        <div className="flex items-center justify-between pt-4">
-          <h4>Recovery codes</h4>
+          <p className="text-muted-foreground mt-2 max-w-[50ch] text-sm">
+            Recovery codes are used to access your account in the event that you lose access to your
+            authenticator app.
+          </p>
+        </div>
 
-          <Button
-            disabled={!isTwoFactorEnabled}
-            onClick={() => {
-              setModalState('password');
-            }}
-            size="sm"
-          >
-            View
+        <div>
+          <Button onClick={() => setIsOpen(true)} disabled={!isTwoFactorEnabled} size="sm">
+            View Codes
           </Button>
         </div>
+      </div>
 
-        <div className="flex pt-2">
-          <CardDescription>
-            In case you lose access to your device and are unable to receive two-factor
-            authentication codes, recovery codes provide a means to access your account.
-          </CardDescription>
-        </div>
-      </CardContent>
-
-      <PasswordCheckDialog
-        open={modalState === 'password'}
-        onOpenChange={() => {
-          setModalState(null);
-        }}
-        // eslint-disable-next-line @typescript-eslint/require-await
-        onVerified={async () => {
-          setModalState('recover-codes');
-        }}
-        title="View recovery code"
-      />
-
-      <RecoveryCodesDialog
-        open={modalState === 'recover-codes'}
-        onOpenChange={() => {
-          setModalState(null);
-        }}
-        backupCodes={backupCodes}
+      <ViewRecoveryCodesDialog
+        key={isOpen ? 'open' : 'closed'}
+        open={isOpen}
+        onOpenChange={setIsOpen}
       />
     </>
   );

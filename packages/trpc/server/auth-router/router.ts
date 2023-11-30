@@ -27,6 +27,7 @@ export const authRouter = router({
       });
     }
   }),
+
   verifyPassword: authenticatedProcedure
     .input(ZVerifyPasswordMutationSchema)
     .mutation(async ({ input: { password }, ctx: { user } }) => {
@@ -37,6 +38,7 @@ export const authRouter = router({
         });
       }
       const verified = await compare(password, user.password);
+
       return { verified };
     }),
 });

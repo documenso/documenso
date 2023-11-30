@@ -5,7 +5,7 @@ import { fieldRouter } from './field-router/router';
 import { profileRouter } from './profile-router/router';
 import { shareLinkRouter } from './share-link-router/router';
 import { procedure, router } from './trpc';
-import { twoFactorRouter } from './two-factor-router/router';
+import { twoFactorAuthenticationRouter } from './two-factor-authentication-router/router';
 
 export const appRouter = router({
   health: procedure.query(() => {
@@ -17,7 +17,7 @@ export const appRouter = router({
   field: fieldRouter,
   admin: adminRouter,
   shareLink: shareLinkRouter,
-  twoFactor: twoFactorRouter,
+  twoFactorAuthentication: twoFactorAuthenticationRouter,
 });
 
 export type AppRouter = typeof appRouter;
