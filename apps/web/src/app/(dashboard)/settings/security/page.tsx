@@ -1,4 +1,5 @@
 import { getRequiredServerComponentSession } from '@documenso/lib/next-auth/get-server-component-session';
+import { identityProviderName } from '@documenso/lib/server-only/auth/identityProviderName';
 
 import { AuthenticatorApp } from '~/components/forms/2fa/authenticator-app';
 import { RecoveryCodes } from '~/components/forms/2fa/recovery-codes';
@@ -46,10 +47,12 @@ export default async function SecuritySettingsPage() {
         </div>
       ) : (
         <div>
-          <h4 className="text-lg font-medium">Your account is managed by Google</h4>
+          <h4 className="text-lg font-medium">
+            Your account is managed by {identityProviderName[user.identityProvider]}
+          </h4>
           <p className="text-muted-foreground mt-2 text-sm">
-            To change your password, enable two-factor authentication and more, please visit your
-            Google account settings.
+            To change your password, enable two-factor authentication and more, please visit your{' '}
+            {identityProviderName[user.identityProvider]} account settings.
           </p>
         </div>
       )}
