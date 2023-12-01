@@ -8,6 +8,7 @@
     "build": "next build",
     "start": "next start -p 3001",
     "lint": "next lint",
+    "lint:fix": "next lint --fix",
     "clean": "rimraf .next && rimraf node_modules",
     "copy:pdfjs": "node ../../scripts/copy-pdfjs.cjs"
   },
@@ -20,6 +21,7 @@
     "contentlayer": "^0.3.4",
     "framer-motion": "^10.12.8",
     "lucide-react": "^0.279.0",
+    "luxon": "^3.4.0",
     "micro": "^10.0.1",
     "next": "14.0.0",
     "next-auth": "4.24.3",

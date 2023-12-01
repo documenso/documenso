@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
-import { z } from 'zod';
+import type { z } from 'zod';
 
 import { trpc } from '@documenso/trpc/react';
 import { ZUpdateProfileMutationByAdminSchema } from '@documenso/trpc/server/admin-router/schema';

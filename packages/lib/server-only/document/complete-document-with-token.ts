@@ -94,6 +94,7 @@ export const completeDocumentWithToken = async ({
     },
     data: {
       status: DocumentStatus.COMPLETED,
+      completedAt: new Date(),
     },
   });
 

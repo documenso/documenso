@@ -14,6 +14,7 @@ import { FROM_ADDRESS, FROM_NAME, SERVICE_USER_EMAIL } from '@documenso/lib/cons
 import { insertFieldInPDF } from '@documenso/lib/server-only/pdf/insert-field-in-pdf';
 import { alphaid } from '@documenso/lib/universal/id';
 import { getFile } from '@documenso/lib/universal/upload/get-file';
+import { putFile } from '@documenso/lib/universal/upload/put-file';
 import { prisma } from '@documenso/prisma';
 import {
   DocumentDataType,
@@ -24,6 +25,7 @@ import {
   SendStatus,
   SigningStatus,
 } from '@documenso/prisma/client';
+import { signPdf } from '@documenso/signing';
 
 const ZCreateSinglePlayerDocumentSchema = z.object({
   documentData: z.object({
@@ -97,11 +99,13 @@ export const createSinglePlayerDocument = async (
     });
   }
 
-  const pdfBytes = await doc.save();
+  const unsignedPdfBytes = await doc.save();
 
-  const documentToken = await prisma.$transaction(
+  const signedPdfBuffer = await signPdf({ pdf: Buffer.from(unsignedPdfBytes) });
+
+  const { token } = await prisma.$transaction(
     async (tx) => {
-      const documentToken = alphaid();
+      const token = alphaid();
 
       // Fetch service user who will be the owner of the document.
       const serviceUser = await tx.user.findFirstOrThrow({
@@ -110,14 +114,10 @@ export const createSinglePlayerDocument = async (
         },
       });
 
-      const documentDataBytes = Buffer.from(pdfBytes).toString('base64');
-
-      const { id: documentDataId } = await tx.documentData.create({
-        data: {
-          type: DocumentDataType.BYTES_64,
-          data: documentDataBytes,
-          initialData: documentDataBytes,
-        },
+      const { id: documentDataId } = await putFile({
+        name: `${documentName}.pdf`,
+        type: 'application/pdf',
+        arrayBuffer: async () => Promise.resolve(signedPdfBuffer),
       });
 
       // Create document.
@@ -137,7 +137,7 @@ export const createSinglePlayerDocument = async (
           documentId: document.id,
           name: signer.name,
           email: signer.email,
-          token: documentToken,
+          token,
           signedAt: createdAt,
           readStatus: ReadStatus.OPENED,
           signingStatus: SigningStatus.SIGNED,
@@ -169,7 +169,7 @@ export const createSinglePlayerDocument = async (
         }),
       );
 
-      return documentToken;
+      return { document, token };
     },
     {
       maxWait: 5000,
@@ -195,10 +195,10 @@ export const createSinglePlayerDocument = async (
     subject: 'Document signed',
     html: render(template),
     text: render(template, { plainText: true }),
-    attachments: [{ content: Buffer.from(pdfBytes), filename: documentName }],
+    attachments: [{ content: signedPdfBuffer, filename: documentName }],
   });
 
-  return documentToken;
+  return token;
 };
 
 /**
