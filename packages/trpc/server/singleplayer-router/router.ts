@@ -1,6 +1,5 @@
 import { createElement } from 'react';
 
-import { performance } from 'node:perf_hooks';
 import { PDFDocument } from 'pdf-lib';
 
 import { mailer } from '@documenso/email/mailer';
@@ -25,38 +24,25 @@ import { procedure, router } from '../trpc';
 import { mapField } from './helper';
 import { ZCreateSinglePlayerDocumentMutationSchema } from './schema';
 
-const timer = (label: string) => {
-  const start = performance.now();
-
-  return () => {
-    const end = performance.now();
-    console.log(`${label}: ${end - start}ms`);
-  };
-};
-
 export const singleplayerRouter = router({
   createSinglePlayerDocument: procedure
     .input(ZCreateSinglePlayerDocumentMutationSchema)
     .mutation(async ({ input }) => {
       const { signer, fields, documentData, documentName } = input;
 
-      const stopGetFileTimer = timer('getFile');
       const document = await getFile({
         data: documentData.data,
         type: documentData.type,
       });
-      stopGetFileTimer();
 
-      const stopLoadPdfTimer = timer('loadPdf');
       const doc = await PDFDocument.load(document);
-      stopLoadPdfTimer();
+
       const createdAt = new Date();
 
       const isBase64 = signer.signature.startsWith('data:image/png;base64,');
       const signatureImageAsBase64 = isBase64 ? signer.signature : null;
       const typedSignature = !isBase64 ? signer.signature : null;
 
-      const stopInsertFieldsTimer = timer('insertFields');
       // Update the document with the fields inserted.
       for (const field of fields) {
         const isSignatureField = field.type === FieldType.SIGNATURE;
@@ -80,17 +66,11 @@ export const singleplayerRouter = router({
           recipientId: -1,
         });
       }
-      stopInsertFieldsTimer();
 
-      const stopSavePdfTimer = timer('savePdf');
       const unsignedPdfBytes = await doc.save();
-      stopSavePdfTimer();
 
-      const stopSignPdfTimer = timer('signPdf');
       const signedPdfBuffer = await signPdf({ pdf: Buffer.from(unsignedPdfBytes) });
-      stopSignPdfTimer();
 
-      const stopCreateDocumentTimer = timer('createDocument');
       const { token } = await prisma.$transaction(
         async (tx) => {
           const token = alphaid();
@@ -102,13 +82,11 @@ export const singleplayerRouter = router({
             },
           });
 
-          const stopPutFileTimer = timer('putFile');
           const { id: documentDataId } = await putFile({
             name: `${documentName}.pdf`,
             type: 'application/pdf',
             arrayBuffer: async () => Promise.resolve(signedPdfBuffer),
           });
-          stopPutFileTimer();
 
           // Create document.
           const document = await tx.document.create({
@@ -135,7 +113,6 @@ export const singleplayerRouter = router({
             },
           });
 
-          const stopCreateFieldsTimer = timer('createFields');
           // Create fields and signatures.
           await Promise.all(
             fields.map(async (field) => {
@@ -159,7 +136,6 @@ export const singleplayerRouter = router({
               }
             }),
           );
-          stopCreateFieldsTimer();
 
           return { document, token };
         },
@@ -168,21 +144,17 @@ export const singleplayerRouter = router({
           timeout: 30000,
         },
       );
-      stopCreateDocumentTimer();
 
       const template = createElement(DocumentSelfSignedEmailTemplate, {
         documentName: documentName,
         assetBaseUrl: process.env.NEXT_PUBLIC_WEBAPP_URL || 'http://localhost:3000',
       });
 
-      const stopRenderTimer = timer('render');
       const [html, text] = await Promise.all([
         renderAsync(template),
         renderAsync(template, { plainText: true }),
       ]);
-      stopRenderTimer();
 
-      const stopSendEmailTimer = timer('sendEmail');
       // Send email to signer.
       await mailer.sendMail({
         to: {
@@ -198,7 +170,6 @@ export const singleplayerRouter = router({
         text,
         attachments: [{ content: signedPdfBuffer, filename: documentName }],
       });
-      stopSendEmailTimer();
 
       return token;
     }),

@@ -52,8 +52,6 @@ const config = {
       config.resolve.alias.canvas = false;
     }
 
-    config.optimization.minimize = false;
-
     return config;
   },
   async rewrites() {
