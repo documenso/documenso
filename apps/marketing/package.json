@@ -46,6 +46,9 @@
     "@types/react-dom": "18.2.7"
   },
   "overrides": {
+    "next-auth": {
+      "next": "$next"
+    },
     "next-contentlayer": {
       "next": "$next"
     }

@@ -53,5 +53,13 @@
     "@types/node": "20.1.0",
     "@types/react": "18.2.18",
     "@types/react-dom": "18.2.7"
+  },
+  "overrides": {
+    "next-auth": {
+      "next": "$next"
+    },
+    "next-contentlayer": {
+      "next": "$next"
+    }
   }
 }
