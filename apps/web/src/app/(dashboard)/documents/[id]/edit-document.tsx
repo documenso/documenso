@@ -4,23 +4,24 @@ import { useState } from 'react';
 
 import { useRouter } from 'next/navigation';
 
-import { DocumentData, DocumentStatus, Field, Recipient, User } from '@documenso/prisma/client';
-import { DocumentWithData } from '@documenso/prisma/types/document-with-data';
+import type { DocumentData, Field, Recipient, User } from '@documenso/prisma/client';
+import { DocumentStatus } from '@documenso/prisma/client';
+import type { DocumentWithData } from '@documenso/prisma/types/document-with-data';
 import { cn } from '@documenso/ui/lib/utils';
 import { Card, CardContent } from '@documenso/ui/primitives/card';
 import { AddFieldsFormPartial } from '@documenso/ui/primitives/document-flow/add-fields';
-import { TAddFieldsFormSchema } from '@documenso/ui/primitives/document-flow/add-fields.types';
+import type { TAddFieldsFormSchema } from '@documenso/ui/primitives/document-flow/add-fields.types';
 import { AddSignersFormPartial } from '@documenso/ui/primitives/document-flow/add-signers';
-import { TAddSignersFormSchema } from '@documenso/ui/primitives/document-flow/add-signers.types';
+import type { TAddSignersFormSchema } from '@documenso/ui/primitives/document-flow/add-signers.types';
 import { AddSubjectFormPartial } from '@documenso/ui/primitives/document-flow/add-subject';
-import { TAddSubjectFormSchema } from '@documenso/ui/primitives/document-flow/add-subject.types';
+import type { TAddSubjectFormSchema } from '@documenso/ui/primitives/document-flow/add-subject.types';
 import { AddTitleFormPartial } from '@documenso/ui/primitives/document-flow/add-title';
-import { TAddTitleFormSchema } from '@documenso/ui/primitives/document-flow/add-title.types';
+import type { TAddTitleFormSchema } from '@documenso/ui/primitives/document-flow/add-title.types';
 import {
   DocumentFlowFormContainer,
   DocumentFlowFormContainerHeader,
 } from '@documenso/ui/primitives/document-flow/document-flow-root';
-import { DocumentFlowStep } from '@documenso/ui/primitives/document-flow/types';
+import type { DocumentFlowStep } from '@documenso/ui/primitives/document-flow/types';
 import { LazyPDFViewer } from '@documenso/ui/primitives/lazy-pdf-viewer';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
@@ -191,7 +192,10 @@ export const EditDocumentForm = ({
       </Card>
 
       <div className="col-span-12 lg:col-span-6 xl:col-span-5">
-        <DocumentFlowFormContainer onSubmit={(e) => e.preventDefault()}>
+        <DocumentFlowFormContainer
+          className="lg:h-[calc(100vh-6rem)]"
+          onSubmit={(e) => e.preventDefault()}
+        >
           <DocumentFlowFormContainerHeader
             title={currentDocumentFlow.title}
             description={currentDocumentFlow.description}
