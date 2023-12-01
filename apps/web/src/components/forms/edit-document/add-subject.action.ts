@@ -1,9 +1,9 @@
 'use server';
 
-import { getRequiredServerComponentSession } from '@documenso/lib/next-auth/get-server-session';
+import { getRequiredServerComponentSession } from '@documenso/lib/next-auth/get-server-component-session';
 import { upsertDocumentMeta } from '@documenso/lib/server-only/document-meta/upsert-document-meta';
 import { sendDocument } from '@documenso/lib/server-only/document/send-document';
-import { TAddSubjectFormSchema } from '@documenso/ui/primitives/document-flow/add-subject.types';
+import type { TAddSubjectFormSchema } from '@documenso/ui/primitives/document-flow/add-subject.types';
 
 export type CompleteDocumentActionInput = TAddSubjectFormSchema & {
   documentId: number;

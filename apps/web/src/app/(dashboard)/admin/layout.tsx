@@ -2,7 +2,7 @@ import React from 'react';
 
 import { redirect } from 'next/navigation';
 
-import { getRequiredServerComponentSession } from '@documenso/lib/next-auth/get-server-session';
+import { getRequiredServerComponentSession } from '@documenso/lib/next-auth/get-server-component-session';
 import { isAdmin } from '@documenso/lib/next-auth/guards/is-admin';
 
 import { AdminNav } from './nav';

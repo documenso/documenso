@@ -110,6 +110,7 @@ export const NEXT_AUTH_OPTIONS: AuthOptions = {
         merged.id = retrieved.id;
         merged.name = retrieved.name;
         merged.email = retrieved.email;
+        merged.emailVerified = retrieved.emailVerified;
       }
 
       if (
@@ -134,6 +135,7 @@ export const NEXT_AUTH_OPTIONS: AuthOptions = {
         name: merged.name,
         email: merged.email,
         lastSignedIn: merged.lastSignedIn,
+        emailVerified: merged.emailVerified,
       };
     },
 
@@ -145,6 +147,8 @@ export const NEXT_AUTH_OPTIONS: AuthOptions = {
             id: Number(token.id),
             name: token.name,
             email: token.email,
+            emailVerified:
+              typeof token.emailVerified === 'string' ? new Date(token.emailVerified) : null,
           },
         } satisfies Session;
       }

@@ -52,6 +52,16 @@ model PasswordResetToken {
   User      User     @relation(fields: [userId], references: [id])
 }
 
+model VerificationToken {
+  id         Int      @id @default(autoincrement())
+  identifier String
+  token      String   @unique
+  expires    DateTime
+  createdAt  DateTime @default(now())
+  userId     Int
+  user       User     @relation(fields: [userId], references: [id])
+}
+
 enum SubscriptionStatus {
   ACTIVE
   PAST_DUE
