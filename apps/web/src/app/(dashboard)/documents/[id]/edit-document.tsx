@@ -193,7 +193,10 @@ export const EditDocumentForm = ({
       </Card>
 
       <div className="col-span-12 lg:col-span-6 xl:col-span-5">
-        <DocumentFlowFormContainer onSubmit={(e) => e.preventDefault()}>
+        <DocumentFlowFormContainer
+          className="lg:h-[calc(100vh-6rem)]"
+          onSubmit={(e) => e.preventDefault()}
+        >
           <DocumentFlowFormContainerHeader
             title={currentDocumentFlow.title}
             description={currentDocumentFlow.description}
