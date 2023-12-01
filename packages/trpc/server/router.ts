@@ -7,6 +7,7 @@ import { recipientRouter } from './recipient-router/router';
 import { shareLinkRouter } from './share-link-router/router';
 import { singleplayerRouter } from './singleplayer-router/router';
 import { router } from './trpc';
+import { twoFactorAuthenticationRouter } from './two-factor-authentication-router/router';
 
 export const appRouter = router({
   auth: authRouter,
@@ -17,6 +18,7 @@ export const appRouter = router({
   admin: adminRouter,
   shareLink: shareLinkRouter,
   singleplayer: singleplayerRouter,
+  twoFactorAuthentication: twoFactorAuthenticationRouter,
 });
 
 export type AppRouter = typeof appRouter;

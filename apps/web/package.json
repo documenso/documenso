@@ -44,6 +44,7 @@
     "sharp": "0.32.5",
     "ts-pattern": "^5.0.5",
     "typescript": "5.2.2",
+    "uqr": "^0.1.2",
     "zod": "^3.22.4"
   },
   "devDependencies": {

@@ -22,7 +22,9 @@ const config = {
   output: process.env.DOCKER_OUTPUT ? 'standalone' : undefined,
   experimental: {
     outputFileTracingRoot: path.join(__dirname, '../../'),
-    serverActionsBodySizeLimit: '50mb',
+    serverActions: {
+      bodySizeLimit: '50mb',
+    },
   },
   reactStrictMode: true,
   transpilePackages: [
@@ -50,7 +52,7 @@ const config = {
       config.resolve.alias.canvas = false;
     }
 
-    config.optimization.minimize = false
+    config.optimization.minimize = false;
 
     return config;
   },
