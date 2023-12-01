@@ -28,6 +28,7 @@ import { SignaturePad } from '@documenso/ui/primitives/signature-pad';
 import { DATE_FORMATS } from '~/helpers/constants';
 
 import { useRequiredSigningContext } from './provider';
+import { SignDialog } from './sign-dialog';
 
 export type SigningFormProps = {
   document: Document;
@@ -57,6 +58,7 @@ export const SigningForm = ({ document, recipient, fields }: SigningFormProps) =
 
   const onFormSubmit = async () => {
     setValidateUninsertedFields(true);
+
     const isFieldsValid = validateFieldsInserted(fields);
 
     if (!isFieldsValid) {
@@ -168,9 +170,12 @@ export const SigningForm = ({ document, recipient, fields }: SigningFormProps) =
                 Cancel
               </Button>
 
-              <Button className="w-full" type="submit" size="lg" loading={isSubmitting}>
-                Complete
-              </Button>
+              <SignDialog
+                isSubmitting={isSubmitting}
+                onSignatureComplete={handleSubmit(onFormSubmit)}
+                document={document}
+                fields={fields}
+              />
             </div>
           </div>
         </div>

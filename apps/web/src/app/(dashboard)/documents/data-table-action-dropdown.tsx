@@ -8,7 +8,6 @@ import {
   Copy,
   Download,
   Edit,
-  History,
   Loader,
   MoreHorizontal,
   Pencil,
@@ -18,15 +17,12 @@ import {
 } from 'lucide-react';
 import { useSession } from 'next-auth/react';
 
-import { useCopyShareLink } from '@documenso/lib/client-only/hooks/use-copy-share-link';
-import {
-  TOAST_DOCUMENT_SHARE_ERROR,
-  TOAST_DOCUMENT_SHARE_SUCCESS,
-} from '@documenso/lib/constants/toast';
 import { getFile } from '@documenso/lib/universal/upload/get-file';
-import { Document, DocumentStatus, Recipient, User } from '@documenso/prisma/client';
-import { DocumentWithData } from '@documenso/prisma/types/document-with-data';
+import type { Document, Recipient, User } from '@documenso/prisma/client';
+import { DocumentStatus } from '@documenso/prisma/client';
+import type { DocumentWithData } from '@documenso/prisma/types/document-with-data';
 import { trpc as trpcClient } from '@documenso/trpc/client';
+import { DocumentShareButton } from '@documenso/ui/components/document/document-share-button';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -34,9 +30,10 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from '@documenso/ui/primitives/dropdown-menu';
-import { useToast } from '@documenso/ui/primitives/use-toast';
 
+import { ResendDocumentActionItem } from './_action-items/resend-document';
 import { DeleteDraftDocumentDialog } from './delete-draft-document-dialog';
+import { DuplicateDocumentDialog } from './duplicate-document-dialog';
 
 export type DataTableActionDropdownProps = {
   row: Document & {
@@ -48,14 +45,8 @@ export type DataTableActionDropdownProps = {
 export const DataTableActionDropdown = ({ row }: DataTableActionDropdownProps) => {
   const { data: session } = useSession();
 
-  const { toast } = useToast();
-
-  const { createAndCopyShareLink, isCopyingShareLink } = useCopyShareLink({
-    onSuccess: () => toast(TOAST_DOCUMENT_SHARE_SUCCESS),
-    onError: () => toast(TOAST_DOCUMENT_SHARE_ERROR),
-  });
-
   const [isDeleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [isDuplicateDialogOpen, setDuplicateDialogOpen] = useState(false);
 
   if (!session) {
     return null;
@@ -106,6 +97,7 @@ export const DataTableActionDropdown = ({ row }: DataTableActionDropdownProps) =
     window.URL.revokeObjectURL(link.href);
   };
 
+  const nonSignedRecipients = row.Recipient.filter((item) => item.signingStatus !== 'SIGNED');
   return (
     <DropdownMenu>
       <DropdownMenuTrigger>
@@ -134,7 +126,7 @@ export const DataTableActionDropdown = ({ row }: DataTableActionDropdownProps) =
           Download
         </DropdownMenuItem>
 
-        <DropdownMenuItem disabled>
+        <DropdownMenuItem onClick={() => setDuplicateDialogOpen(true)}>
           <Copy className="mr-2 h-4 w-4" />
           Duplicate
         </DropdownMenuItem>
@@ -151,27 +143,20 @@ export const DataTableActionDropdown = ({ row }: DataTableActionDropdownProps) =
 
         <DropdownMenuLabel>Share</DropdownMenuLabel>
 
-        <DropdownMenuItem disabled>
-          <History className="mr-2 h-4 w-4" />
-          Resend
-        </DropdownMenuItem>
+        <ResendDocumentActionItem document={row} recipients={nonSignedRecipients} />
 
-        <DropdownMenuItem
-          disabled={isDraft}
-          onClick={async () =>
-            createAndCopyShareLink({
-              token: recipient?.token,
-              documentId: row.id,
-            })
-          }
-        >
-          {isCopyingShareLink ? (
-            <Loader className="mr-2 h-4 w-4" />
-          ) : (
-            <Share className="mr-2 h-4 w-4" />
+        <DocumentShareButton
+          documentId={row.id}
+          token={recipient?.token}
+          trigger={({ loading, disabled }) => (
+            <DropdownMenuItem disabled={disabled || isDraft} onSelect={(e) => e.preventDefault()}>
+              <div className="flex items-center">
+                {loading ? <Loader className="mr-2 h-4 w-4" /> : <Share className="mr-2 h-4 w-4" />}
+                Share
+              </div>
+            </DropdownMenuItem>
           )}
-          Share
-        </DropdownMenuItem>
+        />
       </DropdownMenuContent>
 
       {isDocumentDeletable && (
@@ -179,6 +164,13 @@ export const DataTableActionDropdown = ({ row }: DataTableActionDropdownProps) =
           id={row.id}
           open={isDeleteDialogOpen}
           onOpenChange={setDeleteDialogOpen}
+        />
+      )}
+      {isDuplicateDialogOpen && (
+        <DuplicateDocumentDialog
+          id={row.id}
+          open={isDuplicateDialogOpen}
+          onOpenChange={setDuplicateDialogOpen}
         />
       )}
     </DropdownMenu>
