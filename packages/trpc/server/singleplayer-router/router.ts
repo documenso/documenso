@@ -3,7 +3,7 @@ import { createElement } from 'react';
 import { PDFDocument } from 'pdf-lib';
 
 import { mailer } from '@documenso/email/mailer';
-import { render } from '@documenso/email/render';
+import { renderAsync } from '@documenso/email/render';
 import { DocumentSelfSignedEmailTemplate } from '@documenso/email/templates/document-self-signed';
 import { FROM_ADDRESS, FROM_NAME, SERVICE_USER_EMAIL } from '@documenso/lib/constants/email';
 import { insertFieldInPDF } from '@documenso/lib/server-only/pdf/insert-field-in-pdf';
@@ -36,6 +36,7 @@ export const singleplayerRouter = router({
       });
 
       const doc = await PDFDocument.load(document);
+
       const createdAt = new Date();
 
       const isBase64 = signer.signature.startsWith('data:image/png;base64,');
@@ -149,6 +150,11 @@ export const singleplayerRouter = router({
         assetBaseUrl: process.env.NEXT_PUBLIC_WEBAPP_URL || 'http://localhost:3000',
       });
 
+      const [html, text] = await Promise.all([
+        renderAsync(template),
+        renderAsync(template, { plainText: true }),
+      ]);
+
       // Send email to signer.
       await mailer.sendMail({
         to: {
@@ -160,8 +166,8 @@ export const singleplayerRouter = router({
           address: FROM_ADDRESS,
         },
         subject: 'Document signed',
-        html: render(template),
-        text: render(template, { plainText: true }),
+        html,
+        text,
         attachments: [{ content: signedPdfBuffer, filename: documentName }],
       });
 

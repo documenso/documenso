@@ -1,20 +1,8 @@
-import {
-  Body,
-  Container,
-  Head,
-  Html,
-  Img,
-  Preview,
-  Section,
-  Tailwind,
-} from '@react-email/components';
-
 import config from '@documenso/tailwind-config';
 
-import {
-  TemplateConfirmationEmail,
-  TemplateConfirmationEmailProps,
-} from '../template-components/template-confirmation-email';
+import { Body, Container, Head, Html, Img, Preview, Section, Tailwind } from '../components';
+import type { TemplateConfirmationEmailProps } from '../template-components/template-confirmation-email';
+import { TemplateConfirmationEmail } from '../template-components/template-confirmation-email';
 import { TemplateFooter } from '../template-components/template-footer';
 
 export const ConfirmEmailTemplate = ({
