@@ -17,28 +17,40 @@ export default async function SecuritySettingsPage() {
 
       <hr className="my-4" />
 
-      <PasswordForm user={user} className="max-w-xl" />
+      {user.identityProvider === 'DOCUMENSO' ? (
+        <div>
+          <PasswordForm user={user} className="max-w-xl" />
 
-      <hr className="mb-4 mt-8" />
+          <hr className="mb-4 mt-8" />
 
-      <h4 className="text-lg font-medium">Two Factor Authentication</h4>
+          <h4 className="text-lg font-medium">Two Factor Authentication</h4>
 
-      <p className="text-muted-foreground mt-2 text-sm">
-        Add and manage your two factor security settings to add an extra layer of security to your
-        account!
-      </p>
+          <p className="text-muted-foreground mt-2 text-sm">
+            Add and manage your two factor security settings to add an extra layer of security to
+            your account!
+          </p>
 
-      <div className="mt-4 max-w-xl">
-        <h5 className="font-medium">Two-factor methods</h5>
+          <div className="mt-4 max-w-xl">
+            <h5 className="font-medium">Two-factor methods</h5>
 
-        <AuthenticatorApp isTwoFactorEnabled={user.twoFactorEnabled} />
-      </div>
+            <AuthenticatorApp isTwoFactorEnabled={user.twoFactorEnabled} />
+          </div>
 
-      {user.twoFactorEnabled && (
-        <div className="mt-4 max-w-xl">
-          <h5 className="font-medium">Recovery methods</h5>
+          {user.twoFactorEnabled && (
+            <div className="mt-4 max-w-xl">
+              <h5 className="font-medium">Recovery methods</h5>
 
-          <RecoveryCodes isTwoFactorEnabled={user.twoFactorEnabled} />
+              <RecoveryCodes isTwoFactorEnabled={user.twoFactorEnabled} />
+            </div>
+          )}
+        </div>
+      ) : (
+        <div>
+          <h4 className="text-lg font-medium">Your account is managed by Google</h4>
+          <p className="text-muted-foreground mt-2 text-sm">
+            To change your password, enable two-factor authentication and more, please visit your
+            Google account settings.
+          </p>
         </div>
       )}
     </div>
