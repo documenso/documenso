@@ -47,7 +47,10 @@
     "apps/*",
     "packages/*"
   ],
-  "dependencies": {},
+  "dependencies": {
+    "mammoth": "^1.6.0",
+    "puppeteer": "^21.5.2"
+  },
   "overrides": {
     "next-auth": {
       "next": "14.0.3"
