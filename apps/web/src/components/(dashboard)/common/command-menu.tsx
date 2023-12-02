@@ -1,17 +1,19 @@
 'use client';
 
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { useRouter } from 'next/navigation';
 
-import { Monitor, Moon, Sun } from 'lucide-react';
+import { Loader, Monitor, Moon, Sun } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import { useHotkeys } from 'react-hotkeys-hook';
 
+import { useDebouncedValue } from '@documenso/lib/client-only/hooks/use-debounced-value';
 import {
   DOCUMENTS_PAGE_SHORTCUT,
   SETTINGS_PAGE_SHORTCUT,
 } from '@documenso/lib/constants/keyboard-shortcuts';
+import { trpc } from '@documenso/trpc/react';
 import {
   CommandDialog,
   CommandEmpty,
@@ -52,6 +54,33 @@ export function CommandMenu({ open, onOpenChange }: CommandMenuProps) {
   const [isOpen, setIsOpen] = useState(() => open ?? false);
   const [search, setSearch] = useState('');
   const [pages, setPages] = useState<string[]>([]);
+
+  const [searchResults, setSearchResults] = useState<
+    { label: string; path: string; recipents: string[] }[]
+  >([]);
+
+  const debouncedSearchString = useDebouncedValue(search, 1000);
+  const { isLoading: isSearchingDocuments, refetch: findDocuments } =
+    trpc.document.searchDocuments.useQuery(
+      {
+        query: search,
+      },
+      {
+        enabled: search !== '',
+        onSuccess: (data) => {
+          const newResults = data?.map((document) => ({
+            label: document.title,
+            path: `/documents/${document.id}`,
+            recipents: document.Recipient.map((recipient) => recipient.email),
+          }));
+          setSearchResults(newResults);
+        },
+      },
+    );
+
+  useEffect(() => {
+    findDocuments();
+  }, [debouncedSearchString, findDocuments]);
 
   const currentPage = pages[pages.length - 1];
 
@@ -113,7 +142,22 @@ export function CommandMenu({ open, onOpenChange }: CommandMenuProps) {
   };
 
   return (
-    <CommandDialog commandProps={{ onKeyDown: handleKeyDown }} open={open} onOpenChange={setOpen}>
+    <CommandDialog
+      commandProps={{
+        onKeyDown: handleKeyDown,
+        filter: (value, search) => {
+          const exists = value.includes(search);
+          if (exists) return 1;
+          const result = searchResults.find(
+            (result) => result.label.toLocaleLowerCase() === value.toLocaleLowerCase(),
+          );
+          if (result?.recipents.some((recipent) => recipent.includes(search))) return 1;
+          return 0;
+        },
+      }}
+      open={open}
+      onOpenChange={setOpen}
+    >
       <CommandInput
         value={search}
         onValueChange={setSearch}
@@ -121,7 +165,17 @@ export function CommandMenu({ open, onOpenChange }: CommandMenuProps) {
       />
 
       <CommandList>
-        <CommandEmpty>No results found.</CommandEmpty>
+        {isSearchingDocuments ? (
+          <CommandEmpty>
+            <div className="flex items-center justify-center ">
+              <span className="animate-spin">
+                <Loader />
+              </span>
+            </div>
+          </CommandEmpty>
+        ) : (
+          <CommandEmpty>No results found.</CommandEmpty>
+        )}
         {!currentPage && (
           <>
             <CommandGroup heading="Documents">
@@ -133,6 +187,11 @@ export function CommandMenu({ open, onOpenChange }: CommandMenuProps) {
             <CommandGroup heading="Preferences">
               <CommandItem onSelect={() => addPage('theme')}>Change theme</CommandItem>
             </CommandGroup>
+            {searchResults.length > 0 && (
+              <CommandGroup heading="Your sent and received documents">
+                <Commands push={push} pages={searchResults} />
+              </CommandGroup>
+            )}
           </>
         )}
         {currentPage === 'theme' && <ThemeCommands setTheme={setTheme} />}
@@ -148,8 +207,8 @@ const Commands = ({
   push: (_path: string) => void;
   pages: { label: string; path: string; shortcut?: string }[];
 }) => {
-  return pages.map((page) => (
-    <CommandItem key={page.path} onSelect={() => push(page.path)}>
+  return pages.map((page, index) => (
+    <CommandItem key={page.path + index} value={page.label} onSelect={() => push(page.path)}>
       {page.label}
       {page.shortcut && <CommandShortcut>{page.shortcut}</CommandShortcut>}
     </CommandItem>
