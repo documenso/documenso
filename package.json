@@ -31,6 +31,7 @@
   "devDependencies": {
     "@commitlint/cli": "^17.7.1",
     "@commitlint/config-conventional": "^17.7.0",
+    "@types/jspdf": "^2.0.0",
     "dotenv": "^16.3.1",
     "dotenv-cli": "^7.3.0",
     "eslint": "^8.40.0",
@@ -48,6 +49,8 @@
     "packages/*"
   ],
   "dependencies": {
+    "html2pdf.js": "^0.10.1",
+    "jspdf": "^2.5.1",
     "mammoth": "^1.6.0",
     "puppeteer": "^21.5.2"
   },

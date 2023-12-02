@@ -5,7 +5,9 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
+import html2pdf from 'html2pdf.js';
 import { Loader } from 'lucide-react';
+import Mammoth from 'mammoth/mammoth.browser';
 import { useSession } from 'next-auth/react';
 
 import { useLimits } from '@documenso/ee/server-only/limits/provider/client';
@@ -19,6 +21,41 @@ import { useToast } from '@documenso/ui/primitives/use-toast';
 
 export type UploadDocumentProps = {
   className?: string;
+};
+
+// eslint-disable-next-line @typescript-eslint/require-await
+const generatePDF = async (htmlContent: string | Element): Promise<Blob> => {
+  return html2pdf().from(htmlContent).output('blob');
+};
+
+const convertDocToPDF = async (file: File): Promise<File> => {
+  try {
+    if (file.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
+      const arrayBuffer = await file.arrayBuffer();
+      const result = await Mammoth.convertToHtml({ arrayBuffer });
+      const html = result.value;
+
+      // Create a temporary element to hold the HTML content
+      const tempDiv = document.createElement('div');
+      tempDiv.innerHTML = html;
+
+      // Use generatePDF to convert the HTML content to a PDF Blob
+      const pdfBlob = await generatePDF(tempDiv);
+
+      // Create and return a File object from the Blob
+      const pdfFile = new File([pdfBlob], file.name.replace(/\.[^/.]+$/, '') + '.pdf', {
+        type: 'application/pdf',
+      });
+
+      return pdfFile;
+    } else {
+      // Return the original file if it's not a DOCX file
+      return file;
+    }
+  } catch (error) {
+    console.error('Error converting document:', error);
+    throw error;
+  }
 };
 
 export const UploadDocument = ({ className }: UploadDocumentProps) => {
@@ -36,9 +73,15 @@ export const UploadDocument = ({ className }: UploadDocumentProps) => {
   const onFileDrop = async (file: File) => {
     try {
       setIsLoading(true);
+      let processedFile = file;
+      if (
+        file.type === 'application/msword' ||
+        file.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+      ) {
+        processedFile = await convertDocToPDF(file);
+      }
 
-      const { type, data } = await putFile(file);
-
+      const { type, data } = await putFile(processedFile);
       const { id: documentDataId } = await createDocumentData({
         type,
         data,
