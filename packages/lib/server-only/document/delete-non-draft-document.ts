@@ -9,7 +9,6 @@ import { prisma } from '@documenso/prisma';
 import { DocumentStatus } from '@documenso/prisma/client';
 
 import { FROM_ADDRESS, FROM_NAME } from '../../constants/email';
-import { renderCustomEmailTemplate } from '../../utils/render-custom-email-template';
 
 export type DeleteNonDraftDocumentOptions = {
   id: number;
@@ -41,8 +40,6 @@ export const deleteNonDraftDocument = async ({
       },
     });
 
-    const customEmail = document?.documentMeta;
-
     if (!document) {
       throw new Error('Document not found');
     }
@@ -62,15 +59,12 @@ export const deleteNonDraftDocument = async ({
         };
 
         const assetBaseUrl = process.env.NEXT_PUBLIC_WEBAPP_URL || 'http://localhost:3000';
-        const signDocumentLink = `${process.env.NEXT_PUBLIC_WEBAPP_URL}/sign/${recipient.token}`;
 
         const template = createElement(DocumentCancelTemplate, {
           documentName: document.title,
           inviterName: user.name || undefined,
           inviterEmail: user.email,
           assetBaseUrl,
-          signDocumentLink,
-          customBody: renderCustomEmailTemplate(customEmail?.message || '', customEmailTemplate),
         });
 
         await mailer.sendMail({
@@ -82,9 +76,7 @@ export const deleteNonDraftDocument = async ({
             name: FROM_NAME,
             address: FROM_ADDRESS,
           },
-          subject: customEmail?.subject
-            ? renderCustomEmailTemplate(customEmail.subject, customEmailTemplate)
-            : 'Please sign this document',
+          subject: 'Docuement cancelled',
           html: render(template),
           text: render(template, { plainText: true }),
         });

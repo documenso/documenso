@@ -1,34 +1,18 @@
 import config from '@documenso/tailwind-config';
 
-import {
-  Body,
-  Container,
-  Head,
-  Hr,
-  Html,
-  Img,
-  Link,
-  Preview,
-  Section,
-  Tailwind,
-  Text,
-} from '../components';
-import type { TemplateDocumentInviteProps } from '../template-components/template-document-invite';
-import { TemplateDocumentInvite } from '../template-components/template-document-invite';
+import { Body, Container, Head, Hr, Html, Img, Preview, Section, Tailwind } from '../components';
+import type { TemplateDocumentCancelProps } from '../template-components/template-document-cancel';
+import { TemplateDocumentCancel } from '../template-components/template-document-cancel';
 import { TemplateFooter } from '../template-components/template-footer';
 
-export type DocumentInviteEmailTemplateProps = Partial<TemplateDocumentInviteProps> & {
-  customBody?: string;
-};
+export type DocumentCancelEmailTemplateProps = Partial<TemplateDocumentCancelProps>;
 
 export const DocumentCancelTemplate = ({
   inviterName = 'Lucas Smith',
   inviterEmail = 'lucas@documenso.com',
   documentName = 'Open Source Pledge.pdf',
-  signDocumentLink = 'https://documenso.com',
   assetBaseUrl = 'http://localhost:3002',
-  customBody,
-}: DocumentInviteEmailTemplateProps) => {
+}: DocumentCancelEmailTemplateProps) => {
   const previewText = `${inviterName} has cancelled the document ${documentName}, you don't need to sign it anymore.`;
 
   const getAssetUrl = (path: string) => {
@@ -58,32 +42,12 @@ export const DocumentCancelTemplate = ({
                   className="mb-4 h-6"
                 />
 
-                <TemplateDocumentInvite
+                <TemplateDocumentCancel
                   inviterName={inviterName}
                   inviterEmail={inviterEmail}
                   documentName={documentName}
-                  signDocumentLink={signDocumentLink}
                   assetBaseUrl={assetBaseUrl}
                 />
-              </Section>
-            </Container>
-
-            <Container className="mx-auto mt-12 max-w-xl">
-              <Section>
-                <Text className="my-4 text-base font-semibold">
-                  {inviterName}{' '}
-                  <Link className="font-normal text-slate-400" href="mailto:{inviterEmail}">
-                    ({inviterEmail})
-                  </Link>
-                </Text>
-
-                <Text className="mt-2 text-base text-slate-400">
-                  {customBody ? (
-                    <pre className="font-sans text-base text-slate-400">{customBody}</pre>
-                  ) : (
-                    `${inviterName} has invited you to sign the document "${documentName}".`
-                  )}
-                </Text>
               </Section>
             </Container>
 
