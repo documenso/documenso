@@ -6,8 +6,8 @@ import { useRouter } from 'next/navigation';
 
 import { Loader } from 'lucide-react';
 
-import { Recipient } from '@documenso/prisma/client';
-import { FieldWithSignature } from '@documenso/prisma/types/field-with-signature';
+import type { Recipient } from '@documenso/prisma/client';
+import type { FieldWithSignature } from '@documenso/prisma/types/field-with-signature';
 import { trpc } from '@documenso/trpc/react';
 import { Button } from '@documenso/ui/primitives/button';
 import { Dialog, DialogContent, DialogFooter, DialogTitle } from '@documenso/ui/primitives/dialog';
@@ -76,10 +76,16 @@ export const SignatureField = ({ field, recipient }: SignatureFieldProps) => {
         return;
       }
 
+      const value = source === 'local' && localSignature ? localSignature : providedSignature ?? '';
+
+      if (!value) {
+        return;
+      }
+
       await signFieldWithToken({
         token: recipient.token,
         fieldId: field.id,
-        value: source === 'local' && localSignature ? localSignature : providedSignature ?? '',
+        value,
         isBase64: true,
       });
 

@@ -1,6 +1,7 @@
 import { TRPCError } from '@trpc/server';
 
 import { getServerLimits } from '@documenso/ee/server-only/limits/server';
+import { upsertDocumentMeta } from '@documenso/lib/server-only/document-meta/upsert-document-meta';
 import { createDocument } from '@documenso/lib/server-only/document/create-document';
 import { deleteDocument } from '@documenso/lib/server-only/document/delete-document';
 import { duplicateDocumentById } from '@documenso/lib/server-only/document/duplicate-document-by-id';
@@ -175,7 +176,15 @@ export const documentRouter = router({
     .input(ZSendDocumentMutationSchema)
     .mutation(async ({ input, ctx }) => {
       try {
-        const { documentId } = input;
+        const { documentId, email } = input;
+
+        if (email.message || email.subject) {
+          await upsertDocumentMeta({
+            documentId,
+            subject: email.subject,
+            message: email.message,
+          });
+        }
 
         return await sendDocument({
           userId: ctx.user.id,

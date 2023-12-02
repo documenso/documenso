@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation';
 import type { DocumentData, Field, Recipient, User } from '@documenso/prisma/client';
 import { DocumentStatus } from '@documenso/prisma/client';
 import type { DocumentWithData } from '@documenso/prisma/types/document-with-data';
+import { trpc } from '@documenso/trpc/react';
 import { cn } from '@documenso/ui/lib/utils';
 import { Card, CardContent } from '@documenso/ui/primitives/card';
 import { AddFieldsFormPartial } from '@documenso/ui/primitives/document-flow/add-fields';
@@ -24,11 +25,6 @@ import {
 import type { DocumentFlowStep } from '@documenso/ui/primitives/document-flow/types';
 import { LazyPDFViewer } from '@documenso/ui/primitives/lazy-pdf-viewer';
 import { useToast } from '@documenso/ui/primitives/use-toast';
-
-import { addFields } from '~/components/forms/edit-document/add-fields.action';
-import { addSigners } from '~/components/forms/edit-document/add-signers.action';
-import { completeDocument } from '~/components/forms/edit-document/add-subject.action';
-import { addTitle } from '~/components/forms/edit-document/add-title.action';
 
 export type EditDocumentFormProps = {
   className?: string;
@@ -55,6 +51,11 @@ export const EditDocumentForm = ({
   const [step, setStep] = useState<EditDocumentStep>(
     document.status === DocumentStatus.DRAFT ? 'title' : 'signers',
   );
+
+  const { mutateAsync: addTitle } = trpc.document.setTitleForDocument.useMutation();
+  const { mutateAsync: addFields } = trpc.field.addFields.useMutation();
+  const { mutateAsync: addSigners } = trpc.recipient.addSigners.useMutation();
+  const { mutateAsync: sendDocument } = trpc.document.sendDocument.useMutation();
 
   const documentFlow: Record<EditDocumentStep, DocumentFlowStep> = {
     title: {
@@ -154,7 +155,7 @@ export const EditDocumentForm = ({
     const { subject, message } = data.email;
 
     try {
-      await completeDocument({
+      await sendDocument({
         documentId: document.id,
         email: {
           subject,

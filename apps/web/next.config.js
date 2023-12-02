@@ -23,7 +23,7 @@ const config = {
   experimental: {
     outputFileTracingRoot: path.join(__dirname, '../../'),
     serverActions: {
-      bodySizeLimit: '50mb' 
+      bodySizeLimit: '50mb',
     },
   },
   reactStrictMode: true,
