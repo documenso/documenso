@@ -74,12 +74,13 @@ export const DocumentsDataTable = ({ results }: DocumentsDataTableProps) => {
           },
           {
             header: 'Actions',
-            cell: ({ row }) => (
-              <div className="flex items-center gap-x-4">
-                <DataTableActionButton row={row.original} />
-                <DataTableActionDropdown row={row.original} />
-              </div>
-            ),
+            cell: ({ row }) =>
+              !row.original.deletedAt && (
+                <div className="flex items-center gap-x-4">
+                  <DataTableActionButton row={row.original} />
+                  <DataTableActionDropdown row={row.original} />
+                </div>
+              ),
           },
         ]}
         data={results.data}

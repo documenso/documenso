@@ -67,6 +67,11 @@ export const findDocuments = async ({
           },
         },
       ],
+      AND: {
+        deletedAt: {
+          equals: null,
+        },
+      },
     }))
     .with(ExtendedDocumentStatus.INBOX, () => ({
       status: {
@@ -100,6 +105,11 @@ export const findDocuments = async ({
           },
         },
       ],
+      AND: {
+        deletedAt: {
+          equals: null,
+        },
+      },
     }))
     .with(ExtendedDocumentStatus.COMPLETED, () => ({
       OR: [
@@ -116,6 +126,11 @@ export const findDocuments = async ({
           },
         },
       ],
+      AND: {
+        deletedAt: {
+          equals: null,
+        },
+      },
     }))
     .exhaustive();
 
