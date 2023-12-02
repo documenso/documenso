@@ -69,15 +69,7 @@ export const StackAvatarsWithTooltip = ({
               <div>
                 <h1 className="text-base font-medium">Waiting</h1>
                 {waitingRecipients.map((recipient: Recipient) => (
-                  <div key={recipient.id} className="my-1 flex items-center gap-2">
-                    <StackAvatar
-                      first={true}
-                      key={recipient.id}
-                      type={getRecipientType(recipient)}
-                      fallbackText={recipientAbbreviation(recipient)}
-                    />
-                    <span className="text-muted-foreground text-sm">{recipient.email}</span>
-                  </div>
+                  <AvatarWithRecipient key={recipient.id} recipient={recipient} />
                 ))}
               </div>
             )}
