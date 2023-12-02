@@ -16,6 +16,7 @@ export const getStats = async ({ user }: GetStatsInput) => {
       },
       where: {
         userId: user.id,
+        deletedAt: null,
       },
     }),
     prisma.document.groupBy({
@@ -25,6 +26,7 @@ export const getStats = async ({ user }: GetStatsInput) => {
       },
       where: {
         status: ExtendedDocumentStatus.PENDING,
+        deletedAt: null,
         Recipient: {
           some: {
             email: user.email,

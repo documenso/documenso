@@ -3,6 +3,7 @@ import { TRPCError } from '@trpc/server';
 import { getServerLimits } from '@documenso/ee/server-only/limits/server';
 import { upsertDocumentMeta } from '@documenso/lib/server-only/document-meta/upsert-document-meta';
 import { createDocument } from '@documenso/lib/server-only/document/create-document';
+import { deleteDocument } from '@documenso/lib/server-only/document/delete-document';
 import { deleteDraftDocument } from '@documenso/lib/server-only/document/delete-draft-document';
 import { duplicateDocumentById } from '@documenso/lib/server-only/document/duplicate-document-by-id';
 import { getDocumentById } from '@documenso/lib/server-only/document/get-document-by-id';
@@ -16,6 +17,7 @@ import { setRecipientsForDocument } from '@documenso/lib/server-only/recipient/s
 import { authenticatedProcedure, procedure, router } from '../trpc';
 import {
   ZCreateDocumentMutationSchema,
+  ZDeleteDocumentMutationSchema,
   ZDeleteDraftDocumentMutationSchema,
   ZGetDocumentByIdQuerySchema,
   ZGetDocumentByTokenQuerySchema,
@@ -106,6 +108,25 @@ export const documentRouter = router({
         const userId = ctx.user.id;
 
         return await deleteDraftDocument({ id, userId });
+      } catch (err) {
+        console.error(err);
+
+        throw new TRPCError({
+          code: 'BAD_REQUEST',
+          message: 'We were unable to delete this document. Please try again later.',
+        });
+      }
+    }),
+
+  deleteDocument: authenticatedProcedure
+    .input(ZDeleteDocumentMutationSchema)
+    .mutation(async ({ input, ctx }) => {
+      try {
+        const { id } = input;
+
+        const userId = ctx.user.id;
+
+        return await deleteDocument({ id, userId });
       } catch (err) {
         console.error(err);
 

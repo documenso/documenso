@@ -32,6 +32,7 @@ import {
 } from '@documenso/ui/primitives/dropdown-menu';
 
 import { ResendDocumentActionItem } from './_action-items/resend-document';
+import { DeleteDocumentDialog } from './delete-document-dialog';
 import { DeleteDraftDocumentDialog } from './delete-draft-document-dialog';
 import { DuplicateDocumentDialog } from './duplicate-document-dialog';
 
@@ -57,10 +58,10 @@ export const DataTableActionDropdown = ({ row }: DataTableActionDropdownProps) =
   const isOwner = row.User.id === session.user.id;
   // const isRecipient = !!recipient;
   const isDraft = row.status === DocumentStatus.DRAFT;
-  // const isPending = row.status === DocumentStatus.PENDING;
+  const isPending = row.status === DocumentStatus.PENDING;
   const isComplete = row.status === DocumentStatus.COMPLETED;
   // const isSigned = recipient?.signingStatus === SigningStatus.SIGNED;
-  const isDocumentDeletable = isOwner && row.status === DocumentStatus.DRAFT;
+  const isDocumentDeletable = isOwner;
 
   const onDownloadClick = async () => {
     let document: DocumentWithData | null = null;
@@ -160,8 +161,16 @@ export const DataTableActionDropdown = ({ row }: DataTableActionDropdownProps) =
         />
       </DropdownMenuContent>
 
-      {isDocumentDeletable && (
+      {isDocumentDeletable && isDraft && (
         <DeleteDraftDocumentDialog
+          id={row.id}
+          open={isDeleteDialogOpen}
+          onOpenChange={setDeleteDialogOpen}
+        />
+      )}
+
+      {isDocumentDeletable && (isPending || isComplete) && (
+        <DeleteDocumentDialog
           id={row.id}
           open={isDeleteDialogOpen}
           onOpenChange={setDeleteDialogOpen}
