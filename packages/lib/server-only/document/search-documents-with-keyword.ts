@@ -31,6 +31,9 @@ export const SearchDocumentsWithKeyword = async ({
       ],
       userId: userId,
     },
+    include: {
+      Recipient: true,
+    },
   });
 
   return documents;

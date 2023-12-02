@@ -14,6 +14,7 @@ import {
 } from '@documenso/lib/constants/keyboard-shortcuts';
 import { trpc as trpcReact } from '@documenso/trpc/react';
 import {
+  Command,
   CommandDialog,
   CommandEmpty,
   CommandGroup,
@@ -54,7 +55,9 @@ export function CommandMenu({ open, onOpenChange }: CommandMenuProps) {
   const [search, setSearch] = useState('');
   const [pages, setPages] = useState<string[]>([]);
 
-  const [searchResults, setSearchResults] = useState<{ label: string; path: string }[]>([]);
+  const [searchResults, setSearchResults] = useState<
+    { label: string; path: string; recipents: string[] }[]
+  >([]);
 
   const { isLoading: isSearchingDocuments, refetch: findDocuments } =
     trpcReact.document.searchDocuments.useQuery(
@@ -67,6 +70,7 @@ export function CommandMenu({ open, onOpenChange }: CommandMenuProps) {
           const newResults = data?.map((document) => ({
             label: document.title,
             path: `/documents/${document.id}`,
+            recipents: document.Recipient.map((recipient) => recipient.email),
           }));
           setSearchResults(newResults);
         },
@@ -139,7 +143,24 @@ export function CommandMenu({ open, onOpenChange }: CommandMenuProps) {
   };
 
   return (
-    <CommandDialog commandProps={{ onKeyDown: handleKeyDown }} open={open} onOpenChange={setOpen}>
+    <CommandDialog
+      commandProps={{
+        onKeyDown: handleKeyDown,
+        filter: (value, search) => {
+          const exists = value.includes(search);
+          if (exists) return 1;
+
+          const result = searchResults.find(
+            (result) => result.label.toLocaleLowerCase() === value.toLocaleLowerCase(),
+          );
+
+          if (result?.recipents.some((recipent) => recipent.includes(search))) return 1;
+          return 0;
+        },
+      }}
+      open={open}
+      onOpenChange={setOpen}
+    >
       <CommandInput
         value={search}
         onValueChange={setSearch}
@@ -169,7 +190,7 @@ export function CommandMenu({ open, onOpenChange }: CommandMenuProps) {
             <CommandGroup heading="Preferences">
               <CommandItem onSelect={() => addPage('theme')}>Change theme</CommandItem>
             </CommandGroup>
-            <CommandGroup heading="Search reults">
+            <CommandGroup heading="Your documents">
               <Commands push={push} pages={searchResults} />
             </CommandGroup>
           </>
@@ -188,7 +209,7 @@ const Commands = ({
   pages: { label: string; path: string; shortcut?: string }[];
 }) => {
   return pages.map((page, idx) => (
-    <CommandItem key={page.path + idx} onSelect={() => push(page.path)}>
+    <CommandItem key={page.path + idx} value={page.label} onSelect={() => push(page.path)}>
       {page.label}
       {page.shortcut && <CommandShortcut>{page.shortcut}</CommandShortcut>}
     </CommandItem>
