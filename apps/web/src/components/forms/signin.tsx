@@ -12,9 +12,16 @@ import { ErrorCode, isErrorCode } from '@documenso/lib/next-auth/error-codes';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@documenso/ui/primitives/dialog';
-import { FormErrorMessage } from '@documenso/ui/primitives/form/form-error-message';
-import { Input, PasswordInput } from '@documenso/ui/primitives/input';
-import { Label } from '@documenso/ui/primitives/label';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@documenso/ui/primitives/form/form';
+import { Input } from '@documenso/ui/primitives/input';
+import { PasswordInput } from '@documenso/ui/primitives/password-input';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
 const ERROR_MESSAGES: Partial<Record<keyof typeof ErrorCode, string>> = {
@@ -52,12 +59,7 @@ export const SignInForm = ({ className }: SignInFormProps) => {
     'totp' | 'backup'
   >('totp');
 
-  const {
-    register,
-    handleSubmit,
-    setValue,
-    formState: { errors, isSubmitting },
-  } = useForm<TSignInFormSchema>({
+  const form = useForm<TSignInFormSchema>({
     values: {
       email: '',
       password: '',
@@ -67,9 +69,11 @@ export const SignInForm = ({ className }: SignInFormProps) => {
     resolver: zodResolver(ZSignInFormSchema),
   });
 
+  const isSubmitting = form.formState.isSubmitting;
+
   const onCloseTwoFactorAuthenticationDialog = () => {
-    setValue('totpCode', '');
-    setValue('backupCode', '');
+    form.setValue('totpCode', '');
+    form.setValue('backupCode', '');
 
     setIsTwoFactorAuthenticationDialogOpen(false);
   };
@@ -78,11 +82,11 @@ export const SignInForm = ({ className }: SignInFormProps) => {
     const method = twoFactorAuthenticationMethod === 'totp' ? 'backup' : 'totp';
 
     if (method === 'totp') {
-      setValue('backupCode', '');
+      form.setValue('backupCode', '');
     }
 
     if (method === 'backup') {
-      setValue('totpCode', '');
+      form.setValue('totpCode', '');
     }
 
     setTwoFactorAuthenticationMethod(method);
@@ -113,7 +117,6 @@ export const SignInForm = ({ className }: SignInFormProps) => {
       if (result?.error && isErrorCode(result.error)) {
         if (result.error === TwoFactorEnabledErrorCode) {
           setIsTwoFactorAuthenticationDialogOpen(true);
-
           return;
         }
 
@@ -156,64 +159,69 @@ export const SignInForm = ({ className }: SignInFormProps) => {
   };
 
   return (
-    <form
-      className={cn('flex w-full flex-col gap-y-4', className)}
-      onSubmit={handleSubmit(onFormSubmit)}
-    >
-      <div>
-        <Label htmlFor="email" className="text-muted-forground">
-          Email
-        </Label>
-
-        <Input id="email" type="email" className="bg-background mt-2" {...register('email')} />
-
-        <FormErrorMessage className="mt-1.5" error={errors.email} />
-      </div>
-
-      <div>
-        <Label htmlFor="password" className="text-muted-forground">
-          <span>Password</span>
-        </Label>
-
-        <PasswordInput
-          id="password"
-          minLength={6}
-          maxLength={72}
-          className="bg-background mt-2"
-          autoComplete="current-password"
-          {...register('password')}
-        />
-
-        <FormErrorMessage className="mt-1.5" error={errors.password} />
-      </div>
-
-      <Button
-        size="lg"
-        loading={isSubmitting}
-        disabled={isSubmitting}
-        className="dark:bg-documenso dark:hover:opacity-90"
+    <Form {...form}>
+      <form
+        className={cn('flex w-full flex-col gap-y-4', className)}
+        onSubmit={form.handleSubmit(onFormSubmit)}
       >
-        {isSubmitting ? 'Signing in...' : 'Sign In'}
-      </Button>
+        <fieldset className="flex w-full flex-col gap-y-4" disabled={isSubmitting}>
+          <FormField
+            control={form.control}
+            name="email"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Email</FormLabel>
+                <FormControl>
+                  <Input type="email" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-      <div className="relative flex items-center justify-center gap-x-4 py-2 text-xs uppercase">
-        <div className="bg-border h-px flex-1" />
-        <span className="text-muted-foreground bg-transparent">Or continue with</span>
-        <div className="bg-border h-px flex-1" />
-      </div>
+          <FormField
+            control={form.control}
+            name="password"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Password</FormLabel>
+                <FormControl>
+                  <PasswordInput {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </fieldset>
 
-      <Button
-        type="button"
-        size="lg"
-        variant={'outline'}
-        className="bg-background text-muted-foreground border"
-        disabled={isSubmitting}
-        onClick={onSignInWithGoogleClick}
-      >
-        <FcGoogle className="mr-2 h-5 w-5" />
-        Google
-      </Button>
+        <Button
+          type="submit"
+          size="lg"
+          loading={isSubmitting}
+          className="dark:bg-documenso dark:hover:opacity-90"
+          loadingText="Signing in..."
+        >
+          Sign In
+        </Button>
 
+        <div className="relative flex items-center justify-center gap-x-4 py-2 text-xs uppercase">
+          <div className="bg-border h-px flex-1" />
+          <span className="text-muted-foreground bg-transparent">Or continue with</span>
+          <div className="bg-border h-px flex-1" />
+        </div>
+
+        <Button
+          type="button"
+          size="lg"
+          variant={'outline'}
+          className="bg-background text-muted-foreground border"
+          disabled={isSubmitting}
+          onClick={onSignInWithGoogleClick}
+        >
+          <FcGoogle className="mr-2 h-5 w-5" />
+          Google
+        </Button>
+      </form>
       <Dialog
         open={isTwoFactorAuthenticationDialogOpen}
         onOpenChange={onCloseTwoFactorAuthenticationDialog}
@@ -223,40 +231,40 @@ export const SignInForm = ({ className }: SignInFormProps) => {
             <DialogTitle>Two-Factor Authentication</DialogTitle>
           </DialogHeader>
 
-          <form onSubmit={handleSubmit(onFormSubmit)}>
-            {twoFactorAuthenticationMethod === 'totp' && (
-              <div>
-                <Label htmlFor="totpCode" className="text-muted-forground">
-                  Authentication Token
-                </Label>
-
-                <Input
-                  id="totpCode"
-                  type="text"
-                  className="bg-background mt-2"
-                  {...register('totpCode')}
+          <form onSubmit={form.handleSubmit(onFormSubmit)}>
+            <fieldset disabled={isSubmitting}>
+              {twoFactorAuthenticationMethod === 'totp' && (
+                <FormField
+                  control={form.control}
+                  name="totpCode"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Authentication Token</FormLabel>
+                      <FormControl>
+                        <Input type="text" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
                 />
+              )}
 
-                <FormErrorMessage className="mt-1.5" error={errors.totpCode} />
-              </div>
-            )}
-
-            {twoFactorAuthenticationMethod === 'backup' && (
-              <div>
-                <Label htmlFor="backupCode" className="text-muted-forground">
-                  Backup Code
-                </Label>
-
-                <Input
-                  id="backupCode"
-                  type="text"
-                  className="bg-background mt-2"
-                  {...register('backupCode')}
+              {twoFactorAuthenticationMethod === 'backup' && (
+                <FormField
+                  control={form.control}
+                  name="backupCode"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel> Backup Code</FormLabel>
+                      <FormControl>
+                        <Input type="text" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
                 />
-
-                <FormErrorMessage className="mt-1.5" error={errors.backupCode} />
-              </div>
-            )}
+              )}
+            </fieldset>
 
             <div className="mt-4 flex items-center justify-between">
               <Button
@@ -267,13 +275,13 @@ export const SignInForm = ({ className }: SignInFormProps) => {
                 {twoFactorAuthenticationMethod === 'totp' ? 'Use Backup Code' : 'Use Authenticator'}
               </Button>
 
-              <Button type="submit" loading={isSubmitting}>
+              <Button type="submit" loadingText="Signing in..." loading={isSubmitting}>
                 Sign In
               </Button>
             </div>
           </form>
         </DialogContent>
       </Dialog>
-    </form>
+    </Form>
   );
 };
