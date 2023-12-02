@@ -3,7 +3,8 @@ import { TRPCError } from '@trpc/server';
 import { getServerLimits } from '@documenso/ee/server-only/limits/server';
 import { upsertDocumentMeta } from '@documenso/lib/server-only/document-meta/upsert-document-meta';
 import { createDocument } from '@documenso/lib/server-only/document/create-document';
-import { deleteDocument } from '@documenso/lib/server-only/document/delete-document';
+import { deleteDraftDocument } from '@documenso/lib/server-only/document/delete-draft-document';
+import { deleteNonDraftDocument } from '@documenso/lib/server-only/document/delete-non-draft-document';
 import { duplicateDocumentById } from '@documenso/lib/server-only/document/duplicate-document-by-id';
 import { getDocumentById } from '@documenso/lib/server-only/document/get-document-by-id';
 import { getDocumentAndSenderByToken } from '@documenso/lib/server-only/document/get-document-by-token';
@@ -12,6 +13,7 @@ import { sendDocument } from '@documenso/lib/server-only/document/send-document'
 import { updateTitle } from '@documenso/lib/server-only/document/update-title';
 import { setFieldsForDocument } from '@documenso/lib/server-only/field/set-fields-for-document';
 import { setRecipientsForDocument } from '@documenso/lib/server-only/recipient/set-recipients-for-document';
+import { DocumentStatus } from '@documenso/prisma/client';
 
 import { authenticatedProcedure, procedure, router } from '../trpc';
 import {
@@ -104,7 +106,11 @@ export const documentRouter = router({
         const { id, status } = input;
 
         const userId = ctx.user.id;
-        return await deleteDocument({ id, userId, status });
+
+        if (status === DocumentStatus.DRAFT) {
+          return await deleteDraftDocument({ id, userId });
+        }
+        return await deleteNonDraftDocument({ id, userId, status });
       } catch (err) {
         console.error(err);
 
