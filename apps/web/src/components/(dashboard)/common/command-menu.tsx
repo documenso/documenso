@@ -1,10 +1,10 @@
 'use client';
 
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { useRouter } from 'next/navigation';
 
-import { Monitor, Moon, Sun } from 'lucide-react';
+import { Loader, Monitor, Moon, Sun } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import { useHotkeys } from 'react-hotkeys-hook';
 
@@ -12,6 +12,7 @@ import {
   DOCUMENTS_PAGE_SHORTCUT,
   SETTINGS_PAGE_SHORTCUT,
 } from '@documenso/lib/constants/keyboard-shortcuts';
+import { trpc as trpcReact } from '@documenso/trpc/react';
 import {
   CommandDialog,
   CommandEmpty,
@@ -52,6 +53,31 @@ export function CommandMenu({ open, onOpenChange }: CommandMenuProps) {
   const [isOpen, setIsOpen] = useState(() => open ?? false);
   const [search, setSearch] = useState('');
   const [pages, setPages] = useState<string[]>([]);
+
+  const [searchResults, setSearchResults] = useState<{ label: string; path: string }[]>([]);
+
+  const { isLoading: isSearchingDocuments, refetch: findDocuments } =
+    trpcReact.document.searchDocuments.useQuery(
+      {
+        query: search,
+      },
+      {
+        enabled: search !== '',
+        onSuccess: (data) => {
+          const newResults = data?.map((document) => ({
+            label: document.title,
+            path: `/documents/${document.id}`,
+          }));
+          setSearchResults(newResults);
+        },
+      },
+    );
+
+  useEffect(() => {
+    if (search) {
+      void findDocuments();
+    }
+  }, [search, findDocuments]);
 
   const currentPage = pages[pages.length - 1];
 
@@ -121,7 +147,17 @@ export function CommandMenu({ open, onOpenChange }: CommandMenuProps) {
       />
 
       <CommandList>
-        <CommandEmpty>No results found.</CommandEmpty>
+        {isSearchingDocuments ? (
+          <CommandEmpty>
+            <div className="flex items-center justify-center">
+              <span className="animate-spin">
+                <Loader />
+              </span>
+            </div>
+          </CommandEmpty>
+        ) : (
+          <CommandEmpty>No results found.</CommandEmpty>
+        )}
         {!currentPage && (
           <>
             <CommandGroup heading="Documents">
@@ -132,6 +168,9 @@ export function CommandMenu({ open, onOpenChange }: CommandMenuProps) {
             </CommandGroup>
             <CommandGroup heading="Preferences">
               <CommandItem onSelect={() => addPage('theme')}>Change theme</CommandItem>
+            </CommandGroup>
+            <CommandGroup heading="Search reults">
+              <Commands push={push} pages={searchResults} />
             </CommandGroup>
           </>
         )}
@@ -148,8 +187,8 @@ const Commands = ({
   push: (_path: string) => void;
   pages: { label: string; path: string; shortcut?: string }[];
 }) => {
-  return pages.map((page) => (
-    <CommandItem key={page.path} onSelect={() => push(page.path)}>
+  return pages.map((page, idx) => (
+    <CommandItem key={page.path + idx} onSelect={() => push(page.path)}>
       {page.label}
       {page.shortcut && <CommandShortcut>{page.shortcut}</CommandShortcut>}
     </CommandItem>
