@@ -1,7 +1,4 @@
-import { Button, Column, Img, Link, Section, Tailwind, Text } from '@react-email/components';
-
-import * as config from '@documenso/tailwind-config';
-
+import { Button, Column, Img, Link, Section, Text } from '../components';
 import { TemplateDocumentImage } from './template-document-image';
 
 export interface TemplateDocumentSelfSignedProps {
@@ -20,15 +17,7 @@ export const TemplateDocumentSelfSigned = ({
   };
 
   return (
-    <Tailwind
-      config={{
-        theme: {
-          extend: {
-            colors: config.theme.extend.colors,
-          },
-        },
-      }}
-    >
+    <>
       <TemplateDocumentImage className="mt-6" assetBaseUrl={assetBaseUrl} />
 
       <Section className="flex-row items-center justify-center">
@@ -84,7 +73,7 @@ export const TemplateDocumentSelfSigned = ({
           </Button>
         </Section>
       </Section>
-    </Tailwind>
+    </>
   );
 };
 

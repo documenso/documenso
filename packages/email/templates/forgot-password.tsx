@@ -1,21 +1,9 @@
-import {
-  Body,
-  Container,
-  Head,
-  Html,
-  Img,
-  Preview,
-  Section,
-  Tailwind,
-} from '@react-email/components';
-
 import config from '@documenso/tailwind-config';
 
+import { Body, Container, Head, Html, Img, Preview, Section, Tailwind } from '../components';
 import { TemplateFooter } from '../template-components/template-footer';
-import {
-  TemplateForgotPassword,
-  TemplateForgotPasswordProps,
-} from '../template-components/template-forgot-password';
+import type { TemplateForgotPasswordProps } from '../template-components/template-forgot-password';
+import { TemplateForgotPassword } from '../template-components/template-forgot-password';
 
 export type ForgotPasswordTemplateProps = Partial<TemplateForgotPasswordProps>;
 

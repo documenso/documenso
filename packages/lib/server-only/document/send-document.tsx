@@ -45,7 +45,7 @@ export const sendDocument = async ({ documentId, userId }: SendDocumentOptions) 
     throw new Error('Can not send completed document');
   }
 
-  await Promise.all([
+  await Promise.all(
     document.Recipient.map(async (recipient) => {
       const { email, name } = recipient;
 
@@ -96,7 +96,7 @@ export const sendDocument = async ({ documentId, userId }: SendDocumentOptions) 
         },
       });
     }),
-  ]);
+  );
 
   const updatedDocument = await prisma.document.update({
     where: {

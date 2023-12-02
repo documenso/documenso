@@ -33,6 +33,7 @@
   "globalDependencies": ["**/.env.*local"],
   "globalEnv": [
     "APP_VERSION",
+    "NEXT_PRIVATE_ENCRYPTION_KEY",
     "NEXTAUTH_URL",
     "NEXTAUTH_SECRET",
     "NEXT_PUBLIC_PROJECT",
