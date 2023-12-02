@@ -33,7 +33,7 @@
     "@react-email/render": "0.0.9",
     "@react-email/row": "0.0.6",
     "@react-email/section": "0.0.10",
-    "@react-email/tailwind": "0.0.13-canary.1",
+    "@react-email/tailwind": "0.0.9",
     "@react-email/text": "0.0.6",
     "nodemailer": "^6.9.3",
     "react-email": "^1.9.5",
