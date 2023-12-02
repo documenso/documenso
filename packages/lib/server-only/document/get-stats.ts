@@ -17,6 +17,9 @@ export const getStats = async ({ user }: GetStatsInput) => {
       },
       where: {
         userId: user.id,
+        deletedAt: {
+          equals: null,
+        },
       },
     }),
     prisma.document.groupBy({
