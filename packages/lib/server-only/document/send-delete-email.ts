@@ -4,8 +4,7 @@ import { mailer } from '@documenso/email/mailer';
 import { render } from '@documenso/email/render';
 import { DocumentDeletedEmailTemplate } from '@documenso/email/templates/document-deleted';
 import { prisma } from '@documenso/prisma';
-
-import { getFile } from '../../universal/upload/get-file';
+import { DocumentStatus, SigningStatus } from '@documenso/prisma/client';
 
 export interface SendDocumentOptions {
   documentId: number;
@@ -32,14 +31,18 @@ export const sendDeletedEmail = async ({ documentId, userId }: SendDocumentOptio
     throw new Error('Document not found');
   }
 
+  if (document.status == DocumentStatus.DRAFT) {
+    throw new Error('Document is a draft state');
+  }
+
   if (document.Recipient.length === 0) {
     throw new Error('Document has no recipients');
   }
 
   await Promise.all([
     document.Recipient.map(async (recipient) => {
-      if (recipient.signingStatus !== 'SIGNED') {
-        const { email, name, token } = recipient;
+      if (recipient.signingStatus !== SigningStatus.SIGNED) {
+        const { email, name } = recipient;
 
         const assetBaseUrl = process.env.NEXT_PUBLIC_WEBAPP_URL || 'http://localhost:3000';
 
