@@ -55,6 +55,10 @@ export default async function SigningPage({ params: { token } }: SigningPageProp
     redirect(`/sign/${token}/complete`);
   }
 
+  if (document.deletedAt !== null) {
+    redirect(`/sign/${token}/deleted`);
+  }
+
   return (
     <SigningProvider
       email={recipient.email}
