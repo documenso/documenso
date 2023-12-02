@@ -1,5 +1,3 @@
-'use client';
-
 import { useState } from 'react';
 
 import Link from 'next/link';
@@ -161,21 +159,20 @@ export const DataTableActionDropdown = ({ row }: DataTableActionDropdownProps) =
         />
       </DropdownMenuContent>
 
-      {isDocumentDeletable && isDraft && (
+      {isDocumentDeletable && isDraft ? (
         <DeleteDraftDocumentDialog
           id={row.id}
           open={isDeleteDialogOpen}
           onOpenChange={setDeleteDialogOpen}
         />
-      )}
-
-      {isDocumentDeletable && (isPending || isComplete) && (
+      ) : (
         <DeleteDocumentDialog
           id={row.id}
           open={isDeleteDialogOpen}
           onOpenChange={setDeleteDialogOpen}
         />
       )}
+
       {isDuplicateDialogOpen && (
         <DuplicateDocumentDialog
           id={row.id}
