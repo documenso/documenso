@@ -1,5 +1,7 @@
 import { z } from 'zod';
 
+import { RecipientRole } from '.prisma/client';
+
 export const ZAddSignersFormSchema = z
   .object({
     signers: z.array(
@@ -8,7 +10,7 @@ export const ZAddSignersFormSchema = z
         nativeId: z.number().optional(),
         email: z.string().email().min(1),
         name: z.string(),
-        role: z.string(),
+        role: z.nativeEnum(RecipientRole),
       }),
     ),
   })

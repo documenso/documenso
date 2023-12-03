@@ -2,7 +2,6 @@ import { TRPCError } from '@trpc/server';
 
 import { completeDocumentWithToken } from '@documenso/lib/server-only/document/complete-document-with-token';
 import { setRecipientsForDocument } from '@documenso/lib/server-only/recipient/set-recipients-for-document';
-import type { RecipientRole } from '@documenso/prisma/client';
 
 import { authenticatedProcedure, procedure, router } from '../trpc';
 import { ZAddSignersMutationSchema, ZCompleteDocumentWithTokenMutationSchema } from './schema';
@@ -21,7 +20,7 @@ export const recipientRouter = router({
             id: signer.nativeId,
             email: signer.email,
             name: signer.name,
-            role: signer.role as RecipientRole,
+            role: signer.role,
           })),
         });
       } catch (err) {

@@ -12,7 +12,6 @@ import { sendDocument } from '@documenso/lib/server-only/document/send-document'
 import { updateTitle } from '@documenso/lib/server-only/document/update-title';
 import { setFieldsForDocument } from '@documenso/lib/server-only/field/set-fields-for-document';
 import { setRecipientsForDocument } from '@documenso/lib/server-only/recipient/set-recipients-for-document';
-import type { RecipientRole } from '@documenso/prisma/client';
 
 import { authenticatedProcedure, procedure, router } from '../trpc';
 import {
@@ -140,7 +139,7 @@ export const documentRouter = router({
         return await setRecipientsForDocument({
           userId: ctx.user.id,
           documentId,
-          recipients: recipients.map((x) => ({ ...x, role: x.role as RecipientRole })),
+          recipients,
         });
       } catch (err) {
         console.error(err);
