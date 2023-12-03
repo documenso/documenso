@@ -151,6 +151,7 @@ export const findDocuments = async ({
           },
         },
         Recipient: true,
+        documentThumbnail: true,
       },
     }),
     prisma.document.count({

@@ -7,7 +7,7 @@ import { useSession } from 'next-auth/react';
 
 import { useUpdateSearchParams } from '@documenso/lib/client-only/hooks/use-update-search-params';
 import type { FindResultSet } from '@documenso/lib/types/find-result-set';
-import type { Document, Recipient, User } from '@documenso/prisma/client';
+import type { Document, DocumentThumbnail, Recipient, User } from '@documenso/prisma/client';
 import { DataTable } from '@documenso/ui/primitives/data-table';
 import { DataTablePagination } from '@documenso/ui/primitives/data-table-pagination';
 
@@ -24,6 +24,7 @@ export type DocumentsDataTableProps = {
     Document & {
       Recipient: Recipient[];
       User: Pick<User, 'id' | 'name' | 'email'>;
+      documentThumbnail: DocumentThumbnail;
     }
   >;
 };

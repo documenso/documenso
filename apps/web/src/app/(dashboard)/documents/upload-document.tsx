@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -10,16 +10,22 @@ import { useSession } from 'next-auth/react';
 
 import { useLimits } from '@documenso/ee/server-only/limits/provider/client';
 import { createDocumentData } from '@documenso/lib/server-only/document-data/create-document-data';
+import { createDocumentThumbnail } from '@documenso/lib/server-only/document-thumbnail/create-document-thumbnail';
 import { putFile } from '@documenso/lib/universal/upload/put-file';
+import { DocumentDataType } from '@documenso/prisma/client';
 import { TRPCClientError } from '@documenso/trpc/client';
 import { trpc } from '@documenso/trpc/react';
 import { cn } from '@documenso/ui/lib/utils';
 import { DocumentDropzone } from '@documenso/ui/primitives/document-dropzone';
+import { LazyPDFViewerNoLoader } from '@documenso/ui/primitives/lazy-pdf-viewer';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
 export type UploadDocumentProps = {
   className?: string;
 };
+
+const THUMBNAIL_MAX_DIMENSION = 260;
+const THUMBNAIL_TIMEOUT = 2000;
 
 export const UploadDocument = ({ className }: UploadDocumentProps) => {
   const router = useRouter();
@@ -33,20 +39,43 @@ export const UploadDocument = ({ className }: UploadDocumentProps) => {
 
   const { mutateAsync: createDocument } = trpc.document.createDocument.useMutation();
 
+  const [docData, setDocData] = useState('');
+
+  const thumbnailResolveRef = useRef<(value: unknown) => void | null>({ current: null });
+
   const onFileDrop = async (file: File) => {
     try {
       setIsLoading(true);
 
       const { type, data } = await putFile(file);
 
+      // render the pdf to generate thumbnail
+      setDocData(data);
+
+      // if failed to generate thumbnail in THUMBNAIL_TIMEOUT ms, skip thumbnail generation
+      const thumbnailData = (await Promise.race([
+        new Promise((resolve) => {
+          thumbnailResolveRef.current = resolve;
+        }),
+        new Promise((resolve) => {
+          setTimeout(resolve, THUMBNAIL_TIMEOUT);
+        }),
+      ])) as string;
+      console.log(thumbnailData);
       const { id: documentDataId } = await createDocumentData({
         type,
         data,
       });
 
+      const { id: documentThumbnailId } = await createDocumentThumbnail({
+        highResThumbnailBytes: typeof thumbnailData === 'string' ? thumbnailData : '',
+        lowResThumbnailBytes: typeof thumbnailData === 'string' ? thumbnailData : '',
+      });
+
       const { id } = await createDocument({
         title: file.name,
         documentDataId,
+        documentThumbnailId,
       });
 
       toast({
@@ -77,6 +106,83 @@ export const UploadDocument = ({ className }: UploadDocumentProps) => {
     }
   };
 
+  const generateThumbnail = (page: number, canvas: HTMLCanvasElement | null) => {
+    if (page !== 1 || !canvas) return;
+
+    try {
+      // Determine whether the width or height is the larger side
+      let thumbnailWidth, thumbnailHeight;
+      if (canvas.width > canvas.height) {
+        thumbnailWidth = THUMBNAIL_MAX_DIMENSION;
+        thumbnailHeight = (canvas.height / canvas.width) * THUMBNAIL_MAX_DIMENSION;
+      } else {
+        thumbnailHeight = THUMBNAIL_MAX_DIMENSION;
+        thumbnailWidth = (canvas.width / canvas.height) * THUMBNAIL_MAX_DIMENSION;
+      }
+
+      // Create a new canvas to resize for thumbnail
+      const thumbnailCanvas = document.createElement('canvas');
+      thumbnailCanvas.width = thumbnailWidth;
+      thumbnailCanvas.height = thumbnailHeight;
+
+      // Copy and scale the content of the original canvas to the new canvas
+      const ctx = thumbnailCanvas.getContext('2d');
+      if (ctx === null) return thumbnailResolveRef.current?.(undefined);
+      ctx.drawImage(canvas, 0, 0, thumbnailWidth, thumbnailHeight);
+
+      // Convert the canvas content to a base64 image
+      const base64Image = thumbnailCanvas.toDataURL('image/png'); // You can choose the desired image format
+
+      // Resolve the promise with the base64 image
+      thumbnailResolveRef.current?.(base64Image);
+    } catch (error) {
+      return thumbnailResolveRef.current?.(undefined);
+    }
+  };
+
+  const createThumbnail = (file: File, maxWidth: number, maxHeight: number): Promise<Blob> => {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        if (!ctx) {
+          reject(new Error('Unable to get canvas context'));
+          return;
+        }
+
+        let width = img.width;
+        let height = img.height;
+
+        // Maintain aspect ratio
+        if (width > height) {
+          if (width > maxWidth) {
+            height = (height * maxWidth) / width;
+            width = maxWidth;
+          }
+        } else {
+          if (height > maxHeight) {
+            width = (width * maxHeight) / height;
+            height = maxHeight;
+          }
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+        ctx.drawImage(img, 0, 0, width, height);
+
+        canvas.toBlob((blob) => {
+          if (blob) {
+            resolve(blob);
+          } else {
+            reject(new Error('Canvas toBlob failed'));
+          }
+        }, file.type);
+      };
+      img.onerror = reject;
+      img.src = URL.createObjectURL(file);
+    });
+  };
   return (
     <div className={cn('relative', className)}>
       <DocumentDropzone
@@ -118,6 +224,20 @@ export const UploadDocument = ({ className }: UploadDocumentProps) => {
             </Link>
           </div>
         </div>
+      )}
+
+      {!!docData && (
+        <LazyPDFViewerNoLoader
+          className="hidden"
+          documentData={{
+            id: '',
+            data: docData,
+            initialData: docData,
+            type: DocumentDataType.BYTES_64,
+          }}
+          maxPages={1}
+          onPageRender={generateThumbnail}
+        />
       )}
     </div>
   );

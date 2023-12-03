@@ -4,8 +4,8 @@ generator client {
 
 datasource db {
   provider  = "postgresql"
-  url       = env("NEXT_PRIVATE_DATABASE_URL")
-  directUrl = env("NEXT_PRIVATE_DIRECT_DATABASE_URL")
+  url       = "postgres://documenso:password@127.0.0.1:54320/documenso"
+  directUrl = "postgres://documenso:password@127.0.0.1:54320/documenso"
 }
 
 enum IdentityProvider {
@@ -121,22 +121,25 @@ enum DocumentStatus {
 }
 
 model Document {
-  id             Int                 @id @default(autoincrement())
-  userId         Int
-  User           User                @relation(fields: [userId], references: [id], onDelete: Cascade)
-  title          String
-  status         DocumentStatus      @default(DRAFT)
-  Recipient      Recipient[]
-  Field          Field[]
-  ShareLink      DocumentShareLink[]
-  documentDataId String
-  documentData   DocumentData        @relation(fields: [documentDataId], references: [id], onDelete: Cascade)
-  documentMeta   DocumentMeta?
-  createdAt      DateTime            @default(now())
-  updatedAt      DateTime            @default(now()) @updatedAt
-  completedAt    DateTime?
+  id                       Int                 @id @default(autoincrement())
+  userId                   Int
+  User                     User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title                    String
+  status                   DocumentStatus      @default(DRAFT)
+  Recipient                Recipient[]
+  Field                    Field[]
+  ShareLink                DocumentShareLink[]
+  documentDataId           String
+  documentThumbnailId      Int?                
+  documentData             DocumentData        @relation(fields: [documentDataId], references: [id], onDelete: Cascade)
+  documentThumbnail        DocumentThumbnail?   @relation(fields: [documentThumbnailId], references: [id], onDelete: Cascade)
+  documentMeta             DocumentMeta?
+  createdAt                DateTime            @default(now())
+  updatedAt                DateTime            @default(now()) @updatedAt
+  completedAt              DateTime?
 
   @@unique([documentDataId])
+  @@unique([documentThumbnailId])
   @@index([userId])
   @@index([status])
 }
@@ -145,6 +148,15 @@ enum DocumentDataType {
   S3_PATH
   BYTES
   BYTES_64
+}
+
+model DocumentThumbnail {
+  id                     Int                @id @default(autoincrement())
+  lowResThumbnailBytes   String
+  highResThumbnailBytes  String
+  Document               Document?
+  createdAt              DateTime           @default(now())
+  updatedAt              DateTime           @default(now()) @updatedAt
 }
 
 model DocumentData {
