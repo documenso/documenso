@@ -68,7 +68,7 @@ export const documentRouter = router({
     .input(ZCreateDocumentMutationSchema)
     .mutation(async ({ input, ctx }) => {
       try {
-        const { title, documentDataId } = input;
+        const { title, documentDataId, documentThumbnail } = input;
 
         const { remaining } = await getServerLimits({ email: ctx.user.email });
 
@@ -84,6 +84,7 @@ export const documentRouter = router({
           userId: ctx.user.id,
           title,
           documentDataId,
+          documentThumbnail,
         });
       } catch (err) {
         if (err instanceof TRPCError) {

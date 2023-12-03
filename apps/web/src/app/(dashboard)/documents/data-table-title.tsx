@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useSession } from 'next-auth/react';
 import { match } from 'ts-pattern';
 
-import { Document, Recipient, User } from '@documenso/prisma/client';
+import type { Document, Recipient, User } from '@documenso/prisma/client';
 
 export type DataTableTitleProps = {
   row: Document & {
@@ -36,6 +36,11 @@ export const DataTableTitle = ({ row }: DataTableTitleProps) => {
         title={row.title}
         className="block max-w-[10rem] truncate font-medium hover:underline md:max-w-[20rem]"
       >
+        <img
+          className="mr-2 inline-block h-10"
+          src={row.documentThumbnail ?? '/static/document.png'}
+          alt="document-preview"
+        />
         {row.title}
       </Link>
     ))
@@ -45,11 +50,21 @@ export const DataTableTitle = ({ row }: DataTableTitleProps) => {
         title={row.title}
         className="block max-w-[10rem] truncate font-medium hover:underline md:max-w-[20rem]"
       >
+        <img
+          className="mr-2 inline-block h-10"
+          src={row.documentThumbnail ?? '/static/document.png'}
+          alt="document-preview"
+        />
         {row.title}
       </Link>
     ))
     .otherwise(() => (
       <span className="block max-w-[10rem] truncate font-medium hover:underline md:max-w-[20rem]">
+        <img
+          className="mr-2 inline-block h-10"
+          src={row.documentThumbnail ?? '/static/document.png'}
+          alt="document-preview"
+        />
         {row.title}
       </span>
     ));

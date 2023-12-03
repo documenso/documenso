@@ -3,14 +3,14 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 
 import { Loader } from 'lucide-react';
-import { PDFDocumentProxy } from 'pdfjs-dist';
+import type { PDFDocumentProxy } from 'pdfjs-dist';
 import { Document as PDFDocument, Page as PDFPage, pdfjs } from 'react-pdf';
 import 'react-pdf/dist/esm/Page/AnnotationLayer.css';
 import 'react-pdf/dist/esm/Page/TextLayer.css';
 
 import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
 import { getFile } from '@documenso/lib/universal/upload/get-file';
-import { DocumentData } from '@documenso/prisma/client';
+import type { DocumentData } from '@documenso/prisma/client';
 import { cn } from '@documenso/ui/lib/utils';
 
 import { useToast } from './use-toast';
@@ -44,6 +44,7 @@ export type PDFViewerProps = {
   className?: string;
   documentData: DocumentData;
   onDocumentLoad?: (_doc: LoadedPDFDocument) => void;
+  onPageRender?: (page: number, el: HTMLCanvasElement | null) => void;
   onPageClick?: OnPDFViewerPageClick;
   [key: string]: unknown;
 } & Omit<React.HTMLAttributes<HTMLDivElement>, 'onPageClick'>;
@@ -52,12 +53,14 @@ export const PDFViewer = ({
   className,
   documentData,
   onDocumentLoad,
+  onPageRender,
   onPageClick,
   ...props
 }: PDFViewerProps) => {
   const { toast } = useToast();
 
   const $el = useRef<HTMLDivElement>(null);
+  const $canvas = useRef<HTMLCanvasElement>(null);
 
   const [isDocumentBytesLoading, setIsDocumentBytesLoading] = useState(false);
   const [documentBytes, setDocumentBytes] = useState<Uint8Array | null>(null);
@@ -211,6 +214,8 @@ export const PDFViewer = ({
               >
                 <PDFPage
                   pageNumber={i + 1}
+                  canvasRef={$canvas}
+                  onRenderSuccess={() => onPageRender?.(i + 1, $canvas.current)}
                   width={width}
                   renderAnnotationLayer={false}
                   renderTextLayer={false}
