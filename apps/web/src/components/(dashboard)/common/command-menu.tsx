@@ -4,14 +4,19 @@ import { useCallback, useMemo, useState } from 'react';
 
 import { useRouter } from 'next/navigation';
 
+import { zodResolver } from '@hookform/resolvers/zod';
 import { Monitor, Moon, Sun } from 'lucide-react';
 import { useTheme } from 'next-themes';
+import { flushSync } from 'react-dom';
+import { useForm } from 'react-hook-form';
 import { useHotkeys } from 'react-hotkeys-hook';
+import { z } from 'zod';
 
 import {
   DOCUMENTS_PAGE_SHORTCUT,
   SETTINGS_PAGE_SHORTCUT,
 } from '@documenso/lib/constants/keyboard-shortcuts';
+import { trpc } from '@documenso/trpc/react';
 import {
   CommandDialog,
   CommandEmpty,
@@ -44,6 +49,12 @@ export type CommandMenuProps = {
   open?: boolean;
   onOpenChange?: (_open: boolean) => void;
 };
+
+export const ZSearchForm = z.object({
+  user_query: z.string().min(1),
+});
+
+export type TSearchForm = z.infer<typeof ZSearchForm>;
 
 export function CommandMenu({ open, onOpenChange }: CommandMenuProps) {
   const { setTheme } = useTheme();
@@ -111,12 +122,37 @@ export function CommandMenu({ open, onOpenChange }: CommandMenuProps) {
       setPages((pages) => pages.slice(0, -1));
     }
   };
+  const searchForm = useForm<TSearchForm>({
+    defaultValues: {
+      user_query: '',
+    },
+    resolver: zodResolver(ZSearchForm),
+  });
+
+  const { mutateAsync: runSemSearch, data: rumSemSearchData } = trpc.semSearch.run.useMutation();
+
+  const onSearchChange = async (user_query: string) => {
+    setSearch(user_query);
+    console.log('user_query:', user_query);
+
+    if (user_query.length >= 5) {
+      // Define MIN_SEARCH_LENGTH as per your requirement
+      try {
+        const results = await runSemSearch({ user_query });
+
+        // Handle the search results
+        // For example, you can redirect to a results page or update the state to display the results
+      } catch (error) {
+        // Handle error
+      }
+    }
+  };
 
   return (
     <CommandDialog commandProps={{ onKeyDown: handleKeyDown }} open={open} onOpenChange={setOpen}>
       <CommandInput
         value={search}
-        onValueChange={setSearch}
+        onValueChange={(e) => onSearchChange(e)}
         placeholder="Type a command or search..."
       />
 
