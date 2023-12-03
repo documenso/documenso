@@ -16,6 +16,7 @@ import {
   DocumentFlowFormContainerActions,
   DocumentFlowFormContainerContent,
   DocumentFlowFormContainerFooter,
+  DocumentFlowFormContainerHeader,
   DocumentFlowFormContainerStep,
 } from './document-flow-root';
 import type { DocumentFlowStep } from './types';
@@ -53,6 +54,10 @@ export const AddSubjectFormPartial = ({
 
   return (
     <>
+      <DocumentFlowFormContainerHeader
+        title={documentFlow.title}
+        description={documentFlow.description}
+      />
       <DocumentFlowFormContainerContent>
         <div className="flex flex-col">
           <div className="flex flex-col gap-y-4">
