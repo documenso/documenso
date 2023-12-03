@@ -8,7 +8,7 @@ import { FormErrorMessage } from '@documenso/ui/primitives/form/form-error-messa
 import { Input } from '@documenso/ui/primitives/input';
 import { Label } from '@documenso/ui/primitives/label';
 
-import type { WithStep } from '../stepper';
+import { useStep } from '../stepper';
 import type { TAddTitleFormSchema } from './add-title.types';
 import {
   DocumentFlowFormContainerActions,
@@ -32,8 +32,7 @@ export const AddTitleFormPartial = ({
   fields: _fields,
   document,
   onSubmit,
-  useStep,
-}: WithStep<AddTitleFormProps>) => {
+}: AddTitleFormProps) => {
   const {
     register,
     handleSubmit,

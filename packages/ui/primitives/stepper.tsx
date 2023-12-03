@@ -1,26 +1,24 @@
-import React, { useEffect, useState } from 'react';
+import React, { createContext, useContext, useEffect, useState } from 'react';
 import type { FC } from 'react';
 
-type StepProps = {
-  readonly useStep: () => {
-    stepIndex: number;
-    currentStep: number;
-    totalSteps: number;
-    isFirst: boolean;
-    isLast: boolean;
-    nextStep: () => void;
-    previousStep: () => void;
-  };
+type StepContextType = {
+  stepIndex: number;
+  currentStep: number;
+  totalSteps: number;
+  isFirst: boolean;
+  isLast: boolean;
+  nextStep: () => void;
+  previousStep: () => void;
 };
 
-export type WithStep<T> = T & StepProps;
+const StepContext = createContext<StepContextType | null>(null);
 
 type StepperProps = {
   children: React.ReactNode;
   onComplete?: () => void;
   onStepChanged?: (currentStep: number) => void;
-  currentStep?: number;
-  setCurrentStep?: (step: number) => void;
+  currentStep?: number; // external control prop
+  setCurrentStep?: (step: number) => void; // external control function
 };
 
 export const Stepper: FC<StepperProps> = ({
@@ -57,7 +55,12 @@ export const Stepper: FC<StepperProps> = ({
     onStepChanged && onStepChanged(currentStep);
   }, [currentStep, onStepChanged]);
 
-  const useStep = () => ({
+  // Empty stepper
+  if (totalSteps === 0) return null;
+
+  const currentChild = React.Children.toArray(children)[currentStep - 1];
+
+  const stepContextValue: StepContextType = {
     stepIndex: currentStep - 1,
     currentStep,
     totalSteps,
@@ -65,15 +68,14 @@ export const Stepper: FC<StepperProps> = ({
     isLast: currentStep === totalSteps,
     nextStep,
     previousStep,
-  });
+  };
 
-  // empty stepper
-  if (totalSteps === 0) return null;
+  return <StepContext.Provider value={stepContextValue}>{currentChild}</StepContext.Provider>;
+};
 
-  const currentChild = React.Children.toArray(children)[currentStep - 1];
-
-  // type validation
-  if (!React.isValidElement<StepProps>(currentChild)) return null;
-
-  return <>{React.cloneElement(currentChild, { useStep })}</>;
+/** Hook for children to use the step context */
+export const useStep = (): StepContextType => {
+  const context = useContext(StepContext);
+  if (!context) throw new Error('useStep must be used within a Stepper');
+  return context;
 };

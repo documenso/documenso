@@ -10,7 +10,7 @@ import { Input } from '@documenso/ui/primitives/input';
 import { Label } from '@documenso/ui/primitives/label';
 import { Textarea } from '@documenso/ui/primitives/textarea';
 
-import type { WithStep } from '../stepper';
+import { useStep } from '../stepper';
 import type { TAddSubjectFormSchema } from './add-subject.types';
 import {
   DocumentFlowFormContainerActions,
@@ -34,8 +34,7 @@ export const AddSubjectFormPartial = ({
   fields: _fields,
   document,
   onSubmit,
-  useStep,
-}: WithStep<AddSubjectFormProps>) => {
+}: AddSubjectFormProps) => {
   const {
     register,
     handleSubmit,
@@ -50,7 +49,7 @@ export const AddSubjectFormPartial = ({
   });
 
   const onFormSubmit = handleSubmit(onSubmit);
-  const { currentStep, totalSteps, nextStep, previousStep } = useStep();
+  const { currentStep, totalSteps, previousStep } = useStep();
 
   return (
     <>

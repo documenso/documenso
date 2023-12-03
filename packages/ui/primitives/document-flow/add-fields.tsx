@@ -26,7 +26,7 @@ import {
 import { Popover, PopoverContent, PopoverTrigger } from '@documenso/ui/primitives/popover';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@documenso/ui/primitives/tooltip';
 
-import type { WithStep } from '../stepper';
+import { useStep } from '../stepper';
 import type { TAddFieldsFormSchema } from './add-fields.types';
 import {
   DocumentFlowFormContainerActions,
@@ -65,10 +65,9 @@ export const AddFieldsFormPartial = ({
   recipients,
   fields,
   onSubmit,
-  useStep, // Stepper
-}: WithStep<AddFieldsFormProps>) => {
+}: AddFieldsFormProps) => {
   const { isWithinPageBounds, getFieldPosition, getPage } = useDocumentElement();
-  const { currentStep, totalSteps, nextStep, previousStep } = useStep();
+  const { currentStep, totalSteps, previousStep } = useStep();
 
   const {
     control,

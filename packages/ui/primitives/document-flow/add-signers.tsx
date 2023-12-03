@@ -18,7 +18,7 @@ import { Input } from '@documenso/ui/primitives/input';
 import { Label } from '@documenso/ui/primitives/label';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
-import type { WithStep } from '../stepper';
+import { useStep } from '../stepper';
 import type { TAddSignersFormSchema } from './add-signers.types';
 import { ZAddSignersFormSchema } from './add-signers.types';
 import {
@@ -43,14 +43,13 @@ export const AddSignersFormPartial = ({
   document,
   fields: _fields,
   onSubmit,
-  useStep, // Stepper
-}: WithStep<AddSignersFormProps>) => {
+}: AddSignersFormProps) => {
   const { toast } = useToast();
   const { remaining } = useLimits();
 
   const initialId = useId();
 
-  const { currentStep, totalSteps, nextStep, previousStep } = useStep();
+  const { currentStep, totalSteps, previousStep } = useStep();
 
   const {
     control,

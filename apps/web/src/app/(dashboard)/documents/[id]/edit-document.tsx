@@ -4,6 +4,7 @@ import { useState } from 'react';
 
 import { useRouter } from 'next/navigation';
 
+import { DocumentStatus } from '@documenso/prisma/client';
 import type { DocumentData, Field, Recipient, User } from '@documenso/prisma/client';
 import type { DocumentWithData } from '@documenso/prisma/types/document-with-data';
 import { trpc } from '@documenso/trpc/react';
@@ -35,12 +36,8 @@ export type EditDocumentFormProps = {
   documentData: DocumentData;
 };
 
-enum EditDocumentStepEnum {
-  TITLE,
-  SIGNERS,
-  FIELDS,
-  SUBJECT,
-}
+type EditDocumentStep = 'title' | 'signers' | 'fields' | 'subject';
+const EditDocumentSteps: EditDocumentStep[] = ['title', 'signers', 'fields', 'subject'];
 
 export const EditDocumentForm = ({
   className,
@@ -54,34 +51,37 @@ export const EditDocumentForm = ({
   const router = useRouter();
 
   // controlled stepper state
-  const [stepIdx, setStepIdx] = useState<EditDocumentStepEnum>(0);
+  const [step, setStep] = useState<EditDocumentStep>(
+    document.status === DocumentStatus.DRAFT ? 'title' : 'signers',
+  );
 
   const { mutateAsync: addTitle } = trpc.document.setTitleForDocument.useMutation();
   const { mutateAsync: addFields } = trpc.field.addFields.useMutation();
   const { mutateAsync: addSigners } = trpc.recipient.addSigners.useMutation();
   const { mutateAsync: sendDocument } = trpc.document.sendDocument.useMutation();
 
-  // controlled stepper next
-  const nextStep = () => setStepIdx(stepIdx + 1);
-
-  const documentFlow: DocumentFlowStep[] = [
-    {
+  const documentFlow: Record<EditDocumentStep, DocumentFlowStep> = {
+    title: {
       title: 'Add Title',
       description: 'Add the title to the document.',
+      stepIndex: 1,
     },
-    {
+    signers: {
       title: 'Add Signers',
       description: 'Add the people who will sign the document.',
+      stepIndex: 2,
     },
-    {
+    fields: {
       title: 'Add Fields',
       description: 'Add all relevant fields for each recipient.',
+      stepIndex: 3,
     },
-    {
+    subject: {
       title: 'Add Subject',
       description: 'Add the subject and message you wish to send to signers.',
+      stepIndex: 4,
     },
-  ];
+  };
 
   const onAddTitleFormSubmit = async (data: TAddTitleFormSchema) => {
     try {
@@ -93,7 +93,7 @@ export const EditDocumentForm = ({
 
       router.refresh();
 
-      nextStep();
+      setStep('signers');
     } catch (err) {
       console.error(err);
 
@@ -114,7 +114,7 @@ export const EditDocumentForm = ({
       });
 
       router.refresh();
-      nextStep();
+      setStep('fields');
     } catch (err) {
       console.error(err);
 
@@ -135,7 +135,7 @@ export const EditDocumentForm = ({
       });
 
       router.refresh();
-      nextStep();
+      setStep('subject');
     } catch (err) {
       console.error(err);
 
@@ -177,7 +177,7 @@ export const EditDocumentForm = ({
     }
   };
 
-  const currentDocumentFlow = documentFlow[stepIdx];
+  const currentDocumentFlow = documentFlow[step];
 
   return (
     <div className={cn('grid w-full grid-cols-12 gap-8', className)}>
@@ -199,10 +199,13 @@ export const EditDocumentForm = ({
             title={currentDocumentFlow.title}
             description={currentDocumentFlow.description}
           />
-          <Stepper currentStep={stepIdx + 1} setCurrentStep={(step) => setStepIdx(step - 1)}>
+          <Stepper
+            currentStep={currentDocumentFlow.stepIndex}
+            setCurrentStep={(step) => setStep(EditDocumentSteps[step - 1])}
+          >
             <AddTitleFormPartial
               key={recipients.length}
-              documentFlow={documentFlow[EditDocumentStepEnum.TITLE]}
+              documentFlow={documentFlow.title}
               recipients={recipients}
               fields={fields}
               document={document}
@@ -210,7 +213,7 @@ export const EditDocumentForm = ({
             />
             <AddSignersFormPartial
               key={recipients.length}
-              documentFlow={documentFlow[EditDocumentStepEnum.SIGNERS]}
+              documentFlow={documentFlow.signers}
               document={document}
               recipients={recipients}
               fields={fields}
@@ -218,14 +221,14 @@ export const EditDocumentForm = ({
             />
             <AddFieldsFormPartial
               key={fields.length}
-              documentFlow={documentFlow[EditDocumentStepEnum.FIELDS]}
+              documentFlow={documentFlow.fields}
               recipients={recipients}
               fields={fields}
               onSubmit={onAddFieldsFormSubmit}
             />
             <AddSubjectFormPartial
               key={recipients.length}
-              documentFlow={documentFlow[EditDocumentStepEnum.SUBJECT]}
+              documentFlow={documentFlow.subject}
               document={document}
               recipients={recipients}
               fields={fields}
