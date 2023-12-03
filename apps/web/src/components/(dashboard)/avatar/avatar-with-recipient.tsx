@@ -35,12 +35,15 @@ export function AvatarWithRecipient({ recipient }: AvatarWithRecipientProps) {
         type={getRecipientType(recipient)}
         fallbackText={recipientAbbreviation(recipient)}
       />
-      <span
-        className="text-muted-foreground text-sm hover:underline"
-        title="Click to copy signing link for sending to recipient"
-      >
-        {recipient.email}
-      </span>
+      <div>
+        <p
+          className="text-muted-foreground text-sm hover:underline"
+          title="Click to copy signing link for sending to recipient"
+        >
+          {recipient.email}
+        </p>
+        <p className="text-muted-foreground text-xs font-bold">{recipient.role}</p>
+      </div>
     </div>
   );
 }

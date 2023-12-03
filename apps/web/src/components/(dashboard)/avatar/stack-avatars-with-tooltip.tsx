@@ -59,7 +59,10 @@ export const StackAvatarsWithTooltip = ({
                       type={getRecipientType(recipient)}
                       fallbackText={recipientAbbreviation(recipient)}
                     />
-                    <span className="text-muted-foreground text-sm">{recipient.email}</span>
+                    <div className="">
+                      <p className="text-muted-foreground text-sm">{recipient.email}</p>
+                      <p className="text-muted-foreground text-xs font-bold">{recipient.role}</p>
+                    </div>
                   </div>
                 ))}
               </div>
