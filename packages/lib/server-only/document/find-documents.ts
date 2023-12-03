@@ -68,6 +68,20 @@ export const findDocuments = async ({
               email: user.email,
             },
           },
+          deletedAt: {
+            equals: null,
+          },
+        },
+        {
+          status: {
+            not: ExtendedDocumentStatus.DRAFT,
+          },
+          Recipient: {
+            some: {
+              email: user.email,
+              signingStatus: SigningStatus.SIGNED,
+            },
+          },
         },
       ],
     }))
@@ -80,6 +94,9 @@ export const findDocuments = async ({
           email: user.email,
           signingStatus: SigningStatus.NOT_SIGNED,
         },
+      },
+      deletedAt: {
+        equals: null,
       },
     }))
     .with(ExtendedDocumentStatus.DRAFT, () => ({

@@ -107,6 +107,7 @@ export const DeleteDocumentDialog = ({
               loading={isLoading}
               onClick={onDelete}
               disabled={!isDeleteEnabled}
+              variant="destructive"
               className="flex-1"
             >
               Delete

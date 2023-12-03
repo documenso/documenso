@@ -67,50 +67,48 @@ export default async function CompletedSigningPage({
       />
 
       <div className="relative mt-6 flex w-full flex-col items-center">
-        {match(document.status)
-          .with(DocumentStatus.COMPLETED, () => (
+        {match({ status: document.status, deleteAt: document.deletedAt })
+          .with({ status: DocumentStatus.COMPLETED }, () => (
             <div className="text-documenso-700 flex items-center text-center">
               <CheckCircle2 className="mr-2 h-5 w-5" />
               <span className="text-sm">Everyone has signed</span>
             </div>
           ))
-          .otherwise(() =>
-            document.deletedAt ? (
-              <div className="flex items-center text-center text-red-600">
-                <Clock8 className="mr-2 h-5 w-5" />
-                <span className="text-sm">Document no longer available to sign</span>
-              </div>
-            ) : (
-              <div className="flex items-center text-center text-blue-600">
-                <Clock8 className="mr-2 h-5 w-5" />
-                <span className="text-sm">Waiting for others to sign</span>
-              </div>
-            ),
-          )}
+          .with({ deleteAt: null }, () => (
+            <div className="flex items-center text-center text-blue-600">
+              <Clock8 className="mr-2 h-5 w-5" />
+              <span className="text-sm">Waiting for others to sign</span>
+            </div>
+          ))
+          .otherwise(() => (
+            <div className="flex items-center text-center text-red-600">
+              <Clock8 className="mr-2 h-5 w-5" />
+              <span className="text-sm">Document no longer available to sign</span>
+            </div>
+          ))}
 
         <h2 className="mt-6 max-w-[35ch] text-center text-2xl font-semibold leading-normal md:text-3xl lg:text-4xl">
           You have signed
           <span className="mt-1.5 block">"{document.title}"</span>
         </h2>
 
-        {match(document.status)
-          .with(DocumentStatus.COMPLETED, () => (
+        {match({ status: document.status, deleteAt: document.deletedAt })
+          .with({ status: DocumentStatus.COMPLETED }, () => (
             <p className="text-muted-foreground/60 mt-2.5 max-w-[60ch] text-center text-sm font-medium md:text-base">
               Everyone has signed! You will receive an Email copy of the signed document.
             </p>
           ))
-          .otherwise(() =>
-            document.deletedAt ? (
-              <p className="text-muted-foreground/60 mt-2.5 max-w-[60ch] text-center text-sm font-medium md:text-base">
-                This document has been cancelled by the owner and is no longer available for others
-                to sign.
-              </p>
-            ) : (
-              <p className="text-muted-foreground/60 mt-2.5 max-w-[60ch] text-center text-sm font-medium md:text-base">
-                You will receive an Email copy of the signed document once everyone has signed.
-              </p>
-            ),
-          )}
+          .with({ deleteAt: null }, () => (
+            <p className="text-muted-foreground/60 mt-2.5 max-w-[60ch] text-center text-sm font-medium md:text-base">
+              You will receive an Email copy of the signed document once everyone has signed.
+            </p>
+          ))
+          .otherwise(() => (
+            <p className="text-muted-foreground/60 mt-2.5 max-w-[60ch] text-center text-sm font-medium md:text-base">
+              This document has been cancelled by the owner and is no longer available for others to
+              sign.
+            </p>
+          ))}
 
         <div className="mt-8 flex w-full max-w-sm items-center justify-center gap-4">
           <DocumentShareButton documentId={document.id} token={recipient.token} />

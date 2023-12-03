@@ -8,6 +8,7 @@ import { useSession } from 'next-auth/react';
 import { useUpdateSearchParams } from '@documenso/lib/client-only/hooks/use-update-search-params';
 import type { FindResultSet } from '@documenso/lib/types/find-result-set';
 import type { Document, Recipient, User } from '@documenso/prisma/client';
+import { ExtendedDocumentStatus } from '@documenso/prisma/types/extended-document-status';
 import { DataTable } from '@documenso/ui/primitives/data-table';
 import { DataTablePagination } from '@documenso/ui/primitives/data-table-pagination';
 
@@ -75,7 +76,8 @@ export const DocumentsDataTable = ({ results }: DocumentsDataTableProps) => {
           {
             header: 'Actions',
             cell: ({ row }) =>
-              !row.original.deletedAt && (
+              (!row.original.deletedAt ||
+                row.original.status === ExtendedDocumentStatus.COMPLETED) && (
                 <div className="flex items-center gap-x-4">
                   <DataTableActionButton row={row.original} />
                   <DataTableActionDropdown row={row.original} />
