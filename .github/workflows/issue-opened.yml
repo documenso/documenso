@@ -1,0 +1,24 @@
+name: "Label Issues"
+
+on:
+  issues:
+    types:
+      - reopened
+      - opened
+
+jobs:
+  label_issues:
+    runs-on: ubuntu-latest
+    if: github.repository == 'documenso/documenso'
+    permissions:
+      issues: write
+    steps:
+      - uses: actions/github-script@v6
+        with:
+          script: |
+            github.rest.issues.addLabels({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              labels: ["needs triage"]
+            })
