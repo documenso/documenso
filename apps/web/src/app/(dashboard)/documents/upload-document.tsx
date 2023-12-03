@@ -101,7 +101,9 @@ export const UploadDocument = ({ className }: UploadDocumentProps) => {
   };
 
   const generateThumbnail = (page: number, canvas: HTMLCanvasElement | null) => {
-    if (page !== 1 || !canvas) return;
+    if (page !== 1 || !canvas) {
+      return;
+    }
 
     try {
       // Determine whether the width or height is the larger side
@@ -121,7 +123,9 @@ export const UploadDocument = ({ className }: UploadDocumentProps) => {
 
       // Copy and scale the content of the original canvas to the new canvas
       const ctx = thumbnailCanvas.getContext('2d');
-      if (ctx === null) return thumbnailResolveRef.current?.(undefined);
+      if (ctx === null) {
+        return thumbnailResolveRef.current?.(undefined);
+      }
       ctx.drawImage(canvas, 0, 0, thumbnailWidth, thumbnailHeight);
 
       // Convert the canvas content to a base64 image
@@ -177,7 +181,7 @@ export const UploadDocument = ({ className }: UploadDocumentProps) => {
         </div>
       )}
 
-      {Boolean(docData) && (
+      {!!docData && (
         <LazyPDFViewerNoLoader
           className="hidden"
           documentData={{
