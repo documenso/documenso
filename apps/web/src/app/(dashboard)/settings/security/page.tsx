@@ -3,6 +3,7 @@ import { getRequiredServerComponentSession } from '@documenso/lib/next-auth/get-
 import { AuthenticatorApp } from '~/components/forms/2fa/authenticator-app';
 import { RecoveryCodes } from '~/components/forms/2fa/recovery-codes';
 import { PasswordForm } from '~/components/forms/password';
+import { SemanticSearchApp } from '~/components/forms/sem-search/semantic-toggle';
 
 export default async function SecuritySettingsPage() {
   const { user } = await getRequiredServerComponentSession();
@@ -32,6 +33,20 @@ export default async function SecuritySettingsPage() {
         <h5 className="font-medium">Two-factor methods</h5>
 
         <AuthenticatorApp isTwoFactorEnabled={user.twoFactorEnabled} />
+      </div>
+
+      <hr className="mb-4 mt-8" />
+
+      <h4 className="text-lg font-medium">Semantic Search Settings</h4>
+
+      <p className="text-muted-foreground mt-2 text-sm">
+        Toggle the ability to perform semantic search on your documents.
+      </p>
+
+      <div className="mt-4 max-w-xl">
+        <h5 className="font-medium">Semantic search option</h5>
+
+        <SemanticSearchApp semSearchEnabled={user.semSearchEnabled} />
       </div>
 
       {user.twoFactorEnabled && (

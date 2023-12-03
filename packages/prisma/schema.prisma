@@ -38,6 +38,7 @@ model User {
   PasswordResetToken   PasswordResetToken[]
   twoFactorSecret      String?
   twoFactorEnabled     Boolean              @default(false)
+  semSearchEnabled     Boolean              @default(false)
   twoFactorBackupCodes String?
   VerificationToken    VerificationToken[]
 
