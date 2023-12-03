@@ -1,7 +1,8 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useContext, useState } from 'react';
 import type { FC } from 'react';
 
 type StepContextType = {
+  isCompleting: boolean;
   stepIndex: number;
   currentStep: number;
   totalSteps: number;
@@ -15,10 +16,11 @@ const StepContext = createContext<StepContextType | null>(null);
 
 type StepperProps = {
   children: React.ReactNode;
-  onComplete?: () => void;
+  onComplete?: () => void | Promise<void>;
   onStepChanged?: (currentStep: number) => void;
   currentStep?: number; // external control prop
   setCurrentStep?: (step: number) => void; // external control function
+  isAsyncComplete?: boolean;
 };
 
 export const Stepper: FC<StepperProps> = ({
@@ -27,8 +29,10 @@ export const Stepper: FC<StepperProps> = ({
   onStepChanged,
   currentStep: propCurrentStep,
   setCurrentStep: propSetCurrentStep,
+  isAsyncComplete,
 }) => {
   const [stateCurrentStep, stateSetCurrentStep] = useState(1);
+  const [isCompleting, setIsCompleting] = useState(false);
 
   // Determine if props are provided, otherwise use state
   const isControlled = propCurrentStep !== undefined && propSetCurrentStep !== undefined;
@@ -37,23 +41,38 @@ export const Stepper: FC<StepperProps> = ({
 
   const totalSteps = React.Children.count(children);
 
+  const handleComplete = async () => {
+    if (!onComplete) {
+      return;
+    }
+    if (!isAsyncComplete) {
+      void onComplete();
+      return;
+    }
+    setIsCompleting(true);
+    await onComplete();
+    // handle async complete action
+    setIsCompleting(false);
+  };
+
+  const handleStepChange = (nextStep: number) => {
+    setCurrentStep(nextStep);
+    onStepChanged && onStepChanged(nextStep);
+  };
+
   const nextStep = () => {
     if (currentStep < totalSteps) {
-      setCurrentStep(currentStep + 1);
+      void handleStepChange(currentStep + 1);
     } else {
-      onComplete && onComplete();
+      void handleComplete();
     }
   };
 
   const previousStep = () => {
     if (currentStep > 1) {
-      setCurrentStep(currentStep - 1);
+      void handleStepChange(currentStep - 1);
     }
   };
-
-  useEffect(() => {
-    onStepChanged && onStepChanged(currentStep);
-  }, [currentStep, onStepChanged]);
 
   // Empty stepper
   if (totalSteps === 0) {
@@ -63,6 +82,7 @@ export const Stepper: FC<StepperProps> = ({
   const currentChild = React.Children.toArray(children)[currentStep - 1];
 
   const stepContextValue: StepContextType = {
+    isCompleting,
     stepIndex: currentStep - 1,
     currentStep,
     totalSteps,
