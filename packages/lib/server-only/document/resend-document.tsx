@@ -59,7 +59,9 @@ export const resendDocument = async ({ documentId, userId, recipients }: ResendD
 
   await Promise.all(
     document.Recipient.map(async (recipient) => {
-      if (recipient.role === RecipientRole.CC) return;
+      if (recipient.role === RecipientRole.CC) {
+        return;
+      }
 
       const { email, name } = recipient;
 

@@ -50,6 +50,7 @@ export const sendDocument = async ({ documentId, userId }: SendDocumentOptions) 
       if (recipient.sendStatus === SendStatus.SENT || recipient.role === RecipientRole.CC) {
         return;
       }
+
       const { email, name } = recipient;
 
       const customEmailTemplate = {
