@@ -121,22 +121,24 @@ enum DocumentStatus {
 }
 
 model Document {
-  id                Int                 @id @default(autoincrement())
-  userId            Int
-  User              User                @relation(fields: [userId], references: [id], onDelete: Cascade)
-  title             String
-  status            DocumentStatus      @default(DRAFT)
-  Recipient         Recipient[]
-  Field             Field[]
-  ShareLink         DocumentShareLink[]
-  documentThumbnail DocumentThumbnail?
-  documentDataId    String
-  documentData      DocumentData        @relation(fields: [documentDataId], references: [id], onDelete: Cascade)
-  documentMeta      DocumentMeta?
-  createdAt         DateTime            @default(now())
-  updatedAt         DateTime            @default(now()) @updatedAt
-  completedAt       DateTime?
+  id                  Int                 @id @default(autoincrement())
+  userId              Int
+  User                User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title               String
+  status              DocumentStatus      @default(DRAFT)
+  Recipient           Recipient[]
+  Field               Field[]
+  ShareLink           DocumentShareLink[]
+  documentThumbnailId String?
+  documentThumbnail   DocumentThumbnail?  @relation(fields: [documentThumbnailId], references: [id], onDelete: Cascade)
+  documentDataId      String
+  documentData        DocumentData        @relation(fields: [documentDataId], references: [id], onDelete: Cascade)
+  documentMeta        DocumentMeta?
+  createdAt           DateTime            @default(now())
+  updatedAt           DateTime            @default(now()) @updatedAt
+  completedAt         DateTime?
 
+  @@unique([documentThumbnailId])
   @@unique([documentDataId])
   @@index([userId])
   @@index([status])
@@ -148,12 +150,18 @@ enum DocumentDataType {
   BYTES_64
 }
 
+// So to summarise, if I were doing a dirty implementation for a hackathon
+
+// New table DocumentThumbnail which would have id thumbnail_bytes hq_thumbnail_bytes
+// Store thumbnail on the Document via a foreign key
+// Create a /thumbnail/<id> endpoint which would also support a /thumbnail/<id>/hq
+// Use stale while revalidate to keep it cached for ages to reduce the performance impact
+
 model DocumentThumbnail {
-  id                 String   @id @default(cuid())
-  documentId         Int      @unique
-  thumbnail_bytes    Bytes?
-  hq_thumbnail_bytes Bytes?
-  Document           Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  id                 String    @id @default(cuid())
+  thumbnail_bytes    Bytes
+  hq_thumbnail_bytes Bytes
+  Document           Document?
 }
 
 model DocumentData {
