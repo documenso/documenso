@@ -32,7 +32,7 @@ export const DataTableImage = ({ row }: DataTableTitleProps) => {
     <>
       <img
         className="mr-2 inline-block h-10 w-7 cursor-pointer object-cover"
-        src={row.documentThumbnail.lowResThumbnailBytes ?? '/static/document.png'}
+        src={row?.documentThumbnail?.lowResThumbnailBytes ?? '/static/document.png'}
         alt="document-preview"
         onClick={(e) => openDialogForImage(e)}
       />
@@ -45,7 +45,7 @@ export const DataTableImage = ({ row }: DataTableTitleProps) => {
 
           <img
             className="mr-2 inline-block h-[34rem] w-[28rem]  object-cover"
-            src={row.documentThumbnail.highResThumbnailBytes ?? '/static/document.png'}
+            src={row?.documentThumbnail?.highResThumbnailBytes ?? '/static/document.png'}
             alt="document-preview"
             onClick={() => setShowImageDialog(true)}
           />
