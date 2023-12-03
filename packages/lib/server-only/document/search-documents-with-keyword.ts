@@ -24,6 +24,9 @@ export const searchDocumentsWithKeyword = async ({
             mode: 'insensitive',
           },
           userId: userId,
+          deletedAt: {
+            equals: null,
+          },
         },
         {
           Recipient: {
@@ -34,6 +37,9 @@ export const searchDocumentsWithKeyword = async ({
             },
           },
           userId: userId,
+          deletedAt: {
+            equals: null,
+          },
         },
         {
           Recipient: {
