@@ -31,13 +31,20 @@ const DOCUMENTS_PAGES = [
     shortcut: DOCUMENTS_PAGE_SHORTCUT.replace('+', ''),
   },
   { label: 'Draft documents', path: '/documents?status=DRAFT' },
-  { label: 'Completed documents', path: '/documents?status=COMPLETED' },
+  {
+    label: 'Completed documents',
+    path: '/documents?status=COMPLETED',
+  },
   { label: 'Pending documents', path: '/documents?status=PENDING' },
   { label: 'Inbox documents', path: '/documents?status=INBOX' },
 ];
 
 const SETTINGS_PAGES = [
-  { label: 'Settings', path: '/settings', shortcut: SETTINGS_PAGE_SHORTCUT.replace('+', '') },
+  {
+    label: 'Settings',
+    path: '/settings',
+    shortcut: SETTINGS_PAGE_SHORTCUT.replace('+', ''),
+  },
   { label: 'Profile', path: '/settings/profile' },
   { label: 'Password', path: '/settings/password' },
 ];
@@ -56,32 +63,40 @@ export function CommandMenu({ open, onOpenChange }: CommandMenuProps) {
   const [pages, setPages] = useState<string[]>([]);
 
   const [searchResults, setSearchResults] = useState<
-    { label: string; path: string; recipents: string[] }[]
+    { label: string; path: string; value: string }[]
   >([]);
 
-  const { isLoading: isSearchingDocuments, refetch: findDocuments } =
-    trpcReact.document.searchDocuments.useQuery(
-      {
-        query: search,
-      },
-      {
-        enabled: search !== '',
-        onSuccess: (data) => {
-          const newResults = data?.map((document) => ({
-            label: document.title,
-            path: `/documents/${document.id}`,
-            recipents: document.Recipient.map((recipient) => recipient.email),
-          }));
-          setSearchResults(newResults);
-        },
-      },
-    );
+  const {
+    data: searchDocuments,
+    isLoading: isSearchingDocuments,
+    refetch: findDocuments,
+  } = trpcReact.document.searchDocuments.useQuery(
+    {
+      query: search,
+    },
+    {
+      enabled: search !== '',
+    },
+  );
 
   useEffect(() => {
     if (search) {
       void findDocuments();
+    } else {
+      setSearchResults([]);
     }
   }, [search, findDocuments]);
+
+  useEffect(() => {
+    if (searchDocuments) {
+      const newResults = searchDocuments?.map((document) => ({
+        label: document.title,
+        path: `/documents/${document.id}`,
+        value: document.title + document.Recipient.map((recipient) => recipient.email).join(' '),
+      }));
+      setSearchResults(newResults);
+    }
+  }, [searchDocuments]);
 
   const currentPage = pages[pages.length - 1];
 
@@ -146,17 +161,6 @@ export function CommandMenu({ open, onOpenChange }: CommandMenuProps) {
     <CommandDialog
       commandProps={{
         onKeyDown: handleKeyDown,
-        filter: (value, search) => {
-          const exists = value.includes(search);
-          if (exists) return 1;
-
-          const result = searchResults.find(
-            (result) => result.label.toLocaleLowerCase() === value.toLocaleLowerCase(),
-          );
-
-          if (result?.recipents.some((recipent) => recipent.includes(search))) return 1;
-          return 0;
-        },
       }}
       open={open}
       onOpenChange={setOpen}
@@ -190,9 +194,11 @@ export function CommandMenu({ open, onOpenChange }: CommandMenuProps) {
             <CommandGroup heading="Preferences">
               <CommandItem onSelect={() => addPage('theme')}>Change theme</CommandItem>
             </CommandGroup>
-            <CommandGroup heading="Your documents">
-              <Commands push={push} pages={searchResults} />
-            </CommandGroup>
+            {searchResults.length > 0 && (
+              <CommandGroup heading="Your documents">
+                <Commands push={push} pages={searchResults} />
+              </CommandGroup>
+            )}
           </>
         )}
         {currentPage === 'theme' && <ThemeCommands setTheme={setTheme} />}
@@ -206,10 +212,14 @@ const Commands = ({
   pages,
 }: {
   push: (_path: string) => void;
-  pages: { label: string; path: string; shortcut?: string }[];
+  pages: { label: string; path: string; shortcut?: string; value?: string }[];
 }) => {
   return pages.map((page, idx) => (
-    <CommandItem key={page.path + idx} value={page.label} onSelect={() => push(page.path)}>
+    <CommandItem
+      key={page.path + idx}
+      value={page.value ?? page.label}
+      onSelect={() => push(page.path)}
+    >
       {page.label}
       {page.shortcut && <CommandShortcut>{page.shortcut}</CommandShortcut>}
     </CommandItem>

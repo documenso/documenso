@@ -9,7 +9,12 @@ export const SearchDocumentsWithKeyword = async ({
   query,
   userId,
 }: SearchDocumentsWithKeywordOptions) => {
-  // modify this to make it casse insensitive
+  const user = await prisma.user.findFirstOrThrow({
+    where: {
+      id: userId,
+    },
+  });
+
   const documents = await prisma.document.findMany({
     where: {
       OR: [
@@ -18,6 +23,7 @@ export const SearchDocumentsWithKeyword = async ({
             contains: query,
             mode: 'insensitive',
           },
+          userId: userId,
         },
         {
           Recipient: {
@@ -27,9 +33,20 @@ export const SearchDocumentsWithKeyword = async ({
               },
             },
           },
+          userId: userId,
+        },
+        {
+          Recipient: {
+            some: {
+              email: user.email,
+            },
+          },
+          title: {
+            contains: query,
+            mode: 'insensitive',
+          },
         },
       ],
-      userId: userId,
     },
     include: {
       Recipient: true,
