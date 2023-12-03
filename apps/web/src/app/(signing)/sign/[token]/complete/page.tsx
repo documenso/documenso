@@ -74,12 +74,19 @@ export default async function CompletedSigningPage({
               <span className="text-sm">Everyone has signed</span>
             </div>
           ))
-          .otherwise(() => (
-            <div className="flex items-center text-center text-blue-600">
-              <Clock8 className="mr-2 h-5 w-5" />
-              <span className="text-sm">Waiting for others to sign</span>
-            </div>
-          ))}
+          .otherwise(() =>
+            document.deletedAt ? (
+              <div className="flex items-center text-center text-red-600">
+                <Clock8 className="mr-2 h-5 w-5" />
+                <span className="text-sm">Document no longer available to sign</span>
+              </div>
+            ) : (
+              <div className="flex items-center text-center text-blue-600">
+                <Clock8 className="mr-2 h-5 w-5" />
+                <span className="text-sm">Waiting for others to sign</span>
+              </div>
+            ),
+          )}
 
         <h2 className="mt-6 max-w-[35ch] text-center text-2xl font-semibold leading-normal md:text-3xl lg:text-4xl">
           You have signed
@@ -92,11 +99,18 @@ export default async function CompletedSigningPage({
               Everyone has signed! You will receive an Email copy of the signed document.
             </p>
           ))
-          .otherwise(() => (
-            <p className="text-muted-foreground/60 mt-2.5 max-w-[60ch] text-center text-sm font-medium md:text-base">
-              You will receive an Email copy of the signed document once everyone has signed.
-            </p>
-          ))}
+          .otherwise(() =>
+            document.deletedAt ? (
+              <p className="text-muted-foreground/60 mt-2.5 max-w-[60ch] text-center text-sm font-medium md:text-base">
+                This document has been cancelled by the owner and is no longer available for others
+                to sign.
+              </p>
+            ) : (
+              <p className="text-muted-foreground/60 mt-2.5 max-w-[60ch] text-center text-sm font-medium md:text-base">
+                You will receive an Email copy of the signed document once everyone has signed.
+              </p>
+            ),
+          )}
 
         <div className="mt-8 flex w-full max-w-sm items-center justify-center gap-4">
           <DocumentShareButton documentId={document.id} token={recipient.token} />
