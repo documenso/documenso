@@ -4,6 +4,12 @@ module.exports = {
   extends: ['@documenso/eslint-config'],
   rules: {
     '@next/next/no-img-element': 'off',
+    'prettier/prettier': [
+      'error',
+      {
+        endOfLine: 'off',
+      },
+    ],
   },
   settings: {
     next: {
