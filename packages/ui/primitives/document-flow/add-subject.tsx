@@ -2,38 +2,34 @@
 
 import { useForm } from 'react-hook-form';
 
-import { DocumentStatus, Field, Recipient } from '@documenso/prisma/client';
-import { DocumentWithData } from '@documenso/prisma/types/document-with-data';
+import type { Field, Recipient } from '@documenso/prisma/client';
+import { DocumentStatus } from '@documenso/prisma/client';
+import type { DocumentWithData } from '@documenso/prisma/types/document-with-data';
 import { FormErrorMessage } from '@documenso/ui/primitives/form/form-error-message';
 import { Input } from '@documenso/ui/primitives/input';
 import { Label } from '@documenso/ui/primitives/label';
 import { Textarea } from '@documenso/ui/primitives/textarea';
 
-import { TAddSubjectFormSchema } from './add-subject.types';
-import {
-  DocumentFlowFormContainerActions,
-  DocumentFlowFormContainerContent,
-  DocumentFlowFormContainerFooter,
-  DocumentFlowFormContainerStep,
-} from './document-flow-root';
-import { DocumentFlowStep } from './types';
+import type { StepProps } from '../stepper';
+import { Step } from '../stepper';
+import type { TAddSubjectFormSchema } from './add-subject.types';
+import { DocumentFlowFormContainerContent } from './document-flow-root';
 
 export type AddSubjectFormProps = {
-  documentFlow: DocumentFlowStep;
   recipients: Recipient[];
   fields: Field[];
   document: DocumentWithData;
-  numberOfSteps: number;
+
   onSubmit: (_data: TAddSubjectFormSchema) => void;
-};
+} & Omit<StepProps, 'children'>;
 
 export const AddSubjectFormPartial = ({
-  documentFlow,
   recipients: _recipients,
   fields: _fields,
   document,
-  numberOfSteps,
   onSubmit,
+  title,
+  description,
 }: AddSubjectFormProps) => {
   const {
     register,
@@ -51,7 +47,13 @@ export const AddSubjectFormPartial = ({
   const onFormSubmit = handleSubmit(onSubmit);
 
   return (
-    <>
+    <Step
+      nextLabel={document.status === DocumentStatus.DRAFT ? 'Send' : 'Update'}
+      onNext={() => void onFormSubmit()}
+      isLoading={isSubmitting}
+      title={title}
+      description={description}
+    >
       <DocumentFlowFormContainerContent>
         <div className="flex flex-col">
           <div className="flex flex-col gap-y-4">
@@ -120,22 +122,6 @@ export const AddSubjectFormPartial = ({
           </div>
         </div>
       </DocumentFlowFormContainerContent>
-
-      <DocumentFlowFormContainerFooter>
-        <DocumentFlowFormContainerStep
-          title={documentFlow.title}
-          step={documentFlow.stepIndex}
-          maxStep={numberOfSteps}
-        />
-
-        <DocumentFlowFormContainerActions
-          loading={isSubmitting}
-          disabled={isSubmitting}
-          goNextLabel={document.status === DocumentStatus.DRAFT ? 'Send' : 'Update'}
-          onGoBackClick={documentFlow.onBackStep}
-          onGoNextClick={() => void onFormSubmit()}
-        />
-      </DocumentFlowFormContainerFooter>
-    </>
+    </Step>
   );
 };

@@ -11,7 +11,8 @@ import { getBoundingClientRect } from '@documenso/lib/client-only/get-bounding-c
 import { useDocumentElement } from '@documenso/lib/client-only/hooks/use-document-element';
 import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
 import { nanoid } from '@documenso/lib/universal/id';
-import { Field, FieldType, Recipient, SendStatus } from '@documenso/prisma/client';
+import type { Field, Recipient } from '@documenso/prisma/client';
+import { FieldType, SendStatus } from '@documenso/prisma/client';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
 import { Card, CardContent } from '@documenso/ui/primitives/card';
@@ -25,15 +26,12 @@ import {
 import { Popover, PopoverContent, PopoverTrigger } from '@documenso/ui/primitives/popover';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@documenso/ui/primitives/tooltip';
 
-import { TAddFieldsFormSchema } from './add-fields.types';
-import {
-  DocumentFlowFormContainerActions,
-  DocumentFlowFormContainerContent,
-  DocumentFlowFormContainerFooter,
-  DocumentFlowFormContainerStep,
-} from './document-flow-root';
+import type { StepProps } from '../stepper';
+import { Step } from '../stepper';
+import type { TAddFieldsFormSchema } from './add-fields.types';
+import { DocumentFlowFormContainerContent } from './document-flow-root';
 import { FieldItem } from './field-item';
-import { DocumentFlowStep, FRIENDLY_FIELD_TYPE } from './types';
+import { FRIENDLY_FIELD_TYPE } from './types';
 
 const fontCaveat = Caveat({
   weight: ['500'],
@@ -49,21 +47,21 @@ const MIN_HEIGHT_PX = 60;
 const MIN_WIDTH_PX = 200;
 
 export type AddFieldsFormProps = {
-  documentFlow: DocumentFlowStep;
   hideRecipients?: boolean;
   recipients: Recipient[];
   fields: Field[];
-  numberOfSteps: number;
   onSubmit: (_data: TAddFieldsFormSchema) => void;
-};
+} & Omit<StepProps, 'children'>;
 
 export const AddFieldsFormPartial = ({
-  documentFlow,
   hideRecipients = false,
   recipients,
   fields,
-  numberOfSteps,
+  title,
+  description,
   onSubmit,
+  canGoPrevious,
+  onPrevious,
 }: AddFieldsFormProps) => {
   const { isWithinPageBounds, getFieldPosition, getPage } = useDocumentElement();
 
@@ -286,7 +284,17 @@ export const AddFieldsFormPartial = ({
   }, [recipients]);
 
   return (
-    <>
+    <Step
+      title={title}
+      description={description}
+      onNext={() => void onFormSubmit()}
+      isLoading={isSubmitting}
+      onPrevious={() => {
+        onPrevious?.();
+        remove();
+      }}
+      canGoPrevious={canGoPrevious}
+    >
       <DocumentFlowFormContainerContent>
         <div className="flex flex-col">
           {selectedField && (
@@ -509,24 +517,6 @@ export const AddFieldsFormPartial = ({
           </div>
         </div>
       </DocumentFlowFormContainerContent>
-
-      <DocumentFlowFormContainerFooter>
-        <DocumentFlowFormContainerStep
-          title={documentFlow.title}
-          step={documentFlow.stepIndex}
-          maxStep={numberOfSteps}
-        />
-
-        <DocumentFlowFormContainerActions
-          loading={isSubmitting}
-          disabled={isSubmitting}
-          onGoBackClick={() => {
-            documentFlow.onBackStep?.();
-            remove();
-          }}
-          onGoNextClick={() => void onFormSubmit()}
-        />
-      </DocumentFlowFormContainerFooter>
-    </>
+    </Step>
   );
 };

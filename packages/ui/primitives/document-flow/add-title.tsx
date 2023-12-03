@@ -8,31 +8,25 @@ import { FormErrorMessage } from '@documenso/ui/primitives/form/form-error-messa
 import { Input } from '@documenso/ui/primitives/input';
 import { Label } from '@documenso/ui/primitives/label';
 
+import type { StepProps } from '../stepper';
+import { Step } from '../stepper';
 import type { TAddTitleFormSchema } from './add-title.types';
-import {
-  DocumentFlowFormContainerActions,
-  DocumentFlowFormContainerContent,
-  DocumentFlowFormContainerFooter,
-  DocumentFlowFormContainerStep,
-} from './document-flow-root';
-import type { DocumentFlowStep } from './types';
+import { DocumentFlowFormContainerContent } from './document-flow-root';
 
 export type AddTitleFormProps = {
-  documentFlow: DocumentFlowStep;
   recipients: Recipient[];
   fields: Field[];
   document: DocumentWithData;
-  numberOfSteps: number;
   onSubmit: (_data: TAddTitleFormSchema) => void;
-};
+} & Omit<StepProps, 'children'>;
 
 export const AddTitleFormPartial = ({
-  documentFlow,
   recipients: _recipients,
   fields: _fields,
   document,
-  numberOfSteps,
   onSubmit,
+  title,
+  description,
 }: AddTitleFormProps) => {
   const {
     register,
@@ -47,7 +41,14 @@ export const AddTitleFormPartial = ({
   const onFormSubmit = handleSubmit(onSubmit);
 
   return (
-    <>
+    <Step
+      title={title}
+      description={description}
+      onNext={() => {
+        void onFormSubmit();
+      }}
+      isLoading={isSubmitting}
+    >
       <DocumentFlowFormContainerContent>
         <div className="flex flex-col">
           <div className="flex flex-col gap-y-4">
@@ -68,21 +69,6 @@ export const AddTitleFormPartial = ({
           </div>
         </div>
       </DocumentFlowFormContainerContent>
-
-      <DocumentFlowFormContainerFooter>
-        <DocumentFlowFormContainerStep
-          title={documentFlow.title}
-          step={documentFlow.stepIndex}
-          maxStep={numberOfSteps}
-        />
-
-        <DocumentFlowFormContainerActions
-          loading={isSubmitting}
-          disabled={isSubmitting}
-          onGoBackClick={documentFlow.onBackStep}
-          onGoNextClick={() => void onFormSubmit()}
-        />
-      </DocumentFlowFormContainerFooter>
-    </>
+    </Step>
   );
 };

@@ -17,15 +17,10 @@ import { AddFieldsFormPartial } from '@documenso/ui/primitives/document-flow/add
 import type { TAddFieldsFormSchema } from '@documenso/ui/primitives/document-flow/add-fields.types';
 import { AddSignatureFormPartial } from '@documenso/ui/primitives/document-flow/add-signature';
 import type { TAddSignatureFormSchema } from '@documenso/ui/primitives/document-flow/add-signature.types';
-import {
-  DocumentFlowFormContainer,
-  DocumentFlowFormContainerHeader,
-} from '@documenso/ui/primitives/document-flow/document-flow-root';
-import type { DocumentFlowStep } from '@documenso/ui/primitives/document-flow/types';
+import { DocumentFlowFormContainer } from '@documenso/ui/primitives/document-flow/document-flow-root';
 import { LazyPDFViewer } from '@documenso/ui/primitives/lazy-pdf-viewer';
+import { Stepper } from '@documenso/ui/primitives/stepper';
 import { useToast } from '@documenso/ui/primitives/use-toast';
-
-type SinglePlayerModeStep = 'fields' | 'sign';
 
 // !: This entire file is a hack to get around failed prerendering of
 // !: the Single Player Mode page. This regression was introduced during
@@ -38,34 +33,10 @@ export const SinglePlayerClient = () => {
 
   const [uploadedFile, setUploadedFile] = useState<{ file: File; fileBase64: string } | null>();
 
-  const [step, setStep] = useState<SinglePlayerModeStep>('fields');
   const [fields, setFields] = useState<Field[]>([]);
 
   const { mutateAsync: createSinglePlayerDocument } =
     trpc.singleplayer.createSinglePlayerDocument.useMutation();
-
-  const documentFlow: Record<SinglePlayerModeStep, DocumentFlowStep> = {
-    fields: {
-      title: 'Add document',
-      description: 'Upload a document and add fields.',
-      stepIndex: 1,
-      onBackStep: uploadedFile
-        ? () => {
-            setUploadedFile(null);
-            setFields([]);
-          }
-        : undefined,
-      onNextStep: () => setStep('sign'),
-    },
-    sign: {
-      title: 'Sign',
-      description: 'Enter your details.',
-      stepIndex: 2,
-      onBackStep: () => setStep('fields'),
-    },
-  };
-
-  const currentDocumentFlow = documentFlow[step];
 
   useEffect(() => {
     analytics.startSessionRecording('marketing_session_recording_spm');
@@ -100,8 +71,6 @@ export const SinglePlayerClient = () => {
     );
 
     analytics.capture('Marketing: SPM - Fields added');
-
-    documentFlow.fields.onNextStep?.();
   };
 
   /**
@@ -227,36 +196,33 @@ export const SinglePlayerClient = () => {
 
         <div className="col-span-12 lg:col-span-6 xl:col-span-5">
           <DocumentFlowFormContainer className="top-24" onSubmit={(e) => e.preventDefault()}>
-            <DocumentFlowFormContainerHeader
-              title={currentDocumentFlow.title}
-              description={currentDocumentFlow.description}
-            />
-
-            {/* Add fields to PDF page. */}
-            {step === 'fields' && (
+            <Stepper>
               <fieldset disabled={!uploadedFile} className="flex h-full flex-col">
                 <AddFieldsFormPartial
-                  documentFlow={documentFlow.fields}
+                  title="Add document"
+                  description="Upload a document and add fields."
                   hideRecipients={true}
                   recipients={uploadedFile ? [placeholderRecipient] : []}
-                  numberOfSteps={Object.keys(documentFlow).length}
                   fields={fields}
                   onSubmit={onFieldsSubmit}
+                  canGoPrevious={!!uploadedFile}
+                  onPrevious={() => {
+                    setUploadedFile(null);
+                    setFields([]);
+                  }}
                 />
               </fieldset>
-            )}
 
-            {/* Enter user details and signature. */}
-            {step === 'sign' && (
               <AddSignatureFormPartial
-                documentFlow={documentFlow.sign}
-                numberOfSteps={Object.keys(documentFlow).length}
+                title="Sign"
+                description="Enter your details."
                 fields={fields}
                 onSubmit={onSignSubmit}
                 requireName={Boolean(fields.find((field) => field.type === 'NAME'))}
                 requireSignature={Boolean(fields.find((field) => field.type === 'SIGNATURE'))}
+                canGoNext
               />
-            )}
+            </Stepper>
           </DocumentFlowFormContainer>
         </div>
       </div>
