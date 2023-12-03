@@ -50,7 +50,10 @@ export const UploadDocument = ({ className }: UploadDocumentProps) => {
     setType(type);
   };
 
-  const createDocuments = async (highResThumbnailBytes: string, lowResThumbnailBytes: string) => {
+  const createDocumentAndThumbnail = async (
+    highResThumbnailBytes: string,
+    lowResThumbnailBytes: string,
+  ) => {
     try {
       const { id: documentDataId } = await createDocumentData({
         type: type as DocumentDataType,
@@ -99,7 +102,7 @@ export const UploadDocument = ({ className }: UploadDocumentProps) => {
   const generateThumbnail = async (page: number, canvas: HTMLCanvasElement | null) => {
     try {
       if (page !== 1 || !canvas) {
-        await createDocuments('', '');
+        await createDocumentAndThumbnail('', '');
         return;
       }
       // For High Resolution
@@ -130,7 +133,7 @@ export const UploadDocument = ({ className }: UploadDocumentProps) => {
       // Convert the temporary HTMLCanvasElement to a data URL (in PNG format by default)
       const lowResDataUrl = highResTempCanvas.toDataURL('image/png');
       console.log(lowResDataUrl, 'lowResDataUrl');
-      await createDocuments(highResDataUrl, lowResDataUrl);
+      await createDocumentAndThumbnail(highResDataUrl, lowResDataUrl);
     } catch (error) {
       console.log(error);
       toast({

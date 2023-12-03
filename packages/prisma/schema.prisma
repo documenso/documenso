@@ -4,8 +4,8 @@ generator client {
 
 datasource db {
   provider  = "postgresql"
-  url       = "postgres://documenso:password@127.0.0.1:54320/documenso"
-  directUrl = "postgres://documenso:password@127.0.0.1:54320/documenso"
+  url       = env("NEXT_PRIVATE_DATABASE_URL")
+  directUrl = env("NEXT_PRIVATE_DIRECT_DATABASE_URL")
 }
 
 enum IdentityProvider {

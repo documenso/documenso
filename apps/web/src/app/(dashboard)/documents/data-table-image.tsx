@@ -25,7 +25,6 @@ export const DataTableImage = ({ row }: DataTableTitleProps) => {
   const [showImageDialog, setShowImageDialog] = useState(false);
 
   const openDialogForImage = (e: React.MouseEvent<HTMLImageElement>) => {
-    e.stopPropagation();
     setShowImageDialog(true);
   };
 
