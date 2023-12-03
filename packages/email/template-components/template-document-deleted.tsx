@@ -1,7 +1,6 @@
-import { Button, Column, Img, Section, Tailwind, Text } from '@react-email/components';
+import config from '@documenso/tailwind-config';
 
-import * as config from '@documenso/tailwind-config';
-
+import { Column, Section, Tailwind, Text } from '../components';
 import { TemplateDocumentImage } from './template-document-image';
 
 export interface TemplateDocumentDeletedProps {

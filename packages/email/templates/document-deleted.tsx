@@ -1,16 +1,6 @@
-import {
-  Body,
-  Container,
-  Head,
-  Html,
-  Img,
-  Preview,
-  Section,
-  Tailwind,
-} from '@react-email/components';
-
 import config from '@documenso/tailwind-config';
 
+import { Body, Container, Head, Html, Img, Preview, Section, Tailwind } from '../components';
 import {
   TemplateDocumentDeleted,
   TemplateDocumentDeletedProps,
