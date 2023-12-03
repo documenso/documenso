@@ -1,5 +1,5 @@
 import { prisma } from '@documenso/prisma';
-import type { RecipientRole } from '@documenso/prisma/client';
+import { RecipientRole } from '@documenso/prisma/client';
 import { SendStatus, SigningStatus } from '@documenso/prisma/client';
 
 import { nanoid } from '../../universal/id';
@@ -83,6 +83,8 @@ export const setRecipientsForDocument = async ({
           email: recipient.email,
           role: recipient.role,
           documentId,
+          signingStatus:
+            recipient.role === RecipientRole.CC ? SigningStatus.SIGNED : SigningStatus.NOT_SIGNED,
         },
         create: {
           name: recipient.name,
@@ -90,6 +92,8 @@ export const setRecipientsForDocument = async ({
           role: recipient.role,
           token: nanoid(),
           documentId,
+          signingStatus:
+            recipient.role === RecipientRole.CC ? SigningStatus.SIGNED : SigningStatus.NOT_SIGNED,
         },
       }),
     ),
