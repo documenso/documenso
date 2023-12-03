@@ -85,5 +85,5 @@ export const ZDeleteDraftDocumentMutationSchema = z.object({
 export type TDeleteDraftDocumentMutationSchema = z.infer<typeof ZDeleteDraftDocumentMutationSchema>;
 
 export const ZSearchDocumentsMutationSchema = z.object({
-  query: z.string().min(1),
+  query: z.string(),
 });

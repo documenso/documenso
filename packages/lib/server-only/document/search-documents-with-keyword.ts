@@ -3,11 +3,13 @@ import { prisma } from '@documenso/prisma';
 export type SearchDocumentsWithKeywordOptions = {
   query: string;
   userId: number;
+  limit?: number;
 };
 
 export const searchDocumentsWithKeyword = async ({
   query,
   userId,
+  limit = 5,
 }: SearchDocumentsWithKeywordOptions) => {
   const user = await prisma.user.findFirstOrThrow({
     where: {
@@ -60,6 +62,7 @@ export const searchDocumentsWithKeyword = async ({
     orderBy: {
       createdAt: 'desc',
     },
+    take: limit,
   });
 
   return documents;

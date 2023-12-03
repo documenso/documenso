@@ -71,24 +71,15 @@ export function CommandMenu({ open, onOpenChange }: CommandMenuProps) {
       {
         query: search,
       },
-      {
-        enabled: search !== '',
-      },
+      // {
+      //   enabled: search !== '',
+      // },
     );
 
-  // useEffect(() => {
-  //   if (searchDocuments) {
-  //     const newResults = searchDocuments?.map((document) => ({
-  //       label: document.title,
-  //       path: `/documents/${document.id}`,
-  //       value: document.title + document.Recipient.map((recipient) => recipient.email).join(' '),
-  //     }));
-  //     setSearchResults(newResults);
-  //   }
-  // }, [searchDocuments]);
-
   const searchResults = useMemo(() => {
-    if (!searchDocuments) return [];
+    if (!searchDocuments) {
+      return [];
+    }
 
     return searchDocuments.map((document) => ({
       label: document.title,
