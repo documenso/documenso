@@ -3,7 +3,7 @@ import { P, match } from 'ts-pattern';
 
 import { prisma } from '@documenso/prisma';
 import type { Document, Prisma } from '@documenso/prisma/client';
-import { SigningStatus } from '@documenso/prisma/client';
+import { RecipientRole, SigningStatus } from '@documenso/prisma/client';
 import { ExtendedDocumentStatus } from '@documenso/prisma/types/extended-document-status';
 
 import type { FindResultSet } from '../../types/find-result-set';
@@ -63,6 +63,18 @@ export const findDocuments = async ({
           Recipient: {
             some: {
               email: user.email,
+              role: {
+                not: RecipientRole.CC,
+              },
+            },
+          },
+        },
+        {
+          status: ExtendedDocumentStatus.COMPLETED,
+          Recipient: {
+            some: {
+              email: user.email,
+              role: RecipientRole.CC,
             },
           },
         },
@@ -76,6 +88,9 @@ export const findDocuments = async ({
         some: {
           email: user.email,
           signingStatus: SigningStatus.NOT_SIGNED,
+          role: {
+            not: RecipientRole.CC,
+          },
         },
       },
     }))
@@ -96,6 +111,9 @@ export const findDocuments = async ({
             some: {
               email: user.email,
               signingStatus: SigningStatus.SIGNED,
+              role: {
+                not: RecipientRole.CC,
+              },
             },
           },
         },
