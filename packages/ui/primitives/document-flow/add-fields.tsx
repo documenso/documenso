@@ -4,14 +4,15 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { Caveat } from 'next/font/google';
 
-import { Check, ChevronsUpDown, Info } from 'lucide-react';
+import { Check, CheckCircle, ChevronsUpDown, CopyIcon, EyeIcon, Info, PenIcon } from 'lucide-react';
 import { useFieldArray, useForm } from 'react-hook-form';
 
 import { getBoundingClientRect } from '@documenso/lib/client-only/get-bounding-client-rect';
 import { useDocumentElement } from '@documenso/lib/client-only/hooks/use-document-element';
 import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
 import { nanoid } from '@documenso/lib/universal/id';
-import { Field, FieldType, Recipient, SendStatus } from '@documenso/prisma/client';
+import type { Field, Recipient } from '@documenso/prisma/client';
+import { FieldType, RecipientRole, SendStatus } from '@documenso/prisma/client';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
 import { Card, CardContent } from '@documenso/ui/primitives/card';
@@ -25,7 +26,7 @@ import {
 import { Popover, PopoverContent, PopoverTrigger } from '@documenso/ui/primitives/popover';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@documenso/ui/primitives/tooltip';
 
-import { TAddFieldsFormSchema } from './add-fields.types';
+import type { TAddFieldsFormSchema } from './add-fields.types';
 import {
   DocumentFlowFormContainerActions,
   DocumentFlowFormContainerContent,
@@ -33,7 +34,8 @@ import {
   DocumentFlowFormContainerStep,
 } from './document-flow-root';
 import { FieldItem } from './field-item';
-import { DocumentFlowStep, FRIENDLY_FIELD_TYPE } from './types';
+import type { DocumentFlowStep } from './types';
+import { FRIENDLY_FIELD_TYPE } from './types';
 
 const fontCaveat = Caveat({
   weight: ['500'],
@@ -335,9 +337,17 @@ export const AddFieldsFormPartial = ({
                   className="bg-background text-muted-foreground mb-12 justify-between font-normal"
                 >
                   {selectedSigner?.email && (
-                    <span className="flex-1 truncate text-left">
-                      {selectedSigner?.name} ({selectedSigner?.email})
-                    </span>
+                    <div className="flex items-center">
+                      <span className="mr-2 flex-1 truncate text-left">
+                        {selectedSigner?.name} ({selectedSigner?.email})
+                      </span>
+                      {selectedSigner?.role === RecipientRole.SIGNER && <PenIcon className="w-4" />}
+                      {selectedSigner?.role === RecipientRole.CC && <CopyIcon className="w-4" />}
+                      {selectedSigner?.role === RecipientRole.APPROVER && (
+                        <CheckCircle className="w-4" />
+                      )}
+                      {selectedSigner?.role === RecipientRole.VIEWER && <EyeIcon className="w-4" />}
+                    </div>
                   )}
 
                   {!selectedSigner?.email && (
@@ -390,12 +400,21 @@ export const AddFieldsFormPartial = ({
                         )}
 
                         {recipient.name && (
-                          <span
-                            className="truncate"
-                            title={`${recipient.name} (${recipient.email})`}
-                          >
-                            {recipient.name} ({recipient.email})
-                          </span>
+                          <div className="flex items-center">
+                            <span
+                              className="mr-2 truncate"
+                              title={`${recipient.name} (${recipient.email})`}
+                            >
+                              {recipient.name} ({recipient.email})
+                            </span>
+                            {recipient?.role === RecipientRole.SIGNER && (
+                              <PenIcon className="w-4" />
+                            )}
+                            {recipient?.role === RecipientRole.CC && <CopyIcon className="w-4" />}
+                            {recipient?.role === RecipientRole.APPROVER && (
+                              <CheckCircle className="w-4" />
+                            )}
+                          </div>
                         )}
 
                         {!recipient.name && (
