@@ -15,8 +15,7 @@ export const deleteDocument = async ({ id, userId, status }: DeleteDocumentOptio
   if (status === DocumentStatus.DRAFT) {
     return await prisma.document.delete({ where: { id, userId, status: DocumentStatus.DRAFT } });
   }
-  const documentId = id;
-  await sendDeletedEmail({ documentId, userId });
+  await sendDeletedEmail({ documentId: id, userId });
   return await prisma.document.update({
     where: {
       id,
