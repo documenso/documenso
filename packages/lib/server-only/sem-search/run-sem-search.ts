@@ -2,16 +2,18 @@ import { ErrorCode } from '@documenso/lib/next-auth/error-codes';
 import { prisma } from '@documenso/prisma';
 import { User } from '@documenso/prisma/client';
 
-import { triggerEmbedJob } from './document-processor';
+import { generateEmbedding } from './document-processor';
 
-export const runSemSearch = async (user: User, user_query) => {
+export const runSemSearch = async (user: User, query: string) => {
   if (user.identityProvider !== 'DOCUMENSO') {
     throw new Error(ErrorCode.INCORRECT_IDENTITY_PROVIDER);
   }
+  console.log('I AM HERE NOW');
+  console.log('THIS THE QUERY');
+  console.log(query);
 
-  if (user.semSearchEnabled) {
-    throw new Error(ErrorCode.SEM_SEARCH_ALREADY_ENABLED);
-  }
+  // Embed query
+  const queryEmbedding = await generateEmbedding(query);
 
   const userDocs = await prisma.user.findUnique({
     where: {
@@ -23,9 +25,15 @@ export const runSemSearch = async (user: User, user_query) => {
   });
 
   if (userDocs && userDocs.Document) {
-    for (const doc of userDocs.Document) {
-      // Process each document
-    }
+    const formattedQueryVector = queryEmbedding.join(',');
+    let limit = 6;
+
+    // Execute a raw SQL query to perform the similarity search
+    const result = await prisma.$queryRaw`SELECT "documentId"
+                                          FROM "Embedding"
+                                          INNER JOIN "Document" ON "Document".id = "Embedding"."documentId"
+                                          ORDER BY embedding <-> array[${formattedQueryVector}]::float8[]
+                                          LIMIT ${limit};`;
+    return result;
   }
-  console.log('User updated');
 };
