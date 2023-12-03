@@ -16,7 +16,7 @@ import { TRPCClientError } from '@documenso/trpc/client';
 import { trpc } from '@documenso/trpc/react';
 import { cn } from '@documenso/ui/lib/utils';
 import { DocumentDropzone } from '@documenso/ui/primitives/document-dropzone';
-import { LazyPDFViewer } from '@documenso/ui/primitives/lazy-pdf-viewer';
+import { LazyPDFViewerNoLoader } from '@documenso/ui/primitives/lazy-pdf-viewer';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
 export type UploadDocumentProps = {
@@ -24,7 +24,7 @@ export type UploadDocumentProps = {
 };
 
 const THUMBNAIL_MAX_DIMENSION = 260;
-const THUMBNAIL_TIMEOUT = 500;
+const THUMBNAIL_TIMEOUT = 1000;
 
 export const UploadDocument = ({ className }: UploadDocumentProps) => {
   const router = useRouter();
@@ -101,8 +101,7 @@ export const UploadDocument = ({ className }: UploadDocumentProps) => {
   };
 
   const generateThumbnail = (page: number, canvas: HTMLCanvasElement | null) => {
-    if (page !== 1) return;
-    if (!canvas) return;
+    if (page !== 1 || !canvas) return;
 
     try {
       // Determine whether the width or height is the larger side
@@ -179,7 +178,7 @@ export const UploadDocument = ({ className }: UploadDocumentProps) => {
       )}
 
       {Boolean(docData) && (
-        <LazyPDFViewer
+        <LazyPDFViewerNoLoader
           className="hidden"
           documentData={{
             id: '',
@@ -187,6 +186,7 @@ export const UploadDocument = ({ className }: UploadDocumentProps) => {
             initialData: docData,
             type: DocumentDataType.BYTES_64,
           }}
+          maxPages={1}
           onPageRender={generateThumbnail}
         />
       )}

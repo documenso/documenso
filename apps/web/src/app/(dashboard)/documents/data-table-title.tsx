@@ -37,7 +37,7 @@ export const DataTableTitle = ({ row }: DataTableTitleProps) => {
         className="block max-w-[10rem] truncate font-medium hover:underline md:max-w-[20rem]"
       >
         <img
-          className="mr-2 inline-block h-10"
+          className="mr-2 inline-block h-10 w-7 object-cover"
           src={row.documentThumbnail ?? '/static/document.png'}
           alt="document-preview"
         />
@@ -51,7 +51,7 @@ export const DataTableTitle = ({ row }: DataTableTitleProps) => {
         className="block max-w-[10rem] truncate font-medium hover:underline md:max-w-[20rem]"
       >
         <img
-          className="mr-2 inline-block h-10"
+          className="mr-2 inline-block h-10 w-7 object-cover"
           src={row.documentThumbnail ?? '/static/document.png'}
           alt="document-preview"
         />
@@ -61,7 +61,7 @@ export const DataTableTitle = ({ row }: DataTableTitleProps) => {
     .otherwise(() => (
       <span className="block max-w-[10rem] truncate font-medium hover:underline md:max-w-[20rem]">
         <img
-          className="mr-2 inline-block h-10"
+          className="mr-2 inline-block h-10 w-7 object-cover"
           src={row.documentThumbnail ?? '/static/document.png'}
           alt="document-preview"
         />

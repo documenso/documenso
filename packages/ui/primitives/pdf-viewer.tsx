@@ -44,6 +44,7 @@ export type PDFViewerProps = {
   className?: string;
   documentData: DocumentData;
   onDocumentLoad?: (_doc: LoadedPDFDocument) => void;
+  maxPages?: number;
   onPageRender?: (page: number, el: HTMLCanvasElement | null) => void;
   onPageClick?: OnPDFViewerPageClick;
   [key: string]: unknown;
@@ -52,6 +53,7 @@ export type PDFViewerProps = {
 export const PDFViewer = ({
   className,
   documentData,
+  maxPages,
   onDocumentLoad,
   onPageRender,
   onPageClick,
@@ -77,7 +79,7 @@ export const PDFViewer = ({
   const isLoading = isDocumentBytesLoading || !documentBytes;
 
   const onDocumentLoaded = (doc: LoadedPDFDocument) => {
-    setNumPages(doc.numPages);
+    setNumPages(maxPages ? Math.min(maxPages, doc.numPages) : doc.numPages);
     onDocumentLoad?.(doc);
   };
 
