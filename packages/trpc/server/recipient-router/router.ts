@@ -20,6 +20,7 @@ export const recipientRouter = router({
             id: signer.nativeId,
             email: signer.email,
             name: signer.name,
+            role: signer.role,
           })),
         });
       } catch (err) {

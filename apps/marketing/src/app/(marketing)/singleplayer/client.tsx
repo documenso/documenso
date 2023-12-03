@@ -154,6 +154,7 @@ export const SinglePlayerClient = () => {
     token: '',
     expired: null,
     signedAt: null,
+    role: 'SIGNER',
     readStatus: 'OPENED',
     signingStatus: 'NOT_SIGNED',
     sendStatus: 'NOT_SENT',

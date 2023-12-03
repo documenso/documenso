@@ -163,6 +163,14 @@ model DocumentMeta {
   document   Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
 }
 
+enum RecipientRole {
+  SIGNER
+  APPROVER
+  COPY
+  VIEWER
+}
+
+
 enum ReadStatus {
   NOT_OPENED
   OPENED
@@ -186,6 +194,7 @@ model Recipient {
   token         String
   expired       DateTime?
   signedAt      DateTime?
+  role          RecipientRole @default(SIGNER)
   readStatus    ReadStatus    @default(NOT_OPENED)
   signingStatus SigningStatus @default(NOT_SIGNED)
   sendStatus    SendStatus    @default(NOT_SENT)

@@ -11,7 +11,8 @@ import { getBoundingClientRect } from '@documenso/lib/client-only/get-bounding-c
 import { useDocumentElement } from '@documenso/lib/client-only/hooks/use-document-element';
 import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
 import { nanoid } from '@documenso/lib/universal/id';
-import { Field, FieldType, Recipient, SendStatus } from '@documenso/prisma/client';
+import type { Field, Recipient, RecipientRole } from '@documenso/prisma/client';
+import { FieldType, SendStatus } from '@documenso/prisma/client';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
 import { Card, CardContent } from '@documenso/ui/primitives/card';
@@ -25,7 +26,7 @@ import {
 import { Popover, PopoverContent, PopoverTrigger } from '@documenso/ui/primitives/popover';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@documenso/ui/primitives/tooltip';
 
-import { TAddFieldsFormSchema } from './add-fields.types';
+import type { TAddFieldsFormSchema } from './add-fields.types';
 import {
   DocumentFlowFormContainerActions,
   DocumentFlowFormContainerContent,
@@ -33,7 +34,8 @@ import {
   DocumentFlowFormContainerStep,
 } from './document-flow-root';
 import { FieldItem } from './field-item';
-import { DocumentFlowStep, FRIENDLY_FIELD_TYPE } from './types';
+import type { DocumentFlowStep } from './types';
+import { FRIENDLY_FIELD_TYPE } from './types';
 
 const fontCaveat = Caveat({
   weight: ['500'],
@@ -47,6 +49,15 @@ const DEFAULT_WIDTH_PERCENT = 15;
 
 const MIN_HEIGHT_PX = 60;
 const MIN_WIDTH_PX = 200;
+
+function createEmptyRecipientsByRole(): Record<RecipientRole, Recipient[]> {
+  return {
+    SIGNER: [],
+    APPROVER: [],
+    COPY: [],
+    VIEWER: [],
+  };
+}
 
 export type AddFieldsFormProps = {
   documentFlow: DocumentFlowStep;
@@ -285,6 +296,15 @@ export const AddFieldsFormPartial = ({
     setSelectedSigner(recipients.find((r) => r.sendStatus !== SendStatus.SENT) ?? recipients[0]);
   }, [recipients]);
 
+  const recipientsByRole = recipients.reduce((acc, recipient) => {
+    const role = recipient.role;
+    if (!acc[role]) {
+      acc[role] = [];
+    }
+    acc[role].push(recipient);
+    return acc;
+  }, createEmptyRecipientsByRole());
+
   return (
     <>
       <DocumentFlowFormContainerContent>
@@ -357,55 +377,60 @@ export const AddFieldsFormPartial = ({
                     </span>
                   </CommandEmpty>
 
-                  <CommandGroup>
-                    {recipients.map((recipient, index) => (
-                      <CommandItem
-                        key={index}
-                        className={cn({
-                          'text-muted-foreground': recipient.sendStatus === SendStatus.SENT,
-                        })}
-                        onSelect={() => {
-                          setSelectedSigner(recipient);
-                          setShowRecipientsSelector(false);
-                        }}
-                      >
-                        {recipient.sendStatus !== SendStatus.SENT ? (
-                          <Check
-                            aria-hidden={recipient !== selectedSigner}
-                            className={cn('mr-2 h-4 w-4 flex-shrink-0', {
-                              'opacity-0': recipient !== selectedSigner,
-                              'opacity-100': recipient === selectedSigner,
-                            })}
-                          />
-                        ) : (
-                          <Tooltip>
-                            <TooltipTrigger>
-                              <Info className="mr-2 h-4 w-4" />
-                            </TooltipTrigger>
-                            <TooltipContent className="max-w-xs">
-                              This document has already been sent to this recipient. You can no
-                              longer edit this recipient.
-                            </TooltipContent>
-                          </Tooltip>
-                        )}
+                  {Object.entries(recipientsByRole).map(([role, recipientsForRole], roleIndex) => (
+                    <CommandGroup key={roleIndex}>
+                      <div className="text-muted-foreground px-4 py-2 text-xs uppercase">
+                        {role}
+                      </div>
+                      {recipientsForRole.map((recipient) => (
+                        <CommandItem
+                          key={recipient.id}
+                          className={cn({
+                            'text-muted-foreground': recipient.sendStatus === SendStatus.SENT,
+                          })}
+                          onSelect={() => {
+                            setSelectedSigner(recipient);
+                            setShowRecipientsSelector(false);
+                          }}
+                        >
+                          {recipient.sendStatus !== SendStatus.SENT ? (
+                            <Check
+                              aria-hidden={recipient !== selectedSigner}
+                              className={cn('mr-2 h-4 w-4 flex-shrink-0', {
+                                'opacity-0': recipient !== selectedSigner,
+                                'opacity-100': recipient === selectedSigner,
+                              })}
+                            />
+                          ) : (
+                            <Tooltip>
+                              <TooltipTrigger>
+                                <Info className="mr-2 h-4 w-4" />
+                              </TooltipTrigger>
+                              <TooltipContent className="max-w-xs">
+                                This document has already been sent to this recipient. You can no
+                                longer edit this recipient.
+                              </TooltipContent>
+                            </Tooltip>
+                          )}
 
-                        {recipient.name && (
-                          <span
-                            className="truncate"
-                            title={`${recipient.name} (${recipient.email})`}
-                          >
-                            {recipient.name} ({recipient.email})
-                          </span>
-                        )}
+                          {recipient.name && (
+                            <span
+                              className="truncate"
+                              title={`${recipient.name} (${recipient.email})`}
+                            >
+                              {recipient.name} ({recipient.email})
+                            </span>
+                          )}
 
-                        {!recipient.name && (
-                          <span className="truncate" title={recipient.email}>
-                            {recipient.email}
-                          </span>
-                        )}
-                      </CommandItem>
-                    ))}
-                  </CommandGroup>
+                          {!recipient.name && (
+                            <span className="truncate" title={recipient.email}>
+                              {recipient.email}
+                            </span>
+                          )}
+                        </CommandItem>
+                      ))}
+                    </CommandGroup>
+                  ))}
                 </Command>
               </PopoverContent>
             </Popover>

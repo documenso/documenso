@@ -35,6 +35,7 @@ export const ZSetRecipientsForDocumentMutationSchema = z.object({
       id: z.number().nullish(),
       email: z.string().min(1).email(),
       name: z.string(),
+      role: z.enum(['SIGNER', 'APPROVER', 'COPY', 'VIEWER']),
     }),
   ),
 });

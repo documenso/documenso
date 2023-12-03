@@ -1,4 +1,5 @@
 import { prisma } from '@documenso/prisma';
+import type { RecipientRole } from '@documenso/prisma/client';
 import { SendStatus, SigningStatus } from '@documenso/prisma/client';
 
 import { nanoid } from '../../universal/id';
@@ -10,6 +11,7 @@ export interface SetRecipientsForDocumentOptions {
     id?: number | null;
     email: string;
     name: string;
+    role: RecipientRole;
   }[];
 }
 
@@ -79,6 +81,7 @@ export const setRecipientsForDocument = async ({
         update: {
           name: recipient.name,
           email: recipient.email,
+          role: recipient.role,
           documentId,
         },
         create: {

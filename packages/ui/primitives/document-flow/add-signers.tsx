@@ -4,27 +4,43 @@ import React, { useId } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { AnimatePresence, motion } from 'framer-motion';
-import { Plus, Trash } from 'lucide-react';
+import { BadgeCheck, ChevronsUpDown, Copy, Eye, Plus, Trash } from 'lucide-react';
+import { PencilLine } from 'lucide-react';
 import { Controller, useFieldArray, useForm } from 'react-hook-form';
 
 import { useLimits } from '@documenso/ee/server-only/limits/provider/client';
 import { nanoid } from '@documenso/lib/universal/id';
-import { DocumentStatus, Field, Recipient, SendStatus } from '@documenso/prisma/client';
-import { DocumentWithData } from '@documenso/prisma/types/document-with-data';
+import type { Field, Recipient } from '@documenso/prisma/client';
+import { DocumentStatus, SendStatus } from '@documenso/prisma/client';
+import type { DocumentWithData } from '@documenso/prisma/types/document-with-data';
 import { Button } from '@documenso/ui/primitives/button';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@documenso/ui/primitives/dropdown-menu';
 import { FormErrorMessage } from '@documenso/ui/primitives/form/form-error-message';
 import { Input } from '@documenso/ui/primitives/input';
 import { Label } from '@documenso/ui/primitives/label';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
-import { TAddSignersFormSchema, ZAddSignersFormSchema } from './add-signers.types';
+import type { TAddSignersFormSchema } from './add-signers.types';
+import { ZAddSignersFormSchema } from './add-signers.types';
 import {
   DocumentFlowFormContainerActions,
   DocumentFlowFormContainerContent,
   DocumentFlowFormContainerFooter,
   DocumentFlowFormContainerStep,
 } from './document-flow-root';
-import { DocumentFlowStep } from './types';
+import type { DocumentFlowStep } from './types';
+
+const roleIcons: Record<string, JSX.Element> = {
+  SIGNER: <PencilLine className="h-4 w-4" />,
+  APPROVER: <BadgeCheck className="h-4 w-4" />,
+  COPY: <Copy className="h-4 w-4" />,
+  VIEWER: <Eye className="h-4 w-4" />,
+};
 
 export type AddSignersFormProps = {
   documentFlow: DocumentFlowStep;
@@ -62,12 +78,14 @@ export const AddSignersFormPartial = ({
               formId: String(recipient.id),
               name: recipient.name,
               email: recipient.email,
+              role: recipient.role,
             }))
           : [
               {
                 formId: initialId,
                 name: '',
                 email: '',
+                role: 'SIGNER',
               },
             ],
     },
@@ -99,6 +117,7 @@ export const AddSignersFormPartial = ({
       formId: nanoid(12),
       name: '',
       email: '',
+      role: 'SIGNER',
     });
   };
 
@@ -122,6 +141,10 @@ export const AddSignersFormPartial = ({
     if (event.key === 'Enter' && event.target instanceof HTMLInputElement) {
       onAddSigner();
     }
+  };
+
+  const getRoleIcon = (role: string): JSX.Element => {
+    return roleIcons[role] || <Plus className="h-4 w-4" />; // Fallback to a default icon if none matches
   };
 
   return (
@@ -172,6 +195,43 @@ export const AddSignersFormPartial = ({
                         onKeyDown={onKeyDown}
                         {...field}
                       />
+                    )}
+                  />
+                </div>
+                <div className="">
+                  <Label htmlFor={`signer-${signer.id}-role`}>
+                    Role
+                    <span className="text-destructive ml-1 inline-block font-medium">*</span>
+                  </Label>
+
+                  <Controller
+                    control={control}
+                    name={`signers.${index}.role`}
+                    render={({ field }) => (
+                      <DropdownMenu>
+                        <DropdownMenuTrigger className="border-input ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring mt-2 flex flex h-10 w-full rounded-md border bg-transparent px-3 py-2 text-sm file:border-0 file:bg-transparent file:text-sm file:font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50">
+                          {getRoleIcon(field.value)} <ChevronsUpDown className="ml-2 h-4 w-4" />
+                        </DropdownMenuTrigger>
+
+                        <DropdownMenuContent className="w-52" align="start" forceMount>
+                          <DropdownMenuItem onClick={() => field.onChange(`SIGNER`)}>
+                            <PencilLine className="mr-2 h-4 w-4" />
+                            Signer
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => field.onChange(`APPROVER`)}>
+                            <BadgeCheck className="mr-2 h-4 w-4" />
+                            Approver
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => field.onChange(`COPY`)}>
+                            <Copy className="mr-2 h-4 w-4" />
+                            Receives copy
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => field.onChange(`VIEWER`)}>
+                            <Eye className="mr-2 h-4 w-4" />
+                            Viewer
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
                     )}
                   />
                 </div>
