@@ -4,7 +4,7 @@ import path from 'node:path';
 import { PDFDocument } from 'pdf-lib';
 
 import { prisma } from '@documenso/prisma';
-import { DocumentStatus, SigningStatus } from '@documenso/prisma/client';
+import { DocumentStatus, RecipientRole, SigningStatus } from '@documenso/prisma/client';
 import { signPdf } from '@documenso/signing';
 
 import { getFile } from '../../universal/upload/get-file';
@@ -45,7 +45,13 @@ export const sealDocument = async ({ documentId, sendEmail = true }: SealDocumen
     },
   });
 
-  if (recipients.some((recipient) => recipient.signingStatus !== SigningStatus.SIGNED)) {
+  if (
+    recipients.some(
+      (recipient) =>
+        recipient.signingStatus !== SigningStatus.SIGNED &&
+        (recipient.role === RecipientRole.SIGNER || recipient.role === RecipientRole.APPROVER),
+    )
+  ) {
     throw new Error(`Document ${document.id} has unsigned recipients`);
   }
 

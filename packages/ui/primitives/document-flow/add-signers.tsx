@@ -4,27 +4,30 @@ import React, { useId } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { AnimatePresence, motion } from 'framer-motion';
-import { Plus, Trash } from 'lucide-react';
+import { CheckCircle, CopyIcon, EyeIcon, PenIcon, Plus, Trash } from 'lucide-react';
 import { Controller, useFieldArray, useForm } from 'react-hook-form';
 
 import { useLimits } from '@documenso/ee/server-only/limits/provider/client';
 import { nanoid } from '@documenso/lib/universal/id';
-import { DocumentStatus, Field, Recipient, SendStatus } from '@documenso/prisma/client';
-import { DocumentWithData } from '@documenso/prisma/types/document-with-data';
+import type { Field, Recipient } from '@documenso/prisma/client';
+import { DocumentStatus, RecipientRole, SendStatus } from '@documenso/prisma/client';
+import type { DocumentWithData } from '@documenso/prisma/types/document-with-data';
 import { Button } from '@documenso/ui/primitives/button';
 import { FormErrorMessage } from '@documenso/ui/primitives/form/form-error-message';
 import { Input } from '@documenso/ui/primitives/input';
 import { Label } from '@documenso/ui/primitives/label';
+import { Select, SelectContent, SelectItem, SelectTrigger } from '@documenso/ui/primitives/select';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
-import { TAddSignersFormSchema, ZAddSignersFormSchema } from './add-signers.types';
+import type { TAddSignersFormSchema } from './add-signers.types';
+import { ZAddSignersFormSchema } from './add-signers.types';
 import {
   DocumentFlowFormContainerActions,
   DocumentFlowFormContainerContent,
   DocumentFlowFormContainerFooter,
   DocumentFlowFormContainerStep,
 } from './document-flow-root';
-import { DocumentFlowStep } from './types';
+import type { DocumentFlowStep } from './types';
 
 export type AddSignersFormProps = {
   documentFlow: DocumentFlowStep;
@@ -62,12 +65,14 @@ export const AddSignersFormPartial = ({
               formId: String(recipient.id),
               name: recipient.name,
               email: recipient.email,
+              role: recipient.role,
             }))
           : [
               {
                 formId: initialId,
                 name: '',
                 email: '',
+                role: RecipientRole.SIGNER,
               },
             ],
     },
@@ -99,6 +104,7 @@ export const AddSignersFormPartial = ({
       formId: nanoid(12),
       name: '',
       email: '',
+      role: RecipientRole.SIGNER,
     });
   };
 
@@ -172,6 +178,58 @@ export const AddSignersFormPartial = ({
                         onKeyDown={onKeyDown}
                         {...field}
                       />
+                    )}
+                  />
+                </div>
+                <div className="w-[60px]">
+                  <Controller
+                    control={control}
+                    name={`signers.${index}.role`}
+                    render={({ field }) => (
+                      <div className="w-[60px]">
+                        <Input
+                          id={`signer-${signer.id}-role`}
+                          type="text"
+                          className="bg-background mt-2 hidden"
+                          value={field.value}
+                        />
+                        <Select onValueChange={(x) => field.onChange(x)}>
+                          <SelectTrigger className="w-[60px]">
+                            {field.value === RecipientRole.SIGNER && <PenIcon className="w-4" />}
+                            {field.value === RecipientRole.CC && <CopyIcon className="w-4" />}
+                            {field.value === RecipientRole.APPROVER && (
+                              <CheckCircle className="w-4" />
+                            )}
+                            {field.value === RecipientRole.VIEWER && <EyeIcon className="w-4" />}
+                          </SelectTrigger>
+                          <SelectContent className="" align="end">
+                            <SelectItem value={RecipientRole.SIGNER}>
+                              <div className="flex items-center">
+                                <PenIcon className="mr-2 w-4" />
+                                Signer
+                              </div>
+                            </SelectItem>
+                            <SelectItem value={RecipientRole.CC}>
+                              <div className="flex items-center">
+                                <CopyIcon className="mr-2 w-4" />
+                                Receives copy
+                              </div>
+                            </SelectItem>
+                            <SelectItem value={RecipientRole.APPROVER}>
+                              <div className="flex items-center">
+                                <CheckCircle className="mr-2 w-4" />
+                                Approver
+                              </div>
+                            </SelectItem>
+                            <SelectItem value={RecipientRole.VIEWER}>
+                              <div className="flex items-center">
+                                <EyeIcon className="mr-2 w-4" />
+                                Viewer
+                              </div>
+                            </SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
                     )}
                   />
                 </div>

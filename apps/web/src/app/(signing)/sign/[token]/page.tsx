@@ -8,7 +8,7 @@ import { getDocumentAndSenderByToken } from '@documenso/lib/server-only/document
 import { viewedDocument } from '@documenso/lib/server-only/document/viewed-document';
 import { getFieldsForToken } from '@documenso/lib/server-only/field/get-fields-for-token';
 import { getRecipientByToken } from '@documenso/lib/server-only/recipient/get-recipient-by-token';
-import { DocumentStatus, FieldType, SigningStatus } from '@documenso/prisma/client';
+import { DocumentStatus, FieldType, RecipientRole, SigningStatus } from '@documenso/prisma/client';
 import { Card, CardContent } from '@documenso/ui/primitives/card';
 import { ElementVisible } from '@documenso/ui/primitives/element-visible';
 import { LazyPDFViewer } from '@documenso/ui/primitives/lazy-pdf-viewer';
@@ -68,7 +68,10 @@ export default async function SigningPage({ params: { token } }: SigningPageProp
 
         <div className="mt-2.5 flex items-center gap-x-6">
           <p className="text-muted-foreground">
-            {document.User.name} ({document.User.email}) has invited you to sign this document.
+            {document.User.name} ({document.User.email}) has invited you to{' '}
+            {recipient.role === RecipientRole.VIEWER && 'view'}
+            {recipient.role === RecipientRole.SIGNER && 'sign'}
+            {recipient.role === RecipientRole.APPROVER && 'approve'} this document.
           </p>
         </div>
 

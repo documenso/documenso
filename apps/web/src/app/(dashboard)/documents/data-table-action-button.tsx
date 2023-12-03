@@ -2,13 +2,13 @@
 
 import Link from 'next/link';
 
-import { Download, Edit, Pencil } from 'lucide-react';
+import { CheckCircle, Download, Edit, EyeIcon, Pencil } from 'lucide-react';
 import { useSession } from 'next-auth/react';
 import { match } from 'ts-pattern';
 
 import { getFile } from '@documenso/lib/universal/upload/get-file';
 import type { Document, Recipient, User } from '@documenso/prisma/client';
-import { DocumentStatus, SigningStatus } from '@documenso/prisma/client';
+import { DocumentStatus, RecipientRole, SigningStatus } from '@documenso/prisma/client';
 import type { DocumentWithData } from '@documenso/prisma/types/document-with-data';
 import { trpc as trpcClient } from '@documenso/trpc/client';
 import { Button } from '@documenso/ui/primitives/button';
@@ -35,6 +35,7 @@ export const DataTableActionButton = ({ row }: DataTableActionButtonProps) => {
   const isPending = row.status === DocumentStatus.PENDING;
   const isComplete = row.status === DocumentStatus.COMPLETED;
   const isSigned = recipient?.signingStatus === SigningStatus.SIGNED;
+  const role = recipient?.role;
 
   const onDownloadClick = async () => {
     let document: DocumentWithData | null = null;
@@ -72,6 +73,8 @@ export const DataTableActionButton = ({ row }: DataTableActionButtonProps) => {
     window.URL.revokeObjectURL(link.href);
   };
 
+  if (recipient?.role === RecipientRole.CC && isComplete === false) return <div></div>;
+
   return match({
     isOwner,
     isRecipient,
@@ -91,15 +94,41 @@ export const DataTableActionButton = ({ row }: DataTableActionButtonProps) => {
     .with({ isRecipient: true, isPending: true, isSigned: false }, () => (
       <Button className="w-32" asChild>
         <Link href={`/sign/${recipient?.token}`}>
-          <Pencil className="-ml-1 mr-2 h-4 w-4" />
-          Sign
+          {role === RecipientRole.VIEWER && (
+            <>
+              <EyeIcon className="-ml-1 mr-2 h-4 w-4" />
+              View
+            </>
+          )}
+          {role === RecipientRole.SIGNER && (
+            <>
+              <Pencil className="-ml-1 mr-2 h-4 w-4" />
+              Sign
+            </>
+          )}
+          {role === RecipientRole.APPROVER && (
+            <>
+              <CheckCircle className="-ml-1 mr-2 h-4 w-4" />
+              Approve
+            </>
+          )}
         </Link>
       </Button>
     ))
     .with({ isPending: true, isSigned: true }, () => (
       <Button className="w-32" disabled={true}>
-        <Pencil className="-ml-1 mr-2 inline h-4 w-4" />
-        Sign
+        {role === RecipientRole.SIGNER && (
+          <>
+            <Pencil className="-ml-1 mr-2 inline h-4 w-4" />
+            Sign
+          </>
+        )}
+        {role === RecipientRole.APPROVER && (
+          <>
+            <CheckCircle className="-ml-1 mr-2 h-4 w-4" />
+            Approve
+          </>
+        )}
       </Button>
     ))
     .with({ isComplete: true }, () => (

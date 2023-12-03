@@ -1,7 +1,7 @@
 'use server';
 
 import { prisma } from '@documenso/prisma';
-import { DocumentStatus, SigningStatus } from '@documenso/prisma/client';
+import { DocumentStatus, RecipientRole, SigningStatus } from '@documenso/prisma/client';
 
 import { sealDocument } from './seal-document';
 import { sendPendingEmail } from './send-pending-email';
@@ -88,7 +88,20 @@ export const completeDocumentWithToken = async ({
       id: document.id,
       Recipient: {
         every: {
-          signingStatus: SigningStatus.SIGNED,
+          OR: [
+            {
+              AND: [
+                { signingStatus: SigningStatus.SIGNED },
+                { OR: [{ role: RecipientRole.SIGNER }, { role: RecipientRole.APPROVER }] },
+              ],
+            },
+            {
+              AND: [
+                { signingStatus: SigningStatus.NOT_SIGNED },
+                { OR: [{ role: RecipientRole.CC }, { role: RecipientRole.VIEWER }] },
+              ],
+            },
+          ],
         },
       },
     },

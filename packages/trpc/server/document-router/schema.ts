@@ -1,5 +1,6 @@
 import { z } from 'zod';
 
+import type { RecipientRole } from '@documenso/prisma/client';
 import { FieldType } from '@documenso/prisma/client';
 
 export const ZGetDocumentByIdQuerySchema = z.object({
@@ -35,13 +36,14 @@ export const ZSetRecipientsForDocumentMutationSchema = z.object({
       id: z.number().nullish(),
       email: z.string().min(1).email(),
       name: z.string(),
+      role: z.string(),
     }),
   ),
 });
 
 export type TSetRecipientsForDocumentMutationSchema = z.infer<
   typeof ZSetRecipientsForDocumentMutationSchema
->;
+> & { role: RecipientRole };
 
 export const ZSetFieldsForDocumentMutationSchema = z.object({
   documentId: z.number(),

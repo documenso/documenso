@@ -1,5 +1,7 @@
 import { z } from 'zod';
 
+import type { RecipientRole } from '@documenso/prisma/client';
+
 export const ZAddSignersMutationSchema = z
   .object({
     documentId: z.number(),
@@ -8,6 +10,7 @@ export const ZAddSignersMutationSchema = z
         nativeId: z.number().optional(),
         email: z.string().email().min(1),
         name: z.string(),
+        role: z.string(),
       }),
     ),
   })
@@ -21,7 +24,9 @@ export const ZAddSignersMutationSchema = z
     { message: 'Signers must have unique emails', path: ['signers__root'] },
   );
 
-export type TAddSignersMutationSchema = z.infer<typeof ZAddSignersMutationSchema>;
+export type TAddSignersMutationSchema = z.infer<typeof ZAddSignersMutationSchema> & {
+  role: RecipientRole;
+};
 
 export const ZCompleteDocumentWithTokenMutationSchema = z.object({
   token: z.string(),
