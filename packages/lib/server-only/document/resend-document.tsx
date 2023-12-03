@@ -81,6 +81,7 @@ export const resendDocument = async ({ documentId, userId, recipients }: ResendD
         assetBaseUrl,
         signDocumentLink,
         customBody: renderCustomEmailTemplate(customEmail?.message || '', customEmailTemplate),
+        role: recipient.role,
       });
 
       await mailer.sendMail({

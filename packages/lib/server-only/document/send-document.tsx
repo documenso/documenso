@@ -69,6 +69,7 @@ export const sendDocument = async ({ documentId, userId }: SendDocumentOptions) 
         assetBaseUrl,
         signDocumentLink,
         customBody: renderCustomEmailTemplate(customEmail?.message || '', customEmailTemplate),
+        role: recipient.role,
       });
 
       await mailer.sendMail({

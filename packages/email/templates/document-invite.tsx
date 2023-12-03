@@ -1,3 +1,4 @@
+import { RecipientRole } from '@documenso/prisma/client';
 import config from '@documenso/tailwind-config';
 
 import {
@@ -19,6 +20,7 @@ import { TemplateFooter } from '../template-components/template-footer';
 
 export type DocumentInviteEmailTemplateProps = Partial<TemplateDocumentInviteProps> & {
   customBody?: string;
+  role: RecipientRole;
 };
 
 export const DocumentInviteEmailTemplate = ({
@@ -28,8 +30,17 @@ export const DocumentInviteEmailTemplate = ({
   signDocumentLink = 'https://documenso.com',
   assetBaseUrl = 'http://localhost:3002',
   customBody,
+  role,
 }: DocumentInviteEmailTemplateProps) => {
-  const previewText = `${inviterName} has invited you to sign ${documentName}`;
+  let action;
+  if (role === RecipientRole.SIGNER) {
+    action = 'sign';
+  } else if (role === RecipientRole.VIEWER) {
+    action = 'view';
+  } else if (role === RecipientRole.APPROVER) {
+    action = 'approve';
+  }
+  const previewText = `${inviterName} has invited you to ${action} ${documentName}`;
 
   const getAssetUrl = (path: string) => {
     return new URL(path, assetBaseUrl).toString();
@@ -81,7 +92,7 @@ export const DocumentInviteEmailTemplate = ({
                   {customBody ? (
                     <pre className="font-sans text-base text-slate-400">{customBody}</pre>
                   ) : (
-                    `${inviterName} has invited you to sign the document "${documentName}".`
+                    `${inviterName} has invited you to ${action} the document "${documentName}".`
                   )}
                 </Text>
               </Section>
