@@ -1,41 +1,30 @@
-import jsPDF from 'jspdf';
-import mammoth from 'mammoth';
-
-interface ConversionResult {
-  value: string;
-}
-
-async function convertDocxToHtml(docxBuffer: ArrayBuffer): Promise<string> {
-  const { value }: ConversionResult = await mammoth.extractRawText({ arrayBuffer: docxBuffer });
-  return value;
-}
-
-async function createPDFFromHtml(htmlContent: string): Promise<Blob> {
-  return new Promise((resolve) => {
-    const pdf = new jsPDF();
-
-    // Use jsPDF's html method to add HTML content to the PDF
-    void pdf.html(htmlContent, {
-      callback: (pdf) => {
-        // Output the PDF as a blob
-        const pdfBlob = pdf.output('blob');
-        resolve(pdfBlob);
-      },
-    });
-  });
-}
+import ConvertApi from 'convertapi-js';
 
 async function convertDocumentToPDF(file: File): Promise<File> {
   try {
     if (file.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
       const arrayBuffer = await file.arrayBuffer();
-      const htmlContent = await convertDocxToHtml(arrayBuffer);
+      const buffer = Buffer.from(arrayBuffer);
 
-      // Use createPDFFromHtml to convert the HTML content to a PDF Blob
-      const pdfBlob = await createPDFFromHtml(htmlContent);
+      // Configure ConvertAPI with your secret
+      const convertApi = ConvertApi.auth('YOUR CONVERT API KEY');
 
-      // Create and return a File object from the Blob
-      const pdfFile = new File([pdfBlob], `${file.name.replace(/\.[^/.]+$/, '')}.pdf`, {
+      // Use ConvertAPI to convert the DOCX buffer to a PDF Buffer
+      const params = convertApi.createParams();
+      params.add('File', new File([buffer], file.name));
+      params.add('Converter', 'OpenOffice');
+      const result = await convertApi.convert('doc', 'pdf', params);
+
+      // Get result file URL
+      const url = result.files[0].Url;
+
+      // Use fetch API to download the file
+      const response = await fetch(url);
+      const data = await response.arrayBuffer();
+      const pdfBuffer = new Uint8Array(data);
+
+      // Create and return a File object from the Buffer
+      const pdfFile = new File([pdfBuffer], `${file.name.replace(/\.[^/.]+$/, '')}.pdf`, {
         type: 'application/pdf',
       });
 

@@ -48,8 +48,9 @@
     "packages/*"
   ],
   "dependencies": {
-    "jspdf": "^2.5.1",
-    "mammoth": "^1.6.0"
+    "@types/node": "^20.10.2",
+    "convertapi-js": "~1.1",
+    "officegen": "^0.6.5"
   },
   "overrides": {
     "next-auth": {
