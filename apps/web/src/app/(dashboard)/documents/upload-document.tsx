@@ -5,6 +5,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
+import { convertDocumentToPDF } from 'convertDocumentToPDF';
 import { Loader } from 'lucide-react';
 import { useSession } from 'next-auth/react';
 
@@ -37,7 +38,17 @@ export const UploadDocument = ({ className }: UploadDocumentProps) => {
     try {
       setIsLoading(true);
 
-      const { type, data } = await putFile(file);
+      // Check if the file is a supported document type for conversion
+      const isConvertible = [
+        'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      ].includes(file.type);
+
+      let processedFile = file;
+      if (isConvertible) {
+        processedFile = await convertDocumentToPDF(file);
+      }
+
+      const { type, data } = await putFile(processedFile);
 
       const { id: documentDataId } = await createDocumentData({
         type,

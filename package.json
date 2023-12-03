@@ -47,7 +47,10 @@
     "apps/*",
     "packages/*"
   ],
-  "dependencies": {},
+  "dependencies": {
+    "jspdf": "^2.5.1",
+    "mammoth": "^1.6.0"
+  },
   "overrides": {
     "next-auth": {
       "next": "14.0.3"
