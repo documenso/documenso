@@ -42,7 +42,7 @@ export function AvatarWithRecipient({ recipient }: AvatarWithRecipientProps) {
         >
           {recipient.email}
         </p>
-        <p className="text-muted-foreground text-xs font-bold">{recipient.role}</p>
+        <p className="text-muted-foreground/50 text-xs">{recipient.role}</p>
       </div>
     </div>
   );
