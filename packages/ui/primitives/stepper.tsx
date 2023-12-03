@@ -57,8 +57,8 @@ export const Stepper: FC<StepperProps> = ({
     onStepChanged && onStepChanged(currentStep);
   }, [currentStep, onStepChanged]);
 
-  const useStep = (stepIndex: number) => ({
-    stepIndex,
+  const useStep = () => ({
+    stepIndex: currentStep - 1,
     currentStep,
     totalSteps,
     isFirst: currentStep === 1,
@@ -67,14 +67,13 @@ export const Stepper: FC<StepperProps> = ({
     previousStep,
   });
 
-  const renderStep = (child: React.ReactNode, index: number) => {
-    if (!React.isValidElement<StepProps>(child)) return null;
-    return index + 1 === currentStep
-      ? React.cloneElement(child, {
-          useStep: () => useStep(index),
-        })
-      : null;
-  };
+  // empty stepper
+  if (totalSteps === 0) return null;
 
-  return <>{React.Children.toArray(children).map(renderStep)}</>;
+  const currentChild = React.Children.toArray(children)[currentStep - 1];
+
+  // type validation
+  if (!React.isValidElement<StepProps>(currentChild)) return null;
+
+  return <>{React.cloneElement(currentChild, { useStep })}</>;
 };
