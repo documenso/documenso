@@ -55,6 +55,9 @@ export const findDocuments = async ({
       OR: [
         {
           userId,
+          deletedAt: {
+            equals: null,
+          },
         },
         {
           status: {
@@ -67,11 +70,6 @@ export const findDocuments = async ({
           },
         },
       ],
-      AND: {
-        deletedAt: {
-          equals: null,
-        },
-      },
     }))
     .with(ExtendedDocumentStatus.INBOX, () => ({
       status: {
@@ -93,10 +91,12 @@ export const findDocuments = async ({
         {
           userId,
           status: ExtendedDocumentStatus.PENDING,
+          deletedAt: {
+            equals: null,
+          },
         },
         {
           status: ExtendedDocumentStatus.PENDING,
-
           Recipient: {
             some: {
               email: user.email,
@@ -105,17 +105,15 @@ export const findDocuments = async ({
           },
         },
       ],
-      AND: {
-        deletedAt: {
-          equals: null,
-        },
-      },
     }))
     .with(ExtendedDocumentStatus.COMPLETED, () => ({
       OR: [
         {
           userId,
           status: ExtendedDocumentStatus.COMPLETED,
+          deletedAt: {
+            equals: null,
+          },
         },
         {
           status: ExtendedDocumentStatus.COMPLETED,
@@ -126,11 +124,6 @@ export const findDocuments = async ({
           },
         },
       ],
-      AND: {
-        deletedAt: {
-          equals: null,
-        },
-      },
     }))
     .exhaustive();
 

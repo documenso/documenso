@@ -55,9 +55,6 @@ export const getStats = async ({ user }: GetStatsInput) => {
             signingStatus: SigningStatus.SIGNED,
           },
         },
-        deletedAt: {
-          equals: null,
-        },
       },
     }),
   ]);
