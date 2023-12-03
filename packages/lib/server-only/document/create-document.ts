@@ -6,21 +6,21 @@ export type CreateDocumentOptions = {
   title: string;
   userId: number;
   documentDataId: string;
-  documentThumbnail?: string;
+  documentThumbnailId?: string;
 };
 
 export const createDocument = async ({
   userId,
   title,
   documentDataId,
-  documentThumbnail,
+  documentThumbnailId,
 }: CreateDocumentOptions) => {
   return await prisma.document.create({
     data: {
       title,
       documentDataId,
       userId,
-      documentThumbnail,
+      documentThumbnailId,
     },
   });
 };
