@@ -4,9 +4,6 @@ import { useState } from 'react';
 
 import { useRouter } from 'next/navigation';
 
-import { User } from '@prisma/client';
-import { z } from 'zod';
-
 import { trpc } from '@documenso/trpc/react';
 import { Button } from '@documenso/ui/primitives/button';
 import { useToast } from '@documenso/ui/primitives/use-toast';
@@ -30,8 +27,6 @@ export const SemanticSearchApp = ({ semSearchEnabled }: SemanticSearchProps) => 
       setSemState('enabled');
       try {
         await enableSemSearch();
-
-        //should be using a load state here
 
         toast({
           title: 'Semantic search enabled',
