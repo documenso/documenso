@@ -122,11 +122,11 @@ export const documentRouter = router({
     .input(ZDeleteDocumentMutationSchema)
     .mutation(async ({ input, ctx }) => {
       try {
-        const { id } = input;
+        const { id, status } = input;
 
         const userId = ctx.user.id;
 
-        return await deleteDocument({ id, userId });
+        return await deleteDocument({ id, userId, status });
       } catch (err) {
         console.error(err);
 

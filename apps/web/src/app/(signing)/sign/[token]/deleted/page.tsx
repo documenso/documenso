@@ -1,6 +1,6 @@
 import Link from 'next/link';
 
-import { getServerSession } from 'next-auth';
+import { getServerComponentSession } from '@documenso/lib/next-auth/get-server-component-session';
 
 export type DeletedDocumentSigningPageProps = {
   params: {
@@ -11,8 +11,8 @@ export type DeletedDocumentSigningPageProps = {
 export default async function DeletedDocumentSigningPage({
   params: { token },
 }: DeletedDocumentSigningPageProps) {
-  const sessionData = await getServerSession();
-  const isLoggedIn = !!sessionData?.user;
+  const sessionData = await getServerComponentSession();
+  const isLoggedIn = !!sessionData.user;
   return (
     <div className="-mx-4 flex max-w-[100vw] flex-col items-center overflow-x-hidden px-4 pt-24 md:-mx-8 md:px-8 lg:pt-36 xl:pt-44">
       <h2 className="mt-6 max-w-[35ch] text-center text-2xl font-semibold leading-normal md:text-3xl lg:text-4xl">

@@ -86,6 +86,7 @@ export type TDeleteDraftDocumentMutationSchema = z.infer<typeof ZDeleteDraftDocu
 
 export const ZDeleteDocumentMutationSchema = z.object({
   id: z.number().min(1),
+  status: z.string().min(1),
 });
 
 export type TDeleteDocumentMutationSchema = z.infer<typeof ZDeleteDocumentMutationSchema>;

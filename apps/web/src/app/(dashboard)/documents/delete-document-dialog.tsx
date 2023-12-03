@@ -2,6 +2,7 @@ import { useState } from 'react';
 
 import { useRouter } from 'next/navigation';
 
+import { DocumentStatus } from '@documenso/prisma/client';
 import { trpc as trpcReact } from '@documenso/trpc/react';
 import { Button } from '@documenso/ui/primitives/button';
 import {
@@ -18,11 +19,18 @@ import { useToast } from '@documenso/ui/primitives/use-toast';
 type DeleteDocumentDialogProps = {
   id: number;
   open: boolean;
+  status: DocumentStatus;
   onOpenChange: (_open: boolean) => void;
 };
 
-export const DeleteDocumentDialog = ({ id, open, onOpenChange }: DeleteDocumentDialogProps) => {
+export const DeleteDocumentDialog = ({
+  id,
+  open,
+  status,
+  onOpenChange,
+}: DeleteDocumentDialogProps) => {
   const [textValue, setTextValue] = useState('');
+  const [isDeleteEnabled, setIsDeleteEnabled] = useState(status === DocumentStatus.DRAFT);
   const router = useRouter();
 
   const { toast } = useToast();
@@ -43,16 +51,7 @@ export const DeleteDocumentDialog = ({ id, open, onOpenChange }: DeleteDocumentD
 
   const onDelete = async () => {
     try {
-      if (textValue !== 'delete me') {
-        toast({
-          title: 'Something went wrong',
-          description: 'Please enter delete me to confirm.',
-          variant: 'destructive',
-          duration: 4000,
-        });
-        return;
-      }
-      await deleteDocument({ id });
+      await deleteDocument({ id, status });
     } catch {
       toast({
         title: 'Something went wrong',
@@ -62,9 +61,14 @@ export const DeleteDocumentDialog = ({ id, open, onOpenChange }: DeleteDocumentD
       });
     }
   };
+  const onTextChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setTextValue(event.target.value);
+    setIsDeleteEnabled(event.target.value === 'delete me');
+  };
 
   const onCancel = async () => {
     setTextValue('');
+    setIsDeleteEnabled(false);
     onOpenChange(false);
   };
 
@@ -80,10 +84,14 @@ export const DeleteDocumentDialog = ({ id, open, onOpenChange }: DeleteDocumentD
           </DialogDescription>
         </DialogHeader>
 
-        <p>
-          Enter <span className=" font-semibold">delete me</span> to confirm
-        </p>
-        <Input type="text" onChange={(e) => setTextValue(e.target.value)} />
+        {status !== DocumentStatus.DRAFT && (
+          <>
+            <p>
+              Enter <span className=" font-semibold">delete me</span> to confirm
+            </p>
+            <Input type="text" onChange={onTextChange} />
+          </>
+        )}
 
         <DialogFooter>
           <div className="flex w-full flex-1 flex-nowrap gap-4">
@@ -91,7 +99,13 @@ export const DeleteDocumentDialog = ({ id, open, onOpenChange }: DeleteDocumentD
               Cancel
             </Button>
 
-            <Button type="button" loading={isLoading} onClick={onDelete} className="flex-1">
+            <Button
+              type="button"
+              loading={isLoading}
+              onClick={onDelete}
+              disabled={!isDeleteEnabled}
+              className="flex-1"
+            >
               Delete
             </Button>
           </div>

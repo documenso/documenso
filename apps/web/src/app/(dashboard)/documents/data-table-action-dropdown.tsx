@@ -159,19 +159,12 @@ export const DataTableActionDropdown = ({ row }: DataTableActionDropdownProps) =
         />
       </DropdownMenuContent>
 
-      {isDocumentDeletable && isDraft ? (
-        <DeleteDraftDocumentDialog
-          id={row.id}
-          open={isDeleteDialogOpen}
-          onOpenChange={setDeleteDialogOpen}
-        />
-      ) : (
-        <DeleteDocumentDialog
-          id={row.id}
-          open={isDeleteDialogOpen}
-          onOpenChange={setDeleteDialogOpen}
-        />
-      )}
+      <DeleteDocumentDialog
+        id={row.id}
+        open={isDeleteDialogOpen}
+        status={row.status}
+        onOpenChange={setDeleteDialogOpen}
+      />
 
       {isDuplicateDialogOpen && (
         <DuplicateDocumentDialog
