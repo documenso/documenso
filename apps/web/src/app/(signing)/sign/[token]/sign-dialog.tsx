@@ -1,6 +1,7 @@
 import { useState } from 'react';
 
-import { Document, Field } from '@documenso/prisma/client';
+import type { Document, Field } from '@documenso/prisma/client';
+import { RecipientRole } from '@documenso/prisma/client';
 import { Button } from '@documenso/ui/primitives/button';
 import {
   Dialog,
@@ -14,6 +15,7 @@ export type SignDialogProps = {
   document: Document;
   fields: Field[];
   onSignatureComplete: () => void | Promise<void>;
+  role: RecipientRole;
 };
 
 export const SignDialog = ({
@@ -21,6 +23,7 @@ export const SignDialog = ({
   document,
   fields,
   onSignatureComplete,
+  role,
 }: SignDialogProps) => {
   const [showDialog, setShowDialog] = useState(false);
 
@@ -41,9 +44,13 @@ export const SignDialog = ({
       </DialogTrigger>
       <DialogContent>
         <div className="text-center">
-          <div className="text-xl font-semibold text-neutral-800">Sign Document</div>
+          <div className="text-xl font-semibold text-neutral-800">
+            {role === RecipientRole.VIEWER ? 'Mark Document as Viewed' : 'Sign Document'}
+          </div>
           <div className="text-muted-foreground mx-auto w-4/5 py-2 text-center">
-            You are about to finish signing "{document.title}". Are you sure?
+            {role === RecipientRole.VIEWER
+              ? `You are about to finish viewing "${document.title}". Are you sure?`
+              : `You are about to finish signing "${document.title}". Are you sure?`}
           </div>
         </div>
 
@@ -67,7 +74,7 @@ export const SignDialog = ({
               loading={isSubmitting}
               onClick={onSignatureComplete}
             >
-              Sign
+              {role === RecipientRole.VIEWER ? 'Mark as Viewed' : 'Sign'}
             </Button>
           </div>
         </DialogFooter>

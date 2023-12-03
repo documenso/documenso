@@ -117,6 +117,12 @@ export const DataTableActionButton = ({ row }: DataTableActionButtonProps) => {
     ))
     .with({ isPending: true, isSigned: true }, () => (
       <Button className="w-32" disabled={true}>
+        {role === RecipientRole.VIEWER && (
+          <>
+            <EyeIcon className="-ml-1 mr-2 inline h-4 w-4" />
+            View
+          </>
+        )}
         {role === RecipientRole.SIGNER && (
           <>
             <Pencil className="-ml-1 mr-2 inline h-4 w-4" />

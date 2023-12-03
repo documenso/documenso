@@ -92,7 +92,37 @@ export const SigningForm = ({ document, recipient, fields }: SigningFormProps) =
           </h3>
 
           {recipient.role === RecipientRole.VIEWER ? (
-            <p className="text-muted-foreground mt-2 text-sm">You can only view this document</p>
+            <>
+              <p className="text-muted-foreground mt-2 text-sm">
+                Please mark as viewed to complete
+              </p>
+
+              <hr className="border-border mb-8 mt-4" />
+
+              <div className="-mx-2 flex flex-1 flex-col gap-4 overflow-y-auto px-2">
+                <div className="flex flex-1 flex-col gap-y-4" />
+                <div className="flex flex-col gap-4 md:flex-row">
+                  <Button
+                    type="button"
+                    className="dark:bg-muted dark:hover:bg-muted/80 w-full  bg-black/5 hover:bg-black/10"
+                    variant="secondary"
+                    size="lg"
+                    disabled={typeof window !== 'undefined' && window.history.length <= 1}
+                    onClick={() => router.back()}
+                  >
+                    Cancel
+                  </Button>
+
+                  <SignDialog
+                    isSubmitting={isSubmitting}
+                    onSignatureComplete={handleSubmit(onFormSubmit)}
+                    document={document}
+                    fields={fields}
+                    role={recipient.role}
+                  />
+                </div>
+              </div>
+            </>
           ) : (
             <>
               <p className="text-muted-foreground mt-2 text-sm">
@@ -149,6 +179,7 @@ export const SigningForm = ({ document, recipient, fields }: SigningFormProps) =
                     onSignatureComplete={handleSubmit(onFormSubmit)}
                     document={document}
                     fields={fields}
+                    role={recipient.role}
                   />
                 </div>
               </div>

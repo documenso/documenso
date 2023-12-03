@@ -4,7 +4,6 @@ import { ReadStatus, RecipientRole, SendStatus, SigningStatus } from '@documenso
 export const getRecipientType = (recipient: Recipient) => {
   if (
     recipient.role === RecipientRole.CC ||
-    recipient.role === RecipientRole.VIEWER ||
     (recipient.sendStatus === SendStatus.SENT && recipient.signingStatus === SigningStatus.SIGNED)
   ) {
     return 'completed';
@@ -18,11 +17,7 @@ export const getRecipientType = (recipient: Recipient) => {
     return 'opened';
   }
 
-  if (
-    recipient.sendStatus === 'SENT' &&
-    recipient.signingStatus === 'NOT_SIGNED' &&
-    (recipient.role === RecipientRole.SIGNER || recipient.role === RecipientRole.APPROVER)
-  ) {
+  if (recipient.sendStatus === 'SENT' && recipient.signingStatus === 'NOT_SIGNED') {
     return 'waiting';
   }
 
