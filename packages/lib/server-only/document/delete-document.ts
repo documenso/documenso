@@ -10,17 +10,17 @@ import { DocumentStatus } from '@documenso/prisma/client';
 
 import { FROM_ADDRESS, FROM_NAME } from '../../constants/email';
 
-export type DeleteNonDraftDocumentOptions = {
+export type DeleteDocumentOptions = {
   id: number;
   userId: number;
   status: DocumentStatus;
 };
 
-export const deleteNonDraftDocument = async ({
-  id,
-  userId,
-  status,
-}: DeleteNonDraftDocumentOptions) => {
+export const deleteDocument = async ({ id, userId, status }: DeleteDocumentOptions) => {
+  // if the document is a draft, hard-delete
+  if (status === DocumentStatus.DRAFT)
+    return await prisma.document.delete({ where: { id, userId, status: DocumentStatus.DRAFT } });
+
   // if the document is pending, send cancellation emails to all recipients
   if (status === DocumentStatus.PENDING) {
     const user = await prisma.user.findFirstOrThrow({
