@@ -63,7 +63,7 @@ export const DeleteDocumentDialog = ({
     }
   };
 
-  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const onInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setInputValue(event.target.value);
     setIsDeleteEnabled(event.target.value === 'delete');
   };
@@ -85,7 +85,7 @@ export const DeleteDocumentDialog = ({
             <Input
               type="text"
               value={inputValue}
-              onChange={handleInputChange}
+              onChange={onInputChange}
               placeholder="Type 'delete' to confirm"
             />
           </div>

@@ -18,8 +18,9 @@ export type DeleteDocumentOptions = {
 
 export const deleteDocument = async ({ id, userId, status }: DeleteDocumentOptions) => {
   // if the document is a draft, hard-delete
-  if (status === DocumentStatus.DRAFT)
+  if (status === DocumentStatus.DRAFT) {
     return await prisma.document.delete({ where: { id, userId, status: DocumentStatus.DRAFT } });
+  }
 
   // if the document is pending, send cancellation emails to all recipients
   if (status === DocumentStatus.PENDING) {
@@ -37,6 +38,7 @@ export const deleteDocument = async ({ id, userId, status }: DeleteDocumentOptio
       include: {
         Recipient: true,
         documentMeta: true,
+        User: true,
       },
     });
 
@@ -44,44 +46,36 @@ export const deleteDocument = async ({ id, userId, status }: DeleteDocumentOptio
       throw new Error('Document not found');
     }
 
-    if (document.Recipient.length === 0) {
-      throw new Error('Document has no recipients');
+    if (document.Recipient.length > 0) {
+      await Promise.all(
+        document.Recipient.map(async (recipient) => {
+          const { email, name } = recipient;
+
+          const assetBaseUrl = process.env.NEXT_PUBLIC_WEBAPP_URL || 'http://localhost:3000';
+
+          const template = createElement(DocumentCancelTemplate, {
+            documentName: document.title,
+            inviterName: user.name || undefined,
+            inviterEmail: user.email,
+            assetBaseUrl,
+          });
+
+          await mailer.sendMail({
+            to: {
+              address: email,
+              name,
+            },
+            from: {
+              name: FROM_NAME,
+              address: FROM_ADDRESS,
+            },
+            subject: 'Docuement cancelled',
+            html: render(template),
+            text: render(template, { plainText: true }),
+          });
+        }),
+      );
     }
-
-    await Promise.all(
-      document.Recipient.map(async (recipient) => {
-        const { email, name } = recipient;
-
-        const customEmailTemplate = {
-          'signer.name': name,
-          'signer.email': email,
-          'document.name': document.title,
-        };
-
-        const assetBaseUrl = process.env.NEXT_PUBLIC_WEBAPP_URL || 'http://localhost:3000';
-
-        const template = createElement(DocumentCancelTemplate, {
-          documentName: document.title,
-          inviterName: user.name || undefined,
-          inviterEmail: user.email,
-          assetBaseUrl,
-        });
-
-        await mailer.sendMail({
-          to: {
-            address: email,
-            name,
-          },
-          from: {
-            name: FROM_NAME,
-            address: FROM_ADDRESS,
-          },
-          subject: 'Docuement cancelled',
-          html: render(template),
-          text: render(template, { plainText: true }),
-        });
-      }),
-    );
   }
 
   // If the document is not a draft, only soft-delete.
