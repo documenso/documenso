@@ -129,7 +129,7 @@ model Document {
   Recipient         Recipient[]
   Field             Field[]
   ShareLink         DocumentShareLink[]
-  documentThumbnail String? // base 64 encoded
+  documentThumbnail DocumentThumbnail?
   documentDataId    String
   documentData      DocumentData        @relation(fields: [documentDataId], references: [id], onDelete: Cascade)
   documentMeta      DocumentMeta?
@@ -146,6 +146,14 @@ enum DocumentDataType {
   S3_PATH
   BYTES
   BYTES_64
+}
+
+model DocumentThumbnail {
+  id                 String   @id @default(cuid())
+  documentId         Int      @unique
+  thumbnail_bytes    Bytes?
+  hq_thumbnail_bytes Bytes?
+  Document           Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
 }
 
 model DocumentData {
