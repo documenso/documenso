@@ -3,15 +3,7 @@
 import { useState } from 'react';
 
 import type { Document, DocumentThumbnail, Recipient, User } from '@documenso/prisma/client';
-import { Button } from '@documenso/ui/primitives/button';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from '@documenso/ui/primitives/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@documenso/ui/primitives/dialog';
 
 export type DataTableTitleProps = {
   row: Document & {
