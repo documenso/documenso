@@ -51,7 +51,7 @@ export const UploadDocument = ({ className }: UploadDocumentProps) => {
       // render the pdf to generate thumbnail
       setDocData(data);
 
-      // if failed to generate thumbnail in 500ms, skip thumbnail generation
+      // if failed to generate thumbnail in THUMBNAIL_TIMEOUT ms, skip thumbnail generation
       const thumbnailData = await Promise.race([
         new Promise((resolve) => {
           thumbnailResolveRef.current = resolve;
