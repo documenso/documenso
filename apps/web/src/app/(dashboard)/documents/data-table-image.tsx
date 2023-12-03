@@ -41,22 +41,15 @@ export const DataTableImage = ({ row }: DataTableTitleProps) => {
       <Dialog open={showImageDialog} onOpenChange={setShowImageDialog}>
         <DialogContent position="center">
           <DialogHeader>
-            <DialogTitle>Image</DialogTitle>
+            <DialogTitle>Thumbnail</DialogTitle>
           </DialogHeader>
 
-          <DialogDescription>High Quality Thumbnail</DialogDescription>
           <img
-            className="mr-2 inline-block h-96 w-96 object-cover"
-            src={row.documentThumbnail.lowResThumbnailBytes ?? '/static/document.png'}
+            className="mr-2 inline-block h-[34rem] w-[28rem]  object-cover"
+            src={row.documentThumbnail.highResThumbnailBytes ?? '/static/document.png'}
             alt="document-preview"
             onClick={() => setShowImageDialog(true)}
           />
-
-          <DialogFooter>
-            <Button variant="ghost" onClick={() => setShowImageDialog(false)}>
-              Cancel
-            </Button>
-          </DialogFooter>
         </DialogContent>
       </Dialog>
     </>

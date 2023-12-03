@@ -24,9 +24,6 @@ export type UploadDocumentProps = {
   className?: string;
 };
 
-const THUMBNAIL_MAX_DIMENSION = 260;
-const THUMBNAIL_TIMEOUT = 2000;
-
 export const UploadDocument = ({ className }: UploadDocumentProps) => {
   const router = useRouter();
   const { data: session } = useSession();
@@ -40,40 +37,33 @@ export const UploadDocument = ({ className }: UploadDocumentProps) => {
   const { mutateAsync: createDocument } = trpc.document.createDocument.useMutation();
 
   const [docData, setDocData] = useState('');
-
-  const thumbnailResolveRef = useRef<(value: unknown) => void | null>({ current: null });
+  const [type, setType] = useState<DocumentDataType>();
+  const [file, setFile] = useState<File>();
 
   const onFileDrop = async (file: File) => {
+    setIsLoading(true);
+
+    const { type, data } = await putFile(file);
+
+    setDocData(data);
+    setFile(file);
+    setType(type);
+  };
+
+  const createDocuments = async (highResThumbnailBytes: string, lowResThumbnailBytes: string) => {
     try {
-      setIsLoading(true);
-
-      const { type, data } = await putFile(file);
-
-      // render the pdf to generate thumbnail
-      setDocData(data);
-
-      // if failed to generate thumbnail in THUMBNAIL_TIMEOUT ms, skip thumbnail generation
-      const thumbnailData = (await Promise.race([
-        new Promise((resolve) => {
-          thumbnailResolveRef.current = resolve;
-        }),
-        new Promise((resolve) => {
-          setTimeout(resolve, THUMBNAIL_TIMEOUT);
-        }),
-      ])) as string;
-      console.log(thumbnailData);
       const { id: documentDataId } = await createDocumentData({
-        type,
-        data,
+        type: type as DocumentDataType,
+        data: docData,
       });
 
       const { id: documentThumbnailId } = await createDocumentThumbnail({
-        highResThumbnailBytes: typeof thumbnailData === 'string' ? thumbnailData : '',
-        lowResThumbnailBytes: typeof thumbnailData === 'string' ? thumbnailData : '',
+        highResThumbnailBytes,
+        lowResThumbnailBytes,
       });
 
       const { id } = await createDocument({
-        title: file.name,
+        title: file?.name || '',
         documentDataId,
         documentThumbnailId,
       });
@@ -106,83 +96,51 @@ export const UploadDocument = ({ className }: UploadDocumentProps) => {
     }
   };
 
-  const generateThumbnail = (page: number, canvas: HTMLCanvasElement | null) => {
-    if (page !== 1 || !canvas) return;
-
+  const generateThumbnail = async (page: number, canvas: HTMLCanvasElement | null) => {
     try {
-      // Determine whether the width or height is the larger side
-      let thumbnailWidth, thumbnailHeight;
-      if (canvas.width > canvas.height) {
-        thumbnailWidth = THUMBNAIL_MAX_DIMENSION;
-        thumbnailHeight = (canvas.height / canvas.width) * THUMBNAIL_MAX_DIMENSION;
-      } else {
-        thumbnailHeight = THUMBNAIL_MAX_DIMENSION;
-        thumbnailWidth = (canvas.width / canvas.height) * THUMBNAIL_MAX_DIMENSION;
+      if (page !== 1 || !canvas) {
+        await createDocuments('', '');
+        return;
       }
+      // For High Resolution
+      const highResTempCanvas = document.createElement('canvas');
+      highResTempCanvas.width = canvas.width * 3;
+      highResTempCanvas.height = canvas.height * 3;
 
-      // Create a new canvas to resize for thumbnail
-      const thumbnailCanvas = document.createElement('canvas');
-      thumbnailCanvas.width = thumbnailWidth;
-      thumbnailCanvas.height = thumbnailHeight;
+      const highResCtx = highResTempCanvas.getContext('2d');
+      if (highResCtx === null) return;
 
-      // Copy and scale the content of the original canvas to the new canvas
-      const ctx = thumbnailCanvas.getContext('2d');
-      if (ctx === null) return thumbnailResolveRef.current?.(undefined);
-      ctx.drawImage(canvas, 0, 0, thumbnailWidth, thumbnailHeight);
+      // Draw the original canvas onto the temporary canvas
+      highResCtx.drawImage(canvas, 0, 0, highResTempCanvas.width, highResTempCanvas.height);
 
-      // Convert the canvas content to a base64 image
-      const base64Image = thumbnailCanvas.toDataURL('image/png'); // You can choose the desired image format
+      // Convert the temporary HTMLCanvasElement to a data URL (in PNG format by default)
+      const highResDataUrl = highResTempCanvas.toDataURL('image/png');
+      console.log(highResDataUrl, 'highResDataUrl');
 
-      // Resolve the promise with the base64 image
-      thumbnailResolveRef.current?.(base64Image);
+      // For Low Resolution
+      const lowResTempCanvas = document.createElement('canvas');
+      lowResTempCanvas.width = canvas.width * 0.5;
+      lowResTempCanvas.height = canvas.height * 0.5;
+      const lowResCtx = lowResTempCanvas.getContext('2d');
+      if (lowResCtx === null) return;
+
+      // Draw the original canvas onto the temporary canvas
+      lowResCtx.drawImage(canvas, 0, 0, lowResTempCanvas.width, lowResTempCanvas.height);
+
+      // Convert the temporary HTMLCanvasElement to a data URL (in PNG format by default)
+      const lowResDataUrl = highResTempCanvas.toDataURL('image/png');
+      console.log(lowResDataUrl, 'lowResDataUrl');
+      await createDocuments(highResDataUrl, lowResDataUrl);
     } catch (error) {
-      return thumbnailResolveRef.current?.(undefined);
+      console.log(error);
+      toast({
+        title: 'Error',
+        description: 'An error occurred while uploading your document.',
+        variant: 'destructive',
+      });
     }
   };
 
-  const createThumbnail = (file: File, maxWidth: number, maxHeight: number): Promise<Blob> => {
-    return new Promise((resolve, reject) => {
-      const img = new Image();
-      img.onload = () => {
-        const canvas = document.createElement('canvas');
-        const ctx = canvas.getContext('2d');
-        if (!ctx) {
-          reject(new Error('Unable to get canvas context'));
-          return;
-        }
-
-        let width = img.width;
-        let height = img.height;
-
-        // Maintain aspect ratio
-        if (width > height) {
-          if (width > maxWidth) {
-            height = (height * maxWidth) / width;
-            width = maxWidth;
-          }
-        } else {
-          if (height > maxHeight) {
-            width = (width * maxHeight) / height;
-            height = maxHeight;
-          }
-        }
-
-        canvas.width = width;
-        canvas.height = height;
-        ctx.drawImage(img, 0, 0, width, height);
-
-        canvas.toBlob((blob) => {
-          if (blob) {
-            resolve(blob);
-          } else {
-            reject(new Error('Canvas toBlob failed'));
-          }
-        }, file.type);
-      };
-      img.onerror = reject;
-      img.src = URL.createObjectURL(file);
-    });
-  };
   return (
     <div className={cn('relative', className)}>
       <DocumentDropzone
