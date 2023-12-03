@@ -5,7 +5,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 
 import type { DocumentData, Field, Recipient, User } from '@documenso/prisma/client';
-import { DocumentStatus } from '@documenso/prisma/client';
+import { DocumentStatus, RecipientRole } from '@documenso/prisma/client';
 import type { DocumentWithData } from '@documenso/prisma/types/document-with-data';
 import { trpc } from '@documenso/trpc/react';
 import { cn } from '@documenso/ui/lib/utils';
@@ -230,7 +230,9 @@ export const EditDocumentForm = ({
             <AddFieldsFormPartial
               key={fields.length}
               documentFlow={documentFlow.fields}
-              recipients={recipients}
+              recipients={recipients.filter(
+                (x) => x.role === RecipientRole.SIGNER || x.role === RecipientRole.APPROVER,
+              )}
               fields={fields}
               numberOfSteps={Object.keys(documentFlow).length}
               onSubmit={onAddFieldsFormSubmit}
