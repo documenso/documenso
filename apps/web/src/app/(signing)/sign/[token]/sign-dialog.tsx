@@ -45,12 +45,17 @@ export const SignDialog = ({
       <DialogContent>
         <div className="text-center">
           <div className="text-xl font-semibold text-neutral-800">
-            {role === RecipientRole.VIEWER ? 'Mark Document as Viewed' : 'Sign Document'}
+            {role === RecipientRole.VIEWER && 'Mark Document as Viewed'}
+            {role === RecipientRole.SIGNER && 'Sign Document'}
+            {role === RecipientRole.APPROVER && 'Approve Document'}
           </div>
           <div className="text-muted-foreground mx-auto w-4/5 py-2 text-center">
-            {role === RecipientRole.VIEWER
-              ? `You are about to finish viewing "${document.title}". Are you sure?`
-              : `You are about to finish signing "${document.title}". Are you sure?`}
+            {role === RecipientRole.VIEWER &&
+              `You are about to finish viewing "${document.title}". Are you sure?`}
+            {role === RecipientRole.SIGNER &&
+              `You are about to finish signing "${document.title}". Are you sure?`}
+            {role === RecipientRole.APPROVER &&
+              `You are about to finish approving "${document.title}". Are you sure?`}
           </div>
         </div>
 
@@ -74,7 +79,9 @@ export const SignDialog = ({
               loading={isSubmitting}
               onClick={onSignatureComplete}
             >
-              {role === RecipientRole.VIEWER ? 'Mark as Viewed' : 'Sign'}
+              {role === RecipientRole.VIEWER && 'Mark as Viewed'}
+              {role === RecipientRole.SIGNER && 'Sign'}
+              {role === RecipientRole.APPROVER && 'Approve'}
             </Button>
           </div>
         </DialogFooter>
