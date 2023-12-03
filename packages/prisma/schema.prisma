@@ -136,6 +136,7 @@ model Document {
   createdAt      DateTime            @default(now())
   updatedAt      DateTime            @default(now()) @updatedAt
   completedAt    DateTime?
+  Embeddings     Embedding[]
 
   @@unique([documentDataId])
   @@index([userId])
@@ -162,6 +163,16 @@ model DocumentMeta {
   message    String?
   documentId Int      @unique
   document   Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+}
+
+model Embedding {
+  id         Int      @id @default(autoincrement())
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  documentId Int
+  document   Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  embedding  Float[]
+  userId     Int
 }
 
 enum ReadStatus {

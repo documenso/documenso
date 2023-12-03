@@ -47,7 +47,10 @@
     "apps/*",
     "packages/*"
   ],
-  "dependencies": {},
+  "dependencies": {
+    "openai": "^4.20.1",
+    "unpdf": "^0.10.0"
+  },
   "overrides": {
     "next-auth": {
       "next": "14.0.3"

@@ -45,7 +45,10 @@
     "ts-pattern": "^5.0.5",
     "typescript": "5.2.2",
     "uqr": "^0.1.2",
-    "zod": "^3.22.4"
+    "zod": "^3.22.4",
+    "@trigger.dev/sdk": "^2.2.10",
+    "@trigger.dev/nextjs": "^2.2.10",
+    "@trigger.dev/react": "^2.2.10"
   },
   "devDependencies": {
     "@types/formidable": "^2.0.6",
@@ -61,5 +64,8 @@
     "next-contentlayer": {
       "next": "$next"
     }
+  },
+  "trigger.dev": {
+    "endpointId": "documenso-17h3"
   }
 }

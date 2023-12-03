@@ -31,6 +31,8 @@ export const SemanticSearchApp = ({ semSearchEnabled }: SemanticSearchProps) => 
       try {
         await enableSemSearch();
 
+        //should be using a load state here
+
         toast({
           title: 'Semantic search enabled',
           description:
