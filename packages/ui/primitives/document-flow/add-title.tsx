@@ -8,6 +8,7 @@ import { FormErrorMessage } from '@documenso/ui/primitives/form/form-error-messa
 import { Input } from '@documenso/ui/primitives/input';
 import { Label } from '@documenso/ui/primitives/label';
 
+import type { WithStep } from '../stepper';
 import type { TAddTitleFormSchema } from './add-title.types';
 import {
   DocumentFlowFormContainerActions,
@@ -22,7 +23,6 @@ export type AddTitleFormProps = {
   recipients: Recipient[];
   fields: Field[];
   document: DocumentWithData;
-  numberOfSteps: number;
   onSubmit: (_data: TAddTitleFormSchema) => void;
 };
 
@@ -31,9 +31,9 @@ export const AddTitleFormPartial = ({
   recipients: _recipients,
   fields: _fields,
   document,
-  numberOfSteps,
   onSubmit,
-}: AddTitleFormProps) => {
+  useStep,
+}: WithStep<AddTitleFormProps>) => {
   const {
     register,
     handleSubmit,
@@ -45,6 +45,8 @@ export const AddTitleFormPartial = ({
   });
 
   const onFormSubmit = handleSubmit(onSubmit);
+
+  const { stepIndex, currentStep, totalSteps, previousStep } = useStep();
 
   return (
     <>
@@ -72,14 +74,15 @@ export const AddTitleFormPartial = ({
       <DocumentFlowFormContainerFooter>
         <DocumentFlowFormContainerStep
           title={documentFlow.title}
-          step={documentFlow.stepIndex}
-          maxStep={numberOfSteps}
+          step={currentStep}
+          maxStep={totalSteps}
         />
 
         <DocumentFlowFormContainerActions
           loading={isSubmitting}
           disabled={isSubmitting}
-          onGoBackClick={documentFlow.onBackStep}
+          canGoBack={stepIndex !== 0}
+          onGoBackClick={previousStep}
           onGoNextClick={() => void onFormSubmit()}
         />
       </DocumentFlowFormContainerFooter>
