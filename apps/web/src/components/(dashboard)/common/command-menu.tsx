@@ -62,40 +62,39 @@ export function CommandMenu({ open, onOpenChange }: CommandMenuProps) {
   const [search, setSearch] = useState('');
   const [pages, setPages] = useState<string[]>([]);
 
-  const [searchResults, setSearchResults] = useState<
-    { label: string; path: string; value: string }[]
-  >([]);
+  // const [searchResults, setSearchResults] = useState<
+  //   { label: string; path: string; value: string }[]
+  // >([]);
 
-  const {
-    data: searchDocuments,
-    isLoading: isSearchingDocuments,
-    refetch: findDocuments,
-  } = trpcReact.document.searchDocuments.useQuery(
-    {
-      query: search,
-    },
-    {
-      enabled: search !== '',
-    },
-  );
+  const { data: searchDocuments, isLoading: isSearchingDocuments } =
+    trpcReact.document.searchDocuments.useQuery(
+      {
+        query: search,
+      },
+      {
+        enabled: search !== '',
+      },
+    );
 
-  useEffect(() => {
-    if (search) {
-      void findDocuments();
-    } else {
-      setSearchResults([]);
-    }
-  }, [search, findDocuments]);
+  // useEffect(() => {
+  //   if (searchDocuments) {
+  //     const newResults = searchDocuments?.map((document) => ({
+  //       label: document.title,
+  //       path: `/documents/${document.id}`,
+  //       value: document.title + document.Recipient.map((recipient) => recipient.email).join(' '),
+  //     }));
+  //     setSearchResults(newResults);
+  //   }
+  // }, [searchDocuments]);
 
-  useEffect(() => {
-    if (searchDocuments) {
-      const newResults = searchDocuments?.map((document) => ({
-        label: document.title,
-        path: `/documents/${document.id}`,
-        value: document.title + document.Recipient.map((recipient) => recipient.email).join(' '),
-      }));
-      setSearchResults(newResults);
-    }
+  const searchResults = useMemo(() => {
+    if (!searchDocuments) return [];
+
+    return searchDocuments.map((document) => ({
+      label: document.title,
+      path: `/documents/${document.id}`,
+      value: document.title + document.Recipient.map((recipient) => recipient.email).join(' '),
+    }));
   }, [searchDocuments]);
 
   const currentPage = pages[pages.length - 1];

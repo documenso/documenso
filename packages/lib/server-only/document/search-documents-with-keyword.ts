@@ -5,7 +5,7 @@ export type SearchDocumentsWithKeywordOptions = {
   userId: number;
 };
 
-export const SearchDocumentsWithKeyword = async ({
+export const searchDocumentsWithKeyword = async ({
   query,
   userId,
 }: SearchDocumentsWithKeywordOptions) => {
@@ -50,6 +50,9 @@ export const SearchDocumentsWithKeyword = async ({
     },
     include: {
       Recipient: true,
+    },
+    orderBy: {
+      createdAt: 'desc',
     },
   });
 

@@ -8,7 +8,7 @@ import { duplicateDocumentById } from '@documenso/lib/server-only/document/dupli
 import { getDocumentById } from '@documenso/lib/server-only/document/get-document-by-id';
 import { getDocumentAndSenderByToken } from '@documenso/lib/server-only/document/get-document-by-token';
 import { resendDocument } from '@documenso/lib/server-only/document/resend-document';
-import { SearchDocumentsWithKeyword } from '@documenso/lib/server-only/document/search-documents-with-keyword';
+import { searchDocumentsWithKeyword } from '@documenso/lib/server-only/document/search-documents-with-keyword';
 import { sendDocument } from '@documenso/lib/server-only/document/send-document';
 import { updateTitle } from '@documenso/lib/server-only/document/update-title';
 import { setFieldsForDocument } from '@documenso/lib/server-only/field/set-fields-for-document';
@@ -249,7 +249,7 @@ export const documentRouter = router({
       const { query } = input;
 
       try {
-        const documents = await SearchDocumentsWithKeyword({
+        const documents = await searchDocumentsWithKeyword({
           query,
           userId: ctx.user.id,
         });
