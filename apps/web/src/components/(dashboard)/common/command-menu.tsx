@@ -84,7 +84,8 @@ export function CommandMenu({ open, onOpenChange }: CommandMenuProps) {
     return searchDocuments.map((document) => ({
       label: document.title,
       path: `/documents/${document.id}`,
-      value: document.title + document.Recipient.map((recipient) => recipient.email).join(' '),
+      value:
+        document.title + ' ' + document.Recipient.map((recipient) => recipient.email).join(' '),
     }));
   }, [searchDocuments]);
 

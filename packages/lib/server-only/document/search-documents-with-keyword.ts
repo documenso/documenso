@@ -35,6 +35,7 @@ export const searchDocumentsWithKeyword = async ({
             some: {
               email: {
                 contains: query,
+                mode: 'insensitive',
               },
             },
           },
