@@ -6,7 +6,7 @@ import { DocumentInviteEmailTemplate } from '@documenso/email/templates/document
 import { FROM_ADDRESS, FROM_NAME } from '@documenso/lib/constants/email';
 import { renderCustomEmailTemplate } from '@documenso/lib/utils/render-custom-email-template';
 import { prisma } from '@documenso/prisma';
-import { DocumentStatus, SigningStatus } from '@documenso/prisma/client';
+import { DocumentStatus, RecipientRole, SigningStatus } from '@documenso/prisma/client';
 
 export type ResendDocumentOptions = {
   documentId: number;
@@ -59,6 +59,8 @@ export const resendDocument = async ({ documentId, userId, recipients }: ResendD
 
   await Promise.all(
     document.Recipient.map(async (recipient) => {
+      if (recipient.role === RecipientRole.CC) return;
+
       const { email, name } = recipient;
 
       const customEmailTemplate = {
