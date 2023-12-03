@@ -27,10 +27,12 @@ export const Stepper = ({ children }: StepperProps) => {
   const isLastStep = currentStep === totalSteps;
 
   const nextStep = () => {
+    if (isLastStep) return;
     setCurrentStep(currentStep + 1);
   };
 
   const prevStep = () => {
+    if (isFirstStep) return;
     setCurrentStep(currentStep - 1);
   };
 

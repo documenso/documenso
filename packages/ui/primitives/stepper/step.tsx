@@ -56,7 +56,7 @@ const StepperAction = ({
     if (onNext) {
       onNext();
     }
-    if (isLastStep) return;
+
     nextStep();
   };
 
@@ -64,7 +64,7 @@ const StepperAction = ({
     if (onPrevious) {
       onPrevious();
     }
-    if (isFirstStep) return;
+
     prevStep();
   };
 
