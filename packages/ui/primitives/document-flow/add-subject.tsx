@@ -30,6 +30,7 @@ export const AddSubjectFormPartial = ({
   onSubmit,
   title,
   description,
+  canGoNext,
 }: AddSubjectFormProps) => {
   const {
     register,
@@ -53,6 +54,7 @@ export const AddSubjectFormPartial = ({
       isLoading={isSubmitting}
       title={title}
       description={description}
+      canGoNext={canGoNext}
     >
       <DocumentFlowFormContainerContent>
         <div className="flex flex-col">

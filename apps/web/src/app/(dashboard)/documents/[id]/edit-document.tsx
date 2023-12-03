@@ -189,6 +189,7 @@ export const EditDocumentForm = ({
               recipients={recipients}
               fields={fields}
               onSubmit={onAddSubjectFormSubmit}
+              canGoNext
             />
           </Stepper>
         </DocumentFlowFormContainer>
