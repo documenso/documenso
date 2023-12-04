@@ -4,47 +4,18 @@
 'apps: web': 
   - apps/web/**
 
-'docker': 
-  - docker/**
+'version bump 👀':
+  - '**/package.json'
+  - '**/package-lock.json'
 
-'scripts': 
-  - scripts/**
-
-'migrations':
+'🚨 migrations 🚨':
   - packages/prisma/migrations/**/migration.sql
 
-'e2e tests changes':
+'🚨 e2e changes 🚨':
   - packages/app-tests/e2e/**
 
-'pkg: assets':
-  - packages/assets/**
+"🚨 .env changes 🚨":
+  - .env.example
 
-'pkg: email':
-  - packages/email/**
-
-'pkg: eslint-config':
-  - packages/eslint-config/**
-
-'pkg: lib':
-  - packages/lib/**
-
-'pkg: prettier-config':
-  - packages/prettier-config/**
-
-'pkg: prisma':
-  - packages/prisma/**
-
-'pkg: signing':
-  - packages/signing/**
-
-'pkg: tailwind-config':
-  - packages/tailwind-config/**
-
-'pkg: trpc':
-  - packages/trpc/**
-
-'pkg: tsconfig':
-  - packages/tsconfig/**
-
-'pkg: ui':
-  - packages/ui/**
+'pkg: ee changes':
+  - packages/ee/**
