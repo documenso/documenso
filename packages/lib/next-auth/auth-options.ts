@@ -4,6 +4,8 @@ import { compare } from 'bcrypt';
 import { DateTime } from 'luxon';
 import type { AuthOptions, Session, User } from 'next-auth';
 import type { JWT } from 'next-auth/jwt';
+import type { AppleProfile } from 'next-auth/providers/apple';
+import AppleProvider from 'next-auth/providers/apple';
 import CredentialsProvider from 'next-auth/providers/credentials';
 import type { GoogleProfile } from 'next-auth/providers/google';
 import GoogleProvider from 'next-auth/providers/google';
@@ -88,6 +90,23 @@ export const NEXT_AUTH_OPTIONS: AuthOptions = {
           name: profile.name || `${profile.given_name} ${profile.family_name}`.trim(),
           email: profile.email,
           emailVerified: profile.email_verified ? new Date().toISOString() : null,
+        };
+      },
+    }),
+    AppleProvider<AppleProfile>({
+      clientId: process.env.NEXT_PRIVATE_APPLE_CLIENT_ID ?? '',
+      clientSecret: process.env.NEXT_PRIVATE_APPLE_CLIENT_SECRET ?? '',
+      allowDangerousEmailAccountLinking: true,
+
+      profile(profile) {
+        return {
+          id: Number(profile.sub),
+          name: profile.email.split('@')[0],
+          email: profile.email,
+          emailVerified:
+            profile.email_verified || profile.email_verified === 'true'
+              ? new Date().toISOString()
+              : null,
         };
       },
     }),

@@ -4,7 +4,7 @@ import { SignUpForm } from '~/components/forms/signup';
 
 export default function SignUpPage() {
   return (
-    <div>
+    <div className="-mt-12">
       <h1 className="text-4xl font-semibold">Create a new account</h1>
 
       <p className="text-muted-foreground/60 mt-2 text-sm">

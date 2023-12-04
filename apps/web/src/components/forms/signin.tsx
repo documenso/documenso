@@ -6,6 +6,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { signIn } from 'next-auth/react';
 import { useForm } from 'react-hook-form';
 import { FcGoogle } from 'react-icons/fc';
+import { GrApple } from 'react-icons/gr';
 import { z } from 'zod';
 
 import { ErrorCode, isErrorCode } from '@documenso/lib/next-auth/error-codes';
@@ -155,6 +156,19 @@ export const SignInForm = ({ className }: SignInFormProps) => {
     }
   };
 
+  const onSignInWithAppleClick = async () => {
+    try {
+      await signIn('apple', { callbackUrl: LOGIN_REDIRECT_PATH });
+    } catch (err) {
+      toast({
+        title: 'An unknown error occurred',
+        description:
+          'We encountered an unknown error while attempting to sign you In. Please try again later.',
+        variant: 'destructive',
+      });
+    }
+  };
+
   return (
     <form
       className={cn('flex w-full flex-col gap-y-4', className)}
@@ -212,6 +226,18 @@ export const SignInForm = ({ className }: SignInFormProps) => {
       >
         <FcGoogle className="mr-2 h-5 w-5" />
         Google
+      </Button>
+
+      <Button
+        type="button"
+        size="lg"
+        variant={'outline'}
+        className="bg-background text-muted-foreground border"
+        disabled={isSubmitting}
+        onClick={onSignInWithAppleClick}
+      >
+        <GrApple className="mr-2 h-5 w-5" />
+        Apple
       </Button>
 
       <Dialog

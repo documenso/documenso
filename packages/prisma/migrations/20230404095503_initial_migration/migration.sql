@@ -1,5 +1,5 @@
 -- CreateEnum
-CREATE TYPE "IdentityProvider" AS ENUM ('DOCUMENSO', 'GOOGLE');
+CREATE TYPE "IdentityProvider" AS ENUM ('DOCUMENSO', 'GOOGLE', 'APPLE');
 
 -- CreateEnum
 CREATE TYPE "DocumentStatus" AS ENUM ('DRAFT', 'PENDING', 'COMPLETED');
