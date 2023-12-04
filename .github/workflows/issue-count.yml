@@ -1,3 +1,4 @@
+# Triggered with '/issue-count @username'
 name: "Issue Count"
 
 on:
@@ -9,6 +10,7 @@ permissions:
 
 jobs:
   countIssues:
+    if: ${{ !github.event.issue.pull_request }}
     runs-on: ubuntu-latest
     env:
       MY_ENV_VARIABLE: ${{ secrets.GITHUB_TOKEN }}
@@ -61,7 +63,7 @@ jobs:
                 headers: {
                     'Authorization': `token ${{ secrets.GITHUB_TOKEN }}`,
                 }
-            });
+              });
             } else {
               console.log('No valid username found in the comment');
             }
