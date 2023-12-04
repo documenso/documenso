@@ -16,6 +16,7 @@ env:
 jobs:
   build_app:
     name: Build App
+    if: github.repository == 'documenso/documenso'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout

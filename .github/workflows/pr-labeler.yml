@@ -9,6 +9,7 @@ concurrency:
 
 jobs:
   labeler:
+    if: github.repository == 'documenso/documenso'
     permissions:
       contents: read
       pull-requests: write

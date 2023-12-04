@@ -6,7 +6,7 @@ on:
 
 jobs:
   stale:
-
+    if: github.repository == 'documenso/documenso'
     runs-on: ubuntu-latest
     permissions:
       issues: write

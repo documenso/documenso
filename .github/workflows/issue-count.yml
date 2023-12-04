@@ -10,7 +10,7 @@ permissions:
 
 jobs:
   countIssues:
-    if: ${{ !github.event.issue.pull_request }}
+    if: ${{ !github.event.issue.pull_request }} && github.repository == 'documenso/documenso' && github.event.comment.author_association == 'MEMBER' || 'COLLABORATOR' || 'OWNER'
     runs-on: ubuntu-latest
     env:
       MY_ENV_VARIABLE: ${{ secrets.GITHUB_TOKEN }}
