@@ -2,3 +2,4 @@
 
 export * from './examples';
 export * from './embedJob';
+export * from './embedNewDocJob';

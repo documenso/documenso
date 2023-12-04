@@ -19,9 +19,10 @@ import { useToast } from '@documenso/ui/primitives/use-toast';
 
 export type UploadDocumentProps = {
   className?: string;
+  user: User
 };
 
-export const UploadDocument = ({ className }: UploadDocumentProps) => {
+export const UploadDocument = ({ className, user }: UploadDocumentProps) => {
   const router = useRouter();
   const { data: session } = useSession();
 
@@ -42,6 +43,7 @@ export const UploadDocument = ({ className }: UploadDocumentProps) => {
       const { id: documentDataId } = await createDocumentData({
         type,
         data,
+        user
       });
 
       const { id } = await createDocument({
