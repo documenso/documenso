@@ -14,7 +14,7 @@ export default async function SecuritySettingsPage() {
     subFlag = existingSubscription.status == 'ACTIVE';
   }
 
-  if (true) {
+  if (subFlag) {
     return (
       <div>
         <h3 className="text-2xl font-semibold">Security</h3>

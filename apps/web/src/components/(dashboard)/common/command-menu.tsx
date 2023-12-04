@@ -63,6 +63,7 @@ export function CommandMenu({ open, onOpenChange }: CommandMenuProps) {
   const [isOpen, setIsOpen] = useState(() => open ?? false);
   const [search, setSearch] = useState('');
   const [pages, setPages] = useState<string[]>([]);
+  const [searchResults, setSearchResults] = useState<string[]>([]);
 
   const currentPage = pages[pages.length - 1];
 
@@ -129,7 +130,7 @@ export function CommandMenu({ open, onOpenChange }: CommandMenuProps) {
     resolver: zodResolver(ZSearchForm),
   });
 
-  const { mutateAsync: runSemSearch, data: rumSemSearchData } = trpc.semSearch.run.useMutation();
+  const { mutateAsync: runSemSearch, data: runSemSearchData } = trpc.semSearch.run.useMutation();
 
   const onSearchChange = async (user_query: string) => {
     setSearch(user_query);
@@ -139,6 +140,13 @@ export function CommandMenu({ open, onOpenChange }: CommandMenuProps) {
       // Define MIN_SEARCH_LENGTH as per your requirement
       try {
         const results = await runSemSearch({ user_query });
+        console.log('I AM HERE 2');
+        if (results) {
+          setSearchResults(results);
+        } else {
+          setSearchResults([]);
+        }
+        return results;
 
         // Handle the search results
         // For example, you can redirect to a results page or update the state to display the results
@@ -147,7 +155,7 @@ export function CommandMenu({ open, onOpenChange }: CommandMenuProps) {
       }
     }
   };
-
+  console.log(searchResults);
   return (
     <CommandDialog commandProps={{ onKeyDown: handleKeyDown }} open={open} onOpenChange={setOpen}>
       <CommandInput
@@ -157,7 +165,12 @@ export function CommandMenu({ open, onOpenChange }: CommandMenuProps) {
       />
 
       <CommandList>
-        <CommandEmpty>No results found.</CommandEmpty>
+        {searchResults && searchResults.length > 0 ? (
+          searchResults.map((title, index) => <CommandItem key={index}>{title}</CommandItem>)
+        ) : (
+          <CommandEmpty>No results found.</CommandEmpty>
+        )}
+
         {!currentPage && (
           <>
             <CommandGroup heading="Documents">

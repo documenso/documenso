@@ -71,11 +71,10 @@ export const SemanticSearchApp = ({ semSearchEnabled }: SemanticSearchProps) => 
     <>
       <div className="mt-4 flex flex-col justify-between gap-4 rounded-lg border p-4 md:flex-row md:items-center md:gap-8">
         <div className="flex-1">
-          <p>Authenticator app</p>
+          <p>Semantic Search</p>
 
           <p className="text-muted-foreground mt-2 max-w-[50ch] text-sm">
-            Create one-time passwords that serve as a secondary authentication method for confirming
-            your identity when requested during the sign-in process.
+            Search through your documents semantically rather than using keywords.
           </p>
         </div>
 
