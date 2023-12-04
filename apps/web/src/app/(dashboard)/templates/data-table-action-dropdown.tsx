@@ -3,13 +3,11 @@
 import { useState } from 'react';
 
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 
 import { Copy, Edit, MoreHorizontal, Trash2 } from 'lucide-react';
 import { useSession } from 'next-auth/react';
 
 import { Template } from '@documenso/prisma/client';
-import { trpc } from '@documenso/trpc/react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -17,9 +15,9 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from '@documenso/ui/primitives/dropdown-menu';
-import { toast } from '@documenso/ui/primitives/use-toast';
 
 import { DeleteTemplateDialog } from './delete-template-dialog';
+import { DuplicateTemplateDialog } from './duplicate-template-dialog';
 
 export type DataTableActionDropdownProps = {
   row: Template;
@@ -29,36 +27,11 @@ export const DataTableActionDropdown = ({ row }: DataTableActionDropdownProps) =
   const { data: session } = useSession();
 
   const [isDeleteDialogOpen, setDeleteDialogOpen] = useState(false);
-
-  const router = useRouter();
+  const [isDuplicateDialogOpen, setDuplicateDialogOpen] = useState(false);
 
   if (!session) {
     return null;
   }
-
-  const { mutateAsync: duplicateTemplate } = trpc.template.duplicateTemplate.useMutation();
-
-  const onDuplicateButtonClick = async (templateId: number) => {
-    try {
-      await duplicateTemplate({
-        templateId,
-      });
-
-      toast({
-        title: 'Template duplicated',
-        description: 'Your template has been duplicated successfully.',
-        duration: 5000,
-      });
-
-      router.refresh();
-    } catch (err) {
-      toast({
-        title: 'Error',
-        description: 'An error occurred while duplicating template.',
-        variant: 'destructive',
-      });
-    }
-  };
 
   const isOwner = row.userId === session.user.id;
 
@@ -78,7 +51,8 @@ export const DataTableActionDropdown = ({ row }: DataTableActionDropdownProps) =
           </Link>
         </DropdownMenuItem>
 
-        <DropdownMenuItem disabled={!isOwner} onClick={async () => onDuplicateButtonClick(row.id)}>
+        {/* <DropdownMenuItem disabled={!isOwner} onClick={async () => onDuplicateButtonClick(row.id)}> */}
+        <DropdownMenuItem disabled={!isOwner} onClick={() => setDuplicateDialogOpen(true)}>
           <Copy className="mr-2 h-4 w-4" />
           Duplicate
         </DropdownMenuItem>
@@ -88,6 +62,12 @@ export const DataTableActionDropdown = ({ row }: DataTableActionDropdownProps) =
           Delete
         </DropdownMenuItem>
       </DropdownMenuContent>
+
+      <DuplicateTemplateDialog
+        id={row.id}
+        open={isDuplicateDialogOpen}
+        onOpenChange={setDuplicateDialogOpen}
+      />
 
       <DeleteTemplateDialog
         id={row.id}
