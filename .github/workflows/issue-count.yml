@@ -1,0 +1,67 @@
+name: "Issue Count"
+
+on:
+  issue_comment:
+    types: [created]
+
+permissions:
+  issues: write
+
+jobs:
+  countIssues:
+    runs-on: ubuntu-latest
+    env:
+      MY_ENV_VARIABLE: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          
+      - name: Install Octokit
+        run: npm install @octokit/rest@18
+        
+      - name: Parse comment and count issues
+        id: parse-comment
+        uses: actions/github-script@v5
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const { Octokit } = require("@octokit/rest");
+            const octokit = new Octokit({ auth: process.env.GITHUB_TOKEN });
+            
+            const comment = context.payload.comment.body.trim();
+            const regex = /^\/issue-count @(\S+)/;
+            const match = comment.match(regex);
+            
+            if (match) {
+              const username = match[1];
+              console.log(`Username extracted: ${username}`);
+              
+              const { data: issues } = await octokit.issues.listForRepo({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                assignee: username,
+                state: 'open'
+              });
+              
+              const issueCount = issues.length;
+              console.log(`Issue count for ${username}: ${issueCount}`);
+              
+              const issueCommentId = context.payload.comment.id;
+              console.log(`Issue comment ID: ${issueCommentId}`);
+              
+              const issueCountMessage = `@${username} has ${issueCount} open issues assigned.`;
+
+              await octokit.request('POST /repos/{owner}/{repo}/issues/{issue_number}/comments', {
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body: issueCountMessage,
+                headers: {
+                    'Authorization': `token ${{ secrets.GITHUB_TOKEN }}`,
+                }
+            });
+            } else {
+              console.log('No valid username found in the comment');
+            }
