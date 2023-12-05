@@ -18,10 +18,6 @@ export const getFlag = async (
 ): Promise<TFeatureFlagValue> => {
   const requestHeaders = options?.requestHeaders ?? {};
 
-  if (!LOCAL_FEATURE_FLAGS[flag]) {
-    return LOCAL_FEATURE_FLAGS[flag];
-  }
-
   if (!isFeatureFlagEnabled()) {
     return LOCAL_FEATURE_FLAGS[flag] ?? true;
   }
