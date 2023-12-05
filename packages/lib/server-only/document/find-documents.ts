@@ -55,33 +55,24 @@ export const findDocuments = async ({
       OR: [
         {
           userId,
-          deletedAt: {
-            equals: null,
-          },
+          deletedAt: null,
         },
         {
-          status: {
-            not: ExtendedDocumentStatus.DRAFT,
-          },
+          status: ExtendedDocumentStatus.COMPLETED,
           Recipient: {
             some: {
               email: user.email,
             },
           },
-          deletedAt: {
-            equals: null,
-          },
         },
         {
-          status: {
-            not: ExtendedDocumentStatus.DRAFT,
-          },
+          status: ExtendedDocumentStatus.PENDING,
           Recipient: {
             some: {
               email: user.email,
-              signingStatus: SigningStatus.SIGNED,
             },
           },
+          deletedAt: null,
         },
       ],
     }))
@@ -95,22 +86,19 @@ export const findDocuments = async ({
           signingStatus: SigningStatus.NOT_SIGNED,
         },
       },
-      deletedAt: {
-        equals: null,
-      },
+      deletedAt: null,
     }))
     .with(ExtendedDocumentStatus.DRAFT, () => ({
       userId,
       status: ExtendedDocumentStatus.DRAFT,
+      deletedAt: null,
     }))
     .with(ExtendedDocumentStatus.PENDING, () => ({
       OR: [
         {
           userId,
           status: ExtendedDocumentStatus.PENDING,
-          deletedAt: {
-            equals: null,
-          },
+          deletedAt: null,
         },
         {
           status: ExtendedDocumentStatus.PENDING,
@@ -120,6 +108,7 @@ export const findDocuments = async ({
               signingStatus: SigningStatus.SIGNED,
             },
           },
+          deletedAt: null,
         },
       ],
     }))
@@ -128,9 +117,7 @@ export const findDocuments = async ({
         {
           userId,
           status: ExtendedDocumentStatus.COMPLETED,
-          deletedAt: {
-            equals: null,
-          },
+          deletedAt: null,
         },
         {
           status: ExtendedDocumentStatus.COMPLETED,
