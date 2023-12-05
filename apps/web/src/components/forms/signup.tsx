@@ -65,6 +65,7 @@ export const SignUpForm = ({ className }: SignUpFormProps) => {
         callbackUrl: '/',
       });
     } catch (err) {
+      console.error('signup error', err);
       if (err instanceof TRPCClientError && err.data?.code === 'BAD_REQUEST') {
         toast({
           title: 'An error occurred',
