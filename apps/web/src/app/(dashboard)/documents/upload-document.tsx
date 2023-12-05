@@ -10,11 +10,14 @@ import { useSession } from 'next-auth/react';
 
 import { useLimits } from '@documenso/ee/server-only/limits/provider/client';
 import { createDocumentData } from '@documenso/lib/server-only/document-data/create-document-data';
+import { createDocumentThumbnail } from '@documenso/lib/server-only/document-thumbnail/create-document-thumbnail';
 import { putFile } from '@documenso/lib/universal/upload/put-file';
+import { DocumentDataType } from '@documenso/prisma/client';
 import { TRPCClientError } from '@documenso/trpc/client';
 import { trpc } from '@documenso/trpc/react';
 import { cn } from '@documenso/ui/lib/utils';
 import { DocumentDropzone } from '@documenso/ui/primitives/document-dropzone';
+import { LazyPDFViewerNoLoader } from '@documenso/ui/primitives/lazy-pdf-viewer';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
 export type UploadDocumentProps = {
@@ -33,20 +36,39 @@ export const UploadDocument = ({ className }: UploadDocumentProps) => {
 
   const { mutateAsync: createDocument } = trpc.document.createDocument.useMutation();
 
+  const [docData, setDocData] = useState('');
+  const [type, setType] = useState<DocumentDataType>();
+  const [file, setFile] = useState<File>();
+
   const onFileDrop = async (file: File) => {
+    setIsLoading(true);
+
+    const { type, data } = await putFile(file);
+
+    setDocData(data);
+    setFile(file);
+    setType(type);
+  };
+
+  const createDocumentAndThumbnail = async (
+    highResThumbnailBytes: string,
+    lowResThumbnailBytes: string,
+  ) => {
     try {
-      setIsLoading(true);
-
-      const { type, data } = await putFile(file);
-
       const { id: documentDataId } = await createDocumentData({
-        type,
-        data,
+        type: type as DocumentDataType,
+        data: docData,
+      });
+
+      const { id: documentThumbnailId } = await createDocumentThumbnail({
+        highResThumbnailBytes,
+        lowResThumbnailBytes,
       });
 
       const { id } = await createDocument({
-        title: file.name,
+        title: file?.name || '',
         documentDataId,
+        documentThumbnailId,
       });
 
       toast({
@@ -74,6 +96,51 @@ export const UploadDocument = ({ className }: UploadDocumentProps) => {
       }
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const generateThumbnail = async (page: number, canvas: HTMLCanvasElement | null) => {
+    try {
+      if (page !== 1 || !canvas) {
+        await createDocumentAndThumbnail('', '');
+        return;
+      }
+      // For High Resolution
+      const highResTempCanvas = document.createElement('canvas');
+      highResTempCanvas.width = canvas.width * 3;
+      highResTempCanvas.height = canvas.height * 3;
+
+      const highResCtx = highResTempCanvas.getContext('2d');
+      if (highResCtx === null) return;
+
+      // Draw the original canvas onto the temporary canvas
+      highResCtx.drawImage(canvas, 0, 0, highResTempCanvas.width, highResTempCanvas.height);
+
+      // Convert the temporary HTMLCanvasElement to a data URL (in PNG format by default)
+      const highResDataUrl = highResTempCanvas.toDataURL('image/png');
+      console.log(highResDataUrl, 'highResDataUrl');
+
+      // For Low Resolution
+      const lowResTempCanvas = document.createElement('canvas');
+      lowResTempCanvas.width = canvas.width * 0.5;
+      lowResTempCanvas.height = canvas.height * 0.5;
+      const lowResCtx = lowResTempCanvas.getContext('2d');
+      if (lowResCtx === null) return;
+
+      // Draw the original canvas onto the temporary canvas
+      lowResCtx.drawImage(canvas, 0, 0, lowResTempCanvas.width, lowResTempCanvas.height);
+
+      // Convert the temporary HTMLCanvasElement to a data URL (in PNG format by default)
+      const lowResDataUrl = highResTempCanvas.toDataURL('image/png');
+      console.log(lowResDataUrl, 'lowResDataUrl');
+      await createDocumentAndThumbnail(highResDataUrl, lowResDataUrl);
+    } catch (error) {
+      console.log(error);
+      toast({
+        title: 'Error',
+        description: 'An error occurred while uploading your document.',
+        variant: 'destructive',
+      });
     }
   };
 
@@ -118,6 +185,20 @@ export const UploadDocument = ({ className }: UploadDocumentProps) => {
             </Link>
           </div>
         </div>
+      )}
+
+      {!!docData && (
+        <LazyPDFViewerNoLoader
+          className="hidden"
+          documentData={{
+            id: '',
+            data: docData,
+            initialData: docData,
+            type: DocumentDataType.BYTES_64,
+          }}
+          maxPages={1}
+          onPageRender={generateThumbnail}
+        />
       )}
     </div>
   );
