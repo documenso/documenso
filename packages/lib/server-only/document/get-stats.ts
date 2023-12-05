@@ -17,9 +17,7 @@ export const getStats = async ({ user }: GetStatsInput) => {
       },
       where: {
         userId: user.id,
-        deletedAt: {
-          equals: null,
-        },
+        deletedAt: null,
       },
     }),
     prisma.document.groupBy({
@@ -35,9 +33,7 @@ export const getStats = async ({ user }: GetStatsInput) => {
             signingStatus: SigningStatus.NOT_SIGNED,
           },
         },
-        deletedAt: {
-          equals: null,
-        },
+        deletedAt: null,
       },
     }),
     prisma.document.groupBy({
@@ -46,15 +42,27 @@ export const getStats = async ({ user }: GetStatsInput) => {
         _all: true,
       },
       where: {
-        status: {
-          not: ExtendedDocumentStatus.DRAFT,
-        },
-        Recipient: {
-          some: {
-            email: user.email,
-            signingStatus: SigningStatus.SIGNED,
+        OR: [
+          {
+            status: ExtendedDocumentStatus.PENDING,
+            Recipient: {
+              some: {
+                email: user.email,
+                signingStatus: SigningStatus.SIGNED,
+              },
+            },
+            deletedAt: null,
           },
-        },
+          {
+            status: ExtendedDocumentStatus.COMPLETED,
+            Recipient: {
+              some: {
+                email: user.email,
+                signingStatus: SigningStatus.SIGNED,
+              },
+            },
+          },
+        ],
       },
     }),
   ]);
