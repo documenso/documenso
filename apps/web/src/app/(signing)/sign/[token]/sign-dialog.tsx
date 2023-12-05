@@ -13,6 +13,7 @@ export type SignDialogProps = {
   isSubmitting: boolean;
   document: Document;
   fields: Field[];
+  fieldsValidated: () => void | Promise<void>;
   onSignatureComplete: () => void | Promise<void>;
 };
 
@@ -20,6 +21,7 @@ export const SignDialog = ({
   isSubmitting,
   document,
   fields,
+  fieldsValidated,
   onSignatureComplete,
 }: SignDialogProps) => {
   const [showDialog, setShowDialog] = useState(false);
@@ -27,13 +29,13 @@ export const SignDialog = ({
   const isComplete = fields.every((field) => field.inserted);
 
   return (
-    <Dialog open={showDialog} onOpenChange={setShowDialog}>
+    <Dialog open={showDialog && isComplete} onOpenChange={isComplete ? setShowDialog : undefined}>
       <DialogTrigger asChild>
         <Button
           className="w-full"
           type="button"
           size="lg"
-          disabled={!isComplete}
+          onClick={fieldsValidated}
           loading={isSubmitting}
         >
           Complete
