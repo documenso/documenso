@@ -9,7 +9,6 @@ on:
 
 jobs:
   analyze:
-    if: github.repository == 'documenso/documenso'
     name: Analyze
     runs-on: ubuntu-latest
     permissions:
