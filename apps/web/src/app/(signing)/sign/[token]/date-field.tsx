@@ -6,8 +6,8 @@ import { useRouter } from 'next/navigation';
 
 import { Loader } from 'lucide-react';
 
-import { Recipient } from '@documenso/prisma/client';
-import { FieldWithSignature } from '@documenso/prisma/types/field-with-signature';
+import type { Recipient } from '@documenso/prisma/client';
+import type { FieldWithSignature } from '@documenso/prisma/types/field-with-signature';
 import { trpc } from '@documenso/trpc/react';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
@@ -83,7 +83,12 @@ export const DateField = ({ field, recipient }: DateFieldProps) => {
       )}
 
       {!field.inserted && (
-        <p className="group-hover:text-primary text-muted-foreground text-lg duration-200">Date</p>
+        <p
+          data-field-id={`${field.id}`}
+          className="group-hover:text-primary text-muted-foreground text-lg duration-200"
+        >
+          Date
+        </p>
       )}
 
       {field.inserted && (

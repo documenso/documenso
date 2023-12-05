@@ -6,8 +6,8 @@ import { useRouter } from 'next/navigation';
 
 import { Loader } from 'lucide-react';
 
-import { Recipient } from '@documenso/prisma/client';
-import { FieldWithSignature } from '@documenso/prisma/types/field-with-signature';
+import type { Recipient } from '@documenso/prisma/client';
+import type { FieldWithSignature } from '@documenso/prisma/types/field-with-signature';
 import { trpc } from '@documenso/trpc/react';
 import { Button } from '@documenso/ui/primitives/button';
 import { Dialog, DialogContent, DialogFooter, DialogTitle } from '@documenso/ui/primitives/dialog';
@@ -106,7 +106,12 @@ export const NameField = ({ field, recipient }: NameFieldProps) => {
       )}
 
       {!field.inserted && (
-        <p className="group-hover:text-primary text-muted-foreground text-lg duration-200">Name</p>
+        <p
+          data-field-id={`${field.id}`}
+          className="group-hover:text-primary text-muted-foreground text-lg duration-200"
+        >
+          Name
+        </p>
       )}
 
       {field.inserted && <p className="text-muted-foreground duration-200">{field.customText}</p>}

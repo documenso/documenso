@@ -135,7 +135,10 @@ export const SignatureField = ({ field, recipient }: SignatureFieldProps) => {
       )}
 
       {state === 'empty' && (
-        <p className="group-hover:text-primary font-signature text-muted-foreground text-lg duration-200 sm:text-xl md:text-2xl lg:text-3xl">
+        <p
+          data-field-id={`${field.id}`}
+          className="group-hover:text-primary font-signature text-muted-foreground text-lg duration-200 sm:text-xl md:text-2xl lg:text-3xl"
+        >
           Signature
         </p>
       )}
