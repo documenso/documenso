@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
 import { Loader } from 'lucide-react';
+import { useSession } from 'next-auth/react';
 
 import { useLimits } from '@documenso/ee/server-only/limits/provider/client';
 import { useAnalytics } from '@documenso/lib/client-only/hooks/use-analytics';
@@ -19,12 +20,12 @@ import { useToast } from '@documenso/ui/primitives/use-toast';
 
 export type UploadDocumentProps = {
   className?: string;
-  userId?: number;
 };
 
-export const UploadDocument = ({ className, userId }: UploadDocumentProps) => {
+export const UploadDocument = ({ className }: UploadDocumentProps) => {
   const router = useRouter();
   const analytics = useAnalytics();
+  const { data: session } = useSession();
 
   const { toast } = useToast();
 
@@ -57,7 +58,7 @@ export const UploadDocument = ({ className, userId }: UploadDocumentProps) => {
       });
 
       analytics.capture('App: Document Uploaded', {
-        userId,
+        userId: session?.user.id,
         documentId: id,
         timestamp: new Date().toISOString(),
       });
