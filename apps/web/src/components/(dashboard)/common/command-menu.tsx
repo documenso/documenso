@@ -4,14 +4,19 @@ import { useCallback, useMemo, useState } from 'react';
 
 import { useRouter } from 'next/navigation';
 
+import { zodResolver } from '@hookform/resolvers/zod';
 import { Monitor, Moon, Sun } from 'lucide-react';
 import { useTheme } from 'next-themes';
+import { flushSync } from 'react-dom';
+import { useForm } from 'react-hook-form';
 import { useHotkeys } from 'react-hotkeys-hook';
+import { z } from 'zod';
 
 import {
   DOCUMENTS_PAGE_SHORTCUT,
   SETTINGS_PAGE_SHORTCUT,
 } from '@documenso/lib/constants/keyboard-shortcuts';
+import { trpc } from '@documenso/trpc/react';
 import {
   CommandDialog,
   CommandEmpty,
@@ -45,6 +50,12 @@ export type CommandMenuProps = {
   onOpenChange?: (_open: boolean) => void;
 };
 
+export const ZSearchForm = z.object({
+  user_query: z.string().min(1),
+});
+
+export type TSearchForm = z.infer<typeof ZSearchForm>;
+
 export function CommandMenu({ open, onOpenChange }: CommandMenuProps) {
   const { setTheme } = useTheme();
   const router = useRouter();
@@ -52,6 +63,7 @@ export function CommandMenu({ open, onOpenChange }: CommandMenuProps) {
   const [isOpen, setIsOpen] = useState(() => open ?? false);
   const [search, setSearch] = useState('');
   const [pages, setPages] = useState<string[]>([]);
+  const [searchResults, setSearchResults] = useState<string[]>([]);
 
   const currentPage = pages[pages.length - 1];
 
@@ -111,17 +123,54 @@ export function CommandMenu({ open, onOpenChange }: CommandMenuProps) {
       setPages((pages) => pages.slice(0, -1));
     }
   };
+  const searchForm = useForm<TSearchForm>({
+    defaultValues: {
+      user_query: '',
+    },
+    resolver: zodResolver(ZSearchForm),
+  });
 
+  const { mutateAsync: runSemSearch, data: runSemSearchData } = trpc.semSearch.run.useMutation();
+
+  const onSearchChange = async (user_query: string) => {
+    setSearch(user_query);
+    console.log('user_query:', user_query);
+
+    if (user_query.length >= 5) {
+      // Define MIN_SEARCH_LENGTH as per your requirement
+      try {
+        const results = await runSemSearch({ user_query });
+        console.log('I AM HERE 2');
+        if (results) {
+          setSearchResults(results);
+        } else {
+          setSearchResults([]);
+        }
+        return results;
+
+        // Handle the search results
+        // For example, you can redirect to a results page or update the state to display the results
+      } catch (error) {
+        // Handle error
+      }
+    }
+  };
+  console.log(searchResults);
   return (
     <CommandDialog commandProps={{ onKeyDown: handleKeyDown }} open={open} onOpenChange={setOpen}>
       <CommandInput
         value={search}
-        onValueChange={setSearch}
+        onValueChange={(e) => onSearchChange(e)}
         placeholder="Type a command or search..."
       />
 
       <CommandList>
-        <CommandEmpty>No results found.</CommandEmpty>
+        {searchResults && searchResults.length > 0 ? (
+          searchResults.map((title, index) => <CommandItem key={index}>{title}</CommandItem>)
+        ) : (
+          <CommandEmpty>No results found.</CommandEmpty>
+        )}
+
         {!currentPage && (
           <>
             <CommandGroup heading="Documents">

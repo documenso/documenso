@@ -11,6 +11,7 @@ import { useSession } from 'next-auth/react';
 import { useLimits } from '@documenso/ee/server-only/limits/provider/client';
 import { createDocumentData } from '@documenso/lib/server-only/document-data/create-document-data';
 import { putFile } from '@documenso/lib/universal/upload/put-file';
+import { User } from '@documenso/prisma/client';
 import { TRPCClientError } from '@documenso/trpc/client';
 import { trpc } from '@documenso/trpc/react';
 import { cn } from '@documenso/ui/lib/utils';
@@ -19,9 +20,10 @@ import { useToast } from '@documenso/ui/primitives/use-toast';
 
 export type UploadDocumentProps = {
   className?: string;
+  user: User;
 };
 
-export const UploadDocument = ({ className }: UploadDocumentProps) => {
+export const UploadDocument = ({ className, user }: UploadDocumentProps) => {
   const router = useRouter();
   const { data: session } = useSession();
 
@@ -81,7 +83,7 @@ export const UploadDocument = ({ className }: UploadDocumentProps) => {
     <div className={cn('relative', className)}>
       <DocumentDropzone
         className="min-h-[40vh]"
-        disabled={remaining.documents === 0 || !session?.user.emailVerified}
+        disabled={remaining.documents === 0 || !session?.user.emailVerified} // Changed This
         onDrop={onFileDrop}
       />
 

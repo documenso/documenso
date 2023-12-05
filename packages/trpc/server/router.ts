@@ -4,6 +4,7 @@ import { documentRouter } from './document-router/router';
 import { fieldRouter } from './field-router/router';
 import { profileRouter } from './profile-router/router';
 import { recipientRouter } from './recipient-router/router';
+import { semSearchRouter } from './sem-search-router/router';
 import { shareLinkRouter } from './share-link-router/router';
 import { singleplayerRouter } from './singleplayer-router/router';
 import { router } from './trpc';
@@ -19,6 +20,7 @@ export const appRouter = router({
   shareLink: shareLinkRouter,
   singleplayer: singleplayerRouter,
   twoFactorAuthentication: twoFactorAuthenticationRouter,
+  semSearch: semSearchRouter,
 });
 
 export type AppRouter = typeof appRouter;
