@@ -62,7 +62,7 @@ export default async function SigningPage({ params: { token } }: SigningPageProp
   if (document.deletedAt) {
     return (
       <NoLongerAvailable
-        isLoggedIn={!!user}
+        document={document}
         recipientName={recipient.name}
         recipientSignature={recipientSignature}
       />

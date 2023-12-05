@@ -24,7 +24,7 @@ export const TemplateDocumentCancel = ({
         </Text>
 
         <Text className="my-1 text-center text-base text-slate-400">
-          No need to need to sign it anymore.
+          You don't need to sign it anymore.
         </Text>
       </Section>
     </>

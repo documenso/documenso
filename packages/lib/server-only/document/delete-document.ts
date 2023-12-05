@@ -32,13 +32,13 @@ export const deleteDocument = async ({ id, userId, status }: DeleteDocumentOptio
 
     const document = await prisma.document.findUnique({
       where: {
-        id: id,
+        id,
+        status,
         userId,
       },
       include: {
         Recipient: true,
         documentMeta: true,
-        User: true,
       },
     });
 
@@ -49,8 +49,6 @@ export const deleteDocument = async ({ id, userId, status }: DeleteDocumentOptio
     if (document.Recipient.length > 0) {
       await Promise.all(
         document.Recipient.map(async (recipient) => {
-          const { email, name } = recipient;
-
           const assetBaseUrl = process.env.NEXT_PUBLIC_WEBAPP_URL || 'http://localhost:3000';
 
           const template = createElement(DocumentCancelTemplate, {
@@ -62,14 +60,14 @@ export const deleteDocument = async ({ id, userId, status }: DeleteDocumentOptio
 
           await mailer.sendMail({
             to: {
-              address: email,
-              name,
+              address: recipient.email,
+              name: recipient.name,
             },
             from: {
               name: FROM_NAME,
               address: FROM_ADDRESS,
             },
-            subject: 'Docuement cancelled',
+            subject: 'Document Cancelled',
             html: render(template),
             text: render(template, { plainText: true }),
           });
