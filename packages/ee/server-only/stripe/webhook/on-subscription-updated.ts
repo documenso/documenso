@@ -1,6 +1,6 @@
 import { match } from 'ts-pattern';
 
-import { Stripe } from '@documenso/lib/server-only/stripe';
+import type { Stripe } from '@documenso/lib/server-only/stripe';
 import { prisma } from '@documenso/prisma';
 import { SubscriptionStatus } from '@documenso/prisma/client';
 
@@ -23,7 +23,7 @@ export const onSubscriptionUpdated = async ({
 
   await prisma.subscription.upsert({
     where: {
-      customerId,
+      planId: subscription.id,
     },
     create: {
       customerId,
