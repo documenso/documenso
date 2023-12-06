@@ -1,4 +1,5 @@
 import { prisma } from '@documenso/prisma';
+import { DocumentStatus } from '@documenso/prisma/client';
 
 export type SearchDocumentsWithKeywordOptions = {
   query: string;
@@ -26,9 +27,7 @@ export const searchDocumentsWithKeyword = async ({
             mode: 'insensitive',
           },
           userId: userId,
-          deletedAt: {
-            equals: null,
-          },
+          deletedAt: null,
         },
         {
           Recipient: {
@@ -40,11 +39,10 @@ export const searchDocumentsWithKeyword = async ({
             },
           },
           userId: userId,
-          deletedAt: {
-            equals: null,
-          },
+          deletedAt: null,
         },
         {
+          status: DocumentStatus.COMPLETED,
           Recipient: {
             some: {
               email: user.email,
@@ -54,6 +52,19 @@ export const searchDocumentsWithKeyword = async ({
             contains: query,
             mode: 'insensitive',
           },
+        },
+        {
+          status: DocumentStatus.PENDING,
+          Recipient: {
+            some: {
+              email: user.email,
+            },
+          },
+          title: {
+            contains: query,
+            mode: 'insensitive',
+          },
+          deletedAt: null,
         },
       ],
     },

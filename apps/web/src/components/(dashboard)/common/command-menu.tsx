@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 
 import { useRouter } from 'next/navigation';
 
@@ -14,7 +14,6 @@ import {
 } from '@documenso/lib/constants/keyboard-shortcuts';
 import { trpc as trpcReact } from '@documenso/trpc/react';
 import {
-  Command,
   CommandDialog,
   CommandEmpty,
   CommandGroup,
@@ -62,32 +61,28 @@ export function CommandMenu({ open, onOpenChange }: CommandMenuProps) {
   const [search, setSearch] = useState('');
   const [pages, setPages] = useState<string[]>([]);
 
-  // const [searchResults, setSearchResults] = useState<
-  //   { label: string; path: string; value: string }[]
-  // >([]);
-
-  const { data: searchDocuments, isLoading: isSearchingDocuments } =
+  const { data: searchDocumentsData, isLoading: isSearchingDocuments } =
     trpcReact.document.searchDocuments.useQuery(
       {
         query: search,
       },
-      // {
-      //   enabled: search !== '',
-      // },
+      {
+        keepPreviousData: true,
+      },
     );
 
   const searchResults = useMemo(() => {
-    if (!searchDocuments) {
+    if (!searchDocumentsData) {
       return [];
     }
 
-    return searchDocuments.map((document) => ({
+    return searchDocumentsData.map((document) => ({
       label: document.title,
       path: `/documents/${document.id}`,
       value:
         document.title + ' ' + document.Recipient.map((recipient) => recipient.email).join(' '),
     }));
-  }, [searchDocuments]);
+  }, [searchDocumentsData]);
 
   const currentPage = pages[pages.length - 1];
 
