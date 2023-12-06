@@ -60,7 +60,7 @@ model VerificationToken {
   expires    DateTime
   createdAt  DateTime @default(now())
   userId     Int
-  user       User     @relation(fields: [userId], references: [id])
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 enum SubscriptionStatus {
@@ -135,6 +135,7 @@ model Document {
   createdAt      DateTime            @default(now())
   updatedAt      DateTime            @default(now()) @updatedAt
   completedAt    DateTime?
+  deletedAt      DateTime?
 
   @@unique([documentDataId])
   @@index([userId])

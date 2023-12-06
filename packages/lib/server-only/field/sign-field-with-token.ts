@@ -37,6 +37,10 @@ export const signFieldWithToken = async ({
     throw new Error(`Document ${document.id} has already been completed`);
   }
 
+  if (document.deletedAt) {
+    throw new Error(`Document ${document.id} has been deleted`);
+  }
+
   if (recipient?.signingStatus === SigningStatus.SIGNED) {
     throw new Error(`Recipient ${recipient.id} has already signed`);
   }
