@@ -86,7 +86,7 @@ const createDraftDocument = async (sender: User, recipients: User[]) => {
       data: {
         email: String(recipient.email),
         name: String(recipient.name),
-        token: `token-${index}`,
+        token: `draft-token-${index}`,
         readStatus: ReadStatus.NOT_OPENED,
         sendStatus: SendStatus.NOT_SENT,
         signingStatus: SigningStatus.NOT_SIGNED,
@@ -139,10 +139,10 @@ const createPendingDocument = async (sender: User, recipients: User[]) => {
       data: {
         email: String(recipient.email),
         name: String(recipient.name),
-        token: `token-${index}`,
+        token: `pending-token-${index}`,
         readStatus: ReadStatus.OPENED,
         sendStatus: SendStatus.SENT,
-        signingStatus: index === 0 ? SigningStatus.SIGNED : SigningStatus.NOT_SIGNED,
+        signingStatus: SigningStatus.SIGNED,
         signedAt: new Date(),
         Document: {
           connect: {
@@ -192,7 +192,7 @@ const createCompletedDocument = async (sender: User, recipients: User[]) => {
       data: {
         email: String(recipient.email),
         name: String(recipient.name),
-        token: `token-${index}`,
+        token: `completed-token-${index}`,
         readStatus: ReadStatus.OPENED,
         sendStatus: SendStatus.SENT,
         signingStatus: SigningStatus.SIGNED,

@@ -25,6 +25,8 @@ test('[PR-711]: seeded documents should be visible', async ({ page }) => {
   await page.waitForURL('/signin');
 
   for (const recipient of recipients) {
+    await page.goto('/signin');
+
     await page.getByLabel('Email').fill(recipient.email);
     await page.getByLabel('Password', { exact: true }).fill(recipient.password);
     await page.getByRole('button', { name: 'Sign In' }).click();
@@ -79,6 +81,8 @@ test('[PR-711]: deleting a completed document should not remove it from recipien
   await page.waitForURL('/signin');
 
   for (const recipient of recipients) {
+    await page.goto('/signin');
+
     // sign in
     await page.getByLabel('Email').fill(recipient.email);
     await page.getByLabel('Password', { exact: true }).fill(recipient.password);
@@ -87,6 +91,11 @@ test('[PR-711]: deleting a completed document should not remove it from recipien
     await page.waitForURL('/documents');
 
     await expect(page.getByRole('link', { name: 'Document 1 - Completed' })).toBeVisible();
+
+    await page.goto(`/sign/completed-token-${recipients.indexOf(recipient)}`);
+    await expect(page.getByText('Everyone has signed').nth(0)).toBeVisible();
+
+    await page.goto('/documents');
 
     await page.getByTitle('Profile Dropdown').click();
     await page.getByRole('menuitem', { name: 'Sign Out' }).click();
@@ -97,6 +106,12 @@ test('[PR-711]: deleting a completed document should not remove it from recipien
 
 test('[PR-711]: deleting a pending document should remove it from recipients', async ({ page }) => {
   const [sender, ...recipients] = TEST_USERS;
+
+  for (const recipient of recipients) {
+    await page.goto(`/sign/pending-token-${recipients.indexOf(recipient)}`);
+
+    await expect(page.getByText('Waiting for others to sign').nth(0)).toBeVisible();
+  }
 
   await page.goto('/signin');
 
@@ -124,6 +139,8 @@ test('[PR-711]: deleting a pending document should remove it from recipients', a
   await page.waitForURL('/signin');
 
   for (const recipient of recipients) {
+    await page.goto('/signin');
+
     // sign in
     await page.getByLabel('Email').fill(recipient.email);
     await page.getByLabel('Password', { exact: true }).fill(recipient.password);
@@ -132,6 +149,11 @@ test('[PR-711]: deleting a pending document should remove it from recipients', a
     await page.waitForURL('/documents');
 
     await expect(page.getByRole('link', { name: 'Document 1 - Pending' })).not.toBeVisible();
+
+    await page.goto(`/sign/pending-token-${recipients.indexOf(recipient)}`);
+    await expect(page.getByText(/document.*cancelled/i).nth(0)).toBeVisible();
+
+    await page.goto('/documents');
 
     await page.getByTitle('Profile Dropdown').click();
     await page.getByRole('menuitem', { name: 'Sign Out' }).click();
