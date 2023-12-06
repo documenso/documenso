@@ -133,9 +133,7 @@ const router = createNextRoute(contract, {
       const match = body.toString().match(regexPattern);
       const documentTitle = match?.[1] ?? 'Untitled document';
 
-      console.log(body.toString());
-
-      const file = new Blob([body.toString()], {
+      const file = new Blob([body], {
         type: 'application/pdf',
       });
 
