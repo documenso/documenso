@@ -15,6 +15,7 @@ import { FieldToolTip } from '@documenso/ui/components/field/field-tooltip';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
 import { Card, CardContent } from '@documenso/ui/primitives/card';
+import { Combobox } from '@documenso/ui/primitives/combobox';
 import { Input } from '@documenso/ui/primitives/input';
 import { Label } from '@documenso/ui/primitives/label';
 import {
@@ -153,26 +154,14 @@ export const SigningForm = ({ document, recipient, fields }: SigningFormProps) =
               )}
 
               {hasDateField && (
-                <div>
+                <div className="flex flex-col">
                   <Label htmlFor="time-format">Time Format</Label>
 
-                  <Select
-                    onValueChange={(value) => {
-                      setTimeFormat(value);
-                    }}
-                    defaultValue={timeFormat}
-                  >
-                    <SelectTrigger className="bg-background mt-2">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {TIME_ZONES.map((zone) => (
-                        <SelectItem key={zone} value={zone}>
-                          {zone}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <Combobox
+                    listValues={TIME_ZONES}
+                    onChange={(value: string) => setTimeFormat(value)}
+                    selectedValue={timeFormat}
+                  />
                 </div>
               )}
 

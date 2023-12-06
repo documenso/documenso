@@ -1,7 +1,8 @@
 import * as React from 'react';
 
-import { Check, ChevronDown } from 'lucide-react';
+import { Check, ChevronsUpDown } from 'lucide-react';
 
+import { Role } from '@documenso/prisma/client';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
 import {
@@ -15,21 +16,30 @@ import { Popover, PopoverContent, PopoverTrigger } from '@documenso/ui/primitive
 
 type ComboboxProps = {
   listValues: string[];
-  onChange: (_value: string) => void;
-  selectedValue: string | null;
+  onChange: (_values: string[]) => void;
 };
 
-const Combobox = ({ listValues, onChange, selectedValue }: ComboboxProps) => {
+const MultiSelectCombobox = ({ listValues, onChange }: ComboboxProps) => {
   const [open, setOpen] = React.useState(false);
-  const [selectedValueLocal, setSelectedValueLocal] = React.useState<string | null>(selectedValue);
+  const [selectedValues, setSelectedValues] = React.useState<string[]>([]);
+  const dbRoles = Object.values(Role);
 
   React.useEffect(() => {
-    setSelectedValueLocal(selectedValue);
-  }, [selectedValue]);
+    setSelectedValues(listValues);
+  }, [listValues]);
+
+  const allRoles = [...new Set([...dbRoles, ...selectedValues])];
 
   const handleSelect = (currentValue: string) => {
-    setSelectedValueLocal(currentValue === selectedValueLocal ? null : currentValue);
-    onChange(currentValue === selectedValueLocal ? '' : currentValue);
+    let newSelectedValues;
+    if (selectedValues.includes(currentValue)) {
+      newSelectedValues = selectedValues.filter((value) => value !== currentValue);
+    } else {
+      newSelectedValues = [...selectedValues, currentValue];
+    }
+
+    setSelectedValues(newSelectedValues);
+    onChange(newSelectedValues);
     setOpen(false);
   };
 
@@ -40,28 +50,23 @@ const Combobox = ({ listValues, onChange, selectedValue }: ComboboxProps) => {
           variant="outline"
           role="combobox"
           aria-expanded={open}
-          className="mb-2 mt-2 w-full justify-between"
+          className="w-[200px] justify-between"
         >
-          {selectedValueLocal ? selectedValueLocal : 'Select Time Zone'}
-          <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+          {selectedValues.length > 0 ? selectedValues.join(', ') : 'Select values...'}
+          <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent
-        className="w-full justify-normal p-0"
-        side="bottom"
-        sideOffset={8}
-        align="start"
-      >
+      <PopoverContent className="w-[200px] p-0">
         <Command>
-          <CommandInput placeholder={selectedValueLocal || 'Select Time Zone'} />
+          <CommandInput placeholder={selectedValues.join(', ')} />
           <CommandEmpty>No value found.</CommandEmpty>
           <CommandGroup>
-            {listValues.map((value: string, i: number) => (
+            {allRoles.map((value: string, i: number) => (
               <CommandItem key={i} onSelect={() => handleSelect(value)}>
                 <Check
                   className={cn(
                     'mr-2 h-4 w-4',
-                    selectedValueLocal === value ? 'opacity-100' : 'opacity-0',
+                    selectedValues.includes(value) ? 'opacity-100' : 'opacity-0',
                   )}
                 />
                 {value}
@@ -74,4 +79,4 @@ const Combobox = ({ listValues, onChange, selectedValue }: ComboboxProps) => {
   );
 };
 
-export { Combobox };
+export { MultiSelectCombobox };
