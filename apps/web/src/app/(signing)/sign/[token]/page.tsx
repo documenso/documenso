@@ -57,7 +57,7 @@ export default async function SigningPage({ params: { token } }: SigningPageProp
     redirect(`/sign/${token}/complete`);
   }
 
-  const recipientSignature = (await getRecipientSignatures({ recipientId: recipient.id }))[0];
+  const [recipientSignature] = await getRecipientSignatures({ recipientId: recipient.id });
 
   if (document.deletedAt) {
     return (

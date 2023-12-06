@@ -31,6 +31,7 @@ const FOOTER_LINKS = [
   { href: 'https://status.documenso.com', text: 'Status', target: '_blank' },
   { href: 'mailto:support@documenso.com', text: 'Support', target: '_blank' },
   { href: '/oss-friends', text: 'OSS Friends' },
+  { href: '/careers', text: 'Careers' },
   { href: '/privacy', text: 'Privacy' },
 ];
 
