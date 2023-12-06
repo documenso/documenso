@@ -87,12 +87,7 @@ export const EmailField = ({ field, recipient }: EmailFieldProps) => {
       )}
 
       {!field.inserted && (
-        <p
-          data-field-id={`${field.id}`}
-          className="group-hover:text-primary text-muted-foreground text-lg duration-200"
-        >
-          Email
-        </p>
+        <p className="group-hover:text-primary text-muted-foreground text-lg duration-200">Email</p>
       )}
 
       {field.inserted && <p className="text-muted-foreground duration-200">{field.customText}</p>}

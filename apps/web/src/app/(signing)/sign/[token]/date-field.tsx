@@ -83,12 +83,7 @@ export const DateField = ({ field, recipient }: DateFieldProps) => {
       )}
 
       {!field.inserted && (
-        <p
-          data-field-id={`${field.id}`}
-          className="group-hover:text-primary text-muted-foreground text-lg duration-200"
-        >
-          Date
-        </p>
+        <p className="group-hover:text-primary text-muted-foreground text-lg duration-200">Date</p>
       )}
 
       {field.inserted && (

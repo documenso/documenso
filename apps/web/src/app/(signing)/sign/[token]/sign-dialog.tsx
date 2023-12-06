@@ -1,8 +1,14 @@
 import { useState } from 'react';
 
+import { validateFieldsInserted } from '@documenso/lib/utils/fields';
 import type { Document, Field } from '@documenso/prisma/client';
 import { Button } from '@documenso/ui/primitives/button';
-import { Dialog, DialogContent, DialogFooter } from '@documenso/ui/primitives/dialog';
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogTrigger,
+} from '@documenso/ui/primitives/dialog';
 
 export type SignDialogProps = {
   isSubmitting: boolean;
@@ -21,40 +27,21 @@ export const SignDialog = ({
 
   const isComplete = fields.every((field) => field.inserted);
 
-  const onComplete = () => {
-    if (!isComplete) {
-      const fieldToScroll = fields.find((field) => !field.inserted);
-      if (fieldToScroll) {
-        scrollToField(fieldToScroll.id);
-      }
-    } else {
-      setShowDialog(true);
-    }
-  };
-
-  const scrollToField = (fieldId: number) => {
-    const fieldNode = window.document.querySelector(`p[data-field-id='${fieldId}']`);
-    if (fieldNode) {
-      fieldNode.scrollIntoView({
-        behavior: 'smooth',
-        block: 'center',
-        inline: 'center',
-      });
-    }
-  };
-
   return (
-    <Dialog open={showDialog} onOpenChange={setShowDialog}>
-      <Button
-        className="w-full"
-        type="button"
-        size="lg"
-        // disabled={!isComplete}
-        loading={isSubmitting}
-        onClick={onComplete}
-      >
-        Complete
-      </Button>
+    <Dialog open={isComplete && showDialog} onOpenChange={setShowDialog}>
+      <DialogTrigger asChild>
+        <Button
+          className="w-full"
+          type="button"
+          size="lg"
+          // disabled={!isComplete}
+          loading={isSubmitting}
+          onClick={() => validateFieldsInserted(fields)}
+        >
+          {' '}
+          {isComplete ? 'Complete' : 'Skip to next field'}
+        </Button>
+      </DialogTrigger>
       <DialogContent>
         <div className="text-center">
           <div className="text-xl font-semibold text-neutral-800">Sign Document</div>
