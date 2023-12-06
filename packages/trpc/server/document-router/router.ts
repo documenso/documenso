@@ -8,6 +8,7 @@ import { duplicateDocumentById } from '@documenso/lib/server-only/document/dupli
 import { getDocumentById } from '@documenso/lib/server-only/document/get-document-by-id';
 import { getDocumentAndSenderByToken } from '@documenso/lib/server-only/document/get-document-by-token';
 import { resendDocument } from '@documenso/lib/server-only/document/resend-document';
+import { searchDocumentsWithKeyword } from '@documenso/lib/server-only/document/search-documents-with-keyword';
 import { sendDocument } from '@documenso/lib/server-only/document/send-document';
 import { updateTitle } from '@documenso/lib/server-only/document/update-title';
 import { setFieldsForDocument } from '@documenso/lib/server-only/field/set-fields-for-document';
@@ -20,6 +21,7 @@ import {
   ZGetDocumentByIdQuerySchema,
   ZGetDocumentByTokenQuerySchema,
   ZResendDocumentMutationSchema,
+  ZSearchDocumentsMutationSchema,
   ZSendDocumentMutationSchema,
   ZSetFieldsForDocumentMutationSchema,
   ZSetRecipientsForDocumentMutationSchema,
@@ -237,6 +239,25 @@ export const documentRouter = router({
         throw new TRPCError({
           code: 'BAD_REQUEST',
           message: 'We are unable to duplicate this document. Please try again later.',
+        });
+      }
+    }),
+
+  searchDocuments: authenticatedProcedure
+    .input(ZSearchDocumentsMutationSchema)
+    .query(async ({ input, ctx }) => {
+      const { query } = input;
+
+      try {
+        const documents = await searchDocumentsWithKeyword({
+          query,
+          userId: ctx.user.id,
+        });
+        return documents;
+      } catch (error) {
+        throw new TRPCError({
+          code: 'BAD_REQUEST',
+          message: 'We are unable to search for documents. Please try again later.',
         });
       }
     }),
