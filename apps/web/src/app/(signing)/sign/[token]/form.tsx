@@ -49,8 +49,8 @@ export const SigningForm = ({ document, recipient, fields }: SigningFormProps) =
     setSignature,
     dateFormat,
     setDateFormat,
-    timeFormat,
-    setTimeFormat,
+    timeZone,
+    setTimeZone,
   } = useRequiredSigningContext();
 
   const [validateUninsertedFields, setValidateUninsertedFields] = useState(false);
@@ -106,7 +106,11 @@ export const SigningForm = ({ document, recipient, fields }: SigningFormProps) =
         disabled={isSubmitting}
         className={cn('-mx-2 flex flex-1 flex-col overflow-hidden px-2')}
       >
-        <div className={cn('flex flex-1 flex-col')}>
+        <div
+          className={cn(
+            'custom-scrollbar -mx-2 flex flex-1 flex-col overflow-y-auto overflow-x-hidden px-2',
+          )}
+        >
           <h3 className="text-foreground text-2xl font-semibold">Sign Document</h3>
 
           <p className="text-muted-foreground mt-2 text-sm">
@@ -155,12 +159,12 @@ export const SigningForm = ({ document, recipient, fields }: SigningFormProps) =
 
               {hasDateField && (
                 <div className="flex flex-col">
-                  <Label htmlFor="time-format">Time Format</Label>
+                  <Label htmlFor="time-zone">Time Zone</Label>
 
                   <Combobox
                     listValues={TIME_ZONES}
-                    onChange={(value: string) => setTimeFormat(value)}
-                    selectedValue={timeFormat}
+                    onChange={(value: string) => setTimeZone(value)}
+                    selectedValue={timeZone}
                   />
                 </div>
               )}
