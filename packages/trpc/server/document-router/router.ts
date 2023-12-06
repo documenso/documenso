@@ -3,7 +3,7 @@ import { TRPCError } from '@trpc/server';
 import { getServerLimits } from '@documenso/ee/server-only/limits/server';
 import { upsertDocumentMeta } from '@documenso/lib/server-only/document-meta/upsert-document-meta';
 import { createDocument } from '@documenso/lib/server-only/document/create-document';
-import { deleteDraftDocument } from '@documenso/lib/server-only/document/delete-draft-document';
+import { deleteDocument } from '@documenso/lib/server-only/document/delete-document';
 import { duplicateDocumentById } from '@documenso/lib/server-only/document/duplicate-document-by-id';
 import { getDocumentById } from '@documenso/lib/server-only/document/get-document-by-id';
 import { getDocumentAndSenderByToken } from '@documenso/lib/server-only/document/get-document-by-token';
@@ -97,15 +97,15 @@ export const documentRouter = router({
       }
     }),
 
-  deleteDraftDocument: authenticatedProcedure
+  deleteDocument: authenticatedProcedure
     .input(ZDeleteDraftDocumentMutationSchema)
     .mutation(async ({ input, ctx }) => {
       try {
-        const { id } = input;
+        const { id, status } = input;
 
         const userId = ctx.user.id;
 
-        return await deleteDraftDocument({ id, userId });
+        return await deleteDocument({ id, userId, status });
       } catch (err) {
         console.error(err);
 

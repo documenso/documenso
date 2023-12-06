@@ -20,7 +20,7 @@ import { LuGithub } from 'react-icons/lu';
 import { useFeatureFlags } from '@documenso/lib/client-only/providers/feature-flag';
 import { isAdmin } from '@documenso/lib/next-auth/guards/is-admin';
 import { recipientInitials } from '@documenso/lib/utils/recipient-formatter';
-import { User } from '@documenso/prisma/client';
+import type { User } from '@documenso/prisma/client';
 import { Avatar, AvatarFallback } from '@documenso/ui/primitives/avatar';
 import { Button } from '@documenso/ui/primitives/button';
 import {
@@ -56,7 +56,11 @@ export const ProfileDropdown = ({ user }: ProfileDropdownProps) => {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" className="relative h-10 w-10 rounded-full">
+        <Button
+          variant="ghost"
+          title="Profile Dropdown"
+          className="relative h-10 w-10 rounded-full"
+        >
           <Avatar className="h-10 w-10">
             <AvatarFallback>{avatarFallback}</AvatarFallback>
           </Avatar>
