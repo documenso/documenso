@@ -19,25 +19,28 @@ enum Role {
 }
 
 model User {
-  id                 Int                  @id @default(autoincrement())
-  name               String?
-  email              String               @unique
-  emailVerified      DateTime?
-  password           String?
-  source             String?
-  signature          String?
-  createdAt          DateTime             @default(now())
-  updatedAt          DateTime             @default(now()) @updatedAt
-  lastSignedIn       DateTime             @default(now())
-  roles              Role[]               @default([USER])
-  identityProvider   IdentityProvider     @default(DOCUMENSO)
-  accounts           Account[]
-  sessions           Session[]
-  Document           Document[]
-  Subscription       Subscription?
-  PasswordResetToken PasswordResetToken[]
-  VerificationToken  VerificationToken[]
-  ApiToken           ApiToken[]
+  id                   Int                  @id @default(autoincrement())
+  name                 String?
+  email                String               @unique
+  emailVerified        DateTime?
+  password             String?
+  source               String?
+  signature            String?
+  createdAt            DateTime             @default(now())
+  updatedAt            DateTime             @default(now()) @updatedAt
+  lastSignedIn         DateTime             @default(now())
+  roles                Role[]               @default([USER])
+  identityProvider     IdentityProvider     @default(DOCUMENSO)
+  accounts             Account[]
+  sessions             Session[]
+  Document             Document[]
+  Subscription         Subscription?
+  PasswordResetToken   PasswordResetToken[]
+  twoFactorSecret      String?
+  twoFactorEnabled     Boolean              @default(false)
+  twoFactorBackupCodes String?
+  VerificationToken    VerificationToken[]
+  ApiToken             ApiToken[]
 
   @@index([email])
 }
@@ -58,7 +61,7 @@ model VerificationToken {
   expires    DateTime
   createdAt  DateTime @default(now())
   userId     Int
-  user       User     @relation(fields: [userId], references: [id])
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 enum ApiTokenAlgorithm {
@@ -148,6 +151,7 @@ model Document {
   createdAt      DateTime            @default(now())
   updatedAt      DateTime            @default(now()) @updatedAt
   completedAt    DateTime?
+  deletedAt      DateTime?
 
   @@unique([documentDataId])
   @@index([userId])

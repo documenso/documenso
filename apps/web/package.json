@@ -1,6 +1,6 @@
 {
   "name": "@documenso/web",
-  "version": "0.1.0",
+  "version": "1.2.3",
   "private": true,
   "license": "AGPL-3.0",
   "scripts": {
@@ -8,6 +8,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
+    "e2e:prepare": "next build && next start",
     "lint:fix": "next lint --fix",
     "clean": "rimraf .next && rimraf node_modules",
     "copy:pdfjs": "node ../../scripts/copy-pdfjs.cjs"
@@ -27,8 +28,8 @@
     "lucide-react": "^0.279.0",
     "luxon": "^3.4.0",
     "micro": "^10.0.1",
-    "next": "14.0.0",
-    "next-auth": "4.24.3",
+    "next": "14.0.3",
+    "next-auth": "4.24.5",
     "next-plausible": "^3.10.1",
     "next-themes": "^0.2.1",
     "perfect-freehand": "^1.2.0",
@@ -44,6 +45,7 @@
     "sharp": "0.32.5",
     "ts-pattern": "^5.0.5",
     "typescript": "5.2.2",
+    "uqr": "^0.1.2",
     "zod": "^3.22.4"
   },
   "devDependencies": {
@@ -52,5 +54,13 @@
     "@types/node": "20.1.0",
     "@types/react": "18.2.18",
     "@types/react-dom": "18.2.7"
+  },
+  "overrides": {
+    "next-auth": {
+      "next": "$next"
+    },
+    "next-contentlayer": {
+      "next": "$next"
+    }
   }
 }

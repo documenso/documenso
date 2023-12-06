@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
+const fs = require('fs');
 const path = require('path');
 const { version } = require('./package.json');
 
@@ -10,24 +11,35 @@ ENV_FILES.forEach((file) => {
   });
 });
 
+// !: This is a temp hack to get caveat working without placing it back in the public directory.
+// !: By inlining this at build time we should be able to sign faster.
+const FONT_CAVEAT_BYTES = fs.readFileSync(
+  path.join(__dirname, '../../packages/assets/fonts/caveat.ttf'),
+);
+
 /** @type {import('next').NextConfig} */
 const config = {
   output: process.env.DOCKER_OUTPUT ? 'standalone' : undefined,
   experimental: {
     outputFileTracingRoot: path.join(__dirname, '../../'),
-    serverActionsBodySizeLimit: '50mb',
+    serverActions: {
+      bodySizeLimit: '50mb',
+    },
   },
   reactStrictMode: true,
   transpilePackages: [
+    '@documenso/assets',
+    '@documenso/ee',
     '@documenso/lib',
     '@documenso/prisma',
+    '@documenso/tailwind-config',
     '@documenso/trpc',
     '@documenso/ui',
-    '@documenso/email',
   ],
   env: {
     APP_VERSION: version,
     NEXT_PUBLIC_PROJECT: 'web',
+    FONT_CAVEAT_URI: `data:font/ttf;base64,${FONT_CAVEAT_BYTES.toString('base64')}`,
   },
   modularizeImports: {
     'lucide-react': {

@@ -7,6 +7,7 @@ declare namespace NodeJS {
     NEXT_PRIVATE_GOOGLE_CLIENT_SECRET?: string;
 
     NEXT_PRIVATE_DATABASE_URL: string;
+    NEXT_PRIVATE_ENCRYPTION_KEY: string;
 
     NEXT_PUBLIC_STRIPE_COMMUNITY_PLAN_MONTHLY_PRICE_ID: string;
     NEXT_PUBLIC_STRIPE_COMMUNITY_PLAN_YEARLY_PRICE_ID: string;
@@ -62,6 +63,7 @@ declare namespace NodeJS {
     VERCEL_URL?: string;
 
     DEPLOYMENT_TARGET?: 'webapp' | 'marketing';
+    FONT_CAVEAT_URI: string;
 
     POSTGRES_URL?: string;
     DATABASE_URL?: string;

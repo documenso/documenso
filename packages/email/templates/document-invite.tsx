@@ -1,3 +1,5 @@
+import config from '@documenso/tailwind-config';
+
 import {
   Body,
   Container,
@@ -10,14 +12,9 @@ import {
   Section,
   Tailwind,
   Text,
-} from '@react-email/components';
-
-import config from '@documenso/tailwind-config';
-
-import {
-  TemplateDocumentInvite,
-  TemplateDocumentInviteProps,
-} from '../template-components/template-document-invite';
+} from '../components';
+import type { TemplateDocumentInviteProps } from '../template-components/template-document-invite';
+import { TemplateDocumentInvite } from '../template-components/template-document-invite';
 import { TemplateFooter } from '../template-components/template-footer';
 
 export type DocumentInviteEmailTemplateProps = Partial<TemplateDocumentInviteProps> & {
