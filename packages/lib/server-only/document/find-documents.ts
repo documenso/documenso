@@ -55,16 +55,24 @@ export const findDocuments = async ({
       OR: [
         {
           userId,
+          deletedAt: null,
         },
         {
-          status: {
-            not: ExtendedDocumentStatus.DRAFT,
-          },
+          status: ExtendedDocumentStatus.COMPLETED,
           Recipient: {
             some: {
               email: user.email,
             },
           },
+        },
+        {
+          status: ExtendedDocumentStatus.PENDING,
+          Recipient: {
+            some: {
+              email: user.email,
+            },
+          },
+          deletedAt: null,
         },
       ],
     }))
@@ -78,26 +86,29 @@ export const findDocuments = async ({
           signingStatus: SigningStatus.NOT_SIGNED,
         },
       },
+      deletedAt: null,
     }))
     .with(ExtendedDocumentStatus.DRAFT, () => ({
       userId,
       status: ExtendedDocumentStatus.DRAFT,
+      deletedAt: null,
     }))
     .with(ExtendedDocumentStatus.PENDING, () => ({
       OR: [
         {
           userId,
           status: ExtendedDocumentStatus.PENDING,
+          deletedAt: null,
         },
         {
           status: ExtendedDocumentStatus.PENDING,
-
           Recipient: {
             some: {
               email: user.email,
               signingStatus: SigningStatus.SIGNED,
             },
           },
+          deletedAt: null,
         },
       ],
     }))
@@ -106,6 +117,7 @@ export const findDocuments = async ({
         {
           userId,
           status: ExtendedDocumentStatus.COMPLETED,
+          deletedAt: null,
         },
         {
           status: ExtendedDocumentStatus.COMPLETED,
