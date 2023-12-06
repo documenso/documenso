@@ -30,7 +30,7 @@ const TwoFactorEnabledErrorCode = ErrorCode.TWO_FACTOR_MISSING_CREDENTIALS;
 
 const LOGIN_REDIRECT_PATH = '/documents';
 
-const shouldRender =
+const ALLOW_GOOGLE_OAUTH =
   process.env.NEXT_PRIVATE_GOOGLE_CLIENT_ID && process.env.NEXT_PRIVATE_GOOGLE_CLIENT_SECRET;
 
 export const ZSignInFormSchema = z.object({
@@ -199,7 +199,7 @@ export const SignInForm = ({ className }: SignInFormProps) => {
         {isSubmitting ? 'Signing in...' : 'Sign In'}
       </Button>
 
-      {shouldRender ? (
+      {ALLOW_GOOGLE_OAUTH ? (
         <div>
           <div className="relative flex items-center justify-center gap-x-4 py-2 text-xs uppercase">
             <div className="bg-border h-px flex-1" />
