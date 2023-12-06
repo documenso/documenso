@@ -47,7 +47,6 @@
     "apps/*",
     "packages/*"
   ],
-  "dependencies": {},
   "overrides": {
     "next-auth": {
       "next": "14.0.3"

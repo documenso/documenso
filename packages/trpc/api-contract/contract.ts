@@ -23,6 +23,18 @@ const DocumentSchema = z.object({
   completedAt: z.date().nullable(),
 });
 
+const SendDocumentForSigningMutationSchema = z.object({
+  signerEmail: z.string(),
+  signerName: z.string().optional(),
+});
+
+const UploadDocumentSuccessfulSchema = z.object({
+  uploadedFile: z.object({
+    id: z.number(),
+    message: z.string(),
+  }),
+});
+
 const SuccessfulResponseSchema = z.object({
   documents: DocumentSchema.array(),
   totalPages: z.number(),
@@ -65,6 +77,18 @@ export const contract = c.router(
         404: UnsuccessfulResponseSchema,
       },
       summary: 'Delete a document',
+    },
+    createDocument: {
+      method: 'POST',
+      path: '/documents',
+      contentType: 'multipart/form-data',
+      body: c.type<{ file: File }>(),
+      responses: {
+        200: UploadDocumentSuccessfulSchema,
+        401: UnsuccessfulResponseSchema,
+        500: UnsuccessfulResponseSchema,
+      },
+      summary: 'Upload a new document',
     },
   },
   {
