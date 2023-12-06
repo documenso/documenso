@@ -31,6 +31,9 @@ jobs:
       - name: Create the database
         run: npm run prisma:migrate-dev
 
+      - name: Seed the database
+        run: npm run prisma:seed
+
       - name: Run Playwright tests
         run: npm run ci
 

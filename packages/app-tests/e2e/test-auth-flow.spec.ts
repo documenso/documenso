@@ -4,15 +4,15 @@ import { deleteUser } from '@documenso/lib/server-only/user/delete-user';
 
 test.use({ storageState: { cookies: [], origins: [] } });
 
-/* 
+/*
   Using them sequentially so the 2nd test
   uses the details from the 1st (registration) test
 */
 test.describe.configure({ mode: 'serial' });
 
-const username = process.env.E2E_TEST_AUTHENTICATE_USERNAME;
-const email = process.env.E2E_TEST_AUTHENTICATE_USER_EMAIL;
-const password = process.env.E2E_TEST_AUTHENTICATE_USER_PASSWORD;
+const username = 'Test User';
+const email = 'test-user@auth-flow.documenso.com';
+const password = 'Password123';
 
 test('user can sign up with email and password', async ({ page }: { page: Page }) => {
   await page.goto('/signup');

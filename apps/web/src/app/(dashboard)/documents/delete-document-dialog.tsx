@@ -1,5 +1,8 @@
+import { useState } from 'react';
+
 import { useRouter } from 'next/navigation';
 
+import { DocumentStatus } from '@documenso/prisma/client';
 import { trpc as trpcReact } from '@documenso/trpc/react';
 import { Button } from '@documenso/ui/primitives/button';
 import {
@@ -10,41 +13,46 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@documenso/ui/primitives/dialog';
+import { Input } from '@documenso/ui/primitives/input';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
 type DeleteDraftDocumentDialogProps = {
   id: number;
   open: boolean;
   onOpenChange: (_open: boolean) => void;
+  status: DocumentStatus;
 };
 
-export const DeleteDraftDocumentDialog = ({
+export const DeleteDocumentDialog = ({
   id,
   open,
   onOpenChange,
+  status,
 }: DeleteDraftDocumentDialogProps) => {
   const router = useRouter();
 
   const { toast } = useToast();
 
-  const { mutateAsync: deleteDocument, isLoading } =
-    trpcReact.document.deleteDraftDocument.useMutation({
-      onSuccess: () => {
-        router.refresh();
+  const [inputValue, setInputValue] = useState('');
+  const [isDeleteEnabled, setIsDeleteEnabled] = useState(status === DocumentStatus.DRAFT);
 
-        toast({
-          title: 'Document deleted',
-          description: 'Your document has been successfully deleted.',
-          duration: 5000,
-        });
+  const { mutateAsync: deleteDocument, isLoading } = trpcReact.document.deleteDocument.useMutation({
+    onSuccess: () => {
+      router.refresh();
 
-        onOpenChange(false);
-      },
-    });
+      toast({
+        title: 'Document deleted',
+        description: 'Your document has been successfully deleted.',
+        duration: 5000,
+      });
 
-  const onDraftDelete = async () => {
+      onOpenChange(false);
+    },
+  });
+
+  const onDelete = async () => {
     try {
-      await deleteDocument({ id });
+      await deleteDocument({ id, status });
     } catch {
       toast({
         title: 'Something went wrong',
@@ -53,6 +61,11 @@ export const DeleteDraftDocumentDialog = ({
         duration: 7500,
       });
     }
+  };
+
+  const onInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setInputValue(event.target.value);
+    setIsDeleteEnabled(event.target.value === 'delete');
   };
 
   return (
@@ -67,6 +80,17 @@ export const DeleteDraftDocumentDialog = ({
           </DialogDescription>
         </DialogHeader>
 
+        {status !== DocumentStatus.DRAFT && (
+          <div className="mt-8">
+            <Input
+              type="text"
+              value={inputValue}
+              onChange={onInputChange}
+              placeholder="Type 'delete' to confirm"
+            />
+          </div>
+        )}
+
         <DialogFooter>
           <div className="flex w-full flex-1 flex-nowrap gap-4">
             <Button
@@ -78,7 +102,14 @@ export const DeleteDraftDocumentDialog = ({
               Cancel
             </Button>
 
-            <Button type="button" loading={isLoading} onClick={onDraftDelete} className="flex-1">
+            <Button
+              type="button"
+              loading={isLoading}
+              onClick={onDelete}
+              disabled={!isDeleteEnabled}
+              variant="destructive"
+              className="flex-1"
+            >
               Delete
             </Button>
           </div>
