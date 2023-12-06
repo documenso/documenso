@@ -30,6 +30,9 @@ const TwoFactorEnabledErrorCode = ErrorCode.TWO_FACTOR_MISSING_CREDENTIALS;
 
 const LOGIN_REDIRECT_PATH = '/documents';
 
+const shouldRender =
+  process.env.NEXT_PRIVATE_GOOGLE_CLIENT_ID && process.env.NEXT_PRIVATE_GOOGLE_CLIENT_SECRET;
+
 export const ZSignInFormSchema = z.object({
   email: z.string().email().min(1),
   password: z.string().min(6).max(72),
@@ -196,23 +199,26 @@ export const SignInForm = ({ className }: SignInFormProps) => {
         {isSubmitting ? 'Signing in...' : 'Sign In'}
       </Button>
 
-      <div className="relative flex items-center justify-center gap-x-4 py-2 text-xs uppercase">
-        <div className="bg-border h-px flex-1" />
-        <span className="text-muted-foreground bg-transparent">Or continue with</span>
-        <div className="bg-border h-px flex-1" />
-      </div>
-
-      <Button
-        type="button"
-        size="lg"
-        variant={'outline'}
-        className="bg-background text-muted-foreground border"
-        disabled={isSubmitting}
-        onClick={onSignInWithGoogleClick}
-      >
-        <FcGoogle className="mr-2 h-5 w-5" />
-        Google
-      </Button>
+      {shouldRender ? (
+        <div>
+          <div className="relative flex items-center justify-center gap-x-4 py-2 text-xs uppercase">
+            <div className="bg-border h-px flex-1" />
+            <span className="text-muted-foreground bg-transparent">Or continue with</span>
+            <div className="bg-border h-px flex-1" />
+          </div>
+          <Button
+            type="button"
+            size="lg"
+            variant={'outline'}
+            className="bg-background text-muted-foreground w-full border"
+            disabled={isSubmitting}
+            onClick={onSignInWithGoogleClick}
+          >
+            <FcGoogle className="mr-2 h-5 w-5" />
+            Google
+          </Button>
+        </div>
+      ) : null}
 
       <Dialog
         open={isTwoFactorAuthenticationDialogOpen}
