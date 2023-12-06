@@ -6,8 +6,8 @@ import { useRouter } from 'next/navigation';
 
 import { Loader } from 'lucide-react';
 
-import { Recipient } from '@documenso/prisma/client';
-import { FieldWithSignature } from '@documenso/prisma/types/field-with-signature';
+import type { Recipient } from '@documenso/prisma/client';
+import type { FieldWithSignature } from '@documenso/prisma/types/field-with-signature';
 import { trpc } from '@documenso/trpc/react';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
@@ -78,7 +78,7 @@ export const DateField = ({ field, recipient }: DateFieldProps) => {
   };
 
   return (
-    <SigningFieldContainer field={field} onSign={onSign} onRemove={onRemove}>
+    <SigningFieldContainer field={field} onSign={onSign} onRemove={onRemove} type="Date">
       {isLoading && (
         <div className="bg-background absolute inset-0 flex items-center justify-center rounded-md">
           <Loader className="text-primary h-5 w-5 animate-spin md:h-8 md:w-8" />

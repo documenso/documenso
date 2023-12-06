@@ -2,21 +2,29 @@
 
 import { useForm } from 'react-hook-form';
 
-import { DocumentStatus, Field, Recipient } from '@documenso/prisma/client';
-import { DocumentWithData } from '@documenso/prisma/types/document-with-data';
+import type { Field, Recipient } from '@documenso/prisma/client';
+import { DocumentStatus } from '@documenso/prisma/client';
+import type { DocumentWithData } from '@documenso/prisma/types/document-with-data';
 import { FormErrorMessage } from '@documenso/ui/primitives/form/form-error-message';
 import { Input } from '@documenso/ui/primitives/input';
 import { Label } from '@documenso/ui/primitives/label';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@documenso/ui/primitives/select';
 import { Textarea } from '@documenso/ui/primitives/textarea';
 
-import { TAddSubjectFormSchema } from './add-subject.types';
+import type { TAddSubjectFormSchema } from './add-subject.types';
 import {
   DocumentFlowFormContainerActions,
   DocumentFlowFormContainerContent,
   DocumentFlowFormContainerFooter,
   DocumentFlowFormContainerStep,
 } from './document-flow-root';
-import { DocumentFlowStep } from './types';
+import type { DocumentFlowStep } from './types';
 
 export type AddSubjectFormProps = {
   documentFlow: DocumentFlowStep;
@@ -89,6 +97,28 @@ export const AddSubjectFormPartial = ({
                   typeof errors.email?.message !== 'string' ? errors.email?.message : undefined
                 }
               />
+            </div>
+
+            <div>
+              <Label htmlFor="time-format">Time Format</Label>
+
+              <Select
+                onValueChange={(value) => {
+                  setTimeFormat(value);
+                }}
+                defaultValue={timeFormat}
+              >
+                <SelectTrigger className="bg-background mt-2">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {TIME_FORMATS.map((format) => (
+                    <SelectItem key={format.key} value={format.value}>
+                      {format.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
 
             <div>

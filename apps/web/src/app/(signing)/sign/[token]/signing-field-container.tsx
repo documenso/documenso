@@ -2,8 +2,11 @@
 
 import React from 'react';
 
-import { FieldWithSignature } from '@documenso/prisma/types/field-with-signature';
+import type { FieldWithSignature } from '@documenso/prisma/types/field-with-signature';
 import { FieldRootContainer } from '@documenso/ui/components/field/field';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@documenso/ui/primitives/tooltip';
+
+import { useRequiredSigningContext } from './provider';
 
 export type SignatureFieldProps = {
   field: FieldWithSignature;
@@ -11,6 +14,7 @@ export type SignatureFieldProps = {
   children: React.ReactNode;
   onSign?: () => Promise<void> | void;
   onRemove?: () => Promise<void> | void;
+  type?: 'Date' | 'Email' | 'Name' | 'Signature';
 };
 
 export const SigningFieldContainer = ({
@@ -19,7 +23,10 @@ export const SigningFieldContainer = ({
   onSign,
   onRemove,
   children,
+  type,
 }: SignatureFieldProps) => {
+  const { dateFormat } = useRequiredSigningContext();
+
   const onSignFieldClick = async () => {
     if (field.inserted) {
       return;
@@ -46,7 +53,21 @@ export const SigningFieldContainer = ({
         />
       )}
 
-      {field.inserted && !loading && (
+      {type === 'Date' && field.inserted && !loading && (
+        <Tooltip>
+          <TooltipTrigger>
+            <button
+              className="text-destructive bg-background/40 absolute inset-0 z-10 flex h-full w-full items-center justify-center rounded-md text-sm opacity-0 backdrop-blur-sm duration-200 group-hover:opacity-100"
+              onClick={onRemoveSignedFieldClick}
+            >
+              Remove
+            </button>
+          </TooltipTrigger>
+          <TooltipContent className="max-w-xs">{dateFormat}</TooltipContent>
+        </Tooltip>
+      )}
+
+      {type !== 'Date' && field.inserted && !loading && (
         <button
           className="text-destructive bg-background/40 absolute inset-0 z-10 flex h-full w-full items-center justify-center rounded-md text-sm opacity-0 backdrop-blur-sm duration-200 group-hover:opacity-100"
           onClick={onRemoveSignedFieldClick}

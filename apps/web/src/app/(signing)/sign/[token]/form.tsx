@@ -7,9 +7,10 @@ import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import { useForm } from 'react-hook-form';
 
+import { TIME_ZONES } from '@documenso/lib/constants/time-zones';
 import { completeDocumentWithToken } from '@documenso/lib/server-only/document/complete-document-with-token';
 import { sortFieldsByPosition, validateFieldsInserted } from '@documenso/lib/utils/fields';
-import { Document, Field, Recipient } from '@documenso/prisma/client';
+import type { Document, Field, Recipient } from '@documenso/prisma/client';
 import { FieldToolTip } from '@documenso/ui/components/field/field-tooltip';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
@@ -40,8 +41,16 @@ export const SigningForm = ({ document, recipient, fields }: SigningFormProps) =
   const router = useRouter();
   const { data: session } = useSession();
 
-  const { fullName, signature, setFullName, setSignature, dateFormat, setDateFormat } =
-    useRequiredSigningContext();
+  const {
+    fullName,
+    signature,
+    setFullName,
+    setSignature,
+    dateFormat,
+    setDateFormat,
+    timeFormat,
+    setTimeFormat,
+  } = useRequiredSigningContext();
 
   const [validateUninsertedFields, setValidateUninsertedFields] = useState(false);
 
@@ -72,6 +81,8 @@ export const SigningForm = ({ document, recipient, fields }: SigningFormProps) =
 
     router.push(`/sign/${recipient.token}/complete`);
   };
+
+  console.log('TZ Bruh', TIME_ZONES);
 
   return (
     <form
@@ -134,6 +145,30 @@ export const SigningForm = ({ document, recipient, fields }: SigningFormProps) =
                       {DATE_FORMATS.map((format) => (
                         <SelectItem key={format.key} value={format.value}>
                           {format.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
+
+              {hasDateField && (
+                <div>
+                  <Label htmlFor="time-format">Time Format</Label>
+
+                  <Select
+                    onValueChange={(value) => {
+                      setTimeFormat(value);
+                    }}
+                    defaultValue={timeFormat}
+                  >
+                    <SelectTrigger className="bg-background mt-2">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {TIME_ZONES.map((zone) => (
+                        <SelectItem key={zone} value={zone}>
+                          {zone}
                         </SelectItem>
                       ))}
                     </SelectContent>
