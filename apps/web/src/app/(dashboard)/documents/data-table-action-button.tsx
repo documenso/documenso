@@ -23,7 +23,7 @@ export type DataTableActionButtonProps = {
 
 export const DataTableActionButton = ({ row }: DataTableActionButtonProps) => {
   const { data: session } = useSession();
-  const toast = useToast();
+  const { toast } = useToast();
 
   if (!session) {
     return null;
