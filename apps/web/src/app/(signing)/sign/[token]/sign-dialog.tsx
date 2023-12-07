@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { validateFieldsInserted } from '@documenso/lib/utils/fields';
 import { Document, Field } from '@documenso/prisma/client';
@@ -31,14 +31,20 @@ export const SignDialog = ({
   const isComplete = fields.every((field) => field.inserted);
 
   const fieldSignCheck = () => {
-    enableTips();
     const isAllFieldSigned = validateFieldsInserted(fields);
     if (isAllFieldSigned) {
       setIsFieldsSigned(true);
     } else {
-      setIsFieldsSigned(false);
     }
   };
+
+  useEffect(() => {
+    if (fields.every((field) => field.inserted)) {
+      setIsFieldsSigned(true);
+    } else {
+      setIsFieldsSigned(false);
+    }
+  }, [fields]);
 
   return (
     <Dialog open={isFieldsSigned && showDialog} onOpenChange={setShowDialog}>
@@ -47,7 +53,10 @@ export const SignDialog = ({
           className="w-full"
           type="button"
           size="lg"
-          onClick={() => fieldSignCheck()}
+          onClick={() => {
+            enableTips();
+            fieldSignCheck();
+          }}
           loading={isSubmitting}
         >
           {isFieldsSigned ? <>Complete</> : <>Next Field</>}
