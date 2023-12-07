@@ -1,20 +1,12 @@
 'use client';
 
-import {
-  HTMLAttributes,
-  MouseEvent,
-  PointerEvent,
-  TouchEvent,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
+import type { HTMLAttributes, MouseEvent, PointerEvent, TouchEvent } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 
-import { StrokeOptions, getStroke } from 'perfect-freehand';
+import type { StrokeOptions } from 'perfect-freehand';
+import { getStroke } from 'perfect-freehand';
 
-import { cn } from '@documenso/ui/lib/utils';
-
+import { cn } from '../../lib/utils';
 import { getSvgPathFromStroke } from './helper';
 import { Point } from './point';
 

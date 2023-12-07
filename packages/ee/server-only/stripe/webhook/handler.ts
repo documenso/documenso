@@ -1,9 +1,10 @@
-import { NextApiRequest, NextApiResponse } from 'next';
+import type { NextApiRequest, NextApiResponse } from 'next';
 
 import { buffer } from 'micro';
 import { match } from 'ts-pattern';
 
-import { Stripe, stripe } from '@documenso/lib/server-only/stripe';
+import type { Stripe } from '@documenso/lib/server-only/stripe';
+import { stripe } from '@documenso/lib/server-only/stripe';
 import { getFlag } from '@documenso/lib/universal/get-feature-flag';
 import { prisma } from '@documenso/prisma';
 
@@ -174,6 +175,13 @@ export const stripeWebhookHandler = async (
 
         const subscription = await stripe.subscriptions.retrieve(subscriptionId);
 
+        if (subscription.status === 'incomplete_expired') {
+          return res.status(200).json({
+            success: true,
+            message: 'Webhook received',
+          });
+        }
+
         const result = await prisma.subscription.findFirst({
           select: {
             userId: true,
@@ -217,6 +225,13 @@ export const stripeWebhookHandler = async (
         }
 
         const subscription = await stripe.subscriptions.retrieve(subscriptionId);
+
+        if (subscription.status === 'incomplete_expired') {
+          return res.status(200).json({
+            success: true,
+            message: 'Webhook received',
+          });
+        }
 
         const result = await prisma.subscription.findFirst({
           select: {
