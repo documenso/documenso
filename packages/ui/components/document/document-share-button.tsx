@@ -13,8 +13,9 @@ import {
 } from '@documenso/lib/constants/toast';
 import { generateTwitterIntent } from '@documenso/lib/universal/generate-twitter-intent';
 import { trpc } from '@documenso/trpc/react';
-import { cn } from '@documenso/ui/lib/utils';
-import { Button } from '@documenso/ui/primitives/button';
+
+import { cn } from '../../lib/utils';
+import { Button } from '../../primitives/button';
 import {
   Dialog,
   DialogContent,
@@ -22,8 +23,8 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '@documenso/ui/primitives/dialog';
-import { useToast } from '@documenso/ui/primitives/use-toast';
+} from '../../primitives/dialog';
+import { useToast } from '../../primitives/use-toast';
 
 export type DocumentShareButtonProps = HTMLAttributes<HTMLButtonElement> & {
   token?: string;

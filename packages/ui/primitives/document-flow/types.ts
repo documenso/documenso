@@ -53,7 +53,7 @@ export const FRIENDLY_FIELD_TYPE: Record<FieldType, string> = {
 export interface DocumentFlowStep {
   title: string;
   description: string;
-  stepIndex: number;
+  stepIndex?: number;
   onBackStep?: () => unknown;
   onNextStep?: () => unknown;
 }
