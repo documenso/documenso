@@ -90,7 +90,7 @@ export const sealDocument = async ({ documentId, sendEmail = true }: SealDocumen
   if (postHog) {
     postHog.capture({
       distinctId: nanoid(),
-      event: 'App: Document Signed',
+      event: 'App: Document Sealed',
       properties: {
         documentId: document.id,
       },
