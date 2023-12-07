@@ -14,6 +14,7 @@ export type SignDialogProps = {
   isSubmitting: boolean;
   document: Document;
   fields: Field[];
+  enableTips: () => void;
   onSignatureComplete: () => void | Promise<void>;
 };
 
@@ -21,6 +22,7 @@ export const SignDialog = ({
   isSubmitting,
   document,
   fields,
+  enableTips,
   onSignatureComplete,
 }: SignDialogProps) => {
   const [showDialog, setShowDialog] = useState(false);
@@ -29,6 +31,7 @@ export const SignDialog = ({
   const isComplete = fields.every((field) => field.inserted);
 
   const fieldSignCheck = () => {
+    enableTips();
     const isAllFieldSigned = validateFieldsInserted(fields);
     if (isAllFieldSigned) {
       setisFieldsSigned(true);

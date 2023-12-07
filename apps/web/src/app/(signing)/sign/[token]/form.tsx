@@ -46,9 +46,11 @@ export const SigningForm = ({ document, recipient, fields }: SigningFormProps) =
     return sortFieldsByPosition(fields.filter((field) => !field.inserted));
   }, [fields]);
 
-  const onFormSubmit = async () => {
+  const enableTips = () => {
     setValidateUninsertedFields(true);
+  };
 
+  const onFormSubmit = async () => {
     const isFieldsValid = validateFieldsInserted(fields);
 
     if (!isFieldsValid) {
@@ -140,6 +142,7 @@ export const SigningForm = ({ document, recipient, fields }: SigningFormProps) =
                 isSubmitting={isSubmitting}
                 onSignatureComplete={handleSubmit(onFormSubmit)}
                 document={document}
+                enableTips={enableTips}
                 fields={fields}
               />
             </div>
