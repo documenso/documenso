@@ -32,7 +32,7 @@ export const findUsers = async ({
   });
 
   const [users, count] = await Promise.all([
-    await prisma.user.findMany({
+    prisma.user.findMany({
       include: {
         Subscription: true,
         Document: {
@@ -45,7 +45,7 @@ export const findUsers = async ({
       skip: Math.max(page - 1, 0) * perPage,
       take: perPage,
     }),
-    await prisma.user.count({
+    prisma.user.count({
       where: whereClause,
     }),
   ]);

@@ -2,7 +2,6 @@ import fontkit from '@pdf-lib/fontkit';
 import { PDFDocument, StandardFonts } from 'pdf-lib';
 
 import {
-  CAVEAT_FONT_PATH,
   DEFAULT_HANDWRITING_FONT_SIZE,
   DEFAULT_STANDARD_FONT_SIZE,
   MIN_HANDWRITING_FONT_SIZE,
@@ -10,12 +9,12 @@ import {
 } from '@documenso/lib/constants/pdf';
 import { FieldType } from '@documenso/prisma/client';
 import { isSignatureFieldType } from '@documenso/prisma/guards/is-signature-field';
-import { FieldWithSignature } from '@documenso/prisma/types/field-with-signature';
+import type { FieldWithSignature } from '@documenso/prisma/types/field-with-signature';
 
 export const insertFieldInPDF = async (pdf: PDFDocument, field: FieldWithSignature) => {
-  // Fetch the font file from the public URL.
-  const fontResponse = await fetch(CAVEAT_FONT_PATH);
-  const fontCaveat = await fontResponse.arrayBuffer();
+  const fontCaveat = await fetch(process.env.FONT_CAVEAT_URI).then(async (res) =>
+    res.arrayBuffer(),
+  );
 
   const isSignatureField = isSignatureFieldType(field.type);
 

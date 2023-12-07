@@ -12,6 +12,7 @@ import { DocumentStatus, SigningStatus } from '@documenso/prisma/client';
 import type { DocumentWithData } from '@documenso/prisma/types/document-with-data';
 import { trpc as trpcClient } from '@documenso/trpc/client';
 import { Button } from '@documenso/ui/primitives/button';
+import { useToast } from '@documenso/ui/primitives/use-toast';
 
 export type DataTableActionButtonProps = {
   row: Document & {
@@ -22,6 +23,7 @@ export type DataTableActionButtonProps = {
 
 export const DataTableActionButton = ({ row }: DataTableActionButtonProps) => {
   const { data: session } = useSession();
+  const { toast } = useToast();
 
   if (!session) {
     return null;
@@ -37,39 +39,47 @@ export const DataTableActionButton = ({ row }: DataTableActionButtonProps) => {
   const isSigned = recipient?.signingStatus === SigningStatus.SIGNED;
 
   const onDownloadClick = async () => {
-    let document: DocumentWithData | null = null;
+    try {
+      let document: DocumentWithData | null = null;
 
-    if (!recipient) {
-      document = await trpcClient.document.getDocumentById.query({
-        id: row.id,
+      if (!recipient) {
+        document = await trpcClient.document.getDocumentById.query({
+          id: row.id,
+        });
+      } else {
+        document = await trpcClient.document.getDocumentByToken.query({
+          token: recipient.token,
+        });
+      }
+
+      const documentData = document?.documentData;
+
+      if (!documentData) {
+        return;
+      }
+
+      const documentBytes = await getFile(documentData);
+
+      const blob = new Blob([documentBytes], {
+        type: 'application/pdf',
       });
-    } else {
-      document = await trpcClient.document.getDocumentByToken.query({
-        token: recipient.token,
+
+      const link = window.document.createElement('a');
+      const baseTitle = row.title.includes('.pdf') ? row.title.split('.pdf')[0] : row.title;
+
+      link.href = window.URL.createObjectURL(blob);
+      link.download = baseTitle ? `${baseTitle}_signed.pdf` : 'document.pdf';
+
+      link.click();
+
+      window.URL.revokeObjectURL(link.href);
+    } catch (error) {
+      toast({
+        title: 'Something went wrong',
+        description: 'An error occurred while trying to download file.',
+        variant: 'destructive',
       });
     }
-
-    const documentData = document?.documentData;
-
-    if (!documentData) {
-      return;
-    }
-
-    const documentBytes = await getFile(documentData);
-
-    const blob = new Blob([documentBytes], {
-      type: 'application/pdf',
-    });
-
-    const link = window.document.createElement('a');
-    const baseTitle = row.title.includes('.pdf') ? row.title.split('.pdf')[0] : row.title;
-
-    link.href = window.URL.createObjectURL(blob);
-    link.download = baseTitle ? `${baseTitle}_signed.pdf` : 'document.pdf';
-
-    link.click();
-
-    window.URL.revokeObjectURL(link.href);
   };
 
   return match({

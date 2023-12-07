@@ -8,7 +8,6 @@ import { useSession } from 'next-auth/react';
 import { useForm } from 'react-hook-form';
 
 import { useAnalytics } from '@documenso/lib/client-only/hooks/use-analytics';
-import { completeDocumentWithToken } from '@documenso/lib/server-only/document/complete-document-with-token';
 import { sortFieldsByPosition, validateFieldsInserted } from '@documenso/lib/utils/fields';
 import type { Document, Field, Recipient } from '@documenso/prisma/client';
 import { FieldToolTip } from '@documenso/ui/components/field/field-tooltip';
@@ -35,6 +34,9 @@ export const SigningForm = ({ document, recipient, fields }: SigningFormProps) =
 
   const { fullName, signature, setFullName, setSignature } = useRequiredSigningContext();
   const [validateUninsertedFields, setValidateUninsertedFields] = useState(false);
+
+  const { mutateAsync: completeDocumentWithToken } =
+    trpc.recipient.completeDocumentWithToken.useMutation();
 
   const {
     handleSubmit,

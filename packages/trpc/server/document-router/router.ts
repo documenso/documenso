@@ -1,13 +1,16 @@
 import { TRPCError } from '@trpc/server';
 
 import { getServerLimits } from '@documenso/ee/server-only/limits/server';
+import { upsertDocumentMeta } from '@documenso/lib/server-only/document-meta/upsert-document-meta';
 import { createDocument } from '@documenso/lib/server-only/document/create-document';
-import { deleteDraftDocument } from '@documenso/lib/server-only/document/delete-draft-document';
+import { deleteDocument } from '@documenso/lib/server-only/document/delete-document';
 import { duplicateDocumentById } from '@documenso/lib/server-only/document/duplicate-document-by-id';
 import { getDocumentById } from '@documenso/lib/server-only/document/get-document-by-id';
 import { getDocumentAndSenderByToken } from '@documenso/lib/server-only/document/get-document-by-token';
 import { resendDocument } from '@documenso/lib/server-only/document/resend-document';
+import { searchDocumentsWithKeyword } from '@documenso/lib/server-only/document/search-documents-with-keyword';
 import { sendDocument } from '@documenso/lib/server-only/document/send-document';
+import { updateTitle } from '@documenso/lib/server-only/document/update-title';
 import { setFieldsForDocument } from '@documenso/lib/server-only/field/set-fields-for-document';
 import { setRecipientsForDocument } from '@documenso/lib/server-only/recipient/set-recipients-for-document';
 
@@ -18,9 +21,11 @@ import {
   ZGetDocumentByIdQuerySchema,
   ZGetDocumentByTokenQuerySchema,
   ZResendDocumentMutationSchema,
+  ZSearchDocumentsMutationSchema,
   ZSendDocumentMutationSchema,
   ZSetFieldsForDocumentMutationSchema,
   ZSetRecipientsForDocumentMutationSchema,
+  ZSetTitleForDocumentMutationSchema,
 } from './schema';
 
 export const documentRouter = router({
@@ -94,15 +99,15 @@ export const documentRouter = router({
       }
     }),
 
-  deleteDraftDocument: authenticatedProcedure
+  deleteDocument: authenticatedProcedure
     .input(ZDeleteDraftDocumentMutationSchema)
     .mutation(async ({ input, ctx }) => {
       try {
-        const { id } = input;
+        const { id, status } = input;
 
         const userId = ctx.user.id;
 
-        return await deleteDraftDocument({ id, userId });
+        return await deleteDocument({ id, userId, status });
       } catch (err) {
         console.error(err);
 
@@ -111,6 +116,20 @@ export const documentRouter = router({
           message: 'We were unable to delete this document. Please try again later.',
         });
       }
+    }),
+
+  setTitleForDocument: authenticatedProcedure
+    .input(ZSetTitleForDocumentMutationSchema)
+    .mutation(async ({ input, ctx }) => {
+      const { documentId, title } = input;
+
+      const userId = ctx.user.id;
+
+      return await updateTitle({
+        title,
+        userId,
+        documentId,
+      });
     }),
 
   setRecipientsForDocument: authenticatedProcedure
@@ -160,7 +179,15 @@ export const documentRouter = router({
     .input(ZSendDocumentMutationSchema)
     .mutation(async ({ input, ctx }) => {
       try {
-        const { documentId } = input;
+        const { documentId, email } = input;
+
+        if (email.message || email.subject) {
+          await upsertDocumentMeta({
+            documentId,
+            subject: email.subject,
+            message: email.message,
+          });
+        }
 
         return await sendDocument({
           userId: ctx.user.id,
@@ -212,6 +239,25 @@ export const documentRouter = router({
         throw new TRPCError({
           code: 'BAD_REQUEST',
           message: 'We are unable to duplicate this document. Please try again later.',
+        });
+      }
+    }),
+
+  searchDocuments: authenticatedProcedure
+    .input(ZSearchDocumentsMutationSchema)
+    .query(async ({ input, ctx }) => {
+      const { query } = input;
+
+      try {
+        const documents = await searchDocumentsWithKeyword({
+          query,
+          userId: ctx.user.id,
+        });
+        return documents;
+      } catch (error) {
+        throw new TRPCError({
+          code: 'BAD_REQUEST',
+          message: 'We are unable to search for documents. Please try again later.',
         });
       }
     }),

@@ -9,35 +9,38 @@ import { match } from 'ts-pattern';
 
 import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
 import { sortFieldsByPosition, validateFieldsInserted } from '@documenso/lib/utils/fields';
-import { Field, FieldType } from '@documenso/prisma/client';
-import { FieldWithSignature } from '@documenso/prisma/types/field-with-signature';
-import { FieldToolTip } from '@documenso/ui/components/field/field-tooltip';
-import { cn } from '@documenso/ui/lib/utils';
-import { Card, CardContent } from '@documenso/ui/primitives/card';
-import { TAddSignatureFormSchema } from '@documenso/ui/primitives/document-flow/add-signature.types';
+import type { Field } from '@documenso/prisma/client';
+import { FieldType } from '@documenso/prisma/client';
+import type { FieldWithSignature } from '@documenso/prisma/types/field-with-signature';
+
+import { FieldToolTip } from '../../components/field/field-tooltip';
+import { cn } from '../../lib/utils';
+import { Card, CardContent } from '../card';
+import { ElementVisible } from '../element-visible';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '../form/form';
+import { Input } from '../input';
+import { SignaturePad } from '../signature-pad';
+import { useStep } from '../stepper';
+import type { TAddSignatureFormSchema } from './add-signature.types';
+import { ZAddSignatureFormSchema } from './add-signature.types';
 import {
   DocumentFlowFormContainerActions,
   DocumentFlowFormContainerContent,
   DocumentFlowFormContainerFooter,
+  DocumentFlowFormContainerHeader,
   DocumentFlowFormContainerStep,
-} from '@documenso/ui/primitives/document-flow/document-flow-root';
-import { DocumentFlowStep } from '@documenso/ui/primitives/document-flow/types';
-import { ElementVisible } from '@documenso/ui/primitives/element-visible';
-import { Input } from '@documenso/ui/primitives/input';
-import { SignaturePad } from '@documenso/ui/primitives/signature-pad';
-
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '../form/form';
-import { ZAddSignatureFormSchema } from './add-signature.types';
+} from './document-flow-root';
 import {
   SinglePlayerModeCustomTextField,
   SinglePlayerModeSignatureField,
 } from './single-player-mode-fields';
+import type { DocumentFlowStep } from './types';
 
 export type AddSignatureFormProps = {
   defaultValues?: TAddSignatureFormSchema;
   documentFlow: DocumentFlowStep;
   fields: FieldWithSignature[];
-  numberOfSteps: number;
+
   onSubmit: (_data: TAddSignatureFormSchema) => Promise<void> | void;
   requireName?: boolean;
   requireSignature?: boolean;
@@ -47,11 +50,13 @@ export const AddSignatureFormPartial = ({
   defaultValues,
   documentFlow,
   fields,
-  numberOfSteps,
+
   onSubmit,
   requireName = false,
   requireSignature = true,
 }: AddSignatureFormProps) => {
+  const { currentStep, totalSteps } = useStep();
+
   const [validateUninsertedFields, setValidateUninsertedFields] = useState(false);
 
   // Refined schema which takes into account whether to allow an empty name or signature.
@@ -206,46 +211,30 @@ export const AddSignatureFormPartial = ({
   };
 
   return (
-    <Form {...form}>
-      <fieldset className="flex h-full flex-col" disabled={form.formState.isSubmitting}>
-        <DocumentFlowFormContainerContent>
-          <div className="space-y-4">
-            <FormField
-              control={form.control}
-              name="email"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel required>Email</FormLabel>
-                  <FormControl>
-                    <Input
-                      className="bg-background"
-                      type="email"
-                      autoComplete="email"
-                      {...field}
-                      onChange={(value) => {
-                        onFormValueChange(FieldType.EMAIL);
-                        field.onChange(value);
-                      }}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+    <>
+      <DocumentFlowFormContainerHeader
+        title={documentFlow.title}
+        description={documentFlow.description}
+      />
 
-            {requireName && (
+      <Form {...form}>
+        <fieldset className="flex h-full flex-col" disabled={form.formState.isSubmitting}>
+          <DocumentFlowFormContainerContent>
+            <div className="space-y-4">
               <FormField
                 control={form.control}
-                name="name"
+                name="email"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel required={requireName}>Name</FormLabel>
+                    <FormLabel required>Email</FormLabel>
                     <FormControl>
                       <Input
                         className="bg-background"
+                        type="email"
+                        autoComplete="email"
                         {...field}
                         onChange={(value) => {
-                          onFormValueChange(FieldType.NAME);
+                          onFormValueChange(FieldType.EMAIL);
                           field.onChange(value);
                         }}
                       />
@@ -254,91 +243,114 @@ export const AddSignatureFormPartial = ({
                   </FormItem>
                 )}
               />
-            )}
 
-            {requireSignature && (
-              <FormField
-                control={form.control}
-                name="signature"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel required={requireSignature}>Signature</FormLabel>
-                    <FormControl>
-                      <Card
-                        className={cn('mt-2', {
-                          'rounded-sm ring-2 ring-red-500 ring-offset-2 transition-all':
-                            form.formState.errors.signature,
-                        })}
-                        gradient={!form.formState.errors.signature}
-                        degrees={-120}
-                      >
-                        <CardContent className="p-0">
-                          <SignaturePad
-                            className="h-44 w-full"
-                            defaultValue={field.value}
-                            onBlur={field.onBlur}
-                            onChange={(value) => {
-                              onFormValueChange(FieldType.SIGNATURE);
-                              field.onChange(value);
-                            }}
-                          />
-                        </CardContent>
-                      </Card>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            )}
-          </div>
-        </DocumentFlowFormContainerContent>
+              {requireName && (
+                <FormField
+                  control={form.control}
+                  name="name"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel required={requireName}>Name</FormLabel>
+                      <FormControl>
+                        <Input
+                          className="bg-background"
+                          {...field}
+                          onChange={(value) => {
+                            onFormValueChange(FieldType.NAME);
+                            field.onChange(value);
+                          }}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              )}
 
-        <DocumentFlowFormContainerFooter>
-          <DocumentFlowFormContainerStep
-            title={documentFlow.title}
-            step={documentFlow.stepIndex}
-            maxStep={numberOfSteps}
-          />
+              {requireSignature && (
+                <FormField
+                  control={form.control}
+                  name="signature"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel required={requireSignature}>Signature</FormLabel>
+                      <FormControl>
+                        <Card
+                          className={cn('mt-2', {
+                            'rounded-sm ring-2 ring-red-500 ring-offset-2 transition-all':
+                              form.formState.errors.signature,
+                          })}
+                          gradient={!form.formState.errors.signature}
+                          degrees={-120}
+                        >
+                          <CardContent className="p-0">
+                            <SignaturePad
+                              className="h-44 w-full"
+                              defaultValue={field.value}
+                              onBlur={field.onBlur}
+                              onChange={(value) => {
+                                onFormValueChange(FieldType.SIGNATURE);
+                                field.onChange(value);
+                              }}
+                            />
+                          </CardContent>
+                        </Card>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              )}
+            </div>
+          </DocumentFlowFormContainerContent>
 
-          <DocumentFlowFormContainerActions
-            loading={form.formState.isSubmitting}
-            disabled={form.formState.isSubmitting}
-            onGoBackClick={documentFlow.onBackStep}
-            onGoNextClick={form.handleSubmit(onValidateFields)}
-          />
-        </DocumentFlowFormContainerFooter>
-      </fieldset>
+          <DocumentFlowFormContainerFooter>
+            <DocumentFlowFormContainerStep
+              title={documentFlow.title}
+              step={currentStep}
+              maxStep={totalSteps}
+            />
 
-      {validateUninsertedFields && uninsertedFields[0] && (
-        <FieldToolTip key={uninsertedFields[0].id} field={uninsertedFields[0]} color="warning">
-          Click to insert field
-        </FieldToolTip>
-      )}
+            <DocumentFlowFormContainerActions
+              loading={form.formState.isSubmitting}
+              disabled={form.formState.isSubmitting}
+              onGoBackClick={documentFlow.onBackStep}
+              onGoNextClick={form.handleSubmit(onValidateFields)}
+            />
+          </DocumentFlowFormContainerFooter>
+        </fieldset>
 
-      <ElementVisible target={PDF_VIEWER_PAGE_SELECTOR}>
-        {localFields.map((field) =>
-          match(field.type)
-            .with(FieldType.DATE, FieldType.EMAIL, FieldType.NAME, () => {
-              return (
-                <SinglePlayerModeCustomTextField
+        {validateUninsertedFields && uninsertedFields[0] && (
+          <FieldToolTip key={uninsertedFields[0].id} field={uninsertedFields[0]} color="warning">
+            Click to insert field
+          </FieldToolTip>
+        )}
+
+        <ElementVisible target={PDF_VIEWER_PAGE_SELECTOR}>
+          {localFields.map((field) =>
+            match(field.type)
+              .with(FieldType.DATE, FieldType.EMAIL, FieldType.NAME, () => {
+                return (
+                  <SinglePlayerModeCustomTextField
+                    onClick={insertField(field)}
+                    key={field.id}
+                    field={field}
+                  />
+                );
+              })
+              .with(FieldType.SIGNATURE, () => (
+                <SinglePlayerModeSignatureField
                   onClick={insertField(field)}
                   key={field.id}
                   field={field}
                 />
-              );
-            })
-            .with(FieldType.SIGNATURE, () => (
-              <SinglePlayerModeSignatureField
-                onClick={insertField(field)}
-                key={field.id}
-                field={field}
-              />
-            ))
-            .otherwise(() => {
-              return null;
-            }),
-        )}
-      </ElementVisible>
-    </Form>
+              ))
+              .otherwise(() => {
+                return null;
+              }),
+          )}
+        </ElementVisible>
+      </Form>
+    </>
   );
 };

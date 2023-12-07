@@ -4,27 +4,25 @@ import { useState } from 'react';
 
 import { useRouter } from 'next/navigation';
 
-import { DocumentData, Field, Recipient, User } from '@documenso/prisma/client';
-import { DocumentWithData } from '@documenso/prisma/types/document-with-data';
+import { DocumentStatus } from '@documenso/prisma/client';
+import type { DocumentData, Field, Recipient, User } from '@documenso/prisma/client';
+import type { DocumentWithData } from '@documenso/prisma/types/document-with-data';
+import { trpc } from '@documenso/trpc/react';
 import { cn } from '@documenso/ui/lib/utils';
 import { Card, CardContent } from '@documenso/ui/primitives/card';
 import { AddFieldsFormPartial } from '@documenso/ui/primitives/document-flow/add-fields';
-import { TAddFieldsFormSchema } from '@documenso/ui/primitives/document-flow/add-fields.types';
+import type { TAddFieldsFormSchema } from '@documenso/ui/primitives/document-flow/add-fields.types';
 import { AddSignersFormPartial } from '@documenso/ui/primitives/document-flow/add-signers';
-import { TAddSignersFormSchema } from '@documenso/ui/primitives/document-flow/add-signers.types';
+import type { TAddSignersFormSchema } from '@documenso/ui/primitives/document-flow/add-signers.types';
 import { AddSubjectFormPartial } from '@documenso/ui/primitives/document-flow/add-subject';
-import { TAddSubjectFormSchema } from '@documenso/ui/primitives/document-flow/add-subject.types';
-import {
-  DocumentFlowFormContainer,
-  DocumentFlowFormContainerHeader,
-} from '@documenso/ui/primitives/document-flow/document-flow-root';
-import { DocumentFlowStep } from '@documenso/ui/primitives/document-flow/types';
+import type { TAddSubjectFormSchema } from '@documenso/ui/primitives/document-flow/add-subject.types';
+import { AddTitleFormPartial } from '@documenso/ui/primitives/document-flow/add-title';
+import type { TAddTitleFormSchema } from '@documenso/ui/primitives/document-flow/add-title.types';
+import { DocumentFlowFormContainer } from '@documenso/ui/primitives/document-flow/document-flow-root';
+import type { DocumentFlowStep } from '@documenso/ui/primitives/document-flow/types';
 import { LazyPDFViewer } from '@documenso/ui/primitives/lazy-pdf-viewer';
+import { Stepper } from '@documenso/ui/primitives/stepper';
 import { useToast } from '@documenso/ui/primitives/use-toast';
-
-import { addFields } from '~/components/forms/edit-document/add-fields.action';
-import { addSigners } from '~/components/forms/edit-document/add-signers.action';
-import { completeDocument } from '~/components/forms/edit-document/add-subject.action';
 
 export type EditDocumentFormProps = {
   className?: string;
@@ -35,7 +33,8 @@ export type EditDocumentFormProps = {
   documentData: DocumentData;
 };
 
-type EditDocumentStep = 'signers' | 'fields' | 'subject';
+type EditDocumentStep = 'title' | 'signers' | 'fields' | 'subject';
+const EditDocumentSteps: EditDocumentStep[] = ['title', 'signers', 'fields', 'subject'];
 
 export const EditDocumentForm = ({
   className,
@@ -48,29 +47,60 @@ export const EditDocumentForm = ({
   const { toast } = useToast();
   const router = useRouter();
 
-  const [step, setStep] = useState<EditDocumentStep>('signers');
+  // controlled stepper state
+  const [step, setStep] = useState<EditDocumentStep>(
+    document.status === DocumentStatus.DRAFT ? 'title' : 'signers',
+  );
+
+  const { mutateAsync: addTitle } = trpc.document.setTitleForDocument.useMutation();
+  const { mutateAsync: addFields } = trpc.field.addFields.useMutation();
+  const { mutateAsync: addSigners } = trpc.recipient.addSigners.useMutation();
+  const { mutateAsync: sendDocument } = trpc.document.sendDocument.useMutation();
 
   const documentFlow: Record<EditDocumentStep, DocumentFlowStep> = {
+    title: {
+      title: 'Add Title',
+      description: 'Add the title to the document.',
+      stepIndex: 1,
+    },
     signers: {
       title: 'Add Signers',
       description: 'Add the people who will sign the document.',
-      stepIndex: 1,
+      stepIndex: 2,
     },
     fields: {
       title: 'Add Fields',
       description: 'Add all relevant fields for each recipient.',
-      stepIndex: 2,
-      onBackStep: () => setStep('signers'),
+      stepIndex: 3,
     },
     subject: {
       title: 'Add Subject',
       description: 'Add the subject and message you wish to send to signers.',
-      stepIndex: 3,
-      onBackStep: () => setStep('fields'),
+      stepIndex: 4,
     },
   };
 
-  const currentDocumentFlow = documentFlow[step];
+  const onAddTitleFormSubmit = async (data: TAddTitleFormSchema) => {
+    try {
+      // Custom invocation server action
+      await addTitle({
+        documentId: document.id,
+        title: data.title,
+      });
+
+      router.refresh();
+
+      setStep('signers');
+    } catch (err) {
+      console.error(err);
+
+      toast({
+        title: 'Error',
+        description: 'An error occurred while updating title.',
+        variant: 'destructive',
+      });
+    }
+  };
 
   const onAddSignersFormSubmit = async (data: TAddSignersFormSchema) => {
     try {
@@ -81,7 +111,6 @@ export const EditDocumentForm = ({
       });
 
       router.refresh();
-
       setStep('fields');
     } catch (err) {
       console.error(err);
@@ -103,7 +132,6 @@ export const EditDocumentForm = ({
       });
 
       router.refresh();
-
       setStep('subject');
     } catch (err) {
       console.error(err);
@@ -120,7 +148,7 @@ export const EditDocumentForm = ({
     const { subject, message } = data.email;
 
     try {
-      await completeDocument({
+      await sendDocument({
         documentId: document.id,
         email: {
           subject,
@@ -146,6 +174,8 @@ export const EditDocumentForm = ({
     }
   };
 
+  const currentDocumentFlow = documentFlow[step];
+
   return (
     <div className={cn('grid w-full grid-cols-12 gap-8', className)}>
       <Card
@@ -158,44 +188,47 @@ export const EditDocumentForm = ({
       </Card>
 
       <div className="col-span-12 lg:col-span-6 xl:col-span-5">
-        <DocumentFlowFormContainer onSubmit={(e) => e.preventDefault()}>
-          <DocumentFlowFormContainerHeader
-            title={currentDocumentFlow.title}
-            description={currentDocumentFlow.description}
-          />
+        <DocumentFlowFormContainer
+          className="lg:h-[calc(100vh-6rem)]"
+          onSubmit={(e) => e.preventDefault()}
+        >
+          <Stepper
+            currentStep={currentDocumentFlow.stepIndex}
+            setCurrentStep={(step) => setStep(EditDocumentSteps[step - 1])}
+          >
+            <AddTitleFormPartial
+              key={recipients.length}
+              documentFlow={documentFlow.title}
+              recipients={recipients}
+              fields={fields}
+              document={document}
+              onSubmit={onAddTitleFormSubmit}
+            />
 
-          {step === 'signers' && (
             <AddSignersFormPartial
               key={recipients.length}
               documentFlow={documentFlow.signers}
+              document={document}
               recipients={recipients}
               fields={fields}
-              numberOfSteps={Object.keys(documentFlow).length}
               onSubmit={onAddSignersFormSubmit}
             />
-          )}
-
-          {step === 'fields' && (
             <AddFieldsFormPartial
               key={fields.length}
               documentFlow={documentFlow.fields}
               recipients={recipients}
               fields={fields}
-              numberOfSteps={Object.keys(documentFlow).length}
               onSubmit={onAddFieldsFormSubmit}
             />
-          )}
-
-          {step === 'subject' && (
             <AddSubjectFormPartial
+              key={recipients.length}
               documentFlow={documentFlow.subject}
               document={document}
               recipients={recipients}
               fields={fields}
-              numberOfSteps={Object.keys(documentFlow).length}
               onSubmit={onAddSubjectFormSubmit}
             />
-          )}
+          </Stepper>
         </DocumentFlowFormContainer>
       </div>
     </div>
