@@ -1,5 +1,6 @@
 import { useState } from 'react';
 
+import { validateFieldsInserted } from '@documenso/lib/utils/fields';
 import { Document, Field } from '@documenso/prisma/client';
 import { Button } from '@documenso/ui/primitives/button';
 import {
@@ -23,17 +24,25 @@ export const SignDialog = ({
   onSignatureComplete,
 }: SignDialogProps) => {
   const [showDialog, setShowDialog] = useState(false);
+  const [isFieldsSigned, setisFieldsSigned] = useState(false);
 
   const isComplete = fields.every((field) => field.inserted);
 
+  const fieldSignCheck = () => {
+    const isAllFieldSigned = validateFieldsInserted(fields);
+    if (isAllFieldSigned) {
+      setisFieldsSigned(true);
+    }
+  };
+
   return (
-    <Dialog open={showDialog} onOpenChange={setShowDialog}>
+    <Dialog open={isFieldsSigned && showDialog} onOpenChange={setShowDialog}>
       <DialogTrigger asChild>
         <Button
           className="w-full"
           type="button"
           size="lg"
-          disabled={!isComplete}
+          onClick={() => fieldSignCheck()}
           loading={isSubmitting}
         >
           Complete
