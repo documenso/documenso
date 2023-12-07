@@ -4,6 +4,7 @@ import { useState } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { History } from 'lucide-react';
+import { useSession } from 'next-auth/react';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
 
@@ -54,11 +55,14 @@ export const ResendDocumentActionItem = ({
   document,
   recipients,
 }: ResendDocumentActionItemProps) => {
+  const { data: session } = useSession();
   const { toast } = useToast();
 
   const [isOpen, setIsOpen] = useState(false);
+  const isOwner = document.userId === session?.user?.id;
 
   const isDisabled =
+    !isOwner ||
     document.status !== 'PENDING' ||
     !recipients.some((r) => r.signingStatus === SigningStatus.NOT_SIGNED);
 

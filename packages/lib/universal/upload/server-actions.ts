@@ -1,5 +1,8 @@
 'use server';
 
+import { headers } from 'next/headers';
+import { NextRequest } from 'next/server';
+
 import {
   DeleteObjectCommand,
   GetObjectCommand,
@@ -7,10 +10,11 @@ import {
   S3Client,
 } from '@aws-sdk/client-s3';
 import slugify from '@sindresorhus/slugify';
+import { type JWT, getToken } from 'next-auth/jwt';
 import path from 'node:path';
 
+import { APP_BASE_URL } from '../../constants/app';
 import { ONE_HOUR, ONE_SECOND } from '../../constants/time';
-import { getServerComponentSession } from '../../next-auth/get-server-component-session';
 import { alphaid } from '../id';
 
 export const getPresignPostUrl = async (fileName: string, contentType: string) => {
@@ -18,15 +22,25 @@ export const getPresignPostUrl = async (fileName: string, contentType: string) =
 
   const { getSignedUrl } = await import('@aws-sdk/s3-request-presigner');
 
-  const { user } = await getServerComponentSession();
+  let token: JWT | null = null;
+
+  try {
+    token = await getToken({
+      req: new NextRequest(APP_BASE_URL ?? 'http://localhost:3000', {
+        headers: headers(),
+      }),
+    });
+  } catch (err) {
+    // Non server-component environment
+  }
 
   // Get the basename and extension for the file
   const { name, ext } = path.parse(fileName);
 
   let key = `${alphaid(12)}/${slugify(name)}${ext}`;
 
-  if (user) {
-    key = `${user.id}/${key}`;
+  if (token) {
+    key = `${token.id}/${key}`;
   }
 
   const putObjectCommand = new PutObjectCommand({

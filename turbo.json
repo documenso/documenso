@@ -33,6 +33,7 @@
   "globalDependencies": ["**/.env.*local"],
   "globalEnv": [
     "APP_VERSION",
+    "NEXT_PRIVATE_ENCRYPTION_KEY",
     "NEXTAUTH_URL",
     "NEXTAUTH_SECRET",
     "NEXT_PUBLIC_PROJECT",
@@ -85,6 +86,7 @@
     "VERCEL_ENV",
     "VERCEL_URL",
     "DEPLOYMENT_TARGET",
+    "FONT_CAVEAT_URI",
     "POSTGRES_URL",
     "DATABASE_URL",
     "POSTGRES_PRISMA_URL",

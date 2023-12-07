@@ -1,7 +1,4 @@
-import { Button, Column, Img, Section, Tailwind, Text } from '@react-email/components';
-
-import * as config from '@documenso/tailwind-config';
-
+import { Button, Column, Img, Section, Text } from '../components';
 import { TemplateDocumentImage } from './template-document-image';
 
 export interface TemplateDocumentCompletedProps {
@@ -20,15 +17,7 @@ export const TemplateDocumentCompleted = ({
   };
 
   return (
-    <Tailwind
-      config={{
-        theme: {
-          extend: {
-            colors: config.theme.extend.colors,
-          },
-        },
-      }}
-    >
+    <>
       <TemplateDocumentImage className="mt-6" assetBaseUrl={assetBaseUrl} />
 
       <Section>
@@ -72,7 +61,7 @@ export const TemplateDocumentCompleted = ({
           </Button>
         </Section>
       </Section>
-    </Tailwind>
+    </>
   );
 };
 

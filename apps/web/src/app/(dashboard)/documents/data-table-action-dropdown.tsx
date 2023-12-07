@@ -32,7 +32,7 @@ import {
 } from '@documenso/ui/primitives/dropdown-menu';
 
 import { ResendDocumentActionItem } from './_action-items/resend-document';
-import { DeleteDraftDocumentDialog } from './delete-draft-document-dialog';
+import { DeleteDocumentDialog } from './delete-document-dialog';
 import { DuplicateDocumentDialog } from './duplicate-document-dialog';
 
 export type DataTableActionDropdownProps = {
@@ -60,7 +60,7 @@ export const DataTableActionDropdown = ({ row }: DataTableActionDropdownProps) =
   // const isPending = row.status === DocumentStatus.PENDING;
   const isComplete = row.status === DocumentStatus.COMPLETED;
   // const isSigned = recipient?.signingStatus === SigningStatus.SIGNED;
-  const isDocumentDeletable = isOwner && row.status === DocumentStatus.DRAFT;
+  const isDocumentDeletable = isOwner;
 
   const onDownloadClick = async () => {
     let document: DocumentWithData | null = null;
@@ -88,9 +88,10 @@ export const DataTableActionDropdown = ({ row }: DataTableActionDropdownProps) =
     });
 
     const link = window.document.createElement('a');
+    const baseTitle = row.title.includes('.pdf') ? row.title.split('.pdf')[0] : row.title;
 
     link.href = window.URL.createObjectURL(blob);
-    link.download = row.title || 'document.pdf';
+    link.download = baseTitle ? `${baseTitle}_signed.pdf` : 'document.pdf';
 
     link.click();
 
@@ -160,8 +161,9 @@ export const DataTableActionDropdown = ({ row }: DataTableActionDropdownProps) =
       </DropdownMenuContent>
 
       {isDocumentDeletable && (
-        <DeleteDraftDocumentDialog
+        <DeleteDocumentDialog
           id={row.id}
+          status={row.status}
           open={isDeleteDialogOpen}
           onOpenChange={setDeleteDialogOpen}
         />

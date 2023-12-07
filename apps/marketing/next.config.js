@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
+const fs = require('fs');
 const path = require('path');
 const { withContentlayer } = require('next-contentlayer');
 
@@ -10,16 +11,31 @@ ENV_FILES.forEach((file) => {
   });
 });
 
+// !: This is a temp hack to get caveat working without placing it back in the public directory.
+// !: By inlining this at build time we should be able to sign faster.
+const FONT_CAVEAT_BYTES = fs.readFileSync(
+  path.join(__dirname, '../../packages/assets/fonts/caveat.ttf'),
+);
+
 /** @type {import('next').NextConfig} */
 const config = {
   experimental: {
-    serverActionsBodySizeLimit: '10mb',
     outputFileTracingRoot: path.join(__dirname, '../../'),
+    serverActions: {
+      bodySizeLimit: '50mb',
+    },
   },
   reactStrictMode: true,
-  transpilePackages: ['@documenso/lib', '@documenso/prisma', '@documenso/trpc', '@documenso/ui'],
+  transpilePackages: [
+    '@documenso/assets',
+    '@documenso/lib',
+    '@documenso/tailwind-config',
+    '@documenso/trpc',
+    '@documenso/ui',
+  ],
   env: {
     NEXT_PUBLIC_PROJECT: 'marketing',
+    FONT_CAVEAT_URI: `data:font/ttf;base64,${FONT_CAVEAT_BYTES.toString('base64')}`,
   },
   modularizeImports: {
     'lucide-react': {

@@ -43,11 +43,11 @@ export default async function DocumentPage({ params }: DocumentPageProps) {
   const { documentData } = document;
 
   const [recipients, fields] = await Promise.all([
-    await getRecipientsForDocument({
+    getRecipientsForDocument({
       documentId,
       userId: user.id,
     }),
-    await getFieldsForDocument({
+    getFieldsForDocument({
       documentId,
       userId: user.id,
     }),
