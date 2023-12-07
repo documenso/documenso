@@ -9,10 +9,6 @@ export const ZCreateDocumentFromTemplateMutationSchema = z.object({
   templateId: z.number(),
 });
 
-export const ZCreateTemplateFromDocumentMutationSchema = z.object({
-  documentId: z.number(),
-});
-
 export const ZDuplicateTemplateMutationSchema = z.object({
   templateId: z.number(),
 });
@@ -23,10 +19,6 @@ export const ZDeleteTemplateMutationSchema = z.object({
 
 export type TCreateTemplateMutationSchema = z.infer<typeof ZCreateTemplateMutationSchema>;
 export type TCreateDocumentFromTemplateMutationSchema = z.infer<
-  typeof ZCreateDocumentFromTemplateMutationSchema
->;
-
-export type TCreateTemplateFromDocumentMutationSchema = z.infer<
   typeof ZCreateDocumentFromTemplateMutationSchema
 >;
 

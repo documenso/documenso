@@ -55,27 +55,6 @@ export const DataTableActionDropdown = ({ row }: DataTableActionDropdownProps) =
 
   const router = useRouter();
 
-  const { mutateAsync: createTemplateFromDocument } =
-    trpc.template.createTemplateFromDocument.useMutation({
-      onSuccess: ({ id }) => {
-        router.refresh();
-        router.push(`/templates/${id}`);
-
-        toast({
-          title: 'Template created',
-          description: 'Your template has been created successfully.',
-          duration: 5000,
-        });
-      },
-      onError: () => {
-        toast({
-          title: 'Error',
-          description: 'An error occurred while creating template from document.',
-          variant: 'destructive',
-        });
-      },
-    });
-
   const { createAndCopyShareLink, isCopyingShareLink } = useCopyShareLink({
     onSuccess: () => toast(TOAST_DOCUMENT_SHARE_SUCCESS),
     onError: () => toast(TOAST_DOCUMENT_SHARE_ERROR),
@@ -132,19 +111,6 @@ export const DataTableActionDropdown = ({ row }: DataTableActionDropdownProps) =
     window.URL.revokeObjectURL(link.href);
   };
 
-  const onSaveAsTemplateClick = async () => {
-    try {
-      await createTemplateFromDocument({ documentId: row.id });
-    } catch {
-      toast({
-        title: 'Something went wrong',
-        description: 'This template could not be created at this time. Please try again.',
-        variant: 'destructive',
-        duration: 7500,
-      });
-    }
-  };
-
   return (
     <DropdownMenu>
       <DropdownMenuTrigger>
@@ -171,11 +137,6 @@ export const DataTableActionDropdown = ({ row }: DataTableActionDropdownProps) =
         <DropdownMenuItem disabled={!isComplete} onClick={onDownloadClick}>
           <Download className="mr-2 h-4 w-4" />
           Download
-        </DropdownMenuItem>
-
-        <DropdownMenuItem disabled={!isOwner || isComplete} onClick={onSaveAsTemplateClick}>
-          <Files className="mr-2 h-4 w-4" />
-          Save as Template
         </DropdownMenuItem>
 
         <DropdownMenuItem disabled>
