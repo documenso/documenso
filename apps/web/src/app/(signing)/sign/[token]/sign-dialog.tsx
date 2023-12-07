@@ -26,7 +26,7 @@ export const SignDialog = ({
   onSignatureComplete,
 }: SignDialogProps) => {
   const [showDialog, setShowDialog] = useState(false);
-  const [isFieldsSigned, setisFieldsSigned] = useState(false);
+  const [isFieldsSigned, setIsFieldsSigned] = useState(false);
 
   const isComplete = fields.every((field) => field.inserted);
 
@@ -34,7 +34,9 @@ export const SignDialog = ({
     enableTips();
     const isAllFieldSigned = validateFieldsInserted(fields);
     if (isAllFieldSigned) {
-      setisFieldsSigned(true);
+      setIsFieldsSigned(true);
+    } else {
+      setIsFieldsSigned(false);
     }
   };
 
@@ -48,7 +50,7 @@ export const SignDialog = ({
           onClick={() => fieldSignCheck()}
           loading={isSubmitting}
         >
-          Complete
+          {isFieldsSigned ? <>Complete</> : <>Next Field</>}
         </Button>
       </DialogTrigger>
       <DialogContent>
