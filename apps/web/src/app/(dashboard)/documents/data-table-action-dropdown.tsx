@@ -17,7 +17,7 @@ import {
 } from 'lucide-react';
 import { useSession } from 'next-auth/react';
 
-import { getFile } from '@documenso/lib/universal/upload/get-file';
+import { downloadFile } from '@documenso/lib/client-only/download-pdf';
 import type { Document, Recipient, User } from '@documenso/prisma/client';
 import { DocumentStatus } from '@documenso/prisma/client';
 import type { DocumentWithData } from '@documenso/prisma/types/document-with-data';
@@ -81,21 +81,7 @@ export const DataTableActionDropdown = ({ row }: DataTableActionDropdownProps) =
       return;
     }
 
-    const documentBytes = await getFile(documentData);
-
-    const blob = new Blob([documentBytes], {
-      type: 'application/pdf',
-    });
-
-    const link = window.document.createElement('a');
-    const baseTitle = row.title.includes('.pdf') ? row.title.split('.pdf')[0] : row.title;
-
-    link.href = window.URL.createObjectURL(blob);
-    link.download = baseTitle ? `${baseTitle}_signed.pdf` : 'document.pdf';
-
-    link.click();
-
-    window.URL.revokeObjectURL(link.href);
+    await downloadFile({ documentData, fileName: row.title });
   };
 
   const nonSignedRecipients = row.Recipient.filter((item) => item.signingStatus !== 'SIGNED');
