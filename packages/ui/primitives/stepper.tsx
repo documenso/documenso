@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState } from 'react';
 import type { FC } from 'react';
 
-type StepContextType = {
+type StepContextValue = {
   isCompleting: boolean;
   stepIndex: number;
   currentStep: number;
@@ -12,7 +12,7 @@ type StepContextType = {
   previousStep: () => void;
 };
 
-const StepContext = createContext<StepContextType | null>(null);
+const StepContext = createContext<StepContextValue | null>(null);
 
 type StepperProps = {
   children: React.ReactNode;
@@ -20,7 +20,6 @@ type StepperProps = {
   onStepChanged?: (currentStep: number) => void;
   currentStep?: number; // external control prop
   setCurrentStep?: (step: number) => void; // external control function
-  isAsyncComplete?: boolean;
 };
 
 export const Stepper: FC<StepperProps> = ({
@@ -29,7 +28,6 @@ export const Stepper: FC<StepperProps> = ({
   onStepChanged,
   currentStep: propCurrentStep,
   setCurrentStep: propSetCurrentStep,
-  isAsyncComplete,
 }) => {
   const [stateCurrentStep, stateSetCurrentStep] = useState(1);
   const [isCompleting, setIsCompleting] = useState(false);
@@ -42,22 +40,26 @@ export const Stepper: FC<StepperProps> = ({
   const totalSteps = React.Children.count(children);
 
   const handleComplete = async () => {
-    if (!onComplete) {
-      return;
+    try {
+      if (!onComplete) {
+        return;
+      }
+
+      setIsCompleting(true);
+
+      await onComplete();
+
+      setIsCompleting(false);
+    } catch (error) {
+      setIsCompleting(false);
+
+      throw error;
     }
-    if (!isAsyncComplete) {
-      void onComplete();
-      return;
-    }
-    setIsCompleting(true);
-    await onComplete();
-    // handle async complete action
-    setIsCompleting(false);
   };
 
   const handleStepChange = (nextStep: number) => {
     setCurrentStep(nextStep);
-    onStepChanged && onStepChanged(nextStep);
+    onStepChanged?.(nextStep);
   };
 
   const nextStep = () => {
@@ -81,7 +83,7 @@ export const Stepper: FC<StepperProps> = ({
 
   const currentChild = React.Children.toArray(children)[currentStep - 1];
 
-  const stepContextValue: StepContextType = {
+  const stepContextValue: StepContextValue = {
     isCompleting,
     stepIndex: currentStep - 1,
     currentStep,
@@ -96,10 +98,12 @@ export const Stepper: FC<StepperProps> = ({
 };
 
 /** Hook for children to use the step context */
-export const useStep = (): StepContextType => {
+export const useStep = (): StepContextValue => {
   const context = useContext(StepContext);
+
   if (!context) {
     throw new Error('useStep must be used within a Stepper');
   }
+
   return context;
 };
