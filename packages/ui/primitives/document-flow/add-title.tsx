@@ -4,10 +4,10 @@ import { useForm } from 'react-hook-form';
 
 import type { Field, Recipient } from '@documenso/prisma/client';
 import type { DocumentWithData } from '@documenso/prisma/types/document-with-data';
-import { FormErrorMessage } from '@documenso/ui/primitives/form/form-error-message';
-import { Input } from '@documenso/ui/primitives/input';
-import { Label } from '@documenso/ui/primitives/label';
 
+import { FormErrorMessage } from '../form/form-error-message';
+import { Input } from '../input';
+import { Label } from '../label';
 import { useStep } from '../stepper';
 import type { TAddTitleFormSchema } from './add-title.types';
 import {

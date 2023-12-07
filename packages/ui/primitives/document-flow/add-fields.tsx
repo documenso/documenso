@@ -13,20 +13,14 @@ import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
 import { nanoid } from '@documenso/lib/universal/id';
 import type { Field, Recipient } from '@documenso/prisma/client';
 import { FieldType, SendStatus } from '@documenso/prisma/client';
-import { cn } from '@documenso/ui/lib/utils';
-import { Button } from '@documenso/ui/primitives/button';
-import { Card, CardContent } from '@documenso/ui/primitives/card';
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-} from '@documenso/ui/primitives/command';
-import { Popover, PopoverContent, PopoverTrigger } from '@documenso/ui/primitives/popover';
-import { Tooltip, TooltipContent, TooltipTrigger } from '@documenso/ui/primitives/tooltip';
 
+import { cn } from '../../lib/utils';
+import { Button } from '../button';
+import { Card, CardContent } from '../card';
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from '../command';
+import { Popover, PopoverContent, PopoverTrigger } from '../popover';
 import { useStep } from '../stepper';
+import { Tooltip, TooltipContent, TooltipTrigger } from '../tooltip';
 import type { TAddFieldsFormSchema } from './add-fields.types';
 import {
   DocumentFlowFormContainerActions,

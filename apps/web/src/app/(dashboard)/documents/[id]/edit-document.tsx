@@ -204,6 +204,7 @@ export const EditDocumentForm = ({
               document={document}
               onSubmit={onAddTitleFormSubmit}
             />
+
             <AddSignersFormPartial
               key={recipients.length}
               documentFlow={documentFlow.signers}

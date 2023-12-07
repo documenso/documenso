@@ -5,8 +5,8 @@ import React from 'react';
 
 import { motion } from 'framer-motion';
 
-import { cn } from '@documenso/ui/lib/utils';
-import { Button } from '@documenso/ui/primitives/button';
+import { cn } from '../../lib/utils';
+import { Button } from '../button';
 
 export type DocumentFlowFormContainerProps = HTMLAttributes<HTMLFormElement> & {
   children?: React.ReactNode;
