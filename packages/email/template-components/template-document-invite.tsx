@@ -1,7 +1,4 @@
-import { Button, Section, Tailwind, Text } from '@react-email/components';
-
-import * as config from '@documenso/tailwind-config';
-
+import { Button, Section, Text } from '../components';
 import { TemplateDocumentImage } from './template-document-image';
 
 export interface TemplateDocumentInviteProps {
@@ -19,15 +16,7 @@ export const TemplateDocumentInvite = ({
   assetBaseUrl,
 }: TemplateDocumentInviteProps) => {
   return (
-    <Tailwind
-      config={{
-        theme: {
-          extend: {
-            colors: config.theme.extend.colors,
-          },
-        },
-      }}
-    >
+    <>
       <TemplateDocumentImage className="mt-6" assetBaseUrl={assetBaseUrl} />
 
       <Section>
@@ -49,7 +38,7 @@ export const TemplateDocumentInvite = ({
           </Button>
         </Section>
       </Section>
-    </Tailwind>
+    </>
   );
 };
 

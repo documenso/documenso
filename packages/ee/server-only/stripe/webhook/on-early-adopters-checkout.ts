@@ -1,4 +1,4 @@
-import Stripe from 'stripe';
+import type Stripe from 'stripe';
 
 import { hashSync } from '@documenso/lib/server-only/auth/hash';
 import { sealDocument } from '@documenso/lib/server-only/document/seal-document';

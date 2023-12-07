@@ -19,6 +19,7 @@
     "prisma:generate": "npm run with:env -- npm run prisma:generate -w @documenso/prisma",
     "prisma:migrate-dev": "npm run with:env -- npm run prisma:migrate-dev -w @documenso/prisma",
     "prisma:migrate-deploy": "npm run with:env -- npm run prisma:migrate-deploy -w @documenso/prisma",
+    "prisma:seed": "npm run with:env -- npm run prisma:seed -w @documenso/prisma",
     "prisma:studio": "npm run with:env -- npx prisma studio --schema packages/prisma/schema.prisma",
     "with:env": "dotenv -e .env -e .env.local --",
     "reset:hard": "npm run clean && npm i && npm run prisma:generate"
@@ -46,8 +47,13 @@
     "apps/*",
     "packages/*"
   ],
-  "dependencies": {
-    "recharts": "^2.7.2",
-    "react-hotkeys-hook": "^4.4.1"
+  "dependencies": {},
+  "overrides": {
+    "next-auth": {
+      "next": "14.0.3"
+    },
+    "next-contentlayer": {
+      "next": "14.0.3"
+    }
   }
 }

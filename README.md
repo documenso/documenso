@@ -240,7 +240,7 @@ Now you can install the dependencies and build it:
 
 ```
 npm i
-npm run:build:web
+npm run build:web
 npm run prisma:migrate-deploy
 ```
 
