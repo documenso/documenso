@@ -58,7 +58,7 @@ export const DataTableActionButton = ({ row }: DataTableActionButtonProps) => {
         return;
       }
 
-      const documentBytes = await getFile({ data: documentData.data, type: documentData.type });
+      const documentBytes = await getFile(documentData);
 
       const blob = new Blob([documentBytes], {
         type: 'application/pdf',
