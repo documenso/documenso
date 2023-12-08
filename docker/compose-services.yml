@@ -20,7 +20,7 @@ services:
 
   minio:
     image: minio/minio
-    container_name: s3
+    container_name: minio
     ports:
       - 9002:9002
       - 9001:9001
