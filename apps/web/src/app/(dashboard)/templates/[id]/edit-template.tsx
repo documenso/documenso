@@ -4,13 +4,7 @@ import { useState } from 'react';
 
 import { useRouter } from 'next/navigation';
 
-import {
-  DocumentData,
-  Template,
-  TemplateField,
-  TemplateRecipient,
-  User,
-} from '@documenso/prisma/client';
+import { DocumentData, Field, Recipient, Template, User } from '@documenso/prisma/client';
 import { cn } from '@documenso/ui/lib/utils';
 import { Card, CardContent } from '@documenso/ui/primitives/card';
 import {
@@ -32,8 +26,8 @@ export type EditTemplateFormProps = {
   className?: string;
   user: User;
   template: Template;
-  recipients: TemplateRecipient[];
-  fields: TemplateField[];
+  recipients: Recipient[];
+  fields: Field[];
   documentData: DocumentData;
 };
 

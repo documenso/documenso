@@ -20,9 +20,9 @@ export const addTemplatePlaceholders = async ({
     userId: user.id,
     templateId,
     recipients: signers.map((signer) => ({
-      id: signer.nativeId,
+      id: signer.nativeId!,
       email: signer.email,
-      name: signer.name,
+      name: signer.name!,
     })),
   });
 };

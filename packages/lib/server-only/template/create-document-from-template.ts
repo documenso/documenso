@@ -13,8 +13,8 @@ export const createDocumentFromTemplate = async ({
   const template = await prisma.template.findUnique({
     where: { id: templateId, userId },
     include: {
-      TemplateRecipient: true,
-      TemplateField: true,
+      Recipient: true,
+      Field: true,
       templateDocumentData: true,
     },
   });
@@ -37,7 +37,7 @@ export const createDocumentFromTemplate = async ({
       title: template.title,
       documentDataId: documentData.id,
       Recipient: {
-        create: template.TemplateRecipient.map((recipient) => ({
+        create: template.Recipient.map((recipient) => ({
           email: recipient.email,
           name: recipient.name,
           token: nanoid(),
@@ -52,10 +52,8 @@ export const createDocumentFromTemplate = async ({
   });
 
   await prisma.field.createMany({
-    data: template.TemplateField.map((field) => {
-      const recipient = template.TemplateRecipient.find(
-        (recipient) => recipient.id === field.recipientId,
-      );
+    data: template.Field.map((field) => {
+      const recipient = template.Recipient.find((recipient) => recipient.id === field.recipientId);
 
       const documentRecipient = document.Recipient.find(
         (doc) => doc.templateToken === recipient?.templateToken,

@@ -6,7 +6,7 @@ export interface GetFieldsForTemplateOptions {
 }
 
 export const getFieldsForTemplate = async ({ templateId, userId }: GetFieldsForTemplateOptions) => {
-  const fields = await prisma.templateField.findMany({
+  const fields = await prisma.field.findMany({
     where: {
       templateId,
       Template: {

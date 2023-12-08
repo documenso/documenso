@@ -8,7 +8,7 @@ import { Plus, Trash } from 'lucide-react';
 import { Controller, useFieldArray, useForm } from 'react-hook-form';
 
 import { nanoid } from '@documenso/lib/universal/id';
-import { TemplateField, TemplateRecipient } from '@documenso/prisma/client';
+import { Field, Recipient } from '@documenso/prisma/client';
 import { Button } from '@documenso/ui/primitives/button';
 import { FormErrorMessage } from '@documenso/ui/primitives/form/form-error-message';
 import { Input } from '@documenso/ui/primitives/input';
@@ -28,8 +28,8 @@ import {
 
 export type AddTemplatePlaceholderRecipientsFormProps = {
   documentFlow: DocumentFlowStep;
-  recipients: TemplateRecipient[];
-  fields: TemplateField[];
+  recipients: Recipient[];
+  fields: Field[];
   numberOfSteps: number;
   onSubmit: (_data: TAddTemplatePlacholderRecipientsFormSchema) => void;
 };

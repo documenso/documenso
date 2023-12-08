@@ -9,7 +9,7 @@ export const getRecipientsForTemplate = async ({
   templateId,
   userId,
 }: GetRecipientsForTemplateOptions) => {
-  const recipients = await prisma.templateRecipient.findMany({
+  const recipients = await prisma.recipient.findMany({
     where: {
       templateId,
       Template: {

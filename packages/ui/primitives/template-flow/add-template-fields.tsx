@@ -11,7 +11,7 @@ import { getBoundingClientRect } from '@documenso/lib/client-only/get-bounding-c
 import { useDocumentElement } from '@documenso/lib/client-only/hooks/use-document-element';
 import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
 import { nanoid } from '@documenso/lib/universal/id';
-import { FieldType, TemplateField, TemplateRecipient } from '@documenso/prisma/client';
+import { Field, FieldType, Recipient } from '@documenso/prisma/client';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
 import { Card, CardContent } from '@documenso/ui/primitives/card';
@@ -54,8 +54,8 @@ const MIN_WIDTH_PX = 200;
 export type AddTemplateFieldsFormProps = {
   documentFlow: DocumentFlowStep;
   hideRecipients?: boolean;
-  recipients: TemplateRecipient[];
-  fields: TemplateField[];
+  recipients: Recipient[];
+  fields: Field[];
   numberOfSteps: number;
   onSubmit: (_data: TAddTemplateFieldsFormSchema) => void;
 };
@@ -107,7 +107,7 @@ export const AddTemplateFieldsFormPartial = ({
   });
 
   const [selectedField, setSelectedField] = useState<FieldType | null>(null);
-  const [selectedSigner, setSelectedSigner] = useState<TemplateRecipient | null>(null);
+  const [selectedSigner, setSelectedSigner] = useState<Recipient | null>(null);
   const [showRecipientsSelector, setShowRecipientsSelector] = useState(false);
 
   const [isFieldWithinBounds, setIsFieldWithinBounds] = useState(false);

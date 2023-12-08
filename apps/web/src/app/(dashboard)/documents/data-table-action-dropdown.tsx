@@ -3,13 +3,11 @@
 import { useState } from 'react';
 
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 
 import {
   Copy,
   Download,
   Edit,
-  Files,
   History,
   Loader,
   MoreHorizontal,
@@ -29,7 +27,6 @@ import { getFile } from '@documenso/lib/universal/upload/get-file';
 import { Document, DocumentStatus, Recipient, User } from '@documenso/prisma/client';
 import { DocumentWithData } from '@documenso/prisma/types/document-with-data';
 import { trpc as trpcClient } from '@documenso/trpc/client';
-import { trpc } from '@documenso/trpc/react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -52,8 +49,6 @@ export const DataTableActionDropdown = ({ row }: DataTableActionDropdownProps) =
   const { data: session } = useSession();
 
   const { toast } = useToast();
-
-  const router = useRouter();
 
   const { createAndCopyShareLink, isCopyingShareLink } = useCopyShareLink({
     onSuccess: () => toast(TOAST_DOCUMENT_SHARE_SUCCESS),

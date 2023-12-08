@@ -35,12 +35,12 @@ export const setFieldsForTemplate = async ({
     throw new Error('Document not found');
   }
 
-  const existingFields = await prisma.templateField.findMany({
+  const existingFields = await prisma.field.findMany({
     where: {
       templateId,
     },
     include: {
-      TemplateRecipient: true,
+      Recipient: true,
     },
   });
 
@@ -48,8 +48,7 @@ export const setFieldsForTemplate = async ({
     (existingField) =>
       !fields.find(
         (field) =>
-          field.id === existingField.id ||
-          field.signerEmail === existingField.TemplateRecipient?.email,
+          field.id === existingField.id || field.signerEmail === existingField.Recipient?.email,
       ),
   );
 
@@ -66,7 +65,7 @@ export const setFieldsForTemplate = async ({
     // Disabling as wrapping promises here causes type issues
     // eslint-disable-next-line @typescript-eslint/promise-function-async
     linkedFields.map((field) =>
-      prisma.templateField.upsert({
+      prisma.field.upsert({
         where: {
           id: field._persisted?.id ?? -1,
           templateId,
@@ -92,7 +91,7 @@ export const setFieldsForTemplate = async ({
               id: templateId,
             },
           },
-          TemplateRecipient: {
+          Recipient: {
             connect: {
               id: field.signerId,
               email: field.signerEmail,

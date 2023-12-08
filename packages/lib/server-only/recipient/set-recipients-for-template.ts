@@ -2,15 +2,15 @@ import { prisma } from '@documenso/prisma';
 
 import { nanoid } from '../../universal/id';
 
-export interface SetRecipientsForTemplateOptions {
+export type SetRecipientsForTemplateOptions = {
   userId: number;
   templateId: number;
   recipients: {
-    id?: number | null;
+    id?: number;
     email: string;
     name: string;
   }[];
-}
+};
 
 export const setRecipientsForTemplate = async ({
   userId,
@@ -33,7 +33,7 @@ export const setRecipientsForTemplate = async ({
     email: recipient.email.toLowerCase(),
   }));
 
-  const existingRecipients = await prisma.templateRecipient.findMany({
+  const existingRecipients = await prisma.recipient.findMany({
     where: {
       templateId,
     },
@@ -63,7 +63,7 @@ export const setRecipientsForTemplate = async ({
     // Disabling as wrapping promises here causes type issues
     // eslint-disable-next-line @typescript-eslint/promise-function-async
     linkedRecipients.map((recipient) =>
-      prisma.templateRecipient.upsert({
+      prisma.recipient.upsert({
         where: {
           id: recipient._persisted?.id ?? -1,
           templateId,
