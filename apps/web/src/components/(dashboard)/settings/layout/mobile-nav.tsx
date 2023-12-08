@@ -60,7 +60,7 @@ export const MobileNav = ({ className, ...props }: MobileNavProps) => {
           )}
         >
           <Braces className="mr-2 h-5 w-5" />
-          API Token
+          API Tokens
         </Button>
       </Link>
 

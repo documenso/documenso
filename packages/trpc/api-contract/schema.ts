@@ -38,10 +38,8 @@ export const SendDocumentForSigningMutationSchema = z.object({
 });
 
 export const UploadDocumentSuccessfulSchema = z.object({
-  uploadedFile: z.object({
-    url: z.string(),
-    key: z.string(),
-  }),
+  url: z.string(),
+  key: z.string(),
 });
 
 export const CreateDocumentMutationSchema = z.object({

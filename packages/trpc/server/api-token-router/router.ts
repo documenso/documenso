@@ -23,6 +23,7 @@ export const apiTokenRouter = router({
       });
     }
   }),
+
   getTokenById: authenticatedProcedure
     .input(ZGetApiTokenByIdQuerySchema)
     .query(async ({ input, ctx }) => {
@@ -40,6 +41,7 @@ export const apiTokenRouter = router({
         });
       }
     }),
+
   createToken: authenticatedProcedure
     .input(ZCreateTokenMutationSchema)
     .mutation(async ({ input, ctx }) => {
@@ -56,6 +58,7 @@ export const apiTokenRouter = router({
         });
       }
     }),
+
   deleteTokenById: authenticatedProcedure
     .input(ZDeleteTokenByIdMutationSchema)
     .mutation(async ({ input, ctx }) => {

@@ -1,12 +1,14 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 
-import { createDocumentData } from '@documenso/lib/server-only/document-data/create-document-data';
-import { createDocument } from '@documenso/lib/server-only/document/create-document';
+import { upsertDocumentMeta } from '@documenso/lib/server-only/document-meta/upsert-document-meta';
 import { deleteDocument } from '@documenso/lib/server-only/document/delete-document';
+import { findDocuments } from '@documenso/lib/server-only/document/find-documents';
 import { getDocumentById } from '@documenso/lib/server-only/document/get-document-by-id';
-import { getDocuments } from '@documenso/lib/server-only/public-api/get-documents';
+import { sendDocument } from '@documenso/lib/server-only/document/send-document';
+import { setFieldsForDocument } from '@documenso/lib/server-only/field/set-fields-for-document';
 import { checkUserFromToken } from '@documenso/lib/server-only/public-api/get-user-by-token';
-import { putFile } from '@documenso/lib/universal/upload/put-file';
+import { setRecipientsForDocument } from '@documenso/lib/server-only/recipient/set-recipients-for-document';
+import { getPresignPostUrl } from '@documenso/lib/universal/upload/server-actions';
 import { contract } from '@documenso/trpc/api-contract/contract';
 import { createNextRoute, createNextRouter } from '@documenso/trpc/server/public-api/ts-rest';
 
@@ -35,7 +37,7 @@ const router = createNextRoute(contract, {
       };
     }
 
-    const { documents, totalPages } = await getDocuments({ page, perPage, userId: user.id });
+    const { data: documents, totalPages } = await findDocuments({ page, perPage, userId: user.id });
 
     return {
       status: 200,
@@ -114,7 +116,30 @@ const router = createNextRoute(contract, {
     }
   },
   createDocument: async (args) => {
+    const { body } = args;
+
+    try {
+      const { url, key } = await getPresignPostUrl(body.fileName, body.contentType);
+
+      return {
+        status: 200,
+        body: {
+          url,
+          key,
+        },
+      };
+    } catch (e) {
+      return {
+        status: 404,
+        body: {
+          message: 'An error has occured while uploading the file',
+        },
+      };
+    }
+  },
+  sendDocumentForSigning: async (args) => {
     const { authorization } = args.headers;
+    const { id } = args.params;
     const { body } = args;
 
     const user = await validateUserToken(authorization);
@@ -128,39 +153,72 @@ const router = createNextRoute(contract, {
       };
     }
 
+    const document = await getDocumentById({ id: Number(id), userId: user.id });
+
+    if (!document) {
+      return {
+        status: 404,
+        body: {
+          message: 'Document not found',
+        },
+      };
+    }
+
+    if (document.status === 'PENDING') {
+      return {
+        status: 400,
+        body: {
+          message: 'Document is already waiting for signing',
+        },
+      };
+    }
+
     try {
-      const regexPattern = /filename="(.+?)"/;
-      const match = body.toString().match(regexPattern);
-      const documentTitle = match?.[1] ?? 'Untitled document';
-
-      const file = new Blob([body], {
-        type: 'application/pdf',
+      await setRecipientsForDocument({
+        userId: user.id,
+        documentId: Number(id),
+        recipients: [
+          {
+            email: body.signerEmail,
+            name: body.signerName ?? '',
+          },
+        ],
       });
 
-      const { type, data } = await putFile(file);
-
-      const { id: documentDataId } = await createDocumentData({
-        type,
-        data,
+      await setFieldsForDocument({
+        documentId: Number(id),
+        userId: user.id,
+        fields: body.fields.map((field) => ({
+          signerEmail: body.signerEmail,
+          type: field.fieldType,
+          pageNumber: field.pageNumber,
+          pageX: field.pageX,
+          pageY: field.pageY,
+          pageWidth: field.pageWidth,
+          pageHeight: field.pageHeight,
+        })),
       });
 
-      const { id } = await createDocument({
-        title: documentTitle,
-        documentDataId,
+      if (body.emailBody || body.emailSubject) {
+        await upsertDocumentMeta({
+          documentId: Number(id),
+          subject: body.emailSubject ?? '',
+          message: body.emailBody ?? '',
+        });
+      }
+
+      await sendDocument({
+        documentId: Number(id),
         userId: user.id,
       });
 
       return {
         status: 200,
         body: {
-          uploadedFile: {
-            id,
-            message: 'Document uploaded successfuly',
-          },
+          message: 'Document sent for signing successfully',
         },
       };
     } catch (e) {
-      console.error(e);
       return {
         status: 500,
         body: {
