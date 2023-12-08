@@ -3,16 +3,11 @@ import * as React from 'react';
 import { Check, ChevronsUpDown } from 'lucide-react';
 
 import { Role } from '@documenso/prisma/client';
-import { cn } from '@documenso/ui/lib/utils';
-import { Button } from '@documenso/ui/primitives/button';
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-} from '@documenso/ui/primitives/command';
-import { Popover, PopoverContent, PopoverTrigger } from '@documenso/ui/primitives/popover';
+
+import { cn } from '../lib/utils';
+import { Button } from './button';
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from './command';
+import { Popover, PopoverContent, PopoverTrigger } from './popover';
 
 type ComboboxProps = {
   listValues: string[];

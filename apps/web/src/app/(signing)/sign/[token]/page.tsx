@@ -8,6 +8,7 @@ import { getDocumentAndSenderByToken } from '@documenso/lib/server-only/document
 import { viewedDocument } from '@documenso/lib/server-only/document/viewed-document';
 import { getFieldsForToken } from '@documenso/lib/server-only/field/get-fields-for-token';
 import { getRecipientByToken } from '@documenso/lib/server-only/recipient/get-recipient-by-token';
+import { getRecipientSignatures } from '@documenso/lib/server-only/recipient/get-recipient-signatures';
 import { DocumentStatus, FieldType, SigningStatus } from '@documenso/prisma/client';
 import { Card, CardContent } from '@documenso/ui/primitives/card';
 import { ElementVisible } from '@documenso/ui/primitives/element-visible';
@@ -17,6 +18,7 @@ import { DateField } from './date-field';
 import { EmailField } from './email-field';
 import { SigningForm } from './form';
 import { NameField } from './name-field';
+import { NoLongerAvailable } from './no-longer-available';
 import { SigningProvider } from './provider';
 import { SignatureField } from './signature-field';
 
@@ -53,6 +55,18 @@ export default async function SigningPage({ params: { token } }: SigningPageProp
     recipient.signingStatus === SigningStatus.SIGNED
   ) {
     redirect(`/sign/${token}/complete`);
+  }
+
+  const [recipientSignature] = await getRecipientSignatures({ recipientId: recipient.id });
+
+  if (document.deletedAt) {
+    return (
+      <NoLongerAvailable
+        document={document}
+        recipientName={recipient.name}
+        recipientSignature={recipientSignature}
+      />
+    );
   }
 
   return (

@@ -7,8 +7,9 @@ import { Download } from 'lucide-react';
 
 import { getFile } from '@documenso/lib/universal/upload/get-file';
 import type { DocumentData } from '@documenso/prisma/client';
-import { Button } from '@documenso/ui/primitives/button';
-import { useToast } from '@documenso/ui/primitives/use-toast';
+
+import { Button } from '../../primitives/button';
+import { useToast } from '../../primitives/use-toast';
 
 export type DownloadButtonProps = HTMLAttributes<HTMLButtonElement> & {
   disabled?: boolean;
