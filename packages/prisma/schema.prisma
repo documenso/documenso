@@ -35,7 +35,7 @@ model User {
   accounts             Account[]
   sessions             Session[]
   Document             Document[]
-  Subscription       Subscription[]
+  Subscription         Subscription[]
   PasswordResetToken   PasswordResetToken[]
   twoFactorSecret      String?
   twoFactorEnabled     Boolean              @default(false)

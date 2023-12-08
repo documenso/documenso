@@ -1,12 +1,10 @@
-import type Stripe from 'stripe';
-
 import { stripe } from '@documenso/lib/server-only/stripe';
 import { prisma } from '@documenso/prisma';
 import type { User } from '@documenso/prisma/client';
 
 import { onSubscriptionUpdated } from './webhook/on-subscription-updated';
 
-export const getStripeCustomerByEmail = async (email: string): Promise<Stripe.Customer | null> => {
+export const getStripeCustomerByEmail = async (email: string) => {
   const foundStripeCustomers = await stripe.customers.list({
     email,
   });

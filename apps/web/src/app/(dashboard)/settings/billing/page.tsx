@@ -28,13 +28,12 @@ export default async function BillingSettingsPage() {
   }
 
   if (!user.customerId) {
-    const stripeSession = await getStripeCustomerByUser(user);
-    user = stripeSession.user;
+    user = await getStripeCustomerByUser(user).then((result) => result.user);
   }
 
   const [subscriptions, prices, individualPrices] = await Promise.all([
     getSubscriptionsByUserId({ userId: user.id }),
-    getPricesByInterval({ filterType: 'individual' }),
+    getPricesByInterval({ type: 'individual' }),
     getPricesByType('individual'),
   ]);
 

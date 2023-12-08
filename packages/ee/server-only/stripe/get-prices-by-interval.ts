@@ -11,10 +11,10 @@ export type GetPricesByIntervalOptions = {
   /**
    * Filter products by their meta 'type' attribute.
    */
-  filterType?: 'individual';
+  type?: 'individual';
 };
 
-export const getPricesByInterval = async ({ filterType }: GetPricesByIntervalOptions = {}) => {
+export const getPricesByInterval = async ({ type }: GetPricesByIntervalOptions = {}) => {
   let { data: prices } = await stripe.prices.search({
     query: `active:'true' type:'recurring'`,
     expand: ['data.product'],
@@ -26,7 +26,7 @@ export const getPricesByInterval = async ({ filterType }: GetPricesByIntervalOpt
     // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
     const product = price.product as Stripe.Product;
 
-    const filter = !filterType || product.metadata?.type === filterType;
+    const filter = !type || product.metadata?.type === type;
 
     // Filter out prices for products that are not active.
     return product.active && filter;
