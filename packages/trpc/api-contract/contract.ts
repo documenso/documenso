@@ -1,48 +1,19 @@
 import { initContract } from '@ts-rest/core';
-import { z } from 'zod';
+
+import {
+  AuthorizationHeadersSchema,
+  CreateDocumentMutationSchema,
+  DeleteDocumentMutationSchema,
+  GetDocumentsQuerySchema,
+  SendDocumentForSigningMutationSchema,
+  SuccessfulDocumentResponseSchema,
+  SuccessfulResponseSchema,
+  SuccessfulSigningResponseSchema,
+  UnsuccessfulResponseSchema,
+  UploadDocumentSuccessfulSchema,
+} from './schema';
 
 const c = initContract();
-
-/* 
-  These schemas should be moved from here probably.
-  It grows quickly.
-*/
-const GetDocumentsQuerySchema = z.object({
-  page: z.string().optional(),
-  perPage: z.string().optional(),
-});
-
-const DocumentSchema = z.object({
-  id: z.number(),
-  userId: z.number(),
-  title: z.string(),
-  status: z.string(),
-  documentDataId: z.string(),
-  createdAt: z.date(),
-  updatedAt: z.date(),
-  completedAt: z.date().nullable(),
-});
-
-const SendDocumentForSigningMutationSchema = z.object({
-  signerEmail: z.string(),
-  signerName: z.string().optional(),
-});
-
-const UploadDocumentSuccessfulSchema = z.object({
-  uploadedFile: z.object({
-    id: z.number(),
-    message: z.string(),
-  }),
-});
-
-const SuccessfulResponseSchema = z.object({
-  documents: DocumentSchema.array(),
-  totalPages: z.number(),
-});
-
-const UnsuccessfulResponseSchema = z.object({
-  message: z.string(),
-});
 
 export const contract = c.router(
   {
@@ -61,39 +32,48 @@ export const contract = c.router(
       method: 'GET',
       path: `/documents/:id`,
       responses: {
-        200: DocumentSchema,
+        200: SuccessfulDocumentResponseSchema,
         401: UnsuccessfulResponseSchema,
         404: UnsuccessfulResponseSchema,
       },
       summary: 'Get a single document',
     },
+    createDocument: {
+      method: 'POST',
+      path: '/documents',
+      body: CreateDocumentMutationSchema,
+      responses: {
+        200: UploadDocumentSuccessfulSchema,
+        401: UnsuccessfulResponseSchema,
+        404: UnsuccessfulResponseSchema,
+      },
+      summary: 'Upload a new document and get a presigned URL',
+    },
+    sendDocumentForSigning: {
+      method: 'PATCH',
+      path: '/documents/:id/send-for-signing',
+      body: SendDocumentForSigningMutationSchema,
+      responses: {
+        200: SuccessfulSigningResponseSchema,
+        400: UnsuccessfulResponseSchema,
+        401: UnsuccessfulResponseSchema,
+        404: UnsuccessfulResponseSchema,
+      },
+      summary: 'Send a document for signing',
+    },
     deleteDocument: {
       method: 'DELETE',
       path: `/documents/:id`,
-      body: z.string(),
+      body: DeleteDocumentMutationSchema,
       responses: {
-        200: DocumentSchema,
+        200: SuccessfulDocumentResponseSchema,
         401: UnsuccessfulResponseSchema,
         404: UnsuccessfulResponseSchema,
       },
       summary: 'Delete a document',
     },
-    createDocument: {
-      method: 'POST',
-      path: '/documents',
-      contentType: 'multipart/form-data',
-      body: c.type<{ file: File }>(),
-      responses: {
-        200: UploadDocumentSuccessfulSchema,
-        401: UnsuccessfulResponseSchema,
-        500: UnsuccessfulResponseSchema,
-      },
-      summary: 'Upload a new document',
-    },
   },
   {
-    baseHeaders: z.object({
-      authorization: z.string(),
-    }),
+    baseHeaders: AuthorizationHeadersSchema,
   },
 );
