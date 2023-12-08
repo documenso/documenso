@@ -52,7 +52,7 @@ export const SigningProvider = ({
   const [email, setEmail] = useState(initialEmail || '');
   const [signature, setSignature] = useState(initialSignature || null);
   const [dateFormat, setDateFormat] = useState(initialDateFormat || 'yyyy-MM-dd hh:mm a');
-  const [timeZone, setTimeZone] = useState(initialTimeZone || '');
+  const [timeZone, setTimeZone] = useState(initialTimeZone || 'Europe/London');
 
   return (
     <SigningContext.Provider

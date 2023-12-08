@@ -7,7 +7,8 @@ import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import { useForm } from 'react-hook-form';
 
-import { TIME_ZONES } from '@documenso/lib/constants/time-zones';
+import { DATE_FORMATS } from '@documenso/lib/constants/date-formats';
+import { TIME_ZONES_FULL } from '@documenso/lib/constants/time-zones';
 import { completeDocumentWithToken } from '@documenso/lib/server-only/document/complete-document-with-token';
 import { sortFieldsByPosition, validateFieldsInserted } from '@documenso/lib/utils/fields';
 import type { Document, Field, Recipient } from '@documenso/prisma/client';
@@ -26,8 +27,6 @@ import {
   SelectValue,
 } from '@documenso/ui/primitives/select';
 import { SignaturePad } from '@documenso/ui/primitives/signature-pad';
-
-import { DATE_FORMATS } from '~/helpers/constants';
 
 import { useRequiredSigningContext } from './provider';
 import { SignDialog } from './sign-dialog';
@@ -82,8 +81,6 @@ export const SigningForm = ({ document, recipient, fields }: SigningFormProps) =
 
     router.push(`/sign/${recipient.token}/complete`);
   };
-
-  console.log('TZ Bruh', TIME_ZONES);
 
   return (
     <form
@@ -162,7 +159,7 @@ export const SigningForm = ({ document, recipient, fields }: SigningFormProps) =
                   <Label htmlFor="time-zone">Time Zone</Label>
 
                   <Combobox
-                    listValues={TIME_ZONES}
+                    listValues={TIME_ZONES_FULL}
                     onChange={(value: string) => setTimeZone(value)}
                     selectedValue={timeZone}
                   />

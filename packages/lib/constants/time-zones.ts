@@ -1,4 +1,4 @@
-import { rawTimeZones } from '@vvo/tzdb';
+import { rawTimeZones, timeZonesNames } from '@vvo/tzdb';
 
 export const TIME_ZONE_DATA = rawTimeZones;
 
@@ -28,4 +28,6 @@ const getGMTOffsets = (timezones: TimeZone[]): string[] => {
   return gmtOffsets;
 };
 
-export const TIME_ZONES = getGMTOffsets(TIME_ZONE_DATA);
+export const TIME_ZONES_FULL = getGMTOffsets(TIME_ZONE_DATA);
+
+export const TIME_ZONES = timeZonesNames;

@@ -19,6 +19,8 @@ export const completeDocument = async ({ documentId, email }: CompleteDocumentAc
       documentId,
       subject: email.subject,
       message: email.message,
+      timezone: email.timezone,
+      dateFormat: email.dateFormat,
     });
   }
 

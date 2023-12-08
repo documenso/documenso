@@ -2,6 +2,8 @@
 
 import { useForm } from 'react-hook-form';
 
+import { DATE_FORMATS } from '@documenso/lib/constants/date-formats';
+import { TIME_ZONES_FULL } from '@documenso/lib/constants/time-zones';
 import type { Field, Recipient } from '@documenso/prisma/client';
 import { DocumentStatus } from '@documenso/prisma/client';
 import type { DocumentWithData } from '@documenso/prisma/types/document-with-data';
@@ -17,6 +19,7 @@ import {
 } from '@documenso/ui/primitives/select';
 import { Textarea } from '@documenso/ui/primitives/textarea';
 
+import { Combobox } from '../combobox';
 import type { TAddSubjectFormSchema } from './add-subject.types';
 import {
   DocumentFlowFormContainerActions,
@@ -47,16 +50,22 @@ export const AddSubjectFormPartial = ({
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
+    getValues,
+    setValue,
   } = useForm<TAddSubjectFormSchema>({
     defaultValues: {
       email: {
         subject: document.documentMeta?.subject ?? '',
         message: document.documentMeta?.message ?? '',
+        timezone: document.documentMeta?.timezone ?? 'Europe/London',
+        dateFormat: document.documentMeta?.dateFormat ?? 'MM-DD-YYYY',
       },
     },
   });
 
   const onFormSubmit = handleSubmit(onSubmit);
+
+  const hasDateField = _fields.find((field) => field.type === 'DATE');
 
   return (
     <>
@@ -99,27 +108,43 @@ export const AddSubjectFormPartial = ({
               />
             </div>
 
-            <div>
-              <Label htmlFor="time-format">Time Format</Label>
+            {hasDateField && (
+              <div className="flex flex-col">
+                <Label htmlFor="time-zone">
+                  Date Format <span className="text-muted-foreground">(Optional)</span>
+                </Label>
 
-              <Select
-                onValueChange={(value) => {
-                  setTimeFormat(value);
-                }}
-                defaultValue={timeFormat}
-              >
-                <SelectTrigger className="bg-background mt-2">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {TIME_FORMATS.map((format) => (
-                    <SelectItem key={format.key} value={format.value}>
-                      {format.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+                <Select
+                  onValueChange={(value) => setValue('email.dateFormat', value)}
+                  defaultValue={getValues('email.dateFormat')}
+                >
+                  <SelectTrigger className="bg-background mt-2">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {DATE_FORMATS.map((format) => (
+                      <SelectItem key={format.key} value={format.value}>
+                        {format.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
+
+            {hasDateField && (
+              <div className="flex flex-col">
+                <Label htmlFor="time-zone">
+                  Time Zone <span className="text-muted-foreground">(Optional)</span>
+                </Label>
+
+                <Combobox
+                  listValues={TIME_ZONES_FULL}
+                  onChange={(value) => setValue('email.timezone', value)}
+                  selectedValue={getValues('email.timezone')}
+                />
+              </div>
+            )}
 
             <div>
               <p className="text-muted-foreground text-sm">
