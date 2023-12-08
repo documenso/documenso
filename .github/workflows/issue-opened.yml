@@ -1,15 +1,12 @@
-name: "Label Issues"
+name: 'Label Issues'
 
 on:
   issues:
-    types:
-      - reopened
-      - opened
+    types: ['opened', 'reopened']
 
 jobs:
   label_issues:
     runs-on: ubuntu-latest
-    if: github.repository == 'documenso/documenso'
     permissions:
       issues: write
     steps:

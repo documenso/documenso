@@ -1,7 +1,7 @@
 'apps: marketing':
   - apps/marketing/**
 
-'apps: web': 
+'apps: web':
   - apps/web/**
 
 'version bump 👀':
@@ -14,7 +14,7 @@
 '🚨 e2e changes 🚨':
   - packages/app-tests/e2e/**
 
-"🚨 .env changes 🚨":
+'🚨 .env changes 🚨':
   - .env.example
 
 'pkg: ee changes':

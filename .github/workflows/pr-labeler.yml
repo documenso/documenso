@@ -1,4 +1,4 @@
-name: "PR Labeler"
+name: 'PR Labeler'
 
 on:
   - pull_request_target
@@ -9,7 +9,6 @@ concurrency:
 
 jobs:
   labeler:
-    if: github.repository == 'documenso/documenso'
     permissions:
       contents: read
       pull-requests: write
@@ -18,4 +17,4 @@ jobs:
       - uses: actions/labeler@v4
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
-          sync-labels: ""
+          sync-labels: ''

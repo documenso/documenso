@@ -13,7 +13,6 @@ permissions:
 
 jobs:
   validate-pr:
-    if: github.repository == 'documenso/documenso'
     name: Validate PR title
     runs-on: ubuntu-latest
     steps:
