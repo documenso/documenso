@@ -8,6 +8,7 @@
     "build": "next build",
     "start": "next start -p 3001",
     "lint": "next lint",
+    "lint:fix": "next lint --fix",
     "clean": "rimraf .next && rimraf node_modules",
     "copy:pdfjs": "node ../../scripts/copy-pdfjs.cjs"
   },

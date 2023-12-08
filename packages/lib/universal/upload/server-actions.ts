@@ -10,7 +10,7 @@ import slugify from '@sindresorhus/slugify';
 import path from 'node:path';
 
 import { ONE_HOUR, ONE_SECOND } from '../../constants/time';
-import { getServerComponentSession } from '../../next-auth/get-server-session';
+import { getServerComponentSession } from '../../next-auth/get-server-component-session';
 import { alphaid } from '../id';
 
 export const getPresignPostUrl = async (fileName: string, contentType: string) => {

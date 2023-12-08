@@ -207,7 +207,7 @@ export const PDFViewer = ({
             .map((_, i) => (
               <div
                 key={i}
-                className="border-border my-8 overflow-hidden rounded border first:mt-0 last:mb-0"
+                className="border-border my-8 overflow-hidden rounded border will-change-transform first:mt-0 last:mb-0"
               >
                 <PDFPage
                   pageNumber={i + 1}

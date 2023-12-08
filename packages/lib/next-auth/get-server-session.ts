@@ -1,4 +1,6 @@
-import { GetServerSidePropsContext, NextApiRequest, NextApiResponse } from 'next';
+'use server';
+
+import type { GetServerSidePropsContext, NextApiRequest, NextApiResponse } from 'next';
 
 import { getServerSession as getNextAuthServerSession } from 'next-auth';
 
@@ -23,32 +25,6 @@ export const getServerSession = async ({ req, res }: GetServerSessionOptions) =>
       email: session.user.email,
     },
   });
-
-  return { user, session };
-};
-
-export const getServerComponentSession = async () => {
-  const session = await getNextAuthServerSession(NEXT_AUTH_OPTIONS);
-
-  if (!session || !session.user?.email) {
-    return { user: null, session: null };
-  }
-
-  const user = await prisma.user.findFirstOrThrow({
-    where: {
-      email: session.user.email,
-    },
-  });
-
-  return { user, session };
-};
-
-export const getRequiredServerComponentSession = async () => {
-  const { user, session } = await getServerComponentSession();
-
-  if (!user || !session) {
-    throw new Error('No session found');
-  }
 
   return { user, session };
 };
