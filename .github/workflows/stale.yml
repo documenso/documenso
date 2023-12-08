@@ -22,4 +22,4 @@ jobs:
           close-issue-message: 'This issue has been closed because of inactivity.'
           close-pr-message: 'This PR has been closed because of inactivity.'
           exempt-pr-labels: 'WIP,on-hold,needs review'
-          exempt-issue-labels: 'WIP,on-hold,needs review,roadmap'
+          exempt-issue-labels: 'WIP,on-hold,needs review,roadmap,assigned'

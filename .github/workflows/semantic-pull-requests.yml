@@ -1,4 +1,4 @@
-name: "Validate PR Name"
+name: 'Validate PR Name'
 
 on:
   pull_request_target:
@@ -9,7 +9,7 @@ on:
       - synchronize
 
 permissions:
-  pull-requests: read
+  pull-requests: write
 
 jobs:
   validate-pr:
