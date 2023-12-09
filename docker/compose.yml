@@ -33,7 +33,6 @@ services:
       - SMTP_MAIL_USER=username
       - SMTP_MAIL_PASSWORD=password
       - MAIL_FROM=admin@example.com
-      - NEXT_PUBLIC_ALLOW_SIGNUP=true
     ports:
       - 3000:3000
     volumes:
