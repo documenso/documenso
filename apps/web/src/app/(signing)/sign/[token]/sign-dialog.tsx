@@ -15,6 +15,7 @@ export type SignDialogProps = {
   document: Document;
   fields: Field[];
   onSignatureComplete: () => void | Promise<void>;
+  setValidateUninsertedFields: (value: boolean) => void;
 };
 
 export const SignDialog = ({
@@ -22,6 +23,7 @@ export const SignDialog = ({
   document,
   fields,
   onSignatureComplete,
+  setValidateUninsertedFields,
 }: SignDialogProps) => {
   const [showDialog, setShowDialog] = useState(false);
 
@@ -36,7 +38,10 @@ export const SignDialog = ({
           size="lg"
           // disabled={!isComplete}
           loading={isSubmitting}
-          onClick={() => validateFieldsInserted(fields)}
+          onClick={() => {
+            validateFieldsInserted(fields);
+            setValidateUninsertedFields(true);
+          }}
         >
           {' '}
           {isComplete ? 'Complete' : 'Skip to next field'}

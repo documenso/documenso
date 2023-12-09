@@ -141,6 +141,7 @@ export const SigningForm = ({ document, recipient, fields }: SigningFormProps) =
                 onSignatureComplete={handleSubmit(onFormSubmit)}
                 document={document}
                 fields={fields}
+                setValidateUninsertedFields={setValidateUninsertedFields}
               />
             </div>
           </div>
