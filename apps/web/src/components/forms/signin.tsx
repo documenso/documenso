@@ -24,6 +24,7 @@ const ERROR_MESSAGES: Partial<Record<keyof typeof ErrorCode, string>> = {
     'This account appears to be using a social login method, please sign in using that method',
   [ErrorCode.INCORRECT_TWO_FACTOR_CODE]: 'The two-factor authentication code provided is incorrect',
   [ErrorCode.INCORRECT_TWO_FACTOR_BACKUP_CODE]: 'The backup code provided is incorrect',
+  [ErrorCode.SIGNUP_DISABLED]: 'Creating new accounts is currently disabled',
 };
 
 const TwoFactorEnabledErrorCode = ErrorCode.TWO_FACTOR_MISSING_CREDENTIALS;
@@ -146,6 +147,7 @@ export const SignInForm = ({ className }: SignInFormProps) => {
     try {
       await signIn('google', { callbackUrl: LOGIN_REDIRECT_PATH });
     } catch (err) {
+      console.error(err);
       toast({
         title: 'An unknown error occurred',
         description:

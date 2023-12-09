@@ -162,5 +162,15 @@ export const NEXT_AUTH_OPTIONS: AuthOptions = {
 
       return session;
     },
+
+    async signIn({ user }) {
+      if (process.env.NEXT_PUBLIC_DISABLE_SIGNUP === 'true') {
+        const userData = await getUserByEmail({ email: user.email! });
+
+        return !!userData;
+      } else {
+        return true;
+      }
+    },
   },
 };
