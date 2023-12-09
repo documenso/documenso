@@ -7,10 +7,11 @@ import { createPortal } from 'react-dom';
 import { Rnd } from 'react-rnd';
 
 import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
-import { cn } from '@documenso/ui/lib/utils';
-import { Card, CardContent } from '@documenso/ui/primitives/card';
 
-import { FRIENDLY_FIELD_TYPE, TDocumentFlowFormSchema } from './types';
+import { cn } from '../../lib/utils';
+import { Card, CardContent } from '../card';
+import type { TDocumentFlowFormSchema } from './types';
+import { FRIENDLY_FIELD_TYPE } from './types';
 
 type Field = TDocumentFlowFormSchema['fields'][0];
 

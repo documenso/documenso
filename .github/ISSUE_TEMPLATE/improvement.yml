@@ -1,4 +1,4 @@
-name: "General Improvement"
+name: 'General Improvement'
 description: Suggest a minor enhancement or improvement for this project
 body:
   - type: markdown

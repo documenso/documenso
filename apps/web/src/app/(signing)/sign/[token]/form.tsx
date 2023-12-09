@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import { useForm } from 'react-hook-form';
 
+import { useAnalytics } from '@documenso/lib/client-only/hooks/use-analytics';
 import { sortFieldsByPosition, validateFieldsInserted } from '@documenso/lib/utils/fields';
 import type { Document, Field, Recipient } from '@documenso/prisma/client';
 import { trpc } from '@documenso/trpc/react';
@@ -29,6 +30,7 @@ export type SigningFormProps = {
 
 export const SigningForm = ({ document, recipient, fields }: SigningFormProps) => {
   const router = useRouter();
+  const analytics = useAnalytics();
   const { data: session } = useSession();
 
   const { fullName, signature, setFullName, setSignature } = useRequiredSigningContext();
@@ -58,6 +60,12 @@ export const SigningForm = ({ document, recipient, fields }: SigningFormProps) =
     await completeDocumentWithToken({
       token: recipient.token,
       documentId: document.id,
+    });
+
+    analytics.capture('App: Recipient has completed signing', {
+      signerId: recipient.id,
+      documentId: document.id,
+      timestamp: new Date().toISOString(),
     });
 
     router.push(`/sign/${recipient.token}/complete`);
