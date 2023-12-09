@@ -1,72 +1,69 @@
-import { expect, test } from '@playwright/test';
+import { expect } from '@playwright/test';
 
-import { TEST_USERS } from '@documenso/prisma/seed/pr-713-add-document-search-to-command-menu';
+import { test } from '../fixtures';
+
+const sentDocumentName = '[713] Document - Sent';
+const receivedDocumentName = '[713] Document - Received';
+
+let recipientEmail = '';
+
+test.beforeEach(async ({ users, documents, samplePdf }) => {
+  const user1 = await users.create();
+  const user2 = await users.create();
+
+  await documents.createPendingDocument({
+    document: samplePdf.pdf,
+    recipients: [{ email: user2.email, name: user2.name }],
+    title: sentDocumentName,
+    userId: user1.id,
+  });
+
+  await documents.createPendingDocument({
+    document: samplePdf.pdf,
+    recipients: [{ email: user1.email, name: user1.name }],
+    title: receivedDocumentName,
+    userId: user2.id,
+  });
+
+  recipientEmail = user2.email;
+  await user1.apiLogin();
+});
+
+test.afterEach(async ({ users, documents }) => {
+  await users.deleteAll();
+
+  await documents.deleteAll();
+});
 
 test('[PR-713]: should see sent documents', async ({ page }) => {
-  const [user] = TEST_USERS;
-
-  await page.goto('/signin');
-
-  await page.getByLabel('Email').fill(user.email);
-  await page.getByLabel('Password', { exact: true }).fill(user.password);
-  await page.getByRole('button', { name: 'Sign In' }).click();
-
-  await page.waitForURL('/documents');
+  await page.goto('/documents');
 
   await page.keyboard.press('Meta+K');
 
   await page.getByPlaceholder('Type a command or search...').fill('sent');
-  await expect(page.getByRole('option', { name: '[713] Document - Sent' })).toBeVisible();
+  await expect(page.getByRole('option', { name: sentDocumentName })).toBeVisible();
 
   await page.keyboard.press('Escape');
-
-  // signout
-  await page.getByTitle('Profile Dropdown').click();
-  await page.getByRole('menuitem', { name: 'Sign Out' }).click();
 });
 
 test('[PR-713]: should see received documents', async ({ page }) => {
-  const [user] = TEST_USERS;
-
-  await page.goto('/signin');
-
-  await page.getByLabel('Email').fill(user.email);
-  await page.getByLabel('Password', { exact: true }).fill(user.password);
-  await page.getByRole('button', { name: 'Sign In' }).click();
-
-  await page.waitForURL('/documents');
+  await page.goto('/documents');
 
   await page.keyboard.press('Meta+K');
 
   await page.getByPlaceholder('Type a command or search...').fill('received');
-  await expect(page.getByRole('option', { name: '[713] Document - Received' })).toBeVisible();
+  await expect(page.getByRole('option', { name: receivedDocumentName })).toBeVisible();
 
   await page.keyboard.press('Escape');
-
-  // signout
-  await page.getByTitle('Profile Dropdown').click();
-  await page.getByRole('menuitem', { name: 'Sign Out' }).click();
 });
 
 test('[PR-713]: should be able to search by recipient', async ({ page }) => {
-  const [user, recipient] = TEST_USERS;
-
-  await page.goto('/signin');
-
-  await page.getByLabel('Email').fill(user.email);
-  await page.getByLabel('Password', { exact: true }).fill(user.password);
-  await page.getByRole('button', { name: 'Sign In' }).click();
-
-  await page.waitForURL('/documents');
+  await page.goto('/documents');
 
   await page.keyboard.press('Meta+K');
 
-  await page.getByPlaceholder('Type a command or search...').fill(recipient.email);
+  await page.getByPlaceholder('Type a command or search...').fill(recipientEmail);
   await expect(page.getByRole('option', { name: '[713] Document - Sent' })).toBeVisible();
 
   await page.keyboard.press('Escape');
-
-  // signout
-  await page.getByTitle('Profile Dropdown').click();
-  await page.getByRole('menuitem', { name: 'Sign Out' }).click();
 });
