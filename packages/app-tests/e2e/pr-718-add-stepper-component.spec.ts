@@ -1,29 +1,22 @@
-import { expect, test } from '@playwright/test';
-import path from 'node:path';
+import { expect } from '@playwright/test';
 
-import { TEST_USER } from '@documenso/prisma/seed/pr-718-add-stepper-component';
+import { test } from '../fixtures';
 
-test(`[PR-718]: should be able to create a document`, async ({ page }) => {
-  await page.goto('/signin');
+const documentTitle = `example-${Date.now()}.pdf`;
 
-  const documentTitle = `example-${Date.now()}.pdf`;
+test.beforeEach(async ({ users }) => {
+  const user = await users.create();
+  await user.apiLogin();
+});
 
-  // Sign in
-  await page.getByLabel('Email').fill(TEST_USER.email);
-  await page.getByLabel('Password', { exact: true }).fill(TEST_USER.password);
-  await page.getByRole('button', { name: 'Sign In' }).click();
+test.afterEach(async ({ users }) => {
+  await users.deleteAll();
+});
 
-  // Upload document
-  const [fileChooser] = await Promise.all([
-    page.waitForEvent('filechooser'),
-    page.locator('input[type=file]').evaluate((e) => {
-      if (e instanceof HTMLInputElement) {
-        e.click();
-      }
-    }),
-  ]);
+test(`[PR-718]: should be able to create a document`, async ({ page, documents, samplePdf }) => {
+  await page.goto('/documents');
 
-  await fileChooser.setFiles(path.join(__dirname, '../../../assets/example.pdf'));
+  await documents.upload(samplePdf);
 
   // Wait to be redirected to the edit page
   await page.waitForURL(/\/documents\/\d+/);
