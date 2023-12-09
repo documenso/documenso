@@ -1,67 +1,87 @@
-import { expect, test } from '@playwright/test';
+import { expect } from '@playwright/test';
 
-import { TEST_USERS } from '@documenso/prisma/seed/pr-711-deletion-of-documents';
+import { test } from '../fixtures';
 
-test.describe.configure({ mode: 'serial' });
+const completedDocumentTitle = 'Document 1 - Completed';
+const draftDocumentTitle = 'Document 1 - Draft';
+const pendingDocumentTitle = 'Document 1 - Pending';
 
-test('[PR-711]: seeded documents should be visible', async ({ page }) => {
-  const [sender, ...recipients] = TEST_USERS;
+test.beforeEach(async ({ users, documents, samplePdf }) => {
+  const user = await users.create();
 
-  await page.goto('/signin');
+  const recipient1 = await users.create();
+  const recipient2 = await users.create();
 
-  await page.getByLabel('Email').fill(sender.email);
-  await page.getByLabel('Password', { exact: true }).fill(sender.password);
-  await page.getByRole('button', { name: 'Sign In' }).click();
+  const recipients = [
+    { email: recipient1.email, name: recipient1.name },
+    { email: recipient2.email, name: recipient2.name },
+  ];
 
-  await page.waitForURL('/documents');
+  await documents.createCompletedDocument({
+    document: samplePdf.pdf,
+    recipients,
+    title: completedDocumentTitle,
+    userId: user.id,
+  });
 
-  await expect(page.getByRole('link', { name: 'Document 1 - Completed' })).toBeVisible();
-  await expect(page.getByRole('link', { name: 'Document 1 - Pending' })).toBeVisible();
-  await expect(page.getByRole('link', { name: 'Document 1 - Draft' })).toBeVisible();
+  await documents.createDraftDocument({
+    document: samplePdf.pdf,
+    recipients,
+    title: draftDocumentTitle,
+    userId: user.id,
+  });
 
-  await page.getByTitle('Profile Dropdown').click();
-  await page.getByRole('menuitem', { name: 'Sign Out' }).click();
+  await documents.createPendingDocument({
+    document: samplePdf.pdf,
+    recipients,
+    title: pendingDocumentTitle,
+    userId: user.id,
+  });
 
-  await page.waitForURL('/signin');
+  await user.apiLogin();
+});
+
+test.afterEach(async ({ users, documents }) => {
+  await users.deleteAll();
+  await documents.deleteAll();
+});
+
+test('[PR-711]: seeded documents should be visible', async ({ page, users }) => {
+  const [_sender, ...recipients] = users.get();
+
+  await page.goto('/documents');
+
+  await expect(page.getByRole('link', { name: completedDocumentTitle })).toBeVisible();
+  await expect(page.getByRole('link', { name: pendingDocumentTitle })).toBeVisible();
+  await expect(page.getByRole('link', { name: draftDocumentTitle })).toBeVisible();
+
+  await users.logout();
 
   for (const recipient of recipients) {
-    await page.goto('/signin');
+    await recipient.apiLogin();
 
-    await page.getByLabel('Email').fill(recipient.email);
-    await page.getByLabel('Password', { exact: true }).fill(recipient.password);
-    await page.getByRole('button', { name: 'Sign In' }).click();
+    await page.goto('/documents');
 
-    await page.waitForURL('/documents');
+    await expect(page.getByRole('link', { name: completedDocumentTitle })).toBeVisible();
+    await expect(page.getByRole('link', { name: pendingDocumentTitle })).toBeVisible();
 
-    await expect(page.getByRole('link', { name: 'Document 1 - Completed' })).toBeVisible();
-    await expect(page.getByRole('link', { name: 'Document 1 - Pending' })).toBeVisible();
+    await expect(page.getByRole('link', { name: draftDocumentTitle })).not.toBeVisible();
 
-    await expect(page.getByRole('link', { name: 'Document 1 - Draft' })).not.toBeVisible();
-
-    await page.getByTitle('Profile Dropdown').click();
-    await page.getByRole('menuitem', { name: 'Sign Out' }).click();
-
-    await page.waitForURL('/signin');
+    await users.logout();
   }
 });
 
 test('[PR-711]: deleting a completed document should not remove it from recipients', async ({
   page,
+  users,
 }) => {
-  const [sender, ...recipients] = TEST_USERS;
+  const [_sender, ...recipients] = users.get();
 
-  await page.goto('/signin');
-
-  // sign in
-  await page.getByLabel('Email').fill(sender.email);
-  await page.getByLabel('Password', { exact: true }).fill(sender.password);
-  await page.getByRole('button', { name: 'Sign In' }).click();
-
-  await page.waitForURL('/documents');
+  await page.goto('/documents');
 
   // open actions menu
   await page
-    .locator('tr', { hasText: 'Document 1 - Completed' })
+    .locator('tr', { hasText: completedDocumentTitle })
     .getByRole('cell', { name: 'Download' })
     .getByRole('button')
     .nth(1)
@@ -72,113 +92,80 @@ test('[PR-711]: deleting a completed document should not remove it from recipien
   await page.getByPlaceholder("Type 'delete' to confirm").fill('delete');
   await page.getByRole('button', { name: 'Delete' }).click();
 
-  await expect(page.getByRole('row', { name: /Document 1 - Completed/ })).not.toBeVisible();
+  await expect(page.getByRole('row', { name: completedDocumentTitle })).not.toBeVisible();
 
   // signout
-  await page.getByTitle('Profile Dropdown').click();
-  await page.getByRole('menuitem', { name: 'Sign Out' }).click();
-
-  await page.waitForURL('/signin');
+  await users.logout();
 
   for (const recipient of recipients) {
-    await page.goto('/signin');
-
     // sign in
-    await page.getByLabel('Email').fill(recipient.email);
-    await page.getByLabel('Password', { exact: true }).fill(recipient.password);
-    await page.getByRole('button', { name: 'Sign In' }).click();
+    await recipient.apiLogin();
 
-    await page.waitForURL('/documents');
+    await page.goto('/documents');
 
-    await expect(page.getByRole('link', { name: 'Document 1 - Completed' })).toBeVisible();
+    await expect(page.getByRole('link', { name: completedDocumentTitle })).toBeVisible();
 
     await page.goto(`/sign/completed-token-${recipients.indexOf(recipient)}`);
     await expect(page.getByText('Everyone has signed').nth(0)).toBeVisible();
 
-    await page.goto('/documents');
-
-    await page.getByTitle('Profile Dropdown').click();
-    await page.getByRole('menuitem', { name: 'Sign Out' }).click();
-
-    await page.waitForURL('/signin');
+    await users.logout();
   }
 });
 
-test('[PR-711]: deleting a pending document should remove it from recipients', async ({ page }) => {
-  const [sender, ...recipients] = TEST_USERS;
+test('[PR-711]: deleting a pending document should remove it from recipients', async ({
+  page,
+  users,
+}) => {
+  const [sender, ...recipients] = users.get();
+
+  await users.logout();
 
   for (const recipient of recipients) {
-    await page.goto(`/sign/pending-token-${recipients.indexOf(recipient)}`);
+    await page.goto(`/sign/pending-token-${recipients.indexOf(recipient)}/complete`);
 
     await expect(page.getByText('Waiting for others to sign').nth(0)).toBeVisible();
   }
 
-  await page.goto('/signin');
-
   // sign in
-  await page.getByLabel('Email').fill(sender.email);
-  await page.getByLabel('Password', { exact: true }).fill(sender.password);
-  await page.getByRole('button', { name: 'Sign In' }).click();
-
-  await page.waitForURL('/documents');
+  await sender.apiLogin();
+  await page.goto('/documents');
 
   // open actions menu
-  await page.locator('tr', { hasText: 'Document 1 - Pending' }).getByRole('button').nth(1).click();
+  await page.locator('tr', { hasText: pendingDocumentTitle }).getByRole('button').nth(1).click();
 
   // delete document
   await page.getByRole('menuitem', { name: 'Delete' }).click();
   await page.getByPlaceholder("Type 'delete' to confirm").fill('delete');
   await page.getByRole('button', { name: 'Delete' }).click();
 
-  await expect(page.getByRole('row', { name: /Document 1 - Pending/ })).not.toBeVisible();
+  await expect(page.getByRole('row', { name: pendingDocumentTitle })).not.toBeVisible();
 
   // signout
-  await page.getByTitle('Profile Dropdown').click();
-  await page.getByRole('menuitem', { name: 'Sign Out' }).click();
-
-  await page.waitForURL('/signin');
+  await users.logout();
 
   for (const recipient of recipients) {
-    await page.goto('/signin');
-
     // sign in
-    await page.getByLabel('Email').fill(recipient.email);
-    await page.getByLabel('Password', { exact: true }).fill(recipient.password);
-    await page.getByRole('button', { name: 'Sign In' }).click();
-
-    await page.waitForURL('/documents');
-
-    await expect(page.getByRole('link', { name: 'Document 1 - Pending' })).not.toBeVisible();
-
-    await page.goto(`/sign/pending-token-${recipients.indexOf(recipient)}`);
-    await expect(page.getByText(/document.*cancelled/i).nth(0)).toBeVisible();
+    await recipient.apiLogin();
 
     await page.goto('/documents');
 
-    await page.getByTitle('Profile Dropdown').click();
-    await page.getByRole('menuitem', { name: 'Sign Out' }).click();
+    await expect(page.getByRole('link', { name: pendingDocumentTitle })).not.toBeVisible();
 
-    await page.waitForURL('/signin');
+    await page.goto(`/sign/pending-token-${recipients.indexOf(recipient)}/complete`);
+    await expect(page.getByText(/document.*cancelled/i).nth(0)).toBeVisible();
+
+    await users.logout();
   }
 });
 
 test('[PR-711]: deleting a draft document should remove it without additional prompting', async ({
   page,
 }) => {
-  const [sender] = TEST_USERS;
-
-  await page.goto('/signin');
-
-  // sign in
-  await page.getByLabel('Email').fill(sender.email);
-  await page.getByLabel('Password', { exact: true }).fill(sender.password);
-  await page.getByRole('button', { name: 'Sign In' }).click();
-
-  await page.waitForURL('/documents');
+  await page.goto('/documents');
 
   // open actions menu
   await page
-    .locator('tr', { hasText: 'Document 1 - Draft' })
+    .locator('tr', { hasText: draftDocumentTitle })
     .getByRole('cell', { name: 'Edit' })
     .getByRole('button')
     .click();
@@ -188,5 +175,5 @@ test('[PR-711]: deleting a draft document should remove it without additional pr
   await expect(page.getByPlaceholder("Type 'delete' to confirm")).not.toBeVisible();
   await page.getByRole('button', { name: 'Delete' }).click();
 
-  await expect(page.getByRole('row', { name: /Document 1 - Draft/ })).not.toBeVisible();
+  await expect(page.getByRole('row', { name: draftDocumentTitle })).not.toBeVisible();
 });
