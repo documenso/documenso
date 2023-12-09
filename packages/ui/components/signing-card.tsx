@@ -2,14 +2,16 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 
-import Image, { StaticImageData } from 'next/image';
+import type { StaticImageData } from 'next/image';
+import Image from 'next/image';
 
 import { animate, motion, useMotionTemplate, useMotionValue, useTransform } from 'framer-motion';
 import { P, match } from 'ts-pattern';
 
-import { Signature } from '@documenso/prisma/client';
-import { cn } from '@documenso/ui/lib/utils';
-import { Card, CardContent } from '@documenso/ui/primitives/card';
+import type { Signature } from '@documenso/prisma/client';
+
+import { cn } from '../lib/utils';
+import { Card, CardContent } from '../primitives/card';
 
 export type SigningCardProps = {
   className?: string;

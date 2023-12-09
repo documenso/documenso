@@ -23,7 +23,7 @@ export const createCheckout = async ({ priceId }: CreateCheckoutOptions) => {
   let stripeCustomer: Stripe.Customer | null = null;
 
   // Find the Stripe customer for the current user subscription.
-  if (existingSubscription) {
+  if (existingSubscription?.periodEnd && existingSubscription.periodEnd >= new Date()) {
     stripeCustomer = await getStripeCustomerById(existingSubscription.customerId);
 
     if (!stripeCustomer) {

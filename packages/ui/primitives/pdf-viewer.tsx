@@ -3,16 +3,16 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 
 import { Loader } from 'lucide-react';
-import { PDFDocumentProxy } from 'pdfjs-dist';
+import type { PDFDocumentProxy } from 'pdfjs-dist';
 import { Document as PDFDocument, Page as PDFPage, pdfjs } from 'react-pdf';
 import 'react-pdf/dist/esm/Page/AnnotationLayer.css';
 import 'react-pdf/dist/esm/Page/TextLayer.css';
 
 import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
 import { getFile } from '@documenso/lib/universal/upload/get-file';
-import { DocumentData } from '@documenso/prisma/client';
-import { cn } from '@documenso/ui/lib/utils';
+import type { DocumentData } from '@documenso/prisma/client';
 
+import { cn } from '../lib/utils';
 import { useToast } from './use-toast';
 
 export type LoadedPDFDocument = PDFDocumentProxy;
