@@ -64,5 +64,5 @@ test(`[PR-718]: should be able to create a document`, async ({ page, documents, 
   await page.waitForURL('/documents');
 
   // Assert document was created
-  await expect(page.getByRole('link', { name: documentTitle })).toBeVisible();
+  await page.getByRole('link', { name: documentTitle }).click();
 });
