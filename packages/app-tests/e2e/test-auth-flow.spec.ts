@@ -1,6 +1,8 @@
-import { type Page, expect, test } from '@playwright/test';
+import { type Page, expect } from '@playwright/test';
 
 import { deleteUser } from '@documenso/lib/server-only/user/delete-user';
+
+import { test } from '../fixtures';
 
 test.use({ storageState: { cookies: [], origins: [] } });
 
@@ -14,7 +16,7 @@ const username = 'Test User';
 const email = 'test-user@auth-flow.documenso.com';
 const password = 'Password123';
 
-test('user can sign up with email and password', async ({ page }: { page: Page }) => {
+test('user can sign up with email and password', async ({ page }) => {
   await page.goto('/signup');
   await page.getByLabel('Name').fill(username);
   await page.getByLabel('Email').fill(email);
