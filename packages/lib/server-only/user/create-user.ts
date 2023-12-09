@@ -10,9 +10,16 @@ export interface CreateUserOptions {
   email: string;
   password: string;
   signature?: string | null;
+  emailVerified?: Date;
 }
 
-export const createUser = async ({ name, email, password, signature }: CreateUserOptions) => {
+export const createUser = async ({
+  name,
+  email,
+  password,
+  signature,
+  emailVerified,
+}: CreateUserOptions) => {
   const hashedPassword = await hash(password, SALT_ROUNDS);
 
   const userExists = await prisma.user.findFirst({
@@ -32,6 +39,7 @@ export const createUser = async ({ name, email, password, signature }: CreateUse
       password: hashedPassword,
       signature,
       identityProvider: IdentityProvider.DOCUMENSO,
+      emailVerified,
     },
   });
 };
