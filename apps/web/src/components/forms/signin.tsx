@@ -146,7 +146,6 @@ export const SignInForm = ({ className }: SignInFormProps) => {
     try {
       await signIn('google', { callbackUrl: LOGIN_REDIRECT_PATH });
     } catch (err) {
-      console.error(err);
       toast({
         title: 'An unknown error occurred',
         description:
