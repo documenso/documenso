@@ -61,6 +61,14 @@ export default async function DocumentsPage({ searchParams = {} }: DocumentsPage
     return `/documents?${params.toString()}`;
   };
 
+  const renderTableData = (count: number) => {
+    if (count > 0) {
+      return <DocumentsDataTable results={results} />;
+    } else if (count === 0) {
+      return <EmptyDocumentState status={status} />;
+    }
+  };
+
   return (
     <div className="mx-auto w-full max-w-screen-xl px-4 md:px-8">
       <UploadDocument />
@@ -105,10 +113,7 @@ export default async function DocumentsPage({ searchParams = {} }: DocumentsPage
         </div>
       </div>
 
-      <div className="mt-8">
-        {results.count > 0 && <DocumentsDataTable results={results} />}
-        {results.count === 0 && <EmptyDocumentState status={status} />}
-      </div>
+      <div className="mt-8">{renderTableData(results.count)}</div>
     </div>
   );
 }
