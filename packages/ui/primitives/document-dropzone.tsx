@@ -104,11 +104,12 @@ export const DocumentDropzone = ({
 
   return (
     <motion.div
-      className={cn('flex', className)}
+      className={cn('flex aria-disabled:cursor-none', className)}
       variants={DocumentDropzoneContainerVariants}
       initial="initial"
       animate="animate"
       whileHover="hover"
+      aria-disabled={disabled}
     >
       <Card
         role="button"
