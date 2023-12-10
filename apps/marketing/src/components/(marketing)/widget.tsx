@@ -49,8 +49,8 @@ const ZWidgetFormSchema = z
 
 export type TWidgetFormSchema = z.infer<typeof ZWidgetFormSchema>;
 
-type Keys = keyof typeof STEP;
-type Values = (typeof STEP)[Keys];
+type StepKeys = keyof typeof STEP;
+type StepValues = (typeof STEP)[StepKeys];
 
 export type WidgetProps = HTMLAttributes<HTMLDivElement>;
 
@@ -58,7 +58,7 @@ export const Widget = ({ className, children, ...props }: WidgetProps) => {
   const { toast } = useToast();
   const event = usePlausible();
 
-  const [step, setStep] = useState<Values>(STEP.EMAIL);
+  const [step, setStep] = useState<StepValues>(STEP.EMAIL);
   const [showSigningDialog, setShowSigningDialog] = useState(false);
   const [draftSignatureDataUrl, setDraftSignatureDataUrl] = useState<string | null>(null);
 
@@ -106,7 +106,7 @@ export const Widget = ({ className, children, ...props }: WidgetProps) => {
     }
 
     if (step === STEP.NAME) {
-      setStep(STEP.EMAIL);
+      setStep(STEP.SIGN);
 
       setTimeout(() => {
         document.querySelector<HTMLElement>('#signatureText')?.focus();
