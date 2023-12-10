@@ -1,11 +1,10 @@
-name: "Bug Report"
-labels: ["bug"]
+name: 'Bug Report'
+labels: ['bug']
 description: Create a bug report to help us improve
 body:
   - type: markdown
     attributes:
-      value:
-        Thank you for reporting an issue.
+      value: Thank you for reporting an issue.
         Please fill in as much of the form below as you're able to.
   - type: textarea
     attributes:

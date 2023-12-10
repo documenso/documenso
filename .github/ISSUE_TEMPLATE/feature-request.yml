@@ -1,9 +1,9 @@
-name: "Feature Request"
+name: 'Feature Request'
 description: Suggest a new idea or enhancement for this project
 body:
   - type: markdown
     attributes:
-      value: Please provide a clear and concise title for your feature request 
+      value: Please provide a clear and concise title for your feature request
   - type: textarea
     attributes:
       label: Feature Description
