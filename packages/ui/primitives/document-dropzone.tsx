@@ -126,8 +126,8 @@ export const DocumentDropzone = ({
           {/* <FilePlus strokeWidth="1px" className="h-16 w-16"/> */}
           <div className="flex">
             <motion.div
-              className="border-muted-foreground/20 group-hover:border-documenso/80 dark:bg-muted/80 z-10 flex aspect-[3/4] w-24 origin-top-right -rotate-[22deg] flex-col gap-y-1 rounded-lg border bg-white/80 px-2 py-4 backdrop-blur-sm"
-              variants={DocumentDropzoneCardLeftVariants}
+              className="border-muted-foreground/20 group-hover:border-documenso/80 dark:bg-muted/80 a z-10 flex aspect-[3/4] w-24 origin-top-right -rotate-[22deg] flex-col gap-y-1 rounded-lg border bg-white/80 px-2 py-4 backdrop-blur-sm"
+              variants={!disabled ? DocumentDropzoneCardLeftVariants : undefined}
             >
               <div className="bg-muted-foreground/20 group-hover:bg-documenso h-2 w-full rounded-[2px]" />
               <div className="bg-muted-foreground/20 group-hover:bg-documenso h-2 w-5/6 rounded-[2px]" />
@@ -136,7 +136,7 @@ export const DocumentDropzone = ({
 
             <motion.div
               className="border-muted-foreground/20 group-hover:border-documenso/80 dark:bg-muted/80 z-20 flex aspect-[3/4] w-24 flex-col items-center justify-center gap-y-1 rounded-lg border bg-white/80 px-2 py-4 backdrop-blur-sm"
-              variants={DocumentDropzoneCardCenterVariants}
+              variants={!disabled ? DocumentDropzoneCardCenterVariants : undefined}
             >
               <Plus
                 strokeWidth="2px"
@@ -146,7 +146,7 @@ export const DocumentDropzone = ({
 
             <motion.div
               className="border-muted-foreground/20 group-hover:border-documenso/80 dark:bg-muted/80 z-10 flex aspect-[3/4] w-24 origin-top-left rotate-[22deg] flex-col gap-y-1 rounded-lg border bg-white/80 px-2 py-4 backdrop-blur-sm"
-              variants={DocumentDropzoneCardRightVariants}
+              variants={!disabled ? DocumentDropzoneCardRightVariants : undefined}
             >
               <div className="bg-muted-foreground/20 group-hover:bg-documenso h-2 w-full rounded-[2px]" />
               <div className="bg-muted-foreground/20 group-hover:bg-documenso h-2 w-5/6 rounded-[2px]" />

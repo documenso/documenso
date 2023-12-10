@@ -36,16 +36,6 @@ export const UploadDocument = ({ className }: UploadDocumentProps) => {
   const { mutateAsync: createDocument } = trpc.document.createDocument.useMutation();
 
   const onFileDrop = async (file: File) => {
-    if (!session?.user.emailVerified) {
-      toast({
-        title: 'Document Upload Failed',
-        description: 'Please verify your email address to upload documents.',
-        variant: 'info',
-      });
-
-      return;
-    }
-
     try {
       setIsLoading(true);
 
@@ -99,7 +89,7 @@ export const UploadDocument = ({ className }: UploadDocumentProps) => {
     <div className={cn('relative', className)}>
       <DocumentDropzone
         className="min-h-[40vh]"
-        disabled={remaining.documents === 0}
+        disabled={remaining.documents === 0 || !session?.user.emailVerified}
         onDrop={onFileDrop}
       />
 
