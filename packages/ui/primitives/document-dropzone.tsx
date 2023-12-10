@@ -6,8 +6,9 @@ import { Plus } from 'lucide-react';
 import { useDropzone } from 'react-dropzone';
 
 import { megabytesToBytes } from '@documenso/lib/universal/unit-convertions';
-import { cn } from '@documenso/ui/lib/utils';
-import { Card, CardContent } from '@documenso/ui/primitives/card';
+
+import { cn } from '../lib/utils';
+import { Card, CardContent } from './card';
 
 const DocumentDropzoneContainerVariants: Variants = {
   initial: {

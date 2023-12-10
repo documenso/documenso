@@ -4,7 +4,7 @@ import { useCallback, useMemo, useState } from 'react';
 
 import { useRouter } from 'next/navigation';
 
-import { Monitor, Moon, Sun } from 'lucide-react';
+import { Loader, Monitor, Moon, Sun } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import { useHotkeys } from 'react-hotkeys-hook';
 
@@ -12,6 +12,7 @@ import {
   DOCUMENTS_PAGE_SHORTCUT,
   SETTINGS_PAGE_SHORTCUT,
 } from '@documenso/lib/constants/keyboard-shortcuts';
+import { trpc as trpcReact } from '@documenso/trpc/react';
 import {
   CommandDialog,
   CommandEmpty,
@@ -29,13 +30,20 @@ const DOCUMENTS_PAGES = [
     shortcut: DOCUMENTS_PAGE_SHORTCUT.replace('+', ''),
   },
   { label: 'Draft documents', path: '/documents?status=DRAFT' },
-  { label: 'Completed documents', path: '/documents?status=COMPLETED' },
+  {
+    label: 'Completed documents',
+    path: '/documents?status=COMPLETED',
+  },
   { label: 'Pending documents', path: '/documents?status=PENDING' },
   { label: 'Inbox documents', path: '/documents?status=INBOX' },
 ];
 
 const SETTINGS_PAGES = [
-  { label: 'Settings', path: '/settings', shortcut: SETTINGS_PAGE_SHORTCUT.replace('+', '') },
+  {
+    label: 'Settings',
+    path: '/settings',
+    shortcut: SETTINGS_PAGE_SHORTCUT.replace('+', ''),
+  },
   { label: 'Profile', path: '/settings/profile' },
   { label: 'Password', path: '/settings/password' },
 ];
@@ -52,6 +60,28 @@ export function CommandMenu({ open, onOpenChange }: CommandMenuProps) {
   const [isOpen, setIsOpen] = useState(() => open ?? false);
   const [search, setSearch] = useState('');
   const [pages, setPages] = useState<string[]>([]);
+
+  const { data: searchDocumentsData, isLoading: isSearchingDocuments } =
+    trpcReact.document.searchDocuments.useQuery(
+      {
+        query: search,
+      },
+      {
+        keepPreviousData: true,
+      },
+    );
+
+  const searchResults = useMemo(() => {
+    if (!searchDocumentsData) {
+      return [];
+    }
+
+    return searchDocumentsData.map((document) => ({
+      label: document.title,
+      path: `/documents/${document.id}`,
+      value: [document.id, document.title, ...document.Recipient.map((r) => r.email)].join(' '),
+    }));
+  }, [searchDocumentsData]);
 
   const currentPage = pages[pages.length - 1];
 
@@ -113,7 +143,13 @@ export function CommandMenu({ open, onOpenChange }: CommandMenuProps) {
   };
 
   return (
-    <CommandDialog commandProps={{ onKeyDown: handleKeyDown }} open={open} onOpenChange={setOpen}>
+    <CommandDialog
+      commandProps={{
+        onKeyDown: handleKeyDown,
+      }}
+      open={open}
+      onOpenChange={setOpen}
+    >
       <CommandInput
         value={search}
         onValueChange={setSearch}
@@ -121,7 +157,17 @@ export function CommandMenu({ open, onOpenChange }: CommandMenuProps) {
       />
 
       <CommandList>
-        <CommandEmpty>No results found.</CommandEmpty>
+        {isSearchingDocuments ? (
+          <CommandEmpty>
+            <div className="flex items-center justify-center">
+              <span className="animate-spin">
+                <Loader />
+              </span>
+            </div>
+          </CommandEmpty>
+        ) : (
+          <CommandEmpty>No results found.</CommandEmpty>
+        )}
         {!currentPage && (
           <>
             <CommandGroup heading="Documents">
@@ -133,6 +179,11 @@ export function CommandMenu({ open, onOpenChange }: CommandMenuProps) {
             <CommandGroup heading="Preferences">
               <CommandItem onSelect={() => addPage('theme')}>Change theme</CommandItem>
             </CommandGroup>
+            {searchResults.length > 0 && (
+              <CommandGroup heading="Your documents">
+                <Commands push={push} pages={searchResults} />
+              </CommandGroup>
+            )}
           </>
         )}
         {currentPage === 'theme' && <ThemeCommands setTheme={setTheme} />}
@@ -146,10 +197,14 @@ const Commands = ({
   pages,
 }: {
   push: (_path: string) => void;
-  pages: { label: string; path: string; shortcut?: string }[];
+  pages: { label: string; path: string; shortcut?: string; value?: string }[];
 }) => {
-  return pages.map((page) => (
-    <CommandItem key={page.path} onSelect={() => push(page.path)}>
+  return pages.map((page, idx) => (
+    <CommandItem
+      key={page.path + idx}
+      value={page.value ?? page.label}
+      onSelect={() => push(page.path)}
+    >
       {page.label}
       {page.shortcut && <CommandShortcut>{page.shortcut}</CommandShortcut>}
     </CommandItem>
