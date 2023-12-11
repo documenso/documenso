@@ -75,7 +75,6 @@ model Subscription {
   status            SubscriptionStatus @default(INACTIVE)
   planId            String             @unique
   priceId           String
-  customerId        String
   periodEnd         DateTime?
   userId            Int
   createdAt         DateTime           @default(now())
@@ -253,4 +252,5 @@ model DocumentShareLink {
   document Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
 
   @@unique([documentId, email])
+
 }

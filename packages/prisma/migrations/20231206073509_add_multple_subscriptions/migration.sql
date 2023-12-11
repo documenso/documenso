@@ -22,6 +22,7 @@ ALTER COLUMN "priceId" SET NOT NULL;
 
 -- AlterTable
 ALTER TABLE "User" ADD COLUMN     "customerId" TEXT;
+ALTER TABLE "Subscription" DROP COLUMN "customerId";
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Subscription_planId_key" ON "Subscription"("planId");
