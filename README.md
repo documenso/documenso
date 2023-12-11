@@ -139,10 +139,12 @@ npm run d
 
 1. **App** - http://localhost:3000
 2. **Incoming Mail Access** - http://localhost:9000
-
 3. **Database Connection Details**
+
    - **Port**: 54320
    - **Connection**: Use your favorite database client to connect using the provided port.
+
+4. **S3 Storage Dashboard** - http://localhost:9001
 
 ## Developer Setup
 

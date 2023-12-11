@@ -1,8 +1,10 @@
 'use server';
 
+import { nanoid } from 'nanoid';
 import path from 'node:path';
 import { PDFDocument } from 'pdf-lib';
 
+import PostHogServerClient from '@documenso/lib/server-only/feature-flags/get-post-hog-server-client';
 import { prisma } from '@documenso/prisma';
 import { DocumentStatus, SigningStatus } from '@documenso/prisma/client';
 import { signPdf } from '@documenso/signing';
@@ -82,6 +84,18 @@ export const sealDocument = async ({ documentId, sendEmail = true }: SealDocumen
     type: 'application/pdf',
     arrayBuffer: async () => Promise.resolve(pdfBuffer),
   });
+
+  const postHog = PostHogServerClient();
+
+  if (postHog) {
+    postHog.capture({
+      distinctId: nanoid(),
+      event: 'App: Document Sealed',
+      properties: {
+        documentId: document.id,
+      },
+    });
+  }
 
   await prisma.documentData.update({
     where: {
