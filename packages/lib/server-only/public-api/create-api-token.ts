@@ -3,7 +3,7 @@ import crypto from 'crypto';
 import { prisma } from '@documenso/prisma';
 
 // temporary choice for testing only
-import { ONE_WEEK } from '../../constants/time';
+import { ONE_YEAR } from '../../constants/time';
 
 type CreateApiTokenInput = {
   userId: number;
@@ -22,7 +22,7 @@ export const createApiToken = async ({ userId, tokenName }: CreateApiTokenInput)
       token: tokenHash,
       name: tokenName,
       userId,
-      expires: new Date(Date.now() + ONE_WEEK),
+      expires: new Date(Date.now() + ONE_YEAR),
     },
   });
 

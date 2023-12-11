@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Loader } from 'lucide-react';
+import { DateTime } from 'luxon';
 import { useForm } from 'react-hook-form';
 import type { z } from 'zod';
 
@@ -139,23 +140,13 @@ export const ApiTokenForm = ({ className }: ApiTokenFormProps) => {
                 <p className="text-sm">
                   Created:{' '}
                   {token.createdAt
-                    ? new Date(token.createdAt).toLocaleDateString(undefined, {
-                        weekday: 'long',
-                        year: 'numeric',
-                        month: 'long',
-                        day: 'numeric',
-                      })
+                    ? DateTime.fromJSDate(token.createdAt).toLocaleString(DateTime.DATETIME_FULL)
                     : 'N/A'}
                 </p>
                 <p className="mb-4 text-sm">
                   Expires:{' '}
                   {token.expires
-                    ? new Date(token.expires).toLocaleDateString(undefined, {
-                        weekday: 'long',
-                        year: 'numeric',
-                        month: 'long',
-                        day: 'numeric',
-                      })
+                    ? DateTime.fromJSDate(token.createdAt).toLocaleString(DateTime.DATETIME_FULL)
                     : 'N/A'}
                 </p>
                 <DeleteTokenDialog

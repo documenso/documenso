@@ -12,27 +12,20 @@ import { getPresignPostUrl } from '@documenso/lib/universal/upload/server-action
 import { contract } from '@documenso/trpc/api-contract/contract';
 import { createNextRoute, createNextRouter } from '@documenso/trpc/server/public-api/ts-rest';
 
-const validateUserToken = async (token: string) => {
-  try {
-    return await checkUserFromToken({ token });
-  } catch (e) {
-    return null;
-  }
-};
-
 const router = createNextRoute(contract, {
   getDocuments: async (args) => {
     const page = Number(args.query.page) || 1;
     const perPage = Number(args.query.perPage) || 10;
     const { authorization } = args.headers;
+    let user;
 
-    const user = await validateUserToken(authorization);
-
-    if (!user) {
+    try {
+      user = await checkUserFromToken({ token: authorization });
+    } catch (e) {
       return {
         status: 401,
         body: {
-          message: 'Unauthorized',
+          message: e.message,
         },
       };
     }
@@ -50,14 +43,15 @@ const router = createNextRoute(contract, {
   getDocument: async (args) => {
     const { id: documentId } = args.params;
     const { authorization } = args.headers;
+    let user;
 
-    const user = await validateUserToken(authorization);
-
-    if (!user) {
+    try {
+      user = await checkUserFromToken({ token: authorization });
+    } catch (e) {
       return {
         status: 401,
         body: {
-          message: 'Unauthorized',
+          message: e.message,
         },
       };
     }
@@ -82,13 +76,15 @@ const router = createNextRoute(contract, {
     const { id: documentId } = args.params;
     const { authorization } = args.headers;
 
-    const user = await validateUserToken(authorization);
+    let user;
 
-    if (!user) {
+    try {
+      user = await checkUserFromToken({ token: authorization });
+    } catch (e) {
       return {
         status: 401,
         body: {
-          message: 'Unauthorized',
+          message: e.message,
         },
       };
     }
@@ -141,14 +137,15 @@ const router = createNextRoute(contract, {
     const { authorization } = args.headers;
     const { id } = args.params;
     const { body } = args;
+    let user;
 
-    const user = await validateUserToken(authorization);
-
-    if (!user) {
+    try {
+      user = await checkUserFromToken({ token: authorization });
+    } catch (e) {
       return {
         status: 401,
         body: {
-          message: 'Unauthorized',
+          message: e.message,
         },
       };
     }
