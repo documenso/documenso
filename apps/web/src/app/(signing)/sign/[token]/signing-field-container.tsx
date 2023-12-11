@@ -13,7 +13,7 @@ export type SignatureFieldProps = {
   onSign?: () => Promise<void> | void;
   onRemove?: () => Promise<void> | void;
   type?: 'Date' | 'Email' | 'Name' | 'Signature';
-  tooltipText?: string;
+  tooltipText?: string | null;
 };
 
 export const SigningFieldContainer = ({
@@ -41,6 +41,8 @@ export const SigningFieldContainer = ({
     await onRemove?.();
   };
 
+  const localToolTipText = tooltipText === null ? 'Invalid Locale' : tooltipText;
+
   return (
     <FieldRootContainer field={field}>
       {!field.inserted && !loading && (
@@ -61,7 +63,7 @@ export const SigningFieldContainer = ({
               Remove
             </button>
           </TooltipTrigger>
-          <TooltipContent className="max-w-xs">{tooltipText}</TooltipContent>
+          <TooltipContent className="max-w-xs">{localToolTipText}</TooltipContent>
         </Tooltip>
       )}
 
