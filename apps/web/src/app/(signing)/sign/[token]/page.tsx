@@ -5,6 +5,7 @@ import { match } from 'ts-pattern';
 import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
 import { getServerComponentSession } from '@documenso/lib/next-auth/get-server-component-session';
 import { getDocumentAndSenderByToken } from '@documenso/lib/server-only/document/get-document-by-token';
+import { getDocumentMetaById } from '@documenso/lib/server-only/document/get-document-meta-by-document-id';
 import { viewedDocument } from '@documenso/lib/server-only/document/viewed-document';
 import { getFieldsForToken } from '@documenso/lib/server-only/field/get-fields-for-token';
 import { getRecipientByToken } from '@documenso/lib/server-only/recipient/get-recipient-by-token';
@@ -40,6 +41,8 @@ export default async function SigningPage({ params: { token } }: SigningPageProp
     viewedDocument({ token }).catch(() => null),
   ]);
 
+  const documentMeta = await getDocumentMetaById({ id: document!.id }).catch(() => null);
+
   if (!document || !document.documentData || !recipient) {
     return notFound();
   }
@@ -54,6 +57,8 @@ export default async function SigningPage({ params: { token } }: SigningPageProp
   ) {
     redirect(`/sign/${token}/complete`);
   }
+
+  console.log('Fields', fields);
 
   return (
     <SigningProvider
@@ -97,7 +102,12 @@ export default async function SigningPage({ params: { token } }: SigningPageProp
                 <NameField key={field.id} field={field} recipient={recipient} />
               ))
               .with(FieldType.DATE, () => (
-                <DateField key={field.id} field={field} recipient={recipient} />
+                <DateField
+                  key={field.id}
+                  field={field}
+                  recipient={recipient}
+                  dateFormat={documentMeta?.dateFormat}
+                />
               ))
               .with(FieldType.EMAIL, () => (
                 <EmailField key={field.id} field={field} recipient={recipient} />

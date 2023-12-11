@@ -6,8 +6,6 @@ import type { FieldWithSignature } from '@documenso/prisma/types/field-with-sign
 import { FieldRootContainer } from '@documenso/ui/components/field/field';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@documenso/ui/primitives/tooltip';
 
-import { useRequiredSigningContext } from './provider';
-
 export type SignatureFieldProps = {
   field: FieldWithSignature;
   loading?: boolean;
@@ -15,6 +13,7 @@ export type SignatureFieldProps = {
   onSign?: () => Promise<void> | void;
   onRemove?: () => Promise<void> | void;
   type?: 'Date' | 'Email' | 'Name' | 'Signature';
+  tooltipText?: string;
 };
 
 export const SigningFieldContainer = ({
@@ -24,9 +23,8 @@ export const SigningFieldContainer = ({
   onRemove,
   children,
   type,
+  tooltipText,
 }: SignatureFieldProps) => {
-  const { dateFormat } = useRequiredSigningContext();
-
   const onSignFieldClick = async () => {
     if (field.inserted) {
       return;
@@ -55,7 +53,7 @@ export const SigningFieldContainer = ({
 
       {type === 'Date' && field.inserted && !loading && (
         <Tooltip>
-          <TooltipTrigger>
+          <TooltipTrigger asChild>
             <button
               className="text-destructive bg-background/40 absolute inset-0 z-10 flex h-full w-full items-center justify-center rounded-md text-sm opacity-0 backdrop-blur-sm duration-200 group-hover:opacity-100"
               onClick={onRemoveSignedFieldClick}
@@ -63,7 +61,7 @@ export const SigningFieldContainer = ({
               Remove
             </button>
           </TooltipTrigger>
-          <TooltipContent className="max-w-xs">{dateFormat}</TooltipContent>
+          <TooltipContent className="max-w-xs">{tooltipText}</TooltipContent>
         </Tooltip>
       )}
 

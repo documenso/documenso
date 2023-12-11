@@ -15,3 +15,9 @@ export const DATE_FORMATS = [
     value: 'MM/dd/yyyy hh:mm a',
   },
 ];
+
+export const splitDateFormat = (dateString: string): string => {
+  const dateParts: string[] = dateString.split(' ');
+  const date: string = dateParts[0];
+  return date;
+};

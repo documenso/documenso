@@ -7,6 +7,12 @@ import { TIME_ZONES_FULL } from '@documenso/lib/constants/time-zones';
 import type { Field, Recipient } from '@documenso/prisma/client';
 import { DocumentStatus } from '@documenso/prisma/client';
 import type { DocumentWithData } from '@documenso/prisma/types/document-with-data';
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from '@documenso/ui/primitives/accordion';
 import { FormErrorMessage } from '@documenso/ui/primitives/form/form-error-message';
 import { Input } from '@documenso/ui/primitives/input';
 import { Label } from '@documenso/ui/primitives/label';
@@ -108,44 +114,6 @@ export const AddSubjectFormPartial = ({
               />
             </div>
 
-            {hasDateField && (
-              <div className="flex flex-col">
-                <Label htmlFor="time-zone">
-                  Date Format <span className="text-muted-foreground">(Optional)</span>
-                </Label>
-
-                <Select
-                  onValueChange={(value) => setValue('email.dateFormat', value)}
-                  defaultValue={getValues('email.dateFormat')}
-                >
-                  <SelectTrigger className="bg-background mt-2">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {DATE_FORMATS.map((format) => (
-                      <SelectItem key={format.key} value={format.value}>
-                        {format.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-            )}
-
-            {hasDateField && (
-              <div className="flex flex-col">
-                <Label htmlFor="time-zone">
-                  Time Zone <span className="text-muted-foreground">(Optional)</span>
-                </Label>
-
-                <Combobox
-                  listValues={TIME_ZONES_FULL}
-                  onChange={(value) => setValue('email.timezone', value)}
-                  selectedValue={getValues('email.timezone')}
-                />
-              </div>
-            )}
-
             <div>
               <p className="text-muted-foreground text-sm">
                 You can use the following variables in your message:
@@ -172,6 +140,54 @@ export const AddSubjectFormPartial = ({
                 </li>
               </ul>
             </div>
+
+            <Accordion type="multiple" className="mt-8">
+              <AccordionItem value="advanced-options no-underline">
+                <AccordionTrigger className="text-md text-left no-underline">
+                  Advanced Options
+                </AccordionTrigger>
+
+                <AccordionContent className="text-muted-foreground max-w-prose text-sm leading-relaxed">
+                  {hasDateField && (
+                    <div className="mt-2 flex flex-col">
+                      <Label htmlFor="date-format">
+                        Date Format <span className="text-muted-foreground">(Optional)</span>
+                      </Label>
+
+                      <Select
+                        defaultValue={getValues('email.dateFormat')}
+                        onValueChange={(value) => setValue('email.dateFormat', value)}
+                      >
+                        <SelectTrigger className="bg-background mt-2">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {DATE_FORMATS.map((format) => (
+                            <SelectItem key={format.key} value={format.value}>
+                              {format.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  )}
+
+                  {hasDateField && (
+                    <div className="mt-4 flex flex-col">
+                      <Label htmlFor="time-zone">
+                        Time Zone <span className="text-muted-foreground">(Optional)</span>
+                      </Label>
+
+                      <Combobox
+                        listValues={TIME_ZONES_FULL}
+                        onChange={(value) => setValue('email.timezone', value)}
+                        selectedValue={getValues('email.timezone')}
+                      />
+                    </div>
+                  )}
+                </AccordionContent>
+              </AccordionItem>
+            </Accordion>
           </div>
         </div>
       </DocumentFlowFormContainerContent>

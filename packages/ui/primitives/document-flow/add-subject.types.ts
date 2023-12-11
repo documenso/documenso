@@ -4,8 +4,8 @@ export const ZAddSubjectFormSchema = z.object({
   email: z.object({
     subject: z.string(),
     message: z.string(),
-    timezone: z.string(),
-    dateFormat: z.string(),
+    timezone: z.string().optional().default('Europe/London'),
+    dateFormat: z.string().optional().default('yyyy-MM-dd hh:mm a'),
   }),
 });
 

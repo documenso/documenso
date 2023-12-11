@@ -80,11 +80,8 @@ export const AddSignatureFormPartial = ({
       name: '',
       email: '',
       signature: '',
-      dateFormat: 'MM-dd-yyyy hh:mm a',
-      timezone: 'Europe/London',
     },
   });
-
   /**
    * A local copy of the provided fields to modify.
    */
@@ -138,7 +135,7 @@ export const AddSignatureFormPartial = ({
     return match(field.type)
       .with(FieldType.DATE, () => ({
         ...field,
-        customText: DateTime.now().toFormat(form.getValues('dateFormat')),
+        customText: DateTime.now().toFormat('yyyy-MM-dd hh:mm a'),
         inserted: true,
       }))
       .with(FieldType.EMAIL, () => ({
