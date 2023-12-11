@@ -58,8 +58,6 @@ export default async function SigningPage({ params: { token } }: SigningPageProp
     redirect(`/sign/${token}/complete`);
   }
 
-  console.log('Fields', fields);
-
   return (
     <SigningProvider
       email={recipient.email}
@@ -107,6 +105,7 @@ export default async function SigningPage({ params: { token } }: SigningPageProp
                   field={field}
                   recipient={recipient}
                   dateFormat={documentMeta?.dateFormat}
+                  timezone={documentMeta?.timezone}
                 />
               ))
               .with(FieldType.EMAIL, () => (
