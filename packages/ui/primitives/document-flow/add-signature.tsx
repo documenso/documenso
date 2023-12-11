@@ -82,6 +82,7 @@ export const AddSignatureFormPartial = ({
       signature: '',
     },
   });
+
   /**
    * A local copy of the provided fields to modify.
    */
