@@ -252,5 +252,4 @@ model DocumentShareLink {
   document Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
 
   @@unique([documentId, email])
-
 }
