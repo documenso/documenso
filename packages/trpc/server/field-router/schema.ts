@@ -11,6 +11,7 @@ export const ZAddFieldsMutationSchema = z.object({
       type: z.nativeEnum(FieldType),
       signerEmail: z.string().min(1),
       pageNumber: z.number().min(1),
+      customFieldValue: z.string().min(0),
       pageX: z.number().min(0),
       pageY: z.number().min(0),
       pageWidth: z.number().min(0),

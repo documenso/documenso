@@ -26,6 +26,7 @@ export const fieldRouter = router({
             signerEmail: field.signerEmail,
             type: field.type,
             pageNumber: field.pageNumber,
+            customFieldValue: field.customFieldValue,
             pageX: field.pageX,
             pageY: field.pageY,
             pageWidth: field.pageWidth,

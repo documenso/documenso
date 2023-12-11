@@ -23,6 +23,7 @@ export const ZDocumentFlowFormSchema = z.object({
     z.object({
       formId: z.string().min(1),
       nativeId: z.number().optional(),
+      customFieldValue: z.string().min(0),
       type: z.nativeEnum(FieldType),
       signerEmail: z.string().min(1),
       pageNumber: z.number().min(1),
@@ -48,6 +49,7 @@ export const FRIENDLY_FIELD_TYPE: Record<FieldType, string> = {
   [FieldType.DATE]: 'Date',
   [FieldType.EMAIL]: 'Email',
   [FieldType.NAME]: 'Name',
+  [FieldType.CUSTOM]: 'Custom',
 };
 
 export interface DocumentFlowStep {

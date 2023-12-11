@@ -33,7 +33,8 @@ export const SigningForm = ({ document, recipient, fields }: SigningFormProps) =
   const analytics = useAnalytics();
   const { data: session } = useSession();
 
-  const { fullName, signature, setFullName, setSignature } = useRequiredSigningContext();
+  const { fullName, signature, setFullName, setSignature, customValue, setCustomValue } =
+    useRequiredSigningContext();
   const [validateUninsertedFields, setValidateUninsertedFields] = useState(false);
 
   const { mutateAsync: completeDocumentWithToken } =
@@ -113,6 +114,32 @@ export const SigningForm = ({ document, recipient, fields }: SigningFormProps) =
                   value={fullName}
                   onChange={(e) => setFullName(e.target.value.trimStart())}
                 />
+
+                {fields.map((field) => {
+                  if (field.customFieldValue !== '') {
+                    return (
+                      <div key={field.id}>
+                        <Label htmlFor={`custom-${field.customFieldValue}`}>
+                          {field.customFieldValue}
+                        </Label>
+                        <Input
+                          type="text"
+                          id={`custom-${field.customFieldValue}`}
+                          className="bg-background mt-2"
+                          value={customValue ? customValue[field.id] : undefined}
+                          onChange={(e) => {
+                            setCustomValue({
+                              ...customValue,
+                              [field.id]: e.target.value.trimStart(),
+                            });
+                          }}
+                        />
+                      </div>
+                    );
+                  } else {
+                    return null;
+                  }
+                })}
               </div>
 
               <div>

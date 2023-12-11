@@ -140,7 +140,7 @@ export const FieldItem = ({
             },
           )}
         >
-          {FRIENDLY_FIELD_TYPE[field.type]}
+          {field.type === 'CUSTOM' ? field.customFieldValue : FRIENDLY_FIELD_TYPE[field.type]}
 
           <p className="text-muted-foreground/50 w-full truncate text-center text-xs">
             {field.signerEmail}

@@ -206,6 +206,7 @@ enum FieldType {
   EMAIL
   DATE
   TEXT
+  CUSTOM
 }
 
 model Field {
@@ -218,6 +219,7 @@ model Field {
   positionY   Decimal    @default(0)
   width       Decimal    @default(-1)
   height      Decimal    @default(-1)
+  customFieldValue  String @default("") 
   customText  String
   inserted    Boolean
   Document    Document   @relation(fields: [documentId], references: [id], onDelete: Cascade)

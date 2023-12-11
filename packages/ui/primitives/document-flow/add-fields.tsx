@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { Caveat } from 'next/font/google';
 
-import { Check, ChevronsUpDown, Info } from 'lucide-react';
+import { Check, ChevronsUpDown, Info, Plus } from 'lucide-react';
 import { useFieldArray, useForm } from 'react-hook-form';
 
 import { getBoundingClientRect } from '@documenso/lib/client-only/get-bounding-client-rect';
@@ -13,11 +13,21 @@ import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
 import { nanoid } from '@documenso/lib/universal/id';
 import type { Field, Recipient } from '@documenso/prisma/client';
 import { FieldType, SendStatus } from '@documenso/prisma/client';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@documenso/ui/primitives/dialog';
 
 import { cn } from '../../lib/utils';
 import { Button } from '../button';
 import { Card, CardContent } from '../card';
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from '../command';
+import { Input } from '../input';
+import { Label } from '../label';
 import { Popover, PopoverContent, PopoverTrigger } from '../popover';
 import { useStep } from '../stepper';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../tooltip';
@@ -63,6 +73,7 @@ export const AddFieldsFormPartial = ({
 }: AddFieldsFormProps) => {
   const { isWithinPageBounds, getFieldPosition, getPage } = useDocumentElement();
   const { currentStep, totalSteps, previousStep } = useStep();
+  const [fieldName, setFieldName] = useState('');
 
   const {
     control,
@@ -74,6 +85,7 @@ export const AddFieldsFormPartial = ({
         nativeId: field.id,
         formId: `${field.id}-${field.documentId}`,
         pageNumber: field.page,
+        customFieldValue: field.customFieldValue,
         type: field.type,
         pageX: Number(field.positionX),
         pageY: Number(field.positionY),
@@ -99,6 +111,9 @@ export const AddFieldsFormPartial = ({
 
   const [selectedField, setSelectedField] = useState<FieldType | null>(null);
   const [selectedSigner, setSelectedSigner] = useState<Recipient | null>(null);
+  const [isOpenDialog, setIsOpenDialog] = useState(false);
+  const [inputValue, setInputValue] = useState<string>('');
+  const [customFields, setCustomFields] = useState<string[]>([]);
   const [showRecipientsSelector, setShowRecipientsSelector] = useState(false);
 
   const hasSelectedSignerBeenSent = selectedSigner?.sendStatus === SendStatus.SENT;
@@ -174,6 +189,7 @@ export const AddFieldsFormPartial = ({
         formId: nanoid(12),
         type: selectedField,
         pageNumber,
+        customFieldValue: fieldName,
         pageX,
         pageY,
         pageWidth: fieldPageWidth,
@@ -184,7 +200,7 @@ export const AddFieldsFormPartial = ({
       setIsFieldWithinBounds(false);
       setSelectedField(null);
     },
-    [append, isWithinPageBounds, selectedField, selectedSigner, getPage],
+    [selectedField, selectedSigner, getPage, isWithinPageBounds, append, fieldName],
   );
 
   const onFieldResize = useCallback(
@@ -307,7 +323,7 @@ export const AddFieldsFormPartial = ({
               }}
             >
               <CardContent className="text-foreground flex h-full w-full items-center justify-center p-2">
-                {FRIENDLY_FIELD_TYPE[selectedField]}
+                {selectedField === 'CUSTOM' ? fieldName : FRIENDLY_FIELD_TYPE[selectedField]}
               </CardContent>
             </Card>
           )}
@@ -506,7 +522,52 @@ export const AddFieldsFormPartial = ({
                   </CardContent>
                 </Card>
               </button>
+              {customFields.length > 0 &&
+                customFields.map((field, index) => {
+                  return (
+                    <button
+                      key={index}
+                      type="button"
+                      className="group h-full w-full"
+                      disabled={!selectedSigner || selectedSigner?.sendStatus === SendStatus.SENT}
+                      onClick={() => {
+                        setFieldName(field);
+                        setSelectedField(FieldType.CUSTOM);
+                      }}
+                      onMouseDown={() => {
+                        setFieldName(field);
+                        setSelectedField(FieldType.CUSTOM);
+                      }}
+                      data-selected={selectedField === FieldType.CUSTOM ? true : undefined}
+                    >
+                      <Card className="group-data-[selected]:border-documenso h-full w-full cursor-pointer group-disabled:opacity-50">
+                        <CardContent className="flex flex-col items-center justify-center px-6 py-4">
+                          <p
+                            className={cn(
+                              'text-muted-foreground group-data-[selected]:text-foreground text-xl font-medium',
+                            )}
+                          >
+                            {field}
+                          </p>
+
+                          <p className="text-muted-foreground mt-2 text-xs">{field}</p>
+                        </CardContent>
+                      </Card>
+                    </button>
+                  );
+                })}
             </div>
+          </div>
+
+          <div className="mt-6">
+            <Button
+              type="button"
+              disabled={!selectedSigner || selectedSigner?.sendStatus === SendStatus.SENT}
+              onClick={() => setIsOpenDialog(true)}
+            >
+              <Plus className="-ml-1 mr-2 h-5 w-5" />
+              Add Custom Field
+            </Button>
           </div>
         </div>
       </DocumentFlowFormContainerContent>
@@ -528,6 +589,49 @@ export const AddFieldsFormPartial = ({
           onGoNextClick={() => void onFormSubmit()}
         />
       </DocumentFlowFormContainerFooter>
+      <Dialog open={isOpenDialog} onOpenChange={setIsOpenDialog}>
+        <DialogContent position="center">
+          <DialogHeader>
+            <DialogTitle>Add Custom Field</DialogTitle>
+          </DialogHeader>
+
+          <DialogDescription>
+            <Label>Field Name</Label>
+            <Input
+              className="mt-1"
+              type="text"
+              value={inputValue}
+              onChange={(event) =>
+                setInputValue(
+                  event.target.value.charAt(0).toUpperCase() + event.target.value.slice(1),
+                )
+              }
+            />
+          </DialogDescription>
+
+          <DialogFooter>
+            <Button
+              variant="ghost"
+              onClick={() => {
+                setInputValue('');
+                setIsOpenDialog(false);
+              }}
+            >
+              Cancel
+            </Button>
+
+            <Button
+              onClick={() => {
+                setCustomFields([...customFields, inputValue]);
+                setInputValue('');
+                setIsOpenDialog(false);
+              }}
+            >
+              Confirm
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </>
   );
 };
