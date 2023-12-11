@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-import { Document, Field } from '@documenso/prisma/client';
+import type { Document, Field } from '@documenso/prisma/client';
 import { Button } from '@documenso/ui/primitives/button';
 import {
   Dialog,

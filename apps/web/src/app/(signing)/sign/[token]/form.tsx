@@ -4,8 +4,10 @@ import { useMemo, useState } from 'react';
 
 import { useRouter } from 'next/navigation';
 
+import { zodResolver } from '@hookform/resolvers/zod';
 import { useSession } from 'next-auth/react';
 import { useForm } from 'react-hook-form';
+import { z } from 'zod';
 
 import { useAnalytics } from '@documenso/lib/client-only/hooks/use-analytics';
 import { sortFieldsByPosition, validateFieldsInserted } from '@documenso/lib/utils/fields';
@@ -28,6 +30,19 @@ export type SigningFormProps = {
   fields: Field[];
 };
 
+const ZSigningpadSchema = z.union([
+  z.object({
+    signatureDataUrl: z.string().min(1),
+    signatureText: z.null().or(z.string().max(0)),
+  }),
+  z.object({
+    signatureDataUrl: z.null().or(z.string().max(0)),
+    signatureText: z.string().trim().min(1),
+  }),
+]);
+
+export type TSigningpadSchema = z.infer<typeof ZSigningpadSchema>;
+
 export const SigningForm = ({ document, recipient, fields }: SigningFormProps) => {
   const router = useRouter();
   const analytics = useAnalytics();
@@ -40,9 +55,22 @@ export const SigningForm = ({ document, recipient, fields }: SigningFormProps) =
     trpc.recipient.completeDocumentWithToken.useMutation();
 
   const {
+    register,
     handleSubmit,
+    setValue,
+    watch,
     formState: { isSubmitting },
-  } = useForm();
+  } = useForm<TSigningpadSchema>({
+    mode: 'onChange',
+    defaultValues: {
+      signatureDataUrl: signature || null,
+      signatureText: '',
+    },
+    resolver: zodResolver(ZSigningpadSchema),
+  });
+
+  const signatureDataUrl = watch('signatureDataUrl');
+  const signatureText = watch('signatureText');
 
   const uninsertedFields = useMemo(() => {
     return sortFieldsByPosition(fields.filter((field) => !field.inserted));
@@ -118,15 +146,69 @@ export const SigningForm = ({ document, recipient, fields }: SigningFormProps) =
               <div>
                 <Label htmlFor="Signature">Signature</Label>
 
-                <Card className="mt-2" gradient degrees={-120}>
-                  <CardContent className="p-0">
-                    <SignaturePad
-                      className="h-44 w-full"
-                      defaultValue={signature ?? undefined}
-                      onChange={(value) => {
-                        setSignature(value);
-                      }}
-                    />
+                <Card id="signature" className="mt-4" degrees={-120} gradient>
+                  <CardContent role="button" className="relative cursor-pointer pt-6">
+                    <div className="flex h-44 items-center justify-center pb-6">
+                      {!signatureText && signature && (
+                        <SignaturePad
+                          className="h-44 w-full"
+                          defaultValue={signature ?? undefined}
+                          onChange={(value) => {
+                            setSignature(value);
+                          }}
+                        />
+                      )}
+
+                      {signatureText && (
+                        <p
+                          className={cn(
+                            'text-foreground text-4xl font-semibold [font-family:var(--font-caveat)]',
+                          )}
+                        >
+                          {signatureText}
+                        </p>
+                      )}
+                    </div>
+
+                    <div
+                      className="absolute inset-x-0 bottom-0 flex cursor-auto items-end justify-between px-4 pb-1 pt-2"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <Input
+                        id="signatureText"
+                        className="text-foreground placeholder:text-muted-foreground border-none bg-transparent p-0 text-sm focus-visible:bg-transparent focus-visible:outline-none focus-visible:ring-0"
+                        placeholder="Draw or type name here"
+                        // disabled={isSubmitting || signature !== null}
+                        disabled={isSubmitting}
+                        {...register('signatureText', {
+                          onChange: (e) => {
+                            if (e.target.value !== '') {
+                              setValue('signatureDataUrl', null);
+                            }
+
+                            setValue('signatureText', e.target.value);
+                          },
+
+                          onBlur: (e) => {
+                            if (e.target.value === '') {
+                              return setValue('signatureText', '');
+                            }
+
+                            setSignature(e.target.value.trimStart());
+                          },
+                        })}
+                      />
+
+                      {/* <div className="absolute bottom-3 right-4">
+                        <button
+                          type="button"
+                          className="focus-visible:ring-ring ring-offset-background text-muted-foreground rounded-full p-0 text-xs focus-visible:outline-none focus-visible:ring-2"
+                          onClick={() => console.log('clear')}
+                        >
+                          Clear Signature
+                        </button>
+                      </div> */}
+                    </div>
                   </CardContent>
                 </Card>
               </div>

@@ -2,7 +2,7 @@
 
 import React from 'react';
 
-import { FieldWithSignature } from '@documenso/prisma/types/field-with-signature';
+import type { FieldWithSignature } from '@documenso/prisma/types/field-with-signature';
 import { FieldRootContainer } from '@documenso/ui/components/field/field';
 
 export type SignatureFieldProps = {

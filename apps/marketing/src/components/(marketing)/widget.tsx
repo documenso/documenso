@@ -1,6 +1,7 @@
 'use client';
 
-import { HTMLAttributes, KeyboardEvent, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
+import type { HTMLAttributes, KeyboardEvent } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { AnimatePresence, motion } from 'framer-motion';

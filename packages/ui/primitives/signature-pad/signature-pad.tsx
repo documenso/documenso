@@ -15,12 +15,14 @@ const DPI = 2;
 export type SignaturePadProps = Omit<HTMLAttributes<HTMLCanvasElement>, 'onChange'> & {
   onChange?: (_signatureDataUrl: string | null) => void;
   containerClassName?: string;
+  clearSignatureClassName?: string;
 };
 
 export const SignaturePad = ({
   className,
   containerClassName,
   defaultValue,
+  clearSignatureClassName,
   onChange,
   ...props
 }: SignaturePadProps) => {
@@ -217,7 +219,7 @@ export const SignaturePad = ({
         {...props}
       />
 
-      <div className="absolute bottom-4 right-4">
+      <div className={cn('absolute bottom-4 right-4', clearSignatureClassName)}>
         <button
           type="button"
           className="focus-visible:ring-ring ring-offset-background text-muted-foreground rounded-full p-0 text-xs focus-visible:outline-none focus-visible:ring-2"

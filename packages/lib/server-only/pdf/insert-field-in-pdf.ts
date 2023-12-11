@@ -46,8 +46,12 @@ export const insertFieldInPDF = async (pdf: PDFDocument, field: FieldWithSignatu
     await pdf.embedFont(fontCaveat);
   }
 
+  const CUSTOM_TEXT = field.customText || field.Signature?.typedSignature || '';
+
   const isInsertingImage =
-    isSignatureField && typeof field.Signature?.signatureImageAsBase64 === 'string';
+    isSignatureField &&
+    typeof field.Signature?.signatureImageAsBase64 === 'string' &&
+    field.Signature?.signatureImageAsBase64.startsWith('data:image/png;base64,');
 
   if (isSignatureField && isInsertingImage) {
     const image = await pdf.embedPng(field.Signature?.signatureImageAsBase64 ?? '');
@@ -73,13 +77,13 @@ export const insertFieldInPDF = async (pdf: PDFDocument, field: FieldWithSignatu
       height: imageHeight,
     });
   } else {
-    let textWidth = font.widthOfTextAtSize(field.customText, fontSize);
+    let textWidth = font.widthOfTextAtSize(CUSTOM_TEXT, fontSize);
     const textHeight = font.heightAtSize(fontSize);
 
     const scalingFactor = Math.min(fieldWidth / textWidth, fieldHeight / textHeight, 1);
 
     fontSize = Math.max(Math.min(fontSize * scalingFactor, maxFontSize), minFontSize);
-    textWidth = font.widthOfTextAtSize(field.customText, fontSize);
+    textWidth = font.widthOfTextAtSize(CUSTOM_TEXT, fontSize);
 
     const textX = fieldX + (fieldWidth - textWidth) / 2;
     let textY = fieldY + (fieldHeight - textHeight) / 2;
@@ -87,7 +91,7 @@ export const insertFieldInPDF = async (pdf: PDFDocument, field: FieldWithSignatu
     // Invert the Y axis since PDFs use a bottom-left coordinate system
     textY = pageHeight - textY - textHeight;
 
-    page.drawText(field.customText, {
+    page.drawText(CUSTOM_TEXT, {
       x: textX,
       y: textY,
       size: fontSize,
