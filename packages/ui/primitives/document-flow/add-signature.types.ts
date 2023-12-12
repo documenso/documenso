@@ -7,6 +7,7 @@ export const ZAddSignatureFormSchema = z.object({
     .email({ message: 'Invalid email address' }),
   name: z.string(),
   signature: z.string(),
+  custom: z.record(z.string()),
 });
 
 export type TAddSignatureFormSchema = z.infer<typeof ZAddSignatureFormSchema>;

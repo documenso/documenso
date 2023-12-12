@@ -73,7 +73,7 @@ export const AddFieldsFormPartial = ({
 }: AddFieldsFormProps) => {
   const { isWithinPageBounds, getFieldPosition, getPage } = useDocumentElement();
   const { currentStep, totalSteps, previousStep } = useStep();
-  const [fieldName, setFieldName] = useState('');
+  const [fieldName, setFieldName] = useState<string>('');
 
   const {
     control,
@@ -166,6 +166,7 @@ export const AddFieldsFormPartial = ({
         )
       ) {
         setSelectedField(null);
+        setFieldName('');
         return;
       }
 
@@ -199,6 +200,7 @@ export const AddFieldsFormPartial = ({
 
       setIsFieldWithinBounds(false);
       setSelectedField(null);
+      setFieldName('');
     },
     [selectedField, selectedSigner, getPage, isWithinPageBounds, append, fieldName],
   );
@@ -538,7 +540,7 @@ export const AddFieldsFormPartial = ({
                         setFieldName(field);
                         setSelectedField(FieldType.CUSTOM);
                       }}
-                      data-selected={selectedField === FieldType.CUSTOM ? true : undefined}
+                      data-selected={field === fieldName ? true : undefined}
                     >
                       <Card className="group-data-[selected]:border-documenso h-full w-full cursor-pointer group-disabled:opacity-50">
                         <CardContent className="flex flex-col items-center justify-center px-6 py-4">
