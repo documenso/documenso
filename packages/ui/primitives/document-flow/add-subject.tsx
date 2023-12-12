@@ -5,7 +5,7 @@ import { useForm } from 'react-hook-form';
 import { DATE_FORMATS } from '@documenso/lib/constants/date-formats';
 import { TIME_ZONES_FULL } from '@documenso/lib/constants/time-zones';
 import type { Field, Recipient } from '@documenso/prisma/client';
-import { DocumentStatus } from '@documenso/prisma/client';
+import { DocumentStatus, SendStatus } from '@documenso/prisma/client';
 import type { DocumentWithData } from '@documenso/prisma/types/document-with-data';
 import {
   Accordion,
@@ -46,7 +46,7 @@ export type AddSubjectFormProps = {
 
 export const AddSubjectFormPartial = ({
   documentFlow,
-  recipients: _recipients,
+  recipients: recipients,
   fields: _fields,
   document,
   numberOfSteps,
@@ -64,7 +64,7 @@ export const AddSubjectFormPartial = ({
         subject: document.documentMeta?.subject ?? '',
         message: document.documentMeta?.message ?? '',
         timezone: document.documentMeta?.timezone ?? 'Europe/London',
-        dateFormat: document.documentMeta?.dateFormat ?? 'MM-DD-YYYY',
+        dateFormat: document.documentMeta?.dateFormat ?? 'YYYY-MM-DD',
       },
     },
   });
@@ -72,6 +72,10 @@ export const AddSubjectFormPartial = ({
   const onFormSubmit = handleSubmit(onSubmit);
 
   const hasDateField = _fields.find((field) => field.type === 'DATE');
+
+  const documentHasBeenSent = recipients.some(
+    (recipient) => recipient.sendStatus === SendStatus.SENT,
+  );
 
   return (
     <>
@@ -157,6 +161,7 @@ export const AddSubjectFormPartial = ({
                       <Select
                         defaultValue={getValues('email.dateFormat')}
                         onValueChange={(value) => setValue('email.dateFormat', value)}
+                        disabled={documentHasBeenSent}
                       >
                         <SelectTrigger className="bg-background mt-2">
                           <SelectValue />
@@ -182,6 +187,7 @@ export const AddSubjectFormPartial = ({
                         listValues={TIME_ZONES_FULL}
                         onChange={(value) => setValue('email.timezone', value)}
                         selectedValue={getValues('email.timezone')}
+                        disabled={documentHasBeenSent}
                       />
                     </div>
                   )}

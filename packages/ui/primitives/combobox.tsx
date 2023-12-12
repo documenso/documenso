@@ -17,9 +17,10 @@ type ComboboxProps = {
   listValues: string[];
   onChange: (_value: string) => void;
   selectedValue: string | null;
+  disabled?: boolean;
 };
 
-const Combobox = ({ listValues, onChange, selectedValue }: ComboboxProps) => {
+const Combobox = ({ listValues, onChange, selectedValue, disabled = false }: ComboboxProps) => {
   const [open, setOpen] = React.useState(false);
   const [selectedValueLocal, setSelectedValueLocal] = React.useState<string | null>(selectedValue);
 
@@ -42,6 +43,7 @@ const Combobox = ({ listValues, onChange, selectedValue }: ComboboxProps) => {
             role="combobox"
             aria-expanded={open}
             className="mb-2 mt-2 w-full justify-between"
+            disabled={disabled}
           >
             {selectedValueLocal ? selectedValueLocal : 'Select Time Zone'}
             <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
