@@ -7,7 +7,7 @@ import Link from 'next/link';
 import { Copy, Edit, MoreHorizontal, Trash2 } from 'lucide-react';
 import { useSession } from 'next-auth/react';
 
-import { Template } from '@documenso/prisma/client';
+import type { Template } from '@documenso/prisma/client';
 import {
   DropdownMenu,
   DropdownMenuContent,

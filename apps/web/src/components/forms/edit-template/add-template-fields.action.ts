@@ -1,8 +1,8 @@
 'use server';
 
-import { getRequiredServerComponentSession } from '@documenso/lib/next-auth/get-server-session';
+import { getRequiredServerComponentSession } from '@documenso/lib/next-auth/get-server-component-session';
 import { setFieldsForTemplate } from '@documenso/lib/server-only/field/set-fields-for-template';
-import { TAddTemplateFieldsFormSchema } from '@documenso/ui/primitives/template-flow/add-template-fields.types';
+import type { TAddTemplateFieldsFormSchema } from '@documenso/ui/primitives/template-flow/add-template-fields.types';
 
 export type AddTemplateFieldsActionInput = TAddTemplateFieldsFormSchema & {
   templateId: number;

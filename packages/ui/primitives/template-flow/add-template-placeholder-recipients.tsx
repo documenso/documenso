@@ -5,10 +5,10 @@ import React, { useId, useState } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Plus, Trash } from 'lucide-react';
-import { Controller, useFieldArray, useForm } from 'react-hook-form';
+import { useFieldArray, useForm } from 'react-hook-form';
 
 import { nanoid } from '@documenso/lib/universal/id';
-import { Field, Recipient } from '@documenso/prisma/client';
+import type { Field, Recipient } from '@documenso/prisma/client';
 import { Button } from '@documenso/ui/primitives/button';
 import { FormErrorMessage } from '@documenso/ui/primitives/form/form-error-message';
 import { Input } from '@documenso/ui/primitives/input';
@@ -20,29 +20,30 @@ import {
   DocumentFlowFormContainerFooter,
   DocumentFlowFormContainerStep,
 } from '../document-flow/document-flow-root';
-import { DocumentFlowStep } from '../document-flow/types';
-import {
-  TAddTemplatePlacholderRecipientsFormSchema,
-  ZAddTemplatePlacholderRecipientsFormSchema,
-} from './add-template-placeholder-recipients.types';
+import type { DocumentFlowStep } from '../document-flow/types';
+import { useStep } from '../stepper';
+import type { TAddTemplatePlacholderRecipientsFormSchema } from './add-template-placeholder-recipients.types';
+import { ZAddTemplatePlacholderRecipientsFormSchema } from './add-template-placeholder-recipients.types';
 
 export type AddTemplatePlaceholderRecipientsFormProps = {
   documentFlow: DocumentFlowStep;
   recipients: Recipient[];
   fields: Field[];
-  numberOfSteps: number;
   onSubmit: (_data: TAddTemplatePlacholderRecipientsFormSchema) => void;
 };
 
 export const AddTemplatePlaceholderRecipientsFormPartial = ({
   documentFlow,
-  numberOfSteps,
   recipients,
   fields: _fields,
   onSubmit,
 }: AddTemplatePlaceholderRecipientsFormProps) => {
   const initialId = useId();
-  const [placeholderRecipientCount, setPlaceholderRecipientCount] = useState(1);
+  const [placeholderRecipientCount, setPlaceholderRecipientCount] = useState(() =>
+    recipients.length > 1 ? recipients.length + 1 : 2,
+  );
+
+  const { currentStep, totalSteps, previousStep } = useStep();
 
   const {
     control,
@@ -62,8 +63,8 @@ export const AddTemplatePlaceholderRecipientsFormPartial = ({
           : [
               {
                 formId: initialId,
-                name: `John Doe`,
-                email: `johndoe@documenso.com`,
+                name: `Recipient 1`,
+                email: `recipient.1@documenso.com`,
               },
             ],
     },
@@ -81,13 +82,13 @@ export const AddTemplatePlaceholderRecipientsFormPartial = ({
   });
 
   const onAddPlaceholderRecipient = () => {
-    setPlaceholderRecipientCount(placeholderRecipientCount + 1);
-
     appendSigner({
       formId: nanoid(12),
-      name: `John Doe ${placeholderRecipientCount}`,
-      email: `johndoe${placeholderRecipientCount}@documenso.com`,
+      name: `Recipient ${placeholderRecipientCount}`,
+      email: `recipient.${placeholderRecipientCount}@documenso.com`,
     });
+
+    setPlaceholderRecipientCount((count) => count + 1);
   };
 
   const onRemoveSigner = (index: number) => {
@@ -117,38 +118,24 @@ export const AddTemplatePlaceholderRecipientsFormPartial = ({
                     <span className="text-destructive ml-1 inline-block font-medium">*</span>
                   </Label>
 
-                  <Controller
-                    control={control}
-                    name={`signers.${index}.email`}
-                    render={({ field }) => (
-                      <Input
-                        id={`signer-${signer.id}-email`}
-                        type="email"
-                        className="bg-background mt-2"
-                        disabled={isSubmitting}
-                        onKeyDown={onKeyDown}
-                        {...field}
-                      />
-                    )}
+                  <Input
+                    id={`signer-${signer.id}-email`}
+                    type="email"
+                    value={signer.email}
+                    disabled
+                    className="bg-background mt-2"
                   />
                 </div>
 
                 <div className="flex-1">
                   <Label htmlFor={`signer-${signer.id}-name`}>Name</Label>
 
-                  <Controller
-                    control={control}
-                    name={`signers.${index}.name`}
-                    render={({ field }) => (
-                      <Input
-                        id={`signer-${signer.id}-name`}
-                        type="text"
-                        className="bg-background mt-2"
-                        disabled={isSubmitting}
-                        onKeyDown={onKeyDown}
-                        {...field}
-                      />
-                    )}
+                  <Input
+                    id={`signer-${signer.id}-name`}
+                    type="text"
+                    value={signer.name}
+                    disabled
+                    className="bg-background mt-2"
                   />
                 </div>
 
@@ -189,14 +176,15 @@ export const AddTemplatePlaceholderRecipientsFormPartial = ({
       <DocumentFlowFormContainerFooter>
         <DocumentFlowFormContainerStep
           title={documentFlow.title}
-          step={documentFlow.stepIndex}
-          maxStep={numberOfSteps}
+          step={currentStep}
+          maxStep={totalSteps}
         />
 
         <DocumentFlowFormContainerActions
           loading={isSubmitting}
           disabled={isSubmitting}
-          onGoBackClick={documentFlow.onBackStep}
+          canGoBack={currentStep > 1}
+          onGoBackClick={() => previousStep()}
           onGoNextClick={() => void onFormSubmit()}
         />
       </DocumentFlowFormContainerFooter>

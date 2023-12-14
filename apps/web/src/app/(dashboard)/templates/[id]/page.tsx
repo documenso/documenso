@@ -5,7 +5,7 @@ import { redirect } from 'next/navigation';
 
 import { ChevronLeft } from 'lucide-react';
 
-import { getRequiredServerComponentSession } from '@documenso/lib/next-auth/get-server-session';
+import { getRequiredServerComponentSession } from '@documenso/lib/next-auth/get-server-component-session';
 import { getFieldsForTemplate } from '@documenso/lib/server-only/field/get-fields-for-template';
 import { getRecipientsForTemplate } from '@documenso/lib/server-only/recipient/get-recipients-for-template';
 import { getTemplateById } from '@documenso/lib/server-only/template/get-template-by-id';

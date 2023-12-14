@@ -4,19 +4,20 @@ import { useState } from 'react';
 
 import { useRouter } from 'next/navigation';
 
-import { DocumentData, Field, Recipient, Template, User } from '@documenso/prisma/client';
+import type { DocumentData, Field, Recipient, Template, User } from '@documenso/prisma/client';
 import { cn } from '@documenso/ui/lib/utils';
 import { Card, CardContent } from '@documenso/ui/primitives/card';
 import {
   DocumentFlowFormContainer,
   DocumentFlowFormContainerHeader,
 } from '@documenso/ui/primitives/document-flow/document-flow-root';
-import { DocumentFlowStep } from '@documenso/ui/primitives/document-flow/types';
+import type { DocumentFlowStep } from '@documenso/ui/primitives/document-flow/types';
 import { LazyPDFViewer } from '@documenso/ui/primitives/lazy-pdf-viewer';
+import { Stepper } from '@documenso/ui/primitives/stepper';
 import { AddTemplateFieldsFormPartial } from '@documenso/ui/primitives/template-flow/add-template-fields';
-import { TAddTemplateFieldsFormSchema } from '@documenso/ui/primitives/template-flow/add-template-fields.types';
+import type { TAddTemplateFieldsFormSchema } from '@documenso/ui/primitives/template-flow/add-template-fields.types';
 import { AddTemplatePlaceholderRecipientsFormPartial } from '@documenso/ui/primitives/template-flow/add-template-placeholder-recipients';
-import { TAddTemplatePlacholderRecipientsFormSchema } from '@documenso/ui/primitives/template-flow/add-template-placeholder-recipients.types';
+import type { TAddTemplatePlacholderRecipientsFormSchema } from '@documenso/ui/primitives/template-flow/add-template-placeholder-recipients.types';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
 import { addTemplateFields } from '~/components/forms/edit-template/add-template-fields.action';
@@ -32,6 +33,7 @@ export type EditTemplateFormProps = {
 };
 
 type EditTemplateStep = 'signers' | 'fields';
+const EditTemplateSteps: EditTemplateStep[] = ['signers', 'fields'];
 
 export const EditTemplateForm = ({
   className,
@@ -56,7 +58,6 @@ export const EditTemplateForm = ({
       title: 'Add Fields',
       description: 'Add all relevant fields for each recipient.',
       stepIndex: 2,
-      onBackStep: () => setStep('signers'),
     },
   };
 
@@ -118,33 +119,35 @@ export const EditTemplateForm = ({
       </Card>
 
       <div className="col-span-12 lg:col-span-6 xl:col-span-5">
-        <DocumentFlowFormContainer onSubmit={(e) => e.preventDefault()}>
+        <DocumentFlowFormContainer
+          className="lg:h-[calc(100vh-6rem)]"
+          onSubmit={(e) => e.preventDefault()}
+        >
           <DocumentFlowFormContainerHeader
             title={currentDocumentFlow.title}
             description={currentDocumentFlow.description}
           />
 
-          {step === 'signers' && (
+          <Stepper
+            currentStep={currentDocumentFlow.stepIndex}
+            setCurrentStep={(step) => setStep(EditTemplateSteps[step - 1])}
+          >
             <AddTemplatePlaceholderRecipientsFormPartial
               key={recipients.length}
               documentFlow={documentFlow.signers}
               recipients={recipients}
               fields={fields}
-              numberOfSteps={Object.keys(documentFlow).length}
               onSubmit={onAddTemplatePlaceholderFormSubmit}
             />
-          )}
 
-          {step === 'fields' && (
             <AddTemplateFieldsFormPartial
               key={fields.length}
               documentFlow={documentFlow.fields}
               recipients={recipients}
               fields={fields}
-              numberOfSteps={Object.keys(documentFlow).length}
               onSubmit={onAddFieldsFormSubmit}
             />
-          )}
+          </Stepper>
         </DocumentFlowFormContainer>
       </div>
     </div>

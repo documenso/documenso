@@ -41,9 +41,29 @@ export const DesktopNav = ({ className, ...props }: DesktopNavProps) => {
 
   return (
     <div
-      className={cn('ml-8 hidden flex-1 gap-x-6 md:flex md:justify-center', className)}
+      className={cn(
+        'ml-8 hidden flex-1 items-center gap-x-12 md:flex md:justify-between',
+        className,
+      )}
       {...props}
     >
+      <div className="flex items-baseline gap-x-6">
+        {navigationLinks.map(({ href, label }) => (
+          <Link
+            key={href}
+            href={href}
+            className={cn(
+              'text-muted-foreground dark:text-muted focus-visible:ring-ring ring-offset-background rounded-md font-medium leading-5 hover:opacity-80 focus-visible:outline-none focus-visible:ring-2',
+              {
+                'text-foreground dark:text-muted-foreground': pathname?.startsWith(href),
+              },
+            )}
+          >
+            {label}
+          </Link>
+        ))}
+      </div>
+
       <CommandMenu open={open} onOpenChange={setOpen} />
 
       <Button
@@ -62,21 +82,6 @@ export const DesktopNav = ({ className, ...props }: DesktopNavProps) => {
           </div>
         </div>
       </Button>
-
-      {navigationLinks.map(({ href, label }) => (
-        <Link
-          key={href}
-          href={href}
-          className={cn(
-            'text-muted-foreground dark:text-muted focus-visible:ring-ring ring-offset-background rounded-md font-medium leading-5 hover:opacity-80 focus-visible:outline-none focus-visible:ring-2',
-            {
-              'text-foreground dark:text-muted-foreground': pathname?.startsWith(href),
-            },
-          )}
-        >
-          {label}
-        </Link>
-      ))}
     </div>
   );
 };

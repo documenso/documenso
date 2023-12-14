@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { getRequiredServerComponentSession } from '@documenso/lib/next-auth/get-server-session';
+import { getRequiredServerComponentSession } from '@documenso/lib/next-auth/get-server-component-session';
 import { getTemplates } from '@documenso/lib/server-only/template/get-templates';
 
 import { TemplatesDataTable } from './data-table-templates';
@@ -27,9 +27,12 @@ export default async function TemplatesPage({ searchParams = {} }: TemplatesPage
 
   return (
     <div className="mx-auto max-w-screen-xl px-4 md:px-8">
-      <div className="flex items-center justify-between">
+      <div className="flex items-baseline justify-between">
         <h1 className="mb-5 mt-2 truncate text-2xl font-semibold md:text-3xl">Templates</h1>
-        <NewTemplateDialog />
+
+        <div>
+          <NewTemplateDialog />
+        </div>
       </div>
 
       <div className="relative">

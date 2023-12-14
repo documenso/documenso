@@ -11,7 +11,8 @@ import { getBoundingClientRect } from '@documenso/lib/client-only/get-bounding-c
 import { useDocumentElement } from '@documenso/lib/client-only/hooks/use-document-element';
 import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
 import { nanoid } from '@documenso/lib/universal/id';
-import { Field, FieldType, Recipient } from '@documenso/prisma/client';
+import type { Field, Recipient } from '@documenso/prisma/client';
+import { FieldType } from '@documenso/prisma/client';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
 import { Card, CardContent } from '@documenso/ui/primitives/card';
@@ -29,14 +30,13 @@ import {
   DocumentFlowFormContainerStep,
 } from '@documenso/ui/primitives/document-flow/document-flow-root';
 import { FieldItem } from '@documenso/ui/primitives/document-flow/field-item';
-import {
-  DocumentFlowStep,
-  FRIENDLY_FIELD_TYPE,
-} from '@documenso/ui/primitives/document-flow/types';
+import type { DocumentFlowStep } from '@documenso/ui/primitives/document-flow/types';
+import { FRIENDLY_FIELD_TYPE } from '@documenso/ui/primitives/document-flow/types';
 import { Popover, PopoverContent, PopoverTrigger } from '@documenso/ui/primitives/popover';
 
+import { useStep } from '../stepper';
 // import { Tooltip, TooltipContent, TooltipTrigger } from '@documenso/ui/primitives/tooltip';
-import { TAddTemplateFieldsFormSchema } from './add-template-fields.types';
+import type { TAddTemplateFieldsFormSchema } from './add-template-fields.types';
 
 const fontCaveat = Caveat({
   weight: ['500'],
@@ -56,7 +56,6 @@ export type AddTemplateFieldsFormProps = {
   hideRecipients?: boolean;
   recipients: Recipient[];
   fields: Field[];
-  numberOfSteps: number;
   onSubmit: (_data: TAddTemplateFieldsFormSchema) => void;
 };
 
@@ -65,10 +64,11 @@ export const AddTemplateFieldsFormPartial = ({
   hideRecipients = false,
   recipients,
   fields,
-  numberOfSteps,
   onSubmit,
 }: AddTemplateFieldsFormProps) => {
   const { isWithinPageBounds, getFieldPosition, getPage } = useDocumentElement();
+
+  const { currentStep, totalSteps, previousStep } = useStep();
 
   const {
     control,
@@ -519,8 +519,8 @@ export const AddTemplateFieldsFormPartial = ({
       <DocumentFlowFormContainerFooter>
         <DocumentFlowFormContainerStep
           title={documentFlow.title}
-          step={documentFlow.stepIndex}
-          maxStep={numberOfSteps}
+          step={currentStep}
+          maxStep={totalSteps}
         />
 
         <DocumentFlowFormContainerActions
@@ -528,7 +528,7 @@ export const AddTemplateFieldsFormPartial = ({
           disabled={isSubmitting}
           goNextLabel="Save Template"
           onGoBackClick={() => {
-            documentFlow.onBackStep?.();
+            previousStep();
             remove();
           }}
           onGoNextClick={() => void onFormSubmit()}

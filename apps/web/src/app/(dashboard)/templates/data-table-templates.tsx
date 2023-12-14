@@ -7,7 +7,7 @@ import { useRouter } from 'next/navigation';
 import { Loader, Plus } from 'lucide-react';
 
 import { useUpdateSearchParams } from '@documenso/lib/client-only/hooks/use-update-search-params';
-import { Template } from '@documenso/prisma/client';
+import type { Template } from '@documenso/prisma/client';
 import { trpc } from '@documenso/trpc/react';
 import { Button } from '@documenso/ui/primitives/button';
 import { DataTable } from '@documenso/ui/primitives/data-table';
@@ -109,7 +109,7 @@ export const TemplatesDataTable = ({
                     }}
                   >
                     {!isRowLoading && <Plus className="-ml-1 mr-2 h-4 w-4" />}
-                    Use
+                    Use Template
                   </Button>
                   <DataTableActionDropdown row={row.original} />
                 </div>
