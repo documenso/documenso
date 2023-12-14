@@ -1,11 +1,11 @@
 import { z } from 'zod';
 
 export const ZAddSubjectFormSchema = z.object({
-  email: z.object({
+  meta: z.object({
     subject: z.string(),
     message: z.string(),
-    timezone: z.string().optional().default('Europe/London'),
-    dateFormat: z.string().optional().default('yyyy-MM-dd hh:mm a'),
+    timezone: z.string().optional().default('Etc/UTC'),
+    dateFormat: z.string().optional().default('yyyy-MM-dd'),
   }),
 });
 

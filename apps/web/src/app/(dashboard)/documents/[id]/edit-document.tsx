@@ -117,12 +117,12 @@ export const EditDocumentForm = ({
   };
 
   const onAddSubjectFormSubmit = async (data: TAddSubjectFormSchema) => {
-    const { subject, message, timezone, dateFormat } = data.email;
+    const { subject, message, timezone, dateFormat } = data.meta;
 
     try {
       await completeDocument({
         documentId: document.id,
-        email: {
+        meta: {
           subject,
           message,
           timezone,
