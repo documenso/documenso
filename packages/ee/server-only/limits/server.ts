@@ -1,10 +1,10 @@
 import { DateTime } from 'luxon';
 
-import { stripe } from '@documenso/lib/server-only/stripe';
 import { getFlag } from '@documenso/lib/universal/get-feature-flag';
 import { prisma } from '@documenso/prisma';
 import { SubscriptionStatus } from '@documenso/prisma/client';
 
+import { getPricesByType } from '../stripe/get-prices-by-type';
 import { FREE_PLAN_LIMITS, SELFHOSTED_PLAN_LIMITS } from './constants';
 import { ERROR_CODES } from './errors';
 import { ZLimitsSchema } from './schema';
@@ -43,23 +43,29 @@ export const getServerLimits = async ({ email }: GetServerLimitsOptions) => {
   let quota = structuredClone(FREE_PLAN_LIMITS);
   let remaining = structuredClone(FREE_PLAN_LIMITS);
 
-  // Since we store details and allow for past due plans we need to check if the subscription is active.
-  if (user.Subscription?.status !== SubscriptionStatus.INACTIVE && user.Subscription?.priceId) {
-    const { product } = await stripe.prices
-      .retrieve(user.Subscription.priceId, {
-        expand: ['product'],
-      })
-      .catch((err) => {
-        console.error(err);
-        throw err;
-      });
+  const activeSubscriptions = user.Subscription.filter(
+    ({ status }) => status === SubscriptionStatus.ACTIVE,
+  );
 
-    if (typeof product === 'string') {
-      throw new Error(ERROR_CODES.SUBSCRIPTION_FETCH_FAILED);
+  if (activeSubscriptions.length > 0) {
+    const individualPrices = await getPricesByType('individual');
+
+    for (const subscription of activeSubscriptions) {
+      const price = individualPrices.find((price) => price.id === subscription.priceId);
+      if (!price || typeof price.product === 'string' || price.product.deleted) {
+        continue;
+      }
+
+      const currentQuota = ZLimitsSchema.parse(
+        'metadata' in price.product ? price.product.metadata : {},
+      );
+
+      // Use the subscription with the highest quota.
+      if (currentQuota.documents > quota.documents && currentQuota.recipients > quota.recipients) {
+        quota = currentQuota;
+        remaining = structuredClone(quota);
+      }
     }
-
-    quota = ZLimitsSchema.parse('metadata' in product ? product.metadata : {});
-    remaining = structuredClone(quota);
   }
 
   const documents = await prisma.document.count({
