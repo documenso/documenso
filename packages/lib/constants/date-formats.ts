@@ -48,7 +48,10 @@ export const DATE_FORMATS = [
   },
 ];
 
-export const splitTimeZone = (input: string): string => {
+export const splitTimeZone = (input: string | null): string => {
+  if (input === null) {
+    return '';
+  }
   const indexGMT = input.indexOf('GMT');
   if (indexGMT !== -1) {
     return input.slice(0, indexGMT).trim();
@@ -58,9 +61,9 @@ export const splitTimeZone = (input: string): string => {
 
 export const convertToLocalSystemFormat = (
   customText: string,
-  dateFormat: string,
-  timeZone: string,
-): string | null => {
+  dateFormat: string | null = 'yyyy-MM-dd hh:mm a',
+  timeZone: string | null = 'Etc/UTC',
+): string => {
   const localTimeZone = splitTimeZone(timeZone);
   const selectedFormat = DATE_FORMATS.find((format) => format.value === dateFormat);
 

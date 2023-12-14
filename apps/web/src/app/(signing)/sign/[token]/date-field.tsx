@@ -21,7 +21,12 @@ export type DateFieldProps = {
   timezone?: string | null;
 };
 
-export const DateField = ({ field, recipient, dateFormat, timezone }: DateFieldProps) => {
+export const DateField = ({
+  field,
+  recipient,
+  dateFormat = 'yyyy-MM-dd hh:mm a',
+  timezone = 'Etc/UTC',
+}: DateFieldProps) => {
   const router = useRouter();
 
   const { toast } = useToast();
@@ -40,16 +45,18 @@ export const DateField = ({ field, recipient, dateFormat, timezone }: DateFieldP
 
   const localDateFormattedValue = convertToLocalSystemFormat(
     field.customText,
-    dateFormat!,
-    timezone!,
+    dateFormat,
+    timezone,
   );
+
+  const dateFormatValue = dateFormat === null ? 'yyyy-MM-dd hh:mm a' : dateFormat;
 
   const onSign = async () => {
     try {
       await signFieldWithToken({
         token: recipient.token,
         fieldId: field.id,
-        value: dateFormat!,
+        value: dateFormatValue,
       });
 
       startTransition(() => router.refresh());
