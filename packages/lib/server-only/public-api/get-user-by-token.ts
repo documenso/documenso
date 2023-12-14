@@ -15,13 +15,13 @@ export const checkUserFromToken = async ({ token }: { token: string }) => {
   });
 
   if (!user) {
-    throw new Error('Token not found');
+    throw new Error('Invalid token');
   }
 
   const tokenObject = user.ApiToken.find((apiToken) => apiToken.token === token);
 
   if (!tokenObject || new Date(tokenObject.expires) < new Date()) {
-    throw new Error('The API token has expired');
+    throw new Error('Expired token');
   }
 
   return user;

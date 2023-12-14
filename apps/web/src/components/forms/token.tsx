@@ -63,17 +63,29 @@ export const ApiTokenForm = ({ className }: ApiTokenFormProps) => {
   */
   const onDelete = (tokenId: number) => {
     if (tokenId === newlyCreatedToken.id) {
-      setShowNewToken((prev) => !prev);
+      setShowNewToken(false);
     }
   };
 
-  const copyToken = (token: string) => {
-    void copy(token).then(() => {
+  const copyToken = async (token: string) => {
+    try {
+      const copied = await copy(token);
+
+      if (!copied) {
+        throw new Error('Unable to copy the token');
+      }
+
       toast({
         title: 'Token copied to clipboard',
         description: 'The token was copied to your clipboard.',
       });
-    });
+    } catch (error) {
+      toast({
+        title: 'Unable to copy token',
+        description: 'We were unable to copy the token to your clipboard. Please try again.',
+        variant: 'destructive',
+      });
+    }
   };
 
   const onSubmit = async ({ tokenName }: TCreateTokenMutationSchema) => {
@@ -146,7 +158,7 @@ export const ApiTokenForm = ({ className }: ApiTokenFormProps) => {
                 <p className="mb-4 text-sm">
                   Expires:{' '}
                   {token.expires
-                    ? DateTime.fromJSDate(token.createdAt).toLocaleString(DateTime.DATETIME_FULL)
+                    ? DateTime.fromJSDate(token.expires).toLocaleString(DateTime.DATETIME_FULL)
                     : 'N/A'}
                 </p>
                 <DeleteTokenDialog
@@ -169,7 +181,7 @@ export const ApiTokenForm = ({ className }: ApiTokenFormProps) => {
           <Button
             variant="outline"
             className="mt-4"
-            onClick={() => copyToken(newlyCreatedToken.token)}
+            onClick={() => void copyToken(newlyCreatedToken.token)}
           >
             Copy token
           </Button>

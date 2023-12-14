@@ -18,6 +18,8 @@ export const fieldRouter = router({
       try {
         const { documentId, fields } = input;
 
+        console.log('fields', fields);
+
         return await setFieldsForDocument({
           documentId,
           userId: ctx.user.id,
