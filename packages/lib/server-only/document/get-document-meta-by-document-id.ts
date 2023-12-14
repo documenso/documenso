@@ -1,10 +1,10 @@
 import { prisma } from '@documenso/prisma';
 
-export interface getDocumentMetaByDocumentIdOptions {
+export interface GetDocumentMetaByDocumentIdOptions {
   id: number;
 }
 
-export const getDocumentMetaByDocumentId = async ({ id }: getDocumentMetaByDocumentIdOptions) => {
+export const getDocumentMetaByDocumentId = async ({ id }: GetDocumentMetaByDocumentIdOptions) => {
   return await prisma.documentMeta.findFirstOrThrow({
     where: {
       documentId: id,
