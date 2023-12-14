@@ -104,7 +104,7 @@ export const DocumentDropzone = ({
 
   return (
     <motion.div
-      className={cn('flex aria-disabled:cursor-none', className)}
+      className={cn('flex aria-disabled:cursor-not-allowed', className)}
       variants={DocumentDropzoneContainerVariants}
       initial="initial"
       animate="animate"
