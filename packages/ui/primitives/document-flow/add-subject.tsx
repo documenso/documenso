@@ -1,6 +1,6 @@
 'use client';
 
-import { useForm } from 'react-hook-form';
+import { Controller, useForm } from 'react-hook-form';
 
 import { DATE_FORMATS } from '@documenso/lib/constants/date-formats';
 import { TIME_ZONES_FULL } from '@documenso/lib/constants/time-zones';
@@ -53,6 +53,7 @@ export const AddSubjectFormPartial = ({
   onSubmit,
 }: AddSubjectFormProps) => {
   const {
+    control,
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
@@ -60,11 +61,11 @@ export const AddSubjectFormPartial = ({
     setValue,
   } = useForm<TAddSubjectFormSchema>({
     defaultValues: {
-      email: {
+      meta: {
         subject: document.documentMeta?.subject ?? '',
         message: document.documentMeta?.message ?? '',
-        timezone: document.documentMeta?.timezone ?? 'Europe/London',
-        dateFormat: document.documentMeta?.dateFormat ?? 'YYYY-MM-DD',
+        timezone: document.documentMeta?.timezone ?? 'Etc/UTC',
+        dateFormat: document.documentMeta?.dateFormat ?? 'yyyy-MM-dd hh:mm a',
       },
     },
   });
@@ -92,10 +93,10 @@ export const AddSubjectFormPartial = ({
                 // placeholder="Subject"
                 className="bg-background mt-2"
                 disabled={isSubmitting}
-                {...register('email.subject')}
+                {...register('meta.subject')}
               />
 
-              <FormErrorMessage className="mt-2" error={errors.email?.subject} />
+              <FormErrorMessage className="mt-2" error={errors.meta?.subject} />
             </div>
 
             <div>
@@ -107,14 +108,12 @@ export const AddSubjectFormPartial = ({
                 id="message"
                 className="bg-background mt-2 h-32 resize-none"
                 disabled={isSubmitting}
-                {...register('email.message')}
+                {...register('meta.message')}
               />
 
               <FormErrorMessage
                 className="mt-2"
-                error={
-                  typeof errors.email?.message !== 'string' ? errors.email?.message : undefined
-                }
+                error={typeof errors.meta?.message !== 'string' ? errors.meta?.message : undefined}
               />
             </div>
 
@@ -132,9 +131,9 @@ export const AddSubjectFormPartial = ({
                 </li>
                 <li className="text-muted-foreground">
                   <code className="text-muted-foreground bg-muted-foreground/20 rounded p-1 text-sm">
-                    {'{signer.email}'}
+                    {'{signer.meta}'}
                   </code>{' '}
-                  - The signer's email
+                  - The signer's meta
                 </li>
                 <li className="text-muted-foreground">
                   <code className="text-muted-foreground bg-muted-foreground/20 rounded p-1 text-sm">
@@ -158,22 +157,29 @@ export const AddSubjectFormPartial = ({
                         Date Format <span className="text-muted-foreground">(Optional)</span>
                       </Label>
 
-                      <Select
-                        defaultValue={getValues('email.dateFormat')}
-                        onValueChange={(value) => setValue('email.dateFormat', value)}
-                        disabled={documentHasBeenSent}
-                      >
-                        <SelectTrigger className="bg-background mt-2">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {DATE_FORMATS.map((format) => (
-                            <SelectItem key={format.key} value={format.value}>
-                              {format.label}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
+                      <Controller
+                        control={control}
+                        name={`meta.dateFormat`}
+                        render={({ field }) => (
+                          <Select
+                            defaultValue={getValues('meta.dateFormat')}
+                            onValueChange={(value) => setValue('meta.dateFormat', value)}
+                            disabled={documentHasBeenSent}
+                            {...field}
+                          >
+                            <SelectTrigger className="bg-background mt-2">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {DATE_FORMATS.map((format) => (
+                                <SelectItem key={format.key} value={format.value}>
+                                  {format.label}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        )}
+                      />
                     </div>
                   )}
 
@@ -183,11 +189,17 @@ export const AddSubjectFormPartial = ({
                         Time Zone <span className="text-muted-foreground">(Optional)</span>
                       </Label>
 
-                      <Combobox
-                        listValues={TIME_ZONES_FULL}
-                        onChange={(value) => setValue('email.timezone', value)}
-                        selectedValue={getValues('email.timezone')}
-                        disabled={documentHasBeenSent}
+                      <Controller
+                        control={control}
+                        name={`meta.timezone`}
+                        render={({ field: { onChange } }) => (
+                          <Combobox
+                            listValues={TIME_ZONES_FULL}
+                            onChange={(value) => onChange(setValue('meta.timezone', value))}
+                            selectedValue={getValues('meta.timezone')}
+                            disabled={documentHasBeenSent}
+                          />
+                        )}
                       />
                     </div>
                   )}
