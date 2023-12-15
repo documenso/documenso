@@ -1,6 +1,6 @@
 import { nanoid } from '@documenso/lib/universal/id';
 import { prisma } from '@documenso/prisma';
-import { TDuplicateTemplateMutationSchema } from '@documenso/trpc/server/template-router/schema';
+import type { TDuplicateTemplateMutationSchema } from '@documenso/trpc/server/template-router/schema';
 
 export type DuplicateTemplateOptions = TDuplicateTemplateMutationSchema & {
   userId: number;
@@ -38,7 +38,6 @@ export const duplicateTemplate = async ({ templateId, userId }: DuplicateTemplat
           email: recipient.email,
           name: recipient.name,
           token: nanoid(),
-          templateToken: recipient.templateToken,
         })),
       },
     },
@@ -53,7 +52,7 @@ export const duplicateTemplate = async ({ templateId, userId }: DuplicateTemplat
       const recipient = template.Recipient.find((recipient) => recipient.id === field.recipientId);
 
       const duplicatedTemplateRecipient = duplicatedTemplate.Recipient.find(
-        (doc) => doc.templateToken === recipient?.templateToken,
+        (doc) => doc.email === recipient?.email,
       );
 
       return {

@@ -89,7 +89,7 @@ export const AddTemplateFieldsFormPartial = ({
         signerEmail:
           recipients.find((recipient) => recipient.id === field.recipientId)?.email ?? '',
         signerToken:
-          recipients.find((recipient) => recipient.id === field.recipientId)?.templateToken ?? '',
+          recipients.find((recipient) => recipient.id === field.recipientId)?.token ?? '',
       })),
     },
   });
@@ -187,7 +187,7 @@ export const AddTemplateFieldsFormPartial = ({
         pageHeight: fieldPageHeight,
         signerEmail: selectedSigner.email,
         signerId: selectedSigner.id,
-        signerToken: selectedSigner.templateToken ?? '',
+        signerToken: selectedSigner.token ?? '',
       });
 
       setIsFieldWithinBounds(false);

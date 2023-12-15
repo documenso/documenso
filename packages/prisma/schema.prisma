@@ -188,7 +188,6 @@ model Recipient {
   email         String         @db.VarChar(255)
   name          String         @default("") @db.VarChar(255)
   token         String
-  templateToken String?
   expired       DateTime?
   signedAt      DateTime?
   readStatus    ReadStatus?    @default(NOT_OPENED)
@@ -272,14 +271,15 @@ enum TemplateType {
 
 model Template {
   id                     Int          @id @default(autoincrement())
-  userId                 Int
-  User                   User         @relation(fields: [userId], references: [id], onDelete: Cascade)
-  title                  String
   type                   TemplateType @default(PRIVATE)
+  title                  String
+  userId                 Int
   templateDocumentDataId String
-  templateDocumentData   DocumentData @relation(fields: [templateDocumentDataId], references: [id], onDelete: Cascade)
   createdAt              DateTime     @default(now())
   updatedAt              DateTime     @default(now()) @updatedAt
+
+  templateDocumentData   DocumentData @relation(fields: [templateDocumentDataId], references: [id], onDelete: Cascade)
+  User                   User         @relation(fields: [userId], references: [id], onDelete: Cascade)
   Recipient              Recipient[]
   Field                  Field[]
 

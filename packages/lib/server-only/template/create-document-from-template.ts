@@ -1,6 +1,6 @@
 import { nanoid } from '@documenso/lib/universal/id';
 import { prisma } from '@documenso/prisma';
-import { TCreateDocumentFromTemplateMutationSchema } from '@documenso/trpc/server/template-router/schema';
+import type { TCreateDocumentFromTemplateMutationSchema } from '@documenso/trpc/server/template-router/schema';
 
 export type CreateDocumentFromTemplateOptions = TCreateDocumentFromTemplateMutationSchema & {
   userId: number;
@@ -41,7 +41,6 @@ export const createDocumentFromTemplate = async ({
           email: recipient.email,
           name: recipient.name,
           token: nanoid(),
-          templateToken: recipient.templateToken,
         })),
       },
     },
@@ -55,9 +54,7 @@ export const createDocumentFromTemplate = async ({
     data: template.Field.map((field) => {
       const recipient = template.Recipient.find((recipient) => recipient.id === field.recipientId);
 
-      const documentRecipient = document.Recipient.find(
-        (doc) => doc.templateToken === recipient?.templateToken,
-      );
+      const documentRecipient = document.Recipient.find((doc) => doc.email === recipient?.email);
 
       return {
         type: field.type,
