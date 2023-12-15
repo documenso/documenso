@@ -8,7 +8,7 @@ import { Edit, Loader } from 'lucide-react';
 
 import { useDebouncedValue } from '@documenso/lib/client-only/hooks/use-debounced-value';
 import { useUpdateSearchParams } from '@documenso/lib/client-only/hooks/use-update-search-params';
-import { Document, Role, Subscription } from '@documenso/prisma/client';
+import type { Document, Role, Subscription } from '@documenso/prisma/client';
 import { Button } from '@documenso/ui/primitives/button';
 import { DataTable } from '@documenso/ui/primitives/data-table';
 import { DataTablePagination } from '@documenso/ui/primitives/data-table-pagination';
@@ -19,7 +19,7 @@ type UserData = {
   name: string | null;
   email: string;
   roles: Role[];
-  Subscription?: SubscriptionLite | null;
+  Subscription?: SubscriptionLite[] | null;
   Document: DocumentLite[];
 };
 
@@ -35,9 +35,16 @@ type UsersDataTableProps = {
   totalPages: number;
   perPage: number;
   page: number;
+  individualPriceIds: string[];
 };
 
-export const UsersDataTable = ({ users, totalPages, perPage, page }: UsersDataTableProps) => {
+export const UsersDataTable = ({
+  users,
+  totalPages,
+  perPage,
+  page,
+  individualPriceIds,
+}: UsersDataTableProps) => {
   const [isPending, startTransition] = useTransition();
   const updateSearchParams = useUpdateSearchParams();
   const [searchString, setSearchString] = useState('');
@@ -100,7 +107,13 @@ export const UsersDataTable = ({ users, totalPages, perPage, page }: UsersDataTa
           {
             header: 'Subscription',
             accessorKey: 'subscription',
-            cell: ({ row }) => row.original.Subscription?.status ?? 'NONE',
+            cell: ({ row }) => {
+              const foundIndividualSubscription = (row.original.Subscription ?? []).find((sub) =>
+                individualPriceIds.includes(sub.priceId),
+              );
+
+              return foundIndividualSubscription?.status ?? 'NONE';
+            },
           },
           {
             header: 'Documents',

@@ -1,53 +1,34 @@
 'use server';
 
-import { createCustomer } from '@documenso/ee/server-only/stripe/create-customer';
 import { getCheckoutSession } from '@documenso/ee/server-only/stripe/get-checkout-session';
-import {
-  getStripeCustomerByEmail,
-  getStripeCustomerById,
-} from '@documenso/ee/server-only/stripe/get-customer';
+import { getStripeCustomerByUser } from '@documenso/ee/server-only/stripe/get-customer';
 import { getPortalSession } from '@documenso/ee/server-only/stripe/get-portal-session';
 import { getRequiredServerComponentSession } from '@documenso/lib/next-auth/get-server-component-session';
-import type { Stripe } from '@documenso/lib/server-only/stripe';
-import { getSubscriptionByUserId } from '@documenso/lib/server-only/subscription/get-subscription-by-user-id';
+import { getSubscriptionsByUserId } from '@documenso/lib/server-only/subscription/get-subscriptions-by-user-id';
 
 export type CreateCheckoutOptions = {
   priceId: string;
 };
 
 export const createCheckout = async ({ priceId }: CreateCheckoutOptions) => {
-  const { user } = await getRequiredServerComponentSession();
+  const session = await getRequiredServerComponentSession();
 
-  const existingSubscription = await getSubscriptionByUserId({ userId: user.id });
+  const { user, stripeCustomer } = await getStripeCustomerByUser(session.user);
 
-  let stripeCustomer: Stripe.Customer | null = null;
+  const existingSubscriptions = await getSubscriptionsByUserId({ userId: user.id });
 
-  // Find the Stripe customer for the current user subscription.
-  if (existingSubscription?.periodEnd && existingSubscription.periodEnd >= new Date()) {
-    stripeCustomer = await getStripeCustomerById(existingSubscription.customerId);
+  const foundSubscription = existingSubscriptions.find(
+    (subscription) =>
+      subscription.priceId === priceId &&
+      subscription.periodEnd &&
+      subscription.periodEnd >= new Date(),
+  );
 
-    if (!stripeCustomer) {
-      throw new Error('Missing Stripe customer for subscription');
-    }
-
+  if (foundSubscription) {
     return getPortalSession({
       customerId: stripeCustomer.id,
       returnUrl: `${process.env.NEXT_PUBLIC_WEBAPP_URL}/settings/billing`,
     });
-  }
-
-  // Fallback to check if a Stripe customer already exists for the current user email.
-  if (!stripeCustomer) {
-    stripeCustomer = await getStripeCustomerByEmail(user.email);
-  }
-
-  // Create a Stripe customer if it does not exist for the current user.
-  if (!stripeCustomer) {
-    await createCustomer({
-      user,
-    });
-
-    stripeCustomer = await getStripeCustomerByEmail(user.email);
   }
 
   return getCheckoutSession({
