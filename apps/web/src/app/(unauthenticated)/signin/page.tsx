@@ -13,12 +13,14 @@ export default function SignInPage() {
 
       <SignInForm className="mt-4" />
 
-      <p className="text-muted-foreground mt-6 text-center text-sm">
-        Don't have an account?{' '}
-        <Link href="/signup" className="text-primary duration-200 hover:opacity-70">
-          Sign up
-        </Link>
-      </p>
+      {process.env.NEXT_PUBLIC_DISABLE_SIGNUP !== 'true' && (
+        <p className="text-muted-foreground mt-6 text-center text-sm">
+          Don't have an account?{' '}
+          <Link href="/signup" className="text-primary duration-200 hover:opacity-70">
+            Sign up
+          </Link>
+        </p>
+      )}
 
       <p className="mt-2.5 text-center">
         <Link
