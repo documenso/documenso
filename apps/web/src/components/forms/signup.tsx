@@ -41,6 +41,7 @@ export type SignUpFormProps = {
 
 export const SignUpForm = ({ className }: SignUpFormProps) => {
   const { toast } = useToast();
+  const analytics = useAnalytics();
 
   const form = useForm<TSignUpFormSchema>({
     values: {
