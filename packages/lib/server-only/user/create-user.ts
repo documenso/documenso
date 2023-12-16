@@ -1,9 +1,11 @@
 import { hash } from 'bcrypt';
 
+import { getStripeCustomerByUser } from '@documenso/ee/server-only/stripe/get-customer';
 import { prisma } from '@documenso/prisma';
 import { IdentityProvider } from '@documenso/prisma/client';
 
 import { SALT_ROUNDS } from '../../constants/auth';
+import { getFlag } from '../../universal/get-feature-flag';
 
 export interface CreateUserOptions {
   name: string;
@@ -20,6 +22,8 @@ export const createUser = async ({
   signature,
   emailVerified,
 }: CreateUserOptions) => {
+  const isBillingEnabled = await getFlag('app_billing');
+
   const hashedPassword = await hash(password, SALT_ROUNDS);
 
   const userExists = await prisma.user.findFirst({
@@ -32,7 +36,7 @@ export const createUser = async ({
     throw new Error('User already exists');
   }
 
-  return await prisma.user.create({
+  let user = await prisma.user.create({
     data: {
       name,
       email: email.toLowerCase(),
@@ -42,4 +46,15 @@ export const createUser = async ({
       emailVerified,
     },
   });
+
+  if (isBillingEnabled) {
+    try {
+      const stripeSession = await getStripeCustomerByUser(user);
+      user = stripeSession.user;
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  return user;
 };
