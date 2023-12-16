@@ -1,9 +1,9 @@
 'use client';
 
-import { HTMLAttributes, useState } from 'react';
+import type { HTMLAttributes } from 'react';
+import { useState } from 'react';
 
 import Link from 'next/link';
-import { useSearchParams } from 'next/navigation';
 
 import { AnimatePresence, motion } from 'framer-motion';
 import { usePlausible } from 'next-plausible';
@@ -16,14 +16,9 @@ export type PricingTableProps = HTMLAttributes<HTMLDivElement>;
 const SELECTED_PLAN_BAR_LAYOUT_ID = 'selected-plan-bar';
 
 export const PricingTable = ({ className, ...props }: PricingTableProps) => {
-  const params = useSearchParams();
   const event = usePlausible();
 
-  const [period, setPeriod] = useState<'MONTHLY' | 'YEARLY'>(() =>
-    params?.get('planId') === process.env.NEXT_PUBLIC_STRIPE_COMMUNITY_PLAN_YEARLY_PRICE_ID
-      ? 'YEARLY'
-      : 'MONTHLY',
-  );
+  const [period, setPeriod] = useState<'MONTHLY' | 'YEARLY'>('MONTHLY');
 
   return (
     <div className={cn('', className)} {...props}>

@@ -26,6 +26,7 @@ import { useToast } from '@documenso/ui/primitives/use-toast';
 
 import { claimPlan } from '~/api/claim-plan/fetcher';
 
+import { STEP } from '../constants';
 import { FormErrorMessage } from '../form/form-error-message';
 
 const ZWidgetFormSchema = z
@@ -48,13 +49,16 @@ const ZWidgetFormSchema = z
 
 export type TWidgetFormSchema = z.infer<typeof ZWidgetFormSchema>;
 
+type StepKeys = keyof typeof STEP;
+type StepValues = (typeof STEP)[StepKeys];
+
 export type WidgetProps = HTMLAttributes<HTMLDivElement>;
 
 export const Widget = ({ className, children, ...props }: WidgetProps) => {
   const { toast } = useToast();
   const event = usePlausible();
 
-  const [step, setStep] = useState<'EMAIL' | 'NAME' | 'SIGN'>('EMAIL');
+  const [step, setStep] = useState<StepValues>(STEP.EMAIL);
   const [showSigningDialog, setShowSigningDialog] = useState(false);
   const [draftSignatureDataUrl, setDraftSignatureDataUrl] = useState<string | null>(null);
 
@@ -81,11 +85,11 @@ export const Widget = ({ className, children, ...props }: WidgetProps) => {
   const signatureText = watch('signatureText');
 
   const stepsRemaining = useMemo(() => {
-    if (step === 'NAME') {
+    if (step === STEP.NAME) {
       return 2;
     }
 
-    if (step === 'SIGN') {
+    if (step === STEP.EMAIL) {
       return 1;
     }
 
@@ -93,16 +97,16 @@ export const Widget = ({ className, children, ...props }: WidgetProps) => {
   }, [step]);
 
   const onNextStepClick = () => {
-    if (step === 'EMAIL') {
-      setStep('NAME');
+    if (step === STEP.EMAIL) {
+      setStep(STEP.NAME);
 
       setTimeout(() => {
         document.querySelector<HTMLElement>('#name')?.focus();
       }, 0);
     }
 
-    if (step === 'NAME') {
-      setStep('SIGN');
+    if (step === STEP.NAME) {
+      setStep(STEP.SIGN);
 
       setTimeout(() => {
         document.querySelector<HTMLElement>('#signatureText')?.focus();
@@ -226,7 +230,7 @@ export const Widget = ({ className, children, ...props }: WidgetProps) => {
                           type="button"
                           className="bg-primary h-full w-14 rounded"
                           disabled={!field.value || !!errors.email?.message}
-                          onClick={() => step === 'EMAIL' && onNextStepClick()}
+                          onClick={() => step === STEP.EMAIL && onNextStepClick()}
                         >
                           Next
                         </Button>
@@ -238,7 +242,7 @@ export const Widget = ({ className, children, ...props }: WidgetProps) => {
                 <FormErrorMessage error={errors.email} className="mt-1" />
               </motion.div>
 
-              {(step === 'NAME' || step === 'SIGN') && (
+              {(step === STEP.NAME || step === STEP.SIGN) && (
                 <motion.div
                   key="name"
                   className="mt-4"
