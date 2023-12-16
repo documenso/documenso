@@ -11,6 +11,7 @@ import {
   useState,
 } from 'react';
 
+import { Undo2 } from 'lucide-react';
 import { StrokeOptions, getStroke } from 'perfect-freehand';
 
 import { cn } from '@documenso/ui/lib/utils';
@@ -58,7 +59,7 @@ export const SignaturePad = ({
     setIsPressed(true);
 
     const point = Point.fromEvent(event, DPI, $el.current);
-    
+
     setCurrentLine([point]);
   };
 
@@ -81,7 +82,7 @@ export const SignaturePad = ({
         const ctx = $el.current.getContext('2d');
 
         if (ctx) {
-          ctx.clearRect(0, 0, $el.current.width, $el.current.height);
+          ctx.restore();
           ctx.imageSmoothingEnabled = true;
           ctx.imageSmoothingQuality = 'high';
 
@@ -89,6 +90,7 @@ export const SignaturePad = ({
             const pathData = new Path2D(
               getSvgPathFromStroke(getStroke(line, perfectFreehandOptions)),
             );
+
             ctx.fill(pathData);
           });
 
@@ -113,7 +115,7 @@ export const SignaturePad = ({
     const newLines = [...lines];
 
     if (addLine && currentLine.length > 0) {
-      newLines.push(currentLine);
+      newLines.push([...currentLine, point]);
       setCurrentLine([]);
     }
 
@@ -123,11 +125,11 @@ export const SignaturePad = ({
       const ctx = $el.current.getContext('2d');
 
       if (ctx) {
-        ctx.clearRect(0, 0, $el.current.width, $el.current.height);
+        ctx.restore();
 
         ctx.imageSmoothingEnabled = true;
         ctx.imageSmoothingQuality = 'high';
-        
+
         newLines.forEach((line) => {
           const pathData = new Path2D(
             getSvgPathFromStroke(getStroke(line, perfectFreehandOptions)),
@@ -136,6 +138,8 @@ export const SignaturePad = ({
         });
 
         onChange?.($el.current.toDataURL());
+
+        ctx.save();
       }
     }
   };
@@ -186,9 +190,7 @@ export const SignaturePad = ({
       ctx?.clearRect(0, 0, $el.current.width, $el.current.height);
 
       newLines.forEach((line) => {
-        const pathData = new Path2D(
-          getSvgPathFromStroke(getStroke(line, perfectFreehandOptions)),
-        );
+        const pathData = new Path2D(getSvgPathFromStroke(getStroke(line, perfectFreehandOptions)));
         ctx?.fill(pathData);
       });
     }
@@ -232,23 +234,28 @@ export const SignaturePad = ({
       />
 
       <div className="absolute bottom-4 right-4 flex gap-2">
-      {lines.length > 0 && (
-          <button
-            type="button"
-            className="bg-secondary hover:bg-secondary-foreground rounded-full px-3 py-1 text-xs text-white transition duration-300 hover:text-slate-500 focus:outline-none"
-            onClick={() => onUndoClick()}
-          >
-            Undo
-          </button>
-        )}
         <button
           type="button"
-          className="bg-primary hover:bg-secondary rounded-full px-3 py-1 text-xs text-slate-500 transition duration-300 hover:text-white focus:outline-none"
+          className="focus-visible:ring-ring ring-offset-background text-muted-foreground/60 hover:text-muted-foreground rounded-full p-0 text-xs focus-visible:outline-none focus-visible:ring-2"
           onClick={() => onClearClick()}
         >
           Clear Signature
         </button>
       </div>
+
+      {lines.length > 0 && (
+        <div className="absolute bottom-4 left-4 flex gap-2">
+          <button
+            type="button"
+            title="undo"
+            className="focus-visible:ring-ring ring-offset-background text-muted-foreground/60 hover:text-muted-foreground rounded-full p-0 text-xs focus-visible:outline-none focus-visible:ring-2"
+            onClick={() => onUndoClick()}
+          >
+            <Undo2 className="h-4 w-4" />
+            <span className="sr-only">Undo</span>
+          </button>
+        </div>
+      )}
     </div>
   );
 };
