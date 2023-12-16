@@ -9,14 +9,7 @@ import {
   DialogTrigger,
 } from '@documenso/ui/primitives/dialog';
 
-const truncateTitle = (title: string, maxLength: number) => {
-  if (title.length <= maxLength) {
-    return title;
-  }
-  const start = title.slice(0, maxLength / 2);
-  const end = title.slice(-maxLength / 2);
-  return `${start}.....${end}`;
-};
+import { truncateTitle } from '~/helpers/truncate-title';
 
 export type SignDialogProps = {
   isSubmitting: boolean;
