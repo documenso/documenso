@@ -3,12 +3,11 @@ import { notFound, redirect } from 'next/navigation';
 import { match } from 'ts-pattern';
 
 import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
-import { getServerComponentSession } from '@documenso/lib/next-auth/get-server-session';
+import { getServerComponentSession } from '@documenso/lib/next-auth/get-server-component-session';
 import { getDocumentAndSenderByToken } from '@documenso/lib/server-only/document/get-document-by-token';
 import { viewedDocument } from '@documenso/lib/server-only/document/viewed-document';
 import { getFieldsForToken } from '@documenso/lib/server-only/field/get-fields-for-token';
 import { getRecipientByToken } from '@documenso/lib/server-only/recipient/get-recipient-by-token';
-import { getFile } from '@documenso/lib/universal/upload/get-file';
 import { DocumentStatus, FieldType, SigningStatus } from '@documenso/prisma/client';
 import { Card, CardContent } from '@documenso/ui/primitives/card';
 import { ElementVisible } from '@documenso/ui/primitives/element-visible';
@@ -47,10 +46,6 @@ export default async function SigningPage({ params: { token } }: SigningPageProp
 
   const { documentData } = document;
 
-  const documentDataUrl = await getFile(documentData)
-    .then((buffer) => Buffer.from(buffer).toString('base64'))
-    .then((data) => `data:application/pdf;base64,${data}`);
-
   const { user } = await getServerComponentSession();
 
   if (
@@ -61,7 +56,11 @@ export default async function SigningPage({ params: { token } }: SigningPageProp
   }
 
   return (
-    <SigningProvider email={recipient.email} fullName={recipient.name} signature={user?.signature}>
+    <SigningProvider
+      email={recipient.email}
+      fullName={user?.email === recipient.email ? user.name : recipient.name}
+      signature={user?.email === recipient.email ? user.signature : undefined}
+    >
       <div className="mx-auto w-full max-w-screen-xl">
         <h1 className="mt-4 truncate text-2xl font-semibold md:text-3xl" title={document.title}>
           {document.title}
@@ -79,7 +78,7 @@ export default async function SigningPage({ params: { token } }: SigningPageProp
             gradient
           >
             <CardContent className="p-2">
-              <LazyPDFViewer document={documentDataUrl} />
+              <LazyPDFViewer key={documentData.id} documentData={documentData} />
             </CardContent>
           </Card>
 

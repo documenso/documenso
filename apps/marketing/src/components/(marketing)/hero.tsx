@@ -134,9 +134,9 @@ export const Hero = ({ className, ...props }: HeroProps) => {
               variants={HeroTitleVariants}
               initial="initial"
               animate="animate"
-              className="border-primary bg-background hover:bg-muted mx-auto mt-8 w-60 rounded-xl border transition duration-300"
+              className="border-primary bg-background hover:bg-muted mx-auto mt-8 w-60 rounded-xl border transition-colors duration-300"
             >
-              <Link href="/single-player-mode" className="block px-4 py-2 text-center">
+              <Link href="/singleplayer" className="block px-4 py-2 text-center">
                 <h2 className="text-muted-foreground text-xs font-semibold">
                   Introducing Single Player Mode
                 </h2>

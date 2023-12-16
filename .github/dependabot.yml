@@ -9,7 +9,7 @@ updates:
     labels:
       - "ci dependencies"
       - "ci"
-    open-pull-requests-limit: 2
+    open-pull-requests-limit: 0
 
   - package-ecosystem: "npm"
     directory: "/apps/marketing"
@@ -19,7 +19,7 @@ updates:
     labels:
       - "npm dependencies"
       - "frontend"
-    open-pull-requests-limit: 2
+    open-pull-requests-limit: 0
 
   - package-ecosystem: "npm"
     directory: "/apps/web"
@@ -29,4 +29,4 @@ updates:
     labels:
       - "npm dependencies"
       - "frontend"
-    open-pull-requests-limit: 2
+    open-pull-requests-limit: 0

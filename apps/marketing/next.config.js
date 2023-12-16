@@ -2,14 +2,17 @@
 const path = require('path');
 const { withContentlayer } = require('next-contentlayer');
 
-require('dotenv').config({
-  path: path.join(__dirname, '../../.env.local'),
+const ENV_FILES = ['.env', '.env.local', `.env.${process.env.NODE_ENV || 'development'}`];
+
+ENV_FILES.forEach((file) => {
+  require('dotenv').config({
+    path: path.join(__dirname, `../../${file}`),
+  });
 });
 
 /** @type {import('next').NextConfig} */
 const config = {
   experimental: {
-    serverActions: true,
     serverActionsBodySizeLimit: '10mb',
   },
   reactStrictMode: true,
@@ -21,6 +24,14 @@ const config = {
     'lucide-react': {
       transform: 'lucide-react/dist/esm/icons/{{ kebabCase member }}',
     },
+  },
+  webpack: (config, { isServer }) => {
+    // fixes: Module not found: Can’t resolve ‘../build/Release/canvas.node’
+    if (isServer) {
+      config.resolve.alias.canvas = false;
+    }
+
+    return config;
   },
   async headers() {
     return [

@@ -70,24 +70,22 @@ export function SinglePlayerModeSignatureField({
     throw new Error('Invalid field type');
   }
 
-  const $paragraphEl = useRef<HTMLParagraphElement>(null);
-
   const { height, width } = useFieldPageCoords(field);
+
+  const insertedBase64Signature = field.inserted && field.Signature?.signatureImageAsBase64;
+  const insertedTypeSignature = field.inserted && field.Signature?.typedSignature;
 
   const scalingFactor = useElementScaleSize(
     {
       height,
       width,
     },
-    $paragraphEl,
+    insertedTypeSignature || '',
     maxFontSize,
     fontVariableValue,
   );
 
   const fontSize = maxFontSize * scalingFactor;
-
-  const insertedBase64Signature = field.inserted && field.Signature?.signatureImageAsBase64;
-  const insertedTypeSignature = field.inserted && field.Signature?.typedSignature;
 
   return (
     <SinglePlayerModeFieldCardContainer field={field}>
@@ -99,7 +97,6 @@ export function SinglePlayerModeSignatureField({
         />
       ) : insertedTypeSignature ? (
         <p
-          ref={$paragraphEl}
           style={{
             fontSize: `clamp(${minFontSize}px, ${fontSize}px, ${maxFontSize}px)`,
             fontFamily: `var(${fontVariable})`,
@@ -145,7 +142,7 @@ export function SinglePlayerModeCustomTextField({
       height,
       width,
     },
-    $paragraphEl,
+    field.customText,
     maxFontSize,
     fontVariableValue,
   );

@@ -2,28 +2,38 @@
   "$schema": "https://turbo.build/schema.json",
   "pipeline": {
     "build": {
-      "dependsOn": [
-        "^build"
-      ],
-      "outputs": [
-        ".next/**",
-        "!.next/cache/**"
-      ]
+      "dependsOn": ["^build"],
+      "outputs": [".next/**", "!.next/cache/**"]
     },
-    "lint": {},
+    "lint": {
+      "cache": false
+    },
+    "lint:fix": {
+      "cache": false
+    },
     "clean": {
       "cache": false
     },
     "dev": {
       "cache": false,
       "persistent": true
+    },
+    "start": {
+      "dependsOn": ["^build"],
+      "cache": false,
+      "persistent": true
+    },
+    "dev:test": {
+      "cache": false
+    },
+    "test:e2e": {
+      "dependsOn": ["^build"]
     }
   },
-  "globalDependencies": [
-    "**/.env.*local"
-  ],
+  "globalDependencies": ["**/.env.*local"],
   "globalEnv": [
     "APP_VERSION",
+    "NEXT_PRIVATE_ENCRYPTION_KEY",
     "NEXTAUTH_URL",
     "NEXTAUTH_SECRET",
     "NEXT_PUBLIC_PROJECT",
@@ -34,6 +44,7 @@
     "NEXT_PUBLIC_FEATURE_BILLING_ENABLED",
     "NEXT_PUBLIC_STRIPE_COMMUNITY_PLAN_YEARLY_PRICE_ID",
     "NEXT_PUBLIC_STRIPE_COMMUNITY_PLAN_MONTHLY_PRICE_ID",
+    "NEXT_PUBLIC_STRIPE_FREE_PLAN_ID",
     "NEXT_PRIVATE_DATABASE_URL",
     "NEXT_PRIVATE_DIRECT_DATABASE_URL",
     "NEXT_PRIVATE_GOOGLE_CLIENT_ID",
@@ -44,6 +55,9 @@
     "NEXT_PRIVATE_UPLOAD_BUCKET",
     "NEXT_PRIVATE_UPLOAD_ACCESS_KEY_ID",
     "NEXT_PRIVATE_UPLOAD_SECRET_ACCESS_KEY",
+    "NEXT_PRIVATE_UPLOAD_DISTRIBUTION_DOMAIN",
+    "NEXT_PRIVATE_UPLOAD_DISTRIBUTION_KEY_ID",
+    "NEXT_PRIVATE_UPLOAD_DISTRIBUTION_KEY_CONTENTS",
     "NEXT_PRIVATE_SIGNING_TRANSPORT",
     "NEXT_PRIVATE_SIGNING_PASSPHRASE",
     "NEXT_PRIVATE_SIGNING_LOCAL_FILE_PATH",
@@ -66,6 +80,8 @@
     "NEXT_PRIVATE_SMTP_FROM_NAME",
     "NEXT_PRIVATE_SMTP_FROM_ADDRESS",
     "NEXT_PRIVATE_STRIPE_API_KEY",
+    "NEXT_PRIVATE_STRIPE_WEBHOOK_SECRET",
+    "NEXT_PRIVATE_GITHUB_TOKEN",
     "VERCEL",
     "VERCEL_ENV",
     "VERCEL_URL",
@@ -73,6 +89,9 @@
     "POSTGRES_URL",
     "DATABASE_URL",
     "POSTGRES_PRISMA_URL",
-    "POSTGRES_URL_NON_POOLING"
+    "POSTGRES_URL_NON_POOLING",
+    "E2E_TEST_AUTHENTICATE_USERNAME",
+    "E2E_TEST_AUTHENTICATE_USER_EMAIL",
+    "E2E_TEST_AUTHENTICATE_USER_PASSWORD"
   ]
 }

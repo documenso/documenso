@@ -20,7 +20,7 @@ import { useToast } from '@documenso/ui/primitives/use-toast';
 import { FormErrorMessage } from '../form/form-error-message';
 
 export const ZProfileFormSchema = z.object({
-  name: z.string().min(1),
+  name: z.string().trim().min(1, { message: 'Please enter a valid name.' }),
   signature: z.string().min(1, 'Signature Pad cannot be empty'),
 });
 
@@ -117,7 +117,8 @@ export const ProfileForm = ({ className, user }: ProfileFormProps) => {
             name="signature"
             render={({ field: { onChange } }) => (
               <SignaturePad
-                className="h-44 w-full rounded-lg border bg-white backdrop-blur-sm dark:border-[#e2d7c5] dark:bg-[#fcf8ee]"
+                className="h-44 w-full"
+                containerClassName="rounded-lg border bg-background"
                 defaultValue={user.signature ?? undefined}
                 onChange={(v) => onChange(v ?? '')}
               />

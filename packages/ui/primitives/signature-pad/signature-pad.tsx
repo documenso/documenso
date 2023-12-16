@@ -23,10 +23,12 @@ const DPI = 2;
 
 export type SignaturePadProps = Omit<HTMLAttributes<HTMLCanvasElement>, 'onChange'> & {
   onChange?: (_signatureDataUrl: string | null) => void;
+  containerClassName?: string;
 };
 
 export const SignaturePad = ({
   className,
+  containerClassName,
   defaultValue,
   onChange,
   ...props
@@ -220,7 +222,7 @@ export const SignaturePad = ({
   }, [defaultValue]);
 
   return (
-    <div className="relative block">
+    <div className={cn('relative block', containerClassName)}>
       <canvas
         ref={$el}
         className={cn('relative block dark:invert', className)}

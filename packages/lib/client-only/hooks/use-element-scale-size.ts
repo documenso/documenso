@@ -60,26 +60,17 @@ export const calculateTextScaleSize = (
  */
 export function useElementScaleSize(
   container: { width: number; height: number },
-  child: RefObject<HTMLElement | null>,
+  text: string,
   fontSize: number,
   fontFamily: string,
 ) {
   const [scalingFactor, setScalingFactor] = useState(1);
 
   useEffect(() => {
-    if (!child.current) {
-      return;
-    }
-
-    const scaleSize = calculateTextScaleSize(
-      container,
-      child.current.innerText,
-      `${fontSize}px`,
-      fontFamily,
-    );
+    const scaleSize = calculateTextScaleSize(container, text, `${fontSize}px`, fontFamily);
 
     setScalingFactor(scaleSize);
-  }, [child, container, fontFamily, fontSize]);
+  }, [text, container, fontFamily, fontSize]);
 
   return scalingFactor;
 }
