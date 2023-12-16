@@ -21,6 +21,7 @@ enum Role {
 model User {
   id                   Int                  @id @default(autoincrement())
   name                 String?
+  customerId           String?              @unique
   email                String               @unique
   emailVerified        DateTime?
   password             String?
@@ -34,7 +35,7 @@ model User {
   accounts             Account[]
   sessions             Session[]
   Document             Document[]
-  Subscription         Subscription?
+  Subscription         Subscription[]
   PasswordResetToken   PasswordResetToken[]
   twoFactorSecret      String?
   twoFactorEnabled     Boolean              @default(false)
@@ -72,18 +73,16 @@ enum SubscriptionStatus {
 model Subscription {
   id                Int                @id @default(autoincrement())
   status            SubscriptionStatus @default(INACTIVE)
-  planId            String?
-  priceId           String?
-  customerId        String
+  planId            String             @unique
+  priceId           String
   periodEnd         DateTime?
-  userId            Int                @unique
+  userId            Int
   createdAt         DateTime           @default(now())
   updatedAt         DateTime           @updatedAt
   cancelAtPeriodEnd Boolean            @default(false)
 
   User User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@unique([customerId])
   @@index([userId])
 }
 
