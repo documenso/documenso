@@ -2,10 +2,8 @@ import { expect } from '@playwright/test';
 
 import { test } from '../fixtures';
 
-const sentDocumentName = '[713] Document - Sent';
-const receivedDocumentName = '[713] Document - Received';
-
-let recipientEmail = '';
+const sentDocumentName = `[713] Document - Sent ${Date.now()}`;
+const receivedDocumentName = `[713] Document - Received ${Date.now()}`;
 
 test.beforeEach(async ({ users, documents, samplePdf }) => {
   const user1 = await users.create();
@@ -25,7 +23,6 @@ test.beforeEach(async ({ users, documents, samplePdf }) => {
     userId: user2.id,
   });
 
-  recipientEmail = user2.email;
   await user1.apiLogin();
 });
 
@@ -35,35 +32,31 @@ test.afterEach(async ({ users, documents }) => {
   await documents.deleteAll();
 });
 
-test('[PR-713]: should see sent documents', async ({ page }) => {
+test('[PR-713]: test document search', async ({ page, users }) => {
   await page.goto('/documents');
 
   await page.keyboard.press('Meta+K');
 
-  await page.getByPlaceholder('Type a command or search...').fill('sent');
-  await expect(page.getByRole('option', { name: sentDocumentName })).toBeVisible();
+  const searchInput = await page.getByPlaceholder('Type a command or search...');
 
-  await page.keyboard.press('Escape');
-});
+  await test.step('should see sent documents', async () => {
+    await searchInput.fill('sent');
+    await expect(page.getByRole('option', { name: sentDocumentName })).toBeVisible();
+  });
 
-test('[PR-713]: should see received documents', async ({ page }) => {
-  await page.goto('/documents');
+  await test.step('should see received documents', async () => {
+    await searchInput.fill('received');
+    await expect(page.getByRole('option', { name: receivedDocumentName })).toBeVisible();
+  });
 
-  await page.keyboard.press('Meta+K');
+  await test.step('should be able to search by recipient', async () => {
+    const [_sender, recipient] = users.get();
+    await searchInput.fill(recipient.email);
+    await expect(page.getByRole('option', { name: '[713] Document - Sent' })).toBeVisible();
+  });
 
-  await page.getByPlaceholder('Type a command or search...').fill('received');
-  await expect(page.getByRole('option', { name: receivedDocumentName })).toBeVisible();
-
-  await page.keyboard.press('Escape');
-});
-
-test('[PR-713]: should be able to search by recipient', async ({ page }) => {
-  await page.goto('/documents');
-
-  await page.keyboard.press('Meta+K');
-
-  await page.getByPlaceholder('Type a command or search...').fill(recipientEmail);
-  await expect(page.getByRole('option', { name: '[713] Document - Sent' })).toBeVisible();
-
-  await page.keyboard.press('Escape');
+  await test.step('should close the dialog', async () => {
+    await page.keyboard.press('Escape');
+    await expect(searchInput).not.toBeVisible();
+  });
 });
