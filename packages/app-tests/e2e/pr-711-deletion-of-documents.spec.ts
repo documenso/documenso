@@ -2,9 +2,9 @@ import { expect } from '@playwright/test';
 
 import { test } from '../fixtures';
 
-const completedDocumentTitle = 'Document 1 - Completed';
-const draftDocumentTitle = 'Document 1 - Draft';
-const pendingDocumentTitle = 'Document 1 - Pending';
+const completedDocumentTitle = `Document 1 - Completed ${Date.now()}`;
+const draftDocumentTitle = `Document 1 - Draft ${Date.now()}`;
+const pendingDocumentTitle = `Document 1 - Pending ${Date.now()}`;
 
 test.beforeEach(async ({ users, documents, samplePdf }) => {
   const user = await users.create();
@@ -13,8 +13,8 @@ test.beforeEach(async ({ users, documents, samplePdf }) => {
   const recipient2 = await users.create();
 
   const recipients = [
-    { email: recipient1.email, name: recipient1.name },
-    { email: recipient2.email, name: recipient2.name },
+    { email: recipient1.email, name: recipient1.name, id: recipient1.id },
+    { email: recipient2.email, name: recipient2.name, id: recipient2.id },
   ];
 
   await documents.createCompletedDocument({
@@ -105,7 +105,7 @@ test('[PR-711]: deleting a completed document should not remove it from recipien
 
     await expect(page.getByRole('link', { name: completedDocumentTitle })).toBeVisible();
 
-    await page.goto(`/sign/completed-token-${recipients.indexOf(recipient)}`);
+    await page.goto(`/sign/completed-token-${recipient.id}`);
     await expect(page.getByText('Everyone has signed').nth(0)).toBeVisible();
 
     await users.logout();
@@ -121,7 +121,7 @@ test('[PR-711]: deleting a pending document should remove it from recipients', a
   await users.logout();
 
   for (const recipient of recipients) {
-    await page.goto(`/sign/pending-token-${recipients.indexOf(recipient)}/complete`);
+    await page.goto(`/sign/pending-token-${recipient.id}/complete`);
 
     await expect(page.getByText('Waiting for others to sign').nth(0)).toBeVisible();
   }
@@ -151,7 +151,7 @@ test('[PR-711]: deleting a pending document should remove it from recipients', a
 
     await expect(page.getByRole('link', { name: pendingDocumentTitle })).not.toBeVisible();
 
-    await page.goto(`/sign/pending-token-${recipients.indexOf(recipient)}/complete`);
+    await page.goto(`/sign/pending-token-${recipient.id}/complete`);
     await expect(page.getByText(/document.*cancelled/i).nth(0)).toBeVisible();
 
     await users.logout();

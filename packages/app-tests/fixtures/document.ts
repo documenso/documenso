@@ -11,7 +11,7 @@ type uploadDocumentsOption = {
   pdfName: string;
 };
 
-type User = { name: string; email: string };
+type User = { name: string; email: string; id: number };
 
 type createDraftDocumentOptions = {
   document: Buffer;
@@ -32,7 +32,16 @@ type createTestDocumentOptions = {
 };
 
 const createDocumentFixture = (document: TDocument) => {
-  return document;
+  // self is a reflective method that return the Prisma object that references this fixture.
+  const self = async () =>
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    (await prisma.document.findUnique({
+      where: { id: document.id },
+    }))!;
+  return {
+    ...document,
+    self,
+  };
 };
 
 type createRecipientOptions = {
@@ -61,13 +70,11 @@ async function createRecipient({ document, recipients, status }: createRecipient
   const isCompleted = status === 'completed';
 
   for (const recipient of recipients) {
-    const index = recipients.indexOf(recipient);
-
     await prisma.recipient.create({
       data: {
         email: String(recipient.email),
         name: String(recipient.name),
-        token: `${status}-token-${index}`,
+        token: `${status}-token-${recipient.id}`,
         readStatus: isCompleted ? ReadStatus.OPENED : ReadStatus.NOT_OPENED,
         sendStatus: isDraft ? SendStatus.NOT_SENT : SendStatus.SENT,
         signingStatus: isCompleted ? SigningStatus.SIGNED : SigningStatus.NOT_SIGNED,
@@ -97,6 +104,7 @@ async function createRecipient({ document, recipients, status }: createRecipient
 
 export const createDocumentsFixture = (page: Page) => {
   const store: { documents: TDocumentFixture[]; page: Page } = { documents: [], page };
+
   return {
     upload: async ({ pdf, pdfName }: uploadDocumentsOption) => {
       await expect(page).toHaveURL('/documents');
@@ -162,9 +170,10 @@ export const createDocumentsFixture = (page: Page) => {
     },
     deleteAll: async () => {
       const ids = store.documents.map((u) => u.id);
-      await prisma.document.deleteMany({ where: { id: { in: ids } } });
+      await prisma.document.deleteMany({ where: { id: { in: ids } } }).catch(() => {});
       // eslint-disable-next-line require-atomic-updates
       store.documents = [];
     },
+    get: () => store.documents,
   };
 };

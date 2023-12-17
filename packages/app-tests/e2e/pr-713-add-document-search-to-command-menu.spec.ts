@@ -13,14 +13,14 @@ test.beforeEach(async ({ users, documents, samplePdf }) => {
 
   await documents.createPendingDocument({
     document: samplePdf.pdf,
-    recipients: [{ email: user2.email, name: user2.name }],
+    recipients: [{ email: user2.email, name: user2.name, id: user2.id }],
     title: sentDocumentName,
     userId: user1.id,
   });
 
   await documents.createPendingDocument({
     document: samplePdf.pdf,
-    recipients: [{ email: user1.email, name: user1.name }],
+    recipients: [{ email: user1.email, name: user1.name, id: user1.id }],
     title: receivedDocumentName,
     userId: user2.id,
   });
