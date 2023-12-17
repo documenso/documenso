@@ -1,5 +1,5 @@
 // credits: https://github.com/calcom/cal.com/blob/main/apps/web/playwright/fixtures/users.ts
-import type { Page, WorkerInfo } from '@playwright/test';
+import type { BrowserContext, Page, WorkerInfo } from '@playwright/test';
 
 import { APP_BASE_URL } from '@documenso/lib/constants/app';
 import type { CreateUserOptions as CreateUserOptions_ } from '@documenso/lib/server-only/user/create-user';
@@ -51,10 +51,11 @@ const createUserFixture = (user: TUser, page: Page) => {
     email: user.email,
     name: user.name as string,
     apiLogin: async () => apiLogin({ user: { ...(await self()) }, page }),
+    self,
   };
 };
 
-export const createUsersFixture = (page: Page, workerInfo: WorkerInfo) => {
+export const createUsersFixture = (page: Page, workerInfo: WorkerInfo, context: BrowserContext) => {
   const store: { users: TUserFixture[]; page: Page } = { users: [], page };
 
   return {
@@ -66,7 +67,9 @@ export const createUsersFixture = (page: Page, workerInfo: WorkerInfo) => {
     },
     get: () => store.users,
     logout: async () => {
-      await page.goto('/logout');
+      await context.clearCookies();
+      await page.goto('/signin');
+      await page.waitForURL('/signin');
     },
     delete: async (id: number) => {
       await prisma.user.delete({ where: { id } });
@@ -74,7 +77,9 @@ export const createUsersFixture = (page: Page, workerInfo: WorkerInfo) => {
     },
     deleteAll: async () => {
       const ids = store.users.map((u) => u.id);
-      await prisma.user.deleteMany({ where: { id: { in: ids } } });
+
+      await prisma.user.deleteMany({ where: { id: { in: ids } } }).catch(() => {});
+
       // eslint-disable-next-line require-atomic-updates
       store.users = [];
     },
@@ -82,7 +87,7 @@ export const createUsersFixture = (page: Page, workerInfo: WorkerInfo) => {
 };
 
 const createUser = async (workerInfo: WorkerInfo, opts?: CreateUserOptions) => {
-  const name = `${workerInfo.workerIndex}-${Date.now()}`;
+  const name = `user-${workerInfo.workerIndex}-${Date.now()}`;
   const email = `${name}@example.com`;
   const password = name;
 

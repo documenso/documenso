@@ -19,8 +19,8 @@ export const test = base.extend<Fixtures>({
     await use({ pdf: examplePdf, pdfName: 'example.pdf' });
   },
 
-  users: async ({ page }, use, workerInfo) => {
-    const usersFixture = createUsersFixture(page, workerInfo);
+  users: async ({ page, context }, use, workerInfo) => {
+    const usersFixture = createUsersFixture(page, workerInfo, context);
     await use(usersFixture);
   },
 
