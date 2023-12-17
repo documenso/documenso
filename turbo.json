@@ -27,7 +27,7 @@
       "cache": false
     },
     "test:e2e": {
-      "dependsOn": ["^build"]
+      "dependsOn": ["build"]
     }
   },
   "globalDependencies": ["**/.env.*local"],
@@ -92,6 +92,7 @@
     "POSTGRES_URL_NON_POOLING",
     "E2E_TEST_AUTHENTICATE_USERNAME",
     "E2E_TEST_AUTHENTICATE_USER_EMAIL",
-    "E2E_TEST_AUTHENTICATE_USER_PASSWORD"
+    "E2E_TEST_AUTHENTICATE_USER_PASSWORD",
+    "CI"
   ]
 }
