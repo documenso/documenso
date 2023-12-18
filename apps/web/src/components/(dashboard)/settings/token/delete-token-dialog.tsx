@@ -88,7 +88,7 @@ export default function DeleteTokenDialog({
         variant: 'destructive',
         duration: 5000,
         description:
-          'We encountered an unknown error while attempting to delete this team. Please try again later.',
+          'We encountered an unknown error while attempting to delete this token. Please try again later.',
       });
     }
   };
@@ -151,7 +151,7 @@ export default function DeleteTokenDialog({
                     type="button"
                     variant="secondary"
                     className="flex-1"
-                    onClick={(prev) => setIsOpen(!prev)}
+                    onClick={() => setIsOpen(false)}
                   >
                     Cancel
                   </Button>

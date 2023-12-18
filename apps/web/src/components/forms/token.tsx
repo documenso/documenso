@@ -134,6 +134,7 @@ export const ApiTokenForm = ({ className }: ApiTokenFormProps) => {
       ) : (
         <div></div>
       )}
+
       {!tokens && isTokensLoading ? (
         <div className="absolute inset-0 flex items-center justify-center bg-white/50">
           <Loader className="h-8 w-8 animate-spin text-gray-500" />
@@ -171,6 +172,7 @@ export const ApiTokenForm = ({ className }: ApiTokenFormProps) => {
           ))}
         </ul>
       )}
+
       {newlyCreatedToken.token && showNewToken && (
         <div className="border-primary mb-8 break-words rounded-sm border p-4">
           <p className="text-muted-foreground mt-2 text-sm italic">
@@ -187,6 +189,7 @@ export const ApiTokenForm = ({ className }: ApiTokenFormProps) => {
           </Button>
         </div>
       )}
+
       <h2 className="text-xl">Create a new token</h2>
       <p className="text-muted-foreground mt-2 text-sm italic">
         Enter a representative name for your new token.
