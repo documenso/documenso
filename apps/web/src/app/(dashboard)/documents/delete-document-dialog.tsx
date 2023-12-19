@@ -53,9 +53,9 @@ export const DeleteDocumentDialog = ({
   useEffect(() => {
     if (open) {
       setInputValue('');
-      setIsDeleteEnabled(false);
+      setIsDeleteEnabled(status === DocumentStatus.DRAFT ? true : false);
     }
-  }, [open]);
+  }, [open, status]);
 
   const onDelete = async () => {
     try {
