@@ -2,8 +2,8 @@
 
 import { Controller, useForm } from 'react-hook-form';
 
-import { DATE_FORMATS } from '@documenso/lib/constants/date-formats';
-import { TIME_ZONES_FULL } from '@documenso/lib/constants/time-zones';
+import { DATE_FORMATS, DEFAULT_DOCUMENT_DATE_FORMAT } from '@documenso/lib/constants/date-formats';
+import { DEFAULT_DOCUMENT_TIME_ZONE, TIME_ZONES_FULL } from '@documenso/lib/constants/time-zones';
 import type { Field, Recipient } from '@documenso/prisma/client';
 import { DocumentStatus, SendStatus } from '@documenso/prisma/client';
 import type { DocumentWithData } from '@documenso/prisma/types/document-with-data';
@@ -64,8 +64,8 @@ export const AddSubjectFormPartial = ({
       meta: {
         subject: document.documentMeta?.subject ?? '',
         message: document.documentMeta?.message ?? '',
-        timezone: document.documentMeta?.timezone ?? 'Etc/UTC',
-        dateFormat: document.documentMeta?.dateFormat ?? 'yyyy-MM-dd hh:mm a',
+        timezone: document.documentMeta?.timezone ?? DEFAULT_DOCUMENT_TIME_ZONE,
+        dateFormat: document.documentMeta?.dateFormat ?? DEFAULT_DOCUMENT_DATE_FORMAT,
       },
     },
   });
@@ -133,7 +133,7 @@ export const AddSubjectFormPartial = ({
                   <code className="text-muted-foreground bg-muted-foreground/20 rounded p-1 text-sm">
                     {'{signer.meta}'}
                   </code>{' '}
-                  - The signer's meta
+                  - The signer's email
                 </li>
                 <li className="text-muted-foreground">
                   <code className="text-muted-foreground bg-muted-foreground/20 rounded p-1 text-sm">

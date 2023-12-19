@@ -6,7 +6,10 @@ import { useRouter } from 'next/navigation';
 
 import { Loader } from 'lucide-react';
 
-import { convertToLocalSystemFormat } from '@documenso/lib/constants/date-formats';
+import {
+  DEFAULT_DOCUMENT_DATE_FORMAT,
+  convertToLocalSystemFormat,
+} from '@documenso/lib/constants/date-formats';
 import type { Recipient } from '@documenso/prisma/client';
 import type { FieldWithSignature } from '@documenso/prisma/types/field-with-signature';
 import { trpc } from '@documenso/trpc/react';
@@ -24,8 +27,8 @@ export type DateFieldProps = {
 export const DateField = ({
   field,
   recipient,
-  dateFormat = 'yyyy-MM-dd hh:mm a',
-  timezone = 'Etc/UTC',
+  dateFormat = DEFAULT_DOCUMENT_DATE_FORMAT,
+  timezone = DEFAULT_DOCUMENT_TIME_ZONE,
 }: DateFieldProps) => {
   const router = useRouter();
 
@@ -49,7 +52,7 @@ export const DateField = ({
     timezone,
   );
 
-  const dateFormatValue = dateFormat === null ? 'yyyy-MM-dd hh:mm a' : dateFormat;
+  const dateFormatValue = dateFormat === null ? DEFAULT_DOCUMENT_DATE_FORMAT : dateFormat;
 
   const onSign = async () => {
     try {

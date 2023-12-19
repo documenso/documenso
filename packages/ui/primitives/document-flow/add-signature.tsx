@@ -7,6 +7,7 @@ import { DateTime } from 'luxon';
 import { useForm } from 'react-hook-form';
 import { match } from 'ts-pattern';
 
+import { DEFAULT_DOCUMENT_DATE_FORMAT } from '@documenso/lib/constants/date-formats';
 import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
 import { sortFieldsByPosition, validateFieldsInserted } from '@documenso/lib/utils/fields';
 import type { Field } from '@documenso/prisma/client';
@@ -136,7 +137,7 @@ export const AddSignatureFormPartial = ({
     return match(field.type)
       .with(FieldType.DATE, () => ({
         ...field,
-        customText: DateTime.now().toFormat('yyyy-MM-dd hh:mm a'),
+        customText: DateTime.now().toFormat(DEFAULT_DOCUMENT_DATE_FORMAT),
         inserted: true,
       }))
       .with(FieldType.EMAIL, () => ({

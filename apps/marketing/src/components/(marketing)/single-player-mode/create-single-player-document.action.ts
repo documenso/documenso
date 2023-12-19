@@ -10,6 +10,7 @@ import { z } from 'zod';
 import { mailer } from '@documenso/email/mailer';
 import { render } from '@documenso/email/render';
 import { DocumentSelfSignedEmailTemplate } from '@documenso/email/templates/document-self-signed';
+import { DEFAULT_DOCUMENT_DATE_FORMAT } from '@documenso/lib/constants/date-formats';
 import { FROM_ADDRESS, FROM_NAME, SERVICE_USER_EMAIL } from '@documenso/lib/constants/email';
 import { insertFieldInPDF } from '@documenso/lib/server-only/pdf/insert-field-in-pdf';
 import { alphaid } from '@documenso/lib/universal/id';
@@ -215,7 +216,7 @@ const mapField = (
   signer: TCreateSinglePlayerDocumentSchema['signer'],
 ) => {
   const customText = match(field.type)
-    .with(FieldType.DATE, () => DateTime.now().toFormat('yyyy-MM-dd hh:mm a'))
+    .with(FieldType.DATE, () => DateTime.now().toFormat(DEFAULT_DOCUMENT_DATE_FORMAT))
     .with(FieldType.EMAIL, () => signer.email)
     .with(FieldType.NAME, () => signer.name)
     .otherwise(() => '');

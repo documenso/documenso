@@ -2,6 +2,8 @@ import { rawTimeZones, timeZonesNames } from '@vvo/tzdb';
 
 export const TIME_ZONE_DATA = rawTimeZones;
 
+export const DEFAULT_DOCUMENT_TIME_ZONE = 'Etc/UTC';
+
 export type TimeZone = {
   name: string;
   rawOffsetInMinutes: number;
@@ -26,6 +28,17 @@ const getGMTOffsets = (timezones: TimeZone[]): string[] => {
   }
 
   return gmtOffsets;
+};
+
+export const splitTimeZone = (input: string | null): string => {
+  if (input === null) {
+    return '';
+  }
+  const indexGMT = input.indexOf('GMT');
+  if (indexGMT !== -1) {
+    return input.slice(0, indexGMT).trim();
+  }
+  return input;
 };
 
 export const TIME_ZONES_FULL = getGMTOffsets(TIME_ZONE_DATA);

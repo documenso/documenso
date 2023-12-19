@@ -14,7 +14,7 @@ export const completeDocument = async ({ documentId, meta }: CompleteDocumentAct
 
   const { user } = await getRequiredServerComponentSession();
 
-  if (meta.message || meta.subject) {
+  if (meta.message || meta.subject || meta.dateFormat || meta.timezone) {
     await upsertDocumentMeta({
       documentId,
       subject: meta.subject,

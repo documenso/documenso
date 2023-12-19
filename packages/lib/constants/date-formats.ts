@@ -1,10 +1,14 @@
 import { DateTime } from 'luxon';
 
+import { DEFAULT_DOCUMENT_TIME_ZONE, splitTimeZone } from './time-zones';
+
+export const DEFAULT_DOCUMENT_DATE_FORMAT = 'yyyy-MM-dd hh:mm a';
+
 export const DATE_FORMATS = [
   {
     key: 'YYYYMMDD',
     label: 'YYYY-MM-DD',
-    value: 'yyyy-MM-dd hh:mm a',
+    value: DEFAULT_DOCUMENT_DATE_FORMAT,
   },
   {
     key: 'DDMMYYYY',
@@ -48,21 +52,10 @@ export const DATE_FORMATS = [
   },
 ];
 
-export const splitTimeZone = (input: string | null): string => {
-  if (input === null) {
-    return '';
-  }
-  const indexGMT = input.indexOf('GMT');
-  if (indexGMT !== -1) {
-    return input.slice(0, indexGMT).trim();
-  }
-  return input;
-};
-
 export const convertToLocalSystemFormat = (
   customText: string,
-  dateFormat: string | null = 'yyyy-MM-dd hh:mm a',
-  timeZone: string | null = 'Etc/UTC',
+  dateFormat: string | null = DEFAULT_DOCUMENT_DATE_FORMAT,
+  timeZone: string | null = DEFAULT_DOCUMENT_TIME_ZONE,
 ): string => {
   const localTimeZone = splitTimeZone(timeZone);
   const selectedFormat = DATE_FORMATS.find((format) => format.value === dateFormat);
