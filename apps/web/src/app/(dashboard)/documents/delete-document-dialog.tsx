@@ -21,6 +21,7 @@ type DeleteDraftDocumentDialogProps = {
   open: boolean;
   onOpenChange: (_open: boolean) => void;
   status: DocumentStatus;
+  documentTitle: string;
 };
 
 export const DeleteDocumentDialog = ({
@@ -28,6 +29,7 @@ export const DeleteDocumentDialog = ({
   open,
   onOpenChange,
   status,
+  documentTitle,
 }: DeleteDraftDocumentDialogProps) => {
   const router = useRouter();
 
@@ -42,7 +44,7 @@ export const DeleteDocumentDialog = ({
 
       toast({
         title: 'Document deleted',
-        description: 'Your document has been successfully deleted.',
+        description: `Your document '${documentTitle} has been successfully deleted.`,
         duration: 5000,
       });
 
