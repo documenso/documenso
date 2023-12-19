@@ -44,6 +44,7 @@ export default function DeleteTokenDialog({
   const router = useRouter();
   const { toast } = useToast();
   const [isOpen, setIsOpen] = useState(false);
+  const [isDeleteEnabled, setIsDeleteEnabled] = useState(false);
 
   const deleteMessage = `delete ${tokenName}`;
 
@@ -67,6 +68,10 @@ export default function DeleteTokenDialog({
       tokenName: '',
     },
   });
+
+  const onInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setIsDeleteEnabled(event.target.value === deleteMessage);
+  };
 
   const onSubmit = async () => {
     try {
@@ -94,10 +99,11 @@ export default function DeleteTokenDialog({
   };
 
   useEffect(() => {
-    if (!open) {
+    if (!isOpen) {
+      setIsDeleteEnabled(false);
       form.reset();
     }
-  }, [open, form]);
+  }, [isOpen, form]);
 
   return (
     <Dialog
@@ -139,7 +145,15 @@ export default function DeleteTokenDialog({
                       </span>
                     </FormLabel>
                     <FormControl>
-                      <Input className="bg-background" {...field} />
+                      <Input
+                        className="bg-background"
+                        type="text"
+                        {...field}
+                        onChange={(value) => {
+                          onInputChange(value);
+                          field.onChange(value);
+                        }}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -159,7 +173,7 @@ export default function DeleteTokenDialog({
                   <Button
                     type="submit"
                     variant="destructive"
-                    disabled={!form.formState.isDirty}
+                    disabled={!isDeleteEnabled}
                     loading={form.formState.isSubmitting}
                   >
                     I'm sure! Delete it
