@@ -44,7 +44,7 @@ export const DeleteDocumentDialog = ({
 
       toast({
         title: 'Document deleted',
-        description: `Your document '${documentTitle} has been successfully deleted.`,
+        description: `Your document "${documentTitle}" has been successfully deleted.`,
         duration: 5000,
       });
 
