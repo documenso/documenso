@@ -67,7 +67,7 @@ const router = createNextRoute(contract, {
       return {
         status: 404,
         body: {
-          message: 'Document not found',
+          message: e.message ?? 'Document not found',
         },
       };
     }
@@ -106,7 +106,7 @@ const router = createNextRoute(contract, {
       return {
         status: 404,
         body: {
-          message: 'Document not found',
+          message: e.message ?? 'Document not found',
         },
       };
     }
@@ -128,7 +128,7 @@ const router = createNextRoute(contract, {
       return {
         status: 404,
         body: {
-          message: 'An error has occured while uploading the file',
+          message: e.message ?? 'An error has occured while uploading the file',
         },
       };
     }
@@ -219,7 +219,7 @@ const router = createNextRoute(contract, {
       return {
         status: 500,
         body: {
-          message: 'An error occurred while uploading your document.',
+          message: e.message ?? 'An error has occured while sending the document for signing',
         },
       };
     }
