@@ -58,11 +58,13 @@ export const TemplatesDataTable = ({
       const { id } = await createDocumentFromTemplate({
         templateId,
       });
+
       toast({
         title: 'Document created',
         description: 'Your document has been created from the template successfully.',
         duration: 5000,
       });
+
       router.push(`/documents/${id}`);
     } catch (err) {
       toast({

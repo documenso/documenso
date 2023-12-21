@@ -49,10 +49,10 @@ export const NewTemplateDialog = () => {
   const { toast } = useToast();
 
   const form = useForm<TCreateTemplateFormSchema>({
-    resolver: zodResolver(ZCreateTemplateFormSchema),
     defaultValues: {
       name: '',
     },
+    resolver: zodResolver(ZCreateTemplateFormSchema),
   });
 
   const { mutateAsync: createTemplate, isLoading: isCreatingTemplate } =

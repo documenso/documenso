@@ -47,8 +47,6 @@ export const DuplicateTemplateDialog = ({
       await duplicateTemplate({
         templateId: id,
       });
-
-      router.refresh();
     } catch (err) {
       toast({
         title: 'Error',

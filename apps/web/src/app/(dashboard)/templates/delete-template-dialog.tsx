@@ -23,13 +23,13 @@ export const DeleteTemplateDialog = ({ id, open, onOpenChange }: DeleteTemplateD
 
   const { toast } = useToast();
 
-  const { mutateAsync: deleteDocument, isLoading } = trpcReact.template.deleteTemplate.useMutation({
+  const { mutateAsync: deleteTemplate, isLoading } = trpcReact.template.deleteTemplate.useMutation({
     onSuccess: () => {
       router.refresh();
 
       toast({
         title: 'Template deleted',
-        description: 'Your document has been successfully deleted.',
+        description: 'Your template has been successfully deleted.',
         duration: 5000,
       });
 
@@ -37,9 +37,9 @@ export const DeleteTemplateDialog = ({ id, open, onOpenChange }: DeleteTemplateD
     },
   });
 
-  const onDraftDelete = async () => {
+  const onDeleteTemplate = async () => {
     try {
-      await deleteDocument({ id });
+      await deleteTemplate({ id });
     } catch {
       toast({
         title: 'Something went wrong',
@@ -73,7 +73,7 @@ export const DeleteTemplateDialog = ({ id, open, onOpenChange }: DeleteTemplateD
               Cancel
             </Button>
 
-            <Button type="button" loading={isLoading} onClick={onDraftDelete} className="flex-1">
+            <Button type="button" loading={isLoading} onClick={onDeleteTemplate} className="flex-1">
               Delete
             </Button>
           </div>

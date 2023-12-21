@@ -189,9 +189,9 @@ model Recipient {
   token         String
   expired       DateTime?
   signedAt      DateTime?
-  readStatus    ReadStatus?    @default(NOT_OPENED)
-  signingStatus SigningStatus? @default(NOT_SIGNED)
-  sendStatus    SendStatus?    @default(NOT_SENT)
+  readStatus    ReadStatus    @default(NOT_OPENED)
+  signingStatus SigningStatus @default(NOT_SIGNED)
+  sendStatus    SendStatus    @default(NOT_SENT)
   Document      Document?      @relation(fields: [documentId], references: [id], onDelete: Cascade)
   Template      Template?      @relation(fields: [templateId], references: [id], onDelete: Cascade)
   Field         Field[]

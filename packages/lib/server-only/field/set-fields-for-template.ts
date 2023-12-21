@@ -1,5 +1,5 @@
 import { prisma } from '@documenso/prisma';
-import { FieldType } from '@documenso/prisma/client';
+import type { FieldType } from '@documenso/prisma/client';
 
 export type Field = {
   id?: number | null;
@@ -32,7 +32,7 @@ export const setFieldsForTemplate = async ({
   });
 
   if (!template) {
-    throw new Error('Document not found');
+    throw new Error('Template not found');
   }
 
   const existingFields = await prisma.field.findMany({
@@ -93,8 +93,10 @@ export const setFieldsForTemplate = async ({
           },
           Recipient: {
             connect: {
-              id: field.signerId,
-              email: field.signerEmail,
+              templateId_email: {
+                templateId,
+                email: field.signerEmail.toLowerCase(),
+              },
             },
           },
         },
