@@ -5,6 +5,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 
 import type { DocumentData, Field, Recipient, Template, User } from '@documenso/prisma/client';
+import { trpc } from '@documenso/trpc/react';
 import { cn } from '@documenso/ui/lib/utils';
 import { Card, CardContent } from '@documenso/ui/primitives/card';
 import {
@@ -19,9 +20,6 @@ import type { TAddTemplateFieldsFormSchema } from '@documenso/ui/primitives/temp
 import { AddTemplatePlaceholderRecipientsFormPartial } from '@documenso/ui/primitives/template-flow/add-template-placeholder-recipients';
 import type { TAddTemplatePlacholderRecipientsFormSchema } from '@documenso/ui/primitives/template-flow/add-template-placeholder-recipients.types';
 import { useToast } from '@documenso/ui/primitives/use-toast';
-
-import { addTemplateFields } from '~/components/forms/edit-template/add-template-fields.action';
-import { addTemplatePlaceholders } from '~/components/forms/edit-template/add-template-placeholders.action';
 
 export type EditTemplateFormProps = {
   className?: string;
@@ -63,11 +61,14 @@ export const EditTemplateForm = ({
 
   const currentDocumentFlow = documentFlow[step];
 
+  const { mutateAsync: addTemplateFields } = trpc.field.addTemplateFields.useMutation();
+  const { mutateAsync: addTemplateSigners } = trpc.recipient.addTemplateSigners.useMutation();
+
   const onAddTemplatePlaceholderFormSubmit = async (
     data: TAddTemplatePlacholderRecipientsFormSchema,
   ) => {
     try {
-      await addTemplatePlaceholders({
+      await addTemplateSigners({
         templateId: template.id,
         signers: data.signers,
       });

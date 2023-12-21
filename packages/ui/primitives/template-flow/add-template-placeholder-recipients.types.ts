@@ -7,7 +7,7 @@ export const ZAddTemplatePlacholderRecipientsFormSchema = z
         formId: z.string().min(1),
         nativeId: z.number().optional(),
         email: z.string().min(1).email(),
-        name: z.string().optional(),
+        name: z.string(),
       }),
     ),
   })
