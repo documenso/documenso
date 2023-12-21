@@ -128,7 +128,7 @@ export const DataTableActionDropdown = ({ row }: DataTableActionDropdownProps) =
           Download
         </DropdownMenuItem>
 
-        <DropdownMenuItem disabled>
+        <DropdownMenuItem onClick={() => setDuplicateDialogOpen(true)}>
           <Copy className="mr-2 h-4 w-4" />
           Duplicate
         </DropdownMenuItem>

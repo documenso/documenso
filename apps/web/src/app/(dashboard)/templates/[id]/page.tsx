@@ -43,11 +43,11 @@ export default async function TemplatePage({ params }: TemplatePageProps) {
   const { templateDocumentData } = template;
 
   const [templateRecipients, templateFields] = await Promise.all([
-    await getRecipientsForTemplate({
+    getRecipientsForTemplate({
       templateId,
       userId: user.id,
     }),
-    await getFieldsForTemplate({
+    getFieldsForTemplate({
       templateId,
       userId: user.id,
     }),
