@@ -99,6 +99,7 @@ export const DataTableActionDropdown = ({ row }: DataTableActionDropdownProps) =
   };
 
   const nonSignedRecipients = row.Recipient.filter((item) => item.signingStatus !== 'SIGNED');
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger>

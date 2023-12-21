@@ -49,7 +49,7 @@ export const Header = ({ className, user, ...props }: HeaderProps) => {
 
         <DesktopNav />
 
-        <div className="flex gap-x-4">
+        <div className="flex gap-x-4 md:ml-8">
           <ProfileDropdown user={user} />
 
           {/* <Button variant="outline" size="sm" className="h-10 w-10 p-0.5 md:hidden">
