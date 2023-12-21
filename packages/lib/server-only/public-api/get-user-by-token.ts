@@ -1,11 +1,15 @@
 import { prisma } from '@documenso/prisma';
 
-export const checkUserFromToken = async ({ token }: { token: string }) => {
+import { hashString } from '../auth/hash';
+
+export const getUserByApiToken = async ({ token }: { token: string }) => {
+  const hashedToken = hashString(token);
+
   const user = await prisma.user.findFirst({
     where: {
       ApiToken: {
         some: {
-          token: token,
+          token: hashedToken,
         },
       },
     },
@@ -18,7 +22,7 @@ export const checkUserFromToken = async ({ token }: { token: string }) => {
     throw new Error('Invalid token');
   }
 
-  const tokenObject = user.ApiToken.find((apiToken) => apiToken.token === token);
+  const tokenObject = user.ApiToken.find((apiToken) => apiToken.token === hashedToken);
 
   if (!tokenObject || new Date(tokenObject.expires) < new Date()) {
     throw new Error('Expired token');

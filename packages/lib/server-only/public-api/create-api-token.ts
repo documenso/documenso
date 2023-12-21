@@ -1,9 +1,9 @@
-import crypto from 'crypto';
-
 import { prisma } from '@documenso/prisma';
 
 // temporary choice for testing only
 import { ONE_YEAR } from '../../constants/time';
+import { alphaid } from '../../universal/id';
+import { hashString } from '../auth/hash';
 
 type CreateApiTokenInput = {
   userId: number;
@@ -11,24 +11,25 @@ type CreateApiTokenInput = {
 };
 
 export const createApiToken = async ({ userId, tokenName }: CreateApiTokenInput) => {
-  // quick implementation for testing; it needs double checking
-  const tokenHash = crypto
-    .createHash('sha512')
-    .update(crypto.randomBytes(32).toString('hex'))
-    .digest('hex');
+  const apiToken = `api_${alphaid(16)}`;
 
-  const token = await prisma.apiToken.create({
+  const hashedToken = hashString(apiToken);
+
+  const dbToken = await prisma.apiToken.create({
     data: {
-      token: tokenHash,
+      token: hashedToken,
       name: tokenName,
       userId,
       expires: new Date(Date.now() + ONE_YEAR),
     },
   });
 
-  if (!token) {
+  if (!dbToken) {
     throw new Error(`Failed to create the API token`);
   }
 
-  return token;
+  return {
+    id: dbToken.id,
+    token: apiToken,
+  };
 };

@@ -1,12 +1,10 @@
-import type { NextApiRequest, NextApiResponse } from 'next';
-
 import { upsertDocumentMeta } from '@documenso/lib/server-only/document-meta/upsert-document-meta';
 import { deleteDocument } from '@documenso/lib/server-only/document/delete-document';
 import { findDocuments } from '@documenso/lib/server-only/document/find-documents';
 import { getDocumentById } from '@documenso/lib/server-only/document/get-document-by-id';
 import { sendDocument } from '@documenso/lib/server-only/document/send-document';
 import { setFieldsForDocument } from '@documenso/lib/server-only/field/set-fields-for-document';
-import { checkUserFromToken } from '@documenso/lib/server-only/public-api/get-user-by-token';
+import { getUserByApiToken } from '@documenso/lib/server-only/public-api/get-user-by-token';
 import { setRecipientsForDocument } from '@documenso/lib/server-only/recipient/set-recipients-for-document';
 import { getPresignPostUrl } from '@documenso/lib/universal/upload/server-actions';
 import { contract } from '@documenso/trpc/api-contract/contract';
@@ -20,7 +18,7 @@ const router = createNextRoute(contract, {
     let user;
 
     try {
-      user = await checkUserFromToken({ token: authorization });
+      user = await getUserByApiToken({ token: authorization });
     } catch (e) {
       return {
         status: 401,
@@ -46,7 +44,7 @@ const router = createNextRoute(contract, {
     let user;
 
     try {
-      user = await checkUserFromToken({ token: authorization });
+      user = await getUserByApiToken({ token: authorization });
     } catch (e) {
       return {
         status: 401,
@@ -79,7 +77,7 @@ const router = createNextRoute(contract, {
     let user;
 
     try {
-      user = await checkUserFromToken({ token: authorization });
+      user = await getUserByApiToken({ token: authorization });
     } catch (e) {
       return {
         status: 401,
@@ -140,7 +138,7 @@ const router = createNextRoute(contract, {
     let user;
 
     try {
-      user = await checkUserFromToken({ token: authorization });
+      user = await getUserByApiToken({ token: authorization });
     } catch (e) {
       return {
         status: 401,
@@ -226,8 +224,4 @@ const router = createNextRoute(contract, {
   },
 });
 
-const nextRouter = createNextRouter(contract, router);
-
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  await nextRouter(req, res);
-}
+export default createNextRouter(contract, router);
