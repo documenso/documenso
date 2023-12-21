@@ -1,41 +1,43 @@
 import { prisma } from '@documenso/prisma';
 import type { FieldType } from '@documenso/prisma/client';
-import { SendStatus, SigningStatus } from '@documenso/prisma/client';
 
-export interface SetFieldsForDocumentOptions {
+export type Field = {
+  id?: number | null;
+  type: FieldType;
+  signerEmail: string;
+  signerId?: number;
+  pageNumber: number;
+  pageX: number;
+  pageY: number;
+  pageWidth: number;
+  pageHeight: number;
+};
+
+export type SetFieldsForTemplateOptions = {
   userId: number;
-  documentId: number;
-  fields: {
-    id?: number | null;
-    type: FieldType;
-    signerEmail: string;
-    pageNumber: number;
-    pageX: number;
-    pageY: number;
-    pageWidth: number;
-    pageHeight: number;
-  }[];
-}
+  templateId: number;
+  fields: Field[];
+};
 
-export const setFieldsForDocument = async ({
+export const setFieldsForTemplate = async ({
   userId,
-  documentId,
+  templateId,
   fields,
-}: SetFieldsForDocumentOptions) => {
-  const document = await prisma.document.findFirst({
+}: SetFieldsForTemplateOptions) => {
+  const template = await prisma.template.findFirst({
     where: {
-      id: documentId,
+      id: templateId,
       userId,
     },
   });
 
-  if (!document) {
-    throw new Error('Document not found');
+  if (!template) {
+    throw new Error('Template not found');
   }
 
   const existingFields = await prisma.field.findMany({
     where: {
-      documentId,
+      templateId,
     },
     include: {
       Recipient: true,
@@ -50,21 +52,14 @@ export const setFieldsForDocument = async ({
       ),
   );
 
-  const linkedFields = fields
-    .map((field) => {
-      const existing = existingFields.find((existingField) => existingField.id === field.id);
+  const linkedFields = fields.map((field) => {
+    const existing = existingFields.find((existingField) => existingField.id === field.id);
 
-      return {
-        ...field,
-        _persisted: existing,
-      };
-    })
-    .filter((field) => {
-      return (
-        field._persisted?.Recipient?.sendStatus !== SendStatus.SENT &&
-        field._persisted?.Recipient?.signingStatus !== SigningStatus.SIGNED
-      );
-    });
+    return {
+      ...field,
+      _persisted: existing,
+    };
+  });
 
   const persistedFields = await prisma.$transaction(
     // Disabling as wrapping promises here causes type issues
@@ -73,7 +68,7 @@ export const setFieldsForDocument = async ({
       prisma.field.upsert({
         where: {
           id: field._persisted?.id ?? -1,
-          documentId,
+          templateId,
         },
         update: {
           page: field.pageNumber,
@@ -91,15 +86,15 @@ export const setFieldsForDocument = async ({
           height: field.pageHeight,
           customText: '',
           inserted: false,
-          Document: {
+          Template: {
             connect: {
-              id: documentId,
+              id: templateId,
             },
           },
           Recipient: {
             connect: {
-              documentId_email: {
-                documentId,
+              templateId_email: {
+                templateId,
                 email: field.signerEmail.toLowerCase(),
               },
             },
