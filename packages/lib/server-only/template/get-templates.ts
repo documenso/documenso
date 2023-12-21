@@ -8,7 +8,7 @@ export type GetTemplatesOptions = {
 
 export const getTemplates = async ({ userId, page = 1, perPage = 10 }: GetTemplatesOptions) => {
   const [templates, count] = await Promise.all([
-    await prisma.template.findMany({
+    prisma.template.findMany({
       where: {
         userId,
       },
@@ -21,11 +21,9 @@ export const getTemplates = async ({ userId, page = 1, perPage = 10 }: GetTempla
         createdAt: 'desc',
       },
     }),
-    await prisma.template.count({
+    prisma.template.count({
       where: {
-        User: {
-          id: userId,
-        },
+        userId,
       },
     }),
   ]);
