@@ -82,8 +82,8 @@ export const ForgotPasswordForm = ({ className }: ForgotPasswordFormProps) => {
           />
         </fieldset>
 
-        <Button size="lg" loading={isSubmitting} loadingText="Sending Reset Email...">
-          Reset Password
+        <Button size="lg" loading={isSubmitting}>
+          {isSubmitting ? 'Sending Reset Email...' : 'Reset Password'}
         </Button>
       </form>
     </Form>

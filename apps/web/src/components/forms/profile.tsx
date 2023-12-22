@@ -6,7 +6,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
-import { User } from '@documenso/prisma/client';
+import type { User } from '@documenso/prisma/client';
 import { TRPCClientError } from '@documenso/trpc/client';
 import { trpc } from '@documenso/trpc/react';
 import { cn } from '@documenso/ui/lib/utils';
@@ -133,8 +133,8 @@ export const ProfileForm = ({ className, user }: ProfileFormProps) => {
           />
         </fieldset>
 
-        <Button type="submit" loadingText="Updating profile..." loading={isSubmitting}>
-          Update profile
+        <Button type="submit" loading={isSubmitting}>
+          {isSubmitting ? 'Updating profile...' : 'Update profile'}
         </Button>
       </form>
     </Form>

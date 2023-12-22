@@ -125,8 +125,8 @@ export const ResetPasswordForm = ({ className, token }: ResetPasswordFormProps) 
           />
         </fieldset>
 
-        <Button type="submit" loadingText="Resetting Password..." size="lg" loading={isSubmitting}>
-          Reset Password
+        <Button type="submit" size="lg" loading={isSubmitting}>
+          {isSubmitting ? 'Resetting Password...' : 'Reset Password'}
         </Button>
       </form>
     </Form>

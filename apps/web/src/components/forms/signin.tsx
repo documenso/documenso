@@ -199,9 +199,8 @@ export const SignInForm = ({ className }: SignInFormProps) => {
           size="lg"
           loading={isSubmitting}
           className="dark:bg-documenso dark:hover:opacity-90"
-          loadingText="Signing in..."
         >
-          Sign In
+          {isSubmitting ? 'Signing in...' : 'Sign In'}
         </Button>
 
         <div className="relative flex items-center justify-center gap-x-4 py-2 text-xs uppercase">
@@ -275,8 +274,8 @@ export const SignInForm = ({ className }: SignInFormProps) => {
                 {twoFactorAuthenticationMethod === 'totp' ? 'Use Backup Code' : 'Use Authenticator'}
               </Button>
 
-              <Button type="submit" loadingText="Signing in..." loading={isSubmitting}>
-                Sign In
+              <Button type="submit" loading={isSubmitting}>
+                {isSubmitting ? 'Signing in...' : 'Sign In'}
               </Button>
             </div>
           </form>

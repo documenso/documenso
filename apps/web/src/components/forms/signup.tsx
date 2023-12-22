@@ -162,10 +162,9 @@ export const SignUpForm = ({ className }: SignUpFormProps) => {
           type="submit"
           size="lg"
           loading={isSubmitting}
-          loadingText="Signing up..."
           className="dark:bg-documenso dark:hover:opacity-90"
         >
-          Sign Up
+          {isSubmitting ? 'Signing up...' : 'Sign Up'}
         </Button>
       </form>
     </Form>

@@ -4,7 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
-import { User } from '@documenso/prisma/client';
+import type { User } from '@documenso/prisma/client';
 import { TRPCClientError } from '@documenso/trpc/client';
 import { trpc } from '@documenso/trpc/react';
 import { cn } from '@documenso/ui/lib/utils';
@@ -146,8 +146,8 @@ export const PasswordForm = ({ className }: PasswordFormProps) => {
         </fieldset>
 
         <div className="mt-4">
-          <Button type="submit" loadingText="Updating password..." loading={isSubmitting}>
-            Update password
+          <Button type="submit" loading={isSubmitting}>
+            {isSubmitting ? 'Updating password...' : 'Update password'}
           </Button>
         </div>
       </form>
