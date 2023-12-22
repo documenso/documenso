@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { useRouter } from 'next/navigation';
 
@@ -49,6 +49,13 @@ export const DeleteDocumentDialog = ({
       onOpenChange(false);
     },
   });
+
+  useEffect(() => {
+    if (open) {
+      setInputValue('');
+      setIsDeleteEnabled(status === DocumentStatus.DRAFT);
+    }
+  }, [open, status]);
 
   const onDelete = async () => {
     try {
