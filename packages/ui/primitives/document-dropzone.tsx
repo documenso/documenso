@@ -75,10 +75,20 @@ const DocumentDropzoneCardCenterVariants: Variants = {
   },
 };
 
+const DocumentDescription = {
+  document: {
+    headline: 'Add a document',
+  },
+  template: {
+    headline: 'Upload Template Document',
+  },
+};
+
 export type DocumentDropzoneProps = {
   className?: string;
   disabled?: boolean;
   onDrop?: (_file: File) => void | Promise<void>;
+  type?: 'document' | 'template';
   [key: string]: unknown;
 };
 
@@ -86,6 +96,7 @@ export const DocumentDropzone = ({
   className,
   onDrop,
   disabled,
+  type = 'document',
   ...props
 }: DocumentDropzoneProps) => {
   const { getRootProps, getInputProps } = useDropzone({
@@ -157,7 +168,7 @@ export const DocumentDropzone = ({
           <input {...getInputProps()} />
 
           <p className="group-hover:text-foreground text-muted-foreground mt-8 font-medium">
-            Add a document
+            {DocumentDescription[type].headline}
           </p>
 
           <p className="text-muted-foreground/80 mt-1 text-sm ">Drag & drop your document here.</p>

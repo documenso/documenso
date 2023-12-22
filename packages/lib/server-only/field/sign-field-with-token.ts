@@ -33,6 +33,10 @@ export const signFieldWithToken = async ({
 
   const { Document: document, Recipient: recipient } = field;
 
+  if (!document) {
+    throw new Error(`Document not found for field ${field.id}`);
+  }
+
   if (document.status === DocumentStatus.COMPLETED) {
     throw new Error(`Document ${document.id} has already been completed`);
   }
