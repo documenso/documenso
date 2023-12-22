@@ -280,7 +280,7 @@ WantedBy=multi-user.target
 
 ### Railway
 
-[![Deploy on Railway](https://railway.app/button.svg)](https://railway.app/template/bG6D4p?referralCode=OEa9MT)
+[![Deploy on Railway](https://railway.app/button.svg)](https://railway.app/template/bG6D4p)
 
 ### Render
 
