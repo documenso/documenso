@@ -41,16 +41,10 @@ export const DeleteDocumentDialog = ({
   const { mutateAsync: deleteDocument, isLoading } = trpcReact.document.deleteDocument.useMutation({
     onSuccess: () => {
       router.refresh();
-      const deletedFileToastDescription = (
-        <p>
-          Your document <span className="text-documenso">{documentTitle}</span> has been
-          successfully deleted.
-        </p>
-      );
 
       toast({
         title: 'Document deleted',
-        description: deletedFileToastDescription,
+        description: `"${documentTitle}" has been successfully deleted`,
         duration: 5000,
       });
 
@@ -80,10 +74,7 @@ export const DeleteDocumentDialog = ({
     <Dialog open={open} onOpenChange={(value) => !isLoading && onOpenChange(value)}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>
-            Do you want to delete the <span className="text-documenso">{documentTitle}</span>{' '}
-            document?
-          </DialogTitle>
+          <DialogTitle>Are you sure you want to delete "{documentTitle}"?</DialogTitle>
 
           <DialogDescription>
             Please note that this action is irreversible. Once confirmed, your document will be
