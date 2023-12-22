@@ -47,7 +47,7 @@ export type AddSubjectFormProps = {
 export const AddSubjectFormPartial = ({
   documentFlow,
   recipients: recipients,
-  fields: _fields,
+  fields: fields,
   document,
   numberOfSteps,
   onSubmit,
@@ -72,7 +72,7 @@ export const AddSubjectFormPartial = ({
 
   const onFormSubmit = handleSubmit(onSubmit);
 
-  const hasDateField = _fields.find((field) => field.type === 'DATE');
+  const hasDateField = fields.find((field) => field.type === 'DATE');
 
   const documentHasBeenSent = recipients.some(
     (recipient) => recipient.sendStatus === SendStatus.SENT,
@@ -131,7 +131,7 @@ export const AddSubjectFormPartial = ({
                 </li>
                 <li className="text-muted-foreground">
                   <code className="text-muted-foreground bg-muted-foreground/20 rounded p-1 text-sm">
-                    {'{signer.meta}'}
+                    {'{signer.email}'}
                   </code>{' '}
                   - The signer's email
                 </li>
