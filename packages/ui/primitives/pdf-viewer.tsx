@@ -3,7 +3,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 
 import { Loader } from 'lucide-react';
-import type { PDFDocumentProxy } from 'pdfjs-dist';
+import { PasswordResponses, type PDFDocumentProxy } from 'pdfjs-dist';
 import { Document as PDFDocument, Page as PDFPage, pdfjs } from 'react-pdf';
 import 'react-pdf/dist/esm/Page/AnnotationLayer.css';
 import 'react-pdf/dist/esm/Page/TextLayer.css';
@@ -14,6 +14,7 @@ import type { DocumentData } from '@documenso/prisma/client';
 
 import { cn } from '../lib/utils';
 import { useToast } from './use-toast';
+import { PasswordDialog } from './document-password-dialog';
 
 export type LoadedPDFDocument = PDFDocumentProxy;
 
@@ -60,6 +61,10 @@ export const PDFViewer = ({
   const $el = useRef<HTMLDivElement>(null);
 
   const [isDocumentBytesLoading, setIsDocumentBytesLoading] = useState(false);
+  const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
+  const [password, setPassword] = useState<string | null>(null);
+  const passwordCallbackRef = useRef<((password: string | null) => void) | null>(null);
+  const [isPasswordError, setIsPasswordError] = useState(false);
   const [documentBytes, setDocumentBytes] = useState<Uint8Array | null>(null);
 
   const [width, setWidth] = useState(0);
@@ -77,6 +82,14 @@ export const PDFViewer = ({
     setNumPages(doc.numPages);
     onDocumentLoad?.(doc);
   };
+  
+  const handlePasswordSubmit = () => {
+    setIsPasswordModalOpen(false);
+    if (passwordCallbackRef.current) {
+      passwordCallbackRef.current(password);
+      passwordCallbackRef.current = null;
+    }
+  }
 
   const onDocumentPageClick = (
     event: React.MouseEvent<HTMLDivElement, MouseEvent>,
@@ -169,11 +182,26 @@ export const PDFViewer = ({
           <PDFLoader />
         </div>
       ) : (
+        <>
         <PDFDocument
           file={documentBytes.buffer}
           className={cn('w-full overflow-hidden rounded', {
             'h-[80vh] max-h-[60rem]': numPages === 0,
           })}
+          onPassword={(callback, reason) => {
+            setIsPasswordModalOpen(true);
+            passwordCallbackRef.current = callback;
+            switch (reason) {
+              case PasswordResponses.NEED_PASSWORD:
+                setIsPasswordError(false);
+                break;
+              case PasswordResponses.INCORRECT_PASSWORD:
+                setIsPasswordError(true);
+                break;
+              default:
+                break;
+            }
+          }}
           onLoadSuccess={(d) => onDocumentLoaded(d)}
           // Uploading a invalid document causes an error which doesn't appear to be handled by the `error` prop.
           // Therefore we add some additional custom error handling.
@@ -220,7 +248,15 @@ export const PDFViewer = ({
               </div>
             ))}
         </PDFDocument>
-      )}
+        <PasswordDialog
+          open={isPasswordModalOpen}
+          onOpenChange={setIsPasswordModalOpen}
+          handleSubmit={handlePasswordSubmit}
+          isError={isPasswordError}
+          setPassword={setPassword} 
+        />
+        </>
+      )} 
     </div>
   );
 };
