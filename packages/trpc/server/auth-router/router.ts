@@ -11,6 +11,13 @@ import { ZSignUpMutationSchema, ZVerifyPasswordMutationSchema } from './schema';
 export const authRouter = router({
   signup: procedure.input(ZSignUpMutationSchema).mutation(async ({ input }) => {
     try {
+      if (process.env.NEXT_PUBLIC_DISABLE_SIGNUP === 'true') {
+        throw new TRPCError({
+          code: 'BAD_REQUEST',
+          message: 'Signups are disabled.',
+        });
+      }
+
       const { name, email, password, signature } = input;
 
       const user = await createUser({ name, email, password, signature });

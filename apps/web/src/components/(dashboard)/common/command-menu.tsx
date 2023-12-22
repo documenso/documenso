@@ -86,7 +86,8 @@ export function CommandMenu({ open, onOpenChange }: CommandMenuProps) {
 
   const currentPage = pages[pages.length - 1];
 
-  const toggleOpen = () => {
+  const toggleOpen = (e: KeyboardEvent) => {
+    e.preventDefault();
     setIsOpen((isOpen) => !isOpen);
     onOpenChange?.(!isOpen);
 
