@@ -52,7 +52,7 @@ export const DateField = ({
     timezone,
   );
 
-  const dateFormatValue = dateFormat === null ? DEFAULT_DOCUMENT_DATE_FORMAT : dateFormat;
+  const dateFormatValue = dateFormat ?? DEFAULT_DOCUMENT_DATE_FORMAT;
 
   const onSign = async () => {
     try {

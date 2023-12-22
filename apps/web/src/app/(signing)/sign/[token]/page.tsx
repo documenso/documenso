@@ -2,7 +2,9 @@ import { notFound, redirect } from 'next/navigation';
 
 import { match } from 'ts-pattern';
 
+import { DEFAULT_DOCUMENT_DATE_FORMAT } from '@documenso/lib/constants/date-formats';
 import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
+import { DEFAULT_DOCUMENT_TIME_ZONE } from '@documenso/lib/constants/time-zones';
 import { getServerComponentSession } from '@documenso/lib/next-auth/get-server-component-session';
 import { getDocumentAndSenderByToken } from '@documenso/lib/server-only/document/get-document-by-token';
 import { getDocumentMetaByDocumentId } from '@documenso/lib/server-only/document/get-document-meta-by-document-id';
@@ -104,8 +106,8 @@ export default async function SigningPage({ params: { token } }: SigningPageProp
                   key={field.id}
                   field={field}
                   recipient={recipient}
-                  dateFormat={documentMeta?.dateFormat}
-                  timezone={documentMeta?.timezone}
+                  dateFormat={documentMeta?.dateFormat ?? DEFAULT_DOCUMENT_DATE_FORMAT}
+                  timezone={documentMeta?.timezone ?? DEFAULT_DOCUMENT_TIME_ZONE}
                 />
               ))
               .with(FieldType.EMAIL, () => (
