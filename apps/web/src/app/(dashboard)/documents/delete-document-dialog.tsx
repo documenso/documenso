@@ -21,6 +21,7 @@ type DeleteDraftDocumentDialogProps = {
   open: boolean;
   onOpenChange: (_open: boolean) => void;
   status: DocumentStatus;
+  documentTitle: string;
 };
 
 export const DeleteDocumentDialog = ({
@@ -28,6 +29,7 @@ export const DeleteDocumentDialog = ({
   open,
   onOpenChange,
   status,
+  documentTitle,
 }: DeleteDraftDocumentDialogProps) => {
   const router = useRouter();
 
@@ -42,7 +44,7 @@ export const DeleteDocumentDialog = ({
 
       toast({
         title: 'Document deleted',
-        description: 'Your document has been successfully deleted.',
+        description: `"${documentTitle}" has been successfully deleted`,
         duration: 5000,
       });
 
@@ -79,7 +81,7 @@ export const DeleteDocumentDialog = ({
     <Dialog open={open} onOpenChange={(value) => !isLoading && onOpenChange(value)}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Do you want to delete this document?</DialogTitle>
+          <DialogTitle>Are you sure you want to delete "{documentTitle}"?</DialogTitle>
 
           <DialogDescription>
             Please note that this action is irreversible. Once confirmed, your document will be
@@ -88,7 +90,7 @@ export const DeleteDocumentDialog = ({
         </DialogHeader>
 
         {status !== DocumentStatus.DRAFT && (
-          <div className="mt-8">
+          <div className="mt-4">
             <Input
               type="text"
               value={inputValue}
