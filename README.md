@@ -115,10 +115,10 @@ To run Documenso locally, you will need
 
 Want to get up and running quickly? Follow these steps:
 
-1. [Clone the repository](https://help.github.com/articles/cloning-a-repository/) it to your local device.
+1. [Clone the repository](https://help.github.com/articles/cloning-a-repository/) it to your local device as a forked repository.
 
 ```sh
-git clone https://github.com/documenso/documenso
+git clone https://github.com/<your-username>/documenso 
 ```
 
 2. Set up your `.env` file using the recommendations in the `.env.example` file. Alternatively, just run `cp .env.example .env` to get started with our handpicked defaults.
