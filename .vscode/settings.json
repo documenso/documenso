@@ -1,7 +1,7 @@
 {
   "typescript.tsdk": "node_modules/typescript/lib",
   "editor.codeActionsOnSave": {
-    "source.fixAll.eslint": "explicit"
+    "source.fixAll.eslint": "true"
   },
   "eslint.validate": ["typescript", "typescriptreact", "javascript", "javascriptreact"],
   "javascript.preferences.importModuleSpecifier": "non-relative",
