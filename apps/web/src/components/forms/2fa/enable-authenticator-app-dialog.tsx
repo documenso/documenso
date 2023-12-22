@@ -27,6 +27,7 @@ import {
   FormMessage,
 } from '@documenso/ui/primitives/form/form';
 import { Input } from '@documenso/ui/primitives/input';
+import { PasswordInput } from '@documenso/ui/primitives/password-input';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
 import { RecoveryCodeList } from './recovery-code-list';
@@ -178,9 +179,8 @@ export const EnableAuthenticatorAppDialog = ({
                       <FormItem>
                         <FormLabel className="text-muted-foreground">Password</FormLabel>
                         <FormControl>
-                          <Input
+                          <PasswordInput
                             {...field}
-                            type="password"
                             autoComplete="current-password"
                             value={field.value ?? ''}
                           />
