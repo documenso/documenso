@@ -23,6 +23,7 @@ import {
   FormMessage,
 } from '@documenso/ui/primitives/form/form';
 import { Input } from '@documenso/ui/primitives/input';
+import { PasswordInput } from '@documenso/ui/primitives/password-input';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
 export const ZDisableTwoFactorAuthenticationForm = z.object({
@@ -107,38 +108,42 @@ export const DisableAuthenticatorAppDialog = ({
             )}
             className="flex flex-col gap-y-4"
           >
-            <FormField
-              name="password"
-              control={disableTwoFactorAuthenticationForm.control}
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-muted-foreground">Password</FormLabel>
-                  <FormControl>
-                    <Input
-                      {...field}
-                      type="password"
-                      autoComplete="current-password"
-                      value={field.value ?? ''}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            <fieldset
+              className="flex flex-col gap-y-4"
+              disabled={isDisableTwoFactorAuthenticationSubmitting}
+            >
+              <FormField
+                name="password"
+                control={disableTwoFactorAuthenticationForm.control}
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-muted-foreground">Password</FormLabel>
+                    <FormControl>
+                      <PasswordInput
+                        {...field}
+                        autoComplete="current-password"
+                        value={field.value ?? ''}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-            <FormField
-              name="backupCode"
-              control={disableTwoFactorAuthenticationForm.control}
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-muted-foreground">Backup Code</FormLabel>
-                  <FormControl>
-                    <Input {...field} type="text" value={field.value ?? ''} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+              <FormField
+                name="backupCode"
+                control={disableTwoFactorAuthenticationForm.control}
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-muted-foreground">Backup Code</FormLabel>
+                    <FormControl>
+                      <Input {...field} type="text" value={field.value ?? ''} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </fieldset>
 
             <div className="flex w-full items-center justify-between">
               <Button type="button" variant="ghost" onClick={() => onOpenChange(false)}>

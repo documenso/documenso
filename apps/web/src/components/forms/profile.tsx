@@ -3,21 +3,26 @@
 import { useRouter } from 'next/navigation';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Loader } from 'lucide-react';
-import { Controller, useForm } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
-import { User } from '@documenso/prisma/client';
+import type { User } from '@documenso/prisma/client';
 import { TRPCClientError } from '@documenso/trpc/client';
 import { trpc } from '@documenso/trpc/react';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@documenso/ui/primitives/form/form';
 import { Input } from '@documenso/ui/primitives/input';
 import { Label } from '@documenso/ui/primitives/label';
 import { SignaturePad } from '@documenso/ui/primitives/signature-pad';
 import { useToast } from '@documenso/ui/primitives/use-toast';
-
-import { FormErrorMessage } from '../form/form-error-message';
 
 export const ZProfileFormSchema = z.object({
   name: z.string().trim().min(1, { message: 'Please enter a valid name.' }),
@@ -36,18 +41,15 @@ export const ProfileForm = ({ className, user }: ProfileFormProps) => {
 
   const { toast } = useToast();
 
-  const {
-    register,
-    control,
-    handleSubmit,
-    formState: { errors, isSubmitting },
-  } = useForm<TProfileFormSchema>({
+  const form = useForm<TProfileFormSchema>({
     values: {
       name: user.name ?? '',
       signature: user.signature || '',
     },
     resolver: zodResolver(ZProfileFormSchema),
   });
+
+  const isSubmitting = form.formState.isSubmitting;
 
   const { mutateAsync: updateProfile } = trpc.profile.updateProfile.useMutation();
 
@@ -84,56 +86,57 @@ export const ProfileForm = ({ className, user }: ProfileFormProps) => {
   };
 
   return (
-    <form
-      className={cn('flex w-full flex-col gap-y-4', className)}
-      onSubmit={handleSubmit(onFormSubmit)}
-    >
-      <div>
-        <Label htmlFor="full-name" className="text-muted-foreground">
-          Full Name
-        </Label>
-
-        <Input id="full-name" type="text" className="bg-background mt-2" {...register('name')} />
-
-        <FormErrorMessage className="mt-1.5" error={errors.name} />
-      </div>
-
-      <div>
-        <Label htmlFor="email" className="text-muted-foreground">
-          Email
-        </Label>
-
-        <Input id="email" type="email" className="bg-muted mt-2" value={user.email} disabled />
-      </div>
-
-      <div>
-        <Label htmlFor="signature" className="text-muted-foreground">
-          Signature
-        </Label>
-
-        <div className="mt-2">
-          <Controller
-            control={control}
-            name="signature"
-            render={({ field: { onChange } }) => (
-              <SignaturePad
-                className="h-44 w-full"
-                containerClassName="rounded-lg border bg-background"
-                defaultValue={user.signature ?? undefined}
-                onChange={(v) => onChange(v ?? '')}
-              />
+    <Form {...form}>
+      <form
+        className={cn('flex w-full flex-col gap-y-4', className)}
+        onSubmit={form.handleSubmit(onFormSubmit)}
+      >
+        <fieldset className="flex w-full flex-col gap-y-4" disabled={isSubmitting}>
+          <FormField
+            control={form.control}
+            name="name"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Full Name</FormLabel>
+                <FormControl>
+                  <Input type="text" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
             )}
           />
-          <FormErrorMessage className="mt-1.5" error={errors.signature} />
-        </div>
-      </div>
 
-      <div className="mt-4">
-        <Button type="submit" disabled={isSubmitting}>
-          {isSubmitting && <Loader className="mr-2 h-5 w-5 animate-spin" />}
-          Update profile
+          <div>
+            <Label htmlFor="email" className="text-muted-foreground">
+              Email
+            </Label>
+            <Input id="email" type="email" className="bg-muted mt-2" value={user.email} disabled />
+          </div>
+
+          <FormField
+            control={form.control}
+            name="signature"
+            render={({ field: { onChange } }) => (
+              <FormItem>
+                <FormLabel>Signature</FormLabel>
+                <FormControl>
+                  <SignaturePad
+                    className="h-44 w-full"
+                    containerClassName="rounded-lg border bg-background"
+                    defaultValue={user.signature ?? undefined}
+                    onChange={(v) => onChange(v ?? '')}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </fieldset>
+
+        <Button type="submit" loading={isSubmitting}>
+          {isSubmitting ? 'Updating profile...' : 'Update profile'}
         </Button>
-      </div>
-    </form>
+      </form>
+    </Form>
   );
 };
