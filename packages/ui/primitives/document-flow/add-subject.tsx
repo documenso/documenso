@@ -1,9 +1,11 @@
 'use client';
 
+import { useEffect } from 'react';
+
 import { Controller, useForm } from 'react-hook-form';
 
 import { DATE_FORMATS, DEFAULT_DOCUMENT_DATE_FORMAT } from '@documenso/lib/constants/date-formats';
-import { DEFAULT_DOCUMENT_TIME_ZONE, TIME_ZONES_FULL } from '@documenso/lib/constants/time-zones';
+import { DEFAULT_DOCUMENT_TIME_ZONE, TIME_ZONES } from '@documenso/lib/constants/time-zones';
 import type { Field, Recipient } from '@documenso/prisma/client';
 import { DocumentStatus, SendStatus } from '@documenso/prisma/client';
 import type { DocumentWithData } from '@documenso/prisma/types/document-with-data';
@@ -56,7 +58,7 @@ export const AddSubjectFormPartial = ({
     control,
     register,
     handleSubmit,
-    formState: { errors, isSubmitting },
+    formState: { errors, isSubmitting, touchedFields },
     getValues,
     setValue,
   } = useForm<TAddSubjectFormSchema>({
@@ -77,6 +79,14 @@ export const AddSubjectFormPartial = ({
   const documentHasBeenSent = recipients.some(
     (recipient) => recipient.sendStatus === SendStatus.SENT,
   );
+
+  // We almost always want to set the timezone to the user's local timezone to avoid confusion
+  // when the document is signed.
+  useEffect(() => {
+    if (!touchedFields.meta?.timezone && !documentHasBeenSent) {
+      setValue('meta.timezone', Intl.DateTimeFormat().resolvedOptions().timeZone);
+    }
+  }, [documentHasBeenSent, setValue, touchedFields.meta?.timezone]);
 
   return (
     <>
@@ -144,13 +154,13 @@ export const AddSubjectFormPartial = ({
               </ul>
             </div>
 
-            <Accordion type="multiple" className="mt-8">
-              <AccordionItem value="advanced-options no-underline">
-                <AccordionTrigger className="text-md text-left no-underline">
+            <Accordion type="multiple" className="mt-8 border-none">
+              <AccordionItem value="advanced-options" className="border-none">
+                <AccordionTrigger className="mb-2 border-b text-left hover:no-underline">
                   Advanced Options
                 </AccordionTrigger>
 
-                <AccordionContent className="text-muted-foreground max-w-prose text-sm leading-relaxed">
+                <AccordionContent className="text-muted-foreground -mx-1 flex max-w-prose flex-col px-1 text-sm leading-relaxed">
                   {hasDateField && (
                     <div className="mt-2 flex flex-col">
                       <Label htmlFor="date-format">
@@ -160,16 +170,13 @@ export const AddSubjectFormPartial = ({
                       <Controller
                         control={control}
                         name={`meta.dateFormat`}
-                        render={({ field }) => (
-                          <Select
-                            defaultValue={getValues('meta.dateFormat')}
-                            onValueChange={(value) => setValue('meta.dateFormat', value)}
-                            disabled={documentHasBeenSent}
-                            {...field}
-                          >
+                        disabled={documentHasBeenSent}
+                        render={({ field: { value, onChange, disabled } }) => (
+                          <Select value={value} onValueChange={onChange} disabled={disabled}>
                             <SelectTrigger className="bg-background mt-2">
                               <SelectValue />
                             </SelectTrigger>
+
                             <SelectContent>
                               {DATE_FORMATS.map((format) => (
                                 <SelectItem key={format.key} value={format.value}>
@@ -192,11 +199,12 @@ export const AddSubjectFormPartial = ({
                       <Controller
                         control={control}
                         name={`meta.timezone`}
-                        render={({ field: { onChange } }) => (
+                        render={({ field: { value, onChange } }) => (
                           <Combobox
-                            listValues={TIME_ZONES_FULL}
-                            onChange={(value) => onChange(setValue('meta.timezone', value))}
-                            selectedValue={getValues('meta.timezone')}
+                            className="bg-background"
+                            options={TIME_ZONES}
+                            value={value}
+                            onChange={(value) => value && onChange(value)}
                             disabled={documentHasBeenSent}
                           />
                         )}

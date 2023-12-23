@@ -41,8 +41,6 @@ export const SigningFieldContainer = ({
     await onRemove?.();
   };
 
-  const senderTimeZoneText = tooltipText === null ? 'Invalid Locale' : tooltipText;
-
   return (
     <FieldRootContainer field={field}>
       {!field.inserted && !loading && (
@@ -54,7 +52,7 @@ export const SigningFieldContainer = ({
       )}
 
       {type === 'Date' && field.inserted && !loading && (
-        <Tooltip>
+        <Tooltip delayDuration={0}>
           <TooltipTrigger asChild>
             <button
               className="text-destructive bg-background/40 absolute inset-0 z-10 flex h-full w-full items-center justify-center rounded-md text-sm opacity-0 backdrop-blur-sm duration-200 group-hover:opacity-100"
@@ -63,7 +61,8 @@ export const SigningFieldContainer = ({
               Remove
             </button>
           </TooltipTrigger>
-          <TooltipContent className="max-w-xs">{senderTimeZoneText}</TooltipContent>
+
+          {tooltipText && <TooltipContent className="max-w-xs">{tooltipText}</TooltipContent>}
         </Tooltip>
       )}
 

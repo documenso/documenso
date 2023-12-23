@@ -22,7 +22,7 @@ const getGMTOffsets = (timezones: TimeZone[]): string[] => {
 
   for (const timezone of timezones) {
     const offsetValue = minutesToHours(timezone.rawOffsetInMinutes);
-    const gmtText = `GMT ${offsetValue}`;
+    const gmtText = `(${offsetValue})`;
 
     gmtOffsets.push(`${timezone.name} ${gmtText}`);
   }
@@ -34,13 +34,11 @@ export const splitTimeZone = (input: string | null): string => {
   if (input === null) {
     return '';
   }
-  const indexGMT = input.indexOf('GMT');
-  if (indexGMT !== -1) {
-    return input.slice(0, indexGMT).trim();
-  }
-  return input;
+  const [timeZone] = input.split('(');
+
+  return timeZone.trim();
 };
 
 export const TIME_ZONES_FULL = getGMTOffsets(TIME_ZONE_DATA);
 
-export const TIME_ZONES = timeZonesNames;
+export const TIME_ZONES = ['Etc/UTC', ...timeZonesNames];

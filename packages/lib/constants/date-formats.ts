@@ -1,6 +1,6 @@
 import { DateTime } from 'luxon';
 
-import { DEFAULT_DOCUMENT_TIME_ZONE, splitTimeZone } from './time-zones';
+import { DEFAULT_DOCUMENT_TIME_ZONE } from './time-zones';
 
 export const DEFAULT_DOCUMENT_DATE_FORMAT = 'yyyy-MM-dd hh:mm a';
 
@@ -57,18 +57,15 @@ export const convertToLocalSystemFormat = (
   dateFormat: string | null = DEFAULT_DOCUMENT_DATE_FORMAT,
   timeZone: string | null = DEFAULT_DOCUMENT_TIME_ZONE,
 ): string => {
-  const localTimeZone = splitTimeZone(timeZone);
-  const selectedFormat = DATE_FORMATS.find((format) => format.value === dateFormat);
+  const parsedDate = DateTime.fromFormat(customText, dateFormat ?? DEFAULT_DOCUMENT_DATE_FORMAT, {
+    zone: timeZone ?? DEFAULT_DOCUMENT_TIME_ZONE,
+  });
 
-  if (!selectedFormat) {
-    return 'Invalid date format value';
-  }
-
-  const parsedDate = DateTime.fromFormat(customText, selectedFormat.value);
   if (!parsedDate.isValid) {
     return 'Invalid date';
   }
-  const formattedDate = parsedDate.setZone(localTimeZone).toFormat(selectedFormat.value);
+
+  const formattedDate = parsedDate.toLocal().toFormat(dateFormat ?? DEFAULT_DOCUMENT_DATE_FORMAT);
 
   return formattedDate;
 };
