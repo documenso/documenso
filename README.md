@@ -117,7 +117,7 @@ Want to get up and running quickly? Follow these steps:
 
 1. [Fork this repository ](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/working-with-forks/about-forks) to your github account.
 
-After forking clone it using the below command
+After forking clone it using the below command:
 
 ```sh
 git clone https://github.com/<your-username>/documenso
@@ -156,7 +156,7 @@ Follow these steps to setup Documenso on your local machine:
 
 1. [Fork this repository](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/working-with-forks/about-forks) it to your github account.
 
-After forking clone it using the below command
+After forking clone it using the below command:
 
 ```sh
 git clone https://github.com/<your-username>/documenso
