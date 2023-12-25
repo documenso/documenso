@@ -11,6 +11,7 @@ import { useHotkeys } from 'react-hotkeys-hook';
 import {
   DOCUMENTS_PAGE_SHORTCUT,
   SETTINGS_PAGE_SHORTCUT,
+  TEMPLATES_PAGE_SHORTCUT,
 } from '@documenso/lib/constants/keyboard-shortcuts';
 import { trpc as trpcReact } from '@documenso/trpc/react';
 import {
@@ -36,6 +37,14 @@ const DOCUMENTS_PAGES = [
   },
   { label: 'Pending documents', path: '/documents?status=PENDING' },
   { label: 'Inbox documents', path: '/documents?status=INBOX' },
+];
+
+const TEMPLATES_PAGES = [
+  {
+    label: 'All templates',
+    path: '/templates',
+    shortcut: TEMPLATES_PAGE_SHORTCUT.replace('+', ''),
+  },
 ];
 
 const SETTINGS_PAGES = [
@@ -124,10 +133,12 @@ export function CommandMenu({ open, onOpenChange }: CommandMenuProps) {
 
   const goToSettings = useCallback(() => push(SETTINGS_PAGES[0].path), [push]);
   const goToDocuments = useCallback(() => push(DOCUMENTS_PAGES[0].path), [push]);
+  const goToTemplates = useCallback(() => push(TEMPLATES_PAGES[0].path), [push]);
 
   useHotkeys(['ctrl+k', 'meta+k'], toggleOpen);
   useHotkeys(SETTINGS_PAGE_SHORTCUT, goToSettings);
   useHotkeys(DOCUMENTS_PAGE_SHORTCUT, goToDocuments);
+  useHotkeys(TEMPLATES_PAGE_SHORTCUT, goToTemplates);
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     // Escape goes to previous page
@@ -173,6 +184,9 @@ export function CommandMenu({ open, onOpenChange }: CommandMenuProps) {
           <>
             <CommandGroup heading="Documents">
               <Commands push={push} pages={DOCUMENTS_PAGES} />
+            </CommandGroup>
+            <CommandGroup heading="Templates">
+              <Commands push={push} pages={TEMPLATES_PAGES} />
             </CommandGroup>
             <CommandGroup heading="Settings">
               <Commands push={push} pages={SETTINGS_PAGES} />
