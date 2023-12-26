@@ -20,7 +20,7 @@ const DialogPortal = ({
 }: DialogPrimitive.DialogPortalProps & { position?: 'start' | 'end' | 'center' }) => (
   <DialogPrimitive.Portal {...props}>
     <div
-      className={cn('fixed inset-0 z-50 flex justify-center sm:items-center', {
+      className={cn('fixed inset-0 z-[9999] flex justify-center sm:items-center', {
         'items-start': position === 'start',
         'items-end': position === 'end',
         'items-center': position === 'center',
