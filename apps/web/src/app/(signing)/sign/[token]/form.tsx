@@ -9,7 +9,7 @@ import { useForm } from 'react-hook-form';
 
 import { completeDocumentWithToken } from '@documenso/lib/server-only/document/complete-document-with-token';
 import { sortFieldsByPosition, validateFieldsInserted } from '@documenso/lib/utils/fields';
-import { Document, Field, Recipient } from '@documenso/prisma/client';
+import type { Document, Field, Recipient } from '@documenso/prisma/client';
 import { FieldToolTip } from '@documenso/ui/components/field/field-tooltip';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
@@ -32,6 +32,7 @@ export const SigningForm = ({ document, recipient, fields }: SigningFormProps) =
   const { data: session } = useSession();
 
   const { fullName, signature, setFullName, setSignature } = useRequiredSigningContext();
+
   const [validateUninsertedFields, setValidateUninsertedFields] = useState(false);
 
   const {
@@ -81,7 +82,11 @@ export const SigningForm = ({ document, recipient, fields }: SigningFormProps) =
         disabled={isSubmitting}
         className={cn('-mx-2 flex flex-1 flex-col overflow-hidden px-2')}
       >
-        <div className={cn('flex flex-1 flex-col')}>
+        <div
+          className={cn(
+            'custom-scrollbar -mx-2 flex flex-1 flex-col overflow-y-auto overflow-x-hidden px-2',
+          )}
+        >
           <h3 className="text-foreground text-2xl font-semibold">Sign Document</h3>
 
           <p className="text-muted-foreground mt-2 text-sm">

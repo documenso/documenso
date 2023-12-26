@@ -9,16 +9,18 @@ export type CompleteDocumentActionInput = TAddSubjectFormSchema & {
   documentId: number;
 };
 
-export const completeDocument = async ({ documentId, email }: CompleteDocumentActionInput) => {
+export const completeDocument = async ({ documentId, meta }: CompleteDocumentActionInput) => {
   'use server';
 
   const { user } = await getRequiredServerComponentSession();
 
-  if (email.message || email.subject) {
+  if (meta.message || meta.subject || meta.dateFormat || meta.timezone) {
     await upsertDocumentMeta({
       documentId,
-      subject: email.subject,
-      message: email.message,
+      subject: meta.subject,
+      message: meta.message,
+      timezone: meta.timezone,
+      dateFormat: meta.dateFormat,
     });
   }
 

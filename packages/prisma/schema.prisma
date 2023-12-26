@@ -159,6 +159,8 @@ model DocumentMeta {
   id         String   @id @default(cuid())
   subject    String?
   message    String?
+  timezone   String?  @db.Text @default("Etc/UTC")
+  dateFormat String?  @db.Text @default("yyyy-MM-dd hh:mm a")
   documentId Int      @unique
   document   Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
 }

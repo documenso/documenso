@@ -7,21 +7,23 @@ import { DateTime } from 'luxon';
 import { useForm } from 'react-hook-form';
 import { match } from 'ts-pattern';
 
+import { DEFAULT_DOCUMENT_DATE_FORMAT } from '@documenso/lib/constants/date-formats';
 import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
 import { sortFieldsByPosition, validateFieldsInserted } from '@documenso/lib/utils/fields';
-import { Field, FieldType } from '@documenso/prisma/client';
-import { FieldWithSignature } from '@documenso/prisma/types/field-with-signature';
+import type { Field } from '@documenso/prisma/client';
+import { FieldType } from '@documenso/prisma/client';
+import type { FieldWithSignature } from '@documenso/prisma/types/field-with-signature';
 import { FieldToolTip } from '@documenso/ui/components/field/field-tooltip';
 import { cn } from '@documenso/ui/lib/utils';
 import { Card, CardContent } from '@documenso/ui/primitives/card';
-import { TAddSignatureFormSchema } from '@documenso/ui/primitives/document-flow/add-signature.types';
+import type { TAddSignatureFormSchema } from '@documenso/ui/primitives/document-flow/add-signature.types';
 import {
   DocumentFlowFormContainerActions,
   DocumentFlowFormContainerContent,
   DocumentFlowFormContainerFooter,
   DocumentFlowFormContainerStep,
 } from '@documenso/ui/primitives/document-flow/document-flow-root';
-import { DocumentFlowStep } from '@documenso/ui/primitives/document-flow/types';
+import type { DocumentFlowStep } from '@documenso/ui/primitives/document-flow/types';
 import { ElementVisible } from '@documenso/ui/primitives/element-visible';
 import { Input } from '@documenso/ui/primitives/input';
 import { SignaturePad } from '@documenso/ui/primitives/signature-pad';
@@ -135,7 +137,7 @@ export const AddSignatureFormPartial = ({
     return match(field.type)
       .with(FieldType.DATE, () => ({
         ...field,
-        customText: DateTime.now().toFormat('yyyy-MM-dd hh:mm a'),
+        customText: DateTime.now().toFormat(DEFAULT_DOCUMENT_DATE_FORMAT),
         inserted: true,
       }))
       .with(FieldType.EMAIL, () => ({

@@ -1,5 +1,6 @@
 import { prisma } from '@documenso/prisma';
-import { SigningStatus, User } from '@documenso/prisma/client';
+import type { User } from '@documenso/prisma/client';
+import { SigningStatus } from '@documenso/prisma/client';
 import { isExtendedDocumentStatus } from '@documenso/prisma/guards/is-extended-document-status';
 import { ExtendedDocumentStatus } from '@documenso/prisma/types/extended-document-status';
 
