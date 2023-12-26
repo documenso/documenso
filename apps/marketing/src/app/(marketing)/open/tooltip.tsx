@@ -29,10 +29,7 @@ export function OpenPageTooltip() {
           </svg>
         </TooltipTrigger>
         <TooltipContent>
-          <p>
-            August and earlier: Active subscribers. September and beyond: Numbers of active
-            subscriptions.
-          </p>
+          <p>Active Subscriptions.</p>
         </TooltipContent>
       </Tooltip>
     </TooltipProvider>
