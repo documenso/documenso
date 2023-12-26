@@ -25,6 +25,7 @@ export type UploadDocumentProps = {
 export const UploadDocument = ({ className }: UploadDocumentProps) => {
   const router = useRouter();
   const analytics = useAnalytics();
+
   const { data: session } = useSession();
 
   const { toast } = useToast();

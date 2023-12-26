@@ -6,8 +6,13 @@ import { useRouter } from 'next/navigation';
 
 import { Loader } from 'lucide-react';
 
-import { Recipient } from '@documenso/prisma/client';
-import { FieldWithSignature } from '@documenso/prisma/types/field-with-signature';
+import {
+  DEFAULT_DOCUMENT_DATE_FORMAT,
+  convertToLocalSystemFormat,
+} from '@documenso/lib/constants/date-formats';
+import { DEFAULT_DOCUMENT_TIME_ZONE } from '@documenso/lib/constants/time-zones';
+import type { Recipient } from '@documenso/prisma/client';
+import type { FieldWithSignature } from '@documenso/prisma/types/field-with-signature';
 import { trpc } from '@documenso/trpc/react';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
@@ -16,9 +21,16 @@ import { SigningFieldContainer } from './signing-field-container';
 export type DateFieldProps = {
   field: FieldWithSignature;
   recipient: Recipient;
+  dateFormat?: string | null;
+  timezone?: string | null;
 };
 
-export const DateField = ({ field, recipient }: DateFieldProps) => {
+export const DateField = ({
+  field,
+  recipient,
+  dateFormat = DEFAULT_DOCUMENT_DATE_FORMAT,
+  timezone = DEFAULT_DOCUMENT_TIME_ZONE,
+}: DateFieldProps) => {
   const router = useRouter();
 
   const { toast } = useToast();
@@ -35,12 +47,18 @@ export const DateField = ({ field, recipient }: DateFieldProps) => {
 
   const isLoading = isSignFieldWithTokenLoading || isRemoveSignedFieldWithTokenLoading || isPending;
 
+  const localDateString = convertToLocalSystemFormat(field.customText, dateFormat, timezone);
+
+  const isDifferentTimeZone = field.inserted && localDateString !== field.customText;
+
+  const tooltipText = `"${field.customText}" will appear on the document as it has a timezone of "${timezone}".`;
+
   const onSign = async () => {
     try {
       await signFieldWithToken({
         token: recipient.token,
         fieldId: field.id,
-        value: '',
+        value: dateFormat ?? DEFAULT_DOCUMENT_DATE_FORMAT,
       });
 
       startTransition(() => router.refresh());
@@ -75,7 +93,13 @@ export const DateField = ({ field, recipient }: DateFieldProps) => {
   };
 
   return (
-    <SigningFieldContainer field={field} onSign={onSign} onRemove={onRemove}>
+    <SigningFieldContainer
+      field={field}
+      onSign={onSign}
+      onRemove={onRemove}
+      type="Date"
+      tooltipText={isDifferentTimeZone ? tooltipText : undefined}
+    >
       {isLoading && (
         <div className="bg-background absolute inset-0 flex items-center justify-center rounded-md">
           <Loader className="text-primary h-5 w-5 animate-spin md:h-8 md:w-8" />
@@ -87,7 +111,7 @@ export const DateField = ({ field, recipient }: DateFieldProps) => {
       )}
 
       {field.inserted && (
-        <p className="text-muted-foreground text-sm duration-200">{field.customText}</p>
+        <p className="text-muted-foreground text-sm duration-200">{localDateString}</p>
       )}
     </SigningFieldContainer>
   );

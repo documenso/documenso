@@ -65,9 +65,11 @@ export type TSetFieldsForDocumentMutationSchema = z.infer<
 
 export const ZSendDocumentMutationSchema = z.object({
   documentId: z.number(),
-  email: z.object({
+  meta: z.object({
     subject: z.string(),
     message: z.string(),
+    timezone: z.string(),
+    dateFormat: z.string(),
   }),
 });
 

@@ -3,7 +3,7 @@ import SuperJSON from 'superjson';
 
 import { isAdmin } from '@documenso/lib/next-auth/guards/is-admin';
 
-import { TrpcContext } from './context';
+import type { TrpcContext } from './context';
 
 const t = initTRPC.context<TrpcContext>().create({
   transformer: SuperJSON,
