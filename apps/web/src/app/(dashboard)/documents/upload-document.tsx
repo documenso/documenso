@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -34,6 +34,16 @@ export const UploadDocument = ({ className }: UploadDocumentProps) => {
   const [isLoading, setIsLoading] = useState(false);
 
   const { mutateAsync: createDocument } = trpc.document.createDocument.useMutation();
+
+  const disabledMessage = useMemo(() => {
+    if (remaining.documents === 0) {
+      return 'You have reached your document limit.';
+    }
+
+    if (!session?.user.emailVerified) {
+      return 'Verify your email to upload documents.';
+    }
+  }, [remaining.documents, session?.user.emailVerified]);
 
   const onFileDrop = async (file: File) => {
     try {
@@ -90,6 +100,7 @@ export const UploadDocument = ({ className }: UploadDocumentProps) => {
       <DocumentDropzone
         className="min-h-[40vh]"
         disabled={remaining.documents === 0 || !session?.user.emailVerified}
+        disabledMessage={disabledMessage}
         onDrop={onFileDrop}
       />
 
