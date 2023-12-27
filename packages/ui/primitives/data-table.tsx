@@ -2,36 +2,49 @@
 
 import React, { useMemo } from 'react';
 
-import {
+import type {
   ColumnDef,
   PaginationState,
   Table as TTable,
   Updater,
-  flexRender,
-  getCoreRowModel,
-  useReactTable,
+  VisibilityState,
 } from '@tanstack/react-table';
+import { flexRender, getCoreRowModel, useReactTable } from '@tanstack/react-table';
 
+import { Skeleton } from './skeleton';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './table';
 
 export type DataTableChildren<TData> = (_table: TTable<TData>) => React.ReactNode;
 
 export interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
+  columnVisibility?: VisibilityState;
   data: TData[];
   perPage?: number;
   currentPage?: number;
   totalPages?: number;
   onPaginationChange?: (_page: number, _perPage: number) => void;
   children?: DataTableChildren<TData>;
+  skeleton?: {
+    enable: boolean;
+    rows: number;
+    component?: React.ReactNode;
+  };
+  error?: {
+    enable: boolean;
+    component?: React.ReactNode;
+  };
 }
 
 export function DataTable<TData, TValue>({
   columns,
+  columnVisibility,
   data,
+  error,
   perPage,
   currentPage,
   totalPages,
+  skeleton,
   onPaginationChange,
   children,
 }: DataTableProps<TData, TValue>) {
@@ -67,6 +80,7 @@ export function DataTable<TData, TValue>({
     getCoreRowModel: getCoreRowModel(),
     state: {
       pagination: manualPagination ? pagination : undefined,
+      columnVisibility,
     },
     manualPagination,
     pageCount: totalPages,
@@ -102,6 +116,18 @@ export function DataTable<TData, TValue>({
                     </TableCell>
                   ))}
                 </TableRow>
+              ))
+            ) : error?.enable ? (
+              <TableRow>
+                {error.component ?? (
+                  <TableCell colSpan={columns.length} className="h-24 text-center">
+                    Something went wrong.
+                  </TableCell>
+                )}
+              </TableRow>
+            ) : skeleton?.enable ? (
+              Array.from({ length: skeleton.rows }).map((_, i) => (
+                <TableRow key={`skeleton-row-${i}`}>{skeleton.component ?? <Skeleton />}</TableRow>
               ))
             ) : (
               <TableRow>

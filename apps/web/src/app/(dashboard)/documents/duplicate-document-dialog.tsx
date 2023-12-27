@@ -16,12 +16,14 @@ type DuplicateDocumentDialogProps = {
   id: number;
   open: boolean;
   onOpenChange: (_open: boolean) => void;
+  teamUrl?: string;
 };
 
 export const DuplicateDocumentDialog = ({
   id,
   open,
   onOpenChange,
+  teamUrl,
 }: DuplicateDocumentDialogProps) => {
   const router = useRouter();
   const { toast } = useToast();
@@ -37,10 +39,12 @@ export const DuplicateDocumentDialog = ({
       }
     : undefined;
 
+  const documentsPath = teamUrl ? `/t/${teamUrl}/documents` : '/documents';
+
   const { mutateAsync: duplicateDocument, isLoading: isDuplicateLoading } =
     trpcReact.document.duplicateDocument.useMutation({
       onSuccess: (newId) => {
-        router.push(`/documents/${newId}`);
+        router.push(`${documentsPath}/${newId}`);
 
         toast({
           title: 'Document Duplicated',

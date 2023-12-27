@@ -22,6 +22,24 @@ export const setRecipientsForDocument = async ({
     where: {
       id: documentId,
       userId,
+      OR: [
+        {
+          team: {
+            is: null,
+          },
+        },
+        {
+          team: {
+            is: {
+              members: {
+                some: {
+                  userId,
+                },
+              },
+            },
+          },
+        },
+      ],
     },
   });
 

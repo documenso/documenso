@@ -70,20 +70,24 @@ export const documentRouter = router({
     .input(ZCreateDocumentMutationSchema)
     .mutation(async ({ input, ctx }) => {
       try {
-        const { title, documentDataId } = input;
+        const { title, documentDataId, teamId } = input;
 
-        const { remaining } = await getServerLimits({ email: ctx.user.email });
+        // Teams bypass document limits.
+        if (teamId !== undefined) {
+          const { remaining } = await getServerLimits({ email: ctx.user.email });
 
-        if (remaining.documents <= 0) {
-          throw new TRPCError({
-            code: 'BAD_REQUEST',
-            message:
-              'You have reached your document limit for this month. Please upgrade your plan.',
-          });
+          if (remaining.documents <= 0) {
+            throw new TRPCError({
+              code: 'BAD_REQUEST',
+              message:
+                'You have reached your document limit for this month. Please upgrade your plan.',
+            });
+          }
         }
 
         return await createDocument({
           userId: ctx.user.id,
+          teamId,
           title,
           documentDataId,
         });

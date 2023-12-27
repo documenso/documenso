@@ -78,6 +78,14 @@ export const getStripeCustomerByUser = async (user: User) => {
   };
 };
 
+export const getStripeCustomerIdByUser = async (user: User) => {
+  if (user.customerId !== null) {
+    return user.customerId;
+  }
+
+  return await getStripeCustomerByUser(user).then((session) => session.stripeCustomer.id);
+};
+
 const syncStripeCustomerSubscriptions = async (userId: number, stripeCustomerId: string) => {
   const stripeSubscriptions = await stripe.subscriptions.list({
     customer: stripeCustomerId,

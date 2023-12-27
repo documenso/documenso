@@ -40,9 +40,10 @@ export type DataTableActionDropdownProps = {
     User: Pick<User, 'id' | 'name' | 'email'>;
     Recipient: Recipient[];
   };
+  teamUrl?: string;
 };
 
-export const DataTableActionDropdown = ({ row }: DataTableActionDropdownProps) => {
+export const DataTableActionDropdown = ({ row, teamUrl }: DataTableActionDropdownProps) => {
   const { data: session } = useSession();
 
   const [isDeleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -61,6 +62,8 @@ export const DataTableActionDropdown = ({ row }: DataTableActionDropdownProps) =
   const isComplete = row.status === DocumentStatus.COMPLETED;
   // const isSigned = recipient?.signingStatus === SigningStatus.SIGNED;
   const isDocumentDeletable = isOwner;
+
+  const documentsPath = teamUrl ? `/t/${teamUrl}/documents` : '/documents';
 
   const onDownloadClick = async () => {
     let document: DocumentWithData | null = null;
@@ -117,7 +120,7 @@ export const DataTableActionDropdown = ({ row }: DataTableActionDropdownProps) =
         </DropdownMenuItem>
 
         <DropdownMenuItem disabled={!isOwner || isComplete} asChild>
-          <Link href={`/documents/${row.id}`}>
+          <Link href={`${documentsPath}/${row.id}`}>
             <Edit className="mr-2 h-4 w-4" />
             Edit
           </Link>
@@ -175,6 +178,7 @@ export const DataTableActionDropdown = ({ row }: DataTableActionDropdownProps) =
           id={row.id}
           open={isDuplicateDialogOpen}
           onOpenChange={setDuplicateDialogOpen}
+          teamUrl={teamUrl}
         />
       )}
     </DropdownMenu>

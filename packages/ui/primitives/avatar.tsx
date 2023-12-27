@@ -48,4 +48,37 @@ const AvatarFallback = React.forwardRef<
 
 AvatarFallback.displayName = AvatarPrimitive.Fallback.displayName;
 
-export { Avatar, AvatarImage, AvatarFallback };
+type AvatarWithTextProps = {
+  avatarClass?: string;
+  avatarFallback: string;
+  className?: string;
+  primaryText: React.ReactNode;
+  secondaryText?: React.ReactNode;
+  rightSideComponent?: React.ReactNode;
+};
+
+const AvatarWithText = ({
+  avatarClass,
+  avatarFallback,
+  className,
+  primaryText,
+  secondaryText,
+  rightSideComponent,
+}: AvatarWithTextProps) => (
+  <div className={cn('flex w-full max-w-xs items-center gap-2', className)}>
+    <Avatar
+      className={cn('dark:border-border h-10 w-10 border-2 border-solid border-white', avatarClass)}
+    >
+      <AvatarFallback className="text-xs text-gray-400">{avatarFallback}</AvatarFallback>
+    </Avatar>
+
+    <div className="flex flex-col text-left text-sm font-normal">
+      <span className="text-foreground">{primaryText}</span>
+      <span className="text-muted-foreground text-xs">{secondaryText}</span>
+    </div>
+
+    {rightSideComponent}
+  </div>
+);
+
+export { Avatar, AvatarImage, AvatarFallback, AvatarWithText };

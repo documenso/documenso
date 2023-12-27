@@ -37,16 +37,17 @@ export type TSignUpFormSchema = z.infer<typeof ZSignUpFormSchema>;
 
 export type SignUpFormProps = {
   className?: string;
+  initialEmail?: string;
 };
 
-export const SignUpForm = ({ className }: SignUpFormProps) => {
+export const SignUpForm = ({ className, initialEmail }: SignUpFormProps) => {
   const { toast } = useToast();
   const analytics = useAnalytics();
 
   const form = useForm<TSignUpFormSchema>({
     values: {
       name: '',
-      email: '',
+      email: initialEmail ?? '',
       password: '',
       signature: '',
     },

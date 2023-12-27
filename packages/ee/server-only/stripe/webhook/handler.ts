@@ -5,6 +5,7 @@ import { match } from 'ts-pattern';
 
 import type { Stripe } from '@documenso/lib/server-only/stripe';
 import { stripe } from '@documenso/lib/server-only/stripe';
+import { createTeamFromPendingTeam } from '@documenso/lib/server-only/team/create-team';
 import { getFlag } from '@documenso/lib/universal/get-feature-flag';
 import { prisma } from '@documenso/prisma';
 
@@ -109,6 +110,12 @@ export const stripeWebhookHandler = async (
         const subscription = await stripe.subscriptions.retrieve(subscriptionId);
 
         await onSubscriptionUpdated({ userId, subscription });
+
+        if (
+          subscription.items.data[0].price.id === process.env.NEXT_PUBLIC_STRIPE_TEAM_SEAT_PRICE_ID
+        ) {
+          await handleTeamSeatCheckout({ subscription });
+        }
 
         return res.status(200).json({
           success: true,
@@ -281,4 +288,22 @@ export const stripeWebhookHandler = async (
       message: 'Unknown error',
     });
   }
+};
+
+export type HandleTeamSeatCheckoutOptions = {
+  subscription: Stripe.Subscription;
+};
+
+const handleTeamSeatCheckout = async ({ subscription }: HandleTeamSeatCheckoutOptions) => {
+  if (subscription.metadata?.pendingTeamId === undefined) {
+    return;
+  }
+
+  const pendingTeamId = Number(subscription.metadata.pendingTeamId);
+
+  if (Number.isNaN(pendingTeamId)) {
+    throw new Error('Invalid pending team ID');
+  }
+
+  await createTeamFromPendingTeam({ pendingTeamId, subscriptionId: subscription.id });
 };

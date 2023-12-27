@@ -17,6 +17,7 @@ export type TGetDocumentByTokenQuerySchema = z.infer<typeof ZGetDocumentByTokenQ
 export const ZCreateDocumentMutationSchema = z.object({
   title: z.string().min(1),
   documentDataId: z.string().min(1),
+  teamId: z.number().optional(),
 });
 
 export type TCreateDocumentMutationSchema = z.infer<typeof ZCreateDocumentMutationSchema>;

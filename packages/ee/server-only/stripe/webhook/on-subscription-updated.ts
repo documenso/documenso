@@ -13,12 +13,19 @@ export const onSubscriptionUpdated = async ({
   userId,
   subscription,
 }: OnSubscriptionUpdatedOptions) => {
+  await prisma.subscription.upsert(mapStripeSubscriptionToPrismaUpsertAction(userId, subscription));
+};
+
+export const mapStripeSubscriptionToPrismaUpsertAction = (
+  userId: number,
+  subscription: Stripe.Subscription,
+) => {
   const status = match(subscription.status)
     .with('active', () => SubscriptionStatus.ACTIVE)
     .with('past_due', () => SubscriptionStatus.PAST_DUE)
     .otherwise(() => SubscriptionStatus.INACTIVE);
 
-  await prisma.subscription.upsert({
+  return {
     where: {
       planId: subscription.id,
     },
@@ -37,5 +44,5 @@ export const onSubscriptionUpdated = async ({
       periodEnd: new Date(subscription.current_period_end * 1000),
       cancelAtPeriodEnd: subscription.cancel_at_period_end,
     },
-  });
+  };
 };
