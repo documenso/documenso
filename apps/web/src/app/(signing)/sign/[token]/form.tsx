@@ -91,7 +91,9 @@ export const SigningForm = ({ document, recipient, fields }: SigningFormProps) =
 
       <fieldset
         disabled={isSubmitting}
-        className={cn('custom-scrollbar -mx-2 flex flex-1 flex-col overflow-y-auto overflow-x-hidden px-2')}
+        className={cn(
+          'custom-scrollbar -mx-2 flex flex-1 flex-col overflow-y-auto overflow-x-hidden px-2',
+        )}
       >
         <div className={cn('flex flex-1 flex-col')}>
           <h3 className="text-foreground text-2xl font-semibold">
