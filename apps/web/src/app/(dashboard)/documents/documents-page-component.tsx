@@ -31,7 +31,7 @@ export type DocumentsPageComponentProps = {
     perPage?: string;
     senderIds?: string;
   };
-  team?: Team & { teamEmail?: TeamEmail };
+  team?: Team & { teamEmail?: TeamEmail | null };
 };
 
 export default async function DocumentsPageComponent({

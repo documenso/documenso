@@ -43,9 +43,9 @@ export default async function TeamsSettingsPage({ params }: TeamsSettingsPagePro
 
       <UpdateTeamForm teamId={team.id} teamName={team.name} teamUrl={team.url} />
 
-      <section className="space-y-6">
+      <section className="mt-6 space-y-6">
         {(team.teamEmail || team.emailVerification) && (
-          <section className="mt-6 rounded-lg bg-gray-50/70 p-6 pb-2">
+          <section className="rounded-lg bg-gray-50/70 p-6 pb-2">
             <h3 className="font-medium">Team email</h3>
 
             <p className="text-muted-foreground text-sm">
