@@ -6,9 +6,14 @@ export const DEFAULT_DOCUMENT_DATE_FORMAT = 'yyyy-MM-dd hh:mm a';
 
 export const DATE_FORMATS = [
   {
+    key: 'yyyy-MM-dd_hh:mm_a',
+    label: 'YYYY-MM-DD HH:mm a',
+    value: DEFAULT_DOCUMENT_DATE_FORMAT,
+  },
+  {
     key: 'YYYYMMDD',
     label: 'YYYY-MM-DD',
-    value: DEFAULT_DOCUMENT_DATE_FORMAT,
+    value: 'YYYY-MM-DD',
   },
   {
     key: 'DDMMYYYY',
@@ -57,15 +62,18 @@ export const convertToLocalSystemFormat = (
   dateFormat: string | null = DEFAULT_DOCUMENT_DATE_FORMAT,
   timeZone: string | null = DEFAULT_DOCUMENT_TIME_ZONE,
 ): string => {
-  const parsedDate = DateTime.fromFormat(customText, dateFormat ?? DEFAULT_DOCUMENT_DATE_FORMAT, {
-    zone: timeZone ?? DEFAULT_DOCUMENT_TIME_ZONE,
+  const coalescedDateFormat = dateFormat ?? DEFAULT_DOCUMENT_DATE_FORMAT;
+  const coalescedTimeZone = timeZone ?? DEFAULT_DOCUMENT_TIME_ZONE;
+
+  const parsedDate = DateTime.fromFormat(customText, coalescedDateFormat, {
+    zone: coalescedTimeZone,
   });
 
   if (!parsedDate.isValid) {
     return 'Invalid date';
   }
 
-  const formattedDate = parsedDate.toLocal().toFormat(dateFormat ?? DEFAULT_DOCUMENT_DATE_FORMAT);
+  const formattedDate = parsedDate.toLocal().toFormat(coalescedDateFormat);
 
   return formattedDate;
 };

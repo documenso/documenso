@@ -49,7 +49,7 @@ export const DateField = ({
 
   const localDateString = convertToLocalSystemFormat(field.customText, dateFormat, timezone);
 
-  const isDifferentTimeZone = field.inserted && localDateString !== field.customText;
+  const isDifferentTime = field.inserted && localDateString !== field.customText;
 
   const tooltipText = `"${field.customText}" will appear on the document as it has a timezone of "${timezone}".`;
 
@@ -98,7 +98,7 @@ export const DateField = ({
       onSign={onSign}
       onRemove={onRemove}
       type="Date"
-      tooltipText={isDifferentTimeZone ? tooltipText : undefined}
+      tooltipText={isDifferentTime ? tooltipText : undefined}
     >
       {isLoading && (
         <div className="bg-background absolute inset-0 flex items-center justify-center rounded-md">
