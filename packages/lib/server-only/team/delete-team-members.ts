@@ -36,7 +36,7 @@ export const deleteTeamMembers = async ({
           some: {
             userId,
             role: {
-              in: TEAM_MEMBER_ROLE_PERMISSIONS_MAP['DELETE_TEAM_MEMBERS'],
+              in: TEAM_MEMBER_ROLE_PERMISSIONS_MAP['MANAGE_TEAM'],
             },
           },
         },

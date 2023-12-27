@@ -1,5 +1,5 @@
 import { prisma } from '@documenso/prisma';
-import { TeamMemberRole } from '@documenso/prisma/client';
+import type { TeamMemberRole } from '@documenso/prisma/client';
 
 import { TEAM_MEMBER_ROLE_PERMISSIONS_MAP } from '../../constants/teams';
 
@@ -27,7 +27,7 @@ export const updateTeamMember = async ({
           some: {
             userId,
             role: {
-              in: TEAM_MEMBER_ROLE_PERMISSIONS_MAP['UPDATE_TEAM_MEMBERS'],
+              in: TEAM_MEMBER_ROLE_PERMISSIONS_MAP['MANAGE_TEAM'],
             },
           },
         },

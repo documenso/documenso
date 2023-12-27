@@ -8,15 +8,12 @@ export const TEAM_MEMBER_ROLE_MAP: Record<keyof typeof TeamMemberRole, string> =
 
 export const TEAM_MEMBER_ROLE_PERMISSIONS_MAP = {
   /**
-   * Includes updating team name, url, logo, emails.
-   *
-   * Todo: Teams - Clean this up, merge etc.
+   * Includes permissions to:
+   * - Manage team members
+   * - Manage team settings, changing name, url, etc.
    */
   MANAGE_TEAM: [TeamMemberRole.ADMIN, TeamMemberRole.MANAGER],
-  DELETE_INVITATIONS: [TeamMemberRole.ADMIN, TeamMemberRole.MANAGER],
-  DELETE_TEAM_MEMBERS: [TeamMemberRole.ADMIN, TeamMemberRole.MANAGER],
   DELETE_TEAM_TRANSFER_REQUEST: [TeamMemberRole.ADMIN],
-  UPDATE_TEAM_MEMBERS: [TeamMemberRole.ADMIN, TeamMemberRole.MANAGER],
 } satisfies Record<string, TeamMemberRole[]>;
 
 /**

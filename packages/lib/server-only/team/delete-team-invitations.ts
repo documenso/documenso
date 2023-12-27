@@ -30,7 +30,7 @@ export const deleteTeamMemberInvitations = async ({
         userId,
         teamId,
         role: {
-          in: TEAM_MEMBER_ROLE_PERMISSIONS_MAP['DELETE_INVITATIONS'],
+          in: TEAM_MEMBER_ROLE_PERMISSIONS_MAP['MANAGE_TEAM'],
         },
       },
     });
