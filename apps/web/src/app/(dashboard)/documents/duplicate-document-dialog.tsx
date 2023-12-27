@@ -41,6 +41,7 @@ export const DuplicateDocumentDialog = ({
     trpcReact.document.duplicateDocument.useMutation({
       onSuccess: (newId) => {
         router.push(`/documents/${newId}`);
+
         toast({
           title: 'Document Duplicated',
           description: 'Your document has been successfully duplicated.',

@@ -4,15 +4,17 @@ import { useForm } from 'react-hook-form';
 
 import type { Field, Recipient } from '@documenso/prisma/client';
 import type { DocumentWithData } from '@documenso/prisma/types/document-with-data';
-import { FormErrorMessage } from '@documenso/ui/primitives/form/form-error-message';
-import { Input } from '@documenso/ui/primitives/input';
-import { Label } from '@documenso/ui/primitives/label';
 
+import { FormErrorMessage } from '../form/form-error-message';
+import { Input } from '../input';
+import { Label } from '../label';
+import { useStep } from '../stepper';
 import type { TAddTitleFormSchema } from './add-title.types';
 import {
   DocumentFlowFormContainerActions,
   DocumentFlowFormContainerContent,
   DocumentFlowFormContainerFooter,
+  DocumentFlowFormContainerHeader,
   DocumentFlowFormContainerStep,
 } from './document-flow-root';
 import type { DocumentFlowStep } from './types';
@@ -22,7 +24,6 @@ export type AddTitleFormProps = {
   recipients: Recipient[];
   fields: Field[];
   document: DocumentWithData;
-  numberOfSteps: number;
   onSubmit: (_data: TAddTitleFormSchema) => void;
 };
 
@@ -31,7 +32,6 @@ export const AddTitleFormPartial = ({
   recipients: _recipients,
   fields: _fields,
   document,
-  numberOfSteps,
   onSubmit,
 }: AddTitleFormProps) => {
   const {
@@ -46,8 +46,14 @@ export const AddTitleFormPartial = ({
 
   const onFormSubmit = handleSubmit(onSubmit);
 
+  const { stepIndex, currentStep, totalSteps, previousStep } = useStep();
+
   return (
     <>
+      <DocumentFlowFormContainerHeader
+        title={documentFlow.title}
+        description={documentFlow.description}
+      />
       <DocumentFlowFormContainerContent>
         <div className="flex flex-col">
           <div className="flex flex-col gap-y-4">
@@ -72,14 +78,15 @@ export const AddTitleFormPartial = ({
       <DocumentFlowFormContainerFooter>
         <DocumentFlowFormContainerStep
           title={documentFlow.title}
-          step={documentFlow.stepIndex}
-          maxStep={numberOfSteps}
+          step={currentStep}
+          maxStep={totalSteps}
         />
 
         <DocumentFlowFormContainerActions
           loading={isSubmitting}
           disabled={isSubmitting}
-          onGoBackClick={documentFlow.onBackStep}
+          canGoBack={stepIndex !== 0}
+          onGoBackClick={previousStep}
           onGoNextClick={() => void onFormSubmit()}
         />
       </DocumentFlowFormContainerFooter>

@@ -162,5 +162,17 @@ export const NEXT_AUTH_OPTIONS: AuthOptions = {
 
       return session;
     },
+
+    async signIn({ user }) {
+      // We do this to stop OAuth providers from creating an account
+      // when signups are disabled
+      if (process.env.NEXT_PUBLIC_DISABLE_SIGNUP === 'true') {
+        const userData = await getUserByEmail({ email: user.email! });
+
+        return !!userData;
+      }
+
+      return true;
+    },
   },
 };

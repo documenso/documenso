@@ -2,12 +2,16 @@ import { notFound, redirect } from 'next/navigation';
 
 import { match } from 'ts-pattern';
 
+import { DEFAULT_DOCUMENT_DATE_FORMAT } from '@documenso/lib/constants/date-formats';
 import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
+import { DEFAULT_DOCUMENT_TIME_ZONE } from '@documenso/lib/constants/time-zones';
 import { getServerComponentSession } from '@documenso/lib/next-auth/get-server-component-session';
 import { getDocumentAndSenderByToken } from '@documenso/lib/server-only/document/get-document-by-token';
+import { getDocumentMetaByDocumentId } from '@documenso/lib/server-only/document/get-document-meta-by-document-id';
 import { viewedDocument } from '@documenso/lib/server-only/document/viewed-document';
 import { getFieldsForToken } from '@documenso/lib/server-only/field/get-fields-for-token';
 import { getRecipientByToken } from '@documenso/lib/server-only/recipient/get-recipient-by-token';
+import { getRecipientSignatures } from '@documenso/lib/server-only/recipient/get-recipient-signatures';
 import { DocumentStatus, FieldType, RecipientRole, SigningStatus } from '@documenso/prisma/client';
 import { Card, CardContent } from '@documenso/ui/primitives/card';
 import { ElementVisible } from '@documenso/ui/primitives/element-visible';
@@ -17,6 +21,7 @@ import { DateField } from './date-field';
 import { EmailField } from './email-field';
 import { SigningForm } from './form';
 import { NameField } from './name-field';
+import { NoLongerAvailable } from './no-longer-available';
 import { SigningProvider } from './provider';
 import { SignatureField } from './signature-field';
 
@@ -40,6 +45,8 @@ export default async function SigningPage({ params: { token } }: SigningPageProp
     viewedDocument({ token }).catch(() => null),
   ]);
 
+  const documentMeta = await getDocumentMetaByDocumentId({ id: document!.id }).catch(() => null);
+
   if (!document || !document.documentData || !recipient) {
     return notFound();
   }
@@ -53,6 +60,18 @@ export default async function SigningPage({ params: { token } }: SigningPageProp
     recipient.signingStatus === SigningStatus.SIGNED
   ) {
     redirect(`/sign/${token}/complete`);
+  }
+
+  const [recipientSignature] = await getRecipientSignatures({ recipientId: recipient.id });
+
+  if (document.deletedAt) {
+    return (
+      <NoLongerAvailable
+        document={document}
+        recipientName={recipient.name}
+        recipientSignature={recipientSignature}
+      />
+    );
   }
 
   return (
@@ -100,7 +119,13 @@ export default async function SigningPage({ params: { token } }: SigningPageProp
                 <NameField key={field.id} field={field} recipient={recipient} />
               ))
               .with(FieldType.DATE, () => (
-                <DateField key={field.id} field={field} recipient={recipient} />
+                <DateField
+                  key={field.id}
+                  field={field}
+                  recipient={recipient}
+                  dateFormat={documentMeta?.dateFormat ?? DEFAULT_DOCUMENT_DATE_FORMAT}
+                  timezone={documentMeta?.timezone ?? DEFAULT_DOCUMENT_TIME_ZONE}
+                />
               ))
               .with(FieldType.EMAIL, () => (
                 <EmailField key={field.id} field={field} recipient={recipient} />

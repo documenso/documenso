@@ -12,19 +12,21 @@ import { nanoid } from '@documenso/lib/universal/id';
 import type { Field, Recipient } from '@documenso/prisma/client';
 import { DocumentStatus, RecipientRole, SendStatus } from '@documenso/prisma/client';
 import type { DocumentWithData } from '@documenso/prisma/types/document-with-data';
-import { Button } from '@documenso/ui/primitives/button';
-import { FormErrorMessage } from '@documenso/ui/primitives/form/form-error-message';
-import { Input } from '@documenso/ui/primitives/input';
-import { Label } from '@documenso/ui/primitives/label';
-import { Select, SelectContent, SelectItem, SelectTrigger } from '@documenso/ui/primitives/select';
-import { useToast } from '@documenso/ui/primitives/use-toast';
 
+import { Button } from '../button';
+import { FormErrorMessage } from '../form/form-error-message';
+import { Input } from '../input';
+import { Label } from '../label';
+import { Select, SelectContent, SelectItem, SelectTrigger } from '../select';
+import { useStep } from '../stepper';
+import { useToast } from '../use-toast';
 import type { TAddSignersFormSchema } from './add-signers.types';
 import { ZAddSignersFormSchema } from './add-signers.types';
 import {
   DocumentFlowFormContainerActions,
   DocumentFlowFormContainerContent,
   DocumentFlowFormContainerFooter,
+  DocumentFlowFormContainerHeader,
   DocumentFlowFormContainerStep,
 } from './document-flow-root';
 import type { DocumentFlowStep } from './types';
@@ -34,13 +36,11 @@ export type AddSignersFormProps = {
   recipients: Recipient[];
   fields: Field[];
   document: DocumentWithData;
-  numberOfSteps: number;
   onSubmit: (_data: TAddSignersFormSchema) => void;
 };
 
 export const AddSignersFormPartial = ({
   documentFlow,
-  numberOfSteps,
   recipients,
   document,
   fields: _fields,
@@ -50,6 +50,8 @@ export const AddSignersFormPartial = ({
   const { remaining } = useLimits();
 
   const initialId = useId();
+
+  const { currentStep, totalSteps, previousStep } = useStep();
 
   const {
     control,
@@ -132,6 +134,10 @@ export const AddSignersFormPartial = ({
 
   return (
     <>
+      <DocumentFlowFormContainerHeader
+        title={documentFlow.title}
+        description={documentFlow.description}
+      />
       <DocumentFlowFormContainerContent>
         <div className="flex w-full flex-col gap-y-4">
           <AnimatePresence>
@@ -279,15 +285,15 @@ export const AddSignersFormPartial = ({
       <DocumentFlowFormContainerFooter>
         <DocumentFlowFormContainerStep
           title={documentFlow.title}
-          step={documentFlow.stepIndex}
-          maxStep={numberOfSteps}
+          step={currentStep}
+          maxStep={totalSteps}
         />
 
         <DocumentFlowFormContainerActions
           canGoBack={document.status === DocumentStatus.DRAFT}
           loading={isSubmitting}
           disabled={isSubmitting}
-          onGoBackClick={documentFlow.onBackStep}
+          onGoBackClick={previousStep}
           onGoNextClick={() => void onFormSubmit()}
         />
       </DocumentFlowFormContainerFooter>

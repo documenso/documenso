@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import { useForm } from 'react-hook-form';
 
+import { useAnalytics } from '@documenso/lib/client-only/hooks/use-analytics';
 import { sortFieldsByPosition, validateFieldsInserted } from '@documenso/lib/utils/fields';
 import { type Document, type Field, type Recipient, RecipientRole } from '@documenso/prisma/client';
 import { trpc } from '@documenso/trpc/react';
@@ -29,9 +30,11 @@ export type SigningFormProps = {
 
 export const SigningForm = ({ document, recipient, fields }: SigningFormProps) => {
   const router = useRouter();
+  const analytics = useAnalytics();
   const { data: session } = useSession();
 
   const { fullName, signature, setFullName, setSignature } = useRequiredSigningContext();
+
   const [validateUninsertedFields, setValidateUninsertedFields] = useState(false);
 
   const { mutateAsync: completeDocumentWithToken } =
@@ -60,6 +63,12 @@ export const SigningForm = ({ document, recipient, fields }: SigningFormProps) =
       documentId: document.id,
     });
 
+    analytics.capture('App: Recipient has completed signing', {
+      signerId: recipient.id,
+      documentId: document.id,
+      timestamp: new Date().toISOString(),
+    });
+
     router.push(`/sign/${recipient.token}/complete`);
   };
 
@@ -82,7 +91,7 @@ export const SigningForm = ({ document, recipient, fields }: SigningFormProps) =
 
       <fieldset
         disabled={isSubmitting}
-        className={cn('-mx-2 flex flex-1 flex-col overflow-hidden px-2')}
+        className={cn('custom-scrollbar -mx-2 flex flex-1 flex-col overflow-y-auto overflow-x-hidden px-2')}
       >
         <div className={cn('flex flex-1 flex-col')}>
           <h3 className="text-foreground text-2xl font-semibold">
