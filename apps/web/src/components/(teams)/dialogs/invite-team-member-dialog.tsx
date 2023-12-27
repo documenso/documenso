@@ -45,7 +45,6 @@ export const ZInviteTeamMembersFormSchema = z
   .object({
     invitations: ZCreateTeamMemberInvitesMutationSchema.shape.invitations,
   })
-  // Todo: Teams
   .refine(
     (schema) => {
       const emails = schema.invitations.map((invitation) => invitation.email.toLowerCase());

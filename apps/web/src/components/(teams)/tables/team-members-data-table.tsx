@@ -7,7 +7,7 @@ import { Edit, MoreHorizontal, Trash2 } from 'lucide-react';
 import { useUpdateSearchParams } from '@documenso/lib/client-only/hooks/use-update-search-params';
 import { TEAM_MEMBER_ROLE_MAP } from '@documenso/lib/constants/teams';
 import { ZBaseTableSearchParamsSchema } from '@documenso/lib/types/search-params';
-import { recipientInitials } from '@documenso/lib/utils/recipient-formatter';
+import { extractInitials } from '@documenso/lib/utils/recipient-formatter';
 import { trpc } from '@documenso/trpc/react';
 import { AvatarWithText } from '@documenso/ui/primitives/avatar';
 import { DataTable } from '@documenso/ui/primitives/data-table';
@@ -78,7 +78,7 @@ export default function TeamMembersDataTable({
           header: 'Team Member',
           cell: ({ row }) => {
             const avatarFallbackText = row.original.user.name
-              ? recipientInitials(row.original.user.name) // Todo: Teams - Extract to `nameInitials`
+              ? extractInitials(row.original.user.name)
               : row.original.user.email.slice(0, 1).toUpperCase();
 
             return (

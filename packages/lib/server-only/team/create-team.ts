@@ -194,7 +194,7 @@ export const createTeamFromPendingTeam = async ({
       .catch((e) => {
         console.error(e);
         // Non-critical error, but we want to log it so we can rectify it.
-        // Todo: Teams - Send alert.
+        // Todo: Teams - Alert us.
       });
   });
 };

@@ -9,7 +9,7 @@ import { signOut } from 'next-auth/react';
 import { TEAM_MEMBER_ROLE_MAP, canExecuteTeamAction } from '@documenso/lib/constants/teams';
 import { isAdmin } from '@documenso/lib/next-auth/guards/is-admin';
 import type { GetTeamsResponse } from '@documenso/lib/server-only/team/get-teams';
-import { recipientInitials } from '@documenso/lib/utils/recipient-formatter';
+import { extractInitials } from '@documenso/lib/utils/recipient-formatter';
 import type { User } from '@documenso/prisma/client';
 import { trpc } from '@documenso/trpc/react';
 import { cn } from '@documenso/ui/lib/utils';
@@ -55,7 +55,7 @@ export const ProfileDropdown = ({ user, teams: initialTeamsData }: ProfileDropdo
       return teamName.slice(0, 1).toUpperCase();
     }
 
-    return user.name ? recipientInitials(user.name) : user.email.slice(0, 1).toUpperCase();
+    return user.name ? extractInitials(user.name) : user.email.slice(0, 1).toUpperCase();
   };
 
   const formatSecondaryAvatarText = (team?: typeof selectedTeam) => {

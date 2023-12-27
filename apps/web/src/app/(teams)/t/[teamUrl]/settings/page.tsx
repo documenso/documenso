@@ -2,7 +2,7 @@ import { CheckCircle2, Clock } from 'lucide-react';
 
 import { getRequiredServerComponentSession } from '@documenso/lib/next-auth/get-server-component-session';
 import { getTeamByUrl } from '@documenso/lib/server-only/team/get-teams';
-import { recipientInitials } from '@documenso/lib/utils/recipient-formatter';
+import { extractInitials } from '@documenso/lib/utils/recipient-formatter';
 import { isTokenExpired } from '@documenso/lib/utils/token-verification';
 import { AvatarWithText } from '@documenso/ui/primitives/avatar';
 
@@ -58,7 +58,7 @@ export default async function TeamsSettingsPage({ params }: TeamsSettingsPagePro
             <div className="flex flex-row items-center justify-between py-4">
               <AvatarWithText
                 avatarClass="h-12 w-12"
-                avatarFallback={recipientInitials(
+                avatarFallback={extractInitials(
                   (team.teamEmail?.name || team.emailVerification?.name) ?? '',
                 )}
                 primaryText={

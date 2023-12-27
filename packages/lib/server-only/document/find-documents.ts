@@ -304,7 +304,6 @@ const findTeamDocumentsFilter = (
     })
     .with(ExtendedDocumentStatus.INBOX, () => {
       // Return a filter that will return nothing.
-      // Todo: Teams - Should be a better way to do this.
       if (!teamEmail) {
         return null;
       }
