@@ -22,6 +22,7 @@ import {
   CommandList,
   CommandShortcut,
 } from '@documenso/ui/primitives/command';
+import { THEMES_TYPE } from '@documenso/ui/primitives/constants';
 
 const DOCUMENTS_PAGES = [
   {
@@ -85,7 +86,8 @@ export function CommandMenu({ open, onOpenChange }: CommandMenuProps) {
 
   const currentPage = pages[pages.length - 1];
 
-  const toggleOpen = () => {
+  const toggleOpen = (e: KeyboardEvent) => {
+    e.preventDefault();
     setIsOpen((isOpen) => !isOpen);
     onOpenChange?.(!isOpen);
 
@@ -214,9 +216,9 @@ const Commands = ({
 const ThemeCommands = ({ setTheme }: { setTheme: (_theme: string) => void }) => {
   const THEMES = useMemo(
     () => [
-      { label: 'Light Mode', theme: 'light', icon: Sun },
-      { label: 'Dark Mode', theme: 'dark', icon: Moon },
-      { label: 'System Theme', theme: 'system', icon: Monitor },
+      { label: 'Light Mode', theme: THEMES_TYPE.LIGHT, icon: Sun },
+      { label: 'Dark Mode', theme: THEMES_TYPE.DARK, icon: Moon },
+      { label: 'System Theme', theme: THEMES_TYPE.SYSTEM, icon: Monitor },
     ],
     [],
   );

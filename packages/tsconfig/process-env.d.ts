@@ -10,8 +10,6 @@ declare namespace NodeJS {
     NEXT_PRIVATE_ENCRYPTION_KEY: string;
 
     NEXT_PUBLIC_STRIPE_COMMUNITY_PLAN_MONTHLY_PRICE_ID: string;
-    NEXT_PUBLIC_STRIPE_COMMUNITY_PLAN_YEARLY_PRICE_ID: string;
-    NEXT_PUBLIC_STRIPE_FREE_PLAN_ID?: string;
 
     NEXT_PRIVATE_STRIPE_API_KEY: string;
     NEXT_PRIVATE_STRIPE_WEBHOOK_SECRET: string;
@@ -54,6 +52,8 @@ declare namespace NodeJS {
 
     NEXT_PRIVATE_SMTP_FROM_NAME?: string;
     NEXT_PRIVATE_SMTP_FROM_ADDRESS?: string;
+
+    NEXT_PUBLIC_DISABLE_SIGNUP?: string;
 
     /**
      * Vercel environment variables

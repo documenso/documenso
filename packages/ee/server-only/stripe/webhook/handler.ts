@@ -75,23 +75,23 @@ export const stripeWebhookHandler = async (
 
         // Finally, attempt to get the user ID from the subscription within the database.
         if (!userId && customerId) {
-          const result = await prisma.subscription.findFirst({
+          const result = await prisma.user.findFirst({
             select: {
-              userId: true,
+              id: true,
             },
             where: {
               customerId,
             },
           });
 
-          if (!result?.userId) {
+          if (!result?.id) {
             return res.status(500).json({
               success: false,
               message: 'User not found',
             });
           }
 
-          userId = result.userId;
+          userId = result.id;
         }
 
         const subscriptionId =
@@ -124,23 +124,23 @@ export const stripeWebhookHandler = async (
             ? subscription.customer
             : subscription.customer.id;
 
-        const result = await prisma.subscription.findFirst({
+        const result = await prisma.user.findFirst({
           select: {
-            userId: true,
+            id: true,
           },
           where: {
             customerId,
           },
         });
 
-        if (!result?.userId) {
+        if (!result?.id) {
           return res.status(500).json({
             success: false,
             message: 'User not found',
           });
         }
 
-        await onSubscriptionUpdated({ userId: result.userId, subscription });
+        await onSubscriptionUpdated({ userId: result.id, subscription });
 
         return res.status(200).json({
           success: true,
@@ -182,23 +182,23 @@ export const stripeWebhookHandler = async (
           });
         }
 
-        const result = await prisma.subscription.findFirst({
+        const result = await prisma.user.findFirst({
           select: {
-            userId: true,
+            id: true,
           },
           where: {
             customerId,
           },
         });
 
-        if (!result?.userId) {
+        if (!result?.id) {
           return res.status(500).json({
             success: false,
             message: 'User not found',
           });
         }
 
-        await onSubscriptionUpdated({ userId: result.userId, subscription });
+        await onSubscriptionUpdated({ userId: result.id, subscription });
 
         return res.status(200).json({
           success: true,
@@ -233,23 +233,23 @@ export const stripeWebhookHandler = async (
           });
         }
 
-        const result = await prisma.subscription.findFirst({
+        const result = await prisma.user.findFirst({
           select: {
-            userId: true,
+            id: true,
           },
           where: {
             customerId,
           },
         });
 
-        if (!result?.userId) {
+        if (!result?.id) {
           return res.status(500).json({
             success: false,
             message: 'User not found',
           });
         }
 
-        await onSubscriptionUpdated({ userId: result.userId, subscription });
+        await onSubscriptionUpdated({ userId: result.id, subscription });
 
         return res.status(200).json({
           success: true,

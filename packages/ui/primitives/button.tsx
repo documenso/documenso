@@ -1,7 +1,8 @@
 import * as React from 'react';
 
 import { Slot } from '@radix-ui/react-slot';
-import { VariantProps, cva } from 'class-variance-authority';
+import type { VariantProps } from 'class-variance-authority';
+import { cva } from 'class-variance-authority';
 import { Loader } from 'lucide-react';
 
 import { cn } from '../lib/utils';
@@ -63,8 +64,8 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       );
     }
 
-    const showLoader = loading === true;
-    const isDisabled = props.disabled || showLoader;
+    const isLoading = loading === true;
+    const isDisabled = props.disabled || isLoading;
 
     return (
       <button
@@ -73,7 +74,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         {...props}
         disabled={isDisabled}
       >
-        {showLoader && <Loader className={cn('mr-2 animate-spin', loaderVariants({ size }))} />}
+        {isLoading && <Loader className={cn('mr-2 animate-spin', loaderVariants({ size }))} />}
         {props.children}
       </button>
     );
