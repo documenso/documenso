@@ -2,6 +2,12 @@ import { z } from 'zod';
 
 import { TeamMemberRole } from '@documenso/prisma/client';
 
+import { generateURLSlug } from '@documenso/lib/utils/generate-url-slug';
+
+import badWords from 'bad-words';
+
+const filter = new badWords();
+
 const GenericFindQuerySchema = z.object({
   term: z.string().optional(),
   page: z.number().optional(),
@@ -20,7 +26,12 @@ export const ZAddTeamEmailVerificationMutationSchema = z.object({
 
 export const ZCreateTeamMutationSchema = z.object({
   name: z.string().min(1),
-  url: z.string().min(1), // Todo: Teams - Apply lowercase, disallow certain symbols, disallow profanity.
+  url: z.string().min(1).refine((value) => {
+    const generatedSlug = generateURLSlug(value);
+    return !filter.isProfane(value.toLowerCase()) && generatedSlug === value.toLowerCase();
+  }, {
+    message: 'URL contains inappropriate language or unsupported characters',
+  }),
 });
 
 export const ZCreateTeamMemberInvitesMutationSchema = z.object({
@@ -100,7 +111,12 @@ export const ZUpdateTeamMutationSchema = z.object({
   data: z.object({
     // Todo: Teams
     name: z.string().min(1),
-    url: z.string().min(1), // Todo: Apply regex. Todo: lowercase, etc
+    url: z.string().min(1).refine((value) => {
+      const generatedSlug = generateURLSlug(value);
+      return !filter.isProfane(value.toLowerCase()) && generatedSlug === value.toLowerCase();
+    }, {
+      message: 'URL contains inappropriate language or unsupported characters',
+    }),
   }),
 });
 
