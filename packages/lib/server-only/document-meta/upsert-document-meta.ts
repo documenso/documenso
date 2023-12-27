@@ -6,11 +6,15 @@ export type CreateDocumentMetaOptions = {
   documentId: number;
   subject: string;
   message: string;
+  timezone: string;
+  dateFormat: string;
 };
 
 export const upsertDocumentMeta = async ({
   subject,
   message,
+  timezone,
+  dateFormat,
   documentId,
 }: CreateDocumentMetaOptions) => {
   return await prisma.documentMeta.upsert({
@@ -20,11 +24,15 @@ export const upsertDocumentMeta = async ({
     create: {
       subject,
       message,
+      dateFormat,
+      timezone,
       documentId,
     },
     update: {
       subject,
       message,
+      dateFormat,
+      timezone,
     },
   });
 };
