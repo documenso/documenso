@@ -5,3 +5,7 @@ export const formatTeamUrl = (teamUrl: string, baseUrl?: string) => {
 
   return `${formattedBaseUrl}/t/${teamUrl}`;
 };
+
+export const formatDocumentsPath = (teamUrl?: string) => {
+  return teamUrl ? `/t/${teamUrl}/documents` : '/documents';
+};

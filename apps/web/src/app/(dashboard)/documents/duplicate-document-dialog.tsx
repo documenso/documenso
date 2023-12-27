@@ -1,5 +1,6 @@
 import { useRouter } from 'next/navigation';
 
+import { formatDocumentsPath } from '@documenso/lib/utils/teams';
 import { trpc as trpcReact } from '@documenso/trpc/react';
 import { Button } from '@documenso/ui/primitives/button';
 import {
@@ -39,7 +40,7 @@ export const DuplicateDocumentDialog = ({
       }
     : undefined;
 
-  const documentsPath = teamUrl ? `/t/${teamUrl}/documents` : '/documents';
+  const documentsPath = formatDocumentsPath(teamUrl);
 
   const { mutateAsync: duplicateDocument, isLoading: isDuplicateLoading } =
     trpcReact.document.duplicateDocument.useMutation({

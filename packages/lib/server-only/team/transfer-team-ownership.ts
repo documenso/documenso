@@ -53,8 +53,6 @@ export const transferTeamOwnership = async ({ token }: TransferTeamOwnershipOpti
       );
     }
 
-    // Todo: Teams - Add billing message in email indicating that billing will be passed on when transferring a team.
-
     await tx.team.update({
       where: {
         id: team.id,

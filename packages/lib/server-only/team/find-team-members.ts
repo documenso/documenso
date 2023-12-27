@@ -1,9 +1,10 @@
 import { P, match } from 'ts-pattern';
 
 import { prisma } from '@documenso/prisma';
-import { Prisma, TeamMember } from '@documenso/prisma/client';
+import type { TeamMember } from '@documenso/prisma/client';
+import { Prisma } from '@documenso/prisma/client';
 
-import { FindResultSet } from '../../types/find-result-set';
+import type { FindResultSet } from '../../types/find-result-set';
 
 export interface FindTeamMembersOptions {
   userId: number;
@@ -37,7 +38,6 @@ export const findTeamMembers = async ({
           userId,
         },
       },
-      // Todo: Teams - Should only certain roles be able to find members?
     },
   });
 

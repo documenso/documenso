@@ -7,6 +7,7 @@ import { useSession } from 'next-auth/react';
 import { match } from 'ts-pattern';
 
 import { getFile } from '@documenso/lib/universal/upload/get-file';
+import { formatDocumentsPath } from '@documenso/lib/utils/teams';
 import type { Document, Recipient, User } from '@documenso/prisma/client';
 import { DocumentStatus, SigningStatus } from '@documenso/prisma/client';
 import type { DocumentWithData } from '@documenso/prisma/types/document-with-data';
@@ -39,8 +40,7 @@ export const DataTableActionButton = ({ row, teamUrl }: DataTableActionButtonPro
   const isComplete = row.status === DocumentStatus.COMPLETED;
   const isSigned = recipient?.signingStatus === SigningStatus.SIGNED;
 
-  // Todo: Teams - Extract calculation.
-  const documentsPath = teamUrl ? `/t/${teamUrl}/documents` : '/documents';
+  const documentsPath = formatDocumentsPath(teamUrl);
 
   const onDownloadClick = async () => {
     try {

@@ -126,10 +126,9 @@ export default function TeamBillingInvoicesDataTable({
         rows: 3,
         component: (
           <>
-            {/* Todo: Teams */}
             <TableCell className="w-1/3 py-4 pr-4">
               <div className="flex w-full flex-row items-center">
-                <Skeleton className="h-12 w-12 flex-shrink-0 rounded-full" />
+                <Skeleton className="h-7 w-7 flex-shrink-0 rounded" />
 
                 <div className="ml-2 flex flex-grow flex-col">
                   <Skeleton className="h-4 w-1/2 max-w-[8rem]" />

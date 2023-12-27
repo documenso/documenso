@@ -38,7 +38,6 @@ export const MobileNav = ({ className, ...props }: MobileNavProps) => {
         </Button>
       </Link>
 
-      {/* Todo: Teams */}
       <Link href="/settings/teams">
         <Button
           variant="ghost"

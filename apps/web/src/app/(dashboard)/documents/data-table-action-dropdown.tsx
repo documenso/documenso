@@ -18,6 +18,7 @@ import {
 import { useSession } from 'next-auth/react';
 
 import { getFile } from '@documenso/lib/universal/upload/get-file';
+import { formatDocumentsPath } from '@documenso/lib/utils/teams';
 import type { Document, Recipient, User } from '@documenso/prisma/client';
 import { DocumentStatus } from '@documenso/prisma/client';
 import type { DocumentWithData } from '@documenso/prisma/types/document-with-data';
@@ -63,7 +64,7 @@ export const DataTableActionDropdown = ({ row, teamUrl }: DataTableActionDropdow
   // const isSigned = recipient?.signingStatus === SigningStatus.SIGNED;
   const isDocumentDeletable = isOwner;
 
-  const documentsPath = teamUrl ? `/t/${teamUrl}/documents` : '/documents';
+  const documentsPath = formatDocumentsPath(teamUrl);
 
   const onDownloadClick = async () => {
     let document: DocumentWithData | null = null;

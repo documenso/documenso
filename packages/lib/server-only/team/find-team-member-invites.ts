@@ -38,7 +38,6 @@ export const findTeamMemberInvites = async ({
           userId,
         },
       },
-      // Todo: Teams - Should only certain roles be able to find members?
     },
   });
 
