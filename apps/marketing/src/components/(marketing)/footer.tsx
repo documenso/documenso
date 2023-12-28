@@ -70,7 +70,7 @@ export const Footer = ({ className, ...props }: FooterProps) => {
               key={index}
               href={link.href}
               target={link.target}
-              className="text-muted-foreground hover:text-muted-foreground/80 flex-shrink-0 text-sm break-words"
+              className="text-muted-foreground hover:text-muted-foreground/80 flex-shrink-0 break-words text-sm"
             >
               {link.text}
             </Link>
