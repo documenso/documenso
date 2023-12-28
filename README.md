@@ -284,7 +284,7 @@ WantedBy=multi-user.target
 
 ### Render
 
-[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/documenso/documenso)
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/sergewilfried/documenso)
 
 ## Troubleshooting
 
