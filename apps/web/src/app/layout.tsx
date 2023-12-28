@@ -16,6 +16,8 @@ import { PostHogPageview } from '~/providers/posthog';
 
 import './globals.css';
 
+dasdas;
+
 const fontInter = Inter({ subsets: ['latin'], variable: '--font-sans' });
 const fontCaveat = Caveat({ subsets: ['latin'], variable: '--font-signature' });
 
