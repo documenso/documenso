@@ -38,7 +38,7 @@ export default async function CompletedSigningPage({
     return notFound();
   }
 
-  const truncatedTitle = truncateTitle(document.title, 16);
+  const truncatedTitle = truncateTitle(document.title);
 
   const { documentData } = document;
 

@@ -25,7 +25,7 @@ export const SignDialog = ({
   onSignatureComplete,
 }: SignDialogProps) => {
   const [showDialog, setShowDialog] = useState(false);
-  const truncatedTitle = truncateTitle(document.title, 16);
+  const truncatedTitle = truncateTitle(document.title);
   const isComplete = fields.every((field) => field.inserted);
 
   return (

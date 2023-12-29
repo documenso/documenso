@@ -1,4 +1,4 @@
-export const truncateTitle = (title: string, maxLength: number) => {
+export const truncateTitle = (title: string, maxLength: number = 16) => {
   if (title.length <= maxLength) {
     return title;
   }

@@ -53,7 +53,7 @@ export default async function SigningPage({ params: { token } }: SigningPageProp
     return notFound();
   }
 
-  const truncatedTitle = truncateTitle(document.title, 16);
+  const truncatedTitle = truncateTitle(document.title);
 
   const { documentData } = document;
 
