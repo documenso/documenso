@@ -1,5 +1,5 @@
 export const STEP = {
   EMAIL: 'EMAIL',
   NAME: 'NAME',
-  SIGN: "SIGN"
+  SIGN: 'SIGN',
 } as const;

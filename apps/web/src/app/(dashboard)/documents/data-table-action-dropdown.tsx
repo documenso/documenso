@@ -99,6 +99,7 @@ export const DataTableActionDropdown = ({ row }: DataTableActionDropdownProps) =
   };
 
   const nonSignedRecipients = row.Recipient.filter((item) => item.signingStatus !== 'SIGNED');
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger>
@@ -164,6 +165,7 @@ export const DataTableActionDropdown = ({ row }: DataTableActionDropdownProps) =
         <DeleteDocumentDialog
           id={row.id}
           status={row.status}
+          documentTitle={row.title}
           open={isDeleteDialogOpen}
           onOpenChange={setDeleteDialogOpen}
         />

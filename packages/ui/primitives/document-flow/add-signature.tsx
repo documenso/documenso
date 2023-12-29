@@ -7,11 +7,13 @@ import { DateTime } from 'luxon';
 import { useForm } from 'react-hook-form';
 import { match } from 'ts-pattern';
 
+import { DEFAULT_DOCUMENT_DATE_FORMAT } from '@documenso/lib/constants/date-formats';
 import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
 import { sortFieldsByPosition, validateFieldsInserted } from '@documenso/lib/utils/fields';
 import type { Field } from '@documenso/prisma/client';
 import { FieldType } from '@documenso/prisma/client';
 import type { FieldWithSignature } from '@documenso/prisma/types/field-with-signature';
+import type { DocumentFlowStep } from '@documenso/ui/primitives/document-flow/types';
 
 import { FieldToolTip } from '../../components/field/field-tooltip';
 import { cn } from '../../lib/utils';
@@ -34,7 +36,6 @@ import {
   SinglePlayerModeCustomTextField,
   SinglePlayerModeSignatureField,
 } from './single-player-mode-fields';
-import type { DocumentFlowStep } from './types';
 
 export type AddSignatureFormProps = {
   defaultValues?: TAddSignatureFormSchema;
@@ -140,7 +141,7 @@ export const AddSignatureFormPartial = ({
     return match(field.type)
       .with(FieldType.DATE, () => ({
         ...field,
-        customText: DateTime.now().toFormat('yyyy-MM-dd hh:mm a'),
+        customText: DateTime.now().toFormat(DEFAULT_DOCUMENT_DATE_FORMAT),
         inserted: true,
       }))
       .with(FieldType.EMAIL, () => ({
