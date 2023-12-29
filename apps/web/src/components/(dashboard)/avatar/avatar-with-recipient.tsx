@@ -40,9 +40,9 @@ export function AvatarWithRecipient({ recipient }: AvatarWithRecipientProps) {
           className="text-muted-foreground text-sm hover:underline"
           title="Click to copy signing link for sending to recipient"
         >
-          {recipient.email}
+          {recipient.email}{' '}
+          <span className="text-muted-foreground/50 uppercase">({recipient.role})</span>
         </p>
-        <p className="text-muted-foreground/50 text-xs">{recipient.role}</p>
       </div>
     </div>
   );

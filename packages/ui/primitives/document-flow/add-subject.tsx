@@ -106,7 +106,6 @@ export const AddSubjectFormPartial = ({
 
               <Input
                 id="subject"
-                // placeholder="Subject"
                 className="bg-background mt-2"
                 disabled={isSubmitting}
                 {...register('meta.subject')}

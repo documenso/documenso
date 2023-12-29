@@ -4,7 +4,7 @@ import React, { useId } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { AnimatePresence, motion } from 'framer-motion';
-import { CheckCircle, CopyIcon, EyeIcon, PenIcon, Plus, Trash } from 'lucide-react';
+import { BadgeCheck, Copy, Eye, PencilLine, Plus, Trash } from 'lucide-react';
 import { Controller, useFieldArray, useForm } from 'react-hook-form';
 
 import { useLimits } from '@documenso/ee/server-only/limits/provider/client';
@@ -30,6 +30,13 @@ import {
   DocumentFlowFormContainerStep,
 } from './document-flow-root';
 import type { DocumentFlowStep } from './types';
+
+const ROLE_ICONS: Record<RecipientRole, JSX.Element> = {
+  SIGNER: <PencilLine className="h-4 w-4" />,
+  APPROVER: <BadgeCheck className="h-4 w-4" />,
+  CC: <Copy className="h-4 w-4" />,
+  VIEWER: <Eye className="h-4 w-4" />,
+};
 
 export type AddSignersFormProps = {
   documentFlow: DocumentFlowStep;
@@ -187,55 +194,45 @@ export const AddSignersFormPartial = ({
                     )}
                   />
                 </div>
+
                 <div className="w-[60px]">
                   <Controller
                     control={control}
                     name={`signers.${index}.role`}
-                    render={({ field }) => (
-                      <div className="w-[60px]">
-                        <Input
-                          id={`signer-${signer.id}-role`}
-                          type="text"
-                          className="bg-background mt-2 hidden"
-                          value={field.value}
-                        />
-                        <Select onValueChange={(x) => field.onChange(x)}>
-                          <SelectTrigger className="w-[60px]">
-                            {field.value === RecipientRole.SIGNER && <PenIcon className="w-4" />}
-                            {field.value === RecipientRole.CC && <CopyIcon className="w-4" />}
-                            {field.value === RecipientRole.APPROVER && (
-                              <CheckCircle className="w-4" />
-                            )}
-                            {field.value === RecipientRole.VIEWER && <EyeIcon className="w-4" />}
-                          </SelectTrigger>
-                          <SelectContent className="" align="end">
-                            <SelectItem value={RecipientRole.SIGNER}>
-                              <div className="flex items-center">
-                                <PenIcon className="mr-2 w-4" />
-                                Signer
-                              </div>
-                            </SelectItem>
-                            <SelectItem value={RecipientRole.CC}>
-                              <div className="flex items-center">
-                                <CopyIcon className="mr-2 w-4" />
-                                Receives copy
-                              </div>
-                            </SelectItem>
-                            <SelectItem value={RecipientRole.APPROVER}>
-                              <div className="flex items-center">
-                                <CheckCircle className="mr-2 w-4" />
-                                Approver
-                              </div>
-                            </SelectItem>
-                            <SelectItem value={RecipientRole.VIEWER}>
-                              <div className="flex items-center">
-                                <EyeIcon className="mr-2 w-4" />
-                                Viewer
-                              </div>
-                            </SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
+                    render={({ field: { value, onChange } }) => (
+                      <Select value={value} onValueChange={(x) => onChange(x)}>
+                        <SelectTrigger className="bg-background">{ROLE_ICONS[value]}</SelectTrigger>
+
+                        <SelectContent className="" align="end">
+                          <SelectItem value={RecipientRole.SIGNER}>
+                            <div className="flex items-center">
+                              {ROLE_ICONS[RecipientRole.SIGNER]}
+                              Signer
+                            </div>
+                          </SelectItem>
+
+                          <SelectItem value={RecipientRole.CC}>
+                            <div className="flex items-center">
+                              {ROLE_ICONS[RecipientRole.CC]}
+                              Receives copy
+                            </div>
+                          </SelectItem>
+
+                          <SelectItem value={RecipientRole.APPROVER}>
+                            <div className="flex items-center">
+                              {ROLE_ICONS[RecipientRole.APPROVER]}
+                              Approver
+                            </div>
+                          </SelectItem>
+
+                          <SelectItem value={RecipientRole.VIEWER}>
+                            <div className="flex items-center">
+                              {ROLE_ICONS[RecipientRole.VIEWER]}
+                              Viewer
+                            </div>
+                          </SelectItem>
+                        </SelectContent>
+                      </Select>
                     )}
                   />
                 </div>

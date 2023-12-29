@@ -92,6 +92,7 @@ export const setRecipientsForDocument = async ({
           role: recipient.role,
           token: nanoid(),
           documentId,
+          sendStatus: recipient.role === RecipientRole.CC ? SendStatus.SENT : SendStatus.NOT_SENT,
           signingStatus:
             recipient.role === RecipientRole.CC ? SigningStatus.SIGNED : SigningStatus.NOT_SIGNED,
         },

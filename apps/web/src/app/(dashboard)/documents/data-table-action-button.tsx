@@ -83,7 +83,10 @@ export const DataTableActionButton = ({ row }: DataTableActionButtonProps) => {
     }
   };
 
-  if (recipient?.role === RecipientRole.CC && isComplete === false) return <div></div>;
+  // TODO: Consider if want to keep this logic for hiding viewing for CC'ers
+  if (recipient?.role === RecipientRole.CC && isComplete === false) {
+    return null;
+  }
 
   return match({
     isOwner,
@@ -104,47 +107,32 @@ export const DataTableActionButton = ({ row }: DataTableActionButtonProps) => {
     .with({ isRecipient: true, isPending: true, isSigned: false }, () => (
       <Button className="w-32" asChild>
         <Link href={`/sign/${recipient?.token}`}>
-          {role === RecipientRole.VIEWER && (
-            <>
-              <EyeIcon className="-ml-1 mr-2 h-4 w-4" />
-              View
-            </>
-          )}
-          {role === RecipientRole.SIGNER && (
-            <>
-              <Pencil className="-ml-1 mr-2 h-4 w-4" />
-              Sign
-            </>
-          )}
-          {role === RecipientRole.APPROVER && (
-            <>
-              <CheckCircle className="-ml-1 mr-2 h-4 w-4" />
-              Approve
-            </>
-          )}
+          {match(role)
+            .with(RecipientRole.SIGNER, () => (
+              <>
+                <Pencil className="-ml-1 mr-2 h-4 w-4" />
+                Sign
+              </>
+            ))
+            .with(RecipientRole.APPROVER, () => (
+              <>
+                <CheckCircle className="-ml-1 mr-2 h-4 w-4" />
+                Approve
+              </>
+            ))
+            .otherwise(() => (
+              <>
+                <EyeIcon className="-ml-1 mr-2 h-4 w-4" />
+                View
+              </>
+            ))}
         </Link>
       </Button>
     ))
     .with({ isPending: true, isSigned: true }, () => (
       <Button className="w-32" disabled={true}>
-        {role === RecipientRole.VIEWER && (
-          <>
-            <EyeIcon className="-ml-1 mr-2 inline h-4 w-4" />
-            View
-          </>
-        )}
-        {role === RecipientRole.SIGNER && (
-          <>
-            <Pencil className="-ml-1 mr-2 inline h-4 w-4" />
-            Sign
-          </>
-        )}
-        {role === RecipientRole.APPROVER && (
-          <>
-            <CheckCircle className="-ml-1 mr-2 h-4 w-4" />
-            Approve
-          </>
-        )}
+        <EyeIcon className="-ml-1 mr-2 h-4 w-4" />
+        View
       </Button>
     ))
     .with({ isComplete: true }, () => (
