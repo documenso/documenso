@@ -87,6 +87,7 @@ const DocumentDescription = {
 export type DocumentDropzoneProps = {
   className?: string;
   disabled?: boolean;
+  disabledMessage?: string;
   onDrop?: (_file: File) => void | Promise<void>;
   type?: 'document' | 'template';
   [key: string]: unknown;
@@ -96,6 +97,7 @@ export const DocumentDropzone = ({
   className,
   onDrop,
   disabled,
+  disabledMessage = 'You cannot upload documents at this time.',
   type = 'document',
   ...props
 }: DocumentDropzoneProps) => {
@@ -172,7 +174,9 @@ export const DocumentDropzone = ({
             {DocumentDescription[type].headline}
           </p>
 
-          <p className="text-muted-foreground/80 mt-1 text-sm ">Drag & drop your document here.</p>
+          <p className="text-muted-foreground/80 mt-1 text-sm">
+            {disabled ? disabledMessage : 'Drag & drop your document here.'}
+          </p>
         </CardContent>
       </Card>
     </motion.div>
