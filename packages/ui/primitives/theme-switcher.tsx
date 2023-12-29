@@ -4,6 +4,8 @@ import { useTheme } from 'next-themes';
 
 import { useIsMounted } from '@documenso/lib/client-only/hooks/use-is-mounted';
 
+import { THEMES_TYPE } from './constants';
+
 export const ThemeSwitcher = () => {
   const { theme, setTheme } = useTheme();
   const isMounted = useIsMounted();
@@ -12,9 +14,9 @@ export const ThemeSwitcher = () => {
     <div className="bg-muted flex items-center gap-x-1 rounded-full p-1">
       <button
         className="text-muted-foreground relative z-10 flex h-8 w-8 items-center justify-center rounded-full"
-        onClick={() => setTheme('light')}
+        onClick={() => setTheme(THEMES_TYPE.LIGHT)}
       >
-        {isMounted && theme === 'light' && (
+        {isMounted && theme === THEMES_TYPE.LIGHT && (
           <motion.div
             className="bg-background absolute inset-0 rounded-full mix-blend-exclusion"
             layoutId="selected-theme"
@@ -25,9 +27,9 @@ export const ThemeSwitcher = () => {
 
       <button
         className="text-muted-foreground relative z-10 flex h-8 w-8 items-center justify-center rounded-full"
-        onClick={() => setTheme('dark')}
+        onClick={() => setTheme(THEMES_TYPE.DARK)}
       >
-        {isMounted && theme === 'dark' && (
+        {isMounted && theme === THEMES_TYPE.DARK && (
           <motion.div
             className="bg-background absolute inset-0 rounded-full mix-blend-exclusion"
             layoutId="selected-theme"
@@ -39,9 +41,9 @@ export const ThemeSwitcher = () => {
 
       <button
         className="text-muted-foreground relative z-10 flex h-8 w-8 items-center justify-center rounded-full"
-        onClick={() => setTheme('system')}
+        onClick={() => setTheme(THEMES_TYPE.SYSTEM)}
       >
-        {isMounted && theme === 'system' && (
+        {isMounted && theme === THEMES_TYPE.SYSTEM && (
           <motion.div
             className="bg-background absolute inset-0 rounded-full mix-blend-exclusion"
             layoutId="selected-theme"

@@ -179,13 +179,15 @@ export const documentRouter = router({
     .input(ZSendDocumentMutationSchema)
     .mutation(async ({ input, ctx }) => {
       try {
-        const { documentId, email } = input;
+        const { documentId, meta } = input;
 
-        if (email.message || email.subject) {
+        if (meta.message || meta.subject || meta.timezone || meta.dateFormat) {
           await upsertDocumentMeta({
             documentId,
-            subject: email.subject,
-            message: email.message,
+            subject: meta.subject,
+            message: meta.message,
+            dateFormat: meta.dateFormat,
+            timezone: meta.timezone,
           });
         }
 
