@@ -3,7 +3,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 
 import { Loader } from 'lucide-react';
-import { PasswordResponses, type PDFDocumentProxy } from 'pdfjs-dist';
+import { type PDFDocumentProxy, PasswordResponses } from 'pdfjs-dist';
 import { Document as PDFDocument, Page as PDFPage, pdfjs } from 'react-pdf';
 import 'react-pdf/dist/esm/Page/AnnotationLayer.css';
 import 'react-pdf/dist/esm/Page/TextLayer.css';
@@ -13,8 +13,8 @@ import { getFile } from '@documenso/lib/universal/upload/get-file';
 import type { DocumentData } from '@documenso/prisma/client';
 
 import { cn } from '../lib/utils';
-import { useToast } from './use-toast';
 import { PasswordDialog } from './document-password-dialog';
+import { useToast } from './use-toast';
 
 export type LoadedPDFDocument = PDFDocumentProxy;
 
@@ -82,14 +82,14 @@ export const PDFViewer = ({
     setNumPages(doc.numPages);
     onDocumentLoad?.(doc);
   };
-  
-  const handlePasswordSubmit = () => {
+
+  const onPasswordSubmit = () => {
     setIsPasswordModalOpen(false);
     if (passwordCallbackRef.current) {
       passwordCallbackRef.current(password);
       passwordCallbackRef.current = null;
     }
-  }
+  };
 
   const onDocumentPageClick = (
     event: React.MouseEvent<HTMLDivElement, MouseEvent>,
@@ -183,80 +183,80 @@ export const PDFViewer = ({
         </div>
       ) : (
         <>
-        <PDFDocument
-          file={documentBytes.buffer}
-          className={cn('w-full overflow-hidden rounded', {
-            'h-[80vh] max-h-[60rem]': numPages === 0,
-          })}
-          onPassword={(callback, reason) => {
-            setIsPasswordModalOpen(true);
-            passwordCallbackRef.current = callback;
-            switch (reason) {
-              case PasswordResponses.NEED_PASSWORD:
-                setIsPasswordError(false);
-                break;
-              case PasswordResponses.INCORRECT_PASSWORD:
-                setIsPasswordError(true);
-                break;
-              default:
-                break;
+          <PDFDocument
+            file={documentBytes.buffer}
+            className={cn('w-full overflow-hidden rounded', {
+              'h-[80vh] max-h-[60rem]': numPages === 0,
+            })}
+            onPassword={(callback, reason) => {
+              setIsPasswordModalOpen(true);
+              passwordCallbackRef.current = callback;
+              switch (reason) {
+                case PasswordResponses.NEED_PASSWORD:
+                  setIsPasswordError(false);
+                  break;
+                case PasswordResponses.INCORRECT_PASSWORD:
+                  setIsPasswordError(true);
+                  break;
+                default:
+                  break;
+              }
+            }}
+            onLoadSuccess={(d) => onDocumentLoaded(d)}
+            // Uploading a invalid document causes an error which doesn't appear to be handled by the `error` prop.
+            // Therefore we add some additional custom error handling.
+            onSourceError={() => {
+              setPdfError(true);
+            }}
+            externalLinkTarget="_blank"
+            loading={
+              <div className="dark:bg-background flex h-[80vh] max-h-[60rem] flex-col items-center justify-center bg-white/50">
+                {pdfError ? (
+                  <div className="text-muted-foreground text-center">
+                    <p>Something went wrong while loading the document.</p>
+                    <p className="mt-1 text-sm">Please try again or contact our support.</p>
+                  </div>
+                ) : (
+                  <PDFLoader />
+                )}
+              </div>
             }
-          }}
-          onLoadSuccess={(d) => onDocumentLoaded(d)}
-          // Uploading a invalid document causes an error which doesn't appear to be handled by the `error` prop.
-          // Therefore we add some additional custom error handling.
-          onSourceError={() => {
-            setPdfError(true);
-          }}
-          externalLinkTarget="_blank"
-          loading={
-            <div className="dark:bg-background flex h-[80vh] max-h-[60rem] flex-col items-center justify-center bg-white/50">
-              {pdfError ? (
+            error={
+              <div className="dark:bg-background flex h-[80vh] max-h-[60rem] flex-col items-center justify-center bg-white/50">
                 <div className="text-muted-foreground text-center">
                   <p>Something went wrong while loading the document.</p>
                   <p className="mt-1 text-sm">Please try again or contact our support.</p>
                 </div>
-              ) : (
-                <PDFLoader />
-              )}
-            </div>
-          }
-          error={
-            <div className="dark:bg-background flex h-[80vh] max-h-[60rem] flex-col items-center justify-center bg-white/50">
-              <div className="text-muted-foreground text-center">
-                <p>Something went wrong while loading the document.</p>
-                <p className="mt-1 text-sm">Please try again or contact our support.</p>
               </div>
-            </div>
-          }
-        >
-          {Array(numPages)
-            .fill(null)
-            .map((_, i) => (
-              <div
-                key={i}
-                className="border-border my-8 overflow-hidden rounded border will-change-transform first:mt-0 last:mb-0"
-              >
-                <PDFPage
-                  pageNumber={i + 1}
-                  width={width}
-                  renderAnnotationLayer={false}
-                  renderTextLayer={false}
-                  loading={() => ''}
-                  onClick={(e) => onDocumentPageClick(e, i + 1)}
-                />
-              </div>
-            ))}
-        </PDFDocument>
-        <PasswordDialog
-          open={isPasswordModalOpen}
-          onOpenChange={setIsPasswordModalOpen}
-          handleSubmit={handlePasswordSubmit}
-          isError={isPasswordError}
-          setPassword={setPassword} 
-        />
+            }
+          >
+            {Array(numPages)
+              .fill(null)
+              .map((_, i) => (
+                <div
+                  key={i}
+                  className="border-border my-8 overflow-hidden rounded border will-change-transform first:mt-0 last:mb-0"
+                >
+                  <PDFPage
+                    pageNumber={i + 1}
+                    width={width}
+                    renderAnnotationLayer={false}
+                    renderTextLayer={false}
+                    loading={() => ''}
+                    onClick={(e) => onDocumentPageClick(e, i + 1)}
+                  />
+                </div>
+              ))}
+          </PDFDocument>
+          <PasswordDialog
+            open={isPasswordModalOpen}
+            onOpenChange={setIsPasswordModalOpen}
+            onPasswordSubmit={onPasswordSubmit}
+            isError={isPasswordError}
+            setPassword={setPassword}
+          />
         </>
-      )} 
+      )}
     </div>
   );
 };
