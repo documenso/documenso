@@ -13,14 +13,15 @@ import {
 import { StackAvatars } from './stack-avatars';
 import { StackAvatarsComponent } from './stack-avatars-component';
 
-export type StackAvatarsWithUIProps = {
+export type StackAvatarsUIProps = {
   recipients: Recipient[];
   position?: 'top' | 'bottom';
   children?: React.ReactNode;
 };
 
-export const StackAvatarsWithUI = ({ recipients, position, children }: StackAvatarsWithUIProps) => {
+export const StackAvatarsUI = ({ recipients, position, children }: StackAvatarsUIProps) => {
   const size = useWindowSize();
+
   return (
     <>
       {size.width > 1050 ? (
