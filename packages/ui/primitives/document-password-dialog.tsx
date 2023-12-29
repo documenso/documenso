@@ -28,19 +28,19 @@ export const PasswordDialog = ({ open, onOpenChange, handleSubmit, isError, setP
           <DialogTitle>Password Required</DialogTitle>
           <DialogDescription>
             {isError ? (
-              <p className="text-red-500">Incorrect password. Please try again.</p>
+              <span className="text-red-500">Incorrect password. Please try again.</span>
             ) : (
-              <p className="text-muted-foreground">
+              <span className="text-muted-foreground">
                 This document is password protected. Please enter the password to view the document.
-              </p>
+              </span>
             )}
           </DialogDescription>
         </DialogHeader>
         <DialogFooter className="flex w-full items-center justify-center gap-4">
           <Input
-            id="password"
             type="password"
             className="bg-background mt-1.5"
+            placeholder='Enter password'
             onChange={(e) => setPassword(e.target.value)}
           />
           <Button onClick={handleSubmit}>Submit</Button>
