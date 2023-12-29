@@ -115,7 +115,7 @@ To run Documenso locally, you will need
 
 Want to get up and running quickly? Follow these steps:
 
-1. [Fork this repository ](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/working-with-forks/about-forks) to your github account.
+1. [Fork this repository](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/working-with-forks/about-forks) to your GitHub account.
 
 After forking clone it using the below command:
 
@@ -154,7 +154,7 @@ npm run d
 
 Follow these steps to setup Documenso on your local machine:
 
-1. [Fork this repository](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/working-with-forks/about-forks) it to your github account.
+1. [Fork this repository](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/working-with-forks/about-forks) to your GitHub account.
 
 After forking clone it using the below command:
 
@@ -231,7 +231,7 @@ cp .env.example .env
 
 The following environment variables must be set:
 
-* `NEXTAUTH_URL`  
+* `NEXTAUTH_URL`
 * `NEXTAUTH_SECRET`
 * `NEXT_PUBLIC_WEBAPP_URL`
 * `NEXT_PUBLIC_MARKETING_URL`
