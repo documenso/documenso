@@ -17,6 +17,8 @@ import { Card, CardContent } from '@documenso/ui/primitives/card';
 import { ElementVisible } from '@documenso/ui/primitives/element-visible';
 import { LazyPDFViewer } from '@documenso/ui/primitives/lazy-pdf-viewer';
 
+import { truncateTitle } from '~/helpers/truncate-title';
+
 import { DateField } from './date-field';
 import { EmailField } from './email-field';
 import { SigningForm } from './form';
@@ -51,6 +53,8 @@ export default async function SigningPage({ params: { token } }: SigningPageProp
     return notFound();
   }
 
+  const truncatedTitle = truncateTitle(document.title, 16);
+
   const { documentData } = document;
 
   const { user } = await getServerComponentSession();
@@ -82,7 +86,7 @@ export default async function SigningPage({ params: { token } }: SigningPageProp
     >
       <div className="mx-auto w-full max-w-screen-xl">
         <h1 className="mt-4 truncate text-2xl font-semibold md:text-3xl" title={document.title}>
-          {document.title}
+          {truncatedTitle}
         </h1>
 
         <div className="mt-2.5 flex items-center gap-x-6">
