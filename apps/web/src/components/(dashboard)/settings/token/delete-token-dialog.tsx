@@ -1,3 +1,5 @@
+'use client';
+
 import { useEffect, useState } from 'react';
 
 import { useRouter } from 'next/navigation';
@@ -6,6 +8,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
+import type { ApiToken } from '@documenso/prisma/client';
 import { trpc } from '@documenso/trpc/react';
 import { Button } from '@documenso/ui/primitives/button';
 import {
@@ -29,24 +32,18 @@ import { Input } from '@documenso/ui/primitives/input';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
 export type DeleteTokenDialogProps = {
-  trigger?: React.ReactNode;
-  tokenId: number;
-  tokenName: string;
-  onDelete: () => void;
+  token: Pick<ApiToken, 'id' | 'name'>;
+  onDelete?: () => void;
+  children?: React.ReactNode;
 };
 
-export default function DeleteTokenDialog({
-  trigger,
-  tokenId,
-  tokenName,
-  onDelete,
-}: DeleteTokenDialogProps) {
+export default function DeleteTokenDialog({ token, onDelete, children }: DeleteTokenDialogProps) {
   const router = useRouter();
   const { toast } = useToast();
-  const [isOpen, setIsOpen] = useState(false);
-  const [isDeleteEnabled, setIsDeleteEnabled] = useState(false);
 
-  const deleteMessage = `delete ${tokenName}`;
+  const [isOpen, setIsOpen] = useState(false);
+
+  const deleteMessage = `delete ${token.name}`;
 
   const ZDeleteTokenDialogSchema = z.object({
     tokenName: z.literal(deleteMessage, {
@@ -58,7 +55,7 @@ export default function DeleteTokenDialog({
 
   const { mutateAsync: deleteTokenMutation } = trpc.apiToken.deleteTokenById.useMutation({
     onSuccess() {
-      onDelete();
+      onDelete?.();
     },
   });
 
@@ -69,14 +66,10 @@ export default function DeleteTokenDialog({
     },
   });
 
-  const onInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setIsDeleteEnabled(event.target.value === deleteMessage);
-  };
-
   const onSubmit = async () => {
     try {
       await deleteTokenMutation({
-        id: tokenId,
+        id: token.id,
       });
 
       toast({
@@ -86,7 +79,8 @@ export default function DeleteTokenDialog({
       });
 
       setIsOpen(false);
-      router.push('/settings/token');
+
+      router.refresh();
     } catch (error) {
       toast({
         title: 'An unknown error occurred',
@@ -100,7 +94,6 @@ export default function DeleteTokenDialog({
 
   useEffect(() => {
     if (!isOpen) {
-      setIsDeleteEnabled(false);
       form.reset();
     }
   }, [isOpen, form]);
@@ -111,12 +104,13 @@ export default function DeleteTokenDialog({
       onOpenChange={(value) => !form.formState.isSubmitting && setIsOpen(value)}
     >
       <DialogTrigger asChild={true}>
-        {trigger ?? (
+        {children ?? (
           <Button className="mr-4" variant="destructive">
             Delete
           </Button>
         )}
       </DialogTrigger>
+
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Are you sure you want to delete this token?</DialogTitle>
@@ -144,21 +138,15 @@ export default function DeleteTokenDialog({
                         {deleteMessage}
                       </span>
                     </FormLabel>
+
                     <FormControl>
-                      <Input
-                        className="bg-background"
-                        type="text"
-                        {...field}
-                        onChange={(value) => {
-                          onInputChange(value);
-                          field.onChange(value);
-                        }}
-                      />
+                      <Input className="bg-background" type="text" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
+
               <DialogFooter>
                 <div className="flex w-full flex-1 flex-nowrap gap-4">
                   <Button
@@ -173,7 +161,7 @@ export default function DeleteTokenDialog({
                   <Button
                     type="submit"
                     variant="destructive"
-                    disabled={!isDeleteEnabled}
+                    disabled={!form.formState.isValid}
                     loading={form.formState.isSubmitting}
                   >
                     I'm sure! Delete it

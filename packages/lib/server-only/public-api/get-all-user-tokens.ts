@@ -5,7 +5,7 @@ export type GetUserTokensOptions = {
 };
 
 export const getUserTokens = async ({ userId }: GetUserTokensOptions) => {
-  return prisma.apiToken.findMany({
+  return await prisma.apiToken.findMany({
     where: {
       userId,
     },
@@ -15,6 +15,9 @@ export const getUserTokens = async ({ userId }: GetUserTokensOptions) => {
       algorithm: true,
       createdAt: true,
       expires: true,
+    },
+    orderBy: {
+      createdAt: 'desc',
     },
   });
 };

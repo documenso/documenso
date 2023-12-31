@@ -5,20 +5,21 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Loader } from 'lucide-react';
-import { DateTime } from 'luxon';
 import { useForm } from 'react-hook-form';
 import type { z } from 'zod';
 
 import { useCopyToClipboard } from '@documenso/lib/client-only/hooks/use-copy-to-clipboard';
 import { TRPCClientError } from '@documenso/trpc/client';
 import { trpc } from '@documenso/trpc/react';
+import type { TCreateTokenMutationSchema } from '@documenso/trpc/server/api-token-router/schema';
 import { ZCreateTokenMutationSchema } from '@documenso/trpc/server/api-token-router/schema';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
+import { Card, CardContent } from '@documenso/ui/primitives/card';
 import {
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -27,45 +28,34 @@ import {
 import { Input } from '@documenso/ui/primitives/input';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
-import DeleteTokenDialog from '~/components/(dashboard)/settings/token/delete-token-dialog';
+const ZCreateTokenFormSchema = ZCreateTokenMutationSchema;
+
+type TCreateTokenFormSchema = z.infer<typeof ZCreateTokenFormSchema>;
 
 export type ApiTokenFormProps = {
   className?: string;
 };
 
-type TCreateTokenMutationSchema = z.infer<typeof ZCreateTokenMutationSchema>;
-
 export const ApiTokenForm = ({ className }: ApiTokenFormProps) => {
   const router = useRouter();
+
   const [, copy] = useCopyToClipboard();
   const { toast } = useToast();
-  const [newlyCreatedToken, setNewlyCreatedToken] = useState({ id: 0, token: '' });
-  const [showNewToken, setShowNewToken] = useState(false);
 
-  const { data: tokens, isLoading: isTokensLoading } = trpc.apiToken.getTokens.useQuery();
+  const [newlyCreatedToken, setNewlyCreatedToken] = useState('');
+
   const { mutateAsync: createTokenMutation } = trpc.apiToken.createToken.useMutation({
     onSuccess(data) {
-      setNewlyCreatedToken({ id: data.id, token: data.token });
+      setNewlyCreatedToken(data.token);
     },
   });
 
-  const form = useForm<TCreateTokenMutationSchema>({
-    resolver: zodResolver(ZCreateTokenMutationSchema),
-    values: {
+  const form = useForm<TCreateTokenFormSchema>({
+    resolver: zodResolver(ZCreateTokenFormSchema),
+    defaultValues: {
       tokenName: '',
     },
   });
-
-  /* 
-    This method is called in "delete-token-dialog.tsx" after a successful mutation
-    to avoid deleting the snippet with the newly created token from the screen
-    when users delete any of their tokens except the newly created one.
-  */
-  const onDelete = (tokenId: number) => {
-    if (tokenId === newlyCreatedToken.id) {
-      setShowNewToken(false);
-    }
-  };
 
   const copyToken = async (token: string) => {
     try {
@@ -100,8 +90,8 @@ export const ApiTokenForm = ({ className }: ApiTokenFormProps) => {
         duration: 5000,
       });
 
-      setShowNewToken(true);
       form.reset();
+
       router.refresh();
     } catch (error) {
       if (error instanceof TRPCClientError && error.data?.code === 'BAD_REQUEST') {
@@ -124,94 +114,42 @@ export const ApiTokenForm = ({ className }: ApiTokenFormProps) => {
 
   return (
     <div className={cn(className)}>
-      <h2 className="mt-6 text-xl">Your existing tokens</h2>
-      {tokens?.length === 0 ? (
-        <div className="mb-4">
-          <p className="text-muted-foreground mt-2 text-sm italic">
-            Your tokens will be shown here once you create them.
-          </p>
-        </div>
-      ) : (
-        <div></div>
-      )}
-
-      {!tokens && isTokensLoading ? (
-        <div className="absolute inset-0 flex items-center justify-center bg-white/50">
-          <Loader className="h-8 w-8 animate-spin text-gray-500" />
-        </div>
-      ) : (
-        <ul className="mb-4 flex flex-col gap-2">
-          {tokens?.map((token) => (
-            <li
-              className="border-muted mb-4 mt-4 break-words rounded-sm border-2 p-4"
-              key={token.id}
-            >
-              <div>
-                <p className="mb-4">
-                  {token.name} <span className="text-sm italic">({token.algorithm})</span>
-                </p>
-                <p className="text-sm">
-                  Created:{' '}
-                  {token.createdAt
-                    ? DateTime.fromJSDate(token.createdAt).toLocaleString(DateTime.DATETIME_FULL)
-                    : 'N/A'}
-                </p>
-                <p className="mb-4 text-sm">
-                  Expires:{' '}
-                  {token.expires
-                    ? DateTime.fromJSDate(token.expires).toLocaleString(DateTime.DATETIME_FULL)
-                    : 'N/A'}
-                </p>
-                <DeleteTokenDialog
-                  tokenId={token.id}
-                  tokenName={token.name}
-                  onDelete={() => onDelete(token.id)}
-                />
-              </div>
-            </li>
-          ))}
-        </ul>
-      )}
-
-      {newlyCreatedToken.token && showNewToken && (
-        <div className="border-primary mb-8 break-words rounded-sm border p-4">
-          <p className="text-muted-foreground mt-2 text-sm italic">
-            Your token was created successfully! Make sure to copy it because you won't be able to
-            see it again!
-          </p>
-          <p className="mb-4 mt-4 font-mono text-sm font-light">{newlyCreatedToken.token}</p>
-          <Button
-            variant="outline"
-            className="mt-4"
-            onClick={() => void copyToken(newlyCreatedToken.token)}
-          >
-            Copy token
-          </Button>
-        </div>
-      )}
-
-      <h2 className="text-xl">Create a new token</h2>
-      <p className="text-muted-foreground mt-2 text-sm italic">
-        Enter a representative name for your new token.
-      </p>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
-          <fieldset className="mt-6 flex w-full flex-col gap-y-4">
+          <fieldset className="mt-6 flex w-full flex-col gap-4 md:flex-row ">
             <FormField
               control={form.control}
               name="tokenName"
               render={({ field }) => (
-                <FormItem>
+                <FormItem className="flex-1">
                   <FormLabel className="text-muted-foreground">Token Name</FormLabel>
-                  <FormControl>
-                    <Input type="text" {...field} value={field.value ?? ''} />
-                  </FormControl>
+
+                  <div className="flex items-center gap-x-4">
+                    <FormControl className="flex-1">
+                      <Input type="text" {...field} />
+                    </FormControl>
+
+                    <Button
+                      type="submit"
+                      className="hidden md:inline-flex"
+                      disabled={!form.formState.isDirty}
+                      loading={form.formState.isSubmitting}
+                    >
+                      Create token
+                    </Button>
+                  </div>
+
+                  <FormDescription>
+                    Please enter a meaningful name for your token. This will help you identify it
+                    later.
+                  </FormDescription>
+
                   <FormMessage />
                 </FormItem>
               )}
             />
 
-            <div className="mt-4">
+            <div className="md:hidden">
               <Button
                 type="submit"
                 disabled={!form.formState.isDirty}
@@ -223,6 +161,25 @@ export const ApiTokenForm = ({ className }: ApiTokenFormProps) => {
           </fieldset>
         </form>
       </Form>
+
+      {newlyCreatedToken && (
+        <Card className="mt-8" gradient>
+          <CardContent className="p-4">
+            <p className="text-muted-foreground mt-2 text-sm">
+              Your token was created successfully! Make sure to copy it because you won't be able to
+              see it again!
+            </p>
+
+            <p className="bg-muted-foreground/10 my-4 rounded-md px-2.5 py-1 font-mono text-sm">
+              {newlyCreatedToken}
+            </p>
+
+            <Button variant="outline" onClick={() => void copyToken(newlyCreatedToken)}>
+              Copy token
+            </Button>
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 };
