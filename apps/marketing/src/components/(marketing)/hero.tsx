@@ -3,7 +3,8 @@
 import Image from 'next/image';
 import Link from 'next/link';
 
-import { Variants, motion } from 'framer-motion';
+import type { Variants } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { usePlausible } from 'next-plausible';
 import { LuGithub } from 'react-icons/lu';
 import { match } from 'ts-pattern';
@@ -234,7 +235,7 @@ export const Hero = ({ className, ...props }: HeroProps) => {
 
             <div>
               <strong>Timur Ercan & Lucas Smith</strong>
-              <p className="mt-1">Co-Founders, Documenso</p>
+              <p className="mt-1">Основатели, Documenso</p>
             </div>
           </Widget>
         </motion.div>

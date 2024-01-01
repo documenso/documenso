@@ -50,7 +50,7 @@ export const Header = ({ className, ...props }: HeaderProps) => {
           href="/pricing"
           className="text-muted-foreground hover:text-muted-foreground/80 text-sm font-semibold"
         >
-          Pricing
+          Тарифы
         </Link>
 
         <Link
