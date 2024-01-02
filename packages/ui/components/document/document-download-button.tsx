@@ -3,9 +3,10 @@
 import type { HTMLAttributes } from 'react';
 import { useState } from 'react';
 
+import { useToast } from '@/primitives/use-toast';
 import { Download } from 'lucide-react';
 
-import { downloadFile } from '@documenso/lib/client-only/download-pdf';
+import { downloadPDF } from '@documenso/lib/client-only/download-pdf';
 import type { DocumentData } from '@documenso/prisma/client';
 
 import { Button } from '../../primitives/button';
@@ -24,17 +25,29 @@ export const DocumentDownloadButton = ({
   ...props
 }: DownloadButtonProps) => {
   const [isLoading, setIsLoading] = useState(false);
+  const { toast } = useToast();
 
   const onDownloadClick = async () => {
-    setIsLoading(true);
+    try {
+      setIsLoading(true);
 
-    if (!documentData) {
-      return;
-    }
+      if (!documentData) {
+        setIsLoading(false);
+        return;
+      }
 
-    await downloadFile({ documentData, fileName }).then(() => {
+      await downloadPDF({ documentData, fileName }).then(() => {
+        setIsLoading(false);
+      });
+    } catch (err) {
       setIsLoading(false);
-    });
+
+      toast({
+        title: 'Something went wrong',
+        description: 'An error occurred while downloading your document.',
+        variant: 'destructive',
+      });
+    }
   };
 
   return (

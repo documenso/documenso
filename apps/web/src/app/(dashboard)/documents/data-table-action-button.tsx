@@ -6,12 +6,13 @@ import { Download, Edit, Pencil } from 'lucide-react';
 import { useSession } from 'next-auth/react';
 import { match } from 'ts-pattern';
 
-import { downloadFile } from '@documenso/lib/client-only/download-pdf';
+import { downloadPDF } from '@documenso/lib/client-only/download-pdf';
 import type { Document, Recipient, User } from '@documenso/prisma/client';
 import { DocumentStatus, SigningStatus } from '@documenso/prisma/client';
 import type { DocumentWithData } from '@documenso/prisma/types/document-with-data';
 import { trpc as trpcClient } from '@documenso/trpc/client';
 import { Button } from '@documenso/ui/primitives/button';
+import { useToast } from '@documenso/ui/primitives/use-toast';
 
 export type DataTableActionButtonProps = {
   row: Document & {
@@ -22,6 +23,7 @@ export type DataTableActionButtonProps = {
 
 export const DataTableActionButton = ({ row }: DataTableActionButtonProps) => {
   const { data: session } = useSession();
+  const { toast } = useToast();
 
   if (!session) {
     return null;
@@ -37,25 +39,33 @@ export const DataTableActionButton = ({ row }: DataTableActionButtonProps) => {
   const isSigned = recipient?.signingStatus === SigningStatus.SIGNED;
 
   const onDownloadClick = async () => {
-    let document: DocumentWithData | null = null;
+    try {
+      let document: DocumentWithData | null = null;
 
-    if (!recipient) {
-      document = await trpcClient.document.getDocumentById.query({
-        id: row.id,
-      });
-    } else {
-      document = await trpcClient.document.getDocumentByToken.query({
-        token: recipient.token,
+      if (!recipient) {
+        document = await trpcClient.document.getDocumentById.query({
+          id: row.id,
+        });
+      } else {
+        document = await trpcClient.document.getDocumentByToken.query({
+          token: recipient.token,
+        });
+      }
+
+      const documentData = document?.documentData;
+
+      if (!documentData) {
+        throw Error('No document available');
+      }
+
+      await downloadPDF({ documentData, fileName: row.title });
+    } catch (err) {
+      toast({
+        title: 'Something went wrong',
+        description: 'An error occurred while downloading your document.',
+        variant: 'destructive',
       });
     }
-
-    const documentData = document?.documentData;
-
-    if (!documentData) {
-      return;
-    }
-
-    await downloadFile({ documentData, fileName: row.title });
   };
 
   return match({

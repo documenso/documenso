@@ -17,7 +17,7 @@ import {
 } from 'lucide-react';
 import { useSession } from 'next-auth/react';
 
-import { downloadFile } from '@documenso/lib/client-only/download-pdf';
+import { downloadPDF } from '@documenso/lib/client-only/download-pdf';
 import type { Document, Recipient, User } from '@documenso/prisma/client';
 import { DocumentStatus } from '@documenso/prisma/client';
 import type { DocumentWithData } from '@documenso/prisma/types/document-with-data';
@@ -63,25 +63,33 @@ export const DataTableActionDropdown = ({ row }: DataTableActionDropdownProps) =
   const isDocumentDeletable = isOwner;
 
   const onDownloadClick = async () => {
-    let document: DocumentWithData | null = null;
+    try {
+      let document: DocumentWithData | null = null;
 
-    if (!recipient) {
-      document = await trpcClient.document.getDocumentById.query({
-        id: row.id,
-      });
-    } else {
-      document = await trpcClient.document.getDocumentByToken.query({
-        token: recipient.token,
+      if (!recipient) {
+        document = await trpcClient.document.getDocumentById.query({
+          id: row.id,
+        });
+      } else {
+        document = await trpcClient.document.getDocumentByToken.query({
+          token: recipient.token,
+        });
+      }
+
+      const documentData = document?.documentData;
+
+      if (!documentData) {
+        return;
+      }
+
+      await downloadPDF({ documentData, fileName: row.title });
+    } catch (err) {
+      toast({
+        title: 'Something went wrong',
+        description: 'An error occurred while downloading your document.',
+        variant: 'destructive',
       });
     }
-
-    const documentData = document?.documentData;
-
-    if (!documentData) {
-      return;
-    }
-
-    await downloadFile({ documentData, fileName: row.title });
   };
 
   const nonSignedRecipients = row.Recipient.filter((item) => item.signingStatus !== 'SIGNED');
