@@ -30,6 +30,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from '@documenso/ui/primitives/dropdown-menu';
+import { useToast } from '@documenso/ui/primitives/use-toast';
 
 import { ResendDocumentActionItem } from './_action-items/resend-document';
 import { DeleteDocumentDialog } from './delete-document-dialog';
@@ -44,6 +45,7 @@ export type DataTableActionDropdownProps = {
 
 export const DataTableActionDropdown = ({ row }: DataTableActionDropdownProps) => {
   const { data: session } = useSession();
+  const { toast } = useToast();
 
   const [isDeleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [isDuplicateDialogOpen, setDuplicateDialogOpen] = useState(false);

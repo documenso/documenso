@@ -3,11 +3,11 @@
 import type { HTMLAttributes } from 'react';
 import { useState } from 'react';
 
-import { useToast } from '@/primitives/use-toast';
 import { Download } from 'lucide-react';
 
 import { downloadPDF } from '@documenso/lib/client-only/download-pdf';
 import type { DocumentData } from '@documenso/prisma/client';
+import { useToast } from '@documenso/ui/primitives/use-toast';
 
 import { Button } from '../../primitives/button';
 
