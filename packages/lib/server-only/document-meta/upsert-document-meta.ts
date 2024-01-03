@@ -8,6 +8,7 @@ export type CreateDocumentMetaOptions = {
   message: string;
   timezone: string;
   dateFormat: string;
+  userId: number;
 };
 
 export const upsertDocumentMeta = async ({
@@ -16,7 +17,15 @@ export const upsertDocumentMeta = async ({
   timezone,
   dateFormat,
   documentId,
+  userId,
 }: CreateDocumentMetaOptions) => {
+  await prisma.document.findFirstOrThrow({
+    where: {
+      id: documentId,
+      userId,
+    },
+  });
+
   return await prisma.documentMeta.upsert({
     where: {
       documentId,

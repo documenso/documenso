@@ -188,6 +188,7 @@ export const documentRouter = router({
             message: meta.message,
             dateFormat: meta.dateFormat,
             timezone: meta.timezone,
+            userId: ctx.user.id,
           });
         }
 
