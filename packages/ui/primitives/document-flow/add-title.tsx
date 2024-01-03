@@ -64,7 +64,7 @@ export const AddTitleFormPartial = ({
 
               <Input
                 id="title"
-                className="bg-background mt-2"
+                className="bg-background my-2"
                 disabled={isSubmitting}
                 {...register('title', { required: "Title can't be empty" })}
               />

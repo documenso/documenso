@@ -86,6 +86,7 @@ export const SinglePlayerClient = () => {
       data.fields.map((field, i) => ({
         id: i,
         documentId: -1,
+        templateId: null,
         recipientId: -1,
         type: field.type,
         page: field.pageNumber,
@@ -148,6 +149,7 @@ export const SinglePlayerClient = () => {
   const placeholderRecipient: Recipient = {
     id: -1,
     documentId: -1,
+    templateId: null,
     email: '',
     name: '',
     token: '',

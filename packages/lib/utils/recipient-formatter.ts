@@ -1,4 +1,4 @@
-import { Recipient } from '@documenso/prisma/client';
+import type { Recipient } from '@documenso/prisma/client';
 
 export const recipientInitials = (text: string) =>
   text
