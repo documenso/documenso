@@ -4,8 +4,8 @@ import { useState } from 'react';
 
 import { useRouter } from 'next/navigation';
 
-import { DocumentStatus } from '@documenso/prisma/client';
 import type { DocumentData, Field, Recipient, User } from '@documenso/prisma/client';
+import { DocumentStatus } from '@documenso/prisma/client';
 import type { DocumentWithData } from '@documenso/prisma/types/document-with-data';
 import { trpc } from '@documenso/trpc/react';
 import { cn } from '@documenso/ui/lib/utils';
@@ -145,14 +145,16 @@ export const EditDocumentForm = ({
   };
 
   const onAddSubjectFormSubmit = async (data: TAddSubjectFormSchema) => {
-    const { subject, message } = data.email;
+    const { subject, message, timezone, dateFormat } = data.meta;
 
     try {
       await sendDocument({
         documentId: document.id,
-        email: {
+        meta: {
           subject,
           message,
+          timezone,
+          dateFormat,
         },
       });
 

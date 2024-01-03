@@ -1,6 +1,7 @@
+/** @type {import('lint-staged').Config} */
 module.exports = {
-  '**/*.{ts,tsx,cts,mts}': ['eslint --fix'],
-  '**/*.{js,jsx,cjs,mjs}': ['prettier --write'],
-  '**/*.{yml,mdx}': ['prettier --write'],
-  '**/*/package.json': ['npm run precommit'],
+  '**/*.{ts,tsx,cts,mts}': (files) => `eslint --fix ${files.join(' ')}`,
+  '**/*.{js,jsx,cjs,mjs}': (files) => `prettier --write ${files.join(' ')}`,
+  '**/*.{yml,mdx}': (files) => `prettier --write ${files.join(' ')}`,
+  '**/*/package.json': 'npm run precommit',
 };
