@@ -10,13 +10,6 @@ runs:
     - name: Cache production build
       uses: actions/cache@v3
       id: production-build-cache
-      env:
-        cache-name: prod-build
-        key-1: ${{ inputs.node_version }}-${{ hashFiles('**/package-lock.json') }}
-        key-2: ${{ hashFiles('apps/**/**.[jt]s', 'apps/**/**.[jt]sx', 'packages/**/**.[jt]s', 'packages/**/**.[jt]sx', '!**/node_modules') }}
-        key-3: ${{ github.event.pull_request.number || github.ref }}
-        # Ensures production-build.yml will always be fresh
-        key-4: ${{ github.sha }}
       with:
         path: |
           ${{ github.workspace }}/apps/web/.next
@@ -24,7 +17,8 @@ runs:
           **/.turbo/**
           **/dist/**
 
-        key: ${{ runner.os }}-${{ env.cache-name }}-${{ env.key-1 }}-${{ env.key-2 }}-${{ env.key-3 }}-${{ env.key-4 }}
+        key: prod-build-${{ github.run_id }}
+        restore-keys: prod-build-
 
     - run: npm run build
       shell: bash
