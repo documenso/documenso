@@ -22,9 +22,6 @@ jobs:
 
       - uses: ./.github/actions/playwright-install
 
-      - name: Generate Prisma Client
-        run: npm run prisma:generate -w @documenso/prisma
-
       - name: Create the database
         run: npm run prisma:migrate-dev
 

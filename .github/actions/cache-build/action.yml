@@ -22,4 +22,3 @@ runs:
 
     - run: npm run build
       shell: bash
-      if: steps.production-build-cache.outputs.cache-hit != 'true'
