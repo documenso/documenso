@@ -27,6 +27,7 @@ runs:
 
     - name: Install dependencies
       shell: bash
+      if: steps.cache-npm.outputs.cache-hit != 'true'
       run: |
         npm ci
         npm run prisma:generate
