@@ -12,6 +12,11 @@ runs:
       id: production-build-cache
       env:
         cache-name: prod-build
+        key-1: ${{ hashFiles('**/package-lock.json') }}
+        key-2: ${{ github.run_id }}
+
+        # Ensures production-build.yml will always be fresh
+        key-3: ${{ github.sha }}
       with:
         path: |
           ${{ github.workspace }}/apps/web/.next
@@ -19,7 +24,7 @@ runs:
           **/.turbo/**
           **/dist/**
 
-      key: ${{ runner.os }}-${{ env.cache-name }}-${{ github.run_id }}
+      key: ${{ runner.os }}-${{ env.cache-name }}-${{ env.key-1 }}-${{ env.key-2 }}-${{ env.key-3 }}
 
     - run: npm run build
       if: steps.production-build-cache.outputs.cache-hit != 'true'
