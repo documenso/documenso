@@ -27,7 +27,8 @@
       "cache": false
     },
     "test:e2e": {
-      "dependsOn": ["^build"]
+      "dependsOn": ["^build"],
+      "cache": false
     }
   },
   "globalDependencies": ["**/.env.*local"],
