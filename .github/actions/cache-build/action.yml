@@ -27,4 +27,5 @@ runs:
       key: ${{ runner.os }}-${{ env.cache-name }}-${{ env.key-1 }}-${{ env.key-2 }}-${{ env.key-3 }}
 
     - run: npm run build
+      shell: bash
       if: steps.production-build-cache.outputs.cache-hit != 'true'

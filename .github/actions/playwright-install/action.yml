@@ -16,3 +16,4 @@ runs:
     - name: Install playwright
       if: steps.cache-playwright.outputs.cache-hit != 'true'
       run: npx playwright install --with-deps
+      shell: bash

@@ -26,6 +26,7 @@ runs:
           ${{ runner.os }}
 
     - name: Install dependencies
+      shell: bash
       run: |
         npm ci
         npm run prisma:generate
