@@ -1,0 +1,16 @@
+name: Node install
+
+on:
+  workflow_call:
+
+jobs:
+  setup:
+    name: Setup Node & cache
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Copy env
+        run: cp .env.example .env
+
+      - uses: ./.github/actions/node-install
