@@ -31,7 +31,7 @@ export const SignDialog = ({
   const isComplete = fields.every((field) => field.inserted);
 
   return (
-    <Dialog open={showDialog && isComplete} onOpenChange={isComplete ? setShowDialog : undefined}>
+    <Dialog open={showDialog && isComplete} onOpenChange={setShowDialog}>
       <DialogTrigger asChild>
         <Button
           className="w-full"
