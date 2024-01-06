@@ -1,8 +1,13 @@
 import Link from 'next/link';
+import { redirect } from 'next/navigation';
 
 import { SignUpForm } from '~/components/forms/signup';
 
 export default function SignUpPage() {
+  if (process.env.NEXT_PUBLIC_DISABLE_SIGNUP === 'true') {
+    redirect('/signin');
+  }
+
   return (
     <div>
       <h1 className="text-4xl font-semibold">Create a new account</h1>

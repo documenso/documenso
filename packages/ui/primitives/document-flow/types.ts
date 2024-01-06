@@ -25,7 +25,7 @@ export const ZDocumentFlowFormSchema = z.object({
       nativeId: z.number().optional(),
       customFieldValue: z.string().min(0),
       type: z.nativeEnum(FieldType),
-      signerEmail: z.string().min(1),
+      signerEmail: z.string().min(1).optional(),
       pageNumber: z.number().min(1),
       pageX: z.number().min(0),
       pageY: z.number().min(0),
