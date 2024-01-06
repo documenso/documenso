@@ -2,8 +2,6 @@ import React from 'react';
 
 import { redirect } from 'next/navigation';
 
-import { getServerSession } from 'next-auth';
-
 import { LimitsProvider } from '@documenso/ee/server-only/limits/provider/server';
 import { NEXT_AUTH_OPTIONS } from '@documenso/lib/next-auth/auth-options';
 import { getRequiredServerComponentSession } from '@documenso/lib/next-auth/get-server-component-session';
