@@ -37,5 +37,13 @@ jobs:
         with:
           fetch-depth: 2
 
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
       - name: Build Docker Image
-        run: ./docker/build.sh
+        uses: docker/build-push-action@v5
+        with:
+          push: false
+          context: .
+          file: ./docker/Dockerfile
+          tags: documenso-${{ github.sha }}
