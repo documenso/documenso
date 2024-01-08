@@ -37,11 +37,10 @@ export const SignDialog = ({
           className="w-full"
           type="button"
           size="lg"
-          variant={isComplete ? 'default' : 'outline'}
           onClick={fieldsValidated}
           loading={isSubmitting}
         >
-          {isComplete ? 'Complete' : 'Fill fields'}
+          {isComplete ? 'Complete' : 'Next field'}
         </Button>
       </DialogTrigger>
       <DialogContent>
