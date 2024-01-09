@@ -44,16 +44,13 @@ export const sealDocument = async ({ documentId, sendEmail = true }: SealDocumen
   const recipients = await prisma.recipient.findMany({
     where: {
       documentId: document.id,
+      role: {
+        not: RecipientRole.CC,
+      },
     },
   });
 
-  if (
-    recipients.some(
-      (recipient) =>
-        recipient.signingStatus !== SigningStatus.SIGNED &&
-        (recipient.role === RecipientRole.SIGNER || recipient.role === RecipientRole.APPROVER),
-    )
-  ) {
+  if (recipients.some((recipient) => recipient.signingStatus !== SigningStatus.SIGNED)) {
     throw new Error(`Document ${document.id} has unsigned recipients`);
   }
 

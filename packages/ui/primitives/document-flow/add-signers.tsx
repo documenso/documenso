@@ -206,28 +206,28 @@ export const AddSignersFormPartial = ({
                         <SelectContent className="" align="end">
                           <SelectItem value={RecipientRole.SIGNER}>
                             <div className="flex items-center">
-                              {ROLE_ICONS[RecipientRole.SIGNER]}
+                              <span className="mr-2">{ROLE_ICONS[RecipientRole.SIGNER]}</span>
                               Signer
                             </div>
                           </SelectItem>
 
                           <SelectItem value={RecipientRole.CC}>
                             <div className="flex items-center">
-                              {ROLE_ICONS[RecipientRole.CC]}
+                              <span className="mr-2">{ROLE_ICONS[RecipientRole.CC]}</span>
                               Receives copy
                             </div>
                           </SelectItem>
 
                           <SelectItem value={RecipientRole.APPROVER}>
                             <div className="flex items-center">
-                              {ROLE_ICONS[RecipientRole.APPROVER]}
+                              <span className="mr-2">{ROLE_ICONS[RecipientRole.APPROVER]}</span>
                               Approver
                             </div>
                           </SelectItem>
 
                           <SelectItem value={RecipientRole.VIEWER}>
                             <div className="flex items-center">
-                              {ROLE_ICONS[RecipientRole.VIEWER]}
+                              <span className="mr-2">{ROLE_ICONS[RecipientRole.VIEWER]}</span>
                               Viewer
                             </div>
                           </SelectItem>

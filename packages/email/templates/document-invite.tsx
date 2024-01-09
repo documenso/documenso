@@ -32,12 +32,13 @@ export const DocumentInviteEmailTemplate = ({
   customBody,
   role,
 }: DocumentInviteEmailTemplateProps) => {
-  let action;
-  if (role === RecipientRole.SIGNER) {
-    action = 'sign';
-  } else if (role === RecipientRole.VIEWER) {
+  let action = 'sign';
+
+  if (role === RecipientRole.VIEWER) {
     action = 'view';
-  } else if (role === RecipientRole.APPROVER) {
+  }
+
+  if (role === RecipientRole.APPROVER) {
     action = 'approve';
   }
   const previewText = `${inviterName} has invited you to ${action} ${documentName}`;

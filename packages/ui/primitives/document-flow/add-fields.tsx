@@ -375,6 +375,7 @@ export const AddFieldsFormPartial = ({
               <PopoverContent className="p-0" align="start">
                 <Command>
                   <CommandInput />
+
                   <CommandEmpty>
                     <span className="text-muted-foreground inline-block px-4">
                       No recipient matching this description was found.
@@ -386,6 +387,15 @@ export const AddFieldsFormPartial = ({
                       <div className="text-muted-foreground/80 py-1 pl-2 text-xs uppercase">
                         {role}
                       </div>
+
+                      {recipients.length === 0 && (
+                        <div
+                          key={`${role}-empty`}
+                          className="text-muted-foreground/80 inline-block px-4 text-sm"
+                        >
+                          No recipients with this role.
+                        </div>
+                      )}
 
                       {recipients.map((recipient) => (
                         <CommandItem
