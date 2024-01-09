@@ -10,6 +10,8 @@ import {
   DialogTrigger,
 } from '@documenso/ui/primitives/dialog';
 
+import { truncateTitle } from '~/helpers/truncate-title';
+
 export type SignDialogProps = {
   isSubmitting: boolean;
   document: Document;
@@ -26,7 +28,7 @@ export const SignDialog = ({
   role,
 }: SignDialogProps) => {
   const [showDialog, setShowDialog] = useState(false);
-
+  const truncatedTitle = truncateTitle(document.title);
   const isComplete = fields.every((field) => field.inserted);
 
   return (
@@ -51,11 +53,12 @@ export const SignDialog = ({
           </div>
           <div className="text-muted-foreground mx-auto w-4/5 py-2 text-center">
             {role === RecipientRole.VIEWER &&
-              `You are about to finish viewing "${document.title}". Are you sure?`}
+              `You are about to finish viewing "${truncatedTitle}". Are you sure?`}
             {role === RecipientRole.SIGNER &&
-              `You are about to finish signing "${document.title}". Are you sure?`}
+              `You are about to finish signing "${truncatedTitle}". Are you sure?`}
             {role === RecipientRole.APPROVER &&
-              `You are about to finish approving "${document.title}". Are you sure?`}
+              `You are about to finish approving "${truncatedTitle}". Are you sure?`}
+
           </div>
         </div>
 

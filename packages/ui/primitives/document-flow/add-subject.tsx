@@ -159,14 +159,14 @@ export const AddSubjectFormPartial = ({
               </ul>
             </div>
 
-            <Accordion type="multiple" className="mt-8 border-none">
-              <AccordionItem value="advanced-options" className="border-none">
-                <AccordionTrigger className="mb-2 border-b text-left hover:no-underline">
-                  Advanced Options
-                </AccordionTrigger>
+            {hasDateField && (
+              <Accordion type="multiple" className="mt-8 border-none">
+                <AccordionItem value="advanced-options" className="border-none">
+                  <AccordionTrigger className="mb-2 border-b text-left hover:no-underline">
+                    Advanced Options
+                  </AccordionTrigger>
 
-                <AccordionContent className="text-muted-foreground -mx-1 flex max-w-prose flex-col px-1 text-sm leading-relaxed">
-                  {hasDateField && (
+                  <AccordionContent className="text-muted-foreground -mx-1 flex max-w-prose flex-col px-1 text-sm leading-relaxed">
                     <div className="mt-2 flex flex-col">
                       <Label htmlFor="date-format">
                         Date Format <span className="text-muted-foreground">(Optional)</span>
@@ -193,9 +193,7 @@ export const AddSubjectFormPartial = ({
                         )}
                       />
                     </div>
-                  )}
 
-                  {hasDateField && (
                     <div className="mt-4 flex flex-col">
                       <Label htmlFor="time-zone">
                         Time Zone <span className="text-muted-foreground">(Optional)</span>
@@ -215,10 +213,10 @@ export const AddSubjectFormPartial = ({
                         )}
                       />
                     </div>
-                  )}
-                </AccordionContent>
-              </AccordionItem>
-            </Accordion>
+                  </AccordionContent>
+                </AccordionItem>
+              </Accordion>
+            )}
           </div>
         </div>
       </DocumentFlowFormContainerContent>
