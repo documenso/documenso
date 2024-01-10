@@ -49,6 +49,11 @@ export const SigningForm = ({ document, recipient, fields }: SigningFormProps) =
     return sortFieldsByPosition(fields.filter((field) => !field.inserted));
   }, [fields]);
 
+  const fieldsValidated = () => {
+    setValidateUninsertedFields(true);
+    validateFieldsInserted(fields);
+  };
+
   const onFormSubmit = async () => {
     setValidateUninsertedFields(true);
 
@@ -154,6 +159,7 @@ export const SigningForm = ({ document, recipient, fields }: SigningFormProps) =
                 onSignatureComplete={handleSubmit(onFormSubmit)}
                 document={document}
                 fields={fields}
+                fieldsValidated={fieldsValidated}
               />
             </div>
           </div>
