@@ -9,7 +9,15 @@ export const metadata: Metadata = {
   title: 'Sign In',
 };
 
-export default function SignInPage() {
+type SignInPageProps = {
+  searchParams: {
+    email?: string;
+  };
+};
+
+export default function SignInPage({ searchParams }: SignInPageProps) {
+  const email = typeof searchParams.email === 'string' ? searchParams.email : undefined;
+
   return (
     <div>
       <h1 className="text-4xl font-semibold">Sign in to your account</h1>
@@ -18,7 +26,11 @@ export default function SignInPage() {
         Welcome back, we are lucky to have you.
       </p>
 
-      <SignInForm className="mt-4" isGoogleSSOEnabled={IS_GOOGLE_SSO_ENABLED} />
+      <SignInForm
+        className="mt-4"
+        initialEmail={email}
+        isGoogleSSOEnabled={IS_GOOGLE_SSO_ENABLED}
+      />
 
       {process.env.NEXT_PUBLIC_DISABLE_SIGNUP !== 'true' && (
         <p className="text-muted-foreground mt-6 text-center text-sm">

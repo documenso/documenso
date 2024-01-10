@@ -10,10 +10,18 @@ export const metadata: Metadata = {
   title: 'Sign Up',
 };
 
-export default function SignUpPage() {
+type SignUpPageProps = {
+  searchParams: {
+    email?: string;
+  };
+};
+
+export default function SignUpPage({ searchParams }: SignUpPageProps) {
   if (process.env.NEXT_PUBLIC_DISABLE_SIGNUP === 'true') {
     redirect('/signin');
   }
+
+  const email = typeof searchParams.email === 'string' ? searchParams.email : undefined;
 
   return (
     <div>
@@ -24,7 +32,11 @@ export default function SignUpPage() {
         signing is within your grasp.
       </p>
 
-      <SignUpForm className="mt-4" isGoogleSSOEnabled={IS_GOOGLE_SSO_ENABLED} />
+      <SignUpForm
+        className="mt-4"
+        initialEmail={email}
+        isGoogleSSOEnabled={IS_GOOGLE_SSO_ENABLED}
+      />
 
       <p className="text-muted-foreground mt-6 text-center text-sm">
         Already have an account?{' '}
