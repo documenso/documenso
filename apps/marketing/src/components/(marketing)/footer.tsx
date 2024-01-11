@@ -39,7 +39,7 @@ export const Footer = ({ className, ...props }: FooterProps) => {
   return (
     <div className={cn('border-t py-12', className)} {...props}>
       <div className="mx-auto flex w-full max-w-screen-xl flex-wrap items-start justify-between gap-8 px-8">
-        <div>
+        <div className="flex-shrink-0">
           <Link href="/">
             <Image
               src={LogoImage}
@@ -64,13 +64,13 @@ export const Footer = ({ className, ...props }: FooterProps) => {
           </div>
         </div>
 
-        <div className="grid max-w-xs flex-1 grid-cols-2 gap-x-4 gap-y-2">
+        <div className="grid w-full max-w-sm grid-cols-2 gap-x-4 gap-y-2 md:w-auto md:gap-x-8">
           {FOOTER_LINKS.map((link, index) => (
             <Link
               key={index}
               href={link.href}
               target={link.target}
-              className="text-muted-foreground hover:text-muted-foreground/80 flex-shrink-0 text-sm"
+              className="text-muted-foreground hover:text-muted-foreground/80 flex-shrink-0 break-words text-sm"
             >
               {link.text}
             </Link>
