@@ -24,6 +24,8 @@ import { LazyPDFViewer } from '@documenso/ui/primitives/lazy-pdf-viewer';
 import { Stepper } from '@documenso/ui/primitives/stepper';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
+import { Comments } from '~/components/forms/comments';
+
 export type EditDocumentFormProps = {
   className?: string;
   user: User;
@@ -179,60 +181,70 @@ export const EditDocumentForm = ({
   const currentDocumentFlow = documentFlow[step];
 
   return (
-    <div className={cn('grid w-full grid-cols-12 gap-8', className)}>
-      <Card
-        className="relative col-span-12 rounded-xl before:rounded-xl lg:col-span-6 xl:col-span-7"
-        gradient
-      >
-        <CardContent className="p-2">
-          <LazyPDFViewer key={documentData.id} documentData={documentData} />
+    <div>
+      <div className={cn('grid w-full grid-cols-12 gap-8', className)}>
+        <Card
+          className="relative col-span-12 rounded-xl before:rounded-xl lg:col-span-6 xl:col-span-7"
+          gradient
+        >
+          <CardContent className="p-2">
+            <LazyPDFViewer key={documentData.id} documentData={documentData} />
+          </CardContent>
+        </Card>
+
+        <div className="col-span-12 lg:col-span-6 xl:col-span-5">
+          <DocumentFlowFormContainer
+            className="lg:h-[calc(100vh-6rem)]"
+            onSubmit={(e) => e.preventDefault()}
+          >
+            <Stepper
+              currentStep={currentDocumentFlow.stepIndex}
+              setCurrentStep={(step) => setStep(EditDocumentSteps[step - 1])}
+            >
+              <AddTitleFormPartial
+                key={recipients.length}
+                documentFlow={documentFlow.title}
+                recipients={recipients}
+                fields={fields}
+                document={document}
+                onSubmit={onAddTitleFormSubmit}
+              />
+
+              <AddSignersFormPartial
+                key={recipients.length}
+                documentFlow={documentFlow.signers}
+                document={document}
+                recipients={recipients}
+                fields={fields}
+                onSubmit={onAddSignersFormSubmit}
+              />
+              <AddFieldsFormPartial
+                key={fields.length}
+                documentFlow={documentFlow.fields}
+                recipients={recipients}
+                fields={fields}
+                onSubmit={onAddFieldsFormSubmit}
+              />
+              <AddSubjectFormPartial
+                key={recipients.length}
+                documentFlow={documentFlow.subject}
+                document={document}
+                recipients={recipients}
+                fields={fields}
+                onSubmit={onAddSubjectFormSubmit}
+              />
+            </Stepper>
+          </DocumentFlowFormContainer>
+        </div>
+      </div>
+      <Card className="my-8" gradient={true} degrees={200}>
+        <CardContent className="mt-8 flex flex-col">
+          <h2 className="text-foreground text-2xl font-semibold">Comments</h2>
+          <hr className="border-border mb-4 mt-4" />
+          <Comments />
+          <hr className="border-border -mt-4 mb-4" />
         </CardContent>
       </Card>
-
-      <div className="col-span-12 lg:col-span-6 xl:col-span-5">
-        <DocumentFlowFormContainer
-          className="lg:h-[calc(100vh-6rem)]"
-          onSubmit={(e) => e.preventDefault()}
-        >
-          <Stepper
-            currentStep={currentDocumentFlow.stepIndex}
-            setCurrentStep={(step) => setStep(EditDocumentSteps[step - 1])}
-          >
-            <AddTitleFormPartial
-              key={recipients.length}
-              documentFlow={documentFlow.title}
-              recipients={recipients}
-              fields={fields}
-              document={document}
-              onSubmit={onAddTitleFormSubmit}
-            />
-
-            <AddSignersFormPartial
-              key={recipients.length}
-              documentFlow={documentFlow.signers}
-              document={document}
-              recipients={recipients}
-              fields={fields}
-              onSubmit={onAddSignersFormSubmit}
-            />
-            <AddFieldsFormPartial
-              key={fields.length}
-              documentFlow={documentFlow.fields}
-              recipients={recipients}
-              fields={fields}
-              onSubmit={onAddFieldsFormSubmit}
-            />
-            <AddSubjectFormPartial
-              key={recipients.length}
-              documentFlow={documentFlow.subject}
-              document={document}
-              recipients={recipients}
-              fields={fields}
-              onSubmit={onAddSubjectFormSubmit}
-            />
-          </Stepper>
-        </DocumentFlowFormContainer>
-      </div>
     </div>
   );
 };

@@ -124,6 +124,7 @@ export const ProfileForm = ({ className, user }: ProfileFormProps) => {
                     className="h-44 w-full"
                     containerClassName="rounded-lg border bg-background"
                     defaultValue={user.signature ?? undefined}
+                    
                     onChange={(v) => onChange(v ?? '')}
                   />
                 </FormControl>

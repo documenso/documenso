@@ -45,6 +45,7 @@
   "name": "@documenso/root",
   "workspaces": [
     "apps/*",
+    
     "packages/*"
   ],
   "dependencies": {},

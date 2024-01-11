@@ -1,5 +1,6 @@
 import { adminRouter } from './admin-router/router';
 import { authRouter } from './auth-router/router';
+import { commentRouter } from './comment-router/router';
 import { documentRouter } from './document-router/router';
 import { fieldRouter } from './field-router/router';
 import { profileRouter } from './profile-router/router';
@@ -21,6 +22,7 @@ export const appRouter = router({
   singleplayer: singleplayerRouter,
   twoFactorAuthentication: twoFactorAuthenticationRouter,
   template: templateRouter,
+  comment: commentRouter,
 });
 
 export type AppRouter = typeof appRouter;
