@@ -40,10 +40,19 @@ export const insertFieldInPDF = async (pdf: PDFDocument, field: FieldWithSignatu
   const fieldX = pageWidth * (Number(field.positionX) / 100);
   const fieldY = pageHeight * (Number(field.positionY) / 100);
 
-  const font = await pdf.embedFont(isSignatureField ? fontCaveat : StandardFonts.Helvetica);
+  // const url =
+  //   'https://fonts.gstatic.com/s/dancingscript/v25/If2cXTr6YS-zF4S-kcSWSVi_sxjsohD9F50Ruu7BMSoHTQ.ttf';
+
+  const url = 'https://fonts.gstatic.com/s/caveat/v18/WnznHAc5bAfYB2QRah7pcpNvOx-pjfJ9SII.ttf';
+  const googleFont = await fetch(url).then(async (res) => res.arrayBuffer());
+
+  const font = await pdf.embedFont(isSignatureField ? googleFont : StandardFonts.Helvetica, {
+    subset: true,
+    features: { liga: false },
+  });
 
   if (field.type === FieldType.SIGNATURE || field.type === FieldType.FREE_SIGNATURE) {
-    await pdf.embedFont(fontCaveat);
+    await pdf.embedFont(googleFont, { subset: true, features: { liga: false } });
   }
 
   const CUSTOM_TEXT = field.customText || field.Signature?.typedSignature || '';

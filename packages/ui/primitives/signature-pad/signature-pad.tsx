@@ -3,10 +3,15 @@
 import type { HTMLAttributes, MouseEvent, PointerEvent, TouchEvent } from 'react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 
+import { zodResolver } from '@hookform/resolvers/zod';
 import type { StrokeOptions } from 'perfect-freehand';
 import { getStroke } from 'perfect-freehand';
+import { useForm } from 'react-hook-form';
+import { z } from 'zod';
 
+import { useRequiredSigningContext } from '../../../../apps/web/src/app/(signing)/sign/[token]/provider';
 import { cn } from '../../lib/utils';
+import { Input } from '../input';
 import { getSvgPathFromStroke } from './helper';
 import { Point } from './point';
 
@@ -16,13 +21,28 @@ export type SignaturePadProps = Omit<HTMLAttributes<HTMLCanvasElement>, 'onChang
   onChange?: (_signatureDataUrl: string | null) => void;
   containerClassName?: string;
   clearSignatureClassName?: string;
+  onFormSubmit?: (_data: TSigningpadSchema) => void;
 };
+
+const ZSigningpadSchema = z.union([
+  z.object({
+    signatureDataUrl: z.string().min(1),
+    signatureText: z.null().or(z.string().max(0)),
+  }),
+  z.object({
+    signatureDataUrl: z.null().or(z.string().max(0)),
+    signatureText: z.string().trim().min(1),
+  }),
+]);
+
+export type TSigningpadSchema = z.infer<typeof ZSigningpadSchema>;
 
 export const SignaturePad = ({
   className,
   containerClassName,
   defaultValue,
   clearSignatureClassName,
+  onFormSubmit,
   onChange,
   ...props
 }: SignaturePadProps) => {
@@ -30,6 +50,26 @@ export const SignaturePad = ({
 
   const [isPressed, setIsPressed] = useState(false);
   const [points, setPoints] = useState<Point[]>([]);
+
+  const { signature, setSignature } = useRequiredSigningContext();
+
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    watch,
+    formState: { isSubmitting },
+  } = useForm<TSigningpadSchema>({
+    mode: 'onChange',
+    defaultValues: {
+      signatureDataUrl: signature || null,
+      signatureText: '',
+    },
+    resolver: zodResolver(ZSigningpadSchema),
+  });
+
+  const signatureDataUrl = watch('signatureDataUrl');
+  const signatureText = watch('signatureText');
 
   const perfectFreehandOptions = useMemo(() => {
     const size = $el.current ? Math.min($el.current.height, $el.current.width) * 0.03 : 10;
@@ -206,28 +246,92 @@ export const SignaturePad = ({
   }, [defaultValue]);
 
   return (
-    <div className={cn('relative block', containerClassName)}>
-      <canvas
-        ref={$el}
-        className={cn('relative block dark:invert', className)}
-        style={{ touchAction: 'none' }}
-        onPointerMove={(event) => onMouseMove(event)}
-        onPointerDown={(event) => onMouseDown(event)}
-        onPointerUp={(event) => onMouseUp(event)}
-        onPointerLeave={(event) => onMouseLeave(event)}
-        onPointerEnter={(event) => onMouseEnter(event)}
-        {...props}
-      />
+    <form onSubmit={handleSubmit(onFormSubmit ?? (() => undefined))}>
+      <div className={cn('relative block', containerClassName)}>
+        <canvas
+          ref={$el}
+          className={cn('relative block dark:invert', className)}
+          style={{ touchAction: 'none' }}
+          onPointerMove={(event) => onMouseMove(event)}
+          onPointerDown={(event) => onMouseDown(event)}
+          onPointerUp={(event) => onMouseUp(event)}
+          onPointerLeave={(event) => onMouseLeave(event)}
+          onPointerEnter={(event) => onMouseEnter(event)}
+          {...props}
+        />
 
-      <div className={cn('absolute bottom-4 right-4', clearSignatureClassName)}>
-        <button
-          type="button"
-          className="focus-visible:ring-ring ring-offset-background text-muted-foreground rounded-full p-0 text-xs focus-visible:outline-none focus-visible:ring-2"
-          onClick={() => onClearClick()}
+        <div className="flex h-44 items-center justify-center pb-6">
+          {!signatureText && signature && (
+            <SignaturePad
+              className="h-44 w-full"
+              defaultValue={signature ?? undefined}
+              onChange={(value) => {
+                setSignature(value);
+              }}
+            />
+          )}
+
+          {signatureText && (
+            <p
+              className={cn(
+                'text-foreground text-4xl font-semibold [font-family:var(--font-caveat)]',
+              )}
+            >
+              {signatureText}
+            </p>
+          )}
+        </div>
+
+        <div
+          className="absolute inset-x-0 bottom-0 flex cursor-auto items-end justify-between px-4 pb-1 pt-2"
+          onClick={(e) => e.stopPropagation()}
         >
-          Clear Signature
-        </button>
+          <Input
+            id="signatureText"
+            className="text-foreground placeholder:text-muted-foreground border-none bg-transparent p-0 text-sm focus-visible:bg-transparent focus-visible:outline-none focus-visible:ring-0"
+            placeholder="Draw or type name here"
+            // disabled={isSubmitting || signature !== null}
+            disabled={isSubmitting}
+            {...register('signatureText', {
+              onChange: (e) => {
+                if (e.target.value !== '') {
+                  setValue('signatureDataUrl', null);
+                }
+
+                setValue('signatureText', e.target.value);
+              },
+
+              onBlur: (e) => {
+                if (e.target.value === '') {
+                  return setValue('signatureText', '');
+                }
+
+                setSignature(e.target.value.trimStart());
+              },
+            })}
+          />
+
+          {/* <div className="absolute bottom-3 right-4">
+                        <button
+                          type="button"
+                          className="focus-visible:ring-ring ring-offset-background text-muted-foreground rounded-full p-0 text-xs focus-visible:outline-none focus-visible:ring-2"
+                          onClick={() => console.log('clear')}
+                        >
+                          Clear Signature
+                        </button>
+                      </div> */}
+        </div>
+
+        <div className={cn('absolute bottom-4 right-4', clearSignatureClassName)}>
+          <button
+            type="button"
+            className="focus-visible:ring-ring ring-offset-background text-muted-foreground rounded-full p-0 text-xs focus-visible:outline-none focus-visible:ring-2"
+            onClick={() => onClearClick()}
+          >
+            Clear Signature
+          </button>
+        </div>
       </div>
-    </div>
+    </form>
   );
 };
