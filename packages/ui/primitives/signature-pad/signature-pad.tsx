@@ -9,7 +9,6 @@ import { getStroke } from 'perfect-freehand';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
-import { useRequiredSigningContext } from '../../../../apps/web/src/app/(signing)/sign/[token]/provider';
 import { cn } from '../../lib/utils';
 import { Input } from '../input';
 import { getSvgPathFromStroke } from './helper';
@@ -18,6 +17,8 @@ import { Point } from './point';
 const DPI = 2;
 
 export type SignaturePadProps = Omit<HTMLAttributes<HTMLCanvasElement>, 'onChange'> & {
+  signature: string | null;
+  setSignature: (_value: string | null) => void;
   onChange?: (_signatureDataUrl: string | null) => void;
   containerClassName?: string;
   clearSignatureClassName?: string;
@@ -44,14 +45,14 @@ export const SignaturePad = ({
   clearSignatureClassName,
   onFormSubmit,
   onChange,
+  signature,
+  setSignature,
   ...props
 }: SignaturePadProps) => {
   const $el = useRef<HTMLCanvasElement>(null);
 
   const [isPressed, setIsPressed] = useState(false);
   const [points, setPoints] = useState<Point[]>([]);
-
-  const { signature, setSignature } = useRequiredSigningContext();
 
   const {
     register,
@@ -68,7 +69,7 @@ export const SignaturePad = ({
     resolver: zodResolver(ZSigningpadSchema),
   });
 
-  const signatureDataUrl = watch('signatureDataUrl');
+  // const signatureDataUrl = watch('signatureDataUrl');
   const signatureText = watch('signatureText');
 
   const perfectFreehandOptions = useMemo(() => {
@@ -248,26 +249,18 @@ export const SignaturePad = ({
   return (
     <form onSubmit={handleSubmit(onFormSubmit ?? (() => undefined))}>
       <div className={cn('relative block', containerClassName)}>
-        <canvas
-          ref={$el}
-          className={cn('relative block dark:invert', className)}
-          style={{ touchAction: 'none' }}
-          onPointerMove={(event) => onMouseMove(event)}
-          onPointerDown={(event) => onMouseDown(event)}
-          onPointerUp={(event) => onMouseUp(event)}
-          onPointerLeave={(event) => onMouseLeave(event)}
-          onPointerEnter={(event) => onMouseEnter(event)}
-          {...props}
-        />
-
         <div className="flex h-44 items-center justify-center pb-6">
           {!signatureText && signature && (
-            <SignaturePad
-              className="h-44 w-full"
-              defaultValue={signature ?? undefined}
-              onChange={(value) => {
-                setSignature(value);
-              }}
+            <canvas
+              ref={$el}
+              className={cn('relative block dark:invert', className)}
+              style={{ touchAction: 'none' }}
+              onPointerMove={(event) => onMouseMove(event)}
+              onPointerDown={(event) => onMouseDown(event)}
+              onPointerUp={(event) => onMouseUp(event)}
+              onPointerLeave={(event) => onMouseLeave(event)}
+              onPointerEnter={(event) => onMouseEnter(event)}
+              {...props}
             />
           )}
 

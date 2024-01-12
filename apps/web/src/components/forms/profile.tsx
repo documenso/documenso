@@ -7,7 +7,7 @@ import { Loader } from 'lucide-react';
 import { Controller, useForm } from 'react-hook-form';
 import { z } from 'zod';
 
-import { User } from '@documenso/prisma/client';
+import type { User } from '@documenso/prisma/client';
 import { TRPCClientError } from '@documenso/trpc/client';
 import { trpc } from '@documenso/trpc/react';
 import { cn } from '@documenso/ui/lib/utils';
@@ -16,6 +16,8 @@ import { Input } from '@documenso/ui/primitives/input';
 import { Label } from '@documenso/ui/primitives/label';
 import { SignaturePad } from '@documenso/ui/primitives/signature-pad';
 import { useToast } from '@documenso/ui/primitives/use-toast';
+
+import { useRequiredSigningContext } from '~/app/(signing)/sign/[token]/provider';
 
 import { FormErrorMessage } from '../form/form-error-message';
 
@@ -35,6 +37,8 @@ export const ProfileForm = ({ className, user }: ProfileFormProps) => {
   const router = useRouter();
 
   const { toast } = useToast();
+
+  const { signature, setSignature } = useRequiredSigningContext();
 
   const {
     register,
@@ -121,6 +125,8 @@ export const ProfileForm = ({ className, user }: ProfileFormProps) => {
                 containerClassName="rounded-lg border bg-background"
                 defaultValue={user.signature ?? undefined}
                 onChange={(v) => onChange(v ?? '')}
+                signature={signature}
+                setSignature={setSignature}
               />
             )}
           />
