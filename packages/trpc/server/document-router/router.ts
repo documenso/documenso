@@ -24,6 +24,7 @@ import {
   ZSearchDocumentsMutationSchema,
   ZSendDocumentMutationSchema,
   ZSetFieldsForDocumentMutationSchema,
+  ZSetPasswordForDocumentMutationSchema,
   ZSetRecipientsForDocumentMutationSchema,
   ZSetTitleForDocumentMutationSchema,
 } from './schema';
@@ -174,6 +175,29 @@ export const documentRouter = router({
         });
       }
     }),
+  
+  setDocumentPassword: authenticatedProcedure
+     .input(ZSetPasswordForDocumentMutationSchema)
+     .mutation(async ({ input, ctx }) => {
+        try {
+          const { documentId, documentPassword } = input;
+          await upsertDocumentMeta({
+            documentId,
+            documentPassword,
+            userId: ctx.user.id,
+          });
+        
+        } catch (err) {
+          console.error(err);
+  
+          throw new TRPCError({
+            code: 'BAD_REQUEST',
+            message: 'We were unable to send this document. Please try again later.',
+          });
+        }
+      }),
+
+      
 
   sendDocument: authenticatedProcedure
     .input(ZSendDocumentMutationSchema)

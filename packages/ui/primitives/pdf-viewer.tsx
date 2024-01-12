@@ -10,11 +10,13 @@ import 'react-pdf/dist/esm/Page/TextLayer.css';
 
 import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
 import { getFile } from '@documenso/lib/universal/upload/get-file';
-import type { DocumentData } from '@documenso/prisma/client';
+import type { DocumentData, DocumentMeta } from '@documenso/prisma/client';
 
 import { cn } from '../lib/utils';
 import { PasswordDialog } from './document-password-dialog';
 import { useToast } from './use-toast';
+import { trpc } from '@documenso/trpc/react';
+import { DocumentWithData } from '@documenso/prisma/types/document-with-data';
 
 export type LoadedPDFDocument = PDFDocumentProxy;
 
@@ -44,6 +46,8 @@ const PDFLoader = () => (
 export type PDFViewerProps = {
   className?: string;
   documentData: DocumentData;
+  document?: DocumentWithData;
+  documentMeta?: DocumentMeta | null;
   onDocumentLoad?: (_doc: LoadedPDFDocument) => void;
   onPageClick?: OnPDFViewerPageClick;
   [key: string]: unknown;
@@ -52,6 +56,8 @@ export type PDFViewerProps = {
 export const PDFViewer = ({
   className,
   documentData,
+  document,
+  documentMeta,
   onDocumentLoad,
   onPageClick,
   ...props
@@ -62,7 +68,7 @@ export const PDFViewer = ({
 
   const [isDocumentBytesLoading, setIsDocumentBytesLoading] = useState(false);
   const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
-  const [password, setPassword] = useState<string | null>(null);
+  const [password, setPassword] = useState<string | null>(documentMeta?.documentPassword || null);
   const passwordCallbackRef = useRef<((password: string | null) => void) | null>(null);
   const [isPasswordError, setIsPasswordError] = useState(false);
   const [documentBytes, setDocumentBytes] = useState<Uint8Array | null>(null);
@@ -76,6 +82,9 @@ export const PDFViewer = ({
     [documentData.data, documentData.type],
   );
 
+  const {mutateAsync: addDocumentPassword } = trpc.document.setDocumentPassword.useMutation();
+
+
   const isLoading = isDocumentBytesLoading || !documentBytes;
 
   const onDocumentLoaded = (doc: LoadedPDFDocument) => {
@@ -83,12 +92,20 @@ export const PDFViewer = ({
     onDocumentLoad?.(doc);
   };
 
-  const onPasswordSubmit = () => {
+  const onPasswordSubmit = async() => {
     setIsPasswordModalOpen(false);
-    if (passwordCallbackRef.current) {
-      passwordCallbackRef.current(password);
+    try{
+      await addDocumentPassword({
+        documentId: document?.id ?? 0,
+        documentPassword: password!,
+      });
+      passwordCallbackRef.current?.(password);
+    } catch (error) {
+      console.error('Error adding document password:', error);
+    } finally {
       passwordCallbackRef.current = null;
     }
+
   };
 
   const onDocumentPageClick = (
@@ -189,6 +206,11 @@ export const PDFViewer = ({
               'h-[80vh] max-h-[60rem]': numPages === 0,
             })}
             onPassword={(callback, reason) => {
+              // If the documentMeta already has a password, we don't need to ask for it again.
+              if(password && reason !== PasswordResponses.INCORRECT_PASSWORD){
+                callback(password);
+                return;
+              }
               setIsPasswordModalOpen(true);
               passwordCallbackRef.current = callback;
               switch (reason) {

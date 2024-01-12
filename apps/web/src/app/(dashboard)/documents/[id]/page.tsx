@@ -13,6 +13,7 @@ import { LazyPDFViewer } from '@documenso/ui/primitives/lazy-pdf-viewer';
 import { EditDocumentForm } from '~/app/(dashboard)/documents/[id]/edit-document';
 import { StackAvatarsWithTooltip } from '~/components/(dashboard)/avatar/stack-avatars-with-tooltip';
 import { DocumentStatus } from '~/components/formatter/document-status';
+import { getDocumentMetaByDocumentId } from '@documenso/lib/server-only/document/get-document-meta-by-document-id';
 
 export type DocumentPageProps = {
   params: {
@@ -41,6 +42,7 @@ export default async function DocumentPage({ params }: DocumentPageProps) {
   }
 
   const { documentData } = document;
+  const documentMeta = await getDocumentMetaByDocumentId({ id: document!.id }).catch(() => null);
 
   const [recipients, fields] = await Promise.all([
     getRecipientsForDocument({
@@ -83,6 +85,7 @@ export default async function DocumentPage({ params }: DocumentPageProps) {
           className="mt-8"
           document={document}
           user={user}
+          documentMeta={documentMeta}
           recipients={recipients}
           fields={fields}
           documentData={documentData}
@@ -91,7 +94,7 @@ export default async function DocumentPage({ params }: DocumentPageProps) {
 
       {document.status === InternalDocumentStatus.COMPLETED && (
         <div className="mx-auto mt-12 max-w-2xl">
-          <LazyPDFViewer key={documentData.id} documentData={documentData} />
+          <LazyPDFViewer document={document} key={documentData.id} documentMeta={documentMeta} documentData={documentData} />
         </div>
       )}
     </div>

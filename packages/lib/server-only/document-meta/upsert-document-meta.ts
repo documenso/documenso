@@ -4,10 +4,11 @@ import { prisma } from '@documenso/prisma';
 
 export type CreateDocumentMetaOptions = {
   documentId: number;
-  subject: string;
-  message: string;
-  timezone: string;
-  dateFormat: string;
+  subject?: string;
+  message?: string;
+  timezone?: string;
+  documentPassword?: string;
+  dateFormat?: string;
   userId: number;
 };
 
@@ -18,6 +19,7 @@ export const upsertDocumentMeta = async ({
   dateFormat,
   documentId,
   userId,
+  documentPassword,
 }: CreateDocumentMetaOptions) => {
   await prisma.document.findFirstOrThrow({
     where: {
@@ -35,12 +37,14 @@ export const upsertDocumentMeta = async ({
       message,
       dateFormat,
       timezone,
+      documentPassword,
       documentId,
     },
     update: {
       subject,
       message,
       dateFormat,
+      documentPassword,
       timezone,
     },
   });

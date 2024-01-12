@@ -101,7 +101,7 @@ export default async function SigningPage({ params: { token } }: SigningPageProp
             gradient
           >
             <CardContent className="p-2">
-              <LazyPDFViewer key={documentData.id} documentData={documentData} />
+              <LazyPDFViewer key={documentData.id} documentData={documentData} document={document} documentMeta={documentMeta} />
             </CardContent>
           </Card>
 
