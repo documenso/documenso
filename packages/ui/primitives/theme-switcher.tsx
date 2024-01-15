@@ -18,7 +18,7 @@ export const ThemeSwitcher = () => {
       >
         {isMounted && theme === THEMES_TYPE.LIGHT && (
           <motion.div
-            className="bg-background absolute inset-0 rounded-full mix-blend-exclusion"
+            className="bg-background absolute inset-0 rounded-full mix-blend-color-burn"
             layoutId="selected-theme"
           />
         )}
