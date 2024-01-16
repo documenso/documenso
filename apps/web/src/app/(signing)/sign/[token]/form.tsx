@@ -55,8 +55,6 @@ export const SigningForm = ({ document, recipient, fields }: SigningFormProps) =
   const { mutateAsync: completeDocumentWithToken } =
     trpc.recipient.completeDocumentWithToken.useMutation();
 
-  console.log(signature);
-
   const {
     register,
     handleSubmit,
