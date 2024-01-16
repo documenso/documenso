@@ -88,7 +88,7 @@ export default async function DocumentsPage({ searchParams = {} }: DocumentsPage
                     <DocumentStatus status={value} />
 
                     {value !== ExtendedDocumentStatus.ALL && (
-                      <span className="ml-1 hidden opacity-50 md:inline-block">
+                      <span className="ml-1 opacity-50 md:inline-block">
                         {Math.min(stats[value], 99)}
                         {stats[value] > 99 && '+'}
                       </span>
