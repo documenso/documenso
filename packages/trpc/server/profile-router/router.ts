@@ -1,7 +1,9 @@
 import { TRPCError } from '@trpc/server';
 
 import { forgotPassword } from '@documenso/lib/server-only/user/forgot-password';
+import { getUserByEmail } from '@documenso/lib/server-only/user/get-user-by-email';
 import { getUserById } from '@documenso/lib/server-only/user/get-user-by-id';
+import { getUserByVerificationToken } from '@documenso/lib/server-only/user/get-user-by-verification-token';
 import { resetPassword } from '@documenso/lib/server-only/user/reset-password';
 import { sendConfirmationToken } from '@documenso/lib/server-only/user/send-confirmation-token';
 import { updatePassword } from '@documenso/lib/server-only/user/update-password';
@@ -12,7 +14,9 @@ import {
   ZConfirmEmailMutationSchema,
   ZForgotPasswordFormSchema,
   ZResetPasswordFormSchema,
+  ZRetrieveUserByEmailMutationSchema,
   ZRetrieveUserByIdQuerySchema,
+  ZRetrieveUserByVerificationTokenQuerySchema,
   ZUpdatePasswordMutationSchema,
   ZUpdateProfileMutationSchema,
 } from './schema';
@@ -30,6 +34,36 @@ export const profileRouter = router({
       });
     }
   }),
+
+  getUserByEmail: procedure
+    .input(ZRetrieveUserByEmailMutationSchema)
+    .mutation(async ({ input }) => {
+      try {
+        const { email } = input;
+
+        return await getUserByEmail({ email });
+      } catch (err) {
+        throw new TRPCError({
+          code: 'BAD_REQUEST',
+          message: 'We were unable to retrieve the specified account. Please try again.',
+        });
+      }
+    }),
+
+  getUserFromVerificationToken: procedure
+    .input(ZRetrieveUserByVerificationTokenQuerySchema)
+    .query(async ({ input }) => {
+      try {
+        const { token } = input;
+
+        return await getUserByVerificationToken({ token });
+      } catch (err) {
+        throw new TRPCError({
+          code: 'BAD_REQUEST',
+          message: 'We were unable to retrieve the specified account. Please try again.',
+        });
+      }
+    }),
 
   updateProfile: authenticatedProcedure
     .input(ZUpdateProfileMutationSchema)

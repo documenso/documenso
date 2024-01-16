@@ -1,7 +1,8 @@
 'use client';
 
+import { useRouter } from 'next/navigation';
+
 import { zodResolver } from '@hookform/resolvers/zod';
-import { signIn } from 'next-auth/react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
@@ -42,6 +43,7 @@ export type SignUpFormProps = {
 export const SignUpForm = ({ className }: SignUpFormProps) => {
   const { toast } = useToast();
   const analytics = useAnalytics();
+  const router = useRouter();
 
   const form = useForm<TSignUpFormSchema>({
     values: {
@@ -61,10 +63,12 @@ export const SignUpForm = ({ className }: SignUpFormProps) => {
     try {
       await signup({ name, email, password, signature });
 
-      await signIn('credentials', {
-        email,
-        password,
-        callbackUrl: '/',
+      router.push('/signin');
+
+      toast({
+        title: 'Registration Successful',
+        description: 'You have successfully registered. Please sign in to continue.',
+        duration: 5000,
       });
 
       analytics.capture('App: User Sign Up', {

@@ -2,6 +2,8 @@
 
 import { useState } from 'react';
 
+import { useRouter } from 'next/navigation';
+
 import { zodResolver } from '@hookform/resolvers/zod';
 import { signIn } from 'next-auth/react';
 import { useForm } from 'react-hook-form';
@@ -9,6 +11,7 @@ import { FcGoogle } from 'react-icons/fc';
 import { z } from 'zod';
 
 import { ErrorCode, isErrorCode } from '@documenso/lib/next-auth/error-codes';
+import { trpc } from '@documenso/trpc/react';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@documenso/ui/primitives/dialog';
@@ -31,6 +34,8 @@ const ERROR_MESSAGES: Partial<Record<keyof typeof ErrorCode, string>> = {
     'This account appears to be using a social login method, please sign in using that method',
   [ErrorCode.INCORRECT_TWO_FACTOR_CODE]: 'The two-factor authentication code provided is incorrect',
   [ErrorCode.INCORRECT_TWO_FACTOR_BACKUP_CODE]: 'The backup code provided is incorrect',
+  [ErrorCode.UNVERIFIED_EMAIL]:
+    'This account has not been verified. Please verify your account before signing in.',
 };
 
 const TwoFactorEnabledErrorCode = ErrorCode.TWO_FACTOR_MISSING_CREDENTIALS;
@@ -54,6 +59,7 @@ export const SignInForm = ({ className }: SignInFormProps) => {
   const { toast } = useToast();
   const [isTwoFactorAuthenticationDialogOpen, setIsTwoFactorAuthenticationDialogOpen] =
     useState(false);
+  const router = useRouter();
 
   const [twoFactorAuthenticationMethod, setTwoFactorAuthenticationMethod] = useState<
     'totp' | 'backup'
@@ -68,6 +74,8 @@ export const SignInForm = ({ className }: SignInFormProps) => {
     },
     resolver: zodResolver(ZSignInFormSchema),
   });
+
+  const { mutateAsync: getUser } = trpc.profile.getUserByEmail.useMutation();
 
   const isSubmitting = form.formState.isSubmitting;
 
@@ -121,6 +129,15 @@ export const SignInForm = ({ className }: SignInFormProps) => {
         }
 
         const errorMessage = ERROR_MESSAGES[result.error];
+
+        if (result.error === ErrorCode.UNVERIFIED_EMAIL) {
+          const user = await getUser({ email });
+          const token = user?.VerificationToken[user.VerificationToken.length - 1].token;
+
+          router.push(`/unverified-account?t=${token}`);
+
+          return;
+        }
 
         toast({
           variant: 'destructive',
