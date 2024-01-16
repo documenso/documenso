@@ -12,7 +12,10 @@ import { isSignatureFieldType } from '@documenso/prisma/guards/is-signature-fiel
 import type { FieldWithSignature } from '@documenso/prisma/types/field-with-signature';
 
 export const insertFieldInPDF = async (pdf: PDFDocument, field: FieldWithSignature) => {
-  const fontCaveat = await fetch(process.env.FONT_CAVEAT_URI).then(async (res) =>
+  const fontDancingScriptURL =
+    'https://fonts.gstatic.com/s/dancingscript/v25/If2cXTr6YS-zF4S-kcSWSVi_sxjsohD9F50Ruu7BMSoHTQ.ttf';
+
+  const fontDancingScript = await fetch(fontDancingScriptURL).then(async (res) =>
     res.arrayBuffer(),
   );
 
@@ -40,10 +43,20 @@ export const insertFieldInPDF = async (pdf: PDFDocument, field: FieldWithSignatu
   const fieldX = pageWidth * (Number(field.positionX) / 100);
   const fieldY = pageHeight * (Number(field.positionY) / 100);
 
-  const font = await pdf.embedFont(isSignatureField ? fontCaveat : StandardFonts.Helvetica);
+  const font = await pdf.embedFont(isSignatureField ? fontDancingScript : StandardFonts.Helvetica, {
+    subset: true,
+    features: {
+      liga: false,
+    },
+  });
 
   if (field.type === FieldType.SIGNATURE || field.type === FieldType.FREE_SIGNATURE) {
-    await pdf.embedFont(fontCaveat);
+    await pdf.embedFont(fontDancingScript, {
+      subset: true,
+      features: {
+        liga: false,
+      },
+    });
   }
 
   const CUSTOM_TEXT = field.customText || field.Signature?.typedSignature || '';
