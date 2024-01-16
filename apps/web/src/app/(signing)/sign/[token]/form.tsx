@@ -166,6 +166,7 @@ export const SigningForm = ({ document, recipient, fields }: SigningFormProps) =
                           className="h-44 w-full"
                           defaultValue={signature ?? undefined}
                           clearSignatureClassName="absolute -bottom-6 -right-2 z-10 cursor-pointer"
+                          undoSignatureClassName="absolute -top-32 -left-4 z-10 cursor-pointer"
                           onChange={(value) => {
                             setSignature(value);
                           }}

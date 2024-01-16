@@ -17,6 +17,7 @@ export type SignaturePadProps = Omit<HTMLAttributes<HTMLCanvasElement>, 'onChang
   onChange?: (_signatureDataUrl: string | null) => void;
   containerClassName?: string;
   clearSignatureClassName?: string;
+  undoSignatureClassName?: string;
 };
 
 export const SignaturePad = ({
@@ -24,6 +25,7 @@ export const SignaturePad = ({
   containerClassName,
   defaultValue,
   clearSignatureClassName,
+  undoSignatureClassName,
   onChange,
   ...props
 }: SignaturePadProps) => {
@@ -240,7 +242,7 @@ export const SignaturePad = ({
       </div>
 
       {lines.length > 0 && (
-        <div className="absolute bottom-4 left-4 flex gap-2">
+        <div className={cn('absolute bottom-4 left-4 flex gap-2', undoSignatureClassName)}>
           <button
             type="button"
             title="undo"
