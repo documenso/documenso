@@ -79,7 +79,7 @@ export const EmailField = ({ field, recipient }: EmailFieldProps) => {
   };
 
   return (
-    <SigningFieldContainer field={field} onSign={onSign} onRemove={onRemove}>
+    <SigningFieldContainer field={field} onSign={onSign} onRemove={onRemove} type="Email">
       {isLoading && (
         <div className="bg-background absolute inset-0 flex items-center justify-center rounded-md">
           <Loader className="text-primary h-5 w-5 animate-spin md:h-8 md:w-8" />

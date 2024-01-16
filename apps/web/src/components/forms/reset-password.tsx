@@ -1,11 +1,8 @@
 'use client';
 
-import { useState } from 'react';
-
 import { useRouter } from 'next/navigation';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Eye, EyeOff } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
@@ -13,9 +10,15 @@ import { TRPCClientError } from '@documenso/trpc/client';
 import { trpc } from '@documenso/trpc/react';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
-import { FormErrorMessage } from '@documenso/ui/primitives/form/form-error-message';
-import { Input } from '@documenso/ui/primitives/input';
-import { Label } from '@documenso/ui/primitives/label';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@documenso/ui/primitives/form/form';
+import { PasswordInput } from '@documenso/ui/primitives/password-input';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
 export const ZResetPasswordFormSchema = z
@@ -40,21 +43,15 @@ export const ResetPasswordForm = ({ className, token }: ResetPasswordFormProps) 
 
   const { toast } = useToast();
 
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-
-  const {
-    register,
-    reset,
-    handleSubmit,
-    formState: { errors, isSubmitting },
-  } = useForm<TResetPasswordFormSchema>({
+  const form = useForm<TResetPasswordFormSchema>({
     values: {
       password: '',
       repeatedPassword: '',
     },
     resolver: zodResolver(ZResetPasswordFormSchema),
   });
+
+  const isSubmitting = form.formState.isSubmitting;
 
   const { mutateAsync: resetPassword } = trpc.profile.resetPassword.useMutation();
 
@@ -65,7 +62,7 @@ export const ResetPasswordForm = ({ className, token }: ResetPasswordFormProps) 
         token,
       });
 
-      reset();
+      form.reset();
 
       toast({
         title: 'Password updated',
@@ -93,81 +90,45 @@ export const ResetPasswordForm = ({ className, token }: ResetPasswordFormProps) 
   };
 
   return (
-    <form
-      className={cn('flex w-full flex-col gap-y-4', className)}
-      onSubmit={handleSubmit(onFormSubmit)}
-    >
-      <div>
-        <Label htmlFor="password" className="text-muted-foreground">
-          <span>Password</span>
-        </Label>
-
-        <div className="relative">
-          <Input
-            id="password"
-            type={showPassword ? 'text' : 'password'}
-            minLength={6}
-            maxLength={72}
-            autoComplete="new-password"
-            className="bg-background mt-2 pr-10"
-            {...register('password')}
+    <Form {...form}>
+      <form
+        className={cn('flex w-full flex-col gap-y-4', className)}
+        onSubmit={form.handleSubmit(onFormSubmit)}
+      >
+        <fieldset className="flex w-full flex-col gap-y-4" disabled={isSubmitting}>
+          <FormField
+            control={form.control}
+            name="password"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Password</FormLabel>
+                <FormControl>
+                  <PasswordInput {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
           />
 
-          <Button
-            variant="link"
-            type="button"
-            className="absolute right-0 top-0 flex h-full items-center justify-center pr-3"
-            aria-label={showPassword ? 'Mask password' : 'Reveal password'}
-            onClick={() => setShowPassword((show) => !show)}
-          >
-            {showPassword ? (
-              <EyeOff className="text-muted-foreground h-5 w-5" />
-            ) : (
-              <Eye className="text-muted-foreground h-5 w-5" />
+          <FormField
+            control={form.control}
+            name="repeatedPassword"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Repeat Password</FormLabel>
+                <FormControl>
+                  <PasswordInput {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
             )}
-          </Button>
-        </div>
-
-        <FormErrorMessage className="mt-1.5" error={errors.password} />
-      </div>
-
-      <div>
-        <Label htmlFor="repeatedPassword" className="text-muted-foreground">
-          <span>Repeat Password</span>
-        </Label>
-
-        <div className="relative">
-          <Input
-            id="repeated-password"
-            type={showConfirmPassword ? 'text' : 'password'}
-            minLength={6}
-            maxLength={72}
-            autoComplete="new-password"
-            className="bg-background mt-2 pr-10"
-            {...register('repeatedPassword')}
           />
+        </fieldset>
 
-          <Button
-            variant="link"
-            type="button"
-            className="absolute right-0 top-0 flex h-full items-center justify-center pr-3"
-            aria-label={showConfirmPassword ? 'Mask password' : 'Reveal password'}
-            onClick={() => setShowConfirmPassword((show) => !show)}
-          >
-            {showConfirmPassword ? (
-              <EyeOff className="text-muted-foreground h-5 w-5" />
-            ) : (
-              <Eye className="text-muted-foreground h-5 w-5" />
-            )}
-          </Button>
-        </div>
-
-        <FormErrorMessage className="mt-1.5" error={errors.repeatedPassword} />
-      </div>
-
-      <Button size="lg" loading={isSubmitting}>
-        {isSubmitting ? 'Resetting Password...' : 'Reset Password'}
-      </Button>
-    </form>
+        <Button type="submit" size="lg" loading={isSubmitting}>
+          {isSubmitting ? 'Resetting Password...' : 'Reset Password'}
+        </Button>
+      </form>
+    </Form>
   );
 };

@@ -11,6 +11,7 @@ import { useHotkeys } from 'react-hotkeys-hook';
 import {
   DOCUMENTS_PAGE_SHORTCUT,
   SETTINGS_PAGE_SHORTCUT,
+  TEMPLATES_PAGE_SHORTCUT,
 } from '@documenso/lib/constants/keyboard-shortcuts';
 import { trpc as trpcReact } from '@documenso/trpc/react';
 import {
@@ -22,6 +23,7 @@ import {
   CommandList,
   CommandShortcut,
 } from '@documenso/ui/primitives/command';
+import { THEMES_TYPE } from '@documenso/ui/primitives/constants';
 
 const DOCUMENTS_PAGES = [
   {
@@ -36,6 +38,14 @@ const DOCUMENTS_PAGES = [
   },
   { label: 'Pending documents', path: '/documents?status=PENDING' },
   { label: 'Inbox documents', path: '/documents?status=INBOX' },
+];
+
+const TEMPLATES_PAGES = [
+  {
+    label: 'All templates',
+    path: '/templates',
+    shortcut: TEMPLATES_PAGE_SHORTCUT.replace('+', ''),
+  },
 ];
 
 const SETTINGS_PAGES = [
@@ -123,10 +133,12 @@ export function CommandMenu({ open, onOpenChange }: CommandMenuProps) {
 
   const goToSettings = useCallback(() => push(SETTINGS_PAGES[0].path), [push]);
   const goToDocuments = useCallback(() => push(DOCUMENTS_PAGES[0].path), [push]);
+  const goToTemplates = useCallback(() => push(TEMPLATES_PAGES[0].path), [push]);
 
-  useHotkeys(['ctrl+k', 'meta+k'], toggleOpen);
+  useHotkeys(['ctrl+k', 'meta+k'], toggleOpen, { preventDefault: true });
   useHotkeys(SETTINGS_PAGE_SHORTCUT, goToSettings);
   useHotkeys(DOCUMENTS_PAGE_SHORTCUT, goToDocuments);
+  useHotkeys(TEMPLATES_PAGE_SHORTCUT, goToTemplates);
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     // Escape goes to previous page
@@ -173,6 +185,9 @@ export function CommandMenu({ open, onOpenChange }: CommandMenuProps) {
             <CommandGroup heading="Documents">
               <Commands push={push} pages={DOCUMENTS_PAGES} />
             </CommandGroup>
+            <CommandGroup heading="Templates">
+              <Commands push={push} pages={TEMPLATES_PAGES} />
+            </CommandGroup>
             <CommandGroup heading="Settings">
               <Commands push={push} pages={SETTINGS_PAGES} />
             </CommandGroup>
@@ -214,9 +229,9 @@ const Commands = ({
 const ThemeCommands = ({ setTheme }: { setTheme: (_theme: string) => void }) => {
   const THEMES = useMemo(
     () => [
-      { label: 'Light Mode', theme: 'light', icon: Sun },
-      { label: 'Dark Mode', theme: 'dark', icon: Moon },
-      { label: 'System Theme', theme: 'system', icon: Monitor },
+      { label: 'Light Mode', theme: THEMES_TYPE.LIGHT, icon: Sun },
+      { label: 'Dark Mode', theme: THEMES_TYPE.DARK, icon: Moon },
+      { label: 'System Theme', theme: THEMES_TYPE.SYSTEM, icon: Monitor },
     ],
     [],
   );
