@@ -55,6 +55,8 @@ export const SigningForm = ({ document, recipient, fields }: SigningFormProps) =
   const { mutateAsync: completeDocumentWithToken } =
     trpc.recipient.completeDocumentWithToken.useMutation();
 
+  console.log(signature);
+
   const {
     register,
     handleSubmit,
@@ -186,7 +188,7 @@ export const SigningForm = ({ document, recipient, fields }: SigningFormProps) =
                         id="signatureText"
                         className="text-foreground placeholder:text-muted-foreground border-0 border-none bg-transparent p-0 text-sm focus-visible:ring-transparent"
                         placeholder="Draw or type name here"
-                        disabled={isSubmitting || signature !== null}
+                        disabled={isSubmitting || signature?.startsWith('data:')}
                         {...register('signatureText', {
                           onChange: (e) => {
                             if (e.target.value !== '') {
