@@ -17,8 +17,6 @@ import { Label } from '@documenso/ui/primitives/label';
 import { SignaturePad } from '@documenso/ui/primitives/signature-pad';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
-import { useRequiredSigningContext } from '~/app/(signing)/sign/[token]/provider';
-
 import { FormErrorMessage } from '../form/form-error-message';
 
 export const ZProfileFormSchema = z.object({
@@ -37,8 +35,6 @@ export const ProfileForm = ({ className, user }: ProfileFormProps) => {
   const router = useRouter();
 
   const { toast } = useToast();
-
-  const { signature, setSignature } = useRequiredSigningContext();
 
   const {
     register,
@@ -125,8 +121,6 @@ export const ProfileForm = ({ className, user }: ProfileFormProps) => {
                 containerClassName="rounded-lg border bg-background"
                 defaultValue={user.signature ?? undefined}
                 onChange={(v) => onChange(v ?? '')}
-                signature={signature}
-                setSignature={setSignature}
               />
             )}
           />
