@@ -149,10 +149,11 @@ export const SigningForm = ({ document, recipient, fields }: SigningFormProps) =
                 <Card id="signature" className="mt-4" degrees={-120} gradient>
                   <CardContent role="button" className="relative cursor-pointer pt-6">
                     <div className="flex h-44 items-center justify-center pb-6">
-                      {!signatureText && signature && (
+                      {!signatureText && (
                         <SignaturePad
                           className="h-44 w-full"
                           defaultValue={signature ?? undefined}
+                          clearSignatureClassName="absolute -bottom-6 -right-2 z-10 cursor-pointer"
                           onChange={(value) => {
                             setSignature(value);
                           }}
@@ -160,11 +161,7 @@ export const SigningForm = ({ document, recipient, fields }: SigningFormProps) =
                       )}
 
                       {signatureText && (
-                        <p
-                          className={cn(
-                            'text-foreground text-4xl font-semibold [font-family:var(--font-caveat)]',
-                          )}
-                        >
+                        <p className={cn('text-foreground font-signature text-4xl font-semibold')}>
                           {signatureText}
                         </p>
                       )}
@@ -173,10 +170,11 @@ export const SigningForm = ({ document, recipient, fields }: SigningFormProps) =
                     <div
                       className="absolute inset-x-0 bottom-0 flex cursor-auto items-end justify-between px-4 pb-1 pt-2"
                       onClick={(e) => e.stopPropagation()}
+                      onKeyDown={(e) => e.stopPropagation()}
                     >
                       <Input
                         id="signatureText"
-                        className="text-foreground placeholder:text-muted-foreground border-none bg-transparent p-0 text-sm focus-visible:bg-transparent focus-visible:outline-none focus-visible:ring-0"
+                        className="text-foreground placeholder:text-muted-foreground border-0 border-none bg-transparent p-0 text-sm focus-visible:ring-transparent"
                         placeholder="Draw or type name here"
                         // disabled={isSubmitting || signature !== null}
                         disabled={isSubmitting}
@@ -198,16 +196,20 @@ export const SigningForm = ({ document, recipient, fields }: SigningFormProps) =
                           },
                         })}
                       />
-
-                      {/* <div className="absolute bottom-3 right-4">
-                        <button
-                          type="button"
-                          className="focus-visible:ring-ring ring-offset-background text-muted-foreground rounded-full p-0 text-xs focus-visible:outline-none focus-visible:ring-2"
-                          onClick={() => console.log('clear')}
-                        >
-                          Clear Signature
-                        </button>
-                      </div> */}
+                      {signatureText && (
+                        <div className="absolute bottom-3 right-4 z-10 cursor-pointer">
+                          <button
+                            type="button"
+                            className="focus-visible:ring-ring ring-offset-background text-muted-foreground rounded-full p-0 text-xs focus-visible:outline-none focus-visible:ring-2"
+                            onClick={() => {
+                              setValue('signatureText', '');
+                              setValue('signatureDataUrl', null);
+                            }}
+                          >
+                            Clear Signature
+                          </button>
+                        </div>
+                      )}
                     </div>
                   </CardContent>
                 </Card>

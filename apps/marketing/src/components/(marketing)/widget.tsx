@@ -351,6 +351,7 @@ export const Widget = ({ className, children, ...props }: WidgetProps) => {
                 <div
                   className="absolute inset-x-0 bottom-0 flex cursor-auto items-center justify-between px-4 pb-2"
                   onClick={(e) => e.stopPropagation()}
+                  onKeyDown={(e) => e.stopPropagation()}
                 >
                   <Input
                     id="signatureText"
