@@ -95,8 +95,7 @@ export function CommandMenu({ open, onOpenChange }: CommandMenuProps) {
 
   const currentPage = pages[pages.length - 1];
 
-  const toggleOpen = (e: KeyboardEvent) => {
-    e.preventDefault();
+  const toggleOpen = () => {
     setIsOpen((isOpen) => !isOpen);
     onOpenChange?.(!isOpen);
 
@@ -136,7 +135,7 @@ export function CommandMenu({ open, onOpenChange }: CommandMenuProps) {
   const goToDocuments = useCallback(() => push(DOCUMENTS_PAGES[0].path), [push]);
   const goToTemplates = useCallback(() => push(TEMPLATES_PAGES[0].path), [push]);
 
-  useHotkeys(['ctrl+k', 'meta+k'], toggleOpen);
+  useHotkeys(['ctrl+k', 'meta+k'], toggleOpen, { preventDefault: true });
   useHotkeys(SETTINGS_PAGE_SHORTCUT, goToSettings);
   useHotkeys(DOCUMENTS_PAGE_SHORTCUT, goToDocuments);
   useHotkeys(TEMPLATES_PAGE_SHORTCUT, goToTemplates);
