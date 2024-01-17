@@ -48,12 +48,12 @@ export const DesktopNav = ({ className, ...props }: DesktopNavProps) => {
         </Button>
       </Link>
 
-      <Link href="/settings/token">
+      <Link href="/settings/tokens">
         <Button
           variant="ghost"
           className={cn(
             'w-full justify-start',
-            pathname?.startsWith('/settings/token') && 'bg-secondary',
+            pathname?.startsWith('/settings/tokens') && 'bg-secondary',
           )}
         >
           <Braces className="mr-2 h-5 w-5" />

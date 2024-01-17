@@ -148,7 +148,7 @@ export default function DeleteTokenDialog({ token, onDelete, children }: DeleteT
               />
 
               <DialogFooter>
-                <div className="flex w-full flex-1 flex-nowrap gap-4">
+                <div className="flex w-full flex-nowrap gap-4">
                   <Button
                     type="button"
                     variant="secondary"
@@ -161,6 +161,7 @@ export default function DeleteTokenDialog({ token, onDelete, children }: DeleteT
                   <Button
                     type="submit"
                     variant="destructive"
+                    className="flex-1"
                     disabled={!form.formState.isValid}
                     loading={form.formState.isSubmitting}
                   >

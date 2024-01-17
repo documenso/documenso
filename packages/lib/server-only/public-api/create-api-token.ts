@@ -25,7 +25,7 @@ export const createApiToken = async ({ userId, tokenName }: CreateApiTokenInput)
   });
 
   if (!dbToken) {
-    throw new Error(`Failed to create the API token`);
+    throw new Error('Failed to create the API token');
   }
 
   return {
