@@ -21,6 +21,7 @@ import {
   CommandInput,
   CommandItem,
   CommandList,
+  CommandSeparator,
   CommandShortcut,
 } from '@documenso/ui/primitives/command';
 import { THEMES_TYPE } from '@documenso/ui/primitives/constants';
@@ -185,15 +186,19 @@ export function CommandMenu({ open, onOpenChange }: CommandMenuProps) {
             <CommandGroup heading="Documents">
               <Commands push={push} pages={DOCUMENTS_PAGES} />
             </CommandGroup>
+            <CommandSeparator />
             <CommandGroup heading="Templates">
               <Commands push={push} pages={TEMPLATES_PAGES} />
             </CommandGroup>
+            <CommandSeparator />
             <CommandGroup heading="Settings">
               <Commands push={push} pages={SETTINGS_PAGES} />
             </CommandGroup>
+            <CommandSeparator />
             <CommandGroup heading="Preferences">
               <CommandItem onSelect={() => addPage('theme')}>Change theme</CommandItem>
             </CommandGroup>
+            <CommandSeparator />
             {searchResults.length > 0 && (
               <CommandGroup heading="Your documents">
                 <Commands push={push} pages={searchResults} />
