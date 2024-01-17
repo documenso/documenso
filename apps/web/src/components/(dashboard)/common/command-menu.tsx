@@ -5,6 +5,7 @@ import { useCallback, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 
 import { Loader, Monitor, Moon, Sun } from 'lucide-react';
+import { useSession } from 'next-auth/react';
 import { useTheme } from 'next-themes';
 import { useHotkeys } from 'react-hotkeys-hook';
 
@@ -13,6 +14,7 @@ import {
   SETTINGS_PAGE_SHORTCUT,
   TEMPLATES_PAGE_SHORTCUT,
 } from '@documenso/lib/constants/keyboard-shortcuts';
+import { DocumentStatus } from '@documenso/prisma/client';
 import { trpc as trpcReact } from '@documenso/trpc/react';
 import {
   CommandDialog,
@@ -66,6 +68,8 @@ export type CommandMenuProps = {
 export function CommandMenu({ open, onOpenChange }: CommandMenuProps) {
   const { setTheme } = useTheme();
   const router = useRouter();
+  const { data: session } = useSession();
+  const accountOwnerEmail = session.user.email;
 
   const [isOpen, setIsOpen] = useState(() => open ?? false);
   const [search, setSearch] = useState('');
@@ -81,6 +85,20 @@ export function CommandMenu({ open, onOpenChange }: CommandMenuProps) {
       },
     );
 
+  const isAccountOwnerRecipient = (document) => {
+    return document.Recipient.some((recipient) => recipient.email === accountOwnerEmail);
+  };
+
+  const isDocumentCompletedByAccountOwner = (document) => {
+    return document.status === DocumentStatus.COMPLETED && isAccountOwnerRecipient(document);
+  };
+
+  const signingCompleteLink = (document) => {
+    return `/sign/${
+      document.Recipient.find((recipient) => recipient.email === accountOwnerEmail)?.token
+    }/complete`;
+  };
+
   const searchResults = useMemo(() => {
     if (!searchDocumentsData) {
       return [];
@@ -88,10 +106,12 @@ export function CommandMenu({ open, onOpenChange }: CommandMenuProps) {
 
     return searchDocumentsData.map((document) => ({
       label: document.title,
-      path: `/documents/${document.id}`,
+      path: isDocumentCompletedByAccountOwner(document)
+        ? signingCompleteLink(document)
+        : `/documents/${document.id}`,
       value: [document.id, document.title, ...document.Recipient.map((r) => r.email)].join(' '),
     }));
-  }, [searchDocumentsData]);
+  }, [searchDocumentsData, accountOwnerEmail]);
 
   const currentPage = pages[pages.length - 1];
 
