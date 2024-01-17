@@ -1,55 +1,95 @@
-import React from 'react';
+import { useEffect } from 'react';
+
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useForm } from 'react-hook-form';
+import { z } from 'zod';
 
 import { Button } from './button';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from './dialog';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from './dialog';
+import { Form, FormControl, FormField, FormItem, FormMessage } from './form/form';
 import { Input } from './input';
+
+const ZPasswordDialogFormSchema = z.object({
+  password: z.string(),
+});
+
+type TPasswordDialogFormSchema = z.infer<typeof ZPasswordDialogFormSchema>;
 
 type PasswordDialogProps = {
   open: boolean;
   onOpenChange: (_open: boolean) => void;
-  setPassword: (_password: string) => void;
-  onPasswordSubmit: () => void;
+  defaultPassword?: string;
+  onPasswordSubmit?: (password: string) => void;
   isError?: boolean;
 };
 
 export const PasswordDialog = ({
   open,
   onOpenChange,
+  defaultPassword,
   onPasswordSubmit,
   isError,
-  setPassword,
 }: PasswordDialogProps) => {
+  const form = useForm<TPasswordDialogFormSchema>({
+    defaultValues: {
+      password: defaultPassword ?? '',
+    },
+    resolver: zodResolver(ZPasswordDialogFormSchema),
+  });
+
+  const onFormSubmit = ({ password }: TPasswordDialogFormSchema) => {
+    onPasswordSubmit?.(password);
+  };
+
+  useEffect(() => {
+    if (isError) {
+      form.setError('password', {
+        type: 'manual',
+        message: 'The password you have entered is incorrect. Please try again.',
+      });
+    }
+  }, [form, isError]);
+
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-md">
+    <Dialog open={open}>
+      <DialogContent className="w-full max-w-md">
         <DialogHeader>
           <DialogTitle>Password Required</DialogTitle>
+
           <DialogDescription className="text-muted-foreground">
             This document is password protected. Please enter the password to view the document.
           </DialogDescription>
         </DialogHeader>
-        <DialogFooter className="flex w-full items-center justify-center gap-4">
-          <Input
-            type="password"
-            className="bg-background mt-1.5"
-            placeholder="Enter password"
-            onChange={(e) => setPassword(e.target.value)}
-            autoComplete="off"
-          />
-          <Button onClick={onPasswordSubmit}>Submit</Button>
-        </DialogFooter>
-        {isError && (
-          <span className="text-xs text-red-500">
-            The password you entered is incorrect. Please try again.
-          </span>
-        )}
+
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onFormSubmit)}>
+            <fieldset className="flex flex-wrap items-start justify-between gap-4">
+              <FormField
+                name="password"
+                control={form.control}
+                render={({ field }) => (
+                  <FormItem className="relative flex-1">
+                    <FormControl>
+                      <Input
+                        type="password"
+                        className="bg-background"
+                        placeholder="Enter password"
+                        autoComplete="off"
+                        {...field}
+                      />
+                    </FormControl>
+
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <div>
+                <Button>Submit</Button>
+              </div>
+            </fieldset>
+          </form>
+        </Form>
       </DialogContent>
     </Dialog>
   );

@@ -75,8 +75,12 @@ export const ZSendDocumentMutationSchema = z.object({
 
 export const ZSetPasswordForDocumentMutationSchema = z.object({
   documentId: z.number(),
-  documentPassword: z.string(),
+  password: z.string(),
 });
+
+export type TSetPasswordForDocumentMutationSchema = z.infer<
+  typeof ZSetPasswordForDocumentMutationSchema
+>;
 
 export const ZResendDocumentMutationSchema = z.object({
   documentId: z.number(),

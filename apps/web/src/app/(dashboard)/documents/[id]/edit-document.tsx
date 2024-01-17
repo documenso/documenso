@@ -58,6 +58,8 @@ export const EditDocumentForm = ({
   const { mutateAsync: addFields } = trpc.field.addFields.useMutation();
   const { mutateAsync: addSigners } = trpc.recipient.addSigners.useMutation();
   const { mutateAsync: sendDocument } = trpc.document.sendDocument.useMutation();
+  const { mutateAsync: setPasswordForDocument } =
+    trpc.document.setPasswordForDocument.useMutation();
 
   const documentFlow: Record<EditDocumentStep, DocumentFlowStep> = {
     title: {
@@ -178,6 +180,13 @@ export const EditDocumentForm = ({
     }
   };
 
+  const onPasswordSubmit = async (password: string) => {
+    await setPasswordForDocument({
+      documentId: document.id,
+      password,
+    });
+  };
+
   const currentDocumentFlow = documentFlow[step];
 
   return (
@@ -187,7 +196,13 @@ export const EditDocumentForm = ({
         gradient
       >
         <CardContent className="p-2">
-          <LazyPDFViewer key={documentData.id} documentData={documentData} document={document} documentMeta={documentMeta} />
+          <LazyPDFViewer
+            key={documentData.id}
+            documentData={documentData}
+            document={document}
+            password={documentMeta?.password}
+            onPasswordSubmit={onPasswordSubmit}
+          />
         </CardContent>
       </Card>
 

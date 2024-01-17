@@ -175,29 +175,27 @@ export const documentRouter = router({
         });
       }
     }),
-  
-  setDocumentPassword: authenticatedProcedure
-     .input(ZSetPasswordForDocumentMutationSchema)
-     .mutation(async ({ input, ctx }) => {
-        try {
-          const { documentId, documentPassword } = input;
-          await upsertDocumentMeta({
-            documentId,
-            documentPassword,
-            userId: ctx.user.id,
-          });
-        
-        } catch (err) {
-          console.error(err);
-  
-          throw new TRPCError({
-            code: 'BAD_REQUEST',
-            message: 'We were unable to send this document. Please try again later.',
-          });
-        }
-      }),
 
-      
+  setPasswordForDocument: authenticatedProcedure
+    .input(ZSetPasswordForDocumentMutationSchema)
+    .mutation(async ({ input, ctx }) => {
+      try {
+        const { documentId, password } = input;
+
+        await upsertDocumentMeta({
+          documentId,
+          password,
+          userId: ctx.user.id,
+        });
+      } catch (err) {
+        console.error(err);
+
+        throw new TRPCError({
+          code: 'BAD_REQUEST',
+          message: 'We were unable to set the password for this document. Please try again later.',
+        });
+      }
+    }),
 
   sendDocument: authenticatedProcedure
     .input(ZSendDocumentMutationSchema)

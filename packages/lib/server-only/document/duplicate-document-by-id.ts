@@ -26,7 +26,7 @@ export const duplicateDocumentById = async ({ id, userId }: DuplicateDocumentByI
           message: true,
           subject: true,
           dateFormat: true,
-          documentPassword: true,
+          password: true,
           timezone: true,
         },
       },
