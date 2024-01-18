@@ -15,10 +15,13 @@ export const downloadPDF = async ({ documentData, fileName }: DownloadPDFProps) 
   });
 
   const link = window.document.createElement('a');
-  const baseTitle = fileName?.includes('.pdf') ? fileName.split('.pdf')[0] : fileName;
+
+  const [baseTitle] = fileName?.includes('.pdf')
+    ? fileName.split('.pdf')
+    : [fileName ?? 'document'];
 
   link.href = window.URL.createObjectURL(blob);
-  link.download = baseTitle ? `${baseTitle}_signed.pdf` : 'document.pdf';
+  link.download = `${baseTitle}_signed.pdf`;
 
   link.click();
 
