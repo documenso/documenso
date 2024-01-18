@@ -1,6 +1,7 @@
 import { TRPCError } from '@trpc/server';
 
 import { getServerLimits } from '@documenso/ee/server-only/limits/server';
+import { DOCUMENSO_ENCRYPTION_KEY } from '@documenso/lib/constants/crypto';
 import { upsertDocumentMeta } from '@documenso/lib/server-only/document-meta/upsert-document-meta';
 import { createDocument } from '@documenso/lib/server-only/document/create-document';
 import { deleteDocument } from '@documenso/lib/server-only/document/delete-document';
@@ -13,6 +14,7 @@ import { sendDocument } from '@documenso/lib/server-only/document/send-document'
 import { updateTitle } from '@documenso/lib/server-only/document/update-title';
 import { setFieldsForDocument } from '@documenso/lib/server-only/field/set-fields-for-document';
 import { setRecipientsForDocument } from '@documenso/lib/server-only/recipient/set-recipients-for-document';
+import { symmetricEncrypt } from '@documenso/lib/universal/crypto';
 
 import { authenticatedProcedure, procedure, router } from '../trpc';
 import {
@@ -24,6 +26,7 @@ import {
   ZSearchDocumentsMutationSchema,
   ZSendDocumentMutationSchema,
   ZSetFieldsForDocumentMutationSchema,
+  ZSetPasswordForDocumentMutationSchema,
   ZSetRecipientsForDocumentMutationSchema,
   ZSetTitleForDocumentMutationSchema,
 } from './schema';
@@ -171,6 +174,38 @@ export const documentRouter = router({
         throw new TRPCError({
           code: 'BAD_REQUEST',
           message: 'We were unable to set the fields for this document. Please try again later.',
+        });
+      }
+    }),
+
+  setPasswordForDocument: authenticatedProcedure
+    .input(ZSetPasswordForDocumentMutationSchema)
+    .mutation(async ({ input, ctx }) => {
+      try {
+        const { documentId, password } = input;
+
+        const key = DOCUMENSO_ENCRYPTION_KEY;
+
+        if (!key) {
+          throw new Error('Missing encryption key');
+        }
+
+        const securePassword = symmetricEncrypt({
+          data: password,
+          key,
+        });
+
+        await upsertDocumentMeta({
+          documentId,
+          password: securePassword,
+          userId: ctx.user.id,
+        });
+      } catch (err) {
+        console.error(err);
+
+        throw new TRPCError({
+          code: 'BAD_REQUEST',
+          message: 'We were unable to set the password for this document. Please try again later.',
         });
       }
     }),
