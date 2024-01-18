@@ -14,7 +14,7 @@ import {
   SETTINGS_PAGE_SHORTCUT,
   TEMPLATES_PAGE_SHORTCUT,
 } from '@documenso/lib/constants/keyboard-shortcuts';
-import { DocumentStatus } from '@documenso/prisma/client';
+import type { Document, Recipient } from '@documenso/prisma/client';
 import { trpc as trpcReact } from '@documenso/trpc/react';
 import {
   CommandDialog,
@@ -67,9 +67,9 @@ export type CommandMenuProps = {
 
 export function CommandMenu({ open, onOpenChange }: CommandMenuProps) {
   const { setTheme } = useTheme();
-  const router = useRouter();
   const { data: session } = useSession();
-  const accountOwnerEmail = session.user.email;
+
+  const router = useRouter();
 
   const [isOpen, setIsOpen] = useState(() => open ?? false);
   const [search, setSearch] = useState('');
@@ -85,19 +85,16 @@ export function CommandMenu({ open, onOpenChange }: CommandMenuProps) {
       },
     );
 
-  const isAccountOwnerRecipient = (document) => {
-    return document.Recipient.some((recipient) => recipient.email === accountOwnerEmail);
-  };
+  const isOwner = useCallback(
+    (document: Document) => document.userId === session?.user.id,
+    [session?.user.id],
+  );
 
-  const isDocumentCompletedByAccountOwner = (document) => {
-    return document.status === DocumentStatus.COMPLETED && isAccountOwnerRecipient(document);
-  };
-
-  const signingCompleteLink = (document) => {
-    return `/sign/${
-      document.Recipient.find((recipient) => recipient.email === accountOwnerEmail)?.token
-    }/complete`;
-  };
+  const getSigningLink = useCallback(
+    (recipients: Recipient[]) =>
+      `/sign/${recipients.find((r) => r.email === session?.user.email)?.token}`,
+    [session?.user.email],
+  );
 
   const searchResults = useMemo(() => {
     if (!searchDocumentsData) {
@@ -106,12 +103,10 @@ export function CommandMenu({ open, onOpenChange }: CommandMenuProps) {
 
     return searchDocumentsData.map((document) => ({
       label: document.title,
-      path: isDocumentCompletedByAccountOwner(document)
-        ? signingCompleteLink(document)
-        : `/documents/${document.id}`,
+      path: isOwner(document) ? `/documents/${document.id}` : getSigningLink(document.Recipient),
       value: [document.id, document.title, ...document.Recipient.map((r) => r.email)].join(' '),
     }));
-  }, [searchDocumentsData, accountOwnerEmail]);
+  }, [searchDocumentsData, isOwner, getSigningLink]);
 
   const currentPage = pages[pages.length - 1];
 
