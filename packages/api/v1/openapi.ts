@@ -8,7 +8,7 @@ export const OpenAPIV1 = generateOpenApi(
     info: {
       title: 'Documenso API',
       version: '1.0.0',
-      description: 'Documenso API',
+      description: 'The Documenso API for retrieving, creating, updating and deleting documents.',
     },
   },
   {
