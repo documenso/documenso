@@ -10,7 +10,20 @@ import type { User } from '@documenso/prisma/client';
 import { TRPCClientError } from '@documenso/trpc/client';
 import { trpc } from '@documenso/trpc/react';
 import { cn } from '@documenso/ui/lib/utils';
+import { Alert, AlertDescription } from '@documenso/ui/primitives/alert';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@documenso/ui/primitives/alert-dialog';
 import { Button } from '@documenso/ui/primitives/button';
+import { Card, CardContent, CardFooter } from '@documenso/ui/primitives/card';
 import {
   Form,
   FormControl,
@@ -133,10 +146,55 @@ export const ProfileForm = ({ className, user }: ProfileFormProps) => {
           />
         </fieldset>
 
-        <Button type="submit" loading={isSubmitting}>
+        <Button type="submit" loading={isSubmitting} className="self-end">
           {isSubmitting ? 'Updating profile...' : 'Update profile'}
         </Button>
       </form>
+
+      <div className="mt-8 max-w-xl">
+        <Label>Delete Account</Label>
+        <Card className="border-destructive mt-2 pb-0">
+          <CardContent className="p-4">
+            Delete your account and all its contents, including completed documents. This action is
+            irreversible and will cancel your subscription, so proceed with caution.
+          </CardContent>
+          <CardFooter className="justify-end pb-4 pr-4">
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button variant="destructive">Delete Account</Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Delete Account</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    Documenso will delete{' '}
+                    <span className="font-semibold">all of your documents</span>, along with all of
+                    your completed documents, signatures, and all other resources belonging to your
+                    Account.
+                    <AlertDestructive />
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogAction className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+                    Delete Account
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          </CardFooter>
+        </Card>
+      </div>
     </Form>
   );
 };
+
+export function AlertDestructive() {
+  return (
+    <Alert variant="destructive" className="mt-5">
+      <AlertDescription className="selection:bg-red-100">
+        This action is not reversible. Please be certain.
+      </AlertDescription>
+    </Alert>
+  );
+}
