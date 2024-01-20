@@ -34,13 +34,7 @@ export const ConfettiScreen = ({
   }
 
   return createPortal(
-    <Confetti
-      {...props}
-      className="w-full"
-      numberOfPieces={numberOfPieces}
-      width={width}
-      height={height}
-    />,
+    <Confetti className="w-full" numberOfPieces={numberOfPieces} width={width} height={height} />,
     document.body,
   );
 };

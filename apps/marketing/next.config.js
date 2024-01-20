@@ -1,3 +1,4 @@
+const million = require('million/compiler');
 /* eslint-disable @typescript-eslint/no-var-requires */
 const fs = require('fs');
 const path = require('path');
@@ -5,11 +6,11 @@ const { withContentlayer } = require('next-contentlayer');
 
 const ENV_FILES = ['.env', '.env.local', `.env.${process.env.NODE_ENV || 'development'}`];
 
-ENV_FILES.forEach((file) => {
+for (file of ENV_FILES) {
   require('dotenv').config({
     path: path.join(__dirname, `../../${file}`),
   });
-});
+}
 
 // !: This is a temp hack to get caveat working without placing it back in the public directory.
 // !: By inlining this at build time we should be able to sign faster.
@@ -94,4 +95,6 @@ const config = {
   },
 };
 
-module.exports = withContentlayer(config);
+module.exports = million.next(
+  withContentlayer(config), { auto: { rsc: true } }
+);

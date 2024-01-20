@@ -1,6 +1,7 @@
 'use client';
 
-import { HTMLAttributes, useEffect, useState } from 'react';
+import type { HTMLAttributes } from 'react';
+import { useEffect, useState } from 'react';
 
 import { Cell, Legend, Pie, PieChart, Tooltip } from 'recharts';
 
@@ -41,14 +42,14 @@ const renderCustomizedLabel = ({
 
 export type CapTableProps = HTMLAttributes<HTMLDivElement>;
 
-export const CapTable = ({ className, ...props }: CapTableProps) => {
+export const CapTable = ({ className }: CapTableProps) => {
   const [isSSR, setIsSSR] = useState(true);
 
   useEffect(() => {
     setIsSSR(false);
   }, []);
   return (
-    <div className={cn('flex flex-col', className)} {...props}>
+    <div className={cn('flex flex-col', className)}>
       <h3 className="px-4 text-lg font-semibold">Cap Table</h3>
 
       <div className="border-border mt-2.5 flex flex-1 items-center justify-center rounded-2xl border shadow-sm hover:shadow">
@@ -76,7 +77,7 @@ export const CapTable = ({ className, ...props }: CapTableProps) => {
             />
             <Tooltip
               formatter={(percent: number, name, props) => {
-                return [`${percent}%`, name || props['name'] || props['payload']['name']];
+                return [`${percent}%`, name || props.name || props.payload.name];
               }}
             />
           </PieChart>

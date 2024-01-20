@@ -1,4 +1,4 @@
-import { HTMLAttributes } from 'react';
+import type { HTMLAttributes } from 'react';
 
 import { cn } from '@documenso/ui/lib/utils';
 import {
@@ -14,9 +14,9 @@ import { TEAM_MEMBERS } from './data';
 
 export type TeamMembersProps = HTMLAttributes<HTMLDivElement>;
 
-export const TeamMembers = ({ className, ...props }: TeamMembersProps) => {
+export const TeamMembers = ({ className }: TeamMembersProps) => {
   return (
-    <div className={cn('flex flex-col', className)} {...props}>
+    <div className={cn('flex flex-col', className)}>
       <h2 className="px-4 text-2xl font-semibold">Team</h2>
 
       <div className="border-border mt-2.5 flex-1 rounded-2xl border shadow-sm hover:shadow">

@@ -15,13 +15,13 @@ export type PricingTableProps = HTMLAttributes<HTMLDivElement>;
 
 const SELECTED_PLAN_BAR_LAYOUT_ID = 'selected-plan-bar';
 
-export const PricingTable = ({ className, ...props }: PricingTableProps) => {
+export const PricingTable = ({ className }: PricingTableProps) => {
   const event = usePlausible();
 
   const [period, setPeriod] = useState<'MONTHLY' | 'YEARLY'>('MONTHLY');
 
   return (
-    <div className={cn('', className)} {...props}>
+    <div className={cn('', className)}>
       <div className="flex items-center justify-center gap-x-6">
         <AnimatePresence>
           <motion.button

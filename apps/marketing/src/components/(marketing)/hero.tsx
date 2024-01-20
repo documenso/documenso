@@ -3,7 +3,8 @@
 import Image from 'next/image';
 import Link from 'next/link';
 
-import { Variants, motion } from 'framer-motion';
+import type { Variants } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { usePlausible } from 'next-plausible';
 import { LuGithub } from 'react-icons/lu';
 import { match } from 'ts-pattern';
@@ -49,7 +50,7 @@ const HeroTitleVariants: Variants = {
   },
 };
 
-export const Hero = ({ className, ...props }: HeroProps) => {
+export const Hero = ({ className }: HeroProps) => {
   const event = usePlausible();
 
   const { getFlag } = useFeatureFlags();
@@ -74,7 +75,7 @@ export const Hero = ({ className, ...props }: HeroProps) => {
   };
 
   return (
-    <motion.div className={cn('relative', className)} {...props}>
+    <motion.div className={cn('relative', className)}>
       <div className="absolute -inset-24 -z-10">
         <motion.div
           className="flex h-full w-full origin-top-right items-center justify-center"

@@ -1,4 +1,4 @@
-import { HTMLAttributes } from 'react';
+import type { HTMLAttributes } from 'react';
 
 import Image from 'next/image';
 
@@ -11,12 +11,9 @@ import { Card, CardContent } from '@documenso/ui/primitives/card';
 
 export type FasterSmarterBeautifulBentoProps = HTMLAttributes<HTMLDivElement>;
 
-export const FasterSmarterBeautifulBento = ({
-  className,
-  ...props
-}: FasterSmarterBeautifulBentoProps) => {
+export const FasterSmarterBeautifulBento = ({ className }: FasterSmarterBeautifulBentoProps) => {
   return (
-    <div className={cn('relative', className)} {...props}>
+    <div className={cn('relative', className)}>
       <div className="absolute inset-0 -z-10 flex items-center justify-center">
         <Image
           src={backgroundPattern}

@@ -20,7 +20,7 @@ export const generateMetadata = ({ params }: { params: { content: string } }) =>
 
 const mdxComponents: MDXComponents = {
   MdxNextImage: (props: { width: number; height: number; alt?: string; src: string }) => (
-    <Image {...props} alt={props.alt ?? ''} />
+    <Image width={props.width} height={props.height} src={props.src} alt={props.alt ?? ''} />
   ),
 };
 

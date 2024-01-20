@@ -1,6 +1,6 @@
 'use client';
 
-import { HTMLAttributes } from 'react';
+import type { HTMLAttributes } from 'react';
 
 import { Bar, BarChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 
@@ -11,14 +11,14 @@ export type FundingRaisedProps = HTMLAttributes<HTMLDivElement> & {
   data: Record<string, string | number>[];
 };
 
-export const FundingRaised = ({ className, data, ...props }: FundingRaisedProps) => {
+export const FundingRaised = ({ className, data }: FundingRaisedProps) => {
   const formattedData = data.map((item) => ({
     amount: Number(item.amount),
     date: formatMonth(item.date as string),
   }));
 
   return (
-    <div className={cn('flex flex-col', className)} {...props}>
+    <div className={cn('flex flex-col', className)}>
       <h3 className="px-4 text-lg font-semibold">Total Funding Raised</h3>
 
       <div className="border-border mt-2.5 flex flex-1 flex-col items-center justify-center rounded-2xl border p-6 pl-2 pt-12 shadow-sm hover:shadow">

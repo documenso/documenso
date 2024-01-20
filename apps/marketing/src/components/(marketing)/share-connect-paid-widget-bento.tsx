@@ -1,4 +1,4 @@
-import { HTMLAttributes } from 'react';
+import type { HTMLAttributes } from 'react';
 
 import Image from 'next/image';
 
@@ -12,12 +12,9 @@ import { Card, CardContent } from '@documenso/ui/primitives/card';
 
 export type ShareConnectPaidWidgetBentoProps = HTMLAttributes<HTMLDivElement>;
 
-export const ShareConnectPaidWidgetBento = ({
-  className,
-  ...props
-}: ShareConnectPaidWidgetBentoProps) => {
+export const ShareConnectPaidWidgetBento = ({ className }: ShareConnectPaidWidgetBentoProps) => {
   return (
-    <div className={cn('relative', className)} {...props}>
+    <div className={cn('relative', className)}>
       <div className="absolute inset-0 -z-10 flex items-center justify-center">
         <Image
           src={backgroundPattern}

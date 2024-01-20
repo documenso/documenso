@@ -15,7 +15,7 @@ import { MobileNavigation } from './mobile-navigation';
 
 export type HeaderProps = HTMLAttributes<HTMLElement>;
 
-export const Header = ({ className, ...props }: HeaderProps) => {
+export const Header = ({ className }: HeaderProps) => {
   const [isHamburgerMenuOpen, setIsHamburgerMenuOpen] = useState(false);
 
   const { getFlag } = useFeatureFlags();
@@ -23,7 +23,7 @@ export const Header = ({ className, ...props }: HeaderProps) => {
   const isSinglePlayerModeMarketingEnabled = getFlag('marketing_header_single_player_mode');
 
   return (
-    <header className={cn('flex items-center justify-between', className)} {...props}>
+    <header className={cn('flex items-center justify-between', className)}>
       <div className="flex items-center space-x-4">
         <Link href="/" className="z-10" onClick={() => setIsHamburgerMenuOpen(false)}>
           <Image

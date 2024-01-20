@@ -55,7 +55,7 @@ type StepValues = (typeof STEP)[StepKeys];
 
 export type WidgetProps = HTMLAttributes<HTMLDivElement>;
 
-export const Widget = ({ className, children, ...props }: WidgetProps) => {
+export const Widget = ({ className, children }: WidgetProps) => {
   const { toast } = useToast();
   const event = usePlausible();
 
@@ -148,19 +148,19 @@ export const Widget = ({ className, children, ...props }: WidgetProps) => {
 
       const claimPlanInput = signatureDataUrl
         ? {
-            name,
-            email,
-            planId,
-            signatureDataUrl: signatureDataUrl,
-            signatureText: null,
-          }
+          name,
+          email,
+          planId,
+          signatureDataUrl: signatureDataUrl,
+          signatureText: null,
+        }
         : {
-            name,
-            email,
-            planId,
-            signatureDataUrl: null,
-            signatureText: signatureText ?? '',
-          };
+          name,
+          email,
+          planId,
+          signatureDataUrl: null,
+          signatureText: signatureText ?? '',
+        };
 
       const [result] = await Promise.all([claimPlan(claimPlanInput), delay]);
 
@@ -183,7 +183,6 @@ export const Widget = ({ className, children, ...props }: WidgetProps) => {
       <Card
         className={cn('mx-auto w-full max-w-4xl rounded-3xl before:rounded-3xl', className)}
         gradient
-        {...props}
       >
         <div className="grid grid-cols-12 gap-y-8 overflow-hidden p-2 lg:gap-x-8">
           <div className="text-muted-foreground col-span-12 flex flex-col gap-y-4 p-4 text-xs leading-relaxed lg:col-span-7">

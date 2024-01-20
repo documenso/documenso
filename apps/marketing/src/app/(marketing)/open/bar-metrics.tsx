@@ -1,6 +1,6 @@
 'use client';
 
-import { HTMLAttributes } from 'react';
+import type { HTMLAttributes } from 'react';
 
 import { Bar, BarChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 
@@ -24,7 +24,6 @@ export const BarMetric = <T extends Record<string, Record<keyof T[string], unkno
   label,
   chartHeight = 400,
   extraInfo,
-  ...props
 }: BarMetricProps<T>) => {
   const formattedData = Object.keys(data)
     .map((key) => ({
@@ -34,7 +33,7 @@ export const BarMetric = <T extends Record<string, Record<keyof T[string], unkno
     .reverse();
 
   return (
-    <div className={cn('flex flex-col', className)} {...props}>
+    <div className={cn('flex flex-col', className)}>
       <div className="flex items-center px-4">
         <h3 className="text-lg font-semibold">{title}</h3>
         <span>{extraInfo}</span>

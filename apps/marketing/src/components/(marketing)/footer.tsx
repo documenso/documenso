@@ -35,9 +35,9 @@ const FOOTER_LINKS = [
   { href: '/privacy', text: 'Privacy' },
 ];
 
-export const Footer = ({ className, ...props }: FooterProps) => {
+export const Footer = ({ className }: FooterProps) => {
   return (
-    <div className={cn('border-t py-12', className)} {...props}>
+    <div className={cn('border-t py-12', className)}>
       <div className="mx-auto flex w-full max-w-screen-xl flex-wrap items-start justify-between gap-8 px-8">
         <div className="flex-shrink-0">
           <Link href="/">
@@ -53,7 +53,7 @@ export const Footer = ({ className, ...props }: FooterProps) => {
           <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-4">
             {SOCIAL_LINKS.map((link, index) => (
               <Link
-                key={index}
+                key={link.href + index.toString()}
                 href={link.href}
                 target="_blank"
                 className="text-muted-foreground hover:text-muted-foreground/80"
@@ -67,7 +67,7 @@ export const Footer = ({ className, ...props }: FooterProps) => {
         <div className="grid w-full max-w-sm grid-cols-2 gap-x-4 gap-y-2 md:w-auto md:gap-x-8">
           {FOOTER_LINKS.map((link, index) => (
             <Link
-              key={index}
+              key={link.href + index.toString()}
               href={link.href}
               target={link.target}
               className="text-muted-foreground hover:text-muted-foreground/80 flex-shrink-0 break-words text-sm"
