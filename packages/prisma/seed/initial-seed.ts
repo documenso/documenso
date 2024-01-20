@@ -18,6 +18,7 @@ export const seedDatabase = async () => {
     create: {
       name: 'Example User',
       email: 'example@documenso.com',
+      emailVerified: new Date(),
       password: hashSync('password'),
       roles: [Role.USER],
     },
@@ -31,6 +32,7 @@ export const seedDatabase = async () => {
     create: {
       name: 'Admin User',
       email: 'admin@documenso.com',
+      emailVerified: new Date(),
       password: hashSync('password'),
       roles: [Role.USER, Role.ADMIN],
     },
