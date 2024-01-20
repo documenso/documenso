@@ -3,6 +3,7 @@
 import { useRouter } from 'next/navigation';
 
 import { zodResolver } from '@hookform/resolvers/zod';
+import { signOut } from 'next-auth/react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
@@ -65,6 +66,7 @@ export const ProfileForm = ({ className, user }: ProfileFormProps) => {
   const isSubmitting = form.formState.isSubmitting;
 
   const { mutateAsync: updateProfile } = trpc.profile.updateProfile.useMutation();
+  const { mutateAsync: deleteAccount } = trpc.profile.deleteAccount.useMutation();
 
   const onFormSubmit = async ({ name, signature }: TProfileFormSchema) => {
     try {
@@ -93,6 +95,39 @@ export const ProfileForm = ({ className, user }: ProfileFormProps) => {
           variant: 'destructive',
           description:
             'We encountered an unknown error while attempting to sign you In. Please try again later.',
+        });
+      }
+    }
+  };
+
+  const onDeleteAccount = async () => {
+    try {
+      await deleteAccount();
+
+      await signOut({ callbackUrl: '/' });
+
+      toast({
+        title: 'Account deleted',
+        description: 'Your account has been deleted successfully.',
+        duration: 5000,
+      });
+
+      // logout after deleting account
+
+      router.push('/');
+    } catch (err) {
+      if (err instanceof TRPCClientError && err.data?.code === 'BAD_REQUEST') {
+        toast({
+          title: 'An error occurred',
+          description: err.message,
+          variant: 'destructive',
+        });
+      } else {
+        toast({
+          title: 'An unknown error occurred',
+          variant: 'destructive',
+          description:
+            'We encountered an unknown error while attempting to delete your account. Please try again later.',
         });
       }
     }
@@ -171,12 +206,19 @@ export const ProfileForm = ({ className, user }: ProfileFormProps) => {
                     <span className="font-semibold">all of your documents</span>, along with all of
                     your completed documents, signatures, and all other resources belonging to your
                     Account.
-                    <AlertDestructive />
+                    <Alert variant="destructive" className="mt-5">
+                      <AlertDescription className="selection:bg-red-100">
+                        This action is not reversible. Please be certain.
+                      </AlertDescription>
+                    </Alert>
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
                   <AlertDialogCancel>Cancel</AlertDialogCancel>
-                  <AlertDialogAction className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+                  <AlertDialogAction
+                    onClick={onDeleteAccount}
+                    className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                  >
                     Delete Account
                   </AlertDialogAction>
                 </AlertDialogFooter>
@@ -189,12 +231,6 @@ export const ProfileForm = ({ className, user }: ProfileFormProps) => {
   );
 };
 
-export function AlertDestructive() {
-  return (
-    <Alert variant="destructive" className="mt-5">
-      <AlertDescription className="selection:bg-red-100">
-        This action is not reversible. Please be certain.
-      </AlertDescription>
-    </Alert>
-  );
-}
+// Cal.com Delete User TRPC = https://github.com/calcom/cal.com/blob/main/packages/trpc/server/routers/loggedInViewer/deleteMe.handler.ts#L11
+// https://github.com/calcom/cal.com/blob/main/packages/features/users/lib/userDeletionService.ts#L7
+// delete stripe: https://github.com/calcom/cal.com/blob/main/packages/app-store/stripepayment/lib/customer.ts#L72
