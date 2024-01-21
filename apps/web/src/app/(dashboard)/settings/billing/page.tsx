@@ -1,3 +1,4 @@
+import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 
 import { match } from 'ts-pattern';
@@ -16,6 +17,10 @@ import { LocaleDate } from '~/components/formatter/locale-date';
 
 import { BillingPlans } from './billing-plans';
 import { BillingPortalButton } from './billing-portal-button';
+
+export const metadata: Metadata = {
+  title: 'Billing',
+};
 
 export default async function BillingSettingsPage() {
   let { user } = await getRequiredServerComponentSession();
