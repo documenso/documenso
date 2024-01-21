@@ -12,19 +12,17 @@ import { TRPCClientError } from '@documenso/trpc/client';
 import { trpc } from '@documenso/trpc/react';
 import { cn } from '@documenso/ui/lib/utils';
 import { Alert, AlertDescription } from '@documenso/ui/primitives/alert';
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from '@documenso/ui/primitives/alert-dialog';
 import { Button } from '@documenso/ui/primitives/button';
 import { Card, CardContent, CardFooter } from '@documenso/ui/primitives/card';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@documenso/ui/primitives/dialog';
 import {
   Form,
   FormControl,
@@ -66,7 +64,8 @@ export const ProfileForm = ({ className, user }: ProfileFormProps) => {
   const isSubmitting = form.formState.isSubmitting;
 
   const { mutateAsync: updateProfile } = trpc.profile.updateProfile.useMutation();
-  const { mutateAsync: deleteAccount } = trpc.profile.deleteAccount.useMutation();
+  const { mutateAsync: deleteAccount, isLoading: isDeletingAccount } =
+    trpc.profile.deleteAccount.useMutation();
 
   const onFormSubmit = async ({ name, signature }: TProfileFormSchema) => {
     try {
@@ -194,14 +193,14 @@ export const ProfileForm = ({ className, user }: ProfileFormProps) => {
             irreversible and will cancel your subscription, so proceed with caution.
           </CardContent>
           <CardFooter className="justify-end pb-4 pr-4">
-            <AlertDialog>
-              <AlertDialogTrigger asChild>
+            <Dialog>
+              <DialogTrigger asChild>
                 <Button variant="destructive">Delete Account</Button>
-              </AlertDialogTrigger>
-              <AlertDialogContent>
-                <AlertDialogHeader>
-                  <AlertDialogTitle>Delete Account</AlertDialogTitle>
-                  <AlertDialogDescription>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Delete Account</DialogTitle>
+                  <DialogDescription>
                     Documenso will delete{' '}
                     <span className="font-semibold">all of your documents</span>, along with all of
                     your completed documents, signatures, and all other resources belonging to your
@@ -211,26 +210,22 @@ export const ProfileForm = ({ className, user }: ProfileFormProps) => {
                         This action is not reversible. Please be certain.
                       </AlertDescription>
                     </Alert>
-                  </AlertDialogDescription>
-                </AlertDialogHeader>
-                <AlertDialogFooter>
-                  <AlertDialogCancel>Cancel</AlertDialogCancel>
-                  <AlertDialogAction
+                  </DialogDescription>
+                </DialogHeader>
+                <DialogFooter>
+                  <Button
                     onClick={onDeleteAccount}
-                    className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                    loading={isDeletingAccount}
+                    variant="destructive"
                   >
-                    Delete Account
-                  </AlertDialogAction>
-                </AlertDialogFooter>
-              </AlertDialogContent>
-            </AlertDialog>
+                    {isDeletingAccount ? 'Deleting account...' : 'Delete Account'}
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
           </CardFooter>
         </Card>
       </div>
     </Form>
   );
 };
-
-// Cal.com Delete User TRPC = https://github.com/calcom/cal.com/blob/main/packages/trpc/server/routers/loggedInViewer/deleteMe.handler.ts#L11
-// https://github.com/calcom/cal.com/blob/main/packages/features/users/lib/userDeletionService.ts#L7
-// delete stripe: https://github.com/calcom/cal.com/blob/main/packages/app-store/stripepayment/lib/customer.ts#L72
