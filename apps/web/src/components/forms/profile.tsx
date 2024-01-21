@@ -7,6 +7,7 @@ import { signOut } from 'next-auth/react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
+import { validateTwoFactorAuthentication } from '@documenso/lib/server-only/2fa/validate-2fa';
 import type { User } from '@documenso/prisma/client';
 import { TRPCClientError } from '@documenso/trpc/client';
 import { trpc } from '@documenso/trpc/react';
@@ -41,6 +42,11 @@ export const ZProfileFormSchema = z.object({
   signature: z.string().min(1, 'Signature Pad cannot be empty'),
 });
 
+export const ZTwoFactorAuthTokenSchema = z.object({
+  token: z.string(),
+});
+
+export type TTwoFactorAuthTokenSchema = z.infer<typeof ZTwoFactorAuthTokenSchema>;
 export type TProfileFormSchema = z.infer<typeof ZProfileFormSchema>;
 
 export type ProfileFormProps = {
@@ -61,7 +67,15 @@ export const ProfileForm = ({ className, user }: ProfileFormProps) => {
     resolver: zodResolver(ZProfileFormSchema),
   });
 
+  const deleteAccountTwoFactorTokenForm = useForm<TTwoFactorAuthTokenSchema>({
+    defaultValues: {
+      token: '',
+    },
+    resolver: zodResolver(ZTwoFactorAuthTokenSchema),
+  });
+
   const isSubmitting = form.formState.isSubmitting;
+  const hasTwoFactorAuthentication = user.twoFactorEnabled;
 
   const { mutateAsync: updateProfile } = trpc.profile.updateProfile.useMutation();
   const { mutateAsync: deleteAccount, isLoading: isDeletingAccount } =
@@ -101,9 +115,20 @@ export const ProfileForm = ({ className, user }: ProfileFormProps) => {
 
   const onDeleteAccount = async () => {
     try {
-      await deleteAccount();
+      const { token } = deleteAccountTwoFactorTokenForm.getValues();
 
-      await signOut({ callbackUrl: '/' });
+      if (!token) {
+        throw new Error('Please enter your Two Factor Authentication token.');
+      }
+
+      await validateTwoFactorAuthentication({
+        totpCode: token,
+        user,
+      }).catch(() => {
+        throw new Error('We were unable to validate your Two Factor Authentication token.');
+      });
+
+      await deleteAccount();
 
       toast({
         title: 'Account deleted',
@@ -111,9 +136,7 @@ export const ProfileForm = ({ className, user }: ProfileFormProps) => {
         duration: 5000,
       });
 
-      // logout after deleting account
-
-      router.push('/');
+      await signOut({ callbackUrl: '/' });
     } catch (err) {
       if (err instanceof TRPCClientError && err.data?.code === 'BAD_REQUEST') {
         toast({
@@ -126,6 +149,7 @@ export const ProfileForm = ({ className, user }: ProfileFormProps) => {
           title: 'An unknown error occurred',
           variant: 'destructive',
           description:
+            err.message ??
             'We encountered an unknown error while attempting to delete your account. Please try again later.',
         });
       }
@@ -193,36 +217,73 @@ export const ProfileForm = ({ className, user }: ProfileFormProps) => {
             irreversible and will cancel your subscription, so proceed with caution.
           </CardContent>
           <CardFooter className="justify-end pb-4 pr-4">
-            <Dialog>
-              <DialogTrigger asChild>
-                <Button variant="destructive">Delete Account</Button>
-              </DialogTrigger>
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle>Delete Account</DialogTitle>
-                  <DialogDescription>
-                    Documenso will delete{' '}
-                    <span className="font-semibold">all of your documents</span>, along with all of
-                    your completed documents, signatures, and all other resources belonging to your
-                    Account.
-                    <Alert variant="destructive" className="mt-5">
+            <Form {...deleteAccountTwoFactorTokenForm}>
+              <form
+                onSubmit={deleteAccountTwoFactorTokenForm.handleSubmit(() => {
+                  console.log('delete account');
+                })}
+              >
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <Button
+                      onClick={() => {
+                        console.log(user);
+                      }}
+                      variant="destructive"
+                    >
+                      Delete Account
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle>Delete Account</DialogTitle>
+                      <DialogDescription>
+                        Documenso will delete{' '}
+                        <span className="font-semibold">all of your documents</span>, along with all
+                        of your completed documents, signatures, and all other resources belonging
+                        to your Account.
+                      </DialogDescription>
+                    </DialogHeader>
+
+                    <Alert variant="destructive">
                       <AlertDescription className="selection:bg-red-100">
                         This action is not reversible. Please be certain.
                       </AlertDescription>
                     </Alert>
-                  </DialogDescription>
-                </DialogHeader>
-                <DialogFooter>
-                  <Button
-                    onClick={onDeleteAccount}
-                    loading={isDeletingAccount}
-                    variant="destructive"
-                  >
-                    {isDeletingAccount ? 'Deleting account...' : 'Delete Account'}
-                  </Button>
-                </DialogFooter>
-              </DialogContent>
-            </Dialog>
+
+                    {hasTwoFactorAuthentication && (
+                      <div className="flex flex-col gap-y-4">
+                        <FormField
+                          name="token"
+                          control={deleteAccountTwoFactorTokenForm.control}
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel className="text-muted-foreground">
+                                Two Factor Authentication Token
+                              </FormLabel>
+                              <FormControl>
+                                <Input {...field} value={field.value ?? ''} />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+                    )}
+
+                    <DialogFooter>
+                      <Button
+                        onClick={onDeleteAccount}
+                        loading={isDeletingAccount}
+                        variant="destructive"
+                      >
+                        {isDeletingAccount ? 'Deleting account...' : 'Delete Account'}
+                      </Button>
+                    </DialogFooter>
+                  </DialogContent>
+                </Dialog>
+              </form>
+            </Form>
           </CardFooter>
         </Card>
       </div>
