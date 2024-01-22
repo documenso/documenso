@@ -5,7 +5,7 @@ import { useState } from 'react';
 import * as DialogPrimitive from '@radix-ui/react-dialog';
 import { X } from 'lucide-react';
 
-import { DocumentData } from '@documenso/prisma/client';
+import type { DocumentData } from '@documenso/prisma/client';
 
 import { cn } from '../../lib/utils';
 import { Dialog, DialogOverlay, DialogPortal } from '../../primitives/dialog';
