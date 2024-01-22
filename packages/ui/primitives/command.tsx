@@ -96,7 +96,10 @@ const CommandGroup = React.forwardRef<
       className,
     )}
     {...props}
-  />
+  >
+    <div className="bg-border -mx-1 h-px"></div>
+    {props.children}
+  </CommandPrimitive.Group>
 ));
 
 CommandGroup.displayName = CommandPrimitive.Group.displayName;
