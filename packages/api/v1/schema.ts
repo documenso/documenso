@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-import { FieldType } from '@documenso/prisma/client';
+import { ReadStatus, SendStatus, SigningStatus } from '@documenso/prisma/client';
 
 export const ZGetDocumentsQuerySchema = z.object({
   page: z.string().optional(),
@@ -9,9 +9,9 @@ export const ZGetDocumentsQuerySchema = z.object({
 
 export type TGetDocumentsQuerySchema = z.infer<typeof ZGetDocumentsQuerySchema>;
 
-export const ZDeleteDocumentMutationSchema = z.string();
+export const ZDeleteDocumentMutationSchema = null;
 
-export type TDeleteDocumentMutationSchema = z.infer<typeof ZDeleteDocumentMutationSchema>;
+export type TDeleteDocumentMutationSchema = typeof ZDeleteDocumentMutationSchema;
 
 export const ZSuccessfulDocumentResponseSchema = z.object({
   id: z.number(),
@@ -26,26 +26,9 @@ export const ZSuccessfulDocumentResponseSchema = z.object({
 
 export type TSuccessfulDocumentResponseSchema = z.infer<typeof ZSuccessfulDocumentResponseSchema>;
 
-export const ZSendDocumentForSigningMutationSchema = z.object({
-  signerEmail: z.string(),
-  signerName: z.string().optional(),
-  emailSubject: z.string().optional(),
-  emailBody: z.string().optional(),
-  fields: z.array(
-    z.object({
-      fieldType: z.nativeEnum(FieldType),
-      pageNumber: z.number(),
-      pageX: z.number(),
-      pageY: z.number(),
-      pageWidth: z.number(),
-      pageHeight: z.number(),
-    }),
-  ),
-});
+export const ZSendDocumentForSigningMutationSchema = null;
 
-export type TSendDocumentForSigningMutationSchema = z.infer<
-  typeof ZSendDocumentForSigningMutationSchema
->;
+export type TSendDocumentForSigningMutationSchema = typeof ZSendDocumentForSigningMutationSchema;
 
 export const ZUploadDocumentSuccessfulSchema = z.object({
   url: z.string(),
@@ -60,6 +43,29 @@ export const ZCreateDocumentMutationSchema = z.object({
 });
 
 export type TCreateDocumentMutationSchema = z.infer<typeof ZCreateDocumentMutationSchema>;
+
+export const ZCreateRecipientMutationSchema = z.object({
+  name: z.string().min(1),
+  email: z.string().email().min(1),
+});
+
+export type TCreateRecipientMutationSchema = z.infer<typeof ZCreateRecipientMutationSchema>;
+
+export const ZSuccessfulRecipientResponseSchema = z.object({
+  id: z.number(),
+  documentId: z.number(),
+  email: z.string().email().min(1),
+  name: z.string(),
+  token: z.string(),
+  // !: Not used for now
+  // expired: z.string(),
+  signedAt: z.date().nullable(),
+  readStatus: z.nativeEnum(ReadStatus),
+  signingStatus: z.nativeEnum(SigningStatus),
+  sendStatus: z.nativeEnum(SendStatus),
+});
+
+export type TSuccessfulRecipientResponseSchema = z.infer<typeof ZSuccessfulRecipientResponseSchema>;
 
 export const ZSuccessfulResponseSchema = z.object({
   documents: ZSuccessfulDocumentResponseSchema.array(),

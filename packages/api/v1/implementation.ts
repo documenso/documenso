@@ -1,13 +1,13 @@
 import { createNextRoute } from '@ts-rest/next';
 
-import { upsertDocumentMeta } from '@documenso/lib/server-only/document-meta/upsert-document-meta';
 import { deleteDocument } from '@documenso/lib/server-only/document/delete-document';
 import { findDocuments } from '@documenso/lib/server-only/document/find-documents';
 import { getDocumentById } from '@documenso/lib/server-only/document/get-document-by-id';
 import { sendDocument } from '@documenso/lib/server-only/document/send-document';
-import { setFieldsForDocument } from '@documenso/lib/server-only/field/set-fields-for-document';
+import { getRecipientsForDocument } from '@documenso/lib/server-only/recipient/get-recipients-for-document';
 import { setRecipientsForDocument } from '@documenso/lib/server-only/recipient/set-recipients-for-document';
 import { getPresignPostUrl } from '@documenso/lib/universal/upload/server-actions';
+import { DocumentStatus } from '@documenso/prisma/client';
 
 import { ApiContractV1 } from './contract';
 import { authenticatedMiddleware } from './middleware/authenticated';
@@ -99,7 +99,6 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
 
   sendDocument: authenticatedMiddleware(async (args, user) => {
     const { id } = args.params;
-    const { body } = args;
 
     const document = await getDocumentById({ id: Number(id), userId: user.id });
 
@@ -122,38 +121,38 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
     }
 
     try {
-      await setRecipientsForDocument({
-        userId: user.id,
-        documentId: Number(id),
-        recipients: [
-          {
-            email: body.signerEmail,
-            name: body.signerName ?? '',
-          },
-        ],
-      });
+      //   await setRecipientsForDocument({
+      //     userId: user.id,
+      //     documentId: Number(id),
+      //     recipients: [
+      //       {
+      //         email: body.signerEmail,
+      //         name: body.signerName ?? '',
+      //       },
+      //     ],
+      //   });
 
-      await setFieldsForDocument({
-        documentId: Number(id),
-        userId: user.id,
-        fields: body.fields.map((field) => ({
-          signerEmail: body.signerEmail,
-          type: field.fieldType,
-          pageNumber: field.pageNumber,
-          pageX: field.pageX,
-          pageY: field.pageY,
-          pageWidth: field.pageWidth,
-          pageHeight: field.pageHeight,
-        })),
-      });
+      //   await setFieldsForDocument({
+      //     documentId: Number(id),
+      //     userId: user.id,
+      //     fields: body.fields.map((field) => ({
+      //       signerEmail: body.signerEmail,
+      //       type: field.fieldType,
+      //       pageNumber: field.pageNumber,
+      //       pageX: field.pageX,
+      //       pageY: field.pageY,
+      //       pageWidth: field.pageWidth,
+      //       pageHeight: field.pageHeight,
+      //     })),
+      //   });
 
-      if (body.emailBody || body.emailSubject) {
-        await upsertDocumentMeta({
-          documentId: Number(id),
-          subject: body.emailSubject ?? '',
-          message: body.emailBody ?? '',
-        });
-      }
+      //   if (body.emailBody || body.emailSubject) {
+      //     await upsertDocumentMeta({
+      //       documentId: Number(id),
+      //       subject: body.emailSubject ?? '',
+      //       message: body.emailBody ?? '',
+      //     });
+      //   }
 
       await sendDocument({
         documentId: Number(id),
@@ -171,6 +170,82 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
         status: 500,
         body: {
           message: 'An error has occured while sending the document for signing',
+        },
+      };
+    }
+  }),
+
+  createRecipient: authenticatedMiddleware(async (args, user) => {
+    const { id: documentId } = args.params;
+    const { name, email } = args.body;
+
+    const document = await getDocumentById({
+      id: Number(documentId),
+      userId: user.id,
+    });
+
+    if (!document) {
+      return {
+        status: 404,
+        body: {
+          message: 'Document not found',
+        },
+      };
+    }
+
+    if (document.status === DocumentStatus.COMPLETED) {
+      return {
+        status: 400,
+        body: {
+          message: 'Document is already completed',
+        },
+      };
+    }
+
+    const recipients = await getRecipientsForDocument({
+      documentId: Number(documentId),
+      userId: user.id,
+    });
+
+    const recipientAlreadyExists = recipients.some((recipient) => recipient.email === email);
+
+    if (recipientAlreadyExists) {
+      return {
+        status: 400,
+        body: {
+          message: 'Recipient already exists',
+        },
+      };
+    }
+
+    try {
+      const newRecipients = await setRecipientsForDocument({
+        documentId: Number(documentId),
+        userId: user.id,
+        recipients: [
+          ...recipients,
+          {
+            email,
+            name,
+          },
+        ],
+      });
+
+      const newRecipient = newRecipients.find((recipient) => recipient.email === email);
+
+      if (!newRecipient) {
+        throw new Error('Recipient not found');
+      }
+
+      return {
+        status: 200,
+        body: newRecipient,
+      };
+    } catch (err) {
+      return {
+        status: 500,
+        body: {
+          message: 'An error has occured while creating the recipient',
         },
       };
     }

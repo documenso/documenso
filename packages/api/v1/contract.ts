@@ -4,9 +4,11 @@ import {
   ZSendDocumentForSigningMutationSchema as SendDocumentMutationSchema,
   ZAuthorizationHeadersSchema,
   ZCreateDocumentMutationSchema,
+  ZCreateRecipientMutationSchema,
   ZDeleteDocumentMutationSchema,
   ZGetDocumentsQuerySchema,
   ZSuccessfulDocumentResponseSchema,
+  ZSuccessfulRecipientResponseSchema,
   ZSuccessfulResponseSchema,
   ZSuccessfulSigningResponseSchema,
   ZUnsuccessfulResponseSchema,
@@ -19,7 +21,7 @@ export const ApiContractV1 = c.router(
   {
     getDocuments: {
       method: 'GET',
-      path: '/documents',
+      path: '/api/v1/documents',
       query: ZGetDocumentsQuerySchema,
       responses: {
         200: ZSuccessfulResponseSchema,
@@ -31,7 +33,7 @@ export const ApiContractV1 = c.router(
 
     getDocument: {
       method: 'GET',
-      path: `/documents/:id`,
+      path: '/api/v1/documents/:id',
       responses: {
         200: ZSuccessfulDocumentResponseSchema,
         401: ZUnsuccessfulResponseSchema,
@@ -42,7 +44,7 @@ export const ApiContractV1 = c.router(
 
     createDocument: {
       method: 'POST',
-      path: '/documents',
+      path: '/api/v1/documents',
       body: ZCreateDocumentMutationSchema,
       responses: {
         200: ZUploadDocumentSuccessfulSchema,
@@ -53,8 +55,8 @@ export const ApiContractV1 = c.router(
     },
 
     sendDocument: {
-      method: 'PATCH',
-      path: '/documents/:id/send',
+      method: 'POST',
+      path: '/api/v1/documents/:id/send',
       body: SendDocumentMutationSchema,
       responses: {
         200: ZSuccessfulSigningResponseSchema,
@@ -68,7 +70,7 @@ export const ApiContractV1 = c.router(
 
     deleteDocument: {
       method: 'DELETE',
-      path: `/documents/:id`,
+      path: '/api/v1/documents/:id',
       body: ZDeleteDocumentMutationSchema,
       responses: {
         200: ZSuccessfulDocumentResponseSchema,
@@ -76,6 +78,20 @@ export const ApiContractV1 = c.router(
         404: ZUnsuccessfulResponseSchema,
       },
       summary: 'Delete a document',
+    },
+
+    createRecipient: {
+      method: 'POST',
+      path: '/api/v1/documents/:id/recipients',
+      body: ZCreateRecipientMutationSchema,
+      responses: {
+        200: ZSuccessfulRecipientResponseSchema,
+        400: ZUnsuccessfulResponseSchema,
+        401: ZUnsuccessfulResponseSchema,
+        404: ZUnsuccessfulResponseSchema,
+        500: ZUnsuccessfulResponseSchema,
+      },
+      summary: 'Create a recipient for a document',
     },
   },
   {

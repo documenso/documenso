@@ -6,7 +6,7 @@ export type GetApiTokenByIdOptions = {
 };
 
 export const getApiTokenById = async ({ id, userId }: GetApiTokenByIdOptions) => {
-  return prisma.apiToken.findFirstOrThrow({
+  return await prisma.apiToken.findFirstOrThrow({
     where: {
       id,
       userId,
