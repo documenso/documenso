@@ -95,11 +95,12 @@ export const UploadDocument = ({ className }: UploadDocumentProps) => {
       setIsLoading(false);
     }
   };
+    const isSmallVerticalScreen = typeof window !== 'undefined' && window.innerHeight < 800;
 
   return (
     <div className={cn('relative', className)}>
       <DocumentDropzone
-        className="min-h-[40vh]"
+        className={`${isSmallVerticalScreen ? 'min-h-[50vh]' : 'min-h-[40vh]'}`}
         disabled={remaining.documents === 0 || !session?.user.emailVerified}
         disabledMessage={disabledMessage}
         onDrop={onFileDrop}
