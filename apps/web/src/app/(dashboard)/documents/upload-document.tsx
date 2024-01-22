@@ -95,7 +95,7 @@ export const UploadDocument = ({ className }: UploadDocumentProps) => {
       setIsLoading(false);
     }
   };
-    const isSmallVerticalScreen = typeof window !== 'undefined' && window.innerHeight < 800;
+    const isSmallVerticalScreen = useMemo(() => typeof window !== 'undefined' && window.innerHeight < 800, []);
 
   return (
     <div className={cn('relative', className)}>
