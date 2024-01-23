@@ -48,9 +48,10 @@ export type TSignInFormSchema = z.infer<typeof ZSignInFormSchema>;
 
 export type SignInFormProps = {
   className?: string;
+  isGoogleSSOEnabled?: boolean;
 };
 
-export const SignInForm = ({ className }: SignInFormProps) => {
+export const SignInForm = ({ className, isGoogleSSOEnabled }: SignInFormProps) => {
   const { toast } = useToast();
   const [isTwoFactorAuthenticationDialogOpen, setIsTwoFactorAuthenticationDialogOpen] =
     useState(false);
@@ -203,24 +204,29 @@ export const SignInForm = ({ className }: SignInFormProps) => {
           {isSubmitting ? 'Signing in...' : 'Sign In'}
         </Button>
 
-        <div className="relative flex items-center justify-center gap-x-4 py-2 text-xs uppercase">
-          <div className="bg-border h-px flex-1" />
-          <span className="text-muted-foreground bg-transparent">Or continue with</span>
-          <div className="bg-border h-px flex-1" />
-        </div>
+        {isGoogleSSOEnabled && (
+          <>
+            <div className="relative flex items-center justify-center gap-x-4 py-2 text-xs uppercase">
+              <div className="bg-border h-px flex-1" />
+              <span className="text-muted-foreground bg-transparent">Or continue with</span>
+              <div className="bg-border h-px flex-1" />
+            </div>
 
-        <Button
-          type="button"
-          size="lg"
-          variant={'outline'}
-          className="bg-background text-muted-foreground border"
-          disabled={isSubmitting}
-          onClick={onSignInWithGoogleClick}
-        >
-          <FcGoogle className="mr-2 h-5 w-5" />
-          Google
-        </Button>
+            <Button
+              type="button"
+              size="lg"
+              variant="outline"
+              className="bg-background text-muted-foreground border"
+              disabled={isSubmitting}
+              onClick={onSignInWithGoogleClick}
+            >
+              <FcGoogle className="mr-2 h-5 w-5" />
+              Google
+            </Button>
+          </>
+        )}
       </form>
+
       <Dialog
         open={isTwoFactorAuthenticationDialogOpen}
         onOpenChange={onCloseTwoFactorAuthenticationDialog}
