@@ -51,6 +51,11 @@ export const getStats = async ({ user }: GetStatsInput) => {
                 signingStatus: SigningStatus.SIGNED,
               },
             },
+            User: {
+              email: {
+                not: user.email,
+              },
+            },
             deletedAt: null,
           },
           {
@@ -59,6 +64,11 @@ export const getStats = async ({ user }: GetStatsInput) => {
               some: {
                 email: user.email,
                 signingStatus: SigningStatus.SIGNED,
+              },
+            },
+            User: {
+              email: {
+                not: user.email,
               },
             },
           },
