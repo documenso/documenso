@@ -120,9 +120,11 @@ export const ProfileForm = ({ className, user }: ProfileFormProps) => {
                 <FormLabel>Signature</FormLabel>
                 <FormControl>
                   <SignaturePad
-                    isDisabled={isSubmitting}
                     className="h-44 w-full"
-                    containerClassName="rounded-lg border bg-background"
+                    containerClassName={cn(
+                      'rounded-lg border bg-background',
+                      isSubmitting ? 'pointer-events-none opacity-50' : null,
+                    )}
                     defaultValue={user.signature ?? undefined}
                     onChange={(v) => onChange(v ?? '')}
                   />

@@ -16,7 +16,6 @@ const DPI = 2;
 export type SignaturePadProps = Omit<HTMLAttributes<HTMLCanvasElement>, 'onChange'> & {
   onChange?: (_signatureDataUrl: string | null) => void;
   containerClassName?: string;
-  isDisabled?: boolean;
 };
 
 export const SignaturePad = ({
@@ -24,7 +23,6 @@ export const SignaturePad = ({
   containerClassName,
   defaultValue,
   onChange,
-  isDisabled = false,
   ...props
 }: SignaturePadProps) => {
   const $el = useRef<HTMLCanvasElement>(null);
@@ -48,9 +46,6 @@ export const SignaturePad = ({
   }, []);
 
   const onMouseDown = (event: MouseEvent | PointerEvent | TouchEvent) => {
-    if (isDisabled) {
-      return;
-    }
     if (event.cancelable) {
       event.preventDefault();
     }
@@ -63,9 +58,6 @@ export const SignaturePad = ({
   };
 
   const onMouseMove = (event: MouseEvent | PointerEvent | TouchEvent) => {
-    if (isDisabled) {
-      return;
-    }
     if (event.cancelable) {
       event.preventDefault();
     }
@@ -106,9 +98,6 @@ export const SignaturePad = ({
   };
 
   const onMouseUp = (event: MouseEvent | PointerEvent | TouchEvent, addLine = true) => {
-    if (isDisabled) {
-      return;
-    }
     if (event.cancelable) {
       event.preventDefault();
     }
