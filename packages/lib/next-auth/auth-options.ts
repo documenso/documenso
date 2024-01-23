@@ -93,7 +93,7 @@ export const NEXT_AUTH_OPTIONS: AuthOptions = {
     }),
   ],
   callbacks: {
-    async jwt({ token, user }) {
+    async jwt({ token, user, trigger, account }) {
       const merged = {
         ...token,
         ...user,
@@ -132,6 +132,23 @@ export const NEXT_AUTH_OPTIONS: AuthOptions = {
           },
           data: {
             lastSignedIn: merged.lastSignedIn,
+          },
+        });
+
+        merged.emailVerified = user.emailVerified?.toISOString() ?? null;
+      }
+
+      if (
+        (trigger === 'signIn' || trigger === 'signUp') &&
+        merged.emailVerified === null &&
+        account?.provider === 'google'
+      ) {
+        const user = await prisma.user.update({
+          where: {
+            id: Number(merged.id),
+          },
+          data: {
+            emailVerified: new Date().toISOString(),
           },
         });
 
