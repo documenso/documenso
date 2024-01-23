@@ -92,14 +92,11 @@ const CommandGroup = React.forwardRef<
   <CommandPrimitive.Group
     ref={ref}
     className={cn(
-      'text-foreground [&_[cmdk-group-heading]]:text-muted-foreground overflow-hidden p-1 [&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:py-1.5 [&_[cmdk-group-heading]]:text-xs [&_[cmdk-group-heading]]:font-medium',
+      'text-foreground [&_[cmdk-group-heading]]:text-muted-foreground overflow-hidden border-b mx-3 pb-2 [&_[cmdk-group-heading]]:px-0 [&_[cmdk-group-heading]]:py-2 [&_[cmdk-group-heading]]:text-xs [&_[cmdk-group-heading]]:font-normal [&_[cmdk-group-heading]]:mt-2 [&_[cmdk-group-heading]]:opacity-50 ',
       className,
     )}
     {...props}
-  >
-    <div className="bg-border -mx-1 h-px"></div>
-    {props.children}
-  </CommandPrimitive.Group>
+  />
 ));
 
 CommandGroup.displayName = CommandPrimitive.Group.displayName;
@@ -124,7 +121,7 @@ const CommandItem = React.forwardRef<
   <CommandPrimitive.Item
     ref={ref}
     className={cn(
-      'aria-selected:bg-accent aria-selected:text-accent-foreground relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none data-[disabled]:pointer-events-none data-[disabled]:opacity-50',
+      'aria-selected:bg-accent aria-selected:text-accent-foreground relative flex cursor-default select-none items-center rounded-xl -my-1 -mx-2 px-2 py-1.5 text-sm outline-none data-[disabled]:pointer-events-none data-[disabled]:opacity-50',
       className,
     )}
     {...props}
