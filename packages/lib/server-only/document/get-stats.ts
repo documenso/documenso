@@ -1,5 +1,6 @@
 import { prisma } from '@documenso/prisma';
-import { SigningStatus, User } from '@documenso/prisma/client';
+import type { User } from '@documenso/prisma/client';
+import { SigningStatus } from '@documenso/prisma/client';
 import { isExtendedDocumentStatus } from '@documenso/prisma/guards/is-extended-document-status';
 import { ExtendedDocumentStatus } from '@documenso/prisma/types/extended-document-status';
 
@@ -16,6 +17,7 @@ export const getStats = async ({ user }: GetStatsInput) => {
       },
       where: {
         userId: user.id,
+        deletedAt: null,
       },
     }),
     prisma.document.groupBy({
@@ -31,6 +33,7 @@ export const getStats = async ({ user }: GetStatsInput) => {
             signingStatus: SigningStatus.NOT_SIGNED,
           },
         },
+        deletedAt: null,
       },
     }),
     prisma.document.groupBy({
@@ -39,15 +42,27 @@ export const getStats = async ({ user }: GetStatsInput) => {
         _all: true,
       },
       where: {
-        status: {
-          not: ExtendedDocumentStatus.DRAFT,
-        },
-        Recipient: {
-          some: {
-            email: user.email,
-            signingStatus: SigningStatus.SIGNED,
+        OR: [
+          {
+            status: ExtendedDocumentStatus.PENDING,
+            Recipient: {
+              some: {
+                email: user.email,
+                signingStatus: SigningStatus.SIGNED,
+              },
+            },
+            deletedAt: null,
           },
-        },
+          {
+            status: ExtendedDocumentStatus.COMPLETED,
+            Recipient: {
+              some: {
+                email: user.email,
+                signingStatus: SigningStatus.SIGNED,
+              },
+            },
+          },
+        ],
       },
     }),
   ]);

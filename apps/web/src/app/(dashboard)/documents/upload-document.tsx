@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -9,6 +9,7 @@ import { Loader } from 'lucide-react';
 import { useSession } from 'next-auth/react';
 
 import { useLimits } from '@documenso/ee/server-only/limits/provider/client';
+import { useAnalytics } from '@documenso/lib/client-only/hooks/use-analytics';
 import { createDocumentData } from '@documenso/lib/server-only/document-data/create-document-data';
 import { putFile } from '@documenso/lib/universal/upload/put-file';
 import { TRPCClientError } from '@documenso/trpc/client';
@@ -23,6 +24,8 @@ export type UploadDocumentProps = {
 
 export const UploadDocument = ({ className }: UploadDocumentProps) => {
   const router = useRouter();
+  const analytics = useAnalytics();
+
   const { data: session } = useSession();
 
   const { toast } = useToast();
@@ -32,6 +35,16 @@ export const UploadDocument = ({ className }: UploadDocumentProps) => {
   const [isLoading, setIsLoading] = useState(false);
 
   const { mutateAsync: createDocument } = trpc.document.createDocument.useMutation();
+
+  const disabledMessage = useMemo(() => {
+    if (remaining.documents === 0) {
+      return 'You have reached your document limit.';
+    }
+
+    if (!session?.user.emailVerified) {
+      return 'Verify your email to upload documents.';
+    }
+  }, [remaining.documents, session?.user.emailVerified]);
 
   const onFileDrop = async (file: File) => {
     try {
@@ -53,6 +66,12 @@ export const UploadDocument = ({ className }: UploadDocumentProps) => {
         title: 'Document uploaded',
         description: 'Your document has been uploaded successfully.',
         duration: 5000,
+      });
+
+      analytics.capture('App: Document Uploaded', {
+        userId: session?.user.id,
+        documentId: id,
+        timestamp: new Date().toISOString(),
       });
 
       router.push(`/documents/${id}`);
@@ -82,6 +101,7 @@ export const UploadDocument = ({ className }: UploadDocumentProps) => {
       <DocumentDropzone
         className="min-h-[40vh]"
         disabled={remaining.documents === 0 || !session?.user.emailVerified}
+        disabledMessage={disabledMessage}
         onDrop={onFileDrop}
       />
 

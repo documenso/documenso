@@ -7,10 +7,11 @@ import { createPortal } from 'react-dom';
 import { Rnd } from 'react-rnd';
 
 import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
-import { cn } from '@documenso/ui/lib/utils';
-import { Card, CardContent } from '@documenso/ui/primitives/card';
 
-import { FRIENDLY_FIELD_TYPE, TDocumentFlowFormSchema } from './types';
+import { cn } from '../../lib/utils';
+import { Card, CardContent } from '../card';
+import type { TDocumentFlowFormSchema } from './types';
+import { FRIENDLY_FIELD_TYPE } from './types';
 
 type Field = TDocumentFlowFormSchema['fields'][0];
 
@@ -120,6 +121,7 @@ export const FieldItem = ({
         <button
           className="text-muted-foreground/50 hover:text-muted-foreground/80 bg-background absolute -right-2 -top-2 z-20 flex h-8 w-8 items-center justify-center rounded-full border"
           onClick={() => onRemove?.()}
+          onTouchEnd={() => onRemove?.()}
         >
           <Trash className="h-4 w-4" />
         </button>

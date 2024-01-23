@@ -7,8 +7,9 @@ import { SigningStatus } from '@documenso/prisma/client';
 import { ExtendedDocumentStatus } from '@documenso/prisma/types/extended-document-status';
 
 import type { FindResultSet } from '../../types/find-result-set';
+import { maskRecipientTokensForDocument } from '../../utils/mask-recipient-tokens-for-document';
 
-export interface FindDocumentsOptions {
+export type FindDocumentsOptions = {
   userId: number;
   term?: string;
   status?: ExtendedDocumentStatus;
@@ -19,7 +20,7 @@ export interface FindDocumentsOptions {
     direction: 'asc' | 'desc';
   };
   period?: '' | '7d' | '14d' | '30d';
-}
+};
 
 export const findDocuments = async ({
   userId,
@@ -55,16 +56,24 @@ export const findDocuments = async ({
       OR: [
         {
           userId,
+          deletedAt: null,
         },
         {
-          status: {
-            not: ExtendedDocumentStatus.DRAFT,
-          },
+          status: ExtendedDocumentStatus.COMPLETED,
           Recipient: {
             some: {
               email: user.email,
             },
           },
+        },
+        {
+          status: ExtendedDocumentStatus.PENDING,
+          Recipient: {
+            some: {
+              email: user.email,
+            },
+          },
+          deletedAt: null,
         },
       ],
     }))
@@ -78,26 +87,29 @@ export const findDocuments = async ({
           signingStatus: SigningStatus.NOT_SIGNED,
         },
       },
+      deletedAt: null,
     }))
     .with(ExtendedDocumentStatus.DRAFT, () => ({
       userId,
       status: ExtendedDocumentStatus.DRAFT,
+      deletedAt: null,
     }))
     .with(ExtendedDocumentStatus.PENDING, () => ({
       OR: [
         {
           userId,
           status: ExtendedDocumentStatus.PENDING,
+          deletedAt: null,
         },
         {
           status: ExtendedDocumentStatus.PENDING,
-
           Recipient: {
             some: {
               email: user.email,
               signingStatus: SigningStatus.SIGNED,
             },
           },
+          deletedAt: null,
         },
       ],
     }))
@@ -106,6 +118,7 @@ export const findDocuments = async ({
         {
           userId,
           status: ExtendedDocumentStatus.COMPLETED,
+          deletedAt: null,
         },
         {
           status: ExtendedDocumentStatus.COMPLETED,
@@ -161,8 +174,15 @@ export const findDocuments = async ({
     }),
   ]);
 
+  const maskedData = data.map((document) =>
+    maskRecipientTokensForDocument({
+      document,
+      user,
+    }),
+  );
+
   return {
-    data,
+    data: maskedData,
     count,
     currentPage: Math.max(page, 1),
     perPage,

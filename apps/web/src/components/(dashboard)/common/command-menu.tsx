@@ -4,14 +4,18 @@ import { useCallback, useMemo, useState } from 'react';
 
 import { useRouter } from 'next/navigation';
 
-import { Monitor, Moon, Sun } from 'lucide-react';
+import { Loader, Monitor, Moon, Sun } from 'lucide-react';
+import { useSession } from 'next-auth/react';
 import { useTheme } from 'next-themes';
 import { useHotkeys } from 'react-hotkeys-hook';
 
 import {
   DOCUMENTS_PAGE_SHORTCUT,
   SETTINGS_PAGE_SHORTCUT,
+  TEMPLATES_PAGE_SHORTCUT,
 } from '@documenso/lib/constants/keyboard-shortcuts';
+import type { Document, Recipient } from '@documenso/prisma/client';
+import { trpc as trpcReact } from '@documenso/trpc/react';
 import {
   CommandDialog,
   CommandEmpty,
@@ -21,6 +25,7 @@ import {
   CommandList,
   CommandShortcut,
 } from '@documenso/ui/primitives/command';
+import { THEMES_TYPE } from '@documenso/ui/primitives/constants';
 
 const DOCUMENTS_PAGES = [
   {
@@ -29,13 +34,28 @@ const DOCUMENTS_PAGES = [
     shortcut: DOCUMENTS_PAGE_SHORTCUT.replace('+', ''),
   },
   { label: 'Draft documents', path: '/documents?status=DRAFT' },
-  { label: 'Completed documents', path: '/documents?status=COMPLETED' },
+  {
+    label: 'Completed documents',
+    path: '/documents?status=COMPLETED',
+  },
   { label: 'Pending documents', path: '/documents?status=PENDING' },
   { label: 'Inbox documents', path: '/documents?status=INBOX' },
 ];
 
+const TEMPLATES_PAGES = [
+  {
+    label: 'All templates',
+    path: '/templates',
+    shortcut: TEMPLATES_PAGE_SHORTCUT.replace('+', ''),
+  },
+];
+
 const SETTINGS_PAGES = [
-  { label: 'Settings', path: '/settings', shortcut: SETTINGS_PAGE_SHORTCUT.replace('+', '') },
+  {
+    label: 'Settings',
+    path: '/settings',
+    shortcut: SETTINGS_PAGE_SHORTCUT.replace('+', ''),
+  },
   { label: 'Profile', path: '/settings/profile' },
   { label: 'Password', path: '/settings/password' },
 ];
@@ -47,11 +67,46 @@ export type CommandMenuProps = {
 
 export function CommandMenu({ open, onOpenChange }: CommandMenuProps) {
   const { setTheme } = useTheme();
+  const { data: session } = useSession();
+
   const router = useRouter();
 
   const [isOpen, setIsOpen] = useState(() => open ?? false);
   const [search, setSearch] = useState('');
   const [pages, setPages] = useState<string[]>([]);
+
+  const { data: searchDocumentsData, isLoading: isSearchingDocuments } =
+    trpcReact.document.searchDocuments.useQuery(
+      {
+        query: search,
+      },
+      {
+        keepPreviousData: true,
+      },
+    );
+
+  const isOwner = useCallback(
+    (document: Document) => document.userId === session?.user.id,
+    [session?.user.id],
+  );
+
+  const getSigningLink = useCallback(
+    (recipients: Recipient[]) =>
+      `/sign/${recipients.find((r) => r.email === session?.user.email)?.token}`,
+    [session?.user.email],
+  );
+
+  const searchResults = useMemo(() => {
+    if (!searchDocumentsData) {
+      return [];
+    }
+
+    return searchDocumentsData.map((document) => ({
+      label: document.title,
+      path: isOwner(document) ? `/documents/${document.id}` : getSigningLink(document.Recipient),
+      value: [document.id, document.title, ...document.Recipient.map((r) => r.email)].join(' '),
+    }));
+  }, [searchDocumentsData, isOwner, getSigningLink]);
 
   const currentPage = pages[pages.length - 1];
 
@@ -93,10 +148,12 @@ export function CommandMenu({ open, onOpenChange }: CommandMenuProps) {
 
   const goToSettings = useCallback(() => push(SETTINGS_PAGES[0].path), [push]);
   const goToDocuments = useCallback(() => push(DOCUMENTS_PAGES[0].path), [push]);
+  const goToTemplates = useCallback(() => push(TEMPLATES_PAGES[0].path), [push]);
 
-  useHotkeys(['ctrl+k', 'meta+k'], toggleOpen);
+  useHotkeys(['ctrl+k', 'meta+k'], toggleOpen, { preventDefault: true });
   useHotkeys(SETTINGS_PAGE_SHORTCUT, goToSettings);
   useHotkeys(DOCUMENTS_PAGE_SHORTCUT, goToDocuments);
+  useHotkeys(TEMPLATES_PAGE_SHORTCUT, goToTemplates);
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     // Escape goes to previous page
@@ -113,7 +170,13 @@ export function CommandMenu({ open, onOpenChange }: CommandMenuProps) {
   };
 
   return (
-    <CommandDialog commandProps={{ onKeyDown: handleKeyDown }} open={open} onOpenChange={setOpen}>
+    <CommandDialog
+      commandProps={{
+        onKeyDown: handleKeyDown,
+      }}
+      open={open}
+      onOpenChange={setOpen}
+    >
       <CommandInput
         value={search}
         onValueChange={setSearch}
@@ -121,11 +184,24 @@ export function CommandMenu({ open, onOpenChange }: CommandMenuProps) {
       />
 
       <CommandList>
-        <CommandEmpty>No results found.</CommandEmpty>
+        {isSearchingDocuments ? (
+          <CommandEmpty>
+            <div className="flex items-center justify-center">
+              <span className="animate-spin">
+                <Loader />
+              </span>
+            </div>
+          </CommandEmpty>
+        ) : (
+          <CommandEmpty>No results found.</CommandEmpty>
+        )}
         {!currentPage && (
           <>
             <CommandGroup heading="Documents">
               <Commands push={push} pages={DOCUMENTS_PAGES} />
+            </CommandGroup>
+            <CommandGroup heading="Templates">
+              <Commands push={push} pages={TEMPLATES_PAGES} />
             </CommandGroup>
             <CommandGroup heading="Settings">
               <Commands push={push} pages={SETTINGS_PAGES} />
@@ -133,6 +209,11 @@ export function CommandMenu({ open, onOpenChange }: CommandMenuProps) {
             <CommandGroup heading="Preferences">
               <CommandItem onSelect={() => addPage('theme')}>Change theme</CommandItem>
             </CommandGroup>
+            {searchResults.length > 0 && (
+              <CommandGroup heading="Your documents">
+                <Commands push={push} pages={searchResults} />
+              </CommandGroup>
+            )}
           </>
         )}
         {currentPage === 'theme' && <ThemeCommands setTheme={setTheme} />}
@@ -146,10 +227,14 @@ const Commands = ({
   pages,
 }: {
   push: (_path: string) => void;
-  pages: { label: string; path: string; shortcut?: string }[];
+  pages: { label: string; path: string; shortcut?: string; value?: string }[];
 }) => {
-  return pages.map((page) => (
-    <CommandItem key={page.path} onSelect={() => push(page.path)}>
+  return pages.map((page, idx) => (
+    <CommandItem
+      key={page.path + idx}
+      value={page.value ?? page.label}
+      onSelect={() => push(page.path)}
+    >
       {page.label}
       {page.shortcut && <CommandShortcut>{page.shortcut}</CommandShortcut>}
     </CommandItem>
@@ -159,9 +244,9 @@ const Commands = ({
 const ThemeCommands = ({ setTheme }: { setTheme: (_theme: string) => void }) => {
   const THEMES = useMemo(
     () => [
-      { label: 'Light Mode', theme: 'light', icon: Sun },
-      { label: 'Dark Mode', theme: 'dark', icon: Moon },
-      { label: 'System Theme', theme: 'system', icon: Monitor },
+      { label: 'Light Mode', theme: THEMES_TYPE.LIGHT, icon: Sun },
+      { label: 'Dark Mode', theme: THEMES_TYPE.DARK, icon: Moon },
+      { label: 'System Theme', theme: THEMES_TYPE.SYSTEM, icon: Monitor },
     ],
     [],
   );

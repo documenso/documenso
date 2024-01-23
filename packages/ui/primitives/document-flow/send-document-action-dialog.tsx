@@ -2,7 +2,8 @@ import { useState } from 'react';
 
 import { Loader } from 'lucide-react';
 
-import { Button, ButtonProps } from '@documenso/ui/primitives/button';
+import type { ButtonProps } from '../button';
+import { Button } from '../button';
 import {
   Dialog,
   DialogContent,
@@ -11,7 +12,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '@documenso/ui/primitives/dialog';
+} from '../dialog';
 
 export type SendDocumentActionDialogProps = ButtonProps & {
   loading?: boolean;

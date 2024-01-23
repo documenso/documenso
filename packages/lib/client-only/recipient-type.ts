@@ -1,4 +1,5 @@
-import { ReadStatus, Recipient, SendStatus, SigningStatus } from '@documenso/prisma/client';
+import type { Recipient } from '@documenso/prisma/client';
+import { ReadStatus, SendStatus, SigningStatus } from '@documenso/prisma/client';
 
 export const getRecipientType = (recipient: Recipient) => {
   if (

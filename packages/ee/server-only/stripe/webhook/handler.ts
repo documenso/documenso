@@ -1,9 +1,10 @@
-import { NextApiRequest, NextApiResponse } from 'next';
+import type { NextApiRequest, NextApiResponse } from 'next';
 
 import { buffer } from 'micro';
 import { match } from 'ts-pattern';
 
-import { Stripe, stripe } from '@documenso/lib/server-only/stripe';
+import type { Stripe } from '@documenso/lib/server-only/stripe';
+import { stripe } from '@documenso/lib/server-only/stripe';
 import { getFlag } from '@documenso/lib/universal/get-feature-flag';
 import { prisma } from '@documenso/prisma';
 
@@ -74,23 +75,23 @@ export const stripeWebhookHandler = async (
 
         // Finally, attempt to get the user ID from the subscription within the database.
         if (!userId && customerId) {
-          const result = await prisma.subscription.findFirst({
+          const result = await prisma.user.findFirst({
             select: {
-              userId: true,
+              id: true,
             },
             where: {
               customerId,
             },
           });
 
-          if (!result?.userId) {
+          if (!result?.id) {
             return res.status(500).json({
               success: false,
               message: 'User not found',
             });
           }
 
-          userId = result.userId;
+          userId = result.id;
         }
 
         const subscriptionId =
@@ -123,23 +124,23 @@ export const stripeWebhookHandler = async (
             ? subscription.customer
             : subscription.customer.id;
 
-        const result = await prisma.subscription.findFirst({
+        const result = await prisma.user.findFirst({
           select: {
-            userId: true,
+            id: true,
           },
           where: {
             customerId,
           },
         });
 
-        if (!result?.userId) {
+        if (!result?.id) {
           return res.status(500).json({
             success: false,
             message: 'User not found',
           });
         }
 
-        await onSubscriptionUpdated({ userId: result.userId, subscription });
+        await onSubscriptionUpdated({ userId: result.id, subscription });
 
         return res.status(200).json({
           success: true,
@@ -174,23 +175,30 @@ export const stripeWebhookHandler = async (
 
         const subscription = await stripe.subscriptions.retrieve(subscriptionId);
 
-        const result = await prisma.subscription.findFirst({
+        if (subscription.status === 'incomplete_expired') {
+          return res.status(200).json({
+            success: true,
+            message: 'Webhook received',
+          });
+        }
+
+        const result = await prisma.user.findFirst({
           select: {
-            userId: true,
+            id: true,
           },
           where: {
             customerId,
           },
         });
 
-        if (!result?.userId) {
+        if (!result?.id) {
           return res.status(500).json({
             success: false,
             message: 'User not found',
           });
         }
 
-        await onSubscriptionUpdated({ userId: result.userId, subscription });
+        await onSubscriptionUpdated({ userId: result.id, subscription });
 
         return res.status(200).json({
           success: true,
@@ -218,23 +226,30 @@ export const stripeWebhookHandler = async (
 
         const subscription = await stripe.subscriptions.retrieve(subscriptionId);
 
-        const result = await prisma.subscription.findFirst({
+        if (subscription.status === 'incomplete_expired') {
+          return res.status(200).json({
+            success: true,
+            message: 'Webhook received',
+          });
+        }
+
+        const result = await prisma.user.findFirst({
           select: {
-            userId: true,
+            id: true,
           },
           where: {
             customerId,
           },
         });
 
-        if (!result?.userId) {
+        if (!result?.id) {
           return res.status(500).json({
             success: false,
             message: 'User not found',
           });
         }
 
-        await onSubscriptionUpdated({ userId: result.userId, subscription });
+        await onSubscriptionUpdated({ userId: result.id, subscription });
 
         return res.status(200).json({
           success: true,

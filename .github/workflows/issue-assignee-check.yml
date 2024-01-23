@@ -1,0 +1,63 @@
+name: 'Issue Assignee Check'
+
+on:
+  issues:
+    types: ['assigned']
+
+permissions:
+  issues: write
+
+jobs:
+  countIssues:
+    if: ${{ github.event.issue.assignee }} && github.event.action == 'assigned' && github.event.sender.type == 'User'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: npm
+
+      - name: Install Octokit
+        run: npm install @octokit/rest@18
+
+      - name: Check Assigned User's Issue Count
+        id: parse-comment
+        uses: actions/github-script@v5
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const { Octokit } = require("@octokit/rest");
+            const octokit = new Octokit({ auth: process.env.GITHUB_TOKEN });
+
+            const username = context.payload.issue.assignee.login;
+            console.log(`Username Extracted: ${username}`);
+
+            const { data: issues } = await octokit.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              assignee: username,
+              state: 'open'
+            });
+
+            const issueCount = issues.length;
+            console.log(`Issue Count For ${username}: ${issueCount}`);
+
+            if (issueCount > 3) {
+              let issueCountMessage = `### 🚨 Documenso Police 🚨`;
+              issueCountMessage += `\n@${username} has ${issueCount} open issues assigned already. Consider whether this issue should be assigned to them or left open for another contributor.`;
+
+              await octokit.request('POST /repos/{owner}/{repo}/issues/{issue_number}/comments', {
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body: issueCountMessage,
+                headers: {
+                  'Authorization': `token ${{ secrets.GITHUB_TOKEN }}`,
+                }
+              });
+            }

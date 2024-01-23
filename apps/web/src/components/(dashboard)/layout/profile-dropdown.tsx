@@ -4,6 +4,7 @@ import Link from 'next/link';
 
 import {
   CreditCard,
+  FileSpreadsheet,
   Lock,
   LogOut,
   User as LucideUser,
@@ -20,7 +21,7 @@ import { LuGithub } from 'react-icons/lu';
 import { useFeatureFlags } from '@documenso/lib/client-only/providers/feature-flag';
 import { isAdmin } from '@documenso/lib/next-auth/guards/is-admin';
 import { recipientInitials } from '@documenso/lib/utils/recipient-formatter';
-import { User } from '@documenso/prisma/client';
+import type { User } from '@documenso/prisma/client';
 import { Avatar, AvatarFallback } from '@documenso/ui/primitives/avatar';
 import { Button } from '@documenso/ui/primitives/button';
 import {
@@ -56,7 +57,11 @@ export const ProfileDropdown = ({ user }: ProfileDropdownProps) => {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" className="relative h-10 w-10 rounded-full">
+        <Button
+          variant="ghost"
+          title="Profile Dropdown"
+          className="relative h-10 w-10 rounded-full"
+        >
           <Avatar className="h-10 w-10">
             <AvatarFallback>{avatarFallback}</AvatarFallback>
           </Avatar>
@@ -103,6 +108,13 @@ export const ProfileDropdown = ({ user }: ProfileDropdownProps) => {
         )}
 
         <DropdownMenuSeparator />
+        <DropdownMenuItem asChild>
+          <Link href="/templates" className="cursor-pointer">
+            <FileSpreadsheet className="mr-2 h-4 w-4" />
+            Templates
+          </Link>
+        </DropdownMenuItem>
+        <DropdownMenuSeparator />
 
         <DropdownMenuSub>
           <DropdownMenuSubTrigger>
@@ -129,7 +141,11 @@ export const ProfileDropdown = ({ user }: ProfileDropdownProps) => {
         </DropdownMenuSub>
         <DropdownMenuSeparator />
         <DropdownMenuItem asChild>
-          <Link href="https://github.com/documenso/documenso" className="cursor-pointer">
+          <Link
+            href="https://github.com/documenso/documenso"
+            className="cursor-pointer"
+            target="_blank"
+          >
             <LuGithub className="mr-2 h-4 w-4" />
             Star on Github
           </Link>

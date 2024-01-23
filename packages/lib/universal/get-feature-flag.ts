@@ -1,9 +1,7 @@
 import { z } from 'zod';
 
-import {
-  TFeatureFlagValue,
-  ZFeatureFlagValueSchema,
-} from '@documenso/lib/client-only/providers/feature-flag.types';
+import type { TFeatureFlagValue } from '@documenso/lib/client-only/providers/feature-flag.types';
+import { ZFeatureFlagValueSchema } from '@documenso/lib/client-only/providers/feature-flag.types';
 import { APP_BASE_URL } from '@documenso/lib/constants/app';
 import { LOCAL_FEATURE_FLAGS, isFeatureFlagEnabled } from '@documenso/lib/constants/feature-flags';
 

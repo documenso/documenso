@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-import { FieldType } from '@documenso/prisma/client';
+import { DocumentStatus, FieldType } from '@documenso/prisma/client';
 
 export const ZGetDocumentByIdQuerySchema = z.object({
   id: z.number().min(1),
@@ -65,7 +65,22 @@ export type TSetFieldsForDocumentMutationSchema = z.infer<
 
 export const ZSendDocumentMutationSchema = z.object({
   documentId: z.number(),
+  meta: z.object({
+    subject: z.string(),
+    message: z.string(),
+    timezone: z.string(),
+    dateFormat: z.string(),
+  }),
 });
+
+export const ZSetPasswordForDocumentMutationSchema = z.object({
+  documentId: z.number(),
+  password: z.string(),
+});
+
+export type TSetPasswordForDocumentMutationSchema = z.infer<
+  typeof ZSetPasswordForDocumentMutationSchema
+>;
 
 export const ZResendDocumentMutationSchema = z.object({
   documentId: z.number(),
@@ -76,6 +91,11 @@ export type TSendDocumentMutationSchema = z.infer<typeof ZSendDocumentMutationSc
 
 export const ZDeleteDraftDocumentMutationSchema = z.object({
   id: z.number().min(1),
+  status: z.nativeEnum(DocumentStatus),
 });
 
 export type TDeleteDraftDocumentMutationSchema = z.infer<typeof ZDeleteDraftDocumentMutationSchema>;
+
+export const ZSearchDocumentsMutationSchema = z.object({
+  query: z.string(),
+});

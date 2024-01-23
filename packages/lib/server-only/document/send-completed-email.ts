@@ -32,7 +32,7 @@ export const sendCompletedEmail = async ({ documentId }: SendDocumentOptions) =>
 
   const buffer = await getFile(document.documentData);
 
-  await Promise.all([
+  await Promise.all(
     document.Recipient.map(async (recipient) => {
       const { email, name, token } = recipient;
 
@@ -64,5 +64,5 @@ export const sendCompletedEmail = async ({ documentId }: SendDocumentOptions) =>
         ],
       });
     }),
-  ]);
+  );
 };

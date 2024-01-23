@@ -1,10 +1,11 @@
 'use client';
 
-import { HTMLAttributes, useEffect, useState } from 'react';
+import type { HTMLAttributes } from 'react';
+import { useEffect, useState } from 'react';
 
 import Link from 'next/link';
 
-import { User } from '@documenso/prisma/client';
+import type { User } from '@documenso/prisma/client';
 import { cn } from '@documenso/ui/lib/utils';
 
 import { Logo } from '~/components/branding/logo';
@@ -32,7 +33,7 @@ export const Header = ({ className, user, ...props }: HeaderProps) => {
   return (
     <header
       className={cn(
-        'supports-backdrop-blur:bg-background/60 bg-background/95 sticky top-0 z-50 flex h-16 w-full items-center border-b border-b-transparent backdrop-blur duration-200',
+        'supports-backdrop-blur:bg-background/60 bg-background/95 sticky top-0 z-[50] flex h-16 w-full items-center border-b border-b-transparent backdrop-blur duration-200',
         scrollY > 5 && 'border-b-border',
         className,
       )}
@@ -48,7 +49,7 @@ export const Header = ({ className, user, ...props }: HeaderProps) => {
 
         <DesktopNav />
 
-        <div className="flex gap-x-4">
+        <div className="flex gap-x-4 md:ml-8">
           <ProfileDropdown user={user} />
 
           {/* <Button variant="outline" size="sm" className="h-10 w-10 p-0.5 md:hidden">

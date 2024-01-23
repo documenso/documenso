@@ -1,9 +1,9 @@
-import { HTMLAttributes } from 'react';
+import type { HTMLAttributes } from 'react';
 
 import { CheckCircle2, Clock, File } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react/dist/lucide-react';
 
-import { ExtendedDocumentStatus } from '@documenso/prisma/types/extended-document-status';
+import type { ExtendedDocumentStatus } from '@documenso/prisma/types/extended-document-status';
 import { SignatureIcon } from '@documenso/ui/icons/signature';
 import { cn } from '@documenso/ui/lib/utils';
 

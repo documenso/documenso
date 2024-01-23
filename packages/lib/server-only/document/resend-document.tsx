@@ -57,7 +57,7 @@ export const resendDocument = async ({ documentId, userId, recipients }: ResendD
     throw new Error('Can not send completed document');
   }
 
-  await Promise.all([
+  await Promise.all(
     document.Recipient.map(async (recipient) => {
       const { email, name } = recipient;
 
@@ -95,5 +95,5 @@ export const resendDocument = async ({ documentId, userId, recipients }: ResendD
         text: render(template, { plainText: true }),
       });
     }),
-  ]);
+  );
 };

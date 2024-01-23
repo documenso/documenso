@@ -1,12 +1,14 @@
 'use client';
 
-import { Variants, motion } from 'framer-motion';
+import type { Variants } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { Plus } from 'lucide-react';
 import { useDropzone } from 'react-dropzone';
 
 import { megabytesToBytes } from '@documenso/lib/universal/unit-convertions';
-import { cn } from '@documenso/ui/lib/utils';
-import { Card, CardContent } from '@documenso/ui/primitives/card';
+
+import { cn } from '../lib/utils';
+import { Card, CardContent } from './card';
 
 const DocumentDropzoneContainerVariants: Variants = {
   initial: {
@@ -73,10 +75,21 @@ const DocumentDropzoneCardCenterVariants: Variants = {
   },
 };
 
+const DocumentDescription = {
+  document: {
+    headline: 'Add a document',
+  },
+  template: {
+    headline: 'Upload Template Document',
+  },
+};
+
 export type DocumentDropzoneProps = {
   className?: string;
   disabled?: boolean;
+  disabledMessage?: string;
   onDrop?: (_file: File) => void | Promise<void>;
+  type?: 'document' | 'template';
   [key: string]: unknown;
 };
 
@@ -84,6 +97,8 @@ export const DocumentDropzone = ({
   className,
   onDrop,
   disabled,
+  disabledMessage = 'You cannot upload documents at this time.',
+  type = 'document',
   ...props
 }: DocumentDropzoneProps) => {
   const { getRootProps, getInputProps } = useDropzone({
@@ -102,11 +117,12 @@ export const DocumentDropzone = ({
 
   return (
     <motion.div
-      className={cn('flex', className)}
+      className={cn('flex aria-disabled:cursor-not-allowed', className)}
       variants={DocumentDropzoneContainerVariants}
       initial="initial"
       animate="animate"
       whileHover="hover"
+      aria-disabled={disabled}
     >
       <Card
         role="button"
@@ -124,8 +140,8 @@ export const DocumentDropzone = ({
           {/* <FilePlus strokeWidth="1px" className="h-16 w-16"/> */}
           <div className="flex">
             <motion.div
-              className="border-muted-foreground/20 group-hover:border-documenso/80 dark:bg-muted/80 z-10 flex aspect-[3/4] w-24 origin-top-right -rotate-[22deg] flex-col gap-y-1 rounded-lg border bg-white/80 px-2 py-4 backdrop-blur-sm"
-              variants={DocumentDropzoneCardLeftVariants}
+              className="border-muted-foreground/20 group-hover:border-documenso/80 dark:bg-muted/80 a z-10 flex aspect-[3/4] w-24 origin-top-right -rotate-[22deg] flex-col gap-y-1 rounded-lg border bg-white/80 px-2 py-4 backdrop-blur-sm"
+              variants={!disabled ? DocumentDropzoneCardLeftVariants : undefined}
             >
               <div className="bg-muted-foreground/20 group-hover:bg-documenso h-2 w-full rounded-[2px]" />
               <div className="bg-muted-foreground/20 group-hover:bg-documenso h-2 w-5/6 rounded-[2px]" />
@@ -134,7 +150,7 @@ export const DocumentDropzone = ({
 
             <motion.div
               className="border-muted-foreground/20 group-hover:border-documenso/80 dark:bg-muted/80 z-20 flex aspect-[3/4] w-24 flex-col items-center justify-center gap-y-1 rounded-lg border bg-white/80 px-2 py-4 backdrop-blur-sm"
-              variants={DocumentDropzoneCardCenterVariants}
+              variants={!disabled ? DocumentDropzoneCardCenterVariants : undefined}
             >
               <Plus
                 strokeWidth="2px"
@@ -144,7 +160,7 @@ export const DocumentDropzone = ({
 
             <motion.div
               className="border-muted-foreground/20 group-hover:border-documenso/80 dark:bg-muted/80 z-10 flex aspect-[3/4] w-24 origin-top-left rotate-[22deg] flex-col gap-y-1 rounded-lg border bg-white/80 px-2 py-4 backdrop-blur-sm"
-              variants={DocumentDropzoneCardRightVariants}
+              variants={!disabled ? DocumentDropzoneCardRightVariants : undefined}
             >
               <div className="bg-muted-foreground/20 group-hover:bg-documenso h-2 w-full rounded-[2px]" />
               <div className="bg-muted-foreground/20 group-hover:bg-documenso h-2 w-5/6 rounded-[2px]" />
@@ -155,10 +171,12 @@ export const DocumentDropzone = ({
           <input {...getInputProps()} />
 
           <p className="group-hover:text-foreground text-muted-foreground mt-8 font-medium">
-            Add a document
+            {DocumentDescription[type].headline}
           </p>
 
-          <p className="text-muted-foreground/80 mt-1 text-sm ">Drag & drop your document here.</p>
+          <p className="text-muted-foreground/80 mt-1 text-sm">
+            {disabled ? disabledMessage : 'Drag & drop your document here.'}
+          </p>
         </CardContent>
       </Card>
     </motion.div>

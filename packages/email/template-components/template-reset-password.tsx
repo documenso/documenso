@@ -1,7 +1,4 @@
-import { Button, Section, Tailwind, Text } from '@react-email/components';
-
-import * as config from '@documenso/tailwind-config';
-
+import { Button, Section, Text } from '../components';
 import { TemplateDocumentImage } from './template-document-image';
 
 export interface TemplateResetPasswordProps {
@@ -12,15 +9,7 @@ export interface TemplateResetPasswordProps {
 
 export const TemplateResetPassword = ({ assetBaseUrl }: TemplateResetPasswordProps) => {
   return (
-    <Tailwind
-      config={{
-        theme: {
-          extend: {
-            colors: config.theme.extend.colors,
-          },
-        },
-      }}
-    >
+    <>
       <TemplateDocumentImage className="mt-6" assetBaseUrl={assetBaseUrl} />
 
       <Section className="flex-row items-center justify-center">
@@ -41,7 +30,7 @@ export const TemplateResetPassword = ({ assetBaseUrl }: TemplateResetPasswordPro
           </Button>
         </Section>
       </Section>
-    </Tailwind>
+    </>
   );
 };
 
