@@ -24,7 +24,7 @@ import { PasswordInput } from '@documenso/ui/primitives/password-input';
 import { SignaturePad } from '@documenso/ui/primitives/signature-pad';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
-const LOGIN_REDIRECT_PATH = '/documents';
+const SIGN_UP_REDIRECT_PATH = '/documents';
 
 export const ZSignUpFormSchema = z.object({
   name: z.string().trim().min(1, { message: 'Please enter a valid name.' }),
@@ -95,7 +95,7 @@ export const SignUpForm = ({ className, isGoogleSSOEnabled }: SignUpFormProps) =
 
   const onSignUpWithGoogleClick = async () => {
     try {
-      await signIn('google', { callbackUrl: LOGIN_REDIRECT_PATH });
+      await signIn('google', { callbackUrl: SIGN_UP_REDIRECT_PATH });
     } catch (err) {
       toast({
         title: 'An unknown error occurred',
