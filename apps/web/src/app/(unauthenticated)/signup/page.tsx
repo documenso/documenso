@@ -1,7 +1,12 @@
+import type { Metadata } from 'next';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 
 import { SignUpForm } from '~/components/forms/signup';
+
+export const metadata: Metadata = {
+  title: 'Signup',
+};
 
 export default function SignUpPage() {
   if (process.env.NEXT_PUBLIC_DISABLE_SIGNUP === 'true') {

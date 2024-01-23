@@ -1,8 +1,13 @@
+import type { Metadata } from 'next';
 import Link from 'next/link';
 
 import { IS_GOOGLE_SSO_ENABLED } from '@documenso/lib/constants/auth';
 
 import { SignInForm } from '~/components/forms/signin';
+
+export const metadata: Metadata = {
+  title: 'Signin',
+};
 
 export default function SignInPage() {
   return (
