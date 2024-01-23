@@ -17,6 +17,8 @@ import { SigningCard3D } from '@documenso/ui/components/signing-card';
 
 import { truncateTitle } from '~/helpers/truncate-title';
 
+import { DocumentPreviewButton } from './document-preview-button';
+
 export type CompletedSigningPageProps = {
   params: {
     token?: string;
@@ -117,12 +119,20 @@ export default async function CompletedSigningPage({
         <div className="mt-8 flex w-full max-w-sm items-center justify-center gap-4">
           <DocumentShareButton documentId={document.id} token={recipient.token} />
 
-          <DocumentDownloadButton
-            className="flex-1"
-            fileName={document.title}
-            documentData={documentData}
-            disabled={document.status !== DocumentStatus.COMPLETED}
-          />
+          {document.status === DocumentStatus.COMPLETED ? (
+            <DocumentDownloadButton
+              className="flex-1"
+              fileName={document.title}
+              documentData={documentData}
+              disabled={document.status !== DocumentStatus.COMPLETED}
+            />
+          ) : (
+            <DocumentPreviewButton
+              className="flex-1"
+              title="Signatures will appear once the document has been completed"
+              documentData={documentData}
+            />
+          )}
         </div>
 
         {isLoggedIn ? (

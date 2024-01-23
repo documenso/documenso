@@ -1,5 +1,5 @@
 import { prisma } from '@documenso/prisma';
-import { DocumentWithRecipient } from '@documenso/prisma/types/document-with-recipient';
+import type { DocumentWithRecipient } from '@documenso/prisma/types/document-with-recipient';
 
 export interface GetDocumentAndSenderByTokenOptions {
   token: string;
@@ -58,7 +58,11 @@ export const getDocumentAndRecipientByToken = async ({
       },
     },
     include: {
-      Recipient: true,
+      Recipient: {
+        where: {
+          token,
+        },
+      },
       documentData: true,
     },
   });
