@@ -141,7 +141,11 @@ export const ProfileDropdown = ({ user }: ProfileDropdownProps) => {
         </DropdownMenuSub>
         <DropdownMenuSeparator />
         <DropdownMenuItem asChild>
-          <Link href="https://github.com/documenso/documenso" className="cursor-pointer">
+          <Link
+            href="https://github.com/documenso/documenso"
+            className="cursor-pointer"
+            target="_blank"
+          >
             <LuGithub className="mr-2 h-4 w-4" />
             Star on Github
           </Link>
