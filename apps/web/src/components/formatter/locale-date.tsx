@@ -1,8 +1,10 @@
 'use client';
 
-import { HTMLAttributes, useEffect, useState } from 'react';
+import type { HTMLAttributes } from 'react';
+import { useEffect, useState } from 'react';
 
-import { DateTime, DateTimeFormatOptions } from 'luxon';
+import type { DateTimeFormatOptions } from 'luxon';
+import { DateTime } from 'luxon';
 
 import { useLocale } from '@documenso/lib/client-only/providers/locale';
 

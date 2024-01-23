@@ -4,8 +4,8 @@ import { useState } from 'react';
 
 import { useRouter } from 'next/navigation';
 
+import type { DocumentData, DocumentMeta, Field, Recipient, User } from '@documenso/prisma/client';
 import { DocumentStatus } from '@documenso/prisma/client';
-import type { DocumentData, Field, Recipient, User } from '@documenso/prisma/client';
 import type { DocumentWithData } from '@documenso/prisma/types/document-with-data';
 import { trpc } from '@documenso/trpc/react';
 import { cn } from '@documenso/ui/lib/utils';
@@ -29,6 +29,7 @@ export type EditDocumentFormProps = {
   user: User;
   document: DocumentWithData;
   recipients: Recipient[];
+  documentMeta: DocumentMeta | null;
   fields: Field[];
   documentData: DocumentData;
 };
@@ -41,6 +42,7 @@ export const EditDocumentForm = ({
   document,
   recipients,
   fields,
+  documentMeta,
   user: _user,
   documentData,
 }: EditDocumentFormProps) => {
@@ -56,6 +58,8 @@ export const EditDocumentForm = ({
   const { mutateAsync: addFields } = trpc.field.addFields.useMutation();
   const { mutateAsync: addSigners } = trpc.recipient.addSigners.useMutation();
   const { mutateAsync: sendDocument } = trpc.document.sendDocument.useMutation();
+  const { mutateAsync: setPasswordForDocument } =
+    trpc.document.setPasswordForDocument.useMutation();
 
   const documentFlow: Record<EditDocumentStep, DocumentFlowStep> = {
     title: {
@@ -145,14 +149,16 @@ export const EditDocumentForm = ({
   };
 
   const onAddSubjectFormSubmit = async (data: TAddSubjectFormSchema) => {
-    const { subject, message } = data.email;
+    const { subject, message, timezone, dateFormat } = data.meta;
 
     try {
       await sendDocument({
         documentId: document.id,
-        email: {
+        meta: {
           subject,
           message,
+          timezone,
+          dateFormat,
         },
       });
 
@@ -174,6 +180,13 @@ export const EditDocumentForm = ({
     }
   };
 
+  const onPasswordSubmit = async (password: string) => {
+    await setPasswordForDocument({
+      documentId: document.id,
+      password,
+    });
+  };
+
   const currentDocumentFlow = documentFlow[step];
 
   return (
@@ -183,7 +196,13 @@ export const EditDocumentForm = ({
         gradient
       >
         <CardContent className="p-2">
-          <LazyPDFViewer key={documentData.id} documentData={documentData} />
+          <LazyPDFViewer
+            key={documentData.id}
+            documentData={documentData}
+            document={document}
+            password={documentMeta?.password}
+            onPasswordSubmit={onPasswordSubmit}
+          />
         </CardContent>
       </Card>
 

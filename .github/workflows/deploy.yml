@@ -1,0 +1,24 @@
+name: Deploy to Production
+
+on:
+  push:
+    tags:
+      - '*'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+          token: ${{ secrets.GH_TOKEN }}
+
+      - name: Push to release branch
+        run: |
+          git checkout release || git checkout -b release
+          git merge --ff-only main
+          git push origin release

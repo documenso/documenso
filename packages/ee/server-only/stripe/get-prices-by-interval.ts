@@ -1,4 +1,4 @@
-import Stripe from 'stripe';
+import type Stripe from 'stripe';
 
 import { stripe } from '@documenso/lib/server-only/stripe';
 
@@ -7,7 +7,14 @@ type PriceWithProduct = Stripe.Price & { product: Stripe.Product };
 
 export type PriceIntervals = Record<Stripe.Price.Recurring.Interval, PriceWithProduct[]>;
 
-export const getPricesByInterval = async () => {
+export type GetPricesByIntervalOptions = {
+  /**
+   * Filter products by their meta 'type' attribute.
+   */
+  type?: 'individual';
+};
+
+export const getPricesByInterval = async ({ type }: GetPricesByIntervalOptions = {}) => {
   let { data: prices } = await stripe.prices.search({
     query: `active:'true' type:'recurring'`,
     expand: ['data.product'],
@@ -19,8 +26,10 @@ export const getPricesByInterval = async () => {
     // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
     const product = price.product as Stripe.Product;
 
+    const filter = !type || product.metadata?.type === type;
+
     // Filter out prices for products that are not active.
-    return product.active;
+    return product.active && filter;
   });
 
   const intervals: PriceIntervals = {

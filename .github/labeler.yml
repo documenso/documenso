@@ -1,0 +1,21 @@
+'apps: marketing':
+  - apps/marketing/**
+
+'apps: web':
+  - apps/web/**
+
+'version bump 👀':
+  - '**/package.json'
+  - '**/package-lock.json'
+
+'🚨 migrations 🚨':
+  - packages/prisma/migrations/**/migration.sql
+
+'🚨 e2e changes 🚨':
+  - packages/app-tests/e2e/**
+
+'🚨 .env changes 🚨':
+  - .env.example
+
+'pkg: ee changes':
+  - packages/ee/**

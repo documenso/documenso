@@ -65,11 +65,22 @@ export type TSetFieldsForDocumentMutationSchema = z.infer<
 
 export const ZSendDocumentMutationSchema = z.object({
   documentId: z.number(),
-  email: z.object({
+  meta: z.object({
     subject: z.string(),
     message: z.string(),
+    timezone: z.string(),
+    dateFormat: z.string(),
   }),
 });
+
+export const ZSetPasswordForDocumentMutationSchema = z.object({
+  documentId: z.number(),
+  password: z.string(),
+});
+
+export type TSetPasswordForDocumentMutationSchema = z.infer<
+  typeof ZSetPasswordForDocumentMutationSchema
+>;
 
 export const ZResendDocumentMutationSchema = z.object({
   documentId: z.number(),
