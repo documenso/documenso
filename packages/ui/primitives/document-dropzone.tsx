@@ -89,6 +89,7 @@ export type DocumentDropzoneProps = {
   disabled?: boolean;
   disabledMessage?: string;
   onDrop?: (_file: File) => void | Promise<void>;
+  onDropRejected?: () => void | Promise<void>;
   type?: 'document' | 'template';
   [key: string]: unknown;
 };
@@ -96,6 +97,7 @@ export type DocumentDropzoneProps = {
 export const DocumentDropzone = ({
   className,
   onDrop,
+  onDropRejected,
   disabled,
   disabledMessage = 'You cannot upload documents at this time.',
   type = 'document',
@@ -110,6 +112,11 @@ export const DocumentDropzone = ({
     onDrop: ([acceptedFile]) => {
       if (acceptedFile && onDrop) {
         void onDrop(acceptedFile);
+      }
+    },
+    onDropRejected: () => {
+      if(onDropRejected){
+        void onDropRejected();
       }
     },
     maxSize: megabytesToBytes(50),
@@ -175,7 +182,7 @@ export const DocumentDropzone = ({
           </p>
 
           <p className="text-muted-foreground/80 mt-1 text-sm">
-            {disabled ? disabledMessage : 'Drag & drop your document here.'}
+            {disabled ? disabledMessage : 'Drag & drop your PDF here.'}
           </p>
         </CardContent>
       </Card>
