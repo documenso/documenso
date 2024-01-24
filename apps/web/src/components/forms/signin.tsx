@@ -208,7 +208,7 @@ export const SignInForm = ({ className, isGoogleSSOEnabled }: SignInFormProps) =
           <>
             <div className="relative flex items-center justify-center gap-x-4 py-2 text-xs uppercase">
               <div className="bg-border h-px flex-1" />
-              <span className="text-muted-foreground bg-transparent">Or</span>
+              <span className="text-muted-foreground bg-transparent">Or continue with</span>
               <div className="bg-border h-px flex-1" />
             </div>
 
@@ -221,7 +221,7 @@ export const SignInForm = ({ className, isGoogleSSOEnabled }: SignInFormProps) =
               onClick={onSignInWithGoogleClick}
             >
               <FcGoogle className="mr-2 h-5 w-5" />
-              Sign In with Google
+              Google
             </Button>
           </>
         )}
