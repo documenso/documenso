@@ -252,7 +252,11 @@ const ThemeCommands = ({ setTheme }: { setTheme: (_theme: string) => void }) => 
   );
 
   return THEMES.map((theme) => (
-    <CommandItem key={theme.theme} onSelect={() => setTheme(theme.theme)} className="mx-2 my-2">
+    <CommandItem
+      key={theme.theme}
+      onSelect={() => setTheme(theme.theme)}
+      className="mx-2 first:mt-2 last:mb-2"
+    >
       <theme.icon className="mr-2" />
       {theme.label}
     </CommandItem>
