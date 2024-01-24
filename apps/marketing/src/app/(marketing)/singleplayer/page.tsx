@@ -1,4 +1,10 @@
+import type { Metadata } from 'next';
+
 import { SinglePlayerClient } from './client';
+
+export const metadata: Metadata = {
+  title: 'Single Player Mode | Documenso',
+};
 
 export const revalidate = 0;
 

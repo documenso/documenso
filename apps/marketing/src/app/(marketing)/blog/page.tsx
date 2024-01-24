@@ -1,5 +1,10 @@
+import type { Metadata } from 'next';
+
 import { allBlogPosts } from 'contentlayer/generated';
 
+export const metadata: Metadata = {
+  title: 'Blog | Documenso',
+};
 export default function BlogPage() {
   const blogPosts = allBlogPosts.sort((a, b) => {
     const dateA = new Date(a.date);

@@ -1,5 +1,4 @@
-'use client';
-
+import type { Metadata } from 'next';
 import Link from 'next/link';
 
 import {
@@ -11,6 +10,10 @@ import {
 import { Button } from '@documenso/ui/primitives/button';
 
 import { PricingTable } from '~/components/(marketing)/pricing-table';
+
+export const metadata: Metadata = {
+  title: 'Pricing | Documenso',
+};
 
 export type PricingPageProps = {
   searchParams?: {
