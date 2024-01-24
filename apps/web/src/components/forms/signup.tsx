@@ -68,7 +68,7 @@ export const SignUpForm = ({ className, isGoogleSSOEnabled }: SignUpFormProps) =
       await signIn('credentials', {
         email,
         password,
-        callbackUrl: '/',
+        callbackUrl: SIGN_UP_REDIRECT_PATH,
       });
 
       analytics.capture('App: User Sign Up', {
