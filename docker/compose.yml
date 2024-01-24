@@ -23,7 +23,8 @@ services:
       - database
       - inbucket
     environment:
-      - DATABASE_URL=postgres://documenso:password@database:5432/documenso
+      - NEXT_PRIVATE_DATABASE_URL=postgres://documenso:password@database:5432/documenso
+      - NEXT_PRIVATE_DIRECT_DATABASE_URL=postgres://documenso:password@database:5432/documenso
       - NEXT_PUBLIC_WEBAPP_URL=http://localhost:3000
       - NEXTAUTH_SECRET=my-super-secure-secret
       - NEXTAUTH_URL=http://localhost:3000
