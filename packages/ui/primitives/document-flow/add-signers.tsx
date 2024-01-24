@@ -65,7 +65,8 @@ export const AddSignersFormPartial = ({
               nativeId: recipient.id,
               formId: String(recipient.id),
               name: recipient.name,
-              email: recipient.email,
+              email: recipient.email ? recipient.email : '',
+              phoneNumber: recipient.phoneNumber ? recipient.phoneNumber : ''
             }))
           : [
               {
@@ -153,14 +154,17 @@ export const AddSignersFormPartial = ({
                     control={control}
                     name={`signers.${index}.email`}
                     render={({ field }) => (
-                      <Input
-                        id={`signer-${signer.id}-email`}
-                        type="email"
-                        className="bg-background mt-2"
-                        disabled={isSubmitting || hasBeenSentToRecipientId(signer.nativeId)}
-                        onKeyDown={onKeyDown}
-                        {...field}
-                      />
+                      <>
+                        <Input
+                          id={`signer-${signer.id}-email`}
+                          type="email"
+                          className="bg-background mt-2"
+                          disabled={isSubmitting || hasBeenSentToRecipientId(signer.nativeId)}
+                          onKeyDown={onKeyDown}
+                          {...field}
+                        />
+                        
+                      </>
                     )}
                   />
                 </div>
