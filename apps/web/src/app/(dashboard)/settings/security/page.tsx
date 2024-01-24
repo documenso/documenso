@@ -1,5 +1,5 @@
+import { IDENTITY_PROVIDER_NAME } from '@documenso/lib/constants/auth';
 import { getRequiredServerComponentSession } from '@documenso/lib/next-auth/get-server-component-session';
-import { identityProviderName } from '@documenso/lib/server-only/auth/identityProviderName';
 
 import { AuthenticatorApp } from '~/components/forms/2fa/authenticator-app';
 import { RecoveryCodes } from '~/components/forms/2fa/recovery-codes';
@@ -48,11 +48,11 @@ export default async function SecuritySettingsPage() {
       ) : (
         <div>
           <h4 className="text-lg font-medium">
-            Your account is managed by {identityProviderName[user.identityProvider]}
+            Your account is managed by {IDENTITY_PROVIDER_NAME[user.identityProvider]}
           </h4>
           <p className="text-muted-foreground mt-2 text-sm">
             To update your password, enable two-factor authentication, and manage other security
-            settings, please go to your {identityProviderName[user.identityProvider]} account
+            settings, please go to your {IDENTITY_PROVIDER_NAME[user.identityProvider]} account
             settings.
           </p>
         </div>
