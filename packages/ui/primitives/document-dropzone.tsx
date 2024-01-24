@@ -5,10 +5,15 @@ import { motion } from 'framer-motion';
 import { Plus } from 'lucide-react';
 import { useDropzone } from 'react-dropzone';
 
+
+
 import { megabytesToBytes } from '@documenso/lib/universal/unit-convertions';
+
+
 
 import { cn } from '../lib/utils';
 import { Card, CardContent } from './card';
+
 
 const DocumentDropzoneContainerVariants: Variants = {
   initial: {
@@ -89,6 +94,7 @@ export type DocumentDropzoneProps = {
   disabled?: boolean;
   disabledMessage?: string;
   onDrop?: (_file: File) => void | Promise<void>;
+  onDropRejected?: () => void | Promise<void>;
   type?: 'document' | 'template';
   [key: string]: unknown;
 };
@@ -96,6 +102,7 @@ export type DocumentDropzoneProps = {
 export const DocumentDropzone = ({
   className,
   onDrop,
+  onDropRejected,
   disabled,
   disabledMessage = 'You cannot upload documents at this time.',
   type = 'document',
@@ -110,6 +117,11 @@ export const DocumentDropzone = ({
     onDrop: ([acceptedFile]) => {
       if (acceptedFile && onDrop) {
         void onDrop(acceptedFile);
+      }
+    },
+    onDropRejected: () => {
+      if (onDropRejected) {
+        void onDropRejected();
       }
     },
     maxSize: megabytesToBytes(50),

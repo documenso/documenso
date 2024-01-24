@@ -2,11 +2,17 @@
 
 import { useMemo, useState } from 'react';
 
+
+
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
+
+
 import { Loader } from 'lucide-react';
 import { useSession } from 'next-auth/react';
+
+
 
 import { useLimits } from '@documenso/ee/server-only/limits/provider/client';
 import { useAnalytics } from '@documenso/lib/client-only/hooks/use-analytics';
@@ -17,6 +23,7 @@ import { trpc } from '@documenso/trpc/react';
 import { cn } from '@documenso/ui/lib/utils';
 import { DocumentDropzone } from '@documenso/ui/primitives/document-dropzone';
 import { useToast } from '@documenso/ui/primitives/use-toast';
+
 
 export type UploadDocumentProps = {
   className?: string;
@@ -96,6 +103,15 @@ export const UploadDocument = ({ className }: UploadDocumentProps) => {
     }
   };
 
+  const onFileDropRejected = () => {
+    toast({
+      title: 'File is larger than 50mb',
+      description: 'Your document failed to upload.',
+      duration: 5000,
+      variant: 'destructive',
+    });
+  };
+
   return (
     <div className={cn('relative', className)}>
       <DocumentDropzone
@@ -103,6 +119,7 @@ export const UploadDocument = ({ className }: UploadDocumentProps) => {
         disabled={remaining.documents === 0 || !session?.user.emailVerified}
         disabledMessage={disabledMessage}
         onDrop={onFileDrop}
+        onDropRejected={onFileDropRejected}
       />
 
       <div className="absolute -bottom-6 right-0">
