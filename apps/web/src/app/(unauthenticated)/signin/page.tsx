@@ -1,6 +1,8 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 
+import { IS_GOOGLE_SSO_ENABLED } from '@documenso/lib/constants/auth';
+
 import { SignInForm } from '~/components/forms/signin';
 
 export const metadata: Metadata = {
@@ -16,7 +18,7 @@ export default function SignInPage() {
         Welcome back, we are lucky to have you.
       </p>
 
-      <SignInForm className="mt-4" />
+      <SignInForm className="mt-4" isGoogleSSOEnabled={IS_GOOGLE_SSO_ENABLED} />
 
       {process.env.NEXT_PUBLIC_DISABLE_SIGNUP !== 'true' && (
         <p className="text-muted-foreground mt-6 text-center text-sm">
