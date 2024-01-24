@@ -51,8 +51,9 @@ export default async function SecuritySettingsPage() {
             Your account is managed by {identityProviderName[user.identityProvider]}
           </h4>
           <p className="text-muted-foreground mt-2 text-sm">
-            To update your password, enable two-factor authentication, and manage other security settings, please go to your{' '}
-            {identityProviderName[user.identityProvider]} account settings.
+            To update your password, enable two-factor authentication, and manage other security
+            settings, please go to your {identityProviderName[user.identityProvider]} account
+            settings.
           </p>
         </div>
       )}
