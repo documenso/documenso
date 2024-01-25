@@ -1,5 +1,7 @@
 'use server';
 
+import { env } from 'next-runtime-env';
+
 import { getCheckoutSession } from '@documenso/ee/server-only/stripe/get-checkout-session';
 import { getStripeCustomerByUser } from '@documenso/ee/server-only/stripe/get-customer';
 import { getPortalSession } from '@documenso/ee/server-only/stripe/get-portal-session';
@@ -11,6 +13,8 @@ export type CreateCheckoutOptions = {
 };
 
 export const createCheckout = async ({ priceId }: CreateCheckoutOptions) => {
+  const NEXT_PUBLIC_WEBAPP_URL = env('NEXT_PUBLIC_WEBAPP_URL');
+
   const session = await getRequiredServerComponentSession();
 
   const { user, stripeCustomer } = await getStripeCustomerByUser(session.user);
@@ -27,13 +31,13 @@ export const createCheckout = async ({ priceId }: CreateCheckoutOptions) => {
   if (foundSubscription) {
     return getPortalSession({
       customerId: stripeCustomer.id,
-      returnUrl: `${process.env.NEXT_PUBLIC_WEBAPP_URL}/settings/billing`,
+      returnUrl: `${NEXT_PUBLIC_WEBAPP_URL}/settings/billing`,
     });
   }
 
   return getCheckoutSession({
     customerId: stripeCustomer.id,
     priceId,
-    returnUrl: `${process.env.NEXT_PUBLIC_WEBAPP_URL}/settings/billing`,
+    returnUrl: `${NEXT_PUBLIC_WEBAPP_URL}/settings/billing`,
   });
 };

@@ -1,7 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 import { nanoid } from 'nanoid';
-import { JWT, getToken } from 'next-auth/jwt';
+import type { JWT } from 'next-auth/jwt';
+import { getToken } from 'next-auth/jwt';
+import { env } from 'next-runtime-env';
 
 import { LOCAL_FEATURE_FLAGS, extractPostHogConfig } from '@documenso/lib/constants/feature-flags';
 import PostHogServerClient from '@documenso/lib/server-only/feature-flags/get-post-hog-server-client';
@@ -13,6 +15,9 @@ import PostHogServerClient from '@documenso/lib/server-only/feature-flags/get-po
  * @returns A Response with the feature flag value.
  */
 export default async function handleFeatureFlagGet(req: Request) {
+  const NEXT_PUBLIC_WEBAPP_URL = env('NEXT_PUBLIC_WEBAPP_URL');
+  const NEXT_PUBLIC_MARKETING_URL = env('NEXT_PUBLIC_MARKETING_URL');
+
   const { searchParams } = new URL(req.url ?? '');
   const flag = searchParams.get('flag');
 
@@ -57,11 +62,11 @@ export default async function handleFeatureFlagGet(req: Request) {
   const origin = req.headers.get('Origin');
 
   if (origin) {
-    if (origin.startsWith(process.env.NEXT_PUBLIC_WEBAPP_URL ?? 'http://localhost:3000')) {
+    if (origin.startsWith(NEXT_PUBLIC_WEBAPP_URL ?? 'http://localhost:3000')) {
       res.headers.set('Access-Control-Allow-Origin', origin);
     }
 
-    if (origin.startsWith(process.env.NEXT_PUBLIC_MARKETING_URL ?? 'http://localhost:3001')) {
+    if (origin.startsWith(NEXT_PUBLIC_MARKETING_URL ?? 'http://localhost:3001')) {
       res.headers.set('Access-Control-Allow-Origin', origin);
     }
   }

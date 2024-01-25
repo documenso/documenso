@@ -2,6 +2,8 @@
 
 import { createElement } from 'react';
 
+import { env } from 'next-runtime-env';
+
 import { mailer } from '@documenso/email/mailer';
 import { render } from '@documenso/email/render';
 import DocumentCancelTemplate from '@documenso/email/templates/document-cancel';
@@ -15,6 +17,8 @@ export type DeleteDocumentOptions = {
   userId: number;
   status: DocumentStatus;
 };
+
+const NEXT_PUBLIC_WEBAPP_URL = env('NEXT_PUBLIC_WEBAPP_URL');
 
 export const deleteDocument = async ({ id, userId, status }: DeleteDocumentOptions) => {
   // if the document is a draft, hard-delete
@@ -49,7 +53,7 @@ export const deleteDocument = async ({ id, userId, status }: DeleteDocumentOptio
     if (document.Recipient.length > 0) {
       await Promise.all(
         document.Recipient.map(async (recipient) => {
-          const assetBaseUrl = process.env.NEXT_PUBLIC_WEBAPP_URL || 'http://localhost:3000';
+          const assetBaseUrl = NEXT_PUBLIC_WEBAPP_URL || 'http://localhost:3000';
 
           const template = createElement(DocumentCancelTemplate, {
             documentName: document.title,

@@ -1,4 +1,5 @@
 import { base64 } from '@scure/base';
+import { env } from 'next-runtime-env';
 import { match } from 'ts-pattern';
 
 import { DocumentDataType } from '@documenso/prisma/client';
@@ -11,8 +12,10 @@ type File = {
   arrayBuffer: () => Promise<ArrayBuffer>;
 };
 
+const NEXT_PUBLIC_UPLOAD_TRANSPORT = env('NEXT_PUBLIC_UPLOAD_TRANSPORT');
+
 export const putFile = async (file: File) => {
-  const { type, data } = await match(process.env.NEXT_PUBLIC_UPLOAD_TRANSPORT)
+  const { type, data } = await match(NEXT_PUBLIC_UPLOAD_TRANSPORT)
     .with('s3', async () => putFileInS3(file))
     .otherwise(async () => putFileInDatabase(file));
 

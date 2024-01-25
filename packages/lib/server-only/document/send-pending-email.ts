@@ -1,5 +1,7 @@
 import { createElement } from 'react';
 
+import { env } from 'next-runtime-env';
+
 import { mailer } from '@documenso/email/mailer';
 import { render } from '@documenso/email/render';
 import { DocumentPendingEmailTemplate } from '@documenso/email/templates/document-pending';
@@ -11,6 +13,8 @@ export interface SendPendingEmailOptions {
 }
 
 export const sendPendingEmail = async ({ documentId, recipientId }: SendPendingEmailOptions) => {
+  const NEXT_PUBLIC_WEBAPP_URL = env('NEXT_PUBLIC_WEBAPP_URL');
+
   const document = await prisma.document.findFirst({
     where: {
       id: documentId,
@@ -41,7 +45,7 @@ export const sendPendingEmail = async ({ documentId, recipientId }: SendPendingE
 
   const { email, name } = recipient;
 
-  const assetBaseUrl = process.env.NEXT_PUBLIC_WEBAPP_URL || 'http://localhost:3000';
+  const assetBaseUrl = NEXT_PUBLIC_WEBAPP_URL || 'http://localhost:3000';
 
   const template = createElement(DocumentPendingEmailTemplate, {
     documentName: document.title,

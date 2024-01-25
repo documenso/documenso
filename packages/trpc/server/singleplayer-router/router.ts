@@ -1,5 +1,6 @@
 import { createElement } from 'react';
 
+import { env } from 'next-runtime-env';
 import { PDFDocument } from 'pdf-lib';
 
 import { mailer } from '@documenso/email/mailer';
@@ -23,6 +24,8 @@ import { signPdf } from '@documenso/signing';
 import { procedure, router } from '../trpc';
 import { mapField } from './helper';
 import { ZCreateSinglePlayerDocumentMutationSchema } from './schema';
+
+const NEXT_PUBLIC_WEBAPP_URL = env('NEXT_PUBLIC_WEBAPP_URL');
 
 export const singleplayerRouter = router({
   createSinglePlayerDocument: procedure
@@ -148,7 +151,7 @@ export const singleplayerRouter = router({
 
       const template = createElement(DocumentSelfSignedEmailTemplate, {
         documentName: documentName,
-        assetBaseUrl: process.env.NEXT_PUBLIC_WEBAPP_URL || 'http://localhost:3000',
+        assetBaseUrl: NEXT_PUBLIC_WEBAPP_URL || 'http://localhost:3000',
       });
 
       const [html, text] = await Promise.all([

@@ -1,3 +1,5 @@
+import { env } from 'next-runtime-env';
+
 /**
  * getAssetBuffer is used to retrieve array buffers for various assets
  * that are hosted in the `public` folder.
@@ -8,7 +10,9 @@
  * @param path The path to the asset, relative to the `public` folder.
  */
 export const getAssetBuffer = async (path: string) => {
-  const baseUrl = process.env.NEXT_PUBLIC_WEBAPP_URL || 'http://localhost:3000';
+  const NEXT_PUBLIC_WEBAPP_URL = env('NEXT_PUBLIC_WEBAPP_URL');
+
+  const baseUrl = NEXT_PUBLIC_WEBAPP_URL || 'http://localhost:3000';
 
   return fetch(new URL(path, baseUrl)).then(async (res) => res.arrayBuffer());
 };

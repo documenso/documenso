@@ -1,6 +1,8 @@
-import { Metadata } from 'next';
+import type { Metadata } from 'next';
 import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';
+
+import { env } from 'next-runtime-env';
 
 import { APP_BASE_URL } from '@documenso/lib/constants/app';
 
@@ -28,6 +30,8 @@ export function generateMetadata({ params: { slug } }: SharePageProps) {
 }
 
 export default function SharePage() {
+  const NEXT_PUBLIC_MARKETING_URL = env('NEXT_PUBLIC_MARKETING_URL');
+
   const userAgent = headers().get('User-Agent') ?? '';
 
   // https://stackoverflow.com/questions/47026171/how-to-detect-bots-for-open-graph-with-user-agent
@@ -35,5 +39,5 @@ export default function SharePage() {
     return null;
   }
 
-  redirect(process.env.NEXT_PUBLIC_MARKETING_URL ?? 'http://localhost:3001');
+  redirect(NEXT_PUBLIC_MARKETING_URL ?? 'http://localhost:3001');
 }

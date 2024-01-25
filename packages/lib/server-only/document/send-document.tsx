@@ -1,5 +1,7 @@
 import { createElement } from 'react';
 
+import { env } from 'next-runtime-env';
+
 import { mailer } from '@documenso/email/mailer';
 import { render } from '@documenso/email/render';
 import { DocumentInviteEmailTemplate } from '@documenso/email/templates/document-invite';
@@ -14,6 +16,8 @@ export type SendDocumentOptions = {
 };
 
 export const sendDocument = async ({ documentId, userId }: SendDocumentOptions) => {
+  const NEXT_PUBLIC_WEBAPP_URL = env('NEXT_PUBLIC_WEBAPP_URL');
+
   const user = await prisma.user.findFirstOrThrow({
     where: {
       id: userId,
@@ -59,8 +63,8 @@ export const sendDocument = async ({ documentId, userId }: SendDocumentOptions) 
         return;
       }
 
-      const assetBaseUrl = process.env.NEXT_PUBLIC_WEBAPP_URL || 'http://localhost:3000';
-      const signDocumentLink = `${process.env.NEXT_PUBLIC_WEBAPP_URL}/sign/${recipient.token}`;
+      const assetBaseUrl = NEXT_PUBLIC_WEBAPP_URL || 'http://localhost:3000';
+      const signDocumentLink = `${NEXT_PUBLIC_WEBAPP_URL}/sign/${recipient.token}`;
 
       const template = createElement(DocumentInviteEmailTemplate, {
         documentName: document.title,

@@ -2,6 +2,8 @@
 
 import React from 'react';
 
+import { env } from 'next-runtime-env';
+
 import { useCopyToClipboard } from '@documenso/lib/client-only/hooks/use-copy-to-clipboard';
 import { getRecipientType } from '@documenso/lib/client-only/recipient-type';
 import { recipientAbbreviation } from '@documenso/lib/utils/recipient-formatter';
@@ -16,6 +18,8 @@ export type AvatarWithRecipientProps = {
 };
 
 export function AvatarWithRecipient({ recipient }: AvatarWithRecipientProps) {
+  const NEXT_PUBLIC_WEBAPP_URL = env('NEXT_PUBLIC_WEBAPP_URL');
+
   const [, copy] = useCopyToClipboard();
   const { toast } = useToast();
 
@@ -24,7 +28,7 @@ export function AvatarWithRecipient({ recipient }: AvatarWithRecipientProps) {
       return;
     }
 
-    void copy(`${process.env.NEXT_PUBLIC_WEBAPP_URL}/sign/${recipient.token}`).then(() => {
+    void copy(`${NEXT_PUBLIC_WEBAPP_URL}/sign/${recipient.token}`).then(() => {
       toast({
         title: 'Copied to clipboard',
         description: 'The signing link has been copied to your clipboard.',

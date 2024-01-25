@@ -1,6 +1,7 @@
 import { ImageResponse } from 'next/og';
 import { NextResponse } from 'next/server';
 
+import { env } from 'next-runtime-env';
 import { P, match } from 'ts-pattern';
 
 import type { ShareHandlerAPIResponse } from '~/pages/api/share';
@@ -22,6 +23,8 @@ type SharePageOpenGraphImageProps = {
 };
 
 export async function GET(_request: Request, { params: { slug } }: SharePageOpenGraphImageProps) {
+  const NEXT_PUBLIC_WEBAPP_URL = env('NEXT_PUBLIC_WEBAPP_URL');
+
   const [interSemiBold, interRegular, caveatRegular, shareFrameImage] = await Promise.all([
     fetch(new URL('@documenso/assets/fonts/inter-semibold.ttf', import.meta.url)).then(
       async (res) => res.arrayBuffer(),
@@ -37,7 +40,7 @@ export async function GET(_request: Request, { params: { slug } }: SharePageOpen
     ),
   ]);
 
-  const baseUrl = process.env.NEXT_PUBLIC_WEBAPP_URL || 'http://localhost:3000';
+  const baseUrl = NEXT_PUBLIC_WEBAPP_URL || 'http://localhost:3000';
 
   const recipientOrSender: ShareHandlerAPIResponse = await fetch(
     new URL(`/api/share?slug=${slug}`, baseUrl),

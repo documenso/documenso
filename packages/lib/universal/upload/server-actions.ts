@@ -11,11 +11,14 @@ import {
 } from '@aws-sdk/client-s3';
 import slugify from '@sindresorhus/slugify';
 import { type JWT, getToken } from 'next-auth/jwt';
+import { env } from 'next-runtime-env';
 import path from 'node:path';
 
 import { APP_BASE_URL } from '../../constants/app';
 import { ONE_HOUR, ONE_SECOND } from '../../constants/time';
 import { alphaid } from '../id';
+
+const NEXT_PUBLIC_UPLOAD_TRANSPORT = env('NEXT_PUBLIC_UPLOAD_TRANSPORT');
 
 export const getPresignPostUrl = async (fileName: string, contentType: string) => {
   const client = getS3Client();
@@ -117,7 +120,7 @@ export const deleteS3File = async (key: string) => {
 };
 
 const getS3Client = () => {
-  if (process.env.NEXT_PUBLIC_UPLOAD_TRANSPORT !== 's3') {
+  if (NEXT_PUBLIC_UPLOAD_TRANSPORT !== 's3') {
     throw new Error('Invalid upload transport');
   }
 

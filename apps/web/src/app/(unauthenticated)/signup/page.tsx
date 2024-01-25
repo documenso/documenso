@@ -1,10 +1,14 @@
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 
+import { env } from 'next-runtime-env';
+
 import { SignUpForm } from '~/components/forms/signup';
 
 export default function SignUpPage() {
-  if (process.env.NEXT_PUBLIC_DISABLE_SIGNUP === 'true') {
+  const NEXT_PUBLIC_DISABLE_SIGNUP = env('NEXT_PUBLIC_DISABLE_SIGNUP');
+
+  if (NEXT_PUBLIC_DISABLE_SIGNUP === 'true') {
     redirect('/signin');
   }
 

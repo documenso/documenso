@@ -1,10 +1,14 @@
 import Link from 'next/link';
 
+import { env } from 'next-runtime-env';
+
 import { IS_GOOGLE_SSO_ENABLED } from '@documenso/lib/constants/auth';
 
 import { SignInForm } from '~/components/forms/signin';
 
 export default function SignInPage() {
+  const NEXT_PUBLIC_DISABLE_SIGNUP = env('NEXT_PUBLIC_DISABLE_SIGNUP');
+
   return (
     <div>
       <h1 className="text-4xl font-semibold">Sign in to your account</h1>
@@ -15,7 +19,7 @@ export default function SignInPage() {
 
       <SignInForm className="mt-4" isGoogleSSOEnabled={IS_GOOGLE_SSO_ENABLED} />
 
-      {process.env.NEXT_PUBLIC_DISABLE_SIGNUP !== 'true' && (
+      {NEXT_PUBLIC_DISABLE_SIGNUP !== 'true' && (
         <p className="text-muted-foreground mt-6 text-center text-sm">
           Don't have an account?{' '}
           <Link href="/signup" className="text-primary duration-200 hover:opacity-70">
