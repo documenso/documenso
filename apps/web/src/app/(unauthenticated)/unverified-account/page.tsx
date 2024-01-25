@@ -18,7 +18,7 @@ export default function UnverifiedAccount() {
   const searchParams = useSearchParams();
   const { toast } = useToast();
 
-  const token = searchParams?.get('t') ?? '';
+  const encryptedEmail = searchParams?.get('t') ?? ''; // TODO: choose a better name instead of t
 
   const { mutateAsync: sendConfirmationEmail } = trpc.profile.sendConfirmationEmail.useMutation();
 
@@ -26,9 +26,7 @@ export default function UnverifiedAccount() {
     try {
       setIsButtonDisabled(true);
 
-      //  TODO: decrypt email and send it
-
-      await sendConfirmationEmail({ email: token ?? '' });
+      await sendConfirmationEmail({ email: encryptedEmail });
 
       toast({
         title: 'Success',

@@ -30,9 +30,9 @@ export const ZResetPasswordFormSchema = z.object({
   password: z.string().min(6),
   token: z.string().min(1),
 });
-
+// TODO: revisit this
 export const ZConfirmEmailMutationSchema = z.object({
-  email: z.string().email().min(1),
+  email: z.string().min(1),
 });
 
 export type TRetrieveUserByIdQuerySchema = z.infer<typeof ZRetrieveUserByIdQuerySchema>;

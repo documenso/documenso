@@ -1,5 +1,6 @@
 import { TRPCError } from '@trpc/server';
 
+import { decryptSecondaryData } from '@documenso/lib/server-only/crypto/decrypt';
 import { forgotPassword } from '@documenso/lib/server-only/user/forgot-password';
 import { getUserByEmail } from '@documenso/lib/server-only/user/get-user-by-email';
 import { getUserById } from '@documenso/lib/server-only/user/get-user-by-id';
@@ -136,7 +137,9 @@ export const profileRouter = router({
       try {
         const { email } = input;
 
-        return await sendConfirmationToken({ email });
+        const decryptedEmail = decryptSecondaryData(email);
+
+        return await sendConfirmationToken({ email: decryptedEmail ?? '' }); // TODO: fix this tomorrow
       } catch (err) {
         let message = 'We were unable to send a confirmation email. Please try again.';
 
