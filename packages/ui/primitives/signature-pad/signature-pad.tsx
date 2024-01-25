@@ -26,7 +26,7 @@ export const SignaturePad = ({
   ...props
 }: SignaturePadProps) => {
   const $el = useRef<HTMLCanvasElement>(null);
-
+  const defaultImageRef = useRef<ImageData | null>(null);
   const [isPressed, setIsPressed] = useState(false);
   const [lines, setLines] = useState<Point[][]>([]);
   const [currentLine, setCurrentLine] = useState<Point[]>([]);
@@ -161,6 +161,7 @@ export const SignaturePad = ({
       const ctx = $el.current.getContext('2d');
 
       ctx?.clearRect(0, 0, $el.current.width, $el.current.height);
+      defaultImageRef.current = null;
     }
 
     onChange?.(null);
@@ -181,8 +182,11 @@ export const SignaturePad = ({
     // Clear the canvas
     if ($el.current) {
       const ctx = $el.current.getContext('2d');
+      const { width, height } = $el.current;
       ctx?.clearRect(0, 0, $el.current.width, $el.current.height);
-
+      if (typeof defaultValue === 'string' && defaultImageRef.current) {
+        ctx?.putImageData(defaultImageRef.current, 0, 0);
+      }
       newLines.forEach((line) => {
         const pathData = new Path2D(getSvgPathFromStroke(getStroke(line, perfectFreehandOptions)));
         ctx?.fill(pathData);
@@ -207,6 +211,8 @@ export const SignaturePad = ({
 
       img.onload = () => {
         ctx?.drawImage(img, 0, 0, Math.min(width, img.width), Math.min(height, img.height));
+        const defaultImageData = ctx?.getImageData(0, 0, width, height) || null;
+        defaultImageRef.current = defaultImageData;
       };
 
       img.src = defaultValue;
