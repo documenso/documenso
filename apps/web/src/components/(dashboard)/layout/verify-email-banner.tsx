@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 
 import { AlertTriangle } from 'lucide-react';
 
-import { ONE_SECOND } from '@documenso/lib/constants/time';
+import { ONE_DAY, ONE_SECOND } from '@documenso/lib/constants/time';
 import { trpc } from '@documenso/trpc/react';
 import { Button } from '@documenso/ui/primitives/button';
 import {
@@ -65,7 +65,7 @@ export const VerifyEmailBanner = ({ email }: VerifyEmailBannerProps) => {
     if (emailVerificationDialogLastShown) {
       const lastShownTimestamp = parseInt(emailVerificationDialogLastShown);
 
-      if (Date.now() - lastShownTimestamp < 24 * 60 * 60 * 1000) {
+      if (Date.now() - lastShownTimestamp < ONE_DAY) {
         return;
       }
     }

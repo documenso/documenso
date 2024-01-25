@@ -9,6 +9,7 @@ import type { GoogleProfile } from 'next-auth/providers/google';
 import GoogleProvider from 'next-auth/providers/google';
 
 import { prisma } from '@documenso/prisma';
+import { IdentityProvider } from '@documenso/prisma/client';
 
 import { ONE_DAY } from '../constants/time';
 import { isTwoFactorAuthenticationEnabled } from '../server-only/2fa/is-2fa-availble';
@@ -105,7 +106,7 @@ export const NEXT_AUTH_OPTIONS: AuthOptions = {
     }),
   ],
   callbacks: {
-    async jwt({ token, user }) {
+    async jwt({ token, user, trigger, account }) {
       const merged = {
         ...token,
         ...user,
@@ -148,6 +149,22 @@ export const NEXT_AUTH_OPTIONS: AuthOptions = {
         });
 
         merged.emailVerified = user.emailVerified?.toISOString() ?? null;
+      }
+
+      if ((trigger === 'signIn' || trigger === 'signUp') && account?.provider === 'google') {
+        merged.emailVerified = user?.emailVerified
+          ? new Date(user.emailVerified).toISOString()
+          : new Date().toISOString();
+
+        await prisma.user.update({
+          where: {
+            id: Number(merged.id),
+          },
+          data: {
+            emailVerified: merged.emailVerified,
+            identityProvider: IdentityProvider.GOOGLE,
+          },
+        });
       }
 
       return {
