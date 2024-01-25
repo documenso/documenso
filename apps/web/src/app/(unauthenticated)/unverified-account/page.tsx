@@ -20,25 +20,15 @@ export default function UnverifiedAccount() {
 
   const token = searchParams?.get('t') ?? '';
 
-  const { data: { email } = {} } = trpc.profile.getUserFromVerificationToken.useQuery({ token });
-
   const { mutateAsync: sendConfirmationEmail } = trpc.profile.sendConfirmationEmail.useMutation();
 
   const onResendConfirmationEmail = async () => {
-    if (!email) {
-      toast({
-        title: 'Unable to send confirmation email',
-        description: 'Something went wrong while sending the confirmation email. Please try again.',
-        variant: 'destructive',
-      });
-
-      return;
-    }
-
     try {
       setIsButtonDisabled(true);
 
-      await sendConfirmationEmail({ email: email });
+      //  TODO: decrypt email and send it
+
+      await sendConfirmationEmail({ email: token ?? '' });
 
       toast({
         title: 'Success',

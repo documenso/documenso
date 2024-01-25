@@ -62,12 +62,15 @@ export const SignUpForm = ({ className, isGoogleSSOEnabled }: SignUpFormProps) =
   const isSubmitting = form.formState.isSubmitting;
 
   const { mutateAsync: signup } = trpc.auth.signup.useMutation();
+  const { mutateAsync: encryptSecondaryData } = trpc.crypto.encryptSecondaryData.useMutation();
 
   const onFormSubmit = async ({ name, email, password, signature }: TSignUpFormSchema) => {
     try {
       await signup({ name, email, password, signature });
 
-      router.push('/signin');
+      const encryptedEmail = await encryptSecondaryData({ data: email });
+
+      router.push(`/unverified-account?t=${encryptedEmail}`);
 
       toast({
         title: 'Registration Successful',

@@ -11,7 +11,6 @@ import GoogleProvider from 'next-auth/providers/google';
 import { prisma } from '@documenso/prisma';
 import { IdentityProvider } from '@documenso/prisma/client';
 
-import { ONE_DAY } from '../constants/time';
 import { isTwoFactorAuthenticationEnabled } from '../server-only/2fa/is-2fa-availble';
 import { validateTwoFactorAuthentication } from '../server-only/2fa/validate-2fa';
 import { getUserByEmail } from '../server-only/user/get-user-by-email';
@@ -71,14 +70,7 @@ export const NEXT_AUTH_OPTIONS: AuthOptions = {
           }
         }
 
-        const userCreationDate = user?.createdAt;
-        const createdWithinLast72Hours = userCreationDate > new Date(Date.now() - ONE_DAY * 3);
-
-        /*
-          avoid messing with the users who signed up before the email verification requirement
-          the error is thrown only if the user doesn't have a verified email and the account was created within the last 72 hours
-        */
-        if (!user.emailVerified && createdWithinLast72Hours) {
+        if (!user.emailVerified) {
           throw new Error(ErrorCode.UNVERIFIED_EMAIL);
         }
 

@@ -62,6 +62,8 @@ export const SignInForm = ({ className, isGoogleSSOEnabled }: SignInFormProps) =
     useState(false);
   const router = useRouter();
 
+  const { mutateAsync: encryptSecondaryData } = trpc.crypto.encryptSecondaryData.useMutation();
+
   const [twoFactorAuthenticationMethod, setTwoFactorAuthenticationMethod] = useState<
     'totp' | 'backup'
   >('totp');
@@ -75,8 +77,6 @@ export const SignInForm = ({ className, isGoogleSSOEnabled }: SignInFormProps) =
     },
     resolver: zodResolver(ZSignInFormSchema),
   });
-
-  const { mutateAsync: getUser } = trpc.profile.getUserByEmail.useMutation();
 
   const isSubmitting = form.formState.isSubmitting;
 
@@ -132,10 +132,9 @@ export const SignInForm = ({ className, isGoogleSSOEnabled }: SignInFormProps) =
         const errorMessage = ERROR_MESSAGES[result.error];
 
         if (result.error === ErrorCode.UNVERIFIED_EMAIL) {
-          const user = await getUser({ email });
-          const token = user?.VerificationToken[user.VerificationToken.length - 1].token;
+          const encryptedEmail = await encryptSecondaryData({ data: email });
 
-          router.push(`/unverified-account?t=${token}`);
+          router.push(`/unverified-account?t=${encryptedEmail}`);
 
           return;
         }
