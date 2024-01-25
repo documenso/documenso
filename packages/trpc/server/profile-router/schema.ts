@@ -23,8 +23,13 @@ export const ZResetPasswordFormSchema = z.object({
   token: z.string().min(1),
 });
 
+export const ZConfirmEmailMutationSchema = z.object({
+  email: z.string().email().min(1),
+});
+
 export type TRetrieveUserByIdQuerySchema = z.infer<typeof ZRetrieveUserByIdQuerySchema>;
 export type TUpdateProfileMutationSchema = z.infer<typeof ZUpdateProfileMutationSchema>;
 export type TUpdatePasswordMutationSchema = z.infer<typeof ZUpdatePasswordMutationSchema>;
 export type TForgotPasswordFormSchema = z.infer<typeof ZForgotPasswordFormSchema>;
 export type TResetPasswordFormSchema = z.infer<typeof ZResetPasswordFormSchema>;
+export type TConfirmEmailMutationSchema = z.infer<typeof ZConfirmEmailMutationSchema>;

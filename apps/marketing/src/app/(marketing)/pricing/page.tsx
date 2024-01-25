@@ -6,6 +6,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from '@documenso/ui/primitives/accordion';
+import { Button } from '@documenso/ui/primitives/button';
 
 import { PricingTable } from '~/components/(marketing)/pricing-table';
 
@@ -32,6 +33,26 @@ export default function PricingPage() {
 
       <div className="mt-12">
         <PricingTable />
+      </div>
+
+      <div className="mx-auto mt-36 max-w-2xl">
+        <h2 className="text-center text-2xl font-semibold">
+          None of these work for you? Try self-hosting!
+        </h2>
+
+        <p className="text-muted-foreground mt-4 text-center leading-relaxed">
+          Our self-hosted option is great for small teams and individuals who need a simple
+          solution. You can use our docker based setup to get started in minutes. Take control with
+          full customizability and data ownership.
+        </p>
+
+        <div className="mt-4 flex justify-center">
+          <Button variant="outline" size="lg" className="rounded-full hover:cursor-pointer" asChild>
+            <Link href="https://github.com/documenso/documenso" target="_blank">
+              Get Started
+            </Link>
+          </Button>
+        </div>
       </div>
 
       <div className="mx-auto mt-36 max-w-2xl">
@@ -96,10 +117,10 @@ export default function PricingPage() {
               and join our{' '}
               <Link
                 className="text-documenso-700 font-bold"
-                href="https://join.slack.com/t/documenso/shared_invite/zt-1vibm8txi-DqsDFtdp44Hn2H5lc~RpPQ"
+                href="https://documen.so/discord"
                 target="_blank"
               >
-                Slack Community
+                Discord Community
               </Link>{' '}
               to keep up to date, on what the current priorities are. In any case, we are an open
               community and welcome all input, technical and non-technical ❤️
@@ -147,10 +168,10 @@ export default function PricingPage() {
               or{' '}
               <a
                 className="text-documenso-700 font-bold"
-                href="https://join.slack.com/t/documenso/shared_invite/zt-1vibm8txi-DqsDFtdp44Hn2H5lc~RpPQ"
+                href="https://documen.so/discord"
                 target="_blank"
               >
-                in our Slack-Support-Channel
+                in our Discord-Support-Channel
               </a>{' '}
               please message either Lucas or Timur to get added to the channel if you are not
               already a member.

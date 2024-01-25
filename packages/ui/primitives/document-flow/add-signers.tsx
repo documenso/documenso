@@ -7,22 +7,25 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { Plus, Trash } from 'lucide-react';
 import { Controller, useFieldArray, useForm } from 'react-hook-form';
 
+import { useLimits } from '@documenso/ee/server-only/limits/provider/client';
 import { nanoid } from '@documenso/lib/universal/id';
-import { Field, Recipient, SendStatus } from '@documenso/prisma/client';
+import type { Field, Recipient } from '@documenso/prisma/client';
+import { SendStatus } from '@documenso/prisma/client';
 import { Button } from '@documenso/ui/primitives/button';
 import { FormErrorMessage } from '@documenso/ui/primitives/form/form-error-message';
 import { Input } from '@documenso/ui/primitives/input';
 import { Label } from '@documenso/ui/primitives/label';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
-import { TAddSignersFormSchema, ZAddSignersFormSchema } from './add-signers.types';
+import type { TAddSignersFormSchema } from './add-signers.types';
+import { ZAddSignersFormSchema } from './add-signers.types';
 import {
   DocumentFlowFormContainerActions,
   DocumentFlowFormContainerContent,
   DocumentFlowFormContainerFooter,
   DocumentFlowFormContainerStep,
 } from './document-flow-root';
-import { DocumentFlowStep } from './types';
+import type { DocumentFlowStep } from './types';
 
 export type AddSignersFormProps = {
   documentFlow: DocumentFlowStep;
@@ -40,6 +43,7 @@ export const AddSignersFormPartial = ({
   onSubmit,
 }: AddSignersFormProps) => {
   const { toast } = useToast();
+  const { remaining } = useLimits();
 
   const initialId = useId();
 
@@ -174,7 +178,7 @@ export const AddSignersFormPartial = ({
                 <div>
                   <button
                     type="button"
-                    className="inline-flex h-10 w-10 items-center justify-center text-slate-500 hover:opacity-80 disabled:cursor-not-allowed disabled:opacity-50"
+                    className="justify-left inline-flex h-10 w-10 items-center text-slate-500 hover:opacity-80 disabled:cursor-not-allowed disabled:opacity-50"
                     disabled={
                       isSubmitting ||
                       hasBeenSentToRecipientId(signer.nativeId) ||
@@ -202,7 +206,11 @@ export const AddSignersFormPartial = ({
         />
 
         <div className="mt-4">
-          <Button type="button" disabled={isSubmitting} onClick={() => onAddSigner()}>
+          <Button
+            type="button"
+            disabled={isSubmitting || signers.length >= remaining.recipients}
+            onClick={() => onAddSigner()}
+          >
             <Plus className="-ml-1 mr-2 h-5 w-5" />
             Add Signer
           </Button>

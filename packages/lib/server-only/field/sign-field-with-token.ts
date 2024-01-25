@@ -5,6 +5,9 @@ import { DateTime } from 'luxon';
 import { prisma } from '@documenso/prisma';
 import { DocumentStatus, FieldType, SigningStatus } from '@documenso/prisma/client';
 
+import { DEFAULT_DOCUMENT_DATE_FORMAT } from '../../constants/date-formats';
+import { DEFAULT_DOCUMENT_TIME_ZONE } from '../../constants/time-zones';
+
 export type SignFieldWithTokenOptions = {
   token: string;
   fieldId: number;
@@ -50,6 +53,12 @@ export const signFieldWithToken = async ({
     throw new Error(`Field ${fieldId} has no recipientId`);
   }
 
+  const documentMeta = await prisma.documentMeta.findFirst({
+    where: {
+      documentId: document.id,
+    },
+  });
+
   const isSignatureField =
     field.type === FieldType.SIGNATURE || field.type === FieldType.FREE_SIGNATURE;
 
@@ -58,7 +67,9 @@ export const signFieldWithToken = async ({
   const typedSignature = isSignatureField && !isBase64 ? value : undefined;
 
   if (field.type === FieldType.DATE) {
-    customText = DateTime.now().toFormat('yyyy-MM-dd hh:mm a');
+    customText = DateTime.now()
+      .setZone(documentMeta?.timezone ?? DEFAULT_DOCUMENT_TIME_ZONE)
+      .toFormat(documentMeta?.dateFormat ?? DEFAULT_DOCUMENT_DATE_FORMAT);
   }
 
   await prisma.field.update({
