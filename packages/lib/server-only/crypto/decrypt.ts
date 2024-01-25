@@ -3,12 +3,12 @@ import { ZEncryptedDataSchema } from '@documenso/lib/server-only/crypto/encrypt'
 import { symmetricDecrypt } from '@documenso/lib/universal/crypto';
 
 /**
- * Decrypt the passed in data.
+ * Decrypt the passed in data. This uses the secondary encrypt key for miscellaneous data.
  *
- * @param encryptedData The data encrypted with the `encryptData` function.
+ * @param encryptedData The data encrypted with the `encryptSecondaryData` function.
  * @returns The decrypted value, or `null` if the data is invalid or expired.
  */
-export const decryptData = (encryptedData: string): string | null => {
+export const decryptSecondaryData = (encryptedData: string): string | null => {
   if (!DOCUMENSO_ENCRYPTION_SECONDARY_KEY) {
     throw new Error('Missing encryption key');
   }
