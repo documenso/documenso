@@ -42,7 +42,7 @@ export const DesktopNav = ({ className, ...props }: DesktopNavProps) => {
   return (
     <div
       className={cn(
-        'ml-8 hidden flex-1 items-center gap-x-12 md:flex md:justify-between',
+        'ml-8 hidden flex-1 items-center gap-x-12 lg:flex lg:justify-between',
         className,
       )}
       {...props}
