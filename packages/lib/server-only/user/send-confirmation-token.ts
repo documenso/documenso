@@ -37,7 +37,6 @@ export const sendConfirmationToken = async ({ email }: { email: string }) => {
     throw new Error(`Failed to create the verification token`);
   }
 
-  // TODO: Revisit tomorrow
   try {
     await sendConfirmationEmail({ userId: user.id });
 

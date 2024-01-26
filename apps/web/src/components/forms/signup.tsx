@@ -70,7 +70,7 @@ export const SignUpForm = ({ className, isGoogleSSOEnabled }: SignUpFormProps) =
 
       const encryptedEmail = await encryptSecondaryData({ data: email });
 
-      router.push(`/unverified-account?t=${encryptedEmail}`);
+      router.push(`/unverified-account?token=${encryptedEmail}`);
 
       toast({
         title: 'Registration Successful',

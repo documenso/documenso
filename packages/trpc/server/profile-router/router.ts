@@ -135,11 +135,15 @@ export const profileRouter = router({
     .input(ZConfirmEmailMutationSchema)
     .mutation(async ({ input }) => {
       try {
-        const { email } = input;
+        const { encryptedEmail } = input;
 
-        const decryptedEmail = decryptSecondaryData(email);
+        const decryptedEmail = decryptSecondaryData(encryptedEmail);
 
-        return await sendConfirmationToken({ email: decryptedEmail ?? '' }); // TODO: fix this tomorrow
+        if (!decryptedEmail) {
+          throw new Error('Email is required');
+        }
+
+        return await sendConfirmationToken({ email: decryptedEmail });
       } catch (err) {
         let message = 'We were unable to send a confirmation email. Please try again.';
 

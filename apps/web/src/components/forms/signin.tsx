@@ -134,7 +134,7 @@ export const SignInForm = ({ className, isGoogleSSOEnabled }: SignInFormProps) =
         if (result.error === ErrorCode.UNVERIFIED_EMAIL) {
           const encryptedEmail = await encryptSecondaryData({ data: email });
 
-          router.push(`/unverified-account?t=${encryptedEmail}`);
+          router.push(`/unverified-account?token=${encryptedEmail}`);
 
           return;
         }
