@@ -6,7 +6,7 @@ import { usePathname } from 'next/navigation';
 import { CheckCircle2, ChevronsUpDown, Plus, Settings2 } from 'lucide-react';
 import { signOut } from 'next-auth/react';
 
-import { TEAM_MEMBER_ROLE_MAP } from '@documenso/lib/constants/teams';
+import { TEAM_MEMBER_ROLE_MAP, TEAM_URL_REGEX } from '@documenso/lib/constants/teams';
 import { isAdmin } from '@documenso/lib/next-auth/guards/is-admin';
 import type { GetTeamsResponse } from '@documenso/lib/server-only/team/get-teams';
 import { extractInitials } from '@documenso/lib/utils/recipient-formatter';
@@ -71,6 +71,22 @@ export const MenuSwitcher = ({ user, teams: initialTeamsData }: MenuSwitcherProp
     return TEAM_MEMBER_ROLE_MAP[team.currentTeamMember.role];
   };
 
+  /**
+   * Formats the redirect URL so we can switch between documents and templates page
+   * seemlessly between teams and personal accounts.
+   */
+  const formatRedirectUrlOnSwitch = (teamUrl?: string) => {
+    const baseUrl = teamUrl ? `/t/${teamUrl}/` : '/';
+
+    const currentPathname = (pathname ?? '/').replace(TEAM_URL_REGEX, '');
+
+    if (currentPathname === '/templates') {
+      return `${baseUrl}templates`;
+    }
+
+    return baseUrl;
+  };
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -100,7 +116,7 @@ export const MenuSwitcher = ({ user, teams: initialTeamsData }: MenuSwitcherProp
             <DropdownMenuLabel>Personal</DropdownMenuLabel>
 
             <DropdownMenuItem asChild>
-              <Link href="/">
+              <Link href={formatRedirectUrlOnSwitch()}>
                 <AvatarWithText
                   avatarFallback={formatAvatarFallback()}
                   primaryText={user.name}
@@ -152,7 +168,7 @@ export const MenuSwitcher = ({ user, teams: initialTeamsData }: MenuSwitcherProp
 
             {teams.map((team) => (
               <DropdownMenuItem asChild key={team.id}>
-                <Link href={`/t/${team.url}`}>
+                <Link href={formatRedirectUrlOnSwitch(team.url)}>
                   <AvatarWithText
                     avatarFallback={formatAvatarFallback(team.name)}
                     primaryText={team.name}

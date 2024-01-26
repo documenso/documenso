@@ -33,7 +33,7 @@ export const recipientRouter = router({
 
         throw new TRPCError({
           code: 'BAD_REQUEST',
-          message: 'We were unable to sign this field. Please try again later.',
+          message: 'We were unable to set this field. Please try again later.',
         });
       }
     }),
@@ -58,7 +58,7 @@ export const recipientRouter = router({
 
         throw new TRPCError({
           code: 'BAD_REQUEST',
-          message: 'We were unable to sign this field. Please try again later.',
+          message: 'We were unable to set this field. Please try again later.',
         });
       }
     }),

@@ -19,12 +19,9 @@ export const templateRouter = router({
     .input(ZCreateTemplateMutationSchema)
     .mutation(async ({ input, ctx }) => {
       try {
-        const { title, templateDocumentDataId } = input;
-
         return await createTemplate({
-          title,
           userId: ctx.user.id,
-          templateDocumentDataId,
+          ...input,
         });
       } catch (err) {
         console.error(err);
@@ -64,11 +61,9 @@ export const templateRouter = router({
     .input(ZDuplicateTemplateMutationSchema)
     .mutation(async ({ input, ctx }) => {
       try {
-        const { templateId } = input;
-
         return await duplicateTemplate({
-          templateId,
           userId: ctx.user.id,
+          ...input,
         });
       } catch (err) {
         console.error(err);
@@ -84,11 +79,9 @@ export const templateRouter = router({
     .input(ZDeleteTemplateMutationSchema)
     .mutation(async ({ input, ctx }) => {
       try {
-        const { id } = input;
-
         const userId = ctx.user.id;
 
-        return await deleteTemplate({ id, userId });
+        return await deleteTemplate({ userId, ...input });
       } catch (err) {
         console.error(err);
 
