@@ -1,19 +1,11 @@
 import React from 'react';
 
-import type { Metadata } from 'next';
 import Image from 'next/image';
 
 import backgroundPattern from '@documenso/assets/images/background-pattern.png';
 
 type UnauthenticatedLayoutProps = {
   children: React.ReactNode;
-};
-
-export const metadata: Metadata = {
-  title: {
-    template: '%s | Documenso',
-    default: 'Documenso',
-  },
 };
 
 export default function UnauthenticatedLayout({ children }: UnauthenticatedLayoutProps) {

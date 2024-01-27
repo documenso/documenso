@@ -12,7 +12,7 @@ import { Button } from '@documenso/ui/primitives/button';
 import { PricingTable } from '~/components/(marketing)/pricing-table';
 
 export const metadata: Metadata = {
-  title: 'Pricing | Documenso',
+  title: 'Pricing',
 };
 
 export type PricingPageProps = {

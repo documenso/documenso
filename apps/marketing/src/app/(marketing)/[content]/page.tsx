@@ -15,7 +15,7 @@ export const generateMetadata = ({ params }: { params: { content: string } }) =>
     notFound();
   }
 
-  return { title: `${document.title} | Documenso` };
+  return { title: document.title };
 };
 
 const mdxComponents: MDXComponents = {

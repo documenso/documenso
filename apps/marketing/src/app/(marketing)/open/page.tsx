@@ -17,7 +17,7 @@ import { TeamMembers } from './team-members';
 import { OpenPageTooltip } from './tooltip';
 
 export const metadata: Metadata = {
-  title: 'Open Startup | Documenso',
+  title: 'Open Startup',
 };
 
 export const revalidate = 3600;

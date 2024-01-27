@@ -5,7 +5,7 @@ import { redirect } from 'next/navigation';
 import { SignUpForm } from '~/components/forms/signup';
 
 export const metadata: Metadata = {
-  title: 'Signup',
+  title: 'Sign Up',
 };
 
 export default function SignUpPage() {

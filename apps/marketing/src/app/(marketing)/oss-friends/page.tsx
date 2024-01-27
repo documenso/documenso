@@ -10,7 +10,7 @@ import type { TOSSFriendsSchema } from './schema';
 import { ZOSSFriendsSchema } from './schema';
 
 export const metadata: Metadata = {
-  title: 'OSS Friends | Documenso',
+  title: 'OSS Friends',
 };
 
 export default async function OSSFriendsPage() {
