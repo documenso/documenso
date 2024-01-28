@@ -113,9 +113,25 @@ export const ProfileForm = ({ className, user }: ProfileFormProps) => {
     }
   };
 
-  const onDeleteAccount = async () => {
+  const onDeleteAccount = async (hasTwoFactorAuthentication: boolean) => {
     try {
+      if (!hasTwoFactorAuthentication) {
+        await deleteAccount();
+
+        toast({
+          title: 'Account deleted',
+          description: 'Your account has been deleted successfully.',
+          duration: 5000,
+        });
+
+        await signOut({ callbackUrl: '/' });
+
+        return;
+      }
+
       const { token } = deleteAccountTwoFactorTokenForm.getValues();
+
+      console.log(token);
 
       if (!token) {
         throw new Error('Please enter your Two Factor Authentication token.');
@@ -273,7 +289,7 @@ export const ProfileForm = ({ className, user }: ProfileFormProps) => {
 
                     <DialogFooter>
                       <Button
-                        onClick={onDeleteAccount}
+                        onClick={async () => onDeleteAccount(hasTwoFactorAuthentication)}
                         loading={isDeletingAccount}
                         variant="destructive"
                       >
