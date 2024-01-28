@@ -186,7 +186,7 @@ export const SigningForm = ({ document, recipient, fields }: SigningFormProps) =
                       <Input
                         id="signatureText"
                         className="text-foreground placeholder:text-muted-foreground border-0 border-none bg-transparent p-0 text-sm focus-visible:ring-transparent"
-                        placeholder="Draw or type name here"
+                        placeholder="Draw or type your name here"
                         disabled={isSubmitting || signature?.startsWith('data:')}
                         {...register('signatureText', {
                           onChange: (e) => {
