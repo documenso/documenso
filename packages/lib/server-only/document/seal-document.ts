@@ -69,8 +69,6 @@ export const sealDocument = async ({ documentId, sendEmail = true }: SealDocumen
 
   const doc = await PDFDocument.load(pdfData);
 
-  console.log('Fields to insert into PDF: ', fields);
-
   for (const field of fields) {
     await insertFieldInPDF(doc, field);
   }
