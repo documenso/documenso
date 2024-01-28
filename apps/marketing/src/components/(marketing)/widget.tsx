@@ -148,19 +148,19 @@ export const Widget = ({ className, children, ...props }: WidgetProps) => {
 
       const claimPlanInput = signatureDataUrl
         ? {
-          name,
-          email,
-          planId,
-          signatureDataUrl: signatureDataUrl,
-          signatureText: null,
-        }
+            name,
+            email,
+            planId,
+            signatureDataUrl: signatureDataUrl,
+            signatureText: null,
+          }
         : {
-          name,
-          email,
-          planId,
-          signatureDataUrl: null,
-          signatureText: signatureText ?? '',
-        };
+            name,
+            email,
+            planId,
+            signatureDataUrl: null,
+            signatureText: signatureText ?? '',
+          };
 
       const [result] = await Promise.all([claimPlan(claimPlanInput), delay]);
 

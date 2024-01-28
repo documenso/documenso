@@ -12,10 +12,7 @@ import { isSignatureFieldType } from '@documenso/prisma/guards/is-signature-fiel
 import type { FieldWithSignature } from '@documenso/prisma/types/field-with-signature';
 
 export const insertFieldInPDF = async (pdf: PDFDocument, field: FieldWithSignature) => {
-  const fontDancingScriptURL =
-    'https://fonts.gstatic.com/s/dancingscript/v25/If2cXTr6YS-zF4S-kcSWSVi_sxjsohD9F50Ruu7BMSoHTQ.ttf';
-
-  const fontDancingScript = await fetch(fontDancingScriptURL).then(async (res) =>
+  const fontDancingScript = await fetch(process.env.FONT_DANCING_SCRIPT_URI).then(async (res) =>
     res.arrayBuffer(),
   );
 
