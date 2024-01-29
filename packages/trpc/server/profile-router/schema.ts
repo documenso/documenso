@@ -8,10 +8,6 @@ export const ZRetrieveUserByEmailMutationSchema = z.object({
   email: z.string().email().min(1),
 });
 
-export const ZRetrieveUserByVerificationTokenQuerySchema = z.object({
-  token: z.string().min(1),
-});
-
 export const ZUpdateProfileMutationSchema = z.object({
   name: z.string().min(1),
   signature: z.string(),
