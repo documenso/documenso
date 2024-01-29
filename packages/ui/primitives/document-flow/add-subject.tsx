@@ -61,7 +61,6 @@ export const AddSubjectFormPartial = ({
     register,
     handleSubmit,
     formState: { errors, isSubmitting, touchedFields },
-    getValues,
     setValue,
   } = useForm<TAddSubjectFormSchema>({
     defaultValues: {

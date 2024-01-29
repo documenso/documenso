@@ -72,7 +72,7 @@ export const SubjectFieldItem = ({ field, recipients }: FieldItemProps) => {
       }}
       bounds={`${PDF_VIEWER_PAGE_SELECTOR}[data-page-number="${field.page}"]`}
     >
-      <Card className={cn('bg-background border-primary/80 h-full w-full')}>
+      <Card className={cn('bg-background h-full w-full')}>
         <CardContent
           className={cn(
             'text-muted-foreground/50 flex h-full w-full flex-col items-center justify-center p-2',
