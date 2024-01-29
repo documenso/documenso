@@ -2,10 +2,12 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 
+import { IS_GOOGLE_SSO_ENABLED } from '@documenso/lib/constants/auth';
+
 import { SignUpForm } from '~/components/forms/signup';
 
 export const metadata: Metadata = {
-  title: 'Signup',
+  title: 'Sign Up',
 };
 
 export default function SignUpPage() {
@@ -22,7 +24,7 @@ export default function SignUpPage() {
         signing is within your grasp.
       </p>
 
-      <SignUpForm className="mt-4" />
+      <SignUpForm className="mt-4" isGoogleSSOEnabled={IS_GOOGLE_SSO_ENABLED} />
 
       <p className="text-muted-foreground mt-6 text-center text-sm">
         Already have an account?{' '}

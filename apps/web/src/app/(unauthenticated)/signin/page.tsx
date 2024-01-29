@@ -6,7 +6,7 @@ import { IS_GOOGLE_SSO_ENABLED } from '@documenso/lib/constants/auth';
 import { SignInForm } from '~/components/forms/signin';
 
 export const metadata: Metadata = {
-  title: 'Signin',
+  title: 'Sign In',
 };
 
 export default function SignInPage() {

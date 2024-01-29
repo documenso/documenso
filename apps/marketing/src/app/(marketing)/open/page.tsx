@@ -1,3 +1,5 @@
+import type { Metadata } from 'next';
+
 import { z } from 'zod';
 
 import { getUserMonthlyGrowth } from '@documenso/lib/server-only/user/get-user-monthly-growth';
@@ -13,6 +15,10 @@ import { MonthlyNewUsersChart } from './monthly-new-users-chart';
 import { MonthlyTotalUsersChart } from './monthly-total-users-chart';
 import { TeamMembers } from './team-members';
 import { OpenPageTooltip } from './tooltip';
+
+export const metadata: Metadata = {
+  title: 'Open Startup',
+};
 
 export const revalidate = 3600;
 

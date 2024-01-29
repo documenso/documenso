@@ -45,7 +45,7 @@ export const SignDialog = ({
       </DialogTrigger>
       <DialogContent>
         <div className="text-center">
-          <div className="text-xl font-semibold text-neutral-800">Sign Document</div>
+          <div className="text-foreground text-xl font-semibold">Sign Document</div>
           <div className="text-muted-foreground mx-auto w-4/5 py-2 text-center">
             You are about to finish signing "{truncatedTitle}". Are you sure?
           </div>

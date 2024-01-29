@@ -42,6 +42,11 @@ export const getStats = async ({ user }: GetStatsInput) => {
         _all: true,
       },
       where: {
+        User: {
+          email: {
+            not: user.email,
+          },
+        },
         OR: [
           {
             status: ExtendedDocumentStatus.PENDING,
