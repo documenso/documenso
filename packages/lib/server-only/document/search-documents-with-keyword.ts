@@ -1,6 +1,8 @@
 import { prisma } from '@documenso/prisma';
 import { DocumentStatus } from '@documenso/prisma/client';
 
+import { maskRecipientTokensForDocument } from '../../utils/mask-recipient-tokens-for-document';
+
 export type SearchDocumentsWithKeywordOptions = {
   query: string;
   userId: number;
@@ -77,5 +79,12 @@ export const searchDocumentsWithKeyword = async ({
     take: limit,
   });
 
-  return documents;
+  const maskedDocuments = documents.map((document) =>
+    maskRecipientTokensForDocument({
+      document,
+      user,
+    }),
+  );
+
+  return maskedDocuments;
 };

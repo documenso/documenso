@@ -5,6 +5,7 @@ import { useCallback, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 
 import { Loader, Monitor, Moon, Sun } from 'lucide-react';
+import { useSession } from 'next-auth/react';
 import { useTheme } from 'next-themes';
 import { useHotkeys } from 'react-hotkeys-hook';
 
@@ -13,6 +14,7 @@ import {
   SETTINGS_PAGE_SHORTCUT,
   TEMPLATES_PAGE_SHORTCUT,
 } from '@documenso/lib/constants/keyboard-shortcuts';
+import type { Document, Recipient } from '@documenso/prisma/client';
 import { trpc as trpcReact } from '@documenso/trpc/react';
 import {
   CommandDialog,
@@ -65,6 +67,8 @@ export type CommandMenuProps = {
 
 export function CommandMenu({ open, onOpenChange }: CommandMenuProps) {
   const { setTheme } = useTheme();
+  const { data: session } = useSession();
+
   const router = useRouter();
 
   const [isOpen, setIsOpen] = useState(() => open ?? false);
@@ -81,6 +85,17 @@ export function CommandMenu({ open, onOpenChange }: CommandMenuProps) {
       },
     );
 
+  const isOwner = useCallback(
+    (document: Document) => document.userId === session?.user.id,
+    [session?.user.id],
+  );
+
+  const getSigningLink = useCallback(
+    (recipients: Recipient[]) =>
+      `/sign/${recipients.find((r) => r.email === session?.user.email)?.token}`,
+    [session?.user.email],
+  );
+
   const searchResults = useMemo(() => {
     if (!searchDocumentsData) {
       return [];
@@ -88,15 +103,14 @@ export function CommandMenu({ open, onOpenChange }: CommandMenuProps) {
 
     return searchDocumentsData.map((document) => ({
       label: document.title,
-      path: `/documents/${document.id}`,
+      path: isOwner(document) ? `/documents/${document.id}` : getSigningLink(document.Recipient),
       value: [document.id, document.title, ...document.Recipient.map((r) => r.email)].join(' '),
     }));
-  }, [searchDocumentsData]);
+  }, [searchDocumentsData, isOwner, getSigningLink]);
 
   const currentPage = pages[pages.length - 1];
 
-  const toggleOpen = (e: KeyboardEvent) => {
-    e.preventDefault();
+  const toggleOpen = () => {
     setIsOpen((isOpen) => !isOpen);
     onOpenChange?.(!isOpen);
 
@@ -136,7 +150,7 @@ export function CommandMenu({ open, onOpenChange }: CommandMenuProps) {
   const goToDocuments = useCallback(() => push(DOCUMENTS_PAGES[0].path), [push]);
   const goToTemplates = useCallback(() => push(TEMPLATES_PAGES[0].path), [push]);
 
-  useHotkeys(['ctrl+k', 'meta+k'], toggleOpen);
+  useHotkeys(['ctrl+k', 'meta+k'], toggleOpen, { preventDefault: true });
   useHotkeys(SETTINGS_PAGE_SHORTCUT, goToSettings);
   useHotkeys(DOCUMENTS_PAGE_SHORTCUT, goToDocuments);
   useHotkeys(TEMPLATES_PAGE_SHORTCUT, goToTemplates);
@@ -238,7 +252,11 @@ const ThemeCommands = ({ setTheme }: { setTheme: (_theme: string) => void }) => 
   );
 
   return THEMES.map((theme) => (
-    <CommandItem key={theme.theme} onSelect={() => setTheme(theme.theme)}>
+    <CommandItem
+      key={theme.theme}
+      onSelect={() => setTheme(theme.theme)}
+      className="mx-2 first:mt-2 last:mb-2"
+    >
       <theme.icon className="mr-2" />
       {theme.label}
     </CommandItem>
