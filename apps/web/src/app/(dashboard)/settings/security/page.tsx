@@ -1,9 +1,15 @@
+import type { Metadata } from 'next';
+
 import { IDENTITY_PROVIDER_NAME } from '@documenso/lib/constants/auth';
 import { getRequiredServerComponentSession } from '@documenso/lib/next-auth/get-server-component-session';
 
 import { AuthenticatorApp } from '~/components/forms/2fa/authenticator-app';
 import { RecoveryCodes } from '~/components/forms/2fa/recovery-codes';
 import { PasswordForm } from '~/components/forms/password';
+
+export const metadata: Metadata = {
+  title: 'Security',
+};
 
 export default async function SecuritySettingsPage() {
   const { user } = await getRequiredServerComponentSession();
