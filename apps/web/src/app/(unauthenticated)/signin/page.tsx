@@ -1,3 +1,4 @@
+import type { Metadata } from 'next';
 import Link from 'next/link';
 
 import { env } from 'next-runtime-env';
@@ -5,6 +6,10 @@ import { env } from 'next-runtime-env';
 import { IS_GOOGLE_SSO_ENABLED } from '@documenso/lib/constants/auth';
 
 import { SignInForm } from '~/components/forms/signin';
+
+export const metadata: Metadata = {
+  title: 'Sign In',
+};
 
 export default function SignInPage() {
   const NEXT_PUBLIC_DISABLE_SIGNUP = env('NEXT_PUBLIC_DISABLE_SIGNUP');
