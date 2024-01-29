@@ -1,5 +1,7 @@
 import React from 'react';
 
+import type { Metadata } from 'next';
+
 import { getRequiredServerComponentSession } from '@documenso/lib/next-auth/get-server-component-session';
 import { getTemplates } from '@documenso/lib/server-only/template/get-templates';
 
@@ -12,6 +14,10 @@ type TemplatesPageProps = {
     page?: number;
     perPage?: number;
   };
+};
+
+export const metadata: Metadata = {
+  title: 'Templates',
 };
 
 export default async function TemplatesPage({ searchParams = {} }: TemplatesPageProps) {
