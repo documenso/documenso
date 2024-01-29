@@ -128,7 +128,7 @@ export default async function CompletedSigningPage({
             />
           ) : (
             <DocumentPreviewButton
-              className="flex-1"
+              className="text-[11px]"
               title="Signatures will appear once the document has been completed"
               documentData={documentData}
             />
