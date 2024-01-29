@@ -12,10 +12,8 @@ import { Card, CardContent } from '../card';
 import { FRIENDLY_FIELD_TYPE } from './types';
 import type { Prisma } from '.prisma/client';
 
-type Field = Prisma.FieldGetPayload<null>;
-
 export type FieldItemProps = {
-  field: Field;
+  field: Prisma.FieldGetPayload<null>;
   recipients: Prisma.RecipientGetPayload<null>[];
 };
 
@@ -44,7 +42,6 @@ export const SubjectFieldItem = ({ field, recipients }: FieldItemProps) => {
     const top = $page.getBoundingClientRect().top + window.scrollY;
     const left = $page.getBoundingClientRect().left + window.scrollX;
 
-    // X and Y are percentages of the page's height and width
     const pageX = (Number(field.positionX) / 100) * width + left;
     const pageY = (Number(field.positionY) / 100) * height + top;
 
