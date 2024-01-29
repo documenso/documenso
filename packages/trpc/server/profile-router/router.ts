@@ -2,7 +2,6 @@ import { TRPCError } from '@trpc/server';
 
 import { decryptSecondaryData } from '@documenso/lib/server-only/crypto/decrypt';
 import { forgotPassword } from '@documenso/lib/server-only/user/forgot-password';
-import { getUserByEmail } from '@documenso/lib/server-only/user/get-user-by-email';
 import { getUserById } from '@documenso/lib/server-only/user/get-user-by-id';
 import { resetPassword } from '@documenso/lib/server-only/user/reset-password';
 import { sendConfirmationToken } from '@documenso/lib/server-only/user/send-confirmation-token';
@@ -14,7 +13,6 @@ import {
   ZConfirmEmailMutationSchema,
   ZForgotPasswordFormSchema,
   ZResetPasswordFormSchema,
-  ZRetrieveUserByEmailMutationSchema,
   ZRetrieveUserByIdQuerySchema,
   ZUpdatePasswordMutationSchema,
   ZUpdateProfileMutationSchema,
@@ -33,21 +31,6 @@ export const profileRouter = router({
       });
     }
   }),
-
-  getUserByEmail: procedure
-    .input(ZRetrieveUserByEmailMutationSchema)
-    .mutation(async ({ input }) => {
-      try {
-        const { email } = input;
-
-        return await getUserByEmail({ email });
-      } catch (err) {
-        throw new TRPCError({
-          code: 'BAD_REQUEST',
-          message: 'We were unable to retrieve the specified account. Please try again.',
-        });
-      }
-    }),
 
   updateProfile: authenticatedProcedure
     .input(ZUpdateProfileMutationSchema)

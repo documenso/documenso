@@ -4,10 +4,6 @@ export const ZRetrieveUserByIdQuerySchema = z.object({
   id: z.number().min(1),
 });
 
-export const ZRetrieveUserByEmailMutationSchema = z.object({
-  email: z.string().email().min(1),
-});
-
 export const ZUpdateProfileMutationSchema = z.object({
   name: z.string().min(1),
   signature: z.string(),
