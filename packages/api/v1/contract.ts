@@ -4,14 +4,20 @@ import {
   ZSendDocumentForSigningMutationSchema as SendDocumentMutationSchema,
   ZAuthorizationHeadersSchema,
   ZCreateDocumentMutationSchema,
+  ZCreateFieldMutationSchema,
   ZCreateRecipientMutationSchema,
   ZDeleteDocumentMutationSchema,
+  ZDeleteFieldMutationSchema,
+  ZDeleteRecipientMutationSchema,
   ZGetDocumentsQuerySchema,
   ZSuccessfulDocumentResponseSchema,
+  ZSuccessfulFieldResponseSchema,
   ZSuccessfulRecipientResponseSchema,
   ZSuccessfulResponseSchema,
   ZSuccessfulSigningResponseSchema,
   ZUnsuccessfulResponseSchema,
+  ZUpdateFieldMutationSchema,
+  ZUpdateRecipientMutationSchema,
   ZUploadDocumentSuccessfulSchema,
 } from './schema';
 
@@ -92,6 +98,76 @@ export const ApiContractV1 = c.router(
         500: ZUnsuccessfulResponseSchema,
       },
       summary: 'Create a recipient for a document',
+    },
+
+    updateRecipient: {
+      method: 'PATCH',
+      path: '/api/v1/documents/:id/recipients/:recipientId',
+      body: ZUpdateRecipientMutationSchema,
+      responses: {
+        200: ZSuccessfulRecipientResponseSchema,
+        400: ZUnsuccessfulResponseSchema,
+        401: ZUnsuccessfulResponseSchema,
+        404: ZUnsuccessfulResponseSchema,
+        500: ZUnsuccessfulResponseSchema,
+      },
+      summary: 'Update a recipient for a document',
+    },
+
+    deleteRecipient: {
+      method: 'DELETE',
+      path: '/api/v1/documents/:id/recipients/:recipientId',
+      body: ZDeleteRecipientMutationSchema,
+      responses: {
+        200: ZSuccessfulRecipientResponseSchema,
+        400: ZUnsuccessfulResponseSchema,
+        401: ZUnsuccessfulResponseSchema,
+        404: ZUnsuccessfulResponseSchema,
+        500: ZUnsuccessfulResponseSchema,
+      },
+      summary: 'Delete a recipient from a document',
+    },
+
+    createField: {
+      method: 'POST',
+      path: '/api/v1/documents/:id/fields',
+      body: ZCreateFieldMutationSchema,
+      responses: {
+        200: ZSuccessfulFieldResponseSchema,
+        400: ZUnsuccessfulResponseSchema,
+        401: ZUnsuccessfulResponseSchema,
+        404: ZUnsuccessfulResponseSchema,
+        500: ZUnsuccessfulResponseSchema,
+      },
+      summary: 'Create a field for a document',
+    },
+
+    updateField: {
+      method: 'PATCH',
+      path: '/api/v1/documents/:id/fields/:fieldId',
+      body: ZUpdateFieldMutationSchema,
+      responses: {
+        200: ZSuccessfulFieldResponseSchema,
+        400: ZUnsuccessfulResponseSchema,
+        401: ZUnsuccessfulResponseSchema,
+        404: ZUnsuccessfulResponseSchema,
+        500: ZUnsuccessfulResponseSchema,
+      },
+      summary: 'Update a field for a document',
+    },
+
+    deleteField: {
+      method: 'DELETE',
+      path: '/api/v1/documents/:id/fields/:fieldId',
+      body: ZDeleteFieldMutationSchema,
+      responses: {
+        200: ZSuccessfulFieldResponseSchema,
+        400: ZUnsuccessfulResponseSchema,
+        401: ZUnsuccessfulResponseSchema,
+        404: ZUnsuccessfulResponseSchema,
+        500: ZUnsuccessfulResponseSchema,
+      },
+      summary: 'Delete a field from a document',
     },
   },
   {

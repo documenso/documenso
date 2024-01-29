@@ -4,10 +4,17 @@ import { deleteDocument } from '@documenso/lib/server-only/document/delete-docum
 import { findDocuments } from '@documenso/lib/server-only/document/find-documents';
 import { getDocumentById } from '@documenso/lib/server-only/document/get-document-by-id';
 import { sendDocument } from '@documenso/lib/server-only/document/send-document';
+import { createField } from '@documenso/lib/server-only/field/create-field';
+import { deleteField } from '@documenso/lib/server-only/field/delete-field';
+import { getFieldById } from '@documenso/lib/server-only/field/get-field-by-id';
+import { updateField } from '@documenso/lib/server-only/field/update-field';
+import { deleteRecipient } from '@documenso/lib/server-only/recipient/delete-recipient';
+import { getRecipientById } from '@documenso/lib/server-only/recipient/get-recipient-by-id';
 import { getRecipientsForDocument } from '@documenso/lib/server-only/recipient/get-recipients-for-document';
 import { setRecipientsForDocument } from '@documenso/lib/server-only/recipient/set-recipients-for-document';
+import { updateRecipient } from '@documenso/lib/server-only/recipient/update-recipient';
 import { getPresignPostUrl } from '@documenso/lib/universal/upload/server-actions';
-import { DocumentStatus } from '@documenso/prisma/client';
+import { DocumentStatus, SigningStatus } from '@documenso/prisma/client';
 
 import { ApiContractV1 } from './contract';
 import { authenticatedMiddleware } from './middleware/authenticated';
@@ -249,5 +256,348 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
         },
       };
     }
+  }),
+
+  updateRecipient: authenticatedMiddleware(async (args, user) => {
+    const { id: documentId, recipientId } = args.params;
+    const { name, email } = args.body;
+
+    const document = await getDocumentById({
+      id: Number(documentId),
+      userId: user.id,
+    });
+
+    if (!document) {
+      return {
+        status: 404,
+        body: {
+          message: 'Document not found',
+        },
+      };
+    }
+
+    if (document.status === DocumentStatus.COMPLETED) {
+      return {
+        status: 400,
+        body: {
+          message: 'Document is already completed',
+        },
+      };
+    }
+
+    const updatedRecipient = await updateRecipient({
+      documentId: Number(documentId),
+      recipientId: Number(recipientId),
+      email,
+      name,
+    }).catch(() => null);
+
+    if (!updatedRecipient) {
+      return {
+        status: 404,
+        body: {
+          message: 'Recipient not found',
+        },
+      };
+    }
+
+    return {
+      status: 200,
+      body: updatedRecipient,
+    };
+  }),
+
+  deleteRecipient: authenticatedMiddleware(async (args, user) => {
+    const { id: documentId, recipientId } = args.params;
+
+    const document = await getDocumentById({
+      id: Number(documentId),
+      userId: user.id,
+    });
+
+    if (!document) {
+      return {
+        status: 404,
+        body: {
+          message: 'Document not found',
+        },
+      };
+    }
+
+    if (document.status === DocumentStatus.COMPLETED) {
+      return {
+        status: 400,
+        body: {
+          message: 'Document is already completed',
+        },
+      };
+    }
+
+    const deletedRecipient = await deleteRecipient({
+      documentId: Number(documentId),
+      recipientId: Number(recipientId),
+    }).catch(() => null);
+
+    if (!deletedRecipient) {
+      return {
+        status: 400,
+        body: {
+          message: 'Unable to delete recipient',
+        },
+      };
+    }
+
+    return {
+      status: 200,
+      body: deletedRecipient,
+    };
+  }),
+
+  createField: authenticatedMiddleware(async (args, user) => {
+    const { id: documentId } = args.params;
+    const { recipientId, type, pageNumber, pageWidth, pageHeight, pageX, pageY } = args.body;
+
+    const document = await getDocumentById({
+      id: Number(documentId),
+      userId: user.id,
+    });
+
+    if (!document) {
+      return {
+        status: 404,
+        body: {
+          message: 'Document not found',
+        },
+      };
+    }
+
+    if (document.status === DocumentStatus.COMPLETED) {
+      return {
+        status: 400,
+        body: {
+          message: 'Document is already completed',
+        },
+      };
+    }
+
+    const recipient = await getRecipientById({
+      id: Number(recipientId),
+      documentId: Number(documentId),
+    }).catch(() => null);
+
+    if (!recipient) {
+      return {
+        status: 404,
+        body: {
+          message: 'Recipient not found',
+        },
+      };
+    }
+
+    if (recipient.signingStatus === SigningStatus.SIGNED) {
+      return {
+        status: 400,
+        body: {
+          message: 'Recipient has already signed the document',
+        },
+      };
+    }
+
+    const field = await createField({
+      documentId: Number(documentId),
+      recipientId: Number(recipientId),
+      type,
+      pageNumber,
+      pageX,
+      pageY,
+      pageWidth,
+      pageHeight,
+    });
+
+    const remappedField = {
+      documentId: field.documentId,
+      recipientId: field.recipientId ?? -1,
+      type: field.type,
+      pageNumber: field.page,
+      pageX: Number(field.positionX),
+      pageY: Number(field.positionY),
+      pageWidth: Number(field.width),
+      pageHeight: Number(field.height),
+      customText: field.customText,
+      inserted: field.inserted,
+    };
+
+    return {
+      status: 200,
+      body: remappedField,
+    };
+  }),
+
+  updateField: authenticatedMiddleware(async (args, user) => {
+    const { id: documentId, fieldId } = args.params;
+    const { recipientId, type, pageNumber, pageWidth, pageHeight, pageX, pageY } = args.body;
+
+    const document = await getDocumentById({
+      id: Number(documentId),
+      userId: user.id,
+    });
+
+    if (!document) {
+      return {
+        status: 404,
+        body: {
+          message: 'Document not found',
+        },
+      };
+    }
+
+    if (document.status === DocumentStatus.COMPLETED) {
+      return {
+        status: 400,
+        body: {
+          message: 'Document is already completed',
+        },
+      };
+    }
+
+    const recipient = await getRecipientById({
+      id: Number(recipientId),
+      documentId: Number(documentId),
+    }).catch(() => null);
+
+    if (!recipient) {
+      return {
+        status: 404,
+        body: {
+          message: 'Recipient not found',
+        },
+      };
+    }
+
+    if (recipient.signingStatus === SigningStatus.SIGNED) {
+      return {
+        status: 400,
+        body: {
+          message: 'Recipient has already signed the document',
+        },
+      };
+    }
+
+    const updatedField = await updateField({
+      fieldId: Number(fieldId),
+      documentId: Number(documentId),
+      recipientId: recipientId ? Number(recipientId) : undefined,
+      type,
+      pageNumber,
+      pageX,
+      pageY,
+      pageWidth,
+      pageHeight,
+    });
+
+    const remappedField = {
+      documentId: updatedField.documentId,
+      recipientId: updatedField.recipientId ?? -1,
+      type: updatedField.type,
+      pageNumber: updatedField.page,
+      pageX: Number(updatedField.positionX),
+      pageY: Number(updatedField.positionY),
+      pageWidth: Number(updatedField.width),
+      pageHeight: Number(updatedField.height),
+      customText: updatedField.customText,
+      inserted: updatedField.inserted,
+    };
+
+    return {
+      status: 200,
+      body: remappedField,
+    };
+  }),
+
+  deleteField: authenticatedMiddleware(async (args, user) => {
+    const { id: documentId, fieldId } = args.params;
+
+    const document = await getDocumentById({
+      id: Number(documentId),
+      userId: user.id,
+    });
+
+    if (!document) {
+      return {
+        status: 404,
+        body: {
+          message: 'Document not found',
+        },
+      };
+    }
+
+    if (document.status === DocumentStatus.COMPLETED) {
+      return {
+        status: 400,
+        body: {
+          message: 'Document is already completed',
+        },
+      };
+    }
+
+    const field = await getFieldById({
+      fieldId: Number(fieldId),
+      documentId: Number(documentId),
+    }).catch(() => null);
+
+    if (!field) {
+      return {
+        status: 404,
+        body: {
+          message: 'Field not found',
+        },
+      };
+    }
+
+    const recipient = await getRecipientById({
+      id: Number(field.recipientId),
+      documentId: Number(documentId),
+    }).catch(() => null);
+
+    if (recipient?.signingStatus === SigningStatus.SIGNED) {
+      return {
+        status: 400,
+        body: {
+          message: 'Recipient has already signed the document',
+        },
+      };
+    }
+
+    const deletedField = await deleteField({
+      documentId: Number(documentId),
+      fieldId: Number(fieldId),
+    }).catch(() => null);
+
+    if (!deletedField) {
+      return {
+        status: 400,
+        body: {
+          message: 'Unable to delete field',
+        },
+      };
+    }
+
+    const remappedField = {
+      documentId: deletedField.documentId,
+      recipientId: deletedField.recipientId ?? -1,
+      type: deletedField.type,
+      pageNumber: deletedField.page,
+      pageX: Number(deletedField.positionX),
+      pageY: Number(deletedField.positionY),
+      pageWidth: Number(deletedField.width),
+      pageHeight: Number(deletedField.height),
+      customText: deletedField.customText,
+      inserted: deletedField.inserted,
+    };
+
+    return {
+      status: 200,
+      body: remappedField,
+    };
   }),
 });

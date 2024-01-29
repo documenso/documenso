@@ -1,7 +1,10 @@
 import { z } from 'zod';
 
-import { ReadStatus, SendStatus, SigningStatus } from '@documenso/prisma/client';
+import { FieldType, ReadStatus, SendStatus, SigningStatus } from '@documenso/prisma/client';
 
+/**
+ * Documents
+ */
 export const ZGetDocumentsQuerySchema = z.object({
   page: z.string().optional(),
   perPage: z.string().optional(),
@@ -49,7 +52,18 @@ export const ZCreateRecipientMutationSchema = z.object({
   email: z.string().email().min(1),
 });
 
+/**
+ * Recipients
+ */
 export type TCreateRecipientMutationSchema = z.infer<typeof ZCreateRecipientMutationSchema>;
+
+export const ZUpdateRecipientMutationSchema = ZCreateRecipientMutationSchema.partial();
+
+export type TUpdateRecipientMutationSchema = z.infer<typeof ZUpdateRecipientMutationSchema>;
+
+export const ZDeleteRecipientMutationSchema = null;
+
+export type TDeleteRecipientMutationSchema = typeof ZDeleteRecipientMutationSchema;
 
 export const ZSuccessfulRecipientResponseSchema = z.object({
   id: z.number(),
@@ -67,6 +81,44 @@ export const ZSuccessfulRecipientResponseSchema = z.object({
 
 export type TSuccessfulRecipientResponseSchema = z.infer<typeof ZSuccessfulRecipientResponseSchema>;
 
+/**
+ * Fields
+ */
+export const ZCreateFieldMutationSchema = z.object({
+  recipientId: z.number(),
+  type: z.nativeEnum(FieldType),
+  pageNumber: z.number(),
+  pageX: z.number(),
+  pageY: z.number(),
+  pageWidth: z.number(),
+  pageHeight: z.number(),
+});
+
+export type TCreateFieldMutationSchema = z.infer<typeof ZCreateFieldMutationSchema>;
+
+export const ZUpdateFieldMutationSchema = ZCreateFieldMutationSchema.partial();
+
+export type TUpdateFieldMutationSchema = z.infer<typeof ZUpdateFieldMutationSchema>;
+
+export const ZDeleteFieldMutationSchema = null;
+
+export type TDeleteFieldMutationSchema = typeof ZDeleteFieldMutationSchema;
+
+export const ZSuccessfulFieldResponseSchema = z.object({
+  documentId: z.number(),
+  recipientId: z.number(),
+  type: z.nativeEnum(FieldType),
+  pageNumber: z.number(),
+  pageX: z.number(),
+  pageY: z.number(),
+  pageWidth: z.number(),
+  pageHeight: z.number(),
+  customText: z.string(),
+  inserted: z.boolean(),
+});
+
+export type TSuccessfulFieldResponseSchema = z.infer<typeof ZSuccessfulFieldResponseSchema>;
+
 export const ZSuccessfulResponseSchema = z.object({
   documents: ZSuccessfulDocumentResponseSchema.array(),
   totalPages: z.number(),
@@ -80,14 +132,17 @@ export const ZSuccessfulSigningResponseSchema = z.object({
 
 export type TSuccessfulSigningResponseSchema = z.infer<typeof ZSuccessfulSigningResponseSchema>;
 
-export const ZUnsuccessfulResponseSchema = z.object({
-  message: z.string(),
-});
-
-export type TUnsuccessfulResponseSchema = z.infer<typeof ZUnsuccessfulResponseSchema>;
-
+/**
+ * General
+ */
 export const ZAuthorizationHeadersSchema = z.object({
   authorization: z.string(),
 });
 
 export type TAuthorizationHeadersSchema = z.infer<typeof ZAuthorizationHeadersSchema>;
+
+export const ZUnsuccessfulResponseSchema = z.object({
+  message: z.string(),
+});
+
+export type TUnsuccessfulResponseSchema = z.infer<typeof ZUnsuccessfulResponseSchema>;
