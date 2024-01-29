@@ -9,7 +9,7 @@ import { useForm } from 'react-hook-form';
 
 import { completeDocumentWithToken } from '@documenso/lib/server-only/document/complete-document-with-token';
 import { sortFieldsByPosition, validateFieldsInserted } from '@documenso/lib/utils/fields';
-import { Document, Field, Recipient } from '@documenso/prisma/client';
+import type { Document, Field, Recipient } from '@documenso/prisma/client';
 import { FieldToolTip } from '@documenso/ui/components/field/field-tooltip';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
@@ -19,6 +19,7 @@ import { Label } from '@documenso/ui/primitives/label';
 import { SignaturePad } from '@documenso/ui/primitives/signature-pad';
 
 import { useRequiredSigningContext } from './provider';
+import { SignDialog } from './sign-dialog';
 
 export type SigningFormProps = {
   document: Document;
@@ -45,6 +46,7 @@ export const SigningForm = ({ document, recipient, fields }: SigningFormProps) =
 
   const onFormSubmit = async () => {
     setValidateUninsertedFields(true);
+
     const isFieldsValid = validateFieldsInserted(fields);
 
     if (!isFieldsValid) {
@@ -80,7 +82,11 @@ export const SigningForm = ({ document, recipient, fields }: SigningFormProps) =
         disabled={isSubmitting}
         className={cn('-mx-2 flex flex-1 flex-col overflow-hidden px-2')}
       >
-        <div className={cn('flex flex-1 flex-col')}>
+        <div
+          className={cn(
+            'custom-scrollbar -mx-2 flex flex-1 flex-col overflow-y-auto overflow-x-hidden px-2',
+          )}
+        >
           <h3 className="text-foreground text-2xl font-semibold">Sign Document</h3>
 
           <p className="text-muted-foreground mt-2 text-sm">
@@ -132,9 +138,12 @@ export const SigningForm = ({ document, recipient, fields }: SigningFormProps) =
                 Cancel
               </Button>
 
-              <Button className="w-full" type="submit" size="lg" loading={isSubmitting}>
-                Complete
-              </Button>
+              <SignDialog
+                isSubmitting={isSubmitting}
+                onSignatureComplete={handleSubmit(onFormSubmit)}
+                document={document}
+                fields={fields}
+              />
             </div>
           </div>
         </div>

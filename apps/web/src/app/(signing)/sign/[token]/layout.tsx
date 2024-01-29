@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { getServerComponentSession } from '@documenso/lib/next-auth/get-server-session';
+import { getServerComponentSession } from '@documenso/lib/next-auth/get-server-component-session';
 
 import { Header as AuthenticatedHeader } from '~/components/(dashboard)/layout/header';
 import { NextAuthProvider } from '~/providers/next-auth';

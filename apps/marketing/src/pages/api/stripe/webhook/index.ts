@@ -1,4 +1,4 @@
-import { NextApiRequest, NextApiResponse } from 'next';
+import type { NextApiRequest, NextApiResponse } from 'next';
 
 import { randomBytes } from 'crypto';
 import { readFileSync } from 'fs';
@@ -7,7 +7,8 @@ import { buffer } from 'micro';
 import { insertImageInPDF } from '@documenso/lib/server-only/pdf/insert-image-in-pdf';
 import { insertTextInPDF } from '@documenso/lib/server-only/pdf/insert-text-in-pdf';
 import { redis } from '@documenso/lib/server-only/redis';
-import { Stripe, stripe } from '@documenso/lib/server-only/stripe';
+import type { Stripe } from '@documenso/lib/server-only/stripe';
+import { stripe } from '@documenso/lib/server-only/stripe';
 import { getFile } from '@documenso/lib/universal/upload/get-file';
 import { updateFile } from '@documenso/lib/universal/upload/update-file';
 import { prisma } from '@documenso/prisma';

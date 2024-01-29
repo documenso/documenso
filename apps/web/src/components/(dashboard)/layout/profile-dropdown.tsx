@@ -4,7 +4,7 @@ import Link from 'next/link';
 
 import {
   CreditCard,
-  Key,
+  Lock,
   LogOut,
   User as LucideUser,
   Monitor,
@@ -87,9 +87,9 @@ export const ProfileDropdown = ({ user }: ProfileDropdownProps) => {
         </DropdownMenuItem>
 
         <DropdownMenuItem asChild>
-          <Link href="/settings/password" className="cursor-pointer">
-            <Key className="mr-2 h-4 w-4" />
-            Password
+          <Link href="/settings/security" className="cursor-pointer">
+            <Lock className="mr-2 h-4 w-4" />
+            Security
           </Link>
         </DropdownMenuItem>
 

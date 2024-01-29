@@ -6,6 +6,7 @@
     "dev": "turbo run dev --filter=@documenso/web --filter=@documenso/marketing",
     "start": "cd apps && cd web && next start",
     "lint": "turbo run lint",
+    "lint:fix": "turbo run lint:fix",
     "format": "prettier --write \"**/*.{js,jsx,cjs,mjs,ts,tsx,cts,mts,mdx}\"",
     "prepare": "husky install",
     "commitlint": "commitlint --edit",
@@ -20,7 +21,8 @@
     "prisma:migrate-deploy": "npm run with:env -- npm run prisma:migrate-deploy -w @documenso/prisma",
     "prisma:studio": "npm run with:env -- npx prisma studio --schema packages/prisma/schema.prisma",
     "with:env": "dotenv -e .env -e .env.local --",
-    "reset:hard": "npm run clean && npm i && npm run prisma:generate"
+    "reset:hard": "npm run clean && npm i && npm run prisma:generate",
+    "precommit": "npm install && git add package.json package-lock.json"
   },
   "engines": {
     "npm": ">=8.6.0",
@@ -46,6 +48,7 @@
     "packages/*"
   ],
   "dependencies": {
-    "recharts": "^2.7.2"
+    "recharts": "^2.7.2",
+    "react-hotkeys-hook": "^4.4.1"
   }
 }

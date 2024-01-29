@@ -105,7 +105,7 @@ export const extractDistinctUserId = (jwt: JWT | null, request: NextRequest): st
   const config = extractPostHogConfig();
 
   const email = jwt?.email;
-  const userId = jwt?.id.toString();
+  const userId = jwt?.id?.toString();
 
   let fallbackDistinctId = nanoid();
 

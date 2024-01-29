@@ -1,12 +1,15 @@
 import { PrismaAdapter } from '@next-auth/prisma-adapter';
 import { compare } from 'bcrypt';
 import { DateTime } from 'luxon';
-import { AuthOptions, Session, User } from 'next-auth';
+import type { AuthOptions, Session, User } from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
-import GoogleProvider, { GoogleProfile } from 'next-auth/providers/google';
+import type { GoogleProfile } from 'next-auth/providers/google';
+import GoogleProvider from 'next-auth/providers/google';
 
 import { prisma } from '@documenso/prisma';
 
+import { isTwoFactorAuthenticationEnabled } from '../server-only/2fa/is-2fa-availble';
+import { validateTwoFactorAuthentication } from '../server-only/2fa/validate-2fa';
 import { getUserByEmail } from '../server-only/user/get-user-by-email';
 import { ErrorCode } from './error-codes';
 
@@ -22,13 +25,19 @@ export const NEXT_AUTH_OPTIONS: AuthOptions = {
       credentials: {
         email: { label: 'Email', type: 'email' },
         password: { label: 'Password', type: 'password' },
+        totpCode: {
+          label: 'Two-factor Code',
+          type: 'input',
+          placeholder: 'Code from authenticator app',
+        },
+        backupCode: { label: 'Backup Code', type: 'input', placeholder: 'Two-factor backup code' },
       },
       authorize: async (credentials, _req) => {
         if (!credentials) {
           throw new Error(ErrorCode.CREDENTIALS_NOT_FOUND);
         }
 
-        const { email, password } = credentials;
+        const { email, password, backupCode, totpCode } = credentials;
 
         const user = await getUserByEmail({ email }).catch(() => {
           throw new Error(ErrorCode.INCORRECT_EMAIL_PASSWORD);
@@ -42,6 +51,20 @@ export const NEXT_AUTH_OPTIONS: AuthOptions = {
 
         if (!isPasswordsSame) {
           throw new Error(ErrorCode.INCORRECT_EMAIL_PASSWORD);
+        }
+
+        const is2faEnabled = isTwoFactorAuthenticationEnabled({ user });
+
+        if (is2faEnabled) {
+          const isValid = await validateTwoFactorAuthentication({ backupCode, totpCode, user });
+
+          if (!isValid) {
+            throw new Error(
+              totpCode
+                ? ErrorCode.INCORRECT_TWO_FACTOR_CODE
+                : ErrorCode.INCORRECT_TWO_FACTOR_BACKUP_CODE,
+            );
+          }
         }
 
         return {
@@ -88,11 +111,13 @@ export const NEXT_AUTH_OPTIONS: AuthOptions = {
         merged.id = retrieved.id;
         merged.name = retrieved.name;
         merged.email = retrieved.email;
+        merged.emailVerified = retrieved.emailVerified;
       }
 
       if (
-        !merged.lastSignedIn ||
-        DateTime.fromISO(merged.lastSignedIn).plus({ hours: 1 }) <= DateTime.now()
+        merged.id &&
+        (!merged.lastSignedIn ||
+          DateTime.fromISO(merged.lastSignedIn).plus({ hours: 1 }) <= DateTime.now())
       ) {
         merged.lastSignedIn = new Date().toISOString();
 
@@ -111,6 +136,7 @@ export const NEXT_AUTH_OPTIONS: AuthOptions = {
         name: merged.name,
         email: merged.email,
         lastSignedIn: merged.lastSignedIn,
+        emailVerified: merged.emailVerified,
       };
     },
 
@@ -122,6 +148,8 @@ export const NEXT_AUTH_OPTIONS: AuthOptions = {
             id: Number(token.id),
             name: token.name,
             email: token.email,
+            emailVerified:
+              typeof token.emailVerified === 'string' ? new Date(token.emailVerified) : null,
           },
         } satisfies Session;
       }
