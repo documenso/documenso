@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-import { ZPasswordSchema } from '../password';
+import { ZCurrentPasswordSchema, ZPasswordSchema } from '../auth-router/schema';
 
 export const ZRetrieveUserByIdQuerySchema = z.object({
   id: z.number().min(1),
@@ -12,7 +12,7 @@ export const ZUpdateProfileMutationSchema = z.object({
 });
 
 export const ZUpdatePasswordMutationSchema = z.object({
-  currentPassword: ZPasswordSchema.min(6),
+  currentPassword: ZCurrentPasswordSchema,
   password: ZPasswordSchema,
 });
 

@@ -10,7 +10,7 @@ import { z } from 'zod';
 import { User } from '@documenso/prisma/client';
 import { TRPCClientError } from '@documenso/trpc/client';
 import { trpc } from '@documenso/trpc/react';
-import { ZPasswordSchema } from '@documenso/trpc/server/password';
+import { ZCurrentPasswordSchema, ZPasswordSchema } from '@documenso/trpc/server/auth-router/schema';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
 import { Input } from '@documenso/ui/primitives/input';
@@ -21,7 +21,7 @@ import { FormErrorMessage } from '../form/form-error-message';
 
 export const ZPasswordFormSchema = z
   .object({
-    currentPassword: ZPasswordSchema.min(6, { message: 'Must be at least 6 characters in length' }),
+    currentPassword: ZCurrentPasswordSchema,
     password: ZPasswordSchema,
     repeatedPassword: ZPasswordSchema,
   })
