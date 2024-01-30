@@ -10,6 +10,7 @@ import { z } from 'zod';
 import { User } from '@documenso/prisma/client';
 import { TRPCClientError } from '@documenso/trpc/client';
 import { trpc } from '@documenso/trpc/react';
+import { ZCurrentPasswordSchema, ZPasswordSchema } from '@documenso/trpc/server/auth-router/schema';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
 import { Input } from '@documenso/ui/primitives/input';
@@ -20,9 +21,9 @@ import { FormErrorMessage } from '../form/form-error-message';
 
 export const ZPasswordFormSchema = z
   .object({
-    currentPassword: z.string().min(6).max(72),
-    password: z.string().min(6).max(72),
-    repeatedPassword: z.string().min(6).max(72),
+    currentPassword: ZCurrentPasswordSchema,
+    password: ZPasswordSchema,
+    repeatedPassword: ZPasswordSchema,
   })
   .refine((data) => data.password === data.repeatedPassword, {
     message: 'Passwords do not match',
