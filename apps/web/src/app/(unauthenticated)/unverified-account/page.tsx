@@ -16,6 +16,10 @@ export default function UnverifiedAccount() {
           confirmation link from your inbox.
         </p>
 
+        <p className="text-muted-foreground mt-4">
+          If you don't find the confirmation link in your inbox, you can request a new one below.
+        </p>
+
         <SendConfirmationEmailForm />
       </div>
     </div>
