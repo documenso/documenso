@@ -192,4 +192,5 @@ export const NEXT_AUTH_OPTIONS: AuthOptions = {
       return true;
     },
   },
+  // Note: `events` are handled in `apps/web/src/pages/api/auth/[...nextauth].ts` to allow access to the request.
 };
