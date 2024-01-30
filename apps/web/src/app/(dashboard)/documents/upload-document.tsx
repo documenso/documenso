@@ -2,17 +2,11 @@
 
 import { useMemo, useState } from 'react';
 
-
-
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
-
-
 import { Loader } from 'lucide-react';
 import { useSession } from 'next-auth/react';
-
-
 
 import { useLimits } from '@documenso/ee/server-only/limits/provider/client';
 import { useAnalytics } from '@documenso/lib/client-only/hooks/use-analytics';
@@ -24,6 +18,7 @@ import { cn } from '@documenso/ui/lib/utils';
 import { DocumentDropzone } from '@documenso/ui/primitives/document-dropzone';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
+import { APP_DOCUMENT_UPLOAD_SIZE_LIMIT } from '@documenso/lib/constants/app'
 
 export type UploadDocumentProps = {
   className?: string;
@@ -105,7 +100,7 @@ export const UploadDocument = ({ className }: UploadDocumentProps) => {
 
   const onFileDropRejected = () => {
     toast({
-      title: 'File is larger than 50mb',
+      title: `File cannot be larger than ${APP_DOCUMENT_UPLOAD_SIZE_LIMIT}mb`,
       description: 'Your document failed to upload.',
       duration: 5000,
       variant: 'destructive',

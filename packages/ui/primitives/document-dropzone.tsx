@@ -5,15 +5,12 @@ import { motion } from 'framer-motion';
 import { Plus } from 'lucide-react';
 import { useDropzone } from 'react-dropzone';
 
-
-
 import { megabytesToBytes } from '@documenso/lib/universal/unit-convertions';
-
-
 
 import { cn } from '../lib/utils';
 import { Card, CardContent } from './card';
 
+import {APP_DOCUMENT_UPLOAD_SIZE_LIMIT} from'@documenso/lib/constants/app';
 
 const DocumentDropzoneContainerVariants: Variants = {
   initial: {
@@ -124,7 +121,7 @@ export const DocumentDropzone = ({
         void onDropRejected();
       }
     },
-    maxSize: megabytesToBytes(50),
+    maxSize: megabytesToBytes(APP_DOCUMENT_UPLOAD_SIZE_LIMIT),
   });
 
   return (
