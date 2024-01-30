@@ -83,7 +83,7 @@ export const SendConfirmationEmailForm = ({ className }: SendConfirmationEmailFo
               )}
             />
           </fieldset>
-          <Button size="lg" type="submit">
+          <Button size="lg" type="submit" disabled={isSubmitting}>
             Send confirmation email
           </Button>
         </form>
