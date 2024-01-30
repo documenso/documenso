@@ -38,7 +38,7 @@ import {
   DocumentFlowFormContainerHeader,
   DocumentFlowFormContainerStep,
 } from './document-flow-root';
-import { SubjectFieldItem } from './subject-field-item';
+import { ShowFieldItem } from './show-field-item';
 import type { DocumentFlowStep } from './types';
 
 export type AddSubjectFormProps = {
@@ -99,7 +99,7 @@ export const AddSubjectFormPartial = ({
       <DocumentFlowFormContainerContent>
         <div className="flex flex-col">
           {fields.map((field, index) => (
-            <SubjectFieldItem key={index} field={field} recipients={recipients} />
+            <ShowFieldItem key={index} field={field} recipients={recipients} />
           ))}
 
           <div className="flex flex-col gap-y-4">

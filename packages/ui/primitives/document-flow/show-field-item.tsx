@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from 'react';
 
+import type { Prisma } from '@prisma/client';
 import { createPortal } from 'react-dom';
 import { Rnd } from 'react-rnd';
 
@@ -10,14 +11,13 @@ import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
 import { cn } from '../../lib/utils';
 import { Card, CardContent } from '../card';
 import { FRIENDLY_FIELD_TYPE } from './types';
-import type { Prisma } from '.prisma/client';
 
-export type FieldItemProps = {
+export type ShowFieldItemProps = {
   field: Prisma.FieldGetPayload<null>;
   recipients: Prisma.RecipientGetPayload<null>[];
 };
 
-export const SubjectFieldItem = ({ field, recipients }: FieldItemProps) => {
+export const ShowFieldItem = ({ field, recipients }: ShowFieldItemProps) => {
   const [coords, setCoords] = useState({
     pageX: Number(field.positionX),
     pageY: Number(field.positionY),
