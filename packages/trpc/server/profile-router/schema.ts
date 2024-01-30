@@ -24,7 +24,7 @@ export const ZResetPasswordFormSchema = z.object({
 });
 
 export const ZConfirmEmailMutationSchema = z.object({
-  encryptedEmail: z.string().min(1),
+  email: z.string().email().min(1),
 });
 
 export type TRetrieveUserByIdQuerySchema = z.infer<typeof ZRetrieveUserByIdQuerySchema>;

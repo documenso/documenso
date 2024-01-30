@@ -9,5 +9,8 @@ export const getUserByEmail = async ({ email }: GetUserByEmailOptions) => {
     where: {
       email: email.toLowerCase(),
     },
+    include: {
+      VerificationToken: true,
+    },
   });
 };

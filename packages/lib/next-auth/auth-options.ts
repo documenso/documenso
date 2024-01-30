@@ -14,6 +14,7 @@ import { IdentityProvider } from '@documenso/prisma/client';
 import { isTwoFactorAuthenticationEnabled } from '../server-only/2fa/is-2fa-availble';
 import { validateTwoFactorAuthentication } from '../server-only/2fa/validate-2fa';
 import { getUserByEmail } from '../server-only/user/get-user-by-email';
+import { sendConfirmationToken } from '../server-only/user/send-confirmation-token';
 import { ErrorCode } from './error-codes';
 
 export const NEXT_AUTH_OPTIONS: AuthOptions = {
@@ -71,6 +72,15 @@ export const NEXT_AUTH_OPTIONS: AuthOptions = {
         }
 
         if (!user.emailVerified) {
+          const totalUserVerificationTokens = user.VerificationToken.length;
+          const lastUserVerificationToken = user.VerificationToken[totalUserVerificationTokens - 1];
+          const expiredToken =
+            DateTime.fromJSDate(lastUserVerificationToken.expires) <= DateTime.now();
+
+          if (totalUserVerificationTokens < 1 || expiredToken) {
+            await sendConfirmationToken({ email });
+          }
+
           throw new Error(ErrorCode.UNVERIFIED_EMAIL);
         }
 

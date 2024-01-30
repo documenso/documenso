@@ -62,19 +62,17 @@ export const SignUpForm = ({ className, isGoogleSSOEnabled }: SignUpFormProps) =
   const isSubmitting = form.formState.isSubmitting;
 
   const { mutateAsync: signup } = trpc.auth.signup.useMutation();
-  const { mutateAsync: encryptSecondaryData } = trpc.crypto.encryptSecondaryData.useMutation();
 
   const onFormSubmit = async ({ name, email, password, signature }: TSignUpFormSchema) => {
     try {
       await signup({ name, email, password, signature });
 
-      const encryptedEmail = await encryptSecondaryData({ data: email });
-
-      router.push(`/unverified-account?token=${encryptedEmail}`);
+      router.push(`/unverified-account}`);
 
       toast({
         title: 'Registration Successful',
-        description: 'You have successfully registered. Please sign in to continue.',
+        description:
+          'You have successfully registered. Please verify your account by clicking on the link you received in the email.',
         duration: 5000,
       });
 

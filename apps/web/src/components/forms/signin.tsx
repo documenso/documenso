@@ -11,7 +11,6 @@ import { FcGoogle } from 'react-icons/fc';
 import { z } from 'zod';
 
 import { ErrorCode, isErrorCode } from '@documenso/lib/next-auth/error-codes';
-import { trpc } from '@documenso/trpc/react';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@documenso/ui/primitives/dialog';
@@ -61,8 +60,6 @@ export const SignInForm = ({ className, isGoogleSSOEnabled }: SignInFormProps) =
   const [isTwoFactorAuthenticationDialogOpen, setIsTwoFactorAuthenticationDialogOpen] =
     useState(false);
   const router = useRouter();
-
-  const { mutateAsync: encryptSecondaryData } = trpc.crypto.encryptSecondaryData.useMutation();
 
   const [twoFactorAuthenticationMethod, setTwoFactorAuthenticationMethod] = useState<
     'totp' | 'backup'
@@ -132,9 +129,12 @@ export const SignInForm = ({ className, isGoogleSSOEnabled }: SignInFormProps) =
         const errorMessage = ERROR_MESSAGES[result.error];
 
         if (result.error === ErrorCode.UNVERIFIED_EMAIL) {
-          const encryptedEmail = await encryptSecondaryData({ data: email });
+          router.push(`/unverified-account`);
 
-          router.push(`/unverified-account?token=${encryptedEmail}`);
+          toast({
+            title: 'Unable to sign in',
+            description: errorMessage ?? 'An unknown error occurred',
+          });
 
           return;
         }

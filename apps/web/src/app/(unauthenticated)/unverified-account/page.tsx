@@ -1,51 +1,8 @@
-'use client';
-
-import { useState } from 'react';
-
-import { useSearchParams } from 'next/navigation';
-
 import { Mails } from 'lucide-react';
 
-import { ONE_SECOND } from '@documenso/lib/constants/time';
-import { trpc } from '@documenso/trpc/react';
-import { Button } from '@documenso/ui/primitives/button';
-import { useToast } from '@documenso/ui/primitives/use-toast';
-
-const RESEND_CONFIRMATION_EMAIL_TIMEOUT = 20 * ONE_SECOND;
+import { SendConfirmationEmailForm } from '~/components/forms/send-confirmation-email';
 
 export default function UnverifiedAccount() {
-  const [isButtonDisabled, setIsButtonDisabled] = useState(false);
-  const searchParams = useSearchParams();
-  const { toast } = useToast();
-
-  const encryptedEmail = searchParams?.get('token') ?? '';
-
-  const { mutateAsync: sendConfirmationEmail } = trpc.profile.sendConfirmationEmail.useMutation();
-
-  const onResendConfirmationEmail = async () => {
-    try {
-      setIsButtonDisabled(true);
-
-      await sendConfirmationEmail({ encryptedEmail });
-
-      toast({
-        title: 'Success',
-        description: 'Verification email sent successfully.',
-        duration: 5000,
-      });
-
-      setTimeout(() => setIsButtonDisabled(false), RESEND_CONFIRMATION_EMAIL_TIMEOUT);
-    } catch (err) {
-      setIsButtonDisabled(false);
-
-      toast({
-        title: 'Error',
-        description: 'Something went wrong while sending the confirmation email.',
-        variant: 'destructive',
-      });
-    }
-  };
-
   return (
     <div className="flex w-full items-start">
       <div className="mr-4 mt-1 hidden md:block">
@@ -55,13 +12,11 @@ export default function UnverifiedAccount() {
         <h2 className="text-2xl font-bold md:text-4xl">Confirm email</h2>
 
         <p className="text-muted-foreground mt-4">
-          To gain full access to your account and unlock all its features, please confirm your email
-          address by clicking on the link sent to your email address.
+          To gain access to your account, please confirm your email address by clicking on the
+          confirmation link from your inbox.
         </p>
 
-        <Button className="mt-4" disabled={isButtonDisabled} onClick={onResendConfirmationEmail}>
-          Resend email
-        </Button>
+        <SendConfirmationEmailForm />
       </div>
     </div>
   );

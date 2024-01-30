@@ -1,6 +1,5 @@
 import { TRPCError } from '@trpc/server';
 
-import { decryptSecondaryData } from '@documenso/lib/server-only/crypto/decrypt';
 import { forgotPassword } from '@documenso/lib/server-only/user/forgot-password';
 import { getUserById } from '@documenso/lib/server-only/user/get-user-by-id';
 import { resetPassword } from '@documenso/lib/server-only/user/reset-password';
@@ -118,15 +117,9 @@ export const profileRouter = router({
     .input(ZConfirmEmailMutationSchema)
     .mutation(async ({ input }) => {
       try {
-        const { encryptedEmail } = input;
+        const { email } = input;
 
-        const decryptedEmail = decryptSecondaryData(encryptedEmail);
-
-        if (!decryptedEmail) {
-          throw new Error('Email is required');
-        }
-
-        return await sendConfirmationToken({ email: decryptedEmail });
+        return await sendConfirmationToken({ email });
       } catch (err) {
         let message = 'We were unable to send a confirmation email. Please try again.';
 
