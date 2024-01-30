@@ -18,16 +18,6 @@ export default async function auth(req: NextApiRequest, res: NextApiResponse) {
       error: '/signin',
     },
     events: {
-      createUser: async ({ user }) => {
-        await prisma.userSecurityAuditLog.create({
-          data: {
-            userId: user.id,
-            ipAddress,
-            userAgent,
-            type: UserSecurityAuditLogType.ACCOUNT_CREATE,
-          },
-        });
-      },
       signIn: async ({ user }) => {
         await prisma.userSecurityAuditLog.create({
           data: {

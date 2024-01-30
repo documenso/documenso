@@ -12,7 +12,6 @@ export const IS_GOOGLE_SSO_ENABLED = Boolean(
 );
 
 export const USER_SECURITY_AUDIT_LOG_MAP: { [key in UserSecurityAuditLogType]: string } = {
-  [UserSecurityAuditLogType.ACCOUNT_CREATE]: 'Account created',
   [UserSecurityAuditLogType.ACCOUNT_SSO_LINK]: 'Linked account to SSO',
   [UserSecurityAuditLogType.ACCOUNT_PROFILE_UPDATE]: 'Profile updated',
   [UserSecurityAuditLogType.AUTH_2FA_DISABLE]: '2FA Disabled',

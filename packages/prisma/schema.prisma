@@ -49,7 +49,6 @@ model User {
 }
 
 enum UserSecurityAuditLogType {
-  ACCOUNT_CREATE
   ACCOUNT_PROFILE_UPDATE
   ACCOUNT_SSO_LINK
   AUTH_2FA_DISABLE
