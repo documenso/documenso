@@ -9,6 +9,7 @@ import { z } from 'zod';
 import { useAnalytics } from '@documenso/lib/client-only/hooks/use-analytics';
 import { TRPCClientError } from '@documenso/trpc/client';
 import { trpc } from '@documenso/trpc/react';
+import { ZPasswordSchema } from '@documenso/trpc/server/auth-router/schema';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
 import {
@@ -26,15 +27,22 @@ import { useToast } from '@documenso/ui/primitives/use-toast';
 
 const SIGN_UP_REDIRECT_PATH = '/documents';
 
-export const ZSignUpFormSchema = z.object({
-  name: z.string().trim().min(1, { message: 'Please enter a valid name.' }),
-  email: z.string().email().min(1),
-  password: z
-    .string()
-    .min(6, { message: 'Password should contain at least 6 characters' })
-    .max(72, { message: 'Password should not contain more than 72 characters' }),
-  signature: z.string().min(1, { message: 'We need your signature to sign documents' }),
-});
+export const ZSignUpFormSchema = z
+  .object({
+    name: z.string().trim().min(1, { message: 'Please enter a valid name.' }),
+    email: z.string().email().min(1),
+    password: ZPasswordSchema,
+    signature: z.string().min(1, { message: 'We need your signature to sign documents' }),
+  })
+  .refine(
+    (data) => {
+      const { name, email, password } = data;
+      return !password.includes(name) && !password.includes(email.split('@')[0]);
+    },
+    {
+      message: 'Password should not be common or based on personal information',
+    },
+  );
 
 export type TSignUpFormSchema = z.infer<typeof ZSignUpFormSchema>;
 
