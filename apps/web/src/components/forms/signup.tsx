@@ -67,7 +67,7 @@ export const SignUpForm = ({ className, isGoogleSSOEnabled }: SignUpFormProps) =
     try {
       await signup({ name, email, password, signature });
 
-      router.push(`/unverified-account}`);
+      router.push(`/unverified-account`);
 
       toast({
         title: 'Registration Successful',
