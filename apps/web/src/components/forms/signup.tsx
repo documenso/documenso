@@ -3,11 +3,13 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { signIn } from 'next-auth/react';
 import { useForm } from 'react-hook-form';
+import { FcGoogle } from 'react-icons/fc';
 import { z } from 'zod';
 
 import { useAnalytics } from '@documenso/lib/client-only/hooks/use-analytics';
 import { TRPCClientError } from '@documenso/trpc/client';
 import { trpc } from '@documenso/trpc/react';
+import { ZPasswordSchema } from '@documenso/trpc/server/auth-router/schema';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
 import {
@@ -23,23 +25,33 @@ import { PasswordInput } from '@documenso/ui/primitives/password-input';
 import { SignaturePad } from '@documenso/ui/primitives/signature-pad';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
-export const ZSignUpFormSchema = z.object({
-  name: z.string().trim().min(1, { message: 'Please enter a valid name.' }),
-  email: z.string().email().min(1),
-  password: z
-    .string()
-    .min(6, { message: 'Password should contain at least 6 characters' })
-    .max(72, { message: 'Password should not contain more than 72 characters' }),
-  signature: z.string().min(1, { message: 'We need your signature to sign documents' }),
-});
+const SIGN_UP_REDIRECT_PATH = '/documents';
+
+export const ZSignUpFormSchema = z
+  .object({
+    name: z.string().trim().min(1, { message: 'Please enter a valid name.' }),
+    email: z.string().email().min(1),
+    password: ZPasswordSchema,
+    signature: z.string().min(1, { message: 'We need your signature to sign documents' }),
+  })
+  .refine(
+    (data) => {
+      const { name, email, password } = data;
+      return !password.includes(name) && !password.includes(email.split('@')[0]);
+    },
+    {
+      message: 'Password should not be common or based on personal information',
+    },
+  );
 
 export type TSignUpFormSchema = z.infer<typeof ZSignUpFormSchema>;
 
 export type SignUpFormProps = {
   className?: string;
+  isGoogleSSOEnabled?: boolean;
 };
 
-export const SignUpForm = ({ className }: SignUpFormProps) => {
+export const SignUpForm = ({ className, isGoogleSSOEnabled }: SignUpFormProps) => {
   const { toast } = useToast();
   const analytics = useAnalytics();
 
@@ -64,7 +76,7 @@ export const SignUpForm = ({ className }: SignUpFormProps) => {
       await signIn('credentials', {
         email,
         password,
-        callbackUrl: '/',
+        callbackUrl: SIGN_UP_REDIRECT_PATH,
       });
 
       analytics.capture('App: User Sign Up', {
@@ -86,6 +98,19 @@ export const SignUpForm = ({ className }: SignUpFormProps) => {
           variant: 'destructive',
         });
       }
+    }
+  };
+
+  const onSignUpWithGoogleClick = async () => {
+    try {
+      await signIn('google', { callbackUrl: SIGN_UP_REDIRECT_PATH });
+    } catch (err) {
+      toast({
+        title: 'An unknown error occurred',
+        description:
+          'We encountered an unknown error while attempting to sign you Up. Please try again later.',
+        variant: 'destructive',
+      });
     }
   };
 
@@ -166,6 +191,28 @@ export const SignUpForm = ({ className }: SignUpFormProps) => {
         >
           {isSubmitting ? 'Signing up...' : 'Sign Up'}
         </Button>
+
+        {isGoogleSSOEnabled && (
+          <>
+            <div className="relative flex items-center justify-center gap-x-4 py-2 text-xs uppercase">
+              <div className="bg-border h-px flex-1" />
+              <span className="text-muted-foreground bg-transparent">Or</span>
+              <div className="bg-border h-px flex-1" />
+            </div>
+
+            <Button
+              type="button"
+              size="lg"
+              variant={'outline'}
+              className="bg-background text-muted-foreground border"
+              disabled={isSubmitting}
+              onClick={onSignUpWithGoogleClick}
+            >
+              <FcGoogle className="mr-2 h-5 w-5" />
+              Sign Up with Google
+            </Button>
+          </>
+        )}
       </form>
     </Form>
   );

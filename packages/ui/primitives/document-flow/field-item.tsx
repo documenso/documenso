@@ -121,6 +121,7 @@ export const FieldItem = ({
         <button
           className="text-muted-foreground/50 hover:text-muted-foreground/80 bg-background absolute -right-2 -top-2 z-20 flex h-8 w-8 items-center justify-center rounded-full border"
           onClick={() => onRemove?.()}
+          onTouchEnd={() => onRemove?.()}
         >
           <Trash className="h-4 w-4" />
         </button>

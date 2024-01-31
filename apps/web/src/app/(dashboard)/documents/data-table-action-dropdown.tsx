@@ -19,7 +19,7 @@ import {
 } from 'lucide-react';
 import { useSession } from 'next-auth/react';
 
-import { getFile } from '@documenso/lib/universal/upload/get-file';
+import { downloadPDF } from '@documenso/lib/client-only/download-pdf';
 import type { Document, Recipient, User } from '@documenso/prisma/client';
 import { DocumentStatus, RecipientRole } from '@documenso/prisma/client';
 import type { DocumentWithData } from '@documenso/prisma/types/document-with-data';
@@ -32,6 +32,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from '@documenso/ui/primitives/dropdown-menu';
+import { useToast } from '@documenso/ui/primitives/use-toast';
 
 import { ResendDocumentActionItem } from './_action-items/resend-document';
 import { DeleteDocumentDialog } from './delete-document-dialog';
@@ -46,6 +47,7 @@ export type DataTableActionDropdownProps = {
 
 export const DataTableActionDropdown = ({ row }: DataTableActionDropdownProps) => {
   const { data: session } = useSession();
+  const { toast } = useToast();
 
   const [isDeleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [isDuplicateDialogOpen, setDuplicateDialogOpen] = useState(false);
@@ -65,39 +67,33 @@ export const DataTableActionDropdown = ({ row }: DataTableActionDropdownProps) =
   const isDocumentDeletable = isOwner;
 
   const onDownloadClick = async () => {
-    let document: DocumentWithData | null = null;
+    try {
+      let document: DocumentWithData | null = null;
 
-    if (!recipient) {
-      document = await trpcClient.document.getDocumentById.query({
-        id: row.id,
-      });
-    } else {
-      document = await trpcClient.document.getDocumentByToken.query({
-        token: recipient.token,
+      if (!recipient) {
+        document = await trpcClient.document.getDocumentById.query({
+          id: row.id,
+        });
+      } else {
+        document = await trpcClient.document.getDocumentByToken.query({
+          token: recipient.token,
+        });
+      }
+
+      const documentData = document?.documentData;
+
+      if (!documentData) {
+        return;
+      }
+
+      await downloadPDF({ documentData, fileName: row.title });
+    } catch (err) {
+      toast({
+        title: 'Something went wrong',
+        description: 'An error occurred while downloading your document.',
+        variant: 'destructive',
       });
     }
-
-    const documentData = document?.documentData;
-
-    if (!documentData) {
-      return;
-    }
-
-    const documentBytes = await getFile(documentData);
-
-    const blob = new Blob([documentBytes], {
-      type: 'application/pdf',
-    });
-
-    const link = window.document.createElement('a');
-    const baseTitle = row.title.includes('.pdf') ? row.title.split('.pdf')[0] : row.title;
-
-    link.href = window.URL.createObjectURL(blob);
-    link.download = baseTitle ? `${baseTitle}_signed.pdf` : 'document.pdf';
-
-    link.click();
-
-    window.URL.revokeObjectURL(link.href);
   };
 
   const nonSignedRecipients = row.Recipient.filter((item) => item.signingStatus !== 'SIGNED');

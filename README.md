@@ -1,3 +1,5 @@
+>We are nominated for a Product Hunt Gold Kitty 😺✨ and appreciate any support: https://documen.so/kitty
+
 <img src="https://github.com/documenso/documenso/assets/13398220/a643571f-0239-46a6-a73e-6bef38d1228b" alt="Documenso Logo">
 
 <p align="center" style="margin-top: 20px">
@@ -13,9 +15,9 @@
     ·
     <a href="https://github.com/documenso/documenso/issues">Issues</a>
     ·
-    <a href="https://github.com/documenso/documenso/milestones">Roadmap</a>
+    <a href="https://documen.so/live">Upcoming Releases</a>
     ·
-    <a href="https://documen.so/launches">Upcoming Launches</a>
+    <a href="https://documen.so/roadmap">Roadmap</a>
   </p>
 </p>
 

@@ -6,7 +6,7 @@ import { CheckCircle, Download, Edit, EyeIcon, Pencil } from 'lucide-react';
 import { useSession } from 'next-auth/react';
 import { match } from 'ts-pattern';
 
-import { getFile } from '@documenso/lib/universal/upload/get-file';
+import { downloadPDF } from '@documenso/lib/client-only/download-pdf';
 import type { Document, Recipient, User } from '@documenso/prisma/client';
 import { DocumentStatus, RecipientRole, SigningStatus } from '@documenso/prisma/client';
 import type { DocumentWithData } from '@documenso/prisma/types/document-with-data';
@@ -56,28 +56,14 @@ export const DataTableActionButton = ({ row }: DataTableActionButtonProps) => {
       const documentData = document?.documentData;
 
       if (!documentData) {
-        return;
+        throw Error('No document available');
       }
 
-      const documentBytes = await getFile(documentData);
-
-      const blob = new Blob([documentBytes], {
-        type: 'application/pdf',
-      });
-
-      const link = window.document.createElement('a');
-      const baseTitle = row.title.includes('.pdf') ? row.title.split('.pdf')[0] : row.title;
-
-      link.href = window.URL.createObjectURL(blob);
-      link.download = baseTitle ? `${baseTitle}_signed.pdf` : 'document.pdf';
-
-      link.click();
-
-      window.URL.revokeObjectURL(link.href);
-    } catch (error) {
+      await downloadPDF({ documentData, fileName: row.title });
+    } catch (err) {
       toast({
         title: 'Something went wrong',
-        description: 'An error occurred while trying to download file.',
+        description: 'An error occurred while downloading your document.',
         variant: 'destructive',
       });
     }

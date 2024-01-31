@@ -7,6 +7,7 @@ import { RecipientRole, SigningStatus } from '@documenso/prisma/client';
 import { ExtendedDocumentStatus } from '@documenso/prisma/types/extended-document-status';
 
 import type { FindResultSet } from '../../types/find-result-set';
+import { maskRecipientTokensForDocument } from '../../utils/mask-recipient-tokens-for-document';
 
 export type FindDocumentsOptions = {
   userId: number;
@@ -191,8 +192,15 @@ export const findDocuments = async ({
     }),
   ]);
 
+  const maskedData = data.map((document) =>
+    maskRecipientTokensForDocument({
+      document,
+      user,
+    }),
+  );
+
   return {
-    data,
+    data: maskedData,
     count,
     currentPage: Math.max(page, 1),
     perPage,

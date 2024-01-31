@@ -2,6 +2,7 @@ import { notFound, redirect } from 'next/navigation';
 
 import { match } from 'ts-pattern';
 
+import { DOCUMENSO_ENCRYPTION_KEY } from '@documenso/lib/constants/crypto';
 import { DEFAULT_DOCUMENT_DATE_FORMAT } from '@documenso/lib/constants/date-formats';
 import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
 import { DEFAULT_DOCUMENT_TIME_ZONE } from '@documenso/lib/constants/time-zones';
@@ -12,6 +13,7 @@ import { viewedDocument } from '@documenso/lib/server-only/document/viewed-docum
 import { getFieldsForToken } from '@documenso/lib/server-only/field/get-fields-for-token';
 import { getRecipientByToken } from '@documenso/lib/server-only/recipient/get-recipient-by-token';
 import { getRecipientSignatures } from '@documenso/lib/server-only/recipient/get-recipient-signatures';
+import { symmetricDecrypt } from '@documenso/lib/universal/crypto';
 import { DocumentStatus, FieldType, RecipientRole, SigningStatus } from '@documenso/prisma/client';
 import { Card, CardContent } from '@documenso/ui/primitives/card';
 import { ElementVisible } from '@documenso/ui/primitives/element-visible';
@@ -66,6 +68,23 @@ export default async function SigningPage({ params: { token } }: SigningPageProp
     redirect(`/sign/${token}/complete`);
   }
 
+  if (documentMeta?.password) {
+    const key = DOCUMENSO_ENCRYPTION_KEY;
+
+    if (!key) {
+      throw new Error('Missing DOCUMENSO_ENCRYPTION_KEY');
+    }
+
+    const securePassword = Buffer.from(
+      symmetricDecrypt({
+        key,
+        data: documentMeta.password,
+      }),
+    ).toString('utf-8');
+
+    documentMeta.password = securePassword;
+  }
+
   const [recipientSignature] = await getRecipientSignatures({ recipientId: recipient.id });
 
   if (document.deletedAt) {
@@ -104,7 +123,12 @@ export default async function SigningPage({ params: { token } }: SigningPageProp
             gradient
           >
             <CardContent className="p-2">
-              <LazyPDFViewer key={documentData.id} documentData={documentData} />
+              <LazyPDFViewer
+                key={documentData.id}
+                documentData={documentData}
+                document={document}
+                password={documentMeta?.password}
+              />
             </CardContent>
           </Card>
 

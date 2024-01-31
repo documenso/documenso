@@ -68,7 +68,7 @@ export const ProfileDropdown = ({ user }: ProfileDropdownProps) => {
         </Button>
       </DropdownMenuTrigger>
 
-      <DropdownMenuContent className="w-56" align="end" forceMount>
+      <DropdownMenuContent className="z-[60] w-56" align="end" forceMount>
         <DropdownMenuLabel>Account</DropdownMenuLabel>
 
         {isUserAdmin && (
@@ -122,7 +122,7 @@ export const ProfileDropdown = ({ user }: ProfileDropdownProps) => {
             Themes
           </DropdownMenuSubTrigger>
           <DropdownMenuPortal>
-            <DropdownMenuSubContent>
+            <DropdownMenuSubContent className="z-[60]">
               <DropdownMenuRadioGroup value={theme} onValueChange={setTheme}>
                 <DropdownMenuRadioItem value="light">
                   <Sun className="mr-2 h-4 w-4" /> Light
@@ -141,7 +141,11 @@ export const ProfileDropdown = ({ user }: ProfileDropdownProps) => {
         </DropdownMenuSub>
         <DropdownMenuSeparator />
         <DropdownMenuItem asChild>
-          <Link href="https://github.com/documenso/documenso" className="cursor-pointer">
+          <Link
+            href="https://github.com/documenso/documenso"
+            className="cursor-pointer"
+            target="_blank"
+          >
             <LuGithub className="mr-2 h-4 w-4" />
             Star on Github
           </Link>

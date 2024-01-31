@@ -1,3 +1,4 @@
+import type { Metadata } from 'next';
 import Link from 'next/link';
 
 import { getRequiredServerComponentSession } from '@documenso/lib/next-auth/get-server-component-session';
@@ -25,6 +26,9 @@ export type DocumentsPageProps = {
   };
 };
 
+export const metadata: Metadata = {
+  title: 'Documents',
+};
 export default async function DocumentsPage({ searchParams = {} }: DocumentsPageProps) {
   const { user } = await getRequiredServerComponentSession();
 
@@ -88,7 +92,7 @@ export default async function DocumentsPage({ searchParams = {} }: DocumentsPage
                     <DocumentStatus status={value} />
 
                     {value !== ExtendedDocumentStatus.ALL && (
-                      <span className="ml-1 hidden opacity-50 md:inline-block">
+                      <span className="ml-1 inline-block opacity-50">
                         {Math.min(stats[value], 99)}
                         {stats[value] > 99 && '+'}
                       </span>
