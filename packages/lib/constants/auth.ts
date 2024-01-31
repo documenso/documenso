@@ -18,6 +18,8 @@ export const USER_SECURITY_AUDIT_LOG_MAP: { [key in UserSecurityAuditLogType]: s
   [UserSecurityAuditLogType.AUTH_2FA_ENABLE]: '2FA Enabled',
   [UserSecurityAuditLogType.PASSWORD_RESET]: 'Password reset',
   [UserSecurityAuditLogType.PASSWORD_UPDATE]: 'Password updated',
-  [UserSecurityAuditLogType.SIGN_IN]: 'Signed In',
   [UserSecurityAuditLogType.SIGN_OUT]: 'Signed Out',
+  [UserSecurityAuditLogType.SIGN_IN]: 'Signed In',
+  [UserSecurityAuditLogType.SIGN_IN_FAIL]: 'Sign in attempt failed',
+  [UserSecurityAuditLogType.SIGN_IN_2FA_FAIL]: 'Sign in 2FA attempt failed',
 };

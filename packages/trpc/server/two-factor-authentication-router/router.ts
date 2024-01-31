@@ -6,7 +6,7 @@ import { enableTwoFactorAuthentication } from '@documenso/lib/server-only/2fa/en
 import { getBackupCodes } from '@documenso/lib/server-only/2fa/get-backup-code';
 import { setupTwoFactorAuthentication } from '@documenso/lib/server-only/2fa/setup-2fa';
 import { compareSync } from '@documenso/lib/server-only/auth/hash';
-import { extractRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
+import { extractNextApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 
 import { authenticatedProcedure, router } from '../trpc';
 import {
@@ -41,7 +41,7 @@ export const twoFactorAuthenticationRouter = router({
         return await enableTwoFactorAuthentication({
           user,
           code,
-          requestMetadata: extractRequestMetadata(ctx.req),
+          requestMetadata: extractNextApiRequestMetadata(ctx.req),
         });
       } catch (err) {
         console.error(err);
@@ -65,7 +65,7 @@ export const twoFactorAuthenticationRouter = router({
           user,
           password,
           backupCode,
-          requestMetadata: extractRequestMetadata(ctx.req),
+          requestMetadata: extractNextApiRequestMetadata(ctx.req),
         });
       } catch (err) {
         console.error(err);

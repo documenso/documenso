@@ -57,6 +57,8 @@ enum UserSecurityAuditLogType {
   PASSWORD_UPDATE
   SIGN_OUT
   SIGN_IN
+  SIGN_IN_FAIL
+  SIGN_IN_2FA_FAIL
 }
 
 model UserSecurityAuditLog {

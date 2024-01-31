@@ -3,12 +3,12 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import NextAuth from 'next-auth';
 
 import { NEXT_AUTH_OPTIONS } from '@documenso/lib/next-auth/auth-options';
-import { extractRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
+import { extractNextApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 import { prisma } from '@documenso/prisma';
 import { UserSecurityAuditLogType } from '@documenso/prisma/client';
 
 export default async function auth(req: NextApiRequest, res: NextApiResponse) {
-  const { ipAddress, userAgent } = extractRequestMetadata(req);
+  const { ipAddress, userAgent } = extractNextApiRequestMetadata(req);
 
   return await NextAuth(req, res, {
     ...NEXT_AUTH_OPTIONS,

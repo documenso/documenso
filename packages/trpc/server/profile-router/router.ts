@@ -7,7 +7,7 @@ import { resetPassword } from '@documenso/lib/server-only/user/reset-password';
 import { sendConfirmationToken } from '@documenso/lib/server-only/user/send-confirmation-token';
 import { updatePassword } from '@documenso/lib/server-only/user/update-password';
 import { updateProfile } from '@documenso/lib/server-only/user/update-profile';
-import { extractRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
+import { extractNextApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 
 import { adminProcedure, authenticatedProcedure, procedure, router } from '../trpc';
 import {
@@ -60,7 +60,7 @@ export const profileRouter = router({
           userId: ctx.user.id,
           name,
           signature,
-          requestMetadata: extractRequestMetadata(ctx.req),
+          requestMetadata: extractNextApiRequestMetadata(ctx.req),
         });
       } catch (err) {
         console.error(err);
@@ -83,7 +83,7 @@ export const profileRouter = router({
           userId: ctx.user.id,
           password,
           currentPassword,
-          requestMetadata: extractRequestMetadata(ctx.req),
+          requestMetadata: extractNextApiRequestMetadata(ctx.req),
         });
       } catch (err) {
         let message =
@@ -119,7 +119,7 @@ export const profileRouter = router({
       return await resetPassword({
         token,
         password,
-        requestMetadata: extractRequestMetadata(ctx.req),
+        requestMetadata: extractNextApiRequestMetadata(ctx.req),
       });
     } catch (err) {
       let message = 'We were unable to reset your password. Please try again.';
