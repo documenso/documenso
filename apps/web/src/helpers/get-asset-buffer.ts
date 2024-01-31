@@ -1,4 +1,4 @@
-import { env } from 'next-runtime-env';
+import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 
 /**
  * getAssetBuffer is used to retrieve array buffers for various assets
@@ -10,9 +10,7 @@ import { env } from 'next-runtime-env';
  * @param path The path to the asset, relative to the `public` folder.
  */
 export const getAssetBuffer = async (path: string) => {
-  const NEXT_PUBLIC_WEBAPP_URL = env('NEXT_PUBLIC_WEBAPP_URL');
-
-  const baseUrl = NEXT_PUBLIC_WEBAPP_URL || 'http://localhost:3000';
+  const baseUrl = NEXT_PUBLIC_WEBAPP_URL() || 'http://localhost:3000';
 
   return fetch(new URL(path, baseUrl)).then(async (res) => res.arrayBuffer());
 };

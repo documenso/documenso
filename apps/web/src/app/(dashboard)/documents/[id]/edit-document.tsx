@@ -61,7 +61,7 @@ export const EditDocumentForm = ({
   const { mutateAsync: setPasswordForDocument } =
     trpc.document.setPasswordForDocument.useMutation();
 
-  const documentFlow: Record<EditDocumentStep, DcumentFlowStep> = {
+  const documentFlow: Record<EditDocumentStep, DocumentFlowStep> = {
     title: {
       title: 'Add Title',
       description: 'Add the title to the document.',

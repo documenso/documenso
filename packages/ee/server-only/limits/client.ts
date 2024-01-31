@@ -11,7 +11,7 @@ export type GetLimitsOptions = {
 export const getLimits = async ({ headers }: GetLimitsOptions = {}) => {
   const requestHeaders = headers ?? {};
 
-  const url = new URL('/api/limits', APP_BASE_URL ?? 'http://localhost:3000');
+  const url = new URL('/api/limits', APP_BASE_URL() ?? 'http://localhost:3000');
 
   return fetch(url, {
     headers: {

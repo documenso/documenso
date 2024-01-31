@@ -17,8 +17,6 @@ import { validateTwoFactorAuthentication } from '../server-only/2fa/validate-2fa
 import { getUserByEmail } from '../server-only/user/get-user-by-email';
 import { ErrorCode } from './error-codes';
 
-const NEXT_PUBLIC_DISABLE_SIGNUP = env('NEXT_PUBLIC_DISABLE_SIGNUP');
-
 export const NEXT_AUTH_OPTIONS: AuthOptions = {
   adapter: PrismaAdapter(prisma),
   secret: process.env.NEXTAUTH_SECRET ?? 'secret',
@@ -186,7 +184,7 @@ export const NEXT_AUTH_OPTIONS: AuthOptions = {
     async signIn({ user }) {
       // We do this to stop OAuth providers from creating an account
       // when signups are disabled
-      if (NEXT_PUBLIC_DISABLE_SIGNUP === 'true') {
+      if (env('NEXT_PUBLIC_DISABLE_SIGNUP') === 'true') {
         const userData = await getUserByEmail({ email: user.email! });
 
         return !!userData;

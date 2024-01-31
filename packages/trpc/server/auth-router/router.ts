@@ -9,12 +9,12 @@ import { sendConfirmationToken } from '@documenso/lib/server-only/user/send-conf
 import { authenticatedProcedure, procedure, router } from '../trpc';
 import { ZSignUpMutationSchema, ZVerifyPasswordMutationSchema } from './schema';
 
-const NEXT_PUBLIC_DISABLE_SIGNUP = env('NEXT_PUBLIC_DISABLE_SIGNUP');
+const NEXT_PUBLIC_DISABLE_SIGNUP = () => env('NEXT_PUBLIC_DISABLE_SIGNUP');
 
 export const authRouter = router({
   signup: procedure.input(ZSignUpMutationSchema).mutation(async ({ input }) => {
     try {
-      if (NEXT_PUBLIC_DISABLE_SIGNUP === 'true') {
+      if (NEXT_PUBLIC_DISABLE_SIGNUP() === 'true') {
         throw new TRPCError({
           code: 'BAD_REQUEST',
           message: 'Signups are disabled.',

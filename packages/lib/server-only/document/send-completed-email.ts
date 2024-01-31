@@ -1,12 +1,11 @@
 import { createElement } from 'react';
 
-import { env } from 'next-runtime-env';
-
 import { mailer } from '@documenso/email/mailer';
 import { render } from '@documenso/email/render';
 import { DocumentCompletedEmailTemplate } from '@documenso/email/templates/document-completed';
 import { prisma } from '@documenso/prisma';
 
+import { NEXT_PUBLIC_WEBAPP_URL } from '../../constants/app';
 import { getFile } from '../../universal/upload/get-file';
 
 export interface SendDocumentOptions {
@@ -14,8 +13,6 @@ export interface SendDocumentOptions {
 }
 
 export const sendCompletedEmail = async ({ documentId }: SendDocumentOptions) => {
-  const NEXT_PUBLIC_WEBAPP_URL = env('NEXT_PUBLIC_WEBAPP_URL');
-
   const document = await prisma.document.findUnique({
     where: {
       id: documentId,
@@ -40,12 +37,12 @@ export const sendCompletedEmail = async ({ documentId }: SendDocumentOptions) =>
     document.Recipient.map(async (recipient) => {
       const { email, name, token } = recipient;
 
-      const assetBaseUrl = NEXT_PUBLIC_WEBAPP_URL || 'http://localhost:3000';
+      const assetBaseUrl = NEXT_PUBLIC_WEBAPP_URL() || 'http://localhost:3000';
 
       const template = createElement(DocumentCompletedEmailTemplate, {
         documentName: document.title,
         assetBaseUrl,
-        downloadLink: `${NEXT_PUBLIC_WEBAPP_URL}/sign/${token}/complete`,
+        downloadLink: `${NEXT_PUBLIC_WEBAPP_URL()}/sign/${token}/complete`,
       });
 
       await mailer.sendMail({

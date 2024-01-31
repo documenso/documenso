@@ -18,8 +18,6 @@ import { APP_BASE_URL } from '../../constants/app';
 import { ONE_HOUR, ONE_SECOND } from '../../constants/time';
 import { alphaid } from '../id';
 
-const NEXT_PUBLIC_UPLOAD_TRANSPORT = env('NEXT_PUBLIC_UPLOAD_TRANSPORT');
-
 export const getPresignPostUrl = async (fileName: string, contentType: string) => {
   const client = getS3Client();
 
@@ -28,8 +26,10 @@ export const getPresignPostUrl = async (fileName: string, contentType: string) =
   let token: JWT | null = null;
 
   try {
+    const baseUrl = APP_BASE_URL() ?? 'http://localhost:3000';
+
     token = await getToken({
-      req: new NextRequest(APP_BASE_URL ?? 'http://localhost:3000', {
+      req: new NextRequest(baseUrl, {
         headers: headers(),
       }),
     });
@@ -120,6 +120,8 @@ export const deleteS3File = async (key: string) => {
 };
 
 const getS3Client = () => {
+  const NEXT_PUBLIC_UPLOAD_TRANSPORT = env('NEXT_PUBLIC_UPLOAD_TRANSPORT');
+
   if (NEXT_PUBLIC_UPLOAD_TRANSPORT !== 's3') {
     throw new Error('Invalid upload transport');
   }

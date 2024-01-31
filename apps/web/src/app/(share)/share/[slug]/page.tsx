@@ -2,9 +2,7 @@ import type { Metadata } from 'next';
 import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';
 
-import { env } from 'next-runtime-env';
-
-import { APP_BASE_URL } from '@documenso/lib/constants/app';
+import { APP_BASE_URL, NEXT_PUBLIC_MARKETING_URL } from '@documenso/lib/constants/app';
 
 type SharePageProps = {
   params: { slug: string };
@@ -18,20 +16,18 @@ export function generateMetadata({ params: { slug } }: SharePageProps) {
       title: 'Documenso - Join the open source signing revolution',
       description: 'I just signed with Documenso!',
       type: 'website',
-      images: [`${APP_BASE_URL}/share/${slug}/opengraph`],
+      images: [`${APP_BASE_URL()}/share/${slug}/opengraph`],
     },
     twitter: {
       site: '@documenso',
       card: 'summary_large_image',
-      images: [`${APP_BASE_URL}/share/${slug}/opengraph`],
+      images: [`${APP_BASE_URL()}/share/${slug}/opengraph`],
       description: 'I just signed with Documenso!',
     },
   } satisfies Metadata;
 }
 
 export default function SharePage() {
-  const NEXT_PUBLIC_MARKETING_URL = env('NEXT_PUBLIC_MARKETING_URL');
-
   const userAgent = headers().get('User-Agent') ?? '';
 
   // https://stackoverflow.com/questions/47026171/how-to-detect-bots-for-open-graph-with-user-agent
@@ -39,5 +35,5 @@ export default function SharePage() {
     return null;
   }
 
-  redirect(NEXT_PUBLIC_MARKETING_URL ?? 'http://localhost:3001');
+  redirect(NEXT_PUBLIC_MARKETING_URL() ?? 'http://localhost:3001');
 }

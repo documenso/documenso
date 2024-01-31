@@ -1,26 +1,24 @@
 import { createElement } from 'react';
 
-import { env } from 'next-runtime-env';
-
 import { mailer } from '@documenso/email/mailer';
 import { render } from '@documenso/email/render';
 import { ResetPasswordTemplate } from '@documenso/email/templates/reset-password';
 import { prisma } from '@documenso/prisma';
+
+import { NEXT_PUBLIC_WEBAPP_URL } from '../../constants/app';
 
 export interface SendResetPasswordOptions {
   userId: number;
 }
 
 export const sendResetPassword = async ({ userId }: SendResetPasswordOptions) => {
-  const NEXT_PUBLIC_WEBAPP_URL = env('NEXT_PUBLIC_WEBAPP_URL');
-
   const user = await prisma.user.findFirstOrThrow({
     where: {
       id: userId,
     },
   });
 
-  const assetBaseUrl = NEXT_PUBLIC_WEBAPP_URL || 'http://localhost:3000';
+  const assetBaseUrl = NEXT_PUBLIC_WEBAPP_URL() || 'http://localhost:3000';
 
   const template = createElement(ResetPasswordTemplate, {
     assetBaseUrl,

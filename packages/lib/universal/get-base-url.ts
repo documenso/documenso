@@ -1,7 +1,5 @@
 /* eslint-disable turbo/no-undeclared-env-vars */
-import { env } from 'next-runtime-env';
-
-const NEXT_PUBLIC_WEBAPP_URL = env('NEXT_PUBLIC_WEBAPP_URL');
+import { NEXT_PUBLIC_WEBAPP_URL } from '../constants/app';
 
 export const getBaseUrl = () => {
   if (typeof window !== 'undefined') {
@@ -12,8 +10,10 @@ export const getBaseUrl = () => {
     return `https://${process.env.VERCEL_URL}`;
   }
 
-  if (NEXT_PUBLIC_WEBAPP_URL) {
-    return NEXT_PUBLIC_WEBAPP_URL;
+  const webAppUrl = NEXT_PUBLIC_WEBAPP_URL();
+
+  if (webAppUrl) {
+    return webAppUrl;
   }
 
   return `http://localhost:${process.env.PORT ?? 3000}`;

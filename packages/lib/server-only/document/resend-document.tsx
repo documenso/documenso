@@ -1,7 +1,5 @@
 import { createElement } from 'react';
 
-import { env } from 'next-runtime-env';
-
 import { mailer } from '@documenso/email/mailer';
 import { render } from '@documenso/email/render';
 import { DocumentInviteEmailTemplate } from '@documenso/email/templates/document-invite';
@@ -10,13 +8,13 @@ import { renderCustomEmailTemplate } from '@documenso/lib/utils/render-custom-em
 import { prisma } from '@documenso/prisma';
 import { DocumentStatus, SigningStatus } from '@documenso/prisma/client';
 
+import { NEXT_PUBLIC_WEBAPP_URL } from '../../constants/app';
+
 export type ResendDocumentOptions = {
   documentId: number;
   userId: number;
   recipients: number[];
 };
-
-const NEXT_PUBLIC_WEBAPP_URL = env('NEXT_PUBLIC_WEBAPP_URL');
 
 export const resendDocument = async ({ documentId, userId, recipients }: ResendDocumentOptions) => {
   const user = await prisma.user.findFirstOrThrow({
@@ -71,8 +69,8 @@ export const resendDocument = async ({ documentId, userId, recipients }: ResendD
         'document.name': document.title,
       };
 
-      const assetBaseUrl = NEXT_PUBLIC_WEBAPP_URL || 'http://localhost:3000';
-      const signDocumentLink = `${NEXT_PUBLIC_WEBAPP_URL}/sign/${recipient.token}`;
+      const assetBaseUrl = NEXT_PUBLIC_WEBAPP_URL() || 'http://localhost:3000';
+      const signDocumentLink = `${NEXT_PUBLIC_WEBAPP_URL()}/sign/${recipient.token}`;
 
       const template = createElement(DocumentInviteEmailTemplate, {
         documentName: document.title,

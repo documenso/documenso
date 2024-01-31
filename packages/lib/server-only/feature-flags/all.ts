@@ -1,20 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 import { getToken } from 'next-auth/jwt';
-import { env } from 'next-runtime-env';
 
 import { LOCAL_FEATURE_FLAGS } from '@documenso/lib/constants/feature-flags';
 import PostHogServerClient from '@documenso/lib/server-only/feature-flags/get-post-hog-server-client';
 
+import { NEXT_PUBLIC_MARKETING_URL, NEXT_PUBLIC_WEBAPP_URL } from '../../constants/app';
 import { extractDistinctUserId, mapJwtToFlagProperties } from './get';
 
 /**
  * Get all the evaluated feature flags based on the current user if possible.
  */
 export default async function handlerFeatureFlagAll(req: Request) {
-  const NEXT_PUBLIC_WEBAPP_URL = env('NEXT_PUBLIC_WEBAPP_URL');
-  const NEXT_PUBLIC_MARKETING_URL = env('NEXT_PUBLIC_MARKETING_URL');
-
   const requestHeaders = Object.fromEntries(req.headers.entries());
 
   const nextReq = new NextRequest(req, {
@@ -42,11 +39,11 @@ export default async function handlerFeatureFlagAll(req: Request) {
   const origin = req.headers.get('origin');
 
   if (origin) {
-    if (origin.startsWith(NEXT_PUBLIC_WEBAPP_URL ?? 'http://localhost:3000')) {
+    if (origin.startsWith(NEXT_PUBLIC_WEBAPP_URL() ?? 'http://localhost:3000')) {
       res.headers.set('Access-Control-Allow-Origin', origin);
     }
 
-    if (origin.startsWith(NEXT_PUBLIC_MARKETING_URL ?? 'http://localhost:3001')) {
+    if (origin.startsWith(NEXT_PUBLIC_MARKETING_URL() ?? 'http://localhost:3001')) {
       res.headers.set('Access-Control-Allow-Origin', origin);
     }
   }
