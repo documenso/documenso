@@ -132,6 +132,9 @@ export const SigningForm = ({ document, recipient, fields }: SigningFormProps) =
                   <CardContent className="p-0">
                     <SignaturePad
                       className="h-44 w-full"
+                      containerClassName={
+                        isSubmitting ? 'pointer-events-none opacity-50' : undefined
+                      }
                       defaultValue={signature ?? undefined}
                       onChange={(value) => {
                         setSignature(value);

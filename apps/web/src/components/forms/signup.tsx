@@ -172,7 +172,10 @@ export const SignUpForm = ({ className, isGoogleSSOEnabled }: SignUpFormProps) =
                 <FormControl>
                   <SignaturePad
                     className="h-36 w-full"
-                    containerClassName="mt-2 rounded-lg border bg-background"
+                    containerClassName={cn(
+                      'mt-2 rounded-lg border bg-background',
+                      isSubmitting ? 'pointer-events-none opacity-50' : null,
+                    )}
                     onChange={(v) => onChange(v ?? '')}
                   />
                 </FormControl>
