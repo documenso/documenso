@@ -15,6 +15,7 @@ export type SignDialogProps = {
   isSubmitting: boolean;
   document: Document;
   fields: Field[];
+  fieldsValidated: () => void | Promise<void>;
   onSignatureComplete: () => void | Promise<void>;
 };
 
@@ -22,6 +23,7 @@ export const SignDialog = ({
   isSubmitting,
   document,
   fields,
+  fieldsValidated,
   onSignatureComplete,
 }: SignDialogProps) => {
   const [showDialog, setShowDialog] = useState(false);
@@ -29,21 +31,21 @@ export const SignDialog = ({
   const isComplete = fields.every((field) => field.inserted);
 
   return (
-    <Dialog open={showDialog} onOpenChange={setShowDialog}>
+    <Dialog open={showDialog && isComplete} onOpenChange={setShowDialog}>
       <DialogTrigger asChild>
         <Button
           className="w-full"
           type="button"
           size="lg"
-          disabled={!isComplete}
+          onClick={fieldsValidated}
           loading={isSubmitting}
         >
-          Complete
+          {isComplete ? 'Complete' : 'Next field'}
         </Button>
       </DialogTrigger>
       <DialogContent>
         <div className="text-center">
-          <div className="text-xl font-semibold text-neutral-800">Sign Document</div>
+          <div className="text-foreground text-xl font-semibold">Sign Document</div>
           <div className="text-muted-foreground mx-auto w-4/5 py-2 text-center">
             You are about to finish signing "{truncatedTitle}". Are you sure?
           </div>

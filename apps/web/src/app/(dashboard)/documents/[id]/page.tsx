@@ -3,10 +3,12 @@ import { redirect } from 'next/navigation';
 
 import { ChevronLeft, Users2 } from 'lucide-react';
 
+import { DOCUMENSO_ENCRYPTION_KEY } from '@documenso/lib/constants/crypto';
 import { getRequiredServerComponentSession } from '@documenso/lib/next-auth/get-server-component-session';
 import { getDocumentById } from '@documenso/lib/server-only/document/get-document-by-id';
 import { getFieldsForDocument } from '@documenso/lib/server-only/field/get-fields-for-document';
 import { getRecipientsForDocument } from '@documenso/lib/server-only/recipient/get-recipients-for-document';
+import { symmetricDecrypt } from '@documenso/lib/universal/crypto';
 import { DocumentStatus as InternalDocumentStatus } from '@documenso/prisma/client';
 import { LazyPDFViewer } from '@documenso/ui/primitives/lazy-pdf-viewer';
 
@@ -40,7 +42,24 @@ export default async function DocumentPage({ params }: DocumentPageProps) {
     redirect('/documents');
   }
 
-  const { documentData } = document;
+  const { documentData, documentMeta } = document;
+
+  if (documentMeta?.password) {
+    const key = DOCUMENSO_ENCRYPTION_KEY;
+
+    if (!key) {
+      throw new Error('Missing DOCUMENSO_ENCRYPTION_KEY');
+    }
+
+    const securePassword = Buffer.from(
+      symmetricDecrypt({
+        key,
+        data: documentMeta.password,
+      }),
+    ).toString('utf-8');
+
+    documentMeta.password = securePassword;
+  }
 
   const [recipients, fields] = await Promise.all([
     getRecipientsForDocument({
@@ -83,6 +102,7 @@ export default async function DocumentPage({ params }: DocumentPageProps) {
           className="mt-8"
           document={document}
           user={user}
+          documentMeta={documentMeta}
           recipients={recipients}
           fields={fields}
           documentData={documentData}
@@ -91,7 +111,12 @@ export default async function DocumentPage({ params }: DocumentPageProps) {
 
       {document.status === InternalDocumentStatus.COMPLETED && (
         <div className="mx-auto mt-12 max-w-2xl">
-          <LazyPDFViewer key={documentData.id} documentData={documentData} />
+          <LazyPDFViewer
+            document={document}
+            key={documentData.id}
+            documentMeta={documentMeta}
+            documentData={documentData}
+          />
         </div>
       )}
     </div>

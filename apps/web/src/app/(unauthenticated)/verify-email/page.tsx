@@ -1,8 +1,13 @@
+import type { Metadata } from 'next';
 import Link from 'next/link';
 
 import { XCircle } from 'lucide-react';
 
 import { Button } from '@documenso/ui/primitives/button';
+
+export const metadata: Metadata = {
+  title: 'Verify Email',
+};
 
 export default function EmailVerificationWithoutTokenPage() {
   return (

@@ -7,6 +7,9 @@ import { SigningStatus } from '@documenso/prisma/client';
 import { ExtendedDocumentStatus } from '@documenso/prisma/types/extended-document-status';
 
 import type { FindResultSet } from '../../types/find-result-set';
+import { maskRecipientTokensForDocument } from '../../utils/mask-recipient-tokens-for-document';
+
+export type PeriodSelectorValue = '' | '7d' | '14d' | '30d';
 
 export type FindDocumentsOptions = {
   userId: number;
@@ -18,7 +21,7 @@ export type FindDocumentsOptions = {
     column: keyof Omit<Document, 'document'>;
     direction: 'asc' | 'desc';
   };
-  period?: '' | '7d' | '14d' | '30d';
+  period?: PeriodSelectorValue;
 };
 
 export const findDocuments = async ({
@@ -173,8 +176,15 @@ export const findDocuments = async ({
     }),
   ]);
 
+  const maskedData = data.map((document) =>
+    maskRecipientTokensForDocument({
+      document,
+      user,
+    }),
+  );
+
   return {
-    data,
+    data: maskedData,
     count,
     currentPage: Math.max(page, 1),
     perPage,

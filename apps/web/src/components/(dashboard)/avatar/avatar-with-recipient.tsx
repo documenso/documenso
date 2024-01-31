@@ -6,6 +6,7 @@ import { useCopyToClipboard } from '@documenso/lib/client-only/hooks/use-copy-to
 import { getRecipientType } from '@documenso/lib/client-only/recipient-type';
 import { recipientAbbreviation } from '@documenso/lib/utils/recipient-formatter';
 import type { Recipient } from '@documenso/prisma/client';
+import { cn } from '@documenso/ui/lib/utils';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
 import { StackAvatar } from './stack-avatar';
@@ -19,6 +20,10 @@ export function AvatarWithRecipient({ recipient }: AvatarWithRecipientProps) {
   const { toast } = useToast();
 
   const onRecipientClick = () => {
+    if (!recipient.token) {
+      return;
+    }
+
     void copy(`${process.env.NEXT_PUBLIC_WEBAPP_URL}/sign/${recipient.token}`).then(() => {
       toast({
         title: 'Copied to clipboard',
@@ -28,19 +33,22 @@ export function AvatarWithRecipient({ recipient }: AvatarWithRecipientProps) {
   };
 
   return (
-    <div className="my-1 flex cursor-pointer items-center gap-2" onClick={onRecipientClick}>
+    <div
+      className={cn('my-1 flex items-center gap-2', {
+        'cursor-pointer hover:underline': recipient.token,
+      })}
+      role={recipient.token ? 'button' : undefined}
+      title={recipient.token && 'Click to copy signing link for sending to recipient'}
+      onClick={onRecipientClick}
+    >
       <StackAvatar
         first={true}
         key={recipient.id}
         type={getRecipientType(recipient)}
         fallbackText={recipientAbbreviation(recipient)}
       />
-      <span
-        className="text-muted-foreground text-sm hover:underline"
-        title="Click to copy signing link for sending to recipient"
-      >
-        {recipient.email}
-      </span>
+
+      <span className="text-muted-foreground text-sm">{recipient.email}</span>
     </div>
   );
 }

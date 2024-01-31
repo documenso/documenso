@@ -1,4 +1,10 @@
+import type { Metadata } from 'next';
+
 import { SinglePlayerClient } from './client';
+
+export const metadata: Metadata = {
+  title: 'Singleplayer',
+};
 
 export const revalidate = 0;
 
