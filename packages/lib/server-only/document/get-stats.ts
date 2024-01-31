@@ -1,14 +1,31 @@
+import { DateTime } from 'luxon';
+
 import { prisma } from '@documenso/prisma';
-import type { User } from '@documenso/prisma/client';
+import type { Prisma, User } from '@documenso/prisma/client';
 import { SigningStatus } from '@documenso/prisma/client';
 import { isExtendedDocumentStatus } from '@documenso/prisma/guards/is-extended-document-status';
 import { ExtendedDocumentStatus } from '@documenso/prisma/types/extended-document-status';
 
+import type { PeriodSelectorValue } from './find-documents';
+
 export type GetStatsInput = {
   user: User;
+  period?: PeriodSelectorValue;
 };
 
-export const getStats = async ({ user }: GetStatsInput) => {
+export const getStats = async ({ user, period }: GetStatsInput) => {
+  let createdAt: Prisma.DocumentWhereInput['createdAt'];
+
+  if (period) {
+    const daysAgo = parseInt(period.replace(/d$/, ''), 10);
+
+    const startOfPeriod = DateTime.now().minus({ days: daysAgo }).startOf('day');
+
+    createdAt = {
+      gte: startOfPeriod.toJSDate(),
+    };
+  }
+
   const [ownerCounts, notSignedCounts, hasSignedCounts] = await Promise.all([
     prisma.document.groupBy({
       by: ['status'],
@@ -17,6 +34,7 @@ export const getStats = async ({ user }: GetStatsInput) => {
       },
       where: {
         userId: user.id,
+        createdAt,
         deletedAt: null,
       },
     }),
@@ -33,6 +51,7 @@ export const getStats = async ({ user }: GetStatsInput) => {
             signingStatus: SigningStatus.NOT_SIGNED,
           },
         },
+        createdAt,
         deletedAt: null,
       },
     }),
@@ -42,6 +61,7 @@ export const getStats = async ({ user }: GetStatsInput) => {
         _all: true,
       },
       where: {
+        createdAt,
         User: {
           email: {
             not: user.email,
