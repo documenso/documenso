@@ -86,7 +86,7 @@ export const SignatureField = ({ field, recipient }: SignatureFieldProps) => {
         token: recipient.token,
         fieldId: field.id,
         value,
-        isBase64: true,
+        isBase64: typeof value === 'string' && value.startsWith('data:image/png;base64,'),
       });
 
       if (source === 'local' && !providedSignature) {

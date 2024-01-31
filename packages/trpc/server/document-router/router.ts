@@ -273,7 +273,6 @@ export const documentRouter = router({
           userId: ctx.user.id,
         });
       } catch (err) {
-        console.log(err);
         throw new TRPCError({
           code: 'BAD_REQUEST',
           message: 'We are unable to duplicate this document. Please try again later.',

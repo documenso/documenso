@@ -16,12 +16,16 @@ const DPI = 2;
 export type SignaturePadProps = Omit<HTMLAttributes<HTMLCanvasElement>, 'onChange'> & {
   onChange?: (_signatureDataUrl: string | null) => void;
   containerClassName?: string;
+  clearSignatureClassName?: string;
+  undoSignatureClassName?: string;
 };
 
 export const SignaturePad = ({
   className,
   containerClassName,
   defaultValue,
+  clearSignatureClassName,
+  undoSignatureClassName,
   onChange,
   ...props
 }: SignaturePadProps) => {
@@ -227,7 +231,7 @@ export const SignaturePad = ({
         {...props}
       />
 
-      <div className="absolute bottom-4 right-4 flex gap-2">
+      <div className={cn('absolute bottom-4 right-4', clearSignatureClassName)}>
         <button
           type="button"
           className="focus-visible:ring-ring ring-offset-background text-muted-foreground/60 hover:text-muted-foreground rounded-full p-0 text-xs focus-visible:outline-none focus-visible:ring-2"
@@ -238,7 +242,7 @@ export const SignaturePad = ({
       </div>
 
       {lines.length > 0 && (
-        <div className="absolute bottom-4 left-4 flex gap-2">
+        <div className={cn('absolute bottom-4 left-4 flex gap-2', undoSignatureClassName)}>
           <button
             type="button"
             title="undo"

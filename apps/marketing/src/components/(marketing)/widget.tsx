@@ -1,7 +1,7 @@
 'use client';
 
-import type { HTMLAttributes, KeyboardEvent } from 'react';
 import { useMemo, useState } from 'react';
+import type { HTMLAttributes, KeyboardEvent } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { AnimatePresence, motion } from 'framer-motion';
@@ -355,6 +355,7 @@ export const Widget = ({ className, children, ...props }: WidgetProps) => {
                 <div
                   className="absolute inset-x-0 bottom-0 flex cursor-auto items-center justify-between px-4 pb-2"
                   onClick={(e) => e.stopPropagation()}
+                  onKeyDown={(e) => e.stopPropagation()}
                 >
                   <Input
                     id="signatureText"
@@ -392,10 +393,11 @@ export const Widget = ({ className, children, ...props }: WidgetProps) => {
           </DialogHeader>
 
           <DialogDescription>
-            By signing you signal your support of Documenso's mission in a <br></br>
-            <strong>non-legally binding, but heartfelt way</strong>. <br></br>
-            <br></br>You also unlock the option to purchase the early supporter plan including
-            everything we build this year for fixed price.
+            By signing you signal your support of Documenso's mission in a <br />
+            <strong>non-legally binding, but heartfelt way</strong>. <br />
+            <br />
+            You also unlock the option to purchase the early supporter plan including everything we
+            build this year for fixed price.
           </DialogDescription>
 
           <SignaturePad
