@@ -70,6 +70,7 @@ export const ZSendDocumentMutationSchema = z.object({
     message: z.string(),
     timezone: z.string(),
     dateFormat: z.string(),
+    redirectUrl: z.string().optional(),
   }),
 });
 

@@ -216,13 +216,14 @@ export const documentRouter = router({
       try {
         const { documentId, meta } = input;
 
-        if (meta.message || meta.subject || meta.timezone || meta.dateFormat) {
+        if (meta.message || meta.subject || meta.timezone || meta.dateFormat || meta.redirectUrl) {
           await upsertDocumentMeta({
             documentId,
             subject: meta.subject,
             message: meta.message,
             dateFormat: meta.dateFormat,
             timezone: meta.timezone,
+            redirectUrl: meta.redirectUrl,
             userId: ctx.user.id,
           });
         }

@@ -9,6 +9,7 @@ export const ZAddSubjectFormSchema = z.object({
     message: z.string(),
     timezone: z.string().optional().default(DEFAULT_DOCUMENT_TIME_ZONE),
     dateFormat: z.string().optional().default(DEFAULT_DOCUMENT_DATE_FORMAT),
+    redirectUrl: z.string().optional(),
   }),
 });
 

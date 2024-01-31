@@ -149,7 +149,7 @@ export const EditDocumentForm = ({
   };
 
   const onAddSubjectFormSubmit = async (data: TAddSubjectFormSchema) => {
-    const { subject, message, timezone, dateFormat } = data.meta;
+    const { subject, message, timezone, dateFormat, redirectUrl } = data.meta;
 
     try {
       await sendDocument({
@@ -157,8 +157,9 @@ export const EditDocumentForm = ({
         meta: {
           subject,
           message,
-          timezone,
           dateFormat,
+          timezone,
+          redirectUrl,
         },
       });
 

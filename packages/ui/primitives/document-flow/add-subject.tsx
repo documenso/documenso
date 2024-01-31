@@ -60,7 +60,6 @@ export const AddSubjectFormPartial = ({
     register,
     handleSubmit,
     formState: { errors, isSubmitting, touchedFields },
-    getValues,
     setValue,
   } = useForm<TAddSubjectFormSchema>({
     defaultValues: {
@@ -69,6 +68,7 @@ export const AddSubjectFormPartial = ({
         message: document.documentMeta?.message ?? '',
         timezone: document.documentMeta?.timezone ?? DEFAULT_DOCUMENT_TIME_ZONE,
         dateFormat: document.documentMeta?.dateFormat ?? DEFAULT_DOCUMENT_DATE_FORMAT,
+        redirectUrl: document.documentMeta?.redirectUrl ?? '',
       },
     },
   });
@@ -213,6 +213,28 @@ export const AddSubjectFormPartial = ({
                           />
                         )}
                       />
+                    </div>
+
+                    <div className="flex flex-col">
+                      <div className="flex flex-col gap-y-4">
+                        <div>
+                          <Label htmlFor="redirectUrl">
+                            Title
+                            <span className="text-destructive ml-1 inline-block font-medium">
+                              *
+                            </span>
+                          </Label>
+
+                          <Input
+                            id="redirectUrl"
+                            className="bg-background my-2"
+                            disabled={isSubmitting}
+                            {...register('meta.redirectUrl')}
+                          />
+
+                          <FormErrorMessage className="mt-2" error={errors.meta} />
+                        </div>
+                      </div>
                     </div>
                   </AccordionContent>
                 </AccordionItem>
