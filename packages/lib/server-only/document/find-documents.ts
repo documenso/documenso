@@ -9,6 +9,8 @@ import { ExtendedDocumentStatus } from '@documenso/prisma/types/extended-documen
 import type { FindResultSet } from '../../types/find-result-set';
 import { maskRecipientTokensForDocument } from '../../utils/mask-recipient-tokens-for-document';
 
+export type PeriodSelectorValue = '' | '7d' | '14d' | '30d';
+
 export type FindDocumentsOptions = {
   userId: number;
   term?: string;
@@ -19,7 +21,7 @@ export type FindDocumentsOptions = {
     column: keyof Omit<Document, 'document'>;
     direction: 'asc' | 'desc';
   };
-  period?: '' | '7d' | '14d' | '30d';
+  period?: PeriodSelectorValue;
 };
 
 export const findDocuments = async ({
