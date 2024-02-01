@@ -63,18 +63,6 @@ export const findDocuments = async ({
           Recipient: {
             some: {
               email: user.email,
-              role: {
-                not: RecipientRole.CC,
-              },
-            },
-          },
-        },
-        {
-          status: ExtendedDocumentStatus.COMPLETED,
-          Recipient: {
-            some: {
-              email: user.email,
-              role: RecipientRole.CC,
             },
           },
         },

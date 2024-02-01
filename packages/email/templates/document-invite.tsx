@@ -1,4 +1,5 @@
-import { RecipientRole } from '@documenso/prisma/client';
+import { RECIPIENT_ROLES_DESCRIPTION } from '@documenso/lib/constants/recipient-roles';
+import type { RecipientRole } from '@documenso/prisma/client';
 import config from '@documenso/tailwind-config';
 
 import {
@@ -32,15 +33,8 @@ export const DocumentInviteEmailTemplate = ({
   customBody,
   role,
 }: DocumentInviteEmailTemplateProps) => {
-  let action = 'sign';
+  const action = RECIPIENT_ROLES_DESCRIPTION[role].actionVerb.toLowerCase();
 
-  if (role === RecipientRole.VIEWER) {
-    action = 'view';
-  }
-
-  if (role === RecipientRole.APPROVER) {
-    action = 'approve';
-  }
   const previewText = `${inviterName} has invited you to ${action} ${documentName}`;
 
   const getAssetUrl = (path: string) => {
@@ -76,6 +70,7 @@ export const DocumentInviteEmailTemplate = ({
                   documentName={documentName}
                   signDocumentLink={signDocumentLink}
                   assetBaseUrl={assetBaseUrl}
+                  role={role}
                 />
               </Section>
             </Container>

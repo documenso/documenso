@@ -8,6 +8,8 @@ import { renderCustomEmailTemplate } from '@documenso/lib/utils/render-custom-em
 import { prisma } from '@documenso/prisma';
 import { DocumentStatus, RecipientRole, SigningStatus } from '@documenso/prisma/client';
 
+import { RECIPIENT_ROLES_DESCRIPTION } from '../../constants/recipient-roles';
+
 export type ResendDocumentOptions = {
   documentId: number;
   userId: number;
@@ -84,6 +86,8 @@ export const resendDocument = async ({ documentId, userId, recipients }: ResendD
         role: recipient.role,
       });
 
+      const { actionVerb } = RECIPIENT_ROLES_DESCRIPTION[recipient.role];
+
       await mailer.sendMail({
         to: {
           address: email,
@@ -95,7 +99,7 @@ export const resendDocument = async ({ documentId, userId, recipients }: ResendD
         },
         subject: customEmail?.subject
           ? renderCustomEmailTemplate(customEmail.subject, customEmailTemplate)
-          : 'Please sign this document',
+          : `Please ${actionVerb.toLowerCase()} this document`,
         html: render(template),
         text: render(template, { plainText: true }),
       });

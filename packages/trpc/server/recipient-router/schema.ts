@@ -24,9 +24,7 @@ export const ZAddSignersMutationSchema = z
     { message: 'Signers must have unique emails', path: ['signers__root'] },
   );
 
-export type TAddSignersMutationSchema = z.infer<typeof ZAddSignersMutationSchema> & {
-  role: RecipientRole;
-};
+export type TAddSignersMutationSchema = z.infer<typeof ZAddSignersMutationSchema>;
 
 export const ZAddTemplateSignersMutationSchema = z
   .object({
