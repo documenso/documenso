@@ -1,12 +1,9 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
-
 import type { Prisma } from '@prisma/client';
 import { createPortal } from 'react-dom';
-import { Rnd } from 'react-rnd';
 
-import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
+import { useFieldPageCoords } from '@documenso/lib/client-only/hooks/use-field-page-coords';
 
 import { cn } from '../../lib/utils';
 import { Card, CardContent } from '../card';
@@ -18,59 +15,20 @@ export type ShowFieldItemProps = {
 };
 
 export const ShowFieldItem = ({ field, recipients }: ShowFieldItemProps) => {
-  const [coords, setCoords] = useState({
-    pageX: Number(field.positionX),
-    pageY: Number(field.positionY),
-    pageHeight: Number(field.height),
-    pageWidth: Number(field.width),
-  });
+  const coords = useFieldPageCoords(field);
 
   const signerEmail =
     recipients.find((recipient) => recipient.id === field.recipientId)?.email ?? '';
 
-  const calculateCoords = useCallback(() => {
-    const $page = document.querySelector<HTMLElement>(
-      `${PDF_VIEWER_PAGE_SELECTOR}[data-page-number="${field.page}"]`,
-    );
-
-    if (!$page) {
-      return;
-    }
-
-    const { height, width } = $page.getBoundingClientRect();
-
-    const top = $page.getBoundingClientRect().top + window.scrollY;
-    const left = $page.getBoundingClientRect().left + window.scrollX;
-
-    const pageX = (Number(field.positionX) / 100) * width + left;
-    const pageY = (Number(field.positionY) / 100) * height + top;
-
-    const pageHeight = (Number(field.height) / 100) * height;
-    const pageWidth = (Number(field.width) / 100) * width;
-
-    setCoords({
-      pageX: pageX,
-      pageY: pageY,
-      pageHeight: pageHeight,
-      pageWidth: pageWidth,
-    });
-  }, [field.page, field.positionX, field.positionY, field.height, field.width]);
-
-  useEffect(() => {
-    calculateCoords();
-  }, [calculateCoords]);
-
   return createPortal(
-    <Rnd
-      key={coords.pageX + coords.pageY + coords.pageHeight + coords.pageWidth}
-      className={cn('pointer-events-none z-10 opacity-75')}
-      default={{
-        x: coords.pageX,
-        y: coords.pageY,
-        height: coords.pageHeight,
-        width: coords.pageWidth,
+    <div
+      className={cn('pointer-events-none absolute z-10 opacity-75')}
+      style={{
+        top: `${coords.y}px`,
+        left: `${coords.x}px`,
+        height: `${coords.height}px`,
+        width: `${coords.width}px`,
       }}
-      bounds={`${PDF_VIEWER_PAGE_SELECTOR}[data-page-number="${field.page}"]`}
     >
       <Card className={cn('bg-background h-full w-full')}>
         <CardContent
@@ -85,7 +43,7 @@ export const ShowFieldItem = ({ field, recipients }: ShowFieldItemProps) => {
           </p>
         </CardContent>
       </Card>
-    </Rnd>,
+    </div>,
     document.body,
   );
 };
