@@ -209,6 +209,13 @@ enum SigningStatus {
   SIGNED
 }
 
+enum RecipientRole {
+  CC
+  SIGNER
+  VIEWER
+  APPROVER
+}
+
 model Recipient {
   id            Int           @id @default(autoincrement())
   documentId    Int?
@@ -218,6 +225,7 @@ model Recipient {
   token         String
   expired       DateTime?
   signedAt      DateTime?
+  role          RecipientRole @default(SIGNER)
   readStatus    ReadStatus    @default(NOT_OPENED)
   signingStatus SigningStatus @default(NOT_SIGNED)
   sendStatus    SendStatus    @default(NOT_SENT)

@@ -5,9 +5,11 @@ import { useState } from 'react';
 import Link from 'next/link';
 
 import {
+  CheckCircle,
   Copy,
   Download,
   Edit,
+  EyeIcon,
   Loader,
   MoreHorizontal,
   Pencil,
@@ -19,7 +21,7 @@ import { useSession } from 'next-auth/react';
 
 import { downloadPDF } from '@documenso/lib/client-only/download-pdf';
 import type { Document, Recipient, User } from '@documenso/prisma/client';
-import { DocumentStatus } from '@documenso/prisma/client';
+import { DocumentStatus, RecipientRole } from '@documenso/prisma/client';
 import type { DocumentWithData } from '@documenso/prisma/types/document-with-data';
 import { trpc as trpcClient } from '@documenso/trpc/client';
 import { DocumentShareButton } from '@documenso/ui/components/document/document-share-button';
@@ -105,12 +107,32 @@ export const DataTableActionDropdown = ({ row }: DataTableActionDropdownProps) =
       <DropdownMenuContent className="w-52" align="start" forceMount>
         <DropdownMenuLabel>Action</DropdownMenuLabel>
 
-        <DropdownMenuItem disabled={!recipient || isComplete} asChild>
-          <Link href={`/sign/${recipient?.token}`}>
-            <Pencil className="mr-2 h-4 w-4" />
-            Sign
-          </Link>
-        </DropdownMenuItem>
+        {recipient?.role !== RecipientRole.CC && (
+          <DropdownMenuItem disabled={!recipient || isComplete} asChild>
+            <Link href={`/sign/${recipient?.token}`}>
+              {recipient?.role === RecipientRole.VIEWER && (
+                <>
+                  <EyeIcon className="mr-2 h-4 w-4" />
+                  View
+                </>
+              )}
+
+              {recipient?.role === RecipientRole.SIGNER && (
+                <>
+                  <Pencil className="mr-2 h-4 w-4" />
+                  Sign
+                </>
+              )}
+
+              {recipient?.role === RecipientRole.APPROVER && (
+                <>
+                  <CheckCircle className="mr-2 h-4 w-4" />
+                  Approve
+                </>
+              )}
+            </Link>
+          </DropdownMenuItem>
+        )}
 
         <DropdownMenuItem disabled={!isOwner || isComplete} asChild>
           <Link href={`/documents/${row.id}`}>
