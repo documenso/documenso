@@ -1,5 +1,6 @@
 import { TRPCError } from '@trpc/server';
 
+import { getServerLimits } from '@documenso/ee/server-only/limits/server';
 import { createDocumentFromTemplate } from '@documenso/lib/server-only/template/create-document-from-template';
 import { createTemplate } from '@documenso/lib/server-only/template/create-template';
 import { deleteTemplate } from '@documenso/lib/server-only/template/delete-template';
@@ -40,6 +41,13 @@ export const templateRouter = router({
     .mutation(async ({ input, ctx }) => {
       try {
         const { templateId } = input;
+
+        const limits = await getServerLimits({ email: ctx.user.email });
+
+        if (limits.remaining.documents === 0) {
+          throw new Error('You have reached your document limit.');
+          return;
+        }
 
         return await createDocumentFromTemplate({
           templateId,
