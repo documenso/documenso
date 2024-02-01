@@ -1,8 +1,6 @@
 'use client';
 
-import React, { useCallback, useState } from 'react';
-
-import Script from 'next/script';
+import React, { useCallback, useEffect, useState } from 'react';
 
 import { FaDropbox } from 'react-icons/fa';
 
@@ -67,19 +65,26 @@ const DropboxPicker: React.FC<dropFunction> = ({ onDrop }) => {
     }
   }, [Dropbox]);
 
-  const dropBoxAppKey = process.env.NEXT_PRIVATE_DROPBOX_APP_KEY ?? '';
+  useEffect(() => {
+    const handleScriptLoad = () => {
+      setDropbox(window.Dropbox);
+    };
+    const script = document.createElement('script');
+    script.type = 'text/javascript';
+    script.src = 'https://www.dropbox.com/static/api/2/dropins.js';
+    script.id = process.env.NEXT_PRIVATE_DROPBOX_APP_KEY ?? '';
+    script.async = true;
+    script.onload = handleScriptLoad;
+
+    document.body.appendChild(script);
+
+    return () => {
+      document.body.removeChild(script);
+    };
+  }, []);
 
   return (
     <>
-      <Script
-        type="text/javascript"
-        src="https://www.dropbox.com/static/api/2/dropins.js"
-        id="dropboxjs"
-        data-app-key={dropBoxAppKey}
-        onLoad={() => {
-          setDropbox(window.Dropbox);
-        }}
-      />
       <Button
         variant="ghost"
         className="flex w-full justify-start"
