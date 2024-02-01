@@ -29,6 +29,7 @@ import {
   DocumentFlowFormContainerHeader,
   DocumentFlowFormContainerStep,
 } from './document-flow-root';
+import { ShowFieldItem } from './show-field-item';
 import type { DocumentFlowStep } from './types';
 
 const ROLE_ICONS: Record<RecipientRole, JSX.Element> = {
@@ -50,7 +51,7 @@ export const AddSignersFormPartial = ({
   documentFlow,
   recipients,
   document,
-  fields: _fields,
+  fields,
   onSubmit,
 }: AddSignersFormProps) => {
   const { toast } = useToast();
@@ -147,6 +148,10 @@ export const AddSignersFormPartial = ({
       />
       <DocumentFlowFormContainerContent>
         <div className="flex w-full flex-col gap-y-4">
+          {fields.map((field, index) => (
+            <ShowFieldItem key={index} field={field} recipients={recipients} />
+          ))}
+
           <AnimatePresence>
             {signers.map((signer, index) => (
               <motion.div
