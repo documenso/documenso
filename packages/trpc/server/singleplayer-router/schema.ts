@@ -12,12 +12,14 @@ export const ZCreateSinglePlayerDocumentMutationSchema = z.object({
     email: z.string().email().min(1),
     name: z.string(),
     signature: z.string(),
+    custom: z.record(z.string()),
   }),
   fields: z.array(
     z.object({
       page: z.number(),
       type: z.nativeEnum(FieldType),
       positionX: z.number(),
+      customFieldValue: z.string(),
       positionY: z.number(),
       width: z.number(),
       height: z.number(),

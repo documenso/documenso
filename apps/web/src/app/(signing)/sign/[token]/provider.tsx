@@ -9,6 +9,8 @@ export type SigningContextValue = {
   setEmail: (_value: string) => void;
   signature: string | null;
   setSignature: (_value: string | null) => void;
+  customValue: Record<number, string> | null;
+  setCustomValue: (_value: Record<number, string> | null) => void;
 };
 
 const SigningContext = createContext<SigningContextValue | null>(null);
@@ -31,6 +33,7 @@ export interface SigningProviderProps {
   fullName?: string | null;
   email?: string | null;
   signature?: string | null;
+  customValue?: Record<number, string> | null;
   children: React.ReactNode;
 }
 
@@ -38,11 +41,13 @@ export const SigningProvider = ({
   fullName: initialFullName,
   email: initialEmail,
   signature: initialSignature,
+  customValue: intialCustomValue,
   children,
 }: SigningProviderProps) => {
   const [fullName, setFullName] = useState(initialFullName || '');
   const [email, setEmail] = useState(initialEmail || '');
   const [signature, setSignature] = useState(initialSignature || null);
+  const [customValue, setCustomValue] = useState(intialCustomValue || null);
 
   return (
     <SigningContext.Provider
@@ -53,6 +58,8 @@ export const SigningProvider = ({
         setEmail,
         signature,
         setSignature,
+        customValue,
+        setCustomValue,
       }}
     >
       {children}

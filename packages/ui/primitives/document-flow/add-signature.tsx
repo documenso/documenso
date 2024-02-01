@@ -85,6 +85,7 @@ export const AddSignatureFormPartial = ({
       name: '',
       email: '',
       signature: '',
+      custom: {},
     },
   });
 
@@ -154,6 +155,11 @@ export const AddSignatureFormPartial = ({
         customText: form.getValues('name'),
         inserted: true,
       }))
+      .with(FieldType.CUSTOM, () => ({
+        ...field,
+        customText: form.getValues(`custom.${field.customFieldValue}`),
+        inserted: true,
+      }))
       .with(FieldType.SIGNATURE, () => {
         const value = form.getValues('signature');
 
@@ -219,7 +225,10 @@ export const AddSignatureFormPartial = ({
       />
 
       <Form {...form}>
-        <fieldset className="flex h-full flex-col" disabled={form.formState.isSubmitting}>
+        <fieldset
+          className="flex h-full flex-col overflow-y-auto px-2"
+          disabled={form.formState.isSubmitting}
+        >
           <DocumentFlowFormContainerContent>
             <div className="space-y-4">
               <FormField
@@ -267,6 +276,36 @@ export const AddSignatureFormPartial = ({
                   )}
                 />
               )}
+              {fields.map((data) => {
+                if (data.customFieldValue !== '') {
+                  return (
+                    <FormField
+                      control={form.control}
+                      key={data.id}
+                      name={`custom.${data.customFieldValue}`}
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel required>{data.customFieldValue}</FormLabel>
+                          <FormControl>
+                            <Input
+                              className="bg-background"
+                              type="custom"
+                              {...field}
+                              onChange={(value) => {
+                                onFormValueChange(FieldType.CUSTOM);
+                                field.onChange(value);
+                              }}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  );
+                } else {
+                  return null;
+                }
+              })}
 
               {requireSignature && (
                 <FormField
@@ -330,7 +369,7 @@ export const AddSignatureFormPartial = ({
         <ElementVisible target={PDF_VIEWER_PAGE_SELECTOR}>
           {localFields.map((field) =>
             match(field.type)
-              .with(FieldType.DATE, FieldType.EMAIL, FieldType.NAME, () => {
+              .with(FieldType.DATE, FieldType.EMAIL, FieldType.NAME, FieldType.CUSTOM, () => {
                 return (
                   <SinglePlayerModeCustomTextField
                     onClick={insertField(field)}

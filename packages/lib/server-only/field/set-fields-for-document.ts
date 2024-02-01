@@ -10,6 +10,7 @@ export interface SetFieldsForDocumentOptions {
     type: FieldType;
     signerEmail: string;
     pageNumber: number;
+    customFieldValue: string;
     pageX: number;
     pageY: number;
     pageWidth: number;
@@ -81,6 +82,7 @@ export const setFieldsForDocument = async ({
           positionY: field.pageY,
           width: field.pageWidth,
           height: field.pageHeight,
+          customFieldValue: field.customFieldValue,
         },
         create: {
           type: field.type,
@@ -89,6 +91,7 @@ export const setFieldsForDocument = async ({
           positionY: field.pageY,
           width: field.pageWidth,
           height: field.pageHeight,
+          customFieldValue: field.customFieldValue,
           customText: '',
           inserted: false,
           Document: {
