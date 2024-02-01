@@ -11,6 +11,7 @@ import {
   Dialog,
   DialogContent,
   DialogDescription,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from '@documenso/ui/primitives/dialog';
@@ -119,15 +120,15 @@ export const ViewRecoveryCodesDialog = ({ open, onOpenChange }: ViewRecoveryCode
                     )}
                   />
 
-                  <div className="flex w-full items-center justify-between">
-                    <Button type="button" variant="ghost" onClick={() => onOpenChange(false)}>
+                  <DialogFooter>
+                    <Button type="button" variant="secondary" onClick={() => onOpenChange(false)}>
                       Cancel
                     </Button>
 
                     <Button type="submit" loading={isViewRecoveryCodesSubmitting}>
                       Continue
                     </Button>
-                  </div>
+                  </DialogFooter>
                 </form>
               </Form>
             );
