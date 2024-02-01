@@ -126,10 +126,11 @@ export const DocumentDropzone = ({
     maxSize: megabytesToBytes(50),
   });
 
-  const isPickerEnabled =
+  const isPickerEnabled = !!(
     process.env.NEXT_PRIVATE_GOOGLE_CLIENT_ID &&
     process.env.NEXT_PRIVATE_GOOGLE_API_KEY &&
-    process.env.NEXT_PRIVATE_DROPBOX_APP_KEY;
+    process.env.NEXT_PRIVATE_DROPBOX_APP_KEY
+  );
 
   return (
     <motion.div
