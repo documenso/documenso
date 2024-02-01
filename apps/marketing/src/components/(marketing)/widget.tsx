@@ -399,7 +399,7 @@ export const Widget = ({ className, children, ...props }: WidgetProps) => {
           </DialogDescription>
 
           <SignaturePad
-            containerClassName={isSubmitting ? 'pointer-events-none opacity-50' : undefined}
+            isDisabled={isSubmitting}
             className="aspect-video w-full rounded-md border"
             defaultValue={signatureDataUrl || ''}
             onChange={setDraftSignatureDataUrl}

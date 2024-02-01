@@ -16,6 +16,7 @@ const DPI = 2;
 export type SignaturePadProps = Omit<HTMLAttributes<HTMLCanvasElement>, 'onChange'> & {
   onChange?: (_signatureDataUrl: string | null) => void;
   containerClassName?: string;
+  isDisabled?: boolean;
 };
 
 export const SignaturePad = ({
@@ -23,6 +24,7 @@ export const SignaturePad = ({
   containerClassName,
   defaultValue,
   onChange,
+  isDisabled = false,
   ...props
 }: SignaturePadProps) => {
   const $el = useRef<HTMLCanvasElement>(null);
@@ -214,7 +216,13 @@ export const SignaturePad = ({
   }, [defaultValue]);
 
   return (
-    <div className={cn('relative block', containerClassName)}>
+    <div
+      className={cn(
+        'relative block',
+        containerClassName,
+        isDisabled ? 'pointer-events-none opacity-50' : null,
+      )}
+    >
       <canvas
         ref={$el}
         className={cn('relative block dark:invert', className)}
