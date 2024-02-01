@@ -217,11 +217,9 @@ export const SignaturePad = ({
 
   return (
     <div
-      className={cn(
-        'relative block',
-        containerClassName,
-        isDisabled ? 'pointer-events-none opacity-50' : null,
-      )}
+      className={cn('relative block', containerClassName, {
+        'pointer-events-none opacity-50': isDisabled,
+      })}
     >
       <canvas
         ref={$el}
