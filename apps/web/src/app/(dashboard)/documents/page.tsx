@@ -74,7 +74,7 @@ export default async function DocumentsPage({ searchParams = {} }: DocumentsPage
         <h1 className="text-4xl font-semibold">Documents</h1>
 
         <div className="-m-1 flex flex-wrap gap-x-4 gap-y-6 overflow-hidden p-1">
-          <Tabs defaultValue={status} className="overflow-x-auto">
+          <Tabs defaultValue={status} value={status} className="overflow-x-auto">
             <TabsList>
               {[
                 ExtendedDocumentStatus.INBOX,

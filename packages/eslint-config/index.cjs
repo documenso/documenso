@@ -57,6 +57,12 @@ module.exports = {
         },
       },
     ],
+    'prettier/prettier': [
+      'error',
+      {
+        endOfLine: 'auto',
+      },
+    ],
 
     // Safety with promises so we aren't running with scissors
     'no-promise-executor-return': 'error',
