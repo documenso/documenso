@@ -218,9 +218,9 @@ export const EditDocumentForm = ({
             <AddTitleFormPartial
               key={recipients.length}
               documentFlow={documentFlow.title}
+              document={document}
               recipients={recipients}
               fields={fields}
-              document={document}
               onSubmit={onAddTitleFormSubmit}
             />
 
