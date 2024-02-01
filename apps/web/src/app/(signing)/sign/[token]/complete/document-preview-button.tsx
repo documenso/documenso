@@ -30,7 +30,7 @@ export const DocumentPreviewButton = ({
         {...props}
       >
         <FileSearch className="mr-2 h-5 w-5" strokeWidth={1.7} />
-        View Document
+        View Original Document
       </Button>
 
       <DocumentDialog documentData={documentData} open={showDialog} onOpenChange={setShowDialog} />
