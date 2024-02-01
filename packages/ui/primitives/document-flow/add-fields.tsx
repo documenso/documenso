@@ -30,8 +30,7 @@ import {
   DocumentFlowFormContainerStep,
 } from './document-flow-root';
 import { FieldItem } from './field-item';
-import type { DocumentFlowStep } from './types';
-import { FRIENDLY_FIELD_TYPE } from './types';
+import { type DocumentFlowStep, FRIENDLY_FIELD_TYPE } from './types';
 
 const fontCaveat = Caveat({
   weight: ['500'],
