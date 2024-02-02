@@ -1,6 +1,11 @@
+import type { Metadata } from 'next';
 import Link from 'next/link';
 
 import { Button } from '@documenso/ui/primitives/button';
+
+export const metadata: Metadata = {
+  title: 'Forgot password',
+};
 
 export default function ForgotPasswordPage() {
   return (
