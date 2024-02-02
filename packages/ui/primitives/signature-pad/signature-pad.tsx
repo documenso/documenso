@@ -134,7 +134,6 @@ export const SignaturePad = ({
         });
 
         onChange?.($el.current.toDataURL());
-
         ctx.save();
       }
     }
@@ -193,6 +192,7 @@ export const SignaturePad = ({
         const pathData = new Path2D(getSvgPathFromStroke(getStroke(line, perfectFreehandOptions)));
         ctx?.fill(pathData);
       });
+      onChange?.($el.current.toDataURL());
     }
   };
 
