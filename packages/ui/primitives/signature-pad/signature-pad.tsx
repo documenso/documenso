@@ -219,7 +219,7 @@ export const SignaturePad = ({
 
       img.src = defaultValue;
     }
-  }, [defaultValue]);
+  }, []);
 
   return (
     <div
