@@ -2,6 +2,11 @@ import { z } from 'zod';
 
 import { ZCurrentPasswordSchema, ZPasswordSchema } from '../auth-router/schema';
 
+export const ZFindUserSecurityAuditLogsSchema = z.object({
+  page: z.number().optional(),
+  perPage: z.number().optional(),
+});
+
 export const ZRetrieveUserByIdQuerySchema = z.object({
   id: z.number().min(1),
 });
@@ -29,6 +34,7 @@ export const ZConfirmEmailMutationSchema = z.object({
   email: z.string().email().min(1),
 });
 
+export type TFindUserSecurityAuditLogsSchema = z.infer<typeof ZFindUserSecurityAuditLogsSchema>;
 export type TRetrieveUserByIdQuerySchema = z.infer<typeof ZRetrieveUserByIdQuerySchema>;
 export type TUpdateProfileMutationSchema = z.infer<typeof ZUpdateProfileMutationSchema>;
 export type TUpdatePasswordMutationSchema = z.infer<typeof ZUpdatePasswordMutationSchema>;
