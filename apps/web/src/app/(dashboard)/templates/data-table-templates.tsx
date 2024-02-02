@@ -2,13 +2,16 @@
 
 import { useState, useTransition } from 'react';
 
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
-import { Loader, Plus } from 'lucide-react';
+import { AlertTriangle, Loader, Plus } from 'lucide-react';
 
+import { useLimits } from '@documenso/ee/server-only/limits/provider/client';
 import { useUpdateSearchParams } from '@documenso/lib/client-only/hooks/use-update-search-params';
 import type { Template } from '@documenso/prisma/client';
 import { trpc } from '@documenso/trpc/react';
+import { Alert, AlertDescription, AlertTitle } from '@documenso/ui/primitives/alert';
 import { Button } from '@documenso/ui/primitives/button';
 import { DataTable } from '@documenso/ui/primitives/data-table';
 import { DataTablePagination } from '@documenso/ui/primitives/data-table-pagination';
@@ -35,6 +38,8 @@ export const TemplatesDataTable = ({
 }: TemplatesDataTableProps) => {
   const [isPending, startTransition] = useTransition();
   const updateSearchParams = useUpdateSearchParams();
+
+  const { remaining } = useLimits();
 
   const router = useRouter();
 
@@ -77,6 +82,19 @@ export const TemplatesDataTable = ({
 
   return (
     <div className="relative">
+      {remaining.documents === 0 && (
+        <Alert className="mb-4 mt-5">
+          <AlertTriangle className="h-4 w-4" />
+          <AlertTitle>Document Limit Exceeded!</AlertTitle>
+          <AlertDescription className="mt-2">
+            You have reached your document limit.{' '}
+            <Link className="underline underline-offset-4" href="/settings/billing">
+              Upgrade your account to continue!
+            </Link>
+          </AlertDescription>
+        </Alert>
+      )}
+
       <DataTable
         columns={[
           {
@@ -102,7 +120,7 @@ export const TemplatesDataTable = ({
               return (
                 <div className="flex items-center gap-x-4">
                   <Button
-                    disabled={isRowLoading}
+                    disabled={isRowLoading || remaining.documents === 0}
                     loading={isRowLoading}
                     onClick={async () => {
                       setLoadingStates((prev) => ({ ...prev, [row.original.id]: true }));

@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { Caveat } from 'next/font/google';
 
@@ -10,8 +10,10 @@ import { useFieldArray, useForm } from 'react-hook-form';
 import { getBoundingClientRect } from '@documenso/lib/client-only/get-bounding-client-rect';
 import { useDocumentElement } from '@documenso/lib/client-only/hooks/use-document-element';
 import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
+import { RECIPIENT_ROLES_DESCRIPTION } from '@documenso/lib/constants/recipient-roles';
 import { nanoid } from '@documenso/lib/universal/id';
 import type { Field, Recipient } from '@documenso/prisma/client';
+import { RecipientRole } from '@documenso/prisma/client';
 import { FieldType, SendStatus } from '@documenso/prisma/client';
 
 import { cn } from '../../lib/utils';
@@ -101,6 +103,12 @@ export const AddFieldsFormPartial = ({
   const [showRecipientsSelector, setShowRecipientsSelector] = useState(false);
 
   const hasSelectedSignerBeenSent = selectedSigner?.sendStatus === SendStatus.SENT;
+
+  const isFieldsDisabled =
+    !selectedSigner ||
+    hasSelectedSignerBeenSent ||
+    selectedSigner?.role === RecipientRole.VIEWER ||
+    selectedSigner?.role === RecipientRole.CC;
 
   const [isFieldWithinBounds, setIsFieldWithinBounds] = useState(false);
   const [coords, setCoords] = useState({
@@ -281,12 +289,28 @@ export const AddFieldsFormPartial = ({
     setSelectedSigner(recipients.find((r) => r.sendStatus !== SendStatus.SENT) ?? recipients[0]);
   }, [recipients]);
 
+  const recipientsByRole = useMemo(() => {
+    const recipientsByRole: Record<RecipientRole, Recipient[]> = {
+      CC: [],
+      VIEWER: [],
+      SIGNER: [],
+      APPROVER: [],
+    };
+
+    recipients.forEach((recipient) => {
+      recipientsByRole[recipient.role].push(recipient);
+    });
+
+    return recipientsByRole;
+  }, [recipients]);
+
   return (
     <>
       <DocumentFlowFormContainerHeader
         title={documentFlow.title}
         description={documentFlow.description}
       />
+
       <DocumentFlowFormContainerContent>
         <div className="flex flex-col">
           {selectedField && (
@@ -351,72 +375,94 @@ export const AddFieldsFormPartial = ({
               <PopoverContent className="p-0" align="start">
                 <Command>
                   <CommandInput />
+
                   <CommandEmpty>
                     <span className="text-muted-foreground inline-block px-4">
                       No recipient matching this description was found.
                     </span>
                   </CommandEmpty>
 
-                  <CommandGroup>
-                    {recipients.map((recipient, index) => (
-                      <CommandItem
-                        key={index}
-                        className={cn({
-                          'text-muted-foreground': recipient.sendStatus === SendStatus.SENT,
-                        })}
-                        onSelect={() => {
-                          setSelectedSigner(recipient);
-                          setShowRecipientsSelector(false);
-                        }}
-                      >
-                        {recipient.sendStatus !== SendStatus.SENT ? (
-                          <Check
-                            aria-hidden={recipient !== selectedSigner}
-                            className={cn('mr-2 h-4 w-4 flex-shrink-0', {
-                              'opacity-0': recipient !== selectedSigner,
-                              'opacity-100': recipient === selectedSigner,
-                            })}
-                          />
-                        ) : (
-                          <Tooltip>
-                            <TooltipTrigger>
-                              <Info className="mr-2 h-4 w-4" />
-                            </TooltipTrigger>
-                            <TooltipContent className="max-w-xs">
-                              This document has already been sent to this recipient. You can no
-                              longer edit this recipient.
-                            </TooltipContent>
-                          </Tooltip>
-                        )}
+                  {Object.entries(recipientsByRole).map(([role, recipients], roleIndex) => (
+                    <CommandGroup key={roleIndex}>
+                      <div className="text-muted-foreground mb-1 ml-2 mt-2 text-xs font-medium">
+                        {
+                          // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+                          RECIPIENT_ROLES_DESCRIPTION[role as RecipientRole].roleName
+                        }
+                      </div>
 
-                        {recipient.name && (
+                      {recipients.length === 0 && (
+                        <div
+                          key={`${role}-empty`}
+                          className="text-muted-foreground/80 px-4 pb-4 pt-2.5 text-center text-xs"
+                        >
+                          No recipients with this role
+                        </div>
+                      )}
+
+                      {recipients.map((recipient) => (
+                        <CommandItem
+                          key={recipient.id}
+                          className={cn('!rounded-2xl px-4 last:mb-1 [&:not(:first-child)]:mt-1', {
+                            'text-muted-foreground': recipient.sendStatus === SendStatus.SENT,
+                          })}
+                          onSelect={() => {
+                            setSelectedSigner(recipient);
+                            setShowRecipientsSelector(false);
+                          }}
+                        >
                           <span
-                            className="truncate"
-                            title={`${recipient.name} (${recipient.email})`}
+                            className={cn('text-foreground/70 truncate', {
+                              'text-foreground': recipient === selectedSigner,
+                            })}
                           >
-                            {recipient.name} ({recipient.email})
-                          </span>
-                        )}
+                            {recipient.name && (
+                              <span title={`${recipient.name} (${recipient.email})`}>
+                                {recipient.name} ({recipient.email})
+                              </span>
+                            )}
 
-                        {!recipient.name && (
-                          <span className="truncate" title={recipient.email}>
-                            {recipient.email}
+                            {!recipient.name && (
+                              <span title={recipient.email}>{recipient.email}</span>
+                            )}
                           </span>
-                        )}
-                      </CommandItem>
-                    ))}
-                  </CommandGroup>
+
+                          <div className="ml-auto flex items-center justify-center">
+                            {recipient.sendStatus !== SendStatus.SENT ? (
+                              <Check
+                                aria-hidden={recipient !== selectedSigner}
+                                className={cn('h-4 w-4 flex-shrink-0', {
+                                  'opacity-0': recipient !== selectedSigner,
+                                  'opacity-100': recipient === selectedSigner,
+                                })}
+                              />
+                            ) : (
+                              <Tooltip>
+                                <TooltipTrigger>
+                                  <Info className="mx-2 h-4 w-4" />
+                                </TooltipTrigger>
+
+                                <TooltipContent className="text-muted-foreground max-w-xs">
+                                  This document has already been sent to this recipient. You can no
+                                  longer edit this recipient.
+                                </TooltipContent>
+                              </Tooltip>
+                            )}
+                          </div>
+                        </CommandItem>
+                      ))}
+                    </CommandGroup>
+                  ))}
                 </Command>
               </PopoverContent>
             </Popover>
           )}
 
           <div className="-mx-2 flex-1 overflow-y-auto px-2">
-            <div className="grid grid-cols-2 gap-x-4 gap-y-8">
+            <fieldset disabled={isFieldsDisabled} className="grid grid-cols-2 gap-x-4 gap-y-8">
               <button
                 type="button"
                 className="group h-full w-full"
-                disabled={!selectedSigner || selectedSigner?.sendStatus === SendStatus.SENT}
                 onClick={() => setSelectedField(FieldType.SIGNATURE)}
                 onMouseDown={() => setSelectedField(FieldType.SIGNATURE)}
                 data-selected={selectedField === FieldType.SIGNATURE ? true : undefined}
@@ -440,7 +486,6 @@ export const AddFieldsFormPartial = ({
               <button
                 type="button"
                 className="group h-full w-full"
-                disabled={!selectedSigner || selectedSigner?.sendStatus === SendStatus.SENT}
                 onClick={() => setSelectedField(FieldType.EMAIL)}
                 onMouseDown={() => setSelectedField(FieldType.EMAIL)}
                 data-selected={selectedField === FieldType.EMAIL ? true : undefined}
@@ -463,7 +508,6 @@ export const AddFieldsFormPartial = ({
               <button
                 type="button"
                 className="group h-full w-full"
-                disabled={!selectedSigner || selectedSigner?.sendStatus === SendStatus.SENT}
                 onClick={() => setSelectedField(FieldType.NAME)}
                 onMouseDown={() => setSelectedField(FieldType.NAME)}
                 data-selected={selectedField === FieldType.NAME ? true : undefined}
@@ -486,7 +530,6 @@ export const AddFieldsFormPartial = ({
               <button
                 type="button"
                 className="group h-full w-full"
-                disabled={!selectedSigner || selectedSigner?.sendStatus === SendStatus.SENT}
                 onClick={() => setSelectedField(FieldType.DATE)}
                 onMouseDown={() => setSelectedField(FieldType.DATE)}
                 data-selected={selectedField === FieldType.DATE ? true : undefined}
@@ -505,7 +548,7 @@ export const AddFieldsFormPartial = ({
                   </CardContent>
                 </Card>
               </button>
-            </div>
+            </fieldset>
           </div>
         </div>
       </DocumentFlowFormContainerContent>

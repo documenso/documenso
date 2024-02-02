@@ -4,19 +4,20 @@ import React, { useId } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { AnimatePresence, motion } from 'framer-motion';
-import { Plus, Trash } from 'lucide-react';
+import { BadgeCheck, Copy, Eye, PencilLine, Plus, Trash } from 'lucide-react';
 import { Controller, useFieldArray, useForm } from 'react-hook-form';
 
 import { useLimits } from '@documenso/ee/server-only/limits/provider/client';
 import { nanoid } from '@documenso/lib/universal/id';
 import type { Field, Recipient } from '@documenso/prisma/client';
-import { DocumentStatus, SendStatus } from '@documenso/prisma/client';
+import { DocumentStatus, RecipientRole, SendStatus } from '@documenso/prisma/client';
 import type { DocumentWithData } from '@documenso/prisma/types/document-with-data';
 
 import { Button } from '../button';
 import { FormErrorMessage } from '../form/form-error-message';
 import { Input } from '../input';
 import { Label } from '../label';
+import { Select, SelectContent, SelectItem, SelectTrigger } from '../select';
 import { useStep } from '../stepper';
 import { useToast } from '../use-toast';
 import type { TAddSignersFormSchema } from './add-signers.types';
@@ -30,6 +31,13 @@ import {
 } from './document-flow-root';
 import { ShowFieldItem } from './show-field-item';
 import type { DocumentFlowStep } from './types';
+
+const ROLE_ICONS: Record<RecipientRole, JSX.Element> = {
+  SIGNER: <PencilLine className="h-4 w-4" />,
+  APPROVER: <BadgeCheck className="h-4 w-4" />,
+  CC: <Copy className="h-4 w-4" />,
+  VIEWER: <Eye className="h-4 w-4" />,
+};
 
 export type AddSignersFormProps = {
   documentFlow: DocumentFlowStep;
@@ -67,12 +75,14 @@ export const AddSignersFormPartial = ({
               formId: String(recipient.id),
               name: recipient.name,
               email: recipient.email,
+              role: recipient.role,
             }))
           : [
               {
                 formId: initialId,
                 name: '',
                 email: '',
+                role: RecipientRole.SIGNER,
               },
             ],
     },
@@ -104,6 +114,7 @@ export const AddSignersFormPartial = ({
       formId: nanoid(12),
       name: '',
       email: '',
+      role: RecipientRole.SIGNER,
     });
   };
 
@@ -185,6 +196,48 @@ export const AddSignersFormPartial = ({
                         onKeyDown={onKeyDown}
                         {...field}
                       />
+                    )}
+                  />
+                </div>
+
+                <div className="w-[60px]">
+                  <Controller
+                    control={control}
+                    name={`signers.${index}.role`}
+                    render={({ field: { value, onChange } }) => (
+                      <Select value={value} onValueChange={(x) => onChange(x)}>
+                        <SelectTrigger className="bg-background">{ROLE_ICONS[value]}</SelectTrigger>
+
+                        <SelectContent className="" align="end">
+                          <SelectItem value={RecipientRole.SIGNER}>
+                            <div className="flex items-center">
+                              <span className="mr-2">{ROLE_ICONS[RecipientRole.SIGNER]}</span>
+                              Signer
+                            </div>
+                          </SelectItem>
+
+                          <SelectItem value={RecipientRole.CC}>
+                            <div className="flex items-center">
+                              <span className="mr-2">{ROLE_ICONS[RecipientRole.CC]}</span>
+                              Receives copy
+                            </div>
+                          </SelectItem>
+
+                          <SelectItem value={RecipientRole.APPROVER}>
+                            <div className="flex items-center">
+                              <span className="mr-2">{ROLE_ICONS[RecipientRole.APPROVER]}</span>
+                              Approver
+                            </div>
+                          </SelectItem>
+
+                          <SelectItem value={RecipientRole.VIEWER}>
+                            <div className="flex items-center">
+                              <span className="mr-2">{ROLE_ICONS[RecipientRole.VIEWER]}</span>
+                              Viewer
+                            </div>
+                          </SelectItem>
+                        </SelectContent>
+                      </Select>
                     )}
                   />
                 </div>
