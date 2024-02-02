@@ -1,6 +1,7 @@
 import { useState } from 'react';
 
 import type { Document, Field } from '@documenso/prisma/client';
+import { RecipientRole } from '@documenso/prisma/client';
 import { Button } from '@documenso/ui/primitives/button';
 import {
   Dialog,
@@ -17,6 +18,7 @@ export type SignDialogProps = {
   fields: Field[];
   fieldsValidated: () => void | Promise<void>;
   onSignatureComplete: () => void | Promise<void>;
+  role: RecipientRole;
 };
 
 export const SignDialog = ({
@@ -25,6 +27,7 @@ export const SignDialog = ({
   fields,
   fieldsValidated,
   onSignatureComplete,
+  role,
 }: SignDialogProps) => {
   const [showDialog, setShowDialog] = useState(false);
   const truncatedTitle = truncateTitle(document.title);
@@ -45,9 +48,18 @@ export const SignDialog = ({
       </DialogTrigger>
       <DialogContent>
         <div className="text-center">
-          <div className="text-foreground text-xl font-semibold">Sign Document</div>
+          <div className="text-foreground text-xl font-semibold">
+            {role === RecipientRole.VIEWER && 'Mark Document as Viewed'}
+            {role === RecipientRole.SIGNER && 'Sign Document'}
+            {role === RecipientRole.APPROVER && 'Approve Document'}
+          </div>
           <div className="text-muted-foreground mx-auto w-4/5 py-2 text-center">
-            You are about to finish signing "{truncatedTitle}". Are you sure?
+            {role === RecipientRole.VIEWER &&
+              `You are about to finish viewing "${truncatedTitle}". Are you sure?`}
+            {role === RecipientRole.SIGNER &&
+              `You are about to finish signing "${truncatedTitle}". Are you sure?`}
+            {role === RecipientRole.APPROVER &&
+              `You are about to finish approving "${truncatedTitle}". Are you sure?`}
           </div>
         </div>
 
@@ -71,7 +83,9 @@ export const SignDialog = ({
               loading={isSubmitting}
               onClick={onSignatureComplete}
             >
-              Sign
+              {role === RecipientRole.VIEWER && 'Mark as Viewed'}
+              {role === RecipientRole.SIGNER && 'Sign'}
+              {role === RecipientRole.APPROVER && 'Approve'}
             </Button>
           </div>
         </DialogFooter>
