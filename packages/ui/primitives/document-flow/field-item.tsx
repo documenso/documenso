@@ -128,7 +128,7 @@ export const FieldItem = ({
       )}
 
       <Card
-        className={cn('bg-background h-full w-full', {
+        className={cn('bg-documenso h-full w-full bg-opacity-20 backdrop-blur-[1.2px]', {
           'border-primary': !disabled,
           'border-primary/80': active,
         })}
@@ -143,9 +143,7 @@ export const FieldItem = ({
         >
           {FRIENDLY_FIELD_TYPE[field.type]}
 
-          <p className="text-muted-foreground/50 w-full truncate text-center text-xs">
-            {field.signerEmail}
-          </p>
+          <p className="w-full truncate text-center text-xs">{field.signerEmail}</p>
         </CardContent>
       </Card>
     </Rnd>,
