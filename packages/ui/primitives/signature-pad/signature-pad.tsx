@@ -185,7 +185,7 @@ export const SignaturePad = ({
     if ($el.current) {
       const ctx = $el.current.getContext('2d');
       const { width, height } = $el.current;
-      ctx?.clearRect(0, 0, $el.current.width, $el.current.height);
+      ctx?.clearRect(0, 0, width, height);
       if (typeof defaultValue === 'string' && defaultImageRef.current) {
         ctx?.putImageData(defaultImageRef.current, 0, 0);
       }
