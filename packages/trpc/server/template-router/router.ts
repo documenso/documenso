@@ -46,7 +46,6 @@ export const templateRouter = router({
 
         if (limits.remaining.documents === 0) {
           throw new Error('You have reached your document limit.');
-          return;
         }
 
         return await createDocumentFromTemplate({

@@ -60,7 +60,7 @@ export const TemplatesDataTable = ({
 
   const onUseButtonClick = async (templateId: number) => {
     try {
-      const documentFromTemplate = await createDocumentFromTemplate({
+      const { id } = await createDocumentFromTemplate({
         templateId,
       });
 
@@ -70,7 +70,7 @@ export const TemplatesDataTable = ({
         duration: 5000,
       });
 
-      router.push(`/documents/${documentFromTemplate?.id}`);
+      router.push(`/documents/${id}`);
     } catch (err) {
       toast({
         title: 'Error',
