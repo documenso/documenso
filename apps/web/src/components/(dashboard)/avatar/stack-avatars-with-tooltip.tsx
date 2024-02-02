@@ -1,4 +1,5 @@
 import { getRecipientType } from '@documenso/lib/client-only/recipient-type';
+import { RECIPIENT_ROLES_DESCRIPTION } from '@documenso/lib/constants/recipient-roles';
 import { recipientAbbreviation } from '@documenso/lib/utils/recipient-formatter';
 import type { Recipient } from '@documenso/prisma/client';
 import {
@@ -59,7 +60,12 @@ export const StackAvatarsWithTooltip = ({
                       type={getRecipientType(recipient)}
                       fallbackText={recipientAbbreviation(recipient)}
                     />
-                    <span className="text-muted-foreground text-sm">{recipient.email}</span>
+                    <div className="">
+                      <p className="text-muted-foreground text-sm">{recipient.email}</p>
+                      <p className="text-muted-foreground/70 text-xs">
+                        {RECIPIENT_ROLES_DESCRIPTION[recipient.role].roleName}
+                      </p>
+                    </div>
                   </div>
                 ))}
               </div>

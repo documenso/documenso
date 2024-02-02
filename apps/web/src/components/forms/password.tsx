@@ -7,6 +7,7 @@ import { z } from 'zod';
 import type { User } from '@documenso/prisma/client';
 import { TRPCClientError } from '@documenso/trpc/client';
 import { trpc } from '@documenso/trpc/react';
+import { ZCurrentPasswordSchema, ZPasswordSchema } from '@documenso/trpc/server/auth-router/schema';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
 import {
@@ -22,18 +23,9 @@ import { useToast } from '@documenso/ui/primitives/use-toast';
 
 export const ZPasswordFormSchema = z
   .object({
-    currentPassword: z
-      .string()
-      .min(6, { message: 'Password should contain at least 6 characters' })
-      .max(72, { message: 'Password should not contain more than 72 characters' }),
-    password: z
-      .string()
-      .min(6, { message: 'Password should contain at least 6 characters' })
-      .max(72, { message: 'Password should not contain more than 72 characters' }),
-    repeatedPassword: z
-      .string()
-      .min(6, { message: 'Password should contain at least 6 characters' })
-      .max(72, { message: 'Password should not contain more than 72 characters' }),
+    currentPassword: ZCurrentPasswordSchema,
+    password: ZPasswordSchema,
+    repeatedPassword: ZPasswordSchema,
   })
   .refine((data) => data.password === data.repeatedPassword, {
     message: 'Passwords do not match',
@@ -145,7 +137,7 @@ export const PasswordForm = ({ className }: PasswordFormProps) => {
           />
         </fieldset>
 
-        <div className="mt-4">
+        <div className="ml-auto mt-4">
           <Button type="submit" loading={isSubmitting}>
             {isSubmitting ? 'Updating password...' : 'Update password'}
           </Button>
