@@ -12,7 +12,13 @@ import { ErrorCode, isErrorCode } from '@documenso/lib/next-auth/error-codes';
 import { ZCurrentPasswordSchema } from '@documenso/trpc/server/auth-router/schema';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@documenso/ui/primitives/dialog';
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@documenso/ui/primitives/dialog';
 import {
   Form,
   FormControl,
@@ -111,7 +117,6 @@ export const SignInForm = ({ className, isGoogleSSOEnabled }: SignInFormProps) =
 
       const result = await signIn('credentials', {
         ...credentials,
-
         callbackUrl: LOGIN_REDIRECT_PATH,
         redirect: false,
       });
@@ -270,21 +275,23 @@ export const SignInForm = ({ className, isGoogleSSOEnabled }: SignInFormProps) =
                   )}
                 />
               )}
+
+              <DialogFooter className="mt-4">
+                <Button
+                  type="button"
+                  variant="secondary"
+                  onClick={onToggleTwoFactorAuthenticationMethodClick}
+                >
+                  {twoFactorAuthenticationMethod === 'totp'
+                    ? 'Use Backup Code'
+                    : 'Use Authenticator'}
+                </Button>
+
+                <Button type="submit" loading={isSubmitting}>
+                  {isSubmitting ? 'Signing in...' : 'Sign In'}
+                </Button>
+              </DialogFooter>
             </fieldset>
-
-            <div className="mt-4 flex items-center justify-between">
-              <Button
-                type="button"
-                variant="ghost"
-                onClick={onToggleTwoFactorAuthenticationMethodClick}
-              >
-                {twoFactorAuthenticationMethod === 'totp' ? 'Use Backup Code' : 'Use Authenticator'}
-              </Button>
-
-              <Button type="submit" loading={isSubmitting}>
-                {isSubmitting ? 'Signing in...' : 'Sign In'}
-              </Button>
-            </div>
           </form>
         </DialogContent>
       </Dialog>

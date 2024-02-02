@@ -1,4 +1,4 @@
-import { CreateNextContextOptions } from '@trpc/server/adapters/next';
+import type { CreateNextContextOptions } from '@trpc/server/adapters/next';
 
 import { getServerSession } from '@documenso/lib/next-auth/get-server-session';
 
@@ -9,6 +9,7 @@ export const createTrpcContext = async ({ req, res }: CreateNextContextOptions) 
     return {
       session: null,
       user: null,
+      req,
     };
   }
 
@@ -16,12 +17,14 @@ export const createTrpcContext = async ({ req, res }: CreateNextContextOptions) 
     return {
       session: null,
       user: null,
+      req,
     };
   }
 
   return {
     session,
     user,
+    req,
   };
 };
 
