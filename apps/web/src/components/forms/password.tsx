@@ -137,7 +137,7 @@ export const PasswordForm = ({ className }: PasswordFormProps) => {
           />
         </fieldset>
 
-        <div className="mt-4">
+        <div className="ml-auto mt-4">
           <Button type="submit" loading={isSubmitting}>
             {isSubmitting ? 'Updating password...' : 'Update password'}
           </Button>
