@@ -1,6 +1,8 @@
+import type { Metadata } from 'next';
 import Link from 'next/link';
 
 import { getRequiredServerComponentSession } from '@documenso/lib/next-auth/get-server-component-session';
+import type { PeriodSelectorValue } from '@documenso/lib/server-only/document/find-documents';
 import { findDocuments } from '@documenso/lib/server-only/document/find-documents';
 import { getStats } from '@documenso/lib/server-only/document/get-stats';
 import { isExtendedDocumentStatus } from '@documenso/prisma/guards/is-extended-document-status';
@@ -8,7 +10,6 @@ import { ExtendedDocumentStatus } from '@documenso/prisma/types/extended-documen
 import { Tabs, TabsList, TabsTrigger } from '@documenso/ui/primitives/tabs';
 
 import { PeriodSelector } from '~/components/(dashboard)/period-selector/period-selector';
-import type { PeriodSelectorValue } from '~/components/(dashboard)/period-selector/types';
 import { isPeriodSelectorValue } from '~/components/(dashboard)/period-selector/types';
 import { DocumentStatus } from '~/components/formatter/document-status';
 
@@ -25,17 +26,21 @@ export type DocumentsPageProps = {
   };
 };
 
+export const metadata: Metadata = {
+  title: 'Documents',
+};
 export default async function DocumentsPage({ searchParams = {} }: DocumentsPageProps) {
   const { user } = await getRequiredServerComponentSession();
-
-  const stats = await getStats({
-    user,
-  });
 
   const status = isExtendedDocumentStatus(searchParams.status) ? searchParams.status : 'ALL';
   const period = isPeriodSelectorValue(searchParams.period) ? searchParams.period : '';
   const page = Number(searchParams.page) || 1;
   const perPage = Number(searchParams.perPage) || 20;
+
+  const stats = await getStats({
+    user,
+    period,
+  });
 
   const results = await findDocuments({
     userId: user.id,
@@ -69,7 +74,7 @@ export default async function DocumentsPage({ searchParams = {} }: DocumentsPage
         <h1 className="text-4xl font-semibold">Documents</h1>
 
         <div className="-m-1 flex flex-wrap gap-x-4 gap-y-6 overflow-hidden p-1">
-          <Tabs defaultValue={status} className="overflow-x-auto">
+          <Tabs value={status} className="overflow-x-auto">
             <TabsList>
               {[
                 ExtendedDocumentStatus.INBOX,

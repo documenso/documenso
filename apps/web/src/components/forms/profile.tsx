@@ -197,7 +197,6 @@ export const ProfileForm = ({ className, user }: ProfileFormProps) => {
             </Label>
             <Input id="email" type="email" className="bg-muted mt-2" value={user.email} disabled />
           </div>
-
           <FormField
             control={form.control}
             name="signature"
@@ -207,7 +206,8 @@ export const ProfileForm = ({ className, user }: ProfileFormProps) => {
                 <FormControl>
                   <SignaturePad
                     className="h-44 w-full"
-                    containerClassName="rounded-lg border bg-background"
+                    disabled={isSubmitting}
+                    containerClassName={cn('rounded-lg border bg-background')}
                     defaultValue={user.signature ?? undefined}
                     onChange={(v) => onChange(v ?? '')}
                   />

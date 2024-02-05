@@ -17,6 +17,7 @@ import {
   DocumentFlowFormContainerHeader,
   DocumentFlowFormContainerStep,
 } from './document-flow-root';
+import { ShowFieldItem } from './show-field-item';
 import type { DocumentFlowStep } from './types';
 
 export type AddTitleFormProps = {
@@ -29,8 +30,8 @@ export type AddTitleFormProps = {
 
 export const AddTitleFormPartial = ({
   documentFlow,
-  recipients: _recipients,
-  fields: _fields,
+  recipients,
+  fields,
   document,
   onSubmit,
 }: AddTitleFormProps) => {
@@ -55,6 +56,10 @@ export const AddTitleFormPartial = ({
         description={documentFlow.description}
       />
       <DocumentFlowFormContainerContent>
+        {fields.map((field, index) => (
+          <ShowFieldItem key={index} field={field} recipients={recipients} />
+        ))}
+
         <div className="flex flex-col">
           <div className="flex flex-col gap-y-4">
             <div>

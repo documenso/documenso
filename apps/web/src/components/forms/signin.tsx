@@ -9,9 +9,16 @@ import { FcGoogle } from 'react-icons/fc';
 import { z } from 'zod';
 
 import { ErrorCode, isErrorCode } from '@documenso/lib/next-auth/error-codes';
+import { ZCurrentPasswordSchema } from '@documenso/trpc/server/auth-router/schema';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@documenso/ui/primitives/dialog';
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@documenso/ui/primitives/dialog';
 import {
   Form,
   FormControl,
@@ -39,7 +46,7 @@ const LOGIN_REDIRECT_PATH = '/documents';
 
 export const ZSignInFormSchema = z.object({
   email: z.string().email().min(1),
-  password: z.string().min(6).max(72),
+  password: ZCurrentPasswordSchema,
   totpCode: z.string().trim().optional(),
   backupCode: z.string().trim().optional(),
 });
@@ -48,9 +55,10 @@ export type TSignInFormSchema = z.infer<typeof ZSignInFormSchema>;
 
 export type SignInFormProps = {
   className?: string;
+  isGoogleSSOEnabled?: boolean;
 };
 
-export const SignInForm = ({ className }: SignInFormProps) => {
+export const SignInForm = ({ className, isGoogleSSOEnabled }: SignInFormProps) => {
   const { toast } = useToast();
   const [isTwoFactorAuthenticationDialogOpen, setIsTwoFactorAuthenticationDialogOpen] =
     useState(false);
@@ -109,7 +117,6 @@ export const SignInForm = ({ className }: SignInFormProps) => {
 
       const result = await signIn('credentials', {
         ...credentials,
-
         callbackUrl: LOGIN_REDIRECT_PATH,
         redirect: false,
       });
@@ -203,24 +210,29 @@ export const SignInForm = ({ className }: SignInFormProps) => {
           {isSubmitting ? 'Signing in...' : 'Sign In'}
         </Button>
 
-        <div className="relative flex items-center justify-center gap-x-4 py-2 text-xs uppercase">
-          <div className="bg-border h-px flex-1" />
-          <span className="text-muted-foreground bg-transparent">Or continue with</span>
-          <div className="bg-border h-px flex-1" />
-        </div>
+        {isGoogleSSOEnabled && (
+          <>
+            <div className="relative flex items-center justify-center gap-x-4 py-2 text-xs uppercase">
+              <div className="bg-border h-px flex-1" />
+              <span className="text-muted-foreground bg-transparent">Or continue with</span>
+              <div className="bg-border h-px flex-1" />
+            </div>
 
-        <Button
-          type="button"
-          size="lg"
-          variant={'outline'}
-          className="bg-background text-muted-foreground border"
-          disabled={isSubmitting}
-          onClick={onSignInWithGoogleClick}
-        >
-          <FcGoogle className="mr-2 h-5 w-5" />
-          Google
-        </Button>
+            <Button
+              type="button"
+              size="lg"
+              variant="outline"
+              className="bg-background text-muted-foreground border"
+              disabled={isSubmitting}
+              onClick={onSignInWithGoogleClick}
+            >
+              <FcGoogle className="mr-2 h-5 w-5" />
+              Google
+            </Button>
+          </>
+        )}
       </form>
+
       <Dialog
         open={isTwoFactorAuthenticationDialogOpen}
         onOpenChange={onCloseTwoFactorAuthenticationDialog}
@@ -263,21 +275,23 @@ export const SignInForm = ({ className }: SignInFormProps) => {
                   )}
                 />
               )}
+
+              <DialogFooter className="mt-4">
+                <Button
+                  type="button"
+                  variant="secondary"
+                  onClick={onToggleTwoFactorAuthenticationMethodClick}
+                >
+                  {twoFactorAuthenticationMethod === 'totp'
+                    ? 'Use Backup Code'
+                    : 'Use Authenticator'}
+                </Button>
+
+                <Button type="submit" loading={isSubmitting}>
+                  {isSubmitting ? 'Signing in...' : 'Sign In'}
+                </Button>
+              </DialogFooter>
             </fieldset>
-
-            <div className="mt-4 flex items-center justify-between">
-              <Button
-                type="button"
-                variant="ghost"
-                onClick={onToggleTwoFactorAuthenticationMethodClick}
-              >
-                {twoFactorAuthenticationMethod === 'totp' ? 'Use Backup Code' : 'Use Authenticator'}
-              </Button>
-
-              <Button type="submit" loading={isSubmitting}>
-                {isSubmitting ? 'Signing in...' : 'Sign In'}
-              </Button>
-            </div>
           </form>
         </DialogContent>
       </Dialog>

@@ -5,7 +5,7 @@ import { createTOTPKeyURI } from 'oslo/otp';
 
 import { ErrorCode } from '@documenso/lib/next-auth/error-codes';
 import { prisma } from '@documenso/prisma';
-import type { User } from '@documenso/prisma/client';
+import { type User } from '@documenso/prisma/client';
 
 import { DOCUMENSO_ENCRYPTION_KEY } from '../../constants/crypto';
 import { symmetricEncrypt } from '../../universal/crypto';
