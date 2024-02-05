@@ -8,6 +8,7 @@ import { useSession } from 'next-auth/react';
 import { useForm } from 'react-hook-form';
 
 import { useAnalytics } from '@documenso/lib/client-only/hooks/use-analytics';
+import { getDocumentMetaByDocumentId } from '@documenso/lib/server-only/document/get-document-meta-by-document-id';
 import { sortFieldsByPosition, validateFieldsInserted } from '@documenso/lib/utils/fields';
 import type { Document, Field, Recipient } from '@documenso/prisma/client';
 import { trpc } from '@documenso/trpc/react';
@@ -55,6 +56,7 @@ export const SigningForm = ({ document, recipient, fields }: SigningFormProps) =
   };
 
   const onFormSubmit = async () => {
+    const documentMeta = await getDocumentMetaByDocumentId({ id: document!.id }).catch(() => null);
     setValidateUninsertedFields(true);
 
     const isFieldsValid = validateFieldsInserted(fields);
@@ -73,8 +75,9 @@ export const SigningForm = ({ document, recipient, fields }: SigningFormProps) =
       documentId: document.id,
       timestamp: new Date().toISOString(),
     });
-
-    router.push(`/sign/${recipient.token}/complete`);
+    documentMeta?.redirectUrl
+      ? router.push(documentMeta.redirectUrl)
+      : router.push(`/sign/${recipient.token}/complete`);
   };
 
   return (

@@ -65,6 +65,7 @@ export default async function SigningPage({ params: { token } }: SigningPageProp
     document.status === DocumentStatus.COMPLETED ||
     recipient.signingStatus === SigningStatus.SIGNED
   ) {
+    //
     redirect(`/sign/${token}/complete`);
   }
 
