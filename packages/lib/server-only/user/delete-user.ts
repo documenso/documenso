@@ -36,6 +36,7 @@ export const deleteUser = async ({ email }: DeleteUserOptions) => {
     },
     data: {
       userId: defaultDeleteUser.id,
+      deletedAt: new Date(),
     },
   });
 
