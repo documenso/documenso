@@ -1,5 +1,6 @@
 'use client';
 
+import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 
 import type { Field, Recipient } from '@documenso/prisma/client';
@@ -9,6 +10,7 @@ import { FormErrorMessage } from '../form/form-error-message';
 import { Input } from '../input';
 import { Label } from '../label';
 import { useStep } from '../stepper';
+import { ZAddTitleFormSchema } from './add-title.types';
 import type { TAddTitleFormSchema } from './add-title.types';
 import {
   DocumentFlowFormContainerActions,
@@ -40,6 +42,7 @@ export const AddTitleFormPartial = ({
     handleSubmit,
     formState: { errors, isSubmitting },
   } = useForm<TAddTitleFormSchema>({
+    resolver: zodResolver(ZAddTitleFormSchema),
     defaultValues: {
       title: document.title,
     },
@@ -71,7 +74,7 @@ export const AddTitleFormPartial = ({
                 id="title"
                 className="bg-background my-2"
                 disabled={isSubmitting}
-                {...register('title', { required: "Title can't be empty" })}
+                {...register('title')}
               />
 
               <FormErrorMessage className="mt-2" error={errors.title} />
