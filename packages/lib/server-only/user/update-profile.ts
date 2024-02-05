@@ -1,12 +1,14 @@
 import { prisma } from '@documenso/prisma';
+import { SignatureType } from '@documenso/prisma/client';
 
 export type UpdateProfileOptions = {
   userId: number;
   name: string;
   signature: string;
+  signatureType: SignatureType;
 };
 
-export const updateProfile = async ({ userId, name, signature }: UpdateProfileOptions) => {
+export const updateProfile = async ({ userId, name, signature, signatureType }: UpdateProfileOptions) => {
   // Existence check
   await prisma.user.findFirstOrThrow({
     where: {
@@ -21,6 +23,7 @@ export const updateProfile = async ({ userId, name, signature }: UpdateProfileOp
     data: {
       name,
       signature,
+      signatureType
     },
   });
 

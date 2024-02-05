@@ -35,12 +35,13 @@ export const profileRouter = router({
     .input(ZUpdateProfileMutationSchema)
     .mutation(async ({ input, ctx }) => {
       try {
-        const { name, signature } = input;
+        const { name, signature, signatureType } = input;
 
         return await updateProfile({
           userId: ctx.user.id,
           name,
           signature,
+          signatureType,
         });
       } catch (err) {
         console.error(err);

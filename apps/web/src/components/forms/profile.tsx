@@ -21,8 +21,9 @@ import {
 } from '@documenso/ui/primitives/form/form';
 import { Input } from '@documenso/ui/primitives/input';
 import { Label } from '@documenso/ui/primitives/label';
-import { SignaturePad } from '@documenso/ui/primitives/signature-pad';
 import { useToast } from '@documenso/ui/primitives/use-toast';
+import { useState } from 'react';
+import { SignaturePad } from '@documenso/ui/primitives/signature-pad/signature-pad';
 
 export const ZProfileFormSchema = z.object({
   name: z.string().trim().min(1, { message: 'Please enter a valid name.' }),
@@ -40,6 +41,8 @@ export const ProfileForm = ({ className, user }: ProfileFormProps) => {
   const router = useRouter();
 
   const { toast } = useToast();
+  const [isUploaded, setIsUploaded] = useState(false);
+  
 
   const form = useForm<TProfileFormSchema>({
     values: {
@@ -58,6 +61,7 @@ export const ProfileForm = ({ className, user }: ProfileFormProps) => {
       await updateProfile({
         name,
         signature,
+        signatureType: isUploaded ? 'UPLOAD' : 'DRAW',
       });
 
       toast({
@@ -84,6 +88,12 @@ export const ProfileForm = ({ className, user }: ProfileFormProps) => {
       }
     }
   };
+
+  const handleSignatureChange = (signature: string, isUploaded: boolean) => {
+      setIsUploaded(isUploaded);
+      form.setValue('signature', signature);
+  }
+
 
   return (
     <Form {...form}>
@@ -115,7 +125,7 @@ export const ProfileForm = ({ className, user }: ProfileFormProps) => {
           <FormField
             control={form.control}
             name="signature"
-            render={({ field: { onChange } }) => (
+            render={() => (
               <FormItem>
                 <FormLabel>Signature</FormLabel>
                 <FormControl>
@@ -124,9 +134,12 @@ export const ProfileForm = ({ className, user }: ProfileFormProps) => {
                     containerClassName={cn(
                       'rounded-lg border bg-background',
                       isSubmitting ? 'pointer-events-none opacity-50' : null,
-                    )}
-                    defaultValue={user.signature ?? undefined}
-                    onChange={(v) => onChange(v ?? '')}
+                    )} 
+                    signature={{
+                      value: user.signature,
+                      type: user.signatureType,
+                    }} 
+                    onChange={(v: any, isUploaded: any) => handleSignatureChange(v, isUploaded)}                    
                   />
                 </FormControl>
                 <FormMessage />

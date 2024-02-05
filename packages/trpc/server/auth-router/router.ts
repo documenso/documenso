@@ -18,9 +18,9 @@ export const authRouter = router({
         });
       }
 
-      const { name, email, password, signature } = input;
+      const { name, email, password, signature, signatureType } = input;
 
-      const user = await createUser({ name, email, password, signature });
+      const user = await createUser({ name, email, password, signature, signatureType });
 
       await sendConfirmationToken({ email: user.email });
 

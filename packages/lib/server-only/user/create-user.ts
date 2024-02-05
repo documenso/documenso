@@ -2,7 +2,7 @@ import { hash } from 'bcrypt';
 
 import { getStripeCustomerByUser } from '@documenso/ee/server-only/stripe/get-customer';
 import { prisma } from '@documenso/prisma';
-import { IdentityProvider } from '@documenso/prisma/client';
+import { IdentityProvider,  SignatureType } from '@documenso/prisma/client';
 
 import { SALT_ROUNDS } from '../../constants/auth';
 import { getFlag } from '../../universal/get-feature-flag';
@@ -12,9 +12,10 @@ export interface CreateUserOptions {
   email: string;
   password: string;
   signature?: string | null;
+  signatureType: SignatureType;
 }
 
-export const createUser = async ({ name, email, password, signature }: CreateUserOptions) => {
+export const createUser = async ({ name, email, password, signature, signatureType }: CreateUserOptions) => {
   const isBillingEnabled = await getFlag('app_billing');
 
   const hashedPassword = await hash(password, SALT_ROUNDS);
@@ -35,6 +36,7 @@ export const createUser = async ({ name, email, password, signature }: CreateUse
       email: email.toLowerCase(),
       password: hashedPassword,
       signature,
+      signatureType,
       identityProvider: IdentityProvider.DOCUMENSO,
     },
   });

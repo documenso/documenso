@@ -18,6 +18,11 @@ enum Role {
   USER
 }
 
+enum SignatureType {
+  DRAW
+  UPLOAD
+}
+
 model User {
   id                   Int                  @id @default(autoincrement())
   name                 String?
@@ -27,6 +32,7 @@ model User {
   password             String?
   source               String?
   signature            String?
+  signatureType        SignatureType        @default(DRAW)
   createdAt            DateTime             @default(now())
   updatedAt            DateTime             @default(now()) @updatedAt
   lastSignedIn         DateTime             @default(now())

@@ -21,8 +21,10 @@ import {
 } from '@documenso/ui/primitives/form/form';
 import { Input } from '@documenso/ui/primitives/input';
 import { PasswordInput } from '@documenso/ui/primitives/password-input';
-import { SignaturePad } from '@documenso/ui/primitives/signature-pad';
 import { useToast } from '@documenso/ui/primitives/use-toast';
+import { SignatureType } from '@documenso/prisma/client';
+import { useState } from 'react';
+import { SignaturePad } from '@documenso/ui/primitives/signature-pad/signature-pad';
 
 const SIGN_UP_REDIRECT_PATH = '/documents';
 
@@ -34,6 +36,7 @@ export const ZSignUpFormSchema = z.object({
     .min(6, { message: 'Password should contain at least 6 characters' })
     .max(72, { message: 'Password should not contain more than 72 characters' }),
   signature: z.string().min(1, { message: 'We need your signature to sign documents' }),
+  signatureType: z.nativeEnum(SignatureType)
 });
 
 export type TSignUpFormSchema = z.infer<typeof ZSignUpFormSchema>;
@@ -46,6 +49,7 @@ export type SignUpFormProps = {
 export const SignUpForm = ({ className, isGoogleSSOEnabled }: SignUpFormProps) => {
   const { toast } = useToast();
   const analytics = useAnalytics();
+  const [isUploaded, setIsUploaded] = useState(false);
 
   const form = useForm<TSignUpFormSchema>({
     values: {
@@ -53,6 +57,7 @@ export const SignUpForm = ({ className, isGoogleSSOEnabled }: SignUpFormProps) =
       email: '',
       password: '',
       signature: '',
+      signatureType: 'DRAW'
     },
     resolver: zodResolver(ZSignUpFormSchema),
   });
@@ -63,7 +68,7 @@ export const SignUpForm = ({ className, isGoogleSSOEnabled }: SignUpFormProps) =
 
   const onFormSubmit = async ({ name, email, password, signature }: TSignUpFormSchema) => {
     try {
-      await signup({ name, email, password, signature });
+      await signup({ name, email, password, signature, signatureType: isUploaded ? 'UPLOAD' : 'DRAW' });
 
       await signIn('credentials', {
         email,
@@ -105,6 +110,11 @@ export const SignUpForm = ({ className, isGoogleSSOEnabled }: SignUpFormProps) =
       });
     }
   };
+
+  const handleSignatureChange = (signature: string, isUploaded: boolean) => {
+    setIsUploaded(isUploaded);
+    form.setValue('signature', signature);
+  }
 
   return (
     <Form {...form}>
@@ -165,7 +175,11 @@ export const SignUpForm = ({ className, isGoogleSSOEnabled }: SignUpFormProps) =
                   <SignaturePad
                     className="h-36 w-full"
                     containerClassName="mt-2 rounded-lg border bg-background"
-                    onChange={(v) => onChange(v ?? '')}
+                    signature={{
+                      value: form.watch('signature'),
+                      type: isUploaded ? 'UPLOAD' : 'DRAW',
+                    }}
+                    onChange={(v: any, isUploaded: any) => handleSignatureChange(v, isUploaded)}
                   />
                 </FormControl>
 
