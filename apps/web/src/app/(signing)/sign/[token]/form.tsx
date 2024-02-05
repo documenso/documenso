@@ -158,10 +158,10 @@ export const SigningForm = ({ document, recipient, fields }: SigningFormProps) =
 
                 <Card id="signature" className="mt-4" degrees={-120} gradient>
                   <CardContent role="button" className="relative cursor-pointer pt-6">
-                    <div className="flex h-44 items-center justify-center pb-6">
+                    <div className="flex h-44 max-w-[18rem] items-center justify-center pb-6">
                       {!signatureText && (
                         <SignaturePad
-                          className="h-44 w-full"
+                          className="h-44"
                           defaultValue={signature ?? undefined}
                           clearSignatureClassName="absolute -bottom-6 -right-2 z-10 cursor-pointer"
                           undoSignatureClassName="absolute -top-32 -left-4 z-10 cursor-pointer"
@@ -185,7 +185,7 @@ export const SigningForm = ({ document, recipient, fields }: SigningFormProps) =
                     >
                       <Input
                         id="signatureText"
-                        className="text-foreground placeholder:text-muted-foreground border-0 border-none bg-transparent p-0 text-sm focus-visible:ring-transparent"
+                        className="text-foreground placeholder:text-muted-foreground max-w-[15rem] border-0 border-none bg-transparent p-0 text-sm focus-visible:ring-transparent"
                         placeholder="Draw or type your name here"
                         disabled={isSubmitting || signature?.startsWith('data:')}
                         {...register('signatureText', {
