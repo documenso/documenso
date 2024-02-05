@@ -10,6 +10,7 @@ import { useSession } from 'next-auth/react';
 
 import { useLimits } from '@documenso/ee/server-only/limits/provider/client';
 import { useAnalytics } from '@documenso/lib/client-only/hooks/use-analytics';
+import { APP_DOCUMENT_UPLOAD_SIZE_LIMIT } from '@documenso/lib/constants/app';
 import { createDocumentData } from '@documenso/lib/server-only/document-data/create-document-data';
 import { putFile } from '@documenso/lib/universal/upload/put-file';
 import { TRPCClientError } from '@documenso/trpc/client';
@@ -96,6 +97,15 @@ export const UploadDocument = ({ className }: UploadDocumentProps) => {
     }
   };
 
+  const onFileDropRejected = () => {
+    toast({
+      title: 'Your document failed to upload.',
+      description: `File cannot be larger than ${APP_DOCUMENT_UPLOAD_SIZE_LIMIT}MB`,
+      duration: 5000,
+      variant: 'destructive',
+    });
+  };
+
   return (
     <div className={cn('relative', className)}>
       <DocumentDropzone
@@ -103,6 +113,7 @@ export const UploadDocument = ({ className }: UploadDocumentProps) => {
         disabled={remaining.documents === 0 || !session?.user.emailVerified}
         disabledMessage={disabledMessage}
         onDrop={onFileDrop}
+        onDropRejected={onFileDropRejected}
       />
 
       <div className="absolute -bottom-6 right-0">

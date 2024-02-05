@@ -12,7 +12,7 @@ test.describe.configure({ mode: 'serial' });
 
 const username = 'Test User';
 const email = 'test-user@auth-flow.documenso.com';
-const password = 'Password123';
+const password = 'Password123#';
 
 test('user can sign up with email and password', async ({ page }: { page: Page }) => {
   await page.goto('/signup');

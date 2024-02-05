@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-import { DocumentStatus, FieldType } from '@documenso/prisma/client';
+import { DocumentStatus, FieldType, RecipientRole } from '@documenso/prisma/client';
 
 export const ZGetDocumentByIdQuerySchema = z.object({
   id: z.number().min(1),
@@ -35,6 +35,7 @@ export const ZSetRecipientsForDocumentMutationSchema = z.object({
       id: z.number().nullish(),
       email: z.string().min(1).email(),
       name: z.string(),
+      role: z.nativeEnum(RecipientRole),
     }),
   ),
 });
