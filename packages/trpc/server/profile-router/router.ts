@@ -139,10 +139,7 @@ export const profileRouter = router({
   deleteAccount: authenticatedProcedure.mutation(async ({ ctx }) => {
     try {
       const user = ctx.user;
-
-      const deletedUser = await deleteStripeCustomer(user);
-
-      console.log(deletedUser);
+      await deleteStripeCustomer(user);
 
       return await deleteUser(user);
     } catch (err) {

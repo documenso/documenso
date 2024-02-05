@@ -131,8 +131,6 @@ export const ProfileForm = ({ className, user }: ProfileFormProps) => {
 
       const { token } = deleteAccountTwoFactorTokenForm.getValues();
 
-      console.log(token);
-
       if (!token) {
         throw new Error('Please enter your Two Factor Authentication token.');
       }
@@ -241,14 +239,7 @@ export const ProfileForm = ({ className, user }: ProfileFormProps) => {
               >
                 <Dialog>
                   <DialogTrigger asChild>
-                    <Button
-                      onClick={() => {
-                        console.log(user);
-                      }}
-                      variant="destructive"
-                    >
-                      Delete Account
-                    </Button>
+                    <Button variant="destructive">Delete Account</Button>
                   </DialogTrigger>
                   <DialogContent>
                     <DialogHeader>
