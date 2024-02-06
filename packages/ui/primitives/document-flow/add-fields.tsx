@@ -568,7 +568,11 @@ export const AddFieldsFormPartial = ({
             remove();
             documentFlow.onBackStep?.();
           }}
-          goBackLabel={currentStep === 1 && typeof documentFlow.onBackStep === "function" ? "Remove" : undefined}
+          goBackLabel={
+            currentStep === 1 && typeof documentFlow.onBackStep === 'function'
+              ? 'Remove'
+              : undefined
+          }
           onGoNextClick={() => void onFormSubmit()}
         />
       </DocumentFlowFormContainerFooter>
