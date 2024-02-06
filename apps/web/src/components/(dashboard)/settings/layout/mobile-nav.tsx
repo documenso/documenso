@@ -5,7 +5,7 @@ import type { HTMLAttributes } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
-import { CreditCard, Lock, User, Users } from 'lucide-react';
+import { CreditCard, Lock, User, Users, Webhook } from 'lucide-react';
 
 import { useFeatureFlags } from '@documenso/lib/client-only/providers/feature-flag';
 import { cn } from '@documenso/ui/lib/utils';
@@ -48,6 +48,19 @@ export const MobileNav = ({ className, ...props }: MobileNavProps) => {
         >
           <Users className="mr-2 h-5 w-5" />
           Teams
+        </Button>
+      </Link>
+
+      <Link href="/settings/webhooks">
+        <Button
+          variant="ghost"
+          className={cn(
+            'w-full justify-start',
+            pathname?.startsWith('/settings/webhooks') && 'bg-secondary',
+          )}
+        >
+          <Webhook className="mr-2 h-5 w-5" />
+          Webhooks
         </Button>
       </Link>
 

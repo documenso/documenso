@@ -47,6 +47,7 @@ model User {
   VerificationToken VerificationToken[]
   Template          Template[]
   securityAuditLogs UserSecurityAuditLog[]
+  Webhooks          Webhook[]
 
   @@index([email])
 }
@@ -92,6 +93,23 @@ model VerificationToken {
   createdAt  DateTime @default(now())
   userId     Int
   user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+enum WebhookTriggerEvents {
+  DOCUMENT_CREATED
+  DOCUMENT_SIGNED
+}
+
+model Webhook {
+  id            Int                    @id @default(autoincrement())
+  webhookUrl    String
+  eventTriggers WebhookTriggerEvents[]
+  secret        String?
+  enabled       Boolean                @default(true)
+  createdAt     DateTime               @default(now())
+  updatedAt     DateTime               @default(now()) @updatedAt
+  userId        Int
+  User          User                   @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 enum SubscriptionStatus {
