@@ -146,19 +146,17 @@ export function MultiSelectCombobox<T = OptionValue>({
           <CommandInput placeholder={inputPlaceholder} />
           <CommandEmpty>No value found.</CommandEmpty>
           <CommandGroup>
-            {options.map((option, i) => {
-              return (
-                <CommandItem key={i} onSelect={() => handleSelect(option.value)}>
-                  <Check
-                    className={cn(
-                      'mr-2 h-4 w-4',
-                      selectedValues.includes(option.value) ? 'opacity-100' : 'opacity-0',
-                    )}
-                  />
-                  {option.label}
-                </CommandItem>
-              );
-            })}
+            {options.map((option, i) => (
+              <CommandItem key={i} onSelect={() => handleSelect(option.value)}>
+                <Check
+                  className={cn(
+                    'mr-2 h-4 w-4',
+                    selectedValues.includes(option.value) ? 'opacity-100' : 'opacity-0',
+                  )}
+                />
+                {option.label}
+              </CommandItem>
+            ))}
           </CommandGroup>
         </Command>
       </PopoverContent>
