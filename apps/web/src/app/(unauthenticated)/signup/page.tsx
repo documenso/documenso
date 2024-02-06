@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { redirect } from 'next/navigation';
 
 import { IS_GOOGLE_SSO_ENABLED } from '@documenso/lib/constants/auth';
+import { decryptSecondaryData } from '@documenso/lib/server-only/crypto/decrypt';
 
 import { SignUpForm } from '~/components/forms/signup';
 
@@ -21,7 +22,12 @@ export default function SignUpPage({ searchParams }: SignUpPageProps) {
     redirect('/signin');
   }
 
-  const email = typeof searchParams.email === 'string' ? searchParams.email : undefined;
+  const rawEmail = typeof searchParams.email === 'string' ? searchParams.email : undefined;
+  const email = rawEmail ? decryptSecondaryData(rawEmail) : null;
+
+  if (!email && rawEmail) {
+    redirect('/signup');
+  }
 
   return (
     <div>
@@ -34,7 +40,7 @@ export default function SignUpPage({ searchParams }: SignUpPageProps) {
 
       <SignUpForm
         className="mt-4"
-        initialEmail={email}
+        initialEmail={email || undefined}
         isGoogleSSOEnabled={IS_GOOGLE_SSO_ENABLED}
       />
 

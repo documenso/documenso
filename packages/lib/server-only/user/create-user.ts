@@ -28,83 +28,93 @@ export const createUser = async ({ name, email, password, signature }: CreateUse
     throw new Error('User already exists');
   }
 
-  const createdUser = await prisma.$transaction(async (tx) => {
-    const user = await tx.user.create({
-      data: {
-        name,
-        email: email.toLowerCase(),
-        password: hashedPassword,
-        signature,
-        identityProvider: IdentityProvider.DOCUMENSO,
-      },
-    });
-
-    const acceptedTeamInvites = await tx.teamMemberInvite.findMany({
-      where: {
-        email: {
-          equals: email,
-          mode: Prisma.QueryMode.insensitive,
-        },
-        status: TeamMemberInviteStatus.ACCEPTED,
-      },
-    });
-
-    // For each team invite, add the user to the team and delete the team invite.
-    await Promise.all(
-      acceptedTeamInvites.map(async (invite) => {
-        await tx.teamMember.create({
-          data: {
-            teamId: invite.teamId,
-            userId: user.id,
-            role: invite.role,
-          },
-        });
-
-        await tx.teamMemberInvite.delete({
-          where: {
-            id: invite.id,
-          },
-        });
-
-        if (!IS_BILLING_ENABLED) {
-          return;
-        }
-
-        const team = await tx.team.findFirstOrThrow({
-          where: {
-            id: invite.teamId,
-          },
-          include: {
-            members: {
-              select: {
-                id: true,
-              },
-            },
-            subscription: true,
-          },
-        });
-
-        if (team.subscription) {
-          await updateSubscriptionItemQuantity({
-            priceId: team.subscription.priceId,
-            subscriptionId: team.subscription.planId,
-            quantity: team.members.length,
-          });
-        }
-      }),
-    );
-
-    return user;
+  const user = await prisma.user.create({
+    data: {
+      name,
+      email: email.toLowerCase(),
+      password: hashedPassword,
+      signature,
+      identityProvider: IdentityProvider.DOCUMENSO,
+    },
   });
+
+  const acceptedTeamInvites = await prisma.teamMemberInvite.findMany({
+    where: {
+      email: {
+        equals: email,
+        mode: Prisma.QueryMode.insensitive,
+      },
+      status: TeamMemberInviteStatus.ACCEPTED,
+    },
+  });
+
+  // For each team invite, add the user to the team and delete the team invite.
+  // If an error occurs, reset the invitation to not accepted.
+  await Promise.allSettled(
+    acceptedTeamInvites.map(async (invite) =>
+      prisma
+        .$transaction(async (tx) => {
+          await tx.teamMember.create({
+            data: {
+              teamId: invite.teamId,
+              userId: user.id,
+              role: invite.role,
+            },
+          });
+
+          await tx.teamMemberInvite.delete({
+            where: {
+              id: invite.id,
+            },
+          });
+
+          if (!IS_BILLING_ENABLED) {
+            return;
+          }
+
+          const team = await tx.team.findFirstOrThrow({
+            where: {
+              id: invite.teamId,
+            },
+            include: {
+              members: {
+                select: {
+                  id: true,
+                },
+              },
+              subscription: true,
+            },
+          });
+
+          if (team.subscription) {
+            await updateSubscriptionItemQuantity({
+              priceId: team.subscription.priceId,
+              subscriptionId: team.subscription.planId,
+              quantity: team.members.length,
+            });
+          }
+        })
+        .catch(async () => {
+          await prisma.teamMemberInvite.update({
+            where: {
+              id: invite.id,
+            },
+            data: {
+              status: TeamMemberInviteStatus.PENDING,
+            },
+          });
+        }),
+    ),
+  );
 
   // Update the user record with a new or existing Stripe customer record.
   if (IS_BILLING_ENABLED) {
     try {
-      return await getStripeCustomerByUser(createdUser).then((session) => session.user);
+      return await getStripeCustomerByUser(user).then((session) => session.user);
     } catch (err) {
       console.error(err);
     }
   }
 
-  return createdUser;
+  return user;
 };

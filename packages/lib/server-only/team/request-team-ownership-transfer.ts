@@ -40,8 +40,10 @@ export const requestTeamOwnershipTransfer = async ({
   userName,
   teamId,
   newOwnerUserId,
-  clearPaymentMethods,
 }: RequestTeamOwnershipTransferOptions) => {
+  // Todo: Clear payment methods disabled for now.
+  const clearPaymentMethods = false;
+
   await prisma.$transaction(async (tx) => {
     const team = await tx.team.findFirstOrThrow({
       where: {

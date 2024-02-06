@@ -61,7 +61,7 @@ export const TeamTransferStatus = ({
       {transferVerification && (
         <AnimateGenericFadeInOut>
           <Alert
-            variant={isExpired ? 'destructive' : 'secondary'}
+            variant={isExpired ? 'destructive' : 'warning'}
             className={cn(
               'flex flex-col justify-between p-6 sm:flex-row sm:items-center',
               className,
@@ -82,7 +82,9 @@ export const TeamTransferStatus = ({
                   <section className="text-sm">
                     <p>
                       A request to transfer the ownership of this team has been sent to{' '}
-                      <strong>{transferVerification.name}</strong>
+                      <strong>
+                        {transferVerification.name} ({transferVerification.email})
+                      </strong>
                     </p>
 
                     <p>

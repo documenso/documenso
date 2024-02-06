@@ -13,7 +13,6 @@ import { IS_BILLING_ENABLED } from '@documenso/lib/constants/app';
 import { trpc } from '@documenso/trpc/react';
 import { Alert, AlertDescription } from '@documenso/ui/primitives/alert';
 import { Button } from '@documenso/ui/primitives/button';
-import { Checkbox } from '@documenso/ui/primitives/checkbox';
 import {
   Dialog,
   DialogContent,
@@ -208,7 +207,8 @@ export const TransferTeamDialog = ({
                   )}
                 />
 
-                {IS_BILLING_ENABLED && (
+                {/* Temporary removed.  */}
+                {/* {IS_BILLING_ENABLED && (
                   <FormField
                     control={form.control}
                     name="clearPaymentMethods"
@@ -218,7 +218,7 @@ export const TransferTeamDialog = ({
                           <Checkbox
                             id="clearPaymentMethods"
                             className="h-5 w-5 rounded-full"
-                            checkClassName="text-white"
+                            checkClassName="dark:text-white text-primary"
                             checked={field.value}
                             onCheckedChange={field.onChange}
                           />
@@ -233,16 +233,22 @@ export const TransferTeamDialog = ({
                       </FormItem>
                     )}
                   />
-                )}
+                )} */}
 
                 <Alert variant="neutral">
                   <AlertDescription>
                     <ul className="list-outside list-disc space-y-2 pl-4">
                       {IS_BILLING_ENABLED && (
+                        // Temporary removed.
+                        // <li>
+                        //   {form.getValues('clearPaymentMethods')
+                        //     ? 'You will not be billed for any upcoming invoices'
+                        //     : 'We will continue to bill current payment methods if required'}
+                        // </li>
+
                         <li>
-                          {form.getValues('clearPaymentMethods')
-                            ? 'You will not be billed for any upcoming invoices'
-                            : 'We will continue to bill current payment methods if required'}
+                          Any payment methods attached to this team will remain attached to this
+                          team. Please contact us if you need to update this information.
                         </li>
                       )}
                       <li>

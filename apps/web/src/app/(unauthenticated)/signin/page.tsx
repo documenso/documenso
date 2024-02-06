@@ -1,7 +1,9 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import { redirect } from 'next/navigation';
 
 import { IS_GOOGLE_SSO_ENABLED } from '@documenso/lib/constants/auth';
+import { decryptSecondaryData } from '@documenso/lib/server-only/crypto/decrypt';
 
 import { SignInForm } from '~/components/forms/signin';
 
@@ -16,7 +18,12 @@ type SignInPageProps = {
 };
 
 export default function SignInPage({ searchParams }: SignInPageProps) {
-  const email = typeof searchParams.email === 'string' ? searchParams.email : undefined;
+  const rawEmail = typeof searchParams.email === 'string' ? searchParams.email : undefined;
+  const email = rawEmail ? decryptSecondaryData(rawEmail) : null;
+
+  if (!email && rawEmail) {
+    redirect('/signin');
+  }
 
   return (
     <div>
@@ -28,7 +35,7 @@ export default function SignInPage({ searchParams }: SignInPageProps) {
 
       <SignInForm
         className="mt-4"
-        initialEmail={email}
+        initialEmail={email || undefined}
         isGoogleSSOEnabled={IS_GOOGLE_SSO_ENABLED}
       />
 

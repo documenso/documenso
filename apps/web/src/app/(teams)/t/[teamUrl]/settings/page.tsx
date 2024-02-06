@@ -127,8 +127,11 @@ export default async function TeamsSettingsPage({ params }: TeamsSettingsPagePro
 
               <AlertDescription className="mr-2">
                 <ul className="text-muted-foreground mt-0.5 list-inside list-disc text-sm">
-                  <li>Display this name and email when sending documents</li>
-                  <li>View documents associated with this email</li>
+                  {/* Feature not available yet. */}
+                  {/* <li>Display this name and email when sending documents</li> */}
+                  {/* <li>View documents associated with this email</li> */}
+
+                  <span>View documents associated with this email</span>
                 </ul>
               </AlertDescription>
             </div>

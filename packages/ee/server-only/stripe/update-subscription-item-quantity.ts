@@ -1,8 +1,10 @@
+import type Stripe from 'stripe';
+
 import { stripe } from '@documenso/lib/server-only/stripe';
 
 export type UpdateSubscriptionItemQuantityOptions = {
   subscriptionId: string;
-  quantity?: number;
+  quantity: number;
   priceId: string;
 };
 
@@ -15,14 +17,28 @@ export const updateSubscriptionItemQuantity = async ({
 
   const items = subscription.items.data.filter((item) => item.price.id === priceId);
 
-  if (items.length === 0) {
+  if (items.length !== 1) {
+    throw new Error('Subscription does not contain required item');
+  }
+
+  const hasYearlyItem = items.find((item) => item.price.recurring?.interval === 'year');
+  const oldQuantity = items[0].quantity;
+
+  if (oldQuantity === quantity) {
     return;
   }
 
-  await stripe.subscriptions.update(subscriptionId, {
+  const subscriptionUpdatePayload: Stripe.SubscriptionUpdateParams = {
     items: items.map((item) => ({
       id: item.id,
       quantity,
     })),
-  });
+  };
+
+  // Only invoice immediately when changing the quantity of yearly item.
+  if (hasYearlyItem) {
+    subscriptionUpdatePayload.proration_behavior = 'always_invoice';
+  }
+
+  await stripe.subscriptions.update(subscriptionId, subscriptionUpdatePayload);
 };

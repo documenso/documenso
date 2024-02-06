@@ -1,6 +1,9 @@
 import Link from 'next/link';
 
+import { DateTime } from 'luxon';
+
 import { getServerComponentSession } from '@documenso/lib/next-auth/get-server-component-session';
+import { encryptSecondaryData } from '@documenso/lib/server-only/crypto/encrypt';
 import { acceptTeamInvitation } from '@documenso/lib/server-only/team/accept-team-invitation';
 import { getTeamById } from '@documenso/lib/server-only/team/get-team';
 import { prisma } from '@documenso/prisma';
@@ -69,6 +72,11 @@ export default async function AcceptInvitationPage({
     });
   }
 
+  const email = encryptSecondaryData({
+    data: teamMemberInvite.email,
+    expiresAt: DateTime.now().plus({ days: 1 }).toMillis(),
+  });
+
   if (!user) {
     return (
       <div>
@@ -83,9 +91,7 @@ export default async function AcceptInvitationPage({
         </p>
 
         <Button asChild>
-          <Link href={`/signup?email=${encodeURIComponent(teamMemberInvite.email)}`}>
-            Create account
-          </Link>
+          <Link href={`/signup?email=${encodeURIComponent(email)}`}>Create account</Link>
         </Button>
       </div>
     );
@@ -107,9 +113,7 @@ export default async function AcceptInvitationPage({
         </Button>
       ) : (
         <Button asChild>
-          <Link href={`/signin?email=${encodeURIComponent(teamMemberInvite.email)}`}>
-            Continue to login
-          </Link>
+          <Link href={`/signin?email=${encodeURIComponent(email)}`}>Continue to login</Link>
         </Button>
       )}
     </div>
