@@ -6,7 +6,7 @@ import { equals } from 'remeda';
 
 import { getLimits } from '../client';
 import { FREE_PLAN_LIMITS } from '../constants';
-import { TLimitsResponseSchema } from '../schema';
+import type { TLimitsResponseSchema } from '../schema';
 
 export type LimitsContextValue = TLimitsResponseSchema;
 
@@ -24,19 +24,22 @@ export const useLimits = () => {
 
 export type LimitsProviderProps = {
   initialValue?: LimitsContextValue;
+  teamId?: number;
   children?: React.ReactNode;
 };
 
-export const LimitsProvider = ({ initialValue, children }: LimitsProviderProps) => {
-  const defaultValue: TLimitsResponseSchema = {
+export const LimitsProvider = ({
+  initialValue = {
     quota: FREE_PLAN_LIMITS,
     remaining: FREE_PLAN_LIMITS,
-  };
-
-  const [limits, setLimits] = useState(() => initialValue ?? defaultValue);
+  },
+  teamId,
+  children,
+}: LimitsProviderProps) => {
+  const [limits, setLimits] = useState(() => initialValue);
 
   const refreshLimits = async () => {
-    const newLimits = await getLimits();
+    const newLimits = await getLimits({ teamId });
 
     setLimits((oldLimits) => {
       if (equals(oldLimits, newLimits)) {

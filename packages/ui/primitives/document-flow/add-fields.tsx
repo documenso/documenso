@@ -403,7 +403,7 @@ export const AddFieldsFormPartial = ({
                       {recipients.map((recipient) => (
                         <CommandItem
                           key={recipient.id}
-                          className={cn('!rounded-2xl px-4 last:mb-1 [&:not(:first-child)]:mt-1', {
+                          className={cn('px-4 last:mb-1 [&:not(:first-child)]:mt-1', {
                             'text-muted-foreground': recipient.sendStatus === SendStatus.SENT,
                           })}
                           onSelect={() => {
@@ -439,7 +439,7 @@ export const AddFieldsFormPartial = ({
                             ) : (
                               <Tooltip>
                                 <TooltipTrigger>
-                                  <Info className="mx-2 h-4 w-4" />
+                                  <Info className="ml-2 h-4 w-4" />
                                 </TooltipTrigger>
 
                                 <TooltipContent className="text-muted-foreground max-w-xs">
