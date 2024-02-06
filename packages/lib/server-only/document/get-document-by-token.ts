@@ -27,6 +27,7 @@ export const getDocumentAndSenderByToken = async ({
     include: {
       User: true,
       documentData: true,
+      documentMeta: true,
     },
   });
 

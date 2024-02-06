@@ -192,7 +192,7 @@ model DocumentMeta {
   dateFormat String?  @default("yyyy-MM-dd hh:mm a") @db.Text
   documentId Int      @unique
   document   Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
-  redirectUrl String? @db.Text 
+  redirectUrl String? 
 }
 
 enum ReadStatus {

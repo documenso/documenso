@@ -8,7 +8,6 @@ import { useSession } from 'next-auth/react';
 import { useForm } from 'react-hook-form';
 
 import { useAnalytics } from '@documenso/lib/client-only/hooks/use-analytics';
-import { getDocumentMetaByDocumentId } from '@documenso/lib/server-only/document/get-document-meta-by-document-id';
 import { sortFieldsByPosition, validateFieldsInserted } from '@documenso/lib/utils/fields';
 import { type Document, type Field, type Recipient, RecipientRole } from '@documenso/prisma/client';
 import { trpc } from '@documenso/trpc/react';
@@ -27,9 +26,10 @@ export type SigningFormProps = {
   document: Document;
   recipient: Recipient;
   fields: Field[];
+  redirectUrl?: string | null;
 };
 
-export const SigningForm = ({ document, recipient, fields }: SigningFormProps) => {
+export const SigningForm = ({ document, recipient, fields, redirectUrl }: SigningFormProps) => {
   const router = useRouter();
   const analytics = useAnalytics();
   const { data: session } = useSession();
@@ -56,7 +56,6 @@ export const SigningForm = ({ document, recipient, fields }: SigningFormProps) =
   };
 
   const onFormSubmit = async () => {
-    const documentMeta = await getDocumentMetaByDocumentId({ id: document!.id }).catch(() => null);
     setValidateUninsertedFields(true);
 
     const isFieldsValid = validateFieldsInserted(fields);
@@ -75,9 +74,8 @@ export const SigningForm = ({ document, recipient, fields }: SigningFormProps) =
       documentId: document.id,
       timestamp: new Date().toISOString(),
     });
-    documentMeta?.redirectUrl
-      ? router.push(documentMeta.redirectUrl)
-      : router.push(`/sign/${recipient.token}/complete`);
+
+    redirectUrl ? router.push(redirectUrl) : router.push(`/sign/${recipient.token}/complete`);
   };
 
   return (
