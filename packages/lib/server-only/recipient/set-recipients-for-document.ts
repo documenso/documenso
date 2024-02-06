@@ -23,7 +23,20 @@ export const setRecipientsForDocument = async ({
   const document = await prisma.document.findFirst({
     where: {
       id: documentId,
-      userId,
+      OR: [
+        {
+          userId,
+        },
+        {
+          team: {
+            members: {
+              some: {
+                userId,
+              },
+            },
+          },
+        },
+      ],
     },
   });
 

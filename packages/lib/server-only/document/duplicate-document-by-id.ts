@@ -1,16 +1,27 @@
 import { prisma } from '@documenso/prisma';
+import type { Prisma } from '@documenso/prisma/client';
+
+import { getDocumentWhereInput } from './get-document-by-id';
 
 export interface DuplicateDocumentByIdOptions {
   id: number;
   userId: number;
+  teamId?: number;
 }
 
-export const duplicateDocumentById = async ({ id, userId }: DuplicateDocumentByIdOptions) => {
+export const duplicateDocumentById = async ({
+  id,
+  userId,
+  teamId,
+}: DuplicateDocumentByIdOptions) => {
+  const documentWhereInput = await getDocumentWhereInput({
+    documentId: id,
+    userId,
+    teamId,
+  });
+
   const document = await prisma.document.findUniqueOrThrow({
-    where: {
-      id,
-      userId: userId,
-    },
+    where: documentWhereInput,
     select: {
       title: true,
       userId: true,
@@ -34,7 +45,7 @@ export const duplicateDocumentById = async ({ id, userId }: DuplicateDocumentByI
     },
   });
 
-  const createdDocument = await prisma.document.create({
+  const createDocumentArguments: Prisma.DocumentCreateArgs = {
     data: {
       title: document.title,
       User: {
@@ -54,7 +65,17 @@ export const duplicateDocumentById = async ({ id, userId }: DuplicateDocumentByI
         },
       },
     },
-  });
+  };
+
+  if (teamId !== undefined) {
+    createDocumentArguments.data.team = {
+      connect: {
+        id: teamId,
+      },
+    };
+  }
+
+  const createdDocument = await prisma.document.create(createDocumentArguments);
 
   return createdDocument.id;
 };

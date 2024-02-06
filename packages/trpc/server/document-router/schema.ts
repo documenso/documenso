@@ -5,6 +5,7 @@ import { DocumentStatus, FieldType, RecipientRole } from '@documenso/prisma/clie
 
 export const ZGetDocumentByIdQuerySchema = z.object({
   id: z.number().min(1),
+  teamId: z.number().min(1).optional(),
 });
 
 export type TGetDocumentByIdQuerySchema = z.infer<typeof ZGetDocumentByIdQuerySchema>;
@@ -18,6 +19,7 @@ export type TGetDocumentByTokenQuerySchema = z.infer<typeof ZGetDocumentByTokenQ
 export const ZCreateDocumentMutationSchema = z.object({
   title: z.string().min(1),
   documentDataId: z.string().min(1),
+  teamId: z.number().optional(),
 });
 
 export type TCreateDocumentMutationSchema = z.infer<typeof ZCreateDocumentMutationSchema>;
@@ -93,6 +95,7 @@ export type TSetPasswordForDocumentMutationSchema = z.infer<
 export const ZResendDocumentMutationSchema = z.object({
   documentId: z.number(),
   recipients: z.array(z.number()).min(1),
+  teamId: z.number().min(1).optional(),
 });
 
 export type TSendDocumentMutationSchema = z.infer<typeof ZSendDocumentMutationSchema>;

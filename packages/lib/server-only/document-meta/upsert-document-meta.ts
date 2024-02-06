@@ -26,7 +26,20 @@ export const upsertDocumentMeta = async ({
   await prisma.document.findFirstOrThrow({
     where: {
       id: documentId,
-      userId,
+      OR: [
+        {
+          userId,
+        },
+        {
+          team: {
+            members: {
+              some: {
+                userId,
+              },
+            },
+          },
+        },
+      ],
     },
   });
 

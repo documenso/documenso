@@ -32,6 +32,7 @@ export type EditDocumentFormProps = {
   documentMeta: DocumentMeta | null;
   fields: Field[];
   documentData: DocumentData;
+  documentRootPath: string;
 };
 
 type EditDocumentStep = 'title' | 'signers' | 'fields' | 'subject';
@@ -45,6 +46,7 @@ export const EditDocumentForm = ({
   documentMeta,
   user: _user,
   documentData,
+  documentRootPath,
 }: EditDocumentFormProps) => {
   const { toast } = useToast();
   const router = useRouter();
@@ -169,7 +171,7 @@ export const EditDocumentForm = ({
         duration: 5000,
       });
 
-      router.push('/documents');
+      router.push(documentRootPath);
     } catch (err) {
       console.error(err);
 
