@@ -1,4 +1,4 @@
-import DocumentPageView from './document-page-view';
+import { DocumentPageView } from './document-page-view';
 
 export type DocumentPageProps = {
   params: {

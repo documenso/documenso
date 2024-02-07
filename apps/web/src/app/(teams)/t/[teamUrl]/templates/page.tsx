@@ -4,7 +4,7 @@ import { getRequiredServerComponentSession } from '@documenso/lib/next-auth/get-
 import { getTeamByUrl } from '@documenso/lib/server-only/team/get-team';
 
 import type { TemplatesPageViewProps } from '~/app/(dashboard)/templates/templates-page-view';
-import TemplatesPageView from '~/app/(dashboard)/templates/templates-page-view';
+import { TemplatesPageView } from '~/app/(dashboard)/templates/templates-page-view';
 
 type TeamTemplatesPageProps = {
   searchParams?: TemplatesPageViewProps['searchParams'];

@@ -18,10 +18,7 @@ export type TemplatesPageViewProps = {
   team?: Team;
 };
 
-export default async function TemplatesPageView({
-  searchParams = {},
-  team,
-}: TemplatesPageViewProps) {
+export const TemplatesPageView = async ({ searchParams = {}, team }: TemplatesPageViewProps) => {
   const { user } = await getRequiredServerComponentSession();
   const page = Number(searchParams.page) || 1;
   const perPage = Number(searchParams.perPage) || 10;
@@ -73,4 +70,4 @@ export default async function TemplatesPageView({
       </div>
     </div>
   );
-}
+};

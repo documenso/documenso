@@ -23,7 +23,7 @@ export type TemplatePageViewProps = {
   team?: Team;
 };
 
-export default async function TemplatePageView({ params, team }: TemplatePageViewProps) {
+export const TemplatePageView = async ({ params, team }: TemplatePageViewProps) => {
   const { id } = params;
 
   const templateId = Number(id);
@@ -83,4 +83,4 @@ export default async function TemplatePageView({ params, team }: TemplatePageVie
       />
     </div>
   );
-}
+};
