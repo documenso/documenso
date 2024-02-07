@@ -3,6 +3,7 @@
 import React, { useRef } from 'react';
 
 import { AnimatePresence, motion } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 import { match } from 'ts-pattern';
 
 import { useElementScaleSize } from '@documenso/lib/client-only/hooks/use-element-scale-size';
@@ -67,6 +68,7 @@ export function SinglePlayerModeSignatureField({
 
   const minFontSize = MIN_HANDWRITING_FONT_SIZE;
   const maxFontSize = DEFAULT_HANDWRITING_FONT_SIZE;
+  const { t } = useTranslation();
 
   if (!isSignatureFieldType(field.type)) {
     throw new Error('Invalid field type');
@@ -112,7 +114,7 @@ export function SinglePlayerModeSignatureField({
           onClick={() => onClick?.()}
           className="group-hover:text-primary text-muted-foreground absolute inset-0 h-full w-full duration-200"
         >
-          Signature
+          {t('signature')}
         </button>
       )}
     </SinglePlayerModeFieldCardContainer>

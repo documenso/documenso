@@ -6,6 +6,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Plus, Trash } from 'lucide-react';
 import { useFieldArray, useForm } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 
 import { nanoid } from '@documenso/lib/universal/id';
 import type { Field, Recipient } from '@documenso/prisma/client';
@@ -71,6 +72,7 @@ export const AddTemplatePlaceholderRecipientsFormPartial = ({
   });
 
   const onFormSubmit = handleSubmit(onSubmit);
+  const { t } = useTranslation();
 
   const {
     append: appendSigner,
@@ -114,7 +116,7 @@ export const AddTemplatePlaceholderRecipientsFormPartial = ({
               >
                 <div className="flex-1">
                   <Label htmlFor={`signer-${signer.id}-email`}>
-                    Email
+                    {t('email')}
                     <span className="text-destructive ml-1 inline-block font-medium">*</span>
                   </Label>
 
@@ -128,7 +130,7 @@ export const AddTemplatePlaceholderRecipientsFormPartial = ({
                 </div>
 
                 <div className="flex-1">
-                  <Label htmlFor={`signer-${signer.id}-name`}>Name</Label>
+                  <Label htmlFor={`signer-${signer.id}-name`}>{t('name')}</Label>
 
                   <Input
                     id={`signer-${signer.id}-name`}
@@ -168,7 +170,7 @@ export const AddTemplatePlaceholderRecipientsFormPartial = ({
         <div className="mt-4">
           <Button type="button" disabled={isSubmitting} onClick={() => onAddPlaceholderRecipient()}>
             <Plus className="-ml-1 mr-2 h-5 w-5" />
-            Add Placeholder Recipient
+            {t('add_placeholder_recepient')}
           </Button>
         </div>
       </DocumentFlowFormContainerContent>

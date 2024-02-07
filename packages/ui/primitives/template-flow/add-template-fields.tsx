@@ -6,6 +6,7 @@ import { Caveat } from 'next/font/google';
 
 import { ChevronsUpDown } from 'lucide-react';
 import { useFieldArray, useForm } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 
 import { getBoundingClientRect } from '@documenso/lib/client-only/get-bounding-client-rect';
 import { useDocumentElement } from '@documenso/lib/client-only/hooks/use-document-element';
@@ -93,6 +94,7 @@ export const AddTemplateFieldsFormPartial = ({
       })),
     },
   });
+  const { t } = useTranslation();
 
   const onFormSubmit = handleSubmit(onSubmit);
 
@@ -359,7 +361,7 @@ export const AddTemplateFieldsFormPartial = ({
                   <CommandInput />
                   <CommandEmpty>
                     <span className="text-muted-foreground inline-block px-4">
-                      No recipient matching this description was found.
+                      {t('no_recipient_matching')}
                     </span>
                   </CommandEmpty>
 
@@ -438,7 +440,9 @@ export const AddTemplateFieldsFormPartial = ({
                       {selectedSigner?.name || 'Signature'}
                     </p>
 
-                    <p className="text-muted-foreground mt-2 text-center text-xs">Signature</p>
+                    <p className="text-muted-foreground mt-2 text-center text-xs">
+                      {t('signature')}
+                    </p>
                   </CardContent>
                 </Card>
               </button>
@@ -461,7 +465,7 @@ export const AddTemplateFieldsFormPartial = ({
                       {'Email'}
                     </p>
 
-                    <p className="text-muted-foreground mt-2 text-xs">Email</p>
+                    <p className="text-muted-foreground mt-2 text-xs">{t('email')}</p>
                   </CardContent>
                 </Card>
               </button>
@@ -484,7 +488,7 @@ export const AddTemplateFieldsFormPartial = ({
                       {'Name'}
                     </p>
 
-                    <p className="text-muted-foreground mt-2 text-xs">Name</p>
+                    <p className="text-muted-foreground mt-2 text-xs">{t('name')}</p>
                   </CardContent>
                 </Card>
               </button>
@@ -507,7 +511,7 @@ export const AddTemplateFieldsFormPartial = ({
                       {'Date'}
                     </p>
 
-                    <p className="text-muted-foreground mt-2 text-xs">Date</p>
+                    <p className="text-muted-foreground mt-2 text-xs">{t('date')}</p>
                   </CardContent>
                 </Card>
               </button>

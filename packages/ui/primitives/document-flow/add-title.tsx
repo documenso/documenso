@@ -1,6 +1,7 @@
 'use client';
 
 import { useForm } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 
 import type { Field, Recipient } from '@documenso/prisma/client';
 import type { DocumentWithData } from '@documenso/prisma/types/document-with-data';
@@ -46,6 +47,7 @@ export const AddTitleFormPartial = ({
   });
 
   const onFormSubmit = handleSubmit(onSubmit);
+  const { t } = useTranslation();
 
   const { stepIndex, currentStep, totalSteps, previousStep } = useStep();
 
@@ -64,7 +66,8 @@ export const AddTitleFormPartial = ({
           <div className="flex flex-col gap-y-4">
             <div>
               <Label htmlFor="title">
-                Title<span className="text-destructive ml-1 inline-block font-medium">*</span>
+                {t('title')}
+                <span className="text-destructive ml-1 inline-block font-medium">*</span>
               </Label>
 
               <Input

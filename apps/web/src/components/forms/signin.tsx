@@ -5,6 +5,7 @@ import { useState } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { signIn } from 'next-auth/react';
 import { useForm } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 import { FcGoogle } from 'react-icons/fc';
 import { z } from 'zod';
 
@@ -59,6 +60,7 @@ export type SignInFormProps = {
 };
 
 export const SignInForm = ({ className, isGoogleSSOEnabled }: SignInFormProps) => {
+  const { t } = useTranslation();
   const { toast } = useToast();
   const [isTwoFactorAuthenticationDialogOpen, setIsTwoFactorAuthenticationDialogOpen] =
     useState(false);
@@ -131,23 +133,22 @@ export const SignInForm = ({ className, isGoogleSSOEnabled }: SignInFormProps) =
 
         toast({
           variant: 'destructive',
-          title: 'Unable to sign in',
-          description: errorMessage ?? 'An unknown error occurred',
+          title: `${t('unable_to_sign_in')}`,
+          description: errorMessage ?? `${t('unknown_error_occured')}`,
         });
 
         return;
       }
 
       if (!result?.url) {
-        throw new Error('An unknown error occurred');
+        throw new Error(`${t('unknown_error_occured')}`);
       }
 
       window.location.href = result.url;
     } catch (err) {
       toast({
-        title: 'An unknown error occurred',
-        description:
-          'We encountered an unknown error while attempting to sign you In. Please try again later.',
+        title: `${t('unknown_error_occured')}`,
+        description: `${t('encountered_an_unknown_error')}`,
       });
     }
   };
@@ -157,9 +158,8 @@ export const SignInForm = ({ className, isGoogleSSOEnabled }: SignInFormProps) =
       await signIn('google', { callbackUrl: LOGIN_REDIRECT_PATH });
     } catch (err) {
       toast({
-        title: 'An unknown error occurred',
-        description:
-          'We encountered an unknown error while attempting to sign you In. Please try again later.',
+        title: `${t('unknown_error_occured')}`,
+        description: `${t('encountered_an_unknown_error')}`,
         variant: 'destructive',
       });
     }
@@ -177,7 +177,7 @@ export const SignInForm = ({ className, isGoogleSSOEnabled }: SignInFormProps) =
             name="email"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Email</FormLabel>
+                <FormLabel>{t('email')}</FormLabel>
                 <FormControl>
                   <Input type="email" {...field} />
                 </FormControl>
@@ -191,7 +191,7 @@ export const SignInForm = ({ className, isGoogleSSOEnabled }: SignInFormProps) =
             name="password"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Password</FormLabel>
+                <FormLabel>{t('password')}</FormLabel>
                 <FormControl>
                   <PasswordInput {...field} />
                 </FormControl>
@@ -207,14 +207,14 @@ export const SignInForm = ({ className, isGoogleSSOEnabled }: SignInFormProps) =
           loading={isSubmitting}
           className="dark:bg-documenso dark:hover:opacity-90"
         >
-          {isSubmitting ? 'Signing in...' : 'Sign In'}
+          {isSubmitting ? `${t('signing_in')}` : `${t('sign_in')}`}
         </Button>
 
         {isGoogleSSOEnabled && (
           <>
             <div className="relative flex items-center justify-center gap-x-4 py-2 text-xs uppercase">
               <div className="bg-border h-px flex-1" />
-              <span className="text-muted-foreground bg-transparent">Or continue with</span>
+              <span className="text-muted-foreground bg-transparent">{t('continue_with')}</span>
               <div className="bg-border h-px flex-1" />
             </div>
 
@@ -239,7 +239,7 @@ export const SignInForm = ({ className, isGoogleSSOEnabled }: SignInFormProps) =
       >
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Two-Factor Authentication</DialogTitle>
+            <DialogTitle>{t('two_factor_authentication')}</DialogTitle>
           </DialogHeader>
 
           <form onSubmit={form.handleSubmit(onFormSubmit)}>
@@ -250,7 +250,7 @@ export const SignInForm = ({ className, isGoogleSSOEnabled }: SignInFormProps) =
                   name="totpCode"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Authentication Token</FormLabel>
+                      <FormLabel>{t('authentication_token')}</FormLabel>
                       <FormControl>
                         <Input type="text" {...field} />
                       </FormControl>
@@ -266,7 +266,7 @@ export const SignInForm = ({ className, isGoogleSSOEnabled }: SignInFormProps) =
                   name="backupCode"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel> Backup Code</FormLabel>
+                      <FormLabel>{t('backup_code')}</FormLabel>
                       <FormControl>
                         <Input type="text" {...field} />
                       </FormControl>
@@ -283,12 +283,12 @@ export const SignInForm = ({ className, isGoogleSSOEnabled }: SignInFormProps) =
                   onClick={onToggleTwoFactorAuthenticationMethodClick}
                 >
                   {twoFactorAuthenticationMethod === 'totp'
-                    ? 'Use Backup Code'
-                    : 'Use Authenticator'}
+                    ? `${t('use_backup_code')}`
+                    : `${t('use_authenticator')}`}
                 </Button>
 
                 <Button type="submit" loading={isSubmitting}>
-                  {isSubmitting ? 'Signing in...' : 'Sign In'}
+                  {isSubmitting ? `${t('signing_in')}` : `${t('sign_in')}`}
                 </Button>
               </DialogFooter>
             </fieldset>

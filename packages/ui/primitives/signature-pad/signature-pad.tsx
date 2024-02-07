@@ -6,6 +6,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { Undo2 } from 'lucide-react';
 import type { StrokeOptions } from 'perfect-freehand';
 import { getStroke } from 'perfect-freehand';
+import { useTranslation } from 'react-i18next';
 
 import { cn } from '../../lib/utils';
 import { getSvgPathFromStroke } from './helper';
@@ -32,6 +33,7 @@ export const SignaturePad = ({
   const [isPressed, setIsPressed] = useState(false);
   const [lines, setLines] = useState<Point[][]>([]);
   const [currentLine, setCurrentLine] = useState<Point[]>([]);
+  const { t } = useTranslation();
 
   const perfectFreehandOptions = useMemo(() => {
     const size = $el.current ? Math.min($el.current.height, $el.current.width) * 0.03 : 10;
@@ -239,7 +241,7 @@ export const SignaturePad = ({
           className="focus-visible:ring-ring ring-offset-background text-muted-foreground/60 hover:text-muted-foreground rounded-full p-0 text-xs focus-visible:outline-none focus-visible:ring-2"
           onClick={() => onClearClick()}
         >
-          Clear Signature
+          {t('clear_signature')}
         </button>
       </div>
 
@@ -252,7 +254,7 @@ export const SignaturePad = ({
             onClick={() => onUndoClick()}
           >
             <Undo2 className="h-4 w-4" />
-            <span className="sr-only">Undo</span>
+            <span className="sr-only">{t('undo')}</span>
           </button>
         </div>
       )}

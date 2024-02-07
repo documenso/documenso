@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
 
 import type { User } from '@documenso/prisma/client';
@@ -38,6 +39,7 @@ export type ProfileFormProps = {
 
 export const ProfileForm = ({ className, user }: ProfileFormProps) => {
   const router = useRouter();
+  const { t } = useTranslation();
 
   const { toast } = useToast();
 
@@ -61,8 +63,8 @@ export const ProfileForm = ({ className, user }: ProfileFormProps) => {
       });
 
       toast({
-        title: 'Profile updated',
-        description: 'Your profile has been updated successfully.',
+        title: `${t('profile_updated')}`,
+        description: `${t('profile_has_been_updated_successfully')}`,
         duration: 5000,
       });
 
@@ -76,10 +78,9 @@ export const ProfileForm = ({ className, user }: ProfileFormProps) => {
         });
       } else {
         toast({
-          title: 'An unknown error occurred',
+          title: `${t('unknown_error_occured')}`,
           variant: 'destructive',
-          description:
-            'We encountered an unknown error while attempting to sign you In. Please try again later.',
+          description: `${t('encountered_an_unknown_error')}`,
         });
       }
     }
@@ -97,7 +98,7 @@ export const ProfileForm = ({ className, user }: ProfileFormProps) => {
             name="name"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Full Name</FormLabel>
+                <FormLabel>{t('full_name')}</FormLabel>
                 <FormControl>
                   <Input type="text" {...field} />
                 </FormControl>
@@ -108,7 +109,7 @@ export const ProfileForm = ({ className, user }: ProfileFormProps) => {
 
           <div>
             <Label htmlFor="email" className="text-muted-foreground">
-              Email
+              {t('email')}
             </Label>
             <Input id="email" type="email" className="bg-muted mt-2" value={user.email} disabled />
           </div>
@@ -117,7 +118,7 @@ export const ProfileForm = ({ className, user }: ProfileFormProps) => {
             name="signature"
             render={({ field: { onChange } }) => (
               <FormItem>
-                <FormLabel>Signature</FormLabel>
+                <FormLabel>{t('signature')}</FormLabel>
                 <FormControl>
                   <SignaturePad
                     className="h-44 w-full"
@@ -134,7 +135,7 @@ export const ProfileForm = ({ className, user }: ProfileFormProps) => {
         </fieldset>
 
         <Button type="submit" loading={isSubmitting}>
-          {isSubmitting ? 'Updating profile...' : 'Update profile'}
+          {isSubmitting ? `${t('updating_profile')}` : `${t('update_profile')}`}
         </Button>
       </form>
     </Form>

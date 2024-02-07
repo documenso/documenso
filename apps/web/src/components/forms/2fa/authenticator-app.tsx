@@ -2,6 +2,8 @@
 
 import { useState } from 'react';
 
+import { useTranslation } from 'react-i18next';
+
 import { Button } from '@documenso/ui/primitives/button';
 
 import { DisableAuthenticatorAppDialog } from './disable-authenticator-app-dialog';
@@ -16,16 +18,17 @@ export const AuthenticatorApp = ({ isTwoFactorEnabled }: AuthenticatorAppProps) 
 
   const isEnableDialogOpen = modalState === 'enable';
   const isDisableDialogOpen = modalState === 'disable';
+  const { t } = useTranslation();
 
   return (
     <>
       <div className="flex-shrink-0">
         {isTwoFactorEnabled ? (
           <Button variant="destructive" onClick={() => setModalState('disable')}>
-            Disable 2FA
+            {t('disable_2FA')}
           </Button>
         ) : (
-          <Button onClick={() => setModalState('enable')}>Enable 2FA</Button>
+          <Button onClick={() => setModalState('enable')}>{t('enable_2FA')}</Button>
         )}
       </div>
 

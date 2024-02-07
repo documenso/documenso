@@ -3,6 +3,7 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { signIn } from 'next-auth/react';
 import { useForm } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 import { FcGoogle } from 'react-icons/fc';
 import { z } from 'zod';
 
@@ -52,6 +53,7 @@ export type SignUpFormProps = {
 };
 
 export const SignUpForm = ({ className, isGoogleSSOEnabled }: SignUpFormProps) => {
+  const { t } = useTranslation();
   const { toast } = useToast();
   const analytics = useAnalytics();
 
@@ -86,15 +88,14 @@ export const SignUpForm = ({ className, isGoogleSSOEnabled }: SignUpFormProps) =
     } catch (err) {
       if (err instanceof TRPCClientError && err.data?.code === 'BAD_REQUEST') {
         toast({
-          title: 'An error occurred',
+          title: `${t('error_occured')}`,
           description: err.message,
           variant: 'destructive',
         });
       } else {
         toast({
-          title: 'An unknown error occurred',
-          description:
-            'We encountered an unknown error while attempting to sign you up. Please try again later.',
+          title: `${t('unknown_error_occured')}`,
+          description: `${t('encountered_an_unknown_error')}`,
           variant: 'destructive',
         });
       }
@@ -106,9 +107,8 @@ export const SignUpForm = ({ className, isGoogleSSOEnabled }: SignUpFormProps) =
       await signIn('google', { callbackUrl: SIGN_UP_REDIRECT_PATH });
     } catch (err) {
       toast({
-        title: 'An unknown error occurred',
-        description:
-          'We encountered an unknown error while attempting to sign you Up. Please try again later.',
+        title: `${t('unknown_error_occured')}`,
+        description: `${t('encountered_an_unknown_error')}`,
         variant: 'destructive',
       });
     }
@@ -126,7 +126,7 @@ export const SignUpForm = ({ className, isGoogleSSOEnabled }: SignUpFormProps) =
             name="name"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Name</FormLabel>
+                <FormLabel>{t('name')}</FormLabel>
                 <FormControl>
                   <Input type="text" {...field} />
                 </FormControl>
@@ -140,7 +140,7 @@ export const SignUpForm = ({ className, isGoogleSSOEnabled }: SignUpFormProps) =
             name="email"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Email</FormLabel>
+                <FormLabel>{t('email')}</FormLabel>
                 <FormControl>
                   <Input type="email" {...field} />
                 </FormControl>
@@ -154,7 +154,7 @@ export const SignUpForm = ({ className, isGoogleSSOEnabled }: SignUpFormProps) =
             name="password"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Password</FormLabel>
+                <FormLabel>{t('password')}</FormLabel>
                 <FormControl>
                   <PasswordInput {...field} />
                 </FormControl>
@@ -168,7 +168,7 @@ export const SignUpForm = ({ className, isGoogleSSOEnabled }: SignUpFormProps) =
             name="signature"
             render={({ field: { onChange } }) => (
               <FormItem>
-                <FormLabel>Sign Here</FormLabel>
+                <FormLabel>{t('sign_here')}</FormLabel>
                 <FormControl>
                   <SignaturePad
                     className="h-36 w-full"
@@ -190,14 +190,14 @@ export const SignUpForm = ({ className, isGoogleSSOEnabled }: SignUpFormProps) =
           loading={isSubmitting}
           className="dark:bg-documenso dark:hover:opacity-90"
         >
-          {isSubmitting ? 'Signing up...' : 'Sign Up'}
+          {isSubmitting ? `${t('signing_up')}` : `${t('sign_up')}`}
         </Button>
 
         {isGoogleSSOEnabled && (
           <>
             <div className="relative flex items-center justify-center gap-x-4 py-2 text-xs uppercase">
               <div className="bg-border h-px flex-1" />
-              <span className="text-muted-foreground bg-transparent">Or</span>
+              <span className="text-muted-foreground bg-transparent">{t('or')}</span>
               <div className="bg-border h-px flex-1" />
             </div>
 
@@ -210,7 +210,7 @@ export const SignUpForm = ({ className, isGoogleSSOEnabled }: SignUpFormProps) =
               onClick={onSignUpWithGoogleClick}
             >
               <FcGoogle className="mr-2 h-5 w-5" />
-              Sign Up with Google
+              {t('sign_up_with_google')}
             </Button>
           </>
         )}

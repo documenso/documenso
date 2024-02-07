@@ -4,6 +4,7 @@ import type { HTMLAttributes } from 'react';
 import React, { useState } from 'react';
 
 import { Copy, Sparkles } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { FaXTwitter } from 'react-icons/fa6';
 
 import { useCopyShareLink } from '@documenso/lib/client-only/hooks/use-copy-share-link';
@@ -39,6 +40,7 @@ export const DocumentShareButton = ({
   trigger,
 }: DocumentShareButtonProps) => {
   const { toast } = useToast();
+  const { t } = useTranslation();
 
   const { copyShareLink, createAndCopyShareLink, isCopyingShareLink } = useCopyShareLink({
     onSuccess: () => toast(TOAST_DOCUMENT_SHARE_SUCCESS),
@@ -122,19 +124,16 @@ export const DocumentShareButton = ({
             loading={isLoading}
           >
             {!isLoading && <Sparkles className="mr-2 h-5 w-5" />}
-            Share Signature Card
+            {t('share_signature_card')}
           </Button>
         )}
       </DialogTrigger>
 
       <DialogContent position="end">
         <DialogHeader>
-          <DialogTitle>Share your signing experience!</DialogTitle>
+          <DialogTitle>{t('share_your_signing_experience')}</DialogTitle>
 
-          <DialogDescription className="mt-4">
-            Don't worry, the document you signed or sent wont be shared; only your signing
-            experience is. Share your signing card and showcase your signature!
-          </DialogDescription>
+          <DialogDescription className="mt-4">{t('showcase_your_signature')}</DialogDescription>
         </DialogHeader>
 
         <div className="flex w-full flex-col">
@@ -171,12 +170,12 @@ export const DocumentShareButton = ({
           <div className="mt-6 flex items-center gap-4">
             <Button variant="outline" className="flex-1" onClick={onTweetClick}>
               <FaXTwitter className="mr-2 h-4 w-4" />
-              Tweet
+              {t('tweet')}
             </Button>
 
             <Button variant="outline" className="flex-1" onClick={onCopyClick}>
               <Copy className="mr-2 h-4 w-4" />
-              Copy Link
+              {t('copy_link')}
             </Button>
           </div>
         </div>

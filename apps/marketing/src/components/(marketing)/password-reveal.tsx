@@ -1,5 +1,7 @@
 'use client';
 
+import { useTranslation } from 'react-i18next';
+
 import { useCopyToClipboard } from '@documenso/lib/client-only/hooks/use-copy-to-clipboard';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
@@ -8,14 +10,15 @@ export type PasswordRevealProps = {
 };
 
 export const PasswordReveal = ({ password }: PasswordRevealProps) => {
+  const { t } = useTranslation();
   const { toast } = useToast();
   const [, copy] = useCopyToClipboard();
 
   const onCopyClick = () => {
     void copy(password).then(() => {
       toast({
-        title: 'Copied to clipboard',
-        description: 'Your password has been copied to your clipboard.',
+        title: `${t('copied_to_clipboard')}`,
+        description: `${t('password_has_been_copied_to_clipboard')}`,
       });
     });
   };

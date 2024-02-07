@@ -4,6 +4,7 @@ import { useState } from 'react';
 
 import * as DialogPrimitive from '@radix-ui/react-dialog';
 import { X } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 import type { DocumentData } from '@documenso/prisma/client';
 
@@ -20,6 +21,7 @@ export type DocumentDialogProps = {
  */
 export default function DocumentDialog({ documentData, ...props }: DocumentDialogProps) {
   const [documentLoaded, setDocumentLoaded] = useState(false);
+  const { t } = useTranslation();
 
   const onDocumentLoad = () => {
     setDocumentLoaded(true);
@@ -48,7 +50,7 @@ export default function DocumentDialog({ documentData, ...props }: DocumentDialo
 
           <DialogPrimitive.Close className="absolute right-4 top-4 rounded-sm opacity-70 transition-opacity hover:opacity-100 focus:outline-none disabled:pointer-events-none">
             <X className="h-6 w-6 text-white" />
-            <span className="sr-only">Close</span>
+            <span className="sr-only">{t('close')}</span>
           </DialogPrimitive.Close>
         </DialogPrimitive.Content>
       </DialogPortal>

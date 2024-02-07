@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
 
 import { TRPCClientError } from '@documenso/trpc/client';
@@ -40,6 +41,7 @@ export type ResetPasswordFormProps = {
 };
 
 export const ResetPasswordForm = ({ className, token }: ResetPasswordFormProps) => {
+  const { t } = useTranslation();
   const router = useRouter();
 
   const { toast } = useToast();
@@ -66,8 +68,8 @@ export const ResetPasswordForm = ({ className, token }: ResetPasswordFormProps) 
       form.reset();
 
       toast({
-        title: 'Password updated',
-        description: 'Your password has been updated successfully.',
+        title: `${t('password_updated')}`,
+        description: `${t('password_updated_successfully')}`,
         duration: 5000,
       });
 
@@ -75,16 +77,15 @@ export const ResetPasswordForm = ({ className, token }: ResetPasswordFormProps) 
     } catch (err) {
       if (err instanceof TRPCClientError && err.data?.code === 'BAD_REQUEST') {
         toast({
-          title: 'An error occurred',
+          title: `${t('error_occured')}`,
           description: err.message,
           variant: 'destructive',
         });
       } else {
         toast({
-          title: 'An unknown error occurred',
+          title: `${t('unknown_error_occured')}`,
           variant: 'destructive',
-          description:
-            'We encountered an unknown error while attempting to reset your password. Please try again later.',
+          description: `${t('encountered_an_unknown_error_while_reset_password')}`,
         });
       }
     }
@@ -102,7 +103,7 @@ export const ResetPasswordForm = ({ className, token }: ResetPasswordFormProps) 
             name="password"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Password</FormLabel>
+                <FormLabel>{t('password')}</FormLabel>
                 <FormControl>
                   <PasswordInput {...field} />
                 </FormControl>
@@ -116,7 +117,7 @@ export const ResetPasswordForm = ({ className, token }: ResetPasswordFormProps) 
             name="repeatedPassword"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Repeat Password</FormLabel>
+                <FormLabel>{t('repeat_password')}</FormLabel>
                 <FormControl>
                   <PasswordInput {...field} />
                 </FormControl>
@@ -127,7 +128,7 @@ export const ResetPasswordForm = ({ className, token }: ResetPasswordFormProps) 
         </fieldset>
 
         <Button type="submit" size="lg" loading={isSubmitting}>
-          {isSubmitting ? 'Resetting Password...' : 'Reset Password'}
+          {isSubmitting ? `${'reseting_password'}` : `${t('reset_password')}`}
         </Button>
       </form>
     </Form>

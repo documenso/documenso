@@ -4,6 +4,7 @@ import type { Variants } from 'framer-motion';
 import { motion } from 'framer-motion';
 import { Plus } from 'lucide-react';
 import { useDropzone } from 'react-dropzone';
+import { useTranslation } from 'react-i18next';
 
 import { megabytesToBytes } from '@documenso/lib/universal/unit-convertions';
 
@@ -75,15 +76,6 @@ const DocumentDropzoneCardCenterVariants: Variants = {
   },
 };
 
-const DocumentDescription = {
-  document: {
-    headline: 'Add a document',
-  },
-  template: {
-    headline: 'Upload Template Document',
-  },
-};
-
 export type DocumentDropzoneProps = {
   className?: string;
   disabled?: boolean;
@@ -114,6 +106,16 @@ export const DocumentDropzone = ({
     },
     maxSize: megabytesToBytes(50),
   });
+  const { t } = useTranslation();
+
+  const DocumentDescription = {
+    document: {
+      headline: `${t('add_a_document')}`,
+    },
+    template: {
+      headline: `${t('upload_template_document')}`,
+    },
+  };
 
   return (
     <motion.div
@@ -175,7 +177,7 @@ export const DocumentDropzone = ({
           </p>
 
           <p className="text-muted-foreground/80 mt-1 text-sm">
-            {disabled ? disabledMessage : 'Drag & drop your document here.'}
+            {disabled ? t(disabledMessage) : t('drag_drop_document')}
           </p>
         </CardContent>
       </Card>

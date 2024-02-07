@@ -3,6 +3,7 @@
 import { useEffect } from 'react';
 
 import { Controller, useForm } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 
 import { DATE_FORMATS, DEFAULT_DOCUMENT_DATE_FORMAT } from '@documenso/lib/constants/date-formats';
 import { DEFAULT_DOCUMENT_TIME_ZONE, TIME_ZONES } from '@documenso/lib/constants/time-zones';
@@ -75,6 +76,7 @@ export const AddSubjectFormPartial = ({
 
   const onFormSubmit = handleSubmit(onSubmit);
   const { currentStep, totalSteps, previousStep } = useStep();
+  const { t } = useTranslation();
 
   const hasDateField = fields.find((field) => field.type === 'DATE');
 
@@ -105,7 +107,7 @@ export const AddSubjectFormPartial = ({
           <div className="flex flex-col gap-y-4">
             <div>
               <Label htmlFor="subject">
-                Subject <span className="text-muted-foreground">(Optional)</span>
+                {t('subject')} <span className="text-muted-foreground">{t('optional')}</span>
               </Label>
 
               <Input
@@ -120,7 +122,7 @@ export const AddSubjectFormPartial = ({
 
             <div>
               <Label htmlFor="message">
-                Message <span className="text-muted-foreground">(Optional)</span>
+                {t('message')} <span className="text-muted-foreground">{t('optional')}</span>
               </Label>
 
               <Textarea
@@ -138,7 +140,7 @@ export const AddSubjectFormPartial = ({
 
             <div>
               <p className="text-muted-foreground text-sm">
-                You can use the following variables in your message:
+                {t('you_can_use_the_following_variables')}
               </p>
 
               <ul className="mt-2 flex list-inside list-disc flex-col gap-y-2 text-sm">
@@ -146,19 +148,19 @@ export const AddSubjectFormPartial = ({
                   <code className="text-muted-foreground bg-muted-foreground/20 rounded p-1 text-sm">
                     {'{signer.name}'}
                   </code>{' '}
-                  - The signer's name
+                  {t('signer_name')}
                 </li>
                 <li className="text-muted-foreground">
                   <code className="text-muted-foreground bg-muted-foreground/20 rounded p-1 text-sm">
                     {'{signer.email}'}
                   </code>{' '}
-                  - The signer's email
+                  {t('signer_email')}
                 </li>
                 <li className="text-muted-foreground">
                   <code className="text-muted-foreground bg-muted-foreground/20 rounded p-1 text-sm">
                     {'{document.name}'}
                   </code>{' '}
-                  - The document's name
+                  {t('document_name')}
                 </li>
               </ul>
             </div>
@@ -167,13 +169,14 @@ export const AddSubjectFormPartial = ({
               <Accordion type="multiple" className="mt-8 border-none">
                 <AccordionItem value="advanced-options" className="border-none">
                   <AccordionTrigger className="mb-2 border-b text-left hover:no-underline">
-                    Advanced Options
+                    {t('advanced_Options')}
                   </AccordionTrigger>
 
                   <AccordionContent className="text-muted-foreground -mx-1 flex max-w-prose flex-col px-1 text-sm leading-relaxed">
                     <div className="mt-2 flex flex-col">
                       <Label htmlFor="date-format">
-                        Date Format <span className="text-muted-foreground">(Optional)</span>
+                        {t('date_format')}{' '}
+                        <span className="text-muted-foreground">{t('optional')}</span>
                       </Label>
 
                       <Controller
@@ -200,7 +203,8 @@ export const AddSubjectFormPartial = ({
 
                     <div className="mt-4 flex flex-col">
                       <Label htmlFor="time-zone">
-                        Time Zone <span className="text-muted-foreground">(Optional)</span>
+                        {t('time_zone')}{' '}
+                        <span className="text-muted-foreground">{t('optional')}</span>
                       </Label>
 
                       <Controller

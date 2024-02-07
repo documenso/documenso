@@ -10,6 +10,7 @@ import type {
   VisibilityState,
 } from '@tanstack/react-table';
 import { flexRender, getCoreRowModel, useReactTable } from '@tanstack/react-table';
+import { useTranslation } from 'react-i18next';
 
 import { Skeleton } from './skeleton';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './table';
@@ -65,6 +66,7 @@ export function DataTable<TData, TValue>({
       pageSize: 0,
     };
   }, [currentPage, perPage]);
+  const { t } = useTranslation();
 
   const manualPagination = Boolean(currentPage !== undefined && totalPages !== undefined);
 
@@ -125,7 +127,7 @@ export function DataTable<TData, TValue>({
               <TableRow>
                 {error.component ?? (
                   <TableCell colSpan={columns.length} className="h-32 text-center">
-                    Something went wrong.
+                    {t('something_went_wrong')}
                   </TableCell>
                 )}
               </TableRow>
@@ -136,14 +138,14 @@ export function DataTable<TData, TValue>({
             ) : (
               <TableRow>
                 <TableCell colSpan={columns.length} className="h-32 text-center">
-                  <p>No results found</p>
+                  <p>{t('no_result_found')}</p>
 
                   {hasFilters && onClearFilters !== undefined && (
                     <button
                       onClick={() => onClearFilters()}
                       className="text-foreground mt-1 text-sm"
                     >
-                      Clear filters
+                      {t('clear_filters')}
                     </button>
                   )}
                 </TableCell>

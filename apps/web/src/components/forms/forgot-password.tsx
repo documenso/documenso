@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
 
 import { trpc } from '@documenso/trpc/react';
@@ -31,6 +32,7 @@ export type ForgotPasswordFormProps = {
 };
 
 export const ForgotPasswordForm = ({ className }: ForgotPasswordFormProps) => {
+  const { t } = useTranslation();
   const router = useRouter();
   const { toast } = useToast();
 
@@ -49,9 +51,8 @@ export const ForgotPasswordForm = ({ className }: ForgotPasswordFormProps) => {
     await forgotPassword({ email }).catch(() => null);
 
     toast({
-      title: 'Reset email sent',
-      description:
-        'A password reset email has been sent, if you have an account you should see it in your inbox shortly.',
+      title: `${t('reset_email_sent')}`,
+      description: `${t('password_reset_email_sent')}`,
       duration: 5000,
     });
 
@@ -72,7 +73,7 @@ export const ForgotPasswordForm = ({ className }: ForgotPasswordFormProps) => {
             name="email"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Email</FormLabel>
+                <FormLabel>{t('email')}</FormLabel>
                 <FormControl>
                   <Input type="email" {...field} />
                 </FormControl>
@@ -83,7 +84,7 @@ export const ForgotPasswordForm = ({ className }: ForgotPasswordFormProps) => {
         </fieldset>
 
         <Button size="lg" loading={isSubmitting}>
-          {isSubmitting ? 'Sending Reset Email...' : 'Reset Password'}
+          {isSubmitting ? `${t('sending_reset_email')}` : `${'reset_password'}`}
         </Button>
       </form>
     </Form>

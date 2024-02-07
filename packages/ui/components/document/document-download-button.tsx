@@ -4,6 +4,7 @@ import type { HTMLAttributes } from 'react';
 import { useState } from 'react';
 
 import { Download } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 import { downloadPDF } from '@documenso/lib/client-only/download-pdf';
 import type { DocumentData } from '@documenso/prisma/client';
@@ -26,6 +27,7 @@ export const DocumentDownloadButton = ({
 }: DownloadButtonProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
+  const { t } = useTranslation();
 
   const onDownloadClick = async () => {
     try {
@@ -43,8 +45,8 @@ export const DocumentDownloadButton = ({
       setIsLoading(false);
 
       toast({
-        title: 'Something went wrong',
-        description: 'An error occurred while downloading your document.',
+        title: `${t('something_went_wrong')}`,
+        description: `${t('error_occured_while_downloading_document')}`,
         variant: 'destructive',
       });
     }
@@ -61,7 +63,7 @@ export const DocumentDownloadButton = ({
       {...props}
     >
       <Download className="mr-2 h-5 w-5" />
-      Download
+      {t('Download')}
     </Button>
   );
 };

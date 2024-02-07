@@ -2,6 +2,7 @@
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
 
 import type { User } from '@documenso/prisma/client';
@@ -41,6 +42,7 @@ export type PasswordFormProps = {
 
 export const PasswordForm = ({ className }: PasswordFormProps) => {
   const { toast } = useToast();
+  const { t } = useTranslation();
 
   const form = useForm<TPasswordFormSchema>({
     values: {
@@ -65,8 +67,8 @@ export const PasswordForm = ({ className }: PasswordFormProps) => {
       form.reset();
 
       toast({
-        title: 'Password updated',
-        description: 'Your password has been updated successfully.',
+        title: `${t('password_updated')}`,
+        description: `${t('password_updated_successfully')}`,
         duration: 5000,
       });
     } catch (err) {
@@ -78,10 +80,9 @@ export const PasswordForm = ({ className }: PasswordFormProps) => {
         });
       } else {
         toast({
-          title: 'An unknown error occurred',
+          title: `${t('unknown_error_occured')}`,
           variant: 'destructive',
-          description:
-            'We encountered an unknown error while attempting to update your password. Please try again later.',
+          description: `${t('error_occured_while_updating_password')}`,
         });
       }
     }
@@ -99,7 +100,7 @@ export const PasswordForm = ({ className }: PasswordFormProps) => {
             name="currentPassword"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Current Password</FormLabel>
+                <FormLabel>{t('current_password')}</FormLabel>
                 <FormControl>
                   <PasswordInput autoComplete="current-password" {...field} />
                 </FormControl>
@@ -113,7 +114,7 @@ export const PasswordForm = ({ className }: PasswordFormProps) => {
             name="password"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Password</FormLabel>
+                <FormLabel>{t('password')}</FormLabel>
                 <FormControl>
                   <PasswordInput autoComplete="new-password" {...field} />
                 </FormControl>
@@ -127,7 +128,7 @@ export const PasswordForm = ({ className }: PasswordFormProps) => {
             name="repeatedPassword"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Repeat Password</FormLabel>
+                <FormLabel>{t('repeat_password')}</FormLabel>
                 <FormControl>
                   <PasswordInput autoComplete="new-password" {...field} />
                 </FormControl>
@@ -139,7 +140,7 @@ export const PasswordForm = ({ className }: PasswordFormProps) => {
 
         <div className="ml-auto mt-4">
           <Button type="submit" loading={isSubmitting}>
-            {isSubmitting ? 'Updating password...' : 'Update password'}
+            {isSubmitting ? `${t('updating_password')}` : `${t('update_password')}`}
           </Button>
         </div>
       </form>

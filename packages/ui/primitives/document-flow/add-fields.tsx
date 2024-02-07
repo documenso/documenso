@@ -6,6 +6,7 @@ import { Caveat } from 'next/font/google';
 
 import { Check, ChevronsUpDown, Info } from 'lucide-react';
 import { useFieldArray, useForm } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 
 import { getBoundingClientRect } from '@documenso/lib/client-only/get-bounding-client-rect';
 import { useDocumentElement } from '@documenso/lib/client-only/hooks/use-document-element';
@@ -64,6 +65,7 @@ export const AddFieldsFormPartial = ({
 }: AddFieldsFormProps) => {
   const { isWithinPageBounds, getFieldPosition, getPage } = useDocumentElement();
   const { currentStep, totalSteps, previousStep } = useStep();
+  const { t } = useTranslation();
 
   const {
     control,
@@ -378,7 +380,7 @@ export const AddFieldsFormPartial = ({
 
                   <CommandEmpty>
                     <span className="text-muted-foreground inline-block px-4">
-                      No recipient matching this description was found.
+                      {t('no_recipient_matching')}
                     </span>
                   </CommandEmpty>
 
@@ -396,7 +398,7 @@ export const AddFieldsFormPartial = ({
                           key={`${role}-empty`}
                           className="text-muted-foreground/80 px-4 pb-4 pt-2.5 text-center text-xs"
                         >
-                          No recipients with this role
+                          {t('no_recipient_with_this_role')}
                         </div>
                       )}
 
@@ -443,8 +445,7 @@ export const AddFieldsFormPartial = ({
                                 </TooltipTrigger>
 
                                 <TooltipContent className="text-muted-foreground max-w-xs">
-                                  This document has already been sent to this recipient. You can no
-                                  longer edit this recipient.
+                                  {t('document_has_already_sent')}
                                 </TooltipContent>
                               </Tooltip>
                             )}
@@ -475,10 +476,12 @@ export const AddFieldsFormPartial = ({
                         fontCaveat.className,
                       )}
                     >
-                      {selectedSigner?.name || 'Signature'}
+                      {selectedSigner?.name || `${t('signature')}`}
                     </p>
 
-                    <p className="text-muted-foreground mt-2 text-center text-xs">Signature</p>
+                    <p className="text-muted-foreground mt-2 text-center text-xs">
+                      {t('signature')}
+                    </p>
                   </CardContent>
                 </Card>
               </button>
@@ -497,10 +500,10 @@ export const AddFieldsFormPartial = ({
                         'text-muted-foreground group-data-[selected]:text-foreground text-xl font-medium',
                       )}
                     >
-                      {'Email'}
+                      {`${t('email')}`}
                     </p>
 
-                    <p className="text-muted-foreground mt-2 text-xs">Email</p>
+                    <p className="text-muted-foreground mt-2 text-xs">{t('email')}</p>
                   </CardContent>
                 </Card>
               </button>
@@ -519,10 +522,10 @@ export const AddFieldsFormPartial = ({
                         'text-muted-foreground group-data-[selected]:text-foreground text-xl font-medium',
                       )}
                     >
-                      {'Name'}
+                      {`${t('name')}`}
                     </p>
 
-                    <p className="text-muted-foreground mt-2 text-xs">Name</p>
+                    <p className="text-muted-foreground mt-2 text-xs">{t('name')}</p>
                   </CardContent>
                 </Card>
               </button>
@@ -541,10 +544,10 @@ export const AddFieldsFormPartial = ({
                         'text-muted-foreground group-data-[selected]:text-foreground text-xl font-medium',
                       )}
                     >
-                      {'Date'}
+                      {`${t('date')}`}
                     </p>
 
-                    <p className="text-muted-foreground mt-2 text-xs">Date</p>
+                    <p className="text-muted-foreground mt-2 text-xs">{t('date')}</p>
                   </CardContent>
                 </Card>
               </button>

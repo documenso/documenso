@@ -5,6 +5,7 @@ import { useMemo, useState } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { DateTime } from 'luxon';
 import { useForm } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 import { match } from 'ts-pattern';
 
 import { DEFAULT_DOCUMENT_DATE_FORMAT } from '@documenso/lib/constants/date-formats';
@@ -57,6 +58,7 @@ export const AddSignatureFormPartial = ({
   requireSignature = true,
 }: AddSignatureFormProps) => {
   const { currentStep, totalSteps } = useStep();
+  const { t } = useTranslation();
 
   const [validateUninsertedFields, setValidateUninsertedFields] = useState(false);
 
@@ -227,7 +229,7 @@ export const AddSignatureFormPartial = ({
                 name="email"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel required>Email</FormLabel>
+                    <FormLabel required>{t('email')}</FormLabel>
                     <FormControl>
                       <Input
                         className="bg-background"
@@ -251,7 +253,7 @@ export const AddSignatureFormPartial = ({
                   name="name"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel required={requireName}>Name</FormLabel>
+                      <FormLabel required={requireName}>{t('name')}</FormLabel>
                       <FormControl>
                         <Input
                           className="bg-background"
@@ -274,7 +276,7 @@ export const AddSignatureFormPartial = ({
                   name="signature"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel required={requireSignature}>Signature</FormLabel>
+                      <FormLabel required={requireSignature}>{t('signature')}</FormLabel>
                       <FormControl>
                         <Card
                           className={cn('mt-2', {
@@ -323,7 +325,7 @@ export const AddSignatureFormPartial = ({
 
         {validateUninsertedFields && uninsertedFields[0] && (
           <FieldToolTip key={uninsertedFields[0].id} field={uninsertedFields[0]} color="warning">
-            Click to insert field
+            {t('click_to_insert_field')}
           </FieldToolTip>
         )}
 

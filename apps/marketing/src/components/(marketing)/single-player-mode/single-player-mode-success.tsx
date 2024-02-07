@@ -4,6 +4,8 @@ import { useEffect, useState } from 'react';
 
 import Link from 'next/link';
 
+import { useTranslation } from 'react-i18next';
+
 import signingCelebration from '@documenso/assets/images/signing-celebration.png';
 import { useFeatureFlags } from '@documenso/lib/client-only/providers/feature-flag';
 import type { Signature } from '@documenso/prisma/client';
@@ -30,6 +32,7 @@ export const SinglePlayerModeSuccess = ({
   signatures,
 }: SinglePlayerModeSuccessProps) => {
   const { getFlag } = useFeatureFlags();
+  const { t } = useTranslation();
 
   const isConfettiEnabled = getFlag('marketing_spm_confetti');
 
@@ -48,7 +51,7 @@ export const SinglePlayerModeSuccess = ({
       )}
 
       <h2 className="relative z-10 text-center text-2xl font-semibold leading-normal md:text-3xl lg:mb-2 lg:text-4xl">
-        You have signed
+        {t('you_have_signed')}
         <span className="mt-2 block">{document.title}</span>
       </h2>
 
@@ -76,22 +79,22 @@ export const SinglePlayerModeSuccess = ({
             />
 
             <Button onClick={() => setShowDocumentDialog(true)} className="z-10 col-span-2">
-              Show document
+              {t('show_document')}
             </Button>
           </div>
         </div>
       </div>
 
       <p className="text-muted-foreground/60 mt-16 text-center text-sm">
-        Create a{' '}
+        {t('create_a')}{' '}
         <Link
           href={`${process.env.NEXT_PUBLIC_WEBAPP_URL}/signup`}
           target="_blank"
           className="text-documenso-700 hover:text-documenso-600 whitespace-nowrap"
         >
-          free account
+          {t('free_account')}
         </Link>{' '}
-        to access your signed documents at any time
+        {t('to_access_your_signed_documents')}
       </p>
 
       <DocumentDialog

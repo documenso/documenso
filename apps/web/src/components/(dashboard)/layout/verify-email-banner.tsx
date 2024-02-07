@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 
 import { AlertTriangle } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 import { ONE_DAY, ONE_SECOND } from '@documenso/lib/constants/time';
 import { trpc } from '@documenso/trpc/react';
@@ -24,6 +25,7 @@ const RESEND_CONFIRMATION_EMAIL_TIMEOUT = 20 * ONE_SECOND;
 export const VerifyEmailBanner = ({ email }: VerifyEmailBannerProps) => {
   const { toast } = useToast();
   const [isOpen, setIsOpen] = useState(false);
+  const { t } = useTranslation();
 
   const [isButtonDisabled, setIsButtonDisabled] = useState(false);
 
@@ -37,8 +39,8 @@ export const VerifyEmailBanner = ({ email }: VerifyEmailBannerProps) => {
       await sendConfirmationEmail({ email: email });
 
       toast({
-        title: 'Success',
-        description: 'Verification email sent successfully.',
+        title: `${t('success')}`,
+        description: `${t('verification_email_sent_successfully')}`,
       });
 
       setIsOpen(false);
@@ -47,8 +49,8 @@ export const VerifyEmailBanner = ({ email }: VerifyEmailBannerProps) => {
       setIsButtonDisabled(false);
 
       toast({
-        title: 'Error',
-        description: 'Something went wrong while sending the confirmation email.',
+        title: `${t('error')}`,
+        description: `${t('error_occured_while_sending_confirmation_email')}`,
         variant: 'destructive',
       });
     }
@@ -81,7 +83,7 @@ export const VerifyEmailBanner = ({ email }: VerifyEmailBannerProps) => {
         <div className="mx-auto flex max-w-screen-xl items-center justify-center gap-x-4 px-4 py-2 text-sm font-medium text-yellow-900">
           <div className="flex items-center">
             <AlertTriangle className="mr-2.5 h-5 w-5" />
-            Verify your email address to unlock all features.
+            {t('verify_email')}
           </div>
 
           <div>
@@ -92,7 +94,7 @@ export const VerifyEmailBanner = ({ email }: VerifyEmailBannerProps) => {
               onClick={() => setIsOpen(true)}
               size="sm"
             >
-              {isButtonDisabled ? 'Verification Email Sent' : 'Verify Now'}
+              {isButtonDisabled ? `${t('verification_email_sent')}` : `${t('verify_now')}`}
             </Button>
           </div>
         </div>
@@ -100,11 +102,11 @@ export const VerifyEmailBanner = ({ email }: VerifyEmailBannerProps) => {
 
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
         <DialogContent>
-          <DialogTitle>Verify your email address</DialogTitle>
+          <DialogTitle>{t('verify_your_email_address')}</DialogTitle>
 
           <DialogDescription>
-            We've sent a confirmation email to <strong>{email}</strong>. Please check your inbox and
-            click the link in the email to verify your account.
+            {t('sent_confirmation_email')} <strong>{email}</strong>. Please check your inbox and
+            {t('check_your_inbox_to_verify')}
           </DialogDescription>
 
           <div>
@@ -113,7 +115,7 @@ export const VerifyEmailBanner = ({ email }: VerifyEmailBannerProps) => {
               loading={isLoading}
               onClick={onResendConfirmationEmail}
             >
-              {isLoading ? 'Sending...' : 'Resend Confirmation Email'}
+              {isLoading ? `${t('sending')}` : `${t('resend_confirmation_email')}`}
             </Button>
           </div>
         </DialogContent>

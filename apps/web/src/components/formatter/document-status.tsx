@@ -7,6 +7,8 @@ import type { ExtendedDocumentStatus } from '@documenso/prisma/types/extended-do
 import { SignatureIcon } from '@documenso/ui/icons/signature';
 import { cn } from '@documenso/ui/lib/utils';
 
+import initTranslations from '~/app/i18n';
+
 type FriendlyStatus = {
   label: string;
   icon?: LucideIcon;
@@ -41,17 +43,20 @@ const FRIENDLY_STATUS_MAP: Record<ExtendedDocumentStatus, FriendlyStatus> = {
 };
 
 export type DocumentStatusProps = HTMLAttributes<HTMLSpanElement> & {
+  locale?: string;
   status: ExtendedDocumentStatus;
   inheritColor?: boolean;
 };
 
-export const DocumentStatus = ({
+export const DocumentStatus = async ({
+  locale = 'en',
   className,
   status,
   inheritColor,
   ...props
 }: DocumentStatusProps) => {
   const { label, icon: Icon, color } = FRIENDLY_STATUS_MAP[status];
+  const { t } = await initTranslations(locale);
 
   return (
     <span className={cn('flex items-center', className)} {...props}>
@@ -62,7 +67,7 @@ export const DocumentStatus = ({
           })}
         />
       )}
-      {label}
+      {t(label)}
     </span>
   );
 };

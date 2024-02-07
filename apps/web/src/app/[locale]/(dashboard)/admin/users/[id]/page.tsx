@@ -1,0 +1,143 @@
+'use client';
+
+import { useRouter } from 'next/navigation';
+
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useForm } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
+import type { z } from 'zod';
+
+import { trpc } from '@documenso/trpc/react';
+import { ZUpdateProfileMutationByAdminSchema } from '@documenso/trpc/server/admin-router/schema';
+import { Button } from '@documenso/ui/primitives/button';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@documenso/ui/primitives/form/form';
+import { Input } from '@documenso/ui/primitives/input';
+import { MultiSelectCombobox } from '@documenso/ui/primitives/multiselect-combobox';
+import { useToast } from '@documenso/ui/primitives/use-toast';
+
+const ZUserFormSchema = ZUpdateProfileMutationByAdminSchema.omit({ id: true });
+
+type TUserFormSchema = z.infer<typeof ZUserFormSchema>;
+
+export default function UserPage({ params }: { params: { id: number } }) {
+  const { toast } = useToast();
+  const router = useRouter();
+  const { t } = useTranslation();
+
+  const { data: user } = trpc.profile.getUser.useQuery(
+    {
+      id: Number(params.id),
+    },
+    {
+      enabled: !!params.id,
+    },
+  );
+
+  const roles = user?.roles ?? [];
+
+  const { mutateAsync: updateUserMutation } = trpc.admin.updateUser.useMutation();
+
+  const form = useForm<TUserFormSchema>({
+    resolver: zodResolver(ZUserFormSchema),
+    values: {
+      name: user?.name ?? '',
+      email: user?.email ?? '',
+      roles: user?.roles ?? [],
+    },
+  });
+
+  const onSubmit = async ({ name, email, roles }: TUserFormSchema) => {
+    try {
+      await updateUserMutation({
+        id: Number(user?.id),
+        name,
+        email,
+        roles,
+      });
+
+      router.refresh();
+
+      toast({
+        title: `${t('profile_updated')}`,
+        description: `${t('profile_has_been_updated')}`,
+        duration: 5000,
+      });
+    } catch (e) {
+      toast({
+        title: `${t('error')}`,
+        description: `${t('error_occured_while_updating_profile')}`,
+        variant: 'destructive',
+      });
+    }
+  };
+
+  return (
+    <div>
+      <h2 className="text-4xl font-semibold">{t('manage_users_profile', { user: user?.name })}</h2>
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)}>
+          <fieldset className="mt-6 flex w-full flex-col gap-y-4">
+            <FormField
+              control={form.control}
+              name="name"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-muted-foreground">{t('name')}</FormLabel>
+                  <FormControl>
+                    <Input type="text" {...field} value={field.value ?? ''} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="email"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-muted-foreground">{t('email')}</FormLabel>
+                  <FormControl>
+                    <Input type="text" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="roles"
+              render={({ field: { onChange } }) => (
+                <FormItem>
+                  <fieldset className="flex flex-col gap-2">
+                    <FormLabel className="text-muted-foreground">{t('roles')}</FormLabel>
+                    <FormControl>
+                      <MultiSelectCombobox
+                        listValues={roles}
+                        onChange={(values: string[]) => onChange(values)}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </fieldset>
+                </FormItem>
+              )}
+            />
+
+            <div className="mt-4">
+              <Button type="submit" loading={form.formState.isSubmitting}>
+                {t('update_user')}
+              </Button>
+            </div>
+          </fieldset>
+        </form>
+      </Form>
+    </div>
+  );
+}

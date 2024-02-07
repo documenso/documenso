@@ -6,6 +6,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { AnimatePresence, motion } from 'framer-motion';
 import { BadgeCheck, Copy, Eye, PencilLine, Plus, Trash } from 'lucide-react';
 import { Controller, useFieldArray, useForm } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 
 import { useLimits } from '@documenso/ee/server-only/limits/provider/client';
 import { nanoid } from '@documenso/lib/universal/id';
@@ -55,6 +56,7 @@ export const AddSignersFormPartial = ({
   onSubmit,
 }: AddSignersFormProps) => {
   const { toast } = useToast();
+  const { t } = useTranslation();
   const { remaining } = useLimits();
 
   const initialId = useId();
@@ -123,8 +125,8 @@ export const AddSignersFormPartial = ({
 
     if (hasBeenSentToRecipientId(signer.nativeId)) {
       toast({
-        title: 'Cannot remove signer',
-        description: 'This signer has already received the document.',
+        title: `${t('cannot_remove_signer')}`,
+        description: `${t('signer_has_already_received_document')}`,
         variant: 'destructive',
       });
 
@@ -161,7 +163,7 @@ export const AddSignersFormPartial = ({
               >
                 <div className="flex-1">
                   <Label htmlFor={`signer-${signer.id}-email`}>
-                    Email
+                    {t('email')}
                     <span className="text-destructive ml-1 inline-block font-medium">*</span>
                   </Label>
 
@@ -182,7 +184,7 @@ export const AddSignersFormPartial = ({
                 </div>
 
                 <div className="flex-1">
-                  <Label htmlFor={`signer-${signer.id}-name`}>Name</Label>
+                  <Label htmlFor={`signer-${signer.id}-name`}>{t('name')}</Label>
 
                   <Controller
                     control={control}
@@ -212,28 +214,28 @@ export const AddSignersFormPartial = ({
                           <SelectItem value={RecipientRole.SIGNER}>
                             <div className="flex items-center">
                               <span className="mr-2">{ROLE_ICONS[RecipientRole.SIGNER]}</span>
-                              Signer
+                              {t('signer')}
                             </div>
                           </SelectItem>
 
                           <SelectItem value={RecipientRole.CC}>
                             <div className="flex items-center">
                               <span className="mr-2">{ROLE_ICONS[RecipientRole.CC]}</span>
-                              Receives copy
+                              {t('receives_copy')}
                             </div>
                           </SelectItem>
 
                           <SelectItem value={RecipientRole.APPROVER}>
                             <div className="flex items-center">
                               <span className="mr-2">{ROLE_ICONS[RecipientRole.APPROVER]}</span>
-                              Approver
+                              {t('approver')}
                             </div>
                           </SelectItem>
 
                           <SelectItem value={RecipientRole.VIEWER}>
                             <div className="flex items-center">
                               <span className="mr-2">{ROLE_ICONS[RecipientRole.VIEWER]}</span>
-                              Viewer
+                              {t('viewer')}
                             </div>
                           </SelectItem>
                         </SelectContent>
@@ -279,7 +281,7 @@ export const AddSignersFormPartial = ({
             onClick={() => onAddSigner()}
           >
             <Plus className="-ml-1 mr-2 h-5 w-5" />
-            Add Signer
+            {t('add_signers')}
           </Button>
         </div>
       </DocumentFlowFormContainerContent>
