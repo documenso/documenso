@@ -11,6 +11,9 @@ module.exports = {
         sans: ['var(--font-sans)', ...fontFamily.sans],
         signature: ['var(--font-signature)'],
       },
+      zIndex: {
+        9999: '9999',
+      },
       colors: {
         border: 'hsl(var(--border))',
         input: 'hsl(var(--input))',

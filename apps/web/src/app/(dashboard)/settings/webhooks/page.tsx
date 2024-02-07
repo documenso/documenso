@@ -5,6 +5,7 @@ import { Zap } from 'lucide-react';
 import { Button } from '@documenso/ui/primitives/button';
 
 import { SettingsHeader } from '~/components/(dashboard)/settings/layout/header';
+import { CreateWebhookDialog } from '~/components/(dashboard)/settings/webhooks/create-webhook-dialog';
 import { DeleteWebhookDialog } from '~/components/(dashboard)/settings/webhooks/delete-webhook-dialog';
 
 export default function WebhookPage() {
@@ -26,7 +27,7 @@ export default function WebhookPage() {
         title="Webhooks"
         subtitle="On this page, you can create new Webhooks and manage the existing ones."
       >
-        <Button variant="default">Create Webhook</Button>
+        <CreateWebhookDialog />
       </SettingsHeader>
 
       {webhooks.length === 0 && (
