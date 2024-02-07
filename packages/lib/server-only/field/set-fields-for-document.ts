@@ -56,11 +56,7 @@ export const setFieldsForDocument = async ({
   });
 
   const removedFields = existingFields.filter(
-    (existingField) =>
-      !fields.find(
-        (field) =>
-          field.id === existingField.id || field.signerEmail === existingField.Recipient?.email,
-      ),
+    (existingField) => !fields.find((field) => field.id === existingField.id),
   );
 
   const linkedFields = fields
