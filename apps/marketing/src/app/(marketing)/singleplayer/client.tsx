@@ -244,6 +244,7 @@ export const SinglePlayerClient = () => {
                   recipients={uploadedFile ? [placeholderRecipient] : []}
                   fields={fields}
                   onSubmit={onFieldsSubmit}
+                  isSinglePlayerMode={true}
                 />
               </fieldset>
 
