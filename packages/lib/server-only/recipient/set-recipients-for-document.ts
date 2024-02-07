@@ -44,6 +44,10 @@ export const setRecipientsForDocument = async ({
     throw new Error('Document not found');
   }
 
+  if (document.completedAt) {
+    throw new Error('Document already complete');
+  }
+
   const normalizedRecipients = recipients.map((recipient) => ({
     ...recipient,
     email: recipient.email.toLowerCase(),
@@ -77,8 +81,9 @@ export const setRecipientsForDocument = async ({
     })
     .filter((recipient) => {
       return (
-        recipient._persisted?.sendStatus !== SendStatus.SENT &&
-        recipient._persisted?.signingStatus !== SigningStatus.SIGNED
+        recipient._persisted?.role === RecipientRole.CC ||
+        (recipient._persisted?.sendStatus !== SendStatus.SENT &&
+          recipient._persisted?.signingStatus !== SigningStatus.SIGNED)
       );
     });
 
@@ -96,6 +101,7 @@ export const setRecipientsForDocument = async ({
           email: recipient.email,
           role: recipient.role,
           documentId,
+          sendStatus: recipient.role === RecipientRole.CC ? SendStatus.SENT : SendStatus.NOT_SENT,
           signingStatus:
             recipient.role === RecipientRole.CC ? SigningStatus.SIGNED : SigningStatus.NOT_SIGNED,
         },
