@@ -30,13 +30,11 @@ export const AuthenticatorApp = ({ isTwoFactorEnabled }: AuthenticatorAppProps) 
       </div>
 
       <EnableAuthenticatorAppDialog
-        key={isEnableDialogOpen ? 'open' : 'closed'}
         open={isEnableDialogOpen}
         onOpenChange={(open) => !open && setModalState(null)}
       />
 
       <DisableAuthenticatorAppDialog
-        key={isDisableDialogOpen ? 'open' : 'closed'}
         open={isDisableDialogOpen}
         onOpenChange={(open) => !open && setModalState(null)}
       />
