@@ -18,7 +18,10 @@ const fontInter = Inter({ subsets: ['latin'], variable: '--font-sans' });
 const fontCaveat = Caveat({ subsets: ['latin'], variable: '--font-signature' });
 
 export const metadata = {
-  title: 'Documenso - The Open Source DocuSign Alternative',
+  title: {
+    template: '%s - Documenso',
+    default: 'Documenso',
+  },
   description:
     'Join Documenso, the open signing infrastructure, and get a 10x better signing experience. Pricing starts at $30/mo. forever! Sign in now and enjoy a faster, smarter, and more beautiful document signing process. Integrates with your favorite tools, customizable, and expandable. Support our mission and become a part of our open-source community.',
   keywords:

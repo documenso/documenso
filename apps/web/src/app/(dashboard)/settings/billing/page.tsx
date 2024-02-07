@@ -1,11 +1,13 @@
+import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 
 import { match } from 'ts-pattern';
 
 import { getStripeCustomerByUser } from '@documenso/ee/server-only/stripe/get-customer';
 import { getPricesByInterval } from '@documenso/ee/server-only/stripe/get-prices-by-interval';
-import { getPricesByType } from '@documenso/ee/server-only/stripe/get-prices-by-type';
+import { getPricesByPlan } from '@documenso/ee/server-only/stripe/get-prices-by-plan';
 import { getProductByPriceId } from '@documenso/ee/server-only/stripe/get-product-by-price-id';
+import { STRIPE_PLAN_TYPE } from '@documenso/lib/constants/billing';
 import { getRequiredServerComponentSession } from '@documenso/lib/next-auth/get-server-component-session';
 import { getServerComponentFlag } from '@documenso/lib/server-only/feature-flags/get-server-component-feature-flag';
 import { type Stripe } from '@documenso/lib/server-only/stripe';
@@ -16,6 +18,10 @@ import { LocaleDate } from '~/components/formatter/locale-date';
 
 import { BillingPlans } from './billing-plans';
 import { BillingPortalButton } from './billing-portal-button';
+
+export const metadata: Metadata = {
+  title: 'Billing',
+};
 
 export default async function BillingSettingsPage() {
   let { user } = await getRequiredServerComponentSession();
@@ -31,23 +37,23 @@ export default async function BillingSettingsPage() {
     user = await getStripeCustomerByUser(user).then((result) => result.user);
   }
 
-  const [subscriptions, prices, individualPrices] = await Promise.all([
+  const [subscriptions, prices, communityPlanPrices] = await Promise.all([
     getSubscriptionsByUserId({ userId: user.id }),
-    getPricesByInterval({ type: 'individual' }),
-    getPricesByType('individual'),
+    getPricesByInterval({ plan: STRIPE_PLAN_TYPE.COMMUNITY }),
+    getPricesByPlan(STRIPE_PLAN_TYPE.COMMUNITY),
   ]);
 
-  const individualPriceIds = individualPrices.map(({ id }) => id);
+  const communityPlanPriceIds = communityPlanPrices.map(({ id }) => id);
 
   let subscriptionProduct: Stripe.Product | null = null;
 
-  const individualUserSubscriptions = subscriptions.filter(({ priceId }) =>
-    individualPriceIds.includes(priceId),
+  const communityPlanUserSubscriptions = subscriptions.filter(({ priceId }) =>
+    communityPlanPriceIds.includes(priceId),
   );
 
   const subscription =
-    individualUserSubscriptions.find(({ status }) => status === SubscriptionStatus.ACTIVE) ??
-    individualUserSubscriptions[0];
+    communityPlanUserSubscriptions.find(({ status }) => status === SubscriptionStatus.ACTIVE) ??
+    communityPlanUserSubscriptions[0];
 
   if (subscription?.priceId) {
     subscriptionProduct = await getProductByPriceId({ priceId: subscription.priceId }).catch(

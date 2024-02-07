@@ -1,4 +1,5 @@
 import { prisma } from '@documenso/prisma';
+import { RecipientRole } from '@documenso/prisma/client';
 import { SendStatus, SigningStatus } from '@documenso/prisma/client';
 
 import { nanoid } from '../../universal/id';
@@ -10,6 +11,7 @@ export interface SetRecipientsForDocumentOptions {
     id?: number | null;
     email: string;
     name: string;
+    role: RecipientRole;
   }[];
 }
 
@@ -21,7 +23,20 @@ export const setRecipientsForDocument = async ({
   const document = await prisma.document.findFirst({
     where: {
       id: documentId,
-      userId,
+      OR: [
+        {
+          userId,
+        },
+        {
+          team: {
+            members: {
+              some: {
+                userId,
+              },
+            },
+          },
+        },
+      ],
     },
   });
 
@@ -79,13 +94,20 @@ export const setRecipientsForDocument = async ({
         update: {
           name: recipient.name,
           email: recipient.email,
+          role: recipient.role,
           documentId,
+          signingStatus:
+            recipient.role === RecipientRole.CC ? SigningStatus.SIGNED : SigningStatus.NOT_SIGNED,
         },
         create: {
           name: recipient.name,
           email: recipient.email,
+          role: recipient.role,
           token: nanoid(),
           documentId,
+          sendStatus: recipient.role === RecipientRole.CC ? SendStatus.SENT : SendStatus.NOT_SENT,
+          signingStatus:
+            recipient.role === RecipientRole.CC ? SigningStatus.SIGNED : SigningStatus.NOT_SIGNED,
         },
       }),
     ),
