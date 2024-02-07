@@ -13,21 +13,25 @@ export const decryptSecondaryData = (encryptedData: string): string | null => {
     throw new Error('Missing encryption key');
   }
 
-  const decryptedBufferValue = symmetricDecrypt({
-    key: DOCUMENSO_ENCRYPTION_SECONDARY_KEY,
-    data: encryptedData,
-  });
+  try {
+    const decryptedBufferValue = symmetricDecrypt({
+      key: DOCUMENSO_ENCRYPTION_SECONDARY_KEY,
+      data: encryptedData,
+    });
 
-  const decryptedValue = Buffer.from(decryptedBufferValue).toString('utf-8');
-  const result = ZEncryptedDataSchema.safeParse(JSON.parse(decryptedValue));
+    const decryptedValue = Buffer.from(decryptedBufferValue).toString('utf-8');
+    const result = ZEncryptedDataSchema.safeParse(JSON.parse(decryptedValue));
 
-  if (!result.success) {
+    if (!result.success) {
+      return null;
+    }
+
+    if (result.data.expiresAt !== undefined && result.data.expiresAt < Date.now()) {
+      return null;
+    }
+
+    return result.data.data;
+  } catch {
     return null;
   }
-
-  if (result.data.expiresAt !== undefined && result.data.expiresAt < Date.now()) {
-    return null;
-  }
-
-  return result.data.data;
 };

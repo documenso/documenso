@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import { Plus } from 'lucide-react';
 import { useDropzone } from 'react-dropzone';
 
+import { APP_DOCUMENT_UPLOAD_SIZE_LIMIT } from '@documenso/lib/constants/app';
 import { megabytesToBytes } from '@documenso/lib/universal/unit-convertions';
 
 import { cn } from '../lib/utils';
@@ -89,6 +90,7 @@ export type DocumentDropzoneProps = {
   disabled?: boolean;
   disabledMessage?: string;
   onDrop?: (_file: File) => void | Promise<void>;
+  onDropRejected?: () => void | Promise<void>;
   type?: 'document' | 'template';
   [key: string]: unknown;
 };
@@ -96,6 +98,7 @@ export type DocumentDropzoneProps = {
 export const DocumentDropzone = ({
   className,
   onDrop,
+  onDropRejected,
   disabled,
   disabledMessage = 'You cannot upload documents at this time.',
   type = 'document',
@@ -112,7 +115,12 @@ export const DocumentDropzone = ({
         void onDrop(acceptedFile);
       }
     },
-    maxSize: megabytesToBytes(50),
+    onDropRejected: () => {
+      if (onDropRejected) {
+        void onDropRejected();
+      }
+    },
+    maxSize: megabytesToBytes(APP_DOCUMENT_UPLOAD_SIZE_LIMIT),
   });
 
   return (
@@ -175,7 +183,7 @@ export const DocumentDropzone = ({
           </p>
 
           <p className="text-muted-foreground/80 mt-1 text-sm">
-            {disabled ? disabledMessage : 'Drag & drop your document here.'}
+            {disabled ? disabledMessage : 'Drag & drop your PDF here.'}
           </p>
         </CardContent>
       </Card>

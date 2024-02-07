@@ -83,7 +83,7 @@ export const TemplatesDataTable = ({
   return (
     <div className="relative">
       {remaining.documents === 0 && (
-        <Alert className="mb-4 mt-5">
+        <Alert variant="warning" className="mb-4">
           <AlertTriangle className="h-4 w-4" />
           <AlertTitle>Document Limit Exceeded!</AlertTitle>
           <AlertDescription className="mt-2">

@@ -55,10 +55,11 @@ export type TSignInFormSchema = z.infer<typeof ZSignInFormSchema>;
 
 export type SignInFormProps = {
   className?: string;
+  initialEmail?: string;
   isGoogleSSOEnabled?: boolean;
 };
 
-export const SignInForm = ({ className, isGoogleSSOEnabled }: SignInFormProps) => {
+export const SignInForm = ({ className, initialEmail, isGoogleSSOEnabled }: SignInFormProps) => {
   const { toast } = useToast();
   const [isTwoFactorAuthenticationDialogOpen, setIsTwoFactorAuthenticationDialogOpen] =
     useState(false);
@@ -69,7 +70,7 @@ export const SignInForm = ({ className, isGoogleSSOEnabled }: SignInFormProps) =
 
   const form = useForm<TSignInFormSchema>({
     values: {
-      email: '',
+      email: initialEmail ?? '',
       password: '',
       totpCode: '',
       backupCode: '',
