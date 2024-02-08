@@ -25,7 +25,7 @@ export type DocumentPageViewProps = {
   team?: Team;
 };
 
-export default async function DocumentPageView({ params, team }: DocumentPageViewProps) {
+export const DocumentPageView = async ({ params, team }: DocumentPageViewProps) => {
   const { id } = params;
 
   const documentId = Number(id);
@@ -128,4 +128,4 @@ export default async function DocumentPageView({ params, team }: DocumentPageVie
       )}
     </div>
   );
-}
+};

@@ -43,8 +43,14 @@ const ZCreateTemplateFormSchema = z.object({
 
 type TCreateTemplateFormSchema = z.infer<typeof ZCreateTemplateFormSchema>;
 
-export const NewTemplateDialog = () => {
+type NewTemplateDialogProps = {
+  teamId?: number;
+  templateRootPath: string;
+};
+
+export const NewTemplateDialog = ({ teamId, templateRootPath }: NewTemplateDialogProps) => {
   const router = useRouter();
+
   const { data: session } = useSession();
   const { toast } = useToast();
 
@@ -99,6 +105,7 @@ export const NewTemplateDialog = () => {
       });
 
       const { id } = await createTemplate({
+        teamId,
         title: values.name ? values.name : file.name,
         templateDocumentDataId,
       });
@@ -112,7 +119,7 @@ export const NewTemplateDialog = () => {
 
       setShowNewTemplateDialog(false);
 
-      void router.push(`/templates/${id}`);
+      router.push(`${templateRootPath}/${id}`);
     } catch {
       toast({
         title: 'Something went wrong',

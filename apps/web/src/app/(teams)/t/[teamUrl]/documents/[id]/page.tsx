@@ -1,7 +1,7 @@
 import { getRequiredServerComponentSession } from '@documenso/lib/next-auth/get-server-component-session';
 import { getTeamByUrl } from '@documenso/lib/server-only/team/get-team';
 
-import DocumentPageComponent from '~/app/(dashboard)/documents/[id]/document-page-view';
+import { DocumentPageView } from '~/app/(dashboard)/documents/[id]/document-page-view';
 
 export type DocumentPageProps = {
   params: {
@@ -16,5 +16,5 @@ export default async function DocumentPage({ params }: DocumentPageProps) {
   const { user } = await getRequiredServerComponentSession();
   const team = await getTeamByUrl({ userId: user.id, teamUrl });
 
-  return <DocumentPageComponent params={params} team={team} />;
+  return <DocumentPageView params={params} team={team} />;
 }

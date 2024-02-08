@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 export const ZAddTitleFormSchema = z.object({
-  title: z.string().min(1),
+  title: z.string().trim().min(1, { message: "Title can't be empty" }),
 });
 
 export type TAddTitleFormSchema = z.infer<typeof ZAddTitleFormSchema>;
