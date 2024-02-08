@@ -5,6 +5,7 @@ import React from 'react';
 import { useCopyToClipboard } from '@documenso/lib/client-only/hooks/use-copy-to-clipboard';
 import { getRecipientType } from '@documenso/lib/client-only/recipient-type';
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
+import { RECIPIENT_ROLES_DESCRIPTION } from '@documenso/lib/constants/recipient-roles';
 import { recipientAbbreviation } from '@documenso/lib/utils/recipient-formatter';
 import type { Recipient } from '@documenso/prisma/client';
 import { cn } from '@documenso/ui/lib/utils';
@@ -48,8 +49,17 @@ export function AvatarWithRecipient({ recipient }: AvatarWithRecipientProps) {
         type={getRecipientType(recipient)}
         fallbackText={recipientAbbreviation(recipient)}
       />
-
-      <span className="text-muted-foreground text-sm">{recipient.email}</span>
+      <div>
+        <div
+          className="text-muted-foreground text-sm"
+          title="Click to copy signing link for sending to recipient"
+        >
+          <p>{recipient.email} </p>
+          <p className="text-muted-foreground/70 text-xs">
+            {RECIPIENT_ROLES_DESCRIPTION[recipient.role].roleName}
+          </p>
+        </div>
+      </div>
     </div>
   );
 }

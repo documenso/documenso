@@ -10,11 +10,12 @@ import GoogleProvider from 'next-auth/providers/google';
 import { env } from 'next-runtime-env';
 
 import { prisma } from '@documenso/prisma';
-import { IdentityProvider } from '@documenso/prisma/client';
+import { IdentityProvider, UserSecurityAuditLogType } from '@documenso/prisma/client';
 
 import { isTwoFactorAuthenticationEnabled } from '../server-only/2fa/is-2fa-availble';
 import { validateTwoFactorAuthentication } from '../server-only/2fa/validate-2fa';
 import { getUserByEmail } from '../server-only/user/get-user-by-email';
+import { extractNextAuthRequestMetadata } from '../universal/extract-request-metadata';
 import { ErrorCode } from './error-codes';
 
 export const NEXT_AUTH_OPTIONS: AuthOptions = {
@@ -36,7 +37,7 @@ export const NEXT_AUTH_OPTIONS: AuthOptions = {
         },
         backupCode: { label: 'Backup Code', type: 'input', placeholder: 'Two-factor backup code' },
       },
-      authorize: async (credentials, _req) => {
+      authorize: async (credentials, req) => {
         if (!credentials) {
           throw new Error(ErrorCode.CREDENTIALS_NOT_FOUND);
         }
@@ -52,8 +53,18 @@ export const NEXT_AUTH_OPTIONS: AuthOptions = {
         }
 
         const isPasswordsSame = await compare(password, user.password);
+        const requestMetadata = extractNextAuthRequestMetadata(req);
 
         if (!isPasswordsSame) {
+          await prisma.userSecurityAuditLog.create({
+            data: {
+              userId: user.id,
+              ipAddress: requestMetadata.ipAddress,
+              userAgent: requestMetadata.userAgent,
+              type: UserSecurityAuditLogType.SIGN_IN_FAIL,
+            },
+          });
+
           throw new Error(ErrorCode.INCORRECT_EMAIL_PASSWORD);
         }
 
@@ -63,6 +74,15 @@ export const NEXT_AUTH_OPTIONS: AuthOptions = {
           const isValid = await validateTwoFactorAuthentication({ backupCode, totpCode, user });
 
           if (!isValid) {
+            await prisma.userSecurityAuditLog.create({
+              data: {
+                userId: user.id,
+                ipAddress: requestMetadata.ipAddress,
+                userAgent: requestMetadata.userAgent,
+                type: UserSecurityAuditLogType.SIGN_IN_2FA_FAIL,
+              },
+            });
+
             throw new Error(
               totpCode
                 ? ErrorCode.INCORRECT_TWO_FACTOR_CODE
@@ -193,4 +213,5 @@ export const NEXT_AUTH_OPTIONS: AuthOptions = {
       return true;
     },
   },
+  // Note: `events` are handled in `apps/web/src/pages/api/auth/[...nextauth].ts` to allow access to the request.
 };

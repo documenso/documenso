@@ -21,7 +21,8 @@
     "@prisma/client": "5.4.2",
     "dotenv": "^16.3.1",
     "dotenv-cli": "^7.3.0",
-    "prisma": "5.4.2"
+    "prisma": "5.4.2",
+    "ts-pattern": "^5.0.6"
   },
   "devDependencies": {
     "ts-node": "^10.9.1",

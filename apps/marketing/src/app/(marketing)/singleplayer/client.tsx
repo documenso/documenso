@@ -159,6 +159,7 @@ export const SinglePlayerClient = () => {
     readStatus: 'OPENED',
     signingStatus: 'NOT_SIGNED',
     sendStatus: 'NOT_SENT',
+    role: 'SIGNER',
   };
 
   const onFileDrop = async (file: File) => {

@@ -9,9 +9,16 @@ import { FcGoogle } from 'react-icons/fc';
 import { z } from 'zod';
 
 import { ErrorCode, isErrorCode } from '@documenso/lib/next-auth/error-codes';
+import { ZCurrentPasswordSchema } from '@documenso/trpc/server/auth-router/schema';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@documenso/ui/primitives/dialog';
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@documenso/ui/primitives/dialog';
 import {
   Form,
   FormControl,
@@ -39,7 +46,7 @@ const LOGIN_REDIRECT_PATH = '/documents';
 
 export const ZSignInFormSchema = z.object({
   email: z.string().email().min(1),
-  password: z.string().min(6).max(72),
+  password: ZCurrentPasswordSchema,
   totpCode: z.string().trim().optional(),
   backupCode: z.string().trim().optional(),
 });
@@ -48,10 +55,11 @@ export type TSignInFormSchema = z.infer<typeof ZSignInFormSchema>;
 
 export type SignInFormProps = {
   className?: string;
+  initialEmail?: string;
   isGoogleSSOEnabled?: boolean;
 };
 
-export const SignInForm = ({ className, isGoogleSSOEnabled }: SignInFormProps) => {
+export const SignInForm = ({ className, initialEmail, isGoogleSSOEnabled }: SignInFormProps) => {
   const { toast } = useToast();
   const [isTwoFactorAuthenticationDialogOpen, setIsTwoFactorAuthenticationDialogOpen] =
     useState(false);
@@ -62,7 +70,7 @@ export const SignInForm = ({ className, isGoogleSSOEnabled }: SignInFormProps) =
 
   const form = useForm<TSignInFormSchema>({
     values: {
-      email: '',
+      email: initialEmail ?? '',
       password: '',
       totpCode: '',
       backupCode: '',
@@ -110,7 +118,6 @@ export const SignInForm = ({ className, isGoogleSSOEnabled }: SignInFormProps) =
 
       const result = await signIn('credentials', {
         ...credentials,
-
         callbackUrl: LOGIN_REDIRECT_PATH,
         redirect: false,
       });
@@ -269,21 +276,23 @@ export const SignInForm = ({ className, isGoogleSSOEnabled }: SignInFormProps) =
                   )}
                 />
               )}
+
+              <DialogFooter className="mt-4">
+                <Button
+                  type="button"
+                  variant="secondary"
+                  onClick={onToggleTwoFactorAuthenticationMethodClick}
+                >
+                  {twoFactorAuthenticationMethod === 'totp'
+                    ? 'Use Backup Code'
+                    : 'Use Authenticator'}
+                </Button>
+
+                <Button type="submit" loading={isSubmitting}>
+                  {isSubmitting ? 'Signing in...' : 'Sign In'}
+                </Button>
+              </DialogFooter>
             </fieldset>
-
-            <div className="mt-4 flex items-center justify-between">
-              <Button
-                type="button"
-                variant="ghost"
-                onClick={onToggleTwoFactorAuthenticationMethodClick}
-              >
-                {twoFactorAuthenticationMethod === 'totp' ? 'Use Backup Code' : 'Use Authenticator'}
-              </Button>
-
-              <Button type="submit" loading={isSubmitting}>
-                {isSubmitting ? 'Signing in...' : 'Sign In'}
-              </Button>
-            </div>
           </form>
         </DialogContent>
       </Dialog>

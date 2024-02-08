@@ -1,3 +1,5 @@
+import { RECIPIENT_ROLES_DESCRIPTION } from '@documenso/lib/constants/recipient-roles';
+import type { RecipientRole } from '@documenso/prisma/client';
 import config from '@documenso/tailwind-config';
 
 import {
@@ -19,6 +21,7 @@ import { TemplateFooter } from '../template-components/template-footer';
 
 export type DocumentInviteEmailTemplateProps = Partial<TemplateDocumentInviteProps> & {
   customBody?: string;
+  role: RecipientRole;
 };
 
 export const DocumentInviteEmailTemplate = ({
@@ -28,8 +31,11 @@ export const DocumentInviteEmailTemplate = ({
   signDocumentLink = 'https://documenso.com',
   assetBaseUrl = 'http://localhost:3002',
   customBody,
+  role,
 }: DocumentInviteEmailTemplateProps) => {
-  const previewText = `${inviterName} has invited you to sign ${documentName}`;
+  const action = RECIPIENT_ROLES_DESCRIPTION[role].actionVerb.toLowerCase();
+
+  const previewText = `${inviterName} has invited you to ${action} ${documentName}`;
 
   const getAssetUrl = (path: string) => {
     return new URL(path, assetBaseUrl).toString();
@@ -64,6 +70,7 @@ export const DocumentInviteEmailTemplate = ({
                   documentName={documentName}
                   signDocumentLink={signDocumentLink}
                   assetBaseUrl={assetBaseUrl}
+                  role={role}
                 />
               </Section>
             </Container>
@@ -81,7 +88,7 @@ export const DocumentInviteEmailTemplate = ({
                   {customBody ? (
                     <pre className="font-sans text-base text-slate-400">{customBody}</pre>
                   ) : (
-                    `${inviterName} has invited you to sign the document "${documentName}".`
+                    `${inviterName} has invited you to ${action} the document "${documentName}".`
                   )}
                 </Text>
               </Section>

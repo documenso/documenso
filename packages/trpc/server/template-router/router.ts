@@ -1,5 +1,6 @@
 import { TRPCError } from '@trpc/server';
 
+import { getServerLimits } from '@documenso/ee/server-only/limits/server';
 import { createDocumentFromTemplate } from '@documenso/lib/server-only/template/create-document-from-template';
 import { createTemplate } from '@documenso/lib/server-only/template/create-template';
 import { deleteTemplate } from '@documenso/lib/server-only/template/delete-template';
@@ -18,11 +19,12 @@ export const templateRouter = router({
     .input(ZCreateTemplateMutationSchema)
     .mutation(async ({ input, ctx }) => {
       try {
-        const { title, templateDocumentDataId } = input;
+        const { teamId, title, templateDocumentDataId } = input;
 
         return await createTemplate({
-          title,
           userId: ctx.user.id,
+          teamId,
+          title,
           templateDocumentDataId,
         });
       } catch (err) {
@@ -41,6 +43,12 @@ export const templateRouter = router({
       try {
         const { templateId } = input;
 
+        const limits = await getServerLimits({ email: ctx.user.email });
+
+        if (limits.remaining.documents === 0) {
+          throw new Error('You have reached your document limit.');
+        }
+
         return await createDocumentFromTemplate({
           templateId,
           userId: ctx.user.id,
@@ -57,11 +65,12 @@ export const templateRouter = router({
     .input(ZDuplicateTemplateMutationSchema)
     .mutation(async ({ input, ctx }) => {
       try {
-        const { templateId } = input;
+        const { teamId, templateId } = input;
 
         return await duplicateTemplate({
-          templateId,
           userId: ctx.user.id,
+          teamId,
+          templateId,
         });
       } catch (err) {
         console.error(err);
@@ -81,7 +90,7 @@ export const templateRouter = router({
 
         const userId = ctx.user.id;
 
-        return await deleteTemplate({ id, userId });
+        return await deleteTemplate({ userId, id });
       } catch (err) {
         console.error(err);
 

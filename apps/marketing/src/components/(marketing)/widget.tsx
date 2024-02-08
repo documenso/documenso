@@ -404,6 +404,7 @@ export const Widget = ({ className, children, ...props }: WidgetProps) => {
           </DialogDescription>
 
           <SignaturePad
+            disabled={isSubmitting}
             className="aspect-video w-full rounded-md border"
             defaultValue={signatureDataUrl || ''}
             onChange={setDraftSignatureDataUrl}

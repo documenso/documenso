@@ -38,6 +38,7 @@ import {
   DocumentFlowFormContainerHeader,
   DocumentFlowFormContainerStep,
 } from './document-flow-root';
+import { ShowFieldItem } from './show-field-item';
 import type { DocumentFlowStep } from './types';
 
 export type AddSubjectFormProps = {
@@ -60,7 +61,6 @@ export const AddSubjectFormPartial = ({
     register,
     handleSubmit,
     formState: { errors, isSubmitting, touchedFields },
-    getValues,
     setValue,
   } = useForm<TAddSubjectFormSchema>({
     defaultValues: {
@@ -98,6 +98,10 @@ export const AddSubjectFormPartial = ({
       />
       <DocumentFlowFormContainerContent>
         <div className="flex flex-col">
+          {fields.map((field, index) => (
+            <ShowFieldItem key={index} field={field} recipients={recipients} />
+          ))}
+
           <div className="flex flex-col gap-y-4">
             <div>
               <Label htmlFor="subject">
@@ -106,7 +110,6 @@ export const AddSubjectFormPartial = ({
 
               <Input
                 id="subject"
-                // placeholder="Subject"
                 className="bg-background mt-2"
                 disabled={isSubmitting}
                 {...register('meta.subject')}
