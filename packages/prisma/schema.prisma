@@ -334,7 +334,8 @@ model Team {
   owner        User          @relation(fields: [ownerUserId], references: [id])
   subscription Subscription?
 
-  document Document[]
+  document  Document[]
+  templates Template[]
 }
 
 model TeamPending {
@@ -415,10 +416,12 @@ model Template {
   type                   TemplateType @default(PRIVATE)
   title                  String
   userId                 Int
+  teamId                 Int?
   templateDocumentDataId String
   createdAt              DateTime     @default(now())
   updatedAt              DateTime     @default(now()) @updatedAt
 
+  team                 Team?        @relation(fields: [teamId], references: [id], onDelete: Cascade)
   templateDocumentData DocumentData @relation(fields: [templateDocumentDataId], references: [id], onDelete: Cascade)
   User                 User         @relation(fields: [userId], references: [id], onDelete: Cascade)
   Recipient            Recipient[]

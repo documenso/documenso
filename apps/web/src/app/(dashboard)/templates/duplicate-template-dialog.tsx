@@ -14,12 +14,14 @@ import { useToast } from '@documenso/ui/primitives/use-toast';
 
 type DuplicateTemplateDialogProps = {
   id: number;
+  teamId?: number;
   open: boolean;
   onOpenChange: (_open: boolean) => void;
 };
 
 export const DuplicateTemplateDialog = ({
   id,
+  teamId,
   open,
   onOpenChange,
 }: DuplicateTemplateDialogProps) => {
@@ -40,21 +42,14 @@ export const DuplicateTemplateDialog = ({
 
         onOpenChange(false);
       },
+      onError: () => {
+        toast({
+          title: 'Error',
+          description: 'An error occurred while duplicating template.',
+          variant: 'destructive',
+        });
+      },
     });
-
-  const onDuplicate = async () => {
-    try {
-      await duplicateTemplate({
-        templateId: id,
-      });
-    } catch (err) {
-      toast({
-        title: 'Error',
-        description: 'An error occurred while duplicating template.',
-        variant: 'destructive',
-      });
-    }
-  };
 
   return (
     <Dialog open={open} onOpenChange={(value) => !isLoading && onOpenChange(value)}>
@@ -66,20 +61,27 @@ export const DuplicateTemplateDialog = ({
         </DialogHeader>
 
         <DialogFooter>
-          <div className="flex w-full flex-1 flex-nowrap gap-4">
-            <Button
-              type="button"
-              variant="secondary"
-              onClick={() => onOpenChange(false)}
-              className="flex-1"
-            >
-              Cancel
-            </Button>
+          <Button
+            type="button"
+            disabled={isLoading}
+            variant="secondary"
+            onClick={() => onOpenChange(false)}
+          >
+            Cancel
+          </Button>
 
-            <Button type="button" loading={isLoading} onClick={onDuplicate} className="flex-1">
-              Duplicate
-            </Button>
-          </div>
+          <Button
+            type="button"
+            loading={isLoading}
+            onClick={async () =>
+              duplicateTemplate({
+                templateId: id,
+                teamId,
+              })
+            }
+          >
+            Duplicate
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
