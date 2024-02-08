@@ -48,17 +48,18 @@ export type TSignUpFormSchema = z.infer<typeof ZSignUpFormSchema>;
 
 export type SignUpFormProps = {
   className?: string;
+  initialEmail?: string;
   isGoogleSSOEnabled?: boolean;
 };
 
-export const SignUpForm = ({ className, isGoogleSSOEnabled }: SignUpFormProps) => {
+export const SignUpForm = ({ className, initialEmail, isGoogleSSOEnabled }: SignUpFormProps) => {
   const { toast } = useToast();
   const analytics = useAnalytics();
 
   const form = useForm<TSignUpFormSchema>({
     values: {
       name: '',
-      email: '',
+      email: initialEmail ?? '',
       password: '',
       signature: '',
     },

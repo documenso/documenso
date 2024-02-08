@@ -28,6 +28,7 @@ export type EditTemplateFormProps = {
   recipients: Recipient[];
   fields: Field[];
   documentData: DocumentData;
+  templateRootPath: string;
 };
 
 type EditTemplateStep = 'signers' | 'fields';
@@ -40,6 +41,7 @@ export const EditTemplateForm = ({
   fields,
   user: _user,
   documentData,
+  templateRootPath,
 }: EditTemplateFormProps) => {
   const { toast } = useToast();
   const router = useRouter();
@@ -98,7 +100,7 @@ export const EditTemplateForm = ({
         duration: 5000,
       });
 
-      router.push('/templates');
+      router.push(templateRootPath);
     } catch (err) {
       toast({
         title: 'Error',

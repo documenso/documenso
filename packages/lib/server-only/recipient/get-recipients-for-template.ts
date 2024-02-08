@@ -13,7 +13,20 @@ export const getRecipientsForTemplate = async ({
     where: {
       templateId,
       Template: {
-        userId,
+        OR: [
+          {
+            userId,
+          },
+          {
+            team: {
+              members: {
+                some: {
+                  userId,
+                },
+              },
+            },
+          },
+        ],
       },
     },
     orderBy: {

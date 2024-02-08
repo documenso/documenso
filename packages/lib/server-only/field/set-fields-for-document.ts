@@ -25,7 +25,20 @@ export const setFieldsForDocument = async ({
   const document = await prisma.document.findFirst({
     where: {
       id: documentId,
-      userId,
+      OR: [
+        {
+          userId,
+        },
+        {
+          team: {
+            members: {
+              some: {
+                userId,
+              },
+            },
+          },
+        },
+      ],
     },
   });
 
@@ -43,11 +56,7 @@ export const setFieldsForDocument = async ({
   });
 
   const removedFields = existingFields.filter(
-    (existingField) =>
-      !fields.find(
-        (field) =>
-          field.id === existingField.id || field.signerEmail === existingField.Recipient?.email,
-      ),
+    (existingField) => !fields.find((field) => field.id === existingField.id),
   );
 
   const linkedFields = fields
