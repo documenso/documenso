@@ -15,6 +15,7 @@ import { updateTitle } from '@documenso/lib/server-only/document/update-title';
 import { setFieldsForDocument } from '@documenso/lib/server-only/field/set-fields-for-document';
 import { setRecipientsForDocument } from '@documenso/lib/server-only/recipient/set-recipients-for-document';
 import { symmetricEncrypt } from '@documenso/lib/universal/crypto';
+import { extractNextApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 
 import { authenticatedProcedure, procedure, router } from '../trpc';
 import {
@@ -88,6 +89,7 @@ export const documentRouter = router({
           teamId,
           title,
           documentDataId,
+          requestMetadata: extractNextApiRequestMetadata(ctx.req),
         });
       } catch (err) {
         if (err instanceof TRPCError) {
@@ -131,6 +133,7 @@ export const documentRouter = router({
         title,
         userId,
         documentId,
+        requestMetadata: extractNextApiRequestMetadata(ctx.req),
       });
     }),
 
@@ -144,6 +147,7 @@ export const documentRouter = router({
           userId: ctx.user.id,
           documentId,
           recipients,
+          requestMetadata: extractNextApiRequestMetadata(ctx.req),
         });
       } catch (err) {
         console.error(err);
@@ -166,6 +170,7 @@ export const documentRouter = router({
           userId: ctx.user.id,
           documentId,
           fields,
+          requestMetadata: extractNextApiRequestMetadata(ctx.req),
         });
       } catch (err) {
         console.error(err);
@@ -198,6 +203,7 @@ export const documentRouter = router({
           documentId,
           password: securePassword,
           userId: ctx.user.id,
+          requestMetadata: extractNextApiRequestMetadata(ctx.req),
         });
       } catch (err) {
         console.error(err);
@@ -223,12 +229,14 @@ export const documentRouter = router({
             dateFormat: meta.dateFormat,
             timezone: meta.timezone,
             userId: ctx.user.id,
+            requestMetadata: extractNextApiRequestMetadata(ctx.req),
           });
         }
 
         return await sendDocument({
           userId: ctx.user.id,
           documentId,
+          requestMetadata: extractNextApiRequestMetadata(ctx.req),
         });
       } catch (err) {
         console.error(err);
@@ -247,6 +255,7 @@ export const documentRouter = router({
         return await resendDocument({
           userId: ctx.user.id,
           ...input,
+          requestMetadata: extractNextApiRequestMetadata(ctx.req),
         });
       } catch (err) {
         console.error(err);
