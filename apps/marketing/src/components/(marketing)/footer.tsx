@@ -55,11 +55,11 @@ export const Footer = ({ className, ...props }: FooterProps) => {
     const newLocale = value;
     const currentLocale = i18n.language;
     if (currentPathname) {
-      router.push('/' + newLocale + currentPathname);
-    } else if (currentLocale === i18nConfig.defaultLocale) {
-      router.push('/' + newLocale);
-    } else {
-      router.replace(`/${newLocale}`);
+      if (currentLocale === i18nConfig.defaultLocale) {
+        router.push('/' + newLocale + currentPathname);
+      } else {
+        router.push(currentPathname.replace(`/${currentLocale}`, `/${newLocale}`));
+      }
     }
 
     router.refresh();

@@ -145,7 +145,7 @@ export default async function OpenPage({ params: { locale } }: PageParams) {
   return (
     <div className="mx-auto mt-6 max-w-screen-lg sm:mt-12">
       <div className="flex flex-col items-center justify-center">
-        <h1 className="text-3xl font-bold lg:text-5xl">{t('open_startup"')}</h1>
+        <h1 className="text-3xl font-bold lg:text-5xl">{t('open_startup')}</h1>
 
         <p className="text-muted-foreground mt-4 max-w-[60ch] text-center text-lg leading-normal">
           {t('we_believe_in_transparency')}{' '}

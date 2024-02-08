@@ -1,10 +1,14 @@
 'use client';
 
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 
+import i18nConfig from 'i18nConfig';
 import {
   CreditCard,
   FileSpreadsheet,
+  Languages,
   Lock,
   LogOut,
   User as LucideUser,
@@ -16,6 +20,7 @@ import {
 } from 'lucide-react';
 import { signOut } from 'next-auth/react';
 import { useTheme } from 'next-themes';
+import { useTranslation } from 'react-i18next';
 import { LuGithub } from 'react-icons/lu';
 
 import { useFeatureFlags } from '@documenso/lib/client-only/providers/feature-flag';
@@ -47,12 +52,34 @@ export const ProfileDropdown = ({ user }: ProfileDropdownProps) => {
   const { getFlag } = useFeatureFlags();
   const { theme, setTheme } = useTheme();
   const isUserAdmin = isAdmin(user);
+  const { t, i18n } = useTranslation();
+  const router = useRouter();
+  const currentPathname = usePathname();
 
   const isBillingEnabled = getFlag('app_billing');
 
   const avatarFallback = user.name
     ? recipientInitials(user.name)
     : user.email.slice(0, 1).toUpperCase();
+
+  const handleLocaleChange = (value: string) => {
+    const newLocale = value;
+    const currentLocale = i18n.language;
+    const days = 30;
+    const date = new Date();
+    date.setTime(date.getTime() + days * 24 * 60 * 60 * 1000);
+    const expires = date.toUTCString();
+    document.cookie = `NEXT_LOCALE=${newLocale};expires=${expires};path=/`;
+    if (currentPathname) {
+      if (currentLocale === i18nConfig.defaultLocale) {
+        router.push('/' + newLocale + currentPathname);
+      } else {
+        router.push(currentPathname.replace(`/${currentLocale}`, `/${newLocale}`));
+      }
+    }
+
+    router.refresh();
+  };
 
   return (
     <DropdownMenu>
@@ -69,14 +96,14 @@ export const ProfileDropdown = ({ user }: ProfileDropdownProps) => {
       </DropdownMenuTrigger>
 
       <DropdownMenuContent className="z-[60] w-56" align="end" forceMount>
-        <DropdownMenuLabel>Account</DropdownMenuLabel>
+        <DropdownMenuLabel>{t('account')}</DropdownMenuLabel>
 
         {isUserAdmin && (
           <>
             <DropdownMenuItem asChild>
               <Link href="/admin" className="cursor-pointer">
                 <UserCog className="mr-2 h-4 w-4" />
-                Admin
+                {t('admin')}
               </Link>
             </DropdownMenuItem>
 
@@ -87,14 +114,13 @@ export const ProfileDropdown = ({ user }: ProfileDropdownProps) => {
         <DropdownMenuItem asChild>
           <Link href="/settings/profile" className="cursor-pointer">
             <LucideUser className="mr-2 h-4 w-4" />
-            Profile
+            {t('profile')}
           </Link>
         </DropdownMenuItem>
-
         <DropdownMenuItem asChild>
           <Link href="/settings/security" className="cursor-pointer">
             <Lock className="mr-2 h-4 w-4" />
-            Security
+            {t('security')}
           </Link>
         </DropdownMenuItem>
 
@@ -102,7 +128,7 @@ export const ProfileDropdown = ({ user }: ProfileDropdownProps) => {
           <DropdownMenuItem asChild>
             <Link href="/settings/billing" className="cursor-pointer">
               <CreditCard className="mr-2 h-4 w-4" />
-              Billing
+              {t('billing')}
             </Link>
           </DropdownMenuItem>
         )}
@@ -111,7 +137,7 @@ export const ProfileDropdown = ({ user }: ProfileDropdownProps) => {
         <DropdownMenuItem asChild>
           <Link href="/templates" className="cursor-pointer">
             <FileSpreadsheet className="mr-2 h-4 w-4" />
-            Templates
+            {t('templates')}
           </Link>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
@@ -119,22 +145,41 @@ export const ProfileDropdown = ({ user }: ProfileDropdownProps) => {
         <DropdownMenuSub>
           <DropdownMenuSubTrigger>
             <Palette className="mr-2 h-4 w-4" />
-            Themes
+            {t('themes')}
           </DropdownMenuSubTrigger>
           <DropdownMenuPortal>
             <DropdownMenuSubContent className="z-[60]">
               <DropdownMenuRadioGroup value={theme} onValueChange={setTheme}>
                 <DropdownMenuRadioItem value="light">
-                  <Sun className="mr-2 h-4 w-4" /> Light
+                  <Sun className="mr-2 h-4 w-4" /> {t('light')}
                 </DropdownMenuRadioItem>
                 <DropdownMenuRadioItem value="dark">
                   <Moon className="mr-2 h-4 w-4" />
-                  Dark
+                  {t('dark"')}
                 </DropdownMenuRadioItem>
                 <DropdownMenuRadioItem value="system">
                   <Monitor className="mr-2 h-4 w-4" />
-                  System
+                  {t('system')}
                 </DropdownMenuRadioItem>
+              </DropdownMenuRadioGroup>
+            </DropdownMenuSubContent>
+          </DropdownMenuPortal>
+        </DropdownMenuSub>
+        <DropdownMenuSeparator />
+        <DropdownMenuSub>
+          <DropdownMenuSubTrigger>
+            <Languages className="mr-2 h-4 w-4" />
+            {t('language')}
+          </DropdownMenuSubTrigger>
+          <DropdownMenuPortal>
+            <DropdownMenuSubContent className="z-[60]">
+              <DropdownMenuRadioGroup value={i18n.language} onValueChange={handleLocaleChange}>
+                <DropdownMenuRadioItem value="en">English</DropdownMenuRadioItem>
+                <DropdownMenuRadioItem value="es">Spanish</DropdownMenuRadioItem>
+                <DropdownMenuRadioItem value="de">German</DropdownMenuRadioItem>
+                <DropdownMenuRadioItem value="fr">French</DropdownMenuRadioItem>
+                <DropdownMenuRadioItem value="it">Italian</DropdownMenuRadioItem>
+                <DropdownMenuRadioItem value="pt">Portuguese</DropdownMenuRadioItem>
               </DropdownMenuRadioGroup>
             </DropdownMenuSubContent>
           </DropdownMenuPortal>
@@ -147,7 +192,7 @@ export const ProfileDropdown = ({ user }: ProfileDropdownProps) => {
             target="_blank"
           >
             <LuGithub className="mr-2 h-4 w-4" />
-            Star on Github
+            {t('star_on_github')}
           </Link>
         </DropdownMenuItem>
 
@@ -161,7 +206,7 @@ export const ProfileDropdown = ({ user }: ProfileDropdownProps) => {
           }
         >
           <LogOut className="mr-2 h-4 w-4" />
-          Sign Out
+          {t('sign_out')}
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

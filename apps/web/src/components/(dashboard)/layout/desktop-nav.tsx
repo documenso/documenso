@@ -7,27 +7,29 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
 import { Search } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
 
 import { CommandMenu } from '../common/command-menu';
 
-const navigationLinks = [
-  {
-    href: '/documents',
-    label: 'Documents',
-  },
-  {
-    href: '/templates',
-    label: 'Templates',
-  },
-];
-
 export type DesktopNavProps = HTMLAttributes<HTMLDivElement>;
 
 export const DesktopNav = ({ className, ...props }: DesktopNavProps) => {
   const pathname = usePathname();
+  const { t } = useTranslation();
+
+  const navigationLinks = [
+    {
+      href: '/documents',
+      label: `${t('documents')}`,
+    },
+    {
+      href: '/templates',
+      label: `${t('templates')}`,
+    },
+  ];
 
   const [open, setOpen] = useState(false);
   const [modifierKey, setModifierKey] = useState(() => 'Ctrl');
@@ -73,7 +75,7 @@ export const DesktopNav = ({ className, ...props }: DesktopNavProps) => {
       >
         <div className="flex items-center">
           <Search className="mr-2 h-5 w-5" />
-          Search
+          {t('search')}
         </div>
 
         <div>
