@@ -2,6 +2,7 @@
 
 import { useEffect } from 'react';
 
+import { zodResolver } from '@hookform/resolvers/zod';
 import { Info } from 'lucide-react';
 import { Controller, useForm } from 'react-hook-form';
 
@@ -32,7 +33,7 @@ import { Input } from '../input';
 import { Label } from '../label';
 import { useStep } from '../stepper';
 import { Textarea } from '../textarea';
-import type { TAddSubjectFormSchema } from './add-subject.types';
+import { type TAddSubjectFormSchema, ZAddSubjectFormSchema } from './add-subject.types';
 import {
   DocumentFlowFormContainerActions,
   DocumentFlowFormContainerContent,
@@ -71,8 +72,10 @@ export const AddSubjectFormPartial = ({
         message: document.documentMeta?.message ?? '',
         timezone: document.documentMeta?.timezone ?? DEFAULT_DOCUMENT_TIME_ZONE,
         dateFormat: document.documentMeta?.dateFormat ?? DEFAULT_DOCUMENT_DATE_FORMAT,
+        redirectUrl: document.documentMeta?.redirectUrl ?? '',
       },
     },
+    resolver: zodResolver(ZAddSubjectFormSchema),
   });
 
   const onFormSubmit = handleSubmit(onSubmit);
@@ -171,10 +174,10 @@ export const AddSubjectFormPartial = ({
                   Advanced Options
                 </AccordionTrigger>
 
-                <AccordionContent className="text-muted-foreground -mx-1 flex max-w-prose flex-col px-1 text-sm leading-relaxed">
+                <AccordionContent className="text-muted-foreground -mx-1 flex max-w-prose flex-col px-1 pt-2 text-sm leading-relaxed">
                   {hasDateField && (
                     <>
-                      <div className="mt-2 flex flex-col">
+                      <div className="flex flex-col">
                         <Label htmlFor="date-format">
                           Date Format <span className="text-muted-foreground">(Optional)</span>
                         </Label>
@@ -246,7 +249,7 @@ export const AddSubjectFormPartial = ({
                           {...register('meta.redirectUrl')}
                         />
 
-                        <FormErrorMessage className="mt-2" error={errors.meta} />
+                        <FormErrorMessage className="mt-2" error={errors.meta?.redirectUrl} />
                       </div>
                     </div>
                   </div>
