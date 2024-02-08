@@ -52,24 +52,22 @@ export const DesktopNav = ({ className, ...props }: DesktopNavProps) => {
       {...props}
     >
       <div className="flex items-baseline gap-x-6">
-        {navigationLinks
-          .filter(({ href }) => href !== '/templates' || rootHref === '') // Remove templates for team pages.
-          .map(({ href, label }) => (
-            <Link
-              key={href}
-              href={`${rootHref}${href}`}
-              className={cn(
-                'text-muted-foreground dark:text-muted focus-visible:ring-ring ring-offset-background rounded-md font-medium leading-5 hover:opacity-80 focus-visible:outline-none focus-visible:ring-2',
-                {
-                  'text-foreground dark:text-muted-foreground': pathname?.startsWith(
-                    `${rootHref}${href}`,
-                  ),
-                },
-              )}
-            >
-              {label}
-            </Link>
-          ))}
+        {navigationLinks.map(({ href, label }) => (
+          <Link
+            key={href}
+            href={`${rootHref}${href}`}
+            className={cn(
+              'text-muted-foreground dark:text-muted focus-visible:ring-ring ring-offset-background rounded-md font-medium leading-5 hover:opacity-80 focus-visible:outline-none focus-visible:ring-2',
+              {
+                'text-foreground dark:text-muted-foreground': pathname?.startsWith(
+                  `${rootHref}${href}`,
+                ),
+              },
+            )}
+          >
+            {label}
+          </Link>
+        ))}
       </div>
 
       <CommandMenu open={open} onOpenChange={setOpen} />

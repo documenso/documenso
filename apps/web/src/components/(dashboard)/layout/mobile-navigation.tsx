@@ -42,7 +42,7 @@ export const MobileNavigation = ({ isMenuOpen, onMenuOpenChange }: MobileNavigat
       href: '/settings/profile',
       text: 'Settings',
     },
-  ].filter(({ text, href }) => text !== 'Templates' || href === '/templates'); // Filter out templates for teams.
+  ];
 
   return (
     <Sheet open={isMenuOpen} onOpenChange={onMenuOpenChange}>

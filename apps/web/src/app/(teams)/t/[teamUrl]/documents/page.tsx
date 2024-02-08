@@ -2,7 +2,7 @@ import { getRequiredServerComponentSession } from '@documenso/lib/next-auth/get-
 import { getTeamByUrl } from '@documenso/lib/server-only/team/get-team';
 
 import type { DocumentsPageViewProps } from '~/app/(dashboard)/documents/documents-page-view';
-import DocumentsPageView from '~/app/(dashboard)/documents/documents-page-view';
+import { DocumentsPageView } from '~/app/(dashboard)/documents/documents-page-view';
 
 export type TeamsDocumentPageProps = {
   params: {
