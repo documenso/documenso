@@ -160,11 +160,11 @@ export const setRecipientsForDocument = async ({
         if (recipient._persisted && changes.length > 0) {
           await tx.documentAuditLog.create({
             data: createDocumentAuditLogData({
+              type: DOCUMENT_AUDIT_LOG_TYPE.RECIPIENT_UPDATED,
               documentId: documentId,
               user,
               requestMetadata,
               data: {
-                type: DOCUMENT_AUDIT_LOG_TYPE.RECIPIENT_UPDATED,
                 changes,
                 ...baseAuditLog,
               },
@@ -176,13 +176,11 @@ export const setRecipientsForDocument = async ({
         if (!recipient._persisted) {
           await tx.documentAuditLog.create({
             data: createDocumentAuditLogData({
+              type: DOCUMENT_AUDIT_LOG_TYPE.RECIPIENT_CREATED,
               documentId: documentId,
               user,
               requestMetadata,
-              data: {
-                type: DOCUMENT_AUDIT_LOG_TYPE.RECIPIENT_CREATED,
-                ...baseAuditLog,
-              },
+              data: baseAuditLog,
             }),
           });
         }
@@ -205,11 +203,11 @@ export const setRecipientsForDocument = async ({
       await tx.documentAuditLog.createMany({
         data: removedRecipients.map((recipient) =>
           createDocumentAuditLogData({
+            type: DOCUMENT_AUDIT_LOG_TYPE.RECIPIENT_DELETED,
             documentId: documentId,
             user,
             requestMetadata,
             data: {
-              type: DOCUMENT_AUDIT_LOG_TYPE.RECIPIENT_DELETED,
               recipientEmail: recipient.email,
               recipientName: recipient.name,
               recipientId: recipient.id,

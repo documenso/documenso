@@ -71,11 +71,11 @@ export const sendCompletedEmail = async ({ documentId, requestMetadata }: SendDo
 
         await tx.documentAuditLog.create({
           data: createDocumentAuditLogData({
+            type: DOCUMENT_AUDIT_LOG_TYPE.EMAIL_SENT,
             documentId: document.id,
             user: null,
             requestMetadata,
             data: {
-              type: DOCUMENT_AUDIT_LOG_TYPE.EMAIL_SENT,
               emailType: 'DOCUMENT_COMPLETED',
               recipientEmail: recipient.email,
               recipientName: recipient.name,

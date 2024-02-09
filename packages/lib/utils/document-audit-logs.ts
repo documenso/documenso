@@ -14,9 +14,10 @@ import {
 } from '../types/document-audit-logs';
 import type { RequestMetadata } from '../universal/extract-request-metadata';
 
-type CreateDocumentAuditLogDataOptions = {
+type CreateDocumentAuditLogDataOptions<T = TDocumentAuditLog['type']> = {
   documentId: number;
-  data: TDocumentAuditLog['data'];
+  type: T;
+  data: Extract<TDocumentAuditLog, { type: T }>['data'];
   user: { email?: string; id?: number | null; name?: string | null } | null;
   requestMetadata?: RequestMetadata;
 };
@@ -30,12 +31,13 @@ type CreateDocumentAuditLogDataResponse = Pick<
 
 export const createDocumentAuditLogData = ({
   documentId,
+  type,
   data,
   user,
   requestMetadata,
 }: CreateDocumentAuditLogDataOptions): CreateDocumentAuditLogDataResponse => {
   return {
-    type: data.type,
+    type,
     data,
     documentId,
     userId: user?.id ?? null,
@@ -146,7 +148,13 @@ export const diffDocumentMetaChanges = (
 ): TDocumentAuditLogDocumentMetaDiffSchema[] => {
   const diffs: TDocumentAuditLogDocumentMetaDiffSchema[] = [];
 
-  if (oldData?.dateFormat !== newData.dateFormat) {
+  const oldDateFormat = oldData?.dateFormat ?? '';
+  const oldMessage = oldData?.message ?? '';
+  const oldSubject = oldData?.subject ?? '';
+  const oldTimezone = oldData?.timezone ?? '';
+  const oldPassword = oldData?.password ?? null;
+
+  if (oldDateFormat !== newData.dateFormat) {
     diffs.push({
       type: DOCUMENT_META_DIFF_TYPE.DATE_FORMAT,
       from: oldData?.dateFormat ?? '',
@@ -154,7 +162,7 @@ export const diffDocumentMetaChanges = (
     });
   }
 
-  if (oldData?.message !== newData.message) {
+  if (oldMessage !== newData.message) {
     diffs.push({
       type: DOCUMENT_META_DIFF_TYPE.MESSAGE,
       from: oldData?.message ?? '',
@@ -162,7 +170,7 @@ export const diffDocumentMetaChanges = (
     });
   }
 
-  if (oldData?.subject !== newData.subject) {
+  if (oldSubject !== newData.subject) {
     diffs.push({
       type: DOCUMENT_META_DIFF_TYPE.SUBJECT,
       from: oldData?.subject ?? '',
@@ -170,7 +178,7 @@ export const diffDocumentMetaChanges = (
     });
   }
 
-  if (oldData?.timezone !== newData.timezone) {
+  if (oldTimezone !== newData.timezone) {
     diffs.push({
       type: DOCUMENT_META_DIFF_TYPE.TIMEZONE,
       from: oldData?.timezone ?? '',
@@ -178,7 +186,7 @@ export const diffDocumentMetaChanges = (
     });
   }
 
-  if (oldData?.password !== newData.password) {
+  if (oldPassword !== newData.password) {
     diffs.push({
       type: DOCUMENT_META_DIFF_TYPE.PASSWORD,
     });

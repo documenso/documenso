@@ -77,6 +77,7 @@ export const completeDocumentWithToken = async ({
 
   await prisma.documentAuditLog.create({
     data: createDocumentAuditLogData({
+      type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_RECIPIENT_FLOW_COMPLETE,
       documentId: document.id,
       user: {
         name: recipient.name,
@@ -84,7 +85,6 @@ export const completeDocumentWithToken = async ({
       },
       requestMetadata,
       data: {
-        type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_RECIPIENT_FLOW_COMPLETE,
         recipientEmail: recipient.email,
         recipientName: recipient.name,
         recipientId: recipient.id,

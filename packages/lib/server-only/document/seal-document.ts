@@ -120,12 +120,11 @@ export const sealDocument = async ({
 
     await tx.documentAuditLog.create({
       data: createDocumentAuditLogData({
+        type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_COMPLETED,
         documentId: document.id,
         requestMetadata,
         user: null,
-        data: {
-          type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_COMPLETED,
-        },
+        data: {},
       }),
     });
   });

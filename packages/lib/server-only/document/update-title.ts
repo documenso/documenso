@@ -60,11 +60,11 @@ export const updateTitle = async ({
 
     await tx.documentAuditLog.create({
       data: createDocumentAuditLogData({
+        type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_TITLE_UPDATED,
         documentId,
         user,
         requestMetadata,
         data: {
-          type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_TITLE_UPDATED,
           from: document.title,
           to: updatedDocument.title,
         },

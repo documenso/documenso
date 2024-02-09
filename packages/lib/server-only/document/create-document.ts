@@ -53,11 +53,11 @@ export const createDocument = async ({
 
     await tx.documentAuditLog.create({
       data: createDocumentAuditLogData({
+        type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_CREATED,
         documentId: document.id,
         user,
         requestMetadata,
         data: {
-          type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_CREATED,
           title,
         },
       }),

@@ -152,11 +152,11 @@ export const setFieldsForDocument = async ({
         if (field._persisted && changes.length > 0) {
           await tx.documentAuditLog.create({
             data: createDocumentAuditLogData({
+              type: DOCUMENT_AUDIT_LOG_TYPE.FIELD_UPDATED,
               documentId: documentId,
               user,
               requestMetadata,
               data: {
-                type: DOCUMENT_AUDIT_LOG_TYPE.FIELD_UPDATED,
                 changes,
                 ...baseAuditLog,
               },
@@ -168,11 +168,11 @@ export const setFieldsForDocument = async ({
         if (!field._persisted) {
           await tx.documentAuditLog.create({
             data: createDocumentAuditLogData({
+              type: DOCUMENT_AUDIT_LOG_TYPE.FIELD_CREATED,
               documentId: documentId,
               user,
               requestMetadata,
               data: {
-                type: DOCUMENT_AUDIT_LOG_TYPE.FIELD_CREATED,
                 ...baseAuditLog,
               },
             }),
@@ -195,19 +195,19 @@ export const setFieldsForDocument = async ({
       });
 
       await tx.documentAuditLog.createMany({
-        data: removedFields.map((field) => ({
-          ...createDocumentAuditLogData({
+        data: removedFields.map((field) =>
+          createDocumentAuditLogData({
+            type: DOCUMENT_AUDIT_LOG_TYPE.FIELD_DELETED,
             documentId: documentId,
             user,
             requestMetadata,
             data: {
-              type: DOCUMENT_AUDIT_LOG_TYPE.FIELD_DELETED,
               fieldRecipientEmail: field.Recipient?.email ?? '',
               fieldRecipientId: field.recipientId ?? -1,
               fieldType: field.type,
             },
           }),
-        })),
+        ),
       });
     });
   }

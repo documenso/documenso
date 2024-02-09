@@ -87,11 +87,11 @@ export const upsertDocumentMeta = async ({
 
     await tx.documentAuditLog.create({
       data: createDocumentAuditLogData({
+        type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_META_UPDATED,
         documentId,
         user,
         requestMetadata,
         data: {
-          type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_META_UPDATED,
           changes: diffDocumentMetaChanges(originalDocumentMeta ?? {}, upsertedDocumentMeta),
         },
       }),

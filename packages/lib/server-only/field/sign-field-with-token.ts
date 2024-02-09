@@ -136,6 +136,7 @@ export const signFieldWithToken = async ({
 
     await tx.documentAuditLog.create({
       data: createDocumentAuditLogData({
+        type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_FIELD_SIGNED,
         documentId: document.id,
         user: {
           email: recipient.email,
@@ -147,7 +148,6 @@ export const signFieldWithToken = async ({
           recipientId: recipient.id,
           recipientName: recipient.name,
           recipientRole: recipient.role,
-          type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_FIELD_SIGNED,
           fieldId: updatedField.id,
           field: match(updatedField.type)
             .with(FieldType.SIGNATURE, FieldType.FREE_SIGNATURE, (type) => ({

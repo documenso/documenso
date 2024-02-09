@@ -134,11 +134,11 @@ export const sendDocument = async ({
 
         await tx.documentAuditLog.create({
           data: createDocumentAuditLogData({
+            type: DOCUMENT_AUDIT_LOG_TYPE.EMAIL_SENT,
             documentId: document.id,
             user,
             requestMetadata,
             data: {
-              type: DOCUMENT_AUDIT_LOG_TYPE.EMAIL_SENT,
               emailType: recipientEmailType,
               recipientEmail: recipient.email,
               recipientName: recipient.name,

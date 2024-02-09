@@ -35,6 +35,7 @@ export const viewedDocument = async ({ token, requestMetadata }: ViewedDocumentO
 
     await tx.documentAuditLog.create({
       data: createDocumentAuditLogData({
+        type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_OPENED,
         documentId,
         user: {
           name: recipient.name,
@@ -42,7 +43,6 @@ export const viewedDocument = async ({ token, requestMetadata }: ViewedDocumentO
         },
         requestMetadata,
         data: {
-          type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_OPENED,
           recipientEmail: recipient.email,
           recipientId: recipient.id,
           recipientName: recipient.name,

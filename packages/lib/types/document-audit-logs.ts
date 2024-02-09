@@ -136,7 +136,6 @@ const ZBaseRecipientDataSchema = z.object({
 export const ZDocumentAuditLogEventEmailSentSchema = z.object({
   type: z.literal(DOCUMENT_AUDIT_LOG_TYPE.EMAIL_SENT),
   data: ZBaseRecipientDataSchema.extend({
-    type: z.literal(DOCUMENT_AUDIT_LOG_TYPE.EMAIL_SENT),
     emailType: z.enum([
       'SIGNING_REQUEST',
       'VIEW_REQUEST',
@@ -154,7 +153,7 @@ export const ZDocumentAuditLogEventEmailSentSchema = z.object({
 export const ZDocumentAuditLogEventDocumentCompletedSchema = z.object({
   type: z.literal(DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_COMPLETED),
   data: z.object({
-    type: z.literal(DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_COMPLETED),
+    // Empty for now.
   }),
 });
 
@@ -164,7 +163,6 @@ export const ZDocumentAuditLogEventDocumentCompletedSchema = z.object({
 export const ZDocumentAuditLogEventDocumentCreatedSchema = z.object({
   type: z.literal(DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_CREATED),
   data: z.object({
-    type: z.literal(DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_CREATED),
     title: z.string(),
   }),
 });
@@ -175,7 +173,6 @@ export const ZDocumentAuditLogEventDocumentCreatedSchema = z.object({
 export const ZDocumentAuditLogEventDocumentFieldSignedSchema = z.object({
   type: z.literal(DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_FIELD_SIGNED),
   data: ZBaseRecipientDataSchema.extend({
-    type: z.literal(DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_FIELD_SIGNED),
     fieldId: z.number(),
 
     // Organised into union to allow us to extend each field if required.
@@ -199,7 +196,6 @@ export const ZDocumentAuditLogEventDocumentFieldSignedSchema = z.object({
       z.object({
         type: z.union([z.literal(FieldType.SIGNATURE), z.literal(FieldType.FREE_SIGNATURE)]),
         data: z.string(),
-        signatureId: z.string(),
       }),
     ]),
 
@@ -216,7 +212,6 @@ export const ZDocumentAuditLogEventDocumentFieldSignedSchema = z.object({
 export const ZDocumentAuditLogEventDocumentFieldUnsignedSchema = z.object({
   type: z.literal(DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_FIELD_UNSIGNED),
   data: z.object({
-    type: z.literal(DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_FIELD_UNSIGNED),
     field: z.nativeEnum(FieldType),
     fieldId: z.number(),
   }),
@@ -228,7 +223,6 @@ export const ZDocumentAuditLogEventDocumentFieldUnsignedSchema = z.object({
 export const ZDocumentAuditLogEventDocumentMetaUpdatedSchema = z.object({
   type: z.literal(DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_META_UPDATED),
   data: z.object({
-    type: z.literal(DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_META_UPDATED),
     changes: z.array(ZDocumentAuditLogDocumentMetaSchema),
   }),
 });
@@ -238,9 +232,7 @@ export const ZDocumentAuditLogEventDocumentMetaUpdatedSchema = z.object({
  */
 export const ZDocumentAuditLogEventDocumentOpenedSchema = z.object({
   type: z.literal(DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_OPENED),
-  data: ZBaseRecipientDataSchema.extend({
-    type: z.literal(DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_OPENED),
-  }),
+  data: ZBaseRecipientDataSchema,
 });
 
 /**
@@ -248,9 +240,7 @@ export const ZDocumentAuditLogEventDocumentOpenedSchema = z.object({
  */
 export const ZDocumentAuditLogEventDocumentRecipientFlowCompleteSchema = z.object({
   type: z.literal(DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_RECIPIENT_FLOW_COMPLETE),
-  data: ZBaseRecipientDataSchema.extend({
-    type: z.literal(DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_RECIPIENT_FLOW_COMPLETE),
-  }),
+  data: ZBaseRecipientDataSchema,
 });
 
 /**
@@ -259,7 +249,6 @@ export const ZDocumentAuditLogEventDocumentRecipientFlowCompleteSchema = z.objec
 export const ZDocumentAuditLogEventDocumentTitleUpdatedSchema = z.object({
   type: z.literal(DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_TITLE_UPDATED),
   data: z.object({
-    type: z.literal(DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_TITLE_UPDATED),
     from: z.string(),
     to: z.string(),
   }),
@@ -270,9 +259,7 @@ export const ZDocumentAuditLogEventDocumentTitleUpdatedSchema = z.object({
  */
 export const ZDocumentAuditLogEventFieldAddedSchema = z.object({
   type: z.literal(DOCUMENT_AUDIT_LOG_TYPE.FIELD_CREATED),
-  data: ZBaseFieldEventDataSchema.extend({
-    type: z.literal(DOCUMENT_AUDIT_LOG_TYPE.FIELD_CREATED),
-  }),
+  data: ZBaseFieldEventDataSchema,
 });
 
 /**
@@ -280,9 +267,7 @@ export const ZDocumentAuditLogEventFieldAddedSchema = z.object({
  */
 export const ZDocumentAuditLogEventFieldRemovedSchema = z.object({
   type: z.literal(DOCUMENT_AUDIT_LOG_TYPE.FIELD_DELETED),
-  data: ZBaseFieldEventDataSchema.extend({
-    type: z.literal(DOCUMENT_AUDIT_LOG_TYPE.FIELD_DELETED),
-  }),
+  data: ZBaseFieldEventDataSchema,
 });
 
 /**
@@ -291,7 +276,6 @@ export const ZDocumentAuditLogEventFieldRemovedSchema = z.object({
 export const ZDocumentAuditLogEventFieldUpdatedSchema = z.object({
   type: z.literal(DOCUMENT_AUDIT_LOG_TYPE.FIELD_UPDATED),
   data: ZBaseFieldEventDataSchema.extend({
-    type: z.literal(DOCUMENT_AUDIT_LOG_TYPE.FIELD_UPDATED),
     changes: z.array(ZDocumentAuditLogFieldDiffSchema),
   }),
 });
@@ -301,9 +285,7 @@ export const ZDocumentAuditLogEventFieldUpdatedSchema = z.object({
  */
 export const ZDocumentAuditLogEventRecipientAddedSchema = z.object({
   type: z.literal(DOCUMENT_AUDIT_LOG_TYPE.RECIPIENT_CREATED),
-  data: ZBaseRecipientDataSchema.extend({
-    type: z.literal(DOCUMENT_AUDIT_LOG_TYPE.RECIPIENT_CREATED),
-  }),
+  data: ZBaseRecipientDataSchema,
 });
 
 /**
@@ -312,7 +294,6 @@ export const ZDocumentAuditLogEventRecipientAddedSchema = z.object({
 export const ZDocumentAuditLogEventRecipientUpdatedSchema = z.object({
   type: z.literal(DOCUMENT_AUDIT_LOG_TYPE.RECIPIENT_UPDATED),
   data: ZBaseRecipientDataSchema.extend({
-    type: z.literal(DOCUMENT_AUDIT_LOG_TYPE.RECIPIENT_UPDATED),
     changes: z.array(ZDocumentAuditLogRecipientDiffSchema),
   }),
 });
@@ -322,9 +303,7 @@ export const ZDocumentAuditLogEventRecipientUpdatedSchema = z.object({
  */
 export const ZDocumentAuditLogEventRecipientRemovedSchema = z.object({
   type: z.literal(DOCUMENT_AUDIT_LOG_TYPE.RECIPIENT_DELETED),
-  data: ZBaseRecipientDataSchema.extend({
-    type: z.literal(DOCUMENT_AUDIT_LOG_TYPE.RECIPIENT_DELETED),
-  }),
+  data: ZBaseRecipientDataSchema,
 });
 
 export const ZDocumentAuditLogBaseSchema = z.object({
