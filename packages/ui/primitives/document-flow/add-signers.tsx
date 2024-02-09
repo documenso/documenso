@@ -105,7 +105,10 @@ export const AddSignersFormPartial = ({
     }
 
     return recipients.some(
-      (recipient) => recipient.id === id && recipient.sendStatus === SendStatus.SENT,
+      (recipient) =>
+        recipient.id === id &&
+        recipient.sendStatus === SendStatus.SENT &&
+        recipient.role !== RecipientRole.CC,
     );
   };
 
