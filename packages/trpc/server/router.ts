@@ -11,6 +11,7 @@ import { teamRouter } from './team-router/router';
 import { templateRouter } from './template-router/router';
 import { router } from './trpc';
 import { twoFactorAuthenticationRouter } from './two-factor-authentication-router/router';
+import { webhookRouter } from './webhook-router/router';
 
 export const appRouter = router({
   auth: authRouter,
@@ -24,6 +25,7 @@ export const appRouter = router({
   singleplayer: singleplayerRouter,
   team: teamRouter,
   template: templateRouter,
+  webhook: webhookRouter,
   twoFactorAuthentication: twoFactorAuthenticationRouter,
 });
 

@@ -1,16 +1,26 @@
 'use client';
 
 import { useState } from 'react';
+
 import { useRouter } from 'next/navigation';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import type * as DialogPrimitive from '@radix-ui/react-dialog';
 import { useForm } from 'react-hook-form';
+import type { z } from 'zod';
 
+import { trpc } from '@documenso/trpc/react';
+import { ZCreateWebhookFormSchema } from '@documenso/trpc/server/webhook-router/schema';
 import { Button } from '@documenso/ui/primitives/button';
-import { Input } from '@documenso/ui/primitives/input';
-import { Switch } from '@documenso/ui/primitives/switch';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from '@documenso/ui/primitives/dialog';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@documenso/ui/primitives/dialog';
 import {
   Form,
   FormControl,
@@ -19,9 +29,13 @@ import {
   FormLabel,
   FormMessage,
 } from '@documenso/ui/primitives/form/form';
+import { Input } from '@documenso/ui/primitives/input';
+import { Switch } from '@documenso/ui/primitives/switch';
+import { useToast } from '@documenso/ui/primitives/use-toast';
 
 import { MultiSelectCombobox } from './multiselect-combobox';
 
+type TCreateWebhookFormSchema = z.infer<typeof ZCreateWebhookFormSchema>;
 
 export type CreateWebhookDialogProps = {
   trigger?: React.ReactNode;
@@ -29,10 +43,11 @@ export type CreateWebhookDialogProps = {
 
 export const CreateWebhookDialog = ({ trigger, ...props }: CreateWebhookDialogProps) => {
   const router = useRouter();
+  const { toast } = useToast();
   const [open, setOpen] = useState(false);
 
-  const form = useForm<>({
-    resolver: zodResolver(),
+  const form = useForm<TCreateWebhookFormSchema>({
+    resolver: zodResolver(ZCreateWebhookFormSchema),
     values: {
       webhookUrl: '',
       eventTriggers: [],
@@ -41,9 +56,30 @@ export const CreateWebhookDialog = ({ trigger, ...props }: CreateWebhookDialogPr
     },
   });
 
-  const onSubmit = async () => {
-    console.log('submitted');
-  }
+  const { mutateAsync: createWebhook } = trpc.webhook.createWebhook.useMutation();
+
+  const onSubmit = async (values: TCreateWebhookFormSchema) => {
+    try {
+      await createWebhook(values);
+
+      setOpen(false);
+
+      toast({
+        title: 'Webhook created',
+        description: 'The webhook was successfully created.',
+      });
+
+      form.reset();
+
+      router.refresh();
+    } catch (err) {
+      toast({
+        title: 'Error',
+        description: 'An error occurred while creating the webhook. Please try again.',
+        variant: 'destructive',
+      });
+    }
+  };
 
   return (
     <Dialog
@@ -92,7 +128,7 @@ export const CreateWebhookDialog = ({ trigger, ...props }: CreateWebhookDialogPr
                         listValues={value}
                         onChange={(values: string[]) => {
                           console.log(values);
-                          onChange(values)
+                          onChange(values);
                         }}
                       />
                     </FormControl>
@@ -101,28 +137,28 @@ export const CreateWebhookDialog = ({ trigger, ...props }: CreateWebhookDialogPr
                 )}
               />
 
-              <FormField 
+              <FormField
                 control={form.control}
                 name="secret"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Secret</FormLabel>
                     <FormControl>
-                      <Input className="bg-background" {...field} />
+                      <Input className="bg-background" {...field} value={field.value ?? ''} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
 
-              <FormField 
+              <FormField
                 control={form.control}
                 name="enabled"
                 render={({ field }) => (
                   <FormItem className="flex items-center gap-2">
                     <FormLabel className="mt-2">Active</FormLabel>
                     <FormControl>
-                      <Switch 
+                      <Switch
                         className="bg-background"
                         checked={field.value}
                         onCheckedChange={field.onChange}
@@ -135,11 +171,7 @@ export const CreateWebhookDialog = ({ trigger, ...props }: CreateWebhookDialogPr
 
               <DialogFooter>
                 <div className="flex w-full flex-nowrap gap-4">
-                  <Button
-                    type="button"
-                    variant="secondary"
-                    onClick={() => setOpen(false)}
-                  >
+                  <Button type="button" variant="secondary" onClick={() => setOpen(false)}>
                     Cancel
                   </Button>
                   <Button type="submit" loading={form.formState.isSubmitting}>
@@ -147,7 +179,6 @@ export const CreateWebhookDialog = ({ trigger, ...props }: CreateWebhookDialogPr
                   </Button>
                 </div>
               </DialogFooter>
-
             </fieldset>
           </form>
         </Form>
