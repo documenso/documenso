@@ -1,3 +1,5 @@
+>We are nominated for a Product Hunt Gold Kitty 😺✨ and appreciate any support: https://documen.so/kitty
+
 <img src="https://github.com/documenso/documenso/assets/13398220/a643571f-0239-46a6-a73e-6bef38d1228b" alt="Documenso Logo">
 
 <p align="center" style="margin-top: 20px">
@@ -13,9 +15,9 @@
     ·
     <a href="https://github.com/documenso/documenso/issues">Issues</a>
     ·
-    <a href="https://github.com/documenso/documenso/milestones">Roadmap</a>
+    <a href="https://documen.so/live">Upcoming Releases</a>
     ·
-    <a href="https://documen.so/launches">Upcoming Launches</a>
+    <a href="https://documen.so/roadmap">Roadmap</a>
   </p>
 </p>
 
@@ -115,10 +117,12 @@ To run Documenso locally, you will need
 
 Want to get up and running quickly? Follow these steps:
 
-1. [Clone the repository](https://help.github.com/articles/cloning-a-repository/) it to your local device.
+1. [Fork this repository](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/working-with-forks/about-forks) to your GitHub account.
+
+After forking the repository, clone it to your local device by using the following command:
 
 ```sh
-git clone https://github.com/documenso/documenso
+git clone https://github.com/<your-username>/documenso
 ```
 
 2. Set up your `.env` file using the recommendations in the `.env.example` file. Alternatively, just run `cp .env.example .env` to get started with our handpicked defaults.
@@ -152,10 +156,12 @@ npm run d
 
 Follow these steps to setup Documenso on your local machine:
 
-1. [Clone the repository](https://help.github.com/articles/cloning-a-repository/) it to your local device.
+1. [Fork this repository](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/working-with-forks/about-forks) to your GitHub account.
+
+After forking the repository, clone it to your local device by using the following command:
 
 ```sh
-git clone https://github.com/documenso/documenso
+git clone https://github.com/<your-username>/documenso
 ```
 
 2. Run `npm i` in the root directory
@@ -280,11 +286,15 @@ WantedBy=multi-user.target
 
 ### Railway
 
-[![Deploy on Railway](https://railway.app/button.svg)](https://railway.app/template/DjrRRX)
+[![Deploy on Railway](https://railway.app/button.svg)](https://railway.app/template/bG6D4p)
 
 ### Render
 
 [![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/documenso/documenso)
+
+### Koyeb
+
+[![Deploy to Koyeb](https://www.koyeb.com/static/images/deploy/button.svg)](https://app.koyeb.com/deploy?type=git&repository=github.com/documenso/documenso&branch=main&name=documenso-app&builder=dockerfile&dockerfile=/docker/Dockerfile)
 
 ## Troubleshooting
 

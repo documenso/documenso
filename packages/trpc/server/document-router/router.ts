@@ -1,6 +1,7 @@
 import { TRPCError } from '@trpc/server';
 
 import { getServerLimits } from '@documenso/ee/server-only/limits/server';
+import { DOCUMENSO_ENCRYPTION_KEY } from '@documenso/lib/constants/crypto';
 import { upsertDocumentMeta } from '@documenso/lib/server-only/document-meta/upsert-document-meta';
 import { createDocument } from '@documenso/lib/server-only/document/create-document';
 import { deleteDocument } from '@documenso/lib/server-only/document/delete-document';
@@ -13,6 +14,7 @@ import { sendDocument } from '@documenso/lib/server-only/document/send-document'
 import { updateTitle } from '@documenso/lib/server-only/document/update-title';
 import { setFieldsForDocument } from '@documenso/lib/server-only/field/set-fields-for-document';
 import { setRecipientsForDocument } from '@documenso/lib/server-only/recipient/set-recipients-for-document';
+import { symmetricEncrypt } from '@documenso/lib/universal/crypto';
 
 import { authenticatedProcedure, procedure, router } from '../trpc';
 import {
@@ -24,6 +26,7 @@ import {
   ZSearchDocumentsMutationSchema,
   ZSendDocumentMutationSchema,
   ZSetFieldsForDocumentMutationSchema,
+  ZSetPasswordForDocumentMutationSchema,
   ZSetRecipientsForDocumentMutationSchema,
   ZSetTitleForDocumentMutationSchema,
 } from './schema';
@@ -33,10 +36,8 @@ export const documentRouter = router({
     .input(ZGetDocumentByIdQuerySchema)
     .query(async ({ input, ctx }) => {
       try {
-        const { id } = input;
-
         return await getDocumentById({
-          id,
+          ...input,
           userId: ctx.user.id,
         });
       } catch (err) {
@@ -70,9 +71,9 @@ export const documentRouter = router({
     .input(ZCreateDocumentMutationSchema)
     .mutation(async ({ input, ctx }) => {
       try {
-        const { title, documentDataId } = input;
+        const { title, documentDataId, teamId } = input;
 
-        const { remaining } = await getServerLimits({ email: ctx.user.email });
+        const { remaining } = await getServerLimits({ email: ctx.user.email, teamId });
 
         if (remaining.documents <= 0) {
           throw new TRPCError({
@@ -84,6 +85,7 @@ export const documentRouter = router({
 
         return await createDocument({
           userId: ctx.user.id,
+          teamId,
           title,
           documentDataId,
         });
@@ -175,17 +177,52 @@ export const documentRouter = router({
       }
     }),
 
+  setPasswordForDocument: authenticatedProcedure
+    .input(ZSetPasswordForDocumentMutationSchema)
+    .mutation(async ({ input, ctx }) => {
+      try {
+        const { documentId, password } = input;
+
+        const key = DOCUMENSO_ENCRYPTION_KEY;
+
+        if (!key) {
+          throw new Error('Missing encryption key');
+        }
+
+        const securePassword = symmetricEncrypt({
+          data: password,
+          key,
+        });
+
+        await upsertDocumentMeta({
+          documentId,
+          password: securePassword,
+          userId: ctx.user.id,
+        });
+      } catch (err) {
+        console.error(err);
+
+        throw new TRPCError({
+          code: 'BAD_REQUEST',
+          message: 'We were unable to set the password for this document. Please try again later.',
+        });
+      }
+    }),
+
   sendDocument: authenticatedProcedure
     .input(ZSendDocumentMutationSchema)
     .mutation(async ({ input, ctx }) => {
       try {
-        const { documentId, email } = input;
+        const { documentId, meta } = input;
 
-        if (email.message || email.subject) {
+        if (meta.message || meta.subject || meta.timezone || meta.dateFormat) {
           await upsertDocumentMeta({
             documentId,
-            subject: email.subject,
-            message: email.message,
+            subject: meta.subject,
+            message: meta.message,
+            dateFormat: meta.dateFormat,
+            timezone: meta.timezone,
+            userId: ctx.user.id,
           });
         }
 
@@ -207,12 +244,9 @@ export const documentRouter = router({
     .input(ZResendDocumentMutationSchema)
     .mutation(async ({ input, ctx }) => {
       try {
-        const { documentId, recipients } = input;
-
         return await resendDocument({
           userId: ctx.user.id,
-          documentId,
-          recipients,
+          ...input,
         });
       } catch (err) {
         console.error(err);
@@ -228,14 +262,13 @@ export const documentRouter = router({
     .input(ZGetDocumentByIdQuerySchema)
     .mutation(async ({ input, ctx }) => {
       try {
-        const { id } = input;
-
         return await duplicateDocumentById({
-          id,
           userId: ctx.user.id,
+          ...input,
         });
       } catch (err) {
         console.log(err);
+
         throw new TRPCError({
           code: 'BAD_REQUEST',
           message: 'We are unable to duplicate this document. Please try again later.',

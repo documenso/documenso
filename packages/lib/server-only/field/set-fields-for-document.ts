@@ -1,5 +1,6 @@
 import { prisma } from '@documenso/prisma';
-import { FieldType, SendStatus, SigningStatus } from '@documenso/prisma/client';
+import type { FieldType } from '@documenso/prisma/client';
+import { SendStatus, SigningStatus } from '@documenso/prisma/client';
 
 export interface SetFieldsForDocumentOptions {
   userId: number;
@@ -24,12 +25,29 @@ export const setFieldsForDocument = async ({
   const document = await prisma.document.findFirst({
     where: {
       id: documentId,
-      userId,
+      OR: [
+        {
+          userId,
+        },
+        {
+          team: {
+            members: {
+              some: {
+                userId,
+              },
+            },
+          },
+        },
+      ],
     },
   });
 
   if (!document) {
     throw new Error('Document not found');
+  }
+
+  if (document.completedAt) {
+    throw new Error('Document already complete');
   }
 
   const existingFields = await prisma.field.findMany({
@@ -42,11 +60,7 @@ export const setFieldsForDocument = async ({
   });
 
   const removedFields = existingFields.filter(
-    (existingField) =>
-      !fields.find(
-        (field) =>
-          field.id === existingField.id || field.signerEmail === existingField.Recipient?.email,
-      ),
+    (existingField) => !fields.find((field) => field.id === existingField.id),
   );
 
   const linkedFields = fields

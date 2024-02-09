@@ -15,6 +15,7 @@ import {
   Dialog,
   DialogContent,
   DialogDescription,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from '@documenso/ui/primitives/dialog';
@@ -27,6 +28,7 @@ import {
   FormMessage,
 } from '@documenso/ui/primitives/form/form';
 import { Input } from '@documenso/ui/primitives/input';
+import { PasswordInput } from '@documenso/ui/primitives/password-input';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
 import { RecoveryCodeList } from './recovery-code-list';
@@ -178,9 +180,8 @@ export const EnableAuthenticatorAppDialog = ({
                       <FormItem>
                         <FormLabel className="text-muted-foreground">Password</FormLabel>
                         <FormControl>
-                          <Input
+                          <PasswordInput
                             {...field}
-                            type="password"
                             autoComplete="current-password"
                             value={field.value ?? ''}
                           />
@@ -190,15 +191,15 @@ export const EnableAuthenticatorAppDialog = ({
                     )}
                   />
 
-                  <div className="flex w-full items-center justify-between">
-                    <Button type="button" variant="ghost" onClick={() => onOpenChange(false)}>
+                  <DialogFooter>
+                    <Button type="button" variant="secondary" onClick={() => onOpenChange(false)}>
                       Cancel
                     </Button>
 
                     <Button type="submit" loading={isSetupTwoFactorAuthenticationSubmitting}>
                       Continue
                     </Button>
-                  </div>
+                  </DialogFooter>
                 </form>
               </Form>
             );
@@ -251,15 +252,15 @@ export const EnableAuthenticatorAppDialog = ({
                   )}
                 />
 
-                <div className="flex w-full items-center justify-between">
-                  <Button type="button" variant="ghost" onClick={() => onOpenChange(false)}>
+                <DialogFooter>
+                  <Button type="button" variant="secondary" onClick={() => onOpenChange(false)}>
                     Cancel
                   </Button>
 
                   <Button type="submit" loading={isEnableTwoFactorAuthenticationSubmitting}>
                     Enable 2FA
                   </Button>
-                </div>
+                </DialogFooter>
               </form>
             </Form>
           ))

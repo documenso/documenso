@@ -10,10 +10,14 @@ import { getDocumentAndSenderByToken } from '@documenso/lib/server-only/document
 import { getFieldsForToken } from '@documenso/lib/server-only/field/get-fields-for-token';
 import { getRecipientByToken } from '@documenso/lib/server-only/recipient/get-recipient-by-token';
 import { getRecipientSignatures } from '@documenso/lib/server-only/recipient/get-recipient-signatures';
-import { DocumentStatus, FieldType } from '@documenso/prisma/client';
+import { DocumentStatus, FieldType, RecipientRole } from '@documenso/prisma/client';
 import { DocumentDownloadButton } from '@documenso/ui/components/document/document-download-button';
 import { DocumentShareButton } from '@documenso/ui/components/document/document-share-button';
 import { SigningCard3D } from '@documenso/ui/components/signing-card';
+
+import { truncateTitle } from '~/helpers/truncate-title';
+
+import { DocumentPreviewButton } from './document-preview-button';
 
 export type CompletedSigningPageProps = {
   params: {
@@ -35,6 +39,8 @@ export default async function CompletedSigningPage({
   if (!document || !document.documentData) {
     return notFound();
   }
+
+  const truncatedTitle = truncateTitle(document.title);
 
   const { documentData } = document;
 
@@ -88,8 +94,11 @@ export default async function CompletedSigningPage({
           ))}
 
         <h2 className="mt-6 max-w-[35ch] text-center text-2xl font-semibold leading-normal md:text-3xl lg:text-4xl">
-          You have signed
-          <span className="mt-1.5 block">"{document.title}"</span>
+          You have
+          {recipient.role === RecipientRole.SIGNER && ' signed '}
+          {recipient.role === RecipientRole.VIEWER && ' viewed '}
+          {recipient.role === RecipientRole.APPROVER && ' approved '}
+          <span className="mt-1.5 block">"{truncatedTitle}"</span>
         </h2>
 
         {match({ status: document.status, deletedAt: document.deletedAt })
@@ -113,12 +122,20 @@ export default async function CompletedSigningPage({
         <div className="mt-8 flex w-full max-w-sm items-center justify-center gap-4">
           <DocumentShareButton documentId={document.id} token={recipient.token} />
 
-          <DocumentDownloadButton
-            className="flex-1"
-            fileName={document.title}
-            documentData={documentData}
-            disabled={document.status !== DocumentStatus.COMPLETED}
-          />
+          {document.status === DocumentStatus.COMPLETED ? (
+            <DocumentDownloadButton
+              className="flex-1"
+              fileName={document.title}
+              documentData={documentData}
+              disabled={document.status !== DocumentStatus.COMPLETED}
+            />
+          ) : (
+            <DocumentPreviewButton
+              className="text-[11px]"
+              title="Signatures will appear once the document has been completed"
+              documentData={documentData}
+            />
+          )}
         </div>
 
         {isLoggedIn ? (

@@ -6,26 +6,39 @@ import { DocumentInviteEmailTemplate } from '@documenso/email/templates/document
 import { FROM_ADDRESS, FROM_NAME } from '@documenso/lib/constants/email';
 import { renderCustomEmailTemplate } from '@documenso/lib/utils/render-custom-email-template';
 import { prisma } from '@documenso/prisma';
-import { DocumentStatus, SigningStatus } from '@documenso/prisma/client';
+import { DocumentStatus, RecipientRole, SigningStatus } from '@documenso/prisma/client';
+import type { Prisma } from '@documenso/prisma/client';
+
+import { RECIPIENT_ROLES_DESCRIPTION } from '../../constants/recipient-roles';
+import { getDocumentWhereInput } from './get-document-by-id';
 
 export type ResendDocumentOptions = {
   documentId: number;
   userId: number;
   recipients: number[];
+  teamId?: number;
 };
 
-export const resendDocument = async ({ documentId, userId, recipients }: ResendDocumentOptions) => {
+export const resendDocument = async ({
+  documentId,
+  userId,
+  recipients,
+  teamId,
+}: ResendDocumentOptions) => {
   const user = await prisma.user.findFirstOrThrow({
     where: {
       id: userId,
     },
   });
 
+  const documentWhereInput: Prisma.DocumentWhereUniqueInput = await getDocumentWhereInput({
+    documentId,
+    userId,
+    teamId,
+  });
+
   const document = await prisma.document.findUnique({
-    where: {
-      id: documentId,
-      userId,
-    },
+    where: documentWhereInput,
     include: {
       Recipient: {
         where: {
@@ -59,6 +72,10 @@ export const resendDocument = async ({ documentId, userId, recipients }: ResendD
 
   await Promise.all(
     document.Recipient.map(async (recipient) => {
+      if (recipient.role === RecipientRole.CC) {
+        return;
+      }
+
       const { email, name } = recipient;
 
       const customEmailTemplate = {
@@ -77,7 +94,10 @@ export const resendDocument = async ({ documentId, userId, recipients }: ResendD
         assetBaseUrl,
         signDocumentLink,
         customBody: renderCustomEmailTemplate(customEmail?.message || '', customEmailTemplate),
+        role: recipient.role,
       });
+
+      const { actionVerb } = RECIPIENT_ROLES_DESCRIPTION[recipient.role];
 
       await mailer.sendMail({
         to: {
@@ -90,7 +110,7 @@ export const resendDocument = async ({ documentId, userId, recipients }: ResendD
         },
         subject: customEmail?.subject
           ? renderCustomEmailTemplate(customEmail.subject, customEmailTemplate)
-          : 'Please sign this document',
+          : `Please ${actionVerb.toLowerCase()} this document`,
         html: render(template),
         text: render(template, { plainText: true }),
       });

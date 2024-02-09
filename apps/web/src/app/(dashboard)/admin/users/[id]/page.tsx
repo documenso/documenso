@@ -9,7 +9,6 @@ import type { z } from 'zod';
 import { trpc } from '@documenso/trpc/react';
 import { ZUpdateProfileMutationByAdminSchema } from '@documenso/trpc/server/admin-router/schema';
 import { Button } from '@documenso/ui/primitives/button';
-import { Combobox } from '@documenso/ui/primitives/combobox';
 import {
   Form,
   FormControl,
@@ -20,6 +19,8 @@ import {
 } from '@documenso/ui/primitives/form/form';
 import { Input } from '@documenso/ui/primitives/input';
 import { useToast } from '@documenso/ui/primitives/use-toast';
+
+import { MultiSelectRoleCombobox } from './multiselect-role-combobox';
 
 const ZUserFormSchema = ZUpdateProfileMutationByAdminSchema.omit({ id: true });
 
@@ -117,7 +118,7 @@ export default function UserPage({ params }: { params: { id: number } }) {
                   <fieldset className="flex flex-col gap-2">
                     <FormLabel className="text-muted-foreground">Roles</FormLabel>
                     <FormControl>
-                      <Combobox
+                      <MultiSelectRoleCombobox
                         listValues={roles}
                         onChange={(values: string[]) => onChange(values)}
                       />

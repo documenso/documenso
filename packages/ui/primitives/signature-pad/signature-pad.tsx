@@ -3,6 +3,7 @@
 import type { HTMLAttributes, MouseEvent, PointerEvent, TouchEvent } from 'react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 
+import { Undo2 } from 'lucide-react';
 import type { StrokeOptions } from 'perfect-freehand';
 import { getStroke } from 'perfect-freehand';
 
@@ -15,6 +16,7 @@ const DPI = 2;
 export type SignaturePadProps = Omit<HTMLAttributes<HTMLCanvasElement>, 'onChange'> & {
   onChange?: (_signatureDataUrl: string | null) => void;
   containerClassName?: string;
+  disabled?: boolean;
 };
 
 export const SignaturePad = ({
@@ -22,12 +24,14 @@ export const SignaturePad = ({
   containerClassName,
   defaultValue,
   onChange,
+  disabled = false,
   ...props
 }: SignaturePadProps) => {
   const $el = useRef<HTMLCanvasElement>(null);
 
   const [isPressed, setIsPressed] = useState(false);
-  const [points, setPoints] = useState<Point[]>([]);
+  const [lines, setLines] = useState<Point[][]>([]);
+  const [currentLine, setCurrentLine] = useState<Point[]>([]);
 
   const perfectFreehandOptions = useMemo(() => {
     const size = $el.current ? Math.min($el.current.height, $el.current.width) * 0.03 : 10;
@@ -52,26 +56,7 @@ export const SignaturePad = ({
 
     const point = Point.fromEvent(event, DPI, $el.current);
 
-    const newPoints = [...points, point];
-
-    setPoints(newPoints);
-
-    if ($el.current) {
-      const ctx = $el.current.getContext('2d');
-
-      if (ctx) {
-        ctx.save();
-
-        ctx.imageSmoothingEnabled = true;
-        ctx.imageSmoothingQuality = 'high';
-
-        const pathData = new Path2D(
-          getSvgPathFromStroke(getStroke(newPoints, perfectFreehandOptions)),
-        );
-
-        ctx.fill(pathData);
-      }
-    }
+    setCurrentLine([point]);
   };
 
   const onMouseMove = (event: MouseEvent | PointerEvent | TouchEvent) => {
@@ -85,31 +70,36 @@ export const SignaturePad = ({
 
     const point = Point.fromEvent(event, DPI, $el.current);
 
-    if (point.distanceTo(points[points.length - 1]) > 5) {
-      const newPoints = [...points, point];
+    if (point.distanceTo(currentLine[currentLine.length - 1]) > 5) {
+      setCurrentLine([...currentLine, point]);
 
-      setPoints(newPoints);
-
+      // Update the canvas here to draw the lines
       if ($el.current) {
         const ctx = $el.current.getContext('2d');
 
         if (ctx) {
           ctx.restore();
-
           ctx.imageSmoothingEnabled = true;
           ctx.imageSmoothingQuality = 'high';
 
-          const pathData = new Path2D(
-            getSvgPathFromStroke(getStroke(points, perfectFreehandOptions)),
-          );
+          lines.forEach((line) => {
+            const pathData = new Path2D(
+              getSvgPathFromStroke(getStroke(line, perfectFreehandOptions)),
+            );
 
+            ctx.fill(pathData);
+          });
+
+          const pathData = new Path2D(
+            getSvgPathFromStroke(getStroke([...currentLine, point], perfectFreehandOptions)),
+          );
           ctx.fill(pathData);
         }
       }
     }
   };
 
-  const onMouseUp = (event: MouseEvent | PointerEvent | TouchEvent, addPoint = true) => {
+  const onMouseUp = (event: MouseEvent | PointerEvent | TouchEvent, addLine = true) => {
     if (event.cancelable) {
       event.preventDefault();
     }
@@ -118,15 +108,16 @@ export const SignaturePad = ({
 
     const point = Point.fromEvent(event, DPI, $el.current);
 
-    const newPoints = [...points];
+    const newLines = [...lines];
 
-    if (addPoint) {
-      newPoints.push(point);
-
-      setPoints(newPoints);
+    if (addLine && currentLine.length > 0) {
+      newLines.push([...currentLine, point]);
+      setCurrentLine([]);
     }
 
-    if ($el.current && newPoints.length > 0) {
+    setLines(newLines);
+
+    if ($el.current && newLines.length > 0) {
       const ctx = $el.current.getContext('2d');
 
       if (ctx) {
@@ -135,19 +126,18 @@ export const SignaturePad = ({
         ctx.imageSmoothingEnabled = true;
         ctx.imageSmoothingQuality = 'high';
 
-        const pathData = new Path2D(
-          getSvgPathFromStroke(getStroke(newPoints, perfectFreehandOptions)),
-        );
+        newLines.forEach((line) => {
+          const pathData = new Path2D(
+            getSvgPathFromStroke(getStroke(line, perfectFreehandOptions)),
+          );
+          ctx.fill(pathData);
+        });
 
-        ctx.fill(pathData);
+        onChange?.($el.current.toDataURL());
 
         ctx.save();
       }
-
-      onChange?.($el.current.toDataURL());
     }
-
-    setPoints([]);
   };
 
   const onMouseEnter = (event: MouseEvent | PointerEvent | TouchEvent) => {
@@ -177,7 +167,29 @@ export const SignaturePad = ({
 
     onChange?.(null);
 
-    setPoints([]);
+    setLines([]);
+    setCurrentLine([]);
+  };
+
+  const onUndoClick = () => {
+    if (lines.length === 0) {
+      return;
+    }
+
+    const newLines = [...lines];
+    newLines.pop(); // Remove the last line
+    setLines(newLines);
+
+    // Clear the canvas
+    if ($el.current) {
+      const ctx = $el.current.getContext('2d');
+      ctx?.clearRect(0, 0, $el.current.width, $el.current.height);
+
+      newLines.forEach((line) => {
+        const pathData = new Path2D(getSvgPathFromStroke(getStroke(line, perfectFreehandOptions)));
+        ctx?.fill(pathData);
+      });
+    }
   };
 
   useEffect(() => {
@@ -204,7 +216,11 @@ export const SignaturePad = ({
   }, [defaultValue]);
 
   return (
-    <div className={cn('relative block', containerClassName)}>
+    <div
+      className={cn('relative block', containerClassName, {
+        'pointer-events-none opacity-50': disabled,
+      })}
+    >
       <canvas
         ref={$el}
         className={cn('relative block dark:invert', className)}
@@ -217,15 +233,29 @@ export const SignaturePad = ({
         {...props}
       />
 
-      <div className="absolute bottom-4 right-4">
+      <div className="absolute bottom-4 right-4 flex gap-2">
         <button
           type="button"
-          className="focus-visible:ring-ring ring-offset-background text-muted-foreground rounded-full p-0 text-xs focus-visible:outline-none focus-visible:ring-2"
+          className="focus-visible:ring-ring ring-offset-background text-muted-foreground/60 hover:text-muted-foreground rounded-full p-0 text-xs focus-visible:outline-none focus-visible:ring-2"
           onClick={() => onClearClick()}
         >
           Clear Signature
         </button>
       </div>
+
+      {lines.length > 0 && (
+        <div className="absolute bottom-4 left-4 flex gap-2">
+          <button
+            type="button"
+            title="undo"
+            className="focus-visible:ring-ring ring-offset-background text-muted-foreground/60 hover:text-muted-foreground rounded-full p-0 text-xs focus-visible:outline-none focus-visible:ring-2"
+            onClick={() => onUndoClick()}
+          >
+            <Undo2 className="h-4 w-4" />
+            <span className="sr-only">Undo</span>
+          </button>
+        </div>
+      )}
     </div>
   );
 };

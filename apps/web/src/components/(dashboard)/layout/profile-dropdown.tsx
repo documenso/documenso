@@ -5,6 +5,7 @@ import Link from 'next/link';
 import {
   Braces,
   CreditCard,
+  FileSpreadsheet,
   Lock,
   LogOut,
   User as LucideUser,
@@ -20,7 +21,7 @@ import { LuGithub } from 'react-icons/lu';
 
 import { useFeatureFlags } from '@documenso/lib/client-only/providers/feature-flag';
 import { isAdmin } from '@documenso/lib/next-auth/guards/is-admin';
-import { recipientInitials } from '@documenso/lib/utils/recipient-formatter';
+import { extractInitials } from '@documenso/lib/utils/recipient-formatter';
 import type { User } from '@documenso/prisma/client';
 import { Avatar, AvatarFallback } from '@documenso/ui/primitives/avatar';
 import { Button } from '@documenso/ui/primitives/button';
@@ -51,7 +52,7 @@ export const ProfileDropdown = ({ user }: ProfileDropdownProps) => {
   const isBillingEnabled = getFlag('app_billing');
 
   const avatarFallback = user.name
-    ? recipientInitials(user.name)
+    ? extractInitials(user.name)
     : user.email.slice(0, 1).toUpperCase();
 
   return (
@@ -68,7 +69,7 @@ export const ProfileDropdown = ({ user }: ProfileDropdownProps) => {
         </Button>
       </DropdownMenuTrigger>
 
-      <DropdownMenuContent className="w-56" align="end" forceMount>
+      <DropdownMenuContent className="z-[60] w-56" align="end" forceMount>
         <DropdownMenuLabel>Account</DropdownMenuLabel>
 
         {isUserAdmin && (
@@ -115,6 +116,13 @@ export const ProfileDropdown = ({ user }: ProfileDropdownProps) => {
         )}
 
         <DropdownMenuSeparator />
+        <DropdownMenuItem asChild>
+          <Link href="/templates" className="cursor-pointer">
+            <FileSpreadsheet className="mr-2 h-4 w-4" />
+            Templates
+          </Link>
+        </DropdownMenuItem>
+        <DropdownMenuSeparator />
 
         <DropdownMenuSub>
           <DropdownMenuSubTrigger>
@@ -122,7 +130,7 @@ export const ProfileDropdown = ({ user }: ProfileDropdownProps) => {
             Themes
           </DropdownMenuSubTrigger>
           <DropdownMenuPortal>
-            <DropdownMenuSubContent>
+            <DropdownMenuSubContent className="z-[60]">
               <DropdownMenuRadioGroup value={theme} onValueChange={setTheme}>
                 <DropdownMenuRadioItem value="light">
                   <Sun className="mr-2 h-4 w-4" /> Light
@@ -141,7 +149,11 @@ export const ProfileDropdown = ({ user }: ProfileDropdownProps) => {
         </DropdownMenuSub>
         <DropdownMenuSeparator />
         <DropdownMenuItem asChild>
-          <Link href="https://github.com/documenso/documenso" className="cursor-pointer">
+          <Link
+            href="https://github.com/documenso/documenso"
+            className="cursor-pointer"
+            target="_blank"
+          >
             <LuGithub className="mr-2 h-4 w-4" />
             Star on Github
           </Link>

@@ -11,6 +11,7 @@ import {
   Dialog,
   DialogContent,
   DialogDescription,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from '@documenso/ui/primitives/dialog';
@@ -22,7 +23,7 @@ import {
   FormLabel,
   FormMessage,
 } from '@documenso/ui/primitives/form/form';
-import { Input } from '@documenso/ui/primitives/input';
+import { PasswordInput } from '@documenso/ui/primitives/password-input';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
 import { RecoveryCodeList } from './recovery-code-list';
@@ -108,9 +109,8 @@ export const ViewRecoveryCodesDialog = ({ open, onOpenChange }: ViewRecoveryCode
                       <FormItem>
                         <FormLabel className="text-muted-foreground">Password</FormLabel>
                         <FormControl>
-                          <Input
+                          <PasswordInput
                             {...field}
-                            type="password"
                             autoComplete="current-password"
                             value={field.value ?? ''}
                           />
@@ -120,15 +120,15 @@ export const ViewRecoveryCodesDialog = ({ open, onOpenChange }: ViewRecoveryCode
                     )}
                   />
 
-                  <div className="flex w-full items-center justify-between">
-                    <Button type="button" variant="ghost" onClick={() => onOpenChange(false)}>
+                  <DialogFooter>
+                    <Button type="button" variant="secondary" onClick={() => onOpenChange(false)}>
                       Cancel
                     </Button>
 
                     <Button type="submit" loading={isViewRecoveryCodesSubmitting}>
                       Continue
                     </Button>
-                  </div>
+                  </DialogFooter>
                 </form>
               </Form>
             );

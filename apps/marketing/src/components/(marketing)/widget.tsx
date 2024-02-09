@@ -1,6 +1,7 @@
 'use client';
 
-import { HTMLAttributes, KeyboardEvent, useMemo, useState } from 'react';
+import type { HTMLAttributes, KeyboardEvent } from 'react';
+import { useMemo, useState } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { AnimatePresence, motion } from 'framer-motion';
@@ -90,10 +91,10 @@ export const Widget = ({ className, children, ...props }: WidgetProps) => {
     }
 
     if (step === STEP.EMAIL) {
-      return 1;
+      return 3;
     }
 
-    return 3;
+    return 1;
   }, [step]);
 
   const onNextStepClick = () => {
@@ -398,6 +399,7 @@ export const Widget = ({ className, children, ...props }: WidgetProps) => {
           </DialogDescription>
 
           <SignaturePad
+            disabled={isSubmitting}
             className="aspect-video w-full rounded-md border"
             defaultValue={signatureDataUrl || ''}
             onChange={setDraftSignatureDataUrl}

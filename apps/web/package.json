@@ -43,9 +43,10 @@
     "react-hotkeys-hook": "^4.4.1",
     "react-icons": "^4.11.0",
     "react-rnd": "^10.4.1",
-    "sharp": "0.32.5",
+    "sharp": "0.33.1",
     "ts-pattern": "^5.0.5",
     "typescript": "5.2.2",
+    "ua-parser-js": "^1.0.37",
     "uqr": "^0.1.2",
     "zod": "^3.22.4"
   },
@@ -54,7 +55,8 @@
     "@types/luxon": "^3.3.1",
     "@types/node": "20.1.0",
     "@types/react": "18.2.18",
-    "@types/react-dom": "18.2.7"
+    "@types/react-dom": "18.2.7",
+    "@types/ua-parser-js": "^0.7.39"
   },
   "overrides": {
     "next-auth": {
