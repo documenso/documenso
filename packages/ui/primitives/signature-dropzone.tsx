@@ -48,7 +48,7 @@ export const SignatureDropzone = ({
       }
     },
     maxSize: megabytesToBytes(40),
-  })
+  });
 
   return ( 
     <motion.div

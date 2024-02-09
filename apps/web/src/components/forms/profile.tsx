@@ -27,7 +27,7 @@ import { SignaturePad } from '@documenso/ui/primitives/signature-pad/signature-p
 
 export const ZProfileFormSchema = z.object({
   name: z.string().trim().min(1, { message: 'Please enter a valid name.' }),
-  signature: z.string().min(1, 'Signature Pad cannot be empty'),
+  signature: z.string().min(0, 'Signature Pad cannot be empty'),
 });
 
 export type TProfileFormSchema = z.infer<typeof ZProfileFormSchema>;

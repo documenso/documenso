@@ -10,7 +10,7 @@ import { SignatureIcon } from '@documenso/ui/icons/signature';
 import {  UploadIcon } from "lucide-react";
 import { DrawPad } from "./drawpad";
 import { SignatureType } from "@prisma/client";
-import { Button } from "../button";
+import { Card, CardContent } from "../card";
 
 export type SignaturePadProps = Omit<HTMLAttributes<HTMLCanvasElement>, 'onChange'> & {
   containerClassName?: string;
@@ -45,7 +45,7 @@ export const SignaturePad = ({
 
   return (
     <div className={cn('relative block', containerClassName)}>
-        <Tabs defaultValue={signature.type ?? undefined} className="overflow-x-auto">
+        <Tabs defaultValue={signature?.type ?? undefined} className="overflow-x-auto">
           <TabsList className="m-2">
             <TabsTrigger value="DRAW">
               <SignatureIcon className="mr-2 inline-block h-4 w-4 text-muted-foreground" />
@@ -60,20 +60,30 @@ export const SignaturePad = ({
             <DrawPad onChange={onChange} signature={signature} className={className} {...props}/>
           </TabsContent>
           <TabsContent value={SignatureType.UPLOAD}>
-            <div className="my-3">
               {uploadedFile || (signature.type === SignatureType.UPLOAD && signature.value ) ? (
-                <div className="m-2">
-                <img src={uploadedFile?.fileBase64 ?? signature?.value ?? ''}  className="h-40 w-full rounded-lg border bg-background" />
-                <Button className="mt-1" >
-                  Remove
-                </Button>
-                </div>
+                <Card
+                id={`field-card-${signature.type}-signature`}
+                className={cn(
+                  'field-card-container bg-background border-0 relative z-20 h-full w-full transition-all'
+                )}
+                >
+                  <CardContent className="text-foreground hover:shadow-primary-foreground group flex h-full w-full flex-col items-center justify-center p-2">
+                    <img src={uploadedFile?.fileBase64 ?? signature?.value ?? ''}  className="h-40 w-full rounded-lg border bg-background" />
+                    <button
+                      className="text-destructive bg-background/40 absolute inset-0 z-10 flex h-full w-full items-center justify-center rounded-md text-sm opacity-0 backdrop-blur-sm duration-200 group-hover:opacity-100"
+                      onClick={() => {
+                        onChange?.("", true);
+                        setUploadedFile(null);
+                      }}
+                    >
+                      Remove
+                    </button>
+                  </CardContent>
+                </Card>
               )
               : (
                 <SignatureDropzone onDrop={onSignatureDrop} className={className} />
               )}
-
-            </div>
           </TabsContent>
         </Tabs>      
     </div>
