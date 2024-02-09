@@ -178,7 +178,7 @@ model Document {
 }
 
 model DocumentAuditLog {
-  id         Int      @id @default(autoincrement())
+  id         String   @id @default(cuid())
   documentId Int
   createdAt  DateTime @default(now())
   type       String
@@ -278,6 +278,7 @@ enum FieldType {
 
 model Field {
   id          Int        @id @default(autoincrement())
+  secondaryId String     @unique @default(cuid())
   documentId  Int?
   templateId  Int?
   recipientId Int?

@@ -141,6 +141,7 @@ export const setFieldsForDocument = async ({
         }
 
         const baseAuditLog = {
+          fieldId: upsertedField.secondaryId,
           fieldRecipientEmail: fieldSignerEmail,
           fieldRecipientId: upsertedField.recipientId,
           fieldType: upsertedField.type,
@@ -202,6 +203,7 @@ export const setFieldsForDocument = async ({
             user,
             requestMetadata,
             data: {
+              fieldId: field.secondaryId,
               fieldRecipientEmail: field.Recipient?.email ?? '',
               fieldRecipientId: field.recipientId ?? -1,
               fieldType: field.type,

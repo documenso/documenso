@@ -68,7 +68,7 @@ export const removeSignedFieldWithToken = async ({
 
     await tx.documentAuditLog.create({
       data: createDocumentAuditLogData({
-        type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_FIELD_UNSIGNED,
+        type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_FIELD_UNINSERTED,
         documentId: document.id,
         user: {
           name: recipient?.name,
@@ -77,7 +77,7 @@ export const removeSignedFieldWithToken = async ({
         requestMetadata,
         data: {
           field: field.type,
-          fieldId: field.id,
+          fieldId: field.secondaryId,
         },
       }),
     });

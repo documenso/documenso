@@ -1,8 +1,9 @@
-////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////
 //
-// Be aware that any changes to this file may need migrations since we're store JSON in Prisma.
+// Be aware that any changes to this file may require migrations since we are storing JSON
+// data in Prisma.
 //
-////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////
 import { z } from 'zod';
 
 import { FieldType } from '@documenso/prisma/client';
@@ -23,12 +24,12 @@ export const ZDocumentAuditLogTypeSchema = z.enum([
   'DOCUMENT_COMPLETED',
   'DOCUMENT_CREATED',
   'DOCUMENT_DELETED',
-  'DOCUMENT_FIELD_SIGNED',
-  'DOCUMENT_FIELD_UNSIGNED',
+  'DOCUMENT_FIELD_INSERTED',
+  'DOCUMENT_FIELD_UNINSERTED',
   'DOCUMENT_META_UPDATED',
   'DOCUMENT_OPENED',
   'DOCUMENT_TITLE_UPDATED',
-  'DOCUMENT_RECIPIENT_FLOW_COMPLETE',
+  'DOCUMENT_RECIPIENT_COMPLETED',
 ]);
 
 export const ZDocumentMetaDiffTypeSchema = z.enum([
@@ -118,6 +119,7 @@ export const ZDocumentAuditLogRecipientDiffSchema = z.union([
 ]);
 
 const ZBaseFieldEventDataSchema = z.object({
+  fieldId: z.string(), // Note: This is the secondary field ID, which will get migrated in the future.
   fieldRecipientEmail: z.string(),
   fieldRecipientId: z.number(),
   fieldType: z.string(), // We specifically don't want to use enums to allow for more flexibility.
@@ -153,7 +155,7 @@ export const ZDocumentAuditLogEventEmailSentSchema = z.object({
 export const ZDocumentAuditLogEventDocumentCompletedSchema = z.object({
   type: z.literal(DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_COMPLETED),
   data: z.object({
-    // Empty for now.
+    transactionId: z.string(),
   }),
 });
 
@@ -168,12 +170,12 @@ export const ZDocumentAuditLogEventDocumentCreatedSchema = z.object({
 });
 
 /**
- * Event: Document field signed.
+ * Event: Document field inserted.
  */
-export const ZDocumentAuditLogEventDocumentFieldSignedSchema = z.object({
-  type: z.literal(DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_FIELD_SIGNED),
+export const ZDocumentAuditLogEventDocumentFieldInsertedSchema = z.object({
+  type: z.literal(DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_FIELD_INSERTED),
   data: ZBaseRecipientDataSchema.extend({
-    fieldId: z.number(),
+    fieldId: z.string(),
 
     // Organised into union to allow us to extend each field if required.
     field: z.union([
@@ -207,13 +209,13 @@ export const ZDocumentAuditLogEventDocumentFieldSignedSchema = z.object({
 });
 
 /**
- * Event: Document field unsigned.
+ * Event: Document field uninserted.
  */
-export const ZDocumentAuditLogEventDocumentFieldUnsignedSchema = z.object({
-  type: z.literal(DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_FIELD_UNSIGNED),
+export const ZDocumentAuditLogEventDocumentFieldUninsertedSchema = z.object({
+  type: z.literal(DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_FIELD_UNINSERTED),
   data: z.object({
     field: z.nativeEnum(FieldType),
-    fieldId: z.number(),
+    fieldId: z.string(),
   }),
 });
 
@@ -236,10 +238,10 @@ export const ZDocumentAuditLogEventDocumentOpenedSchema = z.object({
 });
 
 /**
- * Event: Document recipient flow complete (the recipient has fully actioned and completed their required steps for the document).
+ * Event: Document recipient completed the document (the recipient has fully actioned and completed their required steps for the document).
  */
-export const ZDocumentAuditLogEventDocumentRecipientFlowCompleteSchema = z.object({
-  type: z.literal(DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_RECIPIENT_FLOW_COMPLETE),
+export const ZDocumentAuditLogEventDocumentRecipientCompleteSchema = z.object({
+  type: z.literal(DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_RECIPIENT_COMPLETED),
   data: ZBaseRecipientDataSchema,
 });
 
@@ -255,9 +257,9 @@ export const ZDocumentAuditLogEventDocumentTitleUpdatedSchema = z.object({
 });
 
 /**
- * Event: Field added.
+ * Event: Field created.
  */
-export const ZDocumentAuditLogEventFieldAddedSchema = z.object({
+export const ZDocumentAuditLogEventFieldCreatedSchema = z.object({
   type: z.literal(DOCUMENT_AUDIT_LOG_TYPE.FIELD_CREATED),
   data: ZBaseFieldEventDataSchema,
 });
@@ -307,7 +309,7 @@ export const ZDocumentAuditLogEventRecipientRemovedSchema = z.object({
 });
 
 export const ZDocumentAuditLogBaseSchema = z.object({
-  id: z.number(),
+  id: z.string(),
   createdAt: z.date(),
   documentId: z.number(),
 });
@@ -317,13 +319,13 @@ export const ZDocumentAuditLogSchema = ZDocumentAuditLogBaseSchema.and(
     ZDocumentAuditLogEventEmailSentSchema,
     ZDocumentAuditLogEventDocumentCompletedSchema,
     ZDocumentAuditLogEventDocumentCreatedSchema,
-    ZDocumentAuditLogEventDocumentFieldSignedSchema,
-    ZDocumentAuditLogEventDocumentFieldUnsignedSchema,
+    ZDocumentAuditLogEventDocumentFieldInsertedSchema,
+    ZDocumentAuditLogEventDocumentFieldUninsertedSchema,
     ZDocumentAuditLogEventDocumentMetaUpdatedSchema,
     ZDocumentAuditLogEventDocumentOpenedSchema,
-    ZDocumentAuditLogEventDocumentRecipientFlowCompleteSchema,
+    ZDocumentAuditLogEventDocumentRecipientCompleteSchema,
     ZDocumentAuditLogEventDocumentTitleUpdatedSchema,
-    ZDocumentAuditLogEventFieldAddedSchema,
+    ZDocumentAuditLogEventFieldCreatedSchema,
     ZDocumentAuditLogEventFieldRemovedSchema,
     ZDocumentAuditLogEventFieldUpdatedSchema,
     ZDocumentAuditLogEventRecipientAddedSchema,

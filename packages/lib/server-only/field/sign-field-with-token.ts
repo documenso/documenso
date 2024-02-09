@@ -1,7 +1,6 @@
 'use server';
 
 import { DateTime } from 'luxon';
-import { nanoid } from 'nanoid';
 import { match } from 'ts-pattern';
 
 import { prisma } from '@documenso/prisma';
@@ -136,7 +135,7 @@ export const signFieldWithToken = async ({
 
     await tx.documentAuditLog.create({
       data: createDocumentAuditLogData({
-        type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_FIELD_SIGNED,
+        type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_FIELD_INSERTED,
         documentId: document.id,
         user: {
           email: recipient.email,
@@ -148,12 +147,11 @@ export const signFieldWithToken = async ({
           recipientId: recipient.id,
           recipientName: recipient.name,
           recipientRole: recipient.role,
-          fieldId: updatedField.id,
+          fieldId: updatedField.secondaryId,
           field: match(updatedField.type)
             .with(FieldType.SIGNATURE, FieldType.FREE_SIGNATURE, (type) => ({
               type,
               data: signatureImageAsBase64 || typedSignature || '',
-              signatureId: nanoid(32),
             }))
             .with(FieldType.DATE, FieldType.EMAIL, FieldType.NAME, FieldType.TEXT, (type) => ({
               type,

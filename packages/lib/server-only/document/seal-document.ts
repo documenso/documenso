@@ -124,7 +124,9 @@ export const sealDocument = async ({
         documentId: document.id,
         requestMetadata,
         user: null,
-        data: {},
+        data: {
+          transactionId: nanoid(),
+        },
       }),
     });
   });

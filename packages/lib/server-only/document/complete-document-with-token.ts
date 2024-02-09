@@ -77,7 +77,7 @@ export const completeDocumentWithToken = async ({
 
   await prisma.documentAuditLog.create({
     data: createDocumentAuditLogData({
-      type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_RECIPIENT_FLOW_COMPLETE,
+      type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_RECIPIENT_COMPLETED,
       documentId: document.id,
       user: {
         name: recipient.name,
