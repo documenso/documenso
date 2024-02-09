@@ -11,4 +11,10 @@ export const ZCreateWebhookFormSchema = z.object({
   enabled: z.boolean(),
 });
 
+export const ZDeleteWebhookSchema = z.object({
+  id: z.number(),
+});
+
 export type TCreateWebhookFormSchema = z.infer<typeof ZCreateWebhookFormSchema>;
+
+export type TDeleteWebhookSchema = z.infer<typeof ZDeleteWebhookSchema>;

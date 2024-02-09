@@ -127,7 +127,6 @@ export const CreateWebhookDialog = ({ trigger, ...props }: CreateWebhookDialogPr
                       <MultiSelectCombobox
                         listValues={value}
                         onChange={(values: string[]) => {
-                          console.log(values);
                           onChange(values);
                         }}
                       />

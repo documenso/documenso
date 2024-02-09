@@ -52,7 +52,7 @@ export const DeleteWebhookDialog = ({ webhook, children }: DeleteWebhookDialogPr
 
   type TDeleteWebhookFormSchema = z.infer<typeof ZDeleteWebhookFormSchema>;
 
-  const { mutateAsync: deleteWebhook } = trpc.webhook.deleteWebhookById.useMutation();
+  const { mutateAsync: deleteWebhook } = trpc.webhook.deleteWebhook.useMutation();
 
   const form = useForm<TDeleteWebhookFormSchema>({
     resolver: zodResolver(ZDeleteWebhookFormSchema),
