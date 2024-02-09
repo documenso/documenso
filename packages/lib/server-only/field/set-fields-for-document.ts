@@ -46,6 +46,10 @@ export const setFieldsForDocument = async ({
     throw new Error('Document not found');
   }
 
+  if (document.completedAt) {
+    throw new Error('Document already complete');
+  }
+
   const existingFields = await prisma.field.findMany({
     where: {
       documentId,
