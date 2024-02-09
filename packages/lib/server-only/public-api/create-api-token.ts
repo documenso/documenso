@@ -1,26 +1,42 @@
+import type { Duration } from 'luxon';
+import { DateTime } from 'luxon';
+
 import { prisma } from '@documenso/prisma';
 
 // temporary choice for testing only
-import { ONE_YEAR } from '../../constants/time';
+import * as timeConstants from '../../constants/time';
 import { alphaid } from '../../universal/id';
 import { hashString } from '../auth/hash';
+
+type TimeConstants = typeof timeConstants & {
+  [key: string]: number | Duration;
+};
 
 type CreateApiTokenInput = {
   userId: number;
   tokenName: string;
+  expirationDate: string | null;
 };
 
-export const createApiToken = async ({ userId, tokenName }: CreateApiTokenInput) => {
+export const createApiToken = async ({
+  userId,
+  tokenName,
+  expirationDate,
+}: CreateApiTokenInput) => {
   const apiToken = `api_${alphaid(16)}`;
 
   const hashedToken = hashString(apiToken);
+
+  const timeConstantsRecords: TimeConstants = timeConstants;
 
   const dbToken = await prisma.apiToken.create({
     data: {
       token: hashedToken,
       name: tokenName,
       userId,
-      expires: new Date(Date.now() + ONE_YEAR),
+      expires: expirationDate
+        ? DateTime.now().plus(timeConstantsRecords[expirationDate]).toJSDate()
+        : null,
     },
   });
 

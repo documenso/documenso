@@ -1,12 +1,12 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { useRouter } from 'next/navigation';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
-import type { z } from 'zod';
+import { z } from 'zod';
 
 import { useCopyToClipboard } from '@documenso/lib/client-only/hooks/use-copy-to-clipboard';
 import { TRPCClientError } from '@documenso/trpc/client';
@@ -26,9 +26,21 @@ import {
   FormMessage,
 } from '@documenso/ui/primitives/form/form';
 import { Input } from '@documenso/ui/primitives/input';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@documenso/ui/primitives/select';
+import { Switch } from '@documenso/ui/primitives/switch';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
-const ZCreateTokenFormSchema = ZCreateTokenMutationSchema;
+import { EXPIRATION_DATES } from '../(dashboard)/settings/token/contants';
+
+const ZCreateTokenFormSchema = ZCreateTokenMutationSchema.extend({
+  enabled: z.boolean(),
+});
 
 type TCreateTokenFormSchema = z.infer<typeof ZCreateTokenFormSchema>;
 
@@ -43,6 +55,7 @@ export const ApiTokenForm = ({ className }: ApiTokenFormProps) => {
   const { toast } = useToast();
 
   const [newlyCreatedToken, setNewlyCreatedToken] = useState('');
+  const [noExpirationDate, setNoExpirationDate] = useState(false);
 
   const { mutateAsync: createTokenMutation } = trpc.apiToken.createToken.useMutation({
     onSuccess(data) {
@@ -54,8 +67,20 @@ export const ApiTokenForm = ({ className }: ApiTokenFormProps) => {
     resolver: zodResolver(ZCreateTokenFormSchema),
     defaultValues: {
       tokenName: '',
+      expirationDate: '',
+      enabled: false,
     },
   });
+
+  useEffect(() => {
+    if (newlyCreatedToken) {
+      const timer = setTimeout(() => {
+        setNewlyCreatedToken('');
+      }, 30000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [newlyCreatedToken]);
 
   const copyToken = async (token: string) => {
     try {
@@ -78,10 +103,11 @@ export const ApiTokenForm = ({ className }: ApiTokenFormProps) => {
     }
   };
 
-  const onSubmit = async ({ tokenName }: TCreateTokenMutationSchema) => {
+  const onSubmit = async ({ tokenName, expirationDate }: TCreateTokenMutationSchema) => {
     try {
       await createTokenMutation({
         tokenName,
+        expirationDate: noExpirationDate ? null : expirationDate,
       });
 
       toast({
@@ -116,30 +142,21 @@ export const ApiTokenForm = ({ className }: ApiTokenFormProps) => {
     <div className={cn(className)}>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
-          <fieldset className="mt-6 flex w-full flex-col gap-4 md:flex-row ">
+          <fieldset className="mt-6 flex w-full flex-col gap-4">
             <FormField
               control={form.control}
               name="tokenName"
               render={({ field }) => (
                 <FormItem className="flex-1">
-                  <FormLabel className="text-muted-foreground">Token Name</FormLabel>
+                  <FormLabel className="text-muted-foreground">Token name</FormLabel>
 
                   <div className="flex items-center gap-x-4">
                     <FormControl className="flex-1">
                       <Input type="text" {...field} />
                     </FormControl>
-
-                    <Button
-                      type="submit"
-                      className="hidden md:inline-flex"
-                      disabled={!form.formState.isDirty}
-                      loading={form.formState.isSubmitting}
-                    >
-                      Create token
-                    </Button>
                   </div>
 
-                  <FormDescription>
+                  <FormDescription className="text-xs italic">
                     Please enter a meaningful name for your token. This will help you identify it
                     later.
                   </FormDescription>
@@ -148,6 +165,65 @@ export const ApiTokenForm = ({ className }: ApiTokenFormProps) => {
                 </FormItem>
               )}
             />
+
+            <FormField
+              control={form.control}
+              name="expirationDate"
+              render={({ field }) => (
+                <FormItem className="flex-1">
+                  <FormLabel className="text-muted-foreground">Token expiration date</FormLabel>
+
+                  <div className="flex items-center gap-x-4">
+                    <FormControl className="flex-1">
+                      <Select onValueChange={field.onChange} disabled={noExpirationDate}>
+                        <SelectTrigger className="w-[180px]">
+                          <SelectValue placeholder="Choose..." />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {Object.entries(EXPIRATION_DATES).map(([key, date]) => (
+                            <SelectItem key={key} value={key}>
+                              {date}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </FormControl>
+                  </div>
+
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="enabled"
+              render={({ field }) => (
+                <FormItem className="flex items-center gap-2">
+                  <FormLabel className="text-muted-foreground mt-2">Never expire</FormLabel>
+                  <FormControl>
+                    <Switch
+                      className="bg-background"
+                      checked={field.value}
+                      onCheckedChange={(val) => {
+                        setNoExpirationDate((prev) => !prev);
+                        field.onChange(val);
+                      }}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <Button
+              type="submit"
+              className="hidden md:inline-flex"
+              disabled={!form.formState.isDirty}
+              loading={form.formState.isSubmitting}
+            >
+              Create token
+            </Button>
 
             <div className="md:hidden">
               <Button

@@ -103,7 +103,7 @@ model ApiToken {
   name      String
   token     String            @unique
   algorithm ApiTokenAlgorithm @default(SHA512)
-  expires   DateTime
+  expires   DateTime?
   createdAt DateTime          @default(now())
   userId    Int
   user      User              @relation(fields: [userId], references: [id], onDelete: Cascade)

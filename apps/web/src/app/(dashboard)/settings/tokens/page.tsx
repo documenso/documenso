@@ -48,9 +48,15 @@ export default async function ApiTokensPage() {
                   <p className="text-muted-foreground mt-2 text-xs">
                     Created on <LocaleDate date={token.createdAt} format={DateTime.DATETIME_FULL} />
                   </p>
-                  <p className="text-muted-foreground mt-1 text-xs">
-                    Expires on <LocaleDate date={token.expires} format={DateTime.DATETIME_FULL} />
-                  </p>
+                  {token.expires ? (
+                    <p className="text-muted-foreground mt-1 text-xs">
+                      Expires on <LocaleDate date={token.expires} format={DateTime.DATETIME_FULL} />
+                    </p>
+                  ) : (
+                    <p className="text-muted-foreground mt-1 text-xs">
+                      Token doesn't have an expiration date
+                    </p>
+                  )}
                 </div>
 
                 <div>
