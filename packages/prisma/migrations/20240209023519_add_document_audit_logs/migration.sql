@@ -6,7 +6,13 @@
 
 */
 -- AlterTable
-ALTER TABLE "Field" ADD COLUMN     "secondaryId" TEXT NOT NULL;
+ALTER TABLE "Field" ADD COLUMN     "secondaryId" TEXT;
+
+-- Set all null secondaryId fields to a uuid
+UPDATE "Field" SET "secondaryId" = gen_random_uuid()::text WHERE "secondaryId" IS NULL;
+
+-- Restrict the Field to required
+ALTER TABLE "Field" ALTER COLUMN "secondaryId" SET NOT NULL;
 
 -- CreateTable
 CREATE TABLE "DocumentAuditLog" (
