@@ -35,14 +35,14 @@
     "@react-email/section": "0.0.10",
     "@react-email/tailwind": "0.0.9",
     "@react-email/text": "0.0.6",
-    "nodemailer": "^6.9.3",
+    "nodemailer": "^6.9.9",
     "react-email": "^1.9.5",
     "resend": "^2.0.0"
   },
   "devDependencies": {
     "@documenso/tailwind-config": "*",
     "@documenso/tsconfig": "*",
-    "@types/nodemailer": "^6.4.8",
+    "@types/nodemailer": "^6.4.14",
     "tsup": "^7.1.0"
   }
 }

@@ -307,6 +307,13 @@ export const AddFieldsFormPartial = ({
     return recipientsByRole;
   }, [recipients]);
 
+  const recipientsByRoleToDisplay = useMemo(() => {
+    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+    return (Object.entries(recipientsByRole) as [RecipientRole, Recipient[]][]).filter(
+      ([role]) => role !== RecipientRole.CC && role !== RecipientRole.VIEWER,
+    );
+  }, [recipientsByRole]);
+
   return (
     <>
       <DocumentFlowFormContainerHeader
@@ -385,13 +392,10 @@ export const AddFieldsFormPartial = ({
                     </span>
                   </CommandEmpty>
 
-                  {Object.entries(recipientsByRole).map(([role, recipients], roleIndex) => (
+                  {recipientsByRoleToDisplay.map(([role, recipients], roleIndex) => (
                     <CommandGroup key={roleIndex}>
                       <div className="text-muted-foreground mb-1 ml-2 mt-2 text-xs font-medium">
-                        {
-                          // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-                          RECIPIENT_ROLES_DESCRIPTION[role as RecipientRole].roleName
-                        }
+                        {`${RECIPIENT_ROLES_DESCRIPTION[role].roleName}s`}
                       </div>
 
                       {recipients.length === 0 && (
@@ -406,7 +410,7 @@ export const AddFieldsFormPartial = ({
                       {recipients.map((recipient) => (
                         <CommandItem
                           key={recipient.id}
-                          className={cn('px-4 last:mb-1 [&:not(:first-child)]:mt-1', {
+                          className={cn('px-2 last:mb-1 [&:not(:first-child)]:mt-1', {
                             'text-muted-foreground': recipient.sendStatus === SendStatus.SENT,
                           })}
                           onSelect={() => {
@@ -416,7 +420,7 @@ export const AddFieldsFormPartial = ({
                         >
                           <span
                             className={cn('text-foreground/70 truncate', {
-                              'text-foreground': recipient === selectedSigner,
+                              'text-foreground/80': recipient === selectedSigner,
                             })}
                           >
                             {recipient.name && (

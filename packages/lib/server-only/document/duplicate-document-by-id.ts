@@ -39,6 +39,7 @@ export const duplicateDocumentById = async ({
           dateFormat: true,
           password: true,
           timezone: true,
+          redirectUrl: true,
         },
       },
     },
