@@ -13,7 +13,20 @@ export const getRecipientsForDocument = async ({
     where: {
       documentId,
       Document: {
-        userId,
+        OR: [
+          {
+            userId,
+          },
+          {
+            team: {
+              members: {
+                some: {
+                  userId,
+                },
+              },
+            },
+          },
+        ],
       },
     },
     orderBy: {

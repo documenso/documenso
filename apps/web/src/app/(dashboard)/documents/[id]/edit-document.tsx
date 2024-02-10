@@ -32,6 +32,7 @@ export type EditDocumentFormProps = {
   documentMeta: DocumentMeta | null;
   fields: Field[];
   documentData: DocumentData;
+  documentRootPath: string;
 };
 
 type EditDocumentStep = 'title' | 'signers' | 'fields' | 'subject';
@@ -45,6 +46,7 @@ export const EditDocumentForm = ({
   documentMeta,
   user: _user,
   documentData,
+  documentRootPath,
 }: EditDocumentFormProps) => {
   const { toast } = useToast();
   const router = useRouter();
@@ -149,7 +151,7 @@ export const EditDocumentForm = ({
   };
 
   const onAddSubjectFormSubmit = async (data: TAddSubjectFormSchema) => {
-    const { subject, message, timezone, dateFormat } = data.meta;
+    const { subject, message, timezone, dateFormat, redirectUrl } = data.meta;
 
     try {
       await sendDocument({
@@ -157,8 +159,9 @@ export const EditDocumentForm = ({
         meta: {
           subject,
           message,
-          timezone,
           dateFormat,
+          timezone,
+          redirectUrl,
         },
       });
 
@@ -168,7 +171,7 @@ export const EditDocumentForm = ({
         duration: 5000,
       });
 
-      router.push('/documents');
+      router.push(documentRootPath);
     } catch (err) {
       console.error(err);
 
@@ -218,9 +221,9 @@ export const EditDocumentForm = ({
             <AddTitleFormPartial
               key={recipients.length}
               documentFlow={documentFlow.title}
+              document={document}
               recipients={recipients}
               fields={fields}
-              document={document}
               onSubmit={onAddTitleFormSubmit}
             />
 

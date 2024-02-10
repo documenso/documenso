@@ -19,37 +19,22 @@ export const AuthenticatorApp = ({ isTwoFactorEnabled }: AuthenticatorAppProps) 
 
   return (
     <>
-      <div className="mt-4 flex flex-col justify-between gap-4 rounded-lg border p-4 md:flex-row md:items-center md:gap-8">
-        <div className="flex-1">
-          <p>Authenticator app</p>
-
-          <p className="text-muted-foreground mt-2 max-w-[50ch] text-sm">
-            Create one-time passwords that serve as a secondary authentication method for confirming
-            your identity when requested during the sign-in process.
-          </p>
-        </div>
-
-        <div>
-          {isTwoFactorEnabled ? (
-            <Button variant="destructive" onClick={() => setModalState('disable')} size="sm">
-              Disable 2FA
-            </Button>
-          ) : (
-            <Button onClick={() => setModalState('enable')} size="sm">
-              Enable 2FA
-            </Button>
-          )}
-        </div>
+      <div className="flex-shrink-0">
+        {isTwoFactorEnabled ? (
+          <Button variant="destructive" onClick={() => setModalState('disable')}>
+            Disable 2FA
+          </Button>
+        ) : (
+          <Button onClick={() => setModalState('enable')}>Enable 2FA</Button>
+        )}
       </div>
 
       <EnableAuthenticatorAppDialog
-        key={isEnableDialogOpen ? 'open' : 'closed'}
         open={isEnableDialogOpen}
         onOpenChange={(open) => !open && setModalState(null)}
       />
 
       <DisableAuthenticatorAppDialog
-        key={isDisableDialogOpen ? 'open' : 'closed'}
         open={isDisableDialogOpen}
         onOpenChange={(open) => !open && setModalState(null)}
       />

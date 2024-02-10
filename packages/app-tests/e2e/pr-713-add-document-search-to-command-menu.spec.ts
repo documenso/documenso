@@ -17,12 +17,6 @@ test('[PR-713]: should see sent documents', async ({ page }) => {
 
   await page.getByPlaceholder('Type a command or search...').fill('sent');
   await expect(page.getByRole('option', { name: '[713] Document - Sent' })).toBeVisible();
-
-  await page.keyboard.press('Escape');
-
-  // signout
-  await page.getByTitle('Profile Dropdown').click();
-  await page.getByRole('menuitem', { name: 'Sign Out' }).click();
 });
 
 test('[PR-713]: should see received documents', async ({ page }) => {
@@ -40,12 +34,6 @@ test('[PR-713]: should see received documents', async ({ page }) => {
 
   await page.getByPlaceholder('Type a command or search...').fill('received');
   await expect(page.getByRole('option', { name: '[713] Document - Received' })).toBeVisible();
-
-  await page.keyboard.press('Escape');
-
-  // signout
-  await page.getByTitle('Profile Dropdown').click();
-  await page.getByRole('menuitem', { name: 'Sign Out' }).click();
 });
 
 test('[PR-713]: should be able to search by recipient', async ({ page }) => {
@@ -63,10 +51,4 @@ test('[PR-713]: should be able to search by recipient', async ({ page }) => {
 
   await page.getByPlaceholder('Type a command or search...').fill(recipient.email);
   await expect(page.getByRole('option', { name: '[713] Document - Sent' })).toBeVisible();
-
-  await page.keyboard.press('Escape');
-
-  // signout
-  await page.getByTitle('Profile Dropdown').click();
-  await page.getByRole('menuitem', { name: 'Sign Out' }).click();
 });

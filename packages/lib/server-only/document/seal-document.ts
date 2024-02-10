@@ -6,7 +6,7 @@ import { PDFDocument } from 'pdf-lib';
 
 import PostHogServerClient from '@documenso/lib/server-only/feature-flags/get-post-hog-server-client';
 import { prisma } from '@documenso/prisma';
-import { DocumentStatus, SigningStatus } from '@documenso/prisma/client';
+import { DocumentStatus, RecipientRole, SigningStatus } from '@documenso/prisma/client';
 import { signPdf } from '@documenso/signing';
 
 import { getFile } from '../../universal/upload/get-file';
@@ -44,6 +44,9 @@ export const sealDocument = async ({ documentId, sendEmail = true }: SealDocumen
   const recipients = await prisma.recipient.findMany({
     where: {
       documentId: document.id,
+      role: {
+        not: RecipientRole.CC,
+      },
     },
   });
 

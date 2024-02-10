@@ -9,7 +9,7 @@ import { useForm } from 'react-hook-form';
 
 import { useAnalytics } from '@documenso/lib/client-only/hooks/use-analytics';
 import { sortFieldsByPosition, validateFieldsInserted } from '@documenso/lib/utils/fields';
-import type { Document, Field, Recipient } from '@documenso/prisma/client';
+import { type Document, type Field, type Recipient, RecipientRole } from '@documenso/prisma/client';
 import { trpc } from '@documenso/trpc/react';
 import { FieldToolTip } from '@documenso/ui/components/field/field-tooltip';
 import { cn } from '@documenso/ui/lib/utils';
@@ -26,9 +26,10 @@ export type SigningFormProps = {
   document: Document;
   recipient: Recipient;
   fields: Field[];
+  redirectUrl?: string | null;
 };
 
-export const SigningForm = ({ document, recipient, fields }: SigningFormProps) => {
+export const SigningForm = ({ document, recipient, fields, redirectUrl }: SigningFormProps) => {
   const router = useRouter();
   const analytics = useAnalytics();
   const { data: session } = useSession();
@@ -75,7 +76,7 @@ export const SigningForm = ({ document, recipient, fields }: SigningFormProps) =
       timestamp: new Date().toISOString(),
     });
 
-    router.push(`/sign/${recipient.token}/complete`);
+    redirectUrl ? router.push(redirectUrl) : router.push(`/sign/${recipient.token}/complete`);
   };
 
   return (
@@ -97,37 +98,74 @@ export const SigningForm = ({ document, recipient, fields }: SigningFormProps) =
 
       <fieldset
         disabled={isSubmitting}
-        className={cn('-mx-2 flex flex-1 flex-col overflow-hidden px-2')}
+        className={cn(
+          'custom-scrollbar -mx-2 flex flex-1 flex-col overflow-y-auto overflow-x-hidden px-2',
+        )}
       >
-        <div
-          className={cn(
-            'custom-scrollbar -mx-2 flex flex-1 flex-col overflow-y-auto overflow-x-hidden px-2',
-          )}
-        >
-          <h3 className="text-foreground text-2xl font-semibold">Sign Document</h3>
+        <div className={cn('flex flex-1 flex-col')}>
+          <h3 className="text-foreground text-2xl font-semibold">
+            {recipient.role === RecipientRole.VIEWER && 'View Document'}
+            {recipient.role === RecipientRole.SIGNER && 'Sign Document'}
+            {recipient.role === RecipientRole.APPROVER && 'Approve Document'}
+          </h3>
 
-          <p className="text-muted-foreground mt-2 text-sm">
-            Please review the document before signing.
-          </p>
+          {recipient.role === RecipientRole.VIEWER ? (
+            <>
+              <p className="text-muted-foreground mt-2 text-sm">
+                Please mark as viewed to complete
+              </p>
 
-          <hr className="border-border mb-8 mt-4" />
+              <hr className="border-border mb-8 mt-4" />
 
-          <div className="-mx-2 flex flex-1 flex-col gap-4 overflow-y-auto px-2">
-            <div className="flex flex-1 flex-col gap-y-4">
-              <div>
-                <Label htmlFor="full-name">Full Name</Label>
+              <div className="-mx-2 flex flex-1 flex-col gap-4 overflow-y-auto px-2">
+                <div className="flex flex-1 flex-col gap-y-4" />
+                <div className="flex flex-col gap-4 md:flex-row">
+                  <Button
+                    type="button"
+                    className="dark:bg-muted dark:hover:bg-muted/80 w-full  bg-black/5 hover:bg-black/10"
+                    variant="secondary"
+                    size="lg"
+                    disabled={typeof window !== 'undefined' && window.history.length <= 1}
+                    onClick={() => router.back()}
+                  >
+                    Cancel
+                  </Button>
 
-                <Input
-                  type="text"
-                  id="full-name"
-                  className="bg-background mt-2"
-                  value={fullName}
-                  onChange={(e) => setFullName(e.target.value.trimStart())}
-                />
+                  <SignDialog
+                    isSubmitting={isSubmitting}
+                    onSignatureComplete={handleSubmit(onFormSubmit)}
+                    document={document}
+                    fields={fields}
+                    fieldsValidated={fieldsValidated}
+                    role={recipient.role}
+                  />
+                </div>
               </div>
+            </>
+          ) : (
+            <>
+              <p className="text-muted-foreground mt-2 text-sm">
+                Please review the document before signing.
+              </p>
 
-              <div>
-                <Label htmlFor="Signature">Signature</Label>
+              <hr className="border-border mb-8 mt-4" />
+
+              <div className="-mx-2 flex flex-1 flex-col gap-4 overflow-y-auto px-2">
+                <div className="flex flex-1 flex-col gap-y-4">
+                  <div>
+                    <Label htmlFor="full-name">Full Name</Label>
+
+                    <Input
+                      type="text"
+                      id="full-name"
+                      className="bg-background mt-2"
+                      value={fullName}
+                      onChange={(e) => setFullName(e.target.value.trimStart())}
+                    />
+                  </div>
+
+                  <div>
+                    <Label htmlFor="Signature">Signature</Label>
 
                 <Card className="mt-2" gradient degrees={-120}>
                   <CardContent className="p-0">
@@ -137,6 +175,7 @@ export const SigningForm = ({ document, recipient, fields }: SigningFormProps) =
                         value: signature,
                         type: signatureType ?? 'DRAW',
                       }}
+                      disabled={isSubmitting}
                       onChange={(v: any, isUploaded: any) => {
                         setSignature(v);
                         setSignatureType(isUploaded ? 'UPLOAD' : 'DRAW');
@@ -147,27 +186,30 @@ export const SigningForm = ({ document, recipient, fields }: SigningFormProps) =
               </div>
             </div>
 
-            <div className="flex flex-col gap-4 md:flex-row">
-              <Button
-                type="button"
-                className="dark:bg-muted dark:hover:bg-muted/80 w-full  bg-black/5 hover:bg-black/10"
-                variant="secondary"
-                size="lg"
-                disabled={typeof window !== 'undefined' && window.history.length <= 1}
-                onClick={() => router.back()}
-              >
-                Cancel
-              </Button>
+                <div className="flex flex-col gap-4 md:flex-row">
+                  <Button
+                    type="button"
+                    className="dark:bg-muted dark:hover:bg-muted/80 w-full  bg-black/5 hover:bg-black/10"
+                    variant="secondary"
+                    size="lg"
+                    disabled={typeof window !== 'undefined' && window.history.length <= 1}
+                    onClick={() => router.back()}
+                  >
+                    Cancel
+                  </Button>
 
-              <SignDialog
-                isSubmitting={isSubmitting}
-                onSignatureComplete={handleSubmit(onFormSubmit)}
-                document={document}
-                fields={fields}
-                fieldsValidated={fieldsValidated}
-              />
-            </div>
-          </div>
+                  <SignDialog
+                    isSubmitting={isSubmitting}
+                    onSignatureComplete={handleSubmit(onFormSubmit)}
+                    document={document}
+                    fields={fields}
+                    fieldsValidated={fieldsValidated}
+                    role={recipient.role}
+                  />
+                </div>
+              </div>
+            </>
+          )}
         </div>
       </fieldset>
     </form>

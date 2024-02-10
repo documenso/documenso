@@ -25,6 +25,7 @@ export const recipientRouter = router({
             id: signer.nativeId,
             email: signer.email,
             name: signer.name,
+            role: signer.role,
           })),
         });
       } catch (err) {
@@ -32,7 +33,7 @@ export const recipientRouter = router({
 
         throw new TRPCError({
           code: 'BAD_REQUEST',
-          message: 'We were unable to sign this field. Please try again later.',
+          message: 'We were unable to set this field. Please try again later.',
         });
       }
     }),
@@ -57,7 +58,7 @@ export const recipientRouter = router({
 
         throw new TRPCError({
           code: 'BAD_REQUEST',
-          message: 'We were unable to sign this field. Please try again later.',
+          message: 'We were unable to set this field. Please try again later.',
         });
       }
     }),

@@ -1,4 +1,5 @@
 import { prisma } from '@documenso/prisma';
+import { RecipientRole } from '@documenso/prisma/client';
 import { SendStatus, SigningStatus } from '@documenso/prisma/client';
 
 import { nanoid } from '../../universal/id';
@@ -10,6 +11,7 @@ export interface SetRecipientsForDocumentOptions {
     id?: number | null;
     email: string;
     name: string;
+    role: RecipientRole;
   }[];
 }
 
@@ -21,12 +23,29 @@ export const setRecipientsForDocument = async ({
   const document = await prisma.document.findFirst({
     where: {
       id: documentId,
-      userId,
+      OR: [
+        {
+          userId,
+        },
+        {
+          team: {
+            members: {
+              some: {
+                userId,
+              },
+            },
+          },
+        },
+      ],
     },
   });
 
   if (!document) {
     throw new Error('Document not found');
+  }
+
+  if (document.completedAt) {
+    throw new Error('Document already complete');
   }
 
   const normalizedRecipients = recipients.map((recipient) => ({
@@ -62,8 +81,9 @@ export const setRecipientsForDocument = async ({
     })
     .filter((recipient) => {
       return (
-        recipient._persisted?.sendStatus !== SendStatus.SENT &&
-        recipient._persisted?.signingStatus !== SigningStatus.SIGNED
+        recipient._persisted?.role === RecipientRole.CC ||
+        (recipient._persisted?.sendStatus !== SendStatus.SENT &&
+          recipient._persisted?.signingStatus !== SigningStatus.SIGNED)
       );
     });
 
@@ -79,13 +99,21 @@ export const setRecipientsForDocument = async ({
         update: {
           name: recipient.name,
           email: recipient.email,
+          role: recipient.role,
           documentId,
+          sendStatus: recipient.role === RecipientRole.CC ? SendStatus.SENT : SendStatus.NOT_SENT,
+          signingStatus:
+            recipient.role === RecipientRole.CC ? SigningStatus.SIGNED : SigningStatus.NOT_SIGNED,
         },
         create: {
           name: recipient.name,
           email: recipient.email,
+          role: recipient.role,
           token: nanoid(),
           documentId,
+          sendStatus: recipient.role === RecipientRole.CC ? SendStatus.SENT : SendStatus.NOT_SENT,
+          signingStatus:
+            recipient.role === RecipientRole.CC ? SigningStatus.SIGNED : SigningStatus.NOT_SIGNED,
         },
       }),
     ),

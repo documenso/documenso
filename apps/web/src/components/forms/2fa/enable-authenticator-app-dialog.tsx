@@ -15,6 +15,7 @@ import {
   Dialog,
   DialogContent,
   DialogDescription,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from '@documenso/ui/primitives/dialog';
@@ -190,15 +191,15 @@ export const EnableAuthenticatorAppDialog = ({
                     )}
                   />
 
-                  <div className="flex w-full items-center justify-between">
-                    <Button type="button" variant="ghost" onClick={() => onOpenChange(false)}>
+                  <DialogFooter>
+                    <Button type="button" variant="secondary" onClick={() => onOpenChange(false)}>
                       Cancel
                     </Button>
 
                     <Button type="submit" loading={isSetupTwoFactorAuthenticationSubmitting}>
                       Continue
                     </Button>
-                  </div>
+                  </DialogFooter>
                 </form>
               </Form>
             );
@@ -251,15 +252,15 @@ export const EnableAuthenticatorAppDialog = ({
                   )}
                 />
 
-                <div className="flex w-full items-center justify-between">
-                  <Button type="button" variant="ghost" onClick={() => onOpenChange(false)}>
+                <DialogFooter>
+                  <Button type="button" variant="secondary" onClick={() => onOpenChange(false)}>
                     Cancel
                   </Button>
 
                   <Button type="submit" loading={isEnableTwoFactorAuthenticationSubmitting}>
                     Enable 2FA
                   </Button>
-                </div>
+                </DialogFooter>
               </form>
             </Form>
           ))

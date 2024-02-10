@@ -18,8 +18,9 @@ import {
   FormMessage,
 } from '@documenso/ui/primitives/form/form';
 import { Input } from '@documenso/ui/primitives/input';
-import { MultiSelectCombobox } from '@documenso/ui/primitives/multiselect-combobox';
 import { useToast } from '@documenso/ui/primitives/use-toast';
+
+import { MultiSelectRoleCombobox } from './multiselect-role-combobox';
 
 const ZUserFormSchema = ZUpdateProfileMutationByAdminSchema.omit({ id: true });
 
@@ -117,7 +118,7 @@ export default function UserPage({ params }: { params: { id: number } }) {
                   <fieldset className="flex flex-col gap-2">
                     <FormLabel className="text-muted-foreground">Roles</FormLabel>
                     <FormControl>
-                      <MultiSelectCombobox
+                      <MultiSelectRoleCombobox
                         listValues={roles}
                         onChange={(values: string[]) => onChange(values)}
                       />

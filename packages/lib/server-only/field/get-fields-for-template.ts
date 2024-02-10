@@ -10,7 +10,20 @@ export const getFieldsForTemplate = async ({ templateId, userId }: GetFieldsForT
     where: {
       templateId,
       Template: {
-        userId,
+        OR: [
+          {
+            userId,
+          },
+          {
+            team: {
+              members: {
+                some: {
+                  userId,
+                },
+              },
+            },
+          },
+        ],
       },
     },
     orderBy: {

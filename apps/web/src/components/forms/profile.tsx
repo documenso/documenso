@@ -137,10 +137,8 @@ export const ProfileForm = ({ className, user }: ProfileFormProps) => {
                 <FormControl>
                   <SignaturePad
                     className="h-44 w-full"
-                    containerClassName={cn(
-                      'rounded-lg border bg-background',
-                      isSubmitting ? 'pointer-events-none opacity-50' : null,
-                    )}
+                    disabled={isSubmitting}
+                    containerClassName={cn('rounded-lg border bg-background')}
                     signature={{
                       value: user.signature,
                       type: user.signatureType,

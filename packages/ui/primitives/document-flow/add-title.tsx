@@ -1,5 +1,6 @@
 'use client';
 
+import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 
 import type { Field, Recipient } from '@documenso/prisma/client';
@@ -10,6 +11,7 @@ import { Input } from '../input';
 import { Label } from '../label';
 import { useStep } from '../stepper';
 import type { TAddTitleFormSchema } from './add-title.types';
+import { ZAddTitleFormSchema } from './add-title.types';
 import {
   DocumentFlowFormContainerActions,
   DocumentFlowFormContainerContent,
@@ -17,6 +19,7 @@ import {
   DocumentFlowFormContainerHeader,
   DocumentFlowFormContainerStep,
 } from './document-flow-root';
+import { ShowFieldItem } from './show-field-item';
 import type { DocumentFlowStep } from './types';
 
 export type AddTitleFormProps = {
@@ -29,8 +32,8 @@ export type AddTitleFormProps = {
 
 export const AddTitleFormPartial = ({
   documentFlow,
-  recipients: _recipients,
-  fields: _fields,
+  recipients,
+  fields,
   document,
   onSubmit,
 }: AddTitleFormProps) => {
@@ -39,6 +42,7 @@ export const AddTitleFormPartial = ({
     handleSubmit,
     formState: { errors, isSubmitting },
   } = useForm<TAddTitleFormSchema>({
+    resolver: zodResolver(ZAddTitleFormSchema),
     defaultValues: {
       title: document.title,
     },
@@ -55,6 +59,10 @@ export const AddTitleFormPartial = ({
         description={documentFlow.description}
       />
       <DocumentFlowFormContainerContent>
+        {fields.map((field, index) => (
+          <ShowFieldItem key={index} field={field} recipients={recipients} />
+        ))}
+
         <div className="flex flex-col">
           <div className="flex flex-col gap-y-4">
             <div>
@@ -66,7 +74,7 @@ export const AddTitleFormPartial = ({
                 id="title"
                 className="bg-background my-2"
                 disabled={isSubmitting}
-                {...register('title', { required: "Title can't be empty" })}
+                {...register('title')}
               />
 
               <FormErrorMessage className="mt-2" error={errors.title} />
