@@ -15,6 +15,7 @@ import { Card, CardContent } from "../card";
 export type SignaturePadProps = Omit<HTMLAttributes<HTMLCanvasElement>, 'onChange'> & {
   containerClassName?: string;
   signature: { value: string | null;type :SignatureType;}
+  disabled?: boolean;
   onChange?: (_signatureDataUrl: string | null, isUploaded: boolean) => void;
 };
 
@@ -22,10 +23,13 @@ export const SignaturePad = ({
   className,
   containerClassName,
   onChange,
+  disabled = false, 
   signature,
   ...props
 }: SignaturePadProps) => {
-  const [uploadedFile, setUploadedFile] = useState<{ file: File; fileBase64: string} | null >();
+  const [uploadedFile, setUploadedFile] = useState<{fileBase64: string | null} | null >({
+    fileBase64: signature.type === SignatureType.UPLOAD ? signature.value : null
+  });
 
   const onSignatureDrop = async (file: File) => {
     try {
@@ -33,7 +37,6 @@ export const SignaturePad = ({
       const base64String = base64.encode(new Uint8Array(arrayBuffer));
 
       setUploadedFile({
-        file,
         fileBase64: `data:image/png;base64,${base64String}`,
       });
       onChange?.(`data:image/png;base64,${base64String}`, true)
@@ -42,16 +45,16 @@ export const SignaturePad = ({
       console.error(error);
     }
   };
-
+  
   return (
     <div className={cn('relative block', containerClassName)}>
-        <Tabs defaultValue={signature?.type ?? undefined} className="overflow-x-auto">
+        <Tabs defaultValue={signature?.type ?? undefined}  className="overflow-x-auto">
           <TabsList className="m-2">
-            <TabsTrigger value="DRAW">
+            <TabsTrigger value={SignatureType.DRAW}>
               <SignatureIcon className="mr-2 inline-block h-4 w-4 text-muted-foreground" />
               Draw
             </TabsTrigger>
-            <TabsTrigger value="UPLOAD">
+            <TabsTrigger value={SignatureType.UPLOAD}>
               <UploadIcon className="mr-2 inline-block h-4 w-4 text-muted-foreground" />
               Upload
             </TabsTrigger>
@@ -60,7 +63,7 @@ export const SignaturePad = ({
             <DrawPad onChange={onChange} signature={signature} className={className} {...props}/>
           </TabsContent>
           <TabsContent value={SignatureType.UPLOAD}>
-              {uploadedFile || (signature.type === SignatureType.UPLOAD && signature.value ) ? (
+              {uploadedFile?.fileBase64 && signature.type === SignatureType.UPLOAD ? (
                 <Card
                 id={`field-card-${signature.type}-signature`}
                 className={cn(
@@ -68,8 +71,9 @@ export const SignaturePad = ({
                 )}
                 >
                   <CardContent className="text-foreground hover:shadow-primary-foreground group flex h-full w-full flex-col items-center justify-center p-2">
-                    <img src={uploadedFile?.fileBase64 ?? signature?.value ?? ''}  className="h-40 w-full rounded-lg border bg-background" />
+                    <img src={uploadedFile?.fileBase64 ?? ''}  className="h-40 w-full rounded-lg border bg-background" />
                     <button
+                      type="button"
                       className="text-destructive bg-background/40 absolute inset-0 z-10 flex h-full w-full items-center justify-center rounded-md text-sm opacity-0 backdrop-blur-sm duration-200 group-hover:opacity-100"
                       onClick={() => {
                         onChange?.("", true);

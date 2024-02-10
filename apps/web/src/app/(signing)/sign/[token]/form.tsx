@@ -33,7 +33,7 @@ export const SigningForm = ({ document, recipient, fields }: SigningFormProps) =
   const analytics = useAnalytics();
   const { data: session } = useSession();
 
-  const { fullName, signature, setFullName, setSignature } = useRequiredSigningContext();
+  const { fullName, signature, setFullName, setSignature, signatureType, setSignatureType } = useRequiredSigningContext();
 
   const [validateUninsertedFields, setValidateUninsertedFields] = useState(false);
 
@@ -132,9 +132,13 @@ export const SigningForm = ({ document, recipient, fields }: SigningFormProps) =
                   <CardContent className="p-0">
                     <SignaturePad
                       className="h-44 w-full"
-                      defaultValue={signature ?? undefined}
-                      onChange={(value) => {
-                        setSignature(value);
+                      signature={{
+                        value: signature,
+                        type: signatureType ?? 'DRAW',
+                      }}
+                      onChange={(v: any, isUploaded: any) => {
+                        setSignature(v);
+                        setSignatureType(isUploaded ? 'UPLOAD' : 'DRAW');
                       }}
                     />
                   </CardContent>

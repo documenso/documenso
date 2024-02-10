@@ -400,7 +400,12 @@ export const Widget = ({ className, children, ...props }: WidgetProps) => {
 
           <SignaturePad
             className="aspect-video w-full rounded-md border"
-            defaultValue={signatureDataUrl || ''}
+            signature={{
+              value: signatureDataUrl,
+              type: 'DRAW'
+            }}
+            // Disabling the uploading of a signature for marketing website
+            disabled={true}
             onChange={setDraftSignatureDataUrl}
           />
 

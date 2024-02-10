@@ -200,7 +200,7 @@ export const DrawPad = ({
   }, []);
 
   useEffect(() => {
-    if ($el.current && typeof  signature.value === 'string' && signature.type === SignatureType.DRAW) {
+    if ($el.current && typeof  signature?.value === 'string' && signature?.type === SignatureType.DRAW) {
       const ctx = $el.current.getContext('2d');
 
       const { width, height } = $el.current;
