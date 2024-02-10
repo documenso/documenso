@@ -29,8 +29,11 @@ export const SignatureField = ({ field, recipient }: SignatureFieldProps) => {
   const router = useRouter();
 
   const { toast } = useToast();
-  const { signature: providedSignature, setSignature: setProvidedSignature, setSignatureType: setProvidedSignatureType } =
-    useRequiredSigningContext();
+  const {
+    signature: providedSignature,
+    setSignature: setProvidedSignature,
+    setSignatureType: setProvidedSignatureType,
+  } = useRequiredSigningContext();
 
   const [isPending, startTransition] = useTransition();
 
@@ -47,7 +50,10 @@ export const SignatureField = ({ field, recipient }: SignatureFieldProps) => {
   const isLoading = isSignFieldWithTokenLoading || isRemoveSignedFieldWithTokenLoading || isPending;
 
   const [showSignatureModal, setShowSignatureModal] = useState(false);
-  const [localSignature, setLocalSignature] = useState<{value: string, type: SignatureType | null} | null>();
+  const [localSignature, setLocalSignature] = useState<{
+    value: string;
+    type: SignatureType | null;
+  } | null>();
   const [isLocalSignatureSet, setIsLocalSignatureSet] = useState(false);
 
   const state = useMemo<SignatureFieldState>(() => {
@@ -76,7 +82,10 @@ export const SignatureField = ({ field, recipient }: SignatureFieldProps) => {
         return;
       }
 
-      const value = source === 'local' && localSignature?.value ? localSignature.value : providedSignature ?? '';
+      const value =
+        source === 'local' && localSignature?.value
+          ? localSignature.value
+          : providedSignature ?? '';
 
       if (!value) {
         return;
@@ -91,7 +100,7 @@ export const SignatureField = ({ field, recipient }: SignatureFieldProps) => {
 
       if (source === 'local' && !providedSignature) {
         setProvidedSignature(localSignature?.value ?? '');
-        setProvidedSignatureType(localSignature?.type ?? 'DRAW')
+        setProvidedSignatureType(localSignature?.type ?? 'DRAW');
       }
 
       setLocalSignature(null);
@@ -173,8 +182,11 @@ export const SignatureField = ({ field, recipient }: SignatureFieldProps) => {
                 type: localSignature?.type ?? SignatureType.DRAW,
               }}
               className="border-border mt-2 h-44 w-full rounded-md border"
-              onChange={(value: any, isUploaded:any) => {
-                setLocalSignature({ value, type: isUploaded ? SignatureType.UPLOAD: SignatureType.DRAW });
+              onChange={(value: any, isUploaded: any) => {
+                setLocalSignature({
+                  value,
+                  type: isUploaded ? SignatureType.UPLOAD : SignatureType.DRAW,
+                });
               }}
             />
           </div>

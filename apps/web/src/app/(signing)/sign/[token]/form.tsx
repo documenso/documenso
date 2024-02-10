@@ -33,7 +33,8 @@ export const SigningForm = ({ document, recipient, fields }: SigningFormProps) =
   const analytics = useAnalytics();
   const { data: session } = useSession();
 
-  const { fullName, signature, setFullName, setSignature, signatureType, setSignatureType } = useRequiredSigningContext();
+  const { fullName, signature, setFullName, setSignature, signatureType, setSignatureType } =
+    useRequiredSigningContext();
 
   const [validateUninsertedFields, setValidateUninsertedFields] = useState(false);
 

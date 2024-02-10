@@ -1,7 +1,8 @@
 'use client';
 
-import { SignatureType } from '@documenso/prisma/client';
 import { createContext, useContext, useState } from 'react';
+
+import { SignatureType } from '@documenso/prisma/client';
 
 export type SigningContextValue = {
   fullName: string;
@@ -48,7 +49,9 @@ export const SigningProvider = ({
   const [fullName, setFullName] = useState(initialFullName || '');
   const [email, setEmail] = useState(initialEmail || '');
   const [signature, setSignature] = useState(initialSignature || null);
-  const [signatureType, setSignatureType] = useState<SignatureType | null>(initialSignatureType || null);
+  const [signatureType, setSignatureType] = useState<SignatureType | null>(
+    initialSignatureType || null,
+  );
 
   return (
     <SigningContext.Provider

@@ -1,12 +1,13 @@
-'use client'
+'use client';
 
-import { useDropzone } from 'react-dropzone';
 import type { Variants } from 'framer-motion';
 import { motion } from 'framer-motion';
+import { useDropzone } from 'react-dropzone';
 
-import { megabytesToBytes } from "@documenso/lib/universal/unit-convertions";
-import { Card, CardContent } from './card';
+import { megabytesToBytes } from '@documenso/lib/universal/unit-convertions';
+
 import { cn } from '../lib/utils';
+import { Card, CardContent } from './card';
 
 const DocumentDropzoneContainerVariants: Variants = {
   initial: {
@@ -22,13 +23,12 @@ const DocumentDropzoneContainerVariants: Variants = {
   },
 };
 
-
-export type SignatureDropzoneProps =  {
+export type SignatureDropzoneProps = {
   className?: string;
   onDrop?: (_file: File) => void | Promise<void>;
   disabled?: boolean;
   disabledMessage?: string;
-}
+};
 
 export const SignatureDropzone = ({
   className,
@@ -36,8 +36,7 @@ export const SignatureDropzone = ({
   disabledMessage = 'You cannot upload a signature',
   ...props
 }: SignatureDropzoneProps) => {
-
-  const {getRootProps, getInputProps } = useDropzone({
+  const { getRootProps, getInputProps } = useDropzone({
     accept: {
       'image/png': ['.png'],
     },
@@ -50,7 +49,7 @@ export const SignatureDropzone = ({
     maxSize: megabytesToBytes(40),
   });
 
-  return ( 
+  return (
     <motion.div
       className={cn('flex aria-disabled:cursor-not-allowed', className)}
       variants={DocumentDropzoneContainerVariants}
@@ -60,7 +59,7 @@ export const SignatureDropzone = ({
     >
       <Card
         role="button"
-        className='flex justify-center w-full border-0'
+        className="flex w-full justify-center border-0"
         degrees={120}
         {...props}
         {...getRootProps()}
@@ -71,11 +70,9 @@ export const SignatureDropzone = ({
             Add a signature
           </p>
 
-          <p className="text-muted-foreground/80 mt-1 text-sm">
-            Drag & drop your signature here.
-          </p>
+          <p className="text-muted-foreground/80 mt-1 text-sm">Drag & drop your signature here.</p>
         </CardContent>
       </Card>
     </motion.div>
-  )
-}
+  );
+};

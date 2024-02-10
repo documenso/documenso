@@ -1,5 +1,6 @@
-import { SignatureType } from '@documenso/prisma/client';
 import { z } from 'zod';
+
+import { SignatureType } from '@documenso/prisma/client';
 
 export const ZSignUpMutationSchema = z.object({
   name: z.string().min(1),

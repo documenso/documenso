@@ -1,5 +1,7 @@
 'use client';
 
+import { useState } from 'react';
+
 import { useRouter } from 'next/navigation';
 
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -21,9 +23,8 @@ import {
 } from '@documenso/ui/primitives/form/form';
 import { Input } from '@documenso/ui/primitives/input';
 import { Label } from '@documenso/ui/primitives/label';
-import { useToast } from '@documenso/ui/primitives/use-toast';
-import { useState } from 'react';
 import { SignaturePad } from '@documenso/ui/primitives/signature-pad/signature-pad';
+import { useToast } from '@documenso/ui/primitives/use-toast';
 
 export const ZProfileFormSchema = z.object({
   name: z.string().trim().min(1, { message: 'Please enter a valid name.' }),
@@ -42,7 +43,6 @@ export const ProfileForm = ({ className, user }: ProfileFormProps) => {
 
   const { toast } = useToast();
   const [isUploaded, setIsUploaded] = useState(false);
-  
 
   const form = useForm<TProfileFormSchema>({
     values: {
@@ -58,11 +58,11 @@ export const ProfileForm = ({ className, user }: ProfileFormProps) => {
 
   const onFormSubmit = async ({ name, signature }: TProfileFormSchema) => {
     try {
-      if (signature === "") {
-        form.setError('signature',{
+      if (signature === '') {
+        form.setError('signature', {
           type: 'manual',
-          message: "Signature Pad cannot be empty"
-        })
+          message: 'Signature Pad cannot be empty',
+        });
         return;
       }
       await updateProfile({
@@ -97,10 +97,9 @@ export const ProfileForm = ({ className, user }: ProfileFormProps) => {
   };
 
   const handleSignatureChange = (signature: string, isUploaded: boolean) => {
-      setIsUploaded(isUploaded);
-      form.setValue('signature', signature);
-  }
-
+    setIsUploaded(isUploaded);
+    form.setValue('signature', signature);
+  };
 
   return (
     <Form {...form}>
@@ -141,12 +140,12 @@ export const ProfileForm = ({ className, user }: ProfileFormProps) => {
                     containerClassName={cn(
                       'rounded-lg border bg-background',
                       isSubmitting ? 'pointer-events-none opacity-50' : null,
-                    )} 
+                    )}
                     signature={{
                       value: user.signature,
                       type: user.signatureType,
-                    }} 
-                    onChange={(v: any, isUploaded: any) => handleSignatureChange(v, isUploaded)}                    
+                    }}
+                    onChange={(v: any, isUploaded: any) => handleSignatureChange(v, isUploaded)}
                   />
                 </FormControl>
                 <FormMessage />

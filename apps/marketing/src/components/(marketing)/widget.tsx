@@ -402,7 +402,7 @@ export const Widget = ({ className, children, ...props }: WidgetProps) => {
             className="aspect-video w-full rounded-md border"
             signature={{
               value: signatureDataUrl,
-              type: 'DRAW'
+              type: 'DRAW',
             }}
             // Disabling the uploading of a signature for marketing website
             disabled={true}

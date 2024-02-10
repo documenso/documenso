@@ -1,5 +1,6 @@
-import { SignatureType } from '@documenso/prisma/client';
 import { z } from 'zod';
+
+import { SignatureType } from '@documenso/prisma/client';
 
 export const ZRetrieveUserByIdQuerySchema = z.object({
   id: z.number().min(1),

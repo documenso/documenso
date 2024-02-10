@@ -1,5 +1,7 @@
 'use client';
 
+import { useState } from 'react';
+
 import { zodResolver } from '@hookform/resolvers/zod';
 import { signIn } from 'next-auth/react';
 import { useForm } from 'react-hook-form';
@@ -7,6 +9,7 @@ import { FcGoogle } from 'react-icons/fc';
 import { z } from 'zod';
 
 import { useAnalytics } from '@documenso/lib/client-only/hooks/use-analytics';
+import { SignatureType } from '@documenso/prisma/client';
 import { TRPCClientError } from '@documenso/trpc/client';
 import { trpc } from '@documenso/trpc/react';
 import { cn } from '@documenso/ui/lib/utils';
@@ -21,10 +24,8 @@ import {
 } from '@documenso/ui/primitives/form/form';
 import { Input } from '@documenso/ui/primitives/input';
 import { PasswordInput } from '@documenso/ui/primitives/password-input';
-import { useToast } from '@documenso/ui/primitives/use-toast';
-import { SignatureType } from '@documenso/prisma/client';
-import { useState } from 'react';
 import { SignaturePad } from '@documenso/ui/primitives/signature-pad/signature-pad';
+import { useToast } from '@documenso/ui/primitives/use-toast';
 
 const SIGN_UP_REDIRECT_PATH = '/documents';
 
@@ -36,7 +37,7 @@ export const ZSignUpFormSchema = z.object({
     .min(6, { message: 'Password should contain at least 6 characters' })
     .max(72, { message: 'Password should not contain more than 72 characters' }),
   signature: z.string().min(1, { message: 'We need your signature to sign documents' }),
-  signatureType: z.nativeEnum(SignatureType)
+  signatureType: z.nativeEnum(SignatureType),
 });
 
 export type TSignUpFormSchema = z.infer<typeof ZSignUpFormSchema>;
@@ -57,7 +58,7 @@ export const SignUpForm = ({ className, isGoogleSSOEnabled }: SignUpFormProps) =
       email: '',
       password: '',
       signature: '',
-      signatureType: 'DRAW'
+      signatureType: 'DRAW',
     },
     resolver: zodResolver(ZSignUpFormSchema),
   });
@@ -68,7 +69,13 @@ export const SignUpForm = ({ className, isGoogleSSOEnabled }: SignUpFormProps) =
 
   const onFormSubmit = async ({ name, email, password, signature }: TSignUpFormSchema) => {
     try {
-      await signup({ name, email, password, signature, signatureType: isUploaded ? 'UPLOAD' : 'DRAW' });
+      await signup({
+        name,
+        email,
+        password,
+        signature,
+        signatureType: isUploaded ? 'UPLOAD' : 'DRAW',
+      });
 
       await signIn('credentials', {
         email,
@@ -114,7 +121,7 @@ export const SignUpForm = ({ className, isGoogleSSOEnabled }: SignUpFormProps) =
   const handleSignatureChange = (signature: string, isUploaded: boolean) => {
     setIsUploaded(isUploaded);
     form.setValue('signature', signature);
-  }
+  };
 
   return (
     <Form {...form}>

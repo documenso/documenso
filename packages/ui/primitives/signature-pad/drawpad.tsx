@@ -16,7 +16,7 @@ const DPI = 2;
 
 export type DrawPadProps = Omit<HTMLAttributes<HTMLCanvasElement>, 'onChange'> & {
   onChange?: (_signatureDataUrl: string | null, isUploaded: boolean) => void;
-  signature: { value: string | null;type :string | null;}
+  signature: { value: string | null; type: string | null };
   containerClassName?: string;
 };
 
@@ -200,7 +200,11 @@ export const DrawPad = ({
   }, []);
 
   useEffect(() => {
-    if ($el.current && typeof  signature?.value === 'string' && signature?.type === SignatureType.DRAW) {
+    if (
+      $el.current &&
+      typeof signature?.value === 'string' &&
+      signature?.type === SignatureType.DRAW
+    ) {
       const ctx = $el.current.getContext('2d');
 
       const { width, height } = $el.current;
