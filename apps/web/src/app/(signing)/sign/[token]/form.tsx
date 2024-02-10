@@ -167,24 +167,24 @@ export const SigningForm = ({ document, recipient, fields, redirectUrl }: Signin
                   <div>
                     <Label htmlFor="Signature">Signature</Label>
 
-                <Card className="mt-2" gradient degrees={-120}>
-                  <CardContent className="p-0">
-                    <SignaturePad
-                      className="h-44 w-full"
-                      signature={{
-                        value: signature,
-                        type: signatureType ?? 'DRAW',
-                      }}
-                      disabled={isSubmitting}
-                      onChange={(v: any, isUploaded: any) => {
-                        setSignature(v);
-                        setSignatureType(isUploaded ? 'UPLOAD' : 'DRAW');
-                      }}
-                    />
-                  </CardContent>
-                </Card>
-              </div>
-            </div>
+                    <Card className="mt-2" gradient degrees={-120}>
+                      <CardContent className="p-0">
+                        <SignaturePad
+                          className="h-44 w-full"
+                          signature={{
+                            value: signature,
+                            type: signatureType ?? 'DRAW',
+                          }}
+                          disabled={isSubmitting}
+                          onChange={(v: string | null, isUploaded: boolean) => {
+                            setSignature(v);
+                            setSignatureType(isUploaded ? 'UPLOAD' : 'DRAW');
+                          }}
+                        />
+                      </CardContent>
+                    </Card>
+                  </div>
+                </div>
 
                 <div className="flex flex-col gap-4 md:flex-row">
                   <Button

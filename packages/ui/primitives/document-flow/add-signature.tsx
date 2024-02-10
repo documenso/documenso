@@ -291,9 +291,9 @@ export const AddSignatureFormPartial = ({
                                 value: field.value,
                                 type: 'DRAW',
                               }}
-                              disabled={true}
+                              uploadDisable={true}
                               onBlur={field.onBlur}
-                              onChange={(value: any, _: any) => {
+                              onChange={(value: string | null, _: boolean) => {
                                 onFormValueChange(FieldType.SIGNATURE);
                                 field.onChange(value);
                               }}

@@ -19,6 +19,7 @@ export type SignaturePadProps = Omit<HTMLAttributes<HTMLCanvasElement>, 'onChang
   containerClassName?: string;
   signature: { value: string | null; type: SignatureType };
   disabled?: boolean;
+  uploadDisable?: boolean;
   onChange?: (_signatureDataUrl: string | null, isUploaded: boolean) => void;
 };
 
@@ -27,6 +28,7 @@ export const SignaturePad = ({
   containerClassName,
   onChange,
   disabled = false,
+  uploadDisable = false,
   signature,
   ...props
 }: SignaturePadProps) => {
@@ -56,7 +58,7 @@ export const SignaturePad = ({
             <SignatureIcon className="text-muted-foreground mr-2 inline-block h-4 w-4" />
             Draw
           </TabsTrigger>
-          <TabsTrigger value={SignatureType.UPLOAD}>
+          <TabsTrigger value={SignatureType.UPLOAD} disabled={uploadDisable}>
             <UploadIcon className="text-muted-foreground mr-2 inline-block h-4 w-4" />
             Upload
           </TabsTrigger>

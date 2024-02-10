@@ -6,7 +6,8 @@ import { useRouter } from 'next/navigation';
 
 import { Loader } from 'lucide-react';
 
-import { Recipient, SignatureType } from '@documenso/prisma/client';
+import type { Recipient } from '@documenso/prisma/client';
+import { SignatureType } from '@documenso/prisma/client';
 import type { FieldWithSignature } from '@documenso/prisma/types/field-with-signature';
 import { trpc } from '@documenso/trpc/react';
 import { Button } from '@documenso/ui/primitives/button';
@@ -51,7 +52,7 @@ export const SignatureField = ({ field, recipient }: SignatureFieldProps) => {
 
   const [showSignatureModal, setShowSignatureModal] = useState(false);
   const [localSignature, setLocalSignature] = useState<{
-    value: string;
+    value: string | null;
     type: SignatureType | null;
   } | null>();
   const [isLocalSignatureSet, setIsLocalSignatureSet] = useState(false);
@@ -182,7 +183,7 @@ export const SignatureField = ({ field, recipient }: SignatureFieldProps) => {
                 type: localSignature?.type ?? SignatureType.DRAW,
               }}
               className="border-border mt-2 h-44 w-full rounded-md border"
-              onChange={(value: any, isUploaded: any) => {
+              onChange={(value: string | null, isUploaded: boolean) => {
                 setLocalSignature({
                   value,
                   type: isUploaded ? SignatureType.UPLOAD : SignatureType.DRAW,

@@ -83,7 +83,7 @@ export const SignUpForm = ({ className, initialEmail, isGoogleSSOEnabled }: Sign
         email,
         password,
         signature,
-        signatureType: isUploaded ? 'UPLOAD' : 'DRAW',
+        signatureType: isUploaded ? SignatureType.UPLOAD : SignatureType.DRAW,
       });
 
       await signIn('credentials', {
@@ -127,9 +127,9 @@ export const SignUpForm = ({ className, initialEmail, isGoogleSSOEnabled }: Sign
     }
   };
 
-  const handleSignatureChange = (signature: string, isUploaded: boolean) => {
+  const handleSignatureChange = (signature: string | null, isUploaded: boolean) => {
     setIsUploaded(isUploaded);
-    form.setValue('signature', signature);
+    form.setValue('signature', signature ?? '');
   };
 
   return (
@@ -196,7 +196,9 @@ export const SignUpForm = ({ className, initialEmail, isGoogleSSOEnabled }: Sign
                       value: form.watch('signature'),
                       type: isUploaded ? 'UPLOAD' : 'DRAW',
                     }}
-                    onChange={(v: any, isUploaded: any) => handleSignatureChange(v, isUploaded)}
+                    onChange={(v: string | null, isUploaded: boolean) =>
+                      handleSignatureChange(v, isUploaded)
+                    }
                   />
                 </FormControl>
 

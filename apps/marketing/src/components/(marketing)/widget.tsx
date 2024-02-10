@@ -406,8 +406,8 @@ export const Widget = ({ className, children, ...props }: WidgetProps) => {
               type: 'DRAW',
             }}
             // Disabling the uploading of a signature for marketing website
-            disabled={true}
-            onChange={setDraftSignatureDataUrl}
+            uploadDisable={true}
+            onChange={(value: string | null, _: boolean) => setDraftSignatureDataUrl(value)}
           />
 
           <DialogFooter>
