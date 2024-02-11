@@ -96,4 +96,4 @@ services:
 
 databases:
   - name: documenso-db
-    plan: free
+    plan: pro
