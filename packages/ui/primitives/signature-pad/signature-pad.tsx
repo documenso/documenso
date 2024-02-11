@@ -1,6 +1,6 @@
 'use client';
 
-import { type HTMLAttributes, useState } from 'react';
+import { type HTMLAttributes, useEffect, useState } from 'react';
 
 import { SignatureType } from '@prisma/client';
 import { TabsContent } from '@radix-ui/react-tabs';
@@ -32,23 +32,27 @@ export const SignaturePad = ({
   signature,
   ...props
 }: SignaturePadProps) => {
-  const [uploadedFile, setUploadedFile] = useState<{ fileBase64: string | null } | null>({
-    fileBase64: signature.type === SignatureType.UPLOAD ? signature.value : null,
-  });
+  const [uploadedFile, setUploadedFile] = useState<string | null>(
+    signature.type === SignatureType.UPLOAD ? signature.value : null,
+  );
 
   const onSignatureDrop = async (file: File) => {
     try {
       const arrayBuffer = await file.arrayBuffer();
       const base64String = base64.encode(new Uint8Array(arrayBuffer));
 
-      setUploadedFile({
-        fileBase64: `data:image/png;base64,${base64String}`,
-      });
+      setUploadedFile(`data:image/png;base64,${base64String}`);
       onChange?.(`data:image/png;base64,${base64String}`, true);
     } catch (error) {
       console.error(error);
     }
   };
+
+  useEffect(() => {
+    if (signature.type === SignatureType.DRAW && uploadedFile !== null) {
+      setUploadedFile(null);
+    }
+  }, [signature.type]);
 
   return (
     <div className={cn('relative block', containerClassName)}>
@@ -67,7 +71,7 @@ export const SignaturePad = ({
           <DrawPad onChange={onChange} signature={signature} className={className} {...props} />
         </TabsContent>
         <TabsContent value={SignatureType.UPLOAD}>
-          {uploadedFile?.fileBase64 ? (
+          {uploadedFile ? (
             <Card
               id={`field-card-${signature.type}-signature`}
               className={cn(
@@ -76,7 +80,7 @@ export const SignaturePad = ({
             >
               <CardContent className="text-foreground hover:shadow-primary-foreground group flex h-full w-full flex-col items-center justify-center p-2">
                 <img
-                  src={uploadedFile?.fileBase64 ?? ''}
+                  src={uploadedFile ?? ''}
                   className="bg-background h-40 w-full rounded-lg border"
                 />
                 <button
