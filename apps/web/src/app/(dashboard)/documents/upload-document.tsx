@@ -104,7 +104,9 @@ export const UploadDocument = ({ className, team }: UploadDocumentProps) => {
       setIsLoading(false);
     }
   };
-    const isSmallVerticalScreen = useMemo(() => typeof window !== 'undefined' && window.innerHeight < 800, []);
+    const isSmallVerticalScreen = useMemo(
+      () => typeof window !== 'undefined' && window.innerHeight < 800,
+      []);
 
   const onFileDropRejected = () => {
     toast({
