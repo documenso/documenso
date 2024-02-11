@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useSession } from 'next-auth/react';
 import { match } from 'ts-pattern';
 
-import { Document, Recipient, User } from '@documenso/prisma/client';
+import type { Document, Recipient, User } from '@documenso/prisma/client';
 
 export type DataTableTitleProps = {
   row: Document & {

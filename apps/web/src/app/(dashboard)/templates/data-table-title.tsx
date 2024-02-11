@@ -2,7 +2,7 @@ import Link from 'next/link';
 
 import { useSession } from 'next-auth/react';
 
-import { Template } from '@documenso/prisma/client';
+import type { Template } from '@documenso/prisma/client';
 
 export type DataTableTitleProps = {
   row: Template;
