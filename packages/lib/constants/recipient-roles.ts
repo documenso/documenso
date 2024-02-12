@@ -11,7 +11,7 @@ export const RECIPIENT_ROLES_DESCRIPTION: {
   [RecipientRole.CC]: {
     actionVerb: 'CC',
     progressiveVerb: 'CC',
-    roleName: 'CC',
+    roleName: 'Cc',
   },
   [RecipientRole.SIGNER]: {
     actionVerb: 'Sign',

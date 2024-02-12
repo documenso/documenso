@@ -83,7 +83,7 @@ export const UploadDocument = ({ className, team }: UploadDocumentProps) => {
         timestamp: new Date().toISOString(),
       });
 
-      router.push(`${formatDocumentsPath(team?.url)}/${id}`);
+      router.push(`${formatDocumentsPath(team?.url)}/${id}/edit`);
     } catch (error) {
       console.error(error);
 
