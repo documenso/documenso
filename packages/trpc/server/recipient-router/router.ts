@@ -3,6 +3,7 @@ import { TRPCError } from '@trpc/server';
 import { completeDocumentWithToken } from '@documenso/lib/server-only/document/complete-document-with-token';
 import { setRecipientsForDocument } from '@documenso/lib/server-only/recipient/set-recipients-for-document';
 import { setRecipientsForTemplate } from '@documenso/lib/server-only/recipient/set-recipients-for-template';
+import { extractNextApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 
 import { authenticatedProcedure, procedure, router } from '../trpc';
 import {
@@ -27,6 +28,7 @@ export const recipientRouter = router({
             name: signer.name,
             role: signer.role,
           })),
+          requestMetadata: extractNextApiRequestMetadata(ctx.req),
         });
       } catch (err) {
         console.error(err);
@@ -65,13 +67,14 @@ export const recipientRouter = router({
 
   completeDocumentWithToken: procedure
     .input(ZCompleteDocumentWithTokenMutationSchema)
-    .mutation(async ({ input }) => {
+    .mutation(async ({ input, ctx }) => {
       try {
         const { token, documentId } = input;
 
         return await completeDocumentWithToken({
           token,
           documentId,
+          requestMetadata: extractNextApiRequestMetadata(ctx.req),
         });
       } catch (err) {
         console.error(err);
