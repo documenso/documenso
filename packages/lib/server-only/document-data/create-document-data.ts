@@ -1,7 +1,7 @@
 'use server';
 
 import { prisma } from '@documenso/prisma';
-import { DocumentDataType } from '@documenso/prisma/client';
+import type { DocumentDataType } from '@documenso/prisma/client';
 
 export type CreateDocumentDataOptions = {
   type: DocumentDataType;

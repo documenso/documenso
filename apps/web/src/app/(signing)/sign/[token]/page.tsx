@@ -1,3 +1,4 @@
+import { headers } from 'next/headers';
 import { notFound, redirect } from 'next/navigation';
 
 import { match } from 'ts-pattern';
@@ -8,12 +9,12 @@ import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
 import { DEFAULT_DOCUMENT_TIME_ZONE } from '@documenso/lib/constants/time-zones';
 import { getServerComponentSession } from '@documenso/lib/next-auth/get-server-component-session';
 import { getDocumentAndSenderByToken } from '@documenso/lib/server-only/document/get-document-by-token';
-import { getDocumentMetaByDocumentId } from '@documenso/lib/server-only/document/get-document-meta-by-document-id';
 import { viewedDocument } from '@documenso/lib/server-only/document/viewed-document';
 import { getFieldsForToken } from '@documenso/lib/server-only/field/get-fields-for-token';
 import { getRecipientByToken } from '@documenso/lib/server-only/recipient/get-recipient-by-token';
 import { getRecipientSignatures } from '@documenso/lib/server-only/recipient/get-recipient-signatures';
 import { symmetricDecrypt } from '@documenso/lib/universal/crypto';
+import { extractNextHeaderRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 import { DocumentStatus, FieldType, RecipientRole, SigningStatus } from '@documenso/prisma/client';
 import { Card, CardContent } from '@documenso/ui/primitives/card';
 import { ElementVisible } from '@documenso/ui/primitives/element-visible';
@@ -40,16 +41,18 @@ export default async function SigningPage({ params: { token } }: SigningPageProp
     return notFound();
   }
 
+  const requestHeaders = Object.fromEntries(headers().entries());
+
+  const requestMetadata = extractNextHeaderRequestMetadata(requestHeaders);
+
   const [document, fields, recipient] = await Promise.all([
     getDocumentAndSenderByToken({
       token,
     }).catch(() => null),
     getFieldsForToken({ token }),
     getRecipientByToken({ token }).catch(() => null),
-    viewedDocument({ token }).catch(() => null),
+    viewedDocument({ token, requestMetadata }).catch(() => null),
   ]);
-
-  const documentMeta = await getDocumentMetaByDocumentId({ id: document!.id }).catch(() => null);
 
   if (!document || !document.documentData || !recipient) {
     return notFound();
@@ -57,7 +60,7 @@ export default async function SigningPage({ params: { token } }: SigningPageProp
 
   const truncatedTitle = truncateTitle(document.title);
 
-  const { documentData } = document;
+  const { documentData, documentMeta } = document;
 
   const { user } = await getServerComponentSession();
 
@@ -65,7 +68,9 @@ export default async function SigningPage({ params: { token } }: SigningPageProp
     document.status === DocumentStatus.COMPLETED ||
     recipient.signingStatus === SigningStatus.SIGNED
   ) {
-    redirect(`/sign/${token}/complete`);
+    documentMeta?.redirectUrl
+      ? redirect(documentMeta.redirectUrl)
+      : redirect(`/sign/${token}/complete`);
   }
 
   if (documentMeta?.password) {
@@ -133,7 +138,12 @@ export default async function SigningPage({ params: { token } }: SigningPageProp
           </Card>
 
           <div className="col-span-12 lg:col-span-5 xl:col-span-4">
-            <SigningForm document={document} recipient={recipient} fields={fields} />
+            <SigningForm
+              document={document}
+              recipient={recipient}
+              fields={fields}
+              redirectUrl={documentMeta?.redirectUrl}
+            />
           </div>
         </div>
 

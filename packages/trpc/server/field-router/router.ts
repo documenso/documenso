@@ -4,6 +4,7 @@ import { removeSignedFieldWithToken } from '@documenso/lib/server-only/field/rem
 import { setFieldsForDocument } from '@documenso/lib/server-only/field/set-fields-for-document';
 import { setFieldsForTemplate } from '@documenso/lib/server-only/field/set-fields-for-template';
 import { signFieldWithToken } from '@documenso/lib/server-only/field/sign-field-with-token';
+import { extractNextApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 
 import { authenticatedProcedure, procedure, router } from '../trpc';
 import {
@@ -33,6 +34,7 @@ export const fieldRouter = router({
             pageWidth: field.pageWidth,
             pageHeight: field.pageHeight,
           })),
+          requestMetadata: extractNextApiRequestMetadata(ctx.req),
         });
       } catch (err) {
         console.error(err);
@@ -67,7 +69,7 @@ export const fieldRouter = router({
 
   signFieldWithToken: procedure
     .input(ZSignFieldWithTokenMutationSchema)
-    .mutation(async ({ input }) => {
+    .mutation(async ({ input, ctx }) => {
       try {
         const { token, fieldId, value, isBase64 } = input;
 
@@ -76,6 +78,7 @@ export const fieldRouter = router({
           fieldId,
           value,
           isBase64,
+          requestMetadata: extractNextApiRequestMetadata(ctx.req),
         });
       } catch (err) {
         console.error(err);
@@ -89,13 +92,14 @@ export const fieldRouter = router({
 
   removeSignedFieldWithToken: procedure
     .input(ZRemovedSignedFieldWithTokenMutationSchema)
-    .mutation(async ({ input }) => {
+    .mutation(async ({ input, ctx }) => {
       try {
         const { token, fieldId } = input;
 
         return await removeSignedFieldWithToken({
           token,
           fieldId,
+          requestMetadata: extractNextApiRequestMetadata(ctx.req),
         });
       } catch (err) {
         console.error(err);
