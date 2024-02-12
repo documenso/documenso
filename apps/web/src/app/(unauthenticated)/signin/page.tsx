@@ -21,7 +21,7 @@ type SignInPageProps = {
 
 export default function SignInPage({ searchParams }: SignInPageProps) {
   const NEXT_PUBLIC_DISABLE_SIGNUP = env('NEXT_PUBLIC_DISABLE_SIGNUP');
-  
+
   const rawEmail = typeof searchParams.email === 'string' ? searchParams.email : undefined;
   const email = rawEmail ? decryptSecondaryData(rawEmail) : null;
 

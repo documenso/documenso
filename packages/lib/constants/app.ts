@@ -9,7 +9,7 @@ export const NEXT_PUBLIC_MARKETING_URL = () => env('NEXT_PUBLIC_MARKETING_URL');
 
 export const IS_APP_MARKETING = () => NEXT_PUBLIC_PROJECT() === 'marketing';
 export const IS_APP_WEB = () => NEXT_PUBLIC_PROJECT() === 'web';
-export const IS_BILLING_ENABLED = () => env('NEXT_PUBLIC_FEATURE_BILLING_ENABLED');
+export const IS_BILLING_ENABLED = () => env('NEXT_PUBLIC_FEATURE_BILLING_ENABLED') === 'true';
 
 export const APP_FOLDER = () => (IS_APP_MARKETING() ? 'marketing' : 'web');
 

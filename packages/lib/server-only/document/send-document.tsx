@@ -8,9 +8,8 @@ import { renderCustomEmailTemplate } from '@documenso/lib/utils/render-custom-em
 import { prisma } from '@documenso/prisma';
 import { DocumentStatus, RecipientRole, SendStatus } from '@documenso/prisma/client';
 
-import { RECIPIENT_ROLES_DESCRIPTION } from '../../constants/recipient-roles';
-
 import { NEXT_PUBLIC_WEBAPP_URL } from '../../constants/app';
+import { RECIPIENT_ROLES_DESCRIPTION } from '../../constants/recipient-roles';
 
 export type SendDocumentOptions = {
   documentId: number;
@@ -75,10 +74,6 @@ export const sendDocument = async ({ documentId, userId }: SendDocumentOptions) 
         'signer.email': email,
         'document.name': document.title,
       };
-
-      if (recipient.sendStatus === SendStatus.SENT) {
-        return;
-      }
 
       const assetBaseUrl = NEXT_PUBLIC_WEBAPP_URL() || 'http://localhost:3000';
       const signDocumentLink = `${NEXT_PUBLIC_WEBAPP_URL()}/sign/${recipient.token}`;

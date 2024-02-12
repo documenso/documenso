@@ -13,6 +13,8 @@ import { Button } from '@documenso/ui/primitives/button';
 
 import { PasswordReveal } from '~/components/(marketing)/password-reveal';
 
+export const dynamic = 'force-dynamic';
+
 const fontCaveat = Caveat({
   weight: ['500'],
   subsets: ['latin'],

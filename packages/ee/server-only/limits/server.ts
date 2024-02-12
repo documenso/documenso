@@ -16,7 +16,7 @@ export type GetServerLimitsOptions = {
 };
 
 export const getServerLimits = async ({ email, teamId }: GetServerLimitsOptions) => {
-  if (!IS_BILLING_ENABLED) {
+  if (!IS_BILLING_ENABLED()) {
     return {
       quota: SELFHOSTED_PLAN_LIMITS,
       remaining: SELFHOSTED_PLAN_LIMITS,
