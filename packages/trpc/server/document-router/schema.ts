@@ -1,6 +1,5 @@
 import { z } from 'zod';
 
-import { URL_REGEX } from '@documenso/lib/constants/url-regex';
 import { DocumentStatus, FieldType, RecipientRole } from '@documenso/prisma/client';
 
 export const ZGetDocumentByIdQuerySchema = z.object({
@@ -74,12 +73,7 @@ export const ZSendDocumentMutationSchema = z.object({
     message: z.string(),
     timezone: z.string(),
     dateFormat: z.string(),
-    redirectUrl: z
-      .string()
-      .optional()
-      .refine((value) => value === undefined || URL_REGEX.test(value), {
-        message: 'Please enter a valid URL',
-      }),
+    redirectUrl: z.string().trim().url().optional().or(z.literal('')),
   }),
 });
 
