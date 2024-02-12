@@ -122,6 +122,11 @@ const getCounts = async ({ user, createdAt }: GetCountsOption) => {
                 signingStatus: SigningStatus.SIGNED,
               },
             },
+            User: {
+              email: {
+                not: user.email,
+              },
+            },
             deletedAt: null,
           },
           {
@@ -130,6 +135,11 @@ const getCounts = async ({ user, createdAt }: GetCountsOption) => {
               some: {
                 email: user.email,
                 signingStatus: SigningStatus.SIGNED,
+              },
+            },
+            User: {
+              email: {
+                not: user.email,
               },
             },
           },

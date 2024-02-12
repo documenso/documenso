@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useParams } from 'next/navigation';
 
 import { signOut } from 'next-auth/react';
+import { LocaleSwitcher } from '@documenso/ui/components/LocaleSwitcher'
 
 import LogoImage from '@documenso/assets/logo.png';
 import { getRootHref } from '@documenso/lib/utils/params';
@@ -83,6 +84,8 @@ export const MobileNavigation = ({ isMenuOpen, onMenuOpenChange }: MobileNavigat
 
         <div className="mt-auto flex w-full flex-col space-y-4 self-end">
           <div className="w-fit">
+            <LocaleSwitcher />
+
             <ThemeSwitcher />
           </div>
 

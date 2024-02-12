@@ -2,36 +2,14 @@
 
 import { createContext, useContext } from 'react';
 
-export type LocaleContextValue = {
-  locale: string;
-};
+import { FALLBACK_LOCALE, Locales } from '@documenso/lib/i18n/settings';
 
-export const LocaleContext = createContext<LocaleContextValue | null>(null);
+const Context = createContext<Locales>(FALLBACK_LOCALE);
 
-export const useLocale = () => {
-  const context = useContext(LocaleContext);
+export function LocaleProvider({ children, value }: { children: React.ReactNode; value: Locales }) {
+  return <Context.Provider value={value}>{children}</Context.Provider>;
+}
 
-  if (!context) {
-    throw new Error('useLocale must be used within a LocaleProvider');
-  }
-
-  return context;
-};
-
-export function LocaleProvider({
-  children,
-  locale,
-}: {
-  children: React.ReactNode;
-  locale: string;
-}) {
-  return (
-    <LocaleContext.Provider
-      value={{
-        locale: locale,
-      }}
-    >
-      {children}
-    </LocaleContext.Provider>
-  );
+export function useLocale() {
+  return useContext(Context);
 }

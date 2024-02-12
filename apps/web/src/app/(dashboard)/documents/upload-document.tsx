@@ -105,6 +105,11 @@ export const UploadDocument = ({ className, team }: UploadDocumentProps) => {
     }
   };
 
+  const isSmallVerticalScreen = useMemo(
+    () => typeof window !== 'undefined' && window.innerHeight < 800,
+    [],
+  );
+
   const onFileDropRejected = () => {
     toast({
       title: 'Your document failed to upload.',
@@ -117,7 +122,7 @@ export const UploadDocument = ({ className, team }: UploadDocumentProps) => {
   return (
     <div className={cn('relative', className)}>
       <DocumentDropzone
-        className="min-h-[40vh]"
+        className={`${isSmallVerticalScreen ? 'min-h-[50vh]' : 'min-h-[40vh]'}`}
         disabled={remaining.documents === 0 || !session?.user.emailVerified}
         disabledMessage={disabledMessage}
         onDrop={onFileDrop}

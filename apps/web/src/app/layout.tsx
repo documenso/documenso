@@ -4,6 +4,7 @@ import { Caveat, Inter } from 'next/font/google';
 
 import { FeatureFlagProvider } from '@documenso/lib/client-only/providers/feature-flag';
 import { LocaleProvider } from '@documenso/lib/client-only/providers/locale';
+import type { Locales } from '@documenso/lib/i18n/settings';
 import { getServerComponentAllFlags } from '@documenso/lib/server-only/feature-flags/get-server-component-feature-flag';
 import { getLocale } from '@documenso/lib/server-only/headers/get-locale';
 import { TrpcProvider } from '@documenso/trpc/react';
@@ -49,11 +50,11 @@ export const metadata = {
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const flags = await getServerComponentAllFlags();
 
-  const locale = getLocale();
+  const locale = getLocale() as Locales;
 
   return (
     <html
-      lang="en"
+      lang={locale}
       className={cn(fontInter.variable, fontCaveat.variable)}
       suppressHydrationWarning
     >
@@ -69,7 +70,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       </Suspense>
 
       <body>
-        <LocaleProvider locale={locale}>
+        <LocaleProvider value={locale}>
           <FeatureFlagProvider initialFlags={flags}>
             <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
               <TooltipProvider>

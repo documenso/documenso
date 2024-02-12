@@ -3,6 +3,9 @@ import { Suspense } from 'react';
 import { Caveat, Inter } from 'next/font/google';
 
 import { FeatureFlagProvider } from '@documenso/lib/client-only/providers/feature-flag';
+import { LocaleProvider } from '@documenso/lib/client-only/providers/locale';
+import type { Locales } from '@documenso/lib/i18n/settings';
+import { getLocale } from '@documenso/lib/server-only/headers/get-locale';
 import { getAllAnonymousFlags } from '@documenso/lib/universal/get-feature-flag';
 import { TrpcProvider } from '@documenso/trpc/react';
 import { cn } from '@documenso/ui/lib/utils';
@@ -46,10 +49,11 @@ export const metadata = {
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const flags = await getAllAnonymousFlags();
+  const locale = getLocale() as Locales;
 
   return (
     <html
-      lang="en"
+      lang={locale}
       className={cn(fontInter.variable, fontCaveat.variable)}
       suppressHydrationWarning
     >
@@ -65,13 +69,15 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       </Suspense>
 
       <body>
-        <FeatureFlagProvider initialFlags={flags}>
-          <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-            <PlausibleProvider>
-              <TrpcProvider>{children}</TrpcProvider>
-            </PlausibleProvider>
-          </ThemeProvider>
-        </FeatureFlagProvider>
+        <LocaleProvider value={locale}>
+          <FeatureFlagProvider initialFlags={flags}>
+            <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+              <PlausibleProvider>
+                <TrpcProvider>{children}</TrpcProvider>
+              </PlausibleProvider>
+            </ThemeProvider>
+          </FeatureFlagProvider>
+        </LocaleProvider>
 
         <Toaster />
       </body>

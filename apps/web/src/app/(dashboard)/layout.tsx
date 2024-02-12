@@ -1,5 +1,6 @@
 import React from 'react';
 
+import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 
 import { getServerSession } from 'next-auth';
@@ -13,6 +14,13 @@ import { Header } from '~/components/(dashboard)/layout/header';
 import { VerifyEmailBanner } from '~/components/(dashboard)/layout/verify-email-banner';
 import { RefreshOnFocus } from '~/components/(dashboard)/refresh-on-focus/refresh-on-focus';
 import { NextAuthProvider } from '~/providers/next-auth';
+
+export const metadata: Metadata = {
+  title: {
+    template: '%s | Documenso',
+    default: 'Dashboard',
+  },
+};
 
 export type AuthenticatedDashboardLayoutProps = {
   children: React.ReactNode;
