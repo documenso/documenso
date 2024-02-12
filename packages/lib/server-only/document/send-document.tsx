@@ -4,10 +4,6 @@ import { mailer } from '@documenso/email/mailer';
 import { render } from '@documenso/email/render';
 import { DocumentInviteEmailTemplate } from '@documenso/email/templates/document-invite';
 import { FROM_ADDRESS, FROM_NAME } from '@documenso/lib/constants/email';
-import {
-  RECIPIENT_ROLES_DESCRIPTION,
-  RECIPIENT_ROLE_TO_EMAIL_TYPE,
-} from '@documenso/lib/constants/recipient-roles';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
 import type { RequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 import { createDocumentAuditLogData } from '@documenso/lib/utils/document-audit-logs';
@@ -16,7 +12,10 @@ import { prisma } from '@documenso/prisma';
 import { DocumentStatus, RecipientRole, SendStatus } from '@documenso/prisma/client';
 
 import { NEXT_PUBLIC_WEBAPP_URL } from '../../constants/app';
-import { RECIPIENT_ROLES_DESCRIPTION } from '../../constants/recipient-roles';
+import {
+  RECIPIENT_ROLES_DESCRIPTION,
+  RECIPIENT_ROLE_TO_EMAIL_TYPE,
+} from '../../constants/recipient-roles';
 
 export type SendDocumentOptions = {
   documentId: number;
