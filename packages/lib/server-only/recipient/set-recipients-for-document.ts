@@ -62,6 +62,10 @@ export const setRecipientsForDocument = async ({
     throw new Error('Document not found');
   }
 
+  if (document.completedAt) {
+    throw new Error('Document already complete');
+  }
+
   const normalizedRecipients = recipients.map((recipient) => ({
     ...recipient,
     email: recipient.email.toLowerCase(),

@@ -153,6 +153,7 @@ export const diffDocumentMetaChanges = (
   const oldSubject = oldData?.subject ?? '';
   const oldTimezone = oldData?.timezone ?? '';
   const oldPassword = oldData?.password ?? null;
+  const oldRedirectUrl = oldData?.redirectUrl ?? null;
 
   if (oldDateFormat !== newData.dateFormat) {
     diffs.push({
@@ -189,6 +190,12 @@ export const diffDocumentMetaChanges = (
   if (oldPassword !== newData.password) {
     diffs.push({
       type: DOCUMENT_META_DIFF_TYPE.PASSWORD,
+    });
+  }
+
+  if (oldRedirectUrl !== newData.redirectUrl) {
+    diffs.push({
+      type: DOCUMENT_META_DIFF_TYPE.REDIRECT_URL,
     });
   }
 

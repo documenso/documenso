@@ -36,6 +36,7 @@ export const ZDocumentMetaDiffTypeSchema = z.enum([
   'DATE_FORMAT',
   'MESSAGE',
   'PASSWORD',
+  'REDIRECT_URL',
   'SUBJECT',
   'TIMEZONE',
 ]);
