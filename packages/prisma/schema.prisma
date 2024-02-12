@@ -170,9 +170,28 @@ model Document {
   teamId         Int?
   team           Team?               @relation(fields: [teamId], references: [id])
 
+  auditLogs DocumentAuditLog[]
+
   @@unique([documentDataId])
   @@index([userId])
   @@index([status])
+}
+
+model DocumentAuditLog {
+  id         String   @id @default(cuid())
+  documentId Int
+  createdAt  DateTime @default(now())
+  type       String
+  data       Json
+
+  // Details of the person who performed the action which caused the audit log.
+  name      String?
+  email     String?
+  userId    Int?
+  userAgent String?
+  ipAddress String?
+
+  Document Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
 }
 
 enum DocumentDataType {
@@ -260,6 +279,7 @@ enum FieldType {
 
 model Field {
   id          Int        @id @default(autoincrement())
+  secondaryId String     @unique @default(cuid())
   documentId  Int?
   templateId  Int?
   recipientId Int?

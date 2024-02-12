@@ -85,6 +85,7 @@ export const SinglePlayerClient = () => {
     setFields(
       data.fields.map((field, i) => ({
         id: i,
+        secondaryId: i.toString(),
         documentId: -1,
         templateId: null,
         recipientId: -1,
