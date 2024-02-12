@@ -3,6 +3,7 @@ import { initContract } from '@ts-rest/core';
 import {
   ZSendDocumentForSigningMutationSchema as SendDocumentMutationSchema,
   ZAuthorizationHeadersSchema,
+  ZCreateDocumentMutationResponseSchema,
   ZCreateDocumentMutationSchema,
   ZCreateFieldMutationSchema,
   ZCreateRecipientMutationSchema,
@@ -18,7 +19,6 @@ import {
   ZUnsuccessfulResponseSchema,
   ZUpdateFieldMutationSchema,
   ZUpdateRecipientMutationSchema,
-  ZUploadDocumentSuccessfulSchema,
 } from './schema';
 
 const c = initContract();
@@ -53,7 +53,7 @@ export const ApiContractV1 = c.router(
       path: '/api/v1/documents',
       body: ZCreateDocumentMutationSchema,
       responses: {
-        200: ZUploadDocumentSuccessfulSchema,
+        200: ZCreateDocumentMutationResponseSchema,
         401: ZUnsuccessfulResponseSchema,
         404: ZUnsuccessfulResponseSchema,
       },

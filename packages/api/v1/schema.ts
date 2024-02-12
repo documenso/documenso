@@ -1,6 +1,12 @@
 import { z } from 'zod';
 
-import { FieldType, ReadStatus, SendStatus, SigningStatus } from '@documenso/prisma/client';
+import {
+  FieldType,
+  ReadStatus,
+  RecipientRole,
+  SendStatus,
+  SigningStatus,
+} from '@documenso/prisma/client';
 
 /**
  * Documents
@@ -41,15 +47,45 @@ export const ZUploadDocumentSuccessfulSchema = z.object({
 export type TUploadDocumentSuccessfulSchema = z.infer<typeof ZUploadDocumentSuccessfulSchema>;
 
 export const ZCreateDocumentMutationSchema = z.object({
-  fileName: z.string(),
-  contentType: z.string().default('PDF'),
+  title: z.string().min(1),
+  recipients: z.array(
+    z.object({
+      name: z.string().min(1),
+      email: z.string().email().min(1),
+      role: z.nativeEnum(RecipientRole).optional().default(RecipientRole.SIGNER),
+    }),
+  ),
+  meta: z.object({
+    subject: z.string(),
+    message: z.string(),
+    timezone: z.string(),
+    dateFormat: z.string(),
+    redirectUrl: z.string(),
+  }),
 });
 
 export type TCreateDocumentMutationSchema = z.infer<typeof ZCreateDocumentMutationSchema>;
 
+export const ZCreateDocumentMutationResponseSchema = z.object({
+  uploadUrl: z.string().min(1),
+  documentId: z.number(),
+  recipients: z.array(
+    z.object({
+      recipientId: z.number(),
+      token: z.string(),
+      role: z.nativeEnum(RecipientRole),
+    }),
+  ),
+});
+
+export type TCreateDocumentMutationResponseSchema = z.infer<
+  typeof ZCreateDocumentMutationResponseSchema
+>;
+
 export const ZCreateRecipientMutationSchema = z.object({
   name: z.string().min(1),
   email: z.string().email().min(1),
+  role: z.nativeEnum(RecipientRole).optional().default(RecipientRole.SIGNER),
 });
 
 /**
@@ -70,6 +106,7 @@ export const ZSuccessfulRecipientResponseSchema = z.object({
   documentId: z.number(),
   email: z.string().email().min(1),
   name: z.string(),
+  role: z.nativeEnum(RecipientRole),
   token: z.string(),
   // !: Not used for now
   // expired: z.string(),

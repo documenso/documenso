@@ -1,10 +1,12 @@
 import { prisma } from '@documenso/prisma';
+import type { RecipientRole } from '@documenso/prisma/client';
 
 export type UpdateRecipientOptions = {
   documentId: number;
   recipientId: number;
   email?: string;
   name?: string;
+  role?: RecipientRole;
 };
 
 export const updateRecipient = async ({
@@ -12,6 +14,7 @@ export const updateRecipient = async ({
   recipientId,
   email,
   name,
+  role,
 }: UpdateRecipientOptions) => {
   const recipient = await prisma.recipient.findFirst({
     where: {
@@ -31,6 +34,7 @@ export const updateRecipient = async ({
     data: {
       email: email?.toLowerCase() ?? recipient.email,
       name: name ?? recipient.name,
+      role: role ?? recipient.role,
     },
   });
 

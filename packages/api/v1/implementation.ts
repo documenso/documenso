@@ -1,5 +1,7 @@
 import { createNextRoute } from '@ts-rest/next';
 
+import { createDocumentData } from '@documenso/lib/server-only/document-data/create-document-data';
+import { createDocument } from '@documenso/lib/server-only/document/create-document';
 import { deleteDocument } from '@documenso/lib/server-only/document/delete-document';
 import { findDocuments } from '@documenso/lib/server-only/document/find-documents';
 import { getDocumentById } from '@documenso/lib/server-only/document/get-document-by-id';
@@ -14,7 +16,7 @@ import { getRecipientsForDocument } from '@documenso/lib/server-only/recipient/g
 import { setRecipientsForDocument } from '@documenso/lib/server-only/recipient/set-recipients-for-document';
 import { updateRecipient } from '@documenso/lib/server-only/recipient/update-recipient';
 import { getPresignPostUrl } from '@documenso/lib/universal/upload/server-actions';
-import { DocumentStatus, SigningStatus } from '@documenso/prisma/client';
+import { DocumentDataType, DocumentStatus, SigningStatus } from '@documenso/prisma/client';
 
 import { ApiContractV1 } from './contract';
 import { authenticatedMiddleware } from './middleware/authenticated';
@@ -81,17 +83,50 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
     }
   }),
 
-  createDocument: authenticatedMiddleware(async (args, _user) => {
+  createDocument: authenticatedMiddleware(async (args, user) => {
     const { body } = args;
 
     try {
-      const { url, key } = await getPresignPostUrl(body.fileName, body.contentType);
+      if (process.env.NEXT_PUBLIC_UPLOAD_TRANSPORT !== 's3') {
+        return {
+          status: 500,
+          body: {
+            message: 'Create document is not available without S3 transport.',
+          },
+        };
+      }
+
+      const fileName = body.title.endsWith('.pdf') ? body.title : `${body.title}.pdf`;
+
+      const { url, key } = await getPresignPostUrl(fileName, 'application/pdf');
+
+      const documentData = await createDocumentData({
+        data: key,
+        type: DocumentDataType.S3_PATH,
+      });
+
+      const document = await createDocument({
+        title: body.title,
+        userId: user.id,
+        documentDataId: documentData.id,
+      });
+
+      const recipients = await setRecipientsForDocument({
+        userId: user.id,
+        documentId: document.id,
+        recipients: body.recipients,
+      });
 
       return {
         status: 200,
         body: {
-          url,
-          key,
+          uploadUrl: url,
+          documentId: document.id,
+          recipients: recipients.map((recipient) => ({
+            recipientId: recipient.id,
+            token: recipient.token,
+            role: recipient.role,
+          })),
         },
       };
     } catch (err) {
@@ -184,7 +219,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
 
   createRecipient: authenticatedMiddleware(async (args, user) => {
     const { id: documentId } = args.params;
-    const { name, email } = args.body;
+    const { name, email, role } = args.body;
 
     const document = await getDocumentById({
       id: Number(documentId),
@@ -234,6 +269,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
           {
             email,
             name,
+            role,
           },
         ],
       });
@@ -246,7 +282,10 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
 
       return {
         status: 200,
-        body: newRecipient,
+        body: {
+          ...newRecipient,
+          documentId: Number(documentId),
+        },
       };
     } catch (err) {
       return {
@@ -260,7 +299,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
 
   updateRecipient: authenticatedMiddleware(async (args, user) => {
     const { id: documentId, recipientId } = args.params;
-    const { name, email } = args.body;
+    const { name, email, role } = args.body;
 
     const document = await getDocumentById({
       id: Number(documentId),
@@ -290,6 +329,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
       recipientId: Number(recipientId),
       email,
       name,
+      role,
     }).catch(() => null);
 
     if (!updatedRecipient) {
@@ -303,7 +343,10 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
 
     return {
       status: 200,
-      body: updatedRecipient,
+      body: {
+        ...updatedRecipient,
+        documentId: Number(documentId),
+      },
     };
   }),
 
@@ -349,7 +392,10 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
 
     return {
       status: 200,
-      body: deletedRecipient,
+      body: {
+        ...deletedRecipient,
+        documentId: Number(documentId),
+      },
     };
   }),
 
@@ -429,7 +475,10 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
 
     return {
       status: 200,
-      body: remappedField,
+      body: {
+        ...remappedField,
+        documentId: Number(documentId),
+      },
     };
   }),
 
@@ -510,7 +559,10 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
 
     return {
       status: 200,
-      body: remappedField,
+      body: {
+        ...remappedField,
+        documentId: Number(documentId),
+      },
     };
   }),
 
@@ -597,7 +649,10 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
 
     return {
       status: 200,
-      body: remappedField,
+      body: {
+        ...remappedField,
+        documentId: Number(documentId),
+      },
     };
   }),
 });
