@@ -4,12 +4,18 @@ import { mailer } from '@documenso/email/mailer';
 import { render } from '@documenso/email/render';
 import { DocumentInviteEmailTemplate } from '@documenso/email/templates/document-invite';
 import { FROM_ADDRESS, FROM_NAME } from '@documenso/lib/constants/email';
+import {
+  RECIPIENT_ROLES_DESCRIPTION,
+  RECIPIENT_ROLE_TO_EMAIL_TYPE,
+} from '@documenso/lib/constants/recipient-roles';
+import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
+import type { RequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
+import { createDocumentAuditLogData } from '@documenso/lib/utils/document-audit-logs';
 import { renderCustomEmailTemplate } from '@documenso/lib/utils/render-custom-email-template';
 import { prisma } from '@documenso/prisma';
 import { DocumentStatus, RecipientRole, SigningStatus } from '@documenso/prisma/client';
 import type { Prisma } from '@documenso/prisma/client';
 
-import { RECIPIENT_ROLES_DESCRIPTION } from '../../constants/recipient-roles';
 import { getDocumentWhereInput } from './get-document-by-id';
 
 export type ResendDocumentOptions = {
@@ -17,6 +23,7 @@ export type ResendDocumentOptions = {
   userId: number;
   recipients: number[];
   teamId?: number;
+  requestMetadata: RequestMetadata;
 };
 
 export const resendDocument = async ({
@@ -24,6 +31,7 @@ export const resendDocument = async ({
   userId,
   recipients,
   teamId,
+  requestMetadata,
 }: ResendDocumentOptions) => {
   const user = await prisma.user.findFirstOrThrow({
     where: {
@@ -76,6 +84,8 @@ export const resendDocument = async ({
         return;
       }
 
+      const recipientEmailType = RECIPIENT_ROLE_TO_EMAIL_TYPE[recipient.role];
+
       const { email, name } = recipient;
 
       const customEmailTemplate = {
@@ -99,20 +109,39 @@ export const resendDocument = async ({
 
       const { actionVerb } = RECIPIENT_ROLES_DESCRIPTION[recipient.role];
 
-      await mailer.sendMail({
-        to: {
-          address: email,
-          name,
-        },
-        from: {
-          name: FROM_NAME,
-          address: FROM_ADDRESS,
-        },
-        subject: customEmail?.subject
-          ? renderCustomEmailTemplate(customEmail.subject, customEmailTemplate)
-          : `Please ${actionVerb.toLowerCase()} this document`,
-        html: render(template),
-        text: render(template, { plainText: true }),
+      await prisma.$transaction(async (tx) => {
+        await mailer.sendMail({
+          to: {
+            address: email,
+            name,
+          },
+          from: {
+            name: FROM_NAME,
+            address: FROM_ADDRESS,
+          },
+          subject: customEmail?.subject
+            ? renderCustomEmailTemplate(customEmail.subject, customEmailTemplate)
+            : `Please ${actionVerb.toLowerCase()} this document`,
+          html: render(template),
+          text: render(template, { plainText: true }),
+        });
+
+        await tx.documentAuditLog.create({
+          data: createDocumentAuditLogData({
+            type: DOCUMENT_AUDIT_LOG_TYPE.EMAIL_SENT,
+            documentId: document.id,
+            user,
+            requestMetadata,
+            data: {
+              emailType: recipientEmailType,
+              recipientEmail: recipient.email,
+              recipientName: recipient.name,
+              recipientRole: recipient.role,
+              recipientId: recipient.id,
+              isResending: true,
+            },
+          }),
+        });
       });
     }),
   );
