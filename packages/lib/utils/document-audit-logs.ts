@@ -153,7 +153,7 @@ export const diffDocumentMetaChanges = (
   const oldSubject = oldData?.subject ?? '';
   const oldTimezone = oldData?.timezone ?? '';
   const oldPassword = oldData?.password ?? null;
-  const oldRedirectUrl = oldData?.redirectUrl ?? null;
+  const oldRedirectUrl = oldData?.redirectUrl ?? '';
 
   if (oldDateFormat !== newData.dateFormat) {
     diffs.push({
@@ -166,7 +166,7 @@ export const diffDocumentMetaChanges = (
   if (oldMessage !== newData.message) {
     diffs.push({
       type: DOCUMENT_META_DIFF_TYPE.MESSAGE,
-      from: oldData?.message ?? '',
+      from: oldMessage,
       to: newData.message,
     });
   }
@@ -174,7 +174,7 @@ export const diffDocumentMetaChanges = (
   if (oldSubject !== newData.subject) {
     diffs.push({
       type: DOCUMENT_META_DIFF_TYPE.SUBJECT,
-      from: oldData?.subject ?? '',
+      from: oldSubject,
       to: newData.subject,
     });
   }
@@ -182,20 +182,22 @@ export const diffDocumentMetaChanges = (
   if (oldTimezone !== newData.timezone) {
     diffs.push({
       type: DOCUMENT_META_DIFF_TYPE.TIMEZONE,
-      from: oldData?.timezone ?? '',
+      from: oldTimezone,
       to: newData.timezone,
-    });
-  }
-
-  if (oldPassword !== newData.password) {
-    diffs.push({
-      type: DOCUMENT_META_DIFF_TYPE.PASSWORD,
     });
   }
 
   if (oldRedirectUrl !== newData.redirectUrl) {
     diffs.push({
       type: DOCUMENT_META_DIFF_TYPE.REDIRECT_URL,
+      from: oldRedirectUrl,
+      to: newData.redirectUrl,
+    });
+  }
+
+  if (oldPassword !== newData.password) {
+    diffs.push({
+      type: DOCUMENT_META_DIFF_TYPE.PASSWORD,
     });
   }
 

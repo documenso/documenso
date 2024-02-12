@@ -79,6 +79,7 @@ export const ZDocumentAuditLogDocumentMetaSchema = z.union([
     type: z.union([
       z.literal(DOCUMENT_META_DIFF_TYPE.DATE_FORMAT),
       z.literal(DOCUMENT_META_DIFF_TYPE.MESSAGE),
+      z.literal(DOCUMENT_META_DIFF_TYPE.REDIRECT_URL),
       z.literal(DOCUMENT_META_DIFF_TYPE.SUBJECT),
       z.literal(DOCUMENT_META_DIFF_TYPE.TIMEZONE),
     ]),
