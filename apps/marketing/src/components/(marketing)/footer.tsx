@@ -10,6 +10,7 @@ import { LiaDiscord } from 'react-icons/lia';
 import { LuGithub } from 'react-icons/lu';
 
 import LogoImage from '@documenso/assets/logo.png';
+import { LocaleSwitcher } from '@documenso/ui/components/LocaleSwitcher';
 import { cn } from '@documenso/ui/lib/utils';
 import { ThemeSwitcher } from '@documenso/ui/primitives/theme-switcher';
 
@@ -83,6 +84,7 @@ export const Footer = ({ className, ...props }: FooterProps) => {
         </p>
 
         <div className="flex flex-wrap">
+          <LocaleSwitcher />
           <ThemeSwitcher />
         </div>
       </div>
