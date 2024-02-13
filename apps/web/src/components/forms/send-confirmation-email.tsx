@@ -13,6 +13,7 @@ import {
   FormField,
   FormItem,
   FormLabel,
+  FormMessage,
 } from '@documenso/ui/primitives/form/form';
 import { Input } from '@documenso/ui/primitives/input';
 import { useToast } from '@documenso/ui/primitives/use-toast';
@@ -63,31 +64,32 @@ export const SendConfirmationEmailForm = ({ className }: SendConfirmationEmailFo
   };
 
   return (
-    <div>
-      <Form {...form}>
-        <form
-          className={cn('mt-6 flex w-full flex-col gap-y-4', className)}
-          onSubmit={form.handleSubmit(onFormSubmit)}
-        >
-          <fieldset className="flex w-full flex-col gap-y-4" disabled={isSubmitting}>
-            <FormField
-              control={form.control}
-              name="email"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Email address</FormLabel>
-                  <FormControl>
-                    <Input type="email" {...field} />
-                  </FormControl>
-                </FormItem>
-              )}
-            />
-          </fieldset>
-          <Button size="lg" type="submit" disabled={isSubmitting}>
+    <Form {...form}>
+      <form
+        className={cn('mt-6 flex w-full flex-col gap-y-4', className)}
+        onSubmit={form.handleSubmit(onFormSubmit)}
+      >
+        <fieldset className="flex w-full flex-col gap-y-4" disabled={isSubmitting}>
+          <FormField
+            control={form.control}
+            name="email"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Email address</FormLabel>
+                <FormControl>
+                  <Input type="email" {...field} />
+                </FormControl>
+              </FormItem>
+            )}
+          />
+
+          <FormMessage />
+
+          <Button size="lg" type="submit" disabled={isSubmitting} loading={isSubmitting}>
             Send confirmation email
           </Button>
-        </form>
-      </Form>
-    </div>
+        </fieldset>
+      </form>
+    </Form>
   );
 };

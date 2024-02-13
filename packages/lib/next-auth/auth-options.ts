@@ -13,6 +13,7 @@ import { IdentityProvider, UserSecurityAuditLogType } from '@documenso/prisma/cl
 
 import { isTwoFactorAuthenticationEnabled } from '../server-only/2fa/is-2fa-availble';
 import { validateTwoFactorAuthentication } from '../server-only/2fa/validate-2fa';
+import { getLastVerificationToken } from '../server-only/user/get-last-verification-token';
 import { getUserByEmail } from '../server-only/user/get-user-by-email';
 import { sendConfirmationToken } from '../server-only/user/send-confirmation-token';
 import { extractNextAuthRequestMetadata } from '../universal/extract-request-metadata';
@@ -92,12 +93,19 @@ export const NEXT_AUTH_OPTIONS: AuthOptions = {
         }
 
         if (!user.emailVerified) {
-          const totalUserVerificationTokens = user.VerificationToken.length;
-          const lastUserVerificationToken = user.VerificationToken[totalUserVerificationTokens - 1];
+          const [lastUserVerificationToken] = await getLastVerificationToken({ userId: user.id });
+
+          if (!lastUserVerificationToken) {
+            await sendConfirmationToken({ email });
+            throw new Error(ErrorCode.UNVERIFIED_EMAIL);
+          }
+
           const expiredToken =
             DateTime.fromJSDate(lastUserVerificationToken.expires) <= DateTime.now();
+          const lastSentToken = DateTime.fromJSDate(lastUserVerificationToken.createdAt);
+          const sentWithinLastHour = DateTime.now().minus({ hours: 1 }) <= lastSentToken;
 
-          if (totalUserVerificationTokens < 1 || expiredToken) {
+          if (expiredToken || !sentWithinLastHour) {
             await sendConfirmationToken({ email });
           }
 
