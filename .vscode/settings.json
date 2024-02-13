@@ -9,5 +9,9 @@
   "typescript.enablePromptUseWorkspaceTsdk": true,
   "files.eol": "\n",
   "editor.tabSize": 2,
-  "editor.insertSpaces": true
+  "editor.insertSpaces": true,
+  "i18n-ally.localesPaths": ["packages/lib/i18n/locales"],
+  "i18n-ally.defaultNamespace": "common",
+  "i18n-ally.sourceLanguage": "english",
+  "i18n-ally.keystyle": "nested"
 }
