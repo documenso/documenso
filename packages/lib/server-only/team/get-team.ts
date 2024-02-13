@@ -72,8 +72,20 @@ export const getTeamByUrl = async ({ userId, teamUrl }: GetTeamByUrlOptions) => 
     where: whereFilter,
     include: {
       teamEmail: true,
-      emailVerification: true,
-      transferVerification: true,
+      emailVerification: {
+        select: {
+          expiresAt: true,
+          name: true,
+          email: true,
+        },
+      },
+      transferVerification: {
+        select: {
+          expiresAt: true,
+          name: true,
+          email: true,
+        },
+      },
       subscription: true,
       members: {
         where: {

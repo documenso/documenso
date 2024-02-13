@@ -1,7 +1,8 @@
 import { z } from 'zod';
 
 export const ZCreateTemplateMutationSchema = z.object({
-  title: z.string().min(1),
+  title: z.string().min(1).trim(),
+  teamId: z.number().optional(),
   templateDocumentDataId: z.string().min(1),
 });
 
@@ -11,6 +12,7 @@ export const ZCreateDocumentFromTemplateMutationSchema = z.object({
 
 export const ZDuplicateTemplateMutationSchema = z.object({
   templateId: z.number(),
+  teamId: z.number().optional(),
 });
 
 export const ZDeleteTemplateMutationSchema = z.object({

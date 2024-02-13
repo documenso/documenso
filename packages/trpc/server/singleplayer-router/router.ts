@@ -62,6 +62,7 @@ export const singleplayerRouter = router({
             : null,
           // Dummy data.
           id: -1,
+          secondaryId: '-1',
           documentId: -1,
           templateId: null,
           recipientId: -1,
