@@ -17,6 +17,7 @@ import {
 import type { Document, Recipient } from '@documenso/prisma/client';
 import { trpc as trpcReact } from '@documenso/trpc/react';
 import {
+  Command,
   CommandDialog,
   CommandEmpty,
   CommandGroup,
@@ -66,7 +67,7 @@ export type CommandMenuProps = {
 };
 
 export function CommandMenu({ open, onOpenChange }: CommandMenuProps) {
-  const { setTheme } = useTheme();
+  const { theme, setTheme } = useTheme();
   const { data: session } = useSession();
 
   const router = useRouter();
@@ -74,6 +75,7 @@ export function CommandMenu({ open, onOpenChange }: CommandMenuProps) {
   const [isOpen, setIsOpen] = useState(() => open ?? false);
   const [search, setSearch] = useState('');
   const [pages, setPages] = useState<string[]>([]);
+  const [currentPageLabel, setCurrentPageLabel] = useState('');
 
   const { data: searchDocumentsData, isLoading: isSearchingDocuments } =
     trpcReact.document.searchDocuments.useQuery(
@@ -176,6 +178,7 @@ export function CommandMenu({ open, onOpenChange }: CommandMenuProps) {
       }}
       open={open}
       onOpenChange={setOpen}
+      value={currentPageLabel}
     >
       <CommandInput
         value={search}
@@ -193,18 +196,30 @@ export function CommandMenu({ open, onOpenChange }: CommandMenuProps) {
             </div>
           </CommandEmpty>
         ) : (
-          <CommandEmpty>No results found.</CommandEmpty>
+          currentPage !== 'theme' && <CommandEmpty>No results found.</CommandEmpty>
         )}
         {!currentPage && (
           <>
             <CommandGroup className="mx-2 p-0 pb-2" heading="Documents">
-              <Commands push={push} pages={DOCUMENTS_PAGES} />
+              <Commands
+                push={push}
+                pages={DOCUMENTS_PAGES}
+                setCurrentPageLabel={setCurrentPageLabel}
+              />
             </CommandGroup>
             <CommandGroup className="mx-2 p-0 pb-2" heading="Templates">
-              <Commands push={push} pages={TEMPLATES_PAGES} />
+              <Commands
+                push={push}
+                pages={TEMPLATES_PAGES}
+                setCurrentPageLabel={setCurrentPageLabel}
+              />
             </CommandGroup>
             <CommandGroup className="mx-2 p-0 pb-2" heading="Settings">
-              <Commands push={push} pages={SETTINGS_PAGES} />
+              <Commands
+                push={push}
+                pages={SETTINGS_PAGES}
+                setCurrentPageLabel={setCurrentPageLabel}
+              />
             </CommandGroup>
             <CommandGroup className="mx-2 p-0 pb-2" heading="Preferences">
               <CommandItem className="-mx-2 -my-1 rounded-lg" onSelect={() => addPage('theme')}>
@@ -218,7 +233,9 @@ export function CommandMenu({ open, onOpenChange }: CommandMenuProps) {
             )}
           </>
         )}
-        {currentPage === 'theme' && <ThemeCommands setTheme={setTheme} />}
+        {currentPage === 'theme' && (
+          <ThemeCommands currentPageLabel={theme || ''} setTheme={setTheme} />
+        )}
       </CommandList>
     </CommandDialog>
   );
@@ -227,8 +244,10 @@ export function CommandMenu({ open, onOpenChange }: CommandMenuProps) {
 const Commands = ({
   push,
   pages,
+  setCurrentPageLabel,
 }: {
   push: (_path: string) => void;
+  setCurrentPageLabel?: (_currentPageLabel: string) => void;
   pages: { label: string; path: string; shortcut?: string; value?: string }[];
 }) => {
   return pages.map((page, idx) => (
@@ -236,7 +255,12 @@ const Commands = ({
       className="-mx-2 -my-1 rounded-lg"
       key={page.path + idx}
       value={page.value ?? page.label}
-      onSelect={() => push(page.path)}
+      onSelect={() => {
+        push(page.path);
+        if (setCurrentPageLabel) {
+          setCurrentPageLabel(page.label);
+        }
+      }}
     >
       {page.label}
       {page.shortcut && <CommandShortcut>{page.shortcut}</CommandShortcut>}
@@ -244,7 +268,13 @@ const Commands = ({
   ));
 };
 
-const ThemeCommands = ({ setTheme }: { setTheme: (_theme: string) => void }) => {
+const ThemeCommands = ({
+  setTheme,
+  currentPageLabel,
+}: {
+  currentPageLabel: string;
+  setTheme: (_theme: string) => void;
+}) => {
   const THEMES = useMemo(
     () => [
       { label: 'Light Mode', theme: THEMES_TYPE.LIGHT, icon: Sun },
@@ -254,14 +284,28 @@ const ThemeCommands = ({ setTheme }: { setTheme: (_theme: string) => void }) => 
     [],
   );
 
-  return THEMES.map((theme) => (
-    <CommandItem
-      key={theme.theme}
-      onSelect={() => setTheme(theme.theme)}
-      className="-my-1 mx-2 rounded-lg first:mt-2 last:mb-2"
+  return (
+    <Command
+      value={
+        currentPageLabel === 'light'
+          ? 'Light Mode'
+          : currentPageLabel === 'dark'
+          ? 'Dark Mode'
+          : 'System Theme'
+      }
     >
-      <theme.icon className="mr-2" />
-      {theme.label}
-    </CommandItem>
-  ));
+      <CommandGroup>
+        {THEMES.map((theme) => (
+          <CommandItem
+            key={theme.theme}
+            onSelect={() => setTheme(theme.theme)}
+            className="-my-1 mx-2 rounded-lg first:mt-2 last:mb-2"
+          >
+            <theme.icon className="mr-2" />
+            {theme.label}
+          </CommandItem>
+        ))}
+      </CommandGroup>
+    </Command>
+  );
 };
