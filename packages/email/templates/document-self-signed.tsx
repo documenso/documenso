@@ -36,7 +36,7 @@ export const DocumentSelfSignedEmailTemplate = ({
               <Section className="p-2">
                 <Img
                   src={getAssetUrl('/static/logo.png')}
-                  alt="Documenso Logo"
+                  alt="MonTampon Logo"
                   className="mb-4 h-6"
                 />
 

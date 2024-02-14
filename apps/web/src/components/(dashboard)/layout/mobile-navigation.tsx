@@ -51,7 +51,7 @@ export const MobileNavigation = ({ isMenuOpen, onMenuOpenChange }: MobileNavigat
         <Link href="/" onClick={handleMenuItemClick}>
           <Image
             src={LogoImage}
-            alt="Documenso Logo"
+            alt="MonTampon Logo"
             className="dark:invert"
             width={170}
             height={25}
@@ -90,7 +90,7 @@ export const MobileNavigation = ({ isMenuOpen, onMenuOpenChange }: MobileNavigat
           </div>
 
           <p className="text-muted-foreground text-sm">
-            © {new Date().getFullYear()} Documenso, Inc. All rights reserved.
+            © {new Date().getFullYear()} MonTampon, Inc. All rights reserved.
           </p>
         </div>
       </SheetContent>

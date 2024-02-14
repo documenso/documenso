@@ -48,7 +48,7 @@ jobs:
             console.log(`Issue Count For ${username}: ${issueCount}`);
 
             if (issueCount > 3) {
-              let issueCountMessage = `### 🚨 Documenso Police 🚨`;
+              let issueCountMessage = `### 🚨 MonTampon Police 🚨`;
               issueCountMessage += `\n@${username} has ${issueCount} open issues assigned already. Consider whether this issue should be assigned to them or left open for another contributor.`;
 
               await octokit.request('POST /repos/{owner}/{repo}/issues/{issue_number}/comments', {

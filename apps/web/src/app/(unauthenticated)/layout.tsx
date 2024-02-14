@@ -11,8 +11,8 @@ type UnauthenticatedLayoutProps = {
 
 export const metadata: Metadata = {
   title: {
-    template: '%s | Documenso',
-    default: 'Documenso',
+    template: '%s | MonTampon',
+    default: 'MonTampon',
   },
 };
 

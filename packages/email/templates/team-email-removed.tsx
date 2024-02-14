@@ -20,7 +20,7 @@ export const TeamEmailRemovedTemplate = ({
   teamName = 'Team Name',
   teamUrl = 'demo',
 }: TeamEmailRemovedTemplateProps) => {
-  const previewText = `Team email removed for ${teamName} on Documenso`;
+  const previewText = `Team email removed for ${teamName} on MonTampon`;
 
   return (
     <Html>

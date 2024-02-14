@@ -33,7 +33,7 @@ export const TeamTransferRequestTemplate = ({
   teamUrl = 'demo',
   token = '',
 }: TeamTransferRequestTemplateProps) => {
-  const previewText = 'Accept team transfer request on Documenso';
+  const previewText = 'Accept team transfer request on MonTampon';
 
   return (
     <Html>

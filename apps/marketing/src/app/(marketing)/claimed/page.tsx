@@ -79,7 +79,7 @@ export default async function ClaimedPlanPage({ searchParams = {} }: ClaimedPlan
       </p>
 
       <p className="text-muted-foreground mt-4 max-w-prose text-base md:text-lg">
-        But today is that day, by signing up to Documenso, you're joining a movement of people who
+        But today is that day, by signing up to MonTampon, you're joining a movement of people who
         want to make the world a better place.
       </p>
 

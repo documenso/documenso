@@ -85,7 +85,7 @@ export default async function VerifyEmailPage({ params: { token } }: PageProps) 
         <h2 className="text-2xl font-bold md:text-4xl">Email Confirmed!</h2>
 
         <p className="text-muted-foreground mt-4">
-          Your email has been successfully confirmed! You can now use all features of Documenso.
+          Your email has been successfully confirmed! You can now use all features of MonTampon.
         </p>
 
         <Button className="mt-4" asChild>

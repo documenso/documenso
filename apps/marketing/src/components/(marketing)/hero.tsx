@@ -159,7 +159,7 @@ export const Hero = ({ className, ...props }: HeroProps) => {
               >
                 <img
                   src="https://api.producthunt.com/widgets/embed-image/v1/top-post-badge.svg?post_id=395047&theme=light&period=daily"
-                  alt="Documenso - The open source DocuSign alternative | Product Hunt"
+                  alt="MonTampon - The open source DocuSign alternative | Product Hunt"
                   style={{ width: '250px', height: '54px' }}
                 />
               </Link>
@@ -188,7 +188,7 @@ export const Hero = ({ className, ...props }: HeroProps) => {
           animate="animate"
         >
           <Widget className="mt-12">
-            <strong>Documenso Supporter Pledge</strong>
+            <strong>MonTampon Supporter Pledge</strong>
             <p className="w-full max-w-[70ch]">
               Our mission is to create an open signing infrastructure that empowers the world,
               enabling businesses to embrace openness, cooperation, and transparency. We believe
@@ -198,14 +198,14 @@ export const Hero = ({ className, ...props }: HeroProps) => {
             </p>
 
             <p className="w-full max-w-[70ch]">
-              Through our platform, called Documenso, we strive to earn your trust by allowing
+              Through our platform, called MonTampon, we strive to earn your trust by allowing
               self-hosting and providing complete visibility into its inner workings. We value
               inclusivity and foster an environment where diverse perspectives and contributions are
               welcomed, even though we may not implement them all.
             </p>
 
             <p className="w-full max-w-[70ch]">
-              At Documenso, we envision a web-enabled future for business and contracts, and we are
+              At MonTampon, we envision a web-enabled future for business and contracts, and we are
               committed to being the leading provider of open signing infrastructure. By combining
               exceptional product design with open-source principles, we aim to deliver a robust and
               well-designed application that exceeds your expectations.
@@ -220,7 +220,7 @@ export const Hero = ({ className, ...props }: HeroProps) => {
 
             <p className="w-full max-w-[70ch]">
               Today we invite you to join us on this journey: By signing this mission statement you
-              signal your support of Documenso's mission{' '}
+              signal your support of MonTampon's mission{' '}
               <span className="bg-primary text-black">
                 (in a non-legally binding, but heartfelt way)
               </span>{' '}
@@ -234,7 +234,7 @@ export const Hero = ({ className, ...props }: HeroProps) => {
 
             <div>
               <strong>Timur Ercan & Lucas Smith</strong>
-              <p className="mt-1">Co-Founders, Documenso</p>
+              <p className="mt-1">Co-Founders, MonTampon</p>
             </div>
           </Widget>
         </motion.div>

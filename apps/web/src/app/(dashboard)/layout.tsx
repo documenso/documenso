@@ -17,7 +17,7 @@ import { NextAuthProvider } from '~/providers/next-auth';
 
 export const metadata: Metadata = {
   title: {
-    template: '%s | Documenso',
+    template: '%s | MonTampon',
     default: 'Dashboard',
   },
 };

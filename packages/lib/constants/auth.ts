@@ -3,7 +3,7 @@ import { IdentityProvider, UserSecurityAuditLogType } from '@documenso/prisma/cl
 export const SALT_ROUNDS = 12;
 
 export const IDENTITY_PROVIDER_NAME: { [key in IdentityProvider]: string } = {
-  [IdentityProvider.DOCUMENSO]: 'Documenso',
+  [IdentityProvider.DOCUMENSO]: 'MonTampon',
   [IdentityProvider.GOOGLE]: 'Google',
 };
 
