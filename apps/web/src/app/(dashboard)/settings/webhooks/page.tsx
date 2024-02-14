@@ -1,5 +1,7 @@
 'use client';
 
+import Link from 'next/link';
+
 import { Zap } from 'lucide-react';
 import { ToggleLeft, ToggleRight } from 'lucide-react';
 
@@ -22,7 +24,7 @@ export default function WebhookPage() {
         <CreateWebhookDialog />
       </SettingsHeader>
 
-      {webhooks?.length === 0 && (
+      {webhooks && webhooks.length === 0 && (
         // TODO: Perhaps add some illustrations here to make the page more engaging
         <div className="mb-4">
           <p className="text-muted-foreground mt-2 text-sm italic">
@@ -31,7 +33,7 @@ export default function WebhookPage() {
         </div>
       )}
 
-      {webhooks?.length > 0 && (
+      {webhooks && webhooks.length > 0 && (
         <div className="mt-4 flex max-w-xl flex-col gap-y-4">
           {webhooks?.map((webhook) => (
             <div key={webhook.id} className="border-border rounded-lg border p-4">
@@ -41,9 +43,9 @@ export default function WebhookPage() {
                   <p className="text-muted-foreground">{webhook.webhookUrl}</p>
                   <h4 className="mt-4 text-lg font-semibold">Event triggers</h4>
                   {webhook.eventTriggers.map((trigger, index) => (
-                    <p key={index} className="text-muted-foreground flex flex-row items-center">
-                      <Zap className="mr-1 h-4 w-4 fill-yellow-400 stroke-yellow-600" /> {trigger}
-                    </p>
+                    <span key={index} className="text-muted-foreground flex flex-row items-center">
+                      <Zap className="mr-1 h-4 w-4" /> {trigger}
+                    </span>
                   ))}
                   {webhook.enabled ? (
                     <h4 className="mt-4 flex items-center gap-2 text-lg">
@@ -57,8 +59,8 @@ export default function WebhookPage() {
                 </div>
               </div>
               <div className="flex flex-col-reverse space-y-2 space-y-reverse sm:flex-row sm:justify-end sm:space-x-2 sm:space-y-0">
-                <Button variant="secondary" className="">
-                  Edit
+                <Button asChild variant="outline">
+                  <Link href={`/settings/webhooks/${webhook.id}`}>Edit</Link>
                 </Button>
                 <DeleteWebhookDialog webhook={webhook}>
                   <Button variant="destructive">Delete</Button>

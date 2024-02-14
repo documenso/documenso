@@ -14,6 +14,8 @@ import {
 } from '@documenso/ui/primitives/command';
 import { Popover, PopoverContent, PopoverTrigger } from '@documenso/ui/primitives/popover';
 
+import { truncateTitle } from '~/helpers/truncate-title';
+
 type ComboboxProps = {
   listValues: string[];
   onChange: (_values: string[]) => void;
@@ -53,13 +55,13 @@ const MultiSelectCombobox = ({ listValues, onChange }: ComboboxProps) => {
           aria-expanded={isOpen}
           className="w-[200px] justify-between"
         >
-          {selectedValues.length > 0 ? selectedValues.join(', ') : 'Select values...'}
+          {selectedValues.length > 0 ? selectedValues.length + ' selected...' : 'Select values...'}
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
       <PopoverContent className="z-9999 w-[200px] p-0">
         <Command>
-          <CommandInput placeholder={selectedValues.join(', ')} />
+          <CommandInput placeholder={truncateTitle(selectedValues.join(', '), 15)} />
           <CommandEmpty>No value found.</CommandEmpty>
           <CommandGroup>
             {allEvents.map((value: string, i: number) => (

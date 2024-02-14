@@ -11,10 +11,22 @@ export const ZCreateWebhookFormSchema = z.object({
   enabled: z.boolean(),
 });
 
-export const ZDeleteWebhookSchema = z.object({
+export const ZGetWebhookByIdQuerySchema = z.object({
+  id: z.number(),
+});
+
+export const ZEditWebhookMutationSchema = ZCreateWebhookFormSchema.extend({
+  id: z.number(),
+});
+
+export const ZDeleteWebhookMutationSchema = z.object({
   id: z.number(),
 });
 
 export type TCreateWebhookFormSchema = z.infer<typeof ZCreateWebhookFormSchema>;
 
-export type TDeleteWebhookSchema = z.infer<typeof ZDeleteWebhookSchema>;
+export type TGetWebhookByIdQuerySchema = z.infer<typeof ZGetWebhookByIdQuerySchema>;
+
+export type TDeleteWebhookMutationSchema = z.infer<typeof ZDeleteWebhookMutationSchema>;
+
+export type TEditWebhookMutationSchema = z.infer<typeof ZEditWebhookMutationSchema>;
