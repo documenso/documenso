@@ -92,6 +92,10 @@ const config = {
       },
     ];
   },
+  generateBuildId: async () => {
+    // This could be anything, using the latest git hash
+    return process.env.VERSION || Date.now() + Math.round(Math.random() * 2441139);
+  },
 };
 
 module.exports = withContentlayer(config);
