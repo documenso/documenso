@@ -58,7 +58,7 @@ const config = {
     return [
       {
         source: '/ingest/:path*',
-        destination: 'https://eu.posthog.com/:path*',
+        destination: 'https://app.posthog.com/:path*',
       },
     ];
   },
