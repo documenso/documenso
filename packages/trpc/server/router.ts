@@ -24,7 +24,7 @@ export const appRouter = router({
   singleplayer: singleplayerRouter,
   team: teamRouter,
   template: templateRouter,
-  twoFactorAuthentication: twoFactorAuthenticationRouter,
+  twoFactorAuthentication: twoFactorAuthenticationRouter
 });
 
 export type AppRouter = typeof appRouter;
