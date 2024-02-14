@@ -20,8 +20,9 @@ import {
 import { useSession } from 'next-auth/react';
 
 import { downloadPDF } from '@documenso/lib/client-only/download-pdf';
-import type { Document, Recipient, User } from '@documenso/prisma/client';
+import { formatDocumentsPath } from '@documenso/lib/utils/teams';
 import { DocumentStatus, RecipientRole } from '@documenso/prisma/client';
+import type { Document, Recipient, Team, User } from '@documenso/prisma/client';
 import type { DocumentWithData } from '@documenso/prisma/types/document-with-data';
 import { trpc as trpcClient } from '@documenso/trpc/client';
 import { DocumentShareButton } from '@documenso/ui/components/document/document-share-button';
@@ -42,10 +43,12 @@ export type DataTableActionDropdownProps = {
   row: Document & {
     User: Pick<User, 'id' | 'name' | 'email'>;
     Recipient: Recipient[];
+    team: Pick<Team, 'id' | 'url'> | null;
   };
+  team?: Pick<Team, 'id' | 'url'>;
 };
 
-export const DataTableActionDropdown = ({ row }: DataTableActionDropdownProps) => {
+export const DataTableActionDropdown = ({ row, team }: DataTableActionDropdownProps) => {
   const { data: session } = useSession();
   const { toast } = useToast();
 
@@ -65,6 +68,9 @@ export const DataTableActionDropdown = ({ row }: DataTableActionDropdownProps) =
   const isComplete = row.status === DocumentStatus.COMPLETED;
   // const isSigned = recipient?.signingStatus === SigningStatus.SIGNED;
   const isDocumentDeletable = isOwner;
+  const isCurrentTeamDocument = team && row.team?.url === team.url;
+
+  const documentsPath = formatDocumentsPath(team?.url);
 
   const onDownloadClick = async () => {
     try {
@@ -73,6 +79,7 @@ export const DataTableActionDropdown = ({ row }: DataTableActionDropdownProps) =
       if (!recipient) {
         document = await trpcClient.document.getDocumentById.query({
           id: row.id,
+          teamId: team?.id,
         });
       } else {
         document = await trpcClient.document.getDocumentByToken.query({
@@ -107,7 +114,7 @@ export const DataTableActionDropdown = ({ row }: DataTableActionDropdownProps) =
       <DropdownMenuContent className="w-52" align="start" forceMount>
         <DropdownMenuLabel>Action</DropdownMenuLabel>
 
-        {recipient?.role !== RecipientRole.CC && (
+        {recipient && recipient?.role !== RecipientRole.CC && (
           <DropdownMenuItem disabled={!recipient || isComplete} asChild>
             <Link href={`/sign/${recipient?.token}`}>
               {recipient?.role === RecipientRole.VIEWER && (
@@ -134,8 +141,8 @@ export const DataTableActionDropdown = ({ row }: DataTableActionDropdownProps) =
           </DropdownMenuItem>
         )}
 
-        <DropdownMenuItem disabled={!isOwner || isComplete} asChild>
-          <Link href={`/documents/${row.id}`}>
+        <DropdownMenuItem disabled={(!isOwner && !isCurrentTeamDocument) || isComplete} asChild>
+          <Link href={`${documentsPath}/${row.id}`}>
             <Edit className="mr-2 h-4 w-4" />
             Edit
           </Link>
@@ -163,7 +170,7 @@ export const DataTableActionDropdown = ({ row }: DataTableActionDropdownProps) =
 
         <DropdownMenuLabel>Share</DropdownMenuLabel>
 
-        <ResendDocumentActionItem document={row} recipients={nonSignedRecipients} />
+        <ResendDocumentActionItem document={row} recipients={nonSignedRecipients} team={team} />
 
         <DocumentShareButton
           documentId={row.id}
@@ -193,6 +200,7 @@ export const DataTableActionDropdown = ({ row }: DataTableActionDropdownProps) =
           id={row.id}
           open={isDuplicateDialogOpen}
           onOpenChange={setDuplicateDialogOpen}
+          team={team}
         />
       )}
     </DropdownMenu>

@@ -20,7 +20,7 @@ import { LuGithub } from 'react-icons/lu';
 
 import { useFeatureFlags } from '@documenso/lib/client-only/providers/feature-flag';
 import { isAdmin } from '@documenso/lib/next-auth/guards/is-admin';
-import { recipientInitials } from '@documenso/lib/utils/recipient-formatter';
+import { extractInitials } from '@documenso/lib/utils/recipient-formatter';
 import type { User } from '@documenso/prisma/client';
 import { Avatar, AvatarFallback } from '@documenso/ui/primitives/avatar';
 import { Button } from '@documenso/ui/primitives/button';
@@ -51,7 +51,7 @@ export const ProfileDropdown = ({ user }: ProfileDropdownProps) => {
   const isBillingEnabled = getFlag('app_billing');
 
   const avatarFallback = user.name
-    ? recipientInitials(user.name)
+    ? extractInitials(user.name)
     : user.email.slice(0, 1).toUpperCase();
 
   return (

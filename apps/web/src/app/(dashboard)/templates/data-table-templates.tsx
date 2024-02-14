@@ -28,6 +28,9 @@ type TemplatesDataTableProps = {
   perPage: number;
   page: number;
   totalPages: number;
+  documentRootPath: string;
+  templateRootPath: string;
+  teamId?: number;
 };
 
 export const TemplatesDataTable = ({
@@ -35,6 +38,9 @@ export const TemplatesDataTable = ({
   perPage,
   page,
   totalPages,
+  documentRootPath,
+  templateRootPath,
+  teamId,
 }: TemplatesDataTableProps) => {
   const [isPending, startTransition] = useTransition();
   const updateSearchParams = useUpdateSearchParams();
@@ -70,7 +76,7 @@ export const TemplatesDataTable = ({
         duration: 5000,
       });
 
-      router.push(`/documents/${id}`);
+      router.push(`${documentRootPath}/${id}`);
     } catch (err) {
       toast({
         title: 'Error',
@@ -83,7 +89,7 @@ export const TemplatesDataTable = ({
   return (
     <div className="relative">
       {remaining.documents === 0 && (
-        <Alert className="mb-4 mt-5">
+        <Alert variant="warning" className="mb-4">
           <AlertTriangle className="h-4 w-4" />
           <AlertTitle>Document Limit Exceeded!</AlertTitle>
           <AlertDescription className="mt-2">
@@ -131,7 +137,12 @@ export const TemplatesDataTable = ({
                     {!isRowLoading && <Plus className="-ml-1 mr-2 h-4 w-4" />}
                     Use Template
                   </Button>
-                  <DataTableActionDropdown row={row.original} />
+
+                  <DataTableActionDropdown
+                    row={row.original}
+                    teamId={teamId}
+                    templateRootPath={templateRootPath}
+                  />
                 </div>
               );
             },

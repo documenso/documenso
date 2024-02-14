@@ -118,7 +118,7 @@ export const NameField = ({ field, recipient }: NameFieldProps) => {
             <span className="text-muted-foreground">({recipient.email})</span>
           </DialogTitle>
 
-          <div className="py-4">
+          <div>
             <Label htmlFor="signature">Full Name</Label>
 
             <Input
