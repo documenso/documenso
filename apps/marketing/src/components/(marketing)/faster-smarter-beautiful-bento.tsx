@@ -58,7 +58,8 @@ export const FasterSmarterBeautifulBento = ({
 
             <div className="flex items-center justify-center p-8">
               <Image
-                src={cardBeautifulFigure}
+                src={cardB
+                  eautifulFigure}
                 alt="its fast"
                 className="w-full max-w-xs dark:contrast-[70%] dark:hue-rotate-180 dark:invert"
               />

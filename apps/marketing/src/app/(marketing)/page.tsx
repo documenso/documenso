@@ -13,7 +13,7 @@ import { ShareConnectPaidWidgetBento } from '~/components/(marketing)/share-conn
 export const revalidate = 600;
 export const metadata: Metadata = {
   title: {
-    absolute: 'MonTampon - The Open Source DocuSign Alternative',
+    absolute: 'MonTampon - The DocuSign Alternative',
   },
 };
 
