@@ -124,9 +124,7 @@ export const ProfileForm = ({ className, user }: ProfileFormProps) => {
           duration: 5000,
         });
 
-        await signOut({ callbackUrl: '/' });
-
-        return;
+        return await signOut({ callbackUrl: '/' });
       }
 
       const { token } = deleteAccountTwoFactorTokenForm.getValues();

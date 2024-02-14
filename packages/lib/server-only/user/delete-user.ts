@@ -4,7 +4,7 @@ export type DeleteUserOptions = {
   email: string;
 };
 
-export const deleteUser = async ({ email }: DeleteUserOptions) => {
+export const deletedServiceAccount = async ({ email }: DeleteUserOptions) => {
   const user = await prisma.user.findFirst({
     where: {
       email: {

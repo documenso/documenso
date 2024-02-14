@@ -1,7 +1,6 @@
 import { TRPCError } from '@trpc/server';
 
-import { deleteStripeCustomer } from '@documenso/ee/server-only/stripe/delete-customer';
-import { deleteUser } from '@documenso/lib/server-only/user/delete-user';
+import { deletedServiceAccount } from '@documenso/lib/server-only/user/delete-user';
 import { findUserSecurityAuditLogs } from '@documenso/lib/server-only/user/find-user-security-audit-logs';
 import { forgotPassword } from '@documenso/lib/server-only/user/forgot-password';
 import { getUserById } from '@documenso/lib/server-only/user/get-user-by-id';
@@ -161,9 +160,8 @@ export const profileRouter = router({
   deleteAccount: authenticatedProcedure.mutation(async ({ ctx }) => {
     try {
       const user = ctx.user;
-      await deleteStripeCustomer(user);
 
-      return await deleteUser(user);
+      return await deletedServiceAccount(user);
     } catch (err) {
       let message = 'We were unable to delete your account. Please try again.';
 

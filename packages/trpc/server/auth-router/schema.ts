@@ -26,9 +26,3 @@ export const ZSignUpMutationSchema = z.object({
 export type TSignUpMutationSchema = z.infer<typeof ZSignUpMutationSchema>;
 
 export const ZVerifyPasswordMutationSchema = ZSignUpMutationSchema.pick({ password: true });
-
-export const ZDeleteAccountMutationSchema = z.object({
-  email: z.string().email(),
-});
-
-export type TDeleteAccountMutationSchema = z.infer<typeof ZDeleteAccountMutationSchema>;
