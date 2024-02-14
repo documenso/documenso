@@ -12,8 +12,8 @@ import {
  * Documents
  */
 export const ZGetDocumentsQuerySchema = z.object({
-  page: z.string().optional(),
-  perPage: z.string().optional(),
+  page: z.number().min(1).optional().default(1),
+  perPage: z.number().min(1).optional().default(1),
 });
 
 export type TGetDocumentsQuerySchema = z.infer<typeof ZGetDocumentsQuerySchema>;
@@ -55,13 +55,15 @@ export const ZCreateDocumentMutationSchema = z.object({
       role: z.nativeEnum(RecipientRole).optional().default(RecipientRole.SIGNER),
     }),
   ),
-  meta: z.object({
-    subject: z.string(),
-    message: z.string(),
-    timezone: z.string(),
-    dateFormat: z.string(),
-    redirectUrl: z.string(),
-  }),
+  meta: z
+    .object({
+      subject: z.string(),
+      message: z.string(),
+      timezone: z.string(),
+      dateFormat: z.string(),
+      redirectUrl: z.string(),
+    })
+    .partial(),
 });
 
 export type TCreateDocumentMutationSchema = z.infer<typeof ZCreateDocumentMutationSchema>;
@@ -142,6 +144,7 @@ export const ZDeleteFieldMutationSchema = null;
 export type TDeleteFieldMutationSchema = typeof ZDeleteFieldMutationSchema;
 
 export const ZSuccessfulFieldResponseSchema = z.object({
+  id: z.number(),
   documentId: z.number(),
   recipientId: z.number(),
   type: z.nativeEnum(FieldType),
