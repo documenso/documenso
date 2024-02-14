@@ -3,7 +3,6 @@ import { authRouter } from './auth-router/router';
 import { cryptoRouter } from './crypto/router';
 import { documentRouter } from './document-router/router';
 import { fieldRouter } from './field-router/router';
-import { healthRouter } from './health-router/router';
 import { profileRouter } from './profile-router/router';
 import { recipientRouter } from './recipient-router/router';
 import { shareLinkRouter } from './share-link-router/router';
@@ -25,8 +24,7 @@ export const appRouter = router({
   singleplayer: singleplayerRouter,
   team: teamRouter,
   template: templateRouter,
-  twoFactorAuthentication: twoFactorAuthenticationRouter,
-  health: healthRouter
+  twoFactorAuthentication: twoFactorAuthenticationRouter
 });
 
 export type AppRouter = typeof appRouter;
