@@ -15,6 +15,7 @@ import { updateTitle } from '@documenso/lib/server-only/document/update-title';
 import { setFieldsForDocument } from '@documenso/lib/server-only/field/set-fields-for-document';
 import { setRecipientsForDocument } from '@documenso/lib/server-only/recipient/set-recipients-for-document';
 import { symmetricEncrypt } from '@documenso/lib/universal/crypto';
+import { extractNextApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 
 import { authenticatedProcedure, procedure, router } from '../trpc';
 import {
@@ -36,10 +37,8 @@ export const documentRouter = router({
     .input(ZGetDocumentByIdQuerySchema)
     .query(async ({ input, ctx }) => {
       try {
-        const { id } = input;
-
         return await getDocumentById({
-          id,
+          ...input,
           userId: ctx.user.id,
         });
       } catch (err) {
@@ -73,9 +72,9 @@ export const documentRouter = router({
     .input(ZCreateDocumentMutationSchema)
     .mutation(async ({ input, ctx }) => {
       try {
-        const { title, documentDataId } = input;
+        const { title, documentDataId, teamId } = input;
 
-        const { remaining } = await getServerLimits({ email: ctx.user.email });
+        const { remaining } = await getServerLimits({ email: ctx.user.email, teamId });
 
         if (remaining.documents <= 0) {
           throw new TRPCError({
@@ -87,8 +86,10 @@ export const documentRouter = router({
 
         return await createDocument({
           userId: ctx.user.id,
+          teamId,
           title,
           documentDataId,
+          requestMetadata: extractNextApiRequestMetadata(ctx.req),
         });
       } catch (err) {
         if (err instanceof TRPCError) {
@@ -132,6 +133,7 @@ export const documentRouter = router({
         title,
         userId,
         documentId,
+        requestMetadata: extractNextApiRequestMetadata(ctx.req),
       });
     }),
 
@@ -145,6 +147,7 @@ export const documentRouter = router({
           userId: ctx.user.id,
           documentId,
           recipients,
+          requestMetadata: extractNextApiRequestMetadata(ctx.req),
         });
       } catch (err) {
         console.error(err);
@@ -167,6 +170,7 @@ export const documentRouter = router({
           userId: ctx.user.id,
           documentId,
           fields,
+          requestMetadata: extractNextApiRequestMetadata(ctx.req),
         });
       } catch (err) {
         console.error(err);
@@ -199,6 +203,7 @@ export const documentRouter = router({
           documentId,
           password: securePassword,
           userId: ctx.user.id,
+          requestMetadata: extractNextApiRequestMetadata(ctx.req),
         });
       } catch (err) {
         console.error(err);
@@ -216,20 +221,23 @@ export const documentRouter = router({
       try {
         const { documentId, meta } = input;
 
-        if (meta.message || meta.subject || meta.timezone || meta.dateFormat) {
+        if (meta.message || meta.subject || meta.timezone || meta.dateFormat || meta.redirectUrl) {
           await upsertDocumentMeta({
             documentId,
             subject: meta.subject,
             message: meta.message,
             dateFormat: meta.dateFormat,
             timezone: meta.timezone,
+            redirectUrl: meta.redirectUrl,
             userId: ctx.user.id,
+            requestMetadata: extractNextApiRequestMetadata(ctx.req),
           });
         }
 
         return await sendDocument({
           userId: ctx.user.id,
           documentId,
+          requestMetadata: extractNextApiRequestMetadata(ctx.req),
         });
       } catch (err) {
         console.error(err);
@@ -245,12 +253,10 @@ export const documentRouter = router({
     .input(ZResendDocumentMutationSchema)
     .mutation(async ({ input, ctx }) => {
       try {
-        const { documentId, recipients } = input;
-
         return await resendDocument({
           userId: ctx.user.id,
-          documentId,
-          recipients,
+          ...input,
+          requestMetadata: extractNextApiRequestMetadata(ctx.req),
         });
       } catch (err) {
         console.error(err);
@@ -266,14 +272,13 @@ export const documentRouter = router({
     .input(ZGetDocumentByIdQuerySchema)
     .mutation(async ({ input, ctx }) => {
       try {
-        const { id } = input;
-
         return await duplicateDocumentById({
-          id,
           userId: ctx.user.id,
+          ...input,
         });
       } catch (err) {
         console.log(err);
+
         throw new TRPCError({
           code: 'BAD_REQUEST',
           message: 'We are unable to duplicate this document. Please try again later.',

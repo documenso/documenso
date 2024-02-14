@@ -1,10 +1,10 @@
-import { NextApiRequest, NextApiResponse } from 'next';
+import type { NextApiRequest, NextApiResponse } from 'next';
 
 import { getToken } from 'next-auth/jwt';
 import { match } from 'ts-pattern';
 
 import { ERROR_CODES } from './errors';
-import { TLimitsErrorResponseSchema, TLimitsResponseSchema } from './schema';
+import type { TLimitsErrorResponseSchema, TLimitsResponseSchema } from './schema';
 import { getServerLimits } from './server';
 
 export const limitsHandler = async (
@@ -14,7 +14,19 @@ export const limitsHandler = async (
   try {
     const token = await getToken({ req });
 
-    const limits = await getServerLimits({ email: token?.email });
+    const rawTeamId = req.headers['team-id'];
+
+    let teamId: number | null = null;
+
+    if (typeof rawTeamId === 'string' && !isNaN(parseInt(rawTeamId, 10))) {
+      teamId = parseInt(rawTeamId, 10);
+    }
+
+    if (!teamId && rawTeamId) {
+      throw new Error(ERROR_CODES.INVALID_TEAM_ID);
+    }
+
+    const limits = await getServerLimits({ email: token?.email, teamId });
 
     return res.status(200).json(limits);
   } catch (err) {

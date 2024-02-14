@@ -2,6 +2,8 @@ import { expect, test } from '@playwright/test';
 
 import { TEST_USERS } from '@documenso/prisma/seed/pr-711-deletion-of-documents';
 
+import { manualLogin, manualSignout } from './fixtures/authentication';
+
 test.describe.configure({ mode: 'serial' });
 
 test('[PR-711]: seeded documents should be visible', async ({ page }) => {
@@ -19,17 +21,11 @@ test('[PR-711]: seeded documents should be visible', async ({ page }) => {
   await expect(page.getByRole('link', { name: 'Document 1 - Pending' })).toBeVisible();
   await expect(page.getByRole('link', { name: 'Document 1 - Draft' })).toBeVisible();
 
-  await page.getByTitle('Profile Dropdown').click();
-  await page.getByRole('menuitem', { name: 'Sign Out' }).click();
-
-  await page.waitForURL('/signin');
+  await manualSignout({ page });
 
   for (const recipient of recipients) {
-    await page.goto('/signin');
-
-    await page.getByLabel('Email').fill(recipient.email);
-    await page.getByLabel('Password', { exact: true }).fill(recipient.password);
-    await page.getByRole('button', { name: 'Sign In' }).click();
+    await page.waitForURL('/signin');
+    await manualLogin({ page, email: recipient.email, password: recipient.password });
 
     await page.waitForURL('/documents');
 
@@ -38,10 +34,7 @@ test('[PR-711]: seeded documents should be visible', async ({ page }) => {
 
     await expect(page.getByRole('link', { name: 'Document 1 - Draft' })).not.toBeVisible();
 
-    await page.getByTitle('Profile Dropdown').click();
-    await page.getByRole('menuitem', { name: 'Sign Out' }).click();
-
-    await page.waitForURL('/signin');
+    await manualSignout({ page });
   }
 });
 
@@ -74,13 +67,10 @@ test('[PR-711]: deleting a completed document should not remove it from recipien
 
   await expect(page.getByRole('row', { name: /Document 1 - Completed/ })).not.toBeVisible();
 
-  // signout
-  await page.getByTitle('Profile Dropdown').click();
-  await page.getByRole('menuitem', { name: 'Sign Out' }).click();
-
-  await page.waitForURL('/signin');
+  await manualSignout({ page });
 
   for (const recipient of recipients) {
+    await page.waitForURL('/signin');
     await page.goto('/signin');
 
     // sign in
@@ -96,11 +86,7 @@ test('[PR-711]: deleting a completed document should not remove it from recipien
     await expect(page.getByText('Everyone has signed').nth(0)).toBeVisible();
 
     await page.goto('/documents');
-
-    await page.getByTitle('Profile Dropdown').click();
-    await page.getByRole('menuitem', { name: 'Sign Out' }).click();
-
-    await page.waitForURL('/signin');
+    await manualSignout({ page });
   }
 });
 
@@ -115,11 +101,7 @@ test('[PR-711]: deleting a pending document should remove it from recipients', a
 
   await page.goto('/signin');
 
-  // sign in
-  await page.getByLabel('Email').fill(sender.email);
-  await page.getByLabel('Password', { exact: true }).fill(sender.password);
-  await page.getByRole('button', { name: 'Sign In' }).click();
-
+  await manualLogin({ page, email: sender.email, password: sender.password });
   await page.waitForURL('/documents');
 
   // open actions menu
@@ -133,19 +115,12 @@ test('[PR-711]: deleting a pending document should remove it from recipients', a
   await expect(page.getByRole('row', { name: /Document 1 - Pending/ })).not.toBeVisible();
 
   // signout
-  await page.getByTitle('Profile Dropdown').click();
-  await page.getByRole('menuitem', { name: 'Sign Out' }).click();
-
-  await page.waitForURL('/signin');
+  await manualSignout({ page });
 
   for (const recipient of recipients) {
-    await page.goto('/signin');
+    await page.waitForURL('/signin');
 
-    // sign in
-    await page.getByLabel('Email').fill(recipient.email);
-    await page.getByLabel('Password', { exact: true }).fill(recipient.password);
-    await page.getByRole('button', { name: 'Sign In' }).click();
-
+    await manualLogin({ page, email: recipient.email, password: recipient.password });
     await page.waitForURL('/documents');
 
     await expect(page.getByRole('link', { name: 'Document 1 - Pending' })).not.toBeVisible();
@@ -154,11 +129,9 @@ test('[PR-711]: deleting a pending document should remove it from recipients', a
     await expect(page.getByText(/document.*cancelled/i).nth(0)).toBeVisible();
 
     await page.goto('/documents');
+    await page.waitForURL('/documents');
 
-    await page.getByTitle('Profile Dropdown').click();
-    await page.getByRole('menuitem', { name: 'Sign Out' }).click();
-
-    await page.waitForURL('/signin');
+    await manualSignout({ page });
   }
 });
 
@@ -167,13 +140,7 @@ test('[PR-711]: deleting a draft document should remove it without additional pr
 }) => {
   const [sender] = TEST_USERS;
 
-  await page.goto('/signin');
-
-  // sign in
-  await page.getByLabel('Email').fill(sender.email);
-  await page.getByLabel('Password', { exact: true }).fill(sender.password);
-  await page.getByRole('button', { name: 'Sign In' }).click();
-
+  await manualLogin({ page, email: sender.email, password: sender.password });
   await page.waitForURL('/documents');
 
   // open actions menu

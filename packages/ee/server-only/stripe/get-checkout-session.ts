@@ -1,17 +1,21 @@
 'use server';
 
+import type Stripe from 'stripe';
+
 import { stripe } from '@documenso/lib/server-only/stripe';
 
 export type GetCheckoutSessionOptions = {
   customerId: string;
   priceId: string;
   returnUrl: string;
+  subscriptionMetadata?: Stripe.Metadata;
 };
 
 export const getCheckoutSession = async ({
   customerId,
   priceId,
   returnUrl,
+  subscriptionMetadata,
 }: GetCheckoutSessionOptions) => {
   'use server';
 
@@ -26,6 +30,9 @@ export const getCheckoutSession = async ({
     ],
     success_url: `${returnUrl}?success=true`,
     cancel_url: `${returnUrl}?canceled=true`,
+    subscription_data: {
+      metadata: subscriptionMetadata,
+    },
   });
 
   return session.url;

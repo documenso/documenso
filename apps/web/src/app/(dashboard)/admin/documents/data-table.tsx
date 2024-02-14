@@ -7,9 +7,9 @@ import Link from 'next/link';
 import { Loader } from 'lucide-react';
 
 import { useUpdateSearchParams } from '@documenso/lib/client-only/hooks/use-update-search-params';
-import { FindResultSet } from '@documenso/lib/types/find-result-set';
-import { recipientInitials } from '@documenso/lib/utils/recipient-formatter';
-import { Document, User } from '@documenso/prisma/client';
+import type { FindResultSet } from '@documenso/lib/types/find-result-set';
+import { extractInitials } from '@documenso/lib/utils/recipient-formatter';
+import type { Document, User } from '@documenso/prisma/client';
 import { Avatar, AvatarFallback } from '@documenso/ui/primitives/avatar';
 import { DataTable } from '@documenso/ui/primitives/data-table';
 import { DataTablePagination } from '@documenso/ui/primitives/data-table-pagination';
@@ -65,7 +65,7 @@ export const DocumentsDataTable = ({ results }: DocumentsDataTableProps) => {
             accessorKey: 'owner',
             cell: ({ row }) => {
               const avatarFallbackText = row.original.User.name
-                ? recipientInitials(row.original.User.name)
+                ? extractInitials(row.original.User.name)
                 : row.original.User.email.slice(0, 1).toUpperCase();
 
               return (

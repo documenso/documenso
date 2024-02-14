@@ -1,9 +1,11 @@
 import { z } from 'zod';
 
+import { URL_REGEX } from '@documenso/lib/constants/url-regex';
 import { DocumentStatus, FieldType, RecipientRole } from '@documenso/prisma/client';
 
 export const ZGetDocumentByIdQuerySchema = z.object({
   id: z.number().min(1),
+  teamId: z.number().min(1).optional(),
 });
 
 export type TGetDocumentByIdQuerySchema = z.infer<typeof ZGetDocumentByIdQuerySchema>;
@@ -17,6 +19,7 @@ export type TGetDocumentByTokenQuerySchema = z.infer<typeof ZGetDocumentByTokenQ
 export const ZCreateDocumentMutationSchema = z.object({
   title: z.string().min(1),
   documentDataId: z.string().min(1),
+  teamId: z.number().optional(),
 });
 
 export type TCreateDocumentMutationSchema = z.infer<typeof ZCreateDocumentMutationSchema>;
@@ -71,6 +74,12 @@ export const ZSendDocumentMutationSchema = z.object({
     message: z.string(),
     timezone: z.string(),
     dateFormat: z.string(),
+    redirectUrl: z
+      .string()
+      .optional()
+      .refine((value) => value === undefined || value === '' || URL_REGEX.test(value), {
+        message: 'Please enter a valid URL',
+      }),
   }),
 });
 
@@ -86,6 +95,7 @@ export type TSetPasswordForDocumentMutationSchema = z.infer<
 export const ZResendDocumentMutationSchema = z.object({
   documentId: z.number(),
   recipients: z.array(z.number()).min(1),
+  teamId: z.number().min(1).optional(),
 });
 
 export type TSendDocumentMutationSchema = z.infer<typeof ZSendDocumentMutationSchema>;
