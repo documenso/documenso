@@ -94,7 +94,7 @@ const config = {
   },
   generateBuildId: async () => {
     // This could be anything, using the latest git hash
-    return process.env.VERSION || Date.now() + Math.round(Math.random() * 2441139);
+    return String(process.env.VERSION || Date.now() + Math.round(Math.random() * 2441139));
   },
 };
 
