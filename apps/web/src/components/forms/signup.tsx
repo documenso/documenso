@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { signIn } from 'next-auth/react';
@@ -60,6 +61,7 @@ export const SignUpForm = ({ className, initialEmail, isGoogleSSOEnabled }: Sign
   const { toast } = useToast();
   const analytics = useAnalytics();
   const [isUploaded, setIsUploaded] = useState(false);
+  const router = useRouter();
 
   const form = useForm<TSignUpFormSchema>({
     values: {
@@ -86,10 +88,13 @@ export const SignUpForm = ({ className, initialEmail, isGoogleSSOEnabled }: Sign
         signatureType: isUploaded ? SignatureType.UPLOAD : SignatureType.DRAW,
       });
 
-      await signIn('credentials', {
-        email,
-        password,
-        callbackUrl: SIGN_UP_REDIRECT_PATH,
+      router.push(`/unverified-account`);
+
+      toast({
+        title: 'Registration Successful',
+        description:
+          'You have successfully registered. Please verify your account by clicking on the link you received in the email.',
+        duration: 5000,
       });
 
       analytics.capture('App: User Sign Up', {

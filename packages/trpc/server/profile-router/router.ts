@@ -142,7 +142,7 @@ export const profileRouter = router({
       try {
         const { email } = input;
 
-        return sendConfirmationToken({ email });
+        return await sendConfirmationToken({ email });
       } catch (err) {
         let message = 'We were unable to send a confirmation email. Please try again.';
 
