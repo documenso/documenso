@@ -1,18 +1,16 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import type * as DialogPrimitive from '@radix-ui/react-dialog';
-import { Mail, PlusCircle, Trash } from 'lucide-react';
-import { useFieldArray, useForm } from 'react-hook-form';
+import { FileUp, Mail, User, Users } from 'lucide-react';
+import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
 import { TEAM_MEMBER_ROLE_HIERARCHY, TEAM_MEMBER_ROLE_MAP } from '@documenso/lib/constants/teams';
 import { TeamMemberRole } from '@documenso/prisma/client';
 import { trpc } from '@documenso/trpc/react';
-import { ZCreateTeamMemberInvitesMutationSchema } from '@documenso/trpc/server/team-router/schema';
-import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
 import {
   Dialog,
@@ -39,7 +37,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@documenso/ui/primitives/select';
+import { Textarea } from '@documenso/ui/primitives/textarea';
 import { useToast } from '@documenso/ui/primitives/use-toast';
+
+export type Invitations = {
+  email: string;
+  role: 'ADMIN' | 'MANAGER' | 'MEMBER';
+}[];
 
 export type InviteTeamMembersDialogProps = {
   currentUserTeamRole: TeamMemberRole;
@@ -47,20 +51,20 @@ export type InviteTeamMembersDialogProps = {
   trigger?: React.ReactNode;
 } & Omit<DialogPrimitive.DialogProps, 'children'>;
 
-const ZInviteTeamMembersFormSchema = z
-  .object({
-    invitations: ZCreateTeamMemberInvitesMutationSchema.shape.invitations,
-  })
-  .refine(
-    (schema) => {
-      const emails = schema.invitations.map((invitation) => invitation.email.toLowerCase());
-
-      return new Set(emails).size === emails.length;
+const ZInviteTeamMembersFormSchema = z.object({
+  role: z.enum(['ADMIN', 'MANAGER', 'MEMBER']),
+  email: z.union([z.string().email(), z.array(z.string().email())]).refine(
+    (value) => {
+      if (Array.isArray(value)) {
+        const lowercaseEmails = value.map((email) => email.toLowerCase());
+        return new Set(lowercaseEmails).size === lowercaseEmails.length;
+      } else {
+        return true;
+      }
     },
-    // Dirty hack to handle errors when .root is populated for an array type
-    { message: 'Members must have unique emails', path: ['members__root'] },
-  );
-
+    { message: 'All email addresses must be unique' },
+  ),
+});
 type TInviteTeamMembersFormSchema = z.infer<typeof ZInviteTeamMembersFormSchema>;
 
 export const InviteTeamMembersDialog = ({
@@ -70,41 +74,61 @@ export const InviteTeamMembersDialog = ({
   ...props
 }: InviteTeamMembersDialogProps) => {
   const [open, setOpen] = useState(false);
+  const uploadRef = useRef<HTMLInputElement | null>(null);
+  const [invitationType, setInvitationType] = useState('INDIVIDIUAL');
 
   const { toast } = useToast();
 
   const form = useForm<TInviteTeamMembersFormSchema>({
     resolver: zodResolver(ZInviteTeamMembersFormSchema),
     defaultValues: {
-      invitations: [
-        {
-          email: '',
-          role: TeamMemberRole.MEMBER,
-        },
-      ],
+      email: '' || [''],
+      role: TeamMemberRole.MEMBER,
     },
-  });
-
-  const {
-    append: appendTeamMemberInvite,
-    fields: teamMemberInvites,
-    remove: removeTeamMemberInvite,
-  } = useFieldArray({
-    control: form.control,
-    name: 'invitations',
   });
 
   const { mutateAsync: createTeamMemberInvites } = trpc.team.createTeamMemberInvites.useMutation();
 
-  const onAddTeamMemberInvite = () => {
-    appendTeamMemberInvite({
-      email: '',
-      role: TeamMemberRole.MEMBER,
-    });
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files?.length) {
+      return;
+    }
+    const file = e.target.files[0];
+
+    if (file) {
+      const reader = new FileReader();
+      const emailRegex = /^([A-Z0-9_+-]+\.?)*[A-Z0-9_+-]@([A-Z0-9][A-Z0-9-]*\.)+[A-Z]{2,}$/i;
+      reader.onload = (e) => {
+        const contents = e?.target?.result as string;
+        const lines = contents.split('\n');
+        const validEmails = [];
+        for (const line of lines) {
+          const columns = line.split(/,|;|\|| /);
+          for (const column of columns) {
+            const email = column.trim().toLowerCase();
+
+            if (emailRegex.test(email)) {
+              validEmails.push(email);
+              break;
+            }
+          }
+        }
+
+        form.setValue('email', validEmails);
+      };
+
+      reader.readAsText(file);
+    }
   };
 
-  const onFormSubmit = async ({ invitations }: TInviteTeamMembersFormSchema) => {
+  const onFormSubmit = async ({ role, email }: TInviteTeamMembersFormSchema) => {
     try {
+      let invitations: Invitations;
+      if (Array.isArray(email)) {
+        invitations = email.map((data) => ({ role, email: data }));
+      } else {
+        invitations = [{ role, email }];
+      }
       await createTeamMemberInvites({
         teamId,
         invitations,
@@ -151,80 +175,123 @@ export const InviteTeamMembersDialog = ({
             An email containing an invitation will be sent to each member.
           </DialogDescription>
         </DialogHeader>
-
+        <div className="border-input ring-offset-background flex w-full justify-around rounded-md border">
+          <Button
+            variant={`${invitationType === 'INDIVIDIUAL' ? 'secondary' : 'none'}`}
+            size="sm"
+            className="flex w-1/2 items-center justify-center gap-1"
+            onClick={() => setInvitationType('INDIVIDIUAL')}
+          >
+            <User size={20} />
+            Individual Invitation
+          </Button>
+          <Button
+            variant={`${invitationType === 'BULK' ? 'secondary' : 'none'}`}
+            size="sm"
+            className="flex w-1/2 items-center justify-center gap-1"
+            onClick={() => setInvitationType('BULK')}
+          >
+            <Users size={20} /> Bulk Invitation
+          </Button>
+        </div>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onFormSubmit)}>
             <fieldset
               className="flex h-full flex-col space-y-4"
               disabled={form.formState.isSubmitting}
             >
-              {teamMemberInvites.map((teamMemberInvite, index) => (
-                <div className="flex w-full flex-row space-x-4" key={teamMemberInvite.id}>
+              {invitationType === 'INDIVIDIUAL' && (
+                <FormField
+                  control={form.control}
+                  name="email"
+                  render={({ field }) => (
+                    <FormItem className="w-full">
+                      <FormLabel required>Email address</FormLabel>
+                      <FormControl>
+                        <Input className="bg-background" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              )}
+              {invitationType === 'BULK' && (
+                <div className="flex h-full flex-col space-y-4">
                   <FormField
                     control={form.control}
-                    name={`invitations.${index}.email`}
-                    render={({ field }) => (
+                    name="email"
+                    render={({ field: { onChange, value } }) => (
                       <FormItem className="w-full">
-                        {index === 0 && <FormLabel required>Email address</FormLabel>}
+                        <FormLabel required>Email address</FormLabel>
                         <FormControl>
-                          <Input className="bg-background" {...field} />
+                          <Textarea
+                            className="bg-background placeholder:text-muted-foreground/50"
+                            rows={4}
+                            autoCorrect="off"
+                            placeholder="timur@ercan.com, lucas@smith.com"
+                            value={value}
+                            onChange={(e) => {
+                              const targetValues = e.target.value.split(/[\n,]/);
+                              const emails =
+                                targetValues.length === 1
+                                  ? targetValues[0].trim().toLocaleLowerCase()
+                                  : targetValues.map((email) => email.trim().toLocaleLowerCase());
+
+                              return onChange(emails);
+                            }}
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
                     )}
                   />
-
-                  <FormField
-                    control={form.control}
-                    name={`invitations.${index}.role`}
-                    render={({ field }) => (
-                      <FormItem className="w-full">
-                        {index === 0 && <FormLabel required>Role</FormLabel>}
-                        <FormControl>
-                          <Select {...field} onValueChange={field.onChange}>
-                            <SelectTrigger className="text-muted-foreground max-w-[200px]">
-                              <SelectValue />
-                            </SelectTrigger>
-
-                            <SelectContent position="popper">
-                              {TEAM_MEMBER_ROLE_HIERARCHY[currentUserTeamRole].map((role) => (
-                                <SelectItem key={role} value={role}>
-                                  {TEAM_MEMBER_ROLE_MAP[role] ?? role}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <button
+                  <Button
                     type="button"
-                    className={cn(
-                      'justify-left inline-flex h-10 w-10 items-center text-slate-500 hover:opacity-80 disabled:cursor-not-allowed disabled:opacity-50',
-                      index === 0 ? 'mt-8' : 'mt-0',
-                    )}
-                    disabled={teamMemberInvites.length === 1}
-                    onClick={() => removeTeamMemberInvite(index)}
+                    onClick={() => {
+                      if (uploadRef.current) {
+                        uploadRef.current.click();
+                      }
+                    }}
+                    variant="secondary"
+                    className="flex gap-1"
                   >
-                    <Trash className="h-5 w-5" />
-                  </button>
+                    <FileUp size={18} /> <p>Upload a .csv file</p>
+                  </Button>
+                  <Input
+                    ref={uploadRef}
+                    hidden
+                    type="file"
+                    accept=".csv"
+                    style={{ display: 'none' }}
+                    onChange={handleFileUpload}
+                  />
                 </div>
-              ))}
+              )}
+              <FormField
+                control={form.control}
+                name="role"
+                render={({ field }) => (
+                  <FormItem className="w-full">
+                    <FormLabel required>Role</FormLabel>
+                    <FormControl>
+                      <Select {...field} onValueChange={field.onChange}>
+                        <SelectTrigger className="text-muted-foreground">
+                          <SelectValue />
+                        </SelectTrigger>
 
-              <Button
-                type="button"
-                size="sm"
-                variant="outline"
-                className="w-fit"
-                onClick={() => onAddTeamMemberInvite()}
-              >
-                <PlusCircle className="mr-2 h-4 w-4" />
-                Add more
-              </Button>
-
+                        <SelectContent position="popper">
+                          {TEAM_MEMBER_ROLE_HIERARCHY[currentUserTeamRole].map((role) => (
+                            <SelectItem key={role} value={role}>
+                              {TEAM_MEMBER_ROLE_MAP[role] ?? role}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
               <DialogFooter>
                 <Button type="button" variant="secondary" onClick={() => setOpen(false)}>
                   Cancel
