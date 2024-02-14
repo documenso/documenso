@@ -3,6 +3,7 @@
   "scripts": {
     "build": "turbo run build",
     "build:web": "turbo run build --filter=@documenso/web",
+    "build:marketing": "turbo run build --filter=@documenso/marketing",
     "dev": "turbo run dev --filter=@documenso/marketing",
     "start:marketing": "turbo run start --filter=@documenso/marketing",
     "start:web": "turbo run start --filter=@documenso/web",
