@@ -55,18 +55,14 @@ export const DataTableActionDropdown = ({ row }: DataTableActionDropdownProps) =
   }
 
   const recipient = row.Recipient.find((recipient) => recipient.email === session.user.email);
-
   const isOwner = row.User.id === session.user.id;
-  const isOwnerARecipient = row.Recipient.some(
-    (recipient) => recipient.email === session.user.email,
-  );
 
   // const isRecipient = !!recipient;
   const isDraft = row.status === DocumentStatus.DRAFT;
   // const isPending = row.status === DocumentStatus.PENDING;
   const isComplete = row.status === DocumentStatus.COMPLETED;
   // const isSigned = recipient?.signingStatus === SigningStatus.SIGNED;
-  const isDocumentDeletable = isOwner && !isOwnerARecipient;
+  const isDocumentDeletable = isOwner && !recipient;
 
   const onDownloadClick = async () => {
     try {
