@@ -65,7 +65,7 @@ export const MobileNavigation = ({ isMenuOpen, onMenuOpenChange }: MobileNavigat
         <Link href="/" className="z-10" onClick={handleMenuItemClick}>
           <Image
             src={LogoImage}
-            alt="Documenso Logo"
+            alt="MonTampon Logo"
             className="dark:invert"
             width={170}
             height={25}

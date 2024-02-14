@@ -19,7 +19,7 @@ export const generateMetadata = ({ params }: { params: { post: string } }) => {
 
   return {
     title: {
-      absolute: `${blogPost.title} - Documenso Blog`,
+      absolute: `${blogPost.title} - MonTampon Blog`,
     },
     description: blogPost.description,
   };

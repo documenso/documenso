@@ -38,7 +38,7 @@ export const DocumentCancelTemplate = ({
               <Section>
                 <Img
                   src={getAssetUrl('/static/logo.png')}
-                  alt="Documenso Logo"
+                  alt="MonTampon Logo"
                   className="mb-4 h-6"
                 />
 

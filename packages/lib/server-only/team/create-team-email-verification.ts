@@ -125,7 +125,7 @@ export const sendTeamEmailVerificationEmail = async (
       name: FROM_NAME,
       address: FROM_ADDRESS,
     },
-    subject: `A request to use your email has been initiated by ${teamName} on Documenso`,
+    subject: `A request to use your email has been initiated by ${teamName} on MonTampon`,
     html: render(template),
     text: render(template, { plainText: true }),
   });

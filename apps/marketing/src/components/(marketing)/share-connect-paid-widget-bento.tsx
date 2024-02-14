@@ -87,7 +87,7 @@ export const ShareConnectPaidWidgetBento = ({
           <CardContent className="grid grid-cols-1 gap-8 p-6">
             <p className="text-foreground/80 leading-relaxed">
               <strong className="block">React Widget (Soon).</strong>
-              Easily embed Documenso into your product. Simply copy and paste our react widget into
+              Easily embed MonTampon into your product. Simply copy and paste our react widget into
               your application.
             </p>
 

@@ -33,7 +33,7 @@ export const TeamInviteEmailTemplate = ({
   teamUrl = 'demo',
   token = '',
 }: TeamInviteEmailProps) => {
-  const previewText = `Accept invitation to join a team on Documenso`;
+  const previewText = `Accept invitation to join a team on MonTampon`;
 
   return (
     <Html>
@@ -67,7 +67,7 @@ export const TeamInviteEmailTemplate = ({
 
               <Section className="p-2 text-slate-500">
                 <Text className="text-center text-lg font-medium text-black">
-                  Join {teamName} on Documenso
+                  Join {teamName} on MonTampon
                 </Text>
 
                 <Text className="my-1 text-center text-base">

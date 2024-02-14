@@ -16,7 +16,7 @@ export const TemplateConfirmationEmail = ({
 
       <Section className="flex-row items-center justify-center">
         <Text className="text-primary mx-auto mb-0 max-w-[80%] text-center text-lg font-semibold">
-          Welcome to Documenso!
+          Welcome to MonTampon!
         </Text>
 
         <Text className="my-1 text-center text-base text-slate-400">
