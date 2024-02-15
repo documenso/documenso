@@ -1,34 +1,23 @@
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 
-import {
-  CheckIcon,
-  ChevronLeft,
-  Clock,
-  MailIcon,
-  MailOpenIcon,
-  PenIcon,
-  PlusIcon,
-  Users2,
-} from 'lucide-react';
+import { ChevronLeft, Clock9, Users2 } from 'lucide-react';
 import { match } from 'ts-pattern';
 
 import { DOCUMENSO_ENCRYPTION_KEY } from '@documenso/lib/constants/crypto';
-import { RECIPIENT_ROLES_DESCRIPTION } from '@documenso/lib/constants/recipient-roles';
 import { getRequiredServerComponentSession } from '@documenso/lib/next-auth/get-server-component-session';
 import { getDocumentById } from '@documenso/lib/server-only/document/get-document-by-id';
 import { getRecipientsForDocument } from '@documenso/lib/server-only/recipient/get-recipients-for-document';
 import { symmetricDecrypt } from '@documenso/lib/universal/crypto';
 import { formatDocumentsPath } from '@documenso/lib/utils/teams';
-import { DocumentStatus, RecipientRole, SigningStatus } from '@documenso/prisma/client';
+import { DocumentStatus } from '@documenso/prisma/client';
 import type { Team } from '@documenso/prisma/client';
-import { SignatureIcon } from '@documenso/ui/icons/signature';
-import { AvatarWithText } from '@documenso/ui/primitives/avatar';
-import { Badge } from '@documenso/ui/primitives/badge';
+import { Button } from '@documenso/ui/primitives/button';
 import { Card, CardContent } from '@documenso/ui/primitives/card';
 import { LazyPDFViewer } from '@documenso/ui/primitives/lazy-pdf-viewer';
 
 import { StackAvatarsWithTooltip } from '~/components/(dashboard)/avatar/stack-avatars-with-tooltip';
+import { DocumentHistorySheet } from '~/components/document/document-history-sheet';
 import {
   DocumentStatus as DocumentStatusComponent,
   FRIENDLY_STATUS_MAP,
@@ -37,6 +26,8 @@ import {
 import { DocumentPageViewButton } from './document-page-view-button';
 import { DocumentPageViewDropdown } from './document-page-view-dropdown';
 import { DocumentPageViewInformation } from './document-page-view-information';
+import { DocumentPageViewRecentActivity } from './document-page-view-recent-activity';
+import { DocumentPageViewRecipients } from './document-page-view-recipients';
 
 export type DocumentPageViewProps = {
   params: {
@@ -104,27 +95,38 @@ export const DocumentPageView = async ({ params, team }: DocumentPageViewProps) 
         Documents
       </Link>
 
-      <div>
-        <h1 className="mt-4 truncate text-2xl font-semibold md:text-3xl" title={document.title}>
-          {document.title}
-        </h1>
+      <div className="flex flex-row justify-between">
+        <div>
+          <h1 className="mt-4 truncate text-2xl font-semibold md:text-3xl" title={document.title}>
+            {document.title}
+          </h1>
 
-        <div className="mt-2.5 flex items-center gap-x-6">
-          <DocumentStatusComponent
-            inheritColor
-            status={document.status}
-            className="text-muted-foreground"
-          />
+          <div className="mt-2.5 flex items-center gap-x-6">
+            <DocumentStatusComponent
+              inheritColor
+              status={document.status}
+              className="text-muted-foreground"
+            />
 
-          {recipients.length > 0 && (
-            <div className="text-muted-foreground flex items-center">
-              <Users2 className="mr-2 h-5 w-5" />
+            {recipients.length > 0 && (
+              <div className="text-muted-foreground flex items-center">
+                <Users2 className="mr-2 h-5 w-5" />
 
-              <StackAvatarsWithTooltip recipients={recipients} position="bottom">
-                <span>{recipients.length} Recipient(s)</span>
-              </StackAvatarsWithTooltip>
-            </div>
-          )}
+                <StackAvatarsWithTooltip recipients={recipients} position="bottom">
+                  <span>{recipients.length} Recipient(s)</span>
+                </StackAvatarsWithTooltip>
+              </div>
+            )}
+          </div>
+        </div>
+
+        <div className="self-end">
+          <DocumentHistorySheet documentId={document.id} userId={user.id}>
+            <Button variant="outline">
+              <Clock9 className="mr-1.5 h-4 w-4" />
+              Document history
+            </Button>
+          </DocumentHistorySheet>
         </div>
       </div>
 
@@ -139,8 +141,8 @@ export const DocumentPageView = async ({ params, team }: DocumentPageViewProps) 
         </Card>
 
         <div className="col-span-12 lg:col-span-6 xl:col-span-5">
-          <div className="sticky top-20">
-            <section className="dark:bg-background border-border bg-widget sticky flex flex-col rounded-xl border pb-4 pt-6">
+          <div className="space-y-6">
+            <section className="border-border bg-widget flex flex-col rounded-xl border pb-4 pt-6">
               <div className="flex flex-row items-center justify-between px-4">
                 <h3 className="text-foreground text-2xl font-semibold">
                   Document {FRIENDLY_STATUS_MAP[document.status].label.toLowerCase()}
@@ -180,100 +182,13 @@ export const DocumentPageView = async ({ params, team }: DocumentPageViewProps) 
             <DocumentPageViewInformation document={documentWithRecipients} userId={user.id} />
 
             {/* Recipients section. */}
-            <section className="dark:bg-background border-border bg-widget mt-6 flex flex-col rounded-xl border">
-              <div className="flex flex-row items-center justify-between px-4 py-3">
-                <h1 className="text-foreground font-medium">Recipients</h1>
+            <DocumentPageViewRecipients
+              document={documentWithRecipients}
+              documentRootPath={documentRootPath}
+            />
 
-                {document.status !== DocumentStatus.COMPLETED && (
-                  <Link
-                    href={`${documentRootPath}/${document.id}/edit?step=signers`}
-                    title="Modify recipients"
-                    className="flex flex-row items-center justify-between"
-                  >
-                    {recipients.length === 0 ? (
-                      <PlusIcon className="ml-2 h-4 w-4" />
-                    ) : (
-                      <PenIcon className="ml-2 h-3 w-3" />
-                    )}
-                  </Link>
-                )}
-              </div>
-
-              <ul className="text-muted-foreground divide-y border-t">
-                {recipients.length === 0 && (
-                  <li className="flex flex-col items-center justify-center py-6 text-sm">
-                    No recipients
-                  </li>
-                )}
-
-                {recipients.map((recipient) => (
-                  <li
-                    key={recipient.id}
-                    className="flex items-center justify-between px-4 py-2.5 text-sm"
-                  >
-                    <AvatarWithText
-                      avatarFallback={recipient.email.slice(0, 1).toUpperCase()}
-                      primaryText={
-                        <p className="text-muted-foreground text-sm">{recipient.email}</p>
-                      }
-                      secondaryText={
-                        <p className="text-muted-foreground/70 text-xs">
-                          {RECIPIENT_ROLES_DESCRIPTION[recipient.role].roleName}
-                        </p>
-                      }
-                    />
-
-                    {document.status !== DocumentStatus.DRAFT &&
-                      recipient.signingStatus === SigningStatus.SIGNED && (
-                        <Badge variant="default">
-                          {match(recipient.role)
-                            .with(RecipientRole.APPROVER, () => (
-                              <>
-                                <CheckIcon className="mr-1 h-3 w-3" />
-                                Approved
-                              </>
-                            ))
-                            .with(RecipientRole.CC, () =>
-                              document.status === DocumentStatus.COMPLETED ? (
-                                <>
-                                  <MailIcon className="mr-1 h-3 w-3" />
-                                  Sent
-                                </>
-                              ) : (
-                                <>
-                                  <CheckIcon className="mr-1 h-3 w-3" />
-                                  Ready
-                                </>
-                              ),
-                            )
-
-                            .with(RecipientRole.SIGNER, () => (
-                              <>
-                                <SignatureIcon className="mr-1 h-3 w-3" />
-                                Signed
-                              </>
-                            ))
-                            .with(RecipientRole.VIEWER, () => (
-                              <>
-                                <MailOpenIcon className="mr-1 h-3 w-3" />
-                                Viewed
-                              </>
-                            ))
-                            .exhaustive()}
-                        </Badge>
-                      )}
-
-                    {document.status !== DocumentStatus.DRAFT &&
-                      recipient.signingStatus === SigningStatus.NOT_SIGNED && (
-                        <Badge variant="secondary">
-                          <Clock className="mr-1 h-3 w-3" />
-                          Pending
-                        </Badge>
-                      )}
-                  </li>
-                ))}
-              </ul>
-            </section>
+            {/* Recent activity section. */}
+            <DocumentPageViewRecentActivity documentId={document.id} userId={user.id} />
           </div>
         </div>
       </div>

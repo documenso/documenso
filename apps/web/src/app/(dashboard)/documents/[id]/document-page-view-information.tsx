@@ -52,7 +52,7 @@ export const DocumentPageViewInformation = ({
   }, [isMounted, document, locale, userId]);
 
   return (
-    <section className="dark:bg-background text-foreground border-border bg-widget mt-6 flex flex-col rounded-xl border">
+    <section className="dark:bg-background text-foreground border-border bg-widget flex flex-col rounded-xl border">
       <h1 className="px-4 py-3 font-medium">Information</h1>
 
       <ul className="divide-y border-t">
