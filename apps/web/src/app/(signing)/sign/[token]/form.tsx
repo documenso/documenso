@@ -10,6 +10,12 @@ import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
 import { useAnalytics } from '@documenso/lib/client-only/hooks/use-analytics';
+import { useElementScaleSize } from '@documenso/lib/client-only/hooks/use-element-scale-size';
+import { useFieldPageCoords } from '@documenso/lib/client-only/hooks/use-field-page-coords';
+import {
+  DEFAULT_HANDWRITING_FONT_SIZE,
+  MIN_HANDWRITING_FONT_SIZE,
+} from '@documenso/lib/constants/pdf';
 import { sortFieldsByPosition, validateFieldsInserted } from '@documenso/lib/utils/fields';
 import type { Document, Field, Recipient } from '@documenso/prisma/client';
 import { trpc } from '@documenso/trpc/react';
@@ -43,7 +49,14 @@ const ZSigningpadSchema = z.union([
 
 export type TSigningpadSchema = z.infer<typeof ZSigningpadSchema>;
 
-export const SigningForm = ({ document, recipient, fields }: SigningFormProps) => {
+export const SigningForm = ({ document: _document, recipient, fields }: SigningFormProps) => {
+  const fontVariable = '--font-signature';
+  const minFontSize = MIN_HANDWRITING_FONT_SIZE;
+  const maxFontSize = DEFAULT_HANDWRITING_FONT_SIZE;
+  const fontVariableValue = getComputedStyle(document.documentElement).getPropertyValue(
+    fontVariable,
+  );
+
   const router = useRouter();
   const analytics = useAnalytics();
   const { data: session } = useSession();
@@ -70,6 +83,8 @@ export const SigningForm = ({ document, recipient, fields }: SigningFormProps) =
     resolver: zodResolver(ZSigningpadSchema),
   });
 
+  const { height, width } = useFieldPageCoords(fields.find((field) => field.type === 'SIGNATURE')!);
+
   const signatureDataUrl = watch('signatureDataUrl');
   const signatureText = watch('signatureText');
 
@@ -93,17 +108,29 @@ export const SigningForm = ({ document, recipient, fields }: SigningFormProps) =
 
     await completeDocumentWithToken({
       token: recipient.token,
-      documentId: document.id,
+      documentId: _document.id,
     });
 
     analytics.capture('App: Recipient has completed signing', {
       signerId: recipient.id,
-      documentId: document.id,
+      documentId: _document.id,
       timestamp: new Date().toISOString(),
     });
 
     router.push(`/sign/${recipient.token}/complete`);
   };
+
+  const scalingFactor = useElementScaleSize(
+    {
+      height,
+      width,
+    },
+    signatureText || '',
+    maxFontSize,
+    fontVariableValue,
+  );
+
+  const fontSize = maxFontSize * scalingFactor;
 
   return (
     <form
@@ -172,7 +199,15 @@ export const SigningForm = ({ document, recipient, fields }: SigningFormProps) =
                       )}
 
                       {signatureText && (
-                        <p className={cn('text-foreground font-signature text-4xl font-semibold')}>
+                        <p
+                          style={{
+                            fontSize: `clamp(${minFontSize}px, ${fontSize}px, ${maxFontSize}px)`,
+                            fontFamily: `var(${fontVariable})`,
+                          }}
+                          className={cn(
+                            'text-foreground font-signature max-w-[18rem] text-4xl font-semibold',
+                          )}
+                        >
                           {signatureText}
                         </p>
                       )}
@@ -241,7 +276,7 @@ export const SigningForm = ({ document, recipient, fields }: SigningFormProps) =
               <SignDialog
                 isSubmitting={isSubmitting}
                 onSignatureComplete={handleSubmit(onFormSubmit)}
-                document={document}
+                document={_document}
                 fields={fields}
                 fieldsValidated={fieldsValidated}
               />
