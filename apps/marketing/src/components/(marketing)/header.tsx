@@ -60,12 +60,7 @@ export const Header = ({ className, ...props }: HeaderProps) => {
           Blog
         </Link>
 
-        <Link
-          href="/open"
-          className="text-muted-foreground hover:text-muted-foreground/80 text-sm font-semibold"
-        >
-          Open Startup
-        </Link>
+        
 
         <Link
           href="https://app.documenso.com/signin"

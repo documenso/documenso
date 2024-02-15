@@ -6,7 +6,6 @@ import Link from 'next/link';
 import { motion, useReducedMotion } from 'framer-motion';
 import { FaXTwitter } from 'react-icons/fa6';
 import { LiaDiscord } from 'react-icons/lia';
-import { LuGithub } from 'react-icons/lu';
 
 import LogoImage from '@documenso/assets/logo.png';
 import { Sheet, SheetContent } from '@documenso/ui/primitives/sheet';
@@ -30,10 +29,6 @@ export const MENU_NAVIGATION_LINKS = [
     text: 'Pricing',
   },
   {
-    href: '/open',
-    text: 'Open Startup',
-  },
-  {
     href: 'https://status.documenso.com',
     text: 'Status',
   },
@@ -47,7 +42,7 @@ export const MENU_NAVIGATION_LINKS = [
     text: 'Privacy',
   },
   {
-    href: 'https://app.documenso.com/signin',
+    href: 'https://documenso-app-q0ns.onrender.com/signin',
     text: 'Sign in',
   },
 ];
@@ -118,15 +113,6 @@ export const MobileNavigation = ({ isMenuOpen, onMenuOpenChange }: MobileNavigat
           >
             <FaXTwitter className="h-6 w-6" />
           </Link>
-
-          <Link
-            href="https://github.com/documenso/documenso"
-            target="_blank"
-            className="text-foreground hover:text-foreground/80"
-          >
-            <LuGithub className="h-6 w-6" />
-          </Link>
-
           <Link
             href="https://documen.so/discord"
             target="_blank"
