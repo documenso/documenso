@@ -139,31 +139,6 @@ export const EnableAuthenticatorAppDialog = ({
     }
   };
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const onPinInputChange = ({ currentTarget: input }: any) => {
-    input.value = input.value.replace(/\D+/g, '');
-
-    if (input.value.length === 6) {
-      setState('loading');
-
-      void onEnableTwoFactorAuthenticationFormSubmit({ token: input.value }).then((success) => {
-        if (success) {
-          setState('success');
-          return;
-        }
-
-        setState('error');
-
-        setTimeout(() => {
-          setState('input');
-          input.value = '';
-          input.dispatchEvent(new Event('input'));
-          input.focus();
-        }, 500);
-      });
-    }
-  };
-
   const onCompleteClick = () => {
     flushSync(() => {
       onOpenChange(false);
@@ -273,7 +248,36 @@ export const EnableAuthenticatorAppDialog = ({
                     <FormItem>
                       <FormLabel className="text-muted-foreground">Token</FormLabel>
                       <FormControl>
-                        <PinInput id="remix" state={state} onChange={onPinInputChange} autoFocus />
+                        <PinInput
+                          id="enable-2fa-pin-input"
+                          state={state}
+                          onSubmit={({ code, input }) => {
+                            console.log(code);
+
+                            if (code.length === 6) {
+                              setState('loading');
+
+                              void onEnableTwoFactorAuthenticationFormSubmit({ token: code }).then(
+                                (success) => {
+                                  if (success) {
+                                    setState('success');
+                                    return;
+                                  }
+
+                                  setState('error');
+
+                                  setTimeout(() => {
+                                    setState('input');
+                                    input.value = '';
+                                    input.dispatchEvent(new Event('input'));
+                                    input.focus();
+                                  }, 500);
+                                },
+                              );
+                            }
+                          }}
+                          autoFocus
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
