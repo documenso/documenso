@@ -46,7 +46,7 @@ export const acceptTeamInvitation = async ({ userId, teamId }: AcceptTeamInvitat
       },
     });
 
-    if (IS_BILLING_ENABLED && team.subscription) {
+    if (IS_BILLING_ENABLED() && team.subscription) {
       const numberOfSeats = await tx.teamMember.count({
         where: {
           teamId: teamMemberInvite.teamId,

@@ -7,6 +7,7 @@ import type { JWT } from 'next-auth/jwt';
 import CredentialsProvider from 'next-auth/providers/credentials';
 import type { GoogleProfile } from 'next-auth/providers/google';
 import GoogleProvider from 'next-auth/providers/google';
+import { env } from 'next-runtime-env';
 
 import { prisma } from '@documenso/prisma';
 import { IdentityProvider, UserSecurityAuditLogType } from '@documenso/prisma/client';
@@ -221,7 +222,7 @@ export const NEXT_AUTH_OPTIONS: AuthOptions = {
     async signIn({ user }) {
       // We do this to stop OAuth providers from creating an account
       // when signups are disabled
-      if (process.env.NEXT_PUBLIC_DISABLE_SIGNUP === 'true') {
+      if (env('NEXT_PUBLIC_DISABLE_SIGNUP') === 'true') {
         const userData = await getUserByEmail({ email: user.email! });
 
         return !!userData;
