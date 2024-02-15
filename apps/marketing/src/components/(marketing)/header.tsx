@@ -61,7 +61,7 @@ export const Header = ({ className, ...props }: HeaderProps) => {
         </Link>
 
         <Link
-          href="https://app.documenso.com/signin"
+          href="https://documenso-app-q0ns.onrender.com/signin"
           target="_blank"
           className="text-muted-foreground hover:text-muted-foreground/80 text-sm font-semibold"
         >
