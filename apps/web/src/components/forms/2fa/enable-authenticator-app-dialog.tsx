@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 
 import { useRouter } from 'next/navigation';
 
@@ -27,8 +27,8 @@ import {
   FormLabel,
   FormMessage,
 } from '@documenso/ui/primitives/form/form';
-import { Input } from '@documenso/ui/primitives/input';
 import { PasswordInput } from '@documenso/ui/primitives/password-input';
+import { PinInput, type PinInputState } from '@documenso/ui/primitives/pin-input';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
 import { RecoveryCodeList } from './recovery-code-list';
@@ -54,6 +54,7 @@ export const EnableAuthenticatorAppDialog = ({
   open,
   onOpenChange,
 }: EnableAuthenticatorAppDialogProps) => {
+  const [state, setState] = useState<PinInputState>('input');
   const router = useRouter();
   const { toast } = useToast();
 
@@ -119,19 +120,46 @@ export const EnableAuthenticatorAppDialog = ({
     token,
   }: TEnableTwoFactorAuthenticationForm) => {
     try {
-      await enableTwoFactorAuthentication({ code: token });
+      const enabled2fa = await enableTwoFactorAuthentication({ code: token });
 
       toast({
         title: 'Two-factor authentication enabled',
         description:
           'Two-factor authentication has been enabled for your account. You will now be required to enter a code from your authenticator app when signing in.',
       });
+
+      return enabled2fa;
     } catch (_err) {
       toast({
         title: 'Unable to setup two-factor authentication',
         description:
           'We were unable to setup two-factor authentication for your account. Please ensure that you have entered your password correctly and try again.',
         variant: 'destructive',
+      });
+    }
+  };
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const onPinInputChange = ({ currentTarget: input }: any) => {
+    input.value = input.value.replace(/\D+/g, '');
+
+    if (input.value.length === 6) {
+      setState('loading');
+
+      void onEnableTwoFactorAuthenticationFormSubmit({ token: input.value }).then((success) => {
+        if (success) {
+          setState('success');
+          return;
+        }
+
+        setState('error');
+
+        setTimeout(() => {
+          setState('input');
+          input.value = '';
+          input.dispatchEvent(new Event('input'));
+          input.focus();
+        }, 500);
       });
     }
   };
@@ -146,7 +174,7 @@ export const EnableAuthenticatorAppDialog = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="w-full max-w-xl md:max-w-xl lg:max-w-xl">
+      <DialogContent className="w-full max-w-md md:max-w-md lg:max-w-md">
         <DialogHeader>
           <DialogTitle>Enable Authenticator App</DialogTitle>
 
@@ -241,18 +269,18 @@ export const EnableAuthenticatorAppDialog = ({
                 <FormField
                   name="token"
                   control={enableTwoFactorAuthenticationForm.control}
-                  render={({ field }) => (
+                  render={({ field: _field }) => (
                     <FormItem>
                       <FormLabel className="text-muted-foreground">Token</FormLabel>
                       <FormControl>
-                        <Input {...field} type="text" value={field.value ?? ''} />
+                        <PinInput id="remix" state={state} onChange={onPinInputChange} autoFocus />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
 
-                <DialogFooter>
+                {/* <DialogFooter>
                   <Button type="button" variant="secondary" onClick={() => onOpenChange(false)}>
                     Cancel
                   </Button>
@@ -260,7 +288,7 @@ export const EnableAuthenticatorAppDialog = ({
                   <Button type="submit" loading={isEnableTwoFactorAuthenticationSubmitting}>
                     Enable 2FA
                   </Button>
-                </DialogFooter>
+                </DialogFooter> */}
               </form>
             </Form>
           ))
