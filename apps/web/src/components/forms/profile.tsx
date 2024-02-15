@@ -113,18 +113,22 @@ export const ProfileForm = ({ className, user }: ProfileFormProps) => {
     }
   };
 
+  const deleteAccoutAndSignOut = async () => {
+    await deleteAccount();
+
+    toast({
+      title: 'Account deleted',
+      description: 'Your account has been deleted successfully.',
+      duration: 5000,
+    });
+
+    return await signOut({ callbackUrl: '/' });
+  };
+
   const onDeleteAccount = async (hasTwoFactorAuthentication: boolean) => {
     try {
       if (!hasTwoFactorAuthentication) {
-        await deleteAccount();
-
-        toast({
-          title: 'Account deleted',
-          description: 'Your account has been deleted successfully.',
-          duration: 5000,
-        });
-
-        return await signOut({ callbackUrl: '/' });
+        return await deleteAccoutAndSignOut();
       }
 
       const { token } = deleteAccountTwoFactorTokenForm.getValues();
@@ -140,15 +144,7 @@ export const ProfileForm = ({ className, user }: ProfileFormProps) => {
         throw new Error('We were unable to validate your Two Factor Authentication token.');
       });
 
-      await deleteAccount();
-
-      toast({
-        title: 'Account deleted',
-        description: 'Your account has been deleted successfully.',
-        duration: 5000,
-      });
-
-      await signOut({ callbackUrl: '/' });
+      await deleteAccoutAndSignOut();
     } catch (err) {
       if (err instanceof TRPCClientError && err.data?.code === 'BAD_REQUEST') {
         toast({

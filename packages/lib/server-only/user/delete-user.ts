@@ -1,4 +1,5 @@
 import { prisma } from '@documenso/prisma';
+import { DocumentStatus } from '@documenso/prisma/client';
 
 export type DeleteUserOptions = {
   email: string;
@@ -31,7 +32,7 @@ export const deletedServiceAccount = async ({ email }: DeleteUserOptions) => {
     where: {
       userId: user.id,
       status: {
-        in: ['PENDING', 'COMPLETED'],
+        in: [DocumentStatus.PENDING, DocumentStatus.COMPLETED],
       },
     },
     data: {
