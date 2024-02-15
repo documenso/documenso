@@ -122,7 +122,7 @@ export const Hero = ({ className, ...props }: HeroProps) => {
           <Link href="https://github.com/documenso/documenso" onClick={() => event('view-github')}>
             <Button variant="outline" className="rounded-full bg-transparent backdrop-blur-sm">
               <LuGithub className="mr-2 h-5 w-5" />
-              Star on Github
+              Book a demo
             </Button>
           </Link>
         </motion.div>
