@@ -37,6 +37,7 @@ export const DocumentPageViewRecentActivity = ({
         column: 'createdAt',
         direction: 'asc',
       },
+      perPage: 10,
     },
     {
       getNextPageParam: (lastPage) => lastPage.nextCursor,
@@ -77,7 +78,7 @@ export const DocumentPageViewRecentActivity = ({
             {hasNextPage && (
               <li className="relative flex gap-x-4">
                 <div className="absolute -bottom-6 left-0 top-0 flex w-6 justify-center">
-                  <div className="w-px bg-gray-200" />
+                  <div className="bg-border w-px" />
                 </div>
 
                 <div className="bg-widget relative flex h-6 w-6 flex-none items-center justify-center">
