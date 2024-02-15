@@ -143,14 +143,17 @@ const sheetVariants = cva(
 
 export interface DialogContentProps
   extends React.ComponentPropsWithoutRef<typeof SheetPrimitive.Content>,
-    VariantProps<typeof sheetVariants> {}
+    VariantProps<typeof sheetVariants> {
+  showOverlay?: boolean;
+  sheetClass?: string;
+}
 
 const SheetContent = React.forwardRef<
   React.ElementRef<typeof SheetPrimitive.Content>,
   DialogContentProps
->(({ position, size, className, children, ...props }, ref) => (
+>(({ position, size, className, sheetClass, showOverlay = true, children, ...props }, ref) => (
   <SheetPortal position={position}>
-    <SheetOverlay />
+    {showOverlay && <SheetOverlay className={sheetClass} />}
     <SheetPrimitive.Content
       ref={ref}
       className={cn(sheetVariants({ position, size }), className)}
