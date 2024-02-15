@@ -60,8 +60,6 @@ export const Header = ({ className, ...props }: HeaderProps) => {
           Blog
         </Link>
 
-        
-
         <Link
           href="https://app.documenso.com/signin"
           target="_blank"
