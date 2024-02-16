@@ -3,7 +3,8 @@
 import Image from 'next/image';
 import Link from 'next/link';
 
-import { Variants, motion } from 'framer-motion';
+import type { Variants } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { usePlausible } from 'next-plausible';
 import { LuGithub } from 'react-icons/lu';
 import { match } from 'ts-pattern';
@@ -122,7 +123,7 @@ export const Hero = ({ className, ...props }: HeroProps) => {
           <Link href="https://github.com/documenso/documenso" onClick={() => event('view-github')}>
             <Button variant="outline" className="rounded-full bg-transparent backdrop-blur-sm">
               <LuGithub className="mr-2 h-5 w-5" />
-              Star on Github
+              Book a demo
             </Button>
           </Link>
         </motion.div>
@@ -190,32 +191,30 @@ export const Hero = ({ className, ...props }: HeroProps) => {
           <Widget className="mt-12">
             <strong>MonTampon Supporter Pledge</strong>
             <p className="w-full max-w-[70ch]">
-              Our mission is to create an open signing infrastructure that empowers the world,
-              enabling businesses to embrace openness, cooperation, and transparency. We believe
-              that signing, as a fundamental act, should embody these values. By offering an
-              open-source signing solution, we aim to make document signing accessible, transparent,
-              and trustworthy.
+              Welcome to MonTampon, where our mission is to transform the digital signing landscape
+              into one that's more accessible, transparent, and secure. We're committed to fostering
+              an environment that reflects openness, cooperation, and trust, ensuring our platform
+              meets the needs of both businesses and individuals with a seamless signing experience.
             </p>
 
             <p className="w-full max-w-[70ch]">
-              Through our platform, called MonTampon, we strive to earn your trust by allowing
-              self-hosting and providing complete visibility into its inner workings. We value
-              inclusivity and foster an environment where diverse perspectives and contributions are
-              welcomed, even though we may not implement them all.
+              At the core of MonTampon is our dedication to trust and transparency. We provide a
+              reliable signing solution that prioritizes your security and privacy, making digital
+              signing straightforward and efficient.
             </p>
 
             <p className="w-full max-w-[70ch]">
-              At MonTampon, we envision a web-enabled future for business and contracts, and we are
-              committed to being the leading provider of open signing infrastructure. By combining
-              exceptional product design with open-source principles, we aim to deliver a robust and
-              well-designed application that exceeds your expectations.
+              We envision a future where digital transactions are seamlessly integrated, supported
+              by a reliable and user-friendly platform. Our focus on exceptional design and
+              usability aims to position MonTampon as a leader in digital signing, making every
+              interaction smooth and effective.
             </p>
 
             <p className="w-full max-w-[70ch]">
-              We understand that exceptional products are born from exceptional communities, and we
-              invite you to join our open-source community. Your contributions, whether technical or
-              non-technical, will help shape the future of signing. Together, we can create a better
-              future for everyone.
+              MonTampon is built on the belief that diversity and inclusivity lead to innovation. We
+              welcome contributions from everyone, valuing the variety of perspectives that shape
+              our platform and services. By joining us, you're not just using a service; you're
+              supporting a vision of a more open, cooperative digital world.
             </p>
 
             <p className="w-full max-w-[70ch]">

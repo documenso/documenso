@@ -26,13 +26,8 @@ const FOOTER_LINKS = [
   { href: '/pricing', text: 'Pricing' },
   { href: '/singleplayer', text: 'Singleplayer' },
   { href: '/blog', text: 'Blog' },
-  { href: '/design-system', text: 'Design' },
-  { href: '/open', text: 'Open Startup' },
-  { href: 'https://shop.documenso.com', text: 'Shop', target: '_blank' },
   { href: 'https://status.documenso.com', text: 'Status', target: '_blank' },
   { href: 'mailto:support@documenso.com', text: 'Support', target: '_blank' },
-  { href: '/oss-friends', text: 'OSS Friends' },
-  { href: '/careers', text: 'Careers' },
   { href: '/privacy', text: 'Privacy' },
 ];
 
