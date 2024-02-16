@@ -18,6 +18,8 @@ import type { Prisma } from '@documenso/prisma/client';
 
 import { getDocumentWhereInput } from './get-document-by-id';
 
+import { NEXT_PUBLIC_WEBAPP_URL } from '../../constants/app';
+
 export type ResendDocumentOptions = {
   documentId: number;
   userId: number;
@@ -94,8 +96,8 @@ export const resendDocument = async ({
         'document.name': document.title,
       };
 
-      const assetBaseUrl = process.env.NEXT_PUBLIC_WEBAPP_URL || 'http://localhost:3000';
-      const signDocumentLink = `${process.env.NEXT_PUBLIC_WEBAPP_URL}/sign/${recipient.token}`;
+      const assetBaseUrl = NEXT_PUBLIC_WEBAPP_URL() || 'http://localhost:3000';
+      const signDocumentLink = `${NEXT_PUBLIC_WEBAPP_URL()}/sign/${recipient.token}`;
 
       const template = createElement(DocumentInviteEmailTemplate, {
         documentName: document.title,

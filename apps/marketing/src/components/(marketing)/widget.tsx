@@ -7,6 +7,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Loader } from 'lucide-react';
 import { usePlausible } from 'next-plausible';
+import { env } from 'next-runtime-env';
 import { Controller, useForm } from 'react-hook-form';
 import { z } from 'zod';
 
@@ -144,7 +145,11 @@ export const Widget = ({ className, children, ...props }: WidgetProps) => {
         setTimeout(resolve, 1000);
       });
 
-      const planId = process.env.NEXT_PUBLIC_STRIPE_COMMUNITY_PLAN_MONTHLY_PRICE_ID;
+      const planId = env('NEXT_PUBLIC_STRIPE_COMMUNITY_PLAN_MONTHLY_PRICE_ID');
+
+      if (!planId) {
+        throw new Error('No plan ID found.');
+      }
 
       const claimPlanInput = signatureDataUrl
         ? {

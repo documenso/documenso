@@ -6,6 +6,7 @@ import { FeatureFlagProvider } from '@documenso/lib/client-only/providers/featur
 import { LocaleProvider } from '@documenso/lib/client-only/providers/locale';
 import type { Locales } from '@documenso/lib/i18n/settings';
 import { getLocale } from '@documenso/lib/server-only/headers/get-locale';
+import { NEXT_PUBLIC_MARKETING_URL } from '@documenso/lib/constants/app';
 import { getAllAnonymousFlags } from '@documenso/lib/universal/get-feature-flag';
 import { TrpcProvider } from '@documenso/trpc/react';
 import { cn } from '@documenso/ui/lib/utils';

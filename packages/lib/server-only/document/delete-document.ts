@@ -8,6 +8,7 @@ import DocumentCancelTemplate from '@documenso/email/templates/document-cancel';
 import { prisma } from '@documenso/prisma';
 import { DocumentStatus } from '@documenso/prisma/client';
 
+import { NEXT_PUBLIC_WEBAPP_URL } from '../../constants/app';
 import { FROM_ADDRESS, FROM_NAME } from '../../constants/email';
 
 export type DeleteDocumentOptions = {
@@ -49,7 +50,7 @@ export const deleteDocument = async ({ id, userId, status }: DeleteDocumentOptio
     if (document.Recipient.length > 0) {
       await Promise.all(
         document.Recipient.map(async (recipient) => {
-          const assetBaseUrl = process.env.NEXT_PUBLIC_WEBAPP_URL || 'http://localhost:3000';
+          const assetBaseUrl = NEXT_PUBLIC_WEBAPP_URL() || 'http://localhost:3000';
 
           const template = createElement(DocumentCancelTemplate, {
             documentName: document.title,

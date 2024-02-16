@@ -2,9 +2,12 @@ import { Suspense } from 'react';
 
 import { Caveat, Inter } from 'next/font/google';
 
+import { PublicEnvScript } from 'next-runtime-env';
+
 import { FeatureFlagProvider } from '@documenso/lib/client-only/providers/feature-flag';
 import { LocaleProvider } from '@documenso/lib/client-only/providers/locale';
 import type { Locales } from '@documenso/lib/i18n/settings';
+import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { getServerComponentAllFlags } from '@documenso/lib/server-only/feature-flags/get-server-component-feature-flag';
 import { getLocale } from '@documenso/lib/server-only/headers/get-locale';
 import { TrpcProvider } from '@documenso/trpc/react';
@@ -63,6 +66,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
         <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
         <link rel="manifest" href="/site.webmanifest" />
+        <PublicEnvScript />
       </head>
 
       <Suspense>

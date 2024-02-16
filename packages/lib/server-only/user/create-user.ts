@@ -68,7 +68,7 @@ export const createUser = async ({ name, email, password, signature }: CreateUse
             },
           });
 
-          if (!IS_BILLING_ENABLED) {
+          if (!IS_BILLING_ENABLED()) {
             return;
           }
 
@@ -108,7 +108,7 @@ export const createUser = async ({ name, email, password, signature }: CreateUse
   );
 
   // Update the user record with a new or existing Stripe customer record.
-  if (IS_BILLING_ENABLED) {
+  if (IS_BILLING_ENABLED()) {
     try {
       return await getStripeCustomerByUser(user).then((session) => session.user);
     } catch (err) {

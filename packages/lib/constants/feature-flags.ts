@@ -1,4 +1,9 @@
+import { env } from 'next-runtime-env';
+
 import { APP_BASE_URL } from './app';
+
+const NEXT_PUBLIC_FEATURE_BILLING_ENABLED = () => env('NEXT_PUBLIC_FEATURE_BILLING_ENABLED');
+const NEXT_PUBLIC_POSTHOG_KEY = () => env('NEXT_PUBLIC_POSTHOG_KEY');
 
 /**
  * The flag name for global session recording feature flag.
@@ -16,8 +21,7 @@ export const FEATURE_FLAG_POLL_INTERVAL = 30000;
  * Does not take any person or group properties into account.
  */
 export const LOCAL_FEATURE_FLAGS: Record<string, boolean> = {
-  app_billing: process.env.NEXT_PUBLIC_FEATURE_BILLING_ENABLED === 'true',
-  app_teams: true,
+  app_billing: NEXT_PUBLIC_FEATURE_BILLING_ENABLED() === 'true',
   marketing_header_single_player_mode: false,
 } as const;
 
@@ -25,8 +29,8 @@ export const LOCAL_FEATURE_FLAGS: Record<string, boolean> = {
  * Extract the PostHog configuration from the environment.
  */
 export function extractPostHogConfig(): { key: string; host: string } | null {
-  const postHogKey = process.env.NEXT_PUBLIC_POSTHOG_KEY;
-  const postHogHost = `${APP_BASE_URL}/ingest`;
+  const postHogKey = NEXT_PUBLIC_POSTHOG_KEY();
+  const postHogHost = `${APP_BASE_URL()}/ingest`;
 
   if (!postHogKey || !postHogHost) {
     return null;

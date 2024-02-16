@@ -5,6 +5,7 @@ import { render } from '@documenso/email/render';
 import { DocumentCompletedEmailTemplate } from '@documenso/email/templates/document-completed';
 import { prisma } from '@documenso/prisma';
 
+import { NEXT_PUBLIC_WEBAPP_URL } from '../../constants/app';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '../../types/document-audit-logs';
 import type { RequestMetadata } from '../../universal/extract-request-metadata';
 import { getFile } from '../../universal/upload/get-file';
@@ -40,12 +41,12 @@ export const sendCompletedEmail = async ({ documentId, requestMetadata }: SendDo
     document.Recipient.map(async (recipient) => {
       const { email, name, token } = recipient;
 
-      const assetBaseUrl = process.env.NEXT_PUBLIC_WEBAPP_URL || 'http://localhost:3000';
+      const assetBaseUrl = NEXT_PUBLIC_WEBAPP_URL() || 'http://localhost:3000';
 
       const template = createElement(DocumentCompletedEmailTemplate, {
         documentName: document.title,
         assetBaseUrl,
-        downloadLink: `${process.env.NEXT_PUBLIC_WEBAPP_URL}/sign/${token}/complete`,
+        downloadLink: `${NEXT_PUBLIC_WEBAPP_URL()}/sign/${token}/complete`,
       });
 
       await prisma.$transaction(async (tx) => {
