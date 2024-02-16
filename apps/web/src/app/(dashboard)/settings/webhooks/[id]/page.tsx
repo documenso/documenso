@@ -18,6 +18,7 @@ import {
   FormMessage,
 } from '@documenso/ui/primitives/form/form';
 import { Input } from '@documenso/ui/primitives/input';
+import { PasswordInput } from '@documenso/ui/primitives/password-input';
 import { Switch } from '@documenso/ui/primitives/switch';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
@@ -125,7 +126,7 @@ export default function WebhookPage({ params }: WebhookPageOptions) {
                 <FormItem>
                   <FormLabel>Secret</FormLabel>
                   <FormControl>
-                    <Input className="bg-background" {...field} value={field.value ?? ''} />
+                    <PasswordInput className="bg-background" {...field} value={field.value ?? ''} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
