@@ -130,6 +130,10 @@ export const EnableAuthenticatorAppDialog = ({
 
       return enabled2fa;
     } catch (_err) {
+      enableTwoFactorAuthenticationForm.setError('token', {
+        message: 'Unable to setup two-factor authentication',
+      });
+
       toast({
         title: 'Unable to setup two-factor authentication',
         description:
@@ -251,40 +255,41 @@ export const EnableAuthenticatorAppDialog = ({
                         <PinInput
                           id="enable-2fa-pin-input"
                           state={state}
-                          onSubmit={({ code, input }) => {
-                            console.log(code);
-
+                          onSubmit={async ({ code, input }) => {
                             if (code.length === 6) {
                               setState('loading');
+                              enableTwoFactorAuthenticationForm.setValue('token', code);
 
-                              void onEnableTwoFactorAuthenticationFormSubmit({ token: code }).then(
-                                (success) => {
-                                  if (success) {
-                                    setState('success');
-                                    return;
-                                  }
+                              await enableTwoFactorAuthenticationForm.handleSubmit(
+                                onEnableTwoFactorAuthenticationFormSubmit,
+                              )();
 
-                                  setState('error');
+                              if (
+                                enableTwoFactorAuthenticationForm.formState.isSubmitted &&
+                                !enableTwoFactorAuthenticationForm.formState.errors.totpCode
+                              ) {
+                                setState('success');
+                                return;
+                              }
 
-                                  setTimeout(() => {
-                                    setState('input');
-                                    input.value = '';
-                                    input.dispatchEvent(new Event('input'));
-                                    input.focus();
-                                  }, 500);
-                                },
-                              );
+                              setState('error');
+
+                              setTimeout(() => {
+                                setState('input');
+                                input.value = '';
+                                input.dispatchEvent(new Event('input'));
+                                input.focus();
+                              }, 500);
                             }
                           }}
                           autoFocus
                         />
                       </FormControl>
-                      <FormMessage />
                     </FormItem>
                   )}
                 />
 
-                {/* <DialogFooter>
+                <DialogFooter>
                   <Button type="button" variant="secondary" onClick={() => onOpenChange(false)}>
                     Cancel
                   </Button>
@@ -292,7 +297,7 @@ export const EnableAuthenticatorAppDialog = ({
                   <Button type="submit" loading={isEnableTwoFactorAuthenticationSubmitting}>
                     Enable 2FA
                   </Button>
-                </DialogFooter> */}
+                </DialogFooter>
               </form>
             </Form>
           ))
