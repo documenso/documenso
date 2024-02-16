@@ -74,6 +74,15 @@ export const Header = ({ className, ...props }: HeaderProps) => {
         >
           Sign in
         </Link>
+        <Link
+          href="https://app.documenso.com/signin"
+          target="_blank"
+          className="text-muted-foreground hover:text-muted-foreground/80 text-sm font-semibold"
+        >
+          <span className="bg-primary dark:text-background rounded-full px-3 py-2 text-xs">
+            Sign up
+          </span>
+        </Link>
       </div>
 
       <HamburgerMenu

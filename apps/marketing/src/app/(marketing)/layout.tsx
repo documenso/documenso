@@ -5,6 +5,7 @@ import React, { useEffect, useState } from 'react';
 import { usePathname } from 'next/navigation';
 
 import { cn } from '@documenso/ui/lib/utils';
+import { AnnouncementBar } from '@documenso/ui/primitives/announcement-bar';
 
 import { Footer } from '~/components/(marketing)/footer';
 import { Header } from '~/components/(marketing)/header';
@@ -38,6 +39,7 @@ export default function MarketingLayout({ children }: MarketingLayoutProps) {
           'bg-background/50 backdrop-blur-md': scrollY > 5,
         })}
       >
+        <AnnouncementBar isShown={true} />
         <Header className="mx-auto h-16 max-w-screen-xl px-4 md:h-20 lg:px-8" />
       </div>
 
