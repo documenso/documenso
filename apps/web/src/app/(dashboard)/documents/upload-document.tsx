@@ -117,7 +117,7 @@ export const UploadDocument = ({ className, team }: UploadDocumentProps) => {
   return (
     <div className={cn('relative', className)}>
       <DocumentDropzone
-        className="min-h-[40vh]"
+        className="h-[min(400px,50vh)]"
         disabled={remaining.documents === 0 || !session?.user.emailVerified}
         disabledMessage={disabledMessage}
         onDrop={onFileDrop}
