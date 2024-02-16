@@ -1,15 +1,19 @@
+import { STRIPE_CUSTOMER_TYPE } from '@documenso/lib/constants/billing';
 import { stripe } from '@documenso/lib/server-only/stripe';
 import { prisma } from '@documenso/prisma';
 import type { User } from '@documenso/prisma/client';
 
 import { onSubscriptionUpdated } from './webhook/on-subscription-updated';
 
+/**
+ * Get a non team Stripe customer by email.
+ */
 export const getStripeCustomerByEmail = async (email: string) => {
   const foundStripeCustomers = await stripe.customers.list({
     email,
   });
 
-  return foundStripeCustomers.data[0] ?? null;
+  return foundStripeCustomers.data.find((customer) => customer.metadata.type !== 'team') ?? null;
 };
 
 export const getStripeCustomerById = async (stripeCustomerId: string) => {
@@ -51,6 +55,7 @@ export const getStripeCustomerByUser = async (user: User) => {
       email: user.email,
       metadata: {
         userId: user.id,
+        type: STRIPE_CUSTOMER_TYPE.INDIVIDUAL,
       },
     });
   }
@@ -76,6 +81,14 @@ export const getStripeCustomerByUser = async (user: User) => {
     user: updatedUser,
     stripeCustomer,
   };
+};
+
+export const getStripeCustomerIdByUser = async (user: User) => {
+  if (user.customerId !== null) {
+    return user.customerId;
+  }
+
+  return await getStripeCustomerByUser(user).then((session) => session.stripeCustomer.id);
 };
 
 const syncStripeCustomerSubscriptions = async (userId: number, stripeCustomerId: string) => {

@@ -6,6 +6,7 @@ import Link from 'next/link';
 
 import signingCelebration from '@documenso/assets/images/signing-celebration.png';
 import { useFeatureFlags } from '@documenso/lib/client-only/providers/feature-flag';
+import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import type { Signature } from '@documenso/prisma/client';
 import { DocumentStatus } from '@documenso/prisma/client';
 import type { DocumentWithRecipient } from '@documenso/prisma/types/document-with-recipient';
@@ -85,7 +86,7 @@ export const SinglePlayerModeSuccess = ({
       <p className="text-muted-foreground/60 mt-16 text-center text-sm">
         Create a{' '}
         <Link
-          href={`${process.env.NEXT_PUBLIC_WEBAPP_URL}/signup`}
+          href={`${NEXT_PUBLIC_WEBAPP_URL()}/signup`}
           target="_blank"
           className="text-documenso-700 hover:text-documenso-600 whitespace-nowrap"
         >

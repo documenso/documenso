@@ -2,6 +2,8 @@
 
 import { useState } from 'react';
 
+import { useRouter } from 'next/navigation';
+
 import { zodResolver } from '@hookform/resolvers/zod';
 import { signIn } from 'next-auth/react';
 import { useForm } from 'react-hook-form';
@@ -38,6 +40,8 @@ const ERROR_MESSAGES: Partial<Record<keyof typeof ErrorCode, string>> = {
     'This account appears to be using a social login method, please sign in using that method',
   [ErrorCode.INCORRECT_TWO_FACTOR_CODE]: 'The two-factor authentication code provided is incorrect',
   [ErrorCode.INCORRECT_TWO_FACTOR_BACKUP_CODE]: 'The backup code provided is incorrect',
+  [ErrorCode.UNVERIFIED_EMAIL]:
+    'This account has not been verified. Please verify your account before signing in.',
 };
 
 const TwoFactorEnabledErrorCode = ErrorCode.TWO_FACTOR_MISSING_CREDENTIALS;
@@ -55,13 +59,15 @@ export type TSignInFormSchema = z.infer<typeof ZSignInFormSchema>;
 
 export type SignInFormProps = {
   className?: string;
+  initialEmail?: string;
   isGoogleSSOEnabled?: boolean;
 };
 
-export const SignInForm = ({ className, isGoogleSSOEnabled }: SignInFormProps) => {
+export const SignInForm = ({ className, initialEmail, isGoogleSSOEnabled }: SignInFormProps) => {
   const { toast } = useToast();
   const [isTwoFactorAuthenticationDialogOpen, setIsTwoFactorAuthenticationDialogOpen] =
     useState(false);
+  const router = useRouter();
 
   const [twoFactorAuthenticationMethod, setTwoFactorAuthenticationMethod] = useState<
     'totp' | 'backup'
@@ -69,7 +75,7 @@ export const SignInForm = ({ className, isGoogleSSOEnabled }: SignInFormProps) =
 
   const form = useForm<TSignInFormSchema>({
     values: {
-      email: '',
+      email: initialEmail ?? '',
       password: '',
       totpCode: '',
       backupCode: '',
@@ -128,6 +134,17 @@ export const SignInForm = ({ className, isGoogleSSOEnabled }: SignInFormProps) =
         }
 
         const errorMessage = ERROR_MESSAGES[result.error];
+
+        if (result.error === ErrorCode.UNVERIFIED_EMAIL) {
+          router.push(`/unverified-account`);
+
+          toast({
+            title: 'Unable to sign in',
+            description: errorMessage ?? 'An unknown error occurred',
+          });
+
+          return;
+        }
 
         toast({
           variant: 'destructive',

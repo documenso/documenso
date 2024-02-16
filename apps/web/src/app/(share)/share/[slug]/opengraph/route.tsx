@@ -3,6 +3,8 @@ import { NextResponse } from 'next/server';
 
 import { P, match } from 'ts-pattern';
 
+import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
+
 import type { ShareHandlerAPIResponse } from '~/pages/api/share';
 
 export const runtime = 'edge';
@@ -37,7 +39,7 @@ export async function GET(_request: Request, { params: { slug } }: SharePageOpen
     ),
   ]);
 
-  const baseUrl = process.env.NEXT_PUBLIC_WEBAPP_URL || 'http://localhost:3000';
+  const baseUrl = NEXT_PUBLIC_WEBAPP_URL() || 'http://localhost:3000';
 
   const recipientOrSender: ShareHandlerAPIResponse = await fetch(
     new URL(`/api/share?slug=${slug}`, baseUrl),

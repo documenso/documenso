@@ -30,7 +30,7 @@ test('user can sign up with email and password', async ({ page }: { page: Page }
     await page.mouse.up();
   }
 
-  await page.getByRole('button', { name: 'Sign Up' }).click();
+  await page.getByRole('button', { name: 'Sign Up', exact: true }).click();
   await page.waitForURL('/documents');
 
   await expect(page).toHaveURL('/documents');

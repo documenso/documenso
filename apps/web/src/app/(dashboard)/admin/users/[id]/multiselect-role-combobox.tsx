@@ -19,7 +19,7 @@ type ComboboxProps = {
   onChange: (_values: string[]) => void;
 };
 
-const MultiSelectCombobox = ({ listValues, onChange }: ComboboxProps) => {
+const MultiSelectRoleCombobox = ({ listValues, onChange }: ComboboxProps) => {
   const [open, setOpen] = React.useState(false);
   const [selectedValues, setSelectedValues] = React.useState<string[]>([]);
   const dbRoles = Object.values(Role);
@@ -79,4 +79,4 @@ const MultiSelectCombobox = ({ listValues, onChange }: ComboboxProps) => {
   );
 };
 
-export { MultiSelectCombobox };
+export { MultiSelectRoleCombobox };
