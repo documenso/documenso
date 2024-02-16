@@ -10,6 +10,7 @@ import {
   Download,
   Edit,
   EyeIcon,
+  FileClock,
   Loader,
   MoreHorizontal,
   Pencil,
@@ -37,6 +38,7 @@ import { useToast } from '@documenso/ui/primitives/use-toast';
 
 import { ResendDocumentActionItem } from './_action-items/resend-document';
 import { DeleteDocumentDialog } from './delete-document-dialog';
+import { DocumentHistoryDialog } from './document-history-dialog';
 import { DuplicateDocumentDialog } from './duplicate-document-dialog';
 
 export type DataTableActionDropdownProps = {
@@ -54,6 +56,7 @@ export const DataTableActionDropdown = ({ row, team }: DataTableActionDropdownPr
 
   const [isDeleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [isDuplicateDialogOpen, setDuplicateDialogOpen] = useState(false);
+  const [isHistoryDialogOpen, setHistoryDialogOpen] = useState(false);
 
   if (!session) {
     return null;
@@ -168,6 +171,11 @@ export const DataTableActionDropdown = ({ row, team }: DataTableActionDropdownPr
           Delete
         </DropdownMenuItem>
 
+        <DropdownMenuItem onClick={() => setHistoryDialogOpen(true)}>
+          <FileClock className="mr-2 h-4 w-4" />
+          Version History
+        </DropdownMenuItem>
+
         <DropdownMenuLabel>Share</DropdownMenuLabel>
 
         <ResendDocumentActionItem document={row} recipients={nonSignedRecipients} team={team} />
@@ -201,6 +209,13 @@ export const DataTableActionDropdown = ({ row, team }: DataTableActionDropdownPr
           open={isDuplicateDialogOpen}
           onOpenChange={setDuplicateDialogOpen}
           team={team}
+        />
+      )}
+      {isHistoryDialogOpen && (
+        <DocumentHistoryDialog
+          id={row.id}
+          open={isHistoryDialogOpen}
+          onOpenChange={setHistoryDialogOpen}
         />
       )}
     </DropdownMenu>
