@@ -30,13 +30,12 @@ const PinInput = ({ id, autoFocus, state, onSubmit }: PinInputProps) => {
       inputClassName="caret-transparent selection:bg-transparent ring:ring-2"
       autoFocus={autoFocus}
       length={6}
-      fontFamily="Inter"
-      fontSize="36px"
+      fontSize="30px"
       readOnly={state !== 'input'}
       disabled={state === 'loading'}
       inputRef={inputRef}
       padding={'14px'}
-      spacing={'18px'}
+      spacing={'24px'}
       spellCheck={false}
       inputMode="numeric"
       pattern="[0-9]*"
@@ -69,8 +68,7 @@ const PinInput = ({ id, autoFocus, state, onSubmit }: PinInputProps) => {
           >
             <div
               className={cn({
-                'm-[5px] flex-1 rounded-sm bg-[var(--segment-color)] opacity-[0.15625]':
-                  isSelection,
+                'm-[5px] flex-1 rounded-sm opacity-[0.15625]': isSelection,
                 'mx-auto  my-2 flex-[0_0_2px] animate-[blink-caret_1.2s_step-end_infinite] justify-self-center bg-black':
                   isCaret,
               })}
