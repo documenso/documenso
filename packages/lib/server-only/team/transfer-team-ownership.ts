@@ -49,7 +49,7 @@ export const transferTeamOwnership = async ({ token }: TransferTeamOwnershipOpti
 
     let teamSubscription: Stripe.Subscription | null = null;
 
-    if (IS_BILLING_ENABLED) {
+    if (IS_BILLING_ENABLED()) {
       teamSubscription = await transferTeamSubscription({
         user: newOwnerUser,
         team,

@@ -56,7 +56,7 @@ export const MobileNav = ({ className, ...props }: MobileNavProps) => {
         </Button>
       </Link>
 
-      {IS_BILLING_ENABLED && (
+      {IS_BILLING_ENABLED() && (
         <Link href={billingPath}>
           <Button
             variant="ghost"

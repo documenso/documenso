@@ -35,20 +35,15 @@ export const DeleteTemplateDialog = ({ id, open, onOpenChange }: DeleteTemplateD
 
       onOpenChange(false);
     },
-  });
-
-  const onDeleteTemplate = async () => {
-    try {
-      await deleteTemplate({ id });
-    } catch {
+    onError: () => {
       toast({
         title: 'Something went wrong',
         description: 'This template could not be deleted at this time. Please try again.',
         variant: 'destructive',
         duration: 7500,
       });
-    }
-  };
+    },
+  });
 
   return (
     <Dialog open={open} onOpenChange={(value) => !isLoading && onOpenChange(value)}>
@@ -63,20 +58,18 @@ export const DeleteTemplateDialog = ({ id, open, onOpenChange }: DeleteTemplateD
         </DialogHeader>
 
         <DialogFooter>
-          <div className="flex w-full flex-1 flex-nowrap gap-4">
-            <Button
-              type="button"
-              variant="secondary"
-              onClick={() => onOpenChange(false)}
-              className="flex-1"
-            >
-              Cancel
-            </Button>
+          <Button
+            type="button"
+            variant="secondary"
+            disabled={isLoading}
+            onClick={() => onOpenChange(false)}
+          >
+            Cancel
+          </Button>
 
-            <Button type="button" loading={isLoading} onClick={onDeleteTemplate} className="flex-1">
-              Delete
-            </Button>
-          </div>
+          <Button type="button" loading={isLoading} onClick={async () => deleteTemplate({ id })}>
+            Delete
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

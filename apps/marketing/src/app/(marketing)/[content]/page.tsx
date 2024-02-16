@@ -12,7 +12,7 @@ export const generateMetadata = ({ params }: { params: { content: string } }) =>
   const document = allDocuments.find((post) => post._raw.flattenedPath === params.content);
 
   if (!document) {
-    notFound();
+    return { title: 'Not Found' };
   }
 
   return { title: document.title };

@@ -42,7 +42,7 @@ export const leaveTeam = async ({ userId, teamId }: LeaveTeamOptions) => {
       },
     });
 
-    if (IS_BILLING_ENABLED && team.subscription) {
+    if (IS_BILLING_ENABLED() && team.subscription) {
       const numberOfSeats = await tx.teamMember.count({
         where: {
           teamId,

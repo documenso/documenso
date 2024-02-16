@@ -15,6 +15,8 @@ export const metadata: Metadata = {
   title: 'Pricing',
 };
 
+export const dynamic = 'force-dynamic';
+
 export type PricingPageProps = {
   searchParams?: {
     planId?: string;
