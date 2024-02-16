@@ -309,7 +309,7 @@ export const documentRouter = router({
 
   getDocumentAuditLogsByDocumentId: authenticatedProcedure
     .input(ZGetDocumentAuditLogsByDocumentIdQuerySchema)
-    .query(async ({ input, ctx }) => {
+    .query(async ({ input }) => {
       try {
         return await getDocumentAuditLogsByDocumentId(input);
       } catch (err) {

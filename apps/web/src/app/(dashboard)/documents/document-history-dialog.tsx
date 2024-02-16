@@ -15,7 +15,8 @@ type DocumentHistoryDialogProps = {
 };
 
 export const DocumentHistoryDialog = ({ id, open, onOpenChange }: DocumentHistoryDialogProps) => {
-  const { data: history, isLoading } = trpcReact.document.getDocumentById.useQuery({ id });
+  const { data: auditLogs, isLoading } =
+    trpcReact.document.getDocumentAuditLogsByDocumentId.useQuery({ id });
   return (
     <Dialog open={open} onOpenChange={(value) => !isLoading && onOpenChange(value)}>
       <DialogContent>
@@ -23,9 +24,20 @@ export const DocumentHistoryDialog = ({ id, open, onOpenChange }: DocumentHistor
           <DialogTitle>Version History</DialogTitle>
         </DialogHeader>
 
-        <div className="mx-auto -mt-4 flex w-full max-w-screen-xl flex-col px-4 md:px-8">
-          <h1>Document Audit Logs</h1>
-        </div>
+        {!auditLogs || isLoading ? (
+          <div>loading...</div>
+        ) : (
+          <div className="mx-auto -mt-4 flex w-full max-w-screen-xl flex-col px-4 md:px-8">
+            <h1>Document Audit Logs ({auditLogs.length})</h1>
+            <ul>
+              {auditLogs.map((log) => (
+                <li key={log.id}>
+                  {log.createdAt.toString()}: {log.type} by {log.email}
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
 
         <DialogFooter>
           <div className="flex w-full flex-1 flex-nowrap gap-4">
