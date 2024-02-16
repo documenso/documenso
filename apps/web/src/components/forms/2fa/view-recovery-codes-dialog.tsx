@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
@@ -41,6 +41,7 @@ export type ViewRecoveryCodesDialogProps = {
 
 export const ViewRecoveryCodesDialog = ({ open, onOpenChange }: ViewRecoveryCodesDialogProps) => {
   const { toast } = useToast();
+  const [recoveryCodesUrl, setRecoveryCodesUrl] = useState('');
 
   const { mutateAsync: viewRecoveryCodes, data: viewRecoveryCodesData } =
     trpc.twoFactorAuthentication.viewRecoveryCodes.useMutation();
@@ -61,6 +62,16 @@ export const ViewRecoveryCodesDialog = ({ open, onOpenChange }: ViewRecoveryCode
 
     return 'view';
   }, [viewRecoveryCodesData, isViewRecoveryCodesSubmitting]);
+
+  useEffect(() => {
+    if (viewRecoveryCodesData && viewRecoveryCodesData.recoveryCodes) {
+      const textBlob = new Blob([viewRecoveryCodesData.recoveryCodes.join('\n')], {
+        type: 'text/plain',
+      });
+      if (recoveryCodesUrl) URL.revokeObjectURL(recoveryCodesUrl);
+      setRecoveryCodesUrl(URL.createObjectURL(textBlob));
+    }
+  }, [viewRecoveryCodesData]);
 
   const onViewRecoveryCodesFormSubmit = async ({ password }: TViewRecoveryCodesForm) => {
     try {
@@ -139,8 +150,11 @@ export const ViewRecoveryCodesDialog = ({ open, onOpenChange }: ViewRecoveryCode
                 <RecoveryCodeList recoveryCodes={viewRecoveryCodesData.recoveryCodes} />
               )}
 
-              <div className="mt-4 flex flex-row-reverse items-center justify-between">
+              <div className="mt-4 flex flex-row-reverse items-center gap-2">
                 <Button onClick={() => onOpenChange(false)}>Complete</Button>
+                <a download="documenso-2FA-recovery-codes.txt" href={recoveryCodesUrl}>
+                  <Button>Download</Button>
+                </a>
               </div>
             </div>
           ))
