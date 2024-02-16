@@ -92,7 +92,7 @@ export const CreateWebhookDialog = ({ trigger, ...props }: CreateWebhookDialogPr
         {trigger ?? <Button className="flex-shrink-0">Create Webhook</Button>}
       </DialogTrigger>
 
-      <DialogContent>
+      <DialogContent position="center">
         <DialogHeader>
           <DialogTitle>Create webhook</DialogTitle>
           <DialogDescription>On this page, you can create a new webhook.</DialogDescription>

@@ -65,7 +65,7 @@ export default function WebhookPage() {
                   )}
                 </div>
               </div>
-              <div className="flex flex-col-reverse space-y-2 space-y-reverse sm:flex-row sm:justify-end sm:space-x-2 sm:space-y-0">
+              <div className="mt-6 flex flex-col-reverse space-y-2 space-y-reverse sm:mt-0 sm:flex-row sm:justify-end sm:space-x-2 sm:space-y-0">
                 <Button asChild variant="outline">
                   <Link href={`/settings/webhooks/${webhook.id}`}>Edit</Link>
                 </Button>
