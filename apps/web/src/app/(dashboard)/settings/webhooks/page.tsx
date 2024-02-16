@@ -4,6 +4,7 @@ import Link from 'next/link';
 
 import { Zap } from 'lucide-react';
 import { ToggleLeft, ToggleRight } from 'lucide-react';
+import { Loader } from 'lucide-react';
 
 import { trpc } from '@documenso/trpc/react';
 import { Button } from '@documenso/ui/primitives/button';
@@ -13,7 +14,7 @@ import { CreateWebhookDialog } from '~/components/(dashboard)/settings/webhooks/
 import { DeleteWebhookDialog } from '~/components/(dashboard)/settings/webhooks/delete-webhook-dialog';
 
 export default function WebhookPage() {
-  const { data: webhooks } = trpc.webhook.getWebhooks.useQuery();
+  const { data: webhooks, isLoading } = trpc.webhook.getWebhooks.useQuery();
 
   return (
     <div>
@@ -23,6 +24,12 @@ export default function WebhookPage() {
       >
         <CreateWebhookDialog />
       </SettingsHeader>
+
+      {isLoading && (
+        <div className="absolute inset-0 flex items-center justify-center bg-white/50">
+          <Loader className="h-8 w-8 animate-spin text-gray-500" />
+        </div>
+      )}
 
       {webhooks && webhooks.length === 0 && (
         // TODO: Perhaps add some illustrations here to make the page more engaging
