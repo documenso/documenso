@@ -6,6 +6,7 @@ import { upsertDocumentMeta } from '@documenso/lib/server-only/document-meta/ups
 import { createDocument } from '@documenso/lib/server-only/document/create-document';
 import { deleteDocument } from '@documenso/lib/server-only/document/delete-document';
 import { duplicateDocumentById } from '@documenso/lib/server-only/document/duplicate-document-by-id';
+import { getDocumentAuditLogsByDocumentId } from '@documenso/lib/server-only/document/get-document-audit-logs-by-document-id';
 import { getDocumentById } from '@documenso/lib/server-only/document/get-document-by-id';
 import { getDocumentAndSenderByToken } from '@documenso/lib/server-only/document/get-document-by-token';
 import { resendDocument } from '@documenso/lib/server-only/document/resend-document';
@@ -21,6 +22,7 @@ import { authenticatedProcedure, procedure, router } from '../trpc';
 import {
   ZCreateDocumentMutationSchema,
   ZDeleteDraftDocumentMutationSchema,
+  ZGetDocumentAuditLogsByDocumentIdQuerySchema,
   ZGetDocumentByIdQuerySchema,
   ZGetDocumentByTokenQuerySchema,
   ZResendDocumentMutationSchema,
@@ -301,6 +303,21 @@ export const documentRouter = router({
         throw new TRPCError({
           code: 'BAD_REQUEST',
           message: 'We are unable to search for documents. Please try again later.',
+        });
+      }
+    }),
+
+  getDocumentAuditLogsByDocumentId: authenticatedProcedure
+    .input(ZGetDocumentAuditLogsByDocumentIdQuerySchema)
+    .query(async ({ input, ctx }) => {
+      try {
+        return await getDocumentAuditLogsByDocumentId(input);
+      } catch (err) {
+        console.error(err);
+
+        throw new TRPCError({
+          code: 'BAD_REQUEST',
+          message: 'We were unable to find audit logs for this document. Please try again later.',
         });
       }
     }),

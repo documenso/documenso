@@ -110,3 +110,7 @@ export type TDeleteDraftDocumentMutationSchema = z.infer<typeof ZDeleteDraftDocu
 export const ZSearchDocumentsMutationSchema = z.object({
   query: z.string(),
 });
+
+export const ZGetDocumentAuditLogsByDocumentIdQuerySchema = z.object({
+  id: z.number().min(1),
+});
