@@ -1,6 +1,9 @@
 'use server';
 
 import { prisma } from '@documenso/prisma';
+import { WebhookTriggerEvents } from '@documenso/prisma/client';
+
+import { triggerWebhook } from '../../universal/trigger-webhook';
 
 export type CreateDocumentOptions = {
   title: string;
@@ -29,7 +32,7 @@ export const createDocument = async ({
       });
     }
 
-    return await tx.document.create({
+    const createdDocument = await tx.document.create({
       data: {
         title,
         documentDataId,
@@ -37,5 +40,12 @@ export const createDocument = async ({
         teamId,
       },
     });
+
+    await triggerWebhook({
+      eventTrigger: WebhookTriggerEvents.DOCUMENT_CREATED,
+      documentData: createdDocument,
+    });
+
+    return createdDocument;
   });
 };

@@ -2,7 +2,9 @@
 
 import { prisma } from '@documenso/prisma';
 import { DocumentStatus, SigningStatus } from '@documenso/prisma/client';
+import { WebhookTriggerEvents } from '@documenso/prisma/client';
 
+import { triggerWebhook } from '../../universal/trigger-webhook';
 import { sealDocument } from './seal-document';
 import { sendPendingEmail } from './send-pending-email';
 
@@ -11,13 +13,8 @@ export type CompleteDocumentWithTokenOptions = {
   documentId: number;
 };
 
-export const completeDocumentWithToken = async ({
-  token,
-  documentId,
-}: CompleteDocumentWithTokenOptions) => {
-  'use server';
-
-  const document = await prisma.document.findFirstOrThrow({
+const getDocument = async ({ token, documentId }: CompleteDocumentWithTokenOptions) => {
+  return await prisma.document.findFirstOrThrow({
     where: {
       id: documentId,
       Recipient: {
@@ -34,6 +31,15 @@ export const completeDocumentWithToken = async ({
       },
     },
   });
+};
+
+export const completeDocumentWithToken = async ({
+  token,
+  documentId,
+}: CompleteDocumentWithTokenOptions) => {
+  'use server';
+
+  const document = await getDocument({ token, documentId });
 
   if (document.status === DocumentStatus.COMPLETED) {
     throw new Error(`Document ${document.id} has already been completed`);
@@ -101,4 +107,11 @@ export const completeDocumentWithToken = async ({
   if (documents.count > 0) {
     await sealDocument({ documentId: document.id });
   }
+
+  const updatedDocument = await getDocument({ token, documentId });
+
+  await triggerWebhook({
+    eventTrigger: WebhookTriggerEvents.DOCUMENT_SIGNED,
+    documentData: updatedDocument,
+  });
 };
