@@ -3,6 +3,7 @@ import { hash } from 'bcrypt';
 import { getStripeCustomerByUser } from '@documenso/ee/server-only/stripe/get-customer';
 import { updateSubscriptionItemQuantity } from '@documenso/ee/server-only/stripe/update-subscription-item-quantity';
 import { prisma } from '@documenso/prisma';
+import type { SignatureType } from '@documenso/prisma/client';
 import { IdentityProvider, Prisma, TeamMemberInviteStatus } from '@documenso/prisma/client';
 
 import { IS_BILLING_ENABLED } from '../../constants/app';
@@ -13,9 +14,16 @@ export interface CreateUserOptions {
   email: string;
   password: string;
   signature?: string | null;
+  signatureType: SignatureType;
 }
 
-export const createUser = async ({ name, email, password, signature }: CreateUserOptions) => {
+export const createUser = async ({
+  name,
+  email,
+  password,
+  signature,
+  signatureType,
+}: CreateUserOptions) => {
   const hashedPassword = await hash(password, SALT_ROUNDS);
 
   const userExists = await prisma.user.findFirst({
@@ -34,6 +42,7 @@ export const createUser = async ({ name, email, password, signature }: CreateUse
       email: email.toLowerCase(),
       password: hashedPassword,
       signature,
+      signatureType,
       identityProvider: IdentityProvider.DOCUMENSO,
     },
   });

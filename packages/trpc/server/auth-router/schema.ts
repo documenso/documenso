@@ -1,5 +1,7 @@
 import { z } from 'zod';
 
+import { SignatureType } from '@documenso/prisma/client';
+
 export const ZCurrentPasswordSchema = z
   .string()
   .min(6, { message: 'Must be at least 6 characters in length' })
@@ -21,6 +23,7 @@ export const ZSignUpMutationSchema = z.object({
   email: z.string().email(),
   password: ZPasswordSchema,
   signature: z.string().min(1, { message: 'A signature is required.' }),
+  signatureType: z.nativeEnum(SignatureType),
 });
 
 export type TSignUpMutationSchema = z.infer<typeof ZSignUpMutationSchema>;

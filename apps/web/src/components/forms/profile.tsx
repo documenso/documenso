@@ -1,5 +1,7 @@
 'use client';
 
+import { useState } from 'react';
+
 import { useRouter } from 'next/navigation';
 
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -21,12 +23,12 @@ import {
 } from '@documenso/ui/primitives/form/form';
 import { Input } from '@documenso/ui/primitives/input';
 import { Label } from '@documenso/ui/primitives/label';
-import { SignaturePad } from '@documenso/ui/primitives/signature-pad';
+import { SignaturePad } from '@documenso/ui/primitives/signature-pad/signature-pad';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
 export const ZProfileFormSchema = z.object({
   name: z.string().trim().min(1, { message: 'Please enter a valid name.' }),
-  signature: z.string().min(1, 'Signature Pad cannot be empty'),
+  signature: z.string(),
 });
 
 export type TProfileFormSchema = z.infer<typeof ZProfileFormSchema>;
@@ -40,6 +42,7 @@ export const ProfileForm = ({ className, user }: ProfileFormProps) => {
   const router = useRouter();
 
   const { toast } = useToast();
+  const [isUploaded, setIsUploaded] = useState(false);
 
   const form = useForm<TProfileFormSchema>({
     values: {
@@ -55,9 +58,17 @@ export const ProfileForm = ({ className, user }: ProfileFormProps) => {
 
   const onFormSubmit = async ({ name, signature }: TProfileFormSchema) => {
     try {
+      if (signature === '') {
+        form.setError('signature', {
+          type: 'manual',
+          message: 'Signature Pad cannot be empty',
+        });
+        return;
+      }
       await updateProfile({
         name,
         signature,
+        signatureType: isUploaded ? 'UPLOAD' : 'DRAW',
       });
 
       toast({
@@ -83,6 +94,11 @@ export const ProfileForm = ({ className, user }: ProfileFormProps) => {
         });
       }
     }
+  };
+
+  const handleSignatureChange = (signature: string | null, isUploaded: boolean) => {
+    setIsUploaded(isUploaded);
+    form.setValue('signature', signature ?? '');
   };
 
   return (
@@ -115,7 +131,7 @@ export const ProfileForm = ({ className, user }: ProfileFormProps) => {
           <FormField
             control={form.control}
             name="signature"
-            render={({ field: { onChange } }) => (
+            render={() => (
               <FormItem>
                 <FormLabel>Signature</FormLabel>
                 <FormControl>
@@ -123,8 +139,13 @@ export const ProfileForm = ({ className, user }: ProfileFormProps) => {
                     className="h-44 w-full"
                     disabled={isSubmitting}
                     containerClassName={cn('rounded-lg border bg-background')}
-                    defaultValue={user.signature ?? undefined}
-                    onChange={(v) => onChange(v ?? '')}
+                    signature={{
+                      value: user.signature,
+                      type: user.signatureType,
+                    }}
+                    onChange={(v: string | null, isUploaded: boolean) =>
+                      handleSignatureChange(v, isUploaded)
+                    }
                   />
                 </FormControl>
                 <FormMessage />

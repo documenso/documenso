@@ -1,5 +1,7 @@
 import { z } from 'zod';
 
+import { SignatureType } from '@documenso/prisma/client';
+
 import { ZCurrentPasswordSchema, ZPasswordSchema } from '../auth-router/schema';
 
 export const ZFindUserSecurityAuditLogsSchema = z.object({
@@ -14,6 +16,7 @@ export const ZRetrieveUserByIdQuerySchema = z.object({
 export const ZUpdateProfileMutationSchema = z.object({
   name: z.string().min(1),
   signature: z.string(),
+  signatureType: z.nativeEnum(SignatureType),
 });
 
 export const ZUpdatePasswordMutationSchema = z.object({

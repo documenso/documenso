@@ -1,5 +1,6 @@
 import { prisma } from '@documenso/prisma';
 import { UserSecurityAuditLogType } from '@documenso/prisma/client';
+import type { SignatureType } from '@documenso/prisma/client';
 
 import type { RequestMetadata } from '../../universal/extract-request-metadata';
 
@@ -8,12 +9,14 @@ export type UpdateProfileOptions = {
   name: string;
   signature: string;
   requestMetadata?: RequestMetadata;
+  signatureType: SignatureType;
 };
 
 export const updateProfile = async ({
   userId,
   name,
   signature,
+  signatureType,
   requestMetadata,
 }: UpdateProfileOptions) => {
   // Existence check
@@ -40,6 +43,7 @@ export const updateProfile = async ({
       data: {
         name,
         signature,
+        signatureType,
       },
     });
   });

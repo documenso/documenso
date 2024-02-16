@@ -287,9 +287,13 @@ export const AddSignatureFormPartial = ({
                           <CardContent className="p-0">
                             <SignaturePad
                               className="h-44 w-full"
-                              defaultValue={field.value}
+                              signature={{
+                                value: field.value,
+                                type: 'DRAW',
+                              }}
+                              uploadDisable={true}
                               onBlur={field.onBlur}
-                              onChange={(value) => {
+                              onChange={(value: string | null, _: boolean) => {
                                 onFormValueChange(FieldType.SIGNATURE);
                                 field.onChange(value);
                               }}
