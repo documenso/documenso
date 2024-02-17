@@ -107,7 +107,7 @@ export const TextField = ({ field, recipient }: TextFieldProps) => {
 
       toast({
         title: 'Error',
-        description: 'An error occurred while removing the signature.',
+        description: 'An error occurred while removing the text.',
         variant: 'destructive',
       });
     }
@@ -134,7 +134,7 @@ export const TextField = ({ field, recipient }: TextFieldProps) => {
           </DialogTitle>
 
           <div className="">
-            <Label htmlFor="signature">Custom Text</Label>
+            <Label htmlFor="custom-text">Custom Text</Label>
 
             <Textarea
               id="custom-text"
