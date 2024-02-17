@@ -1,3 +1,4 @@
+import { headers } from 'next/headers';
 import { notFound, redirect } from 'next/navigation';
 
 import { match } from 'ts-pattern';
@@ -13,6 +14,7 @@ import { getFieldsForToken } from '@documenso/lib/server-only/field/get-fields-f
 import { getRecipientByToken } from '@documenso/lib/server-only/recipient/get-recipient-by-token';
 import { getRecipientSignatures } from '@documenso/lib/server-only/recipient/get-recipient-signatures';
 import { symmetricDecrypt } from '@documenso/lib/universal/crypto';
+import { extractNextHeaderRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 import { DocumentStatus, FieldType, RecipientRole, SigningStatus } from '@documenso/prisma/client';
 import { Card, CardContent } from '@documenso/ui/primitives/card';
 import { ElementVisible } from '@documenso/ui/primitives/element-visible';
@@ -39,13 +41,17 @@ export default async function SigningPage({ params: { token } }: SigningPageProp
     return notFound();
   }
 
+  const requestHeaders = Object.fromEntries(headers().entries());
+
+  const requestMetadata = extractNextHeaderRequestMetadata(requestHeaders);
+
   const [document, fields, recipient] = await Promise.all([
     getDocumentAndSenderByToken({
       token,
     }).catch(() => null),
     getFieldsForToken({ token }),
     getRecipientByToken({ token }).catch(() => null),
-    viewedDocument({ token }).catch(() => null),
+    viewedDocument({ token, requestMetadata }).catch(() => null),
   ]);
 
   if (!document || !document.documentData || !recipient) {

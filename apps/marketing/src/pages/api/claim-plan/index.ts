@@ -1,13 +1,15 @@
-import { NextApiRequest, NextApiResponse } from 'next';
+import type { NextApiRequest, NextApiResponse } from 'next';
 
 import { randomUUID } from 'crypto';
 
-import { TEarlyAdopterCheckoutMetadataSchema } from '@documenso/ee/server-only/stripe/webhook/early-adopter-checkout-metadata';
+import type { TEarlyAdopterCheckoutMetadataSchema } from '@documenso/ee/server-only/stripe/webhook/early-adopter-checkout-metadata';
+import { NEXT_PUBLIC_MARKETING_URL, NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { redis } from '@documenso/lib/server-only/redis';
 import { stripe } from '@documenso/lib/server-only/stripe';
 import { prisma } from '@documenso/prisma';
 
-import { TClaimPlanResponseSchema, ZClaimPlanRequestSchema } from '~/api/claim-plan/types';
+import type { TClaimPlanResponseSchema } from '~/api/claim-plan/types';
+import { ZClaimPlanRequestSchema } from '~/api/claim-plan/types';
 
 export default async function handler(
   req: NextApiRequest,
@@ -40,7 +42,7 @@ export default async function handler(
 
     if (user) {
       return res.status(200).json({
-        redirectUrl: `${process.env.NEXT_PUBLIC_WEBAPP_URL}/signin`,
+        redirectUrl: `${NEXT_PUBLIC_WEBAPP_URL()}/signin`,
       });
     }
 
@@ -77,8 +79,8 @@ export default async function handler(
       mode: 'subscription',
       metadata,
       allow_promotion_codes: true,
-      success_url: `${process.env.NEXT_PUBLIC_MARKETING_URL}/claimed?sessionId={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${process.env.NEXT_PUBLIC_MARKETING_URL}`,
+      success_url: `${NEXT_PUBLIC_MARKETING_URL()}/claimed?sessionId={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${NEXT_PUBLIC_MARKETING_URL()}`,
     });
 
     if (!checkout.url) {

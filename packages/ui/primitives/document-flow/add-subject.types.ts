@@ -13,7 +13,7 @@ export const ZAddSubjectFormSchema = z.object({
     redirectUrl: z
       .string()
       .optional()
-      .refine((value) => value === undefined || URL_REGEX.test(value), {
+      .refine((value) => value === undefined || value === '' || URL_REGEX.test(value), {
         message: 'Please enter a valid URL',
       }),
   }),
