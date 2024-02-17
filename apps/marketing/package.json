@@ -29,7 +29,7 @@
     "next-contentlayer": "^0.3.4",
     "next-plausible": "^3.10.1",
     "perfect-freehand": "^1.2.0",
-    "posthog-js": "^1.77.3",
+    "posthog-js": "^1.106.0",
     "react": "18.2.0",
     "react-confetti": "^6.1.0",
     "react-dom": "18.2.0",
