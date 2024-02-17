@@ -2,11 +2,11 @@ import type Stripe from 'stripe';
 import { z } from 'zod';
 
 import { createTeamCustomer } from '@documenso/ee/server-only/stripe/create-team-customer';
-import { getCommunityPlanPriceIds } from '@documenso/ee/server-only/stripe/get-community-plan-prices';
+import { getTeamRelatedPrices } from '@documenso/ee/server-only/stripe/get-team-related-prices';
 import { mapStripeSubscriptionToPrismaUpsertAction } from '@documenso/ee/server-only/stripe/webhook/on-subscription-updated';
 import { IS_BILLING_ENABLED } from '@documenso/lib/constants/app';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
-import { subscriptionsContainsActiveCommunityPlan } from '@documenso/lib/utils/billing';
+import { subscriptionsContainsActivePlan } from '@documenso/lib/utils/billing';
 import { prisma } from '@documenso/prisma';
 import { Prisma, TeamMemberRole } from '@documenso/prisma/client';
 
@@ -61,12 +61,11 @@ export const createTeam = async ({
   let customerId: string | null = null;
 
   if (IS_BILLING_ENABLED()) {
-    const communityPlanPriceIds = await getCommunityPlanPriceIds();
-
-    isPaymentRequired = !subscriptionsContainsActiveCommunityPlan(
-      user.Subscription,
-      communityPlanPriceIds,
+    const teamRelatedPriceIds = await getTeamRelatedPrices().then((prices) =>
+      prices.map((price) => price.id),
     );
+
+    isPaymentRequired = !subscriptionsContainsActivePlan(user.Subscription, teamRelatedPriceIds);
 
     customerId = await createTeamCustomer({
       name: user.name ?? teamName,

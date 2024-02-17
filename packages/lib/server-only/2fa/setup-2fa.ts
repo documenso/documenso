@@ -43,7 +43,7 @@ export const setupTwoFactorAuthentication = async ({
 
   const secret = crypto.randomBytes(10);
 
-  const backupCodes = new Array(10)
+  const backupCodes = Array.from({ length: 10 })
     .fill(null)
     .map(() => crypto.randomBytes(5).toString('hex'))
     .map((code) => `${code.slice(0, 5)}-${code.slice(5)}`.toUpperCase());
