@@ -6,8 +6,8 @@ import { PublicEnvScript } from 'next-runtime-env';
 
 import { FeatureFlagProvider } from '@documenso/lib/client-only/providers/feature-flag';
 import { LocaleProvider } from '@documenso/lib/client-only/providers/locale';
-import type { Locales } from '@documenso/lib/i18n/settings';
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
+import type { Locales } from '@documenso/lib/i18n/settings';
 import { getServerComponentAllFlags } from '@documenso/lib/server-only/feature-flags/get-server-component-feature-flag';
 import { getLocale } from '@documenso/lib/server-only/headers/get-locale';
 import { TrpcProvider } from '@documenso/trpc/react';
@@ -39,12 +39,12 @@ export const metadata = {
     description:
       'Join MonTampon, the open signing infrastructure, and get a 10x better signing experience. Pricing starts at $30/mo. forever! Sign in now and enjoy a faster, smarter, and more beautiful document signing process. Integrates with your favorite tools, customizable, and expandable. Support our mission and become a part of our open-source community.',
     type: 'website',
-    images: [`${process.env.NEXT_PUBLIC_WEBAPP_URL}/opengraph-image.jpg`],
+    images: [`${NEXT_PUBLIC_WEBAPP_URL}/opengraph-image.jpg`],
   },
   twitter: {
     site: '@documenso',
     card: 'summary_large_image',
-    images: [`${process.env.NEXT_PUBLIC_WEBAPP_URL}/opengraph-image.jpg`],
+    images: [`${NEXT_PUBLIC_WEBAPP_URL}/opengraph-image.jpg`],
     description:
       'Join MonTampon, the open signing infrastructure, and get a 10x better signing experience. Pricing starts at $30/mo. forever! Sign in now and enjoy a faster, smarter, and more beautiful document signing process. Integrates with your favorite tools, customizable, and expandable. Support our mission and become a part of our open-source community.',
   },
