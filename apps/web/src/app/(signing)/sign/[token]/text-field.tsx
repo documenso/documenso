@@ -15,7 +15,6 @@ import { Label } from '@documenso/ui/primitives/label';
 import { Textarea } from '@documenso/ui/primitives/textarea';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
-import { useRequiredSigningContext } from './provider';
 import { SigningFieldContainer } from './signing-field-container';
 
 export type TextFieldProps = {
@@ -27,8 +26,6 @@ export const TextField = ({ field, recipient }: TextFieldProps) => {
   const router = useRouter();
 
   const { toast } = useToast();
-  const { customText: providedCustomText, setCustomText: setProvidedCustomText } =
-    useRequiredSigningContext();
 
   const [isPending, startTransition] = useTransition();
 
@@ -52,30 +49,24 @@ export const TextField = ({ field, recipient }: TextFieldProps) => {
     }
   }, [showCustomTextModal, isLocalSignatureSet]);
 
-  const onSign = async (source: 'local' | 'provider' = 'provider') => {
+  const onSign = async () => {
     try {
-      if (!providedCustomText && !localText) {
+      if (!localText) {
         setIsLocalSignatureSet(false);
         setShowCustomTextModal(true);
         return;
       }
 
-      const value = source === 'local' && localText ? localText : providedCustomText ?? '';
-
-      if (!value) {
+      if (!localText) {
         return;
       }
 
       await signFieldWithToken({
         token: recipient.token,
         fieldId: field.id,
-        value,
+        value: localText,
         isBase64: true,
       });
-
-      if (source === 'local' && !providedCustomText) {
-        setProvidedCustomText(localText);
-      }
 
       setLocalCustomText('');
 
@@ -93,9 +84,6 @@ export const TextField = ({ field, recipient }: TextFieldProps) => {
 
   const onRemove = async () => {
     try {
-      // Necessary to reset the custom text if the user removes the signature
-      setProvidedCustomText('');
-
       await removeSignedFieldWithToken({
         token: recipient.token,
         fieldId: field.id,
@@ -164,7 +152,7 @@ export const TextField = ({ field, recipient }: TextFieldProps) => {
                 onClick={() => {
                   setShowCustomTextModal(false);
                   setIsLocalSignatureSet(true);
-                  void onSign('local');
+                  void onSign();
                 }}
               >
                 Save Text
