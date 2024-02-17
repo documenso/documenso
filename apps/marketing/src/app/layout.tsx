@@ -4,9 +4,9 @@ import { Caveat, Inter } from 'next/font/google';
 
 import { FeatureFlagProvider } from '@documenso/lib/client-only/providers/feature-flag';
 import { LocaleProvider } from '@documenso/lib/client-only/providers/locale';
+import { NEXT_PUBLIC_MARKETING_URL } from '@documenso/lib/constants/app';
 import type { Locales } from '@documenso/lib/i18n/settings';
 import { getLocale } from '@documenso/lib/server-only/headers/get-locale';
-import { NEXT_PUBLIC_MARKETING_URL } from '@documenso/lib/constants/app';
 import { getAllAnonymousFlags } from '@documenso/lib/universal/get-feature-flag';
 import { TrpcProvider } from '@documenso/trpc/react';
 import { cn } from '@documenso/ui/lib/utils';
@@ -37,12 +37,12 @@ export const metadata = {
     description:
       'Join MonTampon, the open signing infrastructure, and get a 10x better signing experience. Pricing starts at $30/mo. forever! Sign in now and enjoy a faster, smarter, and more beautiful document signing process. Integrates with your favorite tools, customizable, and expandable. Support our mission and become a part of our open-source community.',
     type: 'website',
-    images: [`${process.env.NEXT_PUBLIC_MARKETING_URL}/opengraph-image.jpg`],
+    images: [`${NEXT_PUBLIC_MARKETING_URL}/opengraph-image.jpg`],
   },
   twitter: {
     site: '@documenso',
     card: 'summary_large_image',
-    images: [`${process.env.NEXT_PUBLIC_MARKETING_URL}/opengraph-image.jpg`],
+    images: [`${NEXT_PUBLIC_MARKETING_URL}/opengraph-image.jpg`],
     description:
       'Join MonTampon, the open signing infrastructure, and get a 10x better signing experience. Pricing starts at $30/mo. forever! Sign in now and enjoy a faster, smarter, and more beautiful document signing process. Integrates with your favorite tools, customizable, and expandable. Support our mission and become a part of our open-source community.',
   },
