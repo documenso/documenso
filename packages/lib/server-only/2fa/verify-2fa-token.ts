@@ -17,7 +17,6 @@ export const verifyTwoFactorAuthenticationToken = async ({
   user,
   totpCode,
 }: VerifyTwoFactorAuthenticationTokenOptions) => {
-  // TODO: This is undefined and I can't figure out why.
   const key = DOCUMENSO_ENCRYPTION_KEY;
 
   if (!user.twoFactorSecret) {
