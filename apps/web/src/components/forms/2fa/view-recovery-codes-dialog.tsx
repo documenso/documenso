@@ -153,7 +153,7 @@ export const ViewRecoveryCodesDialog = ({ open, onOpenChange }: ViewRecoveryCode
               <div className="mt-4 flex flex-row-reverse items-center gap-2">
                 <Button onClick={() => onOpenChange(false)}>Complete</Button>
                 <a download="documenso-2FA-recovery-codes.txt" href={recoveryCodesUrl}>
-                  <Button>Download</Button>
+                  <Button variant="secondary">Download</Button>
                 </a>
               </div>
             </div>
