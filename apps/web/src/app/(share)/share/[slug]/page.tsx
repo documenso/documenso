@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';
+
 import { APP_BASE_URL } from '@documenso/lib/constants/app';
 import { NEXT_PUBLIC_MARKETING_URL } from '@documenso/lib/constants/app';
 
