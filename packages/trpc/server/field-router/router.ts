@@ -33,6 +33,7 @@ export const fieldRouter = router({
             pageY: field.pageY,
             pageWidth: field.pageWidth,
             pageHeight: field.pageHeight,
+            label: field.label,
           })),
           requestMetadata: extractNextApiRequestMetadata(ctx.req),
         });

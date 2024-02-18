@@ -20,6 +20,7 @@ export interface SetFieldsForDocumentOptions {
     pageY: number;
     pageWidth: number;
     pageHeight: number;
+    label: string;
   }[];
   requestMetadata?: RequestMetadata;
 }

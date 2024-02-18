@@ -15,6 +15,7 @@ export const ZAddFieldsMutationSchema = z.object({
       pageY: z.number().min(0),
       pageWidth: z.number().min(0),
       pageHeight: z.number().min(0),
+      label: z.string(),
     }),
   ),
 });

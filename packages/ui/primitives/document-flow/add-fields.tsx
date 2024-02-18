@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { Caveat } from 'next/font/google';
 
+import { Label } from '@radix-ui/react-label';
 import { Check, ChevronsUpDown, Info } from 'lucide-react';
 import { useFieldArray, useForm } from 'react-hook-form';
 
@@ -20,6 +21,7 @@ import { cn } from '../../lib/utils';
 import { Button } from '../button';
 import { Card, CardContent } from '../card';
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from '../command';
+import { Input } from '../input';
 import { Popover, PopoverContent, PopoverTrigger } from '../popover';
 import { useStep } from '../stepper';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../tooltip';
@@ -32,6 +34,7 @@ import {
   DocumentFlowFormContainerStep,
 } from './document-flow-root';
 import { FieldItem } from './field-item';
+import type { TDocumentFlowFormSchema } from './types';
 import { type DocumentFlowStep, FRIENDLY_FIELD_TYPE } from './types';
 
 const fontCaveat = Caveat({
@@ -46,6 +49,8 @@ const DEFAULT_WIDTH_PERCENT = 15;
 
 const MIN_HEIGHT_PX = 60;
 const MIN_WIDTH_PX = 200;
+
+type ActiveField = TDocumentFlowFormSchema['fields'][0];
 
 export type AddFieldsFormProps = {
   documentFlow: DocumentFlowStep;
@@ -69,6 +74,7 @@ export const AddFieldsFormPartial = ({
     control,
     handleSubmit,
     formState: { isSubmitting },
+    setValue,
   } = useForm<TAddFieldsFormSchema>({
     defaultValues: {
       fields: fields.map((field) => ({
@@ -82,11 +88,23 @@ export const AddFieldsFormPartial = ({
         pageHeight: Number(field.height),
         signerEmail:
           recipients.find((recipient) => recipient.id === field.recipientId)?.email ?? '',
+        label: field.label ?? '',
       })),
     },
   });
 
+  // const addLabelForm = useForm<TAddCustomLabelFormSchema>({
+  //   defaultValues: {
+  //     label: '',
+  //   },
+  // });
+
+  // const onCustomLabelFormSubmit = (data: TAddCustomLabelFormSchema) => {
+  //   console.log('Custom label', data);
+  // };
+
   const onFormSubmit = handleSubmit(onSubmit);
+  // const onAddCustomLabelFormSubmit = addLabelForm.handleSubmit(onCustomLabelFormSubmit);
 
   const {
     append,
@@ -101,6 +119,8 @@ export const AddFieldsFormPartial = ({
   const [selectedField, setSelectedField] = useState<FieldType | null>(null);
   const [selectedSigner, setSelectedSigner] = useState<Recipient | null>(null);
   const [showRecipientsSelector, setShowRecipientsSelector] = useState(false);
+  const [activeField, setActiveField] = useState<ActiveField | null>(null);
+  const [fieldLabel, setFieldLabel] = useState<Record<string, string> | null>({});
 
   const hasSelectedSignerBeenSent = selectedSigner?.sendStatus === SendStatus.SENT;
 
@@ -186,12 +206,13 @@ export const AddFieldsFormPartial = ({
         pageWidth: fieldPageWidth,
         pageHeight: fieldPageHeight,
         signerEmail: selectedSigner.email,
+        label: activeField?.label ?? fieldLabel?.[activeField?.formId ?? ''] ?? '',
       });
 
       setIsFieldWithinBounds(false);
       setSelectedField(null);
     },
-    [append, isWithinPageBounds, selectedField, selectedSigner, getPage],
+    [append, isWithinPageBounds, selectedField, selectedSigner, activeField, fieldLabel, getPage],
   );
 
   const onFieldResize = useCallback(
@@ -257,7 +278,7 @@ export const AddFieldsFormPartial = ({
       window.removeEventListener('mousemove', onMouseMove);
       window.removeEventListener('mouseup', onMouseClick);
     };
-  }, [onMouseClick, onMouseMove, selectedField]);
+  }, [onMouseClick, onMouseMove, selectedField, activeField]);
 
   useEffect(() => {
     const observer = new MutationObserver((_mutations) => {
@@ -311,6 +332,8 @@ export const AddFieldsFormPartial = ({
     );
   }, [recipientsByRole]);
 
+  console.log(localFields[0].label);
+
   return (
     <>
       <DocumentFlowFormContainerHeader
@@ -342,19 +365,24 @@ export const AddFieldsFormPartial = ({
             </Card>
           )}
 
-          {localFields.map((field, index) => (
-            <FieldItem
-              key={index}
-              field={field}
-              disabled={selectedSigner?.email !== field.signerEmail || hasSelectedSignerBeenSent}
-              minHeight={fieldBounds.current.height}
-              minWidth={fieldBounds.current.width}
-              passive={isFieldWithinBounds && !!selectedField}
-              onResize={(options) => onFieldResize(options, index)}
-              onMove={(options) => onFieldMove(options, index)}
-              onRemove={() => remove(index)}
-            />
-          ))}
+          {localFields.map((field, index) => {
+            return (
+              <FieldItem
+                key={index}
+                field={field}
+                disabled={selectedSigner?.email !== field.signerEmail || hasSelectedSignerBeenSent}
+                minHeight={fieldBounds.current.height}
+                minWidth={fieldBounds.current.width}
+                passive={isFieldWithinBounds && !!selectedField}
+                onResize={(options) => onFieldResize(options, index)}
+                onClick={(field) => {
+                  setActiveField(field);
+                }}
+                onMove={(options) => onFieldMove(options, index)}
+                onRemove={() => remove(index)}
+              />
+            );
+          })}
 
           {!hideRecipients && (
             <Popover open={showRecipientsSelector} onOpenChange={setShowRecipientsSelector}>
@@ -462,7 +490,7 @@ export const AddFieldsFormPartial = ({
             </Popover>
           )}
 
-          <div className="-mx-2 flex-1 overflow-y-auto px-2">
+          <div className="-mx-2 flex-1 px-2">
             <fieldset disabled={isFieldsDisabled} className="grid grid-cols-2 gap-x-4 gap-y-8">
               <button
                 type="button"
@@ -554,6 +582,40 @@ export const AddFieldsFormPartial = ({
               </button>
             </fieldset>
           </div>
+
+          {activeField && (
+            <div className="-mx-2 my-8 flex-1 gap-1.5 px-2">
+              <Label htmlFor="form-label">Custom Label</Label>
+              <div className="mt-2 flex w-full items-center space-x-2">
+                <Input
+                  type="text"
+                  className="w-full"
+                  placeholder="Label"
+                  id="form-label"
+                  value={fieldLabel?.[activeField.formId] ?? activeField.label}
+                  onChange={(e) => {
+                    setFieldLabel((prev) => ({
+                      ...prev,
+                      [activeField.formId]: e.target.value,
+                    }));
+
+                    setValue(
+                      'fields',
+                      localFields.map((field) => {
+                        if (field.formId === activeField.formId) {
+                          return {
+                            ...field,
+                            label: fieldLabel?.[activeField.formId] ?? activeField.label ?? '',
+                          };
+                        }
+                        return field;
+                      }),
+                    );
+                  }}
+                />
+              </div>
+            </div>
+          )}
         </div>
       </DocumentFlowFormContainerContent>
 

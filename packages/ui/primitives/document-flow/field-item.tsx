@@ -23,6 +23,7 @@ export type FieldItemProps = {
   minWidth?: number;
   onResize?: (_node: HTMLElement) => void;
   onMove?: (_node: HTMLElement) => void;
+  onClick?: (field: Field) => void;
   onRemove?: () => void;
 };
 
@@ -35,6 +36,7 @@ export const FieldItem = ({
   onResize,
   onMove,
   onRemove,
+  onClick,
 }: FieldItemProps) => {
   const [active, setActive] = useState(false);
   const [coords, setCoords] = useState({
@@ -106,7 +108,10 @@ export const FieldItem = ({
         width: coords.pageWidth,
       }}
       bounds={`${PDF_VIEWER_PAGE_SELECTOR}[data-page-number="${field.pageNumber}"]`}
-      onDragStart={() => setActive(true)}
+      onDragStart={() => {
+        setActive(true);
+        onClick?.(field);
+      }}
       onResizeStart={() => setActive(true)}
       onResizeStop={(_e, _d, ref) => {
         setActive(false);
