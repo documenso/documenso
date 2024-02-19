@@ -166,7 +166,7 @@ export const MenuSwitcher = ({ user, teams: initialTeamsData }: MenuSwitcherProp
               </div>
             </DropdownMenuLabel>
 
-            <div className="max-h-[15rem] overflow-auto">
+            <div className="max-h-[40vh] overflow-auto">
               {teams.map((team) => (
                 <DropdownMenuItem asChild key={team.id}>
                   <Link href={formatRedirectUrlOnSwitch(team.url)}>
