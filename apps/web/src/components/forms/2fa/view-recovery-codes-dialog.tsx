@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
@@ -63,7 +63,7 @@ export const ViewRecoveryCodesDialog = ({ open, onOpenChange }: ViewRecoveryCode
     return 'view';
   }, [viewRecoveryCodesData, isViewRecoveryCodesSubmitting]);
 
-  useEffect(() => {
+  const downloadRecoveryCodes = () => {
     if (viewRecoveryCodesData && viewRecoveryCodesData.recoveryCodes) {
       const textBlob = new Blob([viewRecoveryCodesData.recoveryCodes.join('\n')], {
         type: 'text/plain',
@@ -71,7 +71,7 @@ export const ViewRecoveryCodesDialog = ({ open, onOpenChange }: ViewRecoveryCode
       if (recoveryCodesUrl) URL.revokeObjectURL(recoveryCodesUrl);
       setRecoveryCodesUrl(URL.createObjectURL(textBlob));
     }
-  }, [viewRecoveryCodesData]);
+  };
 
   const onViewRecoveryCodesFormSubmit = async ({ password }: TViewRecoveryCodesForm) => {
     try {
@@ -153,7 +153,9 @@ export const ViewRecoveryCodesDialog = ({ open, onOpenChange }: ViewRecoveryCode
               <div className="mt-4 flex flex-row-reverse items-center gap-2">
                 <Button onClick={() => onOpenChange(false)}>Complete</Button>
                 <a download="documenso-2FA-recovery-codes.txt" href={recoveryCodesUrl}>
-                  <Button variant="secondary">Download</Button>
+                  <Button variant="secondary" onClick={downloadRecoveryCodes}>
+                    Download
+                  </Button>
                 </a>
               </div>
             </div>

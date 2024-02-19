@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 
 import { useRouter } from 'next/navigation';
 
@@ -56,6 +56,7 @@ export const EnableAuthenticatorAppDialog = ({
 }: EnableAuthenticatorAppDialogProps) => {
   const router = useRouter();
   const { toast } = useToast();
+  const [recoveryCodesUrl, setRecoveryCodesUrl] = useState('');
 
   const { mutateAsync: setupTwoFactorAuthentication, data: setupTwoFactorAuthenticationData } =
     trpc.twoFactorAuthentication.setup.useMutation();
@@ -112,6 +113,16 @@ export const EnableAuthenticatorAppDialog = ({
           'We were unable to setup two-factor authentication for your account. Please ensure that you have entered your password correctly and try again.',
         variant: 'destructive',
       });
+    }
+  };
+
+  const downloadRecoveryCodes = () => {
+    if (enableTwoFactorAuthenticationData && enableTwoFactorAuthenticationData.recoveryCodes) {
+      const textBlob = new Blob([enableTwoFactorAuthenticationData.recoveryCodes.join('\n')], {
+        type: 'text/plain',
+      });
+      if (recoveryCodesUrl) URL.revokeObjectURL(recoveryCodesUrl);
+      setRecoveryCodesUrl(URL.createObjectURL(textBlob));
     }
   };
 
@@ -270,10 +281,13 @@ export const EnableAuthenticatorAppDialog = ({
                 <RecoveryCodeList recoveryCodes={enableTwoFactorAuthenticationData.recoveryCodes} />
               )}
 
-              <div className="mt-4 flex w-full flex-row-reverse items-center justify-between">
-                <Button type="button" onClick={() => onCompleteClick()}>
-                  Complete
-                </Button>
+              <div className="mt-4 flex flex-row-reverse items-center gap-2">
+                <Button onClick={() => onOpenChange(false)}>Complete</Button>
+                <a download="documenso-2FA-recovery-codes.txt" href={recoveryCodesUrl}>
+                  <Button variant="secondary" onClick={downloadRecoveryCodes}>
+                    Download
+                  </Button>
+                </a>
               </div>
             </div>
           ))
