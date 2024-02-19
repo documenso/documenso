@@ -94,6 +94,12 @@ export const DocumentPageViewRecentActivity = ({
               </li>
             )}
 
+            {documentAuditLogs.length === 0 && (
+              <div className="flex items-center justify-center py-4">
+                <p className="text-muted-foreground/70 text-sm">No recent activity</p>
+              </div>
+            )}
+
             {documentAuditLogs.map((auditLog, auditLogIndex) => (
               <li key={auditLog.id} className="relative flex gap-x-4">
                 <div

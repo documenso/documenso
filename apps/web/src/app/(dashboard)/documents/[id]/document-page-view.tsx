@@ -7,6 +7,7 @@ import { match } from 'ts-pattern';
 import { DOCUMENSO_ENCRYPTION_KEY } from '@documenso/lib/constants/crypto';
 import { getRequiredServerComponentSession } from '@documenso/lib/next-auth/get-server-component-session';
 import { getDocumentById } from '@documenso/lib/server-only/document/get-document-by-id';
+import { getServerComponentFlag } from '@documenso/lib/server-only/feature-flags/get-server-component-feature-flag';
 import { getRecipientsForDocument } from '@documenso/lib/server-only/recipient/get-recipients-for-document';
 import { symmetricDecrypt } from '@documenso/lib/universal/crypto';
 import { formatDocumentsPath } from '@documenso/lib/utils/teams';
@@ -54,6 +55,10 @@ export const DocumentPageView = async ({ params, team }: DocumentPageViewProps) 
     userId: user.id,
     teamId: team?.id,
   }).catch(() => null);
+
+  const isDocumentHistoryEnabled = await getServerComponentFlag(
+    'app_document_page_view_history_sheet',
+  );
 
   if (!document || !document.documentData) {
     redirect(documentRootPath);
@@ -120,14 +125,16 @@ export const DocumentPageView = async ({ params, team }: DocumentPageViewProps) 
           </div>
         </div>
 
-        <div className="self-end">
-          <DocumentHistorySheet documentId={document.id} userId={user.id}>
-            <Button variant="outline">
-              <Clock9 className="mr-1.5 h-4 w-4" />
-              Document history
-            </Button>
-          </DocumentHistorySheet>
-        </div>
+        {isDocumentHistoryEnabled && (
+          <div className="self-end">
+            <DocumentHistorySheet documentId={document.id} userId={user.id}>
+              <Button variant="outline">
+                <Clock9 className="mr-1.5 h-4 w-4" />
+                Document history
+              </Button>
+            </DocumentHistorySheet>
+          </div>
+        )}
       </div>
 
       <div className="mt-6 grid w-full grid-cols-12 gap-8">
