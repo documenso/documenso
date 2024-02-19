@@ -9,7 +9,7 @@ export const RECIPIENT_ROLES_DESCRIPTION = {
   },
   [RecipientRole.CC]: {
     actionVerb: 'CC',
-    actioned: 'CCed',
+    actioned: `CC'd`,
     progressiveVerb: 'CC',
     roleName: 'Cc',
   },

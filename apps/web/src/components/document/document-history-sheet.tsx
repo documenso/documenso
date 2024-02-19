@@ -51,6 +51,7 @@ export const DocumentHistorySheet = ({
     },
     {
       getNextPageParam: (lastPage) => lastPage.nextCursor,
+      keepPreviousData: true,
     },
   );
 
@@ -168,6 +169,7 @@ export const DocumentHistorySheet = ({
                         },
                       ];
 
+                      // Insert the name to the start of the array if available.
                       if (data.recipientName) {
                         values.unshift({
                           key: 'Name',
