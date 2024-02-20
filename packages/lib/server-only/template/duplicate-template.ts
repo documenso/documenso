@@ -1,14 +1,39 @@
 import { nanoid } from '@documenso/lib/universal/id';
 import { prisma } from '@documenso/prisma';
+import type { Prisma } from '@documenso/prisma/client';
 import type { TDuplicateTemplateMutationSchema } from '@documenso/trpc/server/template-router/schema';
 
 export type DuplicateTemplateOptions = TDuplicateTemplateMutationSchema & {
   userId: number;
 };
 
-export const duplicateTemplate = async ({ templateId, userId }: DuplicateTemplateOptions) => {
+export const duplicateTemplate = async ({
+  templateId,
+  userId,
+  teamId,
+}: DuplicateTemplateOptions) => {
+  let templateWhereFilter: Prisma.TemplateWhereUniqueInput = {
+    id: templateId,
+    userId,
+    teamId: null,
+  };
+
+  if (teamId !== undefined) {
+    templateWhereFilter = {
+      id: templateId,
+      teamId,
+      team: {
+        members: {
+          some: {
+            userId,
+          },
+        },
+      },
+    };
+  }
+
   const template = await prisma.template.findUnique({
-    where: { id: templateId, userId },
+    where: templateWhereFilter,
     include: {
       Recipient: true,
       Field: true,
@@ -31,6 +56,7 @@ export const duplicateTemplate = async ({ templateId, userId }: DuplicateTemplat
   const duplicatedTemplate = await prisma.template.create({
     data: {
       userId,
+      teamId,
       title: template.title + ' (copy)',
       templateDocumentDataId: documentData.id,
       Recipient: {

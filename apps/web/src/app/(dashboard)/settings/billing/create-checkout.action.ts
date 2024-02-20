@@ -3,6 +3,7 @@
 import { getCheckoutSession } from '@documenso/ee/server-only/stripe/get-checkout-session';
 import { getStripeCustomerByUser } from '@documenso/ee/server-only/stripe/get-customer';
 import { getPortalSession } from '@documenso/ee/server-only/stripe/get-portal-session';
+import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { getRequiredServerComponentSession } from '@documenso/lib/next-auth/get-server-component-session';
 import { getSubscriptionsByUserId } from '@documenso/lib/server-only/subscription/get-subscriptions-by-user-id';
 
@@ -27,13 +28,13 @@ export const createCheckout = async ({ priceId }: CreateCheckoutOptions) => {
   if (foundSubscription) {
     return getPortalSession({
       customerId: stripeCustomer.id,
-      returnUrl: `${process.env.NEXT_PUBLIC_WEBAPP_URL}/settings/billing`,
+      returnUrl: `${NEXT_PUBLIC_WEBAPP_URL()}/settings/billing`,
     });
   }
 
   return getCheckoutSession({
     customerId: stripeCustomer.id,
     priceId,
-    returnUrl: `${process.env.NEXT_PUBLIC_WEBAPP_URL}/settings/billing`,
+    returnUrl: `${NEXT_PUBLIC_WEBAPP_URL()}/settings/billing`,
   });
 };
