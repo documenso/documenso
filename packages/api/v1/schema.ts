@@ -12,8 +12,8 @@ import {
  * Documents
  */
 export const ZGetDocumentsQuerySchema = z.object({
-  page: z.number().min(1).optional().default(1),
-  perPage: z.number().min(1).optional().default(1),
+  page: z.coerce.number().min(1).optional().default(1),
+  perPage: z.coerce.number().min(1).optional().default(1),
 });
 
 export type TGetDocumentsQuerySchema = z.infer<typeof ZGetDocumentsQuerySchema>;
@@ -32,6 +32,14 @@ export const ZSuccessfulDocumentResponseSchema = z.object({
   updatedAt: z.date(),
   completedAt: z.date().nullable(),
 });
+
+export const ZSuccessfulGetDocumentResponseSchema = ZSuccessfulDocumentResponseSchema.extend({
+  recipients: z.lazy(() => z.array(ZSuccessfulRecipientResponseSchema)),
+});
+
+export type TSuccessfulGetDocumentResponseSchema = z.infer<
+  typeof ZSuccessfulGetDocumentResponseSchema
+>;
 
 export type TSuccessfulDocumentResponseSchema = z.infer<typeof ZSuccessfulDocumentResponseSchema>;
 
@@ -84,6 +92,48 @@ export type TCreateDocumentMutationResponseSchema = z.infer<
   typeof ZCreateDocumentMutationResponseSchema
 >;
 
+export const ZCreateDocumentFromTemplateMutationSchema = z.object({
+  title: z.string().min(1),
+  recipients: z.array(
+    z.object({
+      name: z.string().min(1),
+      email: z.string().email().min(1),
+      role: z.nativeEnum(RecipientRole).optional().default(RecipientRole.SIGNER),
+    }),
+  ),
+  meta: z
+    .object({
+      subject: z.string(),
+      message: z.string(),
+      timezone: z.string(),
+      dateFormat: z.string(),
+      redirectUrl: z.string(),
+    })
+    .partial()
+    .optional(),
+});
+
+export type TCreateDocumentFromTemplateMutationSchema = z.infer<
+  typeof ZCreateDocumentFromTemplateMutationSchema
+>;
+
+export const ZCreateDocumentFromTemplateMutationResponseSchema = z.object({
+  documentId: z.number(),
+  recipients: z.array(
+    z.object({
+      recipientId: z.number(),
+      name: z.string(),
+      email: z.string().email().min(1),
+      token: z.string(),
+      role: z.nativeEnum(RecipientRole).optional().default(RecipientRole.SIGNER),
+    }),
+  ),
+});
+
+export type TCreateDocumentFromTemplateMutationResponseSchema = z.infer<
+  typeof ZCreateDocumentFromTemplateMutationResponseSchema
+>;
+
 export const ZCreateRecipientMutationSchema = z.object({
   name: z.string().min(1),
   email: z.string().email().min(1),
@@ -105,7 +155,9 @@ export type TDeleteRecipientMutationSchema = typeof ZDeleteRecipientMutationSche
 
 export const ZSuccessfulRecipientResponseSchema = z.object({
   id: z.number(),
-  documentId: z.number(),
+  // !: This handles the fact that we have null documentId's for templates
+  // !: while we won't need the default we must add it to satisfy typescript
+  documentId: z.number().nullish().default(-1),
   email: z.string().email().min(1),
   name: z.string(),
   role: z.nativeEnum(RecipientRole),

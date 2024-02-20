@@ -3,6 +3,8 @@ import { initContract } from '@ts-rest/core';
 import {
   ZSendDocumentForSigningMutationSchema as SendDocumentMutationSchema,
   ZAuthorizationHeadersSchema,
+  ZCreateDocumentFromTemplateMutationResponseSchema,
+  ZCreateDocumentFromTemplateMutationSchema,
   ZCreateDocumentMutationResponseSchema,
   ZCreateDocumentMutationSchema,
   ZCreateFieldMutationSchema,
@@ -13,6 +15,7 @@ import {
   ZGetDocumentsQuerySchema,
   ZSuccessfulDocumentResponseSchema,
   ZSuccessfulFieldResponseSchema,
+  ZSuccessfulGetDocumentResponseSchema,
   ZSuccessfulRecipientResponseSchema,
   ZSuccessfulResponseSchema,
   ZSuccessfulSigningResponseSchema,
@@ -41,7 +44,7 @@ export const ApiContractV1 = c.router(
       method: 'GET',
       path: '/api/v1/documents/:id',
       responses: {
-        200: ZSuccessfulDocumentResponseSchema,
+        200: ZSuccessfulGetDocumentResponseSchema,
         401: ZUnsuccessfulResponseSchema,
         404: ZUnsuccessfulResponseSchema,
       },
@@ -54,6 +57,18 @@ export const ApiContractV1 = c.router(
       body: ZCreateDocumentMutationSchema,
       responses: {
         200: ZCreateDocumentMutationResponseSchema,
+        401: ZUnsuccessfulResponseSchema,
+        404: ZUnsuccessfulResponseSchema,
+      },
+      summary: 'Upload a new document and get a presigned URL',
+    },
+
+    createDocumentFromTemplate: {
+      method: 'POST',
+      path: '/api/v1/templates/:templateId/create-document',
+      body: ZCreateDocumentFromTemplateMutationSchema,
+      responses: {
+        200: ZCreateDocumentFromTemplateMutationResponseSchema,
         401: ZUnsuccessfulResponseSchema,
         404: ZUnsuccessfulResponseSchema,
       },

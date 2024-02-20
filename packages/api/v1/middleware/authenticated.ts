@@ -16,7 +16,10 @@ export const authenticatedMiddleware = <
 ) => {
   return async (args: T) => {
     try {
-      const { authorization: token } = args.req.headers;
+      const { authorization } = args.req.headers;
+
+      // Support for both "Authorization: Bearer api_xxx" and "Authorization: api_xxx"
+      const [token] = (authorization || '').split('Bearer ').filter((s) => s.length > 0);
 
       if (!token) {
         throw new Error('Token was not provided for authenticated middleware');
@@ -26,6 +29,7 @@ export const authenticatedMiddleware = <
 
       return await handler(args, user);
     } catch (_err) {
+      console.log({ _err });
       return {
         status: 401,
         body: {

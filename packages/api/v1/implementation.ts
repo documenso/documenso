@@ -1,11 +1,13 @@
 import { createNextRoute } from '@ts-rest/next';
 
 import { createDocumentData } from '@documenso/lib/server-only/document-data/create-document-data';
+import { upsertDocumentMeta } from '@documenso/lib/server-only/document-meta/upsert-document-meta';
 import { createDocument } from '@documenso/lib/server-only/document/create-document';
 import { deleteDocument } from '@documenso/lib/server-only/document/delete-document';
 import { findDocuments } from '@documenso/lib/server-only/document/find-documents';
 import { getDocumentById } from '@documenso/lib/server-only/document/get-document-by-id';
 import { sendDocument } from '@documenso/lib/server-only/document/send-document';
+import { updateDocument } from '@documenso/lib/server-only/document/update-document';
 import { createField } from '@documenso/lib/server-only/field/create-field';
 import { deleteField } from '@documenso/lib/server-only/field/delete-field';
 import { getFieldById } from '@documenso/lib/server-only/field/get-field-by-id';
@@ -15,6 +17,7 @@ import { getRecipientById } from '@documenso/lib/server-only/recipient/get-recip
 import { getRecipientsForDocument } from '@documenso/lib/server-only/recipient/get-recipients-for-document';
 import { setRecipientsForDocument } from '@documenso/lib/server-only/recipient/set-recipients-for-document';
 import { updateRecipient } from '@documenso/lib/server-only/recipient/update-recipient';
+import { createDocumentFromTemplate } from '@documenso/lib/server-only/template/create-document-from-template';
 import { getPresignPostUrl } from '@documenso/lib/universal/upload/server-actions';
 import { DocumentDataType, DocumentStatus, SigningStatus } from '@documenso/prisma/client';
 
@@ -42,10 +45,17 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
 
     try {
       const document = await getDocumentById({ id: Number(documentId), userId: user.id });
+      const recipients = await getRecipientsForDocument({
+        documentId: Number(documentId),
+        userId: user.id,
+      });
 
       return {
         status: 200,
-        body: document,
+        body: {
+          ...document,
+          recipients,
+        },
       };
     } catch (err) {
       return {
@@ -124,6 +134,8 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
           documentId: document.id,
           recipients: recipients.map((recipient) => ({
             recipientId: recipient.id,
+            name: recipient.name,
+            email: recipient.email,
             token: recipient.token,
             role: recipient.role,
           })),
@@ -137,6 +149,53 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
         },
       };
     }
+  }),
+
+  createDocumentFromTemplate: authenticatedMiddleware(async (args, user) => {
+    const { body, params } = args;
+
+    const templateId = Number(params.templateId);
+
+    const fileName = body.title.endsWith('.pdf') ? body.title : `${body.title}.pdf`;
+
+    const document = await createDocumentFromTemplate({
+      templateId,
+      userId: user.id,
+      recipients: body.recipients,
+    });
+
+    await updateDocument({
+      documentId: document.id,
+      userId: user.id,
+      data: {
+        title: body.title,
+      },
+    });
+
+    if (body.meta) {
+      await upsertDocumentMeta({
+        documentId: document.id,
+        userId: user.id,
+        subject: body.meta.subject,
+        message: body.meta.message,
+        dateFormat: body.meta.dateFormat,
+        timezone: body.meta.timezone,
+      });
+    }
+
+    return {
+      status: 200,
+      body: {
+        documentId: document.id,
+        recipients: document.Recipient.map((recipient) => ({
+          recipientId: recipient.id,
+          name: recipient.name,
+          email: recipient.email,
+          token: recipient.token,
+          role: recipient.role,
+        })),
+      },
+    };
   }),
 
   sendDocument: authenticatedMiddleware(async (args, user) => {
@@ -461,6 +520,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
     });
 
     const remappedField = {
+      id: field.id,
       documentId: field.documentId,
       recipientId: field.recipientId ?? -1,
       type: field.type,
@@ -545,6 +605,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
     });
 
     const remappedField = {
+      id: updatedField.id,
       documentId: updatedField.documentId,
       recipientId: updatedField.recipientId ?? -1,
       type: updatedField.type,
@@ -635,6 +696,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
     }
 
     const remappedField = {
+      id: deletedField.id,
       documentId: deletedField.documentId,
       recipientId: deletedField.recipientId ?? -1,
       type: deletedField.type,

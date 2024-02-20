@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 import { useRouter } from 'next/navigation';
 
@@ -71,16 +71,6 @@ export const ApiTokenForm = ({ className }: ApiTokenFormProps) => {
       enabled: false,
     },
   });
-
-  useEffect(() => {
-    if (newlyCreatedToken) {
-      const timer = setTimeout(() => {
-        setNewlyCreatedToken('');
-      }, 30000);
-
-      return () => clearTimeout(timer);
-    }
-  }, [newlyCreatedToken]);
 
   const copyToken = async (token: string) => {
     try {
@@ -166,55 +156,59 @@ export const ApiTokenForm = ({ className }: ApiTokenFormProps) => {
               )}
             />
 
-            <FormField
-              control={form.control}
-              name="expirationDate"
-              render={({ field }) => (
-                <FormItem className="flex-1">
-                  <FormLabel className="text-muted-foreground">Token expiration date</FormLabel>
+            <div className="flex flex-col gap-4 md:flex-row">
+              <FormField
+                control={form.control}
+                name="expirationDate"
+                render={({ field }) => (
+                  <FormItem className="flex-1">
+                    <FormLabel className="text-muted-foreground">Token expiration date</FormLabel>
 
-                  <div className="flex items-center gap-x-4">
-                    <FormControl className="flex-1">
-                      <Select onValueChange={field.onChange} disabled={noExpirationDate}>
-                        <SelectTrigger className="w-[180px]">
-                          <SelectValue placeholder="Choose..." />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {Object.entries(EXPIRATION_DATES).map(([key, date]) => (
-                            <SelectItem key={key} value={key}>
-                              {date}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
+                    <div className="flex items-center gap-x-4">
+                      <FormControl className="flex-1">
+                        <Select onValueChange={field.onChange} disabled={noExpirationDate}>
+                          <SelectTrigger className="w-full">
+                            <SelectValue placeholder="Choose..." />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {Object.entries(EXPIRATION_DATES).map(([key, date]) => (
+                              <SelectItem key={key} value={key}>
+                                {date}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </FormControl>
+                    </div>
+
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="enabled"
+                render={({ field }) => (
+                  <FormItem className="">
+                    <FormLabel className="text-muted-foreground mt-2">Never expire</FormLabel>
+                    <FormControl>
+                      <div className="block md:py-1.5">
+                        <Switch
+                          className="bg-background"
+                          checked={field.value}
+                          onCheckedChange={(val) => {
+                            setNoExpirationDate((prev) => !prev);
+                            field.onChange(val);
+                          }}
+                        />
+                      </div>
                     </FormControl>
-                  </div>
-
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="enabled"
-              render={({ field }) => (
-                <FormItem className="flex items-center gap-2">
-                  <FormLabel className="text-muted-foreground mt-2">Never expire</FormLabel>
-                  <FormControl>
-                    <Switch
-                      className="bg-background"
-                      checked={field.value}
-                      onCheckedChange={(val) => {
-                        setNoExpirationDate((prev) => !prev);
-                        field.onChange(val);
-                      }}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
 
             <Button
               type="submit"

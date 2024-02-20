@@ -22,9 +22,14 @@ export const getUserByApiToken = async ({ token }: { token: string }) => {
     throw new Error('Invalid token');
   }
 
-  const tokenObject = user.ApiToken.find((apiToken) => apiToken.token === hashedToken);
+  const retrievedToken = user.ApiToken.find((apiToken) => apiToken.token === hashedToken);
 
-  if (!tokenObject || new Date(tokenObject.expires) < new Date()) {
+  // This should be impossible but we need to satisfy TypeScript
+  if (!retrievedToken) {
+    throw new Error('Invalid token');
+  }
+
+  if (retrievedToken.expires && retrievedToken.expires < new Date()) {
     throw new Error('Expired token');
   }
 

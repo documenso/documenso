@@ -5,7 +5,7 @@ import { ApiContractV1 } from '@documenso/api/v1/contract';
 import { ApiContractV1Implementation } from '@documenso/api/v1/implementation';
 
 const nextRouteHandler = createNextRouter(ApiContractV1, ApiContractV1Implementation, {
-  responseValidation: false,
+  responseValidation: true,
 });
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
