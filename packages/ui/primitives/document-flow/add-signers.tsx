@@ -32,7 +32,7 @@ import {
 import { ShowFieldItem } from './show-field-item';
 import type { DocumentFlowStep } from './types';
 
-const ROLE_ICONS: Record<RecipientRole, JSX.Element> = {
+export const ROLE_ICONS: Record<RecipientRole, JSX.Element> = {
   SIGNER: <PencilLine className="h-4 w-4" />,
   APPROVER: <BadgeCheck className="h-4 w-4" />,
   CC: <Copy className="h-4 w-4" />,

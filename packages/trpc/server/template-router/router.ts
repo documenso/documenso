@@ -52,6 +52,7 @@ export const templateRouter = router({
         return await createDocumentFromTemplate({
           templateId,
           userId: ctx.user.id,
+          recipients: input.recipients,
         });
       } catch (err) {
         throw new TRPCError({
