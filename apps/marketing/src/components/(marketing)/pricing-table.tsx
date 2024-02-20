@@ -117,29 +117,22 @@ export const PricingTable = ({ className, ...props }: PricingTableProps) => {
           </Button>
 
           <div className="mt-8 flex w-full flex-col divide-y">
-            <p className="text-foreground py-4 font-medium">
-              {' '}
-              <a href="https://documenso.com/blog/early-adopters" target="_blank" rel="noreferrer">
-                The Early Adopter Deal:
+            <p className="text-foreground py-4">
+              <a
+                href="https://documen.so/early-adopters-pricing-page"
+                target="_blank"
+                rel="noreferrer"
+              >
+                Limited Time Offer: <span className="text-documenso-700">Read More</span>
               </a>
             </p>
-            <p className="text-foreground py-4">Join the movement</p>
-            <p className="text-foreground py-4">Simple signing solution</p>
+            <p className="text-foregro‚und py-4">Unlimited Teams</p>
+            <p className="text-foregro‚und py-4">Unlimited Users</p>
+            <p className="text-foregro‚und py-4">Unlimited Documents per month</p>
+            <p className="text-foreground py-4">Includes all upcoming features</p>
             <p className="text-foreground py-4">Email, Discord and Slack assistance</p>
-            <p className="text-foreground py-4">
-              <strong>
-                {' '}
-                <a
-                  href="https://documenso.com/blog/early-adopters"
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  Includes all upcoming features
-                </a>
-              </strong>
-            </p>
-            <p className="text-foreground py-4">Fixed, straightforward pricing</p>
           </div>
+          <div className="flex-1" />
         </div>
 
         <div
