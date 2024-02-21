@@ -25,10 +25,16 @@ export const extractNextApiRequestMetadata = (req: NextApiRequest): RequestMetad
 export const extractNextAuthRequestMetadata = (
   req: Pick<RequestInternal, 'body' | 'query' | 'headers' | 'method'>,
 ): RequestMetadata => {
-  const parsedIp = ZIpSchema.safeParse(req.headers?.['x-forwarded-for']);
+  return extractNextHeaderRequestMetadata(req.headers ?? {});
+};
+
+export const extractNextHeaderRequestMetadata = (
+  headers: Record<string, string>,
+): RequestMetadata => {
+  const parsedIp = ZIpSchema.safeParse(headers?.['x-forwarded-for']);
 
   const ipAddress = parsedIp.success ? parsedIp.data : undefined;
-  const userAgent = req.headers?.['user-agent'];
+  const userAgent = headers?.['user-agent'];
 
   return {
     ipAddress,

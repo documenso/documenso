@@ -380,7 +380,7 @@ export const AddFieldsFormPartial = ({
               </PopoverTrigger>
 
               <PopoverContent className="p-0" align="start">
-                <Command>
+                <Command value={selectedSigner?.email}>
                   <CommandInput />
 
                   <CommandEmpty>
