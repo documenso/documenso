@@ -1,10 +1,11 @@
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { match } from 'ts-pattern';
 import { z } from 'zod';
 
+import { downloadFile } from '@documenso/lib/client-only/download-file';
 import { trpc } from '@documenso/trpc/react';
 import { Button } from '@documenso/ui/primitives/button';
 import {
@@ -41,10 +42,12 @@ export type ViewRecoveryCodesDialogProps = {
 
 export const ViewRecoveryCodesDialog = ({ open, onOpenChange }: ViewRecoveryCodesDialogProps) => {
   const { toast } = useToast();
-  const [recoveryCodesUrl, setRecoveryCodesUrl] = useState('');
 
-  const { mutateAsync: viewRecoveryCodes, data: viewRecoveryCodesData } =
-    trpc.twoFactorAuthentication.viewRecoveryCodes.useMutation();
+  const {
+    mutateAsync: viewRecoveryCodes,
+    data: viewRecoveryCodesData,
+    isLoading: isViewRecoveryCodesDataLoading,
+  } = trpc.twoFactorAuthentication.viewRecoveryCodes.useMutation();
 
   const viewRecoveryCodesForm = useForm<TViewRecoveryCodesForm>({
     defaultValues: {
@@ -65,11 +68,14 @@ export const ViewRecoveryCodesDialog = ({ open, onOpenChange }: ViewRecoveryCode
 
   const downloadRecoveryCodes = () => {
     if (viewRecoveryCodesData && viewRecoveryCodesData.recoveryCodes) {
-      const textBlob = new Blob([viewRecoveryCodesData.recoveryCodes.join('\n')], {
+      const blob = new Blob([viewRecoveryCodesData.recoveryCodes.join('\n')], {
         type: 'text/plain',
       });
-      if (recoveryCodesUrl) URL.revokeObjectURL(recoveryCodesUrl);
-      setRecoveryCodesUrl(URL.createObjectURL(textBlob));
+
+      downloadFile({
+        filename: 'documenso-2FA-recovery-codes.txt',
+        data: blob,
+      });
     }
   };
 
@@ -152,11 +158,15 @@ export const ViewRecoveryCodesDialog = ({ open, onOpenChange }: ViewRecoveryCode
 
               <div className="mt-4 flex flex-row-reverse items-center gap-2">
                 <Button onClick={() => onOpenChange(false)}>Complete</Button>
-                <a download="documenso-2FA-recovery-codes.txt" href={recoveryCodesUrl}>
-                  <Button variant="secondary" onClick={downloadRecoveryCodes}>
-                    Download
-                  </Button>
-                </a>
+
+                <Button
+                  variant="secondary"
+                  disabled={!viewRecoveryCodesData?.recoveryCodes}
+                  loading={isViewRecoveryCodesDataLoading}
+                  onClick={downloadRecoveryCodes}
+                >
+                  Download
+                </Button>
               </div>
             </div>
           ))
