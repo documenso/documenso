@@ -43,9 +43,9 @@ model User {
   twoFactorSecret      String?
   twoFactorEnabled     Boolean              @default(false)
   twoFactorBackupCodes String?
-
-  VerificationToken VerificationToken[]
-  Template          Template[]
+  VerificationToken    VerificationToken[]
+  ApiToken             ApiToken[]
+  Template             Template[]  
   securityAuditLogs UserSecurityAuditLog[]
 
   @@index([email])
@@ -92,6 +92,21 @@ model VerificationToken {
   createdAt  DateTime @default(now())
   userId     Int
   user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+enum ApiTokenAlgorithm {
+  SHA512
+}
+
+model ApiToken {
+  id        Int               @id @default(autoincrement())
+  name      String
+  token     String            @unique
+  algorithm ApiTokenAlgorithm @default(SHA512)
+  expires   DateTime?
+  createdAt DateTime          @default(now())
+  userId    Int
+  user      User              @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 enum SubscriptionStatus {
