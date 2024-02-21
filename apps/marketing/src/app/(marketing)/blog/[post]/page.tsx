@@ -9,9 +9,6 @@ import { useMDXComponent } from 'next-contentlayer/hooks';
 
 export const dynamic = 'force-dynamic';
 
-export const generateStaticParams = () =>
-  allBlogPosts.map((post) => ({ post: post._raw.flattenedPath }));
-
 export const generateMetadata = ({ params }: { params: { post: string } }) => {
   const blogPost = allBlogPosts.find((post) => post._raw.flattenedPath === `blog/${params.post}`);
 

@@ -5,6 +5,7 @@ import { useForm } from 'react-hook-form';
 import { match } from 'ts-pattern';
 import { z } from 'zod';
 
+import { downloadFile } from '@documenso/lib/client-only/download-file';
 import { trpc } from '@documenso/trpc/react';
 import { Button } from '@documenso/ui/primitives/button';
 import {
@@ -42,8 +43,11 @@ export type ViewRecoveryCodesDialogProps = {
 export const ViewRecoveryCodesDialog = ({ open, onOpenChange }: ViewRecoveryCodesDialogProps) => {
   const { toast } = useToast();
 
-  const { mutateAsync: viewRecoveryCodes, data: viewRecoveryCodesData } =
-    trpc.twoFactorAuthentication.viewRecoveryCodes.useMutation();
+  const {
+    mutateAsync: viewRecoveryCodes,
+    data: viewRecoveryCodesData,
+    isLoading: isViewRecoveryCodesDataLoading,
+  } = trpc.twoFactorAuthentication.viewRecoveryCodes.useMutation();
 
   const viewRecoveryCodesForm = useForm<TViewRecoveryCodesForm>({
     defaultValues: {
@@ -61,6 +65,19 @@ export const ViewRecoveryCodesDialog = ({ open, onOpenChange }: ViewRecoveryCode
 
     return 'view';
   }, [viewRecoveryCodesData, isViewRecoveryCodesSubmitting]);
+
+  const downloadRecoveryCodes = () => {
+    if (viewRecoveryCodesData && viewRecoveryCodesData.recoveryCodes) {
+      const blob = new Blob([viewRecoveryCodesData.recoveryCodes.join('\n')], {
+        type: 'text/plain',
+      });
+
+      downloadFile({
+        filename: 'documenso-2FA-recovery-codes.txt',
+        data: blob,
+      });
+    }
+  };
 
   const onViewRecoveryCodesFormSubmit = async ({ password }: TViewRecoveryCodesForm) => {
     try {
@@ -139,8 +156,17 @@ export const ViewRecoveryCodesDialog = ({ open, onOpenChange }: ViewRecoveryCode
                 <RecoveryCodeList recoveryCodes={viewRecoveryCodesData.recoveryCodes} />
               )}
 
-              <div className="mt-4 flex flex-row-reverse items-center justify-between">
+              <div className="mt-4 flex flex-row-reverse items-center gap-2">
                 <Button onClick={() => onOpenChange(false)}>Complete</Button>
+
+                <Button
+                  variant="secondary"
+                  disabled={!viewRecoveryCodesData?.recoveryCodes}
+                  loading={isViewRecoveryCodesDataLoading}
+                  onClick={downloadRecoveryCodes}
+                >
+                  Download
+                </Button>
               </div>
             </div>
           ))
