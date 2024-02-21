@@ -1,14 +1,12 @@
-import { useMemo, useState } from 'react';
-
-import { useRouter } from 'next/navigation';
+import { useMemo } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { flushSync } from 'react-dom';
 import { useForm } from 'react-hook-form';
 import { match } from 'ts-pattern';
 import { renderSVG } from 'uqr';
 import { z } from 'zod';
 
+import { downloadFile } from '@documenso/lib/client-only/download-file';
 import { trpc } from '@documenso/trpc/react';
 import { Button } from '@documenso/ui/primitives/button';
 import {
@@ -54,15 +52,16 @@ export const EnableAuthenticatorAppDialog = ({
   open,
   onOpenChange,
 }: EnableAuthenticatorAppDialogProps) => {
-  const router = useRouter();
   const { toast } = useToast();
-  const [recoveryCodesUrl, setRecoveryCodesUrl] = useState('');
 
   const { mutateAsync: setupTwoFactorAuthentication, data: setupTwoFactorAuthenticationData } =
     trpc.twoFactorAuthentication.setup.useMutation();
 
-  const { mutateAsync: enableTwoFactorAuthentication, data: enableTwoFactorAuthenticationData } =
-    trpc.twoFactorAuthentication.enable.useMutation();
+  const {
+    mutateAsync: enableTwoFactorAuthentication,
+    data: enableTwoFactorAuthenticationData,
+    isLoading: isEnableTwoFactorAuthenticationDataLoading,
+  } = trpc.twoFactorAuthentication.enable.useMutation();
 
   const setupTwoFactorAuthenticationForm = useForm<TSetupTwoFactorAuthenticationForm>({
     defaultValues: {
@@ -118,11 +117,14 @@ export const EnableAuthenticatorAppDialog = ({
 
   const downloadRecoveryCodes = () => {
     if (enableTwoFactorAuthenticationData && enableTwoFactorAuthenticationData.recoveryCodes) {
-      const textBlob = new Blob([enableTwoFactorAuthenticationData.recoveryCodes.join('\n')], {
+      const blob = new Blob([enableTwoFactorAuthenticationData.recoveryCodes.join('\n')], {
         type: 'text/plain',
       });
-      if (recoveryCodesUrl) URL.revokeObjectURL(recoveryCodesUrl);
-      setRecoveryCodesUrl(URL.createObjectURL(textBlob));
+
+      downloadFile({
+        filename: 'documenso-2FA-recovery-codes.txt',
+        data: blob,
+      });
     }
   };
 
@@ -145,14 +147,6 @@ export const EnableAuthenticatorAppDialog = ({
         variant: 'destructive',
       });
     }
-  };
-
-  const onCompleteClick = () => {
-    flushSync(() => {
-      onOpenChange(false);
-    });
-
-    router.refresh();
   };
 
   return (
@@ -283,11 +277,15 @@ export const EnableAuthenticatorAppDialog = ({
 
               <div className="mt-4 flex flex-row-reverse items-center gap-2">
                 <Button onClick={() => onOpenChange(false)}>Complete</Button>
-                <a download="documenso-2FA-recovery-codes.txt" href={recoveryCodesUrl}>
-                  <Button variant="secondary" onClick={downloadRecoveryCodes}>
-                    Download
-                  </Button>
-                </a>
+
+                <Button
+                  variant="secondary"
+                  onClick={downloadRecoveryCodes}
+                  disabled={!enableTwoFactorAuthenticationData?.recoveryCodes}
+                  loading={isEnableTwoFactorAuthenticationDataLoading}
+                >
+                  Download
+                </Button>
               </div>
             </div>
           ))
