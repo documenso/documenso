@@ -8,6 +8,7 @@ import { resetPassword } from '@documenso/lib/server-only/user/reset-password';
 import { sendConfirmationToken } from '@documenso/lib/server-only/user/send-confirmation-token';
 import { updatePassword } from '@documenso/lib/server-only/user/update-password';
 import { updateProfile } from '@documenso/lib/server-only/user/update-profile';
+import { updatePublicProfile } from '@documenso/lib/server-only/user/update-public-profile';
 import { extractNextApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 
 import { adminProcedure, authenticatedProcedure, procedure, router } from '../trpc';
@@ -19,6 +20,7 @@ import {
   ZRetrieveUserByIdQuerySchema,
   ZUpdatePasswordMutationSchema,
   ZUpdateProfileMutationSchema,
+  ZUpdatePublicProfileMutationSchema,
 } from './schema';
 
 export const profileRouter = router({
@@ -70,6 +72,27 @@ export const profileRouter = router({
           code: 'BAD_REQUEST',
           message:
             'We were unable to update your profile. Please review the information you provided and try again.',
+        });
+      }
+    }),
+
+  updatePublicProfile: authenticatedProcedure
+    .input(ZUpdatePublicProfileMutationSchema)
+    .mutation(async ({ input, ctx }) => {
+      try {
+        const { profileURL, profileBio } = input;
+
+        return await updatePublicProfile({
+          id: ctx.user.id,
+          userProfile: { profileURL, profileBio },
+        });
+      } catch (err) {
+        console.error(err);
+
+        throw new TRPCError({
+          code: 'BAD_REQUEST',
+          message:
+            'We were unable to update your public profile. Please review the information you provided and try again.',
         });
       }
     }),

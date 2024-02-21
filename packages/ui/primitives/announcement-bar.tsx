@@ -17,11 +17,7 @@ export const AnnouncementBar: React.FC<AnnouncementBarProps> = ({ isShown }) => 
 
         <div className="flex items-center justify-center gap-4 rounded-lg bg-white px-3 py-1">
           <div className="text-xs text-gray-900">
-            <Link
-              href="https://app.documenso.com"
-            >
-              Claim now
-            </Link>
+            <Link href="https://app.documenso.com">Claim now</Link>
           </div>
         </div>
       </div>

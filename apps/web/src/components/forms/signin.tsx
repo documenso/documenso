@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -183,135 +184,147 @@ export const SignInForm = ({ className, initialEmail, isGoogleSSOEnabled }: Sign
   };
 
   return (
-    <Form {...form}>
-      <form
-        className={cn('flex w-full flex-col gap-y-4', className)}
-        onSubmit={form.handleSubmit(onFormSubmit)}
-      >
-        <fieldset className="flex w-full flex-col gap-y-4" disabled={isSubmitting}>
-          <FormField
-            control={form.control}
-            name="email"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Email</FormLabel>
-                <FormControl>
-                  <Input type="email" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="password"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Password</FormLabel>
-                <FormControl>
-                  <PasswordInput {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </fieldset>
-
-        <Button
-          type="submit"
-          size="lg"
-          loading={isSubmitting}
-          className="dark:bg-documenso dark:hover:opacity-90"
+    <div className={cn('mt-1')}>
+      <Form {...form}>
+        <form
+          className={cn('flex w-full flex-col gap-y-4', className)}
+          onSubmit={form.handleSubmit(onFormSubmit)}
         >
-          {isSubmitting ? 'Signing in...' : 'Sign In'}
-        </Button>
-
-        {isGoogleSSOEnabled && (
-          <>
-            <div className="relative flex items-center justify-center gap-x-4 py-2 text-xs uppercase">
-              <div className="bg-border h-px flex-1" />
-              <span className="text-muted-foreground bg-transparent">Or continue with</span>
-              <div className="bg-border h-px flex-1" />
-            </div>
-
-            <Button
-              type="button"
-              size="lg"
-              variant="outline"
-              className="bg-background text-muted-foreground border"
-              disabled={isSubmitting}
-              onClick={onSignInWithGoogleClick}
-            >
-              <FcGoogle className="mr-2 h-5 w-5" />
-              Google
-            </Button>
-          </>
-        )}
-      </form>
-
-      <Dialog
-        open={isTwoFactorAuthenticationDialogOpen}
-        onOpenChange={onCloseTwoFactorAuthenticationDialog}
-      >
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Two-Factor Authentication</DialogTitle>
-          </DialogHeader>
-
-          <form onSubmit={form.handleSubmit(onFormSubmit)}>
-            <fieldset disabled={isSubmitting}>
-              {twoFactorAuthenticationMethod === 'totp' && (
-                <FormField
-                  control={form.control}
-                  name="totpCode"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Authentication Token</FormLabel>
-                      <FormControl>
-                        <Input type="text" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+          <fieldset className="flex w-full flex-col gap-y-4" disabled={isSubmitting}>
+            <FormField
+              control={form.control}
+              name="email"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Email</FormLabel>
+                  <FormControl>
+                    <Input type="email" placeholder="john@example.com" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
               )}
+            />
 
-              {twoFactorAuthenticationMethod === 'backup' && (
-                <FormField
-                  control={form.control}
-                  name="backupCode"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel> Backup Code</FormLabel>
-                      <FormControl>
-                        <Input type="text" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+            <FormField
+              control={form.control}
+              name="password"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Password</FormLabel>
+                  <FormControl>
+                    <>
+                      <PasswordInput placeholder="Password" {...field} />
+                      <p className="mt-2.5 text-right">
+                        <Link
+                          href="/forgot-password"
+                          className="text-muted-foreground/60 text-sm duration-200 hover:opacity-70"
+                        >
+                          Forgot your password?
+                        </Link>
+                      </p>
+                    </>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
               )}
+            />
+          </fieldset>
 
-              <DialogFooter className="mt-4">
-                <Button
-                  type="button"
-                  variant="secondary"
-                  onClick={onToggleTwoFactorAuthenticationMethodClick}
-                >
-                  {twoFactorAuthenticationMethod === 'totp'
-                    ? 'Use Backup Code'
-                    : 'Use Authenticator'}
-                </Button>
+          <Button
+            type="submit"
+            size="lg"
+            loading={isSubmitting}
+            className="dark:bg-documenso dark:hover:opacity-90"
+          >
+            {isSubmitting ? 'Signing in...' : 'Sign In'}
+          </Button>
 
-                <Button type="submit" loading={isSubmitting}>
-                  {isSubmitting ? 'Signing in...' : 'Sign In'}
-                </Button>
-              </DialogFooter>
-            </fieldset>
-          </form>
-        </DialogContent>
-      </Dialog>
-    </Form>
+          {isGoogleSSOEnabled && (
+            <>
+              <div className="relative flex items-center justify-center gap-x-4 py-2 text-xs uppercase">
+                <div className="bg-border h-px flex-1" />
+                <span className="text-muted-foreground bg-transparent">Or continue with</span>
+                <div className="bg-border h-px flex-1" />
+              </div>
+
+              <Button
+                type="button"
+                size="lg"
+                variant="outline"
+                className="bg-background text-muted-foreground border"
+                disabled={isSubmitting}
+                onClick={onSignInWithGoogleClick}
+              >
+                <FcGoogle className="mr-2 h-5 w-5" />
+                Google
+              </Button>
+            </>
+          )}
+        </form>
+
+        <Dialog
+          open={isTwoFactorAuthenticationDialogOpen}
+          onOpenChange={onCloseTwoFactorAuthenticationDialog}
+        >
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Two-Factor Authentication</DialogTitle>
+            </DialogHeader>
+
+            <form onSubmit={form.handleSubmit(onFormSubmit)}>
+              <fieldset disabled={isSubmitting}>
+                {twoFactorAuthenticationMethod === 'totp' && (
+                  <FormField
+                    control={form.control}
+                    name="totpCode"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Authentication Token</FormLabel>
+                        <FormControl>
+                          <Input type="text" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                )}
+
+                {twoFactorAuthenticationMethod === 'backup' && (
+                  <FormField
+                    control={form.control}
+                    name="backupCode"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel> Backup Code</FormLabel>
+                        <FormControl>
+                          <Input type="text" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                )}
+
+                <DialogFooter className="mt-4">
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    onClick={onToggleTwoFactorAuthenticationMethodClick}
+                  >
+                    {twoFactorAuthenticationMethod === 'totp'
+                      ? 'Use Backup Code'
+                      : 'Use Authenticator'}
+                  </Button>
+
+                  <Button type="submit" loading={isSubmitting}>
+                    {isSubmitting ? 'Signing in...' : 'Sign In'}
+                  </Button>
+                </DialogFooter>
+              </fieldset>
+            </form>
+          </DialogContent>
+        </Dialog>
+      </Form>
+    </div>
   );
 };

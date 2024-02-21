@@ -16,6 +16,11 @@ export const ZUpdateProfileMutationSchema = z.object({
   signature: z.string(),
 });
 
+export const ZUpdatePublicProfileMutationSchema = z.object({
+  profileURL: z.string().min(1),
+  profileBio: z.string().max(256, { message: 'Profile bio must not exceed 256 characters' }),
+});
+
 export const ZUpdatePasswordMutationSchema = z.object({
   currentPassword: ZCurrentPasswordSchema,
   password: ZPasswordSchema,
