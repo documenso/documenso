@@ -43,12 +43,22 @@ model User {
   twoFactorSecret      String?
   twoFactorEnabled     Boolean              @default(false)
   twoFactorBackupCodes String?
+  profileURL           String?               @unique
+  
+  UserProfile          UserProfile? @relation(fields: [profileURL], references: [profileURL], onDelete: Cascade)
 
   VerificationToken VerificationToken[]
   Template          Template[]
   securityAuditLogs UserSecurityAuditLog[]
 
   @@index([email])
+}
+
+model UserProfile {
+  profileURL     String              @id @unique
+  profileBio     String?
+
+  User           User?
 }
 
 enum UserSecurityAuditLogType {

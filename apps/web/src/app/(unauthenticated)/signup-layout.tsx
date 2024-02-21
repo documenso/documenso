@@ -7,11 +7,11 @@ import { Card } from '@documenso/ui/primitives/card';
 
 import { NewHeader } from '../../components/(dashboard)/layout/new/new-header';
 
-type UnauthenticatedLayoutProps = {
+type SignUpLayoutProps = {
   children: React.ReactNode;
 };
 
-export default function UnauthenticatedLayout({ children }: UnauthenticatedLayoutProps) {
+export default function SignUpLayout({ children }: SignUpLayoutProps) {
   return (
     <>
       <NewHeader className="mx-auto h-16 max-w-screen-xl px-4 md:h-20 lg:px-8" />
