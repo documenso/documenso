@@ -47,6 +47,7 @@ model User {
   VerificationToken VerificationToken[]
   Template          Template[]
   securityAuditLogs UserSecurityAuditLog[]
+  Banner            Banner[]
 
   @@index([email])
 }
@@ -210,15 +211,15 @@ model DocumentData {
 }
 
 model DocumentMeta {
-  id         String   @id @default(cuid())
-  subject    String?
-  message    String?
-  timezone   String?  @default("Etc/UTC") @db.Text
-  password   String?
-  dateFormat String?  @default("yyyy-MM-dd hh:mm a") @db.Text
-  documentId Int      @unique
-  document   Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
-  redirectUrl String? 
+  id          String   @id @default(cuid())
+  subject     String?
+  message     String?
+  timezone    String?  @default("Etc/UTC") @db.Text
+  password    String?
+  dateFormat  String?  @default("yyyy-MM-dd hh:mm a") @db.Text
+  documentId  Int      @unique
+  document    Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  redirectUrl String?
 }
 
 enum ReadStatus {
@@ -449,4 +450,12 @@ model Template {
   Field                Field[]
 
   @@unique([templateDocumentDataId])
+}
+
+model Banner {
+  id     Int     @id @default(autoincrement())
+  text   String
+  show   Boolean @default(false)
+  user   User?   @relation(fields: [userId], references: [id])
+  userId Int?
 }
