@@ -46,12 +46,13 @@ export const apiTokenRouter = router({
     .input(ZCreateTokenMutationSchema)
     .mutation(async ({ input, ctx }) => {
       try {
-        const { tokenName, expirationDate } = input;
+        const { tokenName, teamId, expirationDate } = input;
 
         return await createApiToken({
           userId: ctx.user.id,
+          teamId,
           tokenName,
-          expirationDate,
+          expiresIn: expirationDate,
         });
       } catch (e) {
         throw new TRPCError({
@@ -65,10 +66,11 @@ export const apiTokenRouter = router({
     .input(ZDeleteTokenByIdMutationSchema)
     .mutation(async ({ input, ctx }) => {
       try {
-        const { id } = input;
+        const { id, teamId } = input;
 
         return await deleteTokenById({
           id,
+          teamId,
           userId: ctx.user.id,
         });
       } catch (e) {

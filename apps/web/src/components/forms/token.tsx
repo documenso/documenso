@@ -46,9 +46,10 @@ type TCreateTokenFormSchema = z.infer<typeof ZCreateTokenFormSchema>;
 
 export type ApiTokenFormProps = {
   className?: string;
+  teamId?: number;
 };
 
-export const ApiTokenForm = ({ className }: ApiTokenFormProps) => {
+export const ApiTokenForm = ({ className, teamId }: ApiTokenFormProps) => {
   const router = useRouter();
 
   const [, copy] = useCopyToClipboard();
@@ -96,6 +97,7 @@ export const ApiTokenForm = ({ className }: ApiTokenFormProps) => {
   const onSubmit = async ({ tokenName, expirationDate }: TCreateTokenMutationSchema) => {
     try {
       await createTokenMutation({
+        teamId,
         tokenName,
         expirationDate: noExpirationDate ? null : expirationDate,
       });

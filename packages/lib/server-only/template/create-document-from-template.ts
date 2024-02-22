@@ -5,6 +5,7 @@ import type { RecipientRole } from '@documenso/prisma/client';
 export type CreateDocumentFromTemplateOptions = {
   templateId: number;
   userId: number;
+  teamId?: number;
   recipients?: {
     name?: string;
     email: string;
@@ -15,25 +16,27 @@ export type CreateDocumentFromTemplateOptions = {
 export const createDocumentFromTemplate = async ({
   templateId,
   userId,
+  teamId,
   recipients,
 }: CreateDocumentFromTemplateOptions) => {
   const template = await prisma.template.findUnique({
     where: {
       id: templateId,
-      OR: [
-        {
-          userId,
-        },
-        {
-          team: {
-            members: {
-              some: {
-                userId,
+      ...(teamId
+        ? {
+            team: {
+              id: teamId,
+              members: {
+                some: {
+                  userId,
+                },
               },
             },
-          },
-        },
-      ],
+          }
+        : {
+            userId,
+            teamId: null,
+          }),
     },
     include: {
       Recipient: true,

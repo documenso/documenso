@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 import { URL_REGEX } from '@documenso/lib/constants/url-regex';
-import { DocumentStatus, FieldType, RecipientRole } from '@documenso/prisma/client';
+import { FieldType, RecipientRole } from '@documenso/prisma/client';
 
 export const ZGetDocumentByIdQuerySchema = z.object({
   id: z.number().min(1),
@@ -102,7 +102,6 @@ export type TSendDocumentMutationSchema = z.infer<typeof ZSendDocumentMutationSc
 
 export const ZDeleteDraftDocumentMutationSchema = z.object({
   id: z.number().min(1),
-  status: z.nativeEnum(DocumentStatus),
 });
 
 export type TDeleteDraftDocumentMutationSchema = z.infer<typeof ZDeleteDraftDocumentMutationSchema>;

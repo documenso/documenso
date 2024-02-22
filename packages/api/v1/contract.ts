@@ -1,7 +1,6 @@
 import { initContract } from '@ts-rest/core';
 
 import {
-  ZSendDocumentForSigningMutationSchema as SendDocumentMutationSchema,
   ZAuthorizationHeadersSchema,
   ZCreateDocumentFromTemplateMutationResponseSchema,
   ZCreateDocumentFromTemplateMutationSchema,
@@ -13,6 +12,7 @@ import {
   ZDeleteFieldMutationSchema,
   ZDeleteRecipientMutationSchema,
   ZGetDocumentsQuerySchema,
+  ZSendDocumentForSigningMutationSchema,
   ZSuccessfulDocumentResponseSchema,
   ZSuccessfulFieldResponseSchema,
   ZSuccessfulGetDocumentResponseSchema,
@@ -72,13 +72,13 @@ export const ApiContractV1 = c.router(
         401: ZUnsuccessfulResponseSchema,
         404: ZUnsuccessfulResponseSchema,
       },
-      summary: 'Upload a new document and get a presigned URL',
+      summary: 'Create a new document from an existing template',
     },
 
     sendDocument: {
       method: 'POST',
       path: '/api/v1/documents/:id/send',
-      body: SendDocumentMutationSchema,
+      body: ZSendDocumentForSigningMutationSchema,
       responses: {
         200: ZSuccessfulSigningResponseSchema,
         400: ZUnsuccessfulResponseSchema,

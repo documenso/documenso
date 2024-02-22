@@ -32,12 +32,18 @@ import { Input } from '@documenso/ui/primitives/input';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
 export type DeleteTokenDialogProps = {
+  teamId?: number;
   token: Pick<ApiToken, 'id' | 'name'>;
   onDelete?: () => void;
   children?: React.ReactNode;
 };
 
-export default function DeleteTokenDialog({ token, onDelete, children }: DeleteTokenDialogProps) {
+export default function DeleteTokenDialog({
+  teamId,
+  token,
+  onDelete,
+  children,
+}: DeleteTokenDialogProps) {
   const router = useRouter();
   const { toast } = useToast();
 
@@ -70,6 +76,7 @@ export default function DeleteTokenDialog({ token, onDelete, children }: DeleteT
     try {
       await deleteTokenMutation({
         id: token.id,
+        teamId,
       });
 
       toast({

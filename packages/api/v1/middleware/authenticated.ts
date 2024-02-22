@@ -1,7 +1,7 @@
 import type { NextApiRequest } from 'next';
 
-import { getUserByApiToken } from '@documenso/lib/server-only/public-api/get-user-by-token';
-import type { User } from '@documenso/prisma/client';
+import { getApiTokenByToken } from '@documenso/lib/server-only/public-api/get-api-token-by-token';
+import type { Team, User } from '@documenso/prisma/client';
 
 export const authenticatedMiddleware = <
   T extends {
@@ -12,7 +12,7 @@ export const authenticatedMiddleware = <
     body: unknown;
   },
 >(
-  handler: (args: T, user: User) => Promise<R>,
+  handler: (args: T, user: User, team?: Team | null) => Promise<R>,
 ) => {
   return async (args: T) => {
     try {
@@ -25,9 +25,9 @@ export const authenticatedMiddleware = <
         throw new Error('Token was not provided for authenticated middleware');
       }
 
-      const user = await getUserByApiToken({ token });
+      const apiToken = await getApiTokenByToken({ token });
 
-      return await handler(args, user);
+      return await handler(args, apiToken.user, apiToken.team);
     } catch (_err) {
       console.log({ _err });
       return {

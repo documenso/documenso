@@ -20,12 +20,14 @@ import {
 export type SendDocumentOptions = {
   documentId: number;
   userId: number;
+  teamId?: number;
   requestMetadata?: RequestMetadata;
 };
 
 export const sendDocument = async ({
   documentId,
   userId,
+  teamId,
   requestMetadata,
 }: SendDocumentOptions) => {
   const user = await prisma.user.findFirstOrThrow({
@@ -42,20 +44,21 @@ export const sendDocument = async ({
   const document = await prisma.document.findUnique({
     where: {
       id: documentId,
-      OR: [
-        {
-          userId,
-        },
-        {
-          team: {
-            members: {
-              some: {
-                userId,
+      ...(teamId
+        ? {
+            team: {
+              id: teamId,
+              members: {
+                some: {
+                  userId,
+                },
               },
             },
-          },
-        },
-      ],
+          }
+        : {
+            userId,
+            teamId: null,
+          }),
     },
     include: {
       Recipient: true,

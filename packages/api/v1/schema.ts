@@ -25,6 +25,7 @@ export type TDeleteDocumentMutationSchema = typeof ZDeleteDocumentMutationSchema
 export const ZSuccessfulDocumentResponseSchema = z.object({
   id: z.number(),
   userId: z.number(),
+  teamId: z.number().nullish(),
   title: z.string(),
   status: z.string(),
   documentDataId: z.string(),

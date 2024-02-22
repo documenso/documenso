@@ -47,6 +47,9 @@
     "apps/*",
     "packages/*"
   ],
+  "dependencies": {
+    "next-runtime-env": "^3.2.0"
+  },
   "overrides": {
     "next-auth": {
       "next": "14.0.3"

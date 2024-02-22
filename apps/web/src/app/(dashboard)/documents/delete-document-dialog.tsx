@@ -61,7 +61,7 @@ export const DeleteDocumentDialog = ({
 
   const onDelete = async () => {
     try {
-      await deleteDocument({ id, status });
+      await deleteDocument({ id });
     } catch {
       toast({
         title: 'Something went wrong',

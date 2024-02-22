@@ -2,6 +2,7 @@ import type { Duration } from 'luxon';
 import { DateTime } from 'luxon';
 
 import { prisma } from '@documenso/prisma';
+import { TeamMemberRole } from '@documenso/prisma/client';
 
 // temporary choice for testing only
 import * as timeConstants from '../../constants/time';
@@ -14,14 +15,16 @@ type TimeConstants = typeof timeConstants & {
 
 type CreateApiTokenInput = {
   userId: number;
+  teamId?: number;
   tokenName: string;
-  expirationDate: string | null;
+  expiresIn: string | null;
 };
 
 export const createApiToken = async ({
   userId,
+  teamId,
   tokenName,
-  expirationDate,
+  expiresIn,
 }: CreateApiTokenInput) => {
   const apiToken = `api_${alphaid(16)}`;
 
@@ -29,23 +32,36 @@ export const createApiToken = async ({
 
   const timeConstantsRecords: TimeConstants = timeConstants;
 
-  const dbToken = await prisma.apiToken.create({
+  if (teamId) {
+    const member = await prisma.teamMember.findFirst({
+      where: {
+        userId,
+        teamId,
+        role: TeamMemberRole.ADMIN,
+      },
+    });
+
+    if (!member) {
+      throw new Error('You do not have permission to create a token for this team');
+    }
+  }
+
+  const storedToken = await prisma.apiToken.create({
     data: {
-      token: hashedToken,
       name: tokenName,
-      userId,
-      expires: expirationDate
-        ? DateTime.now().plus(timeConstantsRecords[expirationDate]).toJSDate()
-        : null,
+      token: hashedToken,
+      expires: expiresIn ? DateTime.now().plus(timeConstantsRecords[expiresIn]).toJSDate() : null,
+      userId: teamId ? null : userId,
+      teamId,
     },
   });
 
-  if (!dbToken) {
+  if (!storedToken) {
     throw new Error('Failed to create the API token');
   }
 
   return {
-    id: dbToken.id,
+    id: storedToken.id,
     token: apiToken,
   };
 };

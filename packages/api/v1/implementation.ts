@@ -18,6 +18,7 @@ import { getRecipientsForDocument } from '@documenso/lib/server-only/recipient/g
 import { setRecipientsForDocument } from '@documenso/lib/server-only/recipient/set-recipients-for-document';
 import { updateRecipient } from '@documenso/lib/server-only/recipient/update-recipient';
 import { createDocumentFromTemplate } from '@documenso/lib/server-only/template/create-document-from-template';
+import { extractNextApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 import { getPresignPostUrl } from '@documenso/lib/universal/upload/server-actions';
 import { DocumentDataType, DocumentStatus, SigningStatus } from '@documenso/prisma/client';
 
@@ -25,11 +26,16 @@ import { ApiContractV1 } from './contract';
 import { authenticatedMiddleware } from './middleware/authenticated';
 
 export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
-  getDocuments: authenticatedMiddleware(async (args, user) => {
+  getDocuments: authenticatedMiddleware(async (args, user, team) => {
     const page = Number(args.query.page) || 1;
     const perPage = Number(args.query.perPage) || 10;
 
-    const { data: documents, totalPages } = await findDocuments({ page, perPage, userId: user.id });
+    const { data: documents, totalPages } = await findDocuments({
+      page,
+      perPage,
+      userId: user.id,
+      teamId: team?.id,
+    });
 
     return {
       status: 200,
@@ -40,13 +46,19 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
     };
   }),
 
-  getDocument: authenticatedMiddleware(async (args, user) => {
+  getDocument: authenticatedMiddleware(async (args, user, team) => {
     const { id: documentId } = args.params;
 
     try {
-      const document = await getDocumentById({ id: Number(documentId), userId: user.id });
+      const document = await getDocumentById({
+        id: Number(documentId),
+        userId: user.id,
+        teamId: team?.id,
+      });
+
       const recipients = await getRecipientsForDocument({
         documentId: Number(documentId),
+        teamId: team?.id,
         userId: user.id,
       });
 
@@ -67,16 +79,29 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
     }
   }),
 
-  deleteDocument: authenticatedMiddleware(async (args, user) => {
+  deleteDocument: authenticatedMiddleware(async (args, user, team) => {
     const { id: documentId } = args.params;
 
     try {
-      const document = await getDocumentById({ id: Number(documentId), userId: user.id });
-
-      const deletedDocument = await deleteDocument({
+      const document = await getDocumentById({
         id: Number(documentId),
         userId: user.id,
-        status: document.status,
+        teamId: team?.id,
+      });
+
+      if (!document) {
+        return {
+          status: 404,
+          body: {
+            message: 'Document not found',
+          },
+        };
+      }
+
+      const deletedDocument = await deleteDocument({
+        id: document.id,
+        userId: user.id,
+        teamId: team?.id,
       });
 
       return {
@@ -93,7 +118,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
     }
   }),
 
-  createDocument: authenticatedMiddleware(async (args, user) => {
+  createDocument: authenticatedMiddleware(async (args, user, team) => {
     const { body } = args;
 
     try {
@@ -118,13 +143,17 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
       const document = await createDocument({
         title: body.title,
         userId: user.id,
+        teamId: team?.id,
         documentDataId: documentData.id,
+        requestMetadata: extractNextApiRequestMetadata(args.req),
       });
 
       const recipients = await setRecipientsForDocument({
         userId: user.id,
+        teamId: team?.id,
         documentId: document.id,
         recipients: body.recipients,
+        requestMetadata: extractNextApiRequestMetadata(args.req),
       });
 
       return {
@@ -151,7 +180,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
     }
   }),
 
-  createDocumentFromTemplate: authenticatedMiddleware(async (args, user) => {
+  createDocumentFromTemplate: authenticatedMiddleware(async (args, user, team) => {
     const { body, params } = args;
 
     const templateId = Number(params.templateId);
@@ -161,14 +190,16 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
     const document = await createDocumentFromTemplate({
       templateId,
       userId: user.id,
+      teamId: team?.id,
       recipients: body.recipients,
     });
 
     await updateDocument({
       documentId: document.id,
       userId: user.id,
+      teamId: team?.id,
       data: {
-        title: body.title,
+        title: fileName,
       },
     });
 
@@ -180,6 +211,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
         message: body.meta.message,
         dateFormat: body.meta.dateFormat,
         timezone: body.meta.timezone,
+        requestMetadata: extractNextApiRequestMetadata(args.req),
       });
     }
 
@@ -198,10 +230,10 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
     };
   }),
 
-  sendDocument: authenticatedMiddleware(async (args, user) => {
+  sendDocument: authenticatedMiddleware(async (args, user, team) => {
     const { id } = args.params;
 
-    const document = await getDocumentById({ id: Number(id), userId: user.id });
+    const document = await getDocumentById({ id: Number(id), userId: user.id, teamId: team?.id });
 
     if (!document) {
       return {
@@ -212,11 +244,11 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
       };
     }
 
-    if (document.status === 'PENDING') {
+    if (document.status === DocumentStatus.COMPLETED) {
       return {
         status: 400,
         body: {
-          message: 'Document is already waiting for signing',
+          message: 'Document is already complete',
         },
       };
     }
@@ -258,6 +290,8 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
       await sendDocument({
         documentId: Number(id),
         userId: user.id,
+        teamId: team?.id,
+        requestMetadata: extractNextApiRequestMetadata(args.req),
       });
 
       return {
@@ -276,13 +310,14 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
     }
   }),
 
-  createRecipient: authenticatedMiddleware(async (args, user) => {
+  createRecipient: authenticatedMiddleware(async (args, user, team) => {
     const { id: documentId } = args.params;
     const { name, email, role } = args.body;
 
     const document = await getDocumentById({
       id: Number(documentId),
       userId: user.id,
+      teamId: team?.id,
     });
 
     if (!document) {
@@ -306,6 +341,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
     const recipients = await getRecipientsForDocument({
       documentId: Number(documentId),
       userId: user.id,
+      teamId: team?.id,
     });
 
     const recipientAlreadyExists = recipients.some((recipient) => recipient.email === email);
@@ -323,6 +359,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
       const newRecipients = await setRecipientsForDocument({
         documentId: Number(documentId),
         userId: user.id,
+        teamId: team?.id,
         recipients: [
           ...recipients,
           {
@@ -331,6 +368,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
             role,
           },
         ],
+        requestMetadata: extractNextApiRequestMetadata(args.req),
       });
 
       const newRecipient = newRecipients.find((recipient) => recipient.email === email);
@@ -356,13 +394,14 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
     }
   }),
 
-  updateRecipient: authenticatedMiddleware(async (args, user) => {
+  updateRecipient: authenticatedMiddleware(async (args, user, team) => {
     const { id: documentId, recipientId } = args.params;
     const { name, email, role } = args.body;
 
     const document = await getDocumentById({
       id: Number(documentId),
       userId: user.id,
+      teamId: team?.id,
     });
 
     if (!document) {
@@ -386,9 +425,12 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
     const updatedRecipient = await updateRecipient({
       documentId: Number(documentId),
       recipientId: Number(recipientId),
+      userId: user.id,
+      teamId: team?.id,
       email,
       name,
       role,
+      requestMetadata: extractNextApiRequestMetadata(args.req),
     }).catch(() => null);
 
     if (!updatedRecipient) {
@@ -409,12 +451,13 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
     };
   }),
 
-  deleteRecipient: authenticatedMiddleware(async (args, user) => {
+  deleteRecipient: authenticatedMiddleware(async (args, user, team) => {
     const { id: documentId, recipientId } = args.params;
 
     const document = await getDocumentById({
       id: Number(documentId),
       userId: user.id,
+      teamId: team?.id,
     });
 
     if (!document) {
@@ -438,6 +481,9 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
     const deletedRecipient = await deleteRecipient({
       documentId: Number(documentId),
       recipientId: Number(recipientId),
+      userId: user.id,
+      teamId: team?.id,
+      requestMetadata: extractNextApiRequestMetadata(args.req),
     }).catch(() => null);
 
     if (!deletedRecipient) {
@@ -458,13 +504,14 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
     };
   }),
 
-  createField: authenticatedMiddleware(async (args, user) => {
+  createField: authenticatedMiddleware(async (args, user, team) => {
     const { id: documentId } = args.params;
     const { recipientId, type, pageNumber, pageWidth, pageHeight, pageX, pageY } = args.body;
 
     const document = await getDocumentById({
       id: Number(documentId),
       userId: user.id,
+      teamId: team?.id,
     });
 
     if (!document) {
@@ -511,12 +558,15 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
     const field = await createField({
       documentId: Number(documentId),
       recipientId: Number(recipientId),
+      userId: user.id,
+      teamId: team?.id,
       type,
       pageNumber,
       pageX,
       pageY,
       pageWidth,
       pageHeight,
+      requestMetadata: extractNextApiRequestMetadata(args.req),
     });
 
     const remappedField = {
@@ -542,13 +592,14 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
     };
   }),
 
-  updateField: authenticatedMiddleware(async (args, user) => {
+  updateField: authenticatedMiddleware(async (args, user, team) => {
     const { id: documentId, fieldId } = args.params;
     const { recipientId, type, pageNumber, pageWidth, pageHeight, pageX, pageY } = args.body;
 
     const document = await getDocumentById({
       id: Number(documentId),
       userId: user.id,
+      teamId: team?.id,
     });
 
     if (!document) {
@@ -594,6 +645,8 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
 
     const updatedField = await updateField({
       fieldId: Number(fieldId),
+      userId: user.id,
+      teamId: team?.id,
       documentId: Number(documentId),
       recipientId: recipientId ? Number(recipientId) : undefined,
       type,
@@ -602,6 +655,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
       pageY,
       pageWidth,
       pageHeight,
+      requestMetadata: extractNextApiRequestMetadata(args.req),
     });
 
     const remappedField = {
@@ -627,7 +681,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
     };
   }),
 
-  deleteField: authenticatedMiddleware(async (args, user) => {
+  deleteField: authenticatedMiddleware(async (args, user, team) => {
     const { id: documentId, fieldId } = args.params;
 
     const document = await getDocumentById({
@@ -684,6 +738,9 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
     const deletedField = await deleteField({
       documentId: Number(documentId),
       fieldId: Number(fieldId),
+      userId: user.id,
+      teamId: team?.id,
+      requestMetadata: extractNextApiRequestMetadata(args.req),
     }).catch(() => null);
 
     if (!deletedField) {
