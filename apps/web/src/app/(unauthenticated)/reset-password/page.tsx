@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 export default function ResetPasswordPage() {
   return (
     <div>
-      <h1 className="text-4xl font-semibold">Unable to reset password</h1>
+      <h1 className="text-3xl font-semibold">Unable to reset password</h1>
 
       <p className="text-muted-foreground mt-2 text-sm">
         The token you have used to reset your password is either expired or it never existed. If you

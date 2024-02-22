@@ -5,13 +5,13 @@ import Image from 'next/image';
 import backgroundPattern from '@documenso/assets/images/background-pattern.png';
 import { Card } from '@documenso/ui/primitives/card';
 
-import { NewHeader } from '../../components/(dashboard)/layout/new/new-header';
+import { NewHeader } from '../../../components/(dashboard)/layout/new/new-header';
 
-type UnauthenticatedLayoutProps = {
+type TeamLayoutProps = {
   children: React.ReactNode;
 };
 
-export default function UnauthenticatedLayout({ children }: UnauthenticatedLayoutProps) {
+export default function TeamLayout({ children }: TeamLayoutProps) {
   return (
     <>
       <NewHeader className="mx-auto h-16 max-w-screen-xl px-4 md:h-20 lg:px-8" />

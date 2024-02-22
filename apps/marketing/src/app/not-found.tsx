@@ -43,7 +43,7 @@ export default function NotFound() {
 
           <div className="mt-6 flex gap-x-2.5 gap-y-4 md:items-center">
             <Button
-              variant="ghost"
+              variant="secondary"
               className="w-32"
               onClick={() => {
                 void router.back();
