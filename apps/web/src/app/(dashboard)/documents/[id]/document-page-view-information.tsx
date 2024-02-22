@@ -21,6 +21,7 @@ export const DocumentPageViewInformation = ({
   userId,
 }: DocumentPageViewInformationProps) => {
   const isMounted = useIsMounted();
+
   const { locale } = useLocale();
 
   const documentInformation = useMemo(() => {

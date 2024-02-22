@@ -133,9 +133,10 @@ export const documentRouter = router({
     .input(ZFindDocumentAuditLogsQuerySchema)
     .query(async ({ input, ctx }) => {
       try {
-        const { perPage, documentId, cursor, filterForRecentActivity, orderBy } = input;
+        const { page, perPage, documentId, cursor, filterForRecentActivity, orderBy } = input;
 
         return await findDocumentAuditLogs({
+          page,
           perPage,
           documentId,
           cursor,
