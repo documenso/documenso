@@ -5,6 +5,9 @@ import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-log
 import type { RequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 import { createDocumentAuditLogData } from '@documenso/lib/utils/document-audit-logs';
 import { prisma } from '@documenso/prisma';
+import { WebhookTriggerEvents } from '@documenso/prisma/client';
+
+import { triggerWebhook } from '../../universal/trigger-webhook';
 
 export type CreateDocumentOptions = {
   title: string;
@@ -61,6 +64,11 @@ export const createDocument = async ({
           title,
         },
       }),
+    });
+
+    await triggerWebhook({
+      eventTrigger: WebhookTriggerEvents.DOCUMENT_CREATED,
+      documentData: document,
     });
 
     return document;

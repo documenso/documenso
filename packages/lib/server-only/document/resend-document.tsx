@@ -16,9 +16,8 @@ import { prisma } from '@documenso/prisma';
 import { DocumentStatus, RecipientRole, SigningStatus } from '@documenso/prisma/client';
 import type { Prisma } from '@documenso/prisma/client';
 
-import { getDocumentWhereInput } from './get-document-by-id';
-
 import { NEXT_PUBLIC_WEBAPP_URL } from '../../constants/app';
+import { getDocumentWhereInput } from './get-document-by-id';
 
 export type ResendDocumentOptions = {
   documentId: number;
