@@ -233,18 +233,20 @@ export const PDFViewer = ({
             {Array(numPages)
               .fill(null)
               .map((_, i) => (
-                <div
-                  key={i}
-                  className="border-border my-8 overflow-hidden rounded border will-change-transform first:mt-0 last:mb-0"
-                >
-                  <PDFPage
-                    pageNumber={i + 1}
-                    width={width}
-                    renderAnnotationLayer={false}
-                    renderTextLayer={false}
-                    loading={() => ''}
-                    onClick={(e) => onDocumentPageClick(e, i + 1)}
-                  />
+                <div key={i} className="last:-mb-2">
+                  <div className="border-border overflow-hidden rounded border will-change-transform">
+                    <PDFPage
+                      pageNumber={i + 1}
+                      width={width}
+                      renderAnnotationLayer={false}
+                      renderTextLayer={false}
+                      loading={() => ''}
+                      onClick={(e) => onDocumentPageClick(e, i + 1)}
+                    />
+                  </div>
+                  <p className="text-muted-foreground/80 my-2 text-center text-[11px]">
+                    Page {i + 1} of {numPages}
+                  </p>
                 </div>
               ))}
           </PDFDocument>
