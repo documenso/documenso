@@ -7,6 +7,7 @@ import { Copy, Sparkles } from 'lucide-react';
 import { FaXTwitter } from 'react-icons/fa6';
 
 import { useCopyShareLink } from '@documenso/lib/client-only/hooks/use-copy-share-link';
+import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import {
   TOAST_DOCUMENT_SHARE_ERROR,
   TOAST_DOCUMENT_SHARE_SUCCESS,
@@ -68,7 +69,7 @@ export const DocumentShareButton = ({
 
   const onCopyClick = async () => {
     if (shareLink) {
-      await copyShareLink(`${process.env.NEXT_PUBLIC_WEBAPP_URL}/share/${shareLink.slug}`);
+      await copyShareLink(`${NEXT_PUBLIC_WEBAPP_URL()}/share/${shareLink.slug}`);
     } else {
       await createAndCopyShareLink({
         token,
@@ -92,7 +93,7 @@ export const DocumentShareButton = ({
     }
 
     // Ensuring we've prewarmed the opengraph image for the Twitter
-    await fetch(`${process.env.NEXT_PUBLIC_WEBAPP_URL}/share/${slug}/opengraph`, {
+    await fetch(`${NEXT_PUBLIC_WEBAPP_URL()}/share/${slug}/opengraph`, {
       // We don't care about the response, so we can use no-cors
       mode: 'no-cors',
     });
@@ -100,7 +101,7 @@ export const DocumentShareButton = ({
     window.open(
       generateTwitterIntent(
         `I just ${token ? 'signed' : 'sent'} a document in style with @documenso. Check it out!`,
-        `${process.env.NEXT_PUBLIC_WEBAPP_URL}/share/${slug}`,
+        `${NEXT_PUBLIC_WEBAPP_URL()}/share/${slug}`,
       ),
       '_blank',
     );
@@ -148,7 +149,7 @@ export const DocumentShareButton = ({
                 'animate-pulse': !shareLink?.slug,
               })}
             >
-              {process.env.NEXT_PUBLIC_WEBAPP_URL}/share/{shareLink?.slug || '...'}
+              {NEXT_PUBLIC_WEBAPP_URL()}/share/{shareLink?.slug || '...'}
             </span>
             <div
               className={cn(
@@ -160,7 +161,7 @@ export const DocumentShareButton = ({
             >
               {shareLink?.slug && (
                 <img
-                  src={`${process.env.NEXT_PUBLIC_WEBAPP_URL}/share/${shareLink.slug}/opengraph`}
+                  src={`${NEXT_PUBLIC_WEBAPP_URL()}/share/${shareLink.slug}/opengraph`}
                   alt="sharing link"
                   className="h-full w-full object-cover"
                 />

@@ -1,3 +1,5 @@
+import { env } from 'next-runtime-env';
+
 import { Button, Column, Img, Link, Section, Text } from '../components';
 import { TemplateDocumentImage } from './template-document-image';
 
@@ -10,7 +12,9 @@ export const TemplateDocumentSelfSigned = ({
   documentName,
   assetBaseUrl,
 }: TemplateDocumentSelfSignedProps) => {
-  const signUpUrl = `${process.env.NEXT_PUBLIC_WEBAPP_URL ?? 'http://localhost:3000'}/signup`;
+  const NEXT_PUBLIC_WEBAPP_URL = env('NEXT_PUBLIC_WEBAPP_URL');
+
+  const signUpUrl = `${NEXT_PUBLIC_WEBAPP_URL ?? 'http://localhost:3000'}/signup`;
 
   const getAssetUrl = (path: string) => {
     return new URL(path, assetBaseUrl).toString();

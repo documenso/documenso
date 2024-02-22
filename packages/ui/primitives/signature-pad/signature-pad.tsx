@@ -7,6 +7,8 @@ import { Undo2 } from 'lucide-react';
 import type { StrokeOptions } from 'perfect-freehand';
 import { getStroke } from 'perfect-freehand';
 
+import { unsafe_useEffectOnce } from '@documenso/lib/client-only/hooks/use-effect-once';
+
 import { cn } from '../../lib/utils';
 import { getSvgPathFromStroke } from './helper';
 import { Point } from './point';
@@ -28,6 +30,7 @@ export const SignaturePad = ({
   ...props
 }: SignaturePadProps) => {
   const $el = useRef<HTMLCanvasElement>(null);
+  const $imageData = useRef<ImageData | null>(null);
 
   const [isPressed, setIsPressed] = useState(false);
   const [lines, setLines] = useState<Point[][]>([]);
@@ -134,7 +137,6 @@ export const SignaturePad = ({
         });
 
         onChange?.($el.current.toDataURL());
-
         ctx.save();
       }
     }
@@ -163,6 +165,7 @@ export const SignaturePad = ({
       const ctx = $el.current.getContext('2d');
 
       ctx?.clearRect(0, 0, $el.current.width, $el.current.height);
+      $imageData.current = null;
     }
 
     onChange?.(null);
@@ -176,19 +179,25 @@ export const SignaturePad = ({
       return;
     }
 
-    const newLines = [...lines];
-    newLines.pop(); // Remove the last line
+    const newLines = lines.slice(0, -1);
     setLines(newLines);
 
     // Clear the canvas
     if ($el.current) {
       const ctx = $el.current.getContext('2d');
-      ctx?.clearRect(0, 0, $el.current.width, $el.current.height);
+      const { width, height } = $el.current;
+      ctx?.clearRect(0, 0, width, height);
+
+      if (typeof defaultValue === 'string' && $imageData.current) {
+        ctx?.putImageData($imageData.current, 0, 0);
+      }
 
       newLines.forEach((line) => {
         const pathData = new Path2D(getSvgPathFromStroke(getStroke(line, perfectFreehandOptions)));
         ctx?.fill(pathData);
       });
+
+      onChange?.($el.current.toDataURL());
     }
   };
 
@@ -199,7 +208,7 @@ export const SignaturePad = ({
     }
   }, []);
 
-  useEffect(() => {
+  unsafe_useEffectOnce(() => {
     if ($el.current && typeof defaultValue === 'string') {
       const ctx = $el.current.getContext('2d');
 
@@ -209,11 +218,15 @@ export const SignaturePad = ({
 
       img.onload = () => {
         ctx?.drawImage(img, 0, 0, Math.min(width, img.width), Math.min(height, img.height));
+
+        const defaultImageData = ctx?.getImageData(0, 0, width, height) || null;
+
+        $imageData.current = defaultImageData;
       };
 
       img.src = defaultValue;
     }
-  }, [defaultValue]);
+  });
 
   return (
     <div

@@ -4,16 +4,18 @@ import { mailer } from '@documenso/email/mailer';
 import { render } from '@documenso/email/render';
 import { DocumentInviteEmailTemplate } from '@documenso/email/templates/document-invite';
 import { FROM_ADDRESS, FROM_NAME } from '@documenso/lib/constants/email';
-import {
-  RECIPIENT_ROLES_DESCRIPTION,
-  RECIPIENT_ROLE_TO_EMAIL_TYPE,
-} from '@documenso/lib/constants/recipient-roles';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
 import type { RequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 import { createDocumentAuditLogData } from '@documenso/lib/utils/document-audit-logs';
 import { renderCustomEmailTemplate } from '@documenso/lib/utils/render-custom-email-template';
 import { prisma } from '@documenso/prisma';
 import { DocumentStatus, RecipientRole, SendStatus } from '@documenso/prisma/client';
+
+import { NEXT_PUBLIC_WEBAPP_URL } from '../../constants/app';
+import {
+  RECIPIENT_ROLES_DESCRIPTION,
+  RECIPIENT_ROLE_TO_EMAIL_TYPE,
+} from '../../constants/recipient-roles';
 
 export type SendDocumentOptions = {
   documentId: number;
@@ -91,8 +93,8 @@ export const sendDocument = async ({
         'document.name': document.title,
       };
 
-      const assetBaseUrl = process.env.NEXT_PUBLIC_WEBAPP_URL || 'http://localhost:3000';
-      const signDocumentLink = `${process.env.NEXT_PUBLIC_WEBAPP_URL}/sign/${recipient.token}`;
+      const assetBaseUrl = NEXT_PUBLIC_WEBAPP_URL() || 'http://localhost:3000';
+      const signDocumentLink = `${NEXT_PUBLIC_WEBAPP_URL()}/sign/${recipient.token}`;
 
       const template = createElement(DocumentInviteEmailTemplate, {
         documentName: document.title,

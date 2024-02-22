@@ -2,13 +2,13 @@ import type Stripe from 'stripe';
 
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { stripe } from '@documenso/lib/server-only/stripe';
-import { subscriptionsContainsActiveCommunityPlan } from '@documenso/lib/utils/billing';
+import { subscriptionsContainsActivePlan } from '@documenso/lib/utils/billing';
 import { prisma } from '@documenso/prisma';
 import { type Subscription, type Team, type User } from '@documenso/prisma/client';
 
 import { deleteCustomerPaymentMethods } from './delete-customer-payment-methods';
-import { getCommunityPlanPriceIds } from './get-community-plan-prices';
 import { getTeamPrices } from './get-team-prices';
+import { getTeamRelatedPriceIds } from './get-team-related-prices';
 
 type TransferStripeSubscriptionOptions = {
   /**
@@ -46,14 +46,14 @@ export const transferTeamSubscription = async ({
     throw new AppError(AppErrorCode.NOT_FOUND, 'Missing customer ID.');
   }
 
-  const [communityPlanIds, teamSeatPrices] = await Promise.all([
-    getCommunityPlanPriceIds(),
+  const [teamRelatedPlanPriceIds, teamSeatPrices] = await Promise.all([
+    getTeamRelatedPriceIds(),
     getTeamPrices(),
   ]);
 
-  const teamSubscriptionRequired = !subscriptionsContainsActiveCommunityPlan(
+  const teamSubscriptionRequired = !subscriptionsContainsActivePlan(
     user.Subscription,
-    communityPlanIds,
+    teamRelatedPlanPriceIds,
   );
 
   let teamSubscription: Stripe.Subscription | null = null;
