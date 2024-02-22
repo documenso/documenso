@@ -9,55 +9,58 @@ export type AcceptTeamInvitationOptions = {
 };
 
 export const acceptTeamInvitation = async ({ userId, teamId }: AcceptTeamInvitationOptions) => {
-  await prisma.$transaction(async (tx) => {
-    const user = await tx.user.findFirstOrThrow({
-      where: {
-        id: userId,
-      },
-    });
+  await prisma.$transaction(
+    async (tx) => {
+      const user = await tx.user.findFirstOrThrow({
+        where: {
+          id: userId,
+        },
+      });
 
-    const teamMemberInvite = await tx.teamMemberInvite.findFirstOrThrow({
-      where: {
-        teamId,
-        email: user.email,
-      },
-      include: {
-        team: {
-          include: {
-            subscription: true,
+      const teamMemberInvite = await tx.teamMemberInvite.findFirstOrThrow({
+        where: {
+          teamId,
+          email: user.email,
+        },
+        include: {
+          team: {
+            include: {
+              subscription: true,
+            },
           },
         },
-      },
-    });
+      });
 
-    const { team } = teamMemberInvite;
+      const { team } = teamMemberInvite;
 
-    await tx.teamMember.create({
-      data: {
-        teamId: teamMemberInvite.teamId,
-        userId: user.id,
-        role: teamMemberInvite.role,
-      },
-    });
-
-    await tx.teamMemberInvite.delete({
-      where: {
-        id: teamMemberInvite.id,
-      },
-    });
-
-    if (IS_BILLING_ENABLED() && team.subscription) {
-      const numberOfSeats = await tx.teamMember.count({
-        where: {
+      await tx.teamMember.create({
+        data: {
           teamId: teamMemberInvite.teamId,
+          userId: user.id,
+          role: teamMemberInvite.role,
         },
       });
 
-      await updateSubscriptionItemQuantity({
-        priceId: team.subscription.priceId,
-        subscriptionId: team.subscription.planId,
-        quantity: numberOfSeats,
+      await tx.teamMemberInvite.delete({
+        where: {
+          id: teamMemberInvite.id,
+        },
       });
-    }
-  });
+
+      if (IS_BILLING_ENABLED() && team.subscription) {
+        const numberOfSeats = await tx.teamMember.count({
+          where: {
+            teamId: teamMemberInvite.teamId,
+          },
+        });
+
+        await updateSubscriptionItemQuantity({
+          priceId: team.subscription.priceId,
+          subscriptionId: team.subscription.planId,
+          quantity: numberOfSeats,
+        });
+      }
+    },
+    { timeout: 30_000 },
+  );
 };

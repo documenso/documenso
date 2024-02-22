@@ -108,49 +108,52 @@ export const sendDocument = async ({
 
       const { actionVerb } = RECIPIENT_ROLES_DESCRIPTION[recipient.role];
 
-      await prisma.$transaction(async (tx) => {
-        await mailer.sendMail({
-          to: {
-            address: email,
-            name,
-          },
-          from: {
-            name: FROM_NAME,
-            address: FROM_ADDRESS,
-          },
-          subject: customEmail?.subject
-            ? renderCustomEmailTemplate(customEmail.subject, customEmailTemplate)
-            : `Please ${actionVerb.toLowerCase()} this document`,
-          html: render(template),
-          text: render(template, { plainText: true }),
-        });
-
-        await tx.recipient.update({
-          where: {
-            id: recipient.id,
-          },
-          data: {
-            sendStatus: SendStatus.SENT,
-          },
-        });
-
-        await tx.documentAuditLog.create({
-          data: createDocumentAuditLogData({
-            type: DOCUMENT_AUDIT_LOG_TYPE.EMAIL_SENT,
-            documentId: document.id,
-            user,
-            requestMetadata,
-            data: {
-              emailType: recipientEmailType,
-              recipientEmail: recipient.email,
-              recipientName: recipient.name,
-              recipientRole: recipient.role,
-              recipientId: recipient.id,
-              isResending: false,
+      await prisma.$transaction(
+        async (tx) => {
+          await mailer.sendMail({
+            to: {
+              address: email,
+              name,
             },
-          }),
-        });
-      });
+            from: {
+              name: FROM_NAME,
+              address: FROM_ADDRESS,
+            },
+            subject: customEmail?.subject
+              ? renderCustomEmailTemplate(customEmail.subject, customEmailTemplate)
+              : `Please ${actionVerb.toLowerCase()} this document`,
+            html: render(template),
+            text: render(template, { plainText: true }),
+          });
+
+          await tx.recipient.update({
+            where: {
+              id: recipient.id,
+            },
+            data: {
+              sendStatus: SendStatus.SENT,
+            },
+          });
+
+          await tx.documentAuditLog.create({
+            data: createDocumentAuditLogData({
+              type: DOCUMENT_AUDIT_LOG_TYPE.EMAIL_SENT,
+              documentId: document.id,
+              user,
+              requestMetadata,
+              data: {
+                emailType: recipientEmailType,
+                recipientEmail: recipient.email,
+                recipientName: recipient.name,
+                recipientRole: recipient.role,
+                recipientId: recipient.id,
+                isResending: false,
+              },
+            }),
+          });
+        },
+        { timeout: 30_000 },
+      );
     }),
   );
 
