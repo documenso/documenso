@@ -157,13 +157,27 @@ export const sendDocument = async ({
     }),
   );
 
-  const updatedDocument = await prisma.document.update({
-    where: {
-      id: documentId,
-    },
-    data: {
-      status: DocumentStatus.PENDING,
-    },
+  const updatedDocument = await prisma.$transaction(async (tx) => {
+    if (document.status === DocumentStatus.DRAFT) {
+      await tx.documentAuditLog.create({
+        data: createDocumentAuditLogData({
+          type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_SENT,
+          documentId: document.id,
+          requestMetadata,
+          user,
+          data: {},
+        }),
+      });
+    }
+
+    return await tx.document.update({
+      where: {
+        id: documentId,
+      },
+      data: {
+        status: DocumentStatus.PENDING,
+      },
+    });
   });
 
   return updatedDocument;
