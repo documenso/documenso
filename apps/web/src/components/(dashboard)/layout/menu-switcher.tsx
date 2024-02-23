@@ -1,7 +1,5 @@
 'use client';
 
-import { useState } from 'react';
-
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
@@ -36,8 +34,6 @@ export const MenuSwitcher = ({ user, teams: initialTeamsData }: MenuSwitcherProp
   const pathname = usePathname();
 
   const isUserAdmin = isAdmin(user);
-
-  const [hoveredTeamId, setHoveredTeamId] = useState(-1);
 
   const { data: teamsQueryResult } = trpc.team.getTeams.useQuery(undefined, {
     initialData: initialTeamsData,
@@ -171,31 +167,29 @@ export const MenuSwitcher = ({ user, teams: initialTeamsData }: MenuSwitcherProp
             </DropdownMenuLabel>
 
             {teams.map((team) => (
-              <div
-                key={team.id}
-                onMouseEnter={() => setHoveredTeamId(team.id)}
-                onMouseLeave={() => setHoveredTeamId(-1)}
-              >
-                <DropdownMenuItem asChild>
-                  <Link href={formatRedirectUrlOnSwitch(team.url)}>
-                    <AvatarWithText
-                      avatarFallback={formatAvatarFallback(team.name)}
-                      primaryText={team.name}
-                      secondaryText={
-                        hoveredTeamId === team.id
-                          ? formatRedirectUrlOnSwitch(team.url).slice(1, -1)
-                          : formatSecondaryAvatarText(team)
-                      }
-                      isHovered={hoveredTeamId === team.id}
-                      rightSideComponent={
-                        isPathTeamUrl(team.url) && (
-                          <CheckCircle2 className="ml-auto fill-black text-white dark:fill-white dark:text-black" />
-                        )
-                      }
-                    />
-                  </Link>
-                </DropdownMenuItem>
-              </div>
+              <DropdownMenuItem asChild key={team.id}>
+                <Link href={formatRedirectUrlOnSwitch(team.url)} className="group">
+                  <AvatarWithText
+                    avatarFallback={formatAvatarFallback(team.name)}
+                    primaryText={team.name}
+                    secondaryText={
+                      <>
+                        <span className={cn('opacity', teams.length > 1 && 'group-hover:hidden')}>
+                          {formatSecondaryAvatarText(team)}
+                        </span>
+                        <span
+                          className={cn('opacity-0', teams.length > 1 && 'group-hover:opacity-75')}
+                        >{`/t/${team.url}`}</span>
+                      </>
+                    }
+                    rightSideComponent={
+                      isPathTeamUrl(team.url) && (
+                        <CheckCircle2 className="ml-auto fill-black text-white dark:fill-white dark:text-black" />
+                      )
+                    }
+                  />
+                </Link>
+              </DropdownMenuItem>
             ))}
           </>
         ) : (

@@ -55,7 +55,6 @@ type AvatarWithTextProps = {
   primaryText: React.ReactNode;
   secondaryText?: React.ReactNode;
   rightSideComponent?: React.ReactNode;
-  isHovered?: boolean;
 };
 
 const AvatarWithText = ({
@@ -65,7 +64,6 @@ const AvatarWithText = ({
   primaryText,
   secondaryText,
   rightSideComponent,
-  isHovered,
 }: AvatarWithTextProps) => (
   <div className={cn('flex w-full max-w-xs items-center gap-2', className)}>
     <Avatar
@@ -76,14 +74,7 @@ const AvatarWithText = ({
 
     <div className="flex flex-col text-left text-sm font-normal">
       <span className="text-foreground truncate">{primaryText}</span>
-      <span 
-      className={cn(
-        'text-muted-foreground truncate text-xs',
-        isHovered && 'transition-opacity duration-400 ease-in-out opacity-60',
-      )}
-      >
-        {secondaryText}
-      </span>
+      <span className="text-muted-foreground truncate text-xs">{secondaryText}</span>
     </div>
 
     {rightSideComponent}
