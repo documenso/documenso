@@ -47,7 +47,7 @@ model User {
   VerificationToken VerificationToken[]
   Template          Template[]
   securityAuditLogs UserSecurityAuditLog[]
-  Banner            Banner[]
+  siteSettings      SiteSettings[]
 
   @@index([email])
 }
@@ -452,10 +452,11 @@ model Template {
   @@unique([templateDocumentDataId])
 }
 
-model Banner {
-  id     Int     @id @default(autoincrement())
-  text   String
-  show   Boolean @default(false)
-  user   User?   @relation(fields: [userId], references: [id])
-  userId Int?
+model SiteSettings {
+  id                   String   @id
+  enabled              Boolean  @default(false)
+  data                 Json
+  lastModifiedByUserId Int?
+  lastModifiedAt       DateTime @default(now())
+  lastModifiedByUser   User?    @relation(fields: [lastModifiedByUserId], references: [id])
 }

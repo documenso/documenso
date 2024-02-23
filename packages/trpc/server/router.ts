@@ -1,6 +1,5 @@
 import { adminRouter } from './admin-router/router';
 import { authRouter } from './auth-router/router';
-import { bannerRouter } from './banner-router/router';
 import { cryptoRouter } from './crypto/router';
 import { documentRouter } from './document-router/router';
 import { fieldRouter } from './field-router/router';
@@ -15,7 +14,6 @@ import { twoFactorAuthenticationRouter } from './two-factor-authentication-route
 
 export const appRouter = router({
   auth: authRouter,
-  banner: bannerRouter,
   crypto: cryptoRouter,
   profile: profileRouter,
   document: documentRouter,
