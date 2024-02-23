@@ -1,6 +1,6 @@
 import type { Document, WebhookTriggerEvents } from '@documenso/prisma/client';
 
-import { getAllWebhooks } from '../server-only/webhooks/get-all-webhooks';
+import { getAllWebhooksByEventTrigger } from '../server-only/webhooks/get-all-webhooks-by-event-trigger';
 import { postWebhookPayload } from './post-webhook-payload';
 
 export type TriggerWebhookOptions = {
@@ -10,7 +10,7 @@ export type TriggerWebhookOptions = {
 
 export const triggerWebhook = async ({ eventTrigger, documentData }: TriggerWebhookOptions) => {
   try {
-    const allWebhooks = await getAllWebhooks({ eventTrigger });
+    const allWebhooks = await getAllWebhooksByEventTrigger({ eventTrigger });
 
     const webhookPromises = allWebhooks.map((webhook) => {
       const { webhookUrl, secret } = webhook;

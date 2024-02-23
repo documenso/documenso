@@ -5,7 +5,7 @@ export type GetAllWebhooksOptions = {
   eventTrigger: WebhookTriggerEvents;
 };
 
-export const getAllWebhooks = async ({ eventTrigger }: GetAllWebhooksOptions) => {
+export const getAllWebhooksByEventTrigger = async ({ eventTrigger }: GetAllWebhooksOptions) => {
   return prisma.webhook.findMany({
     where: {
       eventTriggers: {
