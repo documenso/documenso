@@ -6,6 +6,7 @@ import { upsertDocumentMeta } from '@documenso/lib/server-only/document-meta/ups
 import { createDocument } from '@documenso/lib/server-only/document/create-document';
 import { deleteDocument } from '@documenso/lib/server-only/document/delete-document';
 import { duplicateDocumentById } from '@documenso/lib/server-only/document/duplicate-document-by-id';
+import { findDocumentAuditLogs } from '@documenso/lib/server-only/document/find-document-audit-logs';
 import { getDocumentById } from '@documenso/lib/server-only/document/get-document-by-id';
 import { getDocumentAndSenderByToken } from '@documenso/lib/server-only/document/get-document-by-token';
 import { resendDocument } from '@documenso/lib/server-only/document/resend-document';
@@ -15,11 +16,13 @@ import { updateTitle } from '@documenso/lib/server-only/document/update-title';
 import { setFieldsForDocument } from '@documenso/lib/server-only/field/set-fields-for-document';
 import { setRecipientsForDocument } from '@documenso/lib/server-only/recipient/set-recipients-for-document';
 import { symmetricEncrypt } from '@documenso/lib/universal/crypto';
+import { extractNextApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 
 import { authenticatedProcedure, procedure, router } from '../trpc';
 import {
   ZCreateDocumentMutationSchema,
   ZDeleteDraftDocumentMutationSchema,
+  ZFindDocumentAuditLogsQuerySchema,
   ZGetDocumentByIdQuerySchema,
   ZGetDocumentByTokenQuerySchema,
   ZResendDocumentMutationSchema,
@@ -88,6 +91,7 @@ export const documentRouter = router({
           teamId,
           title,
           documentDataId,
+          requestMetadata: extractNextApiRequestMetadata(ctx.req),
         });
       } catch (err) {
         if (err instanceof TRPCError) {
@@ -109,13 +113,43 @@ export const documentRouter = router({
 
         const userId = ctx.user.id;
 
-        return await deleteDocument({ id, userId, status });
+        return await deleteDocument({
+          id,
+          userId,
+          status,
+          requestMetadata: extractNextApiRequestMetadata(ctx.req),
+        });
       } catch (err) {
         console.error(err);
 
         throw new TRPCError({
           code: 'BAD_REQUEST',
           message: 'We were unable to delete this document. Please try again later.',
+        });
+      }
+    }),
+
+  findDocumentAuditLogs: authenticatedProcedure
+    .input(ZFindDocumentAuditLogsQuerySchema)
+    .query(async ({ input, ctx }) => {
+      try {
+        const { page, perPage, documentId, cursor, filterForRecentActivity, orderBy } = input;
+
+        return await findDocumentAuditLogs({
+          page,
+          perPage,
+          documentId,
+          cursor,
+          filterForRecentActivity,
+          orderBy,
+          userId: ctx.user.id,
+        });
+      } catch (err) {
+        console.error(err);
+
+        throw new TRPCError({
+          code: 'BAD_REQUEST',
+          message: 'We were unable to find audit logs for this document. Please try again later.',
         });
       }
     }),
@@ -131,6 +165,7 @@ export const documentRouter = router({
         title,
         userId,
         documentId,
+        requestMetadata: extractNextApiRequestMetadata(ctx.req),
       });
     }),
 
@@ -144,6 +179,7 @@ export const documentRouter = router({
           userId: ctx.user.id,
           documentId,
           recipients,
+          requestMetadata: extractNextApiRequestMetadata(ctx.req),
         });
       } catch (err) {
         console.error(err);
@@ -166,6 +202,7 @@ export const documentRouter = router({
           userId: ctx.user.id,
           documentId,
           fields,
+          requestMetadata: extractNextApiRequestMetadata(ctx.req),
         });
       } catch (err) {
         console.error(err);
@@ -198,6 +235,7 @@ export const documentRouter = router({
           documentId,
           password: securePassword,
           userId: ctx.user.id,
+          requestMetadata: extractNextApiRequestMetadata(ctx.req),
         });
       } catch (err) {
         console.error(err);
@@ -224,12 +262,14 @@ export const documentRouter = router({
             timezone: meta.timezone,
             redirectUrl: meta.redirectUrl,
             userId: ctx.user.id,
+            requestMetadata: extractNextApiRequestMetadata(ctx.req),
           });
         }
 
         return await sendDocument({
           userId: ctx.user.id,
           documentId,
+          requestMetadata: extractNextApiRequestMetadata(ctx.req),
         });
       } catch (err) {
         console.error(err);
@@ -248,6 +288,7 @@ export const documentRouter = router({
         return await resendDocument({
           userId: ctx.user.id,
           ...input,
+          requestMetadata: extractNextApiRequestMetadata(ctx.req),
         });
       } catch (err) {
         console.error(err);

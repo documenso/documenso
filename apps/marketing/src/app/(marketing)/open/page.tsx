@@ -147,7 +147,12 @@ export default async function OpenPage() {
         <p className="text-muted-foreground mt-4 max-w-[60ch] text-center text-lg leading-normal">
           All our metrics, finances, and learnings are public. We believe in transparency and want
           to share our journey with you. You can read more about why here:{' '}
-          <a className="font-bold" href="https://documenso.com/blog/pre-seed" target="_blank">
+          <a
+            className="font-bold"
+            href="https://documenso.com/blog/pre-seed"
+            target="_blank"
+            rel="noreferrer"
+          >
             Announcing Open Metrics
           </a>
         </p>

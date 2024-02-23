@@ -11,6 +11,7 @@ import {
 } from '@aws-sdk/client-s3';
 import slugify from '@sindresorhus/slugify';
 import { type JWT, getToken } from 'next-auth/jwt';
+import { env } from 'next-runtime-env';
 import path from 'node:path';
 
 import { APP_BASE_URL } from '../../constants/app';
@@ -25,8 +26,10 @@ export const getPresignPostUrl = async (fileName: string, contentType: string) =
   let token: JWT | null = null;
 
   try {
+    const baseUrl = APP_BASE_URL() ?? 'http://localhost:3000';
+
     token = await getToken({
-      req: new NextRequest(APP_BASE_URL ?? 'http://localhost:3000', {
+      req: new NextRequest(baseUrl, {
         headers: headers(),
       }),
     });
@@ -117,7 +120,9 @@ export const deleteS3File = async (key: string) => {
 };
 
 const getS3Client = () => {
-  if (process.env.NEXT_PUBLIC_UPLOAD_TRANSPORT !== 's3') {
+  const NEXT_PUBLIC_UPLOAD_TRANSPORT = env('NEXT_PUBLIC_UPLOAD_TRANSPORT');
+
+  if (NEXT_PUBLIC_UPLOAD_TRANSPORT !== 's3') {
     throw new Error('Invalid upload transport');
   }
 

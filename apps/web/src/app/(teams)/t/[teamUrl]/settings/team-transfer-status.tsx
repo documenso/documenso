@@ -18,7 +18,7 @@ export type TeamTransferStatusProps = {
   className?: string;
   currentUserTeamRole: TeamMemberRole;
   teamId: number;
-  transferVerification: TeamTransferVerification | null;
+  transferVerification: Pick<TeamTransferVerification, 'email' | 'expiresAt' | 'name'> | null;
 };
 
 export const TeamTransferStatus = ({

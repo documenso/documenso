@@ -82,11 +82,7 @@ export const PricingTable = ({ className, ...props }: PricingTableProps) => {
           </p>
 
           <Button className="rounded-full text-base" asChild>
-            <Link
-              href={`${process.env.NEXT_PUBLIC_WEBAPP_URL}/signup`}
-              target="_blank"
-              className="mt-6"
-            >
+            <Link href={`https://documen.so/signup`} className="mt-6">
               Signup Now
             </Link>
           </Button>
@@ -117,13 +113,13 @@ export const PricingTable = ({ className, ...props }: PricingTableProps) => {
           </p>
 
           <Button className="mt-6 rounded-full text-base" asChild>
-            <Link href={`${process.env.NEXT_PUBLIC_WEBAPP_URL}/signup`}>Signup Now</Link>
+            <Link href={`https://documen.so/signup`}>Signup Now</Link>
           </Button>
 
           <div className="mt-8 flex w-full flex-col divide-y">
             <p className="text-foreground py-4 font-medium">
               {' '}
-              <a href="https://documenso.com/blog/early-adopters" target="_blank">
+              <a href="https://documenso.com/blog/early-adopters" target="_blank" rel="noreferrer">
                 The Early Adopter Deal:
               </a>
             </p>
@@ -133,7 +129,11 @@ export const PricingTable = ({ className, ...props }: PricingTableProps) => {
             <p className="text-foreground py-4">
               <strong>
                 {' '}
-                <a href="https://documenso.com/blog/early-adopters" target="_blank">
+                <a
+                  href="https://documenso.com/blog/early-adopters"
+                  target="_blank"
+                  rel="noreferrer"
+                >
                   Includes all upcoming features
                 </a>
               </strong>

@@ -1,7 +1,20 @@
 import { z } from 'zod';
 
 import { URL_REGEX } from '@documenso/lib/constants/url-regex';
+import { ZBaseTableSearchParamsSchema } from '@documenso/lib/types/search-params';
 import { DocumentStatus, FieldType, RecipientRole } from '@documenso/prisma/client';
+
+export const ZFindDocumentAuditLogsQuerySchema = ZBaseTableSearchParamsSchema.extend({
+  documentId: z.number().min(1),
+  cursor: z.string().optional(),
+  filterForRecentActivity: z.boolean().optional(),
+  orderBy: z
+    .object({
+      column: z.enum(['createdAt', 'type']),
+      direction: z.enum(['asc', 'desc']),
+    })
+    .optional(),
+});
 
 export const ZGetDocumentByIdQuerySchema = z.object({
   id: z.number().min(1),
@@ -77,7 +90,7 @@ export const ZSendDocumentMutationSchema = z.object({
     redirectUrl: z
       .string()
       .optional()
-      .refine((value) => value === undefined || URL_REGEX.test(value), {
+      .refine((value) => value === undefined || value === '' || URL_REGEX.test(value), {
         message: 'Please enter a valid URL',
       }),
   }),

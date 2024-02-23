@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
 import { useAnalytics } from '@documenso/lib/client-only/hooks/use-analytics';
+import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { base64 } from '@documenso/lib/universal/base64';
 import { putFile } from '@documenso/lib/universal/upload/put-file';
 import type { Field, Recipient } from '@documenso/prisma/client';
@@ -85,6 +86,7 @@ export const SinglePlayerClient = () => {
     setFields(
       data.fields.map((field, i) => ({
         id: i,
+        secondaryId: i.toString(),
         documentId: -1,
         templateId: null,
         recipientId: -1,
@@ -189,7 +191,7 @@ export const SinglePlayerClient = () => {
         <p className="text-foreground mx-auto mt-4 max-w-[50ch] text-lg leading-normal">
           Create a{' '}
           <Link
-            href={`${process.env.NEXT_PUBLIC_WEBAPP_URL}/signup`}
+            href={`${NEXT_PUBLIC_WEBAPP_URL()}/signup`}
             target="_blank"
             className="hover:text-foreground/80 font-semibold transition-colors"
           >
