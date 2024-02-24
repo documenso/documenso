@@ -187,6 +187,7 @@ test('[TEMPLATES]: use template', async ({ page }) => {
 
   // Use personal template.
   await page.getByRole('button', { name: 'Use Template' }).click();
+  await page.getByRole('button', { name: 'Create Document' }).click();
   await page.waitForURL(/documents/);
   await page.getByRole('main').getByRole('link', { name: 'Documents' }).click();
   await page.waitForURL('/documents');
@@ -196,6 +197,7 @@ test('[TEMPLATES]: use template', async ({ page }) => {
 
   // Use team template.
   await page.getByRole('button', { name: 'Use Template' }).click();
+  await page.getByRole('button', { name: 'Create Document' }).click();
   await page.waitForURL(/\/t\/.+\/documents/);
   await page.getByRole('main').getByRole('link', { name: 'Documents' }).click();
   await page.waitForURL(`/t/${team.url}/documents`);
