@@ -53,47 +53,50 @@ export const createUser = async ({ name, email, password, signature }: CreateUse
   await Promise.allSettled(
     acceptedTeamInvites.map(async (invite) =>
       prisma
-        .$transaction(async (tx) => {
-          await tx.teamMember.create({
-            data: {
-              teamId: invite.teamId,
-              userId: user.id,
-              role: invite.role,
-            },
-          });
-
-          await tx.teamMemberInvite.delete({
-            where: {
-              id: invite.id,
-            },
-          });
-
-          if (!IS_BILLING_ENABLED()) {
-            return;
-          }
-
-          const team = await tx.team.findFirstOrThrow({
-            where: {
-              id: invite.teamId,
-            },
-            include: {
-              members: {
-                select: {
-                  id: true,
-                },
+        .$transaction(
+          async (tx) => {
+            await tx.teamMember.create({
+              data: {
+                teamId: invite.teamId,
+                userId: user.id,
+                role: invite.role,
               },
-              subscription: true,
-            },
-          });
-
-          if (team.subscription) {
-            await updateSubscriptionItemQuantity({
-              priceId: team.subscription.priceId,
-              subscriptionId: team.subscription.planId,
-              quantity: team.members.length,
             });
-          }
-        })
+
+            await tx.teamMemberInvite.delete({
+              where: {
+                id: invite.id,
+              },
+            });
+
+            if (!IS_BILLING_ENABLED()) {
+              return;
+            }
+
+            const team = await tx.team.findFirstOrThrow({
+              where: {
+                id: invite.teamId,
+              },
+              include: {
+                members: {
+                  select: {
+                    id: true,
+                  },
+                },
+                subscription: true,
+              },
+            });
+
+            if (team.subscription) {
+              await updateSubscriptionItemQuantity({
+                priceId: team.subscription.priceId,
+                subscriptionId: team.subscription.planId,
+                quantity: team.members.length,
+              });
+            }
+          },
+          { timeout: 30_000 },
+        )
         .catch(async () => {
           await prisma.teamMemberInvite.update({
             where: {

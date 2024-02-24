@@ -142,7 +142,7 @@ export const DataTableActionDropdown = ({ row, team }: DataTableActionDropdownPr
         )}
 
         <DropdownMenuItem disabled={(!isOwner && !isCurrentTeamDocument) || isComplete} asChild>
-          <Link href={`${documentsPath}/${row.id}`}>
+          <Link href={`${documentsPath}/${row.id}/edit`}>
             <Edit className="mr-2 h-4 w-4" />
             Edit
           </Link>

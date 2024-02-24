@@ -49,44 +49,47 @@ export const sendCompletedEmail = async ({ documentId, requestMetadata }: SendDo
         downloadLink: `${NEXT_PUBLIC_WEBAPP_URL()}/sign/${token}/complete`,
       });
 
-      await prisma.$transaction(async (tx) => {
-        await mailer.sendMail({
-          to: {
-            address: email,
-            name,
-          },
-          from: {
-            name: process.env.NEXT_PRIVATE_SMTP_FROM_NAME || 'MonTampon',
-            address: process.env.NEXT_PRIVATE_SMTP_FROM_ADDRESS || 'noreply@documenso.com',
-          },
-          subject: 'Signing Complete!',
-          html: render(template),
-          text: render(template, { plainText: true }),
-          attachments: [
-            {
-              filename: document.title,
-              content: Buffer.from(buffer),
+      await prisma.$transaction(
+        async (tx) => {
+          await mailer.sendMail({
+            to: {
+              address: email,
+              name,
             },
-          ],
-        });
+            from: {
+              name: process.env.NEXT_PRIVATE_SMTP_FROM_NAME || 'MonTampon',
+              address: process.env.NEXT_PRIVATE_SMTP_FROM_ADDRESS || 'noreply@montampon.com',
+            },
+            subject: 'Signing Complete!',
+            html: render(template),
+            text: render(template, { plainText: true }),
+            attachments: [
+              {
+                filename: document.title,
+                content: Buffer.from(buffer),
+              },
+            ],
+          });
 
-        await tx.documentAuditLog.create({
-          data: createDocumentAuditLogData({
-            type: DOCUMENT_AUDIT_LOG_TYPE.EMAIL_SENT,
-            documentId: document.id,
-            user: null,
-            requestMetadata,
-            data: {
-              emailType: 'DOCUMENT_COMPLETED',
-              recipientEmail: recipient.email,
-              recipientName: recipient.name,
-              recipientId: recipient.id,
-              recipientRole: recipient.role,
-              isResending: false,
-            },
-          }),
-        });
-      });
+          await tx.documentAuditLog.create({
+            data: createDocumentAuditLogData({
+              type: DOCUMENT_AUDIT_LOG_TYPE.EMAIL_SENT,
+              documentId: document.id,
+              user: null,
+              requestMetadata,
+              data: {
+                emailType: 'DOCUMENT_COMPLETED',
+                recipientEmail: recipient.email,
+                recipientName: recipient.name,
+                recipientId: recipient.id,
+                recipientRole: recipient.role,
+                isResending: false,
+              },
+            }),
+          });
+        },
+        { timeout: 30_000 },
+      );
     }),
   );
 };
