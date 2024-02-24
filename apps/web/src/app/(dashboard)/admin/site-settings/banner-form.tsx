@@ -54,8 +54,6 @@ export function BannerForm({ banner }: BannerFormProps) {
   });
 
   const enabled = form.watch('enabled');
-  const values = form.getValues();
-  console.log({ values });
 
   const { mutateAsync: updateSiteSetting, isLoading: isUpdateSiteSettingLoading } =
     trpcReact.admin.updateSiteSetting.useMutation();

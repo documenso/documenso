@@ -21,11 +21,13 @@ export const upsertSiteSetting = async ({
       enabled,
       data,
       lastModifiedByUserId: userId,
+      lastModifiedAt: new Date(),
     },
     update: {
       enabled,
       data,
       lastModifiedByUserId: userId,
+      lastModifiedAt: new Date(),
     },
   });
 };
