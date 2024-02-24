@@ -15,7 +15,7 @@ test('[PR-713]: should see sent documents', async ({ page }) => {
 
   await page.keyboard.press('Meta+K');
 
-  await page.getByPlaceholder('Type a command or search...').fill('sent');
+  await page.getByPlaceholder('Type a command or search...').first().fill('sent');
   await expect(page.getByRole('option', { name: '[713] Document - Sent' })).toBeVisible();
 });
 
@@ -32,7 +32,7 @@ test('[PR-713]: should see received documents', async ({ page }) => {
 
   await page.keyboard.press('Meta+K');
 
-  await page.getByPlaceholder('Type a command or search...').fill('received');
+  await page.getByPlaceholder('Type a command or search...').first().fill('received');
   await expect(page.getByRole('option', { name: '[713] Document - Received' })).toBeVisible();
 });
 
@@ -49,6 +49,6 @@ test('[PR-713]: should be able to search by recipient', async ({ page }) => {
 
   await page.keyboard.press('Meta+K');
 
-  await page.getByPlaceholder('Type a command or search...').fill(recipient.email);
+  await page.getByPlaceholder('Type a command or search...').first().fill(recipient.email);
   await expect(page.getByRole('option', { name: '[713] Document - Sent' })).toBeVisible();
 });

@@ -22,6 +22,8 @@ export const FEATURE_FLAG_POLL_INTERVAL = 30000;
  */
 export const LOCAL_FEATURE_FLAGS: Record<string, boolean> = {
   app_billing: NEXT_PUBLIC_FEATURE_BILLING_ENABLED() === 'true',
+  app_teams: true,
+  app_document_page_view_history_sheet: false,
   marketing_header_single_player_mode: false,
 } as const;
 

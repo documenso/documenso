@@ -118,7 +118,7 @@ export const ResendDocumentActionItem = ({
 
       <DialogContent className="sm:max-w-sm" hideClose>
         <DialogHeader>
-          <DialogTitle>
+          <DialogTitle asChild>
             <h1 className="text-center text-xl">Who do you want to remind?</h1>
           </DialogTitle>
         </DialogHeader>
