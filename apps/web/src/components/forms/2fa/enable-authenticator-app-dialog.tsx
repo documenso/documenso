@@ -1,14 +1,12 @@
 import { useMemo } from 'react';
 
-import { useRouter } from 'next/navigation';
-
 import { zodResolver } from '@hookform/resolvers/zod';
-import { flushSync } from 'react-dom';
 import { useForm } from 'react-hook-form';
 import { match } from 'ts-pattern';
 import { renderSVG } from 'uqr';
 import { z } from 'zod';
 
+import { downloadFile } from '@documenso/lib/client-only/download-file';
 import { trpc } from '@documenso/trpc/react';
 import { Button } from '@documenso/ui/primitives/button';
 import {
@@ -54,14 +52,16 @@ export const EnableAuthenticatorAppDialog = ({
   open,
   onOpenChange,
 }: EnableAuthenticatorAppDialogProps) => {
-  const router = useRouter();
   const { toast } = useToast();
 
   const { mutateAsync: setupTwoFactorAuthentication, data: setupTwoFactorAuthenticationData } =
     trpc.twoFactorAuthentication.setup.useMutation();
 
-  const { mutateAsync: enableTwoFactorAuthentication, data: enableTwoFactorAuthenticationData } =
-    trpc.twoFactorAuthentication.enable.useMutation();
+  const {
+    mutateAsync: enableTwoFactorAuthentication,
+    data: enableTwoFactorAuthenticationData,
+    isLoading: isEnableTwoFactorAuthenticationDataLoading,
+  } = trpc.twoFactorAuthentication.enable.useMutation();
 
   const setupTwoFactorAuthenticationForm = useForm<TSetupTwoFactorAuthenticationForm>({
     defaultValues: {
@@ -115,6 +115,19 @@ export const EnableAuthenticatorAppDialog = ({
     }
   };
 
+  const downloadRecoveryCodes = () => {
+    if (enableTwoFactorAuthenticationData && enableTwoFactorAuthenticationData.recoveryCodes) {
+      const blob = new Blob([enableTwoFactorAuthenticationData.recoveryCodes.join('\n')], {
+        type: 'text/plain',
+      });
+
+      downloadFile({
+        filename: 'documenso-2FA-recovery-codes.txt',
+        data: blob,
+      });
+    }
+  };
+
   const onEnableTwoFactorAuthenticationFormSubmit = async ({
     token,
   }: TEnableTwoFactorAuthenticationForm) => {
@@ -134,14 +147,6 @@ export const EnableAuthenticatorAppDialog = ({
         variant: 'destructive',
       });
     }
-  };
-
-  const onCompleteClick = () => {
-    flushSync(() => {
-      onOpenChange(false);
-    });
-
-    router.refresh();
   };
 
   return (
@@ -270,9 +275,16 @@ export const EnableAuthenticatorAppDialog = ({
                 <RecoveryCodeList recoveryCodes={enableTwoFactorAuthenticationData.recoveryCodes} />
               )}
 
-              <div className="mt-4 flex w-full flex-row-reverse items-center justify-between">
-                <Button type="button" onClick={() => onCompleteClick()}>
-                  Complete
+              <div className="mt-4 flex flex-row-reverse items-center gap-2">
+                <Button onClick={() => onOpenChange(false)}>Complete</Button>
+
+                <Button
+                  variant="secondary"
+                  onClick={downloadRecoveryCodes}
+                  disabled={!enableTwoFactorAuthenticationData?.recoveryCodes}
+                  loading={isEnableTwoFactorAuthenticationDataLoading}
+                >
+                  Download
                 </Button>
               </div>
             </div>
