@@ -13,7 +13,7 @@ export default function SignUpLayout({ children }: SignUpLayoutProps) {
   return (
     <>
       <NewHeader className="mx-auto h-16 max-w-screen-xl px-4 md:h-20 lg:px-8" />
-      <main className="bg-sand-100 flex flex-col items-center justify-center overflow-hidden px-6 py-16 md:p-10 lg:p-[7.0rem]">
+      <main className="bg-sand-100 flex flex-col items-center justify-center overflow-hidden px-4 py-12 md:p-12 lg:p-[7.2rem]">
         <div className="flex w-full items-center gap-x-8">
           <ClaimUsernameCard />
           <Card className="px-6 py-6">
