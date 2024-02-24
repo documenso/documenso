@@ -34,6 +34,7 @@ export const ZAddTemplateSignersMutationSchema = z
         nativeId: z.number().optional(),
         email: z.string().email().min(1),
         name: z.string(),
+        role: z.nativeEnum(RecipientRole),
       }),
     ),
   })

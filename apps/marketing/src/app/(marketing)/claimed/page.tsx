@@ -4,6 +4,7 @@ import { redirect } from 'next/navigation';
 
 import { ArrowRight } from 'lucide-react';
 
+import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { redis } from '@documenso/lib/server-only/redis';
 import { stripe } from '@documenso/lib/server-only/stripe';
 import { prisma } from '@documenso/prisma';
@@ -11,6 +12,8 @@ import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
 
 import { PasswordReveal } from '~/components/(marketing)/password-reveal';
+
+export const dynamic = 'force-dynamic';
 
 const fontCaveat = Caveat({
   weight: ['500'],
@@ -175,11 +178,7 @@ export default async function ClaimedPlanPage({ searchParams = {} }: ClaimedPlan
           This is a temporary password. Please change it as soon as possible.
         </p>
 
-        <Link
-          href={`${process.env.NEXT_PUBLIC_WEBAPP_URL}/signin`}
-          target="_blank"
-          className="mt-4 block"
-        >
+        <Link href={`${NEXT_PUBLIC_WEBAPP_URL()}/signin`} target="_blank" className="mt-4 block">
           <Button size="lg" className="text-base">
             Let's get started!
             <ArrowRight className="ml-2 h-5 w-5" />

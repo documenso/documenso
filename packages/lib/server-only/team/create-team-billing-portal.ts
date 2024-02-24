@@ -12,7 +12,7 @@ export const createTeamBillingPortal = async ({
   userId,
   teamId,
 }: CreateTeamBillingPortalOptions) => {
-  if (!IS_BILLING_ENABLED) {
+  if (!IS_BILLING_ENABLED()) {
     throw new Error('Billing is not enabled');
   }
 
