@@ -7,14 +7,15 @@ import { ChevronLeft } from 'lucide-react';
 import type { MDXComponents } from 'mdx/types';
 import { useMDXComponent } from 'next-contentlayer/hooks';
 
-export const generateStaticParams = () =>
-  allBlogPosts.map((post) => ({ post: post._raw.flattenedPath }));
+export const dynamic = 'force-dynamic';
 
 export const generateMetadata = ({ params }: { params: { post: string } }) => {
   const blogPost = allBlogPosts.find((post) => post._raw.flattenedPath === `blog/${params.post}`);
 
   if (!blogPost) {
-    notFound();
+    return {
+      title: 'Not Found',
+    };
   }
 
   return {

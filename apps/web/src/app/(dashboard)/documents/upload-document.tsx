@@ -83,7 +83,7 @@ export const UploadDocument = ({ className, team }: UploadDocumentProps) => {
         timestamp: new Date().toISOString(),
       });
 
-      router.push(`${formatDocumentsPath(team?.url)}/${id}`);
+      router.push(`${formatDocumentsPath(team?.url)}/${id}/edit`);
     } catch (error) {
       console.error(error);
 
@@ -117,7 +117,7 @@ export const UploadDocument = ({ className, team }: UploadDocumentProps) => {
   return (
     <div className={cn('relative', className)}>
       <DocumentDropzone
-        className="min-h-[40vh]"
+        className="h-[min(400px,50vh)]"
         disabled={remaining.documents === 0 || !session?.user.emailVerified}
         disabledMessage={disabledMessage}
         onDrop={onFileDrop}

@@ -238,7 +238,7 @@ export const TransferTeamDialog = ({
                 <Alert variant="neutral">
                   <AlertDescription>
                     <ul className="list-outside list-disc space-y-2 pl-4">
-                      {IS_BILLING_ENABLED && (
+                      {IS_BILLING_ENABLED() && (
                         // Temporary removed.
                         // <li>
                         //   {form.getValues('clearPaymentMethods')

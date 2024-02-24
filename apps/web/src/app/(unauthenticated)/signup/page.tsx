@@ -2,6 +2,8 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 
+import { env } from 'next-runtime-env';
+
 import { IS_GOOGLE_SSO_ENABLED } from '@documenso/lib/constants/auth';
 import { decryptSecondaryData } from '@documenso/lib/server-only/crypto/decrypt';
 
@@ -18,7 +20,9 @@ type SignUpPageProps = {
 };
 
 export default function SignUpPage({ searchParams }: SignUpPageProps) {
-  if (process.env.NEXT_PUBLIC_DISABLE_SIGNUP === 'true') {
+  const NEXT_PUBLIC_DISABLE_SIGNUP = env('NEXT_PUBLIC_DISABLE_SIGNUP');
+
+  if (NEXT_PUBLIC_DISABLE_SIGNUP === 'true') {
     redirect('/signin');
   }
 

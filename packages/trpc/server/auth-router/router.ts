@@ -1,4 +1,5 @@
 import { TRPCError } from '@trpc/server';
+import { env } from 'next-runtime-env';
 
 import { ErrorCode } from '@documenso/lib/next-auth/error-codes';
 import { compareSync } from '@documenso/lib/server-only/auth/hash';
@@ -8,10 +9,12 @@ import { sendConfirmationToken } from '@documenso/lib/server-only/user/send-conf
 import { authenticatedProcedure, procedure, router } from '../trpc';
 import { ZSignUpMutationSchema, ZVerifyPasswordMutationSchema } from './schema';
 
+const NEXT_PUBLIC_DISABLE_SIGNUP = () => env('NEXT_PUBLIC_DISABLE_SIGNUP');
+
 export const authRouter = router({
   signup: procedure.input(ZSignUpMutationSchema).mutation(async ({ input }) => {
     try {
-      if (process.env.NEXT_PUBLIC_DISABLE_SIGNUP === 'true') {
+      if (NEXT_PUBLIC_DISABLE_SIGNUP() === 'true') {
         throw new TRPCError({
           code: 'BAD_REQUEST',
           message: 'Signups are disabled.',

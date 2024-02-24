@@ -5,6 +5,7 @@ import { PDFDocument } from 'pdf-lib';
 import { mailer } from '@documenso/email/mailer';
 import { renderAsync } from '@documenso/email/render';
 import { DocumentSelfSignedEmailTemplate } from '@documenso/email/templates/document-self-signed';
+import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { FROM_ADDRESS, FROM_NAME, SERVICE_USER_EMAIL } from '@documenso/lib/constants/email';
 import { insertFieldInPDF } from '@documenso/lib/server-only/pdf/insert-field-in-pdf';
 import { alphaid } from '@documenso/lib/universal/id';
@@ -149,7 +150,7 @@ export const singleplayerRouter = router({
 
       const template = createElement(DocumentSelfSignedEmailTemplate, {
         documentName: documentName,
-        assetBaseUrl: process.env.NEXT_PUBLIC_WEBAPP_URL || 'http://localhost:3000',
+        assetBaseUrl: NEXT_PUBLIC_WEBAPP_URL() || 'http://localhost:3000',
       });
 
       const [html, text] = await Promise.all([

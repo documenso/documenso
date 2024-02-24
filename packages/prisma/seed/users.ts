@@ -32,3 +32,22 @@ export const unseedUser = async (userId: number) => {
     },
   });
 };
+
+export const unseedUserByEmail = async (email: string) => {
+  await prisma.user.delete({
+    where: {
+      email,
+    },
+  });
+};
+
+export const extractUserVerificationToken = async (email: string) => {
+  return await prisma.verificationToken.findFirstOrThrow({
+    where: {
+      identifier: 'confirmation-email',
+      user: {
+        email,
+      },
+    },
+  });
+};

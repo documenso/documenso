@@ -15,6 +15,8 @@ export const metadata: Metadata = {
   title: 'Pricing',
 };
 
+export const dynamic = 'force-dynamic';
+
 export type PricingPageProps = {
   searchParams?: {
     planId?: string;
@@ -53,7 +55,7 @@ export default function PricingPage() {
 
         <div className="mt-4 flex justify-center">
           <Button variant="outline" size="lg" className="rounded-full hover:cursor-pointer" asChild>
-            <Link href="https://github.com/documenso/documenso" target="_blank">
+            <Link href="https://github.com/documenso/documenso" target="_blank" rel="noreferrer">
               Get Started
             </Link>
           </Button>
@@ -166,6 +168,7 @@ export default function PricingPage() {
               <Link
                 className="text-documenso-700 font-bold"
                 target="_blank"
+                rel="noreferrer"
                 href="mailto:support@documenso.com"
               >
                 support@documenso.com
@@ -175,6 +178,7 @@ export default function PricingPage() {
                 className="text-documenso-700 font-bold"
                 href="https://documen.so/discord"
                 target="_blank"
+                rel="noreferrer"
               >
                 in our Discord-Support-Channel
               </a>{' '}
