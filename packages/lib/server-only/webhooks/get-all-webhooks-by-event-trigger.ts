@@ -1,11 +1,13 @@
 import { prisma } from '@documenso/prisma';
 import type { WebhookTriggerEvents } from '@documenso/prisma/client';
 
-export type GetAllWebhooksOptions = {
+export type GetAllWebhooksByEventTriggerOptions = {
   eventTrigger: WebhookTriggerEvents;
 };
 
-export const getAllWebhooks = async ({ eventTrigger }: GetAllWebhooksOptions) => {
+export const getAllWebhooksByEventTrigger = async ({
+  eventTrigger,
+}: GetAllWebhooksByEventTriggerOptions) => {
   return prisma.webhook.findMany({
     where: {
       eventTriggers: {

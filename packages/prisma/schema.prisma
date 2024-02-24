@@ -97,7 +97,10 @@ model VerificationToken {
 
 enum WebhookTriggerEvents {
   DOCUMENT_CREATED
+  DOCUMENT_SENT
+  DOCUMENT_OPENED
   DOCUMENT_SIGNED
+  DOCUMENT_COMPLETED
 }
 
 model Webhook {
@@ -228,15 +231,15 @@ model DocumentData {
 }
 
 model DocumentMeta {
-  id         String   @id @default(cuid())
-  subject    String?
-  message    String?
-  timezone   String?  @default("Etc/UTC") @db.Text
-  password   String?
-  dateFormat String?  @default("yyyy-MM-dd hh:mm a") @db.Text
-  documentId Int      @unique
-  document   Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
-  redirectUrl String? 
+  id          String   @id @default(cuid())
+  subject     String?
+  message     String?
+  timezone    String?  @default("Etc/UTC") @db.Text
+  password    String?
+  dateFormat  String?  @default("yyyy-MM-dd hh:mm a") @db.Text
+  documentId  Int      @unique
+  document    Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  redirectUrl String?
 }
 
 enum ReadStatus {
