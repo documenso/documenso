@@ -107,6 +107,8 @@ test('[TEMPLATES]: delete template', async ({ page }) => {
     await page.getByRole('menuitem', { name: 'Delete' }).click();
     await page.getByRole('button', { name: 'Delete' }).click();
     await expect(page.getByText('Template deleted').first()).toBeVisible();
+
+    await page.waitForTimeout(1000);
   }
 
   await unseedTeam(team.url);
@@ -194,6 +196,7 @@ test('[TEMPLATES]: use template', async ({ page }) => {
   await expect(page.getByRole('main')).toContainText('Showing 1 result');
 
   await page.goto(`${WEBAPP_BASE_URL}/t/${team.url}/templates`);
+  await page.waitForTimeout(1000);
 
   // Use team template.
   await page.getByRole('button', { name: 'Use Template' }).click();
