@@ -80,11 +80,11 @@ export const profileRouter = router({
     .input(ZUpdatePublicProfileMutationSchema)
     .mutation(async ({ input, ctx }) => {
       try {
-        const { profileURL, profileBio } = input;
+        const { profileURL } = input;
 
         return await updatePublicProfile({
           id: ctx.user.id,
-          userProfile: { profileURL, profileBio },
+          profileURL,
         });
       } catch (err) {
         console.error(err);

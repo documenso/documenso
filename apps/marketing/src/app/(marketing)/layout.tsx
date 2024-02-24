@@ -2,8 +2,10 @@
 
 import React, { useEffect, useState } from 'react';
 
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 
+import backgroundPattern from '@documenso/assets/images/background-lw-2.png';
 import { cn } from '@documenso/ui/lib/utils';
 import { AnnouncementBar } from '@documenso/ui/primitives/announcement-bar';
 
@@ -39,7 +41,14 @@ export default function MarketingLayout({ children }: MarketingLayoutProps) {
           'bg-background/50 backdrop-blur-md': scrollY > 5,
         })}
       >
-        <AnnouncementBar isShown={true} />
+        <div className="absolute -inset-0 -z-[1] opacity-100">
+          <Image
+            src={backgroundPattern}
+            alt="background pattern"
+            className="!h-34 w-full object-cover"
+          />
+        </div>
+        <AnnouncementBar className="relative" isShown={true} />
         <Header className="mx-auto h-16 max-w-screen-xl px-4 md:h-20 lg:px-8" />
       </div>
 
