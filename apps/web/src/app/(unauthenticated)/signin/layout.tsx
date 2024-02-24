@@ -20,7 +20,7 @@ export default function SignInLayout({ children }: SignInLayoutProps) {
           <Image
             src={backgroundPattern}
             alt="background pattern"
-            className="flex flex-col overflow-hidden dark:brightness-95 dark:contrast-[70%] dark:invert dark:sepia"
+            className="flex min-h-screen flex-col overflow-hidden dark:brightness-95 dark:contrast-[70%] dark:invert dark:sepia"
           />
         </div>
         <div className="relative flex w-full max-w-md items-center gap-x-24">

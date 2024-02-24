@@ -1,5 +1,7 @@
 'use client';
 
+import { useSearchParams } from 'next/navigation';
+
 import { zodResolver } from '@hookform/resolvers/zod';
 import { signIn } from 'next-auth/react';
 import { useForm } from 'react-hook-form';
@@ -55,6 +57,12 @@ export type SignUpFormProps = {
 export const SignUpForm = ({ className, initialEmail, isGoogleSSOEnabled }: SignUpFormProps) => {
   const { toast } = useToast();
   const analytics = useAnalytics();
+  const searchParams = useSearchParams();
+
+  let src: string | null = null;
+  if (searchParams) {
+    src = searchParams.get('src');
+  }
 
   const form = useForm<TSignUpFormSchema>({
     values: {
@@ -83,6 +91,7 @@ export const SignUpForm = ({ className, initialEmail, isGoogleSSOEnabled }: Sign
       analytics.capture('App: User Sign Up', {
         email,
         timestamp: new Date().toISOString(),
+        custom_campaign_params: { src },
       });
     } catch (err) {
       if (err instanceof TRPCClientError && err.data?.code === 'BAD_REQUEST') {
@@ -127,7 +136,7 @@ export const SignUpForm = ({ className, initialEmail, isGoogleSSOEnabled }: Sign
             name="name"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Name</FormLabel>
+                <FormLabel>Full Name</FormLabel>
                 <FormControl>
                   <Input type="text" {...field} />
                 </FormControl>
@@ -141,7 +150,7 @@ export const SignUpForm = ({ className, initialEmail, isGoogleSSOEnabled }: Sign
             name="email"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Email</FormLabel>
+                <FormLabel>Email Address</FormLabel>
                 <FormControl>
                   <Input type="email" {...field} />
                 </FormControl>

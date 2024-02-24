@@ -82,7 +82,7 @@ export const MobileNav = ({ className, ...props }: MobileNavProps) => {
         </Link>
       )}
 
-      <Link href="/settings/public-profile">
+      <Link href="#">
         <Button
           variant="ghost"
           className={cn(
@@ -92,6 +92,12 @@ export const MobileNav = ({ className, ...props }: MobileNavProps) => {
         >
           <Globe2 className="mr-2 h-5 w-5" />
           Public profile
+          <Link
+            href="#"
+            className="bg-primary dark:text-background ml-2 rounded-full px-2 py-1 text-xs font-semibold sm:px-3"
+          >
+            Coming soon!
+          </Link>
         </Button>
       </Link>
     </div>
