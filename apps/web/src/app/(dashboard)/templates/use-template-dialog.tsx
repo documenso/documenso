@@ -19,10 +19,10 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@documenso/ui/primitives/dialog';
-import { ROLE_ICONS } from '@documenso/ui/primitives/document-flow/add-signers';
 import { FormErrorMessage } from '@documenso/ui/primitives/form/form-error-message';
 import { Input } from '@documenso/ui/primitives/input';
 import { Label } from '@documenso/ui/primitives/label';
+import { ROLE_ICONS } from '@documenso/ui/primitives/recipient-role-icons';
 import { Select, SelectContent, SelectItem, SelectTrigger } from '@documenso/ui/primitives/select';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
@@ -119,7 +119,7 @@ export function UseTemplateDialog({
           Use Template
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-lg">
         <DialogHeader>
           <DialogTitle>Document Recipients</DialogTitle>
           <DialogDescription>Add the recipients to create the template with.</DialogDescription>
