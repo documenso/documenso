@@ -23,7 +23,6 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Input } from '../input';
 import { SignaturePad } from '../signature-pad';
 import { useStep } from '../stepper';
-import { Textarea } from '../textarea';
 import type { TAddSignatureFormSchema } from './add-signature.types';
 import { ZAddSignatureFormSchema } from './add-signature.types';
 import {
@@ -333,8 +332,8 @@ export const AddSignatureFormPartial = ({
                     <FormItem>
                       <FormLabel required={requireCustomText}>Custom Text</FormLabel>
                       <FormControl>
-                        <Textarea
-                          className="bg-background h-44"
+                        <Input
+                          className="bg-background"
                           {...field}
                           onChange={(value) => {
                             onFormValueChange(FieldType.TEXT);

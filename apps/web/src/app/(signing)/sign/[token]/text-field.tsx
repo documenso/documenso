@@ -11,8 +11,8 @@ import type { FieldWithSignature } from '@documenso/prisma/types/field-with-sign
 import { trpc } from '@documenso/trpc/react';
 import { Button } from '@documenso/ui/primitives/button';
 import { Dialog, DialogContent, DialogFooter, DialogTitle } from '@documenso/ui/primitives/dialog';
+import { Input } from '@documenso/ui/primitives/input';
 import { Label } from '@documenso/ui/primitives/label';
-import { Textarea } from '@documenso/ui/primitives/textarea';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
 import { SigningFieldContainer } from './signing-field-container';
@@ -118,21 +118,21 @@ export const TextField = ({ field, recipient }: TextFieldProps) => {
       <Dialog open={showCustomTextModal} onOpenChange={setShowCustomTextModal}>
         <DialogContent>
           <DialogTitle>
-            Enter a Text <span className="text-muted-foreground">({recipient.email})</span>
+            Enter your Text <span className="text-muted-foreground">({recipient.email})</span>
           </DialogTitle>
 
           <div className="">
             <Label htmlFor="custom-text">Custom Text</Label>
 
-            <Textarea
+            <Input
               id="custom-text"
-              className="border-border mt-2 h-44 w-full rounded-md border"
+              className="border-border mt-2 w-full rounded-md border"
               onChange={(e) => setLocalCustomText(e.target.value)}
             />
           </div>
 
           <DialogFooter>
-            <div className="flex w-full flex-1 flex-nowrap gap-4">
+            <div className="mt-4 flex w-full flex-1 flex-nowrap gap-4">
               <Button
                 type="button"
                 className="dark:bg-muted dark:hover:bg-muted/80 flex-1  bg-black/5 hover:bg-black/10"
