@@ -112,7 +112,10 @@ model ApiToken {
 
 enum WebhookTriggerEvents {
   DOCUMENT_CREATED
+  DOCUMENT_SENT
+  DOCUMENT_OPENED
   DOCUMENT_SIGNED
+  DOCUMENT_COMPLETED
 }
 
 model Webhook {

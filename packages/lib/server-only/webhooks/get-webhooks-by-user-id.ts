@@ -5,5 +5,8 @@ export const getWebhooksByUserId = async (userId: number) => {
     where: {
       userId,
     },
+    orderBy: {
+      createdAt: 'desc',
+    },
   });
 };

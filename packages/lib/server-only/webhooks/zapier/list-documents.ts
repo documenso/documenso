@@ -1,6 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 import { findDocuments } from '@documenso/lib/server-only/document/find-documents';
+import { getRecipientsForDocument } from '@documenso/lib/server-only/recipient/get-recipients-for-document';
 
 import { getWebhooksByUserId } from '../get-webhooks-by-user-id';
 import { validateApiToken } from './validateApiToken';
@@ -12,6 +13,10 @@ export const listDocumentsHandler = async (req: NextApiRequest, res: NextApiResp
 
     const documents = await findDocuments({ userId: user.id });
     const allWebhooks = await getWebhooksByUserId(user.id);
+    const recipients = await getRecipientsForDocument({
+      documentId: documents.data[0].id,
+      userId: user.id,
+    });
 
     if (documents.data.length > 0 && allWebhooks.length > 0) {
       const testWebhook = {
@@ -29,6 +34,7 @@ export const listDocumentsHandler = async (req: NextApiRequest, res: NextApiResp
           completedAt: documents.data[0].completedAt,
           deletedAt: documents.data[0].deletedAt,
           teamId: documents.data[0].teamId,
+          Recipient: recipients,
         },
       };
 
