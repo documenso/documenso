@@ -41,7 +41,7 @@ export const templateRouter = router({
     .input(ZCreateDocumentFromTemplateMutationSchema)
     .mutation(async ({ input, ctx }) => {
       try {
-        const { templateId } = input;
+        const { templateId, teamId } = input;
 
         const limits = await getServerLimits({ email: ctx.user.email });
 
@@ -51,6 +51,7 @@ export const templateRouter = router({
 
         return await createDocumentFromTemplate({
           templateId,
+          teamId,
           userId: ctx.user.id,
         });
       } catch (err) {

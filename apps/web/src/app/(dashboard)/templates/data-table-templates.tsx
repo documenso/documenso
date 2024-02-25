@@ -68,6 +68,7 @@ export const TemplatesDataTable = ({
     try {
       const { id } = await createDocumentFromTemplate({
         templateId,
+        teamId,
       });
 
       toast({
