@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { Caveat } from 'next/font/google';
 
@@ -10,9 +10,10 @@ import { useFieldArray, useForm } from 'react-hook-form';
 import { getBoundingClientRect } from '@documenso/lib/client-only/get-bounding-client-rect';
 import { useDocumentElement } from '@documenso/lib/client-only/hooks/use-document-element';
 import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
+import { RECIPIENT_ROLES_DESCRIPTION } from '@documenso/lib/constants/recipient-roles';
 import { nanoid } from '@documenso/lib/universal/id';
 import type { Field, Recipient } from '@documenso/prisma/client';
-import { FieldType } from '@documenso/prisma/client';
+import { FieldType, RecipientRole } from '@documenso/prisma/client';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
 import { Card, CardContent } from '@documenso/ui/primitives/card';
@@ -291,6 +292,28 @@ export const AddTemplateFieldsFormPartial = ({
     setSelectedSigner(recipients[0]);
   }, [recipients]);
 
+  const recipientsByRole = useMemo(() => {
+    const recipientsByRole: Record<RecipientRole, Recipient[]> = {
+      CC: [],
+      VIEWER: [],
+      SIGNER: [],
+      APPROVER: [],
+    };
+
+    recipients.forEach((recipient) => {
+      recipientsByRole[recipient.role].push(recipient);
+    });
+
+    return recipientsByRole;
+  }, [recipients]);
+
+  const recipientsByRoleToDisplay = useMemo(() => {
+    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+    return (Object.entries(recipientsByRole) as [RecipientRole, Recipient[]][]).filter(
+      ([role]) => role !== RecipientRole.CC && role !== RecipientRole.VIEWER,
+    );
+  }, [recipientsByRole]);
+
   return (
     <>
       <DocumentFlowFormContainerContent>
@@ -363,55 +386,49 @@ export const AddTemplateFieldsFormPartial = ({
                     </span>
                   </CommandEmpty>
 
-                  <CommandGroup>
-                    {recipients.map((recipient, index) => (
-                      <CommandItem
-                        key={index}
-                        className={cn({
-                          // 'text-muted-foreground': recipient.sendStatus === SendStatus.SENT,
-                        })}
-                        onSelect={() => {
-                          setSelectedSigner(recipient);
-                          setShowRecipientsSelector(false);
-                        }}
-                      >
-                        {/* {recipient.sendStatus !== SendStatus.SENT ? (
-                          <Check
-                            aria-hidden={recipient !== selectedSigner}
-                            className={cn('mr-2 h-4 w-4 flex-shrink-0', {
-                              'opacity-0': recipient !== selectedSigner,
-                              'opacity-100': recipient === selectedSigner,
-                            })}
-                          />
-                        ) : (
-                          <Tooltip>
-                            <TooltipTrigger>
-                              <Info className="mr-2 h-4 w-4" />
-                            </TooltipTrigger>
-                            <TooltipContent className="max-w-xs">
-                              This document has already been sent to this recipient. You can no
-                              longer edit this recipient.
-                            </TooltipContent>
-                          </Tooltip>
-                        )} */}
+                  {recipientsByRoleToDisplay.map(([role, recipients], roleIndex) => (
+                    <CommandGroup key={roleIndex}>
+                      <div className="text-muted-foreground mb-1 ml-2 mt-2 text-xs font-medium">
+                        {`${RECIPIENT_ROLES_DESCRIPTION[role].roleName}s`}
+                      </div>
 
-                        {recipient.name && (
+                      {recipients.length === 0 && (
+                        <div
+                          key={`${role}-empty`}
+                          className="text-muted-foreground/80 px-4 pb-4 pt-2.5 text-center text-xs"
+                        >
+                          No recipients with this role
+                        </div>
+                      )}
+
+                      {recipients.map((recipient) => (
+                        <CommandItem
+                          key={recipient.id}
+                          className={cn('px-2 last:mb-1 [&:not(:first-child)]:mt-1')}
+                          onSelect={() => {
+                            setSelectedSigner(recipient);
+                            setShowRecipientsSelector(false);
+                          }}
+                        >
                           <span
-                            className="truncate"
-                            title={`${recipient.name} (${recipient.email})`}
+                            className={cn('text-foreground/70 truncate', {
+                              'text-foreground/80': recipient === selectedSigner,
+                            })}
                           >
-                            {recipient.name} ({recipient.email})
-                          </span>
-                        )}
+                            {recipient.name && (
+                              <span title={`${recipient.name} (${recipient.email})`}>
+                                {recipient.name} ({recipient.email})
+                              </span>
+                            )}
 
-                        {!recipient.name && (
-                          <span className="truncate" title={recipient.email}>
-                            {recipient.email}
+                            {!recipient.name && (
+                              <span title={recipient.email}>{recipient.email}</span>
+                            )}
                           </span>
-                        )}
-                      </CommandItem>
-                    ))}
-                  </CommandGroup>
+                        </CommandItem>
+                      ))}
+                    </CommandGroup>
+                  ))}
                 </Command>
               </PopoverContent>
             </Popover>
@@ -508,6 +525,28 @@ export const AddTemplateFieldsFormPartial = ({
                     </p>
 
                     <p className="text-muted-foreground mt-2 text-xs">Date</p>
+                  </CardContent>
+                </Card>
+              </button>
+
+              <button
+                type="button"
+                className="group h-full w-full"
+                onClick={() => setSelectedField(FieldType.TEXT)}
+                onMouseDown={() => setSelectedField(FieldType.TEXT)}
+                data-selected={selectedField === FieldType.TEXT ? true : undefined}
+              >
+                <Card className="group-data-[selected]:border-documenso h-full w-full cursor-pointer group-disabled:opacity-50">
+                  <CardContent className="flex flex-col items-center justify-center px-6 py-4">
+                    <p
+                      className={cn(
+                        'text-muted-foreground group-data-[selected]:text-foreground text-xl font-medium',
+                      )}
+                    >
+                      {'Text'}
+                    </p>
+
+                    <p className="text-muted-foreground mt-2 text-xs">Custom Text</p>
                   </CardContent>
                 </Card>
               </button>

@@ -57,6 +57,7 @@ export const createDocumentFromTemplate = async ({
         create: template.Recipient.map((recipient) => ({
           email: recipient.email,
           name: recipient.name,
+          role: recipient.role,
           token: nanoid(),
         })),
       },

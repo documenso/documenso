@@ -29,6 +29,7 @@ import { NameField } from './name-field';
 import { NoLongerAvailable } from './no-longer-available';
 import { SigningProvider } from './provider';
 import { SignatureField } from './signature-field';
+import { TextField } from './text-field';
 
 export type SigningPageProps = {
   params: {
@@ -167,6 +168,9 @@ export default async function SigningPage({ params: { token } }: SigningPageProp
               ))
               .with(FieldType.EMAIL, () => (
                 <EmailField key={field.id} field={field} recipient={recipient} />
+              ))
+              .with(FieldType.TEXT, () => (
+                <TextField key={field.id} field={field} recipient={recipient} />
               ))
               .otherwise(() => null),
           )}
