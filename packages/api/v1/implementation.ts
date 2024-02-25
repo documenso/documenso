@@ -1,5 +1,6 @@
 import { createNextRoute } from '@ts-rest/next';
 
+import { getServerLimits } from '@documenso/ee/server-only/limits/server';
 import { createDocumentData } from '@documenso/lib/server-only/document-data/create-document-data';
 import { upsertDocumentMeta } from '@documenso/lib/server-only/document-meta/upsert-document-meta';
 import { createDocument } from '@documenso/lib/server-only/document/create-document';
@@ -131,6 +132,17 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
         };
       }
 
+      const { remaining } = await getServerLimits({ email: user.email, teamId: team?.id });
+
+      if (remaining.documents <= 0) {
+        return {
+          status: 400,
+          body: {
+            message: 'You have reached the maximum number of documents allowed for this month',
+          },
+        };
+      }
+
       const fileName = body.title.endsWith('.pdf') ? body.title : `${body.title}.pdf`;
 
       const { url, key } = await getPresignPostUrl(fileName, 'application/pdf');
@@ -182,6 +194,17 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
 
   createDocumentFromTemplate: authenticatedMiddleware(async (args, user, team) => {
     const { body, params } = args;
+
+    const { remaining } = await getServerLimits({ email: user.email, teamId: team?.id });
+
+    if (remaining.documents <= 0) {
+      return {
+        status: 400,
+        body: {
+          message: 'You have reached the maximum number of documents allowed for this month',
+        },
+      };
+    }
 
     const templateId = Number(params.templateId);
 

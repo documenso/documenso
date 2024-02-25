@@ -2,7 +2,7 @@ import { z } from 'zod';
 
 import { URL_REGEX } from '@documenso/lib/constants/url-regex';
 import { ZBaseTableSearchParamsSchema } from '@documenso/lib/types/search-params';
-import { DocumentStatus, FieldType, RecipientRole } from '@documenso/prisma/client';
+import { FieldType, RecipientRole } from '@documenso/prisma/client';
 
 export const ZFindDocumentAuditLogsQuerySchema = ZBaseTableSearchParamsSchema.extend({
   documentId: z.number().min(1),
@@ -115,6 +115,7 @@ export type TSendDocumentMutationSchema = z.infer<typeof ZSendDocumentMutationSc
 
 export const ZDeleteDraftDocumentMutationSchema = z.object({
   id: z.number().min(1),
+  teamId: z.number().min(1).optional(),
 });
 
 export type TDeleteDraftDocumentMutationSchema = z.infer<typeof ZDeleteDraftDocumentMutationSchema>;

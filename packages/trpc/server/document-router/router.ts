@@ -21,7 +21,7 @@ import { extractNextApiRequestMetadata } from '@documenso/lib/universal/extract-
 import { authenticatedProcedure, procedure, router } from '../trpc';
 import {
   ZCreateDocumentMutationSchema,
-  ZDeleteDraftDocumentMutationSchema,
+  ZDeleteDraftDocumentMutationSchema as ZDeleteDocumentMutationSchema,
   ZFindDocumentAuditLogsQuerySchema,
   ZGetDocumentByIdQuerySchema,
   ZGetDocumentByTokenQuerySchema,
@@ -106,17 +106,17 @@ export const documentRouter = router({
     }),
 
   deleteDocument: authenticatedProcedure
-    .input(ZDeleteDraftDocumentMutationSchema)
+    .input(ZDeleteDocumentMutationSchema)
     .mutation(async ({ input, ctx }) => {
       try {
-        const { id } = input;
+        const { id, teamId } = input;
 
         const userId = ctx.user.id;
 
         return await deleteDocument({
           id,
           userId,
-          // TODO: Get teamId
+          teamId,
           requestMetadata: extractNextApiRequestMetadata(ctx.req),
         });
       } catch (err) {
