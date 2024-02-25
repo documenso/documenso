@@ -76,7 +76,7 @@ export const TemplatesDataTable = ({
         duration: 5000,
       });
 
-      router.push(`${documentRootPath}/${id}`);
+      router.push(`${documentRootPath}/${id}/edit`);
     } catch (err) {
       toast({
         title: 'Error',

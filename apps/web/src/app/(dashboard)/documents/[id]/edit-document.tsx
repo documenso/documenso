@@ -2,10 +2,16 @@
 
 import { useState } from 'react';
 
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 
-import type { DocumentData, DocumentMeta, Field, Recipient, User } from '@documenso/prisma/client';
-import { DocumentStatus } from '@documenso/prisma/client';
+import {
+  type DocumentData,
+  type DocumentMeta,
+  DocumentStatus,
+  type Field,
+  type Recipient,
+  type User,
+} from '@documenso/prisma/client';
 import type { DocumentWithData } from '@documenso/prisma/types/document-with-data';
 import { trpc } from '@documenso/trpc/react';
 import { cn } from '@documenso/ui/lib/utils';
@@ -49,12 +55,9 @@ export const EditDocumentForm = ({
   documentRootPath,
 }: EditDocumentFormProps) => {
   const { toast } = useToast();
-  const router = useRouter();
 
-  // controlled stepper state
-  const [step, setStep] = useState<EditDocumentStep>(
-    document.status === DocumentStatus.DRAFT ? 'title' : 'signers',
-  );
+  const router = useRouter();
+  const searchParams = useSearchParams();
 
   const { mutateAsync: addTitle } = trpc.document.setTitleForDocument.useMutation();
   const { mutateAsync: addFields } = trpc.field.addFields.useMutation();
@@ -85,6 +88,24 @@ export const EditDocumentForm = ({
       stepIndex: 4,
     },
   };
+
+  const [step, setStep] = useState<EditDocumentStep>(() => {
+    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+    const searchParamStep = searchParams?.get('step') as EditDocumentStep | undefined;
+
+    let initialStep: EditDocumentStep =
+      document.status === DocumentStatus.DRAFT ? 'title' : 'signers';
+
+    if (
+      searchParamStep &&
+      documentFlow[searchParamStep] !== undefined &&
+      !(recipients.length === 0 && (searchParamStep === 'subject' || searchParamStep === 'fields'))
+    ) {
+      initialStep = searchParamStep;
+    }
+
+    return initialStep;
+  });
 
   const onAddTitleFormSubmit = async (data: TAddTitleFormSchema) => {
     try {

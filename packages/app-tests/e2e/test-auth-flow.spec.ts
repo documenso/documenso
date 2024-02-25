@@ -1,20 +1,19 @@
 import { type Page, expect, test } from '@playwright/test';
 
-import { deleteUser } from '@documenso/lib/server-only/user/delete-user';
+import {
+  extractUserVerificationToken,
+  seedUser,
+  unseedUser,
+  unseedUserByEmail,
+} from '@documenso/prisma/seed/users';
 
 test.use({ storageState: { cookies: [], origins: [] } });
 
-/*
-  Using them sequentially so the 2nd test
-  uses the details from the 1st (registration) test
-*/
-test.describe.configure({ mode: 'serial' });
-
-const username = 'Test User';
-const email = 'test-user@auth-flow.documenso.com';
-const password = 'Password123#';
-
 test('user can sign up with email and password', async ({ page }: { page: Page }) => {
+  const username = 'Test User';
+  const email = `test-user-${Date.now()}@auth-flow.documenso.com`;
+  const password = 'Password123#';
+
   await page.goto('/signup');
   await page.getByLabel('Name').fill(username);
   await page.getByLabel('Email').fill(email);
@@ -31,25 +30,33 @@ test('user can sign up with email and password', async ({ page }: { page: Page }
   }
 
   await page.getByRole('button', { name: 'Sign Up', exact: true }).click();
+
+  await page.waitForURL('/unverified-account');
+
+  const { token } = await extractUserVerificationToken(email);
+
+  await page.goto(`/verify-email/${token}`);
+
+  await expect(page.getByRole('heading')).toContainText('Email Confirmed!');
+
+  await page.getByRole('link', { name: 'Go back home' }).click();
+
   await page.waitForURL('/documents');
 
   await expect(page).toHaveURL('/documents');
+  await unseedUserByEmail(email);
 });
 
 test('user can login with user and password', async ({ page }: { page: Page }) => {
+  const user = await seedUser();
+
   await page.goto('/signin');
-  await page.getByLabel('Email').fill(email);
-  await page.getByLabel('Password', { exact: true }).fill(password);
+  await page.getByLabel('Email').fill(user.email);
+  await page.getByLabel('Password', { exact: true }).fill('password');
   await page.getByRole('button', { name: 'Sign In' }).click();
 
   await page.waitForURL('/documents');
   await expect(page).toHaveURL('/documents');
-});
 
-test.afterAll('Teardown', async () => {
-  try {
-    await deleteUser({ email });
-  } catch (e) {
-    throw new Error(`Error deleting user: ${e}`);
-  }
+  await unseedUser(user.id);
 });

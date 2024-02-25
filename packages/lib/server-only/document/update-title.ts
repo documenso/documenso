@@ -48,13 +48,18 @@ export const updateTitle = async ({
       },
     });
 
-    if (document.title === title) {
-      return document;
-    }
+  if (document.title === title) {
+    return document;
+  }
 
+  return await prisma.$transaction(async (tx) => {
+    // Instead of doing everything in a transaction we can use our knowledge
+    // of the current document title to ensure we aren't performing a conflicting
+    // update.
     const updatedDocument = await tx.document.update({
       where: {
         id: documentId,
+        title: document.title,
       },
       data: {
         title,

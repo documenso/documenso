@@ -43,10 +43,12 @@ model User {
   twoFactorSecret      String?
   twoFactorEnabled     Boolean                @default(false)
   twoFactorBackupCodes String?
-  VerificationToken    VerificationToken[]
-  ApiToken             ApiToken[]
-  Template             Template[]
-  securityAuditLogs    UserSecurityAuditLog[]
+  
+  VerificationToken VerificationToken[]
+  ApiToken          ApiToken[]
+  Template          Template[]
+  securityAuditLogs UserSecurityAuditLog[]
+  siteSettings      SiteSettings[]
 
   @@index([email])
 }
@@ -467,4 +469,13 @@ model Template {
   Field                Field[]
 
   @@unique([templateDocumentDataId])
+}
+
+model SiteSettings {
+  id                   String   @id
+  enabled              Boolean  @default(false)
+  data                 Json
+  lastModifiedByUserId Int?
+  lastModifiedAt       DateTime @default(now())
+  lastModifiedByUser   User?    @relation(fields: [lastModifiedByUserId], references: [id])
 }
