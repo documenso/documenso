@@ -26,27 +26,26 @@ export const updateTitle = async ({
     },
   });
 
-  return await prisma.$transaction(async (tx) => {
-    const document = await tx.document.findFirstOrThrow({
-      where: {
-        id: documentId,
-        ...(teamId
-          ? {
-              team: {
-                id: teamId,
-                members: {
-                  some: {
-                    userId,
-                  },
+  const document = await prisma.document.findFirstOrThrow({
+    where: {
+      id: documentId,
+      ...(teamId
+        ? {
+            team: {
+              id: teamId,
+              members: {
+                some: {
+                  userId,
                 },
               },
-            }
-          : {
-              userId,
-              teamId: null,
-            }),
-      },
-    });
+            },
+          }
+        : {
+            userId,
+            teamId: null,
+          }),
+    },
+  });
 
   if (document.title === title) {
     return document;
