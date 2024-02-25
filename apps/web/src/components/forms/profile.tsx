@@ -3,7 +3,6 @@
 import { useRouter } from 'next/navigation';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { signOut } from 'next-auth/react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
@@ -11,18 +10,7 @@ import type { User } from '@documenso/prisma/client';
 import { TRPCClientError } from '@documenso/trpc/client';
 import { trpc } from '@documenso/trpc/react';
 import { cn } from '@documenso/ui/lib/utils';
-import { Alert, AlertDescription } from '@documenso/ui/primitives/alert';
 import { Button } from '@documenso/ui/primitives/button';
-import { Card, CardContent, CardFooter } from '@documenso/ui/primitives/card';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from '@documenso/ui/primitives/dialog';
 import {
   Form,
   FormControl,
@@ -105,36 +93,6 @@ export const ProfileForm = ({ className, user }: ProfileFormProps) => {
     }
   };
 
-  const onDeleteAccount = async () => {
-    try {
-      await deleteAccount();
-
-      toast({
-        title: 'Account deleted',
-        description: 'Your account has been deleted successfully.',
-        duration: 5000,
-      });
-
-      return await signOut({ callbackUrl: '/' });
-    } catch (err) {
-      if (err instanceof TRPCClientError && err.data?.code === 'BAD_REQUEST') {
-        toast({
-          title: 'An error occurred',
-          description: err.message,
-          variant: 'destructive',
-        });
-      } else {
-        toast({
-          title: 'An unknown error occurred',
-          variant: 'destructive',
-          description:
-            err.message ??
-            'We encountered an unknown error while attempting to delete your account. Please try again later.',
-        });
-      }
-    }
-  };
-
   return (
     <Form {...form}>
       <form
@@ -187,59 +145,6 @@ export const ProfileForm = ({ className, user }: ProfileFormProps) => {
           {isSubmitting ? 'Updating profile...' : 'Update profile'}
         </Button>
       </form>
-
-      <div className="mt-8 max-w-xl">
-        <Label>Delete Account</Label>
-        <Card className="border-destructive mt-2 pb-0">
-          <CardContent className="p-4">
-            Delete your account and all its contents, including completed documents. This action is
-            irreversible and will cancel your subscription, so proceed with caution.
-          </CardContent>
-          <CardFooter className="justify-end pb-4 pr-4">
-            <Dialog>
-              <DialogTrigger asChild>
-                <Button variant="destructive">Delete Account</Button>
-              </DialogTrigger>
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle>Delete Account</DialogTitle>
-                  <DialogDescription>
-                    Documenso will delete{' '}
-                    <span className="font-semibold">all of your documents</span>, along with all of
-                    your completed documents, signatures, and all other resources belonging to your
-                    Account.
-                  </DialogDescription>
-                </DialogHeader>
-
-                <Alert variant="destructive">
-                  <AlertDescription className="selection:bg-red-100">
-                    This action is not reversible. Please be certain.
-                  </AlertDescription>
-                </Alert>
-
-                {hasTwoFactorAuthentication && (
-                  <Alert variant="destructive">
-                    <AlertDescription className="selection:bg-red-100">
-                      Disable Two Factor Authentication before deleting your account.
-                    </AlertDescription>
-                  </Alert>
-                )}
-
-                <DialogFooter>
-                  <Button
-                    onClick={onDeleteAccount}
-                    loading={isDeletingAccount}
-                    variant="destructive"
-                    disabled={hasTwoFactorAuthentication}
-                  >
-                    {isDeletingAccount ? 'Deleting account...' : 'Delete Account'}
-                  </Button>
-                </DialogFooter>
-              </DialogContent>
-            </Dialog>
-          </CardFooter>
-        </Card>
-      </div>
     </Form>
   );
 };

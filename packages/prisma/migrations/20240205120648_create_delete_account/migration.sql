@@ -1,7 +1,7 @@
 -- Create deleted@documenso.com
 DO $$
 BEGIN  
-  IF NOT EXISTS (SELECT 1 FROM "public"."User" WHERE "email" = 'deleted@documenso.com') THEN  
+  IF NOT EXISTS (SELECT 1 FROM "public"."User" WHERE "email" = 'deleted-account@documenso.com') THEN  
     INSERT INTO
       "public"."User" (
         "email",
@@ -16,7 +16,7 @@ BEGIN
       )
     VALUES
       (
-        'deleted@documenso.com',
+        'deleted-account@documenso.com',
         NOW(),
         NULL,
         NOW(),

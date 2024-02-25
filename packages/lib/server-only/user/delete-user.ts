@@ -1,11 +1,13 @@
 import { prisma } from '@documenso/prisma';
 import { DocumentStatus } from '@documenso/prisma/client';
 
+import { deletedAccountServiceAccount } from './service-accounts/deleted-account';
+
 export type DeleteUserOptions = {
   email: string;
 };
 
-export const deletedServiceAccount = async ({ email }: DeleteUserOptions) => {
+export const deleteUser = async ({ email }: DeleteUserOptions) => {
   const user = await prisma.user.findFirst({
     where: {
       email: {
@@ -14,20 +16,13 @@ export const deletedServiceAccount = async ({ email }: DeleteUserOptions) => {
     },
   });
 
-  const defaultDeleteUser = await prisma.user.findFirst({
-    where: {
-      email: 'deleted@documenso.com',
-    },
-  });
-
   if (!user) {
     throw new Error(`User with email ${email} not found`);
   }
 
-  if (!defaultDeleteUser) {
-    throw new Error(`Default delete account not found`);
-  }
+  const serviceAccount = await deletedAccountServiceAccount();
 
+  // TODO: Send out cancellations for all pending docs
   await prisma.document.updateMany({
     where: {
       userId: user.id,
@@ -36,7 +31,7 @@ export const deletedServiceAccount = async ({ email }: DeleteUserOptions) => {
       },
     },
     data: {
-      userId: defaultDeleteUser.id,
+      userId: serviceAccount.id,
       deletedAt: new Date(),
     },
   });
