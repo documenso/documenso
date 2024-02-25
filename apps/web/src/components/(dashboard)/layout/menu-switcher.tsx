@@ -166,31 +166,24 @@ export const MenuSwitcher = ({ user, teams: initialTeamsData }: MenuSwitcherProp
               </div>
             </DropdownMenuLabel>
 
-            {teams.map((team) => (
-              <DropdownMenuItem asChild key={team.id}>
-                <Link href={formatRedirectUrlOnSwitch(team.url)} className="group">
-                  <AvatarWithText
-                    avatarFallback={formatAvatarFallback(team.name)}
-                    primaryText={team.name}
-                    secondaryText={
-                      <>
-                        <span className={cn('opacity', teams.length > 1 && 'group-hover:hidden')}>
-                          {formatSecondaryAvatarText(team)}
-                        </span>
-                        <span
-                          className={cn('opacity-0', teams.length > 1 && 'group-hover:opacity-75')}
-                        >{`/t/${team.url}`}</span>
-                      </>
-                    }
-                    rightSideComponent={
-                      isPathTeamUrl(team.url) && (
-                        <CheckCircle2 className="ml-auto fill-black text-white dark:fill-white dark:text-black" />
-                      )
-                    }
-                  />
-                </Link>
-              </DropdownMenuItem>
-            ))}
+            <div className="custom-scrollbar max-h-[40vh] overflow-auto">
+              {teams.map((team) => (
+                <DropdownMenuItem asChild key={team.id}>
+                  <Link href={formatRedirectUrlOnSwitch(team.url)}>
+                    <AvatarWithText
+                      avatarFallback={formatAvatarFallback(team.name)}
+                      primaryText={team.name}
+                      secondaryText={formatSecondaryAvatarText(team)}
+                      rightSideComponent={
+                        isPathTeamUrl(team.url) && (
+                          <CheckCircle2 className="ml-auto fill-black text-white dark:fill-white dark:text-black" />
+                        )
+                      }
+                    />
+                  </Link>
+                </DropdownMenuItem>
+              ))}
+            </div>
           </>
         ) : (
           <DropdownMenuItem className="text-muted-foreground px-4 py-2" asChild>
