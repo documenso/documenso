@@ -316,9 +316,9 @@ export const AddFieldsFormPartial = ({
           {selectedField && (
             <Card
               className={cn(
-                'bg-documenso pointer-events-none fixed z-50 cursor-pointer border-2 bg-opacity-20 backdrop-blur-[1.2px]',
+                'bg-field-card/80 pointer-events-none fixed z-50 cursor-pointer border-2 backdrop-blur-[1px]',
                 {
-                  'border-primary': isFieldWithinBounds,
+                  'border-field-card-border': isFieldWithinBounds,
                   'opacity-50': !isFieldWithinBounds,
                 },
               )}
@@ -329,7 +329,7 @@ export const AddFieldsFormPartial = ({
                 width: fieldBounds.current.width,
               }}
             >
-              <CardContent className="text-foreground flex h-full w-full items-center justify-center p-2">
+              <CardContent className="text-field-card-foreground flex h-full w-full items-center justify-center p-2">
                 {FRIENDLY_FIELD_TYPE[selectedField]}
               </CardContent>
             </Card>

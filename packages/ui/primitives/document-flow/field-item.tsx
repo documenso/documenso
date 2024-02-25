@@ -128,16 +128,16 @@ export const FieldItem = ({
       )}
 
       <Card
-        className={cn('bg-documenso h-full w-full bg-opacity-20 backdrop-blur-[1.2px]', {
-          'border-primary': !disabled,
-          'border-primary/80': active,
+        className={cn('bg-field-card/80 h-full w-full backdrop-blur-[1px]', {
+          'border-field-card-border': !disabled,
+          'border-field-card-border/80': active,
         })}
       >
         <CardContent
           className={cn(
-            'text-foreground flex h-full w-full flex-col items-center justify-center p-2',
+            'text-field-card-foreground flex h-full w-full flex-col items-center justify-center p-2',
             {
-              'text-muted-foreground/50': disabled,
+              'text-field-card-foreground/50': disabled,
             },
           )}
         >
