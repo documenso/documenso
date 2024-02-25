@@ -1,6 +1,7 @@
 import { TeamMemberRole } from '@documenso/prisma/client';
 
 export const TEAM_URL_ROOT_REGEX = new RegExp('^/t/[^/]+$');
+export const TEAM_URL_REGEX = new RegExp('^/t/[^/]+');
 
 export const TEAM_MEMBER_ROLE_MAP: Record<keyof typeof TeamMemberRole, string> = {
   ADMIN: 'Admin',

@@ -28,6 +28,9 @@ type TemplatesDataTableProps = {
   perPage: number;
   page: number;
   totalPages: number;
+  documentRootPath: string;
+  templateRootPath: string;
+  teamId?: number;
 };
 
 export const TemplatesDataTable = ({
@@ -35,6 +38,9 @@ export const TemplatesDataTable = ({
   perPage,
   page,
   totalPages,
+  documentRootPath,
+  templateRootPath,
+  teamId,
 }: TemplatesDataTableProps) => {
   const [isPending, startTransition] = useTransition();
   const updateSearchParams = useUpdateSearchParams();
@@ -70,7 +76,7 @@ export const TemplatesDataTable = ({
         duration: 5000,
       });
 
-      router.push(`/documents/${id}`);
+      router.push(`${documentRootPath}/${id}/edit`);
     } catch (err) {
       toast({
         title: 'Error',
@@ -131,7 +137,12 @@ export const TemplatesDataTable = ({
                     {!isRowLoading && <Plus className="-ml-1 mr-2 h-4 w-4" />}
                     Use Template
                   </Button>
-                  <DataTableActionDropdown row={row.original} />
+
+                  <DataTableActionDropdown
+                    row={row.original}
+                    teamId={teamId}
+                    templateRootPath={templateRootPath}
+                  />
                 </div>
               );
             },

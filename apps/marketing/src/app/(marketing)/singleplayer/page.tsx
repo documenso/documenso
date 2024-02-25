@@ -7,6 +7,7 @@ export const metadata: Metadata = {
 };
 
 export const revalidate = 0;
+export const dynamic = 'force-dynamic';
 
 // !: This entire file is a hack to get around failed prerendering of
 // !: the Single Player Mode page. This regression was introduced during

@@ -1,8 +1,8 @@
-import { Metadata } from 'next';
+import type { Metadata } from 'next';
 import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';
 
-import { APP_BASE_URL } from '@documenso/lib/constants/app';
+import { NEXT_PUBLIC_MARKETING_URL } from '@documenso/lib/constants/app';
 
 type SharePageProps = {
   params: { slug: string };
@@ -16,12 +16,12 @@ export function generateMetadata({ params: { slug } }: SharePageProps) {
       title: 'Documenso - Join the open source signing revolution',
       description: 'I just signed with Documenso!',
       type: 'website',
-      images: [`${APP_BASE_URL}/share/${slug}/opengraph`],
+      images: [`/share/${slug}/opengraph`],
     },
     twitter: {
       site: '@documenso',
       card: 'summary_large_image',
-      images: [`${APP_BASE_URL}/share/${slug}/opengraph`],
+      images: [`/share/${slug}/opengraph`],
       description: 'I just signed with Documenso!',
     },
   } satisfies Metadata;
@@ -35,5 +35,5 @@ export default function SharePage() {
     return null;
   }
 
-  redirect(process.env.NEXT_PUBLIC_MARKETING_URL ?? 'http://localhost:3001');
+  redirect(NEXT_PUBLIC_MARKETING_URL() ?? 'http://localhost:3001');
 }

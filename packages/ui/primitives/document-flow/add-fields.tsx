@@ -304,6 +304,13 @@ export const AddFieldsFormPartial = ({
     return recipientsByRole;
   }, [recipients]);
 
+  const recipientsByRoleToDisplay = useMemo(() => {
+    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+    return (Object.entries(recipientsByRole) as [RecipientRole, Recipient[]][]).filter(
+      ([role]) => role !== RecipientRole.CC && role !== RecipientRole.VIEWER,
+    );
+  }, [recipientsByRole]);
+
   return (
     <>
       <DocumentFlowFormContainerHeader
@@ -373,7 +380,7 @@ export const AddFieldsFormPartial = ({
               </PopoverTrigger>
 
               <PopoverContent className="p-0" align="start">
-                <Command>
+                <Command value={selectedSigner?.email}>
                   <CommandInput />
 
                   <CommandEmpty>
@@ -382,13 +389,10 @@ export const AddFieldsFormPartial = ({
                     </span>
                   </CommandEmpty>
 
-                  {Object.entries(recipientsByRole).map(([role, recipients], roleIndex) => (
+                  {recipientsByRoleToDisplay.map(([role, recipients], roleIndex) => (
                     <CommandGroup key={roleIndex}>
                       <div className="text-muted-foreground mb-1 ml-2 mt-2 text-xs font-medium">
-                        {
-                          // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-                          RECIPIENT_ROLES_DESCRIPTION[role as RecipientRole].roleName
-                        }
+                        {`${RECIPIENT_ROLES_DESCRIPTION[role].roleName}s`}
                       </div>
 
                       {recipients.length === 0 && (
@@ -403,7 +407,7 @@ export const AddFieldsFormPartial = ({
                       {recipients.map((recipient) => (
                         <CommandItem
                           key={recipient.id}
-                          className={cn('px-4 last:mb-1 [&:not(:first-child)]:mt-1', {
+                          className={cn('px-2 last:mb-1 [&:not(:first-child)]:mt-1', {
                             'text-muted-foreground': recipient.sendStatus === SendStatus.SENT,
                           })}
                           onSelect={() => {
@@ -413,7 +417,7 @@ export const AddFieldsFormPartial = ({
                         >
                           <span
                             className={cn('text-foreground/70 truncate', {
-                              'text-foreground': recipient === selectedSigner,
+                              'text-foreground/80': recipient === selectedSigner,
                             })}
                           >
                             {recipient.name && (
@@ -545,6 +549,28 @@ export const AddFieldsFormPartial = ({
                     </p>
 
                     <p className="text-muted-foreground mt-2 text-xs">Date</p>
+                  </CardContent>
+                </Card>
+              </button>
+
+              <button
+                type="button"
+                className="group h-full w-full"
+                onClick={() => setSelectedField(FieldType.TEXT)}
+                onMouseDown={() => setSelectedField(FieldType.TEXT)}
+                data-selected={selectedField === FieldType.TEXT ? true : undefined}
+              >
+                <Card className="group-data-[selected]:border-documenso h-full w-full cursor-pointer group-disabled:opacity-50">
+                  <CardContent className="flex flex-col items-center justify-center px-6 py-4">
+                    <p
+                      className={cn(
+                        'text-muted-foreground group-data-[selected]:text-foreground text-xl font-medium',
+                      )}
+                    >
+                      {'Text'}
+                    </p>
+
+                    <p className="text-muted-foreground mt-2 text-xs">Custom Text</p>
                   </CardContent>
                 </Card>
               </button>

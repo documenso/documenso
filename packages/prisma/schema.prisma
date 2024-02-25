@@ -47,6 +47,7 @@ model User {
   VerificationToken VerificationToken[]
   Template          Template[]
   securityAuditLogs UserSecurityAuditLog[]
+  siteSettings      SiteSettings[]
 
   @@index([email])
 }
@@ -170,9 +171,28 @@ model Document {
   teamId         Int?
   team           Team?               @relation(fields: [teamId], references: [id])
 
+  auditLogs DocumentAuditLog[]
+
   @@unique([documentDataId])
   @@index([userId])
   @@index([status])
+}
+
+model DocumentAuditLog {
+  id         String   @id @default(cuid())
+  documentId Int
+  createdAt  DateTime @default(now())
+  type       String
+  data       Json
+
+  // Details of the person who performed the action which caused the audit log.
+  name      String?
+  email     String?
+  userId    Int?
+  userAgent String?
+  ipAddress String?
+
+  Document Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
 }
 
 enum DocumentDataType {
@@ -191,14 +211,15 @@ model DocumentData {
 }
 
 model DocumentMeta {
-  id         String   @id @default(cuid())
-  subject    String?
-  message    String?
-  timezone   String?  @default("Etc/UTC") @db.Text
-  password   String?
-  dateFormat String?  @default("yyyy-MM-dd hh:mm a") @db.Text
-  documentId Int      @unique
-  document   Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  id          String   @id @default(cuid())
+  subject     String?
+  message     String?
+  timezone    String?  @default("Etc/UTC") @db.Text
+  password    String?
+  dateFormat  String?  @default("yyyy-MM-dd hh:mm a") @db.Text
+  documentId  Int      @unique
+  document    Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  redirectUrl String?
 }
 
 enum ReadStatus {
@@ -259,6 +280,7 @@ enum FieldType {
 
 model Field {
   id          Int        @id @default(autoincrement())
+  secondaryId String     @unique @default(cuid())
   documentId  Int?
   templateId  Int?
   recipientId Int?
@@ -334,7 +356,8 @@ model Team {
   owner        User          @relation(fields: [ownerUserId], references: [id])
   subscription Subscription?
 
-  document Document[]
+  document  Document[]
+  templates Template[]
 }
 
 model TeamPending {
@@ -415,14 +438,25 @@ model Template {
   type                   TemplateType @default(PRIVATE)
   title                  String
   userId                 Int
+  teamId                 Int?
   templateDocumentDataId String
   createdAt              DateTime     @default(now())
   updatedAt              DateTime     @default(now()) @updatedAt
 
+  team                 Team?        @relation(fields: [teamId], references: [id], onDelete: Cascade)
   templateDocumentData DocumentData @relation(fields: [templateDocumentDataId], references: [id], onDelete: Cascade)
   User                 User         @relation(fields: [userId], references: [id], onDelete: Cascade)
   Recipient            Recipient[]
   Field                Field[]
 
   @@unique([templateDocumentDataId])
+}
+
+model SiteSettings {
+  id                   String   @id
+  enabled              Boolean  @default(false)
+  data                 Json
+  lastModifiedByUserId Int?
+  lastModifiedAt       DateTime @default(now())
+  lastModifiedByUser   User?    @relation(fields: [lastModifiedByUserId], references: [id])
 }

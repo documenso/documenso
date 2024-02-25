@@ -33,10 +33,7 @@ export type DocumentsPageViewProps = {
   team?: Team & { teamEmail?: TeamEmail | null };
 };
 
-export default async function DocumentsPageView({
-  searchParams = {},
-  team,
-}: DocumentsPageViewProps) {
+export const DocumentsPageView = async ({ searchParams = {}, team }: DocumentsPageViewProps) => {
   const { user } = await getRequiredServerComponentSession();
 
   const status = isExtendedDocumentStatus(searchParams.status) ? searchParams.status : 'ALL';
@@ -155,4 +152,4 @@ export default async function DocumentsPageView({
       </div>
     </div>
   );
-}
+};

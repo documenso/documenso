@@ -21,9 +21,15 @@ import { DuplicateTemplateDialog } from './duplicate-template-dialog';
 
 export type DataTableActionDropdownProps = {
   row: Template;
+  templateRootPath: string;
+  teamId?: number;
 };
 
-export const DataTableActionDropdown = ({ row }: DataTableActionDropdownProps) => {
+export const DataTableActionDropdown = ({
+  row,
+  templateRootPath,
+  teamId,
+}: DataTableActionDropdownProps) => {
   const { data: session } = useSession();
 
   const [isDeleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -34,6 +40,7 @@ export const DataTableActionDropdown = ({ row }: DataTableActionDropdownProps) =
   }
 
   const isOwner = row.userId === session.user.id;
+  const isTeamTemplate = row.teamId === teamId;
 
   return (
     <DropdownMenu>
@@ -44,20 +51,25 @@ export const DataTableActionDropdown = ({ row }: DataTableActionDropdownProps) =
       <DropdownMenuContent className="w-52" align="start" forceMount>
         <DropdownMenuLabel>Action</DropdownMenuLabel>
 
-        <DropdownMenuItem disabled={!isOwner} asChild>
-          <Link href={`/templates/${row.id}`}>
+        <DropdownMenuItem disabled={!isOwner && !isTeamTemplate} asChild>
+          <Link href={`${templateRootPath}/${row.id}`}>
             <Edit className="mr-2 h-4 w-4" />
             Edit
           </Link>
         </DropdownMenuItem>
 
-        {/* <DropdownMenuItem disabled={!isOwner} onClick={async () => onDuplicateButtonClick(row.id)}> */}
-        <DropdownMenuItem disabled={!isOwner} onClick={() => setDuplicateDialogOpen(true)}>
+        <DropdownMenuItem
+          disabled={!isOwner && !isTeamTemplate}
+          onClick={() => setDuplicateDialogOpen(true)}
+        >
           <Copy className="mr-2 h-4 w-4" />
           Duplicate
         </DropdownMenuItem>
 
-        <DropdownMenuItem disabled={!isOwner} onClick={() => setDeleteDialogOpen(true)}>
+        <DropdownMenuItem
+          disabled={!isOwner && !isTeamTemplate}
+          onClick={() => setDeleteDialogOpen(true)}
+        >
           <Trash2 className="mr-2 h-4 w-4" />
           Delete
         </DropdownMenuItem>
@@ -65,6 +77,7 @@ export const DataTableActionDropdown = ({ row }: DataTableActionDropdownProps) =
 
       <DuplicateTemplateDialog
         id={row.id}
+        teamId={teamId}
         open={isDuplicateDialogOpen}
         onOpenChange={setDuplicateDialogOpen}
       />
