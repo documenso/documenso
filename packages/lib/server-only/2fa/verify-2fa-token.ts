@@ -1,7 +1,7 @@
 import { base32 } from '@scure/base';
 import { TOTPController } from 'oslo/otp';
 
-import { User } from '@documenso/prisma/client';
+import type { User } from '@documenso/prisma/client';
 
 import { DOCUMENSO_ENCRYPTION_KEY } from '../../constants/crypto';
 import { symmetricDecrypt } from '../../universal/crypto';
