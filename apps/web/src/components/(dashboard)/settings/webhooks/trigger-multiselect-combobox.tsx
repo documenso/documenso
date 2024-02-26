@@ -1,8 +1,9 @@
-import * as React from 'react';
+import { useEffect, useState } from 'react';
 
 import { WebhookTriggerEvents } from '@prisma/client/';
 import { Check, ChevronsUpDown } from 'lucide-react';
 
+import { toFriendlyWebhookEventName } from '@documenso/lib/universal/webhook/to-friendly-webhook-event-name';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
 import {
@@ -16,18 +17,21 @@ import { Popover, PopoverContent, PopoverTrigger } from '@documenso/ui/primitive
 
 import { truncateTitle } from '~/helpers/truncate-title';
 
-type ComboboxProps = {
+type TriggerMultiSelectComboboxProps = {
   listValues: string[];
   onChange: (_values: string[]) => void;
 };
 
-const MultiSelectCombobox = ({ listValues, onChange }: ComboboxProps) => {
-  const [isOpen, setIsOpen] = React.useState(false);
-  const [selectedValues, setSelectedValues] = React.useState<string[]>([]);
+export const TriggerMultiSelectCombobox = ({
+  listValues,
+  onChange,
+}: TriggerMultiSelectComboboxProps) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const [selectedValues, setSelectedValues] = useState<string[]>([]);
 
   const triggerEvents = Object.values(WebhookTriggerEvents);
 
-  React.useEffect(() => {
+  useEffect(() => {
     setSelectedValues(listValues);
   }, [listValues]);
 
@@ -35,6 +39,7 @@ const MultiSelectCombobox = ({ listValues, onChange }: ComboboxProps) => {
 
   const handleSelect = (currentValue: string) => {
     let newSelectedValues;
+
     if (selectedValues.includes(currentValue)) {
       newSelectedValues = selectedValues.filter((value) => value !== currentValue);
     } else {
@@ -59,9 +64,14 @@ const MultiSelectCombobox = ({ listValues, onChange }: ComboboxProps) => {
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="z-9999 w-[200px] p-0">
+      <PopoverContent className="z-9999 w-full max-w-[280px] p-0">
         <Command>
-          <CommandInput placeholder={truncateTitle(selectedValues.join(', '), 15)} />
+          <CommandInput
+            placeholder={truncateTitle(
+              selectedValues.map((v) => toFriendlyWebhookEventName(v)).join(', '),
+              15,
+            )}
+          />
           <CommandEmpty>No value found.</CommandEmpty>
           <CommandGroup>
             {allEvents.map((value: string, i: number) => (
@@ -72,7 +82,7 @@ const MultiSelectCombobox = ({ listValues, onChange }: ComboboxProps) => {
                     selectedValues.includes(value) ? 'opacity-100' : 'opacity-0',
                   )}
                 />
-                {value}
+                {toFriendlyWebhookEventName(value)}
               </CommandItem>
             ))}
           </CommandGroup>
@@ -81,5 +91,3 @@ const MultiSelectCombobox = ({ listValues, onChange }: ComboboxProps) => {
     </Popover>
   );
 };
-
-export { MultiSelectCombobox };

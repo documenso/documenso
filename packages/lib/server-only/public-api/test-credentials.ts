@@ -5,6 +5,7 @@ import { validateApiToken } from '@documenso/lib/server-only/webhooks/zapier/val
 export const testCredentialsHandler = async (req: NextApiRequest, res: NextApiResponse) => {
   try {
     const { authorization } = req.headers;
+
     const user = await validateApiToken({ authorization });
 
     return res.status(200).json({

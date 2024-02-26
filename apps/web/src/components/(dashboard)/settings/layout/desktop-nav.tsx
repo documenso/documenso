@@ -51,19 +51,6 @@ export const DesktopNav = ({ className, ...props }: DesktopNavProps) => {
         </Link>
       )}
 
-      <Link href="/settings/webhooks">
-        <Button
-          variant="ghost"
-          className={cn(
-            'w-full justify-start',
-            pathname?.startsWith('/settings/webhooks') && 'bg-secondary',
-          )}
-        >
-          <Webhook className="mr-2 h-5 w-5" />
-          Webhooks
-        </Button>
-      </Link>
-
       <Link href="/settings/security">
         <Button
           variant="ghost"
@@ -87,6 +74,19 @@ export const DesktopNav = ({ className, ...props }: DesktopNavProps) => {
         >
           <Braces className="mr-2 h-5 w-5" />
           API Tokens
+        </Button>
+      </Link>
+
+      <Link href="/settings/webhooks">
+        <Button
+          variant="ghost"
+          className={cn(
+            'w-full justify-start',
+            pathname?.startsWith('/settings/webhooks') && 'bg-secondary',
+          )}
+        >
+          <Webhook className="mr-2 h-5 w-5" />
+          Webhooks
         </Button>
       </Link>
 

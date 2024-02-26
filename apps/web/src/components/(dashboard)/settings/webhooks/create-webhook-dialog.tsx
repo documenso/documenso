@@ -24,6 +24,7 @@ import {
 import {
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -34,7 +35,7 @@ import { PasswordInput } from '@documenso/ui/primitives/password-input';
 import { Switch } from '@documenso/ui/primitives/switch';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
-import { MultiSelectCombobox } from './multiselect-combobox';
+import { TriggerMultiSelectCombobox } from './trigger-multiselect-combobox';
 
 type TCreateWebhookFormSchema = z.infer<typeof ZCreateWebhookFormSchema>;
 
@@ -92,7 +93,7 @@ export const CreateWebhookDialog = ({ trigger, ...props }: CreateWebhookDialogPr
         {trigger ?? <Button className="flex-shrink-0">Create Webhook</Button>}
       </DialogTrigger>
 
-      <DialogContent position="center">
+      <DialogContent className="max-w-lg" position="center">
         <DialogHeader>
           <DialogTitle>Create webhook</DialogTitle>
           <DialogDescription>On this page, you can create a new webhook.</DialogDescription>
@@ -104,34 +105,68 @@ export const CreateWebhookDialog = ({ trigger, ...props }: CreateWebhookDialogPr
               className="flex h-full flex-col space-y-4"
               disabled={form.formState.isSubmitting}
             >
-              <FormField
-                control={form.control}
-                name="webhookUrl"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel required>Webhook URL</FormLabel>
-                    <FormControl>
-                      <Input className="bg-background" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              <div className="flex flex-col-reverse gap-4 md:flex-row">
+                <FormField
+                  control={form.control}
+                  name="webhookUrl"
+                  render={({ field }) => (
+                    <FormItem className="flex-1">
+                      <FormLabel required>Webhook URL</FormLabel>
+                      <FormControl>
+                        <Input className="bg-background" {...field} />
+                      </FormControl>
+
+                      <FormDescription>
+                        The URL for Documenso to send webhook events to.
+                      </FormDescription>
+
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="enabled"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Enabled</FormLabel>
+
+                      <div>
+                        <FormControl>
+                          <Switch
+                            className="bg-background"
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                          />
+                        </FormControl>
+                      </div>
+
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
 
               <FormField
                 control={form.control}
                 name="eventTriggers"
                 render={({ field: { onChange, value } }) => (
                   <FormItem className="flex flex-col gap-2">
-                    <FormLabel required>Event triggers</FormLabel>
+                    <FormLabel required>Triggers</FormLabel>
                     <FormControl>
-                      <MultiSelectCombobox
+                      <TriggerMultiSelectCombobox
                         listValues={value}
                         onChange={(values: string[]) => {
                           onChange(values);
                         }}
                       />
                     </FormControl>
+
+                    <FormDescription>
+                      The events that will trigger a webhook to be sent to your URL.
+                    </FormDescription>
+
                     <FormMessage />
                   </FormItem>
                 )}
@@ -150,24 +185,11 @@ export const CreateWebhookDialog = ({ trigger, ...props }: CreateWebhookDialogPr
                         value={field.value ?? ''}
                       />
                     </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
 
-              <FormField
-                control={form.control}
-                name="enabled"
-                render={({ field }) => (
-                  <FormItem className="flex items-center gap-2">
-                    <FormLabel className="mt-2">Active</FormLabel>
-                    <FormControl>
-                      <Switch
-                        className="bg-background"
-                        checked={field.value}
-                        onCheckedChange={field.onChange}
-                      />
-                    </FormControl>
+                    <FormDescription>
+                      A secret that will be sent to your URL so you can verify that the request has
+                      been sent by Documenso.
+                    </FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}

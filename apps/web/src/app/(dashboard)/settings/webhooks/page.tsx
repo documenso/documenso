@@ -2,16 +2,19 @@
 
 import Link from 'next/link';
 
-import { Zap } from 'lucide-react';
-import { ToggleLeft, ToggleRight } from 'lucide-react';
 import { Loader } from 'lucide-react';
+import { DateTime } from 'luxon';
 
+import { toFriendlyWebhookEventName } from '@documenso/lib/universal/webhook/to-friendly-webhook-event-name';
 import { trpc } from '@documenso/trpc/react';
+import { cn } from '@documenso/ui/lib/utils';
+import { Badge } from '@documenso/ui/primitives/badge';
 import { Button } from '@documenso/ui/primitives/button';
 
 import { SettingsHeader } from '~/components/(dashboard)/settings/layout/header';
 import { CreateWebhookDialog } from '~/components/(dashboard)/settings/webhooks/create-webhook-dialog';
 import { DeleteWebhookDialog } from '~/components/(dashboard)/settings/webhooks/delete-webhook-dialog';
+import { LocaleDate } from '~/components/formatter/locale-date';
 
 export default function WebhookPage() {
   const { data: webhooks, isLoading } = trpc.webhook.getWebhooks.useQuery();
@@ -43,35 +46,46 @@ export default function WebhookPage() {
       {webhooks && webhooks.length > 0 && (
         <div className="mt-4 flex max-w-xl flex-col gap-y-4">
           {webhooks?.map((webhook) => (
-            <div key={webhook.id} className="border-border rounded-lg border p-4">
+            <div
+              key={webhook.id}
+              className={cn(
+                'border-border rounded-lg border p-4',
+                !webhook.enabled && 'bg-muted/40',
+              )}
+            >
               <div className="flex items-center justify-between gap-x-4">
                 <div>
-                  <h4 className="text-lg font-semibold">Webhook URL</h4>
-                  <p className="text-muted-foreground break-all">{webhook.webhookUrl}</p>
-                  <h4 className="mt-4 text-lg font-semibold">Event triggers</h4>
-                  {webhook.eventTriggers.map((trigger, index) => (
-                    <span key={index} className="text-muted-foreground flex flex-row items-center">
-                      <Zap className="mr-1 h-4 w-4" /> {trigger}
-                    </span>
-                  ))}
-                  {webhook.enabled ? (
-                    <h4 className="mt-4 flex items-center gap-2 text-lg">
-                      Active <ToggleRight className="h-6 w-6 fill-green-200 stroke-green-400" />
-                    </h4>
-                  ) : (
-                    <h4 className="mt-4 flex items-center gap-2 text-lg">
-                      Inactive <ToggleLeft className="h-6 w-6 fill-slate-200 stroke-slate-400" />
-                    </h4>
-                  )}
+                  <div className="truncate font-mono text-xs">{webhook.id}</div>
+
+                  <div className="mt-1.5 flex items-center gap-2">
+                    <h5 className="text-sm">{webhook.webhookUrl}</h5>
+
+                    <Badge variant={webhook.enabled ? 'neutral' : 'warning'} size="small">
+                      {webhook.enabled ? 'Enabled' : 'Disabled'}
+                    </Badge>
+                  </div>
+
+                  <p className="text-muted-foreground mt-2 text-xs">
+                    Listening to{' '}
+                    {webhook.eventTriggers
+                      .map((trigger) => toFriendlyWebhookEventName(trigger))
+                      .join(', ')}
+                  </p>
+
+                  <p className="text-muted-foreground mt-2 text-xs">
+                    Created on{' '}
+                    <LocaleDate date={webhook.createdAt} format={DateTime.DATETIME_FULL} />
+                  </p>
                 </div>
-              </div>
-              <div className="mt-6 flex flex-col-reverse space-y-2 space-y-reverse sm:mt-0 sm:flex-row sm:justify-end sm:space-x-2 sm:space-y-0">
-                <Button asChild variant="outline">
-                  <Link href={`/settings/webhooks/${webhook.id}`}>Edit</Link>
-                </Button>
-                <DeleteWebhookDialog webhook={webhook}>
-                  <Button variant="destructive">Delete</Button>
-                </DeleteWebhookDialog>
+
+                <div className="flex flex-shrink-0 gap-4">
+                  <Button asChild variant="outline">
+                    <Link href={`/settings/webhooks/${webhook.id}`}>Edit</Link>
+                  </Button>
+                  <DeleteWebhookDialog webhook={webhook}>
+                    <Button variant="destructive">Delete</Button>
+                  </DeleteWebhookDialog>
+                </div>
               </div>
             </div>
           ))}
