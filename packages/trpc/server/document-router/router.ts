@@ -9,6 +9,7 @@ import { duplicateDocumentById } from '@documenso/lib/server-only/document/dupli
 import { findDocumentAuditLogs } from '@documenso/lib/server-only/document/find-document-audit-logs';
 import { getDocumentById } from '@documenso/lib/server-only/document/get-document-by-id';
 import { getDocumentAndSenderByToken } from '@documenso/lib/server-only/document/get-document-by-token';
+import { getSignaturesByDocumentId } from '@documenso/lib/server-only/document/get-signatures-by-document-id';
 import { resendDocument } from '@documenso/lib/server-only/document/resend-document';
 import { searchDocumentsWithKeyword } from '@documenso/lib/server-only/document/search-documents-with-keyword';
 import { sendDocument } from '@documenso/lib/server-only/document/send-document';
@@ -25,6 +26,7 @@ import {
   ZFindDocumentAuditLogsQuerySchema,
   ZGetDocumentByIdQuerySchema,
   ZGetDocumentByTokenQuerySchema,
+  ZGetSignaturesByDocumentIdQuerySchema,
   ZResendDocumentMutationSchema,
   ZSearchDocumentsMutationSchema,
   ZSendDocumentMutationSchema,
@@ -333,6 +335,23 @@ export const documentRouter = router({
         throw new TRPCError({
           code: 'BAD_REQUEST',
           message: 'We are unable to search for documents. Please try again later.',
+        });
+      }
+    }),
+
+  getSignaturesByDocumentId: authenticatedProcedure
+    .input(ZGetSignaturesByDocumentIdQuerySchema)
+    .query(async ({ input, ctx }) => {
+      try {
+        return await getSignaturesByDocumentId({
+          ...input,
+        });
+      } catch (err) {
+        console.error(err);
+
+        throw new TRPCError({
+          code: 'BAD_REQUEST',
+          message: 'We were unable to find this document. Please try again later.',
         });
       }
     }),
