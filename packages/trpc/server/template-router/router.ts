@@ -53,6 +53,7 @@ export const templateRouter = router({
           templateId,
           teamId,
           userId: ctx.user.id,
+          recipients: input.recipients,
         });
       } catch (err) {
         throw new TRPCError({
