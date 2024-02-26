@@ -1,4 +1,5 @@
 import { adminRouter } from './admin-router/router';
+import { apiTokenRouter } from './api-token-router/router';
 import { authRouter } from './auth-router/router';
 import { cryptoRouter } from './crypto/router';
 import { documentRouter } from './document-router/router';
@@ -21,6 +22,7 @@ export const appRouter = router({
   recipient: recipientRouter,
   admin: adminRouter,
   shareLink: shareLinkRouter,
+  apiToken: apiTokenRouter,
   singleplayer: singleplayerRouter,
   team: teamRouter,
   template: templateRouter,

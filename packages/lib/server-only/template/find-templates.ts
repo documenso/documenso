@@ -38,6 +38,7 @@ export const findTemplates = async ({
       include: {
         templateDocumentData: true,
         Field: true,
+        Recipient: true,
       },
       skip: Math.max(page - 1, 0) * perPage,
       orderBy: {

@@ -4,7 +4,7 @@ import React, { useId } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { AnimatePresence, motion } from 'framer-motion';
-import { BadgeCheck, Copy, Eye, PencilLine, Plus, Trash } from 'lucide-react';
+import { Plus, Trash } from 'lucide-react';
 import { Controller, useFieldArray, useForm } from 'react-hook-form';
 
 import { useLimits } from '@documenso/ee/server-only/limits/provider/client';
@@ -17,6 +17,7 @@ import { Button } from '../button';
 import { FormErrorMessage } from '../form/form-error-message';
 import { Input } from '../input';
 import { Label } from '../label';
+import { ROLE_ICONS } from '../recipient-role-icons';
 import { Select, SelectContent, SelectItem, SelectTrigger } from '../select';
 import { useStep } from '../stepper';
 import { useToast } from '../use-toast';
@@ -31,13 +32,6 @@ import {
 } from './document-flow-root';
 import { ShowFieldItem } from './show-field-item';
 import type { DocumentFlowStep } from './types';
-
-const ROLE_ICONS: Record<RecipientRole, JSX.Element> = {
-  SIGNER: <PencilLine className="h-4 w-4" />,
-  APPROVER: <BadgeCheck className="h-4 w-4" />,
-  CC: <Copy className="h-4 w-4" />,
-  VIEWER: <Eye className="h-4 w-4" />,
-};
 
 export type AddSignersFormProps = {
   documentFlow: DocumentFlowStep;

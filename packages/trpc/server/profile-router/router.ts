@@ -1,5 +1,6 @@
 import { TRPCError } from '@trpc/server';
 
+import { deleteUser } from '@documenso/lib/server-only/user/delete-user';
 import { findUserSecurityAuditLogs } from '@documenso/lib/server-only/user/find-user-security-audit-logs';
 import { forgotPassword } from '@documenso/lib/server-only/user/forgot-password';
 import { getUserById } from '@documenso/lib/server-only/user/get-user-by-id';
@@ -155,4 +156,23 @@ export const profileRouter = router({
         });
       }
     }),
+
+  deleteAccount: authenticatedProcedure.mutation(async ({ ctx }) => {
+    try {
+      const user = ctx.user;
+
+      return await deleteUser(user);
+    } catch (err) {
+      let message = 'We were unable to delete your account. Please try again.';
+
+      if (err instanceof Error) {
+        message = err.message;
+      }
+
+      throw new TRPCError({
+        code: 'BAD_REQUEST',
+        message,
+      });
+    }
+  }),
 });

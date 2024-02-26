@@ -3,6 +3,7 @@
 import Link from 'next/link';
 
 import {
+  Braces,
   CreditCard,
   FileSpreadsheet,
   Lock,
@@ -95,6 +96,13 @@ export const ProfileDropdown = ({ user }: ProfileDropdownProps) => {
           <Link href="/settings/security" className="cursor-pointer">
             <Lock className="mr-2 h-4 w-4" />
             Security
+          </Link>
+        </DropdownMenuItem>
+
+        <DropdownMenuItem asChild>
+          <Link href="/settings/tokens" className="cursor-pointer">
+            <Braces className="mr-2 h-4 w-4" />
+            API Tokens
           </Link>
         </DropdownMenuItem>
 
