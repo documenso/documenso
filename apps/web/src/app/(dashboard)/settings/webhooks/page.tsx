@@ -47,7 +47,7 @@ export default function WebhookPage() {
               <div className="flex items-center justify-between gap-x-4">
                 <div>
                   <h4 className="text-lg font-semibold">Webhook URL</h4>
-                  <p className="text-muted-foreground">{webhook.webhookUrl}</p>
+                  <p className="text-muted-foreground break-all">{webhook.webhookUrl}</p>
                   <h4 className="mt-4 text-lg font-semibold">Event triggers</h4>
                   {webhook.eventTriggers.map((trigger, index) => (
                     <span key={index} className="text-muted-foreground flex flex-row items-center">

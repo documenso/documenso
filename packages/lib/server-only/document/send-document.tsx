@@ -182,6 +182,9 @@ export const sendDocument = async ({
       data: {
         status: DocumentStatus.PENDING,
       },
+      include: {
+        Recipient: true,
+      },
     });
   });
 

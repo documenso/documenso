@@ -38,6 +38,7 @@ export const sealDocument = async ({
     },
     include: {
       documentData: true,
+      Recipient: true,
     },
   });
 
