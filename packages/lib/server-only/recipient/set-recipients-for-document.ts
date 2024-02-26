@@ -11,6 +11,7 @@ import { SendStatus, SigningStatus } from '@documenso/prisma/client';
 
 export interface SetRecipientsForDocumentOptions {
   userId: number;
+  teamId?: number;
   documentId: number;
   recipients: {
     id?: number | null;
@@ -23,6 +24,7 @@ export interface SetRecipientsForDocumentOptions {
 
 export const setRecipientsForDocument = async ({
   userId,
+  teamId,
   documentId,
   recipients,
   requestMetadata,
@@ -30,20 +32,21 @@ export const setRecipientsForDocument = async ({
   const document = await prisma.document.findFirst({
     where: {
       id: documentId,
-      OR: [
-        {
-          userId,
-        },
-        {
-          team: {
-            members: {
-              some: {
-                userId,
+      ...(teamId
+        ? {
+            team: {
+              id: teamId,
+              members: {
+                some: {
+                  userId,
+                },
               },
             },
-          },
-        },
-      ],
+          }
+        : {
+            userId,
+            teamId: null,
+          }),
     },
   });
 
@@ -106,7 +109,7 @@ export const setRecipientsForDocument = async ({
     });
 
   const persistedRecipients = await prisma.$transaction(async (tx) => {
-    await Promise.all(
+    return await Promise.all(
       linkedRecipients.map(async (recipient) => {
         const upsertedRecipient = await tx.recipient.upsert({
           where: {

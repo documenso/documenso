@@ -74,6 +74,7 @@ export const DocumentEditPageView = async ({ params, team }: DocumentEditPageVie
     getRecipientsForDocument({
       documentId,
       userId: user.id,
+      teamId: team?.id,
     }),
     getFieldsForDocument({
       documentId,

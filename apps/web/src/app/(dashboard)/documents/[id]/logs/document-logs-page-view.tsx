@@ -44,6 +44,7 @@ export const DocumentLogsPageView = async ({ params, team }: DocumentLogsPageVie
     getRecipientsForDocument({
       documentId,
       userId: user.id,
+      teamId: team?.id,
     }),
   ]);
 
