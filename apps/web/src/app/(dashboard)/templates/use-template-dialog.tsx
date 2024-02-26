@@ -26,6 +26,8 @@ import { ROLE_ICONS } from '@documenso/ui/primitives/recipient-role-icons';
 import { Select, SelectContent, SelectItem, SelectTrigger } from '@documenso/ui/primitives/select';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
+import { useOptionalCurrentTeam } from '~/providers/team';
+
 const ZAddRecipientsForNewDocumentSchema = z.object({
   recipients: z.array(
     z.object({
@@ -51,6 +53,8 @@ export function UseTemplateDialog({
 }: UseTemplateDialogProps) {
   const router = useRouter();
   const { toast } = useToast();
+
+  const team = useOptionalCurrentTeam();
 
   const {
     control,
@@ -85,6 +89,7 @@ export function UseTemplateDialog({
     try {
       const { id } = await createDocumentFromTemplate({
         templateId,
+        teamId: team?.id,
         recipients: data.recipients,
       });
 

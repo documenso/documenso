@@ -30,6 +30,8 @@ import { LazyPDFViewer } from '@documenso/ui/primitives/lazy-pdf-viewer';
 import { Stepper } from '@documenso/ui/primitives/stepper';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
+import { useOptionalCurrentTeam } from '~/providers/team';
+
 export type EditDocumentFormProps = {
   className?: string;
   user: User;
@@ -58,6 +60,7 @@ export const EditDocumentForm = ({
 
   const router = useRouter();
   const searchParams = useSearchParams();
+  const team = useOptionalCurrentTeam();
 
   const { mutateAsync: addTitle } = trpc.document.setTitleForDocument.useMutation();
   const { mutateAsync: addFields } = trpc.field.addFields.useMutation();
@@ -112,6 +115,7 @@ export const EditDocumentForm = ({
       // Custom invocation server action
       await addTitle({
         documentId: document.id,
+        teamId: team?.id,
         title: data.title,
       });
 
@@ -134,6 +138,7 @@ export const EditDocumentForm = ({
       // Custom invocation server action
       await addSigners({
         documentId: document.id,
+        teamId: team?.id,
         signers: data.signers,
       });
 
@@ -177,6 +182,7 @@ export const EditDocumentForm = ({
     try {
       await sendDocument({
         documentId: document.id,
+        teamId: team?.id,
         meta: {
           subject,
           message,

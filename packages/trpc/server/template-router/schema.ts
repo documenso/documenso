@@ -10,6 +10,7 @@ export const ZCreateTemplateMutationSchema = z.object({
 
 export const ZCreateDocumentFromTemplateMutationSchema = z.object({
   templateId: z.number(),
+  teamId: z.number().optional(),
   recipients: z
     .array(
       z.object({
