@@ -17,11 +17,12 @@ export const recipientRouter = router({
     .input(ZAddSignersMutationSchema)
     .mutation(async ({ input, ctx }) => {
       try {
-        const { documentId, signers } = input;
+        const { documentId, teamId, signers } = input;
 
         return await setRecipientsForDocument({
           userId: ctx.user.id,
           documentId,
+          teamId,
           recipients: signers.map((signer) => ({
             id: signer.nativeId,
             email: signer.email,

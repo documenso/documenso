@@ -39,6 +39,7 @@ export type TCreateDocumentMutationSchema = z.infer<typeof ZCreateDocumentMutati
 
 export const ZSetTitleForDocumentMutationSchema = z.object({
   documentId: z.number(),
+  teamId: z.number().min(1).optional(),
   title: z.string().min(1),
 });
 
@@ -46,6 +47,7 @@ export type TSetTitleForDocumentMutationSchema = z.infer<typeof ZSetTitleForDocu
 
 export const ZSetRecipientsForDocumentMutationSchema = z.object({
   documentId: z.number(),
+  teamId: z.number().min(1).optional(),
   recipients: z.array(
     z.object({
       id: z.number().nullish(),
@@ -82,6 +84,7 @@ export type TSetFieldsForDocumentMutationSchema = z.infer<
 
 export const ZSendDocumentMutationSchema = z.object({
   documentId: z.number(),
+  teamId: z.number().optional(),
   meta: z.object({
     subject: z.string(),
     message: z.string(),

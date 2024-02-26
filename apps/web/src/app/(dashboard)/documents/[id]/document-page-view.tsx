@@ -85,6 +85,7 @@ export const DocumentPageView = async ({ params, team }: DocumentPageViewProps) 
 
   const recipients = await getRecipientsForDocument({
     documentId,
+    teamId: team?.id,
     userId: user.id,
   });
 
