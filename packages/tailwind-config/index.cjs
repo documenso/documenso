@@ -45,6 +45,11 @@ module.exports = {
           DEFAULT: 'hsl(var(--card))',
           foreground: 'hsl(var(--card-foreground))',
         },
+        'field-card': {
+          DEFAULT: 'hsl(var(--field-card))',
+          border: 'hsl(var(--field-card-border))',
+          foreground: 'hsl(var(--field-card-foreground))',
+        },
         widget: {
           DEFAULT: 'hsl(var(--widget))',
           // foreground: 'hsl(var(--widget-foreground))',

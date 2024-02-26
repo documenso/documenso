@@ -7,6 +7,7 @@ import { prisma } from '@documenso/prisma';
 
 export type UpdateTitleOptions = {
   userId: number;
+  teamId?: number;
   documentId: number;
   title: string;
   requestMetadata?: RequestMetadata;
@@ -14,6 +15,7 @@ export type UpdateTitleOptions = {
 
 export const updateTitle = async ({
   userId,
+  teamId,
   documentId,
   title,
   requestMetadata,
@@ -27,20 +29,21 @@ export const updateTitle = async ({
   const document = await prisma.document.findFirstOrThrow({
     where: {
       id: documentId,
-      OR: [
-        {
-          userId,
-        },
-        {
-          team: {
-            members: {
-              some: {
-                userId,
+      ...(teamId
+        ? {
+            team: {
+              id: teamId,
+              members: {
+                some: {
+                  userId,
+                },
               },
             },
-          },
-        },
-      ],
+          }
+        : {
+            userId,
+            teamId: null,
+          }),
     },
   });
 

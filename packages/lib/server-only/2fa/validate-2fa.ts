@@ -1,4 +1,4 @@
-import { User } from '@documenso/prisma/client';
+import type { User } from '@documenso/prisma/client';
 
 import { ErrorCode } from '../../next-auth/error-codes';
 import { verifyTwoFactorAuthenticationToken } from './verify-2fa-token';

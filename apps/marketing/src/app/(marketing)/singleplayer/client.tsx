@@ -256,6 +256,7 @@ export const SinglePlayerClient = () => {
                 fields={fields}
                 onSubmit={onSignSubmit}
                 requireName={Boolean(fields.find((field) => field.type === 'NAME'))}
+                requireCustomText={Boolean(fields.find((field) => field.type === 'TEXT'))}
                 requireSignature={Boolean(fields.find((field) => field.type === 'SIGNATURE'))}
               />
             </Stepper>
