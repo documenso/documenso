@@ -1,14 +1,21 @@
 import { nanoid } from '@documenso/lib/universal/id';
 import { prisma } from '@documenso/prisma';
-import type { TCreateDocumentFromTemplateMutationSchema } from '@documenso/trpc/server/template-router/schema';
+import type { RecipientRole } from '@documenso/prisma/client';
 
-export type CreateDocumentFromTemplateOptions = TCreateDocumentFromTemplateMutationSchema & {
+export type CreateDocumentFromTemplateOptions = {
+  templateId: number;
   userId: number;
+  recipients?: {
+    name?: string;
+    email: string;
+    role?: RecipientRole;
+  }[];
 };
 
 export const createDocumentFromTemplate = async ({
   templateId,
   userId,
+  recipients,
 }: CreateDocumentFromTemplateOptions) => {
   const template = await prisma.template.findUnique({
     where: {
@@ -64,7 +71,11 @@ export const createDocumentFromTemplate = async ({
     },
 
     include: {
-      Recipient: true,
+      Recipient: {
+        orderBy: {
+          id: 'asc',
+        },
+      },
     },
   });
 
@@ -88,6 +99,35 @@ export const createDocumentFromTemplate = async ({
       };
     }),
   });
+
+  if (recipients && recipients.length > 0) {
+    document.Recipient = await Promise.all(
+      recipients.map(async (recipient, index) => {
+        const existingRecipient = document.Recipient.at(index);
+
+        return await prisma.recipient.upsert({
+          where: {
+            documentId_email: {
+              documentId: document.id,
+              email: existingRecipient?.email ?? recipient.email,
+            },
+          },
+          update: {
+            name: recipient.name,
+            email: recipient.email,
+            role: recipient.role,
+          },
+          create: {
+            documentId: document.id,
+            email: recipient.email,
+            name: recipient.name,
+            role: recipient.role,
+            token: nanoid(),
+          },
+        });
+      }),
+    );
+  }
 
   return document;
 };
