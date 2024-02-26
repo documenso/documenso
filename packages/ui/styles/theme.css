@@ -18,6 +18,10 @@
     --card-border-tint: 112 205 159;
     --card-foreground: 222.2 47.4% 11.2%;
 
+    --field-card: 95 74% 90%;
+    --field-card-border: 95.08 71.08% 67.45%;
+    --field-card-foreground: 222.2 47.4% 11.2%;
+
     --widget: 0 0% 97%;
 
     --border: 214.3 31.8% 91.4%;
@@ -54,6 +58,8 @@
     --card-border: 0 0% 27.9%;
     --card-border-tint: 112 205 159;
     --card-foreground: 0 0% 95%;
+
+    --widget: 0 0% 14.9%;
 
     --border: 0 0% 27.9%;
     --input: 0 0% 27.9%;

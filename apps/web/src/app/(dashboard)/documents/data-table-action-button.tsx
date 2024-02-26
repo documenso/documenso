@@ -94,7 +94,7 @@ export const DataTableActionButton = ({ row, team }: DataTableActionButtonProps)
       isOwner ? { isDraft: true, isOwner: true } : { isDraft: true, isCurrentTeamDocument: true },
       () => (
         <Button className="w-32" asChild>
-          <Link href={`${documentsPath}/${row.id}`}>
+          <Link href={`${documentsPath}/${row.id}/edit`}>
             <Edit className="-ml-1 mr-2 h-4 w-4" />
             Edit
           </Link>

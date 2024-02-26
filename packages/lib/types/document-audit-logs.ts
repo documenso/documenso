@@ -21,15 +21,24 @@ export const ZDocumentAuditLogTypeSchema = z.enum([
   'RECIPIENT_UPDATED',
 
   // Document events.
+  'DOCUMENT_COMPLETED', // When the document is sealed and fully completed.
+  'DOCUMENT_CREATED', // When the document is created.
+  'DOCUMENT_DELETED', // When the document is soft deleted.
+  'DOCUMENT_FIELD_INSERTED', // When a field is inserted (signed/approved/etc) by a recipient.
+  'DOCUMENT_FIELD_UNINSERTED', // When a field is uninserted by a recipient.
+  'DOCUMENT_META_UPDATED', // When the document meta data is updated.
+  'DOCUMENT_OPENED', // When the document is opened by a recipient.
+  'DOCUMENT_RECIPIENT_COMPLETED', // When a recipient completes all their required tasks for the document.
+  'DOCUMENT_SENT', // When the document transitions from DRAFT to PENDING.
+  'DOCUMENT_TITLE_UPDATED', // When the document title is updated.
+]);
+
+export const ZDocumentAuditLogEmailTypeSchema = z.enum([
+  'SIGNING_REQUEST',
+  'VIEW_REQUEST',
+  'APPROVE_REQUEST',
+  'CC',
   'DOCUMENT_COMPLETED',
-  'DOCUMENT_CREATED',
-  'DOCUMENT_DELETED',
-  'DOCUMENT_FIELD_INSERTED',
-  'DOCUMENT_FIELD_UNINSERTED',
-  'DOCUMENT_META_UPDATED',
-  'DOCUMENT_OPENED',
-  'DOCUMENT_TITLE_UPDATED',
-  'DOCUMENT_RECIPIENT_COMPLETED',
 ]);
 
 export const ZDocumentMetaDiffTypeSchema = z.enum([
@@ -40,10 +49,12 @@ export const ZDocumentMetaDiffTypeSchema = z.enum([
   'SUBJECT',
   'TIMEZONE',
 ]);
+
 export const ZFieldDiffTypeSchema = z.enum(['DIMENSION', 'POSITION']);
 export const ZRecipientDiffTypeSchema = z.enum(['NAME', 'ROLE', 'EMAIL']);
 
 export const DOCUMENT_AUDIT_LOG_TYPE = ZDocumentAuditLogTypeSchema.Enum;
+export const DOCUMENT_EMAIL_TYPE = ZDocumentAuditLogEmailTypeSchema.Enum;
 export const DOCUMENT_META_DIFF_TYPE = ZDocumentMetaDiffTypeSchema.Enum;
 export const FIELD_DIFF_TYPE = ZFieldDiffTypeSchema.Enum;
 export const RECIPIENT_DIFF_TYPE = ZRecipientDiffTypeSchema.Enum;
@@ -140,13 +151,7 @@ const ZBaseRecipientDataSchema = z.object({
 export const ZDocumentAuditLogEventEmailSentSchema = z.object({
   type: z.literal(DOCUMENT_AUDIT_LOG_TYPE.EMAIL_SENT),
   data: ZBaseRecipientDataSchema.extend({
-    emailType: z.enum([
-      'SIGNING_REQUEST',
-      'VIEW_REQUEST',
-      'APPROVE_REQUEST',
-      'CC',
-      'DOCUMENT_COMPLETED',
-    ]),
+    emailType: ZDocumentAuditLogEmailTypeSchema,
     isResending: z.boolean(),
   }),
 });
@@ -168,6 +173,16 @@ export const ZDocumentAuditLogEventDocumentCreatedSchema = z.object({
   type: z.literal(DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_CREATED),
   data: z.object({
     title: z.string(),
+  }),
+});
+
+/**
+ * Event: Document deleted.
+ */
+export const ZDocumentAuditLogEventDocumentDeletedSchema = z.object({
+  type: z.literal(DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_DELETED),
+  data: z.object({
+    type: z.enum(['SOFT', 'HARD']),
   }),
 });
 
@@ -248,6 +263,14 @@ export const ZDocumentAuditLogEventDocumentRecipientCompleteSchema = z.object({
 });
 
 /**
+ * Event: Document sent.
+ */
+export const ZDocumentAuditLogEventDocumentSentSchema = z.object({
+  type: z.literal(DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_SENT),
+  data: z.object({}),
+});
+
+/**
  * Event: Document title updated.
  */
 export const ZDocumentAuditLogEventDocumentTitleUpdatedSchema = z.object({
@@ -314,6 +337,11 @@ export const ZDocumentAuditLogBaseSchema = z.object({
   id: z.string(),
   createdAt: z.date(),
   documentId: z.number(),
+  name: z.string().optional().nullable(),
+  email: z.string().optional().nullable(),
+  userId: z.number().optional().nullable(),
+  userAgent: z.string().optional().nullable(),
+  ipAddress: z.string().optional().nullable(),
 });
 
 export const ZDocumentAuditLogSchema = ZDocumentAuditLogBaseSchema.and(
@@ -321,11 +349,13 @@ export const ZDocumentAuditLogSchema = ZDocumentAuditLogBaseSchema.and(
     ZDocumentAuditLogEventEmailSentSchema,
     ZDocumentAuditLogEventDocumentCompletedSchema,
     ZDocumentAuditLogEventDocumentCreatedSchema,
+    ZDocumentAuditLogEventDocumentDeletedSchema,
     ZDocumentAuditLogEventDocumentFieldInsertedSchema,
     ZDocumentAuditLogEventDocumentFieldUninsertedSchema,
     ZDocumentAuditLogEventDocumentMetaUpdatedSchema,
     ZDocumentAuditLogEventDocumentOpenedSchema,
     ZDocumentAuditLogEventDocumentRecipientCompleteSchema,
+    ZDocumentAuditLogEventDocumentSentSchema,
     ZDocumentAuditLogEventDocumentTitleUpdatedSchema,
     ZDocumentAuditLogEventFieldCreatedSchema,
     ZDocumentAuditLogEventFieldRemovedSchema,
@@ -347,4 +377,9 @@ export type TDocumentAuditLogDocumentMetaDiffSchema = z.infer<
 
 export type TDocumentAuditLogRecipientDiffSchema = z.infer<
   typeof ZDocumentAuditLogRecipientDiffSchema
+>;
+
+export type DocumentAuditLogByType<T = TDocumentAuditLog['type']> = Extract<
+  TDocumentAuditLog,
+  { type: T }
 >;

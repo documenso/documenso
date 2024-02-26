@@ -3,10 +3,11 @@ import { z } from 'zod';
 import { PROTECTED_TEAM_URLS } from '@documenso/lib/constants/teams';
 import { TeamMemberRole } from '@documenso/prisma/client';
 
+// Consider refactoring to use ZBaseTableSearchParamsSchema.
 const GenericFindQuerySchema = z.object({
   term: z.string().optional(),
-  page: z.number().optional(),
-  perPage: z.number().optional(),
+  page: z.number().min(1).optional(),
+  perPage: z.number().min(1).optional(),
 });
 
 /**

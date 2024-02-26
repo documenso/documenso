@@ -19,19 +19,19 @@ enum Role {
 }
 
 model User {
-  id                   Int                  @id @default(autoincrement())
+  id                   Int                    @id @default(autoincrement())
   name                 String?
-  customerId           String?              @unique
-  email                String               @unique
+  customerId           String?                @unique
+  email                String                 @unique
   emailVerified        DateTime?
   password             String?
   source               String?
   signature            String?
-  createdAt            DateTime             @default(now())
-  updatedAt            DateTime             @default(now()) @updatedAt
-  lastSignedIn         DateTime             @default(now())
-  roles                Role[]               @default([USER])
-  identityProvider     IdentityProvider     @default(DOCUMENSO)
+  createdAt            DateTime               @default(now())
+  updatedAt            DateTime               @default(now()) @updatedAt
+  lastSignedIn         DateTime               @default(now())
+  roles                Role[]                 @default([USER])
+  identityProvider     IdentityProvider       @default(DOCUMENSO)
   accounts             Account[]
   sessions             Session[]
   Document             Document[]
@@ -41,13 +41,15 @@ model User {
   ownedPendingTeams    TeamPending[]
   teamMembers          TeamMember[]
   twoFactorSecret      String?
-  twoFactorEnabled     Boolean              @default(false)
+  twoFactorEnabled     Boolean                @default(false)
   twoFactorBackupCodes String?
-
+  
   VerificationToken VerificationToken[]
+  ApiToken          ApiToken[]
   Template          Template[]
   securityAuditLogs UserSecurityAuditLog[]
   Webhooks          Webhook[]
+  siteSettings      SiteSettings[]
 
   @@index([email])
 }
@@ -113,6 +115,23 @@ model Webhook {
   updatedAt     DateTime               @default(now()) @updatedAt
   userId        Int
   User          User                   @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+enum ApiTokenAlgorithm {
+  SHA512
+}
+
+model ApiToken {
+  id        Int               @id @default(autoincrement())
+  name      String
+  token     String            @unique
+  algorithm ApiTokenAlgorithm @default(SHA512)
+  expires   DateTime?
+  createdAt DateTime          @default(now())
+  userId    Int?
+  user      User?             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  teamId    Int?
+  team      Team?             @relation(fields: [teamId], references: [id], onDelete: Cascade)
 }
 
 enum SubscriptionStatus {
@@ -378,6 +397,7 @@ model Team {
 
   document  Document[]
   templates Template[]
+  ApiToken  ApiToken[]
 }
 
 model TeamPending {
@@ -470,4 +490,13 @@ model Template {
   Field                Field[]
 
   @@unique([templateDocumentDataId])
+}
+
+model SiteSettings {
+  id                   String   @id
+  enabled              Boolean  @default(false)
+  data                 Json
+  lastModifiedByUserId Int?
+  lastModifiedAt       DateTime @default(now())
+  lastModifiedByUser   User?    @relation(fields: [lastModifiedByUserId], references: [id])
 }

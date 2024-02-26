@@ -10,7 +10,13 @@
     "ghcr.io/devcontainers/features/node:1": {}
   },
   "onCreateCommand": "./.devcontainer/on-create.sh",
-  "forwardPorts": [3000, 54320, 9000, 2500, 1100],
+  "forwardPorts": [
+    3000,
+    54320,
+    9000,
+    2500,
+    1100
+  ],
   "customizations": {
     "vscode": {
       "extensions": [
@@ -25,7 +31,7 @@
         "GitHub.copilot",
         "GitHub.vscode-pull-request-github",
         "Prisma.prisma",
-        "VisualStudioExptTeam.vscodeintellicode",
+        "VisualStudioExptTeam.vscodeintellicode"
       ]
     }
   }
