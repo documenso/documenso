@@ -17,7 +17,7 @@ import {
   RECIPIENT_ROLES_DESCRIPTION,
   RECIPIENT_ROLE_TO_EMAIL_TYPE,
 } from '../../constants/recipient-roles';
-import { triggerWebhook } from '../../universal/trigger-webhook';
+import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
 
 export type SendDocumentOptions = {
   documentId: number;
@@ -189,8 +189,10 @@ export const sendDocument = async ({
   });
 
   await triggerWebhook({
-    eventTrigger: WebhookTriggerEvents.DOCUMENT_SENT,
-    documentData: updatedDocument,
+    event: WebhookTriggerEvents.DOCUMENT_SENT,
+    data: updatedDocument,
+    userId,
+    teamId,
   });
 
   return updatedDocument;

@@ -5,7 +5,7 @@ import { prisma } from '@documenso/prisma';
 import { ReadStatus } from '@documenso/prisma/client';
 import { WebhookTriggerEvents } from '@documenso/prisma/client';
 
-import { triggerWebhook } from '../../universal/trigger-webhook';
+import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
 import { getDocumentAndRecipientByToken } from './get-document-by-token';
 
 export type ViewedDocumentOptions = {
@@ -59,7 +59,9 @@ export const viewedDocument = async ({ token, requestMetadata }: ViewedDocumentO
   const document = await getDocumentAndRecipientByToken({ token });
 
   await triggerWebhook({
-    eventTrigger: WebhookTriggerEvents.DOCUMENT_OPENED,
-    documentData: document,
+    event: WebhookTriggerEvents.DOCUMENT_OPENED,
+    data: document,
+    userId: document.userId,
+    teamId: document.teamId ?? undefined,
   });
 };

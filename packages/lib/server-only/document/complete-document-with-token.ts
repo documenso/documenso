@@ -7,7 +7,7 @@ import { prisma } from '@documenso/prisma';
 import { DocumentStatus, SigningStatus } from '@documenso/prisma/client';
 import { WebhookTriggerEvents } from '@documenso/prisma/client';
 
-import { triggerWebhook } from '../../universal/trigger-webhook';
+import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
 import { sealDocument } from './seal-document';
 import { sendPendingEmail } from './send-pending-email';
 
@@ -134,7 +134,9 @@ export const completeDocumentWithToken = async ({
   const updatedDocument = await getDocument({ token, documentId });
 
   await triggerWebhook({
-    eventTrigger: WebhookTriggerEvents.DOCUMENT_SIGNED,
-    documentData: updatedDocument,
+    event: WebhookTriggerEvents.DOCUMENT_SIGNED,
+    data: updatedDocument,
+    userId: updatedDocument.userId,
+    teamId: updatedDocument.teamId ?? undefined,
   });
 };

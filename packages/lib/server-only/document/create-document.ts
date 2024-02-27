@@ -7,7 +7,7 @@ import { createDocumentAuditLogData } from '@documenso/lib/utils/document-audit-
 import { prisma } from '@documenso/prisma';
 import { WebhookTriggerEvents } from '@documenso/prisma/client';
 
-import { triggerWebhook } from '../../universal/trigger-webhook';
+import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
 
 export type CreateDocumentOptions = {
   title: string;
@@ -67,8 +67,10 @@ export const createDocument = async ({
     });
 
     await triggerWebhook({
-      eventTrigger: WebhookTriggerEvents.DOCUMENT_CREATED,
-      documentData: document,
+      event: WebhookTriggerEvents.DOCUMENT_CREATED,
+      data: document,
+      userId,
+      teamId,
     });
 
     return document;

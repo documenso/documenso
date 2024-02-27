@@ -2,16 +2,35 @@ import { prisma } from '@documenso/prisma';
 import type { WebhookTriggerEvents } from '@documenso/prisma/client';
 
 export type GetAllWebhooksByEventTriggerOptions = {
-  eventTrigger: WebhookTriggerEvents;
+  event: WebhookTriggerEvents;
+  userId: number;
+  teamId?: number;
 };
 
 export const getAllWebhooksByEventTrigger = async ({
-  eventTrigger,
+  event,
+  userId,
+  teamId,
 }: GetAllWebhooksByEventTriggerOptions) => {
   return prisma.webhook.findMany({
     where: {
+      ...(teamId
+        ? {
+            team: {
+              id: teamId,
+              members: {
+                some: {
+                  userId,
+                },
+              },
+            },
+          }
+        : {
+            userId,
+            teamId: null,
+          }),
       eventTriggers: {
-        has: eventTrigger,
+        has: event,
       },
       enabled: true,
     },

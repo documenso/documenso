@@ -126,16 +126,17 @@ enum WebhookCallStatus {
 }
 
 model WebhookCall {
-  id              String            @id @default(cuid())
+  id              String               @id @default(cuid())
   status          WebhookCallStatus
   url             String
+  event           WebhookTriggerEvents
   requestBody     Json
   responseCode    Int
   responseHeaders Json?
   responseBody    Json?
-  createdAt       DateTime          @default(now())
+  createdAt       DateTime             @default(now())
   webhookId       String
-  webhook         Webhook           @relation(fields: [webhookId], references: [id], onDelete: Cascade)
+  webhook         Webhook              @relation(fields: [webhookId], references: [id], onDelete: Cascade)
 }
 
 enum ApiTokenAlgorithm {
