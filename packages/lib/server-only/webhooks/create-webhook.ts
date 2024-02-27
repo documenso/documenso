@@ -7,6 +7,7 @@ export interface CreateWebhookOptions {
   secret: string | null;
   enabled: boolean;
   userId: number;
+  teamId?: number;
 }
 
 export const createWebhook = async ({
@@ -15,7 +16,21 @@ export const createWebhook = async ({
   secret,
   enabled,
   userId,
+  teamId,
 }: CreateWebhookOptions) => {
+  if (teamId) {
+    await prisma.team.findFirstOrThrow({
+      where: {
+        id: teamId,
+        members: {
+          some: {
+            userId,
+          },
+        },
+      },
+    });
+  }
+
   return await prisma.webhook.create({
     data: {
       webhookUrl,
@@ -23,6 +38,7 @@ export const createWebhook = async ({
       secret,
       enabled,
       userId,
+      teamId,
     },
   });
 };

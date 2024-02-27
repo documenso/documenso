@@ -5,7 +5,7 @@ import type { HTMLAttributes } from 'react';
 import Link from 'next/link';
 import { useParams, usePathname } from 'next/navigation';
 
-import { Braces, CreditCard, Settings, Users } from 'lucide-react';
+import { Braces, CreditCard, Settings, Users, Webhook } from 'lucide-react';
 
 import { IS_BILLING_ENABLED } from '@documenso/lib/constants/app';
 import { cn } from '@documenso/ui/lib/utils';
@@ -22,6 +22,7 @@ export const DesktopNav = ({ className, ...props }: DesktopNavProps) => {
   const settingsPath = `/t/${teamUrl}/settings`;
   const membersPath = `/t/${teamUrl}/settings/members`;
   const tokensPath = `/t/${teamUrl}/settings/tokens`;
+  const webhooksPath = `/t/${teamUrl}/settings/webhooks`;
   const billingPath = `/t/${teamUrl}/settings/billing`;
 
   return (
@@ -56,6 +57,19 @@ export const DesktopNav = ({ className, ...props }: DesktopNavProps) => {
         >
           <Braces className="mr-2 h-5 w-5" />
           API Tokens
+        </Button>
+      </Link>
+
+      <Link href={webhooksPath}>
+        <Button
+          variant="ghost"
+          className={cn(
+            'w-full justify-start',
+            pathname?.startsWith(webhooksPath) && 'bg-secondary',
+          )}
+        >
+          <Webhook className="mr-2 h-5 w-5" />
+          Webhooks
         </Button>
       </Link>
 

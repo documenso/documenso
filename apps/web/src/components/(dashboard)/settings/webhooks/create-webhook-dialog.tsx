@@ -10,7 +10,7 @@ import { useForm } from 'react-hook-form';
 import type { z } from 'zod';
 
 import { trpc } from '@documenso/trpc/react';
-import { ZCreateWebhookFormSchema } from '@documenso/trpc/server/webhook-router/schema';
+import { ZCreateWebhookMutationSchema } from '@documenso/trpc/server/webhook-router/schema';
 import { Button } from '@documenso/ui/primitives/button';
 import {
   Dialog,
@@ -35,7 +35,11 @@ import { PasswordInput } from '@documenso/ui/primitives/password-input';
 import { Switch } from '@documenso/ui/primitives/switch';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
+import { useOptionalCurrentTeam } from '~/providers/team';
+
 import { TriggerMultiSelectCombobox } from './trigger-multiselect-combobox';
+
+const ZCreateWebhookFormSchema = ZCreateWebhookMutationSchema.omit({ teamId: true });
 
 type TCreateWebhookFormSchema = z.infer<typeof ZCreateWebhookFormSchema>;
 
@@ -46,6 +50,9 @@ export type CreateWebhookDialogProps = {
 export const CreateWebhookDialog = ({ trigger, ...props }: CreateWebhookDialogProps) => {
   const router = useRouter();
   const { toast } = useToast();
+
+  const team = useOptionalCurrentTeam();
+
   const [open, setOpen] = useState(false);
 
   const form = useForm<TCreateWebhookFormSchema>({
@@ -60,9 +67,20 @@ export const CreateWebhookDialog = ({ trigger, ...props }: CreateWebhookDialogPr
 
   const { mutateAsync: createWebhook } = trpc.webhook.createWebhook.useMutation();
 
-  const onSubmit = async (values: TCreateWebhookFormSchema) => {
+  const onSubmit = async ({
+    enabled,
+    eventTriggers,
+    secret,
+    webhookUrl,
+  }: TCreateWebhookFormSchema) => {
     try {
-      await createWebhook(values);
+      await createWebhook({
+        enabled,
+        eventTriggers,
+        secret,
+        webhookUrl,
+        teamId: team?.id,
+      });
 
       setOpen(false);
 
