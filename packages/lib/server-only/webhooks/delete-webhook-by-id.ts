@@ -1,7 +1,7 @@
 import { prisma } from '@documenso/prisma';
 
 export type DeleteWebhookByIdOptions = {
-  id: number;
+  id: string;
   userId: number;
 };
 

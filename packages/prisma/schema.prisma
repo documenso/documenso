@@ -19,19 +19,19 @@ enum Role {
 }
 
 model User {
-  id                   Int                    @id @default(autoincrement())
+  id                   Int                  @id @default(autoincrement())
   name                 String?
-  customerId           String?                @unique
-  email                String                 @unique
+  customerId           String?              @unique
+  email                String               @unique
   emailVerified        DateTime?
   password             String?
   source               String?
   signature            String?
-  createdAt            DateTime               @default(now())
-  updatedAt            DateTime               @default(now()) @updatedAt
-  lastSignedIn         DateTime               @default(now())
-  roles                Role[]                 @default([USER])
-  identityProvider     IdentityProvider       @default(DOCUMENSO)
+  createdAt            DateTime             @default(now())
+  updatedAt            DateTime             @default(now()) @updatedAt
+  lastSignedIn         DateTime             @default(now())
+  roles                Role[]               @default([USER])
+  identityProvider     IdentityProvider     @default(DOCUMENSO)
   accounts             Account[]
   sessions             Session[]
   Document             Document[]
@@ -41,9 +41,9 @@ model User {
   ownedPendingTeams    TeamPending[]
   teamMembers          TeamMember[]
   twoFactorSecret      String?
-  twoFactorEnabled     Boolean                @default(false)
+  twoFactorEnabled     Boolean              @default(false)
   twoFactorBackupCodes String?
-  
+
   VerificationToken VerificationToken[]
   ApiToken          ApiToken[]
   Template          Template[]
@@ -106,7 +106,7 @@ enum WebhookTriggerEvents {
 }
 
 model Webhook {
-  id            Int                    @id @default(autoincrement())
+  id            String                 @id @default(cuid())
   webhookUrl    String
   eventTriggers WebhookTriggerEvents[]
   secret        String?

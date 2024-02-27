@@ -33,7 +33,7 @@ type TEditWebhookFormSchema = z.infer<typeof ZEditWebhookFormSchema>;
 
 export type WebhookPageOptions = {
   params: {
-    id: number;
+    id: string;
   };
 };
 
@@ -43,7 +43,7 @@ export default function WebhookPage({ params }: WebhookPageOptions) {
 
   const { data: webhook, isLoading } = trpc.webhook.getWebhookById.useQuery(
     {
-      id: Number(params.id),
+      id: params.id,
     },
     { enabled: !!params.id },
   );
@@ -63,7 +63,7 @@ export default function WebhookPage({ params }: WebhookPageOptions) {
   const onSubmit = async (data: TEditWebhookFormSchema) => {
     try {
       await updateWebhook({
-        id: Number(params.id),
+        id: params.id,
         ...data,
       });
 

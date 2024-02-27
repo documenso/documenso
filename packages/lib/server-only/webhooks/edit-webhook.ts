@@ -3,7 +3,7 @@ import type { Prisma } from '@prisma/client';
 import { prisma } from '@documenso/prisma';
 
 export type EditWebhookOptions = {
-  id: number;
+  id: string;
   data: Prisma.WebhookUpdateInput;
   userId: number;
 };
