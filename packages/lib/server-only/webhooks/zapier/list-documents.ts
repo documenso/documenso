@@ -2,23 +2,38 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 
 import { findDocuments } from '@documenso/lib/server-only/document/find-documents';
 import { getRecipientsForDocument } from '@documenso/lib/server-only/recipient/get-recipients-for-document';
+import type { Recipient, Webhook } from '@documenso/prisma/client';
 
+import { getWebhooksByTeamId } from '../get-webhooks-by-team-id';
 import { getWebhooksByUserId } from '../get-webhooks-by-user-id';
 import { validateApiToken } from './validateApiToken';
 
 export const listDocumentsHandler = async (req: NextApiRequest, res: NextApiResponse) => {
   try {
     const { authorization } = req.headers;
-    const user = await validateApiToken({ authorization });
+    const { user, userId, teamId } = await validateApiToken({ authorization });
 
-    const documents = await findDocuments({ userId: user.id });
-    const allWebhooks = await getWebhooksByUserId(user.id);
-    const recipients = await getRecipientsForDocument({
-      documentId: documents.data[0].id,
-      userId: user.id,
-    });
+    let allWebhooks: Webhook[] = [];
+    let documents;
+    let recipients: Recipient[] = [];
 
-    if (documents.data.length > 0 && allWebhooks.length > 0) {
+    if (userId) {
+      documents = await findDocuments({ userId });
+      allWebhooks = await getWebhooksByUserId(userId);
+      recipients = await getRecipientsForDocument({ documentId: documents.data[0].id, userId });
+    }
+
+    if (teamId) {
+      documents = await findDocuments({ userId: user.id, teamId });
+      allWebhooks = await getWebhooksByTeamId(teamId, user.id);
+      recipients = await getRecipientsForDocument({
+        documentId: documents.data[0].id,
+        userId: user.id,
+        teamId,
+      });
+    }
+
+    if (documents && documents.data.length > 0 && allWebhooks.length > 0 && recipients.length > 0) {
       const testWebhook = {
         event: allWebhooks[0].eventTriggers.toString(),
         createdAt: allWebhooks[0].createdAt,
@@ -43,7 +58,6 @@ export const listDocumentsHandler = async (req: NextApiRequest, res: NextApiResp
 
     return res.status(200).json([]);
   } catch (err) {
-    console.error(err);
     return res.status(500).json({
       message: 'Internal Server Error',
     });

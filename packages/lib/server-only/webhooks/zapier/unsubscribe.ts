@@ -10,12 +10,13 @@ export const unsubscribeHandler = async (req: NextApiRequest, res: NextApiRespon
 
     const { webhookId } = req.body;
 
-    const user = await validateApiToken({ authorization });
+    const result = await validateApiToken({ authorization });
 
     const deletedWebhook = await prisma.webhook.delete({
       where: {
         id: webhookId,
-        userId: user.id,
+        userId: result.userId ? result.userId : result.user.id,
+        teamId: result.userId ? undefined : result.teamId,
       },
     });
 

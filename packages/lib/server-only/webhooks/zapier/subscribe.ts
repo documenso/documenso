@@ -10,7 +10,7 @@ export const subscribeHandler = async (req: NextApiRequest, res: NextApiResponse
 
     const { webhookUrl, eventTrigger } = req.body;
 
-    const user = await validateApiToken({ authorization });
+    const result = await validateApiToken({ authorization });
 
     const createdWebhook = await prisma.webhook.create({
       data: {
@@ -18,7 +18,8 @@ export const subscribeHandler = async (req: NextApiRequest, res: NextApiResponse
         eventTriggers: [eventTrigger],
         secret: null,
         enabled: true,
-        userId: user.id,
+        userId: result.userId ? result.userId : result.user.id,
+        teamId: result.userId ? undefined : result.teamId,
       },
     });
 

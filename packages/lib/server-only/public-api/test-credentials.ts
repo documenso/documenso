@@ -6,11 +6,10 @@ export const testCredentialsHandler = async (req: NextApiRequest, res: NextApiRe
   try {
     const { authorization } = req.headers;
 
-    const user = await validateApiToken({ authorization });
+    const result = await validateApiToken({ authorization });
 
     return res.status(200).json({
-      username: user.name,
-      email: user.email,
+      name: result.userId ? result.user.name : result.team?.name,
     });
   } catch (err) {
     return res.status(500).json({
