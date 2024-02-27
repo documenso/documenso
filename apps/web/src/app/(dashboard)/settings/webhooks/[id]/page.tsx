@@ -89,11 +89,13 @@ export default function WebhookPage({ params }: WebhookPageOptions) {
         title="Edit webhook"
         subtitle="On this page, you can edit the webhook and its settings."
       />
+
       {isLoading && (
         <div className="absolute inset-0 z-50 flex items-center justify-center bg-white/50">
           <Loader className="h-8 w-8 animate-spin text-gray-500" />
         </div>
       )}
+
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
           <fieldset

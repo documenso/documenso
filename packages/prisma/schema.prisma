@@ -115,6 +115,25 @@ model Webhook {
   updatedAt     DateTime               @default(now()) @updatedAt
   userId        Int
   User          User                   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  WebhookCall   WebhookCall[]
+}
+
+enum WebhookCallStatus {
+  SUCCESS
+  FAILED
+}
+
+model WebhookCall {
+  id              String            @id @default(cuid())
+  status          WebhookCallStatus
+  url             String
+  requestBody     Json
+  responseCode    Int
+  responseHeaders Json?
+  responseBody    Json?
+  createdAt       DateTime          @default(now())
+  webhookId       String
+  webhook         Webhook           @relation(fields: [webhookId], references: [id], onDelete: Cascade)
 }
 
 enum ApiTokenAlgorithm {
