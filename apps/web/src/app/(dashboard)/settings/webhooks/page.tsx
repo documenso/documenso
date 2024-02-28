@@ -53,12 +53,14 @@ export default function WebhookPage() {
                 !webhook.enabled && 'bg-muted/40',
               )}
             >
-              <div className="flex items-center justify-between gap-x-4">
+              <div className="flex flex-col gap-x-4 sm:flex-row sm:items-center sm:justify-between">
                 <div>
                   <div className="truncate font-mono text-xs">{webhook.id}</div>
 
-                  <div className="mt-1.5 flex items-center gap-2">
-                    <h5 className="text-sm">{webhook.webhookUrl}</h5>
+                  <div className="mt-1.5 flex items-center gap-4">
+                    <h5 className="max-w-[30rem] truncate text-sm sm:max-w-[18rem]">
+                      {webhook.webhookUrl}
+                    </h5>
 
                     <Badge variant={webhook.enabled ? 'neutral' : 'warning'} size="small">
                       {webhook.enabled ? 'Enabled' : 'Disabled'}
@@ -78,7 +80,7 @@ export default function WebhookPage() {
                   </p>
                 </div>
 
-                <div className="flex flex-shrink-0 gap-4">
+                <div className="mt-4 flex flex-shrink-0 gap-4 sm:mt-0">
                   <Button asChild variant="outline">
                     <Link href={`/settings/webhooks/${webhook.id}`}>Edit</Link>
                   </Button>
