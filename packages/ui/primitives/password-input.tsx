@@ -1,5 +1,7 @@
 import * as React from 'react';
 
+import { usePathname } from 'next/navigation';
+
 import { Eye, EyeOff } from 'lucide-react';
 import { Dot } from 'lucide-react';
 import { Check } from 'lucide-react';
@@ -36,29 +38,26 @@ const PasswordInput = React.forwardRef<HTMLInputElement, Omit<InputProps, 'type'
     const [isFocused, setIsFocused] = React.useState(false);
     const [validations, setValidations] = React.useState<Validation[]>(DEFAULT_VALIDATIONS);
     const [input, setInput] = React.useState('');
+    const pathname = usePathname();
 
     const handleFocus = () => setIsFocused(true);
     const handleBlur = () => setIsFocused(false);
 
-    React.useEffect(() => {
-      function handleInputChange() {
-        const newValidations = [...DEFAULT_VALIDATIONS];
-        const currentInput = input;
+    function handleInputChange(inputVal: string) {
+      const newValidations = [...DEFAULT_VALIDATIONS];
+      const currentInput = inputVal;
 
-        newValidations.forEach((validation) => {
-          validation.success = false;
-        });
-        PASSWORD_REGEX.UPPER_CASE.test(currentInput) && (newValidations[0].success = true);
-        PASSWORD_REGEX.LOWER_CASE.test(currentInput) && (newValidations[1].success = true);
-        PASSWORD_REGEX.NUMBER.test(currentInput) && (newValidations[2].success = true);
-        PASSWORD_REGEX.SPECIAL_CHARACTER.test(currentInput) && (newValidations[3].success = true);
-        currentInput.length >= 8 && currentInput.length <= 72 && (newValidations[4].success = true);
+      newValidations.forEach((validation) => {
+        validation.success = false;
+      });
+      PASSWORD_REGEX.UPPER_CASE.test(currentInput) && (newValidations[0].success = true);
+      PASSWORD_REGEX.LOWER_CASE.test(currentInput) && (newValidations[1].success = true);
+      PASSWORD_REGEX.NUMBER.test(currentInput) && (newValidations[2].success = true);
+      PASSWORD_REGEX.SPECIAL_CHARACTER.test(currentInput) && (newValidations[3].success = true);
+      currentInput.length >= 8 && currentInput.length <= 72 && (newValidations[4].success = true);
 
-        setValidations(newValidations);
-      }
-
-      handleInputChange();
-    }, [input]);
+      setValidations(newValidations);
+    }
 
     const validationHints = (
       <ul className="-ml-1 max-w-xs py-4 pr-4">
@@ -91,12 +90,13 @@ const PasswordInput = React.forwardRef<HTMLInputElement, Omit<InputProps, 'type'
           value={input}
           onChange={(e) => {
             setInput(e.target.value);
+            handleInputChange(e.target.value);
           }}
           onFocus={handleFocus}
           onBlur={handleBlur}
         />
 
-        {isFocused && (
+        {isFocused && pathname === '/signup' && (
           <div className="absolute left-full top-1/2 flex -translate-y-1/2 transform items-center justify-center">
             <GoTriangleLeft />
             <div className="bg-background -ml-1 rounded shadow">{validationHints}</div>
