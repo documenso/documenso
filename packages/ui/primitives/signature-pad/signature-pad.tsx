@@ -17,6 +17,7 @@ export type SignaturePadProps = Omit<HTMLAttributes<HTMLCanvasElement>, 'onChang
   onChange?: (_signatureDataUrl: string | null) => void;
   containerClassName?: string;
   disabled?: boolean;
+  height?: number;
 };
 
 export const SignaturePad = ({
@@ -25,6 +26,7 @@ export const SignaturePad = ({
   defaultValue,
   onChange,
   disabled = false,
+  height,
   ...props
 }: SignaturePadProps) => {
   const $el = useRef<HTMLCanvasElement>(null);
@@ -230,6 +232,7 @@ export const SignaturePad = ({
         onPointerUp={(event) => onMouseUp(event)}
         onPointerLeave={(event) => onMouseLeave(event)}
         onPointerEnter={(event) => onMouseEnter(event)}
+        height={height}
         {...props}
       />
 

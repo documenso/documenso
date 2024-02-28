@@ -45,7 +45,7 @@ export default function MarketingLayout({ children }: MarketingLayoutProps) {
           <Image
             src={backgroundPattern}
             alt="background pattern"
-            className="!h-34 w-full object-cover"
+            className="h-[2rem] w-full object-cover"
           />
         </div>
         <AnnouncementBar className="relative" isShown={true} />

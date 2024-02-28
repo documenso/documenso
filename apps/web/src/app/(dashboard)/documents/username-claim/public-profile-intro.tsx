@@ -2,11 +2,14 @@
 
 import React, { useRef, useState } from 'react';
 
+import Image from 'next/image';
+
 import { zodResolver } from '@hookform/resolvers/zod';
-import { BadgeCheck, File } from 'lucide-react';
+import { File } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
+import Check from '@documenso/assets/Check.svg';
 import Lucas from '@documenso/assets/images/Lucas.png';
 import Timur from '@documenso/assets/images/Timur.png';
 import type { User } from '@documenso/prisma/client';
@@ -60,7 +63,7 @@ export const PublicProfileIntro = ({ user }: PublicProfileIntroProps) => {
 
   const isProfileURLClaimed = user.profileURL ? false : true;
   const [showClaimingDialog, setShowClaimingDialog] = useState(isProfileURLClaimed);
-  const [showClaimedDialog, setShowClaimedDialog] = useState(false);
+  const [showClaimedDialog, setShowClaimedDialog] = useState(true);
 
   const onFormSubmit = async ({ profileURL }: TPublicProfileFormSchema) => {
     try {
@@ -92,40 +95,38 @@ export const PublicProfileIntro = ({ user }: PublicProfileIntroProps) => {
       <Dialog open={showClaimingDialog} onOpenChange={setShowClaimingDialog}>
         <DialogContent position="center" className="pb-4">
           <DialogHeader>
-            <DialogTitle className="font-semi-bold text-center text-xl">
+            <DialogTitle className="font-semi-bold text-center text-2xl">
               Introducing public profile!
             </DialogTitle>
-            <DialogDescription className="text-center">
+            <DialogDescription className="text-muted-foreground/60 text-center text-sm">
               Reserve your Documenso public profile username
             </DialogDescription>
           </DialogHeader>
 
-          <Card className="relative px-6 py-6">
-            <Card className="flex flex-col items-center px-6 py-6">
-              <code className="bg-muted rounded-md px-1 py-1 text-sm">
-                <span>documenso.com/u/timur</span>
-              </code>
-              <Avatar className="dark:border-border mt-2 h-12 w-12 border-2 border-solid border-white">
-                <AvatarImage className="AvatarImage" src={Timur.src} alt="Timur" />
-                <AvatarFallback className="text-xs text-gray-400">Timur</AvatarFallback>
-              </Avatar>
-              <div className="flex flex-row gap-x-2">
-                Timur Ercan <BadgeCheck fill="#A2E771" />
-              </div>
-              <span className="text-center">
-                Hey I’m Timur <br /> Pick any of the following agreements below and start signing to
-                get started
-              </span>
-            </Card>
-            <Card className="mt-2 items-center">
-              <CardHeader className="p-2">Documents</CardHeader>
+          <Card className="relative flex flex-col items-center border-none bg-gray-50 px-6 py-6 pb-0 shadow-none">
+            <code className="rounded-md border-2 border-gray-200 px-1 py-1 text-sm">
+              <span>documenso.com/u/timur</span>
+            </code>
+            <Avatar className="dark:border-border mt-2 h-20 w-20 border-2 border-solid border-white bg-white">
+              <AvatarImage className="AvatarImage" src={Timur.src} alt="Timur" />
+              <AvatarFallback className="text-xs text-gray-400">Timur</AvatarFallback>
+            </Avatar>
+            <div className="flex flex-row gap-x-2">
+              Timur Ercan <Image alt="Check" src={Check} />
+            </div>
+            <span className="text-muted-foreground/60 text-center">
+              Hey I’m Timur <br /> Pick any of the following agreements below and start signing to
+              get started
+            </span>
+            <Card className="bg mt-2 w-full items-center shadow-none">
+              <CardHeader className="p-4 text-gray-500">Documents</CardHeader>
               <hr className="mb-2" />
               <div className="mb-2 flex flex-row items-center justify-between">
                 <div className="flex flex-row items-center gap-x-2">
                   <File className="ml-3" />
                   <div className="flex flex-col">
                     <span className="text-md">NDA.pdf</span>
-                    <span className="text-muted-foregroun mt-0.5 text-xs">
+                    <span className="text-muted-foreground mt-0.5 text-xs">
                       Like to discuss about my work?
                     </span>
                   </div>
@@ -135,6 +136,12 @@ export const PublicProfileIntro = ({ user }: PublicProfileIntroProps) => {
                 </Button>
               </div>
             </Card>
+            <div
+              className="fade-overlay bg-black-100 absolute bottom-0 h-1/4 w-full"
+              style={{
+                background: `linear-gradient(180deg, rgba(255, 255, 255, 0.06) 0%, white 75%, white 100%)`,
+              }}
+            ></div>
           </Card>
 
           <Form {...form}>
@@ -173,7 +180,7 @@ export const PublicProfileIntro = ({ user }: PublicProfileIntroProps) => {
           </Form>
         </DialogContent>
       </Dialog>
-      <Dialog open={showClaimedDialog} onOpenChange={setShowClaimedDialog}>
+      <Dialog open={false} onOpenChange={setShowClaimedDialog}>
         <DialogContent position="center" className="pb-4">
           <DialogHeader>
             <DialogTitle className="font-semi-bold text-center text-xl">All set!</DialogTitle>
@@ -192,7 +199,7 @@ export const PublicProfileIntro = ({ user }: PublicProfileIntroProps) => {
                 <AvatarFallback className="text-xs text-gray-400">Timur</AvatarFallback>
               </Avatar>
               <div className="flex flex-row gap-x-2">
-                Lucas Smith <BadgeCheck fill="#A2E771" />
+                Lucas Smith <Image alt="Check" src={Check} />
               </div>
               <div className="flex inline-flex h-full w-full flex-col items-center justify-center gap-3 py-2">
                 <Skeleton className="w-75 h-4 animate-none rounded-full" />
