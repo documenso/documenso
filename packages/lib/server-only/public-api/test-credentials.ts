@@ -9,7 +9,7 @@ export const testCredentialsHandler = async (req: NextApiRequest, res: NextApiRe
     const result = await validateApiToken({ authorization });
 
     return res.status(200).json({
-      name: result.userId ? result.user.name : result.team?.name,
+      name: result.team?.name ?? result.user.name,
     });
   } catch (err) {
     return res.status(500).json({

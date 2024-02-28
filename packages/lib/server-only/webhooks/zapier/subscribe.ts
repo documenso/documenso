@@ -18,8 +18,8 @@ export const subscribeHandler = async (req: NextApiRequest, res: NextApiResponse
         eventTriggers: [eventTrigger],
         secret: null,
         enabled: true,
-        userId: result.userId ? result.userId : result.user.id,
-        teamId: result.userId ? undefined : result.teamId,
+        userId: result.userId ?? result.user.id,
+        teamId: result.teamId ?? undefined,
       },
     });
 

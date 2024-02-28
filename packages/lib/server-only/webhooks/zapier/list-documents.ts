@@ -2,7 +2,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 
 import { findDocuments } from '@documenso/lib/server-only/document/find-documents';
 import { getRecipientsForDocument } from '@documenso/lib/server-only/recipient/get-recipients-for-document';
-import type { Recipient, Webhook } from '@documenso/prisma/client';
+import type { Webhook } from '@documenso/prisma/client';
 
 import { getWebhooksByTeamId } from '../get-webhooks-by-team-id';
 import { getWebhooksByUserId } from '../get-webhooks-by-user-id';
@@ -14,23 +14,25 @@ export const listDocumentsHandler = async (req: NextApiRequest, res: NextApiResp
     const { user, userId, teamId } = await validateApiToken({ authorization });
 
     let allWebhooks: Webhook[] = [];
-    let documents;
-    let recipients: Recipient[] = [];
+
+    const documents = await findDocuments({
+      userId: userId ?? user.id,
+      teamId: teamId ?? undefined,
+      perPage: 1,
+    });
+
+    const recipients = await getRecipientsForDocument({
+      documentId: documents.data[0].id,
+      userId: userId ?? user.id,
+      teamId: teamId ?? undefined,
+    });
 
     if (userId) {
-      documents = await findDocuments({ userId });
       allWebhooks = await getWebhooksByUserId(userId);
-      recipients = await getRecipientsForDocument({ documentId: documents.data[0].id, userId });
     }
 
     if (teamId) {
-      documents = await findDocuments({ userId: user.id, teamId });
       allWebhooks = await getWebhooksByTeamId(teamId, user.id);
-      recipients = await getRecipientsForDocument({
-        documentId: documents.data[0].id,
-        userId: user.id,
-        teamId,
-      });
     }
 
     if (documents && documents.data.length > 0 && allWebhooks.length > 0 && recipients.length > 0) {

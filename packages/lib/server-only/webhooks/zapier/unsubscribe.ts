@@ -15,8 +15,8 @@ export const unsubscribeHandler = async (req: NextApiRequest, res: NextApiRespon
     const deletedWebhook = await prisma.webhook.delete({
       where: {
         id: webhookId,
-        userId: result.userId ? result.userId : result.user.id,
-        teamId: result.userId ? undefined : result.teamId,
+        userId: result.userId ?? result.user.id,
+        teamId: result.teamId ?? undefined,
       },
     });
 
