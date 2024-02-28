@@ -2,7 +2,7 @@ import { z } from 'zod';
 
 import { URL_REGEX } from '@documenso/lib/constants/url-regex';
 import { ZBaseTableSearchParamsSchema } from '@documenso/lib/types/search-params';
-import { DocumentStatus, FieldType, RecipientRole } from '@documenso/prisma/client';
+import { FieldType, RecipientRole } from '@documenso/prisma/client';
 
 export const ZFindDocumentAuditLogsQuerySchema = ZBaseTableSearchParamsSchema.extend({
   documentId: z.number().min(1),
@@ -46,6 +46,7 @@ export type TCreateDocumentMutationSchema = z.infer<typeof ZCreateDocumentMutati
 
 export const ZSetTitleForDocumentMutationSchema = z.object({
   documentId: z.number(),
+  teamId: z.number().min(1).optional(),
   title: z.string().min(1),
 });
 
@@ -53,6 +54,7 @@ export type TSetTitleForDocumentMutationSchema = z.infer<typeof ZSetTitleForDocu
 
 export const ZSetRecipientsForDocumentMutationSchema = z.object({
   documentId: z.number(),
+  teamId: z.number().min(1).optional(),
   recipients: z.array(
     z.object({
       id: z.number().nullish(),
@@ -89,6 +91,7 @@ export type TSetFieldsForDocumentMutationSchema = z.infer<
 
 export const ZSendDocumentMutationSchema = z.object({
   documentId: z.number(),
+  teamId: z.number().optional(),
   meta: z.object({
     subject: z.string(),
     message: z.string(),
@@ -122,7 +125,7 @@ export type TSendDocumentMutationSchema = z.infer<typeof ZSendDocumentMutationSc
 
 export const ZDeleteDraftDocumentMutationSchema = z.object({
   id: z.number().min(1),
-  status: z.nativeEnum(DocumentStatus),
+  teamId: z.number().min(1).optional(),
 });
 
 export type TDeleteDraftDocumentMutationSchema = z.infer<typeof ZDeleteDraftDocumentMutationSchema>;

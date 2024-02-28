@@ -3,6 +3,10 @@ import type { RequestMetadata } from '@documenso/lib/universal/extract-request-m
 import { createDocumentAuditLogData } from '@documenso/lib/utils/document-audit-logs';
 import { prisma } from '@documenso/prisma';
 import { ReadStatus } from '@documenso/prisma/client';
+import { WebhookTriggerEvents } from '@documenso/prisma/client';
+
+import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
+import { getDocumentAndRecipientByToken } from './get-document-by-token';
 
 export type ViewedDocumentOptions = {
   token: string;
@@ -50,5 +54,14 @@ export const viewedDocument = async ({ token, requestMetadata }: ViewedDocumentO
         },
       }),
     });
+  });
+
+  const document = await getDocumentAndRecipientByToken({ token });
+
+  await triggerWebhook({
+    event: WebhookTriggerEvents.DOCUMENT_OPENED,
+    data: document,
+    userId: document.userId,
+    teamId: document.teamId ?? undefined,
   });
 };

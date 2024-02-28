@@ -1,4 +1,5 @@
 import { adminRouter } from './admin-router/router';
+import { apiTokenRouter } from './api-token-router/router';
 import { authRouter } from './auth-router/router';
 import { cryptoRouter } from './crypto/router';
 import { documentRouter } from './document-router/router';
@@ -11,6 +12,7 @@ import { teamRouter } from './team-router/router';
 import { templateRouter } from './template-router/router';
 import { router } from './trpc';
 import { twoFactorAuthenticationRouter } from './two-factor-authentication-router/router';
+import { webhookRouter } from './webhook-router/router';
 
 export const appRouter = router({
   auth: authRouter,
@@ -21,9 +23,11 @@ export const appRouter = router({
   recipient: recipientRouter,
   admin: adminRouter,
   shareLink: shareLinkRouter,
+  apiToken: apiTokenRouter,
   singleplayer: singleplayerRouter,
   team: teamRouter,
   template: templateRouter,
+  webhook: webhookRouter,
   twoFactorAuthentication: twoFactorAuthenticationRouter,
 });
 

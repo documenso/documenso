@@ -5,6 +5,7 @@ import { RecipientRole } from '@documenso/prisma/client';
 export const ZAddSignersMutationSchema = z
   .object({
     documentId: z.number(),
+    teamId: z.number().optional(),
     signers: z.array(
       z.object({
         nativeId: z.number().optional(),
@@ -34,6 +35,7 @@ export const ZAddTemplateSignersMutationSchema = z
         nativeId: z.number().optional(),
         email: z.string().email().min(1),
         name: z.string(),
+        role: z.nativeEnum(RecipientRole),
       }),
     ),
   })
