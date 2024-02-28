@@ -1,35 +1,49 @@
 import { prisma } from '@documenso/prisma';
-import type { User, UserProfile } from '@documenso/prisma/client';
 
-import { getUserById } from './get-user-by-id';
+import { AppError, AppErrorCode } from '../../errors/app-error';
 
 export type UpdatePublicProfileOptions = {
-  id: User['id'];
-  profileURL: UserProfile['profileURL'];
+  userId: number;
+  url: string;
 };
 
-export const updatePublicProfile = async ({ id, profileURL }: UpdatePublicProfileOptions) => {
-  const user = await getUserById({ id });
-  // Existence check
-  await prisma.userProfile.findFirstOrThrow({
+export const updatePublicProfile = async ({ userId, url }: UpdatePublicProfileOptions) => {
+  const isUrlTaken = await prisma.user.findFirst({
+    select: {
+      id: true,
+    },
     where: {
-      profileURL: user.profileURL ?? undefined,
+      id: {
+        not: userId,
+      },
+      url,
     },
   });
 
-  return await prisma.$transaction(async (tx) => {
-    await tx.userProfile.create({
-      data: {
-        profileURL,
+  if (isUrlTaken) {
+    throw new AppError(
+      AppErrorCode.PROFILE_URL_TAKEN,
+      'Profile URL is taken',
+      'The profile URL is already taken',
+    );
+  }
+
+  return await prisma.user.update({
+    where: {
+      id: userId,
+    },
+    data: {
+      url,
+      userProfile: {
+        upsert: {
+          create: {
+            bio: '',
+          },
+          update: {
+            bio: '',
+          },
+        },
       },
-    });
-    await tx.userProfile.update({
-      where: {
-        profileURL: user.profileURL ?? undefined,
-      },
-      data: {
-        profileURL: profileURL,
-      },
-    });
+    },
   });
 };

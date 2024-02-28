@@ -43,9 +43,9 @@ model User {
   twoFactorSecret      String?
   twoFactorEnabled     Boolean              @default(false)
   twoFactorBackupCodes String?
-  profileURL           String?              @unique
+  url                  String?              @unique
 
-  UserProfile       UserProfile?           @relation(fields: [profileURL], references: [profileURL], onDelete: Cascade)
+  userProfile       UserProfile?
   VerificationToken VerificationToken[]
   ApiToken          ApiToken[]
   Template          Template[]
@@ -56,10 +56,10 @@ model User {
 }
 
 model UserProfile {
-  profileURL String  @id @unique
-  profileBio String?
+  id  Int     @id
+  bio String?
 
-  User User?
+  User User? @relation(fields: [id], references: [id], onDelete: Cascade)
 }
 
 enum UserSecurityAuditLogType {

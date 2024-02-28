@@ -17,7 +17,7 @@ export const ZUpdateProfileMutationSchema = z.object({
 });
 
 export const ZUpdatePublicProfileMutationSchema = z.object({
-  profileURL: z.string().min(1),
+  url: z.string().min(1),
 });
 
 export const ZUpdatePasswordMutationSchema = z.object({

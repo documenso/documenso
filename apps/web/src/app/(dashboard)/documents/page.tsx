@@ -4,7 +4,7 @@ import { getRequiredServerComponentSession } from '@documenso/lib/next-auth/get-
 
 import type { DocumentsPageViewProps } from './documents-page-view';
 import { DocumentsPageView } from './documents-page-view';
-import { PublicProfileIntro } from './username-claim/public-profile-intro';
+import { UpcomingProfileClaimTeaser } from './upcoming-profile-claim-teaser';
 
 export type DocumentsPageProps = {
   searchParams?: DocumentsPageViewProps['searchParams'];
@@ -18,7 +18,7 @@ export default async function DocumentsPage({ searchParams = {} }: DocumentsPage
   const { user } = await getRequiredServerComponentSession();
   return (
     <>
-      <PublicProfileIntro user={user} />
+      <UpcomingProfileClaimTeaser user={user} />
       <DocumentsPageView searchParams={searchParams} />
     </>
   );

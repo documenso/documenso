@@ -1,5 +1,6 @@
 import { TRPCError } from '@trpc/server';
 
+import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { deleteUser } from '@documenso/lib/server-only/user/delete-user';
 import { findUserSecurityAuditLogs } from '@documenso/lib/server-only/user/find-user-security-audit-logs';
 import { forgotPassword } from '@documenso/lib/server-only/user/forgot-password';
@@ -80,14 +81,20 @@ export const profileRouter = router({
     .input(ZUpdatePublicProfileMutationSchema)
     .mutation(async ({ input, ctx }) => {
       try {
-        const { profileURL } = input;
+        const { url } = input;
 
-        return await updatePublicProfile({
-          id: ctx.user.id,
-          profileURL,
+        const user = await updatePublicProfile({
+          userId: ctx.user.id,
+          url,
         });
+
+        return { success: true, url: user.url };
       } catch (err) {
-        console.error(err);
+        const error = AppError.parseError(err);
+
+        if (error.code !== AppErrorCode.UNKNOWN_ERROR) {
+          throw AppError.parseErrorToTRPCError(error);
+        }
 
         throw new TRPCError({
           code: 'BAD_REQUEST',
