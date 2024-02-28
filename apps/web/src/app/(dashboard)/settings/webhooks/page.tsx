@@ -58,7 +58,10 @@ export default function WebhookPage() {
                   <div className="truncate font-mono text-xs">{webhook.id}</div>
 
                   <div className="mt-1.5 flex items-center gap-4">
-                    <h5 className="max-w-[30rem] truncate text-sm sm:max-w-[18rem]">
+                    <h5
+                      className="max-w-[30rem] truncate text-sm sm:max-w-[18rem]"
+                      title={webhook.webhookUrl}
+                    >
                       {webhook.webhookUrl}
                     </h5>
 
