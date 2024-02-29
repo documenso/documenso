@@ -9,6 +9,7 @@ import Link from 'next/link';
 import LogoImage from '@documenso/assets/logo.png';
 import { useFeatureFlags } from '@documenso/lib/client-only/providers/feature-flag';
 import { cn } from '@documenso/ui/lib/utils';
+import { Button } from '@documenso/ui/primitives/button';
 
 import { HamburgerMenu } from './mobile-hamburger';
 import { MobileNavigation } from './mobile-navigation';
@@ -61,12 +62,18 @@ export const Header = ({ className, ...props }: HeaderProps) => {
         </Link>
 
         <Link
-          href="https://documenso-app-q0ns.onrender.com/signin"
+          href="https://app.tampon.xyz/signin?utm_source=marketing-header"
           target="_blank"
           className="text-muted-foreground hover:text-muted-foreground/80 text-sm font-semibold"
         >
           Sign in
         </Link>
+
+        <Button className="rounded-full" size="sm" asChild>
+          <Link href="https://app.tampon.xyz/signup?utm_source=marketing-header" target="_blank">
+            Sign up
+          </Link>
+        </Button>
       </div>
 
       <HamburgerMenu

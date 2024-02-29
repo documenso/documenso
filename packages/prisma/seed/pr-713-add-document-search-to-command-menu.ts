@@ -49,6 +49,7 @@ export const seedDatabase = async () => {
           email: u.email,
           password: hashSync(u.password),
           emailVerified: new Date(),
+          url: u.email,
         },
       }),
     ),

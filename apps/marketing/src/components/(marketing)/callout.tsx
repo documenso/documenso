@@ -40,9 +40,9 @@ export const Callout = ({ starCount }: CalloutProps) => {
         className="rounded-full bg-transparent backdrop-blur-sm"
         onClick={onSignUpClick}
       >
-        Get the Early Adopters Plan
-        <span className="bg-primary dark:text-background -mr-2.5 ml-2.5 rounded-full px-2 py-1.5 text-xs">
-          $30/mo. forever!
+        Claim Community Plan
+        <span className="bg-primary dark:text-background -mr-2.5 ml-2.5 rounded-full px-2 py-1.5 text-xs font-medium">
+          $30/mo
         </span>
       </Button>
 

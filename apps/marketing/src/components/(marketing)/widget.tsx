@@ -199,7 +199,7 @@ export const Widget = ({ className, children, ...props }: WidgetProps) => {
             className="bg-foreground/5 col-span-12 flex flex-col rounded-2xl p-6 lg:col-span-5"
             onSubmit={handleSubmit(onFormSubmit)}
           >
-            <h3 className="text-2xl font-semibold">Sign up for the early adopters plan</h3>
+            <h3 className="text-xl font-semibold">Sign up to Community Plan</h3>
             <p className="text-muted-foreground mt-2 text-xs">
               with Timur Ercan & Lucas Smith from MonTampon
             </p>
@@ -208,7 +208,7 @@ export const Widget = ({ className, children, ...props }: WidgetProps) => {
 
             <AnimatePresence>
               <motion.div key="email">
-                <label htmlFor="email" className="text-foreground text-lg font-semibold lg:text-xl">
+                <label htmlFor="email" className="text-foreground font-medium ">
                   What’s your email?
                 </label>
 
@@ -220,7 +220,7 @@ export const Widget = ({ className, children, ...props }: WidgetProps) => {
                       <Input
                         id="email"
                         type="email"
-                        placeholder=""
+                        placeholder="your@example.com"
                         className="bg-background w-full pr-16"
                         disabled={isSubmitting}
                         onKeyDown={(e) =>
@@ -265,11 +265,8 @@ export const Widget = ({ className, children, ...props }: WidgetProps) => {
                     transform: 'translateX(25%)',
                   }}
                 >
-                  <label
-                    htmlFor="name"
-                    className="text-foreground text-lg font-semibold lg:text-xl"
-                  >
-                    and your name?
+                  <label htmlFor="name" className="text-foreground font-medium ">
+                    And your name?
                   </label>
 
                   <Controller

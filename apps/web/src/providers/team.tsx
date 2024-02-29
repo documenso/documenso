@@ -12,7 +12,7 @@ interface TeamProviderProps {
 
 const TeamContext = createContext<Team | null>(null);
 
-export const useCurrentTeam = (): Team | null => {
+export const useCurrentTeam = () => {
   const context = useContext(TeamContext);
 
   if (!context) {
@@ -22,7 +22,7 @@ export const useCurrentTeam = (): Team | null => {
   return context;
 };
 
-export const useOptionalCurrentTeam = (): Team | null => {
+export const useOptionalCurrentTeam = () => {
   return useContext(TeamContext);
 };
 

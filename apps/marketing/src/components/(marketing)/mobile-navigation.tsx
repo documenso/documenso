@@ -42,8 +42,12 @@ export const MENU_NAVIGATION_LINKS = [
     text: 'Privacy',
   },
   {
-    href: 'https://documenso-app-q0ns.onrender.com/signin',
+    href: 'https://app.tampon.xyz/signin?utm_source=marketing-header',
     text: 'Sign in',
+  },
+  {
+    href: 'https://app.documenso.com/signup?utm_source=marketing-header',
+    text: 'Sign up',
   },
 ];
 

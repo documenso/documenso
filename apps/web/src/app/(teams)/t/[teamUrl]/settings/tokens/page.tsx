@@ -1,5 +1,6 @@
 import { DateTime } from 'luxon';
 
+import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { getRequiredServerComponentSession } from '@documenso/lib/next-auth/get-server-component-session';
 import { getTeamTokens } from '@documenso/lib/server-only/public-api/get-all-team-tokens';
 import { getTeamByUrl } from '@documenso/lib/server-only/team/get-team';
@@ -29,7 +30,15 @@ export default async function ApiTokensPage({ params }: ApiTokensPageProps) {
       <h3 className="text-2xl font-semibold">API Tokens</h3>
 
       <p className="text-muted-foreground mt-2 text-sm">
-        On this page, you can create new API tokens and manage the existing ones.
+        On this page, you can create new API tokens and manage the existing ones. <br />
+        You can view our swagger docs{' '}
+        <a
+          className="text-primary underline"
+          href={`${NEXT_PUBLIC_WEBAPP_URL()}/api/v1/openapi`}
+          target="_blank"
+        >
+          here
+        </a>
       </p>
 
       <hr className="my-4" />

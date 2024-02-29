@@ -70,6 +70,6 @@ export const getDocumentAndRecipientByToken = async ({
 
   return {
     ...result,
-    Recipient: result.Recipient[0],
+    Recipient: result.Recipient,
   };
 };
