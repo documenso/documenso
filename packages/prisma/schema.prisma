@@ -43,13 +43,9 @@ model User {
   twoFactorSecret      String?
   twoFactorEnabled     Boolean              @default(false)
   twoFactorBackupCodes String?
-<<<<<<< HEAD
-
-=======
   url                  String?              @unique
 
   userProfile       UserProfile?
->>>>>>> documenso-main
   VerificationToken VerificationToken[]
   ApiToken          ApiToken[]
   Template          Template[]

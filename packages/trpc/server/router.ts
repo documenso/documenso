@@ -27,12 +27,8 @@ export const appRouter = router({
   singleplayer: singleplayerRouter,
   team: teamRouter,
   template: templateRouter,
-<<<<<<< HEAD
-  twoFactorAuthentication: twoFactorAuthenticationRouter
-=======
   webhook: webhookRouter,
   twoFactorAuthentication: twoFactorAuthenticationRouter,
->>>>>>> documenso-main
 });
 
 export type AppRouter = typeof appRouter;
