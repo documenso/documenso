@@ -86,7 +86,7 @@ export const SinglePlayerModeSuccess = ({
       <p className="text-muted-foreground/60 mt-16 text-center text-sm">
         Create a{' '}
         <Link
-          href={`${NEXT_PUBLIC_WEBAPP_URL()}/signup`}
+          href={`${NEXT_PUBLIC_WEBAPP_URL()}/signup?utm_source=singleplayer`}
           target="_blank"
           className="text-documenso-700 hover:text-documenso-600 whitespace-nowrap"
         >

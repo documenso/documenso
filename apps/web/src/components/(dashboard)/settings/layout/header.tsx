@@ -1,15 +1,18 @@
 import React from 'react';
 
+import { cn } from '@documenso/ui/lib/utils';
+
 export type SettingsHeaderProps = {
   title: string;
   subtitle: string;
   children?: React.ReactNode;
+  className?: string;
 };
 
-export const SettingsHeader = ({ children, title, subtitle }: SettingsHeaderProps) => {
+export const SettingsHeader = ({ children, title, subtitle, className }: SettingsHeaderProps) => {
   return (
     <>
-      <div className="flex flex-row items-center justify-between">
+      <div className={cn('flex flex-row items-center justify-between', className)}>
         <div>
           <h3 className="text-lg font-medium">{title}</h3>
 
