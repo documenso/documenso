@@ -15,8 +15,11 @@ export default function SettingsSecurityActivityPage() {
       <SettingsHeader
         title="Security activity"
         subtitle="View all recent security activity related to your account."
-        titleChildren={<ActivityPageBackButton />}
-      />
+      >
+        <div>
+          <ActivityPageBackButton />
+        </div>
+      </SettingsHeader>
 
       <hr className="my-4" />
 

@@ -6,17 +6,10 @@ export type SettingsHeaderProps = {
   title: string;
   subtitle: string;
   children?: React.ReactNode;
-  titleChildren?: React.ReactNode;
   className?: string;
 };
 
-export const SettingsHeader = ({
-  children,
-  title,
-  subtitle,
-  titleChildren,
-  className,
-}: SettingsHeaderProps) => {
+export const SettingsHeader = ({ children, title, subtitle, className }: SettingsHeaderProps) => {
   return (
     <>
       <div className={cn('flex flex-row items-center justify-between', className)}>
@@ -25,8 +18,6 @@ export const SettingsHeader = ({
 
           <p className="text-muted-foreground text-sm md:mt-2">{subtitle}</p>
         </div>
-
-        <div>{titleChildren}</div>
 
         {children}
       </div>
