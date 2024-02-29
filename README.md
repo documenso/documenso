@@ -107,7 +107,7 @@ Contact us if you are interested in our Enterprise plan for large organizations 
 
 To run Documenso locally, you will need
 
-- Node.js
+- Node.js (<b>v18 or above</b>)
 - Postgres SQL Database
 - Docker (optional)
 
