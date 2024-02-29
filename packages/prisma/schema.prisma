@@ -50,6 +50,7 @@ model User {
   ApiToken          ApiToken[]
   Template          Template[]
   securityAuditLogs UserSecurityAuditLog[]
+  Webhooks          Webhook[]
   siteSettings      SiteSettings[]
 
   @@index([email])
@@ -103,6 +104,48 @@ model VerificationToken {
   createdAt  DateTime @default(now())
   userId     Int
   user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+enum WebhookTriggerEvents {
+  DOCUMENT_CREATED
+  DOCUMENT_SENT
+  DOCUMENT_OPENED
+  DOCUMENT_SIGNED
+  DOCUMENT_COMPLETED
+}
+
+model Webhook {
+  id            String                 @id @default(cuid())
+  webhookUrl    String
+  eventTriggers WebhookTriggerEvents[]
+  secret        String?
+  enabled       Boolean                @default(true)
+  createdAt     DateTime               @default(now())
+  updatedAt     DateTime               @default(now()) @updatedAt
+  userId        Int
+  User          User                   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  teamId        Int?
+  team          Team?                  @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  WebhookCall   WebhookCall[]
+}
+
+enum WebhookCallStatus {
+  SUCCESS
+  FAILED
+}
+
+model WebhookCall {
+  id              String               @id @default(cuid())
+  status          WebhookCallStatus
+  url             String
+  event           WebhookTriggerEvents
+  requestBody     Json
+  responseCode    Int
+  responseHeaders Json?
+  responseBody    Json?
+  createdAt       DateTime             @default(now())
+  webhookId       String
+  webhook         Webhook              @relation(fields: [webhookId], references: [id], onDelete: Cascade)
 }
 
 enum ApiTokenAlgorithm {
@@ -386,6 +429,7 @@ model Team {
   document  Document[]
   templates Template[]
   ApiToken  ApiToken[]
+  Webhook   Webhook[]
 }
 
 model TeamPending {

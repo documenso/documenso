@@ -10,12 +10,14 @@ import { createDocumentAuditLogData } from '@documenso/lib/utils/document-audit-
 import { renderCustomEmailTemplate } from '@documenso/lib/utils/render-custom-email-template';
 import { prisma } from '@documenso/prisma';
 import { DocumentStatus, RecipientRole, SendStatus } from '@documenso/prisma/client';
+import { WebhookTriggerEvents } from '@documenso/prisma/client';
 
 import { NEXT_PUBLIC_WEBAPP_URL } from '../../constants/app';
 import {
   RECIPIENT_ROLES_DESCRIPTION,
   RECIPIENT_ROLE_TO_EMAIL_TYPE,
 } from '../../constants/recipient-roles';
+import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
 
 export type SendDocumentOptions = {
   documentId: number;
@@ -180,7 +182,17 @@ export const sendDocument = async ({
       data: {
         status: DocumentStatus.PENDING,
       },
+      include: {
+        Recipient: true,
+      },
     });
+  });
+
+  await triggerWebhook({
+    event: WebhookTriggerEvents.DOCUMENT_SENT,
+    data: updatedDocument,
+    userId,
+    teamId,
   });
 
   return updatedDocument;
