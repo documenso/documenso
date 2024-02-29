@@ -12,7 +12,15 @@ export const getSignaturesByDocumentId = async ({ id }: GetSignaturesByDocumentI
       },
     },
     include: {
-      Recipient: true,
+      Recipient: {
+        include: {
+          Document: {
+            include: {
+              auditLogs: true,
+            },
+          },
+        },
+      },
     },
   });
 };

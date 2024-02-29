@@ -4,6 +4,7 @@ import React from 'react';
 
 import Link from 'next/link';
 
+import { groupBy } from 'lodash';
 import { CheckCircle, Download, Edit, EyeIcon, Pencil } from 'lucide-react';
 import { useSession } from 'next-auth/react';
 import { PDFDocument, rgb } from 'pdf-lib';
@@ -70,64 +71,163 @@ export const DataTableActionButton = ({ row, team }: DataTableActionButtonProps)
       const signatures = await trpcClient.document.getSignaturesByDocumentId.query({
         id: row.id,
       });
+      const auditLogs = groupBy(signatures[0]?.Recipient?.Document?.auditLogs, 'type');
+
       const bytes = await getFile(documentData);
-      const signImg = signatures[0].signatureImageAsBase64;
-
       const pdfDoc = await PDFDocument.load(bytes);
-      const pages = pdfDoc.getPages();
-      const page = pdfDoc.addPage();
-      const { width, height } = page.getSize();
-      const fontSize = 12;
-      page.drawRectangle({
-        x: width * 0.05,
-        y: height * 0.05,
-        width: width * 0.9,
-        height: height * 0.85,
-        borderColor: rgb(229 / 255, 229 / 255, 229 / 255),
-        borderWidth: 1.5,
-      });
-      page.drawRectangle({
-        x: width * 0.05 + 1.5,
-        y: height * 0.05 + 1.5,
-        width: width * 0.9 - 3,
-        height: height * 0.85 - 3,
-        borderColor: rgb(162 / 255, 231 / 255, 113 / 255),
-        borderWidth: 1.5,
-      });
+      let index = 0;
+      for (const signature of signatures) {
+        // signatures.forEach(async (signature, index) => {
+        if (index % 4 == 0) {
+          const page = pdfDoc.addPage();
+          const { width, height } = page.getSize();
+          const tableStyles = {
+            x: width * 0.05,
+            y: height * 0.08,
+            width: width * 0.9,
+            height: height * 0.85,
+          };
+          const fontSize = 10;
+          page.drawRectangle({
+            x: tableStyles.x,
+            y: tableStyles.y,
+            width: tableStyles.width,
+            height: tableStyles.height,
+            borderColor: rgb(229 / 255, 229 / 255, 229 / 255),
+            borderWidth: 1.5,
+          });
+          page.drawRectangle({
+            x: tableStyles.x + 1.5,
+            y: tableStyles.y + 1.5,
+            width: tableStyles.width - 3,
+            height: tableStyles.height - 3,
+            borderColor: rgb(162 / 255, 231 / 255, 113 / 255),
+            borderWidth: 1.5,
+          });
+          page.drawText('Signing Certificate', {
+            x: width * 0.05,
+            y: height * 0.95,
+            size: fontSize + 4,
+          });
 
-      // if(signImg) {
-      //   const pngImage = await pdfDoc.embedPng(signImg);
-      //   page.drawImage(pngImage, {
-      //     width: pngImage.width,
-      //     height: pngImage.height,
-      //   });
-      // }
-      page.drawText('Signing Certificate', {
-        x: width * 0.05,
-        y: height * 0.93,
-        size: fontSize + 4,
-      });
-      page.drawText('Signer Events', {
-        x: width * 0.07,
-        y: height * 0.87,
-        size: fontSize,
-      });
-      page.drawText('Signature', {
-        x: (width - 50) / 3 + width * 0.07,
-        y: height * 0.87,
-        size: fontSize,
-      });
-      page.drawText('Timestamp', {
-        x: ((width - 50) * 2) / 3 + width * 0.07,
-        y: height * 0.87,
-        size: fontSize,
-      });
-      page.drawLine({
-        start: { x: width * 0.05, y: height * 0.85 },
-        end: { x: width * 0.95, y: height * 0.85 },
-        thickness: 1.5,
-        color: rgb(229 / 255, 229 / 255, 229 / 255),
-      });
+          const tableTitlePos = {
+            x: width * 0.07,
+            y: height * 0.9,
+          };
+          const titleCellHeight = height * 0.04;
+          const intialCellPos = {
+            x: tableStyles.x,
+            y: tableTitlePos.y - titleCellHeight / 2,
+          };
+          const cellIncrement = {
+            row: tableStyles.width / 3.0,
+            col: (tableStyles.height - titleCellHeight) / 4.0,
+          };
+
+          page.drawText('Signer Events', {
+            x: tableTitlePos.x,
+            y: tableTitlePos.y,
+            size: fontSize,
+          });
+          page.drawText('Signature', {
+            x: cellIncrement.row + tableTitlePos.x,
+            y: tableTitlePos.y,
+            size: fontSize,
+          });
+          page.drawText('Timestamp', {
+            x: cellIncrement.row * 2 + width * 0.07,
+            y: tableTitlePos.y,
+            size: fontSize,
+          });
+
+          page.drawLine({
+            start: { x: intialCellPos.x, y: intialCellPos.y },
+            end: { x: width * 0.95, y: intialCellPos.y },
+            thickness: 1.5,
+            color: rgb(229 / 255, 229 / 255, 229 / 255),
+          });
+          page.drawLine({
+            start: { x: intialCellPos.x, y: intialCellPos.y - cellIncrement.col },
+            end: { x: width * 0.95, y: intialCellPos.y - cellIncrement.col },
+            thickness: 1.5,
+            color: rgb(229 / 255, 229 / 255, 229 / 255),
+          });
+          page.drawLine({
+            start: { x: intialCellPos.x, y: intialCellPos.y - cellIncrement.col * 2 },
+            end: { x: width * 0.95, y: intialCellPos.y - cellIncrement.col * 2 },
+            thickness: 1.5,
+            color: rgb(229 / 255, 229 / 255, 229 / 255),
+          });
+          page.drawLine({
+            start: { x: intialCellPos.x, y: intialCellPos.y - cellIncrement.col * 3 },
+            end: { x: width * 0.95, y: intialCellPos.y - cellIncrement.col * 3 },
+            thickness: 1.5,
+            color: rgb(229 / 255, 229 / 255, 229 / 255),
+          });
+          const nextLineIndent = 20;
+          page.drawText(
+            `${signature.Recipient.name} \n${signature.Recipient.email} \nSecurity Level: Email, \nAccount Authentication \n(required), Logged in`,
+            {
+              x: tableTitlePos.x,
+              y: intialCellPos.y - nextLineIndent,
+              size: fontSize,
+              maxWidth: width * 0.9 * 0.3,
+            },
+          );
+          const signImg = signature?.signatureImageAsBase64;
+          const signatureDim = {
+            width: cellIncrement.row / 2,
+            height: cellIncrement.col / 4,
+          };
+          if (signImg) {
+            const pngImage = await pdfDoc.embedPng(signImg);
+            const scaledImage = pngImage.scale(signatureDim.width / pngImage.width);
+            page.drawImage(pngImage, {
+              width: scaledImage.width,
+              height: scaledImage.height,
+              x: tableTitlePos.x + cellIncrement.row,
+              y: intialCellPos.y - signatureDim.height,
+            });
+          }
+          page.drawRectangle({
+            x: tableTitlePos.x + cellIncrement.row,
+            y: intialCellPos.y - signatureDim.height - nextLineIndent * 0.5,
+            width: signatureDim.width,
+            height: signatureDim.height,
+            borderColor: rgb(162 / 255, 231 / 255, 113 / 255),
+            borderWidth: 1.5,
+          });
+          page.drawText(
+            `Singature Id:${signature.id} \nIP Address: ${auditLogs['DOCUMENT_FIELD_INSERTED'].find(
+              (log) => (log.email = signature.Recipient.email),
+            )} \nSigning Reason: ${signature.Recipient.role}`,
+            {
+              x: tableTitlePos.x + cellIncrement.row,
+              y: intialCellPos.y - nextLineIndent * 1.5 - signatureDim.height,
+              size: fontSize,
+              maxWidth: width * 0.9 * 0.3,
+            },
+          );
+          page.drawText(
+            `Sent: ${auditLogs.DOCUMENT_SENT[0].createdAt}\nViewed: ${
+              auditLogs.DOCUMENT_OPENED.find((log) => log.email == signature.Recipient.email)
+                ?.createdAt
+            } \nSigned: ${
+              auditLogs.DOCUMENT_FIELD_INSERTED.find(
+                (log) =>
+                  log.email == signature.Recipient.email && log?.data?.field?.type == 'SIGNATURE',
+              )?.createdAt
+            }`,
+            {
+              x: tableTitlePos.x + cellIncrement.row * 2,
+              y: intialCellPos.y - nextLineIndent,
+              size: fontSize,
+              maxWidth: width * 0.9 * 0.3,
+            },
+          );
+        }
+        index++;
+      }
 
       const pdfBytes = await pdfDoc.save();
       const blob = new Blob([pdfBytes], {
