@@ -43,7 +43,7 @@ model User {
   twoFactorSecret      String?
   twoFactorEnabled     Boolean                @default(false)
   twoFactorBackupCodes String?
-  
+
   VerificationToken VerificationToken[]
   ApiToken          ApiToken[]
   Template          Template[]

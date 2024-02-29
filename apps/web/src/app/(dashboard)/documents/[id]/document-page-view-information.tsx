@@ -22,7 +22,7 @@ export const DocumentPageViewInformation = ({
 }: DocumentPageViewInformationProps) => {
   const isMounted = useIsMounted();
 
-  const { locale } = useLocale();
+  const locale = useLocale();
 
   const documentInformation = useMemo(() => {
     let createdValue = DateTime.fromJSDate(document.createdAt).toFormat('MMMM d, yyyy');
