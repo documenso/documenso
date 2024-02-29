@@ -7,7 +7,7 @@ import { getRequiredServerComponentSession } from '@documenso/lib/next-auth/get-
 import { getDocumentById } from '@documenso/lib/server-only/document/get-document-by-id';
 import { getRecipientsForDocument } from '@documenso/lib/server-only/recipient/get-recipients-for-document';
 import { formatDocumentsPath } from '@documenso/lib/utils/teams';
-import type { Recipient, Team } from '@documenso/prisma/client';
+import { DocumentStatus, type Recipient, type Team } from '@documenso/prisma/client';
 import { Button } from '@documenso/ui/primitives/button';
 import { Card } from '@documenso/ui/primitives/card';
 
@@ -108,17 +108,19 @@ export const DocumentLogsPageView = async ({ params, team }: DocumentLogsPageVie
           {document.title}
         </h1>
 
-        <div className="mt-4 flex w-full flex-row sm:mt-0 sm:w-auto sm:self-end">
-          <Button variant="outline" className="mr-2 w-full sm:w-auto">
-            <DownloadIcon className="mr-1.5 h-4 w-4" />
-            Download certificate
-          </Button>
+        {document.status === DocumentStatus.COMPLETED && (
+          <div className="mt-4 flex w-full flex-row sm:mt-0 sm:w-auto sm:self-end">
+            <Button variant="outline" className="mr-2 w-full sm:w-auto">
+              <DownloadIcon className="mr-1.5 h-4 w-4" />
+              Download certificate
+            </Button>
 
-          <Button className="w-full sm:w-auto">
-            <DownloadIcon className="mr-1.5 h-4 w-4" />
-            Download PDF
-          </Button>
-        </div>
+            <Button className="w-full sm:w-auto">
+              <DownloadIcon className="mr-1.5 h-4 w-4" />
+              Download PDF
+            </Button>
+          </div>
+        )}
       </div>
 
       <section className="mt-6">
