@@ -47,11 +47,11 @@ export const MENU_NAVIGATION_LINKS = [
     text: 'Privacy',
   },
   {
-    href: 'https://app.documenso.com/signin',
+    href: 'https://app.documenso.com/signin?utm_source=marketing-header',
     text: 'Sign in',
   },
   {
-    href: 'https://app.documenso.com/signup',
+    href: 'https://app.documenso.com/signup?utm_source=marketing-header',
     text: 'Sign up',
   },
 ];
@@ -108,13 +108,7 @@ export const MobileNavigation = ({ isMenuOpen, onMenuOpenChange }: MobileNavigat
                 onClick={() => handleMenuItemClick()}
                 target={target}
               >
-                {href === 'https://app.documenso.com/signup' ? (
-                  <span className="bg-primary dark:text-background rounded-full px-3 py-2 text-xl">
-                    {text}
-                  </span>
-                ) : (
-                  text
-                )}
+                {text}
               </Link>
             </motion.div>
           ))}

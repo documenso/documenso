@@ -23,8 +23,8 @@ export const updatePublicProfile = async ({ userId, url }: UpdatePublicProfileOp
   if (isUrlTaken) {
     throw new AppError(
       AppErrorCode.PROFILE_URL_TAKEN,
-      'Profile URL is taken',
-      'The profile URL is already taken',
+      'Profile username is taken',
+      'The profile username is already taken',
     );
   }
 

@@ -9,6 +9,7 @@ import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
 import profileClaimTeaserImage from '@documenso/assets/images/profile-claim-teaser.png';
+import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import type { User } from '@documenso/prisma/client';
 import { trpc } from '@documenso/trpc/react';
@@ -35,7 +36,14 @@ import { useToast } from '@documenso/ui/primitives/use-toast';
 import { UserProfileSkeleton } from '../ui/user-profile-skeleton';
 
 export const ZClaimPublicProfileFormSchema = z.object({
-  url: z.string().trim().min(1, { message: 'Please enter a valid URL slug.' }),
+  url: z
+    .string()
+    .trim()
+    .toLowerCase()
+    .min(1, { message: 'Please enter a valid username.' })
+    .regex(/^[a-z0-9-]+$/, {
+      message: 'Username can only container alphanumeric characters and dashes.',
+    }),
 });
 
 export type TClaimPublicProfileFormSchema = z.infer<typeof ZClaimPublicProfileFormSchema>;
@@ -56,6 +64,8 @@ export const ClaimPublicProfileDialogForm = ({
   const { toast } = useToast();
 
   const [claimed, setClaimed] = useState(false);
+
+  const baseUrl = new URL(NEXT_PUBLIC_WEBAPP_URL() ?? 'http://localhost:3000');
 
   const form = useForm<TClaimPublicProfileFormSchema>({
     values: {
@@ -82,12 +92,17 @@ export const ClaimPublicProfileDialogForm = ({
       if (error.code === AppErrorCode.PROFILE_URL_TAKEN) {
         form.setError('url', {
           type: 'manual',
-          message: 'This URL is already taken',
+          message: 'This username is already taken',
+        });
+      } else if (error.code === AppErrorCode.PREMIUM_PROFILE_URL) {
+        form.setError('url', {
+          type: 'manual',
+          message: error.message,
         });
       } else if (error.code !== AppErrorCode.UNKNOWN_ERROR) {
         toast({
           title: 'An error occurred',
-          description: err.message,
+          description: error.userMessage ?? error.message,
           variant: 'destructive',
         });
       } else {
@@ -131,7 +146,7 @@ export const ClaimPublicProfileDialogForm = ({
                     name="url"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Public profile URL</FormLabel>
+                        <FormLabel>Public profile username</FormLabel>
 
                         <FormControl>
                           <Input type="text" className="mb-2 mt-2" {...field} />
@@ -140,7 +155,7 @@ export const ClaimPublicProfileDialogForm = ({
                         <FormMessage />
 
                         <div className="bg-muted/50 text-muted-foreground mt-2 inline-block truncate rounded-md px-2 py-1 text-sm">
-                          documenso.com/u/{field.value || '<username>'}
+                          {baseUrl.host}/u/{field.value || '<username>'}
                         </div>
                       </FormItem>
                     )}

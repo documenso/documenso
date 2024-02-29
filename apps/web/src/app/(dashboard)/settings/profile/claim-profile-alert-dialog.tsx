@@ -29,7 +29,7 @@ export const ClaimProfileAlertDialog = ({ className, user }: ClaimProfileAlertDi
         <div>
           <AlertTitle>Claim your profile</AlertTitle>
           <AlertDescription className="mr-2">
-            Profiles are coming soon! Claim your profile URL now to reserve your corner of the
+            Profiles are coming soon! Claim your profile username now to reserve your corner of the
             signing revolution.
           </AlertDescription>
         </div>

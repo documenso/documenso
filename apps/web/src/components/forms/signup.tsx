@@ -61,7 +61,7 @@ export const SignUpForm = ({ className, initialEmail, isGoogleSSOEnabled }: Sign
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  const src = searchParams?.get('src') ?? null;
+  const utmSrc = searchParams?.get('utm_source') ?? null;
 
   const form = useForm<TSignUpFormSchema>({
     values: {
@@ -93,7 +93,7 @@ export const SignUpForm = ({ className, initialEmail, isGoogleSSOEnabled }: Sign
       analytics.capture('App: User Sign Up', {
         email,
         timestamp: new Date().toISOString(),
-        custom_campaign_params: { src },
+        custom_campaign_params: { src: utmSrc },
       });
     } catch (err) {
       if (err instanceof TRPCClientError && err.data?.code === 'BAD_REQUEST') {

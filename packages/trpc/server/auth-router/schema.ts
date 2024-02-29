@@ -21,6 +21,7 @@ export const ZSignUpMutationSchema = z.object({
   email: z.string().email(),
   password: ZPasswordSchema,
   signature: z.string().min(1, { message: 'A signature is required.' }),
+  url: z.string().optional(),
 });
 
 export type TSignUpMutationSchema = z.infer<typeof ZSignUpMutationSchema>;

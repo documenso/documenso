@@ -116,7 +116,7 @@ export const Hero = ({ className, ...props }: HeroProps) => {
           >
             Claim Community Plan
             <span className="bg-primary dark:text-background -mr-2.5 ml-2.5 rounded-full px-2 py-1.5 text-xs font-medium">
-              -80%
+              $30/mo
             </span>
           </Button>
 
@@ -191,32 +191,41 @@ export const Hero = ({ className, ...props }: HeroProps) => {
           <Widget className="mt-12">
             <strong>Documenso Supporter Pledge</strong>
             <p className="w-full max-w-[70ch]">
-              Our mission is to create an open signing infrastructure that empowers the world. We
-              believe openness and cooperation are the way every business should be conducted.
+              Our mission is to create an open signing infrastructure that empowers the world,
+              enabling businesses to embrace openness, cooperation, and transparency. We believe
+              that signing, as a fundamental act, should embody these values. By offering an
+              open-source signing solution, we aim to make document signing accessible, transparent,
+              and trustworthy.
             </p>
 
             <p className="w-full max-w-[70ch]">
-              By creating an open source signing solution we want to bring these values to
-              businesses' most fundamental act: signing. Document Signing should be open and
-              transparent, as should all trust based products.
+              Through our platform, called Documenso, we strive to earn your trust by allowing
+              self-hosting and providing complete visibility into its inner workings. We value
+              inclusivity and foster an environment where diverse perspectives and contributions are
+              welcomed, even though we may not implement them all.
             </p>
 
             <p className="w-full max-w-[70ch]">
-              We aim to earn this trust by enabling everyone to self-host Documenso and inspect it’s
-              inner workings. We openly share our source, knowledge, and progress while creating
-              Documenso.
+              At Documenso, we envision a web-enabled future for business and contracts, and we are
+              committed to being the leading provider of open signing infrastructure. By combining
+              exceptional product design with open-source principles, we aim to deliver a robust and
+              well-designed application that exceeds your expectations.
             </p>
 
             <p className="w-full max-w-[70ch]">
-              Exceptional products are the results of exceptional communities and we strive to
-              create an inclusive, creative environment, open to all who choose to support our
-              mission. We value the inputs, contributions, and perspectives of everyone in our
-              community, even though we can't apply them all.
+              We understand that exceptional products are born from exceptional communities, and we
+              invite you to join our open-source community. Your contributions, whether technical or
+              non-technical, will help shape the future of signing. Together, we can create a better
+              future for everyone.
             </p>
 
             <p className="w-full max-w-[70ch]">
-              We are building the next generation of trust software and community the way it’s meant
-              to be: Beautifully designed and open for all to join.
+              Today we invite you to join us on this journey: By signing this mission statement you
+              signal your support of Documenso's mission{' '}
+              <span className="bg-primary text-black">
+                (in a non-legally binding, but heartfelt way)
+              </span>{' '}
+              and lock in the community plan for forever, including everything we build this year.
             </p>
 
             <div className="flex h-24 items-center">

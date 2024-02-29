@@ -1,20 +1,21 @@
 'use client';
 
-import { File, User2 } from 'lucide-react';
+import Image from 'next/image';
 
+import { File } from 'lucide-react';
+
+import timurImage from '@documenso/assets/images/timur.png';
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
-import type { User } from '@documenso/prisma/client';
 import { VerifiedIcon } from '@documenso/ui/icons/verified';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
 
-export type UserProfileSkeletonProps = {
+export type UserProfileTimurProps = {
   className?: string;
-  user: Pick<User, 'name' | 'url'>;
   rows?: number;
 };
 
-export const UserProfileSkeleton = ({ className, user, rows = 2 }: UserProfileSkeletonProps) => {
+export const UserProfileTimur = ({ className, rows = 2 }: UserProfileTimurProps) => {
   const baseUrl = new URL(NEXT_PUBLIC_WEBAPP_URL() ?? 'http://localhost:3000');
 
   return (
@@ -24,28 +25,30 @@ export const UserProfileSkeleton = ({ className, user, rows = 2 }: UserProfileSk
         className,
       )}
     >
-      <div className="border-border bg-background text-muted-foreground inline-flex items-center rounded-md border px-2.5 py-1.5 text-sm">
-        <span>{baseUrl.host}/u/</span>
-        <span className="inline-block max-w-[8rem] truncate lowercase">{user.url}</span>
+      <div className="border-border bg-background text-muted-foreground inline-block rounded-md border px-2.5 py-1.5 text-sm">
+        {baseUrl.host}/u/timur
       </div>
 
       <div className="mt-4">
-        <div className="bg-primary/10 rounded-full p-1.5">
-          <div className="bg-background flex h-20 w-20 items-center justify-center rounded-full border-2">
-            <User2 className="h-12 w-12 text-[hsl(228,10%,90%)]" />
-          </div>
-        </div>
+        <Image
+          src={timurImage}
+          className="h-20 w-20 rounded-full"
+          alt="image of timur ercan founder of documenso"
+        />
       </div>
 
       <div className="mt-6">
         <div className="flex items-center justify-center gap-x-2">
-          <h2 className="max-w-[12rem] truncate text-2xl font-semibold">{user.name}</h2>
+          <h2 className="text-2xl font-semibold">Timur Ercan</h2>
 
           <VerifiedIcon className="text-primary h-8 w-8" />
         </div>
 
-        <div className="dark:bg-foreground/30 mx-auto mt-4 h-2 w-52 rounded-full bg-neutral-300" />
-        <div className="dark:bg-foreground/20 mx-auto mt-2 h-2 w-36 rounded-full bg-neutral-200" />
+        <p className="text-muted-foreground mt-4 max-w-[40ch] text-center text-sm">Hey I’m Timur</p>
+
+        <p className="text-muted-foreground mt-1 max-w-[40ch] text-center text-sm">
+          Pick any of the following agreements below and start signing to get started
+        </p>
       </div>
 
       <div className="mt-8 w-full">

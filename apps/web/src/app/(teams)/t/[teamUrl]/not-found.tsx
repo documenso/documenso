@@ -19,7 +19,7 @@ export default function NotFound() {
         </p>
 
         <div className="mt-6 flex gap-x-2.5 gap-y-4 md:items-center">
-          <Button variant="secondary" asChild className="w-32">
+          <Button asChild className="w-32">
             <Link href="/settings/teams">
               <ChevronLeft className="mr-2 h-4 w-4" />
               Go Back

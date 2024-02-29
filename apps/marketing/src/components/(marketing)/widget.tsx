@@ -208,7 +208,7 @@ export const Widget = ({ className, children, ...props }: WidgetProps) => {
 
             <AnimatePresence>
               <motion.div key="email">
-                <label htmlFor="email" className="text-foreground text-lg font-semibold lg:text-xl">
+                <label htmlFor="email" className="text-foreground font-medium ">
                   What’s your email?
                 </label>
 
@@ -265,11 +265,8 @@ export const Widget = ({ className, children, ...props }: WidgetProps) => {
                     transform: 'translateX(25%)',
                   }}
                 >
-                  <label
-                    htmlFor="name"
-                    className="text-foreground text-lg font-semibold lg:text-xl"
-                  >
-                    and your name?
+                  <label htmlFor="name" className="text-foreground font-medium ">
+                    And your name?
                   </label>
 
                   <Controller

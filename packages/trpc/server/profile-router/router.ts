@@ -1,6 +1,8 @@
 import { TRPCError } from '@trpc/server';
 
+import { IS_BILLING_ENABLED } from '@documenso/lib/constants/app';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
+import { getSubscriptionsByUserId } from '@documenso/lib/server-only/subscription/get-subscriptions-by-user-id';
 import { deleteUser } from '@documenso/lib/server-only/user/delete-user';
 import { findUserSecurityAuditLogs } from '@documenso/lib/server-only/user/find-user-security-audit-logs';
 import { forgotPassword } from '@documenso/lib/server-only/user/forgot-password';
@@ -11,6 +13,7 @@ import { updatePassword } from '@documenso/lib/server-only/user/update-password'
 import { updateProfile } from '@documenso/lib/server-only/user/update-profile';
 import { updatePublicProfile } from '@documenso/lib/server-only/user/update-public-profile';
 import { extractNextApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
+import { SubscriptionStatus } from '@documenso/prisma/client';
 
 import { adminProcedure, authenticatedProcedure, procedure, router } from '../trpc';
 import {
@@ -82,6 +85,21 @@ export const profileRouter = router({
     .mutation(async ({ input, ctx }) => {
       try {
         const { url } = input;
+
+        if (IS_BILLING_ENABLED() && url.length <= 6) {
+          const subscriptions = await getSubscriptionsByUserId({
+            userId: ctx.user.id,
+          }).then((subscriptions) =>
+            subscriptions.filter((s) => s.status === SubscriptionStatus.ACTIVE),
+          );
+
+          if (subscriptions.length === 0) {
+            throw new AppError(
+              AppErrorCode.PREMIUM_PROFILE_URL,
+              'Only subscribers can have a username shorter than 6 characters',
+            );
+          }
+        }
 
         const user = await updatePublicProfile({
           userId: ctx.user.id,
