@@ -191,7 +191,7 @@ export const SinglePlayerClient = () => {
         <p className="text-foreground mx-auto mt-4 max-w-[50ch] text-lg leading-normal">
           Create a{' '}
           <Link
-            href={`${NEXT_PUBLIC_WEBAPP_URL()}/signup`}
+            href={`${NEXT_PUBLIC_WEBAPP_URL()}/signup?utm_source=singleplayer`}
             target="_blank"
             className="hover:text-foreground/80 font-semibold transition-colors"
           >
