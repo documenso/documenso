@@ -21,6 +21,7 @@ export const getSignaturesByDocumentId = async ({ id }: GetSignaturesByDocumentI
           },
         },
       },
+      Field: true,
     },
   });
 };
