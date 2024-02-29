@@ -25,6 +25,7 @@ export const LOCAL_FEATURE_FLAGS: Record<string, boolean> = {
   app_teams: true,
   app_document_page_view_history_sheet: false,
   marketing_header_single_player_mode: false,
+  marketing_profiles_announcement_bar: true,
 } as const;
 
 /**

@@ -34,6 +34,7 @@ export const manualLogin = async ({
 };
 
 export const manualSignout = async ({ page }: ManualLoginOptions) => {
+  await page.waitForTimeout(1000);
   await page.getByTestId('menu-switcher').click();
   await page.getByRole('menuitem', { name: 'Sign Out' }).click();
   await page.waitForURL(`${WEBAPP_BASE_URL}/signin`);

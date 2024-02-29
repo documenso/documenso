@@ -83,7 +83,11 @@ export const PricingTable = ({ className, ...props }: PricingTableProps) => {
           </p>
 
           <Button className="rounded-full text-base" asChild>
-            <Link href={`${NEXT_PUBLIC_WEBAPP_URL()}/signup`} target="_blank" className="mt-6">
+            <Link
+              href={`${NEXT_PUBLIC_WEBAPP_URL()}/signup?utm_source=pricing-free-plan`}
+              target="_blank"
+              className="mt-6"
+            >
               Signup Now
             </Link>
           </Button>
@@ -114,7 +118,10 @@ export const PricingTable = ({ className, ...props }: PricingTableProps) => {
           </p>
 
           <Button className="mt-6 rounded-full text-base" asChild>
-            <Link href={`${NEXT_PUBLIC_WEBAPP_URL()}/signup`} target="_blank">
+            <Link
+              href={`${NEXT_PUBLIC_WEBAPP_URL()}/signup?utm_source=pricing-community`}
+              target="_blank"
+            >
               Signup Now
             </Link>
           </Button>

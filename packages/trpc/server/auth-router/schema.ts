@@ -21,6 +21,15 @@ export const ZSignUpMutationSchema = z.object({
   email: z.string().email(),
   password: ZPasswordSchema,
   signature: z.string().min(1, { message: 'A signature is required.' }),
+  url: z
+    .string()
+    .trim()
+    .toLowerCase()
+    .min(1)
+    .regex(/^[a-z0-9-]+$/, {
+      message: 'Username can only container alphanumeric characters and dashes.',
+    })
+    .optional(),
 });
 
 export type TSignUpMutationSchema = z.infer<typeof ZSignUpMutationSchema>;
