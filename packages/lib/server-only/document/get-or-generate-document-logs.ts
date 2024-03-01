@@ -1,6 +1,9 @@
 import { prisma } from '@documenso/prisma';
-import { AdditionalDataType, DocumentDataType, DocumentStatus } from '@documenso/prisma/client';
+import { AdditionalDataType, DocumentStatus } from '@documenso/prisma/client';
 
+import { generateDocumentLogs } from '../pdf/generate-document-logs';
+import { getRecipientsForDocument } from '../recipient/get-recipients-for-document';
+import { findDocumentAuditLogs } from './find-document-audit-logs';
 import { getDocumentById } from './get-document-by-id';
 
 export type GetOrGenerateDocumentOptions = {
@@ -18,8 +21,8 @@ export const getOrGenerateDocumentLogs = async ({
 }: GetOrGenerateDocumentOptions) => {
   const document = await getDocumentById({ id: documentId, userId, teamId });
 
-  if (document.status === DocumentStatus.COMPLETED) {
-    throw new Error('Document has not been completed yet');
+  if (document.status !== DocumentStatus.COMPLETED) {
+    throw new Error(`Document ${documentId} has not been completed`);
   }
 
   const additionalDataWhereInput = {
@@ -34,8 +37,30 @@ export const getOrGenerateDocumentLogs = async ({
     return documentLogsData;
   }
 
+  const [recipients, { data: auditLogs }] = await Promise.all([
+    getRecipientsForDocument({
+      documentId,
+      userId,
+      teamId,
+    }),
+    findDocumentAuditLogs({
+      documentId,
+      userId,
+      perPage: Number.MAX_SAFE_INTEGER,
+    }),
+  ]);
+
+  const recipientsList: string[] = recipients.map((recipient) => {
+    const text = recipient.name ? `${recipient.name} (${recipient.email})` : recipient.email;
+    return `${text} - ${recipient.role}`;
+  });
+
   // Generate PDF and save it as DocumentData
-  const { type, data } = { type: DocumentDataType.BYTES_64, data: '' };
+  const { type, data } = await generateDocumentLogs({
+    document,
+    recipientsList,
+    auditLogs,
+  });
   // Assigng the DocumentData to the document as auditLogsDataId
   return prisma.documentAdditionalData.upsert({
     where: additionalDataWhereInput,
