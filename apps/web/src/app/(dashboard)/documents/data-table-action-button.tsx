@@ -5,11 +5,9 @@ import React from 'react';
 import Link from 'next/link';
 
 // import { PDFPage } from 'https://cdn.skypack.dev/pdf-lib@^1.11.1?dts';
-import { groupBy } from 'lodash';
 import { CheckCircle, Download, Edit, EyeIcon, Pencil } from 'lucide-react';
 import { useSession } from 'next-auth/react';
-import type { PDFPage } from 'pdf-lib';
-import { PDFDocument, rgb } from 'pdf-lib';
+import { PDFDocument } from 'pdf-lib';
 import { match } from 'ts-pattern';
 
 import { downloadFile } from '@documenso/lib/client-only/download-file';
@@ -21,6 +19,8 @@ import type { DocumentWithData } from '@documenso/prisma/types/document-with-dat
 import { trpc as trpcClient } from '@documenso/trpc/client';
 import { Button } from '@documenso/ui/primitives/button';
 import { useToast } from '@documenso/ui/primitives/use-toast';
+
+import { appendCertificate } from '~/helpers/append-certificate';
 
 export type DataTableActionButtonProps = {
   row: Document & {
@@ -72,177 +72,8 @@ export const DataTableActionButton = ({ row, team }: DataTableActionButtonProps)
       }
       const bytes = await getFile(documentData);
       const pdfDoc = await PDFDocument.load(bytes);
-      let page = pdfDoc.addPage();
-
-      const signatures = await trpcClient.document.getSignaturesByDocumentId.query({
-        id: row.id,
-      });
-      const auditLogs = groupBy(signatures[0]?.Recipient?.Document?.auditLogs, 'type');
-      const { width, height } = page.getSize();
-      const tableStyles = {
-        x: width * 0.05,
-        y: height * 0.08,
-        width: width * 0.9,
-        height: height * 0.85,
-      };
-      const fontSize = 10;
-      const tableTitlePos = {
-        x: width * 0.07,
-        y: height * 0.9,
-      };
-      const titleCellHeight = height * 0.04;
-      const intialCellPos = {
-        x: tableStyles.x,
-        y: tableTitlePos.y - titleCellHeight / 2,
-      };
-      const cellIncrement = {
-        row: tableStyles.width / 3.0,
-        col: (tableStyles.height - titleCellHeight) / 4.0,
-      };
-      const nextLineIndent = 20;
-      const drawPageLayout = (page: PDFPage) => {
-        page.drawRectangle({
-          x: tableStyles.x,
-          y: tableStyles.y,
-          width: tableStyles.width,
-          height: tableStyles.height,
-          borderColor: rgb(229 / 255, 229 / 255, 229 / 255),
-          borderWidth: 1.5,
-        });
-        page.drawRectangle({
-          x: tableStyles.x + 1.5,
-          y: tableStyles.y + 1.5,
-          width: tableStyles.width - 3,
-          height: tableStyles.height - 3,
-          borderColor: rgb(162 / 255, 231 / 255, 113 / 255),
-          borderWidth: 1.5,
-        });
-        page.drawText('Signing Certificate', {
-          x: width * 0.05,
-          y: height * 0.95,
-          size: fontSize + 4,
-        });
-        page.drawText('Signer Events', {
-          x: tableTitlePos.x,
-          y: tableTitlePos.y,
-          size: fontSize,
-        });
-        page.drawText('Signature', {
-          x: cellIncrement.row + tableTitlePos.x,
-          y: tableTitlePos.y,
-          size: fontSize,
-        });
-        page.drawText('Timestamp', {
-          x: cellIncrement.row * 2 + width * 0.07,
-          y: tableTitlePos.y,
-          size: fontSize,
-        });
-        page.drawLine({
-          start: { x: intialCellPos.x, y: intialCellPos.y },
-          end: { x: width * 0.95, y: intialCellPos.y },
-          thickness: 1.5,
-          color: rgb(229 / 255, 229 / 255, 229 / 255),
-        });
-        page.drawLine({
-          start: { x: intialCellPos.x, y: intialCellPos.y - cellIncrement.col },
-          end: { x: width * 0.95, y: intialCellPos.y - cellIncrement.col },
-          thickness: 1.5,
-          color: rgb(229 / 255, 229 / 255, 229 / 255),
-        });
-        page.drawLine({
-          start: { x: intialCellPos.x, y: intialCellPos.y - cellIncrement.col * 2 },
-          end: { x: width * 0.95, y: intialCellPos.y - cellIncrement.col * 2 },
-          thickness: 1.5,
-          color: rgb(229 / 255, 229 / 255, 229 / 255),
-        });
-        page.drawLine({
-          start: { x: intialCellPos.x, y: intialCellPos.y - cellIncrement.col * 3 },
-          end: { x: width * 0.95, y: intialCellPos.y - cellIncrement.col * 3 },
-          thickness: 1.5,
-          color: rgb(229 / 255, 229 / 255, 229 / 255),
-        });
-      };
-      let index = 0;
-
-      for (const signature of signatures) {
-        drawPageLayout(page);
-        console.log('signature', signature);
-        const colInd = index % 4;
-        if (colInd == 0 && index != 0) {
-          page = pdfDoc.addPage();
-          drawPageLayout(page);
-        }
-
-        page.drawText(
-          `${signature.Recipient.name} \n${signature.Recipient.email} \nSecurity Level: Email, \nAccount Authentication \n(required), Logged in`,
-          {
-            x: tableTitlePos.x,
-            y: intialCellPos.y - nextLineIndent - cellIncrement.col * colInd,
-            size: fontSize,
-            maxWidth: width * 0.9 * 0.3,
-          },
-        );
-        const signImg = signature?.signatureImageAsBase64;
-        const signatureDim = {
-          width: cellIncrement.row / 2,
-          height: cellIncrement.col / 4,
-        };
-        if (signImg) {
-          const pngImage = await pdfDoc.embedPng(signImg);
-          const scaledImage = pngImage.scale(signatureDim.width / pngImage.width);
-          page.drawImage(pngImage, {
-            width: scaledImage.width,
-            height: scaledImage.height,
-            x: tableTitlePos.x + cellIncrement.row,
-            y: intialCellPos.y - signatureDim.height - cellIncrement.col * colInd,
-          });
-        }
-        page.drawRectangle({
-          x: tableTitlePos.x + cellIncrement.row,
-          y:
-            intialCellPos.y -
-            signatureDim.height -
-            nextLineIndent * 0.5 -
-            cellIncrement.col * colInd,
-          width: signatureDim.width,
-          height: signatureDim.height,
-          borderColor: rgb(162 / 255, 231 / 255, 113 / 255),
-          borderWidth: 1.5,
-        });
-        page.drawText(
-          `Singature Id:${signature.id} \nIP Address: ${auditLogs['DOCUMENT_FIELD_INSERTED'].find(
-            (log) => (log.email = signature.Recipient.email),
-          )} \nSigning Reason: ${signature.Recipient.role}`,
-          {
-            x: tableTitlePos.x + cellIncrement.row,
-            y:
-              intialCellPos.y -
-              nextLineIndent * 1.5 -
-              signatureDim.height -
-              cellIncrement.col * colInd,
-            size: fontSize,
-            maxWidth: width * 0.9 * 0.3,
-          },
-        );
-        page.drawText(
-          `Sent: ${auditLogs.DOCUMENT_SENT[0].createdAt}\nViewed: ${
-            auditLogs.DOCUMENT_OPENED.find((log) => log.email == signature.Recipient.email)
-              ?.createdAt
-          } \nSigned: ${
-            auditLogs.DOCUMENT_FIELD_INSERTED.find(
-              (log) => log?.data?.fieldId == signature.Field.secondaryId,
-            )?.createdAt
-          }`,
-          {
-            x: tableTitlePos.x + cellIncrement.row * 2,
-            y: intialCellPos.y - nextLineIndent - cellIncrement.col * colInd,
-            size: fontSize,
-            maxWidth: width * 0.9 * 0.3,
-          },
-        );
-        index++;
-      }
-
+      const page = pdfDoc.addPage();
+      await appendCertificate(page, pdfDoc, row.id);
       const pdfBytes = await pdfDoc.save();
       const blob = new Blob([pdfBytes], {
         type: 'application/pdf',
@@ -252,8 +83,6 @@ export const DataTableActionButton = ({ row, team }: DataTableActionButtonProps)
         filename: row.title,
         data: blob,
       });
-
-      // await downloadPDF({ documentData, fileName: row.title });
     } catch (err) {
       toast({
         title: 'Something went wrong',
