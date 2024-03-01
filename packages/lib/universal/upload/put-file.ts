@@ -12,14 +12,18 @@ type File = {
   arrayBuffer: () => Promise<ArrayBuffer>;
 };
 
-export const putFile = async (file: File) => {
+type PutFileOptions = {
+  skipDocumentDataCreate?: boolean;
+};
+
+export const putFile = async (file: File, options: PutFileOptions = {}) => {
   const NEXT_PUBLIC_UPLOAD_TRANSPORT = env('NEXT_PUBLIC_UPLOAD_TRANSPORT');
 
   const { type, data } = await match(NEXT_PUBLIC_UPLOAD_TRANSPORT)
     .with('s3', async () => putFileInS3(file))
     .otherwise(async () => putFileInDatabase(file));
 
-  return await createDocumentData({ type, data });
+  return options.skipDocumentDataCreate ? { type, data } : await createDocumentData({ type, data });
 };
 
 const putFileInDatabase = async (file: File) => {

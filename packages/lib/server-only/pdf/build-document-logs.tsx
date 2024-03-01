@@ -227,9 +227,12 @@ export const buildDocumentLogs = async ({
   );
   const signedBuffer = await signPdf({ pdf: pdfBuffer });
 
-  return putFile({
-    name: `${document.title}_logs.pdf`,
-    type: 'application/pdf',
-    arrayBuffer: async () => Promise.resolve(signedBuffer),
-  });
+  return putFile(
+    {
+      name: `${document.title}_logs.pdf`,
+      type: 'application/pdf',
+      arrayBuffer: async () => Promise.resolve(signedBuffer),
+    },
+    { skipDocumentDataCreate: true },
+  );
 };
