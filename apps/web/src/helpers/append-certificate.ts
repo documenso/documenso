@@ -1,10 +1,15 @@
 import { groupBy } from 'lodash';
-import type { PDFDocument, PDFPage } from 'pdf-lib';
-import { rgb } from 'pdf-lib';
+import type { PDFPage } from 'pdf-lib';
+import { PDFDocument, rgb } from 'pdf-lib';
 
+import { getFile } from '@documenso/lib/universal/upload/get-file';
+import type { DocumentData } from '@documenso/prisma/client';
 import { trpc as trpcClient } from '@documenso/trpc/client';
 
-export const appendCertificate = async (page: PDFPage, pdfDoc: PDFDocument, documentId: number) => {
+export const appendCertificate = async (documentData: DocumentData, documentId: number) => {
+  const bytes = await getFile(documentData);
+  const pdfDoc = await PDFDocument.load(bytes);
+  let page = pdfDoc.addPage();
   const signatures = await trpcClient.document.getSignaturesByDocumentId.query({
     id: documentId,
   });
@@ -164,4 +169,8 @@ export const appendCertificate = async (page: PDFPage, pdfDoc: PDFDocument, docu
     );
     index++;
   }
+  const pdfBytes = await pdfDoc.save();
+  return new Blob([pdfBytes], {
+    type: 'application/pdf',
+  });
 };

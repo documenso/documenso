@@ -4,14 +4,11 @@ import React from 'react';
 
 import Link from 'next/link';
 
-// import { PDFPage } from 'https://cdn.skypack.dev/pdf-lib@^1.11.1?dts';
 import { CheckCircle, Download, Edit, EyeIcon, Pencil } from 'lucide-react';
 import { useSession } from 'next-auth/react';
-import { PDFDocument } from 'pdf-lib';
 import { match } from 'ts-pattern';
 
 import { downloadFile } from '@documenso/lib/client-only/download-file';
-import { getFile } from '@documenso/lib/universal/upload/get-file';
 import { formatDocumentsPath } from '@documenso/lib/utils/teams';
 import type { Document, Recipient, Team, User } from '@documenso/prisma/client';
 import { DocumentStatus, RecipientRole, SigningStatus } from '@documenso/prisma/client';
@@ -70,18 +67,11 @@ export const DataTableActionButton = ({ row, team }: DataTableActionButtonProps)
       if (!documentData) {
         throw Error('No document available');
       }
-      const bytes = await getFile(documentData);
-      const pdfDoc = await PDFDocument.load(bytes);
-      const page = pdfDoc.addPage();
-      await appendCertificate(page, pdfDoc, row.id);
-      const pdfBytes = await pdfDoc.save();
-      const blob = new Blob([pdfBytes], {
-        type: 'application/pdf',
-      });
+      const appendedBlob = await appendCertificate(documentData, row.id);
 
       downloadFile({
         filename: row.title,
-        data: blob,
+        data: appendedBlob,
       });
     } catch (err) {
       toast({
