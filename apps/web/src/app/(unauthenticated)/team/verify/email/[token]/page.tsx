@@ -22,16 +22,18 @@ export default async function VerifyTeamEmailPage({ params: { token } }: VerifyT
 
   if (!teamEmailVerification || isTokenExpired(teamEmailVerification.expiresAt)) {
     return (
-      <div>
-        <h1 className="text-4xl font-semibold">Invalid link</h1>
+      <div className="w-screen max-w-lg px-4">
+        <div className="w-full">
+          <h1 className="text-4xl font-semibold">Invalid link</h1>
 
-        <p className="text-muted-foreground mb-4 mt-2 text-sm">
-          This link is invalid or has expired. Please contact your team to resend a verification.
-        </p>
+          <p className="text-muted-foreground mb-4 mt-2 text-sm">
+            This link is invalid or has expired. Please contact your team to resend a verification.
+          </p>
 
-        <Button asChild>
-          <Link href="/">Return</Link>
-        </Button>
+          <Button asChild>
+            <Link href="/">Return</Link>
+          </Button>
+        </div>
       </div>
     );
   }
