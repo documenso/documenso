@@ -15,6 +15,7 @@ import { MonthlyNewUsersChart } from './monthly-new-users-chart';
 import { MonthlyTotalUsersChart } from './monthly-total-users-chart';
 import { TeamMembers } from './team-members';
 import { OpenPageTooltip } from './tooltip';
+import { Typefully } from './typefully';
 
 export const metadata: Metadata = {
   title: 'Open Startup',
@@ -236,6 +237,8 @@ export default async function OpenPage() {
 
         <MonthlyTotalUsersChart data={MONTHLY_USERS} className="col-span-12 lg:col-span-6" />
         <MonthlyNewUsersChart data={MONTHLY_USERS} className="col-span-12 lg:col-span-6" />
+
+        <Typefully className="col-span-12 lg:col-span-6" />
 
         <div className="col-span-12 mt-12 flex flex-col items-center justify-center">
           <h2 className="text-2xl font-bold">Where's the rest?</h2>
