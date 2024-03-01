@@ -1,7 +1,7 @@
 import { prisma } from '@documenso/prisma';
 import { AdditionalDataType, DocumentStatus } from '@documenso/prisma/client';
 
-import { generateDocumentLogs } from '../pdf/generate-document-logs';
+import { buildDocumentLogs } from '../pdf/build-document-logs';
 import { getRecipientsForDocument } from '../recipient/get-recipients-for-document';
 import { findDocumentAuditLogs } from './find-document-audit-logs';
 import { getDocumentById } from './get-document-by-id';
@@ -56,7 +56,7 @@ export const getOrGenerateDocumentLogs = async ({
   });
 
   // Generate PDF and save it as DocumentData
-  const { type, data } = await generateDocumentLogs({
+  const { type, data } = await buildDocumentLogs({
     document,
     recipientsList,
     auditLogs,
