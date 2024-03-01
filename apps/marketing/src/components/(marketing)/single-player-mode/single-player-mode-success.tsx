@@ -55,7 +55,7 @@ export const SinglePlayerModeSuccess = ({
 
       <SigningCard3D
         className="mt-8"
-        name={document.Recipient.name || document.Recipient.email}
+        name={document.Recipient[0].name || document.Recipient[0].email}
         signature={signatures.at(0)}
         signingCelebrationImage={signingCelebration}
       />
@@ -65,7 +65,7 @@ export const SinglePlayerModeSuccess = ({
           <div className="grid w-full max-w-sm grid-cols-2 gap-4">
             <DocumentShareButton
               documentId={document.id}
-              token={document.Recipient.token}
+              token={document.Recipient[0].token}
               className="flex-1 bg-transparent backdrop-blur-sm"
             />
 
@@ -86,7 +86,7 @@ export const SinglePlayerModeSuccess = ({
       <p className="text-muted-foreground/60 mt-16 text-center text-sm">
         Create a{' '}
         <Link
-          href={`${NEXT_PUBLIC_WEBAPP_URL()}/signup`}
+          href={`${NEXT_PUBLIC_WEBAPP_URL()}/signup?utm_source=singleplayer`}
           target="_blank"
           className="text-documenso-700 hover:text-documenso-600 whitespace-nowrap"
         >
