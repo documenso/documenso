@@ -13,24 +13,20 @@ import { resendDocument } from '@documenso/lib/server-only/document/resend-docum
 import { searchDocumentsWithKeyword } from '@documenso/lib/server-only/document/search-documents-with-keyword';
 import { sendDocument } from '@documenso/lib/server-only/document/send-document';
 import { updateTitle } from '@documenso/lib/server-only/document/update-title';
-import { setFieldsForDocument } from '@documenso/lib/server-only/field/set-fields-for-document';
-import { setRecipientsForDocument } from '@documenso/lib/server-only/recipient/set-recipients-for-document';
 import { symmetricEncrypt } from '@documenso/lib/universal/crypto';
 import { extractNextApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 
 import { authenticatedProcedure, procedure, router } from '../trpc';
 import {
   ZCreateDocumentMutationSchema,
-  ZDeleteDraftDocumentMutationSchema,
+  ZDeleteDraftDocumentMutationSchema as ZDeleteDocumentMutationSchema,
   ZFindDocumentAuditLogsQuerySchema,
   ZGetDocumentByIdQuerySchema,
   ZGetDocumentByTokenQuerySchema,
   ZResendDocumentMutationSchema,
   ZSearchDocumentsMutationSchema,
   ZSendDocumentMutationSchema,
-  ZSetFieldsForDocumentMutationSchema,
   ZSetPasswordForDocumentMutationSchema,
-  ZSetRecipientsForDocumentMutationSchema,
   ZSetTitleForDocumentMutationSchema,
 } from './schema';
 
@@ -106,17 +102,17 @@ export const documentRouter = router({
     }),
 
   deleteDocument: authenticatedProcedure
-    .input(ZDeleteDraftDocumentMutationSchema)
+    .input(ZDeleteDocumentMutationSchema)
     .mutation(async ({ input, ctx }) => {
       try {
-        const { id, status } = input;
+        const { id, teamId } = input;
 
         const userId = ctx.user.id;
 
         return await deleteDocument({
           id,
           userId,
-          status,
+          teamId,
           requestMetadata: extractNextApiRequestMetadata(ctx.req),
         });
       } catch (err) {
@@ -157,61 +153,17 @@ export const documentRouter = router({
   setTitleForDocument: authenticatedProcedure
     .input(ZSetTitleForDocumentMutationSchema)
     .mutation(async ({ input, ctx }) => {
-      const { documentId, title } = input;
+      const { documentId, teamId, title } = input;
 
       const userId = ctx.user.id;
 
       return await updateTitle({
         title,
         userId,
+        teamId,
         documentId,
         requestMetadata: extractNextApiRequestMetadata(ctx.req),
       });
-    }),
-
-  setRecipientsForDocument: authenticatedProcedure
-    .input(ZSetRecipientsForDocumentMutationSchema)
-    .mutation(async ({ input, ctx }) => {
-      try {
-        const { documentId, recipients } = input;
-
-        return await setRecipientsForDocument({
-          userId: ctx.user.id,
-          documentId,
-          recipients,
-          requestMetadata: extractNextApiRequestMetadata(ctx.req),
-        });
-      } catch (err) {
-        console.error(err);
-
-        throw new TRPCError({
-          code: 'BAD_REQUEST',
-          message:
-            'We were unable to set the recipients for this document. Please try again later.',
-        });
-      }
-    }),
-
-  setFieldsForDocument: authenticatedProcedure
-    .input(ZSetFieldsForDocumentMutationSchema)
-    .mutation(async ({ input, ctx }) => {
-      try {
-        const { documentId, fields } = input;
-
-        return await setFieldsForDocument({
-          userId: ctx.user.id,
-          documentId,
-          fields,
-          requestMetadata: extractNextApiRequestMetadata(ctx.req),
-        });
-      } catch (err) {
-        console.error(err);
-
-        throw new TRPCError({
-          code: 'BAD_REQUEST',
-          message: 'We were unable to set the fields for this document. Please try again later.',
-        });
-      }
     }),
 
   setPasswordForDocument: authenticatedProcedure
@@ -251,7 +203,7 @@ export const documentRouter = router({
     .input(ZSendDocumentMutationSchema)
     .mutation(async ({ input, ctx }) => {
       try {
-        const { documentId, meta } = input;
+        const { documentId, teamId, meta } = input;
 
         if (meta.message || meta.subject || meta.timezone || meta.dateFormat || meta.redirectUrl) {
           await upsertDocumentMeta({
@@ -269,6 +221,7 @@ export const documentRouter = router({
         return await sendDocument({
           userId: ctx.user.id,
           documentId,
+          teamId,
           requestMetadata: extractNextApiRequestMetadata(ctx.req),
         });
       } catch (err) {

@@ -9,7 +9,7 @@ import SuperJSON from 'superjson';
 
 import { getBaseUrl } from '@documenso/lib/universal/get-base-url';
 
-import { AppRouter } from '../server/router';
+import type { AppRouter } from '../server/router';
 
 export const trpc = createTRPCReact<AppRouter>({
   unstable_overrides: {

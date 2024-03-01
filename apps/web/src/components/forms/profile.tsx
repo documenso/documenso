@@ -29,6 +29,11 @@ export const ZProfileFormSchema = z.object({
   signature: z.string().min(1, 'Signature Pad cannot be empty'),
 });
 
+export const ZTwoFactorAuthTokenSchema = z.object({
+  token: z.string(),
+});
+
+export type TTwoFactorAuthTokenSchema = z.infer<typeof ZTwoFactorAuthTokenSchema>;
 export type TProfileFormSchema = z.infer<typeof ZProfileFormSchema>;
 
 export type ProfileFormProps = {
@@ -50,8 +55,11 @@ export const ProfileForm = ({ className, user }: ProfileFormProps) => {
   });
 
   const isSubmitting = form.formState.isSubmitting;
+  const hasTwoFactorAuthentication = user.twoFactorEnabled;
 
   const { mutateAsync: updateProfile } = trpc.profile.updateProfile.useMutation();
+  const { mutateAsync: deleteAccount, isLoading: isDeletingAccount } =
+    trpc.profile.deleteAccount.useMutation();
 
   const onFormSubmit = async ({ name, signature }: TProfileFormSchema) => {
     try {
@@ -133,7 +141,7 @@ export const ProfileForm = ({ className, user }: ProfileFormProps) => {
           />
         </fieldset>
 
-        <Button type="submit" loading={isSubmitting}>
+        <Button type="submit" loading={isSubmitting} className="self-end">
           {isSubmitting ? 'Updating profile...' : 'Update profile'}
         </Button>
       </form>

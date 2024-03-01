@@ -9,12 +9,14 @@ import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-log
 import { createDocumentAuditLogData } from '@documenso/lib/utils/document-audit-logs';
 import { prisma } from '@documenso/prisma';
 import { DocumentStatus, RecipientRole, SigningStatus } from '@documenso/prisma/client';
+import { WebhookTriggerEvents } from '@documenso/prisma/client';
 import { signPdf } from '@documenso/signing';
 
 import type { RequestMetadata } from '../../universal/extract-request-metadata';
 import { getFile } from '../../universal/upload/get-file';
 import { putFile } from '../../universal/upload/put-file';
 import { insertFieldInPDF } from '../pdf/insert-field-in-pdf';
+import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
 import { sendCompletedEmail } from './send-completed-email';
 
 export type SealDocumentOptions = {
@@ -36,6 +38,7 @@ export const sealDocument = async ({
     },
     include: {
       documentData: true,
+      Recipient: true,
     },
   });
 
@@ -134,4 +137,11 @@ export const sealDocument = async ({
   if (sendEmail) {
     await sendCompletedEmail({ documentId, requestMetadata });
   }
+
+  await triggerWebhook({
+    event: WebhookTriggerEvents.DOCUMENT_COMPLETED,
+    data: document,
+    userId: document.userId,
+    teamId: document.teamId ?? undefined,
+  });
 };
