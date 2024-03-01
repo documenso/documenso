@@ -9,6 +9,7 @@ import { getOrGenerateDocumentLogs } from '@documenso/lib/server-only/document/g
 import { getRecipientsForDocument } from '@documenso/lib/server-only/recipient/get-recipients-for-document';
 import { formatDocumentsPath } from '@documenso/lib/utils/teams';
 import { DocumentStatus, type Recipient, type Team } from '@documenso/prisma/client';
+import { DocumentAdditionalDataDownloadButton } from '@documenso/ui/components/document/document-additional-data-download-button';
 import { Button } from '@documenso/ui/primitives/button';
 import { Card } from '@documenso/ui/primitives/card';
 
@@ -55,13 +56,13 @@ export const DocumentLogsPageView = async ({ params, team }: DocumentLogsPageVie
 
   const isCompleted = document.status === DocumentStatus.COMPLETED;
 
-  if (isCompleted) {
-    const auditLogsData = await getOrGenerateDocumentLogs({
-      documentId,
-      userId: user.id,
-      teamId: team?.id,
-    });
-  }
+  const logDocumentData = isCompleted
+    ? await getOrGenerateDocumentLogs({
+        documentId,
+        userId: user.id,
+        teamId: team?.id,
+      })
+    : null;
 
   const documentInformation: { description: string; value: string }[] = [
     {
@@ -126,10 +127,15 @@ export const DocumentLogsPageView = async ({ params, team }: DocumentLogsPageVie
               Download certificate
             </Button>
 
-            <Button className="w-full sm:w-auto">
-              <DownloadIcon className="mr-1.5 h-4 w-4" />
-              Download PDF
-            </Button>
+            {logDocumentData !== null && (
+              <DocumentAdditionalDataDownloadButton
+                className="w-full sm:w-auto"
+                docTitle={document.title}
+                documentData={logDocumentData}
+              >
+                Download PDF
+              </DocumentAdditionalDataDownloadButton>
+            )}
           </div>
         )}
       </div>

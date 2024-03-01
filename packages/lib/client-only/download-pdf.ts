@@ -1,10 +1,10 @@
-import type { DocumentData } from '@documenso/prisma/client';
+import type { DocumentAdditionalData, DocumentData } from '@documenso/prisma/client';
 
 import { getFile } from '../universal/upload/get-file';
 import { downloadFile } from './download-file';
 
 type DownloadPDFProps = {
-  documentData: DocumentData;
+  documentData: DocumentData | DocumentAdditionalData;
   fileName?: string;
 };
 
