@@ -134,7 +134,8 @@ export const appendCertificate = async (documentData: DocumentData, documentId: 
         width: scaledImage.width,
         height: scaledImage.height,
         x: tableTitlePos.x + cellIncrement.row,
-        y: intialCellPos.y - signatureDim.height - cellIncrement.col * colInd,
+        y:
+          intialCellPos.y - signatureDim.height - cellIncrement.col * colInd - nextLineIndent * 0.5,
       });
     }
     page.drawRectangle({
