@@ -36,7 +36,7 @@ export const appendCertificate = async (documentData: DocumentData, documentId: 
     col: (tableStyles.height - titleCellHeight) / 4.0,
   };
   const nextLineIndent = 20;
-  const drawPageLayout = (page: PDFPage) => {
+  const drawPageLayout = (page: PDFPage, pageInd: number, totalPage: number) => {
     page.drawRectangle({
       x: tableStyles.x,
       y: tableStyles.y,
@@ -97,15 +97,20 @@ export const appendCertificate = async (documentData: DocumentData, documentId: 
       thickness: 1.5,
       color: rgb(229 / 255, 229 / 255, 229 / 255),
     });
+    page.drawText(`Page ${pageInd} of ${totalPage}`, {
+      x: width * 0.85,
+      y: height * 0.05,
+      size: fontSize,
+    });
   };
   let index = 0;
-
+  const totalPage = Math.ceil(signatures.length / 4.0);
+  drawPageLayout(page, 1, totalPage);
   for (const signature of signatures) {
-    drawPageLayout(page);
     const colInd = index % 4;
     if (colInd == 0 && index != 0) {
       page = pdfDoc.addPage();
-      drawPageLayout(page);
+      drawPageLayout(page, Math.ceil(index / 4) + 1, totalPage);
     }
 
     page.drawText(
@@ -141,9 +146,11 @@ export const appendCertificate = async (documentData: DocumentData, documentId: 
       borderWidth: 1.5,
     });
     page.drawText(
-      `Singature Id:${signature.id} \nIP Address: ${auditLogs['DOCUMENT_FIELD_INSERTED'].find(
-        (log) => (log.email = signature.Recipient.email),
-      )} \nSigning Reason: ${signature.Recipient.role}`,
+      `Singature Id:${signature.id} \nIP Address: ${
+        auditLogs.DOCUMENT_FIELD_INSERTED.find(
+          (log) => log?.data?.fieldId == signature.Field.secondaryId,
+        )?.ipAddress
+      } \nSigning Reason: ${signature.Recipient.role}`,
       {
         x: tableTitlePos.x + cellIncrement.row,
         y:
