@@ -2,6 +2,7 @@ import type { WebhookTriggerEvents } from '@documenso/prisma/client';
 
 import { NEXT_PUBLIC_WEBAPP_URL } from '../../../constants/app';
 import { sign } from '../../crypto/sign';
+import { getAllWebhooksByEventTrigger } from '../get-all-webhooks-by-event-trigger';
 
 export type TriggerWebhookOptions = {
   event: WebhookTriggerEvents;
@@ -18,6 +19,12 @@ export const triggerWebhook = async ({ event, data, userId, teamId }: TriggerWeb
       userId,
       teamId,
     };
+
+    const registeredWebhooks = await getAllWebhooksByEventTrigger({ event, userId, teamId });
+
+    if (registeredWebhooks.length === 0) {
+      return;
+    }
 
     const signature = sign(body);
 
