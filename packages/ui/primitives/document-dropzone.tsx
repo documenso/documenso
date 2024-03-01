@@ -3,13 +3,24 @@
 import type { Variants } from 'framer-motion';
 import { motion } from 'framer-motion';
 import { Plus } from 'lucide-react';
+import { ChevronDown } from 'lucide-react';
 import { useDropzone } from 'react-dropzone';
 
 import { APP_DOCUMENT_UPLOAD_SIZE_LIMIT } from '@documenso/lib/constants/app';
 import { megabytesToBytes } from '@documenso/lib/universal/unit-convertions';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@documenso/ui/primitives/dropdown-menu';
 
 import { cn } from '../lib/utils';
+import { Button } from './button';
 import { Card, CardContent } from './card';
+import DropboxPicker from './picker/Dropbox';
+import GdrivePicker from './picker/Gdrive';
 
 const DocumentDropzoneContainerVariants: Variants = {
   initial: {
@@ -123,6 +134,12 @@ export const DocumentDropzone = ({
     maxSize: megabytesToBytes(APP_DOCUMENT_UPLOAD_SIZE_LIMIT),
   });
 
+  const isPickerEnabled = !!(
+    process.env.NEXT_PRIVATE_GOOGLE_CLIENT_ID &&
+    process.env.NEXT_PRIVATE_GOOGLE_API_KEY &&
+    process.env.NEXT_PRIVATE_DROPBOX_APP_KEY
+  );
+
   return (
     <motion.div
       className={cn('flex aria-disabled:cursor-not-allowed', className)}
@@ -186,6 +203,25 @@ export const DocumentDropzone = ({
             {disabled ? disabledMessage : 'Drag & drop your PDF here.'}
           </p>
         </CardContent>
+        {isPickerEnabled && (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" className="bg-background border px-4">
+                <div>Upload</div>
+                <ChevronDown className="ml-3 h-5 w-5" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="z-[60]" align="end">
+              <DropdownMenuItem asChild>
+                <GdrivePicker onDrop={onDrop} />
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem asChild>
+                <DropboxPicker onDrop={onDrop} />
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        )}
       </Card>
     </motion.div>
   );
