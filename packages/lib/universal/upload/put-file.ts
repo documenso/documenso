@@ -23,7 +23,9 @@ export const putFile = async (file: File, options: PutFileOptions = {}) => {
     .with('s3', async () => putFileInS3(file))
     .otherwise(async () => putFileInDatabase(file));
 
-  return options.skipDocumentDataCreate ? { type, data } : await createDocumentData({ type, data });
+  return options.skipDocumentDataCreate
+    ? { id: '', type, data }
+    : await createDocumentData({ type, data });
 };
 
 const putFileInDatabase = async (file: File) => {
