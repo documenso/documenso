@@ -36,7 +36,7 @@ export const ClaimProfileAlertDialog = ({ className, user }: ClaimProfileAlertDi
         </div>
 
         <div className="flex-shrink-0">
-          <Button onClick={() => setOpen(true)}>Claim Now</Button>
+          <Button onClick={() => setOpen(true)}>{user.url ? 'Update Now' : 'Claim Now'}</Button>
         </div>
       </Alert>
 
