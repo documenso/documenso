@@ -22,12 +22,14 @@ import { sendCompletedEmail } from './send-completed-email';
 export type SealDocumentOptions = {
   documentId: number;
   sendEmail?: boolean;
+  isResealing?: boolean;
   requestMetadata?: RequestMetadata;
 };
 
 export const sealDocument = async ({
   documentId,
   sendEmail = true,
+  isResealing = false,
   requestMetadata,
 }: SealDocumentOptions) => {
   'use server';
@@ -78,10 +80,19 @@ export const sealDocument = async ({
     throw new Error(`Document ${document.id} has unsigned fields`);
   }
 
+  if (isResealing) {
+    // If we're resealing we want to use the initial data for the document
+    // so we aren't placing fields on top of eachother.
+    documentData.data = documentData.initialData;
+  }
+
   // !: Need to write the fields onto the document as a hard copy
   const pdfData = await getFile(documentData);
 
   const doc = await PDFDocument.load(pdfData);
+
+  // Flatten the form to stop annotation layers from appearing above documenso fields
+  doc.getForm().flatten();
 
   for (const field of fields) {
     await insertFieldInPDF(doc, field);
@@ -134,7 +145,7 @@ export const sealDocument = async ({
     });
   });
 
-  if (sendEmail) {
+  if (sendEmail && !isResealing) {
     await sendCompletedEmail({ documentId, requestMetadata });
   }
 
