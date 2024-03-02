@@ -56,7 +56,7 @@ export default function MarketingLayout({ children }: MarketingLayoutProps) {
               />
             </div>
 
-            <div className="text-background text-center text-sm">
+            <div className="text-background text-center text-sm text-white">
               Claim your documenso public profile username now!{' '}
               <span className="hidden font-semibold md:inline">documenso.com/u/yourname</span>
               <div className="mt-1.5 block md:ml-4 md:mt-0 md:inline-block">

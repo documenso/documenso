@@ -419,8 +419,7 @@ export const SignUpFormV2 = ({
                 size="lg"
                 variant="secondary"
                 className="flex-1"
-                disabled={step === 'BASIC_DETAILS'}
-                loading={form.formState.isSubmitting}
+                disabled={step === 'BASIC_DETAILS' || form.formState.isSubmitting}
                 onClick={() => setStep('BASIC_DETAILS')}
               >
                 Back
