@@ -119,8 +119,6 @@ export const SignUpFormV2 = ({
     form.formState.dirtyFields.signature &&
     form.formState.errors.signature === undefined;
 
-  console.log({ formSTate: form.formState });
-
   const { mutateAsync: signup } = trpc.auth.signup.useMutation();
 
   const onFormSubmit = async ({ name, email, password, signature, url }: TSignUpFormV2Schema) => {
