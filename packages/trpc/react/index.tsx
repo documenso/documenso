@@ -2,11 +2,13 @@
 
 import { useState } from 'react';
 
+import type { QueryClientConfig } from '@tanstack/react-query';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { httpBatchLink } from '@trpc/client';
 import { createTRPCReact } from '@trpc/react-query';
 import SuperJSON from 'superjson';
 
+import { IS_OFFLINE_DEVELOPMENT_ENABLED } from '@documenso/lib/constants/app';
 import { getBaseUrl } from '@documenso/lib/universal/get-base-url';
 
 import type { AppRouter } from '../server/router';
@@ -27,7 +29,22 @@ export interface TrpcProviderProps {
 }
 
 export function TrpcProvider({ children }: TrpcProviderProps) {
-  const [queryClient] = useState(() => new QueryClient());
+  let queryClientConfig: QueryClientConfig | undefined;
+
+  if (IS_OFFLINE_DEVELOPMENT_ENABLED()) {
+    queryClientConfig = {
+      defaultOptions: {
+        queries: {
+          networkMode: 'always',
+        },
+        mutations: {
+          networkMode: 'always',
+        },
+      },
+    };
+  }
+
+  const [queryClient] = useState(() => new QueryClient(queryClientConfig));
 
   const [trpcClient] = useState(() =>
     trpc.createClient({
