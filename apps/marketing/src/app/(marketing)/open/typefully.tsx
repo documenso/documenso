@@ -2,10 +2,10 @@
 
 import type { HTMLAttributes } from 'react';
 
-import Image from 'next/image';
 import Link from 'next/link';
 
-import Twitter from '@documenso/assets/twitter-icon.png';
+import { FaXTwitter } from 'react-icons/fa6';
+
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
 
@@ -17,8 +17,8 @@ export const Typefully = ({ className, ...props }: TypefullyProps) => {
       <h3 className="px-4 text-lg font-semibold">Twitter Stats</h3>
 
       <div className="border-border mt-2.5 flex flex-1 items-center justify-center rounded-2xl border py-8 shadow-sm hover:shadow">
-        <div className="flex flex-col gap-y-4 text-center">
-          <Image className="opacity-75" src={Twitter} alt="Twitter Logo" width={120} />
+        <div className="flex flex-col items-center gap-y-4 text-center">
+          <FaXTwitter className="h-12 w-12" />
           <Link href="https://typefully.com/documenso/stats" target="_blank">
             <h1>Documenso on X</h1>
           </Link>
