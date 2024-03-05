@@ -21,6 +21,7 @@ export const seedUser = async ({
       email,
       password: hashSync(password),
       emailVerified: verified ? new Date() : undefined,
+      url: name,
     },
   });
 };

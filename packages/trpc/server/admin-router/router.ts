@@ -1,14 +1,39 @@
 import { TRPCError } from '@trpc/server';
 
+import { findDocuments } from '@documenso/lib/server-only/admin/get-all-documents';
+import { updateRecipient } from '@documenso/lib/server-only/admin/update-recipient';
 import { updateUser } from '@documenso/lib/server-only/admin/update-user';
+import { sealDocument } from '@documenso/lib/server-only/document/seal-document';
 import { upsertSiteSetting } from '@documenso/lib/server-only/site-settings/upsert-site-setting';
+import { deleteUser } from '@documenso/lib/server-only/user/delete-user';
+import { getUserById } from '@documenso/lib/server-only/user/get-user-by-id';
 
 import { adminProcedure, router } from '../trpc';
-import { ZUpdateProfileMutationByAdminSchema, ZUpdateSiteSettingMutationSchema } from './schema';
+import {
+  ZAdminDeleteUserMutationSchema,
+  ZAdminFindDocumentsQuerySchema,
+  ZAdminResealDocumentMutationSchema,
+  ZAdminUpdateProfileMutationSchema,
+  ZAdminUpdateRecipientMutationSchema,
+  ZAdminUpdateSiteSettingMutationSchema,
+} from './schema';
 
 export const adminRouter = router({
+  findDocuments: adminProcedure.input(ZAdminFindDocumentsQuerySchema).query(async ({ input }) => {
+    const { term, page, perPage } = input;
+
+    try {
+      return await findDocuments({ term, page, perPage });
+    } catch (err) {
+      throw new TRPCError({
+        code: 'BAD_REQUEST',
+        message: 'We were unable to retrieve the documents. Please try again.',
+      });
+    }
+  }),
+
   updateUser: adminProcedure
-    .input(ZUpdateProfileMutationByAdminSchema)
+    .input(ZAdminUpdateProfileMutationSchema)
     .mutation(async ({ input }) => {
       const { id, name, email, roles } = input;
 
@@ -22,8 +47,23 @@ export const adminRouter = router({
       }
     }),
 
+  updateRecipient: adminProcedure
+    .input(ZAdminUpdateRecipientMutationSchema)
+    .mutation(async ({ input }) => {
+      const { id, name, email } = input;
+
+      try {
+        return await updateRecipient({ id, name, email });
+      } catch (err) {
+        throw new TRPCError({
+          code: 'BAD_REQUEST',
+          message: 'We were unable to update the recipient provided.',
+        });
+      }
+    }),
+
   updateSiteSetting: adminProcedure
-    .input(ZUpdateSiteSettingMutationSchema)
+    .input(ZAdminUpdateSiteSettingMutationSchema)
     .mutation(async ({ ctx, input }) => {
       try {
         const { id, enabled, data } = input;
@@ -41,4 +81,41 @@ export const adminRouter = router({
         });
       }
     }),
+
+  resealDocument: adminProcedure
+    .input(ZAdminResealDocumentMutationSchema)
+    .mutation(async ({ input }) => {
+      const { id } = input;
+
+      try {
+        return await sealDocument({ documentId: id, isResealing: true });
+      } catch (err) {
+        console.log('resealDocument error', err);
+        throw new TRPCError({
+          code: 'BAD_REQUEST',
+          message: 'We were unable to reseal the document provided.',
+        });
+      }
+    }),
+
+  deleteUser: adminProcedure.input(ZAdminDeleteUserMutationSchema).mutation(async ({ input }) => {
+    const { id, email } = input;
+
+    try {
+      const user = await getUserById({ id });
+
+      if (user.email !== email) {
+        throw new Error('Email does not match');
+      }
+
+      return await deleteUser({ id });
+    } catch (err) {
+      console.log(err);
+
+      throw new TRPCError({
+        code: 'BAD_REQUEST',
+        message: 'We were unable to delete the specified account. Please try again.',
+      });
+    }
+  }),
 });
