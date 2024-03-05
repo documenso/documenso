@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 
+import type { QueryClientConfig } from '@tanstack/react-query';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { httpBatchLink } from '@trpc/client';
 import { createTRPCReact } from '@trpc/react-query';
@@ -27,7 +28,27 @@ export interface TrpcProviderProps {
 }
 
 export function TrpcProvider({ children }: TrpcProviderProps) {
-  const [queryClient] = useState(() => new QueryClient());
+  let queryClientConfig: QueryClientConfig | undefined;
+
+  const isDevelopingOffline =
+    typeof window !== 'undefined' &&
+    window.location.hostname === 'localhost' &&
+    !window.navigator.onLine;
+
+  if (isDevelopingOffline) {
+    queryClientConfig = {
+      defaultOptions: {
+        queries: {
+          networkMode: 'always',
+        },
+        mutations: {
+          networkMode: 'always',
+        },
+      },
+    };
+  }
+
+  const [queryClient] = useState(() => new QueryClient(queryClientConfig));
 
   const [trpcClient] = useState(() =>
     trpc.createClient({
