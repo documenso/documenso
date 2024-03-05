@@ -8,7 +8,6 @@ import { httpBatchLink } from '@trpc/client';
 import { createTRPCReact } from '@trpc/react-query';
 import SuperJSON from 'superjson';
 
-import { IS_OFFLINE_DEVELOPMENT_ENABLED } from '@documenso/lib/constants/app';
 import { getBaseUrl } from '@documenso/lib/universal/get-base-url';
 
 import type { AppRouter } from '../server/router';
@@ -31,7 +30,12 @@ export interface TrpcProviderProps {
 export function TrpcProvider({ children }: TrpcProviderProps) {
   let queryClientConfig: QueryClientConfig | undefined;
 
-  if (IS_OFFLINE_DEVELOPMENT_ENABLED()) {
+  const isDevelopingOffline =
+    typeof window !== 'undefined' &&
+    window.location.hostname === 'localhost' &&
+    !window.navigator.onLine;
+
+  if (isDevelopingOffline) {
     queryClientConfig = {
       defaultOptions: {
         queries: {
