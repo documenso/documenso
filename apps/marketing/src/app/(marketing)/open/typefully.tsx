@@ -22,7 +22,7 @@ export const Typefully = ({ className, ...props }: TypefullyProps) => {
     <div className={cn('flex flex-col', className)} {...props}>
       <h3 className="px-4 text-lg font-semibold">Twitter Stats</h3>
 
-      <div className="border-border mt-2.5 flex flex-1 items-center justify-center rounded-2xl border shadow-sm hover:shadow">
+      <div className="border-border mt-2.5 flex flex-1 items-center justify-center rounded-2xl border py-8 shadow-sm hover:shadow">
         {!isSSR && (
           <div className="flex flex-col gap-y-4 text-center">
             <Image className="opacity-75" src={Twitter} alt="Twitter Logo" width={120} />
