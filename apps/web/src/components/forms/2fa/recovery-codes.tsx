@@ -16,7 +16,8 @@ export const RecoveryCodes = ({ isTwoFactorEnabled }: RecoveryCodesProps) => {
   return (
     <>
       <Button
-        className="flex-shrink-0"
+        variant="outline"
+        className="bg-background flex-shrink-0"
         onClick={() => setIsOpen(true)}
         disabled={!isTwoFactorEnabled}
       >

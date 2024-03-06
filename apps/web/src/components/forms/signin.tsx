@@ -6,12 +6,18 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
 import { zodResolver } from '@hookform/resolvers/zod';
+import { browserSupportsWebAuthn, startAuthentication } from '@simplewebauthn/browser';
+import { KeyRoundIcon } from 'lucide-react';
 import { signIn } from 'next-auth/react';
 import { useForm } from 'react-hook-form';
 import { FcGoogle } from 'react-icons/fc';
+import { match } from 'ts-pattern';
 import { z } from 'zod';
 
+import { useFeatureFlags } from '@documenso/lib/client-only/providers/feature-flag';
+import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { ErrorCode, isErrorCode } from '@documenso/lib/next-auth/error-codes';
+import { trpc } from '@documenso/trpc/react';
 import { ZCurrentPasswordSchema } from '@documenso/trpc/server/auth-router/schema';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
@@ -66,13 +72,21 @@ export type SignInFormProps = {
 
 export const SignInForm = ({ className, initialEmail, isGoogleSSOEnabled }: SignInFormProps) => {
   const { toast } = useToast();
+  const { getFlag } = useFeatureFlags();
+
+  const router = useRouter();
+
   const [isTwoFactorAuthenticationDialogOpen, setIsTwoFactorAuthenticationDialogOpen] =
     useState(false);
-  const router = useRouter();
 
   const [twoFactorAuthenticationMethod, setTwoFactorAuthenticationMethod] = useState<
     'totp' | 'backup'
   >('totp');
+
+  const isPasskeyEnabled = getFlag('app_passkey');
+
+  const { mutateAsync: createPasskeySigninOptions } =
+    trpc.auth.createPasskeySigninOptions.useMutation();
 
   const form = useForm<TSignInFormSchema>({
     values: {
@@ -105,6 +119,59 @@ export const SignInForm = ({ className, initialEmail, isGoogleSSOEnabled }: Sign
     }
 
     setTwoFactorAuthenticationMethod(method);
+  };
+
+  const onSignInWithPasskey = async () => {
+    if (!browserSupportsWebAuthn) {
+      toast({
+        title: 'Not supported',
+        description: 'Passkeys are not supported on this browser',
+        duration: 10000,
+        variant: 'destructive',
+      });
+
+      return;
+    }
+
+    try {
+      const options = await createPasskeySigninOptions();
+
+      const credential = await startAuthentication(options);
+
+      const result = await signIn('webauthn', {
+        credential: JSON.stringify(credential),
+        callbackUrl: LOGIN_REDIRECT_PATH,
+        redirect: false,
+      });
+
+      if (!result?.url || result.error) {
+        throw new AppError(result?.error ?? '');
+      }
+
+      window.location.href = result.url;
+    } catch (err) {
+      if (err.name === 'NotAllowedError') {
+        return;
+      }
+
+      const error = AppError.parseError(err);
+
+      const errorMessage = match(error.code)
+        .with(
+          AppErrorCode.NOT_SETUP,
+          () =>
+            'This passkey is not configured for this application. Please login and add one in the user settings.',
+        )
+        .with(AppErrorCode.EXPIRED_CODE, () => 'This session has expired. Please try again.')
+        .otherwise(() => 'Please try again later or login using your normal details');
+
+      toast({
+        title: 'Something went wrong',
+        description: errorMessage,
+        duration: 10000,
+        variant: 'destructive',
+      });
+    }
   };
 
   const onFormSubmit = async ({ email, password, totpCode, backupCode }: TSignInFormSchema) => {
@@ -240,26 +307,40 @@ export const SignInForm = ({ className, initialEmail, isGoogleSSOEnabled }: Sign
           {isSubmitting ? 'Signing in...' : 'Sign In'}
         </Button>
 
-        {isGoogleSSOEnabled && (
-          <>
-            <div className="relative flex items-center justify-center gap-x-4 py-2 text-xs uppercase">
-              <div className="bg-border h-px flex-1" />
-              <span className="text-muted-foreground bg-transparent">Or continue with</span>
-              <div className="bg-border h-px flex-1" />
-            </div>
+        {(isGoogleSSOEnabled || isPasskeyEnabled) && (
+          <div className="relative flex items-center justify-center gap-x-4 py-2 text-xs uppercase">
+            <div className="bg-border h-px flex-1" />
+            <span className="text-muted-foreground bg-transparent">Or continue with</span>
+            <div className="bg-border h-px flex-1" />
+          </div>
+        )}
 
-            <Button
-              type="button"
-              size="lg"
-              variant="outline"
-              className="bg-background text-muted-foreground border"
-              disabled={isSubmitting}
-              onClick={onSignInWithGoogleClick}
-            >
-              <FcGoogle className="mr-2 h-5 w-5" />
-              Google
-            </Button>
-          </>
+        {isGoogleSSOEnabled && (
+          <Button
+            type="button"
+            size="lg"
+            variant="outline"
+            className="bg-background text-muted-foreground border"
+            disabled={isSubmitting}
+            onClick={onSignInWithGoogleClick}
+          >
+            <FcGoogle className="mr-2 h-5 w-5" />
+            Google
+          </Button>
+        )}
+
+        {isPasskeyEnabled && (
+          <Button
+            type="button"
+            size="lg"
+            variant="outline"
+            loading={isSubmitting}
+            className="bg-background text-muted-foreground border"
+            onClick={onSignInWithPasskey}
+          >
+            <KeyRoundIcon className="-ml-1 mr-1 h-5 w-5" />
+            Passkey
+          </Button>
         )}
       </form>
 

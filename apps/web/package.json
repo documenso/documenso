@@ -23,6 +23,8 @@
     "@documenso/trpc": "*",
     "@documenso/ui": "*",
     "@hookform/resolvers": "^3.1.0",
+    "@simplewebauthn/browser": "^9.0.1",
+    "@simplewebauthn/server": "^9.0.3",
     "@tanstack/react-query": "^4.29.5",
     "formidable": "^2.1.1",
     "framer-motion": "^10.12.8",
@@ -52,6 +54,7 @@
     "zod": "^3.22.4"
   },
   "devDependencies": {
+    "@simplewebauthn/types": "^9.0.1",
     "@types/formidable": "^2.0.6",
     "@types/luxon": "^3.3.1",
     "@types/node": "20.1.0",
