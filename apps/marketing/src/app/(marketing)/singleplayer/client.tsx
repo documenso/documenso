@@ -203,7 +203,7 @@ export const SinglePlayerClient = () => {
             target="_blank"
             className="hover:text-foreground/80 font-semibold transition-colors"
           >
-            community plan
+            early adopter plan
           </Link>{' '}
           for exclusive features, including the ability to collaborate with multiple signers.
         </p>
