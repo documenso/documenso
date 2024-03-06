@@ -6,7 +6,6 @@ set -eo pipefail
 # Get the directory of this script, regardless of where it is called from.
 SCRIPT_DIR="$(readlink -f "$(dirname "$0")")"
 
-
 function log() {
   echo "[VercelBuild]: $1"
 }
@@ -77,10 +76,7 @@ function remap_database_integration() {
   if [[ "$NEXT_PRIVATE_DATABASE_URL" == *"neon.tech"* ]]; then
     log "Remapping for Neon integration"
 
-    PROJECT_ID="$(echo "$PGHOST" | cut -d'.' -f1)"
-    PGBOUNCER_HOST="$(echo "$PGHOST" | sed "s/${PROJECT_ID}/${PROJECT_ID}-pooler/")"
-
-    export NEXT_PRIVATE_DATABASE_URL="postgres://${PGUSER}:${PGPASSWORD}@${PGBOUNCER_HOST}/${PGDATABASE}?pgbouncer=true"
+    export NEXT_PRIVATE_DATABASE_URL="postgres://${PGUSER}:${PGPASSWORD}@${PGHOST}/${PGDATABASE}?pgbouncer=true"
   fi
 }
 
