@@ -102,7 +102,7 @@ export const PricingTable = ({ className, ...props }: PricingTableProps) => {
         </div>
 
         <div
-          data-plan="community"
+          data-plan="early-adopter"
           className="border-primary bg-background shadow-foreground/5 flex flex-col items-center justify-center rounded-lg border-2 px-8 py-12 shadow-[0px_0px_0px_4px_#E3E3E380]"
         >
           <p className="text-foreground text-4xl font-medium">Early Adopters</p>
@@ -119,7 +119,7 @@ export const PricingTable = ({ className, ...props }: PricingTableProps) => {
 
           <Button className="mt-6 rounded-full text-base" asChild>
             <Link
-              href={`${NEXT_PUBLIC_WEBAPP_URL()}/signup?utm_source=pricing-community`}
+              href={`${NEXT_PUBLIC_WEBAPP_URL()}/signup?utm_source=pricing-early-adopter`}
               target="_blank"
             >
               Signup Now
