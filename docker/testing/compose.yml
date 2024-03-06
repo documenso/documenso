@@ -20,7 +20,7 @@ services:
   documenso:
     build:
       context: ../../
-      dockerfile: ../docker/Dockerfile
+      dockerfile: docker/Dockerfile
     depends_on:
       - database
       - inbucket
