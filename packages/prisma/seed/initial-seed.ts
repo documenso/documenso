@@ -39,12 +39,24 @@ export const seedDatabase = async () => {
     update: {},
   });
 
+  const documentIdToSeed = 'clmn0kv5k0000pe04vcqg5zla';
+
+  const oldSeededDocument = await prisma.documentData.findFirst({
+    where: {
+      id: documentIdToSeed,
+    },
+  });
+
+  if (oldSeededDocument) {
+    return;
+  }
+
   const examplePdfData = await prisma.documentData.upsert({
     where: {
-      id: 'clmn0kv5k0000pe04vcqg5zla',
+      id: documentIdToSeed,
     },
     create: {
-      id: 'clmn0kv5k0000pe04vcqg5zla',
+      id: documentIdToSeed,
       type: DocumentDataType.BYTES_64,
       data: examplePdf,
       initialData: examplePdf,
