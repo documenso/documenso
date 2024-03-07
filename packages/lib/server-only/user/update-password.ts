@@ -1,4 +1,4 @@
-import { compare, hash } from 'bcrypt';
+import { compare, hash } from '@node-rs/bcrypt';
 
 import { SALT_ROUNDS } from '@documenso/lib/constants/auth';
 import type { RequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
