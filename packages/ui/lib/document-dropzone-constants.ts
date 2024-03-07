@@ -79,7 +79,7 @@ export const DocumentDropzoneDisabledCardLeftVariants: Variants = {
   hover: {
     x: 30,
     y: 0,
-    transition: { type: 'spring', duration: 0.25, bounce: 0.5 },
+    transition: { type: 'spring', duration: 0.3, stiffness: 500 },
   },
 };
 
@@ -97,7 +97,7 @@ export const DocumentDropzoneDisabledCardRightVariants: Variants = {
   hover: {
     x: -40,
     y: 5,
-    transition: { type: 'spring', duration: 0.25, bounce: 0.5 },
+    transition: { type: 'spring', duration: 0.3, stiffness: 500 },
   },
 };
 
@@ -114,5 +114,6 @@ export const DocumentDropzoneDisabledCardCenterVariants: Variants = {
     x: -20,
     y: 0,
     rotate: -5,
+    transition: { type: 'spring', duration: 0.3, stiffness: 1000 },
   },
 };
