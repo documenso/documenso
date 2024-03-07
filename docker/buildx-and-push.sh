@@ -8,6 +8,12 @@ command -v docker >/dev/null 2>&1 || {
 SCRIPT_DIR="$(readlink -f "$(dirname "$0")")"
 MONOREPO_ROOT="$(readlink -f "$SCRIPT_DIR/../")"
 
+# Get the platform from environment variable or set to linux/amd64 if not set
+# quote the string to prevent word splitting
+if [ -z "$PLATFORM" ]; then
+    PLATFORM="linux/amd64"
+fi
+
 APP_VERSION="$(git name-rev --tags --name-only $(git rev-parse HEAD) | head -n 1 | sed 's/\^0//')"
 GIT_SHA="$(git rev-parse HEAD)"
 
@@ -17,7 +23,7 @@ echo "Git SHA: $GIT_SHA"
 
 docker buildx build \
     -f "$SCRIPT_DIR/Dockerfile" \
-    --platform=linux/amd64,linux/arm64 \
+    --platform=$PLATFORM \
     --progress=plain \
     -t "documenso/documenso:latest" \
     -t "documenso/documenso:$GIT_SHA" \
