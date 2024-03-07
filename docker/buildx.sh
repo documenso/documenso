@@ -15,7 +15,9 @@ echo "Building docker image for monorepo at $MONOREPO_ROOT"
 echo "App version: $APP_VERSION"
 echo "Git SHA: $GIT_SHA"
 
-docker build -f "$SCRIPT_DIR/Dockerfile" \
+docker buildx build \
+    -f "$SCRIPT_DIR/Dockerfile" \
+    --platform linux/amd64,linux/arm64 \
     --progress=plain \
     -t "documenso/documenso:latest" \
     -t "documenso/documenso:$GIT_SHA" \
