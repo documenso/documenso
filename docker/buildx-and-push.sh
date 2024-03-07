@@ -17,7 +17,7 @@ echo "Git SHA: $GIT_SHA"
 
 docker buildx build \
     -f "$SCRIPT_DIR/Dockerfile" \
-    --platformlinux/amd64,linux/arm64 \
+    --platform=linux/amd64,linux/arm64 \
     --progress=plain \
     -t "documenso/documenso:latest" \
     -t "documenso/documenso:$GIT_SHA" \
