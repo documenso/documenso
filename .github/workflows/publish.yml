@@ -1,0 +1,42 @@
+name: Publish Docker
+
+on:
+  push:
+    branches: ['release']
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - warp-ubuntu-latest-x64-4x
+          - warp-ubuntu-latest-arm64-4x
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-tags: true
+
+      - name: Login to DockerHub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GH_TOKEN }}
+
+      - name: Build the docker image
+        run: ./docker/build.sh
+
+      - name: Push the docker image to DockerHub
+        run: docker push --all-tags documenso/documenso
+
+      - name: Push the docker image to GitHub Container Registry
+        run: docker push --all-tags ghcr.io/documenso/documenso

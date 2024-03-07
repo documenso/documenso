@@ -1,4 +1,5 @@
-name: documenso-services
+name: documenso-development
+
 services:
   database:
     image: postgres:15
