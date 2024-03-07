@@ -32,11 +32,5 @@ jobs:
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GH_TOKEN }}
 
-      - name: Build the docker image
-        run: ./docker/build.sh
-
-      - name: Push the docker image to DockerHub
-        run: docker push --all-tags documenso/documenso
-
-      - name: Push the docker image to GitHub Container Registry
-        run: docker push --all-tags ghcr.io/documenso/documenso
+      - name: Build and push the docker image
+        run: ./docker/buildx-and-push.sh
