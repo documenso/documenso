@@ -360,7 +360,7 @@ export const SignUpFormV2 = ({
             {step === 'CLAIM_USERNAME' && (
               <fieldset
                 className={cn(
-                  'relative flex h-[500px] w-full flex-col gap-y-4',
+                  'flex h-[500px] w-full flex-col gap-y-4',
                   isGoogleSSOEnabled && 'h-[600px]',
                 )}
                 disabled={isSubmitting}
@@ -378,7 +378,7 @@ export const SignUpFormV2 = ({
 
                       <FormMessage />
 
-                      <div className="bg-muted/50 border-border text-muted-foreground absolute mt-2 inline-block w-full truncate rounded-md border px-2 py-1 text-sm lowercase">
+                      <div className="bg-muted/50 border-border text-muted-foreground mt-2 inline-block max-w-[29rem] truncate rounded-md border px-2 py-1 text-sm lowercase">
                         {baseUrl.host}/u/{field.value || '<username>'}
                       </div>
                     </FormItem>
