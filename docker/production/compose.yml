@@ -2,7 +2,7 @@ name: documenso-production
 
 services:
   database:
-    image: ?:15
+    image: postgres:15
     environment:
       - POSTGRES_USER=${POSTGRES_USER:?err}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:?err}
@@ -18,7 +18,8 @@ services:
   documenso:
     image: documenso/documenso:latest
     depends_on:
-      - database
+      database:
+        condition: service_healthy
     environment:
       - PORT=${PORT:-3000}
       - NEXTAUTH_URL=${NEXTAUTH_URL:-${NEXT_PUBLIC_WEBAPP_URL}}
