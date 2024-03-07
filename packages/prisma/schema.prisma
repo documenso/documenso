@@ -52,8 +52,17 @@ model User {
   securityAuditLogs UserSecurityAuditLog[]
   Webhooks          Webhook[]
   siteSettings      SiteSettings[]
+  dummyData DummyData[]
 
   @@index([email])
+}
+
+model DummyData {
+  id  String @id @default(cuid())
+  userId Int
+  hello String?
+
+  User User? @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model UserProfile {
