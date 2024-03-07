@@ -1,4 +1,4 @@
-import { compare } from 'bcrypt';
+import { compare } from '@node-rs/bcrypt';
 
 import { prisma } from '@documenso/prisma';
 import type { User } from '@documenso/prisma/client';
