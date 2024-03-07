@@ -68,7 +68,7 @@ export const DocumentDropzoneCardCenterVariants: Variants = {
 export const DocumentDropzoneDisabledCardLeftVariants: Variants = {
   initial: {
     x: 40,
-    y: 30,
+    y: 0,
     rotate: -14,
   },
   animate: {
@@ -85,8 +85,8 @@ export const DocumentDropzoneDisabledCardLeftVariants: Variants = {
 
 export const DocumentDropzoneDisabledCardRightVariants: Variants = {
   initial: {
-    x: -40,
-    y: 30,
+    x: -50,
+    y: 5,
     rotate: 14,
   },
   animate: {
@@ -103,7 +103,7 @@ export const DocumentDropzoneDisabledCardRightVariants: Variants = {
 
 export const DocumentDropzoneDisabledCardCenterVariants: Variants = {
   initial: {
-    x: 20,
+    x: -10,
     y: 0,
   },
   animate: {
