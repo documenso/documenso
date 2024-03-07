@@ -7,7 +7,7 @@ import { TemplateFooter } from '../template-components/template-footer';
 
 export const ConfirmEmailTemplate = ({
   confirmationLink,
-  assetBaseUrl,
+  assetBaseUrl = 'http://localhost:3002',
 }: TemplateConfirmationEmailProps) => {
   const previewText = `Please confirm your email address`;
 
@@ -55,3 +55,5 @@ export const ConfirmEmailTemplate = ({
     </Html>
   );
 };
+
+export default ConfirmEmailTemplate;

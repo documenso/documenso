@@ -1,5 +1,3 @@
->We are nominated for a Product Hunt Gold Kitty 😺✨ and appreciate any support: https://documen.so/kitty
-
 <img src="https://github.com/documenso/documenso/assets/13398220/a643571f-0239-46a6-a73e-6bef38d1228b" alt="Documenso Logo">
 
 <p align="center" style="margin-top: 20px">
@@ -107,7 +105,7 @@ Contact us if you are interested in our Enterprise plan for large organizations 
 
 To run Documenso locally, you will need
 
-- Node.js
+- Node.js (v18 or above)
 - Postgres SQL Database
 - Docker (optional)
 
@@ -209,7 +207,16 @@ If you're a visual learner and prefer to watch a video walkthrough of setting up
 
 ## Docker
 
-🚧 Docker containers and images are current in progress. We are actively working on bringing a simple Docker build and publish pipeline for Documenso.
+We provide a Docker container for Documenso, which is published on both DockerHub and GitHub Container Registry.
+
+- DockerHub: [https://hub.docker.com/r/documenso/documenso](https://hub.docker.com/r/documenso/documenso)
+- GitHub Container Registry: [https://ghcr.io/documenso/documenso](https://ghcr.io/documenso/documenso)
+
+You can pull the Docker image from either of these registries and run it with your preferred container hosting provider.
+
+Please note that you will need to provide environment variables for connecting to the database, mailserver, and so forth.
+
+For detailed instructions on how to configure and run the Docker container, please refer to the [Docker README](./docker/README.md) in the `docker` directory.
 
 ## Self Hosting
 

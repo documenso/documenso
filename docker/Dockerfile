@@ -32,12 +32,21 @@ RUN apk add --no-cache libc6-compat
 RUN apk add --no-cache jq
 # Required for node_modules/aws-crt
 RUN apk add --no-cache make cmake g++
+
 WORKDIR /app
 
 # Disable husky from installing hooks
 ENV HUSKY 0
 ENV DOCKER_OUTPUT 1
 ENV NEXT_TELEMETRY_DISABLED 1
+
+# Encryption keys
+ARG NEXT_PRIVATE_ENCRYPTION_KEY="CAFEBABE"
+ENV NEXT_PRIVATE_ENCRYPTION_KEY="$NEXT_PRIVATE_ENCRYPTION_KEY"
+
+ARG NEXT_PRIVATE_ENCRYPTION_SECONDARY_KEY="DEADBEEF"
+ENV NEXT_PRIVATE_ENCRYPTION_SECONDARY_KEY="$NEXT_PRIVATE_ENCRYPTION_SECONDARY_KEY"
+
 
 # Uncomment and use build args to enable remote caching
 # ARG TURBO_TEAM
@@ -72,6 +81,7 @@ WORKDIR /app
 # Don't run production as root
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs
+
 USER nextjs
 
 COPY --from=installer /app/apps/web/next.config.js .
@@ -83,4 +93,18 @@ COPY --from=installer --chown=nextjs:nodejs /app/apps/web/.next/standalone ./
 COPY --from=installer --chown=nextjs:nodejs /app/apps/web/.next/static ./apps/web/.next/static
 COPY --from=installer --chown=nextjs:nodejs /app/apps/web/public ./apps/web/public
 
-CMD node apps/web/server.js
+# Copy the prisma binary, schema and migrations
+COPY --from=installer --chown=nextjs:nodejs /app/packages/prisma/schema.prisma ./packages/prisma/schema.prisma
+COPY --from=installer --chown=nextjs:nodejs /app/packages/prisma/migrations ./packages/prisma/migrations
+COPY --from=installer --chown=nextjs:nodejs /app/node_modules/prisma/ ./node_modules/prisma/
+COPY --from=installer --chown=nextjs:nodejs /app/node_modules/@prisma/ ./node_modules/@prisma/
+
+# Symlink the prisma binary
+RUN mkdir node_modules/.bin
+RUN ln -s /app/node_modules/prisma/build/index.js ./node_modules/.bin/prisma
+
+
+# Get the start script from docker/start.sh
+COPY --chown=nextjs:nodejs ./docker/start.sh ./start.sh
+
+CMD ["sh", "start.sh"]

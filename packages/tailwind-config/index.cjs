@@ -11,6 +11,9 @@ module.exports = {
         sans: ['var(--font-sans)', ...fontFamily.sans],
         signature: ['var(--font-signature)'],
       },
+      zIndex: {
+        9999: '9999',
+      },
       colors: {
         border: 'hsl(var(--border))',
         input: 'hsl(var(--input))',
@@ -44,6 +47,11 @@ module.exports = {
         card: {
           DEFAULT: 'hsl(var(--card))',
           foreground: 'hsl(var(--card-foreground))',
+        },
+        'field-card': {
+          DEFAULT: 'hsl(var(--field-card))',
+          border: 'hsl(var(--field-card-border))',
+          foreground: 'hsl(var(--field-card-foreground))',
         },
         widget: {
           DEFAULT: 'hsl(var(--widget))',

@@ -7,7 +7,11 @@ import { useToast } from '@documenso/ui/primitives/use-toast';
 
 import { createBillingPortal } from './create-billing-portal.action';
 
-export const BillingPortalButton = () => {
+export type BillingPortalButtonProps = {
+  buttonProps?: React.ComponentProps<typeof Button>;
+};
+
+export const BillingPortalButton = ({ buttonProps }: BillingPortalButtonProps) => {
   const { toast } = useToast();
 
   const [isFetchingPortalUrl, setIsFetchingPortalUrl] = useState(false);
@@ -48,7 +52,11 @@ export const BillingPortalButton = () => {
   };
 
   return (
-    <Button onClick={async () => handleFetchPortalUrl()} loading={isFetchingPortalUrl}>
+    <Button
+      {...buttonProps}
+      onClick={async () => handleFetchPortalUrl()}
+      loading={isFetchingPortalUrl}
+    >
       Manage Subscription
     </Button>
   );

@@ -23,6 +23,7 @@ export const seedDatabase = async () => {
       email: TEST_USER.email,
       password: hashSync(TEST_USER.password),
       emailVerified: new Date(),
+      url: TEST_USER.email,
     },
   });
 };

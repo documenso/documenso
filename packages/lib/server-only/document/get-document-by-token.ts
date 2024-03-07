@@ -27,6 +27,7 @@ export const getDocumentAndSenderByToken = async ({
     include: {
       User: true,
       documentData: true,
+      documentMeta: true,
     },
   });
 
@@ -69,6 +70,6 @@ export const getDocumentAndRecipientByToken = async ({
 
   return {
     ...result,
-    Recipient: result.Recipient[0],
+    Recipient: result.Recipient,
   };
 };

@@ -1,5 +1,7 @@
 import { useRouter } from 'next/navigation';
 
+import { formatDocumentsPath } from '@documenso/lib/utils/teams';
+import type { Team } from '@documenso/prisma/client';
 import { trpc as trpcReact } from '@documenso/trpc/react';
 import { Button } from '@documenso/ui/primitives/button';
 import {
@@ -16,18 +18,21 @@ type DuplicateDocumentDialogProps = {
   id: number;
   open: boolean;
   onOpenChange: (_open: boolean) => void;
+  team?: Pick<Team, 'id' | 'url'>;
 };
 
 export const DuplicateDocumentDialog = ({
   id,
   open,
   onOpenChange,
+  team,
 }: DuplicateDocumentDialogProps) => {
   const router = useRouter();
   const { toast } = useToast();
 
   const { data: document, isLoading } = trpcReact.document.getDocumentById.useQuery({
     id,
+    teamId: team?.id,
   });
 
   const documentData = document?.documentData
@@ -37,10 +42,12 @@ export const DuplicateDocumentDialog = ({
       }
     : undefined;
 
+  const documentsPath = formatDocumentsPath(team?.url);
+
   const { mutateAsync: duplicateDocument, isLoading: isDuplicateLoading } =
     trpcReact.document.duplicateDocument.useMutation({
       onSuccess: (newId) => {
-        router.push(`/documents/${newId}`);
+        router.push(`${documentsPath}/${newId}/edit`);
 
         toast({
           title: 'Document Duplicated',
@@ -54,7 +61,7 @@ export const DuplicateDocumentDialog = ({
 
   const onDuplicate = async () => {
     try {
-      await duplicateDocument({ id });
+      await duplicateDocument({ id, teamId: team?.id });
     } catch {
       toast({
         title: 'Something went wrong',

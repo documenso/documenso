@@ -7,7 +7,7 @@ import { useForm } from 'react-hook-form';
 import type { z } from 'zod';
 
 import { trpc } from '@documenso/trpc/react';
-import { ZUpdateProfileMutationByAdminSchema } from '@documenso/trpc/server/admin-router/schema';
+import { ZAdminUpdateProfileMutationSchema } from '@documenso/trpc/server/admin-router/schema';
 import { Button } from '@documenso/ui/primitives/button';
 import {
   Form,
@@ -18,10 +18,12 @@ import {
   FormMessage,
 } from '@documenso/ui/primitives/form/form';
 import { Input } from '@documenso/ui/primitives/input';
-import { MultiSelectCombobox } from '@documenso/ui/primitives/multiselect-combobox';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
-const ZUserFormSchema = ZUpdateProfileMutationByAdminSchema.omit({ id: true });
+import { DeleteUserDialog } from './delete-user-dialog';
+import { MultiSelectRoleCombobox } from './multiselect-role-combobox';
+
+const ZUserFormSchema = ZAdminUpdateProfileMutationSchema.omit({ id: true });
 
 type TUserFormSchema = z.infer<typeof ZUserFormSchema>;
 
@@ -117,7 +119,7 @@ export default function UserPage({ params }: { params: { id: number } }) {
                   <fieldset className="flex flex-col gap-2">
                     <FormLabel className="text-muted-foreground">Roles</FormLabel>
                     <FormControl>
-                      <MultiSelectCombobox
+                      <MultiSelectRoleCombobox
                         listValues={roles}
                         onChange={(values: string[]) => onChange(values)}
                       />
@@ -136,6 +138,10 @@ export default function UserPage({ params }: { params: { id: number } }) {
           </fieldset>
         </form>
       </Form>
+
+      <hr className="my-4" />
+
+      {user && <DeleteUserDialog user={user} />}
     </div>
   );
 }

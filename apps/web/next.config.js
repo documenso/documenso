@@ -22,6 +22,7 @@ const config = {
   output: process.env.DOCKER_OUTPUT ? 'standalone' : undefined,
   experimental: {
     outputFileTracingRoot: path.join(__dirname, '../../'),
+    serverComponentsExternalPackages: ['@node-rs/bcrypt'],
     serverActions: {
       bodySizeLimit: '50mb',
     },
