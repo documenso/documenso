@@ -1,3 +1,5 @@
+'use client';
+
 import { useRef, useState } from 'react';
 
 import { getRecipientType } from '@documenso/lib/client-only/recipient-type';
