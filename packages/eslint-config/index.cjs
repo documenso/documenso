@@ -4,29 +4,20 @@ module.exports = {
     'turbo',
     'eslint:recommended',
     'plugin:@typescript-eslint/recommended',
-    'plugin:prettier/recommended',
     'plugin:package-json/recommended',
   ],
 
-  plugins: ['prettier', 'package-json', 'unused-imports'],
+  plugins: ['package-json', 'unused-imports'],
 
   env: {
+    es2022: true,
     node: true,
     browser: true,
-    es6: true,
   },
 
   parser: '@typescript-eslint/parser',
 
-  parserOptions: {
-    tsconfigRootDir: __dirname,
-    project: ['../../apps/*/tsconfig.json', '../../packages/*/tsconfig.json'],
-    ecmaVersion: 2022,
-    ecmaFeatures: {
-      jsx: true,
-    },
-    sourceType: 'module',
-  },
+  parserOptions: { project: true },
 
   rules: {
     '@next/next/no-html-link-for-pages': 'off',
