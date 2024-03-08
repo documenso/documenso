@@ -25,7 +25,7 @@ export const UserProfileTimur = ({ className, rows = 2 }: UserProfileTimurProps)
         className,
       )}
     >
-      <div className="border-border bg-background text-muted-foreground inline-block rounded-md border px-2.5 py-1.5 text-sm">
+      <div className="border-border bg-background text-muted-foreground inline-block max-w-full truncate rounded-md border px-2.5 py-1.5 text-sm">
         {baseUrl.host}/u/timur
       </div>
 

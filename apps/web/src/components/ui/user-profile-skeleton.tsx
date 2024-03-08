@@ -24,9 +24,8 @@ export const UserProfileSkeleton = ({ className, user, rows = 2 }: UserProfileSk
         className,
       )}
     >
-      <div className="border-border bg-background text-muted-foreground relative inline-block rounded-md border px-2.5 py-1.5 text-sm">
-        <span>{baseUrl.host}/u/</span>
-        <span className="absolute inline-block max-w-[8rem] truncate lowercase">{user.url}</span>
+      <div className="border-border bg-background text-muted-foreground inline-block max-w-full truncate rounded-md border px-2.5 py-1.5 text-sm">
+        {baseUrl.host}/u/{user.url}
       </div>
 
       <div className="mt-4">
