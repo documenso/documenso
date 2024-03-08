@@ -44,63 +44,66 @@ export const requestTeamOwnershipTransfer = async ({
   // Todo: Clear payment methods disabled for now.
   const clearPaymentMethods = false;
 
-  await prisma.$transaction(async (tx) => {
-    const team = await tx.team.findFirstOrThrow({
-      where: {
-        id: teamId,
-        ownerUserId: userId,
-        members: {
-          some: {
-            userId: newOwnerUserId,
+  await prisma.$transaction(
+    async (tx) => {
+      const team = await tx.team.findFirstOrThrow({
+        where: {
+          id: teamId,
+          ownerUserId: userId,
+          members: {
+            some: {
+              userId: newOwnerUserId,
+            },
           },
         },
-      },
-    });
+      });
 
-    const newOwnerUser = await tx.user.findFirstOrThrow({
-      where: {
-        id: newOwnerUserId,
-      },
-    });
+      const newOwnerUser = await tx.user.findFirstOrThrow({
+        where: {
+          id: newOwnerUserId,
+        },
+      });
 
-    const { token, expiresAt } = createTokenVerification({ minute: 10 });
+      const { token, expiresAt } = createTokenVerification({ minute: 10 });
 
-    const teamVerificationPayload = {
-      teamId,
-      token,
-      expiresAt,
-      userId: newOwnerUserId,
-      name: newOwnerUser.name ?? '',
-      email: newOwnerUser.email,
-      clearPaymentMethods,
-    };
-
-    await tx.teamTransferVerification.upsert({
-      where: {
+      const teamVerificationPayload = {
         teamId,
-      },
-      create: teamVerificationPayload,
-      update: teamVerificationPayload,
-    });
+        token,
+        expiresAt,
+        userId: newOwnerUserId,
+        name: newOwnerUser.name ?? '',
+        email: newOwnerUser.email,
+        clearPaymentMethods,
+      };
 
-    const template = createElement(TeamTransferRequestTemplate, {
-      assetBaseUrl: WEBAPP_BASE_URL,
-      baseUrl: WEBAPP_BASE_URL,
-      senderName: userName,
-      teamName: team.name,
-      teamUrl: team.url,
-      token,
-    });
+      await tx.teamTransferVerification.upsert({
+        where: {
+          teamId,
+        },
+        create: teamVerificationPayload,
+        update: teamVerificationPayload,
+      });
 
-    await mailer.sendMail({
-      to: newOwnerUser.email,
-      from: {
-        name: FROM_NAME,
-        address: FROM_ADDRESS,
-      },
-      subject: `You have been requested to take ownership of team ${team.name} on Documenso`,
-      html: render(template),
-      text: render(template, { plainText: true }),
-    });
-  });
+      const template = createElement(TeamTransferRequestTemplate, {
+        assetBaseUrl: WEBAPP_BASE_URL,
+        baseUrl: WEBAPP_BASE_URL,
+        senderName: userName,
+        teamName: team.name,
+        teamUrl: team.url,
+        token,
+      });
+
+      await mailer.sendMail({
+        to: newOwnerUser.email,
+        from: {
+          name: FROM_NAME,
+          address: FROM_ADDRESS,
+        },
+        subject: `You have been requested to take ownership of team ${team.name} on Documenso`,
+        html: render(template),
+        text: render(template, { plainText: true }),
+      });
+    },
+    { timeout: 30_000 },
+  );
 };

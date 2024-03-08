@@ -1,5 +1,5 @@
+import { compare } from '@node-rs/bcrypt';
 import { base32 } from '@scure/base';
-import { compare } from 'bcrypt';
 import crypto from 'crypto';
 import { createTOTPKeyURI } from 'oslo/otp';
 

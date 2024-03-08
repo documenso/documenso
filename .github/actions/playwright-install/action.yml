@@ -1,0 +1,19 @@
+name: Install playwright binaries
+description: 'Install playwright, cache and restore if necessary'
+runs:
+  using: 'composite'
+  steps:
+    - name: Cache playwright
+      id: cache-playwright
+      uses: actions/cache@v3
+      with:
+        path: |
+          ~/.cache/ms-playwright
+          ${{ github.workspace }}/node_modules/playwright
+        key: playwright-${{ hashFiles('**/package-lock.json') }}
+        restore-keys: playwright-
+
+    - name: Install playwright
+      if: steps.cache-playwright.outputs.cache-hit != 'true'
+      run: npx playwright install --with-deps
+      shell: bash

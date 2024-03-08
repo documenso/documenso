@@ -323,9 +323,9 @@ export const AddFieldsFormPartial = ({
           {selectedField && (
             <Card
               className={cn(
-                'bg-background pointer-events-none fixed z-50 cursor-pointer transition-opacity',
+                'bg-field-card/80 pointer-events-none fixed z-50 cursor-pointer border-2 backdrop-blur-[1px]',
                 {
-                  'border-primary': isFieldWithinBounds,
+                  'border-field-card-border': isFieldWithinBounds,
                   'opacity-50': !isFieldWithinBounds,
                 },
               )}
@@ -336,7 +336,7 @@ export const AddFieldsFormPartial = ({
                 width: fieldBounds.current.width,
               }}
             >
-              <CardContent className="text-foreground flex h-full w-full items-center justify-center p-2">
+              <CardContent className="text-field-card-foreground flex h-full w-full items-center justify-center p-2">
                 {FRIENDLY_FIELD_TYPE[selectedField]}
               </CardContent>
             </Card>
@@ -549,6 +549,28 @@ export const AddFieldsFormPartial = ({
                     </p>
 
                     <p className="text-muted-foreground mt-2 text-xs">Date</p>
+                  </CardContent>
+                </Card>
+              </button>
+
+              <button
+                type="button"
+                className="group h-full w-full"
+                onClick={() => setSelectedField(FieldType.TEXT)}
+                onMouseDown={() => setSelectedField(FieldType.TEXT)}
+                data-selected={selectedField === FieldType.TEXT ? true : undefined}
+              >
+                <Card className="group-data-[selected]:border-documenso h-full w-full cursor-pointer group-disabled:opacity-50">
+                  <CardContent className="flex flex-col items-center justify-center px-6 py-4">
+                    <p
+                      className={cn(
+                        'text-muted-foreground group-data-[selected]:text-foreground text-xl font-medium',
+                      )}
+                    >
+                      {'Text'}
+                    </p>
+
+                    <p className="text-muted-foreground mt-2 text-xs">Custom Text</p>
                   </CardContent>
                 </Card>
               </button>

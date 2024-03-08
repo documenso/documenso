@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -195,9 +196,11 @@ export const SignInForm = ({ className, initialEmail, isGoogleSSOEnabled }: Sign
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Email</FormLabel>
+
                 <FormControl>
                   <Input type="email" {...field} />
                 </FormControl>
+
                 <FormMessage />
               </FormItem>
             )}
@@ -209,9 +212,19 @@ export const SignInForm = ({ className, initialEmail, isGoogleSSOEnabled }: Sign
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Password</FormLabel>
+
                 <FormControl>
                   <PasswordInput {...field} />
                 </FormControl>
+
+                <p className="mt-2 text-right">
+                  <Link
+                    href="/forgot-password"
+                    className="text-muted-foreground text-sm duration-200 hover:opacity-70"
+                  >
+                    Forgot your password?
+                  </Link>
+                </p>
                 <FormMessage />
               </FormItem>
             )}

@@ -1,6 +1,7 @@
 'use client';
 
-import { HTMLAttributes, useEffect, useState } from 'react';
+import type { HTMLAttributes } from 'react';
+import { useEffect, useState } from 'react';
 
 import { Cell, Legend, Pie, PieChart, Tooltip } from 'recharts';
 

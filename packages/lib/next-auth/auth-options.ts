@@ -1,6 +1,6 @@
 /// <reference types="../types/next-auth.d.ts" />
 import { PrismaAdapter } from '@next-auth/prisma-adapter';
-import { compare } from 'bcrypt';
+import { compare } from '@node-rs/bcrypt';
 import { DateTime } from 'luxon';
 import type { AuthOptions, Session, User } from 'next-auth';
 import type { JWT } from 'next-auth/jwt';
