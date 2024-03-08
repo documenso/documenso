@@ -7,6 +7,8 @@ import { ChevronLeft } from 'lucide-react';
 import type { MDXComponents } from 'mdx/types';
 import { useMDXComponent } from 'next-contentlayer/hooks';
 
+import CTA from '~/components/(marketing)/CTA';
+
 export const dynamic = 'force-dynamic';
 
 export const generateMetadata = ({ params }: { params: { post: string } }) => {
@@ -89,6 +91,8 @@ export default function BlogPostPage({ params }: { params: { post: string } }) {
         <ChevronLeft className="mr-2 h-6 w-6" />
         Back to all posts
       </Link>
+
+      {post.cta && <CTA />}
     </article>
   );
 }
