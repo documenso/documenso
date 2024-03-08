@@ -138,7 +138,16 @@ export const ViewRecoveryCodesDialog = ({ open, onOpenChange }: ViewRecoveryCode
                   />
 
                   <DialogFooter>
-                    <Button type="button" variant="secondary" onClick={() => onOpenChange(false)}>
+                    <Button
+                      type="button"
+                      variant="secondary"
+                      onClick={() => {
+                        viewRecoveryCodesForm.reset({
+                          password: '',
+                        });
+                        onOpenChange(false);
+                      }}
+                    >
                       Cancel
                     </Button>
 

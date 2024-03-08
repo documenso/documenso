@@ -197,7 +197,16 @@ export const EnableAuthenticatorAppDialog = ({
                   />
 
                   <DialogFooter>
-                    <Button type="button" variant="secondary" onClick={() => onOpenChange(false)}>
+                    <Button
+                      type="button"
+                      variant="secondary"
+                      onClick={() => {
+                        setupTwoFactorAuthenticationForm.reset({
+                          password: '',
+                        });
+                        onOpenChange(false);
+                      }}
+                    >
                       Cancel
                     </Button>
 
