@@ -26,27 +26,6 @@ export const seedUser = async ({
   });
 };
 
-export const seed2faUser = async ({
-  name = `2fa-user-${Date.now()}`,
-  email = `2fa-user-${Date.now()}@test.documenso.com`,
-  password = 'password',
-  verified = true,
-}: SeedUserOptions = {}) => {
-  return await prisma.user.create({
-    data: {
-      name,
-      email,
-      password: hashSync(password),
-      emailVerified: verified ? new Date() : undefined,
-      url: name,
-      twoFactorEnabled: true,
-      twoFactorSecret:
-        'b2840b216b1f089cb086bdd4260196c645d90b0bd3ff8f66d20d19b99a0da1631bf299e416476917194f1064f58b',
-      twoFactorBackupCodes: 'a-bunch-of-backup-codes',
-    },
-  });
-};
-
 export const unseedUser = async (userId: number) => {
   await prisma.user.delete({
     where: {
