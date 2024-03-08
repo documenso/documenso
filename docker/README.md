@@ -60,15 +60,13 @@ docker pull ghcr.io/documenso/documenso
 ```
 docker run -d \
   -p 3000:3000 \
-  -e POSTGRES_USER="<your-postgres-user>"
-  -e POSTGRES_PASSWORD="<your-postgres-password>"
-  -e POSTGRES_DB="<your-postgres-db>"
   -e NEXTAUTH_URL="<your-nextauth-url>"
   -e NEXTAUTH_SECRET="<your-nextauth-secret>"
   -e NEXT_PRIVATE_ENCRYPTION_KEY="<your-next-private-encryption-key>"
   -e NEXT_PRIVATE_ENCRYPTION_SECONDARY_KEY="<your-next-private-encryption-secondary-key>"
   -e NEXT_PUBLIC_WEBAPP_URL="<your-next-public-webapp-url>"
   -e NEXT_PRIVATE_DATABASE_URL="<your-next-private-database-url>"
+  -e NEXT_PRIVATE_DIRECT_DATABASE_URL="<your-next-private-database-url>"
   -e NEXT_PRIVATE_SMTP_TRANSPORT="<your-next-private-smtp-transport>"
   -e NEXT_PRIVATE_SMTP_FROM_NAME="<your-next-private-smtp-from-name>"
   -e NEXT_PRIVATE_SMTP_FROM_ADDRESS="<your-next-private-smtp-from-address>"
