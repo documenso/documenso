@@ -1,5 +1,7 @@
 'use client';
 
+import { useState } from 'react';
+
 import { signOut } from 'next-auth/react';
 
 import type { User } from '@documenso/prisma/client';
@@ -16,6 +18,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@documenso/ui/primitives/dialog';
+import { Input } from '@documenso/ui/primitives/input';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
 export type DeleteAccountDialogProps = {
@@ -27,6 +30,9 @@ export const DeleteAccountDialog = ({ className, user }: DeleteAccountDialogProp
   const { toast } = useToast();
 
   const hasTwoFactorAuthentication = user.twoFactorEnabled;
+  const username = user.name!;
+
+  const [enteredUsername, setEnteredUsername] = useState<string>('');
 
   const { mutateAsync: deleteAccount, isLoading: isDeletingAccount } =
     trpc.profile.deleteAccount.useMutation();
@@ -76,7 +82,7 @@ export const DeleteAccountDialog = ({ className, user }: DeleteAccountDialogProp
         </div>
 
         <div className="flex-shrink-0">
-          <Dialog>
+          <Dialog onOpenChange={() => setEnteredUsername('')}>
             <DialogTrigger asChild>
               <Button variant="destructive">Delete Account</Button>
             </DialogTrigger>
@@ -103,17 +109,44 @@ export const DeleteAccountDialog = ({ className, user }: DeleteAccountDialogProp
                   , along with all of your completed documents, signatures, and all other resources
                   belonging to your Account.
                 </DialogDescription>
+                {!hasTwoFactorAuthentication && (
+                  <DialogDescription>
+                    Please type <span className="font-semibold">{username}</span> to confirm.
+                  </DialogDescription>
+                )}
               </DialogHeader>
 
+              {!hasTwoFactorAuthentication && (
+                <div className="mt-4">
+                  <Input
+                    type="text"
+                    value={enteredUsername}
+                    onChange={(e) => setEnteredUsername(e.target.value)}
+                    onPaste={(e) => e.preventDefault()}
+                  />
+                </div>
+              )}
               <DialogFooter>
-                <Button
-                  onClick={onDeleteAccount}
-                  loading={isDeletingAccount}
-                  variant="destructive"
-                  disabled={hasTwoFactorAuthentication}
-                >
-                  {isDeletingAccount ? 'Deleting account...' : 'Confirm Deletion'}
-                </Button>
+                {!hasTwoFactorAuthentication && (
+                  <Button
+                    className="text-red-500 hover:bg-red-500 hover:text-white sm:w-full"
+                    onClick={onDeleteAccount}
+                    loading={isDeletingAccount}
+                    variant="outline"
+                    disabled={hasTwoFactorAuthentication || enteredUsername !== username}
+                  >
+                    {isDeletingAccount ? (
+                      'Deleting account...'
+                    ) : (
+                      <>
+                        <span className="sm:hidden">Delete account</span>
+                        <span className="hidden sm:block">
+                          I understand the consequences, delete this account
+                        </span>
+                      </>
+                    )}
+                  </Button>
+                )}
               </DialogFooter>
             </DialogContent>
           </Dialog>
