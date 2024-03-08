@@ -2,8 +2,6 @@ import Link from 'next/link';
 
 import { Button } from '@documenso/ui/primitives/button';
 
-// import { cn } from '@documenso/ui/lib/utils';
-
 export default function CTA() {
   return (
     <div className="bg-background shadow-foreground/5 border-documenso mt-12 flex flex-col items-center justify-center rounded-lg border-4 border-double p-8 shadow-lg hover:shadow-md">
