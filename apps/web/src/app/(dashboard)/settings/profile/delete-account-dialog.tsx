@@ -78,7 +78,9 @@ export const DeleteAccountDialog = ({ className, user }: DeleteAccountDialogProp
         <div className="flex-shrink-0">
           <Dialog>
             <DialogTrigger asChild>
-              <Button variant="destructive">Delete Account</Button>
+              <Button variant="destructive" data-testid="delete-account-button">
+                Delete Account
+              </Button>
             </DialogTrigger>
             <DialogContent>
               <DialogHeader className="space-y-4">
@@ -110,6 +112,7 @@ export const DeleteAccountDialog = ({ className, user }: DeleteAccountDialogProp
                   onClick={onDeleteAccount}
                   loading={isDeletingAccount}
                   variant="destructive"
+                  data-testid="delete-account-confirmation-button"
                   disabled={hasTwoFactorAuthentication}
                 >
                   {isDeletingAccount ? 'Deleting account...' : 'Delete Account'}
