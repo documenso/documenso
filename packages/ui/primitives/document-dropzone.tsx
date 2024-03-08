@@ -90,7 +90,7 @@ export const DocumentDropzone = ({
             <div className="flex">
               <motion.div
                 className="group-hover:bg-destructive/2 border-muted-foreground/20 group-hover:border-destructive/10 dark:bg-muted/80 a z-10 flex aspect-[3/4] w-24 origin-top-right -rotate-[22deg] flex-col gap-y-1 rounded-lg border bg-white/80 px-2 py-4 backdrop-blur-sm"
-                variants={disabled ? DocumentDropzoneDisabledCardLeftVariants : undefined}
+                variants={DocumentDropzoneDisabledCardLeftVariants}
               >
                 <div className="bg-muted-foreground/10 group-hover:bg-destructive/10 h-2 w-full rounded-[2px]" />
                 <div className="bg-muted-foreground/10 group-hover:bg-destructive/10 h-2 w-5/6 rounded-[2px]" />
@@ -99,7 +99,7 @@ export const DocumentDropzone = ({
 
               <motion.div
                 className="group-hover:bg-destructive/5 border-muted-foreground/20 group-hover:border-destructive/50 dark:bg-muted/80 z-20 flex aspect-[3/4] w-24 flex-col items-center justify-center gap-y-1 rounded-lg border bg-white/80 px-2 py-4 backdrop-blur-sm"
-                variants={disabled ? DocumentDropzoneDisabledCardCenterVariants : undefined}
+                variants={DocumentDropzoneDisabledCardCenterVariants}
               >
                 <AlertTriangle
                   strokeWidth="2px"
@@ -109,7 +109,7 @@ export const DocumentDropzone = ({
 
               <motion.div
                 className="group-hover:bg-destructive/2 border-muted-foreground/20 group-hover:border-destructive/10 dark:bg-muted/80 z-10 flex aspect-[3/4] w-24 origin-top-left rotate-[22deg] flex-col gap-y-1 rounded-lg border bg-white/80 px-2 py-4 backdrop-blur-sm"
-                variants={disabled ? DocumentDropzoneDisabledCardRightVariants : undefined}
+                variants={DocumentDropzoneDisabledCardRightVariants}
               >
                 <div className="bg-muted-foreground/10 group-hover:bg-destructive/10 h-2 w-full rounded-[2px]" />
                 <div className="bg-muted-foreground/10 group-hover:bg-destructive/10 h-2 w-5/6 rounded-[2px]" />
@@ -121,7 +121,7 @@ export const DocumentDropzone = ({
             <div className="flex">
               <motion.div
                 className="border-muted-foreground/20 group-hover:border-documenso/80 dark:bg-muted/80 a z-10 flex aspect-[3/4] w-24 origin-top-right -rotate-[22deg] flex-col gap-y-1 rounded-lg border bg-white/80 px-2 py-4 backdrop-blur-sm"
-                variants={!disabled ? DocumentDropzoneCardLeftVariants : undefined}
+                variants={DocumentDropzoneCardLeftVariants}
               >
                 <div className="bg-muted-foreground/20 group-hover:bg-documenso h-2 w-full rounded-[2px]" />
                 <div className="bg-muted-foreground/20 group-hover:bg-documenso h-2 w-5/6 rounded-[2px]" />
@@ -130,7 +130,7 @@ export const DocumentDropzone = ({
 
               <motion.div
                 className="border-muted-foreground/20 group-hover:border-documenso/80 dark:bg-muted/80 z-20 flex aspect-[3/4] w-24 flex-col items-center justify-center gap-y-1 rounded-lg border bg-white/80 px-2 py-4 backdrop-blur-sm"
-                variants={!disabled ? DocumentDropzoneCardCenterVariants : undefined}
+                variants={DocumentDropzoneCardCenterVariants}
               >
                 <Plus
                   strokeWidth="2px"
@@ -140,7 +140,7 @@ export const DocumentDropzone = ({
 
               <motion.div
                 className="border-muted-foreground/20 group-hover:border-documenso/80 dark:bg-muted/80 z-10 flex aspect-[3/4] w-24 origin-top-left rotate-[22deg] flex-col gap-y-1 rounded-lg border bg-white/80 px-2 py-4 backdrop-blur-sm"
-                variants={!disabled ? DocumentDropzoneCardRightVariants : undefined}
+                variants={DocumentDropzoneCardRightVariants}
               >
                 <div className="bg-muted-foreground/20 group-hover:bg-documenso h-2 w-full rounded-[2px]" />
                 <div className="bg-muted-foreground/20 group-hover:bg-documenso h-2 w-5/6 rounded-[2px]" />
