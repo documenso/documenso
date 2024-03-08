@@ -13,7 +13,7 @@ import { DocumentStatus as InternalDocumentStatus } from '@documenso/prisma/clie
 import { LazyPDFViewer } from '@documenso/ui/primitives/lazy-pdf-viewer';
 
 import { EditDocumentForm } from '~/app/(dashboard)/documents/[id]/edit-document';
-import { StackAvatarsUI } from '~/components/(dashboard)/avatar/stack-avatars-ui';
+import { StackAvatarsWithTooltip } from '~/components/(dashboard)/avatar/stack-avatars-with-tooltip';
 import { DocumentStatus } from '~/components/formatter/document-status';
 
 export type DocumentPageProps = {
@@ -90,9 +90,9 @@ export default async function DocumentPage({ params }: DocumentPageProps) {
           <div className="text-muted-foreground flex items-center">
             <Users2 className="mr-2 h-5 w-5" />
 
-            <StackAvatarsUI recipients={recipients} position="bottom">
+            <StackAvatarsWithTooltip recipients={recipients} position="bottom">
               <span>{recipients.length} Recipient(s)</span>
-            </StackAvatarsUI>
+            </StackAvatarsWithTooltip>
           </div>
         )}
       </div>

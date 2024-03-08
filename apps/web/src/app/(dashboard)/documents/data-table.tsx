@@ -12,7 +12,7 @@ import { ExtendedDocumentStatus } from '@documenso/prisma/types/extended-documen
 import { DataTable } from '@documenso/ui/primitives/data-table';
 import { DataTablePagination } from '@documenso/ui/primitives/data-table-pagination';
 
-import { StackAvatarsUI } from '~/components/(dashboard)/avatar/stack-avatars-ui';
+import { StackAvatarsWithTooltip } from '~/components/(dashboard)/avatar/stack-avatars-with-tooltip';
 import { DocumentStatus } from '~/components/formatter/document-status';
 import { LocaleDate } from '~/components/formatter/locale-date';
 
@@ -64,7 +64,7 @@ export const DocumentsDataTable = ({ results }: DocumentsDataTableProps) => {
           {
             header: 'Recipient',
             accessorKey: 'recipient',
-            cell: ({ row }) => <StackAvatarsUI recipients={row.original.Recipient} />,
+            cell: ({ row }) => <StackAvatarsWithTooltip recipients={row.original.Recipient} />,
           },
           {
             header: 'Status',
