@@ -2,6 +2,9 @@
 
 import { useState } from 'react';
 
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+
 import { zodResolver } from '@hookform/resolvers/zod';
 import { signIn } from 'next-auth/react';
 import { useForm } from 'react-hook-form';
@@ -9,9 +12,16 @@ import { FcGoogle } from 'react-icons/fc';
 import { z } from 'zod';
 
 import { ErrorCode, isErrorCode } from '@documenso/lib/next-auth/error-codes';
+import { ZCurrentPasswordSchema } from '@documenso/trpc/server/auth-router/schema';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@documenso/ui/primitives/dialog';
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@documenso/ui/primitives/dialog';
 import {
   Form,
   FormControl,
@@ -31,6 +41,8 @@ const ERROR_MESSAGES: Partial<Record<keyof typeof ErrorCode, string>> = {
     'This account appears to be using a social login method, please sign in using that method',
   [ErrorCode.INCORRECT_TWO_FACTOR_CODE]: 'The two-factor authentication code provided is incorrect',
   [ErrorCode.INCORRECT_TWO_FACTOR_BACKUP_CODE]: 'The backup code provided is incorrect',
+  [ErrorCode.UNVERIFIED_EMAIL]:
+    'This account has not been verified. Please verify your account before signing in.',
 };
 
 const TwoFactorEnabledErrorCode = ErrorCode.TWO_FACTOR_MISSING_CREDENTIALS;
@@ -39,7 +51,7 @@ const LOGIN_REDIRECT_PATH = '/documents';
 
 export const ZSignInFormSchema = z.object({
   email: z.string().email().min(1),
-  password: z.string().min(6).max(72),
+  password: ZCurrentPasswordSchema,
   totpCode: z.string().trim().optional(),
   backupCode: z.string().trim().optional(),
 });
@@ -48,13 +60,15 @@ export type TSignInFormSchema = z.infer<typeof ZSignInFormSchema>;
 
 export type SignInFormProps = {
   className?: string;
+  initialEmail?: string;
   isGoogleSSOEnabled?: boolean;
 };
 
-export const SignInForm = ({ className, isGoogleSSOEnabled }: SignInFormProps) => {
+export const SignInForm = ({ className, initialEmail, isGoogleSSOEnabled }: SignInFormProps) => {
   const { toast } = useToast();
   const [isTwoFactorAuthenticationDialogOpen, setIsTwoFactorAuthenticationDialogOpen] =
     useState(false);
+  const router = useRouter();
 
   const [twoFactorAuthenticationMethod, setTwoFactorAuthenticationMethod] = useState<
     'totp' | 'backup'
@@ -62,7 +76,7 @@ export const SignInForm = ({ className, isGoogleSSOEnabled }: SignInFormProps) =
 
   const form = useForm<TSignInFormSchema>({
     values: {
-      email: '',
+      email: initialEmail ?? '',
       password: '',
       totpCode: '',
       backupCode: '',
@@ -110,7 +124,6 @@ export const SignInForm = ({ className, isGoogleSSOEnabled }: SignInFormProps) =
 
       const result = await signIn('credentials', {
         ...credentials,
-
         callbackUrl: LOGIN_REDIRECT_PATH,
         redirect: false,
       });
@@ -122,6 +135,17 @@ export const SignInForm = ({ className, isGoogleSSOEnabled }: SignInFormProps) =
         }
 
         const errorMessage = ERROR_MESSAGES[result.error];
+
+        if (result.error === ErrorCode.UNVERIFIED_EMAIL) {
+          router.push(`/unverified-account`);
+
+          toast({
+            title: 'Unable to sign in',
+            description: errorMessage ?? 'An unknown error occurred',
+          });
+
+          return;
+        }
 
         toast({
           variant: 'destructive',
@@ -172,9 +196,11 @@ export const SignInForm = ({ className, isGoogleSSOEnabled }: SignInFormProps) =
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Email</FormLabel>
+
                 <FormControl>
                   <Input type="email" {...field} />
                 </FormControl>
+
                 <FormMessage />
               </FormItem>
             )}
@@ -186,9 +212,19 @@ export const SignInForm = ({ className, isGoogleSSOEnabled }: SignInFormProps) =
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Password</FormLabel>
+
                 <FormControl>
                   <PasswordInput {...field} />
                 </FormControl>
+
+                <p className="mt-2 text-right">
+                  <Link
+                    href="/forgot-password"
+                    className="text-muted-foreground text-sm duration-200 hover:opacity-70"
+                  >
+                    Forgot your password?
+                  </Link>
+                </p>
                 <FormMessage />
               </FormItem>
             )}
@@ -269,21 +305,23 @@ export const SignInForm = ({ className, isGoogleSSOEnabled }: SignInFormProps) =
                   )}
                 />
               )}
+
+              <DialogFooter className="mt-4">
+                <Button
+                  type="button"
+                  variant="secondary"
+                  onClick={onToggleTwoFactorAuthenticationMethodClick}
+                >
+                  {twoFactorAuthenticationMethod === 'totp'
+                    ? 'Use Backup Code'
+                    : 'Use Authenticator'}
+                </Button>
+
+                <Button type="submit" loading={isSubmitting}>
+                  {isSubmitting ? 'Signing in...' : 'Sign In'}
+                </Button>
+              </DialogFooter>
             </fieldset>
-
-            <div className="mt-4 flex items-center justify-between">
-              <Button
-                type="button"
-                variant="ghost"
-                onClick={onToggleTwoFactorAuthenticationMethodClick}
-              >
-                {twoFactorAuthenticationMethod === 'totp' ? 'Use Backup Code' : 'Use Authenticator'}
-              </Button>
-
-              <Button type="submit" loading={isSubmitting}>
-                {isSubmitting ? 'Signing in...' : 'Sign In'}
-              </Button>
-            </div>
           </form>
         </DialogContent>
       </Dialog>

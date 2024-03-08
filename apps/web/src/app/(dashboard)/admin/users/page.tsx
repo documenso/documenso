@@ -1,4 +1,5 @@
-import { getPricesByType } from '@documenso/ee/server-only/stripe/get-prices-by-type';
+import { getPricesByPlan } from '@documenso/ee/server-only/stripe/get-prices-by-plan';
+import { STRIPE_PLAN_TYPE } from '@documenso/lib/constants/billing';
 
 import { UsersDataTable } from './data-table-users';
 import { search } from './fetch-users.actions';
@@ -18,7 +19,7 @@ export default async function AdminManageUsers({ searchParams = {} }: AdminManag
 
   const [{ users, totalPages }, individualPrices] = await Promise.all([
     search(searchString, page, perPage),
-    getPricesByType('individual'),
+    getPricesByPlan(STRIPE_PLAN_TYPE.COMMUNITY).catch(() => []),
   ]);
 
   const individualPriceIds = individualPrices.map((price) => price.id);

@@ -7,7 +7,7 @@ import { useSession } from 'next-auth/react';
 
 import { useUpdateSearchParams } from '@documenso/lib/client-only/hooks/use-update-search-params';
 import type { FindResultSet } from '@documenso/lib/types/find-result-set';
-import type { Document, Recipient, User } from '@documenso/prisma/client';
+import type { Document, Recipient, Team, User } from '@documenso/prisma/client';
 import { ExtendedDocumentStatus } from '@documenso/prisma/types/extended-document-status';
 import { DataTable } from '@documenso/ui/primitives/data-table';
 import { DataTablePagination } from '@documenso/ui/primitives/data-table-pagination';
@@ -25,11 +25,18 @@ export type DocumentsDataTableProps = {
     Document & {
       Recipient: Recipient[];
       User: Pick<User, 'id' | 'name' | 'email'>;
+      team: Pick<Team, 'id' | 'url'> | null;
     }
   >;
+  showSenderColumn?: boolean;
+  team?: Pick<Team, 'id' | 'url'>;
 };
 
-export const DocumentsDataTable = ({ results }: DocumentsDataTableProps) => {
+export const DocumentsDataTable = ({
+  results,
+  showSenderColumn,
+  team,
+}: DocumentsDataTableProps) => {
   const { data: session } = useSession();
   const [isPending, startTransition] = useTransition();
 
@@ -59,7 +66,12 @@ export const DocumentsDataTable = ({ results }: DocumentsDataTableProps) => {
           },
           {
             header: 'Title',
-            cell: ({ row }) => <DataTableTitle row={row.original} />,
+            cell: ({ row }) => <DataTableTitle row={row.original} teamUrl={team?.url} />,
+          },
+          {
+            id: 'sender',
+            header: 'Sender',
+            cell: ({ row }) => row.original.User.name ?? row.original.User.email,
           },
           {
             header: 'Recipient',
@@ -77,8 +89,8 @@ export const DocumentsDataTable = ({ results }: DocumentsDataTableProps) => {
               (!row.original.deletedAt ||
                 row.original.status === ExtendedDocumentStatus.COMPLETED) && (
                 <div className="flex items-center gap-x-4">
-                  <DataTableActionButton row={row.original} />
-                  <DataTableActionDropdown row={row.original} />
+                  <DataTableActionButton team={team} row={row.original} />
+                  <DataTableActionDropdown team={team} row={row.original} />
                 </div>
               ),
           },
@@ -88,6 +100,9 @@ export const DocumentsDataTable = ({ results }: DocumentsDataTableProps) => {
         currentPage={results.currentPage}
         totalPages={results.totalPages}
         onPaginationChange={onPaginationChange}
+        columnVisibility={{
+          sender: Boolean(showSenderColumn),
+        }}
       >
         {(table) => <DataTablePagination additionalInformation="VisibleCount" table={table} />}
       </DataTable>

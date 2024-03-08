@@ -27,7 +27,8 @@
       "cache": false
     },
     "test:e2e": {
-      "dependsOn": ["^build"]
+      "dependsOn": ["^build"],
+      "cache": false
     }
   },
   "globalDependencies": ["**/.env.*local"],
@@ -43,8 +44,8 @@
     "NEXT_PUBLIC_POSTHOG_KEY",
     "NEXT_PUBLIC_FEATURE_BILLING_ENABLED",
     "NEXT_PUBLIC_STRIPE_COMMUNITY_PLAN_MONTHLY_PRICE_ID",
-    "NEXT_PUBLIC_STRIPE_FREE_PLAN_ID",
     "NEXT_PUBLIC_DISABLE_SIGNUP",
+    "NEXT_PUBLIC_DOCUMENT_SIZE_UPLOAD_LIMIT",
     "NEXT_PRIVATE_DATABASE_URL",
     "NEXT_PRIVATE_DIRECT_DATABASE_URL",
     "NEXT_PRIVATE_GOOGLE_CLIENT_ID",
@@ -89,6 +90,7 @@
     "FONT_CAVEAT_URI",
     "POSTGRES_URL",
     "DATABASE_URL",
+    "DATABASE_URL_UNPOOLED",
     "POSTGRES_PRISMA_URL",
     "POSTGRES_URL_NON_POOLING",
     "E2E_TEST_AUTHENTICATE_USERNAME",

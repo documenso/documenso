@@ -1,5 +1,13 @@
 import signer from 'node-signpdf';
-import { PDFArray, PDFDocument, PDFHexString, PDFName, PDFNumber, PDFString } from 'pdf-lib';
+import {
+  PDFArray,
+  PDFDocument,
+  PDFHexString,
+  PDFName,
+  PDFNumber,
+  PDFString,
+  rectangle,
+} from 'pdf-lib';
 
 export type AddSigningPlaceholderOptions = {
   pdf: Buffer;
@@ -38,6 +46,12 @@ export const addSigningPlaceholder = async ({ pdf }: AddSigningPlaceholderOption
     F: 4,
     P: pages[0].ref,
   });
+
+  const xobj = widget.context.formXObject([rectangle(0, 0, 0, 0)]);
+
+  const streamRef = widget.context.register(xobj);
+
+  widget.set(PDFName.of('AP'), widget.context.obj({ N: streamRef }));
 
   const widgetRef = doc.context.register(widget);
 

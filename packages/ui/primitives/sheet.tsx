@@ -3,7 +3,8 @@
 import * as React from 'react';
 
 import * as SheetPrimitive from '@radix-ui/react-dialog';
-import { VariantProps, cva } from 'class-variance-authority';
+import type { VariantProps } from 'class-variance-authority';
+import { cva } from 'class-variance-authority';
 import { X } from 'lucide-react';
 
 import { cn } from '../lib/utils';
@@ -12,7 +13,7 @@ const Sheet = SheetPrimitive.Root;
 
 const SheetTrigger = SheetPrimitive.Trigger;
 
-const portalVariants = cva('fixed inset-0 z-50 flex', {
+const portalVariants = cva('fixed inset-0 z-[61] flex', {
   variants: {
     position: {
       top: 'items-start',
@@ -42,7 +43,7 @@ const SheetOverlay = React.forwardRef<
 >(({ className, children: _children, ...props }, ref) => (
   <SheetPrimitive.Overlay
     className={cn(
-      'bg-background/80 data-[state=closed]:animate-out data-[state=closed]:fade-out data-[state=open]:fade-in fixed inset-0 z-50 backdrop-blur-sm transition-all duration-100',
+      'bg-background/80 data-[state=closed]:animate-out data-[state=closed]:fade-out data-[state=open]:fade-in fixed inset-0 z-[61] backdrop-blur-sm transition-all duration-100',
       className,
     )}
     {...props}
@@ -53,7 +54,7 @@ const SheetOverlay = React.forwardRef<
 SheetOverlay.displayName = SheetPrimitive.Overlay.displayName;
 
 const sheetVariants = cva(
-  'fixed z-50 scale-100 gap-4 bg-background p-6 opacity-100 shadow-lg border',
+  'fixed z-[61] scale-100 gap-4 bg-background p-6 opacity-100 shadow-lg border',
   {
     variants: {
       position: {
@@ -142,14 +143,17 @@ const sheetVariants = cva(
 
 export interface DialogContentProps
   extends React.ComponentPropsWithoutRef<typeof SheetPrimitive.Content>,
-    VariantProps<typeof sheetVariants> {}
+    VariantProps<typeof sheetVariants> {
+  showOverlay?: boolean;
+  sheetClass?: string;
+}
 
 const SheetContent = React.forwardRef<
   React.ElementRef<typeof SheetPrimitive.Content>,
   DialogContentProps
->(({ position, size, className, children, ...props }, ref) => (
+>(({ position, size, className, sheetClass, showOverlay = true, children, ...props }, ref) => (
   <SheetPortal position={position}>
-    <SheetOverlay />
+    {showOverlay && <SheetOverlay className={sheetClass} />}
     <SheetPrimitive.Content
       ref={ref}
       className={cn(sheetVariants({ position, size }), className)}

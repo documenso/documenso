@@ -4,10 +4,11 @@ import type { HTMLAttributes } from 'react';
 import { useEffect, useState } from 'react';
 
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { useParams, usePathname } from 'next/navigation';
 
 import { Search } from 'lucide-react';
 
+import { getRootHref } from '@documenso/lib/utils/params';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
 
@@ -28,9 +29,12 @@ export type DesktopNavProps = HTMLAttributes<HTMLDivElement>;
 
 export const DesktopNav = ({ className, ...props }: DesktopNavProps) => {
   const pathname = usePathname();
+  const params = useParams();
 
   const [open, setOpen] = useState(false);
   const [modifierKey, setModifierKey] = useState(() => 'Ctrl');
+
+  const rootHref = getRootHref(params, { returnEmptyRootString: true });
 
   useEffect(() => {
     const userAgent = typeof navigator !== 'undefined' ? navigator.userAgent : 'unknown';
@@ -51,11 +55,13 @@ export const DesktopNav = ({ className, ...props }: DesktopNavProps) => {
         {navigationLinks.map(({ href, label }) => (
           <Link
             key={href}
-            href={href}
+            href={`${rootHref}${href}`}
             className={cn(
-              'text-muted-foreground dark:text-muted focus-visible:ring-ring ring-offset-background rounded-md font-medium leading-5 hover:opacity-80 focus-visible:outline-none focus-visible:ring-2',
+              'text-muted-foreground dark:text-muted-foreground/60 focus-visible:ring-ring ring-offset-background rounded-md font-medium leading-5 hover:opacity-80 focus-visible:outline-none focus-visible:ring-2',
               {
-                'text-foreground dark:text-muted-foreground': pathname?.startsWith(href),
+                'text-foreground dark:text-muted-foreground': pathname?.startsWith(
+                  `${rootHref}${href}`,
+                ),
               },
             )}
           >

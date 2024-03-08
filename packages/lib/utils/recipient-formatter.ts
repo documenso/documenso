@@ -1,6 +1,6 @@
 import type { Recipient } from '@documenso/prisma/client';
 
-export const recipientInitials = (text: string) =>
+export const extractInitials = (text: string) =>
   text
     .split(' ')
     .map((name: string) => name.slice(0, 1).toUpperCase())
@@ -8,5 +8,5 @@ export const recipientInitials = (text: string) =>
     .join('');
 
 export const recipientAbbreviation = (recipient: Recipient) => {
-  return recipientInitials(recipient.name) || recipient.email.slice(0, 1).toUpperCase();
+  return extractInitials(recipient.name) || recipient.email.slice(0, 1).toUpperCase();
 };

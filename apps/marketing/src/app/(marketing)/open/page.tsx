@@ -15,6 +15,7 @@ import { MonthlyNewUsersChart } from './monthly-new-users-chart';
 import { MonthlyTotalUsersChart } from './monthly-total-users-chart';
 import { TeamMembers } from './team-members';
 import { OpenPageTooltip } from './tooltip';
+import { Typefully } from './typefully';
 
 export const metadata: Metadata = {
   title: 'Open Startup',
@@ -147,7 +148,12 @@ export default async function OpenPage() {
         <p className="text-muted-foreground mt-4 max-w-[60ch] text-center text-lg leading-normal">
           All our metrics, finances, and learnings are public. We believe in transparency and want
           to share our journey with you. You can read more about why here:{' '}
-          <a className="font-bold" href="https://documenso.com/blog/pre-seed" target="_blank">
+          <a
+            className="font-bold"
+            href="https://documenso.com/blog/pre-seed"
+            target="_blank"
+            rel="noreferrer"
+          >
             Announcing Open Metrics
           </a>
         </p>
@@ -231,6 +237,8 @@ export default async function OpenPage() {
 
         <MonthlyTotalUsersChart data={MONTHLY_USERS} className="col-span-12 lg:col-span-6" />
         <MonthlyNewUsersChart data={MONTHLY_USERS} className="col-span-12 lg:col-span-6" />
+
+        <Typefully className="col-span-12 lg:col-span-6" />
 
         <div className="col-span-12 mt-12 flex flex-col items-center justify-center">
           <h2 className="text-2xl font-bold">Where's the rest?</h2>

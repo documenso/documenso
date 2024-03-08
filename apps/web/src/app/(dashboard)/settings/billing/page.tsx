@@ -5,8 +5,9 @@ import { match } from 'ts-pattern';
 
 import { getStripeCustomerByUser } from '@documenso/ee/server-only/stripe/get-customer';
 import { getPricesByInterval } from '@documenso/ee/server-only/stripe/get-prices-by-interval';
-import { getPricesByType } from '@documenso/ee/server-only/stripe/get-prices-by-type';
+import { getPrimaryAccountPlanPrices } from '@documenso/ee/server-only/stripe/get-primary-account-plan-prices';
 import { getProductByPriceId } from '@documenso/ee/server-only/stripe/get-product-by-price-id';
+import { STRIPE_PLAN_TYPE } from '@documenso/lib/constants/billing';
 import { getRequiredServerComponentSession } from '@documenso/lib/next-auth/get-server-component-session';
 import { getServerComponentFlag } from '@documenso/lib/server-only/feature-flags/get-server-component-feature-flag';
 import { type Stripe } from '@documenso/lib/server-only/stripe';
@@ -36,23 +37,23 @@ export default async function BillingSettingsPage() {
     user = await getStripeCustomerByUser(user).then((result) => result.user);
   }
 
-  const [subscriptions, prices, individualPrices] = await Promise.all([
+  const [subscriptions, prices, primaryAccountPlanPrices] = await Promise.all([
     getSubscriptionsByUserId({ userId: user.id }),
-    getPricesByInterval({ type: 'individual' }),
-    getPricesByType('individual'),
+    getPricesByInterval({ plan: STRIPE_PLAN_TYPE.COMMUNITY }),
+    getPrimaryAccountPlanPrices(),
   ]);
 
-  const individualPriceIds = individualPrices.map(({ id }) => id);
+  const primaryAccountPlanPriceIds = primaryAccountPlanPrices.map(({ id }) => id);
 
   let subscriptionProduct: Stripe.Product | null = null;
 
-  const individualUserSubscriptions = subscriptions.filter(({ priceId }) =>
-    individualPriceIds.includes(priceId),
+  const primaryAccountPlanSubscriptions = subscriptions.filter(({ priceId }) =>
+    primaryAccountPlanPriceIds.includes(priceId),
   );
 
   const subscription =
-    individualUserSubscriptions.find(({ status }) => status === SubscriptionStatus.ACTIVE) ??
-    individualUserSubscriptions[0];
+    primaryAccountPlanSubscriptions.find(({ status }) => status === SubscriptionStatus.ACTIVE) ??
+    primaryAccountPlanSubscriptions[0];
 
   if (subscription?.priceId) {
     subscriptionProduct = await getProductByPriceId({ priceId: subscription.priceId }).catch(

@@ -1,4 +1,5 @@
 import { prisma } from '@documenso/prisma';
+import type { RecipientRole } from '@documenso/prisma/client';
 
 import { nanoid } from '../../universal/id';
 
@@ -9,6 +10,7 @@ export type SetRecipientsForTemplateOptions = {
     id?: number;
     email: string;
     name: string;
+    role: RecipientRole;
   }[];
 };
 
@@ -20,7 +22,20 @@ export const setRecipientsForTemplate = async ({
   const template = await prisma.template.findFirst({
     where: {
       id: templateId,
-      userId,
+      OR: [
+        {
+          userId,
+        },
+        {
+          team: {
+            members: {
+              some: {
+                userId,
+              },
+            },
+          },
+        },
+      ],
     },
   });
 
@@ -71,11 +86,13 @@ export const setRecipientsForTemplate = async ({
         update: {
           name: recipient.name,
           email: recipient.email,
+          role: recipient.role,
           templateId,
         },
         create: {
           name: recipient.name,
           email: recipient.email,
+          role: recipient.role,
           token: nanoid(),
           templateId,
         },

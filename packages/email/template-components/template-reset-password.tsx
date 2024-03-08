@@ -1,3 +1,5 @@
+import { env } from 'next-runtime-env';
+
 import { Button, Section, Text } from '../components';
 import { TemplateDocumentImage } from './template-document-image';
 
@@ -8,6 +10,8 @@ export interface TemplateResetPasswordProps {
 }
 
 export const TemplateResetPassword = ({ assetBaseUrl }: TemplateResetPasswordProps) => {
+  const NEXT_PUBLIC_WEBAPP_URL = env('NEXT_PUBLIC_WEBAPP_URL');
+
   return (
     <>
       <TemplateDocumentImage className="mt-6" assetBaseUrl={assetBaseUrl} />
@@ -24,7 +28,7 @@ export const TemplateResetPassword = ({ assetBaseUrl }: TemplateResetPasswordPro
         <Section className="mb-6 mt-8 text-center">
           <Button
             className="bg-documenso-500 inline-flex items-center justify-center rounded-lg px-6 py-3 text-center text-sm font-medium text-black no-underline"
-            href={`${process.env.NEXT_PUBLIC_WEBAPP_URL ?? 'http://localhost:3000'}/signin`}
+            href={`${NEXT_PUBLIC_WEBAPP_URL ?? 'http://localhost:3000'}/signin`}
           >
             Sign In
           </Button>
