@@ -8,7 +8,7 @@ const buildPrettierCommand = (filenames) =>
 
 /** @type {import('lint-staged').Config} */
 module.exports = {
-  '**/*.{ts,tsx,cts,mts}': [buildEslintCommand],
+  '**/*.{ts,tsx,cts,mts}': [buildEslintCommand, buildPrettierCommand],
   '**/*.{js,jsx,cjs,mjs}': [buildPrettierCommand],
   '**/*.{yml,mdx}': [buildPrettierCommand],
   '**/*/package.json': 'npm run precommit',
