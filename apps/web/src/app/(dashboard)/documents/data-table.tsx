@@ -76,9 +76,7 @@ export const DocumentsDataTable = ({
           {
             header: 'Recipient',
             accessorKey: 'recipient',
-            cell: ({ row }) => {
-              return <StackAvatarsWithTooltip recipients={row.original.Recipient} />;
-            },
+            cell: ({ row }) => <StackAvatarsWithTooltip recipients={row.original.Recipient} />,
           },
           {
             header: 'Status',
