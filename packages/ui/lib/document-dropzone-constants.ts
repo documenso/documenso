@@ -67,18 +67,19 @@ export const DocumentDropzoneCardCenterVariants: Variants = {
 
 export const DocumentDropzoneDisabledCardLeftVariants: Variants = {
   initial: {
-    x: 40,
+    x: 50,
     y: 0,
     rotate: -14,
   },
   animate: {
-    x: 40,
+    x: 50,
     y: 0,
     rotate: -14,
   },
   hover: {
     x: 30,
     y: 0,
+    rotate: -17,
     transition: { type: 'spring', duration: 0.3, stiffness: 500 },
   },
 };
@@ -86,17 +87,18 @@ export const DocumentDropzoneDisabledCardLeftVariants: Variants = {
 export const DocumentDropzoneDisabledCardRightVariants: Variants = {
   initial: {
     x: -50,
-    y: 5,
+    y: 0,
     rotate: 14,
   },
   animate: {
     x: -50,
-    y: 5,
+    y: 0,
     rotate: 14,
   },
   hover: {
-    x: -40,
-    y: 5,
+    x: -30,
+    y: 0,
+    rotate: 17,
     transition: { type: 'spring', duration: 0.3, stiffness: 500 },
   },
 };
@@ -111,9 +113,8 @@ export const DocumentDropzoneDisabledCardCenterVariants: Variants = {
     y: 0,
   },
   hover: {
-    x: -20,
+    x: [-15, -10, -5, -10],
     y: 0,
-    rotate: -5,
     transition: { type: 'spring', duration: 0.3, stiffness: 1000 },
   },
 };

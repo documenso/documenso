@@ -6,7 +6,7 @@ import { motion } from 'framer-motion';
 import { AlertTriangle, Plus } from 'lucide-react';
 import { useDropzone } from 'react-dropzone';
 
-import { APP_DOCUMENT_UPLOAD_SIZE_LIMIT } from '@documenso/lib/constants/app';
+import { APP_DOCUMENT_UPLOAD_SIZE_LIMIT, IS_BILLING_ENABLED } from '@documenso/lib/constants/app';
 import { megabytesToBytes } from '@documenso/lib/universal/unit-convertions';
 
 import {
@@ -37,18 +37,10 @@ export const DocumentDropzone = ({
   onDrop,
   onDropRejected,
   disabled,
-  disabledMessage = 'You can upload up to 5 documents per month on your current plan.',
+  disabledMessage = 'You cannot upload documents at this time.',
   type = 'document',
   ...props
 }: DocumentDropzoneProps) => {
-  const DocumentDescription = {
-    document: {
-      headline: disabled ? 'You have reached your document limit.' : 'Add a document',
-    },
-    template: {
-      headline: 'Upload Template Document',
-    },
-  };
   const { getRootProps, getInputProps } = useDropzone({
     accept: {
       'application/pdf': ['.pdf'],
@@ -68,26 +60,31 @@ export const DocumentDropzone = ({
     maxSize: megabytesToBytes(APP_DOCUMENT_UPLOAD_SIZE_LIMIT),
   });
 
+  const heading = {
+    document: disabled ? 'You have reached your document limit.' : 'Add a document',
+    template: 'Upload Template Document',
+  };
+
   return (
-    <Card
-      role="button"
-      className={cn(
-        'focus-visible:ring-ring ring-offset-background flex flex flex-1 cursor-pointer flex-col items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2',
-        className,
-      )}
-      gradient={!disabled}
-      degrees={120}
-      aria-disabled={disabled}
-      {...getRootProps()}
-      {...props}
+    <motion.div
+      variants={DocumentDropzoneContainerVariants}
+      initial="initial"
+      animate="animate"
+      whileHover="hover"
     >
-      <CardContent className="text-muted-foreground/40 flex flex-col items-center justify-center p-6">
-        <motion.div
-          variants={DocumentDropzoneContainerVariants}
-          initial="initial"
-          animate="animate"
-          whileHover="hover"
-        >
+      <Card
+        role="button"
+        className={cn(
+          'focus-visible:ring-ring ring-offset-background group flex flex-1 cursor-pointer flex-col items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2',
+          className,
+        )}
+        gradient={!disabled}
+        degrees={120}
+        aria-disabled={disabled}
+        {...getRootProps()}
+        {...props}
+      >
+        <CardContent className="text-muted-foreground/40 flex flex-col items-center justify-center p-6">
           {disabled ? (
             // Disabled State
             <div className="flex">
@@ -151,21 +148,22 @@ export const DocumentDropzone = ({
               </motion.div>
             </div>
           )}
-        </motion.div>
 
-        <input {...getInputProps()} />
+          <input {...getInputProps()} />
 
-        <p className="text-foreground mt-8 font-medium">{DocumentDescription[type].headline}</p>
+          <p className="text-foreground mt-8 font-medium">{heading[type]}</p>
 
-        <p className="text-muted-foreground/80 mt-1 text-center text-sm">
-          {disabled ? disabledMessage : 'Drag & drop your PDF here.'}
-        </p>
-        {disabled && (
-          <Button className="hover:bg-warning/80 bg-warning mt-4 w-32" asChild>
-            <Link href="/settings/billing">Upgrade</Link>
-          </Button>
-        )}
-      </CardContent>
-    </Card>
+          <p className="text-muted-foreground/80 mt-1 text-center text-sm">
+            {disabled ? disabledMessage : 'Drag & drop your PDF here.'}
+          </p>
+
+          {disabled && IS_BILLING_ENABLED() && (
+            <Button className="hover:bg-warning/80 bg-warning mt-4 w-32" asChild>
+              <Link href="/settings/billing">Upgrade</Link>
+            </Button>
+          )}
+        </CardContent>
+      </Card>
+    </motion.div>
   );
 };
