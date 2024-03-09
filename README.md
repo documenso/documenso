@@ -13,9 +13,9 @@
     ·
     <a href="https://github.com/documenso/documenso/issues">Issues</a>
     ·
-    <a href="https://github.com/documenso/documenso/milestones">Roadmap</a>
+    <a href="https://documen.so/live">Upcoming Releases</a>
     ·
-    <a href="https://documen.so/launches">Upcoming Launches</a>
+    <a href="https://documen.so/roadmap">Roadmap</a>
   </p>
 </p>
 
@@ -27,7 +27,7 @@
    <a href="https://vscode.dev/redirect?url=vscode://ms-vscode-remote.remote-containers/cloneInVolume?url=https://github.com/documenso/documenso">
    <img alt="open in devcontainer" src="https://img.shields.io/static/v1?label=Dev%20Containers&message=Enabled&color=blue&logo=visualstudiocode" />
    </a>
-   <a href="code_of_conduct.md"><img src="https://img.shields.io/badge/Contributor%20Covenant-2.1-4baaaa.svg" alt="Contributor Covenant"></a>
+   <a href="CODE_OF_CONDUCT.md"><img src="https://img.shields.io/badge/Contributor%20Covenant-2.1-4baaaa.svg" alt="Contributor Covenant"></a>
 </p>
 
 <div>
@@ -105,7 +105,7 @@ Contact us if you are interested in our Enterprise plan for large organizations 
 
 To run Documenso locally, you will need
 
-- Node.js
+- Node.js (v18 or above)
 - Postgres SQL Database
 - Docker (optional)
 
@@ -115,10 +115,12 @@ To run Documenso locally, you will need
 
 Want to get up and running quickly? Follow these steps:
 
-1. [Clone the repository](https://help.github.com/articles/cloning-a-repository/) it to your local device.
+1. [Fork this repository](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/working-with-forks/about-forks) to your GitHub account.
+
+After forking the repository, clone it to your local device by using the following command:
 
 ```sh
-git clone https://github.com/documenso/documenso
+git clone https://github.com/<your-username>/documenso
 ```
 
 2. Set up your `.env` file using the recommendations in the `.env.example` file. Alternatively, just run `cp .env.example .env` to get started with our handpicked defaults.
@@ -139,10 +141,12 @@ npm run d
 
 1. **App** - http://localhost:3000
 2. **Incoming Mail Access** - http://localhost:9000
-
 3. **Database Connection Details**
+
    - **Port**: 54320
    - **Connection**: Use your favorite database client to connect using the provided port.
+
+4. **S3 Storage Dashboard** - http://localhost:9001
 
 ## Developer Setup
 
@@ -150,10 +154,12 @@ npm run d
 
 Follow these steps to setup Documenso on your local machine:
 
-1. [Clone the repository](https://help.github.com/articles/cloning-a-repository/) it to your local device.
+1. [Fork this repository](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/working-with-forks/about-forks) to your GitHub account.
+
+After forking the repository, clone it to your local device by using the following command:
 
 ```sh
-git clone https://github.com/documenso/documenso
+git clone https://github.com/<your-username>/documenso
 ```
 
 2. Run `npm i` in the root directory
@@ -201,7 +207,16 @@ If you're a visual learner and prefer to watch a video walkthrough of setting up
 
 ## Docker
 
-🚧 Docker containers and images are current in progress. We are actively working on bringing a simple Docker build and publish pipeline for Documenso.
+We provide a Docker container for Documenso, which is published on both DockerHub and GitHub Container Registry.
+
+- DockerHub: [https://hub.docker.com/r/documenso/documenso](https://hub.docker.com/r/documenso/documenso)
+- GitHub Container Registry: [https://ghcr.io/documenso/documenso](https://ghcr.io/documenso/documenso)
+
+You can pull the Docker image from either of these registries and run it with your preferred container hosting provider.
+
+Please note that you will need to provide environment variables for connecting to the database, mailserver, and so forth.
+
+For detailed instructions on how to configure and run the Docker container, please refer to the [Docker README](./docker/README.md) in the `docker` directory.
 
 ## Self Hosting
 
@@ -278,11 +293,15 @@ WantedBy=multi-user.target
 
 ### Railway
 
-[![Deploy on Railway](https://railway.app/button.svg)](https://railway.app/template/DjrRRX)
+[![Deploy on Railway](https://railway.app/button.svg)](https://railway.app/template/bG6D4p)
 
 ### Render
 
 [![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/documenso/documenso)
+
+### Koyeb
+
+[![Deploy to Koyeb](https://www.koyeb.com/static/images/deploy/button.svg)](https://app.koyeb.com/deploy?type=git&repository=github.com/documenso/documenso&branch=main&name=documenso-app&builder=dockerfile&dockerfile=/docker/Dockerfile)
 
 ## Troubleshooting
 

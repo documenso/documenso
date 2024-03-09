@@ -1,13 +1,14 @@
 'use client';
 
-import { HTMLAttributes, useState } from 'react';
+import type { HTMLAttributes } from 'react';
+import { useState } from 'react';
 
 import Link from 'next/link';
-import { useSearchParams } from 'next/navigation';
 
 import { AnimatePresence, motion } from 'framer-motion';
 import { usePlausible } from 'next-plausible';
 
+import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
 
@@ -16,14 +17,9 @@ export type PricingTableProps = HTMLAttributes<HTMLDivElement>;
 const SELECTED_PLAN_BAR_LAYOUT_ID = 'selected-plan-bar';
 
 export const PricingTable = ({ className, ...props }: PricingTableProps) => {
-  const params = useSearchParams();
   const event = usePlausible();
 
-  const [period, setPeriod] = useState<'MONTHLY' | 'YEARLY'>(() =>
-    params?.get('planId') === process.env.NEXT_PUBLIC_STRIPE_COMMUNITY_PLAN_YEARLY_PRICE_ID
-      ? 'YEARLY'
-      : 'MONTHLY',
-  );
+  const [period, setPeriod] = useState<'MONTHLY' | 'YEARLY'>('MONTHLY');
 
   return (
     <div className={cn('', className)} {...props}>
@@ -88,7 +84,7 @@ export const PricingTable = ({ className, ...props }: PricingTableProps) => {
 
           <Button className="rounded-full text-base" asChild>
             <Link
-              href={`${process.env.NEXT_PUBLIC_WEBAPP_URL}/signup`}
+              href={`${NEXT_PUBLIC_WEBAPP_URL()}/signup?utm_source=pricing-free-plan`}
               target="_blank"
               className="mt-6"
             >
@@ -106,7 +102,7 @@ export const PricingTable = ({ className, ...props }: PricingTableProps) => {
         </div>
 
         <div
-          data-plan="community"
+          data-plan="early-adopter"
           className="border-primary bg-background shadow-foreground/5 flex flex-col items-center justify-center rounded-lg border-2 px-8 py-12 shadow-[0px_0px_0px_4px_#E3E3E380]"
         >
           <p className="text-foreground text-4xl font-medium">Early Adopters</p>
@@ -122,29 +118,31 @@ export const PricingTable = ({ className, ...props }: PricingTableProps) => {
           </p>
 
           <Button className="mt-6 rounded-full text-base" asChild>
-            <Link href={`${process.env.NEXT_PUBLIC_WEBAPP_URL}/signup`}>Signup Now</Link>
+            <Link
+              href={`${NEXT_PUBLIC_WEBAPP_URL()}/signup?utm_source=pricing-early-adopter`}
+              target="_blank"
+            >
+              Signup Now
+            </Link>
           </Button>
 
           <div className="mt-8 flex w-full flex-col divide-y">
-            <p className="text-foreground py-4 font-medium">
-              {' '}
-              <a href="https://documenso.com/blog/early-adopters" target="_blank">
-                The Early Adopter Deal:
+            <p className="text-foreground py-4">
+              <a
+                href="https://documen.so/early-adopters-pricing-page"
+                target="_blank"
+                rel="noreferrer"
+              >
+                Limited Time Offer: <span className="text-documenso-700">Read More</span>
               </a>
             </p>
-            <p className="text-foreground py-4">Join the movement</p>
-            <p className="text-foreground py-4">Simple signing solution</p>
+            <p className="text-foregro‚und py-4">Unlimited Teams</p>
+            <p className="text-foregro‚und py-4">Unlimited Users</p>
+            <p className="text-foregro‚und py-4">Unlimited Documents per month</p>
+            <p className="text-foreground py-4">Includes all upcoming features</p>
             <p className="text-foreground py-4">Email, Discord and Slack assistance</p>
-            <p className="text-foreground py-4">
-              <strong>
-                {' '}
-                <a href="https://documenso.com/blog/early-adopters" target="_blank">
-                  Includes all upcoming features
-                </a>
-              </strong>
-            </p>
-            <p className="text-foreground py-4">Fixed, straightforward pricing</p>
           </div>
+          <div className="flex-1" />
         </div>
 
         <div

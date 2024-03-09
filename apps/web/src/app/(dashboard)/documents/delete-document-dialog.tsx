@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { useRouter } from 'next/navigation';
 
@@ -16,11 +16,13 @@ import {
 import { Input } from '@documenso/ui/primitives/input';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
-type DeleteDraftDocumentDialogProps = {
+type DeleteDocumentDialogProps = {
   id: number;
   open: boolean;
   onOpenChange: (_open: boolean) => void;
   status: DocumentStatus;
+  documentTitle: string;
+  teamId?: number;
 };
 
 export const DeleteDocumentDialog = ({
@@ -28,7 +30,9 @@ export const DeleteDocumentDialog = ({
   open,
   onOpenChange,
   status,
-}: DeleteDraftDocumentDialogProps) => {
+  documentTitle,
+  teamId,
+}: DeleteDocumentDialogProps) => {
   const router = useRouter();
 
   const { toast } = useToast();
@@ -42,7 +46,7 @@ export const DeleteDocumentDialog = ({
 
       toast({
         title: 'Document deleted',
-        description: 'Your document has been successfully deleted.',
+        description: `"${documentTitle}" has been successfully deleted`,
         duration: 5000,
       });
 
@@ -50,9 +54,16 @@ export const DeleteDocumentDialog = ({
     },
   });
 
+  useEffect(() => {
+    if (open) {
+      setInputValue('');
+      setIsDeleteEnabled(status === DocumentStatus.DRAFT);
+    }
+  }, [open, status]);
+
   const onDelete = async () => {
     try {
-      await deleteDocument({ id, status });
+      await deleteDocument({ id, teamId });
     } catch {
       toast({
         title: 'Something went wrong',
@@ -72,7 +83,7 @@ export const DeleteDocumentDialog = ({
     <Dialog open={open} onOpenChange={(value) => !isLoading && onOpenChange(value)}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Do you want to delete this document?</DialogTitle>
+          <DialogTitle>Are you sure you want to delete "{documentTitle}"?</DialogTitle>
 
           <DialogDescription>
             Please note that this action is irreversible. Once confirmed, your document will be
@@ -81,7 +92,7 @@ export const DeleteDocumentDialog = ({
         </DialogHeader>
 
         {status !== DocumentStatus.DRAFT && (
-          <div className="mt-8">
+          <div className="mt-4">
             <Input
               type="text"
               value={inputValue}

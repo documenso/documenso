@@ -1,11 +1,11 @@
+import { compare } from '@node-rs/bcrypt';
 import { base32 } from '@scure/base';
-import { compare } from 'bcrypt';
 import crypto from 'crypto';
 import { createTOTPKeyURI } from 'oslo/otp';
 
 import { ErrorCode } from '@documenso/lib/next-auth/error-codes';
 import { prisma } from '@documenso/prisma';
-import { User } from '@documenso/prisma/client';
+import { type User } from '@documenso/prisma/client';
 
 import { DOCUMENSO_ENCRYPTION_KEY } from '../../constants/crypto';
 import { symmetricEncrypt } from '../../universal/crypto';
@@ -43,7 +43,7 @@ export const setupTwoFactorAuthentication = async ({
 
   const secret = crypto.randomBytes(10);
 
-  const backupCodes = new Array(10)
+  const backupCodes = Array.from({ length: 10 })
     .fill(null)
     .map(() => crypto.randomBytes(5).toString('hex'))
     .map((code) => `${code.slice(0, 5)}-${code.slice(5)}`.toUpperCase());

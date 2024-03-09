@@ -172,6 +172,7 @@ export function SinglePlayerModeCustomTextField({
             .with(FieldType.DATE, () => 'Date')
             .with(FieldType.NAME, () => 'Name')
             .with(FieldType.EMAIL, () => 'Email')
+            .with(FieldType.TEXT, () => 'Text')
             .with(FieldType.SIGNATURE, FieldType.FREE_SIGNATURE, () => 'Signature')
             .otherwise(() => '')}
         </button>

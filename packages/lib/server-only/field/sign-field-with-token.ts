@@ -1,15 +1,23 @@
 'use server';
 
 import { DateTime } from 'luxon';
+import { match } from 'ts-pattern';
 
 import { prisma } from '@documenso/prisma';
 import { DocumentStatus, FieldType, SigningStatus } from '@documenso/prisma/client';
+
+import { DEFAULT_DOCUMENT_DATE_FORMAT } from '../../constants/date-formats';
+import { DEFAULT_DOCUMENT_TIME_ZONE } from '../../constants/time-zones';
+import { DOCUMENT_AUDIT_LOG_TYPE } from '../../types/document-audit-logs';
+import type { RequestMetadata } from '../../universal/extract-request-metadata';
+import { createDocumentAuditLogData } from '../../utils/document-audit-logs';
 
 export type SignFieldWithTokenOptions = {
   token: string;
   fieldId: number;
   value: string;
   isBase64?: boolean;
+  requestMetadata?: RequestMetadata;
 };
 
 export const signFieldWithToken = async ({
@@ -17,6 +25,7 @@ export const signFieldWithToken = async ({
   fieldId,
   value,
   isBase64,
+  requestMetadata,
 }: SignFieldWithTokenOptions) => {
   const field = await prisma.field.findFirstOrThrow({
     where: {
@@ -32,6 +41,14 @@ export const signFieldWithToken = async ({
   });
 
   const { Document: document, Recipient: recipient } = field;
+
+  if (!document) {
+    throw new Error(`Document not found for field ${field.id}`);
+  }
+
+  if (!recipient) {
+    throw new Error(`Recipient not found for field ${field.id}`);
+  }
 
   if (document.status === DocumentStatus.COMPLETED) {
     throw new Error(`Document ${document.id} has already been completed`);
@@ -54,6 +71,12 @@ export const signFieldWithToken = async ({
     throw new Error(`Field ${fieldId} has no recipientId`);
   }
 
+  const documentMeta = await prisma.documentMeta.findFirst({
+    where: {
+      documentId: document.id,
+    },
+  });
+
   const isSignatureField =
     field.type === FieldType.SIGNATURE || field.type === FieldType.FREE_SIGNATURE;
 
@@ -63,7 +86,9 @@ export const signFieldWithToken = async ({
   const typedSignature = isSignatureField && !isBase64 ? value : undefined;
 
   if (field.type === FieldType.DATE) {
-    customText = DateTime.now().toFormat('yyyy-MM-dd hh:mm a');
+    customText = DateTime.now()
+      .setZone(documentMeta?.timezone ?? DEFAULT_DOCUMENT_TIME_ZONE)
+      .toFormat(documentMeta?.dateFormat ?? DEFAULT_DOCUMENT_DATE_FORMAT);
   }
 
   if (isSignatureField && !signatureImageAsBase64 && !typedSignature) {
@@ -107,6 +132,38 @@ export const signFieldWithToken = async ({
         Signature: signature,
       });
     }
+
+    await tx.documentAuditLog.create({
+      data: createDocumentAuditLogData({
+        type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_FIELD_INSERTED,
+        documentId: document.id,
+        user: {
+          email: recipient.email,
+          name: recipient.name,
+        },
+        requestMetadata,
+        data: {
+          recipientEmail: recipient.email,
+          recipientId: recipient.id,
+          recipientName: recipient.name,
+          recipientRole: recipient.role,
+          fieldId: updatedField.secondaryId,
+          field: match(updatedField.type)
+            .with(FieldType.SIGNATURE, FieldType.FREE_SIGNATURE, (type) => ({
+              type,
+              data: signatureImageAsBase64 || typedSignature || '',
+            }))
+            .with(FieldType.DATE, FieldType.EMAIL, FieldType.NAME, FieldType.TEXT, (type) => ({
+              type,
+              data: updatedField.customText,
+            }))
+            .exhaustive(),
+          fieldSecurity: {
+            type: 'NONE',
+          },
+        },
+      }),
+    });
 
     return updatedField;
   });

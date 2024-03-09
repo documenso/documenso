@@ -1,14 +1,16 @@
 'use client';
 
-import { HTMLAttributes, useEffect, useState } from 'react';
+import type { HTMLAttributes } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
-import { DateTime, DateTimeFormatOptions } from 'luxon';
+import type { DateTimeFormatOptions } from 'luxon';
+import { DateTime } from 'luxon';
 
 import { useLocale } from '@documenso/lib/client-only/providers/locale';
 
 export type LocaleDateProps = HTMLAttributes<HTMLSpanElement> & {
   date: string | number | Date;
-  format?: DateTimeFormatOptions;
+  format?: DateTimeFormatOptions | string;
 };
 
 /**
@@ -20,13 +22,24 @@ export type LocaleDateProps = HTMLAttributes<HTMLSpanElement> & {
 export const LocaleDate = ({ className, date, format, ...props }: LocaleDateProps) => {
   const { locale } = useLocale();
 
+  const formatDateTime = useCallback(
+    (date: DateTime) => {
+      if (typeof format === 'string') {
+        return date.toFormat(format);
+      }
+
+      return date.toLocaleString(format);
+    },
+    [format],
+  );
+
   const [localeDate, setLocaleDate] = useState(() =>
-    DateTime.fromJSDate(new Date(date)).setLocale(locale).toLocaleString(format),
+    formatDateTime(DateTime.fromJSDate(new Date(date)).setLocale(locale)),
   );
 
   useEffect(() => {
-    setLocaleDate(DateTime.fromJSDate(new Date(date)).toLocaleString(format));
-  }, [date, format]);
+    setLocaleDate(formatDateTime(DateTime.fromJSDate(new Date(date))));
+  }, [date, format, formatDateTime]);
 
   return (
     <span className={className} {...props}>

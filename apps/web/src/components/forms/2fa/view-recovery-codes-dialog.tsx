@@ -5,12 +5,14 @@ import { useForm } from 'react-hook-form';
 import { match } from 'ts-pattern';
 import { z } from 'zod';
 
+import { downloadFile } from '@documenso/lib/client-only/download-file';
 import { trpc } from '@documenso/trpc/react';
 import { Button } from '@documenso/ui/primitives/button';
 import {
   Dialog,
   DialogContent,
   DialogDescription,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from '@documenso/ui/primitives/dialog';
@@ -22,7 +24,7 @@ import {
   FormLabel,
   FormMessage,
 } from '@documenso/ui/primitives/form/form';
-import { Input } from '@documenso/ui/primitives/input';
+import { PasswordInput } from '@documenso/ui/primitives/password-input';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
 import { RecoveryCodeList } from './recovery-code-list';
@@ -41,8 +43,11 @@ export type ViewRecoveryCodesDialogProps = {
 export const ViewRecoveryCodesDialog = ({ open, onOpenChange }: ViewRecoveryCodesDialogProps) => {
   const { toast } = useToast();
 
-  const { mutateAsync: viewRecoveryCodes, data: viewRecoveryCodesData } =
-    trpc.twoFactorAuthentication.viewRecoveryCodes.useMutation();
+  const {
+    mutateAsync: viewRecoveryCodes,
+    data: viewRecoveryCodesData,
+    isLoading: isViewRecoveryCodesDataLoading,
+  } = trpc.twoFactorAuthentication.viewRecoveryCodes.useMutation();
 
   const viewRecoveryCodesForm = useForm<TViewRecoveryCodesForm>({
     defaultValues: {
@@ -60,6 +65,19 @@ export const ViewRecoveryCodesDialog = ({ open, onOpenChange }: ViewRecoveryCode
 
     return 'view';
   }, [viewRecoveryCodesData, isViewRecoveryCodesSubmitting]);
+
+  const downloadRecoveryCodes = () => {
+    if (viewRecoveryCodesData && viewRecoveryCodesData.recoveryCodes) {
+      const blob = new Blob([viewRecoveryCodesData.recoveryCodes.join('\n')], {
+        type: 'text/plain',
+      });
+
+      downloadFile({
+        filename: 'documenso-2FA-recovery-codes.txt',
+        data: blob,
+      });
+    }
+  };
 
   const onViewRecoveryCodesFormSubmit = async ({ password }: TViewRecoveryCodesForm) => {
     try {
@@ -108,9 +126,8 @@ export const ViewRecoveryCodesDialog = ({ open, onOpenChange }: ViewRecoveryCode
                       <FormItem>
                         <FormLabel className="text-muted-foreground">Password</FormLabel>
                         <FormControl>
-                          <Input
+                          <PasswordInput
                             {...field}
-                            type="password"
                             autoComplete="current-password"
                             value={field.value ?? ''}
                           />
@@ -120,15 +137,15 @@ export const ViewRecoveryCodesDialog = ({ open, onOpenChange }: ViewRecoveryCode
                     )}
                   />
 
-                  <div className="flex w-full items-center justify-between">
-                    <Button type="button" variant="ghost" onClick={() => onOpenChange(false)}>
+                  <DialogFooter>
+                    <Button type="button" variant="secondary" onClick={() => onOpenChange(false)}>
                       Cancel
                     </Button>
 
                     <Button type="submit" loading={isViewRecoveryCodesSubmitting}>
                       Continue
                     </Button>
-                  </div>
+                  </DialogFooter>
                 </form>
               </Form>
             );
@@ -139,8 +156,17 @@ export const ViewRecoveryCodesDialog = ({ open, onOpenChange }: ViewRecoveryCode
                 <RecoveryCodeList recoveryCodes={viewRecoveryCodesData.recoveryCodes} />
               )}
 
-              <div className="mt-4 flex flex-row-reverse items-center justify-between">
+              <div className="mt-4 flex flex-row-reverse items-center gap-2">
                 <Button onClick={() => onOpenChange(false)}>Complete</Button>
+
+                <Button
+                  variant="secondary"
+                  disabled={!viewRecoveryCodesData?.recoveryCodes}
+                  loading={isViewRecoveryCodesDataLoading}
+                  onClick={downloadRecoveryCodes}
+                >
+                  Download
+                </Button>
               </div>
             </div>
           ))

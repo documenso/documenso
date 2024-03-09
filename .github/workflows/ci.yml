@@ -1,17 +1,15 @@
-name: "Continuous Integration"
+name: 'Continuous Integration'
 
 on:
+  workflow_call:
   push:
-    branches: [ "main" ]
+    branches: ['main']
   pull_request:
-    branches: [ "main" ]
+    branches: ['main']
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
   cancel-in-progress: true
-
-env:
-  HUSKY: 0
 
 jobs:
   build_app:
@@ -19,34 +17,51 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           fetch-depth: 2
 
-      - name: Install Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: 18
-          cache: npm
-
-      - name: Install dependencies
-        run: npm ci
+      - uses: ./.github/actions/node-install
 
       - name: Copy env
         run: cp .env.example .env
 
-      - name: Build
-        run: npm run build
+      - uses: ./.github/actions/cache-build
 
   build_docker:
     name: Build Docker Image
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           fetch-depth: 2
 
-      - name: Build Docker Image
-        run: ./docker/build.sh
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
 
+      - name: Cache Docker layers
+        uses: actions/cache@v3
+        with:
+          path: /tmp/.buildx-cache
+          key: ${{ runner.os }}-buildx-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-buildx-
+
+      - name: Build Docker Image
+        uses: docker/build-push-action@v5
+        with:
+          push: false
+          context: .
+          file: ./docker/Dockerfile
+          tags: documenso-${{ github.sha }}
+          cache-from: type=local,src=/tmp/.buildx-cache
+          cache-to: type=local,dest=/tmp/.buildx-cache-new,mode=max
+
+      - # Temp fix
+        # https://github.com/docker/build-push-action/issues/252
+        # https://github.com/moby/buildkit/issues/1896
+        name: Move cache
+        run: |
+          rm -rf /tmp/.buildx-cache
+          mv /tmp/.buildx-cache-new /tmp/.buildx-cache

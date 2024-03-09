@@ -121,30 +121,29 @@ export const FieldItem = ({
         <button
           className="text-muted-foreground/50 hover:text-muted-foreground/80 bg-background absolute -right-2 -top-2 z-20 flex h-8 w-8 items-center justify-center rounded-full border"
           onClick={() => onRemove?.()}
+          onTouchEnd={() => onRemove?.()}
         >
           <Trash className="h-4 w-4" />
         </button>
       )}
 
       <Card
-        className={cn('bg-background h-full w-full', {
-          'border-primary': !disabled,
-          'border-primary/80': active,
+        className={cn('bg-field-card/80 h-full w-full backdrop-blur-[1px]', {
+          'border-field-card-border': !disabled,
+          'border-field-card-border/80': active,
         })}
       >
         <CardContent
           className={cn(
-            'text-foreground flex h-full w-full flex-col items-center justify-center p-2',
+            'text-field-card-foreground flex h-full w-full flex-col items-center justify-center p-2',
             {
-              'text-muted-foreground/50': disabled,
+              'text-field-card-foreground/50': disabled,
             },
           )}
         >
           {FRIENDLY_FIELD_TYPE[field.type]}
 
-          <p className="text-muted-foreground/50 w-full truncate text-center text-xs">
-            {field.signerEmail}
-          </p>
+          <p className="w-full truncate text-center text-xs">{field.signerEmail}</p>
         </CardContent>
       </Card>
     </Rnd>,

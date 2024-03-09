@@ -3,8 +3,10 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import { buffer } from 'micro';
 import { match } from 'ts-pattern';
 
+import { STRIPE_PLAN_TYPE } from '@documenso/lib/constants/billing';
 import type { Stripe } from '@documenso/lib/server-only/stripe';
 import { stripe } from '@documenso/lib/server-only/stripe';
+import { createTeamFromPendingTeam } from '@documenso/lib/server-only/team/create-team';
 import { getFlag } from '@documenso/lib/universal/get-feature-flag';
 import { prisma } from '@documenso/prisma';
 
@@ -75,23 +77,18 @@ export const stripeWebhookHandler = async (
 
         // Finally, attempt to get the user ID from the subscription within the database.
         if (!userId && customerId) {
-          const result = await prisma.subscription.findFirst({
+          const result = await prisma.user.findFirst({
             select: {
-              userId: true,
+              id: true,
             },
             where: {
               customerId,
             },
           });
 
-          if (!result?.userId) {
-            return res.status(500).json({
-              success: false,
-              message: 'User not found',
-            });
+          if (result?.id) {
+            userId = result.id;
           }
-
-          userId = result.userId;
         }
 
         const subscriptionId =
@@ -99,7 +96,7 @@ export const stripeWebhookHandler = async (
             ? session.subscription
             : session.subscription?.id;
 
-        if (!subscriptionId || Number.isNaN(userId)) {
+        if (!subscriptionId) {
           return res.status(500).json({
             success: false,
             message: 'Invalid session',
@@ -107,6 +104,24 @@ export const stripeWebhookHandler = async (
         }
 
         const subscription = await stripe.subscriptions.retrieve(subscriptionId);
+
+        // Handle team creation after seat checkout.
+        if (subscription.items.data[0].price.metadata.plan === STRIPE_PLAN_TYPE.TEAM) {
+          await handleTeamSeatCheckout({ subscription });
+
+          return res.status(200).json({
+            success: true,
+            message: 'Webhook received',
+          });
+        }
+
+        // Validate user ID.
+        if (!userId || Number.isNaN(userId)) {
+          return res.status(500).json({
+            success: false,
+            message: 'Invalid session or missing user ID',
+          });
+        }
 
         await onSubscriptionUpdated({ userId, subscription });
 
@@ -124,23 +139,45 @@ export const stripeWebhookHandler = async (
             ? subscription.customer
             : subscription.customer.id;
 
-        const result = await prisma.subscription.findFirst({
+        if (subscription.items.data[0].price.metadata.plan === STRIPE_PLAN_TYPE.TEAM) {
+          const team = await prisma.team.findFirst({
+            where: {
+              customerId,
+            },
+          });
+
+          if (!team) {
+            return res.status(500).json({
+              success: false,
+              message: 'No team associated with subscription found',
+            });
+          }
+
+          await onSubscriptionUpdated({ teamId: team.id, subscription });
+
+          return res.status(200).json({
+            success: true,
+            message: 'Webhook received',
+          });
+        }
+
+        const result = await prisma.user.findFirst({
           select: {
-            userId: true,
+            id: true,
           },
           where: {
             customerId,
           },
         });
 
-        if (!result?.userId) {
+        if (!result?.id) {
           return res.status(500).json({
             success: false,
             message: 'User not found',
           });
         }
 
-        await onSubscriptionUpdated({ userId: result.userId, subscription });
+        await onSubscriptionUpdated({ userId: result.id, subscription });
 
         return res.status(200).json({
           success: true,
@@ -182,23 +219,45 @@ export const stripeWebhookHandler = async (
           });
         }
 
-        const result = await prisma.subscription.findFirst({
+        if (subscription.items.data[0].price.metadata.plan === STRIPE_PLAN_TYPE.TEAM) {
+          const team = await prisma.team.findFirst({
+            where: {
+              customerId,
+            },
+          });
+
+          if (!team) {
+            return res.status(500).json({
+              success: false,
+              message: 'No team associated with subscription found',
+            });
+          }
+
+          await onSubscriptionUpdated({ teamId: team.id, subscription });
+
+          return res.status(200).json({
+            success: true,
+            message: 'Webhook received',
+          });
+        }
+
+        const result = await prisma.user.findFirst({
           select: {
-            userId: true,
+            id: true,
           },
           where: {
             customerId,
           },
         });
 
-        if (!result?.userId) {
+        if (!result?.id) {
           return res.status(500).json({
             success: false,
             message: 'User not found',
           });
         }
 
-        await onSubscriptionUpdated({ userId: result.userId, subscription });
+        await onSubscriptionUpdated({ userId: result.id, subscription });
 
         return res.status(200).json({
           success: true,
@@ -233,23 +292,45 @@ export const stripeWebhookHandler = async (
           });
         }
 
-        const result = await prisma.subscription.findFirst({
+        if (subscription.items.data[0].price.metadata.plan === STRIPE_PLAN_TYPE.TEAM) {
+          const team = await prisma.team.findFirst({
+            where: {
+              customerId,
+            },
+          });
+
+          if (!team) {
+            return res.status(500).json({
+              success: false,
+              message: 'No team associated with subscription found',
+            });
+          }
+
+          await onSubscriptionUpdated({ teamId: team.id, subscription });
+
+          return res.status(200).json({
+            success: true,
+            message: 'Webhook received',
+          });
+        }
+
+        const result = await prisma.user.findFirst({
           select: {
-            userId: true,
+            id: true,
           },
           where: {
             customerId,
           },
         });
 
-        if (!result?.userId) {
+        if (!result?.id) {
           return res.status(500).json({
             success: false,
             message: 'User not found',
           });
         }
 
-        await onSubscriptionUpdated({ userId: result.userId, subscription });
+        await onSubscriptionUpdated({ userId: result.id, subscription });
 
         return res.status(200).json({
           success: true,
@@ -281,4 +362,22 @@ export const stripeWebhookHandler = async (
       message: 'Unknown error',
     });
   }
+};
+
+export type HandleTeamSeatCheckoutOptions = {
+  subscription: Stripe.Subscription;
+};
+
+const handleTeamSeatCheckout = async ({ subscription }: HandleTeamSeatCheckoutOptions) => {
+  if (subscription.metadata?.pendingTeamId === undefined) {
+    throw new Error('Missing pending team ID');
+  }
+
+  const pendingTeamId = Number(subscription.metadata.pendingTeamId);
+
+  if (Number.isNaN(pendingTeamId)) {
+    throw new Error('Invalid pending team ID');
+  }
+
+  return await createTeamFromPendingTeam({ pendingTeamId, subscription }).then((team) => team.id);
 };

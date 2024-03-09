@@ -20,7 +20,7 @@ const DialogPortal = ({
 }: DialogPrimitive.DialogPortalProps & { position?: 'start' | 'end' | 'center' }) => (
   <DialogPrimitive.Portal {...props}>
     <div
-      className={cn('fixed inset-0 z-50 flex justify-center sm:items-center', {
+      className={cn('fixed inset-0 z-[1000] flex justify-center sm:items-center', {
         'items-start': position === 'start',
         'items-end': position === 'end',
         'items-center': position === 'center',
@@ -87,7 +87,10 @@ DialogHeader.displayName = 'DialogHeader';
 
 const DialogFooter = ({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
   <div
-    className={cn('flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2', className)}
+    className={cn(
+      'flex flex-col-reverse space-y-2 space-y-reverse sm:flex-row sm:justify-end sm:space-x-2 sm:space-y-0',
+      className,
+    )}
     {...props}
   />
 );

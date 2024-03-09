@@ -7,11 +7,13 @@ import { DateTime } from 'luxon';
 import { useForm } from 'react-hook-form';
 import { match } from 'ts-pattern';
 
+import { DEFAULT_DOCUMENT_DATE_FORMAT } from '@documenso/lib/constants/date-formats';
 import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
 import { sortFieldsByPosition, validateFieldsInserted } from '@documenso/lib/utils/fields';
 import type { Field } from '@documenso/prisma/client';
 import { FieldType } from '@documenso/prisma/client';
 import type { FieldWithSignature } from '@documenso/prisma/types/field-with-signature';
+import type { DocumentFlowStep } from '@documenso/ui/primitives/document-flow/types';
 
 import { FieldToolTip } from '../../components/field/field-tooltip';
 import { cn } from '../../lib/utils';
@@ -34,7 +36,6 @@ import {
   SinglePlayerModeCustomTextField,
   SinglePlayerModeSignatureField,
 } from './single-player-mode-fields';
-import type { DocumentFlowStep } from './types';
 
 export type AddSignatureFormProps = {
   defaultValues?: TAddSignatureFormSchema;
@@ -43,6 +44,7 @@ export type AddSignatureFormProps = {
 
   onSubmit: (_data: TAddSignatureFormSchema) => Promise<void> | void;
   requireName?: boolean;
+  requireCustomText?: boolean;
   requireSignature?: boolean;
 };
 
@@ -53,6 +55,7 @@ export const AddSignatureFormPartial = ({
 
   onSubmit,
   requireName = false,
+  requireCustomText = false,
   requireSignature = true,
 }: AddSignatureFormProps) => {
   const { currentStep, totalSteps } = useStep();
@@ -66,6 +69,14 @@ export const AddSignatureFormPartial = ({
         path: ['name'],
         code: 'custom',
         message: 'Name is required',
+      });
+    }
+
+    if (requireCustomText && val.customText.length === 0) {
+      ctx.addIssue({
+        path: ['customText'],
+        code: 'custom',
+        message: 'Text is required',
       });
     }
 
@@ -84,6 +95,7 @@ export const AddSignatureFormPartial = ({
       name: '',
       email: '',
       signature: '',
+      customText: '',
     },
   });
 
@@ -130,6 +142,11 @@ export const AddSignatureFormPartial = ({
       return !form.formState.errors.email;
     }
 
+    if (fieldType === FieldType.TEXT) {
+      await form.trigger('customText');
+      return !form.formState.errors.customText;
+    }
+
     return true;
   };
 
@@ -140,7 +157,7 @@ export const AddSignatureFormPartial = ({
     return match(field.type)
       .with(FieldType.DATE, () => ({
         ...field,
-        customText: DateTime.now().toFormat('yyyy-MM-dd hh:mm a'),
+        customText: DateTime.now().toFormat(DEFAULT_DOCUMENT_DATE_FORMAT),
         inserted: true,
       }))
       .with(FieldType.EMAIL, () => ({
@@ -151,6 +168,11 @@ export const AddSignatureFormPartial = ({
       .with(FieldType.NAME, () => ({
         ...field,
         customText: form.getValues('name'),
+        inserted: true,
+      }))
+      .with(FieldType.TEXT, () => ({
+        ...field,
+        customText: form.getValues('customText'),
         inserted: true,
       }))
       .with(FieldType.SIGNATURE, () => {
@@ -301,6 +323,29 @@ export const AddSignatureFormPartial = ({
                   )}
                 />
               )}
+
+              {requireCustomText && (
+                <FormField
+                  control={form.control}
+                  name="customText"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel required={requireCustomText}>Custom Text</FormLabel>
+                      <FormControl>
+                        <Input
+                          className="bg-background"
+                          {...field}
+                          onChange={(value) => {
+                            onFormValueChange(FieldType.TEXT);
+                            field.onChange(value);
+                          }}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              )}
             </div>
           </DocumentFlowFormContainerContent>
 
@@ -329,7 +374,7 @@ export const AddSignatureFormPartial = ({
         <ElementVisible target={PDF_VIEWER_PAGE_SELECTOR}>
           {localFields.map((field) =>
             match(field.type)
-              .with(FieldType.DATE, FieldType.EMAIL, FieldType.NAME, () => {
+              .with(FieldType.DATE, FieldType.TEXT, FieldType.EMAIL, FieldType.NAME, () => {
                 return (
                   <SinglePlayerModeCustomTextField
                     onClick={insertField(field)}

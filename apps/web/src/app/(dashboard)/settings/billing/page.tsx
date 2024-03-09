@@ -1,21 +1,30 @@
+import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 
 import { match } from 'ts-pattern';
 
+import { getStripeCustomerByUser } from '@documenso/ee/server-only/stripe/get-customer';
 import { getPricesByInterval } from '@documenso/ee/server-only/stripe/get-prices-by-interval';
+import { getPrimaryAccountPlanPrices } from '@documenso/ee/server-only/stripe/get-primary-account-plan-prices';
 import { getProductByPriceId } from '@documenso/ee/server-only/stripe/get-product-by-price-id';
+import { STRIPE_PLAN_TYPE } from '@documenso/lib/constants/billing';
 import { getRequiredServerComponentSession } from '@documenso/lib/next-auth/get-server-component-session';
 import { getServerComponentFlag } from '@documenso/lib/server-only/feature-flags/get-server-component-feature-flag';
-import type { Stripe } from '@documenso/lib/server-only/stripe';
-import { getSubscriptionByUserId } from '@documenso/lib/server-only/subscription/get-subscription-by-user-id';
+import { type Stripe } from '@documenso/lib/server-only/stripe';
+import { getSubscriptionsByUserId } from '@documenso/lib/server-only/subscription/get-subscriptions-by-user-id';
+import { SubscriptionStatus } from '@documenso/prisma/client';
 
 import { LocaleDate } from '~/components/formatter/locale-date';
 
 import { BillingPlans } from './billing-plans';
 import { BillingPortalButton } from './billing-portal-button';
 
+export const metadata: Metadata = {
+  title: 'Billing',
+};
+
 export default async function BillingSettingsPage() {
-  const { user } = await getRequiredServerComponentSession();
+  let { user } = await getRequiredServerComponentSession();
 
   const isBillingEnabled = await getServerComponentFlag('app_billing');
 
@@ -24,12 +33,27 @@ export default async function BillingSettingsPage() {
     redirect('/settings/profile');
   }
 
-  const [subscription, prices] = await Promise.all([
-    getSubscriptionByUserId({ userId: user.id }),
-    getPricesByInterval(),
+  if (!user.customerId) {
+    user = await getStripeCustomerByUser(user).then((result) => result.user);
+  }
+
+  const [subscriptions, prices, primaryAccountPlanPrices] = await Promise.all([
+    getSubscriptionsByUserId({ userId: user.id }),
+    getPricesByInterval({ plan: STRIPE_PLAN_TYPE.COMMUNITY }),
+    getPrimaryAccountPlanPrices(),
   ]);
 
+  const primaryAccountPlanPriceIds = primaryAccountPlanPrices.map(({ id }) => id);
+
   let subscriptionProduct: Stripe.Product | null = null;
+
+  const primaryAccountPlanSubscriptions = subscriptions.filter(({ priceId }) =>
+    primaryAccountPlanPriceIds.includes(priceId),
+  );
+
+  const subscription =
+    primaryAccountPlanSubscriptions.find(({ status }) => status === SubscriptionStatus.ACTIVE) ??
+    primaryAccountPlanSubscriptions[0];
 
   if (subscription?.priceId) {
     subscriptionProduct = await getProductByPriceId({ priceId: subscription.priceId }).catch(
@@ -37,7 +61,8 @@ export default async function BillingSettingsPage() {
     );
   }
 
-  const isMissingOrInactiveOrFreePlan = !subscription || subscription.status === 'INACTIVE';
+  const isMissingOrInactiveOrFreePlan =
+    !subscription || subscription.status === SubscriptionStatus.INACTIVE;
 
   return (
     <div>

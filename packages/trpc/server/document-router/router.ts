@@ -1,30 +1,32 @@
 import { TRPCError } from '@trpc/server';
 
 import { getServerLimits } from '@documenso/ee/server-only/limits/server';
+import { DOCUMENSO_ENCRYPTION_KEY } from '@documenso/lib/constants/crypto';
 import { upsertDocumentMeta } from '@documenso/lib/server-only/document-meta/upsert-document-meta';
 import { createDocument } from '@documenso/lib/server-only/document/create-document';
 import { deleteDocument } from '@documenso/lib/server-only/document/delete-document';
 import { duplicateDocumentById } from '@documenso/lib/server-only/document/duplicate-document-by-id';
+import { findDocumentAuditLogs } from '@documenso/lib/server-only/document/find-document-audit-logs';
 import { getDocumentById } from '@documenso/lib/server-only/document/get-document-by-id';
 import { getDocumentAndSenderByToken } from '@documenso/lib/server-only/document/get-document-by-token';
 import { resendDocument } from '@documenso/lib/server-only/document/resend-document';
 import { searchDocumentsWithKeyword } from '@documenso/lib/server-only/document/search-documents-with-keyword';
 import { sendDocument } from '@documenso/lib/server-only/document/send-document';
 import { updateTitle } from '@documenso/lib/server-only/document/update-title';
-import { setFieldsForDocument } from '@documenso/lib/server-only/field/set-fields-for-document';
-import { setRecipientsForDocument } from '@documenso/lib/server-only/recipient/set-recipients-for-document';
+import { symmetricEncrypt } from '@documenso/lib/universal/crypto';
+import { extractNextApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 
 import { authenticatedProcedure, procedure, router } from '../trpc';
 import {
   ZCreateDocumentMutationSchema,
-  ZDeleteDraftDocumentMutationSchema,
+  ZDeleteDraftDocumentMutationSchema as ZDeleteDocumentMutationSchema,
+  ZFindDocumentAuditLogsQuerySchema,
   ZGetDocumentByIdQuerySchema,
   ZGetDocumentByTokenQuerySchema,
   ZResendDocumentMutationSchema,
   ZSearchDocumentsMutationSchema,
   ZSendDocumentMutationSchema,
-  ZSetFieldsForDocumentMutationSchema,
-  ZSetRecipientsForDocumentMutationSchema,
+  ZSetPasswordForDocumentMutationSchema,
   ZSetTitleForDocumentMutationSchema,
 } from './schema';
 
@@ -33,10 +35,8 @@ export const documentRouter = router({
     .input(ZGetDocumentByIdQuerySchema)
     .query(async ({ input, ctx }) => {
       try {
-        const { id } = input;
-
         return await getDocumentById({
-          id,
+          ...input,
           userId: ctx.user.id,
         });
       } catch (err) {
@@ -70,9 +70,9 @@ export const documentRouter = router({
     .input(ZCreateDocumentMutationSchema)
     .mutation(async ({ input, ctx }) => {
       try {
-        const { title, documentDataId } = input;
+        const { title, documentDataId, teamId } = input;
 
-        const { remaining } = await getServerLimits({ email: ctx.user.email });
+        const { remaining } = await getServerLimits({ email: ctx.user.email, teamId });
 
         if (remaining.documents <= 0) {
           throw new TRPCError({
@@ -84,8 +84,10 @@ export const documentRouter = router({
 
         return await createDocument({
           userId: ctx.user.id,
+          teamId,
           title,
           documentDataId,
+          requestMetadata: extractNextApiRequestMetadata(ctx.req),
         });
       } catch (err) {
         if (err instanceof TRPCError) {
@@ -100,14 +102,19 @@ export const documentRouter = router({
     }),
 
   deleteDocument: authenticatedProcedure
-    .input(ZDeleteDraftDocumentMutationSchema)
+    .input(ZDeleteDocumentMutationSchema)
     .mutation(async ({ input, ctx }) => {
       try {
-        const { id, status } = input;
+        const { id, teamId } = input;
 
         const userId = ctx.user.id;
 
-        return await deleteDocument({ id, userId, status });
+        return await deleteDocument({
+          id,
+          userId,
+          teamId,
+          requestMetadata: extractNextApiRequestMetadata(ctx.req),
+        });
       } catch (err) {
         console.error(err);
 
@@ -118,59 +125,76 @@ export const documentRouter = router({
       }
     }),
 
+  findDocumentAuditLogs: authenticatedProcedure
+    .input(ZFindDocumentAuditLogsQuerySchema)
+    .query(async ({ input, ctx }) => {
+      try {
+        const { page, perPage, documentId, cursor, filterForRecentActivity, orderBy } = input;
+
+        return await findDocumentAuditLogs({
+          page,
+          perPage,
+          documentId,
+          cursor,
+          filterForRecentActivity,
+          orderBy,
+          userId: ctx.user.id,
+        });
+      } catch (err) {
+        console.error(err);
+
+        throw new TRPCError({
+          code: 'BAD_REQUEST',
+          message: 'We were unable to find audit logs for this document. Please try again later.',
+        });
+      }
+    }),
+
   setTitleForDocument: authenticatedProcedure
     .input(ZSetTitleForDocumentMutationSchema)
     .mutation(async ({ input, ctx }) => {
-      const { documentId, title } = input;
+      const { documentId, teamId, title } = input;
 
       const userId = ctx.user.id;
 
       return await updateTitle({
         title,
         userId,
+        teamId,
         documentId,
+        requestMetadata: extractNextApiRequestMetadata(ctx.req),
       });
     }),
 
-  setRecipientsForDocument: authenticatedProcedure
-    .input(ZSetRecipientsForDocumentMutationSchema)
+  setPasswordForDocument: authenticatedProcedure
+    .input(ZSetPasswordForDocumentMutationSchema)
     .mutation(async ({ input, ctx }) => {
       try {
-        const { documentId, recipients } = input;
+        const { documentId, password } = input;
 
-        return await setRecipientsForDocument({
-          userId: ctx.user.id,
+        const key = DOCUMENSO_ENCRYPTION_KEY;
+
+        if (!key) {
+          throw new Error('Missing encryption key');
+        }
+
+        const securePassword = symmetricEncrypt({
+          data: password,
+          key,
+        });
+
+        await upsertDocumentMeta({
           documentId,
-          recipients,
+          password: securePassword,
+          userId: ctx.user.id,
+          requestMetadata: extractNextApiRequestMetadata(ctx.req),
         });
       } catch (err) {
         console.error(err);
 
         throw new TRPCError({
           code: 'BAD_REQUEST',
-          message:
-            'We were unable to set the recipients for this document. Please try again later.',
-        });
-      }
-    }),
-
-  setFieldsForDocument: authenticatedProcedure
-    .input(ZSetFieldsForDocumentMutationSchema)
-    .mutation(async ({ input, ctx }) => {
-      try {
-        const { documentId, fields } = input;
-
-        return await setFieldsForDocument({
-          userId: ctx.user.id,
-          documentId,
-          fields,
-        });
-      } catch (err) {
-        console.error(err);
-
-        throw new TRPCError({
-          code: 'BAD_REQUEST',
-          message: 'We were unable to set the fields for this document. Please try again later.',
+          message: 'We were unable to set the password for this document. Please try again later.',
         });
       }
     }),
@@ -179,19 +203,26 @@ export const documentRouter = router({
     .input(ZSendDocumentMutationSchema)
     .mutation(async ({ input, ctx }) => {
       try {
-        const { documentId, email } = input;
+        const { documentId, teamId, meta } = input;
 
-        if (email.message || email.subject) {
+        if (meta.message || meta.subject || meta.timezone || meta.dateFormat || meta.redirectUrl) {
           await upsertDocumentMeta({
             documentId,
-            subject: email.subject,
-            message: email.message,
+            subject: meta.subject,
+            message: meta.message,
+            dateFormat: meta.dateFormat,
+            timezone: meta.timezone,
+            redirectUrl: meta.redirectUrl,
+            userId: ctx.user.id,
+            requestMetadata: extractNextApiRequestMetadata(ctx.req),
           });
         }
 
         return await sendDocument({
           userId: ctx.user.id,
           documentId,
+          teamId,
+          requestMetadata: extractNextApiRequestMetadata(ctx.req),
         });
       } catch (err) {
         console.error(err);
@@ -207,12 +238,10 @@ export const documentRouter = router({
     .input(ZResendDocumentMutationSchema)
     .mutation(async ({ input, ctx }) => {
       try {
-        const { documentId, recipients } = input;
-
         return await resendDocument({
           userId: ctx.user.id,
-          documentId,
-          recipients,
+          ...input,
+          requestMetadata: extractNextApiRequestMetadata(ctx.req),
         });
       } catch (err) {
         console.error(err);
@@ -228,14 +257,13 @@ export const documentRouter = router({
     .input(ZGetDocumentByIdQuerySchema)
     .mutation(async ({ input, ctx }) => {
       try {
-        const { id } = input;
-
         return await duplicateDocumentById({
-          id,
           userId: ctx.user.id,
+          ...input,
         });
       } catch (err) {
         console.log(err);
+
         throw new TRPCError({
           code: 'BAD_REQUEST',
           message: 'We are unable to duplicate this document. Please try again later.',
