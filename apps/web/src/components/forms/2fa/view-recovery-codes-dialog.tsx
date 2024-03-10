@@ -138,7 +138,14 @@ export const ViewRecoveryCodesDialog = ({ open, onOpenChange }: ViewRecoveryCode
                   />
 
                   <DialogFooter>
-                    <Button type="button" variant="secondary" onClick={() => onOpenChange(false)}>
+                    <Button
+                      type="button"
+                      variant="secondary"
+                      onClick={() => {
+                        onOpenChange(false);
+                        viewRecoveryCodesForm.reset();
+                      }}
+                    >
                       Cancel
                     </Button>
 

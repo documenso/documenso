@@ -202,7 +202,7 @@ export const EnableAuthenticatorAppDialog = ({
                       variant="secondary"
                       onClick={() => {
                         onOpenChange(false);
-                        setupTwoFactorAuthenticationForm.setValue('password', '');
+                        setupTwoFactorAuthenticationForm.reset();
                       }}
                     >
                       Cancel
