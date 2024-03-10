@@ -150,8 +150,10 @@ export const EnableAuthenticatorAppDialog = ({
   };
 
   useEffect(() => {
-    // Reset the form when the Dialog open state changes
-    setupTwoFactorAuthenticationForm.reset();
+    // Reset the form when the Dialog closes
+    if (!open) {
+      setupTwoFactorAuthenticationForm.reset();
+    }
   }, [open, setupTwoFactorAuthenticationForm]);
 
   return (

@@ -93,8 +93,10 @@ export const ViewRecoveryCodesDialog = ({ open, onOpenChange }: ViewRecoveryCode
   };
 
   useEffect(() => {
-    // Reset the form when the Dialog open state changes
-    viewRecoveryCodesForm.reset();
+    // Reset the form when the Dialog closes
+    if (!open) {
+      viewRecoveryCodesForm.reset();
+    }
   }, [open, viewRecoveryCodesForm]);
 
   return (
