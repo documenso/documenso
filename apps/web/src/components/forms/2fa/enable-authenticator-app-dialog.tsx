@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
@@ -149,6 +149,11 @@ export const EnableAuthenticatorAppDialog = ({
     }
   };
 
+  useEffect(() => {
+    // Reset the form when the Dialog open state changes
+    setupTwoFactorAuthenticationForm.reset();
+  }, [open, setupTwoFactorAuthenticationForm]);
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="w-full max-w-xl md:max-w-xl lg:max-w-xl">
@@ -197,14 +202,7 @@ export const EnableAuthenticatorAppDialog = ({
                   />
 
                   <DialogFooter>
-                    <Button
-                      type="button"
-                      variant="secondary"
-                      onClick={() => {
-                        onOpenChange(false);
-                        setupTwoFactorAuthenticationForm.reset();
-                      }}
-                    >
+                    <Button type="button" variant="secondary" onClick={() => onOpenChange(false)}>
                       Cancel
                     </Button>
 
