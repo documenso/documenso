@@ -29,7 +29,16 @@ NEXT_PRIVATE_SMTP_USERNAME="<your-username>"
 NEXT_PRIVATE_SMTP_PASSWORD="<your-password>"
 ```
 
-4. Run the following command to start the containers:
+4. Update the volume binding for the cert file in the `compose.yml` file to point to your own key file:
+
+Since the `cert.p12` file is required for signing and encrypting documents, you will need to provide your own key file. Update the volume binding in the `compose.yml` file to point to your key file:
+
+```yaml
+volumes:
+  - /path/to/your/keyfile.p12:/opt/documenso/cert.p12
+```
+
+1. Run the following command to start the containers:
 
 ```
 docker-compose --env-file ./.env -d up
@@ -70,6 +79,7 @@ docker run -d \
   -e NEXT_PRIVATE_SMTP_TRANSPORT="<your-next-private-smtp-transport>"
   -e NEXT_PRIVATE_SMTP_FROM_NAME="<your-next-private-smtp-from-name>"
   -e NEXT_PRIVATE_SMTP_FROM_ADDRESS="<your-next-private-smtp-from-address>"
+  -v /path/to/your/keyfile.p12:/opt/documenso/cert.p12
   documenso/documenso
 ```
 
@@ -99,6 +109,10 @@ Here's a markdown table documenting all the provided environment variables:
 | `NEXT_PUBLIC_WEBAPP_URL`                     | The URL for the web application.                                                                    |
 | `NEXT_PRIVATE_DATABASE_URL`                  | The URL for the primary database connection (with connection pooling).                              |
 | `NEXT_PRIVATE_DIRECT_DATABASE_URL`           | The URL for the direct database connection (without connection pooling).                            |
+| `NEXT_PRIVATE_SIGNING_TRANSPORT`             | The signing transport to use. Available options: local (default)                                    |
+| `NEXT_PRIVATE_SIGNING_PASSPHRASE`            | The passphrase for the key file.                                                                    |
+| `NEXT_PRIVATE_SIGNING_LOCAL_FILE_CONTENTS`   | The base64-encoded contents of the key file, will be used instead of file path.                     |
+| `NEXT_PRIVATE_SIGNING_LOCAL_FILE_PATH`       | The path to the key file, default `/opt/documenso/cert.p12`.                                        |
 | `NEXT_PUBLIC_UPLOAD_TRANSPORT`               | The transport to use for file uploads (database or s3).                                             |
 | `NEXT_PRIVATE_UPLOAD_ENDPOINT`               | The endpoint for the S3 storage transport (for third-party S3-compatible providers).                |
 | `NEXT_PRIVATE_UPLOAD_REGION`                 | The region for the S3 storage transport (defaults to us-east-1).                                    |

@@ -49,3 +49,5 @@ services:
       - NEXT_PRIVATE_SMTP_FROM_ADDRESS=noreply@documenso.com
     ports:
       - 3000:3000
+    volumes:
+      - ../../apps/web/example/cert.p12:/opt/documenso/cert.p12
