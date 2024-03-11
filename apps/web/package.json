@@ -43,7 +43,7 @@
     "react-icons": "^4.11.0",
     "react-rnd": "^10.4.1",
     "remeda": "^1.27.1",
-    "sharp": "0.33.1",
+    "sharp": "^0.33.1",
     "ts-pattern": "^5.0.5",
     "ua-parser-js": "^1.0.37",
     "uqr": "^0.1.2",
