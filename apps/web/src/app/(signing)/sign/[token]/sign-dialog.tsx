@@ -12,6 +12,8 @@ import {
 
 import { truncateTitle } from '~/helpers/truncate-title';
 
+import { useRequiredDocumentAuthContext } from './document-auth-provider';
+
 export type SignDialogProps = {
   isSubmitting: boolean;
   document: Document;
@@ -29,12 +31,33 @@ export const SignDialog = ({
   onSignatureComplete,
   role,
 }: SignDialogProps) => {
+  const { executeActionAuthProcedure, isAuthRedirectRequired } = useRequiredDocumentAuthContext();
+
   const [showDialog, setShowDialog] = useState(false);
   const truncatedTitle = truncateTitle(document.title);
   const isComplete = fields.every((field) => field.inserted);
 
+  const handleOpenChange = async (open: boolean) => {
+    if (isSubmitting || !isComplete) {
+      return;
+    }
+
+    if (isAuthRedirectRequired) {
+      await executeActionAuthProcedure({
+        actionTarget: 'DOCUMENT',
+        onReauthFormSubmit: () => {
+          // Do nothing since the user should be redirected.
+        },
+      });
+
+      return;
+    }
+
+    setShowDialog(open);
+  };
+
   return (
-    <Dialog open={showDialog && isComplete} onOpenChange={setShowDialog}>
+    <Dialog open={showDialog} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
         <Button
           className="w-full"

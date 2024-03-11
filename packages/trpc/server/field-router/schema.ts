@@ -1,5 +1,6 @@
 import { z } from 'zod';
 
+import { ZRecipientActionAuthSchema } from '@documenso/lib/types/document-auth';
 import { FieldType } from '@documenso/prisma/client';
 
 export const ZAddFieldsMutationSchema = z.object({
@@ -45,6 +46,7 @@ export const ZSignFieldWithTokenMutationSchema = z.object({
   fieldId: z.number(),
   value: z.string().trim(),
   isBase64: z.boolean().optional(),
+  authOptions: ZRecipientActionAuthSchema.optional(),
 });
 
 export type TSignFieldWithTokenMutationSchema = z.infer<typeof ZSignFieldWithTokenMutationSchema>;
