@@ -30,9 +30,9 @@ export const DeleteAccountDialog = ({ className, user }: DeleteAccountDialogProp
   const { toast } = useToast();
 
   const hasTwoFactorAuthentication = user.twoFactorEnabled;
-  const username = user.name!;
+  const userEmail = user.email;
 
-  const [enteredUsername, setEnteredUsername] = useState<string>('');
+  const [enteredEmail, setEnteredEmail] = useState<string>('');
 
   const { mutateAsync: deleteAccount, isLoading: isDeletingAccount } =
     trpc.profile.deleteAccount.useMutation();
@@ -82,7 +82,7 @@ export const DeleteAccountDialog = ({ className, user }: DeleteAccountDialogProp
         </div>
 
         <div className="flex-shrink-0">
-          <Dialog onOpenChange={() => setEnteredUsername('')}>
+          <Dialog onOpenChange={() => setEnteredEmail('')}>
             <DialogTrigger asChild>
               <Button variant="destructive">Delete Account</Button>
             </DialogTrigger>
@@ -111,7 +111,7 @@ export const DeleteAccountDialog = ({ className, user }: DeleteAccountDialogProp
                 </DialogDescription>
                 {!hasTwoFactorAuthentication && (
                   <DialogDescription>
-                    Please type <span className="font-semibold">{username}</span> to confirm.
+                    Please type <span className="font-semibold">{userEmail}</span> to confirm.
                   </DialogDescription>
                 )}
               </DialogHeader>
@@ -120,9 +120,8 @@ export const DeleteAccountDialog = ({ className, user }: DeleteAccountDialogProp
                 <div className="mt-4">
                   <Input
                     type="text"
-                    value={enteredUsername}
-                    onChange={(e) => setEnteredUsername(e.target.value)}
-                    onPaste={(e) => e.preventDefault()}
+                    value={enteredEmail}
+                    onChange={(e) => setEnteredEmail(e.target.value)}
                   />
                 </div>
               )}
@@ -133,7 +132,7 @@ export const DeleteAccountDialog = ({ className, user }: DeleteAccountDialogProp
                     onClick={onDeleteAccount}
                     loading={isDeletingAccount}
                     variant="outline"
-                    disabled={hasTwoFactorAuthentication || enteredUsername !== username}
+                    disabled={hasTwoFactorAuthentication || enteredEmail !== userEmail}
                   >
                     {isDeletingAccount ? (
                       'Deleting account...'
