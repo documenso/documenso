@@ -81,7 +81,7 @@
     --ring: 95.08 71.08% 67.45%;
 
     --radius: 0.5rem;
-    
+
     --warning: 54 96% 45%;
   }
 }
@@ -89,6 +89,11 @@
 @layer base {
   * {
     @apply border-border;
+  }
+
+  html,
+  body {
+    scrollbar-gutter: stable;
   }
 
   body {
