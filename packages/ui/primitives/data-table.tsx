@@ -118,7 +118,7 @@ export function DataTable<TData, TValue>({
                     <TableCell
                       key={cell.id}
                       style={{
-                        width: cell.column.getSize(),
+                        width: `${cell.column.getSize()}px`,
                       }}
                     >
                       {flexRender(cell.column.columnDef.cell, cell.getContext())}
