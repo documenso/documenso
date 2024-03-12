@@ -4,9 +4,14 @@ import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { Button } from '@documenso/ui/primitives/button';
 import { Card, CardContent } from '@documenso/ui/primitives/card';
 
-export default function CTA() {
+type CallToActionProps = {
+  className?: string;
+  utmSource?: string;
+};
+
+export const CallToAction = ({ className, utmSource = 'generic-cta' }: CallToActionProps) => {
   return (
-    <Card spotlight className="mt-8">
+    <Card spotlight className={className}>
       <CardContent className="flex flex-col items-center justify-center p-12">
         <h2 className="text-center text-2xl font-bold">Join the Open Signing Movement</h2>
 
@@ -16,11 +21,11 @@ export default function CTA() {
         </p>
 
         <Button className="mt-8 rounded-full no-underline" size="lg" asChild>
-          <Link href={`${NEXT_PUBLIC_WEBAPP_URL()}/signup?utm_source=cta`} target="_blank">
+          <Link href={`${NEXT_PUBLIC_WEBAPP_URL()}/signup?utm_source=${utmSource}`} target="_blank">
             Get started
           </Link>
         </Button>
       </CardContent>
     </Card>
   );
-}
+};

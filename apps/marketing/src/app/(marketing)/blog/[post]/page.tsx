@@ -7,7 +7,7 @@ import { ChevronLeft } from 'lucide-react';
 import type { MDXComponents } from 'mdx/types';
 import { useMDXComponent } from 'next-contentlayer/hooks';
 
-import CTA from '~/components/(marketing)/CTA';
+import { CallToAction } from '~/components/(marketing)/call-to-action';
 
 export const dynamic = 'force-dynamic';
 
@@ -93,7 +93,8 @@ export default function BlogPostPage({ params }: { params: { post: string } }) {
           Back to all posts
         </Link>
       </article>
-      {post.cta && <CTA />}
+
+      {post.cta && <CallToAction className="mt-8" utmSource={`blog__${params.post}`} />}
     </div>
   );
 }

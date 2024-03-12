@@ -7,7 +7,7 @@ import { getUserMonthlyGrowth } from '@documenso/lib/server-only/user/get-user-m
 import { FUNDING_RAISED } from '~/app/(marketing)/open/data';
 import { MetricCard } from '~/app/(marketing)/open/metric-card';
 import { SalaryBands } from '~/app/(marketing)/open/salary-bands';
-import CTA from '~/components/(marketing)/CTA';
+import { CallToAction } from '~/components/(marketing)/call-to-action';
 
 import { BarMetric } from './bar-metrics';
 import { CapTable } from './cap-table';
@@ -252,7 +252,8 @@ export default async function OpenPage() {
           </div>
         </div>
       </div>
-      <CTA />
+
+      <CallToAction className="mt-12" utmSource="open-page" />
     </div>
   );
 }
