@@ -346,7 +346,7 @@ export const Widget = ({ className, children, ...props }: WidgetProps) => {
                   {signatureText && (
                     <p
                       className={cn(
-                        'text-foreground text-4xl font-semibold [font-family:var(--font-caveat)]',
+                        'text-foreground truncate text-4xl font-semibold [font-family:var(--font-caveat)]',
                       )}
                     >
                       {signatureText}
