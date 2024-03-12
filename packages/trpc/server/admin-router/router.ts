@@ -3,6 +3,7 @@ import { TRPCError } from '@trpc/server';
 import { findDocuments } from '@documenso/lib/server-only/admin/get-all-documents';
 import { updateRecipient } from '@documenso/lib/server-only/admin/update-recipient';
 import { updateUser } from '@documenso/lib/server-only/admin/update-user';
+import { deleteDocument } from '@documenso/lib/server-only/document/delete-document';
 import { sealDocument } from '@documenso/lib/server-only/document/seal-document';
 import { upsertSiteSetting } from '@documenso/lib/server-only/site-settings/upsert-site-setting';
 import { deleteUser } from '@documenso/lib/server-only/user/delete-user';
@@ -10,6 +11,7 @@ import { getUserById } from '@documenso/lib/server-only/user/get-user-by-id';
 
 import { adminProcedure, router } from '../trpc';
 import {
+  ZAdminDeleteDocumentMutationSchema,
   ZAdminDeleteUserMutationSchema,
   ZAdminFindDocumentsQuerySchema,
   ZAdminResealDocumentMutationSchema,
@@ -118,4 +120,18 @@ export const adminRouter = router({
       });
     }
   }),
+  deleteDocument: adminProcedure
+    .input(ZAdminDeleteDocumentMutationSchema)
+    .mutation(async ({ input }) => {
+      const { id, userId } = input;
+      try {
+        return await deleteDocument({ id, userId });
+      } catch (err) {
+        console.log(err);
+        throw new TRPCError({
+          code: 'BAD_REQUEST',
+          message: 'We were unable to delete the specified document. Please try again.',
+        });
+      }
+    }),
 });
