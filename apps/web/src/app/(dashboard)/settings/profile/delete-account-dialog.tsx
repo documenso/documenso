@@ -19,6 +19,7 @@ import {
   DialogTrigger,
 } from '@documenso/ui/primitives/dialog';
 import { Input } from '@documenso/ui/primitives/input';
+import { Label } from '@documenso/ui/primitives/label';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
 export type DeleteAccountDialogProps = {
@@ -30,7 +31,6 @@ export const DeleteAccountDialog = ({ className, user }: DeleteAccountDialogProp
   const { toast } = useToast();
 
   const hasTwoFactorAuthentication = user.twoFactorEnabled;
-  const userEmail = user.email;
 
   const [enteredEmail, setEnteredEmail] = useState<string>('');
 
@@ -86,6 +86,7 @@ export const DeleteAccountDialog = ({ className, user }: DeleteAccountDialogProp
             <DialogTrigger asChild>
               <Button variant="destructive">Delete Account</Button>
             </DialogTrigger>
+
             <DialogContent>
               <DialogHeader className="space-y-4">
                 <DialogTitle>Delete Account</DialogTitle>
@@ -109,43 +110,34 @@ export const DeleteAccountDialog = ({ className, user }: DeleteAccountDialogProp
                   , along with all of your completed documents, signatures, and all other resources
                   belonging to your Account.
                 </DialogDescription>
-                {!hasTwoFactorAuthentication && (
-                  <DialogDescription>
-                    Please type <span className="font-semibold">{userEmail}</span> to confirm.
-                  </DialogDescription>
-                )}
               </DialogHeader>
 
               {!hasTwoFactorAuthentication && (
                 <div className="mt-4">
+                  <Label>
+                    Please type{' '}
+                    <span className="text-muted-foreground font-semibold">{user.email}</span> to
+                    confirm.
+                  </Label>
+
                   <Input
                     type="text"
+                    className="mt-2"
+                    aria-label="Confirm Email"
                     value={enteredEmail}
                     onChange={(e) => setEnteredEmail(e.target.value)}
                   />
                 </div>
               )}
               <DialogFooter>
-                {!hasTwoFactorAuthentication && (
-                  <Button
-                    className="text-red-500 hover:bg-red-500 hover:text-white sm:w-full"
-                    onClick={onDeleteAccount}
-                    loading={isDeletingAccount}
-                    variant="outline"
-                    disabled={hasTwoFactorAuthentication || enteredEmail !== userEmail}
-                  >
-                    {isDeletingAccount ? (
-                      'Deleting account...'
-                    ) : (
-                      <>
-                        <span className="sm:hidden">Delete account</span>
-                        <span className="hidden sm:block">
-                          I understand the consequences, delete this account
-                        </span>
-                      </>
-                    )}
-                  </Button>
-                )}
+                <Button
+                  onClick={onDeleteAccount}
+                  loading={isDeletingAccount}
+                  variant="destructive"
+                  disabled={hasTwoFactorAuthentication || enteredEmail !== user.email}
+                >
+                  {isDeletingAccount ? 'Deleting account...' : 'Confirm Deletion'}
+                </Button>
               </DialogFooter>
             </DialogContent>
           </Dialog>

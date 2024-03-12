@@ -16,6 +16,8 @@ test('delete user', async ({ page }) => {
   });
 
   await page.getByRole('button', { name: 'Delete Account' }).click();
+  await page.getByLabel('Confirm Email').fill(user.email);
+  await expect(page.getByRole('button', { name: 'Confirm Deletion' })).not.toBeDisabled();
   await page.getByRole('button', { name: 'Confirm Deletion' }).click();
 
   await page.waitForURL(`${WEBAPP_BASE_URL}/signin`);
