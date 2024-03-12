@@ -13,6 +13,7 @@ import { DocumentStatus } from '~/components/formatter/document-status';
 import { LocaleDate } from '~/components/formatter/locale-date';
 
 import { AdminActions } from './admin-actions';
+import { DeleteDocumentDialog } from './delete-document-dialog';
 import { RecipientItem } from './recipient-item';
 
 type AdminDocumentDetailsPageProps = {
@@ -81,6 +82,10 @@ export default async function AdminDocumentDetailsPage({ params }: AdminDocument
           ))}
         </Accordion>
       </div>
+
+      <hr className="my-4" />
+
+      {document && <DeleteDocumentDialog document={document} />}
     </div>
   );
 }

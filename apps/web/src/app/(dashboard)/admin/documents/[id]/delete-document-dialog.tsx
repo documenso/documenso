@@ -34,7 +34,7 @@ export const DeleteDocumentDialog = ({ document }: DeleteDocumentDialogProps) =>
 
   const handleDeleteDocument = async () => {
     try {
-      await deleteDocument({ id: 1, userId: 1 });
+      await deleteDocument({ id: document.id, userId: document.userId });
       toast({
         title: 'Document deleted',
         description: 'The Document has been deleted successfully.',
@@ -68,22 +68,21 @@ export const DeleteDocumentDialog = ({ document }: DeleteDocumentDialogProps) =>
           variant="neutral"
         >
           <div>
-            <AlertTitle>Delete Account</AlertTitle>
+            <AlertTitle>Delete Document</AlertTitle>
             <AlertDescription className="mr-2">
-              Delete the users account and all its contents. This action is irreversible and will
-              cancel their subscription, so proceed with caution.
+              Delete the document. This action is irreversible so proceed with caution.
             </AlertDescription>
           </div>
 
           <div className="flex-shrink-0">
             <Dialog>
               <DialogTrigger asChild>
-                <Button variant="destructive">Delete Account</Button>
+                <Button variant="destructive">Delete Document</Button>
               </DialogTrigger>
 
               <DialogContent>
                 <DialogHeader className="space-y-4">
-                  <DialogTitle>Delete Account</DialogTitle>
+                  <DialogTitle>Delete Document</DialogTitle>
 
                   <Alert variant="destructive">
                     <AlertDescription className="selection:bg-red-100">
@@ -93,7 +92,7 @@ export const DeleteDocumentDialog = ({ document }: DeleteDocumentDialogProps) =>
                 </DialogHeader>
 
                 <div>
-                  <DialogDescription>To confirm, please the reason</DialogDescription>
+                  <DialogDescription>To confirm, please enter the reason</DialogDescription>
 
                   <Input
                     className="mt-2"
@@ -109,7 +108,7 @@ export const DeleteDocumentDialog = ({ document }: DeleteDocumentDialogProps) =>
                     loading={isDeletingDocument}
                     variant="destructive"
                   >
-                    {isDeletingDocument ? 'Deleting account...' : 'Delete Account'}
+                    {isDeletingDocument ? 'Deleting document...' : 'Delete Document'}
                   </Button>
                 </DialogFooter>
               </DialogContent>
