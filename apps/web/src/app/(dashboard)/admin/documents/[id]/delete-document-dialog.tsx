@@ -107,6 +107,7 @@ export const DeleteDocumentDialog = ({ document }: DeleteDocumentDialogProps) =>
                     onClick={handleDeleteDocument}
                     loading={isDeletingDocument}
                     variant="destructive"
+                    disabled={!reason}
                   >
                     {isDeletingDocument ? 'Deleting document...' : 'Delete Document'}
                   </Button>
