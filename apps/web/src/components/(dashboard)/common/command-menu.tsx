@@ -160,6 +160,7 @@ export function CommandMenu({ open, onOpenChange }: CommandMenuProps) {
     // Backspace goes to previous page when search is empty
     if (e.key === 'Escape' || (e.key === 'Backspace' && !search)) {
       e.preventDefault();
+      setOpen(false);
 
       if (currentPage === undefined) {
         setOpen(false);

@@ -55,6 +55,7 @@ type AvatarWithTextProps = {
   primaryText: React.ReactNode;
   secondaryText?: React.ReactNode;
   rightSideComponent?: React.ReactNode;
+  showText?: boolean;
 };
 
 const AvatarWithText = ({
@@ -64,6 +65,7 @@ const AvatarWithText = ({
   primaryText,
   secondaryText,
   rightSideComponent,
+  showText = true,
 }: AvatarWithTextProps) => (
   <div className={cn('flex w-full max-w-xs items-center gap-2', className)}>
     <Avatar
@@ -72,7 +74,9 @@ const AvatarWithText = ({
       <AvatarFallback className="text-xs text-gray-400">{avatarFallback}</AvatarFallback>
     </Avatar>
 
-    <div className="hidden flex-col text-left text-sm font-normal lg:flex">
+    <div
+      className={cn('hidden flex-col text-left text-sm font-normal lg:flex', showText && 'flex')}
+    >
       <span className="text-foreground truncate">{primaryText}</span>
       <span className="text-muted-foreground truncate text-xs">{secondaryText}</span>
     </div>

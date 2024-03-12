@@ -102,6 +102,7 @@ export const MenuSwitcher = ({ user, teams: initialTeamsData }: MenuSwitcherProp
             rightSideComponent={
               <ChevronsUpDown className="text-muted-foreground ml-auto h-4 w-4" />
             }
+            showText={false}
           />
         </Button>
       </DropdownMenuTrigger>
