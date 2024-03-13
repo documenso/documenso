@@ -9,14 +9,12 @@ import { TemplateFooter } from '../template-components/template-footer';
 
 export type DocumentDeleteEmailTemplateProps = Partial<TemplateDocumentDeleteProps>;
 
-export const DocumentDeleteTemplate = ({
-  inviterName = 'Lucas Smith',
-  inviterEmail = 'lucas@documenso.com',
+export const DocumentDeleteEmailTemplate = ({
   documentName = 'Open Source Pledge.pdf',
   assetBaseUrl = 'http://localhost:3002',
   reason = 'Unknown',
 }: DocumentDeleteEmailTemplateProps) => {
-  const previewText = `${inviterName} has cancelled the document ${documentName}, you don't need to sign it anymore.`;
+  const previewText = `Admin has deleted your document ${documentName}.`;
 
   const getAssetUrl = (path: string) => {
     return new URL(path, assetBaseUrl).toString();
@@ -45,11 +43,9 @@ export const DocumentDeleteTemplate = ({
                   className="mb-4 h-6"
                 />
                 <TemplateDocumentDelete
-                  inviterName={inviterName}
                   reason={reason}
                   documentName={documentName}
                   assetBaseUrl={assetBaseUrl}
-                  inviterEmail={inviterEmail}
                 />
               </Section>
             </Container>
@@ -66,4 +62,4 @@ export const DocumentDeleteTemplate = ({
   );
 };
 
-export default DocumentDeleteTemplate;
+export default DocumentDeleteEmailTemplate;

@@ -2,8 +2,6 @@ import { Section, Text } from '../components';
 import { TemplateDocumentImage } from './template-document-image';
 
 export interface TemplateDocumentDeleteProps {
-  inviterName: string;
-  inviterEmail: string;
   reason: string;
   documentName: string;
   assetBaseUrl: string;
