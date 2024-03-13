@@ -1,9 +1,0 @@
-/* Custom CSS for dark mode */
-@media (prefers-color-scheme: dark) {
-  .swagger-ui {
-      filter: invert(85%) hue-rotate(180deg);
-  }
-  .swagger-ui .microlight {
-      filter: invert(100%) hue-rotate(180deg);
-  }
-}
