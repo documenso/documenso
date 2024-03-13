@@ -85,7 +85,7 @@ export default async function AdminDocumentDetailsPage({ params }: AdminDocument
 
       <hr className="my-4" />
 
-      {document && <DeleteDocumentDialog document={document} />}
+      {document && !document.deletedAt && <DeleteDocumentDialog document={document} />}
     </div>
   );
 }
