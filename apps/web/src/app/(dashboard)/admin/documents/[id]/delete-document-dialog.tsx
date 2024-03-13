@@ -40,7 +40,7 @@ export const DeleteDocumentDialog = ({ document }: DeleteDocumentDialogProps) =>
         description: 'The Document has been deleted successfully.',
         duration: 5000,
       });
-      router.push('admin/documents');
+      router.push('/admin/documents');
     } catch (err) {
       if (err instanceof TRPCClientError && err.data?.code === 'BAD_REQUEST') {
         toast({
