@@ -20,6 +20,9 @@ export function DataTablePagination<TData>({
   table,
   additionalInformation = 'VisibleCount',
 }: DataTablePaginationProps<TData>) {
+  const pageCount = table.getPageCount();
+  const isEmptyTable = pageCount === 0;
+
   return (
     <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-4 px-2">
       <div className="text-muted-foreground flex-1 text-sm">
@@ -65,7 +68,9 @@ export function DataTablePagination<TData>({
       </div>
       <div className="flex flex-wrap items-center gap-x-6 gap-y-4 lg:gap-x-8">
         <div className="flex items-center text-sm font-medium md:justify-center">
-          Page {table.getState().pagination.pageIndex + 1} of {table.getPageCount()}
+          {isEmptyTable
+            ? 'Page 1 of 1'
+            : `Page ${table.getState().pagination.pageIndex + 1} of ${pageCount}`}
         </div>
 
         <div className="flex items-center gap-x-2">
@@ -99,7 +104,7 @@ export function DataTablePagination<TData>({
           <Button
             variant="outline"
             className="hidden h-8 w-8 p-0 lg:flex"
-            onClick={() => table.setPageIndex(table.getPageCount() - 1)}
+            onClick={() => table.setPageIndex(pageCount - 1)}
             disabled={!table.getCanNextPage()}
           >
             <span className="sr-only">Go to last page</span>
