@@ -9,12 +9,12 @@ import 'swagger-ui-react/swagger-ui.css';
 import { OpenAPIV1 } from '@documenso/api/v1/openapi';
 
 export const OpenApiDocsPage = () => {
-  const { theme } = useTheme();
+  const { resolvedTheme } = useTheme();
 
   useEffect(() => {
     const body = document.body;
 
-    if (theme === 'dark') {
+    if (resolvedTheme === 'dark') {
       body.classList.add('swagger-dark-theme');
     } else {
       body.classList.remove('swagger-dark-theme');
@@ -23,7 +23,7 @@ export const OpenApiDocsPage = () => {
     return () => {
       body.classList.remove('swagger-dark-theme');
     };
-  }, [theme]);
+  }, [resolvedTheme]);
 
   return <SwaggerUI spec={OpenAPIV1} displayOperationId={true} />;
 };
