@@ -32,6 +32,7 @@ export const sendDeleteEmail = async ({ documentId, reason }: SendDeleteEmailOpt
 
   const template = createElement(DocumentDeleteEmailTemplate, {
     documentName: document.title,
+    reason,
     assetBaseUrl,
   });
 
