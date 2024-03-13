@@ -10,6 +10,7 @@ import { DOCUMENT_AUDIT_LOG_TYPE } from '../../types/document-audit-logs';
 import type { RequestMetadata } from '../../universal/extract-request-metadata';
 import { getFile } from '../../universal/upload/get-file';
 import { createDocumentAuditLogData } from '../../utils/document-audit-logs';
+import { getUserById } from '../user/get-user-by-id';
 
 export interface SendDocumentOptions {
   documentId: number;
@@ -40,6 +41,7 @@ export const sendCompletedEmail = async ({ documentId, requestMetadata }: SendDo
   await Promise.all(
     document.Recipient.map(async (recipient) => {
       const { email, name, token } = recipient;
+      const user = await getUserById({ id: document.userId });
 
       const assetBaseUrl = NEXT_PUBLIC_WEBAPP_URL() || 'http://localhost:3000';
 
@@ -52,10 +54,16 @@ export const sendCompletedEmail = async ({ documentId, requestMetadata }: SendDo
       await prisma.$transaction(
         async (tx) => {
           await mailer.sendMail({
-            to: {
-              address: email,
-              name,
-            },
+            to: [
+              {
+                address: email,
+                name,
+              },
+              {
+                address: user.email,
+                name: user.name!,
+              },
+            ],
             from: {
               name: process.env.NEXT_PRIVATE_SMTP_FROM_NAME || 'Documenso',
               address: process.env.NEXT_PRIVATE_SMTP_FROM_ADDRESS || 'noreply@documenso.com',
