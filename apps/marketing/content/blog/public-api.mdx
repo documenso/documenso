@@ -16,7 +16,7 @@ This article covers the process of building the public API for Documenso. It sta
 
 We decided to build the public API to open a new way of interacting with Documenso. While the web app does the job well, there are use cases where it's not enough. In those cases, the users might want to interact with the platform programmatically. Usually, that's for integrating Documenso with other applications.
 
-The new public API enables them to do that. The users can integrate Documenso's functionalities within other applications to automate tasks, create custom solutions, and build custom workflows, to name just a few.
+With the new public API that's now possible. You can integrate Documenso's functionalities within other applications to automate tasks, create custom solutions, and build custom workflows, to name just a few.
 
 The API provides 12 endpoints at the time of writing this article:
 
@@ -58,11 +58,7 @@ That would mean creating a new codebase and building the API from scratch. Havin
 
 This approach has significant benefits. However, one major drawback is that it requires additional resources.
 
-We'd have to spend a lot of time just on the core stuff, such as building and configuring the basic server. After that, we'd spend time implementing the endpoints and authorization, among other things.
-
-When the building is done, there will be another application to deploy and manage.
-
-All of this would stretch our already limited resources.
+We'd have to spend a lot of time just on the core stuff, such as building and configuring the basic server. After that, we'd spend time implementing the endpoints and authorization, among other things. When the building is done, there will be another application to deploy and manage. All of this would stretch our already limited resources.
 
 So, we asked ourselves if there is another way of doing it without sacrificing the API quality and the developer experience.
 
@@ -85,9 +81,7 @@ So, the main difference between the 2 is that `trpc-openapi` is like a plugin th
 
 ### Our choice
 
-After analyzing and comparing the 2 options, we decided to go with `ts-rest` because of its benefits.
-
-Here's a paragraph from the `ts-rest` documentation that hits the nail on the head:
+After analyzing and comparing the 2 options, we decided to go with `ts-rest` because of its benefits. Here's a paragraph from the `ts-rest` documentation that hits the nail on the head:
 
 > tRPC has many plugins to solve this issue by mapping the API implementation to a REST-like API, however, these approaches are often a bit clunky and reduce the safety of the system overall, ts-rest does this heavy lifting in the client and server implementations rather than requiring a second layer of abstraction and API endpoint(s) to be defined.
 
@@ -98,7 +92,7 @@ We defined the following requirements for the API:
 - The API should use path-based versioning (e.g. `/v1`)
 - The system should use bearer tokens for API authentication
   - The API token should be a random string of 32 to 40 characters
-- The system should encrypt the token and store the encrypted value
+- The system should hash the token and store the hashed value
 - The system should only display the API token when it's created
 - The API should have self-generated documentation like Swagger
 - Users should be able to create an API key
@@ -126,11 +120,11 @@ We defined the following requirements for the API:
 
 We also faced the following constraints while developing the API:
 
-1. Resources
+**1. Resources**
 
 Limited resources were one of the main constraints. We're a new startup with a relatively small team. Building and maintaining an additional application would strain our limited resources.
 
-2. Technology stack
+**2. Technology stack**
 
 Another constraint was the technology stack. Our tech stack includes TypeScript, Prisma, and tRPC, among others. We also use Vercel for hosting.
 
@@ -140,7 +134,7 @@ Using familiar technologies also meant we could develop the API faster, as we di
 
 It's worth mentioning that this is not a permanent decision. We're open to moving the API to another codebase/tech stack when it makes sense (e.g. API is heavily used and needs better performance).
 
-3. File uploads
+**3. File uploads**
 
 Due to our current architecture, we support file uploads with a maximum size of 50 MB. To circumvent this, we created an additional step for uploading documents.
 
@@ -150,9 +144,7 @@ Users make a POST request to the `/api/v1/documents` endpoint and the API respon
 
 ![API package diagram](api-package.webp)
 
-Our codebase is a monorepo, so we created a new API package in the `packages` directory. It contains both the API implementation and its documentation.
-
-The main 2 blocks of the implementation consist of the API contract and the code for the API endpoints.
+Our codebase is a monorepo, so we created a new API package in the `packages` directory. It contains both the API implementation and its documentation. The main 2 blocks of the implementation consist of the API contract and the code for the API endpoints.
 
 ![API implementation diagram](api-implementation.webp)
 
@@ -223,14 +215,13 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
 
 There is a middleware, too, `authenticatedMiddleware`, that handles the authentication for API requests. It ensures that the API token exists and the token used has the appropriate privileges for the resource it accesses.
 
-So, that's how the other endpoints work as well. The code differs, but the principles are the same. You can explore the [API implementation](https://github.com/documenso/documenso/blob/main/packages/api/v1/implementation.ts) and the [middleware code](https://github.com/documenso/documenso/blob/main/packages/api/v1/middleware/authenticated.ts) on GitHub.
+That's how the other endpoints work as well. The code differs, but the principles are the same. You can explore the [API implementation](https://github.com/documenso/documenso/blob/main/packages/api/v1/implementation.ts) and the [middleware code](https://github.com/documenso/documenso/blob/main/packages/api/v1/middleware/authenticated.ts) on GitHub.
 
 ### Documentation
 
 For the documentation, we decided to use Swagger UI, which automatically generates the documentation from the OpenAPI specification.
 
 The OpenAPI specification describes an API containing the available endpoints and their HTTP request methods, authentication methods, and so on. Its purpose is to help both machines and humans understand the API without having to look at the code.
-
 The Documenso OpenAPI specification is live [here](https://documenso.com/api/v1/openapi.json).
 
 Thankfully, `ts-rest` makes it seamless to generate the OpenAPI specification.
