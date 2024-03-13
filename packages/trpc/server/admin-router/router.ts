@@ -5,6 +5,7 @@ import { updateRecipient } from '@documenso/lib/server-only/admin/update-recipie
 import { updateUser } from '@documenso/lib/server-only/admin/update-user';
 import { deleteDocument } from '@documenso/lib/server-only/document/delete-document';
 import { sealDocument } from '@documenso/lib/server-only/document/seal-document';
+import { sendDeleteEmail } from '@documenso/lib/server-only/document/send-delete-email';
 import { upsertSiteSetting } from '@documenso/lib/server-only/site-settings/upsert-site-setting';
 import { deleteUser } from '@documenso/lib/server-only/user/delete-user';
 import { getUserById } from '@documenso/lib/server-only/user/get-user-by-id';
@@ -123,9 +124,11 @@ export const adminRouter = router({
   deleteDocument: adminProcedure
     .input(ZAdminDeleteDocumentMutationSchema)
     .mutation(async ({ input }) => {
-      const { id, userId } = input;
+      const { id, userId, reason } = input;
       try {
-        return await deleteDocument({ id, userId });
+        await deleteDocument({ id, userId });
+        await sendDeleteEmail({ documentId: id, reason });
+        return;
       } catch (err) {
         console.log(err);
         throw new TRPCError({

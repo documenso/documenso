@@ -52,6 +52,7 @@ export type TAdminDeleteUserMutationSchema = z.infer<typeof ZAdminDeleteUserMuta
 export const ZAdminDeleteDocumentMutationSchema = z.object({
   id: z.number().min(1),
   userId: z.number(),
+  reason: z.string(),
 });
 
 export type TAdminDeleteDocomentMutationSchema = z.infer<typeof ZAdminDeleteDocumentMutationSchema>;

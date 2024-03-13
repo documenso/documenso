@@ -34,7 +34,7 @@ export const DeleteDocumentDialog = ({ document }: DeleteDocumentDialogProps) =>
 
   const handleDeleteDocument = async () => {
     try {
-      await deleteDocument({ id: document.id, userId: document.userId });
+      await deleteDocument({ id: document.id, userId: document.userId, reason });
       toast({
         title: 'Document deleted',
         description: 'The Document has been deleted successfully.',
