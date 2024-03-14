@@ -7,8 +7,6 @@ import { ChevronLeft } from 'lucide-react';
 import type { MDXComponents } from 'mdx/types';
 import { useMDXComponent } from 'next-contentlayer/hooks';
 
-import { sign } from '@documenso/lib/server-only/crypto/sign';
-
 import { CallToAction } from '~/components/(marketing)/call-to-action';
 
 export const dynamic = 'force-dynamic';
@@ -22,16 +20,10 @@ export const generateMetadata = ({ params }: { params: { post: string } }) => {
     };
   }
 
-  const signature = sign({
-    title: blogPost.title,
-    author: blogPost.authorName,
-  });
-
   // Use the url constructor to ensure that things are escaped as they should be
   const searchParams = new URLSearchParams({
     title: blogPost.title,
     author: blogPost.authorName,
-    sig: signature,
   });
 
   return {
