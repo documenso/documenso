@@ -108,17 +108,6 @@ export const SignUpFormV2 = ({
   const name = form.watch('name');
   const url = form.watch('url');
 
-  // To continue we need to make sure name, email, password and signature are valid
-  const canContinue =
-    form.formState.dirtyFields.name &&
-    form.formState.errors.name === undefined &&
-    form.formState.dirtyFields.email &&
-    form.formState.errors.email === undefined &&
-    form.formState.dirtyFields.password &&
-    form.formState.errors.password === undefined &&
-    form.formState.dirtyFields.signature &&
-    form.formState.errors.signature === undefined;
-
   const { mutateAsync: signup } = trpc.auth.signup.useMutation();
 
   const onFormSubmit = async ({ name, email, password, signature, url }: TSignUpFormV2Schema) => {
@@ -166,6 +155,14 @@ export const SignUpFormV2 = ({
           variant: 'destructive',
         });
       }
+    }
+  };
+
+  const onNextClick = async () => {
+    const valid = await form.trigger(['name', 'email', 'password', 'signature']);
+
+    if (valid) {
+      setStep('CLAIM_USERNAME');
     }
   };
 
@@ -224,7 +221,7 @@ export const SignUpFormV2 = ({
         </div>
       </div>
 
-      <div className="border-border dark:bg-background relative z-10 flex min-h-[min(800px,80vh)] w-full max-w-lg flex-col rounded-xl border bg-neutral-100 p-6">
+      <div className="border-border dark:bg-background relative z-10 flex min-h-[min(850px,80vh)] w-full max-w-lg flex-col rounded-xl border bg-neutral-100 p-6">
         {step === 'BASIC_DETAILS' && (
           <div className="h-20">
             <h1 className="text-xl font-semibold md:text-2xl">Create a new account</h1>
@@ -257,8 +254,8 @@ export const SignUpFormV2 = ({
             {step === 'BASIC_DETAILS' && (
               <fieldset
                 className={cn(
-                  'flex h-[500px] w-full flex-col gap-y-4',
-                  isGoogleSSOEnabled && 'h-[600px]',
+                  'flex h-[550px] w-full flex-col gap-y-4',
+                  isGoogleSSOEnabled && 'h-[650px]',
                 )}
                 disabled={isSubmitting}
               >
@@ -360,8 +357,8 @@ export const SignUpFormV2 = ({
             {step === 'CLAIM_USERNAME' && (
               <fieldset
                 className={cn(
-                  'flex h-[500px] w-full flex-col gap-y-4',
-                  isGoogleSSOEnabled && 'h-[600px]',
+                  'flex h-[550px] w-full flex-col gap-y-4',
+                  isGoogleSSOEnabled && 'h-[650px]',
                 )}
                 disabled={isSubmitting}
               >
@@ -431,9 +428,8 @@ export const SignUpFormV2 = ({
                   type="button"
                   size="lg"
                   className="flex-1 disabled:cursor-not-allowed"
-                  disabled={!canContinue}
                   loading={form.formState.isSubmitting}
-                  onClick={() => setStep('CLAIM_USERNAME')}
+                  onClick={onNextClick}
                 >
                   Next
                 </Button>
