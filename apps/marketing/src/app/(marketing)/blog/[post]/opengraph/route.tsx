@@ -1,8 +1,6 @@
 import { ImageResponse } from 'next/og';
 import { NextResponse } from 'next/server';
 
-import { verify } from '@documenso/lib/server-only/crypto/verify';
-
 export const runtime = 'edge';
 
 const IMAGE_SIZE = {
@@ -13,15 +11,10 @@ const IMAGE_SIZE = {
 export async function GET(_request: Request) {
   const url = new URL(_request.url);
 
-  const signature = url.searchParams.get('sig');
   const title = url.searchParams.get('title');
   const author = url.searchParams.get('author');
 
-  if (!title || !author || !signature) {
-    return NextResponse.json({ error: 'Not found' }, { status: 404 });
-  }
-
-  if (!verify({ title, author }, signature)) {
+  if (!title || !author) {
     return NextResponse.json({ error: 'Not found' }, { status: 404 });
   }
 
