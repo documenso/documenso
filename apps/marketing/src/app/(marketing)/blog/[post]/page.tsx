@@ -28,11 +28,11 @@ export const generateMetadata = ({ params }: { params: { post: string } }) => {
   });
 
   // Use the url constructor to ensure that things are escaped as they should be
-  const openGraphImageUrl = new URL(`${blogPost.href}/opengraph`);
-
-  openGraphImageUrl.searchParams.set('title', blogPost.title);
-  openGraphImageUrl.searchParams.set('author', blogPost.authorName);
-  openGraphImageUrl.searchParams.set('sig', signature);
+  const searchParams = new URLSearchParams({
+    title: blogPost.title,
+    author: blogPost.authorName,
+    sig: signature,
+  });
 
   return {
     title: {
@@ -40,10 +40,10 @@ export const generateMetadata = ({ params }: { params: { post: string } }) => {
     },
     description: blogPost.description,
     openGraph: {
-      images: [openGraphImageUrl.toString()],
+      images: [`${blogPost.href}/opengraph?${searchParams.toString()}`],
     },
     twitter: {
-      images: [openGraphImageUrl.toString()],
+      images: [`${blogPost.href}/opengraph?${searchParams.toString()}`],
     },
   };
 };
