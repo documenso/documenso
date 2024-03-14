@@ -1,11 +1,7 @@
 import { ImageResponse } from 'next/og';
 import { NextResponse } from 'next/server';
 
-import { allBlogPosts } from 'contentlayer/generated';
-
 export const runtime = 'edge';
-
-const contentType = 'image/png';
 
 const IMAGE_SIZE = {
   width: 1200,
@@ -17,6 +13,8 @@ type BlogPostOpenGraphImageProps = {
 };
 
 export async function GET(_request: Request, { params }: BlogPostOpenGraphImageProps) {
+  const { allBlogPosts } = await import('contentlayer/generated');
+
   const blogPost = allBlogPosts.find((post) => post._raw.flattenedPath === `blog/${params.post}`);
 
   if (!blogPost) {
