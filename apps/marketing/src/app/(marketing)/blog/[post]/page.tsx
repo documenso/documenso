@@ -20,11 +20,23 @@ export const generateMetadata = ({ params }: { params: { post: string } }) => {
     };
   }
 
+  // Use the url constructor to ensure that things are escaped as they should be
+  const searchParams = new URLSearchParams({
+    title: blogPost.title,
+    author: blogPost.authorName,
+  });
+
   return {
     title: {
       absolute: `${blogPost.title} - Documenso Blog`,
     },
     description: blogPost.description,
+    openGraph: {
+      images: [`${blogPost.href}/opengraph?${searchParams.toString()}`],
+    },
+    twitter: {
+      images: [`${blogPost.href}/opengraph?${searchParams.toString()}`],
+    },
   };
 };
 
@@ -94,7 +106,7 @@ export default function BlogPostPage({ params }: { params: { post: string } }) {
         </Link>
       </article>
 
-      {post.cta && <CallToAction className="mt-8" utmSource={`blog__${params.post}`} />}
+      {post.cta && <CallToAction className="mt-8" utmSource={`blog_${params.post}`} />}
     </div>
   );
 }
