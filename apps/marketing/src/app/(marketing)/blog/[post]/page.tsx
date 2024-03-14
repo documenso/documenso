@@ -7,6 +7,8 @@ import { ChevronLeft } from 'lucide-react';
 import type { MDXComponents } from 'mdx/types';
 import { useMDXComponent } from 'next-contentlayer/hooks';
 
+import { sign } from '@documenso/lib/server-only/crypto/sign';
+
 import { CallToAction } from '~/components/(marketing)/call-to-action';
 
 export const dynamic = 'force-dynamic';
@@ -20,16 +22,28 @@ export const generateMetadata = ({ params }: { params: { post: string } }) => {
     };
   }
 
+  const signature = sign({
+    title: blogPost.title,
+    author: blogPost.authorName,
+  });
+
+  // Use the url constructor to ensure that things are escaped as they should be
+  const openGraphImageUrl = new URL(`${blogPost.href}/opengraph`);
+
+  openGraphImageUrl.searchParams.set('title', blogPost.title);
+  openGraphImageUrl.searchParams.set('author', blogPost.authorName);
+  openGraphImageUrl.searchParams.set('sig', signature);
+
   return {
     title: {
       absolute: `${blogPost.title} - Documenso Blog`,
     },
     description: blogPost.description,
     openGraph: {
-      images: [`${blogPost.href}/opengraph`],
+      images: [openGraphImageUrl.toString()],
     },
     twitter: {
-      images: [`${blogPost.href}/opengraph`],
+      images: [openGraphImageUrl.toString()],
     },
   };
 };

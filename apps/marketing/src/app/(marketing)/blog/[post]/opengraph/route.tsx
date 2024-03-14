@@ -1,6 +1,8 @@
 import { ImageResponse } from 'next/og';
 import { NextResponse } from 'next/server';
 
+import { verify } from '@documenso/lib/server-only/crypto/verify';
+
 export const runtime = 'edge';
 
 const IMAGE_SIZE = {
@@ -8,16 +10,18 @@ const IMAGE_SIZE = {
   height: 630,
 };
 
-type BlogPostOpenGraphImageProps = {
-  params: { post: string };
-};
+export async function GET(_request: Request) {
+  const url = new URL(_request.url);
 
-export async function GET(_request: Request, { params }: BlogPostOpenGraphImageProps) {
-  const { allBlogPosts } = await import('contentlayer/generated');
+  const signature = url.searchParams.get('sig');
+  const title = url.searchParams.get('title');
+  const author = url.searchParams.get('author');
 
-  const blogPost = allBlogPosts.find((post) => post._raw.flattenedPath === `blog/${params.post}`);
+  if (!title || !author || !signature) {
+    return NextResponse.json({ error: 'Not found' }, { status: 404 });
+  }
 
-  if (!blogPost) {
+  if (!verify({ title, author }, signature)) {
     return NextResponse.json({ error: 'Not found' }, { status: 404 });
   }
 
@@ -48,10 +52,10 @@ export async function GET(_request: Request, { params }: BlogPostOpenGraphImageP
         <img src={logoImage} alt="logo" tw="h-8" />
 
         <h1 tw="mt-8 text-6xl text-center flex items-center justify-center w-full max-w-[800px] font-bold text-center mx-auto">
-          {blogPost.title}
+          {title}
         </h1>
 
-        <p tw="font-normal">Written by {blogPost.authorName}</p>
+        <p tw="font-normal">Written by {author}</p>
       </div>
     ),
     {
