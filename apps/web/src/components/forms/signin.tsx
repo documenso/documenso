@@ -262,7 +262,10 @@ export const SignInForm = ({ className, initialEmail, isGoogleSSOEnabled }: Sign
         className={cn('flex w-full flex-col gap-y-4', className)}
         onSubmit={form.handleSubmit(onFormSubmit)}
       >
-        <fieldset className="flex w-full flex-col gap-y-4" disabled={isSubmitting}>
+        <fieldset
+          className="flex w-full flex-col gap-y-4"
+          disabled={isSubmitting || isPasskeyLoading}
+        >
           <FormField
             control={form.control}
             name="email"
