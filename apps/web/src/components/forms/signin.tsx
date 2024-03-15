@@ -83,6 +83,8 @@ export const SignInForm = ({ className, initialEmail, isGoogleSSOEnabled }: Sign
     'totp' | 'backup'
   >('totp');
 
+  const [isPasskeyLoading, setIsPasskeyLoading] = useState(false);
+
   const isPasskeyEnabled = getFlag('app_passkey');
 
   const { mutateAsync: createPasskeySigninOptions } =
@@ -134,6 +136,8 @@ export const SignInForm = ({ className, initialEmail, isGoogleSSOEnabled }: Sign
     }
 
     try {
+      setIsPasskeyLoading(true);
+
       const options = await createPasskeySigninOptions();
 
       const credential = await startAuthentication(options);
@@ -150,6 +154,8 @@ export const SignInForm = ({ className, initialEmail, isGoogleSSOEnabled }: Sign
 
       window.location.href = result.url;
     } catch (err) {
+      setIsPasskeyLoading(false);
+
       if (err.name === 'NotAllowedError') {
         return;
       }
@@ -334,11 +340,12 @@ export const SignInForm = ({ className, initialEmail, isGoogleSSOEnabled }: Sign
             type="button"
             size="lg"
             variant="outline"
-            loading={isSubmitting}
+            disabled={isSubmitting}
+            loading={isPasskeyLoading}
             className="bg-background text-muted-foreground border"
             onClick={onSignInWithPasskey}
           >
-            <KeyRoundIcon className="-ml-1 mr-1 h-5 w-5" />
+            {!isPasskeyLoading && <KeyRoundIcon className="-ml-1 mr-1 h-5 w-5" />}
             Passkey
           </Button>
         )}
