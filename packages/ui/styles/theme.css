@@ -139,7 +139,7 @@
   filter: invert(100%) hue-rotate(180deg);
 }
 
-// Custom class to over
+/* Custom class to override the corner focus ring */
 .no-hover-focus {
   outline: none !important;
   box-shadow: none !important;
