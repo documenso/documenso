@@ -12,6 +12,7 @@ import { DocumentStatus, RecipientRole, SigningStatus } from '@documenso/prisma/
 import { WebhookTriggerEvents } from '@documenso/prisma/client';
 import { signPdf } from '@documenso/signing';
 
+import { getRequiredServerComponentSession } from '../../next-auth/get-server-component-session';
 import type { RequestMetadata } from '../../universal/extract-request-metadata';
 import { getFile } from '../../universal/upload/get-file';
 import { putFile } from '../../universal/upload/put-file';
@@ -45,6 +46,8 @@ export const sealDocument = async ({
   });
 
   const { documentData } = document;
+
+  const { user: documentOwner } = await getRequiredServerComponentSession();
 
   if (!documentData) {
     throw new Error(`Document ${document.id} has no document data`);
@@ -169,7 +172,7 @@ export const sealDocument = async ({
   });
 
   if (sendEmail && !isResealing) {
-    await sendCompletedEmail({ documentId, requestMetadata });
+    await sendCompletedEmail({ documentId, requestMetadata, documentOwner });
   }
 
   await triggerWebhook({

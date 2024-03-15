@@ -4,20 +4,25 @@ import { mailer } from '@documenso/email/mailer';
 import { render } from '@documenso/email/render';
 import { DocumentCompletedEmailTemplate } from '@documenso/email/templates/document-completed';
 import { prisma } from '@documenso/prisma';
+import type { User } from '@documenso/prisma/client';
 
 import { NEXT_PUBLIC_WEBAPP_URL } from '../../constants/app';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '../../types/document-audit-logs';
 import type { RequestMetadata } from '../../universal/extract-request-metadata';
 import { getFile } from '../../universal/upload/get-file';
 import { createDocumentAuditLogData } from '../../utils/document-audit-logs';
-import { getUserById } from '../user/get-user-by-id';
 
 export interface SendDocumentOptions {
   documentId: number;
   requestMetadata?: RequestMetadata;
+  documentOwner: User;
 }
 
-export const sendCompletedEmail = async ({ documentId, requestMetadata }: SendDocumentOptions) => {
+export const sendCompletedEmail = async ({
+  documentId,
+  requestMetadata,
+  documentOwner,
+}: SendDocumentOptions) => {
   const document = await prisma.document.findUnique({
     where: {
       id: documentId,
@@ -41,7 +46,6 @@ export const sendCompletedEmail = async ({ documentId, requestMetadata }: SendDo
   await Promise.all(
     document.Recipient.map(async (recipient) => {
       const { email, name, token } = recipient;
-      const user = await getUserById({ id: document.userId });
 
       const assetBaseUrl = NEXT_PUBLIC_WEBAPP_URL() || 'http://localhost:3000';
 
@@ -55,13 +59,15 @@ export const sendCompletedEmail = async ({ documentId, requestMetadata }: SendDo
         async (tx) => {
           await mailer.sendMail({
             to: [
+              // To send email to recipient of the document
               {
                 address: email,
                 name,
               },
+              // To send email to owner of the document
               {
-                address: user.email,
-                name: user.name!,
+                address: documentOwner.email,
+                name: documentOwner.name!,
               },
             ],
             from: {
