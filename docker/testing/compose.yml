@@ -47,5 +47,8 @@ services:
       - NEXT_PRIVATE_SMTP_PASSWORD=password
       - NEXT_PRIVATE_SMTP_FROM_NAME="No Reply @ Documenso"
       - NEXT_PRIVATE_SMTP_FROM_ADDRESS=noreply@documenso.com
+      - NEXT_PRIVATE_SIGNING_LOCAL_FILE_PATH=/opt/documenso/cert.p12
     ports:
       - 3000:3000
+    volumes:
+      - ../../apps/web/example/cert.p12:/opt/documenso/cert.p12

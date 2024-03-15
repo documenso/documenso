@@ -27,20 +27,11 @@
    <a href="https://vscode.dev/redirect?url=vscode://ms-vscode-remote.remote-containers/cloneInVolume?url=https://github.com/documenso/documenso">
    <img alt="open in devcontainer" src="https://img.shields.io/static/v1?label=Dev%20Containers&message=Enabled&color=blue&logo=visualstudiocode" />
    </a>
-   <a href="code_of_conduct.md"><img src="https://img.shields.io/badge/Contributor%20Covenant-2.1-4baaaa.svg" alt="Contributor Covenant"></a>
+   <a href="CODE_OF_CONDUCT.md"><img src="https://img.shields.io/badge/Contributor%20Covenant-2.1-4baaaa.svg" alt="Contributor Covenant"></a>
 </p>
 
-<div>
-  <img style="display: block; height: 120px; width: 24%"
-    src="https://github.com/documenso/documenso/assets/1309312/67e08c98-c153-4115-aa2d-77979bb12c94)">
-  <img style="display: block; height: 120px; width: 24%"
-    src="https://github.com/documenso/documenso/assets/1309312/040cfbae-3438-4ca3-87f2-ce52c793dcaf">
-  <img style="display: block; height: 120px; width: 24%"
-    src="https://github.com/documenso/documenso/assets/1309312/72d445be-41e5-4936-bdba-87ef8e70fa09">
-  <img style="display: block; height: 120px; width: 24%"
-    src="https://github.com/documenso/documenso/assets/1309312/d7b86c0f-a755-4476-a022-a608db2c4633">
-  <img style="display: block; height: 120px; width: 24%"
-    src=https://github.com/documenso/documenso/assets/1309312/c0f55116-ab82-433f-a266-f3fc8571d69f">
+<div align="center">
+  <img src="https://github.com/documenso/documenso/assets/13398220/d96ed533-6f34-4a97-be9b-442bdb189c69" style="width: 80%;" />
 </div>
 
 ## About this project
@@ -207,7 +198,16 @@ If you're a visual learner and prefer to watch a video walkthrough of setting up
 
 ## Docker
 
-🚧 Docker containers and images are current in progress. We are actively working on bringing a simple Docker build and publish pipeline for Documenso.
+We provide a Docker container for Documenso, which is published on both DockerHub and GitHub Container Registry.
+
+- DockerHub: [https://hub.docker.com/r/documenso/documenso](https://hub.docker.com/r/documenso/documenso)
+- GitHub Container Registry: [https://ghcr.io/documenso/documenso](https://ghcr.io/documenso/documenso)
+
+You can pull the Docker image from either of these registries and run it with your preferred container hosting provider.
+
+Please note that you will need to provide environment variables for connecting to the database, mailserver, and so forth.
+
+For detailed instructions on how to configure and run the Docker container, please refer to the [Docker README](./docker/README.md) in the `docker` directory.
 
 ## Self Hosting
 
