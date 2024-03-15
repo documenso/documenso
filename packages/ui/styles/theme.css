@@ -138,3 +138,17 @@
 .swagger-dark-theme .swagger-ui .microlight {
   filter: invert(100%) hue-rotate(180deg);
 }
+
+// Custom class to over
+.no-hover-focus {
+  outline: none !important;
+  box-shadow: none !important;
+  background-color: inherit;
+  color: inherit;
+  border-color: inherit;
+}
+
+.no-hover-focus:focus-visible {
+  outline: none !important;
+  box-shadow: none !important;
+}
