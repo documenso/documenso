@@ -293,6 +293,8 @@ export const SignInForm = ({ className, initialEmail, isGoogleSSOEnabled }: Sign
                   <PasswordInput {...field} />
                 </FormControl>
 
+                <FormMessage />
+
                 <p className="mt-2 text-right">
                   <Link
                     href="/forgot-password"
@@ -301,57 +303,56 @@ export const SignInForm = ({ className, initialEmail, isGoogleSSOEnabled }: Sign
                     Forgot your password?
                   </Link>
                 </p>
-                <FormMessage />
               </FormItem>
             )}
           />
+
+          <Button
+            type="submit"
+            size="lg"
+            loading={isSubmitting}
+            className="dark:bg-documenso dark:hover:opacity-90"
+          >
+            {isSubmitting ? 'Signing in...' : 'Sign In'}
+          </Button>
+
+          {(isGoogleSSOEnabled || isPasskeyEnabled) && (
+            <div className="relative flex items-center justify-center gap-x-4 py-2 text-xs uppercase">
+              <div className="bg-border h-px flex-1" />
+              <span className="text-muted-foreground bg-transparent">Or continue with</span>
+              <div className="bg-border h-px flex-1" />
+            </div>
+          )}
+
+          {isGoogleSSOEnabled && (
+            <Button
+              type="button"
+              size="lg"
+              variant="outline"
+              className="bg-background text-muted-foreground border"
+              disabled={isSubmitting}
+              onClick={onSignInWithGoogleClick}
+            >
+              <FcGoogle className="mr-2 h-5 w-5" />
+              Google
+            </Button>
+          )}
+
+          {isPasskeyEnabled && (
+            <Button
+              type="button"
+              size="lg"
+              variant="outline"
+              disabled={isSubmitting}
+              loading={isPasskeyLoading}
+              className="bg-background text-muted-foreground border"
+              onClick={onSignInWithPasskey}
+            >
+              {!isPasskeyLoading && <KeyRoundIcon className="-ml-1 mr-1 h-5 w-5" />}
+              Passkey
+            </Button>
+          )}
         </fieldset>
-
-        <Button
-          type="submit"
-          size="lg"
-          loading={isSubmitting}
-          className="dark:bg-documenso dark:hover:opacity-90"
-        >
-          {isSubmitting ? 'Signing in...' : 'Sign In'}
-        </Button>
-
-        {(isGoogleSSOEnabled || isPasskeyEnabled) && (
-          <div className="relative flex items-center justify-center gap-x-4 py-2 text-xs uppercase">
-            <div className="bg-border h-px flex-1" />
-            <span className="text-muted-foreground bg-transparent">Or continue with</span>
-            <div className="bg-border h-px flex-1" />
-          </div>
-        )}
-
-        {isGoogleSSOEnabled && (
-          <Button
-            type="button"
-            size="lg"
-            variant="outline"
-            className="bg-background text-muted-foreground border"
-            disabled={isSubmitting}
-            onClick={onSignInWithGoogleClick}
-          >
-            <FcGoogle className="mr-2 h-5 w-5" />
-            Google
-          </Button>
-        )}
-
-        {isPasskeyEnabled && (
-          <Button
-            type="button"
-            size="lg"
-            variant="outline"
-            disabled={isSubmitting}
-            loading={isPasskeyLoading}
-            className="bg-background text-muted-foreground border"
-            onClick={onSignInWithPasskey}
-          >
-            {!isPasskeyLoading && <KeyRoundIcon className="-ml-1 mr-1 h-5 w-5" />}
-            Passkey
-          </Button>
-        )}
       </form>
 
       <Dialog
