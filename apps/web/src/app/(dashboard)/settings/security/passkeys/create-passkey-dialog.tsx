@@ -171,6 +171,18 @@ export const CreatePasskeyDialog = ({ trigger, ...props }: CreatePasskeyDialogPr
                 )}
               />
 
+              <Alert variant="neutral">
+                <AlertDescription>
+                  When you click continue, you will be prompted to add the first available
+                  authenticator on your system.
+                </AlertDescription>
+
+                <AlertDescription className="mt-2">
+                  If you do not want to use the authenticator prompted, you can close it, which will
+                  then display the next avaliable authenticator.
+                </AlertDescription>
+              </Alert>
+
               {formError && (
                 <Alert variant="destructive">
                   {match(formError)
