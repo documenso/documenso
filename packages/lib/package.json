@@ -28,6 +28,7 @@
     "@noble/ciphers": "0.4.0",
     "@noble/hashes": "1.3.2",
     "@pdf-lib/fontkit": "^1.1.1",
+    "@react-pdf/renderer": "^3.3.8",
     "@scure/base": "^1.1.3",
     "@sindresorhus/slugify": "^2.2.1",
     "@upstash/redis": "^1.20.6",

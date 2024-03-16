@@ -5,9 +5,11 @@ import { ChevronLeft, DownloadIcon } from 'lucide-react';
 
 import { getRequiredServerComponentSession } from '@documenso/lib/next-auth/get-server-component-session';
 import { getDocumentById } from '@documenso/lib/server-only/document/get-document-by-id';
+import { getOrGenerateDocumentLogs } from '@documenso/lib/server-only/document/get-or-generate-document-logs';
 import { getRecipientsForDocument } from '@documenso/lib/server-only/recipient/get-recipients-for-document';
 import { formatDocumentsPath } from '@documenso/lib/utils/teams';
-import type { Recipient, Team } from '@documenso/prisma/client';
+import { DocumentStatus, type Recipient, type Team } from '@documenso/prisma/client';
+import { DocumentAdditionalDataDownloadButton } from '@documenso/ui/components/document/document-additional-data-download-button';
 import { Button } from '@documenso/ui/primitives/button';
 import { Card } from '@documenso/ui/primitives/card';
 
@@ -51,6 +53,16 @@ export const DocumentLogsPageView = async ({ params, team }: DocumentLogsPageVie
   if (!document || !document.documentData) {
     redirect(documentRootPath);
   }
+
+  const isCompleted = document.status === DocumentStatus.COMPLETED;
+
+  const logDocumentData = isCompleted
+    ? await getOrGenerateDocumentLogs({
+        documentId,
+        userId: user.id,
+        teamId: team?.id,
+      })
+    : null;
 
   const documentInformation: { description: string; value: string }[] = [
     {
@@ -108,17 +120,24 @@ export const DocumentLogsPageView = async ({ params, team }: DocumentLogsPageVie
           {document.title}
         </h1>
 
-        <div className="mt-4 flex w-full flex-row sm:mt-0 sm:w-auto sm:self-end">
-          <Button variant="outline" className="mr-2 w-full sm:w-auto">
-            <DownloadIcon className="mr-1.5 h-4 w-4" />
-            Download certificate
-          </Button>
+        {isCompleted && (
+          <div className="mt-4 flex w-full flex-row sm:mt-0 sm:w-auto sm:self-end">
+            <Button variant="outline" className="mr-2 w-full sm:w-auto">
+              <DownloadIcon className="mr-1.5 h-4 w-4" />
+              Download certificate
+            </Button>
 
-          <Button className="w-full sm:w-auto">
-            <DownloadIcon className="mr-1.5 h-4 w-4" />
-            Download PDF
-          </Button>
-        </div>
+            {logDocumentData !== null && (
+              <DocumentAdditionalDataDownloadButton
+                className="w-full sm:w-auto"
+                docTitle={document.title}
+                documentData={logDocumentData}
+              >
+                Download PDF
+              </DocumentAdditionalDataDownloadButton>
+            )}
+          </div>
+        )}
       </div>
 
       <section className="mt-6">

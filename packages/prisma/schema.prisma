@@ -241,7 +241,8 @@ model Document {
   teamId         Int?
   team           Team?               @relation(fields: [teamId], references: [id])
 
-  auditLogs DocumentAuditLog[]
+  auditLogs      DocumentAuditLog[]
+  additionalData DocumentAdditionalData[]
 
   @@unique([documentDataId])
   @@index([userId])
@@ -278,6 +279,23 @@ model DocumentData {
   initialData String
   Document    Document?
   Template    Template?
+}
+
+enum AdditionalDataType {
+  LOGS
+  CERTIFICATE
+}
+
+model DocumentAdditionalData {
+  id           String           @id @default(cuid())
+  type         DocumentDataType
+  data         String
+  documentId   Int
+  contentType  AdditionalDataType
+
+  Document     Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+
+  @@unique([documentId, contentType])
 }
 
 model DocumentMeta {

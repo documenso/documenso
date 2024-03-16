@@ -26,6 +26,7 @@ const config = {
     serverActions: {
       bodySizeLimit: '50mb',
     },
+    serverComponentsExternalPackages: ['@react-pdf/renderer'],
   },
   reactStrictMode: true,
   transpilePackages: [
