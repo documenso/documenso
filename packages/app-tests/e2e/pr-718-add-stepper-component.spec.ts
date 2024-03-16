@@ -28,8 +28,8 @@ test(`[PR-718]: should be able to create a document`, async ({ page }) => {
   // Wait to be redirected to the edit page
   await page.waitForURL(/\/documents\/\d+/);
 
-  // Set title
-  await expect(page.getByRole('heading', { name: 'Add Title' })).toBeVisible();
+  // Set general settings
+  await expect(page.getByRole('heading', { name: 'General' })).toBeVisible();
 
   await page.getByLabel('Title').fill(documentTitle);
 

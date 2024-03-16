@@ -4,14 +4,14 @@ import { WEBAPP_BASE_URL } from '@documenso/lib/constants/app';
 import { seedTeam, unseedTeam } from '@documenso/prisma/seed/teams';
 import { seedUser } from '@documenso/prisma/seed/users';
 
-import { manualLogin } from '../fixtures/authentication';
+import { apiSignin } from '../fixtures/authentication';
 
 test.describe.configure({ mode: 'parallel' });
 
 test('[TEAMS]: create team', async ({ page }) => {
   const user = await seedUser();
 
-  await manualLogin({
+  await apiSignin({
     page,
     email: user.email,
     redirectPath: '/settings/teams',
@@ -38,7 +38,7 @@ test('[TEAMS]: create team', async ({ page }) => {
 test('[TEAMS]: delete team', async ({ page }) => {
   const team = await seedTeam();
 
-  await manualLogin({
+  await apiSignin({
     page,
     email: team.owner.email,
     redirectPath: `/t/${team.url}/settings`,
@@ -56,7 +56,7 @@ test('[TEAMS]: delete team', async ({ page }) => {
 test('[TEAMS]: update team', async ({ page }) => {
   const team = await seedTeam();
 
-  await manualLogin({
+  await apiSignin({
     page,
     email: team.owner.email,
   });

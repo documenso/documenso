@@ -160,7 +160,7 @@ export const AddSettingsFormPartial = ({
                   <FormControl>
                     <Select {...field} onValueChange={field.onChange}>
                       <SelectTrigger className="bg-background text-muted-foreground">
-                        <SelectValue placeholder="None" />
+                        <SelectValue data-testid="documentAccessSelectValue" placeholder="None" />
                       </SelectTrigger>
 
                       <SelectContent position="popper">
@@ -216,7 +216,7 @@ export const AddSettingsFormPartial = ({
                   <FormControl>
                     <Select {...field} onValueChange={field.onChange}>
                       <SelectTrigger className="bg-background text-muted-foreground">
-                        <SelectValue placeholder="None" />
+                        <SelectValue data-testid="documentActionSelectValue" placeholder="None" />
                       </SelectTrigger>
 
                       <SelectContent position="popper">

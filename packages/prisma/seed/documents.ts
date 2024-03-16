@@ -33,19 +33,19 @@ export const seedDocuments = async (documents: DocumentToSeed[]) => {
     documents.map(async (document, i) =>
       match(document.type)
         .with(DocumentStatus.DRAFT, async () =>
-          createDraftDocument(document.sender, document.recipients, {
+          seedDraftDocument(document.sender, document.recipients, {
             key: i,
             createDocumentOptions: document.documentOptions,
           }),
         )
         .with(DocumentStatus.PENDING, async () =>
-          createPendingDocument(document.sender, document.recipients, {
+          seedPendingDocument(document.sender, document.recipients, {
             key: i,
             createDocumentOptions: document.documentOptions,
           }),
         )
         .with(DocumentStatus.COMPLETED, async () =>
-          createCompletedDocument(document.sender, document.recipients, {
+          seedCompletedDocument(document.sender, document.recipients, {
             key: i,
             createDocumentOptions: document.documentOptions,
           }),
@@ -55,7 +55,37 @@ export const seedDocuments = async (documents: DocumentToSeed[]) => {
   );
 };
 
-const createDraftDocument = async (
+export const seedBlankDocument = async (owner: User, options: CreateDocumentOptions = {}) => {
+  const { key, createDocumentOptions = {} } = options;
+
+  const documentData = await prisma.documentData.create({
+    data: {
+      type: DocumentDataType.BYTES_64,
+      data: examplePdf,
+      initialData: examplePdf,
+    },
+  });
+
+  return await prisma.document.create({
+    data: {
+      title: `[TEST] Document ${key} - Draft`,
+      status: DocumentStatus.DRAFT,
+      documentDataId: documentData.id,
+      userId: owner.id,
+      ...createDocumentOptions,
+    },
+  });
+};
+
+export const unseedDocument = async (documentId: number) => {
+  await prisma.document.delete({
+    where: {
+      id: documentId,
+    },
+  });
+};
+
+export const seedDraftDocument = async (
   sender: User,
   recipients: (User | string)[],
   options: CreateDocumentOptions = {},
@@ -114,6 +144,8 @@ const createDraftDocument = async (
       },
     });
   }
+
+  return document;
 };
 
 type CreateDocumentOptions = {
@@ -121,7 +153,7 @@ type CreateDocumentOptions = {
   createDocumentOptions?: Partial<Prisma.DocumentUncheckedCreateInput>;
 };
 
-const createPendingDocument = async (
+export const seedPendingDocument = async (
   sender: User,
   recipients: (User | string)[],
   options: CreateDocumentOptions = {},
@@ -180,9 +212,11 @@ const createPendingDocument = async (
       },
     });
   }
+
+  return document;
 };
 
-const createCompletedDocument = async (
+export const seedCompletedDocument = async (
   sender: User,
   recipients: (User | string)[],
   options: CreateDocumentOptions = {},
@@ -241,6 +275,8 @@ const createCompletedDocument = async (
       },
     });
   }
+
+  return document;
 };
 
 /**
