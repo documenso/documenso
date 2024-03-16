@@ -44,7 +44,7 @@ export const apiSignin = async ({
   page,
   email = 'example@documenso.com',
   password = 'password',
-  redirectPath,
+  redirectPath = '/',
 }: LoginOptions) => {
   const { request } = page.context();
 
