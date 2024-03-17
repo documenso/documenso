@@ -11,6 +11,7 @@ import { match } from 'ts-pattern';
 import { UAParser } from 'ua-parser-js';
 import { z } from 'zod';
 
+import { MAXIMUM_PASSKEYS } from '@documenso/lib/constants/auth';
 import { AppError } from '@documenso/lib/errors/app-error';
 import { trpc } from '@documenso/trpc/react';
 import { Alert, AlertDescription, AlertTitle } from '@documenso/ui/primitives/alert';
@@ -188,6 +189,11 @@ export const CreatePasskeyDialog = ({ trigger, ...props }: CreatePasskeyDialogPr
                   {match(formError)
                     .with('ERROR_AUTHENTICATOR_PREVIOUSLY_REGISTERED', () => (
                       <AlertDescription>This passkey has already been registered.</AlertDescription>
+                    ))
+                    .with('TOO_MANY_PASSKEYS', () => (
+                      <AlertDescription>
+                        You cannot have more than {MAXIMUM_PASSKEYS} passkeys.
+                      </AlertDescription>
                     ))
                     .with('InvalidStateError', () => (
                       <>

@@ -32,3 +32,8 @@ export const USER_SECURITY_AUDIT_LOG_MAP: { [key in UserSecurityAuditLogType]: s
  * The duration to wait for a passkey to be verified in MS.
  */
 export const PASSKEY_TIMEOUT = 60000;
+
+/**
+ * The maximum number of passkeys are user can have.
+ */
+export const MAXIMUM_PASSKEYS = 50;
