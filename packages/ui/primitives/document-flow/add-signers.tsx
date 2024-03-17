@@ -174,7 +174,7 @@ export const AddSignersFormPartial = ({
           <ShowFieldItem key={index} field={field} recipients={recipients} />
         ))}
 
-        <AnimateGenericFadeInOut key={showAdvancedSettings ? 'Show' : 'Hide'}>
+        <AnimateGenericFadeInOut motionKey={showAdvancedSettings ? 'Show' : 'Hide'}>
           <Form {...form}>
             <div className="flex w-full flex-col gap-y-2">
               {signers.map((signer, index) => (
@@ -259,25 +259,29 @@ export const AddSignersFormPartial = ({
                                   </TooltipTrigger>
 
                                   <TooltipContent className="text-foreground max-w-md p-4">
+                                    <h2>
+                                      <strong>Recipient action authentication</strong>
+                                    </h2>
+
                                     <p>
-                                      The authentication requirements for recipients to sign fields.
+                                      The authentication required for recipients to sign fields and
+                                      complete the document.
                                     </p>
 
                                     <p className="mt-2">This will override any global settings.</p>
 
-                                    <ul className="mt-2 space-y-0.5">
+                                    <ul className="ml-3.5 list-outside list-disc space-y-0.5 py-2">
                                       <li>
                                         <strong>Inherit authentication method</strong> - Use the
-                                        global recipient signing authentication method configured in
+                                        global action signing authentication method configured in
                                         the "General Settings" step
                                       </li>
                                       <li>
-                                        <strong>Require account</strong> - The recipient must have
-                                        an account, and be signed in to sign fields
+                                        <strong>Require account</strong> - The recipient must be
+                                        signed in
                                       </li>
                                       <li>
-                                        <strong>None</strong> - The recipient does not need any
-                                        authentication to sign fields
+                                        <strong>None</strong> - No authentication required
                                       </li>
                                     </ul>
                                   </TooltipContent>

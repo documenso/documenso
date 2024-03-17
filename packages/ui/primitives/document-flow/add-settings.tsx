@@ -141,12 +141,16 @@ export const AddSettingsFormPartial = ({
                       </TooltipTrigger>
 
                       <TooltipContent className="text-foreground max-w-md space-y-2 p-4">
-                        <p>The authentication requirement for recipients to view the document.</p>
+                        <h2>
+                          <strong>Document access</strong>
+                        </h2>
 
-                        <ul className="space-y-0.5">
+                        <p>The authentication required for recipients to view the document.</p>
+
+                        <ul className="ml-3.5 list-outside list-disc space-y-0.5 py-2">
                           <li>
-                            <strong>Require account</strong> - The recipient must have an account,
-                            and be signed in to view the document
+                            <strong>Require account</strong> - The recipient must be signed in to
+                            view the document
                           </li>
                           <li>
                             <strong>None</strong> - The document can be accessed directly by the URL
@@ -185,28 +189,33 @@ export const AddSettingsFormPartial = ({
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className="flex flex-row items-center">
-                    Recipient signing authentication
+                    Recipient action authentication
                     <Tooltip>
                       <TooltipTrigger>
                         <InfoIcon className="mx-2 h-4 w-4" />
                       </TooltipTrigger>
 
                       <TooltipContent className="text-foreground max-w-md space-y-2 p-4">
-                        <p>The authentication requirement for recipients to sign fields.</p>
+                        <h2>
+                          <strong>Global recipient action authentication</strong>
+                        </h2>
 
                         <p>
-                          You can also override this global setting by setting the authentication
-                          requirements directly on each recipient in the next step.
+                          The authentication required for recipients to sign fields and complete the
+                          document.
                         </p>
 
-                        <ul className="space-y-0.5">
+                        <p>
+                          This can be overriden by setting the authentication requirements directly
+                          on each recipient in the next step.
+                        </p>
+
+                        <ul className="ml-3.5 list-outside list-disc space-y-0.5 py-2">
                           <li>
-                            <strong>Require account</strong> - The recipient must have an account,
-                            and be signed in to sign fields
+                            <strong>Require account</strong> - The recipient must be signed in
                           </li>
                           <li>
-                            <strong>None</strong> - The recipient does not need any authentication
-                            to sign fields
+                            <strong>None</strong> - No authentication required
                           </li>
                         </ul>
                       </TooltipContent>

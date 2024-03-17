@@ -5,17 +5,17 @@ import { motion } from 'framer-motion';
 type AnimateGenericFadeInOutProps = {
   children: React.ReactNode;
   className?: string;
-  key?: string;
+  motionKey?: string;
 };
 
 export const AnimateGenericFadeInOut = ({
   children,
   className,
-  key,
+  motionKey,
 }: AnimateGenericFadeInOutProps) => {
   return (
     <motion.section
-      key={key}
+      key={motionKey}
       initial={{
         opacity: 0,
       }}
