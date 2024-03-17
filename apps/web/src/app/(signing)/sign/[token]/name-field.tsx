@@ -6,6 +6,8 @@ import { useRouter } from 'next/navigation';
 
 import { Loader } from 'lucide-react';
 
+import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
+import type { TRecipientActionAuth } from '@documenso/lib/types/document-auth';
 import type { Recipient } from '@documenso/prisma/client';
 import type { FieldWithSignature } from '@documenso/prisma/types/field-with-signature';
 import { trpc } from '@documenso/trpc/react';
@@ -15,6 +17,7 @@ import { Input } from '@documenso/ui/primitives/input';
 import { Label } from '@documenso/ui/primitives/label';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
+import { useRequiredDocumentAuthContext } from './document-auth-provider';
 import { useRequiredSigningContext } from './provider';
 import { SigningFieldContainer } from './signing-field-container';
 
@@ -31,6 +34,8 @@ export const NameField = ({ field, recipient }: NameFieldProps) => {
   const { fullName: providedFullName, setFullName: setProvidedFullName } =
     useRequiredSigningContext();
 
+  const { executeActionAuthProcedure } = useRequiredDocumentAuthContext();
+
   const [isPending, startTransition] = useTransition();
 
   const { mutateAsync: signFieldWithToken, isLoading: isSignFieldWithTokenLoading } =
@@ -46,9 +51,32 @@ export const NameField = ({ field, recipient }: NameFieldProps) => {
   const [showFullNameModal, setShowFullNameModal] = useState(false);
   const [localFullName, setLocalFullName] = useState('');
 
-  const onSign = async (source: 'local' | 'provider' = 'provider') => {
+  const onPreSign = () => {
+    if (!providedFullName) {
+      setShowFullNameModal(true);
+      return false;
+    }
+
+    return true;
+  };
+
+  /**
+   * When the user clicks the sign button in the dialog where they enter their full name.
+   */
+  const onDialogSignClick = () => {
+    setShowFullNameModal(false);
+    setProvidedFullName(localFullName);
+
+    void executeActionAuthProcedure({
+      onReauthFormSubmit: async (authOptions) => await onSign(authOptions, localFullName),
+    });
+  };
+
+  const onSign = async (authOptions?: TRecipientActionAuth, name?: string) => {
     try {
-      if (!providedFullName && !localFullName) {
+      const value = name || providedFullName;
+
+      if (!value) {
         setShowFullNameModal(true);
         return;
       }
@@ -56,18 +84,19 @@ export const NameField = ({ field, recipient }: NameFieldProps) => {
       await signFieldWithToken({
         token: recipient.token,
         fieldId: field.id,
-        value: source === 'local' && localFullName ? localFullName : providedFullName ?? '',
+        value,
         isBase64: false,
+        authOptions,
       });
-
-      if (source === 'local' && !providedFullName) {
-        setProvidedFullName(localFullName);
-      }
-
-      setLocalFullName('');
 
       startTransition(() => router.refresh());
     } catch (err) {
+      const error = AppError.parseError(err);
+
+      if (error.code === AppErrorCode.UNAUTHORIZED) {
+        throw error;
+      }
+
       console.error(err);
 
       toast({
@@ -98,7 +127,13 @@ export const NameField = ({ field, recipient }: NameFieldProps) => {
   };
 
   return (
-    <SigningFieldContainer field={field} onSign={onSign} onRemove={onRemove} type="Name">
+    <SigningFieldContainer
+      field={field}
+      onPreSign={onPreSign}
+      onSign={onSign}
+      onRemove={onRemove}
+      type="Name"
+    >
       {isLoading && (
         <div className="bg-background absolute inset-0 flex items-center justify-center rounded-md">
           <Loader className="text-primary h-5 w-5 animate-spin md:h-8 md:w-8" />
@@ -147,10 +182,7 @@ export const NameField = ({ field, recipient }: NameFieldProps) => {
                 type="button"
                 className="flex-1"
                 disabled={!localFullName}
-                onClick={() => {
-                  setShowFullNameModal(false);
-                  void onSign('local');
-                }}
+                onClick={() => onDialogSignClick()}
               >
                 Sign
               </Button>

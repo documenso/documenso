@@ -1,10 +1,15 @@
 import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
+import {
+  type TRecipientActionAuthTypes,
+  ZRecipientAuthOptionsSchema,
+} from '@documenso/lib/types/document-auth';
 import type { RequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 import { nanoid } from '@documenso/lib/universal/id';
 import {
   createDocumentAuditLogData,
   diffRecipientChanges,
 } from '@documenso/lib/utils/document-audit-logs';
+import { createRecipientAuthOptions } from '@documenso/lib/utils/document-auth';
 import { prisma } from '@documenso/prisma';
 import { RecipientRole } from '@documenso/prisma/client';
 import { SendStatus, SigningStatus } from '@documenso/prisma/client';
@@ -18,6 +23,7 @@ export interface SetRecipientsForDocumentOptions {
     email: string;
     name: string;
     role: RecipientRole;
+    actionAuth?: TRecipientActionAuthTypes | null;
   }[];
   requestMetadata?: RequestMetadata;
 }
@@ -111,6 +117,15 @@ export const setRecipientsForDocument = async ({
   const persistedRecipients = await prisma.$transaction(async (tx) => {
     return await Promise.all(
       linkedRecipients.map(async (recipient) => {
+        let authOptions = ZRecipientAuthOptionsSchema.parse(recipient._persisted?.authOptions);
+
+        if (recipient.actionAuth !== undefined) {
+          authOptions = createRecipientAuthOptions({
+            accessAuth: authOptions.accessAuth,
+            actionAuth: recipient.actionAuth,
+          });
+        }
+
         const upsertedRecipient = await tx.recipient.upsert({
           where: {
             id: recipient._persisted?.id ?? -1,
@@ -124,6 +139,7 @@ export const setRecipientsForDocument = async ({
             sendStatus: recipient.role === RecipientRole.CC ? SendStatus.SENT : SendStatus.NOT_SENT,
             signingStatus:
               recipient.role === RecipientRole.CC ? SigningStatus.SIGNED : SigningStatus.NOT_SIGNED,
+            authOptions,
           },
           create: {
             name: recipient.name,
@@ -134,6 +150,7 @@ export const setRecipientsForDocument = async ({
             sendStatus: recipient.role === RecipientRole.CC ? SendStatus.SENT : SendStatus.NOT_SENT,
             signingStatus:
               recipient.role === RecipientRole.CC ? SigningStatus.SIGNED : SigningStatus.NOT_SIGNED,
+            authOptions,
           },
         });
 
@@ -187,7 +204,10 @@ export const setRecipientsForDocument = async ({
               documentId: documentId,
               user,
               requestMetadata,
-              data: baseAuditLog,
+              data: {
+                ...baseAuditLog,
+                actionAuth: recipient.actionAuth || undefined,
+              },
             }),
           });
         }

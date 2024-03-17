@@ -8,6 +8,7 @@ import { useSession } from 'next-auth/react';
 import { useForm } from 'react-hook-form';
 
 import { useAnalytics } from '@documenso/lib/client-only/hooks/use-analytics';
+import type { TRecipientActionAuth } from '@documenso/lib/types/document-auth';
 import { sortFieldsByPosition, validateFieldsInserted } from '@documenso/lib/utils/fields';
 import { type Document, type Field, type Recipient, RecipientRole } from '@documenso/prisma/client';
 import { trpc } from '@documenso/trpc/react';
@@ -19,6 +20,7 @@ import { Input } from '@documenso/ui/primitives/input';
 import { Label } from '@documenso/ui/primitives/label';
 import { SignaturePad } from '@documenso/ui/primitives/signature-pad';
 
+import { useRequiredDocumentAuthContext } from './document-auth-provider';
 import { useRequiredSigningContext } from './provider';
 import { SignDialog } from './sign-dialog';
 
@@ -35,6 +37,7 @@ export const SigningForm = ({ document, recipient, fields, redirectUrl }: Signin
   const { data: session } = useSession();
 
   const { fullName, signature, setFullName, setSignature } = useRequiredSigningContext();
+  const { executeActionAuthProcedure } = useRequiredDocumentAuthContext();
 
   const [validateUninsertedFields, setValidateUninsertedFields] = useState(false);
 
@@ -64,9 +67,17 @@ export const SigningForm = ({ document, recipient, fields, redirectUrl }: Signin
       return;
     }
 
+    await executeActionAuthProcedure({
+      onReauthFormSubmit: completeDocument,
+      actionTarget: 'DOCUMENT',
+    });
+  };
+
+  const completeDocument = async (authOptions?: TRecipientActionAuth) => {
     await completeDocumentWithToken({
       token: recipient.token,
       documentId: document.id,
+      authOptions,
     });
 
     analytics.capture('App: Recipient has completed signing', {

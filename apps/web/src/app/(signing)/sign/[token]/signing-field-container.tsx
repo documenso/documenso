@@ -2,15 +2,37 @@
 
 import React from 'react';
 
+import { type TRecipientActionAuth } from '@documenso/lib/types/document-auth';
 import type { FieldWithSignature } from '@documenso/prisma/types/field-with-signature';
 import { FieldRootContainer } from '@documenso/ui/components/field/field';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@documenso/ui/primitives/tooltip';
+
+import { useRequiredDocumentAuthContext } from './document-auth-provider';
 
 export type SignatureFieldProps = {
   field: FieldWithSignature;
   loading?: boolean;
   children: React.ReactNode;
-  onSign?: () => Promise<void> | void;
+
+  /**
+   * A function that is called before the field requires to be signed, or reauthed.
+   *
+   * Example, you may want to show a dialog prior to signing where they can enter a value.
+   *
+   * Once that action is complete, you will need to call `executeActionAuthProcedure` to proceed
+   * regardless if it requires reauth or not.
+   *
+   * If the function returns true, we will proceed with the signing process. Otherwise if
+   * false is returned we will not proceed.
+   */
+  onPreSign?: () => Promise<boolean> | boolean;
+
+  /**
+   * The function required to be executed to insert the field.
+   *
+   * The auth values will be passed in if avaliable.
+   */
+  onSign?: (documentAuthValue?: TRecipientActionAuth) => Promise<void> | void;
   onRemove?: () => Promise<void> | void;
   type?: 'Date' | 'Email' | 'Name' | 'Signature';
   tooltipText?: string | null;
@@ -19,18 +41,42 @@ export type SignatureFieldProps = {
 export const SigningFieldContainer = ({
   field,
   loading,
+  onPreSign,
   onSign,
   onRemove,
   children,
   type,
   tooltipText,
 }: SignatureFieldProps) => {
-  const onSignFieldClick = async () => {
-    if (field.inserted) {
+  const { executeActionAuthProcedure, isAuthRedirectRequired } = useRequiredDocumentAuthContext();
+
+  const handleInsertField = async () => {
+    if (field.inserted || !onSign) {
       return;
     }
 
-    await onSign?.();
+    if (isAuthRedirectRequired) {
+      await executeActionAuthProcedure({
+        onReauthFormSubmit: () => {
+          // Do nothing since the user should be redirected.
+        },
+      });
+
+      return;
+    }
+
+    // Handle any presign requirements, and halt if required.
+    if (onPreSign) {
+      const preSignResult = await onPreSign();
+
+      if (preSignResult === false) {
+        return;
+      }
+    }
+
+    await executeActionAuthProcedure({
+      onReauthFormSubmit: onSign,
+    });
   };
 
   const onRemoveSignedFieldClick = async () => {
@@ -47,7 +93,7 @@ export const SigningFieldContainer = ({
         <button
           type="submit"
           className="absolute inset-0 z-10 h-full w-full"
-          onClick={onSignFieldClick}
+          onClick={async () => handleInsertField()}
         />
       )}
 

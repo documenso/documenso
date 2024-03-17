@@ -7,7 +7,6 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import {
   type DocumentData,
   type DocumentMeta,
-  DocumentStatus,
   type Field,
   type Recipient,
   type User,
@@ -18,12 +17,12 @@ import { cn } from '@documenso/ui/lib/utils';
 import { Card, CardContent } from '@documenso/ui/primitives/card';
 import { AddFieldsFormPartial } from '@documenso/ui/primitives/document-flow/add-fields';
 import type { TAddFieldsFormSchema } from '@documenso/ui/primitives/document-flow/add-fields.types';
+import { AddSettingsFormPartial } from '@documenso/ui/primitives/document-flow/add-settings';
+import type { TAddSettingsFormSchema } from '@documenso/ui/primitives/document-flow/add-settings.types';
 import { AddSignersFormPartial } from '@documenso/ui/primitives/document-flow/add-signers';
 import type { TAddSignersFormSchema } from '@documenso/ui/primitives/document-flow/add-signers.types';
 import { AddSubjectFormPartial } from '@documenso/ui/primitives/document-flow/add-subject';
 import type { TAddSubjectFormSchema } from '@documenso/ui/primitives/document-flow/add-subject.types';
-import { AddTitleFormPartial } from '@documenso/ui/primitives/document-flow/add-title';
-import type { TAddTitleFormSchema } from '@documenso/ui/primitives/document-flow/add-title.types';
 import { DocumentFlowFormContainer } from '@documenso/ui/primitives/document-flow/document-flow-root';
 import type { DocumentFlowStep } from '@documenso/ui/primitives/document-flow/types';
 import { LazyPDFViewer } from '@documenso/ui/primitives/lazy-pdf-viewer';
@@ -43,8 +42,8 @@ export type EditDocumentFormProps = {
   documentRootPath: string;
 };
 
-type EditDocumentStep = 'title' | 'signers' | 'fields' | 'subject';
-const EditDocumentSteps: EditDocumentStep[] = ['title', 'signers', 'fields', 'subject'];
+type EditDocumentStep = 'settings' | 'signers' | 'fields' | 'subject';
+const EditDocumentSteps: EditDocumentStep[] = ['settings', 'signers', 'fields', 'subject'];
 
 export const EditDocumentForm = ({
   className,
@@ -62,7 +61,8 @@ export const EditDocumentForm = ({
   const searchParams = useSearchParams();
   const team = useOptionalCurrentTeam();
 
-  const { mutateAsync: addTitle } = trpc.document.setTitleForDocument.useMutation();
+  const { mutateAsync: setSettingsForDocument } =
+    trpc.document.setSettingsForDocument.useMutation();
   const { mutateAsync: addFields } = trpc.field.addFields.useMutation();
   const { mutateAsync: addSigners } = trpc.recipient.addSigners.useMutation();
   const { mutateAsync: sendDocument } = trpc.document.sendDocument.useMutation();
@@ -70,9 +70,9 @@ export const EditDocumentForm = ({
     trpc.document.setPasswordForDocument.useMutation();
 
   const documentFlow: Record<EditDocumentStep, DocumentFlowStep> = {
-    title: {
-      title: 'Add Title',
-      description: 'Add the title to the document.',
+    settings: {
+      title: 'General',
+      description: 'Configure general settings for the document.',
       stepIndex: 1,
     },
     signers: {
@@ -96,8 +96,7 @@ export const EditDocumentForm = ({
     // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
     const searchParamStep = searchParams?.get('step') as EditDocumentStep | undefined;
 
-    let initialStep: EditDocumentStep =
-      document.status === DocumentStatus.DRAFT ? 'title' : 'signers';
+    let initialStep: EditDocumentStep = 'settings';
 
     if (
       searchParamStep &&
@@ -110,13 +109,23 @@ export const EditDocumentForm = ({
     return initialStep;
   });
 
-  const onAddTitleFormSubmit = async (data: TAddTitleFormSchema) => {
+  const onAddSettingsFormSubmit = async (data: TAddSettingsFormSchema) => {
     try {
-      // Custom invocation server action
-      await addTitle({
+      const { timezone, dateFormat, redirectUrl } = data.meta;
+
+      await setSettingsForDocument({
         documentId: document.id,
         teamId: team?.id,
-        title: data.title,
+        data: {
+          title: data.title,
+          globalAccessAuth: data.globalAccessAuth ?? null,
+          globalActionAuth: data.globalActionAuth ?? null,
+        },
+        meta: {
+          timezone,
+          dateFormat,
+          redirectUrl,
+        },
       });
 
       router.refresh();
@@ -127,7 +136,7 @@ export const EditDocumentForm = ({
 
       toast({
         title: 'Error',
-        description: 'An error occurred while updating title.',
+        description: 'An error occurred while updating the general settings.',
         variant: 'destructive',
       });
     }
@@ -139,7 +148,11 @@ export const EditDocumentForm = ({
       await addSigners({
         documentId: document.id,
         teamId: team?.id,
-        signers: data.signers,
+        signers: data.signers.map((signer) => ({
+          ...signer,
+          // Explicitly set to null to indicate we want to remove auth if required.
+          actionAuth: signer.actionAuth || null,
+        })),
       });
 
       router.refresh();
@@ -177,7 +190,7 @@ export const EditDocumentForm = ({
   };
 
   const onAddSubjectFormSubmit = async (data: TAddSubjectFormSchema) => {
-    const { subject, message, timezone, dateFormat, redirectUrl } = data.meta;
+    const { subject, message } = data.meta;
 
     try {
       await sendDocument({
@@ -186,9 +199,6 @@ export const EditDocumentForm = ({
         meta: {
           subject,
           message,
-          dateFormat,
-          timezone,
-          redirectUrl,
         },
       });
 
@@ -245,23 +255,23 @@ export const EditDocumentForm = ({
             currentStep={currentDocumentFlow.stepIndex}
             setCurrentStep={(step) => setStep(EditDocumentSteps[step - 1])}
           >
-            <AddTitleFormPartial
+            <AddSettingsFormPartial
               key={recipients.length}
-              documentFlow={documentFlow.title}
+              documentFlow={documentFlow.settings}
               document={document}
               recipients={recipients}
               fields={fields}
-              onSubmit={onAddTitleFormSubmit}
+              onSubmit={onAddSettingsFormSubmit}
             />
 
             <AddSignersFormPartial
               key={recipients.length}
               documentFlow={documentFlow.signers}
-              document={document}
               recipients={recipients}
               fields={fields}
               onSubmit={onAddSignersFormSubmit}
             />
+
             <AddFieldsFormPartial
               key={fields.length}
               documentFlow={documentFlow.fields}
@@ -269,6 +279,7 @@ export const EditDocumentForm = ({
               fields={fields}
               onSubmit={onAddFieldsFormSubmit}
             />
+
             <AddSubjectFormPartial
               key={recipients.length}
               documentFlow={documentFlow.subject}
