@@ -20,10 +20,10 @@ export const DOCUMENT_AUTH_TYPES: Record<string, DocumentAuthTypeData> = {
     value: 'Require account',
     isAuthRedirectRequired: true,
   },
-  // [DocumentAuthType.PASSKEY]: {
-  //   key: DocumentAuthType.PASSKEY,
-  //   value: 'Require passkey',
-  // },
+  [DocumentAuth.PASSKEY]: {
+    key: DocumentAuth.PASSKEY,
+    value: 'Require passkey',
+  },
   [DocumentAuth.EXPLICIT_NONE]: {
     key: DocumentAuth.EXPLICIT_NONE,
     value: 'None (Overrides global settings)',

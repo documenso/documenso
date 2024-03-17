@@ -30,7 +30,7 @@ export type SignatureFieldProps = {
   /**
    * The function required to be executed to insert the field.
    *
-   * The auth values will be passed in if avaliable.
+   * The auth values will be passed in if available.
    */
   onSign?: (documentAuthValue?: TRecipientActionAuth) => Promise<void> | void;
   onRemove?: () => Promise<void> | void;

@@ -1,9 +1,10 @@
 'use client';
 
-import { createContext, useContext, useMemo, useState } from 'react';
+import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 
 import { match } from 'ts-pattern';
 
+import { MAXIMUM_PASSKEYS } from '@documenso/lib/constants/auth';
 import { DOCUMENT_AUTH_TYPES } from '@documenso/lib/constants/document-auth';
 import type {
   TDocumentAuthOptions,
@@ -13,10 +14,18 @@ import type {
 } from '@documenso/lib/types/document-auth';
 import { DocumentAuth } from '@documenso/lib/types/document-auth';
 import { extractDocumentAuthMethods } from '@documenso/lib/utils/document-auth';
-import type { Document, Recipient, User } from '@documenso/prisma/client';
+import type { Document, Passkey, Recipient, User } from '@documenso/prisma/client';
+import { trpc } from '@documenso/trpc/react';
 
 import type { DocumentActionAuthDialogProps } from './document-action-auth-dialog';
 import { DocumentActionAuthDialog } from './document-action-auth-dialog';
+
+type PasskeyData = {
+  passkeys: Omit<Passkey, 'credentialId' | 'credentialPublicKey'>[];
+  isLoading: boolean;
+  isInitialLoading: boolean;
+  isLoadingError: boolean;
+};
 
 export type DocumentAuthContextValue = {
   executeActionAuthProcedure: (_value: ExecuteActionAuthProcedureOptions) => Promise<void>;
@@ -29,6 +38,11 @@ export type DocumentAuthContextValue = {
   derivedRecipientAccessAuth: TRecipientAccessAuthTypes | null;
   derivedRecipientActionAuth: TRecipientActionAuthTypes | null;
   isAuthRedirectRequired: boolean;
+  isCurrentlyAuthenticating: boolean;
+  setIsCurrentlyAuthenticating: (_value: boolean) => void;
+  passkeyData: PasskeyData;
+  preferredPasskeyId: string | null;
+  setPreferredPasskeyId: (_value: string | null) => void;
   user?: User | null;
 };
 
@@ -64,6 +78,26 @@ export const DocumentAuthProvider = ({
   const [document, setDocument] = useState(initialDocument);
   const [recipient, setRecipient] = useState(initialRecipient);
 
+  const [isCurrentlyAuthenticating, setIsCurrentlyAuthenticating] = useState(false);
+  const [preferredPasskeyId, setPreferredPasskeyId] = useState<string | null>(null);
+
+  const passkeyQuery = trpc.auth.findPasskeys.useQuery(
+    {
+      perPage: MAXIMUM_PASSKEYS,
+    },
+    {
+      keepPreviousData: true,
+      enabled: false,
+    },
+  );
+
+  const passkeyData: PasskeyData = {
+    passkeys: passkeyQuery.data?.data || [],
+    isLoading: passkeyQuery.isLoading,
+    isInitialLoading: passkeyQuery.isInitialLoading,
+    isLoadingError: passkeyQuery.isLoadingError,
+  };
+
   const {
     documentAuthOption,
     recipientAuthOption,
@@ -77,6 +111,24 @@ export const DocumentAuthProvider = ({
       }),
     [document, recipient],
   );
+
+  /**
+   * By default, select the first passkey since it's pre sorted by most recently used.
+   */
+  useEffect(() => {
+    if (!preferredPasskeyId && passkeyQuery.data && passkeyQuery.data.data.length > 0) {
+      setPreferredPasskeyId(passkeyQuery.data.data[0].id);
+    }
+  }, [passkeyQuery.data, preferredPasskeyId]);
+
+  /**
+   * Only fetch passkeys if required.
+   */
+  useEffect(() => {
+    if (derivedRecipientActionAuth === DocumentAuth.PASSKEY) {
+      void passkeyQuery.refetch();
+    }
+  }, [derivedRecipientActionAuth, passkeyQuery]);
 
   const [documentAuthDialogPayload, setDocumentAuthDialogPayload] =
     useState<ExecuteActionAuthProcedureOptions | null>(null);
@@ -101,7 +153,7 @@ export const DocumentAuthProvider = ({
     .with(DocumentAuth.EXPLICIT_NONE, () => ({
       type: DocumentAuth.EXPLICIT_NONE,
     }))
-    .with(null, () => null)
+    .with(DocumentAuth.PASSKEY, null, () => null)
     .exhaustive();
 
   const executeActionAuthProcedure = async (options: ExecuteActionAuthProcedureOptions) => {
@@ -111,7 +163,7 @@ export const DocumentAuthProvider = ({
       return;
     }
 
-    // Run callback with precalculated auth options if avaliable.
+    // Run callback with precalculated auth options if available.
     if (preCalculatedActionAuthOptions) {
       setDocumentAuthDialogPayload(null);
       await options.onReauthFormSubmit(preCalculatedActionAuthOptions);
@@ -143,6 +195,11 @@ export const DocumentAuthProvider = ({
         derivedRecipientAccessAuth,
         derivedRecipientActionAuth,
         isAuthRedirectRequired,
+        isCurrentlyAuthenticating,
+        setIsCurrentlyAuthenticating,
+        passkeyData,
+        preferredPasskeyId,
+        setPreferredPasskeyId,
       }}
     >
       {children}

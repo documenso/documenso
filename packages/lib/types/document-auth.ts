@@ -1,9 +1,11 @@
 import { z } from 'zod';
 
+import { ZAuthenticationResponseJSONSchema } from './webauthn';
+
 /**
  * All the available types of document authentication options for both access and action.
  */
-export const ZDocumentAuthTypesSchema = z.enum(['ACCOUNT', 'EXPLICIT_NONE']);
+export const ZDocumentAuthTypesSchema = z.enum(['ACCOUNT', 'PASSKEY', 'EXPLICIT_NONE']);
 export const DocumentAuth = ZDocumentAuthTypesSchema.Enum;
 
 const ZDocumentAuthAccountSchema = z.object({
@@ -14,12 +16,19 @@ const ZDocumentAuthExplicitNoneSchema = z.object({
   type: z.literal(DocumentAuth.EXPLICIT_NONE),
 });
 
+const ZDocumentAuthPasskeySchema = z.object({
+  type: z.literal(DocumentAuth.PASSKEY),
+  authenticationResponse: ZAuthenticationResponseJSONSchema,
+  tokenReference: z.string().min(1),
+});
+
 /**
  * All the document auth methods for both accessing and actioning.
  */
 export const ZDocumentAuthMethodsSchema = z.discriminatedUnion('type', [
   ZDocumentAuthAccountSchema,
   ZDocumentAuthExplicitNoneSchema,
+  ZDocumentAuthPasskeySchema,
 ]);
 
 /**
@@ -35,8 +44,11 @@ export const ZDocumentAccessAuthTypesSchema = z.enum([DocumentAuth.ACCOUNT]);
  *
  * Must keep these two in sync.
  */
-export const ZDocumentActionAuthSchema = z.discriminatedUnion('type', [ZDocumentAuthAccountSchema]); // Todo: Add passkeys here.
-export const ZDocumentActionAuthTypesSchema = z.enum([DocumentAuth.ACCOUNT]);
+export const ZDocumentActionAuthSchema = z.discriminatedUnion('type', [
+  ZDocumentAuthAccountSchema,
+  ZDocumentAuthPasskeySchema,
+]);
+export const ZDocumentActionAuthTypesSchema = z.enum([DocumentAuth.ACCOUNT, DocumentAuth.PASSKEY]);
 
 /**
  * The recipient access auth methods.
@@ -54,11 +66,13 @@ export const ZRecipientAccessAuthTypesSchema = z.enum([DocumentAuth.ACCOUNT]);
  * Must keep these two in sync.
  */
 export const ZRecipientActionAuthSchema = z.discriminatedUnion('type', [
-  ZDocumentAuthAccountSchema, // Todo: Add passkeys here.
+  ZDocumentAuthAccountSchema,
+  ZDocumentAuthPasskeySchema,
   ZDocumentAuthExplicitNoneSchema,
 ]);
 export const ZRecipientActionAuthTypesSchema = z.enum([
   DocumentAuth.ACCOUNT,
+  DocumentAuth.PASSKEY,
   DocumentAuth.EXPLICIT_NONE,
 ]);
 
