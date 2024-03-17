@@ -4,6 +4,7 @@ import type { RegistrationResponseJSON } from '@simplewebauthn/types';
 import { prisma } from '@documenso/prisma';
 import { UserSecurityAuditLogType } from '@documenso/prisma/client';
 
+import { MAXIMUM_PASSKEYS } from '../../constants/auth';
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import type { RequestMetadata } from '../../universal/extract-request-metadata';
 import { getAuthenticatorRegistrationOptions } from '../../utils/authenticator';
@@ -21,11 +22,22 @@ export const createPasskey = async ({
   verificationResponse,
   requestMetadata,
 }: CreatePasskeyOptions) => {
-  await prisma.user.findFirstOrThrow({
+  const { _count } = await prisma.user.findFirstOrThrow({
     where: {
       id: userId,
     },
+    include: {
+      _count: {
+        select: {
+          passkeys: true,
+        },
+      },
+    },
   });
+
+  if (_count.passkeys >= MAXIMUM_PASSKEYS) {
+    throw new AppError('TOO_MANY_PASSKEYS');
+  }
 
   const verificationToken = await prisma.verificationToken.findFirst({
     where: {

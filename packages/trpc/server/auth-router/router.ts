@@ -110,10 +110,7 @@ export const authRouter = router({
       } catch (err) {
         console.error(err);
 
-        throw new TRPCError({
-          code: 'BAD_REQUEST',
-          message: 'We were unable to create this passkey. Please try again later.',
-        });
+        throw AppError.parseErrorToTRPCError(err);
       }
     }),
 
