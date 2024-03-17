@@ -1,0 +1,94 @@
+import { verifyRegistrationResponse } from '@simplewebauthn/server';
+import type { RegistrationResponseJSON } from '@simplewebauthn/types';
+
+import { prisma } from '@documenso/prisma';
+import { UserSecurityAuditLogType } from '@documenso/prisma/client';
+
+import { AppError, AppErrorCode } from '../../errors/app-error';
+import type { RequestMetadata } from '../../universal/extract-request-metadata';
+import { getAuthenticatorRegistrationOptions } from '../../utils/authenticator';
+
+type CreatePasskeyOptions = {
+  userId: number;
+  passkeyName: string;
+  verificationResponse: RegistrationResponseJSON;
+  requestMetadata?: RequestMetadata;
+};
+
+export const createPasskey = async ({
+  userId,
+  passkeyName,
+  verificationResponse,
+  requestMetadata,
+}: CreatePasskeyOptions) => {
+  await prisma.user.findFirstOrThrow({
+    where: {
+      id: userId,
+    },
+  });
+
+  const verificationToken = await prisma.verificationToken.findFirst({
+    where: {
+      userId,
+      identifier: 'PASSKEY_CHALLENGE',
+    },
+    orderBy: {
+      createdAt: 'desc',
+    },
+  });
+
+  if (!verificationToken) {
+    throw new AppError(AppErrorCode.NOT_FOUND, 'Challenge token not found');
+  }
+
+  await prisma.verificationToken.deleteMany({
+    where: {
+      userId,
+      identifier: 'PASSKEY_CHALLENGE',
+    },
+  });
+
+  if (verificationToken.expires < new Date()) {
+    throw new AppError(AppErrorCode.EXPIRED_CODE, 'Challenge token expired');
+  }
+
+  const { rpId: expectedRPID, origin: expectedOrigin } = getAuthenticatorRegistrationOptions();
+
+  const verification = await verifyRegistrationResponse({
+    response: verificationResponse,
+    expectedChallenge: verificationToken.token,
+    expectedOrigin,
+    expectedRPID,
+  });
+
+  if (!verification.verified || !verification.registrationInfo) {
+    throw new AppError(AppErrorCode.UNAUTHORIZED, 'Verification failed');
+  }
+
+  const { credentialPublicKey, credentialID, counter, credentialDeviceType, credentialBackedUp } =
+    verification.registrationInfo;
+
+  await prisma.$transaction(async (tx) => {
+    await tx.passkey.create({
+      data: {
+        userId,
+        name: passkeyName,
+        credentialId: Buffer.from(credentialID),
+        credentialPublicKey: Buffer.from(credentialPublicKey),
+        counter,
+        credentialDeviceType,
+        credentialBackedUp,
+        transports: verificationResponse.response.transports,
+      },
+    });
+
+    await tx.userSecurityAuditLog.create({
+      data: {
+        userId,
+        type: UserSecurityAuditLogType.PASSKEY_CREATED,
+        userAgent: requestMetadata?.userAgent,
+        ipAddress: requestMetadata?.ipAddress,
+      },
+    });
+  });
+};
