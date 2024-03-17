@@ -179,7 +179,7 @@ export const CreatePasskeyDialog = ({ trigger, ...props }: CreatePasskeyDialogPr
 
                 <AlertDescription className="mt-2">
                   If you do not want to use the authenticator prompted, you can close it, which will
-                  then display the next avaliable authenticator.
+                  then display the next available authenticator.
                 </AlertDescription>
               </Alert>
 
