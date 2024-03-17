@@ -111,7 +111,7 @@ export const DocumentAuthProvider = ({
       return;
     }
 
-    // Run callback with precalculated auth options if avaliable.
+    // Run callback with precalculated auth options if available.
     if (preCalculatedActionAuthOptions) {
       setDocumentAuthDialogPayload(null);
       await options.onReauthFormSubmit(preCalculatedActionAuthOptions);
