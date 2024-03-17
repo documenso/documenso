@@ -3,8 +3,9 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
-import { CheckCircle2, ChevronsUpDown, Plus, Settings2 } from 'lucide-react';
+import { CheckCircle2, ChevronsUpDown, Monitor, Moon, Plus, Settings2, Sun } from 'lucide-react';
 import { signOut } from 'next-auth/react';
+import { useTheme } from 'next-themes';
 
 import { TEAM_MEMBER_ROLE_MAP, TEAM_URL_REGEX } from '@documenso/lib/constants/teams';
 import { isAdmin } from '@documenso/lib/next-auth/guards/is-admin';
@@ -21,7 +22,13 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
+  DropdownMenuPortal,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
   DropdownMenuSeparator,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from '@documenso/ui/primitives/dropdown-menu';
 
@@ -32,6 +39,7 @@ export type MenuSwitcherProps = {
 
 export const MenuSwitcher = ({ user, teams: initialTeamsData }: MenuSwitcherProps) => {
   const pathname = usePathname();
+  const { theme, setTheme } = useTheme();
 
   const isUserAdmin = isAdmin(user);
 
@@ -215,7 +223,26 @@ export const MenuSwitcher = ({ user, teams: initialTeamsData }: MenuSwitcherProp
               <Link href={`/t/${selectedTeam.url}/settings/`}>Team settings</Link>
             </DropdownMenuItem>
           )}
-
+        <DropdownMenuSub>
+          <DropdownMenuSubTrigger className="px-4 py-2">Themes</DropdownMenuSubTrigger>
+          <DropdownMenuPortal>
+            <DropdownMenuSubContent>
+              <DropdownMenuRadioGroup value={theme} onValueChange={setTheme}>
+                <DropdownMenuRadioItem value="light">
+                  <Sun className="mr-2 h-4 w-4" /> Light
+                </DropdownMenuRadioItem>
+                <DropdownMenuRadioItem value="dark">
+                  <Moon className="mr-2 h-4 w-4" />
+                  Dark
+                </DropdownMenuRadioItem>
+                <DropdownMenuRadioItem value="system">
+                  <Monitor className="mr-2 h-4 w-4" />
+                  System
+                </DropdownMenuRadioItem>
+              </DropdownMenuRadioGroup>
+            </DropdownMenuSubContent>
+          </DropdownMenuPortal>
+        </DropdownMenuSub>
         <DropdownMenuItem
           className="text-destructive/90 hover:!text-destructive px-4 py-2"
           onSelect={async () =>
