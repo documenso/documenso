@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useContext, useEffect, useMemo, useState } from 'react';
+import { createContext, useCallback, useContext, useMemo, useState } from 'react';
 
 import { match } from 'ts-pattern';
 
@@ -22,9 +22,9 @@ import { DocumentActionAuthDialog } from './document-action-auth-dialog';
 
 type PasskeyData = {
   passkeys: Omit<Passkey, 'credentialId' | 'credentialPublicKey'>[];
-  isLoading: boolean;
   isInitialLoading: boolean;
-  isLoadingError: boolean;
+  isRefetching: boolean;
+  isError: boolean;
 };
 
 export type DocumentAuthContextValue = {
@@ -44,6 +44,7 @@ export type DocumentAuthContextValue = {
   preferredPasskeyId: string | null;
   setPreferredPasskeyId: (_value: string | null) => void;
   user?: User | null;
+  refetchPasskeys: () => Promise<void>;
 };
 
 const DocumentAuthContext = createContext<DocumentAuthContextValue | null>(null);
@@ -81,23 +82,6 @@ export const DocumentAuthProvider = ({
   const [isCurrentlyAuthenticating, setIsCurrentlyAuthenticating] = useState(false);
   const [preferredPasskeyId, setPreferredPasskeyId] = useState<string | null>(null);
 
-  const passkeyQuery = trpc.auth.findPasskeys.useQuery(
-    {
-      perPage: MAXIMUM_PASSKEYS,
-    },
-    {
-      keepPreviousData: true,
-      enabled: false,
-    },
-  );
-
-  const passkeyData: PasskeyData = {
-    passkeys: passkeyQuery.data?.data || [],
-    isLoading: passkeyQuery.isLoading,
-    isInitialLoading: passkeyQuery.isInitialLoading,
-    isLoadingError: passkeyQuery.isLoadingError,
-  };
-
   const {
     documentAuthOption,
     recipientAuthOption,
@@ -112,23 +96,31 @@ export const DocumentAuthProvider = ({
     [document, recipient],
   );
 
-  /**
-   * By default, select the first passkey since it's pre sorted by most recently used.
-   */
-  useEffect(() => {
-    if (!preferredPasskeyId && passkeyQuery.data && passkeyQuery.data.data.length > 0) {
-      setPreferredPasskeyId(passkeyQuery.data.data[0].id);
-    }
-  }, [passkeyQuery.data, preferredPasskeyId]);
+  const passkeyQuery = trpc.auth.findPasskeys.useQuery(
+    {
+      perPage: MAXIMUM_PASSKEYS,
+    },
+    {
+      keepPreviousData: true,
+      enabled: derivedRecipientActionAuth === DocumentAuth.PASSKEY,
+    },
+  );
 
-  /**
-   * Only fetch passkeys if required.
-   */
-  useEffect(() => {
-    if (derivedRecipientActionAuth === DocumentAuth.PASSKEY) {
-      void passkeyQuery.refetch();
+  const passkeyData: PasskeyData = {
+    passkeys: passkeyQuery.data?.data || [],
+    isInitialLoading: passkeyQuery.isInitialLoading,
+    isRefetching: passkeyQuery.isRefetching,
+    isError: passkeyQuery.isError,
+  };
+
+  const refetchPasskeys = useCallback(async () => {
+    const { data } = await passkeyQuery.refetch();
+
+    if (!preferredPasskeyId && data && data.data.length > 0) {
+      setPreferredPasskeyId(data.data[0].id);
     }
-  }, [derivedRecipientActionAuth, passkeyQuery]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [preferredPasskeyId]);
 
   const [documentAuthDialogPayload, setDocumentAuthDialogPayload] =
     useState<ExecuteActionAuthProcedureOptions | null>(null);
@@ -200,6 +192,7 @@ export const DocumentAuthProvider = ({
         passkeyData,
         preferredPasskeyId,
         setPreferredPasskeyId,
+        refetchPasskeys,
       }}
     >
       {children}

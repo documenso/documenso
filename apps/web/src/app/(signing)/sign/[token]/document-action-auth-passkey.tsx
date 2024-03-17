@@ -2,11 +2,13 @@ import { useEffect, useState } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { browserSupportsWebAuthn, startAuthentication } from '@simplewebauthn/browser';
+import { Loader } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
 import { AppError } from '@documenso/lib/errors/app-error';
 import { DocumentAuth, type TRecipientActionAuth } from '@documenso/lib/types/document-auth';
+import { RecipientRole } from '@documenso/prisma/client';
 import { trpc } from '@documenso/trpc/react';
 import { Alert, AlertDescription, AlertTitle } from '@documenso/ui/primitives/alert';
 import { Button } from '@documenso/ui/primitives/button';
@@ -27,6 +29,8 @@ import {
   SelectValue,
 } from '@documenso/ui/primitives/select';
 
+import { CreatePasskeyDialog } from '~/app/(dashboard)/settings/security/passkeys/create-passkey-dialog';
+
 import { useRequiredDocumentAuthContext } from './document-auth-provider';
 
 export type DocumentActionAuthPasskeyProps = {
@@ -38,7 +42,7 @@ export type DocumentActionAuthPasskeyProps = {
 };
 
 const ZPasskeyAuthFormSchema = z.object({
-  preferredPasskeyId: z.string(),
+  passkeyId: z.string(),
 });
 
 type TPasskeyAuthFormSchema = z.infer<typeof ZPasskeyAuthFormSchema>;
@@ -51,17 +55,19 @@ export const DocumentActionAuthPasskey = ({
   onOpenChange,
 }: DocumentActionAuthPasskeyProps) => {
   const {
+    recipient,
     passkeyData,
     preferredPasskeyId,
     setPreferredPasskeyId,
     isCurrentlyAuthenticating,
     setIsCurrentlyAuthenticating,
+    refetchPasskeys,
   } = useRequiredDocumentAuthContext();
 
-  const form = useForm({
+  const form = useForm<TPasskeyAuthFormSchema>({
     resolver: zodResolver(ZPasskeyAuthFormSchema),
     defaultValues: {
-      preferredPasskeyId: preferredPasskeyId ?? '',
+      passkeyId: preferredPasskeyId || '',
     },
   });
 
@@ -70,13 +76,13 @@ export const DocumentActionAuthPasskey = ({
 
   const [formErrorCode, setFormErrorCode] = useState<string | null>(null);
 
-  const onFormSubmit = async (values: TPasskeyAuthFormSchema) => {
+  const onFormSubmit = async ({ passkeyId }: TPasskeyAuthFormSchema) => {
     try {
-      setPreferredPasskeyId(values.preferredPasskeyId);
+      setPreferredPasskeyId(passkeyId);
       setIsCurrentlyAuthenticating(true);
 
       const { options, tokenReference } = await createPasskeyAuthenticationOptions({
-        preferredPasskeyId: values.preferredPasskeyId,
+        preferredPasskeyId: passkeyId,
       });
 
       const authenticationResponse = await startAuthentication(options);
@@ -106,7 +112,7 @@ export const DocumentActionAuthPasskey = ({
 
   useEffect(() => {
     form.reset({
-      preferredPasskeyId: preferredPasskeyId ?? '',
+      passkeyId: preferredPasskeyId || '',
     });
 
     setFormErrorCode(null);
@@ -131,80 +137,117 @@ export const DocumentActionAuthPasskey = ({
     );
   }
 
+  if (
+    passkeyData.isInitialLoading ||
+    (passkeyData.isRefetching && passkeyData.passkeys.length === 0)
+  ) {
+    return (
+      <div className="flex h-28 items-center justify-center">
+        <Loader className="text-muted-foreground h-6 w-6 animate-spin" />
+      </div>
+    );
+  }
+
+  if (passkeyData.isError) {
+    return (
+      <div className="h-28 space-y-4">
+        <Alert variant="destructive">
+          <AlertDescription>Something went wrong while loading your passkeys.</AlertDescription>
+        </Alert>
+
+        <DialogFooter>
+          <Button type="button" variant="secondary" onClick={() => onOpenChange(false)}>
+            Cancel
+          </Button>
+
+          <Button type="button" onClick={() => void refetchPasskeys()}>
+            Retry
+          </Button>
+        </DialogFooter>
+      </div>
+    );
+  }
+
+  if (passkeyData.passkeys.length === 0) {
+    return (
+      <div className="space-y-4">
+        <Alert>
+          <AlertDescription>
+            {recipient.role === RecipientRole.VIEWER && actionTarget === 'DOCUMENT'
+              ? 'You need to setup a passkey to mark this document as viewed.'
+              : `You need to setup a passkey to ${actionVerb.toLowerCase()} this ${actionTarget.toLowerCase()}.`}
+          </AlertDescription>
+        </Alert>
+
+        <DialogFooter>
+          <Button type="button" variant="secondary" onClick={() => onOpenChange(false)}>
+            Cancel
+          </Button>
+
+          <CreatePasskeyDialog
+            onSuccess={async () => refetchPasskeys()}
+            trigger={<Button>Setup</Button>}
+          />
+        </DialogFooter>
+      </div>
+    );
+  }
+
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onFormSubmit)}>
         <fieldset disabled={isCurrentlyAuthenticating}>
-          {passkeyData.passkeys.length === 0 && (
-            <div className="space-y-4">
-              <Alert>
+          <div className="space-y-4">
+            <FormField
+              control={form.control}
+              name="passkeyId"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel required>Passkey</FormLabel>
+
+                  <FormControl>
+                    <Select {...field} onValueChange={field.onChange}>
+                      <SelectTrigger className="bg-background text-muted-foreground">
+                        <SelectValue
+                          data-testid="documentAccessSelectValue"
+                          placeholder="Select passkey"
+                        />
+                      </SelectTrigger>
+
+                      <SelectContent position="popper">
+                        {passkeyData.passkeys.map((passkey) => (
+                          <SelectItem key={passkey.id} value={passkey.id}>
+                            {passkey.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </FormControl>
+
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            {formErrorCode && (
+              <Alert variant="destructive">
+                <AlertTitle>Unauthorized</AlertTitle>
                 <AlertDescription>
-                  You need to setup a passkey to {actionVerb.toLowerCase()} this{' '}
-                  {actionTarget.toLowerCase()}.
+                  We were unable to verify your details. Please try again or contact support
                 </AlertDescription>
               </Alert>
+            )}
 
-              <DialogFooter>
-                <Button type="button" variant="secondary" onClick={() => onOpenChange(false)}>
-                  Cancel
-                </Button>
+            <DialogFooter>
+              <Button type="button" variant="secondary" onClick={() => onOpenChange(false)}>
+                Cancel
+              </Button>
 
-                {/* Todo */}
-                <Button asChild>Setup</Button>
-              </DialogFooter>
-            </div>
-          )}
-
-          {passkeyData.passkeys.length > 0 && (
-            <div className="space-y-4">
-              <FormField
-                control={form.control}
-                name="preferredPasskeyId"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel required>Passkey</FormLabel>
-
-                    <FormControl>
-                      <Select {...field} onValueChange={field.onChange}>
-                        <SelectTrigger className="bg-background text-muted-foreground">
-                          <SelectValue data-testid="documentAccessSelectValue" />
-                        </SelectTrigger>
-
-                        <SelectContent position="popper">
-                          {passkeyData.passkeys.map((passkey) => (
-                            <SelectItem key={passkey.id} value={passkey.id}>
-                              {passkey.name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </FormControl>
-
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              {formErrorCode && (
-                <Alert variant="destructive">
-                  <AlertTitle>Unauthorized</AlertTitle>
-                  <AlertDescription>
-                    We were unable to verify your details. Please try again or contact support
-                  </AlertDescription>
-                </Alert>
-              )}
-
-              <DialogFooter>
-                <Button type="button" variant="secondary" onClick={() => onOpenChange(false)}>
-                  Cancel
-                </Button>
-
-                <Button type="submit" loading={isCurrentlyAuthenticating}>
-                  Sign
-                </Button>
-              </DialogFooter>
-            </div>
-          )}
+              <Button type="submit" loading={isCurrentlyAuthenticating}>
+                Sign
+              </Button>
+            </DialogFooter>
+          </div>
         </fieldset>
       </form>
     </Form>
