@@ -17,7 +17,15 @@ module.exports = {
 
   parser: '@typescript-eslint/parser',
 
-  parserOptions: { project: true },
+  parserOptions: {
+    tsconfigRootDir: __dirname,
+    project: ['../../tsconfig.eslint.json'],
+    ecmaVersion: 2022,
+    ecmaFeatures: {
+      jsx: true,
+    },
+    sourceType: 'module',
+  },
 
   rules: {
     '@next/next/no-html-link-for-pages': 'off',

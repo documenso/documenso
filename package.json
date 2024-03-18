@@ -48,6 +48,7 @@
     "packages/*"
   ],
   "dependencies": {
+    "@documenso/pdf-sign": "^0.1.0",
     "next-runtime-env": "^3.2.0"
   },
   "overrides": {
