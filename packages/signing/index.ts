@@ -1,5 +1,6 @@
 import { match } from 'ts-pattern';
 
+import { signWithGoogleCloudHSM } from './transports/google-cloud-hsm';
 import { signWithLocalCert } from './transports/local-cert';
 
 export type SignOptions = {
@@ -11,6 +12,7 @@ export const signPdf = async ({ pdf }: SignOptions) => {
 
   return await match(transport)
     .with('local', async () => signWithLocalCert({ pdf }))
+    .with('gcloud-hsm', async () => signWithGoogleCloudHSM({ pdf }))
     .otherwise(() => {
       throw new Error(`Unsupported signing transport: ${transport}`);
     });
