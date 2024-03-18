@@ -9,6 +9,7 @@ import { z } from 'zod';
 import { useAnalytics } from '@documenso/lib/client-only/hooks/use-analytics';
 import { TRPCClientError } from '@documenso/trpc/client';
 import { trpc } from '@documenso/trpc/react';
+import { ZPasswordSchema } from '@documenso/trpc/server/auth-router/schema';
 import { Button } from '@documenso/ui/primitives/button';
 import {
   Form,
@@ -28,11 +29,22 @@ export type ClaimAccountProps = {
   trigger?: React.ReactNode;
 };
 
-export const ZClaimAccountFormSchema = z.object({
-  name: z.string().trim().min(1, { message: 'Please enter a valid name.' }),
-  email: z.string().email().min(1),
-  password: z.string().min(8),
-});
+export const ZClaimAccountFormSchema = z
+  .object({
+    name: z.string().trim().min(1, { message: 'Please enter a valid name.' }),
+    email: z.string().email().min(1),
+    password: ZPasswordSchema,
+  })
+  .refine(
+    (data) => {
+      const { name, email, password } = data;
+      return !password.includes(name) && !password.includes(email.split('@')[0]);
+    },
+    {
+      message: 'Password should not be common or based on personal information',
+      path: ['password'],
+    },
+  );
 
 export type TClaimAccountFormSchema = z.infer<typeof ZClaimAccountFormSchema>;
 
@@ -65,12 +77,11 @@ export const ClaimAccount = ({ userName, userEmail }: ClaimAccountProps) => {
         duration: 5000,
       });
 
-      analytics.capture('App: User Sign Up', {
+      analytics.capture('App: User Claim Account', {
         email,
         timestamp: new Date().toISOString(),
       });
     } catch (error) {
-      console.log(error);
       if (error instanceof TRPCClientError && error.data?.code === 'BAD_REQUEST') {
         toast({
           title: 'An error occurred',
