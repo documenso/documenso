@@ -89,7 +89,7 @@ export const ClaimAccount = ({ userName, userEmail }: ClaimAccountProps) => {
   };
 
   return (
-    <div className="w-full">
+    <div className="mt-2 w-full">
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onFormSubmit)}>
           <fieldset disabled={form.formState.isSubmitting} className="mt-4">
@@ -111,7 +111,7 @@ export const ClaimAccount = ({ userName, userEmail }: ClaimAccountProps) => {
               control={form.control}
               render={({ field }) => (
                 <FormItem className="mt-4">
-                  <FormLabel>Email</FormLabel>
+                  <FormLabel>Email address</FormLabel>
                   <FormControl>
                     <Input {...field} value={userEmail} placeholder="Enter your email" />
                   </FormControl>
@@ -124,7 +124,7 @@ export const ClaimAccount = ({ userName, userEmail }: ClaimAccountProps) => {
               control={form.control}
               render={({ field }) => (
                 <FormItem className="mt-4">
-                  <FormLabel>Password</FormLabel>
+                  <FormLabel>Set a password</FormLabel>
                   <FormControl>
                     <PasswordInput {...field} placeholder="Pick a password" />
                   </FormControl>
@@ -133,7 +133,7 @@ export const ClaimAccount = ({ userName, userEmail }: ClaimAccountProps) => {
               )}
             />
 
-            <Button type="submit" className="mt-4 w-full" loading={form.formState.isSubmitting}>
+            <Button type="submit" className="mt-6 w-full" loading={form.formState.isSubmitting}>
               Claim account
             </Button>
           </fieldset>

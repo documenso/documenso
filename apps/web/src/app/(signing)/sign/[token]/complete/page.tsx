@@ -153,7 +153,9 @@ export default async function CompletedSigningPage({
 
         {!isLoggedIn && (
           <div className={`flex max-w-xl flex-col items-center justify-center p-4 md:p-12`}>
-            <h2 className="mt-8 text-center text-xl font-bold md:mt-0">Need to sign documents?</h2>
+            <h2 className="mt-8 text-center text-xl font-semibold md:mt-0">
+              Need to sign documents?
+            </h2>
             <p className="text-muted-foreground/60 mt-4 max-w-[55ch] text-center leading-normal">
               Create your account and start using state-of-the-art document signing.
             </p>
