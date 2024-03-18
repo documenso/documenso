@@ -1,4 +1,3 @@
-import signer from 'node-signpdf';
 import {
   PDFArray,
   PDFDocument,
@@ -8,6 +7,8 @@ import {
   PDFString,
   rectangle,
 } from 'pdf-lib';
+
+import { BYTE_RANGE_PLACEHOLDER } from '../constants/byte-range';
 
 export type AddSigningPlaceholderOptions = {
   pdf: Buffer;
@@ -20,9 +21,9 @@ export const addSigningPlaceholder = async ({ pdf }: AddSigningPlaceholderOption
   const byteRange = PDFArray.withContext(doc.context);
 
   byteRange.push(PDFNumber.of(0));
-  byteRange.push(PDFName.of(signer.byteRangePlaceholder));
-  byteRange.push(PDFName.of(signer.byteRangePlaceholder));
-  byteRange.push(PDFName.of(signer.byteRangePlaceholder));
+  byteRange.push(PDFName.of(BYTE_RANGE_PLACEHOLDER));
+  byteRange.push(PDFName.of(BYTE_RANGE_PLACEHOLDER));
+  byteRange.push(PDFName.of(BYTE_RANGE_PLACEHOLDER));
 
   const signature = doc.context.obj({
     Type: 'Sig',

@@ -22,7 +22,7 @@ const config = {
   output: process.env.DOCKER_OUTPUT ? 'standalone' : undefined,
   experimental: {
     outputFileTracingRoot: path.join(__dirname, '../../'),
-    serverComponentsExternalPackages: ['@node-rs/bcrypt'],
+    serverComponentsExternalPackages: ['@node-rs/bcrypt', '@documenso/pdf-sign'],
     serverActions: {
       bodySizeLimit: '50mb',
     },
