@@ -124,7 +124,7 @@ export const ClaimAccount = ({ userName, userEmail }: ClaimAccountProps) => {
                 <FormItem className="mt-4">
                   <FormLabel>Email address</FormLabel>
                   <FormControl>
-                    <Input {...field} value={userEmail} placeholder="Enter your email" />
+                    <Input {...field} placeholder="Enter your email" />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

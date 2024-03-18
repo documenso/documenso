@@ -14,6 +14,7 @@ import { DocumentStatus, FieldType, RecipientRole } from '@documenso/prisma/clie
 import { DocumentDownloadButton } from '@documenso/ui/components/document/document-download-button';
 import { DocumentShareButton } from '@documenso/ui/components/document/document-share-button';
 import { SigningCard3D } from '@documenso/ui/components/signing-card';
+import { cn } from '@documenso/ui/lib/utils';
 import { Badge } from '@documenso/ui/primitives/badge';
 
 import { truncateTitle } from '~/helpers/truncate-title';
@@ -68,12 +69,12 @@ export default async function CompletedSigningPage({
   return (
     <div className="-mx-4 flex flex-col items-center overflow-x-hidden px-4 pt-24 md:-mx-8 md:px-8 lg:pt-36 xl:pt-44">
       <div
-        className={`relative mt-6 flex w-full ${
-          isLoggedIn ? 'flex-col' : 'flex-col divide-y lg:flex-row lg:divide-x lg:divide-y-0'
-        } items-center justify-center`}
+        className={cn('relative mt-6 flex w-full flex-col items-center justify-center', {
+          'flex-col divide-y lg:flex-row lg:divide-x lg:divide-y-0': !isLoggedIn,
+        })}
       >
         <div
-          className={`flex flex-col items-center ${isLoggedIn ? '' : 'mb-8 p-4 md:mb-0 md:p-12'}`}
+          className={cn('flex flex-col items-center', { 'mb-8 p-4 md:mb-0 md:p-12': !isLoggedIn })}
         >
           <Badge variant="neutral" size="default" className="mb-6 rounded-xl border bg-transparent">
             {truncatedTitle}
