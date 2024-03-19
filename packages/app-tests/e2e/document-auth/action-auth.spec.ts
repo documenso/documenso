@@ -151,7 +151,7 @@ test('[DOCUMENT_AUTH]: should deny signing document when required for global aut
 
   await page.getByRole('button', { name: 'Complete' }).click();
   await expect(page.getByRole('paragraph')).toContainText(
-    'Reauthentication is required to sign the document',
+    'Reauthentication is required to sign this document',
   );
 
   await unseedUser(user.id);
@@ -186,7 +186,7 @@ test('[DOCUMENT_AUTH]: should deny signing fields when required for global auth'
     for (const field of Field) {
       await page.locator(`#field-${field.id}`).getByRole('button').click();
       await expect(page.getByRole('paragraph')).toContainText(
-        'Reauthentication is required to sign the field',
+        'Reauthentication is required to sign this field',
       );
       await page.getByRole('button', { name: 'Cancel' }).click();
     }
@@ -251,7 +251,7 @@ test('[DOCUMENT_AUTH]: should allow field signing when required for recipient au
       for (const field of Field) {
         await page.locator(`#field-${field.id}`).getByRole('button').click();
         await expect(page.getByRole('paragraph')).toContainText(
-          'Reauthentication is required to sign the field',
+          'Reauthentication is required to sign this field',
         );
         await page.getByRole('button', { name: 'Cancel' }).click();
       }
@@ -358,7 +358,7 @@ test('[DOCUMENT_AUTH]: should allow field signing when required for recipient an
       for (const field of Field) {
         await page.locator(`#field-${field.id}`).getByRole('button').click();
         await expect(page.getByRole('paragraph')).toContainText(
-          'Reauthentication is required to sign the field',
+          'Reauthentication is required to sign this field',
         );
         await page.getByRole('button', { name: 'Cancel' }).click();
       }

@@ -31,7 +31,8 @@ export const SignDialog = ({
   onSignatureComplete,
   role,
 }: SignDialogProps) => {
-  const { executeActionAuthProcedure, isAuthRedirectRequired } = useRequiredDocumentAuthContext();
+  const { executeActionAuthProcedure, isAuthRedirectRequired, isCurrentlyAuthenticating } =
+    useRequiredDocumentAuthContext();
 
   const [showDialog, setShowDialog] = useState(false);
   const truncatedTitle = truncateTitle(document.title);
@@ -103,7 +104,7 @@ export const SignDialog = ({
               type="button"
               className="flex-1"
               disabled={!isComplete}
-              loading={isSubmitting}
+              loading={isSubmitting || isCurrentlyAuthenticating}
               onClick={onSignatureComplete}
             >
               {role === RecipientRole.VIEWER && 'Mark as Viewed'}

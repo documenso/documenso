@@ -67,6 +67,13 @@ export const isRecipientAuthorized = async ({
     return true;
   }
 
+  // Create auth options when none are passed for account.
+  if (!authOptions && authMethod === DocumentAuth.ACCOUNT) {
+    authOptions = {
+      type: DocumentAuth.ACCOUNT,
+    };
+  }
+
   // Authentication required does not match provided method.
   if (!authOptions || authOptions.type !== authMethod) {
     return false;

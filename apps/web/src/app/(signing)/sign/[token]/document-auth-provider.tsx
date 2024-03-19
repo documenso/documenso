@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useCallback, useContext, useMemo, useState } from 'react';
+import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 
 import { match } from 'ts-pattern';
 
@@ -113,15 +113,6 @@ export const DocumentAuthProvider = ({
     isError: passkeyQuery.isError,
   };
 
-  const refetchPasskeys = useCallback(async () => {
-    const { data } = await passkeyQuery.refetch();
-
-    if (!preferredPasskeyId && data && data.data.length > 0) {
-      setPreferredPasskeyId(data.data[0].id);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [preferredPasskeyId]);
-
   const [documentAuthDialogPayload, setDocumentAuthDialogPayload] =
     useState<ExecuteActionAuthProcedureOptions | null>(null);
 
@@ -168,10 +159,24 @@ export const DocumentAuthProvider = ({
     });
   };
 
+  useEffect(() => {
+    const { passkeys } = passkeyData;
+
+    if (!preferredPasskeyId && passkeys.length > 0) {
+      setPreferredPasskeyId(passkeys[0].id);
+    }
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [passkeyData.passkeys]);
+
   const isAuthRedirectRequired = Boolean(
     DOCUMENT_AUTH_TYPES[derivedRecipientActionAuth || '']?.isAuthRedirectRequired &&
       !preCalculatedActionAuthOptions,
   );
+
+  const refetchPasskeys = async () => {
+    await passkeyQuery.refetch();
+  };
 
   return (
     <DocumentAuthContext.Provider
