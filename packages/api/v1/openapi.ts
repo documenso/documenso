@@ -2,7 +2,7 @@ import { generateOpenApi } from '@ts-rest/open-api';
 
 import { ApiContractV1 } from './contract';
 
-export const OpenAPIV1 = generateOpenApi(
+const generatedOpenApi = generateOpenApi(
   ApiContractV1,
   {
     info: {
@@ -15,3 +15,21 @@ export const OpenAPIV1 = generateOpenApi(
     setOperationId: true,
   },
 );
+
+export const OpenAPIV1 = {
+  ...generatedOpenApi,
+  components: {
+    securitySchemes: {
+      authorization: {
+        type: 'apiKey',
+        in: 'header',
+        name: 'Authorization',
+      },
+    },
+  },
+  security: [
+    {
+      authorization: [],
+    },
+  ],
+};
