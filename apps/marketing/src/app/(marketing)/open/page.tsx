@@ -164,7 +164,7 @@ export default async function OpenPage() {
           </p>
         </div>
 
-        <div className="mt-12 grid grid-cols-12 gap-8">
+        <div className="my-12 grid grid-cols-12 gap-8">
           <div className="col-span-12 grid grid-cols-4 gap-4">
             <MetricCard
               className="col-span-2 lg:col-span-1"
@@ -191,20 +191,17 @@ export default async function OpenPage() {
           <TeamMembers className="col-span-12" />
 
           <SalaryBands className="col-span-12" />
+        </div>
 
+        <h2 className="px-4 text-2xl font-semibold">Finances</h2>
+        <div className="mb-12 mt-4 grid grid-cols-12 gap-8">
           <FundingRaised data={FUNDING_RAISED} className="col-span-12 lg:col-span-6" />
 
           <CapTable className="col-span-12 lg:col-span-6" />
+        </div>
 
-          <BarMetric<EarlyAdoptersType>
-            data={EARLY_ADOPTERS_DATA}
-            metricKey="earlyAdopters"
-            title="Early Adopters"
-            label="Early Adopters"
-            className="col-span-12 lg:col-span-6"
-            extraInfo={<OpenPageTooltip />}
-          />
-
+        <h2 className="px-4 text-2xl font-semibold">Community</h2>
+        <div className="mb-12 mt-4 grid grid-cols-12 gap-8">
           <BarMetric<StargazersType>
             data={STARGAZERS_DATA}
             metricKey="stars"
@@ -240,6 +237,20 @@ export default async function OpenPage() {
             className="col-span-12 lg:col-span-6"
           />
 
+          <Typefully className="col-span-12 lg:col-span-6" />
+        </div>
+
+        <h2 className="px-4 text-2xl font-semibold">Growth</h2>
+        <div className="mb-12 mt-4 grid grid-cols-12 gap-8">
+          <BarMetric<EarlyAdoptersType>
+            data={EARLY_ADOPTERS_DATA}
+            metricKey="earlyAdopters"
+            title="Early Adopters"
+            label="Early Adopters"
+            className="col-span-12 lg:col-span-6"
+            extraInfo={<OpenPageTooltip />}
+          />
+
           <MonthlyTotalUsersChart data={MONTHLY_USERS} className="col-span-12 lg:col-span-6" />
           <MonthlyNewUsersChart data={MONTHLY_USERS} className="col-span-12 lg:col-span-6" />
 
@@ -247,18 +258,16 @@ export default async function OpenPage() {
             data={MONTHLY_COMPLETED_DOCUMENTS}
             className="col-span-12 lg:col-span-6"
           />
-
-          <Typefully className="col-span-12 lg:col-span-6" />
-
-          <div className="col-span-12 mt-12 flex flex-col items-center justify-center">
-            <h2 className="text-2xl font-bold">Where's the rest?</h2>
-
-            <p className="text-muted-foreground mt-4 max-w-[55ch] text-center text-lg leading-normal">
-              We're still working on getting all our metrics together. We'll update this page as
-              soon as we have more to share.
-            </p>
-          </div>
         </div>
+      </div>
+
+      <div className="col-span-12 mt-12 flex flex-col items-center justify-center">
+        <h2 className="text-2xl font-bold">Where's the rest?</h2>
+
+        <p className="text-muted-foreground mt-4 max-w-[55ch] text-center text-lg leading-normal">
+          We're still working on getting all our metrics together. We'll update this page as soon as
+          we have more to share.
+        </p>
       </div>
 
       <CallToAction className="mt-12" utmSource="open-page" />
