@@ -262,10 +262,10 @@ export default async function OpenPage() {
       </div>
 
       <div className="col-span-12 mt-12 flex flex-col items-center justify-center">
-        <h2 className="text-2xl font-bold">Where's the rest?</h2>
+        <h2 className="text-2xl font-bold">Is there more?</h2>
 
         <p className="text-muted-foreground mt-4 max-w-[55ch] text-center text-lg leading-normal">
-          We're still working on getting all our metrics together. We'll update this page as soon as
+          This page is evolving as we learn what makes a great signing company. We'll update it when
           we have more to share.
         </p>
       </div>
