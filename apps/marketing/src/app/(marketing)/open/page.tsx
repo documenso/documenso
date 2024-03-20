@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 
 import { z } from 'zod';
 
+import { getCompletedDocumentsMonthly } from '@documenso/lib/server-only/user/get-monthly-completed-document';
 import { getUserMonthlyGrowth } from '@documenso/lib/server-only/user/get-user-monthly-growth';
 
 import { FUNDING_RAISED } from '~/app/(marketing)/open/data';
@@ -12,6 +13,7 @@ import { CallToAction } from '~/components/(marketing)/call-to-action';
 import { BarMetric } from './bar-metrics';
 import { CapTable } from './cap-table';
 import { FundingRaised } from './funding-raised';
+import { MonthlyCompletedDocumentsChart } from './monthly-completed-documents-chart copy';
 import { MonthlyNewUsersChart } from './monthly-new-users-chart';
 import { MonthlyTotalUsersChart } from './monthly-total-users-chart';
 import { TeamMembers } from './team-members';
@@ -140,6 +142,7 @@ export default async function OpenPage() {
   ]);
 
   const MONTHLY_USERS = await getUserMonthlyGrowth();
+  const MONTHLY_COMPLETED_DOCUMENTS = await getCompletedDocumentsMonthly();
 
   return (
     <div>
@@ -239,6 +242,11 @@ export default async function OpenPage() {
 
           <MonthlyTotalUsersChart data={MONTHLY_USERS} className="col-span-12 lg:col-span-6" />
           <MonthlyNewUsersChart data={MONTHLY_USERS} className="col-span-12 lg:col-span-6" />
+
+          <MonthlyCompletedDocumentsChart
+            data={MONTHLY_COMPLETED_DOCUMENTS}
+            className="col-span-12 lg:col-span-6"
+          />
 
           <Typefully className="col-span-12 lg:col-span-6" />
 
