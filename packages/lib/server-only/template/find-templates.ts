@@ -37,6 +37,12 @@ export const findTemplates = async ({
       where: whereFilter,
       include: {
         templateDocumentData: true,
+        team: {
+          select: {
+            id: true,
+            url: true,
+          },
+        },
         Field: true,
         Recipient: true,
       },
