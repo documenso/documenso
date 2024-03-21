@@ -3,7 +3,6 @@ import type { HTMLAttributes } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 
-import { StatusWidget } from '@openstatus/react';
 import { FaXTwitter } from 'react-icons/fa6';
 import { LiaDiscord } from 'react-icons/lia';
 import { LuGithub } from 'react-icons/lu';
@@ -11,6 +10,8 @@ import { LuGithub } from 'react-icons/lu';
 import LogoImage from '@documenso/assets/logo.png';
 import { cn } from '@documenso/ui/lib/utils';
 import { ThemeSwitcher } from '@documenso/ui/primitives/theme-switcher';
+
+import { StatusWidget } from './status-widget';
 
 export type FooterProps = HTMLAttributes<HTMLDivElement>;
 
@@ -63,7 +64,7 @@ export const Footer = ({ className, ...props }: FooterProps) => {
           </div>
 
           <div className="mt-6">
-            <StatusWidget slug="documenso" href="https://status.documenso.com" />
+            <StatusWidget />
           </div>
         </div>
 
