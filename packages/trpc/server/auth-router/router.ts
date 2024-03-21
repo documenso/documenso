@@ -1,5 +1,6 @@
 import type { RegistrationResponseJSON } from '@simplewebauthn/types';
 import { TRPCError } from '@trpc/server';
+import { parse } from 'cookie-es';
 import { env } from 'next-runtime-env';
 
 import { IS_BILLING_ENABLED } from '@documenso/lib/constants/app';
@@ -131,15 +132,13 @@ export const authRouter = router({
   }),
 
   createPasskeySigninOptions: procedure.mutation(async ({ ctx }) => {
-    const cookie = ctx.req.headers.cookie ?? '';
-
-    const sessionIdToken = cookie?.split(';').find((c) => c.includes('next-auth.csrf-token'));
+    const sessionIdToken = parse(ctx.req.headers.cookie ?? '')['next-auth.csrf-token'];
 
     if (!sessionIdToken) {
       throw new Error('Missing CSRF token');
     }
 
-    const sessionId = decodeURI(sessionIdToken.split('=')[1]).split('|')[0];
+    const sessionId = decodeURI(sessionIdToken).split('|')[0];
 
     try {
       return await createPasskeySigninOptions({ sessionId });

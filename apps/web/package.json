@@ -25,6 +25,7 @@
     "@simplewebauthn/browser": "^9.0.1",
     "@simplewebauthn/server": "^9.0.3",
     "@tanstack/react-query": "^4.29.5",
+    "cookie-es": "^1.0.0",
     "formidable": "^2.1.1",
     "framer-motion": "^10.12.8",
     "lucide-react": "^0.279.0",

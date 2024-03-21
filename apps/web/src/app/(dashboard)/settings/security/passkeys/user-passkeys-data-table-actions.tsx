@@ -172,29 +172,27 @@ export const UserPasskeysDataTableActions = ({
             </DialogDescription>
           </DialogHeader>
 
-          <form
-            onSubmit={(e) => {
-              e.preventDefault();
-
-              void deletePasskey({
-                passkeyId,
-              });
-            }}
-          >
-            <fieldset className="flex h-full flex-col space-y-4" disabled={isDeletingPasskey}>
-              <DialogFooter>
-                <DialogClose asChild>
-                  <Button type="button" variant="secondary">
-                    Cancel
-                  </Button>
-                </DialogClose>
-
-                <Button type="submit" variant="destructive" loading={isDeletingPasskey}>
-                  Delete
+          <fieldset disabled={isDeletingPasskey}>
+            <DialogFooter>
+              <DialogClose asChild>
+                <Button type="button" variant="secondary">
+                  Cancel
                 </Button>
-              </DialogFooter>
-            </fieldset>
-          </form>
+              </DialogClose>
+
+              <Button
+                onClick={async () =>
+                  deletePasskey({
+                    passkeyId,
+                  })
+                }
+                variant="destructive"
+                loading={isDeletingPasskey}
+              >
+                Delete
+              </Button>
+            </DialogFooter>
+          </fieldset>
         </DialogContent>
       </Dialog>
     </div>
