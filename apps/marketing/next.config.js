@@ -21,6 +21,7 @@ const FONT_CAVEAT_BYTES = fs.readFileSync(
 const config = {
   experimental: {
     outputFileTracingRoot: path.join(__dirname, '../../'),
+    serverComponentsExternalPackages: ['@node-rs/bcrypt', '@documenso/pdf-sign'],
     serverActions: {
       bodySizeLimit: '50mb',
     },

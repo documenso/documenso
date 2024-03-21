@@ -27,15 +27,16 @@ export const ClaimProfileAlertDialog = ({ className, user }: ClaimProfileAlertDi
         variant="neutral"
       >
         <div>
-          <AlertTitle>Claim your profile</AlertTitle>
+          <AlertTitle>{user.url ? 'Update your profile' : 'Claim your profile'}</AlertTitle>
           <AlertDescription className="mr-2">
-            Profiles are coming soon! Claim your profile username now to reserve your corner of the
-            signing revolution.
+            {user.url
+              ? 'Profiles are coming soon! Update your profile username to reserve your corner of the signing revolution.'
+              : 'Profiles are coming soon! Claim your profile username now to reserve your corner of the signing revolution.'}
           </AlertDescription>
         </div>
 
         <div className="flex-shrink-0">
-          <Button onClick={() => setOpen(true)}>Claim Now</Button>
+          <Button onClick={() => setOpen(true)}>{user.url ? 'Update Now' : 'Claim Now'}</Button>
         </div>
       </Alert>
 

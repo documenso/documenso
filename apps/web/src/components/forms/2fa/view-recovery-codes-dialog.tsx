@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
@@ -91,6 +91,13 @@ export const ViewRecoveryCodesDialog = ({ open, onOpenChange }: ViewRecoveryCode
       });
     }
   };
+
+  useEffect(() => {
+    // Reset the form when the Dialog closes
+    if (!open) {
+      viewRecoveryCodesForm.reset();
+    }
+  }, [open, viewRecoveryCodesForm]);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>

@@ -42,6 +42,8 @@
     --ring: 95.08 71.08% 67.45%;
 
     --radius: 0.5rem;
+
+    --warning: 54 96% 45%;
   }
 
   .dark {
@@ -79,12 +81,19 @@
     --ring: 95.08 71.08% 67.45%;
 
     --radius: 0.5rem;
+
+    --warning: 54 96% 45%;
   }
 }
 
 @layer base {
   * {
     @apply border-border;
+  }
+
+  html,
+  body {
+    scrollbar-gutter: stable;
   }
 
   body {
@@ -119,4 +128,13 @@
 
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
   background: rgb(100 116 139 / 0.5);
+}
+
+ /* Custom Swagger Dark Theme */
+.swagger-dark-theme .swagger-ui {
+  filter: invert(88%) hue-rotate(180deg);
+}
+
+.swagger-dark-theme .swagger-ui .microlight {
+  filter: invert(100%) hue-rotate(180deg);
 }
