@@ -1,10 +1,9 @@
-'use client';
-
 import type { HTMLAttributes } from 'react';
 
 import Image from 'next/image';
 import Link from 'next/link';
 
+import { StatusWidget } from '@openstatus/react';
 import { FaXTwitter } from 'react-icons/fa6';
 import { LiaDiscord } from 'react-icons/lia';
 import { LuGithub } from 'react-icons/lu';
@@ -61,6 +60,10 @@ export const Footer = ({ className, ...props }: FooterProps) => {
                 {link.icon}
               </Link>
             ))}
+          </div>
+
+          <div className="mt-6">
+            <StatusWidget slug="documenso" href="https://status.documenso.com" />
           </div>
         </div>
 
