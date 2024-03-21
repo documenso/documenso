@@ -22,7 +22,7 @@ export const TotalSignedDocumentsChart = ({ className, data }: TotalSignedDocume
     <div className={className}>
       <div className="border-border flex flex-col justify-center rounded-2xl border p-6 pl-2 shadow-sm hover:shadow">
         <div className="mb-6 flex px-4">
-          <h3 className="text-lg font-semibold">Total Signed Documents</h3>
+          <h3 className="text-lg font-semibold">Total Completed Documents</h3>
         </div>
 
         <ResponsiveContainer width="100%" height={400}>
@@ -34,7 +34,10 @@ export const TotalSignedDocumentsChart = ({ className, data }: TotalSignedDocume
               labelStyle={{
                 color: 'hsl(var(--primary-foreground))',
               }}
-              formatter={(value) => [Number(value).toLocaleString('en-US'), 'Signed Documents']}
+              formatter={(value) => [
+                Number(value).toLocaleString('en-US'),
+                'Total Completed Documents',
+              ]}
               cursor={{ fill: 'hsl(var(--primary) / 10%)' }}
             />
 
@@ -43,7 +46,7 @@ export const TotalSignedDocumentsChart = ({ className, data }: TotalSignedDocume
               fill="hsl(var(--primary))"
               radius={[4, 4, 0, 0]}
               maxBarSize={60}
-              label="Signed Documents"
+              label="Total Completed Documents"
             />
           </BarChart>
         </ResponsiveContainer>
