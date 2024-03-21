@@ -6,15 +6,12 @@ import { Bar, BarChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recha
 import type { GetUserMonthlyGrowthResult } from '@documenso/lib/server-only/user/get-user-monthly-growth';
 import { cn } from '@documenso/ui/lib/utils';
 
-export type MonthlyCompletedDocumentsChartProps = {
+export type TotalSignedDocumentsChartProps = {
   className?: string;
   data: GetUserMonthlyGrowthResult;
 };
 
-export const MonthlyCompletedDocumentsChart = ({
-  className,
-  data,
-}: MonthlyCompletedDocumentsChartProps) => {
+export const TotalSignedDocumentsChart = ({ className, data }: TotalSignedDocumentsChartProps) => {
   const formattedData = [...data].reverse().map(({ month, cume_count: count }) => {
     return {
       month: DateTime.fromFormat(month, 'yyyy-MM').toFormat('LLLL'),
@@ -25,7 +22,7 @@ export const MonthlyCompletedDocumentsChart = ({
   return (
     <div className={cn('flex flex-col', className)}>
       <div className="flex items-center px-4">
-        <h3 className="text-lg font-semibold">Completed Documents per Month</h3>
+        <h3 className="text-lg font-semibold">Total Signed Documents</h3>
       </div>
 
       <div className="border-border mt-2.5 flex flex-1 items-center justify-center rounded-2xl border p-6 pl-2 pt-12 shadow-sm hover:shadow">
@@ -38,7 +35,7 @@ export const MonthlyCompletedDocumentsChart = ({
               labelStyle={{
                 color: 'hsl(var(--primary-foreground))',
               }}
-              formatter={(value) => [Number(value).toLocaleString('en-US'), 'Completed Documents']}
+              formatter={(value) => [Number(value).toLocaleString('en-US'), 'Signed Documents']}
               cursor={{ fill: 'hsl(var(--primary) / 10%)' }}
             />
 
@@ -47,7 +44,7 @@ export const MonthlyCompletedDocumentsChart = ({
               fill="hsl(var(--primary))"
               radius={[4, 4, 0, 0]}
               maxBarSize={60}
-              label="Completed Documents"
+              label="Signed Documents"
             />
           </BarChart>
         </ResponsiveContainer>

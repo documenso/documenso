@@ -6,8 +6,6 @@ import { getCompletedDocumentsMonthly } from '@documenso/lib/server-only/user/ge
 import { getUserMonthlyGrowth } from '@documenso/lib/server-only/user/get-user-monthly-growth';
 
 import { FUNDING_RAISED } from '~/app/(marketing)/open/data';
-import { MetricCard } from '~/app/(marketing)/open/metric-card';
-import { SalaryBands } from '~/app/(marketing)/open/salary-bands';
 import { CallToAction } from '~/components/(marketing)/call-to-action';
 
 import { BarMetric } from './bar-metrics';
@@ -16,8 +14,10 @@ import { FundingRaised } from './funding-raised';
 import { MonthlyCompletedDocumentsChart } from './monthly-completed-documents-chart';
 import { MonthlyNewUsersChart } from './monthly-new-users-chart';
 import { MonthlyTotalUsersChart } from './monthly-total-users-chart';
+import { SalaryBands } from './salary-bands';
 import { TeamMembers } from './team-members';
 import { OpenPageTooltip } from './tooltip';
+import { TotalSignedDocumentsChart } from './total-signed-documents-chart';
 import { Typefully } from './typefully';
 
 export const metadata: Metadata = {
@@ -128,17 +128,17 @@ const fetchEarlyAdopters = async () => {
 
 export default async function OpenPage() {
   const [
-    { forks_count: forksCount, stargazers_count: stargazersCount },
-    { total_count: openIssues },
-    { total_count: mergedPullRequests },
+    // { forks_count: forksCount, stargazers_count: stargazersCount },
+    // { total_count: openIssues },
+    // { total_count: mergedPullRequests },
     STARGAZERS_DATA,
     EARLY_ADOPTERS_DATA,
     MONTHLY_USERS,
     MONTHLY_COMPLETED_DOCUMENTS,
   ] = await Promise.all([
-    fetchGithubStats(),
-    fetchOpenIssues(),
-    fetchMergedPullRequests(),
+    // fetchGithubStats(),
+    // fetchOpenIssues(),
+    // fetchMergedPullRequests(),
     fetchStargazers(),
     fetchEarlyAdopters(),
     getUserMonthlyGrowth(),
@@ -166,7 +166,7 @@ export default async function OpenPage() {
         </div>
 
         <div className="my-12 grid grid-cols-12 gap-8">
-          <div className="col-span-12 grid grid-cols-4 gap-4">
+          {/* <div className="col-span-12 grid grid-cols-4 gap-4">
             <MetricCard
               className="col-span-2 lg:col-span-1"
               title="Stargazers"
@@ -187,7 +187,7 @@ export default async function OpenPage() {
               title="Merged PR's"
               value={mergedPullRequests.toLocaleString('en-US')}
             />
-          </div>
+          </div> */}
 
           <TeamMembers className="col-span-12" />
 
@@ -256,6 +256,10 @@ export default async function OpenPage() {
           <MonthlyNewUsersChart data={MONTHLY_USERS} className="col-span-12 lg:col-span-6" />
 
           <MonthlyCompletedDocumentsChart
+            data={MONTHLY_COMPLETED_DOCUMENTS}
+            className="col-span-12 lg:col-span-6"
+          />
+          <TotalSignedDocumentsChart
             data={MONTHLY_COMPLETED_DOCUMENTS}
             className="col-span-12 lg:col-span-6"
           />
