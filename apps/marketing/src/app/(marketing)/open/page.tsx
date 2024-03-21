@@ -11,6 +11,7 @@ import { CallToAction } from '~/components/(marketing)/call-to-action';
 import { BarMetric } from './bar-metrics';
 import { CapTable } from './cap-table';
 import { FundingRaised } from './funding-raised';
+import { MetricCard } from './metric-card';
 import { MonthlyCompletedDocumentsChart } from './monthly-completed-documents-chart';
 import { MonthlyNewUsersChart } from './monthly-new-users-chart';
 import { MonthlyTotalUsersChart } from './monthly-total-users-chart';
@@ -128,17 +129,17 @@ const fetchEarlyAdopters = async () => {
 
 export default async function OpenPage() {
   const [
-    // { forks_count: forksCount, stargazers_count: stargazersCount },
-    // { total_count: openIssues },
-    // { total_count: mergedPullRequests },
+    { forks_count: forksCount, stargazers_count: stargazersCount },
+    { total_count: openIssues },
+    { total_count: mergedPullRequests },
     STARGAZERS_DATA,
     EARLY_ADOPTERS_DATA,
     MONTHLY_USERS,
     MONTHLY_COMPLETED_DOCUMENTS,
   ] = await Promise.all([
-    // fetchGithubStats(),
-    // fetchOpenIssues(),
-    // fetchMergedPullRequests(),
+    fetchGithubStats(),
+    fetchOpenIssues(),
+    fetchMergedPullRequests(),
     fetchStargazers(),
     fetchEarlyAdopters(),
     getUserMonthlyGrowth(),
@@ -166,7 +167,7 @@ export default async function OpenPage() {
         </div>
 
         <div className="my-12 grid grid-cols-12 gap-8">
-          {/* <div className="col-span-12 grid grid-cols-4 gap-4">
+          <div className="col-span-12 grid grid-cols-4 gap-4">
             <MetricCard
               className="col-span-2 lg:col-span-1"
               title="Stargazers"
@@ -187,7 +188,7 @@ export default async function OpenPage() {
               title="Merged PR's"
               value={mergedPullRequests.toLocaleString('en-US')}
             />
-          </div> */}
+          </div>
 
           <TeamMembers className="col-span-12" />
 
@@ -206,7 +207,7 @@ export default async function OpenPage() {
           <BarMetric<StargazersType>
             data={STARGAZERS_DATA}
             metricKey="stars"
-            title="Github: Total Stars"
+            title="GitHub: Total Stars"
             label="Stars"
             className="col-span-12 lg:col-span-6"
           />
@@ -214,27 +215,27 @@ export default async function OpenPage() {
           <BarMetric<StargazersType>
             data={STARGAZERS_DATA}
             metricKey="mergedPRs"
-            title="Github: Total Merged PRs"
+            title="GitHub: Total Merged PRs"
             label="Merged PRs"
-            chartHeight={300}
+            chartHeight={400}
             className="col-span-12 lg:col-span-6"
           />
 
           <BarMetric<StargazersType>
             data={STARGAZERS_DATA}
             metricKey="forks"
-            title="Github: Total Forks"
+            title="GitHub: Total Forks"
             label="Forks"
-            chartHeight={300}
+            chartHeight={400}
             className="col-span-12 lg:col-span-6"
           />
 
           <BarMetric<StargazersType>
             data={STARGAZERS_DATA}
             metricKey="openIssues"
-            title="Github: Total Open Issues"
+            title="GitHub: Total Open Issues"
             label="Open Issues"
-            chartHeight={300}
+            chartHeight={400}
             className="col-span-12 lg:col-span-6"
           />
 
