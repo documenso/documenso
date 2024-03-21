@@ -29,7 +29,13 @@ export default defineConfig({
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: 'on-first-retry',
 
-    video: 'retain-on-failure',
+    // BEFORE MERGE:      video: 'retain-on-failure',
+    video: 'on',
+
+    // REMOVE BEFORE MERGE
+    launchOptions: {
+      slowMo: 500,
+    },
   },
 
   timeout: 30_000,
