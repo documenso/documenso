@@ -47,7 +47,7 @@ export const MonthlyCompletedDocumentsChart = ({
               fill="hsl(var(--primary))"
               radius={[4, 4, 0, 0]}
               maxBarSize={60}
-              label="Total Users"
+              label="Monthly Completed Documents"
             />
           </BarChart>
         </ResponsiveContainer>

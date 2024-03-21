@@ -13,7 +13,7 @@ import { CallToAction } from '~/components/(marketing)/call-to-action';
 import { BarMetric } from './bar-metrics';
 import { CapTable } from './cap-table';
 import { FundingRaised } from './funding-raised';
-import { MonthlyCompletedDocumentsChart } from './monthly-completed-documents-chart copy';
+import { MonthlyCompletedDocumentsChart } from './monthly-completed-documents-chart';
 import { MonthlyNewUsersChart } from './monthly-new-users-chart';
 import { MonthlyTotalUsersChart } from './monthly-total-users-chart';
 import { TeamMembers } from './team-members';
@@ -133,16 +133,17 @@ export default async function OpenPage() {
     { total_count: mergedPullRequests },
     STARGAZERS_DATA,
     EARLY_ADOPTERS_DATA,
+    MONTHLY_USERS,
+    MONTHLY_COMPLETED_DOCUMENTS,
   ] = await Promise.all([
     fetchGithubStats(),
     fetchOpenIssues(),
     fetchMergedPullRequests(),
     fetchStargazers(),
     fetchEarlyAdopters(),
+    getUserMonthlyGrowth(),
+    getCompletedDocumentsMonthly(),
   ]);
-
-  const MONTHLY_USERS = await getUserMonthlyGrowth();
-  const MONTHLY_COMPLETED_DOCUMENTS = await getCompletedDocumentsMonthly();
 
   return (
     <div>
