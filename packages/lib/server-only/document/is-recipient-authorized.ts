@@ -26,7 +26,7 @@ type IsRecipientAuthorizedOptions = {
   authOptions?: TDocumentAuthMethods;
 };
 
-const getRecipient = async (email: string) => {
+const getUserByEmail = async (email: string) => {
   return await prisma.user.findFirst({
     where: {
       email,
@@ -74,7 +74,7 @@ export const isRecipientAuthorized = async ({
         return false;
       }
 
-      const recipientUser = await getRecipient(recipient.email);
+      const recipientUser = await getUserByEmail(recipient.email);
 
       if (!recipientUser) {
         return false;

@@ -136,7 +136,7 @@ export const EditDocumentForm = ({
 
       toast({
         title: 'Error',
-        description: 'An error occurred while updating the general settings.',
+        description: 'An error occurred while updating the document settings.',
         variant: 'destructive',
       });
     }
