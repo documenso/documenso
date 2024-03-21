@@ -1,6 +1,7 @@
 /// <reference types="../types/next-auth.d.ts" />
-import { PrismaAdapter } from '@next-auth/prisma-adapter';
+import { KyselyAdapter } from '@auth/kysely-adapter';
 import { compare } from '@node-rs/bcrypt';
+import { Kysely, PostgresDialect } from 'kysely';
 import { DateTime } from 'luxon';
 import type { AuthOptions, Session, User } from 'next-auth';
 import type { JWT } from 'next-auth/jwt';
@@ -8,9 +9,11 @@ import CredentialsProvider from 'next-auth/providers/credentials';
 import type { GoogleProfile } from 'next-auth/providers/google';
 import GoogleProvider from 'next-auth/providers/google';
 import { env } from 'next-runtime-env';
+import { Pool } from 'pg';
 
 import { prisma } from '@documenso/prisma';
 import { IdentityProvider, UserSecurityAuditLogType } from '@documenso/prisma/client';
+import type { DB } from '@documenso/prisma/generated/types.js';
 
 import { isTwoFactorAuthenticationEnabled } from '../server-only/2fa/is-2fa-availble';
 import { validateTwoFactorAuthentication } from '../server-only/2fa/validate-2fa';
@@ -20,8 +23,18 @@ import { sendConfirmationToken } from '../server-only/user/send-confirmation-tok
 import { extractNextAuthRequestMetadata } from '../universal/extract-request-metadata';
 import { ErrorCode } from './error-codes';
 
+// move this from here
+const db = new Kysely<DB>({
+  dialect: new PostgresDialect({
+    pool: new Pool({
+      connectionString: process.env.DATABASE_URL,
+    }),
+  }),
+});
+
 export const NEXT_AUTH_OPTIONS: AuthOptions = {
-  adapter: PrismaAdapter(prisma),
+  //@ts-expect-error - https://github.com/nextauthjs/next-auth/issues/8660
+  adapter: KyselyAdapter(db),
   secret: process.env.NEXTAUTH_SECRET ?? 'secret',
   session: {
     strategy: 'jwt',
