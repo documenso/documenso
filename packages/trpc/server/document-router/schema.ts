@@ -29,6 +29,15 @@ export const ZGetDocumentByTokenQuerySchema = z.object({
 
 export type TGetDocumentByTokenQuerySchema = z.infer<typeof ZGetDocumentByTokenQuerySchema>;
 
+export const ZGetDocumentWithDetailsByIdQuerySchema = z.object({
+  id: z.number().min(1),
+  teamId: z.number().min(1).optional(),
+});
+
+export type TGetDocumentWithDetailsByIdQuerySchema = z.infer<
+  typeof ZGetDocumentWithDetailsByIdQuerySchema
+>;
+
 export const ZCreateDocumentMutationSchema = z.object({
   title: z.string().min(1),
   documentDataId: z.string().min(1),

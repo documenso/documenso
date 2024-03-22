@@ -1,18 +1,13 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { useRouter, useSearchParams } from 'next/navigation';
 
-import {
-  type DocumentData,
-  type DocumentMeta,
-  DocumentStatus,
-  type Field,
-  type Recipient,
-  type User,
-} from '@documenso/prisma/client';
-import type { DocumentWithData } from '@documenso/prisma/types/document-with-data';
+import { useQueryClient } from '@tanstack/react-query';
+
+import { DocumentStatus } from '@documenso/prisma/client';
+import type { DocumentWithDetails } from '@documenso/prisma/types/document';
 import { trpc } from '@documenso/trpc/react';
 import { cn } from '@documenso/ui/lib/utils';
 import { Card, CardContent } from '@documenso/ui/primitives/card';
@@ -34,12 +29,7 @@ import { useOptionalCurrentTeam } from '~/providers/team';
 
 export type EditDocumentFormProps = {
   className?: string;
-  user: User;
-  document: DocumentWithData;
-  recipients: Recipient[];
-  documentMeta: DocumentMeta | null;
-  fields: Field[];
-  documentData: DocumentData;
+  initialDocument: DocumentWithDetails;
   documentRootPath: string;
 };
 
@@ -48,12 +38,7 @@ const EditDocumentSteps: EditDocumentStep[] = ['title', 'signers', 'fields', 'su
 
 export const EditDocumentForm = ({
   className,
-  document,
-  recipients,
-  fields,
-  documentMeta,
-  user: _user,
-  documentData,
+  initialDocument,
   documentRootPath,
 }: EditDocumentFormProps) => {
   const { toast } = useToast();
@@ -61,6 +46,33 @@ export const EditDocumentForm = ({
   const router = useRouter();
   const searchParams = useSearchParams();
   const team = useOptionalCurrentTeam();
+  const queryClient = useQueryClient();
+
+  const queryKey = [
+    ['document', 'getDocumentWithDetailsById'],
+    {
+      input: { id: initialDocument.id, teamId: team?.id },
+      type: 'query',
+    },
+  ];
+
+  const { data: document, refetch: refetchDocument } =
+    trpc.document.getDocumentWithDetailsById.useQuery(
+      {
+        id: initialDocument.id,
+        teamId: team?.id,
+      },
+      {
+        initialData: initialDocument,
+        trpc: {
+          context: {
+            skipBatch: true,
+          },
+        },
+      },
+    );
+
+  const { Recipient: recipients, Field: fields } = document;
 
   const { mutateAsync: addTitle } = trpc.document.setTitleForDocument.useMutation();
   const { mutateAsync: addFields } = trpc.field.addFields.useMutation();
@@ -112,13 +124,18 @@ export const EditDocumentForm = ({
 
   const onAddTitleFormSubmit = async (data: TAddTitleFormSchema) => {
     try {
-      // Custom invocation server action
-      await addTitle({
+      const updatedDocument = await addTitle({
         documentId: document.id,
         teamId: team?.id,
         title: data.title,
       });
 
+      queryClient.setQueryData<DocumentWithDetails>(queryKey, (oldData) => ({
+        ...(initialDocument || oldData),
+        ...updatedDocument,
+      }));
+
+      // Router refresh is here to clear the router cache for when navigating to /documents.
       router.refresh();
 
       setStep('signers');
@@ -135,14 +152,20 @@ export const EditDocumentForm = ({
 
   const onAddSignersFormSubmit = async (data: TAddSignersFormSchema) => {
     try {
-      // Custom invocation server action
-      await addSigners({
+      const updatedRecipients = await addSigners({
         documentId: document.id,
         teamId: team?.id,
         signers: data.signers,
       });
 
+      queryClient.setQueryData<DocumentWithDetails>(queryKey, (oldData) => ({
+        ...(initialDocument || oldData),
+        Recipient: updatedRecipients,
+      }));
+
+      // Router refresh is here to clear the router cache for when navigating to /documents.
       router.refresh();
+
       setStep('fields');
     } catch (err) {
       console.error(err);
@@ -157,13 +180,19 @@ export const EditDocumentForm = ({
 
   const onAddFieldsFormSubmit = async (data: TAddFieldsFormSchema) => {
     try {
-      // Custom invocation server action
-      await addFields({
+      const updatedFields = await addFields({
         documentId: document.id,
         fields: data.fields,
       });
 
+      queryClient.setQueryData<DocumentWithDetails>(queryKey, (oldData) => ({
+        ...(initialDocument || oldData),
+        Field: updatedFields,
+      }));
+
+      // Router refresh is here to clear the router cache for when navigating to /documents.
       router.refresh();
+
       setStep('subject');
     } catch (err) {
       console.error(err);
@@ -219,6 +248,15 @@ export const EditDocumentForm = ({
 
   const currentDocumentFlow = documentFlow[step];
 
+  /**
+   * Refresh the data in the background when steps change.
+   */
+  useEffect(() => {
+    void refetchDocument();
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [step]);
+
   return (
     <div className={cn('grid w-full grid-cols-12 gap-8', className)}>
       <Card
@@ -227,10 +265,10 @@ export const EditDocumentForm = ({
       >
         <CardContent className="p-2">
           <LazyPDFViewer
-            key={documentData.id}
-            documentData={documentData}
+            key={document.documentData.id}
+            documentData={document.documentData}
             document={document}
-            password={documentMeta?.password}
+            password={document.documentMeta?.password}
             onPasswordSubmit={onPasswordSubmit}
           />
         </CardContent>

@@ -6,6 +6,7 @@ import {
   diffRecipientChanges,
 } from '@documenso/lib/utils/document-audit-logs';
 import { prisma } from '@documenso/prisma';
+import type { Recipient } from '@documenso/prisma/client';
 import { RecipientRole } from '@documenso/prisma/client';
 import { SendStatus, SigningStatus } from '@documenso/prisma/client';
 
@@ -28,7 +29,7 @@ export const setRecipientsForDocument = async ({
   documentId,
   recipients,
   requestMetadata,
-}: SetRecipientsForDocumentOptions) => {
+}: SetRecipientsForDocumentOptions): Promise<Recipient[]> => {
   const document = await prisma.document.findFirst({
     where: {
       id: documentId,
@@ -226,5 +227,17 @@ export const setRecipientsForDocument = async ({
     });
   }
 
-  return persistedRecipients;
+  // Filter out recipients that have been removed or have been updated.
+  const filteredRecipients: Recipient[] = existingRecipients.filter((recipient) => {
+    const isRemoved = removedRecipients.find(
+      (removedRecipient) => removedRecipient.id === recipient.id,
+    );
+    const isUpdated = persistedRecipients.find(
+      (persistedRecipient) => persistedRecipient.id === recipient.id,
+    );
+
+    return !isRemoved && !isUpdated;
+  });
+
+  return [...filteredRecipients, ...persistedRecipients];
 };
