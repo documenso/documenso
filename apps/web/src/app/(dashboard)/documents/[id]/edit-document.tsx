@@ -143,7 +143,7 @@ export const EditDocumentForm = ({
       });
 
       queryClient.setQueryData<DocumentWithDetails>(queryKey, (oldData) => ({
-        ...(initialDocument || oldData),
+        ...(oldData || initialDocument),
         ...updatedDocument,
       }));
 
@@ -171,7 +171,7 @@ export const EditDocumentForm = ({
       });
 
       queryClient.setQueryData<DocumentWithDetails>(queryKey, (oldData) => ({
-        ...(initialDocument || oldData),
+        ...(oldData || initialDocument),
         Recipient: updatedRecipients,
       }));
 
@@ -198,7 +198,7 @@ export const EditDocumentForm = ({
       });
 
       queryClient.setQueryData<DocumentWithDetails>(queryKey, (oldData) => ({
-        ...(initialDocument || oldData),
+        ...(oldData || initialDocument),
         Field: updatedFields,
       }));
 
