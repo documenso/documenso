@@ -14,7 +14,7 @@ export const MonthlyCompletedDocumentsChart = ({
   className,
   data,
 }: MonthlyCompletedDocumentsChartProps) => {
-  const formattedData = [...data].reverse().map(({ month, cume_count: count }) => {
+  const formattedData = [...data].reverse().map(({ month, count }) => {
     return {
       month: DateTime.fromFormat(month, 'yyyy-MM').toFormat('LLLL'),
       count: Number(count),
