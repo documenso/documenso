@@ -4,7 +4,7 @@ import { useState } from 'react';
 
 import type { QueryClientConfig } from '@tanstack/react-query';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { httpBatchLink } from '@trpc/client';
+import { httpBatchLink, httpLink, splitLink } from '@trpc/client';
 import { createTRPCReact } from '@trpc/react-query';
 import SuperJSON from 'superjson';
 
@@ -13,11 +13,19 @@ import { getBaseUrl } from '@documenso/lib/universal/get-base-url';
 import type { AppRouter } from '../server/router';
 
 export const trpc = createTRPCReact<AppRouter>({
-  unstable_overrides: {
+  overrides: {
     useMutation: {
       async onSuccess(opts) {
         await opts.originalFn();
-        await opts.queryClient.invalidateQueries();
+
+        if (opts.meta.doNotInvalidateQueryOnMutation) {
+          return;
+        }
+
+        // Invalidate all queries besides ones that specify not to in the meta data.
+        await opts.queryClient.invalidateQueries({
+          predicate: (query) => !query?.meta?.doNotInvalidateQueryOnMutation,
+        });
       },
     },
   },
@@ -55,8 +63,14 @@ export function TrpcProvider({ children }: TrpcProviderProps) {
       transformer: SuperJSON,
 
       links: [
-        httpBatchLink({
-          url: `${getBaseUrl()}/api/trpc`,
+        splitLink({
+          condition: (op) => op.context.skipBatch === true,
+          true: httpLink({
+            url: `${getBaseUrl()}/api/trpc`,
+          }),
+          false: httpBatchLink({
+            url: `${getBaseUrl()}/api/trpc`,
+          }),
         }),
       ],
     }),

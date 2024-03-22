@@ -6,6 +6,10 @@ import { useRouter, useSearchParams } from 'next/navigation';
 
 import { useQueryClient } from '@tanstack/react-query';
 
+import {
+  DO_NOT_INVALIDATE_QUERY_ON_MUTATION,
+  SKIP_QUERY_BATCH_META,
+} from '@documenso/lib/constants/trpc';
 import { DocumentStatus } from '@documenso/prisma/client';
 import type { DocumentWithDetails } from '@documenso/prisma/types/document';
 import { trpc } from '@documenso/trpc/react';
@@ -64,20 +68,28 @@ export const EditDocumentForm = ({
       },
       {
         initialData: initialDocument,
-        trpc: {
-          context: {
-            skipBatch: true,
-          },
-        },
+        ...SKIP_QUERY_BATCH_META,
       },
     );
 
   const { Recipient: recipients, Field: fields } = document;
 
-  const { mutateAsync: addTitle } = trpc.document.setTitleForDocument.useMutation();
-  const { mutateAsync: addFields } = trpc.field.addFields.useMutation();
-  const { mutateAsync: addSigners } = trpc.recipient.addSigners.useMutation();
-  const { mutateAsync: sendDocument } = trpc.document.sendDocument.useMutation();
+  const { mutateAsync: addTitle } = trpc.document.setTitleForDocument.useMutation(
+    DO_NOT_INVALIDATE_QUERY_ON_MUTATION,
+  );
+
+  const { mutateAsync: addFields } = trpc.field.addFields.useMutation(
+    DO_NOT_INVALIDATE_QUERY_ON_MUTATION,
+  );
+
+  const { mutateAsync: addSigners } = trpc.recipient.addSigners.useMutation(
+    DO_NOT_INVALIDATE_QUERY_ON_MUTATION,
+  );
+
+  const { mutateAsync: sendDocument } = trpc.document.sendDocument.useMutation(
+    DO_NOT_INVALIDATE_QUERY_ON_MUTATION,
+  );
+
   const { mutateAsync: setPasswordForDocument } =
     trpc.document.setPasswordForDocument.useMutation();
 
