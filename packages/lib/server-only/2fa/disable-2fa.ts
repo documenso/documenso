@@ -1,5 +1,3 @@
-import { compare } from '@node-rs/bcrypt';
-
 import { prisma } from '@documenso/prisma';
 import type { User } from '@documenso/prisma/client';
 import { UserSecurityAuditLogType } from '@documenso/prisma/client';
@@ -10,28 +8,20 @@ import { validateTwoFactorAuthentication } from './validate-2fa';
 
 type DisableTwoFactorAuthenticationOptions = {
   user: User;
-  backupCode: string;
-  password: string;
+  token: string;
   requestMetadata?: RequestMetadata;
 };
 
 export const disableTwoFactorAuthentication = async ({
-  backupCode,
+  token,
   user,
-  password,
   requestMetadata,
 }: DisableTwoFactorAuthenticationOptions) => {
-  if (!user.password) {
-    throw new Error(ErrorCode.USER_MISSING_PASSWORD);
+  let isValid = await validateTwoFactorAuthentication({ totpCode: token, user });
+
+  if (!isValid) {
+    isValid = await validateTwoFactorAuthentication({ backupCode: token, user });
   }
-
-  const isCorrectPassword = await compare(password, user.password);
-
-  if (!isCorrectPassword) {
-    throw new Error(ErrorCode.INCORRECT_PASSWORD);
-  }
-
-  const isValid = await validateTwoFactorAuthentication({ backupCode, user });
 
   if (!isValid) {
     throw new Error(ErrorCode.INCORRECT_TWO_FACTOR_BACKUP_CODE);

@@ -17,10 +17,6 @@ export const enableTwoFactorAuthentication = async ({
   code,
   requestMetadata,
 }: EnableTwoFactorAuthenticationOptions) => {
-  if (user.identityProvider !== 'DOCUMENSO') {
-    throw new Error(ErrorCode.INCORRECT_IDENTITY_PROVIDER);
-  }
-
   if (user.twoFactorEnabled) {
     throw new Error(ErrorCode.TWO_FACTOR_ALREADY_ENABLED);
   }
@@ -35,7 +31,24 @@ export const enableTwoFactorAuthentication = async ({
     throw new Error(ErrorCode.INCORRECT_TWO_FACTOR_CODE);
   }
 
-  const updatedUser = await prisma.$transaction(async (tx) => {
+  let recoveryCodes: string[] = [];
+
+  await prisma.$transaction(async (tx) => {
+    const updatedUser = await tx.user.update({
+      where: {
+        id: user.id,
+      },
+      data: {
+        twoFactorEnabled: true,
+      },
+    });
+
+    recoveryCodes = getBackupCodes({ user: updatedUser }) ?? [];
+
+    if (recoveryCodes.length === 0) {
+      throw new Error(ErrorCode.MISSING_BACKUP_CODE);
+    }
+
     await tx.userSecurityAuditLog.create({
       data: {
         userId: user.id,
@@ -44,18 +57,7 @@ export const enableTwoFactorAuthentication = async ({
         ipAddress: requestMetadata?.ipAddress,
       },
     });
-
-    return await tx.user.update({
-      where: {
-        id: user.id,
-      },
-      data: {
-        twoFactorEnabled: true,
-      },
-    });
   });
-
-  const recoveryCodes = getBackupCodes({ user: updatedUser });
 
   return { recoveryCodes };
 };

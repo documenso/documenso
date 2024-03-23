@@ -1,4 +1,3 @@
-import { compare } from '@node-rs/bcrypt';
 import { base32 } from '@scure/base';
 import crypto from 'crypto';
 import { createTOTPKeyURI } from 'oslo/otp';
@@ -12,33 +11,17 @@ import { symmetricEncrypt } from '../../universal/crypto';
 
 type SetupTwoFactorAuthenticationOptions = {
   user: User;
-  password: string;
 };
 
 const ISSUER = 'Documenso';
 
 export const setupTwoFactorAuthentication = async ({
   user,
-  password,
 }: SetupTwoFactorAuthenticationOptions) => {
   const key = DOCUMENSO_ENCRYPTION_KEY;
 
   if (!key) {
     throw new Error(ErrorCode.MISSING_ENCRYPTION_KEY);
-  }
-
-  if (user.identityProvider !== 'DOCUMENSO') {
-    throw new Error(ErrorCode.INCORRECT_IDENTITY_PROVIDER);
-  }
-
-  if (!user.password) {
-    throw new Error(ErrorCode.USER_MISSING_PASSWORD);
-  }
-
-  const isCorrectPassword = await compare(password, user.password);
-
-  if (!isCorrectPassword) {
-    throw new Error(ErrorCode.INCORRECT_PASSWORD);
   }
 
   const secret = crypto.randomBytes(10);
