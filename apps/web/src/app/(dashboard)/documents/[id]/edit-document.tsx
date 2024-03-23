@@ -62,6 +62,8 @@ export const EditDocumentForm = ({
   const searchParams = useSearchParams();
   const team = useOptionalCurrentTeam();
 
+  const [isDocumentPdfLoaded, setIsDocumentPdfLoaded] = useState(false);
+
   const { mutateAsync: addTitle } = trpc.document.setTitleForDocument.useMutation();
   const { mutateAsync: addFields } = trpc.field.addFields.useMutation();
   const { mutateAsync: addSigners } = trpc.recipient.addSigners.useMutation();
@@ -227,6 +229,7 @@ export const EditDocumentForm = ({
       >
         <CardContent className="p-2">
           <LazyPDFViewer
+            onDocumentLoad={() => setIsDocumentPdfLoaded(true)}
             key={documentData.id}
             documentData={documentData}
             document={document}
@@ -252,8 +255,8 @@ export const EditDocumentForm = ({
               recipients={recipients}
               fields={fields}
               onSubmit={onAddTitleFormSubmit}
+              isDocumentPdfLoaded={isDocumentPdfLoaded}
             />
-
             <AddSignersFormPartial
               key={recipients.length}
               documentFlow={documentFlow.signers}
@@ -261,6 +264,7 @@ export const EditDocumentForm = ({
               recipients={recipients}
               fields={fields}
               onSubmit={onAddSignersFormSubmit}
+              isDocumentPdfLoaded={isDocumentPdfLoaded}
             />
             <AddFieldsFormPartial
               key={fields.length}
@@ -268,6 +272,7 @@ export const EditDocumentForm = ({
               recipients={recipients}
               fields={fields}
               onSubmit={onAddFieldsFormSubmit}
+              isDocumentPdfLoaded={isDocumentPdfLoaded}
             />
             <AddSubjectFormPartial
               key={recipients.length}
@@ -276,6 +281,7 @@ export const EditDocumentForm = ({
               recipients={recipients}
               fields={fields}
               onSubmit={onAddSubjectFormSubmit}
+              isDocumentPdfLoaded={isDocumentPdfLoaded}
             />
           </Stepper>
         </DocumentFlowFormContainer>
