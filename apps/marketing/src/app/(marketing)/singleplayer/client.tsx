@@ -246,6 +246,7 @@ export const SinglePlayerClient = () => {
                   recipients={uploadedFile ? [placeholderRecipient] : []}
                   fields={fields}
                   onSubmit={onFieldsSubmit}
+                  isDocumentPdfLoaded={true}
                 />
               </fieldset>
 
