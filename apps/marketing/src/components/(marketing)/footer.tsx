@@ -1,5 +1,3 @@
-'use client';
-
 import type { HTMLAttributes } from 'react';
 
 import Image from 'next/image';
@@ -12,6 +10,8 @@ import { LuGithub } from 'react-icons/lu';
 import LogoImage from '@documenso/assets/logo.png';
 import { cn } from '@documenso/ui/lib/utils';
 import { ThemeSwitcher } from '@documenso/ui/primitives/theme-switcher';
+
+import { StatusWidget } from './status-widget';
 
 export type FooterProps = HTMLAttributes<HTMLDivElement>;
 
@@ -61,6 +61,10 @@ export const Footer = ({ className, ...props }: FooterProps) => {
                 {link.icon}
               </Link>
             ))}
+          </div>
+
+          <div className="mt-6">
+            <StatusWidget />
           </div>
         </div>
 

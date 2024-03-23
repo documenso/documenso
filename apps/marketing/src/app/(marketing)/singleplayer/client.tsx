@@ -184,83 +184,85 @@ export const SinglePlayerClient = () => {
   };
 
   return (
-    <div className="mt-6 sm:mt-12">
-      <div className="text-center">
-        <h1 className="text-3xl font-bold lg:text-5xl">Single Player Mode</h1>
+    <div className="overflow-x-auto overflow-y-hidden">
+      <div className="mt-6 sm:mt-12">
+        <div className="text-center">
+          <h1 className="text-3xl font-bold lg:text-5xl">Single Player Mode</h1>
 
-        <p className="text-foreground mx-auto mt-4 max-w-[50ch] text-lg leading-normal">
-          Create a{' '}
-          <Link
-            href={`${NEXT_PUBLIC_WEBAPP_URL()}/signup?utm_source=singleplayer`}
-            target="_blank"
-            className="hover:text-foreground/80 font-semibold transition-colors"
-          >
-            free account
-          </Link>{' '}
-          or view our{' '}
-          <Link
-            href={'/pricing'}
-            target="_blank"
-            className="hover:text-foreground/80 font-semibold transition-colors"
-          >
-            early adopter plan
-          </Link>{' '}
-          for exclusive features, including the ability to collaborate with multiple signers.
-        </p>
-      </div>
-
-      <div className="mt-12 grid w-full grid-cols-12 gap-8">
-        <div className="col-span-12 rounded-xl before:rounded-xl lg:col-span-6 xl:col-span-7">
-          {uploadedFile ? (
-            <Card gradient>
-              <CardContent className="p-2">
-                <LazyPDFViewer
-                  documentData={{
-                    id: '',
-                    data: uploadedFile.fileBase64,
-                    initialData: uploadedFile.fileBase64,
-                    type: DocumentDataType.BYTES_64,
-                  }}
-                />
-              </CardContent>
-            </Card>
-          ) : (
-            <DocumentDropzone className="h-[80vh] max-h-[60rem]" onDrop={onFileDrop} />
-          )}
+          <p className="text-foreground mx-auto mt-4 max-w-[50ch] text-lg leading-normal">
+            Create a{' '}
+            <Link
+              href={`${NEXT_PUBLIC_WEBAPP_URL()}/signup?utm_source=singleplayer`}
+              target="_blank"
+              className="hover:text-foreground/80 font-semibold transition-colors"
+            >
+              free account
+            </Link>{' '}
+            or view our{' '}
+            <Link
+              href={'/pricing'}
+              target="_blank"
+              className="hover:text-foreground/80 font-semibold transition-colors"
+            >
+              early adopter plan
+            </Link>{' '}
+            for exclusive features, including the ability to collaborate with multiple signers.
+          </p>
         </div>
 
-        <div className="col-span-12 lg:col-span-6 xl:col-span-5">
-          <DocumentFlowFormContainer
-            className="top-24 lg:h-[calc(100vh-7rem)]"
-            onSubmit={(e) => e.preventDefault()}
-          >
-            <Stepper
-              currentStep={currentDocumentFlow.stepIndex}
-              setCurrentStep={(step) => setStep(SinglePlayerModeSteps[step - 1])}
+        <div className="mt-12 grid w-full grid-cols-12 gap-8">
+          <div className="col-span-12 rounded-xl before:rounded-xl lg:col-span-6 xl:col-span-7">
+            {uploadedFile ? (
+              <Card gradient>
+                <CardContent className="p-2">
+                  <LazyPDFViewer
+                    documentData={{
+                      id: '',
+                      data: uploadedFile.fileBase64,
+                      initialData: uploadedFile.fileBase64,
+                      type: DocumentDataType.BYTES_64,
+                    }}
+                  />
+                </CardContent>
+              </Card>
+            ) : (
+              <DocumentDropzone className="h-[80vh] max-h-[60rem]" onDrop={onFileDrop} />
+            )}
+          </div>
+
+          <div className="col-span-12 lg:col-span-6 xl:col-span-5">
+            <DocumentFlowFormContainer
+              className="top-24 lg:h-[calc(100vh-7rem)]"
+              onSubmit={(e) => e.preventDefault()}
             >
-              {/* Add fields to PDF page. */}
-              <fieldset disabled={!uploadedFile} className="flex h-full flex-col">
-                <AddFieldsFormPartial
-                  documentFlow={documentFlow.fields}
-                  hideRecipients={true}
-                  recipients={uploadedFile ? [placeholderRecipient] : []}
+              <Stepper
+                currentStep={currentDocumentFlow.stepIndex}
+                setCurrentStep={(step) => setStep(SinglePlayerModeSteps[step - 1])}
+              >
+                {/* Add fields to PDF page. */}
+                <fieldset disabled={!uploadedFile} className="flex h-full flex-col">
+                  <AddFieldsFormPartial
+                    documentFlow={documentFlow.fields}
+                    hideRecipients={true}
+                    recipients={uploadedFile ? [placeholderRecipient] : []}
+                    fields={fields}
+                    onSubmit={onFieldsSubmit}
+                  />
+                </fieldset>
+
+                {/* Enter user details and signature. */}
+
+                <AddSignatureFormPartial
+                  documentFlow={documentFlow.sign}
                   fields={fields}
-                  onSubmit={onFieldsSubmit}
+                  onSubmit={onSignSubmit}
+                  requireName={Boolean(fields.find((field) => field.type === 'NAME'))}
+                  requireCustomText={Boolean(fields.find((field) => field.type === 'TEXT'))}
+                  requireSignature={Boolean(fields.find((field) => field.type === 'SIGNATURE'))}
                 />
-              </fieldset>
-
-              {/* Enter user details and signature. */}
-
-              <AddSignatureFormPartial
-                documentFlow={documentFlow.sign}
-                fields={fields}
-                onSubmit={onSignSubmit}
-                requireName={Boolean(fields.find((field) => field.type === 'NAME'))}
-                requireCustomText={Boolean(fields.find((field) => field.type === 'TEXT'))}
-                requireSignature={Boolean(fields.find((field) => field.type === 'SIGNATURE'))}
-              />
-            </Stepper>
-          </DocumentFlowFormContainer>
+              </Stepper>
+            </DocumentFlowFormContainer>
+          </div>
         </div>
       </div>
     </div>
