@@ -26,9 +26,13 @@ export default async function SecuritySettingsPage() {
       />
 
       <div>
-        <PasswordForm user={user} />
+        {user.identityProvider === 'DOCUMENSO' && (
+          <>
+            <PasswordForm user={user} />
 
-        <hr className="border-border/50 mt-6" />
+            <hr className="border-border/50 mt-6" />
+          </>
+        )}
 
         <Alert
           className="mt-6 flex flex-col justify-between p-6 sm:flex-row sm:items-center"
