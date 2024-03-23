@@ -1,7 +1,6 @@
 import { TRPCError } from '@trpc/server';
 
 import { AppError } from '@documenso/lib/errors/app-error';
-import { ErrorCode } from '@documenso/lib/next-auth/error-codes';
 import { disableTwoFactorAuthentication } from '@documenso/lib/server-only/2fa/disable-2fa';
 import { enableTwoFactorAuthentication } from '@documenso/lib/server-only/2fa/enable-2fa';
 import { setupTwoFactorAuthentication } from '@documenso/lib/server-only/2fa/setup-2fa';
@@ -45,7 +44,11 @@ export const twoFactorAuthenticationRouter = router({
           requestMetadata: extractNextApiRequestMetadata(ctx.req),
         });
       } catch (err) {
-        console.error(err);
+        const error = AppError.parseError(err);
+
+        if (error.code !== 'INCORRECT_TWO_FACTOR_CODE') {
+          console.error(err);
+        }
 
         throw new TRPCError({
           code: 'BAD_REQUEST',
@@ -66,7 +69,11 @@ export const twoFactorAuthenticationRouter = router({
           requestMetadata: extractNextApiRequestMetadata(ctx.req),
         });
       } catch (err) {
-        console.error(err);
+        const error = AppError.parseError(err);
+
+        if (error.code !== 'INCORRECT_TWO_FACTOR_CODE') {
+          console.error(err);
+        }
 
         throw new TRPCError({
           code: 'BAD_REQUEST',
@@ -86,7 +93,7 @@ export const twoFactorAuthenticationRouter = router({
       } catch (err) {
         const error = AppError.parseError(err);
 
-        if (error.code !== ErrorCode.INCORRECT_TWO_FACTOR_CODE) {
+        if (error.code !== 'INCORRECT_TWO_FACTOR_CODE') {
           console.error(err);
         }
 

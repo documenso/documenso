@@ -1,7 +1,7 @@
-import { ErrorCode } from '@documenso/lib/next-auth/error-codes';
 import { prisma } from '@documenso/prisma';
 import { type User, UserSecurityAuditLogType } from '@documenso/prisma/client';
 
+import { AppError } from '../../errors/app-error';
 import type { RequestMetadata } from '../../universal/extract-request-metadata';
 import { getBackupCodes } from './get-backup-code';
 import { verifyTwoFactorAuthenticationToken } from './verify-2fa-token';
@@ -18,17 +18,17 @@ export const enableTwoFactorAuthentication = async ({
   requestMetadata,
 }: EnableTwoFactorAuthenticationOptions) => {
   if (user.twoFactorEnabled) {
-    throw new Error(ErrorCode.TWO_FACTOR_ALREADY_ENABLED);
+    throw new AppError('TWO_FACTOR_ALREADY_ENABLED');
   }
 
   if (!user.twoFactorSecret) {
-    throw new Error(ErrorCode.TWO_FACTOR_SETUP_REQUIRED);
+    throw new AppError('TWO_FACTOR_SETUP_REQUIRED');
   }
 
   const isValidToken = await verifyTwoFactorAuthenticationToken({ user, totpCode: code });
 
   if (!isValidToken) {
-    throw new Error(ErrorCode.INCORRECT_TWO_FACTOR_CODE);
+    throw new AppError('INCORRECT_TWO_FACTOR_CODE');
   }
 
   let recoveryCodes: string[] = [];
@@ -46,7 +46,7 @@ export const enableTwoFactorAuthentication = async ({
     recoveryCodes = getBackupCodes({ user: updatedUser }) ?? [];
 
     if (recoveryCodes.length === 0) {
-      throw new Error(ErrorCode.MISSING_BACKUP_CODE);
+      throw new AppError('MISSING_BACKUP_CODE');
     }
 
     await tx.userSecurityAuditLog.create({

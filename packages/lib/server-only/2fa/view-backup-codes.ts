@@ -1,6 +1,6 @@
 import type { User } from '@documenso/prisma/client';
 
-import { ErrorCode } from '../../next-auth/error-codes';
+import { AppError } from '../../errors/app-error';
 import { getBackupCodes } from './get-backup-code';
 import { validateTwoFactorAuthentication } from './validate-2fa';
 
@@ -17,13 +17,13 @@ export const viewBackupCodes = async ({ token, user }: ViewBackupCodesOptions) =
   }
 
   if (!isValid) {
-    throw new Error(ErrorCode.INCORRECT_TWO_FACTOR_CODE);
+    throw new AppError('INCORRECT_TWO_FACTOR_CODE');
   }
 
   const backupCodes = getBackupCodes({ user });
 
   if (!backupCodes) {
-    throw new Error(ErrorCode.MISSING_BACKUP_CODE);
+    throw new AppError('MISSING_BACKUP_CODE');
   }
 
   return backupCodes;

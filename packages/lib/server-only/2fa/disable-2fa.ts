@@ -2,7 +2,7 @@ import { prisma } from '@documenso/prisma';
 import type { User } from '@documenso/prisma/client';
 import { UserSecurityAuditLogType } from '@documenso/prisma/client';
 
-import { ErrorCode } from '../../next-auth/error-codes';
+import { AppError } from '../../errors/app-error';
 import type { RequestMetadata } from '../../universal/extract-request-metadata';
 import { validateTwoFactorAuthentication } from './validate-2fa';
 
@@ -24,7 +24,7 @@ export const disableTwoFactorAuthentication = async ({
   }
 
   if (!isValid) {
-    throw new Error(ErrorCode.INCORRECT_TWO_FACTOR_BACKUP_CODE);
+    throw new AppError('INCORRECT_TWO_FACTOR_CODE');
   }
 
   await prisma.$transaction(async (tx) => {
