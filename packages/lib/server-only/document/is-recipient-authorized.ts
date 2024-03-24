@@ -4,6 +4,7 @@ import { match } from 'ts-pattern';
 import { prisma } from '@documenso/prisma';
 import type { Document, Recipient } from '@documenso/prisma/client';
 
+import { verifyTwoFactorAuthenticationToken } from '../2fa/verify-2fa-token';
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import type { TDocumentAuth, TDocumentAuthMethods } from '../../types/document-auth';
 import { DocumentAuth } from '../../types/document-auth';
@@ -102,6 +103,27 @@ export const isRecipientAuthorized = async ({
         userId,
         authenticationResponse,
         tokenReference,
+      });
+    })
+    .with({ type: DocumentAuth['2FA'] }, async ({ token }) => {
+      if (!userId) {
+        return false;
+      }
+
+      const user = await prisma.user.findFirst({
+        where: {
+          id: userId,
+        },
+      });
+
+      // Should not be possible.
+      if (!user) {
+        throw new AppError(AppErrorCode.NOT_FOUND, 'User not found');
+      }
+
+      return await verifyTwoFactorAuthenticationToken({
+        user,
+        totpCode: token,
       });
     })
     .exhaustive();

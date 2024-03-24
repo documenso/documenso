@@ -5,7 +5,7 @@ import { ZAuthenticationResponseJSONSchema } from './webauthn';
 /**
  * All the available types of document authentication options for both access and action.
  */
-export const ZDocumentAuthTypesSchema = z.enum(['ACCOUNT', 'PASSKEY', 'EXPLICIT_NONE']);
+export const ZDocumentAuthTypesSchema = z.enum(['ACCOUNT', 'PASSKEY', '2FA', 'EXPLICIT_NONE']);
 export const DocumentAuth = ZDocumentAuthTypesSchema.Enum;
 
 const ZDocumentAuthAccountSchema = z.object({
@@ -22,6 +22,11 @@ const ZDocumentAuthPasskeySchema = z.object({
   tokenReference: z.string().min(1),
 });
 
+const ZDocumentAuth2FASchema = z.object({
+  type: z.literal(DocumentAuth['2FA']),
+  token: z.string().min(4).max(10),
+});
+
 /**
  * All the document auth methods for both accessing and actioning.
  */
@@ -29,6 +34,7 @@ export const ZDocumentAuthMethodsSchema = z.discriminatedUnion('type', [
   ZDocumentAuthAccountSchema,
   ZDocumentAuthExplicitNoneSchema,
   ZDocumentAuthPasskeySchema,
+  ZDocumentAuth2FASchema,
 ]);
 
 /**
@@ -47,8 +53,13 @@ export const ZDocumentAccessAuthTypesSchema = z.enum([DocumentAuth.ACCOUNT]);
 export const ZDocumentActionAuthSchema = z.discriminatedUnion('type', [
   ZDocumentAuthAccountSchema,
   ZDocumentAuthPasskeySchema,
+  ZDocumentAuth2FASchema,
 ]);
-export const ZDocumentActionAuthTypesSchema = z.enum([DocumentAuth.ACCOUNT, DocumentAuth.PASSKEY]);
+export const ZDocumentActionAuthTypesSchema = z.enum([
+  DocumentAuth.ACCOUNT,
+  DocumentAuth.PASSKEY,
+  DocumentAuth['2FA'],
+]);
 
 /**
  * The recipient access auth methods.
@@ -68,11 +79,13 @@ export const ZRecipientAccessAuthTypesSchema = z.enum([DocumentAuth.ACCOUNT]);
 export const ZRecipientActionAuthSchema = z.discriminatedUnion('type', [
   ZDocumentAuthAccountSchema,
   ZDocumentAuthPasskeySchema,
+  ZDocumentAuth2FASchema,
   ZDocumentAuthExplicitNoneSchema,
 ]);
 export const ZRecipientActionAuthTypesSchema = z.enum([
   DocumentAuth.ACCOUNT,
   DocumentAuth.PASSKEY,
+  DocumentAuth['2FA'],
   DocumentAuth.EXPLICIT_NONE,
 ]);
 
