@@ -6,13 +6,15 @@ import { CheckCircle, Download, EyeIcon, Pencil } from 'lucide-react';
 import { useSession } from 'next-auth/react';
 import { match } from 'ts-pattern';
 
-import { downloadPDF } from '@documenso/lib/client-only/download-pdf';
+import { downloadFile } from '@documenso/lib/client-only/download-file';
 import { formatDocumentsPath } from '@documenso/lib/utils/teams';
 import type { Document, Recipient, Team, User } from '@documenso/prisma/client';
 import { DocumentStatus, RecipientRole, SigningStatus } from '@documenso/prisma/client';
 import { trpc as trpcClient } from '@documenso/trpc/client';
 import { Button } from '@documenso/ui/primitives/button';
 import { useToast } from '@documenso/ui/primitives/use-toast';
+
+import { appendCertificate } from '~/helpers/append-certificate';
 
 export type DocumentPageViewButtonProps = {
   document: Document & {
@@ -53,8 +55,12 @@ export const DocumentPageViewButton = ({ document, team }: DocumentPageViewButto
       if (!documentData) {
         throw new Error('No document available');
       }
+      const appendedBlob = await appendCertificate(documentData, document.id);
 
-      await downloadPDF({ documentData, fileName: documentWithData.title });
+      downloadFile({
+        filename: documentWithData.title,
+        data: appendedBlob,
+      });
     } catch (err) {
       toast({
         title: 'Something went wrong',

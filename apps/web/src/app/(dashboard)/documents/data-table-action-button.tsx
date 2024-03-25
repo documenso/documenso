@@ -1,12 +1,14 @@
 'use client';
 
+import React from 'react';
+
 import Link from 'next/link';
 
 import { CheckCircle, Download, Edit, EyeIcon, Pencil } from 'lucide-react';
 import { useSession } from 'next-auth/react';
 import { match } from 'ts-pattern';
 
-import { downloadPDF } from '@documenso/lib/client-only/download-pdf';
+import { downloadFile } from '@documenso/lib/client-only/download-file';
 import { formatDocumentsPath } from '@documenso/lib/utils/teams';
 import type { Document, Recipient, Team, User } from '@documenso/prisma/client';
 import { DocumentStatus, RecipientRole, SigningStatus } from '@documenso/prisma/client';
@@ -14,6 +16,8 @@ import type { DocumentWithData } from '@documenso/prisma/types/document-with-dat
 import { trpc as trpcClient } from '@documenso/trpc/client';
 import { Button } from '@documenso/ui/primitives/button';
 import { useToast } from '@documenso/ui/primitives/use-toast';
+
+import { appendCertificate } from '~/helpers/append-certificate';
 
 export type DataTableActionButtonProps = {
   row: Document & {
@@ -48,7 +52,6 @@ export const DataTableActionButton = ({ row, team }: DataTableActionButtonProps)
   const onDownloadClick = async () => {
     try {
       let document: DocumentWithData | null = null;
-
       if (!recipient) {
         document = await trpcClient.document.getDocumentById.query({
           id: row.id,
@@ -61,12 +64,15 @@ export const DataTableActionButton = ({ row, team }: DataTableActionButtonProps)
       }
 
       const documentData = document?.documentData;
-
       if (!documentData) {
         throw Error('No document available');
       }
+      const appendedBlob = await appendCertificate(documentData, row.id);
 
-      await downloadPDF({ documentData, fileName: row.title });
+      downloadFile({
+        filename: row.title,
+        data: appendedBlob,
+      });
     } catch (err) {
       toast({
         title: 'Something went wrong',
@@ -132,11 +138,13 @@ export const DataTableActionButton = ({ row, team }: DataTableActionButtonProps)
         View
       </Button>
     ))
-    .with({ isComplete: true }, () => (
-      <Button className="w-32" onClick={onDownloadClick}>
-        <Download className="-ml-1 mr-2 inline h-4 w-4" />
-        Download
-      </Button>
-    ))
+    .with({ isComplete: true }, () => {
+      return (
+        <Button className="w-32" onClick={onDownloadClick}>
+          <Download className="-ml-1 mr-2 inline h-4 w-4" />
+          Download
+        </Button>
+      );
+    })
     .otherwise(() => <div></div>);
 };

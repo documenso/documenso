@@ -22,6 +22,13 @@ export const ZGetDocumentByIdQuerySchema = z.object({
 });
 
 export type TGetDocumentByIdQuerySchema = z.infer<typeof ZGetDocumentByIdQuerySchema>;
+export const ZGetSignaturesByDocumentIdQuerySchema = z.object({
+  id: z.number().min(1),
+});
+
+export type TGetSignaturesByDocumentIdQuerySchema = z.infer<
+  typeof ZGetSignaturesByDocumentIdQuerySchema
+>;
 
 export const ZGetDocumentByTokenQuerySchema = z.object({
   token: z.string().min(1),
