@@ -38,7 +38,8 @@ export default function MarketingLayout({ children }: MarketingLayoutProps) {
   return (
     <div
       className={cn('relative flex min-h-[100vh] max-w-[100vw] flex-col pt-20 md:pt-28', {
-        'overflow-y-auto overflow-x-hidden': pathname !== '/singleplayer',
+        'overflow-y-auto overflow-x-hidden':
+          pathname && !['/singleplayer', '/pricing'].includes(pathname),
       })}
     >
       <div
