@@ -4,16 +4,15 @@ module.exports = {
     'turbo',
     'eslint:recommended',
     'plugin:@typescript-eslint/recommended',
-    'plugin:prettier/recommended',
     'plugin:package-json/recommended',
   ],
 
-  plugins: ['prettier', 'package-json', 'unused-imports'],
+  plugins: ['package-json', 'unused-imports'],
 
   env: {
+    es2022: true,
     node: true,
     browser: true,
-    es6: true,
   },
 
   parser: '@typescript-eslint/parser',

@@ -178,9 +178,10 @@ export const AddSignersFormPartial = ({
           <Form {...form}>
             <div className="flex w-full flex-col gap-y-2">
               {signers.map((signer, index) => (
-                <motion.div
+                <motion.fieldset
                   key={signer.id}
                   data-native-id={signer.nativeId}
+                  disabled={isSubmitting || hasBeenSentToRecipientId(signer.nativeId)}
                   className={cn('grid grid-cols-8 gap-4 pb-4', {
                     'border-b pt-2': showAdvancedSettings,
                   })}
@@ -312,7 +313,11 @@ export const AddSignersFormPartial = ({
                     render={({ field }) => (
                       <FormItem className="col-span-1 mt-auto">
                         <FormControl>
-                          <Select {...field} onValueChange={field.onChange}>
+                          <Select
+                            {...field}
+                            onValueChange={field.onChange}
+                            disabled={isSubmitting || hasBeenSentToRecipientId(signer.nativeId)}
+                          >
                             <SelectTrigger className="bg-background w-[60px]">
                               {/* eslint-disable-next-line @typescript-eslint/consistent-type-assertions */}
                               {ROLE_ICONS[field.value as RecipientRole]}
@@ -367,7 +372,7 @@ export const AddSignersFormPartial = ({
                   >
                     <Trash className="h-5 w-5" />
                   </button>
-                </motion.div>
+                </motion.fieldset>
               ))}
             </div>
 

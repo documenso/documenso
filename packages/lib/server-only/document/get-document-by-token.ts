@@ -30,6 +30,27 @@ export interface GetDocumentAndRecipientByTokenOptions {
    */
   requireAccessAuth?: boolean;
 }
+export type GetDocumentByTokenOptions = {
+  token: string;
+};
+
+export const getDocumentByToken = async ({ token }: GetDocumentByTokenOptions) => {
+  if (!token) {
+    throw new Error('Missing token');
+  }
+
+  const result = await prisma.document.findFirstOrThrow({
+    where: {
+      Recipient: {
+        some: {
+          token,
+        },
+      },
+    },
+  });
+
+  return result;
+};
 
 export type DocumentAndSender = Awaited<ReturnType<typeof getDocumentAndSenderByToken>>;
 
