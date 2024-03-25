@@ -36,25 +36,6 @@ export default async function SecuritySettingsPage() {
         </>
       )}
 
-      {isPasskeyEnabled && (
-        <Alert
-          className="mt-6 flex flex-col justify-between p-6 sm:flex-row sm:items-center"
-          variant="neutral"
-        >
-          <div className="mb-4 sm:mb-0">
-            <AlertTitle>Passkeys</AlertTitle>
-
-            <AlertDescription className="mr-4">
-              Allows authenticating using biometrics, password managers, hardware keys, etc.
-            </AlertDescription>
-          </div>
-
-          <Button asChild variant="outline" className="bg-background">
-            <Link href="/settings/security/passkeys">Manage passkeys</Link>
-          </Button>
-        </Alert>
-      )}
-
       <Alert
         className="mt-6 flex flex-col justify-between p-6 sm:flex-row sm:items-center"
         variant="neutral"
@@ -92,6 +73,25 @@ export default async function SecuritySettingsPage() {
           </div>
 
           <ViewRecoveryCodesDialog />
+        </Alert>
+      )}
+
+      {isPasskeyEnabled && (
+        <Alert
+          className="mt-6 flex flex-col justify-between p-6 sm:flex-row sm:items-center"
+          variant="neutral"
+        >
+          <div className="mb-4 sm:mb-0">
+            <AlertTitle>Passkeys</AlertTitle>
+
+            <AlertDescription className="mr-4">
+              Allows authenticating using biometrics, password managers, hardware keys, etc.
+            </AlertDescription>
+          </div>
+
+          <Button asChild variant="outline" className="bg-background">
+            <Link href="/settings/security/passkeys">Manage passkeys</Link>
+          </Button>
         </Alert>
       )}
 
