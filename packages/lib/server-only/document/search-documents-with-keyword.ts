@@ -1,7 +1,6 @@
 import { prisma } from '@documenso/prisma';
 import { DocumentStatus } from '@documenso/prisma/client';
-
-import { maskRecipientTokensForDocument } from '../../utils/mask-recipient-tokens-for-document';
+import type { Document, Recipient, User } from '@documenso/prisma/client';
 
 export type SearchDocumentsWithKeywordOptions = {
   query: string;
@@ -79,12 +78,19 @@ export const searchDocumentsWithKeyword = async ({
     take: limit,
   });
 
-  const maskedDocuments = documents.map((document) =>
-    maskRecipientTokensForDocument({
-      document,
-      user,
-    }),
-  );
+  const isOwner = (document: Document, user: User) => document.userId === user.id;
+  const getSigningLink = (recipients: Recipient[], user: User) =>
+    `/sign/${recipients.find((r) => r.email === user.email)?.token}`;
+
+  const maskedDocuments = documents.map((document) => {
+    const { Recipient, ...documentWithoutRecipient } = document;
+
+    return {
+      ...documentWithoutRecipient,
+      path: isOwner(document, user) ? `/documents/${document.id}` : getSigningLink(Recipient, user),
+      value: [document.id, document.title, ...document.Recipient.map((r) => r.email)].join(' '),
+    };
+  });
 
   return maskedDocuments;
 };

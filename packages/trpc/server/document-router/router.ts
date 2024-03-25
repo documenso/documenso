@@ -15,7 +15,6 @@ import { sendDocument } from '@documenso/lib/server-only/document/send-document'
 import { updateTitle } from '@documenso/lib/server-only/document/update-title';
 import { symmetricEncrypt } from '@documenso/lib/universal/crypto';
 import { extractNextApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
-import { maskRecipientTokensForDocument } from '@documenso/lib/utils/mask-recipient-tokens-for-document';
 
 import { authenticatedProcedure, procedure, router } from '../trpc';
 import {
@@ -283,11 +282,7 @@ export const documentRouter = router({
           userId: ctx.user.id,
         });
 
-        const maskedDocuments = documents.map((document) =>
-          maskRecipientTokensForDocument({ document, user: ctx.user }),
-        );
-
-        return maskedDocuments;
+        return documents;
       } catch (error) {
         throw new TRPCError({
           code: 'BAD_REQUEST',
