@@ -281,6 +281,7 @@ export const documentRouter = router({
           query,
           userId: ctx.user.id,
         });
+
         return documents;
       } catch (error) {
         throw new TRPCError({
