@@ -138,7 +138,7 @@ export const authRouter = router({
       throw new Error('Missing CSRF token');
     }
 
-    const sessionId = decodeURI(sessionIdToken).split('|')[0];
+    const [sessionId] = decodeURI(sessionIdToken).split('|');
 
     try {
       return await createPasskeySigninOptions({ sessionId });

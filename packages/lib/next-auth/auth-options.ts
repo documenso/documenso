@@ -212,36 +212,35 @@ export const NEXT_AUTH_OPTIONS: AuthOptions = {
 
         const requestMetadata = extractNextAuthRequestMetadata(req);
 
-        // Explicit success state to reduce chances of bugs.
-        if (verification?.verified === true) {
-          await prisma.passkey.update({
-            where: {
-              id: passkey.id,
-            },
+        if (!verification?.verified) {
+          await prisma.userSecurityAuditLog.create({
             data: {
-              lastUsedAt: new Date(),
-              counter: verification.authenticationInfo.newCounter,
+              userId: user.id,
+              ipAddress: requestMetadata.ipAddress,
+              userAgent: requestMetadata.userAgent,
+              type: UserSecurityAuditLogType.SIGN_IN_PASSKEY_FAIL,
             },
           });
 
-          return {
-            id: Number(user.id),
-            email: user.email,
-            name: user.name,
-            emailVerified: user.emailVerified?.toISOString() ?? null,
-          } satisfies User;
+          return null;
         }
 
-        await prisma.userSecurityAuditLog.create({
+        await prisma.passkey.update({
+          where: {
+            id: passkey.id,
+          },
           data: {
-            userId: user.id,
-            ipAddress: requestMetadata.ipAddress,
-            userAgent: requestMetadata.userAgent,
-            type: UserSecurityAuditLogType.SIGN_IN_PASSKEY_FAIL,
+            lastUsedAt: new Date(),
+            counter: verification.authenticationInfo.newCounter,
           },
         });
 
-        return null;
+        return {
+          id: Number(user.id),
+          email: user.email,
+          name: user.name,
+          emailVerified: user.emailVerified?.toISOString() ?? null,
+        } satisfies User;
       },
     }),
   ],
