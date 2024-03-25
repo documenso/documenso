@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation';
 
 import { CheckCircle2, Clock8 } from 'lucide-react';
 import { getServerSession } from 'next-auth';
+import { env } from 'next-runtime-env';
 import { match } from 'ts-pattern';
 
 import signingCelebration from '@documenso/assets/images/signing-celebration.png';
@@ -31,6 +32,8 @@ export type CompletedSigningPageProps = {
 export default async function CompletedSigningPage({
   params: { token },
 }: CompletedSigningPageProps) {
+  const NEXT_PUBLIC_DISABLE_SIGNUP = Boolean(env('NEXT_PUBLIC_DISABLE_SIGNUP'));
+
   if (!token) {
     return notFound();
   }
@@ -65,16 +68,19 @@ export default async function CompletedSigningPage({
 
   const sessionData = await getServerSession();
   const isLoggedIn = !!sessionData?.user;
+  const callToActionCheck = !isLoggedIn && !NEXT_PUBLIC_DISABLE_SIGNUP;
 
   return (
     <div className="-mx-4 flex flex-col items-center overflow-x-hidden px-4 pt-24 md:-mx-8 md:px-8 lg:pt-36 xl:pt-44">
       <div
         className={cn('relative mt-6 flex w-full flex-col items-center justify-center', {
-          'flex-col divide-y lg:flex-row lg:divide-x lg:divide-y-0': !isLoggedIn,
+          'flex-col divide-y lg:flex-row lg:divide-x lg:divide-y-0': callToActionCheck,
         })}
       >
         <div
-          className={cn('flex flex-col items-center', { 'mb-8 p-4 md:mb-0 md:p-12': !isLoggedIn })}
+          className={cn('flex flex-col items-center', {
+            'mb-8 p-4 md:mb-0 md:p-12': callToActionCheck,
+          })}
         >
           <Badge variant="neutral" size="default" className="mb-6 rounded-xl border bg-transparent">
             {truncatedTitle}
@@ -152,7 +158,7 @@ export default async function CompletedSigningPage({
           </div>
         </div>
 
-        {!isLoggedIn && (
+        {callToActionCheck && (
           <div className={`flex max-w-xl flex-col items-center justify-center p-4 md:p-12`}>
             <h2 className="mt-8 text-center text-xl font-semibold md:mt-0">
               Need to sign documents?
