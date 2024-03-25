@@ -4,8 +4,6 @@ import { useEffect, useState } from 'react';
 
 import { useRouter, useSearchParams } from 'next/navigation';
 
-import { useQueryClient } from '@tanstack/react-query';
-
 import {
   DO_NOT_INVALIDATE_QUERY_ON_MUTATION,
   SKIP_QUERY_BATCH_META,
@@ -50,15 +48,8 @@ export const EditDocumentForm = ({
   const router = useRouter();
   const searchParams = useSearchParams();
   const team = useOptionalCurrentTeam();
-  const queryClient = useQueryClient();
 
-  const queryKey = [
-    ['document', 'getDocumentWithDetailsById'],
-    {
-      input: { id: initialDocument.id, teamId: team?.id },
-      type: 'query',
-    },
-  ];
+  const utils = trpc.useUtils();
 
   const { data: document, refetch: refetchDocument } =
     trpc.document.getDocumentWithDetailsById.useQuery(
@@ -74,21 +65,57 @@ export const EditDocumentForm = ({
 
   const { Recipient: recipients, Field: fields } = document;
 
-  const { mutateAsync: addTitle } = trpc.document.setTitleForDocument.useMutation(
-    DO_NOT_INVALIDATE_QUERY_ON_MUTATION,
-  );
+  const { mutateAsync: addTitle } = trpc.document.setTitleForDocument.useMutation({
+    ...DO_NOT_INVALIDATE_QUERY_ON_MUTATION,
+    onSuccess: (newData) => {
+      utils.document.getDocumentWithDetailsById.setData(
+        {
+          id: initialDocument.id,
+          teamId: team?.id,
+        },
+        (oldData) => ({ ...(oldData || initialDocument), ...newData }),
+      );
+    },
+  });
 
-  const { mutateAsync: addFields } = trpc.field.addFields.useMutation(
-    DO_NOT_INVALIDATE_QUERY_ON_MUTATION,
-  );
+  const { mutateAsync: addFields } = trpc.field.addFields.useMutation({
+    ...DO_NOT_INVALIDATE_QUERY_ON_MUTATION,
+    onSuccess: (newFields) => {
+      utils.document.getDocumentWithDetailsById.setData(
+        {
+          id: initialDocument.id,
+          teamId: team?.id,
+        },
+        (oldData) => ({ ...(oldData || initialDocument), Field: newFields }),
+      );
+    },
+  });
 
-  const { mutateAsync: addSigners } = trpc.recipient.addSigners.useMutation(
-    DO_NOT_INVALIDATE_QUERY_ON_MUTATION,
-  );
+  const { mutateAsync: addSigners } = trpc.recipient.addSigners.useMutation({
+    ...DO_NOT_INVALIDATE_QUERY_ON_MUTATION,
+    onSuccess: (newRecipients) => {
+      utils.document.getDocumentWithDetailsById.setData(
+        {
+          id: initialDocument.id,
+          teamId: team?.id,
+        },
+        (oldData) => ({ ...(oldData || initialDocument), Recipient: newRecipients }),
+      );
+    },
+  });
 
-  const { mutateAsync: sendDocument } = trpc.document.sendDocument.useMutation(
-    DO_NOT_INVALIDATE_QUERY_ON_MUTATION,
-  );
+  const { mutateAsync: sendDocument } = trpc.document.sendDocument.useMutation({
+    ...DO_NOT_INVALIDATE_QUERY_ON_MUTATION,
+    onSuccess: (newData) => {
+      utils.document.getDocumentWithDetailsById.setData(
+        {
+          id: initialDocument.id,
+          teamId: team?.id,
+        },
+        (oldData) => ({ ...(oldData || initialDocument), ...newData }),
+      );
+    },
+  });
 
   const { mutateAsync: setPasswordForDocument } =
     trpc.document.setPasswordForDocument.useMutation();
@@ -136,16 +163,11 @@ export const EditDocumentForm = ({
 
   const onAddTitleFormSubmit = async (data: TAddTitleFormSchema) => {
     try {
-      const updatedDocument = await addTitle({
+      await addTitle({
         documentId: document.id,
         teamId: team?.id,
         title: data.title,
       });
-
-      queryClient.setQueryData<DocumentWithDetails>(queryKey, (oldData) => ({
-        ...(oldData || initialDocument),
-        ...updatedDocument,
-      }));
 
       // Router refresh is here to clear the router cache for when navigating to /documents.
       router.refresh();
@@ -164,16 +186,11 @@ export const EditDocumentForm = ({
 
   const onAddSignersFormSubmit = async (data: TAddSignersFormSchema) => {
     try {
-      const updatedRecipients = await addSigners({
+      await addSigners({
         documentId: document.id,
         teamId: team?.id,
         signers: data.signers,
       });
-
-      queryClient.setQueryData<DocumentWithDetails>(queryKey, (oldData) => ({
-        ...(oldData || initialDocument),
-        Recipient: updatedRecipients,
-      }));
 
       // Router refresh is here to clear the router cache for when navigating to /documents.
       router.refresh();
@@ -192,15 +209,10 @@ export const EditDocumentForm = ({
 
   const onAddFieldsFormSubmit = async (data: TAddFieldsFormSchema) => {
     try {
-      const updatedFields = await addFields({
+      await addFields({
         documentId: document.id,
         fields: data.fields,
       });
-
-      queryClient.setQueryData<DocumentWithDetails>(queryKey, (oldData) => ({
-        ...(oldData || initialDocument),
-        Field: updatedFields,
-      }));
 
       // Router refresh is here to clear the router cache for when navigating to /documents.
       router.refresh();

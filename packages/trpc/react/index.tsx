@@ -12,6 +12,8 @@ import { getBaseUrl } from '@documenso/lib/universal/get-base-url';
 
 import type { AppRouter } from '../server/router';
 
+export { getQueryKey } from '@trpc/react-query';
+
 export const trpc = createTRPCReact<AppRouter>({
   overrides: {
     useMutation: {
