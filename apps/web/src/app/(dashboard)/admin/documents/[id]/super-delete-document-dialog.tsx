@@ -21,11 +21,11 @@ import {
 import { Input } from '@documenso/ui/primitives/input';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
-export type DeleteDocumentDialogProps = {
+export type SuperDeleteDocumentDialogProps = {
   document: Document;
 };
 
-export const DeleteDocumentDialog = ({ document }: DeleteDocumentDialogProps) => {
+export const SuperDeleteDocumentDialog = ({ document }: SuperDeleteDocumentDialogProps) => {
   const router = useRouter();
   const { toast } = useToast();
   const [reason, setReason] = useState('');

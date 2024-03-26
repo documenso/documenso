@@ -13,8 +13,8 @@ import { DocumentStatus } from '~/components/formatter/document-status';
 import { LocaleDate } from '~/components/formatter/locale-date';
 
 import { AdminActions } from './admin-actions';
-import { DeleteDocumentDialog } from './delete-document-dialog';
 import { RecipientItem } from './recipient-item';
+import { SuperDeleteDocumentDialog } from './super-delete-document-dialog';
 
 type AdminDocumentDetailsPageProps = {
   params: {
@@ -85,7 +85,7 @@ export default async function AdminDocumentDetailsPage({ params }: AdminDocument
 
       <hr className="my-4" />
 
-      {document && !document.deletedAt && <DeleteDocumentDialog document={document} />}
+      {document && !document.deletedAt && <SuperDeleteDocumentDialog document={document} />}
     </div>
   );
 }
