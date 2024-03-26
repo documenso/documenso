@@ -1,14 +1,10 @@
 import { expect, test } from '@playwright/test';
-import dotenv from 'dotenv';
-import path from 'path';
 
 import { seedBlankDocument } from '@documenso/prisma/seed/documents';
 import { seedUserSubscription } from '@documenso/prisma/seed/subscriptions';
 import { seedUser, unseedUser } from '@documenso/prisma/seed/users';
 
 import { apiSignin } from '../fixtures/authentication';
-
-dotenv.config({ path: path.resolve(__dirname, '../../../../', '.env.local') });
 
 test.describe.configure({ mode: 'parallel' });
 
