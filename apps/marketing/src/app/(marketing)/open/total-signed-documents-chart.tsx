@@ -5,12 +5,12 @@ import { Bar, BarChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recha
 
 import type { GetUserMonthlyGrowthResult } from '@documenso/lib/server-only/user/get-user-monthly-growth';
 
-export type MonthlyTotalUsersChartProps = {
+export type TotalSignedDocumentsChartProps = {
   className?: string;
   data: GetUserMonthlyGrowthResult;
 };
 
-export const MonthlyTotalUsersChart = ({ className, data }: MonthlyTotalUsersChartProps) => {
+export const TotalSignedDocumentsChart = ({ className, data }: TotalSignedDocumentsChartProps) => {
   const formattedData = [...data].reverse().map(({ month, cume_count: count }) => {
     return {
       month: DateTime.fromFormat(month, 'yyyy-MM').toFormat('LLLL'),
@@ -20,9 +20,9 @@ export const MonthlyTotalUsersChart = ({ className, data }: MonthlyTotalUsersCha
 
   return (
     <div className={className}>
-      <div className="border-border flex flex-1 flex-col justify-center rounded-2xl border p-6 pl-2 shadow-sm hover:shadow">
+      <div className="border-border flex flex-col justify-center rounded-2xl border p-6 pl-2 shadow-sm hover:shadow">
         <div className="mb-6 flex px-4">
-          <h3 className="text-lg font-semibold">Total Users</h3>
+          <h3 className="text-lg font-semibold">Total Completed Documents</h3>
         </div>
 
         <ResponsiveContainer width="100%" height={400}>
@@ -34,7 +34,10 @@ export const MonthlyTotalUsersChart = ({ className, data }: MonthlyTotalUsersCha
               labelStyle={{
                 color: 'hsl(var(--primary-foreground))',
               }}
-              formatter={(value) => [Number(value).toLocaleString('en-US'), 'Total Users']}
+              formatter={(value) => [
+                Number(value).toLocaleString('en-US'),
+                'Total Completed Documents',
+              ]}
               cursor={{ fill: 'hsl(var(--primary) / 10%)' }}
             />
 
@@ -43,7 +46,7 @@ export const MonthlyTotalUsersChart = ({ className, data }: MonthlyTotalUsersCha
               fill="hsl(var(--primary))"
               radius={[4, 4, 0, 0]}
               maxBarSize={60}
-              label="Total Users"
+              label="Total Completed Documents"
             />
           </BarChart>
         </ResponsiveContainer>

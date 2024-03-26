@@ -1,25 +1,21 @@
 import { ImageResponse } from 'next/og';
-
-import { allBlogPosts } from 'contentlayer/generated';
+import { NextResponse } from 'next/server';
 
 export const runtime = 'edge';
 
-export const contentType = 'image/png';
-
-export const IMAGE_SIZE = {
+const IMAGE_SIZE = {
   width: 1200,
   height: 630,
 };
 
-type BlogPostOpenGraphImageProps = {
-  params: { post: string };
-};
+export async function GET(_request: Request) {
+  const url = new URL(_request.url);
 
-export default async function BlogPostOpenGraphImage({ params }: BlogPostOpenGraphImageProps) {
-  const blogPost = allBlogPosts.find((post) => post._raw.flattenedPath === `blog/${params.post}`);
+  const title = url.searchParams.get('title');
+  const author = url.searchParams.get('author');
 
-  if (!blogPost) {
-    return null;
+  if (!title || !author) {
+    return NextResponse.json({ error: 'Not found' }, { status: 404 });
   }
 
   // The long urls are needed for a compiler optimisation on the Next.js side, lifting this up
@@ -49,10 +45,10 @@ export default async function BlogPostOpenGraphImage({ params }: BlogPostOpenGra
         <img src={logoImage} alt="logo" tw="h-8" />
 
         <h1 tw="mt-8 text-6xl text-center flex items-center justify-center w-full max-w-[800px] font-bold text-center mx-auto">
-          {blogPost.title}
+          {title}
         </h1>
 
-        <p tw="font-normal">Written by {blogPost.authorName}</p>
+        <p tw="font-normal">Written by {author}</p>
       </div>
     ),
     {
