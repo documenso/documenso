@@ -54,6 +54,7 @@ const DialogContent = React.forwardRef<
   React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content> & {
     position?: 'start' | 'end' | 'center';
     hideClose?: boolean;
+    overlayClassName?: string;
   }
 >(
   (

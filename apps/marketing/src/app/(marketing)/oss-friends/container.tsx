@@ -2,13 +2,14 @@
 
 import Link from 'next/link';
 
-import { Variants, motion } from 'framer-motion';
+import type { Variants } from 'framer-motion';
+import { motion } from 'framer-motion';
 
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
 import { Card, CardContent, CardTitle } from '@documenso/ui/primitives/card';
 
-import { TOSSFriendsSchema } from './schema';
+import type { TOSSFriendsSchema } from './schema';
 
 const ContainerVariants: Variants = {
   initial: {
