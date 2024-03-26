@@ -52,6 +52,7 @@ model User {
   securityAuditLogs UserSecurityAuditLog[]
   Webhooks          Webhook[]
   siteSettings      SiteSettings[]
+  passkeys          Passkey[]
 
   @@index([email])
 }
@@ -68,12 +69,16 @@ enum UserSecurityAuditLogType {
   ACCOUNT_SSO_LINK
   AUTH_2FA_DISABLE
   AUTH_2FA_ENABLE
+  PASSKEY_CREATED
+  PASSKEY_DELETED
+  PASSKEY_UPDATED
   PASSWORD_RESET
   PASSWORD_UPDATE
   SIGN_OUT
   SIGN_IN
   SIGN_IN_FAIL
   SIGN_IN_2FA_FAIL
+  SIGN_IN_PASSKEY_FAIL
 }
 
 model UserSecurityAuditLog {
@@ -94,6 +99,30 @@ model PasswordResetToken {
   expiry    DateTime
   userId    Int
   User      User     @relation(fields: [userId], references: [id])
+}
+
+model Passkey {
+  id                   String    @id @default(cuid())
+  userId               Int
+  name                 String
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime  @default(now())
+  lastUsedAt           DateTime?
+  credentialId         Bytes
+  credentialPublicKey  Bytes
+  counter              BigInt
+  credentialDeviceType String
+  credentialBackedUp   Boolean
+  transports           String[]
+
+  User User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model AnonymousVerificationToken {
+  id        String   @id @unique @default(cuid())
+  token     String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
 }
 
 model VerificationToken {

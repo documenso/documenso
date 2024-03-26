@@ -270,10 +270,7 @@ export const AddSignersFormPartial = ({
                                       <strong>Recipient action authentication</strong>
                                     </h2>
 
-                                    <p>
-                                      The authentication required for recipients to sign fields and
-                                      complete the document.
-                                    </p>
+                                    <p>The authentication required for recipients to sign fields</p>
 
                                     <p className="mt-2">This will override any global settings.</p>
 

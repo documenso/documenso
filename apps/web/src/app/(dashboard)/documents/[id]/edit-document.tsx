@@ -1,17 +1,14 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { useRouter, useSearchParams } from 'next/navigation';
 
 import {
-  type DocumentData,
-  type DocumentMeta,
-  type Field,
-  type Recipient,
-  type User,
-} from '@documenso/prisma/client';
-import type { DocumentWithData } from '@documenso/prisma/types/document-with-data';
+  DO_NOT_INVALIDATE_QUERY_ON_MUTATION,
+  SKIP_QUERY_BATCH_META,
+} from '@documenso/lib/constants/trpc';
+import type { DocumentWithDetails } from '@documenso/prisma/types/document';
 import { trpc } from '@documenso/trpc/react';
 import { cn } from '@documenso/ui/lib/utils';
 import { Card, CardContent } from '@documenso/ui/primitives/card';
@@ -33,12 +30,7 @@ import { useOptionalCurrentTeam } from '~/providers/team';
 
 export type EditDocumentFormProps = {
   className?: string;
-  user: User;
-  document: DocumentWithData;
-  recipients: Recipient[];
-  documentMeta: DocumentMeta | null;
-  fields: Field[];
-  documentData: DocumentData;
+  initialDocument: DocumentWithDetails;
   documentRootPath: string;
   isDocumentEnterprise: boolean;
 };
@@ -48,12 +40,7 @@ const EditDocumentSteps: EditDocumentStep[] = ['settings', 'signers', 'fields', 
 
 export const EditDocumentForm = ({
   className,
-  document,
-  recipients,
-  fields,
-  documentMeta,
-  user: _user,
-  documentData,
+  initialDocument,
   documentRootPath,
   isDocumentEnterprise,
 }: EditDocumentFormProps) => {
@@ -63,11 +50,74 @@ export const EditDocumentForm = ({
   const searchParams = useSearchParams();
   const team = useOptionalCurrentTeam();
 
-  const { mutateAsync: setSettingsForDocument } =
-    trpc.document.setSettingsForDocument.useMutation();
-  const { mutateAsync: addFields } = trpc.field.addFields.useMutation();
-  const { mutateAsync: addSigners } = trpc.recipient.addSigners.useMutation();
-  const { mutateAsync: sendDocument } = trpc.document.sendDocument.useMutation();
+  const utils = trpc.useUtils();
+
+  const { data: document, refetch: refetchDocument } =
+    trpc.document.getDocumentWithDetailsById.useQuery(
+      {
+        id: initialDocument.id,
+        teamId: team?.id,
+      },
+      {
+        initialData: initialDocument,
+        ...SKIP_QUERY_BATCH_META,
+      },
+    );
+
+  const { Recipient: recipients, Field: fields } = document;
+
+  const { mutateAsync: setSettingsForDocument } = trpc.document.setSettingsForDocument.useMutation({
+    ...DO_NOT_INVALIDATE_QUERY_ON_MUTATION,
+    onSuccess: (newData) => {
+      utils.document.getDocumentWithDetailsById.setData(
+        {
+          id: initialDocument.id,
+          teamId: team?.id,
+        },
+        (oldData) => ({ ...(oldData || initialDocument), ...newData }),
+      );
+    },
+  });
+
+  const { mutateAsync: addFields } = trpc.field.addFields.useMutation({
+    ...DO_NOT_INVALIDATE_QUERY_ON_MUTATION,
+    onSuccess: (newFields) => {
+      utils.document.getDocumentWithDetailsById.setData(
+        {
+          id: initialDocument.id,
+          teamId: team?.id,
+        },
+        (oldData) => ({ ...(oldData || initialDocument), Field: newFields }),
+      );
+    },
+  });
+
+  const { mutateAsync: addSigners } = trpc.recipient.addSigners.useMutation({
+    ...DO_NOT_INVALIDATE_QUERY_ON_MUTATION,
+    onSuccess: (newRecipients) => {
+      utils.document.getDocumentWithDetailsById.setData(
+        {
+          id: initialDocument.id,
+          teamId: team?.id,
+        },
+        (oldData) => ({ ...(oldData || initialDocument), Recipient: newRecipients }),
+      );
+    },
+  });
+
+  const { mutateAsync: sendDocument } = trpc.document.sendDocument.useMutation({
+    ...DO_NOT_INVALIDATE_QUERY_ON_MUTATION,
+    onSuccess: (newData) => {
+      utils.document.getDocumentWithDetailsById.setData(
+        {
+          id: initialDocument.id,
+          teamId: team?.id,
+        },
+        (oldData) => ({ ...(oldData || initialDocument), ...newData }),
+      );
+    },
+  });
+
   const { mutateAsync: setPasswordForDocument } =
     trpc.document.setPasswordForDocument.useMutation();
 
@@ -130,6 +180,7 @@ export const EditDocumentForm = ({
         },
       });
 
+      // Router refresh is here to clear the router cache for when navigating to /documents.
       router.refresh();
 
       setStep('signers');
@@ -146,7 +197,6 @@ export const EditDocumentForm = ({
 
   const onAddSignersFormSubmit = async (data: TAddSignersFormSchema) => {
     try {
-      // Custom invocation server action
       await addSigners({
         documentId: document.id,
         teamId: team?.id,
@@ -157,7 +207,9 @@ export const EditDocumentForm = ({
         })),
       });
 
+      // Router refresh is here to clear the router cache for when navigating to /documents.
       router.refresh();
+
       setStep('fields');
     } catch (err) {
       console.error(err);
@@ -172,13 +224,14 @@ export const EditDocumentForm = ({
 
   const onAddFieldsFormSubmit = async (data: TAddFieldsFormSchema) => {
     try {
-      // Custom invocation server action
       await addFields({
         documentId: document.id,
         fields: data.fields,
       });
 
+      // Router refresh is here to clear the router cache for when navigating to /documents.
       router.refresh();
+
       setStep('subject');
     } catch (err) {
       console.error(err);
@@ -231,6 +284,15 @@ export const EditDocumentForm = ({
 
   const currentDocumentFlow = documentFlow[step];
 
+  /**
+   * Refresh the data in the background when steps change.
+   */
+  useEffect(() => {
+    void refetchDocument();
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [step]);
+
   return (
     <div className={cn('grid w-full grid-cols-12 gap-8', className)}>
       <Card
@@ -239,10 +301,10 @@ export const EditDocumentForm = ({
       >
         <CardContent className="p-2">
           <LazyPDFViewer
-            key={documentData.id}
-            documentData={documentData}
+            key={document.documentData.id}
+            documentData={document.documentData}
             document={document}
-            password={documentMeta?.password}
+            password={document.documentMeta?.password}
             onPasswordSubmit={onPasswordSubmit}
           />
         </CardContent>

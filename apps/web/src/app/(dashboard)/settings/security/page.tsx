@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 
 import { getRequiredServerComponentSession } from '@documenso/lib/next-auth/get-server-component-session';
+import { getServerComponentFlag } from '@documenso/lib/server-only/feature-flags/get-server-component-feature-flag';
 import { Alert, AlertDescription, AlertTitle } from '@documenso/ui/primitives/alert';
 import { Button } from '@documenso/ui/primitives/button';
 
@@ -17,6 +18,8 @@ export const metadata: Metadata = {
 
 export default async function SecuritySettingsPage() {
   const { user } = await getRequiredServerComponentSession();
+
+  const isPasskeyEnabled = await getServerComponentFlag('app_passkey');
 
   return (
     <div>
@@ -73,6 +76,25 @@ export default async function SecuritySettingsPage() {
         </Alert>
       )}
 
+      {isPasskeyEnabled && (
+        <Alert
+          className="mt-6 flex flex-col justify-between p-6 sm:flex-row sm:items-center"
+          variant="neutral"
+        >
+          <div className="mb-4 sm:mb-0">
+            <AlertTitle>Passkeys</AlertTitle>
+
+            <AlertDescription className="mr-4">
+              Allows authenticating using biometrics, password managers, hardware keys, etc.
+            </AlertDescription>
+          </div>
+
+          <Button asChild variant="outline" className="bg-background">
+            <Link href="/settings/security/passkeys">Manage passkeys</Link>
+          </Button>
+        </Alert>
+      )}
+
       <Alert
         className="mt-6 flex flex-col justify-between p-6 sm:flex-row sm:items-center"
         variant="neutral"
@@ -85,7 +107,7 @@ export default async function SecuritySettingsPage() {
           </AlertDescription>
         </div>
 
-        <Button asChild>
+        <Button asChild variant="outline" className="bg-background">
           <Link href="/settings/security/activity">View activity</Link>
         </Button>
       </Alert>

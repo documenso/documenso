@@ -6,9 +6,7 @@ import { ChevronLeft, Users2 } from 'lucide-react';
 import { isUserEnterprise } from '@documenso/ee/server-only/util/is-document-enterprise';
 import { DOCUMENSO_ENCRYPTION_KEY } from '@documenso/lib/constants/crypto';
 import { getRequiredServerComponentSession } from '@documenso/lib/next-auth/get-server-component-session';
-import { getDocumentById } from '@documenso/lib/server-only/document/get-document-by-id';
-import { getFieldsForDocument } from '@documenso/lib/server-only/field/get-fields-for-document';
-import { getRecipientsForDocument } from '@documenso/lib/server-only/recipient/get-recipients-for-document';
+import { getDocumentWithDetailsById } from '@documenso/lib/server-only/document/get-document-with-details-by-id';
 import { symmetricDecrypt } from '@documenso/lib/universal/crypto';
 import { formatDocumentsPath } from '@documenso/lib/utils/teams';
 import type { Team } from '@documenso/prisma/client';
@@ -43,13 +41,13 @@ export const DocumentEditPageView = async ({ params, team }: DocumentEditPageVie
     teamId: team?.id,
   });
 
-  const document = await getDocumentById({
+  const document = await getDocumentWithDetailsById({
     id: documentId,
     userId: user.id,
     teamId: team?.id,
   }).catch(() => null);
 
-  if (!document || !document.documentData) {
+  if (!document) {
     redirect(documentRootPath);
   }
 
@@ -57,7 +55,7 @@ export const DocumentEditPageView = async ({ params, team }: DocumentEditPageVie
     redirect(`${documentRootPath}/${documentId}`);
   }
 
-  const { documentData, documentMeta } = document;
+  const { documentMeta, Recipient: recipients } = document;
 
   if (documentMeta?.password) {
     const key = DOCUMENSO_ENCRYPTION_KEY;
@@ -75,18 +73,6 @@ export const DocumentEditPageView = async ({ params, team }: DocumentEditPageVie
 
     documentMeta.password = securePassword;
   }
-
-  const [recipients, fields] = await Promise.all([
-    getRecipientsForDocument({
-      documentId,
-      userId: user.id,
-      teamId: team?.id,
-    }),
-    getFieldsForDocument({
-      documentId,
-      userId: user.id,
-    }),
-  ]);
 
   return (
     <div className="mx-auto -mt-4 w-full max-w-screen-xl px-4 md:px-8">
@@ -115,12 +101,7 @@ export const DocumentEditPageView = async ({ params, team }: DocumentEditPageVie
 
       <EditDocumentForm
         className="mt-8"
-        document={document}
-        user={user}
-        documentMeta={documentMeta}
-        recipients={recipients}
-        fields={fields}
-        documentData={documentData}
+        initialDocument={document}
         documentRootPath={documentRootPath}
         isDocumentEnterprise={isDocumentEnterprise}
       />

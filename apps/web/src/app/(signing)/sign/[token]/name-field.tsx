@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 
 import { Loader } from 'lucide-react';
 
+import { DO_NOT_INVALIDATE_QUERY_ON_MUTATION } from '@documenso/lib/constants/trpc';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import type { TRecipientActionAuth } from '@documenso/lib/types/document-auth';
 import { type Recipient } from '@documenso/prisma/client';
@@ -39,12 +40,12 @@ export const NameField = ({ field, recipient }: NameFieldProps) => {
   const [isPending, startTransition] = useTransition();
 
   const { mutateAsync: signFieldWithToken, isLoading: isSignFieldWithTokenLoading } =
-    trpc.field.signFieldWithToken.useMutation();
+    trpc.field.signFieldWithToken.useMutation(DO_NOT_INVALIDATE_QUERY_ON_MUTATION);
 
   const {
     mutateAsync: removeSignedFieldWithToken,
     isLoading: isRemoveSignedFieldWithTokenLoading,
-  } = trpc.field.removeSignedFieldWithToken.useMutation();
+  } = trpc.field.removeSignedFieldWithToken.useMutation(DO_NOT_INVALIDATE_QUERY_ON_MUTATION);
 
   const isLoading = isSignFieldWithTokenLoading || isRemoveSignedFieldWithTokenLoading || isPending;
 
