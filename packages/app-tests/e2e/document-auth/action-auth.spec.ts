@@ -124,7 +124,8 @@ test('[DOCUMENT_AUTH]: should allow signing with valid global auth', async ({ pa
   await unseedUser(recipientWithAccount.id);
 });
 
-test('[DOCUMENT_AUTH]: should deny signing document when required for global auth', async ({
+// Currently document auth for signing/approving/viewing is not required.
+test.skip('[DOCUMENT_AUTH]: should deny signing document when required for global auth', async ({
   page,
 }) => {
   const user = await seedUser();
@@ -184,6 +185,10 @@ test('[DOCUMENT_AUTH]: should deny signing fields when required for global auth'
     await expect(page.getByRole('heading', { name: 'Sign Document' })).toBeVisible();
 
     for (const field of Field) {
+      if (field.type !== FieldType.SIGNATURE) {
+        continue;
+      }
+
       await page.locator(`#field-${field.id}`).getByRole('button').click();
       await expect(page.getByRole('paragraph')).toContainText(
         'Reauthentication is required to sign the field',
@@ -249,6 +254,10 @@ test('[DOCUMENT_AUTH]: should allow field signing when required for recipient au
 
     if (isAuthRequired) {
       for (const field of Field) {
+        if (field.type !== FieldType.SIGNATURE) {
+          continue;
+        }
+
         await page.locator(`#field-${field.id}`).getByRole('button').click();
         await expect(page.getByRole('paragraph')).toContainText(
           'Reauthentication is required to sign the field',
@@ -356,6 +365,10 @@ test('[DOCUMENT_AUTH]: should allow field signing when required for recipient an
 
     if (isAuthRequired) {
       for (const field of Field) {
+        if (field.type !== FieldType.SIGNATURE) {
+          continue;
+        }
+
         await page.locator(`#field-${field.id}`).getByRole('button').click();
         await expect(page.getByRole('paragraph')).toContainText(
           'Reauthentication is required to sign the field',

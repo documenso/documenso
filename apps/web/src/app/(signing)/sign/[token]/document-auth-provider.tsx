@@ -13,7 +13,7 @@ import type {
 } from '@documenso/lib/types/document-auth';
 import { DocumentAuth } from '@documenso/lib/types/document-auth';
 import { extractDocumentAuthMethods } from '@documenso/lib/utils/document-auth';
-import type { Document, Recipient, User } from '@documenso/prisma/client';
+import { type Document, FieldType, type Recipient, type User } from '@documenso/prisma/client';
 
 import type { DocumentActionAuthDialogProps } from './document-action-auth-dialog';
 import { DocumentActionAuthDialog } from './document-action-auth-dialog';
@@ -106,7 +106,7 @@ export const DocumentAuthProvider = ({
 
   const executeActionAuthProcedure = async (options: ExecuteActionAuthProcedureOptions) => {
     // Directly run callback if no auth required.
-    if (!derivedRecipientActionAuth) {
+    if (!derivedRecipientActionAuth || options.actionTarget !== FieldType.SIGNATURE) {
       await options.onReauthFormSubmit();
       return;
     }

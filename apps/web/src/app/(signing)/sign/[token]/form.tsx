@@ -20,7 +20,6 @@ import { Input } from '@documenso/ui/primitives/input';
 import { Label } from '@documenso/ui/primitives/label';
 import { SignaturePad } from '@documenso/ui/primitives/signature-pad';
 
-import { useRequiredDocumentAuthContext } from './document-auth-provider';
 import { useRequiredSigningContext } from './provider';
 import { SignDialog } from './sign-dialog';
 
@@ -37,7 +36,6 @@ export const SigningForm = ({ document, recipient, fields, redirectUrl }: Signin
   const { data: session } = useSession();
 
   const { fullName, signature, setFullName, setSignature } = useRequiredSigningContext();
-  const { executeActionAuthProcedure } = useRequiredDocumentAuthContext();
 
   const [validateUninsertedFields, setValidateUninsertedFields] = useState(false);
 
@@ -67,10 +65,13 @@ export const SigningForm = ({ document, recipient, fields, redirectUrl }: Signin
       return;
     }
 
-    await executeActionAuthProcedure({
-      onReauthFormSubmit: completeDocument,
-      actionTarget: 'DOCUMENT',
-    });
+    await completeDocument();
+
+    // Reauth is currently not required for completing the document.
+    // await executeActionAuthProcedure({
+    //   onReauthFormSubmit: completeDocument,
+    //   actionTarget: 'DOCUMENT',
+    // });
   };
 
   const completeDocument = async (authOptions?: TRecipientActionAuth) => {

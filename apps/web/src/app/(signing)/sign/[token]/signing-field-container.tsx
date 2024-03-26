@@ -3,6 +3,7 @@
 import React from 'react';
 
 import { type TRecipientActionAuth } from '@documenso/lib/types/document-auth';
+import { FieldType } from '@documenso/prisma/client';
 import type { FieldWithSignature } from '@documenso/prisma/types/field-with-signature';
 import { FieldRootContainer } from '@documenso/ui/components/field/field';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@documenso/ui/primitives/tooltip';
@@ -55,11 +56,24 @@ export const SigningFieldContainer = ({
       return;
     }
 
+    // Bypass reauth for non signature fields.
+    if (field.type !== FieldType.SIGNATURE) {
+      const presignResult = await onPreSign?.();
+
+      if (presignResult === false) {
+        return;
+      }
+
+      await onSign();
+      return;
+    }
+
     if (isAuthRedirectRequired) {
       await executeActionAuthProcedure({
         onReauthFormSubmit: () => {
           // Do nothing since the user should be redirected.
         },
+        actionTarget: field.type,
       });
 
       return;
@@ -76,6 +90,7 @@ export const SigningFieldContainer = ({
 
     await executeActionAuthProcedure({
       onReauthFormSubmit: onSign,
+      actionTarget: field.type,
     });
   };
 

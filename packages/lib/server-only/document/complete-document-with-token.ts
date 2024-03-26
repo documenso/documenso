@@ -7,11 +7,8 @@ import { prisma } from '@documenso/prisma';
 import { DocumentStatus, SigningStatus } from '@documenso/prisma/client';
 import { WebhookTriggerEvents } from '@documenso/prisma/client';
 
-import { AppError, AppErrorCode } from '../../errors/app-error';
 import type { TRecipientActionAuth } from '../../types/document-auth';
-import { extractDocumentAuthMethods } from '../../utils/document-auth';
 import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
-import { isRecipientAuthorized } from './is-recipient-authorized';
 import { sealDocument } from './seal-document';
 import { sendPendingEmail } from './send-pending-email';
 
@@ -46,8 +43,6 @@ const getDocument = async ({ token, documentId }: CompleteDocumentWithTokenOptio
 export const completeDocumentWithToken = async ({
   token,
   documentId,
-  userId,
-  authOptions,
   requestMetadata,
 }: CompleteDocumentWithTokenOptions) => {
   'use server';
@@ -79,22 +74,24 @@ export const completeDocumentWithToken = async ({
     throw new Error(`Recipient ${recipient.id} has unsigned fields`);
   }
 
-  const { derivedRecipientActionAuth } = extractDocumentAuthMethods({
-    documentAuth: document.authOptions,
-    recipientAuth: recipient.authOptions,
-  });
+  // Document reauth for completing documents is currently not required.
 
-  const isValid = await isRecipientAuthorized({
-    type: 'ACTION',
-    document: document,
-    recipient: recipient,
-    userId,
-    authOptions,
-  });
+  // const { derivedRecipientActionAuth } = extractDocumentAuthMethods({
+  //   documentAuth: document.authOptions,
+  //   recipientAuth: recipient.authOptions,
+  // });
 
-  if (!isValid) {
-    throw new AppError(AppErrorCode.UNAUTHORIZED, 'Invalid authentication values');
-  }
+  // const isValid = await isRecipientAuthorized({
+  //   type: 'ACTION',
+  //   document: document,
+  //   recipient: recipient,
+  //   userId,
+  //   authOptions,
+  // });
+
+  // if (!isValid) {
+  //   throw new AppError(AppErrorCode.UNAUTHORIZED, 'Invalid authentication values');
+  // }
 
   await prisma.$transaction(async (tx) => {
     await tx.recipient.update({
@@ -121,7 +118,7 @@ export const completeDocumentWithToken = async ({
           recipientName: recipient.name,
           recipientId: recipient.id,
           recipientRole: recipient.role,
-          actionAuth: derivedRecipientActionAuth || undefined,
+          // actionAuth: derivedRecipientActionAuth || undefined,
         },
       }),
     });

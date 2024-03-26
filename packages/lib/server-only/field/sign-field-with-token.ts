@@ -79,18 +79,28 @@ export const signFieldWithToken = async ({
     throw new Error(`Field ${fieldId} has no recipientId`);
   }
 
-  const { derivedRecipientActionAuth } = extractDocumentAuthMethods({
+  let { derivedRecipientActionAuth } = extractDocumentAuthMethods({
     documentAuth: document.authOptions,
     recipientAuth: recipient.authOptions,
   });
 
-  const isValid = await isRecipientAuthorized({
-    type: 'ACTION',
-    document: document,
-    recipient: recipient,
-    userId,
-    authOptions,
-  });
+  // Override all non-signature fields to not require any auth.
+  if (field.type !== FieldType.SIGNATURE) {
+    derivedRecipientActionAuth = null;
+  }
+
+  let isValid = true;
+
+  // Only require auth on signature fields for now.
+  if (field.type === FieldType.SIGNATURE) {
+    isValid = await isRecipientAuthorized({
+      type: 'ACTION',
+      document: document,
+      recipient: recipient,
+      userId,
+      authOptions,
+    });
+  }
 
   if (!isValid) {
     throw new AppError(AppErrorCode.UNAUTHORIZED, 'Invalid authentication values');

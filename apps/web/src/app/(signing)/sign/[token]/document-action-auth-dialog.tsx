@@ -9,12 +9,12 @@ import { DateTime } from 'luxon';
 import { signOut } from 'next-auth/react';
 import { match } from 'ts-pattern';
 
-import { RECIPIENT_ROLES_DESCRIPTION } from '@documenso/lib/constants/recipient-roles';
 import {
   DocumentAuth,
   type TRecipientActionAuth,
   type TRecipientActionAuthTypes,
 } from '@documenso/lib/types/document-auth';
+import type { FieldType } from '@documenso/prisma/client';
 import { trpc } from '@documenso/trpc/react';
 import { Alert, AlertDescription } from '@documenso/ui/primitives/alert';
 import { Button } from '@documenso/ui/primitives/button';
@@ -33,7 +33,7 @@ export type DocumentActionAuthDialogProps = {
   title?: string;
   documentAuthType: TRecipientActionAuthTypes;
   description?: string;
-  actionTarget?: 'FIELD' | 'DOCUMENT';
+  actionTarget: FieldType | 'DOCUMENT';
   isSubmitting?: boolean;
   open: boolean;
   onOpenChange: (value: boolean) => void;
@@ -53,7 +53,6 @@ export const DocumentActionAuthDialog = ({
   title,
   description,
   documentAuthType,
-  actionTarget = 'FIELD',
   // onReauthFormSubmit,
   isSubmitting,
   open,
@@ -135,19 +134,14 @@ export const DocumentActionAuthDialog = ({
   //   setFormErrorCode(null);
   // }, [open, form]);
 
-  const defaultRecipientActionVerb = RECIPIENT_ROLES_DESCRIPTION[recipient.role].actionVerb;
-
   return (
     <Dialog open={open} onOpenChange={handleOnOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>
-            {title || `${defaultRecipientActionVerb} ${actionTarget.toLowerCase()}`}
-          </DialogTitle>
+          <DialogTitle>{title || 'Sign field'}</DialogTitle>
 
           <DialogDescription>
-            {description ||
-              `Reauthentication is required to ${defaultRecipientActionVerb.toLowerCase()} the ${actionTarget.toLowerCase()}`}
+            {description || `Reauthentication is required to sign the field`}
           </DialogDescription>
         </DialogHeader>
 
@@ -156,8 +150,7 @@ export const DocumentActionAuthDialog = ({
             <fieldset disabled={isSigningOut} className="space-y-4">
               <Alert>
                 <AlertDescription>
-                  To {defaultRecipientActionVerb.toLowerCase()} this {actionTarget.toLowerCase()},
-                  you need to be logged in as <strong>{recipient.email}</strong>
+                  To sign this field, you need to be logged in as <strong>{recipient.email}</strong>
                 </AlertDescription>
               </Alert>
 
