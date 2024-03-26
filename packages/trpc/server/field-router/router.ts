@@ -21,6 +21,10 @@ export const fieldRouter = router({
       try {
         const { documentId, fields } = input;
 
+        if (Date.now() > 0) {
+          throw new Error('Some demo error');
+        }
+
         return await setFieldsForDocument({
           documentId,
           userId: ctx.user.id,
@@ -37,7 +41,10 @@ export const fieldRouter = router({
           requestMetadata: extractNextApiRequestMetadata(ctx.req),
         });
       } catch (err) {
-        console.error(err);
+        console.error(err, {
+          level: 'CRITICAL',
+          context: 'fieldRouter.addFields',
+        });
 
         throw new TRPCError({
           code: 'BAD_REQUEST',
