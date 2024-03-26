@@ -129,3 +129,12 @@
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
   background: rgb(100 116 139 / 0.5);
 }
+
+ /* Custom Swagger Dark Theme */
+.swagger-dark-theme .swagger-ui {
+  filter: invert(88%) hue-rotate(180deg);
+}
+
+.swagger-dark-theme .swagger-ui .microlight {
+  filter: invert(100%) hue-rotate(180deg);
+}

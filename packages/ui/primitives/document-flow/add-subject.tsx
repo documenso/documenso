@@ -230,7 +230,7 @@ export const AddSubjectFormPartial = ({
                     <div className="flex flex-col gap-y-4">
                       <div>
                         <Label htmlFor="redirectUrl" className="flex items-center">
-                          Redirect URL{' '}
+                          Redirect URL
                           <Tooltip>
                             <TooltipTrigger>
                               <Info className="mx-2 h-4 w-4" />
