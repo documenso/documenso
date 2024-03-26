@@ -93,7 +93,7 @@ export const MenuSwitcher = ({ user, teams: initialTeamsData }: MenuSwitcherProp
         <Button
           data-testid="menu-switcher"
           variant="none"
-          className="relative flex h-12 flex-row items-center px-2 py-2 ring-0 focus-visible:border-0 focus-visible:ring-0"
+          className="relative flex h-12 flex-row items-center px-2 py-2 ring-0 focus:outline-none focus-visible:border-0 focus-visible:ring-0 focus-visible:ring-transparent"
         >
           <AvatarWithText
             avatarFallback={formatAvatarFallback(selectedTeam?.name)}

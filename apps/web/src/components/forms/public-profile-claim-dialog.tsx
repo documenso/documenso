@@ -154,7 +154,7 @@ export const ClaimPublicProfileDialogForm = ({
 
                         <FormMessage />
 
-                        <div className="bg-muted/50 text-muted-foreground mt-2 inline-block truncate rounded-md px-2 py-1 text-sm">
+                        <div className="bg-muted/50 text-muted-foreground mt-2 inline-block max-w-[29rem] truncate rounded-md px-2 py-1 text-sm lowercase">
                           {baseUrl.host}/u/{field.value || '<username>'}
                         </div>
                       </FormItem>

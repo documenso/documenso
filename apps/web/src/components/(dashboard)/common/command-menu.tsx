@@ -14,6 +14,10 @@ import {
   SETTINGS_PAGE_SHORTCUT,
   TEMPLATES_PAGE_SHORTCUT,
 } from '@documenso/lib/constants/keyboard-shortcuts';
+import {
+  DO_NOT_INVALIDATE_QUERY_ON_MUTATION,
+  SKIP_QUERY_BATCH_META,
+} from '@documenso/lib/constants/trpc';
 import type { Document, Recipient } from '@documenso/prisma/client';
 import { trpc as trpcReact } from '@documenso/trpc/react';
 import {
@@ -82,6 +86,10 @@ export function CommandMenu({ open, onOpenChange }: CommandMenuProps) {
       },
       {
         keepPreviousData: true,
+        // Do not batch this due to relatively long request time compared to
+        // other queries which are generally batched with this.
+        ...SKIP_QUERY_BATCH_META,
+        ...DO_NOT_INVALIDATE_QUERY_ON_MUTATION,
       },
     );
 
