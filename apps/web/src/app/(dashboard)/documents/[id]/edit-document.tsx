@@ -40,6 +40,7 @@ export type EditDocumentFormProps = {
   fields: Field[];
   documentData: DocumentData;
   documentRootPath: string;
+  isDocumentEnterprise: boolean;
 };
 
 type EditDocumentStep = 'settings' | 'signers' | 'fields' | 'subject';
@@ -54,6 +55,7 @@ export const EditDocumentForm = ({
   user: _user,
   documentData,
   documentRootPath,
+  isDocumentEnterprise,
 }: EditDocumentFormProps) => {
   const { toast } = useToast();
 
@@ -261,6 +263,7 @@ export const EditDocumentForm = ({
               document={document}
               recipients={recipients}
               fields={fields}
+              isDocumentEnterprise={isDocumentEnterprise}
               onSubmit={onAddSettingsFormSubmit}
             />
 
@@ -269,6 +272,7 @@ export const EditDocumentForm = ({
               documentFlow={documentFlow.signers}
               recipients={recipients}
               fields={fields}
+              isDocumentEnterprise={isDocumentEnterprise}
               onSubmit={onAddSignersFormSubmit}
             />
 

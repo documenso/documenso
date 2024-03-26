@@ -67,6 +67,8 @@ services:
         sync: false
       - key: NEXT_PUBLIC_STRIPE_COMMUNITY_PLAN_MONTHLY_PRICE_ID
         sync: false
+      - key: NEXT_PUBLIC_STRIPE_ENTERPRISE_PLAN_MONTHLY_PRICE_ID
+        sync: false
 
       # Features
       - key: NEXT_PUBLIC_POSTHOG_KEY

@@ -45,6 +45,7 @@ export type AddSignersFormProps = {
   documentFlow: DocumentFlowStep;
   recipients: Recipient[];
   fields: Field[];
+  isDocumentEnterprise: boolean;
   onSubmit: (_data: TAddSignersFormSchema) => void;
 };
 
@@ -52,6 +53,7 @@ export const AddSignersFormPartial = ({
   documentFlow,
   recipients,
   fields,
+  isDocumentEnterprise,
   onSubmit,
 }: AddSignersFormProps) => {
   const { toast } = useToast();
@@ -243,14 +245,18 @@ export const AddSignersFormPartial = ({
                     )}
                   />
 
-                  {showAdvancedSettings && (
+                  {showAdvancedSettings && isDocumentEnterprise && (
                     <FormField
                       control={form.control}
                       name={`signers.${index}.actionAuth`}
                       render={({ field }) => (
                         <FormItem className="col-span-6">
                           <FormControl>
-                            <Select {...field} onValueChange={field.onChange}>
+                            <Select
+                              {...field}
+                              onValueChange={field.onChange}
+                              disabled={isSubmitting || hasBeenSentToRecipientId(signer.nativeId)}
+                            >
                               <SelectTrigger className="bg-background text-muted-foreground">
                                 <SelectValue placeholder="Inherit authentication method" />
 
@@ -396,7 +402,7 @@ export const AddSignersFormPartial = ({
                 Add Signer
               </Button>
 
-              {!alwaysShowAdvancedSettings && (
+              {!alwaysShowAdvancedSettings && isDocumentEnterprise && (
                 <div className="flex flex-row items-center">
                   <Checkbox
                     id="showAdvancedRecipientSettings"

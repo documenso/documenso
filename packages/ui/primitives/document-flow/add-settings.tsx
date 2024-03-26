@@ -49,6 +49,7 @@ export type AddSettingsFormProps = {
   documentFlow: DocumentFlowStep;
   recipients: Recipient[];
   fields: Field[];
+  isDocumentEnterprise: boolean;
   document: DocumentWithData;
   onSubmit: (_data: TAddSettingsFormSchema) => void;
 };
@@ -57,6 +58,7 @@ export const AddSettingsFormPartial = ({
   documentFlow,
   recipients,
   fields,
+  isDocumentEnterprise,
   document,
   onSubmit,
 }: AddSettingsFormProps) => {
@@ -183,66 +185,67 @@ export const AddSettingsFormPartial = ({
               )}
             />
 
-            <FormField
-              control={form.control}
-              name="globalActionAuth"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="flex flex-row items-center">
-                    Recipient action authentication
-                    <Tooltip>
-                      <TooltipTrigger>
-                        <InfoIcon className="mx-2 h-4 w-4" />
-                      </TooltipTrigger>
+            {isDocumentEnterprise && (
+              <FormField
+                control={form.control}
+                name="globalActionAuth"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="flex flex-row items-center">
+                      Recipient action authentication
+                      <Tooltip>
+                        <TooltipTrigger>
+                          <InfoIcon className="mx-2 h-4 w-4" />
+                        </TooltipTrigger>
 
-                      <TooltipContent className="text-foreground max-w-md space-y-2 p-4">
-                        <h2>
-                          <strong>Global recipient action authentication</strong>
-                        </h2>
+                        <TooltipContent className="text-foreground max-w-md space-y-2 p-4">
+                          <h2>
+                            <strong>Global recipient action authentication</strong>
+                          </h2>
 
-                        <p>
-                          The authentication required for recipients to sign fields and complete the
-                          document.
-                        </p>
+                          <p>
+                            The authentication required for recipients to sign the signature field.
+                          </p>
 
-                        <p>
-                          This can be overriden by setting the authentication requirements directly
-                          on each recipient in the next step.
-                        </p>
+                          <p>
+                            This can be overriden by setting the authentication requirements
+                            directly on each recipient in the next step.
+                          </p>
 
-                        <ul className="ml-3.5 list-outside list-disc space-y-0.5 py-2">
-                          <li>
-                            <strong>Require account</strong> - The recipient must be signed in
-                          </li>
-                          <li>
-                            <strong>None</strong> - No authentication required
-                          </li>
-                        </ul>
-                      </TooltipContent>
-                    </Tooltip>
-                  </FormLabel>
+                          <ul className="ml-3.5 list-outside list-disc space-y-0.5 py-2">
+                            <li>
+                              <strong>Require account</strong> - The recipient must be signed in
+                            </li>
+                            <li>
+                              <strong>None</strong> - No authentication required
+                            </li>
+                          </ul>
+                        </TooltipContent>
+                      </Tooltip>
+                    </FormLabel>
 
-                  <FormControl>
-                    <Select {...field} onValueChange={field.onChange}>
-                      <SelectTrigger className="bg-background text-muted-foreground">
-                        <SelectValue data-testid="documentActionSelectValue" placeholder="None" />
-                      </SelectTrigger>
+                    <FormControl>
+                      <Select {...field} onValueChange={field.onChange}>
+                        <SelectTrigger className="bg-background text-muted-foreground">
+                          <SelectValue data-testid="documentActionSelectValue" placeholder="None" />
+                        </SelectTrigger>
 
-                      <SelectContent position="popper">
-                        {Object.values(DocumentActionAuth).map((authType) => (
-                          <SelectItem key={authType} value={authType}>
-                            {DOCUMENT_AUTH_TYPES[authType].value}
-                          </SelectItem>
-                        ))}
+                        <SelectContent position="popper">
+                          {Object.values(DocumentActionAuth).map((authType) => (
+                            <SelectItem key={authType} value={authType}>
+                              {DOCUMENT_AUTH_TYPES[authType].value}
+                            </SelectItem>
+                          ))}
 
-                        {/* Note: -1 is remapped in the Zod schema to the required value. */}
-                        <SelectItem value={'-1'}>None</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </FormControl>
-                </FormItem>
-              )}
-            />
+                          {/* Note: -1 is remapped in the Zod schema to the required value. */}
+                          <SelectItem value={'-1'}>None</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+            )}
 
             <Accordion type="multiple" className="mt-6">
               <AccordionItem value="advanced-options" className="border-none">

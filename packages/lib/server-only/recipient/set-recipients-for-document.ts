@@ -1,3 +1,4 @@
+import { isUserEnterprise } from '@documenso/ee/server-only/util/is-document-enterprise';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
 import {
   type TRecipientActionAuthTypes,
@@ -13,6 +14,8 @@ import { createRecipientAuthOptions } from '@documenso/lib/utils/document-auth';
 import { prisma } from '@documenso/prisma';
 import { RecipientRole } from '@documenso/prisma/client';
 import { SendStatus, SigningStatus } from '@documenso/prisma/client';
+
+import { AppError, AppErrorCode } from '../../errors/app-error';
 
 export interface SetRecipientsForDocumentOptions {
   userId: number;
@@ -73,6 +76,23 @@ export const setRecipientsForDocument = async ({
 
   if (document.completedAt) {
     throw new Error('Document already complete');
+  }
+
+  const recipientsHaveActionAuth = recipients.some((recipient) => recipient.actionAuth);
+
+  // Check if user has permission to set the global action auth.
+  if (recipientsHaveActionAuth) {
+    const isDocumentEnterprise = await isUserEnterprise({
+      userId,
+      teamId,
+    });
+
+    if (!isDocumentEnterprise) {
+      throw new AppError(
+        AppErrorCode.UNAUTHORIZED,
+        'You do not have permission to set the action auth',
+      );
+    }
   }
 
   const normalizedRecipients = recipients.map((recipient) => ({

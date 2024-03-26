@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation';
 
 import { ChevronLeft, Users2 } from 'lucide-react';
 
+import { isUserEnterprise } from '@documenso/ee/server-only/util/is-document-enterprise';
 import { DOCUMENSO_ENCRYPTION_KEY } from '@documenso/lib/constants/crypto';
 import { getRequiredServerComponentSession } from '@documenso/lib/next-auth/get-server-component-session';
 import { getDocumentById } from '@documenso/lib/server-only/document/get-document-by-id';
@@ -36,6 +37,11 @@ export const DocumentEditPageView = async ({ params, team }: DocumentEditPageVie
   }
 
   const { user } = await getRequiredServerComponentSession();
+
+  const isDocumentEnterprise = await isUserEnterprise({
+    userId: user.id,
+    teamId: team?.id,
+  });
 
   const document = await getDocumentById({
     id: documentId,
@@ -116,6 +122,7 @@ export const DocumentEditPageView = async ({ params, team }: DocumentEditPageVie
         fields={fields}
         documentData={documentData}
         documentRootPath={documentRootPath}
+        isDocumentEnterprise={isDocumentEnterprise}
       />
     </div>
   );

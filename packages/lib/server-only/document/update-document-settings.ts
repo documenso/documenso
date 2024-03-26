@@ -1,5 +1,6 @@
 'use server';
 
+import { isUserEnterprise } from '@documenso/ee/server-only/util/is-document-enterprise';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
 import type { RequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 import type { CreateDocumentAuditLogDataResponse } from '@documenso/lib/utils/document-audit-logs';
@@ -73,6 +74,21 @@ export const updateDocumentSettings = async ({
     data?.globalAccessAuth === undefined ? documentGlobalAccessAuth : data.globalAccessAuth;
   const newGlobalActionAuth =
     data?.globalActionAuth === undefined ? documentGlobalActionAuth : data.globalActionAuth;
+
+  // Check if user has permission to set the global action auth.
+  if (newGlobalActionAuth) {
+    const isDocumentEnterprise = await isUserEnterprise({
+      userId,
+      teamId,
+    });
+
+    if (!isDocumentEnterprise) {
+      throw new AppError(
+        AppErrorCode.UNAUTHORIZED,
+        'You do not have permission to set the action auth',
+      );
+    }
+  }
 
   const isTitleSame = data.title === document.title;
   const isGlobalAccessSame = documentGlobalAccessAuth === newGlobalAccessAuth;
