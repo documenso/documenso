@@ -182,6 +182,7 @@ const createCompletedDocument = async (sender: User, recipients: User[]) => {
       title: `[${PULL_REQUEST_NUMBER}] Document 1 - Completed`,
       status: DocumentStatus.COMPLETED,
       documentDataId: documentData.id,
+      completedAt: new Date(),
       userId: sender.id,
     },
   });

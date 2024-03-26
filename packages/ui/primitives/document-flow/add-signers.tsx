@@ -151,9 +151,10 @@ export const AddSignersFormPartial = ({
 
           <AnimatePresence>
             {signers.map((signer, index) => (
-              <motion.div
+              <motion.fieldset
                 key={signer.id}
                 data-native-id={signer.nativeId}
+                disabled={isSubmitting || hasBeenSentToRecipientId(signer.nativeId)}
                 className="flex flex-wrap items-end gap-x-4"
               >
                 <div className="flex-1">
@@ -202,7 +203,11 @@ export const AddSignersFormPartial = ({
                     control={control}
                     name={`signers.${index}.role`}
                     render={({ field: { value, onChange } }) => (
-                      <Select value={value} onValueChange={(x) => onChange(x)}>
+                      <Select
+                        value={value}
+                        onValueChange={(x) => onChange(x)}
+                        disabled={isSubmitting || hasBeenSentToRecipientId(signer.nativeId)}
+                      >
                         <SelectTrigger className="bg-background">{ROLE_ICONS[value]}</SelectTrigger>
 
                         <SelectContent className="" align="end">
@@ -258,7 +263,7 @@ export const AddSignersFormPartial = ({
                   <FormErrorMessage className="mt-2" error={errors.signers?.[index]?.email} />
                   <FormErrorMessage className="mt-2" error={errors.signers?.[index]?.name} />
                 </div>
-              </motion.div>
+              </motion.fieldset>
             ))}
           </AnimatePresence>
         </div>

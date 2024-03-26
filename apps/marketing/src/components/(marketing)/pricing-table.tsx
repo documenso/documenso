@@ -23,7 +23,7 @@ export const PricingTable = ({ className, ...props }: PricingTableProps) => {
 
   return (
     <div className={cn('', className)} {...props}>
-      <div className="flex items-center justify-center gap-x-6">
+      <div className="bg-background sticky top-32 flex items-center justify-end gap-x-6 shadow-[-1px_-5px_2px_6px_hsl(var(--background))] md:top-[7.5rem] lg:static lg:justify-center">
         <AnimatePresence>
           <motion.button
             key="MONTHLY"
@@ -40,7 +40,7 @@ export const PricingTable = ({ className, ...props }: PricingTableProps) => {
             {period === 'MONTHLY' && (
               <motion.div
                 layoutId={SELECTED_PLAN_BAR_LAYOUT_ID}
-                className="bg-primary absolute bottom-0 left-0 h-[3px] w-full rounded-full"
+                className="bg-foreground lg:bg-primary absolute bottom-0 left-0 h-[3px] w-full rounded-full"
               />
             )}
           </motion.button>
@@ -63,7 +63,7 @@ export const PricingTable = ({ className, ...props }: PricingTableProps) => {
             {period === 'YEARLY' && (
               <motion.div
                 layoutId={SELECTED_PLAN_BAR_LAYOUT_ID}
-                className="bg-primary absolute bottom-0 left-0 h-[3px] w-full rounded-full"
+                className="bg-foreground lg:bg-primary absolute bottom-0 left-0 h-[3px] w-full rounded-full"
               />
             )}
           </motion.button>
