@@ -3,9 +3,9 @@ import { TRPCError } from '@trpc/server';
 import { findDocuments } from '@documenso/lib/server-only/admin/get-all-documents';
 import { updateRecipient } from '@documenso/lib/server-only/admin/update-recipient';
 import { updateUser } from '@documenso/lib/server-only/admin/update-user';
-import { deleteDocument } from '@documenso/lib/server-only/document/delete-document';
 import { sealDocument } from '@documenso/lib/server-only/document/seal-document';
 import { sendDeleteEmail } from '@documenso/lib/server-only/document/send-delete-email';
+import { superDeleteDocument } from '@documenso/lib/server-only/document/super-delete-document';
 import { upsertSiteSetting } from '@documenso/lib/server-only/site-settings/upsert-site-setting';
 import { deleteUser } from '@documenso/lib/server-only/user/delete-user';
 import { getUserById } from '@documenso/lib/server-only/user/get-user-by-id';
@@ -126,7 +126,7 @@ export const adminRouter = router({
     .mutation(async ({ input }) => {
       const { id, userId, reason } = input;
       try {
-        const document = await deleteDocument({ id, userId });
+        const document = await superDeleteDocument({ id, userId });
         await sendDeleteEmail({ documentId: id, reason });
         return document;
       } catch (err) {

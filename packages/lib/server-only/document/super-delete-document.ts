@@ -20,7 +20,7 @@ export type SuperDeleteDocumentOptions = {
   requestMetadata?: RequestMetadata;
 };
 
-export const SuperDeleteDocument = async ({
+export const superDeleteDocument = async ({
   id,
   userId,
   requestMetadata,
