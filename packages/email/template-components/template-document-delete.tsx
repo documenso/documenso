@@ -18,7 +18,8 @@ export const TemplateDocumentDelete = ({
 
       <Section>
         <Text className="text-primary mx-auto mb-0 max-w-[80%] text-center text-lg font-semibold">
-          Your document has been deleted
+          This document can not be recovered, if you would like to dispute the reason for future
+          documents please contact support.
           <br />"{documentName}"
         </Text>
         <Text className="text-primary mx-auto mb-0 max-w-[80%] text-center text-lg font-semibold">
