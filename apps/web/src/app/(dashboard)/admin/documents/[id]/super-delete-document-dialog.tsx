@@ -34,13 +34,15 @@ export const SuperDeleteDocumentDialog = ({ document }: SuperDeleteDocumentDialo
 
   const handleDeleteDocument = async () => {
     try {
-      await deleteDocument({ id: document.id, userId: document.userId, reason });
-      toast({
-        title: 'Document deleted',
-        description: 'The Document has been deleted successfully.',
-        duration: 5000,
-      });
-      router.push('/admin/documents');
+      if (reason) {
+        await deleteDocument({ id: document.id, userId: document.userId, reason });
+        toast({
+          title: 'Document deleted',
+          description: 'The Document has been deleted successfully.',
+          duration: 5000,
+        });
+        router.push('/admin/documents');
+      }
     } catch (err) {
       if (err instanceof TRPCClientError && err.data?.code === 'BAD_REQUEST') {
         toast({
