@@ -25,7 +25,7 @@ export const UserProfileSkeleton = ({ className, user, rows = 2 }: UserProfileSk
       )}
     >
       <div className="border-border bg-background text-muted-foreground inline-block max-w-full truncate rounded-md border px-2.5 py-1.5 text-sm">
-        {baseUrl.host}/u/{user.url}
+        {baseUrl.host}/u/{user.url?.toLowerCase()}
       </div>
 
       <div className="mt-4">

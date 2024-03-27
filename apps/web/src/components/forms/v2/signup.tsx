@@ -376,7 +376,7 @@ export const SignUpFormV2 = ({
                       <FormMessage />
 
                       <div className="bg-muted/50 border-border text-muted-foreground mt-2 inline-block max-w-[16rem] truncate rounded-md border px-2 py-1 text-sm lowercase">
-                        {baseUrl.host}/u/{field.value || '<username>'}
+                        {baseUrl.host}/u/{field.value.toLowerCase() || '<username>'}
                       </div>
                     </FormItem>
                   )}
