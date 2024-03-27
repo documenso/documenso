@@ -50,6 +50,7 @@ export type AddSettingsFormProps = {
   recipients: Recipient[];
   fields: Field[];
   isDocumentEnterprise: boolean;
+  isDocumentPdfLoaded: boolean;
   document: DocumentWithData;
   onSubmit: (_data: TAddSettingsFormSchema) => void;
 };
@@ -59,6 +60,7 @@ export const AddSettingsFormPartial = ({
   recipients,
   fields,
   isDocumentEnterprise,
+  isDocumentPdfLoaded,
   document,
   onSubmit,
 }: AddSettingsFormProps) => {
@@ -102,9 +104,10 @@ export const AddSettingsFormPartial = ({
       />
 
       <DocumentFlowFormContainerContent>
-        {fields.map((field, index) => (
-          <ShowFieldItem key={index} field={field} recipients={recipients} />
-        ))}
+        {isDocumentPdfLoaded &&
+          fields.map((field, index) => (
+            <ShowFieldItem key={index} field={field} recipients={recipients} />
+          ))}
 
         <Form {...form}>
           <fieldset

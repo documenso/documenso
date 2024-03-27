@@ -29,6 +29,7 @@ export type AddSubjectFormProps = {
   fields: Field[];
   document: DocumentWithData;
   onSubmit: (_data: TAddSubjectFormSchema) => void;
+  isDocumentPdfLoaded: boolean;
 };
 
 export const AddSubjectFormPartial = ({
@@ -37,6 +38,7 @@ export const AddSubjectFormPartial = ({
   fields: fields,
   document,
   onSubmit,
+  isDocumentPdfLoaded,
 }: AddSubjectFormProps) => {
   const {
     register,
@@ -63,9 +65,10 @@ export const AddSubjectFormPartial = ({
       />
       <DocumentFlowFormContainerContent>
         <div className="flex flex-col">
-          {fields.map((field, index) => (
-            <ShowFieldItem key={index} field={field} recipients={recipients} />
-          ))}
+          {isDocumentPdfLoaded &&
+            fields.map((field, index) => (
+              <ShowFieldItem key={index} field={field} recipients={recipients} />
+            ))}
 
           <div className="flex flex-col gap-y-4">
             <div>

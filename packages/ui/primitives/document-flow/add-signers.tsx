@@ -47,6 +47,7 @@ export type AddSignersFormProps = {
   fields: Field[];
   isDocumentEnterprise: boolean;
   onSubmit: (_data: TAddSignersFormSchema) => void;
+  isDocumentPdfLoaded: boolean;
 };
 
 export const AddSignersFormPartial = ({
@@ -55,6 +56,7 @@ export const AddSignersFormPartial = ({
   fields,
   isDocumentEnterprise,
   onSubmit,
+  isDocumentPdfLoaded,
 }: AddSignersFormProps) => {
   const { toast } = useToast();
   const { remaining } = useLimits();
@@ -172,9 +174,10 @@ export const AddSignersFormPartial = ({
         description={documentFlow.description}
       />
       <DocumentFlowFormContainerContent>
-        {fields.map((field, index) => (
-          <ShowFieldItem key={index} field={field} recipients={recipients} />
-        ))}
+        {isDocumentPdfLoaded &&
+          fields.map((field, index) => (
+            <ShowFieldItem key={index} field={field} recipients={recipients} />
+          ))}
 
         <AnimateGenericFadeInOut motionKey={showAdvancedSettings ? 'Show' : 'Hide'}>
           <Form {...form}>
