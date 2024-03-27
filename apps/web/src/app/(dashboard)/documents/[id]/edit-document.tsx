@@ -49,6 +49,8 @@ export const EditDocumentForm = ({
   const searchParams = useSearchParams();
   const team = useOptionalCurrentTeam();
 
+  const [isDocumentPdfLoaded, setIsDocumentPdfLoaded] = useState(false);
+
   const utils = trpc.useUtils();
 
   const { data: document, refetch: refetchDocument } =
@@ -294,6 +296,7 @@ export const EditDocumentForm = ({
             document={document}
             password={document.documentMeta?.password}
             onPasswordSubmit={onPasswordSubmit}
+            onDocumentLoad={() => setIsDocumentPdfLoaded(true)}
           />
         </CardContent>
       </Card>
@@ -314,8 +317,8 @@ export const EditDocumentForm = ({
               recipients={recipients}
               fields={fields}
               onSubmit={onAddTitleFormSubmit}
+              isDocumentPdfLoaded={isDocumentPdfLoaded}
             />
-
             <AddSignersFormPartial
               key={recipients.length}
               documentFlow={documentFlow.signers}
@@ -323,6 +326,7 @@ export const EditDocumentForm = ({
               recipients={recipients}
               fields={fields}
               onSubmit={onAddSignersFormSubmit}
+              isDocumentPdfLoaded={isDocumentPdfLoaded}
             />
             <AddFieldsFormPartial
               key={fields.length}
@@ -330,6 +334,7 @@ export const EditDocumentForm = ({
               recipients={recipients}
               fields={fields}
               onSubmit={onAddFieldsFormSubmit}
+              isDocumentPdfLoaded={isDocumentPdfLoaded}
             />
             <AddSubjectFormPartial
               key={recipients.length}
@@ -338,6 +343,7 @@ export const EditDocumentForm = ({
               recipients={recipients}
               fields={fields}
               onSubmit={onAddSubjectFormSubmit}
+              isDocumentPdfLoaded={isDocumentPdfLoaded}
             />
           </Stepper>
         </DocumentFlowFormContainer>
