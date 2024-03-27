@@ -91,11 +91,6 @@
     @apply border-border;
   }
 
-  html,
-  body {
-    scrollbar-gutter: stable;
-  }
-
   body {
     @apply bg-background text-foreground;
     font-feature-settings: 'rlig' 1, 'calt' 1;
@@ -130,7 +125,7 @@
   background: rgb(100 116 139 / 0.5);
 }
 
- /* Custom Swagger Dark Theme */
+/* Custom Swagger Dark Theme */
 .swagger-dark-theme .swagger-ui {
   filter: invert(88%) hue-rotate(180deg);
 }
