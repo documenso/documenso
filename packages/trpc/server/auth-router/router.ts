@@ -1,15 +1,31 @@
+import type { RegistrationResponseJSON } from '@simplewebauthn/types';
 import { TRPCError } from '@trpc/server';
+import { parse } from 'cookie-es';
 import { env } from 'next-runtime-env';
 
 import { IS_BILLING_ENABLED } from '@documenso/lib/constants/app';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { ErrorCode } from '@documenso/lib/next-auth/error-codes';
+import { createPasskey } from '@documenso/lib/server-only/auth/create-passkey';
+import { createPasskeyRegistrationOptions } from '@documenso/lib/server-only/auth/create-passkey-registration-options';
+import { createPasskeySigninOptions } from '@documenso/lib/server-only/auth/create-passkey-signin-options';
+import { deletePasskey } from '@documenso/lib/server-only/auth/delete-passkey';
+import { findPasskeys } from '@documenso/lib/server-only/auth/find-passkeys';
 import { compareSync } from '@documenso/lib/server-only/auth/hash';
+import { updatePasskey } from '@documenso/lib/server-only/auth/update-passkey';
 import { createUser } from '@documenso/lib/server-only/user/create-user';
 import { sendConfirmationToken } from '@documenso/lib/server-only/user/send-confirmation-token';
+import { extractNextApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 
 import { authenticatedProcedure, procedure, router } from '../trpc';
-import { ZSignUpMutationSchema, ZVerifyPasswordMutationSchema } from './schema';
+import {
+  ZCreatePasskeyMutationSchema,
+  ZDeletePasskeyMutationSchema,
+  ZFindPasskeysQuerySchema,
+  ZSignUpMutationSchema,
+  ZUpdatePasskeyMutationSchema,
+  ZVerifyPasswordMutationSchema,
+} from './schema';
 
 const NEXT_PUBLIC_DISABLE_SIGNUP = () => env('NEXT_PUBLIC_DISABLE_SIGNUP');
 
@@ -77,5 +93,127 @@ export const authRouter = router({
       const valid = compareSync(password, user.password);
 
       return valid;
+    }),
+
+  createPasskey: authenticatedProcedure
+    .input(ZCreatePasskeyMutationSchema)
+    .mutation(async ({ ctx, input }) => {
+      try {
+        // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+        const verificationResponse = input.verificationResponse as RegistrationResponseJSON;
+
+        return await createPasskey({
+          userId: ctx.user.id,
+          verificationResponse,
+          passkeyName: input.passkeyName,
+          requestMetadata: extractNextApiRequestMetadata(ctx.req),
+        });
+      } catch (err) {
+        console.error(err);
+
+        throw AppError.parseErrorToTRPCError(err);
+      }
+    }),
+
+  createPasskeyRegistrationOptions: authenticatedProcedure.mutation(async ({ ctx }) => {
+    try {
+      return await createPasskeyRegistrationOptions({
+        userId: ctx.user.id,
+      });
+    } catch (err) {
+      console.error(err);
+
+      throw new TRPCError({
+        code: 'BAD_REQUEST',
+        message:
+          'We were unable to create the registration options for the passkey. Please try again later.',
+      });
+    }
+  }),
+
+  createPasskeySigninOptions: procedure.mutation(async ({ ctx }) => {
+    const sessionIdToken = parse(ctx.req.headers.cookie ?? '')['next-auth.csrf-token'];
+
+    if (!sessionIdToken) {
+      throw new Error('Missing CSRF token');
+    }
+
+    const [sessionId] = decodeURI(sessionIdToken).split('|');
+
+    try {
+      return await createPasskeySigninOptions({ sessionId });
+    } catch (err) {
+      console.error(err);
+
+      throw new TRPCError({
+        code: 'BAD_REQUEST',
+        message: 'We were unable to create the options for passkey signin. Please try again later.',
+      });
+    }
+  }),
+
+  deletePasskey: authenticatedProcedure
+    .input(ZDeletePasskeyMutationSchema)
+    .mutation(async ({ ctx, input }) => {
+      try {
+        const { passkeyId } = input;
+
+        await deletePasskey({
+          userId: ctx.user.id,
+          passkeyId,
+          requestMetadata: extractNextApiRequestMetadata(ctx.req),
+        });
+      } catch (err) {
+        console.error(err);
+
+        throw new TRPCError({
+          code: 'BAD_REQUEST',
+          message: 'We were unable to delete this passkey. Please try again later.',
+        });
+      }
+    }),
+
+  findPasskeys: authenticatedProcedure
+    .input(ZFindPasskeysQuerySchema)
+    .query(async ({ input, ctx }) => {
+      try {
+        const { page, perPage, orderBy } = input;
+
+        return await findPasskeys({
+          page,
+          perPage,
+          orderBy,
+          userId: ctx.user.id,
+        });
+      } catch (err) {
+        console.error(err);
+
+        throw new TRPCError({
+          code: 'BAD_REQUEST',
+          message: 'We were unable to find passkeys. Please try again later.',
+        });
+      }
+    }),
+
+  updatePasskey: authenticatedProcedure
+    .input(ZUpdatePasskeyMutationSchema)
+    .mutation(async ({ ctx, input }) => {
+      try {
+        const { passkeyId, name } = input;
+
+        await updatePasskey({
+          userId: ctx.user.id,
+          passkeyId,
+          name,
+          requestMetadata: extractNextApiRequestMetadata(ctx.req),
+        });
+      } catch (err) {
+        console.error(err);
+
+        throw new TRPCError({
+          code: 'BAD_REQUEST',
+          message: 'We were unable to update this passkey. Please try again later.',
+        });
+      }
     }),
 });
