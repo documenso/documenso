@@ -95,8 +95,8 @@ export const sealDocument = async ({
 
   // Normalize and flatten layers that could cause issues with the signature
   normalizeSignatureAppearances(doc);
-  flattenAnnotations(doc);
   doc.getForm().flatten();
+  flattenAnnotations(doc);
 
   for (const field of fields) {
     await insertFieldInPDF(doc, field);
