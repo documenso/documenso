@@ -1,4 +1,10 @@
-import { Document, Recipient } from '@documenso/prisma/client';
+import type {
+  Document,
+  DocumentData,
+  DocumentMeta,
+  Field,
+  Recipient,
+} from '@documenso/prisma/client';
 
 export type DocumentWithRecipientAndSender = Omit<Document, 'document'> & {
   recipient: Recipient;
@@ -9,4 +15,11 @@ export type DocumentWithRecipientAndSender = Omit<Document, 'document'> & {
   };
   subject: string;
   description: string;
+};
+
+export type DocumentWithDetails = Document & {
+  documentData: DocumentData;
+  documentMeta: DocumentMeta | null;
+  Recipient: Recipient[];
+  Field: Field[];
 };

@@ -15,15 +15,14 @@ export default function SettingsSecurityActivityPage() {
       <SettingsHeader
         title="Security activity"
         subtitle="View all recent security activity related to your account."
+        hideDivider={true}
       >
-        <div>
-          <ActivityPageBackButton />
-        </div>
+        <ActivityPageBackButton />
       </SettingsHeader>
 
-      <hr className="my-4" />
-
-      <UserSecurityActivityDataTable />
+      <div className="mt-4">
+        <UserSecurityActivityDataTable />
+      </div>
     </div>
   );
 }
