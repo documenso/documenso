@@ -14,6 +14,7 @@ import {
   DialogTitle,
 } from '@documenso/ui/primitives/dialog';
 
+import { DocumentActionAuth2FA } from './document-action-auth-2fa';
 import { DocumentActionAuthAccount } from './document-action-auth-account';
 import { DocumentActionAuthPasskey } from './document-action-auth-passkey';
 import { useRequiredDocumentAuthContext } from './document-auth-provider';
@@ -69,6 +70,13 @@ export const DocumentActionAuthDialog = ({
           )
           .with({ documentAuthType: DocumentAuth.PASSKEY }, () => (
             <DocumentActionAuthPasskey
+              open={open}
+              onOpenChange={onOpenChange}
+              onReauthFormSubmit={onReauthFormSubmit}
+            />
+          ))
+          .with({ documentAuthType: DocumentAuth.TWO_FACTOR_AUTH }, () => (
+            <DocumentActionAuth2FA
               open={open}
               onOpenChange={onOpenChange}
               onReauthFormSubmit={onReauthFormSubmit}

@@ -142,7 +142,7 @@ export const DocumentAuthProvider = ({
     .with(DocumentAuth.EXPLICIT_NONE, () => ({
       type: DocumentAuth.EXPLICIT_NONE,
     }))
-    .with(DocumentAuth.PASSKEY, null, () => null)
+    .with(DocumentAuth.PASSKEY, DocumentAuth.TWO_FACTOR_AUTH, null, () => null)
     .exhaustive();
 
   const executeActionAuthProcedure = async (options: ExecuteActionAuthProcedureOptions) => {

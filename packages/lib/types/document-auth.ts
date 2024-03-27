@@ -5,7 +5,12 @@ import { ZAuthenticationResponseJSONSchema } from './webauthn';
 /**
  * All the available types of document authentication options for both access and action.
  */
-export const ZDocumentAuthTypesSchema = z.enum(['ACCOUNT', 'PASSKEY', 'EXPLICIT_NONE']);
+export const ZDocumentAuthTypesSchema = z.enum([
+  'ACCOUNT',
+  'PASSKEY',
+  'TWO_FACTOR_AUTH',
+  'EXPLICIT_NONE',
+]);
 export const DocumentAuth = ZDocumentAuthTypesSchema.Enum;
 
 const ZDocumentAuthAccountSchema = z.object({
@@ -22,6 +27,11 @@ const ZDocumentAuthPasskeySchema = z.object({
   tokenReference: z.string().min(1),
 });
 
+const ZDocumentAuth2FASchema = z.object({
+  type: z.literal(DocumentAuth.TWO_FACTOR_AUTH),
+  token: z.string().min(4).max(10),
+});
+
 /**
  * All the document auth methods for both accessing and actioning.
  */
@@ -29,6 +39,7 @@ export const ZDocumentAuthMethodsSchema = z.discriminatedUnion('type', [
   ZDocumentAuthAccountSchema,
   ZDocumentAuthExplicitNoneSchema,
   ZDocumentAuthPasskeySchema,
+  ZDocumentAuth2FASchema,
 ]);
 
 /**
@@ -47,8 +58,13 @@ export const ZDocumentAccessAuthTypesSchema = z.enum([DocumentAuth.ACCOUNT]);
 export const ZDocumentActionAuthSchema = z.discriminatedUnion('type', [
   ZDocumentAuthAccountSchema,
   ZDocumentAuthPasskeySchema,
+  ZDocumentAuth2FASchema,
 ]);
-export const ZDocumentActionAuthTypesSchema = z.enum([DocumentAuth.ACCOUNT, DocumentAuth.PASSKEY]);
+export const ZDocumentActionAuthTypesSchema = z.enum([
+  DocumentAuth.ACCOUNT,
+  DocumentAuth.PASSKEY,
+  DocumentAuth.TWO_FACTOR_AUTH,
+]);
 
 /**
  * The recipient access auth methods.
@@ -68,11 +84,13 @@ export const ZRecipientAccessAuthTypesSchema = z.enum([DocumentAuth.ACCOUNT]);
 export const ZRecipientActionAuthSchema = z.discriminatedUnion('type', [
   ZDocumentAuthAccountSchema,
   ZDocumentAuthPasskeySchema,
+  ZDocumentAuth2FASchema,
   ZDocumentAuthExplicitNoneSchema,
 ]);
 export const ZRecipientActionAuthTypesSchema = z.enum([
   DocumentAuth.ACCOUNT,
   DocumentAuth.PASSKEY,
+  DocumentAuth.TWO_FACTOR_AUTH,
   DocumentAuth.EXPLICIT_NONE,
 ]);
 
