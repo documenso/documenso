@@ -2,7 +2,7 @@
 
 import { nanoid } from 'nanoid';
 import path from 'node:path';
-import { PDFDocument, PDFSignature, rectangle } from 'pdf-lib';
+import { PDFDocument } from 'pdf-lib';
 
 import PostHogServerClient from '@documenso/lib/server-only/feature-flags/get-post-hog-server-client';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
@@ -15,7 +15,9 @@ import { signPdf } from '@documenso/signing';
 import type { RequestMetadata } from '../../universal/extract-request-metadata';
 import { getFile } from '../../universal/upload/get-file';
 import { putFile } from '../../universal/upload/put-file';
+import { flattenAnnotations } from '../pdf/flatten-annotations';
 import { insertFieldInPDF } from '../pdf/insert-field-in-pdf';
+import { normalizeSignatureAppearances } from '../pdf/normalize-signature-appearances';
 import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
 import { sendCompletedEmail } from './send-completed-email';
 
@@ -91,31 +93,10 @@ export const sealDocument = async ({
 
   const doc = await PDFDocument.load(pdfData);
 
-  const form = doc.getForm();
-
-  // Remove old signatures
-  for (const field of form.getFields()) {
-    if (field instanceof PDFSignature) {
-      field.acroField.getWidgets().forEach((widget) => {
-        widget.ensureAP();
-
-        try {
-          widget.getNormalAppearance();
-        } catch (e) {
-          const { context } = widget.dict;
-
-          const xobj = context.formXObject([rectangle(0, 0, 0, 0)]);
-
-          const streamRef = context.register(xobj);
-
-          widget.setNormalAppearance(streamRef);
-        }
-      });
-    }
-  }
-
-  // Flatten the form to stop annotation layers from appearing above documenso fields
-  form.flatten();
+  // Normalize and flatten layers that could cause issues with the signature
+  normalizeSignatureAppearances(doc);
+  flattenAnnotations(doc);
+  doc.getForm().flatten();
 
   for (const field of fields) {
     await insertFieldInPDF(doc, field);
