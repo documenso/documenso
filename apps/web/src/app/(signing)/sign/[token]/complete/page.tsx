@@ -68,7 +68,7 @@ export default async function CompletedSigningPage({
 
   const sessionData = await getServerSession();
   const isLoggedIn = !!sessionData?.user;
-  const callToActionCheck = !isLoggedIn && NEXT_PUBLIC_DISABLE_SIGNUP?.toString() !== 'true';
+  const callToActionCheck = !isLoggedIn && NEXT_PUBLIC_DISABLE_SIGNUP !== 'true';
 
   return (
     <div className="-mx-4 flex flex-col items-center overflow-x-hidden px-4 pt-24 md:-mx-8 md:px-8 lg:pt-36 xl:pt-44">
