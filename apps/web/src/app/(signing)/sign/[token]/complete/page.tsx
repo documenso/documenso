@@ -32,7 +32,7 @@ export type CompletedSigningPageProps = {
 export default async function CompletedSigningPage({
   params: { token },
 }: CompletedSigningPageProps) {
-  const NEXT_PUBLIC_DISABLE_SIGNUP = Boolean(env('NEXT_PUBLIC_DISABLE_SIGNUP'));
+  const NEXT_PUBLIC_DISABLE_SIGNUP = env('NEXT_PUBLIC_DISABLE_SIGNUP');
 
   if (!token) {
     return notFound();
@@ -68,7 +68,7 @@ export default async function CompletedSigningPage({
 
   const sessionData = await getServerSession();
   const isLoggedIn = !!sessionData?.user;
-  const callToActionCheck = !isLoggedIn && !NEXT_PUBLIC_DISABLE_SIGNUP;
+  const callToActionCheck = !isLoggedIn && NEXT_PUBLIC_DISABLE_SIGNUP?.toString() !== 'true';
 
   return (
     <div className="-mx-4 flex flex-col items-center overflow-x-hidden px-4 pt-24 md:-mx-8 md:px-8 lg:pt-36 xl:pt-44">
