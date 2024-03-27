@@ -9,6 +9,7 @@ import type {
 } from '@documenso/prisma/client';
 
 import { RECIPIENT_ROLES_DESCRIPTION } from '../constants/recipient-roles';
+import { AppError } from '../errors/app-error';
 import type {
   TDocumentAuditLog,
   TDocumentAuditLogDocumentMetaDiffSchema,
@@ -69,7 +70,7 @@ export const parseDocumentAuditLogData = (auditLog: DocumentAuditLog): TDocument
   // Handle any required migrations here.
   if (!data.success) {
     console.error(data.error);
-    throw new Error('Migration required');
+    throw new AppError('MIGRATION_REQUIRED');
   }
 
   return data.data;

@@ -3,8 +3,11 @@ import { prisma } from '@documenso/prisma';
 import type { DocumentAuditLog } from '@documenso/prisma/client';
 import type { Prisma } from '@documenso/prisma/client';
 
+import { AppError } from '../../errors/app-error';
+import type { TDocumentAuditLog } from '../../types/document-audit-logs';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '../../types/document-audit-logs';
 import { parseDocumentAuditLogData } from '../../utils/document-audit-logs';
+import { buildServerLogger } from '../../utils/logger';
 
 export interface FindDocumentAuditLogsOptions {
   userId: number;
@@ -97,7 +100,26 @@ export const findDocumentAuditLogs = async ({
 
   let nextCursor: string | undefined = undefined;
 
-  const parsedData = data.map((auditLog) => parseDocumentAuditLogData(auditLog));
+  let parsedData: TDocumentAuditLog[] = [];
+
+  try {
+    parsedData = data.map((auditLog) => parseDocumentAuditLogData(auditLog));
+  } catch (err) {
+    const error = AppError.parseError(err);
+
+    if (error.code === 'MIGRATION_REQUIRED') {
+      const logger = buildServerLogger();
+
+      logger.error('findDocumentAuditLogs', {
+        level: 'ALERT',
+        error,
+      });
+
+      void logger.flush();
+    }
+
+    throw error;
+  }
 
   if (parsedData.length > perPage) {
     const nextItem = parsedData.pop();

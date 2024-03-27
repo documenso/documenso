@@ -16,6 +16,7 @@ import { sendDocument } from '@documenso/lib/server-only/document/send-document'
 import { updateTitle } from '@documenso/lib/server-only/document/update-title';
 import { symmetricEncrypt } from '@documenso/lib/universal/crypto';
 import { extractNextApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
+import { buildServerLogger } from '@documenso/lib/utils/logger';
 
 import { authenticatedProcedure, procedure, router } from '../trpc';
 import {
@@ -32,6 +33,12 @@ import {
   ZSetTitleForDocumentMutationSchema,
 } from './schema';
 
+const logger = buildServerLogger({
+  args: {
+    context: 'trpcDocumentRouter',
+  },
+});
+
 export const documentRouter = router({
   getDocumentById: authenticatedProcedure
     .input(ZGetDocumentByIdQuerySchema)
@@ -42,6 +49,10 @@ export const documentRouter = router({
           userId: ctx.user.id,
         });
       } catch (err) {
+        logger.error('getDocumentById', {
+          error: err,
+        });
+
         console.error(err);
 
         throw new TRPCError({
@@ -59,6 +70,10 @@ export const documentRouter = router({
         token,
       });
     } catch (err) {
+      logger.error('getDocumentByToken', {
+        error: err,
+      });
+
       console.error(err);
 
       throw new TRPCError({
@@ -77,6 +92,10 @@ export const documentRouter = router({
           userId: ctx.user.id,
         });
       } catch (err) {
+        logger.error('getDocumentWithDetailsById', {
+          error: err,
+        });
+
         console.error(err);
 
         throw new TRPCError({
@@ -110,6 +129,10 @@ export const documentRouter = router({
           requestMetadata: extractNextApiRequestMetadata(ctx.req),
         });
       } catch (err) {
+        logger.error('createDocument', {
+          error: err,
+        });
+
         if (err instanceof TRPCError) {
           throw err;
         }
@@ -136,6 +159,10 @@ export const documentRouter = router({
           requestMetadata: extractNextApiRequestMetadata(ctx.req),
         });
       } catch (err) {
+        logger.error('deleteDocument', {
+          error: err,
+        });
+
         console.error(err);
 
         throw new TRPCError({
@@ -161,6 +188,10 @@ export const documentRouter = router({
           userId: ctx.user.id,
         });
       } catch (err) {
+        logger.error('findDocumentAuditLogs', {
+          error: err,
+        });
+
         console.error(err);
 
         throw new TRPCError({
@@ -177,13 +208,21 @@ export const documentRouter = router({
 
       const userId = ctx.user.id;
 
-      return await updateTitle({
-        title,
-        userId,
-        teamId,
-        documentId,
-        requestMetadata: extractNextApiRequestMetadata(ctx.req),
-      });
+      try {
+        return await updateTitle({
+          title,
+          userId,
+          teamId,
+          documentId,
+          requestMetadata: extractNextApiRequestMetadata(ctx.req),
+        });
+      } catch (err) {
+        logger.error('setTitleForDocument', {
+          error: err,
+        });
+
+        console.error(err);
+      }
     }),
 
   setPasswordForDocument: authenticatedProcedure
@@ -210,6 +249,10 @@ export const documentRouter = router({
           requestMetadata: extractNextApiRequestMetadata(ctx.req),
         });
       } catch (err) {
+        logger.error('setPasswordForDocument', {
+          error: err,
+        });
+
         console.error(err);
 
         throw new TRPCError({
@@ -245,6 +288,10 @@ export const documentRouter = router({
           requestMetadata: extractNextApiRequestMetadata(ctx.req),
         });
       } catch (err) {
+        logger.error('sendDocument', {
+          error: err,
+        });
+
         console.error(err);
 
         throw new TRPCError({
@@ -264,6 +311,10 @@ export const documentRouter = router({
           requestMetadata: extractNextApiRequestMetadata(ctx.req),
         });
       } catch (err) {
+        logger.error('resendDocument', {
+          error: err,
+        });
+
         console.error(err);
 
         throw new TRPCError({
@@ -282,6 +333,10 @@ export const documentRouter = router({
           ...input,
         });
       } catch (err) {
+        logger.error('duplicateDocument', {
+          error: err,
+        });
+
         console.log(err);
 
         throw new TRPCError({
@@ -302,7 +357,11 @@ export const documentRouter = router({
           userId: ctx.user.id,
         });
         return documents;
-      } catch (error) {
+      } catch (err) {
+        logger.error('searchDocuments', {
+          error: err,
+        });
+
         throw new TRPCError({
           code: 'BAD_REQUEST',
           message: 'We are unable to search for documents. Please try again later.',

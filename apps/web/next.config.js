@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
+const { withAxiom } = require('next-axiom');
 const fs = require('fs');
 const path = require('path');
 const { version } = require('./package.json');
@@ -91,4 +92,4 @@ const config = {
   },
 };
 
-module.exports = config;
+module.exports = withAxiom(config);
