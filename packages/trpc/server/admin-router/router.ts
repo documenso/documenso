@@ -126,9 +126,8 @@ export const adminRouter = router({
     .mutation(async ({ input }) => {
       const { id, userId, reason } = input;
       try {
-        const document = await superDeleteDocument({ id, userId });
         await sendDeleteEmail({ documentId: id, reason });
-        return document;
+        return await superDeleteDocument({ id, userId });
       } catch (err) {
         console.log(err);
         throw new TRPCError({
