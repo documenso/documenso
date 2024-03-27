@@ -5,7 +5,6 @@ import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import { match } from 'ts-pattern';
 
 import { MAXIMUM_PASSKEYS } from '@documenso/lib/constants/auth';
-import { DOCUMENT_AUTH_TYPES } from '@documenso/lib/constants/document-auth';
 import type {
   TDocumentAuthOptions,
   TRecipientAccessAuthTypes,
@@ -175,9 +174,11 @@ export const DocumentAuthProvider = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [passkeyData.passkeys]);
 
+  // Assume that a user must be logged in for any auth requirements.
   const isAuthRedirectRequired = Boolean(
-    DOCUMENT_AUTH_TYPES[derivedRecipientActionAuth || '']?.isAuthRedirectRequired &&
-      !preCalculatedActionAuthOptions,
+    derivedRecipientActionAuth &&
+      derivedRecipientActionAuth !== DocumentAuth.EXPLICIT_NONE &&
+      user?.email !== recipient.email,
   );
 
   const refetchPasskeys = async () => {

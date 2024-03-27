@@ -1,7 +1,5 @@
 import { useEffect, useState } from 'react';
 
-import Link from 'next/link';
-
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
@@ -21,6 +19,8 @@ import {
   FormMessage,
 } from '@documenso/ui/primitives/form/form';
 import { Input } from '@documenso/ui/primitives/input';
+
+import { EnableAuthenticatorAppDialog } from '~/components/forms/2fa/enable-authenticator-app-dialog';
 
 import { useRequiredDocumentAuthContext } from './document-auth-provider';
 
@@ -58,6 +58,7 @@ export const DocumentActionAuth2FA = ({
     },
   });
 
+  const [is2FASetupSuccessful, setIs2FASetupSuccessful] = useState(false);
   const [formErrorCode, setFormErrorCode] = useState<string | null>(null);
 
   const onFormSubmit = async ({ token }: T2FAAuthFormSchema) => {
@@ -87,17 +88,29 @@ export const DocumentActionAuth2FA = ({
       token: '',
     });
 
+    setIs2FASetupSuccessful(false);
     setFormErrorCode(null);
-  }, [open, form]);
 
-  if (!user?.twoFactorEnabled) {
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open]);
+
+  if (!user?.twoFactorEnabled && !is2FASetupSuccessful) {
     return (
       <div className="space-y-4">
         <Alert variant="warning">
           <AlertDescription>
-            {recipient.role === RecipientRole.VIEWER && actionTarget === 'DOCUMENT'
-              ? 'You need to setup 2FA to mark this document as viewed.'
-              : `You need to setup 2FA to ${actionVerb.toLowerCase()} this ${actionTarget.toLowerCase()}.`}
+            <p>
+              {recipient.role === RecipientRole.VIEWER && actionTarget === 'DOCUMENT'
+                ? 'You need to setup 2FA to mark this document as viewed.'
+                : `You need to setup 2FA to ${actionVerb.toLowerCase()} this ${actionTarget.toLowerCase()}.`}
+            </p>
+
+            {user?.identityProvider === 'DOCUMENSO' && (
+              <p className="mt-2">
+                By enabling 2FA, you will be required to enter a code from your authenticator app
+                every time you sign in.
+              </p>
+            )}
           </AlertDescription>
         </Alert>
 
@@ -106,9 +119,7 @@ export const DocumentActionAuth2FA = ({
             Close
           </Button>
 
-          <Button type="button" asChild>
-            <Link href="/settings/security">Setup 2FA</Link>
-          </Button>
+          <EnableAuthenticatorAppDialog onSuccess={() => setIs2FASetupSuccessful(true)} />
         </DialogFooter>
       </div>
     );

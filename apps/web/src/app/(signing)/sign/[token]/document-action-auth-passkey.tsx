@@ -137,10 +137,7 @@ export const DocumentActionAuthPasskey = ({
     );
   }
 
-  if (
-    passkeyData.isInitialLoading ||
-    (passkeyData.isRefetching && passkeyData.passkeys.length === 0)
-  ) {
+  if (passkeyData.isInitialLoading || (passkeyData.isError && passkeyData.passkeys.length === 0)) {
     return (
       <div className="flex h-28 items-center justify-center">
         <Loader className="text-muted-foreground h-6 w-6 animate-spin" />
@@ -171,7 +168,7 @@ export const DocumentActionAuthPasskey = ({
   if (passkeyData.passkeys.length === 0) {
     return (
       <div className="space-y-4">
-        <Alert>
+        <Alert variant="warning">
           <AlertDescription>
             {recipient.role === RecipientRole.VIEWER && actionTarget === 'DOCUMENT'
               ? 'You need to setup a passkey to mark this document as viewed.'

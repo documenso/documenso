@@ -4,21 +4,12 @@ import { DocumentAuth } from '../types/document-auth';
 type DocumentAuthTypeData = {
   key: TDocumentAuth;
   value: string;
-
-  /**
-   * Whether this authentication event will require the user to halt and
-   * redirect.
-   *
-   * Defaults to false.
-   */
-  isAuthRedirectRequired?: boolean;
 };
 
 export const DOCUMENT_AUTH_TYPES: Record<string, DocumentAuthTypeData> = {
   [DocumentAuth.ACCOUNT]: {
     key: DocumentAuth.ACCOUNT,
     value: 'Require account',
-    isAuthRedirectRequired: true,
   },
   [DocumentAuth.PASSKEY]: {
     key: DocumentAuth.PASSKEY,

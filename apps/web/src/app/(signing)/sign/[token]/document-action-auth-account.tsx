@@ -49,7 +49,7 @@ export const DocumentActionAuthAccount = ({
 
   return (
     <fieldset disabled={isSigningOut} className="space-y-4">
-      <Alert>
+      <Alert variant="warning">
         <AlertDescription>
           {actionTarget === 'DOCUMENT' && recipient.role === RecipientRole.VIEWER ? (
             <span>
