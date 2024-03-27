@@ -96,6 +96,7 @@
     "VERCEL",
     "VERCEL_ENV",
     "VERCEL_URL",
+    "NODE_ENV",
     "DEPLOYMENT_TARGET",
     "FONT_CAVEAT_URI",
     "POSTGRES_URL",

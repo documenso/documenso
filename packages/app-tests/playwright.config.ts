@@ -2,7 +2,13 @@ import { defineConfig, devices } from '@playwright/test';
 import dotenv from 'dotenv';
 import path from 'path';
 
-dotenv.config({ path: path.resolve(__dirname, '../../', '.env.local') });
+const ENV_FILES = ['.env', '.env.local', `.env.${process.env.NODE_ENV || 'development'}`];
+
+ENV_FILES.forEach((file) => {
+  dotenv.config({
+    path: path.join(__dirname, `../../${file}`),
+  });
+});
 
 /**
  * See https://playwright.dev/docs/test-configuration.
