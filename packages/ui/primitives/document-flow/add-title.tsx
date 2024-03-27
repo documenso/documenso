@@ -28,6 +28,7 @@ export type AddTitleFormProps = {
   fields: Field[];
   document: DocumentWithData;
   onSubmit: (_data: TAddTitleFormSchema) => void;
+  isDocumentPdfLoaded: boolean;
 };
 
 export const AddTitleFormPartial = ({
@@ -36,6 +37,7 @@ export const AddTitleFormPartial = ({
   fields,
   document,
   onSubmit,
+  isDocumentPdfLoaded,
 }: AddTitleFormProps) => {
   const {
     register,
@@ -59,9 +61,10 @@ export const AddTitleFormPartial = ({
         description={documentFlow.description}
       />
       <DocumentFlowFormContainerContent>
-        {fields.map((field, index) => (
-          <ShowFieldItem key={index} field={field} recipients={recipients} />
-        ))}
+        {isDocumentPdfLoaded &&
+          fields.map((field, index) => (
+            <ShowFieldItem key={index} field={field} recipients={recipients} />
+          ))}
 
         <div className="flex flex-col">
           <div className="flex flex-col gap-y-4">

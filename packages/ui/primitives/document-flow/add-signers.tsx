@@ -39,6 +39,7 @@ export type AddSignersFormProps = {
   fields: Field[];
   document: DocumentWithData;
   onSubmit: (_data: TAddSignersFormSchema) => void;
+  isDocumentPdfLoaded: boolean;
 };
 
 export const AddSignersFormPartial = ({
@@ -47,6 +48,7 @@ export const AddSignersFormPartial = ({
   document,
   fields,
   onSubmit,
+  isDocumentPdfLoaded,
 }: AddSignersFormProps) => {
   const { toast } = useToast();
   const { remaining } = useLimits();
@@ -145,9 +147,10 @@ export const AddSignersFormPartial = ({
       />
       <DocumentFlowFormContainerContent>
         <div className="flex w-full flex-col gap-y-4">
-          {fields.map((field, index) => (
-            <ShowFieldItem key={index} field={field} recipients={recipients} />
-          ))}
+          {isDocumentPdfLoaded &&
+            fields.map((field, index) => (
+              <ShowFieldItem key={index} field={field} recipients={recipients} />
+            ))}
 
           <AnimatePresence>
             {signers.map((signer, index) => (

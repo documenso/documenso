@@ -85,6 +85,8 @@ services:
         value: 'database'
       - key: NEXT_PRIVATE_UPLOAD_ENDPOINT
         sync: false
+      - key: NEXT_PRIVATE_UPLOAD_FORCE_PATH_STYLE
+        sync: false
       - key: NEXT_PRIVATE_UPLOAD_REGION
         sync: false
       - key: NEXT_PRIVATE_UPLOAD_BUCKET

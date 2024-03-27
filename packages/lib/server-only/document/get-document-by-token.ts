@@ -1,13 +1,30 @@
 import { prisma } from '@documenso/prisma';
 import type { DocumentWithRecipient } from '@documenso/prisma/types/document-with-recipient';
 
-export interface GetDocumentAndSenderByTokenOptions {
+export type GetDocumentByTokenOptions = {
   token: string;
-}
+};
 
-export interface GetDocumentAndRecipientByTokenOptions {
-  token: string;
-}
+export type GetDocumentAndSenderByTokenOptions = GetDocumentByTokenOptions;
+export type GetDocumentAndRecipientByTokenOptions = GetDocumentByTokenOptions;
+
+export const getDocumentByToken = async ({ token }: GetDocumentByTokenOptions) => {
+  if (!token) {
+    throw new Error('Missing token');
+  }
+
+  const result = await prisma.document.findFirstOrThrow({
+    where: {
+      Recipient: {
+        some: {
+          token,
+        },
+      },
+    },
+  });
+
+  return result;
+};
 
 export const getDocumentAndSenderByToken = async ({
   token,
