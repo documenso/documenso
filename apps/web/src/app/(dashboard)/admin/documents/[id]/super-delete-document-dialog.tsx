@@ -26,23 +26,29 @@ export type SuperDeleteDocumentDialogProps = {
 };
 
 export const SuperDeleteDocumentDialog = ({ document }: SuperDeleteDocumentDialogProps) => {
-  const router = useRouter();
   const { toast } = useToast();
+  const router = useRouter();
+
   const [reason, setReason] = useState('');
+
   const { mutateAsync: deleteDocument, isLoading: isDeletingDocument } =
     trpc.admin.deleteDocument.useMutation();
 
   const handleDeleteDocument = async () => {
     try {
-      if (reason) {
-        await deleteDocument({ id: document.id, userId: document.userId, reason });
-        toast({
-          title: 'Document deleted',
-          description: 'The Document has been deleted successfully.',
-          duration: 5000,
-        });
-        router.push('/admin/documents');
+      if (!reason) {
+        return;
       }
+
+      await deleteDocument({ id: document.id, reason });
+
+      toast({
+        title: 'Document deleted',
+        description: 'The Document has been deleted successfully.',
+        duration: 5000,
+      });
+
+      router.push('/admin/documents');
     } catch (err) {
       if (err instanceof TRPCClientError && err.data?.code === 'BAD_REQUEST') {
         toast({

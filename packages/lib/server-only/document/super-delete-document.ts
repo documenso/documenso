@@ -16,19 +16,13 @@ import { createDocumentAuditLogData } from '../../utils/document-audit-logs';
 
 export type SuperDeleteDocumentOptions = {
   id: number;
-  userId: number;
   requestMetadata?: RequestMetadata;
 };
 
-export const superDeleteDocument = async ({
-  id,
-  userId,
-  requestMetadata,
-}: SuperDeleteDocumentOptions) => {
+export const superDeleteDocument = async ({ id, requestMetadata }: SuperDeleteDocumentOptions) => {
   const document = await prisma.document.findUnique({
     where: {
       id,
-      userId,
     },
     include: {
       Recipient: true,
@@ -85,6 +79,7 @@ export const superDeleteDocument = async ({
         },
       }),
     });
+
     return await tx.document.delete({ where: { id } });
   });
 };

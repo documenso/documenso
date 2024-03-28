@@ -4,17 +4,17 @@ import { Body, Container, Head, Hr, Html, Img, Preview, Section, Tailwind } from
 import {
   TemplateDocumentDelete,
   type TemplateDocumentDeleteProps,
-} from '../template-components/template-document-delete';
+} from '../template-components/template-document-super-delete';
 import { TemplateFooter } from '../template-components/template-footer';
 
 export type DocumentDeleteEmailTemplateProps = Partial<TemplateDocumentDeleteProps>;
 
-export const DocumentDeleteEmailTemplate = ({
+export const DocumentSuperDeleteEmailTemplate = ({
   documentName = 'Open Source Pledge.pdf',
   assetBaseUrl = 'http://localhost:3002',
   reason = 'Unknown',
 }: DocumentDeleteEmailTemplateProps) => {
-  const previewText = `Admin has deleted your document ${documentName}.`;
+  const previewText = `An admin has deleted your document "${documentName}".`;
 
   const getAssetUrl = (path: string) => {
     return new URL(path, assetBaseUrl).toString();
@@ -42,6 +42,7 @@ export const DocumentDeleteEmailTemplate = ({
                   alt="Documenso Logo"
                   className="mb-4 h-6"
                 />
+
                 <TemplateDocumentDelete
                   reason={reason}
                   documentName={documentName}
@@ -62,4 +63,4 @@ export const DocumentDeleteEmailTemplate = ({
   );
 };
 
-export default DocumentDeleteEmailTemplate;
+export default DocumentSuperDeleteEmailTemplate;
