@@ -7,6 +7,7 @@ import { IS_BILLING_ENABLED } from '@documenso/lib/constants/app';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { ErrorCode } from '@documenso/lib/next-auth/error-codes';
 import { createPasskey } from '@documenso/lib/server-only/auth/create-passkey';
+import { createPasskeyAuthenticationOptions } from '@documenso/lib/server-only/auth/create-passkey-authentication-options';
 import { createPasskeyRegistrationOptions } from '@documenso/lib/server-only/auth/create-passkey-registration-options';
 import { createPasskeySigninOptions } from '@documenso/lib/server-only/auth/create-passkey-signin-options';
 import { deletePasskey } from '@documenso/lib/server-only/auth/delete-passkey';
@@ -19,6 +20,7 @@ import { extractNextApiRequestMetadata } from '@documenso/lib/universal/extract-
 
 import { authenticatedProcedure, procedure, router } from '../trpc';
 import {
+  ZCreatePasskeyAuthenticationOptionsMutationSchema,
   ZCreatePasskeyMutationSchema,
   ZDeletePasskeyMutationSchema,
   ZFindPasskeysQuerySchema,
@@ -112,6 +114,25 @@ export const authRouter = router({
         console.error(err);
 
         throw AppError.parseErrorToTRPCError(err);
+      }
+    }),
+
+  createPasskeyAuthenticationOptions: authenticatedProcedure
+    .input(ZCreatePasskeyAuthenticationOptionsMutationSchema)
+    .mutation(async ({ ctx, input }) => {
+      try {
+        return await createPasskeyAuthenticationOptions({
+          userId: ctx.user.id,
+          preferredPasskeyId: input?.preferredPasskeyId,
+        });
+      } catch (err) {
+        console.error(err);
+
+        throw new TRPCError({
+          code: 'BAD_REQUEST',
+          message:
+            'We were unable to create the authentication options for the passkey. Please try again later.',
+        });
       }
     }),
 

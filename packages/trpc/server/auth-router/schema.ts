@@ -40,6 +40,12 @@ export const ZCreatePasskeyMutationSchema = z.object({
   verificationResponse: ZRegistrationResponseJSONSchema,
 });
 
+export const ZCreatePasskeyAuthenticationOptionsMutationSchema = z
+  .object({
+    preferredPasskeyId: z.string().optional(),
+  })
+  .optional();
+
 export const ZDeletePasskeyMutationSchema = z.object({
   passkeyId: z.string().trim().min(1),
 });

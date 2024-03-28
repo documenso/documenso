@@ -126,13 +126,14 @@ model AnonymousVerificationToken {
 }
 
 model VerificationToken {
-  id         Int      @id @default(autoincrement())
-  identifier String
-  token      String   @unique
-  expires    DateTime
-  createdAt  DateTime @default(now())
-  userId     Int
-  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id          Int      @id @default(autoincrement())
+  secondaryId String   @unique @default(cuid())
+  identifier  String
+  token       String   @unique
+  expires     DateTime
+  createdAt   DateTime @default(now())
+  userId      Int
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 enum WebhookTriggerEvents {

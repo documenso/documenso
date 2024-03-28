@@ -1,12 +1,24 @@
 import { expect, test } from '@playwright/test';
 import path from 'node:path';
 
-import { getDocumentByToken } from '@documenso/lib/server-only/document/get-document-by-token';
 import { getRecipientByEmail } from '@documenso/lib/server-only/recipient/get-recipient-by-email';
+import { prisma } from '@documenso/prisma';
 import { DocumentStatus } from '@documenso/prisma/client';
 import { seedUser } from '@documenso/prisma/seed/users';
 
 import { apiSignin } from './fixtures/authentication';
+
+const getDocumentByToken = async (token: string) => {
+  return await prisma.document.findFirstOrThrow({
+    where: {
+      Recipient: {
+        some: {
+          token,
+        },
+      },
+    },
+  });
+};
 
 test(`[PR-718]: should be able to create a document`, async ({ page }) => {
   await page.goto('/signin');
@@ -246,7 +258,7 @@ test('should be able to create, send and sign a document', async ({ page }) => {
   await page.waitForURL(`/sign/${token}`);
 
   // Check if document has been viewed
-  const { status } = await getDocumentByToken({ token });
+  const { status } = await getDocumentByToken(token);
   expect(status).toBe(DocumentStatus.PENDING);
 
   await page.getByRole('button', { name: 'Complete' }).click();
@@ -257,7 +269,7 @@ test('should be able to create, send and sign a document', async ({ page }) => {
   await expect(page.getByText('You have signed')).toBeVisible();
 
   // Check if document has been signed
-  const { status: completedStatus } = await getDocumentByToken({ token });
+  const { status: completedStatus } = await getDocumentByToken(token);
   expect(completedStatus).toBe(DocumentStatus.COMPLETED);
 });
 
@@ -331,7 +343,7 @@ test('should be able to create, send with redirect url, sign a document and redi
   await page.waitForURL(`/sign/${token}`);
 
   // Check if document has been viewed
-  const { status } = await getDocumentByToken({ token });
+  const { status } = await getDocumentByToken(token);
   expect(status).toBe(DocumentStatus.PENDING);
 
   await page.getByRole('button', { name: 'Complete' }).click();
@@ -341,6 +353,6 @@ test('should be able to create, send with redirect url, sign a document and redi
   await page.waitForURL('https://documenso.com');
 
   // Check if document has been signed
-  const { status: completedStatus } = await getDocumentByToken({ token });
+  const { status: completedStatus } = await getDocumentByToken(token);
   expect(completedStatus).toBe(DocumentStatus.COMPLETED);
 });

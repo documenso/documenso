@@ -11,6 +11,7 @@ export interface FindPasskeysOptions {
   orderBy?: {
     column: keyof Passkey;
     direction: 'asc' | 'desc';
+    nulls?: Prisma.NullsOrder;
   };
 }
 
@@ -21,8 +22,9 @@ export const findPasskeys = async ({
   perPage = 10,
   orderBy,
 }: FindPasskeysOptions) => {
-  const orderByColumn = orderBy?.column ?? 'name';
+  const orderByColumn = orderBy?.column ?? 'lastUsedAt';
   const orderByDirection = orderBy?.direction ?? 'desc';
+  const orderByNulls: Prisma.NullsOrder | undefined = orderBy?.nulls ?? 'last';
 
   const whereClause: Prisma.PasskeyWhereInput = {
     userId,
@@ -41,7 +43,10 @@ export const findPasskeys = async ({
       skip: Math.max(page - 1, 0) * perPage,
       take: perPage,
       orderBy: {
-        [orderByColumn]: orderByDirection,
+        [orderByColumn]: {
+          sort: orderByDirection,
+          nulls: orderByNulls,
+        },
       },
       select: {
         id: true,

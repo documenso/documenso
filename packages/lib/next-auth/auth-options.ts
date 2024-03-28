@@ -22,7 +22,7 @@ import { sendConfirmationToken } from '../server-only/user/send-confirmation-tok
 import type { TAuthenticationResponseJSONSchema } from '../types/webauthn';
 import { ZAuthenticationResponseJSONSchema } from '../types/webauthn';
 import { extractNextAuthRequestMetadata } from '../universal/extract-request-metadata';
-import { getAuthenticatorRegistrationOptions } from '../utils/authenticator';
+import { getAuthenticatorOptions } from '../utils/authenticator';
 import { ErrorCode } from './error-codes';
 
 export const NEXT_AUTH_OPTIONS: AuthOptions = {
@@ -196,7 +196,7 @@ export const NEXT_AUTH_OPTIONS: AuthOptions = {
 
         const user = passkey.User;
 
-        const { rpId, origin } = getAuthenticatorRegistrationOptions();
+        const { rpId, origin } = getAuthenticatorOptions();
 
         const verification = await verifyAuthenticationResponse({
           response: requestBodyCrediential,

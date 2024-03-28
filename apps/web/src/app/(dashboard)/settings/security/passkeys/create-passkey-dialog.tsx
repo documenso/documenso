@@ -38,6 +38,7 @@ import { useToast } from '@documenso/ui/primitives/use-toast';
 
 export type CreatePasskeyDialogProps = {
   trigger?: React.ReactNode;
+  onSuccess?: () => void;
 } & Omit<DialogPrimitive.DialogProps, 'children'>;
 
 const ZCreatePasskeyFormSchema = z.object({
@@ -48,7 +49,7 @@ type TCreatePasskeyFormSchema = z.infer<typeof ZCreatePasskeyFormSchema>;
 
 const parser = new UAParser();
 
-export const CreatePasskeyDialog = ({ trigger, ...props }: CreatePasskeyDialogProps) => {
+export const CreatePasskeyDialog = ({ trigger, onSuccess, ...props }: CreatePasskeyDialogProps) => {
   const [open, setOpen] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
 
@@ -84,6 +85,7 @@ export const CreatePasskeyDialog = ({ trigger, ...props }: CreatePasskeyDialogPr
         duration: 5000,
       });
 
+      onSuccess?.();
       setOpen(false);
     } catch (err) {
       if (err.name === 'NotAllowedError') {

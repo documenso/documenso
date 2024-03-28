@@ -3,14 +3,14 @@ import { DateTime } from 'luxon';
 
 import { prisma } from '@documenso/prisma';
 
-import { getAuthenticatorRegistrationOptions } from '../../utils/authenticator';
+import { getAuthenticatorOptions } from '../../utils/authenticator';
 
 type CreatePasskeySigninOptions = {
   sessionId: string;
 };
 
 export const createPasskeySigninOptions = async ({ sessionId }: CreatePasskeySigninOptions) => {
-  const { rpId, timeout } = getAuthenticatorRegistrationOptions();
+  const { rpId, timeout } = getAuthenticatorOptions();
 
   const options = await generateAuthenticationOptions({
     rpID: rpId,

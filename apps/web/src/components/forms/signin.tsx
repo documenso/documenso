@@ -124,7 +124,7 @@ export const SignInForm = ({ className, initialEmail, isGoogleSSOEnabled }: Sign
   };
 
   const onSignInWithPasskey = async () => {
-    if (!browserSupportsWebAuthn) {
+    if (!browserSupportsWebAuthn()) {
       toast({
         title: 'Not supported',
         description: 'Passkeys are not supported on this browser',

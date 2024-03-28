@@ -42,10 +42,10 @@ export const SigningForm = ({ document, recipient, fields, redirectUrl }: Signin
   const { mutateAsync: completeDocumentWithToken } =
     trpc.recipient.completeDocumentWithToken.useMutation();
 
-  const {
-    handleSubmit,
-    formState: { isSubmitting },
-  } = useForm();
+  const { handleSubmit, formState } = useForm();
+
+  // Keep the loading state going if successful since the redirect may take some time.
+  const isSubmitting = formState.isSubmitting || formState.isSubmitSuccessful;
 
   const uninsertedFields = useMemo(() => {
     return sortFieldsByPosition(fields.filter((field) => !field.inserted));

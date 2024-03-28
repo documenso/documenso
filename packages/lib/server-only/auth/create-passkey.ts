@@ -7,7 +7,7 @@ import { UserSecurityAuditLogType } from '@documenso/prisma/client';
 import { MAXIMUM_PASSKEYS } from '../../constants/auth';
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import type { RequestMetadata } from '../../universal/extract-request-metadata';
-import { getAuthenticatorRegistrationOptions } from '../../utils/authenticator';
+import { getAuthenticatorOptions } from '../../utils/authenticator';
 
 type CreatePasskeyOptions = {
   userId: number;
@@ -64,7 +64,7 @@ export const createPasskey = async ({
     throw new AppError(AppErrorCode.EXPIRED_CODE, 'Challenge token expired');
   }
 
-  const { rpId: expectedRPID, origin: expectedOrigin } = getAuthenticatorRegistrationOptions();
+  const { rpId: expectedRPID, origin: expectedOrigin } = getAuthenticatorOptions();
 
   const verification = await verifyRegistrationResponse({
     response: verificationResponse,
