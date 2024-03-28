@@ -54,11 +54,10 @@ export const authRouter = router({
 
       return user;
     } catch (err) {
-      console.log(err);
-
       const error = AppError.parseError(err);
 
       if (error.code !== AppErrorCode.UNKNOWN_ERROR) {
+        console.error(error);
         throw AppError.parseErrorToTRPCError(error);
       }
 
