@@ -1,3 +1,4 @@
+import { jsonObjectFrom } from 'kysely/helpers/postgres';
 import { DateTime } from 'luxon';
 import { P, match } from 'ts-pattern';
 
@@ -60,6 +61,22 @@ export const findDocuments = async ({
           teamEmail: true,
         },
       });
+
+      const teamQuery = await prisma.$kysely
+        .selectFrom('Team')
+        .selectAll('Team')
+        .where('Team.id', '=', teamId)
+        .select((eb) => [
+          jsonObjectFrom(
+            eb
+              .selectFrom('TeamEmail')
+              .selectAll('TeamEmail')
+              .where('TeamEmail.teamId', '=', teamId),
+          ).as('teamEmail'),
+        ])
+        .innerJoin('TeamMember', 'TeamMember.teamId', 'Team.id')
+        .where('TeamMember.userId', '=', userId)
+        .executeTakeFirstOrThrow();
     }
 
     return {
@@ -127,6 +144,45 @@ export const findDocuments = async ({
       in: senderIds,
     };
   }
+
+  const dataQuery = await prisma.$kysely
+    .selectFrom('Document')
+    .selectAll('Document')
+    .select((eb) => [
+      jsonObjectFrom(
+        eb
+          .selectFrom('User')
+          .select(['id', 'name', 'email'])
+          .whereRef('User.id', '=', 'Document.userId'),
+      ).as('User'),
+      jsonObjectFrom(
+        eb
+          .selectFrom('Recipient')
+          .selectAll('Recipient')
+          .whereRef('Recipient.documentId', '=', 'Document.id'),
+      ).as('Recipient'),
+      jsonObjectFrom(
+        eb.selectFrom('Team').select(['id', 'url']).whereRef('Team.id', '=', 'Document.teamId'),
+      ).as('team'),
+    ])
+    .where(({ eb, or, and, not, exists, selectFrom }) =>
+      and([
+        eb('Document.title', 'ilike', `${term}`),
+        or([
+          eb('Document.status', '=', 'COMPLETED'),
+          and([
+            not(eb('Document.status', 'ilike', 'COMPLETED')),
+            eb('Document.deletedAt', '=', null),
+          ]),
+        ]),
+      ]),
+    )
+    .offset(Math.max(page - 1, 0) * perPage)
+    .limit(perPage)
+    .orderBy(orderByColumn, orderByDirection)
+    .execute();
+
+  console.log('dataQuery', dataQuery);
 
   const [data, count] = await Promise.all([
     prisma.document.findMany({

@@ -1,5 +1,5 @@
-generator client {
-  provider = "prisma-client-js"
+generator kysely {
+  provider = "prisma-kysely"
 }
 
 datasource db {

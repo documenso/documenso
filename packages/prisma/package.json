@@ -20,12 +20,15 @@
   },
   "dependencies": {
     "@prisma/client": "5.4.2",
+    "kysely": "^0.27.3",
     "prisma": "5.4.2",
+    "prisma-extension-kysely": "^2.1.0",
     "ts-pattern": "^5.0.6"
   },
   "devDependencies": {
     "dotenv": "^16.3.1",
     "dotenv-cli": "^7.3.0",
+    "prisma-kysely": "^1.8.0",
     "ts-node": "^10.9.1",
     "typescript": "5.2.2"
   }
