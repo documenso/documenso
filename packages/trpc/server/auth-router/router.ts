@@ -132,7 +132,10 @@ export const authRouter = router({
   }),
 
   createPasskeySigninOptions: procedure.mutation(async ({ ctx }) => {
-    const sessionIdToken = parse(ctx.req.headers.cookie ?? '')['next-auth.csrf-token'];
+    const cookies = parse(ctx.req.headers.cookie ?? '');
+
+    const sessionIdToken =
+      cookies['__Host-next-auth.csrf-token'] || cookies['next-auth.csrf-token'];
 
     if (!sessionIdToken) {
       throw new Error('Missing CSRF token');
