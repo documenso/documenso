@@ -6,7 +6,13 @@
 
 */
 -- AlterTable
-ALTER TABLE "VerificationToken" ADD COLUMN     "secondaryId" TEXT NOT NULL;
+ALTER TABLE "VerificationToken" ADD COLUMN     "secondaryId" TEXT;
+
+-- Set all null secondaryId fields to a uuid
+UPDATE "VerificationToken" SET "secondaryId" = gen_random_uuid()::text WHERE "secondaryId" IS NULL;
+
+-- Restrict the VerificationToken to required
+ALTER TABLE "VerificationToken" ALTER COLUMN "secondaryId" SET NOT NULL;
 
 -- CreateIndex
 CREATE UNIQUE INDEX "VerificationToken_secondaryId_key" ON "VerificationToken"("secondaryId");
