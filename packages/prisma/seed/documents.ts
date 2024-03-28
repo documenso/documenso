@@ -213,7 +213,14 @@ export const seedPendingDocument = async (
     });
   }
 
-  return document;
+  return prisma.document.findFirstOrThrow({
+    where: {
+      id: document.id,
+    },
+    include: {
+      Recipient: true,
+    },
+  });
 };
 
 export const seedPendingDocumentNoFields = async ({

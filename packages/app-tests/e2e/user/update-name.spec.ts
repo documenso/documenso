@@ -3,16 +3,12 @@ import { expect, test } from '@playwright/test';
 import { getUserByEmail } from '@documenso/lib/server-only/user/get-user-by-email';
 import { seedUser } from '@documenso/prisma/seed/users';
 
-import { manualLogin } from './fixtures/authentication';
+import { apiSignin } from '../fixtures/authentication';
 
-test('update user name', async ({ page }) => {
+test('[USER] update full name', async ({ page }) => {
   const user = await seedUser();
 
-  await manualLogin({
-    page,
-    email: user.email,
-    redirectPath: '/settings/profile',
-  });
+  await apiSignin({ page, email: user.email, redirectPath: '/settings/profile' });
 
   await page.getByLabel('Full Name').fill('John Doe');
 

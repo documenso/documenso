@@ -71,7 +71,6 @@ test('[DOCUMENT_AUTH]: should allow or deny access when required', async ({ page
   await apiSignin({
     page,
     email: recipientWithAccount.email,
-    redirectPath: '/',
   });
 
   // Check that the one logged in is granted access.
