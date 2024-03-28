@@ -33,8 +33,28 @@ export const SignDialog = ({
   const truncatedTitle = truncateTitle(document.title);
   const isComplete = fields.every((field) => field.inserted);
 
+  const handleOpenChange = (open: boolean) => {
+    if (isSubmitting || !isComplete) {
+      return;
+    }
+
+    // Reauth is currently not required for signing the document.
+    // if (isAuthRedirectRequired) {
+    //   await executeActionAuthProcedure({
+    //     actionTarget: 'DOCUMENT',
+    //     onReauthFormSubmit: () => {
+    //       // Do nothing since the user should be redirected.
+    //     },
+    //   });
+
+    //   return;
+    // }
+
+    setShowDialog(open);
+  };
+
   return (
-    <Dialog open={showDialog && isComplete} onOpenChange={setShowDialog}>
+    <Dialog open={showDialog} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
         <Button
           className="w-full"

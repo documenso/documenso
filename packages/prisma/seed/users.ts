@@ -2,6 +2,8 @@ import { hashSync } from '@documenso/lib/server-only/auth/hash';
 
 import { prisma } from '..';
 
+export const seedTestEmail = () => `user-${Date.now()}@test.documenso.com`;
+
 type SeedUserOptions = {
   name?: string;
   email?: string;

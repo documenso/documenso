@@ -1,8 +1,9 @@
 import { prisma } from '@documenso/prisma';
 import type { FieldType, Team } from '@documenso/prisma/client';
 
+import { DOCUMENT_AUDIT_LOG_TYPE } from '../../types/document-audit-logs';
 import type { RequestMetadata } from '../../universal/extract-request-metadata';
-import { createDocumentAuditLogData } from '../../utils/document-audit-logs';
+import { createDocumentAuditLogData, diffFieldChanges } from '../../utils/document-audit-logs';
 
 export type UpdateFieldOptions = {
   fieldId: number;
@@ -33,7 +34,7 @@ export const updateField = async ({
   pageHeight,
   requestMetadata,
 }: UpdateFieldOptions) => {
-  const field = await prisma.field.update({
+  const oldField = await prisma.field.findFirstOrThrow({
     where: {
       id: fieldId,
       Document: {
@@ -55,23 +56,49 @@ export const updateField = async ({
             }),
       },
     },
-    data: {
-      recipientId,
-      type,
-      page: pageNumber,
-      positionX: pageX,
-      positionY: pageY,
-      width: pageWidth,
-      height: pageHeight,
-    },
-    include: {
-      Recipient: true,
-    },
   });
 
-  if (!field) {
-    throw new Error('Field not found');
-  }
+  const field = prisma.$transaction(async (tx) => {
+    const updatedField = await tx.field.update({
+      where: {
+        id: fieldId,
+      },
+      data: {
+        recipientId,
+        type,
+        page: pageNumber,
+        positionX: pageX,
+        positionY: pageY,
+        width: pageWidth,
+        height: pageHeight,
+      },
+      include: {
+        Recipient: true,
+      },
+    });
+
+    await tx.documentAuditLog.create({
+      data: createDocumentAuditLogData({
+        type: DOCUMENT_AUDIT_LOG_TYPE.FIELD_UPDATED,
+        documentId,
+        user: {
+          id: team?.id ?? user.id,
+          email: team?.name ?? user.email,
+          name: team ? '' : user.name,
+        },
+        data: {
+          fieldId: updatedField.secondaryId,
+          fieldRecipientEmail: updatedField.Recipient?.email ?? '',
+          fieldRecipientId: recipientId ?? -1,
+          fieldType: updatedField.type,
+          changes: diffFieldChanges(oldField, updatedField),
+        },
+        requestMetadata,
+      }),
+    });
+
+    return updatedField;
+  });
 
   const user = await prisma.user.findFirstOrThrow({
     where: {
@@ -98,25 +125,6 @@ export const updateField = async ({
       },
     });
   }
-
-  await prisma.documentAuditLog.create({
-    data: createDocumentAuditLogData({
-      type: 'FIELD_UPDATED',
-      documentId,
-      user: {
-        id: team?.id ?? user.id,
-        email: team?.name ?? user.email,
-        name: team ? '' : user.name,
-      },
-      data: {
-        fieldId: field.secondaryId,
-        fieldRecipientEmail: field.Recipient?.email ?? '',
-        fieldRecipientId: recipientId ?? -1,
-        fieldType: field.type,
-      },
-      requestMetadata,
-    }),
-  });
 
   return field;
 };

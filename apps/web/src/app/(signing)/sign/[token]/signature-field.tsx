@@ -1,13 +1,15 @@
 'use client';
 
-import { useEffect, useMemo, useState, useTransition } from 'react';
+import { useMemo, useState, useTransition } from 'react';
 
 import { useRouter } from 'next/navigation';
 
 import { Loader } from 'lucide-react';
 
 import { DO_NOT_INVALIDATE_QUERY_ON_MUTATION } from '@documenso/lib/constants/trpc';
-import type { Recipient } from '@documenso/prisma/client';
+import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
+import type { TRecipientActionAuth } from '@documenso/lib/types/document-auth';
+import { type Recipient } from '@documenso/prisma/client';
 import type { FieldWithSignature } from '@documenso/prisma/types/field-with-signature';
 import { trpc } from '@documenso/trpc/react';
 import { Button } from '@documenso/ui/primitives/button';
@@ -16,6 +18,7 @@ import { Label } from '@documenso/ui/primitives/label';
 import { SignaturePad } from '@documenso/ui/primitives/signature-pad';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
+import { useRequiredDocumentAuthContext } from './document-auth-provider';
 import { useRequiredSigningContext } from './provider';
 import { SigningFieldContainer } from './signing-field-container';
 
@@ -30,8 +33,11 @@ export const SignatureField = ({ field, recipient }: SignatureFieldProps) => {
   const router = useRouter();
 
   const { toast } = useToast();
+
   const { signature: providedSignature, setSignature: setProvidedSignature } =
     useRequiredSigningContext();
+
+  const { executeActionAuthProcedure } = useRequiredDocumentAuthContext();
 
   const [isPending, startTransition] = useTransition();
 
@@ -49,7 +55,6 @@ export const SignatureField = ({ field, recipient }: SignatureFieldProps) => {
 
   const [showSignatureModal, setShowSignatureModal] = useState(false);
   const [localSignature, setLocalSignature] = useState<string | null>(null);
-  const [isLocalSignatureSet, setIsLocalSignatureSet] = useState(false);
 
   const state = useMemo<SignatureFieldState>(() => {
     if (!field.inserted) {
@@ -63,23 +68,38 @@ export const SignatureField = ({ field, recipient }: SignatureFieldProps) => {
     return 'signed-text';
   }, [field.inserted, signature?.signatureImageAsBase64]);
 
-  useEffect(() => {
-    if (!showSignatureModal && !isLocalSignatureSet) {
-      setLocalSignature(null);
+  const onPreSign = () => {
+    if (!providedSignature) {
+      setShowSignatureModal(true);
+      return false;
     }
-  }, [showSignatureModal, isLocalSignatureSet]);
 
-  const onSign = async (source: 'local' | 'provider' = 'provider') => {
+    return true;
+  };
+
+  /**
+   * When the user clicks the sign button in the dialog where they enter their signature.
+   */
+  const onDialogSignClick = () => {
+    setShowSignatureModal(false);
+    setProvidedSignature(localSignature);
+
+    if (!localSignature) {
+      return;
+    }
+
+    void executeActionAuthProcedure({
+      onReauthFormSubmit: async (authOptions) => await onSign(authOptions, localSignature),
+      actionTarget: field.type,
+    });
+  };
+
+  const onSign = async (authOptions?: TRecipientActionAuth, signature?: string) => {
     try {
-      if (!providedSignature && !localSignature) {
-        setIsLocalSignatureSet(false);
-        setShowSignatureModal(true);
-        return;
-      }
-
-      const value = source === 'local' && localSignature ? localSignature : providedSignature ?? '';
+      const value = signature || providedSignature;
 
       if (!value) {
+        setShowSignatureModal(true);
         return;
       }
 
@@ -88,16 +108,17 @@ export const SignatureField = ({ field, recipient }: SignatureFieldProps) => {
         fieldId: field.id,
         value,
         isBase64: true,
+        authOptions,
       });
-
-      if (source === 'local' && !providedSignature) {
-        setProvidedSignature(localSignature);
-      }
-
-      setLocalSignature(null);
 
       startTransition(() => router.refresh());
     } catch (err) {
+      const error = AppError.parseError(err);
+
+      if (error.code === AppErrorCode.UNAUTHORIZED) {
+        throw error;
+      }
+
       console.error(err);
 
       toast({
@@ -128,7 +149,13 @@ export const SignatureField = ({ field, recipient }: SignatureFieldProps) => {
   };
 
   return (
-    <SigningFieldContainer field={field} onSign={onSign} onRemove={onRemove} type="Signature">
+    <SigningFieldContainer
+      field={field}
+      onPreSign={onPreSign}
+      onSign={onSign}
+      onRemove={onRemove}
+      type="Signature"
+    >
       {isLoading && (
         <div className="bg-background absolute inset-0 flex items-center justify-center rounded-md">
           <Loader className="text-primary h-5 w-5 animate-spin md:h-8 md:w-8" />
@@ -191,11 +218,7 @@ export const SignatureField = ({ field, recipient }: SignatureFieldProps) => {
                 type="button"
                 className="flex-1"
                 disabled={!localSignature}
-                onClick={() => {
-                  setShowSignatureModal(false);
-                  setIsLocalSignatureSet(true);
-                  void onSign('local');
-                }}
+                onClick={() => onDialogSignClick()}
               >
                 Sign
               </Button>
