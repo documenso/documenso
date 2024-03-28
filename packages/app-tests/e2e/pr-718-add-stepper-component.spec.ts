@@ -258,7 +258,7 @@ test('should be able to create, send and sign a document', async ({ page }) => {
   await page.waitForURL(`/sign/${token}`);
 
   // Check if document has been viewed
-  const { status } = await getDocumentByToken({ token });
+  const { status } = await getDocumentByToken(token);
   expect(status).toBe(DocumentStatus.PENDING);
 
   await page.getByRole('button', { name: 'Complete' }).click();
@@ -269,7 +269,7 @@ test('should be able to create, send and sign a document', async ({ page }) => {
   await expect(page.getByText('You have signed')).toBeVisible();
 
   // Check if document has been signed
-  const { status: completedStatus } = await getDocumentByToken({ token });
+  const { status: completedStatus } = await getDocumentByToken(token);
   expect(completedStatus).toBe(DocumentStatus.COMPLETED);
 });
 
@@ -343,7 +343,7 @@ test('should be able to create, send with redirect url, sign a document and redi
   await page.waitForURL(`/sign/${token}`);
 
   // Check if document has been viewed
-  const { status } = await getDocumentByToken({ token });
+  const { status } = await getDocumentByToken(token);
   expect(status).toBe(DocumentStatus.PENDING);
 
   await page.getByRole('button', { name: 'Complete' }).click();
@@ -353,6 +353,6 @@ test('should be able to create, send with redirect url, sign a document and redi
   await page.waitForURL('https://documenso.com');
 
   // Check if document has been signed
-  const { status: completedStatus } = await getDocumentByToken({ token });
+  const { status: completedStatus } = await getDocumentByToken(token);
   expect(completedStatus).toBe(DocumentStatus.COMPLETED);
 });
