@@ -25,13 +25,21 @@ const navigationLinks = [
   },
 ];
 
-export type DesktopNavProps = HTMLAttributes<HTMLDivElement>;
+export type DesktopNavProps = HTMLAttributes<HTMLDivElement> & {
+  isCommandMenuOpen?: boolean;
+  setIsCommandMenuOpen?: (value: boolean) => void;
+};
 
-export const DesktopNav = ({ className, ...props }: DesktopNavProps) => {
+export const DesktopNav = ({
+  className,
+  isCommandMenuOpen = false,
+  setIsCommandMenuOpen,
+  ...props
+}: DesktopNavProps) => {
   const pathname = usePathname();
   const params = useParams();
 
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(isCommandMenuOpen);
   const [modifierKey, setModifierKey] = useState(() => 'Ctrl');
 
   const rootHref = getRootHref(params, { returnEmptyRootString: true });
@@ -42,6 +50,14 @@ export const DesktopNav = ({ className, ...props }: DesktopNavProps) => {
 
     setModifierKey(isMacOS ? '⌘' : 'Ctrl');
   }, []);
+
+  const toggleCommandMenu = (_newState: boolean) => {
+    if (typeof setIsCommandMenuOpen === 'function') {
+      setIsCommandMenuOpen(_newState);
+    } else {
+      setOpen(_newState);
+    }
+  };
 
   return (
     <div
@@ -70,12 +86,12 @@ export const DesktopNav = ({ className, ...props }: DesktopNavProps) => {
         ))}
       </div>
 
-      <CommandMenu open={open} onOpenChange={setOpen} />
+      <CommandMenu open={open} onOpenChange={toggleCommandMenu} />
 
       <Button
         variant="outline"
         className="text-muted-foreground flex w-96 items-center justify-between rounded-lg"
-        onClick={() => setOpen((open) => !open)}
+        onClick={() => toggleCommandMenu(true)}
       >
         <div className="flex items-center">
           <Search className="mr-2 h-5 w-5" />
