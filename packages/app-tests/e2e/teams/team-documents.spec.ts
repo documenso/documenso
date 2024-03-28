@@ -6,7 +6,7 @@ import { seedDocuments, seedTeamDocuments } from '@documenso/prisma/seed/documen
 import { seedTeamEmail, unseedTeam, unseedTeamEmail } from '@documenso/prisma/seed/teams';
 import { seedUser } from '@documenso/prisma/seed/users';
 
-import { manualLogin, manualSignout } from '../fixtures/authentication';
+import { apiSignin, apiSignout } from '../fixtures/authentication';
 
 test.describe.configure({ mode: 'parallel' });
 
@@ -30,7 +30,7 @@ test('[TEAMS]: check team documents count', async ({ page }) => {
 
   // Run the test twice, once with the team owner and once with a team member to ensure the counts are the same.
   for (const user of [team.owner, teamMember2]) {
-    await manualLogin({
+    await apiSignin({
       page,
       email: user.email,
       redirectPath: `/t/${team.url}/documents`,
@@ -55,7 +55,7 @@ test('[TEAMS]: check team documents count', async ({ page }) => {
     await checkDocumentTabCount(page, 'Draft', 1);
     await checkDocumentTabCount(page, 'All', 3);
 
-    await manualSignout({ page });
+    await apiSignout({ page });
   }
 
   await unseedTeam(team.url);
@@ -126,7 +126,7 @@ test('[TEAMS]: check team documents count with internal team email', async ({ pa
 
   // Run the test twice, one with the team owner and once with the team member email to ensure the counts are the same.
   for (const user of [team.owner, teamEmailMember]) {
-    await manualLogin({
+    await apiSignin({
       page,
       email: user.email,
       redirectPath: `/t/${team.url}/documents`,
@@ -151,7 +151,7 @@ test('[TEAMS]: check team documents count with internal team email', async ({ pa
     await checkDocumentTabCount(page, 'Draft', 1);
     await checkDocumentTabCount(page, 'All', 3);
 
-    await manualSignout({ page });
+    await apiSignout({ page });
   }
 
   await unseedTeamEmail({ teamId: team.id });
@@ -216,7 +216,7 @@ test('[TEAMS]: check team documents count with external team email', async ({ pa
     },
   ]);
 
-  await manualLogin({
+  await apiSignin({
     page,
     email: teamMember2.email,
     redirectPath: `/t/${team.url}/documents`,
@@ -248,7 +248,7 @@ test('[TEAMS]: check team documents count with external team email', async ({ pa
 test('[TEAMS]: delete pending team document', async ({ page }) => {
   const { team, teamMember2: currentUser } = await seedTeamDocuments();
 
-  await manualLogin({
+  await apiSignin({
     page,
     email: currentUser.email,
     redirectPath: `/t/${team.url}/documents?status=PENDING`,
@@ -266,7 +266,7 @@ test('[TEAMS]: delete pending team document', async ({ page }) => {
 test('[TEAMS]: resend pending team document', async ({ page }) => {
   const { team, teamMember2: currentUser } = await seedTeamDocuments();
 
-  await manualLogin({
+  await apiSignin({
     page,
     email: currentUser.email,
     redirectPath: `/t/${team.url}/documents?status=PENDING`,

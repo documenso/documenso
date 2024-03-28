@@ -1,5 +1,9 @@
 import { z } from 'zod';
 
+import {
+  ZRecipientActionAuthSchema,
+  ZRecipientActionAuthTypesSchema,
+} from '@documenso/lib/types/document-auth';
 import { RecipientRole } from '@documenso/prisma/client';
 
 export const ZAddSignersMutationSchema = z
@@ -12,6 +16,7 @@ export const ZAddSignersMutationSchema = z
         email: z.string().email().min(1),
         name: z.string(),
         role: z.nativeEnum(RecipientRole),
+        actionAuth: ZRecipientActionAuthTypesSchema.optional().nullable(),
       }),
     ),
   })
@@ -54,6 +59,7 @@ export type TAddTemplateSignersMutationSchema = z.infer<typeof ZAddTemplateSigne
 export const ZCompleteDocumentWithTokenMutationSchema = z.object({
   token: z.string(),
   documentId: z.number(),
+  authOptions: ZRecipientActionAuthSchema.optional(),
 });
 
 export type TCompleteDocumentWithTokenMutationSchema = z.infer<

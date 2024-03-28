@@ -255,6 +255,7 @@ model Document {
   id             Int                 @id @default(autoincrement())
   userId         Int
   User           User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  authOptions    Json?
   title          String
   status         DocumentStatus      @default(DRAFT)
   Recipient      Recipient[]
@@ -352,6 +353,7 @@ model Recipient {
   token         String
   expired       DateTime?
   signedAt      DateTime?
+  authOptions   Json?
   role          RecipientRole @default(SIGNER)
   readStatus    ReadStatus    @default(NOT_OPENED)
   signingStatus SigningStatus @default(NOT_SIGNED)

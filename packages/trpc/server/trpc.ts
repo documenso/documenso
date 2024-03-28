@@ -23,7 +23,6 @@ export const authenticatedMiddleware = t.middleware(async ({ ctx, next }) => {
   return await next({
     ctx: {
       ...ctx,
-
       user: ctx.user,
       session: ctx.session,
     },
