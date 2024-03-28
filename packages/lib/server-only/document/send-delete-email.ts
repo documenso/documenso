@@ -2,7 +2,7 @@ import { createElement } from 'react';
 
 import { mailer } from '@documenso/email/mailer';
 import { render } from '@documenso/email/render';
-import { DocumentDeleteEmailTemplate } from '@documenso/email/templates/document-delete';
+import { DocumentSuperDeleteEmailTemplate } from '@documenso/email/templates/document-super-delete';
 import { prisma } from '@documenso/prisma';
 
 import { NEXT_PUBLIC_WEBAPP_URL } from '../../constants/app';
@@ -30,7 +30,7 @@ export const sendDeleteEmail = async ({ documentId, reason }: SendDeleteEmailOpt
 
   const assetBaseUrl = NEXT_PUBLIC_WEBAPP_URL() || 'http://localhost:3000';
 
-  const template = createElement(DocumentDeleteEmailTemplate, {
+  const template = createElement(DocumentSuperDeleteEmailTemplate, {
     documentName: document.title,
     reason,
     assetBaseUrl,
