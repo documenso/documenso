@@ -46,7 +46,7 @@ export const MobileNavigation = ({ isMenuOpen, onMenuOpenChange }: MobileNavigat
 
   return (
     <Sheet open={isMenuOpen} onOpenChange={onMenuOpenChange}>
-      <SheetContent className="flex w-full max-w-[400px] flex-col">
+      <SheetContent className="flex w-full max-w-[350px] flex-col">
         <Link href="/" onClick={handleMenuItemClick}>
           <Image
             src={LogoImage}
@@ -87,7 +87,7 @@ export const MobileNavigation = ({ isMenuOpen, onMenuOpenChange }: MobileNavigat
           </div>
 
           <p className="text-muted-foreground text-sm">
-            © {new Date().getFullYear()} Documenso, Inc. All rights reserved.
+            © {new Date().getFullYear()} Documenso, Inc. <br /> All rights reserved.
           </p>
         </div>
       </SheetContent>

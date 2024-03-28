@@ -1,4 +1,5 @@
-import { TClaimPlanRequestSchema, ZClaimPlanResponseSchema } from './types';
+import type { TClaimPlanRequestSchema } from './types';
+import { ZClaimPlanResponseSchema } from './types';
 
 export const claimPlan = async ({
   name,

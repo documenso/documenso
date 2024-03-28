@@ -1,4 +1,4 @@
-import { MetadataRoute } from 'next';
+import type { MetadataRoute } from 'next';
 
 import { getBaseUrl } from '@documenso/lib/universal/get-base-url';
 

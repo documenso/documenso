@@ -13,6 +13,7 @@ export type FundingRaisedProps = HTMLAttributes<HTMLDivElement> & {
 export const FundingRaised = ({ className, data, ...props }: FundingRaisedProps) => {
   const formattedData = data.map((item) => ({
     amount: Number(item.amount),
+    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
     date: formatMonth(item.date as string),
   }));
 
