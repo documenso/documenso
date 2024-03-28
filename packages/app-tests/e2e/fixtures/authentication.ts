@@ -13,38 +13,11 @@ type LoginOptions = {
   redirectPath?: string;
 };
 
-export const manualLogin = async ({
-  page,
-  email = 'example@documenso.com',
-  password = 'password',
-  redirectPath,
-}: LoginOptions) => {
-  await page.goto(`${WEBAPP_BASE_URL}/signin`);
-
-  await page.getByLabel('Email').click();
-  await page.getByLabel('Email').fill(email);
-
-  await page.getByLabel('Password', { exact: true }).fill(password);
-  await page.getByLabel('Password', { exact: true }).press('Enter');
-
-  if (redirectPath) {
-    await page.waitForURL(`${WEBAPP_BASE_URL}/documents`);
-    await page.goto(`${WEBAPP_BASE_URL}${redirectPath}`);
-  }
-};
-
-export const manualSignout = async ({ page }: LoginOptions) => {
-  await page.waitForTimeout(1000);
-  await page.getByTestId('menu-switcher').click();
-  await page.getByRole('menuitem', { name: 'Sign Out' }).click();
-  await page.waitForURL(`${WEBAPP_BASE_URL}/signin`);
-};
-
 export const apiSignin = async ({
   page,
   email = 'example@documenso.com',
   password = 'password',
-  redirectPath = '/',
+  redirectPath = '/documents',
 }: LoginOptions) => {
   const { request } = page.context();
 
@@ -59,9 +32,7 @@ export const apiSignin = async ({
     },
   });
 
-  if (redirectPath) {
-    await page.goto(`${WEBAPP_BASE_URL}${redirectPath}`);
-  }
+  await page.goto(`${WEBAPP_BASE_URL}${redirectPath}`);
 };
 
 export const apiSignout = async ({ page }: { page: Page }) => {
