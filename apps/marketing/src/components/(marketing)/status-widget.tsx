@@ -1,4 +1,6 @@
-import type { Status } from '@openstatus/react';
+import { use } from 'react';
+
+import { type Status, getStatus } from '@openstatus/react';
 
 import { cn } from '@documenso/ui/lib/utils';
 
@@ -42,7 +44,8 @@ const getStatusLevel = (level: Status) => {
   }[level];
 };
 
-export function StatusWidget({ status }: { status: Status }) {
+export function StatusWidget() {
+  const { status } = use(getStatus('documenso-status'));
   const level = getStatusLevel(status);
 
   return (
