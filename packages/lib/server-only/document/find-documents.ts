@@ -1,4 +1,5 @@
-import { jsonObjectFrom } from 'kysely/helpers/postgres';
+import { sql } from 'kysely';
+import { jsonArrayFrom, jsonObjectFrom } from 'kysely/helpers/postgres';
 import { DateTime } from 'luxon';
 import { P, match } from 'ts-pattern';
 
@@ -76,7 +77,7 @@ export const findDocuments = async ({
         ])
         .innerJoin('TeamMember', 'TeamMember.teamId', 'Team.id')
         .where('TeamMember.userId', '=', userId)
-        .executeTakeFirstOrThrow();
+        .execute();
     }
 
     return {
@@ -145,7 +146,7 @@ export const findDocuments = async ({
     };
   }
 
-  const dataQuery = await prisma.$kysely
+  let dataQuery = prisma.$kysely
     .selectFrom('Document')
     .selectAll('Document')
     .select((eb) => [
@@ -155,7 +156,7 @@ export const findDocuments = async ({
           .select(['id', 'name', 'email'])
           .whereRef('User.id', '=', 'Document.userId'),
       ).as('User'),
-      jsonObjectFrom(
+      jsonArrayFrom(
         eb
           .selectFrom('Recipient')
           .selectAll('Recipient')
@@ -164,25 +165,160 @@ export const findDocuments = async ({
       jsonObjectFrom(
         eb.selectFrom('Team').select(['id', 'url']).whereRef('Team.id', '=', 'Document.teamId'),
       ).as('team'),
-    ])
-    .where(({ eb, or, and, not, exists, selectFrom }) =>
-      and([
-        eb('Document.title', 'ilike', `${term}`),
-        or([
-          eb('Document.status', '=', 'COMPLETED'),
+    ]);
+
+  if (term && term.length >= 1) {
+    dataQuery = dataQuery.where('Document.title', 'ilike', `%${term}%`);
+  }
+
+  if (period) {
+    const daysAgo = parseInt(period.replace(/d$/, ''), 10);
+    const startOfPeriod = DateTime.now().minus({ days: daysAgo }).startOf('day');
+    dataQuery = dataQuery.where('Document.createdAt', '>=', startOfPeriod.toJSDate());
+  }
+
+  if (senderIds && senderIds.length > 0) {
+    dataQuery = dataQuery.where('Document.userId', 'in', senderIds);
+  }
+
+  if (team) {
+    console.log('team');
+  } else if (user) {
+    if (ExtendedDocumentStatus.ALL) {
+      console.log('inside EXTENDED_DOCUMENT_STATUS.ALL');
+      dataQuery = dataQuery.where(({ eb, or, and, exists }) => {
+        return or([
+          eb('Document.userId', '=', user.id),
+          eb('Document.teamId', '=', null),
           and([
-            not(eb('Document.status', 'ilike', 'COMPLETED')),
-            eb('Document.deletedAt', '=', null),
+            eb(sql`"Document"."status"::text`, '=', sql`${ExtendedDocumentStatus.COMPLETED}`),
+            exists(
+              eb
+                .selectFrom('Recipient')
+                .selectAll('Recipient')
+                .whereRef('Recipient.documentId', '=', 'Document.id')
+                .where('Recipient.email', '=', user.email),
+            ),
           ]),
-        ]),
-      ]),
-    )
+          and([
+            eb(sql`"Document"."status"::text`, '=', sql`${ExtendedDocumentStatus.PENDING}`),
+            exists(
+              eb
+                .selectFrom('Recipient')
+                .selectAll('Recipient')
+                .whereRef('Recipient.documentId', '=', 'Document.id')
+                .where('Recipient.email', '=', user.email),
+            ),
+          ]),
+        ]);
+      });
+    }
+    // } else if (ExtendedDocumentStatus.INBOX) {
+    //   dataQuery = dataQuery.where(({ eb, and, not, exists }) => {
+    //     return and([
+    //       not(eb(sql`status::text`, '=', ExtendedDocumentStatus.DRAFT)),
+    //       exists(
+    //         eb
+    //           .selectFrom('Recipient')
+    //           .selectAll('Recipient')
+    //           .whereRef('Recipient.documentId', '=', 'Document.id')
+    //           .where('Recipient.email', '=', user.email)
+    //           .where(sql`Recipient.signingStatus::text`, '=', SigningStatus.NOT_SIGNED)
+    //           .where('Recipient.role', '<>', RecipientRole.CC),
+    //       ),
+    //     ]);
+    //   });
+    // } else if (ExtendedDocumentStatus.DRAFT) {
+    //   dataQuery = dataQuery.where(({ eb, and }) => {
+    //     return and([
+    //       eb('Document.userId', '=', user.id),
+    //       eb('Document.teamId', '=', null),
+    //       eb(sql`status::text`, '=', ExtendedDocumentStatus.DRAFT),
+    //     ]);
+    //   });
+    // } else if (ExtendedDocumentStatus.PENDING) {
+    //   dataQuery = dataQuery.where(({ eb, or, and, exists }) => {
+    //     return or([
+    //       and([
+    //         eb('Document.userId', '=', user.id),
+    //         eb('Document.teamId', '=', null),
+    //         eb(sql`status::text`, '=', ExtendedDocumentStatus.PENDING),
+    //       ]),
+    //       and([
+    //         eb(sql`status::text`, '=', ExtendedDocumentStatus.PENDING),
+    //         exists(
+    //           eb
+    //             .selectFrom('Recipient')
+    //             .selectAll('Recipient')
+    //             .whereRef('Recipient.documentId', '=', 'Document.id')
+    //             .where('Recipient.email', '=', user.email)
+    //             .where(sql`Recipient.signingStatus::text`, '=', SigningStatus.SIGNED)
+    //             .where('Recipient.role', '<>', RecipientRole.CC),
+    //         ),
+    //       ]),
+    //     ]);
+    //   });
+    // } else if (ExtendedDocumentStatus.COMPLETED) {
+    //   dataQuery = dataQuery.where(({ eb, or, exists, and }) => {
+    //     return or([
+    //       and([
+    //         eb('Document.userId', '=', user.id),
+    //         eb('Document.teamId', '=', null),
+    //         eb(sql`status::text`, '=', ExtendedDocumentStatus.COMPLETED),
+    //       ]),
+    //       and([
+    //         eb(sql`status::text`, '=', ExtendedDocumentStatus.COMPLETED),
+    //         exists(
+    //           eb
+    //             .selectFrom('Recipient')
+    //             .selectAll('Recipient')
+    //             .whereRef('Recipient.documentId', '=', 'Document.id')
+    //             .where('Recipient.email', '=', user.email),
+    //         ),
+    //       ]),
+    //     ]);
+    //   });
+    // }
+  } else {
+    return {
+      data: [],
+      count: 0,
+      currentPage: 1,
+      perPage,
+      totalPages: 0,
+    };
+  }
+
+  // dataQuery = dataQuery.where(({ eb, or, and }) =>
+  //   and([
+  //     or([
+  //       eb(sql`"Document"."status"::text`, '=', sql`${ExtendedDocumentStatus.COMPLETED}`),
+  //       and([
+  //         eb(sql`"Document"."status"::text`, '<>', sql`${ExtendedDocumentStatus.COMPLETED}`),
+  //         eb('Document.deletedAt', '=', null),
+  //       ]),
+  //     ]),
+  //   ]),
+  // );
+
+  const finalQuery = dataQuery
     .offset(Math.max(page - 1, 0) * perPage)
     .limit(perPage)
-    .orderBy(orderByColumn, orderByDirection)
-    .execute();
+    .orderBy(orderByColumn, orderByDirection);
 
-  console.log('dataQuery', dataQuery);
+  console.log('\n');
+  console.log('\n');
+  console.log('\n');
+  console.log('\n');
+  console.log('\n');
+  console.log('finalQuery', finalQuery.compile());
+  console.log('\n');
+  console.log('\n');
+  console.log('\n');
+  console.log('\n');
+  console.log('\n');
+
+  console.log('finalQuery', await finalQuery.execute());
 
   const [data, count] = await Promise.all([
     prisma.document.findMany({
@@ -213,6 +349,8 @@ export const findDocuments = async ({
       where: whereClause,
     }),
   ]);
+
+  console.log('prisma query', data);
 
   const maskedData = data.map((document) =>
     maskRecipientTokensForDocument({
