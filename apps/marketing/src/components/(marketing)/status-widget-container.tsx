@@ -6,7 +6,7 @@ import { getStatus } from '@openstatus/react';
 import { StatusWidget } from './status-widget';
 
 export function StatusWidgetContainer() {
-  const res = use(getStatus('documenso'));
+  const res = use(getStatus('documenso-status'));
 
   return (
     <Suspense fallback={<StatusWidgetFallback />}>
