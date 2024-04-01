@@ -5,7 +5,7 @@ import { DateTime } from 'luxon';
 import { prisma } from '@documenso/prisma';
 
 import { PASSKEY_TIMEOUT } from '../../constants/auth';
-import { getAuthenticatorRegistrationOptions } from '../../utils/authenticator';
+import { getAuthenticatorOptions } from '../../utils/authenticator';
 
 type CreatePasskeyRegistrationOptions = {
   userId: number;
@@ -27,7 +27,7 @@ export const createPasskeyRegistrationOptions = async ({
 
   const { passkeys } = user;
 
-  const { rpName, rpId: rpID } = getAuthenticatorRegistrationOptions();
+  const { rpName, rpId: rpID } = getAuthenticatorOptions();
 
   const options = await generateRegistrationOptions({
     rpName,
