@@ -3,7 +3,7 @@ import { expect, test } from '@playwright/test';
 import { WEBAPP_BASE_URL } from '@documenso/lib/constants/app';
 import { seedTeam, seedTeamTransfer, unseedTeam } from '@documenso/prisma/seed/teams';
 
-import { manualLogin } from '../fixtures/authentication';
+import { apiSignin } from '../fixtures/authentication';
 
 test.describe.configure({ mode: 'parallel' });
 
@@ -14,7 +14,7 @@ test('[TEAMS]: initiate and cancel team transfer', async ({ page }) => {
 
   const teamMember = team.members[1];
 
-  await manualLogin({
+  await apiSignin({
     page,
     email: team.owner.email,
     password: 'password',

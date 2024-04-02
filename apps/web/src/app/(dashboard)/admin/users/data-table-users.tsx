@@ -58,6 +58,7 @@ export const UsersDataTable = ({
         perPage,
       });
     });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [debouncedSearchString]);
 
   const onPaginationChange = (page: number, perPage: number) => {

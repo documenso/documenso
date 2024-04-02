@@ -1,20 +1,36 @@
 import { expect, test } from '@playwright/test';
 import path from 'node:path';
 
-import { getDocumentByToken } from '@documenso/lib/server-only/document/get-document-by-token';
 import { getRecipientByEmail } from '@documenso/lib/server-only/recipient/get-recipient-by-email';
+import { prisma } from '@documenso/prisma';
 import { DocumentStatus } from '@documenso/prisma/client';
-import { TEST_USER } from '@documenso/prisma/seed/pr-718-add-stepper-component';
+import { seedUser } from '@documenso/prisma/seed/users';
+
+import { apiSignin } from './fixtures/authentication';
+
+const getDocumentByToken = async (token: string) => {
+  return await prisma.document.findFirstOrThrow({
+    where: {
+      Recipient: {
+        some: {
+          token,
+        },
+      },
+    },
+  });
+};
 
 test(`[PR-718]: should be able to create a document`, async ({ page }) => {
   await page.goto('/signin');
 
   const documentTitle = `example-${Date.now()}.pdf`;
 
-  // Sign in
-  await page.getByLabel('Email').fill(TEST_USER.email);
-  await page.getByLabel('Password', { exact: true }).fill(TEST_USER.password);
-  await page.getByRole('button', { name: 'Sign In' }).click();
+  const user = await seedUser();
+
+  await apiSignin({
+    page,
+    email: user.email,
+  });
 
   // Upload document
   const [fileChooser] = await Promise.all([
@@ -31,8 +47,8 @@ test(`[PR-718]: should be able to create a document`, async ({ page }) => {
   // Wait to be redirected to the edit page
   await page.waitForURL(/\/documents\/\d+/);
 
-  // Set title
-  await expect(page.getByRole('heading', { name: 'Add Title' })).toBeVisible();
+  // Set general settings
+  await expect(page.getByRole('heading', { name: 'General' })).toBeVisible();
 
   await page.getByLabel('Title').fill(documentTitle);
 
@@ -82,10 +98,12 @@ test('should be able to create a document with multiple recipients', async ({ pa
 
   const documentTitle = `example-${Date.now()}.pdf`;
 
-  // Sign in
-  await page.getByLabel('Email').fill(TEST_USER.email);
-  await page.getByLabel('Password', { exact: true }).fill(TEST_USER.password);
-  await page.getByRole('button', { name: 'Sign In' }).click();
+  const user = await seedUser();
+
+  await apiSignin({
+    page,
+    email: user.email,
+  });
 
   // Upload document
   const [fileChooser] = await Promise.all([
@@ -103,7 +121,7 @@ test('should be able to create a document with multiple recipients', async ({ pa
   await page.waitForURL(/\/documents\/\d+/);
 
   // Set title
-  await expect(page.getByRole('heading', { name: 'Add Title' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'General' })).toBeVisible();
 
   await page.getByLabel('Title').fill(documentTitle);
 
@@ -112,13 +130,12 @@ test('should be able to create a document with multiple recipients', async ({ pa
   // Add signers
   await expect(page.getByRole('heading', { name: 'Add Signers' })).toBeVisible();
 
-  await page.getByLabel('Email*').fill('user1@example.com');
-  await page.getByLabel('Name').fill('User 1');
-
+  // Add 2 signers.
+  await page.getByPlaceholder('Email').fill('user1@example.com');
+  await page.getByPlaceholder('Name').fill('User 1');
   await page.getByRole('button', { name: 'Add Signer' }).click();
-
-  await page.getByLabel('Email*').nth(1).fill('user2@example.com');
-  await page.getByLabel('Name').nth(1).fill('User 2');
+  await page.getByRole('textbox', { name: 'Email', exact: true }).fill('user2@example.com');
+  await page.getByRole('textbox', { name: 'Name', exact: true }).fill('User 2');
 
   await page.getByRole('button', { name: 'Continue' }).click();
 
@@ -177,10 +194,12 @@ test('should be able to create, send and sign a document', async ({ page }) => {
 
   const documentTitle = `example-${Date.now()}.pdf`;
 
-  // Sign in
-  await page.getByLabel('Email').fill(TEST_USER.email);
-  await page.getByLabel('Password', { exact: true }).fill(TEST_USER.password);
-  await page.getByRole('button', { name: 'Sign In' }).click();
+  const user = await seedUser();
+
+  await apiSignin({
+    page,
+    email: user.email,
+  });
 
   // Upload document
   const [fileChooser] = await Promise.all([
@@ -198,7 +217,7 @@ test('should be able to create, send and sign a document', async ({ page }) => {
   await page.waitForURL(/\/documents\/\d+/);
 
   // Set title
-  await expect(page.getByRole('heading', { name: 'Add Title' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'General' })).toBeVisible();
 
   await page.getByLabel('Title').fill(documentTitle);
 
@@ -207,8 +226,8 @@ test('should be able to create, send and sign a document', async ({ page }) => {
   // Add signers
   await expect(page.getByRole('heading', { name: 'Add Signers' })).toBeVisible();
 
-  await page.getByLabel('Email*').fill('user1@example.com');
-  await page.getByLabel('Name').fill('User 1');
+  await page.getByPlaceholder('Email').fill('user1@example.com');
+  await page.getByPlaceholder('Name').fill('User 1');
 
   await page.getByRole('button', { name: 'Continue' }).click();
 
@@ -225,8 +244,9 @@ test('should be able to create, send and sign a document', async ({ page }) => {
   // Assert document was created
   await expect(page.getByRole('link', { name: documentTitle })).toBeVisible();
   await page.getByRole('link', { name: documentTitle }).click();
+  await page.waitForURL(/\/documents\/\d+/);
 
-  const url = await page.url().split('/');
+  const url = page.url().split('/');
   const documentId = url[url.length - 1];
 
   const { token } = await getRecipientByEmail({
@@ -238,7 +258,7 @@ test('should be able to create, send and sign a document', async ({ page }) => {
   await page.waitForURL(`/sign/${token}`);
 
   // Check if document has been viewed
-  const { status } = await getDocumentByToken({ token });
+  const { status } = await getDocumentByToken(token);
   expect(status).toBe(DocumentStatus.PENDING);
 
   await page.getByRole('button', { name: 'Complete' }).click();
@@ -249,7 +269,7 @@ test('should be able to create, send and sign a document', async ({ page }) => {
   await expect(page.getByText('You have signed')).toBeVisible();
 
   // Check if document has been signed
-  const { status: completedStatus } = await getDocumentByToken({ token });
+  const { status: completedStatus } = await getDocumentByToken(token);
   expect(completedStatus).toBe(DocumentStatus.COMPLETED);
 });
 
@@ -260,10 +280,12 @@ test('should be able to create, send with redirect url, sign a document and redi
 
   const documentTitle = `example-${Date.now()}.pdf`;
 
-  // Sign in
-  await page.getByLabel('Email').fill(TEST_USER.email);
-  await page.getByLabel('Password', { exact: true }).fill(TEST_USER.password);
-  await page.getByRole('button', { name: 'Sign In' }).click();
+  const user = await seedUser();
+
+  await apiSignin({
+    page,
+    email: user.email,
+  });
 
   // Upload document
   const [fileChooser] = await Promise.all([
@@ -280,29 +302,25 @@ test('should be able to create, send with redirect url, sign a document and redi
   // Wait to be redirected to the edit page
   await page.waitForURL(/\/documents\/\d+/);
 
-  // Set title
-  await expect(page.getByRole('heading', { name: 'Add Title' })).toBeVisible();
-
+  // Set title & advanced redirect
+  await expect(page.getByRole('heading', { name: 'General' })).toBeVisible();
   await page.getByLabel('Title').fill(documentTitle);
+  await page.getByRole('button', { name: 'Advanced Options' }).click();
+  await page.getByLabel('Redirect URL').fill('https://documenso.com');
 
   await page.getByRole('button', { name: 'Continue' }).click();
 
   // Add signers
   await expect(page.getByRole('heading', { name: 'Add Signers' })).toBeVisible();
 
-  await page.getByLabel('Email*').fill('user1@example.com');
-  await page.getByLabel('Name').fill('User 1');
+  await page.getByPlaceholder('Email').fill('user1@example.com');
+  await page.getByPlaceholder('Name').fill('User 1');
 
   await page.getByRole('button', { name: 'Continue' }).click();
 
   // Add fields
   await expect(page.getByRole('heading', { name: 'Add Fields' })).toBeVisible();
   await page.getByRole('button', { name: 'Continue' }).click();
-
-  // Add subject and send
-  await expect(page.getByRole('heading', { name: 'Add Subject' })).toBeVisible();
-  await page.getByRole('button', { name: 'Advanced Options' }).click();
-  await page.getByLabel('Redirect URL').fill('https://documenso.com');
 
   await page.getByRole('button', { name: 'Send' }).click();
 
@@ -311,8 +329,9 @@ test('should be able to create, send with redirect url, sign a document and redi
   // Assert document was created
   await expect(page.getByRole('link', { name: documentTitle })).toBeVisible();
   await page.getByRole('link', { name: documentTitle }).click();
+  await page.waitForURL(/\/documents\/\d+/);
 
-  const url = await page.url().split('/');
+  const url = page.url().split('/');
   const documentId = url[url.length - 1];
 
   const { token } = await getRecipientByEmail({
@@ -324,7 +343,7 @@ test('should be able to create, send with redirect url, sign a document and redi
   await page.waitForURL(`/sign/${token}`);
 
   // Check if document has been viewed
-  const { status } = await getDocumentByToken({ token });
+  const { status } = await getDocumentByToken(token);
   expect(status).toBe(DocumentStatus.PENDING);
 
   await page.getByRole('button', { name: 'Complete' }).click();
@@ -334,6 +353,6 @@ test('should be able to create, send with redirect url, sign a document and redi
   await page.waitForURL('https://documenso.com');
 
   // Check if document has been signed
-  const { status: completedStatus } = await getDocumentByToken({ token });
+  const { status: completedStatus } = await getDocumentByToken(token);
   expect(completedStatus).toBe(DocumentStatus.COMPLETED);
 });

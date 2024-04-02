@@ -4,14 +4,14 @@ import { WEBAPP_BASE_URL } from '@documenso/lib/constants/app';
 import { seedTeam, seedTeamEmailVerification, unseedTeam } from '@documenso/prisma/seed/teams';
 import { seedUser, unseedUser } from '@documenso/prisma/seed/users';
 
-import { manualLogin } from '../fixtures/authentication';
+import { apiSignin } from '../fixtures/authentication';
 
 test.describe.configure({ mode: 'parallel' });
 
 test('[TEAMS]: send team email request', async ({ page }) => {
   const team = await seedTeam();
 
-  await manualLogin({
+  await apiSignin({
     page,
     email: team.owner.email,
     password: 'password',
@@ -57,7 +57,7 @@ test('[TEAMS]: delete team email', async ({ page }) => {
     createTeamEmail: true,
   });
 
-  await manualLogin({
+  await apiSignin({
     page,
     email: team.owner.email,
     redirectPath: `/t/${team.url}/settings`,
@@ -86,7 +86,7 @@ test('[TEAMS]: team email owner removes access', async ({ page }) => {
     email: team.teamEmail.email,
   });
 
-  await manualLogin({
+  await apiSignin({
     page,
     email: teamEmailOwner.email,
     redirectPath: `/settings/teams`,

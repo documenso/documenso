@@ -95,7 +95,7 @@ export const sendCompletedEmail = async ({ documentId, requestMetadata }: SendDo
         data: {
           emailType: 'DOCUMENT_COMPLETED',
           recipientEmail: owner.email,
-          recipientName: owner.name,
+          recipientName: owner.name ?? '',
           recipientId: owner.id,
           recipientRole: 'OWNER',
           isResending: false,
