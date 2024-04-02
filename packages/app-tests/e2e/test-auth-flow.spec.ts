@@ -30,7 +30,7 @@ test('user can sign up with email and password', async ({ page }: { page: Page }
   }
 
   await page.getByRole('button', { name: 'Next', exact: true }).click();
-  await page.getByLabel('Public profile username').fill('username-123');
+  await page.getByLabel('Public profile username').fill(Date.now().toString());
 
   await page.getByRole('button', { name: 'Complete', exact: true }).click();
 
