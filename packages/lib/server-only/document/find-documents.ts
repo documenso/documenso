@@ -182,16 +182,181 @@ export const findDocuments = async ({
   }
 
   if (team) {
-    console.log('team');
+    console.log('team acc');
+
+    if (ExtendedDocumentStatus.ALL === status) {
+      dataQuery = dataQuery.where((eb) => {
+        const ors = [eb('Document.teamId', '=', team.id)];
+
+        if (team.teamEmail) {
+          ors.push(
+            eb.and([
+              eb.not(eb(sql`CAST("Document"."status" AS TEXT)`, '=', ExtendedDocumentStatus.DRAFT)),
+              eb.exists(
+                eb
+                  .selectFrom('Recipient')
+                  .selectAll('Recipient')
+                  .whereRef('Recipient.documentId', '=', 'Document.id')
+                  .where('Recipient.email', '=', team.teamEmail.email),
+              ),
+            ]),
+          );
+
+          ors.push(
+            eb.exists(
+              eb
+                .selectFrom('User')
+                .selectAll('User')
+                .where('User.email', '=', team.teamEmail.email),
+            ),
+          );
+        }
+
+        return eb.or(ors);
+      });
+    } else if (ExtendedDocumentStatus.INBOX === status) {
+      if (team.teamEmail) {
+        dataQuery = dataQuery.where((eb) => {
+          const ands = [];
+
+          if (team.teamEmail) {
+            ands.push(
+              eb.and([
+                eb.not(
+                  eb(sql`CAST("Document"."status" AS TEXT)`, '=', ExtendedDocumentStatus.DRAFT),
+                ),
+                eb.exists(
+                  eb
+                    .selectFrom('Recipient')
+                    .selectAll('Recipient')
+                    .whereRef('Recipient.documentId', '=', 'Document.id')
+                    .where('Recipient.email', '=', team.teamEmail.email)
+                    .where(
+                      sql`CAST("Recipient"."signingStatus" AS TEXT)`,
+                      '=',
+                      SigningStatus.NOT_SIGNED,
+                    )
+                    .where(sql`CAST("Recipient"."role" AS TEXT)`, '!=', RecipientRole.CC),
+                ),
+              ]),
+            );
+          }
+
+          return eb.and(ands);
+        });
+      }
+    } else if (ExtendedDocumentStatus.DRAFT === status) {
+      dataQuery = dataQuery.where((eb) => {
+        const ors = [
+          eb.and([
+            eb('Document.teamId', '=', team.id),
+            eb(sql`CAST("Document"."status" AS TEXT)`, '=', ExtendedDocumentStatus.DRAFT),
+          ]),
+        ];
+
+        if (team.teamEmail) {
+          ors.push(
+            eb.and([
+              eb(sql`CAST("Document"."status" AS TEXT)`, '=', ExtendedDocumentStatus.DRAFT),
+              eb.exists(
+                eb
+                  .selectFrom('User')
+                  .selectAll('User')
+                  .whereRef('userId', '=', 'Document.id')
+                  .where('User.email', '=', team.teamEmail.email),
+              ),
+            ]),
+          );
+        }
+
+        return eb.or(ors);
+      });
+    } else if (ExtendedDocumentStatus.PENDING === status) {
+      dataQuery = dataQuery.where((eb) => {
+        const ors = [
+          eb.and([
+            eb('Document.teamId', '=', team.id),
+            eb(sql`CAST("Document"."status" AS TEXT)`, '=', ExtendedDocumentStatus.PENDING),
+          ]),
+        ];
+
+        if (team.teamEmail) {
+          ors.push(
+            eb.or([
+              eb.and([
+                eb(sql`CAST("Document"."status" AS TEXT)`, '=', ExtendedDocumentStatus.PENDING),
+                eb.and([
+                  eb.exists(
+                    eb
+                      .selectFrom('User')
+                      .selectAll('User')
+                      .whereRef('userId', '=', 'Document.id')
+                      .where('User.email', '=', team.teamEmail.email),
+                  ),
+                  eb.exists(
+                    eb
+                      .selectFrom('Recipient')
+                      .selectAll('Recipient')
+                      .where('Recipient.email', '=', team.teamEmail.email)
+                      .where(
+                        sql`CAST("Recipient"."signingStatus" AS TEXT)`,
+                        '=',
+                        SigningStatus.SIGNED,
+                      )
+                      .where(sql`CAST("Recipient"."role" AS TEXT)`, '!=', RecipientRole.CC),
+                  ),
+                ]),
+              ]),
+            ]),
+          );
+        }
+
+        return eb.or(ors);
+      });
+    } else if (ExtendedDocumentStatus.COMPLETED === status) {
+      dataQuery = dataQuery.where((eb) => {
+        const ors = [];
+
+        if (team.teamEmail) {
+          ors.push(
+            eb(sql`CAST("Document"."status" AS TEXT)`, '=', ExtendedDocumentStatus.COMPLETED),
+            eb.or([
+              eb('Document.teamId', '=', team.id),
+              eb.and([
+                eb.exists(
+                  eb
+                    .selectFrom('User')
+                    .selectAll('User')
+                    .whereRef('userId', '=', 'Document.id')
+                    .where('User.email', '=', team.teamEmail.email),
+                ),
+                eb.exists(
+                  eb
+                    .selectFrom('Recipient')
+                    .selectAll('Recipient')
+                    .where('Recipient.email', '=', team.teamEmail.email)
+                    .where(
+                      sql`CAST("Recipient"."signingStatus" AS TEXT)`,
+                      '=',
+                      SigningStatus.SIGNED,
+                    )
+                    .where(sql`CAST("Recipient"."role" AS TEXT)`, '!=', RecipientRole.CC),
+                ),
+              ]),
+            ]),
+          );
+        }
+
+        return eb.and(ors);
+      });
+    }
   } else if (user) {
-    if (ExtendedDocumentStatus.ALL) {
-      console.log('inside EXTENDED_DOCUMENT_STATUS.ALL');
+    if (ExtendedDocumentStatus.ALL === status) {
       dataQuery = dataQuery.where(({ eb, or, and, exists }) => {
         return or([
-          eb('Document.userId', '=', user.id),
-          eb('Document.teamId', '=', null),
+          and([eb('Document.userId', '=', user.id), eb('Document.teamId', 'is', null)]),
           and([
-            eb(sql`"Document"."status"::text`, '=', sql`${ExtendedDocumentStatus.COMPLETED}`),
+            eb(sql`CAST("Document"."status" AS TEXT)`, '=', ExtendedDocumentStatus.COMPLETED),
             exists(
               eb
                 .selectFrom('Recipient')
@@ -201,7 +366,73 @@ export const findDocuments = async ({
             ),
           ]),
           and([
-            eb(sql`"Document"."status"::text`, '=', sql`${ExtendedDocumentStatus.PENDING}`),
+            eb(sql`CAST("Document"."status" AS TEXT)`, '=', ExtendedDocumentStatus.PENDING),
+            exists(
+              eb
+                .selectFrom('Recipient')
+                .selectAll('Recipient')
+                .whereRef('Recipient.documentId', '=', 'Document.id')
+                .where('Recipient.email', '=', user.email),
+            ),
+          ]),
+        ]);
+      });
+    } else if (ExtendedDocumentStatus.INBOX === status) {
+      dataQuery = dataQuery.where(({ eb, and, not, exists }) => {
+        return and([
+          not(eb(sql`CAST("Document"."status" AS TEXT)`, '=', ExtendedDocumentStatus.DRAFT)),
+          exists(
+            eb
+              .selectFrom('Recipient')
+              .selectAll('Recipient')
+              .whereRef('Recipient.documentId', '=', 'Document.id')
+              .where('Recipient.email', '=', user.email)
+              .where(sql`CAST("Recipient"."signingStatus" AS TEXT)`, '=', SigningStatus.NOT_SIGNED)
+              .where(sql`CAST("Recipient"."role" AS TEXT)`, '!=', RecipientRole.CC),
+          ),
+        ]);
+      });
+    } else if (ExtendedDocumentStatus.DRAFT === status) {
+      dataQuery = dataQuery.where(({ eb, and }) => {
+        return and([
+          eb('Document.userId', '=', user.id),
+          eb('Document.teamId', 'is', null),
+          eb(sql`CAST("Document"."status" AS TEXT)`, '=', ExtendedDocumentStatus.DRAFT),
+        ]);
+      });
+    } else if (ExtendedDocumentStatus.PENDING === status) {
+      dataQuery = dataQuery.where(({ eb, or, and, exists }) => {
+        return or([
+          and([
+            eb('Document.userId', '=', user.id),
+            eb('Document.teamId', 'is', null),
+            eb(sql`CAST("Document"."status" AS TEXT)`, '=', ExtendedDocumentStatus.PENDING),
+          ]),
+          and([
+            eb(sql`CAST("Document"."status" AS TEXT)`, '=', ExtendedDocumentStatus.PENDING),
+            exists(
+              eb
+                .selectFrom('Recipient')
+                .selectAll('Recipient')
+                .whereRef('Recipient.documentId', '=', 'Document.id')
+                .where('Recipient.email', '=', user.email)
+                .where(sql`CAST("Recipient"."signingStatus" AS TEXT)`, '=', SigningStatus.SIGNED)
+                .where(sql`CAST("Recipient"."role" AS TEXT)`, '!=', RecipientRole.CC),
+            ),
+          ]),
+        ]);
+      });
+    } else if (ExtendedDocumentStatus.COMPLETED === status) {
+      console.log('completed bitches');
+      dataQuery = dataQuery.where(({ eb, or, exists, and }) => {
+        return or([
+          and([
+            eb('Document.userId', '=', user.id),
+            eb('Document.teamId', 'is', null),
+            eb(sql`CAST("Document"."status" AS TEXT)`, '=', ExtendedDocumentStatus.COMPLETED),
+          ]),
+          and([
+            eb(sql`CAST("Document"."status" AS TEXT)`, '=', ExtendedDocumentStatus.COMPLETED),
             exists(
               eb
                 .selectFrom('Recipient')
@@ -213,72 +444,6 @@ export const findDocuments = async ({
         ]);
       });
     }
-    // } else if (ExtendedDocumentStatus.INBOX) {
-    //   dataQuery = dataQuery.where(({ eb, and, not, exists }) => {
-    //     return and([
-    //       not(eb(sql`status::text`, '=', ExtendedDocumentStatus.DRAFT)),
-    //       exists(
-    //         eb
-    //           .selectFrom('Recipient')
-    //           .selectAll('Recipient')
-    //           .whereRef('Recipient.documentId', '=', 'Document.id')
-    //           .where('Recipient.email', '=', user.email)
-    //           .where(sql`Recipient.signingStatus::text`, '=', SigningStatus.NOT_SIGNED)
-    //           .where('Recipient.role', '<>', RecipientRole.CC),
-    //       ),
-    //     ]);
-    //   });
-    // } else if (ExtendedDocumentStatus.DRAFT) {
-    //   dataQuery = dataQuery.where(({ eb, and }) => {
-    //     return and([
-    //       eb('Document.userId', '=', user.id),
-    //       eb('Document.teamId', '=', null),
-    //       eb(sql`status::text`, '=', ExtendedDocumentStatus.DRAFT),
-    //     ]);
-    //   });
-    // } else if (ExtendedDocumentStatus.PENDING) {
-    //   dataQuery = dataQuery.where(({ eb, or, and, exists }) => {
-    //     return or([
-    //       and([
-    //         eb('Document.userId', '=', user.id),
-    //         eb('Document.teamId', '=', null),
-    //         eb(sql`status::text`, '=', ExtendedDocumentStatus.PENDING),
-    //       ]),
-    //       and([
-    //         eb(sql`status::text`, '=', ExtendedDocumentStatus.PENDING),
-    //         exists(
-    //           eb
-    //             .selectFrom('Recipient')
-    //             .selectAll('Recipient')
-    //             .whereRef('Recipient.documentId', '=', 'Document.id')
-    //             .where('Recipient.email', '=', user.email)
-    //             .where(sql`Recipient.signingStatus::text`, '=', SigningStatus.SIGNED)
-    //             .where('Recipient.role', '<>', RecipientRole.CC),
-    //         ),
-    //       ]),
-    //     ]);
-    //   });
-    // } else if (ExtendedDocumentStatus.COMPLETED) {
-    //   dataQuery = dataQuery.where(({ eb, or, exists, and }) => {
-    //     return or([
-    //       and([
-    //         eb('Document.userId', '=', user.id),
-    //         eb('Document.teamId', '=', null),
-    //         eb(sql`status::text`, '=', ExtendedDocumentStatus.COMPLETED),
-    //       ]),
-    //       and([
-    //         eb(sql`status::text`, '=', ExtendedDocumentStatus.COMPLETED),
-    //         exists(
-    //           eb
-    //             .selectFrom('Recipient')
-    //             .selectAll('Recipient')
-    //             .whereRef('Recipient.documentId', '=', 'Document.id')
-    //             .where('Recipient.email', '=', user.email),
-    //         ),
-    //       ]),
-    //     ]);
-    //   });
-    // }
   } else {
     return {
       data: [],
@@ -289,36 +454,35 @@ export const findDocuments = async ({
     };
   }
 
-  // dataQuery = dataQuery.where(({ eb, or, and }) =>
-  //   and([
-  //     or([
-  //       eb(sql`"Document"."status"::text`, '=', sql`${ExtendedDocumentStatus.COMPLETED}`),
-  //       and([
-  //         eb(sql`"Document"."status"::text`, '<>', sql`${ExtendedDocumentStatus.COMPLETED}`),
-  //         eb('Document.deletedAt', '=', null),
-  //       ]),
-  //     ]),
-  //   ]),
-  // );
+  dataQuery = dataQuery.where(({ eb, or, and, not }) => {
+    return and([
+      or([
+        eb(sql`CAST("Document"."status" AS TEXT)`, '=', ExtendedDocumentStatus.COMPLETED),
+        and([
+          not(eb(sql`CAST("Document"."status" AS TEXT)`, '=', ExtendedDocumentStatus.COMPLETED)),
+          eb('Document.deletedAt', 'is', null),
+        ]),
+      ]),
+    ]);
+  });
 
-  const finalQuery = dataQuery
+  const finalQuery = await dataQuery
     .offset(Math.max(page - 1, 0) * perPage)
     .limit(perPage)
-    .orderBy(orderByColumn, orderByDirection);
+    .orderBy(orderByColumn, orderByDirection)
+    .execute();
 
   console.log('\n');
   console.log('\n');
   console.log('\n');
   console.log('\n');
   console.log('\n');
-  console.log('finalQuery', finalQuery.compile());
+  console.log('finalQuery', finalQuery);
   console.log('\n');
   console.log('\n');
   console.log('\n');
   console.log('\n');
   console.log('\n');
-
-  console.log('finalQuery', await finalQuery.execute());
 
   const [data, count] = await Promise.all([
     prisma.document.findMany({
@@ -350,7 +514,7 @@ export const findDocuments = async ({
     }),
   ]);
 
-  console.log('prisma query', data);
+  console.log('prisma query data', data);
 
   const maskedData = data.map((document) =>
     maskRecipientTokensForDocument({
