@@ -1,7 +1,6 @@
 import type { HTMLAttributes } from 'react';
 
 import Image from 'next/image';
-import Link from 'next/link';
 
 import backgroundPattern from '@documenso/assets/images/background-pattern.png';
 import cardConnectionsFigure from '@documenso/assets/images/card-connections-figure.png';
@@ -9,7 +8,6 @@ import cardPaidFigure from '@documenso/assets/images/card-paid-figure.png';
 import cardSharingFigure from '@documenso/assets/images/card-sharing-figure.png';
 import cardWidgetFigure from '@documenso/assets/images/card-widget-figure.png';
 import { cn } from '@documenso/ui/lib/utils';
-import { Button } from '@documenso/ui/primitives/button';
 import { Card, CardContent } from '@documenso/ui/primitives/card';
 
 export type ShareConnectPaidWidgetBentoProps = HTMLAttributes<HTMLDivElement>;
@@ -55,15 +53,6 @@ export const ShareConnectPaidWidgetBento = ({
             <p className="text-foreground/80 leading-relaxed">
               <p className="flex flex-row justify-between">
                 <strong className="block justify-between">Connections</strong>
-                <Button variant="outline" className="rounded-full bg-transparent" size="sm" asChild>
-                  <Link
-                    className="text-documenso-700 font-light"
-                    href="https://documen.so/zapier-hub"
-                    target="_blank"
-                  >
-                    Get started
-                  </Link>
-                </Button>
               </p>
               Create connections and automations with Zapier and more to integrate with your
               favorite tools.
