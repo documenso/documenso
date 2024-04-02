@@ -51,9 +51,7 @@ export const ShareConnectPaidWidgetBento = ({
         <Card className="col-span-2 lg:col-span-1" spotlight>
           <CardContent className="grid grid-cols-1 gap-8 p-6">
             <p className="text-foreground/80 leading-relaxed">
-              <p className="flex flex-row justify-between">
-                <strong className="block justify-between">Connections</strong>
-              </p>
+              <strong className="block justify-between">Connections</strong>
               Create connections and automations with Zapier and more to integrate with your
               favorite tools.
             </p>
