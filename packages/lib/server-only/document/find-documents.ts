@@ -182,8 +182,6 @@ export const findDocuments = async ({
   }
 
   if (team) {
-    console.log('team acc');
-
     if (ExtendedDocumentStatus.ALL === status) {
       dataQuery = dataQuery.where((eb) => {
         const ors = [eb('Document.teamId', '=', team.id)];
@@ -423,7 +421,6 @@ export const findDocuments = async ({
         ]);
       });
     } else if (ExtendedDocumentStatus.COMPLETED === status) {
-      console.log('completed bitches');
       dataQuery = dataQuery.where(({ eb, or, exists, and }) => {
         return or([
           and([
