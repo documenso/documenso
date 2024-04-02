@@ -18,6 +18,8 @@ import { Label } from '@documenso/ui/primitives/label';
 import { SignaturePad } from '@documenso/ui/primitives/signature-pad';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
+import { SigningDisclosure } from '~/components/general/signing-disclosure';
+
 import { useRequiredDocumentAuthContext } from './document-auth-provider';
 import { useRequiredSigningContext } from './provider';
 import { SigningFieldContainer } from './signing-field-container';
@@ -199,6 +201,8 @@ export const SignatureField = ({ field, recipient }: SignatureFieldProps) => {
               onChange={(value) => setLocalSignature(value)}
             />
           </div>
+
+          <SigningDisclosure />
 
           <DialogFooter>
             <div className="flex w-full flex-1 flex-nowrap gap-4">
