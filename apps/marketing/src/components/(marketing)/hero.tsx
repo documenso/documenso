@@ -96,7 +96,7 @@ export const Hero = ({ className, ...props }: HeroProps) => {
           variants={HeroTitleVariants}
           initial="initial"
           animate="animate"
-          className="text-center text-4xl font-bold leading-tight tracking-tight lg:text-[64px]"
+          className="text-center text-4xl font-bold leading-tight tracking-tight md:text-[48px] lg:text-[64px]"
         >
           Document signing,
           <span className="block" /> finally open source.
