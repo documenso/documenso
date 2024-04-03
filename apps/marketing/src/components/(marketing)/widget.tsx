@@ -360,7 +360,7 @@ export const Widget = ({ className, children, ...props }: WidgetProps) => {
                 >
                   <Input
                     id="signatureText"
-                    className="text-foreground placeholder:text-muted-foreground border-none p-0 text-sm focus-visible:ring-0"
+                    className="text-foreground placeholder:text-muted-foreground truncate border-none p-0 text-sm focus-visible:ring-0"
                     placeholder="Draw or type name here"
                     disabled={isSubmitting}
                     {...register('signatureText', {
