@@ -262,7 +262,7 @@ test('should be able to create, send and sign a document', async ({ page }) => {
   expect(status).toBe(DocumentStatus.PENDING);
 
   await page.getByRole('button', { name: 'Complete' }).click();
-  await expect(page.getByRole('dialog').getByText('Sign Document')).toBeVisible();
+  await expect(page.getByRole('dialog').getByText('Complete Signing').first()).toBeVisible();
   await page.getByRole('button', { name: 'Sign' }).click();
 
   await page.waitForURL(`/sign/${token}/complete`);
@@ -347,7 +347,7 @@ test('should be able to create, send with redirect url, sign a document and redi
   expect(status).toBe(DocumentStatus.PENDING);
 
   await page.getByRole('button', { name: 'Complete' }).click();
-  await expect(page.getByRole('dialog').getByText('Sign Document')).toBeVisible();
+  await expect(page.getByRole('dialog').getByText('Complete Signing').first()).toBeVisible();
   await page.getByRole('button', { name: 'Sign' }).click();
 
   await page.waitForURL('https://documenso.com');
