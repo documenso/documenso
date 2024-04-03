@@ -1,3 +1,4 @@
+// https://github.com/Hopding/pdf-lib/issues/20#issuecomment-412852821
 import fontkit from '@pdf-lib/fontkit';
 import { PDFDocument, StandardFonts } from 'pdf-lib';
 
@@ -73,13 +74,17 @@ export const insertFieldInPDF = async (pdf: PDFDocument, field: FieldWithSignatu
       height: imageHeight,
     });
   } else {
-    let textWidth = font.widthOfTextAtSize(field.customText, fontSize);
+    const longestLineInTextForWidth = field.customText
+      .split('\n')
+      .sort((a, b) => b.length - a.length)[0];
+
+    let textWidth = font.widthOfTextAtSize(longestLineInTextForWidth, fontSize);
     const textHeight = font.heightAtSize(fontSize);
 
     const scalingFactor = Math.min(fieldWidth / textWidth, fieldHeight / textHeight, 1);
 
     fontSize = Math.max(Math.min(fontSize * scalingFactor, maxFontSize), minFontSize);
-    textWidth = font.widthOfTextAtSize(field.customText, fontSize);
+    textWidth = font.widthOfTextAtSize(longestLineInTextForWidth, fontSize);
 
     const textX = fieldX + (fieldWidth - textWidth) / 2;
     let textY = fieldY + (fieldHeight - textHeight) / 2;

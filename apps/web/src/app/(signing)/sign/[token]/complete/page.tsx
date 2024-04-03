@@ -6,7 +6,9 @@ import { getServerSession } from 'next-auth';
 import { match } from 'ts-pattern';
 
 import signingCelebration from '@documenso/assets/images/signing-celebration.png';
+import { getServerComponentSession } from '@documenso/lib/next-auth/get-server-component-session';
 import { getDocumentAndSenderByToken } from '@documenso/lib/server-only/document/get-document-by-token';
+import { isRecipientAuthorized } from '@documenso/lib/server-only/document/is-recipient-authorized';
 import { getFieldsForToken } from '@documenso/lib/server-only/field/get-fields-for-token';
 import { getRecipientByToken } from '@documenso/lib/server-only/recipient/get-recipient-by-token';
 import { getRecipientSignatures } from '@documenso/lib/server-only/recipient/get-recipient-signatures';
@@ -17,6 +19,7 @@ import { SigningCard3D } from '@documenso/ui/components/signing-card';
 
 import { truncateTitle } from '~/helpers/truncate-title';
 
+import { SigningAuthPageView } from '../signing-auth-page';
 import { DocumentPreviewButton } from './document-preview-button';
 
 export type CompletedSigningPageProps = {
@@ -32,8 +35,11 @@ export default async function CompletedSigningPage({
     return notFound();
   }
 
+  const { user } = await getServerComponentSession();
+
   const document = await getDocumentAndSenderByToken({
     token,
+    requireAccessAuth: false,
   }).catch(() => null);
 
   if (!document || !document.documentData) {
@@ -51,6 +57,17 @@ export default async function CompletedSigningPage({
 
   if (!recipient) {
     return notFound();
+  }
+
+  const isDocumentAccessValid = await isRecipientAuthorized({
+    type: 'ACCESS',
+    document,
+    recipient,
+    userId: user?.id,
+  });
+
+  if (!isDocumentAccessValid) {
+    return <SigningAuthPageView email={recipient.email} />;
   }
 
   const signatures = await getRecipientSignatures({ recipientId: recipient.id });

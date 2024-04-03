@@ -64,6 +64,7 @@
     "luxon": "^3.4.2",
     "next": "14.0.3",
     "pdfjs-dist": "3.6.172",
+    "react-colorful": "^5.6.1",
     "react-day-picker": "^8.7.1",
     "react-hook-form": "^7.45.4",
     "react-pdf": "7.3.3",

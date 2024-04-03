@@ -1,6 +1,7 @@
 /// <reference types="../types/next-auth.d.ts" />
 import { PrismaAdapter } from '@next-auth/prisma-adapter';
-import { compare } from 'bcrypt';
+import { compare } from '@node-rs/bcrypt';
+import { verifyAuthenticationResponse } from '@simplewebauthn/server';
 import { DateTime } from 'luxon';
 import type { AuthOptions, Session, User } from 'next-auth';
 import type { JWT } from 'next-auth/jwt';
@@ -12,12 +13,16 @@ import { env } from 'next-runtime-env';
 import { prisma } from '@documenso/prisma';
 import { IdentityProvider, UserSecurityAuditLogType } from '@documenso/prisma/client';
 
+import { AppError, AppErrorCode } from '../errors/app-error';
 import { isTwoFactorAuthenticationEnabled } from '../server-only/2fa/is-2fa-availble';
 import { validateTwoFactorAuthentication } from '../server-only/2fa/validate-2fa';
 import { getMostRecentVerificationTokenByUserId } from '../server-only/user/get-most-recent-verification-token-by-user-id';
 import { getUserByEmail } from '../server-only/user/get-user-by-email';
 import { sendConfirmationToken } from '../server-only/user/send-confirmation-token';
+import type { TAuthenticationResponseJSONSchema } from '../types/webauthn';
+import { ZAuthenticationResponseJSONSchema } from '../types/webauthn';
 import { extractNextAuthRequestMetadata } from '../universal/extract-request-metadata';
+import { getAuthenticatorOptions } from '../utils/authenticator';
 import { ErrorCode } from './error-codes';
 
 export const NEXT_AUTH_OPTIONS: AuthOptions = {
@@ -129,6 +134,113 @@ export const NEXT_AUTH_OPTIONS: AuthOptions = {
           email: profile.email,
           emailVerified: profile.email_verified ? new Date().toISOString() : null,
         };
+      },
+    }),
+    CredentialsProvider({
+      id: 'webauthn',
+      name: 'Keypass',
+      credentials: {
+        csrfToken: { label: 'csrfToken', type: 'csrfToken' },
+      },
+      async authorize(credentials, req) {
+        const csrfToken = credentials?.csrfToken;
+
+        if (typeof csrfToken !== 'string' || csrfToken.length === 0) {
+          throw new AppError(AppErrorCode.INVALID_REQUEST);
+        }
+
+        let requestBodyCrediential: TAuthenticationResponseJSONSchema | null = null;
+
+        try {
+          const parsedBodyCredential = JSON.parse(req.body?.credential);
+          requestBodyCrediential = ZAuthenticationResponseJSONSchema.parse(parsedBodyCredential);
+        } catch {
+          throw new AppError(AppErrorCode.INVALID_REQUEST);
+        }
+
+        const challengeToken = await prisma.anonymousVerificationToken
+          .delete({
+            where: {
+              id: csrfToken,
+            },
+          })
+          .catch(() => null);
+
+        if (!challengeToken) {
+          return null;
+        }
+
+        if (challengeToken.expiresAt < new Date()) {
+          throw new AppError(AppErrorCode.EXPIRED_CODE);
+        }
+
+        const passkey = await prisma.passkey.findFirst({
+          where: {
+            credentialId: Buffer.from(requestBodyCrediential.id, 'base64'),
+          },
+          include: {
+            User: {
+              select: {
+                id: true,
+                email: true,
+                name: true,
+                emailVerified: true,
+              },
+            },
+          },
+        });
+
+        if (!passkey) {
+          throw new AppError(AppErrorCode.NOT_SETUP);
+        }
+
+        const user = passkey.User;
+
+        const { rpId, origin } = getAuthenticatorOptions();
+
+        const verification = await verifyAuthenticationResponse({
+          response: requestBodyCrediential,
+          expectedChallenge: challengeToken.token,
+          expectedOrigin: origin,
+          expectedRPID: rpId,
+          authenticator: {
+            credentialID: new Uint8Array(Array.from(passkey.credentialId)),
+            credentialPublicKey: new Uint8Array(passkey.credentialPublicKey),
+            counter: Number(passkey.counter),
+          },
+        }).catch(() => null);
+
+        const requestMetadata = extractNextAuthRequestMetadata(req);
+
+        if (!verification?.verified) {
+          await prisma.userSecurityAuditLog.create({
+            data: {
+              userId: user.id,
+              ipAddress: requestMetadata.ipAddress,
+              userAgent: requestMetadata.userAgent,
+              type: UserSecurityAuditLogType.SIGN_IN_PASSKEY_FAIL,
+            },
+          });
+
+          return null;
+        }
+
+        await prisma.passkey.update({
+          where: {
+            id: passkey.id,
+          },
+          data: {
+            lastUsedAt: new Date(),
+            counter: verification.authenticationInfo.newCounter,
+          },
+        });
+
+        return {
+          id: Number(user.id),
+          email: user.email,
+          name: user.name,
+          emailVerified: user.emailVerified?.toISOString() ?? null,
+        } satisfies User;
       },
     }),
   ],

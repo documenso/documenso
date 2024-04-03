@@ -6,6 +6,7 @@
   "main": "index.js",
   "scripts": {
     "test:dev": "playwright test",
+    "test-ui:dev": "playwright test --ui",
     "test:e2e": "start-server-and-test \"npm run start -w @documenso/web\" http://localhost:3000 \"playwright test\""
   },
   "keywords": [],

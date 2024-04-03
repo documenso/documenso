@@ -16,9 +16,8 @@ import { prisma } from '@documenso/prisma';
 import { DocumentStatus, RecipientRole, SigningStatus } from '@documenso/prisma/client';
 import type { Prisma } from '@documenso/prisma/client';
 
-import { getDocumentWhereInput } from './get-document-by-id';
-
 import { NEXT_PUBLIC_WEBAPP_URL } from '../../constants/app';
+import { getDocumentWhereInput } from './get-document-by-id';
 
 export type ResendDocumentOptions = {
   documentId: number;
@@ -111,40 +110,43 @@ export const resendDocument = async ({
 
       const { actionVerb } = RECIPIENT_ROLES_DESCRIPTION[recipient.role];
 
-      await prisma.$transaction(async (tx) => {
-        await mailer.sendMail({
-          to: {
-            address: email,
-            name,
-          },
-          from: {
-            name: FROM_NAME,
-            address: FROM_ADDRESS,
-          },
-          subject: customEmail?.subject
-            ? renderCustomEmailTemplate(customEmail.subject, customEmailTemplate)
-            : `Please ${actionVerb.toLowerCase()} this document`,
-          html: render(template),
-          text: render(template, { plainText: true }),
-        });
-
-        await tx.documentAuditLog.create({
-          data: createDocumentAuditLogData({
-            type: DOCUMENT_AUDIT_LOG_TYPE.EMAIL_SENT,
-            documentId: document.id,
-            user,
-            requestMetadata,
-            data: {
-              emailType: recipientEmailType,
-              recipientEmail: recipient.email,
-              recipientName: recipient.name,
-              recipientRole: recipient.role,
-              recipientId: recipient.id,
-              isResending: true,
+      await prisma.$transaction(
+        async (tx) => {
+          await mailer.sendMail({
+            to: {
+              address: email,
+              name,
             },
-          }),
-        });
-      });
+            from: {
+              name: FROM_NAME,
+              address: FROM_ADDRESS,
+            },
+            subject: customEmail?.subject
+              ? renderCustomEmailTemplate(customEmail.subject, customEmailTemplate)
+              : `Please ${actionVerb.toLowerCase()} this document`,
+            html: render(template),
+            text: render(template, { plainText: true }),
+          });
+
+          await tx.documentAuditLog.create({
+            data: createDocumentAuditLogData({
+              type: DOCUMENT_AUDIT_LOG_TYPE.EMAIL_SENT,
+              documentId: document.id,
+              user,
+              requestMetadata,
+              data: {
+                emailType: recipientEmailType,
+                recipientEmail: recipient.email,
+                recipientName: recipient.name,
+                recipientRole: recipient.role,
+                recipientId: recipient.id,
+                isResending: true,
+              },
+            }),
+          });
+        },
+        { timeout: 30_000 },
+      );
     }),
   );
 };

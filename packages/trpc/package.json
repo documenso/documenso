@@ -17,6 +17,8 @@
     "@trpc/next": "^10.36.0",
     "@trpc/react-query": "^10.36.0",
     "@trpc/server": "^10.36.0",
+    "@ts-rest/core": "^3.30.5",
+    "@ts-rest/next": "^3.30.5",
     "luxon": "^3.4.0",
     "superjson": "^1.13.1",
     "ts-pattern": "^5.0.5",
