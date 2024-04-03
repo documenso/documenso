@@ -67,6 +67,8 @@ services:
         sync: false
       - key: NEXT_PUBLIC_STRIPE_COMMUNITY_PLAN_MONTHLY_PRICE_ID
         sync: false
+      - key: NEXT_PUBLIC_STRIPE_ENTERPRISE_PLAN_MONTHLY_PRICE_ID
+        sync: false
 
       # Features
       - key: NEXT_PUBLIC_POSTHOG_KEY
@@ -84,6 +86,8 @@ services:
       - key: NEXT_PUBLIC_UPLOAD_TRANSPORT
         value: 'database'
       - key: NEXT_PRIVATE_UPLOAD_ENDPOINT
+        sync: false
+      - key: NEXT_PRIVATE_UPLOAD_FORCE_PATH_STYLE
         sync: false
       - key: NEXT_PRIVATE_UPLOAD_REGION
         sync: false

@@ -47,11 +47,8 @@ export const ViewRecoveryCodesDialog = () => {
     data: recoveryCodes,
     mutate,
     isLoading,
-    isError,
     error,
   } = trpc.twoFactorAuthentication.viewRecoveryCodes.useMutation();
-
-  // error?.data?.code
 
   const viewRecoveryCodesForm = useForm<TViewRecoveryCodesForm>({
     defaultValues: {

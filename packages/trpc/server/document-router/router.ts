@@ -13,6 +13,7 @@ import { getDocumentWithDetailsById } from '@documenso/lib/server-only/document/
 import { resendDocument } from '@documenso/lib/server-only/document/resend-document';
 import { searchDocumentsWithKeyword } from '@documenso/lib/server-only/document/search-documents-with-keyword';
 import { sendDocument } from '@documenso/lib/server-only/document/send-document';
+import { updateDocumentSettings } from '@documenso/lib/server-only/document/update-document-settings';
 import { updateTitle } from '@documenso/lib/server-only/document/update-title';
 import { symmetricEncrypt } from '@documenso/lib/universal/crypto';
 import { extractNextApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
@@ -29,6 +30,7 @@ import {
   ZSearchDocumentsMutationSchema,
   ZSendDocumentMutationSchema,
   ZSetPasswordForDocumentMutationSchema,
+  ZSetSettingsForDocumentMutationSchema,
   ZSetTitleForDocumentMutationSchema,
 } from './schema';
 
@@ -51,22 +53,25 @@ export const documentRouter = router({
       }
     }),
 
-  getDocumentByToken: procedure.input(ZGetDocumentByTokenQuerySchema).query(async ({ input }) => {
-    try {
-      const { token } = input;
+  getDocumentByToken: procedure
+    .input(ZGetDocumentByTokenQuerySchema)
+    .query(async ({ input, ctx }) => {
+      try {
+        const { token } = input;
 
-      return await getDocumentAndSenderByToken({
-        token,
-      });
-    } catch (err) {
-      console.error(err);
+        return await getDocumentAndSenderByToken({
+          token,
+          userId: ctx.user?.id,
+        });
+      } catch (err) {
+        console.error(err);
 
-      throw new TRPCError({
-        code: 'BAD_REQUEST',
-        message: 'We were unable to find this document. Please try again later.',
-      });
-    }
-  }),
+        throw new TRPCError({
+          code: 'BAD_REQUEST',
+          message: 'We were unable to find this document. Please try again later.',
+        });
+      }
+    }),
 
   getDocumentWithDetailsById: authenticatedProcedure
     .input(ZGetDocumentWithDetailsByIdQuerySchema)
@@ -166,6 +171,46 @@ export const documentRouter = router({
         throw new TRPCError({
           code: 'BAD_REQUEST',
           message: 'We were unable to find audit logs for this document. Please try again later.',
+        });
+      }
+    }),
+
+  // Todo: Add API
+  setSettingsForDocument: authenticatedProcedure
+    .input(ZSetSettingsForDocumentMutationSchema)
+    .mutation(async ({ input, ctx }) => {
+      try {
+        const { documentId, teamId, data, meta } = input;
+
+        const userId = ctx.user.id;
+
+        const requestMetadata = extractNextApiRequestMetadata(ctx.req);
+
+        if (meta.timezone || meta.dateFormat || meta.redirectUrl) {
+          await upsertDocumentMeta({
+            documentId,
+            dateFormat: meta.dateFormat,
+            timezone: meta.timezone,
+            redirectUrl: meta.redirectUrl,
+            userId: ctx.user.id,
+            requestMetadata,
+          });
+        }
+
+        return await updateDocumentSettings({
+          userId,
+          teamId,
+          documentId,
+          data,
+          requestMetadata,
+        });
+      } catch (err) {
+        console.error(err);
+
+        throw new TRPCError({
+          code: 'BAD_REQUEST',
+          message:
+            'We were unable to update the settings for this document. Please try again later.',
         });
       }
     }),

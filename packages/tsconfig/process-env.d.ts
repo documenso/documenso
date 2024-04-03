@@ -17,6 +17,7 @@ declare namespace NodeJS {
 
     NEXT_PUBLIC_UPLOAD_TRANSPORT?: 'database' | 's3';
     NEXT_PRIVATE_UPLOAD_ENDPOINT?: string;
+    NEXT_PRIVATE_UPLOAD_FORCE_PATH_STYLE?: string;
     NEXT_PRIVATE_UPLOAD_REGION?: string;
     NEXT_PRIVATE_UPLOAD_BUCKET?: string;
     NEXT_PRIVATE_UPLOAD_ACCESS_KEY_ID?: string;
