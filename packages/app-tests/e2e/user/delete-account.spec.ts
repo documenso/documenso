@@ -4,19 +4,16 @@ import { WEBAPP_BASE_URL } from '@documenso/lib/constants/app';
 import { getUserByEmail } from '@documenso/lib/server-only/user/get-user-by-email';
 import { seedUser } from '@documenso/prisma/seed/users';
 
-import { manualLogin } from './fixtures/authentication';
+import { apiSignin } from '../fixtures/authentication';
 
-test('delete user', async ({ page }) => {
+test('[USER] delete account', async ({ page }) => {
   const user = await seedUser();
 
-  await manualLogin({
-    page,
-    email: user.email,
-    redirectPath: '/settings',
-  });
+  await apiSignin({ page, email: user.email, redirectPath: '/settings' });
 
   await page.getByRole('button', { name: 'Delete Account' }).click();
   await page.getByLabel('Confirm Email').fill(user.email);
+
   await expect(page.getByRole('button', { name: 'Confirm Deletion' })).not.toBeDisabled();
   await page.getByRole('button', { name: 'Confirm Deletion' }).click();
 

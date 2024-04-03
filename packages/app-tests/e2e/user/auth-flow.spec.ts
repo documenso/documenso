@@ -2,6 +2,7 @@ import { type Page, expect, test } from '@playwright/test';
 
 import {
   extractUserVerificationToken,
+  seedTestEmail,
   seedUser,
   unseedUser,
   unseedUserByEmail,
@@ -9,9 +10,9 @@ import {
 
 test.use({ storageState: { cookies: [], origins: [] } });
 
-test('user can sign up with email and password', async ({ page }: { page: Page }) => {
+test('[USER] can sign up with email and password', async ({ page }: { page: Page }) => {
   const username = 'Test User';
-  const email = `test-user-${Date.now()}@auth-flow.documenso.com`;
+  const email = seedTestEmail();
   const password = 'Password123#';
 
   await page.goto('/signup');
@@ -50,7 +51,7 @@ test('user can sign up with email and password', async ({ page }: { page: Page }
   await unseedUserByEmail(email);
 });
 
-test('user can login with user and password', async ({ page }: { page: Page }) => {
+test('[USER] can sign in using email and password', async ({ page }: { page: Page }) => {
   const user = await seedUser();
 
   await page.goto('/signin');
