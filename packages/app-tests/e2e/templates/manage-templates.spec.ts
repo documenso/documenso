@@ -108,7 +108,7 @@ test('[TEMPLATES]: delete template', async ({ page }) => {
     await page.getByRole('button', { name: 'Delete' }).click();
     await expect(page.getByText('Template deleted').first()).toBeVisible();
 
-    await page.waitForTimeout(1000);
+    await page.reload();
   }
 
   await unseedTeam(team.url);
