@@ -1,10 +1,10 @@
 'use client';
 
-import { createContext, useContext, useMemo, useState } from 'react';
+import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 
 import { match } from 'ts-pattern';
 
-import { DOCUMENT_AUTH_TYPES } from '@documenso/lib/constants/document-auth';
+import { MAXIMUM_PASSKEYS } from '@documenso/lib/constants/auth';
 import type {
   TDocumentAuthOptions,
   TRecipientAccessAuthTypes,
@@ -13,10 +13,24 @@ import type {
 } from '@documenso/lib/types/document-auth';
 import { DocumentAuth } from '@documenso/lib/types/document-auth';
 import { extractDocumentAuthMethods } from '@documenso/lib/utils/document-auth';
-import { type Document, FieldType, type Recipient, type User } from '@documenso/prisma/client';
+import {
+  type Document,
+  FieldType,
+  type Passkey,
+  type Recipient,
+  type User,
+} from '@documenso/prisma/client';
+import { trpc } from '@documenso/trpc/react';
 
 import type { DocumentActionAuthDialogProps } from './document-action-auth-dialog';
 import { DocumentActionAuthDialog } from './document-action-auth-dialog';
+
+type PasskeyData = {
+  passkeys: Omit<Passkey, 'credentialId' | 'credentialPublicKey'>[];
+  isInitialLoading: boolean;
+  isRefetching: boolean;
+  isError: boolean;
+};
 
 export type DocumentAuthContextValue = {
   executeActionAuthProcedure: (_value: ExecuteActionAuthProcedureOptions) => Promise<void>;
@@ -29,7 +43,13 @@ export type DocumentAuthContextValue = {
   derivedRecipientAccessAuth: TRecipientAccessAuthTypes | null;
   derivedRecipientActionAuth: TRecipientActionAuthTypes | null;
   isAuthRedirectRequired: boolean;
+  isCurrentlyAuthenticating: boolean;
+  setIsCurrentlyAuthenticating: (_value: boolean) => void;
+  passkeyData: PasskeyData;
+  preferredPasskeyId: string | null;
+  setPreferredPasskeyId: (_value: string | null) => void;
   user?: User | null;
+  refetchPasskeys: () => Promise<void>;
 };
 
 const DocumentAuthContext = createContext<DocumentAuthContextValue | null>(null);
@@ -64,6 +84,9 @@ export const DocumentAuthProvider = ({
   const [document, setDocument] = useState(initialDocument);
   const [recipient, setRecipient] = useState(initialRecipient);
 
+  const [isCurrentlyAuthenticating, setIsCurrentlyAuthenticating] = useState(false);
+  const [preferredPasskeyId, setPreferredPasskeyId] = useState<string | null>(null);
+
   const {
     documentAuthOption,
     recipientAuthOption,
@@ -77,6 +100,23 @@ export const DocumentAuthProvider = ({
       }),
     [document, recipient],
   );
+
+  const passkeyQuery = trpc.auth.findPasskeys.useQuery(
+    {
+      perPage: MAXIMUM_PASSKEYS,
+    },
+    {
+      keepPreviousData: true,
+      enabled: derivedRecipientActionAuth === DocumentAuth.PASSKEY,
+    },
+  );
+
+  const passkeyData: PasskeyData = {
+    passkeys: passkeyQuery.data?.data || [],
+    isInitialLoading: passkeyQuery.isInitialLoading,
+    isRefetching: passkeyQuery.isRefetching,
+    isError: passkeyQuery.isError,
+  };
 
   const [documentAuthDialogPayload, setDocumentAuthDialogPayload] =
     useState<ExecuteActionAuthProcedureOptions | null>(null);
@@ -101,7 +141,7 @@ export const DocumentAuthProvider = ({
     .with(DocumentAuth.EXPLICIT_NONE, () => ({
       type: DocumentAuth.EXPLICIT_NONE,
     }))
-    .with(null, () => null)
+    .with(DocumentAuth.PASSKEY, DocumentAuth.TWO_FACTOR_AUTH, null, () => null)
     .exhaustive();
 
   const executeActionAuthProcedure = async (options: ExecuteActionAuthProcedureOptions) => {
@@ -124,10 +164,26 @@ export const DocumentAuthProvider = ({
     });
   };
 
+  useEffect(() => {
+    const { passkeys } = passkeyData;
+
+    if (!preferredPasskeyId && passkeys.length > 0) {
+      setPreferredPasskeyId(passkeys[0].id);
+    }
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [passkeyData.passkeys]);
+
+  // Assume that a user must be logged in for any auth requirements.
   const isAuthRedirectRequired = Boolean(
-    DOCUMENT_AUTH_TYPES[derivedRecipientActionAuth || '']?.isAuthRedirectRequired &&
-      !preCalculatedActionAuthOptions,
+    derivedRecipientActionAuth &&
+      derivedRecipientActionAuth !== DocumentAuth.EXPLICIT_NONE &&
+      user?.email !== recipient.email,
   );
+
+  const refetchPasskeys = async () => {
+    await passkeyQuery.refetch();
+  };
 
   return (
     <DocumentAuthContext.Provider
@@ -143,6 +199,12 @@ export const DocumentAuthProvider = ({
         derivedRecipientAccessAuth,
         derivedRecipientActionAuth,
         isAuthRedirectRequired,
+        isCurrentlyAuthenticating,
+        setIsCurrentlyAuthenticating,
+        passkeyData,
+        preferredPasskeyId,
+        setPreferredPasskeyId,
+        refetchPasskeys,
       }}
     >
       {children}

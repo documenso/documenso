@@ -4,12 +4,16 @@ import { findDocuments } from '@documenso/lib/server-only/admin/get-all-document
 import { updateRecipient } from '@documenso/lib/server-only/admin/update-recipient';
 import { updateUser } from '@documenso/lib/server-only/admin/update-user';
 import { sealDocument } from '@documenso/lib/server-only/document/seal-document';
+import { sendDeleteEmail } from '@documenso/lib/server-only/document/send-delete-email';
+import { superDeleteDocument } from '@documenso/lib/server-only/document/super-delete-document';
 import { upsertSiteSetting } from '@documenso/lib/server-only/site-settings/upsert-site-setting';
 import { deleteUser } from '@documenso/lib/server-only/user/delete-user';
 import { getUserById } from '@documenso/lib/server-only/user/get-user-by-id';
+import { extractNextApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 
 import { adminProcedure, router } from '../trpc';
 import {
+  ZAdminDeleteDocumentMutationSchema,
   ZAdminDeleteUserMutationSchema,
   ZAdminFindDocumentsQuerySchema,
   ZAdminResealDocumentMutationSchema,
@@ -118,4 +122,25 @@ export const adminRouter = router({
       });
     }
   }),
+
+  deleteDocument: adminProcedure
+    .input(ZAdminDeleteDocumentMutationSchema)
+    .mutation(async ({ ctx, input }) => {
+      const { id, reason } = input;
+      try {
+        await sendDeleteEmail({ documentId: id, reason });
+
+        return await superDeleteDocument({
+          id,
+          requestMetadata: extractNextApiRequestMetadata(ctx.req),
+        });
+      } catch (err) {
+        console.log(err);
+
+        throw new TRPCError({
+          code: 'BAD_REQUEST',
+          message: 'We were unable to delete the specified document. Please try again.',
+        });
+      }
+    }),
 });

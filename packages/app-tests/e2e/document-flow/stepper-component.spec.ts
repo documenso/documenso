@@ -236,7 +236,7 @@ test('[DOCUMENT_FLOW]: should be able to create, send and sign a document', asyn
   expect(status).toBe(DocumentStatus.PENDING);
 
   await page.getByRole('button', { name: 'Complete' }).click();
-  await expect(page.getByRole('dialog').getByText('Sign Document')).toBeVisible();
+  await expect(page.getByRole('dialog').getByText('Complete Signing').first()).toBeVisible();
   await page.getByRole('button', { name: 'Sign' }).click();
 
   await page.waitForURL(`/sign/${token}/complete`);
@@ -308,7 +308,7 @@ test('[DOCUMENT_FLOW]: should be able to create, send with redirect url, sign a 
   expect(status).toBe(DocumentStatus.PENDING);
 
   await page.getByRole('button', { name: 'Complete' }).click();
-  await expect(page.getByRole('dialog').getByText('Sign Document')).toBeVisible();
+  await expect(page.getByRole('dialog').getByText('Complete Signing').first()).toBeVisible();
   await page.getByRole('button', { name: 'Sign' }).click();
 
   await page.waitForURL('https://documenso.com');

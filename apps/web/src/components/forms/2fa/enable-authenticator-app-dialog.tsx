@@ -41,8 +41,13 @@ export const ZEnable2FAForm = z.object({
 
 export type TEnable2FAForm = z.infer<typeof ZEnable2FAForm>;
 
-export const EnableAuthenticatorAppDialog = () => {
+export type EnableAuthenticatorAppDialogProps = {
+  onSuccess?: () => void;
+};
+
+export const EnableAuthenticatorAppDialog = ({ onSuccess }: EnableAuthenticatorAppDialogProps) => {
   const { toast } = useToast();
+
   const router = useRouter();
 
   const [isOpen, setIsOpen] = useState(false);
@@ -79,6 +84,7 @@ export const EnableAuthenticatorAppDialog = () => {
       const data = await enable2FA({ code: token });
 
       setRecoveryCodes(data.recoveryCodes);
+      onSuccess?.();
 
       toast({
         title: 'Two-factor authentication enabled',
@@ -89,7 +95,7 @@ export const EnableAuthenticatorAppDialog = () => {
       toast({
         title: 'Unable to setup two-factor authentication',
         description:
-          'We were unable to setup two-factor authentication for your account. Please ensure that you have entered your password correctly and try again.',
+          'We were unable to setup two-factor authentication for your account. Please ensure that you have entered your code correctly and try again.',
         variant: 'destructive',
       });
     }

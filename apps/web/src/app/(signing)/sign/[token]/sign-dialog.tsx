@@ -7,9 +7,11 @@ import {
   Dialog,
   DialogContent,
   DialogFooter,
+  DialogTitle,
   DialogTrigger,
 } from '@documenso/ui/primitives/dialog';
 
+import { SigningDisclosure } from '~/components/general/signing-disclosure';
 import { truncateTitle } from '~/helpers/truncate-title';
 
 export type SignDialogProps = {
@@ -66,22 +68,38 @@ export const SignDialog = ({
           {isComplete ? 'Complete' : 'Next field'}
         </Button>
       </DialogTrigger>
+
       <DialogContent>
-        <div className="text-center">
+        <DialogTitle>
           <div className="text-foreground text-xl font-semibold">
-            {role === RecipientRole.VIEWER && 'Mark Document as Viewed'}
-            {role === RecipientRole.SIGNER && 'Sign Document'}
-            {role === RecipientRole.APPROVER && 'Approve Document'}
+            {role === RecipientRole.VIEWER && 'Complete Viewing'}
+            {role === RecipientRole.SIGNER && 'Complete Signing'}
+            {role === RecipientRole.APPROVER && 'Complete Approval'}
           </div>
-          <div className="text-muted-foreground mx-auto w-4/5 py-2 text-center">
-            {role === RecipientRole.VIEWER &&
-              `You are about to finish viewing "${truncatedTitle}". Are you sure?`}
-            {role === RecipientRole.SIGNER &&
-              `You are about to finish signing "${truncatedTitle}". Are you sure?`}
-            {role === RecipientRole.APPROVER &&
-              `You are about to finish approving "${truncatedTitle}". Are you sure?`}
-          </div>
+        </DialogTitle>
+
+        <div className="text-muted-foreground max-w-[50ch]">
+          {role === RecipientRole.VIEWER && (
+            <span>
+              You are about to complete viewing "{truncatedTitle}".
+              <br /> Are you sure?
+            </span>
+          )}
+          {role === RecipientRole.SIGNER && (
+            <span>
+              You are about to complete signing "{truncatedTitle}".
+              <br /> Are you sure?
+            </span>
+          )}
+          {role === RecipientRole.APPROVER && (
+            <span>
+              You are about to complete approving "{truncatedTitle}".
+              <br /> Are you sure?
+            </span>
+          )}
         </div>
+
+        <SigningDisclosure className="mt-4" />
 
         <DialogFooter>
           <div className="flex w-full flex-1 flex-nowrap gap-4">
