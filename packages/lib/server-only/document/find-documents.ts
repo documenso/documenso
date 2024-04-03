@@ -513,7 +513,23 @@ export const findDocuments = async ({
 
   console.log('prisma query data', data);
 
-  const maskedData = data.map((document) =>
+  const formattedFinalQuery = data.map((item) => ({
+    id: item.id,
+    userId: item.userId,
+    title: item.title,
+    status: item.status,
+    documentDataId: item.documentDataId,
+    createdAt: item.createdAt,
+    updatedAt: item.updatedAt,
+    completedAt: item.completedAt,
+    deletedAt: item.deletedAt,
+    teamId: item.teamId,
+    team: item.team,
+    User: item.User,
+    Recipient: item.Recipient,
+  }));
+
+  const maskedData = formattedFinalQuery.map((document) =>
     maskRecipientTokensForDocument({
       document,
       user,
