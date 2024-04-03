@@ -188,7 +188,7 @@ export const InviteTeamMembersDialog = ({
     });
   };
 
-  const downloadRecoveryCodes = () => {
+  const downloadTemplate = () => {
     const data = [
       { email: 'lucas@gmail.com', role: 'manager' },
       { email: 'timur@gmail.com', role: 'admin' },
@@ -358,7 +358,7 @@ export const InviteTeamMembersDialog = ({
               </CardContent>
             </Card>
             <DialogFooter>
-              <Button type="button" variant="secondary" onClick={downloadRecoveryCodes}>
+              <Button type="button" variant="secondary" onClick={downloadTemplate}>
                 <Download className="mr-2 h-4 w-4" />
                 Template
               </Button>
