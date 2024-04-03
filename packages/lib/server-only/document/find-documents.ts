@@ -469,18 +469,6 @@ export const findDocuments = async ({
     .orderBy(orderByColumn, orderByDirection)
     .execute();
 
-  console.log('\n');
-  console.log('\n');
-  console.log('\n');
-  console.log('\n');
-  console.log('\n');
-  console.log('finalQuery', finalQuery);
-  console.log('\n');
-  console.log('\n');
-  console.log('\n');
-  console.log('\n');
-  console.log('\n');
-
   const [data, count] = await Promise.all([
     prisma.document.findMany({
       where: whereClause,
@@ -511,23 +499,52 @@ export const findDocuments = async ({
     }),
   ]);
 
-  console.log('prisma query data', data);
+  const formattedFinalQuery = finalQuery.map((item) => {
+    return {
+      id: item.id,
+      userId: item.userId,
+      title: item.title,
+      templateId: item.templateId,
+      status: item.status,
+      documentDataId: item.documentDataId,
+      createdAt: item.createdAt,
+      updatedAt: item.updatedAt,
+      completedAt: item.completedAt,
+      deletedAt: item.deletedAt,
+      teamId: item.teamId,
+      team: item.team
+        ? {
+            id: item.team.id,
+            url: item.team.url,
+          }
+        : null,
+      User: {
+        id: item.User?.id,
+        name: item.User?.name, // Ensure this can be string or null as per the expected type
+        email: item.User?.email,
+      },
+      Recipient: Array.isArray(item.Recipient)
+        ? item.Recipient.map((recipient) => ({
+            id: recipient?.id,
+            documentId: recipient?.documentId,
+            templateId: recipient?.templateId,
+            email: recipient?.email,
+            name: recipient?.name,
+            role: recipient?.role,
+            signingStatus: recipient?.signingStatus,
+            token: recipient?.token,
+            expired: recipient?.expired,
+            readStatus: recipient?.readStatus,
+            sendStatus: recipient?.sendStatus,
+            signedAt: recipient?.signedAt,
+            createdAt: item.createdAt,
+            updatedAt: item.updatedAt,
+          }))
+        : [],
+    };
+  });
 
-  const formattedFinalQuery = data.map((item) => ({
-    id: item.id,
-    userId: item.userId,
-    title: item.title,
-    status: item.status,
-    documentDataId: item.documentDataId,
-    createdAt: item.createdAt,
-    updatedAt: item.updatedAt,
-    completedAt: item.completedAt,
-    deletedAt: item.deletedAt,
-    teamId: item.teamId,
-    team: item.team,
-    User: item.User,
-    Recipient: item.Recipient,
-  }));
+  console.log('formattedFinalQuery', formattedFinalQuery);
 
   const maskedData = formattedFinalQuery.map((document) =>
     maskRecipientTokensForDocument({
