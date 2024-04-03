@@ -66,7 +66,7 @@ export const DocumentsDataTable = ({
           },
           {
             header: 'Title',
-            cell: ({ row }) => <DataTableTitle row={row.original} />,
+            cell: ({ row }) => <DataTableTitle row={row.original} teamUrl={team?.url} />,
           },
           {
             id: 'sender',
@@ -76,14 +76,13 @@ export const DocumentsDataTable = ({
           {
             header: 'Recipient',
             accessorKey: 'recipient',
-            cell: ({ row }) => {
-              return <StackAvatarsWithTooltip recipients={row.original.Recipient} />;
-            },
+            cell: ({ row }) => <StackAvatarsWithTooltip recipients={row.original.Recipient} />,
           },
           {
             header: 'Status',
             accessorKey: 'status',
             cell: ({ row }) => <DocumentStatus status={row.getValue('status')} />,
+            size: 140,
           },
           {
             header: 'Actions',

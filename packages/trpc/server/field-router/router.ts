@@ -1,5 +1,6 @@
 import { TRPCError } from '@trpc/server';
 
+import { AppError } from '@documenso/lib/errors/app-error';
 import { removeSignedFieldWithToken } from '@documenso/lib/server-only/field/remove-signed-field-with-token';
 import { setFieldsForDocument } from '@documenso/lib/server-only/field/set-fields-for-document';
 import { setFieldsForTemplate } from '@documenso/lib/server-only/field/set-fields-for-template';
@@ -71,22 +72,21 @@ export const fieldRouter = router({
     .input(ZSignFieldWithTokenMutationSchema)
     .mutation(async ({ input, ctx }) => {
       try {
-        const { token, fieldId, value, isBase64 } = input;
+        const { token, fieldId, value, isBase64, authOptions } = input;
 
         return await signFieldWithToken({
           token,
           fieldId,
           value,
           isBase64,
+          userId: ctx.user?.id,
+          authOptions,
           requestMetadata: extractNextApiRequestMetadata(ctx.req),
         });
       } catch (err) {
         console.error(err);
 
-        throw new TRPCError({
-          code: 'BAD_REQUEST',
-          message: 'We were unable to sign this field. Please try again later.',
-        });
+        throw AppError.parseErrorToTRPCError(err);
       }
     }),
 

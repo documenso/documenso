@@ -2,15 +2,22 @@
 
 import { useState } from 'react';
 
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
 import { zodResolver } from '@hookform/resolvers/zod';
+import { browserSupportsWebAuthn, startAuthentication } from '@simplewebauthn/browser';
+import { KeyRoundIcon } from 'lucide-react';
 import { signIn } from 'next-auth/react';
 import { useForm } from 'react-hook-form';
 import { FcGoogle } from 'react-icons/fc';
+import { match } from 'ts-pattern';
 import { z } from 'zod';
 
+import { useFeatureFlags } from '@documenso/lib/client-only/providers/feature-flag';
+import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { ErrorCode, isErrorCode } from '@documenso/lib/next-auth/error-codes';
+import { trpc } from '@documenso/trpc/react';
 import { ZCurrentPasswordSchema } from '@documenso/trpc/server/auth-router/schema';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
@@ -65,13 +72,23 @@ export type SignInFormProps = {
 
 export const SignInForm = ({ className, initialEmail, isGoogleSSOEnabled }: SignInFormProps) => {
   const { toast } = useToast();
+  const { getFlag } = useFeatureFlags();
+
+  const router = useRouter();
+
   const [isTwoFactorAuthenticationDialogOpen, setIsTwoFactorAuthenticationDialogOpen] =
     useState(false);
-  const router = useRouter();
 
   const [twoFactorAuthenticationMethod, setTwoFactorAuthenticationMethod] = useState<
     'totp' | 'backup'
   >('totp');
+
+  const [isPasskeyLoading, setIsPasskeyLoading] = useState(false);
+
+  const isPasskeyEnabled = getFlag('app_passkey');
+
+  const { mutateAsync: createPasskeySigninOptions } =
+    trpc.auth.createPasskeySigninOptions.useMutation();
 
   const form = useForm<TSignInFormSchema>({
     values: {
@@ -104,6 +121,63 @@ export const SignInForm = ({ className, initialEmail, isGoogleSSOEnabled }: Sign
     }
 
     setTwoFactorAuthenticationMethod(method);
+  };
+
+  const onSignInWithPasskey = async () => {
+    if (!browserSupportsWebAuthn()) {
+      toast({
+        title: 'Not supported',
+        description: 'Passkeys are not supported on this browser',
+        duration: 10000,
+        variant: 'destructive',
+      });
+
+      return;
+    }
+
+    try {
+      setIsPasskeyLoading(true);
+
+      const options = await createPasskeySigninOptions();
+
+      const credential = await startAuthentication(options);
+
+      const result = await signIn('webauthn', {
+        credential: JSON.stringify(credential),
+        callbackUrl: LOGIN_REDIRECT_PATH,
+        redirect: false,
+      });
+
+      if (!result?.url || result.error) {
+        throw new AppError(result?.error ?? '');
+      }
+
+      window.location.href = result.url;
+    } catch (err) {
+      setIsPasskeyLoading(false);
+
+      if (err.name === 'NotAllowedError') {
+        return;
+      }
+
+      const error = AppError.parseError(err);
+
+      const errorMessage = match(error.code)
+        .with(
+          AppErrorCode.NOT_SETUP,
+          () =>
+            'This passkey is not configured for this application. Please login and add one in the user settings.',
+        )
+        .with(AppErrorCode.EXPIRED_CODE, () => 'This session has expired. Please try again.')
+        .otherwise(() => 'Please try again later or login using your normal details');
+
+      toast({
+        title: 'Something went wrong',
+        description: errorMessage,
+        duration: 10000,
+        variant: 'destructive',
+      });
+    }
   };
 
   const onFormSubmit = async ({ email, password, totpCode, backupCode }: TSignInFormSchema) => {
@@ -188,16 +262,21 @@ export const SignInForm = ({ className, initialEmail, isGoogleSSOEnabled }: Sign
         className={cn('flex w-full flex-col gap-y-4', className)}
         onSubmit={form.handleSubmit(onFormSubmit)}
       >
-        <fieldset className="flex w-full flex-col gap-y-4" disabled={isSubmitting}>
+        <fieldset
+          className="flex w-full flex-col gap-y-4"
+          disabled={isSubmitting || isPasskeyLoading}
+        >
           <FormField
             control={form.control}
             name="email"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Email</FormLabel>
+
                 <FormControl>
                   <Input type="email" {...field} />
                 </FormControl>
+
                 <FormMessage />
               </FormItem>
             )}
@@ -209,32 +288,43 @@ export const SignInForm = ({ className, initialEmail, isGoogleSSOEnabled }: Sign
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Password</FormLabel>
+
                 <FormControl>
                   <PasswordInput {...field} />
                 </FormControl>
+
                 <FormMessage />
+
+                <p className="mt-2 text-right">
+                  <Link
+                    href="/forgot-password"
+                    className="text-muted-foreground text-sm duration-200 hover:opacity-70"
+                  >
+                    Forgot your password?
+                  </Link>
+                </p>
               </FormItem>
             )}
           />
-        </fieldset>
 
-        <Button
-          type="submit"
-          size="lg"
-          loading={isSubmitting}
-          className="dark:bg-documenso dark:hover:opacity-90"
-        >
-          {isSubmitting ? 'Signing in...' : 'Sign In'}
-        </Button>
+          <Button
+            type="submit"
+            size="lg"
+            loading={isSubmitting}
+            className="dark:bg-documenso dark:hover:opacity-90"
+          >
+            {isSubmitting ? 'Signing in...' : 'Sign In'}
+          </Button>
 
-        {isGoogleSSOEnabled && (
-          <>
+          {(isGoogleSSOEnabled || isPasskeyEnabled) && (
             <div className="relative flex items-center justify-center gap-x-4 py-2 text-xs uppercase">
               <div className="bg-border h-px flex-1" />
               <span className="text-muted-foreground bg-transparent">Or continue with</span>
               <div className="bg-border h-px flex-1" />
             </div>
+          )}
 
+          {isGoogleSSOEnabled && (
             <Button
               type="button"
               size="lg"
@@ -246,8 +336,23 @@ export const SignInForm = ({ className, initialEmail, isGoogleSSOEnabled }: Sign
               <FcGoogle className="mr-2 h-5 w-5" />
               Google
             </Button>
-          </>
-        )}
+          )}
+
+          {isPasskeyEnabled && (
+            <Button
+              type="button"
+              size="lg"
+              variant="outline"
+              disabled={isSubmitting}
+              loading={isPasskeyLoading}
+              className="bg-background text-muted-foreground border"
+              onClick={onSignInWithPasskey}
+            >
+              {!isPasskeyLoading && <KeyRoundIcon className="-ml-1 mr-1 h-5 w-5" />}
+              Passkey
+            </Button>
+          )}
+        </fieldset>
       </form>
 
       <Dialog

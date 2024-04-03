@@ -37,7 +37,14 @@ export const findTemplates = async ({
       where: whereFilter,
       include: {
         templateDocumentData: true,
+        team: {
+          select: {
+            id: true,
+            url: true,
+          },
+        },
         Field: true,
+        Recipient: true,
       },
       skip: Math.max(page - 1, 0) * perPage,
       orderBy: {

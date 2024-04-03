@@ -89,17 +89,21 @@ export const upsertDocumentMeta = async ({
       },
     });
 
-    await tx.documentAuditLog.create({
-      data: createDocumentAuditLogData({
-        type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_META_UPDATED,
-        documentId,
-        user,
-        requestMetadata,
-        data: {
-          changes: diffDocumentMetaChanges(originalDocumentMeta ?? {}, upsertedDocumentMeta),
-        },
-      }),
-    });
+    const changes = diffDocumentMetaChanges(originalDocumentMeta ?? {}, upsertedDocumentMeta);
+
+    if (changes.length > 0) {
+      await tx.documentAuditLog.create({
+        data: createDocumentAuditLogData({
+          type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_META_UPDATED,
+          documentId,
+          user,
+          requestMetadata,
+          data: {
+            changes: diffDocumentMetaChanges(originalDocumentMeta ?? {}, upsertedDocumentMeta),
+          },
+        }),
+      });
+    }
 
     return upsertedDocumentMeta;
   });

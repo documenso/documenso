@@ -1,0 +1,54 @@
+name: documenso-test
+
+services:
+  database:
+    image: postgres:15
+    environment:
+      - POSTGRES_USER=documenso
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=documenso
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U documenso']
+      interval: 1s
+      timeout: 5s
+      retries: 5
+    ports:
+      - 54322:5432
+
+  inbucket:
+    image: inbucket/inbucket
+    ports:
+      - 9000:9000
+      - 2500:2500
+      - 1100:1100
+
+  documenso:
+    build:
+      context: ../../
+      dockerfile: docker/Dockerfile
+    depends_on:
+      database:
+        condition: service_healthy
+      inbucket:
+        condition: service_started
+    env_file:
+      - ../../.env.example
+    environment:
+      - NEXTAUTH_SECRET=secret
+      - NEXT_PRIVATE_ENCRYPTION_KEY=CAFEBABE
+      - NEXT_PRIVATE_ENCRYPTION_SECONDARY_KEY=DEADBEEF
+      - NEXT_PRIVATE_DATABASE_URL=postgres://documenso:password@database:5432/documenso
+      - NEXT_PRIVATE_DIRECT_DATABASE_URL=postgres://documenso:password@database:5432/documenso
+      - NEXT_PUBLIC_UPLOAD_TRANSPORT=database
+      - NEXT_PRIVATE_SMTP_TRANSPORT=smtp-auth
+      - NEXT_PRIVATE_SMTP_HOST=inbucket
+      - NEXT_PRIVATE_SMTP_PORT=2500
+      - NEXT_PRIVATE_SMTP_USERNAME=documenso
+      - NEXT_PRIVATE_SMTP_PASSWORD=password
+      - NEXT_PRIVATE_SMTP_FROM_NAME="No Reply @ Documenso"
+      - NEXT_PRIVATE_SMTP_FROM_ADDRESS=noreply@documenso.com
+      - NEXT_PRIVATE_SIGNING_LOCAL_FILE_PATH=/opt/documenso/cert.p12
+    ports:
+      - 3000:3000
+    volumes:
+      - ../../apps/web/example/cert.p12:/opt/documenso/cert.p12

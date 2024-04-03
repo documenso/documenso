@@ -9,23 +9,29 @@ import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-log
 import { createDocumentAuditLogData } from '@documenso/lib/utils/document-audit-logs';
 import { prisma } from '@documenso/prisma';
 import { DocumentStatus, RecipientRole, SigningStatus } from '@documenso/prisma/client';
+import { WebhookTriggerEvents } from '@documenso/prisma/client';
 import { signPdf } from '@documenso/signing';
 
 import type { RequestMetadata } from '../../universal/extract-request-metadata';
 import { getFile } from '../../universal/upload/get-file';
 import { putFile } from '../../universal/upload/put-file';
+import { flattenAnnotations } from '../pdf/flatten-annotations';
 import { insertFieldInPDF } from '../pdf/insert-field-in-pdf';
+import { normalizeSignatureAppearances } from '../pdf/normalize-signature-appearances';
+import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
 import { sendCompletedEmail } from './send-completed-email';
 
 export type SealDocumentOptions = {
   documentId: number;
   sendEmail?: boolean;
+  isResealing?: boolean;
   requestMetadata?: RequestMetadata;
 };
 
 export const sealDocument = async ({
   documentId,
   sendEmail = true,
+  isResealing = false,
   requestMetadata,
 }: SealDocumentOptions) => {
   'use server';
@@ -36,6 +42,7 @@ export const sealDocument = async ({
     },
     include: {
       documentData: true,
+      Recipient: true,
     },
   });
 
@@ -75,10 +82,21 @@ export const sealDocument = async ({
     throw new Error(`Document ${document.id} has unsigned fields`);
   }
 
+  if (isResealing) {
+    // If we're resealing we want to use the initial data for the document
+    // so we aren't placing fields on top of eachother.
+    documentData.data = documentData.initialData;
+  }
+
   // !: Need to write the fields onto the document as a hard copy
   const pdfData = await getFile(documentData);
 
   const doc = await PDFDocument.load(pdfData);
+
+  // Normalize and flatten layers that could cause issues with the signature
+  normalizeSignatureAppearances(doc);
+  doc.getForm().flatten();
+  flattenAnnotations(doc);
 
   for (const field of fields) {
     await insertFieldInPDF(doc, field);
@@ -131,7 +149,14 @@ export const sealDocument = async ({
     });
   });
 
-  if (sendEmail) {
+  if (sendEmail && !isResealing) {
     await sendCompletedEmail({ documentId, requestMetadata });
   }
+
+  await triggerWebhook({
+    event: WebhookTriggerEvents.DOCUMENT_COMPLETED,
+    data: document,
+    userId: document.userId,
+    teamId: document.teamId ?? undefined,
+  });
 };

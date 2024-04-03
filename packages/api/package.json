@@ -1,0 +1,30 @@
+{
+  "name": "@documenso/api",
+  "version": "1.0.0",
+  "main": "./index.ts",
+  "types": "./index.ts",
+  "license": "MIT",
+  "scripts": {
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "clean": "rimraf node_modules"
+  },
+  "files": [
+    "index.ts",
+    "next.ts",
+    "v1/"
+  ],
+  "dependencies": {
+    "@documenso/lib": "*",
+    "@documenso/prisma": "*",
+    "@ts-rest/core": "^3.30.5",
+    "@ts-rest/next": "^3.30.5",
+    "@ts-rest/open-api": "^3.33.0",
+    "@types/swagger-ui-react": "^4.18.3",
+    "luxon": "^3.4.0",
+    "superjson": "^1.13.1",
+    "swagger-ui-react": "^5.11.0",
+    "ts-pattern": "^5.0.5",
+    "zod": "^3.22.4"
+  }
+}
