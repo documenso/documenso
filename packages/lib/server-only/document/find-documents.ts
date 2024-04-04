@@ -512,16 +512,20 @@ export const findDocuments = async ({
       completedAt: item.completedAt,
       deletedAt: item.deletedAt,
       teamId: item.teamId,
-      team: item.team
-        ? {
-            id: item.team.id,
-            url: item.team.url,
-          }
-        : null,
+      team:
+        item.team && 'id' in item.team && 'url' in item.team
+          ? {
+              id: item.team.id,
+              url: item.team.url,
+            }
+          : null,
       User: {
-        id: item.User?.id,
-        name: item.User?.name, // Ensure this can be string or null as per the expected type
-        email: item.User?.email,
+        // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+        id: (item.User as { id: number }).id,
+        // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+        name: (item.User as { name: string | null }).name,
+        // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+        email: (item.User as { email: string }).email,
       },
       Recipient: Array.isArray(item.Recipient)
         ? item.Recipient.map((recipient) => ({
@@ -543,8 +547,6 @@ export const findDocuments = async ({
         : [],
     };
   });
-
-  console.log('formattedFinalQuery', formattedFinalQuery);
 
   const maskedData = formattedFinalQuery.map((document) =>
     maskRecipientTokensForDocument({
