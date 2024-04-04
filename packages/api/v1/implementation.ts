@@ -20,7 +20,10 @@ import { setRecipientsForDocument } from '@documenso/lib/server-only/recipient/s
 import { updateRecipient } from '@documenso/lib/server-only/recipient/update-recipient';
 import { createDocumentFromTemplate } from '@documenso/lib/server-only/template/create-document-from-template';
 import { extractNextApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
-import { getPresignPostUrl } from '@documenso/lib/universal/upload/server-actions';
+import {
+  getPresignGetUrl,
+  getPresignPostUrl,
+} from '@documenso/lib/universal/upload/server-actions';
 import { DocumentDataType, DocumentStatus, SigningStatus } from '@documenso/prisma/client';
 
 import { ApiContractV1 } from './contract';
@@ -75,6 +78,50 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
         status: 404,
         body: {
           message: 'Document not found',
+        },
+      };
+    }
+  }),
+
+  downloadSignedDocument: authenticatedMiddleware(async (args, user, team) => {
+    const { id: documentId } = args.params;
+
+    try {
+      const document = await getDocumentById({
+        id: Number(documentId),
+        userId: user.id,
+        teamId: team?.id,
+      });
+
+      if (!document || !document.documentDataId) {
+        return {
+          status: 404,
+          body: {
+            message: 'Document not found',
+          },
+        };
+      }
+
+      if (document.status !== DocumentStatus.COMPLETED) {
+        return {
+          status: 404,
+          body: {
+            message: 'Document is not completed yet.',
+          },
+        };
+      }
+
+      const { url } = await getPresignGetUrl(document.documentData.data);
+
+      return {
+        status: 200,
+        body: { downloadUrl: url },
+      };
+    } catch (err) {
+      return {
+        status: 404,
+        body: {
+          message: 'Error downloading the document. Please try again.',
         },
       };
     }
