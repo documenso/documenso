@@ -7,6 +7,7 @@ import { match } from 'ts-pattern';
 import { UAParser } from 'ua-parser-js';
 
 import { DOCUMENT_AUDIT_LOG_EMAIL_FORMAT } from '@documenso/lib/constants/document-audit-logs';
+import { DOCUMENT_AUTH_TYPES } from '@documenso/lib/constants/document-auth';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
 import { formatDocumentAuditLogActionString } from '@documenso/lib/utils/document-audit-logs';
 import { trpc } from '@documenso/trpc/react';
@@ -79,7 +80,11 @@ export const DocumentHistorySheet = ({
    * @param text The text to format
    * @returns The formatted text
    */
-  const formatGenericText = (text: string) => {
+  const formatGenericText = (text?: string | null) => {
+    if (!text) {
+      return '';
+    }
+
     return (text.charAt(0).toUpperCase() + text.slice(1).toLowerCase()).replaceAll('_', ' ');
   };
 
@@ -219,6 +224,24 @@ export const DocumentHistorySheet = ({
                       />
                     ),
                   )
+                  .with(
+                    { type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_GLOBAL_AUTH_ACCESS_UPDATED },
+                    { type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_GLOBAL_AUTH_ACTION_UPDATED },
+                    ({ data }) => (
+                      <DocumentHistorySheetChanges
+                        values={[
+                          {
+                            key: 'Old',
+                            value: DOCUMENT_AUTH_TYPES[data.from || '']?.value || 'None',
+                          },
+                          {
+                            key: 'New',
+                            value: DOCUMENT_AUTH_TYPES[data.to || '']?.value || 'None',
+                          },
+                        ]}
+                      />
+                    ),
+                  )
                   .with({ type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_META_UPDATED }, ({ data }) => {
                     if (data.changes.length === 0) {
                       return null;
@@ -281,6 +304,7 @@ export const DocumentHistorySheet = ({
                       ]}
                     />
                   ))
+
                   .exhaustive()}
 
                 {isUserDetailsVisible && (

@@ -1,5 +1,6 @@
 import {
   PDFArray,
+  PDFDict,
   PDFDocument,
   PDFHexString,
   PDFName,
@@ -16,7 +17,7 @@ export type AddSigningPlaceholderOptions = {
 
 export const addSigningPlaceholder = async ({ pdf }: AddSigningPlaceholderOptions) => {
   const doc = await PDFDocument.load(pdf);
-  const pages = doc.getPages();
+  const [firstPage] = doc.getPages();
 
   const byteRange = PDFArray.withContext(doc.context);
 
@@ -25,64 +26,71 @@ export const addSigningPlaceholder = async ({ pdf }: AddSigningPlaceholderOption
   byteRange.push(PDFName.of(BYTE_RANGE_PLACEHOLDER));
   byteRange.push(PDFName.of(BYTE_RANGE_PLACEHOLDER));
 
-  const signature = doc.context.obj({
-    Type: 'Sig',
-    Filter: 'Adobe.PPKLite',
-    SubFilter: 'adbe.pkcs7.detached',
-    ByteRange: byteRange,
-    Contents: PDFHexString.fromText(' '.repeat(8192)),
-    Reason: PDFString.of('Signed by Documenso'),
-    M: PDFString.fromDate(new Date()),
-  });
-
-  const signatureRef = doc.context.register(signature);
-
-  const widget = doc.context.obj({
-    Type: 'Annot',
-    Subtype: 'Widget',
-    FT: 'Sig',
-    Rect: [0, 0, 0, 0],
-    V: signatureRef,
-    T: PDFString.of('Signature1'),
-    F: 4,
-    P: pages[0].ref,
-  });
-
-  const xobj = widget.context.formXObject([rectangle(0, 0, 0, 0)]);
-
-  const streamRef = widget.context.register(xobj);
-
-  widget.set(PDFName.of('AP'), widget.context.obj({ N: streamRef }));
-
-  const widgetRef = doc.context.register(widget);
-
-  let widgets = pages[0].node.get(PDFName.of('Annots'));
-
-  if (widgets instanceof PDFArray) {
-    widgets.push(widgetRef);
-  } else {
-    const newWidgets = PDFArray.withContext(doc.context);
-
-    newWidgets.push(widgetRef);
-
-    pages[0].node.set(PDFName.of('Annots'), newWidgets);
-
-    widgets = pages[0].node.get(PDFName.of('Annots'));
-  }
-
-  if (!widgets) {
-    throw new Error('No widgets');
-  }
-
-  pages[0].node.set(PDFName.of('Annots'), widgets);
-
-  doc.catalog.set(
-    PDFName.of('AcroForm'),
+  const signature = doc.context.register(
     doc.context.obj({
-      SigFlags: 3,
-      Fields: [widgetRef],
+      Type: 'Sig',
+      Filter: 'Adobe.PPKLite',
+      SubFilter: 'adbe.pkcs7.detached',
+      ByteRange: byteRange,
+      Contents: PDFHexString.fromText(' '.repeat(8192)),
+      Reason: PDFString.of('Signed by Documenso'),
+      M: PDFString.fromDate(new Date()),
     }),
   );
+
+  const widget = doc.context.register(
+    doc.context.obj({
+      Type: 'Annot',
+      Subtype: 'Widget',
+      FT: 'Sig',
+      Rect: [0, 0, 0, 0],
+      V: signature,
+      T: PDFString.of('Signature1'),
+      F: 4,
+      P: firstPage.ref,
+      AP: doc.context.obj({
+        N: doc.context.register(doc.context.formXObject([rectangle(0, 0, 0, 0)])),
+      }),
+    }),
+  );
+
+  let widgets: PDFArray;
+
+  try {
+    widgets = firstPage.node.lookup(PDFName.of('Annots'), PDFArray);
+  } catch {
+    widgets = PDFArray.withContext(doc.context);
+
+    firstPage.node.set(PDFName.of('Annots'), widgets);
+  }
+
+  widgets.push(widget);
+
+  let arcoForm: PDFDict;
+
+  try {
+    arcoForm = doc.catalog.lookup(PDFName.of('AcroForm'), PDFDict);
+  } catch {
+    arcoForm = doc.context.obj({
+      Fields: PDFArray.withContext(doc.context),
+    });
+
+    doc.catalog.set(PDFName.of('AcroForm'), arcoForm);
+  }
+
+  let fields: PDFArray;
+
+  try {
+    fields = arcoForm.lookup(PDFName.of('Fields'), PDFArray);
+  } catch {
+    fields = PDFArray.withContext(doc.context);
+
+    arcoForm.set(PDFName.of('Fields'), fields);
+  }
+
+  fields.push(widget);
+
+  arcoForm.set(PDFName.of('SigFlags'), PDFNumber.of(3));
 
   return Buffer.from(await doc.save({ useObjectStreams: false }));
 };

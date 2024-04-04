@@ -8,6 +8,7 @@ import { useSession } from 'next-auth/react';
 import { useForm } from 'react-hook-form';
 
 import { useAnalytics } from '@documenso/lib/client-only/hooks/use-analytics';
+import type { TRecipientActionAuth } from '@documenso/lib/types/document-auth';
 import { sortFieldsByPosition, validateFieldsInserted } from '@documenso/lib/utils/fields';
 import { type Document, type Field, type Recipient, RecipientRole } from '@documenso/prisma/client';
 import { trpc } from '@documenso/trpc/react';
@@ -41,10 +42,10 @@ export const SigningForm = ({ document, recipient, fields, redirectUrl }: Signin
   const { mutateAsync: completeDocumentWithToken } =
     trpc.recipient.completeDocumentWithToken.useMutation();
 
-  const {
-    handleSubmit,
-    formState: { isSubmitting },
-  } = useForm();
+  const { handleSubmit, formState } = useForm();
+
+  // Keep the loading state going if successful since the redirect may take some time.
+  const isSubmitting = formState.isSubmitting || formState.isSubmitSuccessful;
 
   const uninsertedFields = useMemo(() => {
     return sortFieldsByPosition(fields.filter((field) => !field.inserted));
@@ -64,9 +65,20 @@ export const SigningForm = ({ document, recipient, fields, redirectUrl }: Signin
       return;
     }
 
+    await completeDocument();
+
+    // Reauth is currently not required for completing the document.
+    // await executeActionAuthProcedure({
+    //   onReauthFormSubmit: completeDocument,
+    //   actionTarget: 'DOCUMENT',
+    // });
+  };
+
+  const completeDocument = async (authOptions?: TRecipientActionAuth) => {
     await completeDocumentWithToken({
       token: recipient.token,
       documentId: document.id,
+      authOptions,
     });
 
     analytics.capture('App: Recipient has completed signing', {

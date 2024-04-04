@@ -56,6 +56,8 @@ export const templateRouter = router({
           recipients: input.recipients,
         });
       } catch (err) {
+        console.error(err);
+
         throw new TRPCError({
           code: 'BAD_REQUEST',
           message: 'We were unable to create this document. Please try again later.',
