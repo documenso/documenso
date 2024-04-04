@@ -24,8 +24,8 @@ import { PasswordInput } from '@documenso/ui/primitives/password-input';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
 export type ClaimAccountProps = {
-  userName: string;
-  userEmail: string;
+  defaultName: string;
+  defaultEmail: string;
   trigger?: React.ReactNode;
 };
 
@@ -48,7 +48,7 @@ export const ZClaimAccountFormSchema = z
 
 export type TClaimAccountFormSchema = z.infer<typeof ZClaimAccountFormSchema>;
 
-export const ClaimAccount = ({ userName, userEmail }: ClaimAccountProps) => {
+export const ClaimAccount = ({ defaultName, defaultEmail }: ClaimAccountProps) => {
   const analytics = useAnalytics();
   const { toast } = useToast();
   const router = useRouter();
@@ -57,8 +57,8 @@ export const ClaimAccount = ({ userName, userEmail }: ClaimAccountProps) => {
 
   const form = useForm<TClaimAccountFormSchema>({
     values: {
-      name: userName ?? '',
-      email: userEmail,
+      name: defaultName ?? '',
+      email: defaultEmail,
       password: '',
     },
     resolver: zodResolver(ZClaimAccountFormSchema),

@@ -68,18 +68,18 @@ export default async function CompletedSigningPage({
 
   const sessionData = await getServerSession();
   const isLoggedIn = !!sessionData?.user;
-  const callToActionCheck = !isLoggedIn && NEXT_PUBLIC_DISABLE_SIGNUP !== 'true';
+  const canSignUp = !isLoggedIn && NEXT_PUBLIC_DISABLE_SIGNUP !== 'true';
 
   return (
     <div className="-mx-4 flex flex-col items-center overflow-x-hidden px-4 pt-24 md:-mx-8 md:px-8 lg:pt-36 xl:pt-44">
       <div
         className={cn('relative mt-6 flex w-full flex-col items-center justify-center', {
-          'flex-col divide-y lg:flex-row lg:divide-x lg:divide-y-0': callToActionCheck,
+          'flex-col divide-y lg:flex-row lg:divide-x lg:divide-y-0': canSignUp,
         })}
       >
         <div
           className={cn('flex flex-col items-center', {
-            'mb-8 p-4 md:mb-0 md:p-12': callToActionCheck,
+            'mb-8 p-4 md:mb-0 md:p-12': canSignUp,
           })}
         >
           <Badge variant="neutral" size="default" className="mb-6 rounded-xl border bg-transparent">
@@ -158,15 +158,17 @@ export default async function CompletedSigningPage({
           </div>
         </div>
 
-        {callToActionCheck && (
+        {canSignUp && (
           <div className={`flex max-w-xl flex-col items-center justify-center p-4 md:p-12`}>
             <h2 className="mt-8 text-center text-xl font-semibold md:mt-0">
               Need to sign documents?
             </h2>
+
             <p className="text-muted-foreground/60 mt-4 max-w-[55ch] text-center leading-normal">
               Create your account and start using state-of-the-art document signing.
             </p>
-            <ClaimAccount userName={recipientName} userEmail={recipient.email} />
+
+            <ClaimAccount defaultName={recipientName} defaultEmail={recipient.email} />
           </div>
         )}
 
