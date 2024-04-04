@@ -115,6 +115,8 @@ export const documentRouter = router({
           requestMetadata: extractNextApiRequestMetadata(ctx.req),
         });
       } catch (err) {
+        console.error(err);
+
         if (err instanceof TRPCError) {
           throw err;
         }
@@ -222,13 +224,19 @@ export const documentRouter = router({
 
       const userId = ctx.user.id;
 
-      return await updateTitle({
-        title,
-        userId,
-        teamId,
-        documentId,
-        requestMetadata: extractNextApiRequestMetadata(ctx.req),
-      });
+      try {
+        return await updateTitle({
+          title,
+          userId,
+          teamId,
+          documentId,
+          requestMetadata: extractNextApiRequestMetadata(ctx.req),
+        });
+      } catch (err) {
+        console.error(err);
+
+        throw err;
+      }
     }),
 
   setPasswordForDocument: authenticatedProcedure
@@ -347,7 +355,9 @@ export const documentRouter = router({
           userId: ctx.user.id,
         });
         return documents;
-      } catch (error) {
+      } catch (err) {
+        console.error(err);
+
         throw new TRPCError({
           code: 'BAD_REQUEST',
           message: 'We are unable to search for documents. Please try again later.',
