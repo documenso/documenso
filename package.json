@@ -49,9 +49,7 @@
   ],
   "dependencies": {
     "@documenso/pdf-sign": "^0.1.0",
-    "@types/papaparse": "^5.3.14",
-    "next-runtime-env": "^3.2.0",
-    "papaparse": "^5.4.1"
+    "next-runtime-env": "^3.2.0"
   },
   "overrides": {
     "next-auth": {
