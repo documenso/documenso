@@ -1,6 +1,7 @@
 import { expect, test } from '@playwright/test';
 import path from 'node:path';
 
+import { getFieldByEmail } from '@documenso/lib/server-only/field/get-field-by-email';
 import { getRecipientByEmail } from '@documenso/lib/server-only/recipient/get-recipient-by-email';
 import { prisma } from '@documenso/prisma';
 import { DocumentStatus } from '@documenso/prisma/client';
@@ -649,6 +650,96 @@ test('[DOCUMENT_FLOW]: should be able to create, send with redirect url, sign a 
   await page.getByRole('button', { name: 'Sign' }).click();
 
   await page.waitForURL('https://documenso.com');
+
+  // Check if document has been signed
+  const { status: completedStatus } = await getDocumentByToken(token);
+  expect(completedStatus).toBe(DocumentStatus.COMPLETED);
+
+  await unseedUser(user.id);
+});
+
+test('[DOCUMENT_FLOW]: should be able to sign a document with custom date', async ({ page }) => {
+  const user = await seedUser();
+  const document = await seedBlankDocument(user);
+
+  await apiSignin({
+    page,
+    email: user.email,
+    redirectPath: `/documents/${document.id}/edit`,
+  });
+
+  const documentTitle = `example-${Date.now()}.pdf`;
+  const currentDate = new Date().toISOString().slice(0, 10);
+
+  // Set title and date format
+  await expect(page.getByRole('heading', { name: 'General' })).toBeVisible();
+  await page.getByLabel('Title').fill(documentTitle);
+  await page.getByRole('button', { name: 'Advanced Options' }).click();
+  await page.getByRole('combobox').nth(1).click();
+  await page.getByLabel('YYYY-MM-DD', { exact: true }).click();
+  await page.getByRole('button', { name: 'Continue' }).click();
+
+  // Add signers
+  await expect(page.getByRole('heading', { name: 'Add Signers' })).toBeVisible();
+
+  await page.getByPlaceholder('Email').fill('user1@example.com');
+  await page.getByPlaceholder('Name').fill('User 1');
+
+  await page.getByRole('button', { name: 'Continue' }).click();
+
+  // Add fields
+  await expect(page.getByRole('heading', { name: 'Add Fields' })).toBeVisible();
+
+  await page.getByRole('button', { name: 'Date Date' }).click();
+  await page.locator('canvas').click({
+    position: {
+      x: 400,
+      y: 100,
+    },
+  });
+
+  await page.getByRole('button', { name: 'Continue' }).click();
+
+  // Add subject and send
+  await expect(page.getByRole('heading', { name: 'Add Subject' })).toBeVisible();
+  await page.getByRole('button', { name: 'Send' }).click();
+
+  await page.waitForURL('/documents');
+
+  // Assert document was created
+  await expect(page.getByRole('link', { name: documentTitle })).toBeVisible();
+  await page.getByRole('link', { name: documentTitle }).click();
+  await page.waitForURL(/\/documents\/\d+/);
+
+  // Start signing process
+  const url = page.url().split('/');
+  const documentId = url[url.length - 1];
+
+  const { token } = await getRecipientByEmail({
+    email: 'user1@example.com',
+    documentId: Number(documentId),
+  });
+
+  await page.goto(`/sign/${token}`);
+  await page.waitForURL(`/sign/${token}`);
+
+  const { status } = await getDocumentByToken(token);
+  expect(status).toBe(DocumentStatus.PENDING);
+
+  await page.getByTestId('field').click();
+
+  await page.getByRole('button', { name: 'Complete' }).click();
+  await expect(page.getByRole('dialog').getByText('Complete Signing').first()).toBeVisible();
+  await page.getByRole('button', { name: 'Sign' }).click();
+
+  await page.waitForURL(`/sign/${token}/complete`);
+  await expect(page.getByText('You have signed')).toBeVisible();
+
+  const field = await getFieldByEmail({
+    email: 'user1@example.com',
+    documentId: Number(documentId),
+  });
+  expect(field?.customText).toBe(currentDate);
 
   // Check if document has been signed
   const { status: completedStatus } = await getDocumentByToken(token);
