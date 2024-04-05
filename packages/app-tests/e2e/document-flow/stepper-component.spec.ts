@@ -1,18 +1,29 @@
 import { expect, test } from '@playwright/test';
 import path from 'node:path';
 
-import { getDocumentByToken } from '@documenso/lib/server-only/document/get-document-by-token';
 import { getRecipientByEmail } from '@documenso/lib/server-only/recipient/get-recipient-by-email';
+import { prisma } from '@documenso/prisma';
 import { DocumentStatus } from '@documenso/prisma/client';
-import { seedUser } from '@documenso/prisma/seed/users';
+import { seedBlankDocument } from '@documenso/prisma/seed/documents';
+import { seedUser, unseedUser } from '@documenso/prisma/seed/users';
 
-import { apiSignin } from './fixtures/authentication';
+import { apiSignin } from '../fixtures/authentication';
 
-test(`[PR-718]: should be able to create a document`, async ({ page }) => {
-  await page.goto('/signin');
+// Can't use the function in server-only/document due to it indirectly using
+// require imports.
+const getDocumentByToken = async (token: string) => {
+  return await prisma.document.findFirstOrThrow({
+    where: {
+      Recipient: {
+        some: {
+          token,
+        },
+      },
+    },
+  });
+};
 
-  const documentTitle = `example-${Date.now()}.pdf`;
-
+test('[DOCUMENT_FLOW]: should be able to upload a PDF document', async ({ page }) => {
   const user = await seedUser();
 
   await apiSignin({
@@ -20,7 +31,7 @@ test(`[PR-718]: should be able to create a document`, async ({ page }) => {
     email: user.email,
   });
 
-  // Upload document
+  // Upload document.
   const [fileChooser] = await Promise.all([
     page.waitForEvent('filechooser'),
     page.locator('input[type=file]').evaluate((e) => {
@@ -30,10 +41,23 @@ test(`[PR-718]: should be able to create a document`, async ({ page }) => {
     }),
   ]);
 
-  await fileChooser.setFiles(path.join(__dirname, '../../../assets/example.pdf'));
+  await fileChooser.setFiles(path.join(__dirname, '../../../../assets/example.pdf'));
 
-  // Wait to be redirected to the edit page
+  // Wait to be redirected to the edit page.
   await page.waitForURL(/\/documents\/\d+/);
+});
+
+test('[DOCUMENT_FLOW]: should be able to create a document', async ({ page }) => {
+  const user = await seedUser();
+  const document = await seedBlankDocument(user);
+
+  await apiSignin({
+    page,
+    email: user.email,
+    redirectPath: `/documents/${document.id}/edit`,
+  });
+
+  const documentTitle = `example-${Date.now()}.pdf`;
 
   // Set general settings
   await expect(page.getByRole('heading', { name: 'General' })).toBeVisible();
@@ -79,34 +103,23 @@ test(`[PR-718]: should be able to create a document`, async ({ page }) => {
 
   // Assert document was created
   await expect(page.getByRole('link', { name: documentTitle })).toBeVisible();
+
+  await unseedUser(user.id);
 });
 
-test('should be able to create a document with multiple recipients', async ({ page }) => {
-  await page.goto('/signin');
-
-  const documentTitle = `example-${Date.now()}.pdf`;
-
+test('[DOCUMENT_FLOW]: should be able to create a document with multiple recipients', async ({
+  page,
+}) => {
   const user = await seedUser();
+  const document = await seedBlankDocument(user);
 
   await apiSignin({
     page,
     email: user.email,
+    redirectPath: `/documents/${document.id}/edit`,
   });
 
-  // Upload document
-  const [fileChooser] = await Promise.all([
-    page.waitForEvent('filechooser'),
-    page.locator('input[type=file]').evaluate((e) => {
-      if (e instanceof HTMLInputElement) {
-        e.click();
-      }
-    }),
-  ]);
-
-  await fileChooser.setFiles(path.join(__dirname, '../../../assets/example.pdf'));
-
-  // Wait to be redirected to the edit page
-  await page.waitForURL(/\/documents\/\d+/);
+  const documentTitle = `example-${Date.now()}.pdf`;
 
   // Set title
   await expect(page.getByRole('heading', { name: 'General' })).toBeVisible();
@@ -175,34 +188,21 @@ test('should be able to create a document with multiple recipients', async ({ pa
 
   // Assert document was created
   await expect(page.getByRole('link', { name: documentTitle })).toBeVisible();
+
+  await unseedUser(user.id);
 });
 
-test('should be able to create, send and sign a document', async ({ page }) => {
-  await page.goto('/signin');
-
-  const documentTitle = `example-${Date.now()}.pdf`;
-
+test('[DOCUMENT_FLOW]: should be able to create, send and sign a document', async ({ page }) => {
   const user = await seedUser();
+  const document = await seedBlankDocument(user);
 
   await apiSignin({
     page,
     email: user.email,
+    redirectPath: `/documents/${document.id}/edit`,
   });
 
-  // Upload document
-  const [fileChooser] = await Promise.all([
-    page.waitForEvent('filechooser'),
-    page.locator('input[type=file]').evaluate((e) => {
-      if (e instanceof HTMLInputElement) {
-        e.click();
-      }
-    }),
-  ]);
-
-  await fileChooser.setFiles(path.join(__dirname, '../../../assets/example.pdf'));
-
-  // Wait to be redirected to the edit page
-  await page.waitForURL(/\/documents\/\d+/);
+  const documentTitle = `example-${Date.now()}.pdf`;
 
   // Set title
   await expect(page.getByRole('heading', { name: 'General' })).toBeVisible();
@@ -246,49 +246,36 @@ test('should be able to create, send and sign a document', async ({ page }) => {
   await page.waitForURL(`/sign/${token}`);
 
   // Check if document has been viewed
-  const { status } = await getDocumentByToken({ token });
+  const { status } = await getDocumentByToken(token);
   expect(status).toBe(DocumentStatus.PENDING);
 
   await page.getByRole('button', { name: 'Complete' }).click();
-  await expect(page.getByRole('dialog').getByText('Sign Document')).toBeVisible();
+  await expect(page.getByRole('dialog').getByText('Complete Signing').first()).toBeVisible();
   await page.getByRole('button', { name: 'Sign' }).click();
 
   await page.waitForURL(`/sign/${token}/complete`);
   await expect(page.getByText('You have signed')).toBeVisible();
 
   // Check if document has been signed
-  const { status: completedStatus } = await getDocumentByToken({ token });
+  const { status: completedStatus } = await getDocumentByToken(token);
   expect(completedStatus).toBe(DocumentStatus.COMPLETED);
+
+  await unseedUser(user.id);
 });
 
-test('should be able to create, send with redirect url, sign a document and redirect to redirect url', async ({
+test('[DOCUMENT_FLOW]: should be able to create, send with redirect url, sign a document and redirect to redirect url', async ({
   page,
 }) => {
-  await page.goto('/signin');
-
-  const documentTitle = `example-${Date.now()}.pdf`;
-
   const user = await seedUser();
+  const document = await seedBlankDocument(user);
 
   await apiSignin({
     page,
     email: user.email,
+    redirectPath: `/documents/${document.id}/edit`,
   });
 
-  // Upload document
-  const [fileChooser] = await Promise.all([
-    page.waitForEvent('filechooser'),
-    page.locator('input[type=file]').evaluate((e) => {
-      if (e instanceof HTMLInputElement) {
-        e.click();
-      }
-    }),
-  ]);
-
-  await fileChooser.setFiles(path.join(__dirname, '../../../assets/example.pdf'));
-
-  // Wait to be redirected to the edit page
-  await page.waitForURL(/\/documents\/\d+/);
+  const documentTitle = `example-${Date.now()}.pdf`;
 
   // Set title & advanced redirect
   await expect(page.getByRole('heading', { name: 'General' })).toBeVisible();
@@ -331,16 +318,18 @@ test('should be able to create, send with redirect url, sign a document and redi
   await page.waitForURL(`/sign/${token}`);
 
   // Check if document has been viewed
-  const { status } = await getDocumentByToken({ token });
+  const { status } = await getDocumentByToken(token);
   expect(status).toBe(DocumentStatus.PENDING);
 
   await page.getByRole('button', { name: 'Complete' }).click();
-  await expect(page.getByRole('dialog').getByText('Sign Document')).toBeVisible();
+  await expect(page.getByRole('dialog').getByText('Complete Signing').first()).toBeVisible();
   await page.getByRole('button', { name: 'Sign' }).click();
 
   await page.waitForURL('https://documenso.com');
 
   // Check if document has been signed
-  const { status: completedStatus } = await getDocumentByToken({ token });
+  const { status: completedStatus } = await getDocumentByToken(token);
   expect(completedStatus).toBe(DocumentStatus.COMPLETED);
+
+  await unseedUser(user.id);
 });

@@ -11,6 +11,11 @@ test.describe.configure({ mode: 'parallel' });
 test('[TEAMS]: create team', async ({ page }) => {
   const user = await seedUser();
 
+  test.skip(
+    process.env.NEXT_PUBLIC_FEATURE_BILLING_ENABLED === 'true',
+    'Test skipped because billing is enabled.',
+  );
+
   await apiSignin({
     page,
     email: user.email,
@@ -25,9 +30,6 @@ test('[TEAMS]: create team', async ({ page }) => {
   await page.getByTestId('dialog-create-team-button').click();
 
   await page.getByTestId('dialog-create-team-button').waitFor({ state: 'hidden' });
-
-  const isCheckoutRequired = page.url().includes('pending');
-  test.skip(isCheckoutRequired, 'Test skipped because billing is enabled.');
 
   // Goto new team settings page.
   await page.getByRole('row').filter({ hasText: teamId }).getByRole('link').nth(1).click();
