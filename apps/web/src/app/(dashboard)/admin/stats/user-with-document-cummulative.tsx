@@ -28,7 +28,7 @@ export const UserWithDocumentCummulativeChart = ({
     <div className={className}>
       <div className="border-border flex flex-1 flex-col justify-center rounded-2xl border p-6 pl-2">
         <div className="mb-6 flex px-4">
-          <h3 className="text-lg font-semibold">Total Activity</h3>
+          <h3 className="text-lg font-semibold">Total Activity (Cummulative)</h3>
         </div>
 
         <ResponsiveContainer width="100%" height={400}>
