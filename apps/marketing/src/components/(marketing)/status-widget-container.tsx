@@ -13,20 +13,9 @@ export function StatusWidgetContainer() {
 
 function StatusWidgetFallback() {
   return (
-    <a
-      className="border-border inline-flex max-w-fit  items-center justify-between gap-2 space-x-2 rounded-md border border-gray-200 px-3 py-1 text-sm"
-      href="https://status.documenso.com"
-      target="_blank"
-      rel="noreferrer"
-    >
-      <div>
-        <p className="text-sm">Operational</p>
-      </div>
-
-      <span className="relative ml-auto flex h-1.5 w-1.5">
-        <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-400 opacity-75" />
-        <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-green-500" />
-      </span>
-    </a>
+    <div className="border-border inline-flex max-w-fit  items-center justify-between space-x-2 rounded-md border border-gray-200 px-2 py-2 pr-3 text-sm">
+      <span className="bg-muted h-2 w-36 animate-pulse rounded-md" />
+      <span className="bg-muted relative inline-flex h-2 w-2 rounded-full" />
+    </div>
   );
 }

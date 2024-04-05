@@ -1,6 +1,7 @@
-import { use } from 'react';
+import { use, useMemo } from 'react';
 
-import { type Status, getStatus } from '@openstatus/react';
+import type { Status } from '@openstatus/react';
+import { getStatus } from '@openstatus/react';
 
 import { cn } from '@documenso/ui/lib/utils';
 
@@ -45,7 +46,8 @@ const getStatusLevel = (level: Status) => {
 };
 
 export function StatusWidget() {
-  const { status } = use(getStatus('documenso-status'));
+  const getStatusMemoized = useMemo(async () => getStatus('documenso-status'), []);
+  const { status } = use(getStatusMemoized);
   const level = getStatusLevel(status);
 
   return (
