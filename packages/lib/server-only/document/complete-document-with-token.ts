@@ -8,9 +8,9 @@ import { DocumentStatus, SigningStatus } from '@documenso/prisma/client';
 import { WebhookTriggerEvents } from '@documenso/prisma/client';
 
 import type { TRecipientActionAuth } from '../../types/document-auth';
+import { queueJob } from '../queue/job';
 import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
 import { sealDocument } from './seal-document';
-import { sendPendingEmail } from './send-pending-email';
 
 export type CompleteDocumentWithTokenOptions = {
   token: string;
@@ -134,7 +134,13 @@ export const completeDocumentWithToken = async ({
   });
 
   if (pendingRecipients > 0) {
-    await sendPendingEmail({ documentId, recipientId: recipient.id });
+    await queueJob({
+      job: 'send-pending-email',
+      args: {
+        documentId: document.id,
+        recipientId: recipient.id,
+      },
+    });
   }
 
   const documents = await prisma.document.updateMany({

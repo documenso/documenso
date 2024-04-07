@@ -5,18 +5,26 @@ import {
   type SendDocumentOptions as SendCompletedDocumentOptions,
   sendCompletedEmail,
 } from '../document/send-completed-email';
+import { type SendPendingEmailOptions, sendPendingEmail } from '../document/send-pending-email';
 
 type JobOptions = {
   'send-completed-email': SendCompletedDocumentOptions;
+  'send-pending-email': SendPendingEmailOptions;
 };
 
 export const jobHandlers: {
   [K in keyof JobOptions]: WorkHandler<JobOptions[K]>;
 } = {
-  'send-completed-email': async ({ data }) => {
+  'send-completed-email': async ({ data: { documentId, requestMetadata } }) => {
     await sendCompletedEmail({
-      documentId: data.documentId,
-      requestMetadata: data.requestMetadata,
+      documentId,
+      requestMetadata,
+    });
+  },
+  'send-pending-email': async ({ data: { documentId, recipientId } }) => {
+    await sendPendingEmail({
+      documentId,
+      recipientId,
     });
   },
 };
