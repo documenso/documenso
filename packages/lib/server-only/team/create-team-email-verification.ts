@@ -2,7 +2,6 @@ import { createElement } from 'react';
 
 import { z } from 'zod';
 
-import { mailer } from '@documenso/email/mailer';
 import { render } from '@documenso/email/render';
 import { ConfirmTeamEmailTemplate } from '@documenso/email/templates/confirm-team-email';
 import { WEBAPP_BASE_URL } from '@documenso/lib/constants/app';
@@ -12,6 +11,8 @@ import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { createTokenVerification } from '@documenso/lib/utils/token-verification';
 import { prisma } from '@documenso/prisma';
 import { Prisma } from '@documenso/prisma/client';
+
+import { queueJob } from '../queue/job';
 
 export type CreateTeamEmailVerificationOptions = {
   userId: number;
@@ -122,14 +123,17 @@ export const sendTeamEmailVerificationEmail = async (
     token,
   });
 
-  await mailer.sendMail({
-    to: email,
-    from: {
-      name: FROM_NAME,
-      address: FROM_ADDRESS,
+  await queueJob({
+    job: 'send-mail',
+    args: {
+      to: email,
+      from: {
+        name: FROM_NAME,
+        address: FROM_ADDRESS,
+      },
+      subject: `A request to use your email has been initiated by ${teamName} on Documenso`,
+      html: render(template),
+      text: render(template, { plainText: true }),
     },
-    subject: `A request to use your email has been initiated by ${teamName} on Documenso`,
-    html: render(template),
-    text: render(template, { plainText: true }),
   });
 };

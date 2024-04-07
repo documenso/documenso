@@ -1,3 +1,4 @@
+import type { SendMailOptions } from 'nodemailer';
 import { createTransport } from 'nodemailer';
 
 import { ResendTransport } from '@documenso/nodemailer-resend';
@@ -54,3 +55,4 @@ const getTransport = () => {
 };
 
 export const mailer = getTransport();
+export type MailOptions = SendMailOptions;

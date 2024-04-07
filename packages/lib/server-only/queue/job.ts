@@ -1,5 +1,7 @@
 import type { WorkHandler } from 'pg-boss';
 
+import type { MailOptions } from '@documenso/email/mailer';
+import { mailer } from '@documenso/email/mailer';
 import { prisma } from '@documenso/prisma';
 
 import { initQueue } from '.';
@@ -12,6 +14,7 @@ import {
 import { type SendPendingEmailOptions, sendPendingEmail } from '../document/send-pending-email';
 
 type JobOptions = {
+  'send-mail': MailOptions;
   'send-completed-email': SendCompletedDocumentOptions;
   'send-pending-email': SendPendingEmailOptions;
   'create-document-audit-log': CreateDocumentAuditLogDataOptions;
@@ -20,25 +23,42 @@ type JobOptions = {
 export const jobHandlers: {
   [K in keyof JobOptions]: WorkHandler<JobOptions[K]>;
 } = {
-  'send-completed-email': async ({ data: { documentId, requestMetadata } }) => {
+  'send-completed-email': async ({ id, name, data: { documentId, requestMetadata } }) => {
+    console.log('Running Queue: ', name, ' ', id);
+
     await sendCompletedEmail({
       documentId,
       requestMetadata,
     });
   },
-  'send-pending-email': async ({ data: { documentId, recipientId } }) => {
+  'send-pending-email': async ({ id, name, data: { documentId, recipientId } }) => {
+    console.log('Running Queue: ', name, ' ', id);
+
     await sendPendingEmail({
       documentId,
       recipientId,
     });
   },
+  'send-mail': async ({ id, name, data: { attachments, to, from, subject, html, text } }) => {
+    console.log('Running Queue: ', name, ' ', id);
+
+    await mailer.sendMail({
+      to,
+      from,
+      subject,
+      html,
+      text,
+      attachments,
+    });
+  },
 
   // Audit Logs Queue
   'create-document-audit-log': async ({
+    name,
     data: { documentId, type, requestMetadata, user, data },
     id,
   }) => {
-    console.log('Running Queue ID', id);
+    console.log('Running Queue: ', name, ' ', id);
 
     await prisma.documentAuditLog.create({
       data: createDocumentAuditLogData({

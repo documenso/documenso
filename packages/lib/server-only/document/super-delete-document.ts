@@ -2,7 +2,6 @@
 
 import { createElement } from 'react';
 
-import { mailer } from '@documenso/email/mailer';
 import { render } from '@documenso/email/render';
 import DocumentCancelTemplate from '@documenso/email/templates/document-cancel';
 import { prisma } from '@documenso/prisma';
@@ -49,18 +48,21 @@ export const superDeleteDocument = async ({ id, requestMetadata }: SuperDeleteDo
           assetBaseUrl,
         });
 
-        await mailer.sendMail({
-          to: {
-            address: recipient.email,
-            name: recipient.name,
+        await queueJob({
+          job: 'send-mail',
+          args: {
+            to: {
+              address: recipient.email,
+              name: recipient.name,
+            },
+            from: {
+              name: FROM_NAME,
+              address: FROM_ADDRESS,
+            },
+            subject: 'Document Cancelled',
+            html: render(template),
+            text: render(template, { plainText: true }),
           },
-          from: {
-            name: FROM_NAME,
-            address: FROM_ADDRESS,
-          },
-          subject: 'Document Cancelled',
-          html: render(template),
-          text: render(template, { plainText: true }),
         });
       }),
     );

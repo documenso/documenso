@@ -2,7 +2,6 @@ import { createElement } from 'react';
 
 import { nanoid } from 'nanoid';
 
-import { mailer } from '@documenso/email/mailer';
 import { render } from '@documenso/email/render';
 import type { TeamInviteEmailProps } from '@documenso/email/templates/team-invite';
 import { TeamInviteEmailTemplate } from '@documenso/email/templates/team-invite';
@@ -14,6 +13,8 @@ import { isTeamRoleWithinUserHierarchy } from '@documenso/lib/utils/teams';
 import { prisma } from '@documenso/prisma';
 import { TeamMemberInviteStatus } from '@documenso/prisma/client';
 import type { TCreateTeamMemberInvitesMutationSchema } from '@documenso/trpc/server/team-router/schema';
+
+import { queueJob } from '../queue/job';
 
 export type CreateTeamMemberInvitesOptions = {
   userId: number;
@@ -148,14 +149,17 @@ export const sendTeamMemberInviteEmail = async ({
     ...emailTemplateOptions,
   });
 
-  await mailer.sendMail({
-    to: email,
-    from: {
-      name: FROM_NAME,
-      address: FROM_ADDRESS,
+  await queueJob({
+    job: 'send-mail',
+    args: {
+      to: email,
+      from: {
+        name: FROM_NAME,
+        address: FROM_ADDRESS,
+      },
+      subject: `You have been invited to join ${emailTemplateOptions.teamName} on Documenso`,
+      html: render(template),
+      text: render(template, { plainText: true }),
     },
-    subject: `You have been invited to join ${emailTemplateOptions.teamName} on Documenso`,
-    html: render(template),
-    text: render(template, { plainText: true }),
   });
 };

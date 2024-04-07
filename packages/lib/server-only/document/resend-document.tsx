@@ -1,6 +1,5 @@
 import { createElement } from 'react';
 
-import { mailer } from '@documenso/email/mailer';
 import { render } from '@documenso/email/render';
 import { DocumentInviteEmailTemplate } from '@documenso/email/templates/document-invite';
 import { FROM_ADDRESS, FROM_NAME } from '@documenso/lib/constants/email';
@@ -110,45 +109,42 @@ export const resendDocument = async ({
 
       const { actionVerb } = RECIPIENT_ROLES_DESCRIPTION[recipient.role];
 
-      await prisma.$transaction(
-        async (tx) => {
-          await mailer.sendMail({
-            to: {
-              address: email,
-              name,
-            },
-            from: {
-              name: FROM_NAME,
-              address: FROM_ADDRESS,
-            },
-            subject: customEmail?.subject
-              ? renderCustomEmailTemplate(customEmail.subject, customEmailTemplate)
-              : `Please ${actionVerb.toLowerCase()} this document`,
-            html: render(template),
-            text: render(template, { plainText: true }),
-          });
-
-          await queueJob({
-            job: 'create-document-audit-log',
-            args: {
-              type: DOCUMENT_AUDIT_LOG_TYPE.EMAIL_SENT,
-              documentId: document.id,
-              user,
-              requestMetadata,
-              data: {
-                emailType: recipientEmailType,
-                recipientEmail: recipient.email,
-                recipientName: recipient.name,
-                recipientRole: recipient.role,
-                recipientId: recipient.id,
-                isResending: true,
-              },
-            },
-          });
+      await queueJob({
+        job: 'send-mail',
+        args: {
+          to: {
+            address: email,
+            name,
+          },
+          from: {
+            name: FROM_NAME,
+            address: FROM_ADDRESS,
+          },
+          subject: customEmail?.subject
+            ? renderCustomEmailTemplate(customEmail.subject, customEmailTemplate)
+            : `Please ${actionVerb.toLowerCase()} this document`,
+          html: render(template),
+          text: render(template, { plainText: true }),
         },
-        // Hopefully the queue makes this redundant
-        { timeout: 30_000 },
-      );
+      });
+
+      await queueJob({
+        job: 'create-document-audit-log',
+        args: {
+          type: DOCUMENT_AUDIT_LOG_TYPE.EMAIL_SENT,
+          documentId: document.id,
+          user,
+          requestMetadata,
+          data: {
+            emailType: recipientEmailType,
+            recipientEmail: recipient.email,
+            recipientName: recipient.name,
+            recipientRole: recipient.role,
+            recipientId: recipient.id,
+            isResending: true,
+          },
+        },
+      });
     }),
   );
 };

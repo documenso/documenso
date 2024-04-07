@@ -1,12 +1,13 @@
 import { createElement } from 'react';
 
-import { mailer } from '@documenso/email/mailer';
 import { render } from '@documenso/email/render';
 import { TeamEmailRemovedTemplate } from '@documenso/email/templates/team-email-removed';
 import { WEBAPP_BASE_URL } from '@documenso/lib/constants/app';
 import { FROM_ADDRESS, FROM_NAME } from '@documenso/lib/constants/email';
 import { TEAM_MEMBER_ROLE_PERMISSIONS_MAP } from '@documenso/lib/constants/teams';
 import { prisma } from '@documenso/prisma';
+
+import { queueJob } from '../queue/job';
 
 export type DeleteTeamEmailOptions = {
   userId: number;
@@ -73,18 +74,21 @@ export const deleteTeamEmail = async ({ userId, userEmail, teamId }: DeleteTeamE
       teamUrl: team.url,
     });
 
-    await mailer.sendMail({
-      to: {
-        address: team.owner.email,
-        name: team.owner.name ?? '',
+    await queueJob({
+      job: 'create-document-audit-log',
+      args: {
+        to: {
+          address: team.owner.email,
+          name: team.owner.name ?? '',
+        },
+        from: {
+          name: FROM_NAME,
+          address: FROM_ADDRESS,
+        },
+        subject: `Team email has been revoked for ${team.name}`,
+        html: render(template),
+        text: render(template, { plainText: true }),
       },
-      from: {
-        name: FROM_NAME,
-        address: FROM_ADDRESS,
-      },
-      subject: `Team email has been revoked for ${team.name}`,
-      html: render(template),
-      text: render(template, { plainText: true }),
     });
   } catch (e) {
     // Todo: Teams - Alert us.
