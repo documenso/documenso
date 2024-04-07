@@ -3,7 +3,7 @@ import type { Team } from '@documenso/prisma/client';
 import { SendStatus } from '@documenso/prisma/client';
 
 import type { RequestMetadata } from '../../universal/extract-request-metadata';
-import { createDocumentAuditLogData } from '../../utils/document-audit-logs';
+import { queueJob } from '../queue/job';
 
 export type DeleteRecipientOptions = {
   documentId: number;
@@ -73,33 +73,30 @@ export const deleteRecipient = async ({
     });
   }
 
-  const deletedRecipient = await prisma.$transaction(async (tx) => {
-    const deleted = await tx.recipient.delete({
-      where: {
-        id: recipient.id,
+  const deletedRecipient = await prisma.recipient.delete({
+    where: {
+      id: recipient.id,
+    },
+  });
+
+  await queueJob({
+    job: 'create-document-audit-log',
+    args: {
+      type: 'RECIPIENT_DELETED',
+      documentId,
+      user: {
+        id: team?.id ?? user.id,
+        email: team?.name ?? user.email,
+        name: team ? '' : user.name,
       },
-    });
-
-    await tx.documentAuditLog.create({
-      data: createDocumentAuditLogData({
-        type: 'RECIPIENT_DELETED',
-        documentId,
-        user: {
-          id: team?.id ?? user.id,
-          email: team?.name ?? user.email,
-          name: team ? '' : user.name,
-        },
-        data: {
-          recipientEmail: recipient.email,
-          recipientName: recipient.name,
-          recipientId: recipient.id,
-          recipientRole: recipient.role,
-        },
-        requestMetadata,
-      }),
-    });
-
-    return deleted;
+      data: {
+        recipientEmail: recipient.email,
+        recipientName: recipient.name,
+        recipientId: recipient.id,
+        recipientRole: recipient.role,
+      },
+      requestMetadata,
+    },
   });
 
   return deletedRecipient;

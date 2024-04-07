@@ -2,9 +2,10 @@
 
 import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
 import type { RequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
-import { createDocumentAuditLogData } from '@documenso/lib/utils/document-audit-logs';
 import { prisma } from '@documenso/prisma';
 import { DocumentStatus, SigningStatus } from '@documenso/prisma/client';
+
+import { queueJob } from '../queue/job';
 
 export type RemovedSignedFieldWithTokenOptions = {
   token: string;
@@ -65,21 +66,22 @@ export const removeSignedFieldWithToken = async ({
         fieldId: field.id,
       },
     });
+  });
 
-    await tx.documentAuditLog.create({
-      data: createDocumentAuditLogData({
-        type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_FIELD_UNINSERTED,
-        documentId: document.id,
-        user: {
-          name: recipient?.name,
-          email: recipient?.email,
-        },
-        requestMetadata,
-        data: {
-          field: field.type,
-          fieldId: field.secondaryId,
-        },
-      }),
-    });
+  await queueJob({
+    job: 'create-document-audit-log',
+    args: {
+      type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_FIELD_UNINSERTED,
+      documentId: document.id,
+      user: {
+        name: recipient?.name,
+        email: recipient?.email,
+      },
+      requestMetadata,
+      data: {
+        field: field.type,
+        fieldId: field.secondaryId,
+      },
+    },
   });
 };

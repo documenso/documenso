@@ -8,6 +8,8 @@ import { prisma } from '@documenso/prisma';
 import type { Field, FieldType } from '@documenso/prisma/client';
 import { SendStatus, SigningStatus } from '@documenso/prisma/client';
 
+import { queueJob } from '../queue/job';
+
 export interface SetFieldsForDocumentOptions {
   userId: number;
   documentId: number;
@@ -155,8 +157,9 @@ export const setFieldsForDocument = async ({
 
         // Handle field updated audit log.
         if (field._persisted && changes.length > 0) {
-          await tx.documentAuditLog.create({
-            data: createDocumentAuditLogData({
+          await queueJob({
+            job: 'create-document-audit-log',
+            args: {
               type: DOCUMENT_AUDIT_LOG_TYPE.FIELD_UPDATED,
               documentId: documentId,
               user,
@@ -165,14 +168,15 @@ export const setFieldsForDocument = async ({
                 changes,
                 ...baseAuditLog,
               },
-            }),
+            },
           });
         }
 
         // Handle field created audit log.
         if (!field._persisted) {
-          await tx.documentAuditLog.create({
-            data: createDocumentAuditLogData({
+          await queueJob({
+            job: 'create-document-audit-log',
+            args: {
               type: DOCUMENT_AUDIT_LOG_TYPE.FIELD_CREATED,
               documentId: documentId,
               user,
@@ -180,7 +184,7 @@ export const setFieldsForDocument = async ({
               data: {
                 ...baseAuditLog,
               },
-            }),
+            },
           });
         }
 

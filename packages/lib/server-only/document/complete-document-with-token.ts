@@ -2,7 +2,6 @@
 
 import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
 import type { RequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
-import { createDocumentAuditLogData } from '@documenso/lib/utils/document-audit-logs';
 import { prisma } from '@documenso/prisma';
 import { DocumentStatus, SigningStatus } from '@documenso/prisma/client';
 import { WebhookTriggerEvents } from '@documenso/prisma/client';
@@ -93,35 +92,34 @@ export const completeDocumentWithToken = async ({
   //   throw new AppError(AppErrorCode.UNAUTHORIZED, 'Invalid authentication values');
   // }
 
-  await prisma.$transaction(async (tx) => {
-    await tx.recipient.update({
-      where: {
-        id: recipient.id,
-      },
-      data: {
-        signingStatus: SigningStatus.SIGNED,
-        signedAt: new Date(),
-      },
-    });
+  await prisma.recipient.update({
+    where: {
+      id: recipient.id,
+    },
+    data: {
+      signingStatus: SigningStatus.SIGNED,
+      signedAt: new Date(),
+    },
+  });
 
-    await tx.documentAuditLog.create({
-      data: createDocumentAuditLogData({
-        type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_RECIPIENT_COMPLETED,
-        documentId: document.id,
-        user: {
-          name: recipient.name,
-          email: recipient.email,
-        },
-        requestMetadata,
-        data: {
-          recipientEmail: recipient.email,
-          recipientName: recipient.name,
-          recipientId: recipient.id,
-          recipientRole: recipient.role,
-          // actionAuth: derivedRecipientActionAuth || undefined,
-        },
-      }),
-    });
+  await queueJob({
+    job: 'create-document-audit-log',
+    args: {
+      type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_RECIPIENT_COMPLETED,
+      documentId: document.id,
+      user: {
+        name: recipient.name,
+        email: recipient.email,
+      },
+      requestMetadata,
+      data: {
+        recipientEmail: recipient.email,
+        recipientName: recipient.name,
+        recipientId: recipient.id,
+        recipientRole: recipient.role,
+        // actionAuth: derivedRecipientActionAuth || undefined,
+      },
+    },
   });
 
   const pendingRecipients = await prisma.recipient.count({

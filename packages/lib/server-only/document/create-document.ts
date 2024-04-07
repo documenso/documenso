@@ -3,10 +3,10 @@
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
 import type { RequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
-import { createDocumentAuditLogData } from '@documenso/lib/utils/document-audit-logs';
 import { prisma } from '@documenso/prisma';
 import { WebhookTriggerEvents } from '@documenso/prisma/client';
 
+import { queueJob } from '../queue/job';
 import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
 
 export type CreateDocumentOptions = {
@@ -44,35 +44,34 @@ export const createDocument = async ({
     throw new AppError(AppErrorCode.NOT_FOUND, 'Team not found');
   }
 
-  return await prisma.$transaction(async (tx) => {
-    const document = await tx.document.create({
-      data: {
-        title,
-        documentDataId,
-        userId,
-        teamId,
-      },
-    });
-
-    await tx.documentAuditLog.create({
-      data: createDocumentAuditLogData({
-        type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_CREATED,
-        documentId: document.id,
-        user,
-        requestMetadata,
-        data: {
-          title,
-        },
-      }),
-    });
-
-    await triggerWebhook({
-      event: WebhookTriggerEvents.DOCUMENT_CREATED,
-      data: document,
+  const document = await prisma.document.create({
+    data: {
+      title,
+      documentDataId,
       userId,
       teamId,
-    });
-
-    return document;
+    },
   });
+
+  await queueJob({
+    job: 'create-document-audit-log',
+    args: {
+      type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_CREATED,
+      documentId: document.id,
+      user,
+      requestMetadata,
+      data: {
+        title,
+      },
+    },
+  });
+
+  await triggerWebhook({
+    event: WebhookTriggerEvents.DOCUMENT_CREATED,
+    data: document,
+    userId,
+    teamId,
+  });
+
+  return document;
 };

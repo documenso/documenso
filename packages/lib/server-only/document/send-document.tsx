@@ -6,7 +6,6 @@ import { DocumentInviteEmailTemplate } from '@documenso/email/templates/document
 import { FROM_ADDRESS, FROM_NAME } from '@documenso/lib/constants/email';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
 import type { RequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
-import { createDocumentAuditLogData } from '@documenso/lib/utils/document-audit-logs';
 import { renderCustomEmailTemplate } from '@documenso/lib/utils/render-custom-email-template';
 import { prisma } from '@documenso/prisma';
 import { DocumentStatus, RecipientRole, SendStatus } from '@documenso/prisma/client';
@@ -17,6 +16,7 @@ import {
   RECIPIENT_ROLES_DESCRIPTION,
   RECIPIENT_ROLE_TO_EMAIL_TYPE,
 } from '../../constants/recipient-roles';
+import { queueJob } from '../queue/job';
 import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
 
 export type SendDocumentOptions = {
@@ -113,79 +113,75 @@ export const sendDocument = async ({
 
       const { actionVerb } = RECIPIENT_ROLES_DESCRIPTION[recipient.role];
 
-      await prisma.$transaction(
-        async (tx) => {
-          await mailer.sendMail({
-            to: {
-              address: email,
-              name,
-            },
-            from: {
-              name: FROM_NAME,
-              address: FROM_ADDRESS,
-            },
-            subject: customEmail?.subject
-              ? renderCustomEmailTemplate(customEmail.subject, customEmailTemplate)
-              : `Please ${actionVerb.toLowerCase()} this document`,
-            html: render(template),
-            text: render(template, { plainText: true }),
-          });
-
-          await tx.recipient.update({
-            where: {
-              id: recipient.id,
-            },
-            data: {
-              sendStatus: SendStatus.SENT,
-            },
-          });
-
-          await tx.documentAuditLog.create({
-            data: createDocumentAuditLogData({
-              type: DOCUMENT_AUDIT_LOG_TYPE.EMAIL_SENT,
-              documentId: document.id,
-              user,
-              requestMetadata,
-              data: {
-                emailType: recipientEmailType,
-                recipientEmail: recipient.email,
-                recipientName: recipient.name,
-                recipientRole: recipient.role,
-                recipientId: recipient.id,
-                isResending: false,
-              },
-            }),
-          });
+      // TODO: Move this to a seperate queue of it's own
+      await mailer.sendMail({
+        to: {
+          address: email,
+          name,
         },
-        { timeout: 30_000 },
-      );
+        from: {
+          name: FROM_NAME,
+          address: FROM_ADDRESS,
+        },
+        subject: customEmail?.subject
+          ? renderCustomEmailTemplate(customEmail.subject, customEmailTemplate)
+          : `Please ${actionVerb.toLowerCase()} this document`,
+        html: render(template),
+        text: render(template, { plainText: true }),
+      });
+
+      await prisma.recipient.update({
+        where: {
+          id: recipient.id,
+        },
+        data: {
+          sendStatus: SendStatus.SENT,
+        },
+      });
+
+      await queueJob({
+        job: 'create-document-audit-log',
+        args: {
+          type: DOCUMENT_AUDIT_LOG_TYPE.EMAIL_SENT,
+          documentId: document.id,
+          user,
+          requestMetadata,
+          data: {
+            emailType: recipientEmailType,
+            recipientEmail: recipient.email,
+            recipientName: recipient.name,
+            recipientRole: recipient.role,
+            recipientId: recipient.id,
+            isResending: false,
+          },
+        },
+      });
     }),
   );
 
-  const updatedDocument = await prisma.$transaction(async (tx) => {
-    if (document.status === DocumentStatus.DRAFT) {
-      await tx.documentAuditLog.create({
-        data: createDocumentAuditLogData({
-          type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_SENT,
-          documentId: document.id,
-          requestMetadata,
-          user,
-          data: {},
-        }),
-      });
-    }
-
-    return await tx.document.update({
-      where: {
-        id: documentId,
-      },
-      data: {
-        status: DocumentStatus.PENDING,
-      },
-      include: {
-        Recipient: true,
+  if (document.status === DocumentStatus.DRAFT) {
+    await queueJob({
+      job: 'create-document-audit-log',
+      args: {
+        type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_SENT,
+        documentId: document.id,
+        requestMetadata,
+        user,
+        data: {},
       },
     });
+  }
+
+  const updatedDocument = await prisma.document.update({
+    where: {
+      id: documentId,
+    },
+    data: {
+      status: DocumentStatus.PENDING,
+    },
+    include: {
+      Recipient: true,
+    },
   });
 
   await triggerWebhook({

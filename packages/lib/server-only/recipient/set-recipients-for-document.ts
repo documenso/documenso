@@ -17,6 +17,7 @@ import { RecipientRole } from '@documenso/prisma/client';
 import { SendStatus, SigningStatus } from '@documenso/prisma/client';
 
 import { AppError, AppErrorCode } from '../../errors/app-error';
+import { queueJob } from '../queue/job';
 
 export interface SetRecipientsForDocumentOptions {
   userId: number;
@@ -203,8 +204,9 @@ export const setRecipientsForDocument = async ({
 
         // Handle recipient updated audit log.
         if (recipient._persisted && changes.length > 0) {
-          await tx.documentAuditLog.create({
-            data: createDocumentAuditLogData({
+          await queueJob({
+            job: 'create-document-audit-log',
+            args: {
               type: DOCUMENT_AUDIT_LOG_TYPE.RECIPIENT_UPDATED,
               documentId: documentId,
               user,
@@ -213,14 +215,15 @@ export const setRecipientsForDocument = async ({
                 changes,
                 ...baseAuditLog,
               },
-            }),
+            },
           });
         }
 
         // Handle recipient created audit log.
         if (!recipient._persisted) {
-          await tx.documentAuditLog.create({
-            data: createDocumentAuditLogData({
+          await queueJob({
+            job: 'create-document-audit-log',
+            args: {
               type: DOCUMENT_AUDIT_LOG_TYPE.RECIPIENT_CREATED,
               documentId: documentId,
               user,
@@ -229,7 +232,7 @@ export const setRecipientsForDocument = async ({
                 ...baseAuditLog,
                 actionAuth: recipient.actionAuth || undefined,
               },
-            }),
+            },
           });
         }
 

@@ -25,7 +25,7 @@ import {
 import { ZRecipientAuthOptionsSchema } from '../types/document-auth';
 import type { RequestMetadata } from '../universal/extract-request-metadata';
 
-type CreateDocumentAuditLogDataOptions<T = TDocumentAuditLog['type']> = {
+export type CreateDocumentAuditLogDataOptions<T = TDocumentAuditLog['type']> = {
   documentId: number;
   type: T;
   data: Extract<TDocumentAuditLog, { type: T }>['data'];

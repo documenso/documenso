@@ -2,7 +2,7 @@ import { prisma } from '@documenso/prisma';
 import type { Team } from '@documenso/prisma/client';
 
 import type { RequestMetadata } from '../../universal/extract-request-metadata';
-import { createDocumentAuditLogData } from '../../utils/document-audit-logs';
+import { queueJob } from '../queue/job';
 
 export type DeleteFieldOptions = {
   fieldId: number;
@@ -67,8 +67,9 @@ export const deleteField = async ({
     });
   }
 
-  await prisma.documentAuditLog.create({
-    data: createDocumentAuditLogData({
+  await queueJob({
+    job: 'create-document-audit-log',
+    args: {
       type: 'FIELD_DELETED',
       documentId,
       user: {
@@ -83,7 +84,7 @@ export const deleteField = async ({
         fieldType: field.type,
       },
       requestMetadata,
-    }),
+    },
   });
 
   return field;

@@ -5,13 +5,12 @@ import path from 'node:path';
 import { PDFDocument } from 'pdf-lib';
 
 import PostHogServerClient from '@documenso/lib/server-only/feature-flags/get-post-hog-server-client';
-import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
-import { createDocumentAuditLogData } from '@documenso/lib/utils/document-audit-logs';
 import { prisma } from '@documenso/prisma';
 import { DocumentStatus, RecipientRole, SigningStatus } from '@documenso/prisma/client';
 import { WebhookTriggerEvents } from '@documenso/prisma/client';
 import { signPdf } from '@documenso/signing';
 
+import { DOCUMENT_AUDIT_LOG_TYPE } from '../../types/document-audit-logs';
 import type { RequestMetadata } from '../../universal/extract-request-metadata';
 import { getFile } from '../../universal/upload/get-file';
 import { putFile } from '../../universal/upload/put-file';
@@ -126,27 +125,26 @@ export const sealDocument = async ({
     });
   }
 
-  await prisma.$transaction(async (tx) => {
-    await tx.documentData.update({
-      where: {
-        id: documentData.id,
-      },
-      data: {
-        data: newData,
-      },
-    });
+  await prisma.documentData.update({
+    where: {
+      id: documentData.id,
+    },
+    data: {
+      data: newData,
+    },
+  });
 
-    await tx.documentAuditLog.create({
-      data: createDocumentAuditLogData({
-        type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_COMPLETED,
-        documentId: document.id,
-        requestMetadata,
-        user: null,
-        data: {
-          transactionId: nanoid(),
-        },
-      }),
-    });
+  await queueJob({
+    job: 'create-document-audit-log',
+    args: {
+      type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_COMPLETED,
+      documentId: document.id,
+      requestMetadata,
+      user: null,
+      data: {
+        transactionId: nanoid(),
+      },
+    },
   });
 
   if (sendEmail && !isResealing) {

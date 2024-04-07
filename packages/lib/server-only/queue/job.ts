@@ -1,6 +1,10 @@
 import type { WorkHandler } from 'pg-boss';
 
+import { prisma } from '@documenso/prisma';
+
 import { initQueue } from '.';
+import type { CreateDocumentAuditLogDataOptions } from '../../utils/document-audit-logs';
+import { createDocumentAuditLogData } from '../../utils/document-audit-logs';
 import {
   type SendDocumentOptions as SendCompletedDocumentOptions,
   sendCompletedEmail,
@@ -10,6 +14,7 @@ import { type SendPendingEmailOptions, sendPendingEmail } from '../document/send
 type JobOptions = {
   'send-completed-email': SendCompletedDocumentOptions;
   'send-pending-email': SendPendingEmailOptions;
+  'create-document-audit-log': CreateDocumentAuditLogDataOptions;
 };
 
 export const jobHandlers: {
@@ -25,6 +30,24 @@ export const jobHandlers: {
     await sendPendingEmail({
       documentId,
       recipientId,
+    });
+  },
+
+  // Audit Logs Queue
+  'create-document-audit-log': async ({
+    data: { documentId, type, requestMetadata, user, data },
+    id,
+  }) => {
+    console.log('Running Queue ID', id);
+
+    await prisma.documentAuditLog.create({
+      data: createDocumentAuditLogData({
+        type,
+        documentId,
+        requestMetadata,
+        user,
+        data,
+      }),
     });
   },
 };

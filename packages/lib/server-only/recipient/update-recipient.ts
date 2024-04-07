@@ -3,7 +3,8 @@ import type { RecipientRole, Team } from '@documenso/prisma/client';
 
 import { DOCUMENT_AUDIT_LOG_TYPE } from '../../types/document-audit-logs';
 import type { RequestMetadata } from '../../universal/extract-request-metadata';
-import { createDocumentAuditLogData, diffRecipientChanges } from '../../utils/document-audit-logs';
+import { diffRecipientChanges } from '../../utils/document-audit-logs';
+import { queueJob } from '../queue/job';
 
 export type UpdateRecipientOptions = {
   documentId: number;
@@ -75,44 +76,43 @@ export const updateRecipient = async ({
     throw new Error('Recipient not found');
   }
 
-  const updatedRecipient = await prisma.$transaction(async (tx) => {
-    const persisted = await prisma.recipient.update({
-      where: {
-        id: recipient.id,
-      },
-      data: {
-        email: email?.toLowerCase() ?? recipient.email,
-        name: name ?? recipient.name,
-        role: role ?? recipient.role,
+  const updatedRecipient = await prisma.recipient.update({
+    where: {
+      id: recipient.id,
+    },
+    data: {
+      email: email?.toLowerCase() ?? recipient.email,
+      name: name ?? recipient.name,
+      role: role ?? recipient.role,
+    },
+  });
+
+  const changes = diffRecipientChanges(recipient, updatedRecipient);
+
+  if (changes.length > 0) {
+    await queueJob({
+      job: 'create-document-audit-log',
+      args: {
+        type: DOCUMENT_AUDIT_LOG_TYPE.RECIPIENT_UPDATED,
+        documentId: documentId,
+        user: {
+          id: team?.id ?? user.id,
+          name: team?.name ?? user.name,
+          email: team ? '' : user.email,
+        },
+        requestMetadata,
+        data: {
+          changes,
+          recipientId,
+          recipientEmail: updatedRecipient.email,
+          recipientName: updatedRecipient.name,
+          recipientRole: updatedRecipient.role,
+        },
       },
     });
 
-    const changes = diffRecipientChanges(recipient, persisted);
-
-    if (changes.length > 0) {
-      await tx.documentAuditLog.create({
-        data: createDocumentAuditLogData({
-          type: DOCUMENT_AUDIT_LOG_TYPE.RECIPIENT_UPDATED,
-          documentId: documentId,
-          user: {
-            id: team?.id ?? user.id,
-            name: team?.name ?? user.name,
-            email: team ? '' : user.email,
-          },
-          requestMetadata,
-          data: {
-            changes,
-            recipientId,
-            recipientEmail: persisted.email,
-            recipientName: persisted.name,
-            recipientRole: persisted.role,
-          },
-        }),
-      });
-
-      return persisted;
-    }
-  });
+    return updatedRecipient;
+  }
 
   return updatedRecipient;
 };

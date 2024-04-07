@@ -3,7 +3,8 @@ import type { FieldType, Team } from '@documenso/prisma/client';
 
 import { DOCUMENT_AUDIT_LOG_TYPE } from '../../types/document-audit-logs';
 import type { RequestMetadata } from '../../universal/extract-request-metadata';
-import { createDocumentAuditLogData, diffFieldChanges } from '../../utils/document-audit-logs';
+import { diffFieldChanges } from '../../utils/document-audit-logs';
+import { queueJob } from '../queue/job';
 
 export type UpdateFieldOptions = {
   fieldId: number;
@@ -77,8 +78,9 @@ export const updateField = async ({
       },
     });
 
-    await tx.documentAuditLog.create({
-      data: createDocumentAuditLogData({
+    await queueJob({
+      job: 'create-document-audit-log',
+      args: {
         type: DOCUMENT_AUDIT_LOG_TYPE.FIELD_UPDATED,
         documentId,
         user: {
@@ -94,7 +96,7 @@ export const updateField = async ({
           changes: diffFieldChanges(oldField, updatedField),
         },
         requestMetadata,
-      }),
+      },
     });
 
     return updatedField;

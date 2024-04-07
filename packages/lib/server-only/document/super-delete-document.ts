@@ -12,7 +12,7 @@ import { NEXT_PUBLIC_WEBAPP_URL } from '../../constants/app';
 import { FROM_ADDRESS, FROM_NAME } from '../../constants/email';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '../../types/document-audit-logs';
 import type { RequestMetadata } from '../../universal/extract-request-metadata';
-import { createDocumentAuditLogData } from '../../utils/document-audit-logs';
+import { queueJob } from '../queue/job';
 
 export type SuperDeleteDocumentOptions = {
   id: number;
@@ -66,20 +66,19 @@ export const superDeleteDocument = async ({ id, requestMetadata }: SuperDeleteDo
     );
   }
 
-  // always hard delete if deleted from admin
-  return await prisma.$transaction(async (tx) => {
-    await tx.documentAuditLog.create({
-      data: createDocumentAuditLogData({
-        documentId: id,
-        type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_DELETED,
-        user,
-        requestMetadata,
-        data: {
-          type: 'HARD',
-        },
-      }),
-    });
-
-    return await tx.document.delete({ where: { id } });
+  await queueJob({
+    job: 'create-document-audit-log',
+    args: {
+      documentId: id,
+      type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_DELETED,
+      user,
+      requestMetadata,
+      data: {
+        type: 'HARD',
+      },
+    },
   });
+
+  // always hard delete if deleted from admin
+  return await prisma.document.delete({ where: { id } });
 };

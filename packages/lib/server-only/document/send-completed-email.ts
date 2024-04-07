@@ -9,7 +9,7 @@ import { NEXT_PUBLIC_WEBAPP_URL } from '../../constants/app';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '../../types/document-audit-logs';
 import type { RequestMetadata } from '../../universal/extract-request-metadata';
 import { getFile } from '../../universal/upload/get-file';
-import { createDocumentAuditLogData } from '../../utils/document-audit-logs';
+import { queueJob } from '../queue/job';
 
 export interface SendDocumentOptions {
   documentId: number;
@@ -86,8 +86,9 @@ export const sendCompletedEmail = async ({ documentId, requestMetadata }: SendDo
       ],
     });
 
-    await prisma.documentAuditLog.create({
-      data: createDocumentAuditLogData({
+    await queueJob({
+      job: 'create-document-audit-log',
+      args: {
         type: DOCUMENT_AUDIT_LOG_TYPE.EMAIL_SENT,
         documentId: document.id,
         user: null,
@@ -100,7 +101,7 @@ export const sendCompletedEmail = async ({ documentId, requestMetadata }: SendDo
           recipientRole: 'OWNER',
           isResending: false,
         },
-      }),
+      },
     });
   }
 
@@ -136,8 +137,9 @@ export const sendCompletedEmail = async ({ documentId, requestMetadata }: SendDo
         ],
       });
 
-      await prisma.documentAuditLog.create({
-        data: createDocumentAuditLogData({
+      await queueJob({
+        job: 'create-document-audit-log',
+        args: {
           type: DOCUMENT_AUDIT_LOG_TYPE.EMAIL_SENT,
           documentId: document.id,
           user: null,
@@ -150,7 +152,7 @@ export const sendCompletedEmail = async ({ documentId, requestMetadata }: SendDo
             recipientRole: recipient.role,
             isResending: false,
           },
-        }),
+        },
       });
     }),
   );

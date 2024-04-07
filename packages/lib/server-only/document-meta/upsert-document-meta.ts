@@ -2,11 +2,10 @@
 
 import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
 import type { RequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
-import {
-  createDocumentAuditLogData,
-  diffDocumentMetaChanges,
-} from '@documenso/lib/utils/document-audit-logs';
+import { diffDocumentMetaChanges } from '@documenso/lib/utils/document-audit-logs';
 import { prisma } from '@documenso/prisma';
+
+import { queueJob } from '../queue/job';
 
 export type CreateDocumentMetaOptions = {
   documentId: number;
@@ -65,46 +64,45 @@ export const upsertDocumentMeta = async ({
     },
   });
 
-  return await prisma.$transaction(async (tx) => {
-    const upsertedDocumentMeta = await tx.documentMeta.upsert({
-      where: {
+  const upsertedDocumentMeta = await prisma.documentMeta.upsert({
+    where: {
+      documentId,
+    },
+    create: {
+      subject,
+      message,
+      password,
+      dateFormat,
+      timezone,
+      documentId,
+      redirectUrl,
+    },
+    update: {
+      subject,
+      message,
+      password,
+      dateFormat,
+      timezone,
+      redirectUrl,
+    },
+  });
+
+  const changes = diffDocumentMetaChanges(originalDocumentMeta ?? {}, upsertedDocumentMeta);
+
+  if (changes.length > 0) {
+    await queueJob({
+      job: 'create-document-audit-log',
+      args: {
+        type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_META_UPDATED,
         documentId,
-      },
-      create: {
-        subject,
-        message,
-        password,
-        dateFormat,
-        timezone,
-        documentId,
-        redirectUrl,
-      },
-      update: {
-        subject,
-        message,
-        password,
-        dateFormat,
-        timezone,
-        redirectUrl,
+        user,
+        requestMetadata,
+        data: {
+          changes: diffDocumentMetaChanges(originalDocumentMeta ?? {}, upsertedDocumentMeta),
+        },
       },
     });
+  }
 
-    const changes = diffDocumentMetaChanges(originalDocumentMeta ?? {}, upsertedDocumentMeta);
-
-    if (changes.length > 0) {
-      await tx.documentAuditLog.create({
-        data: createDocumentAuditLogData({
-          type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_META_UPDATED,
-          documentId,
-          user,
-          requestMetadata,
-          data: {
-            changes: diffDocumentMetaChanges(originalDocumentMeta ?? {}, upsertedDocumentMeta),
-          },
-        }),
-      });
-    }
-
-    return upsertedDocumentMeta;
-  });
+  return upsertedDocumentMeta;
 };

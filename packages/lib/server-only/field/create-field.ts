@@ -2,7 +2,7 @@ import { prisma } from '@documenso/prisma';
 import type { FieldType, Team } from '@documenso/prisma/client';
 
 import type { RequestMetadata } from '../../universal/extract-request-metadata';
-import { createDocumentAuditLogData } from '../../utils/document-audit-logs';
+import { queueJob } from '../queue/job';
 
 export type CreateFieldOptions = {
   documentId: number;
@@ -103,8 +103,9 @@ export const createField = async ({
     },
   });
 
-  await prisma.documentAuditLog.create({
-    data: createDocumentAuditLogData({
+  await queueJob({
+    job: 'create-document-audit-log',
+    args: {
       type: 'FIELD_CREATED',
       documentId,
       user: {
@@ -119,7 +120,7 @@ export const createField = async ({
         fieldType: field.type,
       },
       requestMetadata,
-    }),
+    },
   });
 
   return field;

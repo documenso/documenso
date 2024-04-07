@@ -12,9 +12,9 @@ import { AppError, AppErrorCode } from '../../errors/app-error';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '../../types/document-audit-logs';
 import type { TRecipientActionAuth } from '../../types/document-auth';
 import type { RequestMetadata } from '../../universal/extract-request-metadata';
-import { createDocumentAuditLogData } from '../../utils/document-audit-logs';
 import { extractDocumentAuthMethods } from '../../utils/document-auth';
 import { isRecipientAuthorized } from '../document/is-recipient-authorized';
+import { queueJob } from '../queue/job';
 
 export type SignFieldWithTokenOptions = {
   token: string;
@@ -168,8 +168,9 @@ export const signFieldWithToken = async ({
       });
     }
 
-    await tx.documentAuditLog.create({
-      data: createDocumentAuditLogData({
+    await queueJob({
+      job: 'create-document-audit-log',
+      args: {
         type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_FIELD_INSERTED,
         documentId: document.id,
         user: {
@@ -199,7 +200,7 @@ export const signFieldWithToken = async ({
               }
             : undefined,
         },
-      }),
+      },
     });
 
     return updatedField;

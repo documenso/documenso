@@ -2,8 +2,9 @@
 
 import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
 import type { RequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
-import { createDocumentAuditLogData } from '@documenso/lib/utils/document-audit-logs';
 import { prisma } from '@documenso/prisma';
+
+import { queueJob } from '../queue/job';
 
 export type UpdateTitleOptions = {
   userId: number;
@@ -51,33 +52,32 @@ export const updateTitle = async ({
     return document;
   }
 
-  return await prisma.$transaction(async (tx) => {
-    // Instead of doing everything in a transaction we can use our knowledge
-    // of the current document title to ensure we aren't performing a conflicting
-    // update.
-    const updatedDocument = await tx.document.update({
-      where: {
-        id: documentId,
-        title: document.title,
-      },
-      data: {
-        title,
-      },
-    });
-
-    await tx.documentAuditLog.create({
-      data: createDocumentAuditLogData({
-        type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_TITLE_UPDATED,
-        documentId,
-        user,
-        requestMetadata,
-        data: {
-          from: document.title,
-          to: updatedDocument.title,
-        },
-      }),
-    });
-
-    return updatedDocument;
+  // Instead of doing everything in a transaction we can use our knowledge
+  // of the current document title to ensure we aren't performing a conflicting
+  // update.
+  const updatedDocument = await prisma.document.update({
+    where: {
+      id: documentId,
+      title: document.title,
+    },
+    data: {
+      title,
+    },
   });
+
+  await queueJob({
+    job: 'create-document-audit-log',
+    args: {
+      type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_TITLE_UPDATED,
+      documentId,
+      user,
+      requestMetadata,
+      data: {
+        from: document.title,
+        to: updatedDocument.title,
+      },
+    },
+  });
+
+  return updatedDocument;
 };

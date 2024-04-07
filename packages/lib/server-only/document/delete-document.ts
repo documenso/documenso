@@ -12,7 +12,7 @@ import { NEXT_PUBLIC_WEBAPP_URL } from '../../constants/app';
 import { FROM_ADDRESS, FROM_NAME } from '../../constants/email';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '../../types/document-audit-logs';
 import type { RequestMetadata } from '../../universal/extract-request-metadata';
-import { createDocumentAuditLogData } from '../../utils/document-audit-logs';
+import { queueJob } from '../queue/job';
 
 export type DeleteDocumentOptions = {
   id: number;
@@ -61,23 +61,22 @@ export const deleteDocument = async ({
 
   // if the document is a draft, hard-delete
   if (status === DocumentStatus.DRAFT) {
-    return await prisma.$transaction(async (tx) => {
-      // Currently redundant since deleting a document will delete the audit logs.
-      // However may be useful if we disassociate audit lgos and documents if required.
-      await tx.documentAuditLog.create({
-        data: createDocumentAuditLogData({
-          documentId: id,
-          type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_DELETED,
-          user,
-          requestMetadata,
-          data: {
-            type: 'HARD',
-          },
-        }),
-      });
-
-      return await tx.document.delete({ where: { id, status: DocumentStatus.DRAFT } });
+    // Currently redundant since deleting a document will delete the audit logs.
+    // However may be useful if we disassociate audit lgos and documents if required.
+    await queueJob({
+      job: 'create-document-audit-log',
+      args: {
+        documentId: id,
+        type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_DELETED,
+        user,
+        requestMetadata,
+        data: {
+          type: 'HARD',
+        },
+      },
     });
+
+    return await prisma.document.delete({ where: { id, status: DocumentStatus.DRAFT } });
   }
 
   // if the document is pending, send cancellation emails to all recipients
@@ -111,26 +110,25 @@ export const deleteDocument = async ({
   }
 
   // If the document is not a draft, only soft-delete.
-  return await prisma.$transaction(async (tx) => {
-    await tx.documentAuditLog.create({
-      data: createDocumentAuditLogData({
-        documentId: id,
-        type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_DELETED,
-        user,
-        requestMetadata,
-        data: {
-          type: 'SOFT',
-        },
-      }),
-    });
-
-    return await tx.document.update({
-      where: {
-        id,
-      },
+  await queueJob({
+    job: 'create-document-audit-log',
+    args: {
+      documentId: id,
+      type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_DELETED,
+      user,
+      requestMetadata,
       data: {
-        deletedAt: new Date().toISOString(),
+        type: 'SOFT',
       },
-    });
+    },
+  });
+
+  return await prisma.document.update({
+    where: {
+      id,
+    },
+    data: {
+      deletedAt: new Date().toISOString(),
+    },
   });
 };
