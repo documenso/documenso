@@ -18,8 +18,8 @@ import { putFile } from '../../universal/upload/put-file';
 import { flattenAnnotations } from '../pdf/flatten-annotations';
 import { insertFieldInPDF } from '../pdf/insert-field-in-pdf';
 import { normalizeSignatureAppearances } from '../pdf/normalize-signature-appearances';
+import { queueJob } from '../queue/job';
 import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
-import { sendCompletedEmail } from './send-completed-email';
 
 export type SealDocumentOptions = {
   documentId: number;
@@ -150,7 +150,10 @@ export const sealDocument = async ({
   });
 
   if (sendEmail && !isResealing) {
-    await sendCompletedEmail({ documentId, requestMetadata });
+    await queueJob({
+      job: 'send-completed-email',
+      args: { documentId, requestMetadata },
+    });
   }
 
   await triggerWebhook({

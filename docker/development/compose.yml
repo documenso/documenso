@@ -11,6 +11,17 @@ services:
     ports:
       - 54320:5432
 
+  queue:
+    image: postgres:15
+    container_name: queue
+    user: postgres
+    command: -c jit=off
+    environment:
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: queue
+    ports:
+      - 54321:5432
+
   inbucket:
     image: inbucket/inbucket
     container_name: mailserver
