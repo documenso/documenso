@@ -54,6 +54,7 @@ const DialogContent = React.forwardRef<
   React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content> & {
     position?: 'start' | 'end' | 'center';
     hideClose?: boolean;
+    /* Below prop is to add additional classes to the overlay */
     overlayClassName?: string;
   }
 >(
@@ -62,7 +63,6 @@ const DialogContent = React.forwardRef<
     ref,
   ) => (
     <DialogPortal position={position}>
-      {/* overlayClassName - To add additional classes to the overlay */}
       <DialogOverlay className={cn(overlayClassName)} />
       <DialogPrimitive.Content
         ref={ref}

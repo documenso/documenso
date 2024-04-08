@@ -55,7 +55,7 @@ type AvatarWithTextProps = {
   primaryText: React.ReactNode;
   secondaryText?: React.ReactNode;
   rightSideComponent?: React.ReactNode;
-  showText?: boolean;
+  textSectionClassName?: string;
 };
 
 const AvatarWithText = ({
@@ -65,7 +65,8 @@ const AvatarWithText = ({
   primaryText,
   secondaryText,
   rightSideComponent,
-  showText = true,
+  // Optional class to hide/show the text beside avatar
+  textSectionClassName,
 }: AvatarWithTextProps) => (
   <div className={cn('flex w-full max-w-xs items-center gap-2', className)}>
     <Avatar
@@ -75,7 +76,7 @@ const AvatarWithText = ({
     </Avatar>
 
     <div
-      className={cn('hidden flex-col text-left text-sm font-normal lg:flex', showText && 'flex')}
+      className={cn('hidden flex-col text-left text-sm font-normal lg:flex', textSectionClassName)}
     >
       <span className="text-foreground truncate">{primaryText}</span>
       <span className="text-muted-foreground truncate text-xs">{secondaryText}</span>
