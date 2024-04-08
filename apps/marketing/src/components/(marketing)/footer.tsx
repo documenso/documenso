@@ -13,6 +13,8 @@ import LogoImage from '@documenso/assets/logo.png';
 import { cn } from '@documenso/ui/lib/utils';
 import { ThemeSwitcher } from '@documenso/ui/primitives/theme-switcher';
 
+import { StatusWidgetContainer } from './status-widget-container';
+
 export type FooterProps = HTMLAttributes<HTMLDivElement>;
 
 const SOCIAL_LINKS = [
@@ -61,6 +63,10 @@ export const Footer = ({ className, ...props }: FooterProps) => {
                 {link.icon}
               </Link>
             ))}
+          </div>
+
+          <div className="mt-6">
+            <StatusWidgetContainer />
           </div>
         </div>
 
