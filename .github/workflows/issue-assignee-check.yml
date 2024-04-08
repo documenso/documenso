@@ -27,7 +27,7 @@ jobs:
 
       - name: Check Assigned User's Issue Count
         id: parse-comment
-        uses: actions/github-script@v5
+        uses: actions/github-script@v6
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
