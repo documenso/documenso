@@ -82,7 +82,7 @@ Contact us if you are interested in our Enterprise plan for large organizations 
 - [NextAuth.js](https://next-auth.js.org/) - Authentication
 - [react-email](https://react.email/) - Email Templates
 - [tRPC](https://trpc.io/) - API
-- [@documenso/pdf-sign](https://www.npmjs.com/package/@documenso/pdf-sign) - To sign pdf documents and is designed to be used with the Documenso platform
+- [@documenso/pdf-sign](https://www.npmjs.com/package/@documenso/pdf-sign) - To sign PDF documents and is designed to be used with the Documenso platform
 - [React-PDF](https://github.com/wojtekmaj/react-pdf) - Viewing PDFs
 - [PDF-Lib](https://github.com/Hopding/pdf-lib) - PDF manipulation
 - [Stripe](https://stripe.com/) - Payments
