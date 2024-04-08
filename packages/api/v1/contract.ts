@@ -68,7 +68,7 @@ export const ApiContractV1 = c.router(
       path: '/api/v1/documents/:id/download-from-db',
       responses: {
         200: c.otherResponse({
-          contentType: 'application/application-pdf',
+          contentType: 'application/pdf',
           body: c.type<Buffer>(),
         }),
         401: ZUnsuccessfulResponseSchema,
