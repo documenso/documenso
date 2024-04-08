@@ -153,9 +153,19 @@ export const sealDocument = async ({
     await sendCompletedEmail({ documentId, requestMetadata });
   }
 
+  const updatedDocument = await prisma.document.findFirstOrThrow({
+    where: {
+      id: document.id,
+    },
+    include: {
+      documentData: true,
+      Recipient: true,
+    },
+  });
+
   await triggerWebhook({
     event: WebhookTriggerEvents.DOCUMENT_COMPLETED,
-    data: document,
+    data: updatedDocument,
     userId: document.userId,
     teamId: document.teamId ?? undefined,
   });
