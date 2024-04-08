@@ -20,7 +20,6 @@ import { setRecipientsForDocument } from '@documenso/lib/server-only/recipient/s
 import { updateRecipient } from '@documenso/lib/server-only/recipient/update-recipient';
 import { createDocumentFromTemplate } from '@documenso/lib/server-only/template/create-document-from-template';
 import { extractNextApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
-import { getFile } from '@documenso/lib/universal/upload/get-file';
 import {
   getPresignGetUrl,
   getPresignPostUrl,
@@ -84,7 +83,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
     }
   }),
 
-  downloadSignedDocumentFromS3: authenticatedMiddleware(async (args, user, team) => {
+  downloadSignedDocument: authenticatedMiddleware(async (args, user, team) => {
     const { id: documentId } = args.params;
 
     try {
@@ -130,71 +129,6 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
       return {
         status: 200,
         body: { downloadUrl: url },
-      };
-    } catch (err) {
-      return {
-        status: 404,
-        body: {
-          message: 'Error downloading the document. Please try again.',
-        },
-      };
-    }
-  }),
-
-  downloadSignedDocumentFromDB: authenticatedMiddleware(async (args, user, team) => {
-    const { id: documentId } = args.params;
-    const { res } = args;
-
-    try {
-      if (process.env.NEXT_PUBLIC_UPLOAD_TRANSPORT !== 'database') {
-        return {
-          status: 500,
-          body: {
-            message: 'Please make sure the storage transport is set to database.',
-          },
-        };
-      }
-
-      const document = await getDocumentById({
-        id: Number(documentId),
-        userId: user.id,
-        teamId: team?.id,
-      });
-
-      if (
-        !document ||
-        !document.documentDataId ||
-        DocumentDataType.S3_PATH === document.documentData.type
-      ) {
-        return {
-          status: 404,
-          body: {
-            message: 'Document not found',
-          },
-        };
-      }
-
-      if (document.status !== DocumentStatus.COMPLETED) {
-        return {
-          status: 418,
-          body: {
-            message: 'Document is not completed yet.',
-          },
-        };
-      }
-
-      const bytes = await getFile(document.documentData);
-      const buffer = Buffer.from(bytes);
-
-      res.setHeader('Access-Control-Expose-Headers', 'Content-Disposition');
-      res.setHeader(
-        'Content-Disposition',
-        `attachment; filename="${encodeURIComponent(document.title)}"`,
-      );
-
-      return {
-        status: 200,
-        body: buffer,
       };
     } catch (err) {
       return {
