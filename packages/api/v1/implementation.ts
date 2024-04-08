@@ -125,7 +125,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
           return {
             status: 404,
             body: {
-              message: 'Error downloading the document. Please try again.',
+              message: 'Error generating the download URL. Please try again.',
             },
           };
         }
@@ -149,7 +149,6 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
         };
       }
     } catch (err) {
-      console.log(err);
       return {
         status: 404,
         body: {
