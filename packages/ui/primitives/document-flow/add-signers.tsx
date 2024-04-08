@@ -230,9 +230,7 @@ export const AddSignersFormPartial = ({
                           'col-span-4': showAdvancedSettings,
                         })}
                       >
-                        {!showAdvancedSettings && index === 0 && (
-                          <FormLabel required>Name</FormLabel>
-                        )}
+                        {!showAdvancedSettings && index === 0 && <FormLabel>Name</FormLabel>}
 
                         <FormControl>
                           <Input

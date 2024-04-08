@@ -72,6 +72,7 @@ type GetCountsOption = {
 
 const getCounts = async ({ user, createdAt }: GetCountsOption) => {
   return Promise.all([
+    // Owner counts.
     prisma.document.groupBy({
       by: ['status'],
       _count: {
@@ -84,6 +85,7 @@ const getCounts = async ({ user, createdAt }: GetCountsOption) => {
         deletedAt: null,
       },
     }),
+    // Not signed counts.
     prisma.document.groupBy({
       by: ['status'],
       _count: {
@@ -95,12 +97,13 @@ const getCounts = async ({ user, createdAt }: GetCountsOption) => {
           some: {
             email: user.email,
             signingStatus: SigningStatus.NOT_SIGNED,
+            documentDeletedAt: null,
           },
         },
         createdAt,
-        deletedAt: null,
       },
     }),
+    // Has signed counts.
     prisma.document.groupBy({
       by: ['status'],
       _count: {
@@ -120,9 +123,9 @@ const getCounts = async ({ user, createdAt }: GetCountsOption) => {
               some: {
                 email: user.email,
                 signingStatus: SigningStatus.SIGNED,
+                documentDeletedAt: null,
               },
             },
-            deletedAt: null,
           },
           {
             status: ExtendedDocumentStatus.COMPLETED,
@@ -130,6 +133,7 @@ const getCounts = async ({ user, createdAt }: GetCountsOption) => {
               some: {
                 email: user.email,
                 signingStatus: SigningStatus.SIGNED,
+                documentDeletedAt: null,
               },
             },
           },
@@ -198,6 +202,7 @@ const getTeamCounts = async (options: GetTeamCountsOption) => {
           some: {
             email: teamEmail,
             signingStatus: SigningStatus.NOT_SIGNED,
+            documentDeletedAt: null,
           },
         },
         deletedAt: null,
@@ -219,6 +224,7 @@ const getTeamCounts = async (options: GetTeamCountsOption) => {
               some: {
                 email: teamEmail,
                 signingStatus: SigningStatus.SIGNED,
+                documentDeletedAt: null,
               },
             },
             deletedAt: null,
@@ -229,6 +235,7 @@ const getTeamCounts = async (options: GetTeamCountsOption) => {
               some: {
                 email: teamEmail,
                 signingStatus: SigningStatus.SIGNED,
+                documentDeletedAt: null,
               },
             },
             deletedAt: null,

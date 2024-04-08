@@ -29,7 +29,7 @@ export type DocumentsDataTableProps = {
     }
   >;
   showSenderColumn?: boolean;
-  team?: Pick<Team, 'id' | 'url'>;
+  team?: Pick<Team, 'id' | 'url'> & { teamEmail?: string };
 };
 
 export const DocumentsDataTable = ({
