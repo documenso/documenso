@@ -79,6 +79,7 @@ export const createDocumentFromTemplate = async ({
           id: 'asc',
         },
       },
+      documentData: true,
     },
   });
 
