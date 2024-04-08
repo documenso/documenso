@@ -87,6 +87,15 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
     const { id: documentId } = args.params;
 
     try {
+      if (process.env.NEXT_PUBLIC_UPLOAD_TRANSPORT !== 's3') {
+        return {
+          status: 500,
+          body: {
+            message: 'Delete document is not available without S3 transport.',
+          },
+        };
+      }
+
       const document = await getDocumentById({
         id: Number(documentId),
         userId: user.id,
