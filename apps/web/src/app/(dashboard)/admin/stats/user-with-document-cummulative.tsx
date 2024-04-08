@@ -18,7 +18,7 @@ export const UserWithDocumentCummulativeChart = ({
     .reverse()
     .map(({ month, cume_count: count, cume_signed_count: signed_count }) => {
       return {
-        month: DateTime.fromFormat(month, 'yyyy-MM').toFormat('LLLL'),
+        month: DateTime.fromFormat(month, 'yyyy-MM').toFormat('LLL'),
         count: Number(count),
         signed_count: Number(signed_count),
       };

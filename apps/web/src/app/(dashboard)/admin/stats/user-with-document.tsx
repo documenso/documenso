@@ -13,7 +13,7 @@ export type UserWithDocumentChartProps = {
 export const UserWithDocumentChart = ({ className, data }: UserWithDocumentChartProps) => {
   const formattedData = [...data].reverse().map(({ month, count, signed_count }) => {
     return {
-      month: DateTime.fromFormat(month, 'yyyy-MM').toFormat('LLLL'),
+      month: DateTime.fromFormat(month, 'yyyy-MM').toFormat('LLL'),
       count: Number(count),
       signed_count: Number(signed_count),
     };

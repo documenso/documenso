@@ -60,7 +60,6 @@ export default async function AdminStatsPage() {
         <CardMetric icon={UserPlus2} title="App Version" value={`v${process.env.APP_VERSION}`} />
       </div>
 
-      {/* TODO: remove grid and see something */}
       <div className="mt-16 gap-8">
         <div>
           <h3 className="text-3xl font-semibold">User metrics</h3>
@@ -68,12 +67,12 @@ export default async function AdminStatsPage() {
           <div className="mb-8 mt-4 grid flex-1 grid-cols-1 gap-4 md:grid-cols-2">
             <CardMetric
               icon={File}
-              title="Users with document in the last month"
+              title="Users who sent one or more documents in the past month"
               value={userWithAtLeastOneDocumentPerMonth}
             />
             <CardMetric
               icon={File}
-              title="Users with signed document in the last month"
+              title="Users who sent one or more documents in the past month"
               value={userWithAtLeastOneDocumentSignedPerMonth}
             />
           </div>
@@ -83,7 +82,6 @@ export default async function AdminStatsPage() {
           <h3 className="text-3xl font-semibold">Document metrics</h3>
 
           <div className="mb-8 mt-4 grid flex-1 grid-cols-1 gap-4 md:grid-cols-2">
-            {/* <CardMetric icon={File} title="Total Documents" value={docStats.ALL} /> */}
             <CardMetric icon={FileEdit} title="Drafted Documents" value={docStats.DRAFT} />
             <CardMetric icon={FileClock} title="Pending Documents" value={docStats.PENDING} />
             <CardMetric icon={FileCheck} title="Completed Documents" value={docStats.COMPLETED} />
@@ -109,15 +107,9 @@ export default async function AdminStatsPage() {
       <div className="mt-16">
         <h3 className="text-3xl font-semibold">User Charts</h3>
 
-        <UserWithDocumentChart
-          data={MONTHLY_USERS_SIGNED}
-          className="col-span-12 mb-8 mt-4 lg:col-span-6"
-        />
+        <UserWithDocumentChart data={MONTHLY_USERS_SIGNED} className="mb-8 mt-4" />
 
-        <UserWithDocumentCummulativeChart
-          data={MONTHLY_USERS_SIGNED}
-          className="col-span-12 mb-8 mt-4 lg:col-span-6"
-        />
+        <UserWithDocumentCummulativeChart data={MONTHLY_USERS_SIGNED} className="mb-8 mt-4" />
       </div>
     </div>
   );
