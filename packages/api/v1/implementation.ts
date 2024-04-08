@@ -20,6 +20,7 @@ import { setRecipientsForDocument } from '@documenso/lib/server-only/recipient/s
 import { updateRecipient } from '@documenso/lib/server-only/recipient/update-recipient';
 import { createDocumentFromTemplate } from '@documenso/lib/server-only/template/create-document-from-template';
 import { extractNextApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
+import { getFile } from '@documenso/lib/universal/upload/get-file';
 import {
   getPresignGetUrl,
   getPresignPostUrl,
@@ -85,17 +86,9 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
 
   downloadSignedDocument: authenticatedMiddleware(async (args, user, team) => {
     const { id: documentId } = args.params;
+    const { res } = args;
 
     try {
-      if (process.env.NEXT_PUBLIC_UPLOAD_TRANSPORT !== 's3') {
-        return {
-          status: 500,
-          body: {
-            message: 'Delete document is not available without S3 transport.',
-          },
-        };
-      }
-
       const document = await getDocumentById({
         id: Number(documentId),
         userId: user.id,
@@ -113,20 +106,50 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
 
       if (document.status !== DocumentStatus.COMPLETED) {
         return {
-          status: 404,
+          status: 418,
           body: {
             message: 'Document is not completed yet.',
           },
         };
       }
 
-      const { url } = await getPresignGetUrl(document.documentData.data);
+      if (process.env.NEXT_PUBLIC_UPLOAD_TRANSPORT === 's3') {
+        try {
+          const { url } = await getPresignGetUrl(document.documentData.data);
 
-      return {
-        status: 200,
-        body: { downloadUrl: url },
-      };
+          return {
+            status: 200,
+            body: { downloadUrl: url },
+          };
+        } catch (err) {
+          return {
+            status: 404,
+            body: {
+              message: 'Error downloading the document. Please try again.',
+            },
+          };
+        }
+      } else {
+        const bytes = await getFile(document.documentData);
+        const buffer = Buffer.from(bytes);
+
+        res.setHeader('Access-Control-Expose-Headers', 'Content-Disposition');
+        res.setHeader('Content-Type', 'application/pdf');
+        res.setHeader(
+          'Content-Disposition',
+          `attachment; filename="${encodeURIComponent(document.title)}"`,
+        );
+        res.status(200).send(buffer);
+
+        return {
+          status: 200,
+          body: {
+            message: 'Document downloaded successfully',
+          },
+        };
+      }
     } catch (err) {
+      console.log(err);
       return {
         status: 404,
         body: {

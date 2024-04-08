@@ -53,9 +53,7 @@ export const ZUploadDocumentSuccessfulSchema = z.object({
   key: z.string(),
 });
 
-export const ZDownloadDocumentSuccessfulSchema = z.object({
-  downloadUrl: z.string(),
-});
+export const ZDownloadDocumentSuccessfulSchema = z.unknown();
 
 export type TUploadDocumentSuccessfulSchema = z.infer<typeof ZUploadDocumentSuccessfulSchema>;
 
