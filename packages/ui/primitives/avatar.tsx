@@ -55,6 +55,7 @@ type AvatarWithTextProps = {
   primaryText: React.ReactNode;
   secondaryText?: React.ReactNode;
   rightSideComponent?: React.ReactNode;
+  // Optional class to hide/show the text beside avatar
   textSectionClassName?: string;
 };
 
@@ -65,7 +66,6 @@ const AvatarWithText = ({
   primaryText,
   secondaryText,
   rightSideComponent,
-  // Optional class to hide/show the text beside avatar
   textSectionClassName,
 }: AvatarWithTextProps) => (
   <div className={cn('flex w-full max-w-xs items-center gap-2', className)}>

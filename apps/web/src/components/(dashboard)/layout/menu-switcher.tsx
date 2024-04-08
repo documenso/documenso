@@ -108,7 +108,7 @@ export const MenuSwitcher = ({ user, teams: initialTeamsData }: MenuSwitcherProp
       </DropdownMenuTrigger>
 
       <DropdownMenuContent
-        className={cn('z-[60] ml-4 w-full md:ml-0', teams ? 'min-w-[20rem]' : 'min-w-[12rem]')}
+        className={cn('z-[60] ml-3 w-full md:ml-0', teams ? 'min-w-[20rem]' : 'min-w-[12rem]')}
         align="end"
         forceMount
       >
