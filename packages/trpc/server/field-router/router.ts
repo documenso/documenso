@@ -52,20 +52,26 @@ export const fieldRouter = router({
     .mutation(async ({ input, ctx }) => {
       const { templateId, fields } = input;
 
-      await setFieldsForTemplate({
-        userId: ctx.user.id,
-        templateId,
-        fields: fields.map((field) => ({
-          id: field.nativeId,
-          signerEmail: field.signerEmail,
-          type: field.type,
-          pageNumber: field.pageNumber,
-          pageX: field.pageX,
-          pageY: field.pageY,
-          pageWidth: field.pageWidth,
-          pageHeight: field.pageHeight,
-        })),
-      });
+      try {
+        await setFieldsForTemplate({
+          userId: ctx.user.id,
+          templateId,
+          fields: fields.map((field) => ({
+            id: field.nativeId,
+            signerEmail: field.signerEmail,
+            type: field.type,
+            pageNumber: field.pageNumber,
+            pageX: field.pageX,
+            pageY: field.pageY,
+            pageWidth: field.pageWidth,
+            pageHeight: field.pageHeight,
+          })),
+        });
+      } catch (err) {
+        console.error(err);
+
+        throw err;
+      }
     }),
 
   signFieldWithToken: procedure
