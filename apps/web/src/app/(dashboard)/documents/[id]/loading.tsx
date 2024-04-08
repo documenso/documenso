@@ -16,7 +16,7 @@ export default function Loading() {
         Loading Document...
       </h1>
 
-      <div className="flex h-10 items-center space-x-4">
+      <div className="flex h-10 items-center">
         <Skeleton className="my-6 h-4 w-24 rounded-2xl" />
       </div>
 
