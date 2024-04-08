@@ -84,18 +84,88 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
     }
   }),
 
-  downloadSignedDocument: authenticatedMiddleware(async (args, user, team) => {
+  downloadSignedDocumentFromS3: authenticatedMiddleware(async (args, user, team) => {
     const { id: documentId } = args.params;
-    const { res } = args;
 
     try {
+      if (process.env.NEXT_PUBLIC_UPLOAD_TRANSPORT !== 's3') {
+        return {
+          status: 500,
+          body: {
+            message: 'Please make sure the storage transport is set to S3.',
+          },
+        };
+      }
+
       const document = await getDocumentById({
         id: Number(documentId),
         userId: user.id,
         teamId: team?.id,
       });
 
-      if (!document || !document.documentDataId) {
+      if (
+        !document ||
+        !document.documentDataId ||
+        DocumentDataType.S3_PATH !== document.documentData.type
+      ) {
+        return {
+          status: 404,
+          body: {
+            message: 'Document not found',
+          },
+        };
+      }
+
+      if (document.status !== DocumentStatus.COMPLETED) {
+        return {
+          status: 404,
+          body: {
+            message: 'Document is not completed yet.',
+          },
+        };
+      }
+
+      const { url } = await getPresignGetUrl(document.documentData.data);
+
+      return {
+        status: 200,
+        body: { downloadUrl: url },
+      };
+    } catch (err) {
+      return {
+        status: 404,
+        body: {
+          message: 'Error downloading the document. Please try again.',
+        },
+      };
+    }
+  }),
+
+  downloadSignedDocumentFromDB: authenticatedMiddleware(async (args, user, team) => {
+    const { id: documentId } = args.params;
+    const { res } = args;
+
+    try {
+      if (process.env.NEXT_PUBLIC_UPLOAD_TRANSPORT !== 'database') {
+        return {
+          status: 500,
+          body: {
+            message: 'Please make sure the storage transport is set to database.',
+          },
+        };
+      }
+
+      const document = await getDocumentById({
+        id: Number(documentId),
+        userId: user.id,
+        teamId: team?.id,
+      });
+
+      if (
+        !document ||
+        !document.documentDataId ||
+        DocumentDataType.S3_PATH === document.documentData.type
+      ) {
         return {
           status: 404,
           body: {
@@ -113,41 +183,19 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
         };
       }
 
-      if (process.env.NEXT_PUBLIC_UPLOAD_TRANSPORT === 's3') {
-        try {
-          const { url } = await getPresignGetUrl(document.documentData.data);
+      const bytes = await getFile(document.documentData);
+      const buffer = Buffer.from(bytes);
 
-          return {
-            status: 200,
-            body: { downloadUrl: url },
-          };
-        } catch (err) {
-          return {
-            status: 404,
-            body: {
-              message: 'Error generating the download URL. Please try again.',
-            },
-          };
-        }
-      } else {
-        const bytes = await getFile(document.documentData);
-        const buffer = Buffer.from(bytes);
+      res.setHeader('Access-Control-Expose-Headers', 'Content-Disposition');
+      res.setHeader(
+        'Content-Disposition',
+        `attachment; filename="${encodeURIComponent(document.title)}"`,
+      );
 
-        res.setHeader('Access-Control-Expose-Headers', 'Content-Disposition');
-        res.setHeader('Content-Type', 'application/pdf');
-        res.setHeader(
-          'Content-Disposition',
-          `attachment; filename="${encodeURIComponent(document.title)}"`,
-        );
-        res.status(200).send(buffer);
-
-        return {
-          status: 200,
-          body: {
-            message: 'Document downloaded successfully',
-          },
-        };
-      }
+      return {
+        status: 200,
+        body: buffer,
+      };
     } catch (err) {
       return {
         status: 404,

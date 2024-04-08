@@ -52,15 +52,29 @@ export const ApiContractV1 = c.router(
       summary: 'Get a single document',
     },
 
-    downloadSignedDocument: {
+    downloadSignedDocumentFromS3: {
       method: 'GET',
-      path: '/api/v1/documents/:id/download',
+      path: '/api/v1/documents/:id/download-from-s3',
       responses: {
         200: ZDownloadDocumentSuccessfulSchema,
         401: ZUnsuccessfulResponseSchema,
         404: ZUnsuccessfulResponseSchema,
       },
-      summary: 'Download a signed document',
+      summary: 'Download a signed document when the storage transport is S3',
+    },
+
+    downloadSignedDocumentFromDB: {
+      method: 'GET',
+      path: '/api/v1/documents/:id/download-from-db',
+      responses: {
+        200: c.otherResponse({
+          contentType: 'application/application-pdf',
+          body: c.type<Buffer>(),
+        }),
+        401: ZUnsuccessfulResponseSchema,
+        404: ZUnsuccessfulResponseSchema,
+      },
+      summary: 'Download a signed document when the storage transport is the db',
     },
 
     createDocument: {
