@@ -13,6 +13,7 @@ import { createField } from '@documenso/lib/server-only/field/create-field';
 import { deleteField } from '@documenso/lib/server-only/field/delete-field';
 import { getFieldById } from '@documenso/lib/server-only/field/get-field-by-id';
 import { updateField } from '@documenso/lib/server-only/field/update-field';
+import { insertFormValuesInPdf } from '@documenso/lib/server-only/pdf/insert-form-values-in-pdf';
 import { deleteRecipient } from '@documenso/lib/server-only/recipient/delete-recipient';
 import { getRecipientById } from '@documenso/lib/server-only/recipient/get-recipient-by-id';
 import { getRecipientsForDocument } from '@documenso/lib/server-only/recipient/get-recipients-for-document';
@@ -20,6 +21,8 @@ import { setRecipientsForDocument } from '@documenso/lib/server-only/recipient/s
 import { updateRecipient } from '@documenso/lib/server-only/recipient/update-recipient';
 import { createDocumentFromTemplate } from '@documenso/lib/server-only/template/create-document-from-template';
 import { extractNextApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
+import { getFile } from '@documenso/lib/universal/upload/get-file';
+import { putFile } from '@documenso/lib/universal/upload/put-file';
 import { getPresignPostUrl } from '@documenso/lib/universal/upload/server-actions';
 import { DocumentDataType, DocumentStatus, SigningStatus } from '@documenso/prisma/client';
 
@@ -156,6 +159,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
         title: body.title,
         userId: user.id,
         teamId: team?.id,
+        formValues: body.formValues,
         documentDataId: documentData.id,
         requestMetadata: extractNextApiRequestMetadata(args.req),
       });
@@ -217,12 +221,37 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
       recipients: body.recipients,
     });
 
+    let documentDataId = document.documentDataId;
+
+    if (body.formValues) {
+      const pdf = await getFile(document.documentData);
+
+      const prefilled = await insertFormValuesInPdf({
+        pdf: Buffer.from(pdf),
+        formValues: body.formValues,
+      });
+
+      const newDocumentData = await putFile({
+        name: fileName,
+        type: 'application/pdf',
+        arrayBuffer: async () => Promise.resolve(prefilled),
+      });
+
+      documentDataId = newDocumentData.id;
+    }
+
     await updateDocument({
       documentId: document.id,
       userId: user.id,
       teamId: team?.id,
       data: {
         title: fileName,
+        formValues: body.formValues,
+        documentData: {
+          connect: {
+            id: documentDataId,
+          },
+        },
       },
     });
 
