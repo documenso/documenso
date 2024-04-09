@@ -48,6 +48,7 @@ export const FRIENDLY_FIELD_TYPE: Record<FieldType, string> = {
   [FieldType.DATE]: 'Date',
   [FieldType.EMAIL]: 'Email',
   [FieldType.NAME]: 'Name',
+  [FieldType.CHECKBOX]: 'Checkbox',
 };
 
 export interface DocumentFlowStep {

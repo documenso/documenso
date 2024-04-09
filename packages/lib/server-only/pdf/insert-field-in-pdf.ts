@@ -1,6 +1,7 @@
 // https://github.com/Hopding/pdf-lib/issues/20#issuecomment-412852821
 import fontkit from '@pdf-lib/fontkit';
-import { PDFDocument, StandardFonts } from 'pdf-lib';
+import type { PDFDocument } from 'pdf-lib';
+import { StandardFonts } from 'pdf-lib';
 
 import {
   DEFAULT_HANDWRITING_FONT_SIZE,
@@ -18,6 +19,7 @@ export const insertFieldInPDF = async (pdf: PDFDocument, field: FieldWithSignatu
   );
 
   const isSignatureField = isSignatureFieldType(field.type);
+  const isCheckboxField = field.type === FieldType.CHECKBOX;
 
   pdf.registerFontkit(fontkit);
 
@@ -73,6 +75,28 @@ export const insertFieldInPDF = async (pdf: PDFDocument, field: FieldWithSignatu
       width: imageWidth,
       height: imageHeight,
     });
+  } else if (isCheckboxField) {
+    const form = pdf.getForm();
+    const checkBox = form.createCheckBox(`checkBox.field.${field.id}`);
+
+    const textX = fieldX + fieldWidth / 2;
+    let textY = fieldY + fieldHeight / 2;
+
+    textY = pageHeight - textY;
+
+    checkBox.addToPage(page, {
+      x: textX,
+      y: textY,
+      width: 16,
+      height: 16,
+      borderWidth: 1,
+    });
+
+    if (field.customText === '✓') {
+      checkBox.check();
+    }
+
+    form.getField(`checkBox.field.${field.id}`).enableReadOnly();
   } else {
     const longestLineInTextForWidth = field.customText
       .split('\n')
@@ -101,15 +125,4 @@ export const insertFieldInPDF = async (pdf: PDFDocument, field: FieldWithSignatu
   }
 
   return pdf;
-};
-
-export const insertFieldInPDFBytes = async (
-  pdf: ArrayBuffer | Uint8Array | string,
-  field: FieldWithSignature,
-) => {
-  const pdfDoc = await PDFDocument.load(pdf);
-
-  await insertFieldInPDF(pdfDoc, field);
-
-  return await pdfDoc.save();
 };

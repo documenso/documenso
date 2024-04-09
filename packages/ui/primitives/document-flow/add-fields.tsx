@@ -577,6 +577,28 @@ export const AddFieldsFormPartial = ({
                   </CardContent>
                 </Card>
               </button>
+
+              <button
+                type="button"
+                className="group h-full w-full"
+                onClick={() => setSelectedField(FieldType.CHECKBOX)}
+                onMouseDown={() => setSelectedField(FieldType.CHECKBOX)}
+                data-selected={selectedField === FieldType.CHECKBOX ? true : undefined}
+              >
+                <Card className="group-data-[selected]:border-documenso h-full w-full cursor-pointer group-disabled:opacity-50">
+                  <CardContent className="flex flex-col items-center justify-center px-6 py-4">
+                    <p
+                      className={cn(
+                        'text-muted-foreground group-data-[selected]:text-foreground text-xl font-medium',
+                      )}
+                    >
+                      {'Checkbox'}
+                    </p>
+
+                    <p className="text-muted-foreground mt-2 text-xs">Checkbox</p>
+                  </CardContent>
+                </Card>
+              </button>
             </fieldset>
           </div>
         </div>

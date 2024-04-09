@@ -147,6 +147,11 @@ export const AddSignatureFormPartial = ({
       return !form.formState.errors.customText;
     }
 
+    if (fieldType === FieldType.CHECKBOX) {
+      await form.trigger('customText');
+      return !form.formState.errors.customText;
+    }
+
     return true;
   };
 

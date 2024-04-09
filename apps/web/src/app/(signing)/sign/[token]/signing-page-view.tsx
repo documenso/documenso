@@ -12,6 +12,7 @@ import { LazyPDFViewer } from '@documenso/ui/primitives/lazy-pdf-viewer';
 
 import { truncateTitle } from '~/helpers/truncate-title';
 
+import { CheckboxField } from './checkbox-field';
 import { DateField } from './date-field';
 import { EmailField } from './email-field';
 import { SigningForm } from './form';
@@ -93,6 +94,9 @@ export const SigningPageView = ({ document, recipient, fields }: SigningPageView
             ))
             .with(FieldType.TEXT, () => (
               <TextField key={field.id} field={field} recipient={recipient} />
+            ))
+            .with(FieldType.CHECKBOX, () => (
+              <CheckboxField key={field.id} field={field} recipient={recipient} />
             ))
             .otherwise(() => null),
         )}
