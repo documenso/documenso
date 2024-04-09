@@ -1,7 +1,6 @@
 import { expect, test } from '@playwright/test';
 import path from 'node:path';
 
-import { getFieldByEmail } from '@documenso/lib/server-only/field/get-field-by-email';
 import { getRecipientByEmail } from '@documenso/lib/server-only/recipient/get-recipient-by-email';
 import { prisma } from '@documenso/prisma';
 import { DocumentStatus, FieldType, RecipientRole } from '@documenso/prisma/client';
@@ -569,10 +568,15 @@ test('[DOCUMENT_FLOW]: should be able to sign a document with custom date', asyn
   await page.waitForURL(`/sign/${token}/complete`);
   await expect(page.getByText('You have signed')).toBeVisible();
 
-  const field = await getFieldByEmail({
-    email: 'user1@example.com',
-    documentId: Number(documentId),
+  const field = await prisma.field.findFirst({
+    where: {
+      Recipient: {
+        email: 'user1@example.com',
+      },
+      documentId: Number(documentId),
+    },
   });
+
   expect(field?.customText).toBe(currentDate);
 
   // Check if document has been signed
