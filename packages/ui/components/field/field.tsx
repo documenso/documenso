@@ -18,6 +18,7 @@ export type FieldRootContainerProps = {
 export type FieldContainerPortalProps = {
   field: Field;
   className?: string;
+  raw?: boolean;
   children: React.ReactNode;
 };
 
@@ -44,7 +45,7 @@ export function FieldContainerPortal({
   );
 }
 
-export function FieldRootContainer({ field, children }: FieldContainerPortalProps) {
+export function FieldRootContainer({ field, children, raw = false }: FieldContainerPortalProps) {
   const [isValidating, setIsValidating] = useState(false);
 
   const ref = React.useRef<HTMLDivElement>(null);
@@ -71,21 +72,42 @@ export function FieldRootContainer({ field, children }: FieldContainerPortalProp
 
   return (
     <FieldContainerPortal field={field}>
-      <Card
-        id={`field-${field.id}`}
-        className={cn(
-          'field-card-container bg-background relative z-20 h-full w-full transition-all',
-          {
-            'border-orange-300 ring-1 ring-orange-300': !field.inserted && isValidating,
-          },
-        )}
-        ref={ref}
-        data-inserted={field.inserted ? 'true' : 'false'}
-      >
-        <CardContent className="text-foreground hover:shadow-primary-foreground group flex h-full w-full flex-col items-center justify-center p-2">
+      {!raw && (
+        <Card
+          id={`field-${field.id}`}
+          className={cn(
+            'field-card-container bg-background relative z-20 h-full w-full transition-all',
+            {
+              'border-orange-300 ring-1 ring-orange-300': !field.inserted && isValidating,
+            },
+          )}
+          ref={ref}
+          data-inserted={field.inserted ? 'true' : 'false'}
+        >
+          <CardContent className="text-foreground hover:shadow-primary-foreground group flex h-full w-full flex-col items-center justify-center p-2">
+            {children}
+          </CardContent>
+        </Card>
+      )}
+
+      {raw && (
+        <div
+          onClick={() => {
+            console.log('clickeddd');
+          }}
+          id={`field-${field.id}`}
+          className={cn(
+            'field-card-container bg-background relative z-20 h-full w-full transition-all',
+            {
+              'border-orange-300 ring-1 ring-orange-300': !field.inserted && isValidating,
+            },
+          )}
+          ref={ref}
+          data-inserted={field.inserted ? 'true' : 'false'}
+        >
           {children}
-        </CardContent>
-      </Card>
+        </div>
+      )}
     </FieldContainerPortal>
   );
 }

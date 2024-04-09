@@ -35,8 +35,10 @@ export type SignatureFieldProps = {
    */
   onSign?: (documentAuthValue?: TRecipientActionAuth) => Promise<void> | void;
   onRemove?: () => Promise<void> | void;
-  type?: 'Date' | 'Email' | 'Name' | 'Signature';
+  type?: 'Date' | 'Email' | 'Name' | 'Signature' | 'Checkbox';
   tooltipText?: string | null;
+
+  raw?: boolean;
 };
 
 export const SigningFieldContainer = ({
@@ -48,6 +50,7 @@ export const SigningFieldContainer = ({
   children,
   type,
   tooltipText,
+  raw = false,
 }: SignatureFieldProps) => {
   const { executeActionAuthProcedure, isAuthRedirectRequired } = useRequiredDocumentAuthContext();
 
@@ -103,7 +106,7 @@ export const SigningFieldContainer = ({
   };
 
   return (
-    <FieldRootContainer field={field}>
+    <FieldRootContainer raw={raw} field={field}>
       {!field.inserted && !loading && (
         <button
           type="submit"

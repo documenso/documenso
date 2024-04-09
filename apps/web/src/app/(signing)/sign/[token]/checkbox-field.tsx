@@ -1,10 +1,13 @@
 'use client';
 
-import { useEffect, useState, useTransition } from 'react';
+import { useState, useTransition } from 'react';
 
 import { useRouter } from 'next/navigation';
 
+import { zodResolver } from '@hookform/resolvers/zod';
 import { Loader } from 'lucide-react';
+import { useForm } from 'react-hook-form';
+import { z } from 'zod';
 
 import { DO_NOT_INVALIDATE_QUERY_ON_MUTATION } from '@documenso/lib/constants/trpc';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
@@ -12,12 +15,10 @@ import type { TRecipientActionAuth } from '@documenso/lib/types/document-auth';
 import type { Recipient } from '@documenso/prisma/client';
 import type { FieldWithSignature } from '@documenso/prisma/types/field-with-signature';
 import { trpc } from '@documenso/trpc/react';
-import { Button } from '@documenso/ui/primitives/button';
 import { Checkbox } from '@documenso/ui/primitives/checkbox';
-import { Dialog, DialogContent, DialogFooter, DialogTitle } from '@documenso/ui/primitives/dialog';
+import { Form, FormControl, FormField } from '@documenso/ui/primitives/form/form';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
-import { useRequiredDocumentAuthContext } from './document-auth-provider';
 import { SigningFieldContainer } from './signing-field-container';
 
 export type CheckboxFieldProps = {
@@ -25,12 +26,16 @@ export type CheckboxFieldProps = {
   recipient: Recipient;
 };
 
+const CheckBoxSchema = z.object({
+  check: z.boolean().default(false).optional(),
+});
+
 export const CheckboxField = ({ field, recipient }: CheckboxFieldProps) => {
   const router = useRouter();
 
   const { toast } = useToast();
 
-  const { executeActionAuthProcedure } = useRequiredDocumentAuthContext();
+  // const { executeActionAuthProcedure } = useRequiredDocumentAuthContext();
 
   const [isPending, startTransition] = useTransition();
 
@@ -44,30 +49,17 @@ export const CheckboxField = ({ field, recipient }: CheckboxFieldProps) => {
 
   const isLoading = isSignFieldWithTokenLoading || isRemoveSignedFieldWithTokenLoading || isPending;
 
-  const [showCustomTextModal, setShowCustomTextModal] = useState(false);
   const [localText, setLocalCustomText] = useState('');
 
-  useEffect(() => {
-    if (!showCustomTextModal) {
-      setLocalCustomText('');
-    }
-  }, [showCustomTextModal]);
-
-  /**
-   * When the user clicks the sign button in the dialog where they enter the text field.
-   */
-  const onDialogSignClick = () => {
-    setShowCustomTextModal(false);
-
-    void executeActionAuthProcedure({
-      onReauthFormSubmit: async (authOptions) => await onSign(authOptions),
-      actionTarget: field.type,
-    });
-  };
+  const form = useForm<z.infer<typeof CheckBoxSchema>>({
+    resolver: zodResolver(CheckBoxSchema),
+    defaultValues: {
+      check: true,
+    },
+  });
 
   const onPreSign = () => {
     if (!localText) {
-      setShowCustomTextModal(true);
       return false;
     }
 
@@ -127,13 +119,18 @@ export const CheckboxField = ({ field, recipient }: CheckboxFieldProps) => {
     }
   };
 
+  const onSubmit = (data: z.infer<typeof CheckBoxSchema>) => {
+    console.log(data);
+  };
+
   return (
     <SigningFieldContainer
       field={field}
       onPreSign={onPreSign}
       onSign={onSign}
       onRemove={onRemove}
-      type="Signature"
+      type="Checkbox"
+      raw={true}
     >
       {isLoading && (
         <div className="bg-background absolute inset-0 flex items-center justify-center rounded-md">
@@ -142,54 +139,37 @@ export const CheckboxField = ({ field, recipient }: CheckboxFieldProps) => {
       )}
 
       {!field.inserted && (
-        <p className="group-hover:text-primary text-muted-foreground text-lg duration-200">
-          Checkbox
-        </p>
+        // TODO: span with a box
+        // <p className="group-hover:text-primary text-muted-foreground text-lg duration-200">
+        //   Checkbox
+        // </p>
+
+        <Checkbox
+          id={`field-${field.id}`}
+          onClick={() => {
+            console.log('clicked checkbox');
+          }}
+          onCheckedChange={(checked) => {
+            setLocalCustomText(checked ? '✓' : '𐄂');
+          }}
+        />
       )}
 
       {field.inserted && <p className="text-muted-foreground duration-200">{field.customText}</p>}
 
-      {/* TODO : Avoid the whole dialog thing */}
-      <Dialog open={showCustomTextModal} onOpenChange={setShowCustomTextModal}>
-        <DialogContent>
-          <DialogTitle>Check Field</DialogTitle>
-
-          <div className="mt-4 flex items-center space-x-2">
-            <Checkbox
-              id="checkbox-field"
-              onCheckedChange={(checked) => {
-                setLocalCustomText(checked ? '✓' : '𐄂');
-              }}
-            />
-            <label
-              htmlFor="checkbox-field"
-              className="font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-            >
-              Check Field
-            </label>
-          </div>
-
-          <DialogFooter>
-            <div className="mt-4 flex w-full flex-1 flex-nowrap gap-4">
-              <Button
-                type="button"
-                className="dark:bg-muted dark:hover:bg-muted/80 flex-1  bg-black/5 hover:bg-black/10"
-                variant="secondary"
-                onClick={() => {
-                  setShowCustomTextModal(false);
-                  setLocalCustomText('');
-                }}
-              >
-                Cancel
-              </Button>
-
-              <Button type="button" className="flex-1" onClick={() => onDialogSignClick()}>
-                Save Checkbox
-              </Button>
-            </div>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)}>
+          <FormField
+            control={form.control}
+            name="check"
+            render={({ field }) => (
+              <FormControl>
+                <Checkbox checked={field.value} onCheckedChange={field.onChange} />
+              </FormControl>
+            )}
+          />
+        </form>
+      </Form>
     </SigningFieldContainer>
   );
 };
