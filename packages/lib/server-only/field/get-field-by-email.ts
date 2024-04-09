@@ -5,6 +5,7 @@ export type GetFieldByEmailOptions = {
   email: string;
 };
 
+// TODO: get rid of this thing
 export const getFieldByEmail = async ({ documentId, email }: GetFieldByEmailOptions) => {
   const field = await prisma.field.findFirst({
     where: {

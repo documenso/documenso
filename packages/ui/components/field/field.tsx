@@ -31,7 +31,7 @@ export function FieldContainerPortal({
   return createPortal(
     <div
       className={cn('absolute', className)}
-      data-testid="field"
+      data-testid="field" // TODO: remove this
       style={{
         top: `${coords.y}px`,
         left: `${coords.x}px`,
