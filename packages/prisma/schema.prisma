@@ -257,6 +257,7 @@ model Document {
   userId         Int
   User           User                @relation(fields: [userId], references: [id], onDelete: Cascade)
   authOptions    Json?
+  formValues     Json?
   title          String
   status         DocumentStatus      @default(DRAFT)
   Recipient      Recipient[]
