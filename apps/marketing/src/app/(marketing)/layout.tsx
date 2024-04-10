@@ -47,7 +47,7 @@ export default function MarketingLayout({ children }: MarketingLayoutProps) {
       >
         {showProfilesAnnouncementBar && (
           <div className="relative inline-flex w-full items-center justify-center overflow-hidden bg-[#e7f3df] px-4 py-2.5">
-            <div className="text-foreground text-center text-sm font-medium">
+            <div className="text-black text-center text-sm font-medium">
               Claim your documenso public profile username now!{' '}
               <span className="hidden font-semibold md:inline">documenso.com/u/yourname</span>
               <div className="mt-1.5 block md:ml-4 md:mt-0 md:inline-block">
