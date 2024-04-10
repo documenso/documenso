@@ -5,6 +5,7 @@ import React, { useId, useMemo, useState } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { motion } from 'framer-motion';
 import { InfoIcon, Plus, Trash } from 'lucide-react';
+import { useSession } from 'next-auth/react';
 import { useFieldArray, useForm } from 'react-hook-form';
 
 import { useLimits } from '@documenso/ee/server-only/limits/provider/client';
@@ -60,6 +61,9 @@ export const AddSignersFormPartial = ({
 }: AddSignersFormProps) => {
   const { toast } = useToast();
   const { remaining } = useLimits();
+  const { data: session } = useSession();
+  const user = session?.user;
+  const [selfSignerFormId, setSelfSignerFormId] = useState<string | undefined>(undefined);
 
   const initialId = useId();
 
@@ -135,6 +139,20 @@ export const AddSignersFormPartial = ({
     );
   };
 
+  const onAddSelfSigner = () => {
+    const newSelfSignerId = nanoid(12);
+
+    appendSigner({
+      formId: newSelfSignerId,
+      name: user?.name ?? '',
+      email: user?.email ?? '',
+      role: RecipientRole.SIGNER,
+      actionAuth: undefined,
+    });
+
+    setSelfSignerFormId(newSelfSignerId);
+  };
+
   const onAddSigner = () => {
     appendSigner({
       formId: nanoid(12),
@@ -156,6 +174,10 @@ export const AddSignersFormPartial = ({
       });
 
       return;
+    }
+
+    if (signer.formId === selfSignerFormId) {
+      setSelfSignerFormId(undefined);
     }
 
     removeSigner(index);
@@ -209,8 +231,13 @@ export const AddSignersFormPartial = ({
                           <Input
                             type="email"
                             placeholder="Email"
-                            disabled={isSubmitting || hasBeenSentToRecipientId(signer.nativeId)}
                             {...field}
+                            disabled={
+                              isSubmitting ||
+                              hasBeenSentToRecipientId(signer.nativeId) ||
+                              signer.formId === selfSignerFormId ||
+                              signers[index].email === user?.email
+                            }
                             onKeyDown={onKeyDown}
                           />
                         </FormControl>
@@ -237,8 +264,13 @@ export const AddSignersFormPartial = ({
                         <FormControl>
                           <Input
                             placeholder="Name"
-                            disabled={isSubmitting || hasBeenSentToRecipientId(signer.nativeId)}
                             {...field}
+                            disabled={
+                              isSubmitting ||
+                              hasBeenSentToRecipientId(signer.nativeId) ||
+                              signer.formId === selfSignerFormId ||
+                              signers[index].email === user?.email
+                            }
                             onKeyDown={onKeyDown}
                           />
                         </FormControl>
@@ -258,7 +290,12 @@ export const AddSignersFormPartial = ({
                             <Select
                               {...field}
                               onValueChange={field.onChange}
-                              disabled={isSubmitting || hasBeenSentToRecipientId(signer.nativeId)}
+                              disabled={
+                                isSubmitting ||
+                                hasBeenSentToRecipientId(signer.nativeId) ||
+                                signer.formId === selfSignerFormId ||
+                                signers[index].email === user?.email
+                              }
                             >
                               <SelectTrigger className="bg-background text-muted-foreground">
                                 <SelectValue placeholder="Inherit authentication method" />
@@ -330,7 +367,12 @@ export const AddSignersFormPartial = ({
                           <Select
                             {...field}
                             onValueChange={field.onChange}
-                            disabled={isSubmitting || hasBeenSentToRecipientId(signer.nativeId)}
+                            disabled={
+                              isSubmitting ||
+                              hasBeenSentToRecipientId(signer.nativeId) ||
+                              signer.formId === selfSignerFormId ||
+                              signers[index].email === user?.email
+                            }
                           >
                             <SelectTrigger className="bg-background w-[60px]">
                               {/* eslint-disable-next-line @typescript-eslint/consistent-type-assertions */}
@@ -403,11 +445,27 @@ export const AddSignersFormPartial = ({
             >
               <Button
                 type="button"
+                className="flex-1"
                 disabled={isSubmitting || signers.length >= remaining.recipients}
                 onClick={() => onAddSigner()}
               >
                 <Plus className="-ml-1 mr-2 h-5 w-5" />
                 Add Signer
+              </Button>
+              <Button
+                type="button"
+                variant="secondary"
+                className="dark:bg-muted dark:hover:bg-muted/80 bg-black/5 hover:bg-black/10"
+                disabled={
+                  isSubmitting ||
+                  signers.length >= remaining.recipients ||
+                  !!selfSignerFormId ||
+                  signers.some((signer) => signer.email === user?.email)
+                }
+                onClick={() => onAddSelfSigner()}
+              >
+                <Plus className="-ml-1 mr-2 h-5 w-5" />
+                Add myself
               </Button>
 
               {!alwaysShowAdvancedSettings && isDocumentEnterprise && (
