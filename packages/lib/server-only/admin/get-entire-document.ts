@@ -10,6 +10,14 @@ export const getEntireDocument = async ({ id }: GetEntireDocumentOptions) => {
       id,
     },
     include: {
+      documentMeta: true,
+      User: {
+        select: {
+          id: true,
+          name: true,
+          email: true,
+        },
+      },
       Recipient: {
         include: {
           Field: {
