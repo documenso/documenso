@@ -230,10 +230,14 @@ export default async function SigningCertificate({ searchParams }: SigningCertif
                         <p className="text-muted-foreground text-sm print:text-xs">
                           <span className="font-medium">Sent:</span>{' '}
                           <span className="inline-block">
-                            <LocaleDate
-                              date={logs.EMAIL_SENT[0]?.createdAt}
-                              format="yyyy-MM-dd hh:mm:ss a (ZZZZ)"
-                            />
+                            {logs.EMAIL_SENT[0] ? (
+                              <LocaleDate
+                                date={logs.EMAIL_SENT[0].createdAt}
+                                format="yyyy-MM-dd hh:mm:ss a (ZZZZ)"
+                              />
+                            ) : (
+                              'Unknown'
+                            )}
                           </span>
                         </p>
 
