@@ -207,14 +207,16 @@ export default async function SigningCertificate({ searchParams }: SigningCertif
                           <p className="text-muted-foreground mt-2 text-sm print:text-xs">
                             <span className="font-medium">IP Address:</span>{' '}
                             <span className="inline-block">
-                              {logs.DOCUMENT_RECIPIENT_COMPLETED[0].ipAddress}
+                              {logs.DOCUMENT_RECIPIENT_COMPLETED[0]?.ipAddress ?? 'Unknown'}
                             </span>
                           </p>
 
                           <p className="text-muted-foreground mt-1 text-sm print:text-xs">
                             <span className="font-medium">Device:</span>{' '}
                             <span className="inline-block">
-                              {getDevice(logs.DOCUMENT_RECIPIENT_COMPLETED[0].userAgent)}
+                              {getDevice(
+                                logs.DOCUMENT_RECIPIENT_COMPLETED[0]?.userAgent ?? 'Unknown',
+                              )}
                             </span>
                           </p>
                         </>
@@ -229,7 +231,7 @@ export default async function SigningCertificate({ searchParams }: SigningCertif
                           <span className="font-medium">Sent:</span>{' '}
                           <span className="inline-block">
                             <LocaleDate
-                              date={logs.EMAIL_SENT[0].createdAt}
+                              date={logs.EMAIL_SENT[0]?.createdAt}
                               format="yyyy-MM-dd hh:mm:ss a (ZZZZ)"
                             />
                           </span>
@@ -238,20 +240,28 @@ export default async function SigningCertificate({ searchParams }: SigningCertif
                         <p className="text-muted-foreground text-sm print:text-xs">
                           <span className="font-medium">Viewed:</span>{' '}
                           <span className="inline-block">
-                            <LocaleDate
-                              date={logs.DOCUMENT_OPENED[0].createdAt}
-                              format="yyyy-MM-dd hh:mm:ss a (ZZZZ)"
-                            />
+                            {logs.DOCUMENT_OPENED[0] ? (
+                              <LocaleDate
+                                date={logs.DOCUMENT_OPENED[0].createdAt}
+                                format="yyyy-MM-dd hh:mm:ss a (ZZZZ)"
+                              />
+                            ) : (
+                              'Unknown'
+                            )}
                           </span>
                         </p>
 
                         <p className="text-muted-foreground text-sm print:text-xs">
                           <span className="font-medium">Signed:</span>{' '}
                           <span className="inline-block">
-                            <LocaleDate
-                              date={logs.DOCUMENT_RECIPIENT_COMPLETED[0].createdAt}
-                              format="yyyy-MM-dd hh:mm:ss a (ZZZZ)"
-                            />
+                            {logs.DOCUMENT_RECIPIENT_COMPLETED[0] ? (
+                              <LocaleDate
+                                date={logs.DOCUMENT_RECIPIENT_COMPLETED[0].createdAt}
+                                format="yyyy-MM-dd hh:mm:ss a (ZZZZ)"
+                              />
+                            ) : (
+                              'Unknown'
+                            )}
                           </span>
                         </p>
 
