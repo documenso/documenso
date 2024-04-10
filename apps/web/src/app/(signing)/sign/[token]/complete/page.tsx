@@ -96,7 +96,8 @@ export default async function CompletedSigningPage({
     >
       <div
         className={cn('relative mt-6 flex w-full flex-col items-center justify-center', {
-          'flex-col divide-y overflow-hidden lg:flex-row lg:divide-x lg:divide-y-0': canSignUp,
+          'flex-col divide-y overflow-hidden md:pt-16 lg:flex-row lg:divide-x lg:divide-y-0 lg:pt-20 xl:pt-24':
+            canSignUp,
         })}
       >
         <div
