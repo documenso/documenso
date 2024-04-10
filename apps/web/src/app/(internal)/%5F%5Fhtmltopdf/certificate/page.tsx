@@ -2,6 +2,7 @@ import React from 'react';
 
 import { redirect } from 'next/navigation';
 
+import { match } from 'ts-pattern';
 import { UAParser } from 'ua-parser-js';
 
 import {
@@ -95,26 +96,19 @@ export default async function SigningCertificate({ searchParams }: SigningCertif
       recipientAuth: recipient.authOptions,
     });
 
-    let authLevel = 'Email';
+    let authLevel = match(extractedAuthMethods.derivedRecipientActionAuth)
+      .with('ACCOUNT', () => 'Account Re-Authentication')
+      .with('TWO_FACTOR_AUTH', () => 'Two-Factor Re-Authentication')
+      .with('PASSKEY', () => 'Passkey Re-Authentication')
+      .with('EXPLICIT_NONE', () => 'Email')
+      .with(null, () => null)
+      .exhaustive();
 
-    if (extractedAuthMethods.derivedRecipientAccessAuth === 'ACCOUNT') {
-      authLevel = 'Account Authentication';
-    }
-
-    if (extractedAuthMethods.derivedRecipientActionAuth === 'ACCOUNT') {
-      authLevel = 'Account Re-Authentication';
-    }
-
-    if (extractedAuthMethods.derivedRecipientActionAuth === 'TWO_FACTOR_AUTH') {
-      authLevel = 'Two-Factor Re-Authentication';
-    }
-
-    if (extractedAuthMethods.derivedRecipientActionAuth === 'PASSKEY') {
-      authLevel = 'Passkey Re-Authentication';
-    }
-
-    if (extractedAuthMethods.derivedRecipientActionAuth === 'EXPLICIT_NONE') {
-      authLevel = 'Email';
+    if (!authLevel) {
+      authLevel = match(extractedAuthMethods.derivedRecipientAccessAuth)
+        .with('ACCOUNT', () => 'Account Authentication')
+        .with(null, () => 'Email')
+        .exhaustive();
     }
 
     return authLevel;
