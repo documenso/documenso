@@ -1,7 +1,10 @@
 import { TRPCError } from '@trpc/server';
+import { DateTime } from 'luxon';
 
 import { getServerLimits } from '@documenso/ee/server-only/limits/server';
+import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { DOCUMENSO_ENCRYPTION_KEY } from '@documenso/lib/constants/crypto';
+import { encryptSecondaryData } from '@documenso/lib/server-only/crypto/encrypt';
 import { upsertDocumentMeta } from '@documenso/lib/server-only/document-meta/upsert-document-meta';
 import { createDocument } from '@documenso/lib/server-only/document/create-document';
 import { deleteDocument } from '@documenso/lib/server-only/document/delete-document';
@@ -22,6 +25,7 @@ import { authenticatedProcedure, procedure, router } from '../trpc';
 import {
   ZCreateDocumentMutationSchema,
   ZDeleteDraftDocumentMutationSchema as ZDeleteDocumentMutationSchema,
+  ZDownloadAuditLogsMutationSchema,
   ZFindDocumentAuditLogsQuerySchema,
   ZGetDocumentByIdQuerySchema,
   ZGetDocumentByTokenQuerySchema,
@@ -361,6 +365,68 @@ export const documentRouter = router({
         throw new TRPCError({
           code: 'BAD_REQUEST',
           message: 'We are unable to search for documents. Please try again later.',
+        });
+      }
+    }),
+
+  downloadAuditLogs: authenticatedProcedure
+    .input(ZDownloadAuditLogsMutationSchema)
+    .mutation(async ({ input, ctx }) => {
+      try {
+        const { documentId, teamId } = input;
+
+        const document = await getDocumentById({
+          id: documentId,
+          userId: ctx.user.id,
+          teamId,
+        });
+
+        const encrypted = encryptSecondaryData({
+          data: document.id.toString(),
+          expiresAt: DateTime.now().plus({ minutes: 5 }).toJSDate().valueOf(),
+        });
+
+        return {
+          url: `${NEXT_PUBLIC_WEBAPP_URL()}/__htmltopdf/audit-log?d=${encrypted}`,
+        };
+      } catch (err) {
+        console.error(err);
+
+        throw new TRPCError({
+          code: 'BAD_REQUEST',
+          message:
+            'We were unable to download the audit logs for this document. Please try again later.',
+        });
+      }
+    }),
+
+  downloadCertificate: authenticatedProcedure
+    .input(ZDownloadAuditLogsMutationSchema)
+    .mutation(async ({ input, ctx }) => {
+      try {
+        const { documentId, teamId } = input;
+
+        const document = await getDocumentById({
+          id: documentId,
+          userId: ctx.user.id,
+          teamId,
+        });
+
+        const encrypted = encryptSecondaryData({
+          data: document.id.toString(),
+          expiresAt: DateTime.now().plus({ minutes: 5 }).toJSDate().valueOf(),
+        });
+
+        return {
+          url: `${NEXT_PUBLIC_WEBAPP_URL()}/__htmltopdf/certificate?d=${encrypted}`,
+        };
+      } catch (err) {
+        console.error(err);
+
+        throw new TRPCError({
+          code: 'BAD_REQUEST',
+          message:
+            'We were unable to download the audit logs for this document. Please try again later.',
         });
       }
     }),

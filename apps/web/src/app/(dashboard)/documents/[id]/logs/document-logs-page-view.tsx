@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 
-import { ChevronLeft, DownloadIcon } from 'lucide-react';
+import { ChevronLeft } from 'lucide-react';
 import { DateTime } from 'luxon';
 
 import { getRequiredServerComponentSession } from '@documenso/lib/next-auth/get-server-component-session';
@@ -10,7 +10,6 @@ import { getLocale } from '@documenso/lib/server-only/headers/get-locale';
 import { getRecipientsForDocument } from '@documenso/lib/server-only/recipient/get-recipients-for-document';
 import { formatDocumentsPath } from '@documenso/lib/utils/teams';
 import type { Recipient, Team } from '@documenso/prisma/client';
-import { Button } from '@documenso/ui/primitives/button';
 import { Card } from '@documenso/ui/primitives/card';
 
 import {
@@ -19,6 +18,8 @@ import {
 } from '~/components/formatter/document-status';
 
 import { DocumentLogsDataTable } from './document-logs-data-table';
+import { DownloadAuditLogButton } from './download-audit-log-button';
+import { DownloadCertificateButton } from './download-certificate-button';
 
 export type DocumentLogsPageViewProps = {
   params: {
@@ -132,15 +133,9 @@ export const DocumentLogsPageView = async ({ params, team }: DocumentLogsPageVie
         </div>
 
         <div className="mt-4 flex w-full flex-row sm:mt-0 sm:w-auto sm:self-end">
-          <Button variant="outline" className="mr-2 w-full sm:w-auto">
-            <DownloadIcon className="mr-1.5 h-4 w-4" />
-            Download certificate
-          </Button>
+          <DownloadCertificateButton className="mr-2" documentId={document.id} />
 
-          <Button className="w-full sm:w-auto">
-            <DownloadIcon className="mr-1.5 h-4 w-4" />
-            Download PDF
-          </Button>
+          <DownloadAuditLogButton documentId={document.id} />
         </div>
       </div>
 

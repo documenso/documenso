@@ -61,6 +61,9 @@ declare namespace NodeJS {
 
     NEXT_PUBLIC_DISABLE_SIGNUP?: string;
 
+    //
+    NEXT_PRIVATE_BROWSERLESS_URL?: string;
+
     /**
      * Vercel environment variables
      */
