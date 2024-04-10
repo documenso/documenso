@@ -12,10 +12,7 @@ import { getEntireDocument } from '@documenso/lib/server-only/admin/get-entire-d
 import { decryptSecondaryData } from '@documenso/lib/server-only/crypto/decrypt';
 import { getDocumentCertificateAuditLogs } from '@documenso/lib/server-only/document/get-document-certificate-audit-logs';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
-import {
-  ZDocumentAuthOptionsSchema,
-  ZRecipientAuthOptionsSchema,
-} from '@documenso/lib/types/document-auth';
+import { extractDocumentAuthMethods } from '@documenso/lib/utils/document-auth';
 import { FieldType } from '@documenso/prisma/client';
 import { Card, CardContent } from '@documenso/ui/primitives/card';
 import {
@@ -93,40 +90,30 @@ export default async function SigningCertificate({ searchParams }: SigningCertif
       return 'Unknown';
     }
 
-    const documentAuthOptions = ZDocumentAuthOptionsSchema.parse(document.authOptions);
-    const recipientAuthOptions = ZRecipientAuthOptionsSchema.parse(recipient.authOptions);
+    const extractedAuthMethods = extractDocumentAuthMethods({
+      documentAuth: document.authOptions,
+      recipientAuth: recipient.authOptions,
+    });
 
     let authLevel = 'Email';
 
-    if (
-      documentAuthOptions.globalAccessAuth === 'ACCOUNT' ||
-      recipientAuthOptions.accessAuth === 'ACCOUNT'
-    ) {
+    if (extractedAuthMethods.derivedRecipientAccessAuth === 'ACCOUNT') {
       authLevel = 'Account Authentication';
     }
 
-    if (
-      documentAuthOptions.globalActionAuth === 'ACCOUNT' ||
-      recipientAuthOptions.actionAuth === 'ACCOUNT'
-    ) {
+    if (extractedAuthMethods.derivedRecipientActionAuth === 'ACCOUNT') {
       authLevel = 'Account Re-Authentication';
     }
 
-    if (
-      documentAuthOptions.globalActionAuth === 'TWO_FACTOR_AUTH' ||
-      recipientAuthOptions.actionAuth === 'TWO_FACTOR_AUTH'
-    ) {
-      authLevel = 'Two Factor Re-Authentication';
+    if (extractedAuthMethods.derivedRecipientActionAuth === 'TWO_FACTOR_AUTH') {
+      authLevel = 'Two-Factor Re-Authentication';
     }
 
-    if (
-      documentAuthOptions.globalActionAuth === 'PASSKEY' ||
-      recipientAuthOptions.actionAuth === 'PASSKEY'
-    ) {
+    if (extractedAuthMethods.derivedRecipientActionAuth === 'PASSKEY') {
       authLevel = 'Passkey Re-Authentication';
     }
 
-    if (recipientAuthOptions.actionAuth === 'EXPLICIT_NONE') {
+    if (extractedAuthMethods.derivedRecipientActionAuth === 'EXPLICIT_NONE') {
       authLevel = 'Email';
     }
 
@@ -284,13 +271,6 @@ export default async function SigningCertificate({ searchParams }: SigningCertif
                         </p>
                       </div>
                     </TableCell>
-
-                    {/* <TableCell truncate={false} className="w-[min-content] align-top">
-                      <p className="text-sm text-muted-foreground print:text-xs">
-                        Authentication: {'<authentication>'}
-                      </p>
-                      <p className="text-sm text-muted-foreground print:text-xs">IP: {'<ip>'}</p>
-                    </TableCell> */}
                   </TableRow>
                 );
               })}

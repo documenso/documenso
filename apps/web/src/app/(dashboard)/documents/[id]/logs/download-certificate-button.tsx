@@ -5,6 +5,7 @@ import { DownloadIcon } from 'lucide-react';
 import { trpc } from '@documenso/trpc/react';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
+import { useToast } from '@documenso/ui/primitives/use-toast';
 
 export type DownloadCertificateButtonProps = {
   className?: string;
@@ -15,40 +16,52 @@ export const DownloadCertificateButton = ({
   className,
   documentId,
 }: DownloadCertificateButtonProps) => {
+  const { toast } = useToast();
+
   const { mutateAsync: downloadCertificate, isLoading } =
     trpc.document.downloadCertificate.useMutation();
 
   const onDownloadCertificatesClick = async () => {
-    const { url } = await downloadCertificate({ documentId });
+    try {
+      const { url } = await downloadCertificate({ documentId });
 
-    const iframe = Object.assign(document.createElement('iframe'), {
-      src: url,
-    });
+      const iframe = Object.assign(document.createElement('iframe'), {
+        src: url,
+      });
 
-    Object.assign(iframe.style, {
-      position: 'fixed',
-      top: '0',
-      left: '0',
-      width: '0',
-      height: '0',
-    });
+      Object.assign(iframe.style, {
+        position: 'fixed',
+        top: '0',
+        left: '0',
+        width: '0',
+        height: '0',
+      });
 
-    const onLoaded = () => {
-      if (iframe.contentDocument?.readyState === 'complete') {
-        iframe.contentWindow?.print();
+      const onLoaded = () => {
+        if (iframe.contentDocument?.readyState === 'complete') {
+          iframe.contentWindow?.print();
 
-        iframe.contentWindow?.addEventListener('afterprint', () => {
-          document.body.removeChild(iframe);
-        });
-      }
-    };
+          iframe.contentWindow?.addEventListener('afterprint', () => {
+            document.body.removeChild(iframe);
+          });
+        }
+      };
 
-    // When the iframe has loaded, print the iframe and remove it from the dom
-    iframe.addEventListener('load', onLoaded);
+      // When the iframe has loaded, print the iframe and remove it from the dom
+      iframe.addEventListener('load', onLoaded);
 
-    document.body.appendChild(iframe);
+      document.body.appendChild(iframe);
 
-    onLoaded();
+      onLoaded();
+    } catch (error) {
+      console.error(error);
+
+      toast({
+        title: 'Something went wrong',
+        description: 'Sorry, we were unable to download the certificate. Please try again later.',
+        variant: 'destructive',
+      });
+    }
   };
 
   return (
