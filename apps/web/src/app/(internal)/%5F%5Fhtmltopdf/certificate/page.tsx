@@ -214,9 +214,7 @@ export default async function SigningCertificate({ searchParams }: SigningCertif
                           <p className="text-muted-foreground mt-1 text-sm print:text-xs">
                             <span className="font-medium">Device:</span>{' '}
                             <span className="inline-block">
-                              {getDevice(
-                                logs.DOCUMENT_RECIPIENT_COMPLETED[0]?.userAgent ?? 'Unknown',
-                              )}
+                              {getDevice(logs.DOCUMENT_RECIPIENT_COMPLETED[0]?.userAgent)}
                             </span>
                           </p>
                         </>
