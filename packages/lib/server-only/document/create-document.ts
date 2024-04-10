@@ -14,6 +14,7 @@ export type CreateDocumentOptions = {
   userId: number;
   teamId?: number;
   documentDataId: string;
+  formValues?: Record<string, string | number | boolean>;
   requestMetadata?: RequestMetadata;
 };
 
@@ -22,6 +23,7 @@ export const createDocument = async ({
   title,
   documentDataId,
   teamId,
+  formValues,
   requestMetadata,
 }: CreateDocumentOptions) => {
   const user = await prisma.user.findFirstOrThrow({
@@ -51,6 +53,7 @@ export const createDocument = async ({
         documentDataId,
         userId,
         teamId,
+        formValues,
       },
     });
 
