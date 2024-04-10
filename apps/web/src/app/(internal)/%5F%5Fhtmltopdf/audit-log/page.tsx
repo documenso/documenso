@@ -23,15 +23,13 @@ export default async function AuditLog({ searchParams }: AuditLogProps) {
   const { d } = searchParams;
 
   if (typeof d !== 'string' || !d) {
-    // return redirect('/');
+    return redirect('/');
   }
 
-  let rawDocumentId = decryptSecondaryData(d);
+  const rawDocumentId = decryptSecondaryData(d);
 
   if (!rawDocumentId || isNaN(Number(rawDocumentId))) {
-    // return redirect('/');
-
-    rawDocumentId = '31';
+    return redirect('/');
   }
 
   const documentId = Number(rawDocumentId);
