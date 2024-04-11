@@ -1,0 +1,10 @@
+{
+  "index": "My Homepage",
+  "contact": "Contact Us",
+  "about": "About Us",
+  "GitHub": {
+    "text": "View on GitHub",
+    "href": "https://documen.so/github",
+    "newWindow": true
+  }
+}
