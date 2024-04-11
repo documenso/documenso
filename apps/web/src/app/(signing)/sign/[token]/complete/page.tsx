@@ -91,12 +91,12 @@ export default async function CompletedSigningPage({
     <div
       className={cn(
         '-mx-4 flex flex-col items-center overflow-x-hidden px-4 pt-24 md:-mx-8 md:px-8 lg:pt-36 xl:pt-44',
-        { 'pt-3.5': canSignUp },
+        { 'pt-0 lg:pt-0 xl:pt-0': canSignUp },
       )}
     >
       <div
         className={cn('relative mt-6 flex w-full flex-col items-center justify-center', {
-          'flex-col divide-y overflow-hidden md:pt-16 lg:flex-row lg:divide-x lg:divide-y-0 lg:pt-20 xl:pt-24':
+          'mt-0 flex-col divide-y overflow-hidden pt-6 md:pt-16 lg:flex-row lg:divide-x lg:divide-y-0 lg:pt-20 xl:pt-24':
             canSignUp,
         })}
       >
