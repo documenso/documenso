@@ -4,7 +4,16 @@ import { useState } from 'react';
 
 import Link from 'next/link';
 
-import { Copy, Download, Edit, Loader, MoreHorizontal, Share, Trash2 } from 'lucide-react';
+import {
+  Copy,
+  Download,
+  Edit,
+  Loader,
+  MoreHorizontal,
+  ScrollTextIcon,
+  Share,
+  Trash2,
+} from 'lucide-react';
 import { useSession } from 'next-auth/react';
 
 import { downloadPDF } from '@documenso/lib/client-only/download-pdf';
@@ -105,6 +114,13 @@ export const DocumentPageViewDropdown = ({ document, team }: DocumentPageViewDro
             Download
           </DropdownMenuItem>
         )}
+
+        <DropdownMenuItem asChild>
+          <Link href={`${documentsPath}/${document.id}/logs`}>
+            <ScrollTextIcon className="mr-2 h-4 w-4" />
+            Logs
+          </Link>
+        </DropdownMenuItem>
 
         <DropdownMenuItem onClick={() => setDuplicateDialogOpen(true)}>
           <Copy className="mr-2 h-4 w-4" />
