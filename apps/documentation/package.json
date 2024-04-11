@@ -1,5 +1,5 @@
 {
-  "name": "documentation",
+  "name": "@documenso/documentation",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -9,7 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "next": "14.1.4",
+    "next": "14.0.3",
     "nextra": "^2.13.4",
     "nextra-theme-docs": "^2.13.4",
     "react": "^18",
