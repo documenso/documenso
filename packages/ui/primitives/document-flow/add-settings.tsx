@@ -224,6 +224,10 @@ export const AddSettingsFormPartial = ({
                               and passkey configured via their settings
                             </li>
                             <li>
+                              <strong>Require 2FA</strong> - The recipient must have an account and
+                              2FA enabled via their settings
+                            </li>
+                            <li>
                               <strong>None</strong> - No authentication required
                             </li>
                           </ul>
