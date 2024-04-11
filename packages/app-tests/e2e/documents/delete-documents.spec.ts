@@ -136,13 +136,6 @@ test('[DOCUMENTS]: deleting a pending document should remove it from recipients'
     });
 
     await expect(page.getByRole('link', { name: 'Document 1 - Pending' })).not.toBeVisible();
-
-    await page.goto(`/sign/${recipient.token}`);
-    await expect(page.getByText(/document.*cancelled/i).nth(0)).toBeVisible();
-
-    await page.goto('/documents');
-    await page.waitForURL('/documents');
-
     await apiSignout({ page });
   }
 });

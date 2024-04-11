@@ -136,7 +136,7 @@ test('[DOCUMENT_FLOW]: should be able to create a document with multiple recipie
   await page.getByPlaceholder('Name').fill('User 1');
   await page.getByRole('button', { name: 'Add Signer' }).click();
   await page.getByRole('textbox', { name: 'Email', exact: true }).fill('user2@example.com');
-  await page.getByRole('textbox', { name: 'Name', exact: true }).fill('User 2');
+  await page.getByRole('textbox', { name: 'Name', exact: true }).nth(1).fill('User 2');
 
   await page.getByRole('button', { name: 'Continue' }).click();
 
