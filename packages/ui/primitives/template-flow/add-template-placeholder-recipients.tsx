@@ -49,6 +49,8 @@ export const AddTemplatePlaceholderRecipientsFormPartial = ({
     recipients.length > 1 ? recipients.length + 1 : 2,
   );
 
+  const userIsSelfRecipient = () => signers.some((signer) => signer.email === user?.email);
+
   const { currentStep, totalSteps, previousStep } = useStep();
 
   const {
@@ -115,9 +117,11 @@ export const AddTemplatePlaceholderRecipientsFormPartial = ({
   };
 
   const onRemoveSigner = (index: number) => {
+    const isSelfSigner = signers[index].formId === selfSignerFormId;
+
     removeSigner(index);
 
-    if (signers[index].formId === selfSignerFormId) {
+    if (isSelfSigner) {
       setSelfSignerFormId(undefined);
     }
   };
@@ -238,7 +242,7 @@ export const AddTemplatePlaceholderRecipientsFormPartial = ({
           <Button
             type="button"
             className="dark:bg-muted dark:hover:bg-muted/80 bg-black/5 hover:bg-black/10"
-            disabled={isSubmitting || !!selfSignerFormId}
+            disabled={isSubmitting || !!selfSignerFormId || userIsSelfRecipient()}
             onClick={() => onAddPlaceholderSelfRecipient()}
           >
             <Plus className="-ml-1 mr-2 h-5 w-5" />
