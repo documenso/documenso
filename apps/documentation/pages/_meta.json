@@ -7,6 +7,10 @@
       "sidebar": false
     }
   },
+  "app": {
+    "title": "Getting Started",
+    "type": "page"
+  },
   "faq": {
     "title": "FAQ",
     "type": "page"
@@ -21,6 +25,10 @@
   },
   "webhook": {
     "title": "Webhook",
+    "type": "page"
+  },
+  "contributing": {
+    "title": "Contributing Guide",
     "type": "page"
   },
   "---": {
