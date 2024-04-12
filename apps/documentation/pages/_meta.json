@@ -5,7 +5,8 @@
     "theme": {
       "layout": "full",
       "sidebar": false
-    }
+    },
+    "display": "hidden"
   },
   "app": {
     "title": "Getting Started",
