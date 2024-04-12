@@ -1,0 +1,7 @@
+{
+  "index": "Home",
+  "quickstart": "Developer Quickstart",
+  "manual": "Manual Setup",
+  "docker": "Docker",
+  "gitpod": "Gitpod"
+}

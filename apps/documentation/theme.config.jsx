@@ -1,7 +1,25 @@
-export default {
-  logo: <span>My Nextra Documentation</span>,
+const themeConfig = {
+  logo: <span>Documenso Documentation</span>,
   project: {
-    link: 'https://github.com/shuding/nextra',
+    link: 'https://documen.so/github',
   },
-  // ... other theme options
+  chat: {
+    link: 'https://documen.so/discord',
+  },
+  docsRepositoryBase: 'https://github.com/documenso/documenso/tree/main/apps/documentation',
+  footer: {
+    text: (
+      <span>
+        {new Date().getFullYear()} ©{' '}
+        <a href="https://documen.so" target="_blank">
+          Documenso
+        </a>
+        .
+      </span>
+    ),
+  },
+  primaryHue: 100,
+  primarySaturation: 48.47,
 };
+
+export default themeConfig;

@@ -1,0 +1,38 @@
+# Manual Setup
+
+Follow these steps to setup Documenso on your local machine:
+
+1. [Fork this repository](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/working-with-forks/about-forks) to your GitHub account.
+
+After forking the repository, clone it to your local device by using the following command:
+
+```sh
+git clone https://github.com/<your-username>/documenso
+```
+
+2. Run `npm i` in the root directory
+
+3. Create your `.env` from the `.env.example`. You can use `cp .env.example .env` to get started with our handpicked defaults.
+
+4. Set the following environment variables:
+
+   - NEXTAUTH_URL
+   - NEXTAUTH_SECRET
+   - NEXT_PUBLIC_WEBAPP_URL
+   - NEXT_PUBLIC_MARKETING_URL
+   - NEXT_PRIVATE_DATABASE_URL
+   - NEXT_PRIVATE_DIRECT_DATABASE_URL
+   - NEXT_PRIVATE_SMTP_FROM_NAME
+   - NEXT_PRIVATE_SMTP_FROM_ADDRESS
+
+5. Create the database schema by running `npm run prisma:migrate-dev`
+
+6. Run `npm run dev` in the root directory to start
+
+7. Register a new user at http://localhost:3000/signup
+
+---
+
+- Optional: Seed the database using `npm run prisma:seed -w @documenso/prisma` to create a test user and document.
+- Optional: Create your own signing certificate.
+  - To generate your own using these steps and a Linux Terminal or Windows Subsystem for Linux (WSL), see **[Create your own signing certificate](./SIGNING.md)**.

@@ -1,7 +1,27 @@
 {
-  "index": "My Homepage",
-  "contact": "Contact Us",
-  "about": "About Us",
+  "index": {
+    "title": "Home",
+    "type": "page",
+    "theme": {
+      "layout": "full",
+      "sidebar": false
+    }
+  },
+  "local-development": {
+    "title": "Local Development",
+    "type": "page"
+  },
+  "api": {
+    "title": "API",
+    "type": "page"
+  },
+  "webhook": {
+    "title": "Webhook",
+    "type": "page"
+  },
+  "---": {
+    "type": "separator"
+  },
   "GitHub": {
     "title": "View on GitHub",
     "href": "https://documen.so/github",
