@@ -7,6 +7,10 @@
       "sidebar": false
     }
   },
+  "faq": {
+    "title": "FAQ",
+    "type": "page"
+  },
   "local-development": {
     "title": "Local Development",
     "type": "page"

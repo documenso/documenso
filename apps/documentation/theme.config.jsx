@@ -1,5 +1,5 @@
 const themeConfig = {
-  logo: <span>Documenso Documentation</span>,
+  logo: <span>Documenso</span>,
   project: {
     link: 'https://documen.so/github',
   },
