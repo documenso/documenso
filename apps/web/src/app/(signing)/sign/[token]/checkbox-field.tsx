@@ -1,11 +1,10 @@
 'use client';
 
-import { useState, useTransition } from 'react';
+import { useCallback, useTransition } from 'react';
 
 import { useRouter } from 'next/navigation';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Loader } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
@@ -49,56 +48,41 @@ export const CheckboxField = ({ field, recipient }: CheckboxFieldProps) => {
 
   const isLoading = isSignFieldWithTokenLoading || isRemoveSignedFieldWithTokenLoading || isPending;
 
-  const [localText, setLocalCustomText] = useState('');
-
   const form = useForm<z.infer<typeof CheckBoxSchema>>({
     resolver: zodResolver(CheckBoxSchema),
     defaultValues: {
-      check: true,
+      check: false,
     },
   });
 
-  const onPreSign = () => {
-    if (!localText) {
-      return false;
-    }
+  const onSign = useCallback(
+    async (authOptions?: TRecipientActionAuth) => {
+      try {
+        await signFieldWithToken({
+          token: recipient.token,
+          fieldId: field.id,
+          value: 'checked',
+          isBase64: true,
+          authOptions,
+        });
 
-    return true;
-  };
+        startTransition(() => router.refresh());
+      } catch (err) {
+        const error = AppError.parseError(err);
 
-  const onSign = async (authOptions?: TRecipientActionAuth) => {
-    try {
-      if (!localText) {
-        return;
+        if (error.code === AppErrorCode.UNAUTHORIZED) {
+          throw error;
+        }
+
+        toast({
+          title: 'Error',
+          description: 'An error occurred while signing the document.',
+          variant: 'destructive',
+        });
       }
-
-      await signFieldWithToken({
-        token: recipient.token,
-        fieldId: field.id,
-        value: localText,
-        isBase64: true,
-        authOptions,
-      });
-
-      setLocalCustomText('');
-
-      startTransition(() => router.refresh());
-    } catch (err) {
-      const error = AppError.parseError(err);
-
-      if (error.code === AppErrorCode.UNAUTHORIZED) {
-        throw error;
-      }
-
-      console.error(err);
-
-      toast({
-        title: 'Error',
-        description: 'An error occurred while signing the document.',
-        variant: 'destructive',
-      });
-    }
-  };
+    },
+    [field.id, recipient.token, router, signFieldWithToken, toast],
+  );
 
   const onRemove = async () => {
     try {
@@ -119,52 +103,26 @@ export const CheckboxField = ({ field, recipient }: CheckboxFieldProps) => {
     }
   };
 
-  const onSubmit = (data: z.infer<typeof CheckBoxSchema>) => {
-    console.log(data);
-  };
-
   return (
     <SigningFieldContainer
       field={field}
-      onPreSign={onPreSign}
       onSign={onSign}
       onRemove={onRemove}
       type="Checkbox"
       raw={true}
     >
-      {isLoading && (
-        <div className="bg-background absolute inset-0 flex items-center justify-center rounded-md">
-          <Loader className="text-primary h-5 w-5 animate-spin md:h-8 md:w-8" />
-        </div>
-      )}
-
-      {!field.inserted && (
-        // TODO: span with a box
-        // <p className="group-hover:text-primary text-muted-foreground text-lg duration-200">
-        //   Checkbox
-        // </p>
-
-        <Checkbox
-          id={`field-${field.id}`}
-          onClick={() => {
-            console.log('clicked checkbox');
-          }}
-          onCheckedChange={(checked) => {
-            setLocalCustomText(checked ? '✓' : '𐄂');
-          }}
-        />
-      )}
-
-      {field.inserted && <p className="text-muted-foreground duration-200">{field.customText}</p>}
-
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)}>
+        <form>
           <FormField
             control={form.control}
             name="check"
             render={({ field }) => (
               <FormControl>
-                <Checkbox checked={field.value} onCheckedChange={field.onChange} />
+                <Checkbox
+                  checked={field.value}
+                  className="h-8 w-8"
+                  onCheckedChange={field.onChange}
+                />
               </FormControl>
             )}
           />

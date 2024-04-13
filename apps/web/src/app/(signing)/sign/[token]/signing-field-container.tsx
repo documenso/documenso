@@ -107,7 +107,7 @@ export const SigningFieldContainer = ({
 
   return (
     <FieldRootContainer raw={raw} field={field}>
-      {!field.inserted && !loading && (
+      {!field.inserted && !loading && !raw && (
         <button
           type="submit"
           className="absolute inset-0 z-10 h-full w-full"

@@ -19,6 +19,7 @@ import { FieldType, SendStatus } from '@documenso/prisma/client';
 import { cn } from '../../lib/utils';
 import { Button } from '../button';
 import { Card, CardContent } from '../card';
+import { Checkbox } from '../checkbox';
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from '../command';
 import { Popover, PopoverContent, PopoverTrigger } from '../popover';
 import { useStep } from '../stepper';
@@ -135,11 +136,17 @@ export const AddFieldsFormPartial = ({
       );
 
       setCoords({
-        x: event.clientX - fieldBounds.current.width / 2,
-        y: event.clientY - fieldBounds.current.height / 2,
+        x:
+          selectedField === FieldType.CHECKBOX
+            ? event.clientX - 16
+            : event.clientX - fieldBounds.current.width / 2,
+        y:
+          selectedField === FieldType.CHECKBOX
+            ? event.clientY - 16
+            : event.clientY - fieldBounds.current.height / 2,
       });
     },
-    [isWithinPageBounds],
+    [isWithinPageBounds, selectedField],
   );
 
   const onMouseClick = useCallback(
@@ -149,6 +156,7 @@ export const AddFieldsFormPartial = ({
       }
 
       const $page = getPage(event, PDF_VIEWER_PAGE_SELECTOR);
+      const isCheckboxField = selectedField === FieldType.CHECKBOX;
 
       if (
         !$page ||
@@ -172,8 +180,8 @@ export const AddFieldsFormPartial = ({
       let pageY = ((event.pageY - top) / height) * 100;
 
       // Get the bounds as a percentage of the page width and height
-      const fieldPageWidth = (fieldBounds.current.width / width) * 100;
-      const fieldPageHeight = (fieldBounds.current.height / height) * 100;
+      const fieldPageWidth = ((isCheckboxField ? 32 : fieldBounds.current.width) / width) * 100;
+      const fieldPageHeight = ((isCheckboxField ? 32 : fieldBounds.current.height) / height) * 100;
 
       // And center it based on the bounds
       pageX -= fieldPageWidth / 2;
@@ -322,7 +330,8 @@ export const AddFieldsFormPartial = ({
 
       <DocumentFlowFormContainerContent>
         <div className="flex flex-col">
-          {selectedField && (
+          {/* When it is not a checkbox field */}
+          {selectedField && selectedField !== FieldType.CHECKBOX && (
             <Card
               className={cn(
                 'bg-field-card/80 pointer-events-none fixed z-50 cursor-pointer border-2 backdrop-blur-[1px]',
@@ -342,6 +351,27 @@ export const AddFieldsFormPartial = ({
                 {FRIENDLY_FIELD_TYPE[selectedField]}
               </CardContent>
             </Card>
+          )}
+
+          {/* Checkbox Field */}
+          {selectedField && selectedField === FieldType.CHECKBOX && (
+            <div
+              className="pointer-events-none fixed z-50"
+              style={{
+                top: coords.y,
+                left: coords.x,
+                height: 6 * 4,
+                width: 6 * 4,
+              }}
+            >
+              <Checkbox
+                className={cn(
+                  'bg-field-card/80 h-8 w-8 border-2 backdrop-blur-[1px]',
+                  'shadow-[0_0_0_4px_theme(colors.gray.100/70%),0_0_0_1px_theme(colors.gray.100/70%),0_0_0_0.5px_theme(colors.primary.DEFAULT/70%)]',
+                  'border-field-card-border',
+                )}
+              />
+            </div>
           )}
 
           {isDocumentPdfLoaded &&

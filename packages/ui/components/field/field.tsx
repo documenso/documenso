@@ -92,16 +92,10 @@ export function FieldRootContainer({ field, children, raw = false }: FieldContai
 
       {raw && (
         <div
-          onClick={() => {
-            console.log('clickeddd');
-          }}
           id={`field-${field.id}`}
-          className={cn(
-            'field-card-container bg-background relative z-20 h-full w-full transition-all',
-            {
-              'border-orange-300 ring-1 ring-orange-300': !field.inserted && isValidating,
-            },
-          )}
+          className={cn('field-card-container bg-background relative z-20 transition-all', {
+            'border-orange-300 ring-1 ring-orange-300': !field.inserted && isValidating,
+          })}
           ref={ref}
           data-inserted={field.inserted ? 'true' : 'false'}
         >

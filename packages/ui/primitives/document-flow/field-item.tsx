@@ -10,8 +10,10 @@ import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
 
 import { cn } from '../../lib/utils';
 import { Card, CardContent } from '../card';
+import { Checkbox } from '../checkbox';
 import type { TDocumentFlowFormSchema } from './types';
 import { FRIENDLY_FIELD_TYPE } from './types';
+import { FieldType } from '.prisma/client';
 
 type Field = TDocumentFlowFormSchema['fields'][0];
 
@@ -43,6 +45,8 @@ export const FieldItem = ({
     pageHeight: 0,
     pageWidth: 0,
   });
+
+  const isCheckboxField = field.type === FieldType.CHECKBOX;
 
   const calculateCoords = useCallback(() => {
     const $page = document.querySelector<HTMLElement>(
@@ -102,8 +106,8 @@ export const FieldItem = ({
       default={{
         x: coords.pageX,
         y: coords.pageY,
-        height: coords.pageHeight,
-        width: coords.pageWidth,
+        height: isCheckboxField ? 32 : coords.pageHeight,
+        width: isCheckboxField ? 32 : coords.pageWidth,
       }}
       bounds={`${PDF_VIEWER_PAGE_SELECTOR}[data-page-number="${field.pageNumber}"]`}
       onDragStart={() => setActive(true)}
@@ -119,7 +123,13 @@ export const FieldItem = ({
     >
       {!disabled && (
         <button
-          className="text-muted-foreground/50 hover:text-muted-foreground/80 bg-background absolute -right-2 -top-2 z-20 flex h-8 w-8 items-center justify-center rounded-full border"
+          className={cn(
+            'text-muted-foreground/50 hover:text-muted-foreground/80 bg-background absolute -right-2 -top-2 z-20 flex  items-center justify-center rounded-full border',
+            {
+              'h-8 w-8': !isCheckboxField,
+              'h-6 w-6': isCheckboxField,
+            },
+          )}
           onClick={() => onRemove?.()}
           onTouchEnd={() => onRemove?.()}
         >
@@ -127,25 +137,40 @@ export const FieldItem = ({
         </button>
       )}
 
-      <Card
-        className={cn('bg-field-card/80 h-full w-full backdrop-blur-[1px]', {
-          'border-field-card-border': !disabled,
-          'border-field-card-border/80': active,
-        })}
-      >
-        <CardContent
+      {!isCheckboxField && (
+        <Card
+          className={cn('bg-field-card/80 h-full w-full backdrop-blur-[1px]', {
+            'border-field-card-border': !disabled,
+            'border-field-card-border/80': active,
+          })}
+        >
+          <CardContent
+            className={cn(
+              'text-field-card-foreground flex h-full w-full flex-col items-center justify-center p-2',
+              {
+                'text-field-card-foreground/50': disabled,
+              },
+            )}
+          >
+            {FRIENDLY_FIELD_TYPE[field.type]}
+
+            <p className="w-full truncate text-center text-xs">{field.signerEmail}</p>
+          </CardContent>
+        </Card>
+      )}
+
+      {isCheckboxField && (
+        <Checkbox
           className={cn(
-            'text-field-card-foreground flex h-full w-full flex-col items-center justify-center p-2',
+            'bg-field-card/80 h-8 w-8 border-2 backdrop-blur-[1px]',
+            'shadow-[0_0_0_4px_theme(colors.gray.100/70%),0_0_0_1px_theme(colors.gray.100/70%),0_0_0_0.5px_theme(colors.primary.DEFAULT/70%)]',
             {
-              'text-field-card-foreground/50': disabled,
+              'border-field-card-border': !disabled,
+              'border-field-card-border/80': active,
             },
           )}
-        >
-          {FRIENDLY_FIELD_TYPE[field.type]}
-
-          <p className="w-full truncate text-center text-xs">{field.signerEmail}</p>
-        </CardContent>
-      </Card>
+        />
+      )}
     </Rnd>,
     document.body,
   );
