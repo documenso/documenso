@@ -1,4 +1,4 @@
-import { hash } from 'bcrypt';
+import { hash } from '@node-rs/bcrypt';
 
 import { getStripeCustomerByUser } from '@documenso/ee/server-only/stripe/get-customer';
 import { updateSubscriptionItemQuantity } from '@documenso/ee/server-only/stripe/update-subscription-item-quantity';
@@ -7,15 +7,17 @@ import { IdentityProvider, Prisma, TeamMemberInviteStatus } from '@documenso/pri
 
 import { IS_BILLING_ENABLED } from '../../constants/app';
 import { SALT_ROUNDS } from '../../constants/auth';
+import { AppError, AppErrorCode } from '../../errors/app-error';
 
 export interface CreateUserOptions {
   name: string;
   email: string;
   password: string;
   signature?: string | null;
+  url?: string;
 }
 
-export const createUser = async ({ name, email, password, signature }: CreateUserOptions) => {
+export const createUser = async ({ name, email, password, signature, url }: CreateUserOptions) => {
   const hashedPassword = await hash(password, SALT_ROUNDS);
 
   const userExists = await prisma.user.findFirst({
@@ -28,6 +30,22 @@ export const createUser = async ({ name, email, password, signature }: CreateUse
     throw new Error('User already exists');
   }
 
+  if (url) {
+    const urlExists = await prisma.user.findFirst({
+      where: {
+        url,
+      },
+    });
+
+    if (urlExists) {
+      throw new AppError(
+        AppErrorCode.PROFILE_URL_TAKEN,
+        'Profile username is taken',
+        'The profile username is already taken',
+      );
+    }
+  }
+
   const user = await prisma.user.create({
     data: {
       name,
@@ -35,6 +53,7 @@ export const createUser = async ({ name, email, password, signature }: CreateUse
       password: hashedPassword,
       signature,
       identityProvider: IdentityProvider.DOCUMENSO,
+      url,
     },
   });
 

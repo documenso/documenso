@@ -161,6 +161,7 @@ export const SinglePlayerClient = () => {
     signingStatus: 'NOT_SIGNED',
     sendStatus: 'NOT_SENT',
     role: 'SIGNER',
+    authOptions: null,
   };
 
   const onFileDrop = async (file: File) => {
@@ -191,7 +192,7 @@ export const SinglePlayerClient = () => {
         <p className="text-foreground mx-auto mt-4 max-w-[50ch] text-lg leading-normal">
           Create a{' '}
           <Link
-            href={`${NEXT_PUBLIC_WEBAPP_URL()}/signup`}
+            href={`${NEXT_PUBLIC_WEBAPP_URL()}/signup?utm_source=singleplayer`}
             target="_blank"
             className="hover:text-foreground/80 font-semibold transition-colors"
           >
@@ -203,7 +204,7 @@ export const SinglePlayerClient = () => {
             target="_blank"
             className="hover:text-foreground/80 font-semibold transition-colors"
           >
-            community plan
+            early adopter plan
           </Link>{' '}
           for exclusive features, including the ability to collaborate with multiple signers.
         </p>
@@ -246,6 +247,7 @@ export const SinglePlayerClient = () => {
                   recipients={uploadedFile ? [placeholderRecipient] : []}
                   fields={fields}
                   onSubmit={onFieldsSubmit}
+                  isDocumentPdfLoaded={true}
                 />
               </fieldset>
 

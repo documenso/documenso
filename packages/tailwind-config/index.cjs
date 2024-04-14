@@ -7,9 +7,15 @@ module.exports = {
   content: ['src/**/*.{ts,tsx}'],
   theme: {
     extend: {
+      screens: {
+        print: { raw: 'print' },
+      },
       fontFamily: {
         sans: ['var(--font-sans)', ...fontFamily.sans],
         signature: ['var(--font-signature)'],
+      },
+      zIndex: {
+        9999: '9999',
       },
       colors: {
         border: 'hsl(var(--border))',
@@ -24,6 +30,9 @@ module.exports = {
         secondary: {
           DEFAULT: 'hsl(var(--secondary))',
           foreground: 'hsl(var(--secondary-foreground))',
+        },
+        warning: {
+          DEFAULT: 'hsl(var(--warning))',
         },
         destructive: {
           DEFAULT: 'hsl(var(--destructive))',

@@ -2,7 +2,6 @@
 
 import { useMemo, useState } from 'react';
 
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
 import { Loader } from 'lucide-react';
@@ -137,27 +136,6 @@ export const UploadDocument = ({ className, team }: UploadDocumentProps) => {
       {isLoading && (
         <div className="bg-background/50 absolute inset-0 flex items-center justify-center rounded-lg">
           <Loader className="text-muted-foreground h-12 w-12 animate-spin" />
-        </div>
-      )}
-
-      {team?.id === undefined && remaining.documents === 0 && (
-        <div className="bg-background/60 absolute inset-0 flex items-center justify-center rounded-lg backdrop-blur-sm">
-          <div className="text-center">
-            <h2 className="text-muted-foreground/80 text-xl font-semibold">
-              You have reached your document limit.
-            </h2>
-
-            <p className="text-muted-foreground/60 mt-2 text-sm">
-              You can upload up to {quota.documents} documents per month on your current plan.
-            </p>
-
-            <Link
-              className="text-primary hover:text-primary/80 mt-6 block font-medium"
-              href="/settings/billing"
-            >
-              Upgrade your account to upload more documents.
-            </Link>
-          </div>
         </div>
       )}
     </div>

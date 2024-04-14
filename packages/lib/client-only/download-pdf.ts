@@ -15,12 +15,10 @@ export const downloadPDF = async ({ documentData, fileName }: DownloadPDFProps) 
     type: 'application/pdf',
   });
 
-  const [baseTitle] = fileName?.includes('.pdf')
-    ? fileName.split('.pdf')
-    : [fileName ?? 'document'];
+  const baseTitle = (fileName ?? 'document').replace(/\.pdf$/, '');
 
   downloadFile({
-    filename: baseTitle,
+    filename: `${baseTitle}.pdf`,
     data: blob,
   });
 };

@@ -4,7 +4,7 @@ import { WEBAPP_BASE_URL } from '@documenso/lib/constants/app';
 import { seedTeam, seedTeamInvite, unseedTeam } from '@documenso/prisma/seed/teams';
 import { seedUser } from '@documenso/prisma/seed/users';
 
-import { manualLogin } from '../fixtures/authentication';
+import { apiSignin } from '../fixtures/authentication';
 
 test.describe.configure({ mode: 'parallel' });
 
@@ -13,7 +13,7 @@ test('[TEAMS]: update team member role', async ({ page }) => {
     createTeamMembers: 1,
   });
 
-  await manualLogin({
+  await apiSignin({
     page,
     email: team.owner.email,
     password: 'password',
@@ -75,7 +75,7 @@ test('[TEAMS]: member can leave team', async ({ page }) => {
 
   const teamMember = team.members[1];
 
-  await manualLogin({
+  await apiSignin({
     page,
     email: teamMember.user.email,
     password: 'password',
@@ -97,7 +97,7 @@ test('[TEAMS]: owner cannot leave team', async ({ page }) => {
     createTeamMembers: 1,
   });
 
-  await manualLogin({
+  await apiSignin({
     page,
     email: team.owner.email,
     password: 'password',

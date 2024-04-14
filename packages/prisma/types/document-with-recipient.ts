@@ -5,6 +5,6 @@ export type DocumentWithRecipients = Document & {
 };
 
 export type DocumentWithRecipient = Document & {
-  Recipient: Recipient;
+  Recipient: Recipient[];
   documentData: DocumentData;
 };

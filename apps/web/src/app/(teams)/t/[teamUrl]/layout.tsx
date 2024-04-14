@@ -11,6 +11,7 @@ import { SubscriptionStatus } from '@documenso/prisma/client';
 import { Header } from '~/components/(dashboard)/layout/header';
 import { RefreshOnFocus } from '~/components/(dashboard)/refresh-on-focus/refresh-on-focus';
 import { NextAuthProvider } from '~/providers/next-auth';
+import { TeamProvider } from '~/providers/team';
 
 import { LayoutBillingBanner } from './layout-billing-banner';
 
@@ -56,7 +57,9 @@ export default async function AuthenticatedTeamsLayout({
 
         <Header user={user} teams={teams} />
 
-        <main className="mt-8 pb-8 md:mt-12 md:pb-12">{children}</main>
+        <TeamProvider team={team}>
+          <main className="mt-8 pb-8 md:mt-12 md:pb-12">{children}</main>
+        </TeamProvider>
 
         <RefreshOnFocus />
       </LimitsProvider>

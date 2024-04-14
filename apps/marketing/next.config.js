@@ -2,6 +2,7 @@
 const fs = require('fs');
 const path = require('path');
 const { withContentlayer } = require('next-contentlayer');
+const { withAxiom } = require('next-axiom');
 
 const ENV_FILES = ['.env', '.env.local', `.env.${process.env.NODE_ENV || 'development'}`];
 
@@ -21,6 +22,7 @@ const FONT_CAVEAT_BYTES = fs.readFileSync(
 const config = {
   experimental: {
     outputFileTracingRoot: path.join(__dirname, '../../'),
+    serverComponentsExternalPackages: ['@node-rs/bcrypt', '@documenso/pdf-sign', 'playwright'],
     serverActions: {
       bodySizeLimit: '50mb',
     },
@@ -94,4 +96,4 @@ const config = {
   },
 };
 
-module.exports = withContentlayer(config);
+module.exports = withAxiom(withContentlayer(config));

@@ -33,7 +33,7 @@ type TransferStripeSubscriptionOptions = {
  * Will create a new subscription for the new owner and cancel the old one.
  *
  * Returns the subscription that should be associated with the team, null if
- * no subscription is needed (for community plan).
+ * no subscription is needed (for early adopter plan).
  */
 export const transferTeamSubscription = async ({
   user,

@@ -1,5 +1,5 @@
 import { prisma } from '@documenso/prisma';
-import { Prisma } from '@documenso/prisma/client';
+import type { Prisma } from '@documenso/prisma/client';
 
 export interface FindDocumentsOptions {
   term?: string;

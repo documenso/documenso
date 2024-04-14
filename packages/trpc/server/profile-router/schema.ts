@@ -16,6 +16,17 @@ export const ZUpdateProfileMutationSchema = z.object({
   signature: z.string(),
 });
 
+export const ZUpdatePublicProfileMutationSchema = z.object({
+  url: z
+    .string()
+    .trim()
+    .toLowerCase()
+    .min(1, { message: 'Please enter a valid username.' })
+    .regex(/^[a-z0-9-]+$/, {
+      message: 'Username can only container alphanumeric characters and dashes.',
+    }),
+});
+
 export const ZUpdatePasswordMutationSchema = z.object({
   currentPassword: ZCurrentPasswordSchema,
   password: ZPasswordSchema,

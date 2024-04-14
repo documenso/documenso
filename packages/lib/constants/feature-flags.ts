@@ -1,6 +1,6 @@
 import { env } from 'next-runtime-env';
 
-import { APP_BASE_URL } from './app';
+import { APP_BASE_URL, WEBAPP_BASE_URL } from './app';
 
 const NEXT_PUBLIC_FEATURE_BILLING_ENABLED = () => env('NEXT_PUBLIC_FEATURE_BILLING_ENABLED');
 const NEXT_PUBLIC_POSTHOG_KEY = () => env('NEXT_PUBLIC_POSTHOG_KEY');
@@ -22,9 +22,10 @@ export const FEATURE_FLAG_POLL_INTERVAL = 30000;
  */
 export const LOCAL_FEATURE_FLAGS: Record<string, boolean> = {
   app_billing: NEXT_PUBLIC_FEATURE_BILLING_ENABLED() === 'true',
-  app_teams: true,
   app_document_page_view_history_sheet: false,
+  app_passkey: WEBAPP_BASE_URL === 'http://localhost:3000', // Temp feature flag.
   marketing_header_single_player_mode: false,
+  marketing_profiles_announcement_bar: true,
 } as const;
 
 /**

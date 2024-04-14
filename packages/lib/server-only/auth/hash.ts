@@ -1,4 +1,5 @@
-import { compareSync as bcryptCompareSync, hashSync as bcryptHashSync } from 'bcrypt';
+import { compareSync as bcryptCompareSync, hashSync as bcryptHashSync } from '@node-rs/bcrypt';
+import crypto from 'crypto';
 
 import { SALT_ROUNDS } from '../../constants/auth';
 
@@ -11,4 +12,8 @@ export const hashSync = (password: string) => {
 
 export const compareSync = (password: string, hash: string) => {
   return bcryptCompareSync(password, hash);
+};
+
+export const hashString = (input: string) => {
+  return crypto.createHash('sha512').update(input).digest('hex');
 };

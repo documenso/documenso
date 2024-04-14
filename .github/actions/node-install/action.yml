@@ -1,0 +1,39 @@
+name: 'Setup node and cache node_modules'
+inputs:
+  node_version:
+    required: false
+    default: v18.x
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Set up Node ${{ inputs.node_version }}
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ inputs.node_version }}
+
+    - name: Cache npm
+      uses: actions/cache@v3
+      with:
+        path: ~/.npm
+        key: npm-${{ hashFiles('package-lock.json') }}
+        restore-keys: npm-
+
+    - name: Cache node_modules
+      uses: actions/cache@v3
+      id: cache-node-modules
+      with:
+        path: |
+          node_modules
+          packages/*/node_modules
+          apps/*/node_modules
+        key: modules-${{ hashFiles('package-lock.json') }}
+
+    - name: Install dependencies
+      if: steps.cache-node-modules.outputs.cache-hit != 'true'
+      shell: bash
+      run: |
+        npm ci --no-audit
+        npm run prisma:generate
+      env:
+        HUSKY: '0'

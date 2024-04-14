@@ -1,0 +1,133 @@
+name: Publish Docker
+
+on:
+  push:
+    branches: ['release']
+
+jobs:
+  build_and_publish_platform_containers:
+    name: Build and publish platform containers
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - warp-ubuntu-latest-x64-4x
+          - warp-ubuntu-latest-arm64-4x
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-tags: true
+
+      - name: Login to DockerHub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GH_TOKEN }}
+
+      - name: Build the docker image
+        env:
+          BUILD_PLATFORM: ${{ matrix.os == 'warp-ubuntu-latest-arm64-4x' && 'arm64' || 'amd64' }}
+        run: |
+          APP_VERSION="$(git name-rev --tags --name-only $(git rev-parse HEAD) | head -n 1 | sed 's/\^0//')"
+          GIT_SHA="$(git rev-parse HEAD)"
+
+          docker build \
+            -f ./docker/Dockerfile \
+            --progress=plain \
+            -t "documenso/documenso-$BUILD_PLATFORM:latest" \
+            -t "documenso/documenso-$BUILD_PLATFORM:$GIT_SHA" \
+            -t "documenso/documenso-$BUILD_PLATFORM:$APP_VERSION" \
+            -t "ghcr.io/documenso/documenso-$BUILD_PLATFORM:latest" \
+            -t "ghcr.io/documenso/documenso-$BUILD_PLATFORM:$GIT_SHA" \
+            -t "ghcr.io/documenso/documenso-$BUILD_PLATFORM:$APP_VERSION" \
+            .
+
+      - name: Push the docker image to DockerHub
+        run: docker push --all-tags "documenso/documenso-$BUILD_PLATFORM"
+        env:
+          BUILD_PLATFORM: ${{ matrix.os == 'warp-ubuntu-latest-arm64-4x' && 'arm64' || 'amd64' }}
+
+      - name: Push the docker image to GitHub Container Registry
+        run: docker push --all-tags "ghcr.io/documenso/documenso-$BUILD_PLATFORM"
+        env:
+          BUILD_PLATFORM: ${{ matrix.os == 'warp-ubuntu-latest-arm64-4x' && 'arm64' || 'amd64' }}
+
+  create_and_publish_manifest:
+    name: Create and publish manifest
+    runs-on: ubuntu-latest
+    needs: build_and_publish_platform_containers
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-tags: true
+
+      - name: Login to DockerHub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GH_TOKEN }}
+
+      - name: Create and push DockerHub manifest
+        run: |
+          APP_VERSION="$(git name-rev --tags --name-only $(git rev-parse HEAD) | head -n 1 | sed 's/\^0//')"
+          GIT_SHA="$(git rev-parse HEAD)"
+
+          docker manifest create \
+            documenso/documenso:latest \
+            --amend documenso/documenso-amd64:latest \
+            --amend documenso/documenso-arm64:latest \
+
+          docker manifest create \
+            documenso/documenso:$GIT_SHA \
+            --amend documenso/documenso-amd64:$GIT_SHA \
+            --amend documenso/documenso-arm64:$GIT_SHA \
+
+          docker manifest create \
+            documenso/documenso:$APP_VERSION \
+            --amend documenso/documenso-amd64:$APP_VERSION \
+            --amend documenso/documenso-arm64:$APP_VERSION \
+
+          docker manifest push documenso/documenso:latest
+          docker manifest push documenso/documenso:$GIT_SHA
+          docker manifest push documenso/documenso:$APP_VERSION
+
+      - name: Create and push Github Container Registry manifest
+        run: |
+          APP_VERSION="$(git name-rev --tags --name-only $(git rev-parse HEAD) | head -n 1 | sed 's/\^0//')"
+          GIT_SHA="$(git rev-parse HEAD)"
+
+          docker manifest create \
+            ghcr.io/documenso/documenso:latest \
+            --amend ghcr.io/documenso/documenso-amd64:latest \
+            --amend ghcr.io/documenso/documenso-arm64:latest \
+
+          docker manifest create \
+            ghcr.io/documenso/documenso:$GIT_SHA \
+            --amend ghcr.io/documenso/documenso-amd64:$GIT_SHA \
+            --amend ghcr.io/documenso/documenso-arm64:$GIT_SHA \
+
+          docker manifest create \
+            ghcr.io/documenso/documenso:$APP_VERSION \
+            --amend ghcr.io/documenso/documenso-amd64:$APP_VERSION \
+            --amend ghcr.io/documenso/documenso-arm64:$APP_VERSION \
+
+          docker manifest push ghcr.io/documenso/documenso:latest
+          docker manifest push ghcr.io/documenso/documenso:$GIT_SHA
+          docker manifest push ghcr.io/documenso/documenso:$APP_VERSION

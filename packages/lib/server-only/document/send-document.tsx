@@ -10,22 +10,29 @@ import { createDocumentAuditLogData } from '@documenso/lib/utils/document-audit-
 import { renderCustomEmailTemplate } from '@documenso/lib/utils/render-custom-email-template';
 import { prisma } from '@documenso/prisma';
 import { DocumentStatus, RecipientRole, SendStatus } from '@documenso/prisma/client';
+import { WebhookTriggerEvents } from '@documenso/prisma/client';
 
 import { NEXT_PUBLIC_WEBAPP_URL } from '../../constants/app';
 import {
   RECIPIENT_ROLES_DESCRIPTION,
   RECIPIENT_ROLE_TO_EMAIL_TYPE,
 } from '../../constants/recipient-roles';
+import { getFile } from '../../universal/upload/get-file';
+import { putFile } from '../../universal/upload/put-file';
+import { insertFormValuesInPdf } from '../pdf/insert-form-values-in-pdf';
+import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
 
 export type SendDocumentOptions = {
   documentId: number;
   userId: number;
+  teamId?: number;
   requestMetadata?: RequestMetadata;
 };
 
 export const sendDocument = async ({
   documentId,
   userId,
+  teamId,
   requestMetadata,
 }: SendDocumentOptions) => {
   const user = await prisma.user.findFirstOrThrow({
@@ -42,24 +49,26 @@ export const sendDocument = async ({
   const document = await prisma.document.findUnique({
     where: {
       id: documentId,
-      OR: [
-        {
-          userId,
-        },
-        {
-          team: {
-            members: {
-              some: {
-                userId,
+      ...(teamId
+        ? {
+            team: {
+              id: teamId,
+              members: {
+                some: {
+                  userId,
+                },
               },
             },
-          },
-        },
-      ],
+          }
+        : {
+            userId,
+            teamId: null,
+          }),
     },
     include: {
       Recipient: true,
       documentMeta: true,
+      documentData: true,
     },
   });
 
@@ -75,6 +84,38 @@ export const sendDocument = async ({
 
   if (document.status === DocumentStatus.COMPLETED) {
     throw new Error('Can not send completed document');
+  }
+
+  const { documentData } = document;
+
+  if (!documentData.data) {
+    throw new Error('Document data not found');
+  }
+
+  if (document.formValues) {
+    const file = await getFile(documentData);
+
+    const prefilled = await insertFormValuesInPdf({
+      pdf: Buffer.from(file),
+      formValues: document.formValues as Record<string, string | number | boolean>,
+    });
+
+    const newDocumentData = await putFile({
+      name: document.title,
+      type: 'application/pdf',
+      arrayBuffer: async () => Promise.resolve(prefilled),
+    });
+
+    const result = await prisma.document.update({
+      where: {
+        id: document.id,
+      },
+      data: {
+        documentDataId: newDocumentData.id,
+      },
+    });
+
+    Object.assign(document, result);
   }
 
   await Promise.all(
@@ -177,7 +218,17 @@ export const sendDocument = async ({
       data: {
         status: DocumentStatus.PENDING,
       },
+      include: {
+        Recipient: true,
+      },
     });
+  });
+
+  await triggerWebhook({
+    event: WebhookTriggerEvents.DOCUMENT_SENT,
+    data: updatedDocument,
+    userId,
+    teamId,
   });
 
   return updatedDocument;
