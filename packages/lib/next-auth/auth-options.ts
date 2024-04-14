@@ -136,6 +136,25 @@ export const NEXT_AUTH_OPTIONS: AuthOptions = {
         };
       },
     }),
+    {
+      id: 'oidc',
+      name: 'OIDC',
+      wellKnown: process.env.NEXT_PRIVATE_OIDC_WELL_KNOWN,
+      clientId: process.env.NEXT_PRIVATE_OIDC_CLIENT_ID,
+      clientSecret: process.env.NEXT_PRIVATE_OIDC_CLIENT_SECRET,
+      authorization: { params: { scope: 'openid email profile' } },
+      idToken: true,
+      checks: ['pkce', 'state'],
+      type: 'oauth',
+      allowDangerousEmailAccountLinking: true,
+      profile(profile) {
+        return {
+          id: Number(profile.sub),
+          email: profile.email,
+          name: profile.name || `${profile.given_name} ${profile.family_name}`.trim(),
+        };
+      },
+    },
     CredentialsProvider({
       id: 'webauthn',
       name: 'Keypass',

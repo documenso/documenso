@@ -10,6 +10,7 @@ import { browserSupportsWebAuthn, startAuthentication } from '@simplewebauthn/br
 import { KeyRoundIcon } from 'lucide-react';
 import { signIn } from 'next-auth/react';
 import { useForm } from 'react-hook-form';
+import { FaIdCardClip } from 'react-icons/fa6';
 import { FcGoogle } from 'react-icons/fc';
 import { match } from 'ts-pattern';
 import { z } from 'zod';
@@ -68,9 +69,15 @@ export type SignInFormProps = {
   className?: string;
   initialEmail?: string;
   isGoogleSSOEnabled?: boolean;
+  isOIDCSSOEnabled?: boolean;
 };
 
-export const SignInForm = ({ className, initialEmail, isGoogleSSOEnabled }: SignInFormProps) => {
+export const SignInForm = ({
+  className,
+  initialEmail,
+  isGoogleSSOEnabled,
+  isOIDCSSOEnabled,
+}: SignInFormProps) => {
   const { toast } = useToast();
   const { getFlag } = useFeatureFlags();
 
@@ -256,6 +263,19 @@ export const SignInForm = ({ className, initialEmail, isGoogleSSOEnabled }: Sign
     }
   };
 
+  const onSignInWithOIDCClick = async () => {
+    try {
+      await signIn('oidc', { callbackUrl: LOGIN_REDIRECT_PATH });
+    } catch (err) {
+      toast({
+        title: 'An unknown error occurred',
+        description:
+          'We encountered an unknown error while attempting to sign you In. Please try again later.',
+        variant: 'destructive',
+      });
+    }
+  };
+
   return (
     <Form {...form}>
       <form
@@ -316,7 +336,7 @@ export const SignInForm = ({ className, initialEmail, isGoogleSSOEnabled }: Sign
             {isSubmitting ? 'Signing in...' : 'Sign In'}
           </Button>
 
-          {(isGoogleSSOEnabled || isPasskeyEnabled) && (
+          {(isGoogleSSOEnabled || isPasskeyEnabled || isOIDCSSOEnabled) && (
             <div className="relative flex items-center justify-center gap-x-4 py-2 text-xs uppercase">
               <div className="bg-border h-px flex-1" />
               <span className="text-muted-foreground bg-transparent">Or continue with</span>
@@ -335,6 +355,20 @@ export const SignInForm = ({ className, initialEmail, isGoogleSSOEnabled }: Sign
             >
               <FcGoogle className="mr-2 h-5 w-5" />
               Google
+            </Button>
+          )}
+
+          {isOIDCSSOEnabled && (
+            <Button
+              type="button"
+              size="lg"
+              variant="outline"
+              className="bg-background text-muted-foreground border"
+              disabled={isSubmitting}
+              onClick={onSignInWithOIDCClick}
+            >
+              <FaIdCardClip className="mr-2 h-5 w-5" />
+              OIDC
             </Button>
           )}
 

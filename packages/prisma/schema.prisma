@@ -11,6 +11,7 @@ datasource db {
 enum IdentityProvider {
   DOCUMENSO
   GOOGLE
+  OIDC
 }
 
 enum Role {
