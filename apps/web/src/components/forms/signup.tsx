@@ -129,7 +129,7 @@ export const SignUpForm = ({
 
   const onSignUpWithOIDCClick = async () => {
     try {
-      await signIn('google', { callbackUrl: SIGN_UP_REDIRECT_PATH });
+      await signIn('oidc', { callbackUrl: SIGN_UP_REDIRECT_PATH });
     } catch (err) {
       toast({
         title: 'An unknown error occurred',
