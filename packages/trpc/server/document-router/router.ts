@@ -358,6 +358,7 @@ export const documentRouter = router({
           query,
           userId: ctx.user.id,
         });
+
         return documents;
       } catch (err) {
         console.error(err);
