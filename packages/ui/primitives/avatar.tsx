@@ -75,9 +75,7 @@ const AvatarWithText = ({
       <AvatarFallback className="text-xs text-gray-400">{avatarFallback}</AvatarFallback>
     </Avatar>
 
-    <div
-      className={cn('flex flex-col text-left text-sm font-normal lg:flex', textSectionClassName)}
-    >
+    <div className={cn('flex flex-col text-left text-sm font-normal', textSectionClassName)}>
       <span className="text-foreground truncate">{primaryText}</span>
       <span className="text-muted-foreground truncate text-xs">{secondaryText}</span>
     </div>
