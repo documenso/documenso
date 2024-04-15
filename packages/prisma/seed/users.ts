@@ -1,6 +1,10 @@
+import { customAlphabet } from 'nanoid';
+
 import { hashSync } from '@documenso/lib/server-only/auth/hash';
 
 import { prisma } from '..';
+
+export const seedTestEmail = () => `user-${Date.now()}@test.documenso.com`;
 
 type SeedUserOptions = {
   name?: string;
@@ -9,12 +13,22 @@ type SeedUserOptions = {
   verified?: boolean;
 };
 
+const nanoid = customAlphabet('1234567890abcdef', 10);
+
 export const seedUser = async ({
-  name = `user-${Date.now()}`,
-  email = `user-${Date.now()}@test.documenso.com`,
+  name,
+  email,
   password = 'password',
   verified = true,
 }: SeedUserOptions = {}) => {
+  if (!name) {
+    name = nanoid();
+  }
+
+  if (!email) {
+    email = `${nanoid()}@test.documenso.com`;
+  }
+
   return await prisma.user.create({
     data: {
       name,

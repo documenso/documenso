@@ -52,6 +52,7 @@ model User {
   securityAuditLogs UserSecurityAuditLog[]
   Webhooks          Webhook[]
   siteSettings      SiteSettings[]
+  passkeys          Passkey[]
 
   @@index([email])
 }
@@ -68,12 +69,16 @@ enum UserSecurityAuditLogType {
   ACCOUNT_SSO_LINK
   AUTH_2FA_DISABLE
   AUTH_2FA_ENABLE
+  PASSKEY_CREATED
+  PASSKEY_DELETED
+  PASSKEY_UPDATED
   PASSWORD_RESET
   PASSWORD_UPDATE
   SIGN_OUT
   SIGN_IN
   SIGN_IN_FAIL
   SIGN_IN_2FA_FAIL
+  SIGN_IN_PASSKEY_FAIL
 }
 
 model UserSecurityAuditLog {
@@ -96,14 +101,39 @@ model PasswordResetToken {
   User      User     @relation(fields: [userId], references: [id])
 }
 
+model Passkey {
+  id                   String    @id @default(cuid())
+  userId               Int
+  name                 String
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime  @default(now())
+  lastUsedAt           DateTime?
+  credentialId         Bytes
+  credentialPublicKey  Bytes
+  counter              BigInt
+  credentialDeviceType String
+  credentialBackedUp   Boolean
+  transports           String[]
+
+  User User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model AnonymousVerificationToken {
+  id        String   @id @unique @default(cuid())
+  token     String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+}
+
 model VerificationToken {
-  id         Int      @id @default(autoincrement())
-  identifier String
-  token      String   @unique
-  expires    DateTime
-  createdAt  DateTime @default(now())
-  userId     Int
-  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id          Int      @id @default(autoincrement())
+  secondaryId String   @unique @default(cuid())
+  identifier  String
+  token       String   @unique
+  expires     DateTime
+  createdAt   DateTime @default(now())
+  userId      Int
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 enum WebhookTriggerEvents {
@@ -226,6 +256,8 @@ model Document {
   id             Int                 @id @default(autoincrement())
   userId         Int
   User           User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  authOptions    Json?
+  formValues     Json?
   title          String
   status         DocumentStatus      @default(DRAFT)
   Recipient      Recipient[]
@@ -323,6 +355,7 @@ model Recipient {
   token         String
   expired       DateTime?
   signedAt      DateTime?
+  authOptions   Json?
   role          RecipientRole @default(SIGNER)
   readStatus    ReadStatus    @default(NOT_OPENED)
   signingStatus SigningStatus @default(NOT_SIGNED)

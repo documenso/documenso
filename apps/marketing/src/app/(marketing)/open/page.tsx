@@ -2,20 +2,23 @@ import type { Metadata } from 'next';
 
 import { z } from 'zod';
 
+import { getCompletedDocumentsMonthly } from '@documenso/lib/server-only/user/get-monthly-completed-document';
 import { getUserMonthlyGrowth } from '@documenso/lib/server-only/user/get-user-monthly-growth';
 
 import { FUNDING_RAISED } from '~/app/(marketing)/open/data';
-import { MetricCard } from '~/app/(marketing)/open/metric-card';
-import { SalaryBands } from '~/app/(marketing)/open/salary-bands';
 import { CallToAction } from '~/components/(marketing)/call-to-action';
 
 import { BarMetric } from './bar-metrics';
 import { CapTable } from './cap-table';
 import { FundingRaised } from './funding-raised';
+import { MetricCard } from './metric-card';
+import { MonthlyCompletedDocumentsChart } from './monthly-completed-documents-chart';
 import { MonthlyNewUsersChart } from './monthly-new-users-chart';
 import { MonthlyTotalUsersChart } from './monthly-total-users-chart';
+import { SalaryBands } from './salary-bands';
 import { TeamMembers } from './team-members';
 import { OpenPageTooltip } from './tooltip';
+import { TotalSignedDocumentsChart } from './total-signed-documents-chart';
 import { Typefully } from './typefully';
 
 export const metadata: Metadata = {
@@ -131,15 +134,17 @@ export default async function OpenPage() {
     { total_count: mergedPullRequests },
     STARGAZERS_DATA,
     EARLY_ADOPTERS_DATA,
+    MONTHLY_USERS,
+    MONTHLY_COMPLETED_DOCUMENTS,
   ] = await Promise.all([
     fetchGithubStats(),
     fetchOpenIssues(),
     fetchMergedPullRequests(),
     fetchStargazers(),
     fetchEarlyAdopters(),
+    getUserMonthlyGrowth(),
+    getCompletedDocumentsMonthly(),
   ]);
-
-  const MONTHLY_USERS = await getUserMonthlyGrowth();
 
   return (
     <div>
@@ -161,7 +166,7 @@ export default async function OpenPage() {
           </p>
         </div>
 
-        <div className="mt-12 grid grid-cols-12 gap-8">
+        <div className="my-12 grid grid-cols-12 gap-8">
           <div className="col-span-12 grid grid-cols-4 gap-4">
             <MetricCard
               className="col-span-2 lg:col-span-1"
@@ -188,11 +193,57 @@ export default async function OpenPage() {
           <TeamMembers className="col-span-12" />
 
           <SalaryBands className="col-span-12" />
+        </div>
 
+        <h2 className="px-4 text-2xl font-semibold">Finances</h2>
+        <div className="mb-12 mt-4 grid grid-cols-12 gap-8">
           <FundingRaised data={FUNDING_RAISED} className="col-span-12 lg:col-span-6" />
 
           <CapTable className="col-span-12 lg:col-span-6" />
+        </div>
 
+        <h2 className="px-4 text-2xl font-semibold">Community</h2>
+        <div className="mb-12 mt-4 grid grid-cols-12 gap-8">
+          <BarMetric<StargazersType>
+            data={STARGAZERS_DATA}
+            metricKey="stars"
+            title="GitHub: Total Stars"
+            label="Stars"
+            className="col-span-12 lg:col-span-6"
+          />
+
+          <BarMetric<StargazersType>
+            data={STARGAZERS_DATA}
+            metricKey="mergedPRs"
+            title="GitHub: Total Merged PRs"
+            label="Merged PRs"
+            chartHeight={400}
+            className="col-span-12 lg:col-span-6"
+          />
+
+          <BarMetric<StargazersType>
+            data={STARGAZERS_DATA}
+            metricKey="forks"
+            title="GitHub: Total Forks"
+            label="Forks"
+            chartHeight={400}
+            className="col-span-12 lg:col-span-6"
+          />
+
+          <BarMetric<StargazersType>
+            data={STARGAZERS_DATA}
+            metricKey="openIssues"
+            title="GitHub: Total Open Issues"
+            label="Open Issues"
+            chartHeight={400}
+            className="col-span-12 lg:col-span-6"
+          />
+
+          <Typefully className="col-span-12 lg:col-span-6" />
+        </div>
+
+        <h2 className="px-4 text-2xl font-semibold">Growth</h2>
+        <div className="mb-12 mt-4 grid grid-cols-12 gap-8">
           <BarMetric<EarlyAdoptersType>
             data={EARLY_ADOPTERS_DATA}
             metricKey="earlyAdopters"
@@ -202,55 +253,27 @@ export default async function OpenPage() {
             extraInfo={<OpenPageTooltip />}
           />
 
-          <BarMetric<StargazersType>
-            data={STARGAZERS_DATA}
-            metricKey="stars"
-            title="Github: Total Stars"
-            label="Stars"
-            className="col-span-12 lg:col-span-6"
-          />
-
-          <BarMetric<StargazersType>
-            data={STARGAZERS_DATA}
-            metricKey="mergedPRs"
-            title="Github: Total Merged PRs"
-            label="Merged PRs"
-            chartHeight={300}
-            className="col-span-12 lg:col-span-6"
-          />
-
-          <BarMetric<StargazersType>
-            data={STARGAZERS_DATA}
-            metricKey="forks"
-            title="Github: Total Forks"
-            label="Forks"
-            chartHeight={300}
-            className="col-span-12 lg:col-span-6"
-          />
-
-          <BarMetric<StargazersType>
-            data={STARGAZERS_DATA}
-            metricKey="openIssues"
-            title="Github: Total Open Issues"
-            label="Open Issues"
-            chartHeight={300}
-            className="col-span-12 lg:col-span-6"
-          />
-
           <MonthlyTotalUsersChart data={MONTHLY_USERS} className="col-span-12 lg:col-span-6" />
           <MonthlyNewUsersChart data={MONTHLY_USERS} className="col-span-12 lg:col-span-6" />
 
-          <Typefully className="col-span-12 lg:col-span-6" />
-
-          <div className="col-span-12 mt-12 flex flex-col items-center justify-center">
-            <h2 className="text-2xl font-bold">Where's the rest?</h2>
-
-            <p className="text-muted-foreground mt-4 max-w-[55ch] text-center text-lg leading-normal">
-              We're still working on getting all our metrics together. We'll update this page as
-              soon as we have more to share.
-            </p>
-          </div>
+          <MonthlyCompletedDocumentsChart
+            data={MONTHLY_COMPLETED_DOCUMENTS}
+            className="col-span-12 lg:col-span-6"
+          />
+          <TotalSignedDocumentsChart
+            data={MONTHLY_COMPLETED_DOCUMENTS}
+            className="col-span-12 lg:col-span-6"
+          />
         </div>
+      </div>
+
+      <div className="col-span-12 mt-12 flex flex-col items-center justify-center">
+        <h2 className="text-2xl font-bold">Is there more?</h2>
+
+        <p className="text-muted-foreground mt-4 max-w-[55ch] text-center text-lg leading-normal">
+          This page is evolving as we learn what makes a great signing company. We'll update it when
+          we have more to share.
+        </p>
       </div>
 
       <CallToAction className="mt-12" utmSource="open-page" />

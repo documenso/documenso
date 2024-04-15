@@ -2,6 +2,7 @@ import { Suspense } from 'react';
 
 import { Caveat, Inter } from 'next/font/google';
 
+import { AxiomWebVitals } from 'next-axiom';
 import { PublicEnvScript } from 'next-runtime-env';
 
 import { FeatureFlagProvider } from '@documenso/lib/client-only/providers/feature-flag';
@@ -66,6 +67,8 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <link rel="manifest" href="/site.webmanifest" />
         <PublicEnvScript />
       </head>
+
+      <AxiomWebVitals />
 
       <Suspense>
         <PostHogPageview />

@@ -16,7 +16,9 @@ export const apiTokenRouter = router({
   getTokens: authenticatedProcedure.query(async ({ ctx }) => {
     try {
       return await getUserTokens({ userId: ctx.user.id });
-    } catch (e) {
+    } catch (err) {
+      console.error(err);
+
       throw new TRPCError({
         code: 'BAD_REQUEST',
         message: 'We were unable to find your API tokens. Please try again.',
@@ -34,7 +36,9 @@ export const apiTokenRouter = router({
           id,
           userId: ctx.user.id,
         });
-      } catch (e) {
+      } catch (err) {
+        console.error(err);
+
         throw new TRPCError({
           code: 'BAD_REQUEST',
           message: 'We were unable to find this API token. Please try again.',
@@ -54,7 +58,9 @@ export const apiTokenRouter = router({
           tokenName,
           expiresIn: expirationDate,
         });
-      } catch (e) {
+      } catch (err) {
+        console.error(err);
+
         throw new TRPCError({
           code: 'BAD_REQUEST',
           message: 'We were unable to create an API token. Please try again.',
@@ -73,7 +79,9 @@ export const apiTokenRouter = router({
           teamId,
           userId: ctx.user.id,
         });
-      } catch (e) {
+      } catch (err) {
+        console.error(err);
+
         throw new TRPCError({
           code: 'BAD_REQUEST',
           message: 'We were unable to delete this API Token. Please try again.',
