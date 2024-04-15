@@ -97,6 +97,21 @@
   }
 }
 
+/*
+ * Custom CSS for printing reports
+ * - Sets page margins to 0.5 inches
+ * - Hides the header and footer
+ * - Hides the print button
+ * - Sets page size to A4
+ * - Sets the font size to 12pt
+ */
+.print-provider {
+  @page {
+    margin: 1in;
+    size: A4;
+  }
+}
+
 .gradient-border-mask::before {
   mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
   -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);

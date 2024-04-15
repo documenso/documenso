@@ -17,6 +17,9 @@ import {
   RECIPIENT_ROLES_DESCRIPTION,
   RECIPIENT_ROLE_TO_EMAIL_TYPE,
 } from '../../constants/recipient-roles';
+import { getFile } from '../../universal/upload/get-file';
+import { putFile } from '../../universal/upload/put-file';
+import { insertFormValuesInPdf } from '../pdf/insert-form-values-in-pdf';
 import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
 
 export type SendDocumentOptions = {
@@ -65,6 +68,7 @@ export const sendDocument = async ({
     include: {
       Recipient: true,
       documentMeta: true,
+      documentData: true,
     },
   });
 
@@ -80,6 +84,38 @@ export const sendDocument = async ({
 
   if (document.status === DocumentStatus.COMPLETED) {
     throw new Error('Can not send completed document');
+  }
+
+  const { documentData } = document;
+
+  if (!documentData.data) {
+    throw new Error('Document data not found');
+  }
+
+  if (document.formValues) {
+    const file = await getFile(documentData);
+
+    const prefilled = await insertFormValuesInPdf({
+      pdf: Buffer.from(file),
+      formValues: document.formValues as Record<string, string | number | boolean>,
+    });
+
+    const newDocumentData = await putFile({
+      name: document.title,
+      type: 'application/pdf',
+      arrayBuffer: async () => Promise.resolve(prefilled),
+    });
+
+    const result = await prisma.document.update({
+      where: {
+        id: document.id,
+      },
+      data: {
+        documentDataId: newDocumentData.id,
+      },
+    });
+
+    Object.assign(document, result);
   }
 
   await Promise.all(

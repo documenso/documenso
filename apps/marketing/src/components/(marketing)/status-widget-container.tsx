@@ -6,7 +6,7 @@ import { StatusWidget } from './status-widget';
 export function StatusWidgetContainer() {
   return (
     <Suspense fallback={<StatusWidgetFallback />}>
-      <StatusWidget />
+      <StatusWidget slug="documenso-status" />
     </Suspense>
   );
 }
