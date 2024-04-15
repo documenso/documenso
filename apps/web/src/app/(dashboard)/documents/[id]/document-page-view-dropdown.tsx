@@ -118,7 +118,7 @@ export const DocumentPageViewDropdown = ({ document, team }: DocumentPageViewDro
         <DropdownMenuItem asChild>
           <Link href={`${documentsPath}/${document.id}/logs`}>
             <ScrollTextIcon className="mr-2 h-4 w-4" />
-            Logs
+            Audit Log
           </Link>
         </DropdownMenuItem>
 
