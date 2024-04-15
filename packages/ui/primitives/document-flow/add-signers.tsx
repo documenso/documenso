@@ -290,12 +290,7 @@ export const AddSignersFormPartial = ({
                             <Select
                               {...field}
                               onValueChange={field.onChange}
-                              disabled={
-                                isSubmitting ||
-                                hasBeenSentToRecipientId(signer.nativeId) ||
-                                signer.formId === selfSignerFormId ||
-                                signers[index].email === user?.email
-                              }
+                              disabled={isSubmitting || hasBeenSentToRecipientId(signer.nativeId)}
                             >
                               <SelectTrigger className="bg-background text-muted-foreground">
                                 <SelectValue placeholder="Inherit authentication method" />
@@ -367,12 +362,7 @@ export const AddSignersFormPartial = ({
                           <Select
                             {...field}
                             onValueChange={field.onChange}
-                            disabled={
-                              isSubmitting ||
-                              hasBeenSentToRecipientId(signer.nativeId) ||
-                              signer.formId === selfSignerFormId ||
-                              signers[index].email === user?.email
-                            }
+                            disabled={isSubmitting || hasBeenSentToRecipientId(signer.nativeId)}
                           >
                             <SelectTrigger className="bg-background w-[60px]">
                               {/* eslint-disable-next-line @typescript-eslint/consistent-type-assertions */}
@@ -467,26 +457,25 @@ export const AddSignersFormPartial = ({
                 <Plus className="-ml-1 mr-2 h-5 w-5" />
                 Add myself
               </Button>
-
-              {!alwaysShowAdvancedSettings && isDocumentEnterprise && (
-                <div className="flex flex-row items-center">
-                  <Checkbox
-                    id="showAdvancedRecipientSettings"
-                    className="h-5 w-5"
-                    checkClassName="dark:text-white text-primary"
-                    checked={showAdvancedSettings}
-                    onCheckedChange={(value) => setShowAdvancedSettings(Boolean(value))}
-                  />
-
-                  <label
-                    className="text-muted-foreground ml-2 text-sm"
-                    htmlFor="showAdvancedRecipientSettings"
-                  >
-                    Show advanced settings
-                  </label>
-                </div>
-              )}
             </div>
+            {!alwaysShowAdvancedSettings && isDocumentEnterprise && (
+              <div className="mt-6">
+                <Checkbox
+                  id="showAdvancedRecipientSettings"
+                  className="h-5 w-5"
+                  checkClassName="dark:text-white text-primary"
+                  checked={showAdvancedSettings}
+                  onCheckedChange={(value) => setShowAdvancedSettings(Boolean(value))}
+                />
+
+                <label
+                  className="text-muted-foreground ml-2 text-sm"
+                  htmlFor="showAdvancedRecipientSettings"
+                >
+                  Show advanced settings
+                </label>
+              </div>
+            )}
           </Form>
         </AnimateGenericFadeInOut>
       </DocumentFlowFormContainerContent>
