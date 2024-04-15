@@ -44,18 +44,16 @@ export const AddTemplatePlaceholderRecipientsFormPartial = ({
   const initialId = useId();
   const { data: session } = useSession();
   const user = session?.user;
-  const [selfSignerFormId, setSelfSignerFormId] = useState<string | undefined>(undefined);
   const [placeholderRecipientCount, setPlaceholderRecipientCount] = useState(() =>
     recipients.length > 1 ? recipients.length + 1 : 2,
   );
-
-  const userIsSelfRecipient = () => signers.some((signer) => signer.email === user?.email);
 
   const { currentStep, totalSteps, previousStep } = useStep();
 
   const {
     control,
     handleSubmit,
+    getValues,
     formState: { errors, isSubmitting },
   } = useForm<TAddTemplatePlacholderRecipientsFormSchema>({
     resolver: zodResolver(ZAddTemplatePlacholderRecipientsFormSchema),
@@ -100,9 +98,6 @@ export const AddTemplatePlaceholderRecipientsFormPartial = ({
       email: user?.email ?? '',
       role: RecipientRole.SIGNER,
     });
-
-    setSelfSignerFormId(newSelfSignerId);
-    setPlaceholderRecipientCount((count) => count + 1);
   };
 
   const onAddPlaceholderRecipient = () => {
@@ -117,13 +112,7 @@ export const AddTemplatePlaceholderRecipientsFormPartial = ({
   };
 
   const onRemoveSigner = (index: number) => {
-    const isSelfSigner = signers[index].formId === selfSignerFormId;
-
     removeSigner(index);
-
-    if (isSelfSigner) {
-      setSelfSignerFormId(undefined);
-    }
   };
 
   return (
@@ -242,7 +231,9 @@ export const AddTemplatePlaceholderRecipientsFormPartial = ({
           <Button
             type="button"
             className="dark:bg-muted dark:hover:bg-muted/80 bg-black/5 hover:bg-black/10"
-            disabled={isSubmitting || !!selfSignerFormId || userIsSelfRecipient()}
+            disabled={
+              isSubmitting || getValues('signers').some((signer) => signer.email === user?.email)
+            }
             onClick={() => onAddPlaceholderSelfRecipient()}
           >
             <Plus className="-ml-1 mr-2 h-5 w-5" />
