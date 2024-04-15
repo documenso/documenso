@@ -254,7 +254,7 @@ test('[DOCUMENT_FLOW]: should be able to create, send and sign a document', asyn
   await page.getByRole('button', { name: 'Sign' }).click();
 
   await page.waitForURL(`/sign/${token}/complete`);
-  await expect(page.getByText('You have signed')).toBeVisible();
+  await expect(page.getByText('Document Signed')).toBeVisible();
 
   // Check if document has been signed
   const { status: completedStatus } = await getDocumentByToken(token);

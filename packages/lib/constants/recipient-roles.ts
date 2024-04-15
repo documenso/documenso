@@ -32,3 +32,10 @@ export const RECIPIENT_ROLE_TO_EMAIL_TYPE = {
   [RecipientRole.VIEWER]: 'VIEW_REQUEST',
   [RecipientRole.APPROVER]: 'APPROVE_REQUEST',
 } as const;
+
+export const RECIPIENT_ROLE_SIGNING_REASONS = {
+  [RecipientRole.SIGNER]: 'I am a signer of this document',
+  [RecipientRole.APPROVER]: 'I am an approver of this document',
+  [RecipientRole.CC]: 'I am required to recieve a copy of this document',
+  [RecipientRole.VIEWER]: 'I am a viewer of this document',
+} satisfies Record<keyof typeof RecipientRole, string>;

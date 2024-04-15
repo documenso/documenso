@@ -56,7 +56,7 @@ export const authRouter = router({
 
       return user;
     } catch (err) {
-      console.log(err);
+      console.error(err);
 
       const error = AppError.parseError(err);
 
