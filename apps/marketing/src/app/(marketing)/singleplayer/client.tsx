@@ -161,6 +161,7 @@ export const SinglePlayerClient = () => {
     signingStatus: 'NOT_SIGNED',
     sendStatus: 'NOT_SENT',
     role: 'SIGNER',
+    authOptions: null,
   };
 
   const onFileDrop = async (file: File) => {
@@ -246,6 +247,7 @@ export const SinglePlayerClient = () => {
                   recipients={uploadedFile ? [placeholderRecipient] : []}
                   fields={fields}
                   onSubmit={onFieldsSubmit}
+                  isDocumentPdfLoaded={true}
                 />
               </fieldset>
 

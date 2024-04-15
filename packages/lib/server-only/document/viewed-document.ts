@@ -5,15 +5,21 @@ import { prisma } from '@documenso/prisma';
 import { ReadStatus } from '@documenso/prisma/client';
 import { WebhookTriggerEvents } from '@documenso/prisma/client';
 
+import type { TDocumentAccessAuthTypes } from '../../types/document-auth';
 import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
 import { getDocumentAndRecipientByToken } from './get-document-by-token';
 
 export type ViewedDocumentOptions = {
   token: string;
+  recipientAccessAuth?: TDocumentAccessAuthTypes | null;
   requestMetadata?: RequestMetadata;
 };
 
-export const viewedDocument = async ({ token, requestMetadata }: ViewedDocumentOptions) => {
+export const viewedDocument = async ({
+  token,
+  recipientAccessAuth,
+  requestMetadata,
+}: ViewedDocumentOptions) => {
   const recipient = await prisma.recipient.findFirst({
     where: {
       token,
@@ -51,12 +57,13 @@ export const viewedDocument = async ({ token, requestMetadata }: ViewedDocumentO
           recipientId: recipient.id,
           recipientName: recipient.name,
           recipientRole: recipient.role,
+          accessAuth: recipientAccessAuth || undefined,
         },
       }),
     });
   });
 
-  const document = await getDocumentAndRecipientByToken({ token });
+  const document = await getDocumentAndRecipientByToken({ token, requireAccessAuth: false });
 
   await triggerWebhook({
     event: WebhookTriggerEvents.DOCUMENT_OPENED,

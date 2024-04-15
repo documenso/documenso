@@ -1,13 +1,22 @@
+import { isUserEnterprise } from '@documenso/ee/server-only/util/is-document-enterprise';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
+import {
+  type TRecipientActionAuthTypes,
+  ZRecipientAuthOptionsSchema,
+} from '@documenso/lib/types/document-auth';
 import type { RequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 import { nanoid } from '@documenso/lib/universal/id';
 import {
   createDocumentAuditLogData,
   diffRecipientChanges,
 } from '@documenso/lib/utils/document-audit-logs';
+import { createRecipientAuthOptions } from '@documenso/lib/utils/document-auth';
 import { prisma } from '@documenso/prisma';
+import type { Recipient } from '@documenso/prisma/client';
 import { RecipientRole } from '@documenso/prisma/client';
 import { SendStatus, SigningStatus } from '@documenso/prisma/client';
+
+import { AppError, AppErrorCode } from '../../errors/app-error';
 
 export interface SetRecipientsForDocumentOptions {
   userId: number;
@@ -18,6 +27,7 @@ export interface SetRecipientsForDocumentOptions {
     email: string;
     name: string;
     role: RecipientRole;
+    actionAuth?: TRecipientActionAuthTypes | null;
   }[];
   requestMetadata?: RequestMetadata;
 }
@@ -28,7 +38,7 @@ export const setRecipientsForDocument = async ({
   documentId,
   recipients,
   requestMetadata,
-}: SetRecipientsForDocumentOptions) => {
+}: SetRecipientsForDocumentOptions): Promise<Recipient[]> => {
   const document = await prisma.document.findFirst({
     where: {
       id: documentId,
@@ -67,6 +77,23 @@ export const setRecipientsForDocument = async ({
 
   if (document.completedAt) {
     throw new Error('Document already complete');
+  }
+
+  const recipientsHaveActionAuth = recipients.some((recipient) => recipient.actionAuth);
+
+  // Check if user has permission to set the global action auth.
+  if (recipientsHaveActionAuth) {
+    const isDocumentEnterprise = await isUserEnterprise({
+      userId,
+      teamId,
+    });
+
+    if (!isDocumentEnterprise) {
+      throw new AppError(
+        AppErrorCode.UNAUTHORIZED,
+        'You do not have permission to set the action auth',
+      );
+    }
   }
 
   const normalizedRecipients = recipients.map((recipient) => ({
@@ -111,6 +138,15 @@ export const setRecipientsForDocument = async ({
   const persistedRecipients = await prisma.$transaction(async (tx) => {
     return await Promise.all(
       linkedRecipients.map(async (recipient) => {
+        let authOptions = ZRecipientAuthOptionsSchema.parse(recipient._persisted?.authOptions);
+
+        if (recipient.actionAuth !== undefined) {
+          authOptions = createRecipientAuthOptions({
+            accessAuth: authOptions.accessAuth,
+            actionAuth: recipient.actionAuth,
+          });
+        }
+
         const upsertedRecipient = await tx.recipient.upsert({
           where: {
             id: recipient._persisted?.id ?? -1,
@@ -124,6 +160,7 @@ export const setRecipientsForDocument = async ({
             sendStatus: recipient.role === RecipientRole.CC ? SendStatus.SENT : SendStatus.NOT_SENT,
             signingStatus:
               recipient.role === RecipientRole.CC ? SigningStatus.SIGNED : SigningStatus.NOT_SIGNED,
+            authOptions,
           },
           create: {
             name: recipient.name,
@@ -134,6 +171,7 @@ export const setRecipientsForDocument = async ({
             sendStatus: recipient.role === RecipientRole.CC ? SendStatus.SENT : SendStatus.NOT_SENT,
             signingStatus:
               recipient.role === RecipientRole.CC ? SigningStatus.SIGNED : SigningStatus.NOT_SIGNED,
+            authOptions,
           },
         });
 
@@ -187,7 +225,10 @@ export const setRecipientsForDocument = async ({
               documentId: documentId,
               user,
               requestMetadata,
-              data: baseAuditLog,
+              data: {
+                ...baseAuditLog,
+                actionAuth: recipient.actionAuth || undefined,
+              },
             }),
           });
         }
@@ -226,5 +267,17 @@ export const setRecipientsForDocument = async ({
     });
   }
 
-  return persistedRecipients;
+  // Filter out recipients that have been removed or have been updated.
+  const filteredRecipients: Recipient[] = existingRecipients.filter((recipient) => {
+    const isRemoved = removedRecipients.find(
+      (removedRecipient) => removedRecipient.id === recipient.id,
+    );
+    const isUpdated = persistedRecipients.find(
+      (persistedRecipient) => persistedRecipient.id === recipient.id,
+    );
+
+    return !isRemoved && !isUpdated;
+  });
+
+  return [...filteredRecipients, ...persistedRecipients];
 };

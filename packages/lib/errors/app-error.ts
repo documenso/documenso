@@ -137,12 +137,16 @@ export class AppError extends Error {
   }
 
   static parseFromJSONString(jsonString: string): AppError | null {
-    const parsed = ZAppErrorJsonSchema.safeParse(JSON.parse(jsonString));
+    try {
+      const parsed = ZAppErrorJsonSchema.safeParse(JSON.parse(jsonString));
 
-    if (!parsed.success) {
+      if (!parsed.success) {
+        return null;
+      }
+
+      return new AppError(parsed.data.code, parsed.data.message, parsed.data.userMessage);
+    } catch {
       return null;
     }
-
-    return new AppError(parsed.data.code, parsed.data.message, parsed.data.userMessage);
   }
 }

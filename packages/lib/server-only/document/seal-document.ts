@@ -2,7 +2,7 @@
 
 import { nanoid } from 'nanoid';
 import path from 'node:path';
-import { PDFDocument, PDFSignature, rectangle } from 'pdf-lib';
+import { PDFDocument } from 'pdf-lib';
 
 import PostHogServerClient from '@documenso/lib/server-only/feature-flags/get-post-hog-server-client';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
@@ -15,7 +15,10 @@ import { signPdf } from '@documenso/signing';
 import type { RequestMetadata } from '../../universal/extract-request-metadata';
 import { getFile } from '../../universal/upload/get-file';
 import { putFile } from '../../universal/upload/put-file';
+import { getCertificatePdf } from '../htmltopdf/get-certificate-pdf';
+import { flattenAnnotations } from '../pdf/flatten-annotations';
 import { insertFieldInPDF } from '../pdf/insert-field-in-pdf';
+import { normalizeSignatureAppearances } from '../pdf/normalize-signature-appearances';
 import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
 import { sendCompletedEmail } from './send-completed-email';
 
@@ -89,33 +92,22 @@ export const sealDocument = async ({
   // !: Need to write the fields onto the document as a hard copy
   const pdfData = await getFile(documentData);
 
+  const certificate = await getCertificatePdf({ documentId }).then(async (doc) =>
+    PDFDocument.load(doc),
+  );
+
   const doc = await PDFDocument.load(pdfData);
 
-  const form = doc.getForm();
+  // Normalize and flatten layers that could cause issues with the signature
+  normalizeSignatureAppearances(doc);
+  doc.getForm().flatten();
+  flattenAnnotations(doc);
 
-  // Remove old signatures
-  for (const field of form.getFields()) {
-    if (field instanceof PDFSignature) {
-      field.acroField.getWidgets().forEach((widget) => {
-        widget.ensureAP();
+  const certificatePages = await doc.copyPages(certificate, certificate.getPageIndices());
 
-        try {
-          widget.getNormalAppearance();
-        } catch (e) {
-          const { context } = widget.dict;
-
-          const xobj = context.formXObject([rectangle(0, 0, 0, 0)]);
-
-          const streamRef = context.register(xobj);
-
-          widget.setNormalAppearance(streamRef);
-        }
-      });
-    }
-  }
-
-  // Flatten the form to stop annotation layers from appearing above documenso fields
-  form.flatten();
+  certificatePages.forEach((page) => {
+    doc.addPage(page);
+  });
 
   for (const field of fields) {
     await insertFieldInPDF(doc, field);
@@ -172,9 +164,19 @@ export const sealDocument = async ({
     await sendCompletedEmail({ documentId, requestMetadata });
   }
 
+  const updatedDocument = await prisma.document.findFirstOrThrow({
+    where: {
+      id: document.id,
+    },
+    include: {
+      documentData: true,
+      Recipient: true,
+    },
+  });
+
   await triggerWebhook({
     event: WebhookTriggerEvents.DOCUMENT_COMPLETED,
-    data: document,
+    data: updatedDocument,
     userId: document.userId,
     teamId: document.teamId ?? undefined,
   });
