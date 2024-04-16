@@ -80,6 +80,7 @@ export const AddTemplatePlaceholderRecipientsFormPartial = ({
     append: appendSigner,
     fields: signers,
     remove: removeSigner,
+    update: updateSigner,
   } = useFieldArray({
     control,
     name: 'signers',
@@ -97,7 +98,15 @@ export const AddTemplatePlaceholderRecipientsFormPartial = ({
   };
 
   const onRemoveSigner = (index: number) => {
+    for (let i = index; i < signers.length; i++) {
+      updateSigner(i, {
+        ...signers[i],
+        name: `Recipient ${i}`,
+        email: `recipient.${i}@documenso.com`,
+      });
+    }
     removeSigner(index);
+    setPlaceholderRecipientCount((count) => count - 1);
   };
 
   return (
