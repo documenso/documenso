@@ -5,6 +5,7 @@ import React, { useId, useMemo, useState } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { motion } from 'framer-motion';
 import { InfoIcon, Plus, Trash } from 'lucide-react';
+import { useSession } from 'next-auth/react';
 import { useFieldArray, useForm } from 'react-hook-form';
 
 import { useLimits } from '@documenso/ee/server-only/limits/provider/client';
@@ -60,6 +61,8 @@ export const AddSignersFormPartial = ({
 }: AddSignersFormProps) => {
   const { toast } = useToast();
   const { remaining } = useLimits();
+  const { data: session } = useSession();
+  const user = session?.user;
 
   const initialId = useId();
 
@@ -133,6 +136,16 @@ export const AddSignersFormPartial = ({
         recipient.sendStatus === SendStatus.SENT &&
         recipient.role !== RecipientRole.CC,
     );
+  };
+
+  const onAddSelfSigner = () => {
+    appendSigner({
+      formId: nanoid(12),
+      name: user?.name ?? '',
+      email: user?.email ?? '',
+      role: RecipientRole.SIGNER,
+      actionAuth: undefined,
+    });
   };
 
   const onAddSigner = () => {
@@ -209,8 +222,12 @@ export const AddSignersFormPartial = ({
                           <Input
                             type="email"
                             placeholder="Email"
-                            disabled={isSubmitting || hasBeenSentToRecipientId(signer.nativeId)}
                             {...field}
+                            disabled={
+                              isSubmitting ||
+                              hasBeenSentToRecipientId(signer.nativeId) ||
+                              signers[index].email === user?.email
+                            }
                             onKeyDown={onKeyDown}
                           />
                         </FormControl>
@@ -237,8 +254,12 @@ export const AddSignersFormPartial = ({
                         <FormControl>
                           <Input
                             placeholder="Name"
-                            disabled={isSubmitting || hasBeenSentToRecipientId(signer.nativeId)}
                             {...field}
+                            disabled={
+                              isSubmitting ||
+                              hasBeenSentToRecipientId(signer.nativeId) ||
+                              signers[index].email === user?.email
+                            }
                             onKeyDown={onKeyDown}
                           />
                         </FormControl>
@@ -403,32 +424,46 @@ export const AddSignersFormPartial = ({
             >
               <Button
                 type="button"
+                className="flex-1"
                 disabled={isSubmitting || signers.length >= remaining.recipients}
                 onClick={() => onAddSigner()}
               >
                 <Plus className="-ml-1 mr-2 h-5 w-5" />
                 Add Signer
               </Button>
-
-              {!alwaysShowAdvancedSettings && isDocumentEnterprise && (
-                <div className="flex flex-row items-center">
-                  <Checkbox
-                    id="showAdvancedRecipientSettings"
-                    className="h-5 w-5"
-                    checkClassName="dark:text-white text-primary"
-                    checked={showAdvancedSettings}
-                    onCheckedChange={(value) => setShowAdvancedSettings(Boolean(value))}
-                  />
-
-                  <label
-                    className="text-muted-foreground ml-2 text-sm"
-                    htmlFor="showAdvancedRecipientSettings"
-                  >
-                    Show advanced settings
-                  </label>
-                </div>
-              )}
+              <Button
+                type="button"
+                variant="secondary"
+                className="dark:bg-muted dark:hover:bg-muted/80 bg-black/5 hover:bg-black/10"
+                disabled={
+                  isSubmitting ||
+                  form.getValues('signers').some((signer) => signer.email === user?.email)
+                }
+                onClick={() => onAddSelfSigner()}
+              >
+                <Plus className="-ml-1 mr-2 h-5 w-5" />
+                Add myself
+              </Button>
             </div>
+
+            {!alwaysShowAdvancedSettings && isDocumentEnterprise && (
+              <div className="mt-4 flex flex-row items-center">
+                <Checkbox
+                  id="showAdvancedRecipientSettings"
+                  className="h-5 w-5"
+                  checkClassName="dark:text-white text-primary"
+                  checked={showAdvancedSettings}
+                  onCheckedChange={(value) => setShowAdvancedSettings(Boolean(value))}
+                />
+
+                <label
+                  className="text-muted-foreground ml-2 text-sm"
+                  htmlFor="showAdvancedRecipientSettings"
+                >
+                  Show advanced settings
+                </label>
+              </div>
+            )}
           </Form>
         </AnimateGenericFadeInOut>
       </DocumentFlowFormContainerContent>
