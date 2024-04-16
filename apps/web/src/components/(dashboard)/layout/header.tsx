@@ -58,10 +58,7 @@ export const Header = ({ className, user, teams, ...props }: HeaderProps) => {
           <Logo className="h-6 w-auto" />
         </Link>
 
-        <DesktopNav
-          isCommandMenuOpen={isCommandMenuOpen}
-          setIsCommandMenuOpen={setIsCommandMenuOpen}
-        />
+        <DesktopNav setIsCommandMenuOpen={setIsCommandMenuOpen} />
 
         <div className="flex gap-x-4 md:ml-8">
           <MenuSwitcher user={user} teams={teams} />
