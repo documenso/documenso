@@ -342,6 +342,15 @@ export const AddSignersFormPartial = ({
                                 <div className="flex items-center">
                                   <span className="mr-2">{ROLE_ICONS[RecipientRole.SIGNER]}</span>
                                   Signer
+                                  <Tooltip>
+                                    <TooltipTrigger className="-mr-1 ml-auto">
+                                      <InfoIcon className="mx-2 h-4 w-4" />
+                                    </TooltipTrigger>
+
+                                    <TooltipContent className="text-foreground z-9999 max-w-md p-4">
+                                      <p>The recipient is required to sign the document.</p>
+                                    </TooltipContent>
+                                  </Tooltip>
                                 </div>
                               </SelectItem>
 
@@ -349,6 +358,18 @@ export const AddSignersFormPartial = ({
                                 <div className="flex items-center">
                                   <span className="mr-2">{ROLE_ICONS[RecipientRole.CC]}</span>
                                   Receives copy
+                                  <Tooltip>
+                                    <TooltipTrigger className="-mr-1 ml-auto">
+                                      <InfoIcon className="mx-2 h-4 w-4" />
+                                    </TooltipTrigger>
+
+                                    <TooltipContent className="text-foreground z-9999 max-w-md p-4">
+                                      <p>
+                                        The recipient is not required to take any action and
+                                        receives a copy of the document.
+                                      </p>
+                                    </TooltipContent>
+                                  </Tooltip>
                                 </div>
                               </SelectItem>
 
@@ -356,6 +377,15 @@ export const AddSignersFormPartial = ({
                                 <div className="flex items-center">
                                   <span className="mr-2">{ROLE_ICONS[RecipientRole.APPROVER]}</span>
                                   Approver
+                                  <Tooltip>
+                                    <TooltipTrigger className="-mr-1 ml-auto">
+                                      <InfoIcon className="mx-2 h-4 w-4" />
+                                    </TooltipTrigger>
+
+                                    <TooltipContent className="text-foreground z-9999 max-w-md p-4">
+                                      <p>The recipient is required to approve the document.</p>
+                                    </TooltipContent>
+                                  </Tooltip>
                                 </div>
                               </SelectItem>
 
@@ -363,6 +393,15 @@ export const AddSignersFormPartial = ({
                                 <div className="flex items-center">
                                   <span className="mr-2">{ROLE_ICONS[RecipientRole.VIEWER]}</span>
                                   Viewer
+                                  <Tooltip>
+                                    <TooltipTrigger className="-mr-1 ml-auto">
+                                      <InfoIcon className="mx-2 h-4 w-4" />
+                                    </TooltipTrigger>
+
+                                    <TooltipContent className="text-foreground z-9999 max-w-md p-4">
+                                      <p>The recipient is required to view the document.</p>
+                                    </TooltipContent>
+                                  </Tooltip>
                                 </div>
                               </SelectItem>
                             </SelectContent>
