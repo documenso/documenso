@@ -114,8 +114,10 @@ export const DeleteDocumentDialog = ({
                   <p className="mt-1">Once confirmed, the following will occur:</p>
 
                   <ul className="mt-0.5 list-inside list-disc">
-                    <li>All recipients will be notified</li>
                     <li>Document will be permanently deleted</li>
+                    <li>Document signing process will be cancelled</li>
+                    <li>All inserted signatures will be voided</li>
+                    <li>All recipients will be notified</li>
                   </ul>
                 </AlertDescription>
               ))
