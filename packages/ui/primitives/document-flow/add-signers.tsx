@@ -63,7 +63,6 @@ export const AddSignersFormPartial = ({
   const { remaining } = useLimits();
   const { data: session } = useSession();
   const user = session?.user;
-  const [selfSignerFormId, setSelfSignerFormId] = useState<string | undefined>(undefined);
 
   const initialId = useId();
 
@@ -149,8 +148,6 @@ export const AddSignersFormPartial = ({
       role: RecipientRole.SIGNER,
       actionAuth: undefined,
     });
-
-    setSelfSignerFormId(newSelfSignerId);
   };
 
   const onAddSigner = () => {
@@ -174,10 +171,6 @@ export const AddSignersFormPartial = ({
       });
 
       return;
-    }
-
-    if (signer.formId === selfSignerFormId) {
-      setSelfSignerFormId(undefined);
     }
 
     removeSigner(index);
@@ -235,7 +228,6 @@ export const AddSignersFormPartial = ({
                             disabled={
                               isSubmitting ||
                               hasBeenSentToRecipientId(signer.nativeId) ||
-                              signer.formId === selfSignerFormId ||
                               signers[index].email === user?.email
                             }
                             onKeyDown={onKeyDown}
@@ -268,7 +260,6 @@ export const AddSignersFormPartial = ({
                             disabled={
                               isSubmitting ||
                               hasBeenSentToRecipientId(signer.nativeId) ||
-                              signer.formId === selfSignerFormId ||
                               signers[index].email === user?.email
                             }
                             onKeyDown={onKeyDown}
@@ -448,9 +439,7 @@ export const AddSignersFormPartial = ({
                 className="dark:bg-muted dark:hover:bg-muted/80 bg-black/5 hover:bg-black/10"
                 disabled={
                   isSubmitting ||
-                  signers.length >= remaining.recipients ||
-                  !!selfSignerFormId ||
-                  signers.some((signer) => signer.email === user?.email)
+                  form.getValues('signers').some((signer) => signer.email === user?.email)
                 }
                 onClick={() => onAddSelfSigner()}
               >
@@ -458,8 +447,9 @@ export const AddSignersFormPartial = ({
                 Add myself
               </Button>
             </div>
+
             {!alwaysShowAdvancedSettings && isDocumentEnterprise && (
-              <div className="mt-6">
+              <div className="mt-4 flex flex-row items-center">
                 <Checkbox
                   id="showAdvancedRecipientSettings"
                   className="h-5 w-5"
