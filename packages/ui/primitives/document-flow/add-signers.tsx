@@ -139,10 +139,8 @@ export const AddSignersFormPartial = ({
   };
 
   const onAddSelfSigner = () => {
-    const newSelfSignerId = nanoid(12);
-
     appendSigner({
-      formId: newSelfSignerId,
+      formId: nanoid(12),
       name: user?.name ?? '',
       email: user?.email ?? '',
       role: RecipientRole.SIGNER,
