@@ -5,6 +5,7 @@ import React, { useId, useState } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Plus, Trash } from 'lucide-react';
+import { useSession } from 'next-auth/react';
 import { Controller, useFieldArray, useForm } from 'react-hook-form';
 
 import { nanoid } from '@documenso/lib/universal/id';
@@ -41,6 +42,8 @@ export const AddTemplatePlaceholderRecipientsFormPartial = ({
   onSubmit,
 }: AddTemplatePlaceholderRecipientsFormProps) => {
   const initialId = useId();
+  const { data: session } = useSession();
+  const user = session?.user;
   const [placeholderRecipientCount, setPlaceholderRecipientCount] = useState(() =>
     recipients.length > 1 ? recipients.length + 1 : 2,
   );
@@ -50,6 +53,7 @@ export const AddTemplatePlaceholderRecipientsFormPartial = ({
   const {
     control,
     handleSubmit,
+    getValues,
     formState: { errors, isSubmitting },
   } = useForm<TAddTemplatePlacholderRecipientsFormSchema>({
     resolver: zodResolver(ZAddTemplatePlacholderRecipientsFormSchema),
@@ -84,6 +88,15 @@ export const AddTemplatePlaceholderRecipientsFormPartial = ({
     control,
     name: 'signers',
   });
+
+  const onAddPlaceholderSelfRecipient = () => {
+    appendSigner({
+      formId: nanoid(12),
+      name: user?.name ?? '',
+      email: user?.email ?? '',
+      role: RecipientRole.SIGNER,
+    });
+  };
 
   const onAddPlaceholderRecipient = () => {
     appendSigner({
@@ -203,10 +216,26 @@ export const AddTemplatePlaceholderRecipientsFormPartial = ({
           error={'signers__root' in errors && errors['signers__root']}
         />
 
-        <div className="mt-4">
-          <Button type="button" disabled={isSubmitting} onClick={() => onAddPlaceholderRecipient()}>
+        <div className="mt-4 flex flex-row items-center space-x-4">
+          <Button
+            type="button"
+            className="flex-1"
+            disabled={isSubmitting}
+            onClick={() => onAddPlaceholderRecipient()}
+          >
             <Plus className="-ml-1 mr-2 h-5 w-5" />
             Add Placeholder Recipient
+          </Button>
+          <Button
+            type="button"
+            className="dark:bg-muted dark:hover:bg-muted/80 bg-black/5 hover:bg-black/10"
+            disabled={
+              isSubmitting || getValues('signers').some((signer) => signer.email === user?.email)
+            }
+            onClick={() => onAddPlaceholderSelfRecipient()}
+          >
+            <Plus className="-ml-1 mr-2 h-5 w-5" />
+            Add Myself
           </Button>
         </div>
       </DocumentFlowFormContainerContent>
