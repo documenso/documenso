@@ -340,13 +340,16 @@ export const AddSignersFormPartial = ({
                             <SelectContent align="end">
                               <SelectItem value={RecipientRole.SIGNER}>
                                 <div className="flex items-center">
-                                  <span className="mr-2">{ROLE_ICONS[RecipientRole.SIGNER]}</span>
-                                  Signer
+                                  <div className="flex w-[150px] items-center">
+                                    {' '}
+                                    {/* Adjust the width as needed */}
+                                    <span className="mr-2">{ROLE_ICONS[RecipientRole.SIGNER]}</span>
+                                    Needs to sign
+                                  </div>
                                   <Tooltip>
-                                    <TooltipTrigger className="-mr-1 ml-auto">
-                                      <InfoIcon className="mx-2 h-4 w-4" />
+                                    <TooltipTrigger>
+                                      <InfoIcon className="h-4 w-4" />
                                     </TooltipTrigger>
-
                                     <TooltipContent className="text-foreground z-9999 max-w-md p-4">
                                       <p>The recipient is required to sign the document.</p>
                                     </TooltipContent>
@@ -354,34 +357,20 @@ export const AddSignersFormPartial = ({
                                 </div>
                               </SelectItem>
 
-                              <SelectItem value={RecipientRole.CC}>
-                                <div className="flex items-center">
-                                  <span className="mr-2">{ROLE_ICONS[RecipientRole.CC]}</span>
-                                  Receives copy
-                                  <Tooltip>
-                                    <TooltipTrigger className="-mr-1 ml-auto">
-                                      <InfoIcon className="mx-2 h-4 w-4" />
-                                    </TooltipTrigger>
-
-                                    <TooltipContent className="text-foreground z-9999 max-w-md p-4">
-                                      <p>
-                                        The recipient is not required to take any action and
-                                        receives a copy of the document.
-                                      </p>
-                                    </TooltipContent>
-                                  </Tooltip>
-                                </div>
-                              </SelectItem>
-
                               <SelectItem value={RecipientRole.APPROVER}>
                                 <div className="flex items-center">
-                                  <span className="mr-2">{ROLE_ICONS[RecipientRole.APPROVER]}</span>
-                                  Approver
+                                  <div className="flex w-[150px] items-center">
+                                    {' '}
+                                    {/* Adjust the width as needed */}
+                                    <span className="mr-2">
+                                      {ROLE_ICONS[RecipientRole.APPROVER]}
+                                    </span>
+                                    Needs to approve
+                                  </div>
                                   <Tooltip>
-                                    <TooltipTrigger className="-mr-1 ml-auto">
-                                      <InfoIcon className="mx-2 h-4 w-4" />
+                                    <TooltipTrigger>
+                                      <InfoIcon className="h-4 w-4" />
                                     </TooltipTrigger>
-
                                     <TooltipContent className="text-foreground z-9999 max-w-md p-4">
                                       <p>The recipient is required to approve the document.</p>
                                     </TooltipContent>
@@ -391,15 +380,40 @@ export const AddSignersFormPartial = ({
 
                               <SelectItem value={RecipientRole.VIEWER}>
                                 <div className="flex items-center">
-                                  <span className="mr-2">{ROLE_ICONS[RecipientRole.VIEWER]}</span>
-                                  Viewer
+                                  <div className="flex w-[150px] items-center">
+                                    {' '}
+                                    {/* Adjust the width as needed */}
+                                    <span className="mr-2">{ROLE_ICONS[RecipientRole.VIEWER]}</span>
+                                    Needs to view
+                                  </div>
                                   <Tooltip>
-                                    <TooltipTrigger className="-mr-1 ml-auto">
-                                      <InfoIcon className="mx-2 h-4 w-4" />
+                                    <TooltipTrigger>
+                                      <InfoIcon className="h-4 w-4" />
                                     </TooltipTrigger>
-
                                     <TooltipContent className="text-foreground z-9999 max-w-md p-4">
                                       <p>The recipient is required to view the document.</p>
+                                    </TooltipContent>
+                                  </Tooltip>
+                                </div>
+                              </SelectItem>
+
+                              <SelectItem value={RecipientRole.CC}>
+                                <div className="flex items-center">
+                                  <div className="flex w-[150px] items-center">
+                                    {' '}
+                                    {/* Adjust the width as needed */}
+                                    <span className="mr-2">{ROLE_ICONS[RecipientRole.CC]}</span>
+                                    Receives copy
+                                  </div>
+                                  <Tooltip>
+                                    <TooltipTrigger>
+                                      <InfoIcon className="h-4 w-4" />
+                                    </TooltipTrigger>
+                                    <TooltipContent className="text-foreground z-9999 max-w-md p-4">
+                                      <p>
+                                        The recipient is not required to take any action and
+                                        receives a copy of the document.
+                                      </p>
                                     </TooltipContent>
                                   </Tooltip>
                                 </div>
