@@ -341,8 +341,6 @@ export const AddSignersFormPartial = ({
                               <SelectItem value={RecipientRole.SIGNER}>
                                 <div className="flex items-center">
                                   <div className="flex w-[150px] items-center">
-                                    {' '}
-                                    {/* Adjust the width as needed */}
                                     <span className="mr-2">{ROLE_ICONS[RecipientRole.SIGNER]}</span>
                                     Needs to sign
                                   </div>
