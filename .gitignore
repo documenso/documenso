@@ -31,10 +31,6 @@ yarn-error.log*
 
 # turbo
 .turbo
-<<<<<<< HEAD
-=======
-.turbo-cookie
->>>>>>> main
 
 # vercel
 .vercel

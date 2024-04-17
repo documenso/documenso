@@ -1,17 +1,5 @@
-<<<<<<< HEAD
 import { prisma } from '@documenso/prisma';
 import { FieldType, SendStatus, SigningStatus } from '@documenso/prisma/client';
-=======
-import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
-import type { RequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
-import {
-  createDocumentAuditLogData,
-  diffFieldChanges,
-} from '@documenso/lib/utils/document-audit-logs';
-import { prisma } from '@documenso/prisma';
-import type { Field, FieldType } from '@documenso/prisma/client';
-import { SendStatus, SigningStatus } from '@documenso/prisma/client';
->>>>>>> main
 
 export interface SetFieldsForDocumentOptions {
   userId: number;
@@ -26,54 +14,17 @@ export interface SetFieldsForDocumentOptions {
     pageWidth: number;
     pageHeight: number;
   }[];
-<<<<<<< HEAD
-=======
-  requestMetadata?: RequestMetadata;
->>>>>>> main
 }
 
 export const setFieldsForDocument = async ({
   userId,
   documentId,
   fields,
-<<<<<<< HEAD
 }: SetFieldsForDocumentOptions) => {
   const document = await prisma.document.findFirst({
     where: {
       id: documentId,
       userId,
-=======
-  requestMetadata,
-}: SetFieldsForDocumentOptions): Promise<Field[]> => {
-  const document = await prisma.document.findFirst({
-    where: {
-      id: documentId,
-      OR: [
-        {
-          userId,
-        },
-        {
-          team: {
-            members: {
-              some: {
-                userId,
-              },
-            },
-          },
-        },
-      ],
-    },
-  });
-
-  const user = await prisma.user.findFirstOrThrow({
-    where: {
-      id: userId,
-    },
-    select: {
-      id: true,
-      name: true,
-      email: true,
->>>>>>> main
     },
   });
 
@@ -81,13 +32,6 @@ export const setFieldsForDocument = async ({
     throw new Error('Document not found');
   }
 
-<<<<<<< HEAD
-=======
-  if (document.completedAt) {
-    throw new Error('Document already complete');
-  }
-
->>>>>>> main
   const existingFields = await prisma.field.findMany({
     where: {
       documentId,
@@ -98,15 +42,11 @@ export const setFieldsForDocument = async ({
   });
 
   const removedFields = existingFields.filter(
-<<<<<<< HEAD
     (existingField) =>
       !fields.find(
         (field) =>
           field.id === existingField.id || field.signerEmail === existingField.Recipient?.email,
       ),
-=======
-    (existingField) => !fields.find((field) => field.id === existingField.id),
->>>>>>> main
   );
 
   const linkedFields = fields
@@ -125,7 +65,6 @@ export const setFieldsForDocument = async ({
       );
     });
 
-<<<<<<< HEAD
   const persistedFields = await prisma.$transaction(
     // Disabling as wrapping promises here causes type issues
     // eslint-disable-next-line @typescript-eslint/promise-function-async
@@ -180,135 +119,4 @@ export const setFieldsForDocument = async ({
   }
 
   return persistedFields;
-=======
-  const persistedFields = await prisma.$transaction(async (tx) => {
-    return await Promise.all(
-      linkedFields.map(async (field) => {
-        const fieldSignerEmail = field.signerEmail.toLowerCase();
-
-        const upsertedField = await tx.field.upsert({
-          where: {
-            id: field._persisted?.id ?? -1,
-            documentId,
-          },
-          update: {
-            page: field.pageNumber,
-            positionX: field.pageX,
-            positionY: field.pageY,
-            width: field.pageWidth,
-            height: field.pageHeight,
-          },
-          create: {
-            type: field.type,
-            page: field.pageNumber,
-            positionX: field.pageX,
-            positionY: field.pageY,
-            width: field.pageWidth,
-            height: field.pageHeight,
-            customText: '',
-            inserted: false,
-            Document: {
-              connect: {
-                id: documentId,
-              },
-            },
-            Recipient: {
-              connect: {
-                documentId_email: {
-                  documentId,
-                  email: fieldSignerEmail,
-                },
-              },
-            },
-          },
-        });
-
-        if (upsertedField.recipientId === null) {
-          throw new Error('Not possible');
-        }
-
-        const baseAuditLog = {
-          fieldId: upsertedField.secondaryId,
-          fieldRecipientEmail: fieldSignerEmail,
-          fieldRecipientId: upsertedField.recipientId,
-          fieldType: upsertedField.type,
-        };
-
-        const changes = field._persisted ? diffFieldChanges(field._persisted, upsertedField) : [];
-
-        // Handle field updated audit log.
-        if (field._persisted && changes.length > 0) {
-          await tx.documentAuditLog.create({
-            data: createDocumentAuditLogData({
-              type: DOCUMENT_AUDIT_LOG_TYPE.FIELD_UPDATED,
-              documentId: documentId,
-              user,
-              requestMetadata,
-              data: {
-                changes,
-                ...baseAuditLog,
-              },
-            }),
-          });
-        }
-
-        // Handle field created audit log.
-        if (!field._persisted) {
-          await tx.documentAuditLog.create({
-            data: createDocumentAuditLogData({
-              type: DOCUMENT_AUDIT_LOG_TYPE.FIELD_CREATED,
-              documentId: documentId,
-              user,
-              requestMetadata,
-              data: {
-                ...baseAuditLog,
-              },
-            }),
-          });
-        }
-
-        return upsertedField;
-      }),
-    );
-  });
-
-  if (removedFields.length > 0) {
-    await prisma.$transaction(async (tx) => {
-      await tx.field.deleteMany({
-        where: {
-          id: {
-            in: removedFields.map((field) => field.id),
-          },
-        },
-      });
-
-      await tx.documentAuditLog.createMany({
-        data: removedFields.map((field) =>
-          createDocumentAuditLogData({
-            type: DOCUMENT_AUDIT_LOG_TYPE.FIELD_DELETED,
-            documentId: documentId,
-            user,
-            requestMetadata,
-            data: {
-              fieldId: field.secondaryId,
-              fieldRecipientEmail: field.Recipient?.email ?? '',
-              fieldRecipientId: field.recipientId ?? -1,
-              fieldType: field.type,
-            },
-          }),
-        ),
-      });
-    });
-  }
-
-  // Filter out fields that have been removed or have been updated.
-  const filteredFields = existingFields.filter((field) => {
-    const isRemoved = removedFields.find((removedField) => removedField.id === field.id);
-    const isUpdated = persistedFields.find((persistedField) => persistedField.id === field.id);
-
-    return !isRemoved && !isUpdated;
-  });
-
-  return [...filteredFields, ...persistedFields];
->>>>>>> main
 };

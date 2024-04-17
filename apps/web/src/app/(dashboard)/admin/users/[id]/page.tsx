@@ -4,20 +4,12 @@ import { useRouter } from 'next/navigation';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
-<<<<<<< HEAD
 import { z } from 'zod';
 
 import { trpc } from '@documenso/trpc/react';
 import { ZUpdateProfileMutationByAdminSchema } from '@documenso/trpc/server/admin-router/schema';
 import { Button } from '@documenso/ui/primitives/button';
 import { Combobox } from '@documenso/ui/primitives/combobox';
-=======
-import type { z } from 'zod';
-
-import { trpc } from '@documenso/trpc/react';
-import { ZAdminUpdateProfileMutationSchema } from '@documenso/trpc/server/admin-router/schema';
-import { Button } from '@documenso/ui/primitives/button';
->>>>>>> main
 import {
   Form,
   FormControl,
@@ -29,14 +21,7 @@ import {
 import { Input } from '@documenso/ui/primitives/input';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
-<<<<<<< HEAD
 const ZUserFormSchema = ZUpdateProfileMutationByAdminSchema.omit({ id: true });
-=======
-import { DeleteUserDialog } from './delete-user-dialog';
-import { MultiSelectRoleCombobox } from './multiselect-role-combobox';
-
-const ZUserFormSchema = ZAdminUpdateProfileMutationSchema.omit({ id: true });
->>>>>>> main
 
 type TUserFormSchema = z.infer<typeof ZUserFormSchema>;
 
@@ -132,11 +117,7 @@ export default function UserPage({ params }: { params: { id: number } }) {
                   <fieldset className="flex flex-col gap-2">
                     <FormLabel className="text-muted-foreground">Roles</FormLabel>
                     <FormControl>
-<<<<<<< HEAD
                       <Combobox
-=======
-                      <MultiSelectRoleCombobox
->>>>>>> main
                         listValues={roles}
                         onChange={(values: string[]) => onChange(values)}
                       />
@@ -155,13 +136,6 @@ export default function UserPage({ params }: { params: { id: number } }) {
           </fieldset>
         </form>
       </Form>
-<<<<<<< HEAD
-=======
-
-      <hr className="my-4" />
-
-      {user && <DeleteUserDialog user={user} />}
->>>>>>> main
     </div>
   );
 }

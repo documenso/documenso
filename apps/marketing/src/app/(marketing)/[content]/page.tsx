@@ -5,7 +5,6 @@ import { allDocuments } from 'contentlayer/generated';
 import type { MDXComponents } from 'mdx/types';
 import { useMDXComponent } from 'next-contentlayer/hooks';
 
-<<<<<<< HEAD
 export const generateStaticParams = () =>
   allDocuments.map((post) => ({ post: post._raw.flattenedPath }));
 
@@ -17,18 +16,6 @@ export const generateMetadata = ({ params }: { params: { content: string } }) =>
   }
 
   return { title: `Documenso - ${document.title}` };
-=======
-export const dynamic = 'force-dynamic';
-
-export const generateMetadata = ({ params }: { params: { content: string } }) => {
-  const document = allDocuments.find((doc) => doc._raw.flattenedPath === params.content);
-
-  if (!document) {
-    return { title: 'Not Found' };
-  }
-
-  return { title: document.title };
->>>>>>> main
 };
 
 const mdxComponents: MDXComponents = {

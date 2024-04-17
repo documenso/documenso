@@ -8,34 +8,20 @@ import { Edit, Loader } from 'lucide-react';
 
 import { useDebouncedValue } from '@documenso/lib/client-only/hooks/use-debounced-value';
 import { useUpdateSearchParams } from '@documenso/lib/client-only/hooks/use-update-search-params';
-<<<<<<< HEAD
 import { Document, Role, Subscription } from '@documenso/prisma/client';
-=======
-import type { Document, Role, Subscription } from '@documenso/prisma/client';
->>>>>>> main
 import { Button } from '@documenso/ui/primitives/button';
 import { DataTable } from '@documenso/ui/primitives/data-table';
 import { DataTablePagination } from '@documenso/ui/primitives/data-table-pagination';
 import { Input } from '@documenso/ui/primitives/input';
 
-<<<<<<< HEAD
 interface User {
-=======
-type UserData = {
->>>>>>> main
   id: number;
   name: string | null;
   email: string;
   roles: Role[];
-<<<<<<< HEAD
   Subscription?: SubscriptionLite | null;
   Document: DocumentLite[];
 }
-=======
-  Subscription?: SubscriptionLite[] | null;
-  Document: DocumentLite[];
-};
->>>>>>> main
 
 type SubscriptionLite = Pick<
   Subscription,
@@ -45,7 +31,6 @@ type SubscriptionLite = Pick<
 type DocumentLite = Pick<Document, 'id'>;
 
 type UsersDataTableProps = {
-<<<<<<< HEAD
   users: User[];
   totalPages: number;
   perPage: number;
@@ -53,22 +38,6 @@ type UsersDataTableProps = {
 };
 
 export const UsersDataTable = ({ users, totalPages, perPage, page }: UsersDataTableProps) => {
-=======
-  users: UserData[];
-  totalPages: number;
-  perPage: number;
-  page: number;
-  individualPriceIds: string[];
-};
-
-export const UsersDataTable = ({
-  users,
-  totalPages,
-  perPage,
-  page,
-  individualPriceIds,
-}: UsersDataTableProps) => {
->>>>>>> main
   const [isPending, startTransition] = useTransition();
   const updateSearchParams = useUpdateSearchParams();
   const [searchString, setSearchString] = useState('');
@@ -82,10 +51,6 @@ export const UsersDataTable = ({
         perPage,
       });
     });
-<<<<<<< HEAD
-=======
-    // eslint-disable-next-line react-hooks/exhaustive-deps
->>>>>>> main
   }, [debouncedSearchString]);
 
   const onPaginationChange = (page: number, perPage: number) => {
@@ -135,17 +100,7 @@ export const UsersDataTable = ({
           {
             header: 'Subscription',
             accessorKey: 'subscription',
-<<<<<<< HEAD
             cell: ({ row }) => row.original.Subscription?.status ?? 'NONE',
-=======
-            cell: ({ row }) => {
-              const foundIndividualSubscription = (row.original.Subscription ?? []).find((sub) =>
-                individualPriceIds.includes(sub.priceId),
-              );
-
-              return foundIndividualSubscription?.status ?? 'NONE';
-            },
->>>>>>> main
           },
           {
             header: 'Documents',

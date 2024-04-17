@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 import { findDocuments } from '@documenso/lib/server-only/admin/get-all-documents';
 
 import { DocumentsDataTable } from './data-table';
@@ -24,17 +23,6 @@ export default async function Documents({ searchParams = {} }: DocumentsPageProp
       <h2 className="text-4xl font-semibold">Manage documents</h2>
       <div className="mt-8">
         <DocumentsDataTable results={results} />
-=======
-import { AdminDocumentResults } from './document-results';
-
-export default function AdminDocumentsPage() {
-  return (
-    <div>
-      <h2 className="text-4xl font-semibold">Manage documents</h2>
-
-      <div className="mt-8">
-        <AdminDocumentResults />
->>>>>>> main
       </div>
     </div>
   );

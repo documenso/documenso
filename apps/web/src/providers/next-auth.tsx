@@ -2,11 +2,7 @@
 
 import React from 'react';
 
-<<<<<<< HEAD
 import { Session } from 'next-auth';
-=======
-import type { Session } from 'next-auth';
->>>>>>> main
 import { SessionProvider } from 'next-auth/react';
 
 export type NextAuthProviderProps = {

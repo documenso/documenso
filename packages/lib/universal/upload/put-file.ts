@@ -1,17 +1,10 @@
 import { base64 } from '@scure/base';
-<<<<<<< HEAD
-=======
-import { env } from 'next-runtime-env';
->>>>>>> main
 import { match } from 'ts-pattern';
 
 import { DocumentDataType } from '@documenso/prisma/client';
 
 import { createDocumentData } from '../../server-only/document-data/create-document-data';
-<<<<<<< HEAD
 import { getPresignPostUrl } from './server-actions';
-=======
->>>>>>> main
 
 type File = {
   name: string;
@@ -20,13 +13,7 @@ type File = {
 };
 
 export const putFile = async (file: File) => {
-<<<<<<< HEAD
   const { type, data } = await match(process.env.NEXT_PUBLIC_UPLOAD_TRANSPORT)
-=======
-  const NEXT_PUBLIC_UPLOAD_TRANSPORT = env('NEXT_PUBLIC_UPLOAD_TRANSPORT');
-
-  const { type, data } = await match(NEXT_PUBLIC_UPLOAD_TRANSPORT)
->>>>>>> main
     .with('s3', async () => putFileInS3(file))
     .otherwise(async () => putFileInDatabase(file));
 
@@ -47,11 +34,6 @@ const putFileInDatabase = async (file: File) => {
 };
 
 const putFileInS3 = async (file: File) => {
-<<<<<<< HEAD
-=======
-  const { getPresignPostUrl } = await import('./server-actions');
-
->>>>>>> main
   const { url, key } = await getPresignPostUrl(file.name, file.type);
 
   const body = await file.arrayBuffer();

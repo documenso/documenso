@@ -1,21 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 import { nanoid } from 'nanoid';
-<<<<<<< HEAD
 import { JWT, getToken } from 'next-auth/jwt';
-=======
-import type { JWT } from 'next-auth/jwt';
-import { getToken } from 'next-auth/jwt';
->>>>>>> main
 
 import { LOCAL_FEATURE_FLAGS, extractPostHogConfig } from '@documenso/lib/constants/feature-flags';
 import PostHogServerClient from '@documenso/lib/server-only/feature-flags/get-post-hog-server-client';
 
-<<<<<<< HEAD
-=======
-import { NEXT_PUBLIC_MARKETING_URL, NEXT_PUBLIC_WEBAPP_URL } from '../../constants/app';
-
->>>>>>> main
 /**
  * Evaluate a single feature flag based on the current user if possible.
  *
@@ -67,19 +57,11 @@ export default async function handleFeatureFlagGet(req: Request) {
   const origin = req.headers.get('Origin');
 
   if (origin) {
-<<<<<<< HEAD
     if (origin.startsWith(process.env.NEXT_PUBLIC_WEBAPP_URL ?? 'http://localhost:3000')) {
       res.headers.set('Access-Control-Allow-Origin', origin);
     }
 
     if (origin.startsWith(process.env.NEXT_PUBLIC_MARKETING_URL ?? 'http://localhost:3001')) {
-=======
-    if (origin.startsWith(NEXT_PUBLIC_WEBAPP_URL() ?? 'http://localhost:3000')) {
-      res.headers.set('Access-Control-Allow-Origin', origin);
-    }
-
-    if (origin.startsWith(NEXT_PUBLIC_MARKETING_URL() ?? 'http://localhost:3001')) {
->>>>>>> main
       res.headers.set('Access-Control-Allow-Origin', origin);
     }
   }
@@ -123,11 +105,7 @@ export const extractDistinctUserId = (jwt: JWT | null, request: NextRequest): st
   const config = extractPostHogConfig();
 
   const email = jwt?.email;
-<<<<<<< HEAD
   const userId = jwt?.id.toString();
-=======
-  const userId = jwt?.id?.toString();
->>>>>>> main
 
   let fallbackDistinctId = nanoid();
 

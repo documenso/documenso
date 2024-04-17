@@ -1,53 +1,27 @@
 'use client';
 
-<<<<<<< HEAD
 import { useState } from 'react';
 
 import { useRouter } from 'next/navigation';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Eye, EyeOff } from 'lucide-react';
-=======
-import { useRouter } from 'next/navigation';
-
-import { zodResolver } from '@hookform/resolvers/zod';
->>>>>>> main
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
 import { TRPCClientError } from '@documenso/trpc/client';
 import { trpc } from '@documenso/trpc/react';
-<<<<<<< HEAD
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
 import { FormErrorMessage } from '@documenso/ui/primitives/form/form-error-message';
 import { Input } from '@documenso/ui/primitives/input';
 import { Label } from '@documenso/ui/primitives/label';
-=======
-import { ZPasswordSchema } from '@documenso/trpc/server/auth-router/schema';
-import { cn } from '@documenso/ui/lib/utils';
-import { Button } from '@documenso/ui/primitives/button';
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@documenso/ui/primitives/form/form';
-import { PasswordInput } from '@documenso/ui/primitives/password-input';
->>>>>>> main
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
 export const ZResetPasswordFormSchema = z
   .object({
-<<<<<<< HEAD
     password: z.string().min(6).max(72),
     repeatedPassword: z.string().min(6).max(72),
-=======
-    password: ZPasswordSchema,
-    repeatedPassword: ZPasswordSchema,
->>>>>>> main
   })
   .refine((data) => data.password === data.repeatedPassword, {
     path: ['repeatedPassword'],
@@ -66,7 +40,6 @@ export const ResetPasswordForm = ({ className, token }: ResetPasswordFormProps) 
 
   const { toast } = useToast();
 
-<<<<<<< HEAD
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
@@ -76,9 +49,6 @@ export const ResetPasswordForm = ({ className, token }: ResetPasswordFormProps) 
     handleSubmit,
     formState: { errors, isSubmitting },
   } = useForm<TResetPasswordFormSchema>({
-=======
-  const form = useForm<TResetPasswordFormSchema>({
->>>>>>> main
     values: {
       password: '',
       repeatedPassword: '',
@@ -86,11 +56,6 @@ export const ResetPasswordForm = ({ className, token }: ResetPasswordFormProps) 
     resolver: zodResolver(ZResetPasswordFormSchema),
   });
 
-<<<<<<< HEAD
-=======
-  const isSubmitting = form.formState.isSubmitting;
-
->>>>>>> main
   const { mutateAsync: resetPassword } = trpc.profile.resetPassword.useMutation();
 
   const onFormSubmit = async ({ password }: Omit<TResetPasswordFormSchema, 'repeatedPassword'>) => {
@@ -100,11 +65,7 @@ export const ResetPasswordForm = ({ className, token }: ResetPasswordFormProps) 
         token,
       });
 
-<<<<<<< HEAD
       reset();
-=======
-      form.reset();
->>>>>>> main
 
       toast({
         title: 'Password updated',
@@ -132,7 +93,6 @@ export const ResetPasswordForm = ({ className, token }: ResetPasswordFormProps) 
   };
 
   return (
-<<<<<<< HEAD
     <form
       className={cn('flex w-full flex-col gap-y-4', className)}
       onSubmit={handleSubmit(onFormSubmit)}
@@ -209,47 +169,5 @@ export const ResetPasswordForm = ({ className, token }: ResetPasswordFormProps) 
         {isSubmitting ? 'Resetting Password...' : 'Reset Password'}
       </Button>
     </form>
-=======
-    <Form {...form}>
-      <form
-        className={cn('flex w-full flex-col gap-y-4', className)}
-        onSubmit={form.handleSubmit(onFormSubmit)}
-      >
-        <fieldset className="flex w-full flex-col gap-y-4" disabled={isSubmitting}>
-          <FormField
-            control={form.control}
-            name="password"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Password</FormLabel>
-                <FormControl>
-                  <PasswordInput {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="repeatedPassword"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Repeat Password</FormLabel>
-                <FormControl>
-                  <PasswordInput {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </fieldset>
-
-        <Button type="submit" size="lg" loading={isSubmitting}>
-          {isSubmitting ? 'Resetting Password...' : 'Reset Password'}
-        </Button>
-      </form>
-    </Form>
->>>>>>> main
   );
 };

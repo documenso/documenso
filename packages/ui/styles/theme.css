@@ -18,13 +18,6 @@
     --card-border-tint: 112 205 159;
     --card-foreground: 222.2 47.4% 11.2%;
 
-<<<<<<< HEAD
-=======
-    --field-card: 95 74% 90%;
-    --field-card-border: 95.08 71.08% 67.45%;
-    --field-card-foreground: 222.2 47.4% 11.2%;
-
->>>>>>> main
     --widget: 0 0% 97%;
 
     --border: 214.3 31.8% 91.4%;
@@ -45,11 +38,6 @@
     --ring: 95.08 71.08% 67.45%;
 
     --radius: 0.5rem;
-<<<<<<< HEAD
-=======
-
-    --warning: 54 96% 45%;
->>>>>>> main
   }
 
   .dark {
@@ -67,11 +55,6 @@
     --card-border-tint: 112 205 159;
     --card-foreground: 0 0% 95%;
 
-<<<<<<< HEAD
-=======
-    --widget: 0 0% 14.9%;
-
->>>>>>> main
     --border: 0 0% 27.9%;
     --input: 0 0% 27.9%;
 
@@ -90,11 +73,6 @@
     --ring: 95.08 71.08% 67.45%;
 
     --radius: 0.5rem;
-<<<<<<< HEAD
-=======
-
-    --warning: 54 96% 45%;
->>>>>>> main
   }
 }
 
@@ -109,60 +87,9 @@
   }
 }
 
-<<<<<<< HEAD
-=======
-/*
- * Custom CSS for printing reports
- * - Sets page margins to 0.5 inches
- * - Hides the header and footer
- * - Hides the print button
- * - Sets page size to A4
- * - Sets the font size to 12pt
- */
-.print-provider {
-  @page {
-    margin: 1in;
-    size: A4;
-  }
-}
-
->>>>>>> main
 .gradient-border-mask::before {
   mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
   -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
   mask-composite: exclude;
   -webkit-mask-composite: xor;
 }
-<<<<<<< HEAD
-=======
-
-.custom-scrollbar::-webkit-scrollbar {
-  width: 6px;
-  background: transparent;
-  border-radius: 10px;
-  scrollbar-gutter: stable;
-}
-
-.custom-scrollbar::-webkit-scrollbar-track {
-  border-radius: 10px;
-}
-
-.custom-scrollbar::-webkit-scrollbar-thumb {
-  background: rgb(100 116 139 / 1);
-  border-radius: 10px;
-  width: 8px;
-}
-
-.custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: rgb(100 116 139 / 0.5);
-}
-
-/* Custom Swagger Dark Theme */
-.swagger-dark-theme .swagger-ui {
-  filter: invert(88%) hue-rotate(180deg);
-}
-
-.swagger-dark-theme .swagger-ui .microlight {
-  filter: invert(100%) hue-rotate(180deg);
-}
->>>>>>> main

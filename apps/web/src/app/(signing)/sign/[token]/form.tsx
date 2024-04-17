@@ -7,17 +7,9 @@ import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import { useForm } from 'react-hook-form';
 
-<<<<<<< HEAD
 import { completeDocumentWithToken } from '@documenso/lib/server-only/document/complete-document-with-token';
 import { sortFieldsByPosition, validateFieldsInserted } from '@documenso/lib/utils/fields';
 import { Document, Field, Recipient } from '@documenso/prisma/client';
-=======
-import { useAnalytics } from '@documenso/lib/client-only/hooks/use-analytics';
-import type { TRecipientActionAuth } from '@documenso/lib/types/document-auth';
-import { sortFieldsByPosition, validateFieldsInserted } from '@documenso/lib/utils/fields';
-import { type Document, type Field, type Recipient, RecipientRole } from '@documenso/prisma/client';
-import { trpc } from '@documenso/trpc/react';
->>>>>>> main
 import { FieldToolTip } from '@documenso/ui/components/field/field-tooltip';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
@@ -27,104 +19,44 @@ import { Label } from '@documenso/ui/primitives/label';
 import { SignaturePad } from '@documenso/ui/primitives/signature-pad';
 
 import { useRequiredSigningContext } from './provider';
-<<<<<<< HEAD
-=======
-import { SignDialog } from './sign-dialog';
->>>>>>> main
 
 export type SigningFormProps = {
   document: Document;
   recipient: Recipient;
   fields: Field[];
-<<<<<<< HEAD
 };
 
 export const SigningForm = ({ document, recipient, fields }: SigningFormProps) => {
   const router = useRouter();
-=======
-  redirectUrl?: string | null;
-};
-
-export const SigningForm = ({ document, recipient, fields, redirectUrl }: SigningFormProps) => {
-  const router = useRouter();
-  const analytics = useAnalytics();
->>>>>>> main
   const { data: session } = useSession();
 
   const { fullName, signature, setFullName, setSignature } = useRequiredSigningContext();
 
   const [validateUninsertedFields, setValidateUninsertedFields] = useState(false);
 
-<<<<<<< HEAD
   const {
     handleSubmit,
     formState: { isSubmitting },
   } = useForm();
-=======
-  const { mutateAsync: completeDocumentWithToken } =
-    trpc.recipient.completeDocumentWithToken.useMutation();
-
-  const { handleSubmit, formState } = useForm();
-
-  // Keep the loading state going if successful since the redirect may take some time.
-  const isSubmitting = formState.isSubmitting || formState.isSubmitSuccessful;
->>>>>>> main
 
   const uninsertedFields = useMemo(() => {
     return sortFieldsByPosition(fields.filter((field) => !field.inserted));
   }, [fields]);
 
-<<<<<<< HEAD
   const onFormSubmit = async () => {
     setValidateUninsertedFields(true);
-=======
-  const fieldsValidated = () => {
-    setValidateUninsertedFields(true);
-    validateFieldsInserted(fields);
-  };
-
-  const onFormSubmit = async () => {
-    setValidateUninsertedFields(true);
-
->>>>>>> main
     const isFieldsValid = validateFieldsInserted(fields);
 
     if (!isFieldsValid) {
       return;
     }
 
-<<<<<<< HEAD
     await completeDocumentWithToken({
       token: recipient.token,
       documentId: document.id,
     });
 
     router.push(`/sign/${recipient.token}/complete`);
-=======
-    await completeDocument();
-
-    // Reauth is currently not required for completing the document.
-    // await executeActionAuthProcedure({
-    //   onReauthFormSubmit: completeDocument,
-    //   actionTarget: 'DOCUMENT',
-    // });
-  };
-
-  const completeDocument = async (authOptions?: TRecipientActionAuth) => {
-    await completeDocumentWithToken({
-      token: recipient.token,
-      documentId: document.id,
-      authOptions,
-    });
-
-    analytics.capture('App: Recipient has completed signing', {
-      signerId: recipient.id,
-      documentId: document.id,
-      timestamp: new Date().toISOString(),
-    });
-
-    redirectUrl ? router.push(redirectUrl) : router.push(`/sign/${recipient.token}/complete`);
->>>>>>> main
   };
 
   return (
@@ -146,7 +78,6 @@ export const SigningForm = ({ document, recipient, fields, redirectUrl }: Signin
 
       <fieldset
         disabled={isSubmitting}
-<<<<<<< HEAD
         className={cn('-mx-2 flex flex-1 flex-col overflow-hidden px-2')}
       >
         <div className={cn('flex flex-1 flex-col')}>
@@ -206,116 +137,6 @@ export const SigningForm = ({ document, recipient, fields, redirectUrl }: Signin
               </Button>
             </div>
           </div>
-=======
-        className={cn(
-          'custom-scrollbar -mx-2 flex flex-1 flex-col overflow-y-auto overflow-x-hidden px-2',
-        )}
-      >
-        <div className={cn('flex flex-1 flex-col')}>
-          <h3 className="text-foreground text-2xl font-semibold">
-            {recipient.role === RecipientRole.VIEWER && 'View Document'}
-            {recipient.role === RecipientRole.SIGNER && 'Sign Document'}
-            {recipient.role === RecipientRole.APPROVER && 'Approve Document'}
-          </h3>
-
-          {recipient.role === RecipientRole.VIEWER ? (
-            <>
-              <p className="text-muted-foreground mt-2 text-sm">
-                Please mark as viewed to complete
-              </p>
-
-              <hr className="border-border mb-8 mt-4" />
-
-              <div className="-mx-2 flex flex-1 flex-col gap-4 overflow-y-auto px-2">
-                <div className="flex flex-1 flex-col gap-y-4" />
-                <div className="flex flex-col gap-4 md:flex-row">
-                  <Button
-                    type="button"
-                    className="dark:bg-muted dark:hover:bg-muted/80 w-full  bg-black/5 hover:bg-black/10"
-                    variant="secondary"
-                    size="lg"
-                    disabled={typeof window !== 'undefined' && window.history.length <= 1}
-                    onClick={() => router.back()}
-                  >
-                    Cancel
-                  </Button>
-
-                  <SignDialog
-                    isSubmitting={isSubmitting}
-                    onSignatureComplete={handleSubmit(onFormSubmit)}
-                    document={document}
-                    fields={fields}
-                    fieldsValidated={fieldsValidated}
-                    role={recipient.role}
-                  />
-                </div>
-              </div>
-            </>
-          ) : (
-            <>
-              <p className="text-muted-foreground mt-2 text-sm">
-                Please review the document before signing.
-              </p>
-
-              <hr className="border-border mb-8 mt-4" />
-
-              <div className="-mx-2 flex flex-1 flex-col gap-4 overflow-y-auto px-2">
-                <div className="flex flex-1 flex-col gap-y-4">
-                  <div>
-                    <Label htmlFor="full-name">Full Name</Label>
-
-                    <Input
-                      type="text"
-                      id="full-name"
-                      className="bg-background mt-2"
-                      value={fullName}
-                      onChange={(e) => setFullName(e.target.value.trimStart())}
-                    />
-                  </div>
-
-                  <div>
-                    <Label htmlFor="Signature">Signature</Label>
-
-                    <Card className="mt-2" gradient degrees={-120}>
-                      <CardContent className="p-0">
-                        <SignaturePad
-                          className="h-44 w-full"
-                          disabled={isSubmitting}
-                          defaultValue={signature ?? undefined}
-                          onChange={(value) => {
-                            setSignature(value);
-                          }}
-                        />
-                      </CardContent>
-                    </Card>
-                  </div>
-                </div>
-
-                <div className="flex flex-col gap-4 md:flex-row">
-                  <Button
-                    type="button"
-                    className="dark:bg-muted dark:hover:bg-muted/80 w-full  bg-black/5 hover:bg-black/10"
-                    variant="secondary"
-                    size="lg"
-                    disabled={typeof window !== 'undefined' && window.history.length <= 1}
-                    onClick={() => router.back()}
-                  >
-                    Cancel
-                  </Button>
-
-                  <SignDialog
-                    isSubmitting={isSubmitting}
-                    onSignatureComplete={handleSubmit(onFormSubmit)}
-                    document={document}
-                    fields={fields}
-                    fieldsValidated={fieldsValidated}
-                    role={recipient.role}
-                  />
-                </div>
-              </div>
-            </>
-          )}
->>>>>>> main
         </div>
       </fieldset>
     </form>

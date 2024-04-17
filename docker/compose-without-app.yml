@@ -1,0 +1,19 @@
+name: documenso
+services:
+  database:
+    image: postgres:15
+    container_name: database
+    environment:
+      - POSTGRES_USER=documenso
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=documenso
+    ports:
+      - 54320:5432
+
+  inbucket:
+    image: inbucket/inbucket
+    container_name: mailserver
+    ports:
+      - 9000:9000
+      - 2500:2500
+      - 1100:1100

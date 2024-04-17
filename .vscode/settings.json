@@ -1,24 +1,10 @@
 {
   "typescript.tsdk": "node_modules/typescript/lib",
-<<<<<<< HEAD
   "editor.codeActionsOnSave": {
     "source.fixAll.eslint": true
-=======
-  "editor.defaultFormatter": "esbenp.prettier-vscode",
-  "editor.formatOnSave": true,
-  "editor.codeActionsOnSave": {
-    "source.fixAll": "explicit"
->>>>>>> main
   },
   "eslint.validate": ["typescript", "typescriptreact", "javascript", "javascriptreact"],
   "javascript.preferences.importModuleSpecifier": "non-relative",
   "javascript.preferences.useAliasesForRenames": false,
-<<<<<<< HEAD
   "typescript.enablePromptUseWorkspaceTsdk": true
-=======
-  "typescript.enablePromptUseWorkspaceTsdk": true,
-  "files.eol": "\n",
-  "editor.tabSize": 2,
-  "editor.insertSpaces": true
->>>>>>> main
 }

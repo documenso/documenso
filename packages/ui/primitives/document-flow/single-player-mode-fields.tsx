@@ -13,17 +13,9 @@ import {
   MIN_HANDWRITING_FONT_SIZE,
   MIN_STANDARD_FONT_SIZE,
 } from '@documenso/lib/constants/pdf';
-<<<<<<< HEAD
 import { Field, FieldType } from '@documenso/prisma/client';
 import { FieldWithSignature } from '@documenso/prisma/types/field-with-signature';
 import { FieldRootContainer } from '@documenso/ui/components/field/field';
-=======
-import type { Field } from '@documenso/prisma/client';
-import { FieldType } from '@documenso/prisma/client';
-import type { FieldWithSignature } from '@documenso/prisma/types/field-with-signature';
-
-import { FieldRootContainer } from '../../components/field/field';
->>>>>>> main
 
 export type SinglePlayerModeFieldContainerProps = {
   field: FieldWithSignature;
@@ -178,10 +170,6 @@ export function SinglePlayerModeCustomTextField({
             .with(FieldType.DATE, () => 'Date')
             .with(FieldType.NAME, () => 'Name')
             .with(FieldType.EMAIL, () => 'Email')
-<<<<<<< HEAD
-=======
-            .with(FieldType.TEXT, () => 'Text')
->>>>>>> main
             .with(FieldType.SIGNATURE, FieldType.FREE_SIGNATURE, () => 'Signature')
             .otherwise(() => '')}
         </button>

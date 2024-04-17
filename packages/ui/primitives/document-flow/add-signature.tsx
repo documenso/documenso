@@ -7,7 +7,6 @@ import { DateTime } from 'luxon';
 import { useForm } from 'react-hook-form';
 import { match } from 'ts-pattern';
 
-<<<<<<< HEAD
 import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
 import { sortFieldsByPosition, validateFieldsInserted } from '@documenso/lib/utils/fields';
 import { Field, FieldType } from '@documenso/prisma/client';
@@ -16,31 +15,10 @@ import { FieldToolTip } from '@documenso/ui/components/field/field-tooltip';
 import { cn } from '@documenso/ui/lib/utils';
 import { Card, CardContent } from '@documenso/ui/primitives/card';
 import { TAddSignatureFormSchema } from '@documenso/ui/primitives/document-flow/add-signature.types';
-=======
-import { DEFAULT_DOCUMENT_DATE_FORMAT } from '@documenso/lib/constants/date-formats';
-import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
-import { sortFieldsByPosition, validateFieldsInserted } from '@documenso/lib/utils/fields';
-import type { Field } from '@documenso/prisma/client';
-import { FieldType } from '@documenso/prisma/client';
-import type { FieldWithSignature } from '@documenso/prisma/types/field-with-signature';
-import type { DocumentFlowStep } from '@documenso/ui/primitives/document-flow/types';
-
-import { FieldToolTip } from '../../components/field/field-tooltip';
-import { cn } from '../../lib/utils';
-import { Card, CardContent } from '../card';
-import { ElementVisible } from '../element-visible';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '../form/form';
-import { Input } from '../input';
-import { SignaturePad } from '../signature-pad';
-import { useStep } from '../stepper';
-import type { TAddSignatureFormSchema } from './add-signature.types';
-import { ZAddSignatureFormSchema } from './add-signature.types';
->>>>>>> main
 import {
   DocumentFlowFormContainerActions,
   DocumentFlowFormContainerContent,
   DocumentFlowFormContainerFooter,
-<<<<<<< HEAD
   DocumentFlowFormContainerStep,
 } from '@documenso/ui/primitives/document-flow/document-flow-root';
 import { DocumentFlowStep } from '@documenso/ui/primitives/document-flow/types';
@@ -50,11 +28,6 @@ import { SignaturePad } from '@documenso/ui/primitives/signature-pad';
 
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '../form/form';
 import { ZAddSignatureFormSchema } from './add-signature.types';
-=======
-  DocumentFlowFormContainerHeader,
-  DocumentFlowFormContainerStep,
-} from './document-flow-root';
->>>>>>> main
 import {
   SinglePlayerModeCustomTextField,
   SinglePlayerModeSignatureField,
@@ -64,16 +37,9 @@ export type AddSignatureFormProps = {
   defaultValues?: TAddSignatureFormSchema;
   documentFlow: DocumentFlowStep;
   fields: FieldWithSignature[];
-<<<<<<< HEAD
   numberOfSteps: number;
   onSubmit: (_data: TAddSignatureFormSchema) => Promise<void> | void;
   requireName?: boolean;
-=======
-
-  onSubmit: (_data: TAddSignatureFormSchema) => Promise<void> | void;
-  requireName?: boolean;
-  requireCustomText?: boolean;
->>>>>>> main
   requireSignature?: boolean;
 };
 
@@ -81,22 +47,11 @@ export const AddSignatureFormPartial = ({
   defaultValues,
   documentFlow,
   fields,
-<<<<<<< HEAD
   numberOfSteps,
   onSubmit,
   requireName = false,
   requireSignature = true,
 }: AddSignatureFormProps) => {
-=======
-
-  onSubmit,
-  requireName = false,
-  requireCustomText = false,
-  requireSignature = true,
-}: AddSignatureFormProps) => {
-  const { currentStep, totalSteps } = useStep();
-
->>>>>>> main
   const [validateUninsertedFields, setValidateUninsertedFields] = useState(false);
 
   // Refined schema which takes into account whether to allow an empty name or signature.
@@ -109,17 +64,6 @@ export const AddSignatureFormPartial = ({
       });
     }
 
-<<<<<<< HEAD
-=======
-    if (requireCustomText && val.customText.length === 0) {
-      ctx.addIssue({
-        path: ['customText'],
-        code: 'custom',
-        message: 'Text is required',
-      });
-    }
-
->>>>>>> main
     if (requireSignature && val.signature.length === 0) {
       ctx.addIssue({
         path: ['signature'],
@@ -135,10 +79,6 @@ export const AddSignatureFormPartial = ({
       name: '',
       email: '',
       signature: '',
-<<<<<<< HEAD
-=======
-      customText: '',
->>>>>>> main
     },
   });
 
@@ -185,14 +125,6 @@ export const AddSignatureFormPartial = ({
       return !form.formState.errors.email;
     }
 
-<<<<<<< HEAD
-=======
-    if (fieldType === FieldType.TEXT) {
-      await form.trigger('customText');
-      return !form.formState.errors.customText;
-    }
-
->>>>>>> main
     return true;
   };
 
@@ -203,11 +135,7 @@ export const AddSignatureFormPartial = ({
     return match(field.type)
       .with(FieldType.DATE, () => ({
         ...field,
-<<<<<<< HEAD
         customText: DateTime.now().toFormat('yyyy-MM-dd hh:mm a'),
-=======
-        customText: DateTime.now().toFormat(DEFAULT_DOCUMENT_DATE_FORMAT),
->>>>>>> main
         inserted: true,
       }))
       .with(FieldType.EMAIL, () => ({
@@ -220,14 +148,6 @@ export const AddSignatureFormPartial = ({
         customText: form.getValues('name'),
         inserted: true,
       }))
-<<<<<<< HEAD
-=======
-      .with(FieldType.TEXT, () => ({
-        ...field,
-        customText: form.getValues('customText'),
-        inserted: true,
-      }))
->>>>>>> main
       .with(FieldType.SIGNATURE, () => {
         const value = form.getValues('signature');
 
@@ -286,7 +206,6 @@ export const AddSignatureFormPartial = ({
   };
 
   return (
-<<<<<<< HEAD
     <Form {...form}>
       <fieldset className="flex h-full flex-col" disabled={form.formState.isSubmitting}>
         <DocumentFlowFormContainerContent>
@@ -327,32 +246,6 @@ export const AddSignatureFormPartial = ({
                         {...field}
                         onChange={(value) => {
                           onFormValueChange(FieldType.NAME);
-=======
-    <>
-      <DocumentFlowFormContainerHeader
-        title={documentFlow.title}
-        description={documentFlow.description}
-      />
-
-      <Form {...form}>
-        <fieldset className="flex h-full flex-col" disabled={form.formState.isSubmitting}>
-          <DocumentFlowFormContainerContent>
-            <div className="space-y-4">
-              <FormField
-                control={form.control}
-                name="email"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel required>Email</FormLabel>
-                    <FormControl>
-                      <Input
-                        className="bg-background"
-                        type="email"
-                        autoComplete="email"
-                        {...field}
-                        onChange={(value) => {
-                          onFormValueChange(FieldType.EMAIL);
->>>>>>> main
                           field.onChange(value);
                         }}
                       />
@@ -361,7 +254,6 @@ export const AddSignatureFormPartial = ({
                   </FormItem>
                 )}
               />
-<<<<<<< HEAD
             )}
 
             {requireSignature && (
@@ -429,133 +321,10 @@ export const AddSignatureFormPartial = ({
             .with(FieldType.DATE, FieldType.EMAIL, FieldType.NAME, () => {
               return (
                 <SinglePlayerModeCustomTextField
-=======
-
-              {requireName && (
-                <FormField
-                  control={form.control}
-                  name="name"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel required={requireName}>Name</FormLabel>
-                      <FormControl>
-                        <Input
-                          className="bg-background"
-                          {...field}
-                          onChange={(value) => {
-                            onFormValueChange(FieldType.NAME);
-                            field.onChange(value);
-                          }}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              )}
-
-              {requireSignature && (
-                <FormField
-                  control={form.control}
-                  name="signature"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel required={requireSignature}>Signature</FormLabel>
-                      <FormControl>
-                        <Card
-                          className={cn('mt-2', {
-                            'rounded-sm ring-2 ring-red-500 ring-offset-2 transition-all':
-                              form.formState.errors.signature,
-                          })}
-                          gradient={!form.formState.errors.signature}
-                          degrees={-120}
-                        >
-                          <CardContent className="p-0">
-                            <SignaturePad
-                              className="h-44 w-full"
-                              defaultValue={field.value}
-                              onBlur={field.onBlur}
-                              onChange={(value) => {
-                                onFormValueChange(FieldType.SIGNATURE);
-                                field.onChange(value);
-                              }}
-                            />
-                          </CardContent>
-                        </Card>
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              )}
-
-              {requireCustomText && (
-                <FormField
-                  control={form.control}
-                  name="customText"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel required={requireCustomText}>Custom Text</FormLabel>
-                      <FormControl>
-                        <Input
-                          className="bg-background"
-                          {...field}
-                          onChange={(value) => {
-                            onFormValueChange(FieldType.TEXT);
-                            field.onChange(value);
-                          }}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              )}
-            </div>
-          </DocumentFlowFormContainerContent>
-
-          <DocumentFlowFormContainerFooter>
-            <DocumentFlowFormContainerStep
-              title={documentFlow.title}
-              step={currentStep}
-              maxStep={totalSteps}
-            />
-
-            <DocumentFlowFormContainerActions
-              loading={form.formState.isSubmitting}
-              disabled={form.formState.isSubmitting}
-              onGoBackClick={documentFlow.onBackStep}
-              onGoNextClick={form.handleSubmit(onValidateFields)}
-            />
-          </DocumentFlowFormContainerFooter>
-        </fieldset>
-
-        {validateUninsertedFields && uninsertedFields[0] && (
-          <FieldToolTip key={uninsertedFields[0].id} field={uninsertedFields[0]} color="warning">
-            Click to insert field
-          </FieldToolTip>
-        )}
-
-        <ElementVisible target={PDF_VIEWER_PAGE_SELECTOR}>
-          {localFields.map((field) =>
-            match(field.type)
-              .with(FieldType.DATE, FieldType.TEXT, FieldType.EMAIL, FieldType.NAME, () => {
-                return (
-                  <SinglePlayerModeCustomTextField
-                    onClick={insertField(field)}
-                    key={field.id}
-                    field={field}
-                  />
-                );
-              })
-              .with(FieldType.SIGNATURE, () => (
-                <SinglePlayerModeSignatureField
->>>>>>> main
                   onClick={insertField(field)}
                   key={field.id}
                   field={field}
                 />
-<<<<<<< HEAD
               );
             })
             .with(FieldType.SIGNATURE, () => (
@@ -571,15 +340,5 @@ export const AddSignatureFormPartial = ({
         )}
       </ElementVisible>
     </Form>
-=======
-              ))
-              .otherwise(() => {
-                return null;
-              }),
-          )}
-        </ElementVisible>
-      </Form>
-    </>
->>>>>>> main
   );
 };

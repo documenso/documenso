@@ -1,7 +1,3 @@
-<<<<<<< HEAD
-=======
-import type { Metadata } from 'next';
->>>>>>> main
 import Link from 'next/link';
 
 import {
@@ -10,22 +6,9 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from '@documenso/ui/primitives/accordion';
-<<<<<<< HEAD
 
 import { PricingTable } from '~/components/(marketing)/pricing-table';
 
-=======
-import { Button } from '@documenso/ui/primitives/button';
-
-import { PricingTable } from '~/components/(marketing)/pricing-table';
-
-export const metadata: Metadata = {
-  title: 'Pricing',
-};
-
-export const dynamic = 'force-dynamic';
-
->>>>>>> main
 export type PricingPageProps = {
   searchParams?: {
     planId?: string;
@@ -52,29 +35,6 @@ export default function PricingPage() {
       </div>
 
       <div className="mx-auto mt-36 max-w-2xl">
-<<<<<<< HEAD
-=======
-        <h2 className="text-center text-2xl font-semibold">
-          None of these work for you? Try self-hosting!
-        </h2>
-
-        <p className="text-muted-foreground mt-4 text-center leading-relaxed">
-          Our self-hosted option is great for small teams and individuals who need a simple
-          solution. You can use our docker based setup to get started in minutes. Take control with
-          full customizability and data ownership.
-        </p>
-
-        <div className="mt-4 flex justify-center">
-          <Button variant="outline" size="lg" className="rounded-full hover:cursor-pointer" asChild>
-            <Link href="https://github.com/documenso/documenso" target="_blank" rel="noreferrer">
-              Get Started
-            </Link>
-          </Button>
-        </div>
-      </div>
-
-      <div className="mx-auto mt-36 max-w-2xl">
->>>>>>> main
         {/* FAQ Section */}
 
         <h2 className="text-4xl font-semibold">FAQs</h2>
@@ -136,17 +96,10 @@ export default function PricingPage() {
               and join our{' '}
               <Link
                 className="text-documenso-700 font-bold"
-<<<<<<< HEAD
                 href="https://join.slack.com/t/documenso/shared_invite/zt-1vibm8txi-DqsDFtdp44Hn2H5lc~RpPQ"
                 target="_blank"
               >
                 Slack Community
-=======
-                href="https://documen.so/discord"
-                target="_blank"
-              >
-                Discord Community
->>>>>>> main
               </Link>{' '}
               to keep up to date, on what the current priorities are. In any case, we are an open
               community and welcome all input, technical and non-technical ❤️
@@ -187,10 +140,6 @@ export default function PricingPage() {
               <Link
                 className="text-documenso-700 font-bold"
                 target="_blank"
-<<<<<<< HEAD
-=======
-                rel="noreferrer"
->>>>>>> main
                 href="mailto:support@documenso.com"
               >
                 support@documenso.com
@@ -198,18 +147,10 @@ export default function PricingPage() {
               or{' '}
               <a
                 className="text-documenso-700 font-bold"
-<<<<<<< HEAD
                 href="https://join.slack.com/t/documenso/shared_invite/zt-1vibm8txi-DqsDFtdp44Hn2H5lc~RpPQ"
                 target="_blank"
               >
                 in our Slack-Support-Channel
-=======
-                href="https://documen.so/discord"
-                target="_blank"
-                rel="noreferrer"
-              >
-                in our Discord-Support-Channel
->>>>>>> main
               </a>{' '}
               please message either Lucas or Timur to get added to the channel if you are not
               already a member.

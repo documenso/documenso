@@ -21,15 +21,9 @@ export const PeriodSelector = () => {
   const router = useRouter();
 
   const period = useMemo(() => {
-<<<<<<< HEAD
     const p = searchParams?.get('period') ?? '';
 
     return isPeriodSelectorValue(p) ? p : '';
-=======
-    const p = searchParams?.get('period') ?? 'all';
-
-    return isPeriodSelectorValue(p) ? p : 'all';
->>>>>>> main
   }, [searchParams]);
 
   const onPeriodChange = (newPeriod: string) => {
@@ -41,11 +35,7 @@ export const PeriodSelector = () => {
 
     params.set('period', newPeriod);
 
-<<<<<<< HEAD
     if (newPeriod === '') {
-=======
-    if (newPeriod === '' || newPeriod === 'all') {
->>>>>>> main
       params.delete('period');
     }
 
@@ -59,11 +49,7 @@ export const PeriodSelector = () => {
       </SelectTrigger>
 
       <SelectContent position="popper">
-<<<<<<< HEAD
         <SelectItem value="">All Time</SelectItem>
-=======
-        <SelectItem value="all">All Time</SelectItem>
->>>>>>> main
         <SelectItem value="7d">Last 7 days</SelectItem>
         <SelectItem value="14d">Last 14 days</SelectItem>
         <SelectItem value="30d">Last 30 days</SelectItem>

@@ -1,24 +1,14 @@
 import { DateTime } from 'luxon';
 
-<<<<<<< HEAD
 import { stripe } from '@documenso/lib/server-only/stripe';
 import { getFlag } from '@documenso/lib/universal/get-feature-flag';
 import { prisma } from '@documenso/prisma';
 
 import { FREE_PLAN_LIMITS, SELFHOSTED_PLAN_LIMITS } from './constants';
-=======
-import { IS_BILLING_ENABLED } from '@documenso/lib/constants/app';
-import { prisma } from '@documenso/prisma';
-import { SubscriptionStatus } from '@documenso/prisma/client';
-
-import { getDocumentRelatedPrices } from '../stripe/get-document-related-prices.ts';
-import { FREE_PLAN_LIMITS, SELFHOSTED_PLAN_LIMITS, TEAM_PLAN_LIMITS } from './constants';
->>>>>>> main
 import { ERROR_CODES } from './errors';
 import { ZLimitsSchema } from './schema';
 
 export type GetServerLimitsOptions = {
-<<<<<<< HEAD
   email?: string;
 };
 
@@ -26,14 +16,6 @@ export const getServerLimits = async ({ email }: GetServerLimitsOptions) => {
   const isBillingEnabled = await getFlag('app_billing');
 
   if (!isBillingEnabled) {
-=======
-  email?: string | null;
-  teamId?: number | null;
-};
-
-export const getServerLimits = async ({ email, teamId }: GetServerLimitsOptions) => {
-  if (!IS_BILLING_ENABLED()) {
->>>>>>> main
     return {
       quota: SELFHOSTED_PLAN_LIMITS,
       remaining: SELFHOSTED_PLAN_LIMITS,
@@ -44,17 +26,6 @@ export const getServerLimits = async ({ email, teamId }: GetServerLimitsOptions)
     throw new Error(ERROR_CODES.UNAUTHORIZED);
   }
 
-<<<<<<< HEAD
-=======
-  return teamId ? handleTeamLimits({ email, teamId }) : handleUserLimits({ email });
-};
-
-type HandleUserLimitsOptions = {
-  email: string;
-};
-
-const handleUserLimits = async ({ email }: HandleUserLimitsOptions) => {
->>>>>>> main
   const user = await prisma.user.findFirst({
     where: {
       email,
@@ -71,7 +42,6 @@ const handleUserLimits = async ({ email }: HandleUserLimitsOptions) => {
   let quota = structuredClone(FREE_PLAN_LIMITS);
   let remaining = structuredClone(FREE_PLAN_LIMITS);
 
-<<<<<<< HEAD
   if (user.Subscription?.priceId) {
     const { product } = await stripe.prices
       .retrieve(user.Subscription.priceId, {
@@ -88,41 +58,11 @@ const handleUserLimits = async ({ email }: HandleUserLimitsOptions) => {
 
     quota = ZLimitsSchema.parse('metadata' in product ? product.metadata : {});
     remaining = structuredClone(quota);
-=======
-  const activeSubscriptions = user.Subscription.filter(
-    ({ status }) => status === SubscriptionStatus.ACTIVE,
-  );
-
-  if (activeSubscriptions.length > 0) {
-    const documentPlanPrices = await getDocumentRelatedPrices();
-
-    for (const subscription of activeSubscriptions) {
-      const price = documentPlanPrices.find((price) => price.id === subscription.priceId);
-
-      if (!price || typeof price.product === 'string' || price.product.deleted) {
-        continue;
-      }
-
-      const currentQuota = ZLimitsSchema.parse(
-        'metadata' in price.product ? price.product.metadata : {},
-      );
-
-      // Use the subscription with the highest quota.
-      if (currentQuota.documents > quota.documents && currentQuota.recipients > quota.recipients) {
-        quota = currentQuota;
-        remaining = structuredClone(quota);
-      }
-    }
->>>>>>> main
   }
 
   const documents = await prisma.document.count({
     where: {
       userId: user.id,
-<<<<<<< HEAD
-=======
-      teamId: null,
->>>>>>> main
       createdAt: {
         gte: DateTime.utc().startOf('month').toJSDate(),
       },
@@ -136,53 +76,3 @@ const handleUserLimits = async ({ email }: HandleUserLimitsOptions) => {
     remaining,
   };
 };
-<<<<<<< HEAD
-=======
-
-type HandleTeamLimitsOptions = {
-  email: string;
-  teamId: number;
-};
-
-const handleTeamLimits = async ({ email, teamId }: HandleTeamLimitsOptions) => {
-  const team = await prisma.team.findFirst({
-    where: {
-      id: teamId,
-      members: {
-        some: {
-          user: {
-            email,
-          },
-        },
-      },
-    },
-    include: {
-      subscription: true,
-    },
-  });
-
-  if (!team) {
-    throw new Error('Team not found');
-  }
-
-  const { subscription } = team;
-
-  if (subscription && subscription.status === SubscriptionStatus.INACTIVE) {
-    return {
-      quota: {
-        documents: 0,
-        recipients: 0,
-      },
-      remaining: {
-        documents: 0,
-        recipients: 0,
-      },
-    };
-  }
-
-  return {
-    quota: structuredClone(TEAM_PLAN_LIMITS),
-    remaining: structuredClone(TEAM_PLAN_LIMITS),
-  };
-};
->>>>>>> main

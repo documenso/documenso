@@ -1,27 +1,12 @@
-<<<<<<< HEAD
 import { NextApiRequest, NextApiResponse } from 'next';
-=======
-import type { NextApiRequest, NextApiResponse } from 'next';
->>>>>>> main
 
 import { buffer } from 'micro';
 import { match } from 'ts-pattern';
 
-<<<<<<< HEAD
 import { Stripe, stripe } from '@documenso/lib/server-only/stripe';
 import { getFlag } from '@documenso/lib/universal/get-feature-flag';
 import { prisma } from '@documenso/prisma';
 
-=======
-import { STRIPE_PLAN_TYPE } from '@documenso/lib/constants/billing';
-import type { Stripe } from '@documenso/lib/server-only/stripe';
-import { stripe } from '@documenso/lib/server-only/stripe';
-import { createTeamFromPendingTeam } from '@documenso/lib/server-only/team/create-team';
-import { getFlag } from '@documenso/lib/universal/get-feature-flag';
-import { prisma } from '@documenso/prisma';
-
-import { onEarlyAdoptersCheckout } from './on-early-adopters-checkout';
->>>>>>> main
 import { onSubscriptionDeleted } from './on-subscription-deleted';
 import { onSubscriptionUpdated } from './on-subscription-updated';
 
@@ -67,55 +52,13 @@ export const stripeWebhookHandler = async (
         // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
         const session = event.data.object as Stripe.Checkout.Session;
 
-<<<<<<< HEAD
         const userId = Number(session.client_reference_id);
-=======
-        if (session.metadata?.source === 'marketing') {
-          await onEarlyAdoptersCheckout({ session });
-        }
-
-        const customerId =
-          typeof session.customer === 'string' ? session.customer : session.customer?.id;
-
-        // Attempt to get the user ID from the client reference id.
-        let userId = Number(session.client_reference_id);
-
-        // If the user ID is not found, attempt to get it from the Stripe customer metadata.
-        if (!userId && customerId) {
-          const customer = await stripe.customers.retrieve(customerId);
-
-          if (!customer.deleted) {
-            userId = Number(customer.metadata.userId);
-          }
-        }
-
-        // Finally, attempt to get the user ID from the subscription within the database.
-        if (!userId && customerId) {
-          const result = await prisma.user.findFirst({
-            select: {
-              id: true,
-            },
-            where: {
-              customerId,
-            },
-          });
-
-          if (result?.id) {
-            userId = result.id;
-          }
-        }
-
->>>>>>> main
         const subscriptionId =
           typeof session.subscription === 'string'
             ? session.subscription
             : session.subscription?.id;
 
-<<<<<<< HEAD
         if (!subscriptionId || Number.isNaN(userId)) {
-=======
-        if (!subscriptionId) {
->>>>>>> main
           return res.status(500).json({
             success: false,
             message: 'Invalid session',
@@ -124,27 +67,6 @@ export const stripeWebhookHandler = async (
 
         const subscription = await stripe.subscriptions.retrieve(subscriptionId);
 
-<<<<<<< HEAD
-=======
-        // Handle team creation after seat checkout.
-        if (subscription.items.data[0].price.metadata.plan === STRIPE_PLAN_TYPE.TEAM) {
-          await handleTeamSeatCheckout({ subscription });
-
-          return res.status(200).json({
-            success: true,
-            message: 'Webhook received',
-          });
-        }
-
-        // Validate user ID.
-        if (!userId || Number.isNaN(userId)) {
-          return res.status(500).json({
-            success: false,
-            message: 'Invalid session or missing user ID',
-          });
-        }
-
->>>>>>> main
         await onSubscriptionUpdated({ userId, subscription });
 
         return res.status(200).json({
@@ -161,59 +83,23 @@ export const stripeWebhookHandler = async (
             ? subscription.customer
             : subscription.customer.id;
 
-<<<<<<< HEAD
         const result = await prisma.subscription.findFirst({
           select: {
             userId: true,
-=======
-        if (subscription.items.data[0].price.metadata.plan === STRIPE_PLAN_TYPE.TEAM) {
-          const team = await prisma.team.findFirst({
-            where: {
-              customerId,
-            },
-          });
-
-          if (!team) {
-            return res.status(500).json({
-              success: false,
-              message: 'No team associated with subscription found',
-            });
-          }
-
-          await onSubscriptionUpdated({ teamId: team.id, subscription });
-
-          return res.status(200).json({
-            success: true,
-            message: 'Webhook received',
-          });
-        }
-
-        const result = await prisma.user.findFirst({
-          select: {
-            id: true,
->>>>>>> main
           },
           where: {
             customerId,
           },
         });
 
-<<<<<<< HEAD
         if (!result?.userId) {
-=======
-        if (!result?.id) {
->>>>>>> main
           return res.status(500).json({
             success: false,
             message: 'User not found',
           });
         }
 
-<<<<<<< HEAD
         await onSubscriptionUpdated({ userId: result.userId, subscription });
-=======
-        await onSubscriptionUpdated({ userId: result.id, subscription });
->>>>>>> main
 
         return res.status(200).json({
           success: true,
@@ -248,66 +134,23 @@ export const stripeWebhookHandler = async (
 
         const subscription = await stripe.subscriptions.retrieve(subscriptionId);
 
-<<<<<<< HEAD
         const result = await prisma.subscription.findFirst({
           select: {
             userId: true,
-=======
-        if (subscription.status === 'incomplete_expired') {
-          return res.status(200).json({
-            success: true,
-            message: 'Webhook received',
-          });
-        }
-
-        if (subscription.items.data[0].price.metadata.plan === STRIPE_PLAN_TYPE.TEAM) {
-          const team = await prisma.team.findFirst({
-            where: {
-              customerId,
-            },
-          });
-
-          if (!team) {
-            return res.status(500).json({
-              success: false,
-              message: 'No team associated with subscription found',
-            });
-          }
-
-          await onSubscriptionUpdated({ teamId: team.id, subscription });
-
-          return res.status(200).json({
-            success: true,
-            message: 'Webhook received',
-          });
-        }
-
-        const result = await prisma.user.findFirst({
-          select: {
-            id: true,
->>>>>>> main
           },
           where: {
             customerId,
           },
         });
 
-<<<<<<< HEAD
         if (!result?.userId) {
-=======
-        if (!result?.id) {
->>>>>>> main
           return res.status(500).json({
             success: false,
             message: 'User not found',
           });
         }
 
-<<<<<<< HEAD
         await onSubscriptionUpdated({ userId: result.userId, subscription });
-=======
-        await onSubscriptionUpdated({ userId: result.id, subscription });
->>>>>>> main
 
         return res.status(200).json({
           success: true,
@@ -335,71 +178,23 @@ export const stripeWebhookHandler = async (
 
         const subscription = await stripe.subscriptions.retrieve(subscriptionId);
 
-<<<<<<< HEAD
         const result = await prisma.subscription.findFirst({
           select: {
             userId: true,
-=======
-        if (subscription.status === 'incomplete_expired') {
-          return res.status(200).json({
-            success: true,
-            message: 'Webhook received',
-          });
-        }
-
-        if (subscription.items.data[0].price.metadata.plan === STRIPE_PLAN_TYPE.TEAM) {
-          const team = await prisma.team.findFirst({
-            where: {
-              customerId,
-            },
-          });
-
-          if (!team) {
-            return res.status(500).json({
-              success: false,
-              message: 'No team associated with subscription found',
-            });
-          }
-
-          await onSubscriptionUpdated({ teamId: team.id, subscription });
-
-          return res.status(200).json({
-            success: true,
-            message: 'Webhook received',
-          });
-        }
-
-        const result = await prisma.user.findFirst({
-          select: {
-            id: true,
->>>>>>> main
           },
           where: {
             customerId,
           },
         });
 
-<<<<<<< HEAD
         if (!result?.userId) {
-=======
-        if (!result?.id) {
->>>>>>> main
           return res.status(500).json({
             success: false,
             message: 'User not found',
           });
         }
 
-<<<<<<< HEAD
         await onSubscriptionUpdated({ userId: result.userId, subscription });
-=======
-        await onSubscriptionUpdated({ userId: result.id, subscription });
-
-        return res.status(200).json({
-          success: true,
-          message: 'Webhook received',
-        });
->>>>>>> main
       })
       .with('customer.subscription.deleted', async () => {
         // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
@@ -427,24 +222,3 @@ export const stripeWebhookHandler = async (
     });
   }
 };
-<<<<<<< HEAD
-=======
-
-export type HandleTeamSeatCheckoutOptions = {
-  subscription: Stripe.Subscription;
-};
-
-const handleTeamSeatCheckout = async ({ subscription }: HandleTeamSeatCheckoutOptions) => {
-  if (subscription.metadata?.pendingTeamId === undefined) {
-    throw new Error('Missing pending team ID');
-  }
-
-  const pendingTeamId = Number(subscription.metadata.pendingTeamId);
-
-  if (Number.isNaN(pendingTeamId)) {
-    throw new Error('Invalid pending team ID');
-  }
-
-  return await createTeamFromPendingTeam({ pendingTeamId, subscription }).then((team) => team.id);
-};
->>>>>>> main

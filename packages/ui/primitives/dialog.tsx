@@ -11,27 +11,15 @@ const Dialog = DialogPrimitive.Root;
 
 const DialogTrigger = DialogPrimitive.Trigger;
 
-<<<<<<< HEAD
 const DialogPortal = ({
   className,
-=======
-const DialogClose = DialogPrimitive.Close;
-
-const DialogPortal = ({
->>>>>>> main
   children,
   position = 'start',
   ...props
 }: DialogPrimitive.DialogPortalProps & { position?: 'start' | 'end' | 'center' }) => (
-<<<<<<< HEAD
   <DialogPrimitive.Portal className={cn(className)} {...props}>
     <div
       className={cn('fixed inset-0 z-50 flex justify-center sm:items-center', {
-=======
-  <DialogPrimitive.Portal {...props}>
-    <div
-      className={cn('fixed inset-0 z-[1000] flex justify-center sm:items-center', {
->>>>>>> main
         'items-start': position === 'start',
         'items-end': position === 'end',
         'items-center': position === 'center',
@@ -64,7 +52,6 @@ const DialogContent = React.forwardRef<
   React.ElementRef<typeof DialogPrimitive.Content>,
   React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content> & {
     position?: 'start' | 'end' | 'center';
-<<<<<<< HEAD
   }
 >(({ className, children, position = 'start', ...props }, ref) => (
   <DialogPortal position={position}>
@@ -85,38 +72,6 @@ const DialogContent = React.forwardRef<
     </DialogPrimitive.Content>
   </DialogPortal>
 ));
-=======
-    hideClose?: boolean;
-    /* Below prop is to add additional classes to the overlay */
-    overlayClassName?: string;
-  }
->(
-  (
-    { className, children, overlayClassName, position = 'start', hideClose = false, ...props },
-    ref,
-  ) => (
-    <DialogPortal position={position}>
-      <DialogOverlay className={cn(overlayClassName)} />
-      <DialogPrimitive.Content
-        ref={ref}
-        className={cn(
-          'bg-background animate-in data-[state=open]:fade-in-90 sm:zoom-in-90 data-[state=open]:slide-in-from-bottom-10 data-[state=open]:sm:slide-in-from-bottom-0 fixed z-50 grid w-full gap-4 rounded-b-lg border p-6 shadow-lg sm:max-w-lg sm:rounded-lg',
-          className,
-        )}
-        {...props}
-      >
-        {children}
-        {!hideClose && (
-          <DialogPrimitive.Close className="ring-offset-background focus:ring-ring data-[state=open]:bg-accent data-[state=open]:text-muted-foreground absolute right-4 top-4 rounded-sm opacity-70 transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:pointer-events-none">
-            <X className="h-4 w-4" />
-            <span className="sr-only">Close</span>
-          </DialogPrimitive.Close>
-        )}
-      </DialogPrimitive.Content>
-    </DialogPortal>
-  ),
-);
->>>>>>> main
 
 DialogContent.displayName = DialogPrimitive.Content.displayName;
 
@@ -128,14 +83,7 @@ DialogHeader.displayName = 'DialogHeader';
 
 const DialogFooter = ({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
   <div
-<<<<<<< HEAD
     className={cn('flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2', className)}
-=======
-    className={cn(
-      'flex flex-col-reverse space-y-2 space-y-reverse sm:flex-row sm:justify-end sm:space-x-2 sm:space-y-0',
-      className,
-    )}
->>>>>>> main
     {...props}
   />
 );
@@ -178,8 +126,4 @@ export {
   DialogTitle,
   DialogDescription,
   DialogPortal,
-<<<<<<< HEAD
-=======
-  DialogClose,
->>>>>>> main
 };

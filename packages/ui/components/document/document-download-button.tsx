@@ -1,6 +1,5 @@
 'use client';
 
-<<<<<<< HEAD
 import { HTMLAttributes, useState } from 'react';
 
 import { Download } from 'lucide-react';
@@ -10,19 +9,6 @@ import { DocumentData } from '@documenso/prisma/client';
 import { Button } from '@documenso/ui/primitives/button';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
-=======
-import type { HTMLAttributes } from 'react';
-import { useState } from 'react';
-
-import { Download } from 'lucide-react';
-
-import { downloadPDF } from '@documenso/lib/client-only/download-pdf';
-import type { DocumentData } from '@documenso/prisma/client';
-import { useToast } from '@documenso/ui/primitives/use-toast';
-
-import { Button } from '../../primitives/button';
-
->>>>>>> main
 export type DownloadButtonProps = HTMLAttributes<HTMLButtonElement> & {
   disabled?: boolean;
   fileName?: string;
@@ -36,21 +22,15 @@ export const DocumentDownloadButton = ({
   disabled,
   ...props
 }: DownloadButtonProps) => {
-<<<<<<< HEAD
   const { toast } = useToast();
 
   const [isLoading, setIsLoading] = useState(false);
-=======
-  const [isLoading, setIsLoading] = useState(false);
-  const { toast } = useToast();
->>>>>>> main
 
   const onDownloadClick = async () => {
     try {
       setIsLoading(true);
 
       if (!documentData) {
-<<<<<<< HEAD
         return;
       }
 
@@ -78,23 +58,6 @@ export const DocumentDownloadButton = ({
       });
     } finally {
       setIsLoading(false);
-=======
-        setIsLoading(false);
-        return;
-      }
-
-      await downloadPDF({ documentData, fileName }).then(() => {
-        setIsLoading(false);
-      });
-    } catch (err) {
-      setIsLoading(false);
-
-      toast({
-        title: 'Something went wrong',
-        description: 'An error occurred while downloading your document.',
-        variant: 'destructive',
-      });
->>>>>>> main
     }
   };
 
@@ -108,11 +71,7 @@ export const DocumentDownloadButton = ({
       loading={isLoading}
       {...props}
     >
-<<<<<<< HEAD
       <Download className="mr-2 h-5 w-5" />
-=======
-      {!isLoading && <Download className="mr-2 h-5 w-5" />}
->>>>>>> main
       Download
     </Button>
   );

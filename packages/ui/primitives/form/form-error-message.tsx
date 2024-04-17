@@ -1,10 +1,6 @@
 import { AnimatePresence, motion } from 'framer-motion';
 
-<<<<<<< HEAD
 import { cn } from '@documenso/ui/lib/utils';
-=======
-import { cn } from '../../lib/utils';
->>>>>>> main
 
 export type FormErrorMessageProps = {
   className?: string;

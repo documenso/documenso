@@ -1,12 +1,5 @@
 {
   "extends": "@documenso/tsconfig/react-library.json",
   "include": ["."],
-<<<<<<< HEAD
   "exclude": ["dist", "build", "node_modules"]
-=======
-  "exclude": ["dist", "build", "node_modules"],
-  "compilerOptions": {
-    "strict": true,
-  }
->>>>>>> main
 }

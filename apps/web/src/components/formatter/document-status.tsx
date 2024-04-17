@@ -1,17 +1,9 @@
-<<<<<<< HEAD
 import { HTMLAttributes } from 'react';
-=======
-import type { HTMLAttributes } from 'react';
->>>>>>> main
 
 import { CheckCircle2, Clock, File } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react/dist/lucide-react';
 
-<<<<<<< HEAD
 import { ExtendedDocumentStatus } from '@documenso/prisma/types/extended-document-status';
-=======
-import type { ExtendedDocumentStatus } from '@documenso/prisma/types/extended-document-status';
->>>>>>> main
 import { SignatureIcon } from '@documenso/ui/icons/signature';
 import { cn } from '@documenso/ui/lib/utils';
 
@@ -21,11 +13,7 @@ type FriendlyStatus = {
   color: string;
 };
 
-<<<<<<< HEAD
 const FRIENDLY_STATUS_MAP: Record<ExtendedDocumentStatus, FriendlyStatus> = {
-=======
-export const FRIENDLY_STATUS_MAP: Record<ExtendedDocumentStatus, FriendlyStatus> = {
->>>>>>> main
   PENDING: {
     label: 'Pending',
     icon: Clock,

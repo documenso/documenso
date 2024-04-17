@@ -9,21 +9,9 @@ import { z } from 'zod';
 import { trpc } from '@documenso/trpc/react';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
-<<<<<<< HEAD
 import { FormErrorMessage } from '@documenso/ui/primitives/form/form-error-message';
 import { Input } from '@documenso/ui/primitives/input';
 import { Label } from '@documenso/ui/primitives/label';
-=======
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@documenso/ui/primitives/form/form';
-import { Input } from '@documenso/ui/primitives/input';
->>>>>>> main
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
 export const ZForgotPasswordFormSchema = z.object({
@@ -40,27 +28,18 @@ export const ForgotPasswordForm = ({ className }: ForgotPasswordFormProps) => {
   const router = useRouter();
   const { toast } = useToast();
 
-<<<<<<< HEAD
   const {
     register,
     handleSubmit,
     reset,
     formState: { errors, isSubmitting },
   } = useForm<TForgotPasswordFormSchema>({
-=======
-  const form = useForm<TForgotPasswordFormSchema>({
->>>>>>> main
     values: {
       email: '',
     },
     resolver: zodResolver(ZForgotPasswordFormSchema),
   });
 
-<<<<<<< HEAD
-=======
-  const isSubmitting = form.formState.isSubmitting;
-
->>>>>>> main
   const { mutateAsync: forgotPassword } = trpc.profile.forgotPassword.useMutation();
 
   const onFormSubmit = async ({ email }: TForgotPasswordFormSchema) => {
@@ -73,17 +52,12 @@ export const ForgotPasswordForm = ({ className }: ForgotPasswordFormProps) => {
       duration: 5000,
     });
 
-<<<<<<< HEAD
     reset();
-=======
-    form.reset();
->>>>>>> main
 
     router.push('/check-email');
   };
 
   return (
-<<<<<<< HEAD
     <form
       className={cn('flex w-full flex-col gap-y-4', className)}
       onSubmit={handleSubmit(onFormSubmit)}
@@ -102,33 +76,5 @@ export const ForgotPasswordForm = ({ className }: ForgotPasswordFormProps) => {
         {isSubmitting ? 'Sending Reset Email...' : 'Reset Password'}
       </Button>
     </form>
-=======
-    <Form {...form}>
-      <form
-        className={cn('flex w-full flex-col gap-y-4', className)}
-        onSubmit={form.handleSubmit(onFormSubmit)}
-      >
-        <fieldset className="flex w-full flex-col gap-y-4" disabled={isSubmitting}>
-          <FormField
-            control={form.control}
-            name="email"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Email</FormLabel>
-                <FormControl>
-                  <Input type="email" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </fieldset>
-
-        <Button size="lg" loading={isSubmitting}>
-          {isSubmitting ? 'Sending Reset Email...' : 'Reset Password'}
-        </Button>
-      </form>
-    </Form>
->>>>>>> main
   );
 };

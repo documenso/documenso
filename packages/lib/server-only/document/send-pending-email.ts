@@ -5,11 +5,6 @@ import { render } from '@documenso/email/render';
 import { DocumentPendingEmailTemplate } from '@documenso/email/templates/document-pending';
 import { prisma } from '@documenso/prisma';
 
-<<<<<<< HEAD
-=======
-import { NEXT_PUBLIC_WEBAPP_URL } from '../../constants/app';
-
->>>>>>> main
 export interface SendPendingEmailOptions {
   documentId: number;
   recipientId: number;
@@ -46,11 +41,7 @@ export const sendPendingEmail = async ({ documentId, recipientId }: SendPendingE
 
   const { email, name } = recipient;
 
-<<<<<<< HEAD
   const assetBaseUrl = process.env.NEXT_PUBLIC_WEBAPP_URL || 'http://localhost:3000';
-=======
-  const assetBaseUrl = NEXT_PUBLIC_WEBAPP_URL() || 'http://localhost:3000';
->>>>>>> main
 
   const template = createElement(DocumentPendingEmailTemplate, {
     documentName: document.title,

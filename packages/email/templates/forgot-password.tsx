@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 import {
   Body,
   Container,
@@ -17,14 +16,6 @@ import {
   TemplateForgotPassword,
   TemplateForgotPasswordProps,
 } from '../template-components/template-forgot-password';
-=======
-import config from '@documenso/tailwind-config';
-
-import { Body, Container, Head, Html, Img, Preview, Section, Tailwind } from '../components';
-import { TemplateFooter } from '../template-components/template-footer';
-import type { TemplateForgotPasswordProps } from '../template-components/template-forgot-password';
-import { TemplateForgotPassword } from '../template-components/template-forgot-password';
->>>>>>> main
 
 export type ForgotPasswordTemplateProps = Partial<TemplateForgotPasswordProps>;
 

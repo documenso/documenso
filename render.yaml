@@ -67,21 +67,14 @@ services:
         sync: false
       - key: NEXT_PUBLIC_STRIPE_COMMUNITY_PLAN_MONTHLY_PRICE_ID
         sync: false
-<<<<<<< HEAD
       - key: NEXT_PUBLIC_STRIPE_COMMUNITY_PLAN_YEARLY_PRICE_ID
-=======
-      - key: NEXT_PUBLIC_STRIPE_ENTERPRISE_PLAN_MONTHLY_PRICE_ID
->>>>>>> main
         sync: false
 
       # Features
       - key: NEXT_PUBLIC_POSTHOG_KEY
         sync: false
-<<<<<<< HEAD
       - key: NEXT_PUBLIC_POSTHOG_HOST
         value: 'https://eu.posthog.com'
-=======
->>>>>>> main
       - key: NEXT_PUBLIC_FEATURE_BILLING_ENABLED
         sync: false
 
@@ -96,11 +89,6 @@ services:
         value: 'database'
       - key: NEXT_PRIVATE_UPLOAD_ENDPOINT
         sync: false
-<<<<<<< HEAD
-=======
-      - key: NEXT_PRIVATE_UPLOAD_FORCE_PATH_STYLE
-        sync: false
->>>>>>> main
       - key: NEXT_PRIVATE_UPLOAD_REGION
         sync: false
       - key: NEXT_PRIVATE_UPLOAD_BUCKET

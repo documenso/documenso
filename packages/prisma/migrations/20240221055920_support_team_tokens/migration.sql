@@ -1,6 +1,0 @@
--- AlterTable
-ALTER TABLE "ApiToken" ADD COLUMN     "teamId" INTEGER,
-ALTER COLUMN "userId" DROP NOT NULL;
-
--- AddForeignKey
-ALTER TABLE "ApiToken" ADD CONSTRAINT "ApiToken_teamId_fkey" FOREIGN KEY ("teamId") REFERENCES "Team"("id") ON DELETE CASCADE ON UPDATE CASCADE;

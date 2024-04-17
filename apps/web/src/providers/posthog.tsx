@@ -32,10 +32,6 @@ export function PostHogPageview() {
             // Do nothing.
           });
       },
-<<<<<<< HEAD
-=======
-      custom_campaign_params: ['src'],
->>>>>>> main
     });
   }
 

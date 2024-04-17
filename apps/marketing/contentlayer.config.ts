@@ -12,10 +12,6 @@ export const BlogPost = defineDocumentType(() => ({
     authorName: { type: 'string', required: true },
     authorImage: { type: 'string', required: false },
     authorRole: { type: 'string', required: true },
-<<<<<<< HEAD
-=======
-    cta: { type: 'boolean', required: false, default: true },
->>>>>>> main
   },
   computedFields: {
     href: { type: 'string', resolve: (post) => `/${post._raw.flattenedPath}` },

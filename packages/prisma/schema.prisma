@@ -19,7 +19,6 @@ enum Role {
 }
 
 model User {
-<<<<<<< HEAD
   id                 Int                  @id @default(autoincrement())
   name               String?
   email              String               @unique
@@ -34,79 +33,6 @@ model User {
   Document           Document[]
   Subscription       Subscription?
   PasswordResetToken PasswordResetToken[]
-=======
-  id                   Int                  @id @default(autoincrement())
-  name                 String?
-  customerId           String?              @unique
-  email                String               @unique
-  emailVerified        DateTime?
-  password             String?
-  source               String?
-  signature            String?
-  createdAt            DateTime             @default(now())
-  updatedAt            DateTime             @default(now()) @updatedAt
-  lastSignedIn         DateTime             @default(now())
-  roles                Role[]               @default([USER])
-  identityProvider     IdentityProvider     @default(DOCUMENSO)
-  accounts             Account[]
-  sessions             Session[]
-  Document             Document[]
-  Subscription         Subscription[]
-  PasswordResetToken   PasswordResetToken[]
-  ownedTeams           Team[]
-  ownedPendingTeams    TeamPending[]
-  teamMembers          TeamMember[]
-  twoFactorSecret      String?
-  twoFactorEnabled     Boolean              @default(false)
-  twoFactorBackupCodes String?
-  url                  String?              @unique
-
-  userProfile       UserProfile?
-  VerificationToken VerificationToken[]
-  ApiToken          ApiToken[]
-  Template          Template[]
-  securityAuditLogs UserSecurityAuditLog[]
-  Webhooks          Webhook[]
-  siteSettings      SiteSettings[]
-  passkeys          Passkey[]
-
-  @@index([email])
-}
-
-model UserProfile {
-  id  Int     @id
-  bio String?
-
-  User User? @relation(fields: [id], references: [id], onDelete: Cascade)
-}
-
-enum UserSecurityAuditLogType {
-  ACCOUNT_PROFILE_UPDATE
-  ACCOUNT_SSO_LINK
-  AUTH_2FA_DISABLE
-  AUTH_2FA_ENABLE
-  PASSKEY_CREATED
-  PASSKEY_DELETED
-  PASSKEY_UPDATED
-  PASSWORD_RESET
-  PASSWORD_UPDATE
-  SIGN_OUT
-  SIGN_IN
-  SIGN_IN_FAIL
-  SIGN_IN_2FA_FAIL
-  SIGN_IN_PASSKEY_FAIL
-}
-
-model UserSecurityAuditLog {
-  id        Int                      @id @default(autoincrement())
-  userId    Int
-  createdAt DateTime                 @default(now())
-  type      UserSecurityAuditLogType
-  userAgent String?
-  ipAddress String?
-
-  User User @relation(fields: [userId], references: [id], onDelete: Cascade)
->>>>>>> main
 }
 
 model PasswordResetToken {
@@ -116,103 +42,6 @@ model PasswordResetToken {
   expiry    DateTime
   userId    Int
   User      User     @relation(fields: [userId], references: [id])
-<<<<<<< HEAD
-=======
-}
-
-model Passkey {
-  id                   String    @id @default(cuid())
-  userId               Int
-  name                 String
-  createdAt            DateTime  @default(now())
-  updatedAt            DateTime  @default(now())
-  lastUsedAt           DateTime?
-  credentialId         Bytes
-  credentialPublicKey  Bytes
-  counter              BigInt
-  credentialDeviceType String
-  credentialBackedUp   Boolean
-  transports           String[]
-
-  User User @relation(fields: [userId], references: [id], onDelete: Cascade)
-}
-
-model AnonymousVerificationToken {
-  id        String   @id @unique @default(cuid())
-  token     String   @unique
-  expiresAt DateTime
-  createdAt DateTime @default(now())
-}
-
-model VerificationToken {
-  id          Int      @id @default(autoincrement())
-  secondaryId String   @unique @default(cuid())
-  identifier  String
-  token       String   @unique
-  expires     DateTime
-  createdAt   DateTime @default(now())
-  userId      Int
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-}
-
-enum WebhookTriggerEvents {
-  DOCUMENT_CREATED
-  DOCUMENT_SENT
-  DOCUMENT_OPENED
-  DOCUMENT_SIGNED
-  DOCUMENT_COMPLETED
-}
-
-model Webhook {
-  id            String                 @id @default(cuid())
-  webhookUrl    String
-  eventTriggers WebhookTriggerEvents[]
-  secret        String?
-  enabled       Boolean                @default(true)
-  createdAt     DateTime               @default(now())
-  updatedAt     DateTime               @default(now()) @updatedAt
-  userId        Int
-  User          User                   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  teamId        Int?
-  team          Team?                  @relation(fields: [teamId], references: [id], onDelete: Cascade)
-  WebhookCall   WebhookCall[]
-}
-
-enum WebhookCallStatus {
-  SUCCESS
-  FAILED
-}
-
-model WebhookCall {
-  id              String               @id @default(cuid())
-  status          WebhookCallStatus
-  url             String
-  event           WebhookTriggerEvents
-  requestBody     Json
-  responseCode    Int
-  responseHeaders Json?
-  responseBody    Json?
-  createdAt       DateTime             @default(now())
-  webhookId       String
-  webhook         Webhook              @relation(fields: [webhookId], references: [id], onDelete: Cascade)
-}
-
-enum ApiTokenAlgorithm {
-  SHA512
-}
-
-model ApiToken {
-  id        Int               @id @default(autoincrement())
-  name      String
-  token     String            @unique
-  algorithm ApiTokenAlgorithm @default(SHA512)
-  expires   DateTime?
-  createdAt DateTime          @default(now())
-  userId    Int?
-  user      User?             @relation(fields: [userId], references: [id], onDelete: Cascade)
-  teamId    Int?
-  team      Team?             @relation(fields: [teamId], references: [id], onDelete: Cascade)
->>>>>>> main
 }
 
 enum SubscriptionStatus {
@@ -224,26 +53,18 @@ enum SubscriptionStatus {
 model Subscription {
   id                Int                @id @default(autoincrement())
   status            SubscriptionStatus @default(INACTIVE)
-<<<<<<< HEAD
   planId            String?
   priceId           String?
   customerId        String
   periodEnd         DateTime?
   userId            Int                @unique
-=======
-  planId            String             @unique
-  priceId           String
-  periodEnd         DateTime?
-  userId            Int?
-  teamId            Int?               @unique
->>>>>>> main
   createdAt         DateTime           @default(now())
   updatedAt         DateTime           @updatedAt
   cancelAtPeriodEnd Boolean            @default(false)
 
-  team Team? @relation(fields: [teamId], references: [id], onDelete: Cascade)
-  User User? @relation(fields: [userId], references: [id], onDelete: Cascade)
+  User User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
+  @@unique([customerId])
   @@index([userId])
 }
 
@@ -284,57 +105,18 @@ model Document {
   id             Int                 @id @default(autoincrement())
   userId         Int
   User           User                @relation(fields: [userId], references: [id], onDelete: Cascade)
-<<<<<<< HEAD
-=======
-  authOptions    Json?
-  formValues     Json?
->>>>>>> main
   title          String
   status         DocumentStatus      @default(DRAFT)
   Recipient      Recipient[]
   Field          Field[]
   ShareLink      DocumentShareLink[]
   documentDataId String
-<<<<<<< HEAD
   documentData   DocumentData   @relation(fields: [documentDataId], references: [id], onDelete: Cascade)
   documentMeta   DocumentMeta?
   createdAt      DateTime       @default(now())
   updatedAt      DateTime       @default(now()) @updatedAt
 
   @@unique([documentDataId])
-=======
-  documentData   DocumentData        @relation(fields: [documentDataId], references: [id], onDelete: Cascade)
-  documentMeta   DocumentMeta?
-  createdAt      DateTime            @default(now())
-  updatedAt      DateTime            @default(now()) @updatedAt
-  completedAt    DateTime?
-  deletedAt      DateTime?
-  teamId         Int?
-  team           Team?               @relation(fields: [teamId], references: [id])
-
-  auditLogs DocumentAuditLog[]
-
-  @@unique([documentDataId])
-  @@index([userId])
-  @@index([status])
-}
-
-model DocumentAuditLog {
-  id         String   @id @default(cuid())
-  documentId Int
-  createdAt  DateTime @default(now())
-  type       String
-  data       Json
-
-  // Details of the person who performed the action which caused the audit log.
-  name      String?
-  email     String?
-  userId    Int?
-  userAgent String?
-  ipAddress String?
-
-  Document Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
->>>>>>> main
 }
 
 enum DocumentDataType {
@@ -349,7 +131,6 @@ model DocumentData {
   data        String
   initialData String
   Document    Document?
-<<<<<<< HEAD
 }
 
 model DocumentMeta {
@@ -358,21 +139,6 @@ model DocumentMeta {
   message  String?
   documentId Int @unique
   document Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
-=======
-  Template    Template?
-}
-
-model DocumentMeta {
-  id          String   @id @default(cuid())
-  subject     String?
-  message     String?
-  timezone    String?  @default("Etc/UTC") @db.Text
-  password    String?
-  dateFormat  String?  @default("yyyy-MM-dd hh:mm a") @db.Text
-  documentId  Int      @unique
-  document    Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
-  redirectUrl String?
->>>>>>> main
 }
 
 enum ReadStatus {
@@ -390,40 +156,22 @@ enum SigningStatus {
   SIGNED
 }
 
-enum RecipientRole {
-  CC
-  SIGNER
-  VIEWER
-  APPROVER
-}
-
 model Recipient {
   id            Int           @id @default(autoincrement())
-  documentId    Int?
-  templateId    Int?
+  documentId    Int
   email         String        @db.VarChar(255)
   name          String        @default("") @db.VarChar(255)
   token         String
   expired       DateTime?
   signedAt      DateTime?
-  authOptions   Json?
-  role          RecipientRole @default(SIGNER)
   readStatus    ReadStatus    @default(NOT_OPENED)
   signingStatus SigningStatus @default(NOT_SIGNED)
   sendStatus    SendStatus    @default(NOT_SENT)
-  Document      Document?     @relation(fields: [documentId], references: [id], onDelete: Cascade)
-  Template      Template?     @relation(fields: [templateId], references: [id], onDelete: Cascade)
+  Document      Document      @relation(fields: [documentId], references: [id], onDelete: Cascade)
   Field         Field[]
   Signature     Signature[]
 
   @@unique([documentId, email])
-<<<<<<< HEAD
-=======
-  @@unique([templateId, email])
-  @@index([documentId])
-  @@index([templateId])
-  @@index([token])
->>>>>>> main
 }
 
 enum FieldType {
@@ -437,9 +185,7 @@ enum FieldType {
 
 model Field {
   id          Int        @id @default(autoincrement())
-  secondaryId String     @unique @default(cuid())
-  documentId  Int?
-  templateId  Int?
+  documentId  Int
   recipientId Int?
   type        FieldType
   page        Int
@@ -449,14 +195,9 @@ model Field {
   height      Decimal    @default(-1)
   customText  String
   inserted    Boolean
-  Document    Document?  @relation(fields: [documentId], references: [id], onDelete: Cascade)
-  Template    Template?  @relation(fields: [templateId], references: [id], onDelete: Cascade)
+  Document    Document   @relation(fields: [documentId], references: [id], onDelete: Cascade)
   Recipient   Recipient? @relation(fields: [recipientId], references: [id], onDelete: Cascade)
   Signature   Signature?
-
-  @@index([documentId])
-  @@index([templateId])
-  @@index([recipientId])
 }
 
 model Signature {
@@ -469,155 +210,6 @@ model Signature {
 
   Recipient Recipient @relation(fields: [recipientId], references: [id], onDelete: Cascade)
   Field     Field     @relation(fields: [fieldId], references: [id], onDelete: Restrict)
-
-  @@index([recipientId])
-}
-
-model DocumentShareLink {
-  id         Int      @id @default(autoincrement())
-  email      String
-  slug       String   @unique
-  documentId Int
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
-
-  document Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
-
-  @@unique([documentId, email])
-}
-
-enum TeamMemberRole {
-  ADMIN
-  MANAGER
-  MEMBER
-}
-
-enum TeamMemberInviteStatus {
-  ACCEPTED
-  PENDING
-}
-
-model Team {
-  id                   Int                       @id @default(autoincrement())
-  name                 String
-  url                  String                    @unique
-  createdAt            DateTime                  @default(now())
-  customerId           String?                   @unique
-  ownerUserId          Int
-  members              TeamMember[]
-  invites              TeamMemberInvite[]
-  teamEmail            TeamEmail?
-  emailVerification    TeamEmailVerification?
-  transferVerification TeamTransferVerification?
-
-  owner        User          @relation(fields: [ownerUserId], references: [id])
-  subscription Subscription?
-
-  document  Document[]
-  templates Template[]
-  ApiToken  ApiToken[]
-  Webhook   Webhook[]
-}
-
-model TeamPending {
-  id          Int      @id @default(autoincrement())
-  name        String
-  url         String   @unique
-  createdAt   DateTime @default(now())
-  customerId  String   @unique
-  ownerUserId Int
-
-  owner User @relation(fields: [ownerUserId], references: [id], onDelete: Cascade)
-}
-
-model TeamMember {
-  id        Int            @id @default(autoincrement())
-  teamId    Int
-  createdAt DateTime       @default(now())
-  role      TeamMemberRole
-  userId    Int
-  user      User           @relation(fields: [userId], references: [id])
-  team      Team           @relation(fields: [teamId], references: [id], onDelete: Cascade)
-
-  @@unique([userId, teamId])
-}
-
-model TeamEmail {
-  teamId    Int      @id @unique
-  createdAt DateTime @default(now())
-  name      String
-  email     String   @unique
-  team      Team     @relation(fields: [teamId], references: [id], onDelete: Cascade)
-}
-
-model TeamEmailVerification {
-  teamId    Int      @id @unique
-  name      String
-  email     String
-  token     String   @unique
-  expiresAt DateTime
-  createdAt DateTime @default(now())
-
-  team Team @relation(fields: [teamId], references: [id], onDelete: Cascade)
-}
-
-model TeamTransferVerification {
-  teamId              Int      @id @unique
-  userId              Int
-  name                String
-  email               String
-  token               String   @unique
-  expiresAt           DateTime
-  createdAt           DateTime @default(now())
-  clearPaymentMethods Boolean  @default(false)
-
-  team Team @relation(fields: [teamId], references: [id], onDelete: Cascade)
-}
-
-model TeamMemberInvite {
-  id        Int                    @id @default(autoincrement())
-  teamId    Int
-  createdAt DateTime               @default(now())
-  email     String
-  status    TeamMemberInviteStatus @default(PENDING)
-  role      TeamMemberRole
-  token     String                 @unique
-  team      Team                   @relation(fields: [teamId], references: [id], onDelete: Cascade)
-
-  @@unique([teamId, email])
-}
-
-enum TemplateType {
-  PUBLIC
-  PRIVATE
-}
-
-model Template {
-  id                     Int          @id @default(autoincrement())
-  type                   TemplateType @default(PRIVATE)
-  title                  String
-  userId                 Int
-  teamId                 Int?
-  templateDocumentDataId String
-  createdAt              DateTime     @default(now())
-  updatedAt              DateTime     @default(now()) @updatedAt
-
-  team                 Team?        @relation(fields: [teamId], references: [id], onDelete: Cascade)
-  templateDocumentData DocumentData @relation(fields: [templateDocumentDataId], references: [id], onDelete: Cascade)
-  User                 User         @relation(fields: [userId], references: [id], onDelete: Cascade)
-  Recipient            Recipient[]
-  Field                Field[]
-
-  @@unique([templateDocumentDataId])
-}
-
-model SiteSettings {
-  id                   String   @id
-  enabled              Boolean  @default(false)
-  data                 Json
-  lastModifiedByUserId Int?
-  lastModifiedAt       DateTime @default(now())
-  lastModifiedByUser   User?    @relation(fields: [lastModifiedByUserId], references: [id])
 }
 
 model DocumentShareLink {

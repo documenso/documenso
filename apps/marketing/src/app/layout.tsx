@@ -2,15 +2,7 @@ import { Suspense } from 'react';
 
 import { Caveat, Inter } from 'next/font/google';
 
-<<<<<<< HEAD
 import { FeatureFlagProvider } from '@documenso/lib/client-only/providers/feature-flag';
-=======
-import { AxiomWebVitals } from 'next-axiom';
-import { PublicEnvScript } from 'next-runtime-env';
-
-import { FeatureFlagProvider } from '@documenso/lib/client-only/providers/feature-flag';
-import { NEXT_PUBLIC_MARKETING_URL } from '@documenso/lib/constants/app';
->>>>>>> main
 import { getAllAnonymousFlags } from '@documenso/lib/universal/get-feature-flag';
 import { TrpcProvider } from '@documenso/trpc/react';
 import { cn } from '@documenso/ui/lib/utils';
@@ -25,7 +17,6 @@ import './globals.css';
 const fontInter = Inter({ subsets: ['latin'], variable: '--font-sans' });
 const fontCaveat = Caveat({ subsets: ['latin'], variable: '--font-signature' });
 
-<<<<<<< HEAD
 export const metadata = {
   title: 'Documenso - The Open Source DocuSign Alternative',
   description:
@@ -49,37 +40,6 @@ export const metadata = {
       'Join Documenso, the open signing infrastructure, and get a 10x better signing experience. Pricing starts at $30/mo. forever! Sign in now and enjoy a faster, smarter, and more beautiful document signing process. Integrates with your favorite tools, customizable, and expandable. Support our mission and become a part of our open-source community.',
   },
 };
-=======
-export function generateMetadata() {
-  return {
-    title: {
-      template: '%s - Documenso',
-      default: 'Documenso',
-    },
-    description:
-      'Join Documenso, the open signing infrastructure, and get a 10x better signing experience. Pricing starts at $30/mo. forever! Sign in now and enjoy a faster, smarter, and more beautiful document signing process. Integrates with your favorite tools, customizable, and expandable. Support our mission and become a part of our open-source community.',
-    keywords:
-      'Documenso, open source, DocuSign alternative, document signing, open signing infrastructure, open-source community, fast signing, beautiful signing, smart templates',
-    authors: { name: 'Documenso, Inc.' },
-    robots: 'index, follow',
-    metadataBase: new URL(NEXT_PUBLIC_MARKETING_URL() ?? 'http://localhost:3000'),
-    openGraph: {
-      title: 'Documenso - The Open Source DocuSign Alternative',
-      description:
-        'Join Documenso, the open signing infrastructure, and get a 10x better signing experience. Pricing starts at $30/mo. forever! Sign in now and enjoy a faster, smarter, and more beautiful document signing process. Integrates with your favorite tools, customizable, and expandable. Support our mission and become a part of our open-source community.',
-      type: 'website',
-      images: ['/opengraph-image.jpg'],
-    },
-    twitter: {
-      site: '@documenso',
-      card: 'summary_large_image',
-      images: ['/opengraph-image.jpg'],
-      description:
-        'Join Documenso, the open signing infrastructure, and get a 10x better signing experience. Pricing starts at $30/mo. forever! Sign in now and enjoy a faster, smarter, and more beautiful document signing process. Integrates with your favorite tools, customizable, and expandable. Support our mission and become a part of our open-source community.',
-    },
-  };
-}
->>>>>>> main
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const flags = await getAllAnonymousFlags();
@@ -95,16 +55,8 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
         <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
         <link rel="manifest" href="/site.webmanifest" />
-<<<<<<< HEAD
       </head>
 
-=======
-        <PublicEnvScript />
-      </head>
-
-      <AxiomWebVitals />
-
->>>>>>> main
       <Suspense>
         <PostHogPageview />
       </Suspense>

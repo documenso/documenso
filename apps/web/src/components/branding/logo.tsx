@@ -1,8 +1,4 @@
-<<<<<<< HEAD
 import { SVGAttributes } from 'react';
-=======
-import type { SVGAttributes } from 'react';
->>>>>>> main
 
 export type LogoProps = SVGAttributes<SVGSVGElement>;
 

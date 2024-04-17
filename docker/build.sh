@@ -5,10 +5,15 @@ command -v docker >/dev/null 2>&1 || {
     exit 1
 }
 
+command -v jq >/dev/null 2>&1 || {
+    echo "jq is not installed. Please install jq and try again."
+    exit 1
+}
+
 SCRIPT_DIR="$(readlink -f "$(dirname "$0")")"
 MONOREPO_ROOT="$(readlink -f "$SCRIPT_DIR/../")"
 
-APP_VERSION="$(git name-rev --tags --name-only $(git rev-parse HEAD) | head -n 1 | sed 's/\^0//')"
+APP_VERSION="$(jq -r '.version' "$MONOREPO_ROOT/apps/web/package.json")"
 GIT_SHA="$(git rev-parse HEAD)"
 
 echo "Building docker image for monorepo at $MONOREPO_ROOT"
@@ -17,10 +22,7 @@ echo "Git SHA: $GIT_SHA"
 
 docker build -f "$SCRIPT_DIR/Dockerfile" \
     --progress=plain \
-    -t "documenso/documenso:latest" \
-    -t "documenso/documenso:$GIT_SHA" \
-    -t "documenso/documenso:$APP_VERSION" \
-    -t "ghcr.io/documenso/documenso:latest" \
-    -t "ghcr.io/documenso/documenso:$GIT_SHA" \
-    -t "ghcr.io/documenso/documenso:$APP_VERSION" \
+    -t "documenso:latest" \
+    -t "documenso:$GIT_SHA" \
+    -t "documenso:$APP_VERSION" \
     "$MONOREPO_ROOT"

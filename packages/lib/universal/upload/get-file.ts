@@ -3,11 +3,8 @@ import { match } from 'ts-pattern';
 
 import { DocumentDataType } from '@documenso/prisma/client';
 
-<<<<<<< HEAD
 import { getPresignGetUrl } from './server-actions';
 
-=======
->>>>>>> main
 export type GetFileOptions = {
   type: DocumentDataType;
   data: string;
@@ -36,11 +33,6 @@ const getFileFromBytes64 = (data: string) => {
 };
 
 const getFileFromS3 = async (key: string) => {
-<<<<<<< HEAD
-=======
-  const { getPresignGetUrl } = await import('./server-actions');
-
->>>>>>> main
   const { url } = await getPresignGetUrl(key);
 
   const response = await fetch(url, {

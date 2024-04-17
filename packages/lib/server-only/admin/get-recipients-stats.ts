@@ -19,17 +19,9 @@ export const getRecipientsStats = async () => {
 
   results.forEach((result) => {
     const { readStatus, signingStatus, sendStatus, _count } = result;
-<<<<<<< HEAD
     stats[readStatus] += _count;
     stats[signingStatus] += _count;
     stats[sendStatus] += _count;
-=======
-
-    stats[readStatus] += _count;
-    stats[signingStatus] += _count;
-    stats[sendStatus] += _count;
-
->>>>>>> main
     stats.TOTAL_RECIPIENTS += _count;
   });
 

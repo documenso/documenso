@@ -1,13 +1,7 @@
-<<<<<<< HEAD
 import { Button, Column, Img, Link, Section, Tailwind, Text } from '@react-email/components';
 
 import * as config from '@documenso/tailwind-config';
 
-=======
-import { env } from 'next-runtime-env';
-
-import { Button, Column, Img, Link, Section, Text } from '../components';
->>>>>>> main
 import { TemplateDocumentImage } from './template-document-image';
 
 export interface TemplateDocumentSelfSignedProps {
@@ -19,20 +13,13 @@ export const TemplateDocumentSelfSigned = ({
   documentName,
   assetBaseUrl,
 }: TemplateDocumentSelfSignedProps) => {
-<<<<<<< HEAD
   const signUpUrl = `${process.env.NEXT_PUBLIC_WEBAPP_URL ?? 'http://localhost:3000'}/signup`;
-=======
-  const NEXT_PUBLIC_WEBAPP_URL = env('NEXT_PUBLIC_WEBAPP_URL');
-
-  const signUpUrl = `${NEXT_PUBLIC_WEBAPP_URL ?? 'http://localhost:3000'}/signup`;
->>>>>>> main
 
   const getAssetUrl = (path: string) => {
     return new URL(path, assetBaseUrl).toString();
   };
 
   return (
-<<<<<<< HEAD
     <Tailwind
       config={{
         theme: {
@@ -42,9 +29,6 @@ export const TemplateDocumentSelfSigned = ({
         },
       }}
     >
-=======
-    <>
->>>>>>> main
       <TemplateDocumentImage className="mt-6" assetBaseUrl={assetBaseUrl} />
 
       <Section className="flex-row items-center justify-center">
@@ -100,11 +84,7 @@ export const TemplateDocumentSelfSigned = ({
           </Button>
         </Section>
       </Section>
-<<<<<<< HEAD
     </Tailwind>
-=======
-    </>
->>>>>>> main
   );
 };
 

@@ -1,0 +1,40 @@
+services:
+  database:
+    image: postgres:15
+    environment:
+      - POSTGRES_USER=documenso
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=documenso
+    ports:
+      - 5432:5432
+
+  inbucket:
+    image: inbucket/inbucket
+    ports:
+      - 9000:9000
+      - 2500:2500
+      - 1100:1100
+
+  documenso:
+    image: node:18
+    working_dir: /app
+    command: ./docker/compose-entrypoint.sh
+    depends_on:
+      - database
+      - inbucket
+    environment:
+      - DATABASE_URL=postgres://documenso:password@database:5432/documenso
+      - NEXT_PUBLIC_WEBAPP_URL=http://localhost:3000
+      - NEXTAUTH_SECRET=my-super-secure-secret
+      - NEXTAUTH_URL=http://localhost:3000
+      - SENDGRID_API_KEY=
+      - SMTP_MAIL_HOST=inbucket
+      - SMTP_MAIL_PORT=2500
+      - SMTP_MAIL_USER=username
+      - SMTP_MAIL_PASSWORD=password
+      - MAIL_FROM=admin@example.com
+      - NEXT_PUBLIC_ALLOW_SIGNUP=true
+    ports:
+      - 3000:3000
+    volumes:
+      - ../:/app

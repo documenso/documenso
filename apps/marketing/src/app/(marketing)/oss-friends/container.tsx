@@ -2,22 +2,13 @@
 
 import Link from 'next/link';
 
-<<<<<<< HEAD
 import { Variants, motion } from 'framer-motion';
-=======
-import type { Variants } from 'framer-motion';
-import { motion } from 'framer-motion';
->>>>>>> main
 
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
 import { Card, CardContent, CardTitle } from '@documenso/ui/primitives/card';
 
-<<<<<<< HEAD
 import { TOSSFriendsSchema } from './schema';
-=======
-import type { TOSSFriendsSchema } from './schema';
->>>>>>> main
 
 const ContainerVariants: Variants = {
   initial: {

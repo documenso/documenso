@@ -40,15 +40,9 @@ export const Callout = ({ starCount }: CalloutProps) => {
         className="rounded-full bg-transparent backdrop-blur-sm"
         onClick={onSignUpClick}
       >
-<<<<<<< HEAD
         Get the Early Adopters Plan
         <span className="bg-primary dark:text-background -mr-2.5 ml-2.5 rounded-full px-2 py-1.5 text-xs">
           $30/mo. forever!
-=======
-        Claim Early Adopter Plan
-        <span className="bg-primary dark:text-background -mr-2.5 ml-2.5 rounded-full px-2 py-1.5 text-xs font-medium">
-          $30/mo
->>>>>>> main
         </span>
       </Button>
 
@@ -59,11 +53,7 @@ export const Callout = ({ starCount }: CalloutProps) => {
       >
         <Button variant="outline" className="rounded-full bg-transparent backdrop-blur-sm">
           <LuGithub className="mr-2 h-5 w-5" />
-<<<<<<< HEAD
           Star on Github
-=======
-          Star on GitHub
->>>>>>> main
           {starCount && starCount > 0 && (
             <span className="bg-primary dark:text-background -mr-2.5 ml-2.5 rounded-full px-2 py-1.5 text-xs">
               {starCount.toLocaleString('en-US')}

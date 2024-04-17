@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 import {
   Body,
   Container,
@@ -16,13 +15,6 @@ import {
   TemplateDocumentSelfSigned,
   TemplateDocumentSelfSignedProps,
 } from '../template-components/template-document-self-signed';
-=======
-import config from '@documenso/tailwind-config';
-
-import { Body, Container, Head, Html, Img, Preview, Section, Tailwind } from '../components';
-import type { TemplateDocumentSelfSignedProps } from '../template-components/template-document-self-signed';
-import { TemplateDocumentSelfSigned } from '../template-components/template-document-self-signed';
->>>>>>> main
 import { TemplateFooter } from '../template-components/template-footer';
 
 export type DocumentSelfSignedTemplateProps = TemplateDocumentSelfSignedProps;

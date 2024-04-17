@@ -7,22 +7,10 @@ module.exports = {
   content: ['src/**/*.{ts,tsx}'],
   theme: {
     extend: {
-<<<<<<< HEAD
-=======
-      screens: {
-        print: { raw: 'print' },
-      },
->>>>>>> main
       fontFamily: {
         sans: ['var(--font-sans)', ...fontFamily.sans],
         signature: ['var(--font-signature)'],
       },
-<<<<<<< HEAD
-=======
-      zIndex: {
-        9999: '9999',
-      },
->>>>>>> main
       colors: {
         border: 'hsl(var(--border))',
         input: 'hsl(var(--input))',
@@ -37,12 +25,6 @@ module.exports = {
           DEFAULT: 'hsl(var(--secondary))',
           foreground: 'hsl(var(--secondary-foreground))',
         },
-<<<<<<< HEAD
-=======
-        warning: {
-          DEFAULT: 'hsl(var(--warning))',
-        },
->>>>>>> main
         destructive: {
           DEFAULT: 'hsl(var(--destructive))',
           foreground: 'hsl(var(--destructive-foreground))',
@@ -63,14 +45,6 @@ module.exports = {
           DEFAULT: 'hsl(var(--card))',
           foreground: 'hsl(var(--card-foreground))',
         },
-<<<<<<< HEAD
-=======
-        'field-card': {
-          DEFAULT: 'hsl(var(--field-card))',
-          border: 'hsl(var(--field-card-border))',
-          foreground: 'hsl(var(--field-card-foreground))',
-        },
->>>>>>> main
         widget: {
           DEFAULT: 'hsl(var(--widget))',
           // foreground: 'hsl(var(--widget-foreground))',

@@ -1,8 +1,3 @@
-<<<<<<< HEAD
-=======
-import config from '@documenso/tailwind-config';
-
->>>>>>> main
 import {
   Body,
   Container,
@@ -15,7 +10,6 @@ import {
   Section,
   Tailwind,
   Text,
-<<<<<<< HEAD
 } from '@react-email/components';
 
 import config from '@documenso/tailwind-config';
@@ -25,12 +19,6 @@ import {
   TemplateResetPassword,
   TemplateResetPasswordProps,
 } from '../template-components/template-reset-password';
-=======
-} from '../components';
-import { TemplateFooter } from '../template-components/template-footer';
-import type { TemplateResetPasswordProps } from '../template-components/template-reset-password';
-import { TemplateResetPassword } from '../template-components/template-reset-password';
->>>>>>> main
 
 export type ResetPasswordTemplateProps = Partial<TemplateResetPasswordProps>;
 

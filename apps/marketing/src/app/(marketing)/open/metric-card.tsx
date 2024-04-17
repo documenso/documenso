@@ -1,8 +1,4 @@
-<<<<<<< HEAD
 import { HTMLAttributes } from 'react';
-=======
-import type { HTMLAttributes } from 'react';
->>>>>>> main
 
 import { cn } from '@documenso/ui/lib/utils';
 

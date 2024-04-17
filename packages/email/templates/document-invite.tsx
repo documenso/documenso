@@ -1,10 +1,3 @@
-<<<<<<< HEAD
-=======
-import { RECIPIENT_ROLES_DESCRIPTION } from '@documenso/lib/constants/recipient-roles';
-import type { RecipientRole } from '@documenso/prisma/client';
-import config from '@documenso/tailwind-config';
-
->>>>>>> main
 import {
   Body,
   Container,
@@ -17,7 +10,6 @@ import {
   Section,
   Tailwind,
   Text,
-<<<<<<< HEAD
 } from '@react-email/components';
 
 import config from '@documenso/tailwind-config';
@@ -26,19 +18,10 @@ import {
   TemplateDocumentInvite,
   TemplateDocumentInviteProps,
 } from '../template-components/template-document-invite';
-=======
-} from '../components';
-import type { TemplateDocumentInviteProps } from '../template-components/template-document-invite';
-import { TemplateDocumentInvite } from '../template-components/template-document-invite';
->>>>>>> main
 import { TemplateFooter } from '../template-components/template-footer';
 
 export type DocumentInviteEmailTemplateProps = Partial<TemplateDocumentInviteProps> & {
   customBody?: string;
-<<<<<<< HEAD
-=======
-  role: RecipientRole;
->>>>>>> main
 };
 
 export const DocumentInviteEmailTemplate = ({
@@ -48,16 +31,8 @@ export const DocumentInviteEmailTemplate = ({
   signDocumentLink = 'https://documenso.com',
   assetBaseUrl = 'http://localhost:3002',
   customBody,
-<<<<<<< HEAD
 }: DocumentInviteEmailTemplateProps) => {
   const previewText = `Completed Document`;
-=======
-  role,
-}: DocumentInviteEmailTemplateProps) => {
-  const action = RECIPIENT_ROLES_DESCRIPTION[role].actionVerb.toLowerCase();
-
-  const previewText = `${inviterName} has invited you to ${action} ${documentName}`;
->>>>>>> main
 
   const getAssetUrl = (path: string) => {
     return new URL(path, assetBaseUrl).toString();
@@ -92,10 +67,6 @@ export const DocumentInviteEmailTemplate = ({
                   documentName={documentName}
                   signDocumentLink={signDocumentLink}
                   assetBaseUrl={assetBaseUrl}
-<<<<<<< HEAD
-=======
-                  role={role}
->>>>>>> main
                 />
               </Section>
             </Container>
@@ -113,11 +84,7 @@ export const DocumentInviteEmailTemplate = ({
                   {customBody ? (
                     <pre className="font-sans text-base text-slate-400">{customBody}</pre>
                   ) : (
-<<<<<<< HEAD
                     `${inviterName} has invited you to sign the document "${documentName}".`
-=======
-                    `${inviterName} has invited you to ${action} the document "${documentName}".`
->>>>>>> main
                   )}
                 </Text>
               </Section>

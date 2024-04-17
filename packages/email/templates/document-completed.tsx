@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 import {
   Body,
   Container,
@@ -16,13 +15,6 @@ import {
   TemplateDocumentCompleted,
   TemplateDocumentCompletedProps,
 } from '../template-components/template-document-completed';
-=======
-import config from '@documenso/tailwind-config';
-
-import { Body, Container, Head, Html, Img, Preview, Section, Tailwind } from '../components';
-import type { TemplateDocumentCompletedProps } from '../template-components/template-document-completed';
-import { TemplateDocumentCompleted } from '../template-components/template-document-completed';
->>>>>>> main
 import { TemplateFooter } from '../template-components/template-footer';
 
 export type DocumentCompletedEmailTemplateProps = Partial<TemplateDocumentCompletedProps>;

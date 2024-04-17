@@ -4,60 +4,34 @@ import { useEffect, useState } from 'react';
 
 import Link from 'next/link';
 
-<<<<<<< HEAD
 import { useFeatureFlags } from '@documenso/lib/client-only/providers/feature-flag';
 import { base64 } from '@documenso/lib/universal/base64';
 import { getFile } from '@documenso/lib/universal/upload/get-file';
 import { DocumentWithRecipient } from '@documenso/prisma/types/document-with-recipient';
-=======
-import signingCelebration from '@documenso/assets/images/signing-celebration.png';
-import { useFeatureFlags } from '@documenso/lib/client-only/providers/feature-flag';
-import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
-import type { Signature } from '@documenso/prisma/client';
-import { DocumentStatus } from '@documenso/prisma/client';
-import type { DocumentWithRecipient } from '@documenso/prisma/types/document-with-recipient';
->>>>>>> main
 import DocumentDialog from '@documenso/ui/components/document/document-dialog';
 import { DocumentDownloadButton } from '@documenso/ui/components/document/document-download-button';
 import { DocumentShareButton } from '@documenso/ui/components/document/document-share-button';
 import { SigningCard3D } from '@documenso/ui/components/signing-card';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
-<<<<<<< HEAD
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
 import signingCelebration from '~/assets/signing-celebration.png';
 import ConfettiScreen from '~/components/(marketing)/confetti-screen';
 
 import { DocumentStatus } from '.prisma/client';
-=======
-
-import { ConfettiScreen } from '~/components/(marketing)/confetti-screen';
->>>>>>> main
 
 interface SinglePlayerModeSuccessProps {
   className?: string;
   document: DocumentWithRecipient;
-<<<<<<< HEAD
 }
 
 export const SinglePlayerModeSuccess = ({ className, document }: SinglePlayerModeSuccessProps) => {
-=======
-  signatures: Signature[];
-}
-
-export const SinglePlayerModeSuccess = ({
-  className,
-  document,
-  signatures,
-}: SinglePlayerModeSuccessProps) => {
->>>>>>> main
   const { getFlag } = useFeatureFlags();
 
   const isConfettiEnabled = getFlag('marketing_spm_confetti');
 
   const [showDocumentDialog, setShowDocumentDialog] = useState(false);
-<<<<<<< HEAD
   const [isFetchingDocumentFile, setIsFetchingDocumentFile] = useState(false);
   const [documentFile, setDocumentFile] = useState<string | null>(null);
 
@@ -87,10 +61,6 @@ export const SinglePlayerModeSuccess = ({
 
     setIsFetchingDocumentFile(false);
   };
-=======
-
-  const { documentData } = document;
->>>>>>> main
 
   useEffect(() => {
     window.scrollTo({ top: 0 });
@@ -109,12 +79,7 @@ export const SinglePlayerModeSuccess = ({
 
       <SigningCard3D
         className="mt-8"
-<<<<<<< HEAD
         name={document.Recipient.name || document.Recipient.email}
-=======
-        name={document.Recipient[0].name || document.Recipient[0].email}
-        signature={signatures.at(0)}
->>>>>>> main
         signingCelebrationImage={signingCelebration}
       />
 
@@ -123,11 +88,7 @@ export const SinglePlayerModeSuccess = ({
           <div className="grid w-full max-w-sm grid-cols-2 gap-4">
             <DocumentShareButton
               documentId={document.id}
-<<<<<<< HEAD
               token={document.Recipient.token}
-=======
-              token={document.Recipient[0].token}
->>>>>>> main
               className="flex-1 bg-transparent backdrop-blur-sm"
             />
 
@@ -138,15 +99,11 @@ export const SinglePlayerModeSuccess = ({
               disabled={document.status !== DocumentStatus.COMPLETED}
             />
 
-<<<<<<< HEAD
             <Button
               onClick={async () => onShowDocumentClick()}
               loading={isFetchingDocumentFile}
               className="z-10 col-span-2"
             >
-=======
-            <Button onClick={() => setShowDocumentDialog(true)} className="z-10 col-span-2">
->>>>>>> main
               Show document
             </Button>
           </div>
@@ -156,11 +113,7 @@ export const SinglePlayerModeSuccess = ({
       <p className="text-muted-foreground/60 mt-16 text-center text-sm">
         Create a{' '}
         <Link
-<<<<<<< HEAD
           href={`${process.env.NEXT_PUBLIC_WEBAPP_URL}/signup`}
-=======
-          href={`${NEXT_PUBLIC_WEBAPP_URL()}/signup?utm_source=singleplayer`}
->>>>>>> main
           target="_blank"
           className="text-documenso-700 hover:text-documenso-600 whitespace-nowrap"
         >
@@ -170,11 +123,7 @@ export const SinglePlayerModeSuccess = ({
       </p>
 
       <DocumentDialog
-<<<<<<< HEAD
         document={documentFile ?? ''}
-=======
-        documentData={documentData}
->>>>>>> main
         open={showDocumentDialog}
         onOpenChange={setShowDocumentDialog}
       />

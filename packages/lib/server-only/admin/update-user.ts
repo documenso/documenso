@@ -1,9 +1,5 @@
 import { prisma } from '@documenso/prisma';
-<<<<<<< HEAD
 import { Role } from '@documenso/prisma/client';
-=======
-import type { Role } from '@documenso/prisma/client';
->>>>>>> main
 
 export type UpdateUserOptions = {
   id: number;

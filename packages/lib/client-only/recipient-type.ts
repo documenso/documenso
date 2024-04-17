@@ -1,19 +1,9 @@
-<<<<<<< HEAD
 import { ReadStatus, Recipient, SendStatus, SigningStatus } from '@documenso/prisma/client';
 
 export const getRecipientType = (recipient: Recipient) => {
   if (
     recipient.sendStatus === SendStatus.SENT &&
     recipient.signingStatus === SigningStatus.SIGNED
-=======
-import type { Recipient } from '@documenso/prisma/client';
-import { ReadStatus, RecipientRole, SendStatus, SigningStatus } from '@documenso/prisma/client';
-
-export const getRecipientType = (recipient: Recipient) => {
-  if (
-    recipient.role === RecipientRole.CC ||
-    (recipient.sendStatus === SendStatus.SENT && recipient.signingStatus === SigningStatus.SIGNED)
->>>>>>> main
   ) {
     return 'completed';
   }
