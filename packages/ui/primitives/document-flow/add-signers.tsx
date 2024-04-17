@@ -358,8 +358,6 @@ export const AddSignersFormPartial = ({
                               <SelectItem value={RecipientRole.APPROVER}>
                                 <div className="flex items-center">
                                   <div className="flex w-[150px] items-center">
-                                    {' '}
-                                    {/* Adjust the width as needed */}
                                     <span className="mr-2">
                                       {ROLE_ICONS[RecipientRole.APPROVER]}
                                     </span>
@@ -379,8 +377,6 @@ export const AddSignersFormPartial = ({
                               <SelectItem value={RecipientRole.VIEWER}>
                                 <div className="flex items-center">
                                   <div className="flex w-[150px] items-center">
-                                    {' '}
-                                    {/* Adjust the width as needed */}
                                     <span className="mr-2">{ROLE_ICONS[RecipientRole.VIEWER]}</span>
                                     Needs to view
                                   </div>
@@ -398,8 +394,6 @@ export const AddSignersFormPartial = ({
                               <SelectItem value={RecipientRole.CC}>
                                 <div className="flex items-center">
                                   <div className="flex w-[150px] items-center">
-                                    {' '}
-                                    {/* Adjust the width as needed */}
                                     <span className="mr-2">{ROLE_ICONS[RecipientRole.CC]}</span>
                                     Receives copy
                                   </div>
