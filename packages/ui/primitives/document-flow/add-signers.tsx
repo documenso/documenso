@@ -370,7 +370,10 @@ export const AddSignersFormPartial = ({
                                       <InfoIcon className="h-4 w-4" />
                                     </TooltipTrigger>
                                     <TooltipContent className="text-foreground z-9999 max-w-md p-4">
-                                      <p>The recipient is required to sign the document.</p>
+                                      <p>
+                                        The recipient is required to sign the document for it to be
+                                        completed.
+                                      </p>
                                     </TooltipContent>
                                   </Tooltip>
                                 </div>
@@ -389,7 +392,10 @@ export const AddSignersFormPartial = ({
                                       <InfoIcon className="h-4 w-4" />
                                     </TooltipTrigger>
                                     <TooltipContent className="text-foreground z-9999 max-w-md p-4">
-                                      <p>The recipient is required to approve the document.</p>
+                                      <p>
+                                        The recipient is required to approve the document for it to
+                                        be completed.
+                                      </p>
                                     </TooltipContent>
                                   </Tooltip>
                                 </div>
@@ -406,7 +412,10 @@ export const AddSignersFormPartial = ({
                                       <InfoIcon className="h-4 w-4" />
                                     </TooltipTrigger>
                                     <TooltipContent className="text-foreground z-9999 max-w-md p-4">
-                                      <p>The recipient is required to view the document.</p>
+                                      <p>
+                                        The recipient is required to view the document for it to be
+                                        completed.
+                                      </p>
                                     </TooltipContent>
                                   </Tooltip>
                                 </div>
