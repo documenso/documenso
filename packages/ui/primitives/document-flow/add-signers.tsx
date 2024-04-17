@@ -434,7 +434,7 @@ export const AddSignersFormPartial = ({
                                     <TooltipContent className="text-foreground z-9999 max-w-md p-4">
                                       <p>
                                         The recipient is not required to take any action and
-                                        receives a copy of the document.
+                                        receives a copy of the document after it is completed.
                                       </p>
                                     </TooltipContent>
                                   </Tooltip>
