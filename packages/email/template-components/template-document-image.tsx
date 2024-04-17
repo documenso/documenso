@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 import { Column, Img, Row, Section } from '@react-email/components';
+=======
+import { Column, Img, Row, Section } from '../components';
+>>>>>>> main
 
 export interface TemplateDocumentImageProps {
   assetBaseUrl: string;

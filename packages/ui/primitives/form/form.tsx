@@ -1,5 +1,6 @@
 import * as React from 'react';
 
+<<<<<<< HEAD
 import * as LabelPrimitive from '@radix-ui/react-label';
 import { Slot } from '@radix-ui/react-slot';
 import { AnimatePresence, motion } from 'framer-motion';
@@ -14,6 +15,15 @@ import {
 
 import { cn } from '@documenso/ui/lib/utils';
 
+=======
+import type * as LabelPrimitive from '@radix-ui/react-label';
+import { Slot } from '@radix-ui/react-slot';
+import { AnimatePresence, motion } from 'framer-motion';
+import type { ControllerProps, FieldPath, FieldValues } from 'react-hook-form';
+import { Controller, FormProvider, useFormContext } from 'react-hook-form';
+
+import { cn } from '../../lib/utils';
+>>>>>>> main
 import { Label } from '../label';
 
 const Form = FormProvider;

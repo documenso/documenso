@@ -10,7 +10,24 @@ export const getFieldsForDocument = async ({ documentId, userId }: GetFieldsForD
     where: {
       documentId,
       Document: {
+<<<<<<< HEAD
         userId,
+=======
+        OR: [
+          {
+            userId,
+          },
+          {
+            team: {
+              members: {
+                some: {
+                  userId,
+                },
+              },
+            },
+          },
+        ],
+>>>>>>> main
       },
     },
     orderBy: {

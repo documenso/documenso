@@ -1,0 +1,115 @@
+---
+title: Moving from Linear to GitHub & LIVE Roadmap 2.0
+description: We are leaving linear and are going all in on GitHub. Here is how we do it.
+authorName: 'Timur Ercan'
+authorImage: '/blog/blog-author-timur.jpeg'
+authorRole: 'Co-Founder'
+date: 2024-01-10
+tags:
+  - GitHub
+  - Backlog
+  - Roadmap
+---
+
+# From Linear to GitHub
+
+> TLDR; We are leaving Linear and are using only GitHub going forward. We no longer communicate feature timelines, only what we are working on and what's next.
+
+If you follow us, you know we have been in full-on build mode. We are building, the community is building, it's great. Building is our daily business, so we think a lot about improving our approach to doing it.
+Our most recent approach is to reduce the number of tools and platforms we use. Every tool we use
+
+- Reduces the average time you spend on the tool
+- Reduces your focus
+- Increases mental load to keep all points of interest in mind
+
+We thought about where we spend the most time, and hardly surprising: it's GitHub. Not only do we spend a lot of time there, but we also WANT to spend a lot of time there because:
+
+- It's where the community contributes, and we are all about community
+- It's where we show the world what we are working on
+
+# The old structure
+
+So far, we have been using Linear for our Backlog/ Task Management and synced issues we want to showcase or work on with the community via synclinear.com. Not only did we have our development issues there, but since
+we have our own resident founding designer, we created a proper design backlog to structure our design workflows.
+
+# The new structure
+
+We moved everything to GitHub once we realized our focus was already there. This has a few key benefits:
+
+- Reducing dilution of attention and time: You can hang out on GitHub without risk of missing much
+- Putting different aspects of Documenso close to each other: Development, Design, Community
+- Keep long-term, niche, and very abstract issues out of the main repo so we don't get desensitized by large issue numbers
+
+To achieve this, we created a few GitHub repositories to host issues, with the main repository remaining the central point of interest, especially for the community.
+
+## 1. Main Repository - Day to day Issues and the shorter-term roadmap (LIVE Roadmap 2.0)
+
+> [github.com/documenso/documenso](https://github.com/documenso/documenso)
+
+Apart from the source code of the Documenso app and website, the main repo houses issues raised by the community and issues where we invite the community to participate.
+With the overhauling of our issue management, we are also updating our progress communication. While the software and product development process is highly complex,
+we try to give as much insight into what we do as possible. To that end, we went through 3 phases, three being what we do now.
+
+1. **One extensive roadmap**: Initially we had one roadmap and were (very) slowly checking off boxes there (via a "Roadmap" milestone). While this is easy, it's also pretty imprecise and not practical as the project grows
+2. **Estimated releases per quarter**: To give better guidance, we tried communicating our goals for the quarter; a pretty big window we thought we could roughly "hit". While the idea of not being too detailed was good, it is tough to estimate when some significant things are done if you do a lot of minor/ other things in parallel,
+   like working with the community and tuning things you go. Hitting time targets is tricky because there may be better things to do than sticking to that time target. This is always much easier to grasp for the people closely involved. The fallacy is to assume the thing you plan for exists in a vacuum.
+3. Since we do not want to limit ourselves in choosing the most effective course but still give some insight into what's going on and what's coming up, we updated the live roadmap [https://documen.so/live](https://documen.so/live). It now shows what we are currently working on and what we plan on doing next. We do not provide
+   a specific timeline anymore since we couldn't even if we wanted to. Of course, we set our short-term goals based on what's best for the community. We give updates on the issues being worked on as well as possible.
+
+## 2. Public Backlog - The longer-term roadmap
+
+> [github.com/documenso/backlog](https://github.com/documenso/backlog)
+
+The public backlog houses everything we want to build eventually. We do not provide a specific timeline of when that might happen. If we decide against something, it will be removed from the public backlog, as we consider this our long-term vision for Documenso. If you are interested in something on the roadmap, comment on the issue or post on Discord. This helps us gauge interest in specific features.
+**Issues in the public backlog are not** available to be worked on. For issues to work on, please check the main repository issues. The issues found here are scoped broader since they are not meant for immediate execution but rather give a sense of where Documenso is going and what we consider part of our domain.
+
+## 3. Internal Backlog
+
+> github.com/documenso/backlog-internal
+
+<figure>
+  <MdxNextImage
+    src="/blog/gh1.png"
+    width="1260"
+    height="630"
+    alt="GitHub: Development Board"
+  />
+
+  <figcaption className="text-center">
+    Our internal Kanban for development
+  </figcaption>
+</figure>
+
+This serves as the direct replacement for our Linear backlog. Here, we manage issues that are either too small or short-term for inclusion in the long-term roadmap, yet too specialized or fundamental to be integrated into the main repository. Our development Kanban board is implemented using a GitHub project.
+
+## 4. Internal Design Backlog
+
+> github.com/documenso/design-internal
+
+<figure>
+  <MdxNextImage
+    src="/blog/gh2.png"
+    width="1260"
+    height="630"
+    alt="GitHub: Design Board"
+  />
+
+  <figcaption className="text-center">
+    Our internal Kanban for design
+  </figcaption>
+</figure>
+
+This is the design equivalent of the internal backlog. The internal design backlog houses our design projects that include the exploration of new features, detailed UI designs, and improving the platform overall.
+It's similar to the Kanban board for the development backlog.
+
+## 5. Public Design Repository
+
+> [github.com/documenso/backlog-design](https://github.com/documenso/design)
+
+While the internal design backlog also existed in Linear, the public design repository is new. Since designing in the open is tricky, we opted to publish the detailed design artifacts with the corresponding feature instead.
+We already have design.documenso.com housing our general design system. Here, we will publish the specifics of how we applied this to each feature. We will publish the first artifacts here soon, what may be in the cards can be found on the [LIVE Roadmap](https://documen.so/live).
+
+Feel free to connect with us on [Twitter / X](https://twitter.com/eltimuro) (DM open) or [Discord](https://documen.so/discord) if you have any questions or comments! We're always here to help and would love to hear from you :)
+
+Best from Hamburg\
+Timur

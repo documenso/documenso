@@ -8,6 +8,10 @@ import { FaXTwitter } from 'react-icons/fa6';
 import { LiaDiscord } from 'react-icons/lia';
 import { LuGithub } from 'react-icons/lu';
 
+<<<<<<< HEAD
+=======
+import LogoImage from '@documenso/assets/logo.png';
+>>>>>>> main
 import { Sheet, SheetContent } from '@documenso/ui/primitives/sheet';
 
 export type MobileNavigationProps = {
@@ -30,7 +34,11 @@ export const MENU_NAVIGATION_LINKS = [
   },
   {
     href: '/open',
+<<<<<<< HEAD
     text: 'Open',
+=======
+    text: 'Open Startup',
+>>>>>>> main
   },
   {
     href: 'https://status.documenso.com',
@@ -46,9 +54,19 @@ export const MENU_NAVIGATION_LINKS = [
     text: 'Privacy',
   },
   {
+<<<<<<< HEAD
     href: 'https://app.documenso.com/login',
     text: 'Sign in',
   },
+=======
+    href: 'https://app.documenso.com/signin?utm_source=marketing-header',
+    text: 'Sign in',
+  },
+  {
+    href: 'https://app.documenso.com/signup?utm_source=marketing-header',
+    text: 'Sign up',
+  },
+>>>>>>> main
 ];
 
 export const MobileNavigation = ({ isMenuOpen, onMenuOpenChange }: MobileNavigationProps) => {
@@ -63,7 +81,11 @@ export const MobileNavigation = ({ isMenuOpen, onMenuOpenChange }: MobileNavigat
       <SheetContent className="w-full max-w-[400px]">
         <Link href="/" className="z-10" onClick={handleMenuItemClick}>
           <Image
+<<<<<<< HEAD
             src="/logo.png"
+=======
+            src={LogoImage}
+>>>>>>> main
             alt="Documenso Logo"
             className="dark:invert"
             width={170}

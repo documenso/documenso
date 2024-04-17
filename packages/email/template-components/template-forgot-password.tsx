@@ -1,7 +1,11 @@
+<<<<<<< HEAD
 import { Button, Section, Tailwind, Text } from '@react-email/components';
 
 import * as config from '@documenso/tailwind-config';
 
+=======
+import { Button, Section, Text } from '../components';
+>>>>>>> main
 import { TemplateDocumentImage } from './template-document-image';
 
 export type TemplateForgotPasswordProps = {
@@ -14,6 +18,7 @@ export const TemplateForgotPassword = ({
   assetBaseUrl,
 }: TemplateForgotPasswordProps) => {
   return (
+<<<<<<< HEAD
     <Tailwind
       config={{
         theme: {
@@ -23,6 +28,9 @@ export const TemplateForgotPassword = ({
         },
       }}
     >
+=======
+    <>
+>>>>>>> main
       <TemplateDocumentImage className="mt-6" assetBaseUrl={assetBaseUrl} />
 
       <Section className="flex-row items-center justify-center">
@@ -43,7 +51,11 @@ export const TemplateForgotPassword = ({
           </Button>
         </Section>
       </Section>
+<<<<<<< HEAD
     </Tailwind>
+=======
+    </>
+>>>>>>> main
   );
 };
 

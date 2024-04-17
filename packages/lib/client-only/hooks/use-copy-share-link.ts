@@ -1,5 +1,9 @@
 import { trpc } from '@documenso/trpc/react';
+<<<<<<< HEAD
 import { TCreateOrGetShareLinkMutationSchema } from '@documenso/trpc/server/share-link-router/schema';
+=======
+import type { TCreateOrGetShareLinkMutationSchema } from '@documenso/trpc/server/share-link-router/schema';
+>>>>>>> main
 
 import { useCopyToClipboard } from './use-copy-to-clipboard';
 

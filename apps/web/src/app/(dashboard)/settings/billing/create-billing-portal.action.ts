@@ -1,5 +1,6 @@
 'use server';
 
+<<<<<<< HEAD
 import {
   getStripeCustomerByEmail,
   getStripeCustomerById,
@@ -8,10 +9,17 @@ import { getPortalSession } from '@documenso/ee/server-only/stripe/get-portal-se
 import { getRequiredServerComponentSession } from '@documenso/lib/next-auth/get-server-session';
 import { Stripe, stripe } from '@documenso/lib/server-only/stripe';
 import { getSubscriptionByUserId } from '@documenso/lib/server-only/subscription/get-subscription-by-user-id';
+=======
+import { getStripeCustomerByUser } from '@documenso/ee/server-only/stripe/get-customer';
+import { getPortalSession } from '@documenso/ee/server-only/stripe/get-portal-session';
+import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
+import { getRequiredServerComponentSession } from '@documenso/lib/next-auth/get-server-component-session';
+>>>>>>> main
 
 export const createBillingPortal = async () => {
   const { user } = await getRequiredServerComponentSession();
 
+<<<<<<< HEAD
   const existingSubscription = await getSubscriptionByUserId({ userId: user.id });
 
   let stripeCustomer: Stripe.Customer | null = null;
@@ -44,5 +52,12 @@ export const createBillingPortal = async () => {
   return getPortalSession({
     customerId: stripeCustomer.id,
     returnUrl: `${process.env.NEXT_PUBLIC_WEBAPP_URL}/settings/billing`,
+=======
+  const { stripeCustomer } = await getStripeCustomerByUser(user);
+
+  return getPortalSession({
+    customerId: stripeCustomer.id,
+    returnUrl: `${NEXT_PUBLIC_WEBAPP_URL()}/settings/billing`,
+>>>>>>> main
   });
 };

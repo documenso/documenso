@@ -6,8 +6,16 @@ import { useRouter } from 'next/navigation';
 
 import { Loader } from 'lucide-react';
 
+<<<<<<< HEAD
 import { Recipient } from '@documenso/prisma/client';
 import { FieldWithSignature } from '@documenso/prisma/types/field-with-signature';
+=======
+import { DO_NOT_INVALIDATE_QUERY_ON_MUTATION } from '@documenso/lib/constants/trpc';
+import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
+import type { TRecipientActionAuth } from '@documenso/lib/types/document-auth';
+import { type Recipient } from '@documenso/prisma/client';
+import type { FieldWithSignature } from '@documenso/prisma/types/field-with-signature';
+>>>>>>> main
 import { trpc } from '@documenso/trpc/react';
 import { Button } from '@documenso/ui/primitives/button';
 import { Dialog, DialogContent, DialogFooter, DialogTitle } from '@documenso/ui/primitives/dialog';
@@ -15,6 +23,10 @@ import { Input } from '@documenso/ui/primitives/input';
 import { Label } from '@documenso/ui/primitives/label';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
+<<<<<<< HEAD
+=======
+import { useRequiredDocumentAuthContext } from './document-auth-provider';
+>>>>>>> main
 import { useRequiredSigningContext } from './provider';
 import { SigningFieldContainer } from './signing-field-container';
 
@@ -31,24 +43,67 @@ export const NameField = ({ field, recipient }: NameFieldProps) => {
   const { fullName: providedFullName, setFullName: setProvidedFullName } =
     useRequiredSigningContext();
 
+<<<<<<< HEAD
   const [isPending, startTransition] = useTransition();
 
   const { mutateAsync: signFieldWithToken, isLoading: isSignFieldWithTokenLoading } =
     trpc.field.signFieldWithToken.useMutation();
+=======
+  const { executeActionAuthProcedure } = useRequiredDocumentAuthContext();
+
+  const [isPending, startTransition] = useTransition();
+
+  const { mutateAsync: signFieldWithToken, isLoading: isSignFieldWithTokenLoading } =
+    trpc.field.signFieldWithToken.useMutation(DO_NOT_INVALIDATE_QUERY_ON_MUTATION);
+>>>>>>> main
 
   const {
     mutateAsync: removeSignedFieldWithToken,
     isLoading: isRemoveSignedFieldWithTokenLoading,
+<<<<<<< HEAD
   } = trpc.field.removeSignedFieldWithToken.useMutation();
+=======
+  } = trpc.field.removeSignedFieldWithToken.useMutation(DO_NOT_INVALIDATE_QUERY_ON_MUTATION);
+>>>>>>> main
 
   const isLoading = isSignFieldWithTokenLoading || isRemoveSignedFieldWithTokenLoading || isPending;
 
   const [showFullNameModal, setShowFullNameModal] = useState(false);
   const [localFullName, setLocalFullName] = useState('');
 
+<<<<<<< HEAD
   const onSign = async (source: 'local' | 'provider' = 'provider') => {
     try {
       if (!providedFullName && !localFullName) {
+=======
+  const onPreSign = () => {
+    if (!providedFullName) {
+      setShowFullNameModal(true);
+      return false;
+    }
+
+    return true;
+  };
+
+  /**
+   * When the user clicks the sign button in the dialog where they enter their full name.
+   */
+  const onDialogSignClick = () => {
+    setShowFullNameModal(false);
+    setProvidedFullName(localFullName);
+
+    void executeActionAuthProcedure({
+      onReauthFormSubmit: async (authOptions) => await onSign(authOptions, localFullName),
+      actionTarget: field.type,
+    });
+  };
+
+  const onSign = async (authOptions?: TRecipientActionAuth, name?: string) => {
+    try {
+      const value = name || providedFullName;
+
+      if (!value) {
+>>>>>>> main
         setShowFullNameModal(true);
         return;
       }
@@ -56,6 +111,7 @@ export const NameField = ({ field, recipient }: NameFieldProps) => {
       await signFieldWithToken({
         token: recipient.token,
         fieldId: field.id,
+<<<<<<< HEAD
         value: source === 'local' && localFullName ? localFullName : providedFullName ?? '',
         isBase64: false,
       });
@@ -68,6 +124,21 @@ export const NameField = ({ field, recipient }: NameFieldProps) => {
 
       startTransition(() => router.refresh());
     } catch (err) {
+=======
+        value,
+        isBase64: false,
+        authOptions,
+      });
+
+      startTransition(() => router.refresh());
+    } catch (err) {
+      const error = AppError.parseError(err);
+
+      if (error.code === AppErrorCode.UNAUTHORIZED) {
+        throw error;
+      }
+
+>>>>>>> main
       console.error(err);
 
       toast({
@@ -98,7 +169,17 @@ export const NameField = ({ field, recipient }: NameFieldProps) => {
   };
 
   return (
+<<<<<<< HEAD
     <SigningFieldContainer field={field} onSign={onSign} onRemove={onRemove}>
+=======
+    <SigningFieldContainer
+      field={field}
+      onPreSign={onPreSign}
+      onSign={onSign}
+      onRemove={onRemove}
+      type="Name"
+    >
+>>>>>>> main
       {isLoading && (
         <div className="bg-background absolute inset-0 flex items-center justify-center rounded-md">
           <Loader className="text-primary h-5 w-5 animate-spin md:h-8 md:w-8" />
@@ -118,14 +199,22 @@ export const NameField = ({ field, recipient }: NameFieldProps) => {
             <span className="text-muted-foreground">({recipient.email})</span>
           </DialogTitle>
 
+<<<<<<< HEAD
           <div className="py-4">
+=======
+          <div>
+>>>>>>> main
             <Label htmlFor="signature">Full Name</Label>
 
             <Input
               type="text"
               className="mt-2"
               value={localFullName}
+<<<<<<< HEAD
               onChange={(e) => setLocalFullName(e.target.value)}
+=======
+              onChange={(e) => setLocalFullName(e.target.value.trimStart())}
+>>>>>>> main
             />
           </div>
 
@@ -147,10 +236,14 @@ export const NameField = ({ field, recipient }: NameFieldProps) => {
                 type="button"
                 className="flex-1"
                 disabled={!localFullName}
+<<<<<<< HEAD
                 onClick={() => {
                   setShowFullNameModal(false);
                   void onSign('local');
                 }}
+=======
+                onClick={() => onDialogSignClick()}
+>>>>>>> main
               >
                 Sign
               </Button>

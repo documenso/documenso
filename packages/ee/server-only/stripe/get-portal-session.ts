@@ -4,7 +4,11 @@ import { stripe } from '@documenso/lib/server-only/stripe';
 
 export type GetPortalSessionOptions = {
   customerId: string;
+<<<<<<< HEAD
   returnUrl: string;
+=======
+  returnUrl?: string;
+>>>>>>> main
 };
 
 export const getPortalSession = async ({ customerId, returnUrl }: GetPortalSessionOptions) => {

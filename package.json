@@ -4,13 +4,20 @@
     "build": "turbo run build",
     "build:web": "turbo run build --filter=@documenso/web",
     "dev": "turbo run dev --filter=@documenso/web --filter=@documenso/marketing",
+<<<<<<< HEAD
     "start": "cd apps && cd web && next start",
     "lint": "turbo run lint",
+=======
+    "start": "turbo run start --filter=@documenso/web --filter=@documenso/marketing",
+    "lint": "turbo run lint",
+    "lint:fix": "turbo run lint:fix",
+>>>>>>> main
     "format": "prettier --write \"**/*.{js,jsx,cjs,mjs,ts,tsx,cts,mts,mdx}\"",
     "prepare": "husky install",
     "commitlint": "commitlint --edit",
     "clean": "turbo run clean && rimraf node_modules",
     "d": "npm run dx && npm run dev",
+<<<<<<< HEAD
     "dx": "npm i && npm run dx:up && npm run prisma:migrate-dev",
     "dx:up": "docker compose -f docker/compose-services.yml up -d",
     "dx:down": "docker compose -f docker/compose-services.yml down",
@@ -18,6 +25,20 @@
     "prisma:migrate-dev": "npm run with:env -- npm run prisma:migrate-dev -w @documenso/prisma",
     "prisma:migrate-deploy": "npm run with:env -- npm run prisma:migrate-deploy -w @documenso/prisma",
     "with:env": "dotenv -e .env -e .env.local --"
+=======
+    "dx": "npm i && npm run dx:up && npm run prisma:migrate-dev && npm run prisma:seed",
+    "dx:up": "docker compose -f docker/development/compose.yml up -d",
+    "dx:down": "docker compose -f docker/development/compose.yml down",
+    "ci": "turbo run test:e2e",
+    "prisma:generate": "npm run with:env -- npm run prisma:generate -w @documenso/prisma",
+    "prisma:migrate-dev": "npm run with:env -- npm run prisma:migrate-dev -w @documenso/prisma",
+    "prisma:migrate-deploy": "npm run with:env -- npm run prisma:migrate-deploy -w @documenso/prisma",
+    "prisma:seed": "npm run with:env -- npm run prisma:seed -w @documenso/prisma",
+    "prisma:studio": "npm run with:env -- npm run prisma:studio -w @documenso/prisma",
+    "with:env": "dotenv -e .env -e .env.local --",
+    "reset:hard": "npm run clean && npm i && npm run prisma:generate",
+    "precommit": "npm install && git add package.json package-lock.json"
+>>>>>>> main
   },
   "engines": {
     "npm": ">=8.6.0",
@@ -30,19 +51,41 @@
     "dotenv-cli": "^7.3.0",
     "eslint": "^8.40.0",
     "eslint-config-custom": "*",
+<<<<<<< HEAD
     "husky": "^8.0.0",
     "lint-staged": "^14.0.0",
+=======
+    "husky": "^9.0.11",
+    "lint-staged": "^15.2.2",
+    "playwright": "^1.43.0",
+>>>>>>> main
     "prettier": "^2.5.1",
     "rimraf": "^5.0.1",
     "turbo": "^1.9.3"
   },
   "name": "@documenso/root",
+<<<<<<< HEAD
   "packageManager": "npm@8.19.2",
+=======
+>>>>>>> main
   "workspaces": [
     "apps/*",
     "packages/*"
   ],
   "dependencies": {
+<<<<<<< HEAD
     "recharts": "^2.7.2"
+=======
+    "@documenso/pdf-sign": "^0.1.0",
+    "next-runtime-env": "^3.2.0"
+  },
+  "overrides": {
+    "next-auth": {
+      "next": "14.0.3"
+    },
+    "next-contentlayer": {
+      "next": "14.0.3"
+    }
+>>>>>>> main
   }
 }

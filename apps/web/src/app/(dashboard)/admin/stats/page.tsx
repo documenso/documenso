@@ -32,7 +32,11 @@ export default async function AdminStatsPage() {
     <div>
       <h2 className="text-4xl font-semibold">Instance Stats</h2>
 
+<<<<<<< HEAD
       <div className="mt-8 grid flex-1 grid-cols-1 gap-4 md:grid-cols-4">
+=======
+      <div className="mt-8 grid flex-1 grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
+>>>>>>> main
         <CardMetric icon={UserIcon} title="Total Users" value={usersCount} />
         <CardMetric icon={File} title="Total Documents" value={docStats.ALL} />
         <CardMetric
@@ -43,7 +47,11 @@ export default async function AdminStatsPage() {
         <CardMetric icon={UserPlus2} title="App Version" value={`v${process.env.APP_VERSION}`} />
       </div>
 
+<<<<<<< HEAD
       <div className="mt-16 grid grid-cols-1 gap-8 md:grid-cols-2">
+=======
+      <div className="mt-16 grid grid-cols-1 gap-8 md:grid-cols-1 lg:grid-cols-2">
+>>>>>>> main
         <div>
           <h3 className="text-3xl font-semibold">Document metrics</h3>
 

@@ -1,8 +1,15 @@
+<<<<<<< HEAD
+=======
+// https://github.com/Hopding/pdf-lib/issues/20#issuecomment-412852821
+>>>>>>> main
 import fontkit from '@pdf-lib/fontkit';
 import { PDFDocument, StandardFonts } from 'pdf-lib';
 
 import {
+<<<<<<< HEAD
   CAVEAT_FONT_PATH,
+=======
+>>>>>>> main
   DEFAULT_HANDWRITING_FONT_SIZE,
   DEFAULT_STANDARD_FONT_SIZE,
   MIN_HANDWRITING_FONT_SIZE,
@@ -10,12 +17,21 @@ import {
 } from '@documenso/lib/constants/pdf';
 import { FieldType } from '@documenso/prisma/client';
 import { isSignatureFieldType } from '@documenso/prisma/guards/is-signature-field';
+<<<<<<< HEAD
 import { FieldWithSignature } from '@documenso/prisma/types/field-with-signature';
 
 export const insertFieldInPDF = async (pdf: PDFDocument, field: FieldWithSignature) => {
   // Fetch the font file from the public URL.
   const fontResponse = await fetch(CAVEAT_FONT_PATH);
   const fontCaveat = await fontResponse.arrayBuffer();
+=======
+import type { FieldWithSignature } from '@documenso/prisma/types/field-with-signature';
+
+export const insertFieldInPDF = async (pdf: PDFDocument, field: FieldWithSignature) => {
+  const fontCaveat = await fetch(process.env.FONT_CAVEAT_URI).then(async (res) =>
+    res.arrayBuffer(),
+  );
+>>>>>>> main
 
   const isSignatureField = isSignatureFieldType(field.type);
 
@@ -74,13 +90,25 @@ export const insertFieldInPDF = async (pdf: PDFDocument, field: FieldWithSignatu
       height: imageHeight,
     });
   } else {
+<<<<<<< HEAD
     let textWidth = font.widthOfTextAtSize(field.customText, fontSize);
+=======
+    const longestLineInTextForWidth = field.customText
+      .split('\n')
+      .sort((a, b) => b.length - a.length)[0];
+
+    let textWidth = font.widthOfTextAtSize(longestLineInTextForWidth, fontSize);
+>>>>>>> main
     const textHeight = font.heightAtSize(fontSize);
 
     const scalingFactor = Math.min(fieldWidth / textWidth, fieldHeight / textHeight, 1);
 
     fontSize = Math.max(Math.min(fontSize * scalingFactor, maxFontSize), minFontSize);
+<<<<<<< HEAD
     textWidth = font.widthOfTextAtSize(field.customText, fontSize);
+=======
+    textWidth = font.widthOfTextAtSize(longestLineInTextForWidth, fontSize);
+>>>>>>> main
 
     const textX = fieldX + (fieldWidth - textWidth) / 2;
     let textY = fieldY + (fieldHeight - textHeight) / 2;

@@ -4,7 +4,11 @@ import { useState } from 'react';
 
 import { AnimatePresence, motion } from 'framer-motion';
 
+<<<<<<< HEAD
 import { PriceIntervals } from '@documenso/ee/server-only/stripe/get-prices-by-interval';
+=======
+import type { PriceIntervals } from '@documenso/ee/server-only/stripe/get-prices-by-interval';
+>>>>>>> main
 import { useIsMounted } from '@documenso/lib/client-only/hooks/use-is-mounted';
 import { toHumanPrice } from '@documenso/lib/universal/stripe/to-human-price';
 import { Button } from '@documenso/ui/primitives/button';

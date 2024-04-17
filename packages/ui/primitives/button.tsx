@@ -1,7 +1,12 @@
 import * as React from 'react';
 
 import { Slot } from '@radix-ui/react-slot';
+<<<<<<< HEAD
 import { VariantProps, cva } from 'class-variance-authority';
+=======
+import type { VariantProps } from 'class-variance-authority';
+import { cva } from 'class-variance-authority';
+>>>>>>> main
 import { Loader } from 'lucide-react';
 
 import { cn } from '../lib/utils';
@@ -12,11 +17,20 @@ const buttonVariants = cva(
     variants: {
       variant: {
         default: 'bg-primary text-primary-foreground hover:bg-primary/90',
+<<<<<<< HEAD
         destructive: 'bg-destructive text-destructive-foreground hover:bg-destructive/90',
+=======
+        destructive:
+          'bg-destructive text-destructive-foreground hover:bg-destructive/90 focus-visible:ring-destructive',
+>>>>>>> main
         outline: 'border border-input hover:bg-accent hover:text-accent-foreground',
         secondary: 'bg-secondary text-secondary-foreground hover:bg-secondary/80',
         ghost: 'hover:bg-accent hover:text-accent-foreground',
         link: 'underline-offset-4 hover:underline text-primary',
+<<<<<<< HEAD
+=======
+        none: '',
+>>>>>>> main
       },
       size: {
         default: 'h-10 py-2 px-4',
@@ -63,8 +77,13 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       );
     }
 
+<<<<<<< HEAD
     const showLoader = loading === true;
     const isDisabled = props.disabled || showLoader;
+=======
+    const isLoading = loading === true;
+    const isDisabled = props.disabled || isLoading;
+>>>>>>> main
 
     return (
       <button
@@ -73,7 +92,11 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         {...props}
         disabled={isDisabled}
       >
+<<<<<<< HEAD
         {showLoader && <Loader className={cn('mr-2 animate-spin', loaderVariants({ size }))} />}
+=======
+        {isLoading && <Loader className={cn('mr-2 animate-spin', loaderVariants({ size }))} />}
+>>>>>>> main
         {props.children}
       </button>
     );

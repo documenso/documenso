@@ -1,6 +1,10 @@
 import { notFound } from 'next/navigation';
 
 import { getDocumentAndRecipientByToken } from '@documenso/lib/server-only/document/get-document-by-token';
+<<<<<<< HEAD
+=======
+import { getRecipientSignatures } from '@documenso/lib/server-only/recipient/get-recipient-signatures';
+>>>>>>> main
 import { DocumentStatus } from '@documenso/prisma/client';
 
 import { SinglePlayerModeSuccess } from '~/components/(marketing)/single-player-mode/single-player-mode-success';
@@ -26,5 +30,11 @@ export default async function SinglePlayerModeSuccessPage({
     return notFound();
   }
 
+<<<<<<< HEAD
   return <SinglePlayerModeSuccess document={document} />;
+=======
+  const signatures = await getRecipientSignatures({ recipientId: document.Recipient[0].id });
+
+  return <SinglePlayerModeSuccess document={document} signatures={signatures} />;
+>>>>>>> main
 }

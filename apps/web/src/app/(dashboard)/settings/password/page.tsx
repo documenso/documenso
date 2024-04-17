@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import { getRequiredServerComponentSession } from '@documenso/lib/next-auth/get-server-session';
 
 import { PasswordForm } from '~/components/forms/password';
@@ -16,4 +17,10 @@ export default async function PasswordSettingsPage() {
       <PasswordForm user={user} className="max-w-xl" />
     </div>
   );
+=======
+import { redirect } from 'next/navigation';
+
+export default function PasswordSettingsPage() {
+  redirect('/settings/security');
+>>>>>>> main
 }

@@ -5,9 +5,16 @@ import React, { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 
 import { useFieldPageCoords } from '@documenso/lib/client-only/hooks/use-field-page-coords';
+<<<<<<< HEAD
 import { Field } from '@documenso/prisma/client';
 import { cn } from '@documenso/ui/lib/utils';
 import { Card, CardContent } from '@documenso/ui/primitives/card';
+=======
+import type { Field } from '@documenso/prisma/client';
+
+import { cn } from '../../lib/utils';
+import { Card, CardContent } from '../../primitives/card';
+>>>>>>> main
 
 export type FieldRootContainerProps = {
   field: Field;

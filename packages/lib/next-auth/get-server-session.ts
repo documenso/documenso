@@ -1,4 +1,10 @@
+<<<<<<< HEAD
 import { GetServerSidePropsContext, NextApiRequest, NextApiResponse } from 'next';
+=======
+'use server';
+
+import type { GetServerSidePropsContext, NextApiRequest, NextApiResponse } from 'next';
+>>>>>>> main
 
 import { getServerSession as getNextAuthServerSession } from 'next-auth';
 
@@ -26,6 +32,7 @@ export const getServerSession = async ({ req, res }: GetServerSessionOptions) =>
 
   return { user, session };
 };
+<<<<<<< HEAD
 
 export const getServerComponentSession = async () => {
   const session = await getNextAuthServerSession(NEXT_AUTH_OPTIONS);
@@ -52,3 +59,5 @@ export const getRequiredServerComponentSession = async () => {
 
   return { user, session };
 };
+=======
+>>>>>>> main

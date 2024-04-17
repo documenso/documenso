@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 
@@ -14,6 +15,9 @@ import { LazyPDFViewer } from '@documenso/ui/primitives/lazy-pdf-viewer';
 import { EditDocumentForm } from '~/app/(dashboard)/documents/[id]/edit-document';
 import { StackAvatarsWithTooltip } from '~/components/(dashboard)/avatar/stack-avatars-with-tooltip';
 import { DocumentStatus } from '~/components/formatter/document-status';
+=======
+import { DocumentPageView } from './document-page-view';
+>>>>>>> main
 
 export type DocumentPageProps = {
   params: {
@@ -21,6 +25,7 @@ export type DocumentPageProps = {
   };
 };
 
+<<<<<<< HEAD
 export default async function DocumentPage({ params }: DocumentPageProps) {
   const { id } = params;
 
@@ -101,4 +106,8 @@ export default async function DocumentPage({ params }: DocumentPageProps) {
       )}
     </div>
   );
+=======
+export default function DocumentPage({ params }: DocumentPageProps) {
+  return <DocumentPageView params={params} />;
+>>>>>>> main
 }

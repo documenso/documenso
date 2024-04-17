@@ -4,6 +4,10 @@ import { redirect } from 'next/navigation';
 
 import { ArrowRight } from 'lucide-react';
 
+<<<<<<< HEAD
+=======
+import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
+>>>>>>> main
 import { redis } from '@documenso/lib/server-only/redis';
 import { stripe } from '@documenso/lib/server-only/stripe';
 import { prisma } from '@documenso/prisma';
@@ -12,6 +16,11 @@ import { Button } from '@documenso/ui/primitives/button';
 
 import { PasswordReveal } from '~/components/(marketing)/password-reveal';
 
+<<<<<<< HEAD
+=======
+export const dynamic = 'force-dynamic';
+
+>>>>>>> main
 const fontCaveat = Caveat({
   weight: ['500'],
   subsets: ['latin'],
@@ -32,10 +41,28 @@ export default async function ClaimedPlanPage({ searchParams = {} }: ClaimedPlan
   }
 
   const session = await stripe.checkout.sessions.retrieve(sessionId);
+<<<<<<< HEAD
 
   const user = await prisma.user.findFirst({
     where: {
       id: Number(session.client_reference_id),
+=======
+  const customerId = typeof session.customer === 'string' ? session.customer : session.customer?.id;
+
+  if (!customerId) {
+    redirect('/');
+  }
+
+  const customer = await stripe.customers.retrieve(customerId);
+
+  if (!customer || customer.deleted) {
+    redirect('/');
+  }
+
+  const user = await prisma.user.findFirst({
+    where: {
+      id: Number(customer.metadata.userId),
+>>>>>>> main
     },
   });
 
@@ -164,11 +191,15 @@ export default async function ClaimedPlanPage({ searchParams = {} }: ClaimedPlan
           This is a temporary password. Please change it as soon as possible.
         </p>
 
+<<<<<<< HEAD
         <Link
           href={`${process.env.NEXT_PUBLIC_WEBAPP_URL}/login`}
           target="_blank"
           className="mt-4 block"
         >
+=======
+        <Link href={`${NEXT_PUBLIC_WEBAPP_URL()}/signin`} target="_blank" className="mt-4 block">
+>>>>>>> main
           <Button size="lg" className="text-base">
             Let's get started!
             <ArrowRight className="ml-2 h-5 w-5" />

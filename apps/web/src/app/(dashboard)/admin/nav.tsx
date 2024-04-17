@@ -1,11 +1,19 @@
 'use client';
 
+<<<<<<< HEAD
 import { HTMLAttributes } from 'react';
+=======
+import type { HTMLAttributes } from 'react';
+>>>>>>> main
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
+<<<<<<< HEAD
 import { BarChart3, FileStack, User2, Wallet2 } from 'lucide-react';
+=======
+import { BarChart3, FileStack, Settings, User2, Wallet2 } from 'lucide-react';
+>>>>>>> main
 
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
@@ -16,7 +24,17 @@ export const AdminNav = ({ className, ...props }: AdminNavProps) => {
   const pathname = usePathname();
 
   return (
+<<<<<<< HEAD
     <div className={cn('flex gap-x-2.5 gap-y-2 md:flex-col', className)} {...props}>
+=======
+    <div
+      className={cn(
+        'flex gap-x-2.5 gap-y-2 overflow-hidden overflow-x-auto md:flex-col',
+        className,
+      )}
+      {...props}
+    >
+>>>>>>> main
       <Button
         variant="ghost"
         className={cn(
@@ -72,6 +90,23 @@ export const AdminNav = ({ className, ...props }: AdminNavProps) => {
           Subscriptions
         </Link>
       </Button>
+<<<<<<< HEAD
+=======
+
+      <Button
+        variant="ghost"
+        className={cn(
+          'justify-start md:w-full',
+          pathname?.startsWith('/admin/banner') && 'bg-secondary',
+        )}
+        asChild
+      >
+        <Link href="/admin/site-settings">
+          <Settings className="mr-2 h-5 w-5" />
+          Site Settings
+        </Link>
+      </Button>
+>>>>>>> main
     </div>
   );
 };

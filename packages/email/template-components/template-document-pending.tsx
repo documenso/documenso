@@ -1,7 +1,11 @@
+<<<<<<< HEAD
 import { Column, Img, Section, Tailwind, Text } from '@react-email/components';
 
 import * as config from '@documenso/tailwind-config';
 
+=======
+import { Column, Img, Section, Text } from '../components';
+>>>>>>> main
 import { TemplateDocumentImage } from './template-document-image';
 
 export interface TemplateDocumentPendingProps {
@@ -18,6 +22,7 @@ export const TemplateDocumentPending = ({
   };
 
   return (
+<<<<<<< HEAD
     <Tailwind
       config={{
         theme: {
@@ -27,6 +32,9 @@ export const TemplateDocumentPending = ({
         },
       }}
     >
+=======
+    <>
+>>>>>>> main
       <TemplateDocumentImage className="mt-6" assetBaseUrl={assetBaseUrl} />
 
       <Section>
@@ -52,7 +60,11 @@ export const TemplateDocumentPending = ({
           We'll notify you as soon as it's ready.
         </Text>
       </Section>
+<<<<<<< HEAD
     </Tailwind>
+=======
+    </>
+>>>>>>> main
   );
 };
 

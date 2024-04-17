@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import { HTMLAttributes } from 'react';
 
 import Image from 'next/image';
@@ -11,6 +12,20 @@ import cardPaidFigure from '~/assets/card-paid-figure.png';
 import cardSharingFigure from '~/assets/card-sharing-figure.png';
 import cardWidgetFigure from '~/assets/card-widget-figure.png';
 
+=======
+import type { HTMLAttributes } from 'react';
+
+import Image from 'next/image';
+
+import backgroundPattern from '@documenso/assets/images/background-pattern.png';
+import cardConnectionsFigure from '@documenso/assets/images/card-connections-figure.png';
+import cardPaidFigure from '@documenso/assets/images/card-paid-figure.png';
+import cardSharingFigure from '@documenso/assets/images/card-sharing-figure.png';
+import cardWidgetFigure from '@documenso/assets/images/card-widget-figure.png';
+import { cn } from '@documenso/ui/lib/utils';
+import { Card, CardContent } from '@documenso/ui/primitives/card';
+
+>>>>>>> main
 export type ShareConnectPaidWidgetBentoProps = HTMLAttributes<HTMLDivElement>;
 
 export const ShareConnectPaidWidgetBento = ({
@@ -52,7 +67,11 @@ export const ShareConnectPaidWidgetBento = ({
         <Card className="col-span-2 lg:col-span-1" spotlight>
           <CardContent className="grid grid-cols-1 gap-8 p-6">
             <p className="text-foreground/80 leading-relaxed">
+<<<<<<< HEAD
               <strong className="block">Connections (Soon).</strong>
+=======
+              <strong className="block">Connections</strong>
+>>>>>>> main
               Create connections and automations with Zapier and more to integrate with your
               favorite tools.
             </p>

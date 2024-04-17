@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 import { MetadataRoute } from 'next';
+=======
+import type { MetadataRoute } from 'next';
+>>>>>>> main
 
 import { allBlogPosts, allGenericPages } from 'contentlayer/generated';
 

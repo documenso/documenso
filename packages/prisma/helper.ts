@@ -15,6 +15,13 @@ export const getDatabaseUrl = () => {
     process.env.NEXT_PRIVATE_DIRECT_DATABASE_URL = process.env.DATABASE_URL;
   }
 
+<<<<<<< HEAD
+=======
+  if (process.env.DATABASE_URL_UNPOOLED) {
+    process.env.NEXT_PRIVATE_DIRECT_DATABASE_URL = process.env.DATABASE_URL_UNPOOLED;
+  }
+
+>>>>>>> main
   if (process.env.POSTGRES_PRISMA_URL) {
     process.env.NEXT_PRIVATE_DATABASE_URL = process.env.POSTGRES_PRISMA_URL;
   }
@@ -23,6 +30,14 @@ export const getDatabaseUrl = () => {
     process.env.NEXT_PRIVATE_DIRECT_DATABASE_URL = process.env.POSTGRES_URL_NON_POOLING;
   }
 
+<<<<<<< HEAD
+=======
+  // If we don't have a database URL, we can't normalize it.
+  if (!process.env.NEXT_PRIVATE_DATABASE_URL) {
+    return undefined;
+  }
+
+>>>>>>> main
   // We change the protocol from `postgres:` to `https:` so we can construct a easily
   // mofifiable URL.
   const url = new URL(process.env.NEXT_PRIVATE_DATABASE_URL.replace('postgres://', 'https://'));
@@ -35,6 +50,7 @@ export const getDatabaseUrl = () => {
     process.env.NEXT_PRIVATE_DATABASE_URL = url.toString().replace('https://', 'postgres://');
   }
 
+<<<<<<< HEAD
   // Support for neon.tech (Neon Database)
   if (url.hostname.endsWith('neon.tech')) {
     const [projectId, ...rest] = url.hostname.split('.');
@@ -48,5 +64,7 @@ export const getDatabaseUrl = () => {
     process.env.NEXT_PRIVATE_DATABASE_URL = url.toString().replace('https://', 'postgres://');
   }
 
+=======
+>>>>>>> main
   return process.env.NEXT_PRIVATE_DATABASE_URL;
 };

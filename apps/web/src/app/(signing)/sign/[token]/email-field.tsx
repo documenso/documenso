@@ -6,8 +6,16 @@ import { useRouter } from 'next/navigation';
 
 import { Loader } from 'lucide-react';
 
+<<<<<<< HEAD
 import { Recipient } from '@documenso/prisma/client';
 import { FieldWithSignature } from '@documenso/prisma/types/field-with-signature';
+=======
+import { DO_NOT_INVALIDATE_QUERY_ON_MUTATION } from '@documenso/lib/constants/trpc';
+import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
+import type { TRecipientActionAuth } from '@documenso/lib/types/document-auth';
+import type { Recipient } from '@documenso/prisma/client';
+import type { FieldWithSignature } from '@documenso/prisma/types/field-with-signature';
+>>>>>>> main
 import { trpc } from '@documenso/trpc/react';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
@@ -29,26 +37,51 @@ export const EmailField = ({ field, recipient }: EmailFieldProps) => {
   const [isPending, startTransition] = useTransition();
 
   const { mutateAsync: signFieldWithToken, isLoading: isSignFieldWithTokenLoading } =
+<<<<<<< HEAD
     trpc.field.signFieldWithToken.useMutation();
+=======
+    trpc.field.signFieldWithToken.useMutation(DO_NOT_INVALIDATE_QUERY_ON_MUTATION);
+>>>>>>> main
 
   const {
     mutateAsync: removeSignedFieldWithToken,
     isLoading: isRemoveSignedFieldWithTokenLoading,
+<<<<<<< HEAD
   } = trpc.field.removeSignedFieldWithToken.useMutation();
 
   const isLoading = isSignFieldWithTokenLoading || isRemoveSignedFieldWithTokenLoading || isPending;
 
   const onSign = async () => {
+=======
+  } = trpc.field.removeSignedFieldWithToken.useMutation(DO_NOT_INVALIDATE_QUERY_ON_MUTATION);
+
+  const isLoading = isSignFieldWithTokenLoading || isRemoveSignedFieldWithTokenLoading || isPending;
+
+  const onSign = async (authOptions?: TRecipientActionAuth) => {
+>>>>>>> main
     try {
       await signFieldWithToken({
         token: recipient.token,
         fieldId: field.id,
         value: providedEmail ?? '',
         isBase64: false,
+<<<<<<< HEAD
+=======
+        authOptions,
+>>>>>>> main
       });
 
       startTransition(() => router.refresh());
     } catch (err) {
+<<<<<<< HEAD
+=======
+      const error = AppError.parseError(err);
+
+      if (error.code === AppErrorCode.UNAUTHORIZED) {
+        throw error;
+      }
+
+>>>>>>> main
       console.error(err);
 
       toast({
@@ -79,7 +112,11 @@ export const EmailField = ({ field, recipient }: EmailFieldProps) => {
   };
 
   return (
+<<<<<<< HEAD
     <SigningFieldContainer field={field} onSign={onSign} onRemove={onRemove}>
+=======
+    <SigningFieldContainer field={field} onSign={onSign} onRemove={onRemove} type="Email">
+>>>>>>> main
       {isLoading && (
         <div className="bg-background absolute inset-0 flex items-center justify-center rounded-md">
           <Loader className="text-primary h-5 w-5 animate-spin md:h-8 md:w-8" />

@@ -1,0 +1,24 @@
+name: 'Mark Stale Issues and PRs'
+
+on:
+  schedule:
+    - cron: '0 */8 * * *'
+
+jobs:
+  stale:
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      pull-requests: write
+
+    steps:
+      - uses: actions/stale@v4
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          days-before-pr-stale: 90
+          days-before-issue-stale: 90
+          days-before-issue-close: 180
+          stale-pr-message: 'This PR has not seen activitiy for a while. It will be closed in 30 days unless further activity is detected.'
+          close-pr-message: 'This PR has been closed because of inactivity.'
+          exempt-pr-labels: 'WIP,on-hold,needs review'
+          exempt-issue-labels: 'WIP,on-hold,needs review,roadmap,assigned,needs triage'

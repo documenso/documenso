@@ -13,6 +13,25 @@ export const getRecipientOrSenderByShareLinkSlug = async ({
     },
   });
 
+<<<<<<< HEAD
+=======
+  const sender = await prisma.user.findFirst({
+    where: {
+      Document: { some: { id: documentId } },
+      email,
+    },
+    select: {
+      email: true,
+      name: true,
+      signature: true,
+    },
+  });
+
+  if (sender) {
+    return sender;
+  }
+
+>>>>>>> main
   const recipient = await prisma.recipient.findFirst({
     where: {
       documentId,
@@ -27,6 +46,7 @@ export const getRecipientOrSenderByShareLinkSlug = async ({
     return recipient;
   }
 
+<<<<<<< HEAD
   const sender = await prisma.user.findFirst({
     where: {
       Document: { some: { id: documentId } },
@@ -38,5 +58,7 @@ export const getRecipientOrSenderByShareLinkSlug = async ({
     return sender;
   }
 
+=======
+>>>>>>> main
   throw new Error('Recipient or sender not found');
 };

@@ -1,4 +1,13 @@
+<<<<<<< HEAD
 import { APP_BASE_URL } from './app';
+=======
+import { env } from 'next-runtime-env';
+
+import { APP_BASE_URL, WEBAPP_BASE_URL } from './app';
+
+const NEXT_PUBLIC_FEATURE_BILLING_ENABLED = () => env('NEXT_PUBLIC_FEATURE_BILLING_ENABLED');
+const NEXT_PUBLIC_POSTHOG_KEY = () => env('NEXT_PUBLIC_POSTHOG_KEY');
+>>>>>>> main
 
 /**
  * The flag name for global session recording feature flag.
@@ -16,16 +25,29 @@ export const FEATURE_FLAG_POLL_INTERVAL = 30000;
  * Does not take any person or group properties into account.
  */
 export const LOCAL_FEATURE_FLAGS: Record<string, boolean> = {
+<<<<<<< HEAD
   app_billing: process.env.NEXT_PUBLIC_FEATURE_BILLING_ENABLED === 'true',
   marketing_header_single_player_mode: false,
+=======
+  app_billing: NEXT_PUBLIC_FEATURE_BILLING_ENABLED() === 'true',
+  app_document_page_view_history_sheet: false,
+  app_passkey: WEBAPP_BASE_URL === 'http://localhost:3000', // Temp feature flag.
+  marketing_header_single_player_mode: false,
+  marketing_profiles_announcement_bar: true,
+>>>>>>> main
 } as const;
 
 /**
  * Extract the PostHog configuration from the environment.
  */
 export function extractPostHogConfig(): { key: string; host: string } | null {
+<<<<<<< HEAD
   const postHogKey = process.env.NEXT_PUBLIC_POSTHOG_KEY;
   const postHogHost = `${APP_BASE_URL}/ingest`;
+=======
+  const postHogKey = NEXT_PUBLIC_POSTHOG_KEY();
+  const postHogHost = `${APP_BASE_URL()}/ingest`;
+>>>>>>> main
 
   if (!postHogKey || !postHogHost) {
     return null;

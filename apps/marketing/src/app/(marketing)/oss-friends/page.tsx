@@ -1,11 +1,27 @@
+<<<<<<< HEAD
+=======
+import type { Metadata } from 'next';
+>>>>>>> main
 import Image from 'next/image';
 
 import { z } from 'zod';
 
+<<<<<<< HEAD
 import backgroundPattern from '~/assets/background-pattern.png';
 
 import { OSSFriendsContainer } from './container';
 import { TOSSFriendsSchema, ZOSSFriendsSchema } from './schema';
+=======
+import backgroundPattern from '@documenso/assets/images/background-pattern.png';
+
+import { OSSFriendsContainer } from './container';
+import type { TOSSFriendsSchema } from './schema';
+import { ZOSSFriendsSchema } from './schema';
+
+export const metadata: Metadata = {
+  title: 'OSS Friends',
+};
+>>>>>>> main
 
 export default async function OSSFriendsPage() {
   const ossFriends: TOSSFriendsSchema = await fetch('https://formbricks.com/api/oss-friends', {

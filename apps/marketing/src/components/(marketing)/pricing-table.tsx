@@ -1,23 +1,38 @@
 'use client';
 
+<<<<<<< HEAD
 import { HTMLAttributes, useMemo, useState } from 'react';
 
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
+=======
+import type { HTMLAttributes } from 'react';
+import { useState } from 'react';
+
+import Link from 'next/link';
+>>>>>>> main
 
 import { AnimatePresence, motion } from 'framer-motion';
 import { usePlausible } from 'next-plausible';
 
+<<<<<<< HEAD
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
 
 import { ClaimPlanDialog } from './claim-plan-dialog';
 
+=======
+import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
+import { cn } from '@documenso/ui/lib/utils';
+import { Button } from '@documenso/ui/primitives/button';
+
+>>>>>>> main
 export type PricingTableProps = HTMLAttributes<HTMLDivElement>;
 
 const SELECTED_PLAN_BAR_LAYOUT_ID = 'selected-plan-bar';
 
 export const PricingTable = ({ className, ...props }: PricingTableProps) => {
+<<<<<<< HEAD
   const params = useSearchParams();
   const event = usePlausible();
 
@@ -38,6 +53,15 @@ export const PricingTable = ({ className, ...props }: PricingTableProps) => {
   return (
     <div className={cn('', className)} {...props}>
       <div className="flex items-center justify-center gap-x-6">
+=======
+  const event = usePlausible();
+
+  const [period, setPeriod] = useState<'MONTHLY' | 'YEARLY'>('MONTHLY');
+
+  return (
+    <div className={cn('', className)} {...props}>
+      <div className="bg-background sticky top-32 flex items-center justify-end gap-x-6 shadow-[-1px_-5px_2px_6px_hsl(var(--background))] md:top-[7.5rem] lg:static lg:justify-center">
+>>>>>>> main
         <AnimatePresence>
           <motion.button
             key="MONTHLY"
@@ -54,7 +78,11 @@ export const PricingTable = ({ className, ...props }: PricingTableProps) => {
             {period === 'MONTHLY' && (
               <motion.div
                 layoutId={SELECTED_PLAN_BAR_LAYOUT_ID}
+<<<<<<< HEAD
                 className="bg-primary absolute bottom-0 left-0 h-[3px] w-full rounded-full"
+=======
+                className="bg-foreground lg:bg-primary absolute bottom-0 left-0 h-[3px] w-full rounded-full"
+>>>>>>> main
               />
             )}
           </motion.button>
@@ -77,7 +105,11 @@ export const PricingTable = ({ className, ...props }: PricingTableProps) => {
             {period === 'YEARLY' && (
               <motion.div
                 layoutId={SELECTED_PLAN_BAR_LAYOUT_ID}
+<<<<<<< HEAD
                 className="bg-primary absolute bottom-0 left-0 h-[3px] w-full rounded-full"
+=======
+                className="bg-foreground lg:bg-primary absolute bottom-0 left-0 h-[3px] w-full rounded-full"
+>>>>>>> main
               />
             )}
           </motion.button>
@@ -86,6 +118,7 @@ export const PricingTable = ({ className, ...props }: PricingTableProps) => {
 
       <div className="mt-12 grid grid-cols-1 gap-x-6 gap-y-12 md:grid-cols-2 lg:grid-cols-3">
         <div
+<<<<<<< HEAD
           data-plan="self-hosted"
           className="bg-background shadow-foreground/5 flex flex-col items-center justify-center rounded-lg border px-8 py-12 shadow-lg"
         >
@@ -117,6 +150,39 @@ export const PricingTable = ({ className, ...props }: PricingTableProps) => {
 
         <div
           data-plan="community"
+=======
+          data-plan="free"
+          className="bg-background shadow-foreground/5 flex flex-col items-center justify-center rounded-lg border px-8 py-12 shadow-lg"
+        >
+          <p className="text-foreground text-4xl font-medium">Free Plan</p>
+          <p className="text-primary mt-2.5 text-xl font-medium">$0</p>
+
+          <p className="text-foreground mt-4 max-w-[30ch] text-center">
+            For small teams and individuals with basic needs.
+          </p>
+
+          <Button className="rounded-full text-base" asChild>
+            <Link
+              href={`${NEXT_PUBLIC_WEBAPP_URL()}/signup?utm_source=pricing-free-plan`}
+              target="_blank"
+              className="mt-6"
+            >
+              Signup Now
+            </Link>
+          </Button>
+
+          <div className="mt-8 flex w-full flex-col divide-y">
+            <p className="text-foreground py-4">5 standard documents per month</p>
+            <p className="text-foreground py-4">Up to 10 recipients per document</p>
+            <p className="text-foreground py-4">No credit card required</p>
+          </div>
+
+          <div className="flex-1" />
+        </div>
+
+        <div
+          data-plan="early-adopter"
+>>>>>>> main
           className="border-primary bg-background shadow-foreground/5 flex flex-col items-center justify-center rounded-lg border-2 px-8 py-12 shadow-[0px_0px_0px_4px_#E3E3E380]"
         >
           <p className="text-foreground text-4xl font-medium">Early Adopters</p>
@@ -131,6 +197,7 @@ export const PricingTable = ({ className, ...props }: PricingTableProps) => {
             For fast-growing companies that aim to scale across multiple teams.
           </p>
 
+<<<<<<< HEAD
           <ClaimPlanDialog planId={planId}>
             <Button className="mt-6 rounded-full text-base">Signup Now</Button>
           </ClaimPlanDialog>
@@ -155,6 +222,34 @@ export const PricingTable = ({ className, ...props }: PricingTableProps) => {
             </p>
             <p className="text-foreground py-4">Fixed, straightforward pricing</p>
           </div>
+=======
+          <Button className="mt-6 rounded-full text-base" asChild>
+            <Link
+              href={`${NEXT_PUBLIC_WEBAPP_URL()}/signup?utm_source=pricing-early-adopter`}
+              target="_blank"
+            >
+              Signup Now
+            </Link>
+          </Button>
+
+          <div className="mt-8 flex w-full flex-col divide-y">
+            <p className="text-foreground py-4">
+              <a
+                href="https://documen.so/early-adopters-pricing-page"
+                target="_blank"
+                rel="noreferrer"
+              >
+                Limited Time Offer: <span className="text-documenso-700">Read More</span>
+              </a>
+            </p>
+            <p className="text-foregro‚und py-4">Unlimited Teams</p>
+            <p className="text-foregro‚und py-4">Unlimited Users</p>
+            <p className="text-foregro‚und py-4">Unlimited Documents per month</p>
+            <p className="text-foreground py-4">Includes all upcoming features</p>
+            <p className="text-foreground py-4">Email, Discord and Slack assistance</p>
+          </div>
+          <div className="flex-1" />
+>>>>>>> main
         </div>
 
         <div

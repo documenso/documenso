@@ -1,6 +1,10 @@
 import Link from 'next/link';
 
+<<<<<<< HEAD
 import { getServerComponentSession } from '@documenso/lib/next-auth/get-server-session';
+=======
+import { getServerComponentSession } from '@documenso/lib/next-auth/get-server-component-session';
+>>>>>>> main
 import { Button } from '@documenso/ui/primitives/button';
 
 import NotFoundPartial from '~/components/partials/not-found';

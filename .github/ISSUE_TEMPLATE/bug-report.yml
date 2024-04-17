@@ -1,0 +1,47 @@
+name: 'Bug Report'
+labels: ['bug']
+description: Create a bug report to help us improve
+body:
+  - type: markdown
+    attributes:
+      value: Thank you for reporting an issue.
+        Please fill in as much of the form below as you're able to.
+  - type: textarea
+    attributes:
+      label: Issue Description
+      description: Please provide a clear and concise description of the problem.
+  - type: textarea
+    attributes:
+      label: Steps to Reproduce
+      description: Please provide step-by-step instructions to reproduce the issue. Include code snippets, error messages, and any other relevant information.
+  - type: textarea
+    attributes:
+      label: Expected Behavior
+      description: Describe what you expected to happen.
+  - type: textarea
+    attributes:
+      label: Current Behavior
+      description: Describe what is currently happening.
+  - type: textarea
+    attributes:
+      label: Screenshots (optional)
+      description: If applicable, add screenshots to help explain the issue.
+  - type: input
+    attributes:
+      label: Operating System [e.g., Windows 10]
+  - type: input
+    attributes:
+      label: Browser [e.g., Chrome, Firefox]
+  - type: input
+    attributes:
+      label: Version [e.g., 2.0.1]
+  - type: checkboxes
+    attributes:
+      label: Please check the boxes that apply to this issue report.
+      options:
+        - label: I have searched the existing issues to make sure this is not a duplicate.
+        - label: I have provided steps to reproduce the issue.
+        - label: I have included relevant environment information.
+        - label: I have included any relevant screenshots.
+        - label: I understand that this is a voluntary contribution and that there is no guarantee of resolution.
+        - label: I want to work on creating a PR for this issue if approved

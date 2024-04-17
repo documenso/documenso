@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import Link from 'next/link';
 
 import { getRequiredServerComponentSession } from '@documenso/lib/next-auth/get-server-session';
@@ -22,10 +23,27 @@ export type DocumentsPageProps = {
     page?: string;
     perPage?: string;
   };
+=======
+import type { Metadata } from 'next';
+
+import { getRequiredServerComponentSession } from '@documenso/lib/next-auth/get-server-component-session';
+
+import type { DocumentsPageViewProps } from './documents-page-view';
+import { DocumentsPageView } from './documents-page-view';
+import { UpcomingProfileClaimTeaser } from './upcoming-profile-claim-teaser';
+
+export type DocumentsPageProps = {
+  searchParams?: DocumentsPageViewProps['searchParams'];
+};
+
+export const metadata: Metadata = {
+  title: 'Documents',
+>>>>>>> main
 };
 
 export default async function DocumentsPage({ searchParams = {} }: DocumentsPageProps) {
   const { user } = await getRequiredServerComponentSession();
+<<<<<<< HEAD
 
   const stats = await getStats({
     user,
@@ -103,5 +121,12 @@ export default async function DocumentsPage({ searchParams = {} }: DocumentsPage
         {results.count === 0 && <EmptyDocumentState status={status} />}
       </div>
     </div>
+=======
+  return (
+    <>
+      <UpcomingProfileClaimTeaser user={user} />
+      <DocumentsPageView searchParams={searchParams} />
+    </>
+>>>>>>> main
   );
 }

@@ -1,19 +1,36 @@
+<<<<<<< HEAD
 import { compare, hash } from 'bcrypt';
 
 import { prisma } from '@documenso/prisma';
 
 import { SALT_ROUNDS } from '../../constants/auth';
+=======
+import { compare, hash } from '@node-rs/bcrypt';
+
+import { SALT_ROUNDS } from '@documenso/lib/constants/auth';
+import type { RequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
+import { prisma } from '@documenso/prisma';
+import { UserSecurityAuditLogType } from '@documenso/prisma/client';
+>>>>>>> main
 
 export type UpdatePasswordOptions = {
   userId: number;
   password: string;
   currentPassword: string;
+<<<<<<< HEAD
+=======
+  requestMetadata?: RequestMetadata;
+>>>>>>> main
 };
 
 export const updatePassword = async ({
   userId,
   password,
   currentPassword,
+<<<<<<< HEAD
+=======
+  requestMetadata,
+>>>>>>> main
 }: UpdatePasswordOptions) => {
   // Existence check
   const user = await prisma.user.findFirstOrThrow({
@@ -39,6 +56,7 @@ export const updatePassword = async ({
 
   const hashedNewPassword = await hash(password, SALT_ROUNDS);
 
+<<<<<<< HEAD
   const updatedUser = await prisma.user.update({
     where: {
       id: userId,
@@ -49,4 +67,25 @@ export const updatePassword = async ({
   });
 
   return updatedUser;
+=======
+  return await prisma.$transaction(async (tx) => {
+    await tx.userSecurityAuditLog.create({
+      data: {
+        userId,
+        type: UserSecurityAuditLogType.PASSWORD_UPDATE,
+        userAgent: requestMetadata?.userAgent,
+        ipAddress: requestMetadata?.ipAddress,
+      },
+    });
+
+    return await tx.user.update({
+      where: {
+        id: userId,
+      },
+      data: {
+        password: hashedNewPassword,
+      },
+    });
+  });
+>>>>>>> main
 };

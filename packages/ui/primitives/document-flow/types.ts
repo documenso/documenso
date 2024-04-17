@@ -3,6 +3,11 @@ import { z } from 'zod';
 import { FieldType } from '@documenso/prisma/client';
 
 export const ZDocumentFlowFormSchema = z.object({
+<<<<<<< HEAD
+=======
+  title: z.string().min(1),
+
+>>>>>>> main
   signers: z
     .array(
       z.object({
@@ -22,7 +27,11 @@ export const ZDocumentFlowFormSchema = z.object({
       formId: z.string().min(1),
       nativeId: z.number().optional(),
       type: z.nativeEnum(FieldType),
+<<<<<<< HEAD
       signerEmail: z.string().min(1),
+=======
+      signerEmail: z.string().min(1).optional(),
+>>>>>>> main
       pageNumber: z.number().min(1),
       pageX: z.number().min(0),
       pageY: z.number().min(0),
@@ -51,7 +60,13 @@ export const FRIENDLY_FIELD_TYPE: Record<FieldType, string> = {
 export interface DocumentFlowStep {
   title: string;
   description: string;
+<<<<<<< HEAD
   stepIndex: number;
   onBackStep?: () => void;
   onNextStep?: () => void;
+=======
+  stepIndex?: number;
+  onBackStep?: () => unknown;
+  onNextStep?: () => unknown;
+>>>>>>> main
 }

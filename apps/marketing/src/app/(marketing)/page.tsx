@@ -1,4 +1,8 @@
 /* eslint-disable no-unused-vars, @typescript-eslint/no-unused-vars */
+<<<<<<< HEAD
+=======
+import type { Metadata } from 'next';
+>>>>>>> main
 import { Caveat } from 'next/font/google';
 
 import { cn } from '@documenso/ui/lib/utils';
@@ -10,6 +14,14 @@ import { OpenBuildTemplateBento } from '~/components/(marketing)/open-build-temp
 import { ShareConnectPaidWidgetBento } from '~/components/(marketing)/share-connect-paid-widget-bento';
 
 export const revalidate = 600;
+<<<<<<< HEAD
+=======
+export const metadata: Metadata = {
+  title: {
+    absolute: 'Documenso - The Open Source DocuSign Alternative',
+  },
+};
+>>>>>>> main
 
 const fontCaveat = Caveat({
   weight: ['500'],

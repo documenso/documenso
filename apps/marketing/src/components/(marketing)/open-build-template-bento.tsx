@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import { HTMLAttributes } from 'react';
 
 import Image from 'next/image';
@@ -10,6 +11,19 @@ import cardBuildFigure from '~/assets/card-build-figure.png';
 import cardOpenFigure from '~/assets/card-open-figure.png';
 import cardTemplateFigure from '~/assets/card-template-figure.png';
 
+=======
+import type { HTMLAttributes } from 'react';
+
+import Image from 'next/image';
+
+import backgroundPattern from '@documenso/assets/images/background-pattern.png';
+import cardBuildFigure from '@documenso/assets/images/card-build-figure.png';
+import cardOpenFigure from '@documenso/assets/images/card-open-figure.png';
+import cardTemplateFigure from '@documenso/assets/images/card-template-figure.png';
+import { cn } from '@documenso/ui/lib/utils';
+import { Card, CardContent } from '@documenso/ui/primitives/card';
+
+>>>>>>> main
 export type OpenBuildTemplateBentoProps = HTMLAttributes<HTMLDivElement>;
 
 export const OpenBuildTemplateBento = ({ className, ...props }: OpenBuildTemplateBentoProps) => {

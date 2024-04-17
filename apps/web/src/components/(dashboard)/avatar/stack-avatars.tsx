@@ -2,7 +2,11 @@ import React from 'react';
 
 import { getRecipientType } from '@documenso/lib/client-only/recipient-type';
 import { recipientAbbreviation } from '@documenso/lib/utils/recipient-formatter';
+<<<<<<< HEAD
 import { Recipient } from '@documenso/prisma/client';
+=======
+import type { Recipient } from '@documenso/prisma/client';
+>>>>>>> main
 
 import { StackAvatar } from './stack-avatar';
 

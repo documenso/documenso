@@ -12,7 +12,11 @@ export async function insertTextInPDF(
   useHandwritingFont = true,
 ): Promise<string> {
   // Fetch the font file from the public URL.
+<<<<<<< HEAD
   const fontResponse = await fetch(CAVEAT_FONT_PATH);
+=======
+  const fontResponse = await fetch(CAVEAT_FONT_PATH());
+>>>>>>> main
   const fontCaveat = await fontResponse.arrayBuffer();
 
   const pdfDoc = await PDFDocument.load(pdfAsBase64);

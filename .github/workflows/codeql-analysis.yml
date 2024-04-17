@@ -1,11 +1,21 @@
+<<<<<<< HEAD
 name: "CodeQL"
+=======
+name: 'CodeQL'
+>>>>>>> main
 
 on:
   workflow_dispatch:
   push:
+<<<<<<< HEAD
     branches: [ feat/refresh ]
   pull_request:
     branches: [ feat/refresh ]
+=======
+    branches: ['main']
+  pull_request:
+    branches: ['main']
+>>>>>>> main
 
 jobs:
   analyze:
@@ -19,6 +29,7 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
+<<<<<<< HEAD
         language: [ 'javascript' ]
 
     steps:
@@ -46,3 +57,25 @@ jobs:
 
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v2
+=======
+        language: ['javascript']
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Copy env
+        run: cp .env.example .env
+
+      - uses: ./.github/actions/node-install
+
+      - uses: ./.github/actions/cache-build
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v2
+        with:
+          languages: ${{ matrix.language }}
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v2
+>>>>>>> main

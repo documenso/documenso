@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import {
   Body,
   Container,
@@ -15,6 +16,13 @@ import {
   TemplateDocumentPending,
   TemplateDocumentPendingProps,
 } from '../template-components/template-document-pending';
+=======
+import config from '@documenso/tailwind-config';
+
+import { Body, Container, Head, Html, Img, Preview, Section, Tailwind } from '../components';
+import type { TemplateDocumentPendingProps } from '../template-components/template-document-pending';
+import { TemplateDocumentPending } from '../template-components/template-document-pending';
+>>>>>>> main
 import { TemplateFooter } from '../template-components/template-footer';
 
 export type DocumentPendingEmailTemplateProps = Partial<TemplateDocumentPendingProps>;

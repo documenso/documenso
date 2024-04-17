@@ -6,8 +6,14 @@ import { Loader } from 'lucide-react';
 import { useSession } from 'next-auth/react';
 
 import { useUpdateSearchParams } from '@documenso/lib/client-only/hooks/use-update-search-params';
+<<<<<<< HEAD
 import { FindResultSet } from '@documenso/lib/types/find-result-set';
 import { Document, Recipient, User } from '@documenso/prisma/client';
+=======
+import type { FindResultSet } from '@documenso/lib/types/find-result-set';
+import type { Document, Recipient, Team, User } from '@documenso/prisma/client';
+import { ExtendedDocumentStatus } from '@documenso/prisma/types/extended-document-status';
+>>>>>>> main
 import { DataTable } from '@documenso/ui/primitives/data-table';
 import { DataTablePagination } from '@documenso/ui/primitives/data-table-pagination';
 
@@ -24,11 +30,26 @@ export type DocumentsDataTableProps = {
     Document & {
       Recipient: Recipient[];
       User: Pick<User, 'id' | 'name' | 'email'>;
+<<<<<<< HEAD
     }
   >;
 };
 
 export const DocumentsDataTable = ({ results }: DocumentsDataTableProps) => {
+=======
+      team: Pick<Team, 'id' | 'url'> | null;
+    }
+  >;
+  showSenderColumn?: boolean;
+  team?: Pick<Team, 'id' | 'url'>;
+};
+
+export const DocumentsDataTable = ({
+  results,
+  showSenderColumn,
+  team,
+}: DocumentsDataTableProps) => {
+>>>>>>> main
   const { data: session } = useSession();
   const [isPending, startTransition] = useTransition();
 
@@ -58,19 +79,33 @@ export const DocumentsDataTable = ({ results }: DocumentsDataTableProps) => {
           },
           {
             header: 'Title',
+<<<<<<< HEAD
             cell: ({ row }) => <DataTableTitle row={row.original} />,
+=======
+            cell: ({ row }) => <DataTableTitle row={row.original} teamUrl={team?.url} />,
+          },
+          {
+            id: 'sender',
+            header: 'Sender',
+            cell: ({ row }) => row.original.User.name ?? row.original.User.email,
+>>>>>>> main
           },
           {
             header: 'Recipient',
             accessorKey: 'recipient',
+<<<<<<< HEAD
             cell: ({ row }) => {
               return <StackAvatarsWithTooltip recipients={row.original.Recipient} />;
             },
+=======
+            cell: ({ row }) => <StackAvatarsWithTooltip recipients={row.original.Recipient} />,
+>>>>>>> main
           },
           {
             header: 'Status',
             accessorKey: 'status',
             cell: ({ row }) => <DocumentStatus status={row.getValue('status')} />,
+<<<<<<< HEAD
           },
           {
             header: 'Actions',
@@ -80,6 +115,20 @@ export const DocumentsDataTable = ({ results }: DocumentsDataTableProps) => {
                 <DataTableActionDropdown row={row.original} />
               </div>
             ),
+=======
+            size: 140,
+          },
+          {
+            header: 'Actions',
+            cell: ({ row }) =>
+              (!row.original.deletedAt ||
+                row.original.status === ExtendedDocumentStatus.COMPLETED) && (
+                <div className="flex items-center gap-x-4">
+                  <DataTableActionButton team={team} row={row.original} />
+                  <DataTableActionDropdown team={team} row={row.original} />
+                </div>
+              ),
+>>>>>>> main
           },
         ]}
         data={results.data}
@@ -87,6 +136,12 @@ export const DocumentsDataTable = ({ results }: DocumentsDataTableProps) => {
         currentPage={results.currentPage}
         totalPages={results.totalPages}
         onPaginationChange={onPaginationChange}
+<<<<<<< HEAD
+=======
+        columnVisibility={{
+          sender: Boolean(showSenderColumn),
+        }}
+>>>>>>> main
       >
         {(table) => <DataTablePagination additionalInformation="VisibleCount" table={table} />}
       </DataTable>

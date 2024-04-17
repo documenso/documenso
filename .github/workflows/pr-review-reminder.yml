@@ -1,0 +1,64 @@
+name: 'PR Review Reminder'
+
+on:
+  pull_request:
+    types: ['opened', 'reopened', 'ready_for_review', 'review_requested']
+
+permissions:
+  pull-requests: write
+
+jobs:
+  checkPRs:
+    if: ${{ github.event.pull_request.user.login }} && github.event.action == ('opened' || 'reopened' || 'ready_for_review' || 'review_requested')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: npm
+
+      - name: Install Octokit
+        run: npm install @octokit/rest@18
+
+      - name: Check user's PRs awaiting review
+        id: parse-prs
+        uses: actions/github-script@v5
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const { Octokit } = require("@octokit/rest");
+            const octokit = new Octokit({ auth: process.env.GITHUB_TOKEN });
+
+            const username = context.payload.pull_request.user.login;
+            console.log(`Username Extracted: ${username}`);
+
+            const { data: pullRequests } = await octokit.pulls.list({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open',
+              sort: 'created',
+              direction: 'asc',
+            });
+
+            const userPullRequests = pullRequests.filter(pr => pr.user.login === username && (pr.state === 'open' || pr.state === 'ready_for_review'));
+            const prCount = userPullRequests.length;
+            console.log(`PR Count for ${username}: ${prCount}`);
+
+            if (prCount > 3) {
+              let prReminderMessage = `🚨 @${username} has ${prCount} pull requests awaiting review. Please consider reviewing them when possible. 🚨`;
+
+              await octokit.request('POST /repos/{owner}/{repo}/issues/{issue_number}/comments', {
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.payload.pull_request.number,
+                body: prReminderMessage,
+                headers: {
+                  'Authorization': `token ${{ secrets.GITHUB_TOKEN }}`,
+                }
+              });
+            }

@@ -37,7 +37,7 @@ The development branch is <code>main</code>. All pull requests should be made ag
 - Create a new branch (include the issue id and something readable):
 
   ```sh
-  git checkout -b doc-999-my-feature-or-fix
+  git checkout -b feat/doc-999-somefeature-that-rocks
   ```
 
 3. See the [Developer Setup](https://github.com/documenso/documenso/blob/main/README.md#developer-setup) for more setup details.

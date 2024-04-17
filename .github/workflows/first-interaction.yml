@@ -1,0 +1,29 @@
+name: 'Welcome New Contributors'
+
+on:
+  pull_request:
+    types: ['opened']
+  issues:
+    types: ['opened']
+
+permissions:
+  pull-requests: write
+  issues: write
+
+jobs:
+  welcome-message:
+    name: Welcome Contributors
+    if: github.event.action == 'opened'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/first-interaction@v1
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          pr-message: |
+            Thank you for creating your first Pull Request and for being a part of the open signing revolution! 💚🚀
+            <br /> Feel free to hop into our community in [Discord](https://documen.so/discord)
+          issue-message: |
+            Thank you for opening your first issue and for being a part of the open signing revolution!
+            <br /> One of our team members will review it and get back to you as soon as it possible 💚
+            <br /> Meanwhile, please feel free to hop into our community in [Discord](https://documen.so/discord)

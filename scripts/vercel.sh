@@ -6,7 +6,10 @@ set -eo pipefail
 # Get the directory of this script, regardless of where it is called from.
 SCRIPT_DIR="$(readlink -f "$(dirname "$0")")"
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> main
 function log() {
   echo "[VercelBuild]: $1"
 }
@@ -69,10 +72,21 @@ function remap_database_integration() {
     export NEXT_PRIVATE_DIRECT_DATABASE_URL="$DATABASE_URL"
   fi
 
+<<<<<<< HEAD
+=======
+  if [[ ! -z "$DATABASE_URL_UNPOOLED" ]]; then
+    log "Remapping for Neon integration"
+
+    export NEXT_PRIVATE_DATABASE_URL="$DATABASE_URL&pgbouncer=true"
+    export NEXT_PRIVATE_DIRECT_DATABASE_URL="$DATABASE_URL_UNPOOLED"
+  fi
+
+>>>>>>> main
   if [[ ! -z "$POSTGRES_URL_NON_POOLING" ]]; then
     export NEXT_PRIVATE_DATABASE_URL="$POSTGRES_URL?pgbouncer=true"
     export NEXT_PRIVATE_DIRECT_DATABASE_URL="$POSTGRES_URL_NON_POOLING"
   fi
+<<<<<<< HEAD
 
   if [[ "$NEXT_PRIVATE_DATABASE_URL" == *"neon.tech"* ]]; then
     log "Remapping for Neon integration"
@@ -82,6 +96,8 @@ function remap_database_integration() {
 
     export NEXT_PRIVATE_DATABASE_URL="postgres://${PGUSER}:${PGPASSWORD}@${PGBOUNCER_HOST}/${PGDATABASE}?pgbouncer=true"
   fi
+=======
+>>>>>>> main
 }
 
 # Navigate to the root of the project.

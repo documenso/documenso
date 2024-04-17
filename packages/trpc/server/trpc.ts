@@ -3,7 +3,11 @@ import SuperJSON from 'superjson';
 
 import { isAdmin } from '@documenso/lib/next-auth/guards/is-admin';
 
+<<<<<<< HEAD
 import { TrpcContext } from './context';
+=======
+import type { TrpcContext } from './context';
+>>>>>>> main
 
 const t = initTRPC.context<TrpcContext>().create({
   transformer: SuperJSON,
@@ -23,7 +27,10 @@ export const authenticatedMiddleware = t.middleware(async ({ ctx, next }) => {
   return await next({
     ctx: {
       ...ctx,
+<<<<<<< HEAD
 
+=======
+>>>>>>> main
       user: ctx.user,
       session: ctx.session,
     },

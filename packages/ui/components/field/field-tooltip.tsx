@@ -1,17 +1,32 @@
 import { TooltipArrow } from '@radix-ui/react-tooltip';
+<<<<<<< HEAD
 import { VariantProps, cva } from 'class-variance-authority';
 import { createPortal } from 'react-dom';
 
 import { useFieldPageCoords } from '@documenso/lib/client-only/hooks/use-field-page-coords';
 import { cn } from '@documenso/ui/lib/utils';
+=======
+import type { VariantProps } from 'class-variance-authority';
+import { cva } from 'class-variance-authority';
+import { createPortal } from 'react-dom';
+
+import { useFieldPageCoords } from '@documenso/lib/client-only/hooks/use-field-page-coords';
+
+import { cn } from '../..//lib/utils';
+>>>>>>> main
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
+<<<<<<< HEAD
 } from '@documenso/ui/primitives/tooltip';
 
 import { Field } from '.prisma/client';
+=======
+} from '../..//primitives/tooltip';
+import type { Field } from '.prisma/client';
+>>>>>>> main
 
 const tooltipVariants = cva('font-semibold', {
   variants: {

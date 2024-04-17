@@ -1,0 +1,37 @@
+name: documenso-development
+
+services:
+  database:
+    image: postgres:15
+    container_name: database
+    environment:
+      - POSTGRES_USER=documenso
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=documenso
+    ports:
+      - 54320:5432
+
+  inbucket:
+    image: inbucket/inbucket
+    container_name: mailserver
+    ports:
+      - 9000:9000
+      - 2500:2500
+      - 1100:1100
+
+  minio:
+    image: minio/minio
+    container_name: minio
+    ports:
+      - 9002:9002
+      - 9001:9001
+    volumes:
+      - minio:/data
+    environment:
+      MINIO_ROOT_USER: documenso
+      MINIO_ROOT_PASSWORD: password
+    entrypoint: sh
+    command: -c 'mkdir -p /data/documenso && minio server /data --console-address ":9001" --address ":9002"'
+
+volumes:
+  minio:

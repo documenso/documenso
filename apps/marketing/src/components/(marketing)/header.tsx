@@ -1,12 +1,24 @@
 'use client';
 
+<<<<<<< HEAD
 import { HTMLAttributes, useState } from 'react';
+=======
+import type { HTMLAttributes } from 'react';
+import { useState } from 'react';
+>>>>>>> main
 
 import Image from 'next/image';
 import Link from 'next/link';
 
+<<<<<<< HEAD
 import { useFeatureFlags } from '@documenso/lib/client-only/providers/feature-flag';
 import { cn } from '@documenso/ui/lib/utils';
+=======
+import LogoImage from '@documenso/assets/logo.png';
+import { useFeatureFlags } from '@documenso/lib/client-only/providers/feature-flag';
+import { cn } from '@documenso/ui/lib/utils';
+import { Button } from '@documenso/ui/primitives/button';
+>>>>>>> main
 
 import { HamburgerMenu } from './mobile-hamburger';
 import { MobileNavigation } from './mobile-navigation';
@@ -25,7 +37,11 @@ export const Header = ({ className, ...props }: HeaderProps) => {
       <div className="flex items-center space-x-4">
         <Link href="/" className="z-10" onClick={() => setIsHamburgerMenuOpen(false)}>
           <Image
+<<<<<<< HEAD
             src="/logo.png"
+=======
+            src={LogoImage}
+>>>>>>> main
             alt="Documenso Logo"
             className="dark:invert"
             width={170}
@@ -62,16 +78,33 @@ export const Header = ({ className, ...props }: HeaderProps) => {
           href="/open"
           className="text-muted-foreground hover:text-muted-foreground/80 text-sm font-semibold"
         >
+<<<<<<< HEAD
           Open
         </Link>
 
         <Link
           href="https://app.documenso.com/login"
+=======
+          Open Startup
+        </Link>
+
+        <Link
+          href="https://app.documenso.com/signin?utm_source=marketing-header"
+>>>>>>> main
           target="_blank"
           className="text-muted-foreground hover:text-muted-foreground/80 text-sm font-semibold"
         >
           Sign in
         </Link>
+<<<<<<< HEAD
+=======
+
+        <Button className="rounded-full" size="sm" asChild>
+          <Link href="https://app.documenso.com/signup?utm_source=marketing-header" target="_blank">
+            Sign up
+          </Link>
+        </Button>
+>>>>>>> main
       </div>
 
       <HamburgerMenu

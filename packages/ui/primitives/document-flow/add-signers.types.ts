@@ -1,13 +1,30 @@
 import { z } from 'zod';
 
+<<<<<<< HEAD
+=======
+import { ZRecipientActionAuthTypesSchema } from '@documenso/lib/types/document-auth';
+
+import { ZMapNegativeOneToUndefinedSchema } from './add-settings.types';
+import { RecipientRole } from '.prisma/client';
+
+>>>>>>> main
 export const ZAddSignersFormSchema = z
   .object({
     signers: z.array(
       z.object({
         formId: z.string().min(1),
         nativeId: z.number().optional(),
+<<<<<<< HEAD
         email: z.string().min(1).email(),
         name: z.string(),
+=======
+        email: z.string().email().min(1),
+        name: z.string(),
+        role: z.nativeEnum(RecipientRole),
+        actionAuth: ZMapNegativeOneToUndefinedSchema.pipe(
+          ZRecipientActionAuthTypesSchema.optional(),
+        ),
+>>>>>>> main
       }),
     ),
   })

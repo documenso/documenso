@@ -2,9 +2,17 @@
 
 import { createContext, useContext, useEffect, useState } from 'react';
 
+<<<<<<< HEAD
 import { getLimits } from '../client';
 import { FREE_PLAN_LIMITS } from '../constants';
 import { TLimitsResponseSchema } from '../schema';
+=======
+import { equals } from 'remeda';
+
+import { getLimits } from '../client';
+import { FREE_PLAN_LIMITS } from '../constants';
+import type { TLimitsResponseSchema } from '../schema';
+>>>>>>> main
 
 export type LimitsContextValue = TLimitsResponseSchema;
 
@@ -22,6 +30,7 @@ export const useLimits = () => {
 
 export type LimitsProviderProps = {
   initialValue?: LimitsContextValue;
+<<<<<<< HEAD
   children?: React.ReactNode;
 };
 
@@ -35,11 +44,45 @@ export const LimitsProvider = ({ initialValue, children }: LimitsProviderProps) 
 
   useEffect(() => {
     void getLimits().then((limits) => setLimits(limits));
+=======
+  teamId?: number;
+  children?: React.ReactNode;
+};
+
+export const LimitsProvider = ({
+  initialValue = {
+    quota: FREE_PLAN_LIMITS,
+    remaining: FREE_PLAN_LIMITS,
+  },
+  teamId,
+  children,
+}: LimitsProviderProps) => {
+  const [limits, setLimits] = useState(() => initialValue);
+
+  const refreshLimits = async () => {
+    const newLimits = await getLimits({ teamId });
+
+    setLimits((oldLimits) => {
+      if (equals(oldLimits, newLimits)) {
+        return oldLimits;
+      }
+
+      return newLimits;
+    });
+  };
+
+  useEffect(() => {
+    void refreshLimits();
+>>>>>>> main
   }, []);
 
   useEffect(() => {
     const onFocus = () => {
+<<<<<<< HEAD
       void getLimits().then((limits) => setLimits(limits));
+=======
+      void refreshLimits();
+>>>>>>> main
     };
 
     window.addEventListener('focus', onFocus);

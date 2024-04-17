@@ -2,6 +2,11 @@ import Link from 'next/link';
 
 import { ChevronLeft, Loader } from 'lucide-react';
 
+<<<<<<< HEAD
+=======
+import { Skeleton } from '@documenso/ui/primitives/skeleton';
+
+>>>>>>> main
 export default function Loading() {
   return (
     <div className="mx-auto -mt-4 flex w-full max-w-screen-xl flex-col px-4 md:px-8">
@@ -13,7 +18,16 @@ export default function Loading() {
       <h1 className="mt-4 grow-0 truncate text-2xl font-semibold md:text-3xl">
         Loading Document...
       </h1>
+<<<<<<< HEAD
       <div className="mt-8 grid h-[80vh] max-h-[60rem] w-full grid-cols-12 gap-x-8">
+=======
+
+      <div className="flex h-10 items-center">
+        <Skeleton className="my-6 h-4 w-24 rounded-2xl" />
+      </div>
+
+      <div className="mt-4 grid h-[80vh] max-h-[60rem] w-full grid-cols-12 gap-x-8">
+>>>>>>> main
         <div className="dark:bg-background border-border col-span-12 rounded-xl border-2 bg-white/50 p-2 before:rounded-xl lg:col-span-6 xl:col-span-7">
           <div className="flex h-[80vh] max-h-[60rem] flex-col items-center justify-center">
             <Loader className="text-documenso h-12 w-12 animate-spin" />

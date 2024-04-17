@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 import { Link, Section, Text } from '@react-email/components';
+=======
+import { Link, Section, Text } from '../components';
+>>>>>>> main
 
 export type TemplateFooterProps = {
   isDocument?: boolean;
@@ -10,7 +14,11 @@ export const TemplateFooter = ({ isDocument = true }: TemplateFooterProps) => {
       {isDocument && (
         <Text className="my-4 text-base text-slate-400">
           This document was sent using{' '}
+<<<<<<< HEAD
           <Link className="text-[#7AC455]" href="https://documenso.com">
+=======
+          <Link className="text-[#7AC455]" href="https://documen.so/mail-footer">
+>>>>>>> main
             Documenso.
           </Link>
         </Text>

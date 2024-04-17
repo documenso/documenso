@@ -2,6 +2,7 @@ import * as React from 'react';
 
 import { cn } from '../lib/utils';
 
+<<<<<<< HEAD
 const Table = React.forwardRef<HTMLTableElement, React.HTMLAttributes<HTMLTableElement>>(
   ({ className, ...props }, ref) => (
     <div className="w-full overflow-auto">
@@ -9,6 +10,18 @@ const Table = React.forwardRef<HTMLTableElement, React.HTMLAttributes<HTMLTableE
     </div>
   ),
 );
+=======
+const Table = React.forwardRef<
+  HTMLTableElement,
+  React.HTMLAttributes<HTMLTableElement> & {
+    overflowHidden?: boolean;
+  }
+>(({ className, overflowHidden, ...props }, ref) => (
+  <div className={cn('w-full', overflowHidden ? 'overflow-hidden' : 'overflow-auto')}>
+    <table ref={ref} className={cn('w-full caption-bottom text-sm', className)} {...props} />
+  </div>
+));
+>>>>>>> main
 
 Table.displayName = 'Table';
 
@@ -76,11 +89,25 @@ TableHead.displayName = 'TableHead';
 
 const TableCell = React.forwardRef<
   HTMLTableCellElement,
+<<<<<<< HEAD
   React.TdHTMLAttributes<HTMLTableCellElement>
 >(({ className, ...props }, ref) => (
   <td
     ref={ref}
     className={cn('truncate p-4 align-middle [&:has([role=checkbox])]:pr-0', className)}
+=======
+  React.TdHTMLAttributes<HTMLTableCellElement> & {
+    truncate?: boolean;
+  }
+>(({ className, truncate = true, ...props }, ref) => (
+  <td
+    ref={ref}
+    className={cn(
+      'p-4 align-middle [&:has([role=checkbox])]:pr-0',
+      truncate && 'truncate',
+      className,
+    )}
+>>>>>>> main
     {...props}
   />
 ));

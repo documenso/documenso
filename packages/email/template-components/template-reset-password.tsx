@@ -1,7 +1,13 @@
+<<<<<<< HEAD
 import { Button, Section, Tailwind, Text } from '@react-email/components';
 
 import * as config from '@documenso/tailwind-config';
 
+=======
+import { env } from 'next-runtime-env';
+
+import { Button, Section, Text } from '../components';
+>>>>>>> main
 import { TemplateDocumentImage } from './template-document-image';
 
 export interface TemplateResetPasswordProps {
@@ -11,6 +17,7 @@ export interface TemplateResetPasswordProps {
 }
 
 export const TemplateResetPassword = ({ assetBaseUrl }: TemplateResetPasswordProps) => {
+<<<<<<< HEAD
   return (
     <Tailwind
       config={{
@@ -21,6 +28,12 @@ export const TemplateResetPassword = ({ assetBaseUrl }: TemplateResetPasswordPro
         },
       }}
     >
+=======
+  const NEXT_PUBLIC_WEBAPP_URL = env('NEXT_PUBLIC_WEBAPP_URL');
+
+  return (
+    <>
+>>>>>>> main
       <TemplateDocumentImage className="mt-6" assetBaseUrl={assetBaseUrl} />
 
       <Section className="flex-row items-center justify-center">
@@ -35,13 +48,21 @@ export const TemplateResetPassword = ({ assetBaseUrl }: TemplateResetPasswordPro
         <Section className="mb-6 mt-8 text-center">
           <Button
             className="bg-documenso-500 inline-flex items-center justify-center rounded-lg px-6 py-3 text-center text-sm font-medium text-black no-underline"
+<<<<<<< HEAD
             href={`${process.env.NEXT_PUBLIC_WEBAPP_URL ?? 'http://localhost:3000'}/signin`}
+=======
+            href={`${NEXT_PUBLIC_WEBAPP_URL ?? 'http://localhost:3000'}/signin`}
+>>>>>>> main
           >
             Sign In
           </Button>
         </Section>
       </Section>
+<<<<<<< HEAD
     </Tailwind>
+=======
+    </>
+>>>>>>> main
   );
 };
 

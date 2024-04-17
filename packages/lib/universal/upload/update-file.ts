@@ -3,8 +3,11 @@ import { match } from 'ts-pattern';
 
 import { DocumentDataType } from '@documenso/prisma/client';
 
+<<<<<<< HEAD
 import { getAbsolutePresignPostUrl } from './server-actions';
 
+=======
+>>>>>>> main
 export type UpdateFileOptions = {
   type: DocumentDataType;
   oldData: string;
@@ -40,6 +43,11 @@ const updateFileWithBytes64 = (data: string) => {
 };
 
 const updateFileWithS3 = async (key: string, data: string) => {
+<<<<<<< HEAD
+=======
+  const { getAbsolutePresignPostUrl } = await import('./server-actions');
+
+>>>>>>> main
   const { url } = await getAbsolutePresignPostUrl(key);
 
   const response = await fetch(url, {

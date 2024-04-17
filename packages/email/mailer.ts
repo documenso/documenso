@@ -42,12 +42,17 @@ const getTransport = () => {
     });
   }
 
+<<<<<<< HEAD
   if (!process.env.NEXT_PRIVATE_SMTP_HOST) {
     throw new Error('SMTP transport requires NEXT_PRIVATE_SMTP_HOST');
   }
 
   return createTransport({
     host: process.env.NEXT_PRIVATE_SMTP_HOST,
+=======
+  return createTransport({
+    host: process.env.NEXT_PRIVATE_SMTP_HOST ?? 'localhost:2500',
+>>>>>>> main
     port: Number(process.env.NEXT_PRIVATE_SMTP_PORT) || 587,
     secure: process.env.NEXT_PRIVATE_SMTP_SECURE === 'true',
     auth: {

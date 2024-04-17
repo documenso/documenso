@@ -1,16 +1,33 @@
+<<<<<<< HEAD
 import { compare, hash } from 'bcrypt';
 
 import { prisma } from '@documenso/prisma';
 
 import { SALT_ROUNDS } from '../../constants/auth';
+=======
+import { compare, hash } from '@node-rs/bcrypt';
+
+import { prisma } from '@documenso/prisma';
+import { UserSecurityAuditLogType } from '@documenso/prisma/client';
+
+import { SALT_ROUNDS } from '../../constants/auth';
+import type { RequestMetadata } from '../../universal/extract-request-metadata';
+>>>>>>> main
 import { sendResetPassword } from '../auth/send-reset-password';
 
 export type ResetPasswordOptions = {
   token: string;
   password: string;
+<<<<<<< HEAD
 };
 
 export const resetPassword = async ({ token, password }: ResetPasswordOptions) => {
+=======
+  requestMetadata?: RequestMetadata;
+};
+
+export const resetPassword = async ({ token, password, requestMetadata }: ResetPasswordOptions) => {
+>>>>>>> main
   if (!token) {
     throw new Error('Invalid token provided. Please try again.');
   }
@@ -56,6 +73,17 @@ export const resetPassword = async ({ token, password }: ResetPasswordOptions) =
         userId: foundToken.userId,
       },
     }),
+<<<<<<< HEAD
+=======
+    prisma.userSecurityAuditLog.create({
+      data: {
+        userId: foundToken.userId,
+        type: UserSecurityAuditLogType.PASSWORD_RESET,
+        userAgent: requestMetadata?.userAgent,
+        ipAddress: requestMetadata?.ipAddress,
+      },
+    }),
+>>>>>>> main
   ]);
 
   await sendResetPassword({ userId: foundToken.userId });

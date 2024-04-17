@@ -3,7 +3,12 @@
 import * as React from 'react';
 
 import * as SheetPrimitive from '@radix-ui/react-dialog';
+<<<<<<< HEAD
 import { VariantProps, cva } from 'class-variance-authority';
+=======
+import type { VariantProps } from 'class-variance-authority';
+import { cva } from 'class-variance-authority';
+>>>>>>> main
 import { X } from 'lucide-react';
 
 import { cn } from '../lib/utils';
@@ -12,7 +17,11 @@ const Sheet = SheetPrimitive.Root;
 
 const SheetTrigger = SheetPrimitive.Trigger;
 
+<<<<<<< HEAD
 const portalVariants = cva('fixed inset-0 z-50 flex', {
+=======
+const portalVariants = cva('fixed inset-0 z-[61] flex', {
+>>>>>>> main
   variants: {
     position: {
       top: 'items-start',
@@ -28,8 +37,13 @@ interface SheetPortalProps
   extends SheetPrimitive.DialogPortalProps,
     VariantProps<typeof portalVariants> {}
 
+<<<<<<< HEAD
 const SheetPortal = ({ position, className, children, ...props }: SheetPortalProps) => (
   <SheetPrimitive.Portal className={cn(className)} {...props}>
+=======
+const SheetPortal = ({ position, children, ...props }: SheetPortalProps) => (
+  <SheetPrimitive.Portal {...props}>
+>>>>>>> main
     <div className={portalVariants({ position })}>{children}</div>
   </SheetPrimitive.Portal>
 );
@@ -42,7 +56,11 @@ const SheetOverlay = React.forwardRef<
 >(({ className, children: _children, ...props }, ref) => (
   <SheetPrimitive.Overlay
     className={cn(
+<<<<<<< HEAD
       'bg-background/80 data-[state=closed]:animate-out data-[state=closed]:fade-out data-[state=open]:fade-in fixed inset-0 z-50 backdrop-blur-sm transition-all duration-100',
+=======
+      'bg-background/80 data-[state=closed]:animate-out data-[state=closed]:fade-out data-[state=open]:fade-in fixed inset-0 z-[61] backdrop-blur-sm transition-all duration-100',
+>>>>>>> main
       className,
     )}
     {...props}
@@ -53,7 +71,11 @@ const SheetOverlay = React.forwardRef<
 SheetOverlay.displayName = SheetPrimitive.Overlay.displayName;
 
 const sheetVariants = cva(
+<<<<<<< HEAD
   'fixed z-50 scale-100 gap-4 bg-background p-6 opacity-100 shadow-lg border',
+=======
+  'fixed z-[61] scale-100 gap-4 bg-background p-6 opacity-100 shadow-lg border',
+>>>>>>> main
   {
     variants: {
       position: {
@@ -142,14 +164,27 @@ const sheetVariants = cva(
 
 export interface DialogContentProps
   extends React.ComponentPropsWithoutRef<typeof SheetPrimitive.Content>,
+<<<<<<< HEAD
     VariantProps<typeof sheetVariants> {}
+=======
+    VariantProps<typeof sheetVariants> {
+  showOverlay?: boolean;
+  sheetClass?: string;
+}
+>>>>>>> main
 
 const SheetContent = React.forwardRef<
   React.ElementRef<typeof SheetPrimitive.Content>,
   DialogContentProps
+<<<<<<< HEAD
 >(({ position, size, className, children, ...props }, ref) => (
   <SheetPortal position={position}>
     <SheetOverlay />
+=======
+>(({ position, size, className, sheetClass, showOverlay = true, children, ...props }, ref) => (
+  <SheetPortal position={position}>
+    {showOverlay && <SheetOverlay className={sheetClass} />}
+>>>>>>> main
     <SheetPrimitive.Content
       ref={ref}
       className={cn(sheetVariants({ position, size }), className)}
