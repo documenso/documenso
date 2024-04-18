@@ -120,8 +120,8 @@ export const resendDocument = async ({
       const { actionVerb } = RECIPIENT_ROLES_DESCRIPTION[recipient.role];
 
       const emailSubject = selfSigner
-        ? `Please ${actionVerb.toLowerCase()} your document`
-        : `Please ${actionVerb.toLowerCase()} this document`;
+        ? `Reminder: Please ${actionVerb.toLowerCase()} your document`
+        : `Reminder: Please ${actionVerb.toLowerCase()} this document`;
 
       await prisma.$transaction(
         async (tx) => {
