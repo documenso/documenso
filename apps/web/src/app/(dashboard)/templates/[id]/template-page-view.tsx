@@ -44,7 +44,7 @@ export const TemplatePageView = async ({ params, team }: TemplatePageViewProps) 
     redirect(templateRootPath);
   }
 
-  const { templateDocumentData } = template;
+  const { templateDocumentData, templateDocumentMeta } = template;
 
   const [templateRecipients, templateFields] = await Promise.all([
     getRecipientsForTemplate({
@@ -79,6 +79,7 @@ export const TemplatePageView = async ({ params, team }: TemplatePageViewProps) 
         recipients={templateRecipients}
         fields={templateFields}
         documentData={templateDocumentData}
+        documemntMeta={templateDocumentMeta}
         templateRootPath={templateRootPath}
       />
     </div>

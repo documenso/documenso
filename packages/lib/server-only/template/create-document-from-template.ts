@@ -42,6 +42,7 @@ export const createDocumentFromTemplate = async ({
       Recipient: true,
       Field: true,
       templateDocumentData: true,
+      templateDocumentMeta: true,
     },
   });
 
@@ -57,12 +58,24 @@ export const createDocumentFromTemplate = async ({
     },
   });
 
+  // const templateDocumentMeta = await prisma.documentMeta.create({
+  //   data: {
+  //     subject: template.templateDocumentMeta.subject,
+  //     message: template.templateDocumentMeta.message,
+  //     timezone: template.templateDocumentMeta.timezone,
+  //     password: template.templateDocumentMeta.password,
+  //     dateFormat: template.templateDocumentMeta.dateFormat,
+  //     redirectUrl: template.templateDocumentMeta.redirectUrl,
+  //   },
+  // });
+
   const document = await prisma.document.create({
     data: {
       userId,
       teamId: template.teamId,
       title: template.title,
       documentDataId: documentData.id,
+      // documentMeta: templateDocumentMeta,
       Recipient: {
         create: template.Recipient.map((recipient) => ({
           email: recipient.email,

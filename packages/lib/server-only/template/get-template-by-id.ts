@@ -29,6 +29,7 @@ export const getTemplateById = async ({ id, userId }: GetTemplateByIdOptions) =>
     where: whereFilter,
     include: {
       templateDocumentData: true,
+      templateDocumentMeta: true,
     },
   });
 };

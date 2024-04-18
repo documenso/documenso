@@ -1,9 +1,15 @@
+/* eslint-disable unused-imports/no-unused-imports */
+
+/* eslint-disable @typescript-eslint/consistent-type-imports */
+
+/* eslint-disable unused-imports/no-unused-vars */
 'use client';
 
 import { useState } from 'react';
 
 import { useRouter } from 'next/navigation';
 
+import { DO_NOT_INVALIDATE_QUERY_ON_MUTATION } from '@documenso/lib/constants/trpc';
 import type { DocumentData, Field, Recipient, Template, User } from '@documenso/prisma/client';
 import { trpc } from '@documenso/trpc/react';
 import { cn } from '@documenso/ui/lib/utils';
@@ -19,7 +25,13 @@ import { AddTemplateFieldsFormPartial } from '@documenso/ui/primitives/template-
 import type { TAddTemplateFieldsFormSchema } from '@documenso/ui/primitives/template-flow/add-template-fields.types';
 import { AddTemplatePlaceholderRecipientsFormPartial } from '@documenso/ui/primitives/template-flow/add-template-placeholder-recipients';
 import type { TAddTemplatePlacholderRecipientsFormSchema } from '@documenso/ui/primitives/template-flow/add-template-placeholder-recipients.types';
+import { AddTemplateSettingsFormPartial } from '@documenso/ui/primitives/template-flow/add-template-settings';
+import { TTemplateSettingsFormSchema } from '@documenso/ui/primitives/template-flow/add-template-settings.types';
 import { useToast } from '@documenso/ui/primitives/use-toast';
+
+/* eslint-disable unused-imports/no-unused-imports */
+/* eslint-disable @typescript-eslint/consistent-type-imports */
+/* eslint-disable unused-imports/no-unused-vars */
 
 export type EditTemplateFormProps = {
   className?: string;
@@ -31,8 +43,8 @@ export type EditTemplateFormProps = {
   templateRootPath: string;
 };
 
-type EditTemplateStep = 'signers' | 'fields';
-const EditTemplateSteps: EditTemplateStep[] = ['signers', 'fields'];
+type EditTemplateStep = 'settings' | 'signers' | 'fields';
+const EditTemplateSteps: EditTemplateStep[] = ['settings', 'signers', 'fields'];
 
 export const EditTemplateForm = ({
   className,
@@ -49,15 +61,20 @@ export const EditTemplateForm = ({
   const [step, setStep] = useState<EditTemplateStep>('signers');
 
   const documentFlow: Record<EditTemplateStep, DocumentFlowStep> = {
+    settings: {
+      title: 'General',
+      description: 'Configure general settings for the document.',
+      stepIndex: 1,
+    },
     signers: {
       title: 'Add Placeholders',
       description: 'Add all relevant placeholders for each recipient.',
-      stepIndex: 1,
+      stepIndex: 2,
     },
     fields: {
       title: 'Add Fields',
       description: 'Add all relevant fields for each recipient.',
-      stepIndex: 2,
+      stepIndex: 3,
     },
   };
 
@@ -85,6 +102,35 @@ export const EditTemplateForm = ({
         variant: 'destructive',
       });
     }
+  };
+
+  const onAddTemplateSettingsFormSubmit = async (data: TTemplateSettingsFormSchema) => {
+    // try {
+    //   const { timezone, dateFormat, redirectUrl } = data.meta;
+    //   await setSettingsForDocument({
+    //     documentId: document.id,
+    //     data: {
+    //       title: data.title,
+    //       globalAccessAuth: data.globalAccessAuth ?? null,
+    //       globalActionAuth: data.globalActionAuth ?? null,
+    //     },
+    //     meta: {
+    //       timezone,
+    //       dateFormat,
+    //       redirectUrl,
+    //     },
+    //   });
+    //   // Router refresh is here to clear the router cache for when navigating to /documents.
+    //   router.refresh();
+    //   setStep('signers');
+    // } catch (err) {
+    //   console.error(err);
+    //   toast({
+    //     title: 'Error',
+    //     description: 'An error occurred while updating the document settings.',
+    //     variant: 'destructive',
+    //   });
+    // }
   };
 
   const onAddFieldsFormSubmit = async (data: TAddTemplateFieldsFormSchema) => {
@@ -135,6 +181,13 @@ export const EditTemplateForm = ({
             currentStep={currentDocumentFlow.stepIndex}
             setCurrentStep={(step) => setStep(EditTemplateSteps[step - 1])}
           >
+            <AddTemplateSettingsFormPartial
+              key={recipients.length}
+              documentFlow={documentFlow.signers}
+              recipients={recipients}
+              fields={fields}
+              onSubmit={onAddTemplateSettingsFormSubmit}
+            />
             <AddTemplatePlaceholderRecipientsFormPartial
               key={recipients.length}
               documentFlow={documentFlow.signers}

@@ -37,6 +37,7 @@ export const findTemplates = async ({
       where: whereFilter,
       include: {
         templateDocumentData: true,
+        templateDocumentMeta: true,
         team: {
           select: {
             id: true,

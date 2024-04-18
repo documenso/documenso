@@ -38,6 +38,7 @@ export const duplicateTemplate = async ({
       Recipient: true,
       Field: true,
       templateDocumentData: true,
+      templateDocumentMeta: true,
     },
   });
 
