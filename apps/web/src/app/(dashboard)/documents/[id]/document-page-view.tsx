@@ -8,6 +8,7 @@ import { DOCUMENSO_ENCRYPTION_KEY } from '@documenso/lib/constants/crypto';
 import { getRequiredServerComponentSession } from '@documenso/lib/next-auth/get-server-component-session';
 import { getDocumentById } from '@documenso/lib/server-only/document/get-document-by-id';
 import { getServerComponentFlag } from '@documenso/lib/server-only/feature-flags/get-server-component-feature-flag';
+import { getCompletedFieldsForDocument } from '@documenso/lib/server-only/field/get-completed-fields-for-document';
 import { getRecipientsForDocument } from '@documenso/lib/server-only/recipient/get-recipients-for-document';
 import { symmetricDecrypt } from '@documenso/lib/universal/crypto';
 import { formatDocumentsPath } from '@documenso/lib/utils/teams';
@@ -19,6 +20,7 @@ import { LazyPDFViewer } from '@documenso/ui/primitives/lazy-pdf-viewer';
 
 import { StackAvatarsWithTooltip } from '~/components/(dashboard)/avatar/stack-avatars-with-tooltip';
 import { DocumentHistorySheet } from '~/components/document/document-history-sheet';
+import { DocumentReadOnlyFields } from '~/components/document/document-read-only-fields';
 import {
   DocumentStatus as DocumentStatusComponent,
   FRIENDLY_STATUS_MAP,
@@ -83,11 +85,16 @@ export const DocumentPageView = async ({ params, team }: DocumentPageViewProps) 
     documentMeta.password = securePassword;
   }
 
-  const recipients = await getRecipientsForDocument({
-    documentId,
-    teamId: team?.id,
-    userId: user.id,
-  });
+  const [recipients, completedFields] = await Promise.all([
+    getRecipientsForDocument({
+      documentId,
+      teamId: team?.id,
+      userId: user.id,
+    }),
+    getCompletedFieldsForDocument({
+      documentId,
+    }),
+  ]);
 
   const documentWithRecipients = {
     ...document,
@@ -147,6 +154,13 @@ export const DocumentPageView = async ({ params, team }: DocumentPageViewProps) 
             <LazyPDFViewer document={document} key={documentData.id} documentData={documentData} />
           </CardContent>
         </Card>
+
+        {document.status === DocumentStatus.PENDING && (
+          <DocumentReadOnlyFields
+            fields={completedFields}
+            documentMeta={document.documentMeta || undefined}
+          />
+        )}
 
         <div className="col-span-12 lg:col-span-6 xl:col-span-5">
           <div className="space-y-6">
