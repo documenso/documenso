@@ -80,7 +80,7 @@ export const sendCompletedEmail = async ({ documentId, requestMetadata }: SendDo
       text: render(template, { plainText: true }),
       attachments: [
         {
-          filename: document.title.endsWith('.pdf') ? document.title : document.title + '.pdf',
+          filename: document.title,
           content: Buffer.from(completedDocument),
         },
       ],
