@@ -131,7 +131,7 @@ export default async function CompletedSigningPage({
               </div>
             ))
             .with({ deletedAt: null }, () => (
-              <div className="flex items-center text-center text-blue-600">
+              <div className="mt-4 flex items-center text-center text-blue-600">
                 <Clock8 className="mr-2 h-5 w-5" />
                 <span className="text-sm">Waiting for others to sign</span>
               </div>
