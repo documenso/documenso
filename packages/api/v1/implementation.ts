@@ -140,7 +140,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
       };
     } catch (err) {
       return {
-        status: 404,
+        status: 500,
         body: {
           message: 'Error downloading the document. Please try again.',
         },
