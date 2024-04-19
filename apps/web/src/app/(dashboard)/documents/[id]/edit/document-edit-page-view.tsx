@@ -92,7 +92,11 @@ export const DocumentEditPageView = async ({ params, team }: DocumentEditPageVie
           <div className="text-muted-foreground flex items-center">
             <Users2 className="mr-2 h-5 w-5" />
 
-            <StackAvatarsWithTooltip recipients={recipients} position="bottom">
+            <StackAvatarsWithTooltip
+              recipients={recipients}
+              documentStatus={document.status}
+              position="bottom"
+            >
               <span>{recipients.length} Recipient(s)</span>
             </StackAvatarsWithTooltip>
           </div>
