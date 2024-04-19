@@ -56,7 +56,7 @@ export function AvatarWithRecipient({ recipient, documentStatus }: AvatarWithRec
 
       <div
         className="text-muted-foreground text-sm"
-        title="Click to copy signing link for sending to recipient"
+        title={signingToken ? 'Click to copy signing link for sending to recipient' : undefined}
       >
         <p>{recipient.email}</p>
         <p className="text-muted-foreground/70 text-xs">
