@@ -36,8 +36,8 @@ export const removeSignedFieldWithToken = async ({
     throw new Error(`Document not found for field ${field.id}`);
   }
 
-  if (document.status === DocumentStatus.COMPLETED) {
-    throw new Error(`Document ${document.id} has already been completed`);
+  if (document.status !== DocumentStatus.PENDING) {
+    throw new Error(`Document ${document.id} must be pending`);
   }
 
   if (recipient?.signingStatus === SigningStatus.SIGNED) {

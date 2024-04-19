@@ -347,23 +347,24 @@ enum RecipientRole {
 }
 
 model Recipient {
-  id            Int           @id @default(autoincrement())
-  documentId    Int?
-  templateId    Int?
-  email         String        @db.VarChar(255)
-  name          String        @default("") @db.VarChar(255)
-  token         String
-  expired       DateTime?
-  signedAt      DateTime?
-  authOptions   Json?
-  role          RecipientRole @default(SIGNER)
-  readStatus    ReadStatus    @default(NOT_OPENED)
-  signingStatus SigningStatus @default(NOT_SIGNED)
-  sendStatus    SendStatus    @default(NOT_SENT)
-  Document      Document?     @relation(fields: [documentId], references: [id], onDelete: Cascade)
-  Template      Template?     @relation(fields: [templateId], references: [id], onDelete: Cascade)
-  Field         Field[]
-  Signature     Signature[]
+  id                Int           @id @default(autoincrement())
+  documentId        Int?
+  templateId        Int?
+  email             String        @db.VarChar(255)
+  name              String        @default("") @db.VarChar(255)
+  token             String
+  documentDeletedAt DateTime?
+  expired           DateTime?
+  signedAt          DateTime?
+  authOptions       Json?
+  role              RecipientRole @default(SIGNER)
+  readStatus        ReadStatus    @default(NOT_OPENED)
+  signingStatus     SigningStatus @default(NOT_SIGNED)
+  sendStatus        SendStatus    @default(NOT_SENT)
+  Document          Document?     @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  Template          Template?     @relation(fields: [templateId], references: [id], onDelete: Cascade)
+  Field             Field[]
+  Signature         Signature[]
 
   @@unique([documentId, email])
   @@unique([templateId, email])

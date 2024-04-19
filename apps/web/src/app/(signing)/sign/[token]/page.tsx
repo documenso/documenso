@@ -47,7 +47,12 @@ export default async function SigningPage({ params: { token } }: SigningPageProp
     getRecipientByToken({ token }).catch(() => null),
   ]);
 
-  if (!document || !document.documentData || !recipient) {
+  if (
+    !document ||
+    !document.documentData ||
+    !recipient ||
+    document.status === DocumentStatus.DRAFT
+  ) {
     return notFound();
   }
 
