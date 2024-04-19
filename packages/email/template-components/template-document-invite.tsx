@@ -23,19 +23,6 @@ export const TemplateDocumentInvite = ({
   selfSigner,
 }: TemplateDocumentInviteProps) => {
   const { actionVerb, progressiveVerb } = RECIPIENT_ROLES_DESCRIPTION[role];
-  const headerContent = selfSigner ? (
-    <>
-      {`Please ${actionVerb.toLowerCase()} your document`}
-      <br />
-      {`"${documentName}"`}
-    </>
-  ) : (
-    <>
-      {`${inviterName} has invited you to ${actionVerb.toLowerCase()}`}
-      <br />
-      {`"${documentName}"`}
-    </>
-  );
 
   return (
     <>
@@ -43,7 +30,19 @@ export const TemplateDocumentInvite = ({
 
       <Section>
         <Text className="text-primary mx-auto mb-0 max-w-[80%] text-center text-lg font-semibold">
-          {headerContent}
+          {selfSigner ? (
+            <>
+              {`Please ${actionVerb.toLowerCase()} your document`}
+              <br />
+              {`"${documentName}"`}
+            </>
+          ) : (
+            <>
+              {`${inviterName} has invited you to ${actionVerb.toLowerCase()}`}
+              <br />
+              {`"${documentName}"`}
+            </>
+          )}
         </Text>
 
         <Text className="my-1 text-center text-base text-slate-400">
