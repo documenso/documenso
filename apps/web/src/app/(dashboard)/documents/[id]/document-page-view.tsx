@@ -12,7 +12,8 @@ import { getRecipientsForDocument } from '@documenso/lib/server-only/recipient/g
 import { symmetricDecrypt } from '@documenso/lib/universal/crypto';
 import { formatDocumentsPath } from '@documenso/lib/utils/teams';
 import { DocumentStatus } from '@documenso/prisma/client';
-import type { Team } from '@documenso/prisma/client';
+import type { Team, TeamEmail } from '@documenso/prisma/client';
+import { Badge } from '@documenso/ui/primitives/badge';
 import { Button } from '@documenso/ui/primitives/button';
 import { Card, CardContent } from '@documenso/ui/primitives/card';
 import { LazyPDFViewer } from '@documenso/ui/primitives/lazy-pdf-viewer';
@@ -34,7 +35,7 @@ export type DocumentPageViewProps = {
   params: {
     id: string;
   };
-  team?: Team;
+  team?: Team & { teamEmail: TeamEmail | null };
 };
 
 export const DocumentPageView = async ({ params, team }: DocumentPageViewProps) => {
@@ -127,6 +128,8 @@ export const DocumentPageView = async ({ params, team }: DocumentPageViewProps) 
                 </StackAvatarsWithTooltip>
               </div>
             )}
+
+            {document.deletedAt && <Badge variant="destructive">Document deleted</Badge>}
           </div>
         </div>
 

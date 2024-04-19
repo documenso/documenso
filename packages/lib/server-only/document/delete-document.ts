@@ -6,6 +6,7 @@ import { mailer } from '@documenso/email/mailer';
 import { render } from '@documenso/email/render';
 import DocumentCancelTemplate from '@documenso/email/templates/document-cancel';
 import { prisma } from '@documenso/prisma';
+import type { Document, DocumentMeta, Recipient, User } from '@documenso/prisma/client';
 import { DocumentStatus } from '@documenso/prisma/client';
 
 import { NEXT_PUBLIC_WEBAPP_URL } from '../../constants/app';
@@ -27,110 +28,178 @@ export const deleteDocument = async ({
   teamId,
   requestMetadata,
 }: DeleteDocumentOptions) => {
+  const user = await prisma.user.findUnique({
+    where: {
+      id: userId,
+    },
+  });
+
+  if (!user) {
+    throw new Error('User not found');
+  }
+
   const document = await prisma.document.findUnique({
     where: {
       id,
-      ...(teamId
-        ? {
-            team: {
-              id: teamId,
-              members: {
-                some: {
-                  userId,
-                },
-              },
-            },
-          }
-        : {
-            userId,
-            teamId: null,
-          }),
     },
     include: {
       Recipient: true,
       documentMeta: true,
-      User: true,
+      team: {
+        select: {
+          members: true,
+        },
+      },
     },
   });
 
-  if (!document) {
+  if (!document || (teamId !== undefined && teamId !== document.teamId)) {
     throw new Error('Document not found');
   }
 
-  const { status, User: user } = document;
+  const isUserOwner = document.userId === userId;
+  const isUserTeamMember = document.team?.members.some((member) => member.userId === userId);
+  const userRecipient = document.Recipient.find((recipient) => recipient.email === user.email);
 
-  // if the document is a draft, hard-delete
-  if (status === DocumentStatus.DRAFT) {
+  if (!isUserOwner && !isUserTeamMember && !userRecipient) {
+    throw new Error('Not allowed');
+  }
+
+  // Handle hard or soft deleting the actual document if user has permission.
+  if (isUserOwner || isUserTeamMember) {
+    await handleDocumentOwnerDelete({
+      document,
+      user,
+      requestMetadata,
+    });
+  }
+
+  // Continue to hide the document from the user if they are a recipient.
+  if (userRecipient?.documentDeletedAt === null) {
+    await prisma.recipient.update({
+      where: {
+        documentId_email: {
+          documentId: document.id,
+          email: user.email,
+        },
+      },
+      data: {
+        documentDeletedAt: new Date().toISOString(),
+      },
+    });
+  }
+
+  // Return partial document for API v1 response.
+  return {
+    id: document.id,
+    userId: document.userId,
+    teamId: document.teamId,
+    title: document.title,
+    status: document.status,
+    documentDataId: document.documentDataId,
+    createdAt: document.createdAt,
+    updatedAt: document.updatedAt,
+    completedAt: document.completedAt,
+  };
+};
+
+type HandleDocumentOwnerDeleteOptions = {
+  document: Document & {
+    Recipient: Recipient[];
+    documentMeta: DocumentMeta | null;
+  };
+  user: User;
+  requestMetadata?: RequestMetadata;
+};
+
+const handleDocumentOwnerDelete = async ({
+  document,
+  user,
+  requestMetadata,
+}: HandleDocumentOwnerDeleteOptions) => {
+  if (document.deletedAt) {
+    return;
+  }
+
+  // Soft delete completed documents.
+  if (document.status === DocumentStatus.COMPLETED) {
     return await prisma.$transaction(async (tx) => {
-      // Currently redundant since deleting a document will delete the audit logs.
-      // However may be useful if we disassociate audit lgos and documents if required.
       await tx.documentAuditLog.create({
         data: createDocumentAuditLogData({
-          documentId: id,
+          documentId: document.id,
           type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_DELETED,
           user,
           requestMetadata,
           data: {
-            type: 'HARD',
+            type: 'SOFT',
           },
         }),
       });
 
-      return await tx.document.delete({ where: { id, status: DocumentStatus.DRAFT } });
+      return await tx.document.update({
+        where: {
+          id: document.id,
+        },
+        data: {
+          deletedAt: new Date().toISOString(),
+        },
+      });
     });
   }
 
-  // if the document is pending, send cancellation emails to all recipients
-  if (status === DocumentStatus.PENDING && document.Recipient.length > 0) {
-    await Promise.all(
-      document.Recipient.map(async (recipient) => {
-        const assetBaseUrl = NEXT_PUBLIC_WEBAPP_URL() || 'http://localhost:3000';
-
-        const template = createElement(DocumentCancelTemplate, {
-          documentName: document.title,
-          inviterName: user.name || undefined,
-          inviterEmail: user.email,
-          assetBaseUrl,
-        });
-
-        await mailer.sendMail({
-          to: {
-            address: recipient.email,
-            name: recipient.name,
-          },
-          from: {
-            name: FROM_NAME,
-            address: FROM_ADDRESS,
-          },
-          subject: 'Document Cancelled',
-          html: render(template),
-          text: render(template, { plainText: true }),
-        });
-      }),
-    );
-  }
-
-  // If the document is not a draft, only soft-delete.
-  return await prisma.$transaction(async (tx) => {
+  // Hard delete draft and pending documents.
+  const deletedDocument = await prisma.$transaction(async (tx) => {
+    // Currently redundant since deleting a document will delete the audit logs.
+    // However may be useful if we disassociate audit logs and documents if required.
     await tx.documentAuditLog.create({
       data: createDocumentAuditLogData({
-        documentId: id,
+        documentId: document.id,
         type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_DELETED,
         user,
         requestMetadata,
         data: {
-          type: 'SOFT',
+          type: 'HARD',
         },
       }),
     });
 
-    return await tx.document.update({
+    return await tx.document.delete({
       where: {
-        id,
-      },
-      data: {
-        deletedAt: new Date().toISOString(),
+        id: document.id,
+        status: {
+          not: DocumentStatus.COMPLETED,
+        },
       },
     });
   });
+
+  // Send cancellation emails to recipients.
+  await Promise.all(
+    document.Recipient.map(async (recipient) => {
+      const assetBaseUrl = NEXT_PUBLIC_WEBAPP_URL() || 'http://localhost:3000';
+
+      const template = createElement(DocumentCancelTemplate, {
+        documentName: document.title,
+        inviterName: user.name || undefined,
+        inviterEmail: user.email,
+        assetBaseUrl,
+      });
+
+      await mailer.sendMail({
+        to: {
+          address: recipient.email,
+          name: recipient.name,
+        },
+        from: {
+          name: FROM_NAME,
+          address: FROM_ADDRESS,
+        },
+        subject: 'Document Cancelled',
+        html: render(template),
+        text: render(template, { plainText: true }),
+      });
+    }),
+  );
+
+  return deletedDocument;
 };
