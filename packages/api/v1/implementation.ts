@@ -105,11 +105,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
         teamId: team?.id,
       });
 
-      if (
-        !document ||
-        !document.documentDataId ||
-        DocumentDataType.S3_PATH !== document.documentData.type
-      ) {
+      if (!document || !document.documentDataId) {
         return {
           status: 404,
           body: {
@@ -118,9 +114,18 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
         };
       }
 
+      if (DocumentDataType.S3_PATH !== document.documentData.type) {
+        return {
+          status: 400,
+          body: {
+            message: 'Invalid document data type',
+          },
+        };
+      }
+
       if (document.status !== DocumentStatus.COMPLETED) {
         return {
-          status: 404,
+          status: 400,
           body: {
             message: 'Document is not completed yet.',
           },
