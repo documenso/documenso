@@ -5,20 +5,37 @@ import { Button, Section, Text } from '../components';
 import { TemplateDocumentImage } from './template-document-image';
 
 export interface TemplateDocumentInviteProps {
+  inviterName: string;
+  inviterEmail: string;
   documentName: string;
   signDocumentLink: string;
   assetBaseUrl: string;
   role: RecipientRole;
-  headerContent: React.ReactNode;
+  selfSigner: boolean;
 }
 
 export const TemplateDocumentInvite = ({
+  inviterName,
+  documentName,
   signDocumentLink,
   assetBaseUrl,
   role,
-  headerContent,
+  selfSigner,
 }: TemplateDocumentInviteProps) => {
   const { actionVerb, progressiveVerb } = RECIPIENT_ROLES_DESCRIPTION[role];
+  const headerContent = selfSigner ? (
+    <>
+      {`Please ${actionVerb.toLowerCase()} your document`}
+      <br />
+      {`"${documentName}"`}
+    </>
+  ) : (
+    <>
+      {`${inviterName} has invited you to ${actionVerb.toLowerCase()}`}
+      <br />
+      {`"${documentName}"`}
+    </>
+  );
 
   return (
     <>

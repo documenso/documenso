@@ -20,8 +20,6 @@ import { TemplateDocumentInvite } from '../template-components/template-document
 import { TemplateFooter } from '../template-components/template-footer';
 
 export type DocumentInviteEmailTemplateProps = Partial<TemplateDocumentInviteProps> & {
-  inviterName?: string;
-  inviterEmail: string;
   customBody?: string;
   role: RecipientRole;
   selfSigner?: boolean;
@@ -38,19 +36,6 @@ export const DocumentInviteEmailTemplate = ({
   selfSigner = false,
 }: DocumentInviteEmailTemplateProps) => {
   const action = RECIPIENT_ROLES_DESCRIPTION[role].actionVerb.toLowerCase();
-  const headerContent = selfSigner ? (
-    <>
-      {`Please ${action} your document`}
-      <br />
-      {`"${documentName}"`}
-    </>
-  ) : (
-    <>
-      {`${inviterName} has invited you to ${action}`}
-      <br />
-      {`"${documentName}"`}
-    </>
-  );
 
   const previewText = selfSigner
     ? `Please ${action} your document ${documentName}`
@@ -84,11 +69,13 @@ export const DocumentInviteEmailTemplate = ({
                 />
 
                 <TemplateDocumentInvite
+                  inviterName={inviterName}
+                  inviterEmail={inviterEmail}
                   documentName={documentName}
                   signDocumentLink={signDocumentLink}
                   assetBaseUrl={assetBaseUrl}
                   role={role}
-                  headerContent={headerContent}
+                  selfSigner={selfSigner}
                 />
               </Section>
             </Container>
