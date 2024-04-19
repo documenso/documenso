@@ -49,7 +49,12 @@ export default async function SigningPage({ params: { token } }: SigningPageProp
     getCompletedFieldsForToken({ token }),
   ]);
 
-  if (!document || !document.documentData || !recipient) {
+  if (
+    !document ||
+    !document.documentData ||
+    !recipient ||
+    document.status === DocumentStatus.DRAFT
+  ) {
     return notFound();
   }
 

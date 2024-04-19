@@ -158,6 +158,7 @@ export const SinglePlayerClient = () => {
     expired: null,
     signedAt: null,
     readStatus: 'OPENED',
+    documentDeletedAt: null,
     signingStatus: 'NOT_SIGNED',
     sendStatus: 'NOT_SENT',
     role: 'SIGNER',
