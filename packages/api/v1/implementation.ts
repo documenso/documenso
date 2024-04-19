@@ -23,7 +23,10 @@ import { createDocumentFromTemplate } from '@documenso/lib/server-only/template/
 import { extractNextApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 import { getFile } from '@documenso/lib/universal/upload/get-file';
 import { putFile } from '@documenso/lib/universal/upload/put-file';
-import { getPresignPostUrl } from '@documenso/lib/universal/upload/server-actions';
+import {
+  getPresignGetUrl,
+  getPresignPostUrl,
+} from '@documenso/lib/universal/upload/server-actions';
 import { DocumentDataType, DocumentStatus, SigningStatus } from '@documenso/prisma/client';
 
 import { ApiContractV1 } from './contract';
@@ -78,6 +81,68 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
         status: 404,
         body: {
           message: 'Document not found',
+        },
+      };
+    }
+  }),
+
+  downloadSignedDocument: authenticatedMiddleware(async (args, user, team) => {
+    const { id: documentId } = args.params;
+
+    try {
+      if (process.env.NEXT_PUBLIC_UPLOAD_TRANSPORT !== 's3') {
+        return {
+          status: 500,
+          body: {
+            message: 'Please make sure the storage transport is set to S3.',
+          },
+        };
+      }
+
+      const document = await getDocumentById({
+        id: Number(documentId),
+        userId: user.id,
+        teamId: team?.id,
+      });
+
+      if (!document || !document.documentDataId) {
+        return {
+          status: 404,
+          body: {
+            message: 'Document not found',
+          },
+        };
+      }
+
+      if (DocumentDataType.S3_PATH !== document.documentData.type) {
+        return {
+          status: 400,
+          body: {
+            message: 'Invalid document data type',
+          },
+        };
+      }
+
+      if (document.status !== DocumentStatus.COMPLETED) {
+        return {
+          status: 400,
+          body: {
+            message: 'Document is not completed yet.',
+          },
+        };
+      }
+
+      const { url } = await getPresignGetUrl(document.documentData.data);
+
+      return {
+        status: 200,
+        body: { downloadUrl: url },
+      };
+    } catch (err) {
+      return {
+        status: 500,
+        body: {
+          message: 'Error downloading the document. Please try again.',
         },
       };
     }
