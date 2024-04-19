@@ -5,7 +5,7 @@ import { useRef, useState } from 'react';
 import { getRecipientType } from '@documenso/lib/client-only/recipient-type';
 import { RECIPIENT_ROLES_DESCRIPTION } from '@documenso/lib/constants/recipient-roles';
 import { recipientAbbreviation } from '@documenso/lib/utils/recipient-formatter';
-import type { Recipient } from '@documenso/prisma/client';
+import type { DocumentStatus, Recipient } from '@documenso/prisma/client';
 import { Popover, PopoverContent, PopoverTrigger } from '@documenso/ui/primitives/popover';
 
 import { AvatarWithRecipient } from './avatar-with-recipient';
@@ -13,12 +13,14 @@ import { StackAvatar } from './stack-avatar';
 import { StackAvatars } from './stack-avatars';
 
 export type StackAvatarsWithTooltipProps = {
+  documentStatus: DocumentStatus;
   recipients: Recipient[];
   position?: 'top' | 'bottom';
   children?: React.ReactNode;
 };
 
 export const StackAvatarsWithTooltip = ({
+  documentStatus,
   recipients,
   position,
   children,
@@ -120,7 +122,11 @@ export const StackAvatarsWithTooltip = ({
           <div>
             <h1 className="text-base font-medium">Waiting</h1>
             {waitingRecipients.map((recipient: Recipient) => (
-              <AvatarWithRecipient key={recipient.id} recipient={recipient} />
+              <AvatarWithRecipient
+                key={recipient.id}
+                recipient={recipient}
+                documentStatus={documentStatus}
+              />
             ))}
           </div>
         )}
@@ -129,7 +135,11 @@ export const StackAvatarsWithTooltip = ({
           <div>
             <h1 className="text-base font-medium">Opened</h1>
             {openedRecipients.map((recipient: Recipient) => (
-              <AvatarWithRecipient key={recipient.id} recipient={recipient} />
+              <AvatarWithRecipient
+                key={recipient.id}
+                recipient={recipient}
+                documentStatus={documentStatus}
+              />
             ))}
           </div>
         )}
@@ -138,7 +148,11 @@ export const StackAvatarsWithTooltip = ({
           <div>
             <h1 className="text-base font-medium">Uncompleted</h1>
             {uncompletedRecipients.map((recipient: Recipient) => (
-              <AvatarWithRecipient key={recipient.id} recipient={recipient} />
+              <AvatarWithRecipient
+                key={recipient.id}
+                recipient={recipient}
+                documentStatus={documentStatus}
+              />
             ))}
           </div>
         )}

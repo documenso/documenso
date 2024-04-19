@@ -114,7 +114,7 @@ export const DataTableActionDropdown = ({ row, team }: DataTableActionDropdownPr
       <DropdownMenuContent className="w-52" align="start" forceMount>
         <DropdownMenuLabel>Action</DropdownMenuLabel>
 
-        {recipient && recipient?.role !== RecipientRole.CC && (
+        {!isDraft && recipient && recipient?.role !== RecipientRole.CC && (
           <DropdownMenuItem disabled={!recipient || isComplete} asChild>
             <Link href={`/sign/${recipient?.token}`}>
               {recipient?.role === RecipientRole.VIEWER && (
