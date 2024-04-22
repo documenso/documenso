@@ -3,7 +3,7 @@ import * as React from 'react';
 import { Eye, EyeOff } from 'lucide-react';
 import { Dot } from 'lucide-react';
 import { Check } from 'lucide-react';
-import { GoTriangleLeft } from 'react-icons/go';
+import { GoTriangleDown, GoTriangleRight } from 'react-icons/go';
 
 import { cn } from '../lib/utils';
 import { Button } from './button';
@@ -62,7 +62,7 @@ const HintedPasswordInput = React.forwardRef<HTMLInputElement, Omit<InputProps, 
             key={index}
             className={`${
               validation.success ? 'text-green-500' : 'text-muted-foreground'
-            } ml-3 flex items-center text-xs`}
+            } ml-3 flex items-center text-xs font-medium`}
             style={{ whiteSpace: 'nowrap' }}
           >
             {validation.success ? (
@@ -93,9 +93,12 @@ const HintedPasswordInput = React.forwardRef<HTMLInputElement, Omit<InputProps, 
         />
 
         {isFocused && (
-          <div className="absolute left-full top-1/2 flex -translate-y-1/2 transform items-center justify-center">
-            <GoTriangleLeft />
-            <div className="bg-background -ml-1 rounded shadow">{validationHints}</div>
+          <div className="absolute -top-[5.25rem] right-1/2 flex -translate-y-1/2 transform items-center justify-center max-lg:left-1/2 max-lg:flex-col lg:right-full lg:top-1/2">
+            <div className="z-50 -mr-1 rounded-md bg-gray-50 shadow dark:bg-neutral-900 max-lg:-mb-1">
+              {validationHints}
+            </div>
+            <GoTriangleRight className="max-lg:hidden" />
+            <GoTriangleDown className="lg:hidden" />
           </div>
         )}
 

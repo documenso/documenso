@@ -7,7 +7,8 @@ import { z } from 'zod';
 import type { User } from '@documenso/prisma/client';
 import { TRPCClientError } from '@documenso/trpc/client';
 import { trpc } from '@documenso/trpc/react';
-import { ZCurrentPasswordSchema, ZPasswordSchema } from '@documenso/trpc/server/auth-router/schema';
+import { ZCurrentPasswordSchema } from '@documenso/trpc/server/auth-router/schema';
+import { ZHintedPasswordSchema } from '@documenso/trpc/server/auth-router/schema';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
 import {
@@ -18,14 +19,15 @@ import {
   FormLabel,
   FormMessage,
 } from '@documenso/ui/primitives/form/form';
+import { HintedPasswordInput } from '@documenso/ui/primitives/hinted-password-input';
 import { PasswordInput } from '@documenso/ui/primitives/password-input';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
 export const ZPasswordFormSchema = z
   .object({
     currentPassword: ZCurrentPasswordSchema,
-    password: ZPasswordSchema,
-    repeatedPassword: ZPasswordSchema,
+    password: ZHintedPasswordSchema,
+    repeatedPassword: ZHintedPasswordSchema,
   })
   .refine((data) => data.password === data.repeatedPassword, {
     message: 'Passwords do not match',
@@ -115,7 +117,7 @@ export const PasswordForm = ({ className }: PasswordFormProps) => {
               <FormItem>
                 <FormLabel>Password</FormLabel>
                 <FormControl>
-                  <PasswordInput autoComplete="new-password" {...field} />
+                  <HintedPasswordInput autoComplete="new-password" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -129,7 +131,7 @@ export const PasswordForm = ({ className }: PasswordFormProps) => {
               <FormItem>
                 <FormLabel>Repeat Password</FormLabel>
                 <FormControl>
-                  <PasswordInput autoComplete="new-password" {...field} />
+                  <HintedPasswordInput autoComplete="new-password" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
