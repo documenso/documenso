@@ -2,11 +2,10 @@ import { useRouter } from 'next/navigation';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Plus } from 'lucide-react';
-import { Controller, useFieldArray, useForm } from 'react-hook-form';
+import { useFieldArray, useForm } from 'react-hook-form';
 import * as z from 'zod';
 
 import type { Recipient } from '@documenso/prisma/client';
-import { RecipientRole } from '@documenso/prisma/client';
 import { trpc } from '@documenso/trpc/react';
 import { Button } from '@documenso/ui/primitives/button';
 import {
@@ -19,24 +18,56 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@documenso/ui/primitives/dialog';
-import { FormErrorMessage } from '@documenso/ui/primitives/form/form-error-message';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@documenso/ui/primitives/form/form';
 import { Input } from '@documenso/ui/primitives/input';
-import { Label } from '@documenso/ui/primitives/label';
-import { ROLE_ICONS } from '@documenso/ui/primitives/recipient-role-icons';
-import { Select, SelectContent, SelectItem, SelectTrigger } from '@documenso/ui/primitives/select';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
 import { useOptionalCurrentTeam } from '~/providers/team';
 
-const ZAddRecipientsForNewDocumentSchema = z.object({
-  recipients: z.array(
-    z.object({
-      email: z.string().email(),
-      name: z.string(),
-      role: z.nativeEnum(RecipientRole),
-    }),
-  ),
-});
+const ZAddRecipientsForNewDocumentSchema = z
+  .object({
+    recipients: z.array(
+      z.object({
+        id: z.number(),
+        email: z.string().email(),
+        name: z.string(),
+      }),
+    ),
+  })
+  // Display exactly which rows are duplicates.
+  .superRefine((items, ctx) => {
+    const uniqueEmails = new Map<string, number>();
+
+    for (const [index, recipients] of items.recipients.entries()) {
+      const email = recipients.email.toLowerCase();
+
+      const firstFoundIndex = uniqueEmails.get(email);
+
+      if (firstFoundIndex === undefined) {
+        uniqueEmails.set(email, index);
+        continue;
+      }
+
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'Emails must be unique',
+        path: ['recipients', index, 'email'],
+      });
+
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'Emails must be unique',
+        path: ['recipients', firstFoundIndex, 'email'],
+      });
+    }
+  });
 
 type TAddRecipientsForNewDocumentSchema = z.infer<typeof ZAddRecipientsForNewDocumentSchema>;
 
@@ -56,33 +87,18 @@ export function UseTemplateDialog({
 
   const team = useOptionalCurrentTeam();
 
-  const {
-    control,
-    handleSubmit,
-    formState: { errors, isSubmitting },
-  } = useForm<TAddRecipientsForNewDocumentSchema>({
+  const form = useForm<TAddRecipientsForNewDocumentSchema>({
     resolver: zodResolver(ZAddRecipientsForNewDocumentSchema),
     defaultValues: {
-      recipients:
-        recipients.length > 0
-          ? recipients.map((recipient) => ({
-              nativeId: recipient.id,
-              formId: String(recipient.id),
-              name: recipient.name,
-              email: recipient.email,
-              role: recipient.role,
-            }))
-          : [
-              {
-                name: '',
-                email: '',
-                role: RecipientRole.SIGNER,
-              },
-            ],
+      recipients: recipients.map((recipient) => ({
+        id: recipient.id,
+        name: recipient.name,
+        email: recipient.email,
+      })),
     },
   });
 
-  const { mutateAsync: createDocumentFromTemplate, isLoading: isCreatingDocumentFromTemplate } =
+  const { mutateAsync: createDocumentFromTemplate } =
     trpc.template.createDocumentFromTemplate.useMutation();
 
   const onSubmit = async (data: TAddRecipientsForNewDocumentSchema) => {
@@ -109,10 +125,8 @@ export function UseTemplateDialog({
     }
   };
 
-  const onCreateDocumentFromTemplate = handleSubmit(onSubmit);
-
   const { fields: formRecipients } = useFieldArray({
-    control,
+    control: form.control,
     name: 'recipients',
   });
 
@@ -127,120 +141,65 @@ export function UseTemplateDialog({
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
           <DialogTitle>Document Recipients</DialogTitle>
-          <DialogDescription>Add the recipients to create the template with.</DialogDescription>
+          <DialogDescription>Add the recipients to create the template with</DialogDescription>
         </DialogHeader>
-        <div className="flex flex-col space-y-4">
-          {formRecipients.map((recipient, index) => (
-            <div
-              key={recipient.id}
-              data-native-id={recipient.id}
-              className="flex flex-wrap items-end gap-x-4"
+
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)}>
+            <fieldset
+              className="flex h-full flex-col space-y-4"
+              disabled={form.formState.isSubmitting}
             >
-              <div className="flex-1">
-                <Label htmlFor={`recipient-${recipient.id}-email`}>
-                  Email
-                  <span className="text-destructive ml-1 inline-block font-medium">*</span>
-                </Label>
+              <div className="custom-scrollbar -m-1 max-h-[60vh] space-y-4 overflow-y-auto p-1">
+                {formRecipients.map((recipient, index) => (
+                  <div className="flex w-full flex-row space-x-4" key={recipient.id}>
+                    <FormField
+                      control={form.control}
+                      name={`recipients.${index}.email`}
+                      render={({ field }) => (
+                        <FormItem className="w-full">
+                          {index === 0 && <FormLabel required>Email</FormLabel>}
 
-                <Controller
-                  control={control}
-                  name={`recipients.${index}.email`}
-                  render={({ field }) => (
-                    <Input
-                      id={`recipient-${recipient.id}-email`}
-                      type="email"
-                      className="bg-background mt-2"
-                      disabled={isSubmitting}
-                      {...field}
+                          <FormControl>
+                            <Input {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
                     />
-                  )}
-                />
-              </div>
 
-              <div className="flex-1">
-                <Label htmlFor={`recipient-${recipient.id}-name`}>Name</Label>
+                    <FormField
+                      control={form.control}
+                      name={`recipients.${index}.name`}
+                      render={({ field }) => (
+                        <FormItem className="w-full">
+                          {index === 0 && <FormLabel>Name</FormLabel>}
 
-                <Controller
-                  control={control}
-                  name={`recipients.${index}.name`}
-                  render={({ field }) => (
-                    <Input
-                      id={`recipient-${recipient.id}-name`}
-                      type="text"
-                      className="bg-background mt-2"
-                      disabled={isSubmitting}
-                      {...field}
+                          <FormControl>
+                            <Input {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
                     />
-                  )}
-                />
+                  </div>
+                ))}
               </div>
 
-              <div className="w-[60px]">
-                <Controller
-                  control={control}
-                  name={`recipients.${index}.role`}
-                  render={({ field: { value, onChange } }) => (
-                    <Select value={value} onValueChange={(x) => onChange(x)}>
-                      <SelectTrigger className="bg-background">{ROLE_ICONS[value]}</SelectTrigger>
+              <DialogFooter>
+                <DialogClose asChild>
+                  <Button type="button" variant="secondary">
+                    Close
+                  </Button>
+                </DialogClose>
 
-                      <SelectContent className="" align="end">
-                        <SelectItem value={RecipientRole.SIGNER}>
-                          <div className="flex items-center">
-                            <span className="mr-2">{ROLE_ICONS[RecipientRole.SIGNER]}</span>
-                            Signer
-                          </div>
-                        </SelectItem>
-
-                        <SelectItem value={RecipientRole.CC}>
-                          <div className="flex items-center">
-                            <span className="mr-2">{ROLE_ICONS[RecipientRole.CC]}</span>
-                            Receives copy
-                          </div>
-                        </SelectItem>
-
-                        <SelectItem value={RecipientRole.APPROVER}>
-                          <div className="flex items-center">
-                            <span className="mr-2">{ROLE_ICONS[RecipientRole.APPROVER]}</span>
-                            Approver
-                          </div>
-                        </SelectItem>
-
-                        <SelectItem value={RecipientRole.VIEWER}>
-                          <div className="flex items-center">
-                            <span className="mr-2">{ROLE_ICONS[RecipientRole.VIEWER]}</span>
-                            Viewer
-                          </div>
-                        </SelectItem>
-                      </SelectContent>
-                    </Select>
-                  )}
-                />
-              </div>
-
-              <div className="w-full">
-                <FormErrorMessage className="mt-2" error={errors.recipients?.[index]?.email} />
-                <FormErrorMessage className="mt-2" error={errors.recipients?.[index]?.name} />
-              </div>
-            </div>
-          ))}
-        </div>
-
-        <DialogFooter className="justify-end">
-          <DialogClose asChild>
-            <Button type="button" variant="secondary">
-              Close
-            </Button>
-          </DialogClose>
-
-          <Button
-            type="button"
-            loading={isCreatingDocumentFromTemplate}
-            disabled={isCreatingDocumentFromTemplate}
-            onClick={onCreateDocumentFromTemplate}
-          >
-            Create Document
-          </Button>
-        </DialogFooter>
+                <Button type="submit" loading={form.formState.isSubmitting}>
+                  Create Document
+                </Button>
+              </DialogFooter>
+            </fieldset>
+          </form>
+        </Form>
       </DialogContent>
     </Dialog>
   );

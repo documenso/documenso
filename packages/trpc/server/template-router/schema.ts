@@ -1,7 +1,5 @@
 import { z } from 'zod';
 
-import { RecipientRole } from '@documenso/prisma/client';
-
 export const ZCreateTemplateMutationSchema = z.object({
   title: z.string().min(1).trim(),
   teamId: z.number().optional(),
@@ -11,15 +9,13 @@ export const ZCreateTemplateMutationSchema = z.object({
 export const ZCreateDocumentFromTemplateMutationSchema = z.object({
   templateId: z.number(),
   teamId: z.number().optional(),
-  recipients: z
-    .array(
-      z.object({
-        email: z.string().email(),
-        name: z.string(),
-        role: z.nativeEnum(RecipientRole),
-      }),
-    )
-    .optional(),
+  recipients: z.array(
+    z.object({
+      id: z.number(),
+      email: z.string().email(),
+      name: z.string().optional(),
+    }),
+  ),
 });
 
 export const ZDuplicateTemplateMutationSchema = z.object({
