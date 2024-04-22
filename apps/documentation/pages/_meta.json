@@ -24,8 +24,8 @@
     "title": "API",
     "type": "page"
   },
-  "webhook": {
-    "title": "Webhook",
+  "webhooks": {
+    "title": "Webhooks",
     "type": "page"
   },
   "contributing": {

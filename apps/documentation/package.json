@@ -6,7 +6,9 @@
     "dev": "next dev -p 3002",
     "build": "next build",
     "start": "next start -p 3002",
-    "lint": "next lint"
+    "lint:fix": "next lint --fix",
+    "clean": "rimraf .next && rimraf node_modules",
+    "copy:pdfjs": "node ../../scripts/copy-pdfjs.cjs"
   },
   "dependencies": {
     "next": "14.0.3",

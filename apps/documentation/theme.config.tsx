@@ -2,7 +2,7 @@ import { useConfig } from 'nextra-theme-docs';
 import type { DocsThemeConfig } from 'nextra-theme-docs';
 
 const themeConfig: DocsThemeConfig = {
-  logo: <span>Documenso</span>,
+  logo: <span>Documenso Docs</span>,
   head: function useHead() {
     const config = useConfig<{ title?: string; description?: string }>();
 
