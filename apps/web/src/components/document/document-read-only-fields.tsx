@@ -75,7 +75,7 @@ export const DocumentReadOnlyFields = ({ documentMeta, fields }: DocumentReadOnl
                 </PopoverHover>
               </div>
 
-              <div className="text-muted-foreground">
+              <div className="text-muted-foreground break-all text-sm">
                 {match(field)
                   .with({ type: FieldType.SIGNATURE }, (field) =>
                     field.Signature?.signatureImageAsBase64 ? (
@@ -90,18 +90,17 @@ export const DocumentReadOnlyFields = ({ documentMeta, fields }: DocumentReadOnl
                       </p>
                     ),
                   )
-                  .with({ type: P.union(FieldType.NAME, FieldType.TEXT, FieldType.EMAIL) }, () => (
-                    <p className="text-muted-foreground text-lg">{field.customText}</p>
-                  ))
-                  .with({ type: FieldType.DATE }, () => (
-                    <p>
-                      {convertToLocalSystemFormat(
-                        field.customText,
-                        documentMeta?.dateFormat ?? DEFAULT_DOCUMENT_DATE_FORMAT,
-                        documentMeta?.timezone ?? DEFAULT_DOCUMENT_TIME_ZONE,
-                      )}
-                    </p>
-                  ))
+                  .with(
+                    { type: P.union(FieldType.NAME, FieldType.TEXT, FieldType.EMAIL) },
+                    () => field.customText,
+                  )
+                  .with({ type: FieldType.DATE }, () =>
+                    convertToLocalSystemFormat(
+                      field.customText,
+                      documentMeta?.dateFormat ?? DEFAULT_DOCUMENT_DATE_FORMAT,
+                      documentMeta?.timezone ?? DEFAULT_DOCUMENT_TIME_ZONE,
+                    ),
+                  )
                   .with({ type: FieldType.FREE_SIGNATURE }, () => null)
                   .exhaustive()}
               </div>
