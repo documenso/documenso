@@ -100,13 +100,21 @@ export type TCreateDocumentMutationResponseSchema = z.infer<
 
 export const ZCreateDocumentFromTemplateMutationSchema = z.object({
   title: z.string().min(1),
-  recipients: z.array(
-    z.object({
-      name: z.string().min(1),
-      email: z.string().email().min(1),
-      role: z.nativeEnum(RecipientRole).optional().default(RecipientRole.SIGNER),
-    }),
-  ),
+  recipients: z.union([
+    z.array(
+      z.object({
+        id: z.number(),
+        name: z.string().min(1),
+        email: z.string().email().min(1),
+      }),
+    ),
+    z.array(
+      z.object({
+        name: z.string().min(1),
+        email: z.string().email().min(1),
+      }),
+    ),
+  ]),
   meta: z
     .object({
       subject: z.string(),

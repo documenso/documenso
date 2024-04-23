@@ -1,15 +1,23 @@
 import { nanoid } from '@documenso/lib/universal/id';
 import { prisma } from '@documenso/prisma';
+import type { Recipient } from '@documenso/prisma/client';
+
+type RecipientWithId = {
+  id: number;
+  name?: string;
+  email: string;
+};
 
 export type CreateDocumentFromTemplateOptions = {
   templateId: number;
   userId: number;
   teamId?: number;
-  recipients: {
-    id: number;
-    name?: string;
-    email: string;
-  }[];
+  recipients:
+    | RecipientWithId[]
+    | {
+        name?: string;
+        email: string;
+      }[];
 };
 
 export const createDocumentFromTemplate = async ({
@@ -48,19 +56,38 @@ export const createDocumentFromTemplate = async ({
     throw new Error('Template not found.');
   }
 
-  const finalRecipients = template.Recipient.map((templateRecipient) => {
-    const foundRecipient = recipients.find((recipient) => recipient.id === templateRecipient.id);
+  if (recipients.length === 0 || recipients.length !== template.Recipient.length) {
+    throw new Error('Invalid number of recipients.');
+  }
 
-    if (!foundRecipient) {
-      throw new Error('Recipient not found.');
-    }
+  let finalRecipients: Pick<Recipient, 'name' | 'email' | 'role'>[] = [];
 
-    return {
-      name: foundRecipient.name,
-      email: foundRecipient.email,
-      role: templateRecipient.role,
-    };
-  });
+  if (Object.prototype.hasOwnProperty.call(recipients[0], 'id')) {
+    finalRecipients = template.Recipient.map((templateRecipient) => {
+      // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+      const foundRecipient = (recipients as RecipientWithId[]).find(
+        (recipient) => recipient.id === templateRecipient.id,
+      );
+
+      if (!foundRecipient) {
+        throw new Error('Recipient not found.');
+      }
+
+      return {
+        name: foundRecipient.name ?? '',
+        email: foundRecipient.email,
+        role: templateRecipient.role,
+      };
+    });
+  } else {
+    // Backwards compatible logic for /v1/ API where we use the index to associate
+    // the provided recipient with the template recipient.
+    finalRecipients = recipients.map((recipient, index) => ({
+      name: recipient.name ?? '',
+      email: recipient.email,
+      role: template.Recipient[index].role,
+    }));
+  }
 
   const documentData = await prisma.documentData.create({
     data: {
