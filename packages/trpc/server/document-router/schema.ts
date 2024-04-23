@@ -48,12 +48,6 @@ export const ZCreateDocumentMutationSchema = z.object({
   teamId: z.number().optional(),
 });
 
-export const ZUpdateDocumentMutationSchema = z.object({
-  documentId: z.number().min(1),
-  teamId: z.number().optional(),
-  data: z.any(),
-});
-
 export type TCreateDocumentMutationSchema = z.infer<typeof ZCreateDocumentMutationSchema>;
 
 export const ZSetSettingsForDocumentMutationSchema = z.object({

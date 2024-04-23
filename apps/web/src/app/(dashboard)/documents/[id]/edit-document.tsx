@@ -8,7 +8,6 @@ import {
   DO_NOT_INVALIDATE_QUERY_ON_MUTATION,
   SKIP_QUERY_BATCH_META,
 } from '@documenso/lib/constants/trpc';
-import { DocumentStatus, RecipientRole } from '@documenso/prisma/client';
 import type { DocumentWithDetails } from '@documenso/prisma/types/document';
 import { trpc } from '@documenso/trpc/react';
 import { cn } from '@documenso/ui/lib/utils';
@@ -68,10 +67,6 @@ export const EditDocumentForm = ({
     );
 
   const { Recipient: recipients, Field: fields } = document;
-
-  const allRecipientsAreCC = recipients.every((recipient) => recipient.role === RecipientRole.CC);
-
-  const { mutateAsync: updateDocumentStatus } = trpc.document.updateDocument.useMutation();
 
   const { mutateAsync: setSettingsForDocument } = trpc.document.setSettingsForDocument.useMutation({
     ...DO_NOT_INVALIDATE_QUERY_ON_MUTATION,
@@ -254,13 +249,6 @@ export const EditDocumentForm = ({
   const onAddSubjectFormSubmit = async (data: TAddSubjectFormSchema) => {
     const { subject, message } = data.meta;
     try {
-      if (allRecipientsAreCC) {
-        await updateDocumentStatus({
-          documentId: document.id,
-          data: { status: DocumentStatus.COMPLETED },
-        });
-      }
-
       await sendDocument({
         documentId: document.id,
         teamId: team?.id,

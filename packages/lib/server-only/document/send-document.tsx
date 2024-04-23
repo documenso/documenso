@@ -211,6 +211,10 @@ export const sendDocument = async ({
     }),
   );
 
+  const allRecipientsAreCC = document.Recipient.every(
+    (recipient) => recipient.role === RecipientRole.CC,
+  );
+
   const updatedDocument = await prisma.$transaction(async (tx) => {
     if (document.status === DocumentStatus.DRAFT) {
       await tx.documentAuditLog.create({
@@ -229,7 +233,7 @@ export const sendDocument = async ({
         id: documentId,
       },
       data: {
-        status: DocumentStatus.PENDING,
+        status: allRecipientsAreCC ? DocumentStatus.COMPLETED : DocumentStatus.PENDING,
       },
       include: {
         Recipient: true,
