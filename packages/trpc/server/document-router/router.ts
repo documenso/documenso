@@ -16,6 +16,7 @@ import { getDocumentWithDetailsById } from '@documenso/lib/server-only/document/
 import { resendDocument } from '@documenso/lib/server-only/document/resend-document';
 import { searchDocumentsWithKeyword } from '@documenso/lib/server-only/document/search-documents-with-keyword';
 import { sendDocument } from '@documenso/lib/server-only/document/send-document';
+import { updateDocument } from '@documenso/lib/server-only/document/update-document';
 import { updateDocumentSettings } from '@documenso/lib/server-only/document/update-document-settings';
 import { updateTitle } from '@documenso/lib/server-only/document/update-title';
 import { symmetricEncrypt } from '@documenso/lib/universal/crypto';
@@ -36,6 +37,7 @@ import {
   ZSetPasswordForDocumentMutationSchema,
   ZSetSettingsForDocumentMutationSchema,
   ZSetTitleForDocumentMutationSchema,
+  ZUpdateDocumentMutationSchema,
 } from './schema';
 
 export const documentRouter = router({
@@ -128,6 +130,23 @@ export const documentRouter = router({
         throw new TRPCError({
           code: 'BAD_REQUEST',
           message: 'We were unable to create this document. Please try again later.',
+        });
+      }
+    }),
+
+  updateDocument: authenticatedProcedure
+    .input(ZUpdateDocumentMutationSchema)
+    .mutation(async ({ input, ctx }) => {
+      try {
+        const { documentId, data } = input;
+
+        await updateDocument({ documentId, data, userId: ctx.user.id });
+      } catch (err) {
+        console.error(err);
+
+        throw new TRPCError({
+          code: 'BAD_REQUEST',
+          message: 'We were unable to delete this document. Please try again later.',
         });
       }
     }),
