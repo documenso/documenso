@@ -1,13 +1,15 @@
 import { useRouter } from 'next/navigation';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Plus } from 'lucide-react';
+import { InfoIcon, Plus } from 'lucide-react';
 import { useFieldArray, useForm } from 'react-hook-form';
 import * as z from 'zod';
 
+import { AppError } from '@documenso/lib/errors/app-error';
 import type { Recipient } from '@documenso/prisma/client';
 import { trpc } from '@documenso/trpc/react';
 import { Button } from '@documenso/ui/primitives/button';
+import { Checkbox } from '@documenso/ui/primitives/checkbox';
 import {
   Dialog,
   DialogClose,
@@ -27,12 +29,15 @@ import {
   FormMessage,
 } from '@documenso/ui/primitives/form/form';
 import { Input } from '@documenso/ui/primitives/input';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@documenso/ui/primitives/tooltip';
+import type { Toast } from '@documenso/ui/primitives/use-toast';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
 import { useOptionalCurrentTeam } from '~/providers/team';
 
 const ZAddRecipientsForNewDocumentSchema = z
   .object({
+    sendDocument: z.boolean(),
     recipients: z.array(
       z.object({
         id: z.number(),
@@ -90,6 +95,7 @@ export function UseTemplateDialog({
   const form = useForm<TAddRecipientsForNewDocumentSchema>({
     resolver: zodResolver(ZAddRecipientsForNewDocumentSchema),
     defaultValues: {
+      sendDocument: false,
       recipients: recipients.map((recipient) => ({
         id: recipient.id,
         name: recipient.name,
@@ -107,6 +113,7 @@ export function UseTemplateDialog({
         templateId,
         teamId: team?.id,
         recipients: data.recipients,
+        sendDocument: data.sendDocument,
       });
 
       toast({
@@ -117,11 +124,19 @@ export function UseTemplateDialog({
 
       router.push(`${documentRootPath}/${id}`);
     } catch (err) {
-      toast({
+      const error = AppError.parseError(err);
+
+      const toastPayload: Toast = {
         title: 'Error',
         description: 'An error occurred while creating document from template.',
         variant: 'destructive',
-      });
+      };
+
+      if (error.code === 'DOCUMENT_SEND_FAILED') {
+        toastPayload.description = 'The document was created but could not be sent to recipients.';
+      }
+
+      toast(toastPayload);
     }
   };
 
@@ -140,8 +155,8 @@ export function UseTemplateDialog({
       </DialogTrigger>
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
-          <DialogTitle>Document Recipients</DialogTitle>
-          <DialogDescription>Add the recipients to create the template with</DialogDescription>
+          <DialogTitle>Create document from template</DialogTitle>
+          <DialogDescription>Add the recipients to create the document with</DialogDescription>
         </DialogHeader>
 
         <Form {...form}>
@@ -161,7 +176,7 @@ export function UseTemplateDialog({
                           {index === 0 && <FormLabel required>Email</FormLabel>}
 
                           <FormControl>
-                            <Input {...field} />
+                            <Input {...field} placeholder={recipients[index].email} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -176,7 +191,7 @@ export function UseTemplateDialog({
                           {index === 0 && <FormLabel>Name</FormLabel>}
 
                           <FormControl>
-                            <Input {...field} />
+                            <Input {...field} placeholder={recipients[index].name} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -184,6 +199,47 @@ export function UseTemplateDialog({
                     />
                   </div>
                 ))}
+              </div>
+
+              <div className="mt-4 flex flex-row items-center">
+                <FormField
+                  control={form.control}
+                  name="sendDocument"
+                  render={({ field }) => (
+                    <FormItem>
+                      <div className="flex flex-row items-center">
+                        <Checkbox
+                          id="sendDocument"
+                          className="h-5 w-5"
+                          checkClassName="dark:text-white text-primary"
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                        />
+
+                        <label
+                          className="text-muted-foreground ml-2 flex items-center text-sm"
+                          htmlFor="sendDocument"
+                        >
+                          Send document
+                          <Tooltip>
+                            <TooltipTrigger type="button">
+                              <InfoIcon className="mx-1 h-4 w-4" />
+                            </TooltipTrigger>
+
+                            <TooltipContent className="text-muted-foreground z-[99999] max-w-md space-y-2 p-4">
+                              <p>
+                                The document will be immediately sent to recipients if this is
+                                checked.
+                              </p>
+
+                              <p>Otherwise, the document will be created as a draft.</p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </label>
+                      </div>
+                    </FormItem>
+                  )}
+                />
               </div>
 
               <DialogFooter>
@@ -194,7 +250,7 @@ export function UseTemplateDialog({
                 </DialogClose>
 
                 <Button type="submit" loading={form.formState.isSubmitting}>
-                  Create Document
+                  {form.getValues('sendDocument') ? 'Send' : 'Review'}
                 </Button>
               </DialogFooter>
             </fieldset>

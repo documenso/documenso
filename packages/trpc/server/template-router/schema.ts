@@ -16,6 +16,7 @@ export const ZCreateDocumentFromTemplateMutationSchema = z.object({
       name: z.string().optional(),
     }),
   ),
+  sendDocument: z.boolean().optional(),
 });
 
 export const ZDuplicateTemplateMutationSchema = z.object({
