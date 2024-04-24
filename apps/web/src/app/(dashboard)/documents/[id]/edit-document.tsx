@@ -248,6 +248,7 @@ export const EditDocumentForm = ({
 
   const onAddSubjectFormSubmit = async (data: TAddSubjectFormSchema) => {
     const { subject, message } = data.meta;
+
     try {
       await sendDocument({
         documentId: document.id,
