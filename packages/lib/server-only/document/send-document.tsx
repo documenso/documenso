@@ -4,6 +4,8 @@ import { mailer } from '@documenso/email/mailer';
 import { render } from '@documenso/email/render';
 import { DocumentInviteEmailTemplate } from '@documenso/email/templates/document-invite';
 import { FROM_ADDRESS, FROM_NAME } from '@documenso/lib/constants/email';
+import { sealDocument } from '@documenso/lib/server-only/document/seal-document';
+import { updateDocument } from '@documenso/lib/server-only/document/update-document';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
 import type { RequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 import { createDocumentAuditLogData } from '@documenso/lib/utils/document-audit-logs';
@@ -215,6 +217,17 @@ export const sendDocument = async ({
     (recipient) => recipient.role === RecipientRole.CC,
   );
 
+  if (allRecipientsAreCC) {
+    const updatedDocument = await updateDocument({
+      documentId,
+      userId,
+      teamId,
+      data: { status: DocumentStatus.COMPLETED },
+    });
+
+    return await sealDocument({ documentId: updatedDocument.id, requestMetadata });
+  }
+
   const updatedDocument = await prisma.$transaction(async (tx) => {
     if (document.status === DocumentStatus.DRAFT) {
       await tx.documentAuditLog.create({
@@ -233,7 +246,7 @@ export const sendDocument = async ({
         id: documentId,
       },
       data: {
-        status: allRecipientsAreCC ? DocumentStatus.COMPLETED : DocumentStatus.PENDING,
+        status: DocumentStatus.PENDING,
       },
       include: {
         Recipient: true,
