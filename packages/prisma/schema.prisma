@@ -98,7 +98,7 @@ model PasswordResetToken {
   createdAt DateTime @default(now())
   expiry    DateTime
   userId    Int
-  User      User     @relation(fields: [userId], references: [id])
+  User      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Passkey {
@@ -415,7 +415,7 @@ model Signature {
   typedSignature         String?
 
   Recipient Recipient @relation(fields: [recipientId], references: [id], onDelete: Cascade)
-  Field     Field     @relation(fields: [fieldId], references: [id], onDelete: Restrict)
+  Field     Field     @relation(fields: [fieldId], references: [id], onDelete: Cascade)
 
   @@index([recipientId])
 }
@@ -457,7 +457,7 @@ model Team {
   emailVerification    TeamEmailVerification?
   transferVerification TeamTransferVerification?
 
-  owner        User          @relation(fields: [ownerUserId], references: [id])
+  owner        User          @relation(fields: [ownerUserId], references: [id], onDelete: Cascade)
   subscription Subscription?
 
   document  Document[]
@@ -483,7 +483,7 @@ model TeamMember {
   createdAt DateTime       @default(now())
   role      TeamMemberRole
   userId    Int
-  user      User           @relation(fields: [userId], references: [id])
+  user      User           @relation(fields: [userId], references: [id], onDelete: Cascade)
   team      Team           @relation(fields: [teamId], references: [id], onDelete: Cascade)
 
   @@unique([userId, teamId])
@@ -564,5 +564,5 @@ model SiteSettings {
   data                 Json
   lastModifiedByUserId Int?
   lastModifiedAt       DateTime @default(now())
-  lastModifiedByUser   User?    @relation(fields: [lastModifiedByUserId], references: [id])
+  lastModifiedByUser   User?    @relation(fields: [lastModifiedByUserId], references: [id], onDelete: SetNull)
 }
