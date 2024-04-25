@@ -44,6 +44,46 @@ The screenshot below illustrates a newly created webhook subscription.
 
 You can edit or delete your webhook subscriptions by clicking the "**Edit**" or "**Delete**" buttons next to the webhook.
 
+## Webhook fields
+
+The payload sent to the webhook URL contains the following fields:
+
+| Field                                        | Type      | Description                                          |
+| -------------------------------------------- | --------- | ---------------------------------------------------- |
+| `event`                                      | string    | The type of event that triggered the webhook.        |
+| `payload.id`                                 | number    | The id of the document.                              |
+| `payload.userId`                             | number    | The id of the user who owns the document.            |
+| `payload.authOptions`                        | json?     | Authentication options for the document.             |
+| `payload.formValues`                         | json?     | Form values for the document.                        |
+| `payload.title`                              | string    | The name of the document.                            |
+| `payload.status`                             | string    | The current status of the document.                  |
+| `payload.documentDataId`                     | string    | The identifier for the document data.                |
+| `payload.createdAt`                          | datetime  | The creation date and time of the document.          |
+| `payload.updatedAt`                          | datetime  | The last update date and time of the document.       |
+| `payload.completedAt`                        | datetime? | The completion date and time of the document.        |
+| `payload.deletedAt`                          | datetime? | The deletion date and time of the document.          |
+| `payload.teamId`                             | number?   | The id of the team.                                  |
+| `payload.documentData.id`                    | string    | The id of the document data.                         |
+| `payload.documentData.type`                  | string    | The type of the document data.                       |
+| `payload.documentData.data`                  | string    | The data of the document.                            |
+| `payload.documentData.initialData`           | string    | The initial data of the document.                    |
+| `payload.Recipient[].id`                     | number    | The id of the recipient.                             |
+| `payload.Recipient[].documentId`             | number?   | The id the document associated with the recipient.   |
+| `payload.Recipient[].templateId`             | number?   | The template identifier for the recipient.           |
+| `payload.Recipient[].email`                  | string    | The email address of the recipient.                  |
+| `payload.Recipient[].name`                   | string    | The name of the recipient.                           |
+| `payload.Recipient[].token`                  | string    | The token associated with the recipient.             |
+| `payload.Recipient[].expired`                | datetime? | The expiration status of the recipient.              |
+| `payload.Recipient[].signedAt`               | datetime? | The date and time the recipient signed the document. |
+| `payload.Recipient[].authOptions.accessAuth` | json?     | Access authentication options.                       |
+| `payload.Recipient[].authOptions.actionAuth` | json?     | Action authentication options.                       |
+| `payload.Recipient[].role`                   | string    | The role of the recipient.                           |
+| `payload.Recipient[].readStatus`             | string    | The read status of the document by the recipient.    |
+| `payload.Recipient[].signingStatus`          | string    | The signing status of the recipient.                 |
+| `payload.Recipient[].sendStatus`             | string    | The send status of the document to the recipient.    |
+| `createdAt`                                  | datetime  | The creation date and time of the webhook event.     |
+| `webhookEndpoint`                            | string    | The endpoint URL where the webhook is sent.          |
+
 ## Webhook event payload example
 
 When an event that you have subscribed to occurs, Documenso will send a POST request to the specified webhook URL with a payload containing information about the event.
