@@ -387,7 +387,7 @@ model Field {
   secondaryId String     @unique @default(cuid())
   documentId  Int?
   templateId  Int?
-  recipientId Int?
+  recipientId Int
   type        FieldType
   page        Int
   positionX   Decimal    @default(0)
@@ -398,7 +398,7 @@ model Field {
   inserted    Boolean
   Document    Document?  @relation(fields: [documentId], references: [id], onDelete: Cascade)
   Template    Template?  @relation(fields: [templateId], references: [id], onDelete: Cascade)
-  Recipient   Recipient? @relation(fields: [recipientId], references: [id], onDelete: Cascade)
+  Recipient   Recipient  @relation(fields: [recipientId], references: [id], onDelete: Cascade)
   Signature   Signature?
 
   @@index([documentId])

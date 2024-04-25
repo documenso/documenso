@@ -30,4 +30,66 @@ const PopoverContent = React.forwardRef<
 
 PopoverContent.displayName = PopoverPrimitive.Content.displayName;
 
-export { Popover, PopoverTrigger, PopoverContent };
+type PopoverHoverProps = {
+  trigger: React.ReactNode;
+  children: React.ReactNode;
+  contentProps?: React.ComponentPropsWithoutRef<typeof PopoverContent>;
+};
+
+const PopoverHover = ({ trigger, children, contentProps }: PopoverHoverProps) => {
+  const [open, setOpen] = React.useState(false);
+
+  const isControlled = React.useRef(false);
+  const isMouseOver = React.useRef<boolean>(false);
+
+  const onMouseEnter = () => {
+    isMouseOver.current = true;
+
+    if (isControlled.current) {
+      return;
+    }
+
+    setOpen(true);
+  };
+
+  const onMouseLeave = () => {
+    isMouseOver.current = false;
+
+    if (isControlled.current) {
+      return;
+    }
+
+    setTimeout(() => {
+      setOpen(isMouseOver.current);
+    }, 200);
+  };
+
+  const onOpenChange = (newOpen: boolean) => {
+    isControlled.current = newOpen;
+
+    setOpen(newOpen);
+  };
+
+  return (
+    <Popover open={open} onOpenChange={onOpenChange}>
+      <PopoverTrigger
+        className="flex cursor-pointer outline-none"
+        onMouseEnter={onMouseEnter}
+        onMouseLeave={onMouseLeave}
+      >
+        {trigger}
+      </PopoverTrigger>
+
+      <PopoverContent
+        side="top"
+        onMouseEnter={onMouseEnter}
+        onMouseLeave={onMouseLeave}
+        {...contentProps}
+      >
+        {children}
+      </PopoverContent>
+    </Popover>
+  );
+};
+
+export { Popover, PopoverTrigger, PopoverContent, PopoverHover };
