@@ -20,9 +20,10 @@
     "title": "Local Development",
     "type": "page"
   },
-  "api": {
-    "title": "API",
-    "type": "page"
+  "public-api": {
+    "title": "Public API",
+    "type": "page",
+    "href": "/fcc/"
   },
   "webhooks": {
     "title": "Webhooks",
