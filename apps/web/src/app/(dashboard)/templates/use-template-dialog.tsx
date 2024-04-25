@@ -98,8 +98,8 @@ export function UseTemplateDialog({
       sendDocument: false,
       recipients: recipients.map((recipient) => ({
         id: recipient.id,
-        name: recipient.name,
-        email: recipient.email,
+        name: '',
+        email: '',
       })),
     },
   });
@@ -156,15 +156,16 @@ export function UseTemplateDialog({
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
           <DialogTitle>Create document from template</DialogTitle>
-          <DialogDescription>Add the recipients to create the document with</DialogDescription>
+          <DialogDescription>
+            {recipients.length === 0
+              ? 'A draft document will be created'
+              : 'Add the recipients to create the document with'}
+          </DialogDescription>
         </DialogHeader>
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)}>
-            <fieldset
-              className="flex h-full flex-col space-y-4"
-              disabled={form.formState.isSubmitting}
-            >
+            <fieldset className="flex h-full flex-col" disabled={form.formState.isSubmitting}>
               <div className="custom-scrollbar -m-1 max-h-[60vh] space-y-4 overflow-y-auto p-1">
                 {formRecipients.map((recipient, index) => (
                   <div className="flex w-full flex-row space-x-4" key={recipient.id}>
@@ -201,46 +202,48 @@ export function UseTemplateDialog({
                 ))}
               </div>
 
-              <div className="mt-4 flex flex-row items-center">
-                <FormField
-                  control={form.control}
-                  name="sendDocument"
-                  render={({ field }) => (
-                    <FormItem>
-                      <div className="flex flex-row items-center">
-                        <Checkbox
-                          id="sendDocument"
-                          className="h-5 w-5"
-                          checkClassName="dark:text-white text-primary"
-                          checked={field.value}
-                          onCheckedChange={field.onChange}
-                        />
+              {recipients.length > 0 && (
+                <div className="mt-4 flex flex-row items-center">
+                  <FormField
+                    control={form.control}
+                    name="sendDocument"
+                    render={({ field }) => (
+                      <FormItem>
+                        <div className="flex flex-row items-center">
+                          <Checkbox
+                            id="sendDocument"
+                            className="h-5 w-5"
+                            checkClassName="dark:text-white text-primary"
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                          />
 
-                        <label
-                          className="text-muted-foreground ml-2 flex items-center text-sm"
-                          htmlFor="sendDocument"
-                        >
-                          Send document
-                          <Tooltip>
-                            <TooltipTrigger type="button">
-                              <InfoIcon className="mx-1 h-4 w-4" />
-                            </TooltipTrigger>
+                          <label
+                            className="text-muted-foreground ml-2 flex items-center text-sm"
+                            htmlFor="sendDocument"
+                          >
+                            Send document
+                            <Tooltip>
+                              <TooltipTrigger type="button">
+                                <InfoIcon className="mx-1 h-4 w-4" />
+                              </TooltipTrigger>
 
-                            <TooltipContent className="text-muted-foreground z-[99999] max-w-md space-y-2 p-4">
-                              <p>
-                                The document will be immediately sent to recipients if this is
-                                checked.
-                              </p>
+                              <TooltipContent className="text-muted-foreground z-[99999] max-w-md space-y-2 p-4">
+                                <p>
+                                  The document will be immediately sent to recipients if this is
+                                  checked.
+                                </p>
 
-                              <p>Otherwise, the document will be created as a draft.</p>
-                            </TooltipContent>
-                          </Tooltip>
-                        </label>
-                      </div>
-                    </FormItem>
-                  )}
-                />
-              </div>
+                                <p>Otherwise, the document will be created as a draft.</p>
+                              </TooltipContent>
+                            </Tooltip>
+                          </label>
+                        </div>
+                      </FormItem>
+                    )}
+                  />
+                </div>
+              )}
 
               <DialogFooter>
                 <DialogClose asChild>
@@ -250,7 +253,11 @@ export function UseTemplateDialog({
                 </DialogClose>
 
                 <Button type="submit" loading={form.formState.isSubmitting}>
-                  {form.getValues('sendDocument') ? 'Send' : 'Review'}
+                  {recipients.length === 0
+                    ? 'Create'
+                    : form.getValues('sendDocument')
+                    ? 'Send'
+                    : 'Review'}
                 </Button>
               </DialogFooter>
             </fieldset>

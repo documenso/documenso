@@ -56,13 +56,13 @@ export const createDocumentFromTemplate = async ({
     throw new Error('Template not found.');
   }
 
-  if (recipients.length === 0 || recipients.length !== template.Recipient.length) {
+  if (recipients.length !== template.Recipient.length) {
     throw new Error('Invalid number of recipients.');
   }
 
   let finalRecipients: Pick<Recipient, 'name' | 'email' | 'role'>[] = [];
 
-  if (Object.prototype.hasOwnProperty.call(recipients[0], 'id')) {
+  if (recipients.length > 0 && Object.prototype.hasOwnProperty.call(recipients[0], 'id')) {
     finalRecipients = template.Recipient.map((templateRecipient) => {
       // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
       const foundRecipient = (recipients as RecipientWithId[]).find(

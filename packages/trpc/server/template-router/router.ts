@@ -66,7 +66,9 @@ export const templateRouter = router({
             userId: ctx.user.id,
             teamId,
             requestMetadata: extractNextApiRequestMetadata(ctx.req),
-          }).catch(() => {
+          }).catch((err) => {
+            console.error(err);
+
             throw new AppError('DOCUMENT_SEND_FAILED');
           });
         }
