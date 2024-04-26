@@ -4,6 +4,7 @@ import { DateTime } from 'luxon';
 import { getServerLimits } from '@documenso/ee/server-only/limits/server';
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { DOCUMENSO_ENCRYPTION_KEY } from '@documenso/lib/constants/crypto';
+import { AppError } from '@documenso/lib/errors/app-error';
 import { encryptSecondaryData } from '@documenso/lib/server-only/crypto/encrypt';
 import { upsertDocumentMeta } from '@documenso/lib/server-only/document-meta/upsert-document-meta';
 import { createDocument } from '@documenso/lib/server-only/document/create-document';
@@ -20,6 +21,7 @@ import { updateDocumentSettings } from '@documenso/lib/server-only/document/upda
 import { updateTitle } from '@documenso/lib/server-only/document/update-title';
 import { symmetricEncrypt } from '@documenso/lib/universal/crypto';
 import { extractNextApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
+import { DocumentStatus } from '@documenso/prisma/client';
 
 import { authenticatedProcedure, procedure, router } from '../trpc';
 import {
@@ -412,6 +414,10 @@ export const documentRouter = router({
           userId: ctx.user.id,
           teamId,
         });
+
+        if (document.status !== DocumentStatus.COMPLETED) {
+          throw new AppError('DOCUMENT_NOT_COMPLETE');
+        }
 
         const encrypted = encryptSecondaryData({
           data: document.id.toString(),
