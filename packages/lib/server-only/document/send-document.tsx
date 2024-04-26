@@ -213,11 +213,11 @@ export const sendDocument = async ({
     }),
   );
 
-  const allRecipientsAreCC = document.Recipient.every(
+  const allRecipientsHaveNoActionToTake = document.Recipient.every(
     (recipient) => recipient.role === RecipientRole.CC,
   );
 
-  if (allRecipientsAreCC) {
+  if (allRecipientsHaveNoActionToTake) {
     const updatedDocument = await updateDocument({
       documentId,
       userId,
@@ -225,7 +225,17 @@ export const sendDocument = async ({
       data: { status: DocumentStatus.COMPLETED },
     });
 
-    return await sealDocument({ documentId: updatedDocument.id, requestMetadata });
+    await sealDocument({ documentId: updatedDocument.id, requestMetadata });
+
+    // Keep the return type the same for the `sendDocument` method
+    return await prisma.document.findFirstOrThrow({
+      where: {
+        id: documentId,
+      },
+      include: {
+        Recipient: true,
+      },
+    });
   }
 
   const updatedDocument = await prisma.$transaction(async (tx) => {
