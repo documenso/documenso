@@ -18,7 +18,9 @@ export const getCertificatePdf = async ({ documentId }: GetCertificatePdfOptions
   let browser: Browser;
 
   if (process.env.NEXT_PRIVATE_BROWSERLESS_URL) {
-    browser = await chromium.connect(process.env.NEXT_PRIVATE_BROWSERLESS_URL);
+    // !: Use CDP rather than the default `connect` method to avoid coupling to the playwright version.
+    // !: Previously we would have to keep the playwright version in sync with the browserless version to avoid errors.
+    browser = await chromium.connectOverCDP(process.env.NEXT_PRIVATE_BROWSERLESS_URL);
   } else {
     browser = await chromium.launch();
   }
