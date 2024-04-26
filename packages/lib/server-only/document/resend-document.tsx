@@ -135,7 +135,7 @@ export const resendDocument = async ({
               address: FROM_ADDRESS,
             },
             subject: customEmail?.subject
-              ? renderCustomEmailTemplate(customEmail.subject, customEmailTemplate)
+              ? renderCustomEmailTemplate(`Reminder: ${customEmail.subject}`, customEmailTemplate)
               : emailSubject,
             html: render(template),
             text: render(template, { plainText: true }),
