@@ -112,27 +112,46 @@ export const sealDocument = async ({
   doc.getForm().flatten();
   flattenAnnotations(doc);
 
+  const certificatePageTime = Date.now();
+  console.log('certificatePageStart:' + certificatePageTime);
+
   const certificatePages = await doc.copyPages(certificate, certificate.getPageIndices());
+  console.log('certificatePageEnd:' + (Date.now() - certificatePageTime));
 
   certificatePages.forEach((page) => {
     doc.addPage(page);
   });
 
   for (const field of fields) {
+    const insertFIeldTime = Date.now();
+    console.log('insertFieldStart:' + insertFIeldTime);
     await insertFieldInPDF(doc, field);
+    console.log('insertFieldEnd:' + (Date.now() - insertFIeldTime));
   }
 
-  const pdfBytes = await doc.save();
+  const docSaveTime = Date.now();
+  console.log('docSaveStart:' + docSaveTime);
 
+  const pdfBytes = await doc.save();
+  console.log('docSaveEnd:' + (Date.now() - docSaveTime));
+
+  const pdfBufferTIme = Date.now();
+  console.log('pdfBufferStart:' + pdfBufferTIme);
   const pdfBuffer = await signPdf({ pdf: Buffer.from(pdfBytes) });
+  console.log('pdfBufferEnd:' + (Date.now() - pdfBufferTIme));
 
   const { name, ext } = path.parse(document.title);
+
+  const putFIleTIme = Date.now();
+  console.log('putFileStart:' + putFIleTIme);
 
   const { data: newData } = await putFile({
     name: `${name}_signed${ext}`,
     type: 'application/pdf',
     arrayBuffer: async () => Promise.resolve(pdfBuffer),
   });
+
+  console.log('putFileEnd:' + (Date.now() - putFIleTIme));
 
   const postHog = PostHogServerClient();
 
@@ -145,6 +164,9 @@ export const sealDocument = async ({
       },
     });
   }
+
+  const updateDocumentTime = Date.now();
+  console.log('updateDocumentStart:' + updateDocumentTime);
 
   await prisma.$transaction(async (tx) => {
     await tx.documentData.update({
@@ -169,9 +191,17 @@ export const sealDocument = async ({
     });
   });
 
+  console.log('updateDocumentEnd:' + (Date.now() - updateDocumentTime));
+
   if (sendEmail && !isResealing) {
+    const sendCompleteEmailTime = Date.now();
+    console.log('sendCompleteEmailStart:' + sendCompleteEmailTime);
     await sendCompletedEmail({ documentId, requestMetadata });
+    console.log('sendCompleteEmailEnd:' + (Date.now() - sendCompleteEmailTime));
   }
+
+  const asdfasdfasdf = Date.now();
+  console.log('updateDocumentStart:' + asdfasdfasdf);
 
   const updatedDocument = await prisma.document.findFirstOrThrow({
     where: {
@@ -182,6 +212,10 @@ export const sealDocument = async ({
       Recipient: true,
     },
   });
+  console.log('updateDocumentEnd:' + (Date.now() - asdfasdfasdf));
+
+  const triggerWebhookTime = Date.now();
+  console.log('triggerWebhookStart:' + triggerWebhookTime);
 
   await triggerWebhook({
     event: WebhookTriggerEvents.DOCUMENT_COMPLETED,
@@ -189,4 +223,5 @@ export const sealDocument = async ({
     userId: document.userId,
     teamId: document.teamId ?? undefined,
   });
+  console.log('triggerWebhookEnd:' + (Date.now() - triggerWebhookTime));
 };
