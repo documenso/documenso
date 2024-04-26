@@ -75,7 +75,7 @@ export const deleteDocument = async ({
   }
 
   // Continue to hide the document from the user if they are a recipient.
-  if (userRecipient?.documentDeletedAt === null) {
+  if (userRecipient?.documentDeletedAt === null && document.status === DocumentStatus.COMPLETED) {
     await prisma.recipient.update({
       where: {
         documentId_email: {
