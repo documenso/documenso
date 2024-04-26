@@ -3,41 +3,75 @@ title: Manual Setup
 description: Manually set up Documenso on your machine for local development.
 ---
 
+import { Callout, Steps } from 'nextra/components';
+
 # Manual Setup
 
-Follow these steps to setup Documenso on your local machine:
+Follow these steps to set up Documenso on your local machine:
 
-1. [Fork this repository](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/working-with-forks/about-forks) to your GitHub account.
+<Steps>
+
+### Fork Documenso
+
+Fork the [Documenso repository](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/working-with-forks/about-forks) to your GitHub account.
+
+### Clone Repository
 
 After forking the repository, clone it to your local device by using the following command:
 
-```sh
+```bash
 git clone https://github.com/<your-username>/documenso
 ```
 
-2. Run `npm i` in the root directory
+### Install Dependencies
 
-3. Create your `.env` from the `.env.example`. You can use `cp .env.example .env` to get started with our handpicked defaults.
+Run `npm i` in the root directory to install the dependencies required for the project.
 
-4. Set the following environment variables:
+### Set Up Environment Variables
 
-   - NEXTAUTH_URL
-   - NEXTAUTH_SECRET
-   - NEXT_PUBLIC_WEBAPP_URL
-   - NEXT_PUBLIC_MARKETING_URL
-   - NEXT_PRIVATE_DATABASE_URL
-   - NEXT_PRIVATE_DIRECT_DATABASE_URL
-   - NEXT_PRIVATE_SMTP_FROM_NAME
-   - NEXT_PRIVATE_SMTP_FROM_ADDRESS
+Set up the following environment variables in the `.env` file:
 
-5. Create the database schema by running `npm run prisma:migrate-dev`
+```bash
+NEXTAUTH_URL
+NEXTAUTH_SECRET
+NEXT_PUBLIC_WEBAPP_URL
+NEXT_PUBLIC_MARKETING_URL
+NEXT_PRIVATE_DATABASE_URL
+NEXT_PRIVATE_DIRECT_DATABASE_URL
+NEXT_PRIVATE_SMTP_FROM_NAME
+NEXT_PRIVATE_SMTP_FROM_ADDRESS
+```
 
-6. Run `npm run dev` in the root directory to start
+Alternatively, you can run `cp .env.example .env` to get started with our handpicked defaults.
 
-7. Register a new user at http://localhost:3000/signup
+### Create Database Schema
 
----
+Create the database schema by running the following command:
 
-- Optional: Seed the database using `npm run prisma:seed -w @documenso/prisma` to create a test user and document.
-- Optional: Create your own signing certificate.
-  - To generate your own using these steps and a Linux Terminal or Windows Subsystem for Linux (WSL), see **[Create your own signing certificate](./SIGNING.md)**.
+```bash
+npm run prisma:migrate-dev
+```
+
+### Optional: Seed the Database
+
+Seed the database with test data by running the following command:
+
+```bash
+npm run prisma:seed -w @documenso/prisma
+```
+
+### Start the Application
+
+Run `npm run dev` in the root directory to start the application.
+
+### Access the Application
+
+Access the Documenso application by visiting `http://localhost:3000` in your web browser.
+
+</Steps>
+
+<Callout type="info">
+  Optional: Create your signing certificate. To generate your own using these steps and a Linux
+  Terminal or Windows Subsystem for Linux (WSL), see **[Create your signing
+  certificate](./SIGNING.md)**.
+</Callout>

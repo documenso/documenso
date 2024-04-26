@@ -3,7 +3,11 @@ title: Docker Development
 description: Set up Documenso using Docker for local development.
 ---
 
+import { Callout, Steps } from 'nextra/components';
+
 # Docker
+
+The following guide will walk you through setting up Documenso using Docker. You can choose between a Docker Compose production setup or a standalone container.
 
 We provide a Docker container for Documenso, which is published on both DockerHub and GitHub Container Registry.
 
@@ -12,9 +16,7 @@ We provide a Docker container for Documenso, which is published on both DockerHu
 
 You can pull the Docker image from either of these registries and run it with your preferred container hosting provider.
 
-Please note that you will need to provide environment variables for connecting to the database, mailserver, and so forth.
-
-The following guide will walk you through setting up Documenso using Docker. You can choose between a production setup using Docker Compose or a standalone container.
+Please note that you will need to provide environment variables for connecting to the database, mail server, and other services.
 
 ## Prerequisites
 
@@ -25,13 +27,25 @@ Before you begin, ensure that you have the following installed:
 
 ## Option 1: Production Docker Compose Setup
 
-This setup includes a PostgreSQL database and the Documenso application. You will need to provide your own SMTP details via environment variables.
+This setup includes a PostgreSQL database and the Documenso application. You will need to provide your own SMTP details using environment variables.
 
-1. Download the Docker Compose file from the Documenso repository: [compose.yml](https://raw.githubusercontent.com/documenso/documenso/release/docker/production/compose.yml)
-2. Navigate to the directory containing the `compose.yml` file.
-3. Create a `.env` file in the same directory and add your SMTP details as well as a few extra environment variables, following the example below:
+<Steps>
 
-```
+### Download the Docker Compose File
+
+Download the Docker Compose file from the Documenso repository - [compose.yml](https://raw.githubusercontent.com/documenso/documenso/release/docker/production/compose.yml).
+
+### Navigate to the `compose.yml` File
+
+Once downloaded, navigate to the directory containing the `compose.yml` file.
+
+### Set Up Environment Variables
+
+Create a `.env` file in the same directory as the `compose.yml` file.
+
+Then add your SMTP details as well as the following environment variables:
+
+```bash
 NEXTAUTH_SECRET="<your-secret>"
 NEXT_PRIVATE_ENCRYPTION_KEY="<your-key>"
 NEXT_PRIVATE_ENCRYPTION_SECONDARY_KEY="<your-secondary-key>"
@@ -43,77 +57,85 @@ NEXT_PRIVATE_SMTP_USERNAME="<your-username>"
 NEXT_PRIVATE_SMTP_PASSWORD="<your-password>"
 ```
 
-4. Update the volume binding for the cert file in the `compose.yml` file to point to your own key file:
+### Update the Volume Binding
 
-Since the `cert.p12` file is required for signing and encrypting documents, you will need to provide your own key file. Update the volume binding in the `compose.yml` file to point to your key file:
+The `cert.p12` file is required to sign and encrypt documents, so you must provide your key file. Update the volume binding in the `compose.yml` file to point to your key file:
 
 ```yaml
 volumes:
   - /path/to/your/keyfile.p12:/opt/documenso/cert.p12
 ```
 
-1. Run the following command to start the containers:
+After updating the volume binding, save the `compose.yml` file and run the following command to start the containers:
 
-```
+```bash
 docker-compose --env-file ./.env -d up
 ```
 
-This will start the PostgreSQL database and the Documenso application containers.
+The command will start the PostgreSQL database and the Documenso application containers.
 
-5. Access the Documenso application by visiting `http://localhost:3000` in your web browser.
+### Access the Application
+
+Access the Documenso application by visiting `http://localhost:3000` in your web browser.
+
+</Steps>
 
 ## Option 2: Standalone Docker Container
 
-If you prefer to host the Documenso application on your container provider of choice, you can use the pre-built Docker image from DockerHub or GitHub's Package Registry. Note that you will need to provide your own database and SMTP host.
+If you prefer to host the Documenso application on a specific container provider, you can use the pre-built Docker image from DockerHub or GitHub's Package Registry. Note that you will need to provide your own database and SMTP host.
 
-1. Pull the Documenso Docker image:
+<Steps>
 
-```
+### Pull the Docker Image
+
+Pull the Documenso Docker image from DockerHub:
+
+```bash
 docker pull documenso/documenso
 ```
 
-Or, if using GitHub's Package Registry:
+Or, pull the image from GitHub Container Registry:
 
-```
+```bash
 docker pull ghcr.io/documenso/documenso
 ```
 
-2. Run the Docker container, providing the necessary environment variables for your database and SMTP host:
+### Run the Docker Container
 
-```
+Run the Docker container with the required environment variables:
+
+```bash
 docker run -d \
-  -p 3000:3000 \
-  -e NEXTAUTH_URL="<your-nextauth-url>"
-  -e NEXTAUTH_SECRET="<your-nextauth-secret>"
-  -e NEXT_PRIVATE_ENCRYPTION_KEY="<your-next-private-encryption-key>"
-  -e NEXT_PRIVATE_ENCRYPTION_SECONDARY_KEY="<your-next-private-encryption-secondary-key>"
-  -e NEXT_PUBLIC_WEBAPP_URL="<your-next-public-webapp-url>"
-  -e NEXT_PRIVATE_DATABASE_URL="<your-next-private-database-url>"
-  -e NEXT_PRIVATE_DIRECT_DATABASE_URL="<your-next-private-database-url>"
-  -e NEXT_PRIVATE_SMTP_TRANSPORT="<your-next-private-smtp-transport>"
-  -e NEXT_PRIVATE_SMTP_FROM_NAME="<your-next-private-smtp-from-name>"
-  -e NEXT_PRIVATE_SMTP_FROM_ADDRESS="<your-next-private-smtp-from-address>"
-  -v /path/to/your/keyfile.p12:/opt/documenso/cert.p12
-  documenso/documenso
+ -p 3000:3000 \
+ -e NEXTAUTH_URL="<your-nextauth-url>"
+ -e NEXTAUTH_SECRET="<your-nextauth-secret>"
+ -e NEXT_PRIVATE_ENCRYPTION_KEY="<your-next-private-encryption-key>"
+ -e NEXT_PRIVATE_ENCRYPTION_SECONDARY_KEY="<your-next-private-encryption-secondary-key>"
+ -e NEXT_PUBLIC_WEBAPP_URL="<your-next-public-webapp-url>"
+ -e NEXT_PRIVATE_DATABASE_URL="<your-next-private-database-url>"
+ -e NEXT_PRIVATE_DIRECT_DATABASE_URL="<your-next-private-database-url>"
+ -e NEXT_PRIVATE_SMTP_TRANSPORT="<your-next-private-smtp-transport>"
+ -e NEXT_PRIVATE_SMTP_FROM_NAME="<your-next-private-smtp-from-name>"
+ -e NEXT_PRIVATE_SMTP_FROM_ADDRESS="<your-next-private-smtp-from-address>"
+ -v /path/to/your/keyfile.p12:/opt/documenso/cert.p12
+ documenso/documenso
 ```
 
-Replace the placeholders with your actual database and SMTP details.
+Replace the placeholders with the actual values.
 
-1. Access the Documenso application by visiting the URL you provided in the `NEXT_PUBLIC_WEBAPP_URL` environment variable in your web browser.
+### Access the Application
 
-## Success
+Access the Documenso application by visiting the URL you provided for the `NEXT_PUBLIC_WEBAPP_URL` environment variable in your web browser.
 
-You have now successfully set up Documenso using Docker. You can start organizing and managing your documents efficiently. If you encounter any issues or have further questions, please refer to the official Documenso documentation or seek assistance from the community.
+</Steps>
 
 ## Advanced Configuration
 
-The environment variables listed above are a subset of those that are available for configuring Documenso. For a complete list of environment variables and their descriptions, refer to the table below:
-
-Here's a markdown table documenting all the provided environment variables:
+The environment variables listed above are a subset of those available for configuring Documenso. The table below provides a complete list of environment variables and their descriptions.
 
 | Variable                                     | Description                                                                                         |
 | -------------------------------------------- | --------------------------------------------------------------------------------------------------- |
-| `PORT`                                       | The port to run the Documenso application on, defaults to `3000`.                                   |
+| `PORT`                                       | The port on which the Documenso application runs. It defaults to `3000`.                            |
 | `NEXTAUTH_URL`                               | The URL for the NextAuth.js authentication service.                                                 |
 | `NEXTAUTH_SECRET`                            | The secret key used by NextAuth.js for encryption and signing.                                      |
 | `NEXT_PRIVATE_ENCRYPTION_KEY`                | The primary encryption key for symmetric encryption and decryption (at least 32 characters).        |
@@ -125,16 +147,16 @@ Here's a markdown table documenting all the provided environment variables:
 | `NEXT_PRIVATE_DIRECT_DATABASE_URL`           | The URL for the direct database connection (without connection pooling).                            |
 | `NEXT_PRIVATE_SIGNING_TRANSPORT`             | The signing transport to use. Available options: local (default)                                    |
 | `NEXT_PRIVATE_SIGNING_PASSPHRASE`            | The passphrase for the key file.                                                                    |
-| `NEXT_PRIVATE_SIGNING_LOCAL_FILE_CONTENTS`   | The base64-encoded contents of the key file, will be used instead of file path.                     |
+| `NEXT_PRIVATE_SIGNING_LOCAL_FILE_CONTENTS`   | The base64-encoded contents of the key file will be used instead of the file path.                  |
 | `NEXT_PRIVATE_SIGNING_LOCAL_FILE_PATH`       | The path to the key file, default `/opt/documenso/cert.p12`.                                        |
-| `NEXT_PUBLIC_UPLOAD_TRANSPORT`               | The transport to use for file uploads (database or s3).                                             |
+| `NEXT_PUBLIC_UPLOAD_TRANSPORT`               | The transport for file uploads (database or s3).                                                    |
 | `NEXT_PRIVATE_UPLOAD_ENDPOINT`               | The endpoint for the S3 storage transport (for third-party S3-compatible providers).                |
 | `NEXT_PRIVATE_UPLOAD_FORCE_PATH_STYLE`       | Whether to force path-style URLs for the S3 storage transport.                                      |
 | `NEXT_PRIVATE_UPLOAD_REGION`                 | The region for the S3 storage transport (defaults to us-east-1).                                    |
 | `NEXT_PRIVATE_UPLOAD_BUCKET`                 | The bucket to use for the S3 storage transport.                                                     |
 | `NEXT_PRIVATE_UPLOAD_ACCESS_KEY_ID`          | The access key ID for the S3 storage transport.                                                     |
 | `NEXT_PRIVATE_UPLOAD_SECRET_ACCESS_KEY`      | The secret access key for the S3 storage transport.                                                 |
-| `NEXT_PRIVATE_SMTP_TRANSPORT`                | The transport to use for sending emails (smtp-auth, smtp-api, resend, or mailchannels).             |
+| `NEXT_PRIVATE_SMTP_TRANSPORT`                | The transport to send emails (smtp-auth, smtp-api, resend, or mailchannels).                        |
 | `NEXT_PRIVATE_SMTP_HOST`                     | The host for the SMTP server for SMTP transports.                                                   |
 | `NEXT_PRIVATE_SMTP_PORT`                     | The port for the SMTP server for SMTP transports.                                                   |
 | `NEXT_PRIVATE_SMTP_USERNAME`                 | The username for the SMTP server for the `smtp-auth` transport.                                     |
