@@ -89,6 +89,10 @@ export const createDocumentFromTemplate = async ({
 
       const documentRecipient = document.Recipient.find((doc) => doc.email === recipient?.email);
 
+      if (!documentRecipient) {
+        throw new Error('Recipient not found.');
+      }
+
       return {
         type: field.type,
         page: field.page,
@@ -99,7 +103,7 @@ export const createDocumentFromTemplate = async ({
         customText: field.customText,
         inserted: field.inserted,
         documentId: document.id,
-        recipientId: documentRecipient?.id || null,
+        recipientId: documentRecipient.id,
       };
     }),
   });

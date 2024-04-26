@@ -11,6 +11,7 @@ import {
   ZDeleteDocumentMutationSchema,
   ZDeleteFieldMutationSchema,
   ZDeleteRecipientMutationSchema,
+  ZDownloadDocumentSuccessfulSchema,
   ZGetDocumentsQuerySchema,
   ZSendDocumentForSigningMutationSchema,
   ZSuccessfulDocumentResponseSchema,
@@ -49,6 +50,17 @@ export const ApiContractV1 = c.router(
         404: ZUnsuccessfulResponseSchema,
       },
       summary: 'Get a single document',
+    },
+
+    downloadSignedDocument: {
+      method: 'GET',
+      path: '/api/v1/documents/:id/download',
+      responses: {
+        200: ZDownloadDocumentSuccessfulSchema,
+        401: ZUnsuccessfulResponseSchema,
+        404: ZUnsuccessfulResponseSchema,
+      },
+      summary: 'Download a signed document when the storage transport is S3',
     },
 
     createDocument: {

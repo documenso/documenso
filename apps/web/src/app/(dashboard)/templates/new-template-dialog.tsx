@@ -18,7 +18,10 @@ import { Button } from '@documenso/ui/primitives/button';
 import { Card, CardContent } from '@documenso/ui/primitives/card';
 import {
   Dialog,
+  DialogClose,
   DialogContent,
+  DialogDescription,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -34,7 +37,6 @@ import {
   FormMessage,
 } from '@documenso/ui/primitives/form/form';
 import { Input } from '@documenso/ui/primitives/input';
-import { Label } from '@documenso/ui/primitives/label';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
 const ZCreateTemplateFormSchema = z.object({
@@ -61,8 +63,7 @@ export const NewTemplateDialog = ({ teamId, templateRootPath }: NewTemplateDialo
     resolver: zodResolver(ZCreateTemplateFormSchema),
   });
 
-  const { mutateAsync: createTemplate, isLoading: isCreatingTemplate } =
-    trpc.template.createTemplate.useMutation();
+  const { mutateAsync: createTemplate } = trpc.template.createTemplate.useMutation();
 
   const [showNewTemplateDialog, setShowNewTemplateDialog] = useState(false);
   const [uploadedFile, setUploadedFile] = useState<{ file: File; fileBase64: string } | null>();
@@ -140,6 +141,7 @@ export const NewTemplateDialog = ({ teamId, templateRootPath }: NewTemplateDialo
   useEffect(() => {
     if (!showNewTemplateDialog) {
       form.reset();
+      setUploadedFile(null);
     }
   }, [form, showNewTemplateDialog]);
 
@@ -154,20 +156,23 @@ export const NewTemplateDialog = ({ teamId, templateRootPath }: NewTemplateDialo
 
       <DialogContent className="w-full max-w-xl">
         <DialogHeader>
-          <DialogTitle className="mb-4">New Template</DialogTitle>
+          <DialogTitle>New Template</DialogTitle>
+          <DialogDescription>
+            Templates allow you to quickly generate documents with pre-filled recipients and fields.
+          </DialogDescription>
         </DialogHeader>
 
-        <div>
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-y-4">
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)}>
+            <fieldset disabled={form.formState.isSubmitting} className="flex flex-col gap-y-4">
               <FormField
                 control={form.control}
                 name="name"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Name your template</FormLabel>
+                    <FormLabel>Template name</FormLabel>
                     <FormControl>
-                      <Input id="email" type="text" className="bg-background mt-1.5" {...field} />
+                      <Input {...field} />
                     </FormControl>
                     <FormDescription>
                       <span className="text-muted-foreground text-xs">
@@ -180,55 +185,57 @@ export const NewTemplateDialog = ({ teamId, templateRootPath }: NewTemplateDialo
                 )}
               />
 
-              <div>
-                <Label htmlFor="template">Upload a Document</Label>
+              <div className="mt-1.5">
+                {uploadedFile ? (
+                  <Card gradient className="h-[40vh]">
+                    <CardContent className="flex h-full flex-col items-center justify-center p-2">
+                      <button
+                        onClick={() => resetForm()}
+                        title="Remove Template"
+                        className="text-muted-foreground absolute right-2.5 top-2.5 rounded-sm opacity-60 transition-opacity hover:opacity-100 focus:outline-none disabled:pointer-events-none"
+                      >
+                        <X className="h-6 w-6" />
+                        <span className="sr-only">Remove Template</span>
+                      </button>
 
-                <div className="my-3">
-                  {uploadedFile ? (
-                    <Card gradient className="h-[40vh]">
-                      <CardContent className="flex h-full flex-col items-center justify-center p-2">
-                        <button
-                          onClick={() => resetForm()}
-                          title="Remove Template"
-                          className="text-muted-foreground absolute right-2.5 top-2.5 rounded-sm opacity-60 transition-opacity hover:opacity-100 focus:outline-none disabled:pointer-events-none"
-                        >
-                          <X className="h-6 w-6" />
-                          <span className="sr-only">Remove Template</span>
-                        </button>
+                      <div className="border-muted-foreground/20 group-hover:border-documenso/80 dark:bg-muted/80 z-10 flex aspect-[3/4] w-24 flex-col gap-y-1 rounded-lg border bg-white/80 px-2 py-4 backdrop-blur-sm">
+                        <div className="bg-muted-foreground/20 group-hover:bg-documenso h-2 w-full rounded-[2px]" />
+                        <div className="bg-muted-foreground/20 group-hover:bg-documenso h-2 w-5/6 rounded-[2px]" />
+                        <div className="bg-muted-foreground/20 group-hover:bg-documenso h-2 w-full rounded-[2px]" />
+                      </div>
 
-                        <div className="border-muted-foreground/20 group-hover:border-documenso/80 dark:bg-muted/80 z-10 flex aspect-[3/4] w-24 flex-col gap-y-1 rounded-lg border bg-white/80 px-2 py-4 backdrop-blur-sm">
-                          <div className="bg-muted-foreground/20 group-hover:bg-documenso h-2 w-full rounded-[2px]" />
-                          <div className="bg-muted-foreground/20 group-hover:bg-documenso h-2 w-5/6 rounded-[2px]" />
-                          <div className="bg-muted-foreground/20 group-hover:bg-documenso h-2 w-full rounded-[2px]" />
-                        </div>
+                      <p className="group-hover:text-foreground text-muted-foreground mt-4 font-medium">
+                        Uploaded Document
+                      </p>
 
-                        <p className="group-hover:text-foreground text-muted-foreground mt-4 font-medium">
-                          Uploaded Document
-                        </p>
-
-                        <span className="text-muted-foreground/80 mt-1 text-sm">
-                          {uploadedFile.file.name}
-                        </span>
-                      </CardContent>
-                    </Card>
-                  ) : (
-                    <DocumentDropzone
-                      className="mt-1.5 h-[40vh]"
-                      onDrop={onFileDrop}
-                      type="template"
-                    />
-                  )}
-                </div>
+                      <span className="text-muted-foreground/80 mt-1 text-sm">
+                        {uploadedFile.file.name}
+                      </span>
+                    </CardContent>
+                  </Card>
+                ) : (
+                  <DocumentDropzone className="h-[40vh]" onDrop={onFileDrop} type="template" />
+                )}
               </div>
 
-              <div className="flex w-full justify-end">
-                <Button loading={isCreatingTemplate} type="submit">
-                  Create Template
+              <DialogFooter>
+                <DialogClose asChild>
+                  <Button type="button" variant="secondary">
+                    Cancel
+                  </Button>
+                </DialogClose>
+
+                <Button
+                  loading={form.formState.isSubmitting}
+                  disabled={!uploadedFile}
+                  type="submit"
+                >
+                  Create template
                 </Button>
-              </div>
-            </form>
-          </Form>
-        </div>
+              </DialogFooter>
+            </fieldset>
+          </form>
+        </Form>
       </DialogContent>
     </Dialog>
   );
