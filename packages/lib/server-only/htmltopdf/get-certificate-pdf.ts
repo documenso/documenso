@@ -22,7 +22,9 @@ export const getCertificatePdf = async ({ documentId }: GetCertificatePdfOptions
     // !: Previously we would have to keep the playwright version in sync with the browserless version to avoid errors.
     browser = await chromium.connectOverCDP(process.env.NEXT_PRIVATE_BROWSERLESS_URL);
   } else {
+    console.log('here');
     browser = await chromium.launch();
+    console.log('here2');
   }
 
   if (!browser) {
@@ -31,17 +33,41 @@ export const getCertificatePdf = async ({ documentId }: GetCertificatePdfOptions
     );
   }
 
+  console.log('1');
   const page = await browser.newPage();
+  console.log('2');
 
-  await page.goto(`${NEXT_PUBLIC_WEBAPP_URL()}/__htmltopdf/certificate?d=${encryptedId}`, {
-    waitUntil: 'networkidle',
-  });
+  const domcontentloadedTime = Date.now();
+  console.log('domcontentloadedTime:' + domcontentloadedTime);
+
+  await page
+    .goto(`${NEXT_PUBLIC_WEBAPP_URL()}/__htmltopdf/certificate?d=${encryptedId}`, {
+      waitUntil: 'domcontentloaded',
+    })
+    .catch((e) => {
+      console.log(e);
+    });
+  console.log('domcontentloadedEnd:' + (Date.now() - domcontentloadedTime));
+
+  const networkidleTime = Date.now();
+  console.log('networkidleTime:' + networkidleTime);
+
+  await page
+    .goto(`${NEXT_PUBLIC_WEBAPP_URL()}/__htmltopdf/certificate?d=${encryptedId}`, {
+      waitUntil: 'networkidle',
+    })
+    .catch((e) => {
+      console.log(e);
+    });
+  console.log('networkidleEnd:' + (Date.now() - networkidleTime));
 
   const result = await page.pdf({
     format: 'A4',
   });
+  console.log(4);
 
   void browser.close();
 
+  console.log(5);
   return result;
 };

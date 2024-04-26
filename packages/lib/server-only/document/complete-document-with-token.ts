@@ -47,7 +47,13 @@ export const completeDocumentWithToken = async ({
 }: CompleteDocumentWithTokenOptions) => {
   'use server';
 
+  const startTime = Date.now();
+  console.log('Start:' + startTime);
+
+  console.log('getDocumentStart:' + startTime);
   const document = await getDocument({ token, documentId });
+  console.log('getDocumentEnd:' + (Date.now() - startTime));
+  console.log('Acc:' + (Date.now() - startTime));
 
   if (document.status !== DocumentStatus.PENDING) {
     throw new Error(`Document ${document.id} must be pending`);
@@ -63,12 +69,16 @@ export const completeDocumentWithToken = async ({
     throw new Error(`Recipient ${recipient.id} has already signed`);
   }
 
+  const fieldStartTime = Date.now();
+  console.log('fieldStart:' + fieldStartTime);
   const fields = await prisma.field.findMany({
     where: {
       documentId: document.id,
       recipientId: recipient.id,
     },
   });
+  console.log('fieldEnd:' + (Date.now() - fieldStartTime));
+  console.log('Acc:' + (Date.now() - startTime));
 
   if (fields.some((field) => !field.inserted)) {
     throw new Error(`Recipient ${recipient.id} has unsigned fields`);
@@ -92,6 +102,9 @@ export const completeDocumentWithToken = async ({
   // if (!isValid) {
   //   throw new AppError(AppErrorCode.UNAUTHORIZED, 'Invalid authentication values');
   // }
+
+  const recipientUpdateStartTime = Date.now();
+  console.log('recipientUpdateStart:' + recipientUpdateStartTime);
 
   await prisma.$transaction(async (tx) => {
     await tx.recipient.update({
@@ -124,6 +137,12 @@ export const completeDocumentWithToken = async ({
     });
   });
 
+  console.log('recipientUpdateEnd:' + (Date.now() - recipientUpdateStartTime));
+  console.log('Acc:' + (Date.now() - startTime));
+
+  const pendingRecipientsStartTime = Date.now();
+  console.log('pendingRecipientsStart:' + pendingRecipientsStartTime);
+
   const pendingRecipients = await prisma.recipient.count({
     where: {
       documentId: document.id,
@@ -132,10 +151,15 @@ export const completeDocumentWithToken = async ({
       },
     },
   });
+  console.log('pendingRecipientsEnd:' + (Date.now() - pendingRecipientsStartTime));
+  console.log('Acc:' + (Date.now() - startTime));
 
   if (pendingRecipients > 0) {
     await sendPendingEmail({ documentId, recipientId: recipient.id });
   }
+
+  const updateDocumentStartTime = Date.now();
+  console.log('updateDocumentStart:' + updateDocumentStartTime);
 
   const documents = await prisma.document.updateMany({
     where: {
@@ -151,12 +175,26 @@ export const completeDocumentWithToken = async ({
       completedAt: new Date(),
     },
   });
+  console.log('updateDocumentEnd:' + (Date.now() - updateDocumentStartTime));
+  console.log('Acc:' + (Date.now() - startTime));
 
   if (documents.count > 0) {
+    const sealDocumentStartTime = Date.now();
+    console.log('sealDocumentStart:' + sealDocumentStartTime);
     await sealDocument({ documentId: document.id, requestMetadata });
+    console.log('sealDocumentEnd:' + (Date.now() - sealDocumentStartTime));
+    console.log('Acc:' + (Date.now() - startTime));
   }
 
+  const updateDocumentStartTime2 = Date.now();
+  console.log('updateDocumentStart2:' + updateDocumentStartTime2);
+
   const updatedDocument = await getDocument({ token, documentId });
+  console.log('updateDocumentEnd2:' + (Date.now() - updateDocumentStartTime2));
+  console.log('Acc:' + (Date.now() - startTime));
+
+  const triggerWebhookStartTime = Date.now();
+  console.log('triggerWebhookStart:' + triggerWebhookStartTime);
 
   await triggerWebhook({
     event: WebhookTriggerEvents.DOCUMENT_SIGNED,
@@ -164,4 +202,6 @@ export const completeDocumentWithToken = async ({
     userId: updatedDocument.userId,
     teamId: updatedDocument.teamId ?? undefined,
   });
+  console.log('triggerWebhookEnd:' + (Date.now() - triggerWebhookStartTime));
+  console.log('Acc:' + (Date.now() - startTime));
 };

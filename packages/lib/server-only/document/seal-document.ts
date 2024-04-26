@@ -90,13 +90,22 @@ export const sealDocument = async ({
   }
 
   // !: Need to write the fields onto the document as a hard copy
+  const getFileTime = Date.now();
+  console.log('getFileStart:' + getFileTime);
   const pdfData = await getFile(documentData);
+  console.log('getFileEnd:' + (Date.now() - getFileTime));
 
+  const getCertificatePdfTime = Date.now();
+  console.log('getCertificatePdfStart:' + getCertificatePdfTime);
   const certificate = await getCertificatePdf({ documentId }).then(async (doc) =>
     PDFDocument.load(doc),
   );
+  console.log('getCertificatePdfEnd:' + (Date.now() - getCertificatePdfTime));
 
+  const loadDoc = Date.now();
+  console.log('loadDocStart:' + loadDoc);
   const doc = await PDFDocument.load(pdfData);
+  console.log('loadDocEnd:' + (Date.now() - loadDoc));
 
   // Normalize and flatten layers that could cause issues with the signature
   normalizeSignatureAppearances(doc);
