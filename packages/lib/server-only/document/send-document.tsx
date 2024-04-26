@@ -149,7 +149,7 @@ export const sendDocument = async ({
         assetBaseUrl,
         signDocumentLink,
         customBody: renderCustomEmailTemplate(
-          selfSigner ? selfSignerCustomEmail : customEmail?.message || '',
+          selfSigner && !customEmail?.message ? selfSignerCustomEmail : customEmail?.message || '',
           customEmailTemplate,
         ),
         role: recipient.role,
