@@ -38,7 +38,7 @@ export const getFlag = async (
     .then((res) => ZFeatureFlagValueSchema.parse(res))
     .catch((err) => {
       console.error(err);
-      return false;
+      return LOCAL_FEATURE_FLAGS[flag] ?? false;
     });
 };
 
