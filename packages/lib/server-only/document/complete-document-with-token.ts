@@ -74,6 +74,13 @@ export const completeDocumentWithToken = async ({
     throw new Error(`Recipient ${recipient.id} has unsigned fields`);
   }
 
+  // eslint-disable-next-line no-promise-executor-return
+  await new Promise<void>((resolve) => setTimeout(() => resolve(), 70000));
+
+  if (Date.now() > 0) {
+    throw new Error('Test');
+  }
+
   // Document reauth for completing documents is currently not required.
 
   // const { derivedRecipientActionAuth } = extractDocumentAuthMethods({
