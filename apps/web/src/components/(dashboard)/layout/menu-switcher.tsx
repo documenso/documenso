@@ -170,11 +170,20 @@ export const MenuSwitcher = ({ user, teams: initialTeamsData }: MenuSwitcherProp
             <div className="custom-scrollbar max-h-[40vh] overflow-auto">
               {teams.map((team) => (
                 <DropdownMenuItem asChild key={team.id}>
-                  <Link href={formatRedirectUrlOnSwitch(team.url)}>
+                  <Link href={formatRedirectUrlOnSwitch(team.url)} className="group">
                     <AvatarWithText
                       avatarFallback={formatAvatarFallback(team.name)}
                       primaryText={team.name}
-                      secondaryText={formatSecondaryAvatarText(team)}
+                      secondaryText={
+                        <>
+                          <span className={cn('opacity', teams.length > 1 && 'group-hover:hidden')}>
+                            {formatSecondaryAvatarText(team)}
+                          </span>
+                          <span
+                            className={cn('opacity-0', teams.length > 1 && 'group-hover:opacity-75')}
+                          >{`/t/${team.url}`}</span>
+                        </>
+                      }
                       rightSideComponent={
                         isPathTeamUrl(team.url) && (
                           <CheckCircle2 className="ml-auto fill-black text-white dark:fill-white dark:text-black" />
