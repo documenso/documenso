@@ -224,6 +224,10 @@ export const EditDocumentForm = ({
     }
   };
 
+  const setSubjectFormFields = (subject?: string, message?: string) => {
+    // Add functionality here
+  };
+
   const onAddFieldsFormSubmit = async (data: TAddFieldsFormSchema) => {
     try {
       await addFields({
@@ -359,6 +363,7 @@ export const EditDocumentForm = ({
               fields={fields}
               onSubmit={onAddSubjectFormSubmit}
               isDocumentPdfLoaded={isDocumentPdfLoaded}
+              setSubjectFormFields={setSubjectFormFields}
             />
           </Stepper>
         </DocumentFlowFormContainer>

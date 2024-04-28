@@ -1,5 +1,7 @@
 'use client';
 
+import { useEffect } from 'react';
+
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 
@@ -30,6 +32,8 @@ export type AddSubjectFormProps = {
   document: DocumentWithData;
   onSubmit: (_data: TAddSubjectFormSchema) => void;
   isDocumentPdfLoaded: boolean;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  setSubjectFormFields: (subject?: string, message?: string) => void;
 };
 
 export const AddSubjectFormPartial = ({
@@ -39,10 +43,12 @@ export const AddSubjectFormPartial = ({
   document,
   onSubmit,
   isDocumentPdfLoaded,
+  setSubjectFormFields,
 }: AddSubjectFormProps) => {
   const {
     register,
     handleSubmit,
+    getValues,
     formState: { errors, isSubmitting },
   } = useForm<TAddSubjectFormSchema>({
     defaultValues: {
@@ -56,6 +62,13 @@ export const AddSubjectFormPartial = ({
 
   const onFormSubmit = handleSubmit(onSubmit);
   const { currentStep, totalSteps, previousStep } = useStep();
+
+  useEffect(() => {
+    return () => {
+      const { meta } = getValues();
+      setSubjectFormFields(meta.subject, meta.message);
+    };
+  }, [getValues, setSubjectFormFields]);
 
   return (
     <>

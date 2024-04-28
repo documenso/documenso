@@ -221,6 +221,10 @@ export const documentRouter = router({
       }
     }),
 
+  getDocumentMetaById: authenticatedProcedure
+    .input(ZSetSettingsForDocumentMutationSchema)
+    .mutation(async ({ input, ctx }) => {}),
+
   setTitleForDocument: authenticatedProcedure
     .input(ZSetTitleForDocumentMutationSchema)
     .mutation(async ({ input, ctx }) => {
