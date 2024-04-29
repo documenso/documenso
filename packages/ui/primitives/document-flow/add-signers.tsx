@@ -116,6 +116,7 @@ export const AddSignersFormPartial = ({
 
   const onFormSubmit = form.handleSubmit(onSubmit);
 
+  
   const {
     append: appendSigner,
     fields: signers,
@@ -124,7 +125,7 @@ export const AddSignersFormPartial = ({
     control,
     name: 'signers',
   });
-
+  
   const hasBeenSentToRecipientId = (id?: number) => {
     if (!id) {
       return false;
@@ -165,7 +166,10 @@ export const AddSignersFormPartial = ({
   };
 
   const onAddSelfSigner = () => {
-    if(signers.length !== 0) onRemoveSigner(0);
+    const lastSignerIndex = signers.length - 1;
+    if(!signers[lastSignerIndex].name || !signers[lastSignerIndex].email){
+      onRemoveSigner(lastSignerIndex)
+    }
     appendSigner({
       formId: nanoid(12),
       name: user?.name ?? '',
