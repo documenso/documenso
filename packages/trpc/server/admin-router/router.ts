@@ -29,6 +29,8 @@ export const adminRouter = router({
     try {
       return await findDocuments({ term, page, perPage });
     } catch (err) {
+      console.error(err);
+
       throw new TRPCError({
         code: 'BAD_REQUEST',
         message: 'We were unable to retrieve the documents. Please try again.',
@@ -44,6 +46,8 @@ export const adminRouter = router({
       try {
         return await updateUser({ id, name, email, roles });
       } catch (err) {
+        console.error(err);
+
         throw new TRPCError({
           code: 'BAD_REQUEST',
           message: 'We were unable to retrieve the specified account. Please try again.',
@@ -59,6 +63,8 @@ export const adminRouter = router({
       try {
         return await updateRecipient({ id, name, email });
       } catch (err) {
+        console.error(err);
+
         throw new TRPCError({
           code: 'BAD_REQUEST',
           message: 'We were unable to update the recipient provided.',
@@ -79,6 +85,8 @@ export const adminRouter = router({
           userId: ctx.user.id,
         });
       } catch (err) {
+        console.error(err);
+
         throw new TRPCError({
           code: 'BAD_REQUEST',
           message: 'We were unable to update the site setting provided.',
@@ -95,6 +103,7 @@ export const adminRouter = router({
         return await sealDocument({ documentId: id, isResealing: true });
       } catch (err) {
         console.log('resealDocument error', err);
+
         throw new TRPCError({
           code: 'BAD_REQUEST',
           message: 'We were unable to reseal the document provided.',

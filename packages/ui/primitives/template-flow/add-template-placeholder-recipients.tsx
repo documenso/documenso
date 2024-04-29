@@ -4,7 +4,8 @@ import React, { useId, useState } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { AnimatePresence, motion } from 'framer-motion';
-import { Plus, Trash } from 'lucide-react';
+import { InfoIcon, Plus, Trash } from 'lucide-react';
+import { useSession } from 'next-auth/react';
 import { Controller, useFieldArray, useForm } from 'react-hook-form';
 
 import { nanoid } from '@documenso/lib/universal/id';
@@ -24,6 +25,7 @@ import type { DocumentFlowStep } from '../document-flow/types';
 import { ROLE_ICONS } from '../recipient-role-icons';
 import { Select, SelectContent, SelectItem, SelectTrigger } from '../select';
 import { useStep } from '../stepper';
+import { Tooltip, TooltipContent, TooltipTrigger } from '../tooltip';
 import type { TAddTemplatePlacholderRecipientsFormSchema } from './add-template-placeholder-recipients.types';
 import { ZAddTemplatePlacholderRecipientsFormSchema } from './add-template-placeholder-recipients.types';
 
@@ -41,6 +43,8 @@ export const AddTemplatePlaceholderRecipientsFormPartial = ({
   onSubmit,
 }: AddTemplatePlaceholderRecipientsFormProps) => {
   const initialId = useId();
+  const { data: session } = useSession();
+  const user = session?.user;
   const [placeholderRecipientCount, setPlaceholderRecipientCount] = useState(() =>
     recipients.length > 1 ? recipients.length + 1 : 2,
   );
@@ -50,6 +54,7 @@ export const AddTemplatePlaceholderRecipientsFormPartial = ({
   const {
     control,
     handleSubmit,
+    getValues,
     formState: { errors, isSubmitting },
   } = useForm<TAddTemplatePlacholderRecipientsFormSchema>({
     resolver: zodResolver(ZAddTemplatePlacholderRecipientsFormSchema),
@@ -84,6 +89,15 @@ export const AddTemplatePlaceholderRecipientsFormPartial = ({
     control,
     name: 'signers',
   });
+
+  const onAddPlaceholderSelfRecipient = () => {
+    appendSigner({
+      formId: nanoid(12),
+      name: user?.name ?? '',
+      email: user?.email ?? '',
+      role: RecipientRole.SIGNER,
+    });
+  };
 
   const onAddPlaceholderRecipient = () => {
     appendSigner({
@@ -146,29 +160,81 @@ export const AddTemplatePlaceholderRecipientsFormPartial = ({
                         <SelectContent className="" align="end">
                           <SelectItem value={RecipientRole.SIGNER}>
                             <div className="flex items-center">
-                              <span className="mr-2">{ROLE_ICONS[RecipientRole.SIGNER]}</span>
-                              Signer
-                            </div>
-                          </SelectItem>
-
-                          <SelectItem value={RecipientRole.CC}>
-                            <div className="flex items-center">
-                              <span className="mr-2">{ROLE_ICONS[RecipientRole.CC]}</span>
-                              Receives copy
+                              <div className="flex w-[150px] items-center">
+                                <span className="mr-2">{ROLE_ICONS[RecipientRole.SIGNER]}</span>
+                                Needs to sign
+                              </div>
+                              <Tooltip>
+                                <TooltipTrigger>
+                                  <InfoIcon className="h-4 w-4" />
+                                </TooltipTrigger>
+                                <TooltipContent className="text-foreground z-9999 max-w-md p-4">
+                                  <p>
+                                    The recipient is required to sign the document for it to be
+                                    completed.
+                                  </p>
+                                </TooltipContent>
+                              </Tooltip>
                             </div>
                           </SelectItem>
 
                           <SelectItem value={RecipientRole.APPROVER}>
                             <div className="flex items-center">
-                              <span className="mr-2">{ROLE_ICONS[RecipientRole.APPROVER]}</span>
-                              Approver
+                              <div className="flex w-[150px] items-center">
+                                <span className="mr-2">{ROLE_ICONS[RecipientRole.APPROVER]}</span>
+                                Needs to approve
+                              </div>
+                              <Tooltip>
+                                <TooltipTrigger>
+                                  <InfoIcon className="h-4 w-4" />
+                                </TooltipTrigger>
+                                <TooltipContent className="text-foreground z-9999 max-w-md p-4">
+                                  <p>
+                                    The recipient is required to approve the document for it to be
+                                    completed.
+                                  </p>
+                                </TooltipContent>
+                              </Tooltip>
                             </div>
                           </SelectItem>
 
                           <SelectItem value={RecipientRole.VIEWER}>
                             <div className="flex items-center">
-                              <span className="mr-2">{ROLE_ICONS[RecipientRole.VIEWER]}</span>
-                              Viewer
+                              <div className="flex w-[150px] items-center">
+                                <span className="mr-2">{ROLE_ICONS[RecipientRole.VIEWER]}</span>
+                                Needs to view
+                              </div>
+                              <Tooltip>
+                                <TooltipTrigger>
+                                  <InfoIcon className="h-4 w-4" />
+                                </TooltipTrigger>
+                                <TooltipContent className="text-foreground z-9999 max-w-md p-4">
+                                  <p>
+                                    The recipient is required to view the document for it to be
+                                    completed.
+                                  </p>
+                                </TooltipContent>
+                              </Tooltip>
+                            </div>
+                          </SelectItem>
+
+                          <SelectItem value={RecipientRole.CC}>
+                            <div className="flex items-center">
+                              <div className="flex w-[150px] items-center">
+                                <span className="mr-2">{ROLE_ICONS[RecipientRole.CC]}</span>
+                                Receives copy
+                              </div>
+                              <Tooltip>
+                                <TooltipTrigger>
+                                  <InfoIcon className="h-4 w-4" />
+                                </TooltipTrigger>
+                                <TooltipContent className="text-foreground z-9999 max-w-md p-4">
+                                  <p>
+                                    The recipient is not required to take any action and receives a
+                                    copy of the document after it is completed.
+                                  </p>
+                                </TooltipContent>
+                              </Tooltip>
                             </div>
                           </SelectItem>
                         </SelectContent>
@@ -203,10 +269,26 @@ export const AddTemplatePlaceholderRecipientsFormPartial = ({
           error={'signers__root' in errors && errors['signers__root']}
         />
 
-        <div className="mt-4">
-          <Button type="button" disabled={isSubmitting} onClick={() => onAddPlaceholderRecipient()}>
+        <div className="mt-4 flex flex-row items-center space-x-4">
+          <Button
+            type="button"
+            className="flex-1"
+            disabled={isSubmitting}
+            onClick={() => onAddPlaceholderRecipient()}
+          >
             <Plus className="-ml-1 mr-2 h-5 w-5" />
             Add Placeholder Recipient
+          </Button>
+          <Button
+            type="button"
+            className="dark:bg-muted dark:hover:bg-muted/80 bg-black/5 hover:bg-black/10"
+            disabled={
+              isSubmitting || getValues('signers').some((signer) => signer.email === user?.email)
+            }
+            onClick={() => onAddPlaceholderSelfRecipient()}
+          >
+            <Plus className="-ml-1 mr-2 h-5 w-5" />
+            Add Myself
           </Button>
         </div>
       </DocumentFlowFormContainerContent>

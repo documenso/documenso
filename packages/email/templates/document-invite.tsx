@@ -22,6 +22,7 @@ import { TemplateFooter } from '../template-components/template-footer';
 export type DocumentInviteEmailTemplateProps = Partial<TemplateDocumentInviteProps> & {
   customBody?: string;
   role: RecipientRole;
+  selfSigner?: boolean;
 };
 
 export const DocumentInviteEmailTemplate = ({
@@ -32,10 +33,13 @@ export const DocumentInviteEmailTemplate = ({
   assetBaseUrl = 'http://localhost:3002',
   customBody,
   role,
+  selfSigner = false,
 }: DocumentInviteEmailTemplateProps) => {
   const action = RECIPIENT_ROLES_DESCRIPTION[role].actionVerb.toLowerCase();
 
-  const previewText = `${inviterName} has invited you to ${action} ${documentName}`;
+  const previewText = selfSigner
+    ? `Please ${action} your document ${documentName}`
+    : `${inviterName} has invited you to ${action} ${documentName}`;
 
   const getAssetUrl = (path: string) => {
     return new URL(path, assetBaseUrl).toString();
@@ -71,6 +75,7 @@ export const DocumentInviteEmailTemplate = ({
                   signDocumentLink={signDocumentLink}
                   assetBaseUrl={assetBaseUrl}
                   role={role}
+                  selfSigner={selfSigner}
                 />
               </Section>
             </Container>

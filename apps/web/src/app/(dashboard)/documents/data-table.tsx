@@ -29,7 +29,7 @@ export type DocumentsDataTableProps = {
     }
   >;
   showSenderColumn?: boolean;
-  team?: Pick<Team, 'id' | 'url'>;
+  team?: Pick<Team, 'id' | 'url'> & { teamEmail?: string };
 };
 
 export const DocumentsDataTable = ({
@@ -76,7 +76,12 @@ export const DocumentsDataTable = ({
           {
             header: 'Recipient',
             accessorKey: 'recipient',
-            cell: ({ row }) => <StackAvatarsWithTooltip recipients={row.original.Recipient} />,
+            cell: ({ row }) => (
+              <StackAvatarsWithTooltip
+                recipients={row.original.Recipient}
+                documentStatus={row.original.status}
+              />
+            ),
           },
           {
             header: 'Status',

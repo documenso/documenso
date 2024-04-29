@@ -236,11 +236,29 @@ export const ZDocumentAuditLogEventDocumentFieldInsertedSchema = z.object({
         data: z.string(),
       }),
     ]),
-    fieldSecurity: z
-      .object({
-        type: ZRecipientActionAuthTypesSchema,
-      })
-      .optional(),
+    fieldSecurity: z.preprocess(
+      (input) => {
+        const legacyNoneSecurityType = JSON.stringify({
+          type: 'NONE',
+        });
+
+        // Replace legacy 'NONE' field security type with undefined.
+        if (
+          typeof input === 'object' &&
+          input !== null &&
+          JSON.stringify(input) === legacyNoneSecurityType
+        ) {
+          return undefined;
+        }
+
+        return input;
+      },
+      z
+        .object({
+          type: ZRecipientActionAuthTypesSchema,
+        })
+        .optional(),
+    ),
   }),
 });
 
