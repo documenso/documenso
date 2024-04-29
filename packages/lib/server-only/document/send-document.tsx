@@ -11,7 +11,7 @@ import type { RequestMetadata } from '@documenso/lib/universal/extract-request-m
 import { createDocumentAuditLogData } from '@documenso/lib/utils/document-audit-logs';
 import { renderCustomEmailTemplate } from '@documenso/lib/utils/render-custom-email-template';
 import { prisma } from '@documenso/prisma';
-import { DocumentStatus, RecipientRole, SendStatus } from '@documenso/prisma/client';
+import { DocumentStatus, RecipientRole, SendStatus, SigningStatus } from '@documenso/prisma/client';
 import { WebhookTriggerEvents } from '@documenso/prisma/client';
 
 import { NEXT_PUBLIC_WEBAPP_URL } from '../../constants/app';
@@ -122,7 +122,7 @@ export const sendDocument = async ({
 
   await Promise.all(
     document.Recipient.map(async (recipient) => {
-      if (recipient.sendStatus === SendStatus.SENT || recipient.role === RecipientRole.CC) {
+      if (recipient.signingStatus === SigningStatus.SIGNED || recipient.role === RecipientRole.CC) {
         return;
       }
 
