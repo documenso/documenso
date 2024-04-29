@@ -138,16 +138,6 @@ export const AddSignersFormPartial = ({
     );
   };
 
-  const onAddSelfSigner = () => {
-    appendSigner({
-      formId: nanoid(12),
-      name: user?.name ?? '',
-      email: user?.email ?? '',
-      role: RecipientRole.SIGNER,
-      actionAuth: undefined,
-    });
-  };
-
   const onAddSigner = () => {
     appendSigner({
       formId: nanoid(12),
@@ -172,6 +162,20 @@ export const AddSignersFormPartial = ({
     }
 
     removeSigner(index);
+  };
+
+  const onAddSelfSigner = () => {
+    const lastSignerIndex = signers.length - 1;
+    if(!signers[lastSignerIndex].name || !signers[lastSignerIndex].email){
+      onRemoveSigner(lastSignerIndex)
+    }
+    appendSigner({
+      formId: nanoid(12),
+      name: user?.name ?? '',
+      email: user?.email ?? '',
+      role: RecipientRole.SIGNER,
+      actionAuth: undefined,
+    });
   };
 
   const onKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
