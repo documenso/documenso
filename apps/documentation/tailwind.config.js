@@ -7,5 +7,13 @@ module.exports = {
   content: [
     ...baseConfig.content,
     `${path.join(require.resolve('@documenso/ui'), '..')}/**/*.{ts,tsx}`,
+    './pages/**/*.{js,ts,jsx,tsx,mdx}',
+    './components/**/*.{js,ts,jsx,tsx,mdx}',
   ],
+  theme: {
+    fontFamily: {
+      sans: ['Inter', 'sans-serif'],
+      serif: ['Caveat', 'cursive'],
+    },
+  },
 };
