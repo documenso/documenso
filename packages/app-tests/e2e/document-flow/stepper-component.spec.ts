@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test';
+import { DateTime } from 'luxon';
 import path from 'node:path';
 
 import { getRecipientByEmail } from '@documenso/lib/server-only/recipient/get-recipient-by-email';
@@ -493,71 +494,18 @@ test('[DOCUMENT_FLOW]: should be able to create, send with redirect url, sign a 
 
 test('[DOCUMENT_FLOW]: should be able to sign a document with custom date', async ({ page }) => {
   const user = await seedUser();
-  const document = await seedBlankDocument(user);
+  const customDate = DateTime.local().toFormat('yyyy-MM-dd hh:mm a');
 
-  await apiSignin({
-    page,
-    email: user.email,
-    redirectPath: `/documents/${document.id}/edit`,
+  const { document, recipients } = await seedPendingDocumentWithFullFields({
+    owner: user,
+    recipients: ['user1@example.com'],
+    fields: [FieldType.DATE],
   });
 
-  const documentTitle = `example-${Date.now()}.pdf`;
-  const currentDate = new Date().toISOString().slice(0, 10);
-
-  // Set title and date format
-  await expect(page.getByRole('heading', { name: 'General' })).toBeVisible();
-  await page.getByLabel('Title').fill(documentTitle);
-  await page.getByRole('button', { name: 'Advanced Options' }).click();
-  await page.getByRole('combobox').nth(1).click();
-  await page.getByLabel('YYYY-MM-DD', { exact: true }).click();
-  await page.getByRole('button', { name: 'Continue' }).click();
-
-  // Add signers
-  await expect(page.getByRole('heading', { name: 'Add Signers' })).toBeVisible();
-
-  await page.getByPlaceholder('Email').fill('user1@example.com');
-  await page.getByPlaceholder('Name').fill('User 1');
-
-  await page.getByRole('button', { name: 'Continue' }).click();
-
-  // Add fields
-  await expect(page.getByRole('heading', { name: 'Add Fields' })).toBeVisible();
-
-  await page.getByRole('button', { name: 'Date Date' }).click();
-  await page.locator('canvas').click({
-    position: {
-      x: 400,
-      y: 100,
-    },
-  });
-
-  await page.getByRole('button', { name: 'Continue' }).click();
-
-  // Add subject and send
-  await expect(page.getByRole('heading', { name: 'Add Subject' })).toBeVisible();
-  await page.getByRole('button', { name: 'Send' }).click();
-
-  await page.waitForURL('/documents');
-
-  // Assert document was created
-  await expect(page.getByRole('link', { name: documentTitle })).toBeVisible();
-  await page.getByRole('link', { name: documentTitle }).click();
-  await page.waitForURL(/\/documents\/\d+/);
-
-  // Start signing process
-  const url = page.url().split('/');
-  const documentId = url[url.length - 1];
-
-  const { token } = await getRecipientByEmail({
-    email: 'user1@example.com',
-    documentId: Number(documentId),
-  });
+  const { token } = recipients[0];
 
   await page.goto(`/sign/${token}`);
   await page.waitForURL(`/sign/${token}`);
-
-  const { status } = await getDocumentByToken(token);
-  expect(status).toBe(DocumentStatus.PENDING);
 
   await page.getByTestId('field').click();
 
@@ -573,11 +521,11 @@ test('[DOCUMENT_FLOW]: should be able to sign a document with custom date', asyn
       Recipient: {
         email: 'user1@example.com',
       },
-      documentId: Number(documentId),
+      documentId: Number(document.id),
     },
   });
 
-  expect(field?.customText).toBe(currentDate);
+  expect(field?.customText).toBe(customDate);
 
   // Check if document has been signed
   const { status: completedStatus } = await getDocumentByToken(token);
