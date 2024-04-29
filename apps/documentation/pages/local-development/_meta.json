@@ -3,5 +3,6 @@
   "quickstart": "Developer Quickstart",
   "manual": "Manual Setup",
   "docker": "Docker",
-  "gitpod": "Gitpod"
+  "gitpod": "Gitpod",
+  "signing-certificate": "Signing Certificate"
 }
