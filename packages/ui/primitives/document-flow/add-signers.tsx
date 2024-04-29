@@ -116,7 +116,6 @@ export const AddSignersFormPartial = ({
 
   const onFormSubmit = form.handleSubmit(onSubmit);
 
-  
   const {
     append: appendSigner,
     fields: signers,
@@ -125,7 +124,7 @@ export const AddSignersFormPartial = ({
     control,
     name: 'signers',
   });
-  
+
   const hasBeenSentToRecipientId = (id?: number) => {
     if (!id) {
       return false;
@@ -137,6 +136,16 @@ export const AddSignersFormPartial = ({
         recipient.sendStatus === SendStatus.SENT &&
         recipient.role !== RecipientRole.CC,
     );
+  };
+
+  const onAddSelfSigner = () => {
+    appendSigner({
+      formId: nanoid(12),
+      name: user?.name ?? '',
+      email: user?.email ?? '',
+      role: RecipientRole.SIGNER,
+      actionAuth: undefined,
+    });
   };
 
   const onAddSigner = () => {
@@ -163,20 +172,6 @@ export const AddSignersFormPartial = ({
     }
 
     removeSigner(index);
-  };
-
-  const onAddSelfSigner = () => {
-    const lastSignerIndex = signers.length - 1;
-    if(!signers[lastSignerIndex].name || !signers[lastSignerIndex].email){
-      onRemoveSigner(lastSignerIndex)
-    }
-    appendSigner({
-      formId: nanoid(12),
-      name: user?.name ?? '',
-      email: user?.email ?? '',
-      role: RecipientRole.SIGNER,
-      actionAuth: undefined,
-    });
   };
 
   const onKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
@@ -307,10 +302,10 @@ export const AddSignersFormPartial = ({
                                         global action signing authentication method configured in
                                         the "General Settings" step
                                       </li>
-                                      <li>
+                                      {/* <li>
                                         <strong>Require account</strong> - The recipient must be
                                         signed in
-                                      </li>
+                                      </li> */}
                                       <li>
                                         <strong>Require passkey</strong> - The recipient must have
                                         an account and passkey configured via their settings
@@ -331,11 +326,13 @@ export const AddSignersFormPartial = ({
                                 {/* Note: -1 is remapped in the Zod schema to the required value. */}
                                 <SelectItem value="-1">Inherit authentication method</SelectItem>
 
-                                {Object.values(RecipientActionAuth).map((authType) => (
-                                  <SelectItem key={authType} value={authType}>
-                                    {DOCUMENT_AUTH_TYPES[authType].value}
-                                  </SelectItem>
-                                ))}
+                                {Object.values(RecipientActionAuth)
+                                  .filter((auth) => auth !== RecipientActionAuth.ACCOUNT)
+                                  .map((authType) => (
+                                    <SelectItem key={authType} value={authType}>
+                                      {DOCUMENT_AUTH_TYPES[authType].value}
+                                    </SelectItem>
+                                  ))}
                               </SelectContent>
                             </Select>
                           </FormControl>
