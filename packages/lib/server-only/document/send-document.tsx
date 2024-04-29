@@ -4,14 +4,12 @@ import { mailer } from '@documenso/email/mailer';
 import { render } from '@documenso/email/render';
 import { DocumentInviteEmailTemplate } from '@documenso/email/templates/document-invite';
 import { FROM_ADDRESS, FROM_NAME } from '@documenso/lib/constants/email';
-import { sealDocument } from '@documenso/lib/server-only/document/seal-document';
-import { updateDocument } from '@documenso/lib/server-only/document/update-document';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
 import type { RequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 import { createDocumentAuditLogData } from '@documenso/lib/utils/document-audit-logs';
 import { renderCustomEmailTemplate } from '@documenso/lib/utils/render-custom-email-template';
 import { prisma } from '@documenso/prisma';
-import { DocumentStatus, RecipientRole, SendStatus } from '@documenso/prisma/client';
+import { DocumentStatus, RecipientRole, SendStatus, SigningStatus } from '@documenso/prisma/client';
 import { WebhookTriggerEvents } from '@documenso/prisma/client';
 
 import { NEXT_PUBLIC_WEBAPP_URL } from '../../constants/app';
@@ -99,6 +97,7 @@ export const sendDocument = async ({
 
     const prefilled = await insertFormValuesInPdf({
       pdf: Buffer.from(file),
+      // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
       formValues: document.formValues as Record<string, string | number | boolean>,
     });
 
@@ -122,7 +121,7 @@ export const sendDocument = async ({
 
   await Promise.all(
     document.Recipient.map(async (recipient) => {
-      if (recipient.sendStatus === SendStatus.SENT || recipient.role === RecipientRole.CC) {
+      if (recipient.signingStatus === SigningStatus.SIGNED || recipient.role === RecipientRole.CC) {
         return;
       }
 
@@ -212,31 +211,6 @@ export const sendDocument = async ({
       );
     }),
   );
-
-  const allRecipientsHaveNoActionToTake = document.Recipient.every(
-    (recipient) => recipient.role === RecipientRole.CC,
-  );
-
-  if (allRecipientsHaveNoActionToTake) {
-    const updatedDocument = await updateDocument({
-      documentId,
-      userId,
-      teamId,
-      data: { status: DocumentStatus.COMPLETED },
-    });
-
-    await sealDocument({ documentId: updatedDocument.id, requestMetadata });
-
-    // Keep the return type the same for the `sendDocument` method
-    return await prisma.document.findFirstOrThrow({
-      where: {
-        id: documentId,
-      },
-      include: {
-        Recipient: true,
-      },
-    });
-  }
 
   const updatedDocument = await prisma.$transaction(async (tx) => {
     if (document.status === DocumentStatus.DRAFT) {
