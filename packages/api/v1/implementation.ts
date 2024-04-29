@@ -229,6 +229,13 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
         requestMetadata: extractNextApiRequestMetadata(args.req),
       });
 
+      await upsertDocumentMeta({
+        documentId: document.id,
+        userId: user.id,
+        ...body.meta,
+        requestMetadata: extractNextApiRequestMetadata(args.req),
+      });
+
       const recipients = await setRecipientsForDocument({
         userId: user.id,
         teamId: team?.id,
@@ -324,10 +331,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
       await upsertDocumentMeta({
         documentId: document.id,
         userId: user.id,
-        subject: body.meta.subject,
-        message: body.meta.message,
-        dateFormat: body.meta.dateFormat,
-        timezone: body.meta.timezone,
+        ...body.meta,
         requestMetadata: extractNextApiRequestMetadata(args.req),
       });
     }
