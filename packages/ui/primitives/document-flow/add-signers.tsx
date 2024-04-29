@@ -166,8 +166,8 @@ export const AddSignersFormPartial = ({
 
   const onAddSelfSigner = () => {
     const lastSignerIndex = signers.length - 1;
-    if(!signers[lastSignerIndex].name || !signers[lastSignerIndex].email){
-      onRemoveSigner(lastSignerIndex)
+    if (!signers[lastSignerIndex].name || !signers[lastSignerIndex].email) {
+      onRemoveSigner(lastSignerIndex);
     }
     appendSigner({
       formId: nanoid(12),
