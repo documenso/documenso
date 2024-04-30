@@ -29,7 +29,7 @@ export default async function auth(req: NextApiRequest, res: NextApiResponse) {
           }),
           await prisma.userSecurityAuditLog.create({
             data: {
-              userId: userId,
+              userId,
               ipAddress,
               userAgent,
               type: UserSecurityAuditLogType.SIGN_IN,
