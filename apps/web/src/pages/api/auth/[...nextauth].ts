@@ -39,7 +39,9 @@ export default async function auth(req: NextApiRequest, res: NextApiResponse) {
 
         // Create the Stripe customer and attach it to the user if it doesn't exist.
         if (user.customerId === null && IS_BILLING_ENABLED()) {
-          await getStripeCustomerByUser(user);
+          await getStripeCustomerByUser(user).catch((err) => {
+            console.error(err);
+          });
         }
       },
       signOut: async ({ token }) => {
