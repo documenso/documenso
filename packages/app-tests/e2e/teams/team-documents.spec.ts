@@ -1,4 +1,3 @@
-import type { Page } from '@playwright/test';
 import { expect, test } from '@playwright/test';
 
 import { DocumentStatus } from '@documenso/prisma/client';
@@ -7,23 +6,9 @@ import { seedTeamEmail, unseedTeam, unseedTeamEmail } from '@documenso/prisma/se
 import { seedUser } from '@documenso/prisma/seed/users';
 
 import { apiSignin, apiSignout } from '../fixtures/authentication';
+import { checkDocumentTabCount } from '../fixtures/documents';
 
 test.describe.configure({ mode: 'parallel' });
-
-const checkDocumentTabCount = async (page: Page, tabName: string, count: number) => {
-  await page.getByRole('tab', { name: tabName }).click();
-
-  if (tabName !== 'All') {
-    await expect(page.getByRole('tab', { name: tabName })).toContainText(count.toString());
-  }
-
-  if (count === 0) {
-    await expect(page.getByRole('main')).toContainText(`Nothing to do`);
-    return;
-  }
-
-  await expect(page.getByRole('main')).toContainText(`Showing ${count}`);
-};
 
 test('[TEAMS]: check team documents count', async ({ page }) => {
   const { team, teamMember2 } = await seedTeamDocuments();
@@ -245,24 +230,6 @@ test('[TEAMS]: check team documents count with external team email', async ({ pa
   await unseedTeam(team.url);
 });
 
-test('[TEAMS]: delete pending team document', async ({ page }) => {
-  const { team, teamMember2: currentUser } = await seedTeamDocuments();
-
-  await apiSignin({
-    page,
-    email: currentUser.email,
-    redirectPath: `/t/${team.url}/documents?status=PENDING`,
-  });
-
-  await page.getByRole('row').getByRole('button').nth(1).click();
-
-  await page.getByRole('menuitem', { name: 'Delete' }).click();
-  await page.getByPlaceholder("Type 'delete' to confirm").fill('delete');
-  await page.getByRole('button', { name: 'Delete' }).click();
-
-  await checkDocumentTabCount(page, 'Pending', 1);
-});
-
 test('[TEAMS]: resend pending team document', async ({ page }) => {
   const { team, teamMember2: currentUser } = await seedTeamDocuments();
 
@@ -279,4 +246,126 @@ test('[TEAMS]: resend pending team document', async ({ page }) => {
   await page.getByRole('button', { name: 'Send reminder' }).click();
 
   await expect(page.getByRole('status')).toContainText('Document re-sent');
+});
+
+test('[TEAMS]: delete draft team document', async ({ page }) => {
+  const { team, teamMember2: teamEmailMember, teamMember3 } = await seedTeamDocuments();
+
+  await apiSignin({
+    page,
+    email: teamMember3.email,
+    redirectPath: `/t/${team.url}/documents?status=DRAFT`,
+  });
+
+  await page.getByRole('row').getByRole('button').nth(1).click();
+
+  await page.getByRole('menuitem', { name: 'Delete' }).click();
+  await page.getByRole('button', { name: 'Delete' }).click();
+
+  await checkDocumentTabCount(page, 'Draft', 1);
+
+  // Should be hidden for all team members.
+  await apiSignout({ page });
+
+  // Run the test twice, one with the team owner and once with the team member email to ensure the counts are the same.
+  for (const user of [team.owner, teamEmailMember]) {
+    await apiSignin({
+      page,
+      email: user.email,
+      redirectPath: `/t/${team.url}/documents`,
+    });
+
+    // Check document counts.
+    await checkDocumentTabCount(page, 'Inbox', 0);
+    await checkDocumentTabCount(page, 'Pending', 2);
+    await checkDocumentTabCount(page, 'Completed', 1);
+    await checkDocumentTabCount(page, 'Draft', 1);
+    await checkDocumentTabCount(page, 'All', 4);
+
+    await apiSignout({ page });
+  }
+
+  await unseedTeam(team.url);
+});
+
+test('[TEAMS]: delete pending team document', async ({ page }) => {
+  const { team, teamMember2: teamEmailMember, teamMember3 } = await seedTeamDocuments();
+
+  await apiSignin({
+    page,
+    email: teamMember3.email,
+    redirectPath: `/t/${team.url}/documents?status=PENDING`,
+  });
+
+  await page.getByRole('row').getByRole('button').nth(1).click();
+
+  await page.getByRole('menuitem', { name: 'Delete' }).click();
+  await page.getByPlaceholder("Type 'delete' to confirm").fill('delete');
+  await page.getByRole('button', { name: 'Delete' }).click();
+
+  await checkDocumentTabCount(page, 'Pending', 1);
+
+  // Should be hidden for all team members.
+  await apiSignout({ page });
+
+  // Run the test twice, one with the team owner and once with the team member email to ensure the counts are the same.
+  for (const user of [team.owner, teamEmailMember]) {
+    await apiSignin({
+      page,
+      email: user.email,
+      redirectPath: `/t/${team.url}/documents`,
+    });
+
+    // Check document counts.
+    await checkDocumentTabCount(page, 'Inbox', 0);
+    await checkDocumentTabCount(page, 'Pending', 1);
+    await checkDocumentTabCount(page, 'Completed', 1);
+    await checkDocumentTabCount(page, 'Draft', 2);
+    await checkDocumentTabCount(page, 'All', 4);
+
+    await apiSignout({ page });
+  }
+
+  await unseedTeam(team.url);
+});
+
+test('[TEAMS]: delete completed team document', async ({ page }) => {
+  const { team, teamMember2: teamEmailMember, teamMember3 } = await seedTeamDocuments();
+
+  await apiSignin({
+    page,
+    email: teamMember3.email,
+    redirectPath: `/t/${team.url}/documents?status=COMPLETED`,
+  });
+
+  await page.getByRole('row').getByRole('button').nth(2).click();
+
+  await page.getByRole('menuitem', { name: 'Delete' }).click();
+  await page.getByPlaceholder("Type 'delete' to confirm").fill('delete');
+  await page.getByRole('button', { name: 'Delete' }).click();
+
+  await checkDocumentTabCount(page, 'Completed', 0);
+
+  // Should be hidden for all team members.
+  await apiSignout({ page });
+
+  // Run the test twice, one with the team owner and once with the team member email to ensure the counts are the same.
+  for (const user of [team.owner, teamEmailMember]) {
+    await apiSignin({
+      page,
+      email: user.email,
+      redirectPath: `/t/${team.url}/documents`,
+    });
+
+    // Check document counts.
+    await checkDocumentTabCount(page, 'Inbox', 0);
+    await checkDocumentTabCount(page, 'Pending', 2);
+    await checkDocumentTabCount(page, 'Completed', 0);
+    await checkDocumentTabCount(page, 'Draft', 2);
+    await checkDocumentTabCount(page, 'All', 4);
+
+    await apiSignout({ page });
+  }
+
+  await unseedTeam(team.url);
 });

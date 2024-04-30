@@ -88,6 +88,11 @@ export const resendDocument = async ({
       const recipientEmailType = RECIPIENT_ROLE_TO_EMAIL_TYPE[recipient.role];
 
       const { email, name } = recipient;
+      const selfSigner = email === user.email;
+
+      const selfSignerCustomEmail = `You have initiated the document ${`"${document.title}"`} that requires you to ${RECIPIENT_ROLES_DESCRIPTION[
+        recipient.role
+      ].actionVerb.toLowerCase()} it.`;
 
       const customEmailTemplate = {
         'signer.name': name,
@@ -104,11 +109,19 @@ export const resendDocument = async ({
         inviterEmail: user.email,
         assetBaseUrl,
         signDocumentLink,
-        customBody: renderCustomEmailTemplate(customEmail?.message || '', customEmailTemplate),
+        customBody: renderCustomEmailTemplate(
+          selfSigner ? selfSignerCustomEmail : customEmail?.message || '',
+          customEmailTemplate,
+        ),
         role: recipient.role,
+        selfSigner,
       });
 
       const { actionVerb } = RECIPIENT_ROLES_DESCRIPTION[recipient.role];
+
+      const emailSubject = selfSigner
+        ? `Reminder: Please ${actionVerb.toLowerCase()} your document`
+        : `Reminder: Please ${actionVerb.toLowerCase()} this document`;
 
       await prisma.$transaction(
         async (tx) => {
@@ -123,7 +136,7 @@ export const resendDocument = async ({
             },
             subject: customEmail?.subject
               ? renderCustomEmailTemplate(customEmail.subject, customEmailTemplate)
-              : `Please ${actionVerb.toLowerCase()} this document`,
+              : emailSubject,
             html: render(template),
             text: render(template, { plainText: true }),
           });

@@ -8,6 +8,7 @@ import {
 import { seedUser } from '@documenso/prisma/seed/users';
 
 import { apiSignin, apiSignout } from '../fixtures/authentication';
+import { checkDocumentTabCount } from '../fixtures/documents';
 
 test.describe.configure({ mode: 'serial' });
 
@@ -74,7 +75,7 @@ test('[DOCUMENTS]: deleting a completed document should not remove it from recip
     email: sender.email,
   });
 
-  // open actions menu
+  // Open document action menu.
   await page
     .locator('tr', { hasText: 'Document 1 - Completed' })
     .getByRole('cell', { name: 'Download' })
@@ -115,7 +116,7 @@ test('[DOCUMENTS]: deleting a pending document should remove it from recipients'
     email: sender.email,
   });
 
-  // open actions menu
+  // Open document action menu.
   await page.locator('tr', { hasText: 'Document 1 - Pending' }).getByRole('button').nth(1).click();
 
   // delete document
@@ -135,20 +136,11 @@ test('[DOCUMENTS]: deleting a pending document should remove it from recipients'
     });
 
     await expect(page.getByRole('link', { name: 'Document 1 - Pending' })).not.toBeVisible();
-
-    await page.goto(`/sign/${recipient.token}`);
-    await expect(page.getByText(/document.*cancelled/i).nth(0)).toBeVisible();
-
-    await page.goto('/documents');
-    await page.waitForURL('/documents');
-
     await apiSignout({ page });
   }
 });
 
-test('[DOCUMENTS]: deleting a draft document should remove it without additional prompting', async ({
-  page,
-}) => {
+test('[DOCUMENTS]: deleting draft documents should permanently remove it', async ({ page }) => {
   const { sender } = await seedDeleteDocumentsTestRequirements();
 
   await apiSignin({
@@ -156,11 +148,10 @@ test('[DOCUMENTS]: deleting a draft document should remove it without additional
     email: sender.email,
   });
 
-  // open actions menu
+  // Open document action menu.
   await page
     .locator('tr', { hasText: 'Document 1 - Draft' })
-    .getByRole('cell', { name: 'Edit' })
-    .getByRole('button')
+    .getByTestId('document-table-action-btn')
     .click();
 
   // delete document
@@ -169,4 +160,155 @@ test('[DOCUMENTS]: deleting a draft document should remove it without additional
   await page.getByRole('button', { name: 'Delete' }).click();
 
   await expect(page.getByRole('row', { name: /Document 1 - Draft/ })).not.toBeVisible();
+
+  // Check document counts.
+  await checkDocumentTabCount(page, 'Inbox', 0);
+  await checkDocumentTabCount(page, 'Pending', 1);
+  await checkDocumentTabCount(page, 'Completed', 1);
+  await checkDocumentTabCount(page, 'Draft', 0);
+  await checkDocumentTabCount(page, 'All', 2);
+});
+
+test('[DOCUMENTS]: deleting pending documents should permanently remove it', async ({ page }) => {
+  const { sender } = await seedDeleteDocumentsTestRequirements();
+
+  await apiSignin({
+    page,
+    email: sender.email,
+  });
+
+  // Open document action menu.
+  await page
+    .locator('tr', { hasText: 'Document 1 - Pending' })
+    .getByTestId('document-table-action-btn')
+    .click();
+
+  // Delete document.
+  await page.getByRole('menuitem', { name: 'Delete' }).click();
+  await page.getByPlaceholder("Type 'delete' to confirm").fill('delete');
+  await page.getByRole('button', { name: 'Delete' }).click();
+
+  await expect(page.getByRole('row', { name: /Document 1 - Pending/ })).not.toBeVisible();
+
+  // Check document counts.
+  await checkDocumentTabCount(page, 'Inbox', 0);
+  await checkDocumentTabCount(page, 'Pending', 0);
+  await checkDocumentTabCount(page, 'Completed', 1);
+  await checkDocumentTabCount(page, 'Draft', 1);
+  await checkDocumentTabCount(page, 'All', 2);
+});
+
+test('[DOCUMENTS]: deleting completed documents as an owner should hide it from only the owner', async ({
+  page,
+}) => {
+  const { sender, recipients } = await seedDeleteDocumentsTestRequirements();
+
+  await apiSignin({
+    page,
+    email: sender.email,
+  });
+
+  // Open document action menu.
+  await page
+    .locator('tr', { hasText: 'Document 1 - Completed' })
+    .getByTestId('document-table-action-btn')
+    .click();
+
+  // Delete document.
+  await page.getByRole('menuitem', { name: 'Delete' }).click();
+  await page.getByPlaceholder("Type 'delete' to confirm").fill('delete');
+  await page.getByRole('button', { name: 'Delete' }).click();
+
+  // Check document counts.
+  await expect(page.getByRole('row', { name: /Document 1 - Completed/ })).not.toBeVisible();
+  await checkDocumentTabCount(page, 'Inbox', 0);
+  await checkDocumentTabCount(page, 'Pending', 1);
+  await checkDocumentTabCount(page, 'Completed', 0);
+  await checkDocumentTabCount(page, 'Draft', 1);
+  await checkDocumentTabCount(page, 'All', 2);
+
+  // Sign into the recipient account.
+  await apiSignout({ page });
+  await apiSignin({
+    page,
+    email: recipients[0].email,
+  });
+
+  // Check document counts.
+  await expect(page.getByRole('row', { name: /Document 1 - Completed/ })).toBeVisible();
+  await checkDocumentTabCount(page, 'Inbox', 1);
+  await checkDocumentTabCount(page, 'Pending', 0);
+  await checkDocumentTabCount(page, 'Completed', 1);
+  await checkDocumentTabCount(page, 'Draft', 0);
+  await checkDocumentTabCount(page, 'All', 2);
+});
+
+test('[DOCUMENTS]: deleting documents as a recipient should only hide it for them', async ({
+  page,
+}) => {
+  const { sender, recipients } = await seedDeleteDocumentsTestRequirements();
+  const recipientA = recipients[0];
+  const recipientB = recipients[1];
+
+  await apiSignin({
+    page,
+    email: recipientA.email,
+  });
+
+  // Open document action menu.
+  await page
+    .locator('tr', { hasText: 'Document 1 - Completed' })
+    .getByTestId('document-table-action-btn')
+    .click();
+
+  // Delete document.
+  await page.getByRole('menuitem', { name: 'Hide' }).click();
+  await page.getByRole('button', { name: 'Hide' }).click();
+
+  // Open document action menu.
+  await page
+    .locator('tr', { hasText: 'Document 1 - Pending' })
+    .getByTestId('document-table-action-btn')
+    .click();
+
+  // Delete document.
+  await page.getByRole('menuitem', { name: 'Hide' }).click();
+  await page.getByRole('button', { name: 'Hide' }).click();
+
+  // Check document counts.
+  await expect(page.getByRole('row', { name: /Document 1 - Completed/ })).not.toBeVisible();
+  await expect(page.getByRole('row', { name: /Document 1 - Pending/ })).not.toBeVisible();
+  await checkDocumentTabCount(page, 'Inbox', 0);
+  await checkDocumentTabCount(page, 'Pending', 0);
+  await checkDocumentTabCount(page, 'Completed', 0);
+  await checkDocumentTabCount(page, 'Draft', 0);
+  await checkDocumentTabCount(page, 'All', 0);
+
+  // Sign into the sender account.
+  await apiSignout({ page });
+  await apiSignin({
+    page,
+    email: sender.email,
+  });
+
+  // Check document counts for sender.
+  await checkDocumentTabCount(page, 'Inbox', 0);
+  await checkDocumentTabCount(page, 'Pending', 1);
+  await checkDocumentTabCount(page, 'Completed', 1);
+  await checkDocumentTabCount(page, 'Draft', 1);
+  await checkDocumentTabCount(page, 'All', 3);
+
+  // Sign into the other recipient account.
+  await apiSignout({ page });
+  await apiSignin({
+    page,
+    email: recipientB.email,
+  });
+
+  // Check document counts for other recipient.
+  await checkDocumentTabCount(page, 'Inbox', 1);
+  await checkDocumentTabCount(page, 'Pending', 0);
+  await checkDocumentTabCount(page, 'Completed', 1);
+  await checkDocumentTabCount(page, 'Draft', 0);
+  await checkDocumentTabCount(page, 'All', 2);
 });

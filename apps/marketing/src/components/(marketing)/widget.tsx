@@ -346,7 +346,7 @@ export const Widget = ({ className, children, ...props }: WidgetProps) => {
                   {signatureText && (
                     <p
                       className={cn(
-                        'text-foreground text-4xl font-semibold [font-family:var(--font-caveat)]',
+                        'text-foreground truncate text-4xl font-semibold [font-family:var(--font-caveat)]',
                       )}
                     >
                       {signatureText}
@@ -360,7 +360,7 @@ export const Widget = ({ className, children, ...props }: WidgetProps) => {
                 >
                   <Input
                     id="signatureText"
-                    className="text-foreground placeholder:text-muted-foreground border-none p-0 text-sm focus-visible:ring-0"
+                    className="text-foreground placeholder:text-muted-foreground truncate border-none p-0 text-sm focus-visible:ring-0"
                     placeholder="Draw or type name here"
                     disabled={isSubmitting}
                     {...register('signatureText', {

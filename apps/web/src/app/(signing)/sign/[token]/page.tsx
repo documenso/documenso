@@ -6,6 +6,7 @@ import { getServerComponentSession } from '@documenso/lib/next-auth/get-server-c
 import { getDocumentAndSenderByToken } from '@documenso/lib/server-only/document/get-document-by-token';
 import { isRecipientAuthorized } from '@documenso/lib/server-only/document/is-recipient-authorized';
 import { viewedDocument } from '@documenso/lib/server-only/document/viewed-document';
+import { getCompletedFieldsForToken } from '@documenso/lib/server-only/field/get-completed-fields-for-token';
 import { getFieldsForToken } from '@documenso/lib/server-only/field/get-fields-for-token';
 import { getRecipientByToken } from '@documenso/lib/server-only/recipient/get-recipient-by-token';
 import { getRecipientSignatures } from '@documenso/lib/server-only/recipient/get-recipient-signatures';
@@ -37,7 +38,7 @@ export default async function SigningPage({ params: { token } }: SigningPageProp
 
   const requestMetadata = extractNextHeaderRequestMetadata(requestHeaders);
 
-  const [document, fields, recipient] = await Promise.all([
+  const [document, fields, recipient, completedFields] = await Promise.all([
     getDocumentAndSenderByToken({
       token,
       userId: user?.id,
@@ -45,9 +46,15 @@ export default async function SigningPage({ params: { token } }: SigningPageProp
     }).catch(() => null),
     getFieldsForToken({ token }),
     getRecipientByToken({ token }).catch(() => null),
+    getCompletedFieldsForToken({ token }),
   ]);
 
-  if (!document || !document.documentData || !recipient) {
+  if (
+    !document ||
+    !document.documentData ||
+    !recipient ||
+    document.status === DocumentStatus.DRAFT
+  ) {
     return notFound();
   }
 
@@ -120,7 +127,12 @@ export default async function SigningPage({ params: { token } }: SigningPageProp
       signature={user?.email === recipient.email ? user.signature : undefined}
     >
       <DocumentAuthProvider document={document} recipient={recipient} user={user}>
-        <SigningPageView recipient={recipient} document={document} fields={fields} />
+        <SigningPageView
+          recipient={recipient}
+          document={document}
+          fields={fields}
+          completedFields={completedFields}
+        />
       </DocumentAuthProvider>
     </SigningProvider>
   );
