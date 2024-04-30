@@ -110,6 +110,8 @@ export const AddSignersFormPartial = ({
   const [showAdvancedSettings, setShowAdvancedSettings] = useState(alwaysShowAdvancedSettings);
 
   const {
+    setValue,
+    getValues,
     formState: { errors, isSubmitting },
     control,
   } = form;
@@ -164,18 +166,29 @@ export const AddSignersFormPartial = ({
     removeSigner(index);
   };
 
+  const emptySignerIndex = signers.findIndex(
+    (signer) =>
+      !getValues(`signers.${signers.indexOf(signer)}.name`) ||
+      !getValues(`signers.${signers.indexOf(signer)}.email`),
+  );
+
   const onAddSelfSigner = () => {
     const lastSignerIndex = signers.length - 1;
-    if (!signers[lastSignerIndex].name || !signers[lastSignerIndex].email) {
+    if (!signers[lastSignerIndex].name && !signers[lastSignerIndex].email) {
       onRemoveSigner(lastSignerIndex);
     }
-    appendSigner({
-      formId: nanoid(12),
-      name: user?.name ?? '',
-      email: user?.email ?? '',
-      role: RecipientRole.SIGNER,
-      actionAuth: undefined,
-    });
+    if (emptySignerIndex !== -1) {
+      setValue(`signers.${emptySignerIndex}.name`, user?.name ?? '');
+      setValue(`signers.${emptySignerIndex}.email`, user?.email ?? '');
+    } else {
+      appendSigner({
+        formId: nanoid(12),
+        name: user?.name ?? '',
+        email: user?.email ?? '',
+        role: RecipientRole.SIGNER,
+        actionAuth: undefined,
+      });
+    }
   };
 
   const onKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
