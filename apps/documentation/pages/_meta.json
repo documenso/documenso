@@ -16,22 +16,42 @@
     "title": "FAQ",
     "type": "page"
   },
-  "local-development": {
-    "title": "Local Development",
-    "type": "page"
-  },
   "public-api": {
-    "title": "Public API",
+    "title": "API",
     "type": "page",
-    "href": "/fcc/"
+    "display": "hidden"
   },
   "webhooks": {
     "title": "Webhooks",
     "type": "page"
   },
+  "local-development": {
+    "title": "Local Development",
+    "type": "page",
+    "display": "hidden"
+  },
   "contributing": {
     "title": "Contributing Guide",
-    "type": "page"
+    "type": "page",
+    "display": "hidden"
+  },
+  "developer": {
+    "title": "Developer",
+    "type": "menu",
+    "items": {
+      "local-development": {
+        "title": "Local Development",
+        "href": "/local-development"
+      },
+      "contributing": {
+        "title": "Contributing Guide",
+        "href": "/contributing"
+      },
+      "public-api": {
+        "title": "API",
+        "href": "/public-api"
+      }
+    }
   },
   "---": {
     "type": "separator"

@@ -1,8 +1,9 @@
 {
-  "intro": {
+  "index": {
     "title": "Get started",
     "theme": {
-      "sidebar": false
+      "sidebar": false,
+      "breadcrumb": false
     }
   }
 }
