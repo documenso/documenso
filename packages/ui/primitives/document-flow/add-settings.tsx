@@ -9,7 +9,11 @@ import { useForm } from 'react-hook-form';
 import { DATE_FORMATS, DEFAULT_DOCUMENT_DATE_FORMAT } from '@documenso/lib/constants/date-formats';
 import { DOCUMENT_AUTH_TYPES } from '@documenso/lib/constants/document-auth';
 import { DEFAULT_DOCUMENT_TIME_ZONE, TIME_ZONES } from '@documenso/lib/constants/time-zones';
-import { DocumentAccessAuth, DocumentActionAuth } from '@documenso/lib/types/document-auth';
+import {
+  DocumentAccessAuth,
+  DocumentActionAuth,
+  DocumentAuth,
+} from '@documenso/lib/types/document-auth';
 import { extractDocumentAuthMethods } from '@documenso/lib/utils/document-auth';
 import { DocumentStatus, type Field, type Recipient, SendStatus } from '@documenso/prisma/client';
 import type { DocumentWithData } from '@documenso/prisma/types/document-with-data';
@@ -216,9 +220,9 @@ export const AddSettingsFormPartial = ({
                           </p>
 
                           <ul className="ml-3.5 list-outside list-disc space-y-0.5 py-2">
-                            <li>
+                            {/* <li>
                               <strong>Require account</strong> - The recipient must be signed in
-                            </li>
+                            </li> */}
                             <li>
                               <strong>Require passkey</strong> - The recipient must have an account
                               and passkey configured via their settings
@@ -242,11 +246,13 @@ export const AddSettingsFormPartial = ({
                         </SelectTrigger>
 
                         <SelectContent position="popper">
-                          {Object.values(DocumentActionAuth).map((authType) => (
-                            <SelectItem key={authType} value={authType}>
-                              {DOCUMENT_AUTH_TYPES[authType].value}
-                            </SelectItem>
-                          ))}
+                          {Object.values(DocumentActionAuth)
+                            .filter((auth) => auth !== DocumentAuth.ACCOUNT)
+                            .map((authType) => (
+                              <SelectItem key={authType} value={authType}>
+                                {DOCUMENT_AUTH_TYPES[authType].value}
+                              </SelectItem>
+                            ))}
 
                           {/* Note: -1 is remapped in the Zod schema to the required value. */}
                           <SelectItem value={'-1'}>None</SelectItem>

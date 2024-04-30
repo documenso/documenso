@@ -53,6 +53,10 @@ export const ZUploadDocumentSuccessfulSchema = z.object({
   key: z.string(),
 });
 
+export const ZDownloadDocumentSuccessfulSchema = z.object({
+  downloadUrl: z.string(),
+});
+
 export type TUploadDocumentSuccessfulSchema = z.infer<typeof ZUploadDocumentSuccessfulSchema>;
 
 export const ZCreateDocumentMutationSchema = z.object({
@@ -73,6 +77,7 @@ export const ZCreateDocumentMutationSchema = z.object({
       redirectUrl: z.string(),
     })
     .partial(),
+  formValues: z.record(z.string(), z.union([z.string(), z.boolean(), z.number()])).optional(),
 });
 
 export type TCreateDocumentMutationSchema = z.infer<typeof ZCreateDocumentMutationSchema>;
@@ -112,6 +117,7 @@ export const ZCreateDocumentFromTemplateMutationSchema = z.object({
     })
     .partial()
     .optional(),
+  formValues: z.record(z.string(), z.union([z.string(), z.boolean(), z.number()])).optional(),
 });
 
 export type TCreateDocumentFromTemplateMutationSchema = z.infer<

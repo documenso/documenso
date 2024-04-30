@@ -49,8 +49,8 @@ export const completeDocumentWithToken = async ({
 
   const document = await getDocument({ token, documentId });
 
-  if (document.status === DocumentStatus.COMPLETED) {
-    throw new Error(`Document ${document.id} has already been completed`);
+  if (document.status !== DocumentStatus.PENDING) {
+    throw new Error(`Document ${document.id} must be pending`);
   }
 
   if (document.Recipient.length === 0) {
