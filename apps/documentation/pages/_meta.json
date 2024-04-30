@@ -8,13 +8,10 @@
     },
     "display": "hidden"
   },
-  "app": {
-    "title": "Getting Started",
-    "type": "page"
-  },
-  "faq": {
-    "title": "FAQ",
-    "type": "page"
+  "get-started": {
+    "title": "Get Started",
+    "type": "page",
+    "display": "hidden"
   },
   "public-api": {
     "title": "API",
@@ -35,6 +32,16 @@
     "title": "Contributing Guide",
     "type": "page",
     "display": "hidden"
+  },
+  "user": {
+    "title": "User",
+    "type": "menu",
+    "items": {
+      "app": {
+        "title": "Get Started",
+        "href": "/get-started"
+      }
+    }
   },
   "developer": {
     "title": "Developer",
