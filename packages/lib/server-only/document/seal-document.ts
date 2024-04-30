@@ -14,7 +14,7 @@ import { signPdf } from '@documenso/signing';
 
 import type { RequestMetadata } from '../../universal/extract-request-metadata';
 import { getFile } from '../../universal/upload/get-file';
-import { putFile } from '../../universal/upload/put-file';
+import { putDocumentFile } from '../../universal/upload/put-file';
 import { getCertificatePdf } from '../htmltopdf/get-certificate-pdf';
 import { flattenAnnotations } from '../pdf/flatten-annotations';
 import { insertFieldInPDF } from '../pdf/insert-field-in-pdf';
@@ -119,7 +119,7 @@ export const sealDocument = async ({
 
   const { name, ext } = path.parse(document.title);
 
-  const { data: newData } = await putFile({
+  const { data: newData } = await putDocumentFile({
     name: `${name}_signed${ext}`,
     type: 'application/pdf',
     arrayBuffer: async () => Promise.resolve(pdfBuffer),

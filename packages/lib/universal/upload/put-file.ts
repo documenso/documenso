@@ -14,14 +14,15 @@ type File = {
   arrayBuffer: () => Promise<ArrayBuffer>;
 };
 
-export const putFile = async (file: File) => {
-  const NEXT_PUBLIC_UPLOAD_TRANSPORT = env('NEXT_PUBLIC_UPLOAD_TRANSPORT');
-
+/**
+ * Uploads a document file to the appropriate storage location and creates
+ * a document data record.
+ */
+export const putDocumentFile = async (file: File) => {
   const isEncryptedDocumentsAllowed = await getFlag('app_allow_encrypted_documents');
 
+  // This will prevent uploading encrypted PDFs or anything that can't be opened.
   if (!isEncryptedDocumentsAllowed) {
-    // Putting this here since `putFile` seems to be hardcoded for Documents anyway.
-    // This will prevent uploading encrypted PDFs or anything that can't be opened.
     await PDFDocument.load(await file.arrayBuffer()).catch((e) => {
       console.error(`PDF upload parse error: ${e.message}`);
 
@@ -29,11 +30,20 @@ export const putFile = async (file: File) => {
     });
   }
 
-  const { type, data } = await match(NEXT_PUBLIC_UPLOAD_TRANSPORT)
-    .with('s3', async () => putFileInS3(file))
-    .otherwise(async () => putFileInDatabase(file));
+  const { type, data } = await putFileInDatabase(file);
 
   return await createDocumentData({ type, data });
+};
+
+/**
+ * Uploads a file to the appropriate storage location.
+ */
+export const putFile = async (file: File) => {
+  const NEXT_PUBLIC_UPLOAD_TRANSPORT = env('NEXT_PUBLIC_UPLOAD_TRANSPORT');
+
+  return await match(NEXT_PUBLIC_UPLOAD_TRANSPORT)
+    .with('s3', async () => putFileInS3(file))
+    .otherwise(async () => putFileInDatabase(file));
 };
 
 const putFileInDatabase = async (file: File) => {
