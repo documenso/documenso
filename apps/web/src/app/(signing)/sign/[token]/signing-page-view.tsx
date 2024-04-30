@@ -4,12 +4,14 @@ import { DEFAULT_DOCUMENT_DATE_FORMAT } from '@documenso/lib/constants/date-form
 import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
 import { DEFAULT_DOCUMENT_TIME_ZONE } from '@documenso/lib/constants/time-zones';
 import type { DocumentAndSender } from '@documenso/lib/server-only/document/get-document-by-token';
+import type { CompletedField } from '@documenso/lib/types/fields';
 import type { Field, Recipient } from '@documenso/prisma/client';
 import { FieldType, RecipientRole } from '@documenso/prisma/client';
 import { Card, CardContent } from '@documenso/ui/primitives/card';
 import { ElementVisible } from '@documenso/ui/primitives/element-visible';
 import { LazyPDFViewer } from '@documenso/ui/primitives/lazy-pdf-viewer';
 
+import { DocumentReadOnlyFields } from '~/components/document/document-read-only-fields';
 import { truncateTitle } from '~/helpers/truncate-title';
 
 import { DateField } from './date-field';
@@ -23,9 +25,15 @@ export type SigningPageViewProps = {
   document: DocumentAndSender;
   recipient: Recipient;
   fields: Field[];
+  completedFields: CompletedField[];
 };
 
-export const SigningPageView = ({ document, recipient, fields }: SigningPageViewProps) => {
+export const SigningPageView = ({
+  document,
+  recipient,
+  fields,
+  completedFields,
+}: SigningPageViewProps) => {
   const truncatedTitle = truncateTitle(document.title);
 
   const { documentData, documentMeta } = document;
@@ -69,6 +77,8 @@ export const SigningPageView = ({ document, recipient, fields }: SigningPageView
           />
         </div>
       </div>
+
+      <DocumentReadOnlyFields fields={completedFields} />
 
       <ElementVisible target={PDF_VIEWER_PAGE_SELECTOR}>
         {fields.map((field) =>

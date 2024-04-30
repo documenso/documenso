@@ -58,12 +58,12 @@ export const signFieldWithToken = async ({
     throw new Error(`Recipient not found for field ${field.id}`);
   }
 
-  if (document.status === DocumentStatus.COMPLETED) {
-    throw new Error(`Document ${document.id} has already been completed`);
-  }
-
   if (document.deletedAt) {
     throw new Error(`Document ${document.id} has been deleted`);
+  }
+
+  if (document.status !== DocumentStatus.PENDING) {
+    throw new Error(`Document ${document.id} must be pending for signing`);
   }
 
   if (recipient?.signingStatus === SigningStatus.SIGNED) {

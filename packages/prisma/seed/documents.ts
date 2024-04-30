@@ -342,14 +342,15 @@ export const seedPendingDocumentWithFullFields = async ({
     },
   });
 
-  const latestDocument = updateDocumentOptions
-    ? await prisma.document.update({
-        where: {
-          id: document.id,
-        },
-        data: updateDocumentOptions,
-      })
-    : document;
+  const latestDocument = await prisma.document.update({
+    where: {
+      id: document.id,
+    },
+    data: {
+      ...updateDocumentOptions,
+      status: DocumentStatus.PENDING,
+    },
+  });
 
   return {
     document: latestDocument,

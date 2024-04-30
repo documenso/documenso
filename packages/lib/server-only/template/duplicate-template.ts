@@ -82,6 +82,10 @@ export const duplicateTemplate = async ({
         (doc) => doc.email === recipient?.email,
       );
 
+      if (!duplicatedTemplateRecipient) {
+        throw new Error('Recipient not found.');
+      }
+
       return {
         type: field.type,
         page: field.page,
@@ -92,7 +96,7 @@ export const duplicateTemplate = async ({
         customText: field.customText,
         inserted: field.inserted,
         templateId: duplicatedTemplate.id,
-        recipientId: duplicatedTemplateRecipient?.id || null,
+        recipientId: duplicatedTemplateRecipient.id,
       };
     }),
   });

@@ -4,6 +4,8 @@ import { mailer } from '@documenso/email/mailer';
 import { render } from '@documenso/email/render';
 import { DocumentInviteEmailTemplate } from '@documenso/email/templates/document-invite';
 import { FROM_ADDRESS, FROM_NAME } from '@documenso/lib/constants/email';
+import { sealDocument } from '@documenso/lib/server-only/document/seal-document';
+import { updateDocument } from '@documenso/lib/server-only/document/update-document';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
 import type { RequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 import { createDocumentAuditLogData } from '@documenso/lib/utils/document-audit-logs';
@@ -127,6 +129,11 @@ export const sendDocument = async ({
       const recipientEmailType = RECIPIENT_ROLE_TO_EMAIL_TYPE[recipient.role];
 
       const { email, name } = recipient;
+      const selfSigner = email === user.email;
+
+      const selfSignerCustomEmail = `You have initiated the document ${`"${document.title}"`} that requires you to ${RECIPIENT_ROLES_DESCRIPTION[
+        recipient.role
+      ].actionVerb.toLowerCase()} it.`;
 
       const customEmailTemplate = {
         'signer.name': name,
@@ -143,11 +150,19 @@ export const sendDocument = async ({
         inviterEmail: user.email,
         assetBaseUrl,
         signDocumentLink,
-        customBody: renderCustomEmailTemplate(customEmail?.message || '', customEmailTemplate),
+        customBody: renderCustomEmailTemplate(
+          selfSigner ? selfSignerCustomEmail : customEmail?.message || '',
+          customEmailTemplate,
+        ),
         role: recipient.role,
+        selfSigner,
       });
 
       const { actionVerb } = RECIPIENT_ROLES_DESCRIPTION[recipient.role];
+
+      const emailSubject = selfSigner
+        ? `Please ${actionVerb.toLowerCase()} your document`
+        : `Please ${actionVerb.toLowerCase()} this document`;
 
       await prisma.$transaction(
         async (tx) => {
@@ -162,7 +177,7 @@ export const sendDocument = async ({
             },
             subject: customEmail?.subject
               ? renderCustomEmailTemplate(customEmail.subject, customEmailTemplate)
-              : `Please ${actionVerb.toLowerCase()} this document`,
+              : emailSubject,
             html: render(template),
             text: render(template, { plainText: true }),
           });
@@ -197,6 +212,31 @@ export const sendDocument = async ({
       );
     }),
   );
+
+  const allRecipientsHaveNoActionToTake = document.Recipient.every(
+    (recipient) => recipient.role === RecipientRole.CC,
+  );
+
+  if (allRecipientsHaveNoActionToTake) {
+    const updatedDocument = await updateDocument({
+      documentId,
+      userId,
+      teamId,
+      data: { status: DocumentStatus.COMPLETED },
+    });
+
+    await sealDocument({ documentId: updatedDocument.id, requestMetadata });
+
+    // Keep the return type the same for the `sendDocument` method
+    return await prisma.document.findFirstOrThrow({
+      where: {
+        id: documentId,
+      },
+      include: {
+        Recipient: true,
+      },
+    });
+  }
 
   const updatedDocument = await prisma.$transaction(async (tx) => {
     if (document.status === DocumentStatus.DRAFT) {
