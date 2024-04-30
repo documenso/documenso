@@ -6,6 +6,7 @@ import { match } from 'ts-pattern';
 import { getFlag } from '@documenso/lib/universal/get-feature-flag';
 import { DocumentDataType } from '@documenso/prisma/client';
 
+import { AppError } from '../../errors/app-error';
 import { createDocumentData } from '../../server-only/document-data/create-document-data';
 
 type File = {
@@ -26,7 +27,7 @@ export const putDocumentFile = async (file: File) => {
     await PDFDocument.load(await file.arrayBuffer()).catch((e) => {
       console.error(`PDF upload parse error: ${e.message}`);
 
-      throw new Error('Unable to load PDF file');
+      throw new AppError('INVALID_DOCUMENT_FILE');
     });
   }
 
