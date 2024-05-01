@@ -40,6 +40,11 @@ export const sealDocument = async ({
   const document = await prisma.document.findFirstOrThrow({
     where: {
       id: documentId,
+      Recipient: {
+        every: {
+          signingStatus: SigningStatus.SIGNED,
+        },
+      },
     },
     include: {
       documentData: true,
@@ -51,10 +56,6 @@ export const sealDocument = async ({
 
   if (!documentData) {
     throw new Error(`Document ${document.id} has no document data`);
-  }
-
-  if (document.status !== DocumentStatus.COMPLETED) {
-    throw new Error(`Document ${document.id} has not been completed`);
   }
 
   const recipients = await prisma.recipient.findMany({
@@ -92,9 +93,9 @@ export const sealDocument = async ({
   // !: Need to write the fields onto the document as a hard copy
   const pdfData = await getFile(documentData);
 
-  const certificate = await getCertificatePdf({ documentId }).then(async (doc) =>
-    PDFDocument.load(doc),
-  );
+  const certificate = await getCertificatePdf({ documentId })
+    .then(async (doc) => PDFDocument.load(doc))
+    .catch(() => null);
 
   const doc = await PDFDocument.load(pdfData);
 
@@ -103,11 +104,13 @@ export const sealDocument = async ({
   doc.getForm().flatten();
   flattenAnnotations(doc);
 
-  const certificatePages = await doc.copyPages(certificate, certificate.getPageIndices());
+  if (certificate) {
+    const certificatePages = await doc.copyPages(certificate, certificate.getPageIndices());
 
-  certificatePages.forEach((page) => {
-    doc.addPage(page);
-  });
+    certificatePages.forEach((page) => {
+      doc.addPage(page);
+    });
+  }
 
   for (const field of fields) {
     await insertFieldInPDF(doc, field);
@@ -138,6 +141,16 @@ export const sealDocument = async ({
   }
 
   await prisma.$transaction(async (tx) => {
+    await tx.document.update({
+      where: {
+        id: document.id,
+      },
+      data: {
+        status: DocumentStatus.COMPLETED,
+        completedAt: new Date(),
+      },
+    });
+
     await tx.documentData.update({
       where: {
         id: documentData.id,
