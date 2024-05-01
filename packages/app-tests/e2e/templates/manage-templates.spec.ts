@@ -189,6 +189,13 @@ test('[TEMPLATES]: use template', async ({ page }) => {
 
   // Use personal template.
   await page.getByRole('button', { name: 'Use Template' }).click();
+
+  // Enter template values.
+  await page.getByPlaceholder('recipient.1@documenso.com').click();
+  await page.getByPlaceholder('recipient.1@documenso.com').fill(teamMemberUser.email);
+  await page.getByPlaceholder('Recipient 1').click();
+  await page.getByPlaceholder('Recipient 1').fill('name');
+
   await page.getByRole('button', { name: 'Review' }).click();
   await page.waitForURL(/documents/);
   await page.getByRole('main').getByRole('link', { name: 'Documents' }).click();
@@ -200,6 +207,13 @@ test('[TEMPLATES]: use template', async ({ page }) => {
 
   // Use team template.
   await page.getByRole('button', { name: 'Use Template' }).click();
+
+  // Enter template values.
+  await page.getByPlaceholder('recipient.1@documenso.com').click();
+  await page.getByPlaceholder('recipient.1@documenso.com').fill(teamMemberUser.email);
+  await page.getByPlaceholder('Recipient 1').click();
+  await page.getByPlaceholder('Recipient 1').fill('name');
+
   await page.getByRole('button', { name: 'Review' }).click();
   await page.waitForURL(/\/t\/.+\/documents/);
   await page.getByRole('main').getByRole('link', { name: 'Documents' }).click();
