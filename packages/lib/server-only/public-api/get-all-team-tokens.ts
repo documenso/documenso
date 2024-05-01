@@ -15,10 +15,13 @@ export const getTeamTokens = async ({ userId, teamId }: GetUserTokensOptions) =>
   });
 
   if (teamMember?.role !== TeamMemberRole.ADMIN) {
-    throw new Error('You do not have permission to view tokens for this team');
+    return {
+      tokens: [],
+      error: { message: 'You do not have the required permissions to view this page' },
+    };
   }
 
-  return await prisma.apiToken.findMany({
+  const tokens = await prisma.apiToken.findMany({
     where: {
       teamId,
     },
@@ -33,4 +36,6 @@ export const getTeamTokens = async ({ userId, teamId }: GetUserTokensOptions) =>
       createdAt: 'desc',
     },
   });
+
+  return { tokens, error: null };
 };
