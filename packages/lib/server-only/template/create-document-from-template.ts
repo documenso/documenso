@@ -47,7 +47,11 @@ export const createDocumentFromTemplate = async ({
     },
     include: {
       Recipient: true,
-      Field: true,
+      Field: {
+        include: {
+          Recipient: true,
+        },
+      },
       templateDocumentData: true,
     },
   });
@@ -125,11 +129,9 @@ export const createDocumentFromTemplate = async ({
 
     await tx.field.createMany({
       data: template.Field.map((field) => {
-        const recipient = template.Recipient.find(
-          (recipient) => recipient.id === field.recipientId,
+        const documentRecipient = document.Recipient.find(
+          (recipient) => recipient.email === field.Recipient.email,
         );
-
-        const documentRecipient = document.Recipient.find((doc) => doc.email === recipient?.email);
 
         if (!documentRecipient) {
           throw new Error('Recipient not found.');
