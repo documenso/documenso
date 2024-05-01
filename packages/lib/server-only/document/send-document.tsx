@@ -8,7 +8,7 @@ import { sealDocument } from '@documenso/lib/server-only/document/seal-document'
 import { updateDocument } from '@documenso/lib/server-only/document/update-document';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
 import type { RequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
-import { putDocumentFile } from '@documenso/lib/universal/upload/put-file';
+import { putPdfFile } from '@documenso/lib/universal/upload/put-file';
 import { createDocumentAuditLogData } from '@documenso/lib/utils/document-audit-logs';
 import { renderCustomEmailTemplate } from '@documenso/lib/utils/render-custom-email-template';
 import { prisma } from '@documenso/prisma';
@@ -102,7 +102,7 @@ export const sendDocument = async ({
       formValues: document.formValues as Record<string, string | number | boolean>,
     });
 
-    const newDocumentData = await putDocumentFile({
+    const newDocumentData = await putPdfFile({
       name: document.title,
       type: 'application/pdf',
       arrayBuffer: async () => Promise.resolve(prefilled),

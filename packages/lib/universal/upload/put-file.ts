@@ -19,7 +19,7 @@ type File = {
  * Uploads a document file to the appropriate storage location and creates
  * a document data record.
  */
-export const putDocumentFile = async (file: File) => {
+export const putPdfFile = async (file: File) => {
   const isEncryptedDocumentsAllowed = await getFlag('app_allow_encrypted_documents');
 
   // This will prevent uploading encrypted PDFs or anything that can't be opened.
@@ -31,7 +31,7 @@ export const putDocumentFile = async (file: File) => {
     });
   }
 
-  const { type, data } = await putFileInDatabase(file);
+  const { type, data } = await putFile(file);
 
   return await createDocumentData({ type, data });
 };

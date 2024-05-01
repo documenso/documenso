@@ -12,7 +12,7 @@ import { useAnalytics } from '@documenso/lib/client-only/hooks/use-analytics';
 import { APP_DOCUMENT_UPLOAD_SIZE_LIMIT } from '@documenso/lib/constants/app';
 import { AppError } from '@documenso/lib/errors/app-error';
 import { createDocumentData } from '@documenso/lib/server-only/document-data/create-document-data';
-import { putDocumentFile } from '@documenso/lib/universal/upload/put-file';
+import { putPdfFile } from '@documenso/lib/universal/upload/put-file';
 import { formatDocumentsPath } from '@documenso/lib/utils/teams';
 import { TRPCClientError } from '@documenso/trpc/client';
 import { trpc } from '@documenso/trpc/react';
@@ -58,7 +58,7 @@ export const UploadDocument = ({ className, team }: UploadDocumentProps) => {
     try {
       setIsLoading(true);
 
-      const { type, data } = await putDocumentFile(file);
+      const { type, data } = await putPdfFile(file);
 
       const { id: documentDataId } = await createDocumentData({
         type,
