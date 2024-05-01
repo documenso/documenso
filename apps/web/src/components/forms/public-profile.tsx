@@ -3,6 +3,7 @@
 import { useRouter } from 'next/navigation';
 
 import { zodResolver } from '@hookform/resolvers/zod';
+import { Copy } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
@@ -98,13 +99,35 @@ export const PublicProfileForm = ({ className, user }: PublicProfileFormProps) =
     }
   };
 
+  const handleCopyUrl = () => {
+    const profileUrl = `documenso.com/u/${user.url}`;
+    navigator.clipboard
+      .writeText(profileUrl)
+      .then(() => {
+        toast({
+          title: 'URL Copied',
+          description: 'The profile URL has been copied to your clipboard.',
+          duration: 3000,
+        });
+      })
+      .catch((err) => {
+        console.error('Failed to copy: ', err);
+        toast({
+          title: 'Error',
+          description: 'Failed to copy the URL to clipboard.',
+          variant: 'destructive',
+          duration: 3000,
+        });
+      });
+  };
+
   return (
     <Form {...form}>
       <form
         className={cn('flex w-full flex-col gap-y-4', className)}
         onSubmit={form.handleSubmit(onFormSubmit)}
       >
-        <fieldset className="flex w-full flex-col gap-y-4" disabled={isSubmitting}>
+        <fieldset className="flex w-full flex-col gap-y-8" disabled={isSubmitting}>
           <FormField
             control={form.control}
             name="url"
@@ -114,11 +137,21 @@ export const PublicProfileForm = ({ className, user }: PublicProfileFormProps) =
                 <FormControl>
                   <Input type="text" {...field} />
                 </FormControl>
-
                 <FormMessage />
               </FormItem>
             )}
           />
+          <div className="bg-muted flex w-full items-center rounded pl-2">
+            <span className="text-xs">documenso.com/u/{user.url}</span>
+            <Button
+              variant="ghost"
+              onClick={handleCopyUrl}
+              className="flex items-center justify-center rounded p-2 hover:bg-gray-200"
+              aria-label="Copy URL"
+            >
+              <Copy className="h-5 w-5" />
+            </Button>
+          </div>
 
           <FormField
             control={form.control}
