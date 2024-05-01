@@ -147,6 +147,7 @@ export const sealDocument = async ({
       },
       data: {
         status: DocumentStatus.COMPLETED,
+        completedAt: new Date(),
       },
     });
 

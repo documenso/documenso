@@ -152,15 +152,6 @@ export const completeDocumentWithToken = async ({
     await sealDocument({ documentId: document.id, requestMetadata });
   }
 
-  await prisma.document.update({
-    where: {
-      id: document.id,
-    },
-    data: {
-      completedAt: new Date(),
-    },
-  });
-
   const updatedDocument = await getDocument({ token, documentId });
 
   await triggerWebhook({
