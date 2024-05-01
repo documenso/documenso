@@ -5,9 +5,10 @@ import { AppError, AppErrorCode } from '../../errors/app-error';
 export type UpdatePublicProfileOptions = {
   userId: number;
   url: string;
+  bio?: string;
 };
 
-export const updatePublicProfile = async ({ userId, url }: UpdatePublicProfileOptions) => {
+export const updatePublicProfile = async ({ userId, url, bio }: UpdatePublicProfileOptions) => {
   const isUrlTaken = await prisma.user.findFirst({
     select: {
       id: true,
@@ -37,10 +38,10 @@ export const updatePublicProfile = async ({ userId, url }: UpdatePublicProfileOp
       userProfile: {
         upsert: {
           create: {
-            bio: '',
+            bio: bio,
           },
           update: {
-            bio: '',
+            bio: bio,
           },
         },
       },

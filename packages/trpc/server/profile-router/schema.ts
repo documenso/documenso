@@ -25,6 +25,13 @@ export const ZUpdatePublicProfileMutationSchema = z.object({
     .regex(/^[a-z0-9-]+$/, {
       message: 'Username can only container alphanumeric characters and dashes.',
     }),
+  bio: z
+    .string()
+    .trim()
+    .max(256, {
+      message: 'Bio cannot be longer than 256 characters.',
+    })
+    .optional(),
 });
 
 export const ZUpdatePasswordMutationSchema = z.object({
