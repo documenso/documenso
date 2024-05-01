@@ -19,7 +19,8 @@ export default async function PublicProfileSettingsPage() {
       <SettingsHeader
         title="Public profile"
         subtitle="You can choose to enable/disable your profile for public view"
-        className="justify"
+        className="justify mb-8"
+        hideDivider
       >
         <div className="flex flex-row">
           <label className="mr-2 text-white" htmlFor="hide">

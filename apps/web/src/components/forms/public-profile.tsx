@@ -71,7 +71,7 @@ export const PublicProfileForm = ({ className, user }: PublicProfileFormProps) =
     try {
       await updatePublicProfile({
         url,
-        bio: bio ?? '',
+        bio,
       });
 
       toast({
