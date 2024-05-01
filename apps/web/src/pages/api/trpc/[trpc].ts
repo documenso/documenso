@@ -3,7 +3,7 @@ import { createTrpcContext } from '@documenso/trpc/server/context';
 import { appRouter } from '@documenso/trpc/server/router';
 
 export const config = {
-  maxDuration: 60,
+  maxDuration: 120,
   api: {
     bodyParser: {
       sizeLimit: '50mb',
