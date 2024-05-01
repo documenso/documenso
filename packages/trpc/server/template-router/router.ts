@@ -53,11 +53,14 @@ export const templateRouter = router({
           throw new Error('You have reached your document limit.');
         }
 
+        const requestMetadata = extractNextApiRequestMetadata(ctx.req);
+
         let document: Document = await createDocumentFromTemplate({
           templateId,
           teamId,
           userId: ctx.user.id,
           recipients: input.recipients,
+          requestMetadata,
         });
 
         if (input.sendDocument) {
@@ -65,7 +68,7 @@ export const templateRouter = router({
             documentId: document.id,
             userId: ctx.user.id,
             teamId,
-            requestMetadata: extractNextApiRequestMetadata(ctx.req),
+            requestMetadata,
           }).catch((err) => {
             console.error(err);
 

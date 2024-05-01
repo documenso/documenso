@@ -196,7 +196,7 @@ test('[TEMPLATES]: use template', async ({ page }) => {
   await page.getByPlaceholder('Recipient 1').click();
   await page.getByPlaceholder('Recipient 1').fill('name');
 
-  await page.getByRole('button', { name: 'Review' }).click();
+  await page.getByRole('button', { name: 'Create as draft' }).click();
   await page.waitForURL(/documents/);
   await page.getByRole('main').getByRole('link', { name: 'Documents' }).click();
   await page.waitForURL('/documents');
@@ -214,7 +214,7 @@ test('[TEMPLATES]: use template', async ({ page }) => {
   await page.getByPlaceholder('Recipient 1').click();
   await page.getByPlaceholder('Recipient 1').fill('name');
 
-  await page.getByRole('button', { name: 'Review' }).click();
+  await page.getByRole('button', { name: 'Create as draft' }).click();
   await page.waitForURL(/\/t\/.+\/documents/);
   await page.getByRole('main').getByRole('link', { name: 'Documents' }).click();
   await page.waitForURL(`/t/${team.url}/documents`);

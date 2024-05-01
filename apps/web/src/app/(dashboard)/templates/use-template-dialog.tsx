@@ -5,6 +5,7 @@ import { InfoIcon, Plus } from 'lucide-react';
 import { useFieldArray, useForm } from 'react-hook-form';
 import * as z from 'zod';
 
+import { TEMPLATE_RECIPIENT_PLACEHOLDER_REGEX } from '@documenso/lib/constants/template';
 import { AppError } from '@documenso/lib/errors/app-error';
 import type { Recipient } from '@documenso/prisma/client';
 import { trpc } from '@documenso/trpc/react';
@@ -96,11 +97,23 @@ export function UseTemplateDialog({
     resolver: zodResolver(ZAddRecipientsForNewDocumentSchema),
     defaultValues: {
       sendDocument: false,
-      recipients: recipients.map((recipient) => ({
-        id: recipient.id,
-        name: '',
-        email: '',
-      })),
+      recipients: recipients.map((recipient) => {
+        const isRecipientPlaceholder = recipient.email.match(TEMPLATE_RECIPIENT_PLACEHOLDER_REGEX);
+
+        if (isRecipientPlaceholder) {
+          return {
+            id: recipient.id,
+            name: '',
+            email: '',
+          };
+        }
+
+        return {
+          id: recipient.id,
+          name: recipient.name,
+          email: recipient.email,
+        };
+      }),
     },
   });
 
@@ -253,11 +266,7 @@ export function UseTemplateDialog({
                 </DialogClose>
 
                 <Button type="submit" loading={form.formState.isSubmitting}>
-                  {recipients.length === 0
-                    ? 'Create'
-                    : form.getValues('sendDocument')
-                    ? 'Send'
-                    : 'Review'}
+                  {form.getValues('sendDocument') ? 'Create and send' : 'Create as draft'}
                 </Button>
               </DialogFooter>
             </fieldset>
