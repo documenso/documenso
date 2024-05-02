@@ -32,6 +32,7 @@ import {
   DocumentFlowFormContainerStep,
 } from './document-flow-root';
 import { FieldItem } from './field-item';
+import { NoSignatureHintDialog } from './no-signature-hint-dialog';
 import { type DocumentFlowStep, FRIENDLY_FIELD_TYPE } from './types';
 
 const fontCaveat = Caveat({
@@ -64,6 +65,9 @@ export const AddFieldsFormPartial = ({
   onSubmit,
   isDocumentPdfLoaded,
 }: AddFieldsFormProps) => {
+  const [isConfirmationModalVisible, setIsConfirmationModalVisible] = useState(false);
+  const [userHasConfirmed, setUserHasConfirmed] = useState(false);
+
   const { isWithinPageBounds, getFieldPosition, getPage } = useDocumentElement();
   const { currentStep, totalSteps, previousStep } = useStep();
 
@@ -99,6 +103,9 @@ export const AddFieldsFormPartial = ({
     control,
     name: 'fields',
   });
+
+  const hasSignerRole = recipients.some((recipient) => recipient.role === 'SIGNER');
+  const hasSignatureField = localFields.some((field) => field.type === 'SIGNATURE');
 
   const [selectedField, setSelectedField] = useState<FieldType | null>(null);
   const [selectedSigner, setSelectedSigner] = useState<Recipient | null>(null);
@@ -312,6 +319,23 @@ export const AddFieldsFormPartial = ({
       ([role]) => role !== RecipientRole.CC && role !== RecipientRole.VIEWER,
     );
   }, [recipientsByRole]);
+
+  const handleGoNextClick = () => {
+    if (hasSignerRole && !hasSignatureField && !userHasConfirmed) {
+      setIsConfirmationModalVisible(true);
+    } else {
+      void onFormSubmit();
+    }
+  };
+
+  const handleOpenChange = () => {
+    setIsConfirmationModalVisible((prev) => !prev);
+  };
+
+  const handleConfirm = () => {
+    setIsConfirmationModalVisible(false);
+    setUserHasConfirmed(true);
+  };
 
   return (
     <>
@@ -596,9 +620,17 @@ export const AddFieldsFormPartial = ({
             previousStep();
             remove();
           }}
-          onGoNextClick={() => void onFormSubmit()}
+          onGoNextClick={handleGoNextClick}
         />
       </DocumentFlowFormContainerFooter>
+
+      {!userHasConfirmed && (
+        <NoSignatureHintDialog
+          isOpen={isConfirmationModalVisible}
+          onOpenChange={handleOpenChange}
+          onConfirm={handleConfirm}
+        />
+      )}
     </>
   );
 };
