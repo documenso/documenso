@@ -10,17 +10,17 @@ import {
   DialogTitle,
 } from '@documenso/ui/primitives/dialog';
 
-export type NoSignatureHintDialogProps = {
+export type MissingSignatureFieldDialogProps = {
   isOpen: boolean;
   onOpenChange: () => void;
   onConfirm: () => void;
 };
 
-export const NoSignatureHintDialog = ({
+export const MissingSignatureFieldDialog = ({
   isOpen,
   onOpenChange,
   onConfirm,
-}: NoSignatureHintDialogProps) => {
+}: MissingSignatureFieldDialogProps) => {
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-lg" position="center">
@@ -28,10 +28,14 @@ export const NoSignatureHintDialog = ({
           <DialogTitle>No signature field found</DialogTitle>
           <DialogDescription>
             <p className="mt-2">
-              You do not have a signature field for your signers. They will be able to sign wherever
-              they want.
+              Some signers have not been assigned a signature field. As a result, they may place
+              their signature anywhere on the document.
             </p>
-            <p className="mt-4">To avoid that, please add a signature field for your signers.</p>
+            <p className="mt-4">
+              If you would like to assign a signature field to each signer, please click the
+              "Cancel" and add the missing signature fields.
+            </p>
+            <p className="mt-4">Otherwise, click "Proceed" to continue.</p>
           </DialogDescription>
         </DialogHeader>
         <DialogFooter>

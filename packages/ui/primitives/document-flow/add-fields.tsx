@@ -32,7 +32,7 @@ import {
   DocumentFlowFormContainerStep,
 } from './document-flow-root';
 import { FieldItem } from './field-item';
-import { NoSignatureHintDialog } from './no-signature-hint-dialog';
+import { MissingSignatureFieldDialog } from './missing-signature-field-dialog';
 import { type DocumentFlowStep, FRIENDLY_FIELD_TYPE } from './types';
 
 const fontCaveat = Caveat({
@@ -65,8 +65,8 @@ export const AddFieldsFormPartial = ({
   onSubmit,
   isDocumentPdfLoaded,
 }: AddFieldsFormProps) => {
-  const [isConfirmationModalVisible, setIsConfirmationModalVisible] = useState(false);
-  const [userHasConfirmed, setUserHasConfirmed] = useState(false);
+  const [isMissingSignatureDialogVisible, setIsMissingSignatureDialogVisible] = useState(false);
+  const [hasConfirmedMissingSignature, setHasConfirmedMissingSignature] = useState(false);
 
   const { isWithinPageBounds, getFieldPosition, getPage } = useDocumentElement();
   const { currentStep, totalSteps, previousStep } = useStep();
@@ -103,9 +103,6 @@ export const AddFieldsFormPartial = ({
     control,
     name: 'fields',
   });
-
-  const hasSignerRole = recipients.some((recipient) => recipient.role === 'SIGNER');
-  const hasSignatureField = localFields.some((field) => field.type === 'SIGNATURE');
 
   const [selectedField, setSelectedField] = useState<FieldType | null>(null);
   const [selectedSigner, setSelectedSigner] = useState<Recipient | null>(null);
@@ -320,21 +317,26 @@ export const AddFieldsFormPartial = ({
     );
   }, [recipientsByRole]);
 
+  const isSignerRolePresent = recipients.some((recipient) => recipient.role === 'SIGNER');
+  const everySignerHasSignature = recipientsByRole.SIGNER.every((signer) =>
+    localFields.some((field) => field.type === 'SIGNATURE' && field.signerEmail === signer.email),
+  );
+
   const handleGoNextClick = () => {
-    if (hasSignerRole && !hasSignatureField && !userHasConfirmed) {
-      setIsConfirmationModalVisible(true);
+    if (isSignerRolePresent && !everySignerHasSignature && !hasConfirmedMissingSignature) {
+      setIsMissingSignatureDialogVisible(true);
     } else {
       void onFormSubmit();
     }
   };
 
   const handleOpenChange = () => {
-    setIsConfirmationModalVisible((prev) => !prev);
+    setIsMissingSignatureDialogVisible((prev) => !prev);
   };
 
   const handleConfirm = () => {
-    setIsConfirmationModalVisible(false);
-    setUserHasConfirmed(true);
+    setIsMissingSignatureDialogVisible(false);
+    setHasConfirmedMissingSignature(true);
     void onFormSubmit();
   };
 
@@ -625,9 +627,9 @@ export const AddFieldsFormPartial = ({
         />
       </DocumentFlowFormContainerFooter>
 
-      {!userHasConfirmed && (
-        <NoSignatureHintDialog
-          isOpen={isConfirmationModalVisible}
+      {!hasConfirmedMissingSignature && (
+        <MissingSignatureFieldDialog
+          isOpen={isMissingSignatureDialogVisible}
           onOpenChange={handleOpenChange}
           onConfirm={handleConfirm}
         />
