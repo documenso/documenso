@@ -335,6 +335,7 @@ export const AddFieldsFormPartial = ({
   const handleConfirm = () => {
     setIsConfirmationModalVisible(false);
     setUserHasConfirmed(true);
+    void onFormSubmit();
   };
 
   return (
