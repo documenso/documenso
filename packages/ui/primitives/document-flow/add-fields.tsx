@@ -486,7 +486,7 @@ export const AddFieldsFormPartial = ({
                 onMouseDown={() => setSelectedField(FieldType.SIGNATURE)}
                 data-selected={selectedField === FieldType.SIGNATURE ? true : undefined}
               >
-                <Card className="group-data-[selected]:border-documenso h-full w-full cursor-pointer group-disabled:opacity-50">
+                <Card className="group-data-[selected]:border-documenso hover:border-documenso h-full w-full cursor-pointer  group-disabled:opacity-50">
                   <CardContent className="flex flex-col items-center justify-center px-6 py-4">
                     <p
                       className={cn(
@@ -507,7 +507,7 @@ export const AddFieldsFormPartial = ({
                 onMouseDown={() => setSelectedField(FieldType.EMAIL)}
                 data-selected={selectedField === FieldType.EMAIL ? true : undefined}
               >
-                <Card className="group-data-[selected]:border-documenso h-full w-full cursor-pointer group-disabled:opacity-50">
+                <Card className="group-data-[selected]:border-documenso hover:border-documenso h-full w-full cursor-pointer group-disabled:opacity-50">
                   <CardContent className="flex flex-col items-center justify-center px-6 py-4">
                     <p
                       className={cn(
@@ -529,7 +529,7 @@ export const AddFieldsFormPartial = ({
                 onMouseDown={() => setSelectedField(FieldType.NAME)}
                 data-selected={selectedField === FieldType.NAME ? true : undefined}
               >
-                <Card className="group-data-[selected]:border-documenso h-full w-full cursor-pointer group-disabled:opacity-50">
+                <Card className="group-data-[selected]:border-documenso hover:border-documenso h-full w-full cursor-pointer group-disabled:opacity-50">
                   <CardContent className="flex flex-col items-center justify-center px-6 py-4">
                     <p
                       className={cn(
@@ -550,7 +550,7 @@ export const AddFieldsFormPartial = ({
                 onMouseDown={() => setSelectedField(FieldType.DATE)}
                 data-selected={selectedField === FieldType.DATE ? true : undefined}
               >
-                <Card className="group-data-[selected]:border-documenso h-full w-full cursor-pointer group-disabled:opacity-50">
+                <Card className="group-data-[selected]:border-documenso hover:border-documenso h-full w-full cursor-pointer group-disabled:opacity-50">
                   <CardContent className="flex flex-col items-center justify-center px-6 py-4">
                     <p
                       className={cn(
@@ -571,7 +571,7 @@ export const AddFieldsFormPartial = ({
                 onMouseDown={() => setSelectedField(FieldType.TEXT)}
                 data-selected={selectedField === FieldType.TEXT ? true : undefined}
               >
-                <Card className="group-data-[selected]:border-documenso h-full w-full cursor-pointer group-disabled:opacity-50">
+                <Card className="group-data-[selected]:border-documenso hover:border-documenso h-full w-full cursor-pointer group-disabled:opacity-50">
                   <CardContent className="flex flex-col items-center justify-center px-6 py-4">
                     <p
                       className={cn(
@@ -592,7 +592,7 @@ export const AddFieldsFormPartial = ({
                 onMouseDown={() => setSelectedField(FieldType.NUMBER)}
                 data-selected={selectedField === FieldType.NUMBER ? true : undefined}
               >
-                <Card className="group-data-[selected]:border-documenso h-full w-full cursor-pointer group-disabled:opacity-50">
+                <Card className="group-data-[selected]:border-documenso hover:border-documenso h-full w-full cursor-pointer group-disabled:opacity-50">
                   <CardContent className="flex flex-col items-center justify-center px-6 py-4">
                     <p
                       className={cn(
@@ -613,7 +613,7 @@ export const AddFieldsFormPartial = ({
                 onMouseDown={() => setSelectedField(FieldType.RADIO)}
                 data-selected={selectedField === FieldType.RADIO ? true : undefined}
               >
-                <Card className="group-data-[selected]:border-documenso h-full w-full cursor-pointer group-disabled:opacity-50">
+                <Card className="group-data-[selected]:border-documenso hover:border-documenso h-full w-full cursor-pointer group-disabled:opacity-50">
                   <CardContent className="flex flex-col items-center justify-center px-6 py-4">
                     <p
                       className={cn(
@@ -634,7 +634,7 @@ export const AddFieldsFormPartial = ({
                 onMouseDown={() => setSelectedField(FieldType.CHECKBOX)}
                 data-selected={selectedField === FieldType.CHECKBOX ? true : undefined}
               >
-                <Card className="group-data-[selected]:border-documenso h-full w-full cursor-pointer group-disabled:opacity-50">
+                <Card className="group-data-[selected]:border-documenso hover:border-documenso h-full w-full cursor-pointer group-disabled:opacity-50">
                   <CardContent className="flex flex-col items-center justify-center px-6 py-4">
                     <p
                       className={cn(
@@ -655,7 +655,7 @@ export const AddFieldsFormPartial = ({
                 onMouseDown={() => setSelectedField(FieldType.DROPDOWN)}
                 data-selected={selectedField === FieldType.DROPDOWN ? true : undefined}
               >
-                <Card className="group-data-[selected]:border-documenso h-full w-full cursor-pointer group-disabled:opacity-50">
+                <Card className="group-data-[selected]:border-documenso hover:border-documenso h-full w-full cursor-pointer group-disabled:opacity-50">
                   <CardContent className="flex flex-col items-center justify-center px-6 py-4">
                     <p
                       className={cn(
