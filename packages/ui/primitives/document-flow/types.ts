@@ -48,6 +48,10 @@ export const FRIENDLY_FIELD_TYPE: Record<FieldType, string> = {
   [FieldType.DATE]: 'Date',
   [FieldType.EMAIL]: 'Email',
   [FieldType.NAME]: 'Name',
+  [FieldType.NUMBER]: 'Number',
+  [FieldType.RADIO]: 'Radio',
+  [FieldType.CHECKBOX]: 'Checkbox',
+  [FieldType.DROPDOWN]: 'Dropdown',
 };
 
 export interface DocumentFlowStep {

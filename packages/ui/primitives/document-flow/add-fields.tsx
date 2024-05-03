@@ -4,7 +4,19 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { Caveat } from 'next/font/google';
 
-import { Check, ChevronsUpDown, Info } from 'lucide-react';
+import {
+  CalendarDays,
+  Check,
+  CheckSquare,
+  ChevronDown,
+  ChevronsUpDown,
+  Disc,
+  Hash,
+  Info,
+  Mail,
+  Type,
+  User,
+} from 'lucide-react';
 import { useFieldArray, useForm } from 'react-hook-form';
 
 import { getBoundingClientRect } from '@documenso/lib/client-only/get-bounding-client-rect';
@@ -484,8 +496,6 @@ export const AddFieldsFormPartial = ({
                     >
                       {selectedSigner?.name || 'Signature'}
                     </p>
-
-                    <p className="text-muted-foreground mt-2 text-center text-xs">Signature</p>
                   </CardContent>
                 </Card>
               </button>
@@ -501,13 +511,13 @@ export const AddFieldsFormPartial = ({
                   <CardContent className="flex flex-col items-center justify-center px-6 py-4">
                     <p
                       className={cn(
-                        'text-muted-foreground group-data-[selected]:text-foreground text-xl font-medium',
+                        selectedSigner?.name ? 'mt-1.5' : 'mt-0',
+                        'text-muted-foreground group-data-[selected]:text-foreground flex items-center justify-center gap-x-1 text-xl font-normal',
                       )}
                     >
+                      <Mail />
                       {'Email'}
                     </p>
-
-                    <p className="text-muted-foreground mt-2 text-xs">Email</p>
                   </CardContent>
                 </Card>
               </button>
@@ -523,13 +533,12 @@ export const AddFieldsFormPartial = ({
                   <CardContent className="flex flex-col items-center justify-center px-6 py-4">
                     <p
                       className={cn(
-                        'text-muted-foreground group-data-[selected]:text-foreground text-xl font-medium',
+                        'text-muted-foreground group-data-[selected]:text-foreground flex items-center justify-center gap-x-1 text-xl font-normal',
                       )}
                     >
+                      <User />
                       {'Name'}
                     </p>
-
-                    <p className="text-muted-foreground mt-2 text-xs">Name</p>
                   </CardContent>
                 </Card>
               </button>
@@ -545,13 +554,12 @@ export const AddFieldsFormPartial = ({
                   <CardContent className="flex flex-col items-center justify-center px-6 py-4">
                     <p
                       className={cn(
-                        'text-muted-foreground group-data-[selected]:text-foreground text-xl font-medium',
+                        'text-muted-foreground group-data-[selected]:text-foreground flex items-center justify-center gap-x-1 text-xl font-normal',
                       )}
                     >
+                      <CalendarDays />
                       {'Date'}
                     </p>
-
-                    <p className="text-muted-foreground mt-2 text-xs">Date</p>
                   </CardContent>
                 </Card>
               </button>
@@ -567,13 +575,12 @@ export const AddFieldsFormPartial = ({
                   <CardContent className="flex flex-col items-center justify-center px-6 py-4">
                     <p
                       className={cn(
-                        'text-muted-foreground group-data-[selected]:text-foreground text-xl font-medium',
+                        'text-muted-foreground group-data-[selected]:text-foreground flex items-center justify-center gap-x-1 text-xl font-normal',
                       )}
                     >
+                      <Type />
                       {'Text'}
                     </p>
-
-                    <p className="text-muted-foreground mt-2 text-xs">Custom Text</p>
                   </CardContent>
                 </Card>
               </button>
@@ -589,13 +596,12 @@ export const AddFieldsFormPartial = ({
                   <CardContent className="flex flex-col items-center justify-center px-6 py-4">
                     <p
                       className={cn(
-                        'text-muted-foreground group-data-[selected]:text-foreground text-xl font-medium',
+                        'text-muted-foreground group-data-[selected]:text-foreground flex items-center justify-center gap-x-1 text-xl font-normal',
                       )}
                     >
+                      <Hash />
                       {'Number'}
                     </p>
-
-                    <p className="text-muted-foreground mt-2 text-xs">Number</p>
                   </CardContent>
                 </Card>
               </button>
@@ -611,13 +617,12 @@ export const AddFieldsFormPartial = ({
                   <CardContent className="flex flex-col items-center justify-center px-6 py-4">
                     <p
                       className={cn(
-                        'text-muted-foreground group-data-[selected]:text-foreground text-xl font-medium',
+                        'text-muted-foreground group-data-[selected]:text-foreground flex items-center justify-center gap-x-1 text-xl font-normal',
                       )}
                     >
+                      <Disc />
                       {'Radio'}
                     </p>
-
-                    <p className="text-muted-foreground mt-2 text-xs">Radio</p>
                   </CardContent>
                 </Card>
               </button>
@@ -633,13 +638,12 @@ export const AddFieldsFormPartial = ({
                   <CardContent className="flex flex-col items-center justify-center px-6 py-4">
                     <p
                       className={cn(
-                        'text-muted-foreground group-data-[selected]:text-foreground text-xl font-medium',
+                        'text-muted-foreground group-data-[selected]:text-foreground flex items-center justify-center gap-x-1 text-xl font-normal',
                       )}
                     >
+                      <CheckSquare />
                       {'Checkbox'}
                     </p>
-
-                    <p className="text-muted-foreground mt-2 text-xs">Checkbox</p>
                   </CardContent>
                 </Card>
               </button>
@@ -655,13 +659,12 @@ export const AddFieldsFormPartial = ({
                   <CardContent className="flex flex-col items-center justify-center px-6 py-4">
                     <p
                       className={cn(
-                        'text-muted-foreground group-data-[selected]:text-foreground text-xl font-medium',
+                        'text-muted-foreground group-data-[selected]:text-foreground flex items-center justify-center gap-x-1 text-xl font-normal',
                       )}
                     >
+                      <ChevronDown />
                       {'Dropdown'}
                     </p>
-
-                    <p className="text-muted-foreground mt-2 text-xs">Dropdown</p>
                   </CardContent>
                 </Card>
               </button>
