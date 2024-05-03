@@ -34,6 +34,12 @@ export const getDocumentById = async ({ id, userId, teamId }: GetDocumentByIdOpt
           url: true,
         },
       },
+      Recipient: {
+        select: {
+          email: true,
+          role: true,
+        },
+      },
     },
   });
 };
