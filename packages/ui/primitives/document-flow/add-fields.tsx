@@ -66,7 +66,6 @@ export const AddFieldsFormPartial = ({
   isDocumentPdfLoaded,
 }: AddFieldsFormProps) => {
   const [isMissingSignatureDialogVisible, setIsMissingSignatureDialogVisible] = useState(false);
-  const [hasConfirmedMissingSignature, setHasConfirmedMissingSignature] = useState(false);
 
   const { isWithinPageBounds, getFieldPosition, getPage } = useDocumentElement();
   const { currentStep, totalSteps, previousStep } = useStep();
@@ -323,7 +322,7 @@ export const AddFieldsFormPartial = ({
   );
 
   const handleGoNextClick = () => {
-    if (isSignerRolePresent && !everySignerHasSignature && !hasConfirmedMissingSignature) {
+    if (isSignerRolePresent && !everySignerHasSignature) {
       setIsMissingSignatureDialogVisible(true);
     } else {
       void onFormSubmit();
@@ -336,8 +335,6 @@ export const AddFieldsFormPartial = ({
 
   const handleConfirm = () => {
     setIsMissingSignatureDialogVisible(false);
-    setHasConfirmedMissingSignature(true);
-    void onFormSubmit();
   };
 
   return (
@@ -627,7 +624,7 @@ export const AddFieldsFormPartial = ({
         />
       </DocumentFlowFormContainerFooter>
 
-      {!hasConfirmedMissingSignature && (
+      {!everySignerHasSignature && (
         <MissingSignatureFieldDialog
           isOpen={isMissingSignatureDialogVisible}
           onOpenChange={handleOpenChange}

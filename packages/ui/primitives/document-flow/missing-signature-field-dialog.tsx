@@ -28,14 +28,9 @@ export const MissingSignatureFieldDialog = ({
           <DialogTitle>No signature field found</DialogTitle>
           <DialogDescription>
             <p className="mt-2">
-              Some signers have not been assigned a signature field. As a result, they may place
-              their signature anywhere on the document.
+              Some signers have not been assigned a signature field. Please assign a signature field
+              to each signer before proceeding.
             </p>
-            <p className="mt-4">
-              If you would like to assign a signature field to each signer, please click the
-              "Cancel" and add the missing signature fields.
-            </p>
-            <p className="mt-4">Otherwise, click "Proceed" to continue.</p>
           </DialogDescription>
         </DialogHeader>
         <DialogFooter>
