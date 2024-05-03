@@ -32,14 +32,12 @@ export const MissingSignatureFieldDialog = ({
           </DialogDescription>
         </DialogHeader>
         <DialogFooter>
-          <div className="flex w-full flex-nowrap gap-4">
-            <Button type="button" variant="secondary" onClick={onOpenChange}>
-              Cancel
-            </Button>
-            <Button type="submit" onClick={onOpenChange}>
-              Proceed
-            </Button>
-          </div>
+          <Button type="button" variant="secondary" onClick={onOpenChange}>
+            Cancel
+          </Button>
+          <Button type="submit" onClick={onOpenChange}>
+            Proceed
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
