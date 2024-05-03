@@ -20,7 +20,9 @@ type File = {
  * a document data record.
  */
 export const putPdfFile = async (file: File) => {
-  const isEncryptedDocumentsAllowed = await getFlag('app_allow_encrypted_documents');
+  const isEncryptedDocumentsAllowed = await getFlag('app_allow_encrypted_documents').catch(
+    () => false,
+  );
 
   // This will prevent uploading encrypted PDFs or anything that can't be opened.
   if (!isEncryptedDocumentsAllowed) {
