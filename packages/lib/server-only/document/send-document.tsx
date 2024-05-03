@@ -21,6 +21,7 @@ import {
 } from '../../constants/recipient-roles';
 import { getFile } from '../../universal/upload/get-file';
 import { putFile } from '../../universal/upload/put-file';
+import { getFieldsForDocument } from '../field/get-fields-for-document';
 import { insertFormValuesInPdf } from '../pdf/insert-form-values-in-pdf';
 import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
 
@@ -118,6 +119,29 @@ export const sendDocument = async ({
     });
 
     Object.assign(document, result);
+  }
+
+  const fields = await getFieldsForDocument({
+    documentId: documentId,
+    userId: userId,
+  });
+
+  const fieldsWithSignerEmail = fields.map((field) => ({
+    ...field,
+    signerEmail:
+      document.Recipient.find((recipient) => recipient.id === field.recipientId)?.email ?? '',
+  }));
+
+  const everySignerHasSignature = document?.Recipient.every(
+    (recipient) =>
+      recipient.role !== RecipientRole.SIGNER ||
+      fieldsWithSignerEmail.some(
+        (field) => field.type === 'SIGNATURE' && field.signerEmail === recipient.email,
+      ),
+  );
+
+  if (!everySignerHasSignature) {
+    throw new Error('Some signers have not been assigned a signature field.');
   }
 
   await Promise.all(

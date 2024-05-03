@@ -1,7 +1,6 @@
 import { TRPCError } from '@trpc/server';
 
 import { AppError } from '@documenso/lib/errors/app-error';
-import { getDocumentById } from '@documenso/lib/server-only/document/get-document-by-id';
 import { removeSignedFieldWithToken } from '@documenso/lib/server-only/field/remove-signed-field-with-token';
 import { setFieldsForDocument } from '@documenso/lib/server-only/field/set-fields-for-document';
 import { setFieldsForTemplate } from '@documenso/lib/server-only/field/set-fields-for-template';
@@ -22,27 +21,6 @@ export const fieldRouter = router({
     .mutation(async ({ input, ctx }) => {
       try {
         const { documentId, fields } = input;
-
-        const document = await getDocumentById({
-          id: documentId,
-          userId: ctx.user.id,
-        }).catch(() => null);
-
-        const everySignerHasSignature = document?.Recipient.every(
-          (recipient) =>
-            recipient.role !== 'SIGNER' ||
-            fields.some(
-              (field) => field.type === 'SIGNATURE' && field.signerEmail === recipient.email,
-            ),
-        );
-
-        if (!everySignerHasSignature) {
-          throw new TRPCError({
-            code: 'BAD_REQUEST',
-            message:
-              'Some signers have not been assigned a signature field. Please assign a signature field to each signer before proceeding.',
-          });
-        }
 
         return await setFieldsForDocument({
           documentId,
