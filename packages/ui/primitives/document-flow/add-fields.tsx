@@ -627,7 +627,6 @@ export const AddFieldsFormPartial = ({
         <MissingSignatureFieldDialog
           isOpen={isMissingSignatureDialogVisible}
           onOpenChange={handleOpenChange}
-          onConfirm={handleConfirm}
         />
       )}
     </>

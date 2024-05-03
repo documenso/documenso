@@ -13,13 +13,11 @@ import {
 export type MissingSignatureFieldDialogProps = {
   isOpen: boolean;
   onOpenChange: () => void;
-  onConfirm: () => void;
 };
 
 export const MissingSignatureFieldDialog = ({
   isOpen,
   onOpenChange,
-  onConfirm,
 }: MissingSignatureFieldDialogProps) => {
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
@@ -38,7 +36,7 @@ export const MissingSignatureFieldDialog = ({
             <Button type="button" variant="secondary" onClick={onOpenChange}>
               Cancel
             </Button>
-            <Button type="submit" onClick={onConfirm}>
+            <Button type="submit" onClick={onOpenChange}>
               Proceed
             </Button>
           </div>
