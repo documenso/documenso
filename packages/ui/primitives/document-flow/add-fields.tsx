@@ -316,13 +316,12 @@ export const AddFieldsFormPartial = ({
     );
   }, [recipientsByRole]);
 
-  const isSignerRolePresent = recipients.some((recipient) => recipient.role === 'SIGNER');
   const everySignerHasSignature = recipientsByRole.SIGNER.every((signer) =>
     localFields.some((field) => field.type === 'SIGNATURE' && field.signerEmail === signer.email),
   );
 
   const handleGoNextClick = () => {
-    if (isSignerRolePresent && !everySignerHasSignature) {
+    if (!everySignerHasSignature) {
       setIsMissingSignatureDialogVisible(true);
     } else {
       void onFormSubmit();
