@@ -332,10 +332,6 @@ export const AddFieldsFormPartial = ({
     setIsMissingSignatureDialogVisible((prev) => !prev);
   };
 
-  const handleConfirm = () => {
-    setIsMissingSignatureDialogVisible(false);
-  };
-
   return (
     <>
       <DocumentFlowFormContainerHeader
