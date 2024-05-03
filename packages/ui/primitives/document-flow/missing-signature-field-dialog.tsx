@@ -26,7 +26,7 @@ export const MissingSignatureFieldDialog = ({
           <DialogTitle>No signature field found</DialogTitle>
           <DialogDescription>
             <p className="mt-2">
-              Some signers have not been assigned a signature field. Please assign a signature field
+              Some signers have not been assigned a signature field. Please assign at least 1 signature field
               to each signer before proceeding.
             </p>
           </DialogDescription>
