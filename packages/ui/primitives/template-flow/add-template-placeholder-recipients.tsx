@@ -282,6 +282,7 @@ export const AddTemplatePlaceholderRecipientsFormPartial = ({
           <Button
             type="button"
             className="dark:bg-muted dark:hover:bg-muted/80 bg-black/5 hover:bg-black/10"
+            variant="secondary"
             disabled={
               isSubmitting || getValues('signers').some((signer) => signer.email === user?.email)
             }
