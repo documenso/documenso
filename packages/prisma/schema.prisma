@@ -380,6 +380,10 @@ enum FieldType {
   EMAIL
   DATE
   TEXT
+  NUMBER
+  RADIO
+  CHECKBOX
+  DROPDOWN
 }
 
 model Field {
