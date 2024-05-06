@@ -8,6 +8,7 @@ import { sealDocument } from '@documenso/lib/server-only/document/seal-document'
 import { updateDocument } from '@documenso/lib/server-only/document/update-document';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
 import type { RequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
+import { putPdfFile } from '@documenso/lib/universal/upload/put-file';
 import { createDocumentAuditLogData } from '@documenso/lib/utils/document-audit-logs';
 import { renderCustomEmailTemplate } from '@documenso/lib/utils/render-custom-email-template';
 import { prisma } from '@documenso/prisma';
@@ -20,7 +21,6 @@ import {
   RECIPIENT_ROLE_TO_EMAIL_TYPE,
 } from '../../constants/recipient-roles';
 import { getFile } from '../../universal/upload/get-file';
-import { putFile } from '../../universal/upload/put-file';
 import { insertFormValuesInPdf } from '../pdf/insert-form-values-in-pdf';
 import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
 
@@ -102,7 +102,7 @@ export const sendDocument = async ({
       formValues: document.formValues as Record<string, string | number | boolean>,
     });
 
-    const newDocumentData = await putFile({
+    const newDocumentData = await putPdfFile({
       name: document.title,
       type: 'application/pdf',
       arrayBuffer: async () => Promise.resolve(prefilled),
@@ -151,7 +151,7 @@ export const sendDocument = async ({
         assetBaseUrl,
         signDocumentLink,
         customBody: renderCustomEmailTemplate(
-          selfSigner ? selfSignerCustomEmail : customEmail?.message || '',
+          selfSigner && !customEmail?.message ? selfSignerCustomEmail : customEmail?.message || '',
           customEmailTemplate,
         ),
         role: recipient.role,
