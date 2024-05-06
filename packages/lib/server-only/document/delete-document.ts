@@ -75,18 +75,20 @@ export const deleteDocument = async ({
   }
 
   // Continue to hide the document from the user if they are a recipient.
+  // Dirty way of doing this but it's faster than refetching the document.
   if (userRecipient?.documentDeletedAt === null) {
-    await prisma.recipient.update({
-      where: {
-        documentId_email: {
-          documentId: document.id,
-          email: user.email,
+    await prisma.recipient
+      .update({
+        where: {
+          id: userRecipient.id,
         },
-      },
-      data: {
-        documentDeletedAt: new Date().toISOString(),
-      },
-    });
+        data: {
+          documentDeletedAt: new Date().toISOString(),
+        },
+      })
+      .catch(() => {
+        // Do nothing.
+      });
   }
 
   // Return partial document for API v1 response.
