@@ -1,19 +1,39 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
-import { Settings2, Trash } from 'lucide-react';
+import { Caveat } from 'next/font/google';
+
+import {
+  CalendarDays,
+  CheckSquare,
+  ChevronDown,
+  Disc,
+  Hash,
+  Mail,
+  Settings2,
+  Trash,
+  Type,
+  User,
+} from 'lucide-react';
 import { createPortal } from 'react-dom';
 import { Rnd } from 'react-rnd';
 
 import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
+import { FieldType } from '@documenso/prisma/client';
 
 import { cn } from '../../lib/utils';
 import { Card, CardContent } from '../card';
 import type { TDocumentFlowFormSchema } from './types';
-import { FRIENDLY_FIELD_TYPE } from './types';
 
 type Field = TDocumentFlowFormSchema['fields'][0];
+
+const fontCaveat = Caveat({
+  weight: ['500'],
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-caveat',
+});
 
 export type FieldItemProps = {
   field: Field;
@@ -43,6 +63,8 @@ export const FieldItem = ({
     pageHeight: 0,
     pageWidth: 0,
   });
+  const [settingsActive, setSettingsActive] = useState(false);
+  const cardRef = useRef(null);
 
   const advancedField =
     field.type === 'NUMBER' ||
@@ -95,6 +117,19 @@ export const FieldItem = ({
     };
   }, [calculateCoords]);
 
+  const handleOnClick = (event: MouseEvent) => {
+    if (settingsActive && cardRef.current && !event.composedPath().includes(cardRef.current)) {
+      setSettingsActive(false);
+    }
+  };
+
+  useEffect(() => {
+    document.body.addEventListener('click', handleOnClick);
+    return () => {
+      document.body.removeEventListener('click', handleOnClick);
+    };
+  }, [settingsActive]);
+
   return createPortal(
     <Rnd
       key={coords.pageX + coords.pageY + coords.pageHeight + coords.pageWidth}
@@ -126,31 +161,102 @@ export const FieldItem = ({
       <Card
         className={cn('bg-field-card/10 h-full w-full backdrop-blur-[1px]', {
           'border-field-card-border': !disabled,
-          'border-field-card-border/80': active,
+          'border-field-card-border/80 bg-field-card/80': active || settingsActive,
         })}
+        onClick={() => {
+          setSettingsActive((prev) => !prev);
+        }}
+        ref={cardRef}
       >
         <CardContent
           className={cn(
-            'text-field-card-foreground flex h-full w-full flex-col items-center justify-center p-2',
+            'text-field-card-foreground group flex h-full w-full flex-col items-center justify-center p-2',
             {
               'text-field-card-foreground/50': disabled,
             },
           )}
         >
-          {FRIENDLY_FIELD_TYPE[field.type]}
+          {(() => {
+            switch (field.type) {
+              case FieldType.EMAIL:
+                return (
+                  <div className="text-field-card-foreground flex items-center justify-center gap-x-1 text-xl  font-light">
+                    <Mail className="h-5 w-5" /> Email
+                  </div>
+                );
+              case FieldType.NAME:
+                return (
+                  <div className="text-field-card-foreground flex items-center justify-center gap-x-1 text-xl font-light">
+                    <User className="h-5 w-5" /> Name
+                  </div>
+                );
+              case FieldType.DATE:
+                return (
+                  <div className="text-field-card-foreground flex items-center justify-center gap-x-1 text-xl font-light">
+                    <CalendarDays className="h-5 w-5" /> Date
+                  </div>
+                );
+              case FieldType.TEXT:
+                return (
+                  <div className="text-field-card-foreground flex items-center justify-center gap-x-1 text-xl font-light">
+                    <Type className="h-5 w-5" /> Text
+                  </div>
+                );
+              case FieldType.NUMBER:
+                return (
+                  <div className="text-field-card-foreground flex items-center justify-center gap-x-1 text-xl font-light">
+                    <Hash className="h-5 w-5" /> Number
+                  </div>
+                );
+              case FieldType.RADIO:
+                return (
+                  <div className="text-field-card-foreground flex items-center justify-center gap-x-1 text-xl font-light">
+                    <Disc className="h-5 w-5" /> Radio
+                  </div>
+                );
+              case FieldType.CHECKBOX:
+                return (
+                  <div className="text-field-card-foreground flex items-center justify-center gap-x-1 text-xl font-light">
+                    <CheckSquare className="h-5 w-5 font-light" /> Checkbox
+                  </div>
+                );
+              case FieldType.DROPDOWN:
+                return (
+                  <div className="text-field-card-foreground flex items-center justify-center gap-x-1 text-xl font-light">
+                    <ChevronDown className="h-5 w-5" /> Dropdown
+                  </div>
+                );
+              case 'SIGNATURE':
+                return (
+                  <div
+                    className={cn(
+                      'text-field-card-foreground flex items-center justify-center gap-x-1 text-xl font-light',
+                      fontCaveat.className,
+                    )}
+                  >
+                    {field.signerEmail}
+                  </div>
+                );
+              default:
+                return null;
+            }
+          })()}
 
-          <p className="w-full truncate text-center text-xs">{field.signerEmail}</p>
+          <p className="bg-documenso-700 absolute -right-11 z-20 hidden h-10 w-14 items-center justify-center rounded-xl font-semibold text-white group-hover:flex">
+            {(field.signerEmail?.charAt(0)?.toUpperCase() ?? '') +
+              (field.signerEmail?.charAt(1)?.toUpperCase() ?? '')}
+          </p>
         </CardContent>
       </Card>
 
-      {!disabled && (
+      {!disabled && settingsActive && (
         <div className="mt-1 flex justify-center">
           <div
             className={cn(
               'bg-background group flex items-center justify-evenly rounded-md border',
               {
-                'h-7 w-16': advancedField,
-                'h-7 w-8': !advancedField,
+                'h-8 w-16': advancedField,
+                'h-8 w-8': !advancedField,
               },
             )}
           >
