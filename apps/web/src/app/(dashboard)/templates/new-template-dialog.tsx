@@ -12,7 +12,7 @@ import * as z from 'zod';
 
 import { createDocumentData } from '@documenso/lib/server-only/document-data/create-document-data';
 import { base64 } from '@documenso/lib/universal/base64';
-import { putFile } from '@documenso/lib/universal/upload/put-file';
+import { putPdfFile } from '@documenso/lib/universal/upload/put-file';
 import { trpc } from '@documenso/trpc/react';
 import { Button } from '@documenso/ui/primitives/button';
 import { Card, CardContent } from '@documenso/ui/primitives/card';
@@ -98,7 +98,7 @@ export const NewTemplateDialog = ({ teamId, templateRootPath }: NewTemplateDialo
     const file: File = uploadedFile.file;
 
     try {
-      const { type, data } = await putFile(file);
+      const { type, data } = await putPdfFile(file);
 
       const { id: templateDocumentDataId } = await createDocumentData({
         type,
