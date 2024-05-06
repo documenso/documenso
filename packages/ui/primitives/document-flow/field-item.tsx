@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from 'react';
 
-import { Trash } from 'lucide-react';
+import { Settings2, Trash } from 'lucide-react';
 import { createPortal } from 'react-dom';
 import { Rnd } from 'react-rnd';
 
@@ -43,6 +43,12 @@ export const FieldItem = ({
     pageHeight: 0,
     pageWidth: 0,
   });
+
+  const advancedField =
+    field.type === 'NUMBER' ||
+    field.type === 'RADIO' ||
+    field.type === 'CHECKBOX' ||
+    field.type === 'DROPDOWN';
 
   const calculateCoords = useCallback(() => {
     const $page = document.querySelector<HTMLElement>(
@@ -117,18 +123,8 @@ export const FieldItem = ({
         onMove?.(d.node);
       }}
     >
-      {!disabled && (
-        <button
-          className="text-muted-foreground/50 hover:text-muted-foreground/80 bg-background absolute -right-2 -top-2 z-20 flex h-8 w-8 items-center justify-center rounded-full border"
-          onClick={() => onRemove?.()}
-          onTouchEnd={() => onRemove?.()}
-        >
-          <Trash className="h-4 w-4" />
-        </button>
-      )}
-
       <Card
-        className={cn('bg-field-card/80 h-full w-full backdrop-blur-[1px]', {
+        className={cn('bg-field-card/10 h-full w-full backdrop-blur-[1px]', {
           'border-field-card-border': !disabled,
           'border-field-card-border/80': active,
         })}
@@ -146,6 +142,36 @@ export const FieldItem = ({
           <p className="w-full truncate text-center text-xs">{field.signerEmail}</p>
         </CardContent>
       </Card>
+
+      {!disabled && (
+        <div className="mt-1 flex justify-center">
+          <div
+            className={cn(
+              'bg-background group flex items-center justify-evenly rounded-md border',
+              {
+                'h-7 w-16': advancedField,
+                'h-7 w-8': !advancedField,
+              },
+            )}
+          >
+            {advancedField && (
+              <button
+                className="text-muted-foreground/50 hover:text-muted-foreground hover:bg-foreground/10 rounded-md p-1 transition-colors"
+                onClick={() => onRemove?.()}
+              >
+                <Settings2 className="h-4 w-4" />
+              </button>
+            )}
+            <button
+              className="text-muted-foreground/50 hover:text-foreground hover:bg-foreground/10 rounded-md p-1 transition-colors"
+              onClick={() => onRemove?.()}
+              onTouchEnd={() => onRemove?.()}
+            >
+              <Trash className="h-4 w-4" />
+            </button>
+          </div>
+        </div>
+      )}
     </Rnd>,
     document.body,
   );
