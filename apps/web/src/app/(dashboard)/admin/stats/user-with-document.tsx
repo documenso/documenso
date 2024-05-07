@@ -37,7 +37,10 @@ export const UserWithDocumentChart = ({ className, data }: UserWithDocumentChart
               }}
               formatter={(value, name) => [
                 Number(value).toLocaleString('en-US'),
-                name === 'count' ? 'User with document' : 'Users with signed document',
+                {
+                  count: 'User with document',
+                  signed_count: 'Users with signed document',
+                }[name],
               ]}
               cursor={{ fill: 'hsl(var(--primary) / 10%)' }}
             />

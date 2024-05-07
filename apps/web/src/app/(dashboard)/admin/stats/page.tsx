@@ -72,7 +72,7 @@ export default async function AdminStatsPage() {
             />
             <CardMetric
               icon={File}
-              title="Users who sent one or more documents in the past month"
+              title="Users who uploaded one or more documents in the past month"
               value={userWithAtLeastOneDocumentSignedPerMonth}
             />
           </div>
