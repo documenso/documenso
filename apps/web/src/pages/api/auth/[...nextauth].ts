@@ -2,6 +2,8 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 
 import NextAuth from 'next-auth';
 
+import { getStripeCustomerByUser } from '@documenso/ee/server-only/stripe/get-customer';
+import { IS_BILLING_ENABLED } from '@documenso/lib/constants/app';
 import { NEXT_AUTH_OPTIONS } from '@documenso/lib/next-auth/auth-options';
 import { extractNextApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 import { prisma } from '@documenso/prisma';
@@ -18,15 +20,29 @@ export default async function auth(req: NextApiRequest, res: NextApiResponse) {
       error: '/signin',
     },
     events: {
-      signIn: async ({ user }) => {
-        await prisma.userSecurityAuditLog.create({
-          data: {
-            userId: user.id,
-            ipAddress,
-            userAgent,
-            type: UserSecurityAuditLogType.SIGN_IN,
-          },
-        });
+      signIn: async ({ user: { id: userId } }) => {
+        const [user] = await Promise.all([
+          await prisma.user.findFirstOrThrow({
+            where: {
+              id: userId,
+            },
+          }),
+          await prisma.userSecurityAuditLog.create({
+            data: {
+              userId,
+              ipAddress,
+              userAgent,
+              type: UserSecurityAuditLogType.SIGN_IN,
+            },
+          }),
+        ]);
+
+        // Create the Stripe customer and attach it to the user if it doesn't exist.
+        if (user.customerId === null && IS_BILLING_ENABLED()) {
+          await getStripeCustomerByUser(user).catch((err) => {
+            console.error(err);
+          });
+        }
       },
       signOut: async ({ token }) => {
         const userId = typeof token.id === 'string' ? parseInt(token.id) : token.id;

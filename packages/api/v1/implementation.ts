@@ -19,10 +19,10 @@ import { getRecipientById } from '@documenso/lib/server-only/recipient/get-recip
 import { getRecipientsForDocument } from '@documenso/lib/server-only/recipient/get-recipients-for-document';
 import { setRecipientsForDocument } from '@documenso/lib/server-only/recipient/set-recipients-for-document';
 import { updateRecipient } from '@documenso/lib/server-only/recipient/update-recipient';
-import { createDocumentFromTemplate } from '@documenso/lib/server-only/template/create-document-from-template';
+import { createDocumentFromTemplateLegacy } from '@documenso/lib/server-only/template/create-document-from-template-legacy';
 import { extractNextApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 import { getFile } from '@documenso/lib/universal/upload/get-file';
-import { putFile } from '@documenso/lib/universal/upload/put-file';
+import { putPdfFile } from '@documenso/lib/universal/upload/put-file';
 import {
   getPresignGetUrl,
   getPresignPostUrl,
@@ -286,7 +286,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
 
     const fileName = body.title.endsWith('.pdf') ? body.title : `${body.title}.pdf`;
 
-    const document = await createDocumentFromTemplate({
+    const document = await createDocumentFromTemplateLegacy({
       templateId,
       userId: user.id,
       teamId: team?.id,
@@ -303,7 +303,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
         formValues: body.formValues,
       });
 
-      const newDocumentData = await putFile({
+      const newDocumentData = await putPdfFile({
         name: fileName,
         type: 'application/pdf',
         arrayBuffer: async () => Promise.resolve(prefilled),
