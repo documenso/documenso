@@ -1,20 +1,25 @@
 'use client';
 
-import React, { useId, useState } from 'react';
+import React, { useId, useMemo, useState } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { AnimatePresence, motion } from 'framer-motion';
-import { InfoIcon, Plus, Trash } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { Plus, Trash } from 'lucide-react';
 import { useSession } from 'next-auth/react';
-import { Controller, useFieldArray, useForm } from 'react-hook-form';
+import { useFieldArray, useForm } from 'react-hook-form';
 
+import { ZRecipientAuthOptionsSchema } from '@documenso/lib/types/document-auth';
 import { nanoid } from '@documenso/lib/universal/id';
 import { type Field, type Recipient, RecipientRole } from '@documenso/prisma/client';
+import { AnimateGenericFadeInOut } from '@documenso/ui/components/animate/animate-generic-fade-in-out';
+import { RecipientActionAuthSelect } from '@documenso/ui/components/recipient/recipient-action-auth-select';
+import { RecipientRoleSelect } from '@documenso/ui/components/recipient/recipient-role-select';
+import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
 import { FormErrorMessage } from '@documenso/ui/primitives/form/form-error-message';
 import { Input } from '@documenso/ui/primitives/input';
-import { Label } from '@documenso/ui/primitives/label';
 
+import { Checkbox } from '../checkbox';
 import {
   DocumentFlowFormContainerActions,
   DocumentFlowFormContainerContent,
@@ -22,10 +27,8 @@ import {
   DocumentFlowFormContainerStep,
 } from '../document-flow/document-flow-root';
 import type { DocumentFlowStep } from '../document-flow/types';
-import { ROLE_ICONS } from '../recipient-role-icons';
-import { Select, SelectContent, SelectItem, SelectTrigger } from '../select';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '../form/form';
 import { useStep } from '../stepper';
-import { Tooltip, TooltipContent, TooltipTrigger } from '../tooltip';
 import type { TAddTemplatePlacholderRecipientsFormSchema } from './add-template-placeholder-recipients.types';
 import { ZAddTemplatePlacholderRecipientsFormSchema } from './add-template-placeholder-recipients.types';
 
@@ -33,30 +36,29 @@ export type AddTemplatePlaceholderRecipientsFormProps = {
   documentFlow: DocumentFlowStep;
   recipients: Recipient[];
   fields: Field[];
+  isTemplateOwnerEnterprise: boolean;
   onSubmit: (_data: TAddTemplatePlacholderRecipientsFormSchema) => void;
 };
 
 export const AddTemplatePlaceholderRecipientsFormPartial = ({
   documentFlow,
+  isTemplateOwnerEnterprise,
   recipients,
   fields: _fields,
   onSubmit,
 }: AddTemplatePlaceholderRecipientsFormProps) => {
   const initialId = useId();
   const { data: session } = useSession();
+
   const user = session?.user;
+
   const [placeholderRecipientCount, setPlaceholderRecipientCount] = useState(() =>
     recipients.length > 1 ? recipients.length + 1 : 2,
   );
 
   const { currentStep, totalSteps, previousStep } = useStep();
 
-  const {
-    control,
-    handleSubmit,
-    getValues,
-    formState: { errors, isSubmitting },
-  } = useForm<TAddTemplatePlacholderRecipientsFormSchema>({
+  const form = useForm<TAddTemplatePlacholderRecipientsFormSchema>({
     resolver: zodResolver(ZAddTemplatePlacholderRecipientsFormSchema),
     defaultValues: {
       signers:
@@ -67,6 +69,8 @@ export const AddTemplatePlaceholderRecipientsFormPartial = ({
               name: recipient.name,
               email: recipient.email,
               role: recipient.role,
+              actionAuth:
+                ZRecipientAuthOptionsSchema.parse(recipient.authOptions)?.actionAuth ?? undefined,
             }))
           : [
               {
@@ -74,12 +78,33 @@ export const AddTemplatePlaceholderRecipientsFormPartial = ({
                 name: `Recipient 1`,
                 email: `recipient.1@documenso.com`,
                 role: RecipientRole.SIGNER,
+                actionAuth: undefined,
               },
             ],
     },
   });
 
-  const onFormSubmit = handleSubmit(onSubmit);
+  // Always show advanced settings if any recipient has auth options.
+  const alwaysShowAdvancedSettings = useMemo(() => {
+    const recipientHasAuthOptions = recipients.find((recipient) => {
+      const recipientAuthOptions = ZRecipientAuthOptionsSchema.parse(recipient.authOptions);
+
+      return recipientAuthOptions?.accessAuth || recipientAuthOptions?.actionAuth;
+    });
+
+    const formHasActionAuth = form.getValues('signers').find((signer) => signer.actionAuth);
+
+    return recipientHasAuthOptions !== undefined || formHasActionAuth !== undefined;
+  }, [recipients, form]);
+
+  const [showAdvancedSettings, setShowAdvancedSettings] = useState(alwaysShowAdvancedSettings);
+
+  const {
+    formState: { errors, isSubmitting },
+    control,
+  } = form;
+
+  const onFormSubmit = form.handleSubmit(onSubmit);
 
   const {
     append: appendSigner,
@@ -102,8 +127,9 @@ export const AddTemplatePlaceholderRecipientsFormPartial = ({
   const onAddPlaceholderRecipient = () => {
     appendSigner({
       formId: nanoid(12),
+      // Update TEMPLATE_RECIPIENT_NAME_PLACEHOLDER_REGEX if this is ever changed.
       name: `Recipient ${placeholderRecipientCount}`,
-      // Update TEMPLATE_RECIPIENT_PLACEHOLDER_REGEX if this is ever changed.
+      // Update TEMPLATE_RECIPIENT_EMAIL_PLACEHOLDER_REGEX if this is ever changed.
       email: `recipient.${placeholderRecipientCount}@documenso.com`,
       role: RecipientRole.SIGNER,
     });
@@ -118,181 +144,176 @@ export const AddTemplatePlaceholderRecipientsFormPartial = ({
   return (
     <>
       <DocumentFlowFormContainerContent>
-        <div className="flex w-full flex-col gap-y-4">
-          <AnimatePresence>
-            {signers.map((signer, index) => (
-              <motion.div
-                key={signer.id}
-                data-native-id={signer.nativeId}
-                className="flex flex-wrap items-end gap-x-4"
-              >
-                <div className="flex-1">
-                  <Label htmlFor={`signer-${signer.id}-email`}>Email</Label>
+        <AnimateGenericFadeInOut motionKey={showAdvancedSettings ? 'Show' : 'Hide'}>
+          <Form {...form}>
+            <div className="flex w-full flex-col gap-y-2">
+              {signers.map((signer, index) => (
+                <motion.fieldset
+                  key={signer.id}
+                  data-native-id={signer.nativeId}
+                  disabled={isSubmitting}
+                  className={cn('grid grid-cols-8 gap-4 pb-4', {
+                    'border-b pt-2': showAdvancedSettings,
+                  })}
+                >
+                  <FormField
+                    control={form.control}
+                    name={`signers.${index}.email`}
+                    render={({ field }) => (
+                      <FormItem
+                        className={cn('relative', {
+                          'col-span-3': !showAdvancedSettings,
+                          'col-span-4': showAdvancedSettings,
+                        })}
+                      >
+                        {!showAdvancedSettings && index === 0 && (
+                          <FormLabel required>Email</FormLabel>
+                        )}
 
-                  <Input
-                    id={`signer-${signer.id}-email`}
-                    type="email"
-                    value={signer.email}
-                    disabled
-                    className="bg-background mt-2"
-                  />
-                </div>
+                        <FormControl>
+                          <Input
+                            type="email"
+                            placeholder="Email"
+                            {...field}
+                            disabled={isSubmitting || signers[index].email === user?.email}
+                          />
+                        </FormControl>
 
-                <div className="flex-1">
-                  <Label htmlFor={`signer-${signer.id}-name`}>Name</Label>
-
-                  <Input
-                    id={`signer-${signer.id}-name`}
-                    type="text"
-                    value={signer.name}
-                    disabled
-                    className="bg-background mt-2"
-                  />
-                </div>
-
-                <div className="w-[60px]">
-                  <Controller
-                    control={control}
-                    name={`signers.${index}.role`}
-                    render={({ field: { value, onChange } }) => (
-                      <Select value={value} onValueChange={(x) => onChange(x)}>
-                        <SelectTrigger className="bg-background">{ROLE_ICONS[value]}</SelectTrigger>
-
-                        <SelectContent className="" align="end">
-                          <SelectItem value={RecipientRole.SIGNER}>
-                            <div className="flex items-center">
-                              <div className="flex w-[150px] items-center">
-                                <span className="mr-2">{ROLE_ICONS[RecipientRole.SIGNER]}</span>
-                                Needs to sign
-                              </div>
-                              <Tooltip>
-                                <TooltipTrigger>
-                                  <InfoIcon className="h-4 w-4" />
-                                </TooltipTrigger>
-                                <TooltipContent className="text-foreground z-9999 max-w-md p-4">
-                                  <p>
-                                    The recipient is required to sign the document for it to be
-                                    completed.
-                                  </p>
-                                </TooltipContent>
-                              </Tooltip>
-                            </div>
-                          </SelectItem>
-
-                          <SelectItem value={RecipientRole.APPROVER}>
-                            <div className="flex items-center">
-                              <div className="flex w-[150px] items-center">
-                                <span className="mr-2">{ROLE_ICONS[RecipientRole.APPROVER]}</span>
-                                Needs to approve
-                              </div>
-                              <Tooltip>
-                                <TooltipTrigger>
-                                  <InfoIcon className="h-4 w-4" />
-                                </TooltipTrigger>
-                                <TooltipContent className="text-foreground z-9999 max-w-md p-4">
-                                  <p>
-                                    The recipient is required to approve the document for it to be
-                                    completed.
-                                  </p>
-                                </TooltipContent>
-                              </Tooltip>
-                            </div>
-                          </SelectItem>
-
-                          <SelectItem value={RecipientRole.VIEWER}>
-                            <div className="flex items-center">
-                              <div className="flex w-[150px] items-center">
-                                <span className="mr-2">{ROLE_ICONS[RecipientRole.VIEWER]}</span>
-                                Needs to view
-                              </div>
-                              <Tooltip>
-                                <TooltipTrigger>
-                                  <InfoIcon className="h-4 w-4" />
-                                </TooltipTrigger>
-                                <TooltipContent className="text-foreground z-9999 max-w-md p-4">
-                                  <p>
-                                    The recipient is required to view the document for it to be
-                                    completed.
-                                  </p>
-                                </TooltipContent>
-                              </Tooltip>
-                            </div>
-                          </SelectItem>
-
-                          <SelectItem value={RecipientRole.CC}>
-                            <div className="flex items-center">
-                              <div className="flex w-[150px] items-center">
-                                <span className="mr-2">{ROLE_ICONS[RecipientRole.CC]}</span>
-                                Receives copy
-                              </div>
-                              <Tooltip>
-                                <TooltipTrigger>
-                                  <InfoIcon className="h-4 w-4" />
-                                </TooltipTrigger>
-                                <TooltipContent className="text-foreground z-9999 max-w-md p-4">
-                                  <p>
-                                    The recipient is not required to take any action and receives a
-                                    copy of the document after it is completed.
-                                  </p>
-                                </TooltipContent>
-                              </Tooltip>
-                            </div>
-                          </SelectItem>
-                        </SelectContent>
-                      </Select>
+                        <FormMessage />
+                      </FormItem>
                     )}
                   />
-                </div>
 
-                <div>
+                  <FormField
+                    control={form.control}
+                    name={`signers.${index}.name`}
+                    render={({ field }) => (
+                      <FormItem
+                        className={cn({
+                          'col-span-3': !showAdvancedSettings,
+                          'col-span-4': showAdvancedSettings,
+                        })}
+                      >
+                        {!showAdvancedSettings && index === 0 && <FormLabel>Name</FormLabel>}
+
+                        <FormControl>
+                          <Input
+                            placeholder="Name"
+                            {...field}
+                            disabled={isSubmitting || signers[index].email === user?.email}
+                          />
+                        </FormControl>
+
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  {showAdvancedSettings && isTemplateOwnerEnterprise && (
+                    <FormField
+                      control={form.control}
+                      name={`signers.${index}.actionAuth`}
+                      render={({ field }) => (
+                        <FormItem className="col-span-6">
+                          <FormControl>
+                            <RecipientActionAuthSelect
+                              {...field}
+                              onValueChange={field.onChange}
+                              disabled={isSubmitting}
+                            />
+                          </FormControl>
+
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  )}
+
+                  <FormField
+                    name={`signers.${index}.role`}
+                    render={({ field }) => (
+                      <FormItem className="col-span-1 mt-auto">
+                        <FormControl>
+                          <RecipientRoleSelect
+                            {...field}
+                            onValueChange={field.onChange}
+                            disabled={isSubmitting}
+                          />
+                        </FormControl>
+
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
                   <button
                     type="button"
-                    className="inline-flex h-10 w-10 items-center justify-center text-slate-500 hover:opacity-80 disabled:cursor-not-allowed disabled:opacity-50"
+                    className="col-span-1 mt-auto inline-flex h-10 w-10 items-center justify-center text-slate-500 hover:opacity-80 disabled:cursor-not-allowed disabled:opacity-50"
                     disabled={isSubmitting || signers.length === 1}
                     onClick={() => onRemoveSigner(index)}
                   >
                     <Trash className="h-5 w-5" />
                   </button>
-                </div>
+                </motion.fieldset>
+              ))}
+            </div>
 
-                <div className="w-full">
-                  <FormErrorMessage className="mt-2" error={errors.signers?.[index]?.email} />
-                  <FormErrorMessage className="mt-2" error={errors.signers?.[index]?.name} />
-                </div>
-              </motion.div>
-            ))}
-          </AnimatePresence>
-        </div>
+            <FormErrorMessage
+              className="mt-2"
+              // Dirty hack to handle errors when .root is populated for an array type
+              error={'signers__root' in errors && errors['signers__root']}
+            />
 
-        <FormErrorMessage
-          className="mt-2"
-          // Dirty hack to handle errors when .root is populated for an array type
-          error={'signers__root' in errors && errors['signers__root']}
-        />
+            <div
+              className={cn('mt-2 flex flex-row items-center space-x-4', {
+                'mt-4': showAdvancedSettings,
+              })}
+            >
+              <Button
+                type="button"
+                className="flex-1"
+                disabled={isSubmitting}
+                onClick={() => onAddPlaceholderRecipient()}
+              >
+                <Plus className="-ml-1 mr-2 h-5 w-5" />
+                Add Placeholder Recipient
+              </Button>
 
-        <div className="mt-4 flex flex-row items-center space-x-4">
-          <Button
-            type="button"
-            className="flex-1"
-            disabled={isSubmitting}
-            onClick={() => onAddPlaceholderRecipient()}
-          >
-            <Plus className="-ml-1 mr-2 h-5 w-5" />
-            Add Placeholder Recipient
-          </Button>
-          <Button
-            type="button"
-            className="dark:bg-muted dark:hover:bg-muted/80 bg-black/5 hover:bg-black/10"
-            variant="secondary"
-            disabled={
-              isSubmitting || getValues('signers').some((signer) => signer.email === user?.email)
-            }
-            onClick={() => onAddPlaceholderSelfRecipient()}
-          >
-            <Plus className="-ml-1 mr-2 h-5 w-5" />
-            Add Myself
-          </Button>
-        </div>
+              <Button
+                type="button"
+                className="dark:bg-muted dark:hover:bg-muted/80 bg-black/5 hover:bg-black/10"
+                variant="secondary"
+                disabled={
+                  isSubmitting ||
+                  form.getValues('signers').some((signer) => signer.email === user?.email)
+                }
+                onClick={() => onAddPlaceholderSelfRecipient()}
+              >
+                <Plus className="-ml-1 mr-2 h-5 w-5" />
+                Add Myself
+              </Button>
+            </div>
+
+            {!alwaysShowAdvancedSettings && isTemplateOwnerEnterprise && (
+              <div className="mt-4 flex flex-row items-center">
+                <Checkbox
+                  id="showAdvancedRecipientSettings"
+                  className="h-5 w-5"
+                  checkClassName="dark:text-white text-primary"
+                  checked={showAdvancedSettings}
+                  onCheckedChange={(value) => setShowAdvancedSettings(Boolean(value))}
+                />
+
+                <label
+                  className="text-muted-foreground ml-2 text-sm"
+                  htmlFor="showAdvancedRecipientSettings"
+                >
+                  Show advanced settings
+                </label>
+              </div>
+            )}
+          </Form>
+        </AnimateGenericFadeInOut>
       </DocumentFlowFormContainerContent>
 
       <DocumentFlowFormContainerFooter>

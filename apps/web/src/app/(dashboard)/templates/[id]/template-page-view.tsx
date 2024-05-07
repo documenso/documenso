@@ -73,7 +73,7 @@ export const TemplatePageView = async ({ params, team }: TemplatePageViewProps) 
       </div>
 
       <EditTemplateForm
-        className="mt-8"
+        className="mt-6"
         template={template}
         user={user}
         recipients={templateRecipients}

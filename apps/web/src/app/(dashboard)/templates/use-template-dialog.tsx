@@ -1,3 +1,5 @@
+import { useEffect, useState } from 'react';
+
 import { useRouter } from 'next/navigation';
 
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -5,7 +7,10 @@ import { InfoIcon, Plus } from 'lucide-react';
 import { useFieldArray, useForm } from 'react-hook-form';
 import * as z from 'zod';
 
-import { TEMPLATE_RECIPIENT_PLACEHOLDER_REGEX } from '@documenso/lib/constants/template';
+import {
+  TEMPLATE_RECIPIENT_EMAIL_PLACEHOLDER_REGEX,
+  TEMPLATE_RECIPIENT_NAME_PLACEHOLDER_REGEX,
+} from '@documenso/lib/constants/template';
 import { AppError } from '@documenso/lib/errors/app-error';
 import type { Recipient } from '@documenso/prisma/client';
 import { trpc } from '@documenso/trpc/react';
@@ -91,6 +96,8 @@ export function UseTemplateDialog({
   const router = useRouter();
   const { toast } = useToast();
 
+  const [open, setOpen] = useState(false);
+
   const team = useOptionalCurrentTeam();
 
   const form = useForm<TAddRecipientsForNewDocumentSchema>({
@@ -98,20 +105,18 @@ export function UseTemplateDialog({
     defaultValues: {
       sendDocument: false,
       recipients: recipients.map((recipient) => {
-        const isRecipientPlaceholder = recipient.email.match(TEMPLATE_RECIPIENT_PLACEHOLDER_REGEX);
+        const isRecipientEmailPlaceholder = recipient.email.match(
+          TEMPLATE_RECIPIENT_EMAIL_PLACEHOLDER_REGEX,
+        );
 
-        if (isRecipientPlaceholder) {
-          return {
-            id: recipient.id,
-            name: '',
-            email: '',
-          };
-        }
+        const isRecipientNamePlaceholder = recipient.name.match(
+          TEMPLATE_RECIPIENT_NAME_PLACEHOLDER_REGEX,
+        );
 
         return {
           id: recipient.id,
-          name: recipient.name,
-          email: recipient.email,
+          name: !isRecipientNamePlaceholder ? recipient.name : '',
+          email: !isRecipientEmailPlaceholder ? recipient.email : '',
         };
       }),
     },
@@ -158,8 +163,14 @@ export function UseTemplateDialog({
     name: 'recipients',
   });
 
+  useEffect(() => {
+    if (!open) {
+      form.reset();
+    }
+  }, [open, form]);
+
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={(value) => !form.formState.isSubmitting && setOpen(value)}>
       <DialogTrigger asChild>
         <Button className="cursor-pointer">
           <Plus className="-ml-1 mr-2 h-4 w-4" />
@@ -190,7 +201,7 @@ export function UseTemplateDialog({
                           {index === 0 && <FormLabel required>Email</FormLabel>}
 
                           <FormControl>
-                            <Input {...field} placeholder={recipients[index].email} />
+                            <Input {...field} placeholder={recipients[index].email || 'Email'} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -205,7 +216,7 @@ export function UseTemplateDialog({
                           {index === 0 && <FormLabel>Name</FormLabel>}
 
                           <FormControl>
-                            <Input {...field} placeholder={recipients[index].name} />
+                            <Input {...field} placeholder={recipients[index].name || 'Name'} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
