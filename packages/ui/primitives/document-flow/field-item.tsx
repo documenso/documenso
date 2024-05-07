@@ -133,9 +133,9 @@ export const FieldItem = ({
   return createPortal(
     <Rnd
       key={coords.pageX + coords.pageY + coords.pageHeight + coords.pageWidth}
-      className={cn('z-20', {
-        'pointer-events-none': passive,
-        'pointer-events-none opacity-75': disabled,
+      className={cn('group z-20', {
+        'active:pointer-events-none': passive,
+        'opacity-75 active:pointer-events-none': disabled,
         'z-10': !active || disabled,
       })}
       // minHeight={minHeight}
@@ -170,7 +170,7 @@ export const FieldItem = ({
       >
         <CardContent
           className={cn(
-            'text-field-card-foreground group flex h-full w-full flex-col items-center justify-center p-2',
+            'text-field-card-foreground flex h-full w-full flex-col items-center justify-center p-2',
             {
               'text-field-card-foreground/50': disabled,
             },
@@ -242,7 +242,14 @@ export const FieldItem = ({
             }
           })()}
 
-          <p className="bg-documenso-700 absolute -right-11 z-20 hidden h-10 w-14 items-center justify-center rounded-xl font-semibold text-white group-hover:flex">
+          <p
+            className={cn(
+              'bg-documenso-700 absolute -right-9 z-20 hidden h-8 w-9 items-center justify-center rounded-r-xl font-semibold text-white group-hover:flex',
+              {
+                'text-field-card-foreground/50 bg-slate-900/10': disabled || passive,
+              },
+            )}
+          >
             {(field.signerEmail?.charAt(0)?.toUpperCase() ?? '') +
               (field.signerEmail?.charAt(1)?.toUpperCase() ?? '')}
           </p>
