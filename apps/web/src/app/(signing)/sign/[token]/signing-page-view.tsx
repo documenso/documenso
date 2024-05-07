@@ -14,10 +14,14 @@ import { LazyPDFViewer } from '@documenso/ui/primitives/lazy-pdf-viewer';
 import { DocumentReadOnlyFields } from '~/components/document/document-read-only-fields';
 import { truncateTitle } from '~/helpers/truncate-title';
 
+import { CheckboxField } from './checkbox-field';
 import { DateField } from './date-field';
+import { DropdownField } from './dropdown-field';
 import { EmailField } from './email-field';
 import { SigningForm } from './form';
 import { NameField } from './name-field';
+import { NumberField } from './number';
+import { RadioField } from './radio-field';
 import { SignatureField } from './signature-field';
 import { TextField } from './text-field';
 
@@ -103,6 +107,18 @@ export const SigningPageView = ({
             ))
             .with(FieldType.TEXT, () => (
               <TextField key={field.id} field={field} recipient={recipient} />
+            ))
+            .with(FieldType.NUMBER, () => (
+              <NumberField key={field.id} field={field} recipient={recipient} />
+            ))
+            .with(FieldType.RADIO, () => (
+              <RadioField key={field.id} field={field} recipient={recipient} />
+            ))
+            .with(FieldType.CHECKBOX, () => (
+              <CheckboxField key={field.id} field={field} recipient={recipient} />
+            ))
+            .with(FieldType.DROPDOWN, () => (
+              <DropdownField key={field.id} field={field} recipient={recipient} />
             ))
             .otherwise(() => null),
         )}

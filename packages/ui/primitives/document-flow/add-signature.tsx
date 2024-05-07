@@ -175,6 +175,26 @@ export const AddSignatureFormPartial = ({
         customText: form.getValues('customText'),
         inserted: true,
       }))
+      .with(FieldType.NUMBER, () => ({
+        ...field,
+        customText: form.getValues('number'),
+        inserted: true,
+      }))
+      .with(FieldType.RADIO, () => ({
+        ...field,
+        customText: form.getValues('radio'),
+        inserted: true,
+      }))
+      .with(FieldType.CHECKBOX, () => ({
+        ...field,
+        customText: form.getValues('checkbox'),
+        inserted: true,
+      }))
+      .with(FieldType.DROPDOWN, () => ({
+        ...field,
+        customText: form.getValues('dropdown'),
+        inserted: true,
+      }))
       .with(FieldType.SIGNATURE, () => {
         const value = form.getValues('signature');
 

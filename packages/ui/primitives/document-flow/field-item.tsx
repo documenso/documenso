@@ -44,6 +44,7 @@ export type FieldItemProps = {
   onResize?: (_node: HTMLElement) => void;
   onMove?: (_node: HTMLElement) => void;
   onRemove?: () => void;
+  onAdvancedSettings?: () => void;
 };
 
 export const FieldItem = ({
@@ -55,6 +56,7 @@ export const FieldItem = ({
   onResize,
   onMove,
   onRemove,
+  onAdvancedSettings,
 }: FieldItemProps) => {
   const [active, setActive] = useState(false);
   const [coords, setCoords] = useState({
@@ -270,7 +272,8 @@ export const FieldItem = ({
             {advancedField && (
               <button
                 className="text-muted-foreground/50 hover:text-muted-foreground hover:bg-foreground/10 rounded-md p-1 transition-colors"
-                onClick={() => onRemove?.()}
+                onClick={onAdvancedSettings}
+                onTouchEnd={onAdvancedSettings}
               >
                 <Settings2 className="h-4 w-4" />
               </button>
