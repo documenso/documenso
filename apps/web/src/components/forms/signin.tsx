@@ -1,12 +1,16 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { browserSupportsWebAuthn, startAuthentication } from '@simplewebauthn/browser';
+import {
+  browserSupportsWebAuthn,
+  browserSupportsWebAuthnAutofill,
+  startAuthentication,
+} from '@simplewebauthn/browser';
 import { KeyRoundIcon } from 'lucide-react';
 import { signIn } from 'next-auth/react';
 import { useForm } from 'react-hook-form';
@@ -123,7 +127,7 @@ export const SignInForm = ({ className, initialEmail, isGoogleSSOEnabled }: Sign
     setTwoFactorAuthenticationMethod(method);
   };
 
-  const onSignInWithPasskey = async () => {
+  const onSignInWithPasskey = async (autofill: boolean = false) => {
     if (!browserSupportsWebAuthn()) {
       toast({
         title: 'Not supported',
@@ -136,11 +140,11 @@ export const SignInForm = ({ className, initialEmail, isGoogleSSOEnabled }: Sign
     }
 
     try {
-      setIsPasskeyLoading(true);
+      !autofill && setIsPasskeyLoading(true);
 
       const options = await createPasskeySigninOptions();
 
-      const credential = await startAuthentication(options);
+      const credential = await startAuthentication(options, autofill);
 
       const result = await signIn('webauthn', {
         credential: JSON.stringify(credential),
@@ -256,6 +260,22 @@ export const SignInForm = ({ className, initialEmail, isGoogleSSOEnabled }: Sign
     }
   };
 
+  useEffect(() => {
+    void signInWithPasskeyAutofill();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const signInWithPasskeyAutofill = async () => {
+    const autoFillSupported = await browserSupportsWebAuthnAutofill();
+    if (autoFillSupported) {
+      try {
+        await onSignInWithPasskey(true);
+      } catch (error) {
+        console.error('Error during Passkey autofill attempt:', error);
+      }
+    }
+  };
+
   return (
     <Form {...form}>
       <form
@@ -274,7 +294,7 @@ export const SignInForm = ({ className, initialEmail, isGoogleSSOEnabled }: Sign
                 <FormLabel>Email</FormLabel>
 
                 <FormControl>
-                  <Input type="email" {...field} />
+                  <Input type="email" {...field} autoComplete="email webauthn" />
                 </FormControl>
 
                 <FormMessage />
@@ -290,7 +310,7 @@ export const SignInForm = ({ className, initialEmail, isGoogleSSOEnabled }: Sign
                 <FormLabel>Password</FormLabel>
 
                 <FormControl>
-                  <PasswordInput {...field} />
+                  <PasswordInput {...field} autoComplete="password webauthn" />
                 </FormControl>
 
                 <FormMessage />
@@ -346,7 +366,7 @@ export const SignInForm = ({ className, initialEmail, isGoogleSSOEnabled }: Sign
               disabled={isSubmitting}
               loading={isPasskeyLoading}
               className="bg-background text-muted-foreground border"
-              onClick={onSignInWithPasskey}
+              onClick={async () => await onSignInWithPasskey()}
             >
               {!isPasskeyLoading && <KeyRoundIcon className="-ml-1 mr-1 h-5 w-5" />}
               Passkey
