@@ -1,14 +1,16 @@
 import { useRouter } from 'next/navigation';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Plus } from 'lucide-react';
-import { Controller, useFieldArray, useForm } from 'react-hook-form';
+import { InfoIcon, Plus } from 'lucide-react';
+import { useFieldArray, useForm } from 'react-hook-form';
 import * as z from 'zod';
 
+import { TEMPLATE_RECIPIENT_PLACEHOLDER_REGEX } from '@documenso/lib/constants/template';
+import { AppError } from '@documenso/lib/errors/app-error';
 import type { Recipient } from '@documenso/prisma/client';
-import { RecipientRole } from '@documenso/prisma/client';
 import { trpc } from '@documenso/trpc/react';
 import { Button } from '@documenso/ui/primitives/button';
+import { Checkbox } from '@documenso/ui/primitives/checkbox';
 import {
   Dialog,
   DialogClose,
@@ -19,24 +21,59 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@documenso/ui/primitives/dialog';
-import { FormErrorMessage } from '@documenso/ui/primitives/form/form-error-message';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@documenso/ui/primitives/form/form';
 import { Input } from '@documenso/ui/primitives/input';
-import { Label } from '@documenso/ui/primitives/label';
-import { ROLE_ICONS } from '@documenso/ui/primitives/recipient-role-icons';
-import { Select, SelectContent, SelectItem, SelectTrigger } from '@documenso/ui/primitives/select';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@documenso/ui/primitives/tooltip';
+import type { Toast } from '@documenso/ui/primitives/use-toast';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
 import { useOptionalCurrentTeam } from '~/providers/team';
 
-const ZAddRecipientsForNewDocumentSchema = z.object({
-  recipients: z.array(
-    z.object({
-      email: z.string().email(),
-      name: z.string(),
-      role: z.nativeEnum(RecipientRole),
-    }),
-  ),
-});
+const ZAddRecipientsForNewDocumentSchema = z
+  .object({
+    sendDocument: z.boolean(),
+    recipients: z.array(
+      z.object({
+        id: z.number(),
+        email: z.string().email(),
+        name: z.string(),
+      }),
+    ),
+  })
+  // Display exactly which rows are duplicates.
+  .superRefine((items, ctx) => {
+    const uniqueEmails = new Map<string, number>();
+
+    for (const [index, recipients] of items.recipients.entries()) {
+      const email = recipients.email.toLowerCase();
+
+      const firstFoundIndex = uniqueEmails.get(email);
+
+      if (firstFoundIndex === undefined) {
+        uniqueEmails.set(email, index);
+        continue;
+      }
+
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'Emails must be unique',
+        path: ['recipients', index, 'email'],
+      });
+
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'Emails must be unique',
+        path: ['recipients', firstFoundIndex, 'email'],
+      });
+    }
+  });
 
 type TAddRecipientsForNewDocumentSchema = z.infer<typeof ZAddRecipientsForNewDocumentSchema>;
 
@@ -56,33 +93,31 @@ export function UseTemplateDialog({
 
   const team = useOptionalCurrentTeam();
 
-  const {
-    control,
-    handleSubmit,
-    formState: { errors, isSubmitting },
-  } = useForm<TAddRecipientsForNewDocumentSchema>({
+  const form = useForm<TAddRecipientsForNewDocumentSchema>({
     resolver: zodResolver(ZAddRecipientsForNewDocumentSchema),
     defaultValues: {
-      recipients:
-        recipients.length > 0
-          ? recipients.map((recipient) => ({
-              nativeId: recipient.id,
-              formId: String(recipient.id),
-              name: recipient.name,
-              email: recipient.email,
-              role: recipient.role,
-            }))
-          : [
-              {
-                name: '',
-                email: '',
-                role: RecipientRole.SIGNER,
-              },
-            ],
+      sendDocument: false,
+      recipients: recipients.map((recipient) => {
+        const isRecipientPlaceholder = recipient.email.match(TEMPLATE_RECIPIENT_PLACEHOLDER_REGEX);
+
+        if (isRecipientPlaceholder) {
+          return {
+            id: recipient.id,
+            name: '',
+            email: '',
+          };
+        }
+
+        return {
+          id: recipient.id,
+          name: recipient.name,
+          email: recipient.email,
+        };
+      }),
     },
   });
 
-  const { mutateAsync: createDocumentFromTemplate, isLoading: isCreatingDocumentFromTemplate } =
+  const { mutateAsync: createDocumentFromTemplate } =
     trpc.template.createDocumentFromTemplate.useMutation();
 
   const onSubmit = async (data: TAddRecipientsForNewDocumentSchema) => {
@@ -91,6 +126,7 @@ export function UseTemplateDialog({
         templateId,
         teamId: team?.id,
         recipients: data.recipients,
+        sendDocument: data.sendDocument,
       });
 
       toast({
@@ -101,18 +137,24 @@ export function UseTemplateDialog({
 
       router.push(`${documentRootPath}/${id}`);
     } catch (err) {
-      toast({
+      const error = AppError.parseError(err);
+
+      const toastPayload: Toast = {
         title: 'Error',
         description: 'An error occurred while creating document from template.',
         variant: 'destructive',
-      });
+      };
+
+      if (error.code === 'DOCUMENT_SEND_FAILED') {
+        toastPayload.description = 'The document was created but could not be sent to recipients.';
+      }
+
+      toast(toastPayload);
     }
   };
 
-  const onCreateDocumentFromTemplate = handleSubmit(onSubmit);
-
   const { fields: formRecipients } = useFieldArray({
-    control,
+    control: form.control,
     name: 'recipients',
   });
 
@@ -126,121 +168,110 @@ export function UseTemplateDialog({
       </DialogTrigger>
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
-          <DialogTitle>Document Recipients</DialogTitle>
-          <DialogDescription>Add the recipients to create the template with.</DialogDescription>
+          <DialogTitle>Create document from template</DialogTitle>
+          <DialogDescription>
+            {recipients.length === 0
+              ? 'A draft document will be created'
+              : 'Add the recipients to create the document with'}
+          </DialogDescription>
         </DialogHeader>
-        <div className="flex flex-col space-y-4">
-          {formRecipients.map((recipient, index) => (
-            <div
-              key={recipient.id}
-              data-native-id={recipient.id}
-              className="flex flex-wrap items-end gap-x-4"
-            >
-              <div className="flex-1">
-                <Label htmlFor={`recipient-${recipient.id}-email`}>
-                  Email
-                  <span className="text-destructive ml-1 inline-block font-medium">*</span>
-                </Label>
 
-                <Controller
-                  control={control}
-                  name={`recipients.${index}.email`}
-                  render={({ field }) => (
-                    <Input
-                      id={`recipient-${recipient.id}-email`}
-                      type="email"
-                      className="bg-background mt-2"
-                      disabled={isSubmitting}
-                      {...field}
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)}>
+            <fieldset className="flex h-full flex-col" disabled={form.formState.isSubmitting}>
+              <div className="custom-scrollbar -m-1 max-h-[60vh] space-y-4 overflow-y-auto p-1">
+                {formRecipients.map((recipient, index) => (
+                  <div className="flex w-full flex-row space-x-4" key={recipient.id}>
+                    <FormField
+                      control={form.control}
+                      name={`recipients.${index}.email`}
+                      render={({ field }) => (
+                        <FormItem className="w-full">
+                          {index === 0 && <FormLabel required>Email</FormLabel>}
+
+                          <FormControl>
+                            <Input {...field} placeholder={recipients[index].email} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
                     />
-                  )}
-                />
-              </div>
 
-              <div className="flex-1">
-                <Label htmlFor={`recipient-${recipient.id}-name`}>Name</Label>
+                    <FormField
+                      control={form.control}
+                      name={`recipients.${index}.name`}
+                      render={({ field }) => (
+                        <FormItem className="w-full">
+                          {index === 0 && <FormLabel>Name</FormLabel>}
 
-                <Controller
-                  control={control}
-                  name={`recipients.${index}.name`}
-                  render={({ field }) => (
-                    <Input
-                      id={`recipient-${recipient.id}-name`}
-                      type="text"
-                      className="bg-background mt-2"
-                      disabled={isSubmitting}
-                      {...field}
+                          <FormControl>
+                            <Input {...field} placeholder={recipients[index].name} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
                     />
-                  )}
-                />
+                  </div>
+                ))}
               </div>
 
-              <div className="w-[60px]">
-                <Controller
-                  control={control}
-                  name={`recipients.${index}.role`}
-                  render={({ field: { value, onChange } }) => (
-                    <Select value={value} onValueChange={(x) => onChange(x)}>
-                      <SelectTrigger className="bg-background">{ROLE_ICONS[value]}</SelectTrigger>
+              {recipients.length > 0 && (
+                <div className="mt-4 flex flex-row items-center">
+                  <FormField
+                    control={form.control}
+                    name="sendDocument"
+                    render={({ field }) => (
+                      <FormItem>
+                        <div className="flex flex-row items-center">
+                          <Checkbox
+                            id="sendDocument"
+                            className="h-5 w-5"
+                            checkClassName="dark:text-white text-primary"
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                          />
 
-                      <SelectContent className="" align="end">
-                        <SelectItem value={RecipientRole.SIGNER}>
-                          <div className="flex items-center">
-                            <span className="mr-2">{ROLE_ICONS[RecipientRole.SIGNER]}</span>
-                            Signer
-                          </div>
-                        </SelectItem>
+                          <label
+                            className="text-muted-foreground ml-2 flex items-center text-sm"
+                            htmlFor="sendDocument"
+                          >
+                            Send document
+                            <Tooltip>
+                              <TooltipTrigger type="button">
+                                <InfoIcon className="mx-1 h-4 w-4" />
+                              </TooltipTrigger>
 
-                        <SelectItem value={RecipientRole.CC}>
-                          <div className="flex items-center">
-                            <span className="mr-2">{ROLE_ICONS[RecipientRole.CC]}</span>
-                            Receives copy
-                          </div>
-                        </SelectItem>
+                              <TooltipContent className="text-muted-foreground z-[99999] max-w-md space-y-2 p-4">
+                                <p>
+                                  The document will be immediately sent to recipients if this is
+                                  checked.
+                                </p>
 
-                        <SelectItem value={RecipientRole.APPROVER}>
-                          <div className="flex items-center">
-                            <span className="mr-2">{ROLE_ICONS[RecipientRole.APPROVER]}</span>
-                            Approver
-                          </div>
-                        </SelectItem>
+                                <p>Otherwise, the document will be created as a draft.</p>
+                              </TooltipContent>
+                            </Tooltip>
+                          </label>
+                        </div>
+                      </FormItem>
+                    )}
+                  />
+                </div>
+              )}
 
-                        <SelectItem value={RecipientRole.VIEWER}>
-                          <div className="flex items-center">
-                            <span className="mr-2">{ROLE_ICONS[RecipientRole.VIEWER]}</span>
-                            Viewer
-                          </div>
-                        </SelectItem>
-                      </SelectContent>
-                    </Select>
-                  )}
-                />
-              </div>
+              <DialogFooter>
+                <DialogClose asChild>
+                  <Button type="button" variant="secondary">
+                    Close
+                  </Button>
+                </DialogClose>
 
-              <div className="w-full">
-                <FormErrorMessage className="mt-2" error={errors.recipients?.[index]?.email} />
-                <FormErrorMessage className="mt-2" error={errors.recipients?.[index]?.name} />
-              </div>
-            </div>
-          ))}
-        </div>
-
-        <DialogFooter className="justify-end">
-          <DialogClose asChild>
-            <Button type="button" variant="secondary">
-              Close
-            </Button>
-          </DialogClose>
-
-          <Button
-            type="button"
-            loading={isCreatingDocumentFromTemplate}
-            disabled={isCreatingDocumentFromTemplate}
-            onClick={onCreateDocumentFromTemplate}
-          >
-            Create Document
-          </Button>
-        </DialogFooter>
+                <Button type="submit" loading={form.formState.isSubmitting}>
+                  {form.getValues('sendDocument') ? 'Create and send' : 'Create as draft'}
+                </Button>
+              </DialogFooter>
+            </fieldset>
+          </form>
+        </Form>
       </DialogContent>
     </Dialog>
   );

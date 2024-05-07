@@ -1,4 +1,5 @@
 import { TRPCError } from '@trpc/server';
+import { match } from 'ts-pattern';
 import { z } from 'zod';
 
 import { TRPCClientError } from '@documenso/trpc/client';
@@ -148,5 +149,25 @@ export class AppError extends Error {
     } catch {
       return null;
     }
+  }
+
+  static toRestAPIError(err: unknown): {
+    status: 400 | 401 | 404 | 500;
+    body: { message: string };
+  } {
+    const error = AppError.parseError(err);
+
+    const status = match(error.code)
+      .with(AppErrorCode.INVALID_BODY, AppErrorCode.INVALID_REQUEST, () => 400 as const)
+      .with(AppErrorCode.UNAUTHORIZED, () => 401 as const)
+      .with(AppErrorCode.NOT_FOUND, () => 404 as const)
+      .otherwise(() => 500 as const);
+
+    return {
+      status,
+      body: {
+        message: status !== 500 ? error.message : 'Something went wrong',
+      },
+    };
   }
 }

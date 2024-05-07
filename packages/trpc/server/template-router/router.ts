@@ -1,10 +1,14 @@
 import { TRPCError } from '@trpc/server';
 
 import { getServerLimits } from '@documenso/ee/server-only/limits/server';
+import { AppError } from '@documenso/lib/errors/app-error';
+import { sendDocument } from '@documenso/lib/server-only/document/send-document';
 import { createDocumentFromTemplate } from '@documenso/lib/server-only/template/create-document-from-template';
 import { createTemplate } from '@documenso/lib/server-only/template/create-template';
 import { deleteTemplate } from '@documenso/lib/server-only/template/delete-template';
 import { duplicateTemplate } from '@documenso/lib/server-only/template/duplicate-template';
+import { extractNextApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
+import type { Document } from '@documenso/prisma/client';
 
 import { authenticatedProcedure, router } from '../trpc';
 import {
@@ -49,19 +53,34 @@ export const templateRouter = router({
           throw new Error('You have reached your document limit.');
         }
 
-        return await createDocumentFromTemplate({
+        const requestMetadata = extractNextApiRequestMetadata(ctx.req);
+
+        let document: Document = await createDocumentFromTemplate({
           templateId,
           teamId,
           userId: ctx.user.id,
           recipients: input.recipients,
+          requestMetadata,
         });
+
+        if (input.sendDocument) {
+          document = await sendDocument({
+            documentId: document.id,
+            userId: ctx.user.id,
+            teamId,
+            requestMetadata,
+          }).catch((err) => {
+            console.error(err);
+
+            throw new AppError('DOCUMENT_SEND_FAILED');
+          });
+        }
+
+        return document;
       } catch (err) {
         console.error(err);
 
-        throw new TRPCError({
-          code: 'BAD_REQUEST',
-          message: 'We were unable to create this document. Please try again later.',
-        });
+        throw AppError.parseErrorToTRPCError(err);
       }
     }),
 

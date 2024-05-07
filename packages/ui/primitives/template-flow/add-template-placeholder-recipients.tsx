@@ -103,6 +103,7 @@ export const AddTemplatePlaceholderRecipientsFormPartial = ({
     appendSigner({
       formId: nanoid(12),
       name: `Recipient ${placeholderRecipientCount}`,
+      // Update TEMPLATE_RECIPIENT_PLACEHOLDER_REGEX if this is ever changed.
       email: `recipient.${placeholderRecipientCount}@documenso.com`,
       role: RecipientRole.SIGNER,
     });
