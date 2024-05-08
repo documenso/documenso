@@ -58,7 +58,7 @@ export const TemplatePageView = async ({ params, team }: TemplatePageViewProps) 
   ]);
 
   return (
-    <div className="mx-auto max-w-screen-xl px-4 md:px-8">
+    <div className="mx-auto -mt-4 max-w-screen-xl px-4 md:px-8">
       <Link href="/templates" className="flex items-center text-[#7AC455] hover:opacity-80">
         <ChevronLeft className="mr-2 inline-block h-5 w-5" />
         Templates
@@ -73,7 +73,7 @@ export const TemplatePageView = async ({ params, team }: TemplatePageViewProps) 
       </div>
 
       <EditTemplateForm
-        className="mt-8"
+        className="mt-6"
         template={template}
         user={user}
         recipients={templateRecipients}
