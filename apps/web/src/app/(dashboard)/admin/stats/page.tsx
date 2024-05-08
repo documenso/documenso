@@ -69,7 +69,7 @@ export default async function AdminStatsPage() {
             <CardMetric icon={PenTool} title="Signatures Collected" value={recipientStats.SIGNED} />
             <CardMetric
               icon={PenTool}
-              title="Users that signup up after signing at least one Document"
+              title="Recipients that signed up"
               value={recipientStats.CONVERTED_RECIPIENTS}
             />
           </div>
