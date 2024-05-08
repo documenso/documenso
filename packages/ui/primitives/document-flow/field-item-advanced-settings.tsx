@@ -1,7 +1,19 @@
+'use client';
+
+import { useParams } from 'next/navigation';
+
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 
 import { trpc } from '@documenso/trpc/react';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@documenso/ui/primitives/select';
+import { Switch } from '@documenso/ui/primitives/switch';
 
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '../form/form';
 import { Input } from '../input';
@@ -25,6 +37,18 @@ export type FieldAdvancedSettingsProps = {
   isDocumentPdfLoaded: boolean;
 };
 
+// TODO: Remove hardcoded values and refactor
+const listValues = [
+  {
+    label: '123,456.78',
+    value: '123,456.78',
+  },
+  {
+    label: '123.456,78',
+    value: '123.456,78',
+  },
+];
+
 export const FieldAdvancedSettings = ({
   title,
   description,
@@ -33,13 +57,27 @@ export const FieldAdvancedSettings = ({
   onAdvancedSettings,
   isDocumentPdfLoaded,
 }: FieldAdvancedSettingsProps) => {
+  const params = useParams();
+  const documentId = params.id;
+
   const { data } = trpc.field.getField.useQuery({
     fieldId: field.nativeId || 0,
-    documentId: 8,
+    documentId: Number(documentId),
   });
+
+  const { mutateAsync: updateRadioField } = trpc.field.updateRadioField.useMutation();
 
   const form = useForm<TNumberAdvancedSettingsFormSchema>({
     resolver: zodResolver(ZNumberAdvancedSettingsFormSchema),
+    defaultValues: {
+      // TODO: Fix this to get rid of the error "Property 'placeholder' does not exist on type 'string | number | boolean | JsonObject | JsonArray'"
+      label: data?.fieldMeta?.label ?? '',
+      placeholder: data?.fieldMeta?.placeholder ?? '',
+      format: data?.fieldMeta?.format ?? '',
+      characterLimit: data?.fieldMeta?.characterLimit ?? '',
+      required: data?.fieldMeta?.required ?? false,
+      readOnly: data?.fieldMeta?.readOnly ?? false,
+    },
   });
 
   const onSubmit = form.handleSubmit((data) => {
@@ -109,16 +147,22 @@ export const FieldAdvancedSettings = ({
                 control={form.control}
                 name="format"
                 render={({ field }) => (
-                  <FormItem>
+                  <FormItem className="flex flex-col">
                     <FormLabel htmlFor="format">Format</FormLabel>
                     <FormControl>
-                      <Input
-                        id="format"
-                        className="bg-background mt-2"
-                        disabled={form.formState.isSubmitting}
-                        placeholder="Field format"
-                        {...field}
-                      />
+                      <Select {...field} onValueChange={field.onChange}>
+                        <SelectTrigger className="text-muted-foreground w-full">
+                          <SelectValue placeholder="Field format" />
+                        </SelectTrigger>
+
+                        <SelectContent position="popper">
+                          {listValues.map((item, index) => (
+                            <SelectItem key={index} value={item.value}>
+                              {item.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -144,6 +188,44 @@ export const FieldAdvancedSettings = ({
                   </FormItem>
                 )}
               />
+
+              <div className="flex flex-row items-center gap-12">
+                <FormField
+                  control={form.control}
+                  name="required"
+                  render={({ field }) => (
+                    <FormItem className="flex flex-row items-center gap-2">
+                      <FormLabel className="mt-2">Required field?</FormLabel>
+                      <FormControl>
+                        <Switch
+                          className="bg-background"
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="readOnly"
+                  render={({ field }) => (
+                    <FormItem className="flex flex-row items-center gap-2">
+                      <FormLabel className="mt-2">Read only?</FormLabel>
+                      <FormControl>
+                        <Switch
+                          className="bg-background"
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
             </div>
           </Form>
         </div>
