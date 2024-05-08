@@ -59,3 +59,16 @@ export const ZRemovedSignedFieldWithTokenMutationSchema = z.object({
 export type TRemovedSignedFieldWithTokenMutationSchema = z.infer<
   typeof ZRemovedSignedFieldWithTokenMutationSchema
 >;
+
+export const ZGetFieldQuerySchema = z.object({
+  fieldId: z.number(),
+  documentId: z.number(),
+});
+
+export type TGetFieldQuerySchema = z.infer<typeof ZGetFieldQuerySchema>;
+
+export const ZUpdateFieldMutationSchema = z.object({
+  fieldId: z.number(),
+  documentId: z.number(),
+  meta: z.any(),
+});

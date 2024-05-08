@@ -80,9 +80,13 @@ export const FieldAdvancedSettings = ({
     },
   });
 
-  const onSubmit = form.handleSubmit((data) => {
+  const onSubmit = form.handleSubmit(async (data) => {
     try {
-      console.log(data);
+      await updateRadioField({
+        fieldId: field.nativeId || 0,
+        documentId: Number(documentId),
+        meta: data,
+      });
       onAdvancedSettings?.();
     } catch (err) {
       console.error(err);

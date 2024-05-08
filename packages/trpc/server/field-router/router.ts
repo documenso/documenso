@@ -1,18 +1,22 @@
 import { TRPCError } from '@trpc/server';
 
 import { AppError } from '@documenso/lib/errors/app-error';
+import { getFieldById } from '@documenso/lib/server-only/field/get-field-by-id';
 import { removeSignedFieldWithToken } from '@documenso/lib/server-only/field/remove-signed-field-with-token';
 import { setFieldsForDocument } from '@documenso/lib/server-only/field/set-fields-for-document';
 import { setFieldsForTemplate } from '@documenso/lib/server-only/field/set-fields-for-template';
 import { signFieldWithToken } from '@documenso/lib/server-only/field/sign-field-with-token';
+import { updateField } from '@documenso/lib/server-only/field/update-field';
 import { extractNextApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 
 import { authenticatedProcedure, procedure, router } from '../trpc';
 import {
   ZAddFieldsMutationSchema,
   ZAddTemplateFieldsMutationSchema,
+  ZGetFieldQuerySchema,
   ZRemovedSignedFieldWithTokenMutationSchema,
   ZSignFieldWithTokenMutationSchema,
+  ZUpdateFieldMutationSchema,
 } from './schema';
 
 export const fieldRouter = router({
@@ -113,6 +117,44 @@ export const fieldRouter = router({
         throw new TRPCError({
           code: 'BAD_REQUEST',
           message: 'We were unable to remove the signature for this field. Please try again later.',
+        });
+      }
+    }),
+
+  getField: authenticatedProcedure.input(ZGetFieldQuerySchema).query(async ({ input }) => {
+    try {
+      const { fieldId, documentId } = input;
+
+      const field = await getFieldById({ fieldId, documentId });
+
+      return field;
+    } catch (err) {
+      throw new TRPCError({
+        code: 'BAD_REQUEST',
+        message: 'We were unable to find this field. Please try again.',
+      });
+    }
+  }),
+
+  updateRadioField: authenticatedProcedure
+    .input(ZUpdateFieldMutationSchema)
+    .mutation(async ({ input, ctx }) => {
+      try {
+        const { documentId, fieldId, meta } = input;
+
+        return await updateField({
+          fieldId,
+          documentId,
+          userId: ctx.user.id,
+          requestMetadata: extractNextApiRequestMetadata(ctx.req),
+          fieldMeta: meta,
+        });
+      } catch (err) {
+        console.error(err);
+
+        throw new TRPCError({
+          code: 'BAD_REQUEST',
+          message: 'We were unable to set this field. Please try again later.',
         });
       }
     }),
