@@ -162,8 +162,8 @@ export const AddSettingsFormPartial = ({
                             view the document
                           </li>
                           <li>
-                            <strong>Anyone with the link</strong> - The document can be accessed
-                            directly by the URL sent to the recipient
+                            <strong>No restrictions</strong> - The document can be accessed directly
+                            by the URL sent to the recipient
                           </li>
                         </ul>
                       </TooltipContent>
@@ -175,7 +175,7 @@ export const AddSettingsFormPartial = ({
                       <SelectTrigger className="bg-background text-muted-foreground">
                         <SelectValue
                           data-testid="documentAccessSelectValue"
-                          placeholder="Anyone with the link"
+                          placeholder="No restrictions"
                         />
                       </SelectTrigger>
 
@@ -187,7 +187,7 @@ export const AddSettingsFormPartial = ({
                         ))}
 
                         {/* Note: -1 is remapped in the Zod schema to the required value. */}
-                        <SelectItem value={'-1'}>Anyone with the link</SelectItem>
+                        <SelectItem value={'-1'}>No restrictions</SelectItem>
                       </SelectContent>
                     </Select>
                   </FormControl>
@@ -235,7 +235,7 @@ export const AddSettingsFormPartial = ({
                               2FA enabled via their settings
                             </li>
                             <li>
-                              <strong>Anyone with the link</strong> - No authentication required
+                              <strong>No restrictions</strong> - No authentication required
                             </li>
                           </ul>
                         </TooltipContent>
@@ -247,7 +247,7 @@ export const AddSettingsFormPartial = ({
                         <SelectTrigger className="bg-background text-muted-foreground">
                           <SelectValue
                             data-testid="documentActionSelectValue"
-                            placeholder="Anyone with the link"
+                            placeholder="No restrictions"
                           />
                         </SelectTrigger>
 
@@ -261,7 +261,7 @@ export const AddSettingsFormPartial = ({
                             ))}
 
                           {/* Note: -1 is remapped in the Zod schema to the required value. */}
-                          <SelectItem value={'-1'}>Anyone with the link</SelectItem>
+                          <SelectItem value={'-1'}>No restrictions</SelectItem>
                         </SelectContent>
                       </Select>
                     </FormControl>
