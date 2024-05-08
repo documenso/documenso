@@ -1,3 +1,4 @@
+import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { prisma } from '@documenso/prisma';
 import { TeamMemberRole } from '@documenso/prisma/client';
 
@@ -5,6 +6,8 @@ export type GetUserTokensOptions = {
   userId: number;
   teamId: number;
 };
+
+export type GetTeamTokensResponse = Awaited<ReturnType<typeof getTeamTokens>>;
 
 export const getTeamTokens = async ({ userId, teamId }: GetUserTokensOptions) => {
   const teamMember = await prisma.teamMember.findFirst({
@@ -15,13 +18,13 @@ export const getTeamTokens = async ({ userId, teamId }: GetUserTokensOptions) =>
   });
 
   if (teamMember?.role !== TeamMemberRole.ADMIN) {
-    return {
-      tokens: [],
-      error: { message: 'You do not have the required permissions to view this page' },
-    };
+    throw new AppError(
+      AppErrorCode.UNAUTHORIZED,
+      'You do not have the required permissions to view this page.',
+    );
   }
 
-  const tokens = await prisma.apiToken.findMany({
+  return await prisma.apiToken.findMany({
     where: {
       teamId,
     },
@@ -36,6 +39,4 @@ export const getTeamTokens = async ({ userId, teamId }: GetUserTokensOptions) =>
       createdAt: 'desc',
     },
   });
-
-  return { tokens, error: null };
 };
