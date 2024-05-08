@@ -44,7 +44,7 @@ import {
   DocumentFlowFormContainerStep,
 } from './document-flow-root';
 import { FieldItem } from './field-item';
-import { FieldAdvancedSettings } from './testing';
+import { FieldAdvancedSettings } from './field-item-advanced-settings';
 import { type DocumentFlowStep, FRIENDLY_FIELD_TYPE } from './types';
 
 const fontCaveat = Caveat({
@@ -59,6 +59,18 @@ const DEFAULT_WIDTH_PERCENT = 15;
 
 const MIN_HEIGHT_PX = 60;
 const MIN_WIDTH_PX = 200;
+
+export type FieldFormType = {
+  nativeId?: number;
+  formId: string;
+  pageNumber: number;
+  type: FieldType;
+  pageX: number;
+  pageY: number;
+  pageWidth: number;
+  pageHeight: number;
+  signerEmail: string;
+};
 
 export type AddFieldsFormProps = {
   documentFlow: DocumentFlowStep;
@@ -79,6 +91,8 @@ export const AddFieldsFormPartial = ({
 }: AddFieldsFormProps) => {
   const { isWithinPageBounds, getFieldPosition, getPage } = useDocumentElement();
   const { currentStep, totalSteps, previousStep } = useStep();
+  const [showAdvancedSettings, setShowAdvancedSettings] = useState(false);
+  const [currentField, setCurrentField] = useState<FieldFormType>();
 
   const {
     control,
@@ -337,8 +351,7 @@ export const AddFieldsFormPartial = ({
           title="Advanced settings"
           description={`Configure the ${FRIENDLY_FIELD_TYPE[currentField.type]} field`}
           field={currentField}
-          recipients={recipients}
-          fields={fields}
+          fields={localFields}
           onAdvancedSettings={handleAdvancedSettings}
           isDocumentPdfLoaded={isDocumentPdfLoaded}
         />
@@ -389,21 +402,24 @@ export const AddFieldsFormPartial = ({
                     onRemove={() => remove(index)}
                     onAdvancedSettings={() => {
                       handleAdvancedSettings();
-                      setCurrentField(field);
+                      setCurrentField({
+                        nativeId: field.nativeId,
+                        formId: field.formId,
+                        pageNumber: field.pageNumber,
+                        type: field.type,
+                        pageX: field.pageX,
+                        pageY: field.pageY,
+                        pageWidth: field.pageWidth,
+                        pageHeight: field.pageHeight,
+                        signerEmail: field.signerEmail,
+                      });
                     }}
                   />
                 ))}
 
               {!hideRecipients && (
                 <Popover open={showRecipientsSelector} onOpenChange={setShowRecipientsSelector}>
-                  <PopoverTrigger
-                    asChild
-                    className={`border-2 ${
-                      recipientWithColor.find(
-                        (recipient) => recipient.email === selectedSigner?.email,
-                      )?.color
-                    }`}
-                  >
+                  <PopoverTrigger asChild>
                     <Button
                       type="button"
                       variant="outline"

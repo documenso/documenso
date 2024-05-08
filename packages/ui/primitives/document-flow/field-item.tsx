@@ -68,11 +68,7 @@ export const FieldItem = ({
   const [settingsActive, setSettingsActive] = useState(false);
   const cardRef = useRef(null);
 
-  const advancedField =
-    field.type === 'NUMBER' ||
-    field.type === 'RADIO' ||
-    field.type === 'CHECKBOX' ||
-    field.type === 'DROPDOWN';
+  const advancedField = ['NUMBER', 'RADIO', 'CHECKBOX', 'DROPDOWN'].includes(field.type);
 
   const calculateCoords = useCallback(() => {
     const $page = document.querySelector<HTMLElement>(
