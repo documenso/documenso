@@ -169,7 +169,7 @@ export const AddSignersFormPartial = ({
 
   const onAddSelfSigner = () => {
     const lastSignerIndex = signers.length - 1;
-    if (!signers[lastSignerIndex].name && !signers[lastSignerIndex].email) {
+    if (signers[lastSignerIndex].email || signers[lastSignerIndex].name) {
       onRemoveSigner(lastSignerIndex);
     }
     if (emptySignerIndex !== -1) {
@@ -268,7 +268,7 @@ export const AddSignersFormPartial = ({
                             disabled={
                               isSubmitting ||
                               hasBeenSentToRecipientId(signer.nativeId) ||
-                              signers[index].email === user?.email
+                              signers[index].name === user?.name
                             }
                             onKeyDown={onKeyDown}
                           />
