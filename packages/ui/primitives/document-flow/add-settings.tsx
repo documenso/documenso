@@ -162,8 +162,8 @@ export const AddSettingsFormPartial = ({
                             view the document
                           </li>
                           <li>
-                            <strong>None</strong> - The document can be accessed directly by the URL
-                            sent to the recipient
+                            <strong>No restrictions</strong> - The document can be accessed directly
+                            by the URL sent to the recipient
                           </li>
                         </ul>
                       </TooltipContent>
@@ -173,7 +173,10 @@ export const AddSettingsFormPartial = ({
                   <FormControl>
                     <Select {...field} onValueChange={field.onChange}>
                       <SelectTrigger className="bg-background text-muted-foreground">
-                        <SelectValue data-testid="documentAccessSelectValue" placeholder="None" />
+                        <SelectValue
+                          data-testid="documentAccessSelectValue"
+                          placeholder="No restrictions"
+                        />
                       </SelectTrigger>
 
                       <SelectContent position="popper">
@@ -184,7 +187,7 @@ export const AddSettingsFormPartial = ({
                         ))}
 
                         {/* Note: -1 is remapped in the Zod schema to the required value. */}
-                        <SelectItem value={'-1'}>None</SelectItem>
+                        <SelectItem value={'-1'}>No restrictions</SelectItem>
                       </SelectContent>
                     </Select>
                   </FormControl>
@@ -232,7 +235,7 @@ export const AddSettingsFormPartial = ({
                               2FA enabled via their settings
                             </li>
                             <li>
-                              <strong>None</strong> - No authentication required
+                              <strong>No restrictions</strong> - No authentication required
                             </li>
                           </ul>
                         </TooltipContent>
@@ -242,7 +245,10 @@ export const AddSettingsFormPartial = ({
                     <FormControl>
                       <Select {...field} onValueChange={field.onChange}>
                         <SelectTrigger className="bg-background text-muted-foreground">
-                          <SelectValue data-testid="documentActionSelectValue" placeholder="None" />
+                          <SelectValue
+                            data-testid="documentActionSelectValue"
+                            placeholder="No restrictions"
+                          />
                         </SelectTrigger>
 
                         <SelectContent position="popper">
@@ -255,7 +261,7 @@ export const AddSettingsFormPartial = ({
                             ))}
 
                           {/* Note: -1 is remapped in the Zod schema to the required value. */}
-                          <SelectItem value={'-1'}>None</SelectItem>
+                          <SelectItem value={'-1'}>No restrictions</SelectItem>
                         </SelectContent>
                       </Select>
                     </FormControl>
