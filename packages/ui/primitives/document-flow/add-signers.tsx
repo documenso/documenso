@@ -4,20 +4,18 @@ import React, { useId, useMemo, useState } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { motion } from 'framer-motion';
-import { InfoIcon, Plus, Trash } from 'lucide-react';
+import { Plus, Trash } from 'lucide-react';
 import { useSession } from 'next-auth/react';
 import { useFieldArray, useForm } from 'react-hook-form';
 
 import { useLimits } from '@documenso/ee/server-only/limits/provider/client';
-import { DOCUMENT_AUTH_TYPES } from '@documenso/lib/constants/document-auth';
-import {
-  RecipientActionAuth,
-  ZRecipientAuthOptionsSchema,
-} from '@documenso/lib/types/document-auth';
+import { ZRecipientAuthOptionsSchema } from '@documenso/lib/types/document-auth';
 import { nanoid } from '@documenso/lib/universal/id';
 import type { Field, Recipient } from '@documenso/prisma/client';
 import { RecipientRole, SendStatus } from '@documenso/prisma/client';
 import { AnimateGenericFadeInOut } from '@documenso/ui/components/animate/animate-generic-fade-in-out';
+import { RecipientActionAuthSelect } from '@documenso/ui/components/recipient/recipient-action-auth-select';
+import { RecipientRoleSelect } from '@documenso/ui/components/recipient/recipient-role-select';
 import { cn } from '@documenso/ui/lib/utils';
 
 import { Button } from '../button';
@@ -25,10 +23,7 @@ import { Checkbox } from '../checkbox';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '../form/form';
 import { FormErrorMessage } from '../form/form-error-message';
 import { Input } from '../input';
-import { ROLE_ICONS } from '../recipient-role-icons';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../select';
 import { useStep } from '../stepper';
-import { Tooltip, TooltipContent, TooltipTrigger } from '../tooltip';
 import { useToast } from '../use-toast';
 import type { TAddSignersFormSchema } from './add-signers.types';
 import { ZAddSignersFormSchema } from './add-signers.types';
@@ -291,67 +286,11 @@ export const AddSignersFormPartial = ({
                       render={({ field }) => (
                         <FormItem className="col-span-6">
                           <FormControl>
-                            <Select
+                            <RecipientActionAuthSelect
                               {...field}
                               onValueChange={field.onChange}
                               disabled={isSubmitting || hasBeenSentToRecipientId(signer.nativeId)}
-                            >
-                              <SelectTrigger className="bg-background text-muted-foreground">
-                                <SelectValue placeholder="Inherit authentication method" />
-
-                                <Tooltip>
-                                  <TooltipTrigger className="-mr-1 ml-auto">
-                                    <InfoIcon className="mx-2 h-4 w-4" />
-                                  </TooltipTrigger>
-
-                                  <TooltipContent className="text-foreground max-w-md p-4">
-                                    <h2>
-                                      <strong>Recipient action authentication</strong>
-                                    </h2>
-
-                                    <p>The authentication required for recipients to sign fields</p>
-
-                                    <p className="mt-2">This will override any global settings.</p>
-
-                                    <ul className="ml-3.5 list-outside list-disc space-y-0.5 py-2">
-                                      <li>
-                                        <strong>Inherit authentication method</strong> - Use the
-                                        global action signing authentication method configured in
-                                        the "General Settings" step
-                                      </li>
-                                      {/* <li>
-                                        <strong>Require account</strong> - The recipient must be
-                                        signed in
-                                      </li> */}
-                                      <li>
-                                        <strong>Require passkey</strong> - The recipient must have
-                                        an account and passkey configured via their settings
-                                      </li>
-                                      <li>
-                                        <strong>Require 2FA</strong> - The recipient must have an
-                                        account and 2FA enabled via their settings
-                                      </li>
-                                      <li>
-                                        <strong>None</strong> - No authentication required
-                                      </li>
-                                    </ul>
-                                  </TooltipContent>
-                                </Tooltip>
-                              </SelectTrigger>
-
-                              <SelectContent position="popper">
-                                {/* Note: -1 is remapped in the Zod schema to the required value. */}
-                                <SelectItem value="-1">Inherit authentication method</SelectItem>
-
-                                {Object.values(RecipientActionAuth)
-                                  .filter((auth) => auth !== RecipientActionAuth.ACCOUNT)
-                                  .map((authType) => (
-                                    <SelectItem key={authType} value={authType}>
-                                      {DOCUMENT_AUTH_TYPES[authType].value}
-                                    </SelectItem>
-                                  ))}
-                              </SelectContent>
-                            </Select>
+                            />
                           </FormControl>
 
                           <FormMessage />
@@ -365,100 +304,11 @@ export const AddSignersFormPartial = ({
                     render={({ field }) => (
                       <FormItem className="col-span-1 mt-auto">
                         <FormControl>
-                          <Select
+                          <RecipientRoleSelect
                             {...field}
                             onValueChange={field.onChange}
                             disabled={isSubmitting || hasBeenSentToRecipientId(signer.nativeId)}
-                          >
-                            <SelectTrigger className="bg-background w-[60px]">
-                              {/* eslint-disable-next-line @typescript-eslint/consistent-type-assertions */}
-                              {ROLE_ICONS[field.value as RecipientRole]}
-                            </SelectTrigger>
-
-                            <SelectContent align="end">
-                              <SelectItem value={RecipientRole.SIGNER}>
-                                <div className="flex items-center">
-                                  <div className="flex w-[150px] items-center">
-                                    <span className="mr-2">{ROLE_ICONS[RecipientRole.SIGNER]}</span>
-                                    Needs to sign
-                                  </div>
-                                  <Tooltip>
-                                    <TooltipTrigger>
-                                      <InfoIcon className="h-4 w-4" />
-                                    </TooltipTrigger>
-                                    <TooltipContent className="text-foreground z-9999 max-w-md p-4">
-                                      <p>
-                                        The recipient is required to sign the document for it to be
-                                        completed.
-                                      </p>
-                                    </TooltipContent>
-                                  </Tooltip>
-                                </div>
-                              </SelectItem>
-
-                              <SelectItem value={RecipientRole.APPROVER}>
-                                <div className="flex items-center">
-                                  <div className="flex w-[150px] items-center">
-                                    <span className="mr-2">
-                                      {ROLE_ICONS[RecipientRole.APPROVER]}
-                                    </span>
-                                    Needs to approve
-                                  </div>
-                                  <Tooltip>
-                                    <TooltipTrigger>
-                                      <InfoIcon className="h-4 w-4" />
-                                    </TooltipTrigger>
-                                    <TooltipContent className="text-foreground z-9999 max-w-md p-4">
-                                      <p>
-                                        The recipient is required to approve the document for it to
-                                        be completed.
-                                      </p>
-                                    </TooltipContent>
-                                  </Tooltip>
-                                </div>
-                              </SelectItem>
-
-                              <SelectItem value={RecipientRole.VIEWER}>
-                                <div className="flex items-center">
-                                  <div className="flex w-[150px] items-center">
-                                    <span className="mr-2">{ROLE_ICONS[RecipientRole.VIEWER]}</span>
-                                    Needs to view
-                                  </div>
-                                  <Tooltip>
-                                    <TooltipTrigger>
-                                      <InfoIcon className="h-4 w-4" />
-                                    </TooltipTrigger>
-                                    <TooltipContent className="text-foreground z-9999 max-w-md p-4">
-                                      <p>
-                                        The recipient is required to view the document for it to be
-                                        completed.
-                                      </p>
-                                    </TooltipContent>
-                                  </Tooltip>
-                                </div>
-                              </SelectItem>
-
-                              <SelectItem value={RecipientRole.CC}>
-                                <div className="flex items-center">
-                                  <div className="flex w-[150px] items-center">
-                                    <span className="mr-2">{ROLE_ICONS[RecipientRole.CC]}</span>
-                                    Receives copy
-                                  </div>
-                                  <Tooltip>
-                                    <TooltipTrigger>
-                                      <InfoIcon className="h-4 w-4" />
-                                    </TooltipTrigger>
-                                    <TooltipContent className="text-foreground z-9999 max-w-md p-4">
-                                      <p>
-                                        The recipient is not required to take any action and
-                                        receives a copy of the document after it is completed.
-                                      </p>
-                                    </TooltipContent>
-                                  </Tooltip>
-                                </div>
-                              </SelectItem>
-                            </SelectContent>
-                          </Select>
+                          />
                         </FormControl>
 
                         <FormMessage />
