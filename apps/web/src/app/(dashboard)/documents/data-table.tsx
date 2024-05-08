@@ -64,7 +64,10 @@ export const DocumentsDataTable = ({
             header: 'Created',
             accessorKey: 'createdAt',
             cell: ({ row }) => (
-              <LocaleDate date={row.original.createdAt} format={DateTime.DATETIME_SHORT} />
+              <LocaleDate
+                date={row.original.createdAt}
+                format={{ ...DateTime.DATETIME_SHORT, hourCycle: 'h12' }}
+              />
             ),
           },
           {
