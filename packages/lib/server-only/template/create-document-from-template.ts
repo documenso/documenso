@@ -20,6 +20,10 @@ type FinalRecipient = Pick<Recipient, 'name' | 'email' | 'role' | 'authOptions'>
   fields: Field[];
 };
 
+export type CreateDocumentFromTemplateResponse = Awaited<
+  ReturnType<typeof createDocumentFromTemplate>
+>;
+
 export type CreateDocumentFromTemplateOptions = {
   templateId: number;
   userId: number;
