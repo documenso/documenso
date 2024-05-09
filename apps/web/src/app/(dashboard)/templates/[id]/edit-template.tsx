@@ -192,6 +192,8 @@ export const EditTemplateForm = ({
               recipients={recipients}
               fields={fields}
               onSubmit={onAddTemplatePlaceholderFormSubmit}
+              // Todo: Add when we setup template settings.
+              isTemplateOwnerEnterprise={false}
             />
 
             <AddTemplateFieldsFormPartial
