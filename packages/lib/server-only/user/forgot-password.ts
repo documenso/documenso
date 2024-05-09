@@ -1,7 +1,7 @@
 import crypto from 'crypto';
 
 import { prisma } from '@documenso/prisma';
-import { TForgotPasswordFormSchema } from '@documenso/trpc/server/profile-router/schema';
+import type { TForgotPasswordFormSchema } from '@documenso/trpc/server/profile-router/schema';
 
 import { ONE_DAY, ONE_HOUR } from '../../constants/time';
 import { sendForgotPassword } from '../auth/send-forgot-password';

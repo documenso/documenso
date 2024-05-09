@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/consistent-type-assertions */
-import { RefObject, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 /**
  * Calculate the width and height of a text element.

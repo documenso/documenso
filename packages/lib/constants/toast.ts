@@ -1,4 +1,4 @@
-import { Toast } from '@documenso/ui/primitives/use-toast';
+import type { Toast } from '@documenso/ui/primitives/use-toast';
 
 export const TOAST_DOCUMENT_SHARE_SUCCESS: Toast = {
   title: 'Copied to clipboard',

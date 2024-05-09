@@ -9,7 +9,7 @@ import {
 } from '@documenso/lib/constants/feature-flags';
 import { getAllFlags } from '@documenso/lib/universal/get-feature-flag';
 
-import { TFeatureFlagValue } from './feature-flag.types';
+import type { TFeatureFlagValue } from './feature-flag.types';
 
 export type FeatureFlagContextValue = {
   getFlag: (_key: string) => TFeatureFlagValue;

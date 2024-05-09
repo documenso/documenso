@@ -1,5 +1,5 @@
-import { NextApiResponse } from 'next';
-import { NextResponse } from 'next/server';
+import type { NextApiResponse } from 'next';
+import type { NextResponse } from 'next/server';
 
 type NarrowedResponse<T> = T extends NextResponse
   ? NextResponse
