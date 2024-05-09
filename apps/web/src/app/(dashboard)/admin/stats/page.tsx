@@ -2,13 +2,14 @@ import {
   File,
   FileCheck,
   FileClock,
+  FileCog,
   FileEdit,
   Mail,
   MailOpen,
   PenTool,
-  User as UserIcon,
-  UserPlus2,
+  UserPlus,
   UserSquare2,
+  Users,
 } from 'lucide-react';
 
 import { getDocumentStats } from '@documenso/lib/server-only/admin/get-documents-stats';
@@ -17,15 +18,25 @@ import {
   getUsersCount,
   getUsersWithSubscriptionsCount,
 } from '@documenso/lib/server-only/admin/get-users-stats';
+import { getSignerConversionMonthly } from '@documenso/lib/server-only/user/get-signer-conversion';
 
 import { CardMetric } from '~/components/(dashboard)/metric-card/metric-card';
 
+import { SignerConversionChart } from './signer-conversion-chart';
+
 export default async function AdminStatsPage() {
-  const [usersCount, usersWithSubscriptionsCount, docStats, recipientStats] = await Promise.all([
+  const [
+    usersCount,
+    usersWithSubscriptionsCount,
+    docStats,
+    recipientStats,
+    signerConversionMonthly,
+  ] = await Promise.all([
     getUsersCount(),
     getUsersWithSubscriptionsCount(),
     getDocumentStats(),
     getRecipientsStats(),
+    getSignerConversionMonthly(),
   ]);
 
   return (
@@ -33,14 +44,15 @@ export default async function AdminStatsPage() {
       <h2 className="text-4xl font-semibold">Instance Stats</h2>
 
       <div className="mt-8 grid flex-1 grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <CardMetric icon={UserIcon} title="Total Users" value={usersCount} />
+        <CardMetric icon={Users} title="Total Users" value={usersCount} />
         <CardMetric icon={File} title="Total Documents" value={docStats.ALL} />
         <CardMetric
-          icon={UserPlus2}
+          icon={UserPlus}
           title="Active Subscriptions"
           value={usersWithSubscriptionsCount}
         />
-        <CardMetric icon={UserPlus2} title="App Version" value={`v${process.env.APP_VERSION}`} />
+
+        <CardMetric icon={FileCog} title="App Version" value={`v${process.env.APP_VERSION}`} />
       </div>
 
       <div className="mt-16 grid grid-cols-1 gap-8 md:grid-cols-1 lg:grid-cols-2">
@@ -68,11 +80,23 @@ export default async function AdminStatsPage() {
             <CardMetric icon={MailOpen} title="Documents Viewed" value={recipientStats.OPENED} />
             <CardMetric icon={PenTool} title="Signatures Collected" value={recipientStats.SIGNED} />
             <CardMetric
-              icon={PenTool}
+              icon={UserPlus}
               title="Recipients that signed up"
               value={recipientStats.CONVERTED_RECIPIENTS}
             />
           </div>
+        </div>
+      </div>
+
+      <div className="mt-16">
+        <h3 className="text-3xl font-semibold">Charts</h3>
+        <div className="mt-5 grid grid-cols-2 gap-x-10">
+          <SignerConversionChart title="Recipients that signed up" data={signerConversionMonthly} />
+          <SignerConversionChart
+            title="Total Recipients that signed up"
+            data={signerConversionMonthly}
+            cummulative
+          />
         </div>
       </div>
     </div>
