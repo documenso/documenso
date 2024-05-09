@@ -5,11 +5,17 @@ import { type Recipient, WebhookTriggerEvents } from '@documenso/prisma/client';
 
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '../../types/document-audit-logs';
+import { ZRecipientAuthOptionsSchema } from '../../types/document-auth';
 import type { RequestMetadata } from '../../universal/extract-request-metadata';
 import { createDocumentAuditLogData } from '../../utils/document-audit-logs';
+import {
+  createDocumentAuthOptions,
+  createRecipientAuthOptions,
+  extractDocumentAuthMethods,
+} from '../../utils/document-auth';
 import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
 
-type FinalRecipient = Pick<Recipient, 'name' | 'email' | 'role'> & {
+type FinalRecipient = Pick<Recipient, 'name' | 'email' | 'role' | 'authOptions'> & {
   templateRecipientId: number;
   fields: Field[];
 };
@@ -65,6 +71,7 @@ export const createDocumentFromTemplate = async ({
         },
       },
       templateDocumentData: true,
+      templateMeta: true,
     },
   });
 
@@ -75,6 +82,10 @@ export const createDocumentFromTemplate = async ({
   if (recipients.length !== template.Recipient.length) {
     throw new AppError(AppErrorCode.INVALID_BODY, 'Invalid number of recipients.');
   }
+
+  const { documentAuthOption: templateAuthOptions } = extractDocumentAuthMethods({
+    documentAuth: template.authOptions,
+  });
 
   const finalRecipients: FinalRecipient[] = template.Recipient.map((templateRecipient) => {
     const foundRecipient = recipients.find((recipient) => recipient.id === templateRecipient.id);
@@ -92,6 +103,7 @@ export const createDocumentFromTemplate = async ({
       name: foundRecipient.name ?? '',
       email: foundRecipient.email,
       role: templateRecipient.role,
+      authOptions: templateRecipient.authOptions,
     };
   });
 
@@ -110,14 +122,36 @@ export const createDocumentFromTemplate = async ({
         teamId: template.teamId,
         title: template.title,
         documentDataId: documentData.id,
+        authOptions: createDocumentAuthOptions({
+          globalAccessAuth: templateAuthOptions.globalAccessAuth,
+          globalActionAuth: templateAuthOptions.globalActionAuth,
+        }),
+        documentMeta: {
+          create: {
+            subject: template.templateMeta?.subject,
+            message: template.templateMeta?.message,
+            timezone: template.templateMeta?.timezone,
+            password: template.templateMeta?.password,
+            dateFormat: template.templateMeta?.dateFormat,
+            redirectUrl: template.templateMeta?.redirectUrl,
+          },
+        },
         Recipient: {
           createMany: {
-            data: finalRecipients.map((recipient) => ({
-              email: recipient.email,
-              name: recipient.name,
-              role: recipient.role,
-              token: nanoid(),
-            })),
+            data: finalRecipients.map((recipient) => {
+              const authOptions = ZRecipientAuthOptionsSchema.parse(recipient?.authOptions);
+
+              return {
+                email: recipient.email,
+                name: recipient.name,
+                role: recipient.role,
+                authOptions: createRecipientAuthOptions({
+                  accessAuth: authOptions.accessAuth,
+                  actionAuth: authOptions.actionAuth,
+                }),
+                token: nanoid(),
+              };
+            }),
           },
         },
       },

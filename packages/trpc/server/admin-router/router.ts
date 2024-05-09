@@ -102,7 +102,7 @@ export const adminRouter = router({
       try {
         return await sealDocument({ documentId: id, isResealing: true });
       } catch (err) {
-        console.log('resealDocument error', err);
+        console.error('resealDocument error', err);
 
         throw new TRPCError({
           code: 'BAD_REQUEST',
@@ -123,7 +123,7 @@ export const adminRouter = router({
 
       return await deleteUser({ id });
     } catch (err) {
-      console.log(err);
+      console.error(err);
 
       throw new TRPCError({
         code: 'BAD_REQUEST',
@@ -144,7 +144,7 @@ export const adminRouter = router({
           requestMetadata: extractNextApiRequestMetadata(ctx.req),
         });
       } catch (err) {
-        console.log(err);
+        console.error(err);
 
         throw new TRPCError({
           code: 'BAD_REQUEST',
