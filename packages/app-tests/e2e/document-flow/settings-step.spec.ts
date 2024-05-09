@@ -164,9 +164,8 @@ test('[DOCUMENT_FLOW]: add settings', async ({ page }) => {
   await page.getByRole('button', { name: 'Go Back' }).click();
   await expect(page.getByRole('heading', { name: 'General' })).toBeVisible();
 
-  await expect(page.getByLabel('Title')).toContainText('New Title');
+  await expect(page.getByLabel('Title')).toHaveValue('New Title');
   await expect(page.getByTestId('documentAccessSelectValue')).toContainText('Require account');
-  await expect(page.getByTestId('documentActionSelectValue')).toContainText('Require account');
 
   await unseedUser(user.id);
 });

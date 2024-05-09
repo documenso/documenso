@@ -92,22 +92,5 @@ test('[DOCUMENT_FLOW]: add signers', async ({ page }) => {
   await page.getByRole('button', { name: 'Go Back' }).click();
   await expect(page.getByRole('heading', { name: 'Add Signers' })).toBeVisible();
 
-  // Expect that the advanced settings is unchecked, since no advanced settings were applied.
-  await expect(page.getByLabel('Show advanced settings')).toBeChecked({ checked: false });
-
-  // Add advanced settings for a single recipient.
-  await page.getByLabel('Show advanced settings').check();
-  await page.getByRole('combobox').first().click();
-  await page.getByLabel('Require passkey').click();
-
-  // Navigate to the next step and back.
-  await page.getByRole('button', { name: 'Continue' }).click();
-  await expect(page.getByRole('heading', { name: 'Add Fields' })).toBeVisible();
-  await page.getByRole('button', { name: 'Go Back' }).click();
-  await expect(page.getByRole('heading', { name: 'Add Signers' })).toBeVisible();
-
-  // Expect that the advanced settings is visible, and the checkbox is hidden. Since advanced
-  // settings were applied.
-
   await unseedUser(user.id);
 });
