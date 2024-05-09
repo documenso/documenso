@@ -24,10 +24,10 @@ export const Wrapper = ({ children }) => {
 <div className="mt-6 grid grid-cols-2 gap-8 md:mt-8">
 <Link href="/get-started">
         <Card className="col-span-2 lg:col-span-1 border border-border">
-          <CardContent className="grid grid-cols-1 gap-8 p-6">
+          <CardContent className="grid grid-cols-1 gap-8 p-6 max-h-[460px]">
             <span className="text-foreground/80 leading-relaxed">
-              <strong className="block">Users</strong>
-              Learn how to set up your Documenso account, create and organize your documents, collaborate with team members, and leverage our advanced features.
+              <strong className="block">Learn</strong>
+              Learn how to make the most of your account and leverage our advanced features to level up your productivity.
             </span>
 
             <div className="flex items-center justify-center p-8">
@@ -44,10 +44,11 @@ export const Wrapper = ({ children }) => {
 
 <Link href='/local-development'>
         <Card className="col-span-2 lg:col-span-1 border border-border">
-          <CardContent className="grid grid-cols-1 gap-8 p-6">
+          <CardContent className="grid grid-cols-1 gap-8 p-6 max-h-[460px]">
             <span className="text-foreground/80 leading-relaxed">
-              <strong className="block">Developers</strong>
-              Detailed information on how to set up your local development environment, work with our API, and utilize webhooks for seamless integration.
+              <strong className="block">Build</strong>
+              Everything you need to set up your local development environment.
+              Use our API and utilize webhooks for seamless integration.
             </span>
 
             <div className="flex items-center justify-center p-8">
