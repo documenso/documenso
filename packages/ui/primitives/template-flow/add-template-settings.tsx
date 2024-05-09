@@ -260,7 +260,7 @@ export const AddTemplateSettingsFormPartial = ({
 
                           <FormControl>
                             <Combobox
-                              className="bg-background"
+                              className="bg-background time-zone-field"
                               options={TIME_ZONES}
                               {...field}
                               onChange={(value) => value && field.onChange(value)}

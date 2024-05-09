@@ -65,7 +65,7 @@ test('[TEMPLATE]: should create a document from a template', async ({ page }) =>
   await page.locator('button').filter({ hasText: 'YYYY-MM-DD HH:mm a' }).click();
   await page.getByLabel('DD/MM/YYYY').click();
 
-  await page.getByRole('combobox').nth(3).click();
+  await page.locator('.time-zone-field').click();
   await page.getByRole('option', { name: 'Etc/UTC' }).click();
   await page.getByLabel('Redirect URL').fill('https://documenso.com');
   await page.getByRole('button', { name: 'Continue' }).click();
@@ -200,7 +200,7 @@ test('[TEMPLATE]: should create a team document from a team template', async ({ 
   await page.locator('button').filter({ hasText: 'YYYY-MM-DD HH:mm a' }).click();
   await page.getByLabel('DD/MM/YYYY').click();
 
-  await page.getByRole('combobox').nth(3).click();
+  await page.locator('.time-zone-field').click();
   await page.getByRole('option', { name: 'Etc/UTC' }).click();
   await page.getByLabel('Redirect URL').fill('https://documenso.com');
   await page.getByRole('button', { name: 'Continue' }).click();
