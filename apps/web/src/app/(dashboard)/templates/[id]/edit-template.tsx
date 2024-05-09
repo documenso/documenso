@@ -1,16 +1,17 @@
-/* eslint-disable unused-imports/no-unused-imports */
-
-/* eslint-disable @typescript-eslint/consistent-type-imports */
-
-/* eslint-disable unused-imports/no-unused-vars */
 'use client';
 
 import { useState } from 'react';
 
 import { useRouter } from 'next/navigation';
 
-import { DO_NOT_INVALIDATE_QUERY_ON_MUTATION } from '@documenso/lib/constants/trpc';
-import type { DocumentData, Field, Recipient, Template, User } from '@documenso/prisma/client';
+import type {
+  DocumentData,
+  Field,
+  Recipient,
+  Template,
+  TemplateDocumentMeta,
+  User,
+} from '@documenso/prisma/client';
 import { trpc } from '@documenso/trpc/react';
 import { cn } from '@documenso/ui/lib/utils';
 import { Card, CardContent } from '@documenso/ui/primitives/card';
@@ -26,12 +27,8 @@ import type { TAddTemplateFieldsFormSchema } from '@documenso/ui/primitives/temp
 import { AddTemplatePlaceholderRecipientsFormPartial } from '@documenso/ui/primitives/template-flow/add-template-placeholder-recipients';
 import type { TAddTemplatePlacholderRecipientsFormSchema } from '@documenso/ui/primitives/template-flow/add-template-placeholder-recipients.types';
 import { AddTemplateSettingsFormPartial } from '@documenso/ui/primitives/template-flow/add-template-settings';
-import { TTemplateSettingsFormSchema } from '@documenso/ui/primitives/template-flow/add-template-settings.types';
+import type { TTemplateSettingsFormSchema } from '@documenso/ui/primitives/template-flow/add-template-settings.types';
 import { useToast } from '@documenso/ui/primitives/use-toast';
-
-/* eslint-disable unused-imports/no-unused-imports */
-/* eslint-disable @typescript-eslint/consistent-type-imports */
-/* eslint-disable unused-imports/no-unused-vars */
 
 export type EditTemplateFormProps = {
   className?: string;
@@ -40,6 +37,7 @@ export type EditTemplateFormProps = {
   recipients: Recipient[];
   fields: Field[];
   documentData: DocumentData;
+  documentMeta: TemplateDocumentMeta | null;
   templateRootPath: string;
 };
 
@@ -54,16 +52,17 @@ export const EditTemplateForm = ({
   user: _user,
   documentData,
   templateRootPath,
+  documentMeta,
 }: EditTemplateFormProps) => {
   const { toast } = useToast();
   const router = useRouter();
 
-  const [step, setStep] = useState<EditTemplateStep>('signers');
+  const [step, setStep] = useState<EditTemplateStep>('settings');
 
   const documentFlow: Record<EditTemplateStep, DocumentFlowStep> = {
     settings: {
-      title: 'General',
-      description: 'Configure general settings for the document.',
+      title: 'Settings',
+      description: 'Configure general settings for the template.',
       stepIndex: 1,
     },
     signers: {
@@ -82,6 +81,8 @@ export const EditTemplateForm = ({
 
   const { mutateAsync: addTemplateFields } = trpc.field.addTemplateFields.useMutation();
   const { mutateAsync: addTemplateSigners } = trpc.recipient.addTemplateSigners.useMutation();
+  const { mutateAsync: setSettingsForTemplate } =
+    trpc.template.setSettingsForTemplate.useMutation();
 
   const onAddTemplatePlaceholderFormSubmit = async (
     data: TAddTemplatePlacholderRecipientsFormSchema,
@@ -105,32 +106,28 @@ export const EditTemplateForm = ({
   };
 
   const onAddTemplateSettingsFormSubmit = async (data: TTemplateSettingsFormSchema) => {
-    // try {
-    //   const { timezone, dateFormat, redirectUrl } = data.meta;
-    //   await setSettingsForDocument({
-    //     documentId: document.id,
-    //     data: {
-    //       title: data.title,
-    //       globalAccessAuth: data.globalAccessAuth ?? null,
-    //       globalActionAuth: data.globalActionAuth ?? null,
-    //     },
-    //     meta: {
-    //       timezone,
-    //       dateFormat,
-    //       redirectUrl,
-    //     },
-    //   });
-    //   // Router refresh is here to clear the router cache for when navigating to /documents.
-    //   router.refresh();
-    //   setStep('signers');
-    // } catch (err) {
-    //   console.error(err);
-    //   toast({
-    //     title: 'Error',
-    //     description: 'An error occurred while updating the document settings.',
-    //     variant: 'destructive',
-    //   });
-    // }
+    try {
+      const { subject, message, timezone, dateFormat, redirectUrl } = data.meta;
+      await setSettingsForTemplate({
+        templateId: template.id,
+        meta: {
+          subject,
+          message,
+          timezone,
+          dateFormat,
+          redirectUrl,
+        },
+      });
+      router.refresh();
+      setStep('signers');
+    } catch (err) {
+      console.error(err);
+      toast({
+        title: 'Error',
+        description: 'An error occurred while updating the template settings.',
+        variant: 'destructive',
+      });
+    }
   };
 
   const onAddFieldsFormSubmit = async (data: TAddTemplateFieldsFormSchema) => {
@@ -182,11 +179,12 @@ export const EditTemplateForm = ({
             setCurrentStep={(step) => setStep(EditTemplateSteps[step - 1])}
           >
             <AddTemplateSettingsFormPartial
+              template={template}
               key={recipients.length}
-              documentFlow={documentFlow.signers}
+              documentFlow={documentFlow.settings}
               recipients={recipients}
-              fields={fields}
               onSubmit={onAddTemplateSettingsFormSubmit}
+              documentMeta={documentMeta}
             />
             <AddTemplatePlaceholderRecipientsFormPartial
               key={recipients.length}

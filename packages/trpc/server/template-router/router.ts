@@ -1,6 +1,7 @@
 import { TRPCError } from '@trpc/server';
 
 import { getServerLimits } from '@documenso/ee/server-only/limits/server';
+import { upsertTemplateDocumentMeta } from '@documenso/lib/server-only/template-document-meta/upsert-template-document-meta';
 import { createDocumentFromTemplate } from '@documenso/lib/server-only/template/create-document-from-template';
 import { createTemplate } from '@documenso/lib/server-only/template/create-template';
 import { deleteTemplate } from '@documenso/lib/server-only/template/delete-template';
@@ -12,6 +13,7 @@ import {
   ZCreateTemplateMutationSchema,
   ZDeleteTemplateMutationSchema,
   ZDuplicateTemplateMutationSchema,
+  ZSetSettingsForTemplateMutationSchema,
 } from './schema';
 
 export const templateRouter = router({
@@ -101,6 +103,29 @@ export const templateRouter = router({
         throw new TRPCError({
           code: 'BAD_REQUEST',
           message: 'We were unable to delete this template. Please try again later.',
+        });
+      }
+    }),
+  setSettingsForTemplate: authenticatedProcedure
+    .input(ZSetSettingsForTemplateMutationSchema)
+    .mutation(async ({ input }) => {
+      try {
+        const { meta, templateId } = input;
+
+        return await upsertTemplateDocumentMeta({
+          templateId,
+          subject: meta.subject,
+          message: meta.message,
+          dateFormat: meta.dateFormat,
+          timezone: meta.timezone,
+          redirectUrl: meta.redirectUrl,
+        });
+      } catch (err) {
+        console.error(err);
+
+        throw new TRPCError({
+          code: 'BAD_REQUEST',
+          message: 'We were unable to set template settings. Please try again later.',
         });
       }
     }),

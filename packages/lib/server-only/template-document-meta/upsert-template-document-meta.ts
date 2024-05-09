@@ -21,6 +21,14 @@ export const upsertTemplateDocumentMeta = async ({
   password,
   redirectUrl,
 }: CreateTemplateDocumentMetaOptions) => {
+  const templateDocumentMeta = await prisma.templateDocumentMeta.findFirstOrThrow({
+    where: {
+      templateId: templateId,
+    },
+    include: {
+      template: true,
+    },
+  });
   return await prisma.$transaction(async (tx) => {
     const upsertedTemplateDocumentMeta = await tx.templateDocumentMeta.upsert({
       where: {

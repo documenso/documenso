@@ -28,6 +28,8 @@ export const ZTemplateSettingsFormSchema = z.object({
     ZDocumentActionAuthTypesSchema.optional(),
   ),
   meta: z.object({
+    subject: z.string().optional(),
+    message: z.string().optional(),
     timezone: z.string().optional().default(DEFAULT_DOCUMENT_TIME_ZONE),
     dateFormat: z.string().optional().default(DEFAULT_DOCUMENT_DATE_FORMAT),
     redirectUrl: z

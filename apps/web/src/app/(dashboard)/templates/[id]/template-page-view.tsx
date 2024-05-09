@@ -79,7 +79,7 @@ export const TemplatePageView = async ({ params, team }: TemplatePageViewProps) 
         recipients={templateRecipients}
         fields={templateFields}
         documentData={templateDocumentData}
-        documemntMeta={templateDocumentMeta}
+        documentMeta={templateDocumentMeta}
         templateRootPath={templateRootPath}
       />
     </div>

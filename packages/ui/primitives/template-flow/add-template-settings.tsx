@@ -7,11 +7,9 @@ import { InfoIcon } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 
 import { DATE_FORMATS, DEFAULT_DOCUMENT_DATE_FORMAT } from '@documenso/lib/constants/date-formats';
-import { DOCUMENT_AUTH_TYPES } from '@documenso/lib/constants/document-auth';
 import { DEFAULT_DOCUMENT_TIME_ZONE, TIME_ZONES } from '@documenso/lib/constants/time-zones';
-import { DocumentAccessAuth, DocumentActionAuth } from '@documenso/lib/types/document-auth';
-import { DocumentStatus, type Field, type Recipient, SendStatus } from '@documenso/prisma/client';
-import type { DocumentWithData } from '@documenso/prisma/types/document-with-data';
+import type { Template, TemplateDocumentMeta } from '@documenso/prisma/client';
+import { type Recipient, SendStatus } from '@documenso/prisma/client';
 import {
   Accordion,
   AccordionContent,
@@ -32,47 +30,42 @@ import {
   DocumentFlowFormContainerActions,
   DocumentFlowFormContainerContent,
   DocumentFlowFormContainerFooter,
-  DocumentFlowFormContainerHeader,
   DocumentFlowFormContainerStep,
 } from '../document-flow/document-flow-root';
-import { ShowFieldItem } from '../document-flow/show-field-item';
 import type { DocumentFlowStep } from '../document-flow/types';
 import { Input } from '../input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../select';
 import { useStep } from '../stepper';
+import { Textarea } from '../textarea';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../tooltip';
 import type { TTemplateSettingsFormSchema } from './add-template-settings.types';
 import { ZTemplateSettingsFormSchema } from './add-template-settings.types';
 
 export type AddSettingsFormProps = {
+  template: Template;
   documentFlow: DocumentFlowStep;
   recipients: Recipient[];
-  fields: Field[];
-  isDocumentEnterprise: boolean;
-  isDocumentPdfLoaded: boolean;
-  document: DocumentWithData;
+  documentMeta: TemplateDocumentMeta | null;
   onSubmit: (_data: TTemplateSettingsFormSchema) => void;
 };
 
 export const AddTemplateSettingsFormPartial = ({
   documentFlow,
   recipients,
-  fields,
-  isDocumentEnterprise,
-  isDocumentPdfLoaded,
-  document,
+  documentMeta,
+  template,
   onSubmit,
 }: AddSettingsFormProps) => {
   const form = useForm<TTemplateSettingsFormSchema>({
     resolver: zodResolver(ZTemplateSettingsFormSchema),
     defaultValues: {
-      title: document.title,
-      globalAccessAuth: documentAuthOption?.globalAccessAuth || undefined,
-      globalActionAuth: documentAuthOption?.globalActionAuth || undefined,
+      title: template.title,
       meta: {
-        timezone: document.documentMeta?.timezone ?? DEFAULT_DOCUMENT_TIME_ZONE,
-        dateFormat: document.documentMeta?.dateFormat ?? DEFAULT_DOCUMENT_DATE_FORMAT,
-        redirectUrl: document.documentMeta?.redirectUrl ?? '',
+        subject: documentMeta?.subject ?? '',
+        message: documentMeta?.message ?? '',
+        timezone: documentMeta?.timezone ?? DEFAULT_DOCUMENT_TIME_ZONE,
+        dateFormat: documentMeta?.dateFormat ?? DEFAULT_DOCUMENT_DATE_FORMAT,
+        redirectUrl: documentMeta?.redirectUrl ?? '',
       },
     },
   });
@@ -83,8 +76,6 @@ export const AddTemplateSettingsFormPartial = ({
     (recipient) => recipient.sendStatus === SendStatus.SENT,
   );
 
-  // We almost always want to set the timezone to the user's local timezone to avoid confusion
-  // when the document is signed.
   useEffect(() => {
     if (!form.formState.touchedFields.meta?.timezone && !documentHasBeenSent) {
       form.setValue('meta.timezone', Intl.DateTimeFormat().resolvedOptions().timeZone);
@@ -93,17 +84,7 @@ export const AddTemplateSettingsFormPartial = ({
 
   return (
     <>
-      <DocumentFlowFormContainerHeader
-        title={documentFlow.title}
-        description={documentFlow.description}
-      />
-
       <DocumentFlowFormContainerContent>
-        {isDocumentPdfLoaded &&
-          fields.map((field, index) => (
-            <ShowFieldItem key={index} field={field} recipients={recipients} />
-          ))}
-
         <Form {...form}>
           <fieldset
             className="flex h-full flex-col space-y-6"
@@ -115,143 +96,13 @@ export const AddTemplateSettingsFormPartial = ({
               render={({ field }) => (
                 <FormItem>
                   <FormLabel required>Title</FormLabel>
-
                   <FormControl>
-                    <Input
-                      className="bg-background"
-                      {...field}
-                      disabled={document.status !== DocumentStatus.DRAFT || field.disabled}
-                    />
+                    <Input className="bg-background" {...field} disabled={field.disabled} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
-
-            <FormField
-              control={form.control}
-              name="globalAccessAuth"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="flex flex-row items-center">
-                    Document access
-                    <Tooltip>
-                      <TooltipTrigger>
-                        <InfoIcon className="mx-2 h-4 w-4" />
-                      </TooltipTrigger>
-
-                      <TooltipContent className="text-foreground max-w-md space-y-2 p-4">
-                        <h2>
-                          <strong>Document access</strong>
-                        </h2>
-
-                        <p>The authentication required for recipients to view the document.</p>
-
-                        <ul className="ml-3.5 list-outside list-disc space-y-0.5 py-2">
-                          <li>
-                            <strong>Require account</strong> - The recipient must be signed in to
-                            view the document
-                          </li>
-                          <li>
-                            <strong>None</strong> - The document can be accessed directly by the URL
-                            sent to the recipient
-                          </li>
-                        </ul>
-                      </TooltipContent>
-                    </Tooltip>
-                  </FormLabel>
-
-                  <FormControl>
-                    <Select {...field} onValueChange={field.onChange}>
-                      <SelectTrigger className="bg-background text-muted-foreground">
-                        <SelectValue data-testid="documentAccessSelectValue" placeholder="None" />
-                      </SelectTrigger>
-
-                      <SelectContent position="popper">
-                        {Object.values(DocumentAccessAuth).map((authType) => (
-                          <SelectItem key={authType} value={authType}>
-                            {DOCUMENT_AUTH_TYPES[authType].value}
-                          </SelectItem>
-                        ))}
-
-                        {/* Note: -1 is remapped in the Zod schema to the required value. */}
-                        <SelectItem value={'-1'}>None</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </FormControl>
-                </FormItem>
-              )}
-            />
-
-            {isDocumentEnterprise && (
-              <FormField
-                control={form.control}
-                name="globalActionAuth"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="flex flex-row items-center">
-                      Recipient action authentication
-                      <Tooltip>
-                        <TooltipTrigger>
-                          <InfoIcon className="mx-2 h-4 w-4" />
-                        </TooltipTrigger>
-
-                        <TooltipContent className="text-foreground max-w-md space-y-2 p-4">
-                          <h2>
-                            <strong>Global recipient action authentication</strong>
-                          </h2>
-
-                          <p>
-                            The authentication required for recipients to sign the signature field.
-                          </p>
-
-                          <p>
-                            This can be overriden by setting the authentication requirements
-                            directly on each recipient in the next step.
-                          </p>
-
-                          <ul className="ml-3.5 list-outside list-disc space-y-0.5 py-2">
-                            <li>
-                              <strong>Require account</strong> - The recipient must be signed in
-                            </li>
-                            <li>
-                              <strong>Require passkey</strong> - The recipient must have an account
-                              and passkey configured via their settings
-                            </li>
-                            <li>
-                              <strong>Require 2FA</strong> - The recipient must have an account and
-                              2FA enabled via their settings
-                            </li>
-                            <li>
-                              <strong>None</strong> - No authentication required
-                            </li>
-                          </ul>
-                        </TooltipContent>
-                      </Tooltip>
-                    </FormLabel>
-
-                    <FormControl>
-                      <Select {...field} onValueChange={field.onChange}>
-                        <SelectTrigger className="bg-background text-muted-foreground">
-                          <SelectValue data-testid="documentActionSelectValue" placeholder="None" />
-                        </SelectTrigger>
-
-                        <SelectContent position="popper">
-                          {Object.values(DocumentActionAuth).map((authType) => (
-                            <SelectItem key={authType} value={authType}>
-                              {DOCUMENT_AUTH_TYPES[authType].value}
-                            </SelectItem>
-                          ))}
-
-                          {/* Note: -1 is remapped in the Zod schema to the required value. */}
-                          <SelectItem value={'-1'}>None</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </FormControl>
-                  </FormItem>
-                )}
-              />
-            )}
 
             <Accordion type="multiple" className="mt-6">
               <AccordionItem value="advanced-options" className="border-none">
@@ -288,6 +139,67 @@ export const AddTemplateSettingsFormPartial = ({
                             </Select>
                           </FormControl>
 
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="meta.subject"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="flex flex-row items-center">
+                            Subject{' '}
+                            <Tooltip>
+                              <TooltipTrigger>
+                                <InfoIcon className="mx-2 h-4 w-4" />
+                              </TooltipTrigger>
+
+                              <TooltipContent className="text-muted-foreground max-w-xs">
+                                Add email subject
+                              </TooltipContent>
+                            </Tooltip>
+                          </FormLabel>
+
+                          <FormControl>
+                            <Input
+                              id="subject"
+                              className="bg-background mt-2"
+                              disabled={field.disabled}
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="meta.message"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="flex flex-row items-center">
+                            Message{' '}
+                            <Tooltip>
+                              <TooltipTrigger>
+                                <InfoIcon className="mx-2 h-4 w-4" />
+                              </TooltipTrigger>
+
+                              <TooltipContent className="text-muted-foreground max-w-xs">
+                                Add message to send in the email
+                              </TooltipContent>
+                            </Tooltip>
+                          </FormLabel>
+
+                          <FormControl>
+                            <Textarea
+                              id="message"
+                              className="bg-background mt-2 h-24 resize-none"
+                              {...field}
+                            />
+                          </FormControl>
                           <FormMessage />
                         </FormItem>
                       )}
