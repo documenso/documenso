@@ -171,7 +171,7 @@ export const templateRouter = router({
         throw new TRPCError({
           code: 'BAD_REQUEST',
           message:
-            'We were unable to update the settings for this document. Please try again later.',
+            'We were unable to update the settings for this template. Please try again later.',
         });
       }
     }),

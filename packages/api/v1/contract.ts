@@ -104,7 +104,7 @@ export const ApiContractV1 = c.router(
       },
       summary: 'Create a new document from an existing template',
       description:
-        'Create a new document from an existing template. Passing in values for title and meta will override the original values defined in the template.',
+        'Create a new document from an existing template. Passing in values for title and meta will override the original values defined in the template. If you do not pass in values for recipients, it will use the values defined in the template.',
     },
 
     sendDocument: {
