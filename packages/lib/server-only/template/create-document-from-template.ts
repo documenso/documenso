@@ -33,6 +33,19 @@ export type CreateDocumentFromTemplateOptions = {
     name?: string;
     email: string;
   }[];
+
+  /**
+   * Values that will override the predefined values in the template.
+   */
+  override?: {
+    title?: string;
+    subject?: string;
+    message?: string;
+    timezone?: string;
+    password?: string;
+    dateFormat?: string;
+    redirectUrl?: string;
+  };
   requestMetadata?: RequestMetadata;
 };
 
@@ -41,6 +54,7 @@ export const createDocumentFromTemplate = async ({
   userId,
   teamId,
   recipients,
+  override,
   requestMetadata,
 }: CreateDocumentFromTemplateOptions) => {
   const user = await prisma.user.findFirstOrThrow({
@@ -83,9 +97,19 @@ export const createDocumentFromTemplate = async ({
     throw new AppError(AppErrorCode.NOT_FOUND, 'Template not found');
   }
 
-  if (recipients.length !== template.Recipient.length) {
-    throw new AppError(AppErrorCode.INVALID_BODY, 'Invalid number of recipients.');
-  }
+  // Check that all the passed in recipient IDs can be associated with a template recipient.
+  recipients.forEach((recipient) => {
+    const foundRecipient = template.Recipient.find(
+      (templateRecipient) => templateRecipient.id === recipient.id,
+    );
+
+    if (!foundRecipient) {
+      throw new AppError(
+        AppErrorCode.INVALID_BODY,
+        `Recipient with ID ${recipient.id} not found in the template.`,
+      );
+    }
+  });
 
   const { documentAuthOption: templateAuthOptions } = extractDocumentAuthMethods({
     documentAuth: template.authOptions,
@@ -94,18 +118,11 @@ export const createDocumentFromTemplate = async ({
   const finalRecipients: FinalRecipient[] = template.Recipient.map((templateRecipient) => {
     const foundRecipient = recipients.find((recipient) => recipient.id === templateRecipient.id);
 
-    if (!foundRecipient) {
-      throw new AppError(
-        AppErrorCode.INVALID_BODY,
-        `Missing template recipient with ID ${templateRecipient.id}`,
-      );
-    }
-
     return {
       templateRecipientId: templateRecipient.id,
       fields: templateRecipient.Field,
-      name: foundRecipient.name ?? '',
-      email: foundRecipient.email,
+      name: foundRecipient ? foundRecipient.name ?? '' : templateRecipient.name,
+      email: foundRecipient ? foundRecipient.email : templateRecipient.email,
       role: templateRecipient.role,
       authOptions: templateRecipient.authOptions,
     };
@@ -124,7 +141,7 @@ export const createDocumentFromTemplate = async ({
       data: {
         userId,
         teamId: template.teamId,
-        title: template.title,
+        title: override?.title || template.title,
         documentDataId: documentData.id,
         authOptions: createDocumentAuthOptions({
           globalAccessAuth: templateAuthOptions.globalAccessAuth,
@@ -132,12 +149,12 @@ export const createDocumentFromTemplate = async ({
         }),
         documentMeta: {
           create: {
-            subject: template.templateMeta?.subject,
-            message: template.templateMeta?.message,
-            timezone: template.templateMeta?.timezone,
-            password: template.templateMeta?.password,
-            dateFormat: template.templateMeta?.dateFormat,
-            redirectUrl: template.templateMeta?.redirectUrl,
+            subject: override?.subject || template.templateMeta?.subject,
+            message: override?.message || template.templateMeta?.message,
+            timezone: override?.timezone || template.templateMeta?.timezone,
+            password: override?.password || template.templateMeta?.password,
+            dateFormat: override?.dateFormat || template.templateMeta?.dateFormat,
+            redirectUrl: override?.redirectUrl || template.templateMeta?.redirectUrl,
           },
         },
         Recipient: {

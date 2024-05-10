@@ -73,7 +73,8 @@ export const updateTemplateSettings = async ({
   // Early return to avoid unnecessary updates.
   if (
     template.title === data.title &&
-    JSON.stringify(template.authOptions) === JSON.stringify(documentAuthOption) &&
+    data.globalAccessAuth === documentAuthOption.globalAccessAuth &&
+    data.globalActionAuth === documentAuthOption.globalActionAuth &&
     isDateSame &&
     isMessageSame &&
     isPasswordSame &&
