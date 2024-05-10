@@ -53,7 +53,7 @@ export const fieldRouter = router({
       const { templateId, fields } = input;
 
       try {
-        await setFieldsForTemplate({
+        return await setFieldsForTemplate({
           userId: ctx.user.id,
           templateId,
           fields: fields.map((field) => ({
