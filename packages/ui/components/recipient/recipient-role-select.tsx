@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { forwardRef } from 'react';
 
 import type { SelectProps } from '@radix-ui/react-select';
 import { InfoIcon } from 'lucide-react';
@@ -12,86 +12,86 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@documenso/ui/primitive
 
 export type RecipientRoleSelectProps = SelectProps;
 
-export const RecipientRoleSelect = (props: RecipientRoleSelectProps) => {
-  return (
-    <Select {...props}>
-      <SelectTrigger className="bg-background w-[60px]">
-        {/* eslint-disable-next-line @typescript-eslint/consistent-type-assertions */}
-        {ROLE_ICONS[props.value as RecipientRole]}
-      </SelectTrigger>
+export const RecipientRoleSelect = forwardRef<HTMLButtonElement, SelectProps>((props, ref) => (
+  <Select {...props}>
+    <SelectTrigger ref={ref} className="bg-background w-[60px]">
+      {/* eslint-disable-next-line @typescript-eslint/consistent-type-assertions */}
+      {ROLE_ICONS[props.value as RecipientRole]}
+    </SelectTrigger>
 
-      <SelectContent align="end">
-        <SelectItem value={RecipientRole.SIGNER}>
-          <div className="flex items-center">
-            <div className="flex w-[150px] items-center">
-              <span className="mr-2">{ROLE_ICONS[RecipientRole.SIGNER]}</span>
-              Needs to sign
-            </div>
-            <Tooltip>
-              <TooltipTrigger>
-                <InfoIcon className="h-4 w-4" />
-              </TooltipTrigger>
-              <TooltipContent className="text-foreground z-9999 max-w-md p-4">
-                <p>The recipient is required to sign the document for it to be completed.</p>
-              </TooltipContent>
-            </Tooltip>
+    <SelectContent align="end">
+      <SelectItem value={RecipientRole.SIGNER}>
+        <div className="flex items-center">
+          <div className="flex w-[150px] items-center">
+            <span className="mr-2">{ROLE_ICONS[RecipientRole.SIGNER]}</span>
+            Needs to sign
           </div>
-        </SelectItem>
+          <Tooltip>
+            <TooltipTrigger>
+              <InfoIcon className="h-4 w-4" />
+            </TooltipTrigger>
+            <TooltipContent className="text-foreground z-9999 max-w-md p-4">
+              <p>The recipient is required to sign the document for it to be completed.</p>
+            </TooltipContent>
+          </Tooltip>
+        </div>
+      </SelectItem>
 
-        <SelectItem value={RecipientRole.APPROVER}>
-          <div className="flex items-center">
-            <div className="flex w-[150px] items-center">
-              <span className="mr-2">{ROLE_ICONS[RecipientRole.APPROVER]}</span>
-              Needs to approve
-            </div>
-            <Tooltip>
-              <TooltipTrigger>
-                <InfoIcon className="h-4 w-4" />
-              </TooltipTrigger>
-              <TooltipContent className="text-foreground z-9999 max-w-md p-4">
-                <p>The recipient is required to approve the document for it to be completed.</p>
-              </TooltipContent>
-            </Tooltip>
+      <SelectItem value={RecipientRole.APPROVER}>
+        <div className="flex items-center">
+          <div className="flex w-[150px] items-center">
+            <span className="mr-2">{ROLE_ICONS[RecipientRole.APPROVER]}</span>
+            Needs to approve
           </div>
-        </SelectItem>
+          <Tooltip>
+            <TooltipTrigger>
+              <InfoIcon className="h-4 w-4" />
+            </TooltipTrigger>
+            <TooltipContent className="text-foreground z-9999 max-w-md p-4">
+              <p>The recipient is required to approve the document for it to be completed.</p>
+            </TooltipContent>
+          </Tooltip>
+        </div>
+      </SelectItem>
 
-        <SelectItem value={RecipientRole.VIEWER}>
-          <div className="flex items-center">
-            <div className="flex w-[150px] items-center">
-              <span className="mr-2">{ROLE_ICONS[RecipientRole.VIEWER]}</span>
-              Needs to view
-            </div>
-            <Tooltip>
-              <TooltipTrigger>
-                <InfoIcon className="h-4 w-4" />
-              </TooltipTrigger>
-              <TooltipContent className="text-foreground z-9999 max-w-md p-4">
-                <p>The recipient is required to view the document for it to be completed.</p>
-              </TooltipContent>
-            </Tooltip>
+      <SelectItem value={RecipientRole.VIEWER}>
+        <div className="flex items-center">
+          <div className="flex w-[150px] items-center">
+            <span className="mr-2">{ROLE_ICONS[RecipientRole.VIEWER]}</span>
+            Needs to view
           </div>
-        </SelectItem>
+          <Tooltip>
+            <TooltipTrigger>
+              <InfoIcon className="h-4 w-4" />
+            </TooltipTrigger>
+            <TooltipContent className="text-foreground z-9999 max-w-md p-4">
+              <p>The recipient is required to view the document for it to be completed.</p>
+            </TooltipContent>
+          </Tooltip>
+        </div>
+      </SelectItem>
 
-        <SelectItem value={RecipientRole.CC}>
-          <div className="flex items-center">
-            <div className="flex w-[150px] items-center">
-              <span className="mr-2">{ROLE_ICONS[RecipientRole.CC]}</span>
-              Receives copy
-            </div>
-            <Tooltip>
-              <TooltipTrigger>
-                <InfoIcon className="h-4 w-4" />
-              </TooltipTrigger>
-              <TooltipContent className="text-foreground z-9999 max-w-md p-4">
-                <p>
-                  The recipient is not required to take any action and receives a copy of the
-                  document after it is completed.
-                </p>
-              </TooltipContent>
-            </Tooltip>
+      <SelectItem value={RecipientRole.CC}>
+        <div className="flex items-center">
+          <div className="flex w-[150px] items-center">
+            <span className="mr-2">{ROLE_ICONS[RecipientRole.CC]}</span>
+            Receives copy
           </div>
-        </SelectItem>
-      </SelectContent>
-    </Select>
-  );
-};
+          <Tooltip>
+            <TooltipTrigger>
+              <InfoIcon className="h-4 w-4" />
+            </TooltipTrigger>
+            <TooltipContent className="text-foreground z-9999 max-w-md p-4">
+              <p>
+                The recipient is not required to take any action and receives a copy of the document
+                after it is completed.
+              </p>
+            </TooltipContent>
+          </Tooltip>
+        </div>
+      </SelectItem>
+    </SelectContent>
+  </Select>
+));
+
+RecipientRoleSelect.displayName = 'RecipientRoleSelect';

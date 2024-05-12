@@ -46,16 +46,18 @@ export const recipientRouter = router({
     .input(ZAddTemplateSignersMutationSchema)
     .mutation(async ({ input, ctx }) => {
       try {
-        const { templateId, signers } = input;
+        const { templateId, signers, teamId } = input;
 
         return await setRecipientsForTemplate({
           userId: ctx.user.id,
+          teamId,
           templateId,
           recipients: signers.map((signer) => ({
             id: signer.nativeId,
             email: signer.email,
             name: signer.name,
             role: signer.role,
+            actionAuth: signer.actionAuth,
           })),
         });
       } catch (err) {
