@@ -1,12 +1,9 @@
 'use client';
 
-import { useParams } from 'next/navigation';
-
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm } from 'react-hook-form';
+import { forwardRef, useState } from 'react';
 
 import { FieldType } from '@documenso/prisma/client';
-import { trpc } from '@documenso/trpc/react';
+import { Label } from '@documenso/ui/primitives/label';
 import {
   Select,
   SelectContent,
@@ -16,7 +13,6 @@ import {
 } from '@documenso/ui/primitives/select';
 import { Switch } from '@documenso/ui/primitives/switch';
 
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '../form/form';
 import { Input } from '../input';
 import type { FieldFormType } from './add-fields';
 import {
@@ -26,8 +22,6 @@ import {
   DocumentFlowFormContainerHeader,
 } from './document-flow-root';
 import { FieldItem } from './field-item';
-import type { TNumberAdvancedSettingsFormSchema } from './field-item-advanced-settings.types';
-import { ZNumberAdvancedSettingsFormSchema } from './field-item-advanced-settings.types';
 
 export type FieldAdvancedSettingsProps = {
   title: string;
@@ -59,204 +53,134 @@ const listValues = [
   },
 ];
 
-export const FieldAdvancedSettings = ({
-  title,
-  description,
-  field,
-  fields,
-  onAdvancedSettings,
-  isDocumentPdfLoaded,
-}: FieldAdvancedSettingsProps) => {
-  const params = useParams();
-  const documentId = params?.id;
-  const numberField = field.type === FieldType.NUMBER;
+export const FieldAdvancedSettings = forwardRef<HTMLDivElement, FieldAdvancedSettingsProps>(
+  ({ title, description, field, fields, onAdvancedSettings, isDocumentPdfLoaded }, ref) => {
+    const [fieldState, setFieldState] = useState({
+      label: '',
+      placeholder: '',
+      format: '',
+      characterLimit: '',
+      required: false,
+      readOnly: false,
+    });
 
-  const { data } = trpc.field.getField.useQuery({
-    fieldId: field.nativeId || 0,
-    documentId: Number(documentId),
-  });
+    const handleFieldChange = (key: keyof FieldMeta, value: string | boolean) => {
+      setFieldState((prevState) => ({
+        ...prevState,
+        [key]: value,
+      }));
+    };
 
-  const { mutateAsync: updateField } = trpc.field.updateField.useMutation();
+    const handleBooleanChange = (value: boolean) => {
+      setFieldState((prevState) => ({
+        ...prevState,
+        readOnly: value,
+      }));
+    };
 
-  const fieldMeta = data?.fieldMeta as FieldMeta;
+    const numberField = field.type === FieldType.NUMBER;
 
-  const form = useForm<TNumberAdvancedSettingsFormSchema>({
-    resolver: zodResolver(ZNumberAdvancedSettingsFormSchema),
-    defaultValues: {
-      // TODO: Fix this to get rid of the error "Property 'placeholder' does not exist on type 'string | number | boolean | JsonObject | JsonArray'"
-      label: fieldMeta.label ?? '',
-      placeholder: fieldMeta.placeholder ?? '',
-      format: fieldMeta.format ?? '',
-      characterLimit: fieldMeta.characterLimit ?? '',
-      required: fieldMeta.required ?? false,
-      readOnly: fieldMeta.readOnly ?? false,
-    },
-  });
+    return (
+      <div ref={ref} className="flex h-full flex-col">
+        <DocumentFlowFormContainerHeader title={title} description={description} />
+        <DocumentFlowFormContainerContent>
+          <div className="-mt-5 flex flex-col gap-4">
+            {isDocumentPdfLoaded &&
+              fields.map((field, index) => (
+                <span key={index} className="opacity-75 active:pointer-events-none">
+                  <FieldItem key={index} field={field} disabled={true} />
+                </span>
+              ))}
 
-  const onSubmit = form.handleSubmit(async (data) => {
-    try {
-      await updateField({
-        fieldId: field.nativeId || 0,
-        documentId: Number(documentId),
-        meta: data,
-      });
-      onAdvancedSettings?.();
-    } catch (err) {
-      console.error(err);
-    }
-  });
-
-  return (
-    <>
-      <DocumentFlowFormContainerHeader title={title} description={description} />
-      <DocumentFlowFormContainerContent>
-        <div className="flex flex-col">
-          {isDocumentPdfLoaded &&
-            fields.map((field, index) => (
-              <span key={index} className="opacity-75 active:pointer-events-none">
-                <FieldItem key={index} field={field} disabled={true} />
-              </span>
-            ))}
-
-          <Form {...form}>
-            <div className="flex flex-col gap-y-4">
-              <FormField
-                control={form.control}
-                name="label"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel htmlFor="label">Label</FormLabel>
-                    <FormControl>
-                      <Input
-                        id="label"
-                        className="bg-background mt-2"
-                        disabled={form.formState.isSubmitting}
-                        placeholder="Field label"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
+            <div>
+              <Label>Label</Label>
+              <Input
+                id="label"
+                className="bg-background mt-2"
+                placeholder="Field label"
+                value={fieldState.label}
+                onChange={(e) => handleFieldChange('label', e.target.value)}
               />
+            </div>
 
-              <FormField
-                control={form.control}
-                name="placeholder"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel htmlFor="placeholder">Placeholder</FormLabel>
-                    <FormControl>
-                      <Input
-                        id="placeholder"
-                        className="bg-background mt-2"
-                        disabled={form.formState.isSubmitting}
-                        placeholder="Field placeholder"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
+            <div>
+              <Label>Placeholder</Label>
+              <Input
+                id="placeholder"
+                className="bg-background mt-2"
+                placeholder="Field placeholder"
+                value={fieldState.placeholder}
+                onChange={(e) => handleFieldChange('placeholder', e.target.value)}
               />
+            </div>
 
-              {numberField && (
-                <>
-                  <FormField
-                    control={form.control}
-                    name="format"
-                    render={({ field }) => (
-                      <FormItem className="flex flex-col">
-                        <FormLabel htmlFor="format">Format</FormLabel>
-                        <FormControl>
-                          <Select {...field} onValueChange={field.onChange}>
-                            <SelectTrigger className="text-muted-foreground w-full">
-                              <SelectValue placeholder="Field format" />
-                            </SelectTrigger>
-                            <SelectContent position="popper">
-                              {listValues.map((item, index) => (
-                                <SelectItem key={index} value={item.value}>
-                                  {item.label}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
+            {numberField && (
+              <>
+                <div className="flex flex-col gap-2">
+                  <Label>Format</Label>
+                  <Select>
+                    <SelectTrigger className="text-muted-foreground w-full">
+                      <SelectValue placeholder="Field format" />
+                    </SelectTrigger>
+                    <SelectContent position="popper">
+                      {listValues.map((item, index) => (
+                        <SelectItem key={index} value={item.value}>
+                          {item.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div>
+                  <Label>Character Limit</Label>
+                  <Input
+                    id="characterLimit"
+                    className="bg-background mt-2"
+                    placeholder="Field character limit"
+                    value={fieldState.characterLimit}
+                    onChange={(e) => handleFieldChange('characterLimit', e.target.value)}
                   />
-                  <FormField
-                    control={form.control}
-                    name="characterLimit"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel htmlFor="characterLimit">Character Limit</FormLabel>
-                        <FormControl>
-                          <Input
-                            id="characterLimit"
-                            className="bg-background mt-2"
-                            disabled={form.formState.isSubmitting}
-                            placeholder="Field character limit"
-                            {...field}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <div className="flex flex-row items-center gap-12">
-                    <FormField
-                      control={form.control}
-                      name="required"
-                      render={({ field }) => (
-                        <FormItem className="flex flex-row items-center gap-2">
-                          <FormLabel className="mt-2">Required field?</FormLabel>
-                          <FormControl>
-                            <Switch
-                              className="bg-background"
-                              checked={field.value}
-                              onCheckedChange={field.onChange}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={form.control}
-                      name="readOnly"
-                      render={({ field }) => (
-                        <FormItem className="flex flex-row items-center gap-2">
-                          <FormLabel className="mt-2">Read only?</FormLabel>
-                          <FormControl>
-                            <Switch
-                              className="bg-background"
-                              checked={field.value}
-                              onCheckedChange={field.onChange}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
+                </div>
+
+                <div className="flex flex-row items-center gap-12">
+                  <div className="flex flex-row items-center justify-center gap-2">
+                    <Label>Required field?</Label>
+                    <Switch
+                      className="bg-background"
+                      checked={fieldState.required}
+                      onChange={(e) => handleFieldChange('required', e.target.checked)}
                     />
                   </div>
-                </>
-              )}
-            </div>
-          </Form>
-        </div>
-      </DocumentFlowFormContainerContent>
-      <DocumentFlowFormContainerFooter>
-        <DocumentFlowFormContainerActions
-          goNextLabel="Save"
-          goBackLabel="Cancel"
-          onGoBackClick={onAdvancedSettings}
-          onGoNextClick={() => {
-            void onSubmit();
-          }}
-        />
-      </DocumentFlowFormContainerFooter>
-    </>
-  );
-};
+                  <div className="flex flex-row items-center justify-center gap-2">
+                    <Label>Read only?</Label>
+                    <Switch
+                      className="bg-background"
+                      checked={fieldState.readOnly}
+                      onClick={(e) => {
+                        console.log('clicked');
+                        handleBooleanChange(e.target.checked);
+                      }}
+                    />
+                  </div>
+                </div>
+              </>
+            )}
+          </div>
+        </DocumentFlowFormContainerContent>
+        <DocumentFlowFormContainerFooter className="mt-auto">
+          <DocumentFlowFormContainerActions
+            goNextLabel="Save"
+            goBackLabel="Cancel"
+            onGoBackClick={onAdvancedSettings}
+            onGoNextClick={() => {
+              console.log('Save');
+            }}
+          />
+        </DocumentFlowFormContainerFooter>
+      </div>
+    );
+  },
+);
+
+FieldAdvancedSettings.displayName = 'FieldAdvancedSettings';

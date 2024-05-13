@@ -351,7 +351,6 @@ export const AddFieldsFormPartial = ({
       settingsRef.current &&
       !event.composedPath().includes(settingsRef.current)
     ) {
-      console.log('click outside');
       setShowAdvancedSettings(false);
     }
   };
@@ -737,7 +736,7 @@ export const AddFieldsFormPartial = ({
                 </fieldset>
               </div>
             </div>
-          </DocumentFlowFormContainerContent>{' '}
+          </DocumentFlowFormContainerContent>
           <DocumentFlowFormContainerFooter>
             <DocumentFlowFormContainerStep
               title={documentFlow.title}
