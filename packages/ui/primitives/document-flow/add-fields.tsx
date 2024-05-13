@@ -93,6 +93,7 @@ export const AddFieldsFormPartial = ({
   const { currentStep, totalSteps, previousStep } = useStep();
   const [showAdvancedSettings, setShowAdvancedSettings] = useState(false);
   const [currentField, setCurrentField] = useState<FieldFormType>();
+  const settingsRef = useRef<HTMLDivElement>(null);
 
   const {
     control,
@@ -344,6 +345,25 @@ export const AddFieldsFormPartial = ({
     setShowAdvancedSettings((prev) => !prev);
   };
 
+  const handleClickOutside = (event: MouseEvent) => {
+    if (
+      showAdvancedSettings &&
+      settingsRef.current &&
+      !event.composedPath().includes(settingsRef.current)
+    ) {
+      console.log('click outside');
+      setShowAdvancedSettings(false);
+    }
+  };
+
+  useEffect(() => {
+    document.body.addEventListener('click', handleClickOutside);
+
+    return () => {
+      document.body.removeEventListener('click', handleClickOutside);
+    };
+  }, [showAdvancedSettings]);
+
   return (
     <>
       {showAdvancedSettings && currentField ? (
@@ -354,6 +374,7 @@ export const AddFieldsFormPartial = ({
           fields={localFields}
           onAdvancedSettings={handleAdvancedSettings}
           isDocumentPdfLoaded={isDocumentPdfLoaded}
+          ref={settingsRef}
         />
       ) : (
         <>

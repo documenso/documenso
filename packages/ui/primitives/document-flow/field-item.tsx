@@ -115,16 +115,16 @@ export const FieldItem = ({
     };
   }, [calculateCoords]);
 
-  const handleOnClick = (event: MouseEvent) => {
+  const handleClickOutside = (event: MouseEvent) => {
     if (settingsActive && cardRef.current && !event.composedPath().includes(cardRef.current)) {
       setSettingsActive(false);
     }
   };
 
   useEffect(() => {
-    document.body.addEventListener('click', handleOnClick);
+    document.body.addEventListener('click', handleClickOutside);
     return () => {
-      document.body.removeEventListener('click', handleOnClick);
+      document.body.removeEventListener('click', handleClickOutside);
     };
   }, [settingsActive]);
 
