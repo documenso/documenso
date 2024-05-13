@@ -52,16 +52,12 @@ export const EditTemplateForm = ({
     signers: {
       title: 'Add Placeholders',
       description: 'Add all relevant placeholders for each recipient.',
-      stepIndex: 1,
+      stepIndex: 2,
     },
     fields: {
-      title: 'Add Fields',
-      description: 'Add all relevant fields for each recipient.',
-      stepIndex: 2,
-      stepIndex: 3,
       title: 'ველების დამატება',
       description: 'დაამატეთ ყველა შესაბამისი ველი თითოეული მიმღებისთვის.',
-      stepIndex: 2,
+      stepIndex: 3,
     },
   };
 
