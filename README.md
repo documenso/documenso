@@ -78,7 +78,7 @@ Contact us if you are interested in our Enterprise plan for large organizations 
 - [NextAuth.js](https://next-auth.js.org/) - Authentication
 - [react-email](https://react.email/) - Email Templates
 - [tRPC](https://trpc.io/) - API
-- [@documenso/pdf-sign](https://www.npmjs.com/package/@documenso/pdf-sign) - PDF Signatures
+- [@documenso/pdf-sign](https://www.npmjs.com/package/@documenso/pdf-sign) - PDF Signatures (launching soon)
 - [React-PDF](https://github.com/wojtekmaj/react-pdf) - Viewing PDFs
 - [PDF-Lib](https://github.com/Hopding/pdf-lib) - PDF manipulation
 - [Stripe](https://stripe.com/) - Payments
@@ -227,14 +227,14 @@ cp .env.example .env
 
 The following environment variables must be set:
 
-* `NEXTAUTH_URL`
-* `NEXTAUTH_SECRET`
-* `NEXT_PUBLIC_WEBAPP_URL`
-* `NEXT_PUBLIC_MARKETING_URL`
-* `NEXT_PRIVATE_DATABASE_URL`
-* `NEXT_PRIVATE_DIRECT_DATABASE_URL`
-* `NEXT_PRIVATE_SMTP_FROM_NAME`
-* `NEXT_PRIVATE_SMTP_FROM_ADDRESS`
+- `NEXTAUTH_URL`
+- `NEXTAUTH_SECRET`
+- `NEXT_PUBLIC_WEBAPP_URL`
+- `NEXT_PUBLIC_MARKETING_URL`
+- `NEXT_PRIVATE_DATABASE_URL`
+- `NEXT_PRIVATE_DIRECT_DATABASE_URL`
+- `NEXT_PRIVATE_SMTP_FROM_NAME`
+- `NEXT_PRIVATE_SMTP_FROM_ADDRESS`
 
 > If you are using a reverse proxy in front of Documenso, don't forget to provide the public URL for both `NEXTAUTH_URL` and `NEXT_PUBLIC_WEBAPP_URL` variables!
 
