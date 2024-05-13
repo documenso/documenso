@@ -26,6 +26,7 @@ import {
   DocumentFlowFormContainerFooter,
   DocumentFlowFormContainerStep,
 } from '../document-flow/document-flow-root';
+import { ShowFieldItem } from '../document-flow/show-field-item';
 import type { DocumentFlowStep } from '../document-flow/types';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '../form/form';
 import { useStep } from '../stepper';
@@ -36,15 +37,17 @@ export type AddTemplatePlaceholderRecipientsFormProps = {
   documentFlow: DocumentFlowStep;
   recipients: Recipient[];
   fields: Field[];
-  isTemplateOwnerEnterprise: boolean;
+  isEnterprise: boolean;
+  isDocumentPdfLoaded: boolean;
   onSubmit: (_data: TAddTemplatePlacholderRecipientsFormSchema) => void;
 };
 
 export const AddTemplatePlaceholderRecipientsFormPartial = ({
   documentFlow,
-  isTemplateOwnerEnterprise,
+  isEnterprise,
   recipients,
-  fields: _fields,
+  fields,
+  isDocumentPdfLoaded,
   onSubmit,
 }: AddTemplatePlaceholderRecipientsFormProps) => {
   const initialId = useId();
@@ -144,6 +147,11 @@ export const AddTemplatePlaceholderRecipientsFormPartial = ({
   return (
     <>
       <DocumentFlowFormContainerContent>
+        {isDocumentPdfLoaded &&
+          fields.map((field, index) => (
+            <ShowFieldItem key={index} field={field} recipients={recipients} />
+          ))}
+
         <AnimateGenericFadeInOut motionKey={showAdvancedSettings ? 'Show' : 'Hide'}>
           <Form {...form}>
             <div className="flex w-full flex-col gap-y-2">
@@ -209,7 +217,7 @@ export const AddTemplatePlaceholderRecipientsFormPartial = ({
                     )}
                   />
 
-                  {showAdvancedSettings && isTemplateOwnerEnterprise && (
+                  {showAdvancedSettings && isEnterprise && (
                     <FormField
                       control={form.control}
                       name={`signers.${index}.actionAuth`}
@@ -294,7 +302,7 @@ export const AddTemplatePlaceholderRecipientsFormPartial = ({
               </Button>
             </div>
 
-            {!alwaysShowAdvancedSettings && isTemplateOwnerEnterprise && (
+            {!alwaysShowAdvancedSettings && isEnterprise && (
               <div className="mt-4 flex flex-row items-center">
                 <Checkbox
                   id="showAdvancedRecipientSettings"

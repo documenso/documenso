@@ -1,22 +1,19 @@
 import { prisma } from '@documenso/prisma';
 import type { FieldType } from '@documenso/prisma/client';
 
-export type Field = {
-  id?: number | null;
-  type: FieldType;
-  signerEmail: string;
-  signerId?: number;
-  pageNumber: number;
-  pageX: number;
-  pageY: number;
-  pageWidth: number;
-  pageHeight: number;
-};
-
 export type SetFieldsForTemplateOptions = {
   userId: number;
   templateId: number;
-  fields: Field[];
+  fields: {
+    id?: number | null;
+    type: FieldType;
+    signerEmail: string;
+    pageNumber: number;
+    pageX: number;
+    pageY: number;
+    pageWidth: number;
+    pageHeight: number;
+  }[];
 };
 
 export const setFieldsForTemplate = async ({
@@ -58,11 +55,7 @@ export const setFieldsForTemplate = async ({
   });
 
   const removedFields = existingFields.filter(
-    (existingField) =>
-      !fields.find(
-        (field) =>
-          field.id === existingField.id || field.signerEmail === existingField.Recipient?.email,
-      ),
+    (existingField) => !fields.find((field) => field.id === existingField.id),
   );
 
   const linkedFields = fields.map((field) => {
@@ -127,5 +120,13 @@ export const setFieldsForTemplate = async ({
     });
   }
 
-  return persistedFields;
+  // Filter out fields that have been removed or have been updated.
+  const filteredFields = existingFields.filter((field) => {
+    const isRemoved = removedFields.find((removedField) => removedField.id === field.id);
+    const isUpdated = persistedFields.find((persistedField) => persistedField.id === field.id);
+
+    return !isRemoved && !isUpdated;
+  });
+
+  return [...filteredFields, ...persistedFields];
 };
