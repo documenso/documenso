@@ -20,6 +20,8 @@ export interface SetFieldsForDocumentOptions {
     pageY: number;
     pageWidth: number;
     pageHeight: number;
+    // TODO: Add proper type
+    fieldMeta?: unknown;
   }[];
   requestMetadata?: RequestMetadata;
 }
@@ -114,6 +116,7 @@ export const setFieldsForDocument = async ({
             positionY: field.pageY,
             width: field.pageWidth,
             height: field.pageHeight,
+            fieldMeta: field.fieldMeta,
           },
           create: {
             type: field.type,
@@ -124,6 +127,7 @@ export const setFieldsForDocument = async ({
             height: field.pageHeight,
             customText: '',
             inserted: false,
+            fieldMeta: field.fieldMeta,
             Document: {
               connect: {
                 id: documentId,

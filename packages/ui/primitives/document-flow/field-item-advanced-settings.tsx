@@ -30,6 +30,7 @@ export type FieldAdvancedSettingsProps = {
   fields: FieldFormType[];
   onAdvancedSettings?: () => void;
   isDocumentPdfLoaded: boolean;
+  onSave?: (fieldState: FieldMeta) => void;
 };
 
 export type FieldMeta = {
@@ -54,7 +55,7 @@ const listValues = [
 ];
 
 export const FieldAdvancedSettings = forwardRef<HTMLDivElement, FieldAdvancedSettingsProps>(
-  ({ title, description, field, fields, onAdvancedSettings, isDocumentPdfLoaded }, ref) => {
+  ({ title, description, field, fields, onAdvancedSettings, isDocumentPdfLoaded, onSave }, ref) => {
     const [fieldState, setFieldState] = useState({
       label: '',
       placeholder: '',
@@ -64,17 +65,17 @@ export const FieldAdvancedSettings = forwardRef<HTMLDivElement, FieldAdvancedSet
       readOnly: false,
     });
 
-    const handleFieldChange = (key: keyof FieldMeta, value: string | boolean) => {
+    const handleFieldChange = (key: keyof FieldMeta, value: string) => {
       setFieldState((prevState) => ({
         ...prevState,
         [key]: value,
       }));
     };
 
-    const handleBooleanChange = (value: boolean) => {
+    const handleToggleChange = (key: keyof FieldMeta) => {
       setFieldState((prevState) => ({
         ...prevState,
-        readOnly: value,
+        [key]: !prevState[key],
       }));
     };
 
@@ -149,7 +150,8 @@ export const FieldAdvancedSettings = forwardRef<HTMLDivElement, FieldAdvancedSet
                     <Switch
                       className="bg-background"
                       checked={fieldState.required}
-                      onChange={(e) => handleFieldChange('required', e.target.checked)}
+                      onChange={() => handleToggleChange('required')}
+                      onClick={() => handleToggleChange('required')}
                     />
                   </div>
                   <div className="flex flex-row items-center justify-center gap-2">
@@ -157,10 +159,8 @@ export const FieldAdvancedSettings = forwardRef<HTMLDivElement, FieldAdvancedSet
                     <Switch
                       className="bg-background"
                       checked={fieldState.readOnly}
-                      onClick={(e) => {
-                        console.log('clicked');
-                        handleBooleanChange(e.target.checked);
-                      }}
+                      onChange={() => handleToggleChange('readOnly')}
+                      onClick={() => handleToggleChange('readOnly')}
                     />
                   </div>
                 </div>
@@ -174,7 +174,8 @@ export const FieldAdvancedSettings = forwardRef<HTMLDivElement, FieldAdvancedSet
             goBackLabel="Cancel"
             onGoBackClick={onAdvancedSettings}
             onGoNextClick={() => {
-              console.log('Save');
+              onAdvancedSettings?.();
+              onSave && onSave(fieldState);
             }}
           />
         </DocumentFlowFormContainerFooter>

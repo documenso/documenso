@@ -99,6 +99,7 @@ export const AddFieldsFormPartial = ({
     control,
     handleSubmit,
     formState: { isSubmitting },
+    getValues,
   } = useForm<TAddFieldsFormSchema>({
     defaultValues: {
       fields: fields.map((field) => ({
@@ -374,6 +375,7 @@ export const AddFieldsFormPartial = ({
           onAdvancedSettings={handleAdvancedSettings}
           isDocumentPdfLoaded={isDocumentPdfLoaded}
           ref={settingsRef}
+          onSave={handleSavedFieldSettings}
         />
       ) : (
         <>
