@@ -91,7 +91,17 @@ export const DocumentReadOnlyFields = ({ documentMeta, fields }: DocumentReadOnl
                     ),
                   )
                   .with(
-                    { type: P.union(FieldType.NAME, FieldType.TEXT, FieldType.EMAIL) },
+                    {
+                      type: P.union(
+                        FieldType.NAME,
+                        FieldType.TEXT,
+                        FieldType.EMAIL,
+                        FieldType.NUMBER,
+                        FieldType.RADIO,
+                        FieldType.CHECKBOX,
+                        FieldType.DROPDOWN,
+                      ),
+                    },
                     () => field.customText,
                   )
                   .with({ type: FieldType.DATE }, () =>

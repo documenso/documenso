@@ -79,6 +79,24 @@ export const signFieldWithToken = async ({
     throw new Error(`Field ${fieldId} has no recipientId`);
   }
 
+  if (field.type === FieldType.NUMBER) {
+    if (isNaN(Number(value))) {
+      throw new Error(`Value ${value} is not a number`);
+    }
+
+    if (
+      typeof field.fieldMeta === 'object' &&
+      !Array.isArray(field.fieldMeta) &&
+      field.fieldMeta?.characterLimit &&
+      typeof field.fieldMeta?.characterLimit === 'number' &&
+      value.length > field.fieldMeta.characterLimit
+    ) {
+      throw new Error(
+        `Value ${value} exceeds the character limit of ${field.fieldMeta.characterLimit}`,
+      );
+    }
+  }
+
   let { derivedRecipientActionAuth } = extractDocumentAuthMethods({
     documentAuth: document.authOptions,
     recipientAuth: recipient.authOptions,
@@ -192,6 +210,16 @@ export const signFieldWithToken = async ({
               type,
               data: updatedField.customText,
             }))
+            .with(
+              FieldType.NUMBER,
+              FieldType.RADIO,
+              FieldType.CHECKBOX,
+              FieldType.DROPDOWN,
+              (type) => ({
+                type,
+                data: updatedField.customText,
+              }),
+            )
             .exhaustive(),
           fieldSecurity: derivedRecipientActionAuth
             ? {

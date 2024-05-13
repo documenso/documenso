@@ -35,7 +35,7 @@ export type SignatureFieldProps = {
    */
   onSign?: (documentAuthValue?: TRecipientActionAuth) => Promise<void> | void;
   onRemove?: () => Promise<void> | void;
-  type?: 'Date' | 'Email' | 'Name' | 'Signature';
+  type?: 'Date' | 'Email' | 'Name' | 'Signature' | 'Radio' | 'Dropdown' | 'Number' | 'Checkbox';
   tooltipText?: string | null;
 };
 

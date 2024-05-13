@@ -98,6 +98,8 @@ export const SinglePlayerClient = () => {
         height: new Prisma.Decimal(field.pageHeight),
         customText: '',
         inserted: false,
+        // TODO: Fix this
+        fieldMeta: {},
       })),
     );
 

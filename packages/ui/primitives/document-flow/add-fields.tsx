@@ -357,7 +357,6 @@ export const AddFieldsFormPartial = ({
         />
       ) : (
         <>
-          {' '}
           <DocumentFlowFormContainerHeader
             title={documentFlow.title}
             description={documentFlow.description}
@@ -401,7 +400,6 @@ export const AddFieldsFormPartial = ({
                     onMove={(options) => onFieldMove(options, index)}
                     onRemove={() => remove(index)}
                     onAdvancedSettings={() => {
-                      handleAdvancedSettings();
                       setCurrentField({
                         nativeId: field.nativeId,
                         formId: field.formId,
@@ -413,6 +411,7 @@ export const AddFieldsFormPartial = ({
                         pageHeight: field.pageHeight,
                         signerEmail: field.signerEmail,
                       });
+                      handleAdvancedSettings();
                     }}
                   />
                 ))}

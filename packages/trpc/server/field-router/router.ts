@@ -136,7 +136,7 @@ export const fieldRouter = router({
     }
   }),
 
-  updateRadioField: authenticatedProcedure
+  updateField: authenticatedProcedure
     .input(ZUpdateFieldMutationSchema)
     .mutation(async ({ input, ctx }) => {
       try {

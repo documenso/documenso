@@ -70,5 +70,12 @@ export type TGetFieldQuerySchema = z.infer<typeof ZGetFieldQuerySchema>;
 export const ZUpdateFieldMutationSchema = z.object({
   fieldId: z.number(),
   documentId: z.number(),
-  meta: z.any(),
+  meta: z.object({
+    label: z.string(),
+    placeholder: z.string(),
+    format: z.string(),
+    characterLimit: z.string(),
+    required: z.boolean(),
+    readOnly: z.boolean(),
+  }),
 });

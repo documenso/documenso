@@ -5,6 +5,7 @@ import { useParams } from 'next/navigation';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 
+import { FieldType } from '@documenso/prisma/client';
 import { trpc } from '@documenso/trpc/react';
 import {
   Select,
@@ -37,6 +38,15 @@ export type FieldAdvancedSettingsProps = {
   isDocumentPdfLoaded: boolean;
 };
 
+export type FieldMeta = {
+  label?: string;
+  placeholder?: string;
+  format?: string;
+  characterLimit?: string;
+  required?: boolean;
+  readOnly?: boolean;
+};
+
 // TODO: Remove hardcoded values and refactor
 const listValues = [
   {
@@ -58,31 +68,34 @@ export const FieldAdvancedSettings = ({
   isDocumentPdfLoaded,
 }: FieldAdvancedSettingsProps) => {
   const params = useParams();
-  const documentId = params.id;
+  const documentId = params?.id;
+  const numberField = field.type === FieldType.NUMBER;
 
   const { data } = trpc.field.getField.useQuery({
     fieldId: field.nativeId || 0,
     documentId: Number(documentId),
   });
 
-  const { mutateAsync: updateRadioField } = trpc.field.updateRadioField.useMutation();
+  const { mutateAsync: updateField } = trpc.field.updateField.useMutation();
+
+  const fieldMeta = data?.fieldMeta as FieldMeta;
 
   const form = useForm<TNumberAdvancedSettingsFormSchema>({
     resolver: zodResolver(ZNumberAdvancedSettingsFormSchema),
     defaultValues: {
       // TODO: Fix this to get rid of the error "Property 'placeholder' does not exist on type 'string | number | boolean | JsonObject | JsonArray'"
-      label: data?.fieldMeta?.label ?? '',
-      placeholder: data?.fieldMeta?.placeholder ?? '',
-      format: data?.fieldMeta?.format ?? '',
-      characterLimit: data?.fieldMeta?.characterLimit ?? '',
-      required: data?.fieldMeta?.required ?? false,
-      readOnly: data?.fieldMeta?.readOnly ?? false,
+      label: fieldMeta.label ?? '',
+      placeholder: fieldMeta.placeholder ?? '',
+      format: fieldMeta.format ?? '',
+      characterLimit: fieldMeta.characterLimit ?? '',
+      required: fieldMeta.required ?? false,
+      readOnly: fieldMeta.readOnly ?? false,
     },
   });
 
   const onSubmit = form.handleSubmit(async (data) => {
     try {
-      await updateRadioField({
+      await updateField({
         fieldId: field.nativeId || 0,
         documentId: Number(documentId),
         meta: data,
@@ -147,89 +160,89 @@ export const FieldAdvancedSettings = ({
                 )}
               />
 
-              <FormField
-                control={form.control}
-                name="format"
-                render={({ field }) => (
-                  <FormItem className="flex flex-col">
-                    <FormLabel htmlFor="format">Format</FormLabel>
-                    <FormControl>
-                      <Select {...field} onValueChange={field.onChange}>
-                        <SelectTrigger className="text-muted-foreground w-full">
-                          <SelectValue placeholder="Field format" />
-                        </SelectTrigger>
-
-                        <SelectContent position="popper">
-                          {listValues.map((item, index) => (
-                            <SelectItem key={index} value={item.value}>
-                              {item.label}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="characterLimit"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel htmlFor="characterLimit">Character Limit</FormLabel>
-                    <FormControl>
-                      <Input
-                        id="characterLimit"
-                        className="bg-background mt-2"
-                        disabled={form.formState.isSubmitting}
-                        placeholder="Field character limit"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <div className="flex flex-row items-center gap-12">
-                <FormField
-                  control={form.control}
-                  name="required"
-                  render={({ field }) => (
-                    <FormItem className="flex flex-row items-center gap-2">
-                      <FormLabel className="mt-2">Required field?</FormLabel>
-                      <FormControl>
-                        <Switch
-                          className="bg-background"
-                          checked={field.value}
-                          onCheckedChange={field.onChange}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="readOnly"
-                  render={({ field }) => (
-                    <FormItem className="flex flex-row items-center gap-2">
-                      <FormLabel className="mt-2">Read only?</FormLabel>
-                      <FormControl>
-                        <Switch
-                          className="bg-background"
-                          checked={field.value}
-                          onCheckedChange={field.onChange}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
+              {numberField && (
+                <>
+                  <FormField
+                    control={form.control}
+                    name="format"
+                    render={({ field }) => (
+                      <FormItem className="flex flex-col">
+                        <FormLabel htmlFor="format">Format</FormLabel>
+                        <FormControl>
+                          <Select {...field} onValueChange={field.onChange}>
+                            <SelectTrigger className="text-muted-foreground w-full">
+                              <SelectValue placeholder="Field format" />
+                            </SelectTrigger>
+                            <SelectContent position="popper">
+                              {listValues.map((item, index) => (
+                                <SelectItem key={index} value={item.value}>
+                                  {item.label}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="characterLimit"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel htmlFor="characterLimit">Character Limit</FormLabel>
+                        <FormControl>
+                          <Input
+                            id="characterLimit"
+                            className="bg-background mt-2"
+                            disabled={form.formState.isSubmitting}
+                            placeholder="Field character limit"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <div className="flex flex-row items-center gap-12">
+                    <FormField
+                      control={form.control}
+                      name="required"
+                      render={({ field }) => (
+                        <FormItem className="flex flex-row items-center gap-2">
+                          <FormLabel className="mt-2">Required field?</FormLabel>
+                          <FormControl>
+                            <Switch
+                              className="bg-background"
+                              checked={field.value}
+                              onCheckedChange={field.onChange}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="readOnly"
+                      render={({ field }) => (
+                        <FormItem className="flex flex-row items-center gap-2">
+                          <FormLabel className="mt-2">Read only?</FormLabel>
+                          <FormControl>
+                            <Switch
+                              className="bg-background"
+                              checked={field.value}
+                              onCheckedChange={field.onChange}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                </>
+              )}
             </div>
           </Form>
         </div>
