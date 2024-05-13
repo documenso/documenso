@@ -68,16 +68,17 @@ export default function WebhookPage({ params }: WebhookPageOptions) {
       });
 
       toast({
-        title: 'Webhook updated',
-        description: 'The webhook has been updated successfully.',
+        title: 'ვებჰუკი განახლებულია',
+        description: 'ვებჰუკი წარმატებით განახლდა.',
         duration: 5000,
       });
 
       router.refresh();
     } catch (err) {
       toast({
-        title: 'Failed to update webhook',
-        description: 'We encountered an error while updating the webhook. Please try again later.',
+        title: 'ვებჰუკის განახლება ვერ მოხერხდა',
+        description:
+          'ვებჰუკის განახლებისას დაფიქსირდა ხარვეზი. Გთხოვთ სცადოთ მოგვიანებით ან დაგვიკავშირდით.',
         variant: 'destructive',
       });
     }
@@ -86,8 +87,8 @@ export default function WebhookPage({ params }: WebhookPageOptions) {
   return (
     <div>
       <SettingsHeader
-        title="Edit webhook"
-        subtitle="On this page, you can edit the webhook and its settings."
+        title="ვებჰუკის რედაქტირება"
+        subtitle="ამ გვერდზე შეგიძლიათ შეცვალოთ ვებჰუკი და მისი პარამეტრები."
       />
 
       {isLoading && (
@@ -108,7 +109,7 @@ export default function WebhookPage({ params }: WebhookPageOptions) {
                 name="webhookUrl"
                 render={({ field }) => (
                   <FormItem className="flex-1">
-                    <FormLabel required>Webhook URL</FormLabel>
+                    <FormLabel required>ვებჰუკის ბმული</FormLabel>
                     <FormControl>
                       <Input className="bg-background" {...field} />
                     </FormControl>
@@ -127,7 +128,7 @@ export default function WebhookPage({ params }: WebhookPageOptions) {
                 name="enabled"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Enabled</FormLabel>
+                    <FormLabel>გააქტიურებული</FormLabel>
 
                     <div>
                       <FormControl>

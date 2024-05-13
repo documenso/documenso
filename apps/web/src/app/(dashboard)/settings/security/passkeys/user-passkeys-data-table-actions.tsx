@@ -62,14 +62,13 @@ export const UserPasskeysDataTableActions = ({
       onSuccess: () => {
         toast({
           title: 'Success',
-          description: 'Passkey has been updated',
+          description: 'Passkey განახლებულია',
         });
       },
       onError: () => {
         toast({
-          title: 'Something went wrong',
-          description:
-            'We are unable to update this passkey at the moment. Please try again later.',
+          title: 'დაფიქსირდა ხარვეზი',
+          description: 'ჩვენ ვერ ვახერხებთ ამ Passkey განახლებას. Გთხოვთ სცადოთ მოგვიანებით.',
           duration: 10000,
           variant: 'destructive',
         });
@@ -81,14 +80,13 @@ export const UserPasskeysDataTableActions = ({
       onSuccess: () => {
         toast({
           title: 'Success',
-          description: 'Passkey has been removed',
+          description: 'Passkey წაიშალა',
         });
       },
       onError: () => {
         toast({
-          title: 'Something went wrong',
-          description:
-            'We are unable to remove this passkey at the moment. Please try again later.',
+          title: 'დაფიქსირდა ხარვეზი',
+          description: 'Passkey წაშლა ვერ მოხერხდა. Გთხოვთ სცადოთ მოგვიანებით.',
           duration: 10000,
           variant: 'destructive',
         });
@@ -102,15 +100,15 @@ export const UserPasskeysDataTableActions = ({
         onOpenChange={(value) => !isUpdatingPasskey && setIsUpdateDialogOpen(value)}
       >
         <DialogTrigger onClick={(e) => e.stopPropagation()} asChild>
-          <Button variant="outline">Edit</Button>
+          <Button variant="outline">რედაქტირება</Button>
         </DialogTrigger>
 
         <DialogContent position="center">
           <DialogHeader>
-            <DialogTitle>Update passkey</DialogTitle>
+            <DialogTitle>განაახლეთ passkey</DialogTitle>
 
             <DialogDescription className="mt-4">
-              You are currently updating the <strong>{passkeyName}</strong> passkey.
+              თქვენ ახლა ანახლებთ <strong>{passkeyName}</strong> passkey.
             </DialogDescription>
           </DialogHeader>
 
@@ -129,7 +127,7 @@ export const UserPasskeysDataTableActions = ({
                   name="name"
                   render={({ field }) => (
                     <FormItem className="w-full">
-                      <FormLabel required>Name</FormLabel>
+                      <FormLabel required>სახელი</FormLabel>
                       <FormControl>
                         <Input {...field} />
                       </FormControl>
@@ -141,12 +139,12 @@ export const UserPasskeysDataTableActions = ({
                 <DialogFooter className="mt-4">
                   <DialogClose asChild>
                     <Button type="button" variant="secondary">
-                      Cancel
+                      გაუქმება
                     </Button>
                   </DialogClose>
 
                   <Button type="submit" loading={isUpdatingPasskey}>
-                    Update
+                    განალება
                   </Button>
                 </DialogFooter>
               </fieldset>
@@ -160,15 +158,15 @@ export const UserPasskeysDataTableActions = ({
         onOpenChange={(value) => !isDeletingPasskey && setIsDeleteDialogOpen(value)}
       >
         <DialogTrigger onClick={(e) => e.stopPropagation()} asChild={true}>
-          <Button variant="destructive">Delete</Button>
+          <Button variant="destructive">წაშლა</Button>
         </DialogTrigger>
 
         <DialogContent position="center">
           <DialogHeader>
-            <DialogTitle>Delete passkey</DialogTitle>
+            <DialogTitle>passkey წაშლა</DialogTitle>
 
             <DialogDescription className="mt-4">
-              Are you sure you want to remove the <strong>{passkeyName}</strong> passkey.
+              დარწმუნებული ხართ, რომ გსურთ წაშალოთ <strong>{passkeyName}</strong> passkey?
             </DialogDescription>
           </DialogHeader>
 
@@ -176,7 +174,7 @@ export const UserPasskeysDataTableActions = ({
             <DialogFooter>
               <DialogClose asChild>
                 <Button type="button" variant="secondary">
-                  Cancel
+                  გაუქმება
                 </Button>
               </DialogClose>
 
@@ -189,7 +187,7 @@ export const UserPasskeysDataTableActions = ({
                 variant="destructive"
                 loading={isDeletingPasskey}
               >
-                Delete
+                წაშლა
               </Button>
             </DialogFooter>
           </fieldset>

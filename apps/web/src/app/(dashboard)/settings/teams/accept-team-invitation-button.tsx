@@ -18,17 +18,17 @@ export const AcceptTeamInvitationButton = ({ teamId }: AcceptTeamInvitationButto
   } = trpc.team.acceptTeamInvitation.useMutation({
     onSuccess: () => {
       toast({
-        title: 'Success',
+        title: 'გილოცავთ!',
         description: 'Accepted team invitation',
         duration: 5000,
       });
     },
     onError: () => {
       toast({
-        title: 'Something went wrong',
+        title: 'დაფიქსირდა ხარვეზი',
         variant: 'destructive',
         duration: 10000,
-        description: 'Unable to join this team at this time.',
+        description: 'ამ დროისთვის ამ გუნდში შესვლა ვერ მოხერხდა.',
       });
     },
   });

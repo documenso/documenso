@@ -27,7 +27,7 @@ export const ClaimProfileAlertDialog = ({ className, user }: ClaimProfileAlertDi
         variant="neutral"
       >
         <div>
-          <AlertTitle>{user.url ? 'Update your profile' : 'Claim your profile'}</AlertTitle>
+          <AlertTitle>{user.url ? 'განაახლეთ პროფილი' : 'Claim your profile'}</AlertTitle>
           <AlertDescription className="mr-2">
             {user.url
               ? 'Profiles are coming soon! Update your profile username to reserve your corner of the signing revolution.'

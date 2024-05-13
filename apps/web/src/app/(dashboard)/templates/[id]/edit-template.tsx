@@ -58,6 +58,10 @@ export const EditTemplateForm = ({
       title: 'Add Fields',
       description: 'Add all relevant fields for each recipient.',
       stepIndex: 2,
+      stepIndex: 3,
+      title: 'ველების დამატება',
+      description: 'დაამატეთ ყველა შესაბამისი ველი თითოეული მიმღებისთვის.',
+      stepIndex: 2,
     },
   };
 
@@ -80,8 +84,8 @@ export const EditTemplateForm = ({
       setStep('fields');
     } catch (err) {
       toast({
-        title: 'Error',
-        description: 'An error occurred while adding signers.',
+        title: 'ხარვეზი',
+        description: 'ხელმომწერების დამატებისას დაფიქსირდა ხარვეზი.',
         variant: 'destructive',
       });
     }
@@ -95,16 +99,16 @@ export const EditTemplateForm = ({
       });
 
       toast({
-        title: 'Template saved',
-        description: 'Your templates has been saved successfully.',
+        title: 'შაბლონი შენახულია',
+        description: 'თქვენი შაბლონები წარმატებით იქნა შენახული.',
         duration: 5000,
       });
 
       router.push(templateRootPath);
     } catch (err) {
       toast({
-        title: 'Error',
-        description: 'An error occurred while adding signers.',
+        title: 'ხარვეზი',
+        description: 'ხელმომწერების დამატებისას დაფიქსირდა ხარვეზი.',
         variant: 'destructive',
       });
     }

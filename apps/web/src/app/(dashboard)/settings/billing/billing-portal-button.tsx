@@ -33,15 +33,15 @@ export const BillingPortalButton = ({ buttonProps }: BillingPortalButtonProps) =
       window.open(sessionUrl, '_blank');
     } catch (e) {
       let description =
-        'We are unable to proceed to the billing portal at this time. Please try again, or contact support.';
+        'ამჯერად გადახდის პორტალზე გადასვლა ვერ მოხერხდა. გთხოვთ, სცადოთ ხელახლა ან დაგვიკავშირდეთ.';
 
       if (e.message === 'CUSTOMER_NOT_FOUND') {
         description =
-          'You do not currently have a customer record, this should not happen. Please contact support for assistance.';
+          'ამჟამად არ გაქვთ მომხმარებლის ჩანაწერი, ეს არ უნდა მოხდეს. გთხოვთ დაგვიკავშირდეთ.';
       }
 
       toast({
-        title: 'Something went wrong',
+        title: 'დაფიქსირდა ხარვეზი',
         description,
         variant: 'destructive',
         duration: 10000,

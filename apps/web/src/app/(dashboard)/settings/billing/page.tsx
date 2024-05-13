@@ -66,12 +66,12 @@ export default async function BillingSettingsPage() {
 
   return (
     <div>
-      <h3 className="text-2xl font-semibold">Billing</h3>
+      <h3 className="text-2xl font-semibold">პაკეტები</h3>
 
       <div className="text-muted-foreground mt-2 text-sm">
         {isMissingOrInactiveOrFreePlan && (
           <p>
-            You are currently on the <span className="font-semibold">Free Plan</span>.
+            თქვენ ამჟამად გაქვთ<span className="font-semibold">უფასო პაკეტი</span>.
           </p>
         )}
 
@@ -81,25 +81,25 @@ export default async function BillingSettingsPage() {
               <p>
                 {subscriptionProduct ? (
                   <span>
-                    You are currently subscribed to{' '}
+                    თქვენ ამჟამად გაქვთ{' '}
                     <span className="font-semibold">{subscriptionProduct.name}</span>
                   </span>
                 ) : (
-                  <span>You currently have an active plan</span>
+                  <span>თქვენი პაკეტი გააქტიურებულია</span>
                 )}
 
                 {subscription.periodEnd && (
                   <span>
                     {' '}
-                    which is set to{' '}
+                    გააქტიურებულია{' '}
                     {subscription.cancelAtPeriodEnd ? (
                       <span>
-                        end on{' '}
+                        მთავრდება{' '}
                         <LocaleDate className="font-semibold" date={subscription.periodEnd} />.
                       </span>
                     ) : (
                       <span>
-                        automatically renew on{' '}
+                        ავტომატური განახლება{' '}
                         <LocaleDate className="font-semibold" date={subscription.periodEnd} />.
                       </span>
                     )}
@@ -108,7 +108,7 @@ export default async function BillingSettingsPage() {
               </p>
             ))
             .with('PAST_DUE', () => (
-              <p>Your current plan is past due. Please update your payment information.</p>
+              <p>თქვენს მიმდინარე პაკეტს ვადა გაუვიდა. Please update your payment information.</p>
             ))
             .otherwise(() => null)}
       </div>

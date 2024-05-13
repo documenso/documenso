@@ -22,10 +22,10 @@ const INTERVALS: Interval[] = ['day', 'week', 'month', 'year'];
 const isInterval = (value: unknown): value is Interval => INTERVALS.includes(value as Interval);
 
 const FRIENDLY_INTERVALS: Record<Interval, string> = {
-  day: 'Daily',
-  week: 'Weekly',
-  month: 'Monthly',
-  year: 'Yearly',
+  day: 'დღიური',
+  week: 'კვირეული',
+  month: 'თვიური',
+  year: 'წლიური',
 };
 
 const MotionCard = motion(Card);
@@ -49,14 +49,14 @@ export const BillingPlans = ({ prices }: BillingPlansProps) => {
       const url = await createCheckout({ priceId });
 
       if (!url) {
-        throw new Error('Unable to create session');
+        throw new Error('სამწუხაროდ სესიის დაწყება ვერ მოხერხდა');
       }
 
       window.open(url);
     } catch (_err) {
       toast({
-        title: 'Something went wrong',
-        description: 'An error occurred while trying to create a checkout session.',
+        title: 'დაფიქსირდა ხარვეზი',
+        description: 'დაფიქსირდა ხარვეზი გადახდის სესიის დროს.',
         variant: 'destructive',
       });
     } finally {
@@ -93,7 +93,7 @@ export const BillingPlans = ({ prices }: BillingPlansProps) => {
 
                 <div className="text-muted-foreground mt-2 text-lg font-medium">
                   ${toHumanPrice(price.unit_amount ?? 0)} {price.currency.toUpperCase()}{' '}
-                  <span className="text-xs">per {interval}</span>
+                  <span className="text-xs">ყოველ {interval}</span>
                 </div>
 
                 <div className="text-muted-foreground mt-1.5 text-sm">
@@ -102,7 +102,7 @@ export const BillingPlans = ({ prices }: BillingPlansProps) => {
 
                 {price.product.features && price.product.features.length > 0 && (
                   <div className="text-muted-foreground mt-4">
-                    <div className="text-sm font-medium">Includes:</div>
+                    <div className="text-sm font-medium">მოიცავს:</div>
 
                     <ul className="mt-1 divide-y text-sm">
                       {price.product.features.map((feature, index) => (
@@ -121,7 +121,7 @@ export const BillingPlans = ({ prices }: BillingPlansProps) => {
                   loading={isFetchingCheckoutSession}
                   onClick={() => void onSubscribeClick(price.id)}
                 >
-                  Subscribe
+                  გამოიწერეთ
                 </Button>
               </CardContent>
             </MotionCard>

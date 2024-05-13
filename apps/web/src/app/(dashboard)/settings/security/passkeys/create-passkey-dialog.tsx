@@ -81,7 +81,7 @@ export const CreatePasskeyDialog = ({ trigger, onSuccess, ...props }: CreatePass
       });
 
       toast({
-        description: 'Successfully created passkey',
+        description: 'წარმატებით შეიქმნა passkey',
         duration: 5000,
       });
 
@@ -140,17 +140,18 @@ export const CreatePasskeyDialog = ({ trigger, onSuccess, ...props }: CreatePass
         {trigger ?? (
           <Button variant="secondary" loading={isLoading}>
             <KeyRoundIcon className="-ml-1 mr-1 h-5 w-5" />
-            Add passkey
+            დაამატე passkey
           </Button>
         )}
       </DialogTrigger>
 
       <DialogContent position="center">
         <DialogHeader>
-          <DialogTitle>Add passkey</DialogTitle>
+          <DialogTitle>დაამატე passkey</DialogTitle>
 
           <DialogDescription className="mt-4">
-            Passkeys allow you to sign in and authenticate using biometrics, password managers, etc.
+            Passkey გაძლევთ საშუალებას შეხვიდეთ და დაადასტუროთ ბიომეტრიის, პაროლის მენეჯერების და
+            ა.შ.{' '}
           </DialogDescription>
         </DialogHeader>
 
@@ -165,7 +166,7 @@ export const CreatePasskeyDialog = ({ trigger, onSuccess, ...props }: CreatePass
                 name="passkeyName"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel required>Passkey name</FormLabel>
+                    <FormLabel required>Passkey სახელი</FormLabel>
                     <FormControl>
                       <Input className="bg-background" placeholder="eg. Mac" {...field} />
                     </FormControl>
@@ -176,13 +177,13 @@ export const CreatePasskeyDialog = ({ trigger, onSuccess, ...props }: CreatePass
 
               <Alert variant="neutral">
                 <AlertDescription>
-                  When you click continue, you will be prompted to add the first available
-                  authenticator on your system.
+                  როდესაც დააჭირეთ გაგრძელებას, გთხოვთ დაამატოთ პირველი ხელმისაწვდომი
+                  ავთენტიფიკატორი თქვენს სისტემაში.
                 </AlertDescription>
 
                 <AlertDescription className="mt-2">
-                  If you do not want to use the authenticator prompted, you can close it, which will
-                  then display the next available authenticator.
+                  თუ არ გსურთ მოთხოვნილი ავთენტიფიკატორის გამოყენება, შეგიძლიათ დახუროთ ის, რაც
+                  შემდეგ გამოჩენს შემდეგ ხელმისაწვდომ ავთენტიფიკატორს.
                 </AlertDescription>
               </Alert>
 
@@ -190,22 +191,22 @@ export const CreatePasskeyDialog = ({ trigger, onSuccess, ...props }: CreatePass
                 <Alert variant="destructive">
                   {match(formError)
                     .with('ERROR_AUTHENTICATOR_PREVIOUSLY_REGISTERED', () => (
-                      <AlertDescription>This passkey has already been registered.</AlertDescription>
+                      <AlertDescription>ეს passkey უკვე დარეგისტრირებულია.</AlertDescription>
                     ))
                     .with('TOO_MANY_PASSKEYS', () => (
                       <AlertDescription>
-                        You cannot have more than {MAXIMUM_PASSKEYS} passkeys.
+                        თქვენ არ შეგიძლიათ გქონდეთ {MAXIMUM_PASSKEYS}-ზე მეტი passkeys.
                       </AlertDescription>
                     ))
                     .with('InvalidStateError', () => (
                       <>
                         <AlertTitle className="text-sm">
-                          Passkey creation cancelled due to one of the following reasons:
+                          passkey შექმნა გაუქმდა ერთ-ერთი შემდეგი მიზეზის გამო:
                         </AlertTitle>
                         <AlertDescription>
                           <ul className="mt-1 list-inside list-disc">
-                            <li>Cancelled by user</li>
-                            <li>Passkey already exists for the provided authenticator</li>
+                            <li>გაუქმდა მომხმარებლის მიერ</li>
+                            <li>Passkey უკვე არსებობს მითითებული ავთენტიფიკატორისთვის</li>
                             <li>Exceeded timeout</li>
                           </ul>
                         </AlertDescription>
@@ -213,7 +214,7 @@ export const CreatePasskeyDialog = ({ trigger, onSuccess, ...props }: CreatePass
                     ))
                     .otherwise(() => (
                       <AlertDescription>
-                        Something went wrong. Please try again or contact support.
+                        დაფიქსირდა ხარვეზი. გთხოვთ სცადოთ თავიდან ან დაგვიკავშირდეთ.
                       </AlertDescription>
                     ))}
                 </Alert>
@@ -221,11 +222,11 @@ export const CreatePasskeyDialog = ({ trigger, onSuccess, ...props }: CreatePass
 
               <DialogFooter>
                 <Button type="button" variant="secondary" onClick={() => setOpen(false)}>
-                  Cancel
+                  გაუქმება
                 </Button>
 
                 <Button type="submit" loading={form.formState.isSubmitting}>
-                  Continue
+                  გაგრძელება
                 </Button>
               </DialogFooter>
             </fieldset>

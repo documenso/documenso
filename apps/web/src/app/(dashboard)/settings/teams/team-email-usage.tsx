@@ -30,18 +30,18 @@ export const TeamEmailUsage = ({ teamEmail }: TeamEmailUsageProps) => {
     trpc.team.deleteTeamEmail.useMutation({
       onSuccess: () => {
         toast({
-          title: 'Success',
-          description: 'You have successfully revoked access.',
+          title: 'გილოცავთ!',
+          description: 'თქვენ წარმატებით გააუქმეთ წვდომა.',
           duration: 5000,
         });
       },
       onError: () => {
         toast({
-          title: 'Something went wrong',
+          title: 'დაფიქსირდა ხარვეზი',
           variant: 'destructive',
           duration: 10000,
           description:
-            'We encountered an unknown error while attempting to revoke access. Please try again or contact support.',
+            'წვდომის გაუქმების მცდელობისას დაფიქსირდა ხარვეზი. გთხოვთ, სცადოთ ხელახლა ან დაგვიკავშირდეთ.',
         });
       },
     });
@@ -49,36 +49,36 @@ export const TeamEmailUsage = ({ teamEmail }: TeamEmailUsageProps) => {
   return (
     <Alert variant="neutral" className="flex flex-row items-center justify-between p-6">
       <div>
-        <AlertTitle className="mb-0">Team Email</AlertTitle>
+        <AlertTitle className="mb-0">გუნდის ელ. ფოსტა</AlertTitle>
         <AlertDescription>
           <p>
-            Your email is currently being used by team{' '}
+            თქვენს ელფოსტას ამჟამად გუნდი იყენებს{' '}
             <span className="font-semibold">{teamEmail.team.name}</span> ({teamEmail.team.url}
             ).
           </p>
 
-          <p className="mt-1">They have permission on your behalf to:</p>
+          <p className="mt-1">მათ აქვთ უფლება თქვენი სახელით:</p>
 
           <ul className="mt-0.5 list-inside list-disc">
-            <li>Display your name and email in documents</li>
-            <li>View all documents sent to your account</li>
+            <li>აჩვენონ თქვენი სახელი და ელ. ფოსტა დოკუმენტებში</li>
+            <li>იხილონ თქვენს ანგარიშზე გამოგზავნილი ყველა დოკუმენტი</li>
           </ul>
         </AlertDescription>
       </div>
 
       <Dialog open={open} onOpenChange={(value) => !isDeletingTeamEmail && setOpen(value)}>
         <DialogTrigger asChild>
-          <Button variant="destructive">Revoke access</Button>
+          <Button variant="destructive">წვდომის გაუქმება</Button>
         </DialogTrigger>
 
         <DialogContent position="center">
           <DialogHeader>
-            <DialogTitle>Are you sure?</DialogTitle>
+            <DialogTitle>Დარწმუნებული ხართ?</DialogTitle>
 
             <DialogDescription className="mt-4">
-              You are about to revoke access for team{' '}
-              <span className="font-semibold">{teamEmail.team.name}</span> ({teamEmail.team.url}) to
-              use your email.
+              თქვენ გააუქმებთ გუნდს წვდომას{' '}
+              <span className="font-semibold">{teamEmail.team.name}</span> ({teamEmail.team.url})
+              თქვენს ელ. ფოსტაზე.
             </DialogDescription>
           </DialogHeader>
 

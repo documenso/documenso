@@ -66,11 +66,11 @@ export const TemplatesDataTable = ({
       {remaining.documents === 0 && (
         <Alert variant="warning" className="mb-4">
           <AlertTriangle className="h-4 w-4" />
-          <AlertTitle>Document Limit Exceeded!</AlertTitle>
+          <AlertTitle>დოკუმენტების ლიმიტი გადაჭარბებულია!</AlertTitle>
           <AlertDescription className="mt-2">
-            You have reached your document limit.{' '}
+            თქვენ მიაღწიეთ დოკუმენტების რაოდენობის ლიმიტს.{' '}
             <Link className="underline underline-offset-4" href="/settings/billing">
-              Upgrade your account to continue!
+              განაახლეთ თქვენი ანგარიში გასაგრძელებლად!
             </Link>
           </AlertDescription>
         </Alert>

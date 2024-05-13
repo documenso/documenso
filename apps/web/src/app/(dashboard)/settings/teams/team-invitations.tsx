@@ -31,14 +31,13 @@ export const TeamInvitations = () => {
               <BellIcon className="mr-4 h-5 w-5 text-blue-800" />
 
               <AlertDescription className="mr-2">
-                You have <strong>{data.length}</strong> pending team invitation
-                {data.length > 1 ? 's' : ''}.
+                თქვენი <strong>{data.length}</strong> გუნდის მოწვევა განხილვის პროცესშია.
               </AlertDescription>
 
               <Dialog>
                 <DialogTrigger asChild>
                   <button className="ml-auto text-sm font-medium text-blue-700 hover:text-blue-600">
-                    View invites
+                    მოწვევების ნახვა
                   </button>
                 </DialogTrigger>
 
@@ -47,7 +46,7 @@ export const TeamInvitations = () => {
                     <DialogTitle>Pending invitations</DialogTitle>
 
                     <DialogDescription className="mt-4">
-                      You have {data.length} pending team invitation{data.length > 1 ? 's' : ''}.
+                      თქვენი {data.length} გუნდის მოწვევა განხილვის პროცესშია.
                     </DialogDescription>
                   </DialogHeader>
 

@@ -24,8 +24,8 @@ export default async function SecuritySettingsPage() {
   return (
     <div>
       <SettingsHeader
-        title="Security"
-        subtitle="Here you can manage your password and security settings."
+        title="უსაფრთხოება"
+        subtitle="აქ შეგიძლიათ მართოთ თქვენი პაროლი და უსაფრთხოების პარამეტრები."
       />
 
       {user.identityProvider === 'DOCUMENSO' && (
@@ -41,13 +41,13 @@ export default async function SecuritySettingsPage() {
         variant="neutral"
       >
         <div className="mb-4 sm:mb-0">
-          <AlertTitle>Two factor authentication</AlertTitle>
+          <AlertTitle>ორ ფაქტორიანი ავთენტიფიკაცია (2FA)</AlertTitle>
 
           <AlertDescription className="mr-4">
-            Add an authenticator to serve as a secondary authentication method{' '}
+            დაამატეთ ავთენტიფიკატორი მეორე ავტორიზაციის მეთოდად{' '}
             {user.identityProvider === 'DOCUMENSO'
-              ? 'when signing in, or when signing documents.'
-              : 'for signing documents.'}
+              ? 'შესვლისას, ან დოკუმენტების ხელმოწერისას.'
+              : 'დოკუმენტების ხელმოწერისას.'}
           </AlertDescription>
         </div>
 
@@ -100,15 +100,15 @@ export default async function SecuritySettingsPage() {
         variant="neutral"
       >
         <div className="mb-4 mr-4 sm:mb-0">
-          <AlertTitle>Recent activity</AlertTitle>
+          <AlertTitle>ბოლო აქტივობა</AlertTitle>
 
           <AlertDescription className="mr-2">
-            View all recent security activity related to your account.
+            თქვენს ანგარიშთან დაკავშირებული უსაფრთხოების ყველა ბოლო აქტივობის ნახვა.
           </AlertDescription>
         </div>
 
         <Button asChild variant="outline" className="bg-background">
-          <Link href="/settings/security/activity">View activity</Link>
+          <Link href="/settings/security/activity">აქტივობის ნახვა</Link>
         </Button>
       </Alert>
     </div>
