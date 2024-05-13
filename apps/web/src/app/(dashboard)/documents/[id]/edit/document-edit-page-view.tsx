@@ -76,7 +76,7 @@ export const DocumentEditPageView = async ({ params, team }: DocumentEditPageVie
 
   return (
     <div className="mx-auto -mt-4 w-full max-w-screen-xl px-4 md:px-8">
-      <Link href={documentRootPath} className="flex items-center text-[#7AC455] hover:opacity-80">
+      <Link href={documentRootPath} className="flex items-center text-[#6414DB] hover:opacity-80">
         <ChevronLeft className="mr-2 inline-block h-5 w-5" />
         Documents
       </Link>

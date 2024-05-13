@@ -7,7 +7,7 @@ import { Cell, Legend, Pie, PieChart, Tooltip } from 'recharts';
 
 import { CAP_TABLE } from './data';
 
-const COLORS = ['#7fd843', '#a2e771', '#c6f2a4'];
+const COLORS = ['#7fd843', '#6414DB', '#c6f2a4'];
 const RADIAN = Math.PI / 180;
 
 export type LabelRenderProps = {

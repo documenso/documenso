@@ -10,16 +10,16 @@ export const TemplateFooter = ({ isDocument = true }: TemplateFooterProps) => {
       {isDocument && (
         <Text className="my-4 text-base text-slate-400">
           This document was sent using{' '}
-          <Link className="text-[#7AC455]" href="https://documen.so/mail-footer">
-            Documenso.
+          <Link className="text-[#6414DB]" href="https://app.businesskitz.com">
+            Businesskitz.
           </Link>
         </Text>
       )}
 
       <Text className="my-8 text-sm text-slate-400">
-        Documenso, Inc.
+        Businesskitz, Inc.
         <br />
-        2261 Market Street, #5211, San Francisco, CA 94114, USA
+        Level 2/310 Edward St, Brisbane City QLD 4000, Australia
       </Text>
     </Section>
   );
