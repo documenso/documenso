@@ -1,6 +1,6 @@
 'use client';
 
-import { forwardRef, useState } from 'react';
+import { forwardRef, useEffect, useState } from 'react';
 
 import { FieldType } from '@documenso/prisma/client';
 import { Label } from '@documenso/ui/primitives/label';
@@ -56,28 +56,39 @@ const listValues = [
 
 export const FieldAdvancedSettings = forwardRef<HTMLDivElement, FieldAdvancedSettingsProps>(
   ({ title, description, field, fields, onAdvancedSettings, isDocumentPdfLoaded, onSave }, ref) => {
-    const [fieldState, setFieldState] = useState({
-      label: '',
-      placeholder: '',
-      format: '',
-      characterLimit: '',
-      required: false,
-      readOnly: false,
+    const localStorageKey = `field_${field.formId}_${field.type}`;
+
+    const [fieldState, setFieldState] = useState(() => {
+      const savedState = localStorage.getItem(localStorageKey);
+      return savedState
+        ? JSON.parse(savedState)
+        : {
+            label: '',
+            placeholder: '',
+            format: '',
+            characterLimit: '',
+            required: false,
+            readOnly: false,
+          };
     });
 
     const handleFieldChange = (key: keyof FieldMeta, value: string) => {
-      setFieldState((prevState) => ({
+      setFieldState((prevState: FieldMeta) => ({
         ...prevState,
         [key]: value,
       }));
     };
 
     const handleToggleChange = (key: keyof FieldMeta) => {
-      setFieldState((prevState) => ({
+      setFieldState((prevState: FieldMeta) => ({
         ...prevState,
         [key]: !prevState[key],
       }));
     };
+
+    useEffect(() => {
+      localStorage.setItem(localStorageKey, JSON.stringify(fieldState));
+    }, [fieldState, localStorageKey]);
 
     const numberField = field.type === FieldType.NUMBER;
 
@@ -85,7 +96,7 @@ export const FieldAdvancedSettings = forwardRef<HTMLDivElement, FieldAdvancedSet
       <div ref={ref} className="flex h-full flex-col">
         <DocumentFlowFormContainerHeader title={title} description={description} />
         <DocumentFlowFormContainerContent>
-          <div className="-mt-5 flex flex-col gap-4">
+          <div className="-mt-4 flex flex-col gap-4">
             {isDocumentPdfLoaded &&
               fields.map((field, index) => (
                 <span key={index} className="opacity-75 active:pointer-events-none">
@@ -175,7 +186,7 @@ export const FieldAdvancedSettings = forwardRef<HTMLDivElement, FieldAdvancedSet
             onGoBackClick={onAdvancedSettings}
             onGoNextClick={() => {
               onAdvancedSettings?.();
-              onSave && onSave(fieldState);
+              onSave?.(fieldState);
             }}
           />
         </DocumentFlowFormContainerFooter>

@@ -27,6 +27,7 @@ import { nanoid } from '@documenso/lib/universal/id';
 import type { Field, Recipient } from '@documenso/prisma/client';
 import { RecipientRole } from '@documenso/prisma/client';
 import { FieldType, SendStatus } from '@documenso/prisma/client';
+import type { FieldMeta } from '@documenso/ui/primitives/document-flow/field-item-advanced-settings';
 
 import { cn } from '../../lib/utils';
 import { Button } from '../button';
@@ -99,6 +100,7 @@ export const AddFieldsFormPartial = ({
     control,
     handleSubmit,
     formState: { isSubmitting },
+    setValue,
     getValues,
   } = useForm<TAddFieldsFormSchema>({
     defaultValues: {
@@ -118,6 +120,15 @@ export const AddFieldsFormPartial = ({
   });
 
   const onFormSubmit = handleSubmit(onSubmit);
+  const handleSavedFieldSettings = (fieldState: FieldMeta) => {
+    const initialValues = getValues();
+
+    const updatedFields = initialValues.fields.map((f) =>
+      f.formId === currentField?.formId ? { ...f, fieldMeta: { ...fieldState } } : f,
+    );
+
+    setValue('fields', updatedFields);
+  };
 
   const {
     append,
