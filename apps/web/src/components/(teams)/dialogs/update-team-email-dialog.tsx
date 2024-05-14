@@ -73,8 +73,8 @@ export const UpdateTeamEmailDialog = ({
       });
 
       toast({
-        title: 'Success',
-        description: 'Team email was updated.',
+        title: 'ელ. ფოსტა განახლებულია',
+        description: 'გუნდის ელ. ფოსტა წარმატებით განახლდა.',
         duration: 5000,
       });
 
@@ -83,10 +83,10 @@ export const UpdateTeamEmailDialog = ({
       setOpen(false);
     } catch (err) {
       toast({
-        title: 'An unknown error occurred',
+        title: 'დაფიქსირდა ხარვეზი',
         variant: 'destructive',
         description:
-          'We encountered an unknown error while attempting update the team email. Please try again later.',
+          'გუნდის ელ. ფოსტის განახლებისას დაფიქსირდა ხარვეზი. გთხოვთ თავიდან სცადოთ ან დაგვიკავშირდეთ.',
       });
     }
   };
@@ -106,17 +106,18 @@ export const UpdateTeamEmailDialog = ({
       <DialogTrigger onClick={(e) => e.stopPropagation()} asChild>
         {trigger ?? (
           <Button variant="outline" className="bg-background">
-            Update team email
+            გუნდის ელ. ფოსტის განახლება
           </Button>
         )}
       </DialogTrigger>
 
       <DialogContent position="center">
         <DialogHeader>
-          <DialogTitle>Update team email</DialogTitle>
+          <DialogTitle>განაახლეთ გუნდის ელ. ფოსტა</DialogTitle>
 
           <DialogDescription className="mt-4">
-            To change the email you must remove and add a new email address.
+            ელ. ფოსტის შესაცვლელად თქვენ უნდა წაშალოთ ახლანდელი და დაამატოთ ახალი ელ. ფოსტის
+            მისამართი.
           </DialogDescription>
         </DialogHeader>
 
@@ -131,7 +132,7 @@ export const UpdateTeamEmailDialog = ({
                 name="name"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel required>Name</FormLabel>
+                    <FormLabel required>სახელი</FormLabel>
                     <FormControl>
                       <Input className="bg-background" placeholder="eg. Legal" {...field} />
                     </FormControl>
@@ -141,7 +142,7 @@ export const UpdateTeamEmailDialog = ({
               />
 
               <FormItem>
-                <FormLabel required>Email</FormLabel>
+                <FormLabel required>ელ. ფოსტა</FormLabel>
                 <FormControl>
                   <Input className="bg-background" value={teamEmail.email} disabled={true} />
                 </FormControl>
@@ -149,11 +150,11 @@ export const UpdateTeamEmailDialog = ({
 
               <DialogFooter>
                 <Button type="button" variant="secondary" onClick={() => setOpen(false)}>
-                  Cancel
+                  დახურვა
                 </Button>
 
                 <Button type="submit" loading={form.formState.isSubmitting}>
-                  Update
+                  განახლება
                 </Button>
               </DialogFooter>
             </fieldset>

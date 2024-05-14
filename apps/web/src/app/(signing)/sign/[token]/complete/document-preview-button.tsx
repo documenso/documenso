@@ -30,7 +30,7 @@ export const DocumentPreviewButton = ({
         {...props}
       >
         <FileSearch className="mr-2 h-5 w-5" strokeWidth={1.7} />
-        View Original Document
+        იხილეთ დოკუმენტის საწყისი ვერსია
       </Button>
 
       <DocumentDialog documentData={documentData} open={showDialog} onOpenChange={setShowDialog} />

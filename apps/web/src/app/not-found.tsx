@@ -12,13 +12,13 @@ export default async function NotFound() {
     <NotFoundPartial>
       {session && (
         <Button className="w-32" asChild>
-          <Link href="/documents">Documents</Link>
+          <Link href="/documents">დოკუმენტები</Link>
         </Button>
       )}
 
       {!session && (
         <Button className="w-32" asChild>
-          <Link href="/signin">Sign In</Link>
+          <Link href="/signin">ავტორიზაცია</Link>
         </Button>
       )}
     </NotFoundPartial>

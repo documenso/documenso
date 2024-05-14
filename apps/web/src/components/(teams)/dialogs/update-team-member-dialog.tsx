@@ -94,7 +94,7 @@ export const UpdateTeamMemberDialog = ({
       setOpen(false);
     } catch {
       toast({
-        title: 'An unknown error occurred',
+        title: 'დაფიქსირდა ხარვეზი',
         variant: 'destructive',
         description:
           'We encountered an unknown error while attempting to update this team member. Please try again later.',
@@ -146,7 +146,7 @@ export const UpdateTeamMemberDialog = ({
                 name="role"
                 render={({ field }) => (
                   <FormItem className="w-full">
-                    <FormLabel required>Role</FormLabel>
+                    <FormLabel required>როლი</FormLabel>
                     <FormControl>
                       <Select {...field} onValueChange={field.onChange}>
                         <SelectTrigger className="text-muted-foreground">
@@ -169,7 +169,7 @@ export const UpdateTeamMemberDialog = ({
 
               <DialogFooter className="mt-4">
                 <Button type="button" variant="secondary" onClick={() => setOpen(false)}>
-                  Cancel
+                  დახურვა
                 </Button>
 
                 <Button type="submit" loading={form.formState.isSubmitting}>

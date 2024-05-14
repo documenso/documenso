@@ -94,7 +94,7 @@ export function UseTemplateDialog({
       });
 
       toast({
-        title: 'Document created',
+        title: 'დოკუმენტი შექმნილია',
         description: 'Your document has been created from the template successfully.',
         duration: 5000,
       });
@@ -102,7 +102,7 @@ export function UseTemplateDialog({
       router.push(`${documentRootPath}/${id}`);
     } catch (err) {
       toast({
-        title: 'Error',
+        title: 'დაფიქსირდა ხარვეზი',
         description: 'An error occurred while creating document from template.',
         variant: 'destructive',
       });
@@ -121,13 +121,16 @@ export function UseTemplateDialog({
       <DialogTrigger asChild>
         <Button className="cursor-pointer">
           <Plus className="-ml-1 mr-2 h-4 w-4" />
-          Use Template
+          შაბლონის გამოყენება
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
-          <DialogTitle>Document Recipients</DialogTitle>
-          <DialogDescription>Add the recipients to create the template with.</DialogDescription>
+          <DialogTitle>დოკუმენტის მიმღებები</DialogTitle>
+          <DialogDescription>
+            Add the recipients to create the template with. (დაამატეთ მიმღებები შაბლონის
+            შესაქმნელად.)
+          </DialogDescription>
         </DialogHeader>
         <div className="flex flex-col space-y-4">
           {formRecipients.map((recipient, index) => (
@@ -138,7 +141,7 @@ export function UseTemplateDialog({
             >
               <div className="flex-1">
                 <Label htmlFor={`recipient-${recipient.id}-email`}>
-                  Email
+                  ელ. ფოსტა
                   <span className="text-destructive ml-1 inline-block font-medium">*</span>
                 </Label>
 
@@ -158,7 +161,7 @@ export function UseTemplateDialog({
               </div>
 
               <div className="flex-1">
-                <Label htmlFor={`recipient-${recipient.id}-name`}>Name</Label>
+                <Label htmlFor={`recipient-${recipient.id}-name`}>სახელი</Label>
 
                 <Controller
                   control={control}
@@ -187,14 +190,14 @@ export function UseTemplateDialog({
                         <SelectItem value={RecipientRole.SIGNER}>
                           <div className="flex items-center">
                             <span className="mr-2">{ROLE_ICONS[RecipientRole.SIGNER]}</span>
-                            Signer
+                            ხელმომწერი
                           </div>
                         </SelectItem>
 
                         <SelectItem value={RecipientRole.CC}>
                           <div className="flex items-center">
                             <span className="mr-2">{ROLE_ICONS[RecipientRole.CC]}</span>
-                            Receives copy
+                            ასლის მიმღები
                           </div>
                         </SelectItem>
 
@@ -228,7 +231,7 @@ export function UseTemplateDialog({
         <DialogFooter className="justify-end">
           <DialogClose asChild>
             <Button type="button" variant="secondary">
-              Close
+              დახურვა
             </Button>
           </DialogClose>
 
@@ -238,7 +241,7 @@ export function UseTemplateDialog({
             disabled={isCreatingDocumentFromTemplate}
             onClick={onCreateDocumentFromTemplate}
           >
-            Create Document
+            დოკუმენტის შექმნა
           </Button>
         </DialogFooter>
       </DialogContent>

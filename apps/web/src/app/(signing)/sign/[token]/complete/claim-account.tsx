@@ -31,7 +31,7 @@ export type ClaimAccountProps = {
 
 export const ZClaimAccountFormSchema = z
   .object({
-    name: z.string().trim().min(1, { message: 'Please enter a valid name.' }),
+    name: z.string().trim().min(1, { message: 'გთხოვთ, შეიყვანოთ სწორი სახელი.' }),
     email: z.string().email().min(1),
     password: ZPasswordSchema,
   })
@@ -41,7 +41,7 @@ export const ZClaimAccountFormSchema = z
       return !password.includes(name) && !password.includes(email.split('@')[0]);
     },
     {
-      message: 'Password should not be common or based on personal information',
+      message: 'პაროლი უნდა იყოს იდენტური და არ უნდა ეფუძნებოდეს პერსონალურ ინფორმაციას',
       path: ['password'],
     },
   );
@@ -71,9 +71,9 @@ export const ClaimAccount = ({ defaultName, defaultEmail }: ClaimAccountProps) =
       router.push(`/unverified-account`);
 
       toast({
-        title: 'Registration Successful',
+        title: 'Rწარმატებული რეგისტრაცია',
         description:
-          'You have successfully registered. Please verify your account by clicking on the link you received in the email.',
+          'თქვენ წარმატებით დარეგისტრირდით. გთხოვთ, გადაამოწმოთ თქვენი ანგარიში ელ. ფოსტაში მიღებულ ბმულზე გადასვლით.',
         duration: 5000,
       });
 
@@ -84,15 +84,15 @@ export const ClaimAccount = ({ defaultName, defaultEmail }: ClaimAccountProps) =
     } catch (error) {
       if (error instanceof TRPCClientError && error.data?.code === 'BAD_REQUEST') {
         toast({
-          title: 'An error occurred',
+          title: 'დაფიქსირდა ხარვეზი',
           description: error.message,
           variant: 'destructive',
         });
       } else {
         toast({
-          title: 'An unknown error occurred',
+          title: 'დაფიქსირდა ხარვეზი',
           description:
-            'We encountered an unknown error while attempting to sign you up. Please try again later.',
+            'დაფიქსირდა ხარვეზი თქვენი დარეგისტრირების მცდელობისას. Გთხოვთ სცადოთ მოგვიანებით ან დაგვიკავშირდით.',
           variant: 'destructive',
         });
       }
@@ -109,7 +109,7 @@ export const ClaimAccount = ({ defaultName, defaultEmail }: ClaimAccountProps) =
               control={form.control}
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Name</FormLabel>
+                  <FormLabel>სახელი</FormLabel>
                   <FormControl>
                     <Input {...field} placeholder="Enter your name" />
                   </FormControl>
@@ -122,7 +122,7 @@ export const ClaimAccount = ({ defaultName, defaultEmail }: ClaimAccountProps) =
               control={form.control}
               render={({ field }) => (
                 <FormItem className="mt-4">
-                  <FormLabel>Email address</FormLabel>
+                  <FormLabel>ელ. ფოსტა</FormLabel>
                   <FormControl>
                     <Input {...field} placeholder="Enter your email" />
                   </FormControl>
@@ -135,7 +135,7 @@ export const ClaimAccount = ({ defaultName, defaultEmail }: ClaimAccountProps) =
               control={form.control}
               render={({ field }) => (
                 <FormItem className="mt-4">
-                  <FormLabel>Set a password</FormLabel>
+                  <FormLabel>დააყენეთ პაროლი</FormLabel>
                   <FormControl>
                     <PasswordInput {...field} placeholder="Pick a password" />
                   </FormControl>

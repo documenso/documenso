@@ -91,7 +91,7 @@ export const TeamBillingInvoicesDataTable = ({ teamId }: TeamBillingInvoicesData
                 disabled={typeof row.original.hostedInvoicePdf !== 'string'}
               >
                 <Link href={row.original.hostedInvoicePdf ?? ''} target="_blank">
-                  View
+                  იხილეთ
                 </Link>
               </Button>
 
@@ -101,7 +101,7 @@ export const TeamBillingInvoicesDataTable = ({ teamId }: TeamBillingInvoicesData
                 disabled={typeof row.original.hostedInvoicePdf !== 'string'}
               >
                 <Link href={row.original.invoicePdf ?? ''} target="_blank">
-                  Download
+                  ჩამოტვირთეთ
                 </Link>
               </Button>
             </div>

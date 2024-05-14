@@ -114,7 +114,7 @@ export const MenuSwitcher = ({ user, teams: initialTeamsData }: MenuSwitcherProp
       >
         {teams ? (
           <>
-            <DropdownMenuLabel>Personal</DropdownMenuLabel>
+            <DropdownMenuLabel>პერსონალური</DropdownMenuLabel>
 
             <DropdownMenuItem asChild>
               <Link href={formatRedirectUrlOnSwitch()}>
@@ -135,7 +135,7 @@ export const MenuSwitcher = ({ user, teams: initialTeamsData }: MenuSwitcherProp
 
             <DropdownMenuLabel>
               <div className="flex flex-row items-center justify-between">
-                <p>Teams</p>
+                <p>გუნდები</p>
 
                 <div className="flex flex-row space-x-2">
                   <DropdownMenuItem asChild>
@@ -192,7 +192,7 @@ export const MenuSwitcher = ({ user, teams: initialTeamsData }: MenuSwitcherProp
               href="/settings/teams?action=add-team"
               className="flex items-center justify-between"
             >
-              Create team
+              გუნდის შექმნა
               <Plus className="ml-2 h-4 w-4" />
             </Link>
           </DropdownMenuItem>
@@ -202,18 +202,18 @@ export const MenuSwitcher = ({ user, teams: initialTeamsData }: MenuSwitcherProp
 
         {isUserAdmin && (
           <DropdownMenuItem className="text-muted-foreground px-4 py-2" asChild>
-            <Link href="/admin">Admin panel</Link>
+            <Link href="/admin">ადმინ პანელი</Link>
           </DropdownMenuItem>
         )}
 
         <DropdownMenuItem className="text-muted-foreground px-4 py-2" asChild>
-          <Link href="/settings/profile">User settings</Link>
+          <Link href="/settings/profile">მომხმარებლის პარამეტრები</Link>
         </DropdownMenuItem>
 
         {selectedTeam &&
           canExecuteTeamAction('MANAGE_TEAM', selectedTeam.currentTeamMember.role) && (
             <DropdownMenuItem className="text-muted-foreground px-4 py-2" asChild>
-              <Link href={`/t/${selectedTeam.url}/settings/`}>Team settings</Link>
+              <Link href={`/t/${selectedTeam.url}/settings/`}>გუნდის პარამეტრები</Link>
             </DropdownMenuItem>
           )}
 
@@ -225,7 +225,7 @@ export const MenuSwitcher = ({ user, teams: initialTeamsData }: MenuSwitcherProp
             })
           }
         >
-          Sign Out
+          ანგარიშიდან გამოსვლა
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

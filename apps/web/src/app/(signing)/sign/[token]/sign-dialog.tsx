@@ -111,7 +111,7 @@ export const SignDialog = ({
                 setShowDialog(false);
               }}
             >
-              Cancel
+              დახურვა
             </Button>
 
             <Button

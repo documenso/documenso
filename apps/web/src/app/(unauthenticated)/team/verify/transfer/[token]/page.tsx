@@ -27,7 +27,7 @@ export default async function VerifyTeamTransferPage({
     return (
       <div className="w-screen max-w-lg px-4">
         <div className="w-full">
-          <h1 className="text-4xl font-semibold">Invalid link</h1>
+          <h1 className="text-4xl font-semibold">არასწორი ბმული</h1>
 
           <p className="text-muted-foreground mb-4 mt-2 text-sm">
             This link is invalid or has expired. Please contact your team to resend a transfer
@@ -35,7 +35,7 @@ export default async function VerifyTeamTransferPage({
           </p>
 
           <Button asChild>
-            <Link href="/">Return</Link>
+            <Link href="/">დაბრუნება</Link>
           </Button>
         </div>
       </div>
@@ -75,7 +75,7 @@ export default async function VerifyTeamTransferPage({
       </p>
 
       <Button asChild>
-        <Link href={`/t/${team.url}/settings`}>Continue</Link>
+        <Link href={`/t/${team.url}/settings`}>გაგრძელება</Link>
       </Button>
     </div>
   );

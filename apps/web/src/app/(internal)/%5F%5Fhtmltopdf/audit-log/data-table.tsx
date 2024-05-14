@@ -38,7 +38,7 @@ export const AuditLogDataTable = ({ logs }: AuditLogDataTableProps) => {
       <TableHeader>
         <TableRow>
           <TableHead>Time</TableHead>
-          <TableHead>User</TableHead>
+          <TableHead>მომხმარებელი</TableHead>
           <TableHead>Action</TableHead>
           <TableHead>IP Address</TableHead>
           <TableHead>Browser</TableHead>

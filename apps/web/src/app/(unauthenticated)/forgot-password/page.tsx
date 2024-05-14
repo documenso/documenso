@@ -11,19 +11,19 @@ export default function ForgotPasswordPage() {
   return (
     <div className="w-screen max-w-lg px-4">
       <div className="w-full">
-        <h1 className="text-3xl font-semibold">Forgot your password?</h1>
+        <h1 className="text-3xl font-semibold">დაგავიწყდათ პაროლი?</h1>
 
         <p className="text-muted-foreground mt-2 text-sm">
-          No worries, it happens! Enter your email and we'll email you a special link to reset your
-          password.
+          არ ინერვიულოთ! შეიყვანეთ თქვენი ელფოსტა და ჩვენ გამოგიგზავნით სპეციალურ ბმულს თქვენი
+          პაროლის აღსადგენად.
         </p>
 
         <ForgotPasswordForm className="mt-4" />
 
         <p className="text-muted-foreground mt-6 text-center text-sm">
-          Remembered your password?{' '}
+          გაგახსენდათ პაროლი?{' '}
           <Link href="/signin" className="text-primary duration-200 hover:opacity-70">
-            Sign In
+            ავტორიზაცია
           </Link>
         </p>
       </div>

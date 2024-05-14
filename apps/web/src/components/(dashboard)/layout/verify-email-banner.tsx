@@ -38,7 +38,7 @@ export const VerifyEmailBanner = ({ email }: VerifyEmailBannerProps) => {
 
       toast({
         title: 'Success',
-        description: 'Verification email sent successfully.',
+        description: 'დამადასტურებელი მეილი წარმატებით გაიგზავნა.',
       });
 
       setIsOpen(false);
@@ -47,8 +47,8 @@ export const VerifyEmailBanner = ({ email }: VerifyEmailBannerProps) => {
       setIsButtonDisabled(false);
 
       toast({
-        title: 'Error',
-        description: 'Something went wrong while sending the confirmation email.',
+        title: 'დაფიქსირდა ხარვეზი',
+        description: 'დამადასტურებელი მეილის გაგზავნისას დაფიქსირდა ხარვეზი.',
         variant: 'destructive',
       });
     }
@@ -81,7 +81,7 @@ export const VerifyEmailBanner = ({ email }: VerifyEmailBannerProps) => {
         <div className="mx-auto flex max-w-screen-xl items-center justify-center gap-x-4 px-4 py-2 text-sm font-medium text-yellow-900">
           <div className="flex items-center">
             <AlertTriangle className="mr-2.5 h-5 w-5" />
-            Verify your email address to unlock all features.
+            დაადასტურეთ თქვენი ელფოსტა, რათა შეძლოთ ყველა ფუნქციის გამოყენება
           </div>
 
           <div>
@@ -100,11 +100,11 @@ export const VerifyEmailBanner = ({ email }: VerifyEmailBannerProps) => {
 
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
         <DialogContent>
-          <DialogTitle>Verify your email address</DialogTitle>
+          <DialogTitle>დაადასტურეთ თქვენი ელ. ფოსტა</DialogTitle>
 
           <DialogDescription>
-            We've sent a confirmation email to <strong>{email}</strong>. Please check your inbox and
-            click the link in the email to verify your account.
+            ჩვენ გამოვაგზავნეთ დამადასტურებელი მეილი <strong>{email}</strong> ელ. ფოსტაზე. გთხოვთ
+            შეამოწმოთ თქვენი ელ. ფოსტა და გადახვიდეთ გამოგზავნილ ბმულზე ანგარიშის დადასტურებისთვის.
           </DialogDescription>
 
           <div>
@@ -113,7 +113,7 @@ export const VerifyEmailBanner = ({ email }: VerifyEmailBannerProps) => {
               loading={isLoading}
               onClick={onResendConfirmationEmail}
             >
-              {isLoading ? 'Sending...' : 'Resend Confirmation Email'}
+              {isLoading ? 'იგზავნება...' : 'თავიდან გამოაგზავნეთ დამადასტურებელი მეილი'}
             </Button>
           </div>
         </DialogContent>

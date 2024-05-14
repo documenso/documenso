@@ -28,7 +28,7 @@ export default function ErrorPage({ error }: ErrorProps) {
       <div>
         <p className="text-muted-foreground font-semibold">{errorMessage}</p>
 
-        <h1 className="mt-3 text-2xl font-bold md:text-3xl">Oops! Something went wrong.</h1>
+        <h1 className="mt-3 text-2xl font-bold md:text-3xl">დაფიქსირდა ხარვეზი.</h1>
 
         <p className="text-muted-foreground mt-4 text-sm">{errorDetails}</p>
 
@@ -41,11 +41,11 @@ export default function ErrorPage({ error }: ErrorProps) {
             }}
           >
             <ChevronLeft className="mr-2 h-4 w-4" />
-            Go Back
+            უკან
           </Button>
 
           <Button asChild>
-            <Link href="/settings/teams">View teams</Link>
+            <Link href="/settings/teams">იხილეთ გუნდები</Link>
           </Button>
         </div>
       </div>

@@ -34,8 +34,8 @@ export const LeaveTeamDialog = ({ trigger, teamId, teamName, role }: LeaveTeamDi
   const { mutateAsync: leaveTeam, isLoading: isLeavingTeam } = trpc.team.leaveTeam.useMutation({
     onSuccess: () => {
       toast({
-        title: 'Success',
-        description: 'You have successfully left this team.',
+        title: 'გუნდიდან გამოსვლა',
+        description: 'თქვენ გუნდი წარმატებით დატოვეთ.',
         duration: 5000,
       });
 
@@ -43,11 +43,11 @@ export const LeaveTeamDialog = ({ trigger, teamId, teamName, role }: LeaveTeamDi
     },
     onError: () => {
       toast({
-        title: 'An unknown error occurred',
+        title: 'დაფიქსირდა  ხარვეზი',
         variant: 'destructive',
         duration: 10000,
         description:
-          'We encountered an unknown error while attempting to leave this team. Please try again later.',
+          'ამ გუნდიდან გასვლისას დაფიქსირდა ხარვეზი. გთხოვთ თავიდან სცადოთ ან დაგვიკავშირდით.',
       });
     },
   });
@@ -55,16 +55,14 @@ export const LeaveTeamDialog = ({ trigger, teamId, teamName, role }: LeaveTeamDi
   return (
     <Dialog open={open} onOpenChange={(value) => !isLeavingTeam && setOpen(value)}>
       <DialogTrigger asChild>
-        {trigger ?? <Button variant="destructive">Leave team</Button>}
+        {trigger ?? <Button variant="destructive">გუნდიდან გამოსვლა</Button>}
       </DialogTrigger>
 
       <DialogContent position="center">
         <DialogHeader>
-          <DialogTitle>Are you sure?</DialogTitle>
+          <DialogTitle>ნამდვილად გსურთ გუნდიდან გამოსვა?</DialogTitle>
 
-          <DialogDescription className="mt-4">
-            You are about to leave the following team.
-          </DialogDescription>
+          <DialogDescription className="mt-4">თქვენ ახლა გუნდიდან გამოხვალთ.</DialogDescription>
         </DialogHeader>
 
         <Alert variant="neutral" padding="tight">
@@ -79,7 +77,7 @@ export const LeaveTeamDialog = ({ trigger, teamId, teamName, role }: LeaveTeamDi
         <fieldset disabled={isLeavingTeam}>
           <DialogFooter>
             <Button type="button" variant="secondary" onClick={() => setOpen(false)}>
-              Cancel
+              დახურვა
             </Button>
 
             <Button
@@ -88,7 +86,7 @@ export const LeaveTeamDialog = ({ trigger, teamId, teamName, role }: LeaveTeamDi
               loading={isLeavingTeam}
               onClick={async () => leaveTeam({ teamId })}
             >
-              Leave
+              გამოსვლა
             </Button>
           </DialogFooter>
         </fieldset>

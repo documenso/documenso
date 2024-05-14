@@ -90,10 +90,10 @@ export default function WebhookPage() {
 
                 <div className="mt-4 flex flex-shrink-0 gap-4 sm:mt-0">
                   <Button asChild variant="outline">
-                    <Link href={`/t/${team.url}/settings/webhooks/${webhook.id}`}>Edit</Link>
+                    <Link href={`/t/${team.url}/settings/webhooks/${webhook.id}`}>რედაქტირება</Link>
                   </Button>
                   <DeleteWebhookDialog webhook={webhook}>
-                    <Button variant="destructive">Delete</Button>
+                    <Button variant="destructive">წაშლა</Button>
                   </DeleteWebhookDialog>
                 </div>
               </div>

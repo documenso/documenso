@@ -73,8 +73,8 @@ export const AddTeamEmailDialog = ({ teamId, trigger, ...props }: AddTeamEmailDi
       });
 
       toast({
-        title: 'Success',
-        description: 'We have sent a confirmation email for verification.',
+        title: 'მეილი გაგზავნილია',
+        description: 'დამატასტურებელი მეილი წარმატებით გაიგზავნა.',
         duration: 5000,
       });
 
@@ -87,17 +87,16 @@ export const AddTeamEmailDialog = ({ teamId, trigger, ...props }: AddTeamEmailDi
       if (error.code === AppErrorCode.ALREADY_EXISTS) {
         form.setError('email', {
           type: 'manual',
-          message: 'This email is already being used by another team.',
+          message: 'ამ ელ. ფოსტას სხვა გუნდი იყენებს.',
         });
 
         return;
       }
 
       toast({
-        title: 'An unknown error occurred',
+        title: 'დაფიქსირდა ხარვეზი',
         variant: 'destructive',
-        description:
-          'We encountered an unknown error while attempting to add this email. Please try again later.',
+        description: 'ამ ელ. ფოსტის დამატებისას დაფიქსირდა ხარვეზი. გთხოვთ თავიდან სცადოთ.',
       });
     }
   };
@@ -118,17 +117,17 @@ export const AddTeamEmailDialog = ({ teamId, trigger, ...props }: AddTeamEmailDi
         {trigger ?? (
           <Button variant="outline" loading={isLoading} className="bg-background">
             <Plus className="-ml-1 mr-1 h-5 w-5" />
-            Add email
+            ელ. ფოსტის დამატება
           </Button>
         )}
       </DialogTrigger>
 
       <DialogContent position="center">
         <DialogHeader>
-          <DialogTitle>Add team email</DialogTitle>
+          <DialogTitle>დაამატეთ გუნდის ელ.ფოსტა</DialogTitle>
 
           <DialogDescription className="mt-4">
-            A verification email will be sent to the provided email.
+            დამადასტურებელი მეილი გაიგზავნება მითითებულ ელფოსტაზე.
           </DialogDescription>
         </DialogHeader>
 
@@ -143,7 +142,7 @@ export const AddTeamEmailDialog = ({ teamId, trigger, ...props }: AddTeamEmailDi
                 name="name"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel required>Name</FormLabel>
+                    <FormLabel required>სახელი</FormLabel>
                     <FormControl>
                       <Input className="bg-background" placeholder="eg. Legal" {...field} />
                     </FormControl>
@@ -157,7 +156,7 @@ export const AddTeamEmailDialog = ({ teamId, trigger, ...props }: AddTeamEmailDi
                 name="email"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel required>Email</FormLabel>
+                    <FormLabel required>ელ. ფოსტა</FormLabel>
                     <FormControl>
                       <Input
                         className="bg-background"
@@ -172,11 +171,11 @@ export const AddTeamEmailDialog = ({ teamId, trigger, ...props }: AddTeamEmailDi
 
               <DialogFooter>
                 <Button type="button" variant="secondary" onClick={() => setOpen(false)}>
-                  Cancel
+                  დახურვა
                 </Button>
 
                 <Button type="submit" loading={form.formState.isSubmitting}>
-                  Add
+                  დამატება
                 </Button>
               </DialogFooter>
             </fieldset>

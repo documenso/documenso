@@ -62,8 +62,8 @@ export const EmailField = ({ field, recipient }: EmailFieldProps) => {
       console.error(err);
 
       toast({
-        title: 'Error',
-        description: 'An error occurred while signing the document.',
+        title: 'დაფიქსირდა ხარვეზი',
+        description: 'დოკუმენტზე ხელმოწერისას დაფიქსირდა ხარვეზი.',
         variant: 'destructive',
       });
     }
@@ -81,8 +81,8 @@ export const EmailField = ({ field, recipient }: EmailFieldProps) => {
       console.error(err);
 
       toast({
-        title: 'Error',
-        description: 'An error occurred while removing the signature.',
+        title: 'დაფიქსირდა ხარვეზი',
+        description: 'ხელმოწერის წაშლისას დაფიქსირდა ხარვეზი.',
         variant: 'destructive',
       });
     }
@@ -97,7 +97,9 @@ export const EmailField = ({ field, recipient }: EmailFieldProps) => {
       )}
 
       {!field.inserted && (
-        <p className="group-hover:text-primary text-muted-foreground text-lg duration-200">Email</p>
+        <p className="group-hover:text-primary text-muted-foreground text-lg duration-200">
+          ელ. ფოსტა
+        </p>
       )}
 
       {field.inserted && <p className="text-muted-foreground duration-200">{field.customText}</p>}

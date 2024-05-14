@@ -31,7 +31,7 @@ export const DesktopNav = ({ className, ...props }: DesktopNavProps) => {
           )}
         >
           <User className="mr-2 h-5 w-5" />
-          Profile
+          პროფილი
         </Button>
       </Link>
 
@@ -44,7 +44,7 @@ export const DesktopNav = ({ className, ...props }: DesktopNavProps) => {
           )}
         >
           <Users className="mr-2 h-5 w-5" />
-          Teams
+          გუნდები
         </Button>
       </Link>
 
@@ -57,7 +57,7 @@ export const DesktopNav = ({ className, ...props }: DesktopNavProps) => {
           )}
         >
           <Lock className="mr-2 h-5 w-5" />
-          Security
+          უსაფრთხოება
         </Button>
       </Link>
 
@@ -70,7 +70,7 @@ export const DesktopNav = ({ className, ...props }: DesktopNavProps) => {
           )}
         >
           <Braces className="mr-2 h-5 w-5" />
-          API Tokens
+          API ტოკენები
         </Button>
       </Link>
 
@@ -83,7 +83,7 @@ export const DesktopNav = ({ className, ...props }: DesktopNavProps) => {
           )}
         >
           <Webhook className="mr-2 h-5 w-5" />
-          Webhooks
+          ვებჰუკები
         </Button>
       </Link>
 

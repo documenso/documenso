@@ -144,18 +144,17 @@ export const InviteTeamMembersDialog = ({
       });
 
       toast({
-        title: 'Success',
-        description: 'Team invitations have been sent.',
+        title: 'მოწვევები გაგზავნილია',
+        description: 'გუნდის მოწვევები წარმატებით გაიგზავნა.',
         duration: 5000,
       });
 
       setOpen(false);
     } catch {
       toast({
-        title: 'An unknown error occurred',
+        title: 'დაფიქსირდა ხარვეზი',
         variant: 'destructive',
-        description:
-          'We encountered an unknown error while attempting to invite team members. Please try again later.',
+        description: 'გუნდის წევრების მოწვევისას დაფიქსირდა ხარვეზი. გთხოვთ თავუდან სცადოთ.',
       });
     }
   };
@@ -204,8 +203,9 @@ export const InviteTeamMembersDialog = ({
 
           toast({
             variant: 'destructive',
-            title: 'Something went wrong',
-            description: 'Please check the CSV file and make sure it is according to our format',
+            title: 'დაფიქსირდა ხარვეზი',
+            description:
+              'გთხოვთ შეამოწმოთ CSV ფაილი და დარწმუნდით, რომ ის ჩვენი ფორმატის მიხედვითაა',
           });
         }
       },
@@ -239,15 +239,15 @@ export const InviteTeamMembersDialog = ({
       onOpenChange={(value) => !form.formState.isSubmitting && setOpen(value)}
     >
       <DialogTrigger onClick={(e) => e.stopPropagation()} asChild>
-        {trigger ?? <Button variant="secondary">Invite member</Button>}
+        {trigger ?? <Button variant="secondary">გუნდის წევრის მოწვევა</Button>}
       </DialogTrigger>
 
       <DialogContent position="center">
         <DialogHeader>
-          <DialogTitle>Invite team members</DialogTitle>
+          <DialogTitle>მოიწვიეთ გუნდის წევრი</DialogTitle>
 
           <DialogDescription className="mt-4">
-            An email containing an invitation will be sent to each member.
+            მოწვევის მეილი გაეგზავნება თითოეულ გუნდის წევრს.
           </DialogDescription>
         </DialogHeader>
 
@@ -260,7 +260,7 @@ export const InviteTeamMembersDialog = ({
           <TabsList className="w-full">
             <TabsTrigger value="INDIVIDUAL" className="hover:text-foreground w-full">
               <MailIcon size={20} className="mr-2" />
-              Invite Members
+              მოიწვიეთ გუნდის წევრები
             </TabsTrigger>
 
             <TabsTrigger value="BULK" className="hover:text-foreground w-full">
@@ -283,7 +283,7 @@ export const InviteTeamMembersDialog = ({
                           name={`invitations.${index}.email`}
                           render={({ field }) => (
                             <FormItem className="w-full">
-                              {index === 0 && <FormLabel required>Email address</FormLabel>}
+                              {index === 0 && <FormLabel required>ელ. ფოსტა</FormLabel>}
                               <FormControl>
                                 <Input className="bg-background" {...field} />
                               </FormControl>
@@ -297,7 +297,7 @@ export const InviteTeamMembersDialog = ({
                           name={`invitations.${index}.role`}
                           render={({ field }) => (
                             <FormItem className="w-full">
-                              {index === 0 && <FormLabel required>Role</FormLabel>}
+                              {index === 0 && <FormLabel required>როლი</FormLabel>}
                               <FormControl>
                                 <Select {...field} onValueChange={field.onChange}>
                                   <SelectTrigger className="text-muted-foreground max-w-[200px]">
@@ -341,17 +341,17 @@ export const InviteTeamMembersDialog = ({
                     onClick={() => onAddTeamMemberInvite()}
                   >
                     <PlusCircle className="mr-2 h-4 w-4" />
-                    Add more
+                    დაამატეთ
                   </Button>
 
                   <DialogFooter>
                     <Button type="button" variant="secondary" onClick={() => setOpen(false)}>
-                      Cancel
+                      დახურვა
                     </Button>
 
                     <Button type="submit" loading={form.formState.isSubmitting}>
                       {!form.formState.isSubmitting && <Mail className="mr-2 h-4 w-4" />}
-                      Invite
+                      მოწვევა
                     </Button>
                   </DialogFooter>
                 </fieldset>
@@ -368,7 +368,7 @@ export const InviteTeamMembersDialog = ({
                 >
                   <Upload className="h-5 w-5" />
 
-                  <p className="mt-1 text-sm">Click here to upload</p>
+                  <p className="mt-1 text-sm">ატვირთისთვის დააკლიკეთ</p>
 
                   <input
                     onChange={onFileInputChange}
@@ -383,7 +383,7 @@ export const InviteTeamMembersDialog = ({
               <DialogFooter>
                 <Button type="button" variant="secondary" onClick={downloadTemplate}>
                   <Download className="mr-2 h-4 w-4" />
-                  Template
+                  შაბლონი
                 </Button>
               </DialogFooter>
             </div>

@@ -63,16 +63,16 @@ export const DeleteTeamMemberDialog = ({
   return (
     <Dialog open={open} onOpenChange={(value) => !isDeletingTeamMember && setOpen(value)}>
       <DialogTrigger asChild>
-        {trigger ?? <Button variant="secondary">Delete team member</Button>}
+        {trigger ?? <Button variant="secondary">წაშალეთ გუნდის წევრი</Button>}
       </DialogTrigger>
 
       <DialogContent position="center">
         <DialogHeader>
-          <DialogTitle>Are you sure?</DialogTitle>
+          <DialogTitle>ნამდვილად გსურთ წაშლა?</DialogTitle>
 
           <DialogDescription className="mt-4">
-            You are about to remove the following user from{' '}
-            <span className="font-semibold">{teamName}</span>.
+            თქვენ შლით შემდეგ მომხმარებელს <span className="font-semibold">{teamName}</span>{' '}
+            გუნდიდან.
           </DialogDescription>
         </DialogHeader>
 
@@ -88,7 +88,7 @@ export const DeleteTeamMemberDialog = ({
         <fieldset disabled={isDeletingTeamMember}>
           <DialogFooter>
             <Button type="button" variant="secondary" onClick={() => setOpen(false)}>
-              Cancel
+              დახურვა
             </Button>
 
             <Button
@@ -97,7 +97,7 @@ export const DeleteTeamMemberDialog = ({
               loading={isDeletingTeamMember}
               onClick={async () => deleteTeamMembers({ teamId, teamMemberIds: [teamMemberId] })}
             >
-              Delete
+              წაშლა
             </Button>
           </DialogFooter>
         </fieldset>

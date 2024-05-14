@@ -15,7 +15,7 @@ export default function ActivityPageBackButton() {
           void router.back();
         }}
       >
-        Back
+        უკან
       </Button>
     </div>
   );

@@ -57,7 +57,7 @@ export default async function AuditLog({ searchParams }: AuditLogProps) {
       <Card>
         <CardContent className="grid grid-cols-2 gap-4 p-6 text-sm print:text-xs">
           <p>
-            <span className="font-medium">Document ID</span>
+            <span className="font-medium">დოკუმენტის ID</span>
 
             <span className="mt-1 block break-words">{document.id}</span>
           </p>
@@ -69,13 +69,13 @@ export default async function AuditLog({ searchParams }: AuditLogProps) {
           </p>
 
           <p>
-            <span className="font-medium">Status</span>
+            <span className="font-medium">სტატუსი</span>
 
             <span className="mt-1 block">{document.deletedAt ? 'DELETED' : document.status}</span>
           </p>
 
           <p>
-            <span className="font-medium">Owner</span>
+            <span className="font-medium">მფლობელი</span>
 
             <span className="mt-1 block break-words">
               {document.User.name} ({document.User.email})

@@ -102,8 +102,8 @@ export const NameField = ({ field, recipient }: NameFieldProps) => {
       console.error(err);
 
       toast({
-        title: 'Error',
-        description: 'An error occurred while signing the document.',
+        title: 'დაფიქსირდა ხარვეზი',
+        description: 'დოკუმენტზე ხელმოწერისას დაფიქსირდა ხარვეზი.',
         variant: 'destructive',
       });
     }
@@ -121,8 +121,8 @@ export const NameField = ({ field, recipient }: NameFieldProps) => {
       console.error(err);
 
       toast({
-        title: 'Error',
-        description: 'An error occurred while removing the signature.',
+        title: 'დაფიქსირდა ხარვეზი',
+        description: 'ხელმოწერის წაშლისას დაფიქსირდა ხარვეზი.',
         variant: 'destructive',
       });
     }
@@ -143,7 +143,9 @@ export const NameField = ({ field, recipient }: NameFieldProps) => {
       )}
 
       {!field.inserted && (
-        <p className="group-hover:text-primary text-muted-foreground text-lg duration-200">Name</p>
+        <p className="group-hover:text-primary text-muted-foreground text-lg duration-200">
+          სახელი
+        </p>
       )}
 
       {field.inserted && <p className="text-muted-foreground duration-200">{field.customText}</p>}
@@ -151,12 +153,12 @@ export const NameField = ({ field, recipient }: NameFieldProps) => {
       <Dialog open={showFullNameModal} onOpenChange={setShowFullNameModal}>
         <DialogContent>
           <DialogTitle>
-            Sign as {recipient.name}{' '}
+            ავტორიზაცია როგორც {recipient.name}{' '}
             <span className="text-muted-foreground">({recipient.email})</span>
           </DialogTitle>
 
           <div>
-            <Label htmlFor="signature">Full Name</Label>
+            <Label htmlFor="signature">სრული სახელი</Label>
 
             <Input
               type="text"
@@ -177,7 +179,7 @@ export const NameField = ({ field, recipient }: NameFieldProps) => {
                   setLocalFullName('');
                 }}
               >
-                Cancel
+                დახურვა
               </Button>
 
               <Button
@@ -186,7 +188,7 @@ export const NameField = ({ field, recipient }: NameFieldProps) => {
                 disabled={!localFullName}
                 onClick={() => onDialogSignClick()}
               >
-                Sign
+                ხელის მოწერა
               </Button>
             </div>
           </DialogFooter>

@@ -34,7 +34,7 @@ export const MobileNav = ({ className, ...props }: MobileNavProps) => {
           )}
         >
           <User className="mr-2 h-5 w-5" />
-          Profile
+          პროფილი
         </Button>
       </Link>
 
@@ -47,7 +47,7 @@ export const MobileNav = ({ className, ...props }: MobileNavProps) => {
           )}
         >
           <Users className="mr-2 h-5 w-5" />
-          Teams
+          გუნდები
         </Button>
       </Link>
 
@@ -60,7 +60,7 @@ export const MobileNav = ({ className, ...props }: MobileNavProps) => {
           )}
         >
           <Lock className="mr-2 h-5 w-5" />
-          Security
+          უსაფრთხოება
         </Button>
       </Link>
 
@@ -73,7 +73,7 @@ export const MobileNav = ({ className, ...props }: MobileNavProps) => {
           )}
         >
           <Braces className="mr-2 h-5 w-5" />
-          API Tokens
+          API ტოკენები
         </Button>
       </Link>
 
@@ -86,7 +86,7 @@ export const MobileNav = ({ className, ...props }: MobileNavProps) => {
           )}
         >
           <Webhook className="mr-2 h-5 w-5" />
-          Webhooks
+          ვებჰუკები
         </Button>
       </Link>
 

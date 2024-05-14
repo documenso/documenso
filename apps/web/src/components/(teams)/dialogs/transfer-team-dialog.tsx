@@ -74,7 +74,7 @@ export const TransferTeamDialog = ({
 
   const ZTransferTeamFormSchema = z.object({
     teamName: z.literal(confirmTransferMessage, {
-      errorMap: () => ({ message: `You must enter '${confirmTransferMessage}' to proceed` }),
+      errorMap: () => ({ message: `გაგრძელებისთვის ჩაწერეთ '${confirmTransferMessage}'` }),
     }),
     newOwnerUserId: z.string(),
     clearPaymentMethods: z.boolean(),
@@ -110,7 +110,7 @@ export const TransferTeamDialog = ({
       setOpen(false);
     } catch (err) {
       toast({
-        title: 'An unknown error occurred',
+        title: 'დაფიქსირდა ხარვეზი',
         variant: 'destructive',
         duration: 10000,
         description:
@@ -166,7 +166,7 @@ export const TransferTeamDialog = ({
                   name="newOwnerUserId"
                   render={({ field }) => (
                     <FormItem className="w-full">
-                      <FormLabel required>New team owner</FormLabel>
+                      <FormLabel required>ახალი გუნდის მფლობელები</FormLabel>
                       <FormControl>
                         <Select {...field} onValueChange={field.onChange}>
                           <SelectTrigger className="text-muted-foreground">
@@ -196,7 +196,7 @@ export const TransferTeamDialog = ({
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>
-                        Confirm by typing{' '}
+                        დადასტურებისთვის ჩაწერეთ{' '}
                         <span className="text-destructive">{confirmTransferMessage}</span>
                       </FormLabel>
                       <FormControl>
@@ -247,8 +247,9 @@ export const TransferTeamDialog = ({
                         // </li>
 
                         <li>
-                          Any payment methods attached to this team will remain attached to this
-                          team. Please contact us if you need to update this information.
+                          გადახდის ნებისმიერი მეთოდი, რომელიც გააქტიურებულია ამ გუნდის მიერ, დარჩება
+                          ამ გუნდთან დაკავშირებული. გთხოვთ დაგვიკავშირდეთ, თუ გჭირდებათ ამ
+                          ინფორმაციის განახლება.
                         </li>
                       )}
                       <li>
@@ -261,7 +262,7 @@ export const TransferTeamDialog = ({
 
                 <DialogFooter>
                   <Button type="button" variant="secondary" onClick={() => setOpen(false)}>
-                    Cancel
+                    დახურვა
                   </Button>
 
                   <Button type="submit" variant="destructive" loading={form.formState.isSubmitting}>

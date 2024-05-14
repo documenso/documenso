@@ -130,7 +130,7 @@ export const DocumentActionAuthPasskey = ({
 
         <DialogFooter>
           <Button type="button" variant="secondary" onClick={() => onOpenChange(false)}>
-            Close
+            დახურვა
           </Button>
         </DialogFooter>
       </div>
@@ -154,11 +154,11 @@ export const DocumentActionAuthPasskey = ({
 
         <DialogFooter>
           <Button type="button" variant="secondary" onClick={() => onOpenChange(false)}>
-            Cancel
+            დახურვა
           </Button>
 
           <Button type="button" onClick={() => void refetchPasskeys()}>
-            Retry
+            სცადეთ თავიდან
           </Button>
         </DialogFooter>
       </div>
@@ -178,7 +178,7 @@ export const DocumentActionAuthPasskey = ({
 
         <DialogFooter>
           <Button type="button" variant="secondary" onClick={() => onOpenChange(false)}>
-            Cancel
+            დახურვა
           </Button>
 
           <CreatePasskeyDialog
@@ -230,18 +230,19 @@ export const DocumentActionAuthPasskey = ({
               <Alert variant="destructive">
                 <AlertTitle>Unauthorized</AlertTitle>
                 <AlertDescription>
-                  We were unable to verify your details. Please try again or contact support
+                  ჩვენ ვერ შევძელით თქვენი დეტალების გადამოწმება. გთხოვთ, სცადოთ ხელახლა ან
+                  დაგვიკავშირდეთ
                 </AlertDescription>
               </Alert>
             )}
 
             <DialogFooter>
               <Button type="button" variant="secondary" onClick={() => onOpenChange(false)}>
-                Cancel
+                დახურვა
               </Button>
 
               <Button type="submit" loading={isCurrentlyAuthenticating}>
-                Sign
+                ხელის მოწერა
               </Button>
             </DialogFooter>
           </div>

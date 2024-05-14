@@ -55,14 +55,15 @@ export const TeamMemberInvitesDataTable = ({ teamId }: TeamMemberInvitesDataTabl
     trpc.team.resendTeamMemberInvitation.useMutation({
       onSuccess: () => {
         toast({
-          title: 'Success',
-          description: 'Invitation has been resent',
+          title: 'მოწვევა გაგზავნილია',
+          description: 'მოწვევა თავიდან წარმატებით გაიგზავნა',
         });
       },
       onError: () => {
         toast({
-          title: 'Something went wrong',
-          description: 'Unable to resend invitation. Please try again.',
+          title: 'დაფიქსირდა ხარვეზი',
+          description:
+            'მოწვევის ხელახლა გაგზავნა ვერ მოხერხდა. გთხოვთ თავიდან სცადოთ ან დაგვიკავშირდეთ.',
           variant: 'destructive',
         });
       },
@@ -72,14 +73,14 @@ export const TeamMemberInvitesDataTable = ({ teamId }: TeamMemberInvitesDataTabl
     trpc.team.deleteTeamMemberInvitations.useMutation({
       onSuccess: () => {
         toast({
-          title: 'Success',
-          description: 'Invitation has been deleted',
+          title: 'მოწვევა წაშლილია',
+          description: 'მოწვევა წარმატებით წაიშალა',
         });
       },
       onError: () => {
         toast({
-          title: 'Something went wrong',
-          description: 'Unable to delete invitation. Please try again.',
+          title: 'დაფიქსირდა ხარვეზი',
+          description: 'მოწვევის წაშლა ვერ მოხერხდა. გთხოვთ სცადოთ თავიდან ან დაგვიკავშირდეთ.',
           variant: 'destructive',
         });
       },

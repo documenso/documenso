@@ -32,8 +32,8 @@ export function AvatarWithRecipient({ recipient, documentStatus }: AvatarWithRec
 
     void copy(`${NEXT_PUBLIC_WEBAPP_URL()}/sign/${signingToken}`).then(() => {
       toast({
-        title: 'Copied to clipboard',
-        description: 'The signing link has been copied to your clipboard.',
+        title: 'დაკოპირებულია!',
+        description: 'ხელმოწერის ბმული წარმატებით დაკოპირდა.',
       });
     });
   };

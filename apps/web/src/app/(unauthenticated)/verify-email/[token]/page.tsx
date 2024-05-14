@@ -40,7 +40,7 @@ export default async function VerifyEmailPage({ params: { token } }: PageProps) 
           </div>
 
           <div>
-            <h2 className="text-2xl font-bold md:text-4xl">Something went wrong</h2>
+            <h2 className="text-2xl font-bold md:text-4xl">დაფიქსირდა ხარვეზი</h2>
 
             <p className="text-muted-foreground mt-4">
               We were unable to verify your email. If your email is not verified already, please try
@@ -48,7 +48,7 @@ export default async function VerifyEmailPage({ params: { token } }: PageProps) 
             </p>
 
             <Button className="mt-4" asChild>
-              <Link href="/">Go back home</Link>
+              <Link href="/">მთავარზე დაბრუნება</Link>
             </Button>
           </div>
         </div>
@@ -65,15 +65,15 @@ export default async function VerifyEmailPage({ params: { token } }: PageProps) 
           </div>
 
           <div>
-            <h2 className="text-2xl font-bold md:text-4xl">Your token has expired!</h2>
+            <h2 className="text-2xl font-bold md:text-4xl">ტოკენს ვადა გაუვიდა!</h2>
 
             <p className="text-muted-foreground mt-4">
-              It seems that the provided token has expired. We've just sent you another token,
-              please check your email and try again.
+              როგორც ჩანს, თქვენ მიერ მოწოდებულ ტოკენს ვადა გაუვიდა. ჩვენ ახლახან გამოგიგზავნეთ
+              ახალი ტოკენი, გთხოვთ შეამოწმოთ თქვენი ელ. ფოსტა და სცადოთ ხელახლა.
             </p>
 
             <Button className="mt-4" asChild>
-              <Link href="/">Go back home</Link>
+              <Link href="/">მთავარზე დაბრუნება</Link>
             </Button>
           </div>
         </div>
@@ -89,14 +89,15 @@ export default async function VerifyEmailPage({ params: { token } }: PageProps) 
         </div>
 
         <div>
-          <h2 className="text-2xl font-bold md:text-4xl">Email Confirmed!</h2>
+          <h2 className="text-2xl font-bold md:text-4xl">ელ. ფოსტა დადასტურებულია!</h2>
 
           <p className="text-muted-foreground mt-4">
-            Your email has been successfully confirmed! You can now use all features of Documenso.
+            თქვენი ელ. ფოსტა წარმატებით დადასტურდა! ახლა შეგიძლიათ გამოიყენოთ "ჩიქოვანები"-ს ყველა
+            ფუნქცია.
           </p>
 
           <Button className="mt-4" asChild>
-            <Link href="/">Go back home</Link>
+            <Link href="/">მთავარზე დაბრუნება</Link>
           </Button>
         </div>
       </div>

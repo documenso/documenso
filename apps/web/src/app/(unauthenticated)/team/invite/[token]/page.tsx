@@ -31,14 +31,15 @@ export default async function AcceptInvitationPage({
     return (
       <div className="w-screen max-w-lg px-4">
         <div className="w-full">
-          <h1 className="text-4xl font-semibold">Invalid token</h1>
+          <h1 className="text-4xl font-semibold">არასწორი ტოკენი</h1>
 
           <p className="text-muted-foreground mb-4 mt-2 text-sm">
-            This token is invalid or has expired. Please contact your team for a new invitation.
+            ეს ტოკენი არასწორია ან ვადა გაუვიდა. გთხოვთ, დაუკავშირდეთ თქვენს გუნდს ახალი
+            მოწვევისთვის.
           </p>
 
           <Button asChild>
-            <Link href="/">Return</Link>
+            <Link href="/">დაბრუნება</Link>
           </Button>
         </div>
       </div>
@@ -82,18 +83,18 @@ export default async function AcceptInvitationPage({
   if (!user) {
     return (
       <div>
-        <h1 className="text-4xl font-semibold">Team invitation</h1>
+        <h1 className="text-4xl font-semibold">გუნდის მოწვევა</h1>
 
         <p className="text-muted-foreground mt-2 text-sm">
-          You have been invited by <strong>{team.name}</strong> to join their team.
+          თქვენ გუნდში მოგიწვიათ <strong>{team.name}</strong>-მა.
         </p>
 
         <p className="text-muted-foreground mb-4 mt-1 text-sm">
-          To accept this invitation you must create an account.
+          ამ მოწვევის მისაღებად თქვენ უნდა შექმნათ ანგარიში.
         </p>
 
         <Button asChild>
-          <Link href={`/signup?email=${encodeURIComponent(email)}`}>Create account</Link>
+          <Link href={`/signup?email=${encodeURIComponent(email)}`}>ანგარიშის შექმნა</Link>
         </Button>
       </div>
     );
@@ -103,19 +104,19 @@ export default async function AcceptInvitationPage({
 
   return (
     <div>
-      <h1 className="text-4xl font-semibold">Invitation accepted!</h1>
+      <h1 className="text-4xl font-semibold">მოწვევა მიღებულია!</h1>
 
       <p className="text-muted-foreground mb-4 mt-2 text-sm">
-        You have accepted an invitation from <strong>{team.name}</strong> to join their team.
+        თქვენ დაადასტურეთ <strong>{team.name}</strong>-ის გუნდის მოწვევა.
       </p>
 
       {isSessionUserTheInvitedUser ? (
         <Button asChild>
-          <Link href="/">Continue</Link>
+          <Link href="/">გაგრძელება</Link>
         </Button>
       ) : (
         <Button asChild>
-          <Link href={`/signin?email=${encodeURIComponent(email)}`}>Continue to login</Link>
+          <Link href={`/signin?email=${encodeURIComponent(email)}`}>რეგისტრაციის გაგრძელება</Link>
         </Button>
       )}
     </div>

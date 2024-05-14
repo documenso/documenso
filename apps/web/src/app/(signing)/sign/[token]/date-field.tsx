@@ -76,8 +76,8 @@ export const DateField = ({
       console.error(err);
 
       toast({
-        title: 'Error',
-        description: 'An error occurred while signing the document.',
+        title: 'დაფიქსირდა ხარვეზი',
+        description: 'დოკუმენტზე ხელმოწერისას დაფიქსირდა ხარვეზი.',
         variant: 'destructive',
       });
     }
@@ -95,8 +95,8 @@ export const DateField = ({
       console.error(err);
 
       toast({
-        title: 'Error',
-        description: 'An error occurred while removing the signature.',
+        title: 'დაფიქსირდა ხარვეზი',
+        description: 'ხელმოწერის წაშლისას დაფიქსირდა ხარვეზი.',
         variant: 'destructive',
       });
     }
@@ -117,7 +117,9 @@ export const DateField = ({
       )}
 
       {!field.inserted && (
-        <p className="group-hover:text-primary text-muted-foreground text-lg duration-200">Date</p>
+        <p className="group-hover:text-primary text-muted-foreground text-lg duration-200">
+          თარიღი
+        </p>
       )}
 
       {field.inserted && (

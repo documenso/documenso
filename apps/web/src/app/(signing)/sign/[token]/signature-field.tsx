@@ -124,8 +124,8 @@ export const SignatureField = ({ field, recipient }: SignatureFieldProps) => {
       console.error(err);
 
       toast({
-        title: 'Error',
-        description: 'An error occurred while signing the document.',
+        title: 'დაფიქსირდა ხარვეზი',
+        description: 'დოკუმენტზე ხელმოწერისას დაფიქსირდა ხარვეზი.',
         variant: 'destructive',
       });
     }
@@ -143,8 +143,8 @@ export const SignatureField = ({ field, recipient }: SignatureFieldProps) => {
       console.error(err);
 
       toast({
-        title: 'Error',
-        description: 'An error occurred while removing the signature.',
+        title: 'დაფიქსირდა ხარვეზი',
+        description: 'ხელმოწერის წაშლისას დაფიქსირდა ხარვეზი.',
         variant: 'destructive',
       });
     }
@@ -166,7 +166,7 @@ export const SignatureField = ({ field, recipient }: SignatureFieldProps) => {
 
       {state === 'empty' && (
         <p className="group-hover:text-primary font-signature text-muted-foreground text-lg duration-200 sm:text-xl md:text-2xl lg:text-3xl">
-          Signature
+          ხელმოწერა
         </p>
       )}
 
@@ -193,7 +193,7 @@ export const SignatureField = ({ field, recipient }: SignatureFieldProps) => {
           </DialogTitle>
 
           <div className="">
-            <Label htmlFor="signature">Signature</Label>
+            <Label htmlFor="signature">ხელმოწერა</Label>
 
             <SignaturePad
               id="signature"
@@ -215,7 +215,7 @@ export const SignatureField = ({ field, recipient }: SignatureFieldProps) => {
                   setLocalSignature(null);
                 }}
               >
-                Cancel
+                დახურვა
               </Button>
 
               <Button
@@ -224,7 +224,7 @@ export const SignatureField = ({ field, recipient }: SignatureFieldProps) => {
                 disabled={!localSignature}
                 onClick={() => onDialogSignClick()}
               >
-                Sign
+                ხელის მოწერა
               </Button>
             </div>
           </DialogFooter>

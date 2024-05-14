@@ -117,7 +117,7 @@ export default async function CompletedSigningPage({
           />
 
           <h2 className="mt-6 max-w-[35ch] text-center text-2xl font-semibold leading-normal md:text-3xl lg:text-4xl">
-            Document
+            დოკუმენტი
             {recipient.role === RecipientRole.SIGNER && ' Signed '}
             {recipient.role === RecipientRole.VIEWER && ' Viewed '}
             {recipient.role === RecipientRole.APPROVER && ' Approved '}
@@ -127,37 +127,37 @@ export default async function CompletedSigningPage({
             .with({ status: DocumentStatus.COMPLETED }, () => (
               <div className="text-documenso-700 mt-4 flex items-center text-center">
                 <CheckCircle2 className="mr-2 h-5 w-5" />
-                <span className="text-sm">Everyone has signed</span>
+                <span className="text-sm">ხელი ყველამ მოაწერა</span>
               </div>
             ))
             .with({ deletedAt: null }, () => (
-              <div className="flex items-center mt-4 text-center text-blue-600">
+              <div className="mt-4 flex items-center text-center text-blue-600">
                 <Clock8 className="mr-2 h-5 w-5" />
-                <span className="text-sm">Waiting for others to sign</span>
+                <span className="text-sm">ველოდებით სხვების ხელმოწერას</span>
               </div>
             ))
             .otherwise(() => (
               <div className="flex items-center text-center text-red-600">
                 <Clock8 className="mr-2 h-5 w-5" />
-                <span className="text-sm">Document no longer available to sign</span>
+                <span className="text-sm">დოკუმენტი ხელმოწერისთვის ხელმისაწვდომი აღარ არის</span>
               </div>
             ))}
 
           {match({ status: document.status, deletedAt: document.deletedAt })
             .with({ status: DocumentStatus.COMPLETED }, () => (
               <p className="text-muted-foreground/60 mt-2.5 max-w-[60ch] text-center text-sm font-medium md:text-base">
-                Everyone has signed! You will receive an Email copy of the signed document.
+                ხელი ყველამ მოაწერა! თქვენ მიიღებთ ხელმოწერილი დოკუმენტის ასლს ელექტრონულ ფოსტაზე.
               </p>
             ))
             .with({ deletedAt: null }, () => (
               <p className="text-muted-foreground/60 mt-2.5 max-w-[60ch] text-center text-sm font-medium md:text-base">
-                You will receive an Email copy of the signed document once everyone has signed.
+                თქვენ მიიღებთ ხელმოწერილი დოკუმენტის ასლს ელექტრონულ ფოსტაზე, როგორც კი ყველა ხელს
+                მოაწერს.
               </p>
             ))
             .otherwise(() => (
               <p className="text-muted-foreground/60 mt-2.5 max-w-[60ch] text-center text-sm font-medium md:text-base">
-                This document has been cancelled by the owner and is no longer available for others
-                to sign.
+                ეს დოკუმენტი გააუქმა მფლობელმა და აღარ არის ხელმისაწვდომი.
               </p>
             ))}
 
@@ -184,11 +184,11 @@ export default async function CompletedSigningPage({
         {canSignUp && (
           <div className={`flex max-w-xl flex-col items-center justify-center p-4 md:p-12`}>
             <h2 className="mt-8 text-center text-xl font-semibold md:mt-0">
-              Need to sign documents?
+              გჭირდებათ დოკუმენტებზე ხელმოწერა?
             </h2>
 
             <p className="text-muted-foreground/60 mt-4 max-w-[55ch] text-center leading-normal">
-              Create your account and start using state-of-the-art document signing.
+              შექმენით თქვენი ანგარიში და დაიწყეთ დოკუმენტებზე ონლაინ ხელმოწერის გამოყენება.
             </p>
 
             <ClaimAccount defaultName={recipientName} defaultEmail={recipient.email} />
@@ -197,7 +197,7 @@ export default async function CompletedSigningPage({
 
         {isLoggedIn && (
           <Link href="/documents" className="text-documenso-700 hover:text-documenso-600 mt-36">
-            Go Back Home
+            მთავარზე დაბრუნება
           </Link>
         )}
       </div>

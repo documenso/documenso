@@ -174,7 +174,7 @@ export function CommandMenu({ open, onOpenChange }: CommandMenuProps) {
       <CommandInput
         value={search}
         onValueChange={setSearch}
-        placeholder="Type a command or search..."
+        placeholder="ჩაწერეთ ბრძანება ან მოძებნეთ..."
       />
 
       <CommandList>
@@ -187,7 +187,7 @@ export function CommandMenu({ open, onOpenChange }: CommandMenuProps) {
             </div>
           </CommandEmpty>
         ) : (
-          <CommandEmpty>No results found.</CommandEmpty>
+          <CommandEmpty>შედეგები არ მოიძებნა.</CommandEmpty>
         )}
         {!currentPage && (
           <>

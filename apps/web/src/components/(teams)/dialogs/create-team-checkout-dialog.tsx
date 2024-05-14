@@ -44,7 +44,7 @@ export const CreateTeamCheckoutDialog = ({
       },
       onError: () =>
         toast({
-          title: 'Something went wrong',
+          title: 'დაფიქსირდა ხარვეზი',
           description:
             'We were unable to create a checkout session. Please try again, or contact support',
           variant: 'destructive',
@@ -89,7 +89,7 @@ export const CreateTeamCheckoutDialog = ({
             {isLoading ? (
               <Loader className="text-documenso h-6 w-6 animate-spin" />
             ) : (
-              <p>Something went wrong</p>
+              <p>დაფიქსირდა ხარვეზი</p>
             )}
           </div>
         )}
@@ -121,16 +121,16 @@ export const CreateTeamCheckoutDialog = ({
                 <CardContent className="flex h-full flex-col p-6">
                   {selectedPrice.interval === 'monthly' ? (
                     <div className="text-muted-foreground text-lg font-medium">
-                      $50 USD <span className="text-xs">per month</span>
+                      $50 ლარი <span className="text-xs">თვეში</span>
                     </div>
                   ) : (
                     <div className="text-muted-foreground flex items-center justify-between text-lg font-medium">
                       <span>
-                        $480 USD <span className="text-xs">per year</span>
+                        $480 ლარი <span className="text-xs">წელიწადში</span>
                       </span>
                       <div className="bg-primary text-primary-foreground ml-2 inline-flex flex-row items-center justify-center rounded px-2 py-1 text-xs">
                         <TagIcon className="mr-1 h-4 w-4" />
-                        20% off
+                        -20%
                       </div>
                     </div>
                   )}
@@ -153,7 +153,7 @@ export const CreateTeamCheckoutDialog = ({
                 disabled={isCreatingCheckout}
                 onClick={() => onClose()}
               >
-                Cancel
+                დახურვა
               </Button>
 
               <Button

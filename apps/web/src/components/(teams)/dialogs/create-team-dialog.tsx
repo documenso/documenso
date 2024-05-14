@@ -82,8 +82,8 @@ export const CreateTeamDialog = ({ trigger, ...props }: CreateTeamDialogProps) =
       }
 
       toast({
-        title: 'Success',
-        description: 'Your team has been created.',
+        title: 'გუნდი შექმნილია',
+        description: 'თქვენი გუნდი წარმატებით შეიქმნა!.',
         duration: 5000,
       });
     } catch (err) {
@@ -92,17 +92,16 @@ export const CreateTeamDialog = ({ trigger, ...props }: CreateTeamDialogProps) =
       if (error.code === AppErrorCode.ALREADY_EXISTS) {
         form.setError('teamUrl', {
           type: 'manual',
-          message: 'This URL is already in use.',
+          message: 'ეს URL უკვე გამოყენებულია.',
         });
 
         return;
       }
 
       toast({
-        title: 'An unknown error occurred',
+        title: 'დაფიქსირდა ხარვეზი',
         variant: 'destructive',
-        description:
-          'We encountered an unknown error while attempting to create a team. Please try again later.',
+        description: 'გუნდის შექმნისას დაფიქსირდა ხარვეზი. გთხოვთ თავიდან სცადოთ.',
       });
     }
   };
@@ -131,17 +130,17 @@ export const CreateTeamDialog = ({ trigger, ...props }: CreateTeamDialogProps) =
       <DialogTrigger onClick={(e) => e.stopPropagation()} asChild={true}>
         {trigger ?? (
           <Button className="flex-shrink-0" variant="secondary">
-            Create team
+            გუნდის შექმნა
           </Button>
         )}
       </DialogTrigger>
 
       <DialogContent position="center">
         <DialogHeader>
-          <DialogTitle>Create team</DialogTitle>
+          <DialogTitle>შექმენით გუნდი</DialogTitle>
 
           <DialogDescription className="mt-4">
-            Create a team to collaborate with your team members.
+            შექმენით გუნდი თქვენი გუნდის წევრებთან თანამშრომლობისთვის.
           </DialogDescription>
         </DialogHeader>
 
@@ -156,7 +155,7 @@ export const CreateTeamDialog = ({ trigger, ...props }: CreateTeamDialogProps) =
                 name="teamName"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel required>Team Name</FormLabel>
+                    <FormLabel required>გუნდის სახელი</FormLabel>
                     <FormControl>
                       <Input
                         className="bg-background"
@@ -184,7 +183,7 @@ export const CreateTeamDialog = ({ trigger, ...props }: CreateTeamDialogProps) =
                 name="teamUrl"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel required>Team URL</FormLabel>
+                    <FormLabel required>გუნდის URL</FormLabel>
                     <FormControl>
                       <Input className="bg-background" {...field} />
                     </FormControl>
@@ -203,7 +202,7 @@ export const CreateTeamDialog = ({ trigger, ...props }: CreateTeamDialogProps) =
 
               <DialogFooter>
                 <Button type="button" variant="secondary" onClick={() => setOpen(false)}>
-                  Cancel
+                  დახურვა
                 </Button>
 
                 <Button
@@ -211,7 +210,7 @@ export const CreateTeamDialog = ({ trigger, ...props }: CreateTeamDialogProps) =
                   data-testid="dialog-create-team-button"
                   loading={form.formState.isSubmitting}
                 >
-                  Create Team
+                  გუნდის შექმნა
                 </Button>
               </DialogFooter>
             </fieldset>

@@ -85,8 +85,8 @@ export const CreateWebhookDialog = ({ trigger, ...props }: CreateWebhookDialogPr
       setOpen(false);
 
       toast({
-        title: 'Webhook created',
-        description: 'The webhook was successfully created.',
+        title: 'ვებჰუკი შექმნილია',
+        description: 'ვებჰუკი წარმატებით შეიქმნა.',
       });
 
       form.reset();
@@ -94,8 +94,8 @@ export const CreateWebhookDialog = ({ trigger, ...props }: CreateWebhookDialogPr
       router.refresh();
     } catch (err) {
       toast({
-        title: 'Error',
-        description: 'An error occurred while creating the webhook. Please try again.',
+        title: 'დაფიქსირდა ხარვეზი',
+        description: 'ვებჰუკის შექმნისას დაფიქსირდა ხარვეზი. გთხოვთ თავიდან სცადოთ.',
         variant: 'destructive',
       });
     }
@@ -108,13 +108,13 @@ export const CreateWebhookDialog = ({ trigger, ...props }: CreateWebhookDialogPr
       {...props}
     >
       <DialogTrigger onClick={(e) => e.stopPropagation()} asChild>
-        {trigger ?? <Button className="flex-shrink-0">Create Webhook</Button>}
+        {trigger ?? <Button className="flex-shrink-0">ვებჰუკის შექმნა</Button>}
       </DialogTrigger>
 
       <DialogContent className="max-w-lg" position="center">
         <DialogHeader>
-          <DialogTitle>Create webhook</DialogTitle>
-          <DialogDescription>On this page, you can create a new webhook.</DialogDescription>
+          <DialogTitle>ვებჰუკის შექმნა</DialogTitle>
+          <DialogDescription>ამ გვერდზე შეგიძლიათ შექმნათ ახალი ვებჰუკები.</DialogDescription>
         </DialogHeader>
 
         <Form {...form}>
@@ -129,7 +129,7 @@ export const CreateWebhookDialog = ({ trigger, ...props }: CreateWebhookDialogPr
                   name="webhookUrl"
                   render={({ field }) => (
                     <FormItem className="flex-1">
-                      <FormLabel required>Webhook URL</FormLabel>
+                      <FormLabel required>ვებჰუკის URL</FormLabel>
                       <FormControl>
                         <Input className="bg-background" {...field} />
                       </FormControl>

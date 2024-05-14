@@ -35,8 +35,8 @@ export type DocumentActionAuth2FAProps = {
 const Z2FAAuthFormSchema = z.object({
   token: z
     .string()
-    .min(4, { message: 'Token must at least 4 characters long' })
-    .max(10, { message: 'Token must be at most 10 characters long' }),
+    .min(4, { message: 'ტოკენი უნდა შეიცავდეს მინიმუმ 4 სიმბოლოს' })
+    .max(10, { message: 'ტოკენი უნდა შეიცავდეს მაქსიმუმ 10 სიმბოლოს' }),
 });
 
 type T2FAAuthFormSchema = z.infer<typeof Z2FAAuthFormSchema>;
@@ -107,8 +107,8 @@ export const DocumentActionAuth2FA = ({
 
             {user?.identityProvider === 'DOCUMENSO' && (
               <p className="mt-2">
-                By enabling 2FA, you will be required to enter a code from your authenticator app
-                every time you sign in.
+                2FA-ს ჩართვით, თქვენ მოგიწევთ შეიყვანოთ კოდი თქვენი ავტორიზაციის აპლიკაციიდან ყოველი
+                შემოსვლის დროს.
               </p>
             )}
           </AlertDescription>
@@ -116,7 +116,7 @@ export const DocumentActionAuth2FA = ({
 
         <DialogFooter>
           <Button type="button" variant="secondary" onClick={() => onOpenChange(false)}>
-            Close
+            დახურვა
           </Button>
 
           <EnableAuthenticatorAppDialog onSuccess={() => setIs2FASetupSuccessful(true)} />
@@ -135,7 +135,7 @@ export const DocumentActionAuth2FA = ({
               name="token"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel required>2FA token</FormLabel>
+                  <FormLabel required>2FA ტოკენი</FormLabel>
 
                   <FormControl>
                     <Input {...field} placeholder="Token" />
@@ -150,18 +150,19 @@ export const DocumentActionAuth2FA = ({
               <Alert variant="destructive">
                 <AlertTitle>Unauthorized</AlertTitle>
                 <AlertDescription>
-                  We were unable to verify your details. Please try again or contact support
+                  ჩვენ ვერ შევძელით თქვენი დეტალების გადამოწმება. გთხოვთ, სცადოთ ხელახლა ან
+                  დაგვიკავშირდეთ
                 </AlertDescription>
               </Alert>
             )}
 
             <DialogFooter>
               <Button type="button" variant="secondary" onClick={() => onOpenChange(false)}>
-                Cancel
+                დახურვა
               </Button>
 
               <Button type="submit" loading={isCurrentlyAuthenticating}>
-                Sign
+                ხელის მოწერა
               </Button>
             </DialogFooter>
           </div>

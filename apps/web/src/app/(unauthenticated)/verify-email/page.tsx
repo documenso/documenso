@@ -28,7 +28,7 @@ export default function EmailVerificationWithoutTokenPage() {
           </p>
 
           <Button className="mt-4" asChild>
-            <Link href="/">Go back home</Link>
+            <Link href="/">მთავარზე დაბრუნება</Link>
           </Button>
         </div>
       </div>

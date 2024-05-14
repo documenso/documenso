@@ -35,8 +35,8 @@ export const DuplicateTemplateDialog = ({
         router.refresh();
 
         toast({
-          title: 'Template duplicated',
-          description: 'Your template has been duplicated successfully.',
+          title: 'შაბლონის დუპლიკაცია',
+          description: 'თქვენი შაბლონი წარმატებით იქნა დუბლირებული.',
           duration: 5000,
         });
 
@@ -44,8 +44,8 @@ export const DuplicateTemplateDialog = ({
       },
       onError: () => {
         toast({
-          title: 'Error',
-          description: 'An error occurred while duplicating template.',
+          title: 'დაფიქსირდა ხარვეზი',
+          description: 'შაბლონის დუბლირებისას დაფიქსირდა ხარვეზი.',
           variant: 'destructive',
         });
       },
@@ -55,9 +55,9 @@ export const DuplicateTemplateDialog = ({
     <Dialog open={open} onOpenChange={(value) => !isLoading && onOpenChange(value)}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Do you want to duplicate this template?</DialogTitle>
+          <DialogTitle>გნებავთ ამ შაბლონის დუბლირება?</DialogTitle>
 
-          <DialogDescription className="pt-2">Your template will be duplicated.</DialogDescription>
+          <DialogDescription className="pt-2">თქვენი შაბლონი დუბლირებული იქნება.</DialogDescription>
         </DialogHeader>
 
         <DialogFooter>
@@ -67,7 +67,7 @@ export const DuplicateTemplateDialog = ({
             variant="secondary"
             onClick={() => onOpenChange(false)}
           >
-            Cancel
+            დახურვა
           </Button>
 
           <Button
@@ -80,7 +80,7 @@ export const DuplicateTemplateDialog = ({
               })
             }
           >
-            Duplicate
+            დუბლირება
           </Button>
         </DialogFooter>
       </DialogContent>

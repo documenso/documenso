@@ -47,9 +47,9 @@ export const LayoutBillingBanner = ({
       setIsOpen(false);
     } catch (err) {
       toast({
-        title: 'Something went wrong',
+        title: 'დაფიქსირდა ხარვეზი',
         description:
-          'We are unable to proceed to the billing portal at this time. Please try again, or contact support.',
+          'ამჯერად გადახდების პორტალზე გადასვლა ვერ მოხერხდა. გთხოვთ, სცადოთ ხელახლა ან დაგვიკავშირდეთ.',
         variant: 'destructive',
         duration: 10000,
       });
@@ -99,19 +99,19 @@ export const LayoutBillingBanner = ({
 
       <Dialog open={isOpen} onOpenChange={(value) => !isLoading && setIsOpen(value)}>
         <DialogContent>
-          <DialogTitle>Payment overdue</DialogTitle>
+          <DialogTitle>ვადაგადაცილებული გადახდა</DialogTitle>
 
           {match(subscription.status)
             .with(SubscriptionStatus.PAST_DUE, () => (
               <DialogDescription>
-                Your payment for teams is overdue. Please settle the payment to avoid any service
-                disruptions.
+                თქვენი გადახდა გუნდებისთვის დაგვიანებულია. გთხოვთ დაფაროთ დავალიანება, რათა თავიდან
+                აიცილოთ ნებისმიერი სერვისის შეფერხება.
               </DialogDescription>
             ))
             .with(SubscriptionStatus.INACTIVE, () => (
               <DialogDescription>
-                Due to an unpaid invoice, your team has been restricted. Please settle the payment
-                to restore full access to your team.
+                დავალიანების გამო, თქვენ გუნდს სერვისები შეეზღუდა. გთხოვთ, დაფაროთ დავალიანება
+                თქვენს გუნდზე სრული წვდომის აღსადგენად.
               </DialogDescription>
             ))
             .otherwise(() => null)}

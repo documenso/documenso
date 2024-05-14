@@ -74,7 +74,7 @@ export const DesktopNav = ({ className, setIsCommandMenuOpen, ...props }: Deskto
       >
         <div className="flex items-center">
           <Search className="mr-2 h-5 w-5" />
-          Search
+          ძებნა
         </div>
 
         <div>

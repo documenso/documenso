@@ -8,7 +8,7 @@ export default function SignatureDisclosure() {
       <article className="prose dark:prose-invert">
         <h1>Electronic Signature Disclosure</h1>
 
-        <h2>Welcome</h2>
+        <h2>მოგესალმებით!</h2>
         <p>
           Thank you for using Documenso to perform your electronic document signing. The purpose of
           this disclosure is to inform you about the process, legality, and your rights regarding

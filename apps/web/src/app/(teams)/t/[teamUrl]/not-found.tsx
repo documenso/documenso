@@ -10,19 +10,19 @@ export default function NotFound() {
   return (
     <div className="mx-auto flex min-h-[80vh] w-full items-center justify-center py-32">
       <div>
-        <p className="text-muted-foreground font-semibold">404 Team not found</p>
+        <p className="text-muted-foreground font-semibold">404 გუნდი არ მოიძებნა</p>
 
-        <h1 className="mt-3 text-2xl font-bold md:text-3xl">Oops! Something went wrong.</h1>
+        <h1 className="mt-3 text-2xl font-bold md:text-3xl">ბოდიშს გიხდით! დაფიქსირდა ხარვეზი</h1>
 
         <p className="text-muted-foreground mt-4 text-sm">
-          The team you are looking for may have been removed, renamed or may have never existed.
+          გუნდი, რომელსაც ეძებთ, შესაძლოა წაიშალა, გადაარქვეს სახელი ან არ არსებობს.
         </p>
 
         <div className="mt-6 flex gap-x-2.5 gap-y-4 md:items-center">
           <Button asChild className="w-32">
             <Link href="/settings/teams">
               <ChevronLeft className="mr-2 h-4 w-4" />
-              Go Back
+              უკან
             </Link>
           </Button>
         </div>

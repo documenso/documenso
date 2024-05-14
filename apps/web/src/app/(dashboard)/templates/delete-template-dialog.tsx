@@ -28,8 +28,8 @@ export const DeleteTemplateDialog = ({ id, open, onOpenChange }: DeleteTemplateD
       router.refresh();
 
       toast({
-        title: 'Template deleted',
-        description: 'Your template has been successfully deleted.',
+        title: 'შაბლონის წაშლა',
+        description: 'თქვენი შაბლონი წარმატებით წაიშალა.',
         duration: 5000,
       });
 
@@ -37,8 +37,9 @@ export const DeleteTemplateDialog = ({ id, open, onOpenChange }: DeleteTemplateD
     },
     onError: () => {
       toast({
-        title: 'Something went wrong',
-        description: 'This template could not be deleted at this time. Please try again.',
+        title: 'დაფიქსირდა ხარვეზი',
+        description:
+          'სამწუხაროდ შაბლონის წაშლა ვერ მოხერხდა. გთხოვთ თავიდან სცადოთ ან დაგვიკავშირდეთ.',
         variant: 'destructive',
         duration: 7500,
       });
@@ -49,11 +50,11 @@ export const DeleteTemplateDialog = ({ id, open, onOpenChange }: DeleteTemplateD
     <Dialog open={open} onOpenChange={(value) => !isLoading && onOpenChange(value)}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Do you want to delete this template?</DialogTitle>
+          <DialogTitle>გნებავთ ამ შაბლონის წაშლა?</DialogTitle>
 
           <DialogDescription>
-            Please note that this action is irreversible. Once confirmed, your template will be
-            permanently deleted.
+            გთხოვთ გაითვალისწინოთ, რომ ეს ქმედება შეუქცევადია. დადასტურების შემდეგ, თქვენი შაბლონი
+            სამუდამოდ წაიშლება.
           </DialogDescription>
         </DialogHeader>
 
@@ -64,11 +65,11 @@ export const DeleteTemplateDialog = ({ id, open, onOpenChange }: DeleteTemplateD
             disabled={isLoading}
             onClick={() => onOpenChange(false)}
           >
-            Cancel
+            დახურვა
           </Button>
 
           <Button type="button" loading={isLoading} onClick={async () => deleteTemplate({ id })}>
-            Delete
+            წაშლა
           </Button>
         </DialogFooter>
       </DialogContent>

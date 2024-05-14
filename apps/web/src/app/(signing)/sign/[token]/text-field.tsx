@@ -102,8 +102,8 @@ export const TextField = ({ field, recipient }: TextFieldProps) => {
       console.error(err);
 
       toast({
-        title: 'Error',
-        description: 'An error occurred while signing the document.',
+        title: 'დაფიქსირდა ხარვეზი',
+        description: 'დოკუმენტზე ხელმოწერისას დაფიქსირდა ხარვეზი.',
         variant: 'destructive',
       });
     }
@@ -121,8 +121,8 @@ export const TextField = ({ field, recipient }: TextFieldProps) => {
       console.error(err);
 
       toast({
-        title: 'Error',
-        description: 'An error occurred while removing the text.',
+        title: 'დაფიქსირდა ხარვეზი',
+        description: 'ტექსტის წაშლისას დაფიქსირდა ხარვეზი',
         variant: 'destructive',
       });
     }
@@ -143,7 +143,9 @@ export const TextField = ({ field, recipient }: TextFieldProps) => {
       )}
 
       {!field.inserted && (
-        <p className="group-hover:text-primary text-muted-foreground text-lg duration-200">Text</p>
+        <p className="group-hover:text-primary text-muted-foreground text-lg duration-200">
+          ტექსტი
+        </p>
       )}
 
       {field.inserted && <p className="text-muted-foreground duration-200">{field.customText}</p>}
@@ -151,11 +153,11 @@ export const TextField = ({ field, recipient }: TextFieldProps) => {
       <Dialog open={showCustomTextModal} onOpenChange={setShowCustomTextModal}>
         <DialogContent>
           <DialogTitle>
-            Enter your Text <span className="text-muted-foreground">({recipient.email})</span>
+            ჩაწერეთ ტექსტი <span className="text-muted-foreground">({recipient.email})</span>
           </DialogTitle>
 
           <div className="">
-            <Label htmlFor="custom-text">Custom Text</Label>
+            <Label htmlFor="custom-text">ტექსტი</Label>
 
             <Input
               id="custom-text"
@@ -175,7 +177,7 @@ export const TextField = ({ field, recipient }: TextFieldProps) => {
                   setLocalCustomText('');
                 }}
               >
-                Cancel
+                დახურვა
               </Button>
 
               <Button
@@ -184,7 +186,7 @@ export const TextField = ({ field, recipient }: TextFieldProps) => {
                 disabled={!localText}
                 onClick={() => onDialogSignClick()}
               >
-                Save Text
+                ტექსტის შენახვა
               </Button>
             </div>
           </DialogFooter>

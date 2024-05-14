@@ -27,17 +27,17 @@ export default async function ApiTokensPage({ params }: ApiTokensPageProps) {
 
   return (
     <div>
-      <h3 className="text-2xl font-semibold">API Tokens</h3>
+      <h3 className="text-2xl font-semibold">API ტოკენები</h3>
 
       <p className="text-muted-foreground mt-2 text-sm">
-        On this page, you can create new API tokens and manage the existing ones. <br />
-        You can view our swagger docs{' '}
+        ამ გვერდზე შეგიძლიათ შექმნათ ახალი API ტოკენები და მართოთ არსებული. <br />
+        თქვენ შეგიძლიათ ნახოთ ჩვენი swagger დოკუმენტები{' '}
         <a
           className="text-primary underline"
           href={`${NEXT_PUBLIC_WEBAPP_URL()}/api/v1/openapi`}
           target="_blank"
         >
-          here
+          აქ
         </a>
       </p>
 
@@ -47,12 +47,12 @@ export default async function ApiTokensPage({ params }: ApiTokensPageProps) {
 
       <hr className="mb-4 mt-8" />
 
-      <h4 className="text-xl font-medium">Your existing tokens</h4>
+      <h4 className="text-xl font-medium">თქვენი არსებული ტოკენები</h4>
 
       {tokens.length === 0 && (
         <div className="mb-4">
           <p className="text-muted-foreground mt-2 text-sm italic">
-            Your tokens will be shown here once you create them.
+            თქვენი ტოკენები აქ გამოჩნდება, როგორც კი მათ შექმნით.
           </p>
         </div>
       )}
@@ -66,22 +66,23 @@ export default async function ApiTokensPage({ params }: ApiTokensPageProps) {
                   <h5 className="text-base">{token.name}</h5>
 
                   <p className="text-muted-foreground mt-2 text-xs">
-                    Created on <LocaleDate date={token.createdAt} format={DateTime.DATETIME_FULL} />
+                    შექმნილია <LocaleDate date={token.createdAt} format={DateTime.DATETIME_FULL} />
                   </p>
                   {token.expires ? (
                     <p className="text-muted-foreground mt-1 text-xs">
-                      Expires on <LocaleDate date={token.expires} format={DateTime.DATETIME_FULL} />
+                      ვადა გასდის{' '}
+                      <LocaleDate date={token.expires} format={DateTime.DATETIME_FULL} />
                     </p>
                   ) : (
                     <p className="text-muted-foreground mt-1 text-xs">
-                      Token doesn't have an expiration date
+                      ტოკენს არ აქვს ვადის გასვლის თარიღი
                     </p>
                   )}
                 </div>
 
                 <div>
                   <DeleteTokenDialog token={token} teamId={team.id}>
-                    <Button variant="destructive">Delete</Button>
+                    <Button variant="destructive">წაშლა</Button>
                   </DeleteTokenDialog>
                 </div>
               </div>

@@ -29,17 +29,18 @@ export const TeamEmailDropdown = ({ team }: TeamsSettingsPageProps) => {
     trpc.team.resendTeamEmailVerification.useMutation({
       onSuccess: () => {
         toast({
-          title: 'Success',
-          description: 'Email verification has been resent',
+          title: 'წარმატებით გამოიგზავნა',
+          description: 'სავერიფიკაციო მეილი თავიდან გამოიგზავნა.',
           duration: 5000,
         });
       },
       onError: () => {
         toast({
-          title: 'Something went wrong',
+          title: 'დაფიქსირდა ხარვეზი',
           variant: 'destructive',
           duration: 10000,
-          description: 'Unable to resend verification at this time. Please try again.',
+          description:
+            'სავერიფიკაციო მეილის ხელახლა გაგზავნა ამჯერად შეუძლებელია. გთხოვთ სცადოთ თავიდან.',
         });
       },
     });
@@ -48,17 +49,17 @@ export const TeamEmailDropdown = ({ team }: TeamsSettingsPageProps) => {
     trpc.team.deleteTeamEmail.useMutation({
       onSuccess: () => {
         toast({
-          title: 'Success',
-          description: 'Team email has been removed',
+          title: 'წარმატებით წაშლა',
+          description: 'გუნდის ელ. ფოსტა წაიშალა',
           duration: 5000,
         });
       },
       onError: () => {
         toast({
-          title: 'Something went wrong',
+          title: 'დაფიქსირდა ხარვეზი',
           variant: 'destructive',
           duration: 10000,
-          description: 'Unable to remove team email at this time. Please try again.',
+          description: 'გუნდის ელ. ფოსტის წაშლა ამჯერად შეუძლებელია. Გთხოვთ კიდევ სცადეთ.',
         });
       },
     });
@@ -114,7 +115,7 @@ export const TeamEmailDropdown = ({ team }: TeamsSettingsPageProps) => {
             ) : (
               <Mail className="mr-2 h-4 w-4" />
             )}
-            Resend verification
+            ვერიფიკაციის ხელახლა გაგზავნა
           </DropdownMenuItem>
         )}
 
@@ -124,7 +125,7 @@ export const TeamEmailDropdown = ({ team }: TeamsSettingsPageProps) => {
             trigger={
               <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
                 <Edit className="mr-2 h-4 w-4" />
-                Edit
+                რედაქტირება
               </DropdownMenuItem>
             }
           />

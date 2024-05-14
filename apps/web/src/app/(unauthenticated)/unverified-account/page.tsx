@@ -10,15 +10,15 @@ export default function UnverifiedAccount() {
           <Mails className="text-primary h-10 w-10" strokeWidth={2} />
         </div>
         <div className="">
-          <h2 className="text-2xl font-bold md:text-4xl">Confirm email</h2>
+          <h2 className="text-2xl font-bold md:text-4xl">ელ. ფოსტის დაადასტურება</h2>
 
           <p className="text-muted-foreground mt-4">
-            To gain access to your account, please confirm your email address by clicking on the
-            confirmation link from your inbox.
+            თქვენს ანგარიშზე წვდომის მისაღებად, გთხოვთ გადახვიდეთ თქვენ ელ. ფოსტაზე გამოგზავნილ
+            დადასტურების ბმულზე.
           </p>
 
           <p className="text-muted-foreground mt-4">
-            If you don't find the confirmation link in your inbox, you can request a new one below.
+            თუ თქვენ ვერ იპოვით დადასტურების ბმულს, შეგიძლიათ მოითხოვოთ ახალი ქვემოთ.
           </p>
 
           <SendConfirmationEmailForm />

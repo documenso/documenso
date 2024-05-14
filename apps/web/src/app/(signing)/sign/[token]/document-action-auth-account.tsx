@@ -67,11 +67,11 @@ export const DocumentActionAuthAccount = ({
 
       <DialogFooter>
         <Button type="button" variant="secondary" onClick={() => onOpenChange(false)}>
-          Cancel
+          დახურვა
         </Button>
 
         <Button onClick={async () => handleChangeAccount(recipient.email)} loading={isSigningOut}>
-          Login
+          ავტორიზაცია
         </Button>
       </DialogFooter>
     </fieldset>

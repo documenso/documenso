@@ -45,7 +45,7 @@ export const TemplatesPageView = async ({ searchParams = {}, team }: TemplatesPa
             </Avatar>
           )}
 
-          <h1 className="truncate text-2xl font-semibold md:text-3xl">Templates</h1>
+          <h1 className="truncate text-2xl font-semibold md:text-3xl">შაბლონები</h1>
         </div>
 
         <div>

@@ -66,8 +66,8 @@ export const DeleteTeamDialog = ({ trigger, teamId, teamName }: DeleteTeamDialog
       await deleteTeam({ teamId });
 
       toast({
-        title: 'Success',
-        description: 'Your team has been successfully deleted.',
+        title: 'გუნდი წაშლილია',
+        description: 'თქვენი გუნდი წარმატებით წაიშალა.',
         duration: 5000,
       });
 
@@ -78,16 +78,15 @@ export const DeleteTeamDialog = ({ trigger, teamId, teamName }: DeleteTeamDialog
       const error = AppError.parseError(err);
 
       let toastError: Toast = {
-        title: 'An unknown error occurred',
+        title: 'დაფიქსირდა ხარვეზი',
         variant: 'destructive',
         duration: 10000,
-        description:
-          'We encountered an unknown error while attempting to delete this team. Please try again later.',
+        description: 'გუნდის წაშლისას დაფიქსირდა ხარვეზი. გთხოვთ თავიდან სცადოთ.',
       };
 
       if (error.code === 'resource_missing') {
         toastError = {
-          title: 'Unable to delete team',
+          title: 'გუნდის წაშლა ვერ მოხერხდა',
           variant: 'destructive',
           duration: 15000,
           description:
@@ -108,15 +107,15 @@ export const DeleteTeamDialog = ({ trigger, teamId, teamName }: DeleteTeamDialog
   return (
     <Dialog open={open} onOpenChange={(value) => !form.formState.isSubmitting && setOpen(value)}>
       <DialogTrigger asChild>
-        {trigger ?? <Button variant="destructive">Delete team</Button>}
+        {trigger ?? <Button variant="destructive">წაშლა</Button>}
       </DialogTrigger>
 
       <DialogContent position="center">
         <DialogHeader>
-          <DialogTitle>Delete team</DialogTitle>
+          <DialogTitle>წაშალეთ გუნდი</DialogTitle>
 
           <DialogDescription className="mt-4">
-            Are you sure? This is irreversable.
+            ნამდვილად გსურთ წაშლა? ეს ქმედება შეუქცევადია.
           </DialogDescription>
         </DialogHeader>
 
@@ -132,7 +131,8 @@ export const DeleteTeamDialog = ({ trigger, teamId, teamName }: DeleteTeamDialog
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>
-                      Confirm by typing <span className="text-destructive">{deleteMessage}</span>
+                      დადასტურებისთვის ჩაწერეთ{' '}
+                      <span className="text-destructive">{deleteMessage}</span>
                     </FormLabel>
                     <FormControl>
                       <Input className="bg-background" {...field} />
@@ -144,11 +144,11 @@ export const DeleteTeamDialog = ({ trigger, teamId, teamName }: DeleteTeamDialog
 
               <DialogFooter>
                 <Button type="button" variant="secondary" onClick={() => setOpen(false)}>
-                  Cancel
+                  დახურვა
                 </Button>
 
                 <Button type="submit" variant="destructive" loading={form.formState.isSubmitting}>
-                  Delete
+                  წაშლა
                 </Button>
               </DialogFooter>
             </fieldset>

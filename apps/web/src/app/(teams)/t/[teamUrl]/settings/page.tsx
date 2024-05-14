@@ -35,7 +35,10 @@ export default async function TeamsSettingsPage({ params }: TeamsSettingsPagePro
 
   return (
     <div>
-      <SettingsHeader title="Team Profile" subtitle="Here you can edit your team's details." />
+      <SettingsHeader
+        title="გუნდის პროფილი"
+        subtitle="აქ შეგიძლიათ შეცვალოთ თქვენი გუნდის დეტალები და მონაცემები."
+      />
 
       <TeamTransferStatus
         className="mb-4"
@@ -49,11 +52,11 @@ export default async function TeamsSettingsPage({ params }: TeamsSettingsPagePro
       <section className="mt-6 space-y-6">
         {(team.teamEmail || team.emailVerification) && (
           <Alert className="p-6" variant="neutral">
-            <AlertTitle>Team email</AlertTitle>
+            <AlertTitle>გუნდის ელ. ფოსტა</AlertTitle>
 
             <AlertDescription className="mr-2">
-              You can view documents associated with this email and use this identity when sending
-              documents.
+              შეგიძლიათ ნახოთ ამ ელ. ფოსტასთან დაკავშირებული დოკუმენტები და გამოიყენოთ ეს იდენტობა
+              დოკუმენტების გაგზავნისას.
             </AlertDescription>
 
             <hr className="border-border/50 mt-2" />
@@ -85,7 +88,7 @@ export default async function TeamsSettingsPage({ params }: TeamsSettingsPagePro
                     .with({ teamEmail: P.not(null) }, () => (
                       <>
                         <CheckCircle2 className="mr-1.5 text-green-500 dark:text-green-300" />
-                        Active
+                        აქტიური
                       </>
                     ))
                     .with(
@@ -98,14 +101,14 @@ export default async function TeamsSettingsPage({ params }: TeamsSettingsPagePro
                       () => (
                         <>
                           <Clock className="mr-1.5 text-yellow-500 dark:text-yellow-200" />
-                          Expired
+                          ვადა გასული
                         </>
                       ),
                     )
                     .with({ emailVerification: P.not(null) }, () => (
                       <>
                         <Clock className="mr-1.5 text-blue-600 dark:text-blue-300" />
-                        Awaiting email confirmation
+                        ველოდებით ელ. ფოსტის დადასტურებას
                       </>
                     ))
                     .otherwise(() => null)}
@@ -123,7 +126,7 @@ export default async function TeamsSettingsPage({ params }: TeamsSettingsPagePro
             variant="neutral"
           >
             <div className="mb-4 sm:mb-0">
-              <AlertTitle>Team email</AlertTitle>
+              <AlertTitle>გუნდის ელ. ფოსტა</AlertTitle>
 
               <AlertDescription className="mr-2">
                 <ul className="text-muted-foreground mt-0.5 list-inside list-disc text-sm">
@@ -131,7 +134,7 @@ export default async function TeamsSettingsPage({ params }: TeamsSettingsPagePro
                   {/* <li>Display this name and email when sending documents</li> */}
                   {/* <li>View documents associated with this email</li> */}
 
-                  <span>View documents associated with this email</span>
+                  <span>ნახეთ ამ ელფოსტასთან დაკავშირებული დოკუმენტები</span>
                 </ul>
               </AlertDescription>
             </div>
@@ -168,11 +171,11 @@ export default async function TeamsSettingsPage({ params }: TeamsSettingsPagePro
               variant="neutral"
             >
               <div className="mb-4 sm:mb-0">
-                <AlertTitle>Delete team</AlertTitle>
+                <AlertTitle>გუნდის წაშლა</AlertTitle>
 
                 <AlertDescription className="mr-2">
-                  This team, and any associated data excluding billing invoices will be permanently
-                  deleted.
+                  ეს გუნდი და მასთან დაკავშირებული ნებისმიერი მონაცემი, ბილინგის ინვოისების გარდა
+                  სამუდამოდ წაიშლება.
                 </AlertDescription>
               </div>
 

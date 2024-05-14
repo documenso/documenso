@@ -91,7 +91,7 @@ export const CurrentUserTeamsDataTable = () => {
             <div className="flex justify-end space-x-2">
               {canExecuteTeamAction('MANAGE_TEAM', row.original.currentTeamMember.role) && (
                 <Button variant="outline" asChild>
-                  <Link href={`/t/${row.original.url}/settings`}>Manage</Link>
+                  <Link href={`/t/${row.original.url}/settings`}>მართვა</Link>
                 </Button>
               )}
 
@@ -105,7 +105,7 @@ export const CurrentUserTeamsDataTable = () => {
                     disabled={row.original.ownerUserId === row.original.currentTeamMember.userId}
                     onSelect={(e) => e.preventDefault()}
                   >
-                    Leave
+                    გასვლა
                   </Button>
                 }
               />

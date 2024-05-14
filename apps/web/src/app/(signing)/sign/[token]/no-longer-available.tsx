@@ -40,16 +40,16 @@ export const NoLongerAvailable = ({
 
         <h2 className="mt-6 max-w-[35ch] text-center text-2xl font-semibold leading-normal md:text-3xl lg:text-4xl">
           <span className="mt-1.5 block">"{document.title}"</span>
-          is no longer available to sign
+          აღარ არის ხელმისაწვდომი
         </h2>
 
         <p className="text-muted-foreground/60 mt-2.5 max-w-[60ch] text-center text-sm font-medium md:text-base">
-          This document has been cancelled by the owner.
+          ეს დოკუმენტი გაუქმდა მფლობელის მიერ.
         </p>
 
         {session?.user ? (
           <Link href="/documents" className="text-documenso-700 hover:text-documenso-600 mt-36">
-            Go Back Home
+            მთავარზე დაბრუნება
           </Link>
         ) : (
           <p className="text-muted-foreground/60 mt-36 text-sm">

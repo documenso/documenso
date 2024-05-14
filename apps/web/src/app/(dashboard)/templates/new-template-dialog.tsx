@@ -83,8 +83,8 @@ export const NewTemplateDialog = ({ teamId, templateRootPath }: NewTemplateDialo
       }
     } catch {
       toast({
-        title: 'Something went wrong',
-        description: 'Please try again later.',
+        title: 'დაფიქსირდა ხარვეზი',
+        description: 'გთხოვთ სცადეთ თავიდან.',
         variant: 'destructive',
       });
     }
@@ -112,9 +112,9 @@ export const NewTemplateDialog = ({ teamId, templateRootPath }: NewTemplateDialo
       });
 
       toast({
-        title: 'Template document uploaded',
+        title: 'შაბლონის დოკუმენტი ატვირთვა',
         description:
-          'Your document has been uploaded successfully. You will be redirected to the template page.',
+          'თქვენი დოკუმენტი წარმატებით აიტვირთა. თქვენ გადამისამართდებით შაბლონების გვერდზე.',
         duration: 5000,
       });
 
@@ -123,8 +123,8 @@ export const NewTemplateDialog = ({ teamId, templateRootPath }: NewTemplateDialo
       router.push(`${templateRootPath}/${id}`);
     } catch {
       toast({
-        title: 'Something went wrong',
-        description: 'Please try again later.',
+        title: 'დაფიქსირდა ხარვეზი',
+        description: 'გთხოვთ სცადეთ თავიდან.',
         variant: 'destructive',
       });
     }
@@ -150,15 +150,16 @@ export const NewTemplateDialog = ({ teamId, templateRootPath }: NewTemplateDialo
       <DialogTrigger asChild>
         <Button className="cursor-pointer" disabled={!session?.user.emailVerified}>
           <FilePlus className="-ml-1 mr-2 h-4 w-4" />
-          New Template
+          ახალი შაბლონი
         </Button>
       </DialogTrigger>
 
       <DialogContent className="w-full max-w-xl">
         <DialogHeader>
-          <DialogTitle>New Template</DialogTitle>
+          <DialogTitle>ახალი შაბლონი</DialogTitle>
           <DialogDescription>
-            Templates allow you to quickly generate documents with pre-filled recipients and fields.
+            შაბლონები საშუალებას გაძლევთ სწრაფად შექმნათ დოკუმენტები წინასწარ შევსებული მიმღებებითა
+            და ველებით.
           </DialogDescription>
         </DialogHeader>
 
@@ -170,14 +171,14 @@ export const NewTemplateDialog = ({ teamId, templateRootPath }: NewTemplateDialo
                 name="name"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Template name</FormLabel>
+                    <FormLabel>შაბლონის სახელი</FormLabel>
                     <FormControl>
                       <Input {...field} />
                     </FormControl>
                     <FormDescription>
                       <span className="text-muted-foreground text-xs">
-                        Leave this empty if you would like to use your document's name for the
-                        template
+                        დატოვეთ ეს ველი ცარიელი, თუ გსურთ გამოიყენოთ თქვენი დოკუმენტის სახელი
+                        შაბლონის სახელად.
                       </span>
                     </FormDescription>
                     <FormMessage />
@@ -195,7 +196,7 @@ export const NewTemplateDialog = ({ teamId, templateRootPath }: NewTemplateDialo
                         className="text-muted-foreground absolute right-2.5 top-2.5 rounded-sm opacity-60 transition-opacity hover:opacity-100 focus:outline-none disabled:pointer-events-none"
                       >
                         <X className="h-6 w-6" />
-                        <span className="sr-only">Remove Template</span>
+                        <span className="sr-only">შაბლონის წაშლა</span>
                       </button>
 
                       <div className="border-muted-foreground/20 group-hover:border-documenso/80 dark:bg-muted/80 z-10 flex aspect-[3/4] w-24 flex-col gap-y-1 rounded-lg border bg-white/80 px-2 py-4 backdrop-blur-sm">
@@ -205,7 +206,7 @@ export const NewTemplateDialog = ({ teamId, templateRootPath }: NewTemplateDialo
                       </div>
 
                       <p className="group-hover:text-foreground text-muted-foreground mt-4 font-medium">
-                        Uploaded Document
+                        ატვირთული დოკუმენტი
                       </p>
 
                       <span className="text-muted-foreground/80 mt-1 text-sm">
@@ -221,7 +222,7 @@ export const NewTemplateDialog = ({ teamId, templateRootPath }: NewTemplateDialo
               <DialogFooter>
                 <DialogClose asChild>
                   <Button type="button" variant="secondary">
-                    Cancel
+                    დახურვა
                   </Button>
                 </DialogClose>
 
@@ -230,7 +231,7 @@ export const NewTemplateDialog = ({ teamId, templateRootPath }: NewTemplateDialo
                   disabled={!uploadedFile}
                   type="submit"
                 >
-                  Create template
+                  შაბლონის შექმნა
                 </Button>
               </DialogFooter>
             </fieldset>

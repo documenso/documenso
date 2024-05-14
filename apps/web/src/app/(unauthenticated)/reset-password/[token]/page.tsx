@@ -21,16 +21,16 @@ export default async function ResetPasswordPage({ params: { token } }: ResetPass
   return (
     <div className="w-screen max-w-lg px-4">
       <div className="w-full">
-        <h1 className="text-4xl font-semibold">Reset Password</h1>
+        <h1 className="text-4xl font-semibold">პაროლის აღდგენა</h1>
 
-        <p className="text-muted-foreground mt-2 text-sm">Please choose your new password </p>
+        <p className="text-muted-foreground mt-2 text-sm">გთხოვთ ჩაწეროთ ახალი პაროლი </p>
 
         <ResetPasswordForm token={token} className="mt-4" />
 
         <p className="text-muted-foreground mt-6 text-center text-sm">
-          Don't have an account?{' '}
+          არ გაქვთ ანგარიში?{' '}
           <Link href="/signup" className="text-primary duration-200 hover:opacity-70">
-            Sign up
+            რეგისტრაცია
           </Link>
         </p>
       </div>

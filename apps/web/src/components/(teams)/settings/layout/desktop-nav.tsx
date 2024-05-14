@@ -33,7 +33,7 @@ export const DesktopNav = ({ className, ...props }: DesktopNavProps) => {
           className={cn('w-full justify-start', pathname === settingsPath && 'bg-secondary')}
         >
           <Settings className="mr-2 h-5 w-5" />
-          General
+          ზოგადი
         </Button>
       </Link>
 
@@ -46,7 +46,7 @@ export const DesktopNav = ({ className, ...props }: DesktopNavProps) => {
           )}
         >
           <Users className="mr-2 h-5 w-5" />
-          Members
+          წევრები
         </Button>
       </Link>
 
@@ -56,7 +56,7 @@ export const DesktopNav = ({ className, ...props }: DesktopNavProps) => {
           className={cn('w-full justify-start', pathname?.startsWith(tokensPath) && 'bg-secondary')}
         >
           <Braces className="mr-2 h-5 w-5" />
-          API Tokens
+          API ტოკენები
         </Button>
       </Link>
 
@@ -69,7 +69,7 @@ export const DesktopNav = ({ className, ...props }: DesktopNavProps) => {
           )}
         >
           <Webhook className="mr-2 h-5 w-5" />
-          Webhooks
+          ვებჰუკები
         </Button>
       </Link>
 

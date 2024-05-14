@@ -41,7 +41,7 @@ export const MobileNav = ({ className, ...props }: MobileNavProps) => {
           )}
         >
           <User className="mr-2 h-5 w-5" />
-          General
+          ზოგადი
         </Button>
       </Link>
 
@@ -54,7 +54,7 @@ export const MobileNav = ({ className, ...props }: MobileNavProps) => {
           )}
         >
           <Key className="mr-2 h-5 w-5" />
-          Members
+          წევრები
         </Button>
       </Link>
 
@@ -64,7 +64,7 @@ export const MobileNav = ({ className, ...props }: MobileNavProps) => {
           className={cn('w-full justify-start', pathname?.startsWith(tokensPath) && 'bg-secondary')}
         >
           <Braces className="mr-2 h-5 w-5" />
-          API Tokens
+          API ტოკენები
         </Button>
       </Link>
 
@@ -77,7 +77,7 @@ export const MobileNav = ({ className, ...props }: MobileNavProps) => {
           )}
         >
           <Webhook className="mr-2 h-5 w-5" />
-          Webhooks
+          ვებჰუკები
         </Button>
       </Link>
 

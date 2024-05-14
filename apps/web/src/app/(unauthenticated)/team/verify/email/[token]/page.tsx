@@ -24,14 +24,15 @@ export default async function VerifyTeamEmailPage({ params: { token } }: VerifyT
     return (
       <div className="w-screen max-w-lg px-4">
         <div className="w-full">
-          <h1 className="text-4xl font-semibold">Invalid link</h1>
+          <h1 className="text-4xl font-semibold">არასწორი ბმული</h1>
 
           <p className="text-muted-foreground mb-4 mt-2 text-sm">
-            This link is invalid or has expired. Please contact your team to resend a verification.
+            ეს ბმული არასწორია ან ვადა გაუვიდა. გთხოვთ, დაუკავშირდეთ თქვენს გუნდს ვერიფიკაციის
+            ხელახლა გამოსაგზავნად.
           </p>
 
           <Button asChild>
-            <Link href="/">Return</Link>
+            <Link href="/">დაბრუნება</Link>
           </Button>
         </div>
       </div>
@@ -65,11 +66,11 @@ export default async function VerifyTeamEmailPage({ params: { token } }: VerifyT
   if (isTeamEmailVerificationError) {
     return (
       <div>
-        <h1 className="text-4xl font-semibold">Team email verification</h1>
+        <h1 className="text-4xl font-semibold">გუნდის ელ. ფოსტის ვერიფიკაცია</h1>
 
         <p className="text-muted-foreground mt-2 text-sm">
           Something went wrong while attempting to verify your email address for{' '}
-          <strong>{team.name}</strong>. Please try again later.
+          <strong>{team.name}</strong>. გთხოვთ თავიდან სცადეთ.
         </p>
       </div>
     );
@@ -77,14 +78,14 @@ export default async function VerifyTeamEmailPage({ params: { token } }: VerifyT
 
   return (
     <div>
-      <h1 className="text-4xl font-semibold">Team email verified!</h1>
+      <h1 className="text-4xl font-semibold">გუნდის ელ. ფოსტა ვერიფიცირებულია!</h1>
 
       <p className="text-muted-foreground mb-4 mt-2 text-sm">
-        You have verified your email address for <strong>{team.name}</strong>.
+        თქვენ დაადასტურეთ თქვენი ელ. ფოსტის მისამართი <strong>{team.name}</strong>-სთვის.
       </p>
 
       <Button asChild>
-        <Link href="/">Continue</Link>
+        <Link href="/">გაგრძელება</Link>
       </Button>
     </div>
   );

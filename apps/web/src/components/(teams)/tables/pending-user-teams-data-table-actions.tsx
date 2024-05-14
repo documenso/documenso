@@ -26,7 +26,7 @@ export const PendingUserTeamsDataTableActions = ({
       },
       onError: () => {
         toast({
-          title: 'Something went wrong',
+          title: 'დაფიქსირდა ხარვეზი',
           description:
             'We encountered an unknown error while attempting to delete the pending team. Please try again later.',
           duration: 10000,
@@ -38,7 +38,7 @@ export const PendingUserTeamsDataTableActions = ({
   return (
     <fieldset disabled={deletingTeam} className={cn('flex justify-end space-x-2', className)}>
       <Button variant="outline" onClick={() => onPayClick(pendingTeamId)}>
-        Pay
+        გადახდა
       </Button>
 
       <Button

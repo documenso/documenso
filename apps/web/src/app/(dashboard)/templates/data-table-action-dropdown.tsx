@@ -49,12 +49,12 @@ export const DataTableActionDropdown = ({
       </DropdownMenuTrigger>
 
       <DropdownMenuContent className="w-52" align="start" forceMount>
-        <DropdownMenuLabel>Action</DropdownMenuLabel>
+        <DropdownMenuLabel>პარამეტრები</DropdownMenuLabel>
 
         <DropdownMenuItem disabled={!isOwner && !isTeamTemplate} asChild>
           <Link href={`${templateRootPath}/${row.id}`}>
             <Edit className="mr-2 h-4 w-4" />
-            Edit
+            რედაქტირება
           </Link>
         </DropdownMenuItem>
 
@@ -63,7 +63,7 @@ export const DataTableActionDropdown = ({
           onClick={() => setDuplicateDialogOpen(true)}
         >
           <Copy className="mr-2 h-4 w-4" />
-          Duplicate
+          დუპლიკაცია
         </DropdownMenuItem>
 
         <DropdownMenuItem
@@ -71,7 +71,7 @@ export const DataTableActionDropdown = ({
           onClick={() => setDeleteDialogOpen(true)}
         >
           <Trash2 className="mr-2 h-4 w-4" />
-          Delete
+          წაშლა
         </DropdownMenuItem>
       </DropdownMenuContent>
 

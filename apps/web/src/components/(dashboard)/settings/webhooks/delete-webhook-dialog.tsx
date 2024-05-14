@@ -47,11 +47,11 @@ export const DeleteWebhookDialog = ({ webhook, children }: DeleteWebhookDialogPr
 
   const [open, setOpen] = useState(false);
 
-  const deleteMessage = `delete ${webhook.webhookUrl}`;
+  const deleteMessage = `წაშალეთ ${webhook.webhookUrl}`;
 
   const ZDeleteWebhookFormSchema = z.object({
     webhookUrl: z.literal(deleteMessage, {
-      errorMap: () => ({ message: `You must enter '${deleteMessage}' to proceed` }),
+      errorMap: () => ({ message: `გაგრძელებისთვის უნდა ჩაწერთ: '${deleteMessage}'` }),
     }),
   });
 
@@ -71,9 +71,9 @@ export const DeleteWebhookDialog = ({ webhook, children }: DeleteWebhookDialogPr
       await deleteWebhook({ id: webhook.id, teamId: team?.id });
 
       toast({
-        title: 'Webhook deleted',
+        title: 'ვებჰუკი წაშლილია',
         duration: 5000,
-        description: 'The webhook has been successfully deleted.',
+        description: 'ვებჰუკი წარმატებით წაიშალა.',
       });
 
       setOpen(false);
@@ -81,11 +81,10 @@ export const DeleteWebhookDialog = ({ webhook, children }: DeleteWebhookDialogPr
       router.refresh();
     } catch (error) {
       toast({
-        title: 'An unknown error occurred',
+        title: 'დაფიქსირდა ხარვეზი',
         variant: 'destructive',
         duration: 5000,
-        description:
-          'We encountered an unknown error while attempting to delete it. Please try again later.',
+        description: 'ვებჰუკის წაშლისას დაფიქსირდა ხარვეზი. გთხოვთ თავიდან სცადოთ.',
       });
     }
   };
@@ -101,18 +100,18 @@ export const DeleteWebhookDialog = ({ webhook, children }: DeleteWebhookDialogPr
       <DialogTrigger asChild>
         {children ?? (
           <Button className="mr-4" variant="destructive">
-            Delete
+            წაშლა
           </Button>
         )}
       </DialogTrigger>
 
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Delete Webhook</DialogTitle>
+          <DialogTitle>ვებჰუკის წაშლა</DialogTitle>
 
           <DialogDescription>
-            Please note that this action is irreversible. Once confirmed, your webhook will be
-            permanently deleted.
+            გთხოვთ გაითვალისწინოთ, რომ ეს ქმედება შეუქცევადია. დადასტურების შემდეგ, თქვენი ვებჰუკი
+            სამუდამოდ წაიშლება.
           </DialogDescription>
         </DialogHeader>
 
@@ -128,7 +127,7 @@ export const DeleteWebhookDialog = ({ webhook, children }: DeleteWebhookDialogPr
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>
-                      Confirm by typing:{' '}
+                      დადასტურებისთვის ჩაწერეთ:{' '}
                       <span className="font-sm text-destructive font-semibold">
                         {deleteMessage}
                       </span>
@@ -149,7 +148,7 @@ export const DeleteWebhookDialog = ({ webhook, children }: DeleteWebhookDialogPr
                     className="flex-1"
                     onClick={() => setOpen(false)}
                   >
-                    Cancel
+                    დახურვა
                   </Button>
 
                   <Button
@@ -159,7 +158,7 @@ export const DeleteWebhookDialog = ({ webhook, children }: DeleteWebhookDialogPr
                     disabled={!form.formState.isValid}
                     loading={form.formState.isSubmitting}
                   >
-                    I'm sure! Delete it
+                    დარწმუნებული ვარ, წაშალე!
                   </Button>
                 </div>
               </DialogFooter>

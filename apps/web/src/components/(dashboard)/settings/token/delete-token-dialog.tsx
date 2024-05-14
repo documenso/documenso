@@ -49,11 +49,11 @@ export default function DeleteTokenDialog({
 
   const [isOpen, setIsOpen] = useState(false);
 
-  const deleteMessage = `delete ${token.name}`;
+  const deleteMessage = `წაშალეთ ${token.name}`;
 
   const ZDeleteTokenDialogSchema = z.object({
     tokenName: z.literal(deleteMessage, {
-      errorMap: () => ({ message: `You must enter '${deleteMessage}' to proceed` }),
+      errorMap: () => ({ message: `გაგრძელებისთვის თქვენ უნდა ჩაწეროთ '${deleteMessage}'` }),
     }),
   });
 
@@ -80,8 +80,8 @@ export default function DeleteTokenDialog({
       });
 
       toast({
-        title: 'Token deleted',
-        description: 'The token was deleted successfully.',
+        title: 'ტოკენი წაიშალა',
+        description: 'ტოკენი წარმატებით წაიშალა!.',
         duration: 5000,
       });
 
@@ -90,11 +90,10 @@ export default function DeleteTokenDialog({
       router.refresh();
     } catch (error) {
       toast({
-        title: 'An unknown error occurred',
+        title: 'დაფიქსირდა ხარვეზი',
         variant: 'destructive',
         duration: 5000,
-        description:
-          'We encountered an unknown error while attempting to delete this token. Please try again later.',
+        description: 'ტოკენის წაშლისას დაფიქსირდა ხარვეზი. გთხოვთ თავიდან სცადოთ.',
       });
     }
   };
@@ -113,18 +112,18 @@ export default function DeleteTokenDialog({
       <DialogTrigger asChild={true}>
         {children ?? (
           <Button className="mr-4" variant="destructive">
-            Delete
+            წაშლა
           </Button>
         )}
       </DialogTrigger>
 
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Are you sure you want to delete this token?</DialogTitle>
+          <DialogTitle>ნამდვილად გნებავთ ტოკენის წაშლა?</DialogTitle>
 
           <DialogDescription>
-            Please note that this action is irreversible. Once confirmed, your token will be
-            permanently deleted.
+            გთხოვთ გაითვალისწინოთ, რომ ეს ქმედება შეუქცევადია. დადასტურების შემდეგ, თქვენი ტოკენი
+            სამუდამოდ წაიშლება.
           </DialogDescription>
         </DialogHeader>
 
@@ -140,7 +139,7 @@ export default function DeleteTokenDialog({
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>
-                      Confirm by typing:{' '}
+                      დადასტურებისთის ჩაწერეთ:{' '}
                       <span className="font-sm text-destructive font-semibold">
                         {deleteMessage}
                       </span>
@@ -162,7 +161,7 @@ export default function DeleteTokenDialog({
                     className="flex-1"
                     onClick={() => setIsOpen(false)}
                   >
-                    Cancel
+                    დახურვა
                   </Button>
 
                   <Button
@@ -172,7 +171,7 @@ export default function DeleteTokenDialog({
                     disabled={!form.formState.isValid}
                     loading={form.formState.isSubmitting}
                   >
-                    I'm sure! Delete it
+                    დარწმუნებული ვარ, წაშალე!
                   </Button>
                 </div>
               </DialogFooter>

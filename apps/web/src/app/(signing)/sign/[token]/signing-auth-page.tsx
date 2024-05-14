@@ -34,8 +34,8 @@ export const SigningAuthPageView = ({ email }: SigningAuthPageViewProps) => {
       });
     } catch {
       toast({
-        title: 'Something went wrong',
-        description: 'We were unable to log you out at this time.',
+        title: 'დაფიქსირდა ხარვეზი',
+        description: 'ანგარიშიდან გამოსვლა ამჯერად ვერ მოხერხდა. გთხოვთ, თავიდან სცადეთ.',
         duration: 10000,
         variant: 'destructive',
       });
@@ -47,10 +47,10 @@ export const SigningAuthPageView = ({ email }: SigningAuthPageViewProps) => {
   return (
     <div className="mx-auto flex h-[70vh] w-full max-w-md flex-col items-center justify-center">
       <div>
-        <h1 className="text-3xl font-semibold">Authentication required</h1>
+        <h1 className="text-3xl font-semibold">საჭიროა ავთენტიფიკაცია</h1>
 
         <p className="text-muted-foreground mt-2 text-sm">
-          You need to be logged in as <strong>{email}</strong> to view this page.
+          ამ გვერდის სანახავად ავტორიზირებული უნდა იყოთ როგორც: <strong>{email}</strong>
         </p>
 
         <Button
@@ -59,7 +59,7 @@ export const SigningAuthPageView = ({ email }: SigningAuthPageViewProps) => {
           onClick={async () => handleChangeAccount(email)}
           loading={isSigningOut}
         >
-          Login
+          ავტორიზაცია
         </Button>
       </div>
     </div>

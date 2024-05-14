@@ -88,7 +88,7 @@ export const UpdateTeamForm = ({ teamId, teamName, teamUrl }: UpdateTeamDialogPr
       }
 
       toast({
-        title: 'An unknown error occurred',
+        title: 'დაფიქსირდა ხარვეზი',
         variant: 'destructive',
         description:
           'We encountered an unknown error while attempting to update your team. Please try again later.',
@@ -105,7 +105,7 @@ export const UpdateTeamForm = ({ teamId, teamName, teamUrl }: UpdateTeamDialogPr
             name="name"
             render={({ field }) => (
               <FormItem>
-                <FormLabel required>Team Name</FormLabel>
+                <FormLabel required>გუნდის სახელი</FormLabel>
                 <FormControl>
                   <Input className="bg-background" {...field} />
                 </FormControl>
@@ -119,7 +119,7 @@ export const UpdateTeamForm = ({ teamId, teamName, teamUrl }: UpdateTeamDialogPr
             name="url"
             render={({ field }) => (
               <FormItem className="mt-4">
-                <FormLabel required>Team URL</FormLabel>
+                <FormLabel required>გუნდის URL</FormLabel>
                 <FormControl>
                   <Input className="bg-background" {...field} />
                 </FormControl>
