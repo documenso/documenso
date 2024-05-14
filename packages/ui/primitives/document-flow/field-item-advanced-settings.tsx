@@ -186,6 +186,7 @@ export const FieldAdvancedSettings = forwardRef<HTMLDivElement, FieldAdvancedSet
             onGoBackClick={onAdvancedSettings}
             onGoNextClick={() => {
               onAdvancedSettings?.();
+              // TODO Validate fieldState so users can't edit and submit invalid data
               onSave?.(fieldState);
             }}
           />

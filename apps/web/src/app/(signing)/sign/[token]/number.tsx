@@ -6,7 +6,7 @@ import { useParams } from 'next/navigation';
 import { useRouter } from 'next/navigation';
 
 import { Loader } from 'lucide-react';
-import { Disc } from 'lucide-react';
+import { Hash } from 'lucide-react';
 
 import { DO_NOT_INVALIDATE_QUERY_ON_MUTATION } from '@documenso/lib/constants/trpc';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
@@ -159,7 +159,7 @@ export const NumberField = ({ field, recipient }: NumberFieldProps) => {
       {!field.inserted && (
         <p className="group-hover:text-primary text-muted-foreground flex flex-col items-center justify-center duration-200">
           <span className="flex items-center justify-center gap-x-1 text-lg">
-            <Disc /> {fieldMeta.label ?? 'Radio'}
+            <Hash /> {fieldMeta.label ?? 'Radio'}
           </span>
           <p className="mt-1 text-xs">{fieldMeta.placeholder}</p>
         </p>
@@ -167,7 +167,7 @@ export const NumberField = ({ field, recipient }: NumberFieldProps) => {
 
       {field.inserted && (
         <p className="text-muted-foreground flex items-center justify-center gap-x-1 duration-200">
-          <Disc /> {field.customText}
+          <Hash /> {field.customText}
         </p>
       )}
 
