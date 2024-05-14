@@ -9,6 +9,7 @@ import { getRequiredServerComponentSession } from '@documenso/lib/next-auth/get-
 import { getDocumentById } from '@documenso/lib/server-only/document/get-document-by-id';
 import { getServerComponentFlag } from '@documenso/lib/server-only/feature-flags/get-server-component-feature-flag';
 import { getCompletedFieldsForDocument } from '@documenso/lib/server-only/field/get-completed-fields-for-document';
+import { getPendingFieldsForDocument } from '@documenso/lib/server-only/field/get-pending-fields-for-document';
 import { getRecipientsForDocument } from '@documenso/lib/server-only/recipient/get-recipients-for-document';
 import { symmetricDecrypt } from '@documenso/lib/universal/crypto';
 import { formatDocumentsPath } from '@documenso/lib/utils/teams';
@@ -21,6 +22,7 @@ import { LazyPDFViewer } from '@documenso/ui/primitives/lazy-pdf-viewer';
 
 import { StackAvatarsWithTooltip } from '~/components/(dashboard)/avatar/stack-avatars-with-tooltip';
 import { DocumentHistorySheet } from '~/components/document/document-history-sheet';
+import { DocumentPendingFields } from '~/components/document/document-pending-fields';
 import { DocumentReadOnlyFields } from '~/components/document/document-read-only-fields';
 import {
   DocumentStatus as DocumentStatusComponent,
@@ -86,11 +88,14 @@ export const DocumentPageView = async ({ params, team }: DocumentPageViewProps) 
     documentMeta.password = securePassword;
   }
 
-  const [recipients, completedFields] = await Promise.all([
+  const [recipients, pendingFields, completedFields] = await Promise.all([
     getRecipientsForDocument({
       documentId,
       teamId: team?.id,
       userId: user.id,
+    }),
+    getPendingFieldsForDocument({
+      documentId,
     }),
     getCompletedFieldsForDocument({
       documentId,
@@ -162,11 +167,15 @@ export const DocumentPageView = async ({ params, team }: DocumentPageViewProps) 
           </CardContent>
         </Card>
 
-        {document.status === DocumentStatus.PENDING && (
+        {document.status === DocumentStatus.COMPLETED && (
           <DocumentReadOnlyFields
             fields={completedFields}
             documentMeta={document.documentMeta || undefined}
           />
+        )}
+
+        {document.status === DocumentStatus.PENDING && (
+          <DocumentPendingFields fields={pendingFields} />
         )}
 
         <div className="col-span-12 lg:col-span-6 xl:col-span-5">
