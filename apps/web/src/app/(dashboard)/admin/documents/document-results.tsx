@@ -56,7 +56,7 @@ export const AdminDocumentResults = () => {
     <div>
       <Input
         type="search"
-        placeholder="Search by document title"
+        placeholder="მოძებნეთ დოკუმენტის სახელით"
         value={term}
         onChange={(e) => setTerm(e.target.value)}
       />
@@ -65,12 +65,12 @@ export const AdminDocumentResults = () => {
         <DataTable
           columns={[
             {
-              header: 'Created',
+              header: 'შექმნილია',
               accessorKey: 'createdAt',
               cell: ({ row }) => <LocaleDate date={row.original.createdAt} />,
             },
             {
-              header: 'Title',
+              header: 'სათაური',
               accessorKey: 'title',
               cell: ({ row }) => {
                 return (
@@ -84,12 +84,12 @@ export const AdminDocumentResults = () => {
               },
             },
             {
-              header: 'Status',
+              header: 'სტატუსი',
               accessorKey: 'status',
               cell: ({ row }) => <DocumentStatus status={row.original.status} />,
             },
             {
-              header: 'Owner',
+              header: 'მფლობელი',
               accessorKey: 'owner',
               cell: ({ row }) => {
                 const avatarFallbackText = row.original.User.name
@@ -125,7 +125,7 @@ export const AdminDocumentResults = () => {
               },
             },
             {
-              header: 'Last updated',
+              header: 'ბოლო განახლება',
               accessorKey: 'updatedAt',
               cell: ({ row }) => <LocaleDate date={row.original.updatedAt} />,
             },

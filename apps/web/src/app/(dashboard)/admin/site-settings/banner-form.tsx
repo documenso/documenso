@@ -67,8 +67,8 @@ export function BannerForm({ banner }: BannerFormProps) {
       });
 
       toast({
-        title: 'Banner Updated',
-        description: 'Your banner has been updated successfully.',
+        title: 'ბანერი განახლებულია',
+        description: 'ბანერი წარმატებით განახლდა.',
         duration: 5000,
       });
 
@@ -76,16 +76,16 @@ export function BannerForm({ banner }: BannerFormProps) {
     } catch (err) {
       if (err instanceof TRPCClientError && err.data?.code === 'BAD_REQUEST') {
         toast({
-          title: 'An error occurred',
+          title: 'დაფიქსირდა ხარვეზი',
           description: err.message,
           variant: 'destructive',
         });
       } else {
         toast({
-          title: 'An unknown error occurred',
+          title: 'დაფიქსირდა ხარვეზი',
           variant: 'destructive',
           description:
-            'We encountered an unknown error while attempting to update the banner. Please try again later.',
+            'ბანერის განახლებისას დაფიქსირდა ხარვეზი. გთხოვთ თავიდან სცადოთ ან დაგვიკავშირდეთ.',
         });
       }
     }
@@ -131,7 +131,7 @@ export function BannerForm({ banner }: BannerFormProps) {
                 name="data.bgColor"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Background Color</FormLabel>
+                    <FormLabel>ფონის ფერი</FormLabel>
 
                     <FormControl>
                       <div>
@@ -149,7 +149,7 @@ export function BannerForm({ banner }: BannerFormProps) {
                 name="data.textColor"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Text Color</FormLabel>
+                    <FormLabel>ტექსტის ფერი</FormLabel>
 
                     <FormControl>
                       <div>
@@ -191,7 +191,7 @@ export function BannerForm({ banner }: BannerFormProps) {
             loading={isUpdateSiteSettingLoading}
             className="mt-4 justify-end self-end"
           >
-            Update Banner
+            ბანერის განახლება
           </Button>
         </form>
       </Form>

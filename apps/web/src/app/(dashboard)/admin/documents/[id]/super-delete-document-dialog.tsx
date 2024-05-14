@@ -43,8 +43,8 @@ export const SuperDeleteDocumentDialog = ({ document }: SuperDeleteDocumentDialo
       await deleteDocument({ id: document.id, reason });
 
       toast({
-        title: 'Document deleted',
-        description: 'The Document has been deleted successfully.',
+        title: 'დოკუმენტი წაშლილია',
+        description: 'დოკუმენტი წარმატებით წაიშალა.',
         duration: 5000,
       });
 
@@ -52,17 +52,17 @@ export const SuperDeleteDocumentDialog = ({ document }: SuperDeleteDocumentDialo
     } catch (err) {
       if (err instanceof TRPCClientError && err.data?.code === 'BAD_REQUEST') {
         toast({
-          title: 'An error occurred',
+          title: 'დაფიქსირდა ხარვეზი',
           description: err.message,
           variant: 'destructive',
         });
       } else {
         toast({
-          title: 'An unknown error occurred',
+          title: 'დაფიქსირდა ხარვეზი',
           variant: 'destructive',
           description:
             err.message ??
-            'We encountered an unknown error while attempting to delete your document. Please try again later.',
+            'დოკუმენტის წაშლისას დაფიქსირდა ხარვეზი. გთხოვთ სცადოთ თავიდან ან დაგვიკავშირდეთ.',
         });
       }
     }
@@ -76,31 +76,31 @@ export const SuperDeleteDocumentDialog = ({ document }: SuperDeleteDocumentDialo
           variant="neutral"
         >
           <div>
-            <AlertTitle>Delete Document</AlertTitle>
+            <AlertTitle>დოკუმენტის წაშლა</AlertTitle>
             <AlertDescription className="mr-2">
-              Delete the document. This action is irreversible so proceed with caution.
+              Delete the document. გაითვალისწინეთ, რომ ეს ქმედება შეუქცევადია.
             </AlertDescription>
           </div>
 
           <div className="flex-shrink-0">
             <Dialog>
               <DialogTrigger asChild>
-                <Button variant="destructive">Delete Document</Button>
+                <Button variant="destructive">დოკუმენტის წაშლა</Button>
               </DialogTrigger>
 
               <DialogContent>
                 <DialogHeader className="space-y-4">
-                  <DialogTitle>Delete Document</DialogTitle>
+                  <DialogTitle>დოკუმენტის წაშლა</DialogTitle>
 
                   <Alert variant="destructive">
                     <AlertDescription className="selection:bg-red-100">
-                      This action is not reversible. Please be certain.
+                      ეს ქმედება შეუქცევადია, დარწმუნდით სანამ განაგრძობთ.
                     </AlertDescription>
                   </Alert>
                 </DialogHeader>
 
                 <div>
-                  <DialogDescription>To confirm, please enter the reason</DialogDescription>
+                  <DialogDescription>დადასტურებისთვის, გთხოვთ მიუთითოთ მიზეზი:</DialogDescription>
 
                   <Input
                     className="mt-2"
@@ -117,7 +117,7 @@ export const SuperDeleteDocumentDialog = ({ document }: SuperDeleteDocumentDialo
                     variant="destructive"
                     disabled={!reason}
                   >
-                    {isDeletingDocument ? 'Deleting document...' : 'Delete Document'}
+                    {isDeletingDocument ? 'დოკუმენტი იშლება...' : 'დოკუმენტის წაშლა'}
                   </Button>
                 </DialogFooter>
               </DialogContent>

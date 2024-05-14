@@ -35,17 +35,17 @@ export default async function AdminDocumentDetailsPage({ params }: AdminDocument
 
         {document.deletedAt && (
           <Badge size="large" variant="destructive">
-            Deleted
+            წაშლილია
           </Badge>
         )}
       </div>
 
       <div className="text-muted-foreground mt-4 text-sm">
         <div>
-          Created on: <LocaleDate date={document.createdAt} format={DateTime.DATETIME_MED} />
+          შექმნილია: <LocaleDate date={document.createdAt} format={DateTime.DATETIME_MED} />
         </div>
         <div>
-          Last updated at: <LocaleDate date={document.updatedAt} format={DateTime.DATETIME_MED} />
+          ბოლო განახლება: <LocaleDate date={document.updatedAt} format={DateTime.DATETIME_MED} />
         </div>
       </div>
 
@@ -56,7 +56,7 @@ export default async function AdminDocumentDetailsPage({ params }: AdminDocument
       <AdminActions className="mt-2" document={document} />
 
       <hr className="my-4" />
-      <h2 className="text-lg font-semibold">Recipients</h2>
+      <h2 className="text-lg font-semibold">მიმღებები</h2>
 
       <div className="mt-4">
         <Accordion type="multiple" className="space-y-4">

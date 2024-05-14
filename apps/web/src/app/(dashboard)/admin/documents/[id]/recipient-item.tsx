@@ -64,14 +64,14 @@ export const RecipientItem = ({ recipient }: RecipientItemProps) => {
       });
 
       toast({
-        title: 'Recipient updated',
-        description: 'The recipient has been updated successfully',
+        title: 'მიმღები განახლებულია',
+        description: 'მიმღები წარმატებით განახლდა',
       });
 
       router.refresh();
     } catch (error) {
       toast({
-        title: 'Failed to update recipient',
+        title: 'მიმღების განახლება ვერ მოხერხდა',
         description: error.message,
         variant: 'destructive',
       });
@@ -93,7 +93,7 @@ export const RecipientItem = ({ recipient }: RecipientItemProps) => {
               name="name"
               render={({ field }) => (
                 <FormItem className="flex-1">
-                  <FormLabel required>Name</FormLabel>
+                  <FormLabel required>სახელი</FormLabel>
 
                   <FormControl>
                     <Input {...field} />
@@ -109,7 +109,7 @@ export const RecipientItem = ({ recipient }: RecipientItemProps) => {
               name="email"
               render={({ field }) => (
                 <FormItem className="flex-1">
-                  <FormLabel required>Email</FormLabel>
+                  <FormLabel required>ელ. ფოსტა</FormLabel>
 
                   <FormControl>
                     <Input type="email" {...field} />
@@ -122,7 +122,7 @@ export const RecipientItem = ({ recipient }: RecipientItemProps) => {
 
             <div>
               <Button type="submit" loading={form.formState.isSubmitting}>
-                Update Recipient
+                მიმღების განახლება
               </Button>
             </div>
           </fieldset>
@@ -131,7 +131,7 @@ export const RecipientItem = ({ recipient }: RecipientItemProps) => {
 
       <hr className="my-4" />
 
-      <h2 className="mb-4 text-lg font-semibold">Fields</h2>
+      <h2 className="mb-4 text-lg font-semibold">ველები</h2>
 
       <DataTable
         data={recipient.Field}
