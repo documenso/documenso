@@ -7,6 +7,7 @@ import {
 import { prisma } from '@documenso/prisma';
 import type { Field, FieldType } from '@documenso/prisma/client';
 import { SendStatus, SigningStatus } from '@documenso/prisma/client';
+import type { FieldMeta } from '@documenso/ui/primitives/document-flow/field-item-advanced-settings';
 
 export interface SetFieldsForDocumentOptions {
   userId: number;
@@ -20,8 +21,7 @@ export interface SetFieldsForDocumentOptions {
     pageY: number;
     pageWidth: number;
     pageHeight: number;
-    // TODO: Add proper type
-    fieldMeta?: unknown;
+    fieldMeta?: FieldMeta;
   }[];
   requestMetadata?: RequestMetadata;
 }

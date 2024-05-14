@@ -1,6 +1,8 @@
 'use client';
 
-import { forwardRef, useEffect, useState } from 'react';
+import { forwardRef, useState } from 'react';
+
+import { z } from 'zod';
 
 import { FieldType } from '@documenso/prisma/client';
 import { Label } from '@documenso/ui/primitives/label';
@@ -12,6 +14,7 @@ import {
   SelectValue,
 } from '@documenso/ui/primitives/select';
 import { Switch } from '@documenso/ui/primitives/switch';
+import { useToast } from '@documenso/ui/primitives/use-toast';
 
 import { Input } from '../input';
 import type { FieldFormType } from './add-fields';
@@ -37,7 +40,7 @@ export type FieldMeta = {
   label?: string;
   placeholder?: string;
   format?: string;
-  characterLimit?: string;
+  characterLimit?: number;
   required?: boolean;
   readOnly?: boolean;
 };
@@ -54,29 +57,50 @@ const listValues = [
   },
 ];
 
+const defaultConfigSchema = z.object({
+  label: z.string(),
+  placeholder: z.string(),
+  format: z.string(),
+  characterLimit: z.number(),
+  required: z.boolean(),
+  readOnly: z.boolean(),
+});
+
 export const FieldAdvancedSettings = forwardRef<HTMLDivElement, FieldAdvancedSettingsProps>(
   ({ title, description, field, fields, onAdvancedSettings, isDocumentPdfLoaded, onSave }, ref) => {
+    const { toast } = useToast();
     const localStorageKey = `field_${field.formId}_${field.type}`;
 
-    const [fieldState, setFieldState] = useState(() => {
+    const defaultState: FieldMeta = {
+      label: '',
+      placeholder: '',
+      format: '',
+      characterLimit: 0,
+      required: false,
+      readOnly: false,
+    };
+
+    const [fieldState, setFieldState] = useState<FieldMeta>(() => {
       const savedState = localStorage.getItem(localStorageKey);
-      return savedState
-        ? JSON.parse(savedState)
-        : {
-            label: '',
-            placeholder: '',
-            format: '',
-            characterLimit: '',
-            required: false,
-            readOnly: false,
-          };
+      return savedState ? { ...defaultState, ...JSON.parse(savedState) } : defaultState;
     });
 
     const handleFieldChange = (key: keyof FieldMeta, value: string) => {
-      setFieldState((prevState: FieldMeta) => ({
-        ...prevState,
-        [key]: value,
-      }));
+      setFieldState((prevState: FieldMeta) => {
+        if (key === 'characterLimit') {
+          const parsedValue = Number(value);
+
+          return {
+            ...prevState,
+            [key]: isNaN(parsedValue) ? undefined : parsedValue,
+          };
+        } else {
+          return {
+            ...prevState,
+            [key]: value,
+          };
+        }
+      });
     };
 
     const handleToggleChange = (key: keyof FieldMeta) => {
@@ -86,11 +110,36 @@ export const FieldAdvancedSettings = forwardRef<HTMLDivElement, FieldAdvancedSet
       }));
     };
 
-    useEffect(() => {
-      localStorage.setItem(localStorageKey, JSON.stringify(fieldState));
-    }, [fieldState, localStorageKey]);
-
     const numberField = field.type === FieldType.NUMBER;
+
+    const handleOnGoNextClick = () => {
+      const validation = defaultConfigSchema.safeParse(fieldState);
+
+      if (!validation.success) {
+        toast({
+          title: 'Error',
+          description: 'An error occurred while saving the field.',
+          variant: 'destructive',
+        });
+
+        return;
+      } else {
+        try {
+          localStorage.setItem(localStorageKey, JSON.stringify(fieldState));
+
+          onSave?.(fieldState);
+          onAdvancedSettings?.();
+        } catch (error) {
+          console.error('Failed to save to localStorage:', error);
+
+          toast({
+            title: 'Error',
+            description: 'Failed to save settings.',
+            variant: 'destructive',
+          });
+        }
+      }
+    };
 
     return (
       <div ref={ref} className="flex h-full flex-col">
@@ -184,11 +233,7 @@ export const FieldAdvancedSettings = forwardRef<HTMLDivElement, FieldAdvancedSet
             goNextLabel="Save"
             goBackLabel="Cancel"
             onGoBackClick={onAdvancedSettings}
-            onGoNextClick={() => {
-              onAdvancedSettings?.();
-              // TODO Validate fieldState so users can't edit and submit invalid data
-              onSave?.(fieldState);
-            }}
+            onGoNextClick={handleOnGoNextClick}
           />
         </DocumentFlowFormContainerFooter>
       </div>

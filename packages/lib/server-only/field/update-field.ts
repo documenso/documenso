@@ -1,5 +1,6 @@
 import { prisma } from '@documenso/prisma';
 import type { FieldType, Team } from '@documenso/prisma/client';
+import type { FieldMeta } from '@documenso/ui/primitives/document-flow/field-item-advanced-settings';
 
 import { DOCUMENT_AUDIT_LOG_TYPE } from '../../types/document-audit-logs';
 import type { RequestMetadata } from '../../universal/extract-request-metadata';
@@ -18,9 +19,7 @@ export type UpdateFieldOptions = {
   pageWidth?: number;
   pageHeight?: number;
   requestMetadata?: RequestMetadata;
-  // TODO: Update meta type
-  // eslint-disable-next-line
-  fieldMeta?: any;
+  fieldMeta?: FieldMeta;
 };
 
 export const updateField = async ({
