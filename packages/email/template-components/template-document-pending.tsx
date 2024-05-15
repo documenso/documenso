@@ -26,19 +26,19 @@ export const TemplateDocumentPending = ({
                 src={getAssetUrl('/static/clock.png')}
                 className="-mt-0.5 mr-2 inline h-7 w-7 align-middle"
               />
-              Waiting for others
+              დანარჩენების მოლოდინში
             </Text>
           </Column>
         </Section>
 
         <Text className="text-primary mb-0 text-center text-lg font-semibold">
-          “{documentName}” has been signed
+          “{documentName}” ხელმოწერილია
         </Text>
 
         <Text className="mx-auto mb-6 mt-1 max-w-[80%] text-center text-base text-slate-400">
-          We're still waiting for other signers to sign this document.
+          ჩვენ ჯერ კიდევ ველოდებით სხვა ხელმომწერებს.
           <br />
-          We'll notify you as soon as it's ready.
+          შეგატყობინებთ როგორც კი მზად იქნება.
         </Text>
       </Section>
     </>

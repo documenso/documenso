@@ -18,21 +18,21 @@ export const TemplateDocumentDelete = ({
 
       <Section>
         <Text className="text-primary mb-0 mt-6 text-left text-lg font-semibold">
-          Your document has been deleted by an admin!
+          თქვენი დოკუმენტი ადმინმა წაშალა!
         </Text>
 
         <Text className="mx-auto mb-6 mt-1 text-left text-base text-slate-400">
-          "{documentName}" has been deleted by an admin.
+          "{documentName}" ადმინმა წაშალა.
         </Text>
 
         <Text className="mx-auto mb-6 mt-1 text-left text-base text-slate-400">
-          This document can not be recovered, if you would like to dispute the reason for future
-          documents please contact support.
+          {/* This document can not be recovered, if you would like to dispute the reason for future
+          documents please contact support. */}
+          ამ დოკუმენტის აღდგენა შეუძლებელია, თუ გსურთ სამომავლო მიზეზის დაპირისპირება დოკუმენტები
+          გთხოვთ დაგვიკავშირდეთ.
         </Text>
 
-        <Text className="mx-auto mt-1 text-left text-base text-slate-400">
-          The reason provided for deletion is the following:
-        </Text>
+        <Text className="mx-auto mt-1 text-left text-base text-slate-400">წაშლის მიზეზია:</Text>
 
         <Text className="mx-auto mb-6 mt-1 text-left text-base italic text-slate-400">
           {reason}

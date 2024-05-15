@@ -33,6 +33,7 @@ export const ConfirmTeamEmailTemplate = ({
   token = '',
 }: ConfirmTeamEmailProps) => {
   const previewText = `Accept team email request for ${teamName} on Documenso`;
+  //
 
   return (
     <Html>
@@ -66,12 +67,12 @@ export const ConfirmTeamEmailTemplate = ({
 
               <Section className="p-2 text-slate-500">
                 <Text className="text-center text-lg font-medium text-black">
-                  Verify your team email address
+                  დაადასტურეთ თქვენი გუნდის ელ.ფოსტა
                 </Text>
 
                 <Text className="text-center text-base">
-                  <span className="font-bold">{teamName}</span> has requested to use your email
-                  address for their team on Documenso.
+                  <span className="font-bold">{teamName}</span> ითხოვს გუნდისთვის თქვენი ელ.ფოსტის
+                  გამოყენებას.
                 </Text>
 
                 <div className="mx-auto mt-6 w-fit rounded-lg bg-gray-50 px-4 py-2 text-base font-medium text-slate-600">
@@ -80,22 +81,22 @@ export const ConfirmTeamEmailTemplate = ({
 
                 <Section className="mt-6">
                   <Text className="my-0 text-sm">
-                    By accepting this request, you will be granting <strong>{teamName}</strong>{' '}
-                    access to:
+                    ამ მოთხოვნაზე თანხმობით თქვენ აძლევთ <strong>{teamName}</strong>
+                    {'-ს '} წვდომას:
                   </Text>
 
                   <ul className="mb-0 mt-2">
                     <li className="text-sm">
-                      View all documents sent to and from this email address
+                      იხილეთ ყველა დოკუმენტი, რომელიც ამ ელ.ფოსტას უკავშირდება
                     </li>
                     <li className="mt-1 text-sm">
-                      Allow document recipients to reply directly to this email address
+                      მიეცით უფლება დოკუმენტის მიმღებებს უპასუხონ პირდაპირ ამ ელ.ფოსტას
                     </li>
                   </ul>
 
                   <Text className="mt-2 text-sm">
-                    You can revoke access at any time in your team settings on Documenso{' '}
-                    <Link href={`${baseUrl}/settings/teams`}>here.</Link>
+                    თქვენ შეგიძლიათ ნებისმიერ დროს გააუქმოთ წვდომა თქვენი გუნდის პარამეტრებში{' '}
+                    <Link href={`${baseUrl}/settings/teams`}>აქ.</Link>
                   </Text>
                 </Section>
 
@@ -104,12 +105,14 @@ export const ConfirmTeamEmailTemplate = ({
                     className="bg-documenso-500 inline-flex items-center justify-center rounded-lg px-6 py-3 text-center text-sm font-medium text-black no-underline"
                     href={`${baseUrl}/team/verify/email/${token}`}
                   >
-                    Accept
+                    თანხმობა
                   </Button>
                 </Section>
               </Section>
 
-              <Text className="text-center text-xs text-slate-500">Link expires in 1 hour.</Text>
+              <Text className="text-center text-xs text-slate-500">
+                ბმულს ვადა ეწურება 1 საათში.
+              </Text>
             </Container>
 
             <Hr className="mx-auto mt-12 max-w-xl" />

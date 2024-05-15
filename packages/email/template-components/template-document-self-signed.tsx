@@ -32,25 +32,26 @@ export const TemplateDocumentSelfSigned = ({
                 src={getAssetUrl('/static/completed.png')}
                 className="-mt-0.5 mr-2 inline h-7 w-7 align-middle"
               />
-              Completed
+              დასრულებულია
             </Text>
           </Column>
         </Section>
 
         <Text className="text-primary mb-0 mt-6 text-center text-lg font-semibold">
-          You have signed “{documentName}”
+          თქვენ მოაწერეთ ხელი “{documentName}”-ს
         </Text>
 
         <Text className="mx-auto mb-6 mt-1 max-w-[80%] text-center text-base text-slate-400">
-          Create a{' '}
+          შექმენით{' '}
           <Link
             href={signUpUrl}
             target="_blank"
             className="text-documenso-700 hover:text-documenso-600 whitespace-nowrap"
           >
-            free account
-          </Link>{' '}
-          to access your signed documents at any time.
+            უფასო ანგარიში
+          </Link>
+          {', '}
+          რათა წვდომა გქონდეთ ხელმოწერილ დოკუმენტებზე.
         </Text>
 
         <Section className="mb-6 mt-8 text-center">
@@ -62,7 +63,7 @@ export const TemplateDocumentSelfSigned = ({
               src={getAssetUrl('/static/user-plus.png')}
               className="mb-0.5 mr-2 inline h-5 w-5 align-middle"
             />
-            Create account
+            შექმენით ანგარიში
           </Button>
 
           <Button
@@ -73,7 +74,7 @@ export const TemplateDocumentSelfSigned = ({
               src={getAssetUrl('/static/review.png')}
               className="mb-0.5 mr-2 inline h-5 w-5 align-middle"
             />
-            View plans
+            იხილეთ პაკეტები
           </Button>
         </Section>
       </Section>
