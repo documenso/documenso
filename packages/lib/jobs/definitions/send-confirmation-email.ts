@@ -6,7 +6,7 @@ import { jobsClient } from '../client';
 jobsClient.defineJob({
   id: 'send.confirmation.email',
   name: 'Send Confirmation Email',
-  version: '1-0-0',
+  version: '1.0.0',
   trigger: {
     name: 'send.confirmation.email',
     schema: z.object({

@@ -24,7 +24,8 @@
     "prisma:studio": "npm run with:env -- npm run prisma:studio -w @documenso/prisma",
     "with:env": "dotenv -e .env -e .env.local --",
     "reset:hard": "npm run clean && npm i && npm run prisma:generate",
-    "precommit": "npm install && git add package.json package-lock.json"
+    "precommit": "npm install && git add package.json package-lock.json",
+    "trigger:dev": "npm run with:env -- npx trigger-cli dev --handler-path=\"/api/jobs\""
   },
   "engines": {
     "npm": ">=8.6.0",
@@ -33,6 +34,7 @@
   "devDependencies": {
     "@commitlint/cli": "^17.7.1",
     "@commitlint/config-conventional": "^17.7.0",
+    "@trigger.dev/cli": "^2.3.18",
     "dotenv": "^16.3.1",
     "dotenv-cli": "^7.3.0",
     "eslint": "^8.40.0",
@@ -60,5 +62,8 @@
     "next-contentlayer": {
       "next": "14.0.3"
     }
+  },
+  "trigger.dev": {
+    "endpointId": "documenso-app"
   }
 }

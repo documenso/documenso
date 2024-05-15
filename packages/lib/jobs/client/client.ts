@@ -11,6 +11,8 @@ export class JobClient {
   private constructor() {
     if (process.env.NEXT_PRIVATE_JOBS_PROVIDER === 'trigger') {
       this._provider = TriggerJobProvider.getInstance();
+
+      return;
     }
 
     this._provider = LocalJobProvider.getInstance();
