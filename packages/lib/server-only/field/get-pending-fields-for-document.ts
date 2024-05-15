@@ -8,7 +8,7 @@ export type GetPendingFieldsForDocumentOptions = {
 export const getPendingFieldsForDocument = async ({
   documentId,
 }: GetPendingFieldsForDocumentOptions) => {
-  const a = await prisma.field.findMany({
+  return await prisma.field.findMany({
     where: {
       documentId,
       Recipient: {
@@ -25,8 +25,4 @@ export const getPendingFieldsForDocument = async ({
       },
     },
   });
-
-  console.log(a);
-
-  return a;
 };

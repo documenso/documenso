@@ -8,12 +8,11 @@ import { DOCUMENSO_ENCRYPTION_KEY } from '@documenso/lib/constants/crypto';
 import { getRequiredServerComponentSession } from '@documenso/lib/next-auth/get-server-component-session';
 import { getDocumentById } from '@documenso/lib/server-only/document/get-document-by-id';
 import { getServerComponentFlag } from '@documenso/lib/server-only/feature-flags/get-server-component-feature-flag';
-import { getCompletedFieldsForDocument } from '@documenso/lib/server-only/field/get-completed-fields-for-document';
-import { getPendingFieldsForDocument } from '@documenso/lib/server-only/field/get-pending-fields-for-document';
+import { getFieldsForDocument } from '@documenso/lib/server-only/field/get-fields-for-document';
 import { getRecipientsForDocument } from '@documenso/lib/server-only/recipient/get-recipients-for-document';
 import { symmetricDecrypt } from '@documenso/lib/universal/crypto';
 import { formatDocumentsPath } from '@documenso/lib/utils/teams';
-import { DocumentStatus } from '@documenso/prisma/client';
+import { DocumentStatus, SigningStatus } from '@documenso/prisma/client';
 import type { Team, TeamEmail } from '@documenso/prisma/client';
 import { Badge } from '@documenso/ui/primitives/badge';
 import { Button } from '@documenso/ui/primitives/button';
@@ -88,19 +87,24 @@ export const DocumentPageView = async ({ params, team }: DocumentPageViewProps) 
     documentMeta.password = securePassword;
   }
 
-  const [recipients, pendingFields, completedFields] = await Promise.all([
+  const [recipients, fields] = await Promise.all([
     getRecipientsForDocument({
       documentId,
       teamId: team?.id,
       userId: user.id,
     }),
-    getPendingFieldsForDocument({
+    getFieldsForDocument({
       documentId,
-    }),
-    getCompletedFieldsForDocument({
-      documentId,
+      userId: user.id,
     }),
   ]);
+
+  const pendingFields = fields.filter(
+    (field) => field.Recipient.signingStatus === SigningStatus.NOT_SIGNED,
+  );
+  const completedFields = fields.filter(
+    (field) => field.Recipient.signingStatus === SigningStatus.SIGNED && field.inserted,
+  );
 
   const documentWithRecipients = {
     ...document,

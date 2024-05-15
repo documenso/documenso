@@ -26,6 +26,16 @@ export const getFieldsForDocument = async ({ documentId, userId }: GetFieldsForD
         ],
       },
     },
+    include: {
+      Signature: true,
+      Recipient: {
+        select: {
+          name: true,
+          email: true,
+          signingStatus: true,
+        },
+      },
+    },
     orderBy: {
       id: 'asc',
     },
