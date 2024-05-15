@@ -17,11 +17,11 @@ export default function BlogPage() {
   return (
     <div className="mt-6 sm:mt-12">
       <div className="text-center">
-        <h1 className="text-3xl font-bold lg:text-5xl">From the blog</h1>
+        <h1 className="text-3xl font-bold lg:text-5xl">ბლოგები</h1>
 
         <p className="text-muted-foreground mx-auto mt-4 max-w-xl text-center text-lg leading-normal">
-          Get the latest news from Documenso, including product updates, team announcements and
-          more!
+          მიიღეთ უახლესი ამბები Documenso-სგან, მათ შორის პროგრამის განახლებები, გუნდის განცხადებები
+          და მეტი!
         </p>
       </div>
 

@@ -49,7 +49,8 @@ export const OpenBuildTemplateBento = ({ className, ...props }: OpenBuildTemplat
           <CardContent className="grid grid-cols-1 gap-8 p-6">
             <p className="text-foreground/80 leading-relaxed">
               <strong className="block">Build on top.</strong>
-              Make it your own through advanced customization and adjustability.
+              {/* Make it your own through advanced customization and adjustability. */}
+              გახადეთ ის თქვენი საკუთარი მოწინავე პერსონალიზაციისა და რეგულირების გზით.
             </p>
 
             <div className="flex items-center justify-center p-8">

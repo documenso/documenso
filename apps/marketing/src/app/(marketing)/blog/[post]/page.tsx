@@ -102,7 +102,8 @@ export default function BlogPostPage({ params }: { params: { post: string } }) {
 
         <Link href="/blog" className="text-muted-foreground flex items-center hover:opacity-60">
           <ChevronLeft className="mr-2 h-6 w-6" />
-          Back to all posts
+          {/* back to all posts */}
+          ყველა პოსტზე დაბრუნება
         </Link>
       </article>
 

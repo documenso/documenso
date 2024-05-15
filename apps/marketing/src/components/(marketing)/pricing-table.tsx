@@ -36,7 +36,7 @@ export const PricingTable = ({ className, ...props }: PricingTableProps) => {
             )}
             onClick={() => setPeriod('MONTHLY')}
           >
-            Monthly
+            თვიური
             {period === 'MONTHLY' && (
               <motion.div
                 layoutId={SELECTED_PLAN_BAR_LAYOUT_ID}
@@ -56,9 +56,9 @@ export const PricingTable = ({ className, ...props }: PricingTableProps) => {
             )}
             onClick={() => setPeriod('YEARLY')}
           >
-            Yearly
+            წლიური
             <div className="bg-muted text-foreground block rounded-full px-2 py-0.5 text-xs">
-              Save $60
+              დაზოგე 50%-მდე
             </div>
             {period === 'YEARLY' && (
               <motion.div
@@ -79,7 +79,7 @@ export const PricingTable = ({ className, ...props }: PricingTableProps) => {
           <p className="text-primary mt-2.5 text-xl font-medium">$0</p>
 
           <p className="text-foreground mt-4 max-w-[30ch] text-center">
-            For small teams and individuals with basic needs.
+            მცირე გუნდებისთვის და ძირითადი საჭიროებების მქონე პირებისთვის.
           </p>
 
           <Button className="rounded-full text-base" asChild>
@@ -88,14 +88,14 @@ export const PricingTable = ({ className, ...props }: PricingTableProps) => {
               target="_blank"
               className="mt-6"
             >
-              Signup Now
+              დარეგისტრირდი ახლავე
             </Link>
           </Button>
 
           <div className="mt-8 flex w-full flex-col divide-y">
-            <p className="text-foreground py-4">5 standard documents per month</p>
-            <p className="text-foreground py-4">Up to 10 recipients per document</p>
-            <p className="text-foreground py-4">No credit card required</p>
+            <p className="text-foreground py-4">5 სტანდარტული დოკუმენტი თვეში</p>
+            <p className="text-foreground py-4">10-მდე მიმღები თითო დოკუმენტზე</p>
+            <p className="text-foreground py-4">არ არის საჭირო საკრედიტო ბარათი</p>
           </div>
 
           <div className="flex-1" />
@@ -114,7 +114,7 @@ export const PricingTable = ({ className, ...props }: PricingTableProps) => {
           </div>
 
           <p className="text-foreground mt-4 max-w-[30ch] text-center">
-            For fast-growing companies that aim to scale across multiple teams.
+            სწრაფად მზარდი კომპანიებისთვის, რომლებიც მიზნად ისახავს მასშტაბირებას მრავალ გუნდში.
           </p>
 
           <Button className="mt-6 rounded-full text-base" asChild>
@@ -122,7 +122,7 @@ export const PricingTable = ({ className, ...props }: PricingTableProps) => {
               href={`${NEXT_PUBLIC_WEBAPP_URL()}/signup?utm_source=pricing-early-adopter`}
               target="_blank"
             >
-              Signup Now
+              დარეგისტრირდი ახლავე
             </Link>
           </Button>
 
@@ -133,13 +133,13 @@ export const PricingTable = ({ className, ...props }: PricingTableProps) => {
                 target="_blank"
                 rel="noreferrer"
               >
-                Limited Time Offer: <span className="text-documenso-700">Read More</span>
+                შეზღუდული დროით: <span className="text-documenso-700">წაიკითხე მეტი</span>
               </a>
             </p>
-            <p className="text-foregro‚und py-4">Unlimited Teams</p>
-            <p className="text-foregro‚und py-4">Unlimited Users</p>
-            <p className="text-foregro‚und py-4">Unlimited Documents per month</p>
-            <p className="text-foreground py-4">Includes all upcoming features</p>
+            <p className="text-foregro‚und py-4">ულიმიტო გუნდები</p>
+            <p className="text-foregro‚und py-4">ულიმიტო მომცმარებელი</p>
+            <p className="text-foregro‚und py-4">ულიმიტო დოკუმენტები ყოველ თვე</p>
+            <p className="text-foreground py-4">მოიცავს ყველა მომავალ ფუნქციას</p>
             <p className="text-foreground py-4">Email, Discord and Slack assistance</p>
           </div>
           <div className="flex-1" />
@@ -150,10 +150,10 @@ export const PricingTable = ({ className, ...props }: PricingTableProps) => {
           className="bg-background shadow-foreground/5 flex flex-col items-center justify-center rounded-lg border px-8 py-12 shadow-lg"
         >
           <p className="text-foreground text-4xl font-medium">Enterprise</p>
-          <p className="text-primary mt-2.5 text-xl font-medium">Pricing on request</p>
+          <p className="text-primary mt-2.5 text-xl font-medium">ფასი მოთხოვნით</p>
 
           <p className="text-foreground mt-4 max-w-[30ch] text-center">
-            For large organizations that need extra flexibility and control.
+            დიდი ორგანიზაციებისთვის, რომლებსაც დამატებითი მოქნილობა და კონტროლი სჭირდებათ.
           </p>
 
           <Link
@@ -162,7 +162,7 @@ export const PricingTable = ({ className, ...props }: PricingTableProps) => {
             className="mt-6"
             onClick={() => event('enterprise-contact')}
           >
-            <Button className="rounded-full text-base">Contact Us</Button>
+            <Button className="rounded-full text-base">დაგვიკავშირდით</Button>
           </Link>
 
           <div className="mt-8 flex w-full flex-col divide-y">
@@ -171,7 +171,7 @@ export const PricingTable = ({ className, ...props }: PricingTableProps) => {
             <p className="text-foreground py-4">Compliance Check</p>
             <p className="text-foreground py-4">Guaranteed Uptime</p>
             <p className="text-foreground py-4">Reporting & Analysis</p>
-            <p className="text-foreground py-4">24/7 Support</p>
+            <p className="text-foreground py-4">24/7 მხარდაჭერა</p>
           </div>
         </div>
       </div>

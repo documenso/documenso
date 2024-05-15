@@ -98,8 +98,8 @@ export const Hero = ({ className, ...props }: HeroProps) => {
           animate="animate"
           className="text-center text-4xl font-bold leading-tight tracking-tight md:text-[48px] lg:text-[64px]"
         >
-          Document signing,
-          <span className="block" /> finally open source.
+          გაამარტივე დაკონტრაქტების
+          <span className="block" /> პროცესი
         </motion.h2>
 
         <motion.div
@@ -189,13 +189,13 @@ export const Hero = ({ className, ...props }: HeroProps) => {
           animate="animate"
         >
           <Widget className="mt-12">
-            <strong>Documenso Supporter Pledge</strong>
+            <strong>Documenso მხარდამჭერი პირობა</strong>
             <p className="w-full max-w-[70ch]">
-              Our mission is to create an open signing infrastructure that empowers the world,
-              enabling businesses to embrace openness, cooperation, and transparency. We believe
-              that signing, as a fundamental act, should embody these values. By offering an
-              open-source signing solution, we aim to make document signing accessible, transparent,
-              and trustworthy.
+              ამხელა ტექსტს პონტი არაა ვერ გადავთარგმნი Our mission is to create an open signing
+              infrastructure that empowers the world, enabling businesses to embrace openness,
+              cooperation, and transparency. We believe that signing, as a fundamental act, should
+              embody these values. By offering an open-source signing solution, we aim to make
+              document signing accessible, transparent, and trustworthy.
             </p>
 
             <p className="w-full max-w-[70ch]">
@@ -230,12 +230,12 @@ export const Hero = ({ className, ...props }: HeroProps) => {
             </p>
 
             <div className="flex h-24 items-center">
-              <p className={cn('text-5xl [font-family:var(--font-caveat)]')}>Timur & Lucas</p>
+              <p className={cn('text-5xl [font-family:var(--font-caveat)]')}>ლუკა & გიორგი</p>
             </div>
 
             <div>
-              <strong>Timur Ercan & Lucas Smith</strong>
-              <p className="mt-1">Co-Founders, Documenso</p>
+              <strong>ლუკა ჩქოვანი & გიორგი ჩიქოვანი</strong>
+              <p className="mt-1">თანადამფუძნებლები, Documenso</p>
             </div>
           </Widget>
         </motion.div>

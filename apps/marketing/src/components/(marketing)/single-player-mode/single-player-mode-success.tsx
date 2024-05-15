@@ -49,7 +49,7 @@ export const SinglePlayerModeSuccess = ({
       )}
 
       <h2 className="relative z-10 text-center text-2xl font-semibold leading-normal md:text-3xl lg:mb-2 lg:text-4xl">
-        You have signed
+        თქვენ მოაწერეთ ხელი
         <span className="mt-2 block">{document.title}</span>
       </h2>
 
@@ -77,14 +77,14 @@ export const SinglePlayerModeSuccess = ({
             />
 
             <Button onClick={() => setShowDocumentDialog(true)} className="z-10 col-span-2">
-              Show document
+              დოკუმენტის ნახვა
             </Button>
           </div>
         </div>
       </div>
 
       <p className="text-muted-foreground/60 mt-16 text-center text-sm">
-        Create a{' '}
+        შექმენით{' '}
         <Link
           href={`${NEXT_PUBLIC_WEBAPP_URL()}/signup?utm_source=singleplayer`}
           target="_blank"
@@ -92,7 +92,8 @@ export const SinglePlayerModeSuccess = ({
         >
           free account
         </Link>{' '}
-        to access your signed documents at any time
+        {/* to access your signed documents at any time */}
+        რათა ნებისმიერ დროს გქონდეთ წვდომა თევენს ხელმოწერილ დოკუმენტებზე
       </p>
 
       <DocumentDialog

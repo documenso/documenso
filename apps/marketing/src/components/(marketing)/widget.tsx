@@ -209,7 +209,7 @@ export const Widget = ({ className, children, ...props }: WidgetProps) => {
             <AnimatePresence>
               <motion.div key="email">
                 <label htmlFor="email" className="text-foreground font-medium ">
-                  What’s your email?
+                  Რა არის შენი ელ.ფოსტა?
                 </label>
 
                 <Controller
@@ -238,7 +238,7 @@ export const Widget = ({ className, children, ...props }: WidgetProps) => {
                           disabled={!field.value || !!errors.email?.message}
                           onClick={() => step === STEP.EMAIL && onNextStepClick()}
                         >
-                          Next
+                          შემდეგი
                         </Button>
                       </div>
                     </div>
@@ -266,7 +266,7 @@ export const Widget = ({ className, children, ...props }: WidgetProps) => {
                   }}
                 >
                   <label htmlFor="name" className="text-foreground font-medium ">
-                    And your name?
+                    შენი სახელი?
                   </label>
 
                   <Controller
@@ -378,7 +378,7 @@ export const Widget = ({ className, children, ...props }: WidgetProps) => {
                     disabled={!isValid || isSubmitting}
                   >
                     {isSubmitting && <Loader className="mr-2 h-4 w-4 animate-spin" />}
-                    Sign
+                    მოაწერე ხელი
                   </Button>
                 </div>
               </CardContent>
@@ -390,7 +390,7 @@ export const Widget = ({ className, children, ...props }: WidgetProps) => {
       <Dialog open={showSigningDialog} onOpenChange={setShowSigningDialog}>
         <DialogContent position="center">
           <DialogHeader>
-            <DialogTitle>Add your signature</DialogTitle>
+            <DialogTitle>დაამატე შენი ხელმოწერა</DialogTitle>
           </DialogHeader>
 
           <DialogDescription>
@@ -409,7 +409,7 @@ export const Widget = ({ className, children, ...props }: WidgetProps) => {
 
           <DialogFooter>
             <Button variant="ghost" onClick={() => setShowSigningDialog(false)}>
-              Cancel
+              გაუქმება
             </Button>
 
             <Button onClick={() => onSignatureConfirmClick()}>Confirm</Button>

@@ -21,7 +21,7 @@ export const FundingRaised = ({ className, data, ...props }: FundingRaisedProps)
     <div className={className} {...props}>
       <div className="border-border flex flex-col justify-center rounded-2xl border p-6 pl-2 shadow-sm hover:shadow">
         <div className="mb-6 flex px-4">
-          <h3 className="text-lg font-semibold">Total Funding Raised</h3>
+          <h3 className="text-lg font-semibold">მთლიანად მოზიდული დაფინანსება</h3>
         </div>
 
         <ResponsiveContainer width="100%" height={400}>

@@ -46,8 +46,8 @@ export const SinglePlayerClient = () => {
 
   const documentFlow: Record<SinglePlayerModeStep, DocumentFlowStep> = {
     fields: {
-      title: 'Add document',
-      description: 'Upload a document and add fields.',
+      title: 'დოკუმენტის დამატება',
+      description: 'ატვირთეთ დოკუმენტი და დაამატეთ ველები.',
       stepIndex: 1,
       onBackStep: uploadedFile
         ? () => {
@@ -59,7 +59,7 @@ export const SinglePlayerClient = () => {
     },
     sign: {
       title: 'Sign',
-      description: 'Enter your details.',
+      description: 'შეიყვანეთ თქვენი მონაცემები.',
       stepIndex: 2,
       onBackStep: () => setStep('fields'),
     },
@@ -141,8 +141,8 @@ export const SinglePlayerClient = () => {
       router.push(`/singleplayer/${documentToken}/success`);
     } catch {
       toast({
-        title: 'Something went wrong',
-        description: 'Please try again later.',
+        title: 'დაფიქსირდა ხარვეზი',
+        description: 'გთხოვთ სცადოთ მოგვიანებით',
         variant: 'destructive',
       });
     }
@@ -178,8 +178,8 @@ export const SinglePlayerClient = () => {
       analytics.capture('Marketing: SPM - Document uploaded');
     } catch {
       toast({
-        title: 'Something went wrong',
-        description: 'Please try again later.',
+        title: 'დაფიქსირდა ხარვეზი',
+        description: 'გთხოვთ სცადოთ მოგვიანებით',
         variant: 'destructive',
       });
     }
@@ -191,15 +191,15 @@ export const SinglePlayerClient = () => {
         <h1 className="text-3xl font-bold lg:text-5xl">Single Player Mode</h1>
 
         <p className="text-foreground mx-auto mt-4 max-w-[50ch] text-lg leading-normal">
-          Create a{' '}
+          შექმენით{' '}
           <Link
             href={`${NEXT_PUBLIC_WEBAPP_URL()}/signup?utm_source=singleplayer`}
             target="_blank"
             className="hover:text-foreground/80 font-semibold transition-colors"
           >
-            free account
+            უფასო ანგარიში
           </Link>{' '}
-          or view our{' '}
+          ან ნახეთ ჩვენი{' '}
           <Link
             href={'/pricing'}
             target="_blank"

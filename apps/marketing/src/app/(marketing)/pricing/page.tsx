@@ -30,12 +30,12 @@ export default function PricingPage() {
   return (
     <div className="mt-6 sm:mt-12">
       <div className="text-center">
-        <h1 className="text-3xl font-bold lg:text-5xl">Pricing</h1>
+        <h1 className="text-3xl font-bold lg:text-5xl">შეარჩიე შენი პაკეტი</h1>
 
         <p className="text-foreground mt-4 text-lg leading-normal">
           Designed for every stage of your journey.
         </p>
-        <p className="text-foreground text-lg leading-normal">Get started today.</p>
+        <p className="text-foreground text-lg leading-normal">დაიწყეთ დღესვე.</p>
       </div>
 
       <div className="mt-12">
@@ -44,7 +44,7 @@ export default function PricingPage() {
 
       <div className="mx-auto mt-36 max-w-2xl">
         <h2 className="text-center text-2xl font-semibold">
-          None of these work for you? Try self-hosting!
+          არცერთი მათგანი არ მუშაობს თქვენთვის? სცადეთ თვითჰოსტინგი!
         </h2>
 
         <p className="text-muted-foreground mt-4 text-center leading-relaxed">
@@ -56,7 +56,7 @@ export default function PricingPage() {
         <div className="mt-4 flex justify-center">
           <Button variant="outline" size="lg" className="rounded-full hover:cursor-pointer" asChild>
             <Link href="https://github.com/documenso/documenso" target="_blank" rel="noreferrer">
-              Get Started
+              Დაიწყე
             </Link>
           </Button>
         </div>
@@ -70,46 +70,49 @@ export default function PricingPage() {
         <Accordion type="multiple" className="mt-8">
           <AccordionItem value="plan-differences">
             <AccordionTrigger className="text-left text-lg font-semibold">
-              What is the difference between the plans?
+              რა განსხვავებაა გეგმებს შორის?
             </AccordionTrigger>
 
             <AccordionContent className="text-muted-foreground max-w-prose text-sm leading-relaxed">
-              You can self-host Documenso for free or use our ready-to-use hosted version. The
-              hosted version comes with additional support, painless scalability and more. Early
-              adopters will get access to all features we build this year, for no additional cost!
-              Forever! Yes, that includes multiple users per account later. If you want Documenso
-              for your enterprise, we are happy to talk about your needs.
+              თქვენ შეგიძლიათ თავად მოაწყოთ Documenso უფასოდ ან გამოიყენოთ ჩვენი მზა ჰოსტინგული
+              ვერსია. ჰოსტინგულ ვერსიას გააჩნია დამატებითი მხარდაჭერა, უმტკივნეულო მასშტაბირება და
+              სხვა. ადრეული მიმღებები მიიღებენ წვდომას ყველა ფუნქციაზე, რომელსაც ჩვენ ვაშენებთ წელს,
+              დამატებითი საფასურის გარეშე! სამუდამოდ! დიახ, ეს მოიცავს რამდენიმე მომხმარებელს თითო
+              ანგარიშზე მოგვიანებით. თუ გსურთ Documenso თქვენი საწარმოსთვის, მოხარული ვართ ვისაუბროთ
+              თქვენს საჭიროებებზე.
             </AccordionContent>
           </AccordionItem>
 
           <AccordionItem value="data-handling">
             <AccordionTrigger className="text-left text-lg font-semibold">
-              How do you handle my data?
+              როგორ ამუშავებ ჩემს მონაცემებს?
             </AccordionTrigger>
 
             <AccordionContent className="text-muted-foreground max-w-prose text-sm leading-relaxed">
-              Securely. Our data centers are located in Frankfurt (Germany), giving us the best
-              local privacy laws. We are very aware of the sensitive nature of our data and follow
-              best practices to ensure the security and integrity of the data entrusted to us.
+              უსაფრთხოდ. ჩვენი მონაცემთა ცენტრები მდებარეობს ფრანკფურტში (გერმანია) და გვაძლევს
+              საუკეთესოს კონფიდენციალურობის ადგილობრივი კანონები. ჩვენ კარგად ვაცნობიერებთ ჩვენი
+              მონაცემების სენსიტიურ ხასიათს და ვიყენებთ საუკეთესო პრაქტიკებს ჩვენთვის მინდობილი
+              მონაცემების უსაფრთხოებისა და მთლიანობის უზრუნველსაყოფად.
             </AccordionContent>
           </AccordionItem>
 
           <AccordionItem value="should-use-cloud">
             <AccordionTrigger className="text-left text-lg font-semibold">
-              Why should I use your hosting service?
+              რატომ უნდა გამოვიყენო თქვენი ჰოსტინგის სერვისი?
             </AccordionTrigger>
 
             <AccordionContent className="text-muted-foreground max-w-prose text-sm leading-relaxed">
-              Using our hosted version is the easiest way to get started, you can simply subscribe
-              and start signing your documents. We take care of the infrastructure, so you can focus
-              on your business. Additionally, when using our hosted version you benefit from our
-              trusted signing certificates which helps you to build trust with your customers.
+              ჩვენი ჰოსტირებული ვერსიის გამოყენება დასაწყებად ყველაზე მარტივი გზაა, შეგიძლიათ
+              უბრალოდ გამოიწეროთ და დაიწყეთ თქვენი დოკუმენტების ხელმოწერა. ჩვენ ვზრუნავთ
+              ინფრასტრუქტურაზე, ასე რომ თქვენ შეგიძლიათ ფოკუსირება თქვენს საქმეზე. გარდა ამისა,
+              ჩვენი ჰოსტირებული ვერსიის გამოყენებისას თქვენ სარგებლობთ ჩვენით სანდო ხელმოწერის
+              სერთიფიკატები, რომლებიც გეხმარებათ ნდობის დამყარებაში თქვენს კლიენტებთან.
             </AccordionContent>
           </AccordionItem>
 
           <AccordionItem value="how-to-contribute">
             <AccordionTrigger className="text-left text-lg font-semibold">
-              How can I contribute?
+              როგორ შემიძლია წვლილი შევიტანო?
             </AccordionTrigger>
 
             <AccordionContent className="text-muted-foreground max-w-prose text-sm leading-relaxed">
@@ -136,35 +139,35 @@ export default function PricingPage() {
 
           <AccordionItem value="can-i-use-documenso-commercially">
             <AccordionTrigger className="text-left text-lg font-semibold">
-              Can I use Documenso commercially?
+              შემიძლია დოკუმენსო კომერციულად გამოვიყენო?
             </AccordionTrigger>
 
             <AccordionContent className="text-muted-foreground max-w-prose text-sm leading-relaxed">
-              Yes! Documenso is offered under the GNU AGPL V3 open source license. This means you
-              can use it for free and even modify it to fit your needs, as long as you publish your
-              changes under the same license.
+              დიახ! Documenso შემოთავაზებულია GNU AGPL V3 ღია კოდის ლიცენზიით. ეს ნიშნავს შენ
+              შეგიძლიათ გამოიყენოთ იგი უფასოდ და შეცვალოთ იგი თქვენს საჭიროებებზე, თუ თქვენ
+              გამოაქვეყნებთ თქვენს საჭიროებებს იცვლება იმავე ლიცენზიით.
             </AccordionContent>
           </AccordionItem>
 
           <AccordionItem value="why-prefer-documenso">
             <AccordionTrigger className="text-left text-lg font-semibold">
-              Why should I prefer Documenso over DocuSign or some other signing tool?
+              რატომ უნდა ვამჯობინო Documenso, ვიდრე Signify ან სხვა ხელმოწერის ინსტრუმენტი?
             </AccordionTrigger>
 
             <AccordionContent className="text-muted-foreground max-w-prose text-sm leading-relaxed">
-              Documenso is a community effort to create an open and vibrant ecosystem around a tool,
-              everybody is free to use and adapt. By being truly open we want to create trusted
-              infrastructure for the future of the internet.
+              Documenso არის საზოგადოების ძალისხმევა, რათა შეიქმნას ღია და ძლიერი ეკოსისტემა
+              ინსტრუმენტის გარშემო, ყველას თავისუფლად შეუძლია გამოიყენოს და მოერგოს. ჭეშმარიტად
+              გახსნილობით გვინდა შევქმნათ სანდო ინფრასტრუქტურა ინტერნეტის მომავლისთვის.
             </AccordionContent>
           </AccordionItem>
 
           <AccordionItem value="where-can-i-get-support">
             <AccordionTrigger className="text-left text-lg font-semibold">
-              Where can I get support?
+              სად შემიძლია მივიღო მხარდაჭერა?
             </AccordionTrigger>
 
             <AccordionContent className="text-muted-foreground max-w-prose text-sm leading-relaxed">
-              We are happy to assist you at{' '}
+              მოხარული ვართ დაგეხმაროთ{' '}
               <Link
                 className="text-documenso-700 font-bold"
                 target="_blank"
@@ -173,14 +176,14 @@ export default function PricingPage() {
               >
                 support@documenso.com
               </Link>{' '}
-              or{' '}
+              ან{' '}
               <a
                 className="text-documenso-700 font-bold"
                 href="https://documen.so/discord"
                 target="_blank"
                 rel="noreferrer"
               >
-                in our Discord-Support-Channel
+                ჩვენს Discord-ის Channel-ში
               </a>{' '}
               please message either Lucas or Timur to get added to the channel if you are not
               already a member.

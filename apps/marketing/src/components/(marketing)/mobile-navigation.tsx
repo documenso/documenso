@@ -23,11 +23,11 @@ export const MENU_NAVIGATION_LINKS = [
   },
   {
     href: '/blog',
-    text: 'Blog',
+    text: 'ბლოგი',
   },
   {
     href: '/pricing',
-    text: 'Pricing',
+    text: 'ფასი',
   },
   {
     href: '/open',
@@ -35,24 +35,24 @@ export const MENU_NAVIGATION_LINKS = [
   },
   {
     href: 'https://status.documenso.com',
-    text: 'Status',
+    text: 'სტატუსი',
   },
   {
     href: 'mailto:support@documenso.com',
-    text: 'Support',
+    text: 'მხარდაჭერა',
     target: '_blank',
   },
   {
     href: '/privacy',
-    text: 'Privacy',
+    text: 'კონფედენციალურობა',
   },
   {
     href: 'https://app.documenso.com/signin?utm_source=marketing-header',
-    text: 'Sign in',
+    text: 'შესვლა',
   },
   {
     href: 'https://app.documenso.com/signup?utm_source=marketing-header',
-    text: 'Sign up',
+    text: 'რეგისტრაცია',
   },
 ];
 

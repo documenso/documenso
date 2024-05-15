@@ -24,17 +24,17 @@ const SOCIAL_LINKS = [
 ];
 
 const FOOTER_LINKS = [
-  { href: '/pricing', text: 'Pricing' },
+  { href: '/pricing', text: 'ფასი' },
   { href: '/singleplayer', text: 'Singleplayer' },
-  { href: '/blog', text: 'Blog' },
-  { href: '/design-system', text: 'Design' },
+  { href: '/blog', text: 'ბლოგი' },
+  { href: '/design-system', text: 'დიზაინი' },
   { href: '/open', text: 'Open Startup' },
-  { href: 'https://shop.documenso.com', text: 'Shop', target: '_blank' },
-  { href: 'https://status.documenso.com', text: 'Status', target: '_blank' },
-  { href: 'mailto:support@documenso.com', text: 'Support', target: '_blank' },
+  { href: 'https://shop.documenso.com', text: 'მაღაზია', target: '_blank' },
+  { href: 'https://status.documenso.com', text: 'სტატუსი', target: '_blank' },
+  { href: 'mailto:support@documenso.com', text: 'მხარდაჭერა', target: '_blank' },
   { href: '/oss-friends', text: 'OSS Friends' },
-  { href: '/careers', text: 'Careers' },
-  { href: '/privacy', text: 'Privacy' },
+  { href: '/careers', text: 'კარიერა' },
+  { href: '/privacy', text: 'კონფიდენციალურობა' },
 ];
 
 export const Footer = ({ className, ...props }: FooterProps) => {
@@ -85,7 +85,7 @@ export const Footer = ({ className, ...props }: FooterProps) => {
       </div>
       <div className="mx-auto mt-4 flex w-full max-w-screen-xl flex-wrap items-center justify-between gap-4 px-8 md:mt-12 lg:mt-24">
         <p className="text-muted-foreground text-sm">
-          © {new Date().getFullYear()} Documenso, Inc. All rights reserved.
+          © {new Date().getFullYear()} Documenso, Inc. ყველა უფლება დაცვულია
         </p>
 
         <div className="flex flex-wrap">
