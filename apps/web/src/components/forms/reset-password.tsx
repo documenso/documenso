@@ -29,7 +29,7 @@ export const ZResetPasswordFormSchema = z
   })
   .refine((data) => data.password === data.repeatedPassword, {
     path: ['repeatedPassword'],
-    message: "Passwords don't match",
+    message: 'პაროლები ერთმანეთს არ ემთხვევა',
   });
 
 export type TResetPasswordFormSchema = z.infer<typeof ZResetPasswordFormSchema>;
@@ -66,8 +66,8 @@ export const ResetPasswordForm = ({ className, token }: ResetPasswordFormProps) 
       form.reset();
 
       toast({
-        title: 'Password updated',
-        description: 'Your password has been updated successfully.',
+        title: 'პაროლი განახლებულია',
+        description: 'თქვენი პაროლი წარმატებით განახლდა.',
         duration: 5000,
       });
 
@@ -75,16 +75,16 @@ export const ResetPasswordForm = ({ className, token }: ResetPasswordFormProps) 
     } catch (err) {
       if (err instanceof TRPCClientError && err.data?.code === 'BAD_REQUEST') {
         toast({
-          title: 'An error occurred',
+          title: 'დაფიქსირდა ხარვეზი',
           description: err.message,
           variant: 'destructive',
         });
       } else {
         toast({
-          title: 'An unknown error occurred',
+          title: 'დაფიქსირდა ხარვეზი',
           variant: 'destructive',
           description:
-            'We encountered an unknown error while attempting to reset your password. Please try again later.',
+            'პაროლის აღდგენისას დაფიქსირდა ხარვეზი. გთხოვთ თავიდან სცადოთ ან დაგვიკავშირდეთ.',
         });
       }
     }
@@ -102,7 +102,7 @@ export const ResetPasswordForm = ({ className, token }: ResetPasswordFormProps) 
             name="password"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Password</FormLabel>
+                <FormLabel>პაროლი</FormLabel>
                 <FormControl>
                   <PasswordInput {...field} />
                 </FormControl>
@@ -116,7 +116,7 @@ export const ResetPasswordForm = ({ className, token }: ResetPasswordFormProps) 
             name="repeatedPassword"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Repeat Password</FormLabel>
+                <FormLabel>გაიმეორეთ პაროლი</FormLabel>
                 <FormControl>
                   <PasswordInput {...field} />
                 </FormControl>
@@ -127,7 +127,7 @@ export const ResetPasswordForm = ({ className, token }: ResetPasswordFormProps) 
         </fieldset>
 
         <Button type="submit" size="lg" loading={isSubmitting}>
-          {isSubmitting ? 'Resetting Password...' : 'Reset Password'}
+          {isSubmitting ? 'პაროლის აღდგენა...' : 'პაროლის აღდგენა'}
         </Button>
       </form>
     </Form>

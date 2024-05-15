@@ -97,12 +97,12 @@ export const DocumentHistorySheet = ({
         className="flex w-full max-w-[500px] flex-col overflow-y-auto p-0"
       >
         <div className="text-foreground px-6 pt-6">
-          <h1 className="text-lg font-medium">Document history</h1>
+          <h1 className="text-lg font-medium">დოკუმენტების ისტორია</h1>
           <button
             className="text-muted-foreground text-sm"
             onClick={() => setIsUserDetailsVisible(!isUserDetailsVisible)}
           >
-            {isUserDetailsVisible ? 'Hide' : 'Show'} additional information
+            {isUserDetailsVisible ? 'Hide' : 'Show'} დამატებითი ინფორმაცია
           </button>
         </div>
 
@@ -114,12 +114,12 @@ export const DocumentHistorySheet = ({
 
         {isLoadingError && (
           <div className="flex h-full flex-col items-center justify-center">
-            <p className="text-foreground/80 text-sm">Unable to load document history</p>
+            <p className="text-foreground/80 text-sm">დოკუმენტის ისტორიის ჩატვირთვა ვერ მოხერხდა</p>
             <button
               onClick={async () => refetch()}
               className="text-foreground/70 hover:text-muted-foreground mt-2 text-sm"
             >
-              Click here to retry
+              თავიდან სცადეთ
             </button>
           </div>
         )}
@@ -330,7 +330,7 @@ export const DocumentHistorySheet = ({
                   loading={isFetchingNextPage}
                   onClick={async () => fetchNextPage()}
                 >
-                  Show more
+                  იხილეთ მეტი
                 </Button>
               </div>
             )}

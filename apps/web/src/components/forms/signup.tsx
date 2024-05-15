@@ -31,10 +31,12 @@ const SIGN_UP_REDIRECT_PATH = '/documents';
 
 export const ZSignUpFormSchema = z
   .object({
-    name: z.string().trim().min(1, { message: 'Please enter a valid name.' }),
+    name: z.string().trim().min(1, { message: 'გთხოვთ შეიყვანოთ სწორი სახელი.' }),
     email: z.string().email().min(1),
     password: ZPasswordSchema,
-    signature: z.string().min(1, { message: 'We need your signature to sign documents' }),
+    signature: z
+      .string()
+      .min(1, { message: 'დოკუმენტების გასაფორმებლად თქვენი ხელმოწერაა საჭირო' }),
   })
   .refine(
     (data) => {
@@ -42,7 +44,7 @@ export const ZSignUpFormSchema = z
       return !password.includes(name) && !password.includes(email.split('@')[0]);
     },
     {
-      message: 'Password should not be common or based on personal information',
+      message: 'პაროლი არ უნდა იყოს საჯარო ან ეფუძნებოდეს პირად მონაცემებს.',
     },
   );
 
@@ -80,9 +82,9 @@ export const SignUpForm = ({ className, initialEmail, isGoogleSSOEnabled }: Sign
       router.push(`/unverified-account`);
 
       toast({
-        title: 'Registration Successful',
+        title: 'რეგისტრაცია წარმატებულია',
         description:
-          'You have successfully registered. Please verify your account by clicking on the link you received in the email.',
+          'თქვენ წარმატებით დარეგისტრირდით. გთხოვთ დაადასტუროთ თქვენს ელ. ფოსტაზე გამოგზავნილ ბმულზე გადასვლით.',
         duration: 5000,
       });
 
@@ -93,15 +95,15 @@ export const SignUpForm = ({ className, initialEmail, isGoogleSSOEnabled }: Sign
     } catch (err) {
       if (err instanceof TRPCClientError && err.data?.code === 'BAD_REQUEST') {
         toast({
-          title: 'An error occurred',
+          title: 'დაფიქსირდა ხარვეზი',
           description: err.message,
           variant: 'destructive',
         });
       } else {
         toast({
-          title: 'An unknown error occurred',
+          title: 'დაფიქსირდა ხარვეზი',
           description:
-            'We encountered an unknown error while attempting to sign you up. Please try again later.',
+            'რეგისტრირების დროს დაფიქსირდა ხარვეზი. გთხოვთ თავიდან სცადოთ ან დაგვიკავშირდეთ.',
           variant: 'destructive',
         });
       }
@@ -113,9 +115,9 @@ export const SignUpForm = ({ className, initialEmail, isGoogleSSOEnabled }: Sign
       await signIn('google', { callbackUrl: SIGN_UP_REDIRECT_PATH });
     } catch (err) {
       toast({
-        title: 'An unknown error occurred',
+        title: 'დაფიქსირდა ხარვეზი',
         description:
-          'We encountered an unknown error while attempting to sign you Up. Please try again later.',
+          'რეგისტრირების დროს დაფიქსირდა ხარვეზი. გთხოვთ თავიდან სცადოთ ან დაგვიკავშირდეთ.',
         variant: 'destructive',
       });
     }
@@ -133,7 +135,7 @@ export const SignUpForm = ({ className, initialEmail, isGoogleSSOEnabled }: Sign
             name="name"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Name</FormLabel>
+                <FormLabel>სახელი</FormLabel>
                 <FormControl>
                   <Input type="text" {...field} />
                 </FormControl>
@@ -147,7 +149,7 @@ export const SignUpForm = ({ className, initialEmail, isGoogleSSOEnabled }: Sign
             name="email"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Email</FormLabel>
+                <FormLabel>ელ. ფოსტა</FormLabel>
                 <FormControl>
                   <Input type="email" {...field} />
                 </FormControl>
@@ -161,7 +163,7 @@ export const SignUpForm = ({ className, initialEmail, isGoogleSSOEnabled }: Sign
             name="password"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Password</FormLabel>
+                <FormLabel>პაროლი</FormLabel>
                 <FormControl>
                   <PasswordInput {...field} />
                 </FormControl>
@@ -175,7 +177,7 @@ export const SignUpForm = ({ className, initialEmail, isGoogleSSOEnabled }: Sign
             name="signature"
             render={({ field: { onChange } }) => (
               <FormItem>
-                <FormLabel>Sign Here</FormLabel>
+                <FormLabel>მოაწერეთ აქ</FormLabel>
                 <FormControl>
                   <SignaturePad
                     className="h-36 w-full"
@@ -197,14 +199,14 @@ export const SignUpForm = ({ className, initialEmail, isGoogleSSOEnabled }: Sign
           loading={isSubmitting}
           className="dark:bg-documenso dark:hover:opacity-90"
         >
-          {isSubmitting ? 'Signing up...' : 'Sign Up'}
+          {isSubmitting ? 'რეგისტრაცია...' : 'რეგისტრაცია'}
         </Button>
 
         {isGoogleSSOEnabled && (
           <>
             <div className="relative flex items-center justify-center gap-x-4 py-2 text-xs uppercase">
               <div className="bg-border h-px flex-1" />
-              <span className="text-muted-foreground bg-transparent">Or</span>
+              <span className="text-muted-foreground bg-transparent">ან</span>
               <div className="bg-border h-px flex-1" />
             </div>
 
@@ -217,7 +219,7 @@ export const SignUpForm = ({ className, initialEmail, isGoogleSSOEnabled }: Sign
               onClick={onSignUpWithGoogleClick}
             >
               <FcGoogle className="mr-2 h-5 w-5" />
-              Sign Up with Google
+              დარეგისტრირდით Google-ით
             </Button>
           </>
         )}

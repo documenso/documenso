@@ -16,18 +16,18 @@ export const RecoveryCodeList = ({ recoveryCodes }: RecoveryCodeListProps) => {
       const result = await copyToClipboard(code);
 
       if (!result) {
-        throw new Error('Unable to copy recovery code');
+        throw new Error('აღდგენის კოდის დაკოპირება ვერ მოხერხდა');
       }
 
       toast({
-        title: 'Recovery code copied',
-        description: 'Your recovery code has been copied to your clipboard.',
+        title: 'აღდგენის კოდი დაკოპირებული',
+        description: 'თქვენი აღდგენის კოდი წარმატებით დაკოპირდა.',
       });
     } catch (_err) {
       toast({
-        title: 'Unable to copy recovery code',
+        title: 'აღდგენის კოდის დაკოპირება ვერ მოხერხდა',
         description:
-          'We were unable to copy your recovery code to your clipboard. Please try again.',
+          'თქვენი აღდგენის კოდის დაკოპირება ვერ მოხერხდა. გთხოვთ თავიდან სცადოთ ან დაგვიკავშირდეთ.',
         variant: 'destructive',
       });
     }

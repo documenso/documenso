@@ -44,17 +44,17 @@ type SignUpStep = 'BASIC_DETAILS' | 'CLAIM_USERNAME';
 
 export const ZSignUpFormV2Schema = z
   .object({
-    name: z.string().trim().min(1, { message: 'Please enter a valid name.' }),
+    name: z.string().trim().min(1, { message: 'გთხოვთ შეიყვანოთ სწორი სახელი.' }),
     email: z.string().email().min(1),
     password: ZPasswordSchema,
-    signature: z.string().min(1, { message: 'We need your signature to sign documents' }),
+    signature: z.string().min(1, { message: 'დოკუმენტის გასაფორმებლად საჭიროა თქვენი ხელმოწერა' }),
     url: z
       .string()
       .trim()
       .toLowerCase()
-      .min(1, { message: 'We need a username to create your profile' })
+      .min(1, { message: 'თქვენი ანგარიშის შესაქმნელად საჭიროა პროფილის სახელი' })
       .regex(/^[a-z0-9-]+$/, {
-        message: 'Username can only container alphanumeric characters and dashes.',
+        message: 'მომხმარებლის სახელი უნდა შეიცავდეს მხოლოდ ასოებსა და ტირეებს.',
       }),
   })
   .refine(
@@ -63,7 +63,7 @@ export const ZSignUpFormV2Schema = z
       return !password.includes(name) && !password.includes(email.split('@')[0]);
     },
     {
-      message: 'Password should not be common or based on personal information',
+      message: 'პაროლი არ უნდა იყოს საჯარო ან ეფუძნებოდეს პირად ინფორმაციას',
     },
   );
 
@@ -117,9 +117,9 @@ export const SignUpFormV2 = ({
       router.push(`/unverified-account`);
 
       toast({
-        title: 'Registration Successful',
+        title: 'რეგისტრაცია წარმატებულია',
         description:
-          'You have successfully registered. Please verify your account by clicking on the link you received in the email.',
+          'თქვენ წარმატებით დარეგისტრირდით. გთხოვთ დაადასტუროთ თქვენს ელ. ფოსტაში მიღებულ ბმულზე გადასვლით.',
         duration: 5000,
       });
 
@@ -134,7 +134,7 @@ export const SignUpFormV2 = ({
       if (error.code === AppErrorCode.PROFILE_URL_TAKEN) {
         form.setError('url', {
           type: 'manual',
-          message: 'This username has already been taken',
+          message: 'ეს სახელი უკვე აღებულია',
         });
       } else if (error.code === AppErrorCode.PREMIUM_PROFILE_URL) {
         form.setError('url', {
@@ -143,15 +143,14 @@ export const SignUpFormV2 = ({
         });
       } else if (err instanceof TRPCClientError && err.data?.code === 'BAD_REQUEST') {
         toast({
-          title: 'An error occurred',
+          title: 'დაფიქსირდა ხარვეზი',
           description: err.message,
           variant: 'destructive',
         });
       } else {
         toast({
-          title: 'An unknown error occurred',
-          description:
-            'We encountered an unknown error while attempting to sign you up. Please try again later.',
+          title: 'დაფიქსირდა ხარვეზი',
+          description: 'თქვენი დარეგისტრირებისას დაფიქსირდა ხარვეზი. გთხოვთ თავიდან სცადოთ.',
           variant: 'destructive',
         });
       }
@@ -171,9 +170,8 @@ export const SignUpFormV2 = ({
       await signIn('google', { callbackUrl: SIGN_UP_REDIRECT_PATH });
     } catch (err) {
       toast({
-        title: 'An unknown error occurred',
-        description:
-          'We encountered an unknown error while attempting to sign you Up. Please try again later.',
+        title: 'დაფიქსირდა ხარვეზი',
+        description: 'თქვენი დარეგისტრირებისას დაფიქსირდა ხარვეზი. გთხოვთ თავიდან სცადოთ.',
         variant: 'destructive',
       });
     }
@@ -224,11 +222,11 @@ export const SignUpFormV2 = ({
       <div className="border-border dark:bg-background relative z-10 flex min-h-[min(850px,80vh)] w-full max-w-lg flex-col rounded-xl border bg-neutral-100 p-6">
         {step === 'BASIC_DETAILS' && (
           <div className="h-20">
-            <h1 className="text-xl font-semibold md:text-2xl">Create a new account</h1>
+            <h1 className="text-xl font-semibold md:text-2xl">შექმენით ახალი ანგარიშიt</h1>
 
             <p className="text-muted-foreground mt-2 text-xs md:text-sm">
-              Create your account and start using state-of-the-art document signing. Open and
-              beautiful signing is within your grasp.
+              შექმენით თქვენი ანგარიში და დაიწყეთ უახლესი დოკუმენტის ხელმოწერის გამოყენება. მარტივი
+              და ლამაზი ხელმოწერები თქვენს ხელშია.
             </p>
           </div>
         )}
@@ -264,7 +262,7 @@ export const SignUpFormV2 = ({
                   name="name"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Full Name</FormLabel>
+                      <FormLabel>სრული სახელი</FormLabel>
                       <FormControl>
                         <Input type="text" {...field} />
                       </FormControl>
@@ -278,7 +276,7 @@ export const SignUpFormV2 = ({
                   name="email"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Email Address</FormLabel>
+                      <FormLabel>ელ. ფოსტა</FormLabel>
                       <FormControl>
                         <Input type="email" {...field} />
                       </FormControl>
@@ -292,7 +290,7 @@ export const SignUpFormV2 = ({
                   name="password"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Password</FormLabel>
+                      <FormLabel>პაროლი</FormLabel>
 
                       <FormControl>
                         <PasswordInput {...field} />
@@ -308,7 +306,7 @@ export const SignUpFormV2 = ({
                   name="signature"
                   render={({ field: { onChange } }) => (
                     <FormItem>
-                      <FormLabel>Sign Here</FormLabel>
+                      <FormLabel>მოაწერეთ ხელი აქ</FormLabel>
                       <FormControl>
                         <SignaturePad
                           className="h-36 w-full"
@@ -327,7 +325,7 @@ export const SignUpFormV2 = ({
                   <>
                     <div className="relative flex items-center justify-center gap-x-4 py-2 text-xs uppercase">
                       <div className="bg-border h-px flex-1" />
-                      <span className="text-muted-foreground bg-transparent">Or</span>
+                      <span className="text-muted-foreground bg-transparent">ან</span>
                       <div className="bg-border h-px flex-1" />
                     </div>
 
@@ -340,15 +338,15 @@ export const SignUpFormV2 = ({
                       onClick={onSignUpWithGoogleClick}
                     >
                       <FcGoogle className="mr-2 h-5 w-5" />
-                      Sign Up with Google
+                      დარეგისტრირდით Google-ით
                     </Button>
                   </>
                 )}
 
                 <p className="text-muted-foreground mt-4 text-sm">
-                  Already have an account?{' '}
+                  გააქვთ ანგარიში?{' '}
                   <Link href="/signin" className="text-documenso-700 duration-200 hover:opacity-70">
-                    Sign in instead
+                    ავტორიზაცია
                   </Link>
                 </p>
               </fieldset>
@@ -387,13 +385,13 @@ export const SignUpFormV2 = ({
             <div className="mt-6">
               {step === 'BASIC_DETAILS' && (
                 <p className="text-muted-foreground text-sm">
-                  <span className="font-medium">Basic details</span> 1/2
+                  <span className="font-medium">ძირითადი დეტალები</span> 1/2
                 </p>
               )}
 
               {step === 'CLAIM_USERNAME' && (
                 <p className="text-muted-foreground text-sm">
-                  <span className="font-medium">Claim username</span> 2/2
+                  <span className="font-medium">მიიღეთ პროფილის სახელი</span> 2/2
                 </p>
               )}
 
@@ -419,7 +417,7 @@ export const SignUpFormV2 = ({
                 disabled={step === 'BASIC_DETAILS' || form.formState.isSubmitting}
                 onClick={() => setStep('BASIC_DETAILS')}
               >
-                Back
+                უკან
               </Button>
 
               {/* Continue button */}
@@ -431,7 +429,7 @@ export const SignUpFormV2 = ({
                   loading={form.formState.isSubmitting}
                   onClick={onNextClick}
                 >
-                  Next
+                  შემდეგი
                 </Button>
               )}
 
@@ -444,7 +442,7 @@ export const SignUpFormV2 = ({
                   size="lg"
                   className="flex-1"
                 >
-                  Complete
+                  დასრულება
                 </Button>
               )}
             </div>

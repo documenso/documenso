@@ -33,12 +33,12 @@ export default function NotFound() {
 
       <div className="container mx-auto flex h-full min-h-screen items-center px-6 py-32">
         <div>
-          <p className="text-muted-foreground font-semibold">404 Გვერდი არ მოიძებნა</p>
+          <p className="text-muted-foreground font-semibold">404 გვერდი არ მოიძებნა</p>
 
           <h1 className="mt-3 text-2xl font-bold md:text-3xl">დაფიქსირდა ხარვეზი</h1>
 
           <p className="text-muted-foreground mt-4 text-sm">
-            The page you are looking for was moved, removed, renamed or might never have existed.
+            გვერდი, რომელსაც ეძებთ, წაიშალა, გადაარქვეს სახელი ან შესაძლოა არ არსებობს.
           </p>
 
           <div className="mt-6 flex gap-x-2.5 gap-y-4 md:items-center">
@@ -50,7 +50,7 @@ export default function NotFound() {
               }}
             >
               <ChevronLeft className="mr-2 h-4 w-4" />
-              უკან დაბრუნება
+              უკან
             </Button>
 
             <Button className="w-32" asChild>

@@ -49,9 +49,9 @@ export const ForgotPasswordForm = ({ className }: ForgotPasswordFormProps) => {
     await forgotPassword({ email }).catch(() => null);
 
     toast({
-      title: 'Reset email sent',
+      title: 'აღსადგენი მეილი გამოგზავნილია!',
       description:
-        'A password reset email has been sent, if you have an account you should see it in your inbox shortly.',
+        'პაროლის აღდგენის მეილი წარმატებით გაიგზავნა, იხილეთ ის თქვენი ელ. ფოსტის შემოსულებში.',
       duration: 5000,
     });
 
@@ -72,7 +72,7 @@ export const ForgotPasswordForm = ({ className }: ForgotPasswordFormProps) => {
             name="email"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Email</FormLabel>
+                <FormLabel>ელ. ფოსტა</FormLabel>
                 <FormControl>
                   <Input type="email" {...field} />
                 </FormControl>
@@ -83,7 +83,7 @@ export const ForgotPasswordForm = ({ className }: ForgotPasswordFormProps) => {
         </fieldset>
 
         <Button size="lg" loading={isSubmitting}>
-          {isSubmitting ? 'Sending Reset Email...' : 'Reset Password'}
+          {isSubmitting ? 'აღსადგენი მეილი იგზავნება...' : 'პაროლის აღდგენა'}
         </Button>
       </form>
     </Form>

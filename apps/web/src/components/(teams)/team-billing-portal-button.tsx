@@ -22,9 +22,9 @@ export const TeamBillingPortalButton = ({ buttonProps, teamId }: TeamBillingPort
       window.open(sessionUrl, '_blank');
     } catch (err) {
       toast({
-        title: 'Something went wrong',
+        title: 'დაფიქსირდა ხარვეზი',
         description:
-          'We are unable to proceed to the billing portal at this time. Please try again, or contact support.',
+          'გადახდების პორტალზე გადასვლა ვერ მოხერხდა. გთხოვთ სცადოთ თავიდან ან დაგვიკავშირდეთ.',
         variant: 'destructive',
         duration: 10000,
       });
@@ -33,7 +33,7 @@ export const TeamBillingPortalButton = ({ buttonProps, teamId }: TeamBillingPort
 
   return (
     <Button {...buttonProps} onClick={async () => handleCreatePortal()} loading={isLoading}>
-      Manage subscription
+      პაკეტის მართვა
     </Button>
   );
 };

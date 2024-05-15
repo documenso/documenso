@@ -6,7 +6,6 @@ import Link from 'next/link';
 import type { Variants } from 'framer-motion';
 import { motion } from 'framer-motion';
 import { usePlausible } from 'next-plausible';
-import { LuGithub } from 'react-icons/lu';
 import { match } from 'ts-pattern';
 
 import backgroundPattern from '@documenso/assets/images/background-pattern.png';
@@ -98,7 +97,7 @@ export const Hero = ({ className, ...props }: HeroProps) => {
           animate="animate"
           className="text-center text-4xl font-bold leading-tight tracking-tight md:text-[48px] lg:text-[64px]"
         >
-          გაამარტივე დაკონტრაქტების
+          გაამარტივეთ დაკონტრაქტების
           <span className="block" /> პროცესი
         </motion.h2>
 
@@ -114,18 +113,18 @@ export const Hero = ({ className, ...props }: HeroProps) => {
             className="rounded-full bg-transparent backdrop-blur-sm"
             onClick={onSignUpClick}
           >
-            Claim Early Adopter Plan
+            სცადეთ უფასოდ 14 დღის განმავლობაში
             <span className="bg-primary dark:text-background -mr-2.5 ml-2.5 rounded-full px-2 py-1.5 text-xs font-medium">
-              $30/mo
+              დაწყება
             </span>
           </Button>
 
-          <Link href="https://github.com/documenso/documenso" onClick={() => event('view-github')}>
+          {/* <Link href="https://github.com/documenso/documenso" onClick={() => event('view-github')}>
             <Button variant="outline" className="rounded-full bg-transparent backdrop-blur-sm">
               <LuGithub className="mr-2 h-5 w-5" />
               Star on GitHub
             </Button>
-          </Link>
+          </Link> */}
         </motion.div>
 
         {match(heroMarketingCTA)
@@ -189,7 +188,7 @@ export const Hero = ({ className, ...props }: HeroProps) => {
           animate="animate"
         >
           <Widget className="mt-12">
-            <strong>Documenso მხარდამჭერი პირობა</strong>
+            <strong>CHIKOVANI მხარდამჭერი პირობა</strong>
             <p className="w-full max-w-[70ch]">
               ამხელა ტექსტს პონტი არაა ვერ გადავთარგმნი Our mission is to create an open signing
               infrastructure that empowers the world, enabling businesses to embrace openness,
@@ -235,7 +234,7 @@ export const Hero = ({ className, ...props }: HeroProps) => {
 
             <div>
               <strong>ლუკა ჩქოვანი & გიორგი ჩიქოვანი</strong>
-              <p className="mt-1">თანადამფუძნებლები, Documenso</p>
+              <p className="mt-1">დამფუძნებლები, CHIKOVANI</p>
             </div>
           </Widget>
         </motion.div>

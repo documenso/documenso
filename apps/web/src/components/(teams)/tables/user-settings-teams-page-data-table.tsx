@@ -62,12 +62,12 @@ export const UserSettingsTeamsPageDataTable = () => {
         <Tabs value={currentTab} className="flex-shrink-0 overflow-x-auto">
           <TabsList>
             <TabsTrigger className="min-w-[60px]" value="active" asChild>
-              <Link href={pathname ?? '/'}>Active</Link>
+              <Link href={pathname ?? '/'}>აქტიური</Link>
             </TabsTrigger>
 
             <TabsTrigger className="min-w-[60px]" value="pending" asChild>
               <Link href={`${pathname}?tab=pending`}>
-                Pending
+                მოლოდინში
                 {data && data.count > 0 && (
                   <span className="ml-1 hidden opacity-50 md:inline-block">{data.count}</span>
                 )}

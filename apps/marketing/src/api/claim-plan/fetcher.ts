@@ -25,13 +25,13 @@ export const claimPlan = async ({
   const body = await response.json();
 
   if (response.status !== 200) {
-    throw new Error('Failed to claim plan');
+    throw new Error('პაკეტის გააქტიურება ვერ მოხერხდა');
   }
 
   const safeBody = ZClaimPlanResponseSchema.safeParse(body);
 
   if (!safeBody.success) {
-    throw new Error('Failed to claim plan');
+    throw new Error('პაკეტის გააქტიურება ვერ მოხერხდა');
   }
 
   if ('error' in safeBody.data) {

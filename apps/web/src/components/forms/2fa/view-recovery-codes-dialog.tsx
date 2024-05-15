@@ -80,10 +80,10 @@ export const ViewRecoveryCodesDialog = () => {
         {recoveryCodes ? (
           <div>
             <DialogHeader className="mb-4">
-              <DialogTitle>View Recovery Codes</DialogTitle>
+              <DialogTitle>იხილეთ აღდგენის კოდები</DialogTitle>
 
               <DialogDescription>
-                Your recovery codes are listed below. Please store them in a safe place.
+                თქვენი აღდგენის კოდები მოცემულია ქვემოთ. გთხოვთ შეინახოთ ისინი უსაფრთხო ადგილას.
               </DialogDescription>
             </DialogHeader>
 
@@ -91,20 +91,20 @@ export const ViewRecoveryCodesDialog = () => {
 
             <DialogFooter className="mt-4">
               <DialogClose asChild>
-                <Button variant="secondary">Close</Button>
+                <Button variant="secondary">დახურვა</Button>
               </DialogClose>
 
-              <Button onClick={downloadRecoveryCodes}>Download</Button>
+              <Button onClick={downloadRecoveryCodes}>ჩამოტვირთვა</Button>
             </DialogFooter>
           </div>
         ) : (
           <Form {...viewRecoveryCodesForm}>
             <form onSubmit={viewRecoveryCodesForm.handleSubmit((value) => mutate(value))}>
               <DialogHeader className="mb-4">
-                <DialogTitle>View Recovery Codes</DialogTitle>
+                <DialogTitle>იხილეთ აღდგენის კოდები</DialogTitle>
 
                 <DialogDescription>
-                  Please provide a token from your authenticator, or a backup code.
+                  გთხოვთ მოგვაწოდოთ ტოკენი თქვენი ავთენტიფიკატორიდან ან სარეზერვო კოდი.
                 </DialogDescription>
               </DialogHeader>
 
@@ -128,10 +128,10 @@ export const ViewRecoveryCodesDialog = () => {
                       {match(AppError.parseError(error).message)
                         .with(
                           ErrorCode.INCORRECT_TWO_FACTOR_CODE,
-                          () => 'Invalid code. Please try again.',
+                          () => 'არასწორი კოდი. გთხოვთ თავიდან სცადოთ.',
                         )
                         .otherwise(
-                          () => 'Something went wrong. Please try again or contact support.',
+                          () => 'დაფიქსირდა ხარვეზი. გთხოვთ თავიდან სცადოთ ან დაგვიკავშირდეთ.',
                         )}
                     </AlertDescription>
                   </Alert>
@@ -140,12 +140,12 @@ export const ViewRecoveryCodesDialog = () => {
                 <DialogFooter>
                   <DialogClose asChild>
                     <Button type="button" variant="secondary">
-                      Cancel
+                      დახურვა
                     </Button>
                   </DialogClose>
 
                   <Button type="submit" loading={isLoading}>
-                    View
+                    ნახვა
                   </Button>
                 </DialogFooter>
               </fieldset>

@@ -78,17 +78,17 @@ export const ApiTokenForm = ({ className, teamId }: ApiTokenFormProps) => {
       const copied = await copy(token);
 
       if (!copied) {
-        throw new Error('Unable to copy the token');
+        throw new Error('ტოკენი ვერ დაკოპირდა');
       }
 
       toast({
-        title: 'Token copied to clipboard',
-        description: 'The token was copied to your clipboard.',
+        title: 'ტოკენი დაკოპირებულია',
+        description: 'ტოკენი წარმატებით დაკოპირდა.',
       });
     } catch (error) {
       toast({
-        title: 'Unable to copy token',
-        description: 'We were unable to copy the token to your clipboard. Please try again.',
+        title: 'ტოკენი ვერ დაკოპირდა',
+        description: 'ტოკენის დაკოპირება ვერ მოხერხდა. გთხოვთ თავიდან სცადოთ.',
         variant: 'destructive',
       });
     }
@@ -103,8 +103,8 @@ export const ApiTokenForm = ({ className, teamId }: ApiTokenFormProps) => {
       });
 
       toast({
-        title: 'Token created',
-        description: 'A new token was created successfully.',
+        title: 'ტოკენი შექმნილია',
+        description: 'ახალი ტოკენი წარმატებით შეიქმნა.',
         duration: 5000,
       });
 
@@ -114,17 +114,17 @@ export const ApiTokenForm = ({ className, teamId }: ApiTokenFormProps) => {
     } catch (error) {
       if (error instanceof TRPCClientError && error.data?.code === 'BAD_REQUEST') {
         toast({
-          title: 'An error occurred',
+          title: 'დაფიქსირდა ხარვეზი',
           description: error.message,
           variant: 'destructive',
         });
       } else {
         toast({
-          title: 'An unknown error occurred',
+          title: 'დაფიქსირდა ხარვეზი',
           variant: 'destructive',
           duration: 5000,
           description:
-            'We encountered an unknown error while attempting create the new token. Please try again later.',
+            'ახალი ტოკენის შექმნისას დაფიქსირდა ხარვეზი. გთხოვთ თავიდან სცადოთ ან დაგვიკავშირდეთ.',
         });
       }
     }
@@ -140,7 +140,7 @@ export const ApiTokenForm = ({ className, teamId }: ApiTokenFormProps) => {
               name="tokenName"
               render={({ field }) => (
                 <FormItem className="flex-1">
-                  <FormLabel className="text-muted-foreground">Token name</FormLabel>
+                  <FormLabel className="text-muted-foreground">ტოკენის სახელი</FormLabel>
 
                   <div className="flex items-center gap-x-4">
                     <FormControl className="flex-1">
@@ -149,8 +149,7 @@ export const ApiTokenForm = ({ className, teamId }: ApiTokenFormProps) => {
                   </div>
 
                   <FormDescription className="text-xs italic">
-                    Please enter a meaningful name for your token. This will help you identify it
-                    later.
+                    გთხოვთ აურჩიოთ ტოკენს რელევანტური სახელი, რაც შემდეგ მის ამოცნობაში დაგეხმარებთ
                   </FormDescription>
 
                   <FormMessage />
@@ -164,7 +163,9 @@ export const ApiTokenForm = ({ className, teamId }: ApiTokenFormProps) => {
                 name="expirationDate"
                 render={({ field }) => (
                   <FormItem className="flex-1">
-                    <FormLabel className="text-muted-foreground">Token expiration date</FormLabel>
+                    <FormLabel className="text-muted-foreground">
+                      ტოკენის ვადის გასვლის თარიღი
+                    </FormLabel>
 
                     <div className="flex items-center gap-x-4">
                       <FormControl className="flex-1">
@@ -193,7 +194,7 @@ export const ApiTokenForm = ({ className, teamId }: ApiTokenFormProps) => {
                 name="enabled"
                 render={({ field }) => (
                   <FormItem className="">
-                    <FormLabel className="text-muted-foreground mt-2">Never expire</FormLabel>
+                    <FormLabel className="text-muted-foreground mt-2">უვადო</FormLabel>
                     <FormControl>
                       <div className="block md:py-1.5">
                         <Switch
@@ -218,7 +219,7 @@ export const ApiTokenForm = ({ className, teamId }: ApiTokenFormProps) => {
               disabled={!form.formState.isDirty}
               loading={form.formState.isSubmitting}
             >
-              Create token
+              ტოკენის შექმნა
             </Button>
 
             <div className="md:hidden">
@@ -227,7 +228,7 @@ export const ApiTokenForm = ({ className, teamId }: ApiTokenFormProps) => {
                 disabled={!form.formState.isDirty}
                 loading={form.formState.isSubmitting}
               >
-                Create token
+                ტოკენის შექმნა
               </Button>
             </div>
           </fieldset>
@@ -238,8 +239,8 @@ export const ApiTokenForm = ({ className, teamId }: ApiTokenFormProps) => {
         <Card className="mt-8" gradient>
           <CardContent className="p-4">
             <p className="text-muted-foreground mt-2 text-sm">
-              Your token was created successfully! Make sure to copy it because you won't be able to
-              see it again!
+              თქვენი ტოკენი წარმატებით შეიქმნა! დარწმუნდით, რომ დააკოპირეთ, რადგან ვეღარ იხილავთ
+              მას!
             </p>
 
             <p className="bg-muted-foreground/10 my-4 rounded-md px-2.5 py-1 font-mono text-sm">
@@ -247,7 +248,7 @@ export const ApiTokenForm = ({ className, teamId }: ApiTokenFormProps) => {
             </p>
 
             <Button variant="outline" onClick={() => void copyToken(newlyCreatedToken)}>
-              Copy token
+              ტოკენის დაკოპირება
             </Button>
           </CardContent>
         </Card>

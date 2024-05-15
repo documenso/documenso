@@ -9,12 +9,12 @@ export type SigningDisclosureProps = HTMLAttributes<HTMLParagraphElement>;
 export const SigningDisclosure = ({ className, ...props }: SigningDisclosureProps) => {
   return (
     <p className={cn('text-muted-foreground text-xs', className)} {...props}>
-      By proceeding with your electronic signature, you acknowledge and consent that it will be used
-      to sign the given document and holds the same legal validity as a handwritten signature. By
-      completing the electronic signing process, you affirm your understanding and acceptance of
-      these conditions.
+      თქვენი ელექტრონული ხელმოწერის გაგრძელებით, თქვენ ადასტურებთ და ეთანხმებით, რომ იგი
+      გამოყენებული იქნება მოცემულ დოკუმენტზე ხელმოწერისთვის და აქვს იგივე იურიდიული ძალა, როგორიც
+      ხელნაწერ ხელმოწერას. ელექტრონული ხელმოწერის პროცესის დასრულებით, თქვენ ადასტურებთ, რომ გესმით
+      და ეთანხმებით ამ პირობებს.
       <span className="mt-2 block">
-        Read the full{' '}
+        იხილეთ სრულად{' '}
         <Link
           className="text-documenso-700 underline"
           href="/articles/signature-disclosure"

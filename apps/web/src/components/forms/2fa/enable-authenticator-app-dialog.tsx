@@ -62,9 +62,9 @@ export const EnableAuthenticatorAppDialog = ({ onSuccess }: EnableAuthenticatorA
   } = trpc.twoFactorAuthentication.setup.useMutation({
     onError: () => {
       toast({
-        title: 'Unable to setup two-factor authentication',
+        title: 'ორფაქტორიანი ავთენტიფიკაციის გააქტიურება ვერ მოხერხდა',
         description:
-          'We were unable to setup two-factor authentication for your account. Please ensure that you have entered your code correctly and try again.',
+          'თქვენს ანგარიშზე ორფაქტორიანი ავთენტიფიკაციის გააქტიურება ვერ მოხერხდა. გთხოვთ დარწმუნდით, რომ სწორად შეიყვანეთ თქვენი კოდი და სცადეთ თავიდან.',
         variant: 'destructive',
       });
     },
@@ -87,15 +87,15 @@ export const EnableAuthenticatorAppDialog = ({ onSuccess }: EnableAuthenticatorA
       onSuccess?.();
 
       toast({
-        title: 'Two-factor authentication enabled',
+        title: 'ორფაქტორიანი ავთენტიფიკაციის გააქტიურდა',
         description:
-          'You will now be required to enter a code from your authenticator app when signing in.',
+          'სისტემაში ყოველ შესვლისას მოგიწევთ კოდის შეყვანა თქვენი ავთენტიფიკატორის აპლიკაციიდან.',
       });
     } catch (_err) {
       toast({
-        title: 'Unable to setup two-factor authentication',
+        title: 'ორფაქტორიანი ავთენტიფიკაციის გააქტიურება ვერ მოხერხდა',
         description:
-          'We were unable to setup two-factor authentication for your account. Please ensure that you have entered your code correctly and try again.',
+          'თქვენს ანგარიშზე ორფაქტორიანი ავთენტიფიკაციის გააქტიურება ვერ მოხერხდა. გთხოვთ დარწმუნდით, რომ სწორად შეიყვანეთ თქვენი კოდი და სცადეთ თავიდან.',
         variant: 'destructive',
       });
     }
@@ -144,7 +144,7 @@ export const EnableAuthenticatorAppDialog = ({ onSuccess }: EnableAuthenticatorA
             void handleEnable2FA();
           }}
         >
-          Enable 2FA
+          გააქტიურეთ 2FA
         </Button>
       </DialogTrigger>
 
@@ -154,9 +154,9 @@ export const EnableAuthenticatorAppDialog = ({ onSuccess }: EnableAuthenticatorA
             {recoveryCodes ? (
               <div>
                 <DialogHeader>
-                  <DialogTitle>Backup codes</DialogTitle>
+                  <DialogTitle>სარეზერვო კოდები</DialogTitle>
                   <DialogDescription>
-                    Your recovery codes are listed below. Please store them in a safe place.
+                    თქვენი აღდგენის კოდები მოცემულია ქვემოთ. გთხოვთ შეინახოთ ისინი უსაფრთხო ადგილას.
                   </DialogDescription>
                 </DialogHeader>
 
@@ -166,20 +166,20 @@ export const EnableAuthenticatorAppDialog = ({ onSuccess }: EnableAuthenticatorA
 
                 <DialogFooter className="mt-4">
                   <DialogClose asChild>
-                    <Button variant="secondary">Close</Button>
+                    <Button variant="secondary">დახურვა</Button>
                   </DialogClose>
 
-                  <Button onClick={downloadRecoveryCodes}>Download</Button>
+                  <Button onClick={downloadRecoveryCodes}>ჩამოწერა</Button>
                 </DialogFooter>
               </div>
             ) : (
               <Form {...enable2FAForm}>
                 <form onSubmit={enable2FAForm.handleSubmit(onEnable2FAFormSubmit)}>
                   <DialogHeader>
-                    <DialogTitle>Enable Authenticator App</DialogTitle>
+                    <DialogTitle>ავთენტიფიკატორი აპლიკაციის გააქტიურება</DialogTitle>
                     <DialogDescription>
-                      To enable two-factor authentication, scan the following QR code using your
-                      authenticator app.
+                      ორფაქტორიანი ავთენტიფიკაციის ჩასართავად, დაასკანერეთ შემდეგი QR კოდი თქვენი
+                      ავთენტიფიკატორის აპის გამოყენებით.
                     </DialogDescription>
                   </DialogHeader>
 
@@ -192,8 +192,8 @@ export const EnableAuthenticatorAppDialog = ({ onSuccess }: EnableAuthenticatorA
                     />
 
                     <p className="text-muted-foreground text-sm">
-                      If your authenticator app does not support QR codes, you can use the following
-                      code instead:
+                      თუ თქვენი ავთენტიფიკატორი აპლიკაცია არ აღიქვავს QR კოდებსს, ამის ნაცვლად
+                      შეგიძლიათ გამოიყენოთ შემდეგი კოდი:
                     </p>
 
                     <p className="bg-muted/60 text-muted-foreground rounded-lg p-2 text-center font-mono tracking-widest">
@@ -201,8 +201,8 @@ export const EnableAuthenticatorAppDialog = ({ onSuccess }: EnableAuthenticatorA
                     </p>
 
                     <p className="text-muted-foreground text-sm">
-                      Once you have scanned the QR code or entered the code manually, enter the code
-                      provided by your authenticator app below.
+                      QR კოდის დასკანერების ან კოდის ხელით შეყვანის შემდეგ, შეიყვანეთ ქვემოთ თქვენი
+                      ავთენტიფიკატორი აპლიკაციის კოდი.
                     </p>
 
                     <FormField
@@ -221,11 +221,11 @@ export const EnableAuthenticatorAppDialog = ({ onSuccess }: EnableAuthenticatorA
 
                     <DialogFooter>
                       <DialogClose asChild>
-                        <Button variant="secondary">Cancel</Button>
+                        <Button variant="secondary">დახურვა</Button>
                       </DialogClose>
 
                       <Button type="submit" loading={isEnabling2FA}>
-                        Enable 2FA
+                        გააქტიურეთ 2FA
                       </Button>
                     </DialogFooter>
                   </fieldset>

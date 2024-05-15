@@ -200,16 +200,14 @@ export const Widget = ({ className, children, ...props }: WidgetProps) => {
             onSubmit={handleSubmit(onFormSubmit)}
           >
             <h3 className="text-xl font-semibold">Sign up to Early Adopter Plan</h3>
-            <p className="text-muted-foreground mt-2 text-xs">
-              with Timur Ercan & Lucas Smith from Documenso
-            </p>
+            <p className="text-muted-foreground mt-2 text-xs">CHIKOVANI-სთან ერთად</p>
 
             <hr className="mb-6 mt-4" />
 
             <AnimatePresence>
               <motion.div key="email">
                 <label htmlFor="email" className="text-foreground font-medium ">
-                  Რა არის შენი ელ.ფოსტა?
+                  თქვენი ელ. ფოსტა?
                 </label>
 
                 <Controller
@@ -237,6 +235,7 @@ export const Widget = ({ className, children, ...props }: WidgetProps) => {
                           className="bg-primary h-full w-14 rounded"
                           disabled={!field.value || !!errors.email?.message}
                           onClick={() => step === STEP.EMAIL && onNextStepClick()}
+                          style={{ width: '100%' }}
                         >
                           შემდეგი
                         </Button>
@@ -266,7 +265,7 @@ export const Widget = ({ className, children, ...props }: WidgetProps) => {
                   }}
                 >
                   <label htmlFor="name" className="text-foreground font-medium ">
-                    შენი სახელი?
+                    თქვენი სახელი?
                   </label>
 
                   <Controller
@@ -294,8 +293,9 @@ export const Widget = ({ className, children, ...props }: WidgetProps) => {
                             className="bg-primary h-full w-14 rounded"
                             disabled={!field.value || !!errors.name?.message}
                             onClick={() => onNextStepClick()}
+                            style={{ width: '100%' }}
                           >
-                            Next
+                            შემდეგი
                           </Button>
                         </div>
                       </div>
@@ -378,7 +378,7 @@ export const Widget = ({ className, children, ...props }: WidgetProps) => {
                     disabled={!isValid || isSubmitting}
                   >
                     {isSubmitting && <Loader className="mr-2 h-4 w-4 animate-spin" />}
-                    მოაწერე ხელი
+                    შემდეგი
                   </Button>
                 </div>
               </CardContent>
@@ -390,7 +390,7 @@ export const Widget = ({ className, children, ...props }: WidgetProps) => {
       <Dialog open={showSigningDialog} onOpenChange={setShowSigningDialog}>
         <DialogContent position="center">
           <DialogHeader>
-            <DialogTitle>დაამატე შენი ხელმოწერა</DialogTitle>
+            <DialogTitle>დაამატეთ თქვენი ხელმოწერა</DialogTitle>
           </DialogHeader>
 
           <DialogDescription>
@@ -409,10 +409,10 @@ export const Widget = ({ className, children, ...props }: WidgetProps) => {
 
           <DialogFooter>
             <Button variant="ghost" onClick={() => setShowSigningDialog(false)}>
-              გაუქმება
+              დახურვა
             </Button>
 
-            <Button onClick={() => onSignatureConfirmClick()}>Confirm</Button>
+            <Button onClick={() => onSignatureConfirmClick()}>დადასტურება</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

@@ -47,17 +47,17 @@ export const SendConfirmationEmailForm = ({ className }: SendConfirmationEmailFo
       await sendConfirmationEmail({ email });
 
       toast({
-        title: 'Confirmation email sent',
+        title: 'დამადასტურებელი მეილი გაგზავნილია',
         description:
-          'A confirmation email has been sent, and it should arrive in your inbox shortly.',
+          'დამადასტურებელი მეილი წარმატებით გაიგზავნა. იხილეთ ის თქვენი ელ. ფოსტის შემოსულებში.',
         duration: 5000,
       });
 
       form.reset();
     } catch (err) {
       toast({
-        title: 'An error occurred while sending your confirmation email',
-        description: 'Please try again and make sure you enter the correct email address.',
+        title: 'დამადასტურებელი მეილის გაგზავნისას დაფიქსირდა ხარვეზი',
+        description: 'გთხოვთ თავიდან სცადოთ და დარწმუნდეთ, რომ სწორ ელ. ფოსტას უთითებთ.',
         variant: 'destructive',
       });
     }
@@ -75,7 +75,7 @@ export const SendConfirmationEmailForm = ({ className }: SendConfirmationEmailFo
             name="email"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Email address</FormLabel>
+                <FormLabel>ელ. ფოსტა</FormLabel>
                 <FormControl>
                   <Input type="email" {...field} />
                 </FormControl>
@@ -86,7 +86,7 @@ export const SendConfirmationEmailForm = ({ className }: SendConfirmationEmailFo
           <FormMessage />
 
           <Button size="lg" type="submit" disabled={isSubmitting} loading={isSubmitting}>
-            Send confirmation email
+            გაგზავნეთ დამადასტურებელი მეილი
           </Button>
         </fieldset>
       </form>

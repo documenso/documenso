@@ -50,7 +50,7 @@ export const CapTable = ({ className, ...props }: CapTableProps) => {
     <div className={className} {...props}>
       <div className="border-border flex flex-col justify-center rounded-2xl border p-6 pl-2 shadow-sm hover:shadow">
         <div className="mb-6 flex px-4">
-          <h3 className="text-lg font-semibold">Cap Table</h3>
+          <h3 className="text-lg font-semibold">განაწილების ცხრილი</h3>
         </div>
 
         {!isSSR && (

@@ -154,18 +154,18 @@ export default async function ClaimedPlanPage({ searchParams = {} }: ClaimedPlan
               {user.name}
               <span className="block lg:hidden" />
               <span className="hidden lg:inline"> - </span>
-              ჩვენი ახალი ფავორიტი მომხმარებელი
+              ჩვენი ახალი ფავორიტი მომხმარებელი!
             </p>
           </div>
         </div>
       </div>
 
       <div className="mt-12">
-        <h2 className="text-foreground text-2xl font-bold">თქვენი შესვლის დეტალები</h2>
+        <h2 className="text-foreground text-2xl font-bold">თქვენი ანგარიშის დეტალები</h2>
 
         <div className="mt-4">
           <p className="text-muted-foreground text-lg">
-            <span className="font-bold">ელ.ფოსტა:</span> {user.email}
+            <span className="font-bold">ელ. ფოსტა:</span> {user.email}
           </p>
 
           <p className="text-muted-foreground mt-2 text-lg">
@@ -180,7 +180,7 @@ export default async function ClaimedPlanPage({ searchParams = {} }: ClaimedPlan
 
         <Link href={`${NEXT_PUBLIC_WEBAPP_URL()}/signin`} target="_blank" className="mt-4 block">
           <Button size="lg" className="text-base">
-            Დავიწყოთ!
+            დავიწყოთ!
             <ArrowRight className="ml-2 h-5 w-5" />
           </Button>
         </Link>

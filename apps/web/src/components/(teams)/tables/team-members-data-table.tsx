@@ -79,7 +79,7 @@ export const TeamMembersDataTable = ({
     <DataTable
       columns={[
         {
-          header: 'Team Member',
+          header: 'გუნდის წევრი',
           cell: ({ row }) => {
             const avatarFallbackText = row.original.user.name
               ? extractInitials(row.original.user.name)
@@ -98,20 +98,20 @@ export const TeamMembersDataTable = ({
           },
         },
         {
-          header: 'Role',
+          header: 'როლი',
           accessorKey: 'role',
           cell: ({ row }) =>
             teamOwnerUserId === row.original.userId
-              ? 'Owner'
+              ? 'მფლობელი'
               : TEAM_MEMBER_ROLE_MAP[row.original.role],
         },
         {
-          header: 'Member Since',
+          header: 'გაწევრიანდა',
           accessorKey: 'createdAt',
           cell: ({ row }) => <LocaleDate date={row.original.createdAt} />,
         },
         {
-          header: 'Actions',
+          header: 'პარამეტრები',
           cell: ({ row }) => (
             <DropdownMenu>
               <DropdownMenuTrigger>
@@ -119,7 +119,7 @@ export const TeamMembersDataTable = ({
               </DropdownMenuTrigger>
 
               <DropdownMenuContent className="w-52" align="start" forceMount>
-                <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                <DropdownMenuLabel>პარამეტრები</DropdownMenuLabel>
 
                 <UpdateTeamMemberDialog
                   currentUserTeamRole={currentUserTeamRole}
@@ -137,7 +137,7 @@ export const TeamMembersDataTable = ({
                       title="Update team member role"
                     >
                       <Edit className="mr-2 h-4 w-4" />
-                      Update role
+                      როლის შეცვლა
                     </DropdownMenuItem>
                   }
                 />
@@ -158,7 +158,7 @@ export const TeamMembersDataTable = ({
                       title="Remove team member"
                     >
                       <Trash2 className="mr-2 h-4 w-4" />
-                      Remove
+                      წაშლა
                     </DropdownMenuItem>
                   }
                 />

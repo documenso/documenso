@@ -30,10 +30,10 @@ export default function PricingPage() {
   return (
     <div className="mt-6 sm:mt-12">
       <div className="text-center">
-        <h1 className="text-3xl font-bold lg:text-5xl">შეარჩიე შენი პაკეტი</h1>
+        <h1 className="text-3xl font-bold lg:text-5xl">შეარჩიეთ თქვენი პაკეტი</h1>
 
         <p className="text-foreground mt-4 text-lg leading-normal">
-          Designed for every stage of your journey.
+          გამოცადეთ ჩვენი ფუნქციონალი სრულიად უფასოდ 14 დღის განმავლობაში.
         </p>
         <p className="text-foreground text-lg leading-normal">დაიწყეთ დღესვე.</p>
       </div>
@@ -56,7 +56,7 @@ export default function PricingPage() {
         <div className="mt-4 flex justify-center">
           <Button variant="outline" size="lg" className="rounded-full hover:cursor-pointer" asChild>
             <Link href="https://github.com/documenso/documenso" target="_blank" rel="noreferrer">
-              Დაიწყე
+              დაიწყეთ
             </Link>
           </Button>
         </div>
@@ -85,7 +85,7 @@ export default function PricingPage() {
 
           <AccordionItem value="data-handling">
             <AccordionTrigger className="text-left text-lg font-semibold">
-              როგორ ამუშავებ ჩემს მონაცემებს?
+              როგორ ამუშავებთ ჩემს მონაცემებს?
             </AccordionTrigger>
 
             <AccordionContent className="text-muted-foreground max-w-prose text-sm leading-relaxed">

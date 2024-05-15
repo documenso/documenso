@@ -73,7 +73,7 @@ export const OSSFriendsContainer = ({ className, ossFriends }: OSSFriendsContain
 
               <div className="mt-8">
                 <Link target="_blank" href={friend.href}>
-                  <Button>Learn more</Button>
+                  <Button>იხილეთ მეტი</Button>
                 </Link>
               </div>
             </CardContent>

@@ -34,8 +34,7 @@ export const FasterSmarterBeautifulBento = ({
           <CardContent className="grid grid-cols-12 gap-8 overflow-hidden p-6 lg:aspect-[2.5/1]">
             <p className="text-foreground/80 col-span-12 leading-relaxed lg:col-span-6">
               <strong className="block">სწრაფი.</strong>
-              {/* When it comes to sending or receiving a contract, you can count on lightning-fast
-              speeds. */}
+              {/* When it comes to sending or receiving a contract, you can count on lightning-fast speeds. You can trust that it's really, really fast */}
               როდესაც საქმე ეხება ხელშეკრულების გაგზავნას ან მიღებას, you can count on
               lightning-fast speeds.
             </p>
@@ -72,8 +71,8 @@ export const FasterSmarterBeautifulBento = ({
           <CardContent className="grid grid-cols-1 gap-8 p-6">
             <p className="text-foreground/80 leading-relaxed">
               <strong className="block">მარტივი.</strong>
-              ჩვენი მორგებული შაბლონები აღჭურვილია ისეთი თვისებებით, რომლებიც დაგეხმარებათ დაზოგოთ
-              დრო და ენერგია.
+              ჩვენი შაბლონები აღჭურვილია ისეთი თვისებებით, რომლებიც დაგეხმარებათ დაზოგოთ დრო და
+              ენერგია.
             </p>
 
             <div className="flex items-center justify-center p-8">

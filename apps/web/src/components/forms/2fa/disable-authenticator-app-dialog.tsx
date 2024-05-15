@@ -60,9 +60,9 @@ export const DisableAuthenticatorAppDialog = () => {
       await disable2FA({ token });
 
       toast({
-        title: 'Two-factor authentication disabled',
+        title: 'ორფაქტორიანი ავთენტიფიკაცია გამორთულია',
         description:
-          'Two-factor authentication has been disabled for your account. You will no longer be required to enter a code from your authenticator app when signing in.',
+          'ორფაქტორიანი ავთენტიფიკაცია გამორთულია. სისტემაში შესვლისას აღარ მოგიწევთ კოდის შეყვანა თქვენი ავთენტიფიკატორის აპლიკაციიდან.',
       });
 
       flushSync(() => {
@@ -72,9 +72,9 @@ export const DisableAuthenticatorAppDialog = () => {
       router.refresh();
     } catch (_err) {
       toast({
-        title: 'Unable to disable two-factor authentication',
+        title: 'ორფაქტორიანი ავთენტიფიკაცია გამორთვა ვერ მოხერხდა',
         description:
-          'We were unable to disable two-factor authentication for your account. Please ensure that you have entered your password and backup code correctly and try again.',
+          'თქვენი ანგარიშისთვის ორფაქტორიანი ავთენტიფიკაციის გამორთვა ვერ მოხერხდა. გთხოვთ დარწმუნდით, რომ სწორად შეიყვანეთ პაროლი და სარეზერვო კოდი და სცადეთ თავიდან.',
         variant: 'destructive',
       });
     }
@@ -84,17 +84,17 @@ export const DisableAuthenticatorAppDialog = () => {
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild={true}>
         <Button className="flex-shrink-0" variant="destructive">
-          Disable 2FA
+          გააუქმეთ 2FA
         </Button>
       </DialogTrigger>
 
       <DialogContent position="center">
         <DialogHeader>
-          <DialogTitle>Disable 2FA</DialogTitle>
+          <DialogTitle>გააუქმეთ 2FA</DialogTitle>
 
           <DialogDescription>
-            Please provide a token from the authenticator, or a backup code. If you do not have a
-            backup code available, please contact support.
+            გთხოვთ მოგვაწოდოთ ტოკენი ავთენტიფიკატორიდან ან სარეზერვო კოდი. თუ არ გაქვთ სარეზერვო
+            კოდი, გთხოვთ დაგვიკავშირდეთ.
           </DialogDescription>
         </DialogHeader>
 
@@ -117,12 +117,12 @@ export const DisableAuthenticatorAppDialog = () => {
               <DialogFooter>
                 <DialogClose asChild>
                   <Button type="button" variant="secondary">
-                    Cancel
+                    დახურვა
                   </Button>
                 </DialogClose>
 
                 <Button type="submit" variant="destructive" loading={isDisable2FASubmitting}>
-                  Disable 2FA
+                  2FA-ს გაუქმება
                 </Button>
               </DialogFooter>
             </fieldset>

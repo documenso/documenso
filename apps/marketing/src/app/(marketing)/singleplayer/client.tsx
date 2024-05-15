@@ -58,7 +58,7 @@ export const SinglePlayerClient = () => {
       onNextStep: () => setStep('sign'),
     },
     sign: {
-      title: 'Sign',
+      title: 'ხელმოწერა',
       description: 'შეიყვანეთ თქვენი მონაცემები.',
       stepIndex: 2,
       onBackStep: () => setStep('fields'),
@@ -142,7 +142,7 @@ export const SinglePlayerClient = () => {
     } catch {
       toast({
         title: 'დაფიქსირდა ხარვეზი',
-        description: 'გთხოვთ სცადოთ მოგვიანებით',
+        description: 'გთხოვთ სცადოთ თავიდან ან დაგვიკავშირდეთ.',
         variant: 'destructive',
       });
     }
@@ -179,7 +179,7 @@ export const SinglePlayerClient = () => {
     } catch {
       toast({
         title: 'დაფიქსირდა ხარვეზი',
-        description: 'გთხოვთ სცადოთ მოგვიანებით',
+        description: 'გთხოვთ სცადოთ თავიდან ან დაგვიკავშირდეთ.',
         variant: 'destructive',
       });
     }
@@ -199,7 +199,7 @@ export const SinglePlayerClient = () => {
           >
             უფასო ანგარიში
           </Link>{' '}
-          ან ნახეთ ჩვენი{' '}
+          ან იხილეთ ჩვენი{' '}
           <Link
             href={'/pricing'}
             target="_blank"

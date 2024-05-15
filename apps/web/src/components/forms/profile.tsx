@@ -66,8 +66,8 @@ export const ProfileForm = ({ className, user }: ProfileFormProps) => {
       });
 
       toast({
-        title: 'Profile updated',
-        description: 'Your profile has been updated successfully.',
+        title: 'პროფილი განახლებულია',
+        description: 'თქვენი პროფილი წარმატებით განახლდა.',
         duration: 5000,
       });
 
@@ -75,16 +75,16 @@ export const ProfileForm = ({ className, user }: ProfileFormProps) => {
     } catch (err) {
       if (err instanceof TRPCClientError && err.data?.code === 'BAD_REQUEST') {
         toast({
-          title: 'An error occurred',
+          title: 'დაფიქსირდა ხარვეზი',
           description: err.message,
           variant: 'destructive',
         });
       } else {
         toast({
-          title: 'An unknown error occurred',
+          title: 'დაფიქსირდა ხარვეზი',
           variant: 'destructive',
           description:
-            'We encountered an unknown error while attempting to sign you In. Please try again later.',
+            'თქვენი ავტორიზაციისას დაფიქსირდა ხარვეზი. გთხოვთ თავიდან სცადოთ ან დაგვიკავშირდეთ.',
         });
       }
     }
@@ -102,7 +102,7 @@ export const ProfileForm = ({ className, user }: ProfileFormProps) => {
             name="name"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Full Name</FormLabel>
+                <FormLabel>სრული სახელი</FormLabel>
                 <FormControl>
                   <Input type="text" {...field} />
                 </FormControl>
@@ -113,7 +113,7 @@ export const ProfileForm = ({ className, user }: ProfileFormProps) => {
 
           <div>
             <Label htmlFor="email" className="text-muted-foreground">
-              Email
+              ელ. ფოსტა
             </Label>
             <Input id="email" type="email" className="bg-muted mt-2" value={user.email} disabled />
           </div>
@@ -122,7 +122,7 @@ export const ProfileForm = ({ className, user }: ProfileFormProps) => {
             name="signature"
             render={({ field: { onChange } }) => (
               <FormItem>
-                <FormLabel>Signature</FormLabel>
+                <FormLabel>ხელმოწერა</FormLabel>
                 <FormControl>
                   <SignaturePad
                     className="h-44 w-full"
@@ -139,7 +139,7 @@ export const ProfileForm = ({ className, user }: ProfileFormProps) => {
         </fieldset>
 
         <Button type="submit" loading={isSubmitting} className="self-end">
-          {isSubmitting ? 'Updating profile...' : 'Update profile'}
+          {isSubmitting ? 'პროფილი ნახლდება...' : 'განაახლეთ პროფილი'}
         </Button>
       </form>
     </Form>

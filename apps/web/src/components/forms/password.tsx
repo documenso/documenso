@@ -28,7 +28,7 @@ export const ZPasswordFormSchema = z
     repeatedPassword: ZPasswordSchema,
   })
   .refine((data) => data.password === data.repeatedPassword, {
-    message: 'Passwords do not match',
+    message: 'პაროლები ერთმანეთს არ ემთხვევა',
     path: ['repeatedPassword'],
   });
 
@@ -65,23 +65,23 @@ export const PasswordForm = ({ className }: PasswordFormProps) => {
       form.reset();
 
       toast({
-        title: 'Password updated',
-        description: 'Your password has been updated successfully.',
+        title: 'პაროლი განახლებულია',
+        description: 'თქვენი პაროლი წარმატებით განახლდა.',
         duration: 5000,
       });
     } catch (err) {
       if (err instanceof TRPCClientError && err.data?.code === 'BAD_REQUEST') {
         toast({
-          title: 'An error occurred',
+          title: 'დაფიქსირდა ხარვეზი',
           description: err.message,
           variant: 'destructive',
         });
       } else {
         toast({
-          title: 'An unknown error occurred',
+          title: 'დაფიქსირდა ხარვეზი',
           variant: 'destructive',
           description:
-            'We encountered an unknown error while attempting to update your password. Please try again later.',
+            'პაროლის აღდგენისას დაფიქსირდა ხარვეზი. გთხოვთ თავიდან სცადოთ ან დაგვიკავშირდეთ.',
         });
       }
     }
@@ -99,7 +99,7 @@ export const PasswordForm = ({ className }: PasswordFormProps) => {
             name="currentPassword"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Current Password</FormLabel>
+                <FormLabel>მოქმედი პაროლი</FormLabel>
                 <FormControl>
                   <PasswordInput autoComplete="current-password" {...field} />
                 </FormControl>
@@ -113,7 +113,7 @@ export const PasswordForm = ({ className }: PasswordFormProps) => {
             name="password"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Password</FormLabel>
+                <FormLabel>ახალი პაროლი</FormLabel>
                 <FormControl>
                   <PasswordInput autoComplete="new-password" {...field} />
                 </FormControl>
@@ -127,7 +127,7 @@ export const PasswordForm = ({ className }: PasswordFormProps) => {
             name="repeatedPassword"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Repeat Password</FormLabel>
+                <FormLabel>გაიმეორეთ პაროლი</FormLabel>
                 <FormControl>
                   <PasswordInput autoComplete="new-password" {...field} />
                 </FormControl>
@@ -139,7 +139,7 @@ export const PasswordForm = ({ className }: PasswordFormProps) => {
 
         <div className="ml-auto mt-4">
           <Button type="submit" loading={isSubmitting}>
-            {isSubmitting ? 'Updating password...' : 'Update password'}
+            {isSubmitting ? 'პაროლი ნახლდება...' : 'განაახლეთ პაროლი'}
           </Button>
         </div>
       </form>

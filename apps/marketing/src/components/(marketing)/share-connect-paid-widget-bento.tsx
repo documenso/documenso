@@ -26,8 +26,10 @@ export const ShareConnectPaidWidgetBento = ({
         />
       </div>
       <h2 className="px-0 text-[22px] font-semibold md:px-12 md:text-4xl lg:px-24">
-        ინტეგრირდება ყველა თქვენს საყვარელ ინსტრუმენტთან.
-        <span className="block md:mt-0">გააგზავნეთ, დააკავშირეთ, მიიღეთ და ჩააშენეთ ყველგან.</span>
+        {/* ინტეგრირდება ყველა თქვენს საყვარელ ინსტრუმენტთან. */}
+        <span className="block md:mt-0">
+          გააგზავნეთ, დააკავშირეთ, მიიღეთ <br /> და ჩააშენეთ ყველგან.
+        </span>
       </h2>
 
       <div className="mt-6 grid grid-cols-2 gap-8 md:mt-8">

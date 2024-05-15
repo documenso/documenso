@@ -70,7 +70,7 @@ export const DocumentReadOnlyFields = ({ documentMeta, fields }: DocumentReadOnl
                     className="mt-2.5 h-6 text-xs focus:outline-none focus-visible:ring-0"
                     onClick={() => handleHideField(field.secondaryId)}
                   >
-                    Hide field
+                    დაფარეთ ველი
                   </Button>
                 </PopoverHover>
               </div>

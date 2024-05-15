@@ -48,7 +48,7 @@ export async function GET(_request: Request) {
           {title}
         </h1>
 
-        <p tw="font-normal">დაწერილია {author} მიერ</p>
+        <p tw="font-normal">დაწერილია: {author} </p>
       </div>
     ),
     {

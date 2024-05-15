@@ -40,9 +40,9 @@ export const ZClaimPublicProfileFormSchema = z.object({
     .string()
     .trim()
     .toLowerCase()
-    .min(1, { message: 'Please enter a valid username.' })
+    .min(1, { message: 'გთხოვთ შეიყვანოთ მომხმარებლის სწორი სახელი.' })
     .regex(/^[a-z0-9-]+$/, {
-      message: 'Username can only container alphanumeric characters and dashes.',
+      message: 'პროფილის სახელი უნდა შეიცავდეს მხოლოდ ასოებსა და ტირეებს.',
     }),
 });
 
@@ -92,7 +92,7 @@ export const ClaimPublicProfileDialogForm = ({
       if (error.code === AppErrorCode.PROFILE_URL_TAKEN) {
         form.setError('url', {
           type: 'manual',
-          message: 'This username is already taken',
+          message: 'ეს სახელი უკვე აღებულია',
         });
       } else if (error.code === AppErrorCode.PREMIUM_PROFILE_URL) {
         form.setError('url', {
@@ -101,16 +101,15 @@ export const ClaimPublicProfileDialogForm = ({
         });
       } else if (error.code !== AppErrorCode.UNKNOWN_ERROR) {
         toast({
-          title: 'An error occurred',
+          title: 'დაფიქსირდა ხარვეზი',
           description: error.userMessage ?? error.message,
           variant: 'destructive',
         });
       } else {
         toast({
-          title: 'An unknown error occurred',
+          title: 'დაფიქსირდა ხარვეზი',
           variant: 'destructive',
-          description:
-            'We encountered an unknown error while attempting to save your details. Please try again later.',
+          description: 'თქვენი მონაცემების შენახვისას დაფიქსირდა ხარვეზი. გთხოვთ თავიდან სცადოთ.',
         });
       }
     }

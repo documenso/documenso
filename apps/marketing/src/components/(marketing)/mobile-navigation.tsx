@@ -48,7 +48,7 @@ export const MENU_NAVIGATION_LINKS = [
   },
   {
     href: 'https://app.documenso.com/signin?utm_source=marketing-header',
-    text: 'შესვლა',
+    text: 'ავტორიზაცია',
   },
   {
     href: 'https://app.documenso.com/signup?utm_source=marketing-header',

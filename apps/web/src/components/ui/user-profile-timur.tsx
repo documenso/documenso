@@ -26,7 +26,7 @@ export const UserProfileTimur = ({ className, rows = 2 }: UserProfileTimurProps)
       )}
     >
       <div className="border-border bg-background text-muted-foreground inline-block max-w-full truncate rounded-md border px-2.5 py-1.5 text-sm">
-        {baseUrl.host}/u/timur
+        {baseUrl.host}/u/Luka
       </div>
 
       <div className="mt-4">
@@ -39,22 +39,24 @@ export const UserProfileTimur = ({ className, rows = 2 }: UserProfileTimurProps)
 
       <div className="mt-6">
         <div className="flex items-center justify-center gap-x-2">
-          <h2 className="text-2xl font-semibold">Timur Ercan</h2>
+          <h2 className="text-2xl font-semibold">Luka Chikovani</h2>
 
           <VerifiedIcon className="text-primary h-8 w-8" />
         </div>
 
-        <p className="text-muted-foreground mt-4 max-w-[40ch] text-center text-sm">Hey I’m Timur</p>
+        <p className="text-muted-foreground mt-4 max-w-[40ch] text-center text-sm">
+          მოგესალმებით, მე ლუკა ვარ!
+        </p>
 
         <p className="text-muted-foreground mt-1 max-w-[40ch] text-center text-sm">
-          Pick any of the following agreements below and start signing to get started
+          აირჩიეთ ქვემოთ ჩამოთვლილი რომელიმე შეთანხმება და დაიწყეთ ხელმოწერა
         </p>
       </div>
 
       <div className="mt-8 w-full">
         <div className="dark:divide-foreground/30 dark:border-foreground/30 divide-y-2 divide-neutral-200 overflow-hidden rounded-lg border-2 border-neutral-200">
           <div className="text-muted-foreground dark:bg-foreground/20 bg-neutral-50 p-4 font-medium">
-            Documents
+            დოკუმენტები
           </div>
 
           {Array(rows)
@@ -75,7 +77,7 @@ export const UserProfileTimur = ({ className, rows = 2 }: UserProfileTimurProps)
 
                 <div className="flex-shrink-0">
                   <Button type="button" size="sm" className="pointer-events-none w-32">
-                    Sign
+                    ხელის მოწერა
                   </Button>
                 </div>
               </div>

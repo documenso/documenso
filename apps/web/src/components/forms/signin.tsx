@@ -41,14 +41,14 @@ import { PasswordInput } from '@documenso/ui/primitives/password-input';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
 const ERROR_MESSAGES: Partial<Record<keyof typeof ErrorCode, string>> = {
-  [ErrorCode.CREDENTIALS_NOT_FOUND]: 'The email or password provided is incorrect',
-  [ErrorCode.INCORRECT_EMAIL_PASSWORD]: 'The email or password provided is incorrect',
+  [ErrorCode.CREDENTIALS_NOT_FOUND]: 'მითითებული ელ. ფოსტა ან პაროლი არასწორია',
+  [ErrorCode.INCORRECT_EMAIL_PASSWORD]: 'მითითებული ელ. ფოსტა ან პაროლი არასწორია',
   [ErrorCode.USER_MISSING_PASSWORD]:
     'This account appears to be using a social login method, please sign in using that method',
-  [ErrorCode.INCORRECT_TWO_FACTOR_CODE]: 'The two-factor authentication code provided is incorrect',
-  [ErrorCode.INCORRECT_TWO_FACTOR_BACKUP_CODE]: 'The backup code provided is incorrect',
+  [ErrorCode.INCORRECT_TWO_FACTOR_CODE]: 'მითითებული ორფაქტორიანი ავთენტიფიკაციის კოდი არასწორია',
+  [ErrorCode.INCORRECT_TWO_FACTOR_BACKUP_CODE]: 'მითითებული სარეზერვო კოდი არასწორია',
   [ErrorCode.UNVERIFIED_EMAIL]:
-    'This account has not been verified. Please verify your account before signing in.',
+    'ეს ანგარიში არ არის ვერიფიცირებული. გთხოვთ შესვლამდე ვერიფიკაცია გაიაროთ.',
 };
 
 const TwoFactorEnabledErrorCode = ErrorCode.TWO_FACTOR_MISSING_CREDENTIALS;
@@ -168,11 +168,14 @@ export const SignInForm = ({ className, initialEmail, isGoogleSSOEnabled }: Sign
           () =>
             'This passkey is not configured for this application. Please login and add one in the user settings.',
         )
-        .with(AppErrorCode.EXPIRED_CODE, () => 'This session has expired. Please try again.')
-        .otherwise(() => 'Please try again later or login using your normal details');
+        .with(AppErrorCode.EXPIRED_CODE, () => 'სესიას ვადა ამოეწურა. გთხოვთ თავიდან სცადეთ.')
+        .otherwise(
+          () =>
+            'გთხოვთ სცადოთ მოგვიანებით ან შედით სისტემაში თქვენი ჩვეულებრივი მონაცემების გამოყენებით',
+        );
 
       toast({
-        title: 'Something went wrong',
+        title: 'დაფიქსირდა ხარვეზი',
         description: errorMessage,
         duration: 10000,
         variant: 'destructive',
@@ -213,8 +216,8 @@ export const SignInForm = ({ className, initialEmail, isGoogleSSOEnabled }: Sign
           router.push(`/unverified-account`);
 
           toast({
-            title: 'Unable to sign in',
-            description: errorMessage ?? 'An unknown error occurred',
+            title: 'ავტორიზაცია ვერ მოხერხდა',
+            description: errorMessage ?? 'დაფიქსირდა ხარვეზი',
           });
 
           return;
@@ -222,23 +225,23 @@ export const SignInForm = ({ className, initialEmail, isGoogleSSOEnabled }: Sign
 
         toast({
           variant: 'destructive',
-          title: 'Unable to sign in',
-          description: errorMessage ?? 'An unknown error occurred',
+          title: 'ავტორიზაცია ვერ მოხერხდა',
+          description: errorMessage ?? 'დაფიქსირდა ხარვეზი',
         });
 
         return;
       }
 
       if (!result?.url) {
-        throw new Error('An unknown error occurred');
+        throw new Error('დაფიქსირდა ხარვეზი');
       }
 
       window.location.href = result.url;
     } catch (err) {
       toast({
-        title: 'An unknown error occurred',
+        title: 'დაფიქსირდა ხარვეზი',
         description:
-          'We encountered an unknown error while attempting to sign you In. Please try again later.',
+          'თქვენი ავტორიზაციისას დაფიქსირდა ხარვეზი. გთხოვთ თავიდან სცადოთ ან დაგვიკავშირდეთ.',
       });
     }
   };
@@ -248,9 +251,9 @@ export const SignInForm = ({ className, initialEmail, isGoogleSSOEnabled }: Sign
       await signIn('google', { callbackUrl: LOGIN_REDIRECT_PATH });
     } catch (err) {
       toast({
-        title: 'An unknown error occurred',
+        title: 'დაფიქსირდა ხარვეზი',
         description:
-          'We encountered an unknown error while attempting to sign you In. Please try again later.',
+          'თქვენი ავტორიზაციისას დაფიქსირდა ხარვეზი. გთხოვთ თავიდან სცადოთ ან დაგვიკავშირდეთ.',
         variant: 'destructive',
       });
     }
@@ -271,7 +274,7 @@ export const SignInForm = ({ className, initialEmail, isGoogleSSOEnabled }: Sign
             name="email"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Email</FormLabel>
+                <FormLabel>ელ. ფოსტა</FormLabel>
 
                 <FormControl>
                   <Input type="email" {...field} />
@@ -287,7 +290,7 @@ export const SignInForm = ({ className, initialEmail, isGoogleSSOEnabled }: Sign
             name="password"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Password</FormLabel>
+                <FormLabel>პაროლი</FormLabel>
 
                 <FormControl>
                   <PasswordInput {...field} />
@@ -300,7 +303,7 @@ export const SignInForm = ({ className, initialEmail, isGoogleSSOEnabled }: Sign
                     href="/forgot-password"
                     className="text-muted-foreground text-sm duration-200 hover:opacity-70"
                   >
-                    Forgot your password?
+                    დაგავიწყდათ პაროლი?
                   </Link>
                 </p>
               </FormItem>
@@ -313,13 +316,13 @@ export const SignInForm = ({ className, initialEmail, isGoogleSSOEnabled }: Sign
             loading={isSubmitting}
             className="dark:bg-documenso dark:hover:opacity-90"
           >
-            {isSubmitting ? 'Signing in...' : 'Sign In'}
+            {isSubmitting ? 'ავტორიზაცია...' : 'ავტორიზაცია'}
           </Button>
 
           {(isGoogleSSOEnabled || isPasskeyEnabled) && (
             <div className="relative flex items-center justify-center gap-x-4 py-2 text-xs uppercase">
               <div className="bg-border h-px flex-1" />
-              <span className="text-muted-foreground bg-transparent">Or continue with</span>
+              <span className="text-muted-foreground bg-transparent">ან განაგრძეთ</span>
               <div className="bg-border h-px flex-1" />
             </div>
           )}
@@ -361,7 +364,7 @@ export const SignInForm = ({ className, initialEmail, isGoogleSSOEnabled }: Sign
       >
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Two-Factor Authentication</DialogTitle>
+            <DialogTitle>ორფაქტორიანი ავთენტიფიკაცია</DialogTitle>
           </DialogHeader>
 
           <form onSubmit={form.handleSubmit(onFormSubmit)}>
@@ -372,7 +375,7 @@ export const SignInForm = ({ className, initialEmail, isGoogleSSOEnabled }: Sign
                   name="totpCode"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Authentication Token</FormLabel>
+                      <FormLabel>ავთენტიფიკაციის ტოკენი</FormLabel>
                       <FormControl>
                         <Input type="text" {...field} />
                       </FormControl>
@@ -388,7 +391,7 @@ export const SignInForm = ({ className, initialEmail, isGoogleSSOEnabled }: Sign
                   name="backupCode"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel> Backup Code</FormLabel>
+                      <FormLabel> სარეზერვო კოდი</FormLabel>
                       <FormControl>
                         <Input type="text" {...field} />
                       </FormControl>
@@ -405,12 +408,12 @@ export const SignInForm = ({ className, initialEmail, isGoogleSSOEnabled }: Sign
                   onClick={onToggleTwoFactorAuthenticationMethodClick}
                 >
                   {twoFactorAuthenticationMethod === 'totp'
-                    ? 'Use Backup Code'
-                    : 'Use Authenticator'}
+                    ? 'გამოიყენეთ სარეზერვო კოდი'
+                    : 'გამოიყენეთ ავთენტიპიკატორი'}
                 </Button>
 
                 <Button type="submit" loading={isSubmitting}>
-                  {isSubmitting ? 'Signing in...' : 'Sign In'}
+                  {isSubmitting ? 'ავტორიზაცია...' : 'ავტორიზაცია'}
                 </Button>
               </DialogFooter>
             </fieldset>

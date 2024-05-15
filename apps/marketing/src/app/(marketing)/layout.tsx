@@ -48,14 +48,14 @@ export default function MarketingLayout({ children }: MarketingLayoutProps) {
         {showProfilesAnnouncementBar && (
           <div className="relative inline-flex w-full items-center justify-center overflow-hidden bg-[#e7f3df] px-4 py-2.5">
             <div className="text-center text-sm font-medium text-black">
-              დარეგისტრირდი Documenso-ზე დღესვე და მიიღე 50%-მდე ფასდაკლება{' '}
-              <span className="hidden font-semibold md:inline">50%-მდე ფასდაკლება</span>
+              დარეგისტრირდით CHIKOVANI-ზე დღესვე და მიიღეთ{' '}
+              <span className="hidden font-semibold md:inline">25%-მდე ფასდაკლება</span>
               <div className="mt-1.5 block md:ml-4 md:mt-0 md:inline-block">
                 <a
                   href={`${NEXT_PUBLIC_WEBAPP_URL()}/signup?utm_source=marketing-announcement-bar`}
                   className="bg-background text-foreground rounded-md px-2.5 py-1 text-xs font-medium duration-300"
                 >
-                  Claim Now
+                  დაწყება
                 </a>
               </div>
             </div>

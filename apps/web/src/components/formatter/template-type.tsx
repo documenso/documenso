@@ -16,12 +16,12 @@ type TemplateTypes = (typeof TemplateTypePrisma)[keyof typeof TemplateTypePrisma
 
 const TEMPLATE_TYPES: Record<TemplateTypes, TemplateTypeIcon> = {
   PRIVATE: {
-    label: 'Private',
+    label: 'პირადი',
     icon: Lock,
     color: 'text-blue-600 dark:text-blue-300',
   },
   PUBLIC: {
-    label: 'Public',
+    label: 'საჯარო',
     icon: Globe,
     color: 'text-green-500 dark:text-green-300',
   },

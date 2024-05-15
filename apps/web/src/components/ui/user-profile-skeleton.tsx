@@ -50,7 +50,7 @@ export const UserProfileSkeleton = ({ className, user, rows = 2 }: UserProfileSk
       <div className="mt-8 w-full">
         <div className="dark:divide-foreground/30 dark:border-foreground/30 divide-y-2 divide-neutral-200 overflow-hidden rounded-lg border-2 border-neutral-200">
           <div className="text-muted-foreground dark:bg-foreground/20 bg-neutral-50 p-4 font-medium">
-            Documents
+            დოკუმენტები
           </div>
 
           {Array(rows)
@@ -71,7 +71,7 @@ export const UserProfileSkeleton = ({ className, user, rows = 2 }: UserProfileSk
 
                 <div className="flex-shrink-0">
                   <Button type="button" size="sm" className="pointer-events-none w-32">
-                    Sign
+                    ხელის მოწერა
                   </Button>
                 </div>
               </div>

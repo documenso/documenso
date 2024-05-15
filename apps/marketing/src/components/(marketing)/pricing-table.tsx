@@ -88,7 +88,7 @@ export const PricingTable = ({ className, ...props }: PricingTableProps) => {
               target="_blank"
               className="mt-6"
             >
-              დარეგისტრირდი ახლავე
+              დაიწყეთ ახლავე
             </Link>
           </Button>
 
@@ -122,7 +122,7 @@ export const PricingTable = ({ className, ...props }: PricingTableProps) => {
               href={`${NEXT_PUBLIC_WEBAPP_URL()}/signup?utm_source=pricing-early-adopter`}
               target="_blank"
             >
-              დარეგისტრირდი ახლავე
+              დაიწყეთ ახლავე
             </Link>
           </Button>
 
@@ -133,7 +133,7 @@ export const PricingTable = ({ className, ...props }: PricingTableProps) => {
                 target="_blank"
                 rel="noreferrer"
               >
-                შეზღუდული დროით: <span className="text-documenso-700">წაიკითხე მეტი</span>
+                შეზღუდული დროით: <span className="text-documenso-700">იხილეთ მეტი</span>
               </a>
             </p>
             <p className="text-foregro‚und py-4">ულიმიტო გუნდები</p>

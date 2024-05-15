@@ -18,7 +18,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
       lastModified,
     })),
     {
-      url: `${baseUrl}/blog`,
+      url: `${baseUrl}/ბლოგი`,
       lastModified,
     },
     ...allBlogPosts.map((doc) => ({
@@ -34,7 +34,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
       lastModified,
     },
     {
-      url: `${baseUrl}/pricing`,
+      url: `${baseUrl}/ფასი`,
       lastModified,
     },
   ];

@@ -67,11 +67,11 @@ export const TeamsMemberPageDataTable = ({
         <Tabs value={currentTab} className="flex-shrink-0 overflow-x-auto">
           <TabsList>
             <TabsTrigger className="min-w-[60px]" value="members" asChild>
-              <Link href={pathname ?? '/'}>Active</Link>
+              <Link href={pathname ?? '/'}>აქტიური</Link>
             </TabsTrigger>
 
             <TabsTrigger className="min-w-[60px]" value="invites" asChild>
-              <Link href={`${pathname}?tab=invites`}>Pending</Link>
+              <Link href={`${pathname}?tab=invites`}>მოლოდინში</Link>
             </TabsTrigger>
           </TabsList>
         </Tabs>
