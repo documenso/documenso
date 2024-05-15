@@ -1,9 +1,5 @@
 {
-  "index": {
-    "title": "Get started",
-    "theme": {
-      "sidebar": false,
-      "breadcrumb": false
-    }
-  }
+  "index": "First Steps",
+  "create": "Create your Account",
+  "setup": "Setup your Account"
 }

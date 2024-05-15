@@ -28,23 +28,41 @@
     "type": "page",
     "display": "hidden"
   },
+  "release-notes": {
+    "title": "Release Notes",
+    "type": "page",
+    "display": "hidden"
+  },
+  "licenses": {
+    "title": "Licenses",
+    "type": "page",
+    "display": "hidden"
+  },
   "contributing": {
     "title": "Contributing Guide",
     "type": "page",
     "display": "hidden"
   },
   "user": {
-    "title": "User",
+    "title": "Learn",
     "type": "menu",
     "items": {
-      "app": {
-        "title": "Get Started",
+      "first-steps": {
+        "title": "First Steps",
         "href": "/get-started"
+      },
+      "documents": {
+        "title": "Getting Documents Signed",
+        "href": "/documents"
+      },
+      "templates": {
+        "title": "Templates",
+        "href": "/templates"
       }
     }
   },
   "developer": {
-    "title": "Developer",
+    "title": "Build",
     "type": "menu",
     "items": {
       "local-development": {
@@ -62,6 +80,35 @@
       "webhooks": {
         "title": "Webhooks",
         "href": "/webhooks"
+      }
+    }
+  },
+  "host": {
+    "title": "Host",
+    "type": "menu",
+    "items": {
+      "local-development": {
+        "title": "Licenses",
+        "href": "/licenses"
+      },
+      "hosting-start": {
+        "title": "Getting Stared",
+        "href": "/"
+      }
+    }
+  },
+  "updates": {
+    "title": "What's New",
+    "type": "menu",
+    "items": {
+      "changelog": {
+        "title": "Release Notes",
+        "href": "/release-notes"
+      },
+      "blog": {
+        "title": "Blog",
+        "href": "https://documenso.com/blog",
+        "newWindow": true
       }
     }
   },
