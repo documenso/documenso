@@ -21,7 +21,7 @@ import { LazyPDFViewer } from '@documenso/ui/primitives/lazy-pdf-viewer';
 
 import { StackAvatarsWithTooltip } from '~/components/(dashboard)/avatar/stack-avatars-with-tooltip';
 import { DocumentHistorySheet } from '~/components/document/document-history-sheet';
-import { DocumentPendingFields } from '~/components/document/document-pending-fields';
+import { DocumentPendingFields } from '~/components/document/document-pending-readonly-fields';
 import { DocumentReadOnlyFields } from '~/components/document/document-read-only-fields';
 import {
   DocumentStatus as DocumentStatusComponent,
