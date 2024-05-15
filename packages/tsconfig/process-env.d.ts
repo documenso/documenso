@@ -68,6 +68,14 @@ declare namespace NodeJS {
     //
     NEXT_PRIVATE_BROWSERLESS_URL?: string;
 
+    NEXT_PRIVATE_JOBS_PROVIDER?: 'trigger' | 'local';
+
+    /**
+     * Trigger.dev environment variables
+     */
+    NEXT_PRIVATE_TRIGGER_API_KEY?: string;
+    NEXT_PRIVATE_TRIGGER_API_URL?: string;
+
     /**
      * Vercel environment variables
      */
