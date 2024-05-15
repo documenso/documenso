@@ -38,6 +38,16 @@
     "type": "page",
     "display": "hidden"
   },
+  "hosting-start": {
+    "title": "Getting Started",
+    "type": "page",
+    "display": "hidden"
+  },
+  "documents": {
+    "title": "Documents",
+    "type": "page",
+    "display": "hidden"
+  },
   "contributing": {
     "title": "Contributing Guide",
     "type": "page",
@@ -93,7 +103,7 @@
       },
       "hosting-start": {
         "title": "Getting Stared",
-        "href": "/"
+        "href": "/hosting-start"
       }
     }
   },
