@@ -12,7 +12,7 @@ const main = async () => {
 
   const { status, body } = await client.createDocument({
     body: {
-      title: 'My Document',
+      title: 'ჩემი დოკუმენტი',
       recipients: [
         {
           name: 'John Doe',
@@ -26,14 +26,14 @@ const main = async () => {
         },
       ],
       meta: {
-        subject: 'Please sign this document',
-        message: 'Hey {signer.name}, please sign the following document: {document.name}',
+        subject: 'გთხოვთ ხელი მოაწეროთ ამ დოკუმენტს',
+        message: 'გამარჯობა {signer.name}, გთხოვთ მოაწეროთ ხელი ამ დოკუმენტს: {document.name}',
       },
     },
   });
 
   if (status !== 200) {
-    throw new Error('Failed to create document');
+    throw new Error('დოკუმენტის შემქნა ვერ მოხერხდა');
   }
 
   const { uploadUrl, documentId } = body;

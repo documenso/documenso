@@ -35,14 +35,18 @@ export const NEXT_AUTH_OPTIONS: AuthOptions = {
     CredentialsProvider({
       name: 'Credentials',
       credentials: {
-        email: { label: 'Email', type: 'email' },
-        password: { label: 'Password', type: 'password' },
+        email: { label: 'ელ. ფოსტა', type: 'email' },
+        password: { label: 'პაროლი', type: 'password' },
         totpCode: {
-          label: 'Two-factor Code',
+          label: '2FA კოდი',
           type: 'input',
-          placeholder: 'Code from authenticator app',
+          placeholder: 'კოდი ავთენტიპიკატორი აპლიკაციიდან',
         },
-        backupCode: { label: 'Backup Code', type: 'input', placeholder: 'Two-factor backup code' },
+        backupCode: {
+          label: 'საარეზერვო კოდი',
+          type: 'input',
+          placeholder: 'ორფაქტორიანი სარეზერვო კოდი',
+        },
       },
       authorize: async (credentials, req) => {
         if (!credentials) {

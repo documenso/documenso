@@ -13,7 +13,7 @@ export const IS_GOOGLE_SSO_ENABLED = Boolean(
 
 export const USER_SECURITY_AUDIT_LOG_MAP: { [key in UserSecurityAuditLogType]: string } = {
   [UserSecurityAuditLogType.ACCOUNT_SSO_LINK]: 'Linked account to SSO',
-  [UserSecurityAuditLogType.ACCOUNT_PROFILE_UPDATE]: 'Profile updated',
+  [UserSecurityAuditLogType.ACCOUNT_PROFILE_UPDATE]: 'პროფილი განახლებულია',
   [UserSecurityAuditLogType.AUTH_2FA_DISABLE]: '2FA გამორთულია',
   [UserSecurityAuditLogType.AUTH_2FA_ENABLE]: '2FA ჩართულია',
   [UserSecurityAuditLogType.PASSKEY_CREATED]: 'Passkey created',
@@ -22,8 +22,8 @@ export const USER_SECURITY_AUDIT_LOG_MAP: { [key in UserSecurityAuditLogType]: s
   [UserSecurityAuditLogType.PASSWORD_RESET]: 'პაროლის შეცვლა',
   [UserSecurityAuditLogType.PASSWORD_UPDATE]: 'პაროლის განახლება',
   [UserSecurityAuditLogType.SIGN_OUT]: 'Signed Out',
-  [UserSecurityAuditLogType.SIGN_IN]: 'Signed In',
-  [UserSecurityAuditLogType.SIGN_IN_FAIL]: 'Sign in attempt failed',
+  [UserSecurityAuditLogType.SIGN_IN]: 'ავტორიზებული',
+  [UserSecurityAuditLogType.SIGN_IN_FAIL]: 'ავტორიზაცია ვერ მოხერხდა',
   [UserSecurityAuditLogType.SIGN_IN_PASSKEY_FAIL]: 'Passkey sign in failed',
   [UserSecurityAuditLogType.SIGN_IN_2FA_FAIL]: 'Sign in 2FA attempt failed',
 };

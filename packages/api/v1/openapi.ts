@@ -7,7 +7,7 @@ export const OpenAPIV1 = Object.assign(
     ApiContractV1,
     {
       info: {
-        title: 'Documenso API',
+        title: 'CHIKOVANI API',
         version: '1.0.0',
         description: 'The Documenso API for retrieving, creating, updating and deleting documents.',
       },

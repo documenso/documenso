@@ -24,7 +24,7 @@ const main = async () => {
   });
 
   if (status !== 200) {
-    throw new Error('Failed to update recipient');
+    throw new Error('მიმღების განახლება ვერ მოხერხდა');
   }
 };
 

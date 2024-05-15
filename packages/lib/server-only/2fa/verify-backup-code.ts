@@ -1,4 +1,4 @@
-import { User } from '@documenso/prisma/client';
+import type { User } from '@documenso/prisma/client';
 
 import { getBackupCodes } from './get-backup-code';
 
@@ -11,7 +11,7 @@ export const verifyBackupCode = async ({ user, backupCode }: VerifyBackupCodePar
   const userBackupCodes = await getBackupCodes({ user });
 
   if (!userBackupCodes) {
-    throw new Error('User has no backup codes');
+    throw new Error('მომხმარებელს არ აქვს სარეზერვო კოდები');
   }
 
   return userBackupCodes.includes(backupCode);

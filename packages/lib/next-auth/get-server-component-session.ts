@@ -28,7 +28,7 @@ export const getRequiredServerComponentSession = cache(async () => {
   const { user, session } = await getServerComponentSession();
 
   if (!user || !session) {
-    throw new Error('No session found');
+    throw new Error('სესია არ მოიძებნა');
   }
 
   return { user, session };

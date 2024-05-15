@@ -80,7 +80,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
       return {
         status: 404,
         body: {
-          message: 'Document not found',
+          message: 'დოკუმენტი არ მოიძებნა',
         },
       };
     }
@@ -109,7 +109,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
         return {
           status: 404,
           body: {
-            message: 'Document not found',
+            message: 'დოკუმენტი არ მოიძებნა',
           },
         };
       }
@@ -162,7 +162,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
         return {
           status: 404,
           body: {
-            message: 'Document not found',
+            message: 'დოკუმენტი არ მოიძებნა',
           },
         };
       }
@@ -181,7 +181,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
       return {
         status: 404,
         body: {
-          message: 'Document not found',
+          message: 'დოკუმენტი არ მოიძებნა',
         },
       };
     }
@@ -206,7 +206,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
         return {
           status: 400,
           body: {
-            message: 'You have reached the maximum number of documents allowed for this month',
+            message: 'თქვენ მიაღწიეთ ამ თვეში დასაშვებ დოკუმენტების მაქსიმალურ რაოდენობას',
           },
         };
       }
@@ -277,7 +277,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
       return {
         status: 400,
         body: {
-          message: 'You have reached the maximum number of documents allowed for this month',
+          message: 'თქვენ მიაღწიეთ ამ თვეში დასაშვები დოკუმენტების მაქსიმალურ რაოდენობას',
         },
       };
     }
@@ -360,7 +360,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
       return {
         status: 404,
         body: {
-          message: 'Document not found',
+          message: 'დოკუმენტი არ მოიძებნა',
         },
       };
     }
@@ -369,7 +369,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
       return {
         status: 400,
         body: {
-          message: 'Document is already complete',
+          message: 'დოკუმენტის ხელმოწერა უკვე დასრულებულია',
         },
       };
     }
@@ -418,14 +418,14 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
       return {
         status: 200,
         body: {
-          message: 'Document sent for signing successfully',
+          message: 'დოკუმენტი ხელმოწერისთვის წარმატებით გაიგზავნა',
         },
       };
     } catch (err) {
       return {
         status: 500,
         body: {
-          message: 'An error has occured while sending the document for signing',
+          message: 'დოკუმენტის ხელმოწერითვის გაგზავნა ვერ მოხერხდა',
         },
       };
     }
@@ -445,7 +445,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
       return {
         status: 404,
         body: {
-          message: 'Document not found',
+          message: 'დოკუმენტი არ მოიძებნა',
         },
       };
     }
@@ -454,7 +454,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
       return {
         status: 400,
         body: {
-          message: 'Document is already completed',
+          message: 'დოკუმენტის ხელმოწერა უკვე დასრულებულია',
         },
       };
     }
@@ -471,7 +471,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
       return {
         status: 400,
         body: {
-          message: 'Recipient already exists',
+          message: 'მიმღები უკვე არსებობს',
         },
       };
     }
@@ -495,7 +495,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
       const newRecipient = newRecipients.find((recipient) => recipient.email === email);
 
       if (!newRecipient) {
-        throw new Error('Recipient not found');
+        throw new Error('მიმღები არ მოიძებნა');
       }
 
       return {
@@ -509,7 +509,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
       return {
         status: 500,
         body: {
-          message: 'An error has occured while creating the recipient',
+          message: 'მიმღების შექმნისას დაფიქსირდა ხარვეზი',
         },
       };
     }
@@ -529,7 +529,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
       return {
         status: 404,
         body: {
-          message: 'Document not found',
+          message: 'დოკუმენტი არ მოიძებნა',
         },
       };
     }
@@ -538,7 +538,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
       return {
         status: 400,
         body: {
-          message: 'Document is already completed',
+          message: 'დოკუმენტის ხელმოწერა უკვე დასრულებულია',
         },
       };
     }
@@ -558,7 +558,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
       return {
         status: 404,
         body: {
-          message: 'Recipient not found',
+          message: 'მიმღები არ მოიძებნა',
         },
       };
     }
@@ -585,7 +585,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
       return {
         status: 404,
         body: {
-          message: 'Document not found',
+          message: 'დოკუმენტი არ მოიძებნა',
         },
       };
     }
@@ -594,7 +594,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
       return {
         status: 400,
         body: {
-          message: 'Document is already completed',
+          message: 'დოკუმენტის ხელმოწერა უკვე დასრულებულია',
         },
       };
     }
@@ -611,7 +611,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
       return {
         status: 400,
         body: {
-          message: 'Unable to delete recipient',
+          message: 'მიმღების წაშლა ვერ მოხერხდა',
         },
       };
     }
@@ -639,7 +639,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
       return {
         status: 404,
         body: {
-          message: 'Document not found',
+          message: 'დოკუმენტი არ მოიძებნა',
         },
       };
     }
@@ -648,7 +648,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
       return {
         status: 400,
         body: {
-          message: 'Document is already completed',
+          message: 'დოკუმენტის ხელმოწერა უკვე დასრულებულია',
         },
       };
     }
@@ -662,7 +662,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
       return {
         status: 404,
         body: {
-          message: 'Recipient not found',
+          message: 'მიმღები არ მოიძებნა',
         },
       };
     }
@@ -671,7 +671,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
       return {
         status: 400,
         body: {
-          message: 'Recipient has already signed the document',
+          message: 'მიმღებმა უკვე მოაწერა ხელი დოკუმენტს',
         },
       };
     }
@@ -727,7 +727,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
       return {
         status: 404,
         body: {
-          message: 'Document not found',
+          message: 'დოკუმენტი არ მოიძებნა',
         },
       };
     }
@@ -736,7 +736,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
       return {
         status: 400,
         body: {
-          message: 'Document is already completed',
+          message: 'დოკუმენტის ხელმოწერა უკვე დასრულებულია',
         },
       };
     }
@@ -750,7 +750,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
       return {
         status: 404,
         body: {
-          message: 'Recipient not found',
+          message: 'მიმღები არ მოიძებნა',
         },
       };
     }
@@ -759,7 +759,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
       return {
         status: 400,
         body: {
-          message: 'Recipient has already signed the document',
+          message: 'მიმღებმა უკვე მოაწერა ხელი დოკუმენტს',
         },
       };
     }
@@ -814,7 +814,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
       return {
         status: 404,
         body: {
-          message: 'Document not found',
+          message: 'დოკუმენტი არ მოიძებნა',
         },
       };
     }
@@ -823,7 +823,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
       return {
         status: 400,
         body: {
-          message: 'Document is already completed',
+          message: 'დოკუმენტის ხელმოწერა უკვე დასრულებულია',
         },
       };
     }
@@ -837,7 +837,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
       return {
         status: 404,
         body: {
-          message: 'Field not found',
+          message: 'ველი არ მოიძებნა',
         },
       };
     }
@@ -851,7 +851,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
       return {
         status: 400,
         body: {
-          message: 'Recipient has already signed the document',
+          message: 'მიმღებმა უკვე მოაწერა ხელი დოკუმენტს',
         },
       };
     }
@@ -868,7 +868,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
       return {
         status: 400,
         body: {
-          message: 'Unable to delete field',
+          message: 'ველის წაშლა ვერ მოხერხდა',
         },
       };
     }

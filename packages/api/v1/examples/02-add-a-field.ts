@@ -29,7 +29,7 @@ const main = async () => {
   });
 
   if (status !== 200) {
-    throw new Error('Failed to create field');
+    throw new Error('ველის შექმნა ვერ მოხერხდა');
   }
 
   const { id: fieldId } = body;

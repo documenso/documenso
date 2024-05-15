@@ -21,7 +21,7 @@ const main = async () => {
   });
 
   if (status !== 200) {
-    throw new Error('Failed to remove field');
+    throw new Error('ველის წაშლა ვერ მოხერხდა');
   }
 };
 

@@ -22,7 +22,7 @@ test('[TEAMS]: create team', async ({ page }) => {
     redirectPath: '/settings/teams',
   });
 
-  const teamId = `team-${Date.now()}`;
+  const teamId = `გუნდი-${Date.now()}`;
 
   // Create team.
   await page.getByRole('button', { name: 'Create team' }).click();

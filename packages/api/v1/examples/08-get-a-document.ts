@@ -19,7 +19,7 @@ const main = async () => {
   });
 
   if (status !== 200) {
-    throw new Error('Failed to get document');
+    throw new Error('დოკუმენტის მიღება ვერ მოხერხდა');
   }
 
   console.log(`Got document with id: ${documentId} and title: ${body.title}`);

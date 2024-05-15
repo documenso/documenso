@@ -21,7 +21,7 @@ const main = async () => {
   });
 
   if (status !== 200) {
-    throw new Error('Failed to get documents');
+    throw new Error('დოკუმენტების მიღება ვერ მოხერხდა');
   }
 
   for (const document of body.documents) {

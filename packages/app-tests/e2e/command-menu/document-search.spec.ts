@@ -17,7 +17,7 @@ test('[COMMAND_MENU]: should see sent documents', async ({ page }) => {
 
   await page.keyboard.press('Meta+K');
 
-  await page.getByPlaceholder('Type a command or search...').first().fill(document.title);
+  await page.getByPlaceholder('ძებნა...').first().fill(document.title);
   await expect(page.getByRole('option', { name: document.title })).toBeVisible();
 });
 
@@ -33,7 +33,7 @@ test('[COMMAND_MENU]: should see received documents', async ({ page }) => {
 
   await page.keyboard.press('Meta+K');
 
-  await page.getByPlaceholder('Type a command or search...').first().fill(document.title);
+  await page.getByPlaceholder('ძებნა...').first().fill(document.title);
   await expect(page.getByRole('option', { name: document.title })).toBeVisible();
 });
 
@@ -49,6 +49,6 @@ test('[COMMAND_MENU]: should be able to search by recipient', async ({ page }) =
 
   await page.keyboard.press('Meta+K');
 
-  await page.getByPlaceholder('Type a command or search...').first().fill(recipient.email);
+  await page.getByPlaceholder('ძებნა...').first().fill(recipient.email);
   await expect(page.getByRole('option', { name: document.title })).toBeVisible();
 });

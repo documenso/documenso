@@ -24,7 +24,7 @@ const main = async () => {
   });
 
   if (status !== 200) {
-    throw new Error('Failed to add recipient');
+    throw new Error('მიმღების დამატება ვერ მოხერხდა');
   }
 
   const { id: recipientId } = body;

@@ -34,8 +34,8 @@ export const RECIPIENT_ROLE_TO_EMAIL_TYPE = {
 } as const;
 
 export const RECIPIENT_ROLE_SIGNING_REASONS = {
-  [RecipientRole.SIGNER]: 'I am a signer of this document',
-  [RecipientRole.APPROVER]: 'I am an approver of this document',
-  [RecipientRole.CC]: 'I am required to recieve a copy of this document',
+  [RecipientRole.SIGNER]: 'მე ვარ ამ დოკუმენტის ხელმომწერი',
+  [RecipientRole.APPROVER]: 'მე ვარ ამ დოკუმენტის დამამტკიცებელი',
+  [RecipientRole.CC]: 'მე ვალდებული ვარ მივიღო ამ დოკუმენტის ასლი',
   [RecipientRole.VIEWER]: 'I am a viewer of this document',
 } satisfies Record<keyof typeof RecipientRole, string>;

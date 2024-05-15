@@ -36,7 +36,7 @@ export function useCopyShareLink({ onSuccess, onError }: UseCopyShareLinkOptions
     try {
       const isCopySuccess = await copyToClipboard(shareLink);
       if (!isCopySuccess) {
-        throw new Error('Copy to clipboard failed');
+        throw new Error('დაკოპირება ვერ მოხერხდა');
       }
 
       onSuccess?.();
