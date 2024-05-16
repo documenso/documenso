@@ -4,27 +4,16 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { Caveat } from 'next/font/google';
 
-import {
-  CalendarDays,
-  CheckSquare,
-  ChevronDown,
-  Disc,
-  Hash,
-  Mail,
-  Settings2,
-  Trash,
-  Type,
-  User,
-} from 'lucide-react';
+import { Settings2, Trash } from 'lucide-react';
 import { createPortal } from 'react-dom';
 import { Rnd } from 'react-rnd';
 
 import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
 import { colorVariants } from '@documenso/lib/utils/createColorVariants';
-import { FieldType } from '@documenso/prisma/client';
 
 import { cn } from '../../lib/utils';
 import { Card, CardContent } from '../card';
+import { FieldIcon } from './field-icon';
 import type { TDocumentFlowFormSchema } from './types';
 
 type Field = TDocumentFlowFormSchema['fields'][0];
@@ -186,71 +175,11 @@ export const FieldItem = ({
             },
           )}
         >
-          {(() => {
-            switch (field.type) {
-              case FieldType.EMAIL:
-                return (
-                  <div className="text-field-card-foreground flex items-center justify-center gap-x-1 text-xl font-light">
-                    <Mail className="h-5 w-5" /> Email
-                  </div>
-                );
-              case FieldType.NAME:
-                return (
-                  <div className="text-field-card-foreground flex items-center justify-center gap-x-1 text-xl font-light">
-                    <User className="h-5 w-5" /> Name
-                  </div>
-                );
-              case FieldType.DATE:
-                return (
-                  <div className="text-field-card-foreground flex items-center justify-center gap-x-1 text-xl font-light">
-                    <CalendarDays className="h-5 w-5" /> Date
-                  </div>
-                );
-              case FieldType.TEXT:
-                return (
-                  <div className="text-field-card-foreground flex items-center justify-center gap-x-1 text-xl font-light">
-                    <Type className="h-5 w-5" /> Text
-                  </div>
-                );
-              case FieldType.NUMBER:
-                return (
-                  <div className="text-field-card-foreground flex items-center justify-center gap-x-1 text-xl font-light">
-                    <Hash className="h-5 w-5" /> Number
-                  </div>
-                );
-              case FieldType.RADIO:
-                return (
-                  <div className="text-field-card-foreground flex items-center justify-center gap-x-1 text-xl font-light">
-                    <Disc className="h-5 w-5" /> Radio
-                  </div>
-                );
-              case FieldType.CHECKBOX:
-                return (
-                  <div className="text-field-card-foreground flex items-center justify-center gap-x-1 text-xl font-light">
-                    <CheckSquare className="h-5 w-5 font-light" /> Checkbox
-                  </div>
-                );
-              case FieldType.DROPDOWN:
-                return (
-                  <div className="text-field-card-foreground flex items-center justify-center gap-x-1 text-xl font-light">
-                    <ChevronDown className="h-5 w-5" /> Dropdown
-                  </div>
-                );
-              case 'SIGNATURE':
-                return (
-                  <div
-                    className={cn(
-                      'text-field-card-foreground flex items-center justify-center gap-x-1 text-xl font-light',
-                      fontCaveat.className,
-                    )}
-                  >
-                    {field.signerEmail}
-                  </div>
-                );
-              default:
-                return null;
-            }
-          })()}
+          <FieldIcon
+            type={field.type}
+            signerEmail={field.signerEmail}
+            fontCaveatClassName={fontCaveat.className}
+          />
 
           <p
             className={cn(
