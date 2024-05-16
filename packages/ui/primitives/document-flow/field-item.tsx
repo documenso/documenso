@@ -71,11 +71,12 @@ export const FieldItem = ({
   const [settingsActive, setSettingsActive] = useState(false);
   const cardRef = useRef(null);
 
-  const selectedColorVariant = color ? colorVariants[color] : colorVariants['dawn'];
+  const selectedColorVariant =
+    typeof color === 'string' && color in colorVariants ? colorVariants[color] : undefined;
 
-  const selectedSignerBorderClass = selectedColorVariant.border;
-  const selectedSignerInitialsBGClass = selectedColorVariant.initialsBackground;
-  const selectedSignerActiveBorderClass = selectedColorVariant.borderActive;
+  const selectedSignerBorderClass = selectedColorVariant?.border;
+  const selectedSignerInitialsBGClass = selectedColorVariant?.initialsBackground;
+  const selectedSignerActiveBorderClass = selectedColorVariant?.borderActive;
 
   const advancedField = ['NUMBER', 'RADIO', 'CHECKBOX', 'DROPDOWN'].includes(field.type);
 

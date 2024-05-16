@@ -97,6 +97,14 @@ export const AddFieldsFormPartial = ({
   const [currentField, setCurrentField] = useState<FieldFormType>();
   const settingsRef = useRef<HTMLDivElement>(null);
 
+  const recipientColorClasses = useMemo(() => {
+    const colorMap = new Map();
+    recipients.forEach((recipient, index) => {
+      colorMap.set(recipient.id, colorClasses[index % colorClasses.length]);
+    });
+    return colorMap;
+  }, [recipients]);
+
   const {
     control,
     handleSubmit,
@@ -145,39 +153,19 @@ export const AddFieldsFormPartial = ({
   const [selectedSigner, setSelectedSigner] = useState<Recipient | null>(null);
   const [showRecipientsSelector, setShowRecipientsSelector] = useState(false);
 
-  const recipientColorClasses = useMemo(() => {
-    const colorMap = new Map();
-    recipients.forEach((recipient, index) => {
-      colorMap.set(recipient.id, colorClasses[index % colorClasses.length]);
-    });
-    return colorMap;
-  }, [recipients]);
+  const selectedSignerColorClass = selectedSigner
+    ? recipientColorClasses.get(selectedSigner.id)
+    : '';
 
-  const selectedSignerColorVariant = useMemo(() => {
-    if (!selectedSigner) {
-      return {
-        ring: '',
-        border: '',
-        borderWithHover: '',
-        borderActive: '',
-        background: '',
-        initialsBackground: '',
-      };
-    }
-
-    const colorClass = recipientColorClasses.get(selectedSigner.id);
-
-    return (
-      colorVariants[colorClass] || {
-        ring: '',
-        border: '',
-        borderWithHover: '',
-        borderActive: '',
-        background: '',
-        initialsBackground: '',
-      }
-    );
-  }, [selectedSigner, recipientColorClasses]);
+  const selectedSignerRingClass = selectedSigner
+    ? colorVariants[selectedSignerColorClass]?.ring || ''
+    : '';
+  const selectedSignerBorderClass = selectedSigner
+    ? colorVariants[selectedSignerColorClass]?.borderWithHover || ''
+    : '';
+  const selectedSignerActiveBorderClass = selectedSigner
+    ? colorVariants[selectedSignerColorClass]?.borderActive || ''
+    : '';
 
   const hasSelectedSignerBeenSent = selectedSigner?.sendStatus === SendStatus.SENT;
 
@@ -435,9 +423,9 @@ export const AddFieldsFormPartial = ({
                 <Card
                   className={cn(
                     'pointer-events-none fixed z-50 cursor-pointer border-2 backdrop-blur-[1px]',
-                    selectedSignerColorVariant.background,
+                    selectedSignerActiveBorderClass,
                     {
-                      'border-2': isFieldWithinBounds,
+                      'text-field-card-foreground border-2': isFieldWithinBounds,
                       'opacity-50': !isFieldWithinBounds,
                     },
                   )}
@@ -500,7 +488,7 @@ export const AddFieldsFormPartial = ({
                       role="combobox"
                       className={cn(
                         'bg-background text-muted-foreground hover:text-foreground mb-12 mt-2 justify-between font-normal ring ring-offset-2',
-                        selectedSignerColorVariant.ring,
+                        selectedSignerRingClass,
                       )}
                     >
                       {selectedSigner?.email && (
@@ -612,7 +600,7 @@ export const AddFieldsFormPartial = ({
                     <Card
                       className={cn(
                         'h-full w-full cursor-pointer group-disabled:opacity-50',
-                        selectedSignerColorVariant.borderWithHover,
+                        selectedSignerBorderClass,
                       )}
                     >
                       <CardContent className="flex flex-col items-center justify-center px-6 py-4">
@@ -638,7 +626,7 @@ export const AddFieldsFormPartial = ({
                     <Card
                       className={cn(
                         'h-full w-full cursor-pointer group-disabled:opacity-50',
-                        selectedSignerColorVariant.borderWithHover,
+                        selectedSignerBorderClass,
                       )}
                     >
                       <CardContent className="flex flex-col items-center justify-center px-6 py-4">
@@ -665,7 +653,7 @@ export const AddFieldsFormPartial = ({
                     <Card
                       className={cn(
                         'h-full w-full cursor-pointer group-disabled:opacity-50',
-                        selectedSignerColorVariant.borderWithHover,
+                        selectedSignerBorderClass,
                       )}
                     >
                       <CardContent className="flex flex-col items-center justify-center px-6 py-4">
@@ -691,7 +679,7 @@ export const AddFieldsFormPartial = ({
                     <Card
                       className={cn(
                         'h-full w-full cursor-pointer group-disabled:opacity-50',
-                        selectedSignerColorVariant.borderWithHover,
+                        selectedSignerBorderClass,
                       )}
                     >
                       <CardContent className="flex flex-col items-center justify-center px-6 py-4">
@@ -717,7 +705,7 @@ export const AddFieldsFormPartial = ({
                     <Card
                       className={cn(
                         'h-full w-full cursor-pointer group-disabled:opacity-50',
-                        selectedSignerColorVariant.borderWithHover,
+                        selectedSignerBorderClass,
                       )}
                     >
                       <CardContent className="flex flex-col items-center justify-center px-6 py-4">
@@ -743,7 +731,7 @@ export const AddFieldsFormPartial = ({
                     <Card
                       className={cn(
                         'h-full w-full cursor-pointer group-disabled:opacity-50',
-                        selectedSignerColorVariant.borderWithHover,
+                        selectedSignerBorderClass,
                       )}
                     >
                       <CardContent className="flex flex-col items-center justify-center px-6 py-4">
@@ -769,7 +757,7 @@ export const AddFieldsFormPartial = ({
                     <Card
                       className={cn(
                         'h-full w-full cursor-pointer group-disabled:opacity-50',
-                        selectedSignerColorVariant.borderWithHover,
+                        selectedSignerBorderClass,
                       )}
                     >
                       <CardContent className="flex flex-col items-center justify-center px-6 py-4">
@@ -795,7 +783,7 @@ export const AddFieldsFormPartial = ({
                     <Card
                       className={cn(
                         'h-full w-full cursor-pointer group-disabled:opacity-50',
-                        selectedSignerColorVariant.borderWithHover,
+                        selectedSignerBorderClass,
                       )}
                     >
                       <CardContent className="flex flex-col items-center justify-center px-6 py-4">
@@ -821,7 +809,7 @@ export const AddFieldsFormPartial = ({
                     <Card
                       className={cn(
                         'h-full w-full cursor-pointer group-disabled:opacity-50',
-                        selectedSignerColorVariant.borderWithHover,
+                        selectedSignerBorderClass,
                       )}
                     >
                       <CardContent className="flex flex-col items-center justify-center px-6 py-4">

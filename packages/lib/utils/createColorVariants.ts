@@ -31,7 +31,6 @@ export const colorClasses = [
   'indigo-500',
   'purple-500',
   'pink-500',
-  'dawn',
 ];
 
 export const colorVariants = createColorVariants(colorClasses);
