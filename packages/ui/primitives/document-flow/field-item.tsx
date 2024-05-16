@@ -74,9 +74,11 @@ export const FieldItem = ({
   const selectedColorVariant =
     typeof color === 'string' && color in colorVariants ? colorVariants[color] : undefined;
 
-  const selectedSignerBorderClass = selectedColorVariant?.border;
-  const selectedSignerInitialsBGClass = selectedColorVariant?.initialsBackground;
-  const selectedSignerActiveBorderClass = selectedColorVariant?.borderActive;
+  const selectedSignerBorderClass = selectedColorVariant?.border ?? 'border-field-card-border';
+  const selectedSignerInitialsBGClass =
+    selectedColorVariant?.initialsBackground ?? 'text-field-card-foreground/50 bg-slate-900/10';
+  const selectedSignerActiveBorderClass =
+    selectedColorVariant?.borderActive ?? 'border-field-card-border/80';
 
   const advancedField = ['NUMBER', 'RADIO', 'CHECKBOX', 'DROPDOWN'].includes(field.type);
 
