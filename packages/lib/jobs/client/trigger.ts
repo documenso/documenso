@@ -64,7 +64,7 @@ export class TriggerJobProvider extends BaseJobProvider {
     return {
       wait: io.wait,
       logger: io.logger,
-      stableRun: async (cacheKey, callback) => io.runTask(cacheKey, callback),
+      runTask: async (cacheKey, callback) => io.runTask(cacheKey, callback),
       triggerJob: async (cacheKey, payload) =>
         io.sendEvent(cacheKey, {
           ...payload,
