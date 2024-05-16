@@ -207,11 +207,13 @@ export const createDocumentFromTemplate = async ({
           height: field.height,
           customText: '',
           inserted: false,
+          fieldMeta: field.fieldMeta,
         })),
       );
     });
 
     await tx.field.createMany({
+      // @ts-expect-error fix this later
       data: fieldsToCreate,
     });
 

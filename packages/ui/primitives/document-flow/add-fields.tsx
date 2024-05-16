@@ -167,7 +167,16 @@ export const AddFieldsFormPartial = ({
 
     const colorClass = recipientColorClasses.get(selectedSigner.id);
 
-    return colorVariants[colorClass] || { ring: '', border: '', background: '' };
+    return (
+      colorVariants[colorClass] || {
+        ring: '',
+        border: '',
+        borderWithHover: '',
+        borderActive: '',
+        background: '',
+        initialsBackground: '',
+      }
+    );
   }, [selectedSigner, recipientColorClasses]);
 
   const hasSelectedSignerBeenSent = selectedSigner?.sendStatus === SendStatus.SENT;
