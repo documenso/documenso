@@ -15,29 +15,7 @@ export const registerSendConfirmationEmailJob = (client: JobClient) => {
         force: z.boolean().optional(),
       }),
     },
-    handler: async ({ payload, io }) => {
-      console.log('---- start job ----');
-
-      // eslint-disable-next-line @typescript-eslint/require-await
-      const result = await io.runTask('console-log-1', async () => {
-        console.log('Task 1');
-
-        return 5;
-      });
-
-      console.log({ result });
-
-      console.log('always runs');
-
-      // eslint-disable-next-line @typescript-eslint/require-await
-      await io.runTask('console-log-2', async () => {
-        await Promise.resolve(null);
-        throw new Error('dang2');
-      });
-
-      console.log('---- end job ----');
-
-      // throw new Error('dang')
+    handler: async ({ payload }) => {
       await sendConfirmationToken({
         email: payload.email,
         force: payload.force,
