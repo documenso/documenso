@@ -58,7 +58,7 @@ export const PricingTable = ({ className, ...props }: PricingTableProps) => {
           >
             Yearly
             <div className="bg-muted text-foreground block rounded-full px-2 py-0.5 text-xs">
-              Save $60
+              Save $60 or $100
             </div>
             {period === 'YEARLY' && (
               <motion.div
