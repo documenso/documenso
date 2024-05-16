@@ -75,7 +75,7 @@ export const PricingTable = ({ className, ...props }: PricingTableProps) => {
           data-plan="free"
           className="bg-background shadow-foreground/5 flex flex-col items-center justify-center rounded-lg border px-8 py-12 shadow-lg"
         >
-          <p className="text-foreground text-4xl font-medium">Free Plan</p>
+          <p className="text-foreground text-4xl font-medium">Free</p>
           <p className="text-primary mt-2.5 text-xl font-medium">$0</p>
 
           <p className="text-foreground mt-4 max-w-[30ch] text-center">
