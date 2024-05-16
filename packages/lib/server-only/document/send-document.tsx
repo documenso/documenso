@@ -77,21 +77,21 @@ export const sendDocument = async ({
   const customEmail = document?.documentMeta;
 
   if (!document) {
-    throw new Error('Document not found');
+    throw new Error('დოკუმენტი არ მოიძებნა');
   }
 
   if (document.Recipient.length === 0) {
-    throw new Error('Document has no recipients');
+    throw new Error('დოკუმენტს არ ჰყავს მიმღებები');
   }
 
   if (document.status === DocumentStatus.COMPLETED) {
-    throw new Error('Can not send completed document');
+    throw new Error('ხელმოწირილი დოკუმენტების გაგზავნა შეუძლებელია');
   }
 
   const { documentData } = document;
 
   if (!documentData.data) {
-    throw new Error('Document data not found');
+    throw new Error('დოკუმენტის მონაცემები არ მოიძებნა');
   }
 
   if (document.formValues) {
@@ -161,8 +161,8 @@ export const sendDocument = async ({
       const { actionVerb } = RECIPIENT_ROLES_DESCRIPTION[recipient.role];
 
       const emailSubject = selfSigner
-        ? `Please ${actionVerb.toLowerCase()} your document`
-        : `Please ${actionVerb.toLowerCase()} this document`;
+        ? `გთხოვთ ${actionVerb.toLowerCase()} თქვენს დოკუმენტს`
+        : `გთხოვთ ${actionVerb.toLowerCase()} ამ დოკუმენტს`;
 
       await prisma.$transaction(
         async (tx) => {

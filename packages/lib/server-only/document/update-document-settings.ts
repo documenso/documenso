@@ -97,10 +97,7 @@ export const updateDocumentSettings = async ({
   const auditLogs: CreateDocumentAuditLogDataResponse[] = [];
 
   if (!isTitleSame && document.status !== DocumentStatus.DRAFT) {
-    throw new AppError(
-      AppErrorCode.INVALID_BODY,
-      'You cannot update the title if the document has been sent',
-    );
+    throw new AppError(AppErrorCode.INVALID_BODY, 'გაგზავნილი დოკუმენტის სათაურის ვერ განახლდება');
   }
 
   if (!isTitleSame) {

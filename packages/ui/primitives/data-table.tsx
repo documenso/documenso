@@ -130,7 +130,7 @@ export function DataTable<TData, TValue>({
               <TableRow>
                 {error.component ?? (
                   <TableCell colSpan={columns.length} className="h-32 text-center">
-                    Something went wrong.
+                    დაფიქსირდა ხარვეზი.
                   </TableCell>
                 )}
               </TableRow>
@@ -141,14 +141,14 @@ export function DataTable<TData, TValue>({
             ) : (
               <TableRow>
                 <TableCell colSpan={columns.length} className="h-32 text-center">
-                  <p>No results found</p>
+                  <p>შედეგები ვერ მოიძებნა</p>
 
                   {hasFilters && onClearFilters !== undefined && (
                     <button
                       onClick={() => onClearFilters()}
                       className="text-foreground mt-1 text-sm"
                     >
-                      Clear filters
+                      ფილტრების გასუფთავება
                     </button>
                   )}
                 </TableCell>

@@ -27,7 +27,7 @@ export const sendForgotPassword = async ({ userId }: SendForgotPasswordOptions) 
   });
 
   if (!user) {
-    throw new Error('User not found');
+    throw new Error('მომხმარებელი არ მოიძებნა');
   }
 
   const token = user.PasswordResetToken[0].token;
@@ -48,7 +48,7 @@ export const sendForgotPassword = async ({ userId }: SendForgotPasswordOptions) 
       name: process.env.NEXT_PRIVATE_SMTP_FROM_NAME || 'Documenso',
       address: process.env.NEXT_PRIVATE_SMTP_FROM_ADDRESS || 'noreply@documenso.com',
     },
-    subject: 'Forgot Password?',
+    subject: 'დაგავიწყდათ პაროლი?',
     html: render(template),
     text: render(template, { plainText: true }),
   });

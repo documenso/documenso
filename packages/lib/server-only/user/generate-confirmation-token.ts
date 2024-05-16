@@ -17,7 +17,7 @@ export const generateConfirmationToken = async ({ email }: { email: string }) =>
   });
 
   if (!user) {
-    throw new Error('User not found');
+    throw new Error('მომხმარებელი არ მოიძებნა');
   }
 
   const createdToken = await prisma.verificationToken.create({
@@ -34,7 +34,7 @@ export const generateConfirmationToken = async ({ email }: { email: string }) =>
   });
 
   if (!createdToken) {
-    throw new Error(`Failed to create the verification token`);
+    throw new Error(`სავერიფიკაცი ტოკენის შექმნა ვერ მოხერხდა`);
   }
 
   return sendConfirmationEmail({ userId: user.id });

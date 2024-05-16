@@ -82,7 +82,7 @@ export const deleteTeamEmail = async ({ userId, userEmail, teamId }: DeleteTeamE
         name: FROM_NAME,
         address: FROM_ADDRESS,
       },
-      subject: `Team email has been revoked for ${team.name}`,
+      subject: `გუნდის ელ.ფოსტა გაუქმდა ${team.name}-სთვის`,
       html: render(template),
       text: render(template, { plainText: true }),
     });

@@ -30,16 +30,17 @@ export const SendDocumentActionDialog = ({
       <DialogTrigger asChild>
         <Button type="button" className={className}>
           {loading && <Loader className="text-documenso mr-2 h-5 w-5 animate-spin" />}
-          Send
+          გაგზავნა
         </Button>
       </DialogTrigger>
 
       <DialogContent className="max-w-md">
         <DialogHeader>
-          <DialogTitle className="text-center text-lg font-semibold">Send Document</DialogTitle>
+          <DialogTitle className="text-center text-lg font-semibold">
+            გაგზავნეთ დოკუმენტი
+          </DialogTitle>
           <DialogDescription className="text-center text-base">
-            You are about to send this document to the recipients. Are you sure you want to
-            continue?
+            თქვენ აპირებთ ამ დოკუმენტის გაგზავნას. დარწმუნდით სანამ განაგრძობთ.
           </DialogDescription>
         </DialogHeader>
 
@@ -50,13 +51,13 @@ export const SendDocumentActionDialog = ({
             variant="secondary"
             onClick={() => setOpen(false)}
           >
-            Cancel
+            დახურვა
           </Button>
 
           {/* We would use DialogAction here but it interrupts the submit action */}
           <Button className={className} {...props}>
             {loading && <Loader className="mr-2 h-5 w-5 animate-spin" />}
-            Send
+            გაგზავნა
           </Button>
         </DialogFooter>
       </DialogContent>

@@ -50,17 +50,17 @@ export const completeDocumentWithToken = async ({
   const document = await getDocument({ token, documentId });
 
   if (document.status !== DocumentStatus.PENDING) {
-    throw new Error(`Document ${document.id} must be pending`);
+    throw new Error(`დოკუმენტი ${document.id} must be pending`);
   }
 
   if (document.Recipient.length === 0) {
-    throw new Error(`Document ${document.id} has no recipient with token ${token}`);
+    throw new Error(`დოკუმენტს ${document.id} არ ყავს მიმღები ტოკენით: ${token}`);
   }
 
   const [recipient] = document.Recipient;
 
   if (recipient.signingStatus === SigningStatus.SIGNED) {
-    throw new Error(`Recipient ${recipient.id} has already signed`);
+    throw new Error(`მიმღებმა ${recipient.id} ხელი უკვე მოაწერა`);
   }
 
   const fields = await prisma.field.findMany({

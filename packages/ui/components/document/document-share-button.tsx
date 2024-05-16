@@ -123,18 +123,19 @@ export const DocumentShareButton = ({
             loading={isLoading}
           >
             {!isLoading && <Sparkles className="mr-2 h-5 w-5" />}
-            Share Signature Card
+            გააზიარეთ ხელმოწერის ბარათი
           </Button>
         )}
       </DialogTrigger>
 
       <DialogContent position="end">
         <DialogHeader>
-          <DialogTitle>Share your signing experience!</DialogTitle>
+          <DialogTitle>გააზიარეთ თქვენუ ხელმოწერის გამოცდილება!</DialogTitle>
 
           <DialogDescription className="mt-4">
-            Don't worry, the document you signed or sent wont be shared; only your signing
-            experience is. Share your signing card and showcase your signature!
+            {/* Don't worry, the document you signed or sent wont be shared; only your signing
+            experience is. Share your signing card and showcase your signature! */}
+            თქვენ მიერ ხელმოწერილი ან გაგზავნილი დოკუმენტი არ იქნება საჯაროდ გაზიარებული!
           </DialogDescription>
         </DialogHeader>
 
@@ -177,7 +178,7 @@ export const DocumentShareButton = ({
 
             <Button variant="outline" className="flex-1" onClick={onCopyClick}>
               <Copy className="mr-2 h-4 w-4" />
-              Copy Link
+              ბმულის დაკოპირება
             </Button>
           </div>
         </div>

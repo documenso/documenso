@@ -15,7 +15,7 @@ export const getTeamTokens = async ({ userId, teamId }: GetUserTokensOptions) =>
   });
 
   if (teamMember?.role !== TeamMemberRole.ADMIN) {
-    throw new Error('You do not have permission to view tokens for this team');
+    throw new Error('თქვენ არ გაქვთ ამ გუნდის ტოკენების ნახვის უფლება');
   }
 
   return await prisma.apiToken.findMany({

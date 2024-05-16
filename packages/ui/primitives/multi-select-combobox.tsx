@@ -144,7 +144,7 @@ export function MultiSelectCombobox<T = OptionValue>({
       <PopoverContent className="w-[200px] p-0">
         <Command>
           <CommandInput placeholder={inputPlaceholder} />
-          <CommandEmpty>No value found.</CommandEmpty>
+          <CommandEmpty>მნიშვნელობა ვერ მოიძებნა.</CommandEmpty>
           <CommandGroup>
             {options.map((option, i) => (
               <CommandItem key={i} onSelect={() => handleSelect(option.value)}>

@@ -388,7 +388,7 @@ export const AddFieldsFormPartial = ({
 
                   <CommandEmpty>
                     <span className="text-muted-foreground inline-block px-4">
-                      No recipient matching this description was found.
+                      ამ აღწერილობის შესაბამისი მიმღები ვერ მოიძებნა.
                     </span>
                   </CommandEmpty>
 
@@ -403,7 +403,7 @@ export const AddFieldsFormPartial = ({
                           key={`${role}-empty`}
                           className="text-muted-foreground/80 px-4 pb-4 pt-2.5 text-center text-xs"
                         >
-                          No recipients with this role
+                          ამ როლის მქონდე მიმღები ვერ მოიძებნა
                         </div>
                       )}
 
@@ -450,8 +450,8 @@ export const AddFieldsFormPartial = ({
                                 </TooltipTrigger>
 
                                 <TooltipContent className="text-muted-foreground max-w-xs">
-                                  This document has already been sent to this recipient. You can no
-                                  longer edit this recipient.
+                                  ეს დოკუმენტი უკვე გაეგზავნა ამ მიმღებს. ამ მიმღების შეცვლა აღარ
+                                  შეგიძლიათ.
                                 </TooltipContent>
                               </Tooltip>
                             )}
@@ -485,7 +485,7 @@ export const AddFieldsFormPartial = ({
                       {selectedSigner?.name || 'Signature'}
                     </p>
 
-                    <p className="text-muted-foreground mt-2 text-center text-xs">Signature</p>
+                    <p className="text-muted-foreground mt-2 text-center text-xs">ხელმოწერა</p>
                   </CardContent>
                 </Card>
               </button>
@@ -507,7 +507,7 @@ export const AddFieldsFormPartial = ({
                       {'Email'}
                     </p>
 
-                    <p className="text-muted-foreground mt-2 text-xs">Email</p>
+                    <p className="text-muted-foreground mt-2 text-xs">ელ.ფოსტა</p>
                   </CardContent>
                 </Card>
               </button>
@@ -529,7 +529,7 @@ export const AddFieldsFormPartial = ({
                       {'Name'}
                     </p>
 
-                    <p className="text-muted-foreground mt-2 text-xs">Name</p>
+                    <p className="text-muted-foreground mt-2 text-xs">სახელი</p>
                   </CardContent>
                 </Card>
               </button>
@@ -551,7 +551,7 @@ export const AddFieldsFormPartial = ({
                       {'Date'}
                     </p>
 
-                    <p className="text-muted-foreground mt-2 text-xs">Date</p>
+                    <p className="text-muted-foreground mt-2 text-xs">თარიღი</p>
                   </CardContent>
                 </Card>
               </button>
@@ -573,7 +573,7 @@ export const AddFieldsFormPartial = ({
                       {'Text'}
                     </p>
 
-                    <p className="text-muted-foreground mt-2 text-xs">Custom Text</p>
+                    <p className="text-muted-foreground mt-2 text-xs">ტექსტი</p>
                   </CardContent>
                 </Card>
               </button>

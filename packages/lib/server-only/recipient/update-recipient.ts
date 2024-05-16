@@ -72,7 +72,7 @@ export const updateRecipient = async ({
   });
 
   if (!recipient) {
-    throw new Error('Recipient not found');
+    throw new Error('მიმღები არ მოიძებნა');
   }
 
   const updatedRecipient = await prisma.$transaction(async (tx) => {

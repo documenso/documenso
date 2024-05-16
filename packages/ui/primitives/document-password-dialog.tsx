@@ -45,7 +45,7 @@ export const PasswordDialog = ({
     if (isError) {
       form.setError('password', {
         type: 'manual',
-        message: 'The password you have entered is incorrect. Please try again.',
+        message: 'თქვენ მიერ შეყვანილი პაროლი არასწორია. გთხოვთ კიდევ სცადეთ.',
       });
     }
   }, [form, isError]);
@@ -54,10 +54,10 @@ export const PasswordDialog = ({
     <Dialog open={open}>
       <DialogContent className="w-full max-w-md">
         <DialogHeader>
-          <DialogTitle>Password Required</DialogTitle>
+          <DialogTitle>პაროლი აუცილებელია</DialogTitle>
 
           <DialogDescription className="text-muted-foreground">
-            This document is password protected. Please enter the password to view the document.
+            ეს დოკუმენტი დაცულია პაროლით. გთხოვთ შეიყვანოთ პაროლი დოკუმენტის სანახავად.
           </DialogDescription>
         </DialogHeader>
 
@@ -85,7 +85,7 @@ export const PasswordDialog = ({
               />
 
               <div>
-                <Button>Submit</Button>
+                <Button>დადასტურება</Button>
               </div>
             </fieldset>
           </form>

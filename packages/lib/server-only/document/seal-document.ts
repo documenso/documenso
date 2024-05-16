@@ -55,7 +55,7 @@ export const sealDocument = async ({
   const { documentData } = document;
 
   if (!documentData) {
-    throw new Error(`Document ${document.id} has no document data`);
+    throw new Error(`დოკუმენტ ${document.id}-ს არ აქვს დოკუმენტის მონაცემები`);
   }
 
   const recipients = await prisma.recipient.findMany({
@@ -68,7 +68,7 @@ export const sealDocument = async ({
   });
 
   if (recipients.some((recipient) => recipient.signingStatus !== SigningStatus.SIGNED)) {
-    throw new Error(`Document ${document.id} has unsigned recipients`);
+    throw new Error(`დოკუმენტის- ${document.id} მიმღებებს ხელი არ მოუწერიათ`);
   }
 
   const fields = await prisma.field.findMany({
@@ -81,7 +81,7 @@ export const sealDocument = async ({
   });
 
   if (fields.some((field) => !field.inserted)) {
-    throw new Error(`Document ${document.id} has unsigned fields`);
+    throw new Error(`დოკუმენტ ${document.id}-ს აქვს ხელმოუწერელი ველები`);
   }
 
   if (isResealing) {

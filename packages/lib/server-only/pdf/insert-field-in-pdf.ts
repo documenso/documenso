@@ -30,7 +30,7 @@ export const insertFieldInPDF = async (pdf: PDFDocument, field: FieldWithSignatu
   const page = pages.at(field.page - 1);
 
   if (!page) {
-    throw new Error(`Page ${field.page} does not exist`);
+    throw new Error(`გვერდი ${field.page} არ არსებობს`);
   }
 
   const { width: pageWidth, height: pageHeight } = page.getSize();

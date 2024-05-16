@@ -64,7 +64,7 @@ export const createTeamMemberInvites = async ({
   const currentTeamMember = team.members.find((member) => member.user.id === userId);
 
   if (!currentTeamMember) {
-    throw new AppError(AppErrorCode.UNAUTHORIZED, 'User not part of team.');
+    throw new AppError(AppErrorCode.UNAUTHORIZED, 'მომხმარებელი გუნდის წევრი არ არის.');
   }
 
   const usersToInvite = invitations.filter((invitation) => {
@@ -88,7 +88,7 @@ export const createTeamMemberInvites = async ({
   if (unauthorizedRoleAccess) {
     throw new AppError(
       AppErrorCode.UNAUTHORIZED,
-      'User does not have permission to set high level roles',
+      'მომხმარებელს არ აქვს მაღალი როლების დაყენების უფლება',
     );
   }
 
@@ -154,7 +154,7 @@ export const sendTeamMemberInviteEmail = async ({
       name: FROM_NAME,
       address: FROM_ADDRESS,
     },
-    subject: `You have been invited to join ${emailTemplateOptions.teamName} on Documenso`,
+    subject: `თქვენ მოწვეული ხართ შეუერთდეთ ${emailTemplateOptions.teamName}-ს Documenso-ზე`,
     html: render(template),
     text: render(template, { plainText: true }),
   });

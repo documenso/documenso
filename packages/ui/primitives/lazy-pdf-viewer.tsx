@@ -10,7 +10,7 @@ export const LazyPDFViewer = dynamic(async () => import('./pdf-viewer'), {
     <div className="dark:bg-background flex h-[80vh] max-h-[60rem] flex-col items-center justify-center bg-white/50">
       <Loader className="text-documenso h-12 w-12 animate-spin" />
 
-      <p className="text-muted-foreground mt-4">Loading document...</p>
+      <p className="text-muted-foreground mt-4">დოკუმენტი იტვირთება...</p>
     </div>
   ),
 });

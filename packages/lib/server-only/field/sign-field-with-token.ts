@@ -51,15 +51,15 @@ export const signFieldWithToken = async ({
   const { Document: document, Recipient: recipient } = field;
 
   if (!document) {
-    throw new Error(`Document not found for field ${field.id}`);
+    throw new Error(`დოკუმენტი ველისთვის - ${field.id} არ მოიძებნა`);
   }
 
   if (!recipient) {
-    throw new Error(`Recipient not found for field ${field.id}`);
+    throw new Error(`მიმღები ველისთვის - ${field.id} არ მოიძებნა`);
   }
 
   if (document.deletedAt) {
-    throw new Error(`Document ${document.id} has been deleted`);
+    throw new Error(`დოკუმენტი ${document.id} წაშლილია`);
   }
 
   if (document.status !== DocumentStatus.PENDING) {
@@ -67,16 +67,16 @@ export const signFieldWithToken = async ({
   }
 
   if (recipient?.signingStatus === SigningStatus.SIGNED) {
-    throw new Error(`Recipient ${recipient.id} has already signed`);
+    throw new Error(`მიმღებმა ${recipient.id} ხელი უკვე მოაწერა`);
   }
 
   if (field.inserted) {
-    throw new Error(`Field ${fieldId} has already been inserted`);
+    throw new Error(`ველი ${fieldId} უკვე ჩასმულია`);
   }
 
   // Unreachable code based on the above query but we need to satisfy TypeScript
   if (field.recipientId === null) {
-    throw new Error(`Field ${fieldId} has no recipientId`);
+    throw new Error(`ველს - ${fieldId} არ აქვს მიმღების ID`);
   }
 
   let { derivedRecipientActionAuth } = extractDocumentAuthMethods({
@@ -127,7 +127,7 @@ export const signFieldWithToken = async ({
   }
 
   if (isSignatureField && !signatureImageAsBase64 && !typedSignature) {
-    throw new Error('Signature field must have a signature');
+    throw new Error('ხელმოწერის ველს უნდა ჰქონდეს ხელმოწერა');
   }
 
   return await prisma.$transaction(async (tx) => {
@@ -143,7 +143,7 @@ export const signFieldWithToken = async ({
 
     if (isSignatureField) {
       if (!field.recipientId) {
-        throw new Error('Field has no recipientId');
+        throw new Error('ველს არ აქვს მიმღების ID');
       }
 
       const signature = await tx.signature.upsert({

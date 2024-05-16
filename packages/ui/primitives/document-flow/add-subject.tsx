@@ -73,7 +73,7 @@ export const AddSubjectFormPartial = ({
           <div className="flex flex-col gap-y-4">
             <div>
               <Label htmlFor="subject">
-                Subject <span className="text-muted-foreground">(Optional)</span>
+                თემატიკა <span className="text-muted-foreground">(სურვილისამებრ)</span>
               </Label>
 
               <Input
@@ -88,7 +88,7 @@ export const AddSubjectFormPartial = ({
 
             <div>
               <Label htmlFor="message">
-                Message <span className="text-muted-foreground">(Optional)</span>
+                შეტყობინება <span className="text-muted-foreground">(სურვილისამებრ)</span>
               </Label>
 
               <Textarea
@@ -106,7 +106,7 @@ export const AddSubjectFormPartial = ({
 
             <div>
               <p className="text-muted-foreground text-sm">
-                You can use the following variables in your message:
+                თქვენ შეგიძლიათ გამოიყენოთ შემდეგი ცვლადები თქვენს შეტყობინებაში:
               </p>
 
               <ul className="mt-2 flex list-inside list-disc flex-col gap-y-2 text-sm">
@@ -114,19 +114,19 @@ export const AddSubjectFormPartial = ({
                   <code className="text-muted-foreground bg-muted-foreground/20 rounded p-1 text-sm">
                     {'{signer.name}'}
                   </code>{' '}
-                  - The signer's name
+                  - ხელმომწერის სახელი
                 </li>
                 <li className="text-muted-foreground">
                   <code className="text-muted-foreground bg-muted-foreground/20 rounded p-1 text-sm">
                     {'{signer.email}'}
                   </code>{' '}
-                  - The signer's email
+                  - ხელმომწერის ელ.ფოსტა
                 </li>
                 <li className="text-muted-foreground">
                   <code className="text-muted-foreground bg-muted-foreground/20 rounded p-1 text-sm">
                     {'{document.name}'}
                   </code>{' '}
-                  - The document's name
+                  - დოკუმენტის სახელი
                 </li>
               </ul>
             </div>

@@ -29,7 +29,7 @@ export const TemplateDocumentCancel = ({
         </Text>
 
         <Text className="my-1 text-center text-base text-slate-400">
-          თქვენი ხელმოწერა აღარ არის საჭირო.
+          დოკუმენტზე ხელმოწერა აღარ არის საჭირო.
         </Text>
       </Section>
     </>

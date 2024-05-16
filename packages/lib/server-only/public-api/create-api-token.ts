@@ -42,7 +42,7 @@ export const createApiToken = async ({
     });
 
     if (!member) {
-      throw new Error('You do not have permission to create a token for this team');
+      throw new Error('თქვენ არ გაქვთ უფლება შექმნათ ტოკენი ამ გუნდისთვის');
     }
   }
 
@@ -57,7 +57,7 @@ export const createApiToken = async ({
   });
 
   if (!storedToken) {
-    throw new Error('Failed to create the API token');
+    throw new Error('API ტოკენის შექმნა ვერ მოხერხდა');
   }
 
   return {

@@ -60,11 +60,11 @@ export const deleteTeamMembers = async ({
       );
 
       if (!currentTeamMember) {
-        throw new AppError(AppErrorCode.NOT_FOUND, 'Team member record does not exist');
+        throw new AppError(AppErrorCode.NOT_FOUND, 'გუნდის წევრის ჩანაწერი არ არსებობს');
       }
 
       if (teamMembersToRemove.find((member) => member.userId === team.ownerUserId)) {
-        throw new AppError(AppErrorCode.UNAUTHORIZED, 'Cannot remove the team owner');
+        throw new AppError(AppErrorCode.UNAUTHORIZED, 'გუნდის მფლობელის მოხსნა შეუძლებელია');
       }
 
       const isMemberToRemoveHigherRole = teamMembersToRemove.some(
@@ -72,7 +72,10 @@ export const deleteTeamMembers = async ({
       );
 
       if (isMemberToRemoveHigherRole) {
-        throw new AppError(AppErrorCode.UNAUTHORIZED, 'Cannot remove a member with a higher role');
+        throw new AppError(
+          AppErrorCode.UNAUTHORIZED,
+          'არ შეიძლება უფრო მაღალი როლის მქონე წევრის მოხსნა',
+        );
       }
 
       // Remove the team members.

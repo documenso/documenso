@@ -163,8 +163,8 @@ export const AddSignersFormPartial = ({
 
     if (hasBeenSentToRecipientId(signer.nativeId)) {
       toast({
-        title: 'Cannot remove signer',
-        description: 'This signer has already received the document.',
+        title: 'ხელმომწერის წაშლა შეუძლებელია',
+        description: 'ამ ხელმომწერმა დოკუმენტი უკვე მიიღო.',
         variant: 'destructive',
       });
 
@@ -215,7 +215,7 @@ export const AddSignersFormPartial = ({
                         })}
                       >
                         {!showAdvancedSettings && index === 0 && (
-                          <FormLabel required>Email</FormLabel>
+                          <FormLabel required>ელ.ფოსტა</FormLabel>
                         )}
 
                         <FormControl>
@@ -247,7 +247,7 @@ export const AddSignersFormPartial = ({
                           'col-span-4': showAdvancedSettings,
                         })}
                       >
-                        {!showAdvancedSettings && index === 0 && <FormLabel>Name</FormLabel>}
+                        {!showAdvancedSettings && index === 0 && <FormLabel>სახელი</FormLabel>}
 
                         <FormControl>
                           <Input
@@ -370,10 +370,7 @@ export const AddSignersFormPartial = ({
                                       <InfoIcon className="h-4 w-4" />
                                     </TooltipTrigger>
                                     <TooltipContent className="text-foreground z-9999 max-w-md p-4">
-                                      <p>
-                                        The recipient is required to sign the document for it to be
-                                        completed.
-                                      </p>
+                                      <p>მიმღები ვალდებულია ხელი მოაწეროს დოკუმენტს.</p>
                                     </TooltipContent>
                                   </Tooltip>
                                 </div>
@@ -483,7 +480,7 @@ export const AddSignersFormPartial = ({
                 onClick={() => onAddSigner()}
               >
                 <Plus className="-ml-1 mr-2 h-5 w-5" />
-                Add Signer
+                დაამატეთ ხელმომწერი
               </Button>
               <Button
                 type="button"
@@ -496,7 +493,7 @@ export const AddSignersFormPartial = ({
                 onClick={() => onAddSelfSigner()}
               >
                 <Plus className="-ml-1 mr-2 h-5 w-5" />
-                Add myself
+                თქვენი თავი
               </Button>
             </div>
 
@@ -514,7 +511,7 @@ export const AddSignersFormPartial = ({
                   className="text-muted-foreground ml-2 text-sm"
                   htmlFor="showAdvancedRecipientSettings"
                 >
-                  Show advanced settings
+                  დამატებითი პარამეტრები
                 </label>
               </div>
             )}

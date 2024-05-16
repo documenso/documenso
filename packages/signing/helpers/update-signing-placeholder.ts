@@ -32,7 +32,7 @@ export const updateSigningPlaceholder = ({ pdf }: UpdateSigningPlaceholderOption
   ]);
 
   if (updatedPdf.length !== length) {
-    throw new Error('Updated PDF length does not match original length');
+    throw new Error('განახლებული PDF-ის სიგრძე არ ემთხვევა თავდაპირველ სიგრძეს');
   }
 
   return { pdf: updatedPdf, byteRange };

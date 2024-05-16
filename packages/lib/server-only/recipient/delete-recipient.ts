@@ -45,11 +45,11 @@ export const deleteRecipient = async ({
   });
 
   if (!recipient) {
-    throw new Error('Recipient not found');
+    throw new Error('მიმღები არ მოიძებნა');
   }
 
   if (recipient.sendStatus !== SendStatus.NOT_SENT) {
-    throw new Error('Can not delete a recipient that has already been sent a document');
+    throw new Error('შეუძლებელია მიმღების წაშლა, რომელსაც უკვე გაეგზავნა დოკუმენტი');
   }
 
   const user = await prisma.user.findFirstOrThrow({

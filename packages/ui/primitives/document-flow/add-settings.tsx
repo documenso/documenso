@@ -143,7 +143,7 @@ export const AddSettingsFormPartial = ({
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className="flex flex-row items-center">
-                    Document access
+                    დოკუმენტზე წვდომა
                     <Tooltip>
                       <TooltipTrigger>
                         <InfoIcon className="mx-2 h-4 w-4" />
@@ -151,19 +151,20 @@ export const AddSettingsFormPartial = ({
 
                       <TooltipContent className="text-foreground max-w-md space-y-2 p-4">
                         <h2>
-                          <strong>Document access</strong>
+                          <strong>დოკუმენტზე წვდომა</strong>
                         </h2>
 
-                        <p>The authentication required for recipients to view the document.</p>
+                        <p>ავტორიზაცია, რომელიც საჭიროა მიმღებებისთვის დოკუმენტის სანახავად.</p>
 
                         <ul className="ml-3.5 list-outside list-disc space-y-0.5 py-2">
                           <li>
-                            <strong>Require account</strong> - The recipient must be signed in to
-                            view the document
+                            {/* Require account */}
+                            <strong>საჭიროა ანგარიში </strong> - დოკუმენტის სანახავად მიმღები
+                            ავტორიზირებულნი უნდა იყვნენ.
                           </li>
                           <li>
-                            <strong>None</strong> - The document can be accessed directly by the URL
-                            sent to the recipient
+                            <strong>None</strong> - დოკუმენტზე წვდომა შესაძლებელია უშუალოდ
+                            მიმღებისთვის გაგზავნილი URL-ით
                           </li>
                         </ul>
                       </TooltipContent>
@@ -199,7 +200,7 @@ export const AddSettingsFormPartial = ({
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel className="flex flex-row items-center">
-                      Recipient action authentication
+                      მიმღების ქმედების ავთენტიფიკაცია
                       <Tooltip>
                         <TooltipTrigger>
                           <InfoIcon className="mx-2 h-4 w-4" />
@@ -210,9 +211,7 @@ export const AddSettingsFormPartial = ({
                             <strong>Global recipient action authentication</strong>
                           </h2>
 
-                          <p>
-                            The authentication required for recipients to sign the signature field.
-                          </p>
+                          <p>ხელმოწერის ველზე ხელმოწერისთვის საჭირო ავთენტიფიკაცია.</p>
 
                           <p>
                             This can be overriden by setting the authentication requirements
@@ -267,7 +266,7 @@ export const AddSettingsFormPartial = ({
             <Accordion type="multiple" className="mt-6">
               <AccordionItem value="advanced-options" className="border-none">
                 <AccordionTrigger className="text-foreground mb-2 rounded border px-3 py-2 text-left hover:bg-neutral-200/30 hover:no-underline">
-                  Advanced Options
+                  დამატებითი პარამეტრები
                 </AccordionTrigger>
 
                 <AccordionContent className="text-muted-foreground -mx-1 px-1 pt-2 text-sm leading-relaxed">
@@ -277,7 +276,7 @@ export const AddSettingsFormPartial = ({
                       name="meta.dateFormat"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Date Format</FormLabel>
+                          <FormLabel>თარიღის ფორმატი</FormLabel>
 
                           <FormControl>
                             <Select
@@ -309,7 +308,7 @@ export const AddSettingsFormPartial = ({
                       name="meta.timezone"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Time Zone</FormLabel>
+                          <FormLabel>დროის სარტყელი</FormLabel>
 
                           <FormControl>
                             <Combobox
@@ -332,14 +331,15 @@ export const AddSettingsFormPartial = ({
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel className="flex flex-row items-center">
-                            Redirect URL{' '}
+                            გადამისამრთების URL{' '}
                             <Tooltip>
                               <TooltipTrigger>
                                 <InfoIcon className="mx-2 h-4 w-4" />
                               </TooltipTrigger>
 
                               <TooltipContent className="text-muted-foreground max-w-xs">
-                                Add a URL to redirect the user to once the document is signed
+                                დაამატეთ URL მომხმარებლის გადამისამართებისთვის დოკუმენტზე ხელმოწერის
+                                შემდეგ
                               </TooltipContent>
                             </Tooltip>
                           </FormLabel>

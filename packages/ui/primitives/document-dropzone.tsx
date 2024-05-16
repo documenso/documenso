@@ -61,8 +61,8 @@ export const DocumentDropzone = ({
   });
 
   const heading = {
-    document: disabled ? 'You have reached your document limit.' : 'Add a document',
-    template: 'Upload Template Document',
+    document: disabled ? 'თქვენ მიაღწიეთ დოკუმენტების ლიმიტს.' : 'დაამატეთ დოკუმენტი',
+    template: 'ატვირთეთ შაბლონი დოკუმენტი',
   };
 
   return (

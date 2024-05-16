@@ -24,7 +24,7 @@ export const updateTeam = async ({ userId, teamId, data }: UpdateTeamOptions) =>
       });
 
       if (foundPendingTeamWithUrl) {
-        throw new AppError(AppErrorCode.ALREADY_EXISTS, 'Team URL already exists.');
+        throw new AppError(AppErrorCode.ALREADY_EXISTS, 'გუნდის URL უკვე არსებობს.');
       }
 
       const team = await tx.team.update({
@@ -57,7 +57,7 @@ export const updateTeam = async ({ userId, teamId, data }: UpdateTeamOptions) =>
     const target = z.array(z.string()).safeParse(err.meta?.target);
 
     if (err.code === 'P2002' && target.success && target.data.includes('url')) {
-      throw new AppError(AppErrorCode.ALREADY_EXISTS, 'Team URL already exists.');
+      throw new AppError(AppErrorCode.ALREADY_EXISTS, 'გუნდის URL უკვე არსებობს.');
     }
 
     throw err;

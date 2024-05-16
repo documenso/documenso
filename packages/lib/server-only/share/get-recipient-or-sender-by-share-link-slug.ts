@@ -43,5 +43,5 @@ export const getRecipientOrSenderByShareLinkSlug = async ({
     return recipient;
   }
 
-  throw new Error('Recipient or sender not found');
+  throw new Error('მიმღები ან გამომგზავნი არ მოიძებნა');
 };

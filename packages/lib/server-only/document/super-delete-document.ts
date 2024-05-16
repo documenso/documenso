@@ -32,7 +32,7 @@ export const superDeleteDocument = async ({ id, requestMetadata }: SuperDeleteDo
   });
 
   if (!document) {
-    throw new Error('Document not found');
+    throw new Error('დოკუმენტი არ მოიძებნა');
   }
 
   const { status, User: user } = document;
@@ -58,7 +58,7 @@ export const superDeleteDocument = async ({ id, requestMetadata }: SuperDeleteDo
             name: FROM_NAME,
             address: FROM_ADDRESS,
           },
-          subject: 'Document Cancelled',
+          subject: 'დოკუმენტი გაუქმებულია',
           html: render(template),
           text: render(template, { plainText: true }),
         });

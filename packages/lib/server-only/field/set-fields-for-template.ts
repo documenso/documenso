@@ -45,7 +45,7 @@ export const setFieldsForTemplate = async ({
   });
 
   if (!template) {
-    throw new Error('Template not found');
+    throw new Error('შაბლონი არ მოიძებნა');
   }
 
   const existingFields = await prisma.field.findMany({

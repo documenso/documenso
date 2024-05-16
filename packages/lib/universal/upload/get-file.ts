@@ -40,7 +40,9 @@ const getFileFromS3 = async (key: string) => {
   });
 
   if (!response.ok) {
-    throw new Error(`Failed to get file "${key}", failed with status code ${response.status}`);
+    throw new Error(
+      `ფაილის მიღება ვერ მოხერხდა "${key}", failed with status code ${response.status}`,
+    );
   }
 
   const buffer = await response.arrayBuffer();

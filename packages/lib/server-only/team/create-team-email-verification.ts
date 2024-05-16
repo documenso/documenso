@@ -51,7 +51,7 @@ export const createTeamEmailVerification = async ({
         if (team.teamEmail || team.emailVerification) {
           throw new AppError(
             AppErrorCode.INVALID_REQUEST,
-            'Team already has an email or existing email verification.',
+            'გუნდს უკვე აქვს დადასტურებული ელ.ფოსტა.',
           );
         }
 
@@ -62,7 +62,10 @@ export const createTeamEmailVerification = async ({
         });
 
         if (existingTeamEmail) {
-          throw new AppError(AppErrorCode.ALREADY_EXISTS, 'Email already taken by another team.');
+          throw new AppError(
+            AppErrorCode.ALREADY_EXISTS,
+            'ელ.ფოსტა უკვე გამოყენებულია სხვა გუნდის მიერ.',
+          );
         }
 
         const { token, expiresAt } = createTokenVerification({ hours: 1 });
@@ -91,7 +94,10 @@ export const createTeamEmailVerification = async ({
     const target = z.array(z.string()).safeParse(err.meta?.target);
 
     if (err.code === 'P2002' && target.success && target.data.includes('email')) {
-      throw new AppError(AppErrorCode.ALREADY_EXISTS, 'Email already taken by another team.');
+      throw new AppError(
+        AppErrorCode.ALREADY_EXISTS,
+        'ელ.ფოსტა უკვე გამოყენებულია სხვა გუნდის მიერ.',
+      );
     }
 
     throw err;
@@ -128,7 +134,7 @@ export const sendTeamEmailVerificationEmail = async (
       name: FROM_NAME,
       address: FROM_ADDRESS,
     },
-    subject: `A request to use your email has been initiated by ${teamName} on Documenso`,
+    subject: `${teamName} ითხოვს თქვენი ელ.ფოსტის გამოყენების Documenso-ზე`,
     html: render(template),
     text: render(template, { plainText: true }),
   });

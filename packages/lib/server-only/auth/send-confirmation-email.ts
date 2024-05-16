@@ -32,7 +32,7 @@ export const sendConfirmationEmail = async ({ userId }: SendConfirmationEmailPro
   const [verificationToken] = user.VerificationToken;
 
   if (!verificationToken?.token) {
-    throw new Error('Verification token not found for the user');
+    throw new Error('ვერიფიკაციის ტოკენი მომხმარებლისთვის ვერ მოიძებნა');
   }
 
   const assetBaseUrl = NEXT_PUBLIC_WEBAPP_URL() || 'http://localhost:3000';
@@ -54,7 +54,7 @@ export const sendConfirmationEmail = async ({ userId }: SendConfirmationEmailPro
       name: senderName,
       address: senderAdress,
     },
-    subject: 'Please confirm your email',
+    subject: 'გთხოვთ დაადასტუროთ თქვენი ელ.ფოსტა',
     html: render(confirmationTemplate),
     text: render(confirmationTemplate, { plainText: true }),
   });

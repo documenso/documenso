@@ -23,7 +23,7 @@ export const sendDeleteEmail = async ({ documentId, reason }: SendDeleteEmailOpt
   });
 
   if (!document) {
-    throw new Error('Document not found');
+    throw new Error('დოკუმენტი არ მოიძებნა');
   }
 
   const { email, name } = document.User;
@@ -45,7 +45,7 @@ export const sendDeleteEmail = async ({ documentId, reason }: SendDeleteEmailOpt
       name: process.env.NEXT_PRIVATE_SMTP_FROM_NAME || 'Documenso',
       address: process.env.NEXT_PRIVATE_SMTP_FROM_ADDRESS || 'noreply@documenso.com',
     },
-    subject: 'Document Deleted!',
+    subject: 'დოკუმენტი წაშლილია!',
     html: render(template),
     text: render(template, { plainText: true }),
   });

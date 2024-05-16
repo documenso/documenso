@@ -24,11 +24,11 @@ export const sendConfirmationToken = async ({
   });
 
   if (!user) {
-    throw new Error('User not found');
+    throw new Error('მომხმარებელი არ მოიძებნა');
   }
 
   if (user.emailVerified) {
-    throw new Error('Email verified');
+    throw new Error('ელ.ფოსტა დადასტურებულია');
   }
 
   const mostRecentToken = await getMostRecentVerificationTokenByUserId({ userId: user.id });
@@ -56,7 +56,7 @@ export const sendConfirmationToken = async ({
   });
 
   if (!createdToken) {
-    throw new Error(`Failed to create the verification token`);
+    throw new Error(`დამადასტურებელი ტოკენის შექმნა ვერ მოხერხდა`);
   }
 
   try {
@@ -64,6 +64,6 @@ export const sendConfirmationToken = async ({
 
     return { success: true };
   } catch (err) {
-    throw new Error(`Failed to send the confirmation email`);
+    throw new Error(`დამადასტურებელი ელ.ფოსტის გაგზავნა ვერ მოხერხდა`);
   }
 };

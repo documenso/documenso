@@ -62,11 +62,11 @@ export const setFieldsForDocument = async ({
   });
 
   if (!document) {
-    throw new Error('Document not found');
+    throw new Error('დოკუმენტი არ მოიძებნა');
   }
 
   if (document.completedAt) {
-    throw new Error('Document already complete');
+    throw new Error('დოკუმენტი უკვე ხელმოწერილია');
   }
 
   const existingFields = await prisma.field.findMany({
@@ -141,7 +141,7 @@ export const setFieldsForDocument = async ({
         });
 
         if (upsertedField.recipientId === null) {
-          throw new Error('Not possible');
+          throw new Error('შეუძლებელია');
         }
 
         const baseAuditLog = {

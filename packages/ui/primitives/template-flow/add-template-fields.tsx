@@ -382,7 +382,7 @@ export const AddTemplateFieldsFormPartial = ({
                   <CommandInput />
                   <CommandEmpty>
                     <span className="text-muted-foreground inline-block px-4">
-                      No recipient matching this description was found.
+                      ამ აღწერილობის შესაბამისი მიმღები ვერ მოიძებნა.
                     </span>
                   </CommandEmpty>
 
@@ -397,7 +397,7 @@ export const AddTemplateFieldsFormPartial = ({
                           key={`${role}-empty`}
                           className="text-muted-foreground/80 px-4 pb-4 pt-2.5 text-center text-xs"
                         >
-                          No recipients with this role
+                          ამ როლის მქონე მიმღები არ მოიძებნა
                         </div>
                       )}
 
@@ -455,7 +455,7 @@ export const AddTemplateFieldsFormPartial = ({
                       {selectedSigner?.name || 'Signature'}
                     </p>
 
-                    <p className="text-muted-foreground mt-2 text-center text-xs">Signature</p>
+                    <p className="text-muted-foreground mt-2 text-center text-xs">ხელმოწერა</p>
                   </CardContent>
                 </Card>
               </button>
@@ -478,7 +478,7 @@ export const AddTemplateFieldsFormPartial = ({
                       {'Email'}
                     </p>
 
-                    <p className="text-muted-foreground mt-2 text-xs">Email</p>
+                    <p className="text-muted-foreground mt-2 text-xs">ელ.ფოსტა</p>
                   </CardContent>
                 </Card>
               </button>
@@ -501,7 +501,7 @@ export const AddTemplateFieldsFormPartial = ({
                       {'Name'}
                     </p>
 
-                    <p className="text-muted-foreground mt-2 text-xs">Name</p>
+                    <p className="text-muted-foreground mt-2 text-xs">სახელი</p>
                   </CardContent>
                 </Card>
               </button>
@@ -524,7 +524,7 @@ export const AddTemplateFieldsFormPartial = ({
                       {'Date'}
                     </p>
 
-                    <p className="text-muted-foreground mt-2 text-xs">Date</p>
+                    <p className="text-muted-foreground mt-2 text-xs">თარიღი</p>
                   </CardContent>
                 </Card>
               </button>
@@ -546,7 +546,7 @@ export const AddTemplateFieldsFormPartial = ({
                       {'Text'}
                     </p>
 
-                    <p className="text-muted-foreground mt-2 text-xs">Custom Text</p>
+                    <p className="text-muted-foreground mt-2 text-xs">ტექსტი</p>
                   </CardContent>
                 </Card>
               </button>

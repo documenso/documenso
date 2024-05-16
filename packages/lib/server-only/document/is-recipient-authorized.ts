@@ -106,7 +106,7 @@ export const isRecipientAuthorized = async ({
 
       // Should not be possible.
       if (!user) {
-        throw new AppError(AppErrorCode.NOT_FOUND, 'User not found');
+        throw new AppError(AppErrorCode.NOT_FOUND, 'მომხმარებელი არ მოიძებნა');
       }
 
       return await verifyTwoFactorAuthenticationToken({
@@ -176,11 +176,11 @@ const verifyPasskey = async ({
     .catch(() => null);
 
   if (!verificationToken) {
-    throw new AppError(AppErrorCode.NOT_FOUND, 'Token not found');
+    throw new AppError(AppErrorCode.NOT_FOUND, 'ტოკენი არ მოიძებნა');
   }
 
   if (verificationToken.expires < new Date()) {
-    throw new AppError(AppErrorCode.EXPIRED_CODE, 'Token expired');
+    throw new AppError(AppErrorCode.EXPIRED_CODE, 'ტოკენი ვადაგასულია');
   }
 
   const { rpId, origin } = getAuthenticatorOptions();
@@ -198,7 +198,7 @@ const verifyPasskey = async ({
   }).catch(() => null); // May want to log this for insights.
 
   if (verification?.verified !== true) {
-    throw new AppError(AppErrorCode.UNAUTHORIZED, 'User is not authorized');
+    throw new AppError(AppErrorCode.UNAUTHORIZED, 'მომხმარებელი არ არის ავტორიზებული');
   }
 
   await prisma.passkey.update({

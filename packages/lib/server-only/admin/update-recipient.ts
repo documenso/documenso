@@ -15,7 +15,7 @@ export const updateRecipient = async ({ id, name, email }: UpdateRecipientOption
   });
 
   if (recipient.signingStatus === SigningStatus.SIGNED) {
-    throw new Error('Cannot update a recipient that has already signed.');
+    throw new Error('მიმღებმა უკვე მოაწერა ხელი, ამიტომ მისი შეცვლა შეუძელებელია.');
   }
 
   return await prisma.recipient.update({

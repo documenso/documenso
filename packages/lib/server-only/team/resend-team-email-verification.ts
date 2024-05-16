@@ -37,7 +37,7 @@ export const resendTeamEmailVerification = async ({
       });
 
       if (!team) {
-        throw new AppError('TeamNotFound', 'User is not a member of the team.');
+        throw new AppError('TeamNotFound', 'მომხმარებელი ამ გუნდის წევრი არ არის.');
       }
 
       const { emailVerification } = team;
@@ -45,7 +45,7 @@ export const resendTeamEmailVerification = async ({
       if (!emailVerification) {
         throw new AppError(
           'VerificationNotFound',
-          'No team email verification exists for this team.',
+          'გუნდის ელფოსტის ვერიფიკაცია ამ გუნდისთვის არ არსებობს.',
         );
       }
 

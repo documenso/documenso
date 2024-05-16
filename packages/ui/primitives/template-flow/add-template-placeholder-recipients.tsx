@@ -126,7 +126,7 @@ export const AddTemplatePlaceholderRecipientsFormPartial = ({
                 className="flex flex-wrap items-end gap-x-4"
               >
                 <div className="flex-1">
-                  <Label htmlFor={`signer-${signer.id}-email`}>Email</Label>
+                  <Label htmlFor={`signer-${signer.id}-email`}>ელ.ფოსტა</Label>
 
                   <Input
                     id={`signer-${signer.id}-email`}
@@ -138,7 +138,7 @@ export const AddTemplatePlaceholderRecipientsFormPartial = ({
                 </div>
 
                 <div className="flex-1">
-                  <Label htmlFor={`signer-${signer.id}-name`}>Name</Label>
+                  <Label htmlFor={`signer-${signer.id}-name`}>სახელი</Label>
 
                   <Input
                     id={`signer-${signer.id}-name`}

@@ -15,7 +15,7 @@ export const deleteUser = async ({ id }: DeleteUserOptions) => {
   });
 
   if (!user) {
-    throw new Error(`User with ID ${id} not found`);
+    throw new Error(`მომხმარებელი ID-ით ${id} არ მოიძებნა`);
   }
 
   const serviceAccount = await deletedAccountServiceAccount();

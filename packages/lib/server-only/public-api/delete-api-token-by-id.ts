@@ -18,7 +18,7 @@ export const deleteTokenById = async ({ id, userId, teamId }: DeleteTokenByIdOpt
     });
 
     if (!member) {
-      throw new Error('You do not have permission to delete this token');
+      throw new Error('თქვენ არ გაქვთ ამ ტოკენის წაშლის უფლება');
     }
   }
 

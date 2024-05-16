@@ -48,11 +48,11 @@ export const updateTeamMember = async ({
     const teamMemberToUpdate = team.members.find((member) => member.id === teamMemberId);
 
     if (!teamMemberToUpdate || !currentTeamMember) {
-      throw new AppError(AppErrorCode.NOT_FOUND, 'Team member does not exist');
+      throw new AppError(AppErrorCode.NOT_FOUND, 'გუნდის წევრი არ არსებობს');
     }
 
     if (teamMemberToUpdate.userId === team.ownerUserId) {
-      throw new AppError(AppErrorCode.UNAUTHORIZED, 'Cannot update the owner');
+      throw new AppError(AppErrorCode.UNAUTHORIZED, 'მფლობელის განახლება შეუძლებელია');
     }
 
     const isMemberToUpdateHigherRole = !isTeamRoleWithinUserHierarchy(
@@ -61,7 +61,10 @@ export const updateTeamMember = async ({
     );
 
     if (isMemberToUpdateHigherRole) {
-      throw new AppError(AppErrorCode.UNAUTHORIZED, 'Cannot update a member with a higher role');
+      throw new AppError(
+        AppErrorCode.UNAUTHORIZED,
+        'არ შეიძლება უფრო მაღალი როლის მქონე წევრის განახლება',
+      );
     }
 
     const isNewMemberRoleHigherThanCurrentRole = !isTeamRoleWithinUserHierarchy(

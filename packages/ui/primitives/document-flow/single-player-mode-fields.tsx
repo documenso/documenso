@@ -112,7 +112,7 @@ export function SinglePlayerModeSignatureField({
           onClick={() => onClick?.()}
           className="group-hover:text-primary text-muted-foreground absolute inset-0 h-full w-full duration-200"
         >
-          Signature
+          ხელმოწერა
         </button>
       )}
     </SinglePlayerModeFieldCardContainer>

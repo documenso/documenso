@@ -16,11 +16,11 @@ export const getApiTokenByToken = async ({ token }: { token: string }) => {
   });
 
   if (!apiToken) {
-    throw new Error('Invalid token');
+    throw new Error('არასწორი ტოკენი');
   }
 
   if (apiToken.expires && apiToken.expires < new Date()) {
-    throw new Error('Expired token');
+    throw new Error('ვადაგასული ტოკენი');
   }
 
   if (apiToken.team) {
@@ -34,7 +34,7 @@ export const getApiTokenByToken = async ({ token }: { token: string }) => {
   const { user } = apiToken;
 
   if (!user) {
-    throw new Error('Invalid token');
+    throw new Error('არასწორი ტოკენი');
   }
 
   return { ...apiToken, user };

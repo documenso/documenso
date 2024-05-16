@@ -34,11 +34,11 @@ export const createTeamBillingPortal = async ({
   });
 
   if (!team.subscription) {
-    throw new Error('Team has no subscription');
+    throw new Error('გუნდს პაკეტი არ აქვს');
   }
 
   if (!team.customerId) {
-    throw new Error('Team has no customerId');
+    throw new Error('გუნდს არ აქვს კლიენტის ID');
   }
 
   return getPortalSession({

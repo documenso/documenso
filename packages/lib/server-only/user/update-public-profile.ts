@@ -24,7 +24,7 @@ export const updatePublicProfile = async ({ userId, url }: UpdatePublicProfileOp
     throw new AppError(
       AppErrorCode.PROFILE_URL_TAKEN,
       'Profile username is taken',
-      'The profile username is already taken',
+      'პროფილის სახელი უკვე გამოყენებულია',
     );
   }
 

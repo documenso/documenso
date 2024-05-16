@@ -36,7 +36,7 @@ export type GetDocumentByTokenOptions = {
 
 export const getDocumentByToken = async ({ token }: GetDocumentByTokenOptions) => {
   if (!token) {
-    throw new Error('Missing token');
+    throw new Error('ტოკენი აკლია');
   }
 
   const result = await prisma.document.findFirstOrThrow({
@@ -61,7 +61,7 @@ export const getDocumentAndSenderByToken = async ({
   requireAccessAuth = true,
 }: GetDocumentAndSenderByTokenOptions) => {
   if (!token) {
-    throw new Error('Missing token');
+    throw new Error('ტოკენი აკლია');
   }
 
   const result = await prisma.document.findFirstOrThrow({
@@ -91,7 +91,7 @@ export const getDocumentAndSenderByToken = async ({
 
   // Sanity check, should not be possible.
   if (!recipient) {
-    throw new Error('Missing recipient');
+    throw new Error('მიმღები აკლია');
   }
 
   let documentAccessValid = true;
@@ -126,7 +126,7 @@ export const getDocumentAndRecipientByToken = async ({
   requireAccessAuth = true,
 }: GetDocumentAndRecipientByTokenOptions): Promise<DocumentWithRecipient> => {
   if (!token) {
-    throw new Error('Missing token');
+    throw new Error('ტოკენი აკლია');
   }
 
   const result = await prisma.document.findFirstOrThrow({
@@ -151,7 +151,7 @@ export const getDocumentAndRecipientByToken = async ({
 
   // Sanity check, should not be possible.
   if (!recipient) {
-    throw new Error('Missing recipient');
+    throw new Error('მიმღები აკლია');
   }
 
   let documentAccessValid = true;

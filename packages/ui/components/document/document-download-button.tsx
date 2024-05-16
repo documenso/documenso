@@ -43,8 +43,8 @@ export const DocumentDownloadButton = ({
       setIsLoading(false);
 
       toast({
-        title: 'Something went wrong',
-        description: 'An error occurred while downloading your document.',
+        title: 'დაფიქსირდა ხარვეზი',
+        description: 'თქვენი დოკუმენტის ჩამოტვირთვისას დაფიქსირდა ხარვეზი.',
         variant: 'destructive',
       });
     }
@@ -61,7 +61,7 @@ export const DocumentDownloadButton = ({
       {...props}
     >
       {!isLoading && <Download className="mr-2 h-5 w-5" />}
-      Download
+      ჩამოტვირთვა
     </Button>
   );
 };

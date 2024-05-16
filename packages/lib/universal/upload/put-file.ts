@@ -52,7 +52,7 @@ const putFileInS3 = async (file: File) => {
 
   if (!reponse.ok) {
     throw new Error(
-      `Failed to upload file "${file.name}", failed with status code ${reponse.status}`,
+      `ფაილის ატვირთვა ვერ მოხერხდა "${file.name}", failed with status code ${reponse.status}`,
     );
   }
 

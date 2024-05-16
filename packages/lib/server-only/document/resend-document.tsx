@@ -64,19 +64,19 @@ export const resendDocument = async ({
   const customEmail = document?.documentMeta;
 
   if (!document) {
-    throw new Error('Document not found');
+    throw new Error('დოკუმენტი არ მოიძებნა');
   }
 
   if (document.Recipient.length === 0) {
-    throw new Error('Document has no recipients');
+    throw new Error('დოკუმენტს მიმღებები არ ჰყავს');
   }
 
   if (document.status === DocumentStatus.DRAFT) {
-    throw new Error('Can not send draft document');
+    throw new Error('დრაფტი დოკუმენტის გაგზავნა შეუძლებელია');
   }
 
   if (document.status === DocumentStatus.COMPLETED) {
-    throw new Error('Can not send completed document');
+    throw new Error('ხელმოწერილი დოკუმენტის გაგზავნა შეუძლებელია');
   }
 
   await Promise.all(
@@ -120,8 +120,8 @@ export const resendDocument = async ({
       const { actionVerb } = RECIPIENT_ROLES_DESCRIPTION[recipient.role];
 
       const emailSubject = selfSigner
-        ? `Reminder: Please ${actionVerb.toLowerCase()} your document`
-        : `Reminder: Please ${actionVerb.toLowerCase()} this document`;
+        ? `შეხსენება: გთხოვთ ${actionVerb.toLowerCase()} თქვენს დოკუმენტს`
+        : `შეხსენება: გთხოვთ ${actionVerb.toLowerCase()} ამ დოკუმენტს`;
 
       await prisma.$transaction(
         async (tx) => {

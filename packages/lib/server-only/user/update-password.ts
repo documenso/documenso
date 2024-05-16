@@ -26,18 +26,18 @@ export const updatePassword = async ({
   });
 
   if (!user.password) {
-    throw new Error('User has no password');
+    throw new Error('მომხმარებელს არ აქვს პაროლი');
   }
 
   const isCurrentPasswordValid = await compare(currentPassword, user.password);
   if (!isCurrentPasswordValid) {
-    throw new Error('Current password is incorrect.');
+    throw new Error('ეს პაროლი არასწორია.');
   }
 
   // Compare the new password with the old password
   const isSamePassword = await compare(password, user.password);
   if (isSamePassword) {
-    throw new Error('Your new password cannot be the same as your old password.');
+    throw new Error('თქვენი ახალი პაროლი არ შეიძლება ემთხვეოდეს ძველი პაროლის.');
   }
 
   const hashedNewPassword = await hash(password, SALT_ROUNDS);

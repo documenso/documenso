@@ -48,7 +48,7 @@ export default function DocumentDialog({ documentData, ...props }: DocumentDialo
 
           <DialogPrimitive.Close className="absolute right-4 top-4 rounded-sm opacity-70 transition-opacity hover:opacity-100 focus:outline-none disabled:pointer-events-none">
             <X className="h-6 w-6 text-white" />
-            <span className="sr-only">Close</span>
+            <span className="sr-only">დახურვა</span>
           </DialogPrimitive.Close>
         </DialogPrimitive.Content>
       </DialogPortal>

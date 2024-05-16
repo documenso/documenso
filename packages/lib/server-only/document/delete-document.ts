@@ -35,7 +35,7 @@ export const deleteDocument = async ({
   });
 
   if (!user) {
-    throw new Error('User not found');
+    throw new Error('მომხმარებელი არ მოიძებნა');
   }
 
   const document = await prisma.document.findUnique({
@@ -54,7 +54,7 @@ export const deleteDocument = async ({
   });
 
   if (!document || (teamId !== undefined && teamId !== document.teamId)) {
-    throw new Error('Document not found');
+    throw new Error('დოკუმენტი არ მოიძებნა');
   }
 
   const isUserOwner = document.userId === userId;
@@ -62,7 +62,7 @@ export const deleteDocument = async ({
   const userRecipient = document.Recipient.find((recipient) => recipient.email === user.email);
 
   if (!isUserOwner && !isUserTeamMember && !userRecipient) {
-    throw new Error('Not allowed');
+    throw new Error('არ არის დასაშვები');
   }
 
   // Handle hard or soft deleting the actual document if user has permission.
@@ -196,7 +196,7 @@ const handleDocumentOwnerDelete = async ({
           name: FROM_NAME,
           address: FROM_ADDRESS,
         },
-        subject: 'Document Cancelled',
+        subject: 'დოკუმენტი გაუქმებულია',
         html: render(template),
         text: render(template, { plainText: true }),
       });

@@ -35,11 +35,11 @@ export const sendCompletedEmail = async ({ documentId, requestMetadata }: SendDo
   });
 
   if (!document) {
-    throw new Error('Document not found');
+    throw new Error('დოკუმენტი არ მოიძებნა');
   }
 
   if (document.Recipient.length === 0) {
-    throw new Error('Document has no recipients');
+    throw new Error('დოკუმენტს არ ჰყავს მიმღებები');
   }
 
   const { User: owner } = document;
@@ -75,7 +75,7 @@ export const sendCompletedEmail = async ({ documentId, requestMetadata }: SendDo
         name: process.env.NEXT_PRIVATE_SMTP_FROM_NAME || 'Documenso',
         address: process.env.NEXT_PRIVATE_SMTP_FROM_ADDRESS || 'noreply@documenso.com',
       },
-      subject: 'Signing Complete!',
+      subject: 'ხელმოწერა დასრულებულია!',
       html: render(template),
       text: render(template, { plainText: true }),
       attachments: [

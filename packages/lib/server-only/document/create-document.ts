@@ -43,7 +43,7 @@ export const createDocument = async ({
     teamId !== undefined &&
     !user.teamMembers.some((teamMember) => teamMember.teamId === teamId)
   ) {
-    throw new AppError(AppErrorCode.NOT_FOUND, 'Team not found');
+    throw new AppError(AppErrorCode.NOT_FOUND, 'გუნდი არ მოიძებნა');
   }
 
   return await prisma.$transaction(async (tx) => {

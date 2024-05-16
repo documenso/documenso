@@ -56,7 +56,7 @@ export const createField = async ({
   });
 
   if (!document) {
-    throw new Error('Document not found');
+    throw new Error('დოკუმენტი არ მოიძებნა');
   }
 
   const user = await prisma.user.findFirstOrThrow({

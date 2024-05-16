@@ -52,7 +52,7 @@ const Combobox = ({
         <Command>
           <CommandInput placeholder={value || placeholderValue} />
 
-          <CommandEmpty>No value found.</CommandEmpty>
+          <CommandEmpty>მნიშვნელობა ვერ მოიძებნა.</CommandEmpty>
 
           <CommandGroup className="max-h-[250px] overflow-y-auto">
             {options.map((option, index) => (

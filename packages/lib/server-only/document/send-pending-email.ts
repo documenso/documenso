@@ -32,11 +32,11 @@ export const sendPendingEmail = async ({ documentId, recipientId }: SendPendingE
   });
 
   if (!document) {
-    throw new Error('Document not found');
+    throw new Error('დოკუმენტი არ მოიძებნა');
   }
 
   if (document.Recipient.length === 0) {
-    throw new Error('Document has no recipients');
+    throw new Error('დოკუმენტს მიმღებები არ ჰყავს');
   }
 
   const [recipient] = document.Recipient;
@@ -59,7 +59,7 @@ export const sendPendingEmail = async ({ documentId, recipientId }: SendPendingE
       name: process.env.NEXT_PRIVATE_SMTP_FROM_NAME || 'Documenso',
       address: process.env.NEXT_PRIVATE_SMTP_FROM_ADDRESS || 'noreply@documenso.com',
     },
-    subject: 'Waiting for others to complete signing.',
+    subject: 'ველოდები სხვების ხელმოწერას.',
     html: render(template),
     text: render(template, { plainText: true }),
   });

@@ -72,11 +72,11 @@ export const setRecipientsForDocument = async ({
   });
 
   if (!document) {
-    throw new Error('Document not found');
+    throw new Error('დოკუმენტი არ მოიძებნა');
   }
 
   if (document.completedAt) {
-    throw new Error('Document already complete');
+    throw new Error('დოკუმენტი უკვე ხელმოწერილია');
   }
 
   const recipientsHaveActionAuth = recipients.some((recipient) => recipient.actionAuth);

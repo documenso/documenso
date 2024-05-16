@@ -107,7 +107,7 @@ export const createTeam = async ({
       });
 
       if (existingTeamWithUrl) {
-        throw new AppError(AppErrorCode.ALREADY_EXISTS, 'Team URL already exists.');
+        throw new AppError(AppErrorCode.ALREADY_EXISTS, 'გუნდის URL უკვე არსებობს.');
       }
 
       if (!customerId) {
@@ -138,7 +138,7 @@ export const createTeam = async ({
     const target = z.array(z.string()).safeParse(err.meta?.target);
 
     if (err.code === 'P2002' && target.success && target.data.includes('url')) {
-      throw new AppError(AppErrorCode.ALREADY_EXISTS, 'Team URL already exists.');
+      throw new AppError(AppErrorCode.ALREADY_EXISTS, 'გუნდის URL უკვე არსებობს.');
     }
 
     throw err;

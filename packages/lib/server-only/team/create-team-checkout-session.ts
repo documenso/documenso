@@ -47,6 +47,6 @@ export const createTeamPendingCheckoutSession = async ({
     console.error(e);
 
     // Absorb all the errors incase Stripe throws something sensitive.
-    throw new AppError(AppErrorCode.UNKNOWN_ERROR, 'Something went wrong.');
+    throw new AppError(AppErrorCode.UNKNOWN_ERROR, 'დაფიქსირდა ხარვეზი.');
   }
 };

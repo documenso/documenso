@@ -33,7 +33,7 @@ export const removeSignedFieldWithToken = async ({
   const { Document: document, Recipient: recipient } = field;
 
   if (!document) {
-    throw new Error(`Document not found for field ${field.id}`);
+    throw new Error(`დოკუმენტი ველისთვის - ${field.id} არ მოიძებნა`);
   }
 
   if (document.status !== DocumentStatus.PENDING) {
@@ -41,12 +41,12 @@ export const removeSignedFieldWithToken = async ({
   }
 
   if (recipient?.signingStatus === SigningStatus.SIGNED) {
-    throw new Error(`Recipient ${recipient.id} has already signed`);
+    throw new Error(`მიმღებმა ${recipient.id} ხელი უკვე მოაწერა`);
   }
 
   // Unreachable code based on the above query but we need to satisfy TypeScript
   if (field.recipientId === null) {
-    throw new Error(`Field ${fieldId} has no recipientId`);
+    throw new Error(`ველს - ${fieldId} არ აქვს მიმღების ID`);
   }
 
   await prisma.$transaction(async (tx) => {

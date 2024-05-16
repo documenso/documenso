@@ -63,7 +63,7 @@ export const verifyEmail = async ({ token }: VerifyEmailProps) => {
   ]);
 
   if (!updatedUser || !deletedToken) {
-    throw new Error('Something went wrong while verifying your email. Please try again.');
+    throw new Error('თქვენი ელ.ფოსტის დადასტურებისას დაფიქსირდა ხარვეზი. გთხოვთ თავიდან სცადეთ.');
   }
 
   return !!updatedUser && !!deletedToken;

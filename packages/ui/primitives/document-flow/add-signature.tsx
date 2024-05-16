@@ -68,7 +68,7 @@ export const AddSignatureFormPartial = ({
       ctx.addIssue({
         path: ['name'],
         code: 'custom',
-        message: 'Name is required',
+        message: 'საჭიროა სახელი',
       });
     }
 
@@ -76,7 +76,7 @@ export const AddSignatureFormPartial = ({
       ctx.addIssue({
         path: ['customText'],
         code: 'custom',
-        message: 'Text is required',
+        message: 'საჭიროა ტექსტი',
       });
     }
 
@@ -84,7 +84,7 @@ export const AddSignatureFormPartial = ({
       ctx.addIssue({
         path: ['signature'],
         code: 'custom',
-        message: 'Signature is required',
+        message: 'საჭიროა ხელმოწერა',
       });
     }
   });
@@ -248,7 +248,7 @@ export const AddSignatureFormPartial = ({
                 name="email"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel required>Email</FormLabel>
+                    <FormLabel required>ელ.ფოსტა</FormLabel>
                     <FormControl>
                       <Input
                         className="bg-background"
@@ -272,7 +272,7 @@ export const AddSignatureFormPartial = ({
                   name="name"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel required={requireName}>Name</FormLabel>
+                      <FormLabel required={requireName}>სახელი</FormLabel>
                       <FormControl>
                         <Input
                           className="bg-background"
@@ -295,7 +295,7 @@ export const AddSignatureFormPartial = ({
                   name="signature"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel required={requireSignature}>Signature</FormLabel>
+                      <FormLabel required={requireSignature}>ხელმოწერა</FormLabel>
                       <FormControl>
                         <Card
                           className={cn('mt-2', {
@@ -330,7 +330,7 @@ export const AddSignatureFormPartial = ({
                   name="customText"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel required={requireCustomText}>Custom Text</FormLabel>
+                      <FormLabel required={requireCustomText}>ტექსტი</FormLabel>
                       <FormControl>
                         <Input
                           className="bg-background"
@@ -367,7 +367,7 @@ export const AddSignatureFormPartial = ({
 
         {validateUninsertedFields && uninsertedFields[0] && (
           <FieldToolTip key={uninsertedFields[0].id} field={uninsertedFields[0]} color="warning">
-            Click to insert field
+            დააკლიკეთ ველის დასამატებლად
           </FieldToolTip>
         )}
 

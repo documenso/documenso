@@ -63,7 +63,7 @@ export const resendTeamMemberInvitation = async ({
       });
 
       if (!teamMemberInvite) {
-        throw new AppError('InviteNotFound', 'No invite exists for this user.');
+        throw new AppError('InviteNotFound', 'ამ მომხმარებლის მოწვევა არ არსებობს.');
       }
 
       await sendTeamMemberInviteEmail({

@@ -40,7 +40,7 @@ export const setRecipientsForTemplate = async ({
   });
 
   if (!template) {
-    throw new Error('Template not found');
+    throw new Error('შაბლონი არ მოიძებნა');
   }
 
   const normalizedRecipients = recipients.map((recipient) => ({

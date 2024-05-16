@@ -38,7 +38,7 @@ export const createOrGetShareLink = async ({ documentId, ...options }: CreateSha
     .exhaustive();
 
   if (!email) {
-    throw new Error('Unable to create share link for document with the given email');
+    throw new Error('დოკუმენტის გაზიარების ბმულის შექმნა მოცემული ელ.ფოსტით შეუძლებელია');
   }
 
   return await prisma.documentShareLink.upsert({

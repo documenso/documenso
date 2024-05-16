@@ -15,7 +15,7 @@ export const getBackupCodes = ({ user }: GetBackupCodesOptions) => {
   const key = DOCUMENSO_ENCRYPTION_KEY;
 
   if (!user.twoFactorEnabled) {
-    throw new Error('მომხმარებელs არ აქვს 2FA ჩართული');
+    throw new Error('მომხმარებელს არ აქვს 2FA ჩართული');
   }
 
   if (!user.twoFactorBackupCodes) {

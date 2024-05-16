@@ -19,18 +19,18 @@ export const getUserByApiToken = async ({ token }: { token: string }) => {
   });
 
   if (!user) {
-    throw new Error('Invalid token');
+    throw new Error('არასწორი ტოკენი');
   }
 
   const retrievedToken = user.ApiToken.find((apiToken) => apiToken.token === hashedToken);
 
   // This should be impossible but we need to satisfy TypeScript
   if (!retrievedToken) {
-    throw new Error('Invalid token');
+    throw new Error('არასწორი ტოკენი');
   }
 
   if (retrievedToken.expires && retrievedToken.expires < new Date()) {
-    throw new Error('Expired token');
+    throw new Error('ვადაგასული ტოკენი');
   }
 
   return user;

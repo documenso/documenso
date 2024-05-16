@@ -25,7 +25,7 @@ export const USER_SECURITY_AUDIT_LOG_MAP: { [key in UserSecurityAuditLogType]: s
   [UserSecurityAuditLogType.SIGN_IN]: 'ავტორიზებული',
   [UserSecurityAuditLogType.SIGN_IN_FAIL]: 'ავტორიზაცია ვერ მოხერხდა',
   [UserSecurityAuditLogType.SIGN_IN_PASSKEY_FAIL]: 'Passkey sign in failed',
-  [UserSecurityAuditLogType.SIGN_IN_2FA_FAIL]: 'Sign in 2FA attempt failed',
+  [UserSecurityAuditLogType.SIGN_IN_2FA_FAIL]: '2FA-ში შესვლა ვერ მოხერხდა',
 };
 
 /**
