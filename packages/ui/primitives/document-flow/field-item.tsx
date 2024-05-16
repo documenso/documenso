@@ -20,6 +20,7 @@ import { createPortal } from 'react-dom';
 import { Rnd } from 'react-rnd';
 
 import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
+import { colorVariants } from '@documenso/lib/utils/createColorVariants';
 import { FieldType } from '@documenso/prisma/client';
 
 import { cn } from '../../lib/utils';
@@ -45,6 +46,7 @@ export type FieldItemProps = {
   onMove?: (_node: HTMLElement) => void;
   onRemove?: () => void;
   onAdvancedSettings?: () => void;
+  color?: string;
 };
 
 export const FieldItem = ({
@@ -57,6 +59,7 @@ export const FieldItem = ({
   onMove,
   onRemove,
   onAdvancedSettings,
+  color,
 }: FieldItemProps) => {
   const [active, setActive] = useState(false);
   const [coords, setCoords] = useState({
@@ -67,6 +70,12 @@ export const FieldItem = ({
   });
   const [settingsActive, setSettingsActive] = useState(false);
   const cardRef = useRef(null);
+
+  const selectedColorVariant = color ? colorVariants[color] : colorVariants['dawn'];
+
+  const selectedSignerBorderClass = selectedColorVariant.border;
+  const selectedSignerInitialsBGClass = selectedColorVariant.initialsBackground;
+  const selectedSignerActiveBorderClass = selectedColorVariant.borderActive;
 
   const advancedField = ['NUMBER', 'RADIO', 'CHECKBOX', 'DROPDOWN'].includes(field.type);
 
@@ -158,8 +167,8 @@ export const FieldItem = ({
     >
       <Card
         className={cn('bg-field-card/10 h-full w-full backdrop-blur-[1px]', {
-          'border-field-card-border': !disabled,
-          'border-field-card-border/80 bg-field-card/80': active || settingsActive,
+          [selectedSignerBorderClass]: !disabled,
+          [selectedSignerActiveBorderClass]: active || settingsActive,
         })}
         onClick={() => {
           setSettingsActive((prev) => !prev);
@@ -178,7 +187,7 @@ export const FieldItem = ({
             switch (field.type) {
               case FieldType.EMAIL:
                 return (
-                  <div className="text-field-card-foreground flex items-center justify-center gap-x-1 text-xl  font-light">
+                  <div className="text-field-card-foreground flex items-center justify-center gap-x-1 text-xl font-light">
                     <Mail className="h-5 w-5" /> Email
                   </div>
                 );
@@ -242,7 +251,8 @@ export const FieldItem = ({
 
           <p
             className={cn(
-              'bg-documenso-700 absolute -right-9 z-20 hidden h-8 w-9 items-center justify-center rounded-r-xl font-semibold text-white group-hover:flex',
+              'absolute -right-9 z-20 hidden h-8 w-9 items-center justify-center rounded-r-xl font-semibold text-white group-hover:flex',
+              selectedSignerInitialsBGClass,
               {
                 'text-field-card-foreground/50 bg-slate-900/10': disabled || passive,
               },

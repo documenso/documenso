@@ -24,6 +24,7 @@ import { useDocumentElement } from '@documenso/lib/client-only/hooks/use-documen
 import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
 import { RECIPIENT_ROLES_DESCRIPTION } from '@documenso/lib/constants/recipient-roles';
 import { nanoid } from '@documenso/lib/universal/id';
+import { colorClasses, colorVariants } from '@documenso/lib/utils/createColorVariants';
 import type { Field, Recipient } from '@documenso/prisma/client';
 import { RecipientRole } from '@documenso/prisma/client';
 import { FieldType, SendStatus } from '@documenso/prisma/client';
@@ -143,6 +144,31 @@ export const AddFieldsFormPartial = ({
   const [selectedField, setSelectedField] = useState<FieldType | null>(null);
   const [selectedSigner, setSelectedSigner] = useState<Recipient | null>(null);
   const [showRecipientsSelector, setShowRecipientsSelector] = useState(false);
+
+  const recipientColorClasses = useMemo(() => {
+    const colorMap = new Map();
+    recipients.forEach((recipient, index) => {
+      colorMap.set(recipient.id, colorClasses[index % colorClasses.length]);
+    });
+    return colorMap;
+  }, [recipients]);
+
+  const selectedSignerColorVariant = useMemo(() => {
+    if (!selectedSigner) {
+      return {
+        ring: '',
+        border: '',
+        borderWithHover: '',
+        borderActive: '',
+        background: '',
+        initialsBackground: '',
+      };
+    }
+
+    const colorClass = recipientColorClasses.get(selectedSigner.id);
+
+    return colorVariants[colorClass] || { ring: '', border: '', background: '' };
+  }, [selectedSigner, recipientColorClasses]);
 
   const hasSelectedSignerBeenSent = selectedSigner?.sendStatus === SendStatus.SENT;
 
@@ -399,9 +425,10 @@ export const AddFieldsFormPartial = ({
               {selectedField && (
                 <Card
                   className={cn(
-                    'bg-field-card/80 pointer-events-none fixed z-50 cursor-pointer border-2 backdrop-blur-[1px]',
+                    'pointer-events-none fixed z-50 cursor-pointer border-2 backdrop-blur-[1px]',
+                    selectedSignerColorVariant.background,
                     {
-                      'border-field-card-border': isFieldWithinBounds,
+                      'border-2': isFieldWithinBounds,
                       'opacity-50': !isFieldWithinBounds,
                     },
                   )}
@@ -412,42 +439,48 @@ export const AddFieldsFormPartial = ({
                     width: fieldBounds.current.width,
                   }}
                 >
-                  <CardContent className="text-field-card-foreground flex h-full w-full items-center justify-center p-2">
+                  <CardContent className="text-field-card-background flex h-full w-full items-center justify-center p-2">
                     {FRIENDLY_FIELD_TYPE[selectedField]}
                   </CardContent>
                 </Card>
               )}
 
               {isDocumentPdfLoaded &&
-                localFields.map((field, index) => (
-                  <FieldItem
-                    key={index}
-                    field={field}
-                    disabled={
-                      selectedSigner?.email !== field.signerEmail || hasSelectedSignerBeenSent
-                    }
-                    minHeight={fieldBounds.current.height}
-                    minWidth={fieldBounds.current.width}
-                    passive={isFieldWithinBounds && !!selectedField}
-                    onResize={(options) => onFieldResize(options, index)}
-                    onMove={(options) => onFieldMove(options, index)}
-                    onRemove={() => remove(index)}
-                    onAdvancedSettings={() => {
-                      setCurrentField({
-                        nativeId: field.nativeId,
-                        formId: field.formId,
-                        pageNumber: field.pageNumber,
-                        type: field.type,
-                        pageX: field.pageX,
-                        pageY: field.pageY,
-                        pageWidth: field.pageWidth,
-                        pageHeight: field.pageHeight,
-                        signerEmail: field.signerEmail,
-                      });
-                      handleAdvancedSettings();
-                    }}
-                  />
-                ))}
+                localFields.map((field, index) => {
+                  const recipient = recipients.find((r) => r.email === field.signerEmail);
+                  const colorClass = recipient ? recipientColorClasses.get(recipient.id) : '';
+
+                  return (
+                    <FieldItem
+                      key={index}
+                      field={field}
+                      disabled={
+                        selectedSigner?.email !== field.signerEmail || hasSelectedSignerBeenSent
+                      }
+                      minHeight={fieldBounds.current.height}
+                      minWidth={fieldBounds.current.width}
+                      passive={isFieldWithinBounds && !!selectedField}
+                      onResize={(options) => onFieldResize(options, index)}
+                      onMove={(options) => onFieldMove(options, index)}
+                      onRemove={() => remove(index)}
+                      onAdvancedSettings={() => {
+                        setCurrentField({
+                          nativeId: field.nativeId,
+                          formId: field.formId,
+                          pageNumber: field.pageNumber,
+                          type: field.type,
+                          pageX: field.pageX,
+                          pageY: field.pageY,
+                          pageWidth: field.pageWidth,
+                          pageHeight: field.pageHeight,
+                          signerEmail: field.signerEmail,
+                        });
+                        handleAdvancedSettings();
+                      }}
+                      color={colorClass}
+                    />
+                  );
+                })}
 
               {!hideRecipients && (
                 <Popover open={showRecipientsSelector} onOpenChange={setShowRecipientsSelector}>
@@ -456,7 +489,10 @@ export const AddFieldsFormPartial = ({
                       type="button"
                       variant="outline"
                       role="combobox"
-                      className="bg-background text-muted-foreground mb-12 justify-between font-normal"
+                      className={cn(
+                        'bg-background text-muted-foreground hover:text-foreground mb-12 mt-2 justify-between font-normal ring ring-offset-2',
+                        selectedSignerColorVariant.ring,
+                      )}
                     >
                       {selectedSigner?.email && (
                         <span className="flex-1 truncate text-left">
@@ -564,7 +600,12 @@ export const AddFieldsFormPartial = ({
                     onMouseDown={() => setSelectedField(FieldType.SIGNATURE)}
                     data-selected={selectedField === FieldType.SIGNATURE ? true : undefined}
                   >
-                    <Card className="group-data-[selected]:border-documenso hover:border-documenso h-full w-full cursor-pointer group-disabled:opacity-50">
+                    <Card
+                      className={cn(
+                        'h-full w-full cursor-pointer group-disabled:opacity-50',
+                        selectedSignerColorVariant.borderWithHover,
+                      )}
+                    >
                       <CardContent className="flex flex-col items-center justify-center px-6 py-4">
                         <p
                           className={cn(
@@ -585,7 +626,12 @@ export const AddFieldsFormPartial = ({
                     onMouseDown={() => setSelectedField(FieldType.EMAIL)}
                     data-selected={selectedField === FieldType.EMAIL ? true : undefined}
                   >
-                    <Card className="group-data-[selected]:border-documenso hover:border-documenso h-full w-full cursor-pointer group-disabled:opacity-50">
+                    <Card
+                      className={cn(
+                        'h-full w-full cursor-pointer group-disabled:opacity-50',
+                        selectedSignerColorVariant.borderWithHover,
+                      )}
+                    >
                       <CardContent className="flex flex-col items-center justify-center px-6 py-4">
                         <p
                           className={cn(
@@ -607,7 +653,12 @@ export const AddFieldsFormPartial = ({
                     onMouseDown={() => setSelectedField(FieldType.NAME)}
                     data-selected={selectedField === FieldType.NAME ? true : undefined}
                   >
-                    <Card className="group-data-[selected]:border-documenso hover:border-documenso h-full w-full cursor-pointer group-disabled:opacity-50">
+                    <Card
+                      className={cn(
+                        'h-full w-full cursor-pointer group-disabled:opacity-50',
+                        selectedSignerColorVariant.borderWithHover,
+                      )}
+                    >
                       <CardContent className="flex flex-col items-center justify-center px-6 py-4">
                         <p
                           className={cn(
@@ -628,7 +679,12 @@ export const AddFieldsFormPartial = ({
                     onMouseDown={() => setSelectedField(FieldType.DATE)}
                     data-selected={selectedField === FieldType.DATE ? true : undefined}
                   >
-                    <Card className="group-data-[selected]:border-documenso hover:border-documenso h-full w-full cursor-pointer group-disabled:opacity-50">
+                    <Card
+                      className={cn(
+                        'h-full w-full cursor-pointer group-disabled:opacity-50',
+                        selectedSignerColorVariant.borderWithHover,
+                      )}
+                    >
                       <CardContent className="flex flex-col items-center justify-center px-6 py-4">
                         <p
                           className={cn(
@@ -649,7 +705,12 @@ export const AddFieldsFormPartial = ({
                     onMouseDown={() => setSelectedField(FieldType.TEXT)}
                     data-selected={selectedField === FieldType.TEXT ? true : undefined}
                   >
-                    <Card className="group-data-[selected]:border-documenso hover:border-documenso h-full w-full cursor-pointer group-disabled:opacity-50">
+                    <Card
+                      className={cn(
+                        'h-full w-full cursor-pointer group-disabled:opacity-50',
+                        selectedSignerColorVariant.borderWithHover,
+                      )}
+                    >
                       <CardContent className="flex flex-col items-center justify-center px-6 py-4">
                         <p
                           className={cn(
@@ -670,7 +731,12 @@ export const AddFieldsFormPartial = ({
                     onMouseDown={() => setSelectedField(FieldType.NUMBER)}
                     data-selected={selectedField === FieldType.NUMBER ? true : undefined}
                   >
-                    <Card className="group-data-[selected]:border-documenso hover:border-documenso h-full w-full cursor-pointer group-disabled:opacity-50">
+                    <Card
+                      className={cn(
+                        'h-full w-full cursor-pointer group-disabled:opacity-50',
+                        selectedSignerColorVariant.borderWithHover,
+                      )}
+                    >
                       <CardContent className="flex flex-col items-center justify-center px-6 py-4">
                         <p
                           className={cn(
@@ -691,7 +757,12 @@ export const AddFieldsFormPartial = ({
                     onMouseDown={() => setSelectedField(FieldType.RADIO)}
                     data-selected={selectedField === FieldType.RADIO ? true : undefined}
                   >
-                    <Card className="group-data-[selected]:border-documenso hover:border-documenso h-full w-full cursor-pointer group-disabled:opacity-50">
+                    <Card
+                      className={cn(
+                        'h-full w-full cursor-pointer group-disabled:opacity-50',
+                        selectedSignerColorVariant.borderWithHover,
+                      )}
+                    >
                       <CardContent className="flex flex-col items-center justify-center px-6 py-4">
                         <p
                           className={cn(
@@ -712,7 +783,12 @@ export const AddFieldsFormPartial = ({
                     onMouseDown={() => setSelectedField(FieldType.CHECKBOX)}
                     data-selected={selectedField === FieldType.CHECKBOX ? true : undefined}
                   >
-                    <Card className="group-data-[selected]:border-documenso hover:border-documenso h-full w-full cursor-pointer group-disabled:opacity-50">
+                    <Card
+                      className={cn(
+                        'h-full w-full cursor-pointer group-disabled:opacity-50',
+                        selectedSignerColorVariant.borderWithHover,
+                      )}
+                    >
                       <CardContent className="flex flex-col items-center justify-center px-6 py-4">
                         <p
                           className={cn(
@@ -733,7 +809,12 @@ export const AddFieldsFormPartial = ({
                     onMouseDown={() => setSelectedField(FieldType.DROPDOWN)}
                     data-selected={selectedField === FieldType.DROPDOWN ? true : undefined}
                   >
-                    <Card className="group-data-[selected]:border-documenso hover:border-documenso h-full w-full cursor-pointer group-disabled:opacity-50">
+                    <Card
+                      className={cn(
+                        'h-full w-full cursor-pointer group-disabled:opacity-50',
+                        selectedSignerColorVariant.borderWithHover,
+                      )}
+                    >
                       <CardContent className="flex flex-col items-center justify-center px-6 py-4">
                         <p
                           className={cn(
