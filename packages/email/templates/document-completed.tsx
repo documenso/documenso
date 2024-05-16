@@ -12,7 +12,7 @@ export const DocumentCompletedEmailTemplate = ({
   documentName = 'Open Source Pledge.pdf',
   assetBaseUrl = 'http://localhost:3002',
 }: DocumentCompletedEmailTemplateProps) => {
-  const previewText = `Completed Document`;
+  const previewText = `ხელმოწერილი დოკუმენტი`;
 
   const getAssetUrl = (path: string) => {
     return new URL(path, assetBaseUrl).toString();

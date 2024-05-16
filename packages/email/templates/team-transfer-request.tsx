@@ -89,12 +89,12 @@ export const TeamTransferRequestTemplate = ({
                     className="bg-documenso-500 ml-2 inline-flex items-center justify-center rounded-lg px-6 py-3 text-center text-sm font-medium text-black no-underline"
                     href={`${baseUrl}/team/verify/transfer/${token}`}
                   >
-                    Accept
+                    თანხმობა
                   </Button>
                 </Section>
               </Section>
 
-              <Text className="text-center text-xs">Link expires in 1 hour.</Text>
+              <Text className="text-center text-xs">ბმულს ვადა ეწურება 1 საათში.</Text>
             </Container>
 
             <Hr className="mx-auto mt-12 max-w-xl" />

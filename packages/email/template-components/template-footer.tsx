@@ -9,10 +9,11 @@ export const TemplateFooter = ({ isDocument = true }: TemplateFooterProps) => {
     <Section>
       {isDocument && (
         <Text className="my-4 text-base text-slate-400">
-          This document was sent using{' '}
+          ეს დოკუმენტი გამოგზავნილია{' '}
           <Link className="text-[#7AC455]" href="https://documen.so/mail-footer">
-            Documenso.
+            Documenso-ს
           </Link>
+          გამოყენებით
         </Text>
       )}
 

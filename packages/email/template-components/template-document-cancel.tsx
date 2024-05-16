@@ -19,16 +19,17 @@ export const TemplateDocumentCancel = ({
 
       <Section>
         <Text className="text-primary mx-auto mb-0 max-w-[80%] text-center text-lg font-semibold">
-          {inviterName} has cancelled the document
+          {/* has cancelled the document */}
+          {inviterName} გააუქმა დოკუმენტი
           <br />"{documentName}"
         </Text>
 
         <Text className="my-1 text-center text-base text-slate-400">
-          All signatures have been voided.
+          ყველა ხელმოწერა გაუქმებულია.
         </Text>
 
         <Text className="my-1 text-center text-base text-slate-400">
-          You don't need to sign it anymore.
+          თქვენი ხელმოწერა აღარ არის საჭირო.
         </Text>
       </Section>
     </>

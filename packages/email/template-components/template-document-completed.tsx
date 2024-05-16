@@ -28,17 +28,17 @@ export const TemplateDocumentCompleted = ({
                 src={getAssetUrl('/static/completed.png')}
                 className="-mt-0.5 mr-2 inline h-7 w-7 align-middle"
               />
-              Completed
+              დასრულებულია
             </Text>
           </Column>
         </Section>
 
         <Text className="text-primary mb-0 text-center text-lg font-semibold">
-          “{documentName}” was signed by all signers
+          “{documentName}” დოკუმენტს ყველამ მოაწერა ხელი.
         </Text>
 
         <Text className="my-1 text-center text-base text-slate-400">
-          Continue by downloading the document.
+          განაგრძეთ ამ დოკუმენტის ჩამოტვირთვით.
         </Text>
 
         <Section className="mb-6 mt-8 text-center">
@@ -57,7 +57,7 @@ export const TemplateDocumentCompleted = ({
               src={getAssetUrl('/static/download.png')}
               className="mb-0.5 mr-2 inline h-5 w-5 align-middle"
             />
-            Download
+            ჩამოტვრითვა
           </Button>
         </Section>
       </Section>

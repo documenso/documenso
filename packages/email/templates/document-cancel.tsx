@@ -13,7 +13,8 @@ export const DocumentCancelTemplate = ({
   documentName = 'Open Source Pledge.pdf',
   assetBaseUrl = 'http://localhost:3002',
 }: DocumentCancelEmailTemplateProps) => {
-  const previewText = `${inviterName} has cancelled the document ${documentName}, you don't need to sign it anymore.`;
+  //                    digital institute
+  const previewText = `${inviterName} has cancelled the document ${documentName}, ხელის მოწერა საჭირო აღარ არის.`;
 
   const getAssetUrl = (path: string) => {
     return new URL(path, assetBaseUrl).toString();

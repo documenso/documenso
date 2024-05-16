@@ -20,7 +20,8 @@ export const TemplateConfirmationEmail = ({
         </Text>
 
         <Text className="my-1 text-center text-base text-slate-400">
-          Before you get started, please confirm your email address by clicking the button below:
+          სანამ დაიწყებთ, გთხოვთ, დაადასტუროთ თქვენი ელფოსტის მისამართი ქვემოთ მოცემულ ღილაკზე
+          დაჭერით:
         </Text>
 
         <Section className="mb-6 mt-8 text-center">
@@ -28,11 +29,11 @@ export const TemplateConfirmationEmail = ({
             className="bg-documenso-500 inline-flex items-center justify-center rounded-lg px-6 py-3 text-center text-sm font-medium text-black no-underline"
             href={confirmationLink}
           >
-            Confirm email
+            დაადასტურეთ ელ.ფოსტა
           </Button>
           <Text className="mt-8 text-center text-sm italic text-slate-400">
-            You can also copy and paste this link into your browser: {confirmationLink} (link
-            expires in 1 hour)
+            თქვენ ასევე შეგიძლიათ დააკოპიროთ და ჩასვათ ეს ბმული თქვენს ბრაუზერში: {confirmationLink}{' '}
+            (ბმულს ვადა ეწურება 1 საათში)
           </Text>
         </Section>
       </Section>

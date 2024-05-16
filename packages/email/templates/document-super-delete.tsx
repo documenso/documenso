@@ -14,7 +14,7 @@ export const DocumentSuperDeleteEmailTemplate = ({
   assetBaseUrl = 'http://localhost:3002',
   reason = 'Unknown',
 }: DocumentDeleteEmailTemplateProps) => {
-  const previewText = `An admin has deleted your document "${documentName}".`;
+  const previewText = `ადმინმა თქვენი "${documentName}" დოკუმენტი წაშალა.`;
 
   const getAssetUrl = (path: string) => {
     return new URL(path, assetBaseUrl).toString();
