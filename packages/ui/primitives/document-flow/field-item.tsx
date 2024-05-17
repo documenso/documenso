@@ -160,7 +160,7 @@ export const FieldItem = ({
   const selectedSignerFieldBackground =
     selectedColorVariant?.fieldBackground ?? 'bg-field-card-background';
 
-  const advancedField = ['NUMBER', 'RADIO', 'CHECKBOX', 'DROPDOWN'].includes(field.type);
+  const advancedField = ['NUMBER', 'RADIO', 'CHECKBOX', 'DROPDOWN', 'TEXT'].includes(field.type);
 
   const calculateCoords = useCallback(() => {
     const $page = document.querySelector<HTMLElement>(

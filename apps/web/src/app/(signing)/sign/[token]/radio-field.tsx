@@ -214,7 +214,7 @@ export const RadioField = ({ field, recipient }: RadioFieldProps) => {
                 disabled={!localText}
                 onClick={() => onDialogSignClick()}
               >
-                Sign
+                Save
               </Button>
             </div>
           </DialogFooter>
