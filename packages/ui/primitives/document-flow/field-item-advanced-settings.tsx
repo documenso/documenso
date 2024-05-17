@@ -111,6 +111,8 @@ export const FieldAdvancedSettings = forwardRef<HTMLDivElement, FieldAdvancedSet
     };
 
     const numberField = field.type === FieldType.NUMBER;
+    const checkBoxField = field.type === FieldType.CHECKBOX;
+    const radioField = field.type === FieldType.RADIO;
 
     const handleOnGoNextClick = () => {
       const validation = defaultConfigSchema.safeParse(fieldState);
@@ -164,16 +166,18 @@ export const FieldAdvancedSettings = forwardRef<HTMLDivElement, FieldAdvancedSet
               />
             </div>
 
-            <div>
-              <Label>Placeholder</Label>
-              <Input
-                id="placeholder"
-                className="bg-background mt-2"
-                placeholder="Field placeholder"
-                value={fieldState.placeholder}
-                onChange={(e) => handleFieldChange('placeholder', e.target.value)}
-              />
-            </div>
+            {!checkBoxField && !radioField && (
+              <div>
+                <Label>Placeholder</Label>
+                <Input
+                  id="placeholder"
+                  className="bg-background mt-2"
+                  placeholder="Field placeholder"
+                  value={fieldState.placeholder}
+                  onChange={(e) => handleFieldChange('placeholder', e.target.value)}
+                />
+              </div>
+            )}
 
             {numberField && (
               <>

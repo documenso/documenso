@@ -5,26 +5,24 @@ import { useState, useTransition } from 'react';
 import { useParams } from 'next/navigation';
 import { useRouter } from 'next/navigation';
 
+import { Loader } from 'lucide-react';
 import { CheckSquare } from 'lucide-react';
 
 import { DO_NOT_INVALIDATE_QUERY_ON_MUTATION } from '@documenso/lib/constants/trpc';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import type { TRecipientActionAuth } from '@documenso/lib/types/document-auth';
 import type { Recipient } from '@documenso/prisma/client';
-import type { FieldWithSignature } from '@documenso/prisma/types/field-with-signature';
+import type { FieldWithSignatureAndFieldMeta } from '@documenso/prisma/types/field-with-signature-and-fieldmeta';
 import { trpc } from '@documenso/trpc/react';
-import { Button } from '@documenso/ui/primitives/button';
-import { Dialog, DialogContent, DialogFooter, DialogTitle } from '@documenso/ui/primitives/dialog';
+import { Checkbox } from '@documenso/ui/primitives/checkbox';
 import type { FieldMeta } from '@documenso/ui/primitives/document-flow/field-item-advanced-settings';
-import { Input } from '@documenso/ui/primitives/input';
-import { Label } from '@documenso/ui/primitives/label';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
 import { useRequiredDocumentAuthContext } from './document-auth-provider';
 import { SigningFieldContainer } from './signing-field-container';
 
 export type CheckboxFieldProps = {
-  field: FieldWithSignature;
+  field: FieldWithSignatureAndFieldMeta;
   recipient: Recipient;
 };
 
@@ -33,9 +31,8 @@ export const CheckboxField = ({ field, recipient }: CheckboxFieldProps) => {
   const { toast } = useToast();
   const params = useParams();
   const [isPending, startTransition] = useTransition();
-  const [showRadioModal, setShowRadioModal] = useState(false);
-  const [localText, setLocalCustomText] = useState('');
   const token = params?.token;
+  const [checkboxValue, setCheckboxValue] = useState('');
 
   const { executeActionAuthProcedure } = useRequiredDocumentAuthContext();
 
@@ -58,7 +55,7 @@ export const CheckboxField = ({ field, recipient }: CheckboxFieldProps) => {
     },
   );
 
-  const fieldMeta = field.fieldMeta as FieldMeta;
+  const { label } = (data?.fieldMeta as FieldMeta) ?? {};
 
   const { mutateAsync: signFieldWithToken, isLoading: isSignFieldWithTokenLoading } =
     trpc.field.signFieldWithToken.useMutation(DO_NOT_INVALIDATE_QUERY_ON_MUTATION);
@@ -70,30 +67,15 @@ export const CheckboxField = ({ field, recipient }: CheckboxFieldProps) => {
 
   const isLoading = isSignFieldWithTokenLoading || isRemoveSignedFieldWithTokenLoading || isPending;
 
-  const onDialogSignClick = () => {
-    setShowRadioModal(false);
-
-    void executeActionAuthProcedure({
-      onReauthFormSubmit: async (authOptions) => await onSign(authOptions),
-      actionTarget: field.type,
-    });
-  };
-
   const onSign = async (authOptions?: TRecipientActionAuth) => {
     try {
-      if (!localText) {
-        return;
-      }
-
       await signFieldWithToken({
         token: recipient.token,
         fieldId: field.id,
-        value: localText,
+        value: label ?? checkboxValue,
         isBase64: true,
         authOptions,
       });
-
-      setLocalCustomText('');
 
       startTransition(() => router.refresh());
     } catch (err) {
@@ -114,11 +96,6 @@ export const CheckboxField = ({ field, recipient }: CheckboxFieldProps) => {
   };
 
   const onPreSign = () => {
-    if (!localText) {
-      setShowRadioModal(true);
-      return false;
-    }
-
     return true;
   };
 
@@ -141,66 +118,52 @@ export const CheckboxField = ({ field, recipient }: CheckboxFieldProps) => {
     }
   };
 
+  const handleCheckboxClick = () => {
+    setCheckboxValue(checkboxValue === 'checked' ? '' : 'checked');
+
+    void executeActionAuthProcedure({
+      onReauthFormSubmit: async (authOptions) => await onSign(authOptions),
+      actionTarget: field.type,
+    });
+  };
+
   return (
-    <SigningFieldContainer
-      field={field}
-      onPreSign={onPreSign}
-      onSign={onSign}
-      onRemove={onRemove}
-      type="Radio"
-    >
-      {!field.inserted && (
-        <p className="group-hover:text-primary text-muted-foreground flex flex-col items-center justify-center duration-200">
-          <span className="flex items-center justify-center gap-x-1 text-lg">
-            <CheckSquare /> {fieldMeta.label ?? 'Radio'}
-          </span>
-          <p className="mt-1 text-xs">{fieldMeta.placeholder}</p>
-        </p>
-      )}
-
-      {field.inserted && (
-        <p className="text-muted-foreground flex items-center justify-center gap-x-1 duration-200">
-          <CheckSquare /> {field.customText}
-        </p>
-      )}
-
-      <Dialog open={showRadioModal} onOpenChange={setShowRadioModal}>
-        <DialogContent>
-          <DialogTitle>
-            Check the option <span className="text-muted-foreground">({recipient.email})</span>
-          </DialogTitle>
-
-          <div>
-            <Label htmlFor="signature">Checkbox</Label>
-            {/* TODO: Update to checkbox */}
-            <Input
-              type="text"
-              className="mt-2"
-              onChange={(e) => setLocalCustomText(e.target.value)}
-            />
+    <div className="pointer-events-none">
+      <SigningFieldContainer
+        field={field}
+        onPreSign={onPreSign}
+        onSign={onSign}
+        onRemove={onRemove}
+        type="Checkbox"
+      >
+        {isLoading && (
+          <div className="bg-background absolute inset-0 flex items-center justify-center rounded-md">
+            <Loader className="text-primary h-5 w-5 animate-spin md:h-8 md:w-8" />
           </div>
+        )}
 
-          <DialogFooter>
-            <div className="flex w-full flex-1 flex-nowrap gap-4">
-              <Button
-                type="button"
-                className="dark:bg-muted dark:hover:bg-muted/80 flex-1  bg-black/5 hover:bg-black/10"
-                variant="secondary"
-                onClick={() => {
-                  setShowRadioModal(false);
-                  setLocalCustomText('');
-                }}
-              >
-                Cancel
-              </Button>
+        {!field.inserted && (
+          <p className="group-hover:text-primary text-muted-foreground flex flex-col items-center justify-center duration-200">
+            <span className="flex items-center justify-center gap-x-1 text-lg">
+              <div className="flex items-center gap-2.5 py-1">
+                <Checkbox
+                  className="h-5 w-5 data-[state=checked]:border-black data-[state=checked]:bg-black"
+                  checkClassName="text-white"
+                  checked={checkboxValue === 'checked'}
+                  onClick={handleCheckboxClick}
+                />
+                {label}
+              </div>
+            </span>
+          </p>
+        )}
 
-              <Button type="button" className="flex-1" onClick={() => onDialogSignClick()}>
-                Sign
-              </Button>
-            </div>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-    </SigningFieldContainer>
+        {field.inserted && (
+          <p className="text-muted-foreground flex items-center justify-center gap-x-1 duration-200">
+            <CheckSquare /> {field.fieldMeta?.label ?? 'Checkbox'}
+          </p>
+        )}
+      </SigningFieldContainer>
+    </div>
   );
 };
