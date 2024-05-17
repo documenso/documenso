@@ -155,16 +155,44 @@ export const FieldAdvancedSettings = forwardRef<HTMLDivElement, FieldAdvancedSet
                 </span>
               ))}
 
-            <div>
-              <Label>Label</Label>
-              <Input
-                id="label"
-                className="bg-background mt-2"
-                placeholder="Field label"
-                value={fieldState.label}
-                onChange={(e) => handleFieldChange('label', e.target.value)}
-              />
-            </div>
+            {/* For testing purposes only. Remove label and placeholder and add proper properties */}
+            {radioField && (
+              <div className="flex flex-col gap-4">
+                <div>
+                  <Label>Option 1</Label>
+                  <Input
+                    id="label"
+                    className="bg-background mt-2"
+                    placeholder="Radio option 1"
+                    value={fieldState.label}
+                    onChange={(e) => handleFieldChange('label', e.target.value)}
+                  />
+                </div>
+                <div>
+                  <Label className="mt-4">Option 2</Label>
+                  <Input
+                    id="placeholder"
+                    className="bg-background mt-2"
+                    placeholder="Radio option 2"
+                    value={fieldState.placeholder}
+                    onChange={(e) => handleFieldChange('placeholder', e.target.value)}
+                  />
+                </div>
+              </div>
+            )}
+
+            {!radioField && (
+              <div>
+                <Label>Label</Label>
+                <Input
+                  id="label"
+                  className="bg-background mt-2"
+                  placeholder="Field label"
+                  value={fieldState.label}
+                  onChange={(e) => handleFieldChange('label', e.target.value)}
+                />
+              </div>
+            )}
 
             {!checkBoxField && !radioField && (
               <div>
