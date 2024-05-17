@@ -33,11 +33,10 @@ export const BillingPortalButton = ({ buttonProps }: BillingPortalButtonProps) =
       window.open(sessionUrl, '_blank');
     } catch (e) {
       let description =
-        'ამჯერად გადახდის პორტალზე გადასვლა ვერ მოხერხდა. გთხოვთ, სცადოთ ხელახლა ან დაგვიკავშირდეთ.';
+        'ამჯერად გადახდის პორტალზე გადასვლა ვერ მოხერხდა. გთხოვთ სცადოთ ხელახლა ან დაგვიკავშირდეთ.';
 
       if (e.message === 'CUSTOMER_NOT_FOUND') {
-        description =
-          'ამჟამად არ გაქვთ მომხმარებლის ჩანაწერი, ეს არ უნდა მოხდეს. გთხოვთ დაგვიკავშირდეთ.';
+        description = 'ამჟამად არ გაქვთ მომხმარებლის ჩანაწერი. გთხოვთ დაგვიკავშირდეთ.';
       }
 
       toast({

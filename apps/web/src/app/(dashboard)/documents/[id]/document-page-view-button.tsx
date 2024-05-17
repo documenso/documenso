@@ -51,14 +51,14 @@ export const DocumentPageViewButton = ({ document, team }: DocumentPageViewButto
       const documentData = documentWithData?.documentData;
 
       if (!documentData) {
-        throw new Error('No document available');
+        throw new Error('დოკუმენტი არ არის ხელმისაწვდომი');
       }
 
       await downloadPDF({ documentData, fileName: documentWithData.title });
     } catch (err) {
       toast({
-        title: 'Something went wrong',
-        description: 'An error occurred while downloading your document.',
+        title: 'დაფიქსირდა ხარვეზი',
+        description: 'დოკუმენტის ჩამოტვირთვისას დაფიქსირდა ხარვეზი.',
         variant: 'destructive',
       });
     }
@@ -77,19 +77,21 @@ export const DocumentPageViewButton = ({ document, team }: DocumentPageViewButto
             .with(RecipientRole.SIGNER, () => (
               <>
                 <Pencil className="-ml-1 mr-2 h-4 w-4" />
-                Sign
+                {/* Sign */}
+                მოაწერეთ ხელი
               </>
             ))
             .with(RecipientRole.APPROVER, () => (
               <>
                 <CheckCircle className="-ml-1 mr-2 h-4 w-4" />
-                Approve
+                {/* Approve */}
+                დაამტკიცეთ
               </>
             ))
             .otherwise(() => (
               <>
                 <EyeIcon className="-ml-1 mr-2 h-4 w-4" />
-                View
+                იხილეთ
               </>
             ))}
         </Link>
@@ -97,13 +99,13 @@ export const DocumentPageViewButton = ({ document, team }: DocumentPageViewButto
     ))
     .with({ isComplete: false }, () => (
       <Button className="w-full" asChild>
-        <Link href={`${documentsPath}/${document.id}/edit`}>Edit</Link>
+        <Link href={`${documentsPath}/${document.id}/edit`}>რედაქტირება</Link>
       </Button>
     ))
     .with({ isComplete: true }, () => (
       <Button className="w-full" onClick={onDownloadClick}>
         <Download className="-ml-1 mr-2 inline h-4 w-4" />
-        Download
+        ჩამოტვირთვა
       </Button>
     ))
     .otherwise(() => null);

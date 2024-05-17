@@ -56,7 +56,7 @@ export const AdminDocumentResults = () => {
     <div>
       <Input
         type="search"
-        placeholder="მოძებნეთ დოკუმენტის სახელით"
+        placeholder="მოძებნეთ დოკუმენტი სახელით"
         value={term}
         onChange={(e) => setTerm(e.target.value)}
       />
@@ -70,7 +70,7 @@ export const AdminDocumentResults = () => {
               cell: ({ row }) => <LocaleDate date={row.original.createdAt} />,
             },
             {
-              header: 'სათაური',
+              header: 'სახელი',
               accessorKey: 'title',
               cell: ({ row }) => {
                 return (

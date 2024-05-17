@@ -50,8 +50,8 @@ export const DeleteDocumentDialog = ({
       router.refresh();
 
       toast({
-        title: 'Document deleted',
-        description: `"${documentTitle}" has been successfully deleted`,
+        title: 'დოკუმენტი წაშლილია',
+        description: `"${documentTitle}" წარმატებით წაიშალა!`,
         duration: 5000,
       });
 
@@ -71,8 +71,8 @@ export const DeleteDocumentDialog = ({
       await deleteDocument({ id, teamId });
     } catch {
       toast({
-        title: 'Something went wrong',
-        description: 'This document could not be deleted at this time. Please try again.',
+        title: 'დაფიქსირდა ხარვეზი',
+        description: 'ამ დოკუმენტის წაშლისას დაფიქსირდა ხარვეზი. გთხოვთ თავიდან სცადეთ.',
         variant: 'destructive',
         duration: 7500,
       });
@@ -88,10 +88,10 @@ export const DeleteDocumentDialog = ({
     <Dialog open={open} onOpenChange={(value) => !isLoading && onOpenChange(value)}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Are you sure?</DialogTitle>
+          <DialogTitle>დარწმუნებული ხართ?</DialogTitle>
 
           <DialogDescription>
-            You are about to {canManageDocument ? 'delete' : 'hide'}{' '}
+            თქვენ ახლა {canManageDocument ? 'წაშლით' : 'დაფარავთ'}{' '}
             <strong>"{documentTitle}"</strong>
           </DialogDescription>
         </DialogHeader>
@@ -101,33 +101,33 @@ export const DeleteDocumentDialog = ({
             {match(status)
               .with(DocumentStatus.DRAFT, () => (
                 <AlertDescription>
-                  Please note that this action is <strong>irreversible</strong>. Once confirmed,
-                  this document will be permanently deleted.
+                  გთხოვთ, გაითვალისწინოთ, რომ ეს ქმედება <strong>შეუქცევადია</strong>. დადასტურების
+                  შემდეგ, ეს დოკუმენტი სამუდამოდ წაიშლება.
                 </AlertDescription>
               ))
               .with(DocumentStatus.PENDING, () => (
                 <AlertDescription>
                   <p>
-                    Please note that this action is <strong>irreversible</strong>.
+                    გთხოვთ, გაითვალისწინოთ, რომ ეს ქმედება <strong>შეუქცევადია</strong>.
                   </p>
 
-                  <p className="mt-1">Once confirmed, the following will occur:</p>
+                  <p className="mt-1">დადასტურების შემდეგ მოხდება შემდეგი:</p>
 
                   <ul className="mt-0.5 list-inside list-disc">
-                    <li>Document will be permanently deleted</li>
-                    <li>Document signing process will be cancelled</li>
-                    <li>All inserted signatures will be voided</li>
-                    <li>All recipients will be notified</li>
+                    <li>დოკუმენტი სამუდამოდ წაიშლება</li>
+                    <li>დოკუმენტის ხელმოწერის პროცესი გაუქმდება</li>
+                    <li>ყველა ჩასმული ხელმოწერა გაუქმდება</li>
+                    <li>ყველა მიმღებს მიუვა შეტყობინება</li>
                   </ul>
                 </AlertDescription>
               ))
               .with(DocumentStatus.COMPLETED, () => (
                 <AlertDescription>
-                  <p>By deleting this document, the following will occur:</p>
+                  <p>ამ დოკუმენტის წაშლით, მოხდება შემდეგი:</p>
 
                   <ul className="mt-0.5 list-inside list-disc">
-                    <li>The document will be hidden from your account</li>
-                    <li>Recipients will still retain their copy of the document</li>
+                    <li>დოკუმენტი დაიფარება თქვენი ანგარიშიდან</li>
+                    <li>მიმღებები კვლავ შეინარჩუნებენ დოკუმენტის ასლს</li>
                   </ul>
                 </AlertDescription>
               ))
@@ -136,7 +136,7 @@ export const DeleteDocumentDialog = ({
         ) : (
           <Alert variant="warning" className="-mt-1">
             <AlertDescription>
-              Please contact support if you would like to revert this action.
+              გთხოვთ დაგვიკავშირდეთ, თუ გსურთ ამ ქმედების დაბრუნება.
             </AlertDescription>
           </Alert>
         )}
@@ -146,13 +146,13 @@ export const DeleteDocumentDialog = ({
             type="text"
             value={inputValue}
             onChange={onInputChange}
-            placeholder="Type 'delete' to confirm"
+            placeholder="დაწერეთ 'delete' დადასტურებისთვის"
           />
         )}
 
         <DialogFooter>
           <Button type="button" variant="secondary" onClick={() => onOpenChange(false)}>
-            Cancel
+            დახურვა
           </Button>
 
           <Button
@@ -162,7 +162,7 @@ export const DeleteDocumentDialog = ({
             disabled={!isDeleteEnabled && canManageDocument}
             variant="destructive"
           >
-            {canManageDocument ? 'Delete' : 'Hide'}
+            {canManageDocument ? 'წაშლა' : 'დაფარვა'}
           </Button>
         </DialogFooter>
       </DialogContent>

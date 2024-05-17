@@ -15,16 +15,19 @@ export default async function Subscriptions() {
 
   return (
     <div>
-      <h2 className="text-4xl font-semibold">Manage subscriptions</h2>
+      <h2 className="text-4xl font-semibold">
+        {/* Manage subscriptions */}
+        პაკეტების მართვა
+      </h2>
       <div className="mt-8">
         <Table>
           <TableHeader>
             <TableRow>
               <TableHead>ID</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Created At</TableHead>
-              <TableHead>Ends On</TableHead>
-              <TableHead>User ID</TableHead>
+              <TableHead>სტატუსი</TableHead>
+              <TableHead>შექმნილია</TableHead>
+              <TableHead>მთავრდება</TableHead>
+              <TableHead>მომხმარებლის ID</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>

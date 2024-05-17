@@ -35,7 +35,7 @@ export const SigningAuthPageView = ({ email }: SigningAuthPageViewProps) => {
     } catch {
       toast({
         title: 'დაფიქსირდა ხარვეზი',
-        description: 'ანგარიშიდან გამოსვლა ამჯერად ვერ მოხერხდა. გთხოვთ, თავიდან სცადეთ.',
+        description: 'ანგარიშიდან გამოსვლა ამჯერად ვერ მოხერხდა. გთხოვთ თავიდან სცადეთ.',
         duration: 10000,
         variant: 'destructive',
       });

@@ -52,17 +52,17 @@ export const UserPasskeysDataTable = () => {
     <DataTable
       columns={[
         {
-          header: 'Name',
+          header: 'სახელი',
           accessorKey: 'name',
         },
         {
-          header: 'Created',
+          header: 'შეიქმნა',
           accessorKey: 'createdAt',
           cell: ({ row }) => DateTime.fromJSDate(row.original.createdAt).toRelative(),
         },
 
         {
-          header: 'Last used',
+          header: 'ბოლო გამოყენება',
           accessorKey: 'updatedAt',
           cell: ({ row }) =>
             row.original.lastUsedAt

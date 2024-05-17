@@ -13,7 +13,7 @@ export default function SettingsSecurityActivityPage() {
   return (
     <div>
       <SettingsHeader
-        title="Security activity"
+        title="უსაფრთხოება"
         subtitle="თქვენს ანგარიშთან დაკავშირებული უსაფრთხოების ყველა ბოლო აქტივობის ნახვა."
         hideDivider={true}
       >

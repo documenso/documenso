@@ -95,7 +95,7 @@ export function UseTemplateDialog({
 
       toast({
         title: 'დოკუმენტი შექმნილია',
-        description: 'Your document has been created from the template successfully.',
+        description: 'თქვენი დოკუმენტი შაბლონიდან წარმატებით შეიქმნა!',
         duration: 5000,
       });
 
@@ -103,7 +103,7 @@ export function UseTemplateDialog({
     } catch (err) {
       toast({
         title: 'დაფიქსირდა ხარვეზი',
-        description: 'An error occurred while creating document from template.',
+        description: 'შაბლონიდან დოკუმენტის შექმნისას დაფიქსირდა ხარვეზი.',
         variant: 'destructive',
       });
     }
@@ -141,7 +141,7 @@ export function UseTemplateDialog({
             >
               <div className="flex-1">
                 <Label htmlFor={`recipient-${recipient.id}-email`}>
-                  ელ. ფოსტა
+                  ელ.ფოსტა
                   <span className="text-destructive ml-1 inline-block font-medium">*</span>
                 </Label>
 
@@ -204,14 +204,16 @@ export function UseTemplateDialog({
                         <SelectItem value={RecipientRole.APPROVER}>
                           <div className="flex items-center">
                             <span className="mr-2">{ROLE_ICONS[RecipientRole.APPROVER]}</span>
-                            Approver
+                            დამამტკივებელი
+                            {/* Approver */}
                           </div>
                         </SelectItem>
 
                         <SelectItem value={RecipientRole.VIEWER}>
                           <div className="flex items-center">
                             <span className="mr-2">{ROLE_ICONS[RecipientRole.VIEWER]}</span>
-                            Viewer
+                            {/* Viewer */}
+                            მხილველი
                           </div>
                         </SelectItem>
                       </SelectContent>

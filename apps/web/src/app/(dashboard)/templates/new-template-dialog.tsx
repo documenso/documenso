@@ -84,7 +84,7 @@ export const NewTemplateDialog = ({ teamId, templateRootPath }: NewTemplateDialo
     } catch {
       toast({
         title: 'დაფიქსირდა ხარვეზი',
-        description: 'გთხოვთ სცადეთ თავიდან.',
+        description: 'გთხოვთ თავიდან სცადეთ.',
         variant: 'destructive',
       });
     }
@@ -112,7 +112,7 @@ export const NewTemplateDialog = ({ teamId, templateRootPath }: NewTemplateDialo
       });
 
       toast({
-        title: 'შაბლონის დოკუმენტი ატვირთვა',
+        title: 'შაბლონის დოკუმენტი ატვირთულია',
         description:
           'თქვენი დოკუმენტი წარმატებით აიტვირთა. თქვენ გადამისამართდებით შაბლონების გვერდზე.',
         duration: 5000,

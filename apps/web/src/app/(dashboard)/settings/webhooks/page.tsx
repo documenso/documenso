@@ -22,8 +22,8 @@ export default function WebhookPage() {
   return (
     <div>
       <SettingsHeader
-        title="Webhooks"
-        subtitle="On this page, you can create new Webhooks and manage the existing ones."
+        title="ვებჰუკები"
+        subtitle="ამ გვერდზე შეგიძლიათ შექმნათ ახალი ვებჰუკები და მართოთ არსებულები."
       >
         <CreateWebhookDialog />
       </SettingsHeader>
@@ -38,7 +38,7 @@ export default function WebhookPage() {
         // TODO: Perhaps add some illustrations here to make the page more engaging
         <div className="mb-4">
           <p className="text-muted-foreground mt-2 text-sm italic">
-            You have no webhooks yet. Your webhooks will be shown here once you create them.
+            თქვენ ჯერ არ გაქვთ ვებჰუკები. ვებჰუქები შექმნისთანავე აქ გამოჩნდება.
           </p>
         </div>
       )}
@@ -78,17 +78,17 @@ export default function WebhookPage() {
                   </p>
 
                   <p className="text-muted-foreground mt-2 text-xs">
-                    Created on{' '}
+                    შექმნილია{' '}
                     <LocaleDate date={webhook.createdAt} format={DateTime.DATETIME_FULL} />
                   </p>
                 </div>
 
                 <div className="mt-4 flex flex-shrink-0 gap-4 sm:mt-0">
                   <Button asChild variant="outline">
-                    <Link href={`/settings/webhooks/${webhook.id}`}>Edit</Link>
+                    <Link href={`/settings/webhooks/${webhook.id}`}>რედაქტირება</Link>
                   </Button>
                   <DeleteWebhookDialog webhook={webhook}>
-                    <Button variant="destructive">Delete</Button>
+                    <Button variant="destructive">წაშლა</Button>
                   </DeleteWebhookDialog>
                 </div>
               </div>

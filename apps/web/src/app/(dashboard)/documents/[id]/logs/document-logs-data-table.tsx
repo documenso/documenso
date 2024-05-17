@@ -70,12 +70,12 @@ export const DocumentLogsDataTable = ({ documentId }: DocumentLogsDataTableProps
     <DataTable
       columns={[
         {
-          header: 'Time',
+          header: 'დრო',
           accessorKey: 'createdAt',
           cell: ({ row }) => <LocaleDate format={dateFormat} date={row.original.createdAt} />,
         },
         {
-          header: 'User',
+          header: 'მომხმარებელი',
           accessorKey: 'name',
           cell: ({ row }) =>
             row.original.name || row.original.email ? (

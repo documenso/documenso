@@ -32,7 +32,7 @@ export const AdminActions = ({ className, document }: AdminActionsProps) => {
       },
       onError: () => {
         toast({
-          title: 'Error',
+          title: 'დაფიქსირდა ხარვეზი',
           description: 'Failed to reseal document',
           variant: 'destructive',
         });

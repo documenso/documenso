@@ -62,37 +62,37 @@ export const DocumentLogsPageView = async ({ params, team }: DocumentLogsPageVie
 
   const documentInformation: { description: string; value: string }[] = [
     {
-      description: 'Document title',
+      description: 'დოკუმენტის სახელი',
       value: document.title,
     },
     {
-      description: 'Document ID',
+      description: 'დოკუმენტის ID',
       value: document.id.toString(),
     },
     {
-      description: 'Document status',
+      description: 'დოკუმენტის სტატუსი',
       value: FRIENDLY_STATUS_MAP[document.status].label,
     },
     {
-      description: 'Created by',
+      description: 'შექმნა',
       value: document.User.name
         ? `${document.User.name} (${document.User.email})`
         : document.User.email,
     },
     {
-      description: 'Date created',
+      description: 'შექმნის თარიღი',
       value: DateTime.fromJSDate(document.createdAt)
         .setLocale(locale)
         .toLocaleString(DateTime.DATETIME_MED_WITH_SECONDS),
     },
     {
-      description: 'Last updated',
+      description: 'ბოლო განახლება',
       value: DateTime.fromJSDate(document.updatedAt)
         .setLocale(locale)
         .toLocaleString(DateTime.DATETIME_MED_WITH_SECONDS),
     },
     {
-      description: 'Time zone',
+      description: 'დროის სარტყელი',
       value: document.documentMeta?.timezone ?? 'N/A',
     },
   ];
@@ -114,7 +114,7 @@ export const DocumentLogsPageView = async ({ params, team }: DocumentLogsPageVie
         className="flex items-center text-[#7AC455] hover:opacity-80"
       >
         <ChevronLeft className="mr-2 inline-block h-5 w-5" />
-        Document
+        დოკუმენტი
       </Link>
 
       <div className="flex flex-col justify-between sm:flex-row">
@@ -153,7 +153,7 @@ export const DocumentLogsPageView = async ({ params, team }: DocumentLogsPageVie
           ))}
 
           <div className="text-foreground text-sm">
-            <h3 className="font-semibold">Recipients</h3>
+            <h3 className="font-semibold">მიმღებები</h3>
             <ul className="text-muted-foreground list-inside list-disc">
               {recipients.map((recipient) => (
                 <li key={`recipient-${recipient.id}`}>

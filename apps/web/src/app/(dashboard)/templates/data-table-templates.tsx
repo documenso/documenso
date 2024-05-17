@@ -79,21 +79,21 @@ export const TemplatesDataTable = ({
       <DataTable
         columns={[
           {
-            header: 'Created',
+            header: 'შეიქმნა',
             accessorKey: 'createdAt',
             cell: ({ row }) => <LocaleDate date={row.original.createdAt} />,
           },
           {
-            header: 'Title',
+            header: 'სათაური',
             cell: ({ row }) => <DataTableTitle row={row.original} />,
           },
           {
-            header: 'Type',
+            header: 'ტიპი',
             accessorKey: 'type',
             cell: ({ row }) => <TemplateType type={row.original.type} />,
           },
           {
-            header: 'Actions',
+            header: 'პარამეტრები',
             accessorKey: 'actions',
             cell: ({ row }) => {
               return (

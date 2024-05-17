@@ -31,7 +31,7 @@ export type ClaimAccountProps = {
 
 export const ZClaimAccountFormSchema = z
   .object({
-    name: z.string().trim().min(1, { message: 'გთხოვთ, შეიყვანოთ სწორი სახელი.' }),
+    name: z.string().trim().min(1, { message: 'გთხოვთ შეიყვანოთ სწორი სახელი.' }),
     email: z.string().email().min(1),
     password: ZPasswordSchema,
   })
@@ -41,7 +41,7 @@ export const ZClaimAccountFormSchema = z
       return !password.includes(name) && !password.includes(email.split('@')[0]);
     },
     {
-      message: 'პაროლი უნდა იყოს იდენტური და არ უნდა ეფუძნებოდეს პერსონალურ ინფორმაციას',
+      message: 'პაროლი უნდა იყოს უნიკალური და არ უნდა ეფუძნებოდეს პერსონალურ ინფორმაციას',
       path: ['password'],
     },
   );
@@ -71,9 +71,9 @@ export const ClaimAccount = ({ defaultName, defaultEmail }: ClaimAccountProps) =
       router.push(`/unverified-account`);
 
       toast({
-        title: 'Rწარმატებული რეგისტრაცია',
+        title: 'წარმატებული რეგისტრაცია',
         description:
-          'თქვენ წარმატებით დარეგისტრირდით. გთხოვთ, გადაამოწმოთ თქვენი ანგარიში ელ. ფოსტაში მიღებულ ბმულზე გადასვლით.',
+          'თქვენ წარმატებით დარეგისტრირდით. გთხოვთ დაადასტუროთ თქვენი ანგარიში ელ.ფოსტაში მიღებულ ბმულზე გადასვლით.',
         duration: 5000,
       });
 
@@ -92,7 +92,7 @@ export const ClaimAccount = ({ defaultName, defaultEmail }: ClaimAccountProps) =
         toast({
           title: 'დაფიქსირდა ხარვეზი',
           description:
-            'დაფიქსირდა ხარვეზი თქვენი დარეგისტრირების მცდელობისას. Გთხოვთ სცადოთ მოგვიანებით ან დაგვიკავშირდით.',
+            'დაფიქსირდა ხარვეზი თქვენი დარეგისტრირების მცდელობისას. გთხოვთ თავიდან სცადოთ ან დაგვიკავშირდით.',
           variant: 'destructive',
         });
       }
@@ -122,7 +122,7 @@ export const ClaimAccount = ({ defaultName, defaultEmail }: ClaimAccountProps) =
               control={form.control}
               render={({ field }) => (
                 <FormItem className="mt-4">
-                  <FormLabel>ელ. ფოსტა</FormLabel>
+                  <FormLabel>ელ.ფოსტა</FormLabel>
                   <FormControl>
                     <Input {...field} placeholder="Enter your email" />
                   </FormControl>
@@ -145,7 +145,8 @@ export const ClaimAccount = ({ defaultName, defaultEmail }: ClaimAccountProps) =
             />
 
             <Button type="submit" className="mt-6 w-full" loading={form.formState.isSubmitting}>
-              Claim account
+              {/* Claim account */}
+              ანგარიშის გააქტიურება
             </Button>
           </fieldset>
         </form>

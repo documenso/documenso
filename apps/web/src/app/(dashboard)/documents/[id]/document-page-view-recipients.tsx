@@ -26,7 +26,7 @@ export const DocumentPageViewRecipients = ({
   return (
     <section className="dark:bg-background border-border bg-widget flex flex-col rounded-xl border">
       <div className="flex flex-row items-center justify-between px-4 py-3">
-        <h1 className="text-foreground font-medium">Recipients</h1>
+        <h1 className="text-foreground font-medium">მიმღებები</h1>
 
         {document.status !== DocumentStatus.COMPLETED && (
           <Link
@@ -45,7 +45,9 @@ export const DocumentPageViewRecipients = ({
 
       <ul className="text-muted-foreground divide-y border-t">
         {recipients.length === 0 && (
-          <li className="flex flex-col items-center justify-center py-6 text-sm">No recipients</li>
+          <li className="flex flex-col items-center justify-center py-6 text-sm">
+            მიმღები არ არის
+          </li>
         )}
 
         {recipients.map((recipient) => (
@@ -67,19 +69,19 @@ export const DocumentPageViewRecipients = ({
                     .with(RecipientRole.APPROVER, () => (
                       <>
                         <CheckIcon className="mr-1 h-3 w-3" />
-                        Approved
+                        დამტკიცებულია
                       </>
                     ))
                     .with(RecipientRole.CC, () =>
                       document.status === DocumentStatus.COMPLETED ? (
                         <>
                           <MailIcon className="mr-1 h-3 w-3" />
-                          Sent
+                          გაგზავნილია
                         </>
                       ) : (
                         <>
                           <CheckIcon className="mr-1 h-3 w-3" />
-                          Ready
+                          მხადაა
                         </>
                       ),
                     )
@@ -87,13 +89,14 @@ export const DocumentPageViewRecipients = ({
                     .with(RecipientRole.SIGNER, () => (
                       <>
                         <SignatureIcon className="mr-1 h-3 w-3" />
-                        Signed
+                        ხელმოწერილია
                       </>
                     ))
                     .with(RecipientRole.VIEWER, () => (
                       <>
                         <MailOpenIcon className="mr-1 h-3 w-3" />
-                        Viewed
+                        {/* Viewed */}
+                        გახსნილია
                       </>
                     ))
                     .exhaustive()}
@@ -104,7 +107,8 @@ export const DocumentPageViewRecipients = ({
               recipient.signingStatus === SigningStatus.NOT_SIGNED && (
                 <Badge variant="secondary">
                   <Clock className="mr-1 h-3 w-3" />
-                  Pending
+                  {/* Pending */}
+                  ველოდებით
                 </Badge>
               )}
           </li>

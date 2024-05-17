@@ -149,7 +149,7 @@ export const DocumentActionAuthPasskey = ({
     return (
       <div className="h-28 space-y-4">
         <Alert variant="destructive">
-          <AlertDescription>Something went wrong while loading your passkeys.</AlertDescription>
+          <AlertDescription>თქვენი passkey ჩატვირთვისას დაფიქსირდა ხარვეზი.</AlertDescription>
         </Alert>
 
         <DialogFooter>
@@ -228,10 +228,10 @@ export const DocumentActionAuthPasskey = ({
 
             {formErrorCode && (
               <Alert variant="destructive">
-                <AlertTitle>Unauthorized</AlertTitle>
+                <AlertTitle>არა ავტორიზებული</AlertTitle>
                 <AlertDescription>
-                  ჩვენ ვერ შევძელით თქვენი დეტალების გადამოწმება. გთხოვთ, სცადოთ ხელახლა ან
-                  დაგვიკავშირდეთ
+                  ჩვენ ვერ შევძელით თქვენი დეტალების გადამოწმება. გთხოვთ სცადოთ ხელახლა ან
+                  დაგვიკავშირდეთ.
                 </AlertDescription>
               </Alert>
             )}

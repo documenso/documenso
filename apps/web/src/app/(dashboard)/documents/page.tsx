@@ -11,7 +11,7 @@ export type DocumentsPageProps = {
 };
 
 export const metadata: Metadata = {
-  title: 'Documents',
+  title: 'დოკუმენტები',
 };
 
 export default async function DocumentsPage({ searchParams = {} }: DocumentsPageProps) {

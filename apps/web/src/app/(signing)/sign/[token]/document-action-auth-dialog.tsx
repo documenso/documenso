@@ -58,7 +58,7 @@ export const DocumentActionAuthDialog = ({
           <DialogTitle>{title || 'Sign field'}</DialogTitle>
 
           <DialogDescription>
-            {description || 'Reauthentication is required to sign this field'}
+            {description || 'ამ ველზე ხელმოწერისთვის საჭიროა ხელახალი ავთენტიფიკაცია'}
           </DialogDescription>
         </DialogHeader>
 

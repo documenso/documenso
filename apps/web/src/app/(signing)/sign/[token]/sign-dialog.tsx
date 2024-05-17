@@ -65,7 +65,7 @@ export const SignDialog = ({
           onClick={fieldsValidated}
           loading={isSubmitting}
         >
-          {isComplete ? 'Complete' : 'Next field'}
+          {isComplete ? 'დასრულება' : 'შემდეგი ველი'}
         </Button>
       </DialogTrigger>
 
@@ -121,9 +121,10 @@ export const SignDialog = ({
               loading={isSubmitting}
               onClick={onSignatureComplete}
             >
-              {role === RecipientRole.VIEWER && 'Mark as Viewed'}
-              {role === RecipientRole.SIGNER && 'Sign'}
-              {role === RecipientRole.APPROVER && 'Approve'}
+              {role === RecipientRole.VIEWER && 'ნანახად მონიშვნა'}
+              {role === RecipientRole.SIGNER && 'ხელის მოწერა'}
+              {/* {role === RecipientRole.APPROVER && 'Approve'} */}
+              {role === RecipientRole.APPROVER && 'დამტკიცება'}
             </Button>
           </div>
         </DialogFooter>

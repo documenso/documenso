@@ -52,7 +52,7 @@ export default async function ApiTokensPage({ params }: ApiTokensPageProps) {
       {tokens.length === 0 && (
         <div className="mb-4">
           <p className="text-muted-foreground mt-2 text-sm italic">
-            თქვენი ტოკენები აქ გამოჩნდება, როგორც კი მათ შექმნით.
+            თქვენი ტოკენები შექმნისთანავე აქ გამოჩნდება.
           </p>
         </div>
       )}

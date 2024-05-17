@@ -59,7 +59,7 @@ const MultiSelectRoleCombobox = ({ listValues, onChange }: ComboboxProps) => {
       <PopoverContent className="w-[200px] p-0">
         <Command>
           <CommandInput placeholder={selectedValues.join(', ')} />
-          <CommandEmpty>No value found.</CommandEmpty>
+          <CommandEmpty>მნიშვნელობა ვერ მოიძებნა.</CommandEmpty>
           <CommandGroup>
             {allRoles.map((value: string, i: number) => (
               <CommandItem key={i} onSelect={() => handleSelect(value)}>

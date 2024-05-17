@@ -33,7 +33,7 @@ export const AdminNav = ({ className, ...props }: AdminNavProps) => {
       >
         <Link href="/admin/stats">
           <BarChart3 className="mr-2 h-5 w-5" />
-          Stats
+          სტატისტიკა
         </Link>
       </Button>
 
@@ -47,7 +47,7 @@ export const AdminNav = ({ className, ...props }: AdminNavProps) => {
       >
         <Link href="/admin/users">
           <User2 className="mr-2 h-5 w-5" />
-          Users
+          მომხმარებლები
         </Link>
       </Button>
 
@@ -61,7 +61,7 @@ export const AdminNav = ({ className, ...props }: AdminNavProps) => {
       >
         <Link href="/admin/documents">
           <FileStack className="mr-2 h-5 w-5" />
-          Documents
+          დოკუმენტები
         </Link>
       </Button>
 
@@ -75,7 +75,8 @@ export const AdminNav = ({ className, ...props }: AdminNavProps) => {
       >
         <Link href="/admin/subscriptions">
           <Wallet2 className="mr-2 h-5 w-5" />
-          Subscriptions
+          {/* Subscriptions */}
+          პაკეტები
         </Link>
       </Button>
 
@@ -89,7 +90,7 @@ export const AdminNav = ({ className, ...props }: AdminNavProps) => {
       >
         <Link href="/admin/site-settings">
           <Settings className="mr-2 h-5 w-5" />
-          Site Settings
+          გვერდის პარამეტრები
         </Link>
       </Button>
     </div>

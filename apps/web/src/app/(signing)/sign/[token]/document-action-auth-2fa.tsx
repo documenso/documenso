@@ -101,14 +101,14 @@ export const DocumentActionAuth2FA = ({
           <AlertDescription>
             <p>
               {recipient.role === RecipientRole.VIEWER && actionTarget === 'DOCUMENT'
-                ? 'You need to setup 2FA to mark this document as viewed.'
+                ? 'თქვენ უნდა დააყენოთ ორფაქტორიანი ავთენტიფიკაცია (2FA), ეს დოკუმენტი ნანახად, რომ მოინიშნოს.'
                 : `You need to setup 2FA to ${actionVerb.toLowerCase()} this ${actionTarget.toLowerCase()}.`}
             </p>
 
             {user?.identityProvider === 'DOCUMENSO' && (
               <p className="mt-2">
-                2FA-ს ჩართვით, თქვენ მოგიწევთ შეიყვანოთ კოდი თქვენი ავტორიზაციის აპლიკაციიდან ყოველი
-                შემოსვლის დროს.
+                2FA-ს გააქტიურებით, თქვენ მოგიწევთ შეიყვანოთ კოდი თქვენი ავთენტიფიკაციის
+                აპლიკაციიდან ყოველი შემოსვლის დროს.
               </p>
             )}
           </AlertDescription>
@@ -148,10 +148,10 @@ export const DocumentActionAuth2FA = ({
 
             {formErrorCode && (
               <Alert variant="destructive">
-                <AlertTitle>Unauthorized</AlertTitle>
+                <AlertTitle>არა ავტორიზებული</AlertTitle>
                 <AlertDescription>
-                  ჩვენ ვერ შევძელით თქვენი დეტალების გადამოწმება. გთხოვთ, სცადოთ ხელახლა ან
-                  დაგვიკავშირდეთ
+                  ჩვენ ვერ შევძელით თქვენი დეტალების გადამოწმება. გთხოვთ სცადოთ ხელახლა ან
+                  დაგვიკავშირდეთ.
                 </AlertDescription>
               </Alert>
             )}

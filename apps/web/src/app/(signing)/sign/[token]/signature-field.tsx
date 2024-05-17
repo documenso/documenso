@@ -188,7 +188,7 @@ export const SignatureField = ({ field, recipient }: SignatureFieldProps) => {
       <Dialog open={showSignatureModal} onOpenChange={setShowSignatureModal}>
         <DialogContent>
           <DialogTitle>
-            Sign as {recipient.name}{' '}
+            მოაწერეთ ხელი როგორც {recipient.name}{' '}
             <span className="text-muted-foreground">({recipient.email})</span>
           </DialogTitle>
 

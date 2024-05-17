@@ -65,14 +65,14 @@ export default function UserPage({ params }: { params: { id: number } }) {
       router.refresh();
 
       toast({
-        title: 'Profile updated',
-        description: 'Your profile has been updated.',
+        title: 'პროფილი განახლებულია',
+        description: 'თქვენი პროფილი წარმატებით განახლდა.',
         duration: 5000,
       });
     } catch (e) {
       toast({
-        title: 'Error',
-        description: 'An error occurred while updating your profile.',
+        title: 'დაფიქსირდა ხარვეზი',
+        description: 'პროფილის განახლებისას დაფიქსირდა ხარვეზი.',
         variant: 'destructive',
       });
     }
@@ -80,7 +80,10 @@ export default function UserPage({ params }: { params: { id: number } }) {
 
   return (
     <div>
-      <h2 className="text-4xl font-semibold">Manage {user?.name}'s profile</h2>
+      <h2 className="text-4xl font-semibold">
+        {/* Manage {user?.name}'s profile */}
+        პროფილის მართვა
+      </h2>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
           <fieldset className="mt-6 flex w-full flex-col gap-y-4">
@@ -89,7 +92,7 @@ export default function UserPage({ params }: { params: { id: number } }) {
               name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-muted-foreground">Name</FormLabel>
+                  <FormLabel className="text-muted-foreground">სახელი</FormLabel>
                   <FormControl>
                     <Input type="text" {...field} value={field.value ?? ''} />
                   </FormControl>
@@ -102,7 +105,7 @@ export default function UserPage({ params }: { params: { id: number } }) {
               name="email"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-muted-foreground">Email</FormLabel>
+                  <FormLabel className="text-muted-foreground">ელ.ფოსტა</FormLabel>
                   <FormControl>
                     <Input type="text" {...field} />
                   </FormControl>
@@ -117,7 +120,7 @@ export default function UserPage({ params }: { params: { id: number } }) {
               render={({ field: { onChange } }) => (
                 <FormItem>
                   <fieldset className="flex flex-col gap-2">
-                    <FormLabel className="text-muted-foreground">Roles</FormLabel>
+                    <FormLabel className="text-muted-foreground">როლები</FormLabel>
                     <FormControl>
                       <MultiSelectRoleCombobox
                         listValues={roles}
@@ -132,7 +135,7 @@ export default function UserPage({ params }: { params: { id: number } }) {
 
             <div className="mt-4">
               <Button type="submit" loading={form.formState.isSubmitting}>
-                Update user
+                მომხმარებლის განახლება
               </Button>
             </div>
           </fieldset>

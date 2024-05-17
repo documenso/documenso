@@ -63,14 +63,14 @@ export const DataTableActionButton = ({ row, team }: DataTableActionButtonProps)
       const documentData = document?.documentData;
 
       if (!documentData) {
-        throw Error('No document available');
+        throw Error('დოკუმენტი არ არის ხელმისაწვდომი');
       }
 
       await downloadPDF({ documentData, fileName: row.title });
     } catch (err) {
       toast({
-        title: 'Something went wrong',
-        description: 'An error occurred while downloading your document.',
+        title: 'დაფიქსირდა ხარვეზი',
+        description: 'დოკუმენტის ჩამოტვირთვისას დაფიქსირდა ხარვეზი.',
         variant: 'destructive',
       });
     }
@@ -108,19 +108,19 @@ export const DataTableActionButton = ({ row, team }: DataTableActionButtonProps)
             .with(RecipientRole.SIGNER, () => (
               <>
                 <Pencil className="-ml-1 mr-2 h-4 w-4" />
-                Sign
+                მოაწერეთ ხელი
               </>
             ))
             .with(RecipientRole.APPROVER, () => (
               <>
                 <CheckCircle className="-ml-1 mr-2 h-4 w-4" />
-                Approve
+                დაამტკიცეთ
               </>
             ))
             .otherwise(() => (
               <>
                 <EyeIcon className="-ml-1 mr-2 h-4 w-4" />
-                View
+                იხილეთ
               </>
             ))}
         </Link>
@@ -129,13 +129,13 @@ export const DataTableActionButton = ({ row, team }: DataTableActionButtonProps)
     .with({ isPending: true, isSigned: true }, () => (
       <Button className="w-32" disabled={true}>
         <EyeIcon className="-ml-1 mr-2 h-4 w-4" />
-        View
+        გახსნა
       </Button>
     ))
     .with({ isComplete: true }, () => (
       <Button className="w-32" onClick={onDownloadClick}>
         <Download className="-ml-1 mr-2 inline h-4 w-4" />
-        Download
+        ჩამოტვირთვა
       </Button>
     ))
     .otherwise(() => <div></div>);

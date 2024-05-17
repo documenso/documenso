@@ -103,7 +103,7 @@ export const SigningForm = ({ document, recipient, fields, redirectUrl }: Signin
     >
       {validateUninsertedFields && uninsertedFields[0] && (
         <FieldToolTip key={uninsertedFields[0].id} field={uninsertedFields[0]} color="warning">
-          დააკლიკეთ ველის ჩასასმელად
+          დააჭირეთ ველის ჩასასმელად
         </FieldToolTip>
       )}
 
@@ -123,7 +123,7 @@ export const SigningForm = ({ document, recipient, fields, redirectUrl }: Signin
           {recipient.role === RecipientRole.VIEWER ? (
             <>
               <p className="text-muted-foreground mt-2 text-sm">
-                Please mark as viewed to complete
+                დასასრულებლად, გთხოვთ მონიშნოთ ნანახად
               </p>
 
               <hr className="border-border mb-8 mt-4" />
@@ -156,7 +156,7 @@ export const SigningForm = ({ document, recipient, fields, redirectUrl }: Signin
           ) : (
             <>
               <p className="text-muted-foreground mt-2 text-sm">
-                გთხოვთ, გადახედოთ დოკუმენტს ხელმოწერამდე.
+                გთხოვთ გადახედოთ დოკუმენტს ხელმოწერამდე.
               </p>
 
               <hr className="border-border mb-8 mt-4" />

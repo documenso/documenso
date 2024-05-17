@@ -63,12 +63,12 @@ export const UserSecurityActivityDataTable = () => {
     <DataTable
       columns={[
         {
-          header: 'Date',
+          header: 'თარიღი',
           accessorKey: 'createdAt',
           cell: ({ row }) => <LocaleDate format={dateFormat} date={row.original.createdAt} />,
         },
         {
-          header: 'Device',
+          header: 'მოწყობილობა',
           cell: ({ row }) => {
             if (!row.original.userAgent) {
               return 'N/A';
@@ -92,7 +92,7 @@ export const UserSecurityActivityDataTable = () => {
           },
         },
         {
-          header: 'Browser',
+          header: 'ბრაუზერი',
           cell: ({ row }) => {
             if (!row.original.userAgent) {
               return 'N/A';
@@ -106,12 +106,12 @@ export const UserSecurityActivityDataTable = () => {
           },
         },
         {
-          header: 'IP Address',
+          header: 'IP მისამართი',
           accessorKey: 'ipAddress',
           cell: ({ row }) => row.original.ipAddress ?? 'N/A',
         },
         {
-          header: 'Action',
+          header: 'პარამეტრები',
           accessorKey: 'type',
           cell: ({ row }) => USER_SECURITY_AUDIT_LOG_MAP[row.original.type],
         },

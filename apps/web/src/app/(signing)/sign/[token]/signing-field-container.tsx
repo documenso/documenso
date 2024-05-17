@@ -119,7 +119,8 @@ export const SigningFieldContainer = ({
               className="text-destructive bg-background/40 absolute inset-0 z-10 flex h-full w-full items-center justify-center rounded-md text-sm opacity-0 backdrop-blur-sm duration-200 group-hover:opacity-100"
               onClick={onRemoveSignedFieldClick}
             >
-              Remove
+              {/* remove */}
+              წაშლა
             </button>
           </TooltipTrigger>
 
@@ -132,7 +133,7 @@ export const SigningFieldContainer = ({
           className="text-destructive bg-background/40 absolute inset-0 z-10 flex h-full w-full items-center justify-center rounded-md text-sm opacity-0 backdrop-blur-sm duration-200 group-hover:opacity-100"
           onClick={onRemoveSignedFieldClick}
         >
-          Remove
+          წაშლა
         </button>
       )}
 

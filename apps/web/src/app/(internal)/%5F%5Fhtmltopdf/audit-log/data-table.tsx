@@ -37,11 +37,11 @@ export const AuditLogDataTable = ({ logs }: AuditLogDataTableProps) => {
     <Table overflowHidden>
       <TableHeader>
         <TableRow>
-          <TableHead>Time</TableHead>
+          <TableHead>დრო</TableHead>
           <TableHead>მომხმარებელი</TableHead>
-          <TableHead>Action</TableHead>
-          <TableHead>IP Address</TableHead>
-          <TableHead>Browser</TableHead>
+          <TableHead>პარამეტრები</TableHead>
+          <TableHead>IP მისამართი</TableHead>
+          <TableHead>ბრაუზერი</TableHead>
         </TableRow>
       </TableHeader>
 

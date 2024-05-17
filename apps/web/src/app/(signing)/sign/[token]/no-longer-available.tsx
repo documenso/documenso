@@ -35,7 +35,7 @@ export const NoLongerAvailable = ({
       <div className="relative mt-2 flex w-full flex-col items-center">
         <div className="mt-8 flex items-center text-center text-red-600">
           <Clock8 className="mr-2 h-5 w-5" />
-          <span className="text-sm">Document Cancelled</span>
+          <span className="text-sm">დოკუმენტი გაუქმებულია</span>
         </div>
 
         <h2 className="mt-6 max-w-[35ch] text-center text-2xl font-semibold leading-normal md:text-3xl lg:text-4xl">
@@ -44,7 +44,7 @@ export const NoLongerAvailable = ({
         </h2>
 
         <p className="text-muted-foreground/60 mt-2.5 max-w-[60ch] text-center text-sm font-medium md:text-base">
-          ეს დოკუმენტი გაუქმდა მფლობელის მიერ.
+          ეს დოკუმენტი გააუქმა მფლობელმა
         </p>
 
         {session?.user ? (
@@ -53,12 +53,12 @@ export const NoLongerAvailable = ({
           </Link>
         ) : (
           <p className="text-muted-foreground/60 mt-36 text-sm">
-            Want to send slick signing links like this one?{' '}
+            გსურთ გააგზავნოთ ამ ხელმოწერის მსგავსი ბმულები?{' '}
             <Link
               href="https://documenso.com"
               className="text-documenso-700 hover:text-documenso-600"
             >
-              Check out Documenso.
+              შემოგვიერთდით CHIKOVANI-ზე.
             </Link>
           </p>
         )}

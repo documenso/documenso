@@ -80,7 +80,7 @@ export const EditTemplateForm = ({
       setStep('fields');
     } catch (err) {
       toast({
-        title: 'ხარვეზი',
+        title: 'დაფიქსირდა ხარვეზი',
         description: 'ხელმომწერების დამატებისას დაფიქსირდა ხარვეზი.',
         variant: 'destructive',
       });
@@ -103,7 +103,7 @@ export const EditTemplateForm = ({
       router.push(templateRootPath);
     } catch (err) {
       toast({
-        title: 'ხარვეზი',
+        title: 'დაფიქსირდა ხარვეზი',
         description: 'ხელმომწერების დამატებისას დაფიქსირდა ხარვეზი.',
         variant: 'destructive',
       });

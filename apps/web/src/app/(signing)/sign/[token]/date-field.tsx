@@ -54,7 +54,7 @@ export const DateField = ({
 
   const isDifferentTime = field.inserted && localDateString !== field.customText;
 
-  const tooltipText = `"${field.customText}" will appear on the document as it has a timezone of "${timezone}".`;
+  const tooltipText = `"${field.customText}" გამოჩნდება დოკუმენტზე, რადგან მისი დროის სარტყელია "${timezone}".`;
 
   const onSign = async (authOptions?: TRecipientActionAuth) => {
     try {
@@ -77,7 +77,8 @@ export const DateField = ({
 
       toast({
         title: 'დაფიქსირდა ხარვეზი',
-        description: 'დოკუმენტზე ხელმოწერისას დაფიქსირდა ხარვეზი.',
+        description:
+          'დოკუმენტზე ხელმოწერისას დაფიქსირდა ხარვეზი. გთხოვთ თავიდან სცადოთ ან დაგვიკავშირდეთ.',
         variant: 'destructive',
       });
     }

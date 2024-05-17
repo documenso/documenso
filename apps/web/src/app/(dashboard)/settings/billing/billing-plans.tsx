@@ -56,7 +56,7 @@ export const BillingPlans = ({ prices }: BillingPlansProps) => {
     } catch (_err) {
       toast({
         title: 'დაფიქსირდა ხარვეზი',
-        description: 'დაფიქსირდა ხარვეზი გადახდის სესიის დროს.',
+        description: 'გადახდისას დაფიქსირდა ხარვეზი.',
         variant: 'destructive',
       });
     } finally {
@@ -122,6 +122,7 @@ export const BillingPlans = ({ prices }: BillingPlansProps) => {
                   onClick={() => void onSubscribeClick(price.id)}
                 >
                   გამოიწერეთ
+                  {/* subscribe */}
                 </Button>
               </CardContent>
             </MotionCard>

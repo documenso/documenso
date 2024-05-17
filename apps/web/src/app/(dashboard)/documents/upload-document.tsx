@@ -44,12 +44,12 @@ export const UploadDocument = ({ className, team }: UploadDocumentProps) => {
   const disabledMessage = useMemo(() => {
     if (remaining.documents === 0) {
       return team
-        ? 'Document upload disabled due to unpaid invoices'
-        : 'You have reached your document limit.';
+        ? 'დოკუმენტის ატვირთვა შეუძლებელია დავალიანების გამო'
+        : 'თქვენ მიაღწიეთ დოკუმენტების რაოდენობის ლიმიტს.';
     }
 
     if (!session?.user.emailVerified) {
-      return 'Verify your email to upload documents.';
+      return 'დოკუმენტის ასატვირთად დაადასტურეთ თქვენი ელ.ფოსტა.';
     }
   }, [remaining.documents, session?.user.emailVerified, team]);
 
@@ -71,8 +71,8 @@ export const UploadDocument = ({ className, team }: UploadDocumentProps) => {
       });
 
       toast({
-        title: 'Document uploaded',
-        description: 'Your document has been uploaded successfully.',
+        title: 'დოკუმენტი ატვირთულია',
+        description: 'თქვენი დოკუმენტი წარმატებით აიტვირთა.',
         duration: 5000,
       });
 
@@ -88,14 +88,14 @@ export const UploadDocument = ({ className, team }: UploadDocumentProps) => {
 
       if (error instanceof TRPCClientError) {
         toast({
-          title: 'Error',
+          title: 'დაფიქსირდა ხარვეზი',
           description: error.message,
           variant: 'destructive',
         });
       } else {
         toast({
-          title: 'Error',
-          description: 'An error occurred while uploading your document.',
+          title: 'დაფიქსირდა ხარვეზი',
+          description: 'დოკუმენტის ატვირთვისას დაფიქსირდა ხარვეზი.',
           variant: 'destructive',
         });
       }
@@ -106,8 +106,8 @@ export const UploadDocument = ({ className, team }: UploadDocumentProps) => {
 
   const onFileDropRejected = () => {
     toast({
-      title: 'Your document failed to upload.',
-      description: `File cannot be larger than ${APP_DOCUMENT_UPLOAD_SIZE_LIMIT}MB`,
+      title: 'დოკუმენტი ვერ აიტვირთა.',
+      description: `ფაილის ზომა არ უნდა აჭარბებდეს ${APP_DOCUMENT_UPLOAD_SIZE_LIMIT}MB-ს`,
       duration: 5000,
       variant: 'destructive',
     });

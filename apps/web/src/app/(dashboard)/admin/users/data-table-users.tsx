@@ -91,22 +91,23 @@ export const UsersDataTable = ({
             cell: ({ row }) => <div>{row.original.id}</div>,
           },
           {
-            header: 'Name',
+            header: 'სახელი',
             accessorKey: 'name',
             cell: ({ row }) => <div>{row.original.name}</div>,
           },
           {
-            header: 'Email',
+            header: 'ელ.ფოსტა',
             accessorKey: 'email',
             cell: ({ row }) => <div>{row.original.email}</div>,
           },
           {
-            header: 'Roles',
+            header: 'როლები',
             accessorKey: 'roles',
             cell: ({ row }) => row.original.roles.join(', '),
           },
           {
-            header: 'Subscription',
+            header: 'პაკეტი',
+            // header: 'გამოწერა',
             accessorKey: 'subscription',
             cell: ({ row }) => {
               const foundIndividualSubscription = (row.original.Subscription ?? []).find((sub) =>
@@ -117,7 +118,7 @@ export const UsersDataTable = ({
             },
           },
           {
-            header: 'Documents',
+            header: 'დოკუმენტები',
             accessorKey: 'documents',
             cell: ({ row }) => {
               return <div>{row.original.Document.length}</div>;
@@ -131,7 +132,7 @@ export const UsersDataTable = ({
                 <Button className="w-24" asChild>
                   <Link href={`/admin/users/${row.original.id}`}>
                     <Edit className="-ml-1 mr-2 h-4 w-4" />
-                    Edit
+                    რედაქტირება
                   </Link>
                 </Button>
               );

@@ -32,23 +32,23 @@ export default async function TeamsSettingBillingPage({ params }: TeamsSettingsB
 
   const formatTeamSubscriptionDetails = (subscription: Stripe.Subscription | null) => {
     if (!subscription) {
-      return 'No payment required';
+      return 'გადახდა არ არის საჭირო';
     }
 
     const numberOfSeats = subscription.items.data[0].quantity ?? 0;
 
-    const formattedTeamMemberQuanity = numberOfSeats > 1 ? `${numberOfSeats} members` : '1 member';
+    const formattedTeamMemberQuanity = numberOfSeats > 1 ? `${numberOfSeats} წევრი` : '1 წევრი';
 
     const formattedDate = DateTime.fromSeconds(subscription.current_period_end).toFormat(
       'LLL dd, yyyy',
     );
 
-    return `${formattedTeamMemberQuanity} • Monthly • Renews: ${formattedDate}`;
+    return `${formattedTeamMemberQuanity} • თვიური • განახლება: ${formattedDate}`;
   };
 
   return (
     <div>
-      <SettingsHeader title="Billing" subtitle="Your subscription is currently active." />
+      <SettingsHeader title="Billing" subtitle="თქვენი პაკეტი ამჟამად აქტიურია." />
 
       <Card gradient className="shadow-sm">
         <CardContent className="flex flex-row items-center justify-between p-4">
@@ -66,7 +66,7 @@ export default async function TeamsSettingBillingPage({ params }: TeamsSettingsB
             <div
               title={
                 canManageBilling
-                  ? 'Manage team subscription.'
+                  ? 'მართეთ თქვენი პაკეტი.'
                   : 'You must be an admin of this team to manage billing.'
               }
             >

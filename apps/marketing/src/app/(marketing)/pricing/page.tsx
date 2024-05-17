@@ -7,7 +7,6 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from '@documenso/ui/primitives/accordion';
-import { Button } from '@documenso/ui/primitives/button';
 
 import { PricingTable } from '~/components/(marketing)/pricing-table';
 
@@ -35,14 +34,14 @@ export default function PricingPage() {
         <p className="text-foreground mt-4 text-lg leading-normal">
           გამოცადეთ ჩვენი ფუნქციონალი სრულიად უფასოდ 14 დღის განმავლობაში.
         </p>
-        <p className="text-foreground text-lg leading-normal">დაიწყეთ დღესვე.</p>
+        <p className="text-foreground text-lg leading-normal">დაიწყეთ დღესვე!</p>
       </div>
 
       <div className="mt-12">
         <PricingTable />
       </div>
 
-      <div className="mx-auto mt-36 max-w-2xl">
+      {/* <div className="mx-auto mt-36 max-w-2xl">
         <h2 className="text-center text-2xl font-semibold">
           არცერთი მათგანი არ მუშაობს თქვენთვის? სცადეთ თვითჰოსტინგი!
         </h2>
@@ -60,17 +59,17 @@ export default function PricingPage() {
             </Link>
           </Button>
         </div>
-      </div>
+      </div> */}
 
       <div className="mx-auto mt-36 max-w-2xl">
         {/* FAQ Section */}
 
-        <h2 className="text-4xl font-semibold">FAQs</h2>
+        <h2 className="text-4xl font-semibold">ხშირად დასმული კითხვები</h2>
 
         <Accordion type="multiple" className="mt-8">
           <AccordionItem value="plan-differences">
             <AccordionTrigger className="text-left text-lg font-semibold">
-              რა განსხვავებაა გეგმებს შორის?
+              რა განსხვავებაა პაკეტებს შორის?
             </AccordionTrigger>
 
             <AccordionContent className="text-muted-foreground max-w-prose text-sm leading-relaxed">
@@ -89,28 +88,30 @@ export default function PricingPage() {
             </AccordionTrigger>
 
             <AccordionContent className="text-muted-foreground max-w-prose text-sm leading-relaxed">
-              უსაფრთხოდ. ჩვენი მონაცემთა ცენტრები მდებარეობს ფრანკფურტში (გერმანია) და გვაძლევს
-              საუკეთესოს კონფიდენციალურობის ადგილობრივი კანონები. ჩვენ კარგად ვაცნობიერებთ ჩვენი
-              მონაცემების სენსიტიურ ხასიათს და ვიყენებთ საუკეთესო პრაქტიკებს ჩვენთვის მინდობილი
-              მონაცემების უსაფრთხოებისა და მთლიანობის უზრუნველსაყოფად.
+              ჩვენ სერიოზულად ვუდგებით უსაფრთხოების ზომებს. ვაგროვებთ მხოლოდ აუცილებელ მონაცემებს,
+              როგორიცაა თქვენი სახელი, ელ.ფოსტის მისამართი და თქვენ მიერ ატვირთული დოკუმენტები,
+              ჩვენი სერვისების უზრუნველსაყოფად. თქვენი მონაცემები უსაფრთხოდ ინახება დაშიფვრის
+              გამოყენებით და მუშავდება მხოლოდ დოკუმენტის ხელმოწერისა და თქვენი ანგარიშის
+              მართვისთვის. ჩვენ არ ვუზიარებთ თქვენს ინფორმაციას მესამე მხარეებს თქვენი თანხმობის
+              გარეშე, გარდა იმ შემთხვევისა, როდესაც კანონიერად არის საჭირო. ჩვენი პრაქტიკა
+              რეგულარულად განიხილება უსაფრთხოების უმაღლესი სტანდარტების უზრუნველსაყოფად.
             </AccordionContent>
           </AccordionItem>
 
           <AccordionItem value="should-use-cloud">
             <AccordionTrigger className="text-left text-lg font-semibold">
-              რატომ უნდა გამოვიყენო თქვენი ჰოსტინგის სერვისი?
+              შემიძლია დოკუმენტებზე ხელის მოწერა ნებისმიერი მოწყობილობიდან?
             </AccordionTrigger>
 
             <AccordionContent className="text-muted-foreground max-w-prose text-sm leading-relaxed">
-              ჩვენი ჰოსტირებული ვერსიის გამოყენება დასაწყებად ყველაზე მარტივი გზაა, შეგიძლიათ
-              უბრალოდ გამოიწეროთ და დაიწყეთ თქვენი დოკუმენტების ხელმოწერა. ჩვენ ვზრუნავთ
-              ინფრასტრუქტურაზე, ასე რომ თქვენ შეგიძლიათ ფოკუსირება თქვენს საქმეზე. გარდა ამისა,
-              ჩვენი ჰოსტირებული ვერსიის გამოყენებისას თქვენ სარგებლობთ ჩვენით სანდო ხელმოწერის
-              სერთიფიკატები, რომლებიც გეხმარებათ ნდობის დამყარებაში თქვენს კლიენტებთან.
+              დიახ, ჩვენი პლატფორმა შექმნილია ისე, რომ იყოს სრულად თავსებადი ყველა ძირითად
+              მოწყობილობასთან, მათ შორის დესკტოპებთან, ლეპტოპებთან, ტაბლეტებთან და სმარტფონებთან.
+              სანამ ინტერნეტთან კავშირი გაქვთ, შეგიძლიათ დოკუმენტების ხელმოწერა ნებისმიერ დროს,
+              ნებისმიერ ადგილას.
             </AccordionContent>
           </AccordionItem>
 
-          <AccordionItem value="how-to-contribute">
+          {/* <AccordionItem value="how-to-contribute">
             <AccordionTrigger className="text-left text-lg font-semibold">
               როგორ შემიძლია წვლილი შევიტანო?
             </AccordionTrigger>
@@ -135,29 +136,26 @@ export default function PricingPage() {
               to keep up to date, on what the current priorities are. In any case, we are an open
               community and welcome all input, technical and non-technical ❤️
             </AccordionContent>
-          </AccordionItem>
+          </AccordionItem> */}
 
           <AccordionItem value="can-i-use-documenso-commercially">
             <AccordionTrigger className="text-left text-lg font-semibold">
-              შემიძლია დოკუმენსო კომერციულად გამოვიყენო?
+              რა ტიპის დოკუმენტების ატვირთვა და ხელმოწერა შემიძლია?
             </AccordionTrigger>
 
             <AccordionContent className="text-muted-foreground max-w-prose text-sm leading-relaxed">
-              დიახ! Documenso შემოთავაზებულია GNU AGPL V3 ღია კოდის ლიცენზიით. ეს ნიშნავს შენ
-              შეგიძლიათ გამოიყენოთ იგი უფასოდ და შეცვალოთ იგი თქვენს საჭიროებებზე, თუ თქვენ
-              გამოაქვეყნებთ თქვენს საჭიროებებს იცვლება იმავე ლიცენზიით.
+              ჩვენს პლატფორმაზე შეგიძლიათ PDF ფორმატის ფაილების ატვირთვა და მათზე ხელმოწერა.
             </AccordionContent>
           </AccordionItem>
 
           <AccordionItem value="why-prefer-documenso">
             <AccordionTrigger className="text-left text-lg font-semibold">
-              რატომ უნდა ვამჯობინო Documenso, ვიდრე Signify ან სხვა ხელმოწერის ინსტრუმენტი?
+              საჭიროა თუ არა, რომ ხელმომწერი პირი რეგისტრირებული იყოს CHIKOVANI-ზე?
             </AccordionTrigger>
 
             <AccordionContent className="text-muted-foreground max-w-prose text-sm leading-relaxed">
-              Documenso არის საზოგადოების ძალისხმევა, რათა შეიქმნას ღია და ძლიერი ეკოსისტემა
-              ინსტრუმენტის გარშემო, ყველას თავისუფლად შეუძლია გამოიყენოს და მოერგოს. ჭეშმარიტად
-              გახსნილობით გვინდა შევქმნათ სანდო ინფრასტრუქტურა ინტერნეტის მომავლისთვის.
+              დოკუმენტზე ხელმოსაწერად არ არის საჭირო რეგისტრაციის გავლა. ხელის მოწერა შესაძლებელი
+              იქნება ჩვეულებრივად, როგორც კომპიუტერიდან, ისევე მობილურიდან.
             </AccordionContent>
           </AccordionItem>
 
@@ -167,7 +165,7 @@ export default function PricingPage() {
             </AccordionTrigger>
 
             <AccordionContent className="text-muted-foreground max-w-prose text-sm leading-relaxed">
-              მოხარული ვართ დაგეხმაროთ{' '}
+              მოხარული ვართ დაგეხმაროთ და ვუპასუხოთ თქვენს ნებისმიერ კითხვას. მოგვწერეთ{' '}
               <Link
                 className="text-documenso-700 font-bold"
                 target="_blank"
@@ -176,8 +174,8 @@ export default function PricingPage() {
               >
                 support@documenso.com
               </Link>{' '}
-              ან{' '}
-              <a
+              {/* ან{' '}  */}
+              {/* <a
                 className="text-documenso-700 font-bold"
                 href="https://documen.so/discord"
                 target="_blank"
@@ -186,7 +184,7 @@ export default function PricingPage() {
                 ჩვენს Discord-ის Channel-ში
               </a>{' '}
               please message either Lucas or Timur to get added to the channel if you are not
-              already a member.
+              already a member. */}
             </AccordionContent>
           </AccordionItem>
         </Accordion>

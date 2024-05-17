@@ -49,7 +49,7 @@ export const DataTableSenderFilter = ({ teamId }: DataTableSenderFilterProps) =>
     <MultiSelectCombobox
       emptySelectionPlaceholder={
         <p className="text-muted-foreground font-normal">
-          <span className="text-muted-foreground/70">Sender:</span> All
+          <span className="text-muted-foreground/70">გამგაზბნი:</span> ყველა
         </p>
       }
       enableClearAllButton={true}

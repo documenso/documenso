@@ -51,7 +51,7 @@ export default async function AuditLog({ searchParams }: AuditLogProps) {
   return (
     <div className="print-provider pointer-events-none mx-auto max-w-screen-md">
       <div className="flex items-center">
-        <h1 className="my-8 text-2xl font-bold">Version History</h1>
+        <h1 className="my-8 text-2xl font-bold">ისტორია</h1>
       </div>
 
       <Card>
@@ -63,8 +63,8 @@ export default async function AuditLog({ searchParams }: AuditLogProps) {
           </p>
 
           <p>
-            <span className="font-medium">Enclosed Document</span>
-
+            <span className="font-medium">თანდართული დოკუმენტი</span>
+            {/* Enclosed Document */}
             <span className="mt-1 block break-words">{document.title}</span>
           </p>
 
@@ -83,7 +83,7 @@ export default async function AuditLog({ searchParams }: AuditLogProps) {
           </p>
 
           <p>
-            <span className="font-medium">Created At</span>
+            <span className="font-medium">შეიქმნა</span>
 
             <span className="mt-1 block">
               <LocaleDate date={document.createdAt} format="yyyy-mm-dd hh:mm:ss a (ZZZZ)" />
@@ -91,7 +91,7 @@ export default async function AuditLog({ searchParams }: AuditLogProps) {
           </p>
 
           <p>
-            <span className="font-medium">Last Updated</span>
+            <span className="font-medium">ბოლო განახლება</span>
 
             <span className="mt-1 block">
               <LocaleDate date={document.updatedAt} format="yyyy-mm-dd hh:mm:ss a (ZZZZ)" />
@@ -99,7 +99,7 @@ export default async function AuditLog({ searchParams }: AuditLogProps) {
           </p>
 
           <p>
-            <span className="font-medium">Time Zone</span>
+            <span className="font-medium">დროის სარტყელი</span>
 
             <span className="mt-1 block break-words">
               {document.documentMeta?.timezone ?? 'N/A'}
@@ -107,7 +107,7 @@ export default async function AuditLog({ searchParams }: AuditLogProps) {
           </p>
 
           <div>
-            <p className="font-medium">Recipients</p>
+            <p className="font-medium">მიმღებები</p>
 
             <ul className="mt-1 list-inside list-disc">
               {document.Recipient.map((recipient) => (

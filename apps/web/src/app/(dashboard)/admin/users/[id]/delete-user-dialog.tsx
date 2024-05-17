@@ -43,8 +43,8 @@ export const DeleteUserDialog = ({ className, user }: DeleteUserDialogProps) => 
       });
 
       toast({
-        title: 'Account deleted',
-        description: 'The account has been deleted successfully.',
+        title: 'ანგარიში წაშლილია',
+        description: 'ანგარიში წარმატებით წაიშალა!.',
         duration: 5000,
       });
 
@@ -52,17 +52,17 @@ export const DeleteUserDialog = ({ className, user }: DeleteUserDialogProps) => 
     } catch (err) {
       if (err instanceof TRPCClientError && err.data?.code === 'BAD_REQUEST') {
         toast({
-          title: 'An error occurred',
+          title: 'დაფიქსირდა ხარვეზი',
           description: err.message,
           variant: 'destructive',
         });
       } else {
         toast({
-          title: 'An unknown error occurred',
+          title: 'დაფიქსირდა ხარვეზი',
           variant: 'destructive',
           description:
             err.message ??
-            'We encountered an unknown error while attempting to delete your account. Please try again later.',
+            'თქვენი ანგარიშის წაშლისას დაფიქსირდა ხარვეზი. გთხოვთ თავიდან სცადოთ ან დაგვიკავშირდეთ.',
         });
       }
     }
@@ -75,33 +75,34 @@ export const DeleteUserDialog = ({ className, user }: DeleteUserDialogProps) => 
         variant="neutral"
       >
         <div>
-          <AlertTitle>Delete Account</AlertTitle>
+          <AlertTitle>ანგარიშის წაშლა</AlertTitle>
           <AlertDescription className="mr-2">
-            Delete the users account and all its contents. This action is irreversible and will
-            cancel their subscription, so proceed with caution.
+            წაშალეთ მომხმარებლის ანგარიში მასში შემავალი ყველა ინფორმაციით. ეს ქმედება შეუქცევადია,
+            ამიტომ დარწმუნდით, სანამ განაგრძობთ.
           </AlertDescription>
         </div>
 
         <div className="flex-shrink-0">
           <Dialog>
             <DialogTrigger asChild>
-              <Button variant="destructive">Delete Account</Button>
+              <Button variant="destructive">ანგარიშის წაშლა</Button>
             </DialogTrigger>
 
             <DialogContent>
               <DialogHeader className="space-y-4">
-                <DialogTitle>Delete Account</DialogTitle>
+                <DialogTitle>ანგარიშის წაშლა</DialogTitle>
 
                 <Alert variant="destructive">
                   <AlertDescription className="selection:bg-red-100">
-                    This action is not reversible. Please be certain.
+                    ეს ქმედება არ შეუქცევადი. გთხოვთ დარწმუნდით, სანამ განაგრძობთ.
                   </AlertDescription>
                 </Alert>
               </DialogHeader>
 
               <div>
                 <DialogDescription>
-                  To confirm, please enter the accounts email address <br />({user.email}).
+                  დადასტურებისთვის, გთხოვთ შეიყვანოთ ანგარიშის ელ.ფოსტის მისამართი <br />(
+                  {user.email}).
                 </DialogDescription>
 
                 <Input
@@ -119,7 +120,7 @@ export const DeleteUserDialog = ({ className, user }: DeleteUserDialogProps) => 
                   variant="destructive"
                   disabled={email !== user.email}
                 >
-                  {isDeletingUser ? 'Deleting account...' : 'Delete Account'}
+                  {isDeletingUser ? 'ანგარიში იშლება...' : 'ანგარიშის წაშლა'}
                 </Button>
               </DialogFooter>
             </DialogContent>

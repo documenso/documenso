@@ -38,15 +38,15 @@ export const DocumentPageViewInformation = ({
 
     return [
       {
-        description: 'Uploaded by',
+        description: 'ატვირთა',
         value: userId === document.userId ? 'You' : document.User.name ?? document.User.email,
       },
       {
-        description: 'Created',
+        description: 'შეიქმნა',
         value: createdValue,
       },
       {
-        description: 'Last modified',
+        description: 'ბოლო განახლება',
         value: lastModifiedValue,
       },
     ];
@@ -54,7 +54,7 @@ export const DocumentPageViewInformation = ({
 
   return (
     <section className="dark:bg-background text-foreground border-border bg-widget flex flex-col rounded-xl border">
-      <h1 className="px-4 py-3 font-medium">Information</h1>
+      <h1 className="px-4 py-3 font-medium">ინფორმაცია</h1>
 
       <ul className="divide-y border-t">
         {documentInformation.map((item) => (

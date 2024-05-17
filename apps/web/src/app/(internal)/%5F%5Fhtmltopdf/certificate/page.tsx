@@ -97,17 +97,17 @@ export default async function SigningCertificate({ searchParams }: SigningCertif
     });
 
     let authLevel = match(extractedAuthMethods.derivedRecipientActionAuth)
-      .with('ACCOUNT', () => 'Account Re-Authentication')
-      .with('TWO_FACTOR_AUTH', () => 'Two-Factor Re-Authentication')
-      .with('PASSKEY', () => 'Passkey Re-Authentication')
-      .with('EXPLICIT_NONE', () => 'Email')
+      .with('ACCOUNT', () => 'ანგარიშის ხელახალი ავთენტიფიკაცია')
+      .with('TWO_FACTOR_AUTH', () => 'ორფაქტორიანი (2FA) ხელახალი ავთენტიფიკაცია')
+      .with('PASSKEY', () => 'Passkey ხელახალი ავთენტიფიკაცია')
+      .with('EXPLICIT_NONE', () => 'ელ.ფოსტა')
       .with(null, () => null)
       .exhaustive();
 
     if (!authLevel) {
       authLevel = match(extractedAuthMethods.derivedRecipientAccessAuth)
         .with('ACCOUNT', () => 'Account Authentication')
-        .with(null, () => 'Email')
+        .with(null, () => 'ელ.ფოსტა')
         .exhaustive();
     }
 
@@ -146,7 +146,7 @@ export default async function SigningCertificate({ searchParams }: SigningCertif
   return (
     <div className="print-provider pointer-events-none mx-auto max-w-screen-md">
       <div className="flex items-center">
-        <h1 className="my-8 text-2xl font-bold">Signing Certificate</h1>
+        <h1 className="my-8 text-2xl font-bold">ხელმოწერის სერთიფიკატი</h1>
       </div>
 
       <Card>
@@ -155,8 +155,8 @@ export default async function SigningCertificate({ searchParams }: SigningCertif
             <TableHeader>
               <TableRow>
                 <TableHead>Signer Events</TableHead>
-                <TableHead>Signature</TableHead>
-                <TableHead>Details</TableHead>
+                <TableHead>ხელმოწერა</TableHead>
+                <TableHead>დეტალები</TableHead>
                 {/* <TableHead>Security</TableHead> */}
               </TableRow>
             </TableHeader>
@@ -176,7 +176,7 @@ export default async function SigningCertificate({ searchParams }: SigningCertif
                       </p>
 
                       <p className="text-muted-foreground mt-2 text-sm print:text-xs">
-                        <span className="font-medium">Authentication Level:</span>{' '}
+                        <span className="font-medium">ავთენტიფიკაციის დონე:</span>{' '}
                         <span className="block">{getAuthenticationLevel(recipient.id)}</span>
                       </p>
                     </TableCell>
@@ -198,21 +198,21 @@ export default async function SigningCertificate({ searchParams }: SigningCertif
                           </div>
 
                           <p className="text-muted-foreground mt-2 text-sm print:text-xs">
-                            <span className="font-medium">Signature ID:</span>{' '}
+                            <span className="font-medium">ხელმოწერის ID:</span>{' '}
                             <span className="block font-mono uppercase">
                               {signature.secondaryId}
                             </span>
                           </p>
 
                           <p className="text-muted-foreground mt-2 text-sm print:text-xs">
-                            <span className="font-medium">IP Address:</span>{' '}
+                            <span className="font-medium">IP მისამართი:</span>{' '}
                             <span className="inline-block">
                               {logs.DOCUMENT_RECIPIENT_COMPLETED[0]?.ipAddress ?? 'Unknown'}
                             </span>
                           </p>
 
                           <p className="text-muted-foreground mt-1 text-sm print:text-xs">
-                            <span className="font-medium">Device:</span>{' '}
+                            <span className="font-medium">მოწყობილობა:</span>{' '}
                             <span className="inline-block">
                               {getDevice(logs.DOCUMENT_RECIPIENT_COMPLETED[0]?.userAgent)}
                             </span>
@@ -226,7 +226,7 @@ export default async function SigningCertificate({ searchParams }: SigningCertif
                     <TableCell truncate={false} className="w-[min-content] align-top">
                       <div className="space-y-1">
                         <p className="text-muted-foreground text-sm print:text-xs">
-                          <span className="font-medium">Sent:</span>{' '}
+                          <span className="font-medium">გაგზავნილია:</span>{' '}
                           <span className="inline-block">
                             {logs.EMAIL_SENT[0] ? (
                               <LocaleDate
@@ -240,7 +240,7 @@ export default async function SigningCertificate({ searchParams }: SigningCertif
                         </p>
 
                         <p className="text-muted-foreground text-sm print:text-xs">
-                          <span className="font-medium">Viewed:</span>{' '}
+                          <span className="font-medium">გახსნილია:</span>{' '}
                           <span className="inline-block">
                             {logs.DOCUMENT_OPENED[0] ? (
                               <LocaleDate
@@ -254,7 +254,7 @@ export default async function SigningCertificate({ searchParams }: SigningCertif
                         </p>
 
                         <p className="text-muted-foreground text-sm print:text-xs">
-                          <span className="font-medium">Signed:</span>{' '}
+                          <span className="font-medium">ხელი მოეწერა:</span>{' '}
                           <span className="inline-block">
                             {logs.DOCUMENT_RECIPIENT_COMPLETED[0] ? (
                               <LocaleDate
@@ -268,7 +268,7 @@ export default async function SigningCertificate({ searchParams }: SigningCertif
                         </p>
 
                         <p className="text-muted-foreground text-sm print:text-xs">
-                          <span className="font-medium">Reason:</span>{' '}
+                          <span className="font-medium">მიზეზი:</span>{' '}
                           <span className="inline-block">
                             {isOwner(recipient.email)
                               ? FRIENDLY_SIGNING_REASONS['__OWNER__']
@@ -288,7 +288,7 @@ export default async function SigningCertificate({ searchParams }: SigningCertif
       <div className="my-8 flex-row-reverse">
         <div className="flex items-end justify-end gap-x-4">
           <p className="flex-shrink-0 text-sm font-medium print:text-xs">
-            Signing certificate provided by:
+            ხელმოწერის სერთიფიკატი უზრუნველყოფილია:
           </p>
 
           <Logo className="max-h-6 print:max-h-4" />

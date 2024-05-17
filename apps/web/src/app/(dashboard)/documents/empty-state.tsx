@@ -12,27 +12,28 @@ export const EmptyDocumentState = ({ status }: EmptyDocumentProps) => {
     icon: Icon,
   } = match(status)
     .with(ExtendedDocumentStatus.COMPLETED, () => ({
-      title: 'Nothing to do',
+      title: 'ხელმოსაწერი არაფერია',
       message:
-        'There are no completed documents yet. Documents that you have created or received will appear here once completed.',
+        'ხელმოწერილი დოკუმენტები ჯერ არ არის. თქვენ მიერ შექმნილი ან მიღებული დოკუმენტები ხელმოწერის შემდეგ აქ გამოჩნდება.',
       icon: CheckCircle2,
     }))
     .with(ExtendedDocumentStatus.DRAFT, () => ({
-      title: 'No active drafts',
+      title: 'აქტიური დრაფტები არ არის',
       message:
         'There are no active drafts at the current moment. You can upload a document to start drafting.',
       icon: CheckCircle2,
     }))
     .with(ExtendedDocumentStatus.ALL, () => ({
-      title: "We're all empty",
+      title: '',
       message:
-        'You have not yet created or received any documents. To create a document please upload one.',
+        'თქვენ ჯერ არ შეგიქმნიათ ან არ მიგიღიათ დოკუმენტი. დოკუმენტის შესაქმნელად გთხოვთ ატვირთოთ ფაილი.',
       icon: Bird,
     }))
     .otherwise(() => ({
-      title: 'Nothing to do',
+      title: 'ხელმოსაწერი არაფერია',
+      // title: 'nothing to do',
       message:
-        'All documents have been processed. Any new documents that are sent or received will show here.',
+        'ყველა დოკუმენტი დამუშავებულია. ნებისმიერი ახალი დოკუმენტი, რომელიც გაიგზავნება ან მიიღება, აქ გამოჩნდება.',
       icon: CheckCircle2,
     }));
 

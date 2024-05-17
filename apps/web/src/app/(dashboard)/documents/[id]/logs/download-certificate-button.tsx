@@ -60,8 +60,9 @@ export const DownloadCertificateButton = ({
       console.error(error);
 
       toast({
-        title: 'Something went wrong',
-        description: 'Sorry, we were unable to download the certificate. Please try again later.',
+        title: 'დაფიქსირდა ხარვეზი',
+        description:
+          'სერთიფიკატის ჩამოტვირთვისას დაფიქსირდა ხარვეზი. გთხოვთ თავიდან სცადოთ ან დაგვიკავშირდეთ.',
         variant: 'destructive',
       });
     }
@@ -76,7 +77,7 @@ export const DownloadCertificateButton = ({
       onClick={() => void onDownloadCertificatesClick()}
     >
       {!isLoading && <DownloadIcon className="mr-1.5 h-4 w-4" />}
-      Download Certificate
+      სერთიფიკატის ჩამოტვირთვა
     </Button>
   );
 };

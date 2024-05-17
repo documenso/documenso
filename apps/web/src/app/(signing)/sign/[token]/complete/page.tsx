@@ -174,7 +174,7 @@ export default async function CompletedSigningPage({
             ) : (
               <DocumentPreviewButton
                 className="text-[11px]"
-                title="Signatures will appear once the document has been completed"
+                title="ხელმოწერები გამოჩნდება დოკუმენტის მთლიანად ხელმოწერის შემდეგ"
                 documentData={documentData}
               />
             )}
@@ -188,7 +188,7 @@ export default async function CompletedSigningPage({
             </h2>
 
             <p className="text-muted-foreground/60 mt-4 max-w-[55ch] text-center leading-normal">
-              შექმენით თქვენი ანგარიში და დაიწყეთ დოკუმენტებზე ონლაინ ხელმოწერის გამოყენება.
+              შექმენით თქვენი ანგარიში და დაიწყეთ დოკუმენტებზე ონლაინ ხელმოწერა!
             </p>
 
             <ClaimAccount defaultName={recipientName} defaultEmail={recipient.email} />

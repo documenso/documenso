@@ -119,7 +119,7 @@ export async function GET(_request: Request, { params: { slug } }: SharePageOpen
               fontWeight: 700,
             }}
           >
-            {isRecipient ? 'Document Signed!' : 'Document Sent!'}
+            {isRecipient ? 'დოკუმენტი ხელმოწერილია!' : 'დოკუმენტი გაგზავნილია!'}
           </h2>
         </div>
       </div>

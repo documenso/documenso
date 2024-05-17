@@ -28,8 +28,8 @@ export const DeleteTemplateDialog = ({ id, open, onOpenChange }: DeleteTemplateD
       router.refresh();
 
       toast({
-        title: 'შაბლონის წაშლა',
-        description: 'თქვენი შაბლონი წარმატებით წაიშალა.',
+        title: 'შაბლონი წაშლილია',
+        description: 'თქვენი შაბლონი წარმატებით წაიშალა!',
         duration: 5000,
       });
 
@@ -53,7 +53,7 @@ export const DeleteTemplateDialog = ({ id, open, onOpenChange }: DeleteTemplateD
           <DialogTitle>გნებავთ ამ შაბლონის წაშლა?</DialogTitle>
 
           <DialogDescription>
-            გთხოვთ გაითვალისწინოთ, რომ ეს ქმედება შეუქცევადია. დადასტურების შემდეგ, თქვენი შაბლონი
+            გთხოვთ გაითვალისწინოთ, რომ ეს ქმედება შეუქცევადია. დადასტურების შემდეგ თქვენი შაბლონი
             სამუდამოდ წაიშლება.
           </DialogDescription>
         </DialogHeader>

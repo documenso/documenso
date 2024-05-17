@@ -78,7 +78,7 @@ export default function WebhookPage({ params }: WebhookPageOptions) {
       toast({
         title: 'ვებჰუკის განახლება ვერ მოხერხდა',
         description:
-          'ვებჰუკის განახლებისას დაფიქსირდა ხარვეზი. Გთხოვთ სცადოთ მოგვიანებით ან დაგვიკავშირდით.',
+          'ვებჰუკის განახლებისას დაფიქსირდა ხარვეზი. გთხოვთ თავიდან სცადოთ ან დაგვიკავშირდეთ.',
         variant: 'destructive',
       });
     }
@@ -191,7 +191,7 @@ export default function WebhookPage({ params }: WebhookPageOptions) {
 
             <div className="mt-4">
               <Button type="submit" loading={form.formState.isSubmitting}>
-                Update webhook
+                განაახლეთ ვებჰუკი
               </Button>
             </div>
           </fieldset>

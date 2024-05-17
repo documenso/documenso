@@ -125,23 +125,23 @@ export const EditDocumentForm = ({
 
   const documentFlow: Record<EditDocumentStep, DocumentFlowStep> = {
     settings: {
-      title: 'General',
-      description: 'Configure general settings for the document.',
+      title: 'ზოგადი',
+      description: 'მართეთ დოკუმენტის პარამეტრები.',
       stepIndex: 1,
     },
     signers: {
-      title: 'Add Signers',
-      description: 'Add the people who will sign the document.',
+      title: 'დაამატეთ ხელმომწერები',
+      description: 'დაამატეთ ადამიანები, რომლებიც ხელს მოაწერენ ამ დოკუმენტს.',
       stepIndex: 2,
     },
     fields: {
-      title: 'Add Fields',
-      description: 'Add all relevant fields for each recipient.',
+      title: 'დაამატეთ ველები',
+      description: 'დაამატეთ ყველა შესაბამისი ველი თითოეული მიმღებისთვის.',
       stepIndex: 3,
     },
     subject: {
-      title: 'Add Subject',
-      description: 'Add the subject and message you wish to send to signers.',
+      title: 'დაამატეთ თემატიკა',
+      description: 'დაამატეთ თემატიკა და შეტყობინება, რომელიც გსურთ გაეგზავნოს ხელმომწერებს.',
       stepIndex: 4,
     },
   };
@@ -190,8 +190,8 @@ export const EditDocumentForm = ({
       console.error(err);
 
       toast({
-        title: 'Error',
-        description: 'An error occurred while updating the document settings.',
+        title: 'დაფიქსირდა ხარვეზი',
+        description: 'დოკუმენტის პარამეტრების განახლებისას დაფიქსირდა ხარვეზი.',
         variant: 'destructive',
       });
     }
@@ -217,8 +217,8 @@ export const EditDocumentForm = ({
       console.error(err);
 
       toast({
-        title: 'Error',
-        description: 'An error occurred while adding signers.',
+        title: 'დაფიქსირდა ხარვეზი',
+        description: 'ხელმომწერების დამატებისას დაფიქსირდა ხარვეზი.',
         variant: 'destructive',
       });
     }
@@ -239,8 +239,8 @@ export const EditDocumentForm = ({
       console.error(err);
 
       toast({
-        title: 'Error',
-        description: 'An error occurred while adding signers.',
+        title: 'დაფიქსირდა ხარვეზი',
+        description: 'ხელმომწერების დამატებისას დაფიქსირდა ხარვეზი.',
         variant: 'destructive',
       });
     }
@@ -260,8 +260,8 @@ export const EditDocumentForm = ({
       });
 
       toast({
-        title: 'Document sent',
-        description: 'Your document has been sent successfully.',
+        title: 'დოკუმენტი გაგზავნილია',
+        description: 'თქვენი დოკუმენტი წარმატებით გაიგზავნა!',
         duration: 5000,
       });
 
@@ -270,8 +270,8 @@ export const EditDocumentForm = ({
       console.error(err);
 
       toast({
-        title: 'Error',
-        description: 'An error occurred while sending the document.',
+        title: 'დაფიქსირდა ხარვეზი',
+        description: 'დოკუმენტის გაგზავნისას დაფიქსირდა ხარვეზი.',
         variant: 'destructive',
       });
     }

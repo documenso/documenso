@@ -35,7 +35,7 @@ export const DuplicateTemplateDialog = ({
         router.refresh();
 
         toast({
-          title: 'შაბლონის დუპლიკაცია',
+          title: 'შაბლონის დუბლირებულია',
           description: 'თქვენი შაბლონი წარმატებით იქნა დუბლირებული.',
           duration: 5000,
         });
@@ -45,7 +45,8 @@ export const DuplicateTemplateDialog = ({
       onError: () => {
         toast({
           title: 'დაფიქსირდა ხარვეზი',
-          description: 'შაბლონის დუბლირებისას დაფიქსირდა ხარვეზი.',
+          description:
+            'შაბლონის დუბლირებისას დაფიქსირდა ხარვეზი. გთხოვთ თავიდან სცადოთ ან დაგვიკავშირდეთ',
           variant: 'destructive',
         });
       },

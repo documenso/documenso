@@ -54,8 +54,9 @@ export const DownloadAuditLogButton = ({ className, documentId }: DownloadAuditL
       console.error(error);
 
       toast({
-        title: 'Something went wrong',
-        description: 'Sorry, we were unable to download the audit logs. Please try again later.',
+        title: 'დაფიქსირდა ხარვეზი',
+        description:
+          'აუდიტის ჩამოტვირთვისას დაფიქსირდა ხარვეზი. გთხოვთ თავიდან სცადოთ ან დაგვიკავშირდეთ',
         variant: 'destructive',
       });
     }
@@ -68,7 +69,7 @@ export const DownloadAuditLogButton = ({ className, documentId }: DownloadAuditL
       onClick={() => void onDownloadAuditLogsClick()}
     >
       {!isLoading && <DownloadIcon className="mr-1.5 h-4 w-4" />}
-      Download Audit Logs
+      აუდიტის ჩამოტვირთვა
     </Button>
   );
 };

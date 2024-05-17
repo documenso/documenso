@@ -49,7 +49,7 @@ export type ResendDocumentActionItemProps = {
 
 export const ZResendDocumentFormSchema = z.object({
   recipients: z.array(z.number()).min(1, {
-    message: 'You must select at least one item.',
+    message: 'თქვენ უნდა აირჩიოთ მინიმუმ ერთი ელემენტი.',
   }),
 });
 
@@ -91,16 +91,17 @@ export const ResendDocumentActionItem = ({
       await resendDocument({ documentId: document.id, recipients, teamId: team?.id });
 
       toast({
-        title: 'Document re-sent',
-        description: 'Your document has been re-sent successfully.',
+        title: 'დოკუმენტი ხელახლაა გაგზავნილი',
+        description: 'თქვენი დოკუმენტი ხელახლა წარმატებით გაიგზავნა!.',
         duration: 5000,
       });
 
       setIsOpen(false);
     } catch (err) {
       toast({
-        title: 'Something went wrong',
-        description: 'This document could not be re-sent at this time. Please try again.',
+        title: 'დაფიქისრდა ხარვეზი',
+        description:
+          'დოკუმენტის ხელახლა გაგზავნა ამჯერად ვერ მოხერხდა. გთხოვთ თავიდან სცადოთ ან დაგვიკავშირდეთ.',
         variant: 'destructive',
         duration: 7500,
       });
@@ -112,14 +113,14 @@ export const ResendDocumentActionItem = ({
       <DialogTrigger asChild>
         <DropdownMenuItem disabled={isDisabled} onSelect={(e) => e.preventDefault()}>
           <History className="mr-2 h-4 w-4" />
-          Resend
+          გადაგზავნა
         </DropdownMenuItem>
       </DialogTrigger>
 
       <DialogContent className="sm:max-w-sm" hideClose>
         <DialogHeader>
           <DialogTitle asChild>
-            <h1 className="text-center text-xl">Who do you want to remind?</h1>
+            <h1 className="text-center text-xl">ვის გინდათ შეახსენოთ?</h1>
           </DialogTitle>
         </DialogHeader>
 
@@ -178,12 +179,12 @@ export const ResendDocumentActionItem = ({
                 variant="secondary"
                 disabled={isSubmitting}
               >
-                Cancel
+                დახურვა
               </Button>
             </DialogClose>
 
             <Button className="flex-1" loading={isSubmitting} type="submit" form={FORM_ID}>
-              Send reminder
+              შეხსენების გაგზავნა
             </Button>
           </div>
         </DialogFooter>

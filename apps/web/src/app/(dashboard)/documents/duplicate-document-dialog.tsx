@@ -50,8 +50,8 @@ export const DuplicateDocumentDialog = ({
         router.push(`${documentsPath}/${newId}/edit`);
 
         toast({
-          title: 'Document Duplicated',
-          description: 'Your document has been successfully duplicated.',
+          title: 'დოკუმენტი დუბლირებულია',
+          description: 'თქვენი დოკუმენტი დუბლირებულია.',
           duration: 5000,
         });
 
@@ -64,8 +64,8 @@ export const DuplicateDocumentDialog = ({
       await duplicateDocument({ id, teamId: team?.id });
     } catch {
       toast({
-        title: 'Something went wrong',
-        description: 'This document could not be duplicated at this time. Please try again.',
+        title: 'დაფიქსირდა ხარვეზი',
+        description: 'ამ დოკუმენტის დუბლირება ამჯერად ვერ მოხერხდა. გთხოვთ თავიდან სცადეთ.',
         variant: 'destructive',
         duration: 7500,
       });
@@ -76,12 +76,12 @@ export const DuplicateDocumentDialog = ({
     <Dialog open={open} onOpenChange={(value) => !isLoading && onOpenChange(value)}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Duplicate</DialogTitle>
+          <DialogTitle>დუბლირება</DialogTitle>
         </DialogHeader>
         {!documentData || isLoading ? (
           <div className="mx-auto -mt-4 flex w-full max-w-screen-xl flex-col px-4 md:px-8">
             <h1 className="mt-4 grow-0 truncate text-2xl font-semibold md:text-3xl">
-              Loading Document...
+              დოკუმენტი იტვირთება...
             </h1>
           </div>
         ) : (
@@ -98,7 +98,7 @@ export const DuplicateDocumentDialog = ({
               onClick={() => onOpenChange(false)}
               className="flex-1"
             >
-              Cancel
+              დახურვა
             </Button>
 
             <Button
@@ -108,7 +108,7 @@ export const DuplicateDocumentDialog = ({
               onClick={onDuplicate}
               className="flex-1"
             >
-              Duplicate
+              დუბლირება
             </Button>
           </div>
         </DialogFooter>

@@ -98,7 +98,7 @@ export const EmailField = ({ field, recipient }: EmailFieldProps) => {
 
       {!field.inserted && (
         <p className="group-hover:text-primary text-muted-foreground text-lg duration-200">
-          ელ. ფოსტა
+          ელ.ფოსტა
         </p>
       )}
 

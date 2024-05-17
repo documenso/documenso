@@ -109,7 +109,7 @@ export const RecipientItem = ({ recipient }: RecipientItemProps) => {
               name="email"
               render={({ field }) => (
                 <FormItem className="flex-1">
-                  <FormLabel required>ელ. ფოსტა</FormLabel>
+                  <FormLabel required>ელ.ფოსტა</FormLabel>
 
                   <FormControl>
                     <Input type="email" {...field} />
@@ -142,12 +142,12 @@ export const RecipientItem = ({ recipient }: RecipientItemProps) => {
             cell: ({ row }) => <div>{row.original.id}</div>,
           },
           {
-            header: 'Type',
+            header: 'ტიპი',
             accessorKey: 'type',
             cell: ({ row }) => <div>{row.original.type}</div>,
           },
           {
-            header: 'Inserted',
+            header: 'ჩასმულია',
             accessorKey: 'inserted',
             cell: ({ row }) => <div>{row.original.inserted ? 'True' : 'False'}</div>,
           },
@@ -157,7 +157,7 @@ export const RecipientItem = ({ recipient }: RecipientItemProps) => {
             cell: ({ row }) => <div>{row.original.customText}</div>,
           },
           {
-            header: 'Signature',
+            header: 'ხელმოწერა',
             accessorKey: 'signature',
             cell: ({ row }) => (
               <div>

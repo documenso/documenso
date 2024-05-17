@@ -106,7 +106,7 @@ export const DocumentPageView = async ({ params, team }: DocumentPageViewProps) 
     <div className="mx-auto -mt-4 w-full max-w-screen-xl px-4 md:px-8">
       <Link href={documentRootPath} className="flex items-center text-[#7AC455] hover:opacity-80">
         <ChevronLeft className="mr-2 inline-block h-5 w-5" />
-        Documents
+        დოკუმენტები
       </Link>
 
       <div className="flex flex-row justify-between">
@@ -131,12 +131,12 @@ export const DocumentPageView = async ({ params, team }: DocumentPageViewProps) 
                   documentStatus={document.status}
                   position="bottom"
                 >
-                  <span>{recipients.length} Recipient(s)</span>
+                  <span>{recipients.length} მიმღები</span>
                 </StackAvatarsWithTooltip>
               </div>
             )}
 
-            {document.deletedAt && <Badge variant="destructive">Document deleted</Badge>}
+            {document.deletedAt && <Badge variant="destructive">დოკუმენტი წაშლილია</Badge>}
           </div>
         </div>
 
@@ -145,7 +145,7 @@ export const DocumentPageView = async ({ params, team }: DocumentPageViewProps) 
             <DocumentHistorySheet documentId={document.id} userId={user.id}>
               <Button variant="outline">
                 <Clock9 className="mr-1.5 h-4 w-4" />
-                Document history
+                დოკუმენტების ისტორია
               </Button>
             </DocumentHistorySheet>
           </div>
@@ -174,7 +174,7 @@ export const DocumentPageView = async ({ params, team }: DocumentPageViewProps) 
             <section className="border-border bg-widget flex flex-col rounded-xl border pb-4 pt-6">
               <div className="flex flex-row items-center justify-between px-4">
                 <h3 className="text-foreground text-2xl font-semibold">
-                  Document {FRIENDLY_STATUS_MAP[document.status].label.toLowerCase()}
+                  დოკუმენტი {FRIENDLY_STATUS_MAP[document.status].label.toLowerCase()}
                 </h3>
 
                 <DocumentPageViewDropdown document={documentWithRecipients} team={team} />
@@ -182,25 +182,21 @@ export const DocumentPageView = async ({ params, team }: DocumentPageViewProps) 
 
               <p className="text-muted-foreground mt-2 px-4 text-sm ">
                 {match(document.status)
-                  .with(
-                    DocumentStatus.COMPLETED,
-                    () => 'This document has been signed by all recipients',
-                  )
+                  .with(DocumentStatus.COMPLETED, () => 'ამ დოკუმენტს ხელი მოაწერა ყველა მიმღებმა')
                   .with(
                     DocumentStatus.DRAFT,
-                    () => 'This document is currently a draft and has not been sent',
+                    () => 'ეს დოკუმენტი ამჟამად არის დრაფტი და არ არის გაგზავნილი',
                   )
                   .with(DocumentStatus.PENDING, () => {
                     const pendingRecipients = recipients.filter(
                       (recipient) => recipient.signingStatus === 'NOT_SIGNED',
                     );
 
-                    return `Waiting on ${pendingRecipients.length} recipient${
-                      pendingRecipients.length > 1 ? 's' : ''
-                    }`;
+                    return `ველოდებით ${pendingRecipients.length} მიმღებს`;
                   })
                   .exhaustive()}
               </p>
+              {/* ${ pendingRecipients.length > 1 ? 's' : ''} */}
 
               <div className="mt-4 border-t px-4 pt-4">
                 <DocumentPageViewButton document={documentWithRecipients} team={team} />

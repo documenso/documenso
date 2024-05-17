@@ -17,7 +17,7 @@ export default async function ProfileSettingsPage() {
 
   return (
     <div>
-      <SettingsHeader title="Profile" subtitle="აქ შეგიძლიათ შეცვალოთ პირადი მონაცემები." />
+      <SettingsHeader title="პროფილი" subtitle="აქ შეგიძლიათ შეცვალოთ პირადი მონაცემები." />
 
       <ProfileForm className="mb-8 max-w-xl" user={user} />
 

@@ -53,7 +53,7 @@ export const DocumentActionAuthAccount = ({
         <AlertDescription>
           {actionTarget === 'DOCUMENT' && recipient.role === RecipientRole.VIEWER ? (
             <span>
-              To mark this document as viewed, you need to be logged in as{' '}
+              ამ დოკუმენტის ნანახად, რომ მოინიშნოს, თქვენ უნდა იყოთ ავტორიზებული, როგორც{' '}
               <strong>{recipient.email}</strong>
             </span>
           ) : (

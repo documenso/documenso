@@ -61,7 +61,7 @@ export const UserPasskeysDataTableActions = ({
     trpc.auth.updatePasskey.useMutation({
       onSuccess: () => {
         toast({
-          title: 'Success',
+          title: '',
           description: 'Passkey განახლებულია',
         });
       },
@@ -79,14 +79,14 @@ export const UserPasskeysDataTableActions = ({
     trpc.auth.deletePasskey.useMutation({
       onSuccess: () => {
         toast({
-          title: 'Success',
+          title: '',
           description: 'Passkey წაიშალა',
         });
       },
       onError: () => {
         toast({
           title: 'დაფიქსირდა ხარვეზი',
-          description: 'Passkey წაშლა ვერ მოხერხდა. Გთხოვთ სცადოთ მოგვიანებით.',
+          description: 'Passkey წაშლა ვერ მოხერხდა. გთხოვთ თავიდან სცადოთ.',
           duration: 10000,
           variant: 'destructive',
         });
@@ -139,7 +139,7 @@ export const UserPasskeysDataTableActions = ({
                 <DialogFooter className="mt-4">
                   <DialogClose asChild>
                     <Button type="button" variant="secondary">
-                      გაუქმება
+                      დახურვა
                     </Button>
                   </DialogClose>
 
@@ -174,7 +174,7 @@ export const UserPasskeysDataTableActions = ({
             <DialogFooter>
               <DialogClose asChild>
                 <Button type="button" variant="secondary">
-                  გაუქმება
+                  დახურვა
                 </Button>
               </DialogClose>
 

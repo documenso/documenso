@@ -42,8 +42,8 @@ export const DeleteAccountDialog = ({ className, user }: DeleteAccountDialogProp
       await deleteAccount();
 
       toast({
-        title: 'ანგარიში წაიშალა',
-        description: 'თვქენი ანგარიში წარმატებით წაიშალა.',
+        title: 'ანგარიში წაშლილია',
+        description: 'თვქენი ანგარიში წარმატებით წაიშალა!',
         duration: 5000,
       });
 
@@ -61,7 +61,7 @@ export const DeleteAccountDialog = ({ className, user }: DeleteAccountDialogProp
           variant: 'destructive',
           description:
             err.message ??
-            'თქვენი ანგარიშის წაშლის მცდელობისას დაფიქსირდა ხარვეზი. Გთხოვთ სცადოთ მოგვიანებით.',
+            'თქვენი ანგარიშის წაშლის მცდელობისას დაფიქსირდა ხარვეზი. გთხოვთ თავიდან სცადოთ.',
         });
       }
     }
@@ -106,14 +106,15 @@ export const DeleteAccountDialog = ({ className, user }: DeleteAccountDialogProp
 
                 <DialogDescription>
                   ჩიქოვანები წაშლიან <span className="font-semibold">ყველა თქვენს დოკუმენტთან</span>
-                  , ხელმოწერებთან და ყველა სხვა რესურსთან ერთად, რომელიც ეკუთვნის თქვენს ანგარიშს.
+                  , ხელმოწერებთან და ყველა სხვა ინფორმაციასთან ერთად, რომელიც ეკუთვნის თქვენს
+                  ანგარიშს.
                 </DialogDescription>
               </DialogHeader>
 
               {!hasTwoFactorAuthentication && (
                 <div className="mt-4">
                   <Label>
-                    Გთხოვთ ჩაწეროთ{' '}
+                    გთხოვთ ჩაწეროთ{' '}
                     <span className="text-muted-foreground font-semibold">{user.email}</span>{' '}
                     დადასტურებისთვის.
                   </Label>

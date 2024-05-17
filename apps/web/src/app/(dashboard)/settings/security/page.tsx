@@ -64,11 +64,11 @@ export default async function SecuritySettingsPage() {
           variant="neutral"
         >
           <div className="mb-4 sm:mb-0">
-            <AlertTitle>Recovery codes</AlertTitle>
+            <AlertTitle>აღდგენის კოდები</AlertTitle>
 
             <AlertDescription className="mr-4">
-              Two factor authentication recovery codes are used to access your account in the event
-              that you lose access to your authenticator app.
+              ორ ფაქტორიანი (2FA) ავთენტიფიკაციის აღდგენის კოდები გამოიყენება თქვენს ანგარიშზე
+              წვდომისთვის იმ შემთხვევაში, თუ დაკარგავთ წვდომას ავთენტიფიკატორ აპლიკაციაზე.
             </AlertDescription>
           </div>
 

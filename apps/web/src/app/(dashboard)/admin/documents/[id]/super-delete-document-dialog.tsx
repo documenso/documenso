@@ -44,7 +44,7 @@ export const SuperDeleteDocumentDialog = ({ document }: SuperDeleteDocumentDialo
 
       toast({
         title: 'დოკუმენტი წაშლილია',
-        description: 'დოკუმენტი წარმატებით წაიშალა.',
+        description: 'დოკუმენტი წარმატებით წაიშალა!',
         duration: 5000,
       });
 
@@ -78,7 +78,7 @@ export const SuperDeleteDocumentDialog = ({ document }: SuperDeleteDocumentDialo
           <div>
             <AlertTitle>დოკუმენტის წაშლა</AlertTitle>
             <AlertDescription className="mr-2">
-              Delete the document. გაითვალისწინეთ, რომ ეს ქმედება შეუქცევადია.
+              გაითვალისწინეთ, რომ დოკუემენტის წაშლა შეუქცევადია.
             </AlertDescription>
           </div>
 
@@ -100,7 +100,7 @@ export const SuperDeleteDocumentDialog = ({ document }: SuperDeleteDocumentDialo
                 </DialogHeader>
 
                 <div>
-                  <DialogDescription>დადასტურებისთვის, გთხოვთ მიუთითოთ მიზეზი:</DialogDescription>
+                  <DialogDescription>დადასტურებისთვის გთხოვთ მიუთითოთ მიზეზი:</DialogDescription>
 
                   <Input
                     className="mt-2"

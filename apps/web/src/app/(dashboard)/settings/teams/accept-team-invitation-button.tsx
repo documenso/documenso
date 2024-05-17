@@ -19,7 +19,7 @@ export const AcceptTeamInvitationButton = ({ teamId }: AcceptTeamInvitationButto
     onSuccess: () => {
       toast({
         title: 'გილოცავთ!',
-        description: 'Accepted team invitation',
+        description: 'გუნდის მოწვევა დადასტურებულია',
         duration: 5000,
       });
     },
@@ -39,7 +39,7 @@ export const AcceptTeamInvitationButton = ({ teamId }: AcceptTeamInvitationButto
       loading={isLoading}
       disabled={isLoading || isSuccess}
     >
-      Accept
+      დადასტურება
     </Button>
   );
 };

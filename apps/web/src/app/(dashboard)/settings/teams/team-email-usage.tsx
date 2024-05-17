@@ -41,7 +41,7 @@ export const TeamEmailUsage = ({ teamEmail }: TeamEmailUsageProps) => {
           variant: 'destructive',
           duration: 10000,
           description:
-            'წვდომის გაუქმების მცდელობისას დაფიქსირდა ხარვეზი. გთხოვთ, სცადოთ ხელახლა ან დაგვიკავშირდეთ.',
+            'წვდომის გაუქმების მცდელობისას დაფიქსირდა ხარვეზი. გთხოვთ სცადოთ ხელახლა ან დაგვიკავშირდეთ.',
         });
       },
     });
@@ -49,10 +49,10 @@ export const TeamEmailUsage = ({ teamEmail }: TeamEmailUsageProps) => {
   return (
     <Alert variant="neutral" className="flex flex-row items-center justify-between p-6">
       <div>
-        <AlertTitle className="mb-0">გუნდის ელ. ფოსტა</AlertTitle>
+        <AlertTitle className="mb-0">გუნდის ელ.ფოსტა</AlertTitle>
         <AlertDescription>
           <p>
-            თქვენს ელფოსტას ამჟამად გუნდი იყენებს{' '}
+            თქვენს ელ.ფოსტას ამჟამად გუნდი იყენებს{' '}
             <span className="font-semibold">{teamEmail.team.name}</span> ({teamEmail.team.url}
             ).
           </p>
@@ -60,7 +60,7 @@ export const TeamEmailUsage = ({ teamEmail }: TeamEmailUsageProps) => {
           <p className="mt-1">მათ აქვთ უფლება თქვენი სახელით:</p>
 
           <ul className="mt-0.5 list-inside list-disc">
-            <li>აჩვენონ თქვენი სახელი და ელ. ფოსტა დოკუმენტებში</li>
+            <li>გამოიყენონ თქვენი სახელი და ელ.ფოსტა დოკუმენტებში</li>
             <li>იხილონ თქვენს ანგარიშზე გამოგზავნილი ყველა დოკუმენტი</li>
           </ul>
         </AlertDescription>
@@ -73,19 +73,19 @@ export const TeamEmailUsage = ({ teamEmail }: TeamEmailUsageProps) => {
 
         <DialogContent position="center">
           <DialogHeader>
-            <DialogTitle>Დარწმუნებული ხართ?</DialogTitle>
+            <DialogTitle>დარწმუნებული ხართ?</DialogTitle>
 
             <DialogDescription className="mt-4">
-              თქვენ გააუქმებთ გუნდს წვდომას{' '}
+              თქვენ გაუუქმებთ გუნდს წვდომას{' '}
               <span className="font-semibold">{teamEmail.team.name}</span> ({teamEmail.team.url})
-              თქვენს ელ. ფოსტაზე.
+              თქვენს ელ.ფოსტაზე.
             </DialogDescription>
           </DialogHeader>
 
           <fieldset disabled={isDeletingTeamEmail}>
             <DialogFooter>
               <Button type="button" variant="secondary" onClick={() => setOpen(false)}>
-                Cancel
+                დახურვა
               </Button>
 
               <Button
@@ -94,7 +94,7 @@ export const TeamEmailUsage = ({ teamEmail }: TeamEmailUsageProps) => {
                 loading={isDeletingTeamEmail}
                 onClick={async () => deleteTeamEmail({ teamId: teamEmail.teamId })}
               >
-                Revoke
+                გაუქმება
               </Button>
             </DialogFooter>
           </fieldset>

@@ -60,21 +60,21 @@ export const DocumentsDataTable = ({
       <DataTable
         columns={[
           {
-            header: 'Created',
+            header: 'შექმნილია',
             accessorKey: 'createdAt',
             cell: ({ row }) => <LocaleDate date={row.original.createdAt} />,
           },
           {
-            header: 'Title',
+            header: 'სათაური',
             cell: ({ row }) => <DataTableTitle row={row.original} teamUrl={team?.url} />,
           },
           {
             id: 'sender',
-            header: 'Sender',
+            header: 'გამგზავნი',
             cell: ({ row }) => row.original.User.name ?? row.original.User.email,
           },
           {
-            header: 'Recipient',
+            header: 'მიმღები',
             accessorKey: 'recipient',
             cell: ({ row }) => (
               <StackAvatarsWithTooltip
@@ -84,13 +84,13 @@ export const DocumentsDataTable = ({
             ),
           },
           {
-            header: 'Status',
+            header: 'სტატუსი',
             accessorKey: 'status',
             cell: ({ row }) => <DocumentStatus status={row.getValue('status')} />,
             size: 140,
           },
           {
-            header: 'Actions',
+            header: 'პარამეტრები',
             cell: ({ row }) =>
               (!row.original.deletedAt ||
                 row.original.status === ExtendedDocumentStatus.COMPLETED) && (

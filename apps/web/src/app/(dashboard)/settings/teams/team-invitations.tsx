@@ -43,7 +43,7 @@ export const TeamInvitations = () => {
 
                 <DialogContent position="center">
                   <DialogHeader>
-                    <DialogTitle>Pending invitations</DialogTitle>
+                    <DialogTitle>მომლოდინე მოწვევები</DialogTitle>
 
                     <DialogDescription className="mt-4">
                       თქვენი {data.length} გუნდის მოწვევა განხილვის პროცესშია.

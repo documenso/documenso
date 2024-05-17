@@ -78,7 +78,7 @@ export const DocumentEditPageView = async ({ params, team }: DocumentEditPageVie
     <div className="mx-auto -mt-4 w-full max-w-screen-xl px-4 md:px-8">
       <Link href={documentRootPath} className="flex items-center text-[#7AC455] hover:opacity-80">
         <ChevronLeft className="mr-2 inline-block h-5 w-5" />
-        Documents
+        დოკუმენტები
       </Link>
 
       <h1 className="mt-4 truncate text-2xl font-semibold md:text-3xl" title={document.title}>
@@ -97,7 +97,7 @@ export const DocumentEditPageView = async ({ params, team }: DocumentEditPageVie
               documentStatus={document.status}
               position="bottom"
             >
-              <span>{recipients.length} Recipient(s)</span>
+              <span>{recipients.length} მიმღები</span>
             </StackAvatarsWithTooltip>
           </div>
         )}

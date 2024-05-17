@@ -108,7 +108,10 @@ export default async function BillingSettingsPage() {
               </p>
             ))
             .with('PAST_DUE', () => (
-              <p>თქვენს მიმდინარე პაკეტს ვადა გაუვიდა. Please update your payment information.</p>
+              <p>
+                თქვენს მიმდინარე პაკეტს ვადა გაუვიდა. სერვისების გამოსაყენებლად, გთხოვთ, განაახლოთ
+                პაკეტი.
+              </p>
             ))
             .otherwise(() => null)}
       </div>

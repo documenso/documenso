@@ -51,7 +51,7 @@ export default async function AdminDocumentDetailsPage({ params }: AdminDocument
 
       <hr className="my-4" />
 
-      <h2 className="text-lg font-semibold">Admin Actions</h2>
+      <h2 className="text-lg font-semibold">ადმინის პარამეტრები</h2>
 
       <AdminActions className="mt-2" document={document} />
 
