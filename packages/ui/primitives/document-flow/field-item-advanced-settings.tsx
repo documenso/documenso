@@ -147,118 +147,116 @@ export const FieldAdvancedSettings = forwardRef<HTMLDivElement, FieldAdvancedSet
       <div ref={ref} className="flex h-full flex-col">
         <DocumentFlowFormContainerHeader title={title} description={description} />
         <DocumentFlowFormContainerContent>
-          <div className="flex flex-col gap-4">
-            {isDocumentPdfLoaded &&
-              fields.map((field, index) => (
-                <span key={index} className="opacity-75 active:pointer-events-none">
-                  <FieldItem key={index} field={field} disabled={true} color={'gray-500'} />
-                </span>
-              ))}
+          {isDocumentPdfLoaded &&
+            fields.map((field, index) => (
+              <span key={index} className="opacity-75 active:pointer-events-none">
+                <FieldItem key={index} field={field} disabled={true} color={'gray-500'} />
+              </span>
+            ))}
 
-            {/* For testing purposes only. Remove label and placeholder and add proper properties */}
-            {radioField && (
-              <div className="flex flex-col gap-4">
-                <div>
-                  <Label>Option 1</Label>
-                  <Input
-                    id="label"
-                    className="bg-background mt-2"
-                    placeholder="Radio option 1"
-                    value={fieldState.label}
-                    onChange={(e) => handleFieldChange('label', e.target.value)}
-                  />
-                </div>
-                <div>
-                  <Label className="mt-4">Option 2</Label>
-                  <Input
-                    id="placeholder"
-                    className="bg-background mt-2"
-                    placeholder="Radio option 2"
-                    value={fieldState.placeholder}
-                    onChange={(e) => handleFieldChange('placeholder', e.target.value)}
-                  />
-                </div>
-              </div>
-            )}
-
-            {!radioField && (
+          {/* For testing purposes only. Remove label and placeholder and add proper properties */}
+          {radioField && (
+            <div className="flex flex-col gap-4">
               <div>
-                <Label>Label</Label>
+                <Label>Option 1</Label>
                 <Input
                   id="label"
                   className="bg-background mt-2"
-                  placeholder="Field label"
+                  placeholder="Radio option 1"
                   value={fieldState.label}
                   onChange={(e) => handleFieldChange('label', e.target.value)}
                 />
               </div>
-            )}
-
-            {!checkBoxField && !radioField && (
               <div>
-                <Label>Placeholder</Label>
+                <Label className="mt-4">Option 2</Label>
                 <Input
                   id="placeholder"
                   className="bg-background mt-2"
-                  placeholder="Field placeholder"
+                  placeholder="Radio option 2"
                   value={fieldState.placeholder}
                   onChange={(e) => handleFieldChange('placeholder', e.target.value)}
                 />
               </div>
-            )}
+            </div>
+          )}
 
-            {numberField && (
-              <>
-                <div className="flex flex-col gap-2">
-                  <Label>Format</Label>
-                  <Select>
-                    <SelectTrigger className="text-muted-foreground w-full">
-                      <SelectValue placeholder="Field format" />
-                    </SelectTrigger>
-                    <SelectContent position="popper">
-                      {listValues.map((item, index) => (
-                        <SelectItem key={index} value={item.value}>
-                          {item.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
+          {!radioField && (
+            <div>
+              <Label>Label</Label>
+              <Input
+                id="label"
+                className="bg-background mt-2"
+                placeholder="Field label"
+                value={fieldState.label}
+                onChange={(e) => handleFieldChange('label', e.target.value)}
+              />
+            </div>
+          )}
 
-                <div>
-                  <Label>Character Limit</Label>
-                  <Input
-                    id="characterLimit"
-                    className="bg-background mt-2"
-                    placeholder="Field character limit"
-                    value={fieldState.characterLimit}
-                    onChange={(e) => handleFieldChange('characterLimit', e.target.value)}
+          {!checkBoxField && !radioField && (
+            <div className="mt-4">
+              <Label>Placeholder</Label>
+              <Input
+                id="placeholder"
+                className="bg-background mt-2"
+                placeholder="Field placeholder"
+                value={fieldState.placeholder}
+                onChange={(e) => handleFieldChange('placeholder', e.target.value)}
+              />
+            </div>
+          )}
+
+          {numberField && (
+            <>
+              <div className="my-4">
+                <Label>Format</Label>
+                <Select>
+                  <SelectTrigger className="text-muted-foreground mt-2 w-full">
+                    <SelectValue placeholder="Field format" />
+                  </SelectTrigger>
+                  <SelectContent position="popper">
+                    {listValues.map((item, index) => (
+                      <SelectItem key={index} value={item.value}>
+                        {item.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div>
+                <Label>Character Limit</Label>
+                <Input
+                  id="characterLimit"
+                  className="bg-background mt-2"
+                  placeholder="Field character limit"
+                  value={fieldState.characterLimit}
+                  onChange={(e) => handleFieldChange('characterLimit', e.target.value)}
+                />
+              </div>
+
+              <div className="mt-4 flex flex-row items-center gap-12">
+                <div className="flex flex-row items-center justify-center gap-2">
+                  <Label>Required field?</Label>
+                  <Switch
+                    className="bg-background"
+                    checked={fieldState.required}
+                    onChange={() => handleToggleChange('required')}
+                    onClick={() => handleToggleChange('required')}
                   />
                 </div>
-
-                <div className="flex flex-row items-center gap-12">
-                  <div className="flex flex-row items-center justify-center gap-2">
-                    <Label>Required field?</Label>
-                    <Switch
-                      className="bg-background"
-                      checked={fieldState.required}
-                      onChange={() => handleToggleChange('required')}
-                      onClick={() => handleToggleChange('required')}
-                    />
-                  </div>
-                  <div className="flex flex-row items-center justify-center gap-2">
-                    <Label>Read only?</Label>
-                    <Switch
-                      className="bg-background"
-                      checked={fieldState.readOnly}
-                      onChange={() => handleToggleChange('readOnly')}
-                      onClick={() => handleToggleChange('readOnly')}
-                    />
-                  </div>
+                <div className="flex flex-row items-center justify-center gap-2">
+                  <Label>Read only?</Label>
+                  <Switch
+                    className="bg-background"
+                    checked={fieldState.readOnly}
+                    onChange={() => handleToggleChange('readOnly')}
+                    onClick={() => handleToggleChange('readOnly')}
+                  />
                 </div>
-              </>
-            )}
-          </div>
+              </div>
+            </>
+          )}
         </DocumentFlowFormContainerContent>
         <DocumentFlowFormContainerFooter className="mt-auto">
           <DocumentFlowFormContainerActions
