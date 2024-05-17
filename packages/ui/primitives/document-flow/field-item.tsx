@@ -9,12 +9,102 @@ import { createPortal } from 'react-dom';
 import { Rnd } from 'react-rnd';
 
 import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
-import { colorVariants } from '@documenso/lib/utils/createColorVariants';
 
 import { cn } from '../../lib/utils';
 import { Card, CardContent } from '../card';
+import type { CombinedStylesKey } from './add-fields';
 import { FieldIcon } from './field-icon';
 import type { TDocumentFlowFormSchema } from './types';
+
+/* 
+  I hate this, but due to TailwindCSS JIT, I couldnn't find a better way to do this for now.
+
+  TODO: Try to find a better way to do this.
+*/
+export const combinedStyles = {
+  'orange-500': {
+    ringColor: 'ring-orange-500/30 ring-offset-orange-500',
+    borderWithHover: 'group-data-[selected]:border-orange-500 hover:border-orange-500',
+    border: 'border-orange-500',
+    borderActive: 'border-orange-500 bg-orange-500/20',
+    background: 'bg-orange-500/60 border-orange-500',
+    initialsBG: 'bg-orange-500',
+    fieldBackground: 'bg-orange-500/[.025]',
+  },
+  'green-500': {
+    ringColor: 'ring-green-500/30 ring-offset-green-500',
+    borderWithHover: 'group-data-[selected]:border-green-500 hover:border-green-500',
+    border: 'border-green-500',
+    borderActive: 'border-green-500 bg-green-500/20',
+    background: 'bg-green-500/60 border-green-500',
+    initialsBG: 'bg-green-500',
+    fieldBackground: 'bg-green-500/[.025]',
+  },
+  'cyan-500': {
+    ringColor: 'ring-cyan-500/30 ring-offset-cyan-500',
+    borderWithHover: 'group-data-[selected]:border-cyan-500 hover:border-cyan-500',
+    border: 'border-cyan-500',
+    borderActive: 'border-cyan-500 bg-cyan-500/20',
+    background: 'bg-cyan-500/60 border-cyan-500',
+    initialsBG: 'bg-cyan-500',
+    fieldBackground: 'bg-cyan-500/[.025]',
+  },
+  'blue-500': {
+    ringColor: 'ring-blue-500/30 ring-offset-blue-500',
+    borderWithHover: 'group-data-[selected]:border-blue-500 hover:border-blue-500',
+    border: 'border-blue-500',
+    borderActive: 'border-blue-500 bg-blue-500/20',
+    background: 'bg-blue-500/60 border-blue-500',
+    initialsBG: 'bg-blue-500',
+    fieldBackground: 'bg-blue-500/[.025]',
+  },
+  'indigo-500': {
+    ringColor: 'ring-indigo-500/30 ring-offset-indigo-500',
+    borderWithHover: 'group-data-[selected]:border-indigo-500 hover:border-indigo-500',
+    border: 'border-indigo-500',
+    borderActive: 'border-indigo-500 bg-indigo-500/20',
+    background: 'bg-indigo-500/60 border-indigo-500',
+    initialsBG: 'bg-indigo-500',
+    fieldBackground: 'bg-indigo-500/[.025]',
+  },
+  'purple-500': {
+    ringColor: 'ring-purple-500/30 ring-offset-purple-500',
+    borderWithHover: 'group-data-[selected]:border-purple-500 hover:border-purple-500',
+    border: 'border-purple-500',
+    borderActive: 'border-purple-500 bg-purple-500/20',
+    background: 'bg-purple-500/60 border-purple-500',
+    initialsBG: 'bg-purple-500',
+    fieldBackground: 'bg-purple-500/[.025]',
+  },
+  'pink-500': {
+    ringColor: 'ring-pink-500/30 ring-offset-pink-500',
+    borderWithHover: 'group-data-[selected]:border-pink-500 hover:border-pink-500',
+    border: 'border-pink-500',
+    borderActive: 'border-pink-500 bg-pink-500/20',
+    background: 'bg-pink-500/60 border-pink-500',
+    initialsBG: 'bg-pink-500',
+    fieldBackground: 'bg-ping-500/[.025]',
+  },
+  'gray-500': {
+    ringColor: 'ring-gray-500/30 ring-offset-gray-500',
+    borderWithHover: 'group-data-[selected]:border-gray-500 hover:border-gray-500',
+    border: 'border-gray-500',
+    borderActive: 'border-gray-500 bg-gray-500/20',
+    background: 'bg-gray-500/60 border-gray-500',
+    initialsBG: 'bg-gray-500',
+    fieldBackground: 'bg-gray-500/[.025]',
+  },
+};
+
+export const colorClasses: CombinedStylesKey[] = [
+  'orange-500',
+  'green-500',
+  'cyan-500',
+  'blue-500',
+  'indigo-500',
+  'purple-500',
+  'pink-500',
+];
 
 type Field = TDocumentFlowFormSchema['fields'][0];
 
@@ -35,7 +125,7 @@ export type FieldItemProps = {
   onMove?: (_node: HTMLElement) => void;
   onRemove?: () => void;
   onAdvancedSettings?: () => void;
-  color?: string;
+  color?: CombinedStylesKey;
 };
 
 export const FieldItem = ({
@@ -60,14 +150,15 @@ export const FieldItem = ({
   const [settingsActive, setSettingsActive] = useState(false);
   const cardRef = useRef(null);
 
-  const selectedColorVariant =
-    typeof color === 'string' && color in colorVariants ? colorVariants[color] : undefined;
+  const selectedColorVariant = color ? combinedStyles[color] : null;
 
   const selectedSignerBorderClass = selectedColorVariant?.border ?? 'border-field-card-border';
   const selectedSignerInitialsBGClass =
-    selectedColorVariant?.initialsBackground ?? 'text-field-card-foreground/50 bg-slate-900/10';
+    selectedColorVariant?.initialsBG ?? 'text-field-card-foreground/50 bg-slate-900/10';
   const selectedSignerActiveBorderClass =
     selectedColorVariant?.borderActive ?? 'border-field-card-border/80';
+  const selectedSignerFieldBackground =
+    selectedColorVariant?.fieldBackground ?? 'bg-field-card-background';
 
   const advancedField = ['NUMBER', 'RADIO', 'CHECKBOX', 'DROPDOWN'].includes(field.type);
 
@@ -158,7 +249,7 @@ export const FieldItem = ({
       }}
     >
       <Card
-        className={cn('bg-field-card/10 h-full w-full backdrop-blur-[1px]', {
+        className={cn('h-full w-full backdrop-blur-[1px]', selectedSignerFieldBackground, {
           [selectedSignerBorderClass]: !disabled,
           [selectedSignerActiveBorderClass]: active || settingsActive,
         })}
@@ -218,8 +309,8 @@ export const FieldItem = ({
             )}
             <button
               className="text-muted-foreground/50 hover:text-foreground hover:bg-foreground/10 rounded-md p-1 transition-colors"
-              onClick={() => onRemove?.()}
-              onTouchEnd={() => onRemove?.()}
+              onClick={onRemove}
+              onTouchEnd={onRemove}
             >
               <Trash className="h-4 w-4" />
             </button>

@@ -24,7 +24,6 @@ import { useDocumentElement } from '@documenso/lib/client-only/hooks/use-documen
 import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
 import { RECIPIENT_ROLES_DESCRIPTION } from '@documenso/lib/constants/recipient-roles';
 import { nanoid } from '@documenso/lib/universal/id';
-import { colorClasses, colorVariants } from '@documenso/lib/utils/createColorVariants';
 import type { Field, Recipient } from '@documenso/prisma/client';
 import { RecipientRole } from '@documenso/prisma/client';
 import { FieldType, SendStatus } from '@documenso/prisma/client';
@@ -74,6 +73,8 @@ export type FieldFormType = {
   signerEmail: string;
 };
 
+export type CombinedStylesKey = keyof typeof combinedStyles;
+
 export type AddFieldsFormProps = {
   documentFlow: DocumentFlowStep;
   hideRecipients?: boolean;
@@ -82,6 +83,89 @@ export type AddFieldsFormProps = {
   onSubmit: (_data: TAddFieldsFormSchema) => void;
   isDocumentPdfLoaded: boolean;
 };
+
+/* 
+  I hate this, but due to TailwindCSS JIT, I couldnn't find a better way to do this for now.
+
+  TODO: Try to find a better way to do this.
+*/
+export const combinedStyles = {
+  'orange-500': {
+    ringColor: 'ring-orange-500/30 ring-offset-orange-500',
+    borderWithHover: 'group-data-[selected]:border-orange-500 hover:border-orange-500',
+    border: 'border-orange-500',
+    borderActive: 'border-orange-500 bg-orange-500/20',
+    background: 'bg-orange-500/60 border-orange-500',
+    initialsBG: 'bg-orange-500',
+  },
+  'green-500': {
+    ringColor: 'ring-green-500/30 ring-offset-green-500',
+    borderWithHover: 'group-data-[selected]:border-green-500 hover:border-green-500',
+    border: 'border-green-500',
+    borderActive: 'border-green-500 bg-green-500/20',
+    background: 'bg-green-500/60 border-green-500',
+    initialsBG: 'bg-green-500',
+  },
+  'cyan-500': {
+    ringColor: 'ring-cyan-500/30 ring-offset-cyan-500',
+    borderWithHover: 'group-data-[selected]:border-cyan-500 hover:border-cyan-500',
+    border: 'border-cyan-500',
+    borderActive: 'border-cyan-500 bg-cyan-500/20',
+    background: 'bg-cyan-500/60 border-cyan-500',
+    initialsBG: 'bg-cyan-500',
+  },
+  'blue-500': {
+    ringColor: 'ring-blue-500/30 ring-offset-blue-500',
+    borderWithHover: 'group-data-[selected]:border-blue-500 hover:border-blue-500',
+    border: 'border-blue-500',
+    borderActive: 'border-blue-500 bg-blue-500/20',
+    background: 'bg-blue-500/60 border-blue-500',
+    initialsBG: 'bg-blue-500',
+  },
+  'indigo-500': {
+    ringColor: 'ring-indigo-500/30 ring-offset-indigo-500',
+    borderWithHover: 'group-data-[selected]:border-indigo-500 hover:border-indigo-500',
+    border: 'border-indigo-500',
+    borderActive: 'border-indigo-500 bg-indigo-500/20',
+    background: 'bg-indigo-500/60 border-indigo-500',
+    initialsBG: 'bg-indigo-500',
+  },
+  'purple-500': {
+    ringColor: 'ring-purple-500/30 ring-offset-purple-500',
+    borderWithHover: 'group-data-[selected]:border-purple-500 hover:border-purple-500',
+    border: 'border-purple-500',
+    borderActive: 'border-purple-500 bg-purple-500/20',
+    background: 'bg-purple-500/60 border-purple-500',
+    initialsBG: 'bg-purple-500',
+  },
+  'pink-500': {
+    ringColor: 'ring-pink-500/30 ring-offset-pink-500',
+    borderWithHover: 'group-data-[selected]:border-pink-500 hover:border-pink-500',
+    border: 'border-pink-500',
+    borderActive: 'border-pink-500 bg-pink-500/20',
+    background: 'bg-pink-500/60 border-pink-500',
+    initialsBG: 'bg-pink-500',
+  },
+  'gray-500': {
+    ringColor: 'ring-gray-500/30 ring-offset-gray-500',
+    borderWithHover: 'group-data-[selected]:border-gray-500 hover:border-gray-500',
+    border: 'border-gray-500',
+    borderActive: 'border-gray-500 bg-gray-500/20',
+    background: 'bg-gray-500/60 border-gray-500',
+    initialsBG: 'bg-gray-500',
+    fieldBackground: 'bg-gray-500/[.025]',
+  },
+};
+
+export const colorClasses: CombinedStylesKey[] = [
+  'orange-500',
+  'green-500',
+  'cyan-500',
+  'blue-500',
+  'indigo-500',
+  'purple-500',
+  'pink-500',
+];
 
 export const AddFieldsFormPartial = ({
   documentFlow,
@@ -98,7 +182,7 @@ export const AddFieldsFormPartial = ({
   const settingsRef = useRef<HTMLDivElement>(null);
 
   const recipientColorClasses = useMemo(() => {
-    const colorMap = new Map();
+    const colorMap = new Map<Recipient['id'], CombinedStylesKey>();
     recipients.forEach((recipient, index) => {
       colorMap.set(recipient.id, colorClasses[index % colorClasses.length]);
     });
@@ -155,16 +239,17 @@ export const AddFieldsFormPartial = ({
 
   const selectedSignerColorClass = selectedSigner
     ? recipientColorClasses.get(selectedSigner.id)
+    : undefined;
+
+  const selectedSignerRingClass = selectedSignerColorClass
+    ? combinedStyles[selectedSignerColorClass]?.ringColor
     : '';
 
-  const selectedSignerRingClass = selectedSigner
-    ? colorVariants[selectedSignerColorClass]?.ring || ''
+  const selectedSignerBorderClass = selectedSignerColorClass
+    ? combinedStyles[selectedSignerColorClass]?.borderWithHover
     : '';
-  const selectedSignerBorderClass = selectedSigner
-    ? colorVariants[selectedSignerColorClass]?.borderWithHover || ''
-    : '';
-  const selectedSignerActiveBorderClass = selectedSigner
-    ? colorVariants[selectedSignerColorClass]?.borderActive || ''
+  const selectedSignerActiveBorderClass = selectedSignerColorClass
+    ? combinedStyles[selectedSignerColorClass]?.borderActive
     : '';
 
   const hasSelectedSignerBeenSent = selectedSigner?.sendStatus === SendStatus.SENT;
@@ -474,7 +559,7 @@ export const AddFieldsFormPartial = ({
                         });
                         handleAdvancedSettings();
                       }}
-                      color={colorClass}
+                      color={colorClass || undefined}
                     />
                   );
                 })}

@@ -145,11 +145,11 @@ export const FieldAdvancedSettings = forwardRef<HTMLDivElement, FieldAdvancedSet
       <div ref={ref} className="flex h-full flex-col">
         <DocumentFlowFormContainerHeader title={title} description={description} />
         <DocumentFlowFormContainerContent>
-          <div className="-mt-4 flex flex-col gap-4">
+          <div className="flex flex-col gap-4">
             {isDocumentPdfLoaded &&
               fields.map((field, index) => (
                 <span key={index} className="opacity-75 active:pointer-events-none">
-                  <FieldItem key={index} field={field} disabled={true} />
+                  <FieldItem key={index} field={field} disabled={true} color={'gray-500'} />
                 </span>
               ))}
 
