@@ -1,154 +1,133 @@
-import type { Metadata } from 'next';
-
-import { z } from 'zod';
-
-import { getCompletedDocumentsMonthly } from '@documenso/lib/server-only/user/get-monthly-completed-document';
-import { getUserMonthlyGrowth } from '@documenso/lib/server-only/user/get-user-monthly-growth';
-
-import { FUNDING_RAISED } from '~/app/(marketing)/open/data';
 import { CallToAction } from '~/components/(marketing)/call-to-action';
 
-import { BarMetric } from './bar-metrics';
-import { CapTable } from './cap-table';
-import { FundingRaised } from './funding-raised';
-import { MetricCard } from './metric-card';
-import { MonthlyCompletedDocumentsChart } from './monthly-completed-documents-chart';
-import { MonthlyNewUsersChart } from './monthly-new-users-chart';
-import { MonthlyTotalUsersChart } from './monthly-total-users-chart';
-import { SalaryBands } from './salary-bands';
-import { TeamMembers } from './team-members';
-import { OpenPageTooltip } from './tooltip';
-import { TotalSignedDocumentsChart } from './total-signed-documents-chart';
-import { Typefully } from './typefully';
+// export const metadata: Metadata = {
+//   title: 'Open Startup',
+// };
 
-export const metadata: Metadata = {
-  title: 'Open Startup',
-};
+// export const revalidate = 3600;
 
-export const revalidate = 3600;
+// export const dynamic = 'force-dynamic';
 
-export const dynamic = 'force-dynamic';
+// const GITHUB_HEADERS: Record<string, string> = {
+//   accept: 'application/vnd.github.v3+json',
+// };
 
-const GITHUB_HEADERS: Record<string, string> = {
-  accept: 'application/vnd.github.v3+json',
-};
+// if (process.env.NEXT_PRIVATE_GITHUB_TOKEN) {
+//   GITHUB_HEADERS.authorization = `Bearer ${process.env.NEXT_PRIVATE_GITHUB_TOKEN}`;
+// }
 
-if (process.env.NEXT_PRIVATE_GITHUB_TOKEN) {
-  GITHUB_HEADERS.authorization = `Bearer ${process.env.NEXT_PRIVATE_GITHUB_TOKEN}`;
-}
+// const ZGithubStatsResponse = z.object({
+//   stargazers_count: z.number(),
+//   forks_count: z.number(),
+//   open_issues: z.number(),
+// });
 
-const ZGithubStatsResponse = z.object({
-  stargazers_count: z.number(),
-  forks_count: z.number(),
-  open_issues: z.number(),
-});
+// const ZMergedPullRequestsResponse = z.object({
+//   total_count: z.number(),
+// });
 
-const ZMergedPullRequestsResponse = z.object({
-  total_count: z.number(),
-});
+// const ZOpenIssuesResponse = z.object({
+//   total_count: z.number(),
+// });
 
-const ZOpenIssuesResponse = z.object({
-  total_count: z.number(),
-});
+// const ZStargazersLiveResponse = z.record(
+//   z.object({
+//     stars: z.number(),
+//     forks: z.number(),
+//     mergedPRs: z.number(),
+//     openIssues: z.number(),
+//   }),
+// );
 
-const ZStargazersLiveResponse = z.record(
-  z.object({
-    stars: z.number(),
-    forks: z.number(),
-    mergedPRs: z.number(),
-    openIssues: z.number(),
-  }),
-);
+// const ZEarlyAdoptersResponse = z.record(
+//   z.object({
+//     id: z.number(),
+//     time: z.string().datetime(),
+//     earlyAdopters: z.number(),
+//   }),
+// );
 
-const ZEarlyAdoptersResponse = z.record(
-  z.object({
-    id: z.number(),
-    time: z.string().datetime(),
-    earlyAdopters: z.number(),
-  }),
-);
+// export type StargazersType = z.infer<typeof ZStargazersLiveResponse>;
+// export type EarlyAdoptersType = z.infer<typeof ZEarlyAdoptersResponse>;
 
-export type StargazersType = z.infer<typeof ZStargazersLiveResponse>;
-export type EarlyAdoptersType = z.infer<typeof ZEarlyAdoptersResponse>;
+// const fetchGithubStats = async () => {
+//   return await fetch('https://api.github.com/repos/documenso/documenso', {
+//     headers: {
+//       ...GITHUB_HEADERS,
+//     },
+//   })
+//     .then(async (res) => res.json())
+//     .then((res) => ZGithubStatsResponse.parse(res));
+// };
 
-const fetchGithubStats = async () => {
-  return await fetch('https://api.github.com/repos/documenso/documenso', {
-    headers: {
-      ...GITHUB_HEADERS,
-    },
-  })
-    .then(async (res) => res.json())
-    .then((res) => ZGithubStatsResponse.parse(res));
-};
+// const fetchOpenIssues = async () => {
+//   return await fetch(
+//     'https://api.github.com/search/issues?q=repo:documenso/documenso+type:issue+state:open&page=0&per_page=1',
+//     {
+//       headers: {
+//         ...GITHUB_HEADERS,
+//       },
+//     },
+//   )
+//     .then(async (res) => res.json())
+//     .then((res) => ZOpenIssuesResponse.parse(res));
+// };
 
-const fetchOpenIssues = async () => {
-  return await fetch(
-    'https://api.github.com/search/issues?q=repo:documenso/documenso+type:issue+state:open&page=0&per_page=1',
-    {
-      headers: {
-        ...GITHUB_HEADERS,
-      },
-    },
-  )
-    .then(async (res) => res.json())
-    .then((res) => ZOpenIssuesResponse.parse(res));
-};
+// const fetchMergedPullRequests = async () => {
+//   return await fetch(
+//     'https://api.github.com/search/issues?q=repo:documenso/documenso/+is:pr+merged:>=2010-01-01&page=0&per_page=1',
+//     {
+//       headers: {
+//         ...GITHUB_HEADERS,
+//       },
+//     },
+//   )
+//     .then(async (res) => res.json())
+//     .then((res) => ZMergedPullRequestsResponse.parse(res));
+// };
 
-const fetchMergedPullRequests = async () => {
-  return await fetch(
-    'https://api.github.com/search/issues?q=repo:documenso/documenso/+is:pr+merged:>=2010-01-01&page=0&per_page=1',
-    {
-      headers: {
-        ...GITHUB_HEADERS,
-      },
-    },
-  )
-    .then(async (res) => res.json())
-    .then((res) => ZMergedPullRequestsResponse.parse(res));
-};
+// const fetchStargazers = async () => {
+//   return await fetch('https://stargrazer-live.onrender.com/api/stats', {
+//     headers: {
+//       accept: 'application/json',
+//     },
+//   })
+//     .then(async (res) => res.json())
+//     .then((res) => ZStargazersLiveResponse.parse(res));
+// };
 
-const fetchStargazers = async () => {
-  return await fetch('https://stargrazer-live.onrender.com/api/stats', {
-    headers: {
-      accept: 'application/json',
-    },
-  })
-    .then(async (res) => res.json())
-    .then((res) => ZStargazersLiveResponse.parse(res));
-};
+// const fetchEarlyAdopters = async () => {
+//   return await fetch('https://stargrazer-live.onrender.com/api/stats/stripe', {
+//     headers: {
+//       accept: 'application/json',
+//     },
+//   })
+//     .then(async (res) => res.json())
+//     .then((res) => ZEarlyAdoptersResponse.parse(res));
+// };
 
-const fetchEarlyAdopters = async () => {
-  return await fetch('https://stargrazer-live.onrender.com/api/stats/stripe', {
-    headers: {
-      accept: 'application/json',
-    },
-  })
-    .then(async (res) => res.json())
-    .then((res) => ZEarlyAdoptersResponse.parse(res));
-};
-
-export default async function OpenPage() {
-  const [
-    { forks_count: forksCount, stargazers_count: stargazersCount },
-    { total_count: openIssues },
-    { total_count: mergedPullRequests },
-    STARGAZERS_DATA,
-    EARLY_ADOPTERS_DATA,
-    MONTHLY_USERS,
-    MONTHLY_COMPLETED_DOCUMENTS,
-  ] = await Promise.all([
-    fetchGithubStats(),
-    fetchOpenIssues(),
-    fetchMergedPullRequests(),
-    fetchStargazers(),
-    fetchEarlyAdopters(),
-    getUserMonthlyGrowth(),
-    getCompletedDocumentsMonthly(),
-  ]);
+export default function OpenPage() {
+  // const [
+  //   { forks_count: forksCount, stargazers_count: stargazersCount },
+  //   { total_count: openIssues },
+  //   { total_count: mergedPullRequests },
+  //   STARGAZERS_DATA,
+  //   EARLY_ADOPTERS_DATA,
+  //   MONTHLY_USERS,
+  //   MONTHLY_COMPLETED_DOCUMENTS,
+  // ] = await Promise.all([
+  //   fetchGithubStats(),
+  //   fetchOpenIssues(),
+  //   fetchMergedPullRequests(),
+  //   fetchStargazers(),
+  //   fetchEarlyAdopters(),
+  //   getUserMonthlyGrowth(),
+  //   getCompletedDocumentsMonthly(),
+  // ]);
 
   return (
     <div>
-      <div className="mx-auto mt-6 max-w-screen-lg sm:mt-12">
+      {/* <div className="mx-auto mt-6 max-w-screen-lg sm:mt-12">
         <div className="flex flex-col items-center justify-center">
           <h1 className="text-3xl font-bold lg:text-5xl">Open Startup</h1>
 
@@ -265,16 +244,16 @@ export default async function OpenPage() {
             className="col-span-12 lg:col-span-6"
           />
         </div>
-      </div>
+      </div> */}
 
-      <div className="col-span-12 mt-12 flex flex-col items-center justify-center">
+      {/* <div className="col-span-12 mt-12 flex flex-col items-center justify-center">
         <h2 className="text-2xl font-bold">Is there more?</h2>
 
         <p className="text-muted-foreground mt-4 max-w-[55ch] text-center text-lg leading-normal">
           This page is evolving as we learn what makes a great signing company. We'll update it when
           we have more to share.
         </p>
-      </div>
+      </div> */}
 
       <CallToAction className="mt-12" utmSource="open-page" />
     </div>

@@ -5,9 +5,9 @@ import type { HTMLAttributes } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 
-import { FaXTwitter } from 'react-icons/fa6';
-import { LiaDiscord } from 'react-icons/lia';
-import { LuGithub } from 'react-icons/lu';
+import { FaFacebookF } from 'react-icons/fa6';
+import { FaInstagram } from 'react-icons/fa6';
+import { FaYoutube } from 'react-icons/fa6';
 
 import LogoImage from '@documenso/assets/logo.png';
 import { cn } from '@documenso/ui/lib/utils';
@@ -18,22 +18,16 @@ import { ThemeSwitcher } from '@documenso/ui/primitives/theme-switcher';
 export type FooterProps = HTMLAttributes<HTMLDivElement>;
 
 const SOCIAL_LINKS = [
-  { href: 'https://twitter.com/documenso', icon: <FaXTwitter className="h-6 w-6" /> },
-  { href: 'https://github.com/documenso/documenso', icon: <LuGithub className="h-6 w-6" /> },
-  { href: 'https://documen.so/discord', icon: <LiaDiscord className="h-7 w-7" /> },
+  { href: 'https://twitter.com/documenso', icon: <FaFacebookF className="h-5 w-5" /> },
+  { href: 'https://github.com/documenso/documenso', icon: <FaInstagram className="h-6 w-6" /> },
+  { href: 'https://documen.so/discord', icon: <FaYoutube className="h-7 w-7" /> },
 ];
 
 const FOOTER_LINKS = [
   { href: '/pricing', text: 'ფასი' },
-  { href: '/singleplayer', text: 'Singleplayer' },
   { href: '/blog', text: 'ბლოგი' },
-  { href: '/design-system', text: 'დიზაინი' },
-  { href: '/open', text: 'Open Startup' },
-  { href: 'https://shop.documenso.com', text: 'მაღაზია', target: '_blank' },
-  { href: 'https://status.documenso.com', text: 'სტატუსი', target: '_blank' },
+  { href: '/open', text: 'open' },
   { href: 'mailto:support@documenso.com', text: 'მხარდაჭერა', target: '_blank' },
-  { href: '/oss-friends', text: 'OSS Friends' },
-  { href: '/careers', text: 'კარიერა' },
   { href: '/privacy', text: 'კონფიდენციალურობა' },
 ];
 

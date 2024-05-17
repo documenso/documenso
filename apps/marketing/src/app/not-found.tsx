@@ -38,7 +38,7 @@ export default function NotFound() {
           <h1 className="mt-3 text-2xl font-bold md:text-3xl">დაფიქსირდა ხარვეზი</h1>
 
           <p className="text-muted-foreground mt-4 text-sm">
-            გვერდი, რომელსაც ეძებთ, წაიშალა, გადაარქვეს სახელი ან შესაძლოა არ არსებობს.
+            გვერდი, რომელსაც ეძებთ, წაიშალა, გადაარქვეა სახელი ან შესაძლოა არასოდეს არსებობდა.
           </p>
 
           <div className="mt-6 flex gap-x-2.5 gap-y-4 md:items-center">
