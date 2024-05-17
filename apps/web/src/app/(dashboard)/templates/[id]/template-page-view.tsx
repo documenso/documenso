@@ -13,6 +13,8 @@ import type { Team } from '@documenso/prisma/client';
 
 import { TemplateType } from '~/components/formatter/template-type';
 
+import { DirectTemplateAccessBadge } from '../direct-template-access-badge';
+import { DirectTemplateAccessDialogWrapper } from './direct-template-access-dialog-wrapper';
 import { EditTemplateForm } from './edit-template';
 
 export type TemplatePageViewProps = {
@@ -50,17 +52,33 @@ export const TemplatePageView = async ({ params, team }: TemplatePageViewProps) 
 
   return (
     <div className="mx-auto -mt-4 max-w-screen-xl px-4 md:px-8">
-      <Link href="/templates" className="flex items-center text-[#7AC455] hover:opacity-80">
-        <ChevronLeft className="mr-2 inline-block h-5 w-5" />
-        Templates
-      </Link>
+      <div className="flex flex-col justify-between sm:flex-row">
+        <div>
+          <Link href="/templates" className="flex items-center text-[#7AC455] hover:opacity-80">
+            <ChevronLeft className="mr-2 inline-block h-5 w-5" />
+            Templates
+          </Link>
 
-      <h1 className="mt-4 truncate text-2xl font-semibold md:text-3xl" title={template.title}>
-        {template.title}
-      </h1>
+          <h1 className="mt-4 truncate text-2xl font-semibold md:text-3xl" title={template.title}>
+            {template.title}
+          </h1>
 
-      <div className="mt-2.5 flex items-center gap-x-6">
-        <TemplateType inheritColor type={template.type} className="text-muted-foreground" />
+          <div className="mt-2.5 flex items-center">
+            <TemplateType inheritColor className="text-muted-foreground" type={template.type} />
+
+            {template.access?.token && (
+              <DirectTemplateAccessBadge
+                className="ml-4"
+                token={template.access.token}
+                enabled={template.access.enabled}
+              />
+            )}
+          </div>
+        </div>
+
+        <div className="mt-2 sm:mt-0 sm:self-end">
+          <DirectTemplateAccessDialogWrapper template={template} />
+        </div>
       </div>
 
       <EditTemplateForm

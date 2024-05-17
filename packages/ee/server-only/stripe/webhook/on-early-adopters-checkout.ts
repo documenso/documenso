@@ -8,6 +8,7 @@ import { alphaid, nanoid } from '@documenso/lib/universal/id';
 import { putPdfFile } from '@documenso/lib/universal/upload/put-file';
 import { prisma } from '@documenso/prisma';
 import {
+  DocumentSource,
   DocumentStatus,
   FieldType,
   ReadStatus,
@@ -86,6 +87,7 @@ export const onEarlyAdoptersCheckout = async ({ session }: OnEarlyAdoptersChecko
         status: DocumentStatus.COMPLETED,
         userId: newUser.id,
         documentDataId,
+        source: DocumentSource.DOCUMENT,
       },
     });
 

@@ -97,12 +97,7 @@ export const sealDocument = async ({
     .then(async (doc) => PDFDocument.load(doc))
     .catch(() => null);
 
-  const doc = await PDFDocument.load(pdfData);
-
-  // Normalize and flatten layers that could cause issues with the signature
-  normalizeSignatureAppearances(doc);
-  doc.getForm().flatten();
-  flattenAnnotations(doc);
+  const doc = await loadPDFForSealing(pdfData);
 
   if (certificate) {
     const certificatePages = await doc.copyPages(certificate, certificate.getPageIndices());
@@ -193,4 +188,15 @@ export const sealDocument = async ({
     userId: document.userId,
     teamId: document.teamId ?? undefined,
   });
+};
+
+export const loadPDFForSealing = async (pdfData: Uint8Array) => {
+  const doc = await PDFDocument.load(pdfData);
+
+  // Normalize and flatten layers that could cause issues with the signature
+  normalizeSignatureAppearances(doc);
+  doc.getForm().flatten();
+  flattenAnnotations(doc);
+
+  return doc;
 };
