@@ -75,12 +75,10 @@ export const PricingTable = ({ className, ...props }: PricingTableProps) => {
           data-plan="free"
           className="bg-background shadow-foreground/5 flex flex-col items-center justify-center rounded-lg border px-8 py-12 shadow-lg"
         >
-          <p className="text-foreground text-4xl font-medium">Free Plan</p>
-          <p className="text-primary mt-2.5 text-xl font-medium">$0</p>
+          <p className="text-foreground text-4xl font-medium">უფასო პაკეტი</p>
+          <p className="text-primary mt-2.5 text-xl font-medium">0₾</p>
 
-          <p className="text-foreground mt-4 max-w-[30ch] text-center">
-            მცირე გუნდებისთვის და ძირითადი საჭიროებების მქონე პირებისთვის.
-          </p>
+          <p className="text-foreground mt-4 max-w-[30ch] text-center">ფიზიკური პირებისთვის</p>
 
           <Button className="rounded-full text-base" asChild>
             <Link
@@ -95,7 +93,7 @@ export const PricingTable = ({ className, ...props }: PricingTableProps) => {
           <div className="mt-8 flex w-full flex-col divide-y">
             <p className="text-foreground py-4">5 სტანდარტული დოკუმენტი თვეში</p>
             <p className="text-foreground py-4">10-მდე მიმღები თითო დოკუმენტზე</p>
-            <p className="text-foreground py-4">არ არის საჭირო საკრედიტო ბარათი</p>
+            <p className="text-foreground py-4">შაბლონები</p>
           </div>
 
           <div className="flex-1" />
@@ -105,7 +103,7 @@ export const PricingTable = ({ className, ...props }: PricingTableProps) => {
           data-plan="early-adopter"
           className="border-primary bg-background shadow-foreground/5 flex flex-col items-center justify-center rounded-lg border-2 px-8 py-12 shadow-[0px_0px_0px_4px_#E3E3E380]"
         >
-          <p className="text-foreground text-4xl font-medium">Early Adopters</p>
+          <p className="text-foreground text-4xl font-medium">ბიზნეს პაკეტი</p>
           <div className="text-primary mt-2.5 text-xl font-medium">
             <AnimatePresence mode="wait">
               {period === 'MONTHLY' && <motion.div layoutId="pricing">$30</motion.div>}
@@ -127,7 +125,7 @@ export const PricingTable = ({ className, ...props }: PricingTableProps) => {
           </Button>
 
           <div className="mt-8 flex w-full flex-col divide-y">
-            <p className="text-foreground py-4">
+            {/* <p className="text-foreground py-4">
               <a
                 href="https://documen.so/early-adopters-pricing-page"
                 target="_blank"
@@ -135,7 +133,7 @@ export const PricingTable = ({ className, ...props }: PricingTableProps) => {
               >
                 შეზღუდული დროით: <span className="text-documenso-700">იხილეთ მეტი</span>
               </a>
-            </p>
+            </p> */}
             <p className="text-foregro‚und py-4">ულიმიტო გუნდები</p>
             <p className="text-foregro‚und py-4">ულიმიტო მომცმარებელი</p>
             <p className="text-foregro‚und py-4">ულიმიტო დოკუმენტები ყოველ თვე</p>

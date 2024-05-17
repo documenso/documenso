@@ -159,6 +159,37 @@ export default function PricingPage() {
             </AccordionContent>
           </AccordionItem>
 
+          <AccordionItem value="gurantee-of-signer">
+            <AccordionTrigger className="text-left text-lg font-semibold">
+              რა გარანტიაა, რომ დოკუმენტზე ნამდვილად სასურველმა ადამიანმა მოაწერა ხელი?
+            </AccordionTrigger>
+
+            <AccordionContent className="text-muted-foreground max-w-prose text-sm leading-relaxed">
+              ამის დასადასტურებლად ყოველ ხელმოწერილ დოკუმენტზე ვქმნით ცნობას, რომელიც შეიცავს:
+              <br />
+              <br />
+              <ul>
+                <li>
+                  <span>&#8226;</span> ხელმომწერის ელ.ფოსტის მისამართს
+                </li>
+                <li>
+                  <span>&#8226;</span> ხელმომწერის სრულ სახელსა და გვარს
+                </li>
+                <li>
+                  <span>&#8226;</span> ხელმოწერის ID-ს
+                </li>
+                <li>
+                  <span>&#8226;</span> მოწყობილობის IP მისამართსა და ბრაუზერს, რომლიდანაც დოკუმენტს
+                  ხელი მოეწერა
+                </li>
+                <li>
+                  <span>&#8226;</span> დოკუმენტის გაგზავნის, ნახვის და ხელმოწერის ზუსტი დროსა და
+                  თარიღს
+                </li>
+              </ul>
+            </AccordionContent>
+          </AccordionItem>
+
           <AccordionItem value="where-can-i-get-support">
             <AccordionTrigger className="text-left text-lg font-semibold">
               სად შემიძლია მივიღო მხარდაჭერა?
