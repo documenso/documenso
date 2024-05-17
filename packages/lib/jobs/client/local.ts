@@ -9,7 +9,12 @@ import { BackgroundJobStatus, Prisma } from '@documenso/prisma/client';
 import { NEXT_PUBLIC_WEBAPP_URL } from '../../constants/app';
 import { sign } from '../../server-only/crypto/sign';
 import { verify } from '../../server-only/crypto/verify';
-import type { JobDefinition, JobRunIO, TriggerJobOptions } from './_internal/job';
+import {
+  type JobDefinition,
+  type JobRunIO,
+  type TriggerJobOptions,
+  ZTriggerJobOptionsSchema,
+} from './_internal/job';
 import type { Json } from './_internal/json';
 import { BaseJobProvider } from './base';
 
@@ -59,7 +64,8 @@ export class LocalJobProvider extends BaseJobProvider {
             jobId: job.id,
             name: job.name,
             version: job.version,
-            payload: options.payload,
+            // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+            payload: options.payload as Prisma.InputJsonValue,
           },
         });
 
@@ -80,7 +86,16 @@ export class LocalJobProvider extends BaseJobProvider {
         const isRetry = req.headers['x-job-retry'] !== undefined;
 
         // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-        const options = (await json(req)) as TriggerJobOptions;
+        const options = await json(req)
+          .then(async (data) => ZTriggerJobOptionsSchema.parseAsync(data))
+          // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+          .then((data) => data as TriggerJobOptions)
+          .catch(() => null);
+
+        if (!options) {
+          res.status(400).send('Bad request');
+          return;
+        }
 
         const definition = this._jobDefinitions[options.name];
 
