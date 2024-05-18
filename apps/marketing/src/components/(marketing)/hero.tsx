@@ -1,19 +1,15 @@
 'use client';
 
 import Image from 'next/image';
-import Link from 'next/link';
 
 import type { Variants } from 'framer-motion';
 import { motion } from 'framer-motion';
 import { usePlausible } from 'next-plausible';
-import { match } from 'ts-pattern';
 
 import backgroundPattern from '@documenso/assets/images/background-pattern.png';
 import { useFeatureFlags } from '@documenso/lib/client-only/providers/feature-flag';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
-
-import { Widget } from './widget';
 
 export type HeroProps = {
   className?: string;
@@ -100,6 +96,10 @@ export const Hero = ({ className, ...props }: HeroProps) => {
           დოკუმენტებზე ხელმოწერა არასდროს ყოფილა ასეთი მარტივი
           <span className="block" />
         </motion.h2>
+        <span className="mt-8 block text-center">
+          დაარედაქტირეთ, მოაწერეთ ხელი და გააზიარეთ დოკუმენტები ონლაინ. ეს ისეთივე მარტივია, როგორც
+          ჟღერს
+        </span>
 
         <motion.div
           variants={HeroTitleVariants}
@@ -127,7 +127,7 @@ export const Hero = ({ className, ...props }: HeroProps) => {
           </Link> */}
         </motion.div>
 
-        {match(heroMarketingCTA)
+        {/* {match(heroMarketingCTA)
           .with('spm', () => (
             <motion.div
               variants={HeroTitleVariants}
@@ -165,9 +165,9 @@ export const Hero = ({ className, ...props }: HeroProps) => {
               </Link>
             </motion.div>
           ))
-          .otherwise(() => null)}
+          .otherwise(() => null)} */}
 
-        <motion.div
+        {/* <motion.div
           className="mt-12"
           variants={{
             initial: {
@@ -237,7 +237,7 @@ export const Hero = ({ className, ...props }: HeroProps) => {
               <p className="mt-1">დამფუძნებლები, CHIKOVANI</p>
             </div>
           </Widget>
-        </motion.div>
+        </motion.div> */}
       </div>
     </motion.div>
   );

@@ -62,8 +62,6 @@ export default function PricingPage() {
       </div> */}
 
       <div className="mx-auto mt-36 max-w-2xl">
-        {/* FAQ Section */}
-
         <h2 className="text-4xl font-semibold">ხშირად დასმული კითხვები</h2>
 
         <Accordion type="multiple" className="mt-8">

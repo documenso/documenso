@@ -5,6 +5,7 @@ import Image from 'next/image';
 import backgroundPattern from '@documenso/assets/images/background-pattern.png';
 import cardBeautifulFigure from '@documenso/assets/images/card-beautiful-figure.jpg';
 import cardSharingFigure from '@documenso/assets/images/card-sharing-figure.jpeg';
+import keepTrackPattern from '@documenso/assets/images/keep-track.png';
 import uploadDocumentPatter from '@documenso/assets/images/upload-document.png';
 import { cn } from '@documenso/ui/lib/utils';
 import { Card, CardContent } from '@documenso/ui/primitives/card';
@@ -24,9 +25,9 @@ export const FasterSmarterBeautifulBento = ({
           className="h-full scale-125 object-cover dark:contrast-[70%] dark:invert dark:sepia md:scale-150 lg:scale-[175%]"
         />
       </div>
-      <h2 className="px-0 text-[22px] font-semibold md:px-12 md:text-4xl lg:px-24">
-        10-ჯერ უკეთესი ხელმოწერის გამოცდილება.
-        <span className="block md:mt-0">უფრო სწრაფი, მარტივი და ლამაზი.</span>
+      <h2 className="px-0 text-center text-[22px] font-semibold md:px-12 md:text-4xl lg:px-24">
+        სერიოზული კონტრაქტების მარტივად გაფორმება.
+        {/* <span className="block md:mt-0">უფრო სწრაფი, მარტივი და ლამაზი.</span> */}
       </h2>
 
       <div className="mt-6 grid grid-cols-2 gap-8 md:mt-8">
@@ -139,6 +140,25 @@ export const FasterSmarterBeautifulBento = ({
                 src={cardSharingFigure}
                 alt="its fast"
                 className="w-full max-w-xs dark:contrast-[70%] dark:hue-rotate-180 dark:invert"
+              />
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="col-span-2 lg:col-span-1" spotlight>
+          <CardContent className="grid h-full grid-cols-1 items-center gap-8 px-6 py-5 md:grid-cols-2">
+            <p className="text-foreground/80 pt-4 leading-relaxed md:p-4">
+              <strong className="block text-lg" style={{ marginBottom: '0.5rem' }}>
+                თვალი ადევნეთ
+              </strong>
+              თვალი ადევნეთ თქვენი დოკუმენტის სტატუსს და შეინახეთ უკვე ხელმომწერილი დოკუმენტი
+            </p>
+
+            <div className="flex items-center justify-center py-4 md:p-4">
+              <Image
+                src={keepTrackPattern}
+                alt="its fast"
+                className="w-full max-w-xs scale-125 dark:contrast-[70%] dark:hue-rotate-180 dark:invert"
               />
             </div>
           </CardContent>
