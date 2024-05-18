@@ -3,9 +3,9 @@ import type { HTMLAttributes } from 'react';
 import Image from 'next/image';
 
 import backgroundPattern from '@documenso/assets/images/background-pattern.png';
-import cardBeautifulFigure from '@documenso/assets/images/card-beautiful-figure.png';
-import cardFastFigure from '@documenso/assets/images/card-fast-figure.png';
-import cardSmartFigure from '@documenso/assets/images/card-smart-figure.png';
+import cardBeautifulFigure from '@documenso/assets/images/card-beautiful-figure.jpg';
+import cardSharingFigure from '@documenso/assets/images/card-sharing-figure.jpeg';
+import uploadDocumentPatter from '@documenso/assets/images/upload-document.png';
 import { cn } from '@documenso/ui/lib/utils';
 import { Card, CardContent } from '@documenso/ui/primitives/card';
 
@@ -30,11 +30,11 @@ export const FasterSmarterBeautifulBento = ({
       </h2>
 
       <div className="mt-6 grid grid-cols-2 gap-8 md:mt-8">
-        <Card className="col-span-2" degrees={45} gradient>
+        {/* <Card className="col-span-2" degrees={45} gradient>
           <CardContent className="grid grid-cols-12 gap-8 overflow-hidden p-6 lg:aspect-[2.5/1]">
             <p className="text-foreground/80 col-span-12 leading-relaxed lg:col-span-6">
               <strong className="block">სწრაფი.</strong>
-              {/* When it comes to sending or receiving a contract, you can count on lightning-fast speeds. You can trust that it's really, really fast */}
+               When it comes to sending or receiving a contract, you can count on lightning-fast speeds. You can trust that it's really, really fast 
               როდესაც საქმე ეხება ხელშეკრულების გაგზავნას ან მიღებას, you can count on
               lightning-fast speeds.
             </p>
@@ -80,6 +80,65 @@ export const FasterSmarterBeautifulBento = ({
                 src={cardSmartFigure}
                 alt="its fast"
                 className="w-full max-w-[16rem] dark:contrast-[70%] dark:hue-rotate-180 dark:invert"
+              />
+            </div>
+          </CardContent>
+        </Card> */}
+
+        <Card className="col-span-2 lg:col-span-1" spotlight>
+          <CardContent className="grid h-full grid-cols-1 items-center gap-8 px-6 py-5 md:grid-cols-2">
+            <p className="text-foreground/80 pt-4 leading-relaxed md:p-4">
+              <strong className="block text-lg" style={{ marginBottom: '0.5rem' }}>
+                ატვირთეთ ფაილი
+              </strong>
+              ერთი დაჭერით ატვირთეთ თქვენი დოკუმენტი, რათა დაიწყოთ უსაფრთხო და შეუფერხებელი
+              ხელმოწერა
+            </p>
+
+            <div className="flex items-center justify-center py-4 md:p-4">
+              <Image
+                src={uploadDocumentPatter}
+                alt="its fast"
+                className="w-full max-w-xs dark:contrast-[70%] dark:hue-rotate-180 dark:invert"
+              />
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="col-span-2 lg:col-span-1" spotlight>
+          <CardContent className="grid h-full grid-cols-1 items-center gap-8 px-6 py-5 md:grid-cols-2">
+            <p className="text-foreground/80 pt-4 leading-relaxed md:p-4">
+              <strong className="block text-lg" style={{ marginBottom: '0.5rem' }}>
+                დაამატეთ ხელმოწერა
+              </strong>
+              მოხაზეთ ან დაბეჭდეთ თქვენი ხელმოწერა, შეინახეთ თქვენს პროფილში და გამოიყენეთ ის, როცა
+              დაგჭირდებათ
+            </p>
+
+            <div className="flex items-center justify-center py-4 md:p-4">
+              <Image
+                src={cardBeautifulFigure}
+                alt="its fast"
+                className="w-full max-w-xs dark:contrast-[70%] dark:hue-rotate-180 dark:invert"
+              />
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="col-span-2 lg:col-span-1" spotlight>
+          <CardContent className="grid h-full grid-cols-1 items-center gap-8 px-6 py-5 md:grid-cols-2">
+            <p className="text-foreground/80 pt-4 leading-relaxed md:p-4">
+              <strong className="block text-lg" style={{ marginBottom: '0.5rem' }}>
+                გააგზავნეთ
+              </strong>
+              ავოტმატურად გადაუგზავნეთ დოკუმენტი სხვა ხელმომწერებს მათი ელ.ფოსტის შეყვანით
+            </p>
+
+            <div className="flex items-center justify-center py-4 md:p-4">
+              <Image
+                src={cardSharingFigure}
+                alt="its fast"
+                className="w-full max-w-xs dark:contrast-[70%] dark:hue-rotate-180 dark:invert"
               />
             </div>
           </CardContent>

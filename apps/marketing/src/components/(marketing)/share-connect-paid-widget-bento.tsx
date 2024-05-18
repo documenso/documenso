@@ -5,7 +5,7 @@ import Image from 'next/image';
 import backgroundPattern from '@documenso/assets/images/background-pattern.png';
 import cardConnectionsFigure from '@documenso/assets/images/card-connections-figure.png';
 import cardPaidFigure from '@documenso/assets/images/card-paid-figure.png';
-import cardSharingFigure from '@documenso/assets/images/card-sharing-figure.png';
+import cardSharingFigure from '@documenso/assets/images/card-sharing-figure.jpeg';
 import cardWidgetFigure from '@documenso/assets/images/card-widget-figure.png';
 import { cn } from '@documenso/ui/lib/utils';
 import { Card, CardContent } from '@documenso/ui/primitives/card';
