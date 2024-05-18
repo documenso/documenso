@@ -10,7 +10,7 @@ import { FROM_ADDRESS, FROM_NAME, SERVICE_USER_EMAIL } from '@documenso/lib/cons
 import { insertFieldInPDF } from '@documenso/lib/server-only/pdf/insert-field-in-pdf';
 import { alphaid } from '@documenso/lib/universal/id';
 import { getFile } from '@documenso/lib/universal/upload/get-file';
-import { putFile } from '@documenso/lib/universal/upload/put-file';
+import { putPdfFile } from '@documenso/lib/universal/upload/put-file';
 import { prisma } from '@documenso/prisma';
 import {
   DocumentStatus,
@@ -86,7 +86,7 @@ export const singleplayerRouter = router({
               },
             });
 
-            const { id: documentDataId } = await putFile({
+            const { id: documentDataId } = await putPdfFile({
               name: `${documentName}.pdf`,
               type: 'application/pdf',
               arrayBuffer: async () => Promise.resolve(signedPdfBuffer),
