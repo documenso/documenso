@@ -11,7 +11,7 @@ CREATE TYPE "DocumentSource" AS ENUM ('DOCUMENT', 'TEMPLATE', 'TEMPLATE_DIRECT_A
 ALTER TABLE "Document" ADD COLUMN     "source" "DocumentSource";
 
 -- Custom: UpdateTable
-UPDATE "Document" SET "source" = 'DOCUMENT' WHERE "source" = NULL;
+UPDATE "Document" SET "source" = 'DOCUMENT' WHERE "source" IS NULL;
 
 -- Custom: AlterColumn
 ALTER TABLE "Document" ALTER COLUMN     "source" SET NOT NULL;
