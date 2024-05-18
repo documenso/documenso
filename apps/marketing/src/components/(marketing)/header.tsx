@@ -41,7 +41,7 @@ export const Header = ({ className, ...props }: HeaderProps) => {
             href="/singleplayer"
             className="bg-primary dark:text-background rounded-full px-2 py-1 text-xs font-semibold sm:px-3"
           >
-            ცადეთ დღესვე!
+            სცადეთ დღესვე!
           </Link>
         )}
       </div>

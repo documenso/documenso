@@ -61,11 +61,11 @@ export const MenuSwitcher = ({ user, teams: initialTeamsData }: MenuSwitcherProp
 
   const formatSecondaryAvatarText = (team?: typeof selectedTeam) => {
     if (!team) {
-      return 'Personal Account';
+      return 'პერსონალური ანგარიში';
     }
 
     if (team.ownerUserId === user.id) {
-      return 'Owner';
+      return 'მფლობელი';
     }
 
     return TEAM_MEMBER_ROLE_MAP[team.currentTeamMember.role];

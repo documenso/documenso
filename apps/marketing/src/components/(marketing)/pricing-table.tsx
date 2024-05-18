@@ -58,7 +58,7 @@ export const PricingTable = ({ className, ...props }: PricingTableProps) => {
           >
             წლიური
             <div className="bg-muted text-foreground block rounded-full px-2 py-0.5 text-xs">
-              დაზოგე 50%-მდე
+              დაზოგე 25%-მდე
             </div>
             {period === 'YEARLY' && (
               <motion.div
@@ -106,14 +106,12 @@ export const PricingTable = ({ className, ...props }: PricingTableProps) => {
           <p className="text-foreground text-4xl font-medium">ბიზნეს პაკეტი</p>
           <div className="text-primary mt-2.5 text-xl font-medium">
             <AnimatePresence mode="wait">
-              {period === 'MONTHLY' && <motion.div layoutId="pricing">$30</motion.div>}
-              {period === 'YEARLY' && <motion.div layoutId="pricing">$300</motion.div>}
+              {period === 'MONTHLY' && <motion.div layoutId="pricing">89₾</motion.div>}
+              {period === 'YEARLY' && <motion.div layoutId="pricing">69₾</motion.div>}
             </AnimatePresence>
           </div>
 
-          <p className="text-foreground mt-4 max-w-[30ch] text-center">
-            სწრაფად მზარდი კომპანიებისთვის, რომლებიც მიზნად ისახავს მასშტაბირებას მრავალ გუნდში.
-          </p>
+          <p className="text-foreground mt-4 max-w-[30ch] text-center">მზარდი კომპანიებისთვის</p>
 
           <Button className="mt-6 rounded-full text-base" asChild>
             <Link
@@ -134,11 +132,12 @@ export const PricingTable = ({ className, ...props }: PricingTableProps) => {
                 შეზღუდული დროით: <span className="text-documenso-700">იხილეთ მეტი</span>
               </a>
             </p> */}
-            <p className="text-foregro‚und py-4">ულიმიტო გუნდები</p>
-            <p className="text-foregro‚und py-4">ულიმიტო მომცმარებელი</p>
-            <p className="text-foregro‚und py-4">ულიმიტო დოკუმენტები ყოველ თვე</p>
-            <p className="text-foreground py-4">მოიცავს ყველა მომავალ ფუნქციას</p>
-            <p className="text-foreground py-4">Email, Discord and Slack assistance</p>
+            <p className="text-foreground py-4 font-medium">უფასო პაკეტს დამატებული:</p>
+            <p className="text-foreground py-4">ულიმიტო დოკუმენტები</p>
+            <p className="text-foreground py-4">ულიმიტო გუნდები</p>
+            <p className="text-foreground py-4">ულიმიტო მომხმარებელი</p>
+            <p className="text-foreground py-4">რეპორტები</p>
+            <p className="text-foreground py-4">შეხსენებები</p>
           </div>
           <div className="flex-1" />
         </div>
@@ -147,12 +146,10 @@ export const PricingTable = ({ className, ...props }: PricingTableProps) => {
           data-plan="enterprise"
           className="bg-background shadow-foreground/5 flex flex-col items-center justify-center rounded-lg border px-8 py-12 shadow-lg"
         >
-          <p className="text-foreground text-4xl font-medium">Enterprise</p>
-          <p className="text-primary mt-2.5 text-xl font-medium">ფასი მოთხოვნით</p>
+          <p className="text-foreground text-4xl font-medium">ენტერპრაიზი</p>
+          <p className="text-primary mt-2.5 text-xl font-medium">დაგვიკავშირდით</p>
 
-          <p className="text-foreground mt-4 max-w-[30ch] text-center">
-            დიდი ორგანიზაციებისთვის, რომლებსაც დამატებითი მოქნილობა და კონტროლი სჭირდებათ.
-          </p>
+          <p className="text-foreground mt-4 max-w-[30ch] text-center">დიდი ორგანიზაციებისთვის</p>
 
           <Link
             href="https://dub.sh/enterprise"
@@ -164,7 +161,7 @@ export const PricingTable = ({ className, ...props }: PricingTableProps) => {
           </Link>
 
           <div className="mt-8 flex w-full flex-col divide-y">
-            <p className="text-foreground py-4 font-medium">Everything in Early Adopters, plus:</p>
+            <p className="text-foreground py-4 font-medium">ბიზნეს პაკეტს დამატებული:</p>
             <p className="text-foreground py-4">Custom Subdomain</p>
             <p className="text-foreground py-4">Compliance Check</p>
             <p className="text-foreground py-4">Guaranteed Uptime</p>

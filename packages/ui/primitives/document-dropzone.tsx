@@ -154,12 +154,12 @@ export const DocumentDropzone = ({
           <p className="text-foreground mt-8 font-medium">{heading[type]}</p>
 
           <p className="text-muted-foreground/80 mt-1 text-center text-sm">
-            {disabled ? disabledMessage : 'Drag & drop your PDF here.'}
+            {disabled ? disabledMessage : 'ატვირთეთ PDF ფაილი'}
           </p>
 
           {disabled && IS_BILLING_ENABLED() && (
             <Button className="hover:bg-warning/80 bg-warning mt-4 w-32" asChild>
-              <Link href="/settings/billing">Upgrade</Link>
+              <Link href="/settings/billing">პაკეტის განახლება</Link>
             </Button>
           )}
         </CardContent>

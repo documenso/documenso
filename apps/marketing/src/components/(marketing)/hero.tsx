@@ -97,8 +97,8 @@ export const Hero = ({ className, ...props }: HeroProps) => {
           animate="animate"
           className="text-center text-4xl font-bold leading-tight tracking-tight md:text-[48px] lg:text-[64px]"
         >
-          გაამარტივეთ დაკონტრაქტების
-          <span className="block" /> პროცესი
+          დოკუმენტებზე ხელმოწერა არასდროს ყოფილა ასეთი მარტივი
+          <span className="block" />
         </motion.h2>
 
         <motion.div

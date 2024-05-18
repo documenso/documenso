@@ -3,9 +3,6 @@
 import { useState } from 'react';
 
 import type { User } from '@documenso/prisma/client';
-import { cn } from '@documenso/ui/lib/utils';
-import { Alert, AlertDescription, AlertTitle } from '@documenso/ui/primitives/alert';
-import { Button } from '@documenso/ui/primitives/button';
 
 import { ClaimPublicProfileDialogForm } from '~/components/forms/public-profile-claim-dialog';
 
@@ -19,7 +16,7 @@ export const ClaimProfileAlertDialog = ({ className, user }: ClaimProfileAlertDi
 
   return (
     <>
-      <Alert
+      {/* <Alert
         className={cn(
           'flex flex-col items-center justify-between gap-4 p-6 md:flex-row',
           className,
@@ -38,7 +35,7 @@ export const ClaimProfileAlertDialog = ({ className, user }: ClaimProfileAlertDi
         <div className="flex-shrink-0">
           <Button onClick={() => setOpen(true)}>{user.url ? 'Update Now' : 'Claim Now'}</Button>
         </div>
-      </Alert>
+      </Alert> */}
 
       <ClaimPublicProfileDialogForm open={open} onOpenChange={setOpen} user={user} />
     </>

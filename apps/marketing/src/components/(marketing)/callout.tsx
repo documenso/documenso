@@ -1,9 +1,6 @@
 'use client';
 
-import Link from 'next/link';
-
 import { usePlausible } from 'next-plausible';
-import { LuGithub } from 'react-icons/lu';
 
 import { Button } from '@documenso/ui/primitives/button';
 
@@ -40,13 +37,13 @@ export const Callout = ({ starCount }: CalloutProps) => {
         className="rounded-full bg-transparent backdrop-blur-sm"
         onClick={onSignUpClick}
       >
-        Claim Early Adopter Plan
+        სცადეთ უფასოდ 14 დღის განმავლობაში
         <span className="bg-primary dark:text-background -mr-2.5 ml-2.5 rounded-full px-2 py-1.5 text-xs font-medium">
-          $30/თვე
+          დაწყება
         </span>
       </Button>
 
-      <Link
+      {/* <Link
         href="https://github.com/documenso/documenso"
         target="_blank"
         onClick={() => event('view-github')}
@@ -60,7 +57,7 @@ export const Callout = ({ starCount }: CalloutProps) => {
             </span>
           )}
         </Button>
-      </Link>
+      </Link> */}
     </div>
   );
 };

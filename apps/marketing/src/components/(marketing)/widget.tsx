@@ -199,7 +199,7 @@ export const Widget = ({ className, children, ...props }: WidgetProps) => {
             className="bg-foreground/5 col-span-12 flex flex-col rounded-2xl p-6 lg:col-span-5"
             onSubmit={handleSubmit(onFormSubmit)}
           >
-            <h3 className="text-xl font-semibold">Sign up to Early Adopter Plan</h3>
+            <h3 className="text-xl font-semibold">გჭირდებათ დოკუმენტზე ხელმოწერა?</h3>
             <p className="text-muted-foreground mt-2 text-xs">CHIKOVANI-სთან ერთად</p>
 
             <hr className="mb-6 mt-4" />
@@ -207,7 +207,7 @@ export const Widget = ({ className, children, ...props }: WidgetProps) => {
             <AnimatePresence>
               <motion.div key="email">
                 <label htmlFor="email" className="text-foreground font-medium ">
-                  თქვენი ელ. ფოსტა?
+                  თქვენი ელ.ფოსტა?
                 </label>
 
                 <Controller
