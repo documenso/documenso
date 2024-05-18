@@ -7,16 +7,18 @@ import { InfoIcon } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 
 import { DATE_FORMATS, DEFAULT_DOCUMENT_DATE_FORMAT } from '@documenso/lib/constants/date-formats';
-import { DOCUMENT_AUTH_TYPES } from '@documenso/lib/constants/document-auth';
 import { DEFAULT_DOCUMENT_TIME_ZONE, TIME_ZONES } from '@documenso/lib/constants/time-zones';
-import {
-  DocumentAccessAuth,
-  DocumentActionAuth,
-  DocumentAuth,
-} from '@documenso/lib/types/document-auth';
 import { extractDocumentAuthMethods } from '@documenso/lib/utils/document-auth';
 import { DocumentStatus, type Field, type Recipient, SendStatus } from '@documenso/prisma/client';
 import type { DocumentWithData } from '@documenso/prisma/types/document-with-data';
+import {
+  DocumentGlobalAuthAccessSelect,
+  DocumentGlobalAuthAccessTooltip,
+} from '@documenso/ui/components/document/document-global-auth-access-select';
+import {
+  DocumentGlobalAuthActionSelect,
+  DocumentGlobalAuthActionTooltip,
+} from '@documenso/ui/components/document/document-global-auth-action-select';
 import {
   Accordion,
   AccordionContent,
@@ -144,50 +146,11 @@ export const AddSettingsFormPartial = ({
                 <FormItem>
                   <FormLabel className="flex flex-row items-center">
                     დოკუმენტზე წვდომა
-                    <Tooltip>
-                      <TooltipTrigger>
-                        <InfoIcon className="mx-2 h-4 w-4" />
-                      </TooltipTrigger>
-
-                      <TooltipContent className="text-foreground max-w-md space-y-2 p-4">
-                        <h2>
-                          <strong>დოკუმენტზე წვდომა</strong>
-                        </h2>
-
-                        <p>ავტორიზაცია, რომელიც საჭიროა მიმღებებისთვის დოკუმენტის სანახავად.</p>
-
-                        <ul className="ml-3.5 list-outside list-disc space-y-0.5 py-2">
-                          <li>
-                            {/* Require account */}
-                            <strong>საჭიროა ანგარიში </strong> - დოკუმენტის სანახავად მიმღები
-                            ავტორიზირებულნი უნდა იყვნენ.
-                          </li>
-                          <li>
-                            <strong>None</strong> - დოკუმენტზე წვდომა შესაძლებელია უშუალოდ
-                            მიმღებისთვის გაგზავნილი URL-ით
-                          </li>
-                        </ul>
-                      </TooltipContent>
-                    </Tooltip>
+                    <DocumentGlobalAuthAccessTooltip />
                   </FormLabel>
 
                   <FormControl>
-                    <Select {...field} onValueChange={field.onChange}>
-                      <SelectTrigger className="bg-background text-muted-foreground">
-                        <SelectValue data-testid="documentAccessSelectValue" placeholder="None" />
-                      </SelectTrigger>
-
-                      <SelectContent position="popper">
-                        {Object.values(DocumentAccessAuth).map((authType) => (
-                          <SelectItem key={authType} value={authType}>
-                            {DOCUMENT_AUTH_TYPES[authType].value}
-                          </SelectItem>
-                        ))}
-
-                        {/* Note: -1 is remapped in the Zod schema to the required value. */}
-                        <SelectItem value={'-1'}>None</SelectItem>
-                      </SelectContent>
-                    </Select>
+                    <DocumentGlobalAuthAccessSelect {...field} onValueChange={field.onChange} />
                   </FormControl>
                 </FormItem>
               )}
@@ -200,63 +163,12 @@ export const AddSettingsFormPartial = ({
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel className="flex flex-row items-center">
-                      მიმღების ქმედების ავთენტიფიკაცია
-                      <Tooltip>
-                        <TooltipTrigger>
-                          <InfoIcon className="mx-2 h-4 w-4" />
-                        </TooltipTrigger>
-
-                        <TooltipContent className="text-foreground max-w-md space-y-2 p-4">
-                          <h2>
-                            <strong>Global recipient action authentication</strong>
-                          </h2>
-
-                          <p>ხელმოწერის ველზე ხელმოწერისთვის საჭირო ავთენტიფიკაცია.</p>
-
-                          <p>
-                            This can be overriden by setting the authentication requirements
-                            directly on each recipient in the next step.
-                          </p>
-
-                          <ul className="ml-3.5 list-outside list-disc space-y-0.5 py-2">
-                            {/* <li>
-                              <strong>Require account</strong> - The recipient must be signed in
-                            </li> */}
-                            <li>
-                              <strong>Require passkey</strong> - The recipient must have an account
-                              and passkey configured via their settings
-                            </li>
-                            <li>
-                              <strong>Require 2FA</strong> - The recipient must have an account and
-                              2FA enabled via their settings
-                            </li>
-                            <li>
-                              <strong>None</strong> - No authentication required
-                            </li>
-                          </ul>
-                        </TooltipContent>
-                      </Tooltip>
+                      Recipient action authentication
+                      <DocumentGlobalAuthActionTooltip />
                     </FormLabel>
 
                     <FormControl>
-                      <Select {...field} onValueChange={field.onChange}>
-                        <SelectTrigger className="bg-background text-muted-foreground">
-                          <SelectValue data-testid="documentActionSelectValue" placeholder="None" />
-                        </SelectTrigger>
-
-                        <SelectContent position="popper">
-                          {Object.values(DocumentActionAuth)
-                            .filter((auth) => auth !== DocumentAuth.ACCOUNT)
-                            .map((authType) => (
-                              <SelectItem key={authType} value={authType}>
-                                {DOCUMENT_AUTH_TYPES[authType].value}
-                              </SelectItem>
-                            ))}
-
-                          {/* Note: -1 is remapped in the Zod schema to the required value. */}
-                          <SelectItem value={'-1'}>None</SelectItem>
-                        </SelectContent>
-                      </Select>
+                      <DocumentGlobalAuthActionSelect {...field} onValueChange={field.onChange} />
                     </FormControl>
                   </FormItem>
                 )}

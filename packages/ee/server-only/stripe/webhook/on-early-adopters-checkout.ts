@@ -5,7 +5,7 @@ import { sealDocument } from '@documenso/lib/server-only/document/seal-document'
 import { redis } from '@documenso/lib/server-only/redis';
 import { stripe } from '@documenso/lib/server-only/stripe';
 import { alphaid, nanoid } from '@documenso/lib/universal/id';
-import { putFile } from '@documenso/lib/universal/upload/put-file';
+import { putPdfFile } from '@documenso/lib/universal/upload/put-file';
 import { prisma } from '@documenso/prisma';
 import {
   DocumentStatus,
@@ -74,7 +74,7 @@ export const onEarlyAdoptersCheckout = async ({ session }: OnEarlyAdoptersChecko
       new URL('@documenso/assets/documenso-supporter-pledge.pdf', import.meta.url),
     ).then(async (res) => res.arrayBuffer());
 
-    const { id: documentDataId } = await putFile({
+    const { id: documentDataId } = await putPdfFile({
       name: 'Documenso Supporter Pledge.pdf',
       type: 'application/pdf',
       arrayBuffer: async () => Promise.resolve(documentBuffer),

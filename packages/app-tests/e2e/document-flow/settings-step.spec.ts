@@ -41,8 +41,8 @@ test.describe('[EE_ONLY]', () => {
 
     // Set EE action auth.
     await page.getByTestId('documentActionSelectValue').click();
-    await page.getByLabel('Require account').getByText('Require account').click();
-    await expect(page.getByTestId('documentActionSelectValue')).toContainText('Require account');
+    await page.getByLabel('Require passkey').getByText('Require passkey').click();
+    await expect(page.getByTestId('documentActionSelectValue')).toContainText('Require passkey');
 
     // Save the settings by going to the next step.
     await page.getByRole('button', { name: 'Continue' }).click();
@@ -52,11 +52,7 @@ test.describe('[EE_ONLY]', () => {
     await page.getByRole('button', { name: 'Go Back' }).click();
     await expect(page.getByRole('heading', { name: 'General' })).toBeVisible();
 
-    // Todo: Verify that the values are correct once we fix the issue where going back
-    // does not show the updated values.
-    // await expect(page.getByLabel('Title')).toContainText('New Title');
-    // await expect(page.getByTestId('documentAccessSelectValue')).toContainText('Require account');
-    // await expect(page.getByTestId('documentActionSelectValue')).toContainText('Require account');
+    await expect(page.getByTestId('documentActionSelectValue')).toContainText('Require passkey');
 
     await unseedUser(user.id);
   });
@@ -89,8 +85,8 @@ test.describe('[EE_ONLY]', () => {
 
     // Set EE action auth.
     await page.getByTestId('documentActionSelectValue').click();
-    await page.getByLabel('Require account').getByText('Require account').click();
-    await expect(page.getByTestId('documentActionSelectValue')).toContainText('Require account');
+    await page.getByLabel('Require passkey').getByText('Require passkey').click();
+    await expect(page.getByTestId('documentActionSelectValue')).toContainText('Require passkey');
 
     // Save the settings by going to the next step.
     await page.getByRole('button', { name: 'Continue' }).click();
@@ -168,11 +164,8 @@ test('[DOCUMENT_FLOW]: add settings', async ({ page }) => {
   await page.getByRole('button', { name: 'Go Back' }).click();
   await expect(page.getByRole('heading', { name: 'General' })).toBeVisible();
 
-  // Todo: Verify that the values are correct once we fix the issue where going back
-  // does not show the updated values.
-  // await expect(page.getByLabel('Title')).toContainText('New Title');
-  // await expect(page.getByTestId('documentAccessSelectValue')).toContainText('Require account');
-  // await expect(page.getByTestId('documentActionSelectValue')).toContainText('Require account');
+  await expect(page.getByLabel('Title')).toHaveValue('New Title');
+  await expect(page.getByTestId('documentAccessSelectValue')).toContainText('Require account');
 
   await unseedUser(user.id);
 });

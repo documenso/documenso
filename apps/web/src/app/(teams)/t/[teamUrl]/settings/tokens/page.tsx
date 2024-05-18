@@ -1,7 +1,10 @@
 import { DateTime } from 'luxon';
+import { match } from 'ts-pattern';
 
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
+import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { getRequiredServerComponentSession } from '@documenso/lib/next-auth/get-server-component-session';
+import type { GetTeamTokensResponse } from '@documenso/lib/server-only/public-api/get-all-team-tokens';
 import { getTeamTokens } from '@documenso/lib/server-only/public-api/get-all-team-tokens';
 import { getTeamByUrl } from '@documenso/lib/server-only/team/get-team';
 import { Button } from '@documenso/ui/primitives/button';
@@ -23,7 +26,24 @@ export default async function ApiTokensPage({ params }: ApiTokensPageProps) {
 
   const team = await getTeamByUrl({ userId: user.id, teamUrl });
 
-  const tokens = await getTeamTokens({ userId: user.id, teamId: team.id });
+  let tokens: GetTeamTokensResponse | null = null;
+
+  try {
+    tokens = await getTeamTokens({ userId: user.id, teamId: team.id });
+  } catch (err) {
+    const error = AppError.parseError(err);
+
+    return (
+      <div>
+        <h3 className="text-2xl font-semibold">API Tokens</h3>
+        <p className="text-muted-foreground mt-2 text-sm">
+          {match(error.code)
+            .with(AppErrorCode.UNAUTHORIZED, () => error.message)
+            .otherwise(() => 'Something went wrong.')}
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div>
