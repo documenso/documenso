@@ -30,7 +30,7 @@ export const FasterSmarterBeautifulBento = ({
         {/* <span className="block md:mt-0">უფრო სწრაფი, მარტივი და ლამაზი.</span> */}
       </h2>
 
-      <div className="mt-6 grid grid-cols-2 gap-8 md:mt-8">
+      <div className="mt-6 grid grid-cols-2 gap-8 md:mt-16">
         {/* <Card className="col-span-2" degrees={45} gradient>
           <CardContent className="grid grid-cols-12 gap-8 overflow-hidden p-6 lg:aspect-[2.5/1]">
             <p className="text-foreground/80 col-span-12 leading-relaxed lg:col-span-6">
@@ -158,7 +158,7 @@ export const FasterSmarterBeautifulBento = ({
               <Image
                 src={keepTrackPattern}
                 alt="its fast"
-                className="w-full max-w-xs scale-125 dark:contrast-[70%] dark:hue-rotate-180 dark:invert"
+                className="w-full max-w-xs scale-100 dark:contrast-[70%] dark:hue-rotate-180 dark:invert lg:scale-125"
               />
             </div>
           </CardContent>

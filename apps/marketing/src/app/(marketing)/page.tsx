@@ -45,10 +45,11 @@ export default async function IndexPage() {
     <div className={cn('mt-12', fontCaveat.variable)}>
       <Hero starCount={starCount} />
 
-      <FasterSmarterBeautifulBento className="my-48" />
+      <FasterSmarterBeautifulBento className="my-24 md:my-36 lg:my-48" />
       {/* <ShareConnectPaidWidgetBento className="my-48" /> */}
-      <OpenBuildTemplateBento className="my-48" />
+      <OpenBuildTemplateBento className="my-24 md:my-36 lg:my-48" />
 
+      {/* FAQs */}
       <div className="mx-auto mt-36 max-w-4xl">
         <h2 className="text-4xl font-semibold">ხშირად დასმული კითხვები</h2>
 
@@ -72,15 +73,12 @@ export default async function IndexPage() {
             </AccordionTrigger>
 
             <AccordionContent className="text-muted-foreground max-w-prose text-sm leading-relaxed">
-              ჩვენ სერიოზულად ვუდგებით უსაფრთხოების ზომებს, როდესაც Signed.ge-სთან ელექტრონულ
-              ხელმოწერას ქმნით, მთელი პროცესი დაცულია TLS დაშიფვრით. თქვენი დოკუმენტები სრულიად
-              დაცულია ატვირთვიდან ჩამოტვირთვამდე. შეგიძლიათ დარწმუნებული იყოთ, რომ თქვენი მონაცემები
-              უსაფრთხო და დაცვულია. ჩვენ სერიოზულად ვუდგებით უსაფრთხოების ზომებს. ვაგროვებთ მხოლოდ
-              აუცილებელ მონაცემებს, როგორიცაა თქვენი სახელი, ელ.ფოსტის მისამართი და თქვენ მიერ
-              ატვირთული დოკუმენტები, ჩვენი სერვისების უზრუნველსაყოფად. თქვენი მონაცემები უსაფრთხოდ
-              ინახება დაშიფვრის გამოყენებით და მუშავდება მხოლოდ დოკუმენტის ხელმოწერისა და თქვენი
-              ანგარიშის მართვისთვის. ჩვენ არ ვუზიარებთ თქვენს ინფორმაციას მესამე მხარეებს თქვენი
-              თანხმობის გარეშე, გარდა იმ შემთხვევისა, როდესაც კანონიერად არის საჭირო. ჩვენი პრაქტიკა
+              ჩვენ სერიოზულად ვუდგებით უსაფრთხოების ზომებს. ვაგროვებთ მხოლოდ აუცილებელ მონაცემებს,
+              როგორიცაა თქვენი სახელი, ელ.ფოსტის მისამართი და თქვენ მიერ ატვირთული დოკუმენტები,
+              ჩვენი სერვისების უზრუნველსაყოფად. თქვენი მონაცემები უსაფრთხოდ ინახება დაშიფვრის
+              გამოყენებით და მუშავდება მხოლოდ დოკუმენტის ხელმოწერისა და თქვენი ანგარიშის
+              მართვისთვის. ჩვენ არ ვუზიარებთ თქვენს ინფორმაციას მესამე მხარეებს თქვენი თანხმობის
+              გარეშე, გარდა იმ შემთხვევისა, როდესაც კანონიერად არის საჭირო. ჩვენი პრაქტიკა
               რეგულარულად განიხილება უსაფრთხოების უმაღლესი სტანდარტების უზრუნველსაყოფად.
             </AccordionContent>
           </AccordionItem>
@@ -165,22 +163,14 @@ export default async function IndexPage() {
               >
                 support@documenso.com
               </Link>{' '}
-              {/* ან{' '}  */}
-              {/* <a
-                className="text-documenso-700 font-bold"
-                href="https://documen.so/discord"
-                target="_blank"
-                rel="noreferrer"
-              >
-                ჩვენს Discord-ის Channel-ში
-              </a>{' '}
-              please message either Lucas or Timur to get added to the channel if you are not
-              already a member. */}
             </AccordionContent>
           </AccordionItem>
         </Accordion>
       </div>
-      <Callout starCount={starCount} />
+
+      <div className="pt-8">
+        <Callout starCount={starCount} />
+      </div>
     </div>
   );
 }

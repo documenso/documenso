@@ -17,7 +17,6 @@ import { Card, CardContent } from '@documenso/ui/primitives/card';
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
@@ -33,8 +32,8 @@ import { FormErrorMessage } from '../form/form-error-message';
 
 const ZWidgetFormSchema = z
   .object({
-    email: z.string().email({ message: 'Please enter a valid email address.' }),
-    name: z.string().trim().min(3, { message: 'Please enter a valid name.' }),
+    email: z.string().email({ message: 'გთხოვთ მიუთითოთ სწორი ელ.ფოსტა' }),
+    name: z.string().trim().min(3, { message: 'გთხოვთ მიუთითოთ სწორი სახელი' }),
   })
   .and(
     z.union([
@@ -176,8 +175,11 @@ export const Widget = ({ className, children, ...props }: WidgetProps) => {
       event('claim-plan-failed');
 
       toast({
-        title: 'Something went wrong',
-        description: error instanceof Error ? error.message : 'Please try again later.',
+        title: 'დაფიქსირდა ხარვეზი',
+        description:
+          error instanceof Error
+            ? error.message
+            : 'გთხოვთ ცადოთ მოგვიანებით ან დაგვიკავშირდეთ support@documenso.com',
         variant: 'destructive',
       });
     }
@@ -191,16 +193,16 @@ export const Widget = ({ className, children, ...props }: WidgetProps) => {
         {...props}
       >
         <div className="grid grid-cols-12 gap-y-8 overflow-hidden p-2 lg:gap-x-8">
-          <div className="text-muted-foreground col-span-12 flex flex-col gap-y-4 p-4 text-xs leading-relaxed lg:col-span-7">
+          <div className="text-muted-foreground order-2 col-span-12 hidden flex-col gap-y-4 p-4 text-sm leading-relaxed md:order-none md:flex lg:col-span-7">
             {children}
           </div>
 
           <form
-            className="bg-foreground/5 col-span-12 flex flex-col rounded-2xl p-6 lg:col-span-5"
+            className="bg-foreground/5 order-1 col-span-12 flex flex-col rounded-2xl p-6 md:order-none lg:col-span-5"
             onSubmit={handleSubmit(onFormSubmit)}
           >
             <h3 className="text-xl font-semibold">გჭირდებათ დოკუმენტზე ხელმოწერა?</h3>
-            <p className="text-muted-foreground mt-2 text-xs">CHIKOVANI-სთან ერთად</p>
+            <p className="text-muted-foreground mt-2 text-sm">SignStream-სთან ერთად</p>
 
             <hr className="mb-6 mt-4" />
 
@@ -310,11 +312,13 @@ export const Widget = ({ className, children, ...props }: WidgetProps) => {
             <div className="mt-12 flex-1" />
 
             <div className="flex items-center justify-between">
-              <p className="text-muted-foreground text-xs">
-                {isValid ? 'Ready for Signing' : `${stepsRemaining} step(s) until signed`}
+              <p className="text-muted-foreground text-sm">
+                {isValid
+                  ? 'თქვენ მზად ხართ ხელმოწერისთვის'
+                  : `${stepsRemaining} ნაბიჯი დამთავრებამდე`}
               </p>
 
-              <p className="text-muted-foreground block text-xs md:hidden">Minimise contract</p>
+              {/* <p className="text-muted-foreground block text-sm md:hidden">Minimise contract</p> */}
             </div>
 
             <div className="bg-background relative mt-2.5 h-[2px] w-full">
@@ -361,7 +365,7 @@ export const Widget = ({ className, children, ...props }: WidgetProps) => {
                   <Input
                     id="signatureText"
                     className="text-foreground placeholder:text-muted-foreground truncate border-none p-0 text-sm focus-visible:ring-0"
-                    placeholder="Draw or type name here"
+                    placeholder="მოხაზეთ ხელმოწერა"
                     disabled={isSubmitting}
                     {...register('signatureText', {
                       onChange: (e) => {
@@ -393,12 +397,12 @@ export const Widget = ({ className, children, ...props }: WidgetProps) => {
             <DialogTitle>დაამატეთ თქვენი ხელმოწერა</DialogTitle>
           </DialogHeader>
 
-          <DialogDescription>
+          {/* <DialogDescription>
             By signing you signal your support of Documenso's mission in a <br></br>
             <strong>non-legally binding, but heartfelt way</strong>. <br></br>
             <br></br>You also unlock the option to purchase the early supporter plan including
             everything we build this year for fixed price.
-          </DialogDescription>
+          </DialogDescription> */}
 
           <SignaturePad
             disabled={isSubmitting}

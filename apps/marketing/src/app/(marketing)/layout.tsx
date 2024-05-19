@@ -46,9 +46,9 @@ export default function MarketingLayout({ children }: MarketingLayoutProps) {
         })}
       >
         {showProfilesAnnouncementBar && (
-          <div className="relative inline-flex w-full items-center justify-center overflow-hidden bg-[#e7f3df] px-4 py-2.5">
+          <div className="relative hidden w-full items-center justify-center overflow-hidden bg-[#e7f3df] px-4  py-2.5 md:inline-flex">
             <div className="text-center text-sm font-medium text-black">
-              დარეგისტრირდით CHIKOVANI-ზე დღესვე და მიიღეთ{' '}
+              დარეგისტრირდით SignStream-ზე დღესვე და მიიღეთ{' '}
               <span className="hidden font-semibold md:inline">25%-მდე ფასდაკლება</span>
               <div className="mt-1.5 block md:ml-4 md:mt-0 md:inline-block">
                 <a
@@ -65,7 +65,7 @@ export default function MarketingLayout({ children }: MarketingLayoutProps) {
         <Header className="mx-auto h-16 max-w-screen-xl px-4 md:h-20 lg:px-8" />
       </div>
 
-      <div className="relative max-w-screen-xl flex-1 px-4 sm:mx-auto lg:px-8">{children}</div>
+      <div className="relative max-w-screen-xl flex-1 px-4 sm:mx-auto md:px-8">{children}</div>
 
       <Footer className="bg-background border-muted mt-24 border-t" />
     </div>

@@ -11,6 +11,8 @@ import { useFeatureFlags } from '@documenso/lib/client-only/providers/feature-fl
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
 
+import { Widget } from './widget';
+
 export type HeroProps = {
   className?: string;
   [key: string]: unknown;
@@ -96,10 +98,6 @@ export const Hero = ({ className, ...props }: HeroProps) => {
           დოკუმენტებზე ხელმოწერა არასდროს ყოფილა ასეთი მარტივი
           <span className="block" />
         </motion.h2>
-        <span className="mt-8 block text-center">
-          დაარედაქტირეთ, მოაწერეთ ხელი და გააზიარეთ დოკუმენტები ონლაინ. ეს ისეთივე მარტივია, როგორც
-          ჟღერს
-        </span>
 
         <motion.div
           variants={HeroTitleVariants}
@@ -167,7 +165,7 @@ export const Hero = ({ className, ...props }: HeroProps) => {
           ))
           .otherwise(() => null)} */}
 
-        {/* <motion.div
+        <motion.div
           className="mt-12"
           variants={{
             initial: {
@@ -187,38 +185,34 @@ export const Hero = ({ className, ...props }: HeroProps) => {
           initial="initial"
           animate="animate"
         >
-          <Widget className="mt-12">
-            <strong>CHIKOVANI მხარდამჭერი პირობა</strong>
-            <p className="w-full max-w-[70ch]">
-              ამხელა ტექსტს პონტი არაა ვერ გადავთარგმნი Our mission is to create an open signing
-              infrastructure that empowers the world, enabling businesses to embrace openness,
-              cooperation, and transparency. We believe that signing, as a fundamental act, should
-              embody these values. By offering an open-source signing solution, we aim to make
-              document signing accessible, transparent, and trustworthy.
+          <Widget className="mt-12 text-sm">
+            <strong>SignStream მხარდამჭერი პირობა</strong>
+            <p className="w-full lg:max-w-[70ch]">
+              მოგესალმებით SignStream-ში, ელექტრონული ხელმოწერების პლატფორმა. ჩვენ ვამარტივებთ
+              ხელმოწერების პროცესს, ვხდით მას უსაფრთხოს, ეფექტურსა და სწრაფს.
+              {/* რომელიც მორგებულია ყველა ზომის ბიზნესისთვის. */}
             </p>
 
-            <p className="w-full max-w-[70ch]">
-              Through our platform, called Documenso, we strive to earn your trust by allowing
-              self-hosting and providing complete visibility into its inner workings. We value
-              inclusivity and foster an environment where diverse perspectives and contributions are
-              welcomed, even though we may not implement them all.
+            <p className="w-full lg:max-w-[70ch]">
+              ელექტრონული ხელმოწერა საშუალებას გაძლევთ ხელი მოაწეროთ დოკუმენტებს ონლაინ, რაც თავს
+              გარიდებთ ფიზიკური ასლების საჭიროებას. ეს ტექნოლოგია აჩქარებს სამუშაო პროცესებს და
+              გიქმნით კომფორტს მოაწეროთ ხელი ნებისმიერი ადგილიდან, ნებისმიერ დროს.
             </p>
 
-            <p className="w-full max-w-[70ch]">
-              At Documenso, we envision a web-enabled future for business and contracts, and we are
-              committed to being the leading provider of open signing infrastructure. By combining
-              exceptional product design with open-source principles, we aim to deliver a robust and
-              well-designed application that exceeds your expectations.
+            <p className="w-full lg:max-w-[70ch]">
+              SignStream-ის გამოყენებით თქვენ დაზოგავთ მნიშვნელოვან დროსა და ენერგიას რომელიც
+              დაიხარჯებოდა მატერიალური დოკუმენტების ფიზიკურად ხელმოწერასა და შენახვაში. ჩვენი მისიაა
+              გავამარტივოთ ციფრული სამყარო და თქვენთვის შევქმნათ ისეთი პლატფორმა, რომელის
+              გამოყენებაც ხელმისაწვდომი იქნება ყველასთვის, მიუხედავად მათი ტექნიკური უნარებისა.
             </p>
 
-            <p className="w-full max-w-[70ch]">
-              We understand that exceptional products are born from exceptional communities, and we
-              invite you to join our open-source community. Your contributions, whether technical or
-              non-technical, will help shape the future of signing. Together, we can create a better
-              future for everyone.
+            <p className="w-full lg:max-w-[70ch]">
+              გამოცადეთ დოკუმენტის ხელმოწერის მომავალი SignStream-ით. შემოგვიერთდით თქვენი
+              მნიშვნელოვანი დოკუმენტების დამუშავების უფრო ეფექტურ, უსაფრთხო და ეკოლოგიურად სუფთა
+              გზაზე გადასვლაში.
             </p>
 
-            <p className="w-full max-w-[70ch]">
+            {/* <p className="w-full max-w-[70ch]">
               Today we invite you to join us on this journey: By signing this mission statement you
               signal your support of Documenso's mission{' '}
               <span className="bg-primary text-black">
@@ -226,10 +220,10 @@ export const Hero = ({ className, ...props }: HeroProps) => {
               </span>{' '}
               and lock in the early adopter plan for forever, including everything we build this
               year.
-            </p>
+            </p> */}
 
-            <div className="flex h-24 items-center">
-              <p className={cn('text-5xl [font-family:var(--font-caveat)]')}>ლუკა & გიორგი</p>
+            <div className="mt-8 flex h-24 items-center">
+              <p className={cn('text-3xl [font-family:var(--font-caveat)]')}>ლუკა & გიორგი</p>
             </div>
 
             <div>
@@ -237,7 +231,7 @@ export const Hero = ({ className, ...props }: HeroProps) => {
               <p className="mt-1">დამფუძნებლები, CHIKOVANI</p>
             </div>
           </Widget>
-        </motion.div> */}
+        </motion.div>
       </div>
     </motion.div>
   );

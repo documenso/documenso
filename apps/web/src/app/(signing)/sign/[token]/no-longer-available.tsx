@@ -58,7 +58,7 @@ export const NoLongerAvailable = ({
               href="https://documenso.com"
               className="text-documenso-700 hover:text-documenso-600"
             >
-              შემოგვიერთდით CHIKOVANI-ზე.
+              შემოგვიერთდით SignStream-ზე.
             </Link>
           </p>
         )}

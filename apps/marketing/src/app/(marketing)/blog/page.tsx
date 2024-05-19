@@ -20,8 +20,8 @@ export default function BlogPage() {
         <h1 className="text-3xl font-bold lg:text-5xl">ბლოგები</h1>
 
         <p className="text-muted-foreground mx-auto mt-4 max-w-xl text-center text-lg leading-normal">
-          მიიღეთ უახლესი ამბები CHIKOVANI-სგან, მათ შორის პროგრამის განახლებები, გუნდის განცხადებები
-          და მეტი!
+          მიიღეთ უახლესი ამბები SignStream-სგან, მათ შორის პროგრამის განახლებები, გუნდის
+          განცხადებები და მეტი!
         </p>
       </div>
 
