@@ -26,14 +26,14 @@ export const AdminActions = ({ className, document }: AdminActionsProps) => {
     trpc.admin.resealDocument.useMutation({
       onSuccess: () => {
         toast({
-          title: 'Success',
-          description: 'Document resealed',
+          title: 'დოკუმენტი დალუქულია',
+          description: 'დოკუმენტი წარმატებით დაილუქა!',
         });
       },
       onError: () => {
         toast({
           title: 'დაფიქსირდა ხარვეზი',
-          description: 'Failed to reseal document',
+          description: 'დოკუმენტის დალუქვისას დაფიქსირდა ხარვეზი',
           variant: 'destructive',
         });
       },
@@ -50,19 +50,19 @@ export const AdminActions = ({ className, document }: AdminActionsProps) => {
               disabled={document.status !== DocumentStatus.COMPLETED}
               onClick={() => resealDocument({ id: document.id })}
             >
-              Reseal document
+              დოკუმენტის დალუქვა
             </Button>
           </TooltipTrigger>
 
           <TooltipContent className="max-w-[40ch]">
-            Attempts sealing the document again, useful for after a code change has occurred to
-            resolve an erroneous document.
+            {/* Attempts sealing the document again, useful for after a code change has occurred to resolve an erroneous document. */}
+            თავიდან ცდის დოკუმენტის დალუქვას
           </TooltipContent>
         </Tooltip>
       </TooltipProvider>
 
       <Button variant="outline" asChild>
-        <Link href={`/admin/users/${document.userId}`}>Go to owner</Link>
+        <Link href={`/admin/users/${document.userId}`}>პროფილზე დაბრუნება</Link>
       </Button>
     </div>
   );

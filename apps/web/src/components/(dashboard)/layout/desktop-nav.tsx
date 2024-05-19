@@ -13,11 +13,11 @@ import { Button } from '@documenso/ui/primitives/button';
 const navigationLinks = [
   {
     href: '/documents',
-    label: 'Documents',
+    label: 'დოკუმენტები',
   },
   {
     href: '/templates',
-    label: 'Templates',
+    label: 'შაბლონები',
   },
 ];
 
