@@ -70,6 +70,7 @@ export const fieldRouter = router({
             pageY: field.pageY,
             pageWidth: field.pageWidth,
             pageHeight: field.pageHeight,
+            fieldMeta: field.fieldMeta,
           })),
         });
       } catch (err) {
