@@ -1,5 +1,6 @@
 import { prisma } from '@documenso/prisma';
 import type { FieldType } from '@documenso/prisma/client';
+import type { FieldMeta } from '@documenso/ui/primitives/document-flow/field-item-advanced-settings';
 
 export type SetFieldsForTemplateOptions = {
   userId: number;
@@ -13,6 +14,7 @@ export type SetFieldsForTemplateOptions = {
     pageY: number;
     pageWidth: number;
     pageHeight: number;
+    fieldMeta?: FieldMeta;
   }[];
 };
 
@@ -82,6 +84,7 @@ export const setFieldsForTemplate = async ({
           positionY: field.pageY,
           width: field.pageWidth,
           height: field.pageHeight,
+          fieldMeta: field.fieldMeta,
         },
         create: {
           type: field.type,
@@ -92,6 +95,7 @@ export const setFieldsForTemplate = async ({
           height: field.pageHeight,
           customText: '',
           inserted: false,
+          fieldMeta: field.fieldMeta,
           Template: {
             connect: {
               id: templateId,
