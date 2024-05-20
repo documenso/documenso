@@ -26,6 +26,8 @@ import {
 import { Input } from '@documenso/ui/primitives/input';
 import { useStep } from '@documenso/ui/primitives/stepper';
 
+import { useRequiredDocumentAuthContext } from '~/app/(signing)/sign/[token]/document-auth-provider';
+
 const ZConfigureDirectTemplateFormSchema = z.object({
   email: z.string().email('Email is invalid'),
 });
@@ -50,6 +52,7 @@ export const ConfigureDirectTemplateFormPartial = ({
   onSubmit,
 }: ConfigureDirectTemplateFormProps) => {
   const { Recipient, Field: fields } = template;
+  const { derivedRecipientAccessAuth } = useRequiredDocumentAuthContext();
 
   const recipientsWithBlankDirectRecipientEmail = Recipient.map((recipient) => {
     if (recipient.id === directTemplateRecipient.id) {
@@ -108,7 +111,11 @@ export const ConfigureDirectTemplateFormPartial = ({
                   <FormLabel required>Email</FormLabel>
 
                   <FormControl>
-                    <Input {...field} placeholder="recipient@documenso.com" />
+                    <Input
+                      {...field}
+                      disabled={field.disabled || derivedRecipientAccessAuth !== null}
+                      placeholder="recipient@documenso.com"
+                    />
                   </FormControl>
 
                   {!fieldState.error && (

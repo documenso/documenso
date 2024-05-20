@@ -105,14 +105,20 @@ export const DirectTemplateAccessDialog = ({
 
   const { mutateAsync: toggleTemplateDirectAccess, isLoading: isTogglingTemplateAccess } =
     trpcReact.template.toggleTemplateDirectAccess.useMutation({
-      onMutate: (data) => {
-        setIsEnabled(data.enabled);
-      },
       onSuccess: (data) => {
-        setIsEnabled(data.enabled);
+        toast({
+          title: 'Success',
+          description: `Direct link signing has been ${data.enabled ? 'enabled' : 'disabled'}`,
+        });
       },
       onError: (_ctx, data) => {
-        setIsEnabled(!data.enabled);
+        toast({
+          title: 'Something went wrong',
+          description: `An error occurred while ${
+            data.enabled ? 'enabling' : 'disabling'
+          } direct link signing.`,
+          variant: 'destructive',
+        });
       },
     });
 
@@ -322,12 +328,6 @@ export const DirectTemplateAccessDialog = ({
             ))
             .with({ token: P.string, currentStep: 'MANAGE' }, ({ token }) => (
               <DialogContent className="relative">
-                {isTogglingTemplateAccess && (
-                  <div className="absolute inset-0 z-50 flex items-center justify-center rounded bg-white/50 dark:bg-black/50">
-                    <LoaderIcon className="h-6 w-6 animate-spin text-gray-500" />
-                  </div>
-                )}
-
                 <DialogHeader>
                   <DialogTitle>Direct Link Signing</DialogTitle>
 
@@ -353,12 +353,7 @@ export const DirectTemplateAccessDialog = ({
                     <Switch
                       className="mt-2"
                       checked={isEnabled}
-                      onCheckedChange={async (value) =>
-                        toggleTemplateDirectAccess({
-                          templateId: template.id,
-                          enabled: value,
-                        })
-                      }
+                      onCheckedChange={(value) => setIsEnabled(value)}
                     />
                   </div>
 
@@ -388,29 +383,37 @@ export const DirectTemplateAccessDialog = ({
                 </div>
 
                 <DialogFooter>
+                  <Button
+                    type="button"
+                    variant="destructive"
+                    className="mr-auto w-full sm:w-auto"
+                    loading={isDeletingTemplateDirectAccess}
+                    onClick={() => setCurrentStep('CONFIRM_DELETE')}
+                  >
+                    Remove direct linking
+                  </Button>
+
                   <Button type="button" variant="secondary" onClick={() => onOpenChange(false)}>
                     Close
                   </Button>
 
                   <Button
                     type="button"
-                    variant="destructive"
-                    loading={isDeletingTemplateDirectAccess}
-                    onClick={() => setCurrentStep('CONFIRM_DELETE')}
+                    loading={isTogglingTemplateAccess}
+                    onClick={async () =>
+                      toggleTemplateDirectAccess({
+                        templateId: template.id,
+                        enabled: isEnabled,
+                      })
+                    }
                   >
-                    Remove direct linking
+                    Update
                   </Button>
                 </DialogFooter>
               </DialogContent>
             ))
             .with({ token: P.string, currentStep: 'CONFIRM_DELETE' }, () => (
               <DialogContent className="relative">
-                {isTogglingTemplateAccess && (
-                  <div className="absolute inset-0 z-50 flex items-center justify-center rounded bg-white/50 dark:bg-black/50">
-                    <LoaderIcon className="h-6 w-6 animate-spin text-gray-500" />
-                  </div>
-                )}
-
                 <DialogHeader>
                   <DialogTitle>Are you sure?</DialogTitle>
 

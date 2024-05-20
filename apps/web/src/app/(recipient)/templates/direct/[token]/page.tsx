@@ -1,15 +1,19 @@
 import { notFound, redirect } from 'next/navigation';
 
 import { UsersIcon } from 'lucide-react';
+import { match } from 'ts-pattern';
 
 import { getServerComponentSession } from '@documenso/lib/next-auth/get-server-component-session';
 import { getTemplateByDirectAccessToken } from '@documenso/lib/server-only/template/get-template-by-direct-access-token';
+import { DocumentAccessAuth } from '@documenso/lib/types/document-auth';
+import { extractDocumentAuthMethods } from '@documenso/lib/utils/document-auth';
 
 import { DocumentAuthProvider } from '~/app/(signing)/sign/[token]/document-auth-provider';
 import { SigningProvider } from '~/app/(signing)/sign/[token]/provider';
 import { truncateTitle } from '~/helpers/truncate-title';
 
 import { DirectTemplatePageView } from './direct-template';
+import { DirectTemplateAuthPageView } from './signing-auth-page';
 
 export type TemplatesDirectPageProps = {
   params: {
@@ -40,6 +44,20 @@ export default async function TemplatesDirectPage({ params }: TemplatesDirectPag
 
   if (!directTemplateRecipient) {
     notFound();
+  }
+
+  const { derivedRecipientAccessAuth } = extractDocumentAuthMethods({
+    documentAuth: template.authOptions,
+  });
+
+  // Ensure typesafety when we add more options.
+  const isAccessAuthValid = match(derivedRecipientAccessAuth)
+    .with(DocumentAccessAuth.ACCOUNT, () => user !== null)
+    .with(null, () => true)
+    .exhaustive();
+
+  if (!isAccessAuthValid) {
+    return <DirectTemplateAuthPageView />;
   }
 
   return (
