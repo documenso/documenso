@@ -32,7 +32,7 @@ export type FieldAdvancedSettingsProps = {
   field: FieldFormType;
   fields: FieldFormType[];
   onAdvancedSettings?: () => void;
-  isDocumentPdfLoaded: boolean;
+  isDocumentPdfLoaded?: boolean;
   onSave?: (fieldState: FieldMeta) => void;
 };
 
@@ -67,7 +67,10 @@ const defaultConfigSchema = z.object({
 });
 
 export const FieldAdvancedSettings = forwardRef<HTMLDivElement, FieldAdvancedSettingsProps>(
-  ({ title, description, field, fields, onAdvancedSettings, isDocumentPdfLoaded, onSave }, ref) => {
+  (
+    { title, description, field, fields, onAdvancedSettings, isDocumentPdfLoaded = true, onSave },
+    ref,
+  ) => {
     const { toast } = useToast();
     const localStorageKey = `field_${field.formId}_${field.type}`;
 

@@ -71,6 +71,7 @@ export type FieldFormType = {
   pageWidth: number;
   pageHeight: number;
   signerEmail: string;
+  fieldMeta?: FieldMeta;
 };
 
 export type CombinedStylesKey = keyof typeof combinedStyles;
@@ -336,6 +337,7 @@ export const AddFieldsFormPartial = ({
         pageWidth: fieldPageWidth,
         pageHeight: fieldPageHeight,
         signerEmail: selectedSigner.email,
+        fieldMeta: {},
       });
 
       setIsFieldWithinBounds(false);

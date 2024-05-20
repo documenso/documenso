@@ -12,10 +12,7 @@ import type { TemplateWithDetails } from '@documenso/prisma/types/template';
 import { trpc } from '@documenso/trpc/react';
 import { cn } from '@documenso/ui/lib/utils';
 import { Card, CardContent } from '@documenso/ui/primitives/card';
-import {
-  DocumentFlowFormContainer,
-  DocumentFlowFormContainerHeader,
-} from '@documenso/ui/primitives/document-flow/document-flow-root';
+import { DocumentFlowFormContainer } from '@documenso/ui/primitives/document-flow/document-flow-root';
 import type { DocumentFlowStep } from '@documenso/ui/primitives/document-flow/types';
 import { LazyPDFViewer } from '@documenso/ui/primitives/lazy-pdf-viewer';
 import { Stepper } from '@documenso/ui/primitives/stepper';
@@ -231,11 +228,6 @@ export const EditTemplateForm = ({
           className="lg:h-[calc(100vh-6rem)]"
           onSubmit={(e) => e.preventDefault()}
         >
-          <DocumentFlowFormContainerHeader
-            title={currentDocumentFlow.title}
-            description={currentDocumentFlow.description}
-          />
-
           <Stepper
             currentStep={currentDocumentFlow.stepIndex}
             setCurrentStep={(step) => setStep(EditTemplateSteps[step - 1])}
