@@ -126,6 +126,7 @@ export type FieldItemProps = {
   onRemove?: () => void;
   onAdvancedSettings?: () => void;
   color?: CombinedStylesKey;
+  hideRecipients?: boolean;
 };
 
 export const FieldItem = ({
@@ -139,6 +140,7 @@ export const FieldItem = ({
   onRemove,
   onAdvancedSettings,
   color,
+  hideRecipients = false,
 }: FieldItemProps) => {
   const [active, setActive] = useState(false);
   const [coords, setCoords] = useState({
@@ -272,18 +274,20 @@ export const FieldItem = ({
             fontCaveatClassName={fontCaveat.className}
           />
 
-          <p
-            className={cn(
-              'absolute -right-9 z-20 hidden h-8 w-9 items-center justify-center rounded-r-xl font-semibold text-white group-hover:flex',
-              selectedSignerInitialsBGClass,
-              {
-                'text-field-card-foreground/50 bg-slate-900/10': disabled || passive,
-              },
-            )}
-          >
-            {(field.signerEmail?.charAt(0)?.toUpperCase() ?? '') +
-              (field.signerEmail?.charAt(1)?.toUpperCase() ?? '')}
-          </p>
+          {!hideRecipients && (
+            <p
+              className={cn(
+                'absolute -right-9 z-20 hidden h-8 w-9 items-center justify-center rounded-r-xl font-semibold text-white group-hover:flex',
+                selectedSignerInitialsBGClass,
+                {
+                  'text-field-card-foreground/50 bg-slate-900/10': disabled || passive,
+                },
+              )}
+            >
+              {(field.signerEmail?.charAt(0)?.toUpperCase() ?? '') +
+                (field.signerEmail?.charAt(1)?.toUpperCase() ?? '')}
+            </p>
+          )}
         </CardContent>
       </Card>
 
@@ -291,7 +295,7 @@ export const FieldItem = ({
         <div className="mt-1 flex justify-center">
           <div
             className={cn(
-              'bg-background group flex items-center justify-evenly rounded-md border',
+              'dark:bg-background group flex items-center justify-evenly rounded-md border bg-gray-900',
               {
                 'h-8 w-16': advancedField,
                 'h-8 w-8': !advancedField,
@@ -300,7 +304,7 @@ export const FieldItem = ({
           >
             {advancedField && (
               <button
-                className="text-muted-foreground/50 hover:text-muted-foreground hover:bg-foreground/10 rounded-md p-1 transition-colors"
+                className="dark:text-muted-foreground/50 dark:hover:text-muted-foreground dark:hover:bg-foreground/10 rounded-md p-1 text-gray-400 transition-colors hover:bg-white/10 hover:text-gray-100"
                 onClick={onAdvancedSettings}
                 onTouchEnd={onAdvancedSettings}
               >
@@ -308,7 +312,7 @@ export const FieldItem = ({
               </button>
             )}
             <button
-              className="text-muted-foreground/50 hover:text-foreground hover:bg-foreground/10 rounded-md p-1 transition-colors"
+              className="dark:text-muted-foreground/50 dark:hover:text-muted-foreground dark:hover:bg-foreground/10 rounded-md p-1 text-gray-400 transition-colors hover:bg-white/10 hover:text-gray-100"
               onClick={onRemove}
               onTouchEnd={onRemove}
             >

@@ -30,7 +30,9 @@ export const singleplayerRouter = router({
     .input(ZCreateSinglePlayerDocumentMutationSchema)
     .mutation(async ({ input }) => {
       try {
-        const { signer, fields, documentData, documentName } = input;
+        const { signer, fields, documentData, documentName, fieldMeta } = input;
+
+        console.log('inside tRPC singlePlayerRouter', input);
 
         const document = await getFile({
           data: documentData.data,
@@ -68,8 +70,7 @@ export const singleplayerRouter = router({
             documentId: -1,
             templateId: null,
             recipientId: -1,
-            // TODO: Fix this
-            fieldMeta: {},
+            fieldMeta,
           });
         }
 

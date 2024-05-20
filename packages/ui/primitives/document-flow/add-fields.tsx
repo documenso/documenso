@@ -560,6 +560,7 @@ export const AddFieldsFormPartial = ({
                         handleAdvancedSettings();
                       }}
                       color={colorClass || undefined}
+                      hideRecipients={hideRecipients}
                     />
                   );
                 })}

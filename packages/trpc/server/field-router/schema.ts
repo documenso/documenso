@@ -1,6 +1,7 @@
 import { z } from 'zod';
 
 import { ZRecipientActionAuthSchema } from '@documenso/lib/types/document-auth';
+import { ZFieldMetaSchema } from '@documenso/lib/types/field-field-meta';
 import { FieldType } from '@documenso/prisma/client';
 
 export const ZAddFieldsMutationSchema = z.object({
@@ -16,8 +17,7 @@ export const ZAddFieldsMutationSchema = z.object({
       pageY: z.number().min(0),
       pageWidth: z.number().min(0),
       pageHeight: z.number().min(0),
-      // TODO: Add proper type
-      fieldMeta: z.any(),
+      fieldMeta: ZFieldMetaSchema,
     }),
   ),
 });

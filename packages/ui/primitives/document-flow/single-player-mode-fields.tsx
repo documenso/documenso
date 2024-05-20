@@ -161,7 +161,12 @@ export function SinglePlayerModeCustomTextField({
             fontFamily: `var(${fontVariable})`,
           }}
         >
-          {field.customText}
+          {field.type === FieldType.TEXT ||
+          field.type === FieldType.DATE ||
+          field.type === FieldType.NAME ||
+          field.type === FieldType.EMAIL
+            ? field.customText
+            : field.fieldMeta?.label}
         </p>
       ) : (
         <button
@@ -174,6 +179,10 @@ export function SinglePlayerModeCustomTextField({
             .with(FieldType.EMAIL, () => 'Email')
             .with(FieldType.TEXT, () => 'Text')
             .with(FieldType.SIGNATURE, FieldType.FREE_SIGNATURE, () => 'Signature')
+            .with(FieldType.NUMBER, () => 'Number')
+            .with(FieldType.CHECKBOX, () => 'Checkbox')
+            .with(FieldType.RADIO, () => 'Radio')
+            .with(FieldType.DROPDOWN, () => 'Dropdown')
             .otherwise(() => '')}
         </button>
       )}

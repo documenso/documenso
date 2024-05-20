@@ -394,15 +394,25 @@ export const AddSignatureFormPartial = ({
         <ElementVisible target={PDF_VIEWER_PAGE_SELECTOR}>
           {localFields.map((field) =>
             match(field.type)
-              .with(FieldType.DATE, FieldType.TEXT, FieldType.EMAIL, FieldType.NAME, () => {
-                return (
-                  <SinglePlayerModeCustomTextField
-                    onClick={insertField(field)}
-                    key={field.id}
-                    field={field}
-                  />
-                );
-              })
+              .with(
+                FieldType.DATE,
+                FieldType.TEXT,
+                FieldType.EMAIL,
+                FieldType.NAME,
+                FieldType.NUMBER,
+                FieldType.CHECKBOX,
+                FieldType.RADIO,
+                FieldType.DROPDOWN,
+                () => {
+                  return (
+                    <SinglePlayerModeCustomTextField
+                      onClick={insertField(field)}
+                      key={field.id}
+                      field={field}
+                    />
+                  );
+                },
+              )
               .with(FieldType.SIGNATURE, () => (
                 <SinglePlayerModeSignatureField
                   onClick={insertField(field)}
