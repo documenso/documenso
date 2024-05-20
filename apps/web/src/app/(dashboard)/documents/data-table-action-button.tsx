@@ -96,7 +96,7 @@ export const DataTableActionButton = ({ row, team }: DataTableActionButtonProps)
         <Button className="w-32" asChild>
           <Link href={`${documentsPath}/${row.id}/edit`}>
             <Edit className="-ml-1 mr-2 h-4 w-4" />
-            Edit
+            რედაქტირება
           </Link>
         </Button>
       ),

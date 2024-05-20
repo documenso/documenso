@@ -156,7 +156,7 @@ export const AddTeamEmailDialog = ({ teamId, trigger, ...props }: AddTeamEmailDi
                 name="email"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel required>ელ. ფოსტა</FormLabel>
+                    <FormLabel required>ელ.ფოსტა</FormLabel>
                     <FormControl>
                       <Input
                         className="bg-background"

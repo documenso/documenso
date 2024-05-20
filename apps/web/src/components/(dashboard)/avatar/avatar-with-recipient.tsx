@@ -44,7 +44,11 @@ export function AvatarWithRecipient({ recipient, documentStatus }: AvatarWithRec
         'cursor-pointer hover:underline': signingToken,
       })}
       role={signingToken ? 'button' : undefined}
-      title={signingToken ? 'Click to copy signing link for sending to recipient' : undefined}
+      title={
+        signingToken
+          ? 'დააჭირეთ ხელმოწერის ბმულის დასაკოპირებლად, რათა მიმღების გადაუგზავნოთ'
+          : undefined
+      }
       onClick={onRecipientClick}
     >
       <StackAvatar
@@ -56,7 +60,11 @@ export function AvatarWithRecipient({ recipient, documentStatus }: AvatarWithRec
 
       <div
         className="text-muted-foreground text-sm"
-        title={signingToken ? 'Click to copy signing link for sending to recipient' : undefined}
+        title={
+          signingToken
+            ? 'დააჭირეთ ხელმოწერის ბმულის დასაკოპირებლად, რათა მიმღების გადაუგზავნოთ'
+            : undefined
+        }
       >
         <p>{recipient.email}</p>
         <p className="text-muted-foreground/70 text-xs">

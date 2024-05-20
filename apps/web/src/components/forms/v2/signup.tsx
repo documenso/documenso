@@ -365,7 +365,7 @@ export const SignUpFormV2 = ({
                   name="url"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Public profile username</FormLabel>
+                      <FormLabel>საჯარო პროფილის სახელი</FormLabel>
 
                       <FormControl>
                         <Input type="text" className="mb-2 mt-2 lowercase" {...field} />

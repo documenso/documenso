@@ -100,7 +100,7 @@ export const DocumentFlowFormContainerStep = ({
   return (
     <div>
       <p className="text-muted-foreground text-sm">
-        Step <span>{`${step} of ${maxStep}`}</span>
+        დარჩენილია <span>{`${maxStep - step}`}</span> ნაბიჯი
       </p>
 
       <div className="bg-muted relative mt-4 h-[2px] rounded-md">
@@ -131,8 +131,8 @@ export type DocumentFlowFormContainerActionsProps = {
 export const DocumentFlowFormContainerActions = ({
   canGoBack = true,
   canGoNext = true,
-  goNextLabel = 'Continue',
-  goBackLabel = 'Go Back',
+  goNextLabel = 'შემდეგი',
+  goBackLabel = 'უკან',
   onGoBackClick,
   onGoNextClick,
   loading,

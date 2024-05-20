@@ -14,7 +14,7 @@ export default function ForgotPasswordPage() {
         <h1 className="text-4xl font-semibold">მეილი გამოგზავნილია!</h1>
 
         <p className="text-muted-foreground mb-4 mt-2 text-sm">
-          პაროლის აღდგენის მეილი გაიგზავნა თქვენი ელ. ფოსტის ანგარიშზე.
+          პაროლის აღდგენის მეილი გაიგზავნა თქვენი ელ.ფოსტის ანგარიშზე.
         </p>
 
         <Button asChild>

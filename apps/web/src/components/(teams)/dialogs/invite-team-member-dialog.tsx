@@ -71,13 +71,13 @@ const ZInviteTeamMembersFormSchema = z
 
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        message: 'Emails must be unique',
+        message: 'ელ.ფოსტები უნიკალური უნდა იყოს',
         path: ['invitations', index, 'email'],
       });
 
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        message: 'Emails must be unique',
+        message: 'ელ.ფოსტები უნიკალური უნდა იყოს',
         path: ['invitations', firstFoundIndex, 'email'],
       });
     }

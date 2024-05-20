@@ -29,7 +29,7 @@ export const TeamEmailDropdown = ({ team }: TeamsSettingsPageProps) => {
     trpc.team.resendTeamEmailVerification.useMutation({
       onSuccess: () => {
         toast({
-          title: 'წარმატებით გამოიგზავნა',
+          title: 'მეილი გამოგზავნილია',
           description: 'სავერიფიკაციო მეილი თავიდან გამოიგზავნა.',
           duration: 5000,
         });
@@ -40,7 +40,7 @@ export const TeamEmailDropdown = ({ team }: TeamsSettingsPageProps) => {
           variant: 'destructive',
           duration: 10000,
           description:
-            'სავერიფიკაციო მეილის ხელახლა გაგზავნა ამჯერად შეუძლებელია. გთხოვთ სცადოთ თავიდან.',
+            'სავერიფიკაციო მეილის ხელახლა გაგზავნა ამჯერად ვერ მოხერხდა. გთხოვთ სცადოთ თავიდან.',
         });
       },
     });
@@ -49,8 +49,8 @@ export const TeamEmailDropdown = ({ team }: TeamsSettingsPageProps) => {
     trpc.team.deleteTeamEmail.useMutation({
       onSuccess: () => {
         toast({
-          title: 'წარმატებით წაშლა',
-          description: 'გუნდის ელ. ფოსტა წაიშალა',
+          title: 'ელ.ფოსტა წაშლილია',
+          description: 'გუნდის ელ.ფოსტა წაიშალა!',
           duration: 5000,
         });
       },
@@ -59,7 +59,7 @@ export const TeamEmailDropdown = ({ team }: TeamsSettingsPageProps) => {
           title: 'დაფიქსირდა ხარვეზი',
           variant: 'destructive',
           duration: 10000,
-          description: 'გუნდის ელ. ფოსტის წაშლა ამჯერად შეუძლებელია. Გთხოვთ კიდევ სცადეთ.',
+          description: 'გუნდის ელ.ფოსტის წაშლა ამჯერად ვერ მოხერხდა. გთხოვთ კიდევ სცადეთ.',
         });
       },
     });
@@ -68,17 +68,17 @@ export const TeamEmailDropdown = ({ team }: TeamsSettingsPageProps) => {
     trpc.team.deleteTeamEmailVerification.useMutation({
       onSuccess: () => {
         toast({
-          title: 'Success',
-          description: 'Email verification has been removed',
+          title: 'ელ.ფოსტის ვერიფიკაცია მოშორებულია',
+          description: 'ელ.ფოსტის ვერიფიკაცია წარმატებით წაიშალა!',
           duration: 5000,
         });
       },
       onError: () => {
         toast({
-          title: 'Something went wrong',
+          title: 'დაფიქსირდა ხარვეზი',
           variant: 'destructive',
           duration: 10000,
-          description: 'Unable to remove email verification at this time. Please try again.',
+          description: 'ამჯერად ელ.ფოსტის ვერიფიკაციის წაშლა ვერ მოხერხდა. გთხოვთ კიდევ სცადეთ.',
         });
       },
     });

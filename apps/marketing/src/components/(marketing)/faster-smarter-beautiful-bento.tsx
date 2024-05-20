@@ -26,7 +26,7 @@ export const FasterSmarterBeautifulBento = ({
         />
       </div>
       <h2 className="px-0 text-center text-[22px] font-semibold md:px-12 md:text-4xl lg:px-24">
-        სერიოზული კონტრაქტების მარტივად გაფორმება.
+        სერიოზული კონტრაქტების მარტივად გაფორმება
         {/* <span className="block md:mt-0">უფრო სწრაფი, მარტივი და ლამაზი.</span> */}
       </h2>
 

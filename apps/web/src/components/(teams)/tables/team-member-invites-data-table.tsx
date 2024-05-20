@@ -56,7 +56,7 @@ export const TeamMemberInvitesDataTable = ({ teamId }: TeamMemberInvitesDataTabl
       onSuccess: () => {
         toast({
           title: 'მოწვევა გაგზავნილია',
-          description: 'მოწვევა თავიდან წარმატებით გაიგზავნა',
+          description: 'მოწვევა თავიდან წარმატებით გაიგზავნა!',
         });
       },
       onError: () => {
@@ -74,7 +74,7 @@ export const TeamMemberInvitesDataTable = ({ teamId }: TeamMemberInvitesDataTabl
       onSuccess: () => {
         toast({
           title: 'მოწვევა წაშლილია',
-          description: 'მოწვევა წარმატებით წაიშალა',
+          description: 'მოწვევა წარმატებით წაიშალა!',
         });
       },
       onError: () => {
@@ -136,7 +136,7 @@ export const TeamMemberInvitesDataTable = ({ teamId }: TeamMemberInvitesDataTabl
               </DropdownMenuTrigger>
 
               <DropdownMenuContent className="w-52" align="start" forceMount>
-                <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                <DropdownMenuLabel>პარამეტრები</DropdownMenuLabel>
 
                 <DropdownMenuItem
                   onClick={async () =>
@@ -147,7 +147,7 @@ export const TeamMemberInvitesDataTable = ({ teamId }: TeamMemberInvitesDataTabl
                   }
                 >
                   <History className="mr-2 h-4 w-4" />
-                  Resend
+                  თავიდან გაგზავნა
                 </DropdownMenuItem>
 
                 <DropdownMenuItem
@@ -159,7 +159,7 @@ export const TeamMemberInvitesDataTable = ({ teamId }: TeamMemberInvitesDataTabl
                   }
                 >
                   <Trash2 className="mr-2 h-4 w-4" />
-                  Remove
+                  წაშლა
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>

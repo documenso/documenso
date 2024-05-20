@@ -17,10 +17,10 @@ export type MobileNavigationProps = {
 };
 
 export const MENU_NAVIGATION_LINKS = [
-  {
-    href: '/singleplayer',
-    text: 'Singleplayer',
-  },
+  // {
+  //   href: '/singleplayer',
+  //   text: 'Singleplayer',
+  // },
   {
     href: '/blog',
     text: 'ბლოგი',
@@ -29,14 +29,14 @@ export const MENU_NAVIGATION_LINKS = [
     href: '/pricing',
     text: 'ფასი',
   },
-  {
-    href: '/open',
-    text: 'Open Startup',
-  },
-  {
-    href: 'https://status.documenso.com',
-    text: 'სტატუსი',
-  },
+  // {
+  //   href: '/open',
+  //   text: 'Open Startup',
+  // },
+  // {
+  //   href: 'https://status.documenso.com',
+  //   text: 'სტატუსი',
+  // },
   {
     href: 'mailto:support@documenso.com',
     text: 'მხარდაჭერა',

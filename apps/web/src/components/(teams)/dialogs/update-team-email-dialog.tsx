@@ -142,7 +142,7 @@ export const UpdateTeamEmailDialog = ({
               />
 
               <FormItem>
-                <FormLabel required>ელ. ფოსტა</FormLabel>
+                <FormLabel required>ელ.ფოსტა</FormLabel>
                 <FormControl>
                   <Input className="bg-background" value={teamEmail.email} disabled={true} />
                 </FormControl>

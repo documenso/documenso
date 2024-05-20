@@ -202,7 +202,7 @@ export const Widget = ({ className, children, ...props }: WidgetProps) => {
             onSubmit={handleSubmit(onFormSubmit)}
           >
             <h3 className="text-xl font-semibold">გჭირდებათ დოკუმენტზე ხელმოწერა?</h3>
-            <p className="text-muted-foreground mt-2 text-sm">SignStream-სთან ერთად</p>
+            <p className="text-muted-foreground mt-2 text-sm">გაიაქტიურეთ ბიზნეს პაკეტი</p>
 
             <hr className="mb-6 mt-4" />
 
@@ -352,6 +352,7 @@ export const Widget = ({ className, children, ...props }: WidgetProps) => {
                       className={cn(
                         'text-foreground truncate text-4xl font-semibold [font-family:var(--font-caveat)]',
                       )}
+                      style={{ fontFamily: "'Yellowtail', cursive" }}
                     >
                       {signatureText}
                     </p>

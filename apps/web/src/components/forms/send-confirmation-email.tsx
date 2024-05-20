@@ -49,7 +49,7 @@ export const SendConfirmationEmailForm = ({ className }: SendConfirmationEmailFo
       toast({
         title: 'დამადასტურებელი მეილი გაგზავნილია',
         description:
-          'დამადასტურებელი მეილი წარმატებით გაიგზავნა. იხილეთ ის თქვენი ელ. ფოსტის შემოსულებში.',
+          'დამადასტურებელი მეილი წარმატებით გაიგზავნა. იხილეთ ის თქვენი ელ.ფოსტის შემოსულებში.',
         duration: 5000,
       });
 
@@ -57,7 +57,7 @@ export const SendConfirmationEmailForm = ({ className }: SendConfirmationEmailFo
     } catch (err) {
       toast({
         title: 'დამადასტურებელი მეილის გაგზავნისას დაფიქსირდა ხარვეზი',
-        description: 'გთხოვთ თავიდან სცადოთ და დარწმუნდეთ, რომ სწორ ელ. ფოსტას უთითებთ.',
+        description: 'გთხოვთ თავიდან სცადოთ და დარწმუნდეთ, რომ სწორ ელ.ფოსტას უთითებთ.',
         variant: 'destructive',
       });
     }
@@ -75,7 +75,7 @@ export const SendConfirmationEmailForm = ({ className }: SendConfirmationEmailFo
             name="email"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>ელ. ფოსტა</FormLabel>
+                <FormLabel>ელ.ფოსტა</FormLabel>
                 <FormControl>
                   <Input type="email" {...field} />
                 </FormControl>

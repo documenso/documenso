@@ -28,7 +28,7 @@ export default function ErrorPage({ error }: ErrorProps) {
       <div>
         <p className="text-muted-foreground font-semibold">{errorMessage}</p>
 
-        <h1 className="mt-3 text-2xl font-bold md:text-3xl">დაფიქსირდა ხარვეზი.</h1>
+        <h1 className="mt-3 text-2xl font-bold md:text-3xl">დაფიქსირდა ხარვეზი</h1>
 
         <p className="text-muted-foreground mt-4 text-sm">{errorDetails}</p>
 

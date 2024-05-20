@@ -413,7 +413,7 @@ export const SignInForm = ({ className, initialEmail, isGoogleSSOEnabled }: Sign
                 </Button>
 
                 <Button type="submit" loading={isSubmitting}>
-                  {isSubmitting ? 'ავტორიზაცია...' : 'ავტორიზაცია'}
+                  {isSubmitting ? 'მიმდინარეობს ავტორიზაცია...' : 'ავტორიზაცია'}
                 </Button>
               </DialogFooter>
             </fieldset>

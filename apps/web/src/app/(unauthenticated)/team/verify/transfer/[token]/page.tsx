@@ -30,8 +30,8 @@ export default async function VerifyTeamTransferPage({
           <h1 className="text-4xl font-semibold">არასწორი ბმული</h1>
 
           <p className="text-muted-foreground mb-4 mt-2 text-sm">
-            This link is invalid or has expired. Please contact your team to resend a transfer
-            request.
+            ეს ბმული არასწორია ან ვადა გაუვიდა. გთხოვთ, დაუკავშირდეთ თქვენს გუნდს ტრანსფერის
+            მოთხოვნის ხელახლა გასაგზავნად.
           </p>
 
           <Button asChild>
@@ -56,11 +56,11 @@ export default async function VerifyTeamTransferPage({
   if (isTransferError) {
     return (
       <div>
-        <h1 className="text-4xl font-semibold">Team ownership transfer</h1>
+        <h1 className="text-4xl font-semibold">გუნდის მფლობელობის გადაცემა</h1>
 
         <p className="text-muted-foreground mt-2 text-sm">
-          Something went wrong while attempting to transfer the ownership of team{' '}
-          <strong>{team.name}</strong> to your. Please try again later or contact support.
+          გუნდის მფლობელობის გადაცემისას დაფიქსირდა ხარვეზი (<strong>{team.name}</strong>). გთხოვთ
+          თავიდან სცადოთ ან დაგვიკავშირდეთ.
         </p>
       </div>
     );
@@ -68,10 +68,10 @@ export default async function VerifyTeamTransferPage({
 
   return (
     <div>
-      <h1 className="text-4xl font-semibold">Team ownership transferred!</h1>
+      <h1 className="text-4xl font-semibold">გუნდის მფლობელობა გადაცემულია!</h1>
 
       <p className="text-muted-foreground mb-4 mt-2 text-sm">
-        The ownership of team <strong>{team.name}</strong> has been successfully transferred to you.
+        გუნდის (<strong>{team.name}</strong>) მფლობელობა წარმატებით გადმოგეცათ.
       </p>
 
       <Button asChild>

@@ -126,7 +126,7 @@ export default async function TeamsSettingsPage({ params }: TeamsSettingsPagePro
             variant="neutral"
           >
             <div className="mb-4 sm:mb-0">
-              <AlertTitle>გუნდის ელ. ფოსტა</AlertTitle>
+              <AlertTitle>გუნდის ელ.ფოსტა</AlertTitle>
 
               <AlertDescription className="mr-2">
                 <ul className="text-muted-foreground mt-0.5 list-inside list-disc text-sm">

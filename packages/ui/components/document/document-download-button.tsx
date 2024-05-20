@@ -44,7 +44,7 @@ export const DocumentDownloadButton = ({
 
       toast({
         title: 'დაფიქსირდა ხარვეზი',
-        description: 'თქვენი დოკუმენტის ჩამოტვირთვისას დაფიქსირდა ხარვეზი.',
+        description: 'დოკუმენტის ჩამოტვირთვისას დაფიქსირდა ხარვეზი.',
         variant: 'destructive',
       });
     }

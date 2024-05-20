@@ -20,7 +20,7 @@ export const DocumentGlobalAuthAccessSelect = forwardRef<HTMLButtonElement, Sele
   (props, ref) => (
     <Select {...props}>
       <SelectTrigger ref={ref} className="bg-background text-muted-foreground">
-        <SelectValue data-testid="documentAccessSelectValue" placeholder="None" />
+        <SelectValue data-testid="documentAccessSelectValue" placeholder="ყველას" />
       </SelectTrigger>
 
       <SelectContent position="popper">
@@ -31,7 +31,7 @@ export const DocumentGlobalAuthAccessSelect = forwardRef<HTMLButtonElement, Sele
         ))}
 
         {/* Note: -1 is remapped in the Zod schema to the required value. */}
-        <SelectItem value={'-1'}>None</SelectItem>
+        <SelectItem value={'-1'}>ყველას</SelectItem>
       </SelectContent>
     </Select>
   ),
@@ -47,18 +47,19 @@ export const DocumentGlobalAuthAccessTooltip = () => (
 
     <TooltipContent className="text-foreground max-w-md space-y-2 p-4">
       <h2>
-        <strong>Document access</strong>
+        <strong>დოკუმენტზე წვდომა</strong>
       </h2>
 
-      <p>The authentication required for recipients to view the document.</p>
+      <p>მიმღებებს ავტორიზაცია უნდა ჰქონდეთ გავლილი ამ დოკუმენტის სანახავად.</p>
 
       <ul className="ml-3.5 list-outside list-disc space-y-0.5 py-2">
         <li>
-          <strong>Require account</strong> - The recipient must be signed in to view the document
+          <strong>ავტორიზებულ პირს</strong> - მიმღებს ავტორიზაცია უნდა ჰქონდეს გავლილი ამ დოკუმენტის
+          სანახავად
         </li>
         <li>
-          <strong>None</strong> - The document can be accessed directly by the URL sent to the
-          recipient
+          <strong>ყველას</strong> - ამ დოკუმენტის სანახავად მიმღებისთვის ავტორიზაციის გავლა საჭირო
+          არ არის
         </li>
       </ul>
     </TooltipContent>

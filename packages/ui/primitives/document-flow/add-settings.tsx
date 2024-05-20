@@ -125,7 +125,7 @@ export const AddSettingsFormPartial = ({
               name="title"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel required>Title</FormLabel>
+                  <FormLabel required>სათაური</FormLabel>
 
                   <FormControl>
                     <Input
@@ -163,7 +163,7 @@ export const AddSettingsFormPartial = ({
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel className="flex flex-row items-center">
-                      Recipient action authentication
+                      მიმღების ქმედების ავთენტიფიკაცია
                       <DocumentGlobalAuthActionTooltip />
                     </FormLabel>
 

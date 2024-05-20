@@ -216,10 +216,10 @@ export const CreateWebhookDialog = ({ trigger, ...props }: CreateWebhookDialogPr
               <DialogFooter>
                 <div className="flex w-full flex-nowrap gap-4">
                   <Button type="button" variant="secondary" onClick={() => setOpen(false)}>
-                    Cancel
+                    დახურვა
                   </Button>
                   <Button type="submit" loading={form.formState.isSubmitting}>
-                    Create
+                    შექმნა
                   </Button>
                 </div>
               </DialogFooter>

@@ -9,7 +9,7 @@ type DocumentAuthTypeData = {
 export const DOCUMENT_AUTH_TYPES: Record<string, DocumentAuthTypeData> = {
   [DocumentAuth.ACCOUNT]: {
     key: DocumentAuth.ACCOUNT,
-    value: 'Require account',
+    value: 'მხოლოდ ავტორიზებულ პირებს',
   },
   [DocumentAuth.PASSKEY]: {
     key: DocumentAuth.PASSKEY,

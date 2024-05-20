@@ -68,13 +68,13 @@ const ZAddRecipientsForNewDocumentSchema = z
 
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        message: 'Emails must be unique',
+        message: 'ელ.ფოსტები უნიკალური უნდა იყოს',
         path: ['recipients', index, 'email'],
       });
 
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        message: 'Emails must be unique',
+        message: 'ელ.ფოსტები უნიკალური უნდა იყოს',
         path: ['recipients', firstFoundIndex, 'email'],
       });
     }
@@ -253,7 +253,8 @@ export function UseTemplateDialog({
 
                               <TooltipContent className="text-muted-foreground z-[99999] max-w-md space-y-2 p-4">
                                 <p>
-                                  დოკუმენტი დაუყოვნებლივ გაეგზავნება მიმღებებს, თუ ეს არის მონიშნული.
+                                  დოკუმენტი დაუყოვნებლივ გაეგზავნება მიმღებებს, თუ ეს არის
+                                  მონიშნული.
                                 </p>
 
                                 <p>სხვა შემთხვევაში, დოკუმენტი შეიქმნება როგორც დრაფტი.</p>
@@ -275,7 +276,7 @@ export function UseTemplateDialog({
                 </DialogClose>
 
                 <Button type="submit" loading={form.formState.isSubmitting}>
-                  {form.getValues('sendDocument') ? 'Create and send' : 'Create as draft'}
+                  {form.getValues('sendDocument') ? 'შექმენით და გააგზავნეთ' : 'დრაფტად შენახვა'}
                 </Button>
               </DialogFooter>
             </fieldset>

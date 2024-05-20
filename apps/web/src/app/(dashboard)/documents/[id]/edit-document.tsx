@@ -126,22 +126,22 @@ export const EditDocumentForm = ({
   const documentFlow: Record<EditDocumentStep, DocumentFlowStep> = {
     settings: {
       title: 'ზოგადი',
-      description: 'მართეთ დოკუმენტის პარამეტრები.',
+      description: 'მართეთ დოკუმენტის პარამეტრები',
       stepIndex: 1,
     },
     signers: {
       title: 'დაამატეთ ხელმომწერები',
-      description: 'დაამატეთ ადამიანები, რომლებიც ხელს მოაწერენ ამ დოკუმენტს.',
+      description: 'დაამატეთ ადამიანები, რომლებიც ხელს მოაწერენ ამ დოკუმენტს',
       stepIndex: 2,
     },
     fields: {
       title: 'დაამატეთ ველები',
-      description: 'დაამატეთ ყველა შესაბამისი ველი თითოეული მიმღებისთვის.',
+      description: 'დაამატეთ ყველა შესაბამისი ველი თითოეული მიმღებისთვის',
       stepIndex: 3,
     },
     subject: {
       title: 'დაამატეთ თემატიკა',
-      description: 'დაამატეთ თემატიკა და შეტყობინება, რომელიც გსურთ გაეგზავნოს ხელმომწერებს.',
+      description: 'დაამატეთ თემატიკა და შეტყობინება, რომელიც გსურთ გაეგზავნოს ხელმომწერებს',
       stepIndex: 4,
     },
   };
