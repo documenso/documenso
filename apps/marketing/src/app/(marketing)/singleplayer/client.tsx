@@ -132,8 +132,9 @@ export const SinglePlayerClient = () => {
           positionY: field.positionY.toNumber(),
           width: field.width.toNumber(),
           height: field.height.toNumber(),
+          fieldMeta: field.fieldMeta,
         })),
-        fieldMeta: fields.map((field) => field.fieldMeta),
+        fieldMeta: {},
       });
 
       analytics.capture('Marketing: SPM - Document signed', {

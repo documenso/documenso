@@ -147,6 +147,26 @@ export const AddSignatureFormPartial = ({
       return !form.formState.errors.customText;
     }
 
+    if (fieldType === FieldType.NUMBER) {
+      await form.trigger('number');
+      return !form.formState.errors.number;
+    }
+
+    if (fieldType === FieldType.RADIO) {
+      await form.trigger('radio');
+      return !form.formState.errors.radio;
+    }
+
+    if (fieldType === FieldType.CHECKBOX) {
+      await form.trigger('checkbox');
+      return !form.formState.errors.checkbox;
+    }
+
+    if (fieldType === FieldType.DROPDOWN) {
+      await form.trigger('dropdown');
+      return !form.formState.errors.dropdown;
+    }
+
     return true;
   };
 
