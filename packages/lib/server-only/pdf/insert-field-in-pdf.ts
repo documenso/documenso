@@ -1,6 +1,7 @@
 // https://github.com/Hopding/pdf-lib/issues/20#issuecomment-412852821
 import fontkit from '@pdf-lib/fontkit';
 import { PDFDocument, StandardFonts } from 'pdf-lib';
+import type { PDFFont, PDFPage } from 'pdf-lib';
 
 import {
   DEFAULT_HANDWRITING_FONT_SIZE,
@@ -11,6 +12,35 @@ import {
 import { FieldType } from '@documenso/prisma/client';
 import { isSignatureFieldType } from '@documenso/prisma/guards/is-signature-field';
 import type { FieldWithSignature } from '@documenso/prisma/types/field-with-signature';
+
+const CHECKBOX_MARK = 'X';
+const RADIO_MARK = 'O';
+const MARK_FONT_SIZE = 20;
+const MARK_OFFSET = 40;
+
+const handleMarkField = (
+  page: PDFPage,
+  fieldX: number,
+  fieldY: number,
+  fieldWidth: number,
+  fieldHeight: number,
+  pageHeight: number,
+  textWidth: number,
+  font: PDFFont,
+  mark: string,
+) => {
+  const textX = fieldX + (fieldWidth - textWidth) / 2;
+  let markY = fieldY + fieldHeight / 2;
+
+  markY = pageHeight - markY - MARK_FONT_SIZE / 2;
+
+  page.drawText(mark, {
+    x: textX + MARK_FONT_SIZE - MARK_OFFSET,
+    y: markY,
+    size: MARK_FONT_SIZE,
+    font,
+  });
+};
 
 export const insertFieldInPDF = async (pdf: PDFDocument, field: FieldWithSignature) => {
   const fontCaveat = await fetch(process.env.FONT_CAVEAT_URI).then(async (res) =>
@@ -91,6 +121,34 @@ export const insertFieldInPDF = async (pdf: PDFDocument, field: FieldWithSignatu
 
     // Invert the Y axis since PDFs use a bottom-left coordinate system
     textY = pageHeight - textY - textHeight;
+
+    if (field.type === FieldType.CHECKBOX) {
+      handleMarkField(
+        page,
+        fieldX,
+        fieldY,
+        fieldWidth,
+        fieldHeight,
+        pageHeight,
+        textWidth,
+        font,
+        CHECKBOX_MARK,
+      );
+    }
+
+    if (field.type === FieldType.RADIO) {
+      handleMarkField(
+        page,
+        fieldX,
+        fieldY,
+        fieldWidth,
+        fieldHeight,
+        pageHeight,
+        textWidth,
+        font,
+        RADIO_MARK,
+      );
+    }
 
     page.drawText(field.customText, {
       x: textX,
