@@ -51,7 +51,7 @@ export const ConfigureDirectTemplateFormPartial = ({
   initialEmail,
   onSubmit,
 }: ConfigureDirectTemplateFormProps) => {
-  const { Recipient, Field: fields } = template;
+  const { Recipient } = template;
   const { derivedRecipientAccessAuth } = useRequiredDocumentAuthContext();
 
   const recipientsWithBlankDirectRecipientEmail = Recipient.map((recipient) => {
@@ -90,7 +90,7 @@ export const ConfigureDirectTemplateFormPartial = ({
 
       <DocumentFlowFormContainerContent>
         {isDocumentPdfLoaded &&
-          fields.map((field, index) => (
+          directTemplateRecipient.Field.map((field, index) => (
             <ShowFieldItem
               key={index}
               field={field}
