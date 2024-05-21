@@ -112,19 +112,8 @@ export default async function AdminStatsPage() {
           />
           <UserWithDocumentChart
             data={MONTHLY_USERS_SIGNED}
-            cummulative
-            title="Cumulative users who created documents"
-          />
-          <UserWithDocumentChart
-            data={MONTHLY_USERS_SIGNED}
             completed
             title="Monthly users who completed documents"
-          />
-          <UserWithDocumentChart
-            data={MONTHLY_USERS_SIGNED}
-            cummulative
-            completed
-            title="Cumulative users who completed documents"
           />
         </div>
       </div>
