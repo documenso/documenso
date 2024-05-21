@@ -24,7 +24,6 @@ import {
 import { CardMetric } from '~/components/(dashboard)/metric-card/metric-card';
 
 import { UserWithDocumentChart } from './user-with-document';
-import { UserWithDocumentCummulativeChart } from './user-with-document-cummulative';
 
 export default async function AdminStatsPage() {
   const [
@@ -67,12 +66,12 @@ export default async function AdminStatsPage() {
           <div className="mb-8 mt-4 grid flex-1 grid-cols-1 gap-4 md:grid-cols-2">
             <CardMetric
               icon={File}
-              title="Users who sent one or more documents in the past month"
+              title="Users who uploaded one or more documents in the past month"
               value={userWithAtLeastOneDocumentPerMonth}
             />
             <CardMetric
               icon={File}
-              title="Users who uploaded one or more documents in the past month"
+              title="Users that created at least 1 document and had it completed"
               value={userWithAtLeastOneDocumentSignedPerMonth}
             />
           </div>
@@ -105,11 +104,29 @@ export default async function AdminStatsPage() {
       </div>
 
       <div className="mt-16">
-        <h3 className="text-3xl font-semibold">User Charts</h3>
-
-        <UserWithDocumentChart data={MONTHLY_USERS_SIGNED} className="mb-8 mt-4" />
-
-        <UserWithDocumentCummulativeChart data={MONTHLY_USERS_SIGNED} className="mb-8 mt-4" />
+        <h3 className="text-3xl font-semibold">Charts</h3>
+        <div className="mt-5 grid grid-cols-2 gap-10">
+          <UserWithDocumentChart
+            data={MONTHLY_USERS_SIGNED}
+            title="Monthly users who created documents"
+          />
+          <UserWithDocumentChart
+            data={MONTHLY_USERS_SIGNED}
+            cummulative
+            title="Cumulative users who created documents"
+          />
+          <UserWithDocumentChart
+            data={MONTHLY_USERS_SIGNED}
+            completed
+            title="Monthly users who completed documents"
+          />
+          <UserWithDocumentChart
+            data={MONTHLY_USERS_SIGNED}
+            cummulative
+            completed
+            title="Cumulative users who completed documents"
+          />
+        </div>
       </div>
     </div>
   );
