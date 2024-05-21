@@ -57,7 +57,7 @@ export const CurrentUserTeamsDataTable = () => {
     <DataTable
       columns={[
         {
-          header: 'Team',
+          header: 'გუნდი',
           accessorKey: 'name',
           cell: ({ row }) => (
             <Link href={`/t/${row.original.url}`} scroll={false}>
@@ -73,7 +73,7 @@ export const CurrentUserTeamsDataTable = () => {
           ),
         },
         {
-          header: 'Role',
+          header: 'როლი',
           accessorKey: 'role',
           cell: ({ row }) =>
             row.original.ownerUserId === row.original.currentTeamMember.userId
@@ -81,7 +81,7 @@ export const CurrentUserTeamsDataTable = () => {
               : TEAM_MEMBER_ROLE_MAP[row.original.currentTeamMember.role],
         },
         {
-          header: 'Member Since',
+          header: 'მომხმარებელი წლიდან',
           accessorKey: 'createdAt',
           cell: ({ row }) => <LocaleDate date={row.original.createdAt} />,
         },
