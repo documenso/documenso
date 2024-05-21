@@ -79,11 +79,6 @@ export default async function AdminStatsPage() {
             <CardMetric icon={Mail} title="Documents Received" value={recipientStats.SENT} />
             <CardMetric icon={MailOpen} title="Documents Viewed" value={recipientStats.OPENED} />
             <CardMetric icon={PenTool} title="Signatures Collected" value={recipientStats.SIGNED} />
-            <CardMetric
-              icon={UserPlus}
-              title="Recipients that signed up"
-              value={recipientStats.CONVERTED_RECIPIENTS}
-            />
           </div>
         </div>
       </div>
