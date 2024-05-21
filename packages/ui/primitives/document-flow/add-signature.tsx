@@ -59,7 +59,6 @@ export const AddSignatureFormPartial = ({
   requireSignature = true,
 }: AddSignatureFormProps) => {
   const { currentStep, totalSteps } = useStep();
-
   const [validateUninsertedFields, setValidateUninsertedFields] = useState(false);
 
   // Refined schema which takes into account whether to allow an empty name or signature.

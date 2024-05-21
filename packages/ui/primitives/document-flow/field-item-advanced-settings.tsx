@@ -100,6 +100,8 @@ export const FieldAdvancedSettings = forwardRef<HTMLDivElement, FieldAdvancedSet
       },
     );
 
+    const doesFieldExist = (!!document || !!template) && field.nativeId !== undefined;
+
     const { data: fieldData } = trpc.field.getField.useQuery(
       {
         fieldId: Number(field.nativeId),
@@ -107,7 +109,7 @@ export const FieldAdvancedSettings = forwardRef<HTMLDivElement, FieldAdvancedSet
         templateId: template?.id ?? undefined,
       },
       {
-        enabled: (!!document || !!template) && field.nativeId !== undefined,
+        enabled: doesFieldExist,
       },
     );
 

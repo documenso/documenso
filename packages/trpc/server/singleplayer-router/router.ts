@@ -32,8 +32,6 @@ export const singleplayerRouter = router({
       try {
         const { signer, fields, documentData, documentName, fieldMeta } = input;
 
-        console.log('inside tRPC singlePlayerRouter', input);
-
         const document = await getFile({
           data: documentData.data,
           type: documentData.type,
