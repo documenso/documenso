@@ -10,6 +10,7 @@ export type UserWithDocumentChartProps = {
   title: string;
   data: GetUserWithDocumentMonthlyGrowth;
   completed?: boolean;
+  tooltip?: string;
 };
 
 export const UserWithDocumentChart = ({
@@ -17,6 +18,7 @@ export const UserWithDocumentChart = ({
   data,
   title,
   completed = false,
+  tooltip,
 }: UserWithDocumentChartProps) => {
   const formattedData = (data: GetUserWithDocumentMonthlyGrowth, completed: boolean) => {
     return [...data].reverse().map(({ month, count, signed_count }) => {
@@ -51,7 +53,7 @@ export const UserWithDocumentChart = ({
               labelStyle={{
                 color: 'hsl(var(--primary-foreground))',
               }}
-              formatter={(value) => [Number(value).toLocaleString('en-US'), 'Documents']}
+              formatter={(value) => [Number(value).toLocaleString('en-US'), tooltip]}
               cursor={{ fill: 'hsl(var(--primary) / 10%)' }}
             />
 
@@ -60,7 +62,7 @@ export const UserWithDocumentChart = ({
               fill="hsl(var(--primary))"
               radius={[4, 4, 0, 0]}
               maxBarSize={60}
-              label="Documents"
+              label={tooltip}
             />
           </BarChart>
         </ResponsiveContainer>
