@@ -53,13 +53,13 @@ export const DocumentActionAuthAccount = ({
         <AlertDescription>
           {actionTarget === 'DOCUMENT' && recipient.role === RecipientRole.VIEWER ? (
             <span>
-              ამ დოკუმენტის ნანახად, რომ მოინიშნოს, თქვენ უნდა იყოთ ავტორიზებული, როგორც{' '}
+              ეს დოკუმენტის ნანახად, რომ მოინიშნოს, თქვენ უნდა იყოთ ავტორიზებული, როგორც{' '}
               <strong>{recipient.email}</strong>
             </span>
           ) : (
             <span>
-              To {actionVerb.toLowerCase()} this {actionTarget.toLowerCase()}, you need to be logged
-              in as <strong>{recipient.email}</strong>
+              To {actionVerb.toLowerCase()} this {actionTarget.toLowerCase()}, თქვენ უნდა იყოთ
+              ავტორიზებული, როგორც <strong>{recipient.email}</strong>
             </span>
           )}
         </AlertDescription>

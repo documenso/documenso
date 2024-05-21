@@ -31,22 +31,22 @@ import { THEMES_TYPE } from '@documenso/ui/primitives/constants';
 
 const DOCUMENTS_PAGES = [
   {
-    label: 'All documents',
+    label: 'ყველა დოკუმენტი',
     path: '/documents?status=ALL',
     shortcut: DOCUMENTS_PAGE_SHORTCUT.replace('+', ''),
   },
-  { label: 'Draft documents', path: '/documents?status=DRAFT' },
+  { label: 'დრაფტი დოკუმენტები', path: '/documents?status=DRAFT' },
   {
-    label: 'Completed documents',
+    label: 'ხელმოწერილი დოკუმენტები',
     path: '/documents?status=COMPLETED',
   },
-  { label: 'Pending documents', path: '/documents?status=PENDING' },
-  { label: 'Inbox documents', path: '/documents?status=INBOX' },
+  { label: 'მომლოდინე დოკუმენტები', path: '/documents?status=PENDING' },
+  { label: 'შემოსული დოკუმენტები', path: '/documents?status=INBOX' },
 ];
 
 const TEMPLATES_PAGES = [
   {
-    label: 'All templates',
+    label: 'ყველა შაბლონი',
     path: '/templates',
     shortcut: TEMPLATES_PAGE_SHORTCUT.replace('+', ''),
   },
@@ -54,12 +54,12 @@ const TEMPLATES_PAGES = [
 
 const SETTINGS_PAGES = [
   {
-    label: 'Settings',
+    label: 'პარამეტრები',
     path: '/settings',
     shortcut: SETTINGS_PAGE_SHORTCUT.replace('+', ''),
   },
-  { label: 'Profile', path: '/settings/profile' },
-  { label: 'Password', path: '/settings/password' },
+  { label: 'პროფილი', path: '/settings/profile' },
+  { label: 'პაროლი', path: '/settings/password' },
 ];
 
 export type CommandMenuProps = {
@@ -171,11 +171,7 @@ export function CommandMenu({ open, onOpenChange }: CommandMenuProps) {
       open={open}
       onOpenChange={setOpen}
     >
-      <CommandInput
-        value={search}
-        onValueChange={setSearch}
-        placeholder="ჩაწერეთ ბრძანება ან მოძებნეთ..."
-      />
+      <CommandInput value={search} onValueChange={setSearch} placeholder="მოძებნეთ..." />
 
       <CommandList>
         {isSearchingDocuments ? (
@@ -202,7 +198,7 @@ export function CommandMenu({ open, onOpenChange }: CommandMenuProps) {
             </CommandGroup>
             <CommandGroup className="mx-2 p-0 pb-2" heading="Preferences">
               <CommandItem className="-mx-2 -my-1 rounded-lg" onSelect={() => addPage('theme')}>
-                Change theme
+                შეცვალეთ ფონი
               </CommandItem>
             </CommandGroup>
             {searchResults.length > 0 && (

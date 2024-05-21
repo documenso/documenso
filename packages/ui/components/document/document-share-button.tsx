@@ -130,12 +130,12 @@ export const DocumentShareButton = ({
 
       <DialogContent position="end">
         <DialogHeader>
-          <DialogTitle>გააზიარეთ თქვენუ ხელმოწერის გამოცდილება!</DialogTitle>
+          <DialogTitle>გააზიარეთ თქვენი ხელმოწერის გამოცდილება!</DialogTitle>
 
           <DialogDescription className="mt-4">
             {/* Don't worry, the document you signed or sent wont be shared; only your signing
             experience is. Share your signing card and showcase your signature! */}
-            თქვენ მიერ ხელმოწერილი ან გაგზავნილი დოკუმენტი არ იქნება საჯაროდ გაზიარებული!
+            თქვენს მიერ ხელმოწერილი ან გაგზავნილი დოკუმენტი არ იქნება საჯაროდ გაზიარებული!
           </DialogDescription>
         </DialogHeader>
 

@@ -28,19 +28,19 @@ export const MobileNavigation = ({ isMenuOpen, onMenuOpenChange }: MobileNavigat
   const menuNavigationLinks = [
     {
       href: `${rootHref}/documents`,
-      text: 'Documents',
+      text: 'დოკუმენტები',
     },
     {
       href: `${rootHref}/templates`,
-      text: 'Templates',
+      text: 'შაბლონები',
     },
     {
       href: '/settings/teams',
-      text: 'Teams',
+      text: 'გუნდები',
     },
     {
       href: '/settings/profile',
-      text: 'Settings',
+      text: 'პარამეტრები',
     },
   ];
 
@@ -50,7 +50,7 @@ export const MobileNavigation = ({ isMenuOpen, onMenuOpenChange }: MobileNavigat
         <Link href="/" onClick={handleMenuItemClick}>
           <Image
             src={LogoImage}
-            alt="Documenso Logo"
+            alt="Signstream Logo"
             className="dark:invert"
             width={170}
             height={25}
@@ -77,7 +77,7 @@ export const MobileNavigation = ({ isMenuOpen, onMenuOpenChange }: MobileNavigat
               })
             }
           >
-            Sign Out
+            გამოსვლა
           </button>
         </div>
 
@@ -87,7 +87,7 @@ export const MobileNavigation = ({ isMenuOpen, onMenuOpenChange }: MobileNavigat
           </div>
 
           <p className="text-muted-foreground text-sm">
-            © {new Date().getFullYear()} CHIKOVANI, Inc. <br /> All rights reserved.
+            © {new Date().getFullYear()} CHIKOVANI, Inc. <br /> ყველა უფლება დაცულია.
           </p>
         </div>
       </SheetContent>

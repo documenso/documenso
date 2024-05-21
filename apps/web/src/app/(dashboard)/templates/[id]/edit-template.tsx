@@ -71,7 +71,7 @@ export const EditTemplateForm = ({
 
   const documentFlow: Record<EditTemplateStep, DocumentFlowStep> = {
     settings: {
-      title: 'General',
+      title: 'ზოგადი',
       description: 'Configure general settings for the template.',
       stepIndex: 1,
     },
