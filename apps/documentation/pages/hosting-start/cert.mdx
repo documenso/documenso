@@ -1,3 +1,26 @@
-### Getting a Signing Certificate
+### Generate or Buy
 
 Hosting your Documenso Instance requires you own signing certificate. You can read about why [here](https://documenso.com/blog/building-documenso-pt1).
+You have to options to consider: **generating your own certificate** or **buying one from a CA (Certificate Authortity)**
+
+> If your industry has no special signing regulation, a self-signed certificate should suffice. e.g. Deel.com is doing hundred of millions in revenue based on a plattform without any signing certificate, making your self-signed instance technically more secure. This is obviously not legal advice.
+
+### Generating your own Certificate
+
+If you don't have special requirements for the signature level of your signed documents, you can use a self-generated (self-signed) ceritificate. The main drawback of this is that mainstream PDF readers like Adobe won't recognize the signature as a trusted source and won't show a green checkmark. The certificate will still include your company/ personal data to prove the document was signed by your instance of Documenso and also guarantees, that the document wasn't altered after signing.
+
+### Buying a Certificate
+
+#### Selecting a Vendor
+
+If you want a more "officially backed" (for lack of a better word) signatures you will need to buy a certificate from a CA (Certificate Authortity). If your goal is to get a green checkmark in Adobe PDF, you will need a vendor is that is trusted by Adobe. You can find a list with all vendors Adobe displays a green checkmark for on the Adobe Trust List:
+https://helpx.adobe.com/acrobat/kb/approved-trust-list1.html. If you are based in Europe, it might make sense to go with a european one, though there is no hard requrement. While the pricing can vary from vendor to vendor, the properties of the certificate don't. The usual case would be a corporate certificate, detailing the name of the company it was issued to.
+
+### Technical Process
+
+The act of receiving your cert is pretty similar to receiving a SSL certificate. Since you need the actual certificate as part of Documenso config you need to generate a secret private key and and CSR (Certificate Signing Request) on top of it:
+
+- Generate private key (on a secure machine or in a HSM, depending on your security needs and the requirements of the provider)
+- Create a CSR
+- Have the CA sign the CSR
+- Configure your instance to use the cert via NEXT_PRIVATE_SIGNING_TRANSPORT with 'local' or 'gcloud-hsm' and the following config vars in .env.example
