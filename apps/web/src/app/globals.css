@@ -1,1 +1,67 @@
 @import '@documenso/ui/styles/theme.css';
+@import '@documenso/ui/styles/theme.css';
+/*overriding Documenso styles*/
+
+header {
+  display: none !important;
+}
+
+a[href="/documents"] {
+  display: none;
+}
+
+[style="transform: none;"] {
+  /*display: none;*/
+}
+
+.bg-primary, .bg-documenso, .bg-documenso-500, .bg-destructive, .bg-yellow-200 {
+  color: #fff;
+  background-color: #6414db;
+}
+
+.bg-yellow-50 {
+  background-color: transparent;
+  color: black;
+}
+
+.group:hover .group-hover\:border-documenso\/80 {
+  border-color: #6414db;
+}
+
+.group:hover .group-hover\:bg-documenso {
+  background-color: #6414db;
+}
+
+.text-primary, .text-green, .text-documenso-700, .group:hover .group-hover\:text-documenso, .text-documenso {
+  color: #6414db;
+}
+
+.focus-visible\:ring-ring:focus-visible {
+  --tw-ring-color: #6414db;
+}
+
+.hover\:bg-primary\/90:hover, .hover\:bg-destructive\/90:hover {
+  background-color: rgb(70, 14, 153);
+  box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.2), 0 4px 5px 0 rgba(0, 0, 0, 0.14), 0 1px 10px 0 rgba(0, 0, 0, 0.12);
+}
+
+.shadow-\[0_0_0_4px_theme\(colors\.gray\.100\/70\%\)\2c 0_0_0_1px_theme\(colors\.gray\.100\/70\%\)\2c 0_0_0_0\.5px_theme\(colors\.primary\.DEFAULT\/70\%\)\] {
+  box-shadow: 0 0 3px rgba(70, 14, 153, 0.5);
+  --tw-shadow: 0 0 3px rgba(70, 14, 153, 0.5);
+}
+
+.before\:\[background\:linear-gradient\(var\(--card-gradient-degrees\)\2c theme\(colors\.documenso\.DEFAULT\/70\%\)_5\%\2c theme\(colors\.border\/80\%\)_30\%\)\]::before {
+  display: none;
+}
+
+.custom-scrollbar {
+  flex: none;
+}
+
+.lg\:h-\[calc\(100vh-6rem\)\] {
+  height: auto;
+}
+
+
+
+
