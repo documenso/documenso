@@ -125,9 +125,21 @@ export const fieldRouter = router({
 
   getField: authenticatedProcedure.input(ZGetFieldQuerySchema).query(async ({ input }) => {
     try {
-      const { fieldId, documentId } = input;
+      const { fieldId, documentId, templateId } = input;
 
-      const field = await getFieldById({ fieldId, documentId });
+      let field;
+      if (documentId) {
+        field = await getFieldById({ fieldId, documentId });
+      } else if (templateId) {
+        field = await getFieldById({ fieldId, templateId });
+      }
+
+      if (!field) {
+        throw new TRPCError({
+          code: 'BAD_REQUEST',
+          message: 'We were unable to find this field. Please try again.',
+        });
+      }
 
       return field;
     } catch (err) {

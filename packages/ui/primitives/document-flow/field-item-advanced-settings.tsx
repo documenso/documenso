@@ -1,10 +1,14 @@
 'use client';
 
-import { forwardRef, useState } from 'react';
+import { forwardRef, useEffect, useState } from 'react';
+
+import { useParams } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 
 import { z } from 'zod';
 
 import { FieldType } from '@documenso/prisma/client';
+import { trpc } from '@documenso/trpc/react';
 import { Label } from '@documenso/ui/primitives/label';
 import {
   Select,
@@ -72,6 +76,43 @@ export const FieldAdvancedSettings = forwardRef<HTMLDivElement, FieldAdvancedSet
     ref,
   ) => {
     const { toast } = useToast();
+    const params = useParams();
+    const pathname = usePathname();
+    const id = params?.id;
+    const isTemplatePage = pathname?.includes('template');
+    const isDocumentPage = pathname?.includes('document');
+
+    const { data: template } = trpc.template.getTemplateWithDetailsById.useQuery(
+      {
+        id: Number(id),
+      },
+      {
+        enabled: isTemplatePage,
+      },
+    );
+
+    const { data: document } = trpc.document.getDocumentById.useQuery(
+      {
+        id: Number(id),
+      },
+      {
+        enabled: isDocumentPage,
+      },
+    );
+
+    const { data: fieldData } = trpc.field.getField.useQuery(
+      {
+        fieldId: Number(field.nativeId),
+        documentId: document?.id ?? undefined,
+        templateId: template?.id ?? undefined,
+      },
+      {
+        enabled: (!!document || !!template) && field.nativeId !== undefined,
+      },
+    );
+
+    const fieldMeta = fieldData?.fieldMeta;
+
     const localStorageKey = `field_${field.formId}_${field.type}`;
 
     const defaultState: FieldMeta = {
@@ -82,6 +123,28 @@ export const FieldAdvancedSettings = forwardRef<HTMLDivElement, FieldAdvancedSet
       required: false,
       readOnly: false,
     };
+
+    useEffect(() => {
+      if (
+        fieldMeta &&
+        typeof fieldMeta === 'object' &&
+        'label' in fieldMeta &&
+        'placeholder' in fieldMeta &&
+        'format' in fieldMeta &&
+        'characterLimit' in fieldMeta &&
+        'required' in fieldMeta &&
+        'readOnly' in fieldMeta
+      ) {
+        setFieldState({
+          label: String(fieldMeta.label ?? ''),
+          placeholder: String(fieldMeta.placeholder ?? ''),
+          format: String(fieldMeta.format ?? ''),
+          characterLimit: Number(fieldMeta.characterLimit ?? 0),
+          required: Boolean(fieldMeta.required ?? false),
+          readOnly: Boolean(fieldMeta.readOnly ?? false),
+        });
+      }
+    }, [fieldMeta]);
 
     const [fieldState, setFieldState] = useState<FieldMeta>(() => {
       const savedState = localStorage.getItem(localStorageKey);
