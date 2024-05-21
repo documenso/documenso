@@ -67,7 +67,13 @@ export const templateRouter = router({
           directTemplateToken,
           signedFieldValues,
           templateUpdatedAt,
-          userId: ctx.user?.id,
+          user: ctx.user
+            ? {
+                id: ctx.user.id,
+                name: ctx.user.name || undefined,
+                email: ctx.user.email,
+              }
+            : undefined,
           requestMetadata,
         });
       } catch (err) {

@@ -40,7 +40,11 @@ export type CreateDocumentFromDirectTemplateOptions = {
   signedFieldValues: TSignFieldWithTokenMutationSchema[];
   templateUpdatedAt: Date;
   requestMetadata: RequestMetadata;
-  userId?: number;
+  user?: {
+    id: number;
+    name?: string;
+    email: string;
+  };
 };
 
 type CreatedDirectRecipientField = {
@@ -54,7 +58,7 @@ export const createDocumentFromDirectTemplate = async ({
   signedFieldValues,
   templateUpdatedAt,
   requestMetadata,
-  userId,
+  user,
 }: CreateDocumentFromDirectTemplateOptions) => {
   const template = await prisma.template.findFirst({
     where: {
@@ -81,11 +85,11 @@ export const createDocumentFromDirectTemplate = async ({
 
   const { Recipient: recipients, access, User: templateOwner } = template;
 
-  const directAccessTemplateRecipient = recipients.find(
+  const directTemplateRecipient = recipients.find(
     (recipient) => recipient.id === access.directTemplateRecipientId,
   );
 
-  if (!directAccessTemplateRecipient || directAccessTemplateRecipient.role === RecipientRole.CC) {
+  if (!directTemplateRecipient || directTemplateRecipient.role === RecipientRole.CC) {
     throw new AppError(AppErrorCode.INVALID_REQUEST, 'Invalid or missing direct recipient');
   }
 
@@ -97,9 +101,11 @@ export const createDocumentFromDirectTemplate = async ({
     documentAuth: template.authOptions,
   });
 
+  const directRecipientName = user?.name;
+
   // Ensure typesafety when we add more options.
   const isAccessAuthValid = match(derivedRecipientAccessAuth)
-    .with(DocumentAccessAuth.ACCOUNT, () => userId !== undefined)
+    .with(DocumentAccessAuth.ACCOUNT, () => user && user?.email === directRecipientEmail)
     .with(null, () => true)
     .exhaustive();
 
@@ -107,12 +113,12 @@ export const createDocumentFromDirectTemplate = async ({
     throw new AppError(AppErrorCode.UNAUTHORIZED, 'You must be logged in');
   }
 
-  const directAccessTemplateRecipientAuthOptions = ZRecipientAuthOptionsSchema.parse(
-    directAccessTemplateRecipient.authOptions,
+  const directTemplateRecipientAuthOptions = ZRecipientAuthOptionsSchema.parse(
+    directTemplateRecipient.authOptions,
   );
 
   const nonDirectTemplateRecipients = template.Recipient.filter(
-    (recipient) => recipient.id !== directAccessTemplateRecipient.id,
+    (recipient) => recipient.id !== directTemplateRecipient.id,
   );
 
   const metaTimezone = template.templateMeta?.timezone || DEFAULT_DOCUMENT_TIME_ZONE;
@@ -120,7 +126,7 @@ export const createDocumentFromDirectTemplate = async ({
 
   // Associate, validate and map to a query every direct template recipient field with the provided fields.
   const createDirectRecipientFieldArgs = await Promise.all(
-    directAccessTemplateRecipient.Field.map(async (templateField) => {
+    directTemplateRecipient.Field.map(async (templateField) => {
       const signedFieldValue = signedFieldValues.find(
         (value) => value.fieldId === templateField.id,
       );
@@ -129,14 +135,18 @@ export const createDocumentFromDirectTemplate = async ({
         throw new AppError(AppErrorCode.INVALID_BODY, 'Invalid, missing or changed fields');
       }
 
+      if (templateField.type === FieldType.NAME && directRecipientName === undefined) {
+        directRecipientName === signedFieldValue.value;
+      }
+
       const derivedRecipientActionAuth = await validateFieldAuth({
         documentAuthOptions: template.authOptions,
         recipient: {
-          authOptions: directAccessTemplateRecipient.authOptions,
+          authOptions: directTemplateRecipient.authOptions,
           email: directRecipientEmail,
         },
         field: templateField,
-        userId,
+        userId: user?.id,
         authOptions: signedFieldValue.authOptions,
       });
 
@@ -269,16 +279,16 @@ export const createDocumentFromDirectTemplate = async ({
     });
 
     // Create the direct recipient and their non signature fields.
-    const createdDirectTemplateRecipient = await tx.recipient.create({
+    const createdDirectRecipient = await tx.recipient.create({
       data: {
         documentId: document.id,
         email: directRecipientEmail,
-        name: '',
+        name: directRecipientName,
         authOptions: createRecipientAuthOptions({
-          accessAuth: directAccessTemplateRecipientAuthOptions.accessAuth,
-          actionAuth: directAccessTemplateRecipientAuthOptions.actionAuth,
+          accessAuth: directTemplateRecipientAuthOptions.accessAuth,
+          actionAuth: directTemplateRecipientAuthOptions.actionAuth,
         }),
-        role: directAccessTemplateRecipient.role,
+        role: directTemplateRecipient.role,
         token: nanoid(),
         signingStatus: SigningStatus.SIGNED,
         sendStatus: SendStatus.SENT,
@@ -316,7 +326,7 @@ export const createDocumentFromDirectTemplate = async ({
           const field = await tx.field.create({
             data: {
               documentId: document.id,
-              recipientId: createdDirectTemplateRecipient.id,
+              recipientId: createdDirectRecipient.id,
               type: templateField.type,
               page: templateField.page,
               positionX: templateField.positionX,
@@ -327,7 +337,7 @@ export const createDocumentFromDirectTemplate = async ({
               inserted: true,
               Signature: {
                 create: {
-                  recipientId: createdDirectTemplateRecipient.id,
+                  recipientId: createdDirectRecipient.id,
                   signatureImageAsBase64: signature.signatureImageAsBase64,
                   typedSignature: signature.typedSignature,
                 },
@@ -347,7 +357,7 @@ export const createDocumentFromDirectTemplate = async ({
     );
 
     const createdDirectRecipientFields: CreatedDirectRecipientField[] = [
-      ...createdDirectTemplateRecipient.Field.map((field) => ({
+      ...createdDirectRecipient.Field.map((field) => ({
         field,
         derivedRecipientActionAuth: null,
       })),
@@ -365,8 +375,9 @@ export const createDocumentFromDirectTemplate = async ({
         type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_CREATED,
         documentId: document.id,
         user: {
+          id: user?.id,
+          name: user?.name,
           email: directRecipientEmail,
-          name: directAccessTemplateRecipient.name,
         },
         requestMetadata,
         data: {
@@ -378,19 +389,38 @@ export const createDocumentFromDirectTemplate = async ({
           },
         },
       }),
+      createDocumentAuditLogData({
+        type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_OPENED,
+        documentId: document.id,
+        user: {
+          id: user?.id,
+          name: user?.name,
+          email: directRecipientEmail,
+        },
+        requestMetadata,
+        data: {
+          recipientEmail: createdDirectRecipient.email,
+          recipientId: createdDirectRecipient.id,
+          recipientName: createdDirectRecipient.name,
+          recipientRole: createdDirectRecipient.role,
+          accessAuth: derivedRecipientAccessAuth || undefined,
+        },
+      }),
       ...createdDirectRecipientFields.map(({ field, derivedRecipientActionAuth }) =>
         createDocumentAuditLogData({
           type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_FIELD_INSERTED,
           documentId: document.id,
           user: {
+            id: user?.id,
+            name: user?.name,
             email: directRecipientEmail,
           },
           requestMetadata,
           data: {
-            recipientEmail: directAccessTemplateRecipient.email,
-            recipientId: directAccessTemplateRecipient.id,
-            recipientName: directAccessTemplateRecipient.name,
-            recipientRole: directAccessTemplateRecipient.role,
+            recipientEmail: createdDirectRecipient.email,
+            recipientId: createdDirectRecipient.id,
+            recipientName: createdDirectRecipient.name,
+            recipientRole: createdDirectRecipient.role,
             fieldId: field.secondaryId,
             field: match(field.type)
               .with(FieldType.SIGNATURE, FieldType.FREE_SIGNATURE, (type) => ({
@@ -415,14 +445,16 @@ export const createDocumentFromDirectTemplate = async ({
         type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_RECIPIENT_COMPLETED,
         documentId: document.id,
         user: {
+          id: user?.id,
+          name: user?.name,
           email: directRecipientEmail,
         },
         requestMetadata,
         data: {
-          recipientEmail: directAccessTemplateRecipient.email,
-          recipientId: directAccessTemplateRecipient.id,
-          recipientName: directAccessTemplateRecipient.name,
-          recipientRole: directAccessTemplateRecipient.role,
+          recipientEmail: createdDirectRecipient.email,
+          recipientId: createdDirectRecipient.id,
+          recipientName: createdDirectRecipient.name,
+          recipientRole: createdDirectRecipient.role,
         },
       }),
     ];
@@ -457,7 +489,7 @@ export const createDocumentFromDirectTemplate = async ({
 
     return {
       documentId: document.id,
-      directRecipientToken: createdDirectTemplateRecipient.token,
+      directRecipientToken: createdDirectRecipient.token,
     };
   });
 
