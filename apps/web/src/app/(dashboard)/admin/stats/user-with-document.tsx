@@ -9,7 +9,6 @@ export type UserWithDocumentChartProps = {
   className?: string;
   title: string;
   data: GetUserWithDocumentMonthlyGrowth;
-  cummulative?: boolean;
   completed?: boolean;
 };
 
@@ -17,28 +16,23 @@ export const UserWithDocumentChart = ({
   className,
   data,
   title,
-  cummulative = false,
   completed = false,
 }: UserWithDocumentChartProps) => {
   const formattedData = (data: GetUserWithDocumentMonthlyGrowth, completed: boolean) => {
-    return [...data]
-      .reverse()
-      .map(({ month, count, cume_count, signed_count, cume_signed_count }) => {
-        const formattedMonth = DateTime.fromFormat(month, 'yyyy-MM').toFormat('LLL');
-        if (completed) {
-          return {
-            month: formattedMonth,
-            count: Number(signed_count),
-            cummulative: Number(cume_signed_count),
-          };
-        } else {
-          return {
-            month: formattedMonth,
-            count: Number(count),
-            cummulative: Number(cume_count),
-          };
-        }
-      });
+    return [...data].reverse().map(({ month, count, signed_count }) => {
+      const formattedMonth = DateTime.fromFormat(month, 'yyyy-MM').toFormat('LLL');
+      if (completed) {
+        return {
+          month: formattedMonth,
+          count: Number(signed_count),
+        };
+      } else {
+        return {
+          month: formattedMonth,
+          count: Number(count),
+        };
+      }
+    });
   };
 
   return (
@@ -62,7 +56,7 @@ export const UserWithDocumentChart = ({
             />
 
             <Bar
-              dataKey={cummulative ? 'cummulative' : 'count'}
+              dataKey="count"
               fill="hsl(var(--primary))"
               radius={[4, 4, 0, 0]}
               maxBarSize={60}
