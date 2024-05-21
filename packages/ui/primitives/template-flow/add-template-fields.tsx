@@ -209,9 +209,18 @@ export const AddTemplateFieldsFormPartial = ({
   const handleSavedFieldSettings = (fieldState: FieldMeta) => {
     const initialValues = getValues();
 
-    const updatedFields = initialValues.fields.map((f) =>
-      f.formId === currentField?.formId ? { ...f, fieldMeta: { ...fieldState } } : f,
-    );
+    const updatedFields = initialValues.fields.map((field) => {
+      if (field.formId === currentField?.formId) {
+        return {
+          ...field,
+          fieldMeta: {
+            ...fieldState,
+          },
+        };
+      }
+
+      return field;
+    });
 
     setValue('fields', updatedFields);
   };
@@ -230,20 +239,26 @@ export const AddTemplateFieldsFormPartial = ({
   const [selectedSigner, setSelectedSigner] = useState<Recipient | null>(null);
   const [showRecipientsSelector, setShowRecipientsSelector] = useState(false);
 
-  const selectedSignerColorClass = selectedSigner
-    ? recipientColorClasses.get(selectedSigner.id)
-    : undefined;
+  const selectedSignerStyles = useMemo(() => {
+    if (!selectedSigner) return {};
 
-  const selectedSignerRingClass = selectedSignerColorClass
-    ? combinedStyles[selectedSignerColorClass]?.ringColor
-    : '';
+    const colorClass = recipientColorClasses.get(selectedSigner.id);
+    if (!colorClass) return {};
 
-  const selectedSignerBorderClass = selectedSignerColorClass
-    ? combinedStyles[selectedSignerColorClass]?.borderWithHover
-    : '';
-  const selectedSignerActiveBorderClass = selectedSignerColorClass
-    ? combinedStyles[selectedSignerColorClass]?.borderActive
-    : '';
+    const styles = combinedStyles[colorClass];
+
+    return {
+      ringClass: styles?.ringColor,
+      borderClass: styles?.borderWithHover,
+      activeBorderClass: styles?.borderActive,
+    };
+  }, [selectedSigner]);
+
+  const {
+    ringClass: selectedSignerRingClass,
+    borderClass: selectedSignerBorderClass,
+    activeBorderClass: selectedSignerActiveBorderClass,
+  } = selectedSignerStyles;
 
   const [isFieldWithinBounds, setIsFieldWithinBounds] = useState(false);
   const [coords, setCoords] = useState({
@@ -453,7 +468,7 @@ export const AddTemplateFieldsFormPartial = ({
     setShowAdvancedSettings((prev) => !prev);
   };
 
-  const handleClickOutside = (event: MouseEvent) => {
+  const handleClickOutsideAdancedSettingsTab = (event: MouseEvent) => {
     if (
       showAdvancedSettings &&
       settingsRef.current &&
@@ -464,10 +479,10 @@ export const AddTemplateFieldsFormPartial = ({
   };
 
   useEffect(() => {
-    document.body.addEventListener('click', handleClickOutside);
+    document.body.addEventListener('click', handleClickOutsideAdancedSettingsTab);
 
     return () => {
-      document.body.removeEventListener('click', handleClickOutside);
+      document.body.removeEventListener('click', handleClickOutsideAdancedSettingsTab);
     };
   }, [showAdvancedSettings]);
 
@@ -530,17 +545,7 @@ export const AddTemplateFieldsFormPartial = ({
                     onMove={(options) => onFieldMove(options, index)}
                     onRemove={() => remove(index)}
                     onAdvancedSettings={() => {
-                      setCurrentField({
-                        nativeId: field.nativeId,
-                        formId: field.formId,
-                        pageNumber: field.pageNumber,
-                        type: field.type,
-                        pageX: field.pageX,
-                        pageY: field.pageY,
-                        pageWidth: field.pageWidth,
-                        pageHeight: field.pageHeight,
-                        signerEmail: field.signerEmail,
-                      });
+                      setCurrentField(field);
                       handleAdvancedSettings();
                     }}
                     color={colorClass || undefined}
