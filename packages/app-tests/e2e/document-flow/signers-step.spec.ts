@@ -48,7 +48,7 @@ test.describe('[EE_ONLY]', () => {
     await page.getByRole('textbox', { name: 'Name', exact: true }).nth(1).fill('Recipient 2');
 
     // Display advanced settings.
-    await page.getByLabel('Show advanced settings').click();
+    await page.getByLabel('Show advanced settings').check();
 
     // Navigate to the next step and back.
     await page.getByRole('button', { name: 'Continue' }).click();
@@ -62,7 +62,6 @@ test.describe('[EE_ONLY]', () => {
   });
 });
 
-// Note: Not complete yet due to issue with back button.
 test('[DOCUMENT_FLOW]: add signers', async ({ page }) => {
   const user = await seedUser();
   const document = await seedBlankDocument(user);
@@ -92,27 +91,6 @@ test('[DOCUMENT_FLOW]: add signers', async ({ page }) => {
   await expect(page.getByRole('heading', { name: 'Add Fields' })).toBeVisible();
   await page.getByRole('button', { name: 'Go Back' }).click();
   await expect(page.getByRole('heading', { name: 'Add Signers' })).toBeVisible();
-
-  // Todo: Fix stepper component back issue before finishing test.
-
-  // // Expect that the advanced settings is unchecked, since no advanced settings were applied.
-  // await expect(page.getByLabel('Show advanced settings')).toBeChecked({ checked: false });
-
-  // // Add advanced settings for a single recipient.
-  // await page.getByLabel('Show advanced settings').click();
-  // await page.getByRole('combobox').first().click();
-  // await page.getByLabel('Require account').click();
-
-  // // Navigate to the next step and back.
-  // await page.getByRole('button', { name: 'Continue' }).click();
-  // await expect(page.getByRole('heading', { name: 'Add Fields' })).toBeVisible();
-  // await page.getByRole('button', { name: 'Go Back' }).click();
-  // await expect(page.getByRole('heading', { name: 'Add Signers' })).toBeVisible();
-
-  // Expect that the advanced settings is visible, and the checkbox is hidden. Since advanced
-  // settings were applied.
-
-  // Todo: Fix stepper component back issue before finishing test.
 
   await unseedUser(user.id);
 });

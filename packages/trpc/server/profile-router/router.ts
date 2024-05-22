@@ -90,7 +90,7 @@ export const profileRouter = router({
       try {
         const { url } = input;
 
-        if (IS_BILLING_ENABLED() && url.length <= 6) {
+        if (IS_BILLING_ENABLED() && url.length < 6) {
           const subscriptions = await getSubscriptionsByUserId({
             userId: ctx.user.id,
           }).then((subscriptions) =>
