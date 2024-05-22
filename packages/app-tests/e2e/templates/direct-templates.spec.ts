@@ -25,13 +25,13 @@ test('[DIRECT_TEMPLATES]: create direct link for template', async ({ page }) => 
   const owner = team.owner;
 
   // Should only be visible to the owner in personal templates.
-  await seedTemplate({
+  const personalTemplate = await seedTemplate({
     title: 'Personal template',
     userId: owner.id,
   });
 
   // Should be visible to team members.
-  await seedTemplate({
+  const teamTemplate = await seedTemplate({
     title: 'Team template 1',
     userId: owner.id,
     teamId: team.id,
@@ -43,24 +43,26 @@ test('[DIRECT_TEMPLATES]: create direct link for template', async ({ page }) => 
     redirectPath: '/templates',
   });
 
-  const urls = [`${WEBAPP_BASE_URL}/t/${team.url}/templates`, `${WEBAPP_BASE_URL}/templates`];
+  const urls = [
+    `${WEBAPP_BASE_URL}/t/${team.url}/templates/${teamTemplate.id}`,
+    `${WEBAPP_BASE_URL}/templates/${personalTemplate.id}`,
+  ];
 
   // Run test for personal and team templates.
   for (const url of urls) {
     // Owner should see list of templates with no direct link badge.
     await page.goto(url);
-    await expect(page.getByRole('button', { name: 'direct link' })).toBeHidden();
+    await expect(page.getByRole('button', { name: 'direct link' })).toHaveCount(1);
 
     // Create direct link.
-    await page.getByRole('cell', { name: 'Use Template' }).getByRole('button').nth(1).click();
-    await page.getByRole('menuitem', { name: 'Direct link' }).click();
+    await page.getByRole('button', { name: 'Create Direct Link' }).click();
     await page.getByRole('button', { name: 'Enable direct link signing' }).click();
     await page.getByRole('button', { name: 'Create one automatically' }).click();
     await expect(page.getByRole('heading', { name: 'Direct Link Signing' })).toBeVisible();
     await page.keyboard.press('Escape');
 
     // Expect badge to appear.
-    await expect(page.getByRole('button', { name: 'direct link' })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'direct link' })).toHaveCount(2);
   }
 
   await unseedTeam(team.url);
