@@ -222,21 +222,21 @@ test('[DOCUMENT_FLOW]: should be able to create a document with multiple recipie
   await page.getByRole('button', { name: 'Add Signer' }).click();
 
   await page.getByRole('textbox', { name: 'Email', exact: true }).fill('user2@example.com');
-  await page.getByRole('textbox', { name: 'Name', exact: true }).fill('User 2');
+  await page.getByRole('textbox', { name: 'Name', exact: true }).nth(1).fill('User 2');
   await page.locator('button[role="combobox"]').nth(1).click();
   await page.getByLabel('Receives copy').click();
   await page.getByRole('button', { name: 'Add Signer' }).click();
 
   await page.getByRole('textbox', { name: 'Email', exact: true }).nth(1).fill('user3@example.com');
-  await page.getByRole('textbox', { name: 'Name', exact: true }).nth(1).fill('User 3');
+  await page.getByRole('textbox', { name: 'Name', exact: true }).nth(2).fill('User 3');
   await page.locator('button[role="combobox"]').nth(2).click();
-  await page.getByLabel('Approver').click();
+  await page.getByLabel('Needs to approve').click();
   await page.getByRole('button', { name: 'Add Signer' }).click();
 
   await page.getByRole('textbox', { name: 'Email', exact: true }).nth(2).fill('user4@example.com');
-  await page.getByRole('textbox', { name: 'Name', exact: true }).nth(2).fill('User 4');
+  await page.getByRole('textbox', { name: 'Name', exact: true }).nth(3).fill('User 4');
   await page.locator('button[role="combobox"]').nth(3).click();
-  await page.getByLabel('Viewer').click();
+  await page.getByLabel('Needs to view').click();
 
   await page.getByRole('button', { name: 'Continue' }).click();
 
@@ -514,7 +514,7 @@ test('[DOCUMENT_FLOW]: should be able to sign a document with custom date', asyn
   await page.getByRole('button', { name: 'Sign' }).click();
 
   await page.waitForURL(`/sign/${token}/complete`);
-  await expect(page.getByText('You have signed')).toBeVisible();
+  await expect(page.getByText('Document Signed')).toBeVisible();
 
   const field = await prisma.field.findFirst({
     where: {
