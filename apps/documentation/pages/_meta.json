@@ -48,6 +48,11 @@
     "type": "page",
     "display": "hidden"
   },
+  "templates": {
+    "title": "Templates",
+    "type": "page",
+    "display": "hidden"
+  },
   "contributing": {
     "title": "Contributing Guide",
     "type": "page",
@@ -62,7 +67,7 @@
         "href": "/get-started"
       },
       "documents": {
-        "title": "Getting Documents Signed",
+        "title": "Signing Documents",
         "href": "/documents"
       },
       "templates": {
