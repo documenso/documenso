@@ -19,6 +19,8 @@ import {
   DocumentFlowFormContainerHeader,
 } from './document-flow-root';
 import { FieldItem } from './field-item';
+import { CheckboxFieldAdvancedSettings } from './field-items-advanced-settings/checkbox-field';
+import { DropdownFieldAdvancedSettings } from './field-items-advanced-settings/dropdown-field';
 import { NumberFieldAdvancedSettings } from './field-items-advanced-settings/number-field';
 import { RadioFieldAdvancedSettings } from './field-items-advanced-settings/radio-field';
 import { TextFieldAdvancedSettings } from './field-items-advanced-settings/text-field';
@@ -169,6 +171,7 @@ export const FieldAdvancedSettings = forwardRef<HTMLDivElement, FieldAdvancedSet
     const checkBoxField = field.type === FieldType.CHECKBOX;
     const radioField = field.type === FieldType.RADIO;
     const textField = field.type === FieldType.TEXT;
+    const dropdownField = field.type === FieldType.DROPDOWN;
 
     const handleOnGoNextClick = () => {
       const validation = defaultConfigSchema.safeParse(fieldState);
@@ -228,6 +231,22 @@ export const FieldAdvancedSettings = forwardRef<HTMLDivElement, FieldAdvancedSet
 
           {radioField && (
             <RadioFieldAdvancedSettings
+              fieldState={fieldState}
+              handleFieldChange={handleFieldChange}
+              handleToggleChange={handleToggleChange}
+            />
+          )}
+
+          {checkBoxField && (
+            <CheckboxFieldAdvancedSettings
+              fieldState={fieldState}
+              handleFieldChange={handleFieldChange}
+              handleToggleChange={handleToggleChange}
+            />
+          )}
+
+          {dropdownField && (
+            <DropdownFieldAdvancedSettings
               fieldState={fieldState}
               handleFieldChange={handleFieldChange}
               handleToggleChange={handleToggleChange}
