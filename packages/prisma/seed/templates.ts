@@ -1,6 +1,11 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
+import {
+  DIRECT_TEMPLATE_RECIPIENT_EMAIL,
+  DIRECT_TEMPLATE_RECIPIENT_NAME,
+} from '@documenso/lib/constants/template';
+
 import { prisma } from '..';
 import type { Prisma, User } from '../client';
 import { DocumentDataType, ReadStatus, RecipientRole, SendStatus, SigningStatus } from '../client';
@@ -13,6 +18,7 @@ type SeedTemplateOptions = {
   title?: string;
   userId: number;
   teamId?: number;
+  createTemplateOptions?: Partial<Prisma.TemplateCreateInput>;
 };
 
 type CreateTemplateOptions = {
@@ -85,6 +91,76 @@ export const seedTemplate = async (options: SeedTemplateOptions) => {
             },
           }
         : {}),
+    },
+  });
+};
+
+export const seedDirectTemplate = async (options: SeedTemplateOptions) => {
+  const { title = 'Untitled', userId, teamId } = options;
+
+  const documentData = await prisma.documentData.create({
+    data: {
+      type: DocumentDataType.BYTES_64,
+      data: examplePdf,
+      initialData: examplePdf,
+    },
+  });
+
+  const template = await prisma.template.create({
+    data: {
+      title,
+      templateDocumentData: {
+        connect: {
+          id: documentData.id,
+        },
+      },
+      User: {
+        connect: {
+          id: userId,
+        },
+      },
+      Recipient: {
+        create: {
+          email: DIRECT_TEMPLATE_RECIPIENT_EMAIL,
+          name: DIRECT_TEMPLATE_RECIPIENT_NAME,
+          token: Math.random().toString().slice(2, 7),
+        },
+      },
+      ...(teamId
+        ? {
+            team: {
+              connect: {
+                id: teamId,
+              },
+            },
+          }
+        : {}),
+      ...options.createTemplateOptions,
+    },
+    include: {
+      Recipient: true,
+      User: true,
+    },
+  });
+
+  await prisma.templateDirectAccess.create({
+    data: {
+      templateId: template.id,
+      enabled: true,
+      token: Math.random().toString(),
+      directTemplateRecipientId: template.Recipient[0].id,
+    },
+  });
+
+  return await prisma.template.findFirstOrThrow({
+    where: {
+      id: template.id,
+    },
+    include: {
+      access: true,
+      Field: true,
+      Recipient: true,
+      team: true,
     },
   });
 };
