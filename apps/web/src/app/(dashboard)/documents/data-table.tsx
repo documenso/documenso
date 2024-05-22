@@ -3,6 +3,7 @@
 import { useTransition } from 'react';
 
 import { Loader } from 'lucide-react';
+import { DateTime } from 'luxon';
 import { useSession } from 'next-auth/react';
 
 import { useUpdateSearchParams } from '@documenso/lib/client-only/hooks/use-update-search-params';
@@ -62,7 +63,12 @@ export const DocumentsDataTable = ({
           {
             header: 'Created',
             accessorKey: 'createdAt',
-            cell: ({ row }) => <LocaleDate date={row.original.createdAt} />,
+            cell: ({ row }) => (
+              <LocaleDate
+                date={row.original.createdAt}
+                format={{ ...DateTime.DATETIME_SHORT, hourCycle: 'h12' }}
+              />
+            ),
           },
           {
             header: 'Title',
