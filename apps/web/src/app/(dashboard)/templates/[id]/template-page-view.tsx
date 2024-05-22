@@ -13,9 +13,9 @@ import type { Team } from '@documenso/prisma/client';
 
 import { TemplateType } from '~/components/formatter/template-type';
 
-import { DirectTemplateAccessBadge } from '../direct-template-access-badge';
-import { DirectTemplateAccessDialogWrapper } from './direct-template-access-dialog-wrapper';
+import { TemplateDirectLinkBadge } from '../template-direct-link-badge';
 import { EditTemplateForm } from './edit-template';
+import { TemplateDirectLinkDialogWrapper } from './template-direct-link-dialog-wrapper';
 
 export type TemplatePageViewProps = {
   params: {
@@ -66,18 +66,18 @@ export const TemplatePageView = async ({ params, team }: TemplatePageViewProps) 
           <div className="mt-2.5 flex items-center">
             <TemplateType inheritColor className="text-muted-foreground" type={template.type} />
 
-            {template.access?.token && (
-              <DirectTemplateAccessBadge
+            {template.directLink?.token && (
+              <TemplateDirectLinkBadge
                 className="ml-4"
-                token={template.access.token}
-                enabled={template.access.enabled}
+                token={template.directLink.token}
+                enabled={template.directLink.enabled}
               />
             )}
           </div>
         </div>
 
         <div className="mt-2 sm:mt-0 sm:self-end">
-          <DirectTemplateAccessDialogWrapper template={template} />
+          <TemplateDirectLinkDialogWrapper template={template} />
         </div>
       </div>
 

@@ -1,21 +1,21 @@
 import { prisma } from '@documenso/prisma';
 
-export interface GetTemplateByDirectAccessTokenOptions {
+export interface GetTemplateByDirectLinkTokenOptions {
   token: string;
 }
 
-export const getTemplateByDirectAccessToken = async ({
+export const getTemplateByDirectLinkToken = async ({
   token,
-}: GetTemplateByDirectAccessTokenOptions) => {
+}: GetTemplateByDirectLinkTokenOptions) => {
   const template = await prisma.template.findFirstOrThrow({
     where: {
-      access: {
+      directLink: {
         token,
         enabled: true,
       },
     },
     include: {
-      access: true,
+      directLink: true,
       Recipient: {
         include: {
           Field: true,

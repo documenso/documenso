@@ -5,15 +5,15 @@ import { prisma } from '@documenso/prisma';
 
 import { AppError, AppErrorCode } from '../../errors/app-error';
 
-export type DeleteTemplateDirectAccessOptions = {
+export type DeleteTemplateDirectLinkOptions = {
   templateId: number;
   userId: number;
 };
 
-export const deleteTemplateDirectAccess = async ({
+export const deleteTemplateDirectLink = async ({
   templateId,
   userId,
-}: DeleteTemplateDirectAccessOptions): Promise<void> => {
+}: DeleteTemplateDirectLinkOptions): Promise<void> => {
   const template = await prisma.template.findFirst({
     where: {
       id: templateId,
@@ -33,7 +33,7 @@ export const deleteTemplateDirectAccess = async ({
       ],
     },
     include: {
-      access: true,
+      directLink: true,
       Recipient: true,
     },
   });
@@ -42,9 +42,9 @@ export const deleteTemplateDirectAccess = async ({
     throw new AppError(AppErrorCode.NOT_FOUND, 'Template not found');
   }
 
-  const { access } = template;
+  const { directLink } = template;
 
-  if (!access) {
+  if (!directLink) {
     return;
   }
 
@@ -52,14 +52,14 @@ export const deleteTemplateDirectAccess = async ({
     await tx.recipient.update({
       where: {
         templateId: template.id,
-        id: access.directTemplateRecipientId,
+        id: directLink.directTemplateRecipientId,
       },
       data: {
         ...generateAvaliableRecipientPlaceholder(template.Recipient),
       },
     });
 
-    await tx.templateDirectAccess.delete({
+    await tx.templateDirectLink.delete({
       where: {
         templateId,
       },

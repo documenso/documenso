@@ -18,7 +18,7 @@ import {
   type Recipient,
   RecipientRole,
   type Template,
-  type TemplateDirectAccess,
+  type TemplateDirectLink,
 } from '@documenso/prisma/client';
 import { trpc as trpcReact } from '@documenso/trpc/react';
 import { AnimateGenericFadeInOut } from '@documenso/ui/components/animate/animate-generic-fade-in-out';
@@ -46,32 +46,32 @@ import {
 import { Tooltip, TooltipContent, TooltipTrigger } from '@documenso/ui/primitives/tooltip';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
-type DirectTemplateAccessDialogProps = {
+type TemplateDirectLinkDialogProps = {
   template: Template & {
-    access?: Pick<TemplateDirectAccess, 'token' | 'enabled'> | null;
+    directLink?: Pick<TemplateDirectLink, 'token' | 'enabled'> | null;
     Recipient: Recipient[];
   };
   open: boolean;
   onOpenChange: (_open: boolean) => void;
 };
 
-type DirectTemplateAccessStep = 'ONBOARD' | 'SELECT_RECIPIENT' | 'MANAGE' | 'CONFIRM_DELETE';
+type TemplateDirectLinkStep = 'ONBOARD' | 'SELECT_RECIPIENT' | 'MANAGE' | 'CONFIRM_DELETE';
 
-export const DirectTemplateAccessDialog = ({
+export const TemplateDirectLinkDialog = ({
   template,
   open,
   onOpenChange,
-}: DirectTemplateAccessDialogProps) => {
+}: TemplateDirectLinkDialogProps) => {
   const { toast } = useToast();
   const { quota, remaining } = useLimits();
 
   const [, copy] = useCopyToClipboard();
   const router = useRouter();
 
-  const [isEnabled, setIsEnabled] = useState(template.access?.enabled ?? false);
-  const [token, setToken] = useState(template.access?.token ?? null);
+  const [isEnabled, setIsEnabled] = useState(template.directLink?.enabled ?? false);
+  const [token, setToken] = useState(template.directLink?.token ?? null);
   const [selectedRecipientId, setSelectedRecipientId] = useState<number | null>(null);
-  const [currentStep, setCurrentStep] = useState<DirectTemplateAccessStep>(
+  const [currentStep, setCurrentStep] = useState<TemplateDirectLinkStep>(
     token ? 'MANAGE' : 'ONBOARD',
   );
 
@@ -81,10 +81,10 @@ export const DirectTemplateAccessDialog = ({
   );
 
   const {
-    mutateAsync: createTemplateDirectAccess,
-    isLoading: isCreatingTemplateDirectAccess,
-    reset: resetCreateTemplateDirectAccess,
-  } = trpcReact.template.createTemplateDirectAccess.useMutation({
+    mutateAsync: createTemplateDirectLink,
+    isLoading: isCreatingTemplateDirectLink,
+    reset: resetCreateTemplateDirectLink,
+  } = trpcReact.template.createTemplateDirectLink.useMutation({
     onSuccess: (data) => {
       setToken(data.token);
       setIsEnabled(data.enabled);
@@ -103,8 +103,8 @@ export const DirectTemplateAccessDialog = ({
     },
   });
 
-  const { mutateAsync: toggleTemplateDirectAccess, isLoading: isTogglingTemplateAccess } =
-    trpcReact.template.toggleTemplateDirectAccess.useMutation({
+  const { mutateAsync: toggleTemplateDirectLink, isLoading: isTogglingTemplateAccess } =
+    trpcReact.template.toggleTemplateDirectLink.useMutation({
       onSuccess: (data) => {
         toast({
           title: 'Success',
@@ -122,8 +122,8 @@ export const DirectTemplateAccessDialog = ({
       },
     });
 
-  const { mutateAsync: deleteTemplateDirectAccess, isLoading: isDeletingTemplateDirectAccess } =
-    trpcReact.template.deleteTemplateDirectAccess.useMutation({
+  const { mutateAsync: deleteTemplateDirectLink, isLoading: isDeletingTemplateDirectLink } =
+    trpcReact.template.deleteTemplateDirectLink.useMutation({
       onSuccess: () => {
         onOpenChange(false);
         setToken(null);
@@ -162,17 +162,17 @@ export const DirectTemplateAccessDialog = ({
 
     setSelectedRecipientId(recipientId);
 
-    await createTemplateDirectAccess({
+    await createTemplateDirectLink({
       templateId: template.id,
       directRecipientId: recipientId,
     });
   };
 
   const isLoading =
-    isCreatingTemplateDirectAccess || isTogglingTemplateAccess || isDeletingTemplateDirectAccess;
+    isCreatingTemplateDirectLink || isTogglingTemplateAccess || isDeletingTemplateDirectLink;
 
   useEffect(() => {
-    resetCreateTemplateDirectAccess();
+    resetCreateTemplateDirectLink();
     setCurrentStep(token ? 'MANAGE' : 'ONBOARD');
     setSelectedRecipientId(null);
 
@@ -237,7 +237,7 @@ export const DirectTemplateAccessDialog = ({
             ))
             .with({ token: P.nullish, currentStep: 'SELECT_RECIPIENT' }, () => (
               <DialogContent className="relative">
-                {isCreatingTemplateDirectAccess && validDirectTemplateRecipients.length !== 0 && (
+                {isCreatingTemplateDirectLink && validDirectTemplateRecipients.length !== 0 && (
                   <div className="absolute inset-0 z-50 flex items-center justify-center rounded bg-white/50 dark:bg-black/50">
                     <LoaderIcon className="h-6 w-6 animate-spin text-gray-500" />
                   </div>
@@ -312,9 +312,9 @@ export const DirectTemplateAccessDialog = ({
                       <Button
                         type="button"
                         className="mt-2"
-                        loading={isCreatingTemplateDirectAccess && !selectedRecipientId}
+                        loading={isCreatingTemplateDirectLink && !selectedRecipientId}
                         onClick={async () =>
-                          createTemplateDirectAccess({
+                          createTemplateDirectLink({
                             templateId: template.id,
                           })
                         }
@@ -387,7 +387,7 @@ export const DirectTemplateAccessDialog = ({
                     type="button"
                     variant="destructive"
                     className="mr-auto w-full sm:w-auto"
-                    loading={isDeletingTemplateDirectAccess}
+                    loading={isDeletingTemplateDirectLink}
                     onClick={() => setCurrentStep('CONFIRM_DELETE')}
                   >
                     Remove direct linking
@@ -401,7 +401,7 @@ export const DirectTemplateAccessDialog = ({
                     type="button"
                     loading={isTogglingTemplateAccess}
                     onClick={async () =>
-                      toggleTemplateDirectAccess({
+                      toggleTemplateDirectLink({
                         templateId: template.id,
                         enabled: isEnabled,
                       })
@@ -435,8 +435,8 @@ export const DirectTemplateAccessDialog = ({
                   <Button
                     type="button"
                     variant="destructive"
-                    loading={isDeletingTemplateDirectAccess}
-                    onClick={() => void deleteTemplateDirectAccess({ templateId: template.id })}
+                    loading={isDeletingTemplateDirectLink}
+                    onClick={() => void deleteTemplateDirectLink({ templateId: template.id })}
                   >
                     Confirm
                   </Button>

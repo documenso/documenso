@@ -62,7 +62,7 @@ export const createDocumentFromDirectTemplate = async ({
 }: CreateDocumentFromDirectTemplateOptions) => {
   const template = await prisma.template.findFirst({
     where: {
-      access: {
+      directLink: {
         token: directTemplateToken,
       },
     },
@@ -72,21 +72,21 @@ export const createDocumentFromDirectTemplate = async ({
           Field: true,
         },
       },
-      access: true,
+      directLink: true,
       templateDocumentData: true,
       templateMeta: true,
       User: true,
     },
   });
 
-  if (!template?.access?.enabled) {
+  if (!template?.directLink?.enabled) {
     throw new AppError(AppErrorCode.INVALID_REQUEST, 'Invalid or missing template');
   }
 
-  const { Recipient: recipients, access, User: templateOwner } = template;
+  const { Recipient: recipients, directLink, User: templateOwner } = template;
 
   const directTemplateRecipient = recipients.find(
-    (recipient) => recipient.id === access.directTemplateRecipientId,
+    (recipient) => recipient.id === directLink.directTemplateRecipientId,
   );
 
   if (!directTemplateRecipient || directTemplateRecipient.role === RecipientRole.CC) {
@@ -205,7 +205,7 @@ export const createDocumentFromDirectTemplate = async ({
     // Create the document and non direct template recipients.
     const document = await tx.document.create({
       data: {
-        source: DocumentSource.TEMPLATE_DIRECT_ACCESS,
+        source: DocumentSource.TEMPLATE_DIRECT_LINK,
         userId: template.userId,
         teamId: template.teamId,
         title: template.title,
@@ -383,7 +383,7 @@ export const createDocumentFromDirectTemplate = async ({
         data: {
           title: document.title,
           source: {
-            type: DocumentSource.TEMPLATE_DIRECT_ACCESS,
+            type: DocumentSource.TEMPLATE_DIRECT_LINK,
             templateId: template.id,
             directRecipientEmail,
           },

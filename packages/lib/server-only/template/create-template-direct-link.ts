@@ -3,7 +3,7 @@
 import { nanoid } from 'nanoid';
 
 import { prisma } from '@documenso/prisma';
-import type { Recipient, TemplateDirectAccess } from '@documenso/prisma/client';
+import type { Recipient, TemplateDirectLink } from '@documenso/prisma/client';
 
 import {
   DIRECT_TEMPLATE_RECIPIENT_EMAIL,
@@ -11,17 +11,17 @@ import {
 } from '../../constants/template';
 import { AppError, AppErrorCode } from '../../errors/app-error';
 
-export type CreateTemplateDirectAccessOptions = {
+export type CreateTemplateDirectLinkOptions = {
   templateId: number;
   userId: number;
   directRecipientId?: number;
 };
 
-export const createTemplateDirectAccess = async ({
+export const createTemplateDirectLink = async ({
   templateId,
   userId,
   directRecipientId,
-}: CreateTemplateDirectAccessOptions): Promise<TemplateDirectAccess> => {
+}: CreateTemplateDirectLinkOptions): Promise<TemplateDirectLink> => {
   const template = await prisma.template.findFirst({
     where: {
       id: templateId,
@@ -42,7 +42,7 @@ export const createTemplateDirectAccess = async ({
     },
     include: {
       Recipient: true,
-      access: true,
+      directLink: true,
     },
   });
 
@@ -50,7 +50,7 @@ export const createTemplateDirectAccess = async ({
     throw new AppError(AppErrorCode.NOT_FOUND, 'Template not found');
   }
 
-  if (template.access) {
+  if (template.directLink) {
     throw new AppError(AppErrorCode.ALREADY_EXISTS, 'Direct template already exists');
   }
 
@@ -95,7 +95,7 @@ export const createTemplateDirectAccess = async ({
       });
     }
 
-    return await tx.templateDirectAccess.create({
+    return await tx.templateDirectLink.create({
       data: {
         templateId,
         enabled: true,

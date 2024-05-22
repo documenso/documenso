@@ -6,12 +6,12 @@ import { sendDocument } from '@documenso/lib/server-only/document/send-document'
 import { createDocumentFromDirectTemplate } from '@documenso/lib/server-only/template/create-document-from-direct-template';
 import { createDocumentFromTemplate } from '@documenso/lib/server-only/template/create-document-from-template';
 import { createTemplate } from '@documenso/lib/server-only/template/create-template';
-import { createTemplateDirectAccess } from '@documenso/lib/server-only/template/create-template-direct-access';
+import { createTemplateDirectLink } from '@documenso/lib/server-only/template/create-template-direct-link';
 import { deleteTemplate } from '@documenso/lib/server-only/template/delete-template';
-import { deleteTemplateDirectAccess } from '@documenso/lib/server-only/template/delete-template-direct-access';
+import { deleteTemplateDirectLink } from '@documenso/lib/server-only/template/delete-template-direct-link';
 import { duplicateTemplate } from '@documenso/lib/server-only/template/duplicate-template';
 import { getTemplateWithDetailsById } from '@documenso/lib/server-only/template/get-template-with-details-by-id';
-import { toggleTemplateDirectAccess } from '@documenso/lib/server-only/template/toggle-template-direct-access';
+import { toggleTemplateDirectLink } from '@documenso/lib/server-only/template/toggle-template-direct-link';
 import { updateTemplateSettings } from '@documenso/lib/server-only/template/update-template-settings';
 import { extractNextApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 import type { Document } from '@documenso/prisma/client';
@@ -20,13 +20,13 @@ import { authenticatedProcedure, router, unknownAuthenticatedProcedure } from '.
 import {
   ZCreateDocumentFromDirectTemplateMutationSchema,
   ZCreateDocumentFromTemplateMutationSchema,
-  ZCreateTemplateDirectAccessMutationSchema,
+  ZCreateTemplateDirectLinkMutationSchema,
   ZCreateTemplateMutationSchema,
-  ZDeleteTemplateDirectAccessMutationSchema,
+  ZDeleteTemplateDirectLinkMutationSchema,
   ZDeleteTemplateMutationSchema,
   ZDuplicateTemplateMutationSchema,
   ZGetTemplateWithDetailsByIdQuerySchema,
-  ZToggleTemplateDirectAccessMutationSchema,
+  ZToggleTemplateDirectLinkMutationSchema,
   ZUpdateTemplateSettingsMutationSchema,
 } from './schema';
 
@@ -214,8 +214,8 @@ export const templateRouter = router({
       }
     }),
 
-  createTemplateDirectAccess: authenticatedProcedure
-    .input(ZCreateTemplateDirectAccessMutationSchema)
+  createTemplateDirectLink: authenticatedProcedure
+    .input(ZCreateTemplateDirectLinkMutationSchema)
     .mutation(async ({ input, ctx }) => {
       try {
         const { templateId, directRecipientId } = input;
@@ -231,7 +231,7 @@ export const templateRouter = router({
           );
         }
 
-        return await createTemplateDirectAccess({ userId, templateId, directRecipientId });
+        return await createTemplateDirectLink({ userId, templateId, directRecipientId });
       } catch (err) {
         console.error(err);
 
@@ -240,15 +240,15 @@ export const templateRouter = router({
       }
     }),
 
-  deleteTemplateDirectAccess: authenticatedProcedure
-    .input(ZDeleteTemplateDirectAccessMutationSchema)
+  deleteTemplateDirectLink: authenticatedProcedure
+    .input(ZDeleteTemplateDirectLinkMutationSchema)
     .mutation(async ({ input, ctx }) => {
       try {
         const { templateId } = input;
 
         const userId = ctx.user.id;
 
-        return await deleteTemplateDirectAccess({ userId, templateId });
+        return await deleteTemplateDirectLink({ userId, templateId });
       } catch (err) {
         console.error(err);
 
@@ -257,15 +257,15 @@ export const templateRouter = router({
       }
     }),
 
-  toggleTemplateDirectAccess: authenticatedProcedure
-    .input(ZToggleTemplateDirectAccessMutationSchema)
+  toggleTemplateDirectLink: authenticatedProcedure
+    .input(ZToggleTemplateDirectLinkMutationSchema)
     .mutation(async ({ input, ctx }) => {
       try {
         const { templateId, enabled } = input;
 
         const userId = ctx.user.id;
 
-        return await toggleTemplateDirectAccess({ userId, templateId, enabled });
+        return await toggleTemplateDirectLink({ userId, templateId, enabled });
       } catch (err) {
         console.error(err);
 

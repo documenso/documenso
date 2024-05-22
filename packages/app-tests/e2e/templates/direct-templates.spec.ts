@@ -17,7 +17,7 @@ import { checkDocumentTabCount } from '../fixtures/documents';
 
 test.describe.configure({ mode: 'parallel' });
 
-test('[DIRECT_TEMPLATES]: create direct access for template', async ({ page }) => {
+test('[DIRECT_TEMPLATES]: create direct link for template', async ({ page }) => {
   const team = await seedTeam({
     createTeamMembers: 1,
   });
@@ -47,11 +47,11 @@ test('[DIRECT_TEMPLATES]: create direct access for template', async ({ page }) =
 
   // Run test for personal and team templates.
   for (const url of urls) {
-    // Owner should see list of templates with no direct access badge.
+    // Owner should see list of templates with no direct link badge.
     await page.goto(url);
     await expect(page.getByRole('button', { name: 'direct link' })).toBeHidden();
 
-    // Create direct access.
+    // Create direct link.
     await page.getByRole('cell', { name: 'Use Template' }).getByRole('button').nth(1).click();
     await page.getByRole('menuitem', { name: 'Direct link' }).click();
     await page.getByRole('button', { name: 'Enable direct link signing' }).click();
@@ -66,7 +66,7 @@ test('[DIRECT_TEMPLATES]: create direct access for template', async ({ page }) =
   await unseedTeam(team.url);
 });
 
-test('[DIRECT_TEMPLATES]: toggle direct template', async ({ page }) => {
+test('[DIRECT_TEMPLATES]: toggle direct template link', async ({ page }) => {
   const team = await seedTeam({
     createTeamMembers: 1,
   });
@@ -75,13 +75,13 @@ test('[DIRECT_TEMPLATES]: toggle direct template', async ({ page }) => {
 
   // Should only be visible to the owner in personal templates.
   const personalDirectTemplate = await seedDirectTemplate({
-    title: 'Personal direct template',
+    title: 'Personal direct template link',
     userId: owner.id,
   });
 
   // Should be visible to team members.
   const teamDirectTemplate = await seedDirectTemplate({
-    title: 'Team direct template 1',
+    title: 'Team direct template link 1',
     userId: owner.id,
     teamId: team.id,
   });
@@ -93,8 +93,8 @@ test('[DIRECT_TEMPLATES]: toggle direct template', async ({ page }) => {
 
   // Run test for personal and team templates.
   for (const template of [personalDirectTemplate, teamDirectTemplate]) {
-    // Check that the direct template is accessible.
-    await page.goto(formatDirectTemplatePath(template.access?.token || ''));
+    // Check that the direct template link is accessible.
+    await page.goto(formatDirectTemplatePath(template.directLink?.token || ''));
     await expect(page.getByRole('heading', { name: 'General' })).toBeVisible();
 
     // Navigate to template settings and disable access.
@@ -106,15 +106,15 @@ test('[DIRECT_TEMPLATES]: toggle direct template', async ({ page }) => {
     await expect(page.getByText('Direct link signing has been').first()).toBeVisible();
     await page.getByLabel('Direct Link Signing', { exact: true }).press('Escape');
 
-    // Check that the direct template is no longer accessible.
-    await page.goto(formatDirectTemplatePath(template.access?.token || ''));
+    // Check that the direct template link is no longer accessible.
+    await page.goto(formatDirectTemplatePath(template.directLink?.token || ''));
     await expect(page.getByText('Template not found')).toBeVisible();
   }
 
   await unseedTeam(team.url);
 });
 
-test('[DIRECT_TEMPLATES]: delete direct template', async ({ page }) => {
+test('[DIRECT_TEMPLATES]: delete direct template link', async ({ page }) => {
   const team = await seedTeam({
     createTeamMembers: 1,
   });
@@ -123,13 +123,13 @@ test('[DIRECT_TEMPLATES]: delete direct template', async ({ page }) => {
 
   // Should only be visible to the owner in personal templates.
   const personalDirectTemplate = await seedDirectTemplate({
-    title: 'Personal direct template',
+    title: 'Personal direct template link',
     userId: owner.id,
   });
 
   // Should be visible to team members.
   const teamDirectTemplate = await seedDirectTemplate({
-    title: 'Team direct template 1',
+    title: 'Team direct template link 1',
     userId: owner.id,
     teamId: team.id,
   });
@@ -141,8 +141,8 @@ test('[DIRECT_TEMPLATES]: delete direct template', async ({ page }) => {
 
   // Run test for personal and team templates.
   for (const template of [personalDirectTemplate, teamDirectTemplate]) {
-    // Check that the direct template is accessible.
-    await page.goto(formatDirectTemplatePath(template.access?.token || ''));
+    // Check that the direct template link is accessible.
+    await page.goto(formatDirectTemplatePath(template.directLink?.token || ''));
     await expect(page.getByRole('heading', { name: 'General' })).toBeVisible();
 
     // Navigate to template settings and delete the access.
@@ -151,21 +151,21 @@ test('[DIRECT_TEMPLATES]: delete direct template', async ({ page }) => {
     await page.getByRole('menuitem', { name: 'Direct link' }).click();
     await page.getByRole('button', { name: 'Remove direct linking' }).click();
     await page.getByRole('button', { name: 'Confirm' }).click();
-    await expect(page.getByText('Direct template link deleted').first()).toBeVisible();
+    await expect(page.getByText('Direct template link link deleted').first()).toBeVisible();
 
-    // Check that the direct template is no longer accessible.
-    await page.goto(formatDirectTemplatePath(template.access?.token || ''));
+    // Check that the direct template link is no longer accessible.
+    await page.goto(formatDirectTemplatePath(template.directLink?.token || ''));
     await expect(page.getByText('Template not found')).toBeVisible();
   }
 
   await unseedTeam(team.url);
 });
 
-test('[DIRECT_TEMPLATES]: direct template auth access', async ({ page }) => {
+test('[DIRECT_TEMPLATES]: direct template link auth access', async ({ page }) => {
   const user = await seedUser();
 
   const directTemplateWithAuth = await seedDirectTemplate({
-    title: 'Personal direct template',
+    title: 'Personal direct template link',
     userId: user.id,
     createTemplateOptions: {
       authOptions: createDocumentAuthOptions({
@@ -175,7 +175,9 @@ test('[DIRECT_TEMPLATES]: direct template auth access', async ({ page }) => {
     },
   });
 
-  const directTemplatePath = formatDirectTemplatePath(directTemplateWithAuth.access?.token || '');
+  const directTemplatePath = formatDirectTemplatePath(
+    directTemplateWithAuth.directLink?.token || '',
+  );
 
   await page.goto(directTemplatePath);
 
@@ -194,7 +196,7 @@ test('[DIRECT_TEMPLATES]: direct template auth access', async ({ page }) => {
   await unseedUser(user.id);
 });
 
-test('[DIRECT_TEMPLATES]: use direct template with 1 recipient', async ({ page }) => {
+test('[DIRECT_TEMPLATES]: use direct template link with 1 recipient', async ({ page }) => {
   const team = await seedTeam({
     createTeamMembers: 1,
   });
@@ -203,21 +205,21 @@ test('[DIRECT_TEMPLATES]: use direct template with 1 recipient', async ({ page }
 
   // Should only be visible to the owner in personal templates.
   const personalDirectTemplate = await seedDirectTemplate({
-    title: 'Personal direct template',
+    title: 'Personal direct template link',
     userId: owner.id,
   });
 
   // Should be visible to team members.
   const teamDirectTemplate = await seedDirectTemplate({
-    title: 'Team direct template 1',
+    title: 'Team direct template link 1',
     userId: owner.id,
     teamId: team.id,
   });
 
   // Run test for personal and team templates.
   for (const template of [personalDirectTemplate, teamDirectTemplate]) {
-    // Check that the direct template is accessible.
-    await page.goto(formatDirectTemplatePath(template.access?.token || ''));
+    // Check that the direct template link is accessible.
+    await page.goto(formatDirectTemplatePath(template.directLink?.token || ''));
     await expect(page.getByRole('heading', { name: 'General' })).toBeVisible();
 
     await page.getByPlaceholder('recipient@documenso.com').fill(seedTestEmail());
@@ -245,7 +247,7 @@ test('[DIRECT_TEMPLATES]: use direct template with 1 recipient', async ({ page }
   await unseedTeam(team.url);
 });
 
-test('[DIRECT_TEMPLATES]: use direct template with 2 recipients', async ({ page }) => {
+test('[DIRECT_TEMPLATES]: use direct template link with 2 recipients', async ({ page }) => {
   const team = await seedTeam({
     createTeamMembers: 1,
   });
@@ -274,14 +276,14 @@ test('[DIRECT_TEMPLATES]: use direct template with 2 recipients', async ({ page 
 
   // Should only be visible to the owner in personal templates.
   const personalDirectTemplate = await seedDirectTemplate({
-    title: 'Personal direct template',
+    title: 'Personal direct template link',
     userId: owner.id,
     createTemplateOptions,
   });
 
   // Should be visible to team members.
   const teamDirectTemplate = await seedDirectTemplate({
-    title: 'Team direct template 1',
+    title: 'Team direct template link 1',
     userId: owner.id,
     teamId: team.id,
     createTemplateOptions,
@@ -289,8 +291,8 @@ test('[DIRECT_TEMPLATES]: use direct template with 2 recipients', async ({ page 
 
   // Run test for personal and team templates.
   for (const template of [personalDirectTemplate, teamDirectTemplate]) {
-    // Check that the direct template is accessible.
-    await page.goto(formatDirectTemplatePath(template.access?.token || ''));
+    // Check that the direct template link is accessible.
+    await page.goto(formatDirectTemplatePath(template.directLink?.token || ''));
     await expect(page.getByRole('heading', { name: 'General' })).toBeVisible();
 
     await page.getByPlaceholder('recipient@documenso.com').fill(seedTestEmail());

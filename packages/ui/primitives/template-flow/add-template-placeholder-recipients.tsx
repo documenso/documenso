@@ -11,7 +11,7 @@ import { useFieldArray, useForm } from 'react-hook-form';
 import { ZRecipientAuthOptionsSchema } from '@documenso/lib/types/document-auth';
 import { nanoid } from '@documenso/lib/universal/id';
 import { generateRecipientPlaceholder } from '@documenso/lib/utils/templates';
-import type { TemplateDirectAccess } from '@documenso/prisma/client';
+import type { TemplateDirectLink } from '@documenso/prisma/client';
 import { type Field, type Recipient, RecipientRole } from '@documenso/prisma/client';
 import { AnimateGenericFadeInOut } from '@documenso/ui/components/animate/animate-generic-fade-in-out';
 import { RecipientActionAuthSelect } from '@documenso/ui/components/recipient/recipient-action-auth-select';
@@ -40,7 +40,7 @@ export type AddTemplatePlaceholderRecipientsFormProps = {
   documentFlow: DocumentFlowStep;
   recipients: Recipient[];
   fields: Field[];
-  templateDirectAccess: TemplateDirectAccess | null;
+  templateDirectLink: TemplateDirectLink | null;
   isEnterprise: boolean;
   isDocumentPdfLoaded: boolean;
   onSubmit: (_data: TAddTemplatePlacholderRecipientsFormSchema) => void;
@@ -50,7 +50,7 @@ export const AddTemplatePlaceholderRecipientsFormPartial = ({
   documentFlow,
   isEnterprise,
   recipients,
-  templateDirectAccess,
+  templateDirectLink,
   fields,
   isDocumentPdfLoaded,
   onSubmit,
@@ -161,8 +161,8 @@ export const AddTemplatePlaceholderRecipientsFormPartial = ({
     signer: TAddTemplatePlacholderRecipientsFormSchema['signers'][number],
   ): boolean => {
     return (
-      templateDirectAccess !== null &&
-      signer.nativeId === templateDirectAccess?.directTemplateRecipientId
+      templateDirectLink !== null &&
+      signer.nativeId === templateDirectLink?.directTemplateRecipientId
     );
   };
 

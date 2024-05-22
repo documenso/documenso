@@ -4,17 +4,17 @@ import { prisma } from '@documenso/prisma';
 
 import { AppError, AppErrorCode } from '../../errors/app-error';
 
-export type ToggleTemplateDirectAccessOptions = {
+export type ToggleTemplateDirectLinkOptions = {
   templateId: number;
   userId: number;
   enabled: boolean;
 };
 
-export const toggleTemplateDirectAccess = async ({
+export const toggleTemplateDirectLink = async ({
   templateId,
   userId,
   enabled,
-}: ToggleTemplateDirectAccessOptions) => {
+}: ToggleTemplateDirectLinkOptions) => {
   const template = await prisma.template.findFirst({
     where: {
       id: templateId,
@@ -35,7 +35,7 @@ export const toggleTemplateDirectAccess = async ({
     },
     include: {
       Recipient: true,
-      access: true,
+      directLink: true,
     },
   });
 
@@ -43,15 +43,15 @@ export const toggleTemplateDirectAccess = async ({
     throw new AppError(AppErrorCode.NOT_FOUND, 'Template not found');
   }
 
-  const { access } = template;
+  const { directLink } = template;
 
-  if (!access) {
-    throw new AppError(AppErrorCode.NOT_FOUND, 'Direct template access not found');
+  if (!directLink) {
+    throw new AppError(AppErrorCode.NOT_FOUND, 'Direct template link not found');
   }
 
-  return await prisma.templateDirectAccess.update({
+  return await prisma.templateDirectLink.update({
     where: {
-      id: access.id,
+      id: directLink.id,
     },
     data: {
       templateId: template.id,

@@ -5,7 +5,7 @@
 
 */
 -- CreateEnum
-CREATE TYPE "DocumentSource" AS ENUM ('DOCUMENT', 'TEMPLATE', 'TEMPLATE_DIRECT_ACCESS');
+CREATE TYPE "DocumentSource" AS ENUM ('DOCUMENT', 'TEMPLATE', 'TEMPLATE_DIRECT_LINK');
 
 -- AlterTable
 ALTER TABLE "Document" ADD COLUMN     "source" "DocumentSource";
@@ -17,7 +17,7 @@ UPDATE "Document" SET "source" = 'DOCUMENT' WHERE "source" IS NULL;
 ALTER TABLE "Document" ALTER COLUMN     "source" SET NOT NULL;
 
 -- CreateTable
-CREATE TABLE "TemplateDirectAccess" (
+CREATE TABLE "TemplateDirectLink" (
     "id" TEXT NOT NULL,
     "templateId" INTEGER NOT NULL,
     "token" TEXT NOT NULL,
@@ -25,17 +25,17 @@ CREATE TABLE "TemplateDirectAccess" (
     "enabled" BOOLEAN NOT NULL,
     "directTemplateRecipientId" INTEGER NOT NULL,
 
-    CONSTRAINT "TemplateDirectAccess_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "TemplateDirectLink_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateIndex
-CREATE UNIQUE INDEX "TemplateDirectAccess_id_key" ON "TemplateDirectAccess"("id");
+CREATE UNIQUE INDEX "TemplateDirectLink_id_key" ON "TemplateDirectLink"("id");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "TemplateDirectAccess_templateId_key" ON "TemplateDirectAccess"("templateId");
+CREATE UNIQUE INDEX "TemplateDirectLink_templateId_key" ON "TemplateDirectLink"("templateId");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "TemplateDirectAccess_token_key" ON "TemplateDirectAccess"("token");
+CREATE UNIQUE INDEX "TemplateDirectLink_token_key" ON "TemplateDirectLink"("token");
 
 -- AddForeignKey
-ALTER TABLE "TemplateDirectAccess" ADD CONSTRAINT "TemplateDirectAccess_templateId_fkey" FOREIGN KEY ("templateId") REFERENCES "Template"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "TemplateDirectLink" ADD CONSTRAINT "TemplateDirectLink_templateId_fkey" FOREIGN KEY ("templateId") REFERENCES "Template"("id") ON DELETE CASCADE ON UPDATE CASCADE;

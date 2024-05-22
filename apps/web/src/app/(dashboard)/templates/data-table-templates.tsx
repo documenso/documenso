@@ -19,7 +19,7 @@ import { TemplateType } from '~/components/formatter/template-type';
 
 import { DataTableActionDropdown } from './data-table-action-dropdown';
 import { DataTableTitle } from './data-table-title';
-import { DirectTemplateAccessBadge } from './direct-template-access-badge';
+import { TemplateDirectLinkBadge } from './template-direct-link-badge';
 import { UseTemplateDialog } from './use-template-dialog';
 
 type TemplatesDataTableProps = {
@@ -138,11 +138,11 @@ export const TemplatesDataTable = ({
               <div className="flex flex-row items-center">
                 <TemplateType type="PRIVATE" />
 
-                {row.original.access?.token && (
-                  <DirectTemplateAccessBadge
+                {row.original.directLink?.token && (
+                  <TemplateDirectLinkBadge
                     className="ml-2"
-                    token={row.original.access.token}
-                    enabled={row.original.access.enabled}
+                    token={row.original.directLink.token}
+                    enabled={row.original.directLink.enabled}
                   />
                 )}
               </div>

@@ -96,7 +96,7 @@ export const sendDocument = async ({
 
   const { documentData } = document;
 
-  const isDirectTemplate = document.source === DocumentSource.TEMPLATE_DIRECT_ACCESS;
+  const isDirectTemplate = document.source === DocumentSource.TEMPLATE_DIRECT_LINK;
 
   if (!documentData.data) {
     throw new Error('Document data not found');

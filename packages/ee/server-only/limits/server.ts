@@ -92,7 +92,7 @@ const handleUserLimits = async ({ email }: HandleUserLimitsOptions) => {
           gte: DateTime.utc().startOf('month').toJSDate(),
         },
         source: {
-          not: DocumentSource.TEMPLATE_DIRECT_ACCESS,
+          not: DocumentSource.TEMPLATE_DIRECT_LINK,
         },
       },
     }),
@@ -100,7 +100,7 @@ const handleUserLimits = async ({ email }: HandleUserLimitsOptions) => {
       where: {
         userId: user.id,
         teamId: null,
-        access: {
+        directLink: {
           isNot: null,
         },
       },

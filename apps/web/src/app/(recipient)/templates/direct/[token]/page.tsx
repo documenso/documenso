@@ -4,7 +4,7 @@ import { UsersIcon } from 'lucide-react';
 import { match } from 'ts-pattern';
 
 import { getServerComponentSession } from '@documenso/lib/next-auth/get-server-component-session';
-import { getTemplateByDirectAccessToken } from '@documenso/lib/server-only/template/get-template-by-direct-access-token';
+import { getTemplateByDirectLinkToken } from '@documenso/lib/server-only/template/get-template-by-direct-link-token';
 import { DocumentAccessAuth } from '@documenso/lib/types/document-auth';
 import { extractDocumentAuthMethods } from '@documenso/lib/utils/document-auth';
 
@@ -30,16 +30,16 @@ export default async function TemplatesDirectPage({ params }: TemplatesDirectPag
 
   const { user } = await getServerComponentSession();
 
-  const template = await getTemplateByDirectAccessToken({
+  const template = await getTemplateByDirectLinkToken({
     token,
   }).catch(() => null);
 
-  if (!template || !template.access?.enabled) {
+  if (!template || !template.directLink?.enabled) {
     notFound();
   }
 
   const directTemplateRecipient = template.Recipient.find(
-    (recipient) => recipient.id === template.access?.directTemplateRecipientId,
+    (recipient) => recipient.id === template.directLink?.directTemplateRecipientId,
   );
 
   if (!directTemplateRecipient) {
@@ -82,7 +82,7 @@ export default async function TemplatesDirectPage({ params }: TemplatesDirectPag
 
           <DirectTemplatePageView
             directTemplateRecipient={directTemplateRecipient}
-            directTemplateToken={template.access.token}
+            directTemplateToken={template.directLink.token}
             template={template}
           />
         </div>

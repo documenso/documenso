@@ -17,8 +17,8 @@ import {
 } from '@documenso/ui/primitives/dropdown-menu';
 
 import { DeleteTemplateDialog } from './delete-template-dialog';
-import { DirectTemplateAccessDialog } from './direct-template-access-dialog';
 import { DuplicateTemplateDialog } from './duplicate-template-dialog';
+import { TemplateDirectLinkDialog } from './template-direct-link-dialog';
 
 export type DataTableActionDropdownProps = {
   row: FindTemplateRow;
@@ -34,7 +34,7 @@ export const DataTableActionDropdown = ({
   const { data: session } = useSession();
 
   const [isDeleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [isDirectTemplateAccessOpen, setDirectTemplateAccessOpen] = useState(false);
+  const [isTemplateDirectLinkDialogOpen, setTemplateDirectLinkDialogOpen] = useState(false);
   const [isDuplicateDialogOpen, setDuplicateDialogOpen] = useState(false);
 
   if (!session) {
@@ -68,7 +68,7 @@ export const DataTableActionDropdown = ({
           Duplicate
         </DropdownMenuItem>
 
-        <DropdownMenuItem onClick={() => setDirectTemplateAccessOpen(true)}>
+        <DropdownMenuItem onClick={() => setTemplateDirectLinkDialogOpen(true)}>
           <Share2Icon className="mr-2 h-4 w-4" />
           Direct link
         </DropdownMenuItem>
@@ -89,10 +89,10 @@ export const DataTableActionDropdown = ({
         onOpenChange={setDuplicateDialogOpen}
       />
 
-      <DirectTemplateAccessDialog
+      <TemplateDirectLinkDialog
         template={row}
-        open={isDirectTemplateAccessOpen}
-        onOpenChange={setDirectTemplateAccessOpen}
+        open={isTemplateDirectLinkDialogOpen}
+        onOpenChange={setTemplateDirectLinkDialogOpen}
       />
 
       <DeleteTemplateDialog

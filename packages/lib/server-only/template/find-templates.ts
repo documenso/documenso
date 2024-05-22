@@ -48,7 +48,7 @@ export const findTemplates = async ({
         },
         Field: true,
         Recipient: true,
-        access: {
+        directLink: {
           select: {
             token: true,
             enabled: true,

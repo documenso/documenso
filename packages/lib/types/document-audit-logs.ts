@@ -202,7 +202,7 @@ export const ZDocumentAuditLogEventDocumentCreatedSchema = z.object({
           templateId: z.number(),
         }),
         z.object({
-          type: z.literal(DocumentSource.TEMPLATE_DIRECT_ACCESS),
+          type: z.literal(DocumentSource.TEMPLATE_DIRECT_LINK),
           templateId: z.number(),
           directRecipientEmail: z.string().email(),
         }),

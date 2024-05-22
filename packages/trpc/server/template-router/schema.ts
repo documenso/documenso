@@ -44,16 +44,16 @@ export const ZDuplicateTemplateMutationSchema = z.object({
   teamId: z.number().optional(),
 });
 
-export const ZCreateTemplateDirectAccessMutationSchema = z.object({
+export const ZCreateTemplateDirectLinkMutationSchema = z.object({
   templateId: z.number().min(1),
   directRecipientId: z.number().min(1).optional(),
 });
 
-export const ZDeleteTemplateDirectAccessMutationSchema = z.object({
+export const ZDeleteTemplateDirectLinkMutationSchema = z.object({
   templateId: z.number().min(1),
 });
 
-export const ZToggleTemplateDirectAccessMutationSchema = z.object({
+export const ZToggleTemplateDirectLinkMutationSchema = z.object({
   templateId: z.number().min(1),
   enabled: z.boolean(),
 });

@@ -143,7 +143,7 @@ export const seedDirectTemplate = async (options: SeedTemplateOptions) => {
     },
   });
 
-  await prisma.templateDirectAccess.create({
+  await prisma.templateDirectLink.create({
     data: {
       templateId: template.id,
       enabled: true,
@@ -157,7 +157,7 @@ export const seedDirectTemplate = async (options: SeedTemplateOptions) => {
       id: template.id,
     },
     include: {
-      access: true,
+      directLink: true,
       Field: true,
       Recipient: true,
       team: true,

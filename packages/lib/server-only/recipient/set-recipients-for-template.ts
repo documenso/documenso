@@ -53,7 +53,7 @@ export const setRecipientsForTemplate = async ({
       ],
     },
     include: {
-      access: true,
+      directLink: true,
     },
   });
 
@@ -80,7 +80,7 @@ export const setRecipientsForTemplate = async ({
 
   const normalizedRecipients = recipients.map((recipient) => {
     // Force replace any changes to the name or email of the direct recipient.
-    if (template.access && recipient.id === template.access.directTemplateRecipientId) {
+    if (template.directLink && recipient.id === template.directLink.directTemplateRecipientId) {
       return {
         ...recipient,
         email: DIRECT_TEMPLATE_RECIPIENT_EMAIL,
@@ -108,13 +108,13 @@ export const setRecipientsForTemplate = async ({
       ),
   );
 
-  if (template.access !== null) {
+  if (template.directLink !== null) {
     const updatedDirectRecipient = recipients.find(
-      (recipient) => recipient.id === template.access?.directTemplateRecipientId,
+      (recipient) => recipient.id === template.directLink?.directTemplateRecipientId,
     );
 
     const deletedDirectRecipient = removedRecipients.find(
-      (recipient) => recipient.id === template.access?.directTemplateRecipientId,
+      (recipient) => recipient.id === template.directLink?.directTemplateRecipientId,
     );
 
     if (updatedDirectRecipient?.role === RecipientRole.CC) {

@@ -7,17 +7,17 @@ import { formatDirectTemplatePath } from '@documenso/lib/utils/templates';
 import { cn } from '@documenso/ui/lib/utils';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
-type DirectTemplateAccessBadgeProps = {
+type TemplateDirectLinkBadgeProps = {
   token: string;
   enabled: boolean;
   className?: string;
 };
 
-export const DirectTemplateAccessBadge = ({
+export const TemplateDirectLinkBadge = ({
   token,
   enabled,
   className,
-}: DirectTemplateAccessBadgeProps) => {
+}: TemplateDirectLinkBadgeProps) => {
   const [, copy] = useCopyToClipboard();
   const { toast } = useToast();
 
