@@ -324,8 +324,9 @@ test('[DIRECT_TEMPLATES]: use direct template link with 2 recipients', async ({ 
   await apiSignin({
     page,
     email: secondRecipient.email,
-    redirectPath: '/documents',
   });
+
+  await page.goto('/documents');
 
   await checkDocumentTabCount(page, 'All', 2);
   await checkDocumentTabCount(page, 'Inbox', 2);
