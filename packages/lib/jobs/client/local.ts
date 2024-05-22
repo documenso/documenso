@@ -12,8 +12,8 @@ import { verify } from '../../server-only/crypto/verify';
 import {
   type JobDefinition,
   type JobRunIO,
-  type TriggerJobOptions,
-  ZTriggerJobOptionsSchema,
+  type SimpleTriggerJobOptions,
+  ZSimpleTriggerJobOptionsSchema,
 } from './_internal/job';
 import type { Json } from './_internal/json';
 import { BaseJobProvider } from './base';
@@ -35,14 +35,14 @@ export class LocalJobProvider extends BaseJobProvider {
     return this._instance;
   }
 
-  public defineJob<T>(definition: JobDefinition<T>) {
+  public defineJob<N extends string, T>(definition: JobDefinition<N, T>) {
     this._jobDefinitions[definition.id] = {
       ...definition,
       enabled: definition.enabled ?? true,
     };
   }
 
-  public async triggerJob(options: TriggerJobOptions) {
+  public async triggerJob(options: SimpleTriggerJobOptions) {
     console.log({ jobDefinitions: this._jobDefinitions });
 
     const eligibleJobs = Object.values(this._jobDefinitions).filter(
@@ -87,9 +87,9 @@ export class LocalJobProvider extends BaseJobProvider {
 
         // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
         const options = await json(req)
-          .then(async (data) => ZTriggerJobOptionsSchema.parseAsync(data))
+          .then(async (data) => ZSimpleTriggerJobOptionsSchema.parseAsync(data))
           // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-          .then((data) => data as TriggerJobOptions)
+          .then((data) => data as SimpleTriggerJobOptions)
           .catch(() => null);
 
         if (!options) {
@@ -224,7 +224,7 @@ export class LocalJobProvider extends BaseJobProvider {
   private async submitJobToEndpoint(options: {
     jobId: string;
     jobDefinitionId: string;
-    data: TriggerJobOptions;
+    data: SimpleTriggerJobOptions;
     isRetry?: boolean;
   }) {
     const { jobId, jobDefinitionId, data, isRetry } = options;

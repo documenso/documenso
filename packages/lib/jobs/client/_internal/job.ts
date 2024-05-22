@@ -2,36 +2,47 @@ import { z } from 'zod';
 
 import type { Json } from './json';
 
-export const ZTriggerJobOptionsSchema = z.object({
+export type SimpleTriggerJobOptions = {
+  id?: string;
+  name: string;
+  payload: unknown;
+  timestamp?: number;
+};
+
+export const ZSimpleTriggerJobOptionsSchema = z.object({
   id: z.string().optional(),
   name: z.string(),
   payload: z.unknown().refine((x) => x !== undefined, { message: 'payload is required' }),
   timestamp: z.number().optional(),
 });
 
-// The Omit is a temporary workaround for a "bug" in the zod library
-// @see: https://github.com/colinhacks/zod/issues/2966
-export type TriggerJobOptions = Omit<z.infer<typeof ZTriggerJobOptionsSchema>, 'payload'> & {
-  payload: unknown;
-};
+// Map the array to create a union of objects we may accept
+export type TriggerJobOptions<Definitions extends Array<JobDefinition> = []> = {
+  [K in keyof Definitions]: {
+    id?: string;
+    name: Definitions[K]['trigger']['name'];
+    payload: Definitions[K]['trigger']['schema'] extends z.ZodType<infer Shape> ? Shape : unknown;
+    timestamp?: number;
+  };
+}[number];
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type JobDefinition<T = any> = {
+export type JobDefinition<Name extends string = string, Schema = any> = {
   id: string;
   name: string;
   version: string;
   enabled?: boolean;
   trigger: {
-    name: string;
-    schema?: z.ZodSchema<T>;
+    name: Name;
+    schema?: z.ZodType<Schema>;
   };
-  handler: (options: { payload: T; io: JobRunIO }) => Promise<Json | void>;
+  handler: (options: { payload: Schema; io: JobRunIO }) => Promise<Json | void>;
 };
 
 export interface JobRunIO {
   // stableRun<T extends Json | void>(cacheKey: string, callback: (io: JobRunIO) => T | Promise<T>): Promise<T>;
   runTask<T extends Json | void>(cacheKey: string, callback: () => Promise<T>): Promise<T>;
-  triggerJob(cacheKey: string, options: TriggerJobOptions): Promise<unknown>;
+  triggerJob(cacheKey: string, options: SimpleTriggerJobOptions): Promise<unknown>;
   wait(cacheKey: string, ms: number): Promise<void>;
   logger: {
     info(...args: unknown[]): void;
@@ -41,3 +52,7 @@ export interface JobRunIO {
     log(...args: unknown[]): void;
   };
 }
+
+export const defineJob = <N extends string, T = unknown>(
+  job: JobDefinition<N, T>,
+): JobDefinition<N, T> => job;

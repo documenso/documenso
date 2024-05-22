@@ -1,15 +1,15 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 
-import type { JobDefinition, TriggerJobOptions } from './_internal/job';
+import type { JobDefinition, SimpleTriggerJobOptions } from './_internal/job';
 
 export abstract class BaseJobProvider {
   // eslint-disable-next-line @typescript-eslint/require-await
-  public async triggerJob(_options: TriggerJobOptions): Promise<void> {
+  public async triggerJob(_options: SimpleTriggerJobOptions): Promise<void> {
     throw new Error('Not implemented');
   }
 
   // eslint-disable-next-line @typescript-eslint/require-await
-  public defineJob<T>(_job: JobDefinition<T>): void {
+  public defineJob<N extends string, T>(_job: JobDefinition<N, T>): void {
     throw new Error('Not implemented');
   }
 

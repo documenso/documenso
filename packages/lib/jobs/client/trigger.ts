@@ -4,7 +4,7 @@ import { createPagesRoute } from '@trigger.dev/nextjs';
 import type { IO } from '@trigger.dev/sdk';
 import { TriggerClient, eventTrigger } from '@trigger.dev/sdk';
 
-import type { JobDefinition, JobRunIO, TriggerJobOptions } from './_internal/job';
+import type { JobDefinition, JobRunIO, SimpleTriggerJobOptions } from './_internal/job';
 import { BaseJobProvider } from './base';
 
 export class TriggerJobProvider extends BaseJobProvider {
@@ -32,7 +32,7 @@ export class TriggerJobProvider extends BaseJobProvider {
     return this._instance;
   }
 
-  public defineJob<T>(job: JobDefinition<T>): void {
+  public defineJob<N extends string, T>(job: JobDefinition<N, T>): void {
     this._client.defineJob({
       id: job.id,
       name: job.name,
@@ -45,12 +45,12 @@ export class TriggerJobProvider extends BaseJobProvider {
     });
   }
 
-  public async triggerJob(_options: TriggerJobOptions): Promise<void> {
+  public async triggerJob(options: SimpleTriggerJobOptions): Promise<void> {
     await this._client.sendEvent({
-      id: _options.id,
-      name: _options.name,
-      payload: _options.payload,
-      timestamp: _options.timestamp ? new Date(_options.timestamp) : undefined,
+      id: options.id,
+      name: options.name,
+      payload: options.payload,
+      timestamp: options.timestamp ? new Date(options.timestamp) : undefined,
     });
   }
 

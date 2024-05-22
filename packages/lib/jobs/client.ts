@@ -1,6 +1,12 @@
 import { JobClient } from './client/client';
-import { registerJobs } from './definitions';
+import { SEND_CONFIRMATION_EMAIL_JOB_DEFINITION } from './definitions/send-confirmation-email';
+import { SEND_SIGNING_EMAIL_JOB_DEFINITION } from './definitions/send-signing-email';
 
-export const jobsClient = JobClient.getInstance();
-
-registerJobs(jobsClient);
+/**
+ * The `as const` assertion is load bearing as it provides the correct level of type inference for
+ * triggering jobs.
+ */
+export const jobsClient = new JobClient([
+  SEND_CONFIRMATION_EMAIL_JOB_DEFINITION,
+  SEND_SIGNING_EMAIL_JOB_DEFINITION,
+] as const);
