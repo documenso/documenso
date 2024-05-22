@@ -141,7 +141,7 @@ export const TemplateDirectLinkDialog = ({
         toast({
           title: 'Something went wrong',
           description:
-            'We encountered an error while removing direct template access. Please try again later.',
+            'We encountered an error while removing the direct template link. Please try again later.',
           variant: 'destructive',
         });
       },

@@ -151,7 +151,7 @@ test('[DIRECT_TEMPLATES]: delete direct template link', async ({ page }) => {
     await page.getByRole('menuitem', { name: 'Direct link' }).click();
     await page.getByRole('button', { name: 'Remove direct linking' }).click();
     await page.getByRole('button', { name: 'Confirm' }).click();
-    await expect(page.getByText('Direct template link link deleted').first()).toBeVisible();
+    await expect(page.getByText('Direct template link deleted').first()).toBeVisible();
 
     // Check that the direct template link is no longer accessible.
     await page.goto(formatDirectTemplatePath(template.directLink?.token || ''));
