@@ -37,9 +37,5 @@ vscode:
     - esbenp.prettier-vscode
     - mikestead.dotenv
     - unifiedjs.vscode-mdx
-    - GitHub.copilot-chat
-    - GitHub.copilot-labs
-    - GitHub.copilot
     - GitHub.vscode-pull-request-github
     - Prisma.prisma
-    - VisualStudioExptTeam.vscodeintellicode
