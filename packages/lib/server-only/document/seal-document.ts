@@ -17,6 +17,7 @@ import { getFile } from '../../universal/upload/get-file';
 import { putPdfFile } from '../../universal/upload/put-file';
 import { getCertificatePdf } from '../htmltopdf/get-certificate-pdf';
 import { flattenAnnotations } from '../pdf/flatten-annotations';
+import { flattenForm } from '../pdf/flatten-form';
 import { insertFieldInPDF } from '../pdf/insert-field-in-pdf';
 import { normalizeSignatureAppearances } from '../pdf/normalize-signature-appearances';
 import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
@@ -101,8 +102,11 @@ export const sealDocument = async ({
 
   // Normalize and flatten layers that could cause issues with the signature
   normalizeSignatureAppearances(doc);
-  doc.getForm().flatten();
+  console.log('normalized');
+  flattenForm(doc);
+  console.log('flattened');
   flattenAnnotations(doc);
+  console.log('annotations');
 
   if (certificate) {
     const certificatePages = await doc.copyPages(certificate, certificate.getPageIndices());
