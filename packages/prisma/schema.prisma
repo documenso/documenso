@@ -539,15 +539,29 @@ enum TemplateType {
   PRIVATE
 }
 
+model TemplateMeta {
+  id          String   @id @default(cuid())
+  subject     String?
+  message     String?
+  timezone    String?  @default("Etc/UTC") @db.Text
+  password    String?
+  dateFormat  String?  @default("yyyy-MM-dd hh:mm a") @db.Text
+  templateId  Int      @unique
+  template    Template @relation(fields: [templateId], references: [id], onDelete: Cascade)
+  redirectUrl String?
+}
+
 model Template {
-  id                     Int          @id @default(autoincrement())
-  type                   TemplateType @default(PRIVATE)
+  id                     Int           @id @default(autoincrement())
+  type                   TemplateType  @default(PRIVATE)
   title                  String
   userId                 Int
   teamId                 Int?
+  authOptions            Json?
+  templateMeta           TemplateMeta?
   templateDocumentDataId String
-  createdAt              DateTime     @default(now())
-  updatedAt              DateTime     @default(now()) @updatedAt
+  createdAt              DateTime      @default(now())
+  updatedAt              DateTime      @default(now()) @updatedAt
 
   team                 Team?        @relation(fields: [teamId], references: [id], onDelete: Cascade)
   templateDocumentData DocumentData @relation(fields: [templateDocumentDataId], references: [id], onDelete: Cascade)

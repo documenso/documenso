@@ -110,7 +110,7 @@ export const resendDocument = async ({
         assetBaseUrl,
         signDocumentLink,
         customBody: renderCustomEmailTemplate(
-          selfSigner ? selfSignerCustomEmail : customEmail?.message || '',
+          selfSigner && !customEmail?.message ? selfSignerCustomEmail : customEmail?.message || '',
           customEmailTemplate,
         ),
         role: recipient.role,
@@ -135,7 +135,7 @@ export const resendDocument = async ({
               address: FROM_ADDRESS,
             },
             subject: customEmail?.subject
-              ? renderCustomEmailTemplate(customEmail.subject, customEmailTemplate)
+              ? renderCustomEmailTemplate(`Reminder: ${customEmail.subject}`, customEmailTemplate)
               : emailSubject,
             html: render(template),
             text: render(template, { plainText: true }),

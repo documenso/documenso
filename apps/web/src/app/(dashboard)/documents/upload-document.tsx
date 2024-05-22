@@ -10,8 +10,9 @@ import { useSession } from 'next-auth/react';
 import { useLimits } from '@documenso/ee/server-only/limits/provider/client';
 import { useAnalytics } from '@documenso/lib/client-only/hooks/use-analytics';
 import { APP_DOCUMENT_UPLOAD_SIZE_LIMIT } from '@documenso/lib/constants/app';
+import { AppError } from '@documenso/lib/errors/app-error';
 import { createDocumentData } from '@documenso/lib/server-only/document-data/create-document-data';
-import { putFile } from '@documenso/lib/universal/upload/put-file';
+import { putPdfFile } from '@documenso/lib/universal/upload/put-file';
 import { formatDocumentsPath } from '@documenso/lib/utils/teams';
 import { TRPCClientError } from '@documenso/trpc/client';
 import { trpc } from '@documenso/trpc/react';
@@ -57,7 +58,7 @@ export const UploadDocument = ({ className, team }: UploadDocumentProps) => {
     try {
       setIsLoading(true);
 
-      const { type, data } = await putFile(file);
+      const { type, data } = await putPdfFile(file);
 
       const { id: documentDataId } = await createDocumentData({
         type,
@@ -83,13 +84,21 @@ export const UploadDocument = ({ className, team }: UploadDocumentProps) => {
       });
 
       router.push(`${formatDocumentsPath(team?.url)}/${id}/edit`);
-    } catch (error) {
-      console.error(error);
+    } catch (err) {
+      const error = AppError.parseError(err);
 
-      if (error instanceof TRPCClientError) {
+      console.error(err);
+
+      if (error.code === 'INVALID_DOCUMENT_FILE') {
+        toast({
+          title: 'Invalid file',
+          description: 'You cannot upload encrypted PDFs',
+          variant: 'destructive',
+        });
+      } else if (err instanceof TRPCClientError) {
         toast({
           title: 'Error',
-          description: error.message,
+          description: err.message,
           variant: 'destructive',
         });
       } else {
