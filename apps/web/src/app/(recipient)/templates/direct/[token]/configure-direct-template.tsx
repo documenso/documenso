@@ -1,6 +1,7 @@
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useSession } from 'next-auth/react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
@@ -53,6 +54,7 @@ export const ConfigureDirectTemplateFormPartial = ({
 }: ConfigureDirectTemplateFormProps) => {
   const { Recipient } = template;
   const { derivedRecipientAccessAuth } = useRequiredDocumentAuthContext();
+  const { data: session } = useSession();
 
   const recipientsWithBlankDirectRecipientEmail = Recipient.map((recipient) => {
     if (recipient.id === directTemplateRecipient.id) {
@@ -113,7 +115,11 @@ export const ConfigureDirectTemplateFormPartial = ({
                   <FormControl>
                     <Input
                       {...field}
-                      disabled={field.disabled || derivedRecipientAccessAuth !== null}
+                      disabled={
+                        field.disabled ||
+                        derivedRecipientAccessAuth !== null ||
+                        session?.user.email !== undefined
+                      }
                       placeholder="recipient@documenso.com"
                     />
                   </FormControl>

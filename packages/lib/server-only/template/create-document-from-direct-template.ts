@@ -29,7 +29,11 @@ import { DocumentAccessAuth, ZRecipientAuthOptionsSchema } from '../../types/doc
 import type { RequestMetadata } from '../../universal/extract-request-metadata';
 import type { CreateDocumentAuditLogDataResponse } from '../../utils/document-audit-logs';
 import { createDocumentAuditLogData } from '../../utils/document-audit-logs';
-import { createRecipientAuthOptions, extractDocumentAuthMethods } from '../../utils/document-auth';
+import {
+  createDocumentAuthOptions,
+  createRecipientAuthOptions,
+  extractDocumentAuthMethods,
+} from '../../utils/document-auth';
 import { formatDocumentsPath } from '../../utils/teams';
 import { sendDocument } from '../document/send-document';
 import { validateFieldAuth } from '../document/validate-field-auth';
@@ -97,9 +101,14 @@ export const createDocumentFromDirectTemplate = async ({
     throw new AppError(AppErrorCode.INVALID_REQUEST, 'Template no longer matches');
   }
 
-  const { derivedRecipientAccessAuth } = extractDocumentAuthMethods({
-    documentAuth: template.authOptions,
-  });
+  if (user && user.email !== directRecipientEmail) {
+    throw new AppError(AppErrorCode.INVALID_REQUEST, 'Email must match if you are logged in');
+  }
+
+  const { derivedRecipientAccessAuth, documentAuthOption: templateAuthOptions } =
+    extractDocumentAuthMethods({
+      documentAuth: template.authOptions,
+    });
 
   const directRecipientName = user?.name;
 
@@ -212,6 +221,10 @@ export const createDocumentFromDirectTemplate = async ({
         createdAt: initialRequestTime,
         status: DocumentStatus.PENDING,
         documentDataId: documentData.id,
+        authOptions: createDocumentAuthOptions({
+          globalAccessAuth: templateAuthOptions.globalAccessAuth,
+          globalActionAuth: templateAuthOptions.globalActionAuth,
+        }),
         Recipient: {
           createMany: {
             data: nonDirectTemplateRecipients.map((recipient) => {
