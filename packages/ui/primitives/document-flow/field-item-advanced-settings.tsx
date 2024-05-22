@@ -9,18 +9,8 @@ import { z } from 'zod';
 
 import { FieldType } from '@documenso/prisma/client';
 import { trpc } from '@documenso/trpc/react';
-import { Label } from '@documenso/ui/primitives/label';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@documenso/ui/primitives/select';
-import { Switch } from '@documenso/ui/primitives/switch';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
-import { Input } from '../input';
 import type { FieldFormType } from './add-fields';
 import {
   DocumentFlowFormContainerActions,
@@ -29,6 +19,9 @@ import {
   DocumentFlowFormContainerHeader,
 } from './document-flow-root';
 import { FieldItem } from './field-item';
+import { NumberFieldAdvancedSettings } from './field-items-advanced-settings/number-field';
+import { RadioFieldAdvancedSettings } from './field-items-advanced-settings/radio-field';
+import { TextFieldAdvancedSettings } from './field-items-advanced-settings/text-field';
 
 export type FieldAdvancedSettingsProps = {
   title: string;
@@ -44,22 +37,16 @@ export type FieldMeta = {
   label?: string;
   placeholder?: string;
   format?: string;
+  textField?: {
+    addText: string;
+  };
+  numberField?: {
+    value: number;
+  };
   characterLimit?: number;
   required?: boolean;
   readOnly?: boolean;
 };
-
-// TODO: Remove hardcoded values and refactor
-const listValues = [
-  {
-    label: '123,456.78',
-    value: '123,456.78',
-  },
-  {
-    label: '123.456,78',
-    value: '123.456,78',
-  },
-];
 
 const defaultConfigSchema = z.object({
   label: z.string(),
@@ -181,6 +168,7 @@ export const FieldAdvancedSettings = forwardRef<HTMLDivElement, FieldAdvancedSet
     const numberField = field.type === FieldType.NUMBER;
     const checkBoxField = field.type === FieldType.CHECKBOX;
     const radioField = field.type === FieldType.RADIO;
+    const textField = field.type === FieldType.TEXT;
 
     const handleOnGoNextClick = () => {
       const validation = defaultConfigSchema.safeParse(fieldState);
@@ -222,109 +210,31 @@ export const FieldAdvancedSettings = forwardRef<HTMLDivElement, FieldAdvancedSet
               </span>
             ))}
 
-          {/* For testing purposes only. Remove label and placeholder and add proper properties */}
-          {radioField && (
-            <div className="flex flex-col gap-4">
-              <div>
-                <Label>Option 1</Label>
-                <Input
-                  id="label"
-                  className="bg-background mt-2"
-                  placeholder="Radio option 1"
-                  value={fieldState.label}
-                  onChange={(e) => handleFieldChange('label', e.target.value)}
-                />
-              </div>
-              <div>
-                <Label className="mt-4">Option 2</Label>
-                <Input
-                  id="placeholder"
-                  className="bg-background mt-2"
-                  placeholder="Radio option 2"
-                  value={fieldState.placeholder}
-                  onChange={(e) => handleFieldChange('placeholder', e.target.value)}
-                />
-              </div>
-            </div>
-          )}
-
-          {!radioField && (
-            <div>
-              <Label>Label</Label>
-              <Input
-                id="label"
-                className="bg-background mt-2"
-                placeholder="Field label"
-                value={fieldState.label}
-                onChange={(e) => handleFieldChange('label', e.target.value)}
-              />
-            </div>
-          )}
-
-          {!checkBoxField && !radioField && (
-            <div className="mt-4">
-              <Label>Placeholder</Label>
-              <Input
-                id="placeholder"
-                className="bg-background mt-2"
-                placeholder="Field placeholder"
-                value={fieldState.placeholder}
-                onChange={(e) => handleFieldChange('placeholder', e.target.value)}
-              />
-            </div>
+          {textField && (
+            <TextFieldAdvancedSettings
+              fieldState={fieldState}
+              handleFieldChange={handleFieldChange}
+              handleToggleChange={handleToggleChange}
+            />
           )}
 
           {numberField && (
-            <>
-              <div className="my-4">
-                <Label>Format</Label>
-                <Select>
-                  <SelectTrigger className="text-muted-foreground mt-2 w-full">
-                    <SelectValue placeholder="Field format" />
-                  </SelectTrigger>
-                  <SelectContent position="popper">
-                    {listValues.map((item, index) => (
-                      <SelectItem key={index} value={item.value}>
-                        {item.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div>
-                <Label>Character Limit</Label>
-                <Input
-                  id="characterLimit"
-                  className="bg-background mt-2"
-                  placeholder="Field character limit"
-                  value={fieldState.characterLimit}
-                  onChange={(e) => handleFieldChange('characterLimit', e.target.value)}
-                />
-              </div>
-
-              <div className="mt-4 flex flex-row items-center gap-12">
-                <div className="flex flex-row items-center justify-center gap-2">
-                  <Label>Required field?</Label>
-                  <Switch
-                    className="bg-background"
-                    checked={fieldState.required}
-                    onChange={() => handleToggleChange('required')}
-                    onClick={() => handleToggleChange('required')}
-                  />
-                </div>
-                <div className="flex flex-row items-center justify-center gap-2">
-                  <Label>Read only?</Label>
-                  <Switch
-                    className="bg-background"
-                    checked={fieldState.readOnly}
-                    onChange={() => handleToggleChange('readOnly')}
-                    onClick={() => handleToggleChange('readOnly')}
-                  />
-                </div>
-              </div>
-            </>
+            <NumberFieldAdvancedSettings
+              fieldState={fieldState}
+              handleFieldChange={handleFieldChange}
+              handleToggleChange={handleToggleChange}
+            />
           )}
+
+          {radioField && (
+            <RadioFieldAdvancedSettings
+              fieldState={fieldState}
+              handleFieldChange={handleFieldChange}
+              handleToggleChange={handleToggleChange}
+            />
+          )}
+
+          {/* add the rest */}
         </DocumentFlowFormContainerContent>
         <DocumentFlowFormContainerFooter className="mt-auto">
           <DocumentFlowFormContainerActions

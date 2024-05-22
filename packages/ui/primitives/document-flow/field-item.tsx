@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { Caveat } from 'next/font/google';
 
@@ -152,15 +152,32 @@ export const FieldItem = ({
   const [settingsActive, setSettingsActive] = useState(false);
   const cardRef = useRef(null);
 
-  const selectedColorVariant = color ? combinedStyles[color] : null;
+  const selectedSignerStyles = useMemo(() => {
+    if (!color) {
+      return null;
+    }
 
-  const selectedSignerBorderClass = selectedColorVariant?.border ?? 'border-field-card-border';
-  const selectedSignerInitialsBGClass =
-    selectedColorVariant?.initialsBG ?? 'text-field-card-foreground/50 bg-slate-900/10';
-  const selectedSignerActiveBorderClass =
-    selectedColorVariant?.borderActive ?? 'border-field-card-border/80';
-  const selectedSignerFieldBackground =
-    selectedColorVariant?.fieldBackground ?? 'bg-field-card-background';
+    const selectedColorVariant = combinedStyles[color];
+
+    return {
+      activeBorderClass: selectedColorVariant?.borderActive,
+      borderClass: selectedColorVariant?.border,
+      initialsBGClass: selectedColorVariant?.initialsBG,
+      fieldBackground: selectedColorVariant?.fieldBackground,
+    };
+  }, [color]);
+
+  const {
+    borderClass: selectedSignerBorderClass,
+    activeBorderClass: selectedSignerActiveBorderClass,
+    initialsBGClass: selectedSignerInitialsBGClass,
+    fieldBackground: selectedSignerFieldBackground,
+  } = selectedSignerStyles || {
+    borderClass: 'border-field-card-border',
+    activeBorderClass: 'border-field-card-border/80',
+    initialsBGClass: 'text-field-card-foreground/50 bg-slate-900/10',
+    fieldBackground: 'bg-field-card-background',
+  };
 
   const advancedField = ['NUMBER', 'RADIO', 'CHECKBOX', 'DROPDOWN', 'TEXT'].includes(field.type);
 
@@ -209,16 +226,16 @@ export const FieldItem = ({
     };
   }, [calculateCoords]);
 
-  const handleClickOutside = (event: MouseEvent) => {
+  const handleClickOutsideField = (event: MouseEvent) => {
     if (settingsActive && cardRef.current && !event.composedPath().includes(cardRef.current)) {
       setSettingsActive(false);
     }
   };
 
   useEffect(() => {
-    document.body.addEventListener('click', handleClickOutside);
+    document.body.addEventListener('click', handleClickOutsideField);
     return () => {
-      document.body.removeEventListener('click', handleClickOutside);
+      document.body.removeEventListener('click', handleClickOutsideField);
     };
   }, [settingsActive]);
 
