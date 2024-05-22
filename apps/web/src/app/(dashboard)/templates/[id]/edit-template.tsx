@@ -146,8 +146,8 @@ export const EditTemplateForm = ({
       console.error(err);
 
       toast({
-        title: 'Error',
-        description: 'An error occurred while updating the document settings.',
+        title: 'დაფიქსირდა ხარვეზი',
+        description: 'დოკუმენტის პარამეტრების ცვლილებისას დაფიქსირდა ხარვეზი.',
         variant: 'destructive',
       });
     }

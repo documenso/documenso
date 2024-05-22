@@ -198,7 +198,7 @@ export function UseTemplateDialog({
                       name={`recipients.${index}.email`}
                       render={({ field }) => (
                         <FormItem className="w-full">
-                          {index === 0 && <FormLabel required>Email</FormLabel>}
+                          {index === 0 && <FormLabel required>ელ.ფოსტა</FormLabel>}
 
                           <FormControl>
                             <Input {...field} placeholder={recipients[index].email || 'Email'} />
@@ -212,7 +212,7 @@ export function UseTemplateDialog({
                       name={`recipients.${index}.name`}
                       render={({ field }) => (
                         <FormItem className="w-full">
-                          {index === 0 && <FormLabel>Name</FormLabel>}
+                          {index === 0 && <FormLabel>სახელი</FormLabel>}
 
                           <FormControl>
                             <Input {...field} placeholder={recipients[index].name || 'Name'} />

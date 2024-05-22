@@ -222,11 +222,11 @@ export const SignUpFormV2 = ({
       <div className="border-border dark:bg-background relative z-10 flex min-h-[min(850px,80vh)] w-full max-w-lg flex-col rounded-xl border bg-neutral-100 p-6">
         {step === 'BASIC_DETAILS' && (
           <div className="h-20">
-            <h1 className="text-xl font-semibold md:text-2xl">შექმენით ახალი ანგარიშიt</h1>
+            <h1 className="text-xl font-semibold md:text-2xl">შექმენით ახალი ანგარიში</h1>
 
             <p className="text-muted-foreground mt-2 text-xs md:text-sm">
-              შექმენით თქვენი ანგარიში და დაიწყეთ უახლესი დოკუმენტის ხელმოწერის გამოყენება. მარტივი
-              და ლამაზი ხელმოწერები თქვენს ხელშია.
+              შექმენით თქვენი ანგარიში და დაიწყეთ დოკუმენტების ელექტრონულად ხელმოწერის გამოყენება.
+              მარტივი და ლამაზი ხელმოწერები თქვენს ხელშია.
             </p>
           </div>
         )}
@@ -276,7 +276,7 @@ export const SignUpFormV2 = ({
                   name="email"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>ელ. ფოსტა</FormLabel>
+                      <FormLabel>ელ.ფოსტა</FormLabel>
                       <FormControl>
                         <Input type="email" {...field} />
                       </FormControl>

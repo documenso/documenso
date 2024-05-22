@@ -187,22 +187,22 @@ export function CommandMenu({ open, onOpenChange }: CommandMenuProps) {
         )}
         {!currentPage && (
           <>
-            <CommandGroup className="mx-2 p-0 pb-2" heading="Documents">
+            <CommandGroup className="mx-2 p-0 pb-2" heading="დოკუმენტები">
               <Commands push={push} pages={DOCUMENTS_PAGES} />
             </CommandGroup>
-            <CommandGroup className="mx-2 p-0 pb-2" heading="Templates">
+            <CommandGroup className="mx-2 p-0 pb-2" heading="შაბლონები">
               <Commands push={push} pages={TEMPLATES_PAGES} />
             </CommandGroup>
-            <CommandGroup className="mx-2 p-0 pb-2" heading="Settings">
+            <CommandGroup className="mx-2 p-0 pb-2" heading="პარამეტრები">
               <Commands push={push} pages={SETTINGS_PAGES} />
             </CommandGroup>
-            <CommandGroup className="mx-2 p-0 pb-2" heading="Preferences">
+            <CommandGroup className="mx-2 p-0 pb-2" heading="პრეფერენციები">
               <CommandItem className="-mx-2 -my-1 rounded-lg" onSelect={() => addPage('theme')}>
                 შეცვალეთ ფონი
               </CommandItem>
             </CommandGroup>
             {searchResults.length > 0 && (
-              <CommandGroup className="mx-2 p-0 pb-2" heading="Your documents">
+              <CommandGroup className="mx-2 p-0 pb-2" heading="თქვენი დოკუმენტები">
                 <Commands push={push} pages={searchResults} />
               </CommandGroup>
             )}
@@ -237,9 +237,9 @@ const Commands = ({
 const ThemeCommands = ({ setTheme }: { setTheme: (_theme: string) => void }) => {
   const THEMES = useMemo(
     () => [
-      { label: 'Light Mode', theme: THEMES_TYPE.LIGHT, icon: Sun },
-      { label: 'Dark Mode', theme: THEMES_TYPE.DARK, icon: Moon },
-      { label: 'System Theme', theme: THEMES_TYPE.SYSTEM, icon: Monitor },
+      { label: 'ნათელი როჟიმი', theme: THEMES_TYPE.LIGHT, icon: Sun },
+      { label: 'მუქი რეჟიმი', theme: THEMES_TYPE.DARK, icon: Moon },
+      { label: 'სისტემის ფონი', theme: THEMES_TYPE.SYSTEM, icon: Monitor },
     ],
     [],
   );

@@ -5,19 +5,19 @@ import { ZRegistrationResponseJSONSchema } from '@documenso/lib/types/webauthn';
 
 export const ZCurrentPasswordSchema = z
   .string()
-  .min(6, { message: 'Must be at least 6 characters in length' })
+  .min(6, { message: 'მინიმუმ 6 სიმბოლოს უნდა შეიცავდეს' })
   .max(72);
 
 export const ZPasswordSchema = z
   .string()
-  .regex(new RegExp('.*[A-Z].*'), { message: 'One uppercase character' })
-  .regex(new RegExp('.*[a-z].*'), { message: 'One lowercase character' })
-  .regex(new RegExp('.*\\d.*'), { message: 'One number' })
+  .regex(new RegExp('.*[A-Z].*'), { message: 'მინ. ერთი დიდი სიმბოლო' })
+  .regex(new RegExp('.*[a-z].*'), { message: 'მინ. ერთი პატარა სიმბოლო' })
+  .regex(new RegExp('.*\\d.*'), { message: 'მინ. ერთი რიცხვი' })
   .regex(new RegExp('.*[`~<>?,./!@#$%^&*()\\-_+="\'|{}\\[\\];:\\\\].*'), {
-    message: 'One special character is required',
+    message: 'მინ. ერთი სპეციალური სიმბოლო',
   })
-  .min(8, { message: 'Must be at least 8 characters in length' })
-  .max(72, { message: 'Cannot be more than 72 characters in length' });
+  .min(8, { message: 'მინიმუმ 8 სიმბოლოს უნდა შეიცავდეს' })
+  .max(72, { message: 'არ შეიძლება იყოს 72 სიმბოლოზე მეტი სიგრძის' });
 
 export const ZSignUpMutationSchema = z.object({
   name: z.string().min(1),
@@ -30,7 +30,7 @@ export const ZSignUpMutationSchema = z.object({
     .toLowerCase()
     .min(1)
     .regex(/^[a-z0-9-]+$/, {
-      message: 'Username can only container alphanumeric characters and dashes.',
+      message: 'სახელი შეიძლება შეიცავდეს მხოლოდ ასო-ციფრული სიმბოლოებსა და ტირეებს.',
     })
     .optional(),
 });
