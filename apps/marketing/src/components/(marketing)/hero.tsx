@@ -72,23 +72,6 @@ export const Hero = ({ className, ...props }: HeroProps) => {
 
   const heroMarketingCTA = getFlag('marketing_landing_hero_cta');
 
-  const onSignUpClick = () => {
-    const el = document.getElementById('email');
-
-    if (el) {
-      const { top } = el.getBoundingClientRect();
-
-      window.scrollTo({
-        top: top - 120,
-        behavior: 'smooth',
-      });
-
-      requestAnimationFrame(() => {
-        el.focus();
-      });
-    }
-  };
-
   return (
     <motion.div className={cn('relative', className)} {...props}>
       <div className="absolute -inset-24 -z-10">
@@ -123,18 +106,18 @@ export const Hero = ({ className, ...props }: HeroProps) => {
           animate="animate"
           className="mt-8 flex flex-wrap items-center justify-center gap-x-6 gap-y-4"
         >
-          <Button
-            type="button"
-            variant="outline"
-            className="rounded-full bg-transparent backdrop-blur-sm"
-            onClick={onSignUpClick}
-          >
-            Claim Early Adopter Plan
-            <span className="bg-primary dark:text-background -mr-2.5 ml-2.5 rounded-full px-2 py-1.5 text-xs font-medium">
-              $30/mo
-            </span>
-          </Button>
-
+          <Link href="https://app.documenso.com/signup?utm_source=marketing-hero">
+            <Button
+              type="button"
+              variant="outline"
+              className="rounded-full bg-transparent backdrop-blur-sm"
+            >
+              Try our Free Plan
+              <span className="bg-primary dark:text-background -mr-2.5 ml-2.5 rounded-full px-2 py-1.5 text-xs font-medium">
+                No Credit Card required
+              </span>
+            </Button>
+          </Link>
           <Link href="https://github.com/documenso/documenso" onClick={() => event('view-github')}>
             <Button variant="outline" className="rounded-full bg-transparent backdrop-blur-sm">
               <LuGithub className="mr-2 h-5 w-5" />
