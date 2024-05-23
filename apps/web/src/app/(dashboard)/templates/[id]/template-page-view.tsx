@@ -5,10 +5,9 @@ import { redirect } from 'next/navigation';
 
 import { ChevronLeft } from 'lucide-react';
 
+import { isUserEnterprise } from '@documenso/ee/server-only/util/is-document-enterprise';
 import { getRequiredServerComponentSession } from '@documenso/lib/next-auth/get-server-component-session';
-import { getFieldsForTemplate } from '@documenso/lib/server-only/field/get-fields-for-template';
-import { getRecipientsForTemplate } from '@documenso/lib/server-only/recipient/get-recipients-for-template';
-import { getTemplateById } from '@documenso/lib/server-only/template/get-template-by-id';
+import { getTemplateWithDetailsById } from '@documenso/lib/server-only/template/get-template-with-details-by-id';
 import { formatTemplatesPath } from '@documenso/lib/utils/teams';
 import type { Team } from '@documenso/prisma/client';
 
@@ -35,7 +34,7 @@ export const TemplatePageView = async ({ params, team }: TemplatePageViewProps) 
 
   const { user } = await getRequiredServerComponentSession();
 
-  const template = await getTemplateById({
+  const template = await getTemplateWithDetailsById({
     id: templateId,
     userId: user.id,
   }).catch(() => null);
@@ -44,18 +43,10 @@ export const TemplatePageView = async ({ params, team }: TemplatePageViewProps) 
     redirect(templateRootPath);
   }
 
-  const { templateDocumentData } = template;
-
-  const [templateRecipients, templateFields] = await Promise.all([
-    getRecipientsForTemplate({
-      templateId,
-      userId: user.id,
-    }),
-    getFieldsForTemplate({
-      templateId,
-      userId: user.id,
-    }),
-  ]);
+  const isTemplateEnterprise = await isUserEnterprise({
+    userId: user.id,
+    teamId: team?.id,
+  });
 
   return (
     <div className="mx-auto -mt-4 max-w-screen-xl px-4 md:px-8">
@@ -74,12 +65,9 @@ export const TemplatePageView = async ({ params, team }: TemplatePageViewProps) 
 
       <EditTemplateForm
         className="mt-6"
-        template={template}
-        user={user}
-        recipients={templateRecipients}
-        fields={templateFields}
-        documentData={templateDocumentData}
+        initialTemplate={template}
         templateRootPath={templateRootPath}
+        isEnterprise={isTemplateEnterprise}
       />
     </div>
   );
