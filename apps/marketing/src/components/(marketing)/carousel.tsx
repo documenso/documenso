@@ -9,11 +9,56 @@ import { Card } from '@documenso/ui/primitives/card';
 
 import { Thumb } from './thumb';
 
-type PropType = {
-  slides: { label: string; imageSrc: string }[];
+type SlideType = {
+  label: string;
+  imageSrc: string;
+  type: 'image' | 'video';
 };
 
-export const EmblaCarousel: React.FC<PropType> = ({ slides }) => {
+type CarouselPropType = {
+  slides: SlideType[];
+};
+
+const SLIDES = [
+  {
+    label: 'Signing Process',
+    type: 'video',
+    src: '/signing.mp4',
+  },
+  {
+    label: 'Templates/Fields',
+    type: 'video',
+    src: '/signing.mp4',
+  },
+  {
+    label: 'Zapier',
+    type: 'video',
+    src: '/signing.mp4',
+  },
+  {
+    label: 'Webhooks',
+    type: 'video',
+    src: '/signing.mp4',
+  },
+  {
+    label: 'API',
+    type: 'video',
+    src: '/signing.mp4',
+  },
+  {
+    label: 'Teams',
+    type: 'video',
+    src: '/signing.mp4',
+  },
+  {
+    label: 'Profile',
+    type: 'video',
+    src: '/signing.mp4',
+  },
+];
+
+export const Carousel = () => {
+  const slides = SLIDES;
   const [_isPlaying, setIsPlaying] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true }, [
@@ -100,15 +145,17 @@ export const EmblaCarousel: React.FC<PropType> = ({ slides }) => {
           <div className="flex touch-pan-y rounded-xl">
             {slides.map((slide, index) => (
               <div className="min-w-[10rem] flex-none basis-full rounded-xl" key={index}>
-                <video
-                  ref={(el) => (videoRefs.current[index] = el)}
-                  muted
-                  loop
-                  className="h-auto w-full rounded-xl"
-                >
-                  <source src="/signing.mp4" type="video/mp4" />
-                  Your browser does not support the video tag.
-                </video>
+                {slide.type === 'video' && (
+                  <video
+                    ref={(el) => (videoRefs.current[index] = el)}
+                    muted
+                    loop
+                    className="h-auto w-full rounded-xl"
+                  >
+                    <source src={slide.src} type="video/mp4" />
+                    Your browser does not support the video tag.
+                  </video>
+                )}
               </div>
             ))}
           </div>

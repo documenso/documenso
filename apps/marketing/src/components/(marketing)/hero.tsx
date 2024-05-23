@@ -14,39 +14,7 @@ import { useFeatureFlags } from '@documenso/lib/client-only/providers/feature-fl
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
 
-import { EmblaCarousel } from './carousel';
-import './embla.css';
-
-const SLIDES = [
-  {
-    label: 'Signing Process',
-    imageSrc: 'https://documenso.com/images/hero/hero-1.png',
-  },
-  {
-    label: 'Templates/Fields',
-    imageSrc: 'https://documenso.com/images/hero/hero-1.png',
-  },
-  {
-    label: 'Zapier',
-    imageSrc: 'https://documenso.com/images/hero/hero-1.png',
-  },
-  {
-    label: 'Webhooks',
-    imageSrc: 'https://documenso.com/images/hero/hero-1.png',
-  },
-  {
-    label: 'API',
-    imageSrc: 'https://documenso.com/images/hero/hero-1.png',
-  },
-  {
-    label: 'Teams',
-    imageSrc: 'https://documenso.com/images/hero/hero-1.png',
-  },
-  {
-    label: 'Profile',
-    imageSrc: 'https://documenso.com/images/hero/hero-1.png',
-  },
-];
+import { Carousel } from './carousel';
 
 export type HeroProps = {
   className?: string;
@@ -221,7 +189,7 @@ export const Hero = ({ className, ...props }: HeroProps) => {
           initial="initial"
           animate="animate"
         >
-          <EmblaCarousel slides={SLIDES} />
+          <Carousel />
         </motion.div>
       </div>
     </motion.div>
