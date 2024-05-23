@@ -80,6 +80,13 @@ export const Carousel = () => {
     emblaThumbsApi.scrollTo(emblaApi.selectedScrollSnap());
 
     resetProgress();
+    const autoplay = emblaApi.plugins()?.autoplay;
+
+    console.log(autoplay);
+
+    if (autoplay) {
+      autoplay.reset();
+    }
   }, [emblaApi, emblaThumbsApi, setSelectedIndex]);
 
   const resetProgress = useCallback(() => {
