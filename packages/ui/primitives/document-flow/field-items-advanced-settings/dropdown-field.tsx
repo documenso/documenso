@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 import { ChevronDown, ChevronUp, Trash } from 'lucide-react';
 
@@ -29,8 +29,15 @@ export const DropdownFieldAdvancedSettings = ({
   handleFieldChange,
   handleToggleChange,
 }: DropdownFieldAdvancedSettingsProps) => {
+  // Weird type check to handle the case where the values are not an array of objects
+  const fieldStateValues: { value: string }[] = useMemo(() => {
+    return Array.isArray(fieldState.values)
+      ? fieldState.values.map((value) => (typeof value === 'string' ? { value } : value))
+      : [{ value: 'Option 1' }];
+  }, [fieldState.values]);
+
   const [showValidation, setShowValidation] = useState(false);
-  const [values, setValues] = useState([{ value: 'Default option' }]);
+  const [values, setValues] = useState(fieldStateValues);
 
   const addValue = () => {
     setValues([...values, { value: 'New option' }]);
@@ -45,11 +52,16 @@ export const DropdownFieldAdvancedSettings = ({
     handleFieldChange('values', newValues);
   };
 
+  useEffect(() => {
+    setValues(fieldStateValues);
+  }, [fieldStateValues]);
+
   return (
     <div className="flex flex-col gap-4">
       <div>
         <Label>Select default option</Label>
         <Select
+          value={fieldState.defaultValue}
           onValueChange={(val) => {
             handleFieldChange('defaultValue', val);
           }}

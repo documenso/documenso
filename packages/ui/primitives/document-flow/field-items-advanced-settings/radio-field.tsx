@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { ChevronDown, ChevronUp, Trash } from 'lucide-react';
 
@@ -27,7 +27,7 @@ export const RadioFieldAdvancedSettings = ({
   handleToggleChange,
 }: RadioFieldAdvancedSettingsProps) => {
   const [showValidation, setShowValidation] = useState(false);
-  const [values, setValues] = useState([{ checked: false, value: '' }]);
+  const [values, setValues] = useState(fieldState.values ?? [{ checked: false, value: '' }]);
 
   const addValue = () => {
     setValues([...values, { checked: false, value: '' }]);
@@ -41,6 +41,10 @@ export const RadioFieldAdvancedSettings = ({
     setValues(newValues);
     handleFieldChange('values', newValues);
   };
+
+  useEffect(() => {
+    setValues(fieldState.values ?? [{ checked: false, value: '' }]);
+  }, [fieldState.values]);
 
   return (
     <div className="flex flex-col gap-4">

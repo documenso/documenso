@@ -66,7 +66,10 @@ export const NumberFieldAdvancedSettings = ({
       </div>
       <div>
         <Label>Number format</Label>
-        <Select onValueChange={(val) => handleFieldChange('numberFormat', val)}>
+        <Select
+          value={fieldState.numberFormat}
+          onValueChange={(val) => handleFieldChange('numberFormat', val)}
+        >
           <SelectTrigger className="text-muted-foreground mt-2 w-full bg-white">
             <SelectValue placeholder="Field format" />
           </SelectTrigger>

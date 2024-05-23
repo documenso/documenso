@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { ChevronDown, ChevronUp, Trash } from 'lucide-react';
 
@@ -35,11 +35,16 @@ export const CheckboxFieldAdvancedSettings = ({
   handleToggleChange,
 }: CheckboxFieldAdvancedSettingsProps) => {
   const [showValidation, setShowValidation] = useState(false);
-  const [values, setValues] = useState([{ checked: false, value: '' }]);
+  const [values, setValues] = useState(fieldState.values ?? [{ checked: false, value: '' }]);
 
   const addValue = () => {
     setValues([...values, { checked: false, value: '' }]);
   };
+
+  // This might look redundant but the values are not updated when the fieldState is updated withouth this useEffect
+  useEffect(() => {
+    setValues(fieldState.values ?? [{ checked: false, value: '' }]);
+  }, [fieldState.values]);
 
   const removeValue = (index: number) => {
     if (values.length === 1) return;
@@ -55,7 +60,10 @@ export const CheckboxFieldAdvancedSettings = ({
       <div className="flex flex-row items-center gap-x-4">
         <div className="flex w-2/3 flex-col">
           <Label>Validation</Label>
-          <Select onValueChange={(val) => handleFieldChange('validationRule', val)}>
+          <Select
+            value={fieldState.validationRule}
+            onValueChange={(val) => handleFieldChange('validationRule', val)}
+          >
             <SelectTrigger className="text-muted-foreground mt-2 w-full bg-white">
               <SelectValue placeholder="Select at least" />
             </SelectTrigger>
@@ -69,7 +77,10 @@ export const CheckboxFieldAdvancedSettings = ({
           </Select>
         </div>
         <div className="mt-3 flex w-1/3 flex-col">
-          <Select onValueChange={(val) => handleFieldChange('validationLength', val)}>
+          <Select
+            value={fieldState.validationLength ? String(fieldState.validationLength) : ''}
+            onValueChange={(val) => handleFieldChange('validationLength', val)}
+          >
             <SelectTrigger className="text-muted-foreground mt-2 w-full bg-white">
               <SelectValue placeholder="Pick a number" />
             </SelectTrigger>
