@@ -9,16 +9,6 @@ import { Card } from '@documenso/ui/primitives/card';
 
 import { Thumb } from './thumb';
 
-type SlideType = {
-  label: string;
-  imageSrc: string;
-  type: 'image' | 'video';
-};
-
-type CarouselPropType = {
-  slides: SlideType[];
-};
-
 const SLIDES = [
   {
     label: 'Signing Process',
@@ -163,7 +153,11 @@ export const Carousel = () => {
       </Card>
 
       <div className="mx-auto mt-12 max-w-4xl px-2">
-        <div className="flex justify-between" ref={emblaThumbsRef}>
+        <div className="bg-muted-foreground/10 text-foreground inline-block rounded-xl px-3 py-2 text-sm">
+          What's new
+        </div>
+
+        <div className="mt-2 flex justify-between" ref={emblaThumbsRef}>
           {slides.map((slide, index) => (
             <Thumb
               key={index}
