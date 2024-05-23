@@ -102,11 +102,8 @@ export const sealDocument = async ({
 
   // Normalize and flatten layers that could cause issues with the signature
   normalizeSignatureAppearances(doc);
-  console.log('normalized');
   flattenForm(doc);
-  console.log('flattened');
   flattenAnnotations(doc);
-  console.log('annotations');
 
   if (certificate) {
     const certificatePages = await doc.copyPages(certificate, certificate.getPageIndices());
