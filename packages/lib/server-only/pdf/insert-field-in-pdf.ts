@@ -17,7 +17,7 @@ export const insertFieldInPDF = async (pdf: PDFDocument, field: FieldWithSignatu
     res.arrayBuffer(),
   );
 
-  const fontUbuntu = await fetch(process.env.FONT_NOTO_SANS_URI).then(async (res) =>
+  const fontNoto = await fetch(process.env.FONT_NOTO_SANS_URI).then(async (res) =>
     res.arrayBuffer(),
   );
 
@@ -45,7 +45,7 @@ export const insertFieldInPDF = async (pdf: PDFDocument, field: FieldWithSignatu
   const fieldX = pageWidth * (Number(field.positionX) / 100);
   const fieldY = pageHeight * (Number(field.positionY) / 100);
 
-  const font = await pdf.embedFont(isSignatureField ? fontCaveat : fontUbuntu);
+  const font = await pdf.embedFont(isSignatureField ? fontCaveat : fontNoto);
 
   if (field.type === FieldType.SIGNATURE || field.type === FieldType.FREE_SIGNATURE) {
     await pdf.embedFont(fontCaveat);
