@@ -7,9 +7,10 @@ services:
     image: postgres:15
     container_name: database
     environment:
-      - POSTGRES_USER=documenso
-      - POSTGRES_PASSWORD=password
-      - POSTGRES_DB=documenso
+      - POSTGRES_USER=${POSTGRES_USER:?err}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:?err}
+      - POSTGRES_DB=${POSTGRES_DB:?err}
+
     ports:
       - 54320:5432
     healthcheck:
