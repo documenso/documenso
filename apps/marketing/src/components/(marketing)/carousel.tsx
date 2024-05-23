@@ -6,6 +6,7 @@ import Autoplay from 'embla-carousel-autoplay';
 import useEmblaCarousel from 'embla-carousel-react';
 
 import { Card } from '@documenso/ui/primitives/card';
+import { Progress } from '@documenso/ui/primitives/progress';
 
 import { Thumb } from './thumb';
 
@@ -51,6 +52,8 @@ export const Carousel = () => {
   const slides = SLIDES;
   const [_isPlaying, setIsPlaying] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(0);
+  const [progress, setProgress] = React.useState(0);
+  const videoRefs = useRef<(HTMLVideoElement | null)[]>([]);
   const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true }, [
     Autoplay({ playOnInit: true, delay: 5000 }),
   ]);
@@ -75,9 +78,13 @@ export const Carousel = () => {
     if (!emblaApi || !emblaThumbsApi) return;
     setSelectedIndex(emblaApi.selectedScrollSnap());
     emblaThumbsApi.scrollTo(emblaApi.selectedScrollSnap());
+
+    resetProgress();
   }, [emblaApi, emblaThumbsApi, setSelectedIndex]);
 
-  const videoRefs = useRef<(HTMLVideoElement | null)[]>([]);
+  const resetProgress = useCallback(() => {
+    setProgress(0);
+  }, []);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -128,6 +135,23 @@ export const Carousel = () => {
       .on('reInit', () => setIsPlaying(autoplay.isPlaying()));
   }, [emblaApi]);
 
+  useEffect(() => {
+    const updateInterval = 50;
+    const increment = 100 / (5000 / updateInterval);
+
+    const timer = setInterval(() => {
+      setProgress((prevProgress) => {
+        if (prevProgress >= 100) {
+          clearInterval(timer);
+          return 100;
+        }
+        return prevProgress + increment;
+      });
+    }, updateInterval);
+
+    return () => clearInterval(timer);
+  }, [selectedIndex]);
+
   return (
     <>
       <Card className="mx-auto mt-12 w-full max-w-4xl rounded-2xl p-1 before:rounded-2xl" gradient>
@@ -149,6 +173,13 @@ export const Carousel = () => {
               </div>
             ))}
           </div>
+        </div>
+
+        <div className="absolute bottom-2 right-2 flex w-[5%] flex-col items-center space-y-1 rounded-lg bg-white p-1.5">
+          <span className="text-foreground text-xs">
+            {selectedIndex + 1}/{slides.length + 1}
+          </span>
+          <Progress value={progress} className="h-1" />
         </div>
       </Card>
 
