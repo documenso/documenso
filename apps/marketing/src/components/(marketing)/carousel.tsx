@@ -177,7 +177,7 @@ export const Carousel = () => {
 
         <div className="absolute bottom-2 right-2 flex w-[5%] flex-col items-center space-y-1 rounded-lg bg-white p-1.5">
           <span className="text-foreground text-xs">
-            {selectedIndex + 1}/{slides.length + 1}
+            {selectedIndex + 1}/{slides.length}
           </span>
           <Progress value={progress} className="h-1" />
         </div>
