@@ -17,23 +17,16 @@ import {
 } from '@documenso/ui/primitives/select';
 import { Switch } from '@documenso/ui/primitives/switch';
 
-import type { FieldMeta } from '.././field-item-advanced-settings';
-
-const listValues = [
-  {
-    label: '123,456.78',
-    value: '123,456.78',
-  },
-  {
-    label: '123.456,78',
-    value: '123.456,78',
-  },
-];
+import type { CheckboxFieldMeta } from '.././field-item-advanced-settings';
+import { checkboxValidationLength, checkboxValidationRules } from './constants';
 
 type CheckboxFieldAdvancedSettingsProps = {
-  fieldState: FieldMeta;
-  handleFieldChange: (key: keyof FieldMeta, value: string) => void;
-  handleToggleChange: (key: keyof FieldMeta) => void;
+  fieldState: CheckboxFieldMeta;
+  handleFieldChange: (
+    key: keyof CheckboxFieldMeta,
+    value: string | { checked: boolean; value: string }[],
+  ) => void;
+  handleToggleChange: (key: keyof CheckboxFieldMeta) => void;
 };
 
 export const CheckboxFieldAdvancedSettings = ({
@@ -54,6 +47,7 @@ export const CheckboxFieldAdvancedSettings = ({
     const newValues = [...values];
     newValues.splice(index, 1);
     setValues(newValues);
+    handleFieldChange('values', newValues);
   };
 
   return (
@@ -61,28 +55,28 @@ export const CheckboxFieldAdvancedSettings = ({
       <div className="flex flex-row items-center gap-x-4">
         <div className="flex w-2/3 flex-col">
           <Label>Validation</Label>
-          <Select>
+          <Select onValueChange={(val) => handleFieldChange('validationRule', val)}>
             <SelectTrigger className="text-muted-foreground mt-2 w-full bg-white">
               <SelectValue placeholder="Select at least" />
             </SelectTrigger>
             <SelectContent position="popper">
-              {listValues.map((item, index) => (
-                <SelectItem key={index} value={item.value}>
-                  {item.label}
+              {checkboxValidationRules.map((item, index) => (
+                <SelectItem key={index} value={item}>
+                  {item}
                 </SelectItem>
               ))}
             </SelectContent>
           </Select>
         </div>
         <div className="mt-3 flex w-1/3 flex-col">
-          <Select>
+          <Select onValueChange={(val) => handleFieldChange('validationLength', val)}>
             <SelectTrigger className="text-muted-foreground mt-2 w-full bg-white">
               <SelectValue placeholder="Pick a number" />
             </SelectTrigger>
             <SelectContent position="popper">
-              {listValues.map((item, index) => (
-                <SelectItem key={index} value={item.value}>
-                  {item.label}
+              {checkboxValidationLength.map((item, index) => (
+                <SelectItem key={index} value={String(item)}>
+                  {item}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -132,6 +126,7 @@ export const CheckboxFieldAdvancedSettings = ({
                   const newValues = [...values];
                   newValues[index].checked = Boolean(checked);
                   setValues(newValues);
+                  handleFieldChange('values', newValues);
                 }}
               />
               <Input
@@ -141,6 +136,7 @@ export const CheckboxFieldAdvancedSettings = ({
                   const newValues = [...values];
                   newValues[index].value = e.target.value;
                   setValues(newValues);
+                  handleFieldChange('values', newValues);
                 }}
               />
               <button

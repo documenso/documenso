@@ -35,20 +35,57 @@ export type FieldAdvancedSettingsProps = {
   onSave?: (fieldState: FieldMeta) => void;
 };
 
-export type FieldMeta = {
+type BaseFieldMeta = {
   label?: string;
   placeholder?: string;
-  format?: string;
-  textField?: {
-    addText: string;
-  };
-  numberField?: {
-    value: number;
-  };
-  characterLimit?: number;
   required?: boolean;
   readOnly?: boolean;
 };
+
+export type TextFieldMeta = BaseFieldMeta & {
+  type: 'text';
+  text?: string;
+  characterLimit?: number;
+};
+
+export type NumberFieldMeta = BaseFieldMeta & {
+  type: 'number';
+  numberFormat?: string;
+  value?: number;
+  minValue?: number;
+  maxValue?: number;
+};
+
+export type RadioFieldMeta = BaseFieldMeta & {
+  type: 'radio';
+  values?: {
+    checked: boolean;
+    value: string;
+  }[];
+};
+
+export type CheckboxFieldMeta = BaseFieldMeta & {
+  type: 'checkbox';
+  values?: {
+    checked: boolean;
+    value: string;
+  }[];
+  validationRule?: string;
+  validationLength?: number;
+};
+
+export type DropdownFieldMeta = BaseFieldMeta & {
+  type: 'dropdown';
+  values?: string[];
+  defaultValue?: string;
+};
+
+export type FieldMeta =
+  | TextFieldMeta
+  | NumberFieldMeta
+  | RadioFieldMeta
+  | CheckboxFieldMeta
+  | DropdownFieldMeta;
 
 const defaultConfigSchema = z.object({
   label: z.string(),
@@ -70,6 +107,59 @@ export const FieldAdvancedSettings = forwardRef<HTMLDivElement, FieldAdvancedSet
     const id = params?.id;
     const isTemplatePage = pathname?.includes('template');
     const isDocumentPage = pathname?.includes('document');
+
+    const getDefaultState = (fieldType: FieldType): FieldMeta => {
+      switch (fieldType) {
+        case FieldType.TEXT:
+          return {
+            type: 'text',
+            label: '',
+            placeholder: '',
+            text: '',
+            characterLimit: 0,
+            required: false,
+            readOnly: false,
+          };
+        case FieldType.NUMBER:
+          return {
+            type: 'number',
+            label: '',
+            placeholder: '',
+            numberFormat: '',
+            value: 0,
+            minValue: 0,
+            maxValue: 0,
+            required: false,
+            readOnly: false,
+          };
+        case FieldType.RADIO:
+          return {
+            type: 'radio',
+            values: [],
+            required: false,
+            readOnly: false,
+          };
+        case FieldType.CHECKBOX:
+          return {
+            type: 'checkbox',
+            values: [],
+            validationRule: '',
+            validationLength: 0,
+            required: false,
+            readOnly: false,
+          };
+        case FieldType.DROPDOWN:
+          return {
+            type: 'dropdown',
+            values: [],
+            defaultValue: '',
+            required: false,
+            readOnly: false,
+          };
+        default:
+          throw new Error(`Unsupported field type: ${fieldType}`);
+      }
+    };
 
     const { data: template } = trpc.template.getTemplateWithDetailsById.useQuery(
       {
@@ -106,14 +196,7 @@ export const FieldAdvancedSettings = forwardRef<HTMLDivElement, FieldAdvancedSet
 
     const localStorageKey = `field_${field.formId}_${field.type}`;
 
-    const defaultState: FieldMeta = {
-      label: '',
-      placeholder: '',
-      format: '',
-      characterLimit: 0,
-      required: false,
-      readOnly: false,
-    };
+    const defaultState: FieldMeta = getDefaultState(field.type);
 
     useEffect(() => {
       if (
@@ -127,12 +210,8 @@ export const FieldAdvancedSettings = forwardRef<HTMLDivElement, FieldAdvancedSet
         'readOnly' in fieldMeta
       ) {
         setFieldState({
-          label: String(fieldMeta.label ?? ''),
-          placeholder: String(fieldMeta.placeholder ?? ''),
-          format: String(fieldMeta.format ?? ''),
-          characterLimit: Number(fieldMeta.characterLimit ?? 0),
-          required: Boolean(fieldMeta.required ?? false),
-          readOnly: Boolean(fieldMeta.readOnly ?? false),
+          ...defaultState,
+          ...fieldMeta,
         });
       }
     }, [fieldMeta]);
@@ -142,9 +221,11 @@ export const FieldAdvancedSettings = forwardRef<HTMLDivElement, FieldAdvancedSet
       return savedState ? { ...defaultState, ...JSON.parse(savedState) } : defaultState;
     });
 
+    console.log('fieldState', fieldState);
+
     const handleFieldChange = (key: keyof FieldMeta, value: string) => {
       setFieldState((prevState: FieldMeta) => {
-        if (key === 'characterLimit') {
+        if (['characterLimit', 'minValue', 'maxValue', 'value', 'validationLength'].includes(key)) {
           const parsedValue = Number(value);
 
           return {

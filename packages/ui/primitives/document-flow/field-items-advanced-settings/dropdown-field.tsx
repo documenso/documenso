@@ -16,24 +16,12 @@ import {
 } from '@documenso/ui/primitives/select';
 import { Switch } from '@documenso/ui/primitives/switch';
 
-import type { FieldMeta } from '.././field-item-advanced-settings';
-
-// TODO: Remove hardcoded values and refactor
-const listValues = [
-  {
-    label: '123,456.78',
-    value: '123,456.78',
-  },
-  {
-    label: '123.456,78',
-    value: '123.456,78',
-  },
-];
+import type { DropdownFieldMeta } from '.././field-item-advanced-settings';
 
 type DropdownFieldAdvancedSettingsProps = {
-  fieldState: FieldMeta;
-  handleFieldChange: (key: keyof FieldMeta, value: string) => void;
-  handleToggleChange: (key: keyof FieldMeta) => void;
+  fieldState: DropdownFieldMeta;
+  handleFieldChange: (key: keyof DropdownFieldMeta, value: string | { value: string }[]) => void;
+  handleToggleChange: (key: keyof DropdownFieldMeta) => void;
 };
 
 export const DropdownFieldAdvancedSettings = ({
@@ -42,10 +30,10 @@ export const DropdownFieldAdvancedSettings = ({
   handleToggleChange,
 }: DropdownFieldAdvancedSettingsProps) => {
   const [showValidation, setShowValidation] = useState(false);
-  const [values, setValues] = useState([{ value: '' }]);
+  const [values, setValues] = useState([{ value: 'Default option' }]);
 
   const addValue = () => {
-    setValues([...values, { value: '' }]);
+    setValues([...values, { value: 'New option' }]);
   };
 
   const removeValue = (index: number) => {
@@ -54,20 +42,25 @@ export const DropdownFieldAdvancedSettings = ({
     const newValues = [...values];
     newValues.splice(index, 1);
     setValues(newValues);
+    handleFieldChange('values', newValues);
   };
 
   return (
     <div className="flex flex-col gap-4">
       <div>
         <Label>Select default option</Label>
-        <Select>
+        <Select
+          onValueChange={(val) => {
+            handleFieldChange('defaultValue', val);
+          }}
+        >
           <SelectTrigger className="text-muted-foreground mt-2 w-full bg-white">
-            <SelectValue placeholder="-- Select --" />
+            <SelectValue placeholder={'-- Select --'} />
           </SelectTrigger>
           <SelectContent position="popper">
-            {listValues.map((item, index) => (
+            {values.map((item, index) => (
               <SelectItem key={index} value={item.value}>
-                {item.label}
+                {item.value}
               </SelectItem>
             ))}
           </SelectContent>
@@ -115,6 +108,7 @@ export const DropdownFieldAdvancedSettings = ({
                   const newValues = [...values];
                   newValues[index].value = e.target.value;
                   setValues(newValues);
+                  handleFieldChange('values', newValues);
                 }}
               />
               <button

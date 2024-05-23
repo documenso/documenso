@@ -240,7 +240,7 @@ export const EditDocumentForm = ({
 
       toast({
         title: 'Error',
-        description: 'An error occurred while adding signers.',
+        description: 'An error occurred while adding the fields.',
         variant: 'destructive',
       });
     }

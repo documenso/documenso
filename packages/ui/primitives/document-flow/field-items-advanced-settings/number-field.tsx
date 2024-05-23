@@ -16,24 +16,13 @@ import {
 } from '@documenso/ui/primitives/select';
 import { Switch } from '@documenso/ui/primitives/switch';
 
-import type { FieldMeta } from '.././field-item-advanced-settings';
-
-// TODO: Remove hardcoded values and refactor
-const listValues = [
-  {
-    label: '123,456.78',
-    value: '123,456.78',
-  },
-  {
-    label: '123.456,78',
-    value: '123.456,78',
-  },
-];
+import type { NumberFieldMeta } from '.././field-item-advanced-settings';
+import { numberFormatValues } from './constants';
 
 type NumberFieldAdvancedSettingsProps = {
-  fieldState: FieldMeta;
-  handleFieldChange: (key: keyof FieldMeta, value: string) => void;
-  handleToggleChange: (key: keyof FieldMeta) => void;
+  fieldState: NumberFieldMeta;
+  handleFieldChange: (key: keyof NumberFieldMeta, value: string) => void;
+  handleToggleChange: (key: keyof NumberFieldMeta) => void;
 };
 
 export const NumberFieldAdvancedSettings = ({
@@ -71,18 +60,18 @@ export const NumberFieldAdvancedSettings = ({
           id="value"
           className="bg-background mt-2"
           placeholder="Value"
-          value={fieldState.numberField?.value}
+          value={fieldState.value}
           onChange={(e) => handleFieldChange('value', e.target.value)}
         />
       </div>
       <div>
         <Label>Number format</Label>
-        <Select>
+        <Select onValueChange={(val) => handleFieldChange('numberFormat', val)}>
           <SelectTrigger className="text-muted-foreground mt-2 w-full bg-white">
             <SelectValue placeholder="Field format" />
           </SelectTrigger>
           <SelectContent position="popper">
-            {listValues.map((item, index) => (
+            {numberFormatValues.map((item, index) => (
               <SelectItem key={index} value={item.value}>
                 {item.label}
               </SelectItem>
@@ -121,25 +110,25 @@ export const NumberFieldAdvancedSettings = ({
         </span>
       </Button>
       {showValidation && (
-        <div className="flex flex-row gap-x-4">
+        <div className="mb-4 flex flex-row gap-x-4">
           <div className="flex flex-col">
             <Label className="mt-4">Min</Label>
             <Input
-              id="add-text"
+              id="minValue"
               className="bg-background mt-2"
               placeholder="E.g. 0"
-              value={fieldState.textField?.addText}
-              onChange={(e) => handleFieldChange('characterLimit', e.target.value)}
+              value={fieldState.minValue}
+              onChange={(e) => handleFieldChange('minValue', e.target.value)}
             />
           </div>
           <div className="flex flex-col">
             <Label className="mt-4">Max</Label>
             <Input
-              id="add-text"
+              id="maxValue"
               className="bg-background mt-2"
               placeholder="E.g. 100"
-              value={fieldState.textField?.addText}
-              onChange={(e) => handleFieldChange('characterLimit', e.target.value)}
+              value={fieldState.maxValue}
+              onChange={(e) => handleFieldChange('maxValue', e.target.value)}
             />
           </div>
         </div>

@@ -10,12 +10,15 @@ import { Input } from '@documenso/ui/primitives/input';
 import { Label } from '@documenso/ui/primitives/label';
 import { Switch } from '@documenso/ui/primitives/switch';
 
-import type { FieldMeta } from '.././field-item-advanced-settings';
+import type { RadioFieldMeta } from '.././field-item-advanced-settings';
 
 type RadioFieldAdvancedSettingsProps = {
-  fieldState: FieldMeta;
-  handleFieldChange: (key: keyof FieldMeta, value: string) => void;
-  handleToggleChange: (key: keyof FieldMeta) => void;
+  fieldState: RadioFieldMeta;
+  handleFieldChange: (
+    key: keyof RadioFieldMeta,
+    value: string | { checked: boolean; value: string }[],
+  ) => void;
+  handleToggleChange: (key: keyof RadioFieldMeta) => void;
 };
 
 export const RadioFieldAdvancedSettings = ({
@@ -36,6 +39,7 @@ export const RadioFieldAdvancedSettings = ({
     const newValues = [...values];
     newValues.splice(index, 1);
     setValues(newValues);
+    handleFieldChange('values', newValues);
   };
 
   return (
@@ -82,6 +86,7 @@ export const RadioFieldAdvancedSettings = ({
                   const newValues = [...values];
                   newValues[index].checked = Boolean(checked);
                   setValues(newValues);
+                  handleFieldChange('values', newValues);
                 }}
               />
               <Input
@@ -91,6 +96,7 @@ export const RadioFieldAdvancedSettings = ({
                   const newValues = [...values];
                   newValues[index].value = e.target.value;
                   setValues(newValues);
+                  handleFieldChange('values', newValues);
                 }}
               />
               <button
