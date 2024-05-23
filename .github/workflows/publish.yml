@@ -1,56 +1,38 @@
 name: Publish Docker
-
 on:
   push:
     branches: ['release']
-
+env:
+  AWS_REGION: ap-southeast-2
 jobs:
   build_and_publish_platform_containers:
     name: Build and publish platform containers
-    runs-on: ${{ matrix.os }}
-    strategy:
-      fail-fast: false
-      matrix:
-        os:
-          - warp-ubuntu-latest-x64-4x
-          - warp-ubuntu-latest-arm64-4x
-
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-tags: true
-
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@67fbcbb121271f7775d2e7715933280b06314838 # v1.7.0
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ env.AWS_REGION }}
-
       - name: Login to Amazon ECR
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@261a7de32bda11ba01f4d75c4ed6caf3739e54be # v1.5.3
-
       - name: Build and tag image
         id: build-image
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           ECR_REPOSITORY: tf-uat-documenso
-          BUILD_PLATFORM: ${{ matrix.os == 'warp-ubuntu-latest-arm64-4x' && 'arm64' || 'amd64' }}
         run: |
           APP_VERSION="$(git name-rev --tags --name-only $(git rev-parse HEAD) | head -n 1 | sed 's/\^0//')"
           GIT_SHA="$(git rev-parse HEAD)"
-
-          docker build \
-            -f ./docker/Dockerfile \
-            --progress=plain \
-            --tag $ECR_REGISTRY/$ECR_REPOSITORY:${GITHUB_REF:11}-${GITHUB_SHA::8}
-            .
-
+          docker build -f ./docker/Dockerfile --progress=plain --tag $ECR_REGISTRY/$ECR_REPOSITORY:${GITHUB_REF:11}-${GITHUB_SHA::8} .
       - name: Push the Docker image to ECR
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           ECR_REPOSITORY: tf-uat-documenso
-          BUILD_PLATFORM: ${{ matrix.os == 'warp-ubuntu-latest-arm64-4x' && 'arm64' || 'amd64' }}
-        run: docker push --all-tags "documenso/documenso-$BUILD_PLATFORM"
+        run: docker push --all-tags "$ECR_REGISTRY/$ECR_REPOSITORY"
           echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:${GITHUB_REF:11}-${GITHUB_SHA::8}" >> $GITHUB_OUTPUT
