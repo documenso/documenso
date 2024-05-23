@@ -14,7 +14,39 @@ import { useFeatureFlags } from '@documenso/lib/client-only/providers/feature-fl
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
 
-import { Widget } from './widget';
+import { EmblaCarousel } from './carousel';
+import './embla.css';
+
+const SLIDES = [
+  {
+    label: 'Signing Process',
+    imageSrc: 'https://documenso.com/images/hero/hero-1.png',
+  },
+  {
+    label: 'Templates/Fields',
+    imageSrc: 'https://documenso.com/images/hero/hero-1.png',
+  },
+  {
+    label: 'Zapier',
+    imageSrc: 'https://documenso.com/images/hero/hero-1.png',
+  },
+  {
+    label: 'Webhooks',
+    imageSrc: 'https://documenso.com/images/hero/hero-1.png',
+  },
+  {
+    label: 'API',
+    imageSrc: 'https://documenso.com/images/hero/hero-1.png',
+  },
+  {
+    label: 'Teams',
+    imageSrc: 'https://documenso.com/images/hero/hero-1.png',
+  },
+  {
+    label: 'Profile',
+    imageSrc: 'https://documenso.com/images/hero/hero-1.png',
+  },
+];
 
 export type HeroProps = {
   className?: string;
@@ -46,6 +78,21 @@ const HeroTitleVariants: Variants = {
     y: 0,
     transition: {
       duration: 0.5,
+    },
+  },
+};
+
+const HeroCarouselVariants: Variants = {
+  initial: {
+    opacity: 0,
+    y: 60,
+  },
+  animate: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      delay: 0.5,
+      duration: 0.8,
     },
   },
 };
@@ -170,74 +217,11 @@ export const Hero = ({ className, ...props }: HeroProps) => {
 
         <motion.div
           className="mt-12"
-          variants={{
-            initial: {
-              scale: 0.2,
-              opacity: 0,
-            },
-            animate: {
-              scale: 1,
-              opacity: 1,
-              transition: {
-                ease: 'easeInOut',
-                delay: 0.5,
-                duration: 0.8,
-              },
-            },
-          }}
+          variants={HeroCarouselVariants}
           initial="initial"
           animate="animate"
         >
-          <Widget className="mt-12">
-            <strong>Documenso Supporter Pledge</strong>
-            <p className="w-full max-w-[70ch]">
-              Our mission is to create an open signing infrastructure that empowers the world,
-              enabling businesses to embrace openness, cooperation, and transparency. We believe
-              that signing, as a fundamental act, should embody these values. By offering an
-              open-source signing solution, we aim to make document signing accessible, transparent,
-              and trustworthy.
-            </p>
-
-            <p className="w-full max-w-[70ch]">
-              Through our platform, called Documenso, we strive to earn your trust by allowing
-              self-hosting and providing complete visibility into its inner workings. We value
-              inclusivity and foster an environment where diverse perspectives and contributions are
-              welcomed, even though we may not implement them all.
-            </p>
-
-            <p className="w-full max-w-[70ch]">
-              At Documenso, we envision a web-enabled future for business and contracts, and we are
-              committed to being the leading provider of open signing infrastructure. By combining
-              exceptional product design with open-source principles, we aim to deliver a robust and
-              well-designed application that exceeds your expectations.
-            </p>
-
-            <p className="w-full max-w-[70ch]">
-              We understand that exceptional products are born from exceptional communities, and we
-              invite you to join our open-source community. Your contributions, whether technical or
-              non-technical, will help shape the future of signing. Together, we can create a better
-              future for everyone.
-            </p>
-
-            <p className="w-full max-w-[70ch]">
-              Today we invite you to join us on this journey: By signing this mission statement you
-              signal your support of Documenso's mission{' '}
-              <span className="bg-primary text-black">
-                (in a non-legally binding, but heartfelt way)
-              </span>{' '}
-              and lock in the early adopter plan for forever, including everything we build this
-              year.
-            </p>
-
-            <div className="flex h-24 items-center">
-              <p className={cn('text-5xl [font-family:var(--font-caveat)]')}>Timur & Lucas</p>
-            </div>
-
-            <div>
-              <strong>Timur Ercan & Lucas Smith</strong>
-              <p className="mt-1">Co-Founders, Documenso</p>
-            </div>
-          </Widget>
+          <EmblaCarousel slides={SLIDES} />
         </motion.div>
       </div>
     </motion.div>

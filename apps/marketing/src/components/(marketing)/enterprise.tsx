@@ -1,16 +1,12 @@
 'use client';
 
-import type { HTMLAttributes } from 'react';
-
 import Link from 'next/link';
 
 import { usePlausible } from 'next-plausible';
 
 import { Button } from '@documenso/ui/primitives/button';
 
-export type EnterpriseProps = HTMLAttributes<HTMLDivElement>;
-
-export const Enterprise = ({ className, ...props }: EnterpriseProps) => {
+export const Enterprise = () => {
   const event = usePlausible();
 
   return (
