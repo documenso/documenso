@@ -82,8 +82,6 @@ export const Carousel = () => {
     resetProgress();
     const autoplay = emblaApi.plugins()?.autoplay;
 
-    console.log(autoplay);
-
     if (autoplay) {
       autoplay.reset();
     }
@@ -182,8 +180,8 @@ export const Carousel = () => {
           </div>
         </div>
 
-        <div className="absolute bottom-2 right-2 flex w-[5%] flex-col items-center space-y-1 rounded-lg bg-white p-1.5">
-          <span className="text-foreground text-xs">
+        <div className="dark:bg-background absolute bottom-2 right-2 flex w-[5%] flex-col items-center space-y-1 rounded-lg bg-white  p-1.5">
+          <span className="text-foreground dark:text-muted-foreground text-xs">
             {selectedIndex + 1}/{slides.length}
           </span>
           <Progress value={progress} className="h-1" />
@@ -191,7 +189,7 @@ export const Carousel = () => {
       </Card>
 
       <div className="mx-auto mt-12 max-w-4xl px-2">
-        <div className="bg-muted-foreground/10 text-foreground inline-block rounded-xl px-3 py-2 text-sm">
+        <div className="bg-muted-foreground/10 dark:bg-muted text-foreground dark:text-muted-foreground inline-block rounded-xl px-3 py-2 text-sm">
           What's new
         </div>
 

@@ -16,9 +16,12 @@ export const Thumb: React.FC<PropType> = (props) => {
     <button
       onClick={onClick}
       type="button"
-      className={cn('text-muted-foreground border-b-2 border-transparent py-4', {
-        'border-primary text-foreground border-b-2': selected,
-      })}
+      className={cn(
+        'text-muted-foreground dark:text-muted-foreground/60 border-b-2 border-transparent py-4',
+        {
+          'border-primary text-foreground dark:text-muted-foreground border-b-2': selected,
+        },
+      )}
     >
       {label}
     </button>
