@@ -107,7 +107,7 @@ export const SigningFieldContainer = ({
       {!field.inserted && !loading && (
         <button
           type="submit"
-          className="absolute inset-0 z-10 h-full w-full"
+          className="absolute inset-0 z-10 h-full w-full rounded-md border border-yellow-300 ring ring-yellow-100 ring-offset-2 ring-offset-yellow-200"
           onClick={async () => handleInsertField()}
         />
       )}
@@ -129,7 +129,7 @@ export const SigningFieldContainer = ({
 
       {type !== 'Date' && field.inserted && !loading && (
         <button
-          className="text-destructive bg-background/40 absolute inset-0 z-10 flex h-full w-full items-center justify-center rounded-md text-sm opacity-0 backdrop-blur-sm duration-200 group-hover:opacity-100"
+          className="text-destructive bg-background/50 absolute inset-0 z-10 flex h-full w-full items-center justify-center rounded-md text-sm opacity-0 backdrop-blur-sm duration-200 group-hover:opacity-100"
           onClick={onRemoveSignedFieldClick}
         >
           Remove

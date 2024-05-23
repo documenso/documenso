@@ -18,7 +18,6 @@ import { Button } from '@documenso/ui/primitives/button';
 import { Dialog, DialogContent, DialogFooter, DialogTitle } from '@documenso/ui/primitives/dialog';
 import type { FieldMeta } from '@documenso/ui/primitives/document-flow/field-item-advanced-settings';
 import { Input } from '@documenso/ui/primitives/input';
-import { Label } from '@documenso/ui/primitives/label';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
 import { useRequiredDocumentAuthContext } from './document-auth-provider';
@@ -159,29 +158,25 @@ export const NumberField = ({ field, recipient }: NumberFieldProps) => {
       {!field.inserted && (
         <p className="group-hover:text-primary text-muted-foreground flex flex-col items-center justify-center duration-200">
           <span className="flex items-center justify-center gap-x-1 text-lg">
-            <Hash /> {fieldMeta.label ?? 'Radio'}
+            <Hash /> Add Number
           </span>
-          <p className="mt-1 text-xs">{fieldMeta.placeholder}</p>
         </p>
       )}
 
       {field.inserted && (
         <p className="text-muted-foreground flex items-center justify-center gap-x-1 duration-200">
-          <Hash /> {field.customText}
+          {field.customText}
         </p>
       )}
 
       <Dialog open={showRadioModal} onOpenChange={setShowRadioModal}>
         <DialogContent>
-          <DialogTitle>
-            Enter a number <span className="text-muted-foreground">({recipient.email})</span>
-          </DialogTitle>
+          <DialogTitle>Add number</DialogTitle>
 
           <div>
-            <Label htmlFor="signature">Number</Label>
-
             <Input
               type="text"
+              placeholder={fieldMeta.placeholder}
               className="mt-2"
               onChange={(e) => setLocalCustomText(e.target.value)}
             />
@@ -207,7 +202,7 @@ export const NumberField = ({ field, recipient }: NumberFieldProps) => {
                 disabled={!localText}
                 onClick={() => onDialogSignClick()}
               >
-                Save number
+                Save
               </Button>
             </div>
           </DialogFooter>

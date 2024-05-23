@@ -5,7 +5,7 @@ import { useEffect, useState, useTransition } from 'react';
 import { useParams } from 'next/navigation';
 import { useRouter } from 'next/navigation';
 
-import { FileTypeIcon, Loader, Type } from 'lucide-react';
+import { Loader, Type } from 'lucide-react';
 
 import { DO_NOT_INVALIDATE_QUERY_ON_MUTATION } from '@documenso/lib/constants/trpc';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
@@ -16,8 +16,7 @@ import { trpc } from '@documenso/trpc/react';
 import { Button } from '@documenso/ui/primitives/button';
 import { Dialog, DialogContent, DialogFooter, DialogTitle } from '@documenso/ui/primitives/dialog';
 import type { FieldMeta } from '@documenso/ui/primitives/document-flow/field-item-advanced-settings';
-import { Input } from '@documenso/ui/primitives/input';
-import { Label } from '@documenso/ui/primitives/label';
+import { Textarea } from '@documenso/ui/primitives/textarea';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
 import { useRequiredDocumentAuthContext } from './document-auth-provider';
@@ -170,28 +169,25 @@ export const TextField = ({ field, recipient }: TextFieldProps) => {
       {!field.inserted && (
         <p className="group-hover:text-primary text-muted-foreground flex flex-col items-center justify-center duration-200">
           <span className="flex items-center justify-center gap-x-1 text-lg">
-            <Type /> {fieldMeta.label ?? 'Radio'}
+            <Type /> Add Text
           </span>
         </p>
       )}
 
       {field.inserted && (
-        <p className="text-muted-foreground flex items-center justify-center gap-x-1 duration-200">
-          <FileTypeIcon /> {field.customText}
+        <p className="text-muted-foreground flex items-center justify-center gap-x-1 text-xs duration-200">
+          {field.customText.substring(0, 20) + '...'}
         </p>
       )}
 
       <Dialog open={showCustomTextModal} onOpenChange={setShowCustomTextModal}>
         <DialogContent>
-          <DialogTitle>
-            Fill the details <span className="text-muted-foreground">({recipient.email})</span>
-          </DialogTitle>
+          <DialogTitle>{fieldMeta.label ?? 'Add Text'}</DialogTitle>
 
           <div className="">
-            <Label htmlFor="custom-text">{fieldMeta.label}</Label>
-
-            <Input
+            <Textarea
               id="custom-text"
+              maxLength={fieldMeta.characterLimit}
               placeholder={fieldMeta.placeholder ?? 'Enter your text here'}
               className="border-border mt-2 w-full rounded-md border"
               onChange={(e) => setLocalCustomText(e.target.value)}

@@ -75,7 +75,11 @@ export function FieldRootContainer({ field, children, cardClassName }: FieldCont
       <Card
         id={`field-${field.id}`}
         className={cn(
-          'field-card-container bg-background relative z-20 h-full w-full transition-all',
+          'field-card-container relative z-20 h-full w-full transition-all',
+          {
+            'bg-documenso/20 border-documenso ring-documenso-200 ring-offset-documenso-400 ring ring-offset-2':
+              field.inserted,
+          },
           {
             'border-orange-300 ring-1 ring-orange-300': !field.inserted && isValidating,
           },
