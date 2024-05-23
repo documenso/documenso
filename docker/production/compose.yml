@@ -1,12 +1,17 @@
-name: documenso-production
-
+version: '2'
 services:
+  test:
+    image: alpine
+    command: echo ${POSTGRES_USER}
   database:
     image: postgres:15
+    container_name: database
     environment:
-      - POSTGRES_USER=${POSTGRES_USER:?err}
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:?err}
-      - POSTGRES_DB=${POSTGRES_DB:?err}
+      - POSTGRES_USER=documenso
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=documenso
+    ports:
+      - 54320:5432
     healthcheck:
       test: ['CMD-SHELL', 'pg_isready -U ${POSTGRES_USER}']
       interval: 10s
@@ -22,7 +27,7 @@ services:
         condition: service_healthy
     environment:
       - PORT=${PORT:-3000}
-      - NEXTAUTH_URL=${NEXTAUTH_URL:-${NEXT_PUBLIC_WEBAPP_URL}}
+      - NEXTAUTH_URL=${NEXTAUTH_URL:?err}
       - NEXTAUTH_SECRET=${NEXTAUTH_SECRET:?err}
       - NEXT_PRIVATE_ENCRYPTION_KEY=${NEXT_PRIVATE_ENCRYPTION_KEY:?err}
       - NEXT_PRIVATE_ENCRYPTION_SECONDARY_KEY=${NEXT_PRIVATE_ENCRYPTION_SECONDARY_KEY:?err}
@@ -31,7 +36,7 @@ services:
       - NEXT_PUBLIC_WEBAPP_URL=${NEXT_PUBLIC_WEBAPP_URL:?err}
       - NEXT_PUBLIC_MARKETING_URL=${NEXT_PUBLIC_MARKETING_URL:-https://documenso.com}
       - NEXT_PRIVATE_DATABASE_URL=${NEXT_PRIVATE_DATABASE_URL:?err}
-      - NEXT_PRIVATE_DIRECT_DATABASE_URL=${NEXT_PRIVATE_DIRECT_DATABASE_URL:-${NEXT_PRIVATE_DATABASE_URL}}
+      - NEXT_PRIVATE_DIRECT_DATABASE_URL=${NEXT_PRIVATE_DIRECT_DATABASE_URL:?err}
       - NEXT_PUBLIC_UPLOAD_TRANSPORT=${NEXT_PUBLIC_UPLOAD_TRANSPORT:-database}
       - NEXT_PRIVATE_UPLOAD_ENDPOINT=${NEXT_PRIVATE_UPLOAD_ENDPOINT}
       - NEXT_PRIVATE_UPLOAD_FORCE_PATH_STYLE=${NEXT_PRIVATE_UPLOAD_FORCE_PATH_STYLE}
@@ -62,7 +67,7 @@ services:
     ports:
       - ${PORT:-3000}:${PORT:-3000}
     volumes:
-      - /opt/documenso/cert.p12:/opt/documenso/cert.p12
+      - /Users/juliuseller/Documents/documenso/docker/production/certs/cert.p12:/opt/documenso/cert.p12
 
 volumes:
   database:
