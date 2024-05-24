@@ -332,6 +332,7 @@ export const EditDocumentForm = ({
               isDocumentPdfLoaded={isDocumentPdfLoaded}
               onSubmit={onAddSettingsFormSubmit}
             />
+
             <AddSignersFormPartial
               key={recipients.length}
               documentFlow={documentFlow.signers}

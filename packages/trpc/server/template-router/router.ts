@@ -7,6 +7,8 @@ import { createDocumentFromTemplate } from '@documenso/lib/server-only/template/
 import { createTemplate } from '@documenso/lib/server-only/template/create-template';
 import { deleteTemplate } from '@documenso/lib/server-only/template/delete-template';
 import { duplicateTemplate } from '@documenso/lib/server-only/template/duplicate-template';
+import { getTemplateWithDetailsById } from '@documenso/lib/server-only/template/get-template-with-details-by-id';
+import { updateTemplateSettings } from '@documenso/lib/server-only/template/update-template-settings';
 import { extractNextApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 import type { Document } from '@documenso/prisma/client';
 
@@ -16,6 +18,8 @@ import {
   ZCreateTemplateMutationSchema,
   ZDeleteTemplateMutationSchema,
   ZDuplicateTemplateMutationSchema,
+  ZGetTemplateWithDetailsByIdQuerySchema,
+  ZUpdateTemplateSettingsMutationSchema,
 } from './schema';
 
 export const templateRouter = router({
@@ -120,6 +124,54 @@ export const templateRouter = router({
         throw new TRPCError({
           code: 'BAD_REQUEST',
           message: 'We were unable to delete this template. Please try again later.',
+        });
+      }
+    }),
+
+  getTemplateWithDetailsById: authenticatedProcedure
+    .input(ZGetTemplateWithDetailsByIdQuerySchema)
+    .query(async ({ input, ctx }) => {
+      try {
+        return await getTemplateWithDetailsById({
+          id: input.id,
+          userId: ctx.user.id,
+        });
+      } catch (err) {
+        console.error(err);
+
+        throw new TRPCError({
+          code: 'BAD_REQUEST',
+          message: 'We were unable to find this template. Please try again later.',
+        });
+      }
+    }),
+
+  // Todo: Add API
+  updateTemplateSettings: authenticatedProcedure
+    .input(ZUpdateTemplateSettingsMutationSchema)
+    .mutation(async ({ input, ctx }) => {
+      try {
+        const { templateId, teamId, data, meta } = input;
+
+        const userId = ctx.user.id;
+
+        const requestMetadata = extractNextApiRequestMetadata(ctx.req);
+
+        return await updateTemplateSettings({
+          userId,
+          teamId,
+          templateId,
+          data,
+          meta,
+          requestMetadata,
+        });
+      } catch (err) {
+        console.error(err);
+
+        throw new TRPCError({
+          code: 'BAD_REQUEST',
+          message:
+            'We were unable to update the settings for this template. Please try again later.',
         });
       }
     }),

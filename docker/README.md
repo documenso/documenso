@@ -41,7 +41,7 @@ volumes:
 1. Run the following command to start the containers:
 
 ```
-docker-compose --env-file ./.env -d up
+docker-compose --env-file ./.env up -d
 ```
 
 This will start the PostgreSQL database and the Documenso application containers.

@@ -5,14 +5,24 @@ import { type Recipient, WebhookTriggerEvents } from '@documenso/prisma/client';
 
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '../../types/document-audit-logs';
+import { ZRecipientAuthOptionsSchema } from '../../types/document-auth';
 import type { RequestMetadata } from '../../universal/extract-request-metadata';
 import { createDocumentAuditLogData } from '../../utils/document-audit-logs';
+import {
+  createDocumentAuthOptions,
+  createRecipientAuthOptions,
+  extractDocumentAuthMethods,
+} from '../../utils/document-auth';
 import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
 
-type FinalRecipient = Pick<Recipient, 'name' | 'email' | 'role'> & {
+type FinalRecipient = Pick<Recipient, 'name' | 'email' | 'role' | 'authOptions'> & {
   templateRecipientId: number;
   fields: Field[];
 };
+
+export type CreateDocumentFromTemplateResponse = Awaited<
+  ReturnType<typeof createDocumentFromTemplate>
+>;
 
 export type CreateDocumentFromTemplateOptions = {
   templateId: number;
@@ -23,6 +33,19 @@ export type CreateDocumentFromTemplateOptions = {
     name?: string;
     email: string;
   }[];
+
+  /**
+   * Values that will override the predefined values in the template.
+   */
+  override?: {
+    title?: string;
+    subject?: string;
+    message?: string;
+    timezone?: string;
+    password?: string;
+    dateFormat?: string;
+    redirectUrl?: string;
+  };
   requestMetadata?: RequestMetadata;
 };
 
@@ -31,6 +54,7 @@ export const createDocumentFromTemplate = async ({
   userId,
   teamId,
   recipients,
+  override,
   requestMetadata,
 }: CreateDocumentFromTemplateOptions) => {
   const user = await prisma.user.findFirstOrThrow({
@@ -65,6 +89,7 @@ export const createDocumentFromTemplate = async ({
         },
       },
       templateDocumentData: true,
+      templateMeta: true,
     },
   });
 
@@ -72,26 +97,34 @@ export const createDocumentFromTemplate = async ({
     throw new AppError(AppErrorCode.NOT_FOUND, 'Template not found');
   }
 
-  if (recipients.length !== template.Recipient.length) {
-    throw new AppError(AppErrorCode.INVALID_BODY, 'Invalid number of recipients.');
-  }
-
-  const finalRecipients: FinalRecipient[] = template.Recipient.map((templateRecipient) => {
-    const foundRecipient = recipients.find((recipient) => recipient.id === templateRecipient.id);
+  // Check that all the passed in recipient IDs can be associated with a template recipient.
+  recipients.forEach((recipient) => {
+    const foundRecipient = template.Recipient.find(
+      (templateRecipient) => templateRecipient.id === recipient.id,
+    );
 
     if (!foundRecipient) {
       throw new AppError(
         AppErrorCode.INVALID_BODY,
-        `Missing template recipient with ID ${templateRecipient.id}`,
+        `Recipient with ID ${recipient.id} not found in the template.`,
       );
     }
+  });
+
+  const { documentAuthOption: templateAuthOptions } = extractDocumentAuthMethods({
+    documentAuth: template.authOptions,
+  });
+
+  const finalRecipients: FinalRecipient[] = template.Recipient.map((templateRecipient) => {
+    const foundRecipient = recipients.find((recipient) => recipient.id === templateRecipient.id);
 
     return {
       templateRecipientId: templateRecipient.id,
       fields: templateRecipient.Field,
-      name: foundRecipient.name ?? '',
-      email: foundRecipient.email,
+      name: foundRecipient ? foundRecipient.name ?? '' : templateRecipient.name,
+      email: foundRecipient ? foundRecipient.email : templateRecipient.email,
       role: templateRecipient.role,
+      authOptions: templateRecipient.authOptions,
     };
   });
 
@@ -108,16 +141,38 @@ export const createDocumentFromTemplate = async ({
       data: {
         userId,
         teamId: template.teamId,
-        title: template.title,
+        title: override?.title || template.title,
         documentDataId: documentData.id,
+        authOptions: createDocumentAuthOptions({
+          globalAccessAuth: templateAuthOptions.globalAccessAuth,
+          globalActionAuth: templateAuthOptions.globalActionAuth,
+        }),
+        documentMeta: {
+          create: {
+            subject: override?.subject || template.templateMeta?.subject,
+            message: override?.message || template.templateMeta?.message,
+            timezone: override?.timezone || template.templateMeta?.timezone,
+            password: override?.password || template.templateMeta?.password,
+            dateFormat: override?.dateFormat || template.templateMeta?.dateFormat,
+            redirectUrl: override?.redirectUrl || template.templateMeta?.redirectUrl,
+          },
+        },
         Recipient: {
           createMany: {
-            data: finalRecipients.map((recipient) => ({
-              email: recipient.email,
-              name: recipient.name,
-              role: recipient.role,
-              token: nanoid(),
-            })),
+            data: finalRecipients.map((recipient) => {
+              const authOptions = ZRecipientAuthOptionsSchema.parse(recipient?.authOptions);
+
+              return {
+                email: recipient.email,
+                name: recipient.name,
+                role: recipient.role,
+                authOptions: createRecipientAuthOptions({
+                  accessAuth: authOptions.accessAuth,
+                  actionAuth: authOptions.actionAuth,
+                }),
+                token: nanoid(),
+              };
+            }),
           },
         },
       },

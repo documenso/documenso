@@ -12,6 +12,8 @@ import {
   ZDeleteFieldMutationSchema,
   ZDeleteRecipientMutationSchema,
   ZDownloadDocumentSuccessfulSchema,
+  ZGenerateDocumentFromTemplateMutationResponseSchema,
+  ZGenerateDocumentFromTemplateMutationSchema,
   ZGetDocumentsQuerySchema,
   ZSendDocumentForSigningMutationSchema,
   ZSuccessfulDocumentResponseSchema,
@@ -85,6 +87,24 @@ export const ApiContractV1 = c.router(
         404: ZUnsuccessfulResponseSchema,
       },
       summary: 'Create a new document from an existing template',
+      deprecated: true,
+      description: `This has been deprecated in favour of "/api/v1/templates/:templateId/generate-document". You may face unpredictable behavior using this endpoint as it is no longer maintained.`,
+    },
+
+    generateDocumentFromTemplate: {
+      method: 'POST',
+      path: '/api/v1/templates/:templateId/generate-document',
+      body: ZGenerateDocumentFromTemplateMutationSchema,
+      responses: {
+        200: ZGenerateDocumentFromTemplateMutationResponseSchema,
+        400: ZUnsuccessfulResponseSchema,
+        401: ZUnsuccessfulResponseSchema,
+        404: ZUnsuccessfulResponseSchema,
+        500: ZUnsuccessfulResponseSchema,
+      },
+      summary: 'Create a new document from an existing template',
+      description:
+        'Create a new document from an existing template. Passing in values for title and meta will override the original values defined in the template. If you do not pass in values for recipients, it will use the values defined in the template.',
     },
 
     sendDocument: {
