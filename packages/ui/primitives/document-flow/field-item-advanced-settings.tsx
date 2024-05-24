@@ -35,7 +35,8 @@ export type FieldAdvancedSettingsProps = {
   onSave?: (fieldState: FieldMeta) => void;
 };
 
-type BaseFieldMeta = {
+export type BaseFieldMeta = {
+  type?: string;
   label?: string;
   placeholder?: string;
   required?: boolean;
@@ -43,13 +44,13 @@ type BaseFieldMeta = {
 };
 
 export type TextFieldMeta = BaseFieldMeta & {
-  type: 'text';
+  type?: 'text';
   text?: string;
   characterLimit?: number;
 };
 
 export type NumberFieldMeta = BaseFieldMeta & {
-  type: 'number';
+  type?: 'number';
   numberFormat?: string;
   value?: number;
   minValue?: number;
@@ -57,7 +58,7 @@ export type NumberFieldMeta = BaseFieldMeta & {
 };
 
 export type RadioFieldMeta = BaseFieldMeta & {
-  type: 'radio';
+  type?: 'radio';
   values?: {
     checked: boolean;
     value: string;
@@ -65,7 +66,7 @@ export type RadioFieldMeta = BaseFieldMeta & {
 };
 
 export type CheckboxFieldMeta = BaseFieldMeta & {
-  type: 'checkbox';
+  type?: 'checkbox';
   values?: {
     checked: boolean;
     value: string;
@@ -75,7 +76,7 @@ export type CheckboxFieldMeta = BaseFieldMeta & {
 };
 
 export type DropdownFieldMeta = BaseFieldMeta & {
-  type: 'dropdown';
+  type?: 'dropdown';
   values?: string[];
   defaultValue?: string;
 };
@@ -86,6 +87,14 @@ export type FieldMeta =
   | RadioFieldMeta
   | CheckboxFieldMeta
   | DropdownFieldMeta;
+
+export type FieldMetaKeys =
+  | keyof BaseFieldMeta
+  | keyof TextFieldMeta
+  | keyof NumberFieldMeta
+  | keyof RadioFieldMeta
+  | keyof CheckboxFieldMeta
+  | keyof DropdownFieldMeta;
 
 const defaultConfigSchema = z.object({
   label: z.string(),
@@ -194,21 +203,22 @@ export const FieldAdvancedSettings = forwardRef<HTMLDivElement, FieldAdvancedSet
 
     const fieldMeta = fieldData?.fieldMeta;
 
+    console.log('\n');
+    console.log('\n');
+    console.log('\n');
+    console.log('\n');
+    console.log('fieldMeta', fieldMeta);
+    console.log('\n');
+    console.log('\n');
+    console.log('\n');
+    console.log('\n');
+
     const localStorageKey = `field_${field.formId}_${field.type}`;
 
     const defaultState: FieldMeta = getDefaultState(field.type);
 
     useEffect(() => {
-      if (
-        fieldMeta &&
-        typeof fieldMeta === 'object' &&
-        'label' in fieldMeta &&
-        'placeholder' in fieldMeta &&
-        'format' in fieldMeta &&
-        'characterLimit' in fieldMeta &&
-        'required' in fieldMeta &&
-        'readOnly' in fieldMeta
-      ) {
+      if (fieldMeta && typeof fieldMeta === 'object') {
         setFieldState({
           ...defaultState,
           ...fieldMeta,
@@ -223,7 +233,10 @@ export const FieldAdvancedSettings = forwardRef<HTMLDivElement, FieldAdvancedSet
 
     console.log('fieldState', fieldState);
 
-    const handleFieldChange = (key: keyof FieldMeta, value: string) => {
+    const handleFieldChange = (
+      key: FieldMetaKeys,
+      value: string | { checked: boolean; value: string }[] | { value: string }[],
+    ) => {
       setFieldState((prevState: FieldMeta) => {
         if (['characterLimit', 'minValue', 'maxValue', 'value', 'validationLength'].includes(key)) {
           const parsedValue = Number(value);
@@ -241,11 +254,17 @@ export const FieldAdvancedSettings = forwardRef<HTMLDivElement, FieldAdvancedSet
       });
     };
 
-    const handleToggleChange = (key: keyof FieldMeta) => {
-      setFieldState((prevState: FieldMeta) => ({
-        ...prevState,
-        [key]: !prevState[key],
-      }));
+    const handleToggleChange = (key: FieldMetaKeys) => {
+      setFieldState((prevState: FieldMeta) => {
+        if (key in prevState) {
+          return {
+            ...prevState,
+            // @ts-expect-error - trying to see how I can fix this
+            [key]: !prevState[key],
+          };
+        }
+        return prevState;
+      });
     };
 
     const numberField = field.type === FieldType.NUMBER;
@@ -296,7 +315,7 @@ export const FieldAdvancedSettings = forwardRef<HTMLDivElement, FieldAdvancedSet
 
           {textField && (
             <TextFieldAdvancedSettings
-              fieldState={fieldState}
+              fieldState={fieldState as TextFieldMeta}
               handleFieldChange={handleFieldChange}
               handleToggleChange={handleToggleChange}
             />
@@ -304,7 +323,7 @@ export const FieldAdvancedSettings = forwardRef<HTMLDivElement, FieldAdvancedSet
 
           {numberField && (
             <NumberFieldAdvancedSettings
-              fieldState={fieldState}
+              fieldState={fieldState as NumberFieldMeta}
               handleFieldChange={handleFieldChange}
               handleToggleChange={handleToggleChange}
             />
@@ -312,7 +331,7 @@ export const FieldAdvancedSettings = forwardRef<HTMLDivElement, FieldAdvancedSet
 
           {radioField && (
             <RadioFieldAdvancedSettings
-              fieldState={fieldState}
+              fieldState={fieldState as RadioFieldMeta}
               handleFieldChange={handleFieldChange}
               handleToggleChange={handleToggleChange}
             />
@@ -320,7 +339,7 @@ export const FieldAdvancedSettings = forwardRef<HTMLDivElement, FieldAdvancedSet
 
           {checkBoxField && (
             <CheckboxFieldAdvancedSettings
-              fieldState={fieldState}
+              fieldState={fieldState as CheckboxFieldMeta}
               handleFieldChange={handleFieldChange}
               handleToggleChange={handleToggleChange}
             />
@@ -328,7 +347,7 @@ export const FieldAdvancedSettings = forwardRef<HTMLDivElement, FieldAdvancedSet
 
           {dropdownField && (
             <DropdownFieldAdvancedSettings
-              fieldState={fieldState}
+              fieldState={fieldState as DropdownFieldMeta}
               handleFieldChange={handleFieldChange}
               handleToggleChange={handleToggleChange}
             />

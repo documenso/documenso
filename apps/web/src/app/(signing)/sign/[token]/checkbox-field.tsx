@@ -1,12 +1,11 @@
 'use client';
 
-import { useState, useTransition } from 'react';
+import { useEffect, useState, useTransition } from 'react';
 
 import { useParams } from 'next/navigation';
 import { useRouter } from 'next/navigation';
 
 import { Loader } from 'lucide-react';
-import { CheckSquare } from 'lucide-react';
 
 import { DO_NOT_INVALIDATE_QUERY_ON_MUTATION } from '@documenso/lib/constants/trpc';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
@@ -15,7 +14,7 @@ import type { Recipient } from '@documenso/prisma/client';
 import type { FieldWithSignatureAndFieldMeta } from '@documenso/prisma/types/field-with-signature-and-fieldmeta';
 import { trpc } from '@documenso/trpc/react';
 import { Checkbox } from '@documenso/ui/primitives/checkbox';
-import type { FieldMeta } from '@documenso/ui/primitives/document-flow/field-item-advanced-settings';
+import { Label } from '@documenso/ui/primitives/label';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
 import { useRequiredDocumentAuthContext } from './document-auth-provider';
@@ -32,8 +31,7 @@ export const CheckboxField = ({ field, recipient }: CheckboxFieldProps) => {
   const params = useParams();
   const [isPending, startTransition] = useTransition();
   const token = params?.token;
-  const [checkboxValue, setCheckboxValue] = useState('');
-
+  const [checkedValues, setCheckedValues] = useState<string[]>([]);
   const { executeActionAuthProcedure } = useRequiredDocumentAuthContext();
 
   const { data: document } = trpc.document.getDocumentByToken.useQuery(
@@ -44,18 +42,6 @@ export const CheckboxField = ({ field, recipient }: CheckboxFieldProps) => {
       enabled: !!token,
     },
   );
-
-  const { data } = trpc.field.getField.useQuery(
-    {
-      fieldId: field.id,
-      documentId: document?.id ?? 0,
-    },
-    {
-      enabled: !!document,
-    },
-  );
-
-  const { label } = (data?.fieldMeta as FieldMeta) ?? {};
 
   const { mutateAsync: signFieldWithToken, isLoading: isSignFieldWithTokenLoading } =
     trpc.field.signFieldWithToken.useMutation(DO_NOT_INVALIDATE_QUERY_ON_MUTATION);
@@ -72,7 +58,7 @@ export const CheckboxField = ({ field, recipient }: CheckboxFieldProps) => {
       await signFieldWithToken({
         token: recipient.token,
         fieldId: field.id,
-        value: label ?? checkboxValue,
+        value: checkedValues.join(','),
         isBase64: true,
         authOptions,
       });
@@ -95,10 +81,6 @@ export const CheckboxField = ({ field, recipient }: CheckboxFieldProps) => {
     }
   };
 
-  const onPreSign = () => {
-    return true;
-  };
-
   const onRemove = async () => {
     try {
       await removeSignedFieldWithToken({
@@ -118,52 +100,55 @@ export const CheckboxField = ({ field, recipient }: CheckboxFieldProps) => {
     }
   };
 
-  const handleCheckboxClick = () => {
-    setCheckboxValue(checkboxValue === 'checked' ? '' : 'checked');
+  const handleCheckboxChange = (value: string) => {
+    const updatedValues = checkedValues.includes(value)
+      ? checkedValues.filter((v) => v !== value)
+      : [...checkedValues, value];
 
-    void executeActionAuthProcedure({
-      onReauthFormSubmit: async (authOptions) => await onSign(authOptions),
-      actionTarget: field.type,
-    });
+    setCheckedValues(updatedValues);
   };
 
+  useEffect(() => {
+    if (!field.inserted && checkedValues.length > 0) {
+      void executeActionAuthProcedure({
+        onReauthFormSubmit: async (authOptions) => await onSign(authOptions),
+        actionTarget: field.type,
+      });
+    }
+  }, [checkedValues]);
+
   return (
-    <div className="pointer-events-none">
-      <SigningFieldContainer
-        field={field}
-        onPreSign={onPreSign}
-        onSign={onSign}
-        onRemove={onRemove}
-        type="Checkbox"
-      >
-        {isLoading && (
-          <div className="bg-background absolute inset-0 flex items-center justify-center rounded-md">
-            <Loader className="text-primary h-5 w-5 animate-spin md:h-8 md:w-8" />
-          </div>
-        )}
+    <SigningFieldContainer field={field} onSign={onSign} onRemove={onRemove} type="Checkbox">
+      {isLoading && (
+        <div className="bg-background absolute inset-0 flex items-center justify-center rounded-md">
+          <Loader className="text-primary h-5 w-5 animate-spin md:h-8 md:w-8" />
+        </div>
+      )}
 
-        {!field.inserted && (
-          <p className="group-hover:text-primary text-muted-foreground flex flex-col items-center justify-center duration-200">
-            <span className="flex items-center justify-center gap-x-1 text-lg">
-              <div className="flex items-center gap-2.5 py-1">
-                <Checkbox
-                  className="h-5 w-5 data-[state=checked]:border-black data-[state=checked]:bg-black"
-                  checkClassName="text-white"
-                  checked={checkboxValue === 'checked'}
-                  onClick={handleCheckboxClick}
-                />
-                {label}
-              </div>
-            </span>
-          </p>
-        )}
+      {!field.inserted && (
+        <div className="z-10 space-y-2">
+          {field.fieldMeta?.values?.map((item, index) => (
+            <div key={index} className="flex items-center space-x-2">
+              <Checkbox
+                id={`checkbox-${index}`}
+                checked={checkedValues.includes(item.value)}
+                onCheckedChange={() => handleCheckboxChange(item.value)}
+              />
+              <Label htmlFor={`checkbox-${index}`}>{item.value}</Label>
+            </div>
+          ))}
+        </div>
+      )}
 
-        {field.inserted && (
-          <p className="text-muted-foreground flex items-center justify-center gap-x-1 duration-200">
-            <CheckSquare /> {field.fieldMeta?.label ?? 'Checkbox'}
-          </p>
-        )}
-      </SigningFieldContainer>
-    </div>
+      {field.inserted && (
+        <div className="flex flex-wrap justify-center gap-2">
+          {field.customText.split(',').map((value, index) => (
+            <div key={index} className="rounded-md bg-black px-3 py-1 text-sm text-white">
+              {value}
+            </div>
+          ))}
+        </div>
+      )}
+    </SigningFieldContainer>
   );
 };
