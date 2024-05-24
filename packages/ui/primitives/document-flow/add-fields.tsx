@@ -53,7 +53,7 @@ export type AddFieldsFormProps = {
   recipients: Recipient[];
   fields: Field[];
   onSubmit: (_data: TAddFieldsFormSchema) => void;
-  isSinglePlayerMode?: boolean;
+  canGoBack?: boolean;
 };
 
 export const AddFieldsFormPartial = ({
@@ -62,12 +62,13 @@ export const AddFieldsFormPartial = ({
   recipients,
   fields,
   onSubmit,
-  isSinglePlayerMode = false,
+  canGoBack = false,
 }: AddFieldsFormProps) => {
   const { isWithinPageBounds, getFieldPosition, getPage } = useDocumentElement();
   const { currentStep, totalSteps, previousStep } = useStep();
   const canRenderBackButtonAsRemove =
-    currentStep === 1 && typeof documentFlow.onBackStep === 'function' && isSinglePlayerMode;
+    currentStep === 1 && typeof documentFlow.onBackStep === 'function' && canGoBack;
+
   const {
     control,
     handleSubmit,
