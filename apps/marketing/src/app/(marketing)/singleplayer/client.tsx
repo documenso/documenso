@@ -248,6 +248,7 @@ export const SinglePlayerClient = () => {
                   recipients={uploadedFile ? [placeholderRecipient] : []}
                   fields={fields}
                   onSubmit={onFieldsSubmit}
+                  canGoBack={true}
                   isDocumentPdfLoaded={true}
                 />
               </fieldset>
