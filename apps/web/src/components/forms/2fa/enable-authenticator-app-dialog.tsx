@@ -30,7 +30,7 @@ import {
   FormLabel,
   FormMessage,
 } from '@documenso/ui/primitives/form/form';
-import { Input } from '@documenso/ui/primitives/input';
+import { PinInput, PinInputGroup, PinInputSlot } from '@documenso/ui/primitives/pin-input';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
 import { RecoveryCodeList } from './recovery-code-list';
@@ -212,7 +212,15 @@ export const EnableAuthenticatorAppDialog = ({ onSuccess }: EnableAuthenticatorA
                         <FormItem>
                           <FormLabel className="text-muted-foreground">Token</FormLabel>
                           <FormControl>
-                            <Input {...field} type="text" value={field.value ?? ''} />
+                            <PinInput {...field} value={field.value ?? ''} maxLength={6}>
+                              {Array(6)
+                                .fill(null)
+                                .map((_, i) => (
+                                  <PinInputGroup key={i}>
+                                    <PinInputSlot index={i} />
+                                  </PinInputGroup>
+                                ))}
+                            </PinInput>
                           </FormControl>
                           <FormMessage />
                         </FormItem>

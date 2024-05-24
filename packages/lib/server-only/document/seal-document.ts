@@ -17,6 +17,7 @@ import { getFile } from '../../universal/upload/get-file';
 import { putPdfFile } from '../../universal/upload/put-file';
 import { getCertificatePdf } from '../htmltopdf/get-certificate-pdf';
 import { flattenAnnotations } from '../pdf/flatten-annotations';
+import { flattenForm } from '../pdf/flatten-form';
 import { insertFieldInPDF } from '../pdf/insert-field-in-pdf';
 import { normalizeSignatureAppearances } from '../pdf/normalize-signature-appearances';
 import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
@@ -97,7 +98,12 @@ export const sealDocument = async ({
     .then(async (doc) => PDFDocument.load(doc))
     .catch(() => null);
 
-  const doc = await loadPDFForSealing(pdfData);
+  const doc = await PDFDocument.load(pdfData);
+
+  // Normalize and flatten layers that could cause issues with the signature
+  normalizeSignatureAppearances(doc);
+  flattenForm(doc);
+  flattenAnnotations(doc);
 
   if (certificate) {
     const certificatePages = await doc.copyPages(certificate, certificate.getPageIndices());
@@ -188,15 +194,4 @@ export const sealDocument = async ({
     userId: document.userId,
     teamId: document.teamId ?? undefined,
   });
-};
-
-export const loadPDFForSealing = async (pdfData: Uint8Array) => {
-  const doc = await PDFDocument.load(pdfData);
-
-  // Normalize and flatten layers that could cause issues with the signature
-  normalizeSignatureAppearances(doc);
-  doc.getForm().flatten();
-  flattenAnnotations(doc);
-
-  return doc;
 };
