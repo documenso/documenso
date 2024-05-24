@@ -34,5 +34,6 @@ jobs:
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           ECR_REPOSITORY: tf-uat-documenso
-        run: docker push $ECR_REGISTRY/$ECR_REPOSITORY:${GITHUB_REF:11}-${GITHUB_SHA::8}
+        run: |
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:${GITHUB_REF:11}-${GITHUB_SHA::8}
           echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:${GITHUB_REF:11}-${GITHUB_SHA::8}" >> $GITHUB_OUTPUT
