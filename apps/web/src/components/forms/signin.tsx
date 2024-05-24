@@ -31,7 +31,6 @@ import {
 } from '@documenso/ui/primitives/form/form';
 import { Input } from '@documenso/ui/primitives/input';
 import { PasswordInput } from '@documenso/ui/primitives/password-input';
-import { PinInput, type PinInputState } from '@documenso/ui/primitives/pin-input';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
 const ERROR_MESSAGES: Partial<Record<keyof typeof ErrorCode, string>> = {
@@ -73,7 +72,6 @@ export const SignInForm = ({ className, initialEmail, isGoogleSSOEnabled }: Sign
   const [twoFactorAuthenticationMethod, setTwoFactorAuthenticationMethod] = useState<
     'totp' | 'backup'
   >('totp');
-  const [state, setState] = useState<PinInputState>('input');
 
   const form = useForm<TSignInFormSchema>({
     values: {
@@ -153,10 +151,9 @@ export const SignInForm = ({ className, initialEmail, isGoogleSSOEnabled }: Sign
           title: 'Unable to sign in',
           description: errorMessage ?? 'An unknown error occurred',
         });
-      }
 
-      setState('success');
-      console.log(result);
+        return;
+      }
 
       if (!result?.url) {
         throw new Error('An unknown error occurred');
@@ -164,13 +161,8 @@ export const SignInForm = ({ className, initialEmail, isGoogleSSOEnabled }: Sign
 
       window.location.href = result.url;
     } catch (err) {
-      form.setError('totpCode', {
-        message: 'invalid totp',
-      });
-
       toast({
         title: 'An unknown error occurred',
-        variant: 'destructive',
         description:
           'We encountered an unknown error while attempting to sign you In. Please try again later.',
       });
@@ -262,7 +254,7 @@ export const SignInForm = ({ className, initialEmail, isGoogleSSOEnabled }: Sign
         open={isTwoFactorAuthenticationDialogOpen}
         onOpenChange={onCloseTwoFactorAuthenticationDialog}
       >
-        <DialogContent className="w-full max-w-md md:max-w-md lg:max-w-md">
+        <DialogContent>
           <DialogHeader>
             <DialogTitle>Two-Factor Authentication</DialogTitle>
           </DialogHeader>
@@ -273,38 +265,13 @@ export const SignInForm = ({ className, initialEmail, isGoogleSSOEnabled }: Sign
                 <FormField
                   control={form.control}
                   name="totpCode"
-                  render={({ field: _field }) => (
+                  render={({ field }) => (
                     <FormItem>
                       <FormLabel>Authentication Token</FormLabel>
                       <FormControl>
-                        <PinInput
-                          id="verify-2fa-signin-pin-input"
-                          state={state}
-                          onSubmit={async ({ code, input }) => {
-                            if (code.length === 6) {
-                              setState('loading');
-                              form.setValue('totpCode', code);
-
-                              await form.handleSubmit(onFormSubmit)();
-
-                              if (form.formState.isSubmitted && !form.formState.errors.totpCode) {
-                                setState('success');
-                                return;
-                              }
-
-                              setState('error');
-
-                              setTimeout(() => {
-                                setState('input');
-                                input.value = '';
-                                input.dispatchEvent(new Event('input'));
-                                input.focus();
-                              }, 500);
-                            }
-                          }}
-                          autoFocus
-                        />
+                        <Input type="text" {...field} />
                       </FormControl>
+                      <FormMessage />
                     </FormItem>
                   )}
                 />

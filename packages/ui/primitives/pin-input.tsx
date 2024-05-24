@@ -1,83 +1,75 @@
 'use client';
 
-import { useRef } from 'react';
+import * as React from 'react';
 
-import { CodeInput, getSegmentCssWidth } from 'rci';
-import { useIsFocused } from 'use-is-focused';
+import { cn } from '@/lib/utils';
+import { DashIcon } from '@radix-ui/react-icons';
+import { OTPInput, OTPInputContext } from 'input-otp';
 
-import { cn } from '@documenso/ui/lib/utils';
+const PinInput = React.forwardRef<
+  React.ElementRef<typeof OTPInput>,
+  React.ComponentPropsWithoutRef<typeof OTPInput>
+>(({ className, containerClassName, ...props }, ref) => (
+  <OTPInput
+    ref={ref}
+    containerClassName={cn(
+      'flex items-center gap-2 has-[:disabled]:opacity-50',
+      containerClassName,
+    )}
+    className={cn('disabled:cursor-not-allowed', className)}
+    {...props}
+  />
+));
 
-export type PinInputState = 'input' | 'loading' | 'error' | 'success';
-export type PinInputProps = {
-  id: string;
-  state: PinInputState;
-  autoFocus?: boolean;
-  onSubmit({ code, input }: { code: string; input: EventTarget & HTMLInputElement }): void;
-};
+PinInput.displayName = 'PinInput';
 
-const PinInput = ({ id, autoFocus, state, onSubmit }: PinInputProps) => {
-  const inputRef = useRef<HTMLInputElement>(null);
-  const focused = useIsFocused(inputRef);
+const PinInputGroup = React.forwardRef<
+  React.ElementRef<'div'>,
+  React.ComponentPropsWithoutRef<'div'>
+>(({ className, ...props }, ref) => (
+  <div ref={ref} className={cn('flex items-center', className)} {...props} />
+));
 
-  const width = getSegmentCssWidth('14px');
+PinInputGroup.displayName = 'PinInputGroup';
+
+const PinInputSlot = React.forwardRef<
+  React.ElementRef<'div'>,
+  React.ComponentPropsWithoutRef<'div'> & { index: number }
+>(({ index, className, ...props }, ref) => {
+  const context = React.useContext(OTPInputContext);
+  const { char, hasFakeCaret, isActive } = context.slots[index];
 
   return (
-    <CodeInput
-      id={id}
-      className={cn({
-        'motion-safe:animate-[shake_0.15s_ease-in-out_0s_2]': state === 'error',
-      })}
-      inputClassName="caret-transparent selection:bg-transparent ring:ring-2"
-      autoFocus={autoFocus}
-      length={6}
-      fontSize="30px"
-      readOnly={state !== 'input'}
-      disabled={state === 'loading'}
-      inputRef={inputRef}
-      padding={'14px'}
-      spacing={'24px'}
-      spellCheck={false}
-      inputMode="numeric"
-      pattern="[0-9]*"
-      autoComplete="one-time-code"
-      onChange={({ currentTarget: input }) => {
-        input.value = input.value.replace(/\D+/g, '');
-        onSubmit({ code: input.value, input });
-      }}
-      renderSegment={(segment) => {
-        const isCaret = focused && segment.state === 'cursor';
-        const isSelection = focused && segment.state === 'selected';
-        const isLoading = state === 'loading';
-        const isSuccess = state === 'success';
-        const isError = state === 'error';
-        const isActive = isSuccess || isError || isSelection || isCaret;
-
-        return (
-          <div
-            key={segment.index}
-            data-state={state}
-            className={cn(
-              'border-input flex appearance-none rounded-md border [--segment-color:#a2e771] data-[state="error"]:[--segment-color:#dc2626] data-[state="success"]:[--segment-color:#a2e771]',
-              {
-                'shadow-[var(--segment-color)_0_0_0_1px] data-[state]:border-[var(--segment-color)]':
-                  isActive,
-                'animate-[pulse-border_1s_ease-in-out_0s_infinite]': isLoading,
-              },
-            )}
-            style={{ width }}
-          >
-            <div
-              className={cn({
-                'm-[5px] flex-1 rounded-sm opacity-[0.15625]': isSelection,
-                'mx-auto  my-2 flex-[0_0_2px] animate-[blink-caret_1.2s_step-end_infinite] justify-self-center bg-black':
-                  isCaret,
-              })}
-            />
-          </div>
-        );
-      }}
-    />
+    <div
+      ref={ref}
+      className={cn(
+        'border-input relative flex h-9 w-9 items-center justify-center border-y border-r text-sm shadow-sm transition-all first:rounded-l-md first:border-l last:rounded-r-md',
+        isActive && 'ring-ring z-10 ring-1',
+        className,
+      )}
+      {...props}
+    >
+      {char}
+      {hasFakeCaret && (
+        <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
+          <div className="animate-caret-blink bg-foreground h-4 w-px duration-1000" />
+        </div>
+      )}
+    </div>
   );
-};
+});
 
-export { PinInput };
+PinInputSlot.displayName = 'PinInputSlot';
+
+const PinInputSeparator = React.forwardRef<
+  React.ElementRef<'div'>,
+  React.ComponentPropsWithoutRef<'div'>
+>(({ ...props }, ref) => (
+  <div ref={ref} role="separator" {...props}>
+    <DashIcon />
+  </div>
+));
+
+PinInputSeparator.displayName = 'PinInputSeparator';
+
+export { PinInput, PinInputGroup, PinInputSlot, PinInputSeparator };

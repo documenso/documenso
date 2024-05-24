@@ -114,25 +114,3 @@
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
   background: rgb(100 116 139 / 0.5);
 }
-
-@keyframes blink-caret {
-  50% {
-    background: transparent;
-  }
-}
-
-@keyframes shake {
-  25% {
-    transform: translateX(10px);
-  }
-  75% {
-    transform: translateX(-10px);
-  }
-}
-
-@keyframes pulse-border {
-  50% {
-    border-color: var(--segment-color);
-    box-shadow: var(--segment-color) 0 0 0 1px;
-  }
-}

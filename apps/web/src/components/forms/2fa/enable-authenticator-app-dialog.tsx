@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
 
 import { useRouter } from 'next/navigation';
 
@@ -27,8 +27,8 @@ import {
   FormLabel,
   FormMessage,
 } from '@documenso/ui/primitives/form/form';
+import { Input } from '@documenso/ui/primitives/input';
 import { PasswordInput } from '@documenso/ui/primitives/password-input';
-import { PinInput, type PinInputState } from '@documenso/ui/primitives/pin-input';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
 import { RecoveryCodeList } from './recovery-code-list';
@@ -54,7 +54,6 @@ export const EnableAuthenticatorAppDialog = ({
   open,
   onOpenChange,
 }: EnableAuthenticatorAppDialogProps) => {
-  const [state, setState] = useState<PinInputState>('input');
   const router = useRouter();
   const { toast } = useToast();
 
@@ -120,20 +119,14 @@ export const EnableAuthenticatorAppDialog = ({
     token,
   }: TEnableTwoFactorAuthenticationForm) => {
     try {
-      const enabled2fa = await enableTwoFactorAuthentication({ code: token });
+      await enableTwoFactorAuthentication({ code: token });
 
       toast({
         title: 'Two-factor authentication enabled',
         description:
           'Two-factor authentication has been enabled for your account. You will now be required to enter a code from your authenticator app when signing in.',
       });
-
-      return enabled2fa;
     } catch (_err) {
-      enableTwoFactorAuthenticationForm.setError('token', {
-        message: 'Unable to setup two-factor authentication',
-      });
-
       toast({
         title: 'Unable to setup two-factor authentication',
         description:
@@ -153,7 +146,7 @@ export const EnableAuthenticatorAppDialog = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="w-full max-w-md md:max-w-md lg:max-w-md">
+      <DialogContent className="w-full max-w-xl md:max-w-xl lg:max-w-xl">
         <DialogHeader>
           <DialogTitle>Enable Authenticator App</DialogTitle>
 
@@ -248,43 +241,13 @@ export const EnableAuthenticatorAppDialog = ({
                 <FormField
                   name="token"
                   control={enableTwoFactorAuthenticationForm.control}
-                  render={({ field: _field }) => (
+                  render={({ field }) => (
                     <FormItem>
                       <FormLabel className="text-muted-foreground">Token</FormLabel>
                       <FormControl>
-                        <PinInput
-                          id="enable-2fa-pin-input"
-                          state={state}
-                          onSubmit={async ({ code, input }) => {
-                            if (code.length === 6) {
-                              setState('loading');
-                              enableTwoFactorAuthenticationForm.setValue('token', code);
-
-                              await enableTwoFactorAuthenticationForm.handleSubmit(
-                                onEnableTwoFactorAuthenticationFormSubmit,
-                              )();
-
-                              if (
-                                enableTwoFactorAuthenticationForm.formState.isSubmitted &&
-                                !enableTwoFactorAuthenticationForm.formState.errors.totpCode
-                              ) {
-                                setState('success');
-                                return;
-                              }
-
-                              setState('error');
-
-                              setTimeout(() => {
-                                setState('input');
-                                input.value = '';
-                                input.dispatchEvent(new Event('input'));
-                                input.focus();
-                              }, 500);
-                            }
-                          }}
-                          autoFocus
-                        />
+                        <Input {...field} type="text" value={field.value ?? ''} />
                       </FormControl>
+                      <FormMessage />
                     </FormItem>
                   )}
                 />
