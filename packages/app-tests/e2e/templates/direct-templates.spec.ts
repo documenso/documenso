@@ -12,7 +12,7 @@ import { seedTeam, unseedTeam } from '@documenso/prisma/seed/teams';
 import { seedDirectTemplate, seedTemplate } from '@documenso/prisma/seed/templates';
 import { seedTestEmail, seedUser, unseedUser } from '@documenso/prisma/seed/users';
 
-import { apiSignin, apiSignout } from '../fixtures/authentication';
+import { apiSignin } from '../fixtures/authentication';
 import { checkDocumentTabCount } from '../fixtures/documents';
 
 test.describe.configure({ mode: 'parallel' });
@@ -319,8 +319,6 @@ test('[DIRECT_TEMPLATES]: use direct template link with 2 recipients', async ({ 
     await checkDocumentTabCount(page, 'All', 1);
     await checkDocumentTabCount(page, 'Pending', 1);
   }
-
-  await apiSignout({ page });
 
   // Check that the second recipient has the 2 pending documents.
   await apiSignin({
