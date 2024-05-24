@@ -86,7 +86,7 @@ export const CreateWebhookDialog = ({ trigger, ...props }: CreateWebhookDialogPr
 
       toast({
         title: 'ვებჰუკი შექმნილია',
-        description: 'ვებჰუკი წარმატებით შეიქმნა.',
+        description: 'ვებჰუკი წარმატებით შეიქმნა!',
       });
 
       form.reset();
@@ -148,7 +148,7 @@ export const CreateWebhookDialog = ({ trigger, ...props }: CreateWebhookDialogPr
                   name="enabled"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Enabled</FormLabel>
+                      <FormLabel>გააქტიურებული</FormLabel>
 
                       <div>
                         <FormControl>

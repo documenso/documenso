@@ -74,7 +74,7 @@ export const AddTeamEmailDialog = ({ teamId, trigger, ...props }: AddTeamEmailDi
 
       toast({
         title: 'მეილი გაგზავნილია',
-        description: 'დამატასტურებელი მეილი წარმატებით გაიგზავნა.',
+        description: 'დამატასტურებელი მეილი წარმატებით გაიგზავნა!',
         duration: 5000,
       });
 
@@ -87,7 +87,7 @@ export const AddTeamEmailDialog = ({ teamId, trigger, ...props }: AddTeamEmailDi
       if (error.code === AppErrorCode.ALREADY_EXISTS) {
         form.setError('email', {
           type: 'manual',
-          message: 'ამ ელ. ფოსტას სხვა გუნდი იყენებს.',
+          message: 'ამ ელ.ფოსტას სხვა გუნდი იყენებს.',
         });
 
         return;
@@ -96,7 +96,7 @@ export const AddTeamEmailDialog = ({ teamId, trigger, ...props }: AddTeamEmailDi
       toast({
         title: 'დაფიქსირდა ხარვეზი',
         variant: 'destructive',
-        description: 'ამ ელ. ფოსტის დამატებისას დაფიქსირდა ხარვეზი. გთხოვთ თავიდან სცადოთ.',
+        description: 'ამ ელ.ფოსტის დამატებისას დაფიქსირდა ხარვეზი. გთხოვთ თავიდან სცადოთ.',
       });
     }
   };
@@ -117,7 +117,7 @@ export const AddTeamEmailDialog = ({ teamId, trigger, ...props }: AddTeamEmailDi
         {trigger ?? (
           <Button variant="outline" loading={isLoading} className="bg-background">
             <Plus className="-ml-1 mr-1 h-5 w-5" />
-            ელ. ფოსტის დამატება
+            ელ.ფოსტის დამატება
           </Button>
         )}
       </DialogTrigger>
@@ -127,7 +127,7 @@ export const AddTeamEmailDialog = ({ teamId, trigger, ...props }: AddTeamEmailDi
           <DialogTitle>დაამატეთ გუნდის ელ.ფოსტა</DialogTitle>
 
           <DialogDescription className="mt-4">
-            დამადასტურებელი მეილი გაიგზავნება მითითებულ ელფოსტაზე.
+            დამადასტურებელი მეილი გაიგზავნება მითითებულ ელ.ფოსტაზე.
           </DialogDescription>
         </DialogHeader>
 
@@ -144,7 +144,7 @@ export const AddTeamEmailDialog = ({ teamId, trigger, ...props }: AddTeamEmailDi
                   <FormItem>
                     <FormLabel required>სახელი</FormLabel>
                     <FormControl>
-                      <Input className="bg-background" placeholder="eg. Legal" {...field} />
+                      <Input className="bg-background" placeholder="მაგ. Legal" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

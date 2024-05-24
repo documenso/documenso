@@ -8,7 +8,7 @@ export async function search(search: string, page: number, perPage: number) {
   const { user } = await getRequiredServerComponentSession();
 
   if (!isAdmin(user)) {
-    throw new Error('Unauthorized');
+    throw new Error('არაავტორიზებული');
   }
 
   const results = await findUsers({ username: search, email: search, page, perPage });

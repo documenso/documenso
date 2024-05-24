@@ -37,8 +37,8 @@ export const VerifyEmailBanner = ({ email }: VerifyEmailBannerProps) => {
       await sendConfirmationEmail({ email: email });
 
       toast({
-        title: 'Success',
-        description: 'დამადასტურებელი მეილი წარმატებით გაიგზავნა.',
+        title: '',
+        description: 'დამადასტურებელი მეილი წარმატებით გაიგზავნა!',
       });
 
       setIsOpen(false);
@@ -113,7 +113,7 @@ export const VerifyEmailBanner = ({ email }: VerifyEmailBannerProps) => {
               loading={isLoading}
               onClick={onResendConfirmationEmail}
             >
-              {isLoading ? 'იგზავნება...' : 'თავიდან გამოაგზავნეთ დამადასტურებელი მეილი'}
+              {isLoading ? 'იგზავნება...' : 'თავიდან გამოგზავნა'}
             </Button>
           </div>
         </DialogContent>

@@ -35,7 +35,7 @@ export const LeaveTeamDialog = ({ trigger, teamId, teamName, role }: LeaveTeamDi
     onSuccess: () => {
       toast({
         title: 'გუნდიდან გამოსვლა',
-        description: 'თქვენ გუნდი წარმატებით დატოვეთ.',
+        description: 'თქვენ გუნდი წარმატებით დატოვეთ!',
         duration: 5000,
       });
 

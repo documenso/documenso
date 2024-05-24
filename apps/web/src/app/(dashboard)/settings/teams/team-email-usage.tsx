@@ -76,9 +76,9 @@ export const TeamEmailUsage = ({ teamEmail }: TeamEmailUsageProps) => {
             <DialogTitle>დარწმუნებული ხართ?</DialogTitle>
 
             <DialogDescription className="mt-4">
-              თქვენ გაუუქმებთ გუნდს წვდომას{' '}
+              თქვენ გაუუქმებთ გუნდს წვდომას თქვენს{' '}
               <span className="font-semibold">{teamEmail.team.name}</span> ({teamEmail.team.url})
-              თქვენს ელ.ფოსტაზე.
+              ელ.ფოსტაზე.
             </DialogDescription>
           </DialogHeader>
 

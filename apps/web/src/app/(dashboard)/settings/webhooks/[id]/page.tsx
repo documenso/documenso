@@ -69,7 +69,7 @@ export default function WebhookPage({ params }: WebhookPageOptions) {
 
       toast({
         title: 'ვებჰუკი განახლებულია',
-        description: 'ვებჰუკი წარმატებით განახლდა.',
+        description: 'ვებჰუკი წარმატებით განახლდა!',
         duration: 5000,
       });
 

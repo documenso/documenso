@@ -171,7 +171,7 @@ export const DocumentActionAuthPasskey = ({
         <Alert variant="warning">
           <AlertDescription>
             {recipient.role === RecipientRole.VIEWER && actionTarget === 'DOCUMENT'
-              ? 'You need to setup a passkey to mark this document as viewed.'
+              ? 'თქვენ უნდა დააყენოთ საიდუმლო გასაღები (Passkey), რათა ეს დოკუმენტი ნანახად მოინიშნოს.'
               : `You need to setup a passkey to ${actionVerb.toLowerCase()} this ${actionTarget.toLowerCase()}.`}
           </AlertDescription>
         </Alert>
@@ -183,7 +183,8 @@ export const DocumentActionAuthPasskey = ({
 
           <CreatePasskeyDialog
             onSuccess={async () => refetchPasskeys()}
-            trigger={<Button>Setup</Button>}
+            trigger={<Button>დაყენება</Button>}
+            // trigger={<Button>Setup</Button>}
           />
         </DialogFooter>
       </div>
@@ -200,14 +201,14 @@ export const DocumentActionAuthPasskey = ({
               name="passkeyId"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel required>Passkey</FormLabel>
+                  <FormLabel required>საიდუმლო გასაღები</FormLabel>
 
                   <FormControl>
                     <Select {...field} onValueChange={field.onChange}>
                       <SelectTrigger className="bg-background text-muted-foreground">
                         <SelectValue
                           data-testid="documentAccessSelectValue"
-                          placeholder="Select passkey"
+                          placeholder="აირჩიეთ საიდუმლო გასაღები"
                         />
                       </SelectTrigger>
 

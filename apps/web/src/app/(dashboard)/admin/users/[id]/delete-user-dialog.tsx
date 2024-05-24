@@ -44,7 +44,7 @@ export const DeleteUserDialog = ({ className, user }: DeleteUserDialogProps) => 
 
       toast({
         title: 'ანგარიში წაშლილია',
-        description: 'ანგარიში წარმატებით წაიშალა!.',
+        description: 'ანგარიში წარმატებით წაიშალა!',
         duration: 5000,
       });
 
@@ -94,7 +94,7 @@ export const DeleteUserDialog = ({ className, user }: DeleteUserDialogProps) => 
 
                 <Alert variant="destructive">
                   <AlertDescription className="selection:bg-red-100">
-                    ეს ქმედება არ შეუქცევადი. გთხოვთ დარწმუნდით, სანამ განაგრძობთ.
+                    ეს ქმედება არის შეუქცევადი. გთხოვთ დარწმუნდით, სანამ განაგრძობთ.
                   </AlertDescription>
                 </Alert>
               </DialogHeader>

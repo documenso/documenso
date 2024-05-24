@@ -21,7 +21,11 @@ export default async function SettingsManagePasskeysPage() {
 
   return (
     <div>
-      <SettingsHeader title="Passkeys" subtitle="Manage your passkeys." hideDivider={true}>
+      <SettingsHeader
+        title="საიდუმლო გასაღებები (Passkeys)"
+        subtitle="მართეთ თქვენი საიდუმლო გასაღებები."
+        hideDivider={true}
+      >
         <CreatePasskeyDialog />
       </SettingsHeader>
 

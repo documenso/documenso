@@ -188,7 +188,7 @@ export default async function CompletedSigningPage({
             </h2>
 
             <p className="text-muted-foreground/60 mt-4 max-w-[55ch] text-center leading-normal">
-              შექმენით თქვენი ანგარიში და დაიწყეთ დოკუმენტებზე ონლაინ ხელმოწერა!
+              შექმენით თქვენი ანგარიში და დაიწყეთ დოკუმენტებზე ელექტრონულად ხელმოწერა!
             </p>
 
             <ClaimAccount defaultName={recipientName} defaultEmail={recipient.email} />

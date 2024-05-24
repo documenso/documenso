@@ -92,7 +92,7 @@ export const DocumentLogsPageView = async ({ params, team }: DocumentLogsPageVie
         .toLocaleString(DateTime.DATETIME_MED_WITH_SECONDS),
     },
     {
-      description: 'დროის სარტყელი',
+      description: 'დროის ზონა',
       value: document.documentMeta?.timezone ?? 'N/A',
     },
   ];

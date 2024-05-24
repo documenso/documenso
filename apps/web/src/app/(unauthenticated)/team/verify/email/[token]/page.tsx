@@ -66,11 +66,12 @@ export default async function VerifyTeamEmailPage({ params: { token } }: VerifyT
   if (isTeamEmailVerificationError) {
     return (
       <div>
-        <h1 className="text-4xl font-semibold">გუნდის ელ. ფოსტის ვერიფიკაცია</h1>
+        <h1 className="text-4xl font-semibold">გუნდის ელ.ფოსტის ვერიფიკაცია</h1>
 
         <p className="text-muted-foreground mt-2 text-sm">
-          Something went wrong while attempting to verify your email address for{' '}
-          <strong>{team.name}</strong>. გთხოვთ თავიდან სცადეთ.
+          {/* Something went wrong while attempting to verify your email address for{' '} */}
+          <strong>{team.name}</strong>-სთვის თქვენი ელ.ფოსტის მისამართის ვერიფიკაციის მცდელობისას
+          მოხდა რაღაც შეცდომა. გთხოვთ თავიდან სცადეთ.
         </p>
       </div>
     );
@@ -78,10 +79,10 @@ export default async function VerifyTeamEmailPage({ params: { token } }: VerifyT
 
   return (
     <div>
-      <h1 className="text-4xl font-semibold">გუნდის ელ. ფოსტა ვერიფიცირებულია!</h1>
+      <h1 className="text-4xl font-semibold">გუნდის ელ.ფოსტა ვერიფიცირებულია!</h1>
 
       <p className="text-muted-foreground mb-4 mt-2 text-sm">
-        თქვენ დაადასტურეთ თქვენი ელ. ფოსტის მისამართი <strong>{team.name}</strong>-სთვის.
+        თქვენ დაადასტურეთ თქვენი ელ.ფოსტის მისამართი <strong>{team.name}</strong>-სთვის.
       </p>
 
       <Button asChild>

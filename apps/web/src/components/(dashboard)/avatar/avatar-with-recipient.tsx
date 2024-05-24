@@ -46,7 +46,7 @@ export function AvatarWithRecipient({ recipient, documentStatus }: AvatarWithRec
       role={signingToken ? 'button' : undefined}
       title={
         signingToken
-          ? 'დააჭირეთ ხელმოწერის ბმულის დასაკოპირებლად, რათა მიმღების გადაუგზავნოთ'
+          ? 'დააჭირეთ ხელმოწერის ბმულის დასაკოპირებლად, რათა მიმღებს გადაუგზავნოთ'
           : undefined
       }
       onClick={onRecipientClick}
@@ -62,7 +62,7 @@ export function AvatarWithRecipient({ recipient, documentStatus }: AvatarWithRec
         className="text-muted-foreground text-sm"
         title={
           signingToken
-            ? 'დააჭირეთ ხელმოწერის ბმულის დასაკოპირებლად, რათა მიმღების გადაუგზავნოთ'
+            ? 'დააჭირეთ ხელმოწერის ბმულის დასაკოპირებლად, რათა მიმღებს გადაუგზავნოთ'
             : undefined
         }
       >

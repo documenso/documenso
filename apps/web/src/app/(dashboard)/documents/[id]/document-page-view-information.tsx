@@ -39,7 +39,7 @@ export const DocumentPageViewInformation = ({
     return [
       {
         description: 'ატვირთა',
-        value: userId === document.userId ? 'You' : document.User.name ?? document.User.email,
+        value: userId === document.userId ? 'თქვენ' : document.User.name ?? document.User.email,
       },
       {
         description: 'შეიქმნა',

@@ -99,7 +99,7 @@ export default async function AuditLog({ searchParams }: AuditLogProps) {
           </p>
 
           <p>
-            <span className="font-medium">დროის სარტყელი</span>
+            <span className="font-medium">დროითი ზონა</span>
 
             <span className="mt-1 block break-words">
               {document.documentMeta?.timezone ?? 'N/A'}

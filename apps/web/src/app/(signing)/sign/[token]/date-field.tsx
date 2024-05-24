@@ -54,7 +54,7 @@ export const DateField = ({
 
   const isDifferentTime = field.inserted && localDateString !== field.customText;
 
-  const tooltipText = `"${field.customText}" გამოჩნდება დოკუმენტზე, რადგან მისი დროის სარტყელია "${timezone}".`;
+  const tooltipText = `"${field.customText}" გამოჩნდება დოკუმენტზე, რადგან მისი დროითი ზონაა "${timezone}".`;
 
   const onSign = async (authOptions?: TRecipientActionAuth) => {
     try {

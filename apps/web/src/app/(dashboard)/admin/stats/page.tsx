@@ -30,14 +30,14 @@ export default async function AdminStatsPage() {
 
   return (
     <div>
-      <h2 className="text-4xl font-semibold">Instance Stats</h2>
+      <h2 className="text-4xl font-semibold">სტატისტიკა</h2>
 
       <div className="mt-8 grid flex-1 grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <CardMetric icon={UserIcon} title="Total Users" value={usersCount} />
-        <CardMetric icon={File} title="Total Documents" value={docStats.ALL} />
+        <CardMetric icon={UserIcon} title="ყველა მომხმარებელი" value={usersCount} />
+        <CardMetric icon={File} title="ყველა დოკუმენტი" value={docStats.ALL} />
         <CardMetric
           icon={UserPlus2}
-          title="Active Subscriptions"
+          title="გაააქტიურეთ პაკეტი"
           value={usersWithSubscriptionsCount}
         />
         <CardMetric icon={UserPlus2} title="App Version" value={`v${process.env.APP_VERSION}`} />
@@ -45,28 +45,32 @@ export default async function AdminStatsPage() {
 
       <div className="mt-16 grid grid-cols-1 gap-8 md:grid-cols-1 lg:grid-cols-2">
         <div>
-          <h3 className="text-3xl font-semibold">Document metrics</h3>
+          <h3 className="text-3xl font-semibold">დოკუმენტების მეტრიკა</h3>
 
           <div className="mt-8 grid flex-1 grid-cols-2 gap-4">
-            <CardMetric icon={File} title="Total Documents" value={docStats.ALL} />
-            <CardMetric icon={FileEdit} title="Drafted Documents" value={docStats.DRAFT} />
-            <CardMetric icon={FileClock} title="Pending Documents" value={docStats.PENDING} />
-            <CardMetric icon={FileCheck} title="Completed Documents" value={docStats.COMPLETED} />
+            <CardMetric icon={File} title="ყველა დოკუმენტი" value={docStats.ALL} />
+            <CardMetric icon={FileEdit} title="დრაფტი დოკუმენტები" value={docStats.DRAFT} />
+            <CardMetric icon={FileClock} title="მომლოდინე დოკუმენტები" value={docStats.PENDING} />
+            <CardMetric
+              icon={FileCheck}
+              title="ხელმოწერილი დოკუმენტები"
+              value={docStats.COMPLETED}
+            />
           </div>
         </div>
 
         <div>
-          <h3 className="text-3xl font-semibold">Recipients metrics</h3>
+          <h3 className="text-3xl font-semibold">მიმღებების მეტრიკა</h3>
 
           <div className="mt-8 grid flex-1 grid-cols-2 gap-4">
             <CardMetric
               icon={UserSquare2}
-              title="Total Recipients"
+              title="ყველა მიმღები"
               value={recipientStats.TOTAL_RECIPIENTS}
             />
-            <CardMetric icon={Mail} title="Documents Received" value={recipientStats.SENT} />
-            <CardMetric icon={MailOpen} title="Documents Viewed" value={recipientStats.OPENED} />
-            <CardMetric icon={PenTool} title="Signatures Collected" value={recipientStats.SIGNED} />
+            <CardMetric icon={Mail} title="დოკუმენტები მიუვიდა" value={recipientStats.SENT} />
+            <CardMetric icon={MailOpen} title="დოკუმენტები გახსნა" value={recipientStats.OPENED} />
+            <CardMetric icon={PenTool} title="ხელმოწერები შეაგროვა" value={recipientStats.SIGNED} />
           </div>
         </div>
       </div>

@@ -12,7 +12,7 @@ export default function NotFound() {
       <div>
         <p className="text-muted-foreground font-semibold">404 გუნდი არ მოიძებნა</p>
 
-        <h1 className="mt-3 text-2xl font-bold md:text-3xl">ბოდიშს გიხდით! დაფიქსირდა ხარვეზი</h1>
+        <h1 className="mt-3 text-2xl font-bold md:text-3xl">დაფიქსირდა ხარვეზი</h1>
 
         <p className="text-muted-foreground mt-4 text-sm">
           გუნდი, რომელსაც ეძებთ, შესაძლოა წაიშალა, გადაარქვეს სახელი ან არ არსებობს.

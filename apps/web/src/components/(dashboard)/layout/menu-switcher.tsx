@@ -140,7 +140,7 @@ export const MenuSwitcher = ({ user, teams: initialTeamsData }: MenuSwitcherProp
                 <div className="flex flex-row space-x-2">
                   <DropdownMenuItem asChild>
                     <Button
-                      title="Manage teams"
+                      title="მართეთ გუნდები"
                       variant="ghost"
                       className="text-muted-foreground flex h-5 w-5 items-center justify-center p-0"
                       asChild
@@ -153,7 +153,7 @@ export const MenuSwitcher = ({ user, teams: initialTeamsData }: MenuSwitcherProp
 
                   <DropdownMenuItem asChild>
                     <Button
-                      title="Create team"
+                      title="შექმენით გუნდი"
                       variant="ghost"
                       className="text-muted-foreground flex h-5 w-5 items-center justify-center p-0"
                       asChild

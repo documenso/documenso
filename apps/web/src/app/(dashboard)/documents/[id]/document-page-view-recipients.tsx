@@ -81,7 +81,7 @@ export const DocumentPageViewRecipients = ({
                       ) : (
                         <>
                           <CheckIcon className="mr-1 h-3 w-3" />
-                          მხადაა
+                          მზადაა
                         </>
                       ),
                     )

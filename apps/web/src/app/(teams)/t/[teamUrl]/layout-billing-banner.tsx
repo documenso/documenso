@@ -49,7 +49,7 @@ export const LayoutBillingBanner = ({
       toast({
         title: 'დაფიქსირდა ხარვეზი',
         description:
-          'ამჯერად გადახდების პორტალზე გადასვლა ვერ მოხერხდა. გთხოვთ, სცადოთ ხელახლა ან დაგვიკავშირდეთ.',
+          'ამჯერად გადახდების პორტალზე გადასვლა ვერ მოხერხდა. გთხოვთ სცადოთ ხელახლა ან დაგვიკავშირდეთ.',
         variant: 'destructive',
         duration: 10000,
       });
@@ -75,8 +75,8 @@ export const LayoutBillingBanner = ({
             <AlertTriangle className="mr-2.5 h-5 w-5" />
 
             {match(subscription.status)
-              .with(SubscriptionStatus.PAST_DUE, () => 'Payment overdue')
-              .with(SubscriptionStatus.INACTIVE, () => 'Teams restricted')
+              .with(SubscriptionStatus.PAST_DUE, () => 'გადახდა ვადაგადაცილებულია')
+              .with(SubscriptionStatus.INACTIVE, () => 'გუნდები შეზღუდულია')
               .exhaustive()}
           </div>
 

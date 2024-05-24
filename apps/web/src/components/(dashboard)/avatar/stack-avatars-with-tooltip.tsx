@@ -49,7 +49,7 @@ export const StackAvatarsWithTooltip = ({
     >
       {completedRecipients.length > 0 && (
         <div>
-          <h1 className="text-base font-medium">Completed</h1>
+          <h1 className="text-base font-medium">ხელმოწერილია</h1>
           {completedRecipients.map((recipient: Recipient) => (
             <div key={recipient.id} className="my-1 flex items-center gap-2">
               <StackAvatar
@@ -71,7 +71,7 @@ export const StackAvatarsWithTooltip = ({
 
       {waitingRecipients.length > 0 && (
         <div>
-          <h1 className="text-base font-medium">Waiting</h1>
+          <h1 className="text-base font-medium">ველოდებით</h1>
           {waitingRecipients.map((recipient: Recipient) => (
             <AvatarWithRecipient
               key={recipient.id}
@@ -84,7 +84,7 @@ export const StackAvatarsWithTooltip = ({
 
       {openedRecipients.length > 0 && (
         <div>
-          <h1 className="text-base font-medium">Opened</h1>
+          <h1 className="text-base font-medium">გახსნილია</h1>
           {openedRecipients.map((recipient: Recipient) => (
             <AvatarWithRecipient
               key={recipient.id}
@@ -97,7 +97,8 @@ export const StackAvatarsWithTooltip = ({
 
       {uncompletedRecipients.length > 0 && (
         <div>
-          <h1 className="text-base font-medium">Uncompleted</h1>
+          <h1 className="text-base font-medium">არაა ხელმოწერილი</h1>
+          {/* <h1 className="text-base font-medium">Uncompleted</h1> */}
           {uncompletedRecipients.map((recipient: Recipient) => (
             <AvatarWithRecipient
               key={recipient.id}

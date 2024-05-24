@@ -35,7 +35,7 @@ export default async function ApiTokensPage({ params }: ApiTokensPageProps) {
 
     return (
       <div>
-        <h3 className="text-2xl font-semibold">API Tokens</h3>
+        <h3 className="text-2xl font-semibold">API ტოკენები</h3>
         <p className="text-muted-foreground mt-2 text-sm">
           {match(error.code)
             .with(AppErrorCode.UNAUTHORIZED, () => error.message)

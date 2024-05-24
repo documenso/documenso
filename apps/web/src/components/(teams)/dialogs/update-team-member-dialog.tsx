@@ -86,8 +86,9 @@ export const UpdateTeamMemberDialog = ({
       });
 
       toast({
-        title: 'Success',
-        description: `You have updated ${teamMemberName}.`,
+        title: '',
+        description: `თქვენ დააწინაურეთ ${teamMemberName}.`,
+        // description: `You have updated ${teamMemberName}.`,
         duration: 5000,
       });
 
@@ -97,7 +98,7 @@ export const UpdateTeamMemberDialog = ({
         title: 'დაფიქსირდა ხარვეზი',
         variant: 'destructive',
         description:
-          'We encountered an unknown error while attempting to update this team member. Please try again later.',
+          'გუნდის ამ წევრის დაწინაურებისას დაფიქსირდა ხარვეზი. გთხოვთ თავიდან სცადოთ ან დაგვიკავშირდეთ.',
       });
     }
   };
@@ -113,7 +114,7 @@ export const UpdateTeamMemberDialog = ({
       setOpen(false);
 
       toast({
-        title: 'You cannot modify a team member who has a higher role than you.',
+        title: 'თქვენ არ შეგიძლიათ თქვენზე მაღალი როლის მქონდე გუნდის წევრის მოდიფიცირება.',
         variant: 'destructive',
       });
     }
@@ -126,15 +127,16 @@ export const UpdateTeamMemberDialog = ({
       onOpenChange={(value) => !form.formState.isSubmitting && setOpen(value)}
     >
       <DialogTrigger onClick={(e) => e.stopPropagation()} asChild>
-        {trigger ?? <Button variant="secondary">Update team member</Button>}
+        {trigger ?? <Button variant="secondary">დააწინაურეთ გუნდის წევრი</Button>}
+        {/* {trigger ?? <Button variant="secondary">Update team member</Button>} */}
       </DialogTrigger>
 
       <DialogContent position="center">
         <DialogHeader>
-          <DialogTitle>Update team member</DialogTitle>
+          <DialogTitle>დააწინაურეთ გუნდის წევრი</DialogTitle>
 
           <DialogDescription className="mt-4">
-            You are currently updating <span className="font-bold">{teamMemberName}.</span>
+            თქვენ ახლა აწინაურებთ <span className="font-bold">{teamMemberName}.</span>
           </DialogDescription>
         </DialogHeader>
 
@@ -173,7 +175,8 @@ export const UpdateTeamMemberDialog = ({
                 </Button>
 
                 <Button type="submit" loading={form.formState.isSubmitting}>
-                  Update
+                  {/* Update */}
+                  დაწინაურება
                 </Button>
               </DialogFooter>
             </fieldset>

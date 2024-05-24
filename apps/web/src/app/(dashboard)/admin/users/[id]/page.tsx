@@ -66,7 +66,7 @@ export default function UserPage({ params }: { params: { id: number } }) {
 
       toast({
         title: 'პროფილი განახლებულია',
-        description: 'თქვენი პროფილი წარმატებით განახლდა.',
+        description: 'თქვენი პროფილი წარმატებით განახლდა!',
         duration: 5000,
       });
     } catch (e) {

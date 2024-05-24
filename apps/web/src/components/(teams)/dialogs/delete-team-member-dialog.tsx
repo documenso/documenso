@@ -42,8 +42,8 @@ export const DeleteTeamMemberDialog = ({
     trpc.team.deleteTeamMembers.useMutation({
       onSuccess: () => {
         toast({
-          title: 'Success',
-          description: 'You have successfully removed this user from the team.',
+          title: '',
+          description: 'თქვენ წარმატებით წაშალეთ ეს მომხმარებელი გუნდიდან.',
           duration: 5000,
         });
 
@@ -51,11 +51,10 @@ export const DeleteTeamMemberDialog = ({
       },
       onError: () => {
         toast({
-          title: 'An unknown error occurred',
+          title: 'დაფიქსირდა ხარვეზი',
           variant: 'destructive',
           duration: 10000,
-          description:
-            'We encountered an unknown error while attempting to remove this user. Please try again later.',
+          description: 'ამ მომხმარებლის წაშლისას დაფიქსირდა ხარვეზი. გთხოვთ თავიდან სცადოთ.',
         });
       },
     });
@@ -71,7 +70,7 @@ export const DeleteTeamMemberDialog = ({
           <DialogTitle>ნამდვილად გსურთ წაშლა?</DialogTitle>
 
           <DialogDescription className="mt-4">
-            თქვენ შლით შემდეგ მომხმარებელს <span className="font-semibold">{teamName}</span>{' '}
+            თქვენ წაშლით შემდეგ მომხმარებელს (<span className="font-semibold">{teamName}</span>){' '}
             გუნდიდან.
           </DialogDescription>
         </DialogHeader>

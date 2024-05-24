@@ -46,8 +46,8 @@ export default async function SecuritySettingsPage() {
           <AlertDescription className="mr-4">
             დაამატეთ ავთენტიფიკატორი მეორე ავტორიზაციის მეთოდად{' '}
             {user.identityProvider === 'DOCUMENSO'
-              ? 'შესვლისას, ან დოკუმენტების ხელმოწერისას.'
-              : 'დოკუმენტების ხელმოწერისას.'}
+              ? 'შესვლისას, ან დოკუმენტებზე ხელმოწერისას.'
+              : 'დოკუმენტებზე ხელმოწერისას.'}
           </AlertDescription>
         </div>
 
@@ -82,15 +82,16 @@ export default async function SecuritySettingsPage() {
           variant="neutral"
         >
           <div className="mb-4 sm:mb-0">
-            <AlertTitle>Passkeys</AlertTitle>
+            <AlertTitle>საიდუმლო გასაღებები</AlertTitle>
 
             <AlertDescription className="mr-4">
-              Allows authenticating using biometrics, password managers, hardware keys, etc.
+              იძლევა ავტორიზაციის საშუალებას ბიომეტრიის, პაროლის მენეჯერების, აპარატურის გასაღებების
+              და ა.შ გამოყენებით.
             </AlertDescription>
           </div>
 
           <Button asChild variant="outline" className="bg-background">
-            <Link href="/settings/security/passkeys">Manage passkeys</Link>
+            <Link href="/settings/security/passkeys">მართეთ საიდუმლო გასაღებები</Link>
           </Button>
         </Alert>
       )}

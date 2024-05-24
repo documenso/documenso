@@ -72,7 +72,7 @@ export const EditTemplateForm = ({
   const documentFlow: Record<EditTemplateStep, DocumentFlowStep> = {
     settings: {
       title: 'ზოგადი',
-      description: 'Configure general settings for the template.',
+      description: 'მართეთ შაბლონის ზოგადი პარამეტრები.',
       stepIndex: 1,
     },
     signers: {
@@ -185,7 +185,7 @@ export const EditTemplateForm = ({
 
       toast({
         title: 'შაბლონი შენახულია',
-        description: 'თქვენი შაბლონები წარმატებით იქნა შენახული.',
+        description: 'თქვენი შაბლონები წარმატებით იქნა შენახული!',
         duration: 5000,
       });
 

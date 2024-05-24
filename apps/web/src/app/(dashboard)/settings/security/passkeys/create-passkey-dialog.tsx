@@ -81,7 +81,8 @@ export const CreatePasskeyDialog = ({ trigger, onSuccess, ...props }: CreatePass
       });
 
       toast({
-        description: 'წარმატებით შეიქმნა passkey',
+        description: 'საიდუმლო გასაღები წარმატებით შეიქმნა',
+        // description: 'წარმატებით შეიქმნა passkey',
         duration: 5000,
       });
 
@@ -140,18 +141,18 @@ export const CreatePasskeyDialog = ({ trigger, onSuccess, ...props }: CreatePass
         {trigger ?? (
           <Button variant="secondary" loading={isLoading}>
             <KeyRoundIcon className="-ml-1 mr-1 h-5 w-5" />
-            დაამატე passkey
+            დაამატეთ საიდუმლო გასაღები
           </Button>
         )}
       </DialogTrigger>
 
       <DialogContent position="center">
         <DialogHeader>
-          <DialogTitle>დაამატე passkey</DialogTitle>
+          <DialogTitle>დაამატეთ საიდუმლო გასაღები</DialogTitle>
 
           <DialogDescription className="mt-4">
-            Passkey გაძლევთ საშუალებას შეხვიდეთ და დაადასტუროთ ბიომეტრიის, პაროლის მენეჯერების და
-            ა.შ.{' '}
+            საიდუმლო გასაღები უსაფრთხოდ ახდენს მომხმარებლების ავთენტიფიკაციას.{' '}
+            {/* საიდუმლო გასაღები გაძლევთ საშუალებას შეხვიდეთ და დაადასტუროთ ბიომეტრიის, პაროლის მენეჯერების და ა.შ.{' '} */}
           </DialogDescription>
         </DialogHeader>
 
@@ -166,9 +167,9 @@ export const CreatePasskeyDialog = ({ trigger, onSuccess, ...props }: CreatePass
                 name="passkeyName"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel required>Passkey სახელი</FormLabel>
+                    <FormLabel required>საიდუმლო გასაღების სახელი</FormLabel>
                     <FormControl>
-                      <Input className="bg-background" placeholder="eg. Mac" {...field} />
+                      <Input className="bg-background" placeholder="მაგ. Mac" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -183,7 +184,7 @@ export const CreatePasskeyDialog = ({ trigger, onSuccess, ...props }: CreatePass
 
                 <AlertDescription className="mt-2">
                   თუ არ გსურთ მოთხოვნილი ავთენტიფიკატორის გამოყენება, შეგიძლიათ დახუროთ ის, რაც
-                  შემდეგ გამოჩენს შემდეგ ხელმისაწვდომ ავთენტიფიკატორს.
+                  შემდეგ გამოაჩენს შემდეგ ხელმისაწვდომ ავთენტიფიკატორს.
                 </AlertDescription>
               </Alert>
 
@@ -191,23 +192,25 @@ export const CreatePasskeyDialog = ({ trigger, onSuccess, ...props }: CreatePass
                 <Alert variant="destructive">
                   {match(formError)
                     .with('ERROR_AUTHENTICATOR_PREVIOUSLY_REGISTERED', () => (
-                      <AlertDescription>ეს passkey უკვე დარეგისტრირებულია.</AlertDescription>
+                      <AlertDescription>
+                        ეს საიდუმლო გასაღები უკვე დარეგისტრირებულია.
+                      </AlertDescription>
                     ))
                     .with('TOO_MANY_PASSKEYS', () => (
                       <AlertDescription>
-                        თქვენ არ შეგიძლიათ გქონდეთ {MAXIMUM_PASSKEYS}-ზე მეტი passkeys.
+                        თქვენ არ შეგიძლიათ გქონდეთ {MAXIMUM_PASSKEYS}-ზე მეტი საიდუმლო გასაღები.
                       </AlertDescription>
                     ))
                     .with('InvalidStateError', () => (
                       <>
                         <AlertTitle className="text-sm">
-                          passkey შექმნა გაუქმდა ერთ-ერთი შემდეგი მიზეზის გამო:
+                          საიდუმლო გასაღების შექმნა გაუქმდა ერთ-ერთი შემდეგი მიზეზის გამო:
                         </AlertTitle>
                         <AlertDescription>
                           <ul className="mt-1 list-inside list-disc">
                             <li>გაუქმდა მომხმარებლის მიერ</li>
-                            <li>Passkey უკვე არსებობს მითითებული ავთენტიფიკატორისთვის</li>
-                            <li>Exceeded timeout</li>
+                            <li>საიდუმლო გასაღები უკვე არსებობს მითითებული ავთენტიფიკატორისთვის</li>
+                            <li>დროის ლიმიტის გადაჭარბება</li>
                           </ul>
                         </AlertDescription>
                       </>

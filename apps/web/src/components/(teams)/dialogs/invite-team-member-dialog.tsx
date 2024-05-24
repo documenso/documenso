@@ -145,7 +145,7 @@ export const InviteTeamMembersDialog = ({
 
       toast({
         title: 'მოწვევები გაგზავნილია',
-        description: 'გუნდის მოწვევები წარმატებით გაიგზავნა.',
+        description: 'გუნდის მოწვევები წარმატებით გაიგზავნა!',
         duration: 5000,
       });
 
@@ -154,7 +154,7 @@ export const InviteTeamMembersDialog = ({
       toast({
         title: 'დაფიქსირდა ხარვეზი',
         variant: 'destructive',
-        description: 'გუნდის წევრების მოწვევისას დაფიქსირდა ხარვეზი. გთხოვთ თავუდან სცადოთ.',
+        description: 'გუნდის წევრების მოწვევისას დაფიქსირდა ხარვეზი. გთხოვთ თავიდან სცადოთ.',
       });
     }
   };
@@ -283,7 +283,7 @@ export const InviteTeamMembersDialog = ({
                           name={`invitations.${index}.email`}
                           render={({ field }) => (
                             <FormItem className="w-full">
-                              {index === 0 && <FormLabel required>ელ. ფოსტა</FormLabel>}
+                              {index === 0 && <FormLabel required>ელ.ფოსტა</FormLabel>}
                               <FormControl>
                                 <Input className="bg-background" {...field} />
                               </FormControl>
@@ -368,7 +368,7 @@ export const InviteTeamMembersDialog = ({
                 >
                   <Upload className="h-5 w-5" />
 
-                  <p className="mt-1 text-sm">ატვირთისთვის დააკლიკეთ</p>
+                  <p className="mt-1 text-sm">ატვირთისთვის დააჭირეთ</p>
 
                   <input
                     onChange={onFileInputChange}

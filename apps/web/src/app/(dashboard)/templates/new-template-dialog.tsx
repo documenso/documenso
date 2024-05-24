@@ -73,7 +73,7 @@ export const NewTemplateDialog = ({ teamId, templateRootPath }: NewTemplateDialo
     } catch {
       toast({
         title: 'დაფიქსირდა ხარვეზი',
-        description: 'გთხოვთ სცადეთ თავიდან.',
+        description: 'გთხოვთ სცადოთ თავიდან.',
         variant: 'destructive',
       });
 

@@ -38,8 +38,8 @@ export const TeamTransferStatus = ({
       onSuccess: () => {
         if (!isExpired) {
           toast({
-            title: 'Success',
-            description: 'The team transfer invitation has been successfully deleted.',
+            title: '',
+            description: 'გუნდის სატრანსფერო მოწვევა წარმატებით წაიშალა!',
             duration: 5000,
           });
         }
@@ -48,10 +48,10 @@ export const TeamTransferStatus = ({
       },
       onError: () => {
         toast({
-          title: 'An unknown error occurred',
+          title: 'დაფიქსირდა ხარვეზი',
           variant: 'destructive',
           description:
-            'We encountered an unknown error while attempting to remove this transfer. Please try again or contact support.',
+            'გუნდის გადაცემის გაუქმებისას დაფიქსირდა ხარვეზი. გთხოვთ თავიდან სცადოთ ან დაგვიკავშირდეთ.',
         });
       },
     });
@@ -69,27 +69,29 @@ export const TeamTransferStatus = ({
           >
             <div>
               <AlertTitle>
-                {isExpired ? 'Team transfer request expired' : 'Team transfer in progress'}
+                {isExpired
+                  ? 'გუნდის გადაცემის მოთხოვნას ვადა გაუვიდა'
+                  : 'გუნდის გადაცემა პროცესშია'}
               </AlertTitle>
 
               <AlertDescription>
                 {isExpired ? (
                   <p className="text-sm">
-                    The team transfer request to <strong>{transferVerification.name}</strong> has
-                    expired.
+                    <strong>{transferVerification.name}</strong>-ზე გუნდის გადაცემის მოთხოვნას ვადა
+                    გაუვიდა.
+                    {/* The team transfer request to <strong>{transferVerification.name}</strong> has expired. */}
                   </p>
                 ) : (
                   <section className="text-sm">
                     <p>
-                      A request to transfer the ownership of this team has been sent to{' '}
+                      ამ გუნდის მფლობელობის გადაცემის მოთხოვნა გაეგზავნა{' '}
                       <strong>
                         {transferVerification.name} ({transferVerification.email})
                       </strong>
+                      -ს
                     </p>
 
-                    <p>
-                      If they accept this request, the team will be transferred to their account.
-                    </p>
+                    <p>თუ ისინი დაეთანხმებიან ამ მოთხოვნას, გუნდი გადავა მათ ანგარიშზე.</p>
                   </section>
                 )}
               </AlertDescription>
@@ -104,7 +106,8 @@ export const TeamTransferStatus = ({
                   'hover:bg-transparent hover:text-blue-800': !isExpired,
                 })}
               >
-                {isExpired ? 'Close' : 'Cancel'}
+                {isExpired ? 'დახურვა' : 'დახურვა'}
+                {/* {isExpired ? 'Close' : 'Cancel'} */}
               </Button>
             )}
           </Alert>

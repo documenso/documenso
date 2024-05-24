@@ -45,7 +45,7 @@ export const UploadDocument = ({ className, team }: UploadDocumentProps) => {
   const disabledMessage = useMemo(() => {
     if (remaining.documents === 0) {
       return team
-        ? 'დოკუმენტის ატვირთვა შეუძლებელია დავალიანების გამო'
+        ? 'დოკუმენტის ატვირთვა შეუძლებელია დავალიანების გამო.'
         : 'თქვენ მიაღწიეთ დოკუმენტების რაოდენობის ლიმიტს.';
     }
 
@@ -73,7 +73,7 @@ export const UploadDocument = ({ className, team }: UploadDocumentProps) => {
 
       toast({
         title: 'დოკუმენტი ატვირთულია',
-        description: 'თქვენი დოკუმენტი წარმატებით აიტვირთა.',
+        description: 'თქვენი დოკუმენტი წარმატებით აიტვირთა!',
         duration: 5000,
       });
 
@@ -91,8 +91,8 @@ export const UploadDocument = ({ className, team }: UploadDocumentProps) => {
 
       if (error.code === 'INVALID_DOCUMENT_FILE') {
         toast({
-          title: 'Invalid file',
-          description: 'You cannot upload encrypted PDFs',
+          title: 'არასწორი ფაილი',
+          description: 'თქვენ არ შეგიძლიათ ატვირთოთ დაშიფრული PDF ფაილები',
           variant: 'destructive',
         });
       } else if (err instanceof TRPCClientError) {
@@ -137,7 +137,7 @@ export const UploadDocument = ({ className, team }: UploadDocumentProps) => {
           remaining.documents > 0 &&
           Number.isFinite(remaining.documents) && (
             <p className="text-muted-foreground/60 text-xs">
-              {remaining.documents} of {quota.documents} documents remaining this month.
+              ამ თვეში დარჩენილია {quota.documents}-იდან {remaining.documents} დოკუმენტი.
             </p>
           )}
       </div>

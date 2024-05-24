@@ -83,7 +83,7 @@ export const CreateTeamDialog = ({ trigger, ...props }: CreateTeamDialogProps) =
 
       toast({
         title: 'გუნდი შექმნილია',
-        description: 'თქვენი გუნდი წარმატებით შეიქმნა!.',
+        description: 'თქვენი გუნდი წარმატებით შეიქმნა!',
         duration: 5000,
       });
     } catch (err) {
@@ -191,7 +191,7 @@ export const CreateTeamDialog = ({ trigger, ...props }: CreateTeamDialogProps) =
                       <span className="text-foreground/50 text-xs font-normal">
                         {field.value
                           ? `${WEBAPP_BASE_URL}/t/${field.value}`
-                          : 'A unique URL to identify your team'}
+                          : 'უნიკალური URL თქვენი გუნდის იდენტიფიცირებისთვის'}
                       </span>
                     )}
 

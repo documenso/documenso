@@ -66,7 +66,7 @@ export default function WebhookPage() {
                     </h5>
 
                     <Badge variant={webhook.enabled ? 'neutral' : 'warning'} size="small">
-                      {webhook.enabled ? 'Enabled' : 'Disabled'}
+                      {webhook.enabled ? 'გააქტიურებული' : 'გამორთული'}
                     </Badge>
                   </div>
 

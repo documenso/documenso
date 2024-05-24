@@ -18,7 +18,6 @@ import { ColorPicker } from '@documenso/ui/primitives/color-picker';
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -93,10 +92,10 @@ export function BannerForm({ banner }: BannerFormProps) {
 
   return (
     <div>
-      <h2 className="font-semibold">Site Banner</h2>
+      <h2 className="font-semibold">ბანერი</h2>
       <p className="text-muted-foreground mt-2 text-sm">
-        The site banner is a message that is shown at the top of the site. It can be used to display
-        important information to your users.
+        საიტის ბანერი არის შეტყობინება, რომელიც ნაჩვენებია ვებგვერდის ზედა ნაწილში. ის შეიძლება
+        გამოყენებულ იქნას თქვენი მომხმარებლებისთვის მნიშვნელოვანი ინფორმაციის საჩვენებლად.
       </p>
 
       <Form {...form}>
@@ -110,7 +109,7 @@ export function BannerForm({ banner }: BannerFormProps) {
               name="enabled"
               render={({ field }) => (
                 <FormItem className="flex-1">
-                  <FormLabel>Enabled</FormLabel>
+                  <FormLabel>გააქტიურებულია</FormLabel>
 
                   <FormControl>
                     <div>
@@ -176,9 +175,9 @@ export function BannerForm({ banner }: BannerFormProps) {
                     <Textarea className="h-32 resize-none" {...field} />
                   </FormControl>
 
-                  <FormDescription>
+                  {/* <FormDescription>
                     The content to show in the banner, HTML is allowed
-                  </FormDescription>
+                  </FormDescription> */}
 
                   <FormMessage />
                 </FormItem>

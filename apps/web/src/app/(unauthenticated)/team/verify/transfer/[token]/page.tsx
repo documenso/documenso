@@ -30,7 +30,7 @@ export default async function VerifyTeamTransferPage({
           <h1 className="text-4xl font-semibold">არასწორი ბმული</h1>
 
           <p className="text-muted-foreground mb-4 mt-2 text-sm">
-            ეს ბმული არასწორია ან ვადა გაუვიდა. გთხოვთ, დაუკავშირდეთ თქვენს გუნდს ტრანსფერის
+            ეს ბმული არასწორია ან ვადა გაუვიდა. გთხოვთ დაუკავშირდეთ თქვენს გუნდს ტრანსფერის
             მოთხოვნის ხელახლა გასაგზავნად.
           </p>
 

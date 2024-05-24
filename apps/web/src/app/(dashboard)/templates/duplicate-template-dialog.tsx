@@ -36,7 +36,7 @@ export const DuplicateTemplateDialog = ({
 
         toast({
           title: 'შაბლონის დუბლირებულია',
-          description: 'თქვენი შაბლონი წარმატებით იქნა დუბლირებული.',
+          description: 'თქვენი შაბლონი წარმატებით იქნა დუბლირებული!',
           duration: 5000,
         });
 
@@ -46,7 +46,7 @@ export const DuplicateTemplateDialog = ({
         toast({
           title: 'დაფიქსირდა ხარვეზი',
           description:
-            'შაბლონის დუბლირებისას დაფიქსირდა ხარვეზი. გთხოვთ თავიდან სცადოთ ან დაგვიკავშირდეთ',
+            'შაბლონის დუბლირებისას დაფიქსირდა ხარვეზი. გთხოვთ თავიდან სცადოთ ან დაგვიკავშირდეთ.',
           variant: 'destructive',
         });
       },
@@ -58,7 +58,8 @@ export const DuplicateTemplateDialog = ({
         <DialogHeader>
           <DialogTitle>გნებავთ ამ შაბლონის დუბლირება?</DialogTitle>
 
-          <DialogDescription className="pt-2">თქვენი შაბლონი დუბლირებული იქნება.</DialogDescription>
+          <DialogDescription className="pt-2">{''}</DialogDescription>
+          {/* <DialogDescription className="pt-2">თქვენი შაბლონი დუბლირებული იქნება.</DialogDescription> */}
         </DialogHeader>
 
         <DialogFooter>

@@ -70,7 +70,7 @@ export const DocumentLogsDataTable = ({ documentId }: DocumentLogsDataTableProps
     <DataTable
       columns={[
         {
-          header: 'დრო',
+          header: 'შექმნილია',
           accessorKey: 'createdAt',
           cell: ({ row }) => <LocaleDate format={dateFormat} date={row.original.createdAt} />,
         },
@@ -97,7 +97,8 @@ export const DocumentLogsDataTable = ({ documentId }: DocumentLogsDataTableProps
             ),
         },
         {
-          header: 'Action',
+          header: 'პარამეტრები',
+          // header: 'Actions',
           accessorKey: 'type',
           cell: ({ row }) => (
             <span>
@@ -106,11 +107,11 @@ export const DocumentLogsDataTable = ({ documentId }: DocumentLogsDataTableProps
           ),
         },
         {
-          header: 'IP Address',
+          header: 'IP მისამართი',
           accessorKey: 'ipAddress',
         },
         {
-          header: 'Browser',
+          header: 'ბრაუზერი',
           cell: ({ row }) => {
             if (!row.original.userAgent) {
               return 'N/A';

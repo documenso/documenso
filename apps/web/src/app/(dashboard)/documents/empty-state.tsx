@@ -20,7 +20,7 @@ export const EmptyDocumentState = ({ status }: EmptyDocumentProps) => {
     .with(ExtendedDocumentStatus.DRAFT, () => ({
       title: 'აქტიური დრაფტები არ არის',
       message:
-        'There are no active drafts at the current moment. You can upload a document to start drafting.',
+        'ამ დროისთვის აქტიური დრაფტები არ არის. შედგენის დასაწყებად შეგიძლიათ ატვირთოთ დოკუმენტი.',
       icon: CheckCircle2,
     }))
     .with(ExtendedDocumentStatus.ALL, () => ({
@@ -33,7 +33,7 @@ export const EmptyDocumentState = ({ status }: EmptyDocumentProps) => {
       title: 'ხელმოსაწერი არაფერია',
       // title: 'nothing to do',
       message:
-        'ყველა დოკუმენტი დამუშავებულია. ნებისმიერი ახალი დოკუმენტი, რომელიც გაიგზავნება ან მიიღება, აქ გამოჩნდება.',
+        'ყველა დოკუმენტი დამუშავებულია. ნებისმიერი ახალი დოკუმენტი, რომელიც მიიღება, აქ გამოჩნდება.',
       icon: CheckCircle2,
     }));
 

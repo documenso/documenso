@@ -14,7 +14,7 @@ export default async function AdminBannerPage() {
 
   return (
     <div>
-      <SettingsHeader title="Site Settings" subtitle="Manage your site settings here" />
+      <SettingsHeader title="საიტის პარამეტრები" subtitle="მართეთ თქვენი საიტის პარამეტრები აქ" />
 
       <div className="mt-8">
         <BannerForm banner={banner} />

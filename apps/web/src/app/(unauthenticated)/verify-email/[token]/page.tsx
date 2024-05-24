@@ -20,9 +20,10 @@ export default async function VerifyEmailPage({ params: { token } }: PageProps) 
             <XOctagon />
           </div>
 
-          <h2 className="text-4xl font-semibold">No token provided</h2>
+          <h2 className="text-4xl font-semibold">ტოკენი არ არის მოწოდებული</h2>
           <p className="text-muted-foreground mt-2 text-base">
-            It seems that there is no token provided. Please check your email and try again.
+            როგორც ჩანს, არანაირი ტოკენი არ არის მოწოდებული. გთხოვთ შეამოწმოთ თქვენი ელ.ფოსტა და
+            სცადოთ ხელახლა.
           </p>
         </div>
       </div>
@@ -43,8 +44,8 @@ export default async function VerifyEmailPage({ params: { token } }: PageProps) 
             <h2 className="text-2xl font-bold md:text-4xl">დაფიქსირდა ხარვეზი</h2>
 
             <p className="text-muted-foreground mt-4">
-              We were unable to verify your email. If your email is not verified already, please try
-              again.
+              ჩვენ ვერ შევძელით თქვენი ელ.ფოსტის დადასტურება. თუ თქვენი ელ.ფოსტა უკვე არ არის
+              დადასტურებული, გთხოვთ, სცადოთ ხელახლა.
             </p>
 
             <Button className="mt-4" asChild>
@@ -68,8 +69,8 @@ export default async function VerifyEmailPage({ params: { token } }: PageProps) 
             <h2 className="text-2xl font-bold md:text-4xl">ტოკენს ვადა გაუვიდა!</h2>
 
             <p className="text-muted-foreground mt-4">
-              როგორც ჩანს, თქვენ მიერ მოწოდებულ ტოკენს ვადა გაუვიდა. ჩვენ ახლახან გამოგიგზავნეთ
-              ახალი ტოკენი, გთხოვთ შეამოწმოთ თქვენი ელ. ფოსტა და სცადოთ ხელახლა.
+              როგორც ჩანს, თქვენ მიერ მოწოდებულ ტოკენს ვადა გაუვიდა. ჩვენ გამოგიგზავნეთ ახალი
+              ტოკენი, გთხოვთ შეამოწმოთ თქვენი ელ.ფოსტა და სცადოთ ხელახლა.
             </p>
 
             <Button className="mt-4" asChild>
@@ -89,10 +90,10 @@ export default async function VerifyEmailPage({ params: { token } }: PageProps) 
         </div>
 
         <div>
-          <h2 className="text-2xl font-bold md:text-4xl">ელ. ფოსტა დადასტურებულია!</h2>
+          <h2 className="text-2xl font-bold md:text-4xl">ელ.ფოსტა დადასტურებულია!</h2>
 
           <p className="text-muted-foreground mt-4">
-            თქვენი ელ. ფოსტა წარმატებით დადასტურდა! ახლა შეგიძლიათ გამოიყენოთ "ჩიქოვანები"-ს ყველა
+            თქვენი ელ.ფოსტა წარმატებით დადასტურდა! ახლა შეგიძლიათ გამოიყენოთ SignSream-ის ყველა
             ფუნქცია.
           </p>
 

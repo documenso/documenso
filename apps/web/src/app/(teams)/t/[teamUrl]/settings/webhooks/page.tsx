@@ -27,8 +27,8 @@ export default function WebhookPage() {
   return (
     <div>
       <SettingsHeader
-        title="Webhooks"
-        subtitle="On this page, you can create new Webhooks and manage the existing ones."
+        title="ვებჰუჯები"
+        subtitle="ამ გვერდზე შეგიძლიათ შექმნათ ახალი ვებჰუკები და მართოთ არსებული."
       >
         <CreateWebhookDialog />
       </SettingsHeader>
@@ -43,7 +43,7 @@ export default function WebhookPage() {
         // TODO: Perhaps add some illustrations here to make the page more engaging
         <div className="mb-4">
           <p className="text-muted-foreground mt-2 text-sm italic">
-            You have no webhooks yet. Your webhooks will be shown here once you create them.
+            თქვენ ჯერ არ გაქვთ ვებჰუკები. თქვენი ვებჰუქები შექმნისთანავე აქ გამოჩნდება.
           </p>
         </div>
       )}
@@ -71,7 +71,7 @@ export default function WebhookPage() {
                     </h5>
 
                     <Badge variant={webhook.enabled ? 'neutral' : 'warning'} size="small">
-                      {webhook.enabled ? 'Enabled' : 'Disabled'}
+                      {webhook.enabled ? 'გააქტიურებული' : 'გამორთული'}
                     </Badge>
                   </div>
 
@@ -83,8 +83,7 @@ export default function WebhookPage() {
                   </p>
 
                   <p className="text-muted-foreground mt-2 text-xs">
-                    Created on{' '}
-                    <LocaleDate date={webhook.createdAt} format={DateTime.DATETIME_FULL} />
+                    შეიქმნა <LocaleDate date={webhook.createdAt} format={DateTime.DATETIME_FULL} />
                   </p>
                 </div>
 

@@ -102,8 +102,8 @@ export const TransferTeamDialog = ({
       router.refresh();
 
       toast({
-        title: 'Success',
-        description: 'An email requesting the transfer of this team has been sent.',
+        title: '',
+        description: 'ამ გუნდის გადაცემის მოთხოვნით მეილი წარმატებით გაიგზავნა!',
         duration: 5000,
       });
 
@@ -113,8 +113,7 @@ export const TransferTeamDialog = ({
         title: 'დაფიქსირდა ხარვეზი',
         variant: 'destructive',
         duration: 10000,
-        description:
-          'We encountered an unknown error while attempting to request a transfer of this team. Please try again later.',
+        description: 'ამ გუნდის გადაცემის მოთხოვნისას დაფიქსირდა ხარვეზი. გთხოვთ თავიდან სცადოთ.',
       });
     }
   };
@@ -140,7 +139,7 @@ export const TransferTeamDialog = ({
       <DialogTrigger asChild>
         {trigger ?? (
           <Button variant="outline" className="bg-background">
-            Transfer team
+            გუნდის გადაცემა
           </Button>
         )}
       </DialogTrigger>
@@ -148,10 +147,11 @@ export const TransferTeamDialog = ({
       {teamMembers && teamMembers.length > 0 ? (
         <DialogContent position="center">
           <DialogHeader>
-            <DialogTitle>Transfer team</DialogTitle>
+            <DialogTitle>გუნდის გადაცემა</DialogTitle>
 
             <DialogDescription className="mt-4">
-              Transfer ownership of this team to a selected team member.
+              {/* Transfer ownership of this team to a selected team member. */}
+              გადაეცით ამ გუნდის მფლობელობა მონიშნულ გუნდის წევრს.
             </DialogDescription>
           </DialogHeader>
 
@@ -253,8 +253,8 @@ export const TransferTeamDialog = ({
                         </li>
                       )}
                       <li>
-                        The selected team member will receive an email which they must accept before
-                        the team is transferred
+                        გუნდის მონიშნული წევრი მიიღებს მეილს, რომელსაც უნდა დაეთანხმოს გუნდის
+                        გადაცემისთვის
                       </li>
                     </ul>
                   </AlertDescription>
@@ -266,7 +266,7 @@ export const TransferTeamDialog = ({
                   </Button>
 
                   <Button type="submit" variant="destructive" loading={form.formState.isSubmitting}>
-                    Request transfer
+                    გადაცემის მოთხოვნა
                   </Button>
                 </DialogFooter>
               </fieldset>
@@ -283,8 +283,8 @@ export const TransferTeamDialog = ({
           ) : (
             <p className="text-center text-sm">
               {loadingTeamMembersError
-                ? 'An error occurred while loading team members. Please try again later.'
-                : 'You must have at least one other team member to transfer ownership.'}
+                ? 'გუნდის წევრების ჩატვირთვისას დაფიქსირდა ხარვეზი. გთხოვთ თავიდან სცადოთ.'
+                : 'თქვენ უნდა გყავდეთ გუნდის მინიმუმ ერთი სხვა წევრი გუნდის მფლობელობის გადასაცემად.'}
             </p>
           )}
         </DialogContent>

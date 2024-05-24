@@ -48,7 +48,7 @@ export default async function TeamsSettingBillingPage({ params }: TeamsSettingsB
 
   return (
     <div>
-      <SettingsHeader title="Billing" subtitle="თქვენი პაკეტი ამჟამად აქტიურია." />
+      <SettingsHeader title="გადახდები" subtitle="თქვენი პაკეტი ამჟამად აქტიურია." />
 
       <Card gradient className="shadow-sm">
         <CardContent className="flex flex-row items-center justify-between p-4">
@@ -67,7 +67,7 @@ export default async function TeamsSettingBillingPage({ params }: TeamsSettingsB
               title={
                 canManageBilling
                   ? 'მართეთ თქვენი პაკეტი.'
-                  : 'You must be an admin of this team to manage billing.'
+                  : 'თქვენ უნდა იყოთ ამ გუნდის ადმინი გადახდების სამართავად.'
               }
             >
               <TeamBillingPortalButton teamId={team.id} />

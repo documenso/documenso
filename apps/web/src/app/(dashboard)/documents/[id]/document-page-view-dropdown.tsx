@@ -4,16 +4,7 @@ import { useState } from 'react';
 
 import Link from 'next/link';
 
-import {
-  Copy,
-  Download,
-  Edit,
-  Loader,
-  MoreHorizontal,
-  ScrollTextIcon,
-  Share,
-  Trash2,
-} from 'lucide-react';
+import { Copy, Download, Edit, MoreHorizontal, ScrollTextIcon, Trash2 } from 'lucide-react';
 import { useSession } from 'next-auth/react';
 
 import { downloadPDF } from '@documenso/lib/client-only/download-pdf';
@@ -149,10 +140,11 @@ export const DocumentPageViewDropdown = ({ document, team }: DocumentPageViewDro
           token={isOwner ? undefined : recipient?.token}
           trigger={({ loading, disabled }) => (
             <DropdownMenuItem disabled={disabled || isDraft} onSelect={(e) => e.preventDefault()}>
-              <div className="flex items-center">
+              {/* <div className="flex items-center">
                 {loading ? <Loader className="mr-2 h-4 w-4" /> : <Share className="mr-2 h-4 w-4" />}
                 გააზიარეთ ხელმოწერის ბარათი
-              </div>
+              </div> */}
+              {/* მე დავაკომენტარე */}
             </DropdownMenuItem>
           )}
         />

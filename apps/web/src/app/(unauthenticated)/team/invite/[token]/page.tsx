@@ -34,7 +34,7 @@ export default async function AcceptInvitationPage({
           <h1 className="text-4xl font-semibold">არასწორი ტოკენი</h1>
 
           <p className="text-muted-foreground mb-4 mt-2 text-sm">
-            ეს ტოკენი არასწორია ან ვადა გაუვიდა. გთხოვთ, დაუკავშირდეთ თქვენს გუნდს ახალი
+            ეს ტოკენი არასწორია ან ვადა გაუვიდა. გთხოვთ დაუკავშირდეთ თქვენს გუნდს ახალი
             მოწვევისთვის.
           </p>
 

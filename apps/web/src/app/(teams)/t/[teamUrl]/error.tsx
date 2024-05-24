@@ -15,12 +15,12 @@ type ErrorProps = {
 export default function ErrorPage({ error }: ErrorProps) {
   const router = useRouter();
 
-  let errorMessage = 'Unknown error';
+  let errorMessage = 'დაფიქსირდა ხარვეზი';
   let errorDetails = '';
 
   if (error.message === AppErrorCode.UNAUTHORIZED) {
-    errorMessage = 'Unauthorized';
-    errorDetails = 'You are not authorized to view this page.';
+    errorMessage = 'არაავტორიზებული';
+    errorDetails = 'თქვენ არ გაქვთ ამ გვერდის ხილვის უფლება';
   }
 
   return (

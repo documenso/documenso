@@ -60,7 +60,8 @@ export const TriggerMultiSelectCombobox = ({
           aria-expanded={isOpen}
           className="w-[200px] justify-between"
         >
-          {selectedValues.length > 0 ? selectedValues.length + ' selected...' : 'Select values...'}
+          {selectedValues.length > 0 ? selectedValues.length + ' არჩეულია...' : 'აირჩიეთ...'}
+          {/* {selectedValues.length > 0 ? selectedValues.length + ' selected...' : 'Select values...'} */}
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
@@ -72,7 +73,7 @@ export const TriggerMultiSelectCombobox = ({
               15,
             )}
           />
-          <CommandEmpty>No value found.</CommandEmpty>
+          <CommandEmpty>მნიშვნელობა ვერ მოიძებნა.</CommandEmpty>
           <CommandGroup>
             {allEvents.map((value: string, i: number) => (
               <CommandItem key={i} onSelect={() => handleSelect(value)}>

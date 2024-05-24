@@ -56,7 +56,8 @@ export const BillingPortalButton = ({ buttonProps }: BillingPortalButtonProps) =
       onClick={async () => handleFetchPortalUrl()}
       loading={isFetchingPortalUrl}
     >
-      Manage Subscription
+      {/* Manage Subscription */}
+      პაკეტების მართვა
     </Button>
   );
 };

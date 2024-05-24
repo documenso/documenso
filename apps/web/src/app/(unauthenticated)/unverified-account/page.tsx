@@ -10,10 +10,10 @@ export default function UnverifiedAccount() {
           <Mails className="text-primary h-10 w-10" strokeWidth={2} />
         </div>
         <div className="">
-          <h2 className="text-2xl font-bold md:text-4xl">ელ. ფოსტის დაადასტურება</h2>
+          <h2 className="text-2xl font-bold md:text-4xl">ელ.ფოსტის დაადასტურება</h2>
 
           <p className="text-muted-foreground mt-4">
-            თქვენს ანგარიშზე წვდომის მისაღებად, გთხოვთ გადახვიდეთ თქვენ ელ. ფოსტაზე გამოგზავნილ
+            თქვენს ანგარიშზე წვდომის მისაღებად, გთხოვთ გადახვიდეთ თქვენს ელ.ფოსტაზე გამოგზავნილ
             დადასტურების ბმულზე.
           </p>
 

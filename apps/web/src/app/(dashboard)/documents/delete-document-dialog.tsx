@@ -92,7 +92,7 @@ export const DeleteDocumentDialog = ({
 
           <DialogDescription>
             თქვენ ახლა {canManageDocument ? 'წაშლით' : 'დაფარავთ'}{' '}
-            <strong>"{documentTitle}"</strong>
+            <strong>"{documentTitle}"</strong>-ს
           </DialogDescription>
         </DialogHeader>
 
@@ -101,14 +101,14 @@ export const DeleteDocumentDialog = ({
             {match(status)
               .with(DocumentStatus.DRAFT, () => (
                 <AlertDescription>
-                  გთხოვთ, გაითვალისწინოთ, რომ ეს ქმედება <strong>შეუქცევადია</strong>. დადასტურების
+                  გთხოვთ გაითვალისწინოთ, რომ ეს ქმედება <strong>შეუქცევადია</strong>. დადასტურების
                   შემდეგ, ეს დოკუმენტი სამუდამოდ წაიშლება.
                 </AlertDescription>
               ))
               .with(DocumentStatus.PENDING, () => (
                 <AlertDescription>
                   <p>
-                    გთხოვთ, გაითვალისწინოთ, რომ ეს ქმედება <strong>შეუქცევადია</strong>.
+                    გთხოვთ გაითვალისწინოთ, რომ ეს ქმედება <strong>შეუქცევადია</strong>.
                   </p>
 
                   <p className="mt-1">დადასტურების შემდეგ მოხდება შემდეგი:</p>

@@ -99,14 +99,15 @@ export default async function SigningCertificate({ searchParams }: SigningCertif
     let authLevel = match(extractedAuthMethods.derivedRecipientActionAuth)
       .with('ACCOUNT', () => 'ანგარიშის ხელახალი ავთენტიფიკაცია')
       .with('TWO_FACTOR_AUTH', () => 'ორფაქტორიანი (2FA) ხელახალი ავთენტიფიკაცია')
-      .with('PASSKEY', () => 'Passkey ხელახალი ავთენტიფიკაცია')
+      .with('PASSKEY', () => 'საიდუმლო გასაღებით ხელახალი ავთენტიფიკაცია')
       .with('EXPLICIT_NONE', () => 'ელ.ფოსტა')
       .with(null, () => null)
       .exhaustive();
 
     if (!authLevel) {
       authLevel = match(extractedAuthMethods.derivedRecipientAccessAuth)
-        .with('ACCOUNT', () => 'Account Authentication')
+        .with('ACCOUNT', () => 'ანგარიშის ავთენტიფიკაცია')
+        // .with('ACCOUNT', () => 'Account Authentication')
         .with(null, () => 'ელ.ფოსტა')
         .exhaustive();
     }

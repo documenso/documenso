@@ -92,7 +92,7 @@ export const ResendDocumentActionItem = ({
 
       toast({
         title: 'დოკუმენტი ხელახლაა გაგზავნილი',
-        description: 'თქვენი დოკუმენტი ხელახლა წარმატებით გაიგზავნა!.',
+        description: 'თქვენი დოკუმენტი ხელახლა წარმატებით გაიგზავნა!',
         duration: 5000,
       });
 

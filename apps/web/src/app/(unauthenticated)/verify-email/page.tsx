@@ -18,13 +18,11 @@ export default function EmailVerificationWithoutTokenPage() {
         </div>
 
         <div>
-          <h2 className="text-2xl font-bold md:text-4xl">
-            Uh oh! Looks like you're missing a token
-          </h2>
+          <h2 className="text-2xl font-bold md:text-4xl">როგორც ჩანს, ტოკენი გამოგრჩათ</h2>
 
           <p className="text-muted-foreground mt-4">
-            It seems that there is no token provided, if you are trying to verify your email please
-            follow the link in your email.
+            ტოკენი არ არის მოწოდებული, თუ ცდილობთ თქვენი ელ.ფოსტის დადასტურებას, გთხოვთ, მიჰყევით
+            თქვენს ელ.ფოსტაზე გამოგზანილ ბმულს.
           </p>
 
           <Button className="mt-4" asChild>

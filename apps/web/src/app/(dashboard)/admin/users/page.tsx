@@ -26,7 +26,7 @@ export default async function AdminManageUsers({ searchParams = {} }: AdminManag
 
   return (
     <div>
-      <h2 className="text-4xl font-semibold">Manage users</h2>
+      <h2 className="text-4xl font-semibold">მომხმარებლების მართვა</h2>
       <UsersDataTable
         users={users}
         individualPriceIds={individualPriceIds}

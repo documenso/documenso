@@ -151,7 +151,8 @@ export function UseTemplateDialog({
       };
 
       if (error.code === 'DOCUMENT_SEND_FAILED') {
-        toastPayload.description = 'The document was created but could not be sent to recipients.';
+        toastPayload.description =
+          'დოკუმენტი შეიქმნა, მაგრამ მიმღებებისთვის გაგზავნა ვერ მოხერხდა.';
       }
 
       toast(toastPayload);
@@ -182,7 +183,7 @@ export function UseTemplateDialog({
           <DialogTitle>შექმენით დოკუმენტი შაბლონიდან</DialogTitle>
           <DialogDescription>
             {recipients.length === 0
-              ? 'A draft document will be created'
+              ? 'შეიქმნება დრაფტი დოკუმენტი'
               : 'დაამატეთ მიმღებები დოკუმენტის შესაქმნელად'}
           </DialogDescription>
         </DialogHeader>

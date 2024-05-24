@@ -43,7 +43,8 @@ type T2FAAuthFormSchema = z.infer<typeof Z2FAAuthFormSchema>;
 
 export const DocumentActionAuth2FA = ({
   actionTarget = 'FIELD',
-  actionVerb = 'sign',
+  actionVerb = 'ხელი მოაწეროთ',
+  // actionVerb = 'sign',
   onReauthFormSubmit,
   open,
   onOpenChange,
@@ -102,7 +103,7 @@ export const DocumentActionAuth2FA = ({
             <p>
               {recipient.role === RecipientRole.VIEWER && actionTarget === 'DOCUMENT'
                 ? 'თქვენ უნდა დააყენოთ ორფაქტორიანი ავთენტიფიკაცია (2FA), ეს დოკუმენტი ნანახად, რომ მოინიშნოს.'
-                : `You need to setup 2FA to ${actionVerb.toLowerCase()} this ${actionTarget.toLowerCase()}.`}
+                : `თქვენ უნდა გაააქტიუროთ 2FA, რათა ${actionVerb.toLowerCase()} ამ ${actionTarget.toLowerCase()}.`}
             </p>
 
             {user?.identityProvider === 'DOCUMENSO' && (

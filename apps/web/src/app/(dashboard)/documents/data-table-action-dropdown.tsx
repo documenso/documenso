@@ -10,10 +10,8 @@ import {
   Download,
   Edit,
   EyeIcon,
-  Loader,
   MoreHorizontal,
   Pencil,
-  Share,
   Trash2,
 } from 'lucide-react';
 import { useSession } from 'next-auth/react';
@@ -183,10 +181,11 @@ export const DataTableActionDropdown = ({ row, team }: DataTableActionDropdownPr
           token={isOwner ? undefined : recipient?.token}
           trigger={({ loading, disabled }) => (
             <DropdownMenuItem disabled={disabled || isDraft} onSelect={(e) => e.preventDefault()}>
-              <div className="flex items-center">
+              {/* <div className="flex items-center">
                 {loading ? <Loader className="mr-2 h-4 w-4" /> : <Share className="mr-2 h-4 w-4" />}
                 გააზიარეთ ხელმოწერის ბარათი
-              </div>
+              </div> */}
+              {/* მე დავაკომენტარე */}
             </DropdownMenuItem>
           )}
         />

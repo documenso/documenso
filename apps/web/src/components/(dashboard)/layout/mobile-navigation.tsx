@@ -87,7 +87,7 @@ export const MobileNavigation = ({ isMenuOpen, onMenuOpenChange }: MobileNavigat
           </div>
 
           <p className="text-muted-foreground text-sm">
-            © {new Date().getFullYear()} CHIKOVANI, Inc. <br /> ყველა უფლება დაცულია.
+            © {new Date().getFullYear()} Signstream, Inc. <br /> ყველა უფლება დაცულია.
           </p>
         </div>
       </SheetContent>

@@ -48,7 +48,7 @@ export const DeleteTeamDialog = ({ trigger, teamId, teamName }: DeleteTeamDialog
 
   const ZDeleteTeamFormSchema = z.object({
     teamName: z.literal(deleteMessage, {
-      errorMap: () => ({ message: `You must enter '${deleteMessage}' to proceed` }),
+      errorMap: () => ({ message: `გასაგრძელებლად უნდა ჩაწეროთ „${deleteMessage}“.` }),
     }),
   });
 
@@ -67,7 +67,7 @@ export const DeleteTeamDialog = ({ trigger, teamId, teamName }: DeleteTeamDialog
 
       toast({
         title: 'გუნდი წაშლილია',
-        description: 'თქვენი გუნდი წარმატებით წაიშალა.',
+        description: 'თქვენი გუნდი წარმატებით წაიშალა!',
         duration: 5000,
       });
 
@@ -89,8 +89,7 @@ export const DeleteTeamDialog = ({ trigger, teamId, teamName }: DeleteTeamDialog
           title: 'გუნდის წაშლა ვერ მოხერხდა',
           variant: 'destructive',
           duration: 15000,
-          description:
-            'Something went wrong while updating the team billing subscription, please contact support.',
+          description: 'გუნდის ბილინგის განახლებისას დაფიქსირდა ხარვეზი. გთხოვთ დაგვიკავშირდეთ.',
         };
       }
 

@@ -81,6 +81,8 @@ export const SigningForm = ({ document, recipient, fields, redirectUrl }: Signin
       authOptions,
     });
 
+    // !!!!!!!!
+    // ამას უნდა დავაკვირდეთ
     analytics.capture('App: Recipient has completed signing', {
       signerId: recipient.id,
       documentId: document.id,

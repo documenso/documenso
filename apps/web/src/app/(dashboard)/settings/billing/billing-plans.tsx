@@ -121,7 +121,7 @@ export const BillingPlans = ({ prices }: BillingPlansProps) => {
                   loading={isFetchingCheckoutSession}
                   onClick={() => void onSubscribeClick(price.id)}
                 >
-                  გამოიწერეთ
+                  გაიაქტიურეთ
                   {/* subscribe */}
                 </Button>
               </CardContent>

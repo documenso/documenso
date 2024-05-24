@@ -38,7 +38,7 @@ export type UpdateTeamEmailDialogProps = {
 } & Omit<DialogPrimitive.DialogProps, 'children'>;
 
 const ZUpdateTeamEmailFormSchema = z.object({
-  name: z.string().trim().min(1, { message: 'Please enter a valid name.' }),
+  name: z.string().trim().min(1, { message: 'გთხოვთ ჩაწერეთ სწორი სახელი.' }),
 });
 
 type TUpdateTeamEmailFormSchema = z.infer<typeof ZUpdateTeamEmailFormSchema>;
@@ -73,8 +73,8 @@ export const UpdateTeamEmailDialog = ({
       });
 
       toast({
-        title: 'ელ. ფოსტა განახლებულია',
-        description: 'გუნდის ელ. ფოსტა წარმატებით განახლდა.',
+        title: 'ელ.ფოსტა განახლებულია',
+        description: 'გუნდის ელ.ფოსტა წარმატებით განახლდა!',
         duration: 5000,
       });
 
@@ -86,7 +86,7 @@ export const UpdateTeamEmailDialog = ({
         title: 'დაფიქსირდა ხარვეზი',
         variant: 'destructive',
         description:
-          'გუნდის ელ. ფოსტის განახლებისას დაფიქსირდა ხარვეზი. გთხოვთ თავიდან სცადოთ ან დაგვიკავშირდეთ.',
+          'გუნდის ელ.ფოსტის განახლებისას დაფიქსირდა ხარვეზი. გთხოვთ თავიდან სცადოთ ან დაგვიკავშირდეთ.',
       });
     }
   };
@@ -106,17 +106,17 @@ export const UpdateTeamEmailDialog = ({
       <DialogTrigger onClick={(e) => e.stopPropagation()} asChild>
         {trigger ?? (
           <Button variant="outline" className="bg-background">
-            გუნდის ელ. ფოსტის განახლება
+            გუნდის ელ.ფოსტის განახლება
           </Button>
         )}
       </DialogTrigger>
 
       <DialogContent position="center">
         <DialogHeader>
-          <DialogTitle>განაახლეთ გუნდის ელ. ფოსტა</DialogTitle>
+          <DialogTitle>განაახლეთ გუნდის ელ.ფოსტა</DialogTitle>
 
           <DialogDescription className="mt-4">
-            ელ. ფოსტის შესაცვლელად თქვენ უნდა წაშალოთ ახლანდელი და დაამატოთ ახალი ელ. ფოსტის
+            ელ.ფოსტის შესაცვლელად თქვენ უნდა წაშალოთ ახლანდელი და დაამატოთ ახალი ელ.ფოსტის
             მისამართი.
           </DialogDescription>
         </DialogHeader>

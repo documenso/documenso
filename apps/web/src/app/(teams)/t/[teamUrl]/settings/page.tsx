@@ -52,10 +52,10 @@ export default async function TeamsSettingsPage({ params }: TeamsSettingsPagePro
       <section className="mt-6 space-y-6">
         {(team.teamEmail || team.emailVerification) && (
           <Alert className="p-6" variant="neutral">
-            <AlertTitle>გუნდის ელ. ფოსტა</AlertTitle>
+            <AlertTitle>გუნდის ელ.ფოსტა</AlertTitle>
 
             <AlertDescription className="mr-2">
-              შეგიძლიათ ნახოთ ამ ელ. ფოსტასთან დაკავშირებული დოკუმენტები და გამოიყენოთ ეს იდენტობა
+              შეგიძლიათ ნახოთ ამ ელ.ფოსტასთან დაკავშირებული დოკუმენტები და გამოიყენოთ ეს იდენტობა
               დოკუმენტების გაგზავნისას.
             </AlertDescription>
 
@@ -108,7 +108,7 @@ export default async function TeamsSettingsPage({ params }: TeamsSettingsPagePro
                     .with({ emailVerification: P.not(null) }, () => (
                       <>
                         <Clock className="mr-1.5 text-blue-600 dark:text-blue-300" />
-                        ველოდებით ელ. ფოსტის დადასტურებას
+                        ველოდებით ელ.ფოსტის დადასტურებას
                       </>
                     ))
                     .otherwise(() => null)}
@@ -134,7 +134,7 @@ export default async function TeamsSettingsPage({ params }: TeamsSettingsPagePro
                   {/* <li>Display this name and email when sending documents</li> */}
                   {/* <li>View documents associated with this email</li> */}
 
-                  <span>ნახეთ ამ ელფოსტასთან დაკავშირებული დოკუმენტები</span>
+                  <span>ნახეთ ამ ელ.ფოსტასთან დაკავშირებული დოკუმენტები</span>
                 </ul>
               </AlertDescription>
             </div>
@@ -151,10 +151,11 @@ export default async function TeamsSettingsPage({ params }: TeamsSettingsPagePro
                 variant="neutral"
               >
                 <div className="mb-4 sm:mb-0">
-                  <AlertTitle>Transfer team</AlertTitle>
+                  <AlertTitle>გუნდის გადაცემა</AlertTitle>
 
                   <AlertDescription className="mr-2">
-                    Transfer the ownership of the team to another team member.
+                    გუნდის მფლობელობის სხვა წევრზე გადაცემა
+                    {/* Transfer the ownership of the team to another team member. */}
                   </AlertDescription>
                 </div>
 

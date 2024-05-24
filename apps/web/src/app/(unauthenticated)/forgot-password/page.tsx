@@ -14,7 +14,7 @@ export default function ForgotPasswordPage() {
         <h1 className="text-3xl font-semibold">დაგავიწყდათ პაროლი?</h1>
 
         <p className="text-muted-foreground mt-2 text-sm">
-          არ ინერვიულოთ! შეიყვანეთ თქვენი ელფოსტა და ჩვენ გამოგიგზავნით სპეციალურ ბმულს თქვენი
+          არ ინერვიულოთ! შეიყვანეთ თქვენი ელ.ფოსტა და ჩვენ გამოგიგზავნით სპეციალურ ბმულს თქვენი
           პაროლის აღსადგენად.
         </p>
 

@@ -80,8 +80,8 @@ export default function DeleteTokenDialog({
       });
 
       toast({
-        title: 'ტოკენი წაიშალა',
-        description: 'ტოკენი წარმატებით წაიშალა!.',
+        title: 'ტოკენი წაშლილია',
+        description: 'ტოკენი წარმატებით წაიშალა!',
         duration: 5000,
       });
 

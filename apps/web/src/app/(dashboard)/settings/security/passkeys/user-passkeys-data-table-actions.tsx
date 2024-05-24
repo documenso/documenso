@@ -62,13 +62,14 @@ export const UserPasskeysDataTableActions = ({
       onSuccess: () => {
         toast({
           title: '',
-          description: 'Passkey განახლებულია',
+          description: 'საიდუმლო გასაღები განახლებულია',
         });
       },
       onError: () => {
         toast({
           title: 'დაფიქსირდა ხარვეზი',
-          description: 'ჩვენ ვერ ვახერხებთ ამ Passkey განახლებას. Გთხოვთ სცადოთ მოგვიანებით.',
+          description:
+            'ჩვენ ვერ ვახერხებთ ამ საიდუმლო გასაღების განახლებას. გთხოვთ სცადოთ თავიდან.',
           duration: 10000,
           variant: 'destructive',
         });
@@ -80,13 +81,13 @@ export const UserPasskeysDataTableActions = ({
       onSuccess: () => {
         toast({
           title: '',
-          description: 'Passkey წაიშალა',
+          description: 'საიდუმლო გასაღები წაიშალა',
         });
       },
       onError: () => {
         toast({
           title: 'დაფიქსირდა ხარვეზი',
-          description: 'Passkey წაშლა ვერ მოხერხდა. გთხოვთ თავიდან სცადოთ.',
+          description: 'საიდუმლო გასაღების წაშლა ვერ მოხერხდა. გთხოვთ თავიდან სცადოთ.',
           duration: 10000,
           variant: 'destructive',
         });
@@ -105,10 +106,10 @@ export const UserPasskeysDataTableActions = ({
 
         <DialogContent position="center">
           <DialogHeader>
-            <DialogTitle>განაახლეთ passkey</DialogTitle>
+            <DialogTitle>განაახლეთ საიდუმლო გასაღები</DialogTitle>
 
             <DialogDescription className="mt-4">
-              თქვენ ახლა ანახლებთ <strong>{passkeyName}</strong> passkey.
+              თქვენ ახლა ანახლებთ <strong>{passkeyName}</strong> საიდუმლო გასაღებს.
             </DialogDescription>
           </DialogHeader>
 
@@ -144,7 +145,7 @@ export const UserPasskeysDataTableActions = ({
                   </DialogClose>
 
                   <Button type="submit" loading={isUpdatingPasskey}>
-                    განალება
+                    განახლება
                   </Button>
                 </DialogFooter>
               </fieldset>
@@ -163,10 +164,10 @@ export const UserPasskeysDataTableActions = ({
 
         <DialogContent position="center">
           <DialogHeader>
-            <DialogTitle>passkey წაშლა</DialogTitle>
+            <DialogTitle>საიდუმლო გასაღების წაშლა</DialogTitle>
 
             <DialogDescription className="mt-4">
-              დარწმუნებული ხართ, რომ გსურთ წაშალოთ <strong>{passkeyName}</strong> passkey?
+              დარწმუნებული ხართ, რომ გსურთ წაშალოთ <strong>{passkeyName}</strong> საიდუმლო გასაღები?
             </DialogDescription>
           </DialogHeader>
 

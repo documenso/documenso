@@ -50,7 +50,7 @@ export const TeamEmailDropdown = ({ team }: TeamsSettingsPageProps) => {
       onSuccess: () => {
         toast({
           title: 'ელ.ფოსტა წაშლილია',
-          description: 'გუნდის ელ.ფოსტა წაიშალა!',
+          description: 'გუნდის ელ.ფოსტა წარმატებით წაიშალა!',
           duration: 5000,
         });
       },
@@ -136,7 +136,8 @@ export const TeamEmailDropdown = ({ team }: TeamsSettingsPageProps) => {
           onClick={async () => onRemove()}
         >
           <X className="mr-2 h-4 w-4" />
-          Remove
+          {/* Remove */}
+          წაშლა
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

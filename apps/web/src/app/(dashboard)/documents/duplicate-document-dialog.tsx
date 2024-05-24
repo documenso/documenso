@@ -51,7 +51,7 @@ export const DuplicateDocumentDialog = ({
 
         toast({
           title: 'დოკუმენტი დუბლირებულია',
-          description: 'თქვენი დოკუმენტი დუბლირებულია.',
+          description: 'თქვენი დოკუმენტი დუბლირებულია!',
           duration: 5000,
         });
 

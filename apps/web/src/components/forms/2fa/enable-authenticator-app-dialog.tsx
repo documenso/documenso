@@ -144,7 +144,7 @@ export const EnableAuthenticatorAppDialog = ({ onSuccess }: EnableAuthenticatorA
             void handleEnable2FA();
           }}
         >
-          გააქტიურეთ 2FA
+          გაააქტიურეთ 2FA
         </Button>
       </DialogTrigger>
 

@@ -76,7 +76,8 @@ export const DeleteAccountDialog = ({ className, user }: DeleteAccountDialogProp
         <div>
           <AlertTitle>ანგარიშის წაშლა</AlertTitle>
           <AlertDescription className="mr-2">
-            წაშალეთ თქვენი ანგარიში ხელმოწერილი დოკუმენტების ჩათვლით. ეს ქმედება არის შეუქცევადი.
+            წაშალეთ თქვენი ანგარიში ხელმოწერილი დოკუმენტების ჩათვლით. გაითვალისწინეთ, რომ ეს ქმედება
+            არის შეუქცევადი.
           </AlertDescription>
         </div>
 
@@ -105,9 +106,9 @@ export const DeleteAccountDialog = ({ className, user }: DeleteAccountDialogProp
                 )}
 
                 <DialogDescription>
-                  ჩიქოვანები წაშლიან <span className="font-semibold">ყველა თქვენს დოკუმენტთან</span>
-                  , ხელმოწერებთან და ყველა სხვა ინფორმაციასთან ერთად, რომელიც ეკუთვნის თქვენს
-                  ანგარიშს.
+                  ჩიქოვანები წაშლიან ამ ანგარიშს
+                  <span className="font-semibold">ყველა თქვენს დოკუმენტთან</span>, ხელმოწერებთან და
+                  ყველა სხვა ინფორმაციასთან ერთად, რომელიც ეკუთვნის თქვენს ანგარიშს.
                 </DialogDescription>
               </DialogHeader>
 

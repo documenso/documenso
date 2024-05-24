@@ -6,101 +6,108 @@ export default function SignatureDisclosure() {
   return (
     <div>
       <article className="prose dark:prose-invert">
-        <h1>Electronic Signature Disclosure</h1>
+        <h1>ელექტრონული ხელმოწერის განცხადება</h1>
 
         <h2>მოგესალმებით!</h2>
         <p>
-          Thank you for using Documenso to perform your electronic document signing. The purpose of
-          this disclosure is to inform you about the process, legality, and your rights regarding
-          the use of electronic signatures on our platform. By opting to use an electronic
-          signature, you are agreeing to the terms and conditions outlined below.
+          გმადლობთ, რომ იყენებთ SignStream-ს თქვენი ელექტრონული დოკუმენტის ხელმოწერის შესასრულებლად.
+          ამ განცხადების მიზანია გაცნობოთ პროცესის, კანონიერებისა და თქვენი უფლებების შესახებ ჩვენს
+          პლატფორმაზე ელექტრონული ხელმოწერების გამოყენებასთან დაკავშირებით. ელექტრონული ხელმოწერის
+          გამოყენების არჩევით, თქვენ ეთანხმებით ქვემოთ მოცემულ პირობებს.
         </p>
 
-        <h2>Acceptance and Consent</h2>
+        <h2>მიღება და თანხმობა</h2>
+        {/* <h2>Acceptance and Consent</h2> */}
         <p>
-          When you use our platform to affix your electronic signature to documents, you are
-          consenting to do so under the Electronic Signatures in Global and National Commerce Act
-          (E-Sign Act) and other applicable laws. This action indicates your agreement to use
-          electronic means to sign documents and receive notifications.
+          როდესაც იყენებთ ჩვენს პლატფორმას დოკუმენტებზე ხელმოსაწერად, თქვენ ეთანხმებით ამ პროცესის,
+          ელექტრონული ხელმოწერების შესახებ გლობალურ და ეროვნულ კომერციის აქტში (E-Sign Act) და სხვა
+          მოქმედი კანონების შესაბამისად გაკეთებაზე. ეს ქმედება მიუთითებს თქვენს თანხმობას
+          დოკუმენტების ხელმოწერისა და შეტყობინებების მისაღებად ელექტრონული საშუალებების
+          გამოყენებაზე.
         </p>
 
-        <h2>Legality of Electronic Signatures</h2>
+        <h2>ელექტრონული ხელმოწერების კანონიერება</h2>
         <p>
-          An electronic signature provided by you on our platform, achieved through clicking through
-          to a document and entering your name, or any other electronic signing method we provide,
-          is legally binding. It carries the same weight and enforceability as a manual signature
-          written with ink on paper.
+          თქვენს მიერ ჩვენს პლატფორმაზე მოწოდებული ელექტრონული ხელმოწერა, რომელიც მიღწეულია
+          დოკუმენტზე დაჭერით და თქვენი სახელის შეყვანით, ან ჩვენ მიერ მოწოდებული ელექტრონული
+          ხელმოწერის ნებისმიერი სხვა მეთოდით, იურიდიულად სავალდებულოა. მას აქვს იგივე წონა და ძალა,
+          როგორც ფიზიკურად შესრულებულ ხელმოწერას ქაღალდზე.
+          {/* legally binding - იურიდიულად სავალდებულოა */}
         </p>
 
-        <h2>System Requirements</h2>
-        <p>To use our electronic signature service, you must have access to:</p>
+        <h2>ტექნიკური საჭიროებები</h2>
+        {/* <h2>System Requirements</h2> */}
+        <p>ჩვენი ელექტრონული ხელმოწერის სერვისით სარგებლობისთვის, თქვენ უნდა გქონდეთ:</p>
         <ul>
-          <li>A stable internet connection</li>
-          <li>An email account</li>
-          <li>A device capable of accessing, opening, and reading documents</li>
-          <li>A means to print or download documents for your records</li>
+          <li>სტაბილური ინტერნეტ კავშირი</li>
+          <li>ელ.ფოსტის ანგარიში</li>
+          <li>მოწყობილობა, რომელსაც შეუძლია დოკუმენტებზე წვდომის მიღება, გახსნა და წაკითხვა</li>
+          <li>თქვენი ჩანაწერებისთვის დოკუმენტების დაბეჭდვის ან ჩამოტვირთვის საშუალება</li>
         </ul>
 
-        <h2>Electronic Delivery of Documents</h2>
+        <h2>დოკუმენტების ელექტრონული მიწოდება</h2>
         <p>
-          All documents related to the electronic signing process will be provided to you
-          electronically through our platform or via email. It is your responsibility to ensure that
-          your email address is current and that you can receive and open our emails.
+          ელექტრონული ხელმოწერის პროცესთან დაკავშირებული ყველა დოკუმენტი მოგეწოდებათ ელექტრონულად
+          ჩვენი პლატფორმის ან ელექტრონული ფოსტის საშუალებით. თქვენი პასუხისმგებლობაა დარწმუნდეთ, რომ
+          თქვენი ელ.ფოსტის მისამართი აქვს და რომ თქვენ შეგიძლიათ მიიღოთ და გახსნათ ჩვენი
+          შეტყობინებები.
         </p>
 
-        <h2>Consent to Electronic Transactions</h2>
+        <h2>თანხმობა ელექტრონულ ტრანზაქციებზე</h2>
         <p>
-          By using the electronic signature feature, you are consenting to conduct transactions and
-          receive disclosures electronically. You acknowledge that your electronic signature on
-          documents is binding and that you accept the terms outlined in the documents you are
-          signing.
+          ელექტრონული ხელმოწერის ფუნქციის გამოყენებით, თქვენ ეთანხმებით ტრანზაქციების განხორციელებას
+          და ინფორმაციის მიწოდებას ელექტრონულად. თქვენ აღიარებთ, რომ თქვენი ელექტრონული ხელმოწერა
+          დოკუმენტებზე სავალდებულოა და ეთანხმებით იმ პირობებს, რომლებიც მითითებულია დოკუმენტებში,
+          რომლებსაც ხელს აწერთ.
         </p>
 
-        <h2>Withdrawing Consent</h2>
+        <h2>თანხმობის გაუქმება</h2>
         <p>
-          You have the right to withdraw your consent to use electronic signatures at any time
-          before completing the signing process. To withdraw your consent, please contact the sender
-          of the document. In failing to contact the sender you may reach out to{' '}
-          <a href="mailto:support@documenso.com">support@documenso.com</a> for assistance. Be aware
-          that withdrawing consent may delay or halt the completion of the related transaction or
-          service.
+          თქვენ გაქვთ უფლება გააუქმოთ თქვენი თანხმობა ელექტრონული ხელმოწერების გამოყენებაზე
+          ხელმოწერის პროცესის დასრულებამდე ნებისმიერ დროს. თანხმობის გასაუქმებლად, გთხოვთ,
+          დაუკავშირდეთ დოკუმენტის გამგზავნს. გამომგზავნთან დაკავშირების შეუძლებლობის შემთხვევაში
+          შეგიძლიათ დახმარებისთვის მოგვმართოთ{' '}
+          <a href="mailto:support@documenso.com">support@SignStream.com</a>. გაითვალისწინეთ, რომ
+          თანხმობის გაუქმებამ შეიძლება შეაფერხოს ან შეაჩეროს დაკავშირებული ტრანზაქციის ან სერვისის
+          დასრულება.
         </p>
 
-        <h2>Updating Your Information</h2>
+        <h2>თქვენი ინფორმაციის განახლება</h2>
         <p>
-          It is crucial to keep your contact information, especially your email address, up to date
-          with us. Please notify us immediately of any changes to ensure that you continue to
-          receive all necessary communications.
+          მნიშვნელოვანია, რომ თქვენი საკონტაქტო ინფორმაცია, განსაკუთრებით თქვენი ელექტრონული ფოსტის
+          მისამართი, განახლების შემთხვევაში ჩვენთანაც განახლდეს. გთხოვთ დაუყოვნებლივ შეგვატყობინოთ
+          ნებისმიერი ცვლილების შესახებ, რათა დარწმუნდეთ, რომ გააგრძელებთ ყველა საჭირო ინფორმაციის
+          მიღებას.
         </p>
 
-        <h2>Retention of Documents</h2>
+        <h2>დოკუმენტების შენახვა</h2>
         <p>
-          After signing a document electronically, you will be provided the opportunity to view,
-          download, and print the document for your records. It is highly recommended that you
-          retain a copy of all electronically signed documents for your personal records. We will
-          also retain a copy of the signed document for our records however we may not be able to
-          provide you with a copy of the signed document after a certain period of time.
+          დოკუმენტზე ელექტრონულად ხელმოწერის შემდეგ, თქვენ მოგეცემათ შესაძლებლობა ნახოთ, გადმოწეროთ
+          და დაბეჭდოთ დოკუმენტები. რეკომენდირებულია შეინახოთ ყველა ელექტრონულად ხელმოწერილი
+          დოკუმენტის ასლი თქვენი პირადი ჩანაწერებისთვის. ჩვენ ასევე შევინახავთ ხელმოწერილი
+          დოკუმენტის ასლს ჩვენს ჩანაწერებში, თუმცა შეიძლება ვერ მოგაწოდოთ ხელმოწერილი დოკუმენტის
+          ასლი გარკვეული პერიოდის შემდეგ.
         </p>
 
-        <h2>Acknowledgment</h2>
+        <h2>დადასტურება</h2>
         <p>
-          By proceeding to use the electronic signature service provided by Documenso, you affirm
-          that you have read and understood this disclosure. You agree to all terms and conditions
-          related to the use of electronic signatures and electronic transactions as outlined
-          herein.
+          SignStream-ს მიერ მოწოდებული ელექტრონული ხელმოწერის სერვისით სარგებლობით, თქვენ
+          ადასტურებთ, რომ წაიკითხეთ და გაიგეთ ეს ინფორმაცია. თქვენ ეთანხმებით ყველა პირობებს,
+          რომლებიც დაკავშირებულია ელექტრონული ხელმოწერების გამოყენებასთან და ელექტრონულ
+          ტრანზაქციებთან, როგორც ეს აღწერილია აქ.
         </p>
 
-        <h2>Contact Information</h2>
+        <h2>საკონტაქტო ინფორმაცია</h2>
         <p>
-          For any questions regarding this disclosure, electronic signatures, or any related
-          process, please contact us at:{' '}
-          <a href="mailto:support@documenso.com">support@documenso.com</a>
+          ამ განცხადებასთან, ელექტრონულ ხელმოწერებთან ან რაიმე რელევანტურ პროცესთან დაკავშირებით
+          ნებისმიერი კითხვისთვის, გთხოვთ, დაგვიკავშირდეთ ელ.ფოსტაზე:{' '}
+          <a href="mailto:support@documenso.com">@documenso.com</a>
         </p>
       </article>
 
       <div className="mt-8">
         <Button asChild>
-          <Link href="/documents">Back to Documents</Link>
+          <Link href="/documents">უკან დაბრუნება</Link>
         </Button>
       </div>
     </div>

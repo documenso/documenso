@@ -67,7 +67,7 @@ export const UserPasskeysDataTable = () => {
           cell: ({ row }) =>
             row.original.lastUsedAt
               ? DateTime.fromJSDate(row.original.lastUsedAt).toRelative()
-              : 'Never',
+              : 'არასდროს',
         },
         {
           id: 'actions',
