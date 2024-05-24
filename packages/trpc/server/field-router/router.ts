@@ -70,7 +70,7 @@ export const fieldRouter = router({
             pageY: field.pageY,
             pageWidth: field.pageWidth,
             pageHeight: field.pageHeight,
-            fieldMeta: field.fieldMeta,
+            fieldMeta: field.fieldMeta || {},
           })),
         });
       } catch (err) {
@@ -154,14 +154,14 @@ export const fieldRouter = router({
     .input(ZUpdateFieldMutationSchema)
     .mutation(async ({ input, ctx }) => {
       try {
-        const { documentId, fieldId, meta } = input;
+        const { documentId, fieldId, fieldMeta } = input;
 
         return await updateField({
           fieldId,
           documentId,
           userId: ctx.user.id,
           requestMetadata: extractNextApiRequestMetadata(ctx.req),
-          fieldMeta: meta,
+          fieldMeta: fieldMeta,
         });
       } catch (err) {
         console.error(err);

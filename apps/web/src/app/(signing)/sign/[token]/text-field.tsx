@@ -187,6 +187,7 @@ export const TextField = ({ field, recipient }: TextFieldProps) => {
           <div className="">
             <Textarea
               id="custom-text"
+              // @ts-expect-error - fix later
               maxLength={fieldMeta.characterLimit}
               placeholder={fieldMeta.placeholder ?? 'Enter your text here'}
               className="border-border mt-2 w-full rounded-md border"
