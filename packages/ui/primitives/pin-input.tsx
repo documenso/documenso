@@ -2,9 +2,10 @@
 
 import * as React from 'react';
 
-import { cn } from '@/lib/utils';
-import { DashIcon } from '@radix-ui/react-icons';
 import { OTPInput, OTPInputContext } from 'input-otp';
+import { Minus } from 'lucide-react';
+
+import { cn } from '../lib/utils';
 
 const PinInput = React.forwardRef<
   React.ElementRef<typeof OTPInput>,
@@ -43,7 +44,7 @@ const PinInputSlot = React.forwardRef<
     <div
       ref={ref}
       className={cn(
-        'border-input relative flex h-9 w-9 items-center justify-center border-y border-r text-sm shadow-sm transition-all first:rounded-l-md first:border-l last:rounded-r-md',
+        'border-input relative flex h-10 w-10 items-center justify-center border-y border-r font-mono shadow-sm transition-all first:rounded-l-md first:border-l last:rounded-r-md',
         isActive && 'ring-ring z-10 ring-1',
         className,
       )}
@@ -66,7 +67,7 @@ const PinInputSeparator = React.forwardRef<
   React.ComponentPropsWithoutRef<'div'>
 >(({ ...props }, ref) => (
   <div ref={ref} role="separator" {...props}>
-    <DashIcon />
+    <Minus className="h-5 w-5" />
   </div>
 ));
 
