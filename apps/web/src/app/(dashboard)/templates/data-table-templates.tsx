@@ -25,7 +25,11 @@ type TemplateWithRecipient = Template & {
 };
 
 type TemplatesDataTableProps = {
-  templates: TemplateWithRecipient[];
+  templates: Array<
+    TemplateWithRecipient & {
+      team: { id: number; url: string } | null;
+    }
+  >;
   perPage: number;
   page: number;
   totalPages: number;

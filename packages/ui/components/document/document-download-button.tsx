@@ -60,7 +60,7 @@ export const DocumentDownloadButton = ({
       loading={isLoading}
       {...props}
     >
-      <Download className="mr-2 h-5 w-5" />
+      {!isLoading && <Download className="mr-2 h-5 w-5" />}
       Download
     </Button>
   );

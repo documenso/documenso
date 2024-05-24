@@ -1,0 +1,56 @@
+---
+title: 'Embracing the Future and Moving Back Again: From Server Actions to tRPC'
+description: 'This article talks about the need for the public API and the process of building it. It also talks about the requirements, constraints, challenges and lessons learnt from building it.'
+authorName: 'Lucas Smith'
+authorImage: '/blog/blog-author-lucas.png'
+authorRole: 'Co-Founder'
+date: 2024-03-07
+tags:
+  - Development
+---
+
+On October 26, 2022, during the Next.js Conf, Vercel unveiled Next.js 13, introducing a bunch of new features and a whole new paradigm shift for creating Next.js apps.
+
+React Server Components (RSCs) have been known for some time but haven't yet been implemented in a React meta-framework. With Next.js now adding them, the world of server-side rendering React applications was about to change.
+
+## The promise of React Server Components
+
+Described by Vercel as a tool for writing UIs rendered or optionally cached on the server, RSC promised direct integration with databases and server-specific capabilities, a departure from the typical React and SSR models.
+
+This feature initially appeared as a game-changer, promising simpler data fetching and routing, thanks to async server components and additional nested layout support.
+
+After experimenting with it for about six months on other projects, I came to the conclusion that while it was a little rough at the edges, it was indeed a game changer and something that should be adopted in Next.js projects moving forward.
+
+## A new new paradigm: Server Actions
+
+Vercel didn't stop at adding Server Components. A short while after the initial Next.js 13 release, they introduced "Server Actions." Server Actions allow for the calling of server-side functions without API routes, reducing the amount of ceremony required for adding a new mutation or event to your application.
+
+## Betting on new technology
+
+Following the release of both Server Actions and Server Components, we at Documenso embarked on a rewrite of the application. We had accumulated a bit of technical debt from the initial MVP, which was best shed as we also improved the design with help from our new designer.
+
+Having had much success with Server Components on other projects, I opted to go all in on both Server Components and Server Actions for the new version of the application. I was excited to see how much simpler and more efficient the application would be with these new technologies.
+
+Following our relaunch, we felt quite happy with our choices of server actions, which even let us cocktail certain client—and server-side logic into a single component without needing a bunch of effort on our end.
+
+## Navigating challenges with Server Actions
+
+While initially successful, we soon encountered issues with Server Actions, particularly when monitoring the application. Unfortunately, server actions make it much harder to monitor network requests and identify failed server actions since they use the route that they are currently on.
+
+Despite this issue, things were manageable; however, a critical issue arose when the usage of server actions caused bundle corruption, resulting in a top-level await insertion that would cause builds and tests to fail.
+
+This last issue was a deal breaker since it highlighted how much magic we were relying on with server actions. I like to avoid adding more magic where possible since, with bundlers and meta-frameworks, we are already handing off a lot of heavy lifting and getting a lot of magic in return.
+
+## Going all in on tRPC
+
+My quick and final solution to the issues we were facing was to fully embrace [tRPC](https://trpc.io/), which we already used in other app areas. The migration took less than a day and resolved all our issues while adding a lot more visibility to failing actions since they now had a dedicated API route.
+
+For those unfamiliar with tRPC, it is a framework for building end-to-end typesafe APIs with TypeScript and Next.js. It's an awesome library that lets you call your defined API safely within the client, causing build time errors when things inevitably drift.
+
+I've been a big fan of tRPC for some time now, so the decision to drop server actions and instead use more of tRPC was easy for me.
+
+## Lessons learned and the future
+
+While I believe server actions are a great idea, and I'm sure they will be improved in the future, I've relearned the lesson that it's best to avoid magic where possible.
+
+This doesn't mean we won't consider moving certain things back to server actions in the future. But for now, we will wait and watch how others use them and how they evolve.

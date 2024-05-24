@@ -1,6 +1,10 @@
 import { z } from 'zod';
 
 import { URL_REGEX } from '@documenso/lib/constants/url-regex';
+import {
+  ZDocumentAccessAuthTypesSchema,
+  ZDocumentActionAuthTypesSchema,
+} from '@documenso/lib/types/document-auth';
 import { ZBaseTableSearchParamsSchema } from '@documenso/lib/types/search-params';
 import { FieldType, RecipientRole } from '@documenso/prisma/client';
 
@@ -29,6 +33,15 @@ export const ZGetDocumentByTokenQuerySchema = z.object({
 
 export type TGetDocumentByTokenQuerySchema = z.infer<typeof ZGetDocumentByTokenQuerySchema>;
 
+export const ZGetDocumentWithDetailsByIdQuerySchema = z.object({
+  id: z.number().min(1),
+  teamId: z.number().min(1).optional(),
+});
+
+export type TGetDocumentWithDetailsByIdQuerySchema = z.infer<
+  typeof ZGetDocumentWithDetailsByIdQuerySchema
+>;
+
 export const ZCreateDocumentMutationSchema = z.object({
   title: z.string().min(1),
   documentDataId: z.string().min(1),
@@ -36,6 +49,30 @@ export const ZCreateDocumentMutationSchema = z.object({
 });
 
 export type TCreateDocumentMutationSchema = z.infer<typeof ZCreateDocumentMutationSchema>;
+
+export const ZSetSettingsForDocumentMutationSchema = z.object({
+  documentId: z.number(),
+  teamId: z.number().min(1).optional(),
+  data: z.object({
+    title: z.string().min(1).optional(),
+    globalAccessAuth: ZDocumentAccessAuthTypesSchema.nullable().optional(),
+    globalActionAuth: ZDocumentActionAuthTypesSchema.nullable().optional(),
+  }),
+  meta: z.object({
+    timezone: z.string(),
+    dateFormat: z.string(),
+    redirectUrl: z
+      .string()
+      .optional()
+      .refine((value) => value === undefined || value === '' || URL_REGEX.test(value), {
+        message: 'Please enter a valid URL',
+      }),
+  }),
+});
+
+export type TSetGeneralSettingsForDocumentMutationSchema = z.infer<
+  typeof ZSetSettingsForDocumentMutationSchema
+>;
 
 export const ZSetTitleForDocumentMutationSchema = z.object({
   documentId: z.number(),
@@ -88,8 +125,8 @@ export const ZSendDocumentMutationSchema = z.object({
   meta: z.object({
     subject: z.string(),
     message: z.string(),
-    timezone: z.string(),
-    dateFormat: z.string(),
+    timezone: z.string().optional(),
+    dateFormat: z.string().optional(),
     redirectUrl: z
       .string()
       .optional()
@@ -125,4 +162,9 @@ export type TDeleteDraftDocumentMutationSchema = z.infer<typeof ZDeleteDraftDocu
 
 export const ZSearchDocumentsMutationSchema = z.object({
   query: z.string(),
+});
+
+export const ZDownloadAuditLogsMutationSchema = z.object({
+  documentId: z.number(),
+  teamId: z.number().optional(),
 });

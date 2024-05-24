@@ -1,4 +1,4 @@
-import { hash } from 'bcrypt';
+import { hash } from '@node-rs/bcrypt';
 
 import { getStripeCustomerByUser } from '@documenso/ee/server-only/stripe/get-customer';
 import { updateSubscriptionItemQuantity } from '@documenso/ee/server-only/stripe/update-subscription-item-quantity';

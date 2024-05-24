@@ -199,7 +199,7 @@ export const Widget = ({ className, children, ...props }: WidgetProps) => {
             className="bg-foreground/5 col-span-12 flex flex-col rounded-2xl p-6 lg:col-span-5"
             onSubmit={handleSubmit(onFormSubmit)}
           >
-            <h3 className="text-xl font-semibold">Sign up to Community Plan</h3>
+            <h3 className="text-xl font-semibold">Sign up to Early Adopter Plan</h3>
             <p className="text-muted-foreground mt-2 text-xs">
               with Timur Ercan & Lucas Smith from Documenso
             </p>
@@ -346,7 +346,7 @@ export const Widget = ({ className, children, ...props }: WidgetProps) => {
                   {signatureText && (
                     <p
                       className={cn(
-                        'text-foreground text-4xl font-semibold [font-family:var(--font-caveat)]',
+                        'text-foreground truncate text-4xl font-semibold [font-family:var(--font-caveat)]',
                       )}
                     >
                       {signatureText}
@@ -360,7 +360,7 @@ export const Widget = ({ className, children, ...props }: WidgetProps) => {
                 >
                   <Input
                     id="signatureText"
-                    className="text-foreground placeholder:text-muted-foreground border-none p-0 text-sm focus-visible:ring-0"
+                    className="text-foreground placeholder:text-muted-foreground truncate border-none p-0 text-sm focus-visible:ring-0"
                     placeholder="Draw or type name here"
                     disabled={isSubmitting}
                     {...register('signatureText', {

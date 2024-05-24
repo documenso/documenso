@@ -4,7 +4,7 @@ import { WEBAPP_BASE_URL } from '@documenso/lib/constants/app';
 import { seedTeam, unseedTeam } from '@documenso/prisma/seed/teams';
 import { seedTemplate } from '@documenso/prisma/seed/templates';
 
-import { manualLogin } from '../fixtures/authentication';
+import { apiSignin } from '../fixtures/authentication';
 
 test.describe.configure({ mode: 'parallel' });
 
@@ -36,7 +36,7 @@ test('[TEMPLATES]: view templates', async ({ page }) => {
     teamId: team.id,
   });
 
-  await manualLogin({
+  await apiSignin({
     page,
     email: owner.email,
     redirectPath: '/templates',
@@ -81,7 +81,7 @@ test('[TEMPLATES]: delete template', async ({ page }) => {
     teamId: team.id,
   });
 
-  await manualLogin({
+  await apiSignin({
     page,
     email: owner.email,
     redirectPath: '/templates',
@@ -108,7 +108,7 @@ test('[TEMPLATES]: delete template', async ({ page }) => {
     await page.getByRole('button', { name: 'Delete' }).click();
     await expect(page.getByText('Template deleted').first()).toBeVisible();
 
-    await page.waitForTimeout(1000);
+    await page.reload();
   }
 
   await unseedTeam(team.url);
@@ -135,7 +135,7 @@ test('[TEMPLATES]: duplicate template', async ({ page }) => {
     teamId: team.id,
   });
 
-  await manualLogin({
+  await apiSignin({
     page,
     email: owner.email,
     redirectPath: '/templates',
@@ -181,7 +181,7 @@ test('[TEMPLATES]: use template', async ({ page }) => {
     teamId: team.id,
   });
 
-  await manualLogin({
+  await apiSignin({
     page,
     email: owner.email,
     redirectPath: '/templates',
@@ -189,7 +189,14 @@ test('[TEMPLATES]: use template', async ({ page }) => {
 
   // Use personal template.
   await page.getByRole('button', { name: 'Use Template' }).click();
-  await page.getByRole('button', { name: 'Create Document' }).click();
+
+  // Enter template values.
+  await page.getByPlaceholder('recipient.1@documenso.com').click();
+  await page.getByPlaceholder('recipient.1@documenso.com').fill(teamMemberUser.email);
+  await page.getByPlaceholder('Recipient 1').click();
+  await page.getByPlaceholder('Recipient 1').fill('name');
+
+  await page.getByRole('button', { name: 'Create as draft' }).click();
   await page.waitForURL(/documents/);
   await page.getByRole('main').getByRole('link', { name: 'Documents' }).click();
   await page.waitForURL('/documents');
@@ -200,7 +207,14 @@ test('[TEMPLATES]: use template', async ({ page }) => {
 
   // Use team template.
   await page.getByRole('button', { name: 'Use Template' }).click();
-  await page.getByRole('button', { name: 'Create Document' }).click();
+
+  // Enter template values.
+  await page.getByPlaceholder('recipient.1@documenso.com').click();
+  await page.getByPlaceholder('recipient.1@documenso.com').fill(teamMemberUser.email);
+  await page.getByPlaceholder('Recipient 1').click();
+  await page.getByPlaceholder('Recipient 1').fill('name');
+
+  await page.getByRole('button', { name: 'Create as draft' }).click();
   await page.waitForURL(/\/t\/.+\/documents/);
   await page.getByRole('main').getByRole('link', { name: 'Documents' }).click();
   await page.waitForURL(`/t/${team.url}/documents`);

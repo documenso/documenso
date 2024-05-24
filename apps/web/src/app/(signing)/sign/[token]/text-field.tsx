@@ -6,6 +6,9 @@ import { useRouter } from 'next/navigation';
 
 import { Loader } from 'lucide-react';
 
+import { DO_NOT_INVALIDATE_QUERY_ON_MUTATION } from '@documenso/lib/constants/trpc';
+import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
+import type { TRecipientActionAuth } from '@documenso/lib/types/document-auth';
 import type { Recipient } from '@documenso/prisma/client';
 import type { FieldWithSignature } from '@documenso/prisma/types/field-with-signature';
 import { trpc } from '@documenso/trpc/react';
@@ -15,6 +18,7 @@ import { Input } from '@documenso/ui/primitives/input';
 import { Label } from '@documenso/ui/primitives/label';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
+import { useRequiredDocumentAuthContext } from './document-auth-provider';
 import { SigningFieldContainer } from './signing-field-container';
 
 export type TextFieldProps = {
@@ -27,36 +31,52 @@ export const TextField = ({ field, recipient }: TextFieldProps) => {
 
   const { toast } = useToast();
 
+  const { executeActionAuthProcedure } = useRequiredDocumentAuthContext();
+
   const [isPending, startTransition] = useTransition();
 
   const { mutateAsync: signFieldWithToken, isLoading: isSignFieldWithTokenLoading } =
-    trpc.field.signFieldWithToken.useMutation();
+    trpc.field.signFieldWithToken.useMutation(DO_NOT_INVALIDATE_QUERY_ON_MUTATION);
 
   const {
     mutateAsync: removeSignedFieldWithToken,
     isLoading: isRemoveSignedFieldWithTokenLoading,
-  } = trpc.field.removeSignedFieldWithToken.useMutation();
+  } = trpc.field.removeSignedFieldWithToken.useMutation(DO_NOT_INVALIDATE_QUERY_ON_MUTATION);
 
   const isLoading = isSignFieldWithTokenLoading || isRemoveSignedFieldWithTokenLoading || isPending;
 
   const [showCustomTextModal, setShowCustomTextModal] = useState(false);
   const [localText, setLocalCustomText] = useState('');
-  const [isLocalSignatureSet, setIsLocalSignatureSet] = useState(false);
 
   useEffect(() => {
-    if (!showCustomTextModal && !isLocalSignatureSet) {
+    if (!showCustomTextModal) {
       setLocalCustomText('');
     }
-  }, [showCustomTextModal, isLocalSignatureSet]);
+  }, [showCustomTextModal]);
 
-  const onSign = async () => {
+  /**
+   * When the user clicks the sign button in the dialog where they enter the text field.
+   */
+  const onDialogSignClick = () => {
+    setShowCustomTextModal(false);
+
+    void executeActionAuthProcedure({
+      onReauthFormSubmit: async (authOptions) => await onSign(authOptions),
+      actionTarget: field.type,
+    });
+  };
+
+  const onPreSign = () => {
+    if (!localText) {
+      setShowCustomTextModal(true);
+      return false;
+    }
+
+    return true;
+  };
+
+  const onSign = async (authOptions?: TRecipientActionAuth) => {
     try {
-      if (!localText) {
-        setIsLocalSignatureSet(false);
-        setShowCustomTextModal(true);
-        return;
-      }
-
       if (!localText) {
         return;
       }
@@ -66,12 +86,19 @@ export const TextField = ({ field, recipient }: TextFieldProps) => {
         fieldId: field.id,
         value: localText,
         isBase64: true,
+        authOptions,
       });
 
       setLocalCustomText('');
 
       startTransition(() => router.refresh());
     } catch (err) {
+      const error = AppError.parseError(err);
+
+      if (error.code === AppErrorCode.UNAUTHORIZED) {
+        throw error;
+      }
+
       console.error(err);
 
       toast({
@@ -102,7 +129,13 @@ export const TextField = ({ field, recipient }: TextFieldProps) => {
   };
 
   return (
-    <SigningFieldContainer field={field} onSign={onSign} onRemove={onRemove} type="Signature">
+    <SigningFieldContainer
+      field={field}
+      onPreSign={onPreSign}
+      onSign={onSign}
+      onRemove={onRemove}
+      type="Signature"
+    >
       {isLoading && (
         <div className="bg-background absolute inset-0 flex items-center justify-center rounded-md">
           <Loader className="text-primary h-5 w-5 animate-spin md:h-8 md:w-8" />
@@ -149,11 +182,7 @@ export const TextField = ({ field, recipient }: TextFieldProps) => {
                 type="button"
                 className="flex-1"
                 disabled={!localText}
-                onClick={() => {
-                  setShowCustomTextModal(false);
-                  setIsLocalSignatureSet(true);
-                  void onSign();
-                }}
+                onClick={() => onDialogSignClick()}
               >
                 Save Text
               </Button>

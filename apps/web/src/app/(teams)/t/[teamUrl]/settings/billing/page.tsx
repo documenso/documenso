@@ -54,7 +54,7 @@ export default async function TeamsSettingBillingPage({ params }: TeamsSettingsB
         <CardContent className="flex flex-row items-center justify-between p-4">
           <div className="flex flex-col text-sm">
             <p className="text-foreground font-semibold">
-              Current plan: {teamSubscription ? 'Team' : 'Community Team'}
+              Current plan: {teamSubscription ? 'Team' : 'Early Adopter Team'}
             </p>
 
             <p className="text-muted-foreground mt-0.5">

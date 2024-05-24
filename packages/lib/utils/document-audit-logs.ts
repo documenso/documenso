@@ -22,6 +22,7 @@ import {
   RECIPIENT_DIFF_TYPE,
   ZDocumentAuditLogSchema,
 } from '../types/document-audit-logs';
+import { ZRecipientAuthOptionsSchema } from '../types/document-auth';
 import type { RequestMetadata } from '../universal/extract-request-metadata';
 
 type CreateDocumentAuditLogDataOptions<T = TDocumentAuditLog['type']> = {
@@ -32,20 +33,20 @@ type CreateDocumentAuditLogDataOptions<T = TDocumentAuditLog['type']> = {
   requestMetadata?: RequestMetadata;
 };
 
-type CreateDocumentAuditLogDataResponse = Pick<
+export type CreateDocumentAuditLogDataResponse = Pick<
   DocumentAuditLog,
   'type' | 'ipAddress' | 'userAgent' | 'email' | 'userId' | 'name' | 'documentId'
 > & {
   data: TDocumentAuditLog['data'];
 };
 
-export const createDocumentAuditLogData = ({
+export const createDocumentAuditLogData = <T extends TDocumentAuditLog['type']>({
   documentId,
   type,
   data,
   user,
   requestMetadata,
-}: CreateDocumentAuditLogDataOptions): CreateDocumentAuditLogDataResponse => {
+}: CreateDocumentAuditLogDataOptions<T>): CreateDocumentAuditLogDataResponse => {
   return {
     type,
     data,
@@ -68,6 +69,7 @@ export const parseDocumentAuditLogData = (auditLog: DocumentAuditLog): TDocument
 
   // Handle any required migrations here.
   if (!data.success) {
+    // Todo: Alert us.
     console.error(data.error);
     throw new Error('Migration required');
   }
@@ -75,13 +77,39 @@ export const parseDocumentAuditLogData = (auditLog: DocumentAuditLog): TDocument
   return data.data;
 };
 
-type PartialRecipient = Pick<Recipient, 'email' | 'name' | 'role'>;
+type PartialRecipient = Pick<Recipient, 'email' | 'name' | 'role' | 'authOptions'>;
 
 export const diffRecipientChanges = (
   oldRecipient: PartialRecipient,
   newRecipient: PartialRecipient,
 ): TDocumentAuditLogRecipientDiffSchema[] => {
   const diffs: TDocumentAuditLogRecipientDiffSchema[] = [];
+
+  const oldAuthOptions = ZRecipientAuthOptionsSchema.parse(oldRecipient.authOptions);
+  const oldAccessAuth = oldAuthOptions.accessAuth;
+  const oldActionAuth = oldAuthOptions.actionAuth;
+
+  const newAuthOptions = ZRecipientAuthOptionsSchema.parse(newRecipient.authOptions);
+  const newAccessAuth =
+    newAuthOptions?.accessAuth === undefined ? oldAccessAuth : newAuthOptions.accessAuth;
+  const newActionAuth =
+    newAuthOptions?.actionAuth === undefined ? oldActionAuth : newAuthOptions.actionAuth;
+
+  if (oldAccessAuth !== newAccessAuth) {
+    diffs.push({
+      type: RECIPIENT_DIFF_TYPE.ACCESS_AUTH,
+      from: oldAccessAuth ?? '',
+      to: newAccessAuth ?? '',
+    });
+  }
+
+  if (oldActionAuth !== newActionAuth) {
+    diffs.push({
+      type: RECIPIENT_DIFF_TYPE.ACTION_AUTH,
+      from: oldActionAuth ?? '',
+      to: newActionAuth ?? '',
+    });
+  }
 
   if (oldRecipient.email !== newRecipient.email) {
     diffs.push({
@@ -166,7 +194,13 @@ export const diffDocumentMetaChanges = (
   const oldPassword = oldData?.password ?? null;
   const oldRedirectUrl = oldData?.redirectUrl ?? '';
 
-  if (oldDateFormat !== newData.dateFormat) {
+  const newDateFormat = newData?.dateFormat ?? '';
+  const newMessage = newData?.message ?? '';
+  const newSubject = newData?.subject ?? '';
+  const newTimezone = newData?.timezone ?? '';
+  const newRedirectUrl = newData?.redirectUrl ?? '';
+
+  if (oldDateFormat !== newDateFormat) {
     diffs.push({
       type: DOCUMENT_META_DIFF_TYPE.DATE_FORMAT,
       from: oldData?.dateFormat ?? '',
@@ -174,35 +208,35 @@ export const diffDocumentMetaChanges = (
     });
   }
 
-  if (oldMessage !== newData.message) {
+  if (oldMessage !== newMessage) {
     diffs.push({
       type: DOCUMENT_META_DIFF_TYPE.MESSAGE,
       from: oldMessage,
-      to: newData.message,
+      to: newMessage,
     });
   }
 
-  if (oldSubject !== newData.subject) {
+  if (oldSubject !== newSubject) {
     diffs.push({
       type: DOCUMENT_META_DIFF_TYPE.SUBJECT,
       from: oldSubject,
-      to: newData.subject,
+      to: newSubject,
     });
   }
 
-  if (oldTimezone !== newData.timezone) {
+  if (oldTimezone !== newTimezone) {
     diffs.push({
       type: DOCUMENT_META_DIFF_TYPE.TIMEZONE,
       from: oldTimezone,
-      to: newData.timezone,
+      to: newTimezone,
     });
   }
 
-  if (oldRedirectUrl !== newData.redirectUrl) {
+  if (oldRedirectUrl !== newRedirectUrl) {
     diffs.push({
       type: DOCUMENT_META_DIFF_TYPE.REDIRECT_URL,
       from: oldRedirectUrl,
-      to: newData.redirectUrl,
+      to: newRedirectUrl,
     });
   }
 
@@ -277,6 +311,14 @@ export const formatDocumentAuditLogAction = (auditLog: TDocumentAuditLog, userId
     .with({ type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_FIELD_UNINSERTED }, () => ({
       anonymous: 'Field unsigned',
       identified: 'unsigned a field',
+    }))
+    .with({ type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_GLOBAL_AUTH_ACCESS_UPDATED }, () => ({
+      anonymous: 'Document access auth updated',
+      identified: 'updated the document access auth requirements',
+    }))
+    .with({ type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_GLOBAL_AUTH_ACTION_UPDATED }, () => ({
+      anonymous: 'Document signing auth updated',
+      identified: 'updated the document signing auth requirements',
     }))
     .with({ type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_META_UPDATED }, () => ({
       anonymous: 'Document updated',

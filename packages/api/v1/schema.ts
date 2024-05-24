@@ -1,5 +1,6 @@
 import { z } from 'zod';
 
+import { ZUrlSchema } from '@documenso/lib/schemas/common';
 import {
   FieldType,
   ReadStatus,
@@ -53,6 +54,10 @@ export const ZUploadDocumentSuccessfulSchema = z.object({
   key: z.string(),
 });
 
+export const ZDownloadDocumentSuccessfulSchema = z.object({
+  downloadUrl: z.string(),
+});
+
 export type TUploadDocumentSuccessfulSchema = z.infer<typeof ZUploadDocumentSuccessfulSchema>;
 
 export const ZCreateDocumentMutationSchema = z.object({
@@ -73,6 +78,7 @@ export const ZCreateDocumentMutationSchema = z.object({
       redirectUrl: z.string(),
     })
     .partial(),
+  formValues: z.record(z.string(), z.union([z.string(), z.boolean(), z.number()])).optional(),
 });
 
 export type TCreateDocumentMutationSchema = z.infer<typeof ZCreateDocumentMutationSchema>;
@@ -112,6 +118,7 @@ export const ZCreateDocumentFromTemplateMutationSchema = z.object({
     })
     .partial()
     .optional(),
+  formValues: z.record(z.string(), z.union([z.string(), z.boolean(), z.number()])).optional(),
 });
 
 export type TCreateDocumentFromTemplateMutationSchema = z.infer<
@@ -133,6 +140,59 @@ export const ZCreateDocumentFromTemplateMutationResponseSchema = z.object({
 
 export type TCreateDocumentFromTemplateMutationResponseSchema = z.infer<
   typeof ZCreateDocumentFromTemplateMutationResponseSchema
+>;
+
+export const ZGenerateDocumentFromTemplateMutationSchema = z.object({
+  title: z.string().optional(),
+  recipients: z
+    .array(
+      z.object({
+        id: z.number(),
+        name: z.string().optional(),
+        email: z.string().email().min(1),
+      }),
+    )
+    .refine(
+      (schema) => {
+        const emails = schema.map((signer) => signer.email.toLowerCase());
+        const ids = schema.map((signer) => signer.id);
+
+        return new Set(emails).size === emails.length && new Set(ids).size === ids.length;
+      },
+      { message: 'Recipient IDs and emails must be unique' },
+    ),
+  meta: z
+    .object({
+      subject: z.string(),
+      message: z.string(),
+      timezone: z.string(),
+      dateFormat: z.string(),
+      redirectUrl: ZUrlSchema,
+    })
+    .partial()
+    .optional(),
+  formValues: z.record(z.string(), z.union([z.string(), z.boolean(), z.number()])).optional(),
+});
+
+export type TGenerateDocumentFromTemplateMutationSchema = z.infer<
+  typeof ZGenerateDocumentFromTemplateMutationSchema
+>;
+
+export const ZGenerateDocumentFromTemplateMutationResponseSchema = z.object({
+  documentId: z.number(),
+  recipients: z.array(
+    z.object({
+      recipientId: z.number(),
+      name: z.string(),
+      email: z.string().email().min(1),
+      token: z.string(),
+      role: z.nativeEnum(RecipientRole),
+    }),
+  ),
+});
+
+export type TGenerateDocumentFromTemplateMutationResponseSchema = z.infer<
+  typeof ZGenerateDocumentFromTemplateMutationResponseSchema
 >;
 
 export const ZCreateRecipientMutationSchema = z.object({

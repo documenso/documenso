@@ -5,11 +5,18 @@ import { cn } from '@documenso/ui/lib/utils';
 export type SettingsHeaderProps = {
   title: string;
   subtitle: string;
+  hideDivider?: boolean;
   children?: React.ReactNode;
   className?: string;
 };
 
-export const SettingsHeader = ({ children, title, subtitle, className }: SettingsHeaderProps) => {
+export const SettingsHeader = ({
+  children,
+  title,
+  subtitle,
+  className,
+  hideDivider,
+}: SettingsHeaderProps) => {
   return (
     <>
       <div className={cn('flex flex-row items-center justify-between', className)}>
@@ -22,7 +29,7 @@ export const SettingsHeader = ({ children, title, subtitle, className }: Setting
         {children}
       </div>
 
-      <hr className="my-4" />
+      {!hideDivider && <hr className="my-4" />}
     </>
   );
 };

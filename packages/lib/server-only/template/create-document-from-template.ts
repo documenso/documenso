@@ -1,16 +1,52 @@
 import { nanoid } from '@documenso/lib/universal/id';
 import { prisma } from '@documenso/prisma';
-import type { RecipientRole } from '@documenso/prisma/client';
+import type { Field } from '@documenso/prisma/client';
+import { type Recipient, WebhookTriggerEvents } from '@documenso/prisma/client';
+
+import { AppError, AppErrorCode } from '../../errors/app-error';
+import { DOCUMENT_AUDIT_LOG_TYPE } from '../../types/document-audit-logs';
+import { ZRecipientAuthOptionsSchema } from '../../types/document-auth';
+import type { RequestMetadata } from '../../universal/extract-request-metadata';
+import { createDocumentAuditLogData } from '../../utils/document-audit-logs';
+import {
+  createDocumentAuthOptions,
+  createRecipientAuthOptions,
+  extractDocumentAuthMethods,
+} from '../../utils/document-auth';
+import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
+
+type FinalRecipient = Pick<Recipient, 'name' | 'email' | 'role' | 'authOptions'> & {
+  templateRecipientId: number;
+  fields: Field[];
+};
+
+export type CreateDocumentFromTemplateResponse = Awaited<
+  ReturnType<typeof createDocumentFromTemplate>
+>;
 
 export type CreateDocumentFromTemplateOptions = {
   templateId: number;
   userId: number;
   teamId?: number;
-  recipients?: {
+  recipients: {
+    id: number;
     name?: string;
     email: string;
-    role?: RecipientRole;
   }[];
+
+  /**
+   * Values that will override the predefined values in the template.
+   */
+  override?: {
+    title?: string;
+    subject?: string;
+    message?: string;
+    timezone?: string;
+    password?: string;
+    dateFormat?: string;
+    redirectUrl?: string;
+  };
+  requestMetadata?: RequestMetadata;
 };
 
 export const createDocumentFromTemplate = async ({
@@ -18,7 +54,15 @@ export const createDocumentFromTemplate = async ({
   userId,
   teamId,
   recipients,
+  override,
+  requestMetadata,
 }: CreateDocumentFromTemplateOptions) => {
+  const user = await prisma.user.findFirstOrThrow({
+    where: {
+      id: userId,
+    },
+  });
+
   const template = await prisma.template.findUnique({
     where: {
       id: templateId,
@@ -39,15 +83,50 @@ export const createDocumentFromTemplate = async ({
           }),
     },
     include: {
-      Recipient: true,
-      Field: true,
+      Recipient: {
+        include: {
+          Field: true,
+        },
+      },
       templateDocumentData: true,
+      templateMeta: true,
     },
   });
 
   if (!template) {
-    throw new Error('Template not found.');
+    throw new AppError(AppErrorCode.NOT_FOUND, 'Template not found');
   }
+
+  // Check that all the passed in recipient IDs can be associated with a template recipient.
+  recipients.forEach((recipient) => {
+    const foundRecipient = template.Recipient.find(
+      (templateRecipient) => templateRecipient.id === recipient.id,
+    );
+
+    if (!foundRecipient) {
+      throw new AppError(
+        AppErrorCode.INVALID_BODY,
+        `Recipient with ID ${recipient.id} not found in the template.`,
+      );
+    }
+  });
+
+  const { documentAuthOption: templateAuthOptions } = extractDocumentAuthMethods({
+    documentAuth: template.authOptions,
+  });
+
+  const finalRecipients: FinalRecipient[] = template.Recipient.map((templateRecipient) => {
+    const foundRecipient = recipients.find((recipient) => recipient.id === templateRecipient.id);
+
+    return {
+      templateRecipientId: templateRecipient.id,
+      fields: templateRecipient.Field,
+      name: foundRecipient ? foundRecipient.name ?? '' : templateRecipient.name,
+      email: foundRecipient ? foundRecipient.email : templateRecipient.email,
+      role: templateRecipient.role,
+      authOptions: templateRecipient.authOptions,
+    };
+  });
 
   const documentData = await prisma.documentData.create({
     data: {
@@ -57,80 +136,104 @@ export const createDocumentFromTemplate = async ({
     },
   });
 
-  const document = await prisma.document.create({
-    data: {
-      userId,
-      teamId: template.teamId,
-      title: template.title,
-      documentDataId: documentData.id,
-      Recipient: {
-        create: template.Recipient.map((recipient) => ({
-          email: recipient.email,
-          name: recipient.name,
-          role: recipient.role,
-          token: nanoid(),
-        })),
-      },
-    },
+  return await prisma.$transaction(async (tx) => {
+    const document = await tx.document.create({
+      data: {
+        userId,
+        teamId: template.teamId,
+        title: override?.title || template.title,
+        documentDataId: documentData.id,
+        authOptions: createDocumentAuthOptions({
+          globalAccessAuth: templateAuthOptions.globalAccessAuth,
+          globalActionAuth: templateAuthOptions.globalActionAuth,
+        }),
+        documentMeta: {
+          create: {
+            subject: override?.subject || template.templateMeta?.subject,
+            message: override?.message || template.templateMeta?.message,
+            timezone: override?.timezone || template.templateMeta?.timezone,
+            password: override?.password || template.templateMeta?.password,
+            dateFormat: override?.dateFormat || template.templateMeta?.dateFormat,
+            redirectUrl: override?.redirectUrl || template.templateMeta?.redirectUrl,
+          },
+        },
+        Recipient: {
+          createMany: {
+            data: finalRecipients.map((recipient) => {
+              const authOptions = ZRecipientAuthOptionsSchema.parse(recipient?.authOptions);
 
-    include: {
-      Recipient: {
-        orderBy: {
-          id: 'asc',
+              return {
+                email: recipient.email,
+                name: recipient.name,
+                role: recipient.role,
+                authOptions: createRecipientAuthOptions({
+                  accessAuth: authOptions.accessAuth,
+                  actionAuth: authOptions.actionAuth,
+                }),
+                token: nanoid(),
+              };
+            }),
+          },
         },
       },
-    },
-  });
+      include: {
+        Recipient: {
+          orderBy: {
+            id: 'asc',
+          },
+        },
+        documentData: true,
+      },
+    });
 
-  await prisma.field.createMany({
-    data: template.Field.map((field) => {
-      const recipient = template.Recipient.find((recipient) => recipient.id === field.recipientId);
+    let fieldsToCreate: Omit<Field, 'id' | 'secondaryId' | 'templateId'>[] = [];
 
-      const documentRecipient = document.Recipient.find((doc) => doc.email === recipient?.email);
+    Object.values(finalRecipients).forEach(({ email, fields }) => {
+      const recipient = document.Recipient.find((recipient) => recipient.email === email);
 
-      return {
-        type: field.type,
-        page: field.page,
-        positionX: field.positionX,
-        positionY: field.positionY,
-        width: field.width,
-        height: field.height,
-        customText: field.customText,
-        inserted: field.inserted,
+      if (!recipient) {
+        throw new Error('Recipient not found.');
+      }
+
+      fieldsToCreate = fieldsToCreate.concat(
+        fields.map((field) => ({
+          documentId: document.id,
+          recipientId: recipient.id,
+          type: field.type,
+          page: field.page,
+          positionX: field.positionX,
+          positionY: field.positionY,
+          width: field.width,
+          height: field.height,
+          customText: '',
+          inserted: false,
+        })),
+      );
+    });
+
+    await tx.field.createMany({
+      data: fieldsToCreate,
+    });
+
+    await tx.documentAuditLog.create({
+      data: createDocumentAuditLogData({
+        type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_CREATED,
         documentId: document.id,
-        recipientId: documentRecipient?.id || null,
-      };
-    }),
-  });
-
-  if (recipients && recipients.length > 0) {
-    document.Recipient = await Promise.all(
-      recipients.map(async (recipient, index) => {
-        const existingRecipient = document.Recipient.at(index);
-
-        return await prisma.recipient.upsert({
-          where: {
-            documentId_email: {
-              documentId: document.id,
-              email: existingRecipient?.email ?? recipient.email,
-            },
-          },
-          update: {
-            name: recipient.name,
-            email: recipient.email,
-            role: recipient.role,
-          },
-          create: {
-            documentId: document.id,
-            email: recipient.email,
-            name: recipient.name,
-            role: recipient.role,
-            token: nanoid(),
-          },
-        });
+        user,
+        requestMetadata,
+        data: {
+          title: document.title,
+        },
       }),
-    );
-  }
+    });
 
-  return document;
+    await triggerWebhook({
+      event: WebhookTriggerEvents.DOCUMENT_CREATED,
+      data: document,
+      userId,
+      teamId,
+    });
+
+    return document;
+  });
 };

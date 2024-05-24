@@ -13,7 +13,13 @@ const seedDatabase = async () => {
 
       if ('seedDatabase' in mod && typeof mod.seedDatabase === 'function') {
         console.log(`[SEEDING]: ${file}`);
-        await mod.seedDatabase();
+
+        try {
+          await mod.seedDatabase();
+        } catch (e) {
+          console.log(`[SEEDING]: Seed failed for ${file}`);
+          console.error(e);
+        }
       }
     }
   }

@@ -1,8 +1,11 @@
-import { useMemo } from 'react';
+'use client';
+
+import { useEffect, useState } from 'react';
+
+import { useRouter } from 'next/navigation';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
-import { match } from 'ts-pattern';
 import { renderSVG } from 'uqr';
 import { z } from 'zod';
 
@@ -11,11 +14,13 @@ import { trpc } from '@documenso/trpc/react';
 import { Button } from '@documenso/ui/primitives/button';
 import {
   Dialog,
+  DialogClose,
   DialogContent,
   DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
+  DialogTrigger,
 } from '@documenso/ui/primitives/dialog';
 import {
   Form,
@@ -26,98 +31,79 @@ import {
   FormMessage,
 } from '@documenso/ui/primitives/form/form';
 import { Input } from '@documenso/ui/primitives/input';
-import { PasswordInput } from '@documenso/ui/primitives/password-input';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
 import { RecoveryCodeList } from './recovery-code-list';
 
-export const ZSetupTwoFactorAuthenticationForm = z.object({
-  password: z.string().min(6).max(72),
-});
-
-export type TSetupTwoFactorAuthenticationForm = z.infer<typeof ZSetupTwoFactorAuthenticationForm>;
-
-export const ZEnableTwoFactorAuthenticationForm = z.object({
+export const ZEnable2FAForm = z.object({
   token: z.string(),
 });
 
-export type TEnableTwoFactorAuthenticationForm = z.infer<typeof ZEnableTwoFactorAuthenticationForm>;
+export type TEnable2FAForm = z.infer<typeof ZEnable2FAForm>;
 
 export type EnableAuthenticatorAppDialogProps = {
-  open: boolean;
-  onOpenChange: (_open: boolean) => void;
+  onSuccess?: () => void;
 };
 
-export const EnableAuthenticatorAppDialog = ({
-  open,
-  onOpenChange,
-}: EnableAuthenticatorAppDialogProps) => {
+export const EnableAuthenticatorAppDialog = ({ onSuccess }: EnableAuthenticatorAppDialogProps) => {
   const { toast } = useToast();
 
-  const { mutateAsync: setupTwoFactorAuthentication, data: setupTwoFactorAuthenticationData } =
-    trpc.twoFactorAuthentication.setup.useMutation();
+  const router = useRouter();
+
+  const [isOpen, setIsOpen] = useState(false);
+  const [recoveryCodes, setRecoveryCodes] = useState<string[] | null>(null);
+
+  const { mutateAsync: enable2FA } = trpc.twoFactorAuthentication.enable.useMutation();
 
   const {
-    mutateAsync: enableTwoFactorAuthentication,
-    data: enableTwoFactorAuthenticationData,
-    isLoading: isEnableTwoFactorAuthenticationDataLoading,
-  } = trpc.twoFactorAuthentication.enable.useMutation();
-
-  const setupTwoFactorAuthenticationForm = useForm<TSetupTwoFactorAuthenticationForm>({
-    defaultValues: {
-      password: '',
+    mutateAsync: setup2FA,
+    data: setup2FAData,
+    isLoading: isSettingUp2FA,
+  } = trpc.twoFactorAuthentication.setup.useMutation({
+    onError: () => {
+      toast({
+        title: 'Unable to setup two-factor authentication',
+        description:
+          'We were unable to setup two-factor authentication for your account. Please ensure that you have entered your code correctly and try again.',
+        variant: 'destructive',
+      });
     },
-    resolver: zodResolver(ZSetupTwoFactorAuthenticationForm),
   });
 
-  const { isSubmitting: isSetupTwoFactorAuthenticationSubmitting } =
-    setupTwoFactorAuthenticationForm.formState;
-
-  const enableTwoFactorAuthenticationForm = useForm<TEnableTwoFactorAuthenticationForm>({
+  const enable2FAForm = useForm<TEnable2FAForm>({
     defaultValues: {
       token: '',
     },
-    resolver: zodResolver(ZEnableTwoFactorAuthenticationForm),
+    resolver: zodResolver(ZEnable2FAForm),
   });
 
-  const { isSubmitting: isEnableTwoFactorAuthenticationSubmitting } =
-    enableTwoFactorAuthenticationForm.formState;
+  const { isSubmitting: isEnabling2FA } = enable2FAForm.formState;
 
-  const step = useMemo(() => {
-    if (!setupTwoFactorAuthenticationData || isSetupTwoFactorAuthenticationSubmitting) {
-      return 'setup';
-    }
-
-    if (!enableTwoFactorAuthenticationData || isEnableTwoFactorAuthenticationSubmitting) {
-      return 'enable';
-    }
-
-    return 'view';
-  }, [
-    setupTwoFactorAuthenticationData,
-    isSetupTwoFactorAuthenticationSubmitting,
-    enableTwoFactorAuthenticationData,
-    isEnableTwoFactorAuthenticationSubmitting,
-  ]);
-
-  const onSetupTwoFactorAuthenticationFormSubmit = async ({
-    password,
-  }: TSetupTwoFactorAuthenticationForm) => {
+  const onEnable2FAFormSubmit = async ({ token }: TEnable2FAForm) => {
     try {
-      await setupTwoFactorAuthentication({ password });
+      const data = await enable2FA({ code: token });
+
+      setRecoveryCodes(data.recoveryCodes);
+      onSuccess?.();
+
+      toast({
+        title: 'Two-factor authentication enabled',
+        description:
+          'You will now be required to enter a code from your authenticator app when signing in.',
+      });
     } catch (_err) {
       toast({
         title: 'Unable to setup two-factor authentication',
         description:
-          'We were unable to setup two-factor authentication for your account. Please ensure that you have entered your password correctly and try again.',
+          'We were unable to setup two-factor authentication for your account. Please ensure that you have entered your code correctly and try again.',
         variant: 'destructive',
       });
     }
   };
 
   const downloadRecoveryCodes = () => {
-    if (enableTwoFactorAuthenticationData && enableTwoFactorAuthenticationData.recoveryCodes) {
-      const blob = new Blob([enableTwoFactorAuthenticationData.recoveryCodes.join('\n')], {
+    if (recoveryCodes) {
+      const blob = new Blob([recoveryCodes.join('\n')], {
         type: 'text/plain',
       });
 
@@ -128,168 +114,126 @@ export const EnableAuthenticatorAppDialog = ({
     }
   };
 
-  const onEnableTwoFactorAuthenticationFormSubmit = async ({
-    token,
-  }: TEnableTwoFactorAuthenticationForm) => {
-    try {
-      await enableTwoFactorAuthentication({ code: token });
-
-      toast({
-        title: 'Two-factor authentication enabled',
-        description:
-          'Two-factor authentication has been enabled for your account. You will now be required to enter a code from your authenticator app when signing in.',
-      });
-    } catch (_err) {
-      toast({
-        title: 'Unable to setup two-factor authentication',
-        description:
-          'We were unable to setup two-factor authentication for your account. Please ensure that you have entered your password correctly and try again.',
-        variant: 'destructive',
-      });
+  const handleEnable2FA = async () => {
+    if (!setup2FAData) {
+      await setup2FA();
     }
+
+    setIsOpen(true);
   };
 
+  useEffect(() => {
+    enable2FAForm.reset();
+
+    if (!isOpen && recoveryCodes && recoveryCodes.length > 0) {
+      setRecoveryCodes(null);
+      router.refresh();
+    }
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOpen]);
+
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="w-full max-w-xl md:max-w-xl lg:max-w-xl">
-        <DialogHeader>
-          <DialogTitle>Enable Authenticator App</DialogTitle>
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+      <DialogTrigger asChild={true}>
+        <Button
+          className="flex-shrink-0"
+          loading={isSettingUp2FA}
+          onClick={(e) => {
+            e.preventDefault();
+            void handleEnable2FA();
+          }}
+        >
+          Enable 2FA
+        </Button>
+      </DialogTrigger>
 
-          {step === 'setup' && (
-            <DialogDescription>
-              To enable two-factor authentication, please enter your password below.
-            </DialogDescription>
-          )}
+      <DialogContent position="center">
+        {setup2FAData && (
+          <>
+            {recoveryCodes ? (
+              <div>
+                <DialogHeader>
+                  <DialogTitle>Backup codes</DialogTitle>
+                  <DialogDescription>
+                    Your recovery codes are listed below. Please store them in a safe place.
+                  </DialogDescription>
+                </DialogHeader>
 
-          {step === 'view' && (
-            <DialogDescription>
-              Your recovery codes are listed below. Please store them in a safe place.
-            </DialogDescription>
-          )}
-        </DialogHeader>
+                <div className="mt-4">
+                  <RecoveryCodeList recoveryCodes={recoveryCodes} />
+                </div>
 
-        {match(step)
-          .with('setup', () => {
-            return (
-              <Form {...setupTwoFactorAuthenticationForm}>
-                <form
-                  onSubmit={setupTwoFactorAuthenticationForm.handleSubmit(
-                    onSetupTwoFactorAuthenticationFormSubmit,
-                  )}
-                  className="flex flex-col gap-y-4"
-                >
-                  <FormField
-                    name="password"
-                    control={setupTwoFactorAuthenticationForm.control}
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="text-muted-foreground">Password</FormLabel>
-                        <FormControl>
-                          <PasswordInput
-                            {...field}
-                            autoComplete="current-password"
-                            value={field.value ?? ''}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+                <DialogFooter className="mt-4">
+                  <DialogClose asChild>
+                    <Button variant="secondary">Close</Button>
+                  </DialogClose>
 
-                  <DialogFooter>
-                    <Button type="button" variant="secondary" onClick={() => onOpenChange(false)}>
-                      Cancel
-                    </Button>
+                  <Button onClick={downloadRecoveryCodes}>Download</Button>
+                </DialogFooter>
+              </div>
+            ) : (
+              <Form {...enable2FAForm}>
+                <form onSubmit={enable2FAForm.handleSubmit(onEnable2FAFormSubmit)}>
+                  <DialogHeader>
+                    <DialogTitle>Enable Authenticator App</DialogTitle>
+                    <DialogDescription>
+                      To enable two-factor authentication, scan the following QR code using your
+                      authenticator app.
+                    </DialogDescription>
+                  </DialogHeader>
 
-                    <Button type="submit" loading={isSetupTwoFactorAuthenticationSubmitting}>
-                      Continue
-                    </Button>
-                  </DialogFooter>
+                  <fieldset disabled={isEnabling2FA} className="mt-4 flex flex-col gap-y-4">
+                    <div
+                      className="flex h-36 justify-center"
+                      dangerouslySetInnerHTML={{
+                        __html: renderSVG(setup2FAData?.uri ?? ''),
+                      }}
+                    />
+
+                    <p className="text-muted-foreground text-sm">
+                      If your authenticator app does not support QR codes, you can use the following
+                      code instead:
+                    </p>
+
+                    <p className="bg-muted/60 text-muted-foreground rounded-lg p-2 text-center font-mono tracking-widest">
+                      {setup2FAData?.secret}
+                    </p>
+
+                    <p className="text-muted-foreground text-sm">
+                      Once you have scanned the QR code or entered the code manually, enter the code
+                      provided by your authenticator app below.
+                    </p>
+
+                    <FormField
+                      name="token"
+                      control={enable2FAForm.control}
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-muted-foreground">Token</FormLabel>
+                          <FormControl>
+                            <Input {...field} type="text" value={field.value ?? ''} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <DialogFooter>
+                      <DialogClose asChild>
+                        <Button variant="secondary">Cancel</Button>
+                      </DialogClose>
+
+                      <Button type="submit" loading={isEnabling2FA}>
+                        Enable 2FA
+                      </Button>
+                    </DialogFooter>
+                  </fieldset>
                 </form>
               </Form>
-            );
-          })
-          .with('enable', () => (
-            <Form {...enableTwoFactorAuthenticationForm}>
-              <form
-                onSubmit={enableTwoFactorAuthenticationForm.handleSubmit(
-                  onEnableTwoFactorAuthenticationFormSubmit,
-                )}
-                className="flex flex-col gap-y-4"
-              >
-                <p className="text-muted-foreground text-sm">
-                  To enable two-factor authentication, scan the following QR code using your
-                  authenticator app.
-                </p>
-
-                <div
-                  className="flex h-36 justify-center"
-                  dangerouslySetInnerHTML={{
-                    __html: renderSVG(setupTwoFactorAuthenticationData?.uri ?? ''),
-                  }}
-                />
-
-                <p className="text-muted-foreground text-sm">
-                  If your authenticator app does not support QR codes, you can use the following
-                  code instead:
-                </p>
-
-                <p className="bg-muted/60 text-muted-foreground rounded-lg p-2 text-center font-mono tracking-widest">
-                  {setupTwoFactorAuthenticationData?.secret}
-                </p>
-
-                <p className="text-muted-foreground text-sm">
-                  Once you have scanned the QR code or entered the code manually, enter the code
-                  provided by your authenticator app below.
-                </p>
-
-                <FormField
-                  name="token"
-                  control={enableTwoFactorAuthenticationForm.control}
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-muted-foreground">Token</FormLabel>
-                      <FormControl>
-                        <Input {...field} type="text" value={field.value ?? ''} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <DialogFooter>
-                  <Button type="button" variant="secondary" onClick={() => onOpenChange(false)}>
-                    Cancel
-                  </Button>
-
-                  <Button type="submit" loading={isEnableTwoFactorAuthenticationSubmitting}>
-                    Enable 2FA
-                  </Button>
-                </DialogFooter>
-              </form>
-            </Form>
-          ))
-          .with('view', () => (
-            <div>
-              {enableTwoFactorAuthenticationData?.recoveryCodes && (
-                <RecoveryCodeList recoveryCodes={enableTwoFactorAuthenticationData.recoveryCodes} />
-              )}
-
-              <div className="mt-4 flex flex-row-reverse items-center gap-2">
-                <Button onClick={() => onOpenChange(false)}>Complete</Button>
-
-                <Button
-                  variant="secondary"
-                  onClick={downloadRecoveryCodes}
-                  disabled={!enableTwoFactorAuthenticationData?.recoveryCodes}
-                  loading={isEnableTwoFactorAuthenticationDataLoading}
-                >
-                  Download
-                </Button>
-              </div>
-            </div>
-          ))
-          .exhaustive()}
+            )}
+          </>
+        )}
       </DialogContent>
     </Dialog>
   );

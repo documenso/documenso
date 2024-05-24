@@ -54,6 +54,7 @@ export type AddFieldsFormProps = {
   fields: Field[];
   onSubmit: (_data: TAddFieldsFormSchema) => void;
   canGoBack?: boolean;
+  isDocumentPdfLoaded: boolean;
 };
 
 export const AddFieldsFormPartial = ({
@@ -63,6 +64,7 @@ export const AddFieldsFormPartial = ({
   fields,
   onSubmit,
   canGoBack = false,
+  isDocumentPdfLoaded,
 }: AddFieldsFormProps) => {
   const { isWithinPageBounds, getFieldPosition, getPage } = useDocumentElement();
   const { currentStep, totalSteps, previousStep } = useStep();
@@ -346,19 +348,20 @@ export const AddFieldsFormPartial = ({
             </Card>
           )}
 
-          {localFields.map((field, index) => (
-            <FieldItem
-              key={index}
-              field={field}
-              disabled={selectedSigner?.email !== field.signerEmail || hasSelectedSignerBeenSent}
-              minHeight={fieldBounds.current.height}
-              minWidth={fieldBounds.current.width}
-              passive={isFieldWithinBounds && !!selectedField}
-              onResize={(options) => onFieldResize(options, index)}
-              onMove={(options) => onFieldMove(options, index)}
-              onRemove={() => remove(index)}
-            />
-          ))}
+          {isDocumentPdfLoaded &&
+            localFields.map((field, index) => (
+              <FieldItem
+                key={index}
+                field={field}
+                disabled={selectedSigner?.email !== field.signerEmail || hasSelectedSignerBeenSent}
+                minHeight={fieldBounds.current.height}
+                minWidth={fieldBounds.current.width}
+                passive={isFieldWithinBounds && !!selectedField}
+                onResize={(options) => onFieldResize(options, index)}
+                onMove={(options) => onFieldMove(options, index)}
+                onRemove={() => remove(index)}
+              />
+            ))}
 
           {!hideRecipients && (
             <Popover open={showRecipientsSelector} onOpenChange={setShowRecipientsSelector}>

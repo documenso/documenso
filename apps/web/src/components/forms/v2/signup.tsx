@@ -108,19 +108,6 @@ export const SignUpFormV2 = ({
   const name = form.watch('name');
   const url = form.watch('url');
 
-  // To continue we need to make sure name, email, password and signature are valid
-  const canContinue =
-    form.formState.dirtyFields.name &&
-    form.formState.errors.name === undefined &&
-    form.formState.dirtyFields.email &&
-    form.formState.errors.email === undefined &&
-    form.formState.dirtyFields.password &&
-    form.formState.errors.password === undefined &&
-    form.formState.dirtyFields.signature &&
-    form.formState.errors.signature === undefined;
-
-  console.log({ formSTate: form.formState });
-
   const { mutateAsync: signup } = trpc.auth.signup.useMutation();
 
   const onFormSubmit = async ({ name, email, password, signature, url }: TSignUpFormV2Schema) => {
@@ -168,6 +155,14 @@ export const SignUpFormV2 = ({
           variant: 'destructive',
         });
       }
+    }
+  };
+
+  const onNextClick = async () => {
+    const valid = await form.trigger(['name', 'email', 'password', 'signature']);
+
+    if (valid) {
+      setStep('CLAIM_USERNAME');
     }
   };
 
@@ -226,12 +221,12 @@ export const SignUpFormV2 = ({
         </div>
       </div>
 
-      <div className="border-border dark:bg-background relative z-10 flex min-h-[min(800px,80vh)] w-full max-w-lg flex-col rounded-xl border bg-neutral-100 p-6">
+      <div className="border-border dark:bg-background relative z-10 flex min-h-[min(850px,80vh)] w-full max-w-lg flex-col rounded-xl border bg-neutral-100 p-6">
         {step === 'BASIC_DETAILS' && (
           <div className="h-20">
-            <h1 className="text-2xl font-semibold">Create a new account</h1>
+            <h1 className="text-xl font-semibold md:text-2xl">Create a new account</h1>
 
-            <p className="text-muted-foreground mt-2 text-sm">
+            <p className="text-muted-foreground mt-2 text-xs md:text-sm">
               Create your account and start using state-of-the-art document signing. Open and
               beautiful signing is within your grasp.
             </p>
@@ -240,9 +235,9 @@ export const SignUpFormV2 = ({
 
         {step === 'CLAIM_USERNAME' && (
           <div className="h-20">
-            <h1 className="text-2xl font-semibold">Claim your username now</h1>
+            <h1 className="text-xl font-semibold md:text-2xl">Claim your username now</h1>
 
-            <p className="text-muted-foreground mt-2 text-sm">
+            <p className="text-muted-foreground mt-2 text-xs md:text-sm">
               You will get notified & be able to set up your documenso public profile when we launch
               the feature.
             </p>
@@ -259,8 +254,8 @@ export const SignUpFormV2 = ({
             {step === 'BASIC_DETAILS' && (
               <fieldset
                 className={cn(
-                  'flex h-[500px] w-full flex-col gap-y-4',
-                  isGoogleSSOEnabled && 'h-[600px]',
+                  'flex h-[550px] w-full flex-col gap-y-4',
+                  isGoogleSSOEnabled && 'h-[650px]',
                 )}
                 disabled={isSubmitting}
               >
@@ -362,8 +357,8 @@ export const SignUpFormV2 = ({
             {step === 'CLAIM_USERNAME' && (
               <fieldset
                 className={cn(
-                  'flex h-[500px] w-full flex-col gap-y-4',
-                  isGoogleSSOEnabled && 'h-[600px]',
+                  'flex h-[550px] w-full flex-col gap-y-4',
+                  isGoogleSSOEnabled && 'h-[650px]',
                 )}
                 disabled={isSubmitting}
               >
@@ -380,7 +375,7 @@ export const SignUpFormV2 = ({
 
                       <FormMessage />
 
-                      <div className="bg-muted/50 border-border text-muted-foreground mt-2 inline-block truncate rounded-md border px-2 py-1 text-sm lowercase">
+                      <div className="bg-muted/50 border-border text-muted-foreground mt-2 inline-block max-w-[16rem] truncate rounded-md border px-2 py-1 text-sm lowercase">
                         {baseUrl.host}/u/{field.value || '<username>'}
                       </div>
                     </FormItem>
@@ -421,8 +416,7 @@ export const SignUpFormV2 = ({
                 size="lg"
                 variant="secondary"
                 className="flex-1"
-                disabled={step === 'BASIC_DETAILS'}
-                loading={form.formState.isSubmitting}
+                disabled={step === 'BASIC_DETAILS' || form.formState.isSubmitting}
                 onClick={() => setStep('BASIC_DETAILS')}
               >
                 Back
@@ -434,9 +428,8 @@ export const SignUpFormV2 = ({
                   type="button"
                   size="lg"
                   className="flex-1 disabled:cursor-not-allowed"
-                  disabled={!canContinue}
                   loading={form.formState.isSubmitting}
-                  onClick={() => setStep('CLAIM_USERNAME')}
+                  onClick={onNextClick}
                 >
                   Next
                 </Button>
