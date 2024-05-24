@@ -7,6 +7,7 @@ import { prisma } from '@documenso/prisma';
 
 export type UpdateTitleOptions = {
   userId: number;
+  teamId?: number;
   documentId: number;
   title: string;
   requestMetadata?: RequestMetadata;
@@ -14,6 +15,7 @@ export type UpdateTitleOptions = {
 
 export const updateTitle = async ({
   userId,
+  teamId,
   documentId,
   title,
   requestMetadata,
@@ -24,34 +26,39 @@ export const updateTitle = async ({
     },
   });
 
-  return await prisma.$transaction(async (tx) => {
-    const document = await tx.document.findFirstOrThrow({
-      where: {
-        id: documentId,
-        OR: [
-          {
-            userId,
-          },
-          {
+  const document = await prisma.document.findFirstOrThrow({
+    where: {
+      id: documentId,
+      ...(teamId
+        ? {
             team: {
+              id: teamId,
               members: {
                 some: {
                   userId,
                 },
               },
             },
-          },
-        ],
-      },
-    });
+          }
+        : {
+            userId,
+            teamId: null,
+          }),
+    },
+  });
 
-    if (document.title === title) {
-      return document;
-    }
+  if (document.title === title) {
+    return document;
+  }
 
+  return await prisma.$transaction(async (tx) => {
+    // Instead of doing everything in a transaction we can use our knowledge
+    // of the current document title to ensure we aren't performing a conflicting
+    // update.
     const updatedDocument = await tx.document.update({
       where: {
         id: documentId,
+        title: document.title,
       },
       data: {
         title,

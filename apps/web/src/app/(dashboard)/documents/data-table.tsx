@@ -3,6 +3,7 @@
 import { useTransition } from 'react';
 
 import { Loader } from 'lucide-react';
+import { DateTime } from 'luxon';
 import { useSession } from 'next-auth/react';
 
 import { useUpdateSearchParams } from '@documenso/lib/client-only/hooks/use-update-search-params';
@@ -29,7 +30,7 @@ export type DocumentsDataTableProps = {
     }
   >;
   showSenderColumn?: boolean;
-  team?: Pick<Team, 'id' | 'url'>;
+  team?: Pick<Team, 'id' | 'url'> & { teamEmail?: string };
 };
 
 export const DocumentsDataTable = ({
@@ -62,11 +63,16 @@ export const DocumentsDataTable = ({
           {
             header: 'Created',
             accessorKey: 'createdAt',
-            cell: ({ row }) => <LocaleDate date={row.original.createdAt} />,
+            cell: ({ row }) => (
+              <LocaleDate
+                date={row.original.createdAt}
+                format={{ ...DateTime.DATETIME_SHORT, hourCycle: 'h12' }}
+              />
+            ),
           },
           {
             header: 'Title',
-            cell: ({ row }) => <DataTableTitle row={row.original} />,
+            cell: ({ row }) => <DataTableTitle row={row.original} teamUrl={team?.url} />,
           },
           {
             id: 'sender',
@@ -76,14 +82,18 @@ export const DocumentsDataTable = ({
           {
             header: 'Recipient',
             accessorKey: 'recipient',
-            cell: ({ row }) => {
-              return <StackAvatarsWithTooltip recipients={row.original.Recipient} />;
-            },
+            cell: ({ row }) => (
+              <StackAvatarsWithTooltip
+                recipients={row.original.Recipient}
+                documentStatus={row.original.status}
+              />
+            ),
           },
           {
             header: 'Status',
             accessorKey: 'status',
             cell: ({ row }) => <DocumentStatus status={row.getValue('status')} />,
+            size: 140,
           },
           {
             header: 'Actions',

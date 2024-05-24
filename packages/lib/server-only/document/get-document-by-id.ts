@@ -21,6 +21,19 @@ export const getDocumentById = async ({ id, userId, teamId }: GetDocumentByIdOpt
     include: {
       documentData: true,
       documentMeta: true,
+      User: {
+        select: {
+          id: true,
+          name: true,
+          email: true,
+        },
+      },
+      team: {
+        select: {
+          id: true,
+          url: true,
+        },
+      },
     },
   });
 };

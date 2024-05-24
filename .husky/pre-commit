@@ -1,4 +1,16 @@
 #!/usr/bin/env sh
 . "$(dirname -- "$0")/_/husky.sh"
 
+SCRIPT_DIR="$(readlink -f "$(dirname "$0")")"
+MONOREPO_ROOT="$(readlink -f "$SCRIPT_DIR/../")"
+
+echo "Copying pdf.js"
+npm run copy:pdfjs --workspace apps/**
+
+echo "Copying .well-known/ contents"
+node "$MONOREPO_ROOT/scripts/copy-wellknown.cjs"
+
+git add "$MONOREPO_ROOT/apps/web/public/"
+git add "$MONOREPO_ROOT/apps/marketing/public/"
+
 npx lint-staged

@@ -12,6 +12,7 @@ export const ZCreateSinglePlayerDocumentMutationSchema = z.object({
     email: z.string().email().min(1),
     name: z.string(),
     signature: z.string(),
+    customText: z.string(),
   }),
   fields: z.array(
     z.object({

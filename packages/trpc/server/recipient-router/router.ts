@@ -17,16 +17,18 @@ export const recipientRouter = router({
     .input(ZAddSignersMutationSchema)
     .mutation(async ({ input, ctx }) => {
       try {
-        const { documentId, signers } = input;
+        const { documentId, teamId, signers } = input;
 
         return await setRecipientsForDocument({
           userId: ctx.user.id,
           documentId,
+          teamId,
           recipients: signers.map((signer) => ({
             id: signer.nativeId,
             email: signer.email,
             name: signer.name,
             role: signer.role,
+            actionAuth: signer.actionAuth,
           })),
           requestMetadata: extractNextApiRequestMetadata(ctx.req),
         });
@@ -44,15 +46,18 @@ export const recipientRouter = router({
     .input(ZAddTemplateSignersMutationSchema)
     .mutation(async ({ input, ctx }) => {
       try {
-        const { templateId, signers } = input;
+        const { templateId, signers, teamId } = input;
 
         return await setRecipientsForTemplate({
           userId: ctx.user.id,
+          teamId,
           templateId,
           recipients: signers.map((signer) => ({
             id: signer.nativeId,
             email: signer.email,
             name: signer.name,
+            role: signer.role,
+            actionAuth: signer.actionAuth,
           })),
         });
       } catch (err) {
@@ -69,11 +74,13 @@ export const recipientRouter = router({
     .input(ZCompleteDocumentWithTokenMutationSchema)
     .mutation(async ({ input, ctx }) => {
       try {
-        const { token, documentId } = input;
+        const { token, documentId, authOptions } = input;
 
         return await completeDocumentWithToken({
           token,
           documentId,
+          authOptions,
+          userId: ctx.user?.id,
           requestMetadata: extractNextApiRequestMetadata(ctx.req),
         });
       } catch (err) {

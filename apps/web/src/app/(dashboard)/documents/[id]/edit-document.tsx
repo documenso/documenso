@@ -1,72 +1,132 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 
-import type { DocumentData, DocumentMeta, Field, Recipient, User } from '@documenso/prisma/client';
-import { DocumentStatus } from '@documenso/prisma/client';
-import type { DocumentWithData } from '@documenso/prisma/types/document-with-data';
+import {
+  DO_NOT_INVALIDATE_QUERY_ON_MUTATION,
+  SKIP_QUERY_BATCH_META,
+} from '@documenso/lib/constants/trpc';
+import type { DocumentWithDetails } from '@documenso/prisma/types/document';
 import { trpc } from '@documenso/trpc/react';
 import { cn } from '@documenso/ui/lib/utils';
 import { Card, CardContent } from '@documenso/ui/primitives/card';
 import { AddFieldsFormPartial } from '@documenso/ui/primitives/document-flow/add-fields';
 import type { TAddFieldsFormSchema } from '@documenso/ui/primitives/document-flow/add-fields.types';
+import { AddSettingsFormPartial } from '@documenso/ui/primitives/document-flow/add-settings';
+import type { TAddSettingsFormSchema } from '@documenso/ui/primitives/document-flow/add-settings.types';
 import { AddSignersFormPartial } from '@documenso/ui/primitives/document-flow/add-signers';
 import type { TAddSignersFormSchema } from '@documenso/ui/primitives/document-flow/add-signers.types';
 import { AddSubjectFormPartial } from '@documenso/ui/primitives/document-flow/add-subject';
 import type { TAddSubjectFormSchema } from '@documenso/ui/primitives/document-flow/add-subject.types';
-import { AddTitleFormPartial } from '@documenso/ui/primitives/document-flow/add-title';
-import type { TAddTitleFormSchema } from '@documenso/ui/primitives/document-flow/add-title.types';
 import { DocumentFlowFormContainer } from '@documenso/ui/primitives/document-flow/document-flow-root';
 import type { DocumentFlowStep } from '@documenso/ui/primitives/document-flow/types';
 import { LazyPDFViewer } from '@documenso/ui/primitives/lazy-pdf-viewer';
 import { Stepper } from '@documenso/ui/primitives/stepper';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
+import { useOptionalCurrentTeam } from '~/providers/team';
+
 export type EditDocumentFormProps = {
   className?: string;
-  user: User;
-  document: DocumentWithData;
-  recipients: Recipient[];
-  documentMeta: DocumentMeta | null;
-  fields: Field[];
-  documentData: DocumentData;
+  initialDocument: DocumentWithDetails;
   documentRootPath: string;
+  isDocumentEnterprise: boolean;
 };
 
-type EditDocumentStep = 'title' | 'signers' | 'fields' | 'subject';
-const EditDocumentSteps: EditDocumentStep[] = ['title', 'signers', 'fields', 'subject'];
+type EditDocumentStep = 'settings' | 'signers' | 'fields' | 'subject';
+const EditDocumentSteps: EditDocumentStep[] = ['settings', 'signers', 'fields', 'subject'];
 
 export const EditDocumentForm = ({
   className,
-  document,
-  recipients,
-  fields,
-  documentMeta,
-  user: _user,
-  documentData,
+  initialDocument,
   documentRootPath,
+  isDocumentEnterprise,
 }: EditDocumentFormProps) => {
   const { toast } = useToast();
+
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const team = useOptionalCurrentTeam();
 
-  // controlled stepper state
-  const [step, setStep] = useState<EditDocumentStep>(
-    document.status === DocumentStatus.DRAFT ? 'title' : 'signers',
-  );
+  const [isDocumentPdfLoaded, setIsDocumentPdfLoaded] = useState(false);
 
-  const { mutateAsync: addTitle } = trpc.document.setTitleForDocument.useMutation();
-  const { mutateAsync: addFields } = trpc.field.addFields.useMutation();
-  const { mutateAsync: addSigners } = trpc.recipient.addSigners.useMutation();
-  const { mutateAsync: sendDocument } = trpc.document.sendDocument.useMutation();
+  const utils = trpc.useUtils();
+
+  const { data: document, refetch: refetchDocument } =
+    trpc.document.getDocumentWithDetailsById.useQuery(
+      {
+        id: initialDocument.id,
+        teamId: team?.id,
+      },
+      {
+        initialData: initialDocument,
+        ...SKIP_QUERY_BATCH_META,
+      },
+    );
+
+  const { Recipient: recipients, Field: fields } = document;
+
+  const { mutateAsync: setSettingsForDocument } = trpc.document.setSettingsForDocument.useMutation({
+    ...DO_NOT_INVALIDATE_QUERY_ON_MUTATION,
+    onSuccess: (newData) => {
+      utils.document.getDocumentWithDetailsById.setData(
+        {
+          id: initialDocument.id,
+          teamId: team?.id,
+        },
+        (oldData) => ({ ...(oldData || initialDocument), ...newData }),
+      );
+    },
+  });
+
+  const { mutateAsync: addFields } = trpc.field.addFields.useMutation({
+    ...DO_NOT_INVALIDATE_QUERY_ON_MUTATION,
+    onSuccess: (newFields) => {
+      utils.document.getDocumentWithDetailsById.setData(
+        {
+          id: initialDocument.id,
+          teamId: team?.id,
+        },
+        (oldData) => ({ ...(oldData || initialDocument), Field: newFields }),
+      );
+    },
+  });
+
+  const { mutateAsync: addSigners } = trpc.recipient.addSigners.useMutation({
+    ...DO_NOT_INVALIDATE_QUERY_ON_MUTATION,
+    onSuccess: (newRecipients) => {
+      utils.document.getDocumentWithDetailsById.setData(
+        {
+          id: initialDocument.id,
+          teamId: team?.id,
+        },
+        (oldData) => ({ ...(oldData || initialDocument), Recipient: newRecipients }),
+      );
+    },
+  });
+
+  const { mutateAsync: sendDocument } = trpc.document.sendDocument.useMutation({
+    ...DO_NOT_INVALIDATE_QUERY_ON_MUTATION,
+    onSuccess: (newData) => {
+      utils.document.getDocumentWithDetailsById.setData(
+        {
+          id: initialDocument.id,
+          teamId: team?.id,
+        },
+        (oldData) => ({ ...(oldData || initialDocument), ...newData }),
+      );
+    },
+  });
+
   const { mutateAsync: setPasswordForDocument } =
     trpc.document.setPasswordForDocument.useMutation();
 
   const documentFlow: Record<EditDocumentStep, DocumentFlowStep> = {
-    title: {
-      title: 'Add Title',
-      description: 'Add the title to the document.',
+    settings: {
+      title: 'General',
+      description: 'Configure general settings for the document.',
       stepIndex: 1,
     },
     signers: {
@@ -86,14 +146,43 @@ export const EditDocumentForm = ({
     },
   };
 
-  const onAddTitleFormSubmit = async (data: TAddTitleFormSchema) => {
+  const [step, setStep] = useState<EditDocumentStep>(() => {
+    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+    const searchParamStep = searchParams?.get('step') as EditDocumentStep | undefined;
+
+    let initialStep: EditDocumentStep = 'settings';
+
+    if (
+      searchParamStep &&
+      documentFlow[searchParamStep] !== undefined &&
+      !(recipients.length === 0 && (searchParamStep === 'subject' || searchParamStep === 'fields'))
+    ) {
+      initialStep = searchParamStep;
+    }
+
+    return initialStep;
+  });
+
+  const onAddSettingsFormSubmit = async (data: TAddSettingsFormSchema) => {
     try {
-      // Custom invocation server action
-      await addTitle({
+      const { timezone, dateFormat, redirectUrl } = data.meta;
+
+      await setSettingsForDocument({
         documentId: document.id,
-        title: data.title,
+        teamId: team?.id,
+        data: {
+          title: data.title,
+          globalAccessAuth: data.globalAccessAuth ?? null,
+          globalActionAuth: data.globalActionAuth ?? null,
+        },
+        meta: {
+          timezone,
+          dateFormat,
+          redirectUrl,
+        },
       });
 
+      // Router refresh is here to clear the router cache for when navigating to /documents.
       router.refresh();
 
       setStep('signers');
@@ -102,7 +191,7 @@ export const EditDocumentForm = ({
 
       toast({
         title: 'Error',
-        description: 'An error occurred while updating title.',
+        description: 'An error occurred while updating the document settings.',
         variant: 'destructive',
       });
     }
@@ -110,13 +199,19 @@ export const EditDocumentForm = ({
 
   const onAddSignersFormSubmit = async (data: TAddSignersFormSchema) => {
     try {
-      // Custom invocation server action
       await addSigners({
         documentId: document.id,
-        signers: data.signers,
+        teamId: team?.id,
+        signers: data.signers.map((signer) => ({
+          ...signer,
+          // Explicitly set to null to indicate we want to remove auth if required.
+          actionAuth: signer.actionAuth || null,
+        })),
       });
 
+      // Router refresh is here to clear the router cache for when navigating to /documents.
       router.refresh();
+
       setStep('fields');
     } catch (err) {
       console.error(err);
@@ -131,13 +226,14 @@ export const EditDocumentForm = ({
 
   const onAddFieldsFormSubmit = async (data: TAddFieldsFormSchema) => {
     try {
-      // Custom invocation server action
       await addFields({
         documentId: document.id,
         fields: data.fields,
       });
 
+      // Router refresh is here to clear the router cache for when navigating to /documents.
       router.refresh();
+
       setStep('subject');
     } catch (err) {
       console.error(err);
@@ -151,17 +247,15 @@ export const EditDocumentForm = ({
   };
 
   const onAddSubjectFormSubmit = async (data: TAddSubjectFormSchema) => {
-    const { subject, message, timezone, dateFormat, redirectUrl } = data.meta;
+    const { subject, message } = data.meta;
 
     try {
       await sendDocument({
         documentId: document.id,
+        teamId: team?.id,
         meta: {
           subject,
           message,
-          dateFormat,
-          timezone,
-          redirectUrl,
         },
       });
 
@@ -192,6 +286,15 @@ export const EditDocumentForm = ({
 
   const currentDocumentFlow = documentFlow[step];
 
+  /**
+   * Refresh the data in the background when steps change.
+   */
+  useEffect(() => {
+    void refetchDocument();
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [step]);
+
   return (
     <div className={cn('grid w-full grid-cols-12 gap-8', className)}>
       <Card
@@ -200,11 +303,12 @@ export const EditDocumentForm = ({
       >
         <CardContent className="p-2">
           <LazyPDFViewer
-            key={documentData.id}
-            documentData={documentData}
+            key={document.documentData.id}
+            documentData={document.documentData}
             document={document}
-            password={documentMeta?.password}
+            password={document.documentMeta?.password}
             onPasswordSubmit={onPasswordSubmit}
+            onDocumentLoad={() => setIsDocumentPdfLoaded(true)}
           />
         </CardContent>
       </Card>
@@ -218,30 +322,36 @@ export const EditDocumentForm = ({
             currentStep={currentDocumentFlow.stepIndex}
             setCurrentStep={(step) => setStep(EditDocumentSteps[step - 1])}
           >
-            <AddTitleFormPartial
+            <AddSettingsFormPartial
               key={recipients.length}
-              documentFlow={documentFlow.title}
+              documentFlow={documentFlow.settings}
               document={document}
               recipients={recipients}
               fields={fields}
-              onSubmit={onAddTitleFormSubmit}
+              isDocumentEnterprise={isDocumentEnterprise}
+              isDocumentPdfLoaded={isDocumentPdfLoaded}
+              onSubmit={onAddSettingsFormSubmit}
             />
 
             <AddSignersFormPartial
               key={recipients.length}
               documentFlow={documentFlow.signers}
-              document={document}
               recipients={recipients}
               fields={fields}
+              isDocumentEnterprise={isDocumentEnterprise}
               onSubmit={onAddSignersFormSubmit}
+              isDocumentPdfLoaded={isDocumentPdfLoaded}
             />
+
             <AddFieldsFormPartial
               key={fields.length}
               documentFlow={documentFlow.fields}
               recipients={recipients}
               fields={fields}
               onSubmit={onAddFieldsFormSubmit}
+              isDocumentPdfLoaded={isDocumentPdfLoaded}
             />
+
             <AddSubjectFormPartial
               key={recipients.length}
               documentFlow={documentFlow.subject}
@@ -249,6 +359,7 @@ export const EditDocumentForm = ({
               recipients={recipients}
               fields={fields}
               onSubmit={onAddSubjectFormSubmit}
+              isDocumentPdfLoaded={isDocumentPdfLoaded}
             />
           </Stepper>
         </DocumentFlowFormContainer>

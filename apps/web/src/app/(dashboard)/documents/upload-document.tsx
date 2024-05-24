@@ -2,7 +2,6 @@
 
 import { useMemo, useState } from 'react';
 
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
 import { Loader } from 'lucide-react';
@@ -11,8 +10,9 @@ import { useSession } from 'next-auth/react';
 import { useLimits } from '@documenso/ee/server-only/limits/provider/client';
 import { useAnalytics } from '@documenso/lib/client-only/hooks/use-analytics';
 import { APP_DOCUMENT_UPLOAD_SIZE_LIMIT } from '@documenso/lib/constants/app';
+import { AppError } from '@documenso/lib/errors/app-error';
 import { createDocumentData } from '@documenso/lib/server-only/document-data/create-document-data';
-import { putFile } from '@documenso/lib/universal/upload/put-file';
+import { putPdfFile } from '@documenso/lib/universal/upload/put-file';
 import { formatDocumentsPath } from '@documenso/lib/utils/teams';
 import { TRPCClientError } from '@documenso/trpc/client';
 import { trpc } from '@documenso/trpc/react';
@@ -58,7 +58,7 @@ export const UploadDocument = ({ className, team }: UploadDocumentProps) => {
     try {
       setIsLoading(true);
 
-      const { type, data } = await putFile(file);
+      const { type, data } = await putPdfFile(file);
 
       const { id: documentDataId } = await createDocumentData({
         type,
@@ -83,14 +83,22 @@ export const UploadDocument = ({ className, team }: UploadDocumentProps) => {
         timestamp: new Date().toISOString(),
       });
 
-      router.push(`${formatDocumentsPath(team?.url)}/${id}`);
-    } catch (error) {
-      console.error(error);
+      router.push(`${formatDocumentsPath(team?.url)}/${id}/edit`);
+    } catch (err) {
+      const error = AppError.parseError(err);
 
-      if (error instanceof TRPCClientError) {
+      console.error(err);
+
+      if (error.code === 'INVALID_DOCUMENT_FILE') {
+        toast({
+          title: 'Invalid file',
+          description: 'You cannot upload encrypted PDFs',
+          variant: 'destructive',
+        });
+      } else if (err instanceof TRPCClientError) {
         toast({
           title: 'Error',
-          description: error.message,
+          description: err.message,
           variant: 'destructive',
         });
       } else {
@@ -117,7 +125,7 @@ export const UploadDocument = ({ className, team }: UploadDocumentProps) => {
   return (
     <div className={cn('relative', className)}>
       <DocumentDropzone
-        className="min-h-[40vh]"
+        className="h-[min(400px,50vh)]"
         disabled={remaining.documents === 0 || !session?.user.emailVerified}
         disabledMessage={disabledMessage}
         onDrop={onFileDrop}
@@ -137,27 +145,6 @@ export const UploadDocument = ({ className, team }: UploadDocumentProps) => {
       {isLoading && (
         <div className="bg-background/50 absolute inset-0 flex items-center justify-center rounded-lg">
           <Loader className="text-muted-foreground h-12 w-12 animate-spin" />
-        </div>
-      )}
-
-      {team?.id === undefined && remaining.documents === 0 && (
-        <div className="bg-background/60 absolute inset-0 flex items-center justify-center rounded-lg backdrop-blur-sm">
-          <div className="text-center">
-            <h2 className="text-muted-foreground/80 text-xl font-semibold">
-              You have reached your document limit.
-            </h2>
-
-            <p className="text-muted-foreground/60 mt-2 text-sm">
-              You can upload up to {quota.documents} documents per month on your current plan.
-            </p>
-
-            <Link
-              className="text-primary hover:text-primary/80 mt-6 block font-medium"
-              href="/settings/billing"
-            >
-              Upgrade your account to upload more documents.
-            </Link>
-          </div>
         </div>
       )}
     </div>

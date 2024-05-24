@@ -22,6 +22,7 @@ export const mapField = (
     .with(FieldType.DATE, () => DateTime.now().toFormat('yyyy-MM-dd hh:mm a'))
     .with(FieldType.EMAIL, () => signer.email)
     .with(FieldType.NAME, () => signer.name)
+    .with(FieldType.TEXT, () => signer.customText)
     .otherwise(() => '');
 
   return {

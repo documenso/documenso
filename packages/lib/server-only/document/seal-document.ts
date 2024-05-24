@@ -9,23 +9,31 @@ import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-log
 import { createDocumentAuditLogData } from '@documenso/lib/utils/document-audit-logs';
 import { prisma } from '@documenso/prisma';
 import { DocumentStatus, RecipientRole, SigningStatus } from '@documenso/prisma/client';
+import { WebhookTriggerEvents } from '@documenso/prisma/client';
 import { signPdf } from '@documenso/signing';
 
 import type { RequestMetadata } from '../../universal/extract-request-metadata';
 import { getFile } from '../../universal/upload/get-file';
-import { putFile } from '../../universal/upload/put-file';
+import { putPdfFile } from '../../universal/upload/put-file';
+import { getCertificatePdf } from '../htmltopdf/get-certificate-pdf';
+import { flattenAnnotations } from '../pdf/flatten-annotations';
+import { flattenForm } from '../pdf/flatten-form';
 import { insertFieldInPDF } from '../pdf/insert-field-in-pdf';
+import { normalizeSignatureAppearances } from '../pdf/normalize-signature-appearances';
+import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
 import { sendCompletedEmail } from './send-completed-email';
 
 export type SealDocumentOptions = {
   documentId: number;
   sendEmail?: boolean;
+  isResealing?: boolean;
   requestMetadata?: RequestMetadata;
 };
 
 export const sealDocument = async ({
   documentId,
   sendEmail = true,
+  isResealing = false,
   requestMetadata,
 }: SealDocumentOptions) => {
   'use server';
@@ -33,9 +41,15 @@ export const sealDocument = async ({
   const document = await prisma.document.findFirstOrThrow({
     where: {
       id: documentId,
+      Recipient: {
+        every: {
+          signingStatus: SigningStatus.SIGNED,
+        },
+      },
     },
     include: {
       documentData: true,
+      Recipient: true,
     },
   });
 
@@ -43,10 +57,6 @@ export const sealDocument = async ({
 
   if (!documentData) {
     throw new Error(`Document ${document.id} has no document data`);
-  }
-
-  if (document.status !== DocumentStatus.COMPLETED) {
-    throw new Error(`Document ${document.id} has not been completed`);
   }
 
   const recipients = await prisma.recipient.findMany({
@@ -75,10 +85,33 @@ export const sealDocument = async ({
     throw new Error(`Document ${document.id} has unsigned fields`);
   }
 
+  if (isResealing) {
+    // If we're resealing we want to use the initial data for the document
+    // so we aren't placing fields on top of eachother.
+    documentData.data = documentData.initialData;
+  }
+
   // !: Need to write the fields onto the document as a hard copy
   const pdfData = await getFile(documentData);
 
+  const certificate = await getCertificatePdf({ documentId })
+    .then(async (doc) => PDFDocument.load(doc))
+    .catch(() => null);
+
   const doc = await PDFDocument.load(pdfData);
+
+  // Normalize and flatten layers that could cause issues with the signature
+  normalizeSignatureAppearances(doc);
+  flattenForm(doc);
+  flattenAnnotations(doc);
+
+  if (certificate) {
+    const certificatePages = await doc.copyPages(certificate, certificate.getPageIndices());
+
+    certificatePages.forEach((page) => {
+      doc.addPage(page);
+    });
+  }
 
   for (const field of fields) {
     await insertFieldInPDF(doc, field);
@@ -90,7 +123,7 @@ export const sealDocument = async ({
 
   const { name, ext } = path.parse(document.title);
 
-  const { data: newData } = await putFile({
+  const { data: newData } = await putPdfFile({
     name: `${name}_signed${ext}`,
     type: 'application/pdf',
     arrayBuffer: async () => Promise.resolve(pdfBuffer),
@@ -109,6 +142,16 @@ export const sealDocument = async ({
   }
 
   await prisma.$transaction(async (tx) => {
+    await tx.document.update({
+      where: {
+        id: document.id,
+      },
+      data: {
+        status: DocumentStatus.COMPLETED,
+        completedAt: new Date(),
+      },
+    });
+
     await tx.documentData.update({
       where: {
         id: documentData.id,
@@ -131,7 +174,24 @@ export const sealDocument = async ({
     });
   });
 
-  if (sendEmail) {
+  if (sendEmail && !isResealing) {
     await sendCompletedEmail({ documentId, requestMetadata });
   }
+
+  const updatedDocument = await prisma.document.findFirstOrThrow({
+    where: {
+      id: document.id,
+    },
+    include: {
+      documentData: true,
+      Recipient: true,
+    },
+  });
+
+  await triggerWebhook({
+    event: WebhookTriggerEvents.DOCUMENT_COMPLETED,
+    data: updatedDocument,
+    userId: document.userId,
+    teamId: document.teamId ?? undefined,
+  });
 };

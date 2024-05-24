@@ -32,13 +32,14 @@
     "@sindresorhus/slugify": "^2.2.1",
     "@upstash/redis": "^1.20.6",
     "@vvo/tzdb": "^6.117.0",
-    "bcrypt": "^5.1.0",
+    "@node-rs/bcrypt": "^1.10.0",
     "luxon": "^3.4.0",
     "nanoid": "^4.0.2",
     "next": "14.0.3",
     "next-auth": "4.24.5",
     "oslo": "^0.17.0",
     "pdf-lib": "^1.17.1",
+    "playwright": "1.43.0",
     "react": "18.2.0",
     "remeda": "^1.27.1",
     "stripe": "^12.7.0",
@@ -46,7 +47,7 @@
     "zod": "^3.22.4"
   },
   "devDependencies": {
-    "@types/bcrypt": "^5.0.0",
-    "@types/luxon": "^3.3.1"
+    "@types/luxon": "^3.3.1",
+    "@playwright/browser-chromium": "1.43.0"
   }
 }

@@ -12,15 +12,15 @@
     "commitlint": "commitlint --edit",
     "clean": "turbo run clean && rimraf node_modules",
     "d": "npm run dx && npm run dev",
-    "dx": "npm i && npm run dx:up && npm run prisma:migrate-dev",
-    "dx:up": "docker compose -f docker/compose-services.yml up -d",
-    "dx:down": "docker compose -f docker/compose-services.yml down",
-    "ci": "turbo run build test:e2e",
+    "dx": "npm i && npm run dx:up && npm run prisma:migrate-dev && npm run prisma:seed",
+    "dx:up": "docker compose -f docker/development/compose.yml up -d",
+    "dx:down": "docker compose -f docker/development/compose.yml down",
+    "ci": "turbo run test:e2e",
     "prisma:generate": "npm run with:env -- npm run prisma:generate -w @documenso/prisma",
     "prisma:migrate-dev": "npm run with:env -- npm run prisma:migrate-dev -w @documenso/prisma",
     "prisma:migrate-deploy": "npm run with:env -- npm run prisma:migrate-deploy -w @documenso/prisma",
     "prisma:seed": "npm run with:env -- npm run prisma:seed -w @documenso/prisma",
-    "prisma:studio": "npm run with:env -- npx prisma studio --schema packages/prisma/schema.prisma",
+    "prisma:studio": "npm run with:env -- npm run prisma:studio -w @documenso/prisma",
     "with:env": "dotenv -e .env -e .env.local --",
     "reset:hard": "npm run clean && npm i && npm run prisma:generate",
     "precommit": "npm install && git add package.json package-lock.json"
@@ -36,8 +36,9 @@
     "dotenv-cli": "^7.3.0",
     "eslint": "^8.40.0",
     "eslint-config-custom": "*",
-    "husky": "^8.0.0",
-    "lint-staged": "^14.0.0",
+    "husky": "^9.0.11",
+    "lint-staged": "^15.2.2",
+    "playwright": "1.43.0",
     "prettier": "^2.5.1",
     "rimraf": "^5.0.1",
     "turbo": "^1.9.3"
@@ -48,6 +49,7 @@
     "packages/*"
   ],
   "dependencies": {
+    "@documenso/pdf-sign": "^0.1.0",
     "next-runtime-env": "^3.2.0"
   },
   "overrides": {

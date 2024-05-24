@@ -2,8 +2,13 @@
   "$schema": "https://turbo.build/schema.json",
   "pipeline": {
     "build": {
-      "dependsOn": ["^build"],
-      "outputs": [".next/**", "!.next/cache/**"]
+      "dependsOn": [
+        "^build"
+      ],
+      "outputs": [
+        ".next/**",
+        "!.next/cache/**"
+      ]
     },
     "lint": {
       "cache": false
@@ -19,7 +24,9 @@
       "persistent": true
     },
     "start": {
-      "dependsOn": ["^build"],
+      "dependsOn": [
+        "^build"
+      ],
       "cache": false,
       "persistent": true
     },
@@ -27,10 +34,15 @@
       "cache": false
     },
     "test:e2e": {
-      "dependsOn": ["^build"]
+      "dependsOn": [
+        "^build"
+      ],
+      "cache": false
     }
   },
-  "globalDependencies": ["**/.env.*local"],
+  "globalDependencies": [
+    "**/.env.*local"
+  ],
   "globalEnv": [
     "APP_VERSION",
     "NEXT_PRIVATE_ENCRYPTION_KEY",
@@ -43,14 +55,24 @@
     "NEXT_PUBLIC_POSTHOG_KEY",
     "NEXT_PUBLIC_FEATURE_BILLING_ENABLED",
     "NEXT_PUBLIC_STRIPE_COMMUNITY_PLAN_MONTHLY_PRICE_ID",
+    "NEXT_PUBLIC_STRIPE_ENTERPRISE_PLAN_MONTHLY_PRICE_ID",
     "NEXT_PUBLIC_DISABLE_SIGNUP",
     "NEXT_PUBLIC_DOCUMENT_SIZE_UPLOAD_LIMIT",
     "NEXT_PRIVATE_DATABASE_URL",
     "NEXT_PRIVATE_DIRECT_DATABASE_URL",
+    "NEXT_PRIVATE_SIGNING_TRANSPORT",
+    "NEXT_PRIVATE_SIGNING_PASSPHRASE",
+    "NEXT_PRIVATE_SIGNING_LOCAL_FILE_PATH",
+    "NEXT_PRIVATE_SIGNING_LOCAL_FILE_CONTENTS",
+    "NEXT_PRIVATE_SIGNING_GCLOUD_HSM_KEY_PATH",
+    "NEXT_PRIVATE_SIGNING_GCLOUD_HSM_PUBLIC_CRT_FILE_PATH",
+    "NEXT_PRIVATE_SIGNING_GCLOUD_HSM_PUBLIC_CRT_FILE_CONTENTS",
+    "NEXT_PRIVATE_SIGNING_GCLOUD_APPLICATION_CREDENTIALS_CONTENTS",
     "NEXT_PRIVATE_GOOGLE_CLIENT_ID",
     "NEXT_PRIVATE_GOOGLE_CLIENT_SECRET",
     "NEXT_PUBLIC_UPLOAD_TRANSPORT",
     "NEXT_PRIVATE_UPLOAD_ENDPOINT",
+    "NEXT_PRIVATE_UPLOAD_FORCE_PATH_STYLE",
     "NEXT_PRIVATE_UPLOAD_REGION",
     "NEXT_PRIVATE_UPLOAD_BUCKET",
     "NEXT_PRIVATE_UPLOAD_ACCESS_KEY_ID",
@@ -82,15 +104,21 @@
     "NEXT_PRIVATE_STRIPE_API_KEY",
     "NEXT_PRIVATE_STRIPE_WEBHOOK_SECRET",
     "NEXT_PRIVATE_GITHUB_TOKEN",
+    "NEXT_PRIVATE_BROWSERLESS_URL",
+    "CI",
     "VERCEL",
     "VERCEL_ENV",
     "VERCEL_URL",
+    "NODE_ENV",
     "DEPLOYMENT_TARGET",
     "FONT_CAVEAT_URI",
+    "FONT_NOTO_SANS_URI",
     "POSTGRES_URL",
     "DATABASE_URL",
+    "DATABASE_URL_UNPOOLED",
     "POSTGRES_PRISMA_URL",
     "POSTGRES_URL_NON_POOLING",
+    "GOOGLE_APPLICATION_CREDENTIALS",
     "E2E_TEST_AUTHENTICATE_USERNAME",
     "E2E_TEST_AUTHENTICATE_USER_EMAIL",
     "E2E_TEST_AUTHENTICATE_USER_PASSWORD"

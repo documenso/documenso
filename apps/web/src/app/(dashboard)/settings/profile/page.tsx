@@ -5,6 +5,9 @@ import { getRequiredServerComponentSession } from '@documenso/lib/next-auth/get-
 import { SettingsHeader } from '~/components/(dashboard)/settings/layout/header';
 import { ProfileForm } from '~/components/forms/profile';
 
+import { ClaimProfileAlertDialog } from './claim-profile-alert-dialog';
+import { DeleteAccountDialog } from './delete-account-dialog';
+
 export const metadata: Metadata = {
   title: 'Profile',
 };
@@ -16,7 +19,13 @@ export default async function ProfileSettingsPage() {
     <div>
       <SettingsHeader title="Profile" subtitle="Here you can edit your personal details." />
 
-      <ProfileForm user={user} className="max-w-xl" />
+      <ProfileForm className="mb-8 max-w-xl" user={user} />
+
+      <ClaimProfileAlertDialog className="max-w-xl" user={user} />
+
+      <hr className="my-4 max-w-xl" />
+
+      <DeleteAccountDialog className="max-w-xl" user={user} />
     </div>
   );
 }

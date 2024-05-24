@@ -17,6 +17,7 @@ declare namespace NodeJS {
 
     NEXT_PUBLIC_UPLOAD_TRANSPORT?: 'database' | 's3';
     NEXT_PRIVATE_UPLOAD_ENDPOINT?: string;
+    NEXT_PRIVATE_UPLOAD_FORCE_PATH_STYLE?: string;
     NEXT_PRIVATE_UPLOAD_REGION?: string;
     NEXT_PRIVATE_UPLOAD_BUCKET?: string;
     NEXT_PRIVATE_UPLOAD_ACCESS_KEY_ID?: string;
@@ -30,6 +31,10 @@ declare namespace NodeJS {
     NEXT_PRIVATE_SIGNING_LOCAL_FILE_PATH?: string;
     NEXT_PRIVATE_SIGNING_LOCAL_FILE_CONTENTS?: string;
     NEXT_PRIVATE_SIGNING_LOCAL_FILE_ENCODING?: string;
+    NEXT_PRIVATE_SIGNING_GCLOUD_HSM_KEY_PATH?: string;
+    NEXT_PRIVATE_SIGNING_GCLOUD_HSM_PUBLIC_CRT_FILE_PATH?: string;
+    NEXT_PRIVATE_SIGNING_GCLOUD_HSM_PUBLIC_CRT_FILE_CONTENTS?: string;
+    NEXT_PRIVATE_SIGNING_GCLOUD_APPLICATION_CREDENTIALS_CONTENTS?: string;
 
     NEXT_PRIVATE_SMTP_TRANSPORT?: 'mailchannels' | 'resend' | 'smtp-auth' | 'smtp-api';
 
@@ -56,6 +61,9 @@ declare namespace NodeJS {
 
     NEXT_PUBLIC_DISABLE_SIGNUP?: string;
 
+    //
+    NEXT_PRIVATE_BROWSERLESS_URL?: string;
+
     /**
      * Vercel environment variables
      */
@@ -65,6 +73,7 @@ declare namespace NodeJS {
 
     DEPLOYMENT_TARGET?: 'webapp' | 'marketing';
     FONT_CAVEAT_URI: string;
+    FONT_NOTO_SANS_URI: string;
 
     POSTGRES_URL?: string;
     DATABASE_URL?: string;

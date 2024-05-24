@@ -19,7 +19,7 @@ export default async function AdminManageUsers({ searchParams = {} }: AdminManag
 
   const [{ users, totalPages }, individualPrices] = await Promise.all([
     search(searchString, page, perPage),
-    getPricesByPlan(STRIPE_PLAN_TYPE.COMMUNITY),
+    getPricesByPlan(STRIPE_PLAN_TYPE.COMMUNITY).catch(() => []),
   ]);
 
   const individualPriceIds = individualPrices.map((price) => price.id);

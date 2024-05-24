@@ -9,6 +9,7 @@ import { NEXT_AUTH_OPTIONS } from '@documenso/lib/next-auth/auth-options';
 import { getRequiredServerComponentSession } from '@documenso/lib/next-auth/get-server-component-session';
 import { getTeams } from '@documenso/lib/server-only/team/get-teams';
 
+import { Banner } from '~/components/(dashboard)/layout/banner';
 import { Header } from '~/components/(dashboard)/layout/header';
 import { VerifyEmailBanner } from '~/components/(dashboard)/layout/verify-email-banner';
 import { RefreshOnFocus } from '~/components/(dashboard)/refresh-on-focus/refresh-on-focus';
@@ -36,6 +37,8 @@ export default async function AuthenticatedDashboardLayout({
     <NextAuthProvider session={session}>
       <LimitsProvider>
         {!user.emailVerified && <VerifyEmailBanner email={user.email} />}
+
+        <Banner />
 
         <Header user={user} teams={teams} />
 

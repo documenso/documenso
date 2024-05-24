@@ -1,9 +1,9 @@
-import { HTMLAttributes } from 'react';
+import type { HTMLAttributes } from 'react';
 
 import { Globe, Lock } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react/dist/lucide-react';
 
-import { TemplateType as TemplateTypePrisma } from '@documenso/prisma/client';
+import type { TemplateType as TemplateTypePrisma } from '@documenso/prisma/client';
 import { cn } from '@documenso/ui/lib/utils';
 
 type TemplateTypeIcon = {

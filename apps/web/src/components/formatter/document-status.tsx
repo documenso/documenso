@@ -13,7 +13,7 @@ type FriendlyStatus = {
   color: string;
 };
 
-const FRIENDLY_STATUS_MAP: Record<ExtendedDocumentStatus, FriendlyStatus> = {
+export const FRIENDLY_STATUS_MAP: Record<ExtendedDocumentStatus, FriendlyStatus> = {
   PENDING: {
     label: 'Pending',
     icon: Clock,

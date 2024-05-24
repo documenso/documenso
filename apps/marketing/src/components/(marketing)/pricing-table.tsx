@@ -23,7 +23,7 @@ export const PricingTable = ({ className, ...props }: PricingTableProps) => {
 
   return (
     <div className={cn('', className)} {...props}>
-      <div className="flex items-center justify-center gap-x-6">
+      <div className="bg-background sticky top-32 flex items-center justify-end gap-x-6 shadow-[-1px_-5px_2px_6px_hsl(var(--background))] md:top-[7.5rem] lg:static lg:justify-center">
         <AnimatePresence>
           <motion.button
             key="MONTHLY"
@@ -40,7 +40,7 @@ export const PricingTable = ({ className, ...props }: PricingTableProps) => {
             {period === 'MONTHLY' && (
               <motion.div
                 layoutId={SELECTED_PLAN_BAR_LAYOUT_ID}
-                className="bg-primary absolute bottom-0 left-0 h-[3px] w-full rounded-full"
+                className="bg-foreground lg:bg-primary absolute bottom-0 left-0 h-[3px] w-full rounded-full"
               />
             )}
           </motion.button>
@@ -63,7 +63,7 @@ export const PricingTable = ({ className, ...props }: PricingTableProps) => {
             {period === 'YEARLY' && (
               <motion.div
                 layoutId={SELECTED_PLAN_BAR_LAYOUT_ID}
-                className="bg-primary absolute bottom-0 left-0 h-[3px] w-full rounded-full"
+                className="bg-foreground lg:bg-primary absolute bottom-0 left-0 h-[3px] w-full rounded-full"
               />
             )}
           </motion.button>
@@ -83,7 +83,11 @@ export const PricingTable = ({ className, ...props }: PricingTableProps) => {
           </p>
 
           <Button className="rounded-full text-base" asChild>
-            <Link href={`${NEXT_PUBLIC_WEBAPP_URL()}/signup`} target="_blank" className="mt-6">
+            <Link
+              href={`${NEXT_PUBLIC_WEBAPP_URL()}/signup?utm_source=pricing-free-plan`}
+              target="_blank"
+              className="mt-6"
+            >
               Signup Now
             </Link>
           </Button>
@@ -98,7 +102,7 @@ export const PricingTable = ({ className, ...props }: PricingTableProps) => {
         </div>
 
         <div
-          data-plan="community"
+          data-plan="early-adopter"
           className="border-primary bg-background shadow-foreground/5 flex flex-col items-center justify-center rounded-lg border-2 px-8 py-12 shadow-[0px_0px_0px_4px_#E3E3E380]"
         >
           <p className="text-foreground text-4xl font-medium">Early Adopters</p>
@@ -114,29 +118,31 @@ export const PricingTable = ({ className, ...props }: PricingTableProps) => {
           </p>
 
           <Button className="mt-6 rounded-full text-base" asChild>
-            <Link href={`${NEXT_PUBLIC_WEBAPP_URL()}/signup`}>Signup Now</Link>
+            <Link
+              href={`${NEXT_PUBLIC_WEBAPP_URL()}/signup?utm_source=pricing-early-adopter`}
+              target="_blank"
+            >
+              Signup Now
+            </Link>
           </Button>
 
           <div className="mt-8 flex w-full flex-col divide-y">
-            <p className="text-foreground py-4 font-medium">
-              {' '}
-              <a href="https://documenso.com/blog/early-adopters" target="_blank">
-                The Early Adopter Deal:
+            <p className="text-foreground py-4">
+              <a
+                href="https://documen.so/early-adopters-pricing-page"
+                target="_blank"
+                rel="noreferrer"
+              >
+                Limited Time Offer: <span className="text-documenso-700">Read More</span>
               </a>
             </p>
-            <p className="text-foreground py-4">Join the movement</p>
-            <p className="text-foreground py-4">Simple signing solution</p>
+            <p className="text-foregro‚und py-4">Unlimited Teams</p>
+            <p className="text-foregro‚und py-4">Unlimited Users</p>
+            <p className="text-foregro‚und py-4">Unlimited Documents per month</p>
+            <p className="text-foreground py-4">Includes all upcoming features</p>
             <p className="text-foreground py-4">Email, Discord and Slack assistance</p>
-            <p className="text-foreground py-4">
-              <strong>
-                {' '}
-                <a href="https://documenso.com/blog/early-adopters" target="_blank">
-                  Includes all upcoming features
-                </a>
-              </strong>
-            </p>
-            <p className="text-foreground py-4">Fixed, straightforward pricing</p>
           </div>
+          <div className="flex-1" />
         </div>
 
         <div

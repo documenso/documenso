@@ -43,12 +43,25 @@ model User {
   twoFactorSecret      String?
   twoFactorEnabled     Boolean              @default(false)
   twoFactorBackupCodes String?
+  url                  String?              @unique
 
+  userProfile       UserProfile?
   VerificationToken VerificationToken[]
+  ApiToken          ApiToken[]
   Template          Template[]
   securityAuditLogs UserSecurityAuditLog[]
+  Webhooks          Webhook[]
+  siteSettings      SiteSettings[]
+  passkeys          Passkey[]
 
   @@index([email])
+}
+
+model UserProfile {
+  id  Int     @id
+  bio String?
+
+  User User? @relation(fields: [id], references: [id], onDelete: Cascade)
 }
 
 enum UserSecurityAuditLogType {
@@ -56,12 +69,16 @@ enum UserSecurityAuditLogType {
   ACCOUNT_SSO_LINK
   AUTH_2FA_DISABLE
   AUTH_2FA_ENABLE
+  PASSKEY_CREATED
+  PASSKEY_DELETED
+  PASSKEY_UPDATED
   PASSWORD_RESET
   PASSWORD_UPDATE
   SIGN_OUT
   SIGN_IN
   SIGN_IN_FAIL
   SIGN_IN_2FA_FAIL
+  SIGN_IN_PASSKEY_FAIL
 }
 
 model UserSecurityAuditLog {
@@ -81,17 +98,101 @@ model PasswordResetToken {
   createdAt DateTime @default(now())
   expiry    DateTime
   userId    Int
-  User      User     @relation(fields: [userId], references: [id])
+  User      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Passkey {
+  id                   String    @id @default(cuid())
+  userId               Int
+  name                 String
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime  @default(now())
+  lastUsedAt           DateTime?
+  credentialId         Bytes
+  credentialPublicKey  Bytes
+  counter              BigInt
+  credentialDeviceType String
+  credentialBackedUp   Boolean
+  transports           String[]
+
+  User User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model AnonymousVerificationToken {
+  id        String   @id @unique @default(cuid())
+  token     String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
 }
 
 model VerificationToken {
-  id         Int      @id @default(autoincrement())
-  identifier String
-  token      String   @unique
-  expires    DateTime
-  createdAt  DateTime @default(now())
-  userId     Int
-  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id          Int      @id @default(autoincrement())
+  secondaryId String   @unique @default(cuid())
+  identifier  String
+  token       String   @unique
+  expires     DateTime
+  createdAt   DateTime @default(now())
+  userId      Int
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+enum WebhookTriggerEvents {
+  DOCUMENT_CREATED
+  DOCUMENT_SENT
+  DOCUMENT_OPENED
+  DOCUMENT_SIGNED
+  DOCUMENT_COMPLETED
+}
+
+model Webhook {
+  id            String                 @id @default(cuid())
+  webhookUrl    String
+  eventTriggers WebhookTriggerEvents[]
+  secret        String?
+  enabled       Boolean                @default(true)
+  createdAt     DateTime               @default(now())
+  updatedAt     DateTime               @default(now()) @updatedAt
+  userId        Int
+  User          User                   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  teamId        Int?
+  team          Team?                  @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  WebhookCall   WebhookCall[]
+}
+
+enum WebhookCallStatus {
+  SUCCESS
+  FAILED
+}
+
+model WebhookCall {
+  id              String               @id @default(cuid())
+  status          WebhookCallStatus
+  url             String
+  event           WebhookTriggerEvents
+  requestBody     Json
+  responseCode    Int
+  responseHeaders Json?
+  responseBody    Json?
+  createdAt       DateTime             @default(now())
+  webhookId       String
+  webhook         Webhook              @relation(fields: [webhookId], references: [id], onDelete: Cascade)
+}
+
+enum ApiTokenAlgorithm {
+  SHA512
+}
+
+model ApiToken {
+  id        Int               @id @default(autoincrement())
+  name      String
+  token     String            @unique
+  algorithm ApiTokenAlgorithm @default(SHA512)
+  expires   DateTime?
+  createdAt DateTime          @default(now())
+  userId    Int?
+  user      User?             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  teamId    Int?
+  team      Team?             @relation(fields: [teamId], references: [id], onDelete: Cascade)
 }
 
 enum SubscriptionStatus {
@@ -155,6 +256,8 @@ model Document {
   id             Int                 @id @default(autoincrement())
   userId         Int
   User           User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  authOptions    Json?
+  formValues     Json?
   title          String
   status         DocumentStatus      @default(DRAFT)
   Recipient      Recipient[]
@@ -210,15 +313,15 @@ model DocumentData {
 }
 
 model DocumentMeta {
-  id         String   @id @default(cuid())
-  subject    String?
-  message    String?
-  timezone   String?  @default("Etc/UTC") @db.Text
-  password   String?
-  dateFormat String?  @default("yyyy-MM-dd hh:mm a") @db.Text
-  documentId Int      @unique
-  document   Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
-  redirectUrl String? 
+  id          String   @id @default(cuid())
+  subject     String?
+  message     String?
+  timezone    String?  @default("Etc/UTC") @db.Text
+  password    String?
+  dateFormat  String?  @default("yyyy-MM-dd hh:mm a") @db.Text
+  documentId  Int      @unique
+  document    Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  redirectUrl String?
 }
 
 enum ReadStatus {
@@ -244,22 +347,24 @@ enum RecipientRole {
 }
 
 model Recipient {
-  id            Int           @id @default(autoincrement())
-  documentId    Int?
-  templateId    Int?
-  email         String        @db.VarChar(255)
-  name          String        @default("") @db.VarChar(255)
-  token         String
-  expired       DateTime?
-  signedAt      DateTime?
-  role          RecipientRole @default(SIGNER)
-  readStatus    ReadStatus    @default(NOT_OPENED)
-  signingStatus SigningStatus @default(NOT_SIGNED)
-  sendStatus    SendStatus    @default(NOT_SENT)
-  Document      Document?     @relation(fields: [documentId], references: [id], onDelete: Cascade)
-  Template      Template?     @relation(fields: [templateId], references: [id], onDelete: Cascade)
-  Field         Field[]
-  Signature     Signature[]
+  id                Int           @id @default(autoincrement())
+  documentId        Int?
+  templateId        Int?
+  email             String        @db.VarChar(255)
+  name              String        @default("") @db.VarChar(255)
+  token             String
+  documentDeletedAt DateTime?
+  expired           DateTime?
+  signedAt          DateTime?
+  authOptions       Json?
+  role              RecipientRole @default(SIGNER)
+  readStatus        ReadStatus    @default(NOT_OPENED)
+  signingStatus     SigningStatus @default(NOT_SIGNED)
+  sendStatus        SendStatus    @default(NOT_SENT)
+  Document          Document?     @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  Template          Template?     @relation(fields: [templateId], references: [id], onDelete: Cascade)
+  Field             Field[]
+  Signature         Signature[]
 
   @@unique([documentId, email])
   @@unique([templateId, email])
@@ -282,7 +387,7 @@ model Field {
   secondaryId String     @unique @default(cuid())
   documentId  Int?
   templateId  Int?
-  recipientId Int?
+  recipientId Int
   type        FieldType
   page        Int
   positionX   Decimal    @default(0)
@@ -293,7 +398,7 @@ model Field {
   inserted    Boolean
   Document    Document?  @relation(fields: [documentId], references: [id], onDelete: Cascade)
   Template    Template?  @relation(fields: [templateId], references: [id], onDelete: Cascade)
-  Recipient   Recipient? @relation(fields: [recipientId], references: [id])
+  Recipient   Recipient  @relation(fields: [recipientId], references: [id], onDelete: Cascade)
   Signature   Signature?
 
   @@index([documentId])
@@ -310,7 +415,7 @@ model Signature {
   typedSignature         String?
 
   Recipient Recipient @relation(fields: [recipientId], references: [id], onDelete: Cascade)
-  Field     Field     @relation(fields: [fieldId], references: [id], onDelete: Restrict)
+  Field     Field     @relation(fields: [fieldId], references: [id], onDelete: Cascade)
 
   @@index([recipientId])
 }
@@ -352,11 +457,13 @@ model Team {
   emailVerification    TeamEmailVerification?
   transferVerification TeamTransferVerification?
 
-  owner        User          @relation(fields: [ownerUserId], references: [id])
+  owner        User          @relation(fields: [ownerUserId], references: [id], onDelete: Cascade)
   subscription Subscription?
 
   document  Document[]
   templates Template[]
+  ApiToken  ApiToken[]
+  Webhook   Webhook[]
 }
 
 model TeamPending {
@@ -376,7 +483,7 @@ model TeamMember {
   createdAt DateTime       @default(now())
   role      TeamMemberRole
   userId    Int
-  user      User           @relation(fields: [userId], references: [id])
+  user      User           @relation(fields: [userId], references: [id], onDelete: Cascade)
   team      Team           @relation(fields: [teamId], references: [id], onDelete: Cascade)
 
   @@unique([userId, teamId])
@@ -432,15 +539,29 @@ enum TemplateType {
   PRIVATE
 }
 
+model TemplateMeta {
+  id          String   @id @default(cuid())
+  subject     String?
+  message     String?
+  timezone    String?  @default("Etc/UTC") @db.Text
+  password    String?
+  dateFormat  String?  @default("yyyy-MM-dd hh:mm a") @db.Text
+  templateId  Int      @unique
+  template    Template @relation(fields: [templateId], references: [id], onDelete: Cascade)
+  redirectUrl String?
+}
+
 model Template {
-  id                     Int          @id @default(autoincrement())
-  type                   TemplateType @default(PRIVATE)
+  id                     Int           @id @default(autoincrement())
+  type                   TemplateType  @default(PRIVATE)
   title                  String
   userId                 Int
   teamId                 Int?
+  authOptions            Json?
+  templateMeta           TemplateMeta?
   templateDocumentDataId String
-  createdAt              DateTime     @default(now())
-  updatedAt              DateTime     @default(now()) @updatedAt
+  createdAt              DateTime      @default(now())
+  updatedAt              DateTime      @default(now()) @updatedAt
 
   team                 Team?        @relation(fields: [teamId], references: [id], onDelete: Cascade)
   templateDocumentData DocumentData @relation(fields: [templateDocumentDataId], references: [id], onDelete: Cascade)
@@ -449,4 +570,13 @@ model Template {
   Field                Field[]
 
   @@unique([templateDocumentDataId])
+}
+
+model SiteSettings {
+  id                   String   @id
+  enabled              Boolean  @default(false)
+  data                 Json
+  lastModifiedByUserId Int?
+  lastModifiedAt       DateTime @default(now())
+  lastModifiedByUser   User?    @relation(fields: [lastModifiedByUserId], references: [id], onDelete: SetNull)
 }

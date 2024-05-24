@@ -53,6 +53,7 @@ export type AddFieldsFormProps = {
   recipients: Recipient[];
   fields: Field[];
   onSubmit: (_data: TAddFieldsFormSchema) => void;
+  isDocumentPdfLoaded: boolean;
 };
 
 export const AddFieldsFormPartial = ({
@@ -61,6 +62,7 @@ export const AddFieldsFormPartial = ({
   recipients,
   fields,
   onSubmit,
+  isDocumentPdfLoaded,
 }: AddFieldsFormProps) => {
   const { isWithinPageBounds, getFieldPosition, getPage } = useDocumentElement();
   const { currentStep, totalSteps, previousStep } = useStep();
@@ -323,9 +325,9 @@ export const AddFieldsFormPartial = ({
           {selectedField && (
             <Card
               className={cn(
-                'bg-background pointer-events-none fixed z-50 cursor-pointer transition-opacity',
+                'bg-field-card/80 pointer-events-none fixed z-50 cursor-pointer border-2 backdrop-blur-[1px]',
                 {
-                  'border-primary': isFieldWithinBounds,
+                  'border-field-card-border': isFieldWithinBounds,
                   'opacity-50': !isFieldWithinBounds,
                 },
               )}
@@ -336,25 +338,26 @@ export const AddFieldsFormPartial = ({
                 width: fieldBounds.current.width,
               }}
             >
-              <CardContent className="text-foreground flex h-full w-full items-center justify-center p-2">
+              <CardContent className="text-field-card-foreground flex h-full w-full items-center justify-center p-2">
                 {FRIENDLY_FIELD_TYPE[selectedField]}
               </CardContent>
             </Card>
           )}
 
-          {localFields.map((field, index) => (
-            <FieldItem
-              key={index}
-              field={field}
-              disabled={selectedSigner?.email !== field.signerEmail || hasSelectedSignerBeenSent}
-              minHeight={fieldBounds.current.height}
-              minWidth={fieldBounds.current.width}
-              passive={isFieldWithinBounds && !!selectedField}
-              onResize={(options) => onFieldResize(options, index)}
-              onMove={(options) => onFieldMove(options, index)}
-              onRemove={() => remove(index)}
-            />
-          ))}
+          {isDocumentPdfLoaded &&
+            localFields.map((field, index) => (
+              <FieldItem
+                key={index}
+                field={field}
+                disabled={selectedSigner?.email !== field.signerEmail || hasSelectedSignerBeenSent}
+                minHeight={fieldBounds.current.height}
+                minWidth={fieldBounds.current.width}
+                passive={isFieldWithinBounds && !!selectedField}
+                onResize={(options) => onFieldResize(options, index)}
+                onMove={(options) => onFieldMove(options, index)}
+                onRemove={() => remove(index)}
+              />
+            ))}
 
           {!hideRecipients && (
             <Popover open={showRecipientsSelector} onOpenChange={setShowRecipientsSelector}>
@@ -380,7 +383,7 @@ export const AddFieldsFormPartial = ({
               </PopoverTrigger>
 
               <PopoverContent className="p-0" align="start">
-                <Command>
+                <Command value={selectedSigner?.email}>
                   <CommandInput />
 
                   <CommandEmpty>
@@ -549,6 +552,28 @@ export const AddFieldsFormPartial = ({
                     </p>
 
                     <p className="text-muted-foreground mt-2 text-xs">Date</p>
+                  </CardContent>
+                </Card>
+              </button>
+
+              <button
+                type="button"
+                className="group h-full w-full"
+                onClick={() => setSelectedField(FieldType.TEXT)}
+                onMouseDown={() => setSelectedField(FieldType.TEXT)}
+                data-selected={selectedField === FieldType.TEXT ? true : undefined}
+              >
+                <Card className="group-data-[selected]:border-documenso h-full w-full cursor-pointer group-disabled:opacity-50">
+                  <CardContent className="flex flex-col items-center justify-center px-6 py-4">
+                    <p
+                      className={cn(
+                        'text-muted-foreground group-data-[selected]:text-foreground text-xl font-medium',
+                      )}
+                    >
+                      {'Text'}
+                    </p>
+
+                    <p className="text-muted-foreground mt-2 text-xs">Custom Text</p>
                   </CardContent>
                 </Card>
               </button>

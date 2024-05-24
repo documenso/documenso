@@ -2,8 +2,11 @@ import { useEffect, useState } from 'react';
 
 import { useRouter } from 'next/navigation';
 
+import { match } from 'ts-pattern';
+
 import { DocumentStatus } from '@documenso/prisma/client';
 import { trpc as trpcReact } from '@documenso/trpc/react';
+import { Alert, AlertDescription } from '@documenso/ui/primitives/alert';
 import { Button } from '@documenso/ui/primitives/button';
 import {
   Dialog,
@@ -16,12 +19,14 @@ import {
 import { Input } from '@documenso/ui/primitives/input';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
-type DeleteDraftDocumentDialogProps = {
+type DeleteDocumentDialogProps = {
   id: number;
   open: boolean;
   onOpenChange: (_open: boolean) => void;
   status: DocumentStatus;
   documentTitle: string;
+  teamId?: number;
+  canManageDocument: boolean;
 };
 
 export const DeleteDocumentDialog = ({
@@ -30,7 +35,9 @@ export const DeleteDocumentDialog = ({
   onOpenChange,
   status,
   documentTitle,
-}: DeleteDraftDocumentDialogProps) => {
+  teamId,
+  canManageDocument,
+}: DeleteDocumentDialogProps) => {
   const router = useRouter();
 
   const { toast } = useToast();
@@ -61,7 +68,7 @@ export const DeleteDocumentDialog = ({
 
   const onDelete = async () => {
     try {
-      await deleteDocument({ id, status });
+      await deleteDocument({ id, teamId });
     } catch {
       toast({
         title: 'Something went wrong',
@@ -81,47 +88,82 @@ export const DeleteDocumentDialog = ({
     <Dialog open={open} onOpenChange={(value) => !isLoading && onOpenChange(value)}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Are you sure you want to delete "{documentTitle}"?</DialogTitle>
+          <DialogTitle>Are you sure?</DialogTitle>
 
           <DialogDescription>
-            Please note that this action is irreversible. Once confirmed, your document will be
-            permanently deleted.
+            You are about to {canManageDocument ? 'delete' : 'hide'}{' '}
+            <strong>"{documentTitle}"</strong>
           </DialogDescription>
         </DialogHeader>
 
-        {status !== DocumentStatus.DRAFT && (
-          <div className="mt-4">
-            <Input
-              type="text"
-              value={inputValue}
-              onChange={onInputChange}
-              placeholder="Type 'delete' to confirm"
-            />
-          </div>
+        {canManageDocument ? (
+          <Alert variant="warning" className="-mt-1">
+            {match(status)
+              .with(DocumentStatus.DRAFT, () => (
+                <AlertDescription>
+                  Please note that this action is <strong>irreversible</strong>. Once confirmed,
+                  this document will be permanently deleted.
+                </AlertDescription>
+              ))
+              .with(DocumentStatus.PENDING, () => (
+                <AlertDescription>
+                  <p>
+                    Please note that this action is <strong>irreversible</strong>.
+                  </p>
+
+                  <p className="mt-1">Once confirmed, the following will occur:</p>
+
+                  <ul className="mt-0.5 list-inside list-disc">
+                    <li>Document will be permanently deleted</li>
+                    <li>Document signing process will be cancelled</li>
+                    <li>All inserted signatures will be voided</li>
+                    <li>All recipients will be notified</li>
+                  </ul>
+                </AlertDescription>
+              ))
+              .with(DocumentStatus.COMPLETED, () => (
+                <AlertDescription>
+                  <p>By deleting this document, the following will occur:</p>
+
+                  <ul className="mt-0.5 list-inside list-disc">
+                    <li>The document will be hidden from your account</li>
+                    <li>Recipients will still retain their copy of the document</li>
+                  </ul>
+                </AlertDescription>
+              ))
+              .exhaustive()}
+          </Alert>
+        ) : (
+          <Alert variant="warning" className="-mt-1">
+            <AlertDescription>
+              Please contact support if you would like to revert this action.
+            </AlertDescription>
+          </Alert>
+        )}
+
+        {status !== DocumentStatus.DRAFT && canManageDocument && (
+          <Input
+            type="text"
+            value={inputValue}
+            onChange={onInputChange}
+            placeholder="Type 'delete' to confirm"
+          />
         )}
 
         <DialogFooter>
-          <div className="flex w-full flex-1 flex-nowrap gap-4">
-            <Button
-              type="button"
-              variant="secondary"
-              onClick={() => onOpenChange(false)}
-              className="flex-1"
-            >
-              Cancel
-            </Button>
+          <Button type="button" variant="secondary" onClick={() => onOpenChange(false)}>
+            Cancel
+          </Button>
 
-            <Button
-              type="button"
-              loading={isLoading}
-              onClick={onDelete}
-              disabled={!isDeleteEnabled}
-              variant="destructive"
-              className="flex-1"
-            >
-              Delete
-            </Button>
-          </div>
+          <Button
+            type="button"
+            loading={isLoading}
+            onClick={onDelete}
+            disabled={!isDeleteEnabled && canManageDocument}
+            variant="destructive"
+          >
+            {canManageDocument ? 'Delete' : 'Hide'}
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

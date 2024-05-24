@@ -9,34 +9,37 @@ export type DeleteTeamOptions = {
 };
 
 export const deleteTeam = async ({ userId, teamId }: DeleteTeamOptions) => {
-  await prisma.$transaction(async (tx) => {
-    const team = await tx.team.findFirstOrThrow({
-      where: {
-        id: teamId,
-        ownerUserId: userId,
-      },
-      include: {
-        subscription: true,
-      },
-    });
+  await prisma.$transaction(
+    async (tx) => {
+      const team = await tx.team.findFirstOrThrow({
+        where: {
+          id: teamId,
+          ownerUserId: userId,
+        },
+        include: {
+          subscription: true,
+        },
+      });
 
-    if (team.subscription) {
-      await stripe.subscriptions
-        .cancel(team.subscription.planId, {
-          prorate: false,
-          invoice_now: true,
-        })
-        .catch((err) => {
-          console.error(err);
-          throw AppError.parseError(err);
-        });
-    }
+      if (team.subscription) {
+        await stripe.subscriptions
+          .cancel(team.subscription.planId, {
+            prorate: false,
+            invoice_now: true,
+          })
+          .catch((err) => {
+            console.error(err);
+            throw AppError.parseError(err);
+          });
+      }
 
-    await tx.team.delete({
-      where: {
-        id: teamId,
-        ownerUserId: userId,
-      },
-    });
-  });
+      await tx.team.delete({
+        where: {
+          id: teamId,
+          ownerUserId: userId,
+        },
+      });
+    },
+    { timeout: 30_000 },
+  );
 };

@@ -5,7 +5,7 @@ import type { HTMLAttributes } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
-import { CreditCard, Lock, User, Users } from 'lucide-react';
+import { Braces, CreditCard, Lock, User, Users, Webhook } from 'lucide-react';
 
 import { useFeatureFlags } from '@documenso/lib/client-only/providers/feature-flag';
 import { cn } from '@documenso/ui/lib/utils';
@@ -19,7 +19,6 @@ export const MobileNav = ({ className, ...props }: MobileNavProps) => {
   const { getFlag } = useFeatureFlags();
 
   const isBillingEnabled = getFlag('app_billing');
-  const isTeamsEnabled = getFlag('app_teams');
 
   return (
     <div
@@ -39,20 +38,18 @@ export const MobileNav = ({ className, ...props }: MobileNavProps) => {
         </Button>
       </Link>
 
-      {isTeamsEnabled && (
-        <Link href="/settings/teams">
-          <Button
-            variant="ghost"
-            className={cn(
-              'w-full justify-start',
-              pathname?.startsWith('/settings/teams') && 'bg-secondary',
-            )}
-          >
-            <Users className="mr-2 h-5 w-5" />
-            Teams
-          </Button>
-        </Link>
-      )}
+      <Link href="/settings/teams">
+        <Button
+          variant="ghost"
+          className={cn(
+            'w-full justify-start',
+            pathname?.startsWith('/settings/teams') && 'bg-secondary',
+          )}
+        >
+          <Users className="mr-2 h-5 w-5" />
+          Teams
+        </Button>
+      </Link>
 
       <Link href="/settings/security">
         <Button
@@ -64,6 +61,32 @@ export const MobileNav = ({ className, ...props }: MobileNavProps) => {
         >
           <Lock className="mr-2 h-5 w-5" />
           Security
+        </Button>
+      </Link>
+
+      <Link href="/settings/tokens">
+        <Button
+          variant="ghost"
+          className={cn(
+            'w-full justify-start',
+            pathname?.startsWith('/settings/tokens') && 'bg-secondary',
+          )}
+        >
+          <Braces className="mr-2 h-5 w-5" />
+          API Tokens
+        </Button>
+      </Link>
+
+      <Link href="/settings/webhooks">
+        <Button
+          variant="ghost"
+          className={cn(
+            'w-full justify-start',
+            pathname?.startsWith('/settings/webhooks') && 'bg-secondary',
+          )}
+        >
+          <Webhook className="mr-2 h-5 w-5" />
+          Webhooks
         </Button>
       </Link>
 

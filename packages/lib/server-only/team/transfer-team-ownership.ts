@@ -11,78 +11,81 @@ export type TransferTeamOwnershipOptions = {
 };
 
 export const transferTeamOwnership = async ({ token }: TransferTeamOwnershipOptions) => {
-  await prisma.$transaction(async (tx) => {
-    const teamTransferVerification = await tx.teamTransferVerification.findFirstOrThrow({
-      where: {
-        token,
-      },
-      include: {
-        team: {
-          include: {
-            subscription: true,
+  await prisma.$transaction(
+    async (tx) => {
+      const teamTransferVerification = await tx.teamTransferVerification.findFirstOrThrow({
+        where: {
+          token,
+        },
+        include: {
+          team: {
+            include: {
+              subscription: true,
+            },
           },
         },
-      },
-    });
-
-    const { team, userId: newOwnerUserId } = teamTransferVerification;
-
-    await tx.teamTransferVerification.delete({
-      where: {
-        teamId: team.id,
-      },
-    });
-
-    const newOwnerUser = await tx.user.findFirstOrThrow({
-      where: {
-        id: newOwnerUserId,
-        teamMembers: {
-          some: {
-            teamId: team.id,
-          },
-        },
-      },
-      include: {
-        Subscription: true,
-      },
-    });
-
-    let teamSubscription: Stripe.Subscription | null = null;
-
-    if (IS_BILLING_ENABLED()) {
-      teamSubscription = await transferTeamSubscription({
-        user: newOwnerUser,
-        team,
-        clearPaymentMethods: teamTransferVerification.clearPaymentMethods,
       });
-    }
 
-    if (teamSubscription) {
-      await tx.subscription.upsert(
-        mapStripeSubscriptionToPrismaUpsertAction(teamSubscription, undefined, team.id),
-      );
-    }
+      const { team, userId: newOwnerUserId } = teamTransferVerification;
 
-    await tx.team.update({
-      where: {
-        id: team.id,
-      },
-      data: {
-        ownerUserId: newOwnerUserId,
-        members: {
-          update: {
-            where: {
-              userId_teamId: {
-                teamId: team.id,
-                userId: newOwnerUserId,
+      await tx.teamTransferVerification.delete({
+        where: {
+          teamId: team.id,
+        },
+      });
+
+      const newOwnerUser = await tx.user.findFirstOrThrow({
+        where: {
+          id: newOwnerUserId,
+          teamMembers: {
+            some: {
+              teamId: team.id,
+            },
+          },
+        },
+        include: {
+          Subscription: true,
+        },
+      });
+
+      let teamSubscription: Stripe.Subscription | null = null;
+
+      if (IS_BILLING_ENABLED()) {
+        teamSubscription = await transferTeamSubscription({
+          user: newOwnerUser,
+          team,
+          clearPaymentMethods: teamTransferVerification.clearPaymentMethods,
+        });
+      }
+
+      if (teamSubscription) {
+        await tx.subscription.upsert(
+          mapStripeSubscriptionToPrismaUpsertAction(teamSubscription, undefined, team.id),
+        );
+      }
+
+      await tx.team.update({
+        where: {
+          id: team.id,
+        },
+        data: {
+          ownerUserId: newOwnerUserId,
+          members: {
+            update: {
+              where: {
+                userId_teamId: {
+                  teamId: team.id,
+                  userId: newOwnerUserId,
+                },
+              },
+              data: {
+                role: TeamMemberRole.ADMIN,
               },
             },
-            data: {
-              role: TeamMemberRole.ADMIN,
-            },
           },
         },
-      },
-    });
-  });
+      });
+    },
+    { timeout: 30_000 },
+  );
 };

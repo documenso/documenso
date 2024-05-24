@@ -28,56 +28,59 @@ export const createTeamEmailVerification = async ({
   data,
 }: CreateTeamEmailVerificationOptions) => {
   try {
-    await prisma.$transaction(async (tx) => {
-      const team = await tx.team.findFirstOrThrow({
-        where: {
-          id: teamId,
-          members: {
-            some: {
-              userId,
-              role: {
-                in: TEAM_MEMBER_ROLE_PERMISSIONS_MAP['MANAGE_TEAM'],
+    await prisma.$transaction(
+      async (tx) => {
+        const team = await tx.team.findFirstOrThrow({
+          where: {
+            id: teamId,
+            members: {
+              some: {
+                userId,
+                role: {
+                  in: TEAM_MEMBER_ROLE_PERMISSIONS_MAP['MANAGE_TEAM'],
+                },
               },
             },
           },
-        },
-        include: {
-          teamEmail: true,
-          emailVerification: true,
-        },
-      });
+          include: {
+            teamEmail: true,
+            emailVerification: true,
+          },
+        });
 
-      if (team.teamEmail || team.emailVerification) {
-        throw new AppError(
-          AppErrorCode.INVALID_REQUEST,
-          'Team already has an email or existing email verification.',
-        );
-      }
+        if (team.teamEmail || team.emailVerification) {
+          throw new AppError(
+            AppErrorCode.INVALID_REQUEST,
+            'Team already has an email or existing email verification.',
+          );
+        }
 
-      const existingTeamEmail = await tx.teamEmail.findFirst({
-        where: {
-          email: data.email,
-        },
-      });
+        const existingTeamEmail = await tx.teamEmail.findFirst({
+          where: {
+            email: data.email,
+          },
+        });
 
-      if (existingTeamEmail) {
-        throw new AppError(AppErrorCode.ALREADY_EXISTS, 'Email already taken by another team.');
-      }
+        if (existingTeamEmail) {
+          throw new AppError(AppErrorCode.ALREADY_EXISTS, 'Email already taken by another team.');
+        }
 
-      const { token, expiresAt } = createTokenVerification({ hours: 1 });
+        const { token, expiresAt } = createTokenVerification({ hours: 1 });
 
-      await tx.teamEmailVerification.create({
-        data: {
-          token,
-          expiresAt,
-          email: data.email,
-          name: data.name,
-          teamId,
-        },
-      });
+        await tx.teamEmailVerification.create({
+          data: {
+            token,
+            expiresAt,
+            email: data.email,
+            name: data.name,
+            teamId,
+          },
+        });
 
-      await sendTeamEmailVerificationEmail(data.email, token, team.name, team.url);
-    });
+        await sendTeamEmailVerificationEmail(data.email, token, team.name, team.url);
+      },
+      { timeout: 30_000 },
+    );
   } catch (err) {
     console.error(err);
 

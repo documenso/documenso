@@ -18,6 +18,10 @@
     --card-border-tint: 112 205 159;
     --card-foreground: 222.2 47.4% 11.2%;
 
+    --field-card: 95 74% 90%;
+    --field-card-border: 95.08 71.08% 67.45%;
+    --field-card-foreground: 222.2 47.4% 11.2%;
+
     --widget: 0 0% 97%;
 
     --border: 214.3 31.8% 91.4%;
@@ -38,6 +42,8 @@
     --ring: 95.08 71.08% 67.45%;
 
     --radius: 0.5rem;
+
+    --warning: 54 96% 45%;
   }
 
   .dark {
@@ -54,6 +60,8 @@
     --card-border: 0 0% 27.9%;
     --card-border-tint: 112 205 159;
     --card-foreground: 0 0% 95%;
+
+    --widget: 0 0% 14.9%;
 
     --border: 0 0% 27.9%;
     --input: 0 0% 27.9%;
@@ -73,6 +81,8 @@
     --ring: 95.08 71.08% 67.45%;
 
     --radius: 0.5rem;
+
+    --warning: 54 96% 45%;
   }
 }
 
@@ -84,6 +94,21 @@
   body {
     @apply bg-background text-foreground;
     font-feature-settings: 'rlig' 1, 'calt' 1;
+  }
+}
+
+/*
+ * Custom CSS for printing reports
+ * - Sets page margins to 0.5 inches
+ * - Hides the header and footer
+ * - Hides the print button
+ * - Sets page size to A4
+ * - Sets the font size to 12pt
+ */
+.print-provider {
+  @page {
+    margin: 1in;
+    size: A4;
   }
 }
 
@@ -113,4 +138,13 @@
 
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
   background: rgb(100 116 139 / 0.5);
+}
+
+/* Custom Swagger Dark Theme */
+.swagger-dark-theme .swagger-ui {
+  filter: invert(88%) hue-rotate(180deg);
+}
+
+.swagger-dark-theme .swagger-ui .microlight {
+  filter: invert(100%) hue-rotate(180deg);
 }

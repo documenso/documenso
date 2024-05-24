@@ -27,7 +27,7 @@ export default async function SinglePlayerModeSuccessPage({
     return notFound();
   }
 
-  const signatures = await getRecipientSignatures({ recipientId: document.Recipient.id });
+  const signatures = await getRecipientSignatures({ recipientId: document.Recipient[0].id });
 
   return <SinglePlayerModeSuccess document={document} signatures={signatures} />;
 }

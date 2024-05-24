@@ -1,5 +1,6 @@
+// https://github.com/Hopding/pdf-lib/issues/20#issuecomment-412852821
 import fontkit from '@pdf-lib/fontkit';
-import { PDFDocument, StandardFonts } from 'pdf-lib';
+import { PDFDocument } from 'pdf-lib';
 
 import {
   DEFAULT_HANDWRITING_FONT_SIZE,
@@ -13,6 +14,10 @@ import type { FieldWithSignature } from '@documenso/prisma/types/field-with-sign
 
 export const insertFieldInPDF = async (pdf: PDFDocument, field: FieldWithSignature) => {
   const fontCaveat = await fetch(process.env.FONT_CAVEAT_URI).then(async (res) =>
+    res.arrayBuffer(),
+  );
+
+  const fontNoto = await fetch(process.env.FONT_NOTO_SANS_URI).then(async (res) =>
     res.arrayBuffer(),
   );
 
@@ -40,7 +45,7 @@ export const insertFieldInPDF = async (pdf: PDFDocument, field: FieldWithSignatu
   const fieldX = pageWidth * (Number(field.positionX) / 100);
   const fieldY = pageHeight * (Number(field.positionY) / 100);
 
-  const font = await pdf.embedFont(isSignatureField ? fontCaveat : StandardFonts.Helvetica);
+  const font = await pdf.embedFont(isSignatureField ? fontCaveat : fontNoto);
 
   if (field.type === FieldType.SIGNATURE || field.type === FieldType.FREE_SIGNATURE) {
     await pdf.embedFont(fontCaveat);
@@ -73,13 +78,17 @@ export const insertFieldInPDF = async (pdf: PDFDocument, field: FieldWithSignatu
       height: imageHeight,
     });
   } else {
-    let textWidth = font.widthOfTextAtSize(field.customText, fontSize);
+    const longestLineInTextForWidth = field.customText
+      .split('\n')
+      .sort((a, b) => b.length - a.length)[0];
+
+    let textWidth = font.widthOfTextAtSize(longestLineInTextForWidth, fontSize);
     const textHeight = font.heightAtSize(fontSize);
 
     const scalingFactor = Math.min(fieldWidth / textWidth, fieldHeight / textHeight, 1);
 
     fontSize = Math.max(Math.min(fontSize * scalingFactor, maxFontSize), minFontSize);
-    textWidth = font.widthOfTextAtSize(field.customText, fontSize);
+    textWidth = font.widthOfTextAtSize(longestLineInTextForWidth, fontSize);
 
     const textX = fieldX + (fieldWidth - textWidth) / 2;
     let textY = fieldY + (fieldHeight - textHeight) / 2;

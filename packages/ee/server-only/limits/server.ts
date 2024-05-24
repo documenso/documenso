@@ -1,11 +1,10 @@
 import { DateTime } from 'luxon';
 
 import { IS_BILLING_ENABLED } from '@documenso/lib/constants/app';
-import { STRIPE_PLAN_TYPE } from '@documenso/lib/constants/billing';
 import { prisma } from '@documenso/prisma';
 import { SubscriptionStatus } from '@documenso/prisma/client';
 
-import { getPricesByPlan } from '../stripe/get-prices-by-plan';
+import { getDocumentRelatedPrices } from '../stripe/get-document-related-prices.ts';
 import { FREE_PLAN_LIMITS, SELFHOSTED_PLAN_LIMITS, TEAM_PLAN_LIMITS } from './constants';
 import { ERROR_CODES } from './errors';
 import { ZLimitsSchema } from './schema';
@@ -56,10 +55,11 @@ const handleUserLimits = async ({ email }: HandleUserLimitsOptions) => {
   );
 
   if (activeSubscriptions.length > 0) {
-    const communityPlanPrices = await getPricesByPlan(STRIPE_PLAN_TYPE.COMMUNITY);
+    const documentPlanPrices = await getDocumentRelatedPrices();
 
     for (const subscription of activeSubscriptions) {
-      const price = communityPlanPrices.find((price) => price.id === subscription.priceId);
+      const price = documentPlanPrices.find((price) => price.id === subscription.priceId);
+
       if (!price || typeof price.product === 'string' || price.product.deleted) {
         continue;
       }

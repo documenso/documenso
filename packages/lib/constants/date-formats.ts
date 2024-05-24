@@ -13,7 +13,7 @@ export const DATE_FORMATS = [
   {
     key: 'YYYYMMDD',
     label: 'YYYY-MM-DD',
-    value: 'YYYY-MM-DD',
+    value: 'yyyy-MM-dd',
   },
   {
     key: 'DDMMYYYY',

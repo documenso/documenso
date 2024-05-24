@@ -35,42 +35,45 @@ export const resendTeamMemberInvitation = async ({
   teamId,
   invitationId,
 }: ResendTeamMemberInvitationOptions) => {
-  await prisma.$transaction(async (tx) => {
-    const team = await tx.team.findUniqueOrThrow({
-      where: {
-        id: teamId,
-        members: {
-          some: {
-            userId,
-            role: {
-              in: TEAM_MEMBER_ROLE_PERMISSIONS_MAP['MANAGE_TEAM'],
+  await prisma.$transaction(
+    async (tx) => {
+      const team = await tx.team.findUniqueOrThrow({
+        where: {
+          id: teamId,
+          members: {
+            some: {
+              userId,
+              role: {
+                in: TEAM_MEMBER_ROLE_PERMISSIONS_MAP['MANAGE_TEAM'],
+              },
             },
           },
         },
-      },
-    });
+      });
 
-    if (!team) {
-      throw new AppError('TeamNotFound', 'User is not a valid member of the team.');
-    }
+      if (!team) {
+        throw new AppError('TeamNotFound', 'User is not a valid member of the team.');
+      }
 
-    const teamMemberInvite = await tx.teamMemberInvite.findUniqueOrThrow({
-      where: {
-        id: invitationId,
-        teamId,
-      },
-    });
+      const teamMemberInvite = await tx.teamMemberInvite.findUniqueOrThrow({
+        where: {
+          id: invitationId,
+          teamId,
+        },
+      });
 
-    if (!teamMemberInvite) {
-      throw new AppError('InviteNotFound', 'No invite exists for this user.');
-    }
+      if (!teamMemberInvite) {
+        throw new AppError('InviteNotFound', 'No invite exists for this user.');
+      }
 
-    await sendTeamMemberInviteEmail({
-      email: teamMemberInvite.email,
-      token: teamMemberInvite.token,
-      teamName: team.name,
-      teamUrl: team.url,
-      senderName: userName,
-    });
-  });
+      await sendTeamMemberInviteEmail({
+        email: teamMemberInvite.email,
+        token: teamMemberInvite.token,
+        teamName: team.name,
+        teamUrl: team.url,
+        senderName: userName,
+      });
+    },
+    { timeout: 30_000 },
+  );
 };

@@ -93,7 +93,7 @@ export const MenuSwitcher = ({ user, teams: initialTeamsData }: MenuSwitcherProp
         <Button
           data-testid="menu-switcher"
           variant="none"
-          className="relative flex h-12 flex-row items-center px-2 py-2 ring-0 focus-visible:border-0 focus-visible:ring-0"
+          className="relative flex h-12 flex-row items-center px-0 py-2 ring-0 focus:outline-none focus-visible:border-0 focus-visible:ring-0 focus-visible:ring-transparent md:px-2"
         >
           <AvatarWithText
             avatarFallback={formatAvatarFallback(selectedTeam?.name)}
@@ -102,12 +102,13 @@ export const MenuSwitcher = ({ user, teams: initialTeamsData }: MenuSwitcherProp
             rightSideComponent={
               <ChevronsUpDown className="text-muted-foreground ml-auto h-4 w-4" />
             }
+            textSectionClassName="hidden lg:flex"
           />
         </Button>
       </DropdownMenuTrigger>
 
       <DropdownMenuContent
-        className={cn('z-[60] ml-2 w-full md:ml-0', teams ? 'min-w-[20rem]' : 'min-w-[12rem]')}
+        className={cn('z-[60] ml-6 w-full md:ml-0', teams ? 'min-w-[20rem]' : 'min-w-[12rem]')}
         align="end"
         forceMount
       >
@@ -166,22 +167,24 @@ export const MenuSwitcher = ({ user, teams: initialTeamsData }: MenuSwitcherProp
               </div>
             </DropdownMenuLabel>
 
-            {teams.map((team) => (
-              <DropdownMenuItem asChild key={team.id}>
-                <Link href={formatRedirectUrlOnSwitch(team.url)}>
-                  <AvatarWithText
-                    avatarFallback={formatAvatarFallback(team.name)}
-                    primaryText={team.name}
-                    secondaryText={formatSecondaryAvatarText(team)}
-                    rightSideComponent={
-                      isPathTeamUrl(team.url) && (
-                        <CheckCircle2 className="ml-auto fill-black text-white dark:fill-white dark:text-black" />
-                      )
-                    }
-                  />
-                </Link>
-              </DropdownMenuItem>
-            ))}
+            <div className="custom-scrollbar max-h-[40vh] overflow-auto">
+              {teams.map((team) => (
+                <DropdownMenuItem asChild key={team.id}>
+                  <Link href={formatRedirectUrlOnSwitch(team.url)}>
+                    <AvatarWithText
+                      avatarFallback={formatAvatarFallback(team.name)}
+                      primaryText={team.name}
+                      secondaryText={formatSecondaryAvatarText(team)}
+                      rightSideComponent={
+                        isPathTeamUrl(team.url) && (
+                          <CheckCircle2 className="ml-auto fill-black text-white dark:fill-white dark:text-black" />
+                        )
+                      }
+                    />
+                  </Link>
+                </DropdownMenuItem>
+              ))}
+            </div>
           </>
         ) : (
           <DropdownMenuItem className="text-muted-foreground px-4 py-2" asChild>

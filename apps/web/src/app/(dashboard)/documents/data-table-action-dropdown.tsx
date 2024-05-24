@@ -15,7 +15,6 @@ import {
   Pencil,
   Share,
   Trash2,
-  XCircle,
 } from 'lucide-react';
 import { useSession } from 'next-auth/react';
 
@@ -45,7 +44,7 @@ export type DataTableActionDropdownProps = {
     Recipient: Recipient[];
     team: Pick<Team, 'id' | 'url'> | null;
   };
-  team?: Pick<Team, 'id' | 'url'>;
+  team?: Pick<Team, 'id' | 'url'> & { teamEmail?: string };
 };
 
 export const DataTableActionDropdown = ({ row, team }: DataTableActionDropdownProps) => {
@@ -67,8 +66,8 @@ export const DataTableActionDropdown = ({ row, team }: DataTableActionDropdownPr
   // const isPending = row.status === DocumentStatus.PENDING;
   const isComplete = row.status === DocumentStatus.COMPLETED;
   // const isSigned = recipient?.signingStatus === SigningStatus.SIGNED;
-  const isDocumentDeletable = isOwner;
   const isCurrentTeamDocument = team && row.team?.url === team.url;
+  const canManageDocument = Boolean(isOwner || isCurrentTeamDocument);
 
   const documentsPath = formatDocumentsPath(team?.url);
 
@@ -107,14 +106,14 @@ export const DataTableActionDropdown = ({ row, team }: DataTableActionDropdownPr
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger>
+      <DropdownMenuTrigger data-testid="document-table-action-btn">
         <MoreHorizontal className="text-muted-foreground h-5 w-5" />
       </DropdownMenuTrigger>
 
       <DropdownMenuContent className="w-52" align="start" forceMount>
         <DropdownMenuLabel>Action</DropdownMenuLabel>
 
-        {recipient && recipient?.role !== RecipientRole.CC && (
+        {!isDraft && recipient && recipient?.role !== RecipientRole.CC && (
           <DropdownMenuItem disabled={!recipient || isComplete} asChild>
             <Link href={`/sign/${recipient?.token}`}>
               {recipient?.role === RecipientRole.VIEWER && (
@@ -141,8 +140,8 @@ export const DataTableActionDropdown = ({ row, team }: DataTableActionDropdownPr
           </DropdownMenuItem>
         )}
 
-        <DropdownMenuItem disabled={(!isOwner && !isCurrentTeamDocument) || isComplete} asChild>
-          <Link href={`${documentsPath}/${row.id}`}>
+        <DropdownMenuItem disabled={!canManageDocument || isComplete} asChild>
+          <Link href={`${documentsPath}/${row.id}/edit`}>
             <Edit className="mr-2 h-4 w-4" />
             Edit
           </Link>
@@ -158,14 +157,18 @@ export const DataTableActionDropdown = ({ row, team }: DataTableActionDropdownPr
           Duplicate
         </DropdownMenuItem>
 
-        <DropdownMenuItem disabled>
+        {/* No point displaying this if there's no functionality. */}
+        {/* <DropdownMenuItem disabled>
           <XCircle className="mr-2 h-4 w-4" />
           Void
-        </DropdownMenuItem>
+        </DropdownMenuItem> */}
 
-        <DropdownMenuItem onClick={() => setDeleteDialogOpen(true)} disabled={!isDocumentDeletable}>
+        <DropdownMenuItem
+          onClick={() => setDeleteDialogOpen(true)}
+          disabled={Boolean(!canManageDocument && team?.teamEmail)}
+        >
           <Trash2 className="mr-2 h-4 w-4" />
-          Delete
+          {canManageDocument ? 'Delete' : 'Hide'}
         </DropdownMenuItem>
 
         <DropdownMenuLabel>Share</DropdownMenuLabel>
@@ -186,15 +189,16 @@ export const DataTableActionDropdown = ({ row, team }: DataTableActionDropdownPr
         />
       </DropdownMenuContent>
 
-      {isDocumentDeletable && (
-        <DeleteDocumentDialog
-          id={row.id}
-          status={row.status}
-          documentTitle={row.title}
-          open={isDeleteDialogOpen}
-          onOpenChange={setDeleteDialogOpen}
-        />
-      )}
+      <DeleteDocumentDialog
+        id={row.id}
+        status={row.status}
+        documentTitle={row.title}
+        open={isDeleteDialogOpen}
+        onOpenChange={setDeleteDialogOpen}
+        teamId={team?.id}
+        canManageDocument={canManageDocument}
+      />
+
       {isDuplicateDialogOpen && (
         <DuplicateDocumentDialog
           id={row.id}

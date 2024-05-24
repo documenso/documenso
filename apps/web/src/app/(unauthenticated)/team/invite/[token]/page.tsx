@@ -29,16 +29,18 @@ export default async function AcceptInvitationPage({
 
   if (!teamMemberInvite) {
     return (
-      <div>
-        <h1 className="text-4xl font-semibold">Invalid token</h1>
+      <div className="w-screen max-w-lg px-4">
+        <div className="w-full">
+          <h1 className="text-4xl font-semibold">Invalid token</h1>
 
-        <p className="text-muted-foreground mb-4 mt-2 text-sm">
-          This token is invalid or has expired. Please contact your team for a new invitation.
-        </p>
+          <p className="text-muted-foreground mb-4 mt-2 text-sm">
+            This token is invalid or has expired. Please contact your team for a new invitation.
+          </p>
 
-        <Button asChild>
-          <Link href="/">Return</Link>
-        </Button>
+          <Button asChild>
+            <Link href="/">Return</Link>
+          </Button>
+        </div>
       </div>
     );
   }

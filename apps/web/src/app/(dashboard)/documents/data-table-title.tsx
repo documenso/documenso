@@ -5,16 +5,19 @@ import Link from 'next/link';
 import { useSession } from 'next-auth/react';
 import { match } from 'ts-pattern';
 
-import { Document, Recipient, User } from '@documenso/prisma/client';
+import { formatDocumentsPath } from '@documenso/lib/utils/teams';
+import type { Document, Recipient, Team, User } from '@documenso/prisma/client';
 
 export type DataTableTitleProps = {
   row: Document & {
     User: Pick<User, 'id' | 'name' | 'email'>;
+    team: Pick<Team, 'url'> | null;
     Recipient: Recipient[];
   };
+  teamUrl?: string;
 };
 
-export const DataTableTitle = ({ row }: DataTableTitleProps) => {
+export const DataTableTitle = ({ row, teamUrl }: DataTableTitleProps) => {
   const { data: session } = useSession();
 
   if (!session) {
@@ -25,14 +28,18 @@ export const DataTableTitle = ({ row }: DataTableTitleProps) => {
 
   const isOwner = row.User.id === session.user.id;
   const isRecipient = !!recipient;
+  const isCurrentTeamDocument = teamUrl && row.team?.url === teamUrl;
+
+  const documentsPath = formatDocumentsPath(isCurrentTeamDocument ? teamUrl : undefined);
 
   return match({
     isOwner,
     isRecipient,
+    isCurrentTeamDocument,
   })
-    .with({ isOwner: true }, () => (
+    .with({ isOwner: true }, { isCurrentTeamDocument: true }, () => (
       <Link
-        href={`/documents/${row.id}`}
+        href={`${documentsPath}/${row.id}`}
         title={row.title}
         className="block max-w-[10rem] truncate font-medium hover:underline md:max-w-[20rem]"
       >

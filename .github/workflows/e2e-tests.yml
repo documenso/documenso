@@ -6,29 +6,21 @@ on:
     branches: ['main']
 jobs:
   e2e_tests:
-    name: "E2E Tests"
+    name: 'E2E Tests'
     timeout-minutes: 60
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 18
-          cache: npm
-      - name: Install dependencies
-        run: npm ci
 
       - name: Copy env
         run: cp .env.example .env
 
+      - uses: ./.github/actions/node-install
+
       - name: Start Services
         run: npm run dx:up
 
-      - name: Install Playwright Browsers
-        run: npx playwright install --with-deps
-
-      - name: Generate Prisma Client
-        run: npm run prisma:generate -w @documenso/prisma
+      - uses: ./.github/actions/playwright-install
 
       - name: Create the database
         run: npm run prisma:migrate-dev
@@ -36,14 +28,16 @@ jobs:
       - name: Seed the database
         run: npm run prisma:seed
 
+      - uses: ./.github/actions/cache-build
+
       - name: Run Playwright tests
         run: npm run ci
 
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: test-results
-          path: "packages/app-tests/**/test-results/*"
+          path: 'packages/app-tests/**/test-results/*'
           retention-days: 30
     env:
       TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}

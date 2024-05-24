@@ -1,6 +1,7 @@
 import type { DocumentData } from '@documenso/prisma/client';
 
 import { getFile } from '../universal/upload/get-file';
+import { downloadFile } from './download-file';
 
 type DownloadPDFProps = {
   documentData: DocumentData;
@@ -14,16 +15,10 @@ export const downloadPDF = async ({ documentData, fileName }: DownloadPDFProps) 
     type: 'application/pdf',
   });
 
-  const link = window.document.createElement('a');
+  const baseTitle = (fileName ?? 'document').replace(/\.pdf$/, '');
 
-  const [baseTitle] = fileName?.includes('.pdf')
-    ? fileName.split('.pdf')
-    : [fileName ?? 'document'];
-
-  link.href = window.URL.createObjectURL(blob);
-  link.download = `${baseTitle}_signed.pdf`;
-
-  link.click();
-
-  window.URL.revokeObjectURL(link.href);
+  downloadFile({
+    filename: `${baseTitle}.pdf`,
+    data: blob,
+  });
 };

@@ -5,7 +5,6 @@ import { useCallback, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 
 import { Loader, Monitor, Moon, Sun } from 'lucide-react';
-import { useSession } from 'next-auth/react';
 import { useTheme } from 'next-themes';
 import { useHotkeys } from 'react-hotkeys-hook';
 
@@ -14,7 +13,10 @@ import {
   SETTINGS_PAGE_SHORTCUT,
   TEMPLATES_PAGE_SHORTCUT,
 } from '@documenso/lib/constants/keyboard-shortcuts';
-import type { Document, Recipient } from '@documenso/prisma/client';
+import {
+  DO_NOT_INVALIDATE_QUERY_ON_MUTATION,
+  SKIP_QUERY_BATCH_META,
+} from '@documenso/lib/constants/trpc';
 import { trpc as trpcReact } from '@documenso/trpc/react';
 import {
   CommandDialog,
@@ -67,7 +69,6 @@ export type CommandMenuProps = {
 
 export function CommandMenu({ open, onOpenChange }: CommandMenuProps) {
   const { setTheme } = useTheme();
-  const { data: session } = useSession();
 
   const router = useRouter();
 
@@ -82,19 +83,12 @@ export function CommandMenu({ open, onOpenChange }: CommandMenuProps) {
       },
       {
         keepPreviousData: true,
+        // Do not batch this due to relatively long request time compared to
+        // other queries which are generally batched with this.
+        ...SKIP_QUERY_BATCH_META,
+        ...DO_NOT_INVALIDATE_QUERY_ON_MUTATION,
       },
     );
-
-  const isOwner = useCallback(
-    (document: Document) => document.userId === session?.user.id,
-    [session?.user.id],
-  );
-
-  const getSigningLink = useCallback(
-    (recipients: Recipient[]) =>
-      `/sign/${recipients.find((r) => r.email === session?.user.email)?.token}`,
-    [session?.user.email],
-  );
 
   const searchResults = useMemo(() => {
     if (!searchDocumentsData) {
@@ -103,10 +97,10 @@ export function CommandMenu({ open, onOpenChange }: CommandMenuProps) {
 
     return searchDocumentsData.map((document) => ({
       label: document.title,
-      path: isOwner(document) ? `/documents/${document.id}` : getSigningLink(document.Recipient),
-      value: [document.id, document.title, ...document.Recipient.map((r) => r.email)].join(' '),
+      path: document.path,
+      value: document.value,
     }));
-  }, [searchDocumentsData, isOwner, getSigningLink]);
+  }, [searchDocumentsData]);
 
   const currentPage = pages[pages.length - 1];
 
