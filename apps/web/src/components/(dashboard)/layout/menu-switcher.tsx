@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
+import { motion } from 'framer-motion';
 import { CheckCircle2, ChevronsUpDown, Plus, Settings2 } from 'lucide-react';
 import { signOut } from 'next-auth/react';
 
@@ -24,6 +25,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@documenso/ui/primitives/dropdown-menu';
+
+const MotionLink = motion(Link);
 
 export type MenuSwitcherProps = {
   user: User;
@@ -170,19 +173,35 @@ export const MenuSwitcher = ({ user, teams: initialTeamsData }: MenuSwitcherProp
             <div className="custom-scrollbar max-h-[40vh] overflow-auto">
               {teams.map((team) => (
                 <DropdownMenuItem asChild key={team.id}>
-                  <Link href={formatRedirectUrlOnSwitch(team.url)} className="group">
+                  <MotionLink
+                    initial="initial"
+                    animate="initial"
+                    whileHover="animate"
+                    href={formatRedirectUrlOnSwitch(team.url)}
+                  >
                     <AvatarWithText
                       avatarFallback={formatAvatarFallback(team.name)}
                       primaryText={team.name}
                       secondaryText={
-                        <>
-                          <span className={cn('opacity', teams.length > 1 && 'group-hover:hidden')}>
+                        <div className="relative">
+                          <motion.span
+                            className="overflow-hidden"
+                            variants={{
+                              initial: { opacity: 1, translateY: 0 },
+                              animate: { opacity: 0, translateY: '100%' },
+                            }}
+                          >
                             {formatSecondaryAvatarText(team)}
-                          </span>
-                          <span
-                            className={cn('opacity-0', teams.length > 1 && 'group-hover:opacity-75')}
-                          >{`/t/${team.url}`}</span>
-                        </>
+                          </motion.span>
+
+                          <motion.span
+                            className="absolute inset-0"
+                            variants={{
+                              initial: { opacity: 0, translateY: '100%' },
+                              animate: { opacity: 1, translateY: 0 },
+                            }}
+                          >{`/t/${team.url}`}</motion.span>
+                        </div>
                       }
                       rightSideComponent={
                         isPathTeamUrl(team.url) && (
@@ -190,7 +209,7 @@ export const MenuSwitcher = ({ user, teams: initialTeamsData }: MenuSwitcherProp
                         )
                       }
                     />
-                  </Link>
+                  </MotionLink>
                 </DropdownMenuItem>
               ))}
             </div>
