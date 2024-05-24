@@ -1,6 +1,7 @@
 import { createNextRoute } from '@ts-rest/next';
 
 import { getServerLimits } from '@documenso/ee/server-only/limits/server';
+import { AppError } from '@documenso/lib/errors/app-error';
 import { createDocumentData } from '@documenso/lib/server-only/document-data/create-document-data';
 import { upsertDocumentMeta } from '@documenso/lib/server-only/document-meta/upsert-document-meta';
 import { createDocument } from '@documenso/lib/server-only/document/create-document';
@@ -19,10 +20,12 @@ import { getRecipientById } from '@documenso/lib/server-only/recipient/get-recip
 import { getRecipientsForDocument } from '@documenso/lib/server-only/recipient/get-recipients-for-document';
 import { setRecipientsForDocument } from '@documenso/lib/server-only/recipient/set-recipients-for-document';
 import { updateRecipient } from '@documenso/lib/server-only/recipient/update-recipient';
+import type { CreateDocumentFromTemplateResponse } from '@documenso/lib/server-only/template/create-document-from-template';
 import { createDocumentFromTemplate } from '@documenso/lib/server-only/template/create-document-from-template';
+import { createDocumentFromTemplateLegacy } from '@documenso/lib/server-only/template/create-document-from-template-legacy';
 import { extractNextApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 import { getFile } from '@documenso/lib/universal/upload/get-file';
-import { putFile } from '@documenso/lib/universal/upload/put-file';
+import { putPdfFile } from '@documenso/lib/universal/upload/put-file';
 import {
   getPresignGetUrl,
   getPresignPostUrl,
@@ -229,6 +232,13 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
         requestMetadata: extractNextApiRequestMetadata(args.req),
       });
 
+      await upsertDocumentMeta({
+        documentId: document.id,
+        userId: user.id,
+        ...body.meta,
+        requestMetadata: extractNextApiRequestMetadata(args.req),
+      });
+
       const recipients = await setRecipientsForDocument({
         userId: user.id,
         teamId: team?.id,
@@ -279,7 +289,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
 
     const fileName = body.title.endsWith('.pdf') ? body.title : `${body.title}.pdf`;
 
-    const document = await createDocumentFromTemplate({
+    const document = await createDocumentFromTemplateLegacy({
       templateId,
       userId: user.id,
       teamId: team?.id,
@@ -296,7 +306,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
         formValues: body.formValues,
       });
 
-      const newDocumentData = await putFile({
+      const newDocumentData = await putPdfFile({
         name: fileName,
         type: 'application/pdf',
         arrayBuffer: async () => Promise.resolve(prefilled),
@@ -324,11 +334,87 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
       await upsertDocumentMeta({
         documentId: document.id,
         userId: user.id,
-        subject: body.meta.subject,
-        message: body.meta.message,
-        dateFormat: body.meta.dateFormat,
-        timezone: body.meta.timezone,
+        ...body.meta,
         requestMetadata: extractNextApiRequestMetadata(args.req),
+      });
+    }
+
+    return {
+      status: 200,
+      body: {
+        documentId: document.id,
+        recipients: document.Recipient.map((recipient) => ({
+          recipientId: recipient.id,
+          name: recipient.name,
+          email: recipient.email,
+          token: recipient.token,
+          role: recipient.role,
+        })),
+      },
+    };
+  }),
+
+  generateDocumentFromTemplate: authenticatedMiddleware(async (args, user, team) => {
+    const { body, params } = args;
+
+    const { remaining } = await getServerLimits({ email: user.email, teamId: team?.id });
+
+    if (remaining.documents <= 0) {
+      return {
+        status: 400,
+        body: {
+          message: 'You have reached the maximum number of documents allowed for this month',
+        },
+      };
+    }
+
+    const templateId = Number(params.templateId);
+
+    let document: CreateDocumentFromTemplateResponse | null = null;
+
+    try {
+      document = await createDocumentFromTemplate({
+        templateId,
+        userId: user.id,
+        teamId: team?.id,
+        recipients: body.recipients,
+        override: {
+          title: body.title,
+          ...body.meta,
+        },
+      });
+    } catch (err) {
+      return AppError.toRestAPIError(err);
+    }
+
+    if (body.formValues) {
+      const fileName = document.title.endsWith('.pdf') ? document.title : `${document.title}.pdf`;
+
+      const pdf = await getFile(document.documentData);
+
+      const prefilled = await insertFormValuesInPdf({
+        pdf: Buffer.from(pdf),
+        formValues: body.formValues,
+      });
+
+      const newDocumentData = await putPdfFile({
+        name: fileName,
+        type: 'application/pdf',
+        arrayBuffer: async () => Promise.resolve(prefilled),
+      });
+
+      await updateDocument({
+        documentId: document.id,
+        userId: user.id,
+        teamId: team?.id,
+        data: {
+          formValues: body.formValues,
+          documentData: {
+            connect: {
+              id: newDocumentData.id,
+            },
+          },
+        },
       });
     }
 

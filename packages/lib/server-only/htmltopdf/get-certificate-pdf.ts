@@ -35,6 +35,7 @@ export const getCertificatePdf = async ({ documentId }: GetCertificatePdfOptions
 
   await page.goto(`${NEXT_PUBLIC_WEBAPP_URL()}/__htmltopdf/certificate?d=${encryptedId}`, {
     waitUntil: 'networkidle',
+    timeout: 10_000,
   });
 
   const result = await page.pdf({
