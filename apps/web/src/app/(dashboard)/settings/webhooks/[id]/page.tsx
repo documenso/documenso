@@ -109,7 +109,7 @@ export default function WebhookPage({ params }: WebhookPageOptions) {
                 name="webhookUrl"
                 render={({ field }) => (
                   <FormItem className="flex-1">
-                    <FormLabel required>ვებჰუკის ბმული</FormLabel>
+                    <FormLabel required>Webhook URL</FormLabel>
                     <FormControl>
                       <Input className="bg-background" {...field} />
                     </FormControl>
@@ -128,7 +128,7 @@ export default function WebhookPage({ params }: WebhookPageOptions) {
                 name="enabled"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>გააქტიურებული</FormLabel>
+                    <FormLabel>Enabled</FormLabel>
 
                     <div>
                       <FormControl>
@@ -182,7 +182,7 @@ export default function WebhookPage({ params }: WebhookPageOptions) {
 
                   <FormDescription>
                     A secret that will be sent to your URL so you can verify that the request has
-                    been sent by Documenso.
+                    been sent by SignStream.
                   </FormDescription>
                   <FormMessage />
                 </FormItem>

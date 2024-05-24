@@ -155,7 +155,8 @@ export default async function SigningCertificate({ searchParams }: SigningCertif
           <Table overflowHidden>
             <TableHeader>
               <TableRow>
-                <TableHead>Signer Events</TableHead>
+                <TableHead>ხელმომწერის აქტივობა</TableHead>
+                {/* <TableHead>Signer Events</TableHead> */}
                 <TableHead>ხელმოწერა</TableHead>
                 <TableHead>დეტალები</TableHead>
                 {/* <TableHead>Security</TableHead> */}
@@ -235,7 +236,7 @@ export default async function SigningCertificate({ searchParams }: SigningCertif
                                 format="yyyy-MM-dd hh:mm:ss a (ZZZZ)"
                               />
                             ) : (
-                              'Unknown'
+                              'უცნობია'
                             )}
                           </span>
                         </p>
@@ -249,7 +250,7 @@ export default async function SigningCertificate({ searchParams }: SigningCertif
                                 format="yyyy-MM-dd hh:mm:ss a (ZZZZ)"
                               />
                             ) : (
-                              'Unknown'
+                              'უცნობია'
                             )}
                           </span>
                         </p>
@@ -263,7 +264,7 @@ export default async function SigningCertificate({ searchParams }: SigningCertif
                                 format="yyyy-MM-dd hh:mm:ss a (ZZZZ)"
                               />
                             ) : (
-                              'Unknown'
+                              'უცნობია'
                             )}
                           </span>
                         </p>

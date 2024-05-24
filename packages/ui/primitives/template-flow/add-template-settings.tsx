@@ -119,7 +119,7 @@ export const AddTemplateSettingsFormPartial = ({
               name="title"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel required>Template title</FormLabel>
+                  <FormLabel required>შაბლონის სათაური</FormLabel>
 
                   <FormControl>
                     <Input className="bg-background" {...field} />
@@ -135,7 +135,7 @@ export const AddTemplateSettingsFormPartial = ({
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className="flex flex-row items-center">
-                    Document access
+                    დოკუმენტზე წვდომა
                     <DocumentGlobalAuthAccessTooltip />
                   </FormLabel>
 
@@ -168,7 +168,7 @@ export const AddTemplateSettingsFormPartial = ({
             <Accordion type="multiple">
               <AccordionItem value="email-options" className="border-none">
                 <AccordionTrigger className="text-foreground rounded border px-3 py-2 text-left hover:bg-neutral-200/30 hover:no-underline">
-                  Email Options
+                  ელ.ფოსტის პარამეტრები
                 </AccordionTrigger>
 
                 <AccordionContent className="text-muted-foreground -mx-1 px-1 pt-4 text-sm leading-relaxed [&>div]:pb-0">
@@ -179,7 +179,7 @@ export const AddTemplateSettingsFormPartial = ({
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel>
-                            Subject <span className="text-muted-foreground">(Optional)</span>
+                            თემატიკა <span className="text-muted-foreground">(სურვილისამებრ)</span>
                           </FormLabel>
 
                           <FormControl>
@@ -197,7 +197,8 @@ export const AddTemplateSettingsFormPartial = ({
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel>
-                            Message <span className="text-muted-foreground">(Optional)</span>
+                            შეტყობინება{' '}
+                            <span className="text-muted-foreground">(სურვილისამებრ)</span>
                           </FormLabel>
 
                           <FormControl>
@@ -218,7 +219,7 @@ export const AddTemplateSettingsFormPartial = ({
             <Accordion type="multiple">
               <AccordionItem value="advanced-options" className="border-none">
                 <AccordionTrigger className="text-foreground rounded border px-3 py-2 text-left hover:bg-neutral-200/30 hover:no-underline">
-                  Advanced Options
+                  დამატებითი პარამეტრები
                 </AccordionTrigger>
 
                 <AccordionContent className="text-muted-foreground -mx-1 px-1 pt-4 text-sm leading-relaxed">
@@ -228,7 +229,7 @@ export const AddTemplateSettingsFormPartial = ({
                       name="meta.dateFormat"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Date Format</FormLabel>
+                          <FormLabel>თარიღის ფორმატი</FormLabel>
 
                           <FormControl>
                             <Select {...field} onValueChange={field.onChange}>
@@ -256,7 +257,7 @@ export const AddTemplateSettingsFormPartial = ({
                       name="meta.timezone"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Time Zone</FormLabel>
+                          <FormLabel>დროითი ზონა</FormLabel>
 
                           <FormControl>
                             <Combobox
@@ -278,14 +279,15 @@ export const AddTemplateSettingsFormPartial = ({
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel className="flex flex-row items-center">
-                            Redirect URL{' '}
+                            გადამისამართების URL{' '}
                             <Tooltip>
                               <TooltipTrigger>
                                 <InfoIcon className="mx-2 h-4 w-4" />
                               </TooltipTrigger>
 
                               <TooltipContent className="text-muted-foreground max-w-xs">
-                                Add a URL to redirect the user to once the document is signed
+                                დაამატეთ URL მომხმარებლის გადამისამართებისთვის დოკუმენტზე ხელმოწერის
+                                შემდეგ
                               </TooltipContent>
                             </Tooltip>
                           </FormLabel>

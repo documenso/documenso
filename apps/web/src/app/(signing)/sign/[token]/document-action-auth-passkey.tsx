@@ -149,7 +149,9 @@ export const DocumentActionAuthPasskey = ({
     return (
       <div className="h-28 space-y-4">
         <Alert variant="destructive">
-          <AlertDescription>თქვენი passkey ჩატვირთვისას დაფიქსირდა ხარვეზი.</AlertDescription>
+          <AlertDescription>
+            თქვენი საიდუმლო გასაღების ჩატვირთვისას დაფიქსირდა ხარვეზი.
+          </AlertDescription>
         </Alert>
 
         <DialogFooter>

@@ -76,8 +76,9 @@ export const EditTemplateForm = ({
       stepIndex: 1,
     },
     signers: {
-      title: 'Add Placeholders',
-      description: 'Add all relevant placeholders for each recipient.',
+      title: 'დაამატეთ ხელმომწერები',
+      description: '',
+      // description: 'Add all relevant placeholders for each recipient.',
       stepIndex: 2,
     },
     fields: {

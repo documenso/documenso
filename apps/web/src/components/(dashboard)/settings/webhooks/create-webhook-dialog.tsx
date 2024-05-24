@@ -129,7 +129,7 @@ export const CreateWebhookDialog = ({ trigger, ...props }: CreateWebhookDialogPr
                   name="webhookUrl"
                   render={({ field }) => (
                     <FormItem className="flex-1">
-                      <FormLabel required>ვებჰუკის URL</FormLabel>
+                      <FormLabel required>Webhook URL</FormLabel>
                       <FormControl>
                         <Input className="bg-background" {...field} />
                       </FormControl>
@@ -148,7 +148,7 @@ export const CreateWebhookDialog = ({ trigger, ...props }: CreateWebhookDialogPr
                   name="enabled"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>გააქტიურებული</FormLabel>
+                      <FormLabel>Enabled</FormLabel>
 
                       <div>
                         <FormControl>

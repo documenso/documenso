@@ -114,7 +114,7 @@ export default function WebhookPage({ params }: WebhookPageOptions) {
                 name="webhookUrl"
                 render={({ field }) => (
                   <FormItem className="flex-1">
-                    <FormLabel required>ვებჰუკის URL</FormLabel>
+                    <FormLabel required>Webhook URL</FormLabel>
                     <FormControl>
                       <Input className="bg-background" {...field} />
                     </FormControl>
@@ -133,7 +133,7 @@ export default function WebhookPage({ params }: WebhookPageOptions) {
                 name="enabled"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>გააქტიურებული</FormLabel>
+                    <FormLabel>Enabled</FormLabel>
 
                     <div>
                       <FormControl>
@@ -196,7 +196,7 @@ export default function WebhookPage({ params }: WebhookPageOptions) {
 
             <div className="mt-4">
               <Button type="submit" loading={form.formState.isSubmitting}>
-                განაახლეთ ვებჰუკი
+                Update Webhook
               </Button>
             </div>
           </fieldset>
