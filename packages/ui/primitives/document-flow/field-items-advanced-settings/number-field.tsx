@@ -4,6 +4,7 @@ import { useState } from 'react';
 
 import { ChevronDown, ChevronUp } from 'lucide-react';
 
+import { type TNumberFieldMeta as NumberFieldMeta } from '@documenso/lib/types/field-field-meta';
 import { Button } from '@documenso/ui/primitives/button';
 import { Input } from '@documenso/ui/primitives/input';
 import { Label } from '@documenso/ui/primitives/label';
@@ -16,7 +17,6 @@ import {
 } from '@documenso/ui/primitives/select';
 import { Switch } from '@documenso/ui/primitives/switch';
 
-import type { NumberFieldMeta } from '.././field-item-advanced-settings';
 import { numberFormatValues } from './constants';
 
 type NumberFieldAdvancedSettingsProps = {

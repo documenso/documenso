@@ -24,11 +24,11 @@ import { useDocumentElement } from '@documenso/lib/client-only/hooks/use-documen
 import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
 import { RECIPIENT_ROLES_DESCRIPTION } from '@documenso/lib/constants/recipient-roles';
 import { ZFieldMetaSchema } from '@documenso/lib/types/field-field-meta';
+import { type TFieldMetaSchema as FieldMeta } from '@documenso/lib/types/field-field-meta';
 import { nanoid } from '@documenso/lib/universal/id';
 import type { Field, Recipient } from '@documenso/prisma/client';
 import { RecipientRole } from '@documenso/prisma/client';
 import { FieldType, SendStatus } from '@documenso/prisma/client';
-import type { FieldMeta } from '@documenso/ui/primitives/document-flow/field-item-advanced-settings';
 
 import { cn } from '../../lib/utils';
 import { Button } from '../button';

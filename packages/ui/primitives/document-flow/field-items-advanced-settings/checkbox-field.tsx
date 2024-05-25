@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 
 import { ChevronDown, ChevronUp, Trash } from 'lucide-react';
 
+import { type TCheckboxFieldMeta as CheckboxFieldMeta } from '@documenso/lib/types/field-field-meta';
 import { Button } from '@documenso/ui/primitives/button';
 import { Checkbox } from '@documenso/ui/primitives/checkbox';
 import { Input } from '@documenso/ui/primitives/input';
@@ -17,7 +18,6 @@ import {
 } from '@documenso/ui/primitives/select';
 import { Switch } from '@documenso/ui/primitives/switch';
 
-import type { CheckboxFieldMeta } from '.././field-item-advanced-settings';
 import { checkboxValidationLength, checkboxValidationRules } from './constants';
 
 type CheckboxFieldAdvancedSettingsProps = {

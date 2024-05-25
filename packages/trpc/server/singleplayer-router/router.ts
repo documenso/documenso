@@ -68,7 +68,7 @@ export const singleplayerRouter = router({
             documentId: -1,
             templateId: null,
             recipientId: -1,
-            fieldMeta,
+            fieldMeta: fieldMeta || null,
           });
         }
 

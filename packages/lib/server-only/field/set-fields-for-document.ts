@@ -1,4 +1,5 @@
 import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
+import { type TFieldMetaSchema as FieldMeta } from '@documenso/lib/types/field-field-meta';
 import type { RequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 import {
   createDocumentAuditLogData,
@@ -7,7 +8,6 @@ import {
 import { prisma } from '@documenso/prisma';
 import type { Field, FieldType } from '@documenso/prisma/client';
 import { SendStatus, SigningStatus } from '@documenso/prisma/client';
-import type { FieldMeta } from '@documenso/ui/primitives/document-flow/field-item-advanced-settings';
 
 export interface SetFieldsForDocumentOptions {
   userId: number;

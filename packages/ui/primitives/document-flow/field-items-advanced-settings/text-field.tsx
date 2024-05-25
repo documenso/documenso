@@ -1,9 +1,8 @@
+import { type TTextFieldMeta as TextFieldMeta } from '@documenso/lib/types/field-field-meta';
 import { Input } from '@documenso/ui/primitives/input';
 import { Label } from '@documenso/ui/primitives/label';
 import { Switch } from '@documenso/ui/primitives/switch';
 import { Textarea } from '@documenso/ui/primitives/textarea';
-
-import type { TextFieldMeta } from '.././field-item-advanced-settings';
 
 type TextFieldAdvancedSettingsProps = {
   fieldState: TextFieldMeta;

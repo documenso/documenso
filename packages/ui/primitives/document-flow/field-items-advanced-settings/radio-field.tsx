@@ -4,13 +4,12 @@ import { useEffect, useState } from 'react';
 
 import { ChevronDown, ChevronUp, Trash } from 'lucide-react';
 
+import { type TRadioFieldMeta as RadioFieldMeta } from '@documenso/lib/types/field-field-meta';
 import { Button } from '@documenso/ui/primitives/button';
 import { Checkbox } from '@documenso/ui/primitives/checkbox';
 import { Input } from '@documenso/ui/primitives/input';
 import { Label } from '@documenso/ui/primitives/label';
 import { Switch } from '@documenso/ui/primitives/switch';
-
-import type { RadioFieldMeta } from '.././field-item-advanced-settings';
 
 type RadioFieldAdvancedSettingsProps = {
   fieldState: RadioFieldMeta;

@@ -1,6 +1,6 @@
+import { type TFieldMetaSchema as FieldMeta } from '@documenso/lib/types/field-field-meta';
 import { prisma } from '@documenso/prisma';
 import type { FieldType } from '@documenso/prisma/client';
-import type { FieldMeta } from '@documenso/ui/primitives/document-flow/field-item-advanced-settings';
 
 export type SetFieldsForTemplateOptions = {
   userId: number;
