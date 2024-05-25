@@ -2,6 +2,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 import { prisma } from '..';
+import type { Prisma, User } from '../client';
 import { DocumentDataType, ReadStatus, RecipientRole, SendStatus, SigningStatus } from '../client';
 
 const examplePdf = fs
@@ -12,6 +13,32 @@ type SeedTemplateOptions = {
   title?: string;
   userId: number;
   teamId?: number;
+};
+
+type CreateTemplateOptions = {
+  key?: string | number;
+  createTemplateOptions?: Partial<Prisma.TemplateUncheckedCreateInput>;
+};
+
+export const seedBlankTemplate = async (owner: User, options: CreateTemplateOptions = {}) => {
+  const { key, createTemplateOptions = {} } = options;
+
+  const documentData = await prisma.documentData.create({
+    data: {
+      type: DocumentDataType.BYTES_64,
+      data: examplePdf,
+      initialData: examplePdf,
+    },
+  });
+
+  return await prisma.template.create({
+    data: {
+      title: `[TEST] Template ${key}`,
+      templateDocumentDataId: documentData.id,
+      userId: owner.id,
+      ...createTemplateOptions,
+    },
+  });
 };
 
 export const seedTemplate = async (options: SeedTemplateOptions) => {

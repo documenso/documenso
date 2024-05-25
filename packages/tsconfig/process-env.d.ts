@@ -61,6 +61,9 @@ declare namespace NodeJS {
 
     NEXT_PUBLIC_DISABLE_SIGNUP?: string;
 
+    //
+    NEXT_PRIVATE_BROWSERLESS_URL?: string;
+
     /**
      * Vercel environment variables
      */
@@ -70,6 +73,7 @@ declare namespace NodeJS {
 
     DEPLOYMENT_TARGET?: 'webapp' | 'marketing';
     FONT_CAVEAT_URI: string;
+    FONT_NOTO_SANS_URI: string;
 
     POSTGRES_URL?: string;
     DATABASE_URL?: string;

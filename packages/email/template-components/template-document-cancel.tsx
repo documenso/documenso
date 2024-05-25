@@ -24,6 +24,10 @@ export const TemplateDocumentCancel = ({
         </Text>
 
         <Text className="my-1 text-center text-base text-slate-400">
+          All signatures have been voided.
+        </Text>
+
+        <Text className="my-1 text-center text-base text-slate-400">
           You don't need to sign it anymore.
         </Text>
       </Section>
