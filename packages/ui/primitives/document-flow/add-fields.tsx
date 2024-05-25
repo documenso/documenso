@@ -23,6 +23,7 @@ import { getBoundingClientRect } from '@documenso/lib/client-only/get-bounding-c
 import { useDocumentElement } from '@documenso/lib/client-only/hooks/use-document-element';
 import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
 import { RECIPIENT_ROLES_DESCRIPTION } from '@documenso/lib/constants/recipient-roles';
+import { ZFieldMetaSchema } from '@documenso/lib/types/field-field-meta';
 import { nanoid } from '@documenso/lib/universal/id';
 import type { Field, Recipient } from '@documenso/prisma/client';
 import { RecipientRole } from '@documenso/prisma/client';
@@ -209,6 +210,7 @@ export const AddFieldsFormPartial = ({
         pageHeight: Number(field.height),
         signerEmail:
           recipients.find((recipient) => recipient.id === field.recipientId)?.email ?? '',
+        fieldMeta: ZFieldMetaSchema.parse(field.fieldMeta) ?? {},
       })),
     },
   });
@@ -219,11 +221,11 @@ export const AddFieldsFormPartial = ({
 
     const updatedFields = initialValues.fields.map((field) => {
       if (field.formId === currentField?.formId) {
+        const parsedFieldMeta = ZFieldMetaSchema.parse(fieldState);
+
         return {
           ...field,
-          fieldMeta: {
-            ...fieldState,
-          },
+          fieldMeta: parsedFieldMeta,
         };
       }
 
@@ -352,7 +354,7 @@ export const AddFieldsFormPartial = ({
         pageWidth: fieldPageWidth,
         pageHeight: fieldPageHeight,
         signerEmail: selectedSigner.email,
-        fieldMeta: {},
+        fieldMeta: undefined,
       });
 
       setIsFieldWithinBounds(false);
