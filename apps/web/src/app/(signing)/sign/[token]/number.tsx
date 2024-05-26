@@ -2,7 +2,6 @@
 
 import { useState, useTransition } from 'react';
 
-import { useParams } from 'next/navigation';
 import { useRouter } from 'next/navigation';
 
 import { Loader } from 'lucide-react';
@@ -11,12 +10,12 @@ import { Hash } from 'lucide-react';
 import { DO_NOT_INVALIDATE_QUERY_ON_MUTATION } from '@documenso/lib/constants/trpc';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import type { TRecipientActionAuth } from '@documenso/lib/types/document-auth';
+import { ZNumberFieldMeta } from '@documenso/lib/types/field-field-meta';
 import type { Recipient } from '@documenso/prisma/client';
 import type { FieldWithSignature } from '@documenso/prisma/types/field-with-signature';
 import { trpc } from '@documenso/trpc/react';
 import { Button } from '@documenso/ui/primitives/button';
 import { Dialog, DialogContent, DialogFooter, DialogTitle } from '@documenso/ui/primitives/dialog';
-import type { FieldMeta } from '@documenso/ui/primitives/document-flow/field-item-advanced-settings';
 import { Input } from '@documenso/ui/primitives/input';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
@@ -31,34 +30,13 @@ export type NumberFieldProps = {
 export const NumberField = ({ field, recipient }: NumberFieldProps) => {
   const router = useRouter();
   const { toast } = useToast();
-  const params = useParams();
   const [isPending, startTransition] = useTransition();
   const [showRadioModal, setShowRadioModal] = useState(false);
   const [localText, setLocalCustomText] = useState('');
-  const token = params?.token;
 
   const { executeActionAuthProcedure } = useRequiredDocumentAuthContext();
 
-  const { data: document } = trpc.document.getDocumentByToken.useQuery(
-    {
-      token: String(token),
-    },
-    {
-      enabled: !!token,
-    },
-  );
-
-  const { data } = trpc.field.getField.useQuery(
-    {
-      fieldId: field.id,
-      documentId: document?.id ?? 0,
-    },
-    {
-      enabled: !!document,
-    },
-  );
-
-  const fieldMeta = field.fieldMeta as FieldMeta;
+  const parsedFieldMeta = ZNumberFieldMeta.parse(field.fieldMeta);
 
   const { mutateAsync: signFieldWithToken, isLoading: isSignFieldWithTokenLoading } =
     trpc.field.signFieldWithToken.useMutation(DO_NOT_INVALIDATE_QUERY_ON_MUTATION);
@@ -176,7 +154,7 @@ export const NumberField = ({ field, recipient }: NumberFieldProps) => {
           <div>
             <Input
               type="text"
-              placeholder={fieldMeta.placeholder}
+              placeholder={parsedFieldMeta.placeholder}
               className="mt-2"
               onChange={(e) => setLocalCustomText(e.target.value)}
             />

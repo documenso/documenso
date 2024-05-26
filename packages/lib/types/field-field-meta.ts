@@ -59,7 +59,7 @@ export type TCheckboxFieldMeta = z.infer<typeof ZCheckboxFieldMeta>;
 
 export const ZDropdownFieldMeta = ZBaseFieldMeta.extend({
   type: z.literal('dropdown').default('dropdown'),
-  values: z.array(z.string()).optional(),
+  values: z.array(z.object({ value: z.string() })).optional(),
   defaultValue: z.string().optional(),
 });
 

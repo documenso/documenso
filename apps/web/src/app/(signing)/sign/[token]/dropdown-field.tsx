@@ -2,7 +2,6 @@
 
 import { useEffect, useState, useTransition } from 'react';
 
-import { useParams } from 'next/navigation';
 import { useRouter } from 'next/navigation';
 
 import { ChevronDown, Loader } from 'lucide-react';
@@ -10,11 +9,10 @@ import { ChevronDown, Loader } from 'lucide-react';
 import { DO_NOT_INVALIDATE_QUERY_ON_MUTATION } from '@documenso/lib/constants/trpc';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import type { TRecipientActionAuth } from '@documenso/lib/types/document-auth';
+import { ZDropdownFieldMeta } from '@documenso/lib/types/field-field-meta';
 import type { Recipient } from '@documenso/prisma/client';
 import type { FieldWithSignatureAndFieldMeta } from '@documenso/prisma/types/field-with-signature-and-fieldmeta';
 import { trpc } from '@documenso/trpc/react';
-import type { DropdownFieldMeta } from '@documenso/ui/primitives/document-flow/field-item-advanced-settings';
-import type { FieldMeta } from '@documenso/ui/primitives/document-flow/field-item-advanced-settings';
 import {
   Select,
   SelectContent,
@@ -35,17 +33,12 @@ export type DropdownFieldProps = {
 export const DropdownField = ({ field, recipient }: DropdownFieldProps) => {
   const router = useRouter();
   const { toast } = useToast();
-  const params = useParams();
   const [isPending, startTransition] = useTransition();
   const [localText, setLocalCustomText] = useState('');
 
   const { executeActionAuthProcedure } = useRequiredDocumentAuthContext();
 
-  const fieldMeta = field.fieldMeta as FieldMeta;
-
-  const isDropdownFieldMeta = (meta: FieldMeta): meta is DropdownFieldMeta => {
-    return meta.type === 'dropdown';
-  };
+  const fieldMeta = ZDropdownFieldMeta.parse(field.fieldMeta);
 
   const { mutateAsync: signFieldWithToken, isLoading: isSignFieldWithTokenLoading } =
     trpc.field.signFieldWithToken.useMutation(DO_NOT_INVALIDATE_QUERY_ON_MUTATION);
@@ -142,7 +135,7 @@ export const DropdownField = ({ field, recipient }: DropdownFieldProps) => {
           </div>
         )}
 
-        {!field.inserted && isDropdownFieldMeta(fieldMeta) && (
+        {!field.inserted && (
           <p className="group-hover:text-primary text-muted-foreground flex flex-col items-center justify-center duration-200">
             <Select value={fieldMeta.defaultValue} onValueChange={handleSelectItem}>
               <SelectTrigger className="text-muted-foreground z-10 h-full w-full border-none ring-0 focus:ring-0">

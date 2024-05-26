@@ -21,6 +21,8 @@ import { getBoundingClientRect } from '@documenso/lib/client-only/get-bounding-c
 import { useDocumentElement } from '@documenso/lib/client-only/hooks/use-document-element';
 import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
 import { RECIPIENT_ROLES_DESCRIPTION } from '@documenso/lib/constants/recipient-roles';
+import { ZFieldMetaSchema } from '@documenso/lib/types/field-field-meta';
+import { type TFieldMetaSchema as FieldMeta } from '@documenso/lib/types/field-field-meta';
 import { nanoid } from '@documenso/lib/universal/id';
 import type { Field, Recipient } from '@documenso/prisma/client';
 import { FieldType, RecipientRole } from '@documenso/prisma/client';
@@ -42,7 +44,6 @@ import {
   DocumentFlowFormContainerStep,
 } from '@documenso/ui/primitives/document-flow/document-flow-root';
 import { FieldItem } from '@documenso/ui/primitives/document-flow/field-item';
-import type { FieldMeta } from '@documenso/ui/primitives/document-flow/field-item-advanced-settings';
 import type { DocumentFlowStep } from '@documenso/ui/primitives/document-flow/types';
 import { FRIENDLY_FIELD_TYPE } from '@documenso/ui/primitives/document-flow/types';
 import { Popover, PopoverContent, PopoverTrigger } from '@documenso/ui/primitives/popover';
@@ -211,11 +212,11 @@ export const AddTemplateFieldsFormPartial = ({
 
     const updatedFields = initialValues.fields.map((field) => {
       if (field.formId === currentField?.formId) {
+        const parsedFieldMeta = ZFieldMetaSchema.parse(fieldState);
+
         return {
           ...field,
-          fieldMeta: {
-            ...fieldState,
-          },
+          fieldMeta: parsedFieldMeta,
         };
       }
 

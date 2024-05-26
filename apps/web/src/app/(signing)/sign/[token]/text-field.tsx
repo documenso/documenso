@@ -2,7 +2,6 @@
 
 import { useEffect, useState, useTransition } from 'react';
 
-import { useParams } from 'next/navigation';
 import { useRouter } from 'next/navigation';
 
 import { Loader, Type } from 'lucide-react';
@@ -10,12 +9,12 @@ import { Loader, Type } from 'lucide-react';
 import { DO_NOT_INVALIDATE_QUERY_ON_MUTATION } from '@documenso/lib/constants/trpc';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import type { TRecipientActionAuth } from '@documenso/lib/types/document-auth';
+import { ZTextFieldMeta } from '@documenso/lib/types/field-field-meta';
 import type { Recipient } from '@documenso/prisma/client';
 import type { FieldWithSignatureAndFieldMeta } from '@documenso/prisma/types/field-with-signature-and-fieldmeta';
 import { trpc } from '@documenso/trpc/react';
 import { Button } from '@documenso/ui/primitives/button';
 import { Dialog, DialogContent, DialogFooter, DialogTitle } from '@documenso/ui/primitives/dialog';
-import type { FieldMeta } from '@documenso/ui/primitives/document-flow/field-item-advanced-settings';
 import { Textarea } from '@documenso/ui/primitives/textarea';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
@@ -29,9 +28,6 @@ export type TextFieldProps = {
 
 export const TextField = ({ field, recipient }: TextFieldProps) => {
   const router = useRouter();
-  const params = useParams();
-
-  const token = params?.token;
   const { toast } = useToast();
 
   const { executeActionAuthProcedure } = useRequiredDocumentAuthContext();
@@ -46,26 +42,7 @@ export const TextField = ({ field, recipient }: TextFieldProps) => {
     isLoading: isRemoveSignedFieldWithTokenLoading,
   } = trpc.field.removeSignedFieldWithToken.useMutation(DO_NOT_INVALIDATE_QUERY_ON_MUTATION);
 
-  const { data: document } = trpc.document.getDocumentByToken.useQuery(
-    {
-      token: String(token),
-    },
-    {
-      enabled: !!token,
-    },
-  );
-
-  const { data } = trpc.field.getField.useQuery(
-    {
-      fieldId: field.id,
-      documentId: document?.id ?? 0,
-    },
-    {
-      enabled: !!document,
-    },
-  );
-
-  const fieldMeta = field.fieldMeta as FieldMeta;
+  const parsedFieldMeta = ZTextFieldMeta.parse(field.fieldMeta);
 
   const isLoading = isSignFieldWithTokenLoading || isRemoveSignedFieldWithTokenLoading || isPending;
 
@@ -182,14 +159,13 @@ export const TextField = ({ field, recipient }: TextFieldProps) => {
 
       <Dialog open={showCustomTextModal} onOpenChange={setShowCustomTextModal}>
         <DialogContent>
-          <DialogTitle>{fieldMeta.label ?? 'Add Text'}</DialogTitle>
+          <DialogTitle>{parsedFieldMeta.label ?? 'Add Text'}</DialogTitle>
 
           <div className="">
             <Textarea
               id="custom-text"
-              // @ts-expect-error - fix later
-              maxLength={fieldMeta.characterLimit}
-              placeholder={fieldMeta.placeholder ?? 'Enter your text here'}
+              maxLength={parsedFieldMeta.characterLimit}
+              placeholder={parsedFieldMeta.placeholder ?? 'Enter your text here'}
               className="border-border mt-2 w-full rounded-md border"
               onChange={(e) => setLocalCustomText(e.target.value)}
             />

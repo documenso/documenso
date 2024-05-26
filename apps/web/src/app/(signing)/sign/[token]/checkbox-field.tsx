@@ -2,7 +2,6 @@
 
 import { useEffect, useState, useTransition } from 'react';
 
-import { useParams } from 'next/navigation';
 import { useRouter } from 'next/navigation';
 
 import { Loader } from 'lucide-react';
@@ -10,6 +9,7 @@ import { Loader } from 'lucide-react';
 import { DO_NOT_INVALIDATE_QUERY_ON_MUTATION } from '@documenso/lib/constants/trpc';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import type { TRecipientActionAuth } from '@documenso/lib/types/document-auth';
+import { ZCheckboxFieldMeta } from '@documenso/lib/types/field-field-meta';
 import type { Recipient } from '@documenso/prisma/client';
 import type { FieldWithSignatureAndFieldMeta } from '@documenso/prisma/types/field-with-signature-and-fieldmeta';
 import { trpc } from '@documenso/trpc/react';
@@ -28,20 +28,11 @@ export type CheckboxFieldProps = {
 export const CheckboxField = ({ field, recipient }: CheckboxFieldProps) => {
   const router = useRouter();
   const { toast } = useToast();
-  const params = useParams();
   const [isPending, startTransition] = useTransition();
-  const token = params?.token;
   const [checkedValues, setCheckedValues] = useState<string[]>([]);
   const { executeActionAuthProcedure } = useRequiredDocumentAuthContext();
 
-  const { data: document } = trpc.document.getDocumentByToken.useQuery(
-    {
-      token: String(token),
-    },
-    {
-      enabled: !!token,
-    },
-  );
+  const parsedFieldMeta = ZCheckboxFieldMeta.parse(field.fieldMeta);
 
   const { mutateAsync: signFieldWithToken, isLoading: isSignFieldWithTokenLoading } =
     trpc.field.signFieldWithToken.useMutation(DO_NOT_INVALIDATE_QUERY_ON_MUTATION);
@@ -127,22 +118,24 @@ export const CheckboxField = ({ field, recipient }: CheckboxFieldProps) => {
 
       {!field.inserted && (
         <div className="z-10 space-y-2">
-          {field.fieldMeta?.values?.map((item, index) => (
-            <div key={index} className="flex items-center space-x-2">
-              <Checkbox
-                id={`checkbox-${index}`}
-                checked={checkedValues.includes(item.value)}
-                onCheckedChange={() => handleCheckboxChange(item.value)}
-              />
-              <Label htmlFor={`checkbox-${index}`}>{item.value}</Label>
-            </div>
-          ))}
+          {parsedFieldMeta.values?.map(
+            (item: { value: string; checked: boolean }, index: number) => (
+              <div key={index} className="flex items-center space-x-2">
+                <Checkbox
+                  id={`checkbox-${index}`}
+                  checked={item.checked}
+                  onCheckedChange={() => handleCheckboxChange(item.value)}
+                />
+                <Label htmlFor={`checkbox-${index}`}>{item.value}</Label>
+              </div>
+            ),
+          )}
         </div>
       )}
 
       {field.inserted && (
         <div className="flex flex-wrap justify-center gap-2">
-          {field.customText.split(',').map((value, index) => (
+          {field.customText.split(',').map((value: string, index: number) => (
             <div key={index} className="rounded-md bg-black px-3 py-1 text-sm text-white">
               {value}
             </div>

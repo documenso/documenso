@@ -9,6 +9,7 @@ import { Loader } from 'lucide-react';
 import { DO_NOT_INVALIDATE_QUERY_ON_MUTATION } from '@documenso/lib/constants/trpc';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import type { TRecipientActionAuth } from '@documenso/lib/types/document-auth';
+import { ZRadioFieldMeta } from '@documenso/lib/types/field-field-meta';
 import type { Recipient } from '@documenso/prisma/client';
 import type { FieldWithSignatureAndFieldMeta } from '@documenso/prisma/types/field-with-signature-and-fieldmeta';
 import { trpc } from '@documenso/trpc/react';
@@ -31,6 +32,8 @@ export const RadioField = ({ field, recipient }: RadioFieldProps) => {
   const [localText, setLocalCustomText] = useState('');
 
   const { executeActionAuthProcedure } = useRequiredDocumentAuthContext();
+
+  const parsedFieldMeta = ZRadioFieldMeta.parse(field.fieldMeta);
 
   const { mutateAsync: signFieldWithToken, isLoading: isSignFieldWithTokenLoading } =
     trpc.field.signFieldWithToken.useMutation(DO_NOT_INVALIDATE_QUERY_ON_MUTATION);
@@ -118,7 +121,7 @@ export const RadioField = ({ field, recipient }: RadioFieldProps) => {
 
       {!field.inserted && (
         <RadioGroup onValueChange={handleSelectItem} className="z-10">
-          {field.fieldMeta?.values?.map((item, index) => (
+          {parsedFieldMeta.values?.map((item, index) => (
             <div key={index} className="flex items-center space-x-2">
               <RadioGroupItem value={item.value} id={`option-${index}`} />
               <Label htmlFor={`option-${index}`}>{item.value}</Label>
