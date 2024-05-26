@@ -4,9 +4,17 @@ import { DEFAULT_DOCUMENT_DATE_FORMAT } from '@documenso/lib/constants/date-form
 import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
 import { DEFAULT_DOCUMENT_TIME_ZONE } from '@documenso/lib/constants/time-zones';
 import type { DocumentAndSender } from '@documenso/lib/server-only/document/get-document-by-token';
+import {
+  ZCheckboxFieldMeta,
+  ZDropdownFieldMeta,
+  ZNumberFieldMeta,
+  ZRadioFieldMeta,
+  ZTextFieldMeta,
+} from '@documenso/lib/types/field-field-meta';
 import type { CompletedField } from '@documenso/lib/types/fields';
 import type { Field, Recipient } from '@documenso/prisma/client';
 import { FieldType, RecipientRole } from '@documenso/prisma/client';
+import type { FieldWithSignatureAndFieldMeta } from '@documenso/prisma/types/field-with-signature-and-fieldmeta';
 import { Card, CardContent } from '@documenso/ui/primitives/card';
 import { ElementVisible } from '@documenso/ui/primitives/element-visible';
 import { LazyPDFViewer } from '@documenso/ui/primitives/lazy-pdf-viewer';
@@ -105,25 +113,41 @@ export const SigningPageView = ({
             .with(FieldType.EMAIL, () => (
               <EmailField key={field.id} field={field} recipient={recipient} />
             ))
-            .with(FieldType.TEXT, () => (
-              // @ts-expect-error fix later
-              <TextField key={field.id} field={field} recipient={recipient} />
-            ))
-            .with(FieldType.NUMBER, () => (
-              <NumberField key={field.id} field={field} recipient={recipient} />
-            ))
-            .with(FieldType.RADIO, () => (
-              // @ts-expect-error fix later
-              <RadioField key={field.id} field={field} recipient={recipient} />
-            ))
-            .with(FieldType.CHECKBOX, () => (
-              // @ts-expect-error fix later
-              <CheckboxField key={field.id} field={field} recipient={recipient} />
-            ))
-            .with(FieldType.DROPDOWN, () => (
-              // @ts-expect-error fix later
-              <DropdownField key={field.id} field={field} recipient={recipient} />
-            ))
+            .with(FieldType.TEXT, () => {
+              const fieldWithMeta: FieldWithSignatureAndFieldMeta = {
+                ...field,
+                fieldMeta: ZTextFieldMeta.parse(field.fieldMeta),
+              };
+              return <TextField key={field.id} field={fieldWithMeta} recipient={recipient} />;
+            })
+            .with(FieldType.NUMBER, () => {
+              const fieldWithMeta: FieldWithSignatureAndFieldMeta = {
+                ...field,
+                fieldMeta: ZNumberFieldMeta.parse(field.fieldMeta),
+              };
+              return <NumberField key={field.id} field={fieldWithMeta} recipient={recipient} />;
+            })
+            .with(FieldType.RADIO, () => {
+              const fieldWithMeta: FieldWithSignatureAndFieldMeta = {
+                ...field,
+                fieldMeta: ZRadioFieldMeta.parse(field.fieldMeta),
+              };
+              return <RadioField key={field.id} field={fieldWithMeta} recipient={recipient} />;
+            })
+            .with(FieldType.CHECKBOX, () => {
+              const fieldWithMeta: FieldWithSignatureAndFieldMeta = {
+                ...field,
+                fieldMeta: ZCheckboxFieldMeta.parse(field.fieldMeta),
+              };
+              return <CheckboxField key={field.id} field={fieldWithMeta} recipient={recipient} />;
+            })
+            .with(FieldType.DROPDOWN, () => {
+              const fieldWithMeta: FieldWithSignatureAndFieldMeta = {
+                ...field,
+                fieldMeta: ZDropdownFieldMeta.parse(field.fieldMeta),
+              };
+              return <DropdownField key={field.id} field={fieldWithMeta} recipient={recipient} />;
+            })
             .otherwise(() => null),
         )}
       </ElementVisible>

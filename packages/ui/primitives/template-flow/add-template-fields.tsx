@@ -339,8 +339,7 @@ export const AddTemplateFieldsFormPartial = ({
         signerEmail: selectedSigner.email,
         signerId: selectedSigner.id,
         signerToken: selectedSigner.token ?? '',
-        // @ts-expect-error fix later
-        fieldMeta: {},
+        fieldMeta: undefined,
       });
 
       setIsFieldWithinBounds(false);
