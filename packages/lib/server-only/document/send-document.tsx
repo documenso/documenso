@@ -34,6 +34,7 @@ export type SendDocumentOptions = {
   documentId: number;
   userId: number;
   teamId?: number;
+  sendEmail?: boolean;
   requestMetadata?: RequestMetadata;
 };
 
@@ -41,6 +42,7 @@ export const sendDocument = async ({
   documentId,
   userId,
   teamId,
+  sendEmail = true,
   requestMetadata,
 }: SendDocumentOptions) => {
   const user = await prisma.user.findFirstOrThrow({
@@ -128,100 +130,102 @@ export const sendDocument = async ({
     Object.assign(document, result);
   }
 
-  await Promise.all(
-    document.Recipient.map(async (recipient) => {
-      if (recipient.sendStatus === SendStatus.SENT || recipient.role === RecipientRole.CC) {
-        return;
-      }
+  if (sendEmail) {
+    await Promise.all(
+      document.Recipient.map(async (recipient) => {
+        if (recipient.sendStatus === SendStatus.SENT || recipient.role === RecipientRole.CC) {
+          return;
+        }
 
-      const recipientEmailType = RECIPIENT_ROLE_TO_EMAIL_TYPE[recipient.role];
+        const recipientEmailType = RECIPIENT_ROLE_TO_EMAIL_TYPE[recipient.role];
 
-      const { email, name } = recipient;
-      const selfSigner = email === user.email;
-      const { actionVerb } = RECIPIENT_ROLES_DESCRIPTION[recipient.role];
-      const recipientActionVerb = actionVerb.toLowerCase();
+        const { email, name } = recipient;
+        const selfSigner = email === user.email;
+        const { actionVerb } = RECIPIENT_ROLES_DESCRIPTION[recipient.role];
+        const recipientActionVerb = actionVerb.toLowerCase();
 
-      let emailMessage = customEmail?.message || '';
-      let emailSubject = `Please ${recipientActionVerb} this document`;
+        let emailMessage = customEmail?.message || '';
+        let emailSubject = `Please ${recipientActionVerb} this document`;
 
-      if (selfSigner) {
-        emailMessage = `You have initiated the document ${`"${document.title}"`} that requires you to ${recipientActionVerb} it.`;
-        emailSubject = `Please ${recipientActionVerb} your document`;
-      }
+        if (selfSigner) {
+          emailMessage = `You have initiated the document ${`"${document.title}"`} that requires you to ${recipientActionVerb} it.`;
+          emailSubject = `Please ${recipientActionVerb} your document`;
+        }
 
-      if (isDirectTemplate) {
-        emailMessage = `A document was created by your direct template that requires you to ${recipientActionVerb} it.`;
-        emailSubject = `Please ${recipientActionVerb} this document created by your direct template`;
-      }
+        if (isDirectTemplate) {
+          emailMessage = `A document was created by your direct template that requires you to ${recipientActionVerb} it.`;
+          emailSubject = `Please ${recipientActionVerb} this document created by your direct template`;
+        }
 
-      const customEmailTemplate = {
-        'signer.name': name,
-        'signer.email': email,
-        'document.name': document.title,
-      };
+        const customEmailTemplate = {
+          'signer.name': name,
+          'signer.email': email,
+          'document.name': document.title,
+        };
 
-      const assetBaseUrl = NEXT_PUBLIC_WEBAPP_URL() || 'http://localhost:3000';
-      const signDocumentLink = `${NEXT_PUBLIC_WEBAPP_URL()}/sign/${recipient.token}`;
+        const assetBaseUrl = NEXT_PUBLIC_WEBAPP_URL() || 'http://localhost:3000';
+        const signDocumentLink = `${NEXT_PUBLIC_WEBAPP_URL()}/sign/${recipient.token}`;
 
-      const template = createElement(DocumentInviteEmailTemplate, {
-        documentName: document.title,
-        inviterName: user.name || undefined,
-        inviterEmail: user.email,
-        assetBaseUrl,
-        signDocumentLink,
-        customBody: renderCustomEmailTemplate(emailMessage, customEmailTemplate),
-        role: recipient.role,
-        selfSigner,
-      });
+        const template = createElement(DocumentInviteEmailTemplate, {
+          documentName: document.title,
+          inviterName: user.name || undefined,
+          inviterEmail: user.email,
+          assetBaseUrl,
+          signDocumentLink,
+          customBody: renderCustomEmailTemplate(emailMessage, customEmailTemplate),
+          role: recipient.role,
+          selfSigner,
+        });
 
-      await prisma.$transaction(
-        async (tx) => {
-          await mailer.sendMail({
-            to: {
-              address: email,
-              name,
-            },
-            from: {
-              name: FROM_NAME,
-              address: FROM_ADDRESS,
-            },
-            subject: customEmail?.subject
-              ? renderCustomEmailTemplate(customEmail.subject, customEmailTemplate)
-              : emailSubject,
-            html: render(template),
-            text: render(template, { plainText: true }),
-          });
-
-          await tx.recipient.update({
-            where: {
-              id: recipient.id,
-            },
-            data: {
-              sendStatus: SendStatus.SENT,
-            },
-          });
-
-          await tx.documentAuditLog.create({
-            data: createDocumentAuditLogData({
-              type: DOCUMENT_AUDIT_LOG_TYPE.EMAIL_SENT,
-              documentId: document.id,
-              user,
-              requestMetadata,
-              data: {
-                emailType: recipientEmailType,
-                recipientEmail: recipient.email,
-                recipientName: recipient.name,
-                recipientRole: recipient.role,
-                recipientId: recipient.id,
-                isResending: false,
+        await prisma.$transaction(
+          async (tx) => {
+            await mailer.sendMail({
+              to: {
+                address: email,
+                name,
               },
-            }),
-          });
-        },
-        { timeout: 30_000 },
-      );
-    }),
-  );
+              from: {
+                name: FROM_NAME,
+                address: FROM_ADDRESS,
+              },
+              subject: customEmail?.subject
+                ? renderCustomEmailTemplate(customEmail.subject, customEmailTemplate)
+                : emailSubject,
+              html: render(template),
+              text: render(template, { plainText: true }),
+            });
+
+            await tx.recipient.update({
+              where: {
+                id: recipient.id,
+              },
+              data: {
+                sendStatus: SendStatus.SENT,
+              },
+            });
+
+            await tx.documentAuditLog.create({
+              data: createDocumentAuditLogData({
+                type: DOCUMENT_AUDIT_LOG_TYPE.EMAIL_SENT,
+                documentId: document.id,
+                user,
+                requestMetadata,
+                data: {
+                  emailType: recipientEmailType,
+                  recipientEmail: recipient.email,
+                  recipientName: recipient.name,
+                  recipientRole: recipient.role,
+                  recipientId: recipient.id,
+                  isResending: false,
+                },
+              }),
+            });
+          },
+          { timeout: 30_000 },
+        );
+      }),
+    );
+  }
 
   const allRecipientsHaveNoActionToTake = document.Recipient.every(
     (recipient) =>
