@@ -286,8 +286,6 @@ export const FieldAdvancedSettings = forwardRef<HTMLDivElement, FieldAdvancedSet
               handleToggleChange={handleToggleChange}
             />
           )}
-
-          {/* add the rest */}
         </DocumentFlowFormContainerContent>
         <DocumentFlowFormContainerFooter className="mt-auto">
           <DocumentFlowFormContainerActions
