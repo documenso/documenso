@@ -1,29 +1,31 @@
 import { RecipientRole } from '@documenso/prisma/client';
 
+// {actionVerb} Document
+
 export const RECIPIENT_ROLES_DESCRIPTION = {
   [RecipientRole.APPROVER]: {
     actionVerb: 'დაამტკიცოთ',
-    actioned: 'Approved',
-    progressiveVerb: 'Approving',
-    roleName: 'Approver',
+    actioned: 'დაამტკიცა',
+    progressiveVerb: 'დამტკიცებით',
+    roleName: 'დამამტკიცებელი',
   },
   [RecipientRole.CC]: {
-    actionVerb: 'CC',
-    actioned: `CC'd`,
-    progressiveVerb: 'CC',
-    roleName: 'Cc',
+    actionVerb: 'ასლი მიიღოთ',
+    actioned: `ასლი მიიღო`,
+    progressiveVerb: 'ასლის მიღებით',
+    roleName: 'ასლის მიმღები',
   },
   [RecipientRole.SIGNER]: {
-    actionVerb: 'ხელი მოაწეოთ',
-    actioned: 'Signed',
-    progressiveVerb: 'Signing',
-    roleName: 'Signer',
+    actionVerb: 'ხელი მოაწეროთ',
+    actioned: 'ხელი მოაწერა',
+    progressiveVerb: 'ხელმოწერით',
+    roleName: 'ხელმომწერი',
   },
   [RecipientRole.VIEWER]: {
     actionVerb: 'იხილოთ',
-    actioned: 'Viewed',
-    progressiveVerb: 'Viewing',
-    roleName: 'Viewer',
+    actioned: 'იხილა',
+    progressiveVerb: 'ნახვით',
+    roleName: 'დამკვირვებელი',
   },
 } satisfies Record<keyof typeof RecipientRole, unknown>;
 

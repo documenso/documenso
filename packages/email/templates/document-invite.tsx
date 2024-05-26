@@ -37,9 +37,23 @@ export const DocumentInviteEmailTemplate = ({
 }: DocumentInviteEmailTemplateProps) => {
   const action = RECIPIENT_ROLES_DESCRIPTION[role].actionVerb.toLowerCase();
 
+  // const previewText = selfSigner
+  // ? `please ${action} your document ${documentName}`
+  // : `${inviterName} has invited you to ${action} ${documentName}`;
+
   const previewText = selfSigner
-    ? `Please ${action} your document ${documentName}`
-    : `${inviterName} has invited you to ${action} ${documentName}`;
+    ? `გთხოვთ 
+    ${action === 'ასლი მიიღოთ' && 'თქვენი დოკუმენტის'}
+    ${action} 
+    ${action === 'დაამტკიცოთ' && 'თქვენი დოკუმენტი'}
+    ${action === 'ხელი მოაწეროთ' && 'თქვენს დოკუმენტს'}
+    ${action === 'იხილოთ' && 'თქვენი დოკუმენტი'}
+    "${documentName}"`
+    : `${inviterName}: მოგიწვიათ, რათა 
+     ${action === 'ასლი მიიღოთ' && 'დოკუმენტის'} 
+     ${action} 
+     ${action === 'ხელი მოაწეროთ' ? 'დოკუმენტს' : action === 'ასლი მიიღოთ' ? '' : 'დოკუმენტი'}
+      "${documentName}"`;
 
   const getAssetUrl = (path: string) => {
     return new URL(path, assetBaseUrl).toString();
@@ -93,7 +107,17 @@ export const DocumentInviteEmailTemplate = ({
                   {customBody ? (
                     <pre className="font-sans text-base text-slate-400">{customBody}</pre>
                   ) : (
-                    `${inviterName} has invited you to ${action} the document "${documentName}".`
+                    `${inviterName}: მოგიწვიათ, რათა 
+                     ${action === 'ასლი მიიღოთ' && 'დოკუმენტის'} 
+                     ${action} 
+                     ${
+                       action === 'ხელი მოაწეროთ'
+                         ? 'დოკუმენტს'
+                         : action === 'ასლი მიიღოთ'
+                         ? ''
+                         : 'დოკუმენტი'
+                     }
+                     "${documentName}"`
                   )}
                 </Text>
               </Section>

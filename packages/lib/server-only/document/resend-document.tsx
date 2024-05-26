@@ -90,9 +90,9 @@ export const resendDocument = async ({
       const { email, name } = recipient;
       const selfSigner = email === user.email;
 
-      const selfSignerCustomEmail = `You have initiated the document ${`"${document.title}"`} that requires you to ${RECIPIENT_ROLES_DESCRIPTION[
-        recipient.role
-      ].actionVerb.toLowerCase()} it.`;
+      const selfSignerCustomEmail = `თქვენ შექმენით დოკუმენტი ${`"${document.title}"`}, რომელიც საჭიროებს, რომ ${
+        RECIPIENT_ROLES_DESCRIPTION[recipient.role].actionVerb
+      }`;
 
       const customEmailTemplate = {
         'signer.name': name,
@@ -119,9 +119,16 @@ export const resendDocument = async ({
 
       const { actionVerb } = RECIPIENT_ROLES_DESCRIPTION[recipient.role];
 
-      const emailSubject = selfSigner
-        ? `შეხსენება: გთხოვთ ${actionVerb.toLowerCase()} თქვენს დოკუმენტს`
-        : `შეხსენება: გთხოვთ ${actionVerb.toLowerCase()} ამ დოკუმენტს`;
+      // const emailSubject = selfSigner
+      //   ? `შეხსენება: გთხოვთ ${actionVerb} თქვენს დოკუმენტს`
+      //   : `შეხსენება: გთხოვთ ${actionVerb} ამ დოკუმენტს`;
+
+      const emailSubject = `
+        ${actionVerb === 'ხელი მოაწეროთ' && `შეხსენება: გთხოვთ ${actionVerb} ამ დოკუმენტს`}
+        ${actionVerb === 'დაამტკიცოთ' && `შეხსენება: გთხოვთ ${actionVerb} ეს დოკუმენტი`}
+        ${actionVerb === 'იხილოთ' && `შეხსენება: გთხოვთ ${actionVerb} ეს დოკუმენტი`}
+        ${actionVerb === 'ასლი მიიღოთ' && `შეხსენება: გთხოვთ ამ დოკუმენტის ${actionVerb}`}
+      `;
 
       await prisma.$transaction(
         async (tx) => {
@@ -135,7 +142,7 @@ export const resendDocument = async ({
               address: FROM_ADDRESS,
             },
             subject: customEmail?.subject
-              ? renderCustomEmailTemplate(`Reminder: ${customEmail.subject}`, customEmailTemplate)
+              ? renderCustomEmailTemplate(`შეხსენება: ${customEmail.subject}`, customEmailTemplate)
               : emailSubject,
             html: render(template),
             text: render(template, { plainText: true }),

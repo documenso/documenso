@@ -1,3 +1,5 @@
+import { Card, CardContent } from '@documenso/ui/primitives/card';
+
 import { CallToAction } from '~/components/(marketing)/call-to-action';
 
 // export const metadata: Metadata = {
@@ -127,25 +129,27 @@ export default function OpenPage() {
 
   return (
     <div>
-      {/* <div className="mx-auto mt-6 max-w-screen-lg sm:mt-12">
+      <div className="mx-auto mt-6 max-w-screen-lg sm:mt-12">
         <div className="flex flex-col items-center justify-center">
-          <h1 className="text-3xl font-bold lg:text-5xl">Open Startup</h1>
+          <h1 className="text-center text-3xl font-bold lg:text-5xl">
+            Simplify Your Workflow with Our E-Sign Platform
+          </h1>
 
           <p className="text-muted-foreground mt-4 max-w-[60ch] text-center text-lg leading-normal">
-            All our metrics, finances, and learnings are public. We believe in transparency and want
-            to share our journey with you. You can read more about why here:{' '}
-            <a
+            Empower your team to close deals faster, stay productive anywhere, and customize your
+            experience. Suitable for all industries: Sales, HR, Real Estate, and more.{' '}
+            {/* <a
               className="font-bold"
               href="https://documenso.com/blog/pre-seed"
               target="_blank"
               rel="noreferrer"
             >
               Announcing Open Metrics
-            </a>
+            </a> */}
           </p>
         </div>
 
-        <div className="my-12 grid grid-cols-12 gap-8">
+        {/* <div className="my-12 grid grid-cols-12 gap-8">
           <div className="col-span-12 grid grid-cols-4 gap-4">
             <MetricCard
               className="col-span-2 lg:col-span-1"
@@ -243,19 +247,37 @@ export default function OpenPage() {
             data={MONTHLY_COMPLETED_DOCUMENTS}
             className="col-span-12 lg:col-span-6"
           />
-        </div>
-      </div> */}
+        </div> */}
+      </div>
 
-      {/* <div className="col-span-12 mt-12 flex flex-col items-center justify-center">
+      <div className="col-span-12 mt-12 flex flex-col items-center justify-center">
         <h2 className="text-2xl font-bold">Is there more?</h2>
 
         <p className="text-muted-foreground mt-4 max-w-[55ch] text-center text-lg leading-normal">
           This page is evolving as we learn what makes a great signing company. We'll update it when
           we have more to share.
         </p>
-      </div> */}
+      </div>
 
       <CallToAction className="mt-12" utmSource="open-page" />
+
+      <Card spotlight className="mt-12">
+        <CardContent className="flex flex-col items-center justify-center p-12">
+          <h2 className="text-center text-2xl font-bold">Close More Deals, Faster</h2>
+
+          <p className="text-muted-foreground mt-4 max-w-[55ch] text-center leading-normal">
+            Prepare contracts quickly, send them for signature, and track the entire process
+            digitally.
+          </p>
+
+          {/* <ul>
+            <li> Benefits:</li>
+            <li>Speed: Reduce contract preparation time.</li>
+            <li>Efficiency: Track progress without paper.</li>
+            <li>Anywhere Access: Convert, create, edit, approve, and sign documents from any device.</li>
+          </ul> */}
+        </CardContent>
+      </Card>
     </div>
   );
 }

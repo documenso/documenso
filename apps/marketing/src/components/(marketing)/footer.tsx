@@ -26,7 +26,7 @@ const SOCIAL_LINKS = [
 const FOOTER_LINKS = [
   { href: '/pricing', text: 'ფასი' },
   { href: '/blog', text: 'ბლოგი' },
-  { href: '/open', text: 'ნებისმიერი' },
+  { href: '/open', text: 'გამოყენებები' },
   { href: 'mailto:support@documenso.com', text: 'მხარდაჭერა', target: '_blank' },
   { href: '/privacy', text: 'კონფიდენციალურობა' },
 ];

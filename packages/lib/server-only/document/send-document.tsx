@@ -131,9 +131,9 @@ export const sendDocument = async ({
       const { email, name } = recipient;
       const selfSigner = email === user.email;
 
-      const selfSignerCustomEmail = `You have initiated the document ${`"${document.title}"`} that requires you to ${RECIPIENT_ROLES_DESCRIPTION[
-        recipient.role
-      ].actionVerb.toLowerCase()} it.`;
+      const selfSignerCustomEmail = `თქვენ შექმენით დოკუმენტი ${`"${document.title}"`}, რომელიც საჭიროებს, რომ ${
+        RECIPIENT_ROLES_DESCRIPTION[recipient.role].actionVerb
+      }`;
 
       const customEmailTemplate = {
         'signer.name': name,
@@ -160,9 +160,12 @@ export const sendDocument = async ({
 
       const { actionVerb } = RECIPIENT_ROLES_DESCRIPTION[recipient.role];
 
-      const emailSubject = selfSigner
-        ? `გთხოვთ ${actionVerb.toLowerCase()} თქვენს დოკუმენტს`
-        : `გთხოვთ ${actionVerb.toLowerCase()} ამ დოკუმენტს`;
+      const emailSubject = `
+        ${actionVerb === 'ხელი მოაწეროთ' && `შეხსენება: გთხოვთ ${actionVerb} ამ დოკუმენტს`}
+        ${actionVerb === 'დაამტკიცოთ' && `შეხსენება: გთხოვთ ${actionVerb} ეს დოკუმენტი`}
+        ${actionVerb === 'იხილოთ' && `შეხსენება: გთხოვთ ${actionVerb} ეს დოკუმენტი`}
+        ${actionVerb === 'ასლი მიიღოთ' && `შეხსენება: გთხოვთ ამ დოკუმენტის ${actionVerb}`}
+      `;
 
       await prisma.$transaction(
         async (tx) => {

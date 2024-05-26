@@ -19,7 +19,7 @@ export type DocumentActionAuthAccountProps = {
 
 export const DocumentActionAuthAccount = ({
   actionTarget = 'FIELD',
-  actionVerb = 'sign',
+  actionVerb = 'ხელი მოაწეროთ',
   onOpenChange,
 }: DocumentActionAuthAccountProps) => {
   const { recipient } = useRequiredDocumentAuthContext();
@@ -58,7 +58,7 @@ export const DocumentActionAuthAccount = ({
             </span>
           ) : (
             <span>
-              To {actionVerb.toLowerCase()} this {actionTarget.toLowerCase()}, თქვენ უნდა იყოთ
+              თუ გნებავთ, რომ {actionVerb} {actionTarget.toLowerCase()}-ს, თქვენ უნდა იყოთ
               ავტორიზებული, როგორც <strong>{recipient.email}</strong>
             </span>
           )}

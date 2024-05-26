@@ -49,7 +49,7 @@ type TPasskeyAuthFormSchema = z.infer<typeof ZPasskeyAuthFormSchema>;
 
 export const DocumentActionAuthPasskey = ({
   actionTarget = 'FIELD',
-  actionVerb = 'sign',
+  actionVerb = 'ხელი მოაწეროთ',
   onReauthFormSubmit,
   open,
   onOpenChange,
@@ -123,8 +123,8 @@ export const DocumentActionAuthPasskey = ({
       <div className="space-y-4">
         <Alert variant="warning">
           <AlertDescription>
-            Your browser does not support passkeys, which is required to {actionVerb.toLowerCase()}{' '}
-            this {actionTarget.toLowerCase()}.
+            თქვენი ბრაუზერი ვერ აღიქვავს საიდუმლო გასაღებებს, რომელებიც საჭიროა იმისთვის, რომ{' '}
+            {actionVerb.toLowerCase()} ამ {actionTarget.toLowerCase()}-ს.
           </AlertDescription>
         </Alert>
 
@@ -174,7 +174,7 @@ export const DocumentActionAuthPasskey = ({
           <AlertDescription>
             {recipient.role === RecipientRole.VIEWER && actionTarget === 'DOCUMENT'
               ? 'თქვენ უნდა დააყენოთ საიდუმლო გასაღები (Passkey), რათა ეს დოკუმენტი ნანახად მოინიშნოს.'
-              : `You need to setup a passkey to ${actionVerb.toLowerCase()} this ${actionTarget.toLowerCase()}.`}
+              : `თქვენ უნდა დააყენოთ საიდუმლო გასაღები, რათა ${actionVerb} ამ ${actionTarget.toLowerCase()}-ს.`}
           </AlertDescription>
         </Alert>
 

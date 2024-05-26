@@ -111,7 +111,9 @@ export const Hero = ({ className, ...props }: HeroProps) => {
             className="rounded-full bg-transparent backdrop-blur-sm"
             onClick={onSignUpClick}
           >
-            სცადეთ უფასოდ 14 დღის განმავლობაში
+            <span className="hidden md:block">სცადეთ უფასოდ 14 დღის განმავლობაში</span>
+            <span className="block md:hidden">უფასო 14 დღე</span>
+
             <span className="bg-primary dark:text-background -mr-2.5 ml-2.5 rounded-full px-2 py-1.5 text-xs font-medium">
               დაწყება
             </span>
