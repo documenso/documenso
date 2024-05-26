@@ -32,7 +32,7 @@ export const ConfirmTeamEmailTemplate = ({
   teamUrl = 'demo',
   token = '',
 }: ConfirmTeamEmailProps) => {
-  const previewText = `Accept team email request for ${teamName} on Documenso`;
+  const previewText = `მიიღეთ გუნდის ელ.ფოსტის მოწვევა ${teamName}-ისთვის Documenso-ზე`;
   //
 
   return (

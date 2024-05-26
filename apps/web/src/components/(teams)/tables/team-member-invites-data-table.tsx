@@ -73,7 +73,8 @@ export const TeamMemberInvitesDataTable = ({ teamId }: TeamMemberInvitesDataTabl
     trpc.team.deleteTeamMemberInvitations.useMutation({
       onSuccess: () => {
         toast({
-          title: 'მოწვევა წაშლილია',
+          title: '',
+          // title: 'მოწვევა წაშლილია',
           description: 'მოწვევა წარმატებით წაიშალა!',
         });
       },
@@ -104,7 +105,7 @@ export const TeamMemberInvitesDataTable = ({ teamId }: TeamMemberInvitesDataTabl
     <DataTable
       columns={[
         {
-          header: 'Team Member',
+          header: 'გუნდის წევრი',
           cell: ({ row }) => {
             return (
               <AvatarWithText
@@ -118,17 +119,18 @@ export const TeamMemberInvitesDataTable = ({ teamId }: TeamMemberInvitesDataTabl
           },
         },
         {
-          header: 'Role',
+          header: 'როლი',
           accessorKey: 'role',
           cell: ({ row }) => TEAM_MEMBER_ROLE_MAP[row.original.role] ?? row.original.role,
         },
         {
-          header: 'Invited At',
+          header: 'მოწვეულია',
+          // header: 'Invited At',
           accessorKey: 'createdAt',
           cell: ({ row }) => <LocaleDate date={row.original.createdAt} />,
         },
         {
-          header: 'Actions',
+          header: 'პარამეტრები',
           cell: ({ row }) => (
             <DropdownMenu>
               <DropdownMenuTrigger>

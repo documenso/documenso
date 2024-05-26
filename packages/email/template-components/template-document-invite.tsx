@@ -33,12 +33,14 @@ export const TemplateDocumentInvite = ({
           {selfSigner ? (
             <>
               {`Please ${actionVerb.toLowerCase()} your document`}
+              {/* {`Please ${actionVerb.toLowerCase()} your document`} */}
               <br />
               {`"${documentName}"`}
             </>
           ) : (
             <>
               {`${inviterName} has invited you to ${actionVerb.toLowerCase()}`}
+              {/* {`${inviterName} has invited you to ${actionVerb.toLowerCase()}`} */}
               <br />
               {`"${documentName}"`}
             </>
@@ -47,6 +49,7 @@ export const TemplateDocumentInvite = ({
 
         <Text className="my-1 text-center text-base text-slate-400">
           Continue by {progressiveVerb.toLowerCase()} the document.
+          {/* Continue by {progressiveVerb.toLowerCase()} the document. */}
         </Text>
 
         <Section className="mb-6 mt-8 text-center">

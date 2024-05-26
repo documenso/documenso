@@ -20,8 +20,8 @@ export const TemplateForgotPassword = ({
         </Text>
 
         <Text className="my-1 text-center text-base text-slate-400">
-          That's okay, it happens! Click the button below to reset your password. არაუშავს!
-          დააკლიკეთ ქვემოთ მოცემულ ღილაკს პაროლის აღსადგენად.
+          {/* That's okay, it happens! Click the button below to reset your password.  */}
+          არაუშავს! დააჭირეთ ქვემოთ მოცემულ ღილაკს პაროლის აღსადგენად.
         </Text>
 
         <Section className="mb-6 mt-8 text-center">

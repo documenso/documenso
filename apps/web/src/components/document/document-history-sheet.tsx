@@ -102,7 +102,7 @@ export const DocumentHistorySheet = ({
             className="text-muted-foreground text-sm"
             onClick={() => setIsUserDetailsVisible(!isUserDetailsVisible)}
           >
-            {isUserDetailsVisible ? 'Hide' : 'Show'} დამატებითი ინფორმაცია
+            {isUserDetailsVisible ? 'დაფარეთ' : 'აჩვენეთ'} დამატებითი ინფორმაცია
           </button>
         </div>
 
@@ -311,7 +311,7 @@ export const DocumentHistorySheet = ({
                   <>
                     <div className="mb-1 mt-2 flex flex-row space-x-2">
                       <Badge variant="neutral" className="text-muted-foreground">
-                        IP: {auditLog.ipAddress ?? 'Unknown'}
+                        IP: {auditLog.ipAddress ?? 'უცნობი'}
                       </Badge>
 
                       <Badge variant="neutral" className="text-muted-foreground">

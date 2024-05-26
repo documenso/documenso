@@ -87,9 +87,9 @@ export const EnableAuthenticatorAppDialog = ({ onSuccess }: EnableAuthenticatorA
       onSuccess?.();
 
       toast({
-        title: 'ორფაქტორიანი ავთენტიფიკაციის გააქტიურდა',
+        title: 'ორფაქტორიანი ავთენტიფიკაცია გააქტიურდა',
         description:
-          'სისტემაში ყოველ შესვლისას მოგიწევთ კოდის შეყვანა თქვენი ავთენტიფიკატორის აპლიკაციიდან.',
+          'სისტემაში ყოველი შემოსვლისას მოგიწევთ კოდის შეყვანა თქვენი ავთენტიფიკატორის აპლიკაციიდან.',
       });
     } catch (_err) {
       toast({
@@ -169,7 +169,7 @@ export const EnableAuthenticatorAppDialog = ({ onSuccess }: EnableAuthenticatorA
                     <Button variant="secondary">დახურვა</Button>
                   </DialogClose>
 
-                  <Button onClick={downloadRecoveryCodes}>ჩამოწერა</Button>
+                  <Button onClick={downloadRecoveryCodes}>ჩამოტვირთვა</Button>
                 </DialogFooter>
               </div>
             ) : (
@@ -210,7 +210,7 @@ export const EnableAuthenticatorAppDialog = ({ onSuccess }: EnableAuthenticatorA
                       control={enable2FAForm.control}
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="text-muted-foreground">Token</FormLabel>
+                          <FormLabel className="text-muted-foreground">ტოკენი</FormLabel>
                           <FormControl>
                             <Input {...field} type="text" value={field.value ?? ''} />
                           </FormControl>

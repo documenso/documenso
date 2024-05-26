@@ -2,7 +2,7 @@ import { RecipientRole } from '@documenso/prisma/client';
 
 export const RECIPIENT_ROLES_DESCRIPTION = {
   [RecipientRole.APPROVER]: {
-    actionVerb: 'Approve',
+    actionVerb: 'დაამტკიცოთ',
     actioned: 'Approved',
     progressiveVerb: 'Approving',
     roleName: 'Approver',
@@ -14,13 +14,13 @@ export const RECIPIENT_ROLES_DESCRIPTION = {
     roleName: 'Cc',
   },
   [RecipientRole.SIGNER]: {
-    actionVerb: 'Sign',
+    actionVerb: 'ხელი მოაწეოთ',
     actioned: 'Signed',
     progressiveVerb: 'Signing',
     roleName: 'Signer',
   },
   [RecipientRole.VIEWER]: {
-    actionVerb: 'View',
+    actionVerb: 'იხილოთ',
     actioned: 'Viewed',
     progressiveVerb: 'Viewing',
     roleName: 'Viewer',
@@ -37,5 +37,5 @@ export const RECIPIENT_ROLE_SIGNING_REASONS = {
   [RecipientRole.SIGNER]: 'მე ვარ ამ დოკუმენტის ხელმომწერი',
   [RecipientRole.APPROVER]: 'მე ვარ ამ დოკუმენტის დამამტკიცებელი',
   [RecipientRole.CC]: 'მე ვალდებული ვარ მივიღო ამ დოკუმენტის ასლი',
-  [RecipientRole.VIEWER]: 'I am a viewer of this document',
+  [RecipientRole.VIEWER]: 'მე ვერ არ დოკუმენტის მოწმე',
 } satisfies Record<keyof typeof RecipientRole, string>;

@@ -44,7 +44,7 @@ export const ZSignUpFormSchema = z
       return !password.includes(name) && !password.includes(email.split('@')[0]);
     },
     {
-      message: 'პაროლი არ უნდა იყოს საჯარო ან ეფუძნებოდეს პირად მონაცემებს.',
+      message: 'პაროლი უნდა იყოს უნიკალური და არ უნდა ეფუძნებოდეს პირად მონაცემებს.',
     },
   );
 
@@ -84,7 +84,7 @@ export const SignUpForm = ({ className, initialEmail, isGoogleSSOEnabled }: Sign
       toast({
         title: 'რეგისტრაცია წარმატებულია',
         description:
-          'თქვენ წარმატებით დარეგისტრირდით. გთხოვთ დაადასტუროთ თქვენს ელ. ფოსტაზე გამოგზავნილ ბმულზე გადასვლით.',
+          'თქვენ წარმატებით დარეგისტრირდით! გთხოვთ დაადასტუროთ ეს თქვენს ელ.ფოსტაზე გამოგზავნილ ბმულზე გადასვლით.',
         duration: 5000,
       });
 
@@ -149,7 +149,7 @@ export const SignUpForm = ({ className, initialEmail, isGoogleSSOEnabled }: Sign
             name="email"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>ელ. ფოსტა</FormLabel>
+                <FormLabel>ელ.ფოსტა</FormLabel>
                 <FormControl>
                   <Input type="email" {...field} />
                 </FormControl>

@@ -83,7 +83,7 @@ export const ApiTokenForm = ({ className, teamId }: ApiTokenFormProps) => {
 
       toast({
         title: 'ტოკენი დაკოპირებულია',
-        description: 'ტოკენი წარმატებით დაკოპირდა.',
+        description: 'ტოკენი წარმატებით დაკოპირდა!',
       });
     } catch (error) {
       toast({
@@ -104,7 +104,7 @@ export const ApiTokenForm = ({ className, teamId }: ApiTokenFormProps) => {
 
       toast({
         title: 'ტოკენი შექმნილია',
-        description: 'ახალი ტოკენი წარმატებით შეიქმნა.',
+        description: 'ახალი ტოკენი წარმატებით შეიქმნა!',
         duration: 5000,
       });
 
@@ -239,8 +239,7 @@ export const ApiTokenForm = ({ className, teamId }: ApiTokenFormProps) => {
         <Card className="mt-8" gradient>
           <CardContent className="p-4">
             <p className="text-muted-foreground mt-2 text-sm">
-              თქვენი ტოკენი წარმატებით შეიქმნა! დარწმუნდით, რომ დააკოპირეთ, რადგან ვეღარ იხილავთ
-              მას!
+              თქვენი ტოკენი წარმატებით შეიქმნა! დარწმუნდით, რომ დააკოპირეთ, რადგან მას ვეღარ იხილავთ
             </p>
 
             <p className="bg-muted-foreground/10 my-4 rounded-md px-2.5 py-1 font-mono text-sm">

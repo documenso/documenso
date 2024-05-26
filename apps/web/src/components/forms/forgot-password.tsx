@@ -72,7 +72,7 @@ export const ForgotPasswordForm = ({ className }: ForgotPasswordFormProps) => {
             name="email"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>ელ. ფოსტა</FormLabel>
+                <FormLabel>ელ.ფოსტა</FormLabel>
                 <FormControl>
                   <Input type="email" {...field} />
                 </FormControl>

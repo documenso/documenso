@@ -25,8 +25,8 @@ import { SignaturePad } from '@documenso/ui/primitives/signature-pad';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
 export const ZProfileFormSchema = z.object({
-  name: z.string().trim().min(1, { message: 'Please enter a valid name.' }),
-  signature: z.string().min(1, 'Signature Pad cannot be empty'),
+  name: z.string().trim().min(1, { message: 'გთხოვთ შეიყვანოთ სწორი სახელი.' }),
+  signature: z.string().min(1, 'ხელმოწერის პადი არ შეიძლება იყოს ცარიელი'),
 });
 
 export const ZTwoFactorAuthTokenSchema = z.object({
@@ -67,7 +67,7 @@ export const ProfileForm = ({ className, user }: ProfileFormProps) => {
 
       toast({
         title: 'პროფილი განახლებულია',
-        description: 'თქვენი პროფილი წარმატებით განახლდა.',
+        description: 'თქვენი პროფილი წარმატებით განახლდა!',
         duration: 5000,
       });
 
@@ -84,7 +84,7 @@ export const ProfileForm = ({ className, user }: ProfileFormProps) => {
           title: 'დაფიქსირდა ხარვეზი',
           variant: 'destructive',
           description:
-            'თქვენი ავტორიზაციისას დაფიქსირდა ხარვეზი. გთხოვთ თავიდან სცადოთ ან დაგვიკავშირდეთ.',
+            'ავტორიზაციისას დაფიქსირდა ხარვეზი. გთხოვთ თავიდან სცადოთ ან დაგვიკავშირდეთ.',
         });
       }
     }
@@ -113,7 +113,7 @@ export const ProfileForm = ({ className, user }: ProfileFormProps) => {
 
           <div>
             <Label htmlFor="email" className="text-muted-foreground">
-              ელ. ფოსტა
+              ელ.ფოსტა
             </Label>
             <Input id="email" type="email" className="bg-muted mt-2" value={user.email} disabled />
           </div>

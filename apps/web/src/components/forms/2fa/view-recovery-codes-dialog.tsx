@@ -35,7 +35,7 @@ import { Input } from '@documenso/ui/primitives/input';
 import { RecoveryCodeList } from './recovery-code-list';
 
 export const ZViewRecoveryCodesForm = z.object({
-  token: z.string().min(1, { message: 'Token is required' }),
+  token: z.string().min(1, { message: 'გთხოვთ მოგვაწოდოთ მოქმედი ტოკენი' }),
 });
 
 export type TViewRecoveryCodesForm = z.infer<typeof ZViewRecoveryCodesForm>;
@@ -73,7 +73,7 @@ export const ViewRecoveryCodesDialog = () => {
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Button className="flex-shrink-0">View Codes</Button>
+        <Button className="flex-shrink-0">იხილეთ კოდები</Button>
       </DialogTrigger>
 
       <DialogContent className="w-full max-w-xl md:max-w-xl lg:max-w-xl">
@@ -115,7 +115,7 @@ export const ViewRecoveryCodesDialog = () => {
                   render={({ field }) => (
                     <FormItem>
                       <FormControl>
-                        <Input {...field} placeholder="Token" />
+                        <Input {...field} placeholder="ტოკენი" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>

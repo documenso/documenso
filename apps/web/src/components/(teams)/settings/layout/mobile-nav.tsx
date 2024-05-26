@@ -91,7 +91,7 @@ export const MobileNav = ({ className, ...props }: MobileNavProps) => {
             )}
           >
             <CreditCard className="mr-2 h-5 w-5" />
-            Billing
+            გადახდები
           </Button>
         </Link>
       )}

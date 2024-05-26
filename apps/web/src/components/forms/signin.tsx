@@ -41,10 +41,10 @@ import { PasswordInput } from '@documenso/ui/primitives/password-input';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
 const ERROR_MESSAGES: Partial<Record<keyof typeof ErrorCode, string>> = {
-  [ErrorCode.CREDENTIALS_NOT_FOUND]: 'მითითებული ელ. ფოსტა ან პაროლი არასწორია',
-  [ErrorCode.INCORRECT_EMAIL_PASSWORD]: 'მითითებული ელ. ფოსტა ან პაროლი არასწორია',
+  [ErrorCode.CREDENTIALS_NOT_FOUND]: 'მითითებული ელ.ფოსტა ან პაროლი არასწორია',
+  [ErrorCode.INCORRECT_EMAIL_PASSWORD]: 'მითითებული ელ.ფოსტა ან პაროლი არასწორია',
   [ErrorCode.USER_MISSING_PASSWORD]:
-    'This account appears to be using a social login method, please sign in using that method',
+    'როგორც ჩანს, ეს ანგარიში იყენებს სოციალური შესვლის მეთოდს, გთხოვთ შეხვიდეთ ამ მეთოდის გამოყენებით',
   [ErrorCode.INCORRECT_TWO_FACTOR_CODE]: 'მითითებული ორფაქტორიანი ავთენტიფიკაციის კოდი არასწორია',
   [ErrorCode.INCORRECT_TWO_FACTOR_BACKUP_CODE]: 'მითითებული სარეზერვო კოდი არასწორია',
   [ErrorCode.UNVERIFIED_EMAIL]:
@@ -126,8 +126,9 @@ export const SignInForm = ({ className, initialEmail, isGoogleSSOEnabled }: Sign
   const onSignInWithPasskey = async () => {
     if (!browserSupportsWebAuthn()) {
       toast({
-        title: 'Not supported',
-        description: 'Passkeys are not supported on this browser',
+        title: '',
+        // title: 'Not supported',
+        description: 'საიდუმლო გასაღებები არ არის მხარდაჭერილი ამ ბრაუზერში',
         duration: 10000,
         variant: 'destructive',
       });
@@ -166,7 +167,7 @@ export const SignInForm = ({ className, initialEmail, isGoogleSSOEnabled }: Sign
         .with(
           AppErrorCode.NOT_SETUP,
           () =>
-            'This passkey is not configured for this application. Please login and add one in the user settings.',
+            'ეს საიდუმლო გასაღები არ არის კონფიგურირებული ამ აპლიკაციისთვის. გთხოვთ შეხვიდეთ სისტემაში და დაამატოთ ის მომხმარებლის პარამეტრებში.',
         )
         .with(AppErrorCode.EXPIRED_CODE, () => 'სესიას ვადა ამოეწურა. გთხოვთ თავიდან სცადეთ.')
         .otherwise(
@@ -274,7 +275,7 @@ export const SignInForm = ({ className, initialEmail, isGoogleSSOEnabled }: Sign
             name="email"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>ელ. ფოსტა</FormLabel>
+                <FormLabel>ელ.ფოსტა</FormLabel>
 
                 <FormControl>
                   <Input type="email" {...field} />

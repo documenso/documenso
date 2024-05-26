@@ -134,7 +134,7 @@ export const TeamMembersDataTable = ({
                         !isTeamRoleWithinUserHierarchy(currentUserTeamRole, row.original.role)
                       }
                       onSelect={(e) => e.preventDefault()}
-                      title="Update team member role"
+                      title="გუნდის წევრის როლის განახლება"
                     >
                       <Edit className="mr-2 h-4 w-4" />
                       როლის შეცვლა
@@ -155,7 +155,7 @@ export const TeamMembersDataTable = ({
                         teamOwnerUserId === row.original.userId ||
                         !isTeamRoleWithinUserHierarchy(currentUserTeamRole, row.original.role)
                       }
-                      title="Remove team member"
+                      title="გუნდის წევრის წაშლა"
                     >
                       <Trash2 className="mr-2 h-4 w-4" />
                       წაშლა

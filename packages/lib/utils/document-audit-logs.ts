@@ -340,10 +340,10 @@ export const formatDocumentAuditLogAction = (auditLog: TDocumentAuditLog, userId
       // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
       const action = RECIPIENT_ROLES_DESCRIPTION[data.recipientRole as RecipientRole]?.actioned;
 
-      const value = action ? `${action.toLowerCase()} the document` : 'completed their task';
+      const value = action ? `${action.toLowerCase()} the document` : 'შეასრულა თავისი მოვალეობა';
 
       return {
-        anonymous: `Recipient ${value}`,
+        anonymous: `მიმღებმა ${value}`,
         identified: value,
       };
     })

@@ -107,7 +107,7 @@ export const DisableAuthenticatorAppDialog = () => {
                 render={({ field }) => (
                   <FormItem>
                     <FormControl>
-                      <Input {...field} placeholder="Token" />
+                      <Input {...field} placeholder="ტოკენი" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

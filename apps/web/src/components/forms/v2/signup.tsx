@@ -47,12 +47,12 @@ export const ZSignUpFormV2Schema = z
     name: z.string().trim().min(1, { message: 'გთხოვთ შეიყვანოთ სწორი სახელი.' }),
     email: z.string().email().min(1),
     password: ZPasswordSchema,
-    signature: z.string().min(1, { message: 'დოკუმენტის გასაფორმებლად საჭიროა თქვენი ხელმოწერა' }),
+    signature: z.string().min(1, { message: 'დოკუმენტის გასაფორმებლად საჭიროა თქვენი ხელმოწერა.' }),
     url: z
       .string()
       .trim()
       .toLowerCase()
-      .min(1, { message: 'თქვენი ანგარიშის შესაქმნელად საჭიროა პროფილის სახელი' })
+      .min(1, { message: 'თქვენი ანგარიშის შესაქმნელად საჭიროა პროფილის სახელი.' })
       .regex(/^[a-z0-9-]+$/, {
         message: 'მომხმარებლის სახელი უნდა შეიცავდეს მხოლოდ ასოებსა და ტირეებს.',
       }),
@@ -63,7 +63,7 @@ export const ZSignUpFormV2Schema = z
       return !password.includes(name) && !password.includes(email.split('@')[0]);
     },
     {
-      message: 'პაროლი არ უნდა იყოს საჯარო ან ეფუძნებოდეს პირად ინფორმაციას',
+      message: 'პაროლი უნდა იყოს უნიკალური და არ უნდა ეფუძნებოდეს პირად ინფორმაციას',
     },
   );
 
@@ -119,7 +119,7 @@ export const SignUpFormV2 = ({
       toast({
         title: 'რეგისტრაცია წარმატებულია',
         description:
-          'თქვენ წარმატებით დარეგისტრირდით. გთხოვთ დაადასტუროთ თქვენს ელ. ფოსტაში მიღებულ ბმულზე გადასვლით.',
+          'თქვენ წარმატებით დარეგისტრირდით! გთხოვთ დაადასტუროთ თქვენს ელ.ფოსტაში მიღებულ ბმულზე გადასვლით.',
         duration: 5000,
       });
 

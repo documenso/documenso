@@ -20,15 +20,15 @@ export const PendingUserTeamsDataTableActions = ({
     trpc.team.deleteTeamPending.useMutation({
       onSuccess: () => {
         toast({
-          title: 'Success',
-          description: 'Pending team deleted.',
+          title: '',
+          description: 'მოლოდინში მყოფი გუნდი წაიშალა.',
+          // description: 'Pending team deleted.',
         });
       },
       onError: () => {
         toast({
           title: 'დაფიქსირდა ხარვეზი',
-          description:
-            'We encountered an unknown error while attempting to delete the pending team. Please try again later.',
+          description: 'მოლოდინში მყოფი გუნდის წაშლისას დაფიქსირდა ხარვეზი. გთხოვთ სცადოთ თავიდან.',
           duration: 10000,
           variant: 'destructive',
         });
@@ -46,7 +46,8 @@ export const PendingUserTeamsDataTableActions = ({
         loading={deletingTeam}
         onClick={async () => deleteTeamPending({ pendingTeamId: pendingTeamId })}
       >
-        Remove
+        {/* Remove */}
+        წაშლა
       </Button>
     </fieldset>
   );

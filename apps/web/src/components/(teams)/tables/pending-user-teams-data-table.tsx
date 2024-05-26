@@ -68,7 +68,7 @@ export const PendingUserTeamsDataTable = () => {
       <DataTable
         columns={[
           {
-            header: 'Team',
+            header: 'გუნდი',
             accessorKey: 'name',
             cell: ({ row }) => (
               <AvatarWithText
@@ -82,7 +82,7 @@ export const PendingUserTeamsDataTable = () => {
             ),
           },
           {
-            header: 'Created on',
+            header: 'შექმნილია',
             accessorKey: 'createdAt',
             cell: ({ row }) => <LocaleDate date={row.original.createdAt} />,
           },

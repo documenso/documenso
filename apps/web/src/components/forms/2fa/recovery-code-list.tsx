@@ -21,13 +21,12 @@ export const RecoveryCodeList = ({ recoveryCodes }: RecoveryCodeListProps) => {
 
       toast({
         title: 'აღდგენის კოდი დაკოპირებული',
-        description: 'თქვენი აღდგენის კოდი წარმატებით დაკოპირდა.',
+        description: 'თქვენი აღდგენის კოდი წარმატებით დაკოპირდა!',
       });
     } catch (_err) {
       toast({
         title: 'აღდგენის კოდის დაკოპირება ვერ მოხერხდა',
-        description:
-          'თქვენი აღდგენის კოდის დაკოპირება ვერ მოხერხდა. გთხოვთ თავიდან სცადოთ ან დაგვიკავშირდეთ.',
+        description: 'თქვენი აღდგენის კოდის დაკოპირება ვერ მოხერხდა. გთხოვთ თავიდან სცადოთ.',
         variant: 'destructive',
       });
     }

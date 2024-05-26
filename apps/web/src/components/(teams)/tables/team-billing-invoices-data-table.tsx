@@ -46,7 +46,7 @@ export const TeamBillingInvoicesDataTable = ({ teamId }: TeamBillingInvoicesData
     <DataTable
       columns={[
         {
-          header: 'Invoice',
+          header: 'ინვოისი',
           accessorKey: 'created',
           cell: ({ row }) => (
             <div className="flex max-w-xs items-center gap-2">
@@ -64,20 +64,20 @@ export const TeamBillingInvoicesDataTable = ({ teamId }: TeamBillingInvoicesData
           ),
         },
         {
-          header: 'Status',
+          header: 'სტატუსი',
           accessorKey: 'status',
           cell: ({ row }) => {
             const { status, paid } = row.original;
 
             if (!status) {
-              return paid ? 'Paid' : 'Unpaid';
+              return paid ? 'გადახდილი' : 'გადაუხდელი';
             }
 
             return status.charAt(0).toUpperCase() + status.slice(1);
           },
         },
         {
-          header: 'Amount',
+          header: 'რაოდენობა',
           accessorKey: 'total',
           cell: ({ row }) => formatCurrency(row.original.currency, row.original.total / 100),
         },

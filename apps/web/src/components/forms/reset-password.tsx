@@ -67,7 +67,7 @@ export const ResetPasswordForm = ({ className, token }: ResetPasswordFormProps) 
 
       toast({
         title: 'პაროლი განახლებულია',
-        description: 'თქვენი პაროლი წარმატებით განახლდა.',
+        description: 'თქვენი პაროლი წარმატებით განახლდა!',
         duration: 5000,
       });
 

@@ -62,7 +62,8 @@ export const DocumentReadOnlyFields = ({ documentMeta, fields }: DocumentReadOnl
                         ? `${field.Recipient.name} (${field.Recipient.email})`
                         : field.Recipient.email}{' '}
                     </span>
-                    inserted a {FRIENDLY_FIELD_TYPE[field.type].toLowerCase()}
+                    ჩასვა {FRIENDLY_FIELD_TYPE[field.type].toLowerCase()}
+                    {/* inserted a {FRIENDLY_FIELD_TYPE[field.type].toLowerCase()} */}
                   </p>
 
                   <Button

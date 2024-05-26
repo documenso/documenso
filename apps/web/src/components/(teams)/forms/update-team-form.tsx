@@ -62,8 +62,8 @@ export const UpdateTeamForm = ({ teamId, teamName, teamUrl }: UpdateTeamDialogPr
       });
 
       toast({
-        title: 'Success',
-        description: 'Your team has been successfully updated.',
+        title: 'გუნდი განახლებულია',
+        description: 'თქვენი გუნდი წარმატებით განახლდა!',
         duration: 5000,
       });
 
@@ -81,7 +81,7 @@ export const UpdateTeamForm = ({ teamId, teamName, teamUrl }: UpdateTeamDialogPr
       if (error.code === AppErrorCode.ALREADY_EXISTS) {
         form.setError('url', {
           type: 'manual',
-          message: 'This URL is already in use.',
+          message: 'ეს URL უკვე გამოყენებულია.',
         });
 
         return;
@@ -90,8 +90,7 @@ export const UpdateTeamForm = ({ teamId, teamName, teamUrl }: UpdateTeamDialogPr
       toast({
         title: 'დაფიქსირდა ხარვეზი',
         variant: 'destructive',
-        description:
-          'We encountered an unknown error while attempting to update your team. Please try again later.',
+        description: 'გუნდის განახლებისას დაფიქსირდა ხარვეზი. გთხოვთ თავიდან სცადოთ.',
       });
     }
   };
@@ -127,7 +126,7 @@ export const UpdateTeamForm = ({ teamId, teamName, teamUrl }: UpdateTeamDialogPr
                   <span className="text-foreground/50 text-xs font-normal">
                     {field.value
                       ? `${WEBAPP_BASE_URL}/t/${field.value}`
-                      : 'A unique URL to identify your team'}
+                      : 'უნიკალური URL თქვენი გუნდის იდენტიფიცირებისთვის'}
                   </span>
                 )}
 
@@ -151,7 +150,8 @@ export const UpdateTeamForm = ({ teamId, teamName, teamUrl }: UpdateTeamDialogPr
                   }}
                 >
                   <Button type="button" variant="secondary" onClick={() => form.reset()}>
-                    Reset
+                    {/* Reset */}
+                    დაბრუნება
                   </Button>
                 </motion.div>
               )}
@@ -163,7 +163,7 @@ export const UpdateTeamForm = ({ teamId, teamName, teamUrl }: UpdateTeamDialogPr
               disabled={!form.formState.isDirty}
               loading={form.formState.isSubmitting}
             >
-              Update team
+              განახლება
             </Button>
           </div>
         </fieldset>
