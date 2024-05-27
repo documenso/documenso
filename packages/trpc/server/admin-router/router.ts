@@ -1,6 +1,7 @@
 import { TRPCError } from '@trpc/server';
 
 import { findDocuments } from '@documenso/lib/server-only/admin/get-all-documents';
+import { getEntireDocument } from '@documenso/lib/server-only/admin/get-entire-document';
 import { updateRecipient } from '@documenso/lib/server-only/admin/update-recipient';
 import { updateUser } from '@documenso/lib/server-only/admin/update-user';
 import { sealDocument } from '@documenso/lib/server-only/document/seal-document';
@@ -10,6 +11,7 @@ import { upsertSiteSetting } from '@documenso/lib/server-only/site-settings/upse
 import { deleteUser } from '@documenso/lib/server-only/user/delete-user';
 import { getUserById } from '@documenso/lib/server-only/user/get-user-by-id';
 import { extractNextApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
+import { DocumentStatus } from '@documenso/prisma/client';
 
 import { adminProcedure, router } from '../trpc';
 import {
@@ -100,7 +102,11 @@ export const adminRouter = router({
       const { id } = input;
 
       try {
-        return await sealDocument({ documentId: id, isResealing: true });
+        const document = await getEntireDocument({ id });
+
+        const isResealing = document.status === DocumentStatus.COMPLETED;
+
+        return await sealDocument({ documentId: id, isResealing });
       } catch (err) {
         console.error('resealDocument error', err);
 
