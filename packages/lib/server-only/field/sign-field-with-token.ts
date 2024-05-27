@@ -86,6 +86,26 @@ export const signFieldWithToken = async ({
     if (isNaN(Number(value))) {
       throw new Error(`Value ${value} is not a number`);
     }
+
+    if (parsedFieldMeta.required && !value) {
+      throw new Error(`Value is required for field ${field.id}`);
+    }
+
+    if (parsedFieldMeta.minValue && Number(value) < parsedFieldMeta.minValue) {
+      throw new Error(
+        `Value ${value} is less than the minimum value of ${parsedFieldMeta.minValue}`,
+      );
+    }
+
+    if (parsedFieldMeta.maxValue && Number(value) > parsedFieldMeta.maxValue) {
+      throw new Error(
+        `Value ${value} is greater than the maximum value of ${parsedFieldMeta.maxValue}`,
+      );
+    }
+
+    if (parsedFieldMeta.numberFormat) {
+      // Validate number format
+    }
   }
 
   if (field.type === FieldType.TEXT) {

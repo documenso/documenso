@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useTransition } from 'react';
+import { useEffect, useState, useTransition } from 'react';
 
 import { useRouter } from 'next/navigation';
 
@@ -35,6 +35,16 @@ export const NumberField = ({ field, recipient }: NumberFieldProps) => {
   const [showRadioModal, setShowRadioModal] = useState(false);
   const [localText, setLocalCustomText] = useState('');
 
+  const initialErrors: Record<string, string[]> = {
+    isNumber: [],
+    required: [],
+    minValue: [],
+    maxValue: [],
+    numberFormat: [],
+  };
+
+  const [errors, setErrors] = useState(initialErrors);
+
   const { executeActionAuthProcedure } = useRequiredDocumentAuthContext();
 
   const parsedFieldMeta = ZNumberFieldMeta.parse(field.fieldMeta);
@@ -49,6 +59,46 @@ export const NumberField = ({ field, recipient }: NumberFieldProps) => {
 
   const isLoading = isSignFieldWithTokenLoading || isRemoveSignedFieldWithTokenLoading || isPending;
 
+  const validateNumber = (text: string) => {
+    const errors: Record<string, string[]> = {
+      isNumber: [],
+      required: [],
+      minValue: [],
+      maxValue: [],
+      numberFormat: [],
+    };
+
+    if (parsedFieldMeta.required && !text) {
+      errors.required.push('This field is required.');
+    }
+
+    if (isNaN(Number(text))) {
+      errors.isNumber.push('This field must be a number.');
+    }
+
+    if (parsedFieldMeta.minValue && Number(text) < parsedFieldMeta.minValue) {
+      errors.minValue.push(`Value must be greater than or equal to ${parsedFieldMeta.minValue}.`);
+    }
+
+    if (parsedFieldMeta.maxValue && Number(text) > parsedFieldMeta.maxValue) {
+      errors.maxValue.push(`Value must be less than or equal to ${parsedFieldMeta.maxValue}.`);
+    }
+
+    if (parsedFieldMeta.numberFormat) {
+      // TODO: Implement number format validation.
+    }
+
+    return errors;
+  };
+
+  const handleNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const text = e.target.value;
+    setLocalCustomText(text);
+
+    const validationErrors = validateNumber(text);
+    setErrors(validationErrors);
+  };
+
   const onDialogSignClick = () => {
     setShowRadioModal(false);
 
@@ -60,7 +110,7 @@ export const NumberField = ({ field, recipient }: NumberFieldProps) => {
 
   const onSign = async (authOptions?: TRecipientActionAuth) => {
     try {
-      if (!localText) {
+      if (!localText || Object.values(errors).some((error) => error.length > 0)) {
         return;
       }
 
@@ -120,6 +170,13 @@ export const NumberField = ({ field, recipient }: NumberFieldProps) => {
     }
   };
 
+  useEffect(() => {
+    if (!showRadioModal) {
+      setLocalCustomText('');
+      setErrors(initialErrors);
+    }
+  }, [showRadioModal]);
+
   return (
     <SigningFieldContainer
       field={field}
@@ -164,10 +221,47 @@ export const NumberField = ({ field, recipient }: NumberFieldProps) => {
             <Input
               type="text"
               placeholder={parsedFieldMeta.placeholder}
-              className="mt-2"
-              onChange={(e) => setLocalCustomText(e.target.value)}
+              className={cn(
+                'mt-2 w-full rounded-md',
+                {
+                  'border-2 border-red-400 ring-2 ring-red-200 ring-offset-2 ring-offset-red-200 focus-visible:ring-4 focus-visible:ring-red-200 focus-visible:ring-offset-2 focus-visible:ring-offset-red-200':
+                    Object.values(errors).some((error) => error.length > 0),
+                },
+                {
+                  'border-border border': Object.values(errors).every(
+                    (error) => error.length === 0,
+                  ),
+                },
+              )}
+              value={localText}
+              onChange={handleNumberChange}
             />
           </div>
+
+          {Object.values(errors).some((error) => error.length > 0) && (
+            <div>
+              {errors.isNumber?.map((error, index) => (
+                <p key={index} className="mt-2 text-sm text-red-500">
+                  {error}
+                </p>
+              ))}
+              {errors.required?.map((error, index) => (
+                <p key={index} className="mt-2 text-sm text-red-500">
+                  {error}
+                </p>
+              ))}
+              {errors.minValue?.map((error, index) => (
+                <p key={index} className="mt-2 text-sm text-red-500">
+                  {error}
+                </p>
+              ))}
+              {errors.maxValue?.map((error, index) => (
+                <p key={index} className="mt-2 text-sm text-red-500">
+                  {error}
+                </p>
+              ))}
+            </div>
+          )}
 
           <DialogFooter>
             <div className="flex w-full flex-1 flex-nowrap gap-4">
@@ -186,7 +280,7 @@ export const NumberField = ({ field, recipient }: NumberFieldProps) => {
               <Button
                 type="button"
                 className="flex-1"
-                disabled={!localText}
+                disabled={!localText || Object.values(errors).some((error) => error.length > 0)}
                 onClick={() => onDialogSignClick()}
               >
                 Save

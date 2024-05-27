@@ -60,6 +60,7 @@ export const TextField = ({ field, recipient }: TextFieldProps) => {
   useEffect(() => {
     if (!showCustomTextModal) {
       setLocalCustomText('');
+      setErrors(initialErrors);
     }
   }, [showCustomTextModal]);
 
@@ -127,7 +128,7 @@ export const TextField = ({ field, recipient }: TextFieldProps) => {
 
   const onSign = async (authOptions?: TRecipientActionAuth) => {
     try {
-      if (!localText) {
+      if (!localText || Object.values(errors).some((error) => error.length > 0)) {
         return;
       }
 
@@ -180,6 +181,16 @@ export const TextField = ({ field, recipient }: TextFieldProps) => {
 
   const parsedField = ZTextFieldMeta.parse(field.fieldMeta);
 
+  const labelDisplay =
+    parsedField?.label && parsedField.label.length < 10
+      ? parsedField.label
+      : parsedField.label?.substring(0, 10) + '...';
+
+  const textDisplay =
+    parsedField?.text && parsedField.text.length < 10
+      ? parsedField?.text
+      : parsedField?.text?.substring(0, 10) + '...';
+
   return (
     <SigningFieldContainer
       field={field}
@@ -206,9 +217,7 @@ export const TextField = ({ field, recipient }: TextFieldProps) => {
         >
           <span className="flex items-center justify-center gap-x-1">
             <Type />
-            {(parsedField?.label?.substring(0, 10) + '...' ||
-              parsedField?.text?.substring(0, 10) + '...') ??
-              'Add text'}
+            {(labelDisplay || textDisplay) ?? 'Add text'}
           </span>
         </p>
       )}
@@ -232,7 +241,7 @@ export const TextField = ({ field, recipient }: TextFieldProps) => {
               className={cn(
                 'mt-2 w-full rounded-md',
                 {
-                  'border-2 border-red-400 ring-2 ring-red-200 ring-offset-2 ring-offset-red-200 focus-visible:border-0 focus-visible:ring-4 focus-visible:ring-red-300 focus-visible:ring-offset-2 focus-visible:ring-offset-red-400':
+                  'border-2 border-red-400 ring-2 ring-red-200 ring-offset-2 ring-offset-red-200 focus-visible:ring-4 focus-visible:ring-red-200 focus-visible:ring-offset-2 focus-visible:ring-offset-red-200':
                     errors.required.length > 0 || errors.characterLimit.length > 0,
                 },
                 {
