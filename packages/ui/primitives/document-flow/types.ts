@@ -1,5 +1,6 @@
 import { z } from 'zod';
 
+import { ZFieldMetaSchema } from '@documenso/lib/types/field-field-meta';
 import { FieldType } from '@documenso/prisma/client';
 
 export const ZDocumentFlowFormSchema = z.object({
@@ -30,6 +31,7 @@ export const ZDocumentFlowFormSchema = z.object({
       pageY: z.number().min(0),
       pageWidth: z.number().min(0),
       pageHeight: z.number().min(0),
+      fieldMeta: ZFieldMetaSchema,
     }),
   ),
 

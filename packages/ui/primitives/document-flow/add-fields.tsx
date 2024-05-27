@@ -210,7 +210,7 @@ export const AddFieldsFormPartial = ({
         pageHeight: Number(field.height),
         signerEmail:
           recipients.find((recipient) => recipient.id === field.recipientId)?.email ?? '',
-        fieldMeta: ZFieldMetaSchema.parse(field.fieldMeta),
+        fieldMeta: field.fieldMeta ? ZFieldMetaSchema.parse(field.fieldMeta) : undefined,
       })),
     },
   });

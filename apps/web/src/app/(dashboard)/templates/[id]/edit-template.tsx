@@ -180,6 +180,14 @@ export const EditTemplateForm = ({
         fields: data.fields,
       });
 
+      // Clear all field data from localStorage
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key && key.startsWith('field_')) {
+          localStorage.removeItem(key);
+        }
+      }
+
       toast({
         title: 'Template saved',
         description: 'Your templates has been saved successfully.',

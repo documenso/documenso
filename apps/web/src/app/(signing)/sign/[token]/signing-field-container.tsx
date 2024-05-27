@@ -107,7 +107,7 @@ export const SigningFieldContainer = ({
       {!field.inserted && !loading && (
         <button
           type="submit"
-          className="absolute inset-0 z-10 h-full w-full rounded-md border border-yellow-300 ring ring-yellow-100 ring-offset-2 ring-offset-yellow-200"
+          className="absolute inset-0 z-10 h-full w-full rounded-md border"
           onClick={async () => handleInsertField()}
         />
       )}

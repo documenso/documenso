@@ -143,7 +143,9 @@ export const NameField = ({ field, recipient }: NameFieldProps) => {
       )}
 
       {!field.inserted && (
-        <p className="group-hover:text-primary text-muted-foreground text-lg duration-200">Name</p>
+        <p className="group-hover:text-primary text-muted-foreground duration-200 group-hover:text-yellow-300">
+          Name
+        </p>
       )}
 
       {field.inserted && <p className="text-muted-foreground duration-200">{field.customText}</p>}

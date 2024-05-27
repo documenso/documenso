@@ -13,6 +13,7 @@ import { ZTextFieldMeta } from '@documenso/lib/types/field-field-meta';
 import type { Recipient } from '@documenso/prisma/client';
 import type { FieldWithSignatureAndFieldMeta } from '@documenso/prisma/types/field-with-signature-and-fieldmeta';
 import { trpc } from '@documenso/trpc/react';
+import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
 import { Dialog, DialogContent, DialogFooter, DialogTitle } from '@documenso/ui/primitives/dialog';
 import { Textarea } from '@documenso/ui/primitives/textarea';
@@ -129,6 +130,8 @@ export const TextField = ({ field, recipient }: TextFieldProps) => {
     }
   };
 
+  const parsedField = ZTextFieldMeta.parse(field.fieldMeta);
+
   return (
     <SigningFieldContainer
       field={field}
@@ -144,9 +147,20 @@ export const TextField = ({ field, recipient }: TextFieldProps) => {
       )}
 
       {!field.inserted && (
-        <p className="group-hover:text-primary text-muted-foreground flex flex-col items-center justify-center duration-200">
-          <span className="flex items-center justify-center gap-x-1 text-lg">
-            <Type /> Add Text
+        <p
+          className={cn(
+            'group-hover:text-primary text-muted-foreground flex flex-col items-center justify-center duration-200',
+            {
+              'group-hover:text-yellow-300': !field.inserted && !parsedFieldMeta.required,
+              'group-hover:text-red-300': !field.inserted && parsedFieldMeta.required,
+            },
+          )}
+        >
+          <span className="flex items-center justify-center gap-x-1">
+            <Type />
+            {(parsedField?.label?.substring(0, 10) + '...' ||
+              parsedField?.text?.substring(0, 10) + '...') ??
+              'Add text'}
           </span>
         </p>
       )}

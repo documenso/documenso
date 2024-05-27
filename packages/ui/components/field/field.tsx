@@ -5,6 +5,7 @@ import React, { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 
 import { useFieldPageCoords } from '@documenso/lib/client-only/hooks/use-field-page-coords';
+import { ZFieldMetaSchema } from '@documenso/lib/types/field-field-meta';
 import type { Field } from '@documenso/prisma/client';
 
 import { cn } from '../../lib/utils';
@@ -70,6 +71,12 @@ export function FieldRootContainer({ field, children, cardClassName }: FieldCont
     };
   }, []);
 
+  let parsedField;
+
+  if (field.fieldMeta) {
+    parsedField = ZFieldMetaSchema.parse(field.fieldMeta);
+  }
+
   return (
     <FieldContainerPortal field={field}>
       <Card
@@ -77,11 +84,19 @@ export function FieldRootContainer({ field, children, cardClassName }: FieldCont
         className={cn(
           'field-card-container relative z-20 h-full w-full transition-all',
           {
-            'bg-documenso/20 border-documenso ring-documenso-200 ring-offset-documenso-400 ring ring-offset-2':
+            'bg-documenso/20 border-documenso ring-documenso-200 ring-offset-documenso-200 ring-2 ring-offset-2':
               field.inserted,
           },
           {
+            'border-yellow-300 ring-2 ring-yellow-100 ring-offset-2 ring-offset-yellow-100':
+              !field.inserted,
+          },
+          {
             'border-orange-300 ring-1 ring-orange-300': !field.inserted && isValidating,
+          },
+          {
+            'border-red-500 ring-2 ring-red-200 ring-offset-2 ring-offset-red-200 hover:text-red-500':
+              !field.inserted && parsedField?.required,
           },
           cardClassName,
         )}
