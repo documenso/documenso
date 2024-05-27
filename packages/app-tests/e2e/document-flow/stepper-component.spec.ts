@@ -503,12 +503,11 @@ test('[DOCUMENT_FLOW]: should be able to sign a document with custom date', asyn
   });
 
   const { token, Field } = recipients[0];
-  const recipientField = Field[0];
+  const [recipientField] = Field;
 
   await page.goto(`/sign/${token}`);
   await page.waitForURL(`/sign/${token}`);
 
-  await page.getByTestId('field').click();
   await page.locator(`#field-${recipientField.id}`).getByRole('button').click();
 
   await page.getByRole('button', { name: 'Complete' }).click();

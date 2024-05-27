@@ -32,7 +32,6 @@ export function FieldContainerPortal({
   return createPortal(
     <div
       className={cn('absolute', className)}
-      data-testid="field"
       style={{
         top: `${coords.y}px`,
         left: `${coords.x}px`,
