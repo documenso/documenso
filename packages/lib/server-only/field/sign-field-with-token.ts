@@ -11,6 +11,7 @@ import { DEFAULT_DOCUMENT_TIME_ZONE } from '../../constants/time-zones';
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '../../types/document-audit-logs';
 import type { TRecipientActionAuth } from '../../types/document-auth';
+import { ZNumberFieldMeta, ZTextFieldMeta } from '../../types/field-field-meta';
 import type { RequestMetadata } from '../../universal/extract-request-metadata';
 import { createDocumentAuditLogData } from '../../utils/document-audit-logs';
 import { extractDocumentAuthMethods } from '../../utils/document-auth';
@@ -80,19 +81,23 @@ export const signFieldWithToken = async ({
   }
 
   if (field.type === FieldType.NUMBER) {
+    const parsedFieldMeta = ZNumberFieldMeta.parse(field.fieldMeta);
+
     if (isNaN(Number(value))) {
       throw new Error(`Value ${value} is not a number`);
     }
+  }
 
-    if (
-      typeof field.fieldMeta === 'object' &&
-      !Array.isArray(field.fieldMeta) &&
-      field.fieldMeta?.characterLimit &&
-      typeof field.fieldMeta?.characterLimit === 'number' &&
-      value.length > field.fieldMeta.characterLimit
-    ) {
+  if (field.type === FieldType.TEXT) {
+    const parsedFieldMeta = ZTextFieldMeta.parse(field.fieldMeta);
+
+    if (parsedFieldMeta.required && !value) {
+      throw new Error(`Value is required for field ${field.id}`);
+    }
+
+    if (parsedFieldMeta.characterLimit && value.length > parsedFieldMeta.characterLimit) {
       throw new Error(
-        `Value ${value} exceeds the character limit of ${field.fieldMeta.characterLimit}`,
+        `Value ${value} exceeds the character limit of ${parsedFieldMeta.characterLimit}`,
       );
     }
   }

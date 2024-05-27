@@ -20,7 +20,7 @@ const fieldIcons = {
   [FieldType.NUMBER]: { icon: Hash, label: 'Number' },
   [FieldType.RADIO]: { icon: Disc, label: 'Radio' },
   [FieldType.CHECKBOX]: { icon: CheckSquare, label: 'Checkbox' },
-  [FieldType.DROPDOWN]: { icon: ChevronDown, label: 'Dropdown' },
+  [FieldType.DROPDOWN]: { icon: ChevronDown, label: 'Select' },
 };
 
 export const FieldIcon = ({

@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useTransition } from 'react';
+import { useCallback, useEffect, useState, useTransition } from 'react';
 
 import { useRouter } from 'next/navigation';
 
@@ -31,6 +31,13 @@ export const TextField = ({ field, recipient }: TextFieldProps) => {
   const router = useRouter();
   const { toast } = useToast();
 
+  const initialErrors: Record<string, string[]> = {
+    required: [],
+    characterLimit: [],
+  };
+
+  const [errors, setErrors] = useState(initialErrors);
+
   const { executeActionAuthProcedure } = useRequiredDocumentAuthContext();
 
   const [isPending, startTransition] = useTransition();
@@ -56,10 +63,44 @@ export const TextField = ({ field, recipient }: TextFieldProps) => {
     }
   }, [showCustomTextModal]);
 
+  const validateText = (text: string) => {
+    const errors: Record<string, string[]> = {
+      required: [],
+      characterLimit: [],
+    };
+
+    if (parsedFieldMeta.required && !text) {
+      errors.required.push('This field is required.');
+    }
+
+    if (parsedFieldMeta.characterLimit && text.length > parsedFieldMeta.characterLimit) {
+      errors.characterLimit.push(
+        `Text exceeds the character limit of ${parsedFieldMeta.characterLimit}.`,
+      );
+    }
+
+    return errors;
+  };
+
+  const handleTextChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const text = e.target.value;
+    setLocalCustomText(text);
+
+    const validationErrors = validateText(text);
+    setErrors(validationErrors);
+  }, []);
+
   /**
    * When the user clicks the sign button in the dialog where they enter the text field.
    */
   const onDialogSignClick = () => {
+    const validationErrors = validateText(localText);
+
+    if (validationErrors.required.length > 0 || validationErrors.characterLimit.length > 0) {
+      setErrors(validationErrors);
+      return;
+    }
+
     setShowCustomTextModal(false);
 
     void executeActionAuthProcedure({
@@ -71,6 +112,13 @@ export const TextField = ({ field, recipient }: TextFieldProps) => {
   const onPreSign = () => {
     if (!localText) {
       setShowCustomTextModal(true);
+      return false;
+    }
+
+    const validationErrors = validateText(localText);
+
+    if (validationErrors.required.length > 0 || validationErrors.characterLimit.length > 0) {
+      setErrors(validationErrors);
       return false;
     }
 
@@ -167,7 +215,9 @@ export const TextField = ({ field, recipient }: TextFieldProps) => {
 
       {field.inserted && (
         <p className="text-muted-foreground flex items-center justify-center gap-x-1 text-xs duration-200">
-          {field.customText.substring(0, 20) + '...'}
+          {field.customText.length < 10
+            ? field.customText
+            : field.customText.substring(0, 20) + '...'}
         </p>
       )}
 
@@ -175,15 +225,40 @@ export const TextField = ({ field, recipient }: TextFieldProps) => {
         <DialogContent>
           <DialogTitle>{parsedFieldMeta.label ?? 'Add Text'}</DialogTitle>
 
-          <div className="">
+          <div>
             <Textarea
               id="custom-text"
-              maxLength={parsedFieldMeta.characterLimit}
               placeholder={parsedFieldMeta.placeholder ?? 'Enter your text here'}
-              className="border-border mt-2 w-full rounded-md border"
-              onChange={(e) => setLocalCustomText(e.target.value)}
+              className={cn(
+                'mt-2 w-full rounded-md',
+                {
+                  'border-2 border-red-400 ring-2 ring-red-200 ring-offset-2 ring-offset-red-200 focus-visible:border-0 focus-visible:ring-4 focus-visible:ring-red-300 focus-visible:ring-offset-2 focus-visible:ring-offset-red-400':
+                    errors.required.length > 0 || errors.characterLimit.length > 0,
+                },
+                {
+                  'border-border border':
+                    errors.required.length === 0 && errors.characterLimit.length === 0,
+                },
+              )}
+              value={localText}
+              onChange={handleTextChange}
             />
           </div>
+
+          {(errors.required.length > 0 || errors.characterLimit.length > 0) && (
+            <div>
+              {errors.required.map((error, index) => (
+                <p key={index} className="text-red-500">
+                  {error}
+                </p>
+              ))}
+              {errors.characterLimit.map((error, index) => (
+                <p key={index} className="text-red-500">
+                  {error}
+                </p>
+              ))}
+            </div>
+          )}
 
           <DialogFooter>
             <div className="mt-4 flex w-full flex-1 flex-nowrap gap-4">
@@ -202,7 +277,9 @@ export const TextField = ({ field, recipient }: TextFieldProps) => {
               <Button
                 type="button"
                 className="flex-1"
-                disabled={!localText}
+                disabled={
+                  !localText || errors.required.length > 0 || errors.characterLimit.length > 0
+                }
                 onClick={() => onDialogSignClick()}
               >
                 Save
