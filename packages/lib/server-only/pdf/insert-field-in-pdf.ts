@@ -1,6 +1,6 @@
 // https://github.com/Hopding/pdf-lib/issues/20#issuecomment-412852821
 import fontkit from '@pdf-lib/fontkit';
-import { PDFDocument, StandardFonts } from 'pdf-lib';
+import { PDFDocument } from 'pdf-lib';
 import type { PDFFont, PDFPage } from 'pdf-lib';
 
 import {
@@ -47,6 +47,10 @@ export const insertFieldInPDF = async (pdf: PDFDocument, field: FieldWithSignatu
     res.arrayBuffer(),
   );
 
+  const fontNoto = await fetch(process.env.FONT_NOTO_SANS_URI).then(async (res) =>
+    res.arrayBuffer(),
+  );
+
   const isSignatureField = isSignatureFieldType(field.type);
 
   pdf.registerFontkit(fontkit);
@@ -71,7 +75,7 @@ export const insertFieldInPDF = async (pdf: PDFDocument, field: FieldWithSignatu
   const fieldX = pageWidth * (Number(field.positionX) / 100);
   const fieldY = pageHeight * (Number(field.positionY) / 100);
 
-  const font = await pdf.embedFont(isSignatureField ? fontCaveat : StandardFonts.Helvetica);
+  const font = await pdf.embedFont(isSignatureField ? fontCaveat : fontNoto);
 
   if (field.type === FieldType.SIGNATURE || field.type === FieldType.FREE_SIGNATURE) {
     await pdf.embedFont(fontCaveat);

@@ -83,6 +83,7 @@ export type AddFieldsFormProps = {
   recipients: Recipient[];
   fields: Field[];
   onSubmit: (_data: TAddFieldsFormSchema) => void;
+  canGoBack?: boolean;
   isDocumentPdfLoaded: boolean;
 };
 
@@ -175,6 +176,7 @@ export const AddFieldsFormPartial = ({
   recipients,
   fields,
   onSubmit,
+  canGoBack = false,
   isDocumentPdfLoaded,
 }: AddFieldsFormProps) => {
   const { isWithinPageBounds, getFieldPosition, getPage } = useDocumentElement();
