@@ -68,12 +68,15 @@ export const NumberField = ({ field, recipient }: NumberFieldProps) => {
       numberFormat: [],
     };
 
+    const numericRegex = /^[\d,.]+$/;
+    const isNumeric = numericRegex.test(text);
+
     if (parsedFieldMeta.required && !text) {
       errors.required.push('This field is required.');
     }
 
-    if (isNaN(Number(text))) {
-      errors.isNumber.push('This field must be a number.');
+    if (!isNumeric && text.length > 0) {
+      errors.isNumber.push(`Value ${text} is not a number`);
     }
 
     if (parsedFieldMeta.minValue && Number(text) < parsedFieldMeta.minValue) {
@@ -85,7 +88,18 @@ export const NumberField = ({ field, recipient }: NumberFieldProps) => {
     }
 
     if (parsedFieldMeta.numberFormat) {
-      // TODO: Implement number format validation.
+      const formatRegex =
+        parsedFieldMeta.numberFormat === '123.456,78'
+          ? new RegExp(/^(\d+(?:\.\d+)?(?:,\d+)?)$/)
+          : parsedFieldMeta.numberFormat === '123,456.78'
+          ? new RegExp(/^(\d+(?:,\d+)?(?:\.\d+)?)$/)
+          : new RegExp(/.*/);
+
+      if (!formatRegex.test(text)) {
+        errors.numberFormat.push(
+          `Value ${text} does not match the number format - ${parsedFieldMeta.numberFormat}`,
+        );
+      }
     }
 
     return errors;
@@ -256,6 +270,11 @@ export const NumberField = ({ field, recipient }: NumberFieldProps) => {
                 </p>
               ))}
               {errors.maxValue?.map((error, index) => (
+                <p key={index} className="mt-2 text-sm text-red-500">
+                  {error}
+                </p>
+              ))}
+              {errors.numberFormat?.map((error, index) => (
                 <p key={index} className="mt-2 text-sm text-red-500">
                   {error}
                 </p>

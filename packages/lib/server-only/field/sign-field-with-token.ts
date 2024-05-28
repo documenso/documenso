@@ -82,8 +82,10 @@ export const signFieldWithToken = async ({
 
   if (field.type === FieldType.NUMBER) {
     const parsedFieldMeta = ZNumberFieldMeta.parse(field.fieldMeta);
+    const numericRegex = /^[\d,.]+$/;
+    const isNumeric = numericRegex.test(value);
 
-    if (isNaN(Number(value))) {
+    if (!isNumeric) {
       throw new Error(`Value ${value} is not a number`);
     }
 
@@ -104,7 +106,18 @@ export const signFieldWithToken = async ({
     }
 
     if (parsedFieldMeta.numberFormat) {
-      // Validate number format
+      const formatRegex =
+        parsedFieldMeta.numberFormat === '123.456,78'
+          ? new RegExp(/^(\d+(?:\.\d+)?(?:,\d+)?)$/)
+          : parsedFieldMeta.numberFormat === '123,456.78'
+          ? new RegExp(/^(\d+(?:,\d+)?(?:\.\d+)?)$/)
+          : new RegExp(/.*/);
+
+      if (!formatRegex.test(value)) {
+        throw new Error(
+          `Value ${value} does not match the number format - ${parsedFieldMeta.numberFormat}`,
+        );
+      }
     }
   }
 
