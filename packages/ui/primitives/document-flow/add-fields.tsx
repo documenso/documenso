@@ -179,6 +179,8 @@ export const AddFieldsFormPartial = ({
 }: AddFieldsFormProps) => {
   const { isWithinPageBounds, getFieldPosition, getPage } = useDocumentElement();
   const { currentStep, totalSteps, previousStep } = useStep();
+  const canRenderBackButtonAsRemove =
+    currentStep === 1 && typeof documentFlow.onBackStep === 'function' && canGoBack;
   const [showAdvancedSettings, setShowAdvancedSettings] = useState(false);
   const [currentField, setCurrentField] = useState<FieldFormType>();
   const settingsRef = useRef<HTMLDivElement>(null);
@@ -936,7 +938,9 @@ export const AddFieldsFormPartial = ({
               onGoBackClick={() => {
                 previousStep();
                 remove();
+                documentFlow.onBackStep?.();
               }}
+              goBackLabel={canRenderBackButtonAsRemove ? 'Remove' : undefined}
               onGoNextClick={() => void onFormSubmit()}
             />
           </DocumentFlowFormContainerFooter>
