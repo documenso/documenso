@@ -37,6 +37,8 @@ export const profileRouter = router({
           ...input,
         });
       } catch (err) {
+        console.error(err);
+
         throw new TRPCError({
           code: 'BAD_REQUEST',
           message: 'We were unable to find user security audit logs. Please try again.',
@@ -50,6 +52,8 @@ export const profileRouter = router({
 
       return await getUserById({ id });
     } catch (err) {
+      console.error(err);
+
       throw new TRPCError({
         code: 'BAD_REQUEST',
         message: 'We were unable to retrieve the specified account. Please try again.',
@@ -86,7 +90,7 @@ export const profileRouter = router({
       try {
         const { url } = input;
 
-        if (IS_BILLING_ENABLED() && url.length <= 6) {
+        if (IS_BILLING_ENABLED() && url.length < 6) {
           const subscriptions = await getSubscriptionsByUserId({
             userId: ctx.user.id,
           }).then((subscriptions) =>
@@ -108,6 +112,8 @@ export const profileRouter = router({
 
         return { success: true, url: user.url };
       } catch (err) {
+        console.error(err);
+
         const error = AppError.parseError(err);
 
         if (error.code !== AppErrorCode.UNKNOWN_ERROR) {
@@ -135,6 +141,8 @@ export const profileRouter = router({
           requestMetadata: extractNextApiRequestMetadata(ctx.req),
         });
       } catch (err) {
+        console.error(err);
+
         let message =
           'We were unable to update your profile. Please review the information you provided and try again.';
 
@@ -171,6 +179,8 @@ export const profileRouter = router({
         requestMetadata: extractNextApiRequestMetadata(ctx.req),
       });
     } catch (err) {
+      console.error(err);
+
       let message = 'We were unable to reset your password. Please try again.';
 
       if (err instanceof Error) {
@@ -192,6 +202,8 @@ export const profileRouter = router({
 
         return await sendConfirmationToken({ email });
       } catch (err) {
+        console.error(err);
+
         let message = 'We were unable to send a confirmation email. Please try again.';
 
         if (err instanceof Error) {
@@ -211,6 +223,8 @@ export const profileRouter = router({
         id: ctx.user.id,
       });
     } catch (err) {
+      console.error(err);
+
       let message = 'We were unable to delete your account. Please try again.';
 
       if (err instanceof Error) {

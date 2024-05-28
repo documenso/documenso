@@ -96,7 +96,7 @@ export const Hero = ({ className, ...props }: HeroProps) => {
           variants={HeroTitleVariants}
           initial="initial"
           animate="animate"
-          className="text-center text-4xl font-bold leading-tight tracking-tight lg:text-[64px]"
+          className="text-center text-4xl font-bold leading-tight tracking-tight md:text-[48px] lg:text-[64px]"
         >
           Document signing,
           <span className="block" /> finally open source.
@@ -123,7 +123,7 @@ export const Hero = ({ className, ...props }: HeroProps) => {
           <Link href="https://github.com/documenso/documenso" onClick={() => event('view-github')}>
             <Button variant="outline" className="rounded-full bg-transparent backdrop-blur-sm">
               <LuGithub className="mr-2 h-5 w-5" />
-              Star on Github
+              Star on GitHub
             </Button>
           </Link>
         </motion.div>

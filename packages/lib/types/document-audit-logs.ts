@@ -8,6 +8,8 @@ import { z } from 'zod';
 
 import { FieldType } from '@documenso/prisma/client';
 
+import { ZRecipientActionAuthTypesSchema } from './document-auth';
+
 export const ZDocumentAuditLogTypeSchema = z.enum([
   // Document actions.
   'EMAIL_SENT',
@@ -26,6 +28,8 @@ export const ZDocumentAuditLogTypeSchema = z.enum([
   'DOCUMENT_DELETED', // When the document is soft deleted.
   'DOCUMENT_FIELD_INSERTED', // When a field is inserted (signed/approved/etc) by a recipient.
   'DOCUMENT_FIELD_UNINSERTED', // When a field is uninserted by a recipient.
+  'DOCUMENT_GLOBAL_AUTH_ACCESS_UPDATED', // When the global access authentication is updated.
+  'DOCUMENT_GLOBAL_AUTH_ACTION_UPDATED', // When the global action authentication is updated.
   'DOCUMENT_META_UPDATED', // When the document meta data is updated.
   'DOCUMENT_OPENED', // When the document is opened by a recipient.
   'DOCUMENT_RECIPIENT_COMPLETED', // When a recipient completes all their required tasks for the document.
@@ -51,7 +55,13 @@ export const ZDocumentMetaDiffTypeSchema = z.enum([
 ]);
 
 export const ZFieldDiffTypeSchema = z.enum(['DIMENSION', 'POSITION']);
-export const ZRecipientDiffTypeSchema = z.enum(['NAME', 'ROLE', 'EMAIL']);
+export const ZRecipientDiffTypeSchema = z.enum([
+  'NAME',
+  'ROLE',
+  'EMAIL',
+  'ACCESS_AUTH',
+  'ACTION_AUTH',
+]);
 
 export const DOCUMENT_AUDIT_LOG_TYPE = ZDocumentAuditLogTypeSchema.Enum;
 export const DOCUMENT_EMAIL_TYPE = ZDocumentAuditLogEmailTypeSchema.Enum;
@@ -107,25 +117,34 @@ export const ZDocumentAuditLogFieldDiffSchema = z.union([
   ZFieldDiffPositionSchema,
 ]);
 
-export const ZRecipientDiffNameSchema = z.object({
+export const ZGenericFromToSchema = z.object({
+  from: z.string().nullable(),
+  to: z.string().nullable(),
+});
+
+export const ZRecipientDiffActionAuthSchema = ZGenericFromToSchema.extend({
+  type: z.literal(RECIPIENT_DIFF_TYPE.ACCESS_AUTH),
+});
+
+export const ZRecipientDiffAccessAuthSchema = ZGenericFromToSchema.extend({
+  type: z.literal(RECIPIENT_DIFF_TYPE.ACTION_AUTH),
+});
+
+export const ZRecipientDiffNameSchema = ZGenericFromToSchema.extend({
   type: z.literal(RECIPIENT_DIFF_TYPE.NAME),
-  from: z.string(),
-  to: z.string(),
 });
 
-export const ZRecipientDiffRoleSchema = z.object({
+export const ZRecipientDiffRoleSchema = ZGenericFromToSchema.extend({
   type: z.literal(RECIPIENT_DIFF_TYPE.ROLE),
-  from: z.string(),
-  to: z.string(),
 });
 
-export const ZRecipientDiffEmailSchema = z.object({
+export const ZRecipientDiffEmailSchema = ZGenericFromToSchema.extend({
   type: z.literal(RECIPIENT_DIFF_TYPE.EMAIL),
-  from: z.string(),
-  to: z.string(),
 });
 
-export const ZDocumentAuditLogRecipientDiffSchema = z.union([
+export const ZDocumentAuditLogRecipientDiffSchema = z.discriminatedUnion('type', [
+  ZRecipientDiffActionAuthSchema,
+  ZRecipientDiffAccessAuthSchema,
   ZRecipientDiffNameSchema,
   ZRecipientDiffRoleSchema,
   ZRecipientDiffEmailSchema,
@@ -217,11 +236,29 @@ export const ZDocumentAuditLogEventDocumentFieldInsertedSchema = z.object({
         data: z.string(),
       }),
     ]),
+    fieldSecurity: z.preprocess(
+      (input) => {
+        const legacyNoneSecurityType = JSON.stringify({
+          type: 'NONE',
+        });
 
-    // Todo: Replace with union once we have more field security types.
-    fieldSecurity: z.object({
-      type: z.literal('NONE'),
-    }),
+        // Replace legacy 'NONE' field security type with undefined.
+        if (
+          typeof input === 'object' &&
+          input !== null &&
+          JSON.stringify(input) === legacyNoneSecurityType
+        ) {
+          return undefined;
+        }
+
+        return input;
+      },
+      z
+        .object({
+          type: ZRecipientActionAuthTypesSchema,
+        })
+        .optional(),
+    ),
   }),
 });
 
@@ -234,6 +271,22 @@ export const ZDocumentAuditLogEventDocumentFieldUninsertedSchema = z.object({
     field: z.nativeEnum(FieldType),
     fieldId: z.string(),
   }),
+});
+
+/**
+ * Event: Document global authentication access updated.
+ */
+export const ZDocumentAuditLogEventDocumentGlobalAuthAccessUpdatedSchema = z.object({
+  type: z.literal(DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_GLOBAL_AUTH_ACCESS_UPDATED),
+  data: ZGenericFromToSchema,
+});
+
+/**
+ * Event: Document global authentication action updated.
+ */
+export const ZDocumentAuditLogEventDocumentGlobalAuthActionUpdatedSchema = z.object({
+  type: z.literal(DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_GLOBAL_AUTH_ACTION_UPDATED),
+  data: ZGenericFromToSchema,
 });
 
 /**
@@ -251,7 +304,9 @@ export const ZDocumentAuditLogEventDocumentMetaUpdatedSchema = z.object({
  */
 export const ZDocumentAuditLogEventDocumentOpenedSchema = z.object({
   type: z.literal(DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_OPENED),
-  data: ZBaseRecipientDataSchema,
+  data: ZBaseRecipientDataSchema.extend({
+    accessAuth: z.string().optional(),
+  }),
 });
 
 /**
@@ -259,7 +314,9 @@ export const ZDocumentAuditLogEventDocumentOpenedSchema = z.object({
  */
 export const ZDocumentAuditLogEventDocumentRecipientCompleteSchema = z.object({
   type: z.literal(DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_RECIPIENT_COMPLETED),
-  data: ZBaseRecipientDataSchema,
+  data: ZBaseRecipientDataSchema.extend({
+    actionAuth: z.string().optional(),
+  }),
 });
 
 /**
@@ -303,7 +360,9 @@ export const ZDocumentAuditLogEventFieldRemovedSchema = z.object({
 export const ZDocumentAuditLogEventFieldUpdatedSchema = z.object({
   type: z.literal(DOCUMENT_AUDIT_LOG_TYPE.FIELD_UPDATED),
   data: ZBaseFieldEventDataSchema.extend({
-    changes: z.array(ZDocumentAuditLogFieldDiffSchema),
+    // Provide an empty array as a migration workaround due to a mistake where we were
+    // not passing through any changes via API/v1 due to a type error.
+    changes: z.preprocess((x) => x || [], z.array(ZDocumentAuditLogFieldDiffSchema)),
   }),
 });
 
@@ -312,7 +371,9 @@ export const ZDocumentAuditLogEventFieldUpdatedSchema = z.object({
  */
 export const ZDocumentAuditLogEventRecipientAddedSchema = z.object({
   type: z.literal(DOCUMENT_AUDIT_LOG_TYPE.RECIPIENT_CREATED),
-  data: ZBaseRecipientDataSchema,
+  data: ZBaseRecipientDataSchema.extend({
+    actionAuth: ZRecipientActionAuthTypesSchema.optional(),
+  }),
 });
 
 /**
@@ -352,6 +413,8 @@ export const ZDocumentAuditLogSchema = ZDocumentAuditLogBaseSchema.and(
     ZDocumentAuditLogEventDocumentDeletedSchema,
     ZDocumentAuditLogEventDocumentFieldInsertedSchema,
     ZDocumentAuditLogEventDocumentFieldUninsertedSchema,
+    ZDocumentAuditLogEventDocumentGlobalAuthAccessUpdatedSchema,
+    ZDocumentAuditLogEventDocumentGlobalAuthActionUpdatedSchema,
     ZDocumentAuditLogEventDocumentMetaUpdatedSchema,
     ZDocumentAuditLogEventDocumentOpenedSchema,
     ZDocumentAuditLogEventDocumentRecipientCompleteSchema,

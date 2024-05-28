@@ -14,6 +14,7 @@ import { LocaleDate } from '~/components/formatter/locale-date';
 
 import { AdminActions } from './admin-actions';
 import { RecipientItem } from './recipient-item';
+import { SuperDeleteDocumentDialog } from './super-delete-document-dialog';
 
 type AdminDocumentDetailsPageProps = {
   params: {
@@ -52,7 +53,7 @@ export default async function AdminDocumentDetailsPage({ params }: AdminDocument
 
       <h2 className="text-lg font-semibold">Admin Actions</h2>
 
-      <AdminActions className="mt-2" document={document} />
+      <AdminActions className="mt-2" document={document} recipients={document.Recipient} />
 
       <hr className="my-4" />
       <h2 className="text-lg font-semibold">Recipients</h2>
@@ -81,6 +82,10 @@ export default async function AdminDocumentDetailsPage({ params }: AdminDocument
           ))}
         </Accordion>
       </div>
+
+      <hr className="my-4" />
+
+      {document && <SuperDeleteDocumentDialog document={document} />}
     </div>
   );
 }

@@ -21,6 +21,8 @@ export const webhookRouter = router({
     try {
       return await getWebhooksByUserId(ctx.user.id);
     } catch (err) {
+      console.error(err);
+
       throw new TRPCError({
         code: 'BAD_REQUEST',
         message: 'We were unable to fetch your webhooks. Please try again later.',
@@ -36,6 +38,8 @@ export const webhookRouter = router({
       try {
         return await getWebhooksByTeamId(teamId, ctx.user.id);
       } catch (err) {
+        console.error(err);
+
         throw new TRPCError({
           code: 'BAD_REQUEST',
           message: 'We were unable to fetch your webhooks. Please try again later.',
@@ -55,6 +59,8 @@ export const webhookRouter = router({
           teamId,
         });
       } catch (err) {
+        console.error(err);
+
         throw new TRPCError({
           code: 'BAD_REQUEST',
           message: 'We were unable to fetch your webhook. Please try again later.',
@@ -77,6 +83,8 @@ export const webhookRouter = router({
           userId: ctx.user.id,
         });
       } catch (err) {
+        console.error(err);
+
         throw new TRPCError({
           code: 'BAD_REQUEST',
           message: 'We were unable to create this webhook. Please try again later.',
@@ -96,6 +104,8 @@ export const webhookRouter = router({
           userId: ctx.user.id,
         });
       } catch (err) {
+        console.error(err);
+
         throw new TRPCError({
           code: 'BAD_REQUEST',
           message: 'We were unable to create this webhook. Please try again later.',
@@ -116,6 +126,8 @@ export const webhookRouter = router({
           teamId,
         });
       } catch (err) {
+        console.error(err);
+
         throw new TRPCError({
           code: 'BAD_REQUEST',
           message: 'We were unable to create this webhook. Please try again later.',

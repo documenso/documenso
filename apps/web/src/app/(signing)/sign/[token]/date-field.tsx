@@ -11,6 +11,9 @@ import {
   convertToLocalSystemFormat,
 } from '@documenso/lib/constants/date-formats';
 import { DEFAULT_DOCUMENT_TIME_ZONE } from '@documenso/lib/constants/time-zones';
+import { DO_NOT_INVALIDATE_QUERY_ON_MUTATION } from '@documenso/lib/constants/trpc';
+import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
+import type { TRecipientActionAuth } from '@documenso/lib/types/document-auth';
 import type { Recipient } from '@documenso/prisma/client';
 import type { FieldWithSignature } from '@documenso/prisma/types/field-with-signature';
 import { trpc } from '@documenso/trpc/react';
@@ -38,12 +41,12 @@ export const DateField = ({
   const [isPending, startTransition] = useTransition();
 
   const { mutateAsync: signFieldWithToken, isLoading: isSignFieldWithTokenLoading } =
-    trpc.field.signFieldWithToken.useMutation();
+    trpc.field.signFieldWithToken.useMutation(DO_NOT_INVALIDATE_QUERY_ON_MUTATION);
 
   const {
     mutateAsync: removeSignedFieldWithToken,
     isLoading: isRemoveSignedFieldWithTokenLoading,
-  } = trpc.field.removeSignedFieldWithToken.useMutation();
+  } = trpc.field.removeSignedFieldWithToken.useMutation(DO_NOT_INVALIDATE_QUERY_ON_MUTATION);
 
   const isLoading = isSignFieldWithTokenLoading || isRemoveSignedFieldWithTokenLoading || isPending;
 
@@ -53,16 +56,23 @@ export const DateField = ({
 
   const tooltipText = `"${field.customText}" will appear on the document as it has a timezone of "${timezone}".`;
 
-  const onSign = async () => {
+  const onSign = async (authOptions?: TRecipientActionAuth) => {
     try {
       await signFieldWithToken({
         token: recipient.token,
         fieldId: field.id,
         value: dateFormat ?? DEFAULT_DOCUMENT_DATE_FORMAT,
+        authOptions,
       });
 
       startTransition(() => router.refresh());
     } catch (err) {
+      const error = AppError.parseError(err);
+
+      if (error.code === AppErrorCode.UNAUTHORIZED) {
+        throw error;
+      }
+
       console.error(err);
 
       toast({

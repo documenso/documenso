@@ -17,9 +17,9 @@ type GetCompletedDocumentsMonthlyQueryResult = Array<{
 export const getCompletedDocumentsMonthly = async () => {
   const result = await prisma.$queryRaw<GetCompletedDocumentsMonthlyQueryResult>`
     SELECT
-      DATE_TRUNC('month', "completedAt") AS "month",
+      DATE_TRUNC('month', "updatedAt") AS "month",
       COUNT("id") as "count",
-      SUM(COUNT("id")) OVER (ORDER BY DATE_TRUNC('month', "completedAt")) as "cume_count"
+      SUM(COUNT("id")) OVER (ORDER BY DATE_TRUNC('month', "updatedAt")) as "cume_count"
     FROM "Document"
     WHERE "status" = 'COMPLETED'
     GROUP BY "month"

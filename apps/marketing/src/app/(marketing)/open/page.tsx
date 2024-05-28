@@ -6,18 +6,19 @@ import { getCompletedDocumentsMonthly } from '@documenso/lib/server-only/user/ge
 import { getUserMonthlyGrowth } from '@documenso/lib/server-only/user/get-user-monthly-growth';
 
 import { FUNDING_RAISED } from '~/app/(marketing)/open/data';
-import { MetricCard } from '~/app/(marketing)/open/metric-card';
-import { SalaryBands } from '~/app/(marketing)/open/salary-bands';
 import { CallToAction } from '~/components/(marketing)/call-to-action';
 
 import { BarMetric } from './bar-metrics';
 import { CapTable } from './cap-table';
 import { FundingRaised } from './funding-raised';
-import { MonthlyCompletedDocumentsChart } from './monthly-completed-documents-chart copy';
+import { MetricCard } from './metric-card';
+import { MonthlyCompletedDocumentsChart } from './monthly-completed-documents-chart';
 import { MonthlyNewUsersChart } from './monthly-new-users-chart';
 import { MonthlyTotalUsersChart } from './monthly-total-users-chart';
+import { SalaryBands } from './salary-bands';
 import { TeamMembers } from './team-members';
 import { OpenPageTooltip } from './tooltip';
+import { TotalSignedDocumentsChart } from './total-signed-documents-chart';
 import { Typefully } from './typefully';
 
 export const metadata: Metadata = {
@@ -133,16 +134,17 @@ export default async function OpenPage() {
     { total_count: mergedPullRequests },
     STARGAZERS_DATA,
     EARLY_ADOPTERS_DATA,
+    MONTHLY_USERS,
+    MONTHLY_COMPLETED_DOCUMENTS,
   ] = await Promise.all([
     fetchGithubStats(),
     fetchOpenIssues(),
     fetchMergedPullRequests(),
     fetchStargazers(),
     fetchEarlyAdopters(),
+    getUserMonthlyGrowth(),
+    getCompletedDocumentsMonthly(),
   ]);
-
-  const MONTHLY_USERS = await getUserMonthlyGrowth();
-  const MONTHLY_COMPLETED_DOCUMENTS = await getCompletedDocumentsMonthly();
 
   return (
     <div>
@@ -205,7 +207,7 @@ export default async function OpenPage() {
           <BarMetric<StargazersType>
             data={STARGAZERS_DATA}
             metricKey="stars"
-            title="Github: Total Stars"
+            title="GitHub: Total Stars"
             label="Stars"
             className="col-span-12 lg:col-span-6"
           />
@@ -213,27 +215,27 @@ export default async function OpenPage() {
           <BarMetric<StargazersType>
             data={STARGAZERS_DATA}
             metricKey="mergedPRs"
-            title="Github: Total Merged PRs"
+            title="GitHub: Total Merged PRs"
             label="Merged PRs"
-            chartHeight={300}
+            chartHeight={400}
             className="col-span-12 lg:col-span-6"
           />
 
           <BarMetric<StargazersType>
             data={STARGAZERS_DATA}
             metricKey="forks"
-            title="Github: Total Forks"
+            title="GitHub: Total Forks"
             label="Forks"
-            chartHeight={300}
+            chartHeight={400}
             className="col-span-12 lg:col-span-6"
           />
 
           <BarMetric<StargazersType>
             data={STARGAZERS_DATA}
             metricKey="openIssues"
-            title="Github: Total Open Issues"
+            title="GitHub: Total Open Issues"
             label="Open Issues"
-            chartHeight={300}
+            chartHeight={400}
             className="col-span-12 lg:col-span-6"
           />
 
@@ -255,6 +257,10 @@ export default async function OpenPage() {
           <MonthlyNewUsersChart data={MONTHLY_USERS} className="col-span-12 lg:col-span-6" />
 
           <MonthlyCompletedDocumentsChart
+            data={MONTHLY_COMPLETED_DOCUMENTS}
+            className="col-span-12 lg:col-span-6"
+          />
+          <TotalSignedDocumentsChart
             data={MONTHLY_COMPLETED_DOCUMENTS}
             className="col-span-12 lg:col-span-6"
           />

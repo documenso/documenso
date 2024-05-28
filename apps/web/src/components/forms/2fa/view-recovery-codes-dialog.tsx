@@ -1,4 +1,6 @@
-import { useEffect, useMemo } from 'react';
+'use client';
+
+import { useState } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
@@ -6,69 +8,58 @@ import { match } from 'ts-pattern';
 import { z } from 'zod';
 
 import { downloadFile } from '@documenso/lib/client-only/download-file';
+import { AppError } from '@documenso/lib/errors/app-error';
+import { ErrorCode } from '@documenso/lib/next-auth/error-codes';
 import { trpc } from '@documenso/trpc/react';
+import { Alert, AlertDescription } from '@documenso/ui/primitives/alert';
 import { Button } from '@documenso/ui/primitives/button';
 import {
   Dialog,
+  DialogClose,
   DialogContent,
   DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
+  DialogTrigger,
 } from '@documenso/ui/primitives/dialog';
 import {
   Form,
   FormControl,
   FormField,
   FormItem,
-  FormLabel,
   FormMessage,
 } from '@documenso/ui/primitives/form/form';
-import { PasswordInput } from '@documenso/ui/primitives/password-input';
-import { useToast } from '@documenso/ui/primitives/use-toast';
+import { PinInput, PinInputGroup, PinInputSlot } from '@documenso/ui/primitives/pin-input';
 
 import { RecoveryCodeList } from './recovery-code-list';
 
 export const ZViewRecoveryCodesForm = z.object({
-  password: z.string().min(6).max(72),
+  token: z.string().min(1, { message: 'Token is required' }),
 });
 
 export type TViewRecoveryCodesForm = z.infer<typeof ZViewRecoveryCodesForm>;
 
-export type ViewRecoveryCodesDialogProps = {
-  open: boolean;
-  onOpenChange: (_open: boolean) => void;
-};
-
-export const ViewRecoveryCodesDialog = ({ open, onOpenChange }: ViewRecoveryCodesDialogProps) => {
-  const { toast } = useToast();
+export const ViewRecoveryCodesDialog = () => {
+  const [isOpen, setIsOpen] = useState(false);
 
   const {
-    mutateAsync: viewRecoveryCodes,
-    data: viewRecoveryCodesData,
-    isLoading: isViewRecoveryCodesDataLoading,
+    data: recoveryCodes,
+    mutate,
+    isLoading,
+    error,
   } = trpc.twoFactorAuthentication.viewRecoveryCodes.useMutation();
 
   const viewRecoveryCodesForm = useForm<TViewRecoveryCodesForm>({
     defaultValues: {
-      password: '',
+      token: '',
     },
     resolver: zodResolver(ZViewRecoveryCodesForm),
   });
 
-  const { isSubmitting: isViewRecoveryCodesSubmitting } = viewRecoveryCodesForm.formState;
-
-  const step = useMemo(() => {
-    if (!viewRecoveryCodesData || isViewRecoveryCodesSubmitting) {
-      return 'authenticate';
-    }
-
-    return 'view';
-  }, [viewRecoveryCodesData, isViewRecoveryCodesSubmitting]);
-
   const downloadRecoveryCodes = () => {
-    if (viewRecoveryCodesData && viewRecoveryCodesData.recoveryCodes) {
-      const blob = new Blob([viewRecoveryCodesData.recoveryCodes.join('\n')], {
+    if (recoveryCodes) {
+      const blob = new Blob([recoveryCodes.join('\n')], {
         type: 'text/plain',
       });
 
@@ -79,105 +70,96 @@ export const ViewRecoveryCodesDialog = ({ open, onOpenChange }: ViewRecoveryCode
     }
   };
 
-  const onViewRecoveryCodesFormSubmit = async ({ password }: TViewRecoveryCodesForm) => {
-    try {
-      await viewRecoveryCodes({ password });
-    } catch (_err) {
-      toast({
-        title: 'Unable to view recovery codes',
-        description:
-          'We were unable to view your recovery codes. Please ensure that you have entered your password correctly and try again.',
-        variant: 'destructive',
-      });
-    }
-  };
-
-  useEffect(() => {
-    // Reset the form when the Dialog closes
-    if (!open) {
-      viewRecoveryCodesForm.reset();
-    }
-  }, [open, viewRecoveryCodesForm]);
-
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+      <DialogTrigger asChild>
+        <Button className="flex-shrink-0">View Codes</Button>
+      </DialogTrigger>
+
       <DialogContent className="w-full max-w-xl md:max-w-xl lg:max-w-xl">
-        <DialogHeader>
-          <DialogTitle>View Recovery Codes</DialogTitle>
+        {recoveryCodes ? (
+          <div>
+            <DialogHeader className="mb-4">
+              <DialogTitle>View Recovery Codes</DialogTitle>
 
-          {step === 'authenticate' && (
-            <DialogDescription>
-              To view your recovery codes, please enter your password below.
-            </DialogDescription>
-          )}
+              <DialogDescription>
+                Your recovery codes are listed below. Please store them in a safe place.
+              </DialogDescription>
+            </DialogHeader>
 
-          {step === 'view' && (
-            <DialogDescription>
-              Your recovery codes are listed below. Please store them in a safe place.
-            </DialogDescription>
-          )}
-        </DialogHeader>
+            <RecoveryCodeList recoveryCodes={recoveryCodes} />
 
-        {match(step)
-          .with('authenticate', () => {
-            return (
-              <Form {...viewRecoveryCodesForm}>
-                <form
-                  onSubmit={viewRecoveryCodesForm.handleSubmit(onViewRecoveryCodesFormSubmit)}
-                  className="flex flex-col gap-y-4"
-                >
-                  <FormField
-                    name="password"
-                    control={viewRecoveryCodesForm.control}
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="text-muted-foreground">Password</FormLabel>
-                        <FormControl>
-                          <PasswordInput
-                            {...field}
-                            autoComplete="current-password"
-                            value={field.value ?? ''}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+            <DialogFooter className="mt-4">
+              <DialogClose asChild>
+                <Button variant="secondary">Close</Button>
+              </DialogClose>
 
-                  <DialogFooter>
-                    <Button type="button" variant="secondary" onClick={() => onOpenChange(false)}>
+              <Button onClick={downloadRecoveryCodes}>Download</Button>
+            </DialogFooter>
+          </div>
+        ) : (
+          <Form {...viewRecoveryCodesForm}>
+            <form onSubmit={viewRecoveryCodesForm.handleSubmit((value) => mutate(value))}>
+              <DialogHeader className="mb-4">
+                <DialogTitle>View Recovery Codes</DialogTitle>
+
+                <DialogDescription>
+                  Please provide a token from your authenticator, or a backup code.
+                </DialogDescription>
+              </DialogHeader>
+
+              <fieldset className="flex flex-col space-y-4" disabled={isLoading}>
+                <FormField
+                  name="token"
+                  control={viewRecoveryCodesForm.control}
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormControl>
+                        <PinInput {...field} value={field.value ?? ''} maxLength={6}>
+                          {Array(6)
+                            .fill(null)
+                            .map((_, i) => (
+                              <PinInputGroup key={i}>
+                                <PinInputSlot index={i} />
+                              </PinInputGroup>
+                            ))}
+                        </PinInput>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                {error && (
+                  <Alert variant="destructive">
+                    <AlertDescription>
+                      {match(AppError.parseError(error).message)
+                        .with(
+                          ErrorCode.INCORRECT_TWO_FACTOR_CODE,
+                          () => 'Invalid code. Please try again.',
+                        )
+                        .otherwise(
+                          () => 'Something went wrong. Please try again or contact support.',
+                        )}
+                    </AlertDescription>
+                  </Alert>
+                )}
+
+                <DialogFooter>
+                  <DialogClose asChild>
+                    <Button type="button" variant="secondary">
                       Cancel
                     </Button>
+                  </DialogClose>
 
-                    <Button type="submit" loading={isViewRecoveryCodesSubmitting}>
-                      Continue
-                    </Button>
-                  </DialogFooter>
-                </form>
-              </Form>
-            );
-          })
-          .with('view', () => (
-            <div>
-              {viewRecoveryCodesData?.recoveryCodes && (
-                <RecoveryCodeList recoveryCodes={viewRecoveryCodesData.recoveryCodes} />
-              )}
-
-              <div className="mt-4 flex flex-row-reverse items-center gap-2">
-                <Button onClick={() => onOpenChange(false)}>Complete</Button>
-
-                <Button
-                  variant="secondary"
-                  disabled={!viewRecoveryCodesData?.recoveryCodes}
-                  loading={isViewRecoveryCodesDataLoading}
-                  onClick={downloadRecoveryCodes}
-                >
-                  Download
-                </Button>
-              </div>
-            </div>
-          ))
-          .exhaustive()}
+                  <Button type="submit" loading={isLoading}>
+                    View
+                  </Button>
+                </DialogFooter>
+              </fieldset>
+            </form>
+          </Form>
+        )}
       </DialogContent>
     </Dialog>
   );

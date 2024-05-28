@@ -1,24 +1,28 @@
 'use client';
 
-import React, { useId } from 'react';
+import React, { useId, useMemo, useState } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { AnimatePresence, motion } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { Plus, Trash } from 'lucide-react';
-import { Controller, useFieldArray, useForm } from 'react-hook-form';
+import { useSession } from 'next-auth/react';
+import { useFieldArray, useForm } from 'react-hook-form';
 
 import { useLimits } from '@documenso/ee/server-only/limits/provider/client';
+import { ZRecipientAuthOptionsSchema } from '@documenso/lib/types/document-auth';
 import { nanoid } from '@documenso/lib/universal/id';
 import type { Field, Recipient } from '@documenso/prisma/client';
-import { DocumentStatus, RecipientRole, SendStatus } from '@documenso/prisma/client';
-import type { DocumentWithData } from '@documenso/prisma/types/document-with-data';
+import { RecipientRole, SendStatus } from '@documenso/prisma/client';
+import { AnimateGenericFadeInOut } from '@documenso/ui/components/animate/animate-generic-fade-in-out';
+import { RecipientActionAuthSelect } from '@documenso/ui/components/recipient/recipient-action-auth-select';
+import { RecipientRoleSelect } from '@documenso/ui/components/recipient/recipient-role-select';
+import { cn } from '@documenso/ui/lib/utils';
 
 import { Button } from '../button';
+import { Checkbox } from '../checkbox';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '../form/form';
 import { FormErrorMessage } from '../form/form-error-message';
 import { Input } from '../input';
-import { Label } from '../label';
-import { ROLE_ICONS } from '../recipient-role-icons';
-import { Select, SelectContent, SelectItem, SelectTrigger } from '../select';
 import { useStep } from '../stepper';
 import { useToast } from '../use-toast';
 import type { TAddSignersFormSchema } from './add-signers.types';
@@ -37,29 +41,29 @@ export type AddSignersFormProps = {
   documentFlow: DocumentFlowStep;
   recipients: Recipient[];
   fields: Field[];
-  document: DocumentWithData;
+  isDocumentEnterprise: boolean;
   onSubmit: (_data: TAddSignersFormSchema) => void;
+  isDocumentPdfLoaded: boolean;
 };
 
 export const AddSignersFormPartial = ({
   documentFlow,
   recipients,
-  document,
   fields,
+  isDocumentEnterprise,
   onSubmit,
+  isDocumentPdfLoaded,
 }: AddSignersFormProps) => {
   const { toast } = useToast();
   const { remaining } = useLimits();
+  const { data: session } = useSession();
+  const user = session?.user;
 
   const initialId = useId();
 
   const { currentStep, totalSteps, previousStep } = useStep();
 
-  const {
-    control,
-    handleSubmit,
-    formState: { errors, isSubmitting },
-  } = useForm<TAddSignersFormSchema>({
+  const form = useForm<TAddSignersFormSchema>({
     resolver: zodResolver(ZAddSignersFormSchema),
     defaultValues: {
       signers:
@@ -70,6 +74,8 @@ export const AddSignersFormPartial = ({
               name: recipient.name,
               email: recipient.email,
               role: recipient.role,
+              actionAuth:
+                ZRecipientAuthOptionsSchema.parse(recipient.authOptions)?.actionAuth ?? undefined,
             }))
           : [
               {
@@ -77,12 +83,37 @@ export const AddSignersFormPartial = ({
                 name: '',
                 email: '',
                 role: RecipientRole.SIGNER,
+                actionAuth: undefined,
               },
             ],
     },
   });
 
-  const onFormSubmit = handleSubmit(onSubmit);
+  // Always show advanced settings if any recipient has auth options.
+  const alwaysShowAdvancedSettings = useMemo(() => {
+    const recipientHasAuthOptions = recipients.find((recipient) => {
+      const recipientAuthOptions = ZRecipientAuthOptionsSchema.parse(recipient.authOptions);
+
+      return recipientAuthOptions?.accessAuth || recipientAuthOptions?.actionAuth;
+    });
+
+    const formHasActionAuth = form.getValues('signers').find((signer) => signer.actionAuth);
+
+    return recipientHasAuthOptions !== undefined || formHasActionAuth !== undefined;
+  }, [recipients, form]);
+
+  const [showAdvancedSettings, setShowAdvancedSettings] = useState(alwaysShowAdvancedSettings);
+
+  const {
+    setValue,
+    formState: { errors, isSubmitting },
+    control,
+    watch,
+  } = form;
+
+  const watchedSigners = watch('signers');
+
+  const onFormSubmit = form.handleSubmit(onSubmit);
 
   const {
     append: appendSigner,
@@ -92,6 +123,11 @@ export const AddSignersFormPartial = ({
     control,
     name: 'signers',
   });
+
+  const emptySignerIndex = watchedSigners.findIndex((signer) => !signer.name && !signer.email);
+  const isUserAlreadyARecipient = watchedSigners.some(
+    (signer) => signer.email.toLowerCase() === user?.email?.toLowerCase(),
+  );
 
   const hasBeenSentToRecipientId = (id?: number) => {
     if (!id) {
@@ -112,6 +148,7 @@ export const AddSignersFormPartial = ({
       name: '',
       email: '',
       role: RecipientRole.SIGNER,
+      actionAuth: undefined,
     });
   };
 
@@ -131,6 +168,21 @@ export const AddSignersFormPartial = ({
     removeSigner(index);
   };
 
+  const onAddSelfSigner = () => {
+    if (emptySignerIndex !== -1) {
+      setValue(`signers.${emptySignerIndex}.name`, user?.name ?? '');
+      setValue(`signers.${emptySignerIndex}.email`, user?.email ?? '');
+    } else {
+      appendSigner({
+        formId: nanoid(12),
+        name: user?.name ?? '',
+        email: user?.email ?? '',
+        role: RecipientRole.SIGNER,
+        actionAuth: undefined,
+      });
+    }
+  };
+
   const onKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
     if (event.key === 'Enter' && event.target instanceof HTMLInputElement) {
       onAddSigner();
@@ -144,110 +196,118 @@ export const AddSignersFormPartial = ({
         description={documentFlow.description}
       />
       <DocumentFlowFormContainerContent>
-        <div className="flex w-full flex-col gap-y-4">
-          {fields.map((field, index) => (
+        {isDocumentPdfLoaded &&
+          fields.map((field, index) => (
             <ShowFieldItem key={index} field={field} recipients={recipients} />
           ))}
 
-          <AnimatePresence>
-            {signers.map((signer, index) => (
-              <motion.fieldset
-                key={signer.id}
-                data-native-id={signer.nativeId}
-                disabled={isSubmitting || hasBeenSentToRecipientId(signer.nativeId)}
-                className="flex flex-wrap items-end gap-x-4"
-              >
-                <div className="flex-1">
-                  <Label htmlFor={`signer-${signer.id}-email`}>
-                    Email
-                    <span className="text-destructive ml-1 inline-block font-medium">*</span>
-                  </Label>
-
-                  <Controller
-                    control={control}
+        <AnimateGenericFadeInOut motionKey={showAdvancedSettings ? 'Show' : 'Hide'}>
+          <Form {...form}>
+            <div className="flex w-full flex-col gap-y-2">
+              {signers.map((signer, index) => (
+                <motion.fieldset
+                  key={signer.id}
+                  data-native-id={signer.nativeId}
+                  disabled={isSubmitting || hasBeenSentToRecipientId(signer.nativeId)}
+                  className={cn('grid grid-cols-8 gap-4 pb-4', {
+                    'border-b pt-2': showAdvancedSettings,
+                  })}
+                >
+                  <FormField
+                    control={form.control}
                     name={`signers.${index}.email`}
                     render={({ field }) => (
-                      <Input
-                        id={`signer-${signer.id}-email`}
-                        type="email"
-                        className="bg-background mt-2"
-                        disabled={isSubmitting || hasBeenSentToRecipientId(signer.nativeId)}
-                        onKeyDown={onKeyDown}
-                        {...field}
-                      />
+                      <FormItem
+                        className={cn('relative', {
+                          'col-span-3': !showAdvancedSettings,
+                          'col-span-4': showAdvancedSettings,
+                        })}
+                      >
+                        {!showAdvancedSettings && index === 0 && (
+                          <FormLabel required>Email</FormLabel>
+                        )}
+
+                        <FormControl>
+                          <Input
+                            type="email"
+                            placeholder="Email"
+                            {...field}
+                            disabled={isSubmitting || hasBeenSentToRecipientId(signer.nativeId)}
+                            onKeyDown={onKeyDown}
+                          />
+                        </FormControl>
+
+                        <FormMessage />
+                      </FormItem>
                     )}
                   />
-                </div>
 
-                <div className="flex-1">
-                  <Label htmlFor={`signer-${signer.id}-name`}>Name</Label>
-
-                  <Controller
-                    control={control}
+                  <FormField
+                    control={form.control}
                     name={`signers.${index}.name`}
                     render={({ field }) => (
-                      <Input
-                        id={`signer-${signer.id}-name`}
-                        type="text"
-                        className="bg-background mt-2"
-                        disabled={isSubmitting || hasBeenSentToRecipientId(signer.nativeId)}
-                        onKeyDown={onKeyDown}
-                        {...field}
-                      />
-                    )}
-                  />
-                </div>
-
-                <div className="w-[60px]">
-                  <Controller
-                    control={control}
-                    name={`signers.${index}.role`}
-                    render={({ field: { value, onChange } }) => (
-                      <Select
-                        value={value}
-                        onValueChange={(x) => onChange(x)}
-                        disabled={isSubmitting || hasBeenSentToRecipientId(signer.nativeId)}
+                      <FormItem
+                        className={cn({
+                          'col-span-3': !showAdvancedSettings,
+                          'col-span-4': showAdvancedSettings,
+                        })}
                       >
-                        <SelectTrigger className="bg-background">{ROLE_ICONS[value]}</SelectTrigger>
+                        {!showAdvancedSettings && index === 0 && <FormLabel>Name</FormLabel>}
 
-                        <SelectContent className="" align="end">
-                          <SelectItem value={RecipientRole.SIGNER}>
-                            <div className="flex items-center">
-                              <span className="mr-2">{ROLE_ICONS[RecipientRole.SIGNER]}</span>
-                              Signer
-                            </div>
-                          </SelectItem>
+                        <FormControl>
+                          <Input
+                            placeholder="Name"
+                            {...field}
+                            disabled={isSubmitting || hasBeenSentToRecipientId(signer.nativeId)}
+                            onKeyDown={onKeyDown}
+                          />
+                        </FormControl>
 
-                          <SelectItem value={RecipientRole.CC}>
-                            <div className="flex items-center">
-                              <span className="mr-2">{ROLE_ICONS[RecipientRole.CC]}</span>
-                              Receives copy
-                            </div>
-                          </SelectItem>
-
-                          <SelectItem value={RecipientRole.APPROVER}>
-                            <div className="flex items-center">
-                              <span className="mr-2">{ROLE_ICONS[RecipientRole.APPROVER]}</span>
-                              Approver
-                            </div>
-                          </SelectItem>
-
-                          <SelectItem value={RecipientRole.VIEWER}>
-                            <div className="flex items-center">
-                              <span className="mr-2">{ROLE_ICONS[RecipientRole.VIEWER]}</span>
-                              Viewer
-                            </div>
-                          </SelectItem>
-                        </SelectContent>
-                      </Select>
+                        <FormMessage />
+                      </FormItem>
                     )}
                   />
-                </div>
 
-                <div>
+                  {showAdvancedSettings && isDocumentEnterprise && (
+                    <FormField
+                      control={form.control}
+                      name={`signers.${index}.actionAuth`}
+                      render={({ field }) => (
+                        <FormItem className="col-span-6">
+                          <FormControl>
+                            <RecipientActionAuthSelect
+                              {...field}
+                              onValueChange={field.onChange}
+                              disabled={isSubmitting || hasBeenSentToRecipientId(signer.nativeId)}
+                            />
+                          </FormControl>
+
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  )}
+
+                  <FormField
+                    name={`signers.${index}.role`}
+                    render={({ field }) => (
+                      <FormItem className="col-span-1 mt-auto">
+                        <FormControl>
+                          <RecipientRoleSelect
+                            {...field}
+                            onValueChange={field.onChange}
+                            disabled={isSubmitting || hasBeenSentToRecipientId(signer.nativeId)}
+                          />
+                        </FormControl>
+
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
                   <button
                     type="button"
-                    className="justify-left inline-flex h-10 w-10 items-center text-slate-500 hover:opacity-80 disabled:cursor-not-allowed disabled:opacity-50"
+                    className="col-span-1 mt-auto inline-flex h-10 w-10 items-center justify-center text-slate-500 hover:opacity-80 disabled:cursor-not-allowed disabled:opacity-50"
                     disabled={
                       isSubmitting ||
                       hasBeenSentToRecipientId(signer.nativeId) ||
@@ -257,33 +317,63 @@ export const AddSignersFormPartial = ({
                   >
                     <Trash className="h-5 w-5" />
                   </button>
-                </div>
+                </motion.fieldset>
+              ))}
+            </div>
 
-                <div className="w-full">
-                  <FormErrorMessage className="mt-2" error={errors.signers?.[index]?.email} />
-                  <FormErrorMessage className="mt-2" error={errors.signers?.[index]?.name} />
-                </div>
-              </motion.fieldset>
-            ))}
-          </AnimatePresence>
-        </div>
+            <FormErrorMessage
+              className="mt-2"
+              // Dirty hack to handle errors when .root is populated for an array type
+              error={'signers__root' in errors && errors['signers__root']}
+            />
 
-        <FormErrorMessage
-          className="mt-2"
-          // Dirty hack to handle errors when .root is populated for an array type
-          error={'signers__root' in errors && errors['signers__root']}
-        />
+            <div
+              className={cn('mt-2 flex flex-row items-center space-x-4', {
+                'mt-4': showAdvancedSettings,
+              })}
+            >
+              <Button
+                type="button"
+                className="flex-1"
+                disabled={isSubmitting || signers.length >= remaining.recipients}
+                onClick={() => onAddSigner()}
+              >
+                <Plus className="-ml-1 mr-2 h-5 w-5" />
+                Add Signer
+              </Button>
 
-        <div className="mt-4">
-          <Button
-            type="button"
-            disabled={isSubmitting || signers.length >= remaining.recipients}
-            onClick={() => onAddSigner()}
-          >
-            <Plus className="-ml-1 mr-2 h-5 w-5" />
-            Add Signer
-          </Button>
-        </div>
+              <Button
+                type="button"
+                variant="secondary"
+                className="dark:bg-muted dark:hover:bg-muted/80 bg-black/5 hover:bg-black/10"
+                disabled={isSubmitting || isUserAlreadyARecipient}
+                onClick={() => onAddSelfSigner()}
+              >
+                <Plus className="-ml-1 mr-2 h-5 w-5" />
+                Add myself
+              </Button>
+            </div>
+
+            {!alwaysShowAdvancedSettings && isDocumentEnterprise && (
+              <div className="mt-4 flex flex-row items-center">
+                <Checkbox
+                  id="showAdvancedRecipientSettings"
+                  className="h-5 w-5"
+                  checkClassName="dark:text-white text-primary"
+                  checked={showAdvancedSettings}
+                  onCheckedChange={(value) => setShowAdvancedSettings(Boolean(value))}
+                />
+
+                <label
+                  className="text-muted-foreground ml-2 text-sm"
+                  htmlFor="showAdvancedRecipientSettings"
+                >
+                  Show advanced settings
+                </label>
+              </div>
+            )}
+          </Form>
+        </AnimateGenericFadeInOut>
       </DocumentFlowFormContainerContent>
 
       <DocumentFlowFormContainerFooter>
@@ -294,7 +384,6 @@ export const AddSignersFormPartial = ({
         />
 
         <DocumentFlowFormContainerActions
-          canGoBack={document.status === DocumentStatus.DRAFT}
           loading={isSubmitting}
           disabled={isSubmitting}
           onGoBackClick={previousStep}

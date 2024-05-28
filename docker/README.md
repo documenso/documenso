@@ -41,7 +41,7 @@ volumes:
 1. Run the following command to start the containers:
 
 ```
-docker-compose --env-file ./.env -d up
+docker-compose --env-file ./.env up -d
 ```
 
 This will start the PostgreSQL database and the Documenso application containers.
@@ -115,6 +115,7 @@ Here's a markdown table documenting all the provided environment variables:
 | `NEXT_PRIVATE_SIGNING_LOCAL_FILE_PATH`       | The path to the key file, default `/opt/documenso/cert.p12`.                                        |
 | `NEXT_PUBLIC_UPLOAD_TRANSPORT`               | The transport to use for file uploads (database or s3).                                             |
 | `NEXT_PRIVATE_UPLOAD_ENDPOINT`               | The endpoint for the S3 storage transport (for third-party S3-compatible providers).                |
+| `NEXT_PRIVATE_UPLOAD_FORCE_PATH_STYLE`       | Whether to force path-style URLs for the S3 storage transport.                                      |
 | `NEXT_PRIVATE_UPLOAD_REGION`                 | The region for the S3 storage transport (defaults to us-east-1).                                    |
 | `NEXT_PRIVATE_UPLOAD_BUCKET`                 | The bucket to use for the S3 storage transport.                                                     |
 | `NEXT_PRIVATE_UPLOAD_ACCESS_KEY_ID`          | The access key ID for the S3 storage transport.                                                     |

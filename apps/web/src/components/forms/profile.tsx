@@ -55,11 +55,8 @@ export const ProfileForm = ({ className, user }: ProfileFormProps) => {
   });
 
   const isSubmitting = form.formState.isSubmitting;
-  const hasTwoFactorAuthentication = user.twoFactorEnabled;
 
   const { mutateAsync: updateProfile } = trpc.profile.updateProfile.useMutation();
-  const { mutateAsync: deleteAccount, isLoading: isDeletingAccount } =
-    trpc.profile.deleteAccount.useMutation();
 
   const onFormSubmit = async ({ name, signature }: TProfileFormSchema) => {
     try {

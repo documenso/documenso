@@ -5,7 +5,7 @@ import {
   diffFieldChanges,
 } from '@documenso/lib/utils/document-audit-logs';
 import { prisma } from '@documenso/prisma';
-import type { FieldType } from '@documenso/prisma/client';
+import type { Field, FieldType } from '@documenso/prisma/client';
 import { SendStatus, SigningStatus } from '@documenso/prisma/client';
 
 export interface SetFieldsForDocumentOptions {
@@ -29,7 +29,7 @@ export const setFieldsForDocument = async ({
   documentId,
   fields,
   requestMetadata,
-}: SetFieldsForDocumentOptions) => {
+}: SetFieldsForDocumentOptions): Promise<Field[]> => {
   const document = await prisma.document.findFirst({
     where: {
       id: documentId,
@@ -99,7 +99,7 @@ export const setFieldsForDocument = async ({
     });
 
   const persistedFields = await prisma.$transaction(async (tx) => {
-    await Promise.all(
+    return await Promise.all(
       linkedFields.map(async (field) => {
         const fieldSignerEmail = field.signerEmail.toLowerCase();
 
@@ -218,5 +218,13 @@ export const setFieldsForDocument = async ({
     });
   }
 
-  return persistedFields;
+  // Filter out fields that have been removed or have been updated.
+  const filteredFields = existingFields.filter((field) => {
+    const isRemoved = removedFields.find((removedField) => removedField.id === field.id);
+    const isUpdated = persistedFields.find((persistedField) => persistedField.id === field.id);
+
+    return !isRemoved && !isUpdated;
+  });
+
+  return [...filteredFields, ...persistedFields];
 };

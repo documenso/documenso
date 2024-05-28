@@ -91,14 +91,24 @@
     @apply border-border;
   }
 
-  html,
-  body {
-    scrollbar-gutter: stable;
-  }
-
   body {
     @apply bg-background text-foreground;
     font-feature-settings: 'rlig' 1, 'calt' 1;
+  }
+}
+
+/*
+ * Custom CSS for printing reports
+ * - Sets page margins to 0.5 inches
+ * - Hides the header and footer
+ * - Hides the print button
+ * - Sets page size to A4
+ * - Sets the font size to 12pt
+ */
+.print-provider {
+  @page {
+    margin: 1in;
+    size: A4;
   }
 }
 
@@ -130,7 +140,7 @@
   background: rgb(100 116 139 / 0.5);
 }
 
- /* Custom Swagger Dark Theme */
+/* Custom Swagger Dark Theme */
 .swagger-dark-theme .swagger-ui {
   filter: invert(88%) hue-rotate(180deg);
 }

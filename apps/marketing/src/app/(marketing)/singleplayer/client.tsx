@@ -8,7 +8,7 @@ import { useRouter } from 'next/navigation';
 import { useAnalytics } from '@documenso/lib/client-only/hooks/use-analytics';
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { base64 } from '@documenso/lib/universal/base64';
-import { putFile } from '@documenso/lib/universal/upload/put-file';
+import { putPdfFile } from '@documenso/lib/universal/upload/put-file';
 import type { Field, Recipient } from '@documenso/prisma/client';
 import { DocumentDataType, Prisma } from '@documenso/prisma/client';
 import { trpc } from '@documenso/trpc/react';
@@ -115,7 +115,7 @@ export const SinglePlayerClient = () => {
     }
 
     try {
-      const putFileData = await putFile(uploadedFile.file);
+      const putFileData = await putPdfFile(uploadedFile.file);
 
       const documentToken = await createSinglePlayerDocument({
         documentData: {
@@ -158,9 +158,11 @@ export const SinglePlayerClient = () => {
     expired: null,
     signedAt: null,
     readStatus: 'OPENED',
+    documentDeletedAt: null,
     signingStatus: 'NOT_SIGNED',
     sendStatus: 'NOT_SENT',
     role: 'SIGNER',
+    authOptions: null,
   };
 
   const onFileDrop = async (file: File) => {
@@ -246,6 +248,8 @@ export const SinglePlayerClient = () => {
                   recipients={uploadedFile ? [placeholderRecipient] : []}
                   fields={fields}
                   onSubmit={onFieldsSubmit}
+                  canGoBack={true}
+                  isDocumentPdfLoaded={true}
                 />
               </fieldset>
 

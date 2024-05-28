@@ -112,22 +112,63 @@ export const findDocuments = async ({
     };
   }
 
-  const whereClause: Prisma.DocumentWhereInput = {
-    ...termFilters,
-    ...filters,
+  let deletedFilter: Prisma.DocumentWhereInput = {
     AND: {
       OR: [
         {
-          status: ExtendedDocumentStatus.COMPLETED,
+          userId: user.id,
+          deletedAt: null,
         },
         {
-          status: {
-            not: ExtendedDocumentStatus.COMPLETED,
+          Recipient: {
+            some: {
+              email: user.email,
+              documentDeletedAt: null,
+            },
           },
-          deletedAt: null,
         },
       ],
     },
+  };
+
+  if (team) {
+    deletedFilter = {
+      AND: {
+        OR: team.teamEmail
+          ? [
+              {
+                teamId: team.id,
+                deletedAt: null,
+              },
+              {
+                User: {
+                  email: team.teamEmail.email,
+                },
+                deletedAt: null,
+              },
+              {
+                Recipient: {
+                  some: {
+                    email: team.teamEmail.email,
+                    documentDeletedAt: null,
+                  },
+                },
+              },
+            ]
+          : [
+              {
+                teamId: team.id,
+                deletedAt: null,
+              },
+            ],
+      },
+    };
+  }
+
+  const whereClause: Prisma.DocumentWhereInput = {
+    ...termFilters,
+    ...filters,
+    ...deletedFilter,
   };
 
   if (period) {

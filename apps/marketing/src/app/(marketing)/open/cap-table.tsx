@@ -5,8 +5,6 @@ import { useEffect, useState } from 'react';
 
 import { Cell, Legend, Pie, PieChart, Tooltip } from 'recharts';
 
-import { cn } from '@documenso/ui/lib/utils';
-
 import { CAP_TABLE } from './data';
 
 const COLORS = ['#7fd843', '#a2e771', '#c6f2a4'];
@@ -49,10 +47,12 @@ export const CapTable = ({ className, ...props }: CapTableProps) => {
     setIsSSR(false);
   }, []);
   return (
-    <div className={cn('flex flex-col', className)} {...props}>
-      <h3 className="px-4 text-lg font-semibold">Cap Table</h3>
+    <div className={className} {...props}>
+      <div className="border-border flex flex-col justify-center rounded-2xl border p-6 pl-2 shadow-sm hover:shadow">
+        <div className="mb-6 flex px-4">
+          <h3 className="text-lg font-semibold">Cap Table</h3>
+        </div>
 
-      <div className="border-border mt-2.5 flex flex-1 items-center justify-center rounded-2xl border shadow-sm hover:shadow">
         {!isSSR && (
           <PieChart width={400} height={400}>
             <Pie
