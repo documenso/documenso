@@ -13,6 +13,8 @@ import { ZCheckboxFieldMeta } from '@documenso/lib/types/field-field-meta';
 import type { Recipient } from '@documenso/prisma/client';
 import type { FieldWithSignatureAndFieldMeta } from '@documenso/prisma/types/field-with-signature-and-fieldmeta';
 import { trpc } from '@documenso/trpc/react';
+import { cn } from '@documenso/ui/lib/utils';
+import { Card, CardContent } from '@documenso/ui/primitives/card';
 import { Checkbox } from '@documenso/ui/primitives/checkbox';
 import { Label } from '@documenso/ui/primitives/label';
 import { useToast } from '@documenso/ui/primitives/use-toast';
@@ -117,29 +119,66 @@ export const CheckboxField = ({ field, recipient }: CheckboxFieldProps) => {
       )}
 
       {!field.inserted && (
-        <div className="z-10 space-y-2">
+        <div className="z-10 space-y-4">
           {parsedFieldMeta.values?.map(
             (item: { value: string; checked: boolean }, index: number) => (
-              <div key={index} className="flex items-center space-x-2">
-                <Checkbox
-                  id={`checkbox-${index}`}
-                  checked={item.checked}
-                  onCheckedChange={() => handleCheckboxChange(item.value)}
-                />
-                <Label htmlFor={`checkbox-${index}`}>{item.value}</Label>
-              </div>
+              <Card
+                id={String(index)}
+                key={index}
+                className={cn(
+                  'm-1 p-2',
+                  {
+                    'border-yellow-300 ring-2 ring-yellow-100 ring-offset-2 ring-offset-yellow-100':
+                      !field.inserted,
+                  },
+                  {
+                    'border-red-500 ring-2 ring-red-200 ring-offset-2 ring-offset-red-200 hover:text-red-500':
+                      !field.inserted && parsedFieldMeta.required,
+                  },
+                )}
+              >
+                <CardContent className="text-foreground hover:shadow-primary-foreground group flex h-full w-full flex-row items-center space-x-2 p-2">
+                  <Checkbox
+                    id={`checkbox-${index}`}
+                    checked={checkedValues.includes(item.value)}
+                    onCheckedChange={() => handleCheckboxChange(item.value)}
+                  />
+                  <Label htmlFor={`checkbox-${index}`}>{item.value}</Label>
+                </CardContent>
+              </Card>
             ),
           )}
         </div>
       )}
 
       {field.inserted && (
-        <div className="flex flex-wrap justify-center gap-2">
-          {field.customText.split(',').map((value: string, index: number) => (
-            <div key={index} className="rounded-md bg-black px-3 py-1 text-sm text-white">
-              {value}
-            </div>
-          ))}
+        <div className="flex flex-col gap-y-2">
+          {parsedFieldMeta.values?.map(
+            (item: { value: string; checked: boolean }, index: number) => (
+              <Card
+                key={index}
+                className={cn(
+                  'm-1 flex items-center justify-center p-2',
+                  {
+                    'border-documenso ring-documenso-200 ring-offset-documenso-200 ring-2 ring-offset-2':
+                      field.inserted,
+                  },
+                  {
+                    'bg-documenso/20 border-documenso ring-documenso-200 ring-offset-documenso-200 ring-2 ring-offset-2':
+                      field.inserted && field.customText.split(',').includes(item.value),
+                  },
+                )}
+              >
+                <CardContent className="flex h-full w-full flex-row items-center space-x-2 p-2">
+                  <Checkbox
+                    id={`checkbox-${index}`}
+                    checked={field.customText.split(',').includes(item.value)}
+                  />
+                  <Label htmlFor={`checkbox-${index}`}>{item.value}</Label>
+                </CardContent>
+              </Card>
+            ),
+          )}
         </div>
       )}
     </SigningFieldContainer>

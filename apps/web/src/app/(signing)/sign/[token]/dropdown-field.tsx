@@ -4,7 +4,7 @@ import { useEffect, useState, useTransition } from 'react';
 
 import { useRouter } from 'next/navigation';
 
-import { ChevronDown, Loader } from 'lucide-react';
+import { Loader } from 'lucide-react';
 
 import { DO_NOT_INVALIDATE_QUERY_ON_MUTATION } from '@documenso/lib/constants/trpc';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
@@ -13,6 +13,7 @@ import { ZDropdownFieldMeta } from '@documenso/lib/types/field-field-meta';
 import type { Recipient } from '@documenso/prisma/client';
 import type { FieldWithSignatureAndFieldMeta } from '@documenso/prisma/types/field-with-signature-and-fieldmeta';
 import { trpc } from '@documenso/trpc/react';
+import { cn } from '@documenso/ui/lib/utils';
 import {
   Select,
   SelectContent,
@@ -138,7 +139,15 @@ export const DropdownField = ({ field, recipient }: DropdownFieldProps) => {
         {!field.inserted && (
           <p className="group-hover:text-primary text-muted-foreground flex flex-col items-center justify-center duration-200">
             <Select value={fieldMeta.defaultValue} onValueChange={handleSelectItem}>
-              <SelectTrigger className="text-muted-foreground z-10 h-full w-full border-none ring-0 focus:ring-0">
+              <SelectTrigger
+                className={cn(
+                  'text-muted-foreground z-10 h-full w-full border-none ring-0 focus:ring-0',
+                  {
+                    'hover:text-red-300': fieldMeta.required,
+                    'hover:text-yellow-300': !fieldMeta.required,
+                  },
+                )}
+              >
                 <SelectValue placeholder={'-- Select --'} />
               </SelectTrigger>
               <SelectContent className="w-full ring-0 focus:ring-0" position="popper">
@@ -155,7 +164,7 @@ export const DropdownField = ({ field, recipient }: DropdownFieldProps) => {
         {field.inserted && (
           <p className="text-muted-foreground flex items-center justify-center gap-x-1 duration-200">
             <span className="flex items-center justify-center gap-x-1 text-xs">
-              {field.customText} <ChevronDown />
+              {field.customText}
             </span>
           </p>
         )}

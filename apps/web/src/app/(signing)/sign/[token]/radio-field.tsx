@@ -13,6 +13,8 @@ import { ZRadioFieldMeta } from '@documenso/lib/types/field-field-meta';
 import type { Recipient } from '@documenso/prisma/client';
 import type { FieldWithSignatureAndFieldMeta } from '@documenso/prisma/types/field-with-signature-and-fieldmeta';
 import { trpc } from '@documenso/trpc/react';
+import { cn } from '@documenso/ui/lib/utils';
+import { Card, CardContent } from '@documenso/ui/primitives/card';
 import { Label } from '@documenso/ui/primitives/label';
 import { RadioGroup, RadioGroupItem } from '@documenso/ui/primitives/radio-group';
 import { useToast } from '@documenso/ui/primitives/use-toast';
@@ -122,21 +124,63 @@ export const RadioField = ({ field, recipient }: RadioFieldProps) => {
       {!field.inserted && (
         <RadioGroup onValueChange={handleSelectItem} className="z-10">
           {parsedFieldMeta.values?.map((item, index) => (
-            <div key={index} className="flex items-center space-x-2">
-              <RadioGroupItem value={item.value} id={`option-${index}`} />
-              <Label htmlFor={`option-${index}`}>{item.value}</Label>
-            </div>
+            <Card
+              id={String(index)}
+              key={index}
+              className={cn(
+                'm-1 p-2',
+                {
+                  'border-yellow-300 ring-2 ring-yellow-100 ring-offset-2 ring-offset-yellow-100':
+                    !field.inserted,
+                },
+                {
+                  'border-red-500 ring-2 ring-red-200 ring-offset-2 ring-offset-red-200 hover:text-red-500':
+                    !field.inserted && parsedFieldMeta.required,
+                },
+              )}
+            >
+              <CardContent className="text-foreground hover:shadow-primary-foreground group flex h-full w-full flex-row items-center space-x-2 p-2">
+                <RadioGroupItem
+                  value={item.value}
+                  id={`option-${index}`}
+                  checked={item.value === field.customText}
+                />
+                <Label htmlFor={`option-${index}`}>{item.value}</Label>
+              </CardContent>
+            </Card>
           ))}
         </RadioGroup>
       )}
 
       {field.inserted && (
-        <div className="">
-          <RadioGroup className="flex items-center justify-center gap-x-1 duration-200">
-            <RadioGroupItem checked value={field.customText} id={`option-checked`} />
-            <Label htmlFor={`option-checked`}>{field.customText}</Label>
-          </RadioGroup>
-        </div>
+        <RadioGroup>
+          {parsedFieldMeta.values?.map((item, index) => (
+            <Card
+              id={String(index)}
+              key={index}
+              className={cn(
+                'm-1 flex items-center justify-center p-2',
+                {
+                  'border-documenso ring-documenso-200 ring-offset-documenso-200 ring-2 ring-offset-2':
+                    field.inserted,
+                },
+                {
+                  'bg-documenso/20 border-documenso ring-documenso-200 ring-offset-documenso-200 ring-2 ring-offset-2':
+                    field.inserted && item.value === field.customText,
+                },
+              )}
+            >
+              <CardContent className="flex h-full w-full flex-row items-center space-x-2 p-2">
+                <RadioGroupItem
+                  value={item.value}
+                  id={`option-${index}`}
+                  checked={item.value === field.customText}
+                />
+                <Label htmlFor={`option-${index}`}>{item.value}</Label>
+              </CardContent>
+            </Card>
+          ))}
+        </RadioGroup>
       )}
     </SigningFieldContainer>
   );
