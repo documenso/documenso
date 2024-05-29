@@ -1,0 +1,138 @@
+{
+  "index": {
+    "title": "Home",
+    "type": "page",
+    "theme": {
+      "layout": "full",
+      "sidebar": false
+    },
+    "display": "hidden"
+  },
+  "get-started": {
+    "title": "Get Started",
+    "type": "page",
+    "display": "hidden"
+  },
+  "public-api": {
+    "title": "API",
+    "type": "page",
+    "display": "hidden"
+  },
+  "webhooks": {
+    "title": "Webhooks",
+    "type": "page",
+    "display": "hidden"
+  },
+  "local-development": {
+    "title": "Local Development",
+    "type": "page",
+    "display": "hidden"
+  },
+  "release-notes": {
+    "title": "Release Notes",
+    "type": "page",
+    "display": "hidden"
+  },
+  "licenses": {
+    "title": "Licenses",
+    "type": "page",
+    "display": "hidden"
+  },
+  "hosting-start": {
+    "title": "Getting Started",
+    "type": "page",
+    "display": "hidden"
+  },
+  "documents": {
+    "title": "Documents",
+    "type": "page",
+    "display": "hidden"
+  },
+  "templates": {
+    "title": "Templates",
+    "type": "page",
+    "display": "hidden"
+  },
+  "contributing": {
+    "title": "Contributing Guide",
+    "type": "page",
+    "display": "hidden"
+  },
+  "user": {
+    "title": "Learn",
+    "type": "menu",
+    "items": {
+      "first-steps": {
+        "title": "First Steps",
+        "href": "/get-started"
+      },
+      "documents": {
+        "title": "Signing Documents",
+        "href": "/documents"
+      },
+      "templates": {
+        "title": "Templates",
+        "href": "/templates"
+      }
+    }
+  },
+  "developer": {
+    "title": "Build",
+    "type": "menu",
+    "items": {
+      "local-development": {
+        "title": "Local Development",
+        "href": "/local-development"
+      },
+      "contributing": {
+        "title": "Contributing Guide",
+        "href": "/contributing"
+      },
+      "public-api": {
+        "title": "API",
+        "href": "/public-api"
+      },
+      "webhooks": {
+        "title": "Webhooks",
+        "href": "/webhooks"
+      }
+    }
+  },
+  "host": {
+    "title": "Host",
+    "type": "menu",
+    "items": {
+      "local-development": {
+        "title": "Licenses",
+        "href": "/licenses"
+      },
+      "hosting-start": {
+        "title": "Getting Stared",
+        "href": "/hosting-start"
+      }
+    }
+  },
+  "updates": {
+    "title": "What's New",
+    "type": "menu",
+    "items": {
+      "changelog": {
+        "title": "Release Notes",
+        "href": "/release-notes"
+      },
+      "blog": {
+        "title": "Blog",
+        "href": "https://documenso.com/blog",
+        "newWindow": true
+      }
+    }
+  },
+  "---": {
+    "type": "separator"
+  },
+  "GitHub": {
+    "title": "View on GitHub",
+    "href": "https://documen.so/github",
+    "newWindow": true
+  }
+}

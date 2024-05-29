@@ -1,0 +1,122 @@
+import Image from 'next/image';
+import Link from 'next/link';
+
+import backgroundPattern from '@documenso/assets/images/background-pattern.png';
+import cardBeautifulFigure from '@documenso/assets/images/card-beautiful-figure.png';
+import cardConnectionsFigure from '@documenso/assets/images/card-connections-figure.png';
+import cardPaidFigure from '@documenso/assets/images/card-paid-figure.png';
+import cardSharingFigure from '@documenso/assets/images/card-sharing-figure.png';
+import { cn } from '@documenso/ui/lib/utils';
+import { Card, CardContent, CardTitle } from '@documenso/ui/primitives/card';
+
+export const Wrapper = ({ children }) => {
+  return <div className="p-20">{children}</div>;
+};
+
+<Wrapper>
+
+<div className="flex flex-col items-center mb-16">
+  # <span className="text-center text-4xl font-bold leading-tight tracking-tight md:text-[48px] lg:text-[64px]">Documenso Docs</span>
+
+  <span className="-mt-1 text-lg">Document signing, finally open source</span>
+</div>
+
+<div className="mt-6 grid grid-cols-2 gap-8 md:mt-8">
+<Link href="/get-started">
+        <Card className="col-span-2 lg:col-span-1 border border-border">
+          <CardContent className="grid grid-cols-1 gap-8 p-6 max-h-[460px]">
+            <span className="text-foreground/80 leading-relaxed">
+              <strong className="block">Learn</strong>
+              Learn how to get started with your account and leverage our advanced features to level up your productivity.
+            </span>
+
+            <div className="flex items-center justify-center p-8">
+              <Image
+                src={cardBeautifulFigure}
+                alt="its fast"
+                className="w-full max-w-xs dark:contrast-[70%] dark:hue-rotate-180 dark:invert"
+              />
+            </div>
+          </CardContent>
+        </Card>
+
+</Link>
+
+<Link href='/local-development'>
+        <Card className="col-span-2 lg:col-span-1 border border-border">
+          <CardContent className="grid grid-cols-1 gap-8 p-6 max-h-[460px]">
+            <span className="text-foreground/80 leading-relaxed">
+              <strong className="block">Build</strong>
+              Everything you need to set up your local development environment.
+              Use our API and utilize webhooks for seamless integration.
+            </span>
+
+            <div className="flex items-center justify-center p-8">
+              <Image
+                src={cardConnectionsFigure}
+                alt="its fast"
+                className="w-full max-w-sm dark:contrast-[70%] dark:hue-rotate-180 dark:invert"
+              />
+            </div>
+          </CardContent>
+        </Card>
+
+</Link>
+      </div>
+
+## About Documenso
+
+Signing documents digitally should be fast and easy and should be the best practice for every document signed worldwide. This is technically quite easy today, but it also introduces a new party to every signature: The signing tool providers. While this is not a problem in itself, it should make us think about how we want these providers of trust to work. Documenso aims to be the world's most trusted document-signing tool. This trust is built by empowering you to self-host Documenso and review how it works under the hood.
+
+Join us in creating the next generation of open trust infrastructure.
+
+## Tech Stack
+
+- [Typescript](https://www.typescriptlang.org/) - Language
+- [Next.js](https://nextjs.org/) - Framework
+- [Prisma](https://www.prisma.io/) - ORM
+- [Tailwind](https://tailwindcss.com/) - CSS
+- [shadcn/ui](https://ui.shadcn.com/) - Component Library
+- [NextAuth.js](https://next-auth.js.org/) - Authentication
+- [react-email](https://react.email/) - Email Templates
+- [tRPC](https://trpc.io/) - API
+- [@documenso/pdf-sign](https://www.npmjs.com/package/@documenso/pdf-sign) - PDF Signatures
+- [React-PDF](https://github.com/wojtekmaj/react-pdf) - Viewing PDFs
+- [PDF-Lib](https://github.com/Hopding/pdf-lib) - PDF manipulation
+- [Stripe](https://stripe.com/) - Payments
+- [Vercel](https://vercel.com) - Hosting
+
+<div className="mt-16 flex items-center justify-center gap-4">
+  <a href="https://documen.so/discord">
+    <img
+      src="https://img.shields.io/badge/Discord-documen.so/discord-%235865F2"
+      alt="Join Documenso on Discord"
+    />
+  </a>
+  <a href="https://github.com/documenso/documenso/stargazers">
+    <img src="https://img.shields.io/github/stars/documenso/documenso" alt="Github Stars" />
+  </a>
+  <a href="https://github.com/documenso/documenso/blob/main/LICENSE">
+    <img src="https://img.shields.io/badge/license-AGPLv3-purple" alt="License" />
+  </a>
+  <a href="https://github.com/documenso/documenso/pulse">
+    <img
+      src="https://img.shields.io/github/commit-activity/m/documenso/documenso"
+      alt="Commits-per-month"
+    />
+  </a>
+  <a href="https://vscode.dev/redirect?url=vscode://ms-vscode-remote.remote-containers/cloneInVolume?url=https://github.com/documenso/documenso">
+    <img
+      alt="open in devcontainer"
+      src="https://img.shields.io/static/v1?label=Dev%20Containers&message=Enabled&color=blue&logo=visualstudiocode"
+    />
+  </a>
+  <a href="https://github.com/documenso/documenso/blob/main/CODE_OF_CONDUCT.md">
+    <img
+      src="https://img.shields.io/badge/Contributor%20Covenant-2.1-4baaaa.svg"
+      alt="Contributor Covenant"
+    />
+  </a>
+</div>
+
+</Wrapper>
