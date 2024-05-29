@@ -29,3 +29,7 @@ export const getCompletedDocumentsMonthly = async () => {
     cume_count: Number(row.cume_count),
   }));
 };
+
+export type GetCompletedDocumentsMonthlyResult = Awaited<
+  ReturnType<typeof getCompletedDocumentsMonthly>
+>;

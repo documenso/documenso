@@ -27,3 +27,5 @@ export const getUserMonthlyGrowth = async () => {
     cume_count: Number(row.cume_count),
   }));
 };
+
+export type GetUserMonthlyGrowthResult = Awaited<ReturnType<typeof getUserMonthlyGrowth>>;
