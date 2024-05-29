@@ -94,7 +94,6 @@ export const DocumentReadOnlyFields = ({ documentMeta, fields }: DocumentReadOnl
                     {
                       type: P.union(
                         FieldType.NAME,
-                        FieldType.TEXT,
                         FieldType.EMAIL,
                         FieldType.NUMBER,
                         FieldType.RADIO,
@@ -104,6 +103,7 @@ export const DocumentReadOnlyFields = ({ documentMeta, fields }: DocumentReadOnl
                     },
                     () => field.customText,
                   )
+                  .with({ type: FieldType.TEXT }, () => field.customText.substring(0, 50) + '...')
                   .with({ type: FieldType.DATE }, () =>
                     convertToLocalSystemFormat(
                       field.customText,

@@ -2,10 +2,13 @@
 
 import React from 'react';
 
+import { X } from 'lucide-react';
+
 import { type TRecipientActionAuth } from '@documenso/lib/types/document-auth';
 import { FieldType } from '@documenso/prisma/client';
 import type { FieldWithSignature } from '@documenso/prisma/types/field-with-signature';
 import { FieldRootContainer } from '@documenso/ui/components/field/field';
+import { cn } from '@documenso/ui/lib/utils';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@documenso/ui/primitives/tooltip';
 
 import { useRequiredDocumentAuthContext } from './document-auth-provider';
@@ -34,7 +37,7 @@ export type SignatureFieldProps = {
    * The auth values will be passed in if available.
    */
   onSign?: (documentAuthValue?: TRecipientActionAuth) => Promise<void> | void;
-  onRemove?: () => Promise<void> | void;
+  onRemove?: (fieldType?: string) => Promise<void> | void;
   type?: 'Date' | 'Email' | 'Name' | 'Signature' | 'Radio' | 'Dropdown' | 'Number' | 'Checkbox';
   tooltipText?: string | null;
 };
@@ -102,41 +105,62 @@ export const SigningFieldContainer = ({
     await onRemove?.();
   };
 
+  const onClearCheckBoxValues = async (fieldType?: string) => {
+    if (!field.inserted) {
+      return;
+    }
+
+    await onRemove?.(fieldType);
+  };
+
   return (
-    <FieldRootContainer field={field}>
-      {!field.inserted && !loading && (
-        <button
-          type="submit"
-          className="absolute inset-0 z-10 h-full w-full rounded-md border"
-          onClick={async () => handleInsertField()}
-        />
-      )}
+    <div className={cn(type === 'Checkbox' ? 'group' : '')}>
+      <FieldRootContainer field={field}>
+        {!field.inserted && !loading && (
+          <button
+            type="submit"
+            className="absolute inset-0 z-10 h-full w-full rounded-md border"
+            onClick={async () => handleInsertField()}
+          />
+        )}
 
-      {type === 'Date' && field.inserted && !loading && (
-        <Tooltip delayDuration={0}>
-          <TooltipTrigger asChild>
-            <button
-              className="text-destructive bg-background/40 absolute inset-0 z-10 flex h-full w-full items-center justify-center rounded-md text-sm opacity-0 backdrop-blur-sm duration-200 group-hover:opacity-100"
-              onClick={onRemoveSignedFieldClick}
-            >
-              Remove
-            </button>
-          </TooltipTrigger>
+        {type === 'Date' && field.inserted && !loading && (
+          <Tooltip delayDuration={0}>
+            <TooltipTrigger asChild>
+              <button
+                className="text-destructive bg-background/40 absolute inset-0 z-10 flex h-full w-full items-center justify-center rounded-md text-sm opacity-0 backdrop-blur-sm duration-200 group-hover:opacity-100"
+                onClick={onRemoveSignedFieldClick}
+              >
+                Remove
+              </button>
+            </TooltipTrigger>
 
-          {tooltipText && <TooltipContent className="max-w-xs">{tooltipText}</TooltipContent>}
-        </Tooltip>
-      )}
+            {tooltipText && <TooltipContent className="max-w-xs">{tooltipText}</TooltipContent>}
+          </Tooltip>
+        )}
 
-      {type !== 'Date' && field.inserted && !loading && (
-        <button
-          className="text-destructive bg-background/50 absolute inset-0 z-10 flex h-full w-full items-center justify-center rounded-md text-sm opacity-0 backdrop-blur-sm duration-200 group-hover:opacity-100"
-          onClick={onRemoveSignedFieldClick}
-        >
-          Remove
-        </button>
-      )}
+        {type === 'Checkbox' && field.inserted && !loading && (
+          <button
+            className="dark:bg-background absolute -bottom-10 flex items-center justify-evenly rounded-md border bg-gray-900 opacity-0 group-hover:opacity-100"
+            onClick={() => void onClearCheckBoxValues(type)}
+          >
+            <span className="dark:text-muted-foreground/50 dark:hover:text-muted-foreground dark:hover:bg-foreground/10 rounded-md p-1 text-gray-400 transition-colors hover:bg-white/10 hover:text-gray-100">
+              <X className="h-4 w-4" />
+            </span>
+          </button>
+        )}
 
-      {children}
-    </FieldRootContainer>
+        {type !== 'Date' && type !== 'Checkbox' && field.inserted && !loading && (
+          <button
+            className="text-destructive bg-background/50 absolute inset-0 z-10 flex h-full w-full items-center justify-center rounded-md text-sm opacity-0 backdrop-blur-sm duration-200 group-hover:opacity-100"
+            onClick={onRemoveSignedFieldClick}
+          >
+            Remove
+          </button>
+        )}
+
+        {children}
+      </FieldRootContainer>
+    </div>
   );
 };

@@ -5,13 +5,19 @@ import { match } from 'ts-pattern';
 
 import { prisma } from '@documenso/prisma';
 import { DocumentStatus, FieldType, SigningStatus } from '@documenso/prisma/client';
+import { checkboxValidationSigns } from '@documenso/ui/primitives/document-flow/field-items-advanced-settings/constants';
 
 import { DEFAULT_DOCUMENT_DATE_FORMAT } from '../../constants/date-formats';
 import { DEFAULT_DOCUMENT_TIME_ZONE } from '../../constants/time-zones';
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '../../types/document-audit-logs';
 import type { TRecipientActionAuth } from '../../types/document-auth';
-import { ZNumberFieldMeta, ZTextFieldMeta } from '../../types/field-field-meta';
+import {
+  ZCheckboxFieldMeta,
+  ZNumberFieldMeta,
+  ZRadioFieldMeta,
+  ZTextFieldMeta,
+} from '../../types/field-field-meta';
 import type { RequestMetadata } from '../../universal/extract-request-metadata';
 import { createDocumentAuditLogData } from '../../utils/document-audit-logs';
 import { extractDocumentAuthMethods } from '../../utils/document-auth';
@@ -132,6 +138,41 @@ export const signFieldWithToken = async ({
       throw new Error(
         `Value ${value} exceeds the character limit of ${parsedFieldMeta.characterLimit}`,
       );
+    }
+  }
+
+  if (field.type === FieldType.RADIO) {
+    const parsedFieldMeta = ZRadioFieldMeta.parse(field.fieldMeta);
+
+    if (parsedFieldMeta.required && !value) {
+      throw new Error(`Choosing an option is required for field ${field.id}`);
+    }
+  }
+
+  if (field.type === FieldType.CHECKBOX) {
+    const parsedFieldMeta = ZCheckboxFieldMeta.parse(field.fieldMeta);
+    const checkboxFieldValues = value.split(',');
+    const checkboxValidationRule = parsedFieldMeta.validationRule;
+    const checkboxValidationLength = parsedFieldMeta.validationLength;
+    const validationSign = checkboxValidationSigns.find(
+      (sign) => sign.label === checkboxValidationRule,
+    )?.value;
+
+    if (parsedFieldMeta.required && checkboxFieldValues.length === 0) {
+      throw new Error(`Selecting an option is required for field ${field.id}`);
+    }
+
+    if (checkboxValidationRule && checkboxValidationLength) {
+      const lengthCondition =
+        (validationSign === '>=' && checkboxFieldValues.length < checkboxValidationLength) ||
+        (validationSign === '=' && checkboxFieldValues.length !== checkboxValidationLength) ||
+        (validationSign === '<=' && checkboxFieldValues.length > checkboxValidationLength);
+
+      if (lengthCondition) {
+        throw new Error(
+          `${checkboxValidationRule.toLowerCase()} ${checkboxValidationLength} options`,
+        );
+      }
     }
   }
 
