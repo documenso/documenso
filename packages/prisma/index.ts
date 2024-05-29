@@ -29,3 +29,5 @@ export const kyselyPrisma = remember('kyselyPrisma', () =>
     }),
   ),
 );
+
+export { sql } from 'kysely';
