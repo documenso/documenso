@@ -106,11 +106,16 @@ export default async function AdminStatsPage() {
       <div className="mt-16">
         <h3 className="text-3xl font-semibold">Charts</h3>
         <div className="mt-5 grid grid-cols-2 gap-10">
-          <UserWithDocumentChart data={MONTHLY_USERS_SIGNED} title="MAU (created document)" />
+          <UserWithDocumentChart
+            data={MONTHLY_USERS_SIGNED}
+            title="MAU (created document)"
+            tooltip="Monthly Active Users: Users that created at least one Document"
+          />
           <UserWithDocumentChart
             data={MONTHLY_USERS_SIGNED}
             completed
             title="MAU (had document completed)"
+            tooltip="Monthly Active Users: Users that had at least one of their documents completed"
           />
         </div>
       </div>

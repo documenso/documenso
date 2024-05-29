@@ -2,6 +2,8 @@
 
 import { DateTime } from 'luxon';
 import { Bar, BarChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
+import type { TooltipProps } from 'recharts';
+import type { NameType, ValueType } from 'recharts/types/component/DefaultTooltipContent';
 
 import type { GetUserWithDocumentMonthlyGrowth } from '@documenso/lib/server-only/admin/get-users-stats';
 
@@ -11,6 +13,27 @@ export type UserWithDocumentChartProps = {
   data: GetUserWithDocumentMonthlyGrowth;
   completed?: boolean;
   tooltip?: string;
+};
+
+const CustomTooltip = ({
+  active,
+  payload,
+  label,
+  tooltip,
+}: TooltipProps<ValueType, NameType> & { tooltip?: string }) => {
+  if (active && payload && payload.length) {
+    return (
+      <div className="z-100 w-60 space-y-1 rounded-md border border-solid  bg-white p-2 px-3">
+        <p className="">{label}</p>
+        <p className="text-documenso">
+          {`${tooltip} : `}
+          <span className="text-black">{payload[0].value}</span>
+        </p>
+      </div>
+    );
+  }
+
+  return null;
 };
 
 export const UserWithDocumentChart = ({
@@ -45,15 +68,15 @@ export const UserWithDocumentChart = ({
         </div>
 
         <ResponsiveContainer width="100%" height={400}>
-          <BarChart data={formattedData(data, completed)}>
+          <BarChart className="bg-white" data={formattedData(data, completed)}>
             <XAxis dataKey="month" />
             <YAxis />
 
             <Tooltip
+              content={<CustomTooltip tooltip={tooltip} />}
               labelStyle={{
                 color: 'hsl(var(--primary-foreground))',
               }}
-              formatter={(value) => [Number(value).toLocaleString('en-US'), tooltip]}
               cursor={{ fill: 'hsl(var(--primary) / 10%)' }}
             />
 
