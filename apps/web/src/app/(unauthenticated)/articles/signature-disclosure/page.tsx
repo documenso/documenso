@@ -5,7 +5,7 @@ import { Button } from '@documenso/ui/primitives/button';
 export default function SignatureDisclosure() {
   return (
     <div>
-      <article className="prose">
+      <article className="prose dark:prose-invert">
         <h1>Electronic Signature Disclosure</h1>
 
         <h2>Welcome</h2>
