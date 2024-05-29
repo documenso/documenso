@@ -20,7 +20,6 @@
     "seed": "tsx ./seed-database.ts"
   },
   "dependencies": {
-    "@epic-web/remember": "1.0.2",
     "@prisma/client": "5.4.2",
     "kysely": "^0.27.3",
     "prisma": "5.4.2",

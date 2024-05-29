@@ -1,10 +1,10 @@
-import { remember } from '@epic-web/remember';
 import { PrismaClient } from '@prisma/client';
 import { Kysely, PostgresAdapter, PostgresIntrospector, PostgresQueryCompiler } from 'kysely';
 import kyselyExtension from 'prisma-extension-kysely';
 
 import type { DB } from './generated/types';
 import { getDatabaseUrl } from './helper';
+import { remember } from './utils/remember';
 
 export const prisma = remember(
   'prisma',
