@@ -2,13 +2,8 @@
   "$schema": "https://turbo.build/schema.json",
   "pipeline": {
     "build": {
-      "dependsOn": [
-        "^build"
-      ],
-      "outputs": [
-        ".next/**",
-        "!.next/cache/**"
-      ]
+      "dependsOn": ["^build"],
+      "outputs": [".next/**", "!.next/cache/**"]
     },
     "lint": {
       "cache": false
@@ -24,9 +19,7 @@
       "persistent": true
     },
     "start": {
-      "dependsOn": [
-        "^build"
-      ],
+      "dependsOn": ["^build"],
       "cache": false,
       "persistent": true
     },
@@ -34,15 +27,11 @@
       "cache": false
     },
     "test:e2e": {
-      "dependsOn": [
-        "^build"
-      ],
+      "dependsOn": ["^build"],
       "cache": false
     }
   },
-  "globalDependencies": [
-    "**/.env.*local"
-  ],
+  "globalDependencies": ["**/.env.*local"],
   "globalEnv": [
     "APP_VERSION",
     "NEXT_PRIVATE_ENCRYPTION_KEY",
@@ -121,6 +110,7 @@
     "GOOGLE_APPLICATION_CREDENTIALS",
     "E2E_TEST_AUTHENTICATE_USERNAME",
     "E2E_TEST_AUTHENTICATE_USER_EMAIL",
-    "E2E_TEST_AUTHENTICATE_USER_PASSWORD"
+    "E2E_TEST_AUTHENTICATE_USER_PASSWORD",
+    "DISABLE_TELEMETRY"
   ]
 }

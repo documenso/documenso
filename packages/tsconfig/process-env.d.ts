@@ -79,5 +79,7 @@ declare namespace NodeJS {
     DATABASE_URL?: string;
     POSTGRES_PRISMA_URL?: string;
     POSTGRES_URL_NON_POOLING?: string;
+
+    DISABLE_TELEMETRY?: string;
   }
 }

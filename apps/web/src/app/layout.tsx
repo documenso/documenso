@@ -4,12 +4,14 @@ import { Caveat, Inter } from 'next/font/google';
 
 import { AxiomWebVitals } from 'next-axiom';
 import { PublicEnvScript } from 'next-runtime-env';
+import { version } from 'package.json';
 
 import { FeatureFlagProvider } from '@documenso/lib/client-only/providers/feature-flag';
 import { LocaleProvider } from '@documenso/lib/client-only/providers/locale';
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { getServerComponentAllFlags } from '@documenso/lib/server-only/feature-flags/get-server-component-feature-flag';
 import { getLocale } from '@documenso/lib/server-only/headers/get-locale';
+import { sendInstanceInfo } from '@documenso/lib/server-only/telemetry/send-instance-info';
 import { TrpcProvider } from '@documenso/trpc/react';
 import { cn } from '@documenso/ui/lib/utils';
 import { Toaster } from '@documenso/ui/primitives/toaster';
@@ -57,6 +59,13 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   const flags = await getServerComponentAllFlags();
 
   const locale = getLocale();
+
+  void sendInstanceInfo({
+    // TODO: Get actual uniqueId for each user
+    uniqueId: 1,
+    timestamp: new Date(),
+    version,
+  });
 
   return (
     <html
