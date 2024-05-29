@@ -1,5 +1,5 @@
 /// <reference types="../types/next-auth.d.ts" />
-import { KyselyAdapter } from '@auth/kysely-adapter';
+import { PrismaAdapter } from '@next-auth/prisma-adapter';
 import { compare } from '@node-rs/bcrypt';
 import { verifyAuthenticationResponse } from '@simplewebauthn/server';
 import { DateTime } from 'luxon';
@@ -24,11 +24,9 @@ import { ZAuthenticationResponseJSONSchema } from '../types/webauthn';
 import { extractNextAuthRequestMetadata } from '../universal/extract-request-metadata';
 import { getAuthenticatorOptions } from '../utils/authenticator';
 import { ErrorCode } from './error-codes';
-import { db } from './kysely-db/db';
 
 export const NEXT_AUTH_OPTIONS: AuthOptions = {
-  //@ts-expect-error - https://github.com/nextauthjs/next-auth/issues/8660
-  adapter: KyselyAdapter(db),
+  adapter: PrismaAdapter(prisma),
   secret: process.env.NEXTAUTH_SECRET ?? 'secret',
   session: {
     strategy: 'jwt',

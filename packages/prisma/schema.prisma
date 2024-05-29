@@ -2,6 +2,10 @@ generator kysely {
   provider = "prisma-kysely"
 }
 
+generator client {
+  provider = "prisma-client-js"
+}
+
 datasource db {
   provider  = "postgresql"
   url       = env("NEXT_PRIVATE_DATABASE_URL")
