@@ -363,6 +363,7 @@ export const TemplateDirectLinkDialog = ({
                     <div className="relative mt-1">
                       <Input
                         id="copy-direct-link"
+                        disabled
                         value={formatDirectTemplatePath(token).replace(/https?:\/\//, '')}
                         readOnly
                         className="pr-12"
@@ -390,7 +391,7 @@ export const TemplateDirectLinkDialog = ({
                     loading={isDeletingTemplateDirectLink}
                     onClick={() => setCurrentStep('CONFIRM_DELETE')}
                   >
-                    Remove direct linking
+                    Remove
                   </Button>
 
                   <Button type="button" variant="secondary" onClick={() => onOpenChange(false)}>

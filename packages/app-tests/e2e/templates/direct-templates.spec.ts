@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test';
+import { customAlphabet } from 'nanoid';
 
 import { WEBAPP_BASE_URL } from '@documenso/lib/constants/app';
 import {
@@ -14,6 +15,8 @@ import { seedTestEmail, seedUser, unseedUser } from '@documenso/prisma/seed/user
 
 import { apiSignin } from '../fixtures/authentication';
 import { checkDocumentTabCount } from '../fixtures/documents';
+
+const nanoid = customAlphabet('1234567890abcdef', 10);
 
 test.describe.configure({ mode: 'parallel' });
 
@@ -151,7 +154,7 @@ test('[DIRECT_TEMPLATES]: delete direct template link', async ({ page }) => {
     await page.goto(`${WEBAPP_BASE_URL}${formatTemplatesPath(template.team?.url)}`);
     await page.getByRole('cell', { name: 'Use Template' }).getByRole('button').nth(1).click();
     await page.getByRole('menuitem', { name: 'Direct link' }).click();
-    await page.getByRole('button', { name: 'Remove direct linking' }).click();
+    await page.getByRole('button', { name: 'Remove' }).click();
     await page.getByRole('button', { name: 'Confirm' }).click();
     await expect(page.getByText('Direct template link deleted').first()).toBeVisible();
 
@@ -249,7 +252,7 @@ test('[DIRECT_TEMPLATES]: use direct template link with 1 recipient', async ({ p
   await unseedTeam(team.url);
 });
 
-test.skip('[DIRECT_TEMPLATES]: use direct template link with 2 recipients', async ({ page }) => {
+test('[DIRECT_TEMPLATES]: use direct template link with 2 recipients', async ({ page }) => {
   const team = await seedTeam({
     createTeamMembers: 1,
   });
@@ -265,11 +268,11 @@ test.skip('[DIRECT_TEMPLATES]: use direct template link with 2 recipients', asyn
           {
             email: DIRECT_TEMPLATE_RECIPIENT_EMAIL,
             name: DIRECT_TEMPLATE_RECIPIENT_NAME,
-            token: Math.random().toString().slice(2, 7),
+            token: nanoid(),
           },
           {
             email: secondRecipient.email,
-            token: Math.random().toString().slice(1, 7),
+            token: nanoid(),
           },
         ],
       },
