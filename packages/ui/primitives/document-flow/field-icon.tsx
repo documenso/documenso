@@ -17,7 +17,7 @@ const fieldIcons = {
   [FieldType.NAME]: { icon: User, label: 'Name' },
   [FieldType.DATE]: { icon: CalendarDays, label: 'Date' },
   [FieldType.TEXT]: { icon: Type, label: 'Add text' },
-  [FieldType.NUMBER]: { icon: Hash, label: 'Number' },
+  [FieldType.NUMBER]: { icon: Hash, label: 'Add number' },
   [FieldType.RADIO]: { icon: Disc, label: 'Radio' },
   [FieldType.CHECKBOX]: { icon: CheckSquare, label: 'Checkbox' },
   [FieldType.DROPDOWN]: { icon: ChevronDown, label: 'Select' },

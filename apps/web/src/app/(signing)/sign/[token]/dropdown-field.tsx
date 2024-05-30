@@ -35,11 +35,11 @@ export const DropdownField = ({ field, recipient }: DropdownFieldProps) => {
   const router = useRouter();
   const { toast } = useToast();
   const [isPending, startTransition] = useTransition();
-  const [localText, setLocalCustomText] = useState('');
 
   const { executeActionAuthProcedure } = useRequiredDocumentAuthContext();
 
-  const fieldMeta = ZDropdownFieldMeta.parse(field.fieldMeta);
+  const parsedFieldMeta = ZDropdownFieldMeta.parse(field.fieldMeta);
+  const [localChoice, setLocalChoice] = useState(parsedFieldMeta.defaultValue ?? '');
 
   const { mutateAsync: signFieldWithToken, isLoading: isSignFieldWithTokenLoading } =
     trpc.field.signFieldWithToken.useMutation(DO_NOT_INVALIDATE_QUERY_ON_MUTATION);
@@ -53,19 +53,19 @@ export const DropdownField = ({ field, recipient }: DropdownFieldProps) => {
 
   const onSign = async (authOptions?: TRecipientActionAuth) => {
     try {
-      if (!localText) {
+      if (!localChoice) {
         return;
       }
 
       await signFieldWithToken({
         token: recipient.token,
         fieldId: field.id,
-        value: localText,
+        value: localChoice,
         isBase64: true,
         authOptions,
       });
 
-      setLocalCustomText('');
+      setLocalChoice('');
 
       startTransition(() => router.refresh());
     } catch (err) {
@@ -96,6 +96,8 @@ export const DropdownField = ({ field, recipient }: DropdownFieldProps) => {
         fieldId: field.id,
       });
 
+      setLocalChoice(parsedFieldMeta.defaultValue ?? '');
+
       startTransition(() => router.refresh());
     } catch (err) {
       console.error(err);
@@ -109,17 +111,26 @@ export const DropdownField = ({ field, recipient }: DropdownFieldProps) => {
   };
 
   const handleSelectItem = (val: string) => {
-    setLocalCustomText(val);
+    setLocalChoice(val);
   };
 
   useEffect(() => {
-    if (!field.inserted && localText) {
+    if (!field.inserted && localChoice) {
       void executeActionAuthProcedure({
         onReauthFormSubmit: async (authOptions) => await onSign(authOptions),
         actionTarget: field.type,
       });
     }
-  }, [localText]);
+  }, [localChoice]);
+
+  useEffect(() => {
+    if (!field.inserted && parsedFieldMeta.defaultValue) {
+      void executeActionAuthProcedure({
+        onReauthFormSubmit: async (authOptions) => await onSign(authOptions),
+        actionTarget: field.type,
+      });
+    }
+  }, []);
 
   return (
     <div className="pointer-events-none">
@@ -138,20 +149,20 @@ export const DropdownField = ({ field, recipient }: DropdownFieldProps) => {
 
         {!field.inserted && (
           <p className="group-hover:text-primary text-muted-foreground flex flex-col items-center justify-center duration-200">
-            <Select value={fieldMeta.defaultValue} onValueChange={handleSelectItem}>
+            <Select value={parsedFieldMeta.defaultValue} onValueChange={handleSelectItem}>
               <SelectTrigger
                 className={cn(
                   'text-muted-foreground z-10 h-full w-full border-none ring-0 focus:ring-0',
                   {
-                    'hover:text-red-300': fieldMeta.required,
-                    'hover:text-yellow-300': !fieldMeta.required,
+                    'hover:text-red-300': parsedFieldMeta.required,
+                    'hover:text-yellow-300': !parsedFieldMeta.required,
                   },
                 )}
               >
                 <SelectValue placeholder={'-- Select --'} />
               </SelectTrigger>
               <SelectContent className="w-full ring-0 focus:ring-0" position="popper">
-                {fieldMeta?.values?.map((item, index) => (
+                {parsedFieldMeta?.values?.map((item, index) => (
                   <SelectItem key={index} value={item.value} className="ring-0 focus:ring-0">
                     {item.value}
                   </SelectItem>
@@ -163,9 +174,7 @@ export const DropdownField = ({ field, recipient }: DropdownFieldProps) => {
 
         {field.inserted && (
           <p className="text-muted-foreground flex items-center justify-center gap-x-1 duration-200">
-            <span className="flex items-center justify-center gap-x-1 text-xs">
-              {field.customText}
-            </span>
+            <span className="flex items-center justify-center gap-x-1">{field.customText}</span>
           </p>
         )}
       </SigningFieldContainer>

@@ -149,16 +149,6 @@ export const FieldAdvancedSettings = forwardRef<HTMLDivElement, FieldAdvancedSet
 
     const fieldMeta = fieldData?.fieldMeta;
 
-    console.log('\n');
-    console.log('\n');
-    console.log('\n');
-    console.log('\n');
-    console.log('fieldMeta', fieldMeta);
-    console.log('\n');
-    console.log('\n');
-    console.log('\n');
-    console.log('\n');
-
     const localStorageKey = `field_${field.formId}_${field.type}`;
 
     const defaultState: FieldMeta = getDefaultState(field.type);

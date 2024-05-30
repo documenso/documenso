@@ -103,7 +103,7 @@ export const DocumentReadOnlyFields = ({ documentMeta, fields }: DocumentReadOnl
                     },
                     () => field.customText,
                   )
-                  .with({ type: FieldType.TEXT }, () => field.customText.substring(0, 50) + '...')
+                  .with({ type: FieldType.TEXT }, () => field.customText.substring(0, 20) + '...')
                   .with({ type: FieldType.DATE }, () =>
                     convertToLocalSystemFormat(
                       field.customText,

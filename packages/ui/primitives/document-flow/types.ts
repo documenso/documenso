@@ -53,7 +53,7 @@ export const FRIENDLY_FIELD_TYPE: Record<FieldType, string> = {
   [FieldType.NUMBER]: 'Number',
   [FieldType.RADIO]: 'Radio',
   [FieldType.CHECKBOX]: 'Checkbox',
-  [FieldType.DROPDOWN]: 'Dropdown',
+  [FieldType.DROPDOWN]: 'Select',
 };
 
 export interface DocumentFlowStep {

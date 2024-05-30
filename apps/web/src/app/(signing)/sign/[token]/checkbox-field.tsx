@@ -130,6 +130,8 @@ export const CheckboxField = ({ field, recipient }: CheckboxFieldProps) => {
       const isChecked = field.customText.split(',').includes(item.value);
 
       if (!isChecked) {
+        updatedValues = [...checkedValues, item.value];
+
         await removeSignedFieldWithToken({
           token: recipient.token,
           fieldId: field.id,
@@ -145,6 +147,7 @@ export const CheckboxField = ({ field, recipient }: CheckboxFieldProps) => {
         }
       } else {
         updatedValues = checkedValues.filter((v) => v !== item.value);
+
         await removeSignedFieldWithToken({
           token: recipient.token,
           fieldId: field.id,

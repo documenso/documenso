@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useState, useTransition } from 'react';
+import { useEffect, useState, useTransition } from 'react';
 
 import { useRouter } from 'next/navigation';
 
@@ -9,6 +9,7 @@ import { Loader, Type } from 'lucide-react';
 import { DO_NOT_INVALIDATE_QUERY_ON_MUTATION } from '@documenso/lib/constants/trpc';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import type { TRecipientActionAuth } from '@documenso/lib/types/document-auth';
+import type { TTextFieldMeta } from '@documenso/lib/types/field-field-meta';
 import { ZTextFieldMeta } from '@documenso/lib/types/field-field-meta';
 import type { Recipient } from '@documenso/prisma/client';
 import type { FieldWithSignatureAndFieldMeta } from '@documenso/prisma/types/field-with-signature-and-fieldmeta';
@@ -21,6 +22,23 @@ import { useToast } from '@documenso/ui/primitives/use-toast';
 
 import { useRequiredDocumentAuthContext } from './document-auth-provider';
 import { SigningFieldContainer } from './signing-field-container';
+
+const validateText = (text: string, fieldMeta: TTextFieldMeta) => {
+  const errors: Record<string, string[]> = {
+    required: [],
+    characterLimit: [],
+  };
+
+  if (fieldMeta.required && !text) {
+    errors.required.push('This field is required');
+  }
+
+  if (fieldMeta.characterLimit && text.length > fieldMeta.characterLimit) {
+    errors.characterLimit.push(`Text exceeds the character limit of ${fieldMeta.characterLimit}`);
+  }
+
+  return errors;
+};
 
 export type TextFieldProps = {
   field: FieldWithSignatureAndFieldMeta;
@@ -37,6 +55,7 @@ export const TextField = ({ field, recipient }: TextFieldProps) => {
   };
 
   const [errors, setErrors] = useState(initialErrors);
+  const userInputHasErrors = Object.values(errors).some((error) => error.length > 0);
 
   const { executeActionAuthProcedure } = useRequiredDocumentAuthContext();
 
@@ -55,47 +74,28 @@ export const TextField = ({ field, recipient }: TextFieldProps) => {
   const isLoading = isSignFieldWithTokenLoading || isRemoveSignedFieldWithTokenLoading || isPending;
 
   const [showCustomTextModal, setShowCustomTextModal] = useState(false);
-  const [localText, setLocalCustomText] = useState('');
+  const [localText, setLocalCustomText] = useState(parsedFieldMeta.text ?? '');
 
   useEffect(() => {
     if (!showCustomTextModal) {
-      setLocalCustomText('');
+      setLocalCustomText(parsedFieldMeta.text ?? '');
       setErrors(initialErrors);
     }
   }, [showCustomTextModal]);
 
-  const validateText = (text: string) => {
-    const errors: Record<string, string[]> = {
-      required: [],
-      characterLimit: [],
-    };
-
-    if (parsedFieldMeta.required && !text) {
-      errors.required.push('This field is required.');
-    }
-
-    if (parsedFieldMeta.characterLimit && text.length > parsedFieldMeta.characterLimit) {
-      errors.characterLimit.push(
-        `Text exceeds the character limit of ${parsedFieldMeta.characterLimit}.`,
-      );
-    }
-
-    return errors;
-  };
-
-  const handleTextChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
+  const handleTextChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const text = e.target.value;
     setLocalCustomText(text);
 
-    const validationErrors = validateText(text);
+    const validationErrors = validateText(text, parsedFieldMeta);
     setErrors(validationErrors);
-  }, []);
+  };
 
   /**
    * When the user clicks the sign button in the dialog where they enter the text field.
    */
   const onDialogSignClick = () => {
-    const validationErrors = validateText(localText);
+    const validationErrors = validateText(localText, parsedFieldMeta);
 
     if (validationErrors.required.length > 0 || validationErrors.characterLimit.length > 0) {
       setErrors(validationErrors);
@@ -111,24 +111,19 @@ export const TextField = ({ field, recipient }: TextFieldProps) => {
   };
 
   const onPreSign = () => {
-    if (!localText) {
-      setShowCustomTextModal(true);
-      return false;
-    }
+    setShowCustomTextModal(true);
 
-    const validationErrors = validateText(localText);
-
-    if (validationErrors.required.length > 0 || validationErrors.characterLimit.length > 0) {
+    if (localText) {
+      const validationErrors = validateText(localText, parsedFieldMeta);
       setErrors(validationErrors);
-      return false;
     }
 
-    return true;
+    return false;
   };
 
   const onSign = async (authOptions?: TRecipientActionAuth) => {
     try {
-      if (!localText || Object.values(errors).some((error) => error.length > 0)) {
+      if (!localText || userInputHasErrors) {
         return;
       }
 
@@ -167,6 +162,8 @@ export const TextField = ({ field, recipient }: TextFieldProps) => {
         fieldId: field.id,
       });
 
+      setLocalCustomText(parsedFieldMeta.text ?? '');
+
       startTransition(() => router.refresh());
     } catch (err) {
       console.error(err);
@@ -179,17 +176,33 @@ export const TextField = ({ field, recipient }: TextFieldProps) => {
     }
   };
 
+  useEffect(() => {
+    if (!field.inserted && parsedFieldMeta.text && localText) {
+      void executeActionAuthProcedure({
+        onReauthFormSubmit: async (authOptions) => await onSign(authOptions),
+        actionTarget: field.type,
+      });
+    }
+  }, []);
+
   const parsedField = ZTextFieldMeta.parse(field.fieldMeta);
 
   const labelDisplay =
-    parsedField?.label && parsedField.label.length < 10
+    parsedField?.label && parsedField.label.length < 20
       ? parsedField.label
-      : parsedField.label?.substring(0, 10) + '...';
+      : parsedField.label
+      ? parsedField.label.substring(0, 20) + '...'
+      : undefined;
 
   const textDisplay =
-    parsedField?.text && parsedField.text.length < 10
-      ? parsedField?.text
-      : parsedField?.text?.substring(0, 10) + '...';
+    parsedField?.text && parsedField.text.length < 20
+      ? parsedField.text
+      : parsedField.text
+      ? parsedField.text.substring(0, 20) + '...'
+      : undefined;
+
+  const fieldDisplayName = labelDisplay ? labelDisplay : textDisplay ? textDisplay : 'Add text';
+  const charactersRemaining = (parsedFieldMeta.characterLimit ?? 0) - (localText.length ?? 0);
 
   return (
     <SigningFieldContainer
@@ -217,45 +230,44 @@ export const TextField = ({ field, recipient }: TextFieldProps) => {
         >
           <span className="flex items-center justify-center gap-x-1">
             <Type />
-            {(labelDisplay || textDisplay) ?? 'Add text'}
+            {fieldDisplayName}
           </span>
         </p>
       )}
 
       {field.inserted && (
-        <p className="text-muted-foreground flex items-center justify-center gap-x-1 text-xs duration-200">
-          {field.customText.length < 10
+        <p className="text-muted-foreground flex items-center justify-center gap-x-1 duration-200">
+          {field.customText.length < 20
             ? field.customText
-            : field.customText.substring(0, 20) + '...'}
+            : field.customText.substring(0, 15) + '...'}
         </p>
       )}
 
       <Dialog open={showCustomTextModal} onOpenChange={setShowCustomTextModal}>
         <DialogContent>
-          <DialogTitle>{parsedFieldMeta.label ?? 'Add Text'}</DialogTitle>
+          <DialogTitle>{parsedFieldMeta.label ? parsedFieldMeta.label : 'Add Text'}</DialogTitle>
 
           <div>
             <Textarea
               id="custom-text"
               placeholder={parsedFieldMeta.placeholder ?? 'Enter your text here'}
-              className={cn(
-                'mt-2 w-full rounded-md',
-                {
-                  'border-2 border-red-400 ring-2 ring-red-200 ring-offset-2 ring-offset-red-200 focus-visible:ring-4 focus-visible:ring-red-200 focus-visible:ring-offset-2 focus-visible:ring-offset-red-200':
-                    errors.required.length > 0 || errors.characterLimit.length > 0,
-                },
-                {
-                  'border-border border':
-                    errors.required.length === 0 && errors.characterLimit.length === 0,
-                },
-              )}
+              className={cn('mt-2 w-full rounded-md', {
+                'border-2 border-red-300 ring-2 ring-red-200 ring-offset-2 ring-offset-red-200 focus-visible:border-red-400 focus-visible:ring-4 focus-visible:ring-red-200 focus-visible:ring-offset-2 focus-visible:ring-offset-red-200':
+                  userInputHasErrors,
+              })}
               value={localText}
               onChange={handleTextChange}
             />
           </div>
 
-          {(errors.required.length > 0 || errors.characterLimit.length > 0) && (
-            <div>
+          {parsedFieldMeta.characterLimit && !userInputHasErrors && (
+            <div className="text-muted-foreground text-sm">
+              {charactersRemaining} characters remaining
+            </div>
+          )}
+
+          {userInputHasErrors && (
+            <div className="text-sm">
               {errors.required.map((error, index) => (
                 <p key={index} className="text-red-500">
                   {error}
@@ -263,7 +275,8 @@ export const TextField = ({ field, recipient }: TextFieldProps) => {
               ))}
               {errors.characterLimit.map((error, index) => (
                 <p key={index} className="text-red-500">
-                  {error}
+                  {error}{' '}
+                  {charactersRemaining < 0 && `(${Math.abs(charactersRemaining)} characters over)`}
                 </p>
               ))}
             </div>

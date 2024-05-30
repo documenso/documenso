@@ -31,7 +31,7 @@ export const RadioField = ({ field, recipient }: RadioFieldProps) => {
   const router = useRouter();
   const { toast } = useToast();
   const [isPending, startTransition] = useTransition();
-  const [localText, setLocalCustomText] = useState('');
+  const [selectedOption, setSelectedOption] = useState('');
 
   const { executeActionAuthProcedure } = useRequiredDocumentAuthContext();
 
@@ -49,19 +49,19 @@ export const RadioField = ({ field, recipient }: RadioFieldProps) => {
 
   const onSign = async (authOptions?: TRecipientActionAuth) => {
     try {
-      if (!localText) {
+      if (!selectedOption) {
         return;
       }
 
       await signFieldWithToken({
         token: recipient.token,
         fieldId: field.id,
-        value: localText,
+        value: selectedOption,
         isBase64: true,
         authOptions,
       });
 
-      setLocalCustomText('');
+      setSelectedOption('');
 
       startTransition(() => router.refresh());
     } catch (err) {
@@ -88,6 +88,8 @@ export const RadioField = ({ field, recipient }: RadioFieldProps) => {
         fieldId: field.id,
       });
 
+      setSelectedOption('');
+
       startTransition(() => router.refresh());
     } catch (err) {
       console.error(err);
@@ -101,22 +103,22 @@ export const RadioField = ({ field, recipient }: RadioFieldProps) => {
   };
 
   const handleSelectItem = (selectedOption: string) => {
-    setLocalCustomText(selectedOption);
+    setSelectedOption(selectedOption);
   };
 
   useEffect(() => {
-    if (!field.inserted && localText) {
+    if (!field.inserted && selectedOption) {
       void executeActionAuthProcedure({
         onReauthFormSubmit: async (authOptions) => await onSign(authOptions),
         actionTarget: field.type,
       });
     }
-  }, [localText]);
+  }, [selectedOption]);
 
   return (
     <SigningFieldContainer field={field} onSign={onSign} onRemove={onRemove} type="Radio">
       {isLoading && (
-        <div className="bg-background absolute inset-0 flex items-center justify-center rounded-md">
+        <div className="bg-background absolute inset-0 z-20 flex items-center justify-center rounded-md">
           <Loader className="text-primary h-5 w-5 animate-spin md:h-8 md:w-8" />
         </div>
       )}
@@ -139,7 +141,17 @@ export const RadioField = ({ field, recipient }: RadioFieldProps) => {
                 },
               )}
             >
-              <CardContent className="text-foreground hover:shadow-primary-foreground group flex h-full w-full flex-row items-center space-x-2 p-2">
+              <CardContent
+                className={cn(
+                  'text-muted-foreground hover:shadow-primary-foreground group flex h-full w-full flex-row items-center space-x-2 p-2',
+                  {
+                    'hover:text-red-300': !field.inserted && parsedFieldMeta.required,
+                  },
+                  {
+                    'hover:text-yellow-300': !field.inserted && !parsedFieldMeta.required,
+                  },
+                )}
+              >
                 <RadioGroupItem
                   value={item.value}
                   id={`option-${index}`}
@@ -165,13 +177,14 @@ export const RadioField = ({ field, recipient }: RadioFieldProps) => {
                     field.inserted,
                 },
                 {
-                  'bg-documenso/20 border-documenso ring-documenso-200 ring-offset-documenso-200 ring-2 ring-offset-2':
+                  'bg-documenso/20 border-documenso':
                     field.inserted && item.value === field.customText,
                 },
               )}
             >
               <CardContent className="flex h-full w-full flex-row items-center space-x-2 p-2">
                 <RadioGroupItem
+                  className="ring-documenso data-[state=checked]:bg-documenso ring-1 ring-offset-2"
                   value={item.value}
                   id={`option-${index}`}
                   checked={item.value === field.customText}
