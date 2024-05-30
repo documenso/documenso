@@ -233,6 +233,10 @@ model Account {
   refresh_token     String? @db.Text
   access_token      String? @db.Text
   expires_at        Int?
+  // Some providers return created_at so we need to make it optional
+  created_at        Int?
+  // Stops next-auth from crashing when dealing with AzureAD
+  ext_expires_in    Int?
   token_type        String?
   scope             String?
   id_token          String? @db.Text
