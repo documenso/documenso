@@ -184,7 +184,7 @@ export const RadioField = ({ field, recipient }: RadioFieldProps) => {
             >
               <CardContent className="flex h-full w-full flex-row items-center space-x-2 p-2">
                 <RadioGroupItem
-                  className="ring-documenso data-[state=checked]:bg-documenso ring-1 ring-offset-2"
+                  className="data-[state=checked]:ring-documenso data-[state=checked]:bg-documenso shrink-0 data-[state=checked]:ring-1 data-[state=checked]:ring-offset-2"
                   value={item.value}
                   id={`option-${index}`}
                   checked={item.value === field.customText}
