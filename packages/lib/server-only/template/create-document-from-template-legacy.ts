@@ -63,6 +63,7 @@ export const createDocumentFromTemplateLegacy = async ({
   const document = await prisma.document.create({
     data: {
       source: DocumentSource.TEMPLATE,
+      templateId: template.id,
       userId,
       teamId: template.teamId,
       title: template.title,

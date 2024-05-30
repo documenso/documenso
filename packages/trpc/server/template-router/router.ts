@@ -16,7 +16,7 @@ import { updateTemplateSettings } from '@documenso/lib/server-only/template/upda
 import { extractNextApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 import type { Document } from '@documenso/prisma/client';
 
-import { authenticatedProcedure, router, unknownAuthenticatedProcedure } from '../trpc';
+import { authenticatedProcedure, maybeAuthenticatedProcedure, router } from '../trpc';
 import {
   ZCreateDocumentFromDirectTemplateMutationSchema,
   ZCreateDocumentFromTemplateMutationSchema,
@@ -53,7 +53,7 @@ export const templateRouter = router({
       }
     }),
 
-  createDocumentFromDirectTemplate: unknownAuthenticatedProcedure
+  createDocumentFromDirectTemplate: maybeAuthenticatedProcedure
     .input(ZCreateDocumentFromDirectTemplateMutationSchema)
     .mutation(async ({ input, ctx }) => {
       try {

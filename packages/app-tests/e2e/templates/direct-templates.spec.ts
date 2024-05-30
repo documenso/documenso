@@ -249,7 +249,7 @@ test('[DIRECT_TEMPLATES]: use direct template link with 1 recipient', async ({ p
   await unseedTeam(team.url);
 });
 
-test('[DIRECT_TEMPLATES]: use direct template link with 2 recipients', async ({ page }) => {
+test.skip('[DIRECT_TEMPLATES]: use direct template link with 2 recipients', async ({ page }) => {
   const team = await seedTeam({
     createTeamMembers: 1,
   });

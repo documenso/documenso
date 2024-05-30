@@ -147,6 +147,7 @@ export const createDocumentFromTemplate = async ({
     const document = await tx.document.create({
       data: {
         source: DocumentSource.TEMPLATE,
+        templateId: template.id,
         userId,
         teamId: template.teamId,
         title: override?.title || template.title,

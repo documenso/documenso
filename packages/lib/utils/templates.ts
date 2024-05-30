@@ -3,7 +3,7 @@ import type { Recipient } from '@documenso/prisma/client';
 import { WEBAPP_BASE_URL } from '../constants/app';
 
 export const formatDirectTemplatePath = (token: string) => {
-  return `${WEBAPP_BASE_URL}/templates/direct/${token}`;
+  return `${WEBAPP_BASE_URL}/d/${token}`;
 };
 
 /**

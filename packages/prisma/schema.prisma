@@ -278,6 +278,8 @@ model Document {
   deletedAt      DateTime?
   teamId         Int?
   team           Team?               @relation(fields: [teamId], references: [id])
+  templateId     Int?
+  template       Template?           @relation(fields: [templateId], references: [id], onDelete: SetNull)
   source         DocumentSource
 
   auditLogs DocumentAuditLog[]
@@ -576,6 +578,7 @@ model Template {
   Recipient            Recipient[]
   Field                Field[]
   directLink           TemplateDirectLink?
+  documents            Document[]
 
   @@unique([templateDocumentDataId])
 }

@@ -29,7 +29,7 @@ export const authenticatedMiddleware = t.middleware(async ({ ctx, next }) => {
   });
 });
 
-export const unknownAuthenticatedMiddleware = t.middleware(async ({ ctx, next }) => {
+export const maybeAuthenticatedMiddleware = t.middleware(async ({ ctx, next }) => {
   return await next({
     ctx: {
       ...ctx,
@@ -71,5 +71,5 @@ export const adminMiddleware = t.middleware(async ({ ctx, next }) => {
 export const router = t.router;
 export const procedure = t.procedure;
 export const authenticatedProcedure = t.procedure.use(authenticatedMiddleware);
-export const unknownAuthenticatedProcedure = t.procedure.use(unknownAuthenticatedMiddleware);
+export const maybeAuthenticatedProcedure = t.procedure.use(maybeAuthenticatedMiddleware);
 export const adminProcedure = t.procedure.use(adminMiddleware);

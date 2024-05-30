@@ -215,6 +215,7 @@ export const createDocumentFromDirectTemplate = async ({
     const document = await tx.document.create({
       data: {
         source: DocumentSource.TEMPLATE_DIRECT_LINK,
+        templateId: template.id,
         userId: template.userId,
         teamId: template.teamId,
         title: template.title,

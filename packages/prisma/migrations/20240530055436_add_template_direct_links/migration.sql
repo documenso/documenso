@@ -8,7 +8,8 @@
 CREATE TYPE "DocumentSource" AS ENUM ('DOCUMENT', 'TEMPLATE', 'TEMPLATE_DIRECT_LINK');
 
 -- AlterTable
-ALTER TABLE "Document" ADD COLUMN     "source" "DocumentSource";
+ALTER TABLE "Document" ADD COLUMN     "source" "DocumentSource",
+ADD COLUMN     "templateId" INTEGER;
 
 -- Custom: UpdateTable
 UPDATE "Document" SET "source" = 'DOCUMENT' WHERE "source" IS NULL;
@@ -36,6 +37,9 @@ CREATE UNIQUE INDEX "TemplateDirectLink_templateId_key" ON "TemplateDirectLink"(
 
 -- CreateIndex
 CREATE UNIQUE INDEX "TemplateDirectLink_token_key" ON "TemplateDirectLink"("token");
+
+-- AddForeignKey
+ALTER TABLE "Document" ADD CONSTRAINT "Document_templateId_fkey" FOREIGN KEY ("templateId") REFERENCES "Template"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "TemplateDirectLink" ADD CONSTRAINT "TemplateDirectLink_templateId_fkey" FOREIGN KEY ("templateId") REFERENCES "Template"("id") ON DELETE CASCADE ON UPDATE CASCADE;
