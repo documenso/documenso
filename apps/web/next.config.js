@@ -28,6 +28,7 @@ const config = {
   experimental: {
     outputFileTracingRoot: path.join(__dirname, '../../'),
     serverComponentsExternalPackages: ['@node-rs/bcrypt', '@documenso/pdf-sign', 'playwright'],
+    instrumentationHook: true,
     serverActions: {
       bodySizeLimit: '50mb',
     },

@@ -1,14 +1,10 @@
 export type SendInstanceInfo = {
-  uniqueId: number;
+  uniqueId: string;
   timestamp: Date;
   version: string;
 };
 
-export const sendInstanceInfo = async ({
-  uniqueId,
-  timestamp,
-  version,
-}: SendInstanceInfo): Promise<void> => {
+export const sendInstanceInfo = async ({ uniqueId, timestamp, version }: SendInstanceInfo) => {
   const isProduction = process.env.NODE_ENV === 'production';
   const isTelemetryDisabled = process.env.DISABLE_TELEMETRY === 'true';
 
@@ -22,8 +18,8 @@ export const sendInstanceInfo = async ({
     const response = await fetch(url, {
       method: 'POST',
       body: JSON.stringify({
-        uniqueId,
-        timestamp,
+        uniqueId: String(uniqueId),
+        timestamp: new Date(timestamp).toISOString(),
         version,
       }),
       headers: {
@@ -35,8 +31,8 @@ export const sendInstanceInfo = async ({
       throw new Error(`Failed to record instance, failed with status code ${response.status}`);
     }
 
-    await response.json();
+    return await response.json();
   } catch (error) {
-    console.error('Error posting instance information:', error);
+    console.error(error);
   }
 };
