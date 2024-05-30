@@ -1,3 +1,7 @@
+generator kysely {
+  provider = "prisma-kysely"
+}
+
 generator client {
   provider = "prisma-client-js"
 }
