@@ -36,6 +36,7 @@ export const getStats = async ({ user, period, ...options }: GetStatsInput) => {
     [ExtendedDocumentStatus.COMPLETED]: 0,
     [ExtendedDocumentStatus.INBOX]: 0,
     [ExtendedDocumentStatus.ALL]: 0,
+    [ExtendedDocumentStatus.BIN]: 0,
   };
 
   ownerCounts.forEach((stat) => {
