@@ -2,6 +2,7 @@
 
 import { DownloadIcon } from 'lucide-react';
 
+import { DocumentStatus } from '@documenso/prisma/client';
 import { trpc } from '@documenso/trpc/react';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
@@ -10,11 +11,13 @@ import { useToast } from '@documenso/ui/primitives/use-toast';
 export type DownloadCertificateButtonProps = {
   className?: string;
   documentId: number;
+  documentStatus: DocumentStatus;
 };
 
 export const DownloadCertificateButton = ({
   className,
   documentId,
+  documentStatus,
 }: DownloadCertificateButtonProps) => {
   const { toast } = useToast();
 
@@ -69,6 +72,7 @@ export const DownloadCertificateButton = ({
       className={cn('w-full sm:w-auto', className)}
       loading={isLoading}
       variant="outline"
+      disabled={documentStatus !== DocumentStatus.COMPLETED}
       onClick={() => void onDownloadCertificatesClick()}
     >
       {!isLoading && <DownloadIcon className="mr-1.5 h-4 w-4" />}

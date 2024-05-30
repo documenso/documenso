@@ -36,11 +36,6 @@ export const DocumentEditPageView = async ({ params, team }: DocumentEditPageVie
 
   const { user } = await getRequiredServerComponentSession();
 
-  const isDocumentEnterprise = await isUserEnterprise({
-    userId: user.id,
-    teamId: team?.id,
-  });
-
   const document = await getDocumentWithDetailsById({
     id: documentId,
     userId: user.id,
@@ -74,6 +69,11 @@ export const DocumentEditPageView = async ({ params, team }: DocumentEditPageVie
     documentMeta.password = securePassword;
   }
 
+  const isDocumentEnterprise = await isUserEnterprise({
+    userId: user.id,
+    teamId: team?.id,
+  });
+
   return (
     <div className="mx-auto -mt-4 w-full max-w-screen-xl px-4 md:px-8">
       <Link href={documentRootPath} className="flex items-center text-[#7AC455] hover:opacity-80">
@@ -92,7 +92,11 @@ export const DocumentEditPageView = async ({ params, team }: DocumentEditPageVie
           <div className="text-muted-foreground flex items-center">
             <Users2 className="mr-2 h-5 w-5" />
 
-            <StackAvatarsWithTooltip recipients={recipients} position="bottom">
+            <StackAvatarsWithTooltip
+              recipients={recipients}
+              documentStatus={document.status}
+              position="bottom"
+            >
               <span>{recipients.length} Recipient(s)</span>
             </StackAvatarsWithTooltip>
           </div>

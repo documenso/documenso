@@ -19,6 +19,7 @@ export type FieldContainerPortalProps = {
   field: Field;
   className?: string;
   children: React.ReactNode;
+  cardClassName?: string;
 };
 
 export function FieldContainerPortal({
@@ -44,7 +45,7 @@ export function FieldContainerPortal({
   );
 }
 
-export function FieldRootContainer({ field, children }: FieldContainerPortalProps) {
+export function FieldRootContainer({ field, children, cardClassName }: FieldContainerPortalProps) {
   const [isValidating, setIsValidating] = useState(false);
 
   const ref = React.useRef<HTMLDivElement>(null);
@@ -78,6 +79,7 @@ export function FieldRootContainer({ field, children }: FieldContainerPortalProp
           {
             'border-orange-300 ring-1 ring-orange-300': !field.inserted && isValidating,
           },
+          cardClassName,
         )}
         ref={ref}
         data-inserted={field.inserted ? 'true' : 'false'}

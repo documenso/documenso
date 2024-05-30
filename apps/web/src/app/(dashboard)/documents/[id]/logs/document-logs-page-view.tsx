@@ -133,7 +133,11 @@ export const DocumentLogsPageView = async ({ params, team }: DocumentLogsPageVie
         </div>
 
         <div className="mt-4 flex w-full flex-row sm:mt-0 sm:w-auto sm:self-end">
-          <DownloadCertificateButton className="mr-2" documentId={document.id} />
+          <DownloadCertificateButton
+            className="mr-2"
+            documentId={document.id}
+            documentStatus={document.status}
+          />
 
           <DownloadAuditLogButton documentId={document.id} />
         </div>

@@ -11,6 +11,7 @@ export interface TemplateDocumentInviteProps {
   signDocumentLink: string;
   assetBaseUrl: string;
   role: RecipientRole;
+  selfSigner: boolean;
 }
 
 export const TemplateDocumentInvite = ({
@@ -19,6 +20,7 @@ export const TemplateDocumentInvite = ({
   signDocumentLink,
   assetBaseUrl,
   role,
+  selfSigner,
 }: TemplateDocumentInviteProps) => {
   const { actionVerb, progressiveVerb } = RECIPIENT_ROLES_DESCRIPTION[role];
 
@@ -28,8 +30,19 @@ export const TemplateDocumentInvite = ({
 
       <Section>
         <Text className="text-primary mx-auto mb-0 max-w-[80%] text-center text-lg font-semibold">
-          {inviterName} has invited you to {actionVerb.toLowerCase()}
-          <br />"{documentName}"
+          {selfSigner ? (
+            <>
+              {`Please ${actionVerb.toLowerCase()} your document`}
+              <br />
+              {`"${documentName}"`}
+            </>
+          ) : (
+            <>
+              {`${inviterName} has invited you to ${actionVerb.toLowerCase()}`}
+              <br />
+              {`"${documentName}"`}
+            </>
+          )}
         </Text>
 
         <Text className="my-1 text-center text-base text-slate-400">

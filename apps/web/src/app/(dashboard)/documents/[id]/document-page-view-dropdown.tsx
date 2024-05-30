@@ -19,7 +19,7 @@ import { useSession } from 'next-auth/react';
 import { downloadPDF } from '@documenso/lib/client-only/download-pdf';
 import { formatDocumentsPath } from '@documenso/lib/utils/teams';
 import { DocumentStatus } from '@documenso/prisma/client';
-import type { Document, Recipient, Team, User } from '@documenso/prisma/client';
+import type { Document, Recipient, Team, TeamEmail, User } from '@documenso/prisma/client';
 import { trpc as trpcClient } from '@documenso/trpc/client';
 import { DocumentShareButton } from '@documenso/ui/components/document/document-share-button';
 import {
@@ -41,7 +41,7 @@ export type DocumentPageViewDropdownProps = {
     Recipient: Recipient[];
     team: Pick<Team, 'id' | 'url'> | null;
   };
-  team?: Pick<Team, 'id' | 'url'>;
+  team?: Pick<Team, 'id' | 'url'> & { teamEmail: TeamEmail | null };
 };
 
 export const DocumentPageViewDropdown = ({ document, team }: DocumentPageViewDropdownProps) => {
@@ -59,9 +59,10 @@ export const DocumentPageViewDropdown = ({ document, team }: DocumentPageViewDro
 
   const isOwner = document.User.id === session.user.id;
   const isDraft = document.status === DocumentStatus.DRAFT;
+  const isDeleted = document.deletedAt !== null;
   const isComplete = document.status === DocumentStatus.COMPLETED;
-  const isDocumentDeletable = isOwner;
   const isCurrentTeamDocument = team && document.team?.url === team.url;
+  const canManageDocument = Boolean(isOwner || isCurrentTeamDocument);
 
   const documentsPath = formatDocumentsPath(team?.url);
 
@@ -127,7 +128,10 @@ export const DocumentPageViewDropdown = ({ document, team }: DocumentPageViewDro
           Duplicate
         </DropdownMenuItem>
 
-        <DropdownMenuItem onClick={() => setDeleteDialogOpen(true)} disabled={!isDocumentDeletable}>
+        <DropdownMenuItem
+          onClick={() => setDeleteDialogOpen(true)}
+          disabled={Boolean(!canManageDocument && team?.teamEmail) || isDeleted}
+        >
           <Trash2 className="mr-2 h-4 w-4" />
           Delete
         </DropdownMenuItem>
@@ -154,15 +158,15 @@ export const DocumentPageViewDropdown = ({ document, team }: DocumentPageViewDro
         />
       </DropdownMenuContent>
 
-      {isDocumentDeletable && (
-        <DeleteDocumentDialog
-          id={document.id}
-          status={document.status}
-          documentTitle={document.title}
-          open={isDeleteDialogOpen}
-          onOpenChange={setDeleteDialogOpen}
-        />
-      )}
+      <DeleteDocumentDialog
+        id={document.id}
+        status={document.status}
+        documentTitle={document.title}
+        open={isDeleteDialogOpen}
+        canManageDocument={canManageDocument}
+        onOpenChange={setDeleteDialogOpen}
+      />
+
       {isDuplicateDialogOpen && (
         <DuplicateDocumentDialog
           id={document.id}

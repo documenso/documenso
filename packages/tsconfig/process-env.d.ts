@@ -77,6 +77,7 @@ declare namespace NodeJS {
 
     DEPLOYMENT_TARGET?: 'webapp' | 'marketing';
     FONT_CAVEAT_URI: string;
+    FONT_NOTO_SANS_URI: string;
 
     POSTGRES_URL?: string;
     DATABASE_URL?: string;

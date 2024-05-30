@@ -41,7 +41,9 @@ export const DocumentsPageView = async ({ searchParams = {}, team }: DocumentsPa
   const page = Number(searchParams.page) || 1;
   const perPage = Number(searchParams.perPage) || 20;
   const senderIds = parseToIntegerArray(searchParams.senderIds ?? '');
-  const currentTeam = team ? { id: team.id, url: team.url } : undefined;
+  const currentTeam = team
+    ? { id: team.id, url: team.url, teamEmail: team.teamEmail?.email }
+    : undefined;
 
   const getStatOptions: GetStatsInput = {
     user,

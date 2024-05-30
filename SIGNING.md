@@ -17,7 +17,8 @@ For the digital signature of your documents you need a signing certificate in .p
    `openssl pkcs12 -export -out certificate.p12 -inkey private.key -in certificate.crt`
 
 4. You will be prompted to enter a password for the p12 file. Choose a strong password and remember it, as you will need it to use the certificate (**can be empty for dev certificates**)
-5. Place the certificate `/apps/web/resources/certificate.p12`
+
+5. Place the certificate `/apps/web/resources/certificate.p12` (If the path does not exist, it needs to be created)
 
 ## Docker
 
