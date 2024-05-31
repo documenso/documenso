@@ -34,19 +34,29 @@ export const NumberFieldAdvancedSettings = ({
 }: NumberFieldAdvancedSettingsProps) => {
   const [showValidation, setShowValidation] = useState(false);
 
-  const handleValueChange = (key: keyof NumberFieldMeta, value: string) => {
-    const newErrors = [];
+  const validateValue = (value: number, minNumber: number, maxNumber: number) => {
+    const errors = [];
 
-    if (fieldState.minValue && fieldState.minValue > 0 && Number(value) < fieldState.minValue) {
-      newErrors.push(`Value ${value} is less than the min value ${fieldState.minValue}`);
+    if (minNumber > 0 && value < minNumber) {
+      errors.push(`Value ${value} is less than the min value ${minNumber}`);
     }
 
-    if (fieldState.maxValue && fieldState.maxValue > 0 && Number(value) > fieldState.maxValue) {
-      newErrors.push(`Value ${value} is greater than the max value ${fieldState.maxValue}`);
+    if (maxNumber > 0 && value > maxNumber) {
+      errors.push(`Value ${value} is greater than the max value ${maxNumber}`);
     }
 
-    handleErrors(newErrors);
-    handleFieldChange(key, value);
+    return errors;
+  };
+
+  const handleInput = (field: keyof NumberFieldMeta, value: string) => {
+    const userValue = field === 'value' ? Number(value) : Number(fieldState.value || 0);
+    const userMinValue = field === 'minValue' ? Number(value) : Number(fieldState.minValue || 0);
+    const userMaxValue = field === 'maxValue' ? Number(value) : Number(fieldState.maxValue || 0);
+
+    const valueErrors = validateValue(userValue, userMinValue, userMaxValue);
+    handleErrors(valueErrors);
+
+    handleFieldChange(field, value);
   };
 
   return (
@@ -78,7 +88,7 @@ export const NumberFieldAdvancedSettings = ({
           className="bg-background mt-2"
           placeholder="Value"
           value={fieldState.value}
-          onChange={(e) => handleValueChange('value', e.target.value)}
+          onChange={(e) => handleInput('value', e.target.value)}
         />
       </div>
       <div>
@@ -146,7 +156,7 @@ export const NumberFieldAdvancedSettings = ({
               className="bg-background mt-2"
               placeholder="E.g. 0"
               value={fieldState.minValue}
-              onChange={(e) => handleFieldChange('minValue', e.target.value)}
+              onChange={(e) => handleInput('minValue', e.target.value)}
             />
           </div>
           <div className="flex flex-col">
@@ -156,7 +166,7 @@ export const NumberFieldAdvancedSettings = ({
               className="bg-background mt-2"
               placeholder="E.g. 100"
               value={fieldState.maxValue}
-              onChange={(e) => handleFieldChange('maxValue', e.target.value)}
+              onChange={(e) => handleInput('maxValue', e.target.value)}
             />
           </div>
         </div>

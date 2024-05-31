@@ -243,11 +243,25 @@ export const FieldAdvancedSettings = forwardRef<HTMLDivElement, FieldAdvancedSet
             ))}
 
           {textField && (
-            <TextFieldAdvancedSettings
-              fieldState={fieldState}
-              handleFieldChange={handleFieldChange}
-              handleToggleChange={handleToggleChange}
-            />
+            <div>
+              <TextFieldAdvancedSettings
+                fieldState={fieldState}
+                handleFieldChange={handleFieldChange}
+                handleToggleChange={handleToggleChange}
+                handleErrors={setErrors}
+              />
+              {errors.length > 0 && (
+                <div className="mt-4">
+                  <ul>
+                    {errors.map((error, index) => (
+                      <li className="text-sm text-red-500" key={index}>
+                        {error}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </div>
           )}
 
           {numberField && (
