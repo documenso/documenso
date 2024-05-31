@@ -1,13 +1,18 @@
 import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
-import { type TFieldMetaSchema as FieldMeta } from '@documenso/lib/types/field-field-meta';
+import {
+  type TFieldMetaSchema as FieldMeta,
+  ZFieldMetaSchema,
+  ZNumberFieldMeta,
+  ZTextFieldMeta,
+} from '@documenso/lib/types/field-field-meta';
 import type { RequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 import {
   createDocumentAuditLogData,
   diffFieldChanges,
 } from '@documenso/lib/utils/document-audit-logs';
 import { prisma } from '@documenso/prisma';
-import type { Field, FieldType } from '@documenso/prisma/client';
-import { SendStatus, SigningStatus } from '@documenso/prisma/client';
+import type { Field } from '@documenso/prisma/client';
+import { FieldType, SendStatus, SigningStatus } from '@documenso/prisma/client';
 
 export interface SetFieldsForDocumentOptions {
   userId: number;
@@ -104,6 +109,67 @@ export const setFieldsForDocument = async ({
     return await Promise.all(
       linkedFields.map(async (field) => {
         const fieldSignerEmail = field.signerEmail.toLowerCase();
+
+        const parsedFieldMeta = ZFieldMetaSchema.parse(field.fieldMeta);
+
+        if (parsedFieldMeta?.readOnly === true && parsedFieldMeta?.required === true) {
+          throw new Error('Field cannot be both read-only and required');
+        }
+
+        if (field.type === FieldType.TEXT) {
+          const textFieldParsedMeta = ZTextFieldMeta.parse(field.fieldMeta);
+
+          if (
+            textFieldParsedMeta.text &&
+            textFieldParsedMeta.characterLimit &&
+            textFieldParsedMeta.characterLimit > 0 &&
+            textFieldParsedMeta.text.length > textFieldParsedMeta.characterLimit
+          ) {
+            throw new Error('Entered text exceeds character limit');
+          }
+        }
+
+        if (field.type === FieldType.NUMBER) {
+          const numberFieldParsedMeta = ZNumberFieldMeta.parse(field.fieldMeta);
+
+          if (numberFieldParsedMeta.value && isNaN(numberFieldParsedMeta.value)) {
+            throw new Error('Invalid number entered');
+          }
+
+          if (
+            numberFieldParsedMeta.minValue &&
+            numberFieldParsedMeta.minValue > 0 &&
+            numberFieldParsedMeta.value &&
+            numberFieldParsedMeta.value < numberFieldParsedMeta.minValue
+          ) {
+            throw new Error('Entered number is less than minimum value');
+          }
+
+          if (
+            numberFieldParsedMeta.maxValue &&
+            numberFieldParsedMeta.maxValue > 0 &&
+            numberFieldParsedMeta.value &&
+            numberFieldParsedMeta.value > numberFieldParsedMeta.maxValue
+          ) {
+            throw new Error('Entered number is greater than maximum value');
+          }
+
+          if (
+            numberFieldParsedMeta.minValue &&
+            numberFieldParsedMeta.maxValue &&
+            numberFieldParsedMeta.minValue > numberFieldParsedMeta.maxValue
+          ) {
+            throw new Error('Minimum value cannot be greater than maximum value');
+          }
+
+          if (
+            numberFieldParsedMeta.maxValue &&
+            numberFieldParsedMeta.minValue &&
+            numberFieldParsedMeta.maxValue < numberFieldParsedMeta.minValue
+          ) {
+            throw new Error('Maximum value cannot be less than minimum value');
+          }
+        }
 
         const upsertedField = await tx.field.upsert({
           where: {
