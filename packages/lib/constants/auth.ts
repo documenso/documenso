@@ -5,10 +5,17 @@ export const SALT_ROUNDS = 12;
 export const IDENTITY_PROVIDER_NAME: { [key in IdentityProvider]: string } = {
   [IdentityProvider.DOCUMENSO]: 'Documenso',
   [IdentityProvider.GOOGLE]: 'Google',
+  [IdentityProvider.OIDC]: 'OIDC',
 };
 
 export const IS_GOOGLE_SSO_ENABLED = Boolean(
   process.env.NEXT_PRIVATE_GOOGLE_CLIENT_ID && process.env.NEXT_PRIVATE_GOOGLE_CLIENT_SECRET,
+);
+
+export const IS_OIDC_SSO_ENABLED = Boolean(
+  process.env.NEXT_PRIVATE_OIDC_WELL_KNOWN &&
+    process.env.NEXT_PRIVATE_OIDC_CLIENT_ID &&
+    process.env.NEXT_PRIVATE_OIDC_CLIENT_SECRET,
 );
 
 export const USER_SECURITY_AUDIT_LOG_MAP: { [key in UserSecurityAuditLogType]: string } = {
