@@ -12,5 +12,9 @@ declare namespace NodeJS {
 
     NEXT_PRIVATE_GOOGLE_CLIENT_ID: string;
     NEXT_PRIVATE_GOOGLE_CLIENT_SECRET: string;
+
+    NEXT_PRIVATE_OIDC_WELL_KNOWN: string;
+    NEXT_PRIVATE_OIDC_CLIENT_ID: string;
+    NEXT_PRIVATE_OIDC_CLIENT_SECRET: string;
   }
 }
