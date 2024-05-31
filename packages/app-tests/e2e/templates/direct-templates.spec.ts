@@ -107,7 +107,7 @@ test('[DIRECT_TEMPLATES]: toggle direct template link', async ({ page }) => {
     await page.getByRole('cell', { name: 'Use Template' }).getByRole('button').nth(1).click();
     await page.getByRole('menuitem', { name: 'Direct link' }).click();
     await page.getByRole('switch').click();
-    await page.getByRole('button', { name: 'Update' }).click();
+    await page.getByRole('button', { name: 'Save' }).click();
     await expect(page.getByText('Direct link signing has been').first()).toBeVisible();
     await page.getByLabel('Direct Link Signing', { exact: true }).press('Escape');
 
