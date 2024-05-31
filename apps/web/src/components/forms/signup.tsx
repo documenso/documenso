@@ -52,9 +52,15 @@ export type SignUpFormProps = {
   className?: string;
   initialEmail?: string;
   isGoogleSSOEnabled?: boolean;
+  isOIDCSSOEnabled?: boolean;
 };
 
-export const SignUpForm = ({ className, initialEmail, isGoogleSSOEnabled }: SignUpFormProps) => {
+export const SignUpForm = ({
+  className,
+  initialEmail,
+  isGoogleSSOEnabled,
+  isOIDCSSOEnabled,
+}: SignUpFormProps) => {
   const { toast } = useToast();
   const analytics = useAnalytics();
   const router = useRouter();
@@ -111,6 +117,19 @@ export const SignUpForm = ({ className, initialEmail, isGoogleSSOEnabled }: Sign
   const onSignUpWithGoogleClick = async () => {
     try {
       await signIn('google', { callbackUrl: SIGN_UP_REDIRECT_PATH });
+    } catch (err) {
+      toast({
+        title: 'An unknown error occurred',
+        description:
+          'We encountered an unknown error while attempting to sign you Up. Please try again later.',
+        variant: 'destructive',
+      });
+    }
+  };
+
+  const onSignUpWithOIDCClick = async () => {
+    try {
+      await signIn('oidc', { callbackUrl: SIGN_UP_REDIRECT_PATH });
     } catch (err) {
       toast({
         title: 'An unknown error occurred',
@@ -218,6 +237,28 @@ export const SignUpForm = ({ className, initialEmail, isGoogleSSOEnabled }: Sign
             >
               <FcGoogle className="mr-2 h-5 w-5" />
               Sign Up with Google
+            </Button>
+          </>
+        )}
+
+        {isOIDCSSOEnabled && (
+          <>
+            <div className="relative flex items-center justify-center gap-x-4 py-2 text-xs uppercase">
+              <div className="bg-border h-px flex-1" />
+              <span className="text-muted-foreground bg-transparent">Or</span>
+              <div className="bg-border h-px flex-1" />
+            </div>
+
+            <Button
+              type="button"
+              size="lg"
+              variant={'outline'}
+              className="bg-background text-muted-foreground border"
+              disabled={isSubmitting}
+              onClick={onSignUpWithOIDCClick}
+            >
+              <FcGoogle className="mr-2 h-5 w-5" />
+              Sign Up with OIDC
             </Button>
           </>
         )}
