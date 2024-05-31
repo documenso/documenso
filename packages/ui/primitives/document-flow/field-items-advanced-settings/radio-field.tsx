@@ -52,8 +52,12 @@ export const RadioFieldAdvancedSettings = ({
           <Switch
             className="bg-background"
             checked={fieldState.required}
-            onChange={() => handleToggleChange('required')}
-            onClick={() => handleToggleChange('required')}
+            onCheckedChange={() => {
+              if (fieldState.readOnly === true) {
+                handleToggleChange('readOnly');
+              }
+              handleToggleChange('required');
+            }}
           />
           <Label>Required field</Label>
         </div>
@@ -61,8 +65,12 @@ export const RadioFieldAdvancedSettings = ({
           <Switch
             className="bg-background"
             checked={fieldState.readOnly}
-            onChange={() => handleToggleChange('readOnly')}
-            onClick={() => handleToggleChange('readOnly')}
+            onCheckedChange={() => {
+              if (fieldState.required) {
+                handleToggleChange('required');
+              }
+              handleToggleChange('readOnly');
+            }}
           />
           <Label>Read only</Label>
         </div>
