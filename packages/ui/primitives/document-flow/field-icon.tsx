@@ -47,8 +47,10 @@ export const FieldIcon = ({
     if (fieldMeta && (type === 'TEXT' || type === 'NUMBER')) {
       if (type === 'TEXT' && 'text' in fieldMeta && fieldMeta.text && !fieldMeta.label) {
         label = fieldMeta.text.substring(0, 10) + '...';
+      } else if (fieldMeta.label) {
+        label = fieldMeta.label.substring(0, 10) + '...';
       } else {
-        label = fieldMeta?.label?.substring(0, 10) + '...';
+        label = fieldIcons[type]?.label;
       }
     } else {
       label = fieldIcons[type]?.label;

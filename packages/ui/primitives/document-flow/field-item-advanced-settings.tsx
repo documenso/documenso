@@ -62,6 +62,7 @@ export const FieldAdvancedSettings = forwardRef<HTMLDivElement, FieldAdvancedSet
     const id = params?.id;
     const isTemplatePage = pathname?.includes('template');
     const isDocumentPage = pathname?.includes('document');
+    const [errors, setErrors] = useState<string[]>([]);
 
     const getDefaultState = (fieldType: FieldType): FieldMeta => {
       switch (fieldType) {
@@ -211,10 +212,14 @@ export const FieldAdvancedSettings = forwardRef<HTMLDivElement, FieldAdvancedSet
 
     const handleOnGoNextClick = () => {
       try {
-        localStorage.setItem(localStorageKey, JSON.stringify(fieldState));
+        if (errors.length > 0) {
+          return;
+        } else {
+          localStorage.setItem(localStorageKey, JSON.stringify(fieldState));
 
-        onSave?.(fieldState);
-        onAdvancedSettings?.();
+          onSave?.(fieldState);
+          onAdvancedSettings?.();
+        }
       } catch (error) {
         console.error('Failed to save to localStorage:', error);
 
@@ -246,11 +251,25 @@ export const FieldAdvancedSettings = forwardRef<HTMLDivElement, FieldAdvancedSet
           )}
 
           {numberField && (
-            <NumberFieldAdvancedSettings
-              fieldState={fieldState}
-              handleFieldChange={handleFieldChange}
-              handleToggleChange={handleToggleChange}
-            />
+            <div>
+              <NumberFieldAdvancedSettings
+                fieldState={fieldState}
+                handleFieldChange={handleFieldChange}
+                handleToggleChange={handleToggleChange}
+                handleErrors={setErrors}
+              />
+              {errors.length > 0 && (
+                <div className="mt-4">
+                  <ul>
+                    {errors.map((error, index) => (
+                      <li className="text-sm text-red-500" key={index}>
+                        {error}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </div>
           )}
 
           {radioField && (
@@ -283,6 +302,7 @@ export const FieldAdvancedSettings = forwardRef<HTMLDivElement, FieldAdvancedSet
             goBackLabel="Cancel"
             onGoBackClick={onAdvancedSettings}
             onGoNextClick={handleOnGoNextClick}
+            disabled={errors.length > 0}
           />
         </DocumentFlowFormContainerFooter>
       </div>

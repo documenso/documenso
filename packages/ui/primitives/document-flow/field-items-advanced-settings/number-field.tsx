@@ -23,14 +23,31 @@ type NumberFieldAdvancedSettingsProps = {
   fieldState: NumberFieldMeta;
   handleFieldChange: (key: keyof NumberFieldMeta, value: string) => void;
   handleToggleChange: (key: keyof NumberFieldMeta) => void;
+  handleErrors: (errors: string[]) => void;
 };
 
 export const NumberFieldAdvancedSettings = ({
   fieldState,
   handleFieldChange,
   handleToggleChange,
+  handleErrors,
 }: NumberFieldAdvancedSettingsProps) => {
   const [showValidation, setShowValidation] = useState(false);
+
+  const handleValueChange = (key: keyof NumberFieldMeta, value: string) => {
+    const newErrors = [];
+
+    if (fieldState.minValue && fieldState.minValue > 0 && Number(value) < fieldState.minValue) {
+      newErrors.push(`Value ${value} is less than the min value ${fieldState.minValue}`);
+    }
+
+    if (fieldState.maxValue && fieldState.maxValue > 0 && Number(value) > fieldState.maxValue) {
+      newErrors.push(`Value ${value} is greater than the max value ${fieldState.maxValue}`);
+    }
+
+    handleErrors(newErrors);
+    handleFieldChange(key, value);
+  };
 
   return (
     <div className="flex flex-col gap-4">
@@ -61,7 +78,7 @@ export const NumberFieldAdvancedSettings = ({
           className="bg-background mt-2"
           placeholder="Value"
           value={fieldState.value}
-          onChange={(e) => handleFieldChange('value', e.target.value)}
+          onChange={(e) => handleValueChange('value', e.target.value)}
         />
       </div>
       <div>
@@ -87,8 +104,12 @@ export const NumberFieldAdvancedSettings = ({
           <Switch
             className="bg-background"
             checked={fieldState.required}
-            onChange={() => handleToggleChange('required')}
-            onClick={() => handleToggleChange('required')}
+            onCheckedChange={() => {
+              if (fieldState.readOnly === true) {
+                handleToggleChange('readOnly');
+              }
+              handleToggleChange('required');
+            }}
           />
           <Label>Required field</Label>
         </div>
@@ -96,8 +117,12 @@ export const NumberFieldAdvancedSettings = ({
           <Switch
             className="bg-background"
             checked={fieldState.readOnly}
-            onChange={() => handleToggleChange('readOnly')}
-            onClick={() => handleToggleChange('readOnly')}
+            onCheckedChange={() => {
+              if (fieldState.required) {
+                handleToggleChange('required');
+              }
+              handleToggleChange('readOnly');
+            }}
           />
           <Label>Read only</Label>
         </div>
