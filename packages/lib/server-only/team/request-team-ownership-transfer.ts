@@ -99,7 +99,8 @@ export const requestTeamOwnershipTransfer = async ({
           name: FROM_NAME,
           address: FROM_ADDRESS,
         },
-        subject: `You have been requested to take ownership of team ${team.name} on Documenso`,
+        subject: `თქვენ გთხოვეს გუნდის (${team.name}) მფლობელობის მიღება Documenso-ზე`,
+        // subject: `You have been requested to take ownership of team ${team.name} on Documenso`,
         html: render(template),
         text: render(template, { plainText: true }),
       });

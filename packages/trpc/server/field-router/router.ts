@@ -42,7 +42,8 @@ export const fieldRouter = router({
 
         throw new TRPCError({
           code: 'BAD_REQUEST',
-          message: 'We were unable to set this field. Please try again later.',
+          message: 'ჩვენ ვერ მოვახერხეთ ამ ველის დაყენება. გთხოვთ სცადოთ მოგვიანებით.',
+          // message: 'We were unable to set this field. Please try again later.',
         });
       }
     }),
@@ -112,7 +113,8 @@ export const fieldRouter = router({
 
         throw new TRPCError({
           code: 'BAD_REQUEST',
-          message: 'We were unable to remove the signature for this field. Please try again later.',
+          message: 'ჩვენ ვერ მოვახერხეთ ამ ველიდან ხელმოწერის მოშორება. გთხოვთ სცადოთ მოგვიანებით.',
+          // message: 'We were unable to remove the signature for this field. Please try again later.',
         });
       }
     }),

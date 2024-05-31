@@ -21,9 +21,11 @@ export const ZUpdatePublicProfileMutationSchema = z.object({
     .string()
     .trim()
     .toLowerCase()
-    .min(1, { message: 'Please enter a valid username.' })
+    .min(1, { message: 'გთხოვთ შეიყვანოთ სწორი პროფილის სახელი' })
+    // .min(1, { message: 'Please enter a valid username.' })
     .regex(/^[a-z0-9-]+$/, {
-      message: 'Username can only container alphanumeric characters and dashes.',
+      message: 'პროფილის სახელი შეიძლია შეიცავდეს მხოლოდ ასო-ციფრულ სიმბოლოებსა და ტირეებს.',
+      // message: 'Username can only container alphanumeric characters and dashes.',
     }),
 });
 

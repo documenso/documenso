@@ -66,7 +66,8 @@ export const setRecipientsForTemplate = async ({
     if (!isDocumentEnterprise) {
       throw new AppError(
         AppErrorCode.UNAUTHORIZED,
-        'You do not have permission to set the action auth',
+        'თქვენ არ გაქვთ პარამეტრების ავტორიზაციის დაყენების ნებართვა',
+        // 'You do not have permission to set the action auth',
       );
     }
   }

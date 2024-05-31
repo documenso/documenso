@@ -26,8 +26,10 @@ export function DataTablePagination<TData>({
         {match(additionalInformation)
           .with('SelectedCount', () => (
             <span>
-              {table.getFilteredSelectedRowModel().rows.length} of{' '}
-              {table.getFilteredRowModel().rows.length} row(s) selected.
+              {table.getFilteredSelectedRowModel().rows.length}-დან{' '}
+              {/* {table.getFilteredSelectedRowModel().rows.length} of{' '} */}
+              {table.getFilteredRowModel().rows.length} ხაზი მოინიშნა.
+              {/* {table.getFilteredRowModel().rows.length} row(s) selected. */}
             </span>
           ))
           .with('VisibleCount', () => {
@@ -45,7 +47,7 @@ export function DataTablePagination<TData>({
       </div>
 
       <div className="flex items-center gap-x-2">
-        <p className="whitespace-nowrap text-sm font-medium">დოკუმენტების რაოდენობა</p>
+        <p className="whitespace-nowrap text-sm font-medium">დოკუმენტების რაოდენობა გვერდზე</p>
         <Select
           value={`${table.getState().pagination.pageSize}`}
           onValueChange={(value) => {

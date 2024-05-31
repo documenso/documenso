@@ -315,7 +315,7 @@ export const DocumentHistorySheet = ({
                       </Badge>
 
                       <Badge variant="neutral" className="text-muted-foreground">
-                        Browser: {extractBrowser(auditLog.userAgent)}
+                        ბრაუზერი: {extractBrowser(auditLog.userAgent)}
                       </Badge>
                     </div>
                   </>

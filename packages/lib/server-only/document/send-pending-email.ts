@@ -59,7 +59,7 @@ export const sendPendingEmail = async ({ documentId, recipientId }: SendPendingE
       name: process.env.NEXT_PRIVATE_SMTP_FROM_NAME || 'Documenso',
       address: process.env.NEXT_PRIVATE_SMTP_FROM_ADDRESS || 'noreply@documenso.com',
     },
-    subject: 'ველოდები სხვების ხელმოწერას.',
+    subject: 'ველოდებით სხვების ხელმოწერას.',
     html: render(template),
     text: render(template, { plainText: true }),
   });

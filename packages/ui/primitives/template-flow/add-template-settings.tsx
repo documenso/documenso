@@ -153,7 +153,7 @@ export const AddTemplateSettingsFormPartial = ({
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel className="flex flex-row items-center">
-                      Recipient action authentication
+                      მიმღების ქმედების ავთენტიფიკაცია
                       <DocumentGlobalAuthActionTooltip />
                     </FormLabel>
 

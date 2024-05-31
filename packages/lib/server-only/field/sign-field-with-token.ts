@@ -63,7 +63,7 @@ export const signFieldWithToken = async ({
   }
 
   if (document.status !== DocumentStatus.PENDING) {
-    throw new Error(`Document ${document.id} must be pending for signing`);
+    throw new Error(`დოკუმენტი ${document.id} ხელმოწერის მოლოდინში უნდა იყოს`);
   }
 
   if (recipient?.signingStatus === SigningStatus.SIGNED) {
@@ -103,7 +103,8 @@ export const signFieldWithToken = async ({
   }
 
   if (!isValid) {
-    throw new AppError(AppErrorCode.UNAUTHORIZED, 'Invalid authentication values');
+    throw new AppError(AppErrorCode.UNAUTHORIZED, 'ავთენტიფიკაციის არასწორი მნიშვნელობები');
+    // throw new AppError(AppErrorCode.UNAUTHORIZED, 'Invalid authentication values');
   }
 
   const documentMeta = await prisma.documentMeta.findFirst({

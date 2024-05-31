@@ -20,7 +20,7 @@ export const getApiTokenByToken = async ({ token }: { token: string }) => {
   }
 
   if (apiToken.expires && apiToken.expires < new Date()) {
-    throw new Error('ვადაგასული ტოკენი');
+    throw new Error('ვადა გასული ტოკენი');
   }
 
   if (apiToken.team) {

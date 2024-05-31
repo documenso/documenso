@@ -52,7 +52,8 @@ export const resendTeamMemberInvitation = async ({
       });
 
       if (!team) {
-        throw new AppError('TeamNotFound', 'User is not a valid member of the team.');
+        throw new AppError('TeamNotFound', 'მომხმარებელი არ არის გუნდის მოქმედი წევრი.');
+        // throw new AppError('TeamNotFound', 'User is not a valid member of the team.');
       }
 
       const teamMemberInvite = await tx.teamMemberInvite.findUniqueOrThrow({

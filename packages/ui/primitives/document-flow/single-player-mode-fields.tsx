@@ -69,7 +69,8 @@ export function SinglePlayerModeSignatureField({
   const maxFontSize = DEFAULT_HANDWRITING_FONT_SIZE;
 
   if (!isSignatureFieldType(field.type)) {
-    throw new Error('Invalid field type');
+    throw new Error('ველის ტიპი არასწორია');
+    // throw new Error('Invalid field type');
   }
 
   const { height, width } = useFieldPageCoords(field);
@@ -132,7 +133,8 @@ export function SinglePlayerModeCustomTextField({
   const maxFontSize = DEFAULT_STANDARD_FONT_SIZE;
 
   if (isSignatureFieldType(field.type)) {
-    throw new Error('Invalid field type');
+    throw new Error('ველის ტიპი არასწორია');
+    // throw new Error('Invalid field type');
   }
 
   const $paragraphEl = useRef<HTMLParagraphElement>(null);

@@ -50,7 +50,8 @@ export const completeDocumentWithToken = async ({
   const document = await getDocument({ token, documentId });
 
   if (document.status !== DocumentStatus.PENDING) {
-    throw new Error(`დოკუმენტი ${document.id} must be pending`);
+    throw new Error(`დოკუმენტი ${document.id} მოლოდინში უნდა იყოს`);
+    // throw new Error(`დოკუმენტი ${document.id} must be pending`);
   }
 
   if (document.Recipient.length === 0) {
@@ -71,7 +72,8 @@ export const completeDocumentWithToken = async ({
   });
 
   if (fields.some((field) => !field.inserted)) {
-    throw new Error(`Recipient ${recipient.id} has unsigned fields`);
+    throw new Error(`მიმღებს ${recipient.id} აქვს ხელმოუწერელი ველები`);
+    // throw new Error(`Recipient ${recipient.id} has unsigned fields`);
   }
 
   // Document reauth for completing documents is currently not required.

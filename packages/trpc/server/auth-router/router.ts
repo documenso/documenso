@@ -46,7 +46,8 @@ export const authRouter = router({
       if (IS_BILLING_ENABLED() && url && url.length < 6) {
         throw new AppError(
           AppErrorCode.PREMIUM_PROFILE_URL,
-          'Only subscribers can have a username shorter than 6 characters',
+          'მხოლოდ აბონენტებს შეუძლიათ ჰქონდეთ პროფილის სახელი 6 სიმბოლოზე მოკლე',
+          // 'Only subscribers can have a username shorter than 6 characters',
         );
       }
 
@@ -65,10 +66,13 @@ export const authRouter = router({
       }
 
       let message =
-        'We were unable to create your account. Please review the information you provided and try again.';
+        'ჩვენ ვერ შევძელით ანგარიშის შექმნა. გთხოვთ გადახედოთ თქვენს მიერ მოწოდებულ ინფორმაციას და სცადოთ ხელახლა.';
+      // 'We were unable to create your account. Please review the information you provided and try again.';
 
       if (err instanceof Error && err.message === 'User already exists') {
-        message = 'User with this email already exists. Please use a different email address.';
+        message =
+          'მომხმარებელი ამ ელ.ფოსტით უკვე არსებობს. გთხოვთ გამოიყენოთ სხვა ელ.ფოსტის მისამართი.';
+        // message = 'User with this email already exists. Please use a different email address.';
       }
 
       throw new TRPCError({
@@ -131,7 +135,8 @@ export const authRouter = router({
         throw new TRPCError({
           code: 'BAD_REQUEST',
           message:
-            'We were unable to create the authentication options for the passkey. Please try again later.',
+            'ჩვენ ვერ შევძელით საიდუმლო გასაღების ავთენტიფიკაციის ვარიანტების შექმნა. გთხოვთ სცადოთ მოგვიანებით.',
+          // 'We were unable to create the authentication options for the passkey. Please try again later.',
         });
       }
     }),
@@ -147,7 +152,8 @@ export const authRouter = router({
       throw new TRPCError({
         code: 'BAD_REQUEST',
         message:
-          'We were unable to create the registration options for the passkey. Please try again later.',
+          'ჩვენ ვერ შევძელით საიდუმლო გასაღების რეგისტრაციის ვარიანტების შექმნა. გთხოვთ სცადოთ მოგვიანებით.',
+        // 'We were unable to create the registration options for the passkey. Please try again later.',
       });
     }
   }),
@@ -171,7 +177,9 @@ export const authRouter = router({
 
       throw new TRPCError({
         code: 'BAD_REQUEST',
-        message: 'We were unable to create the options for passkey signin. Please try again later.',
+        message:
+          'ჩვენ ვერ შევძელით საიდუმლო გასაღებით ავტორიზაციის ვარიანტების შექმნა. გთხოვთ სცადოთ მოგვიანებით.',
+        // message: 'We were unable to create the options for passkey signin. Please try again later.',
       });
     }
   }),
@@ -192,7 +200,8 @@ export const authRouter = router({
 
         throw new TRPCError({
           code: 'BAD_REQUEST',
-          message: 'We were unable to delete this passkey. Please try again later.',
+          message: 'ჩვენ ვერ მოვახერხეთ ამ საიდუმლო გასაღების წაშლა. გთხოვთ სცადოთ მოგვიანებით.',
+          // message: 'We were unable to delete this passkey. Please try again later.',
         });
       }
     }),
@@ -214,7 +223,8 @@ export const authRouter = router({
 
         throw new TRPCError({
           code: 'BAD_REQUEST',
-          message: 'We were unable to find passkeys. Please try again later.',
+          message: 'ჩვენ ვერ ვიპოვეთ საიდუმლო გასაღებები. გთხოვთ სცადოთ მოგვიანებით.',
+          // message: 'We were unable to find passkeys. Please try again later.',
         });
       }
     }),
@@ -236,7 +246,8 @@ export const authRouter = router({
 
         throw new TRPCError({
           code: 'BAD_REQUEST',
-          message: 'We were unable to update this passkey. Please try again later.',
+          message: 'ჩვენ ვერ შევძელით ამ საიდუმლო გასაღების განახლება. გთხოვთ სცადოთ მოგვიანებით.',
+          // message: 'We were unable to update this passkey. Please try again later.',
         });
       }
     }),

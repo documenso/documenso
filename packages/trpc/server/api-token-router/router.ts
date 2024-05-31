@@ -21,7 +21,8 @@ export const apiTokenRouter = router({
 
       throw new TRPCError({
         code: 'BAD_REQUEST',
-        message: 'We were unable to find your API tokens. Please try again.',
+        message: 'ჩვენ ვერ ვიპოვეთ თქვენი API ტოკენები. გთხოვთ კიდევ სცადეთ.',
+        // message: 'We were unable to find your API tokens. Please try again.',
       });
     }
   }),
@@ -41,7 +42,8 @@ export const apiTokenRouter = router({
 
         throw new TRPCError({
           code: 'BAD_REQUEST',
-          message: 'We were unable to find this API token. Please try again.',
+          message: 'ჩვენ ვერ ვიპოვეთ თქვენი API ტოკენები. გთხოვთ კიდევ სცადეთ.',
+          // message: 'We were unable to find this API token. Please try again.',
         });
       }
     }),
@@ -63,7 +65,8 @@ export const apiTokenRouter = router({
 
         throw new TRPCError({
           code: 'BAD_REQUEST',
-          message: 'We were unable to create an API token. Please try again.',
+          message: 'ჩვენ ვერ შევძელით API ტოკენის შექმნა. გთხოვთ კიდევ სცადეთ.',
+          // message: 'We were unable to create an API token. Please try again.',
         });
       }
     }),
@@ -84,7 +87,8 @@ export const apiTokenRouter = router({
 
         throw new TRPCError({
           code: 'BAD_REQUEST',
-          message: 'We were unable to delete this API Token. Please try again.',
+          message: 'ჩვენ ვერ მოვახერხეთ ამ API ტოკენის წაშლა. გთხოვთ კიდევ სცადეთ.',
+          // message: 'We were unable to delete this API Token. Please try again.',
         });
       }
     }),

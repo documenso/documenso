@@ -37,7 +37,8 @@ export const DocumentDropzone = ({
   onDrop,
   onDropRejected,
   disabled,
-  disabledMessage = 'You cannot upload documents at this time.',
+  disabledMessage = 'ამჯერად დოკუმენტების ატვირთვა არ შეგიძლიათ.',
+  // disabledMessage = 'You cannot upload documents at this time.',
   type = 'document',
   ...props
 }: DocumentDropzoneProps) => {

@@ -37,10 +37,10 @@ export const SendDocumentActionDialog = ({
       <DialogContent className="max-w-md">
         <DialogHeader>
           <DialogTitle className="text-center text-lg font-semibold">
-            გაგზავნეთ დოკუმენტი
+            გააგზავნეთ დოკუმენტი
           </DialogTitle>
           <DialogDescription className="text-center text-base">
-            თქვენ აპირებთ ამ დოკუმენტის გაგზავნას. დარწმუნდით სანამ განაგრძობთ.
+            თქვენ აპირებთ ამ დოკუმენტის გაგზავნას, დარწმუნდით სანამ განაგრძობთ.
           </DialogDescription>
         </DialogHeader>
 

@@ -13,7 +13,7 @@ export const createTeamBillingPortal = async ({
   teamId,
 }: CreateTeamBillingPortalOptions) => {
   if (!IS_BILLING_ENABLED()) {
-    throw new Error('Billing is not enabled');
+    throw new Error('ბილინგი არ არის გააქტიურებული');
   }
 
   const team = await prisma.team.findFirstOrThrow({

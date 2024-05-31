@@ -220,7 +220,7 @@ export const AddSettingsFormPartial = ({
                       name="meta.timezone"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>დროის სარტყელი</FormLabel>
+                          <FormLabel>დროითი ზონა</FormLabel>
 
                           <FormControl>
                             <Combobox

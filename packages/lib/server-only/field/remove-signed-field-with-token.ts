@@ -37,7 +37,7 @@ export const removeSignedFieldWithToken = async ({
   }
 
   if (document.status !== DocumentStatus.PENDING) {
-    throw new Error(`Document ${document.id} must be pending`);
+    throw new Error(`დოკუმენტი ${document.id} მოლოდინში უნდა იყოს`);
   }
 
   if (recipient?.signingStatus === SigningStatus.SIGNED) {

@@ -57,7 +57,8 @@ export const duplicateTemplate = async ({
     data: {
       userId,
       teamId,
-      title: template.title + ' (copy)',
+      title: template.title + ' (დუბლირებული)',
+      // title: template.title + ' (copy)',
       templateDocumentDataId: documentData.id,
       Recipient: {
         create: template.Recipient.map((recipient) => ({

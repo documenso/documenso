@@ -15,7 +15,7 @@ export type ResetPasswordOptions = {
 
 export const resetPassword = async ({ token, password, requestMetadata }: ResetPasswordOptions) => {
   if (!token) {
-    throw new Error('ტოკენი არასწორი. გთხოვთ თავიდან სცადეთ.');
+    throw new Error('ტოკენი არასწორია. გთხოვთ თავიდან სცადეთ.');
   }
 
   const foundToken = await prisma.passwordResetToken.findFirst({
@@ -28,7 +28,7 @@ export const resetPassword = async ({ token, password, requestMetadata }: ResetP
   });
 
   if (!foundToken) {
-    throw new Error('ტოკენი არასწორი. გთხოვთ თავიდან სცადეთ.');
+    throw new Error('ტოკენი არასწორია. გთხოვთ თავიდან სცადეთ.');
   }
 
   const now = new Date();
@@ -40,7 +40,7 @@ export const resetPassword = async ({ token, password, requestMetadata }: ResetP
   const isSamePassword = await compare(password, foundToken.User.password || '');
 
   if (isSamePassword) {
-    throw new Error('თქვენი ახალი პაროლი არ შეიძლება ემთხვეოდეს ძველი პაროლის.');
+    throw new Error('თქვენი ახალი პაროლი არ შეიძლება ემთხვეოდეს ძველ პაროლის.');
   }
 
   const hashedPassword = await hash(password, SALT_ROUNDS);

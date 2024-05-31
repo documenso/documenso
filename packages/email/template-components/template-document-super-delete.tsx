@@ -28,8 +28,8 @@ export const TemplateDocumentDelete = ({
         <Text className="mx-auto mb-6 mt-1 text-left text-base text-slate-400">
           {/* This document can not be recovered, if you would like to dispute the reason for future
           documents please contact support. */}
-          ამ დოკუმენტის აღდგენა შეუძლებელია, თუ გსურთ სამომავლო მიზეზის დაპირისპირება დოკუმენტები
-          გთხოვთ დაგვიკავშირდეთ.
+          ამ დოკუმენტის აღდგენა შეუძლებელია. თუ გაინტერესებთ რატომ, გთხოვთ, დაგვიკავშირდეთ მომავალი
+          დოკუმენტებისთვის ინფორმაციის მისაღებად.
         </Text>
 
         <Text className="mx-auto mt-1 text-left text-base text-slate-400">წაშლის მიზეზია:</Text>

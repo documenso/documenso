@@ -62,13 +62,13 @@ export default async function IndexPage() {
             <AccordionContent className="text-muted-foreground max-w-prose text-sm leading-relaxed">
               ელექტრონული ხელმოწერა არის ფიზიკური პირის ხელმოწერის ციფრული ვერსია, რომელიც
               გამოიყენება დოკუმენტებზე ონლაინ ხელმოწერისთვის. ჩვენი ელექტრონული ხელმოწერები
-              იურიდიულად მოქმედებს და აღიარებულია მთელ ევროკავშირში და მსოფლიოს მზარდ ქვეყნებში.
+              იურიდიულად მოქმედებს და აღიარებულია მთელ ევროკავშირსა და მსოფლიოს მზარდ ქვეყნებში.
             </AccordionContent>
           </AccordionItem>
 
           <AccordionItem value="data-handling">
             <AccordionTrigger className="text-left text-lg font-semibold">
-              რამდენად უსაფრთხოა ელექტრონული ხელმოწეერები?
+              რამდენად უსაფრთხოა ელექტრონული ხელმოწერები?
             </AccordionTrigger>
 
             <AccordionContent className="text-muted-foreground max-w-prose text-sm leading-relaxed">
@@ -91,7 +91,7 @@ export default async function IndexPage() {
               დიახ, ჩვენი პლატფორმა შექმნილია ისე, რომ იყოს სრულად თავსებადი ყველა ძირითად
               მოწყობილობასთან, მათ შორის დესკტოპებთან, ლეპტოპებთან, ტაბლეტებთან და სმარტფონებთან.
               სანამ ინტერნეტთან კავშირი გაქვთ, შეგიძლიათ დოკუმენტების ხელმოწერა ნებისმიერ დროს,
-              ნებისმიერ ადგილას.
+              ნებისმიერი ადგილიდან.
             </AccordionContent>
           </AccordionItem>
 
@@ -113,7 +113,7 @@ export default async function IndexPage() {
             <AccordionContent className="text-muted-foreground max-w-prose text-sm leading-relaxed">
               დოკუმენტზე ხელმოსაწერად არ არის საჭირო რეგისტრაციის გავლა. ხელმომწერი დოკუმენტს
               მიიღებს ელ.ფოსტაზე, ხოლო ხელის მოწერა შესაძლებელი იქნება, ყოველგვარი რეგისტრაციის
-              გარეშე, როგორც კომპიუტერიდან, ისევე მობილურიდან.
+              გარეშე.
             </AccordionContent>
           </AccordionItem>
 
@@ -141,7 +141,7 @@ export default async function IndexPage() {
                   ხელი მოეწერა
                 </li>
                 <li>
-                  <span>&#8226;</span> დოკუმენტის გაგზავნის, ნახვის და ხელმოწერის ზუსტ დროსა და
+                  <span>&#8226;</span> დოკუმენტის გაგზავნის, ნახვისა და ხელმოწერის ზუსტ დროსა და
                   თარიღს
                 </li>
               </ul>

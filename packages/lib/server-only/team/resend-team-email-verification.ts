@@ -45,7 +45,7 @@ export const resendTeamEmailVerification = async ({
       if (!emailVerification) {
         throw new AppError(
           'VerificationNotFound',
-          'გუნდის ელფოსტის ვერიფიკაცია ამ გუნდისთვის არ არსებობს.',
+          'ელ.ფოსტის ვერიფიკაცია ამ გუნდისთვის არ არსებობს.',
         );
       }
 

@@ -30,7 +30,7 @@ export const ZSignUpMutationSchema = z.object({
     .toLowerCase()
     .min(1)
     .regex(/^[a-z0-9-]+$/, {
-      message: 'სახელი შეიძლება შეიცავდეს მხოლოდ ასო-ციფრული სიმბოლოებსა და ტირეებს.',
+      message: 'სახელი შეიძლება შეიცავდეს მხოლოდ ასო-ციფრულ სიმბოლოებსა და ტირეებს.',
     })
     .optional(),
 });

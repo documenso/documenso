@@ -49,7 +49,7 @@ const updateFileWithS3 = async (key: string, data: string) => {
 
   if (!response.ok) {
     throw new Error(
-      `ფაილის განახლება ვერ მოხერხდა "${key}", failed with status code ${response.status}`,
+      `ფაილის განახლება ვერ მოხერხდა "${key}", ხარვეზის სტატუს კოდი ${response.status}`,
     );
   }
 

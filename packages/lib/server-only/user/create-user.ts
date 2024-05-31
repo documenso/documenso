@@ -40,7 +40,7 @@ export const createUser = async ({ name, email, password, signature, url }: Crea
     if (urlExists) {
       throw new AppError(
         AppErrorCode.PROFILE_URL_TAKEN,
-        'Profile username is taken',
+        // 'Profile username is taken',
         'პროფილის სახელი უკვე გამოყენებულია',
       );
     }

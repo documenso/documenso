@@ -33,7 +33,7 @@ export const TeamTransferRequestTemplate = ({
   teamUrl = 'demo',
   token = '',
 }: TeamTransferRequestTemplateProps) => {
-  const previewText = 'Accept team transfer request on Documenso';
+  const previewText = 'მიიღეთ გუნდის გადაცემის მოთხოვნა Documenso-ზე';
 
   return (
     <Html>
@@ -67,12 +67,12 @@ export const TeamTransferRequestTemplate = ({
 
               <Section className="p-2 text-slate-500">
                 <Text className="text-center text-lg font-medium text-black">
-                  {teamName} ownership transfer request
+                  {teamName}-ის მფლობელობის გადაცემის მოთხოვნა
                 </Text>
 
                 <Text className="my-1 text-center text-base">
-                  <span className="font-bold">{senderName}</span> has requested that you take
-                  ownership of the following team
+                  <span className="font-bold">{senderName}</span> მოითხოვა, რომ შემდეგი გუნდი თქვენს
+                  მფლობელობაში გადმოვიდეს:
                 </Text>
 
                 <div className="mx-auto my-2 w-fit rounded-lg bg-gray-50 px-4 py-2 text-base font-medium text-slate-600">
@@ -80,8 +80,8 @@ export const TeamTransferRequestTemplate = ({
                 </div>
 
                 <Text className="text-center text-sm">
-                  By accepting this request, you will take responsibility for any billing items
-                  associated with this team.
+                  ამ მოთხოვნის მიღებით, თქვენ იღებთ პასუხისმგებლობას ამ გუნდთან დაკავშირებულ
+                  ნებისმიერ გადახდებზე.
                 </Text>
 
                 <Section className="mb-6 mt-6 text-center">

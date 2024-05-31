@@ -15,7 +15,7 @@ export const PasswordReveal = ({ password }: PasswordRevealProps) => {
     void copy(password).then(() => {
       toast({
         title: 'დაკოპირებულია',
-        description: 'თქვენი პაროლი წარმატებით დაკოპირდა',
+        description: 'თქვენი პაროლი წარმატებით დაკოპირდა!',
       });
     });
   };

@@ -32,7 +32,8 @@ export const updateDocumentSettings = async ({
   requestMetadata,
 }: UpdateDocumentSettingsOptions) => {
   if (!data.title && !data.globalAccessAuth && !data.globalActionAuth) {
-    throw new AppError(AppErrorCode.INVALID_BODY, 'Missing data to update');
+    throw new AppError(AppErrorCode.INVALID_BODY, 'განახლებისთვის არასაკმარისი მონაცემებია');
+    // throw new AppError(AppErrorCode.INVALID_BODY, 'Missing data to update');
   }
 
   const user = await prisma.user.findFirstOrThrow({

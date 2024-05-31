@@ -23,15 +23,17 @@ export const RecipientRoleSelect = forwardRef<HTMLButtonElement, SelectProps>((p
       <SelectItem value={RecipientRole.SIGNER}>
         <div className="flex items-center">
           <div className="flex w-[150px] items-center">
-            <span className="mr-2">{ROLE_ICONS[RecipientRole.SIGNER]}</span>
-            Needs to sign
+            მიმღებმა <span className="mr-2">({ROLE_ICONS[RecipientRole.SIGNER]})</span>
+            საჭიროა ხელი მოაწეროს
+            {/* Needs to sign */}
           </div>
           <Tooltip>
             <TooltipTrigger>
               <InfoIcon className="h-4 w-4" />
             </TooltipTrigger>
             <TooltipContent className="text-foreground z-9999 max-w-md p-4">
-              <p>The recipient is required to sign the document for it to be completed.</p>
+              <p>მიმღები ვალდებულია ხელი მოაწეროს დოკუმენტს.</p>
+              {/* <p>The recipient is required to sign the document for it to be completed.</p> */}
             </TooltipContent>
           </Tooltip>
         </div>
@@ -40,15 +42,16 @@ export const RecipientRoleSelect = forwardRef<HTMLButtonElement, SelectProps>((p
       <SelectItem value={RecipientRole.APPROVER}>
         <div className="flex items-center">
           <div className="flex w-[150px] items-center">
-            <span className="mr-2">{ROLE_ICONS[RecipientRole.APPROVER]}</span>
-            Needs to approve
+            მიმღებმა <span className="mr-2">({ROLE_ICONS[RecipientRole.APPROVER]})</span>
+            საჭიროა დაამტკიცოს
+            {/* Needs to approve */}
           </div>
           <Tooltip>
             <TooltipTrigger>
               <InfoIcon className="h-4 w-4" />
             </TooltipTrigger>
             <TooltipContent className="text-foreground z-9999 max-w-md p-4">
-              <p>The recipient is required to approve the document for it to be completed.</p>
+              <p>მიმღები ვალდებულია დაამტკიცოს დოკუმენტი.</p>
             </TooltipContent>
           </Tooltip>
         </div>
@@ -57,15 +60,15 @@ export const RecipientRoleSelect = forwardRef<HTMLButtonElement, SelectProps>((p
       <SelectItem value={RecipientRole.VIEWER}>
         <div className="flex items-center">
           <div className="flex w-[150px] items-center">
-            <span className="mr-2">{ROLE_ICONS[RecipientRole.VIEWER]}</span>
-            Needs to view
+            მიმღბმა <span className="mr-2">({ROLE_ICONS[RecipientRole.VIEWER]})</span>
+            საჭიროა იხილოს
           </div>
           <Tooltip>
             <TooltipTrigger>
               <InfoIcon className="h-4 w-4" />
             </TooltipTrigger>
             <TooltipContent className="text-foreground z-9999 max-w-md p-4">
-              <p>The recipient is required to view the document for it to be completed.</p>
+              <p>მიმღები ვალდებულია ნახოს დოკუმენტი.</p>
             </TooltipContent>
           </Tooltip>
         </div>
@@ -74,8 +77,9 @@ export const RecipientRoleSelect = forwardRef<HTMLButtonElement, SelectProps>((p
       <SelectItem value={RecipientRole.CC}>
         <div className="flex items-center">
           <div className="flex w-[150px] items-center">
-            <span className="mr-2">{ROLE_ICONS[RecipientRole.CC]}</span>
-            Receives copy
+            მიმღები <span className="mr-2">({ROLE_ICONS[RecipientRole.CC]})</span>
+            იღებს ასლს
+            {/* Receives copy */}
           </div>
           <Tooltip>
             <TooltipTrigger>
@@ -83,8 +87,8 @@ export const RecipientRoleSelect = forwardRef<HTMLButtonElement, SelectProps>((p
             </TooltipTrigger>
             <TooltipContent className="text-foreground z-9999 max-w-md p-4">
               <p>
-                The recipient is not required to take any action and receives a copy of the document
-                after it is completed.
+                მიმღებს არ მოეთხოვება რაიმე ქმედება და იღებს დოკუმენტის ასლს მისი სრულად ხელმოწერის
+                შემდეგ.
               </p>
             </TooltipContent>
           </Tooltip>

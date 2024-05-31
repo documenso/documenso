@@ -72,15 +72,18 @@ export const TeamInviteEmailTemplate = ({
 
                 <Text className="my-1 text-center text-base">
                   {/* You have been invited to join the following team */}
-                  თქვენ გუნდში ხართ მოწვეული (მოგიწვიათ)
+                  {/* თქვენ გუნდში ხართ მოწვეული (მოგიწვიათ) */}
+                  თქვენ მოწვეული ხართ შემდეგ გუნდში:
                 </Text>
 
                 <div className="mx-auto my-2 w-fit rounded-lg bg-gray-50 px-4 py-2 text-base font-medium text-slate-600">
-                  {formatTeamUrl(teamUrl, baseUrl)}
+                  {formatTeamUrl(teamUrl, baseUrl)};
                 </div>
 
                 <Text className="my-1 text-center text-base">
-                  by <span className="text-slate-900">{senderName}</span>
+                  {/* by <span className="text-slate-900">{senderName}</span> */}
+                  <br />
+                  მოგიწვიათ <span className="text-slate-900">{senderName}</span>
                 </Text>
 
                 <Section className="mb-6 mt-6 text-center">

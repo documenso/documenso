@@ -75,7 +75,8 @@ export const updateTeamMember = async ({
     if (isNewMemberRoleHigherThanCurrentRole) {
       throw new AppError(
         AppErrorCode.UNAUTHORIZED,
-        'Cannot give a member a role higher than the user initating the update',
+        'არ შეიძლება გუნდის წევრისთვის უფრო მაღალი როლის მინიჭება, ვიდრე მომხმარებლის, რომელიც განახლების ინიციატორია.',
+        // 'Cannot give a member a role higher than the user initating the update',
       );
     }
 

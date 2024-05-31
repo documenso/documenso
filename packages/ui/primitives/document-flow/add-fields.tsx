@@ -450,7 +450,7 @@ export const AddFieldsFormPartial = ({
                                 </TooltipTrigger>
 
                                 <TooltipContent className="text-muted-foreground max-w-xs">
-                                  ეს დოკუმენტი უკვე გაეგზავნა ამ მიმღებს. ამ მიმღების შეცვლა აღარ
+                                  ეს დოკუმენტი უკვე გაეგზავნა ამ მიმღებს. მიმღების შეცვლა აღარ
                                   შეგიძლიათ.
                                 </TooltipContent>
                               </Tooltip>

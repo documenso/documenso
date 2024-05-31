@@ -20,7 +20,7 @@ export const TeamEmailRemovedTemplate = ({
   teamName = 'Team Name',
   teamUrl = 'demo',
 }: TeamEmailRemovedTemplateProps) => {
-  const previewText = `Team email removed for ${teamName} on Documenso`;
+  const previewText = `${teamName} გუნდის ელ.ფოსტა Documenso-ზე წაიშალა`;
   //                    გუნდის ელ.ფოსტა Digital Insitute-სთვის Documenso-ზე წაიშალა
 
   return (

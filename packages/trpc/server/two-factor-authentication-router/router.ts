@@ -25,7 +25,9 @@ export const twoFactorAuthenticationRouter = router({
 
       throw new TRPCError({
         code: 'BAD_REQUEST',
-        message: 'We were unable to setup two-factor authentication. Please try again later.',
+        message:
+          'ჩვენ ვერ მოვახერხეთ ორფაქტორიანი ავთენტიფიკაციის დაყენება. გთხოვთ სცადოთ მოგვიანებით.',
+        // message: 'We were unable to setup two-factor authentication. Please try again later.',
       });
     }
   }),
@@ -52,7 +54,9 @@ export const twoFactorAuthenticationRouter = router({
 
         throw new TRPCError({
           code: 'BAD_REQUEST',
-          message: 'We were unable to enable two-factor authentication. Please try again later.',
+          message:
+            'ჩვენ ვერ შევძელით ორფაქტორიანი ავთენტიფიკაციის გააქტიურება. გთხოვთ სცადოთ მოგვიანებით.',
+          // message: 'We were unable to enable two-factor authentication. Please try again later.',
         });
       }
     }),
@@ -77,7 +81,9 @@ export const twoFactorAuthenticationRouter = router({
 
         throw new TRPCError({
           code: 'BAD_REQUEST',
-          message: 'We were unable to disable two-factor authentication. Please try again later.',
+          message:
+            'ჩვენ ვერ მოვახერხეთ ორფაქტორიანი ავთენტიფიკაციის გამორთვა. გთხოვთ სცადოთ მოგვიანებით.',
+          // message: 'We were unable to disable two-factor authentication. Please try again later.',
         });
       }
     }),

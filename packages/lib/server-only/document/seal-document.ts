@@ -68,7 +68,7 @@ export const sealDocument = async ({
   });
 
   if (recipients.some((recipient) => recipient.signingStatus !== SigningStatus.SIGNED)) {
-    throw new Error(`დოკუმენტის- ${document.id} მიმღებებს ხელი არ მოუწერიათ`);
+    throw new Error(`დოკუმენტის ${document.id} მიმღებებს ხელი არ მოუწერიათ`);
   }
 
   const fields = await prisma.field.findMany({

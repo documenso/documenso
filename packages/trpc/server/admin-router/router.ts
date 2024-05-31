@@ -33,7 +33,8 @@ export const adminRouter = router({
 
       throw new TRPCError({
         code: 'BAD_REQUEST',
-        message: 'We were unable to retrieve the documents. Please try again.',
+        message: 'ჩვენ ვერ მოვახერხეთ საბუთების მოძიება. გთხოვთ კიდევ სცადეთ.',
+        // message: 'We were unable to retrieve the documents. Please try again.',
       });
     }
   }),
@@ -50,7 +51,8 @@ export const adminRouter = router({
 
         throw new TRPCError({
           code: 'BAD_REQUEST',
-          message: 'We were unable to retrieve the specified account. Please try again.',
+          message: 'ჩვენ ვერ მოვახერხეთ მითითებული ანგარიშის მოძიება. გთხოვთ კიდევ სცადეთ.',
+          // message: 'We were unable to retrieve the specified account. Please try again.',
         });
       }
     }),
@@ -67,7 +69,8 @@ export const adminRouter = router({
 
         throw new TRPCError({
           code: 'BAD_REQUEST',
-          message: 'We were unable to update the recipient provided.',
+          message: 'ჩვენ ვერ შევძელით მითითებული მიმღების განახლება.',
+          // message: 'We were unable to update the recipient provided.',
         });
       }
     }),
@@ -89,7 +92,8 @@ export const adminRouter = router({
 
         throw new TRPCError({
           code: 'BAD_REQUEST',
-          message: 'We were unable to update the site setting provided.',
+          message: 'მოწოდებული პარამეტრის განახლება ვერ მოხერხდა.',
+          // message: 'We were unable to update the site setting provided.',
         });
       }
     }),
@@ -106,7 +110,8 @@ export const adminRouter = router({
 
         throw new TRPCError({
           code: 'BAD_REQUEST',
-          message: 'We were unable to reseal the document provided.',
+          message: 'ჩვენ ვერ მოვახერხეთ მითითებული დოკუმენტის ხელახალი დალუქვა.',
+          // message: 'We were unable to reseal the document provided.',
         });
       }
     }),
@@ -118,7 +123,8 @@ export const adminRouter = router({
       const user = await getUserById({ id });
 
       if (user.email !== email) {
-        throw new Error('Email does not match');
+        throw new Error('ელ.ფოსტები არ ემთხვევა');
+        // throw new Error('Email does not match');
       }
 
       return await deleteUser({ id });
@@ -127,7 +133,8 @@ export const adminRouter = router({
 
       throw new TRPCError({
         code: 'BAD_REQUEST',
-        message: 'We were unable to delete the specified account. Please try again.',
+        message: 'ჩვენ ვერ მოვახერხეთ მითითებული ანგარიშის წაშლა. გთხოვთ კიდევ სცადეთ.',
+        // message: 'We were unable to delete the specified account. Please try again.',
       });
     }
   }),
@@ -148,7 +155,8 @@ export const adminRouter = router({
 
         throw new TRPCError({
           code: 'BAD_REQUEST',
-          message: 'We were unable to delete the specified document. Please try again.',
+          message: 'ჩვენ ვერ მოვახერხეთ მითითებული დოკუმენტის წაშლა. გთხოვთ კიდევ სცადეთ.',
+          // message: 'We were unable to delete the specified document. Please try again.',
         });
       }
     }),

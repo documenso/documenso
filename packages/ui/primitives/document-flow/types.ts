@@ -17,7 +17,8 @@ export const ZDocumentFlowFormSchema = z.object({
     .refine((signers) => {
       const emails = signers.map((signer) => signer.email);
       return new Set(emails).size === emails.length;
-    }, 'Signers must have unique emails'),
+    }, 'ხელმომწერებს უნდა ჰქონდეთ უნიკალური ელ.ფოსტები'),
+  // }, 'Signers must have unique emails'),
 
   fields: z.array(
     z.object({

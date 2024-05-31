@@ -106,7 +106,7 @@ export const createDocumentFromTemplate = async ({
     if (!foundRecipient) {
       throw new AppError(
         AppErrorCode.INVALID_BODY,
-        `Recipient with ID ${recipient.id} not found in the template.`,
+        `მომხმარებელი ID-ით ${recipient.id}, ამ შაბლონში არ მოიძებნა.`,
       );
     }
   });

@@ -16,7 +16,8 @@ export const authenticatedMiddleware = t.middleware(async ({ ctx, next }) => {
   if (!ctx.session) {
     throw new TRPCError({
       code: 'UNAUTHORIZED',
-      message: 'You must be logged in to perform this action.',
+      message: 'ამ მოქმედების შესასრულებლად უნდა იყოთ ავტორიზებული.',
+      // message: 'You must be logged in to perform this action.',
     });
   }
 
@@ -33,7 +34,8 @@ export const adminMiddleware = t.middleware(async ({ ctx, next }) => {
   if (!ctx.session || !ctx.user) {
     throw new TRPCError({
       code: 'UNAUTHORIZED',
-      message: 'You must be logged in to perform this action.',
+      message: 'ამ მოქმედების შესასრულებლად უნდა იყოთ ავტორიზებული.',
+      // message: 'You must be logged in to perform this action.',
     });
   }
 
@@ -42,7 +44,8 @@ export const adminMiddleware = t.middleware(async ({ ctx, next }) => {
   if (!isUserAdmin) {
     throw new TRPCError({
       code: 'UNAUTHORIZED',
-      message: 'Not authorized to perform this action.',
+      message: 'არ არის უფლებამოსილი ამ მოქმედების შესასრულებლად.',
+      // message: 'Not authorized to perform this action.',
     });
   }
 

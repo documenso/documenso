@@ -40,7 +40,8 @@ export const templateRouter = router({
 
         throw new TRPCError({
           code: 'BAD_REQUEST',
-          message: 'We were unable to create this template. Please try again later.',
+          message: 'ჩვენ ვერ შევძელით ამ შაბლონის შექმნა. გთხოვთ სცადოთ მოგვიანებით.',
+          // message: 'We were unable to create this template. Please try again later.',
         });
       }
     }),
@@ -54,7 +55,8 @@ export const templateRouter = router({
         const limits = await getServerLimits({ email: ctx.user.email });
 
         if (limits.remaining.documents === 0) {
-          throw new Error('You have reached your document limit.');
+          throw new Error('თქვენ მიაღწიეთ დოკუმენტების ლიმიტს.');
+          // throw new Error('You have reached your document limit.');
         }
 
         const requestMetadata = extractNextApiRequestMetadata(ctx.req);
@@ -104,7 +106,8 @@ export const templateRouter = router({
 
         throw new TRPCError({
           code: 'BAD_REQUEST',
-          message: 'We were unable to duplicate the template. Please try again later.',
+          message: 'ჩვენ ვერ შევძელით შაბლონის დუბლირება. გთხოვთ სცადოთ მოგვიანებით.',
+          // message: 'We were unable to duplicate the template. Please try again later.',
         });
       }
     }),
@@ -123,7 +126,8 @@ export const templateRouter = router({
 
         throw new TRPCError({
           code: 'BAD_REQUEST',
-          message: 'We were unable to delete this template. Please try again later.',
+          message: 'ჩვენ ვერ მოვახერხეთ ამ შაბლონის წაშლა. გთხოვთ სცადოთ მოგვიანებით.',
+          // message: 'We were unable to delete this template. Please try again later.',
         });
       }
     }),
@@ -141,7 +145,8 @@ export const templateRouter = router({
 
         throw new TRPCError({
           code: 'BAD_REQUEST',
-          message: 'We were unable to find this template. Please try again later.',
+          message: 'ჩვენ ვერ ვიპოვეთ ეს შაბლონი. გთხოვთ სცადოთ მოგვიანებით.',
+          // message: 'We were unable to find this template. Please try again later.',
         });
       }
     }),
@@ -171,7 +176,8 @@ export const templateRouter = router({
         throw new TRPCError({
           code: 'BAD_REQUEST',
           message:
-            'We were unable to update the settings for this template. Please try again later.',
+            'ჩვენ ვერ შევძელით ამ შაბლონის პარამეტრების განახლება. გთხოვთ სცადოთ მოგვიანებით.',
+          // 'We were unable to update the settings for this template. Please try again later.',
         });
       }
     }),

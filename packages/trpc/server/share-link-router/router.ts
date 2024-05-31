@@ -18,7 +18,8 @@ export const shareLinkRouter = router({
 
         if (!ctx.user?.id) {
           throw new Error(
-            'You must either provide a token or be logged in to create a sharing link.',
+            'თქვენ უნდა მოგვაწოდოღ ტოკენი ან იყოთ ავტორიზებული, რომ შექმნათ გაზიარების ბმული.',
+            // 'You must either provide a token or be logged in to create a sharing link.',
           );
         }
 
@@ -28,7 +29,8 @@ export const shareLinkRouter = router({
 
         throw new TRPCError({
           code: 'BAD_REQUEST',
-          message: 'We were unable to create a sharing link.',
+          message: 'ჩვენ ვერ შევძელით გაზიარების ბმულის შექმნა.',
+          // message: 'We were unable to create a sharing link.',
         });
       }
     }),

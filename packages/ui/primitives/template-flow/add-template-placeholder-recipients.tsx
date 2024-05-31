@@ -175,7 +175,7 @@ export const AddTemplatePlaceholderRecipientsFormPartial = ({
                         })}
                       >
                         {!showAdvancedSettings && index === 0 && (
-                          <FormLabel required>Email</FormLabel>
+                          <FormLabel required>ელ.ფოსტა</FormLabel>
                         )}
 
                         <FormControl>
@@ -202,7 +202,7 @@ export const AddTemplatePlaceholderRecipientsFormPartial = ({
                           'col-span-4': showAdvancedSettings,
                         })}
                       >
-                        {!showAdvancedSettings && index === 0 && <FormLabel>Name</FormLabel>}
+                        {!showAdvancedSettings && index === 0 && <FormLabel>სახელი</FormLabel>}
 
                         <FormControl>
                           <Input
@@ -284,7 +284,8 @@ export const AddTemplatePlaceholderRecipientsFormPartial = ({
                 onClick={() => onAddPlaceholderRecipient()}
               >
                 <Plus className="-ml-1 mr-2 h-5 w-5" />
-                Add Placeholder Recipient
+                დაამატეთ მიმღები
+                {/* Add Placeholder Recipient */}
               </Button>
 
               <Button
@@ -298,7 +299,7 @@ export const AddTemplatePlaceholderRecipientsFormPartial = ({
                 onClick={() => onAddPlaceholderSelfRecipient()}
               >
                 <Plus className="-ml-1 mr-2 h-5 w-5" />
-                Add Myself
+                თქვენი თავი
               </Button>
             </div>
 
@@ -316,7 +317,7 @@ export const AddTemplatePlaceholderRecipientsFormPartial = ({
                   className="text-muted-foreground ml-2 text-sm"
                   htmlFor="showAdvancedRecipientSettings"
                 >
-                  Show advanced settings
+                  დამატებითი პარამეტრები
                 </label>
               </div>
             )}

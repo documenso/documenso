@@ -163,7 +163,7 @@ const verifyPasskey = async ({
   });
 
   if (!passkey) {
-    throw new AppError(AppErrorCode.NOT_FOUND, 'Passkey not found');
+    throw new AppError(AppErrorCode.NOT_FOUND, 'საიდუმლო გასაღები არ მოიძებნა');
   }
 
   const verificationToken = await prisma.verificationToken

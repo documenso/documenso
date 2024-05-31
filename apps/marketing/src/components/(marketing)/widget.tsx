@@ -179,7 +179,7 @@ export const Widget = ({ className, children, ...props }: WidgetProps) => {
         description:
           error instanceof Error
             ? error.message
-            : 'გთხოვთ ცადოთ მოგვიანებით ან დაგვიკავშირდეთ support@documenso.com',
+            : 'გთხოვთ სცადოთ მოგვიანებით ან დაგვიკავშირდეთ support@documenso.com',
         variant: 'destructive',
       });
     }
@@ -202,7 +202,7 @@ export const Widget = ({ className, children, ...props }: WidgetProps) => {
             onSubmit={handleSubmit(onFormSubmit)}
           >
             <h3 className="text-xl font-semibold">გჭირდებათ დოკუმენტზე ხელმოწერა?</h3>
-            <p className="text-muted-foreground mt-2 text-sm">გაიაქტიურეთ ბიზნეს პაკეტი</p>
+            <p className="text-muted-foreground mt-2 text-sm">გაიაქტიურეთ პაკეტი</p>
 
             <hr className="mb-6 mt-4" />
 

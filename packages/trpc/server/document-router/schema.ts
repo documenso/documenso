@@ -65,7 +65,8 @@ export const ZSetSettingsForDocumentMutationSchema = z.object({
       .string()
       .optional()
       .refine((value) => value === undefined || value === '' || URL_REGEX.test(value), {
-        message: 'Please enter a valid URL',
+        message: 'გთხოვთ შეიყვანოთ სწორი URL',
+        // message: 'Please enter a valid URL',
       }),
   }),
 });
@@ -131,7 +132,8 @@ export const ZSendDocumentMutationSchema = z.object({
       .string()
       .optional()
       .refine((value) => value === undefined || value === '' || URL_REGEX.test(value), {
-        message: 'Please enter a valid URL',
+        message: 'გთხოვთ შეიყვანოთ სწორი URL',
+        // message: 'Please enter a valid URL',
       }),
   }),
 });

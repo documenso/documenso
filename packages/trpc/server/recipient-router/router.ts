@@ -37,7 +37,8 @@ export const recipientRouter = router({
 
         throw new TRPCError({
           code: 'BAD_REQUEST',
-          message: 'We were unable to set this field. Please try again later.',
+          message: 'ჩვენ ვერ მოვახერხეთ ამ ველის დაყენება. გთხოვთ სცადოთ მოგვიანებით.',
+          // message: 'We were unable to set this field. Please try again later.',
         });
       }
     }),
@@ -65,7 +66,8 @@ export const recipientRouter = router({
 
         throw new TRPCError({
           code: 'BAD_REQUEST',
-          message: 'We were unable to set this field. Please try again later.',
+          message: 'ჩვენ ვერ მოვახერხეთ ამ ველის დაყენება. გთხოვთ სცადოთ მოგვიანებით.',
+          // message: 'We were unable to set this field. Please try again later.',
         });
       }
     }),
@@ -88,7 +90,8 @@ export const recipientRouter = router({
 
         throw new TRPCError({
           code: 'BAD_REQUEST',
-          message: 'We were unable to sign this field. Please try again later.',
+          message: 'ჩვენ ვერ მოვახერხეთ ამ ველზე ხელის მოწერა. გთხოვთ სცადოთ მოგვიანებით.',
+          // message: 'We were unable to sign this field. Please try again later.',
         });
       }
     }),

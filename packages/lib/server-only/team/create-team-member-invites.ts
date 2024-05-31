@@ -125,8 +125,9 @@ export const createTeamMemberInvites = async ({
 
     throw new AppError(
       'EmailDeliveryFailed',
-      'Failed to send invite emails to one or more users.',
-      `Failed to send invites to ${sendEmailResultErrorList.length}/${teamMemberInvites.length} users.`,
+      'მოწვევის ელ.ფოსტის გაგზავნა ვერ მოხერხდა ერთი ან მეტი მომხმარებლისთვის.',
+      `მოწვევის გაგზავნა ${sendEmailResultErrorList.length}/${teamMemberInvites.length} მომხმარებლისთვის ვერ მოხერხდა.`,
+      // `Failed to send invites to ${sendEmailResultErrorList.length}/${teamMemberInvites.length} users.`,
     );
   }
 };

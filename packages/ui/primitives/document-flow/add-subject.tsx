@@ -120,7 +120,8 @@ export const AddSubjectFormPartial = ({
         <DocumentFlowFormContainerActions
           loading={isSubmitting}
           disabled={isSubmitting}
-          goNextLabel={document.status === DocumentStatus.DRAFT ? 'Send' : 'Update'}
+          goNextLabel={document.status === DocumentStatus.DRAFT ? 'გაგზავნა' : 'განახლება'}
+          // goNextLabel={document.status === DocumentStatus.DRAFT ? 'Send' : 'Update'}
           onGoBackClick={previousStep}
           onGoNextClick={() => void onFormSubmit()}
         />

@@ -20,7 +20,7 @@ export const TemplateDocumentCancel = ({
       <Section>
         <Text className="text-primary mx-auto mb-0 max-w-[80%] text-center text-lg font-semibold">
           {/* has cancelled the document */}
-          {inviterName}მ გააუქმა დოკუმენტი
+          {inviterName}: გააუქმა დოკუმენტი
           <br />"{documentName}"
         </Text>
 

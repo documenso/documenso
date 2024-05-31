@@ -31,7 +31,8 @@ const Combobox = ({
     setOpen(false);
   };
 
-  const placeholderValue = placeholder ?? 'Select an option';
+  const placeholderValue = placeholder ?? 'აირჩიეთ ვარიანტი';
+  // const placeholderValue = placeholder ?? 'Select an option';
 
   return (
     <Popover open={open} onOpenChange={setOpen}>

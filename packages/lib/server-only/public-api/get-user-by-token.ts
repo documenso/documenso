@@ -30,7 +30,7 @@ export const getUserByApiToken = async ({ token }: { token: string }) => {
   }
 
   if (retrievedToken.expires && retrievedToken.expires < new Date()) {
-    throw new Error('ვადაგასული ტოკენი');
+    throw new Error('ვადა გასული ტოკენი');
   }
 
   return user;

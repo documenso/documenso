@@ -37,7 +37,7 @@ export const updatePassword = async ({
   // Compare the new password with the old password
   const isSamePassword = await compare(password, user.password);
   if (isSamePassword) {
-    throw new Error('თქვენი ახალი პაროლი არ შეიძლება ემთხვეოდეს ძველი პაროლის.');
+    throw new Error('თქვენი ახალი პაროლი არ შეიძლება ემთხვეოდეს ძველ პაროლის.');
   }
 
   const hashedNewPassword = await hash(password, SALT_ROUNDS);

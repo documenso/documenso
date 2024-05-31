@@ -26,7 +26,8 @@ export const ZCreateDocumentFromTemplateMutationSchema = z.object({
     .refine((recipients) => {
       const emails = recipients.map((signer) => signer.email);
       return new Set(emails).size === emails.length;
-    }, 'Recipients must have unique emails'),
+    }, 'მიმღებებს უნდა ჰქონდეთ უნიკალური ელ.ფოსტები'),
+  // }, 'Recipients must have unique emails'),
   sendDocument: z.boolean().optional(),
 });
 
@@ -56,7 +57,8 @@ export const ZUpdateTemplateSettingsMutationSchema = z.object({
       .string()
       .optional()
       .refine((value) => value === undefined || value === '' || URL_REGEX.test(value), {
-        message: 'Please enter a valid URL',
+        message: 'გთხოვთ შეიყვანოთ სწორი URL',
+        // message: 'Please enter a valid URL',
       }),
   }),
 });

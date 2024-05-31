@@ -160,8 +160,8 @@ export const PDFViewer = ({
         console.error(err);
 
         toast({
-          title: 'Error',
-          description: 'An error occurred while loading the document.',
+          title: 'დაფიქსირდა ხარვეზი',
+          description: 'დოკუმენტის ჩატვირთვისას დაფიქსირდა ხარვეზი.',
           variant: 'destructive',
         });
       }
@@ -213,8 +213,8 @@ export const PDFViewer = ({
               <div className="dark:bg-background flex h-[80vh] max-h-[60rem] flex-col items-center justify-center bg-white/50">
                 {pdfError ? (
                   <div className="text-muted-foreground text-center">
-                    <p>Something went wrong while loading the document.</p>
-                    <p className="mt-1 text-sm">Please try again or contact our support.</p>
+                    <p>დოკუმენტის ჩატვირთვისას დაფიქსირდა ხარვეზი.</p>
+                    <p className="mt-1 text-sm">გთხოვთ თავიდან სცადოთ ან დაგვიკავშირდეთ.</p>
                   </div>
                 ) : (
                   <PDFLoader />
@@ -224,8 +224,8 @@ export const PDFViewer = ({
             error={
               <div className="dark:bg-background flex h-[80vh] max-h-[60rem] flex-col items-center justify-center bg-white/50">
                 <div className="text-muted-foreground text-center">
-                  <p>Something went wrong while loading the document.</p>
-                  <p className="mt-1 text-sm">Please try again or contact our support.</p>
+                  <p>დოკუმენტის ჩატვირთვისას დაფიქსირდა ხარვეზი.</p>
+                  <p className="mt-1 text-sm">გთხოვთ თავიდან სცადოთ ან დაგვიკავშირდეთ.</p>
                 </div>
               </div>
             }
@@ -245,7 +245,8 @@ export const PDFViewer = ({
                     />
                   </div>
                   <p className="text-muted-foreground/80 my-2 text-center text-[11px]">
-                    Page {i + 1} of {numPages}
+                    გვერდი {i + 1} {numPages}-დან
+                    {/* გვერდი {i + 1} of {numPages} */}
                   </p>
                 </div>
               ))}

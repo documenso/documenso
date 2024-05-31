@@ -20,7 +20,8 @@ export const verifyTwoFactorAuthenticationToken = async ({
   const key = DOCUMENSO_ENCRYPTION_KEY;
 
   if (!user.twoFactorSecret) {
-    throw new Error('user missing 2fa secret');
+    throw new Error('მომხმარებელს აკლია 2fa');
+    // throw new Error('user missing 2fa secret');
   }
 
   const secret = Buffer.from(symmetricDecrypt({ key, data: user.twoFactorSecret })).toString(

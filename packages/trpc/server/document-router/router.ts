@@ -54,7 +54,8 @@ export const documentRouter = router({
 
         throw new TRPCError({
           code: 'BAD_REQUEST',
-          message: 'We were unable to find this document. Please try again later.',
+          message: 'ჩვენ ვერ ვიპოვეთ ეს დოკუმენტი. გთხოვთ სცადოთ მოგვიანებით.',
+          // message: 'We were unable to find this document. Please try again later.',
         });
       }
     }),
@@ -74,7 +75,8 @@ export const documentRouter = router({
 
         throw new TRPCError({
           code: 'BAD_REQUEST',
-          message: 'We were unable to find this document. Please try again later.',
+          message: 'ჩვენ ვერ ვიპოვეთ ეს დოკუმენტი. გთხოვთ სცადოთ მოგვიანებით.',
+          // message: 'We were unable to find this document. Please try again later.',
         });
       }
     }),
@@ -92,7 +94,8 @@ export const documentRouter = router({
 
         throw new TRPCError({
           code: 'BAD_REQUEST',
-          message: 'We were unable to find this document. Please try again later.',
+          message: 'ჩვენ ვერ ვიპოვეთ ეს დოკუმენტი. გთხოვთ სცადოთ მოგვიანებით.',
+          // message: 'We were unable to find this document. Please try again later.',
         });
       }
     }),
@@ -109,7 +112,8 @@ export const documentRouter = router({
           throw new TRPCError({
             code: 'BAD_REQUEST',
             message:
-              'You have reached your document limit for this month. Please upgrade your plan.',
+              'თქვენ მიაღწიეთ დოკუმენტების ლიმიტს ამ თვისთვის. გთხოვთ განაახლოთ თქვენი პაკეტი.',
+            // 'You have reached your document limit for this month. Please upgrade your plan.',
           });
         }
 
@@ -129,7 +133,8 @@ export const documentRouter = router({
 
         throw new TRPCError({
           code: 'BAD_REQUEST',
-          message: 'We were unable to create this document. Please try again later.',
+          message: 'ჩვენ ვერ შევძელით ამ დოკუმენტის შექმნა. გთხოვთ სცადოთ მოგვიანებით.',
+          // message: 'We were unable to create this document. Please try again later.',
         });
       }
     }),
@@ -153,7 +158,8 @@ export const documentRouter = router({
 
         throw new TRPCError({
           code: 'BAD_REQUEST',
-          message: 'We were unable to delete this document. Please try again later.',
+          message: 'ჩვენ ვერ შევძელით ამ დოკუმენტის წაშლა. გთხოვთ სცადოთ მოგვიანებით.',
+          // message: 'We were unable to delete this document. Please try again later.',
         });
       }
     }),
@@ -178,7 +184,8 @@ export const documentRouter = router({
 
         throw new TRPCError({
           code: 'BAD_REQUEST',
-          message: 'We were unable to find audit logs for this document. Please try again later.',
+          message: 'ჩვენ ვერ ვიპოვეთ ამ დოკუმენტის აუდიტები. გთხოვთ სცადოთ მოგვიანებით.',
+          // message: 'We were unable to find audit logs for this document. Please try again later.',
         });
       }
     }),
@@ -218,7 +225,8 @@ export const documentRouter = router({
         throw new TRPCError({
           code: 'BAD_REQUEST',
           message:
-            'We were unable to update the settings for this document. Please try again later.',
+            'ჩვენ ვერ შევძელით ამ დოკუმენტის პარამეტრების განახლება. გთხოვთ სცადოთ მოგვიანებით.',
+          // 'We were unable to update the settings for this document. Please try again later.',
         });
       }
     }),
@@ -273,7 +281,8 @@ export const documentRouter = router({
 
         throw new TRPCError({
           code: 'BAD_REQUEST',
-          message: 'We were unable to set the password for this document. Please try again later.',
+          message: 'ამ დოკუმენტისთვის პაროლის დაყენება ვერ მოხერხდა. გთხოვთ სცადოთ მოგვიანებით.',
+          // message: 'We were unable to set the password for this document. Please try again later.',
         });
       }
     }),
@@ -308,7 +317,8 @@ export const documentRouter = router({
 
         throw new TRPCError({
           code: 'BAD_REQUEST',
-          message: 'We were unable to send this document. Please try again later.',
+          message: 'ჩვენ ვერ შევძელით ამ დოკუმენტის გაგზავნა. გთხოვთ სცადოთ მოგვიანებით.',
+          // message: 'We were unable to send this document. Please try again later.',
         });
       }
     }),
@@ -327,7 +337,8 @@ export const documentRouter = router({
 
         throw new TRPCError({
           code: 'BAD_REQUEST',
-          message: 'We were unable to resend this document. Please try again later.',
+          message: 'ჩვენ ვერ შევძელით ამ დოკუმენტის ხელახლა გაგზავნა. გთხოვთ სცადოთ მოგვიანებით.',
+          // message: 'We were unable to resend this document. Please try again later.',
         });
       }
     }),
@@ -345,7 +356,8 @@ export const documentRouter = router({
 
         throw new TRPCError({
           code: 'BAD_REQUEST',
-          message: 'We are unable to duplicate this document. Please try again later.',
+          message: 'ჩვენ არ შეგვიძლია ამ დოკუმენტის დუბლირება. გთხოვთ სცადოთ მოგვიანებით.',
+          // message: 'We are unable to duplicate this document. Please try again later.',
         });
       }
     }),
@@ -367,7 +379,8 @@ export const documentRouter = router({
 
         throw new TRPCError({
           code: 'BAD_REQUEST',
-          message: 'We are unable to search for documents. Please try again later.',
+          message: 'ჩვენ არ შეგვიძლია დოკუმენტების მოძიება. გთხოვთ სცადოთ მოგვიანებით.',
+          // message: 'We are unable to search for documents. Please try again later.',
         });
       }
     }),
@@ -398,7 +411,8 @@ export const documentRouter = router({
         throw new TRPCError({
           code: 'BAD_REQUEST',
           message:
-            'We were unable to download the audit logs for this document. Please try again later.',
+            'ჩვენ ვერ შევძელით ამ დოკუმენტის აუდიტების ჩამოტვირთვა. გთხოვთ სცადოთ მოგვიანებით.',
+          // 'We were unable to download the audit logs for this document. Please try again later.',
         });
       }
     }),
@@ -433,7 +447,8 @@ export const documentRouter = router({
         throw new TRPCError({
           code: 'BAD_REQUEST',
           message:
-            'We were unable to download the audit logs for this document. Please try again later.',
+            'ჩვენ ვერ შევძელით ამ დოკუმენტის აუდიტების ჩამოტვირთვა. გთხოვთ სცადოთ მოგვიანებით.',
+          // 'We were unable to download the audit logs for this document. Please try again later.',
         });
       }
     }),

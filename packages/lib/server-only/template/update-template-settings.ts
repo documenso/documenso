@@ -30,7 +30,8 @@ export const updateTemplateSettings = async ({
   data,
 }: UpdateTemplateSettingsOptions) => {
   if (!data.title && !data.globalAccessAuth && !data.globalActionAuth) {
-    throw new AppError(AppErrorCode.INVALID_BODY, 'Missing data to update');
+    throw new AppError(AppErrorCode.INVALID_BODY, 'განახლებისთვის არასაკმარისი მონაცემებია');
+    // throw new AppError(AppErrorCode.INVALID_BODY, 'Missing data to update');
   }
 
   const template = await prisma.template.findFirstOrThrow({
@@ -104,7 +105,8 @@ export const updateTemplateSettings = async ({
     if (!isDocumentEnterprise) {
       throw new AppError(
         AppErrorCode.UNAUTHORIZED,
-        'You do not have permission to set the action auth',
+        'თქვენ არ გაქვთ პარამეტრების ავტორიზაციის დაყენების ნებართვა',
+        // 'You do not have permission to set the action auth',
       );
     }
   }

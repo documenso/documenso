@@ -41,7 +41,9 @@ export const profileRouter = router({
 
         throw new TRPCError({
           code: 'BAD_REQUEST',
-          message: 'We were unable to find user security audit logs. Please try again.',
+          message:
+            'ჩვენ ვერ ვიპოვეთ მომხმარებლის უსაფრთხოების აუდიტის ჟურნალები. გთხოვთ კიდევ სცადეთ.',
+          // message: 'We were unable to find user security audit logs. Please try again.',
         });
       }
     }),
@@ -56,7 +58,8 @@ export const profileRouter = router({
 
       throw new TRPCError({
         code: 'BAD_REQUEST',
-        message: 'We were unable to retrieve the specified account. Please try again.',
+        message: 'ჩვენ ვერ მოვახერხეთ მითითებული ანგარიშის მოძიება. გთხოვთ კიდევ სცადეთ.',
+        // message: 'We were unable to retrieve the specified account. Please try again.',
       });
     }
   }),
@@ -79,7 +82,8 @@ export const profileRouter = router({
         throw new TRPCError({
           code: 'BAD_REQUEST',
           message:
-            'We were unable to update your profile. Please review the information you provided and try again.',
+            'ჩვენ ვერ შევძელით თქვენი პროფილის განახლება. გთხოვთ გადახედოთ თქვენს მიერ მოწოდებულ ინფორმაციას და სცადოთ ხელახლა.',
+          // 'We were unable to update your profile. Please review the information you provided and try again.',
         });
       }
     }),
@@ -100,7 +104,8 @@ export const profileRouter = router({
           if (subscriptions.length === 0) {
             throw new AppError(
               AppErrorCode.PREMIUM_PROFILE_URL,
-              'Only subscribers can have a username shorter than 6 characters',
+              'მხოლოდ აბონენტებს შეუძლიათ ჰქონდეთ 6 სიმბოლოზე მოკლე პროფილის სახელი',
+              // 'Only subscribers can have a username shorter than 6 characters',
             );
           }
         }
@@ -123,7 +128,8 @@ export const profileRouter = router({
         throw new TRPCError({
           code: 'BAD_REQUEST',
           message:
-            'We were unable to update your public profile. Please review the information you provided and try again.',
+            'ჩვენ ვერ შევძელით თქვენი საჯარო პროფილის განახლება. გთხოვთ გადახედოთ თქვენს მიერ მოწოდებულ ინფორმაციას და სცადოთ ხელახლა.',
+          // 'We were unable to update your public profile. Please review the information you provided and try again.',
         });
       }
     }),
@@ -144,7 +150,8 @@ export const profileRouter = router({
         console.error(err);
 
         let message =
-          'We were unable to update your profile. Please review the information you provided and try again.';
+          'ჩვენ ვერ შევძელით თქვენი პროფილის განახლება. გთხოვთ გადახედოთ თქვენს მიერ მოწოდებულ ინფორმაციას და სცადოთ ხელახლა.';
+        // 'We were unable to update your profile. Please review the information you provided and try again.';
 
         if (err instanceof Error) {
           message = err.message;
@@ -181,7 +188,8 @@ export const profileRouter = router({
     } catch (err) {
       console.error(err);
 
-      let message = 'We were unable to reset your password. Please try again.';
+      let message = 'თქვენი პაროლის გადაყენება ვერ მოხერხდა. გთხოვთ კიდევ სცადეთ.';
+      // let message = 'We were unable to reset your password. Please try again.';
 
       if (err instanceof Error) {
         message = err.message;
@@ -204,7 +212,8 @@ export const profileRouter = router({
       } catch (err) {
         console.error(err);
 
-        let message = 'We were unable to send a confirmation email. Please try again.';
+        let message = 'ჩვენ ვერ შევძელით დამადასტურებელი ელ.ფოსტის გაგზავნა. გთხოვთ კიდევ სცადეთ.';
+        // let message = 'We were unable to send a confirmation email. Please try again.';
 
         if (err instanceof Error) {
           message = err.message;
@@ -225,7 +234,8 @@ export const profileRouter = router({
     } catch (err) {
       console.error(err);
 
-      let message = 'We were unable to delete your account. Please try again.';
+      let message = 'ჩვენ ვერ მოვახერხეთ თქვენი ანგარიშის წაშლა. გთხოვთ კიდევ სცადეთ.';
+      // let message = 'We were unable to delete your account. Please try again.';
 
       if (err instanceof Error) {
         message = err.message;

@@ -125,7 +125,8 @@ export const sendCompletedEmail = async ({ documentId, requestMetadata }: SendDo
           name: process.env.NEXT_PRIVATE_SMTP_FROM_NAME || 'Documenso',
           address: process.env.NEXT_PRIVATE_SMTP_FROM_ADDRESS || 'noreply@documenso.com',
         },
-        subject: 'Signing Complete!',
+        subject: 'ხელმოწერა დასრულებულია!',
+        // subject: 'Signing Complete!',
         html: render(template),
         text: render(template, { plainText: true }),
         attachments: [

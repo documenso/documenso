@@ -23,7 +23,7 @@ export const updatePublicProfile = async ({ userId, url }: UpdatePublicProfileOp
   if (isUrlTaken) {
     throw new AppError(
       AppErrorCode.PROFILE_URL_TAKEN,
-      'Profile username is taken',
+      // 'Profile username is taken',
       'პროფილის სახელი უკვე გამოყენებულია',
     );
   }

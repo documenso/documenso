@@ -27,7 +27,8 @@ export const ZAddTemplatePlacholderRecipientsFormSchema = z
       return new Set(emails).size === emails.length;
     },
     // Dirty hack to handle errors when .root is populated for an array type
-    { message: 'Signers must have unique emails', path: ['signers__root'] },
+    { message: 'ხელმომწერებს უნდა ჰქონდეთ უნიკალური ელ.ფოსტები', path: ['signers__root'] },
+    // { message: 'Signers must have unique emails', path: ['signers__root'] },
   );
 
 export type TAddTemplatePlacholderRecipientsFormSchema = z.infer<

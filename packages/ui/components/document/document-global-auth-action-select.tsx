@@ -33,7 +33,7 @@ export const DocumentGlobalAuthActionSelect = forwardRef<HTMLButtonElement, Sele
           ))}
 
         {/* Note: -1 is remapped in the Zod schema to the required value. */}
-        <SelectItem value={'-1'}>None</SelectItem>
+        <SelectItem value={'-1'}>არანაირი</SelectItem>
       </SelectContent>
     </Select>
   ),
@@ -49,30 +49,36 @@ export const DocumentGlobalAuthActionTooltip = () => (
 
     <TooltipContent className="text-foreground max-w-md space-y-2 p-4">
       <h2>
-        <strong>Global recipient action authentication</strong>
+        <strong>მიმღების გლობალური პარამეტრების ავთენტიფიკაცია</strong>
+        {/* <strong>Global recipient action authentication</strong> ჩემი */}
       </h2>
 
-      <p>The authentication required for recipients to sign the signature field.</p>
+      <p>ველზე ხელმოწერისთვის საჭიროა ავთენტიფიკაცია.</p>
+      {/* <p>The authentication required for recipients to sign the signature field.</p>  ჩემი*/}
 
       <p>
+        ამის გაუქმება შესაძლებელია, შემდეგ ეტაპზე, ავთენტიფიკაციის მოთხოვნების პირდაპირ თითოეულ
+        მიმღებზე დაყენებით.
+      </p>
+      {/* <p>
         This can be overriden by setting the authentication requirements directly on each recipient
         in the next step.
-      </p>
+      </p> ჩემი */}
 
       <ul className="ml-3.5 list-outside list-disc space-y-0.5 py-2">
         {/* <li>
           <strong>Require account</strong> - The recipient must be signed in
         </li> */}
         <li>
-          <strong>Require passkey</strong> - The recipient must have an account and passkey
-          configured via their settings
+          <strong>მოითხოვეთ საიდუმლო გასაღები</strong> - მიმღებს უნდა ჰქონდეს ანგარიში და
+          კონფიგურირებული საიდუმლო გასაღები მათი პარამეტრების მეშვეობით
         </li>
         <li>
-          <strong>Require 2FA</strong> - The recipient must have an account and 2FA enabled via
-          their settings
+          <strong>მოითხოვეთ 2FA</strong> - მიმღებს უნდა ჰქონდეს ანგარიში და 2FA ჩართული მისი
+          პარამეტრების მეშვეობით
         </li>
         <li>
-          <strong>None</strong> - No authentication required
+          <strong>არანაირი</strong> - ავთენტიფიკაცია საჭირო არ არის
         </li>
       </ul>
     </TooltipContent>

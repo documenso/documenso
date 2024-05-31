@@ -49,7 +49,7 @@ export const createDocumentFromTemplateLegacy = async ({
   });
 
   if (!template) {
-    throw new Error('Template not found.');
+    throw new Error('შაბლონი არ მოიძებნა.');
   }
 
   const documentData = await prisma.documentData.create({
@@ -93,7 +93,7 @@ export const createDocumentFromTemplateLegacy = async ({
       const documentRecipient = document.Recipient.find((doc) => doc.email === recipient?.email);
 
       if (!documentRecipient) {
-        throw new Error('Recipient not found.');
+        throw new Error('მიმღები არ მოიძებნა.');
       }
 
       return {
