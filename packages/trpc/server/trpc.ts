@@ -71,5 +71,6 @@ export const adminMiddleware = t.middleware(async ({ ctx, next }) => {
 export const router = t.router;
 export const procedure = t.procedure;
 export const authenticatedProcedure = t.procedure.use(authenticatedMiddleware);
+// While this is functionally the same as `procedure`, it's useful for indicating purpose
 export const maybeAuthenticatedProcedure = t.procedure.use(maybeAuthenticatedMiddleware);
 export const adminProcedure = t.procedure.use(adminMiddleware);

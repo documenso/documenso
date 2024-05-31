@@ -278,7 +278,7 @@ export const AddTemplatePlaceholderRecipientsFormPartial = ({
                             {...field}
                             onValueChange={field.onChange}
                             disabled={isSubmitting}
-                            hideCCer={isSignerDirectRecipient(signer)}
+                            hideCCRecipients={isSignerDirectRecipient(signer)}
                           />
                         </FormControl>
 

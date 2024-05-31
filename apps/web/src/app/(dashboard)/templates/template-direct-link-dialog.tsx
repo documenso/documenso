@@ -383,7 +383,7 @@ export const TemplateDirectLinkDialog = ({
                   </div>
                 </div>
 
-                <DialogFooter>
+                <DialogFooter className='mt-4'>
                   <Button
                     type="button"
                     variant="destructive"
@@ -392,10 +392,6 @@ export const TemplateDirectLinkDialog = ({
                     onClick={() => setCurrentStep('CONFIRM_DELETE')}
                   >
                     Remove
-                  </Button>
-
-                  <Button type="button" variant="secondary" onClick={() => onOpenChange(false)}>
-                    Close
                   </Button>
 
                   <Button
@@ -408,7 +404,7 @@ export const TemplateDirectLinkDialog = ({
                       })
                     }
                   >
-                    Update
+                    Save
                   </Button>
                 </DialogFooter>
               </DialogContent>

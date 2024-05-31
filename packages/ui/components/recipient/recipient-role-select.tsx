@@ -11,11 +11,11 @@ import { Select, SelectContent, SelectItem, SelectTrigger } from '@documenso/ui/
 import { Tooltip, TooltipContent, TooltipTrigger } from '@documenso/ui/primitives/tooltip';
 
 export type RecipientRoleSelectProps = SelectProps & {
-  hideCCer?: boolean;
+  hideCCRecipients?: boolean;
 };
 
 export const RecipientRoleSelect = forwardRef<HTMLButtonElement, RecipientRoleSelectProps>(
-  ({ hideCCer, ...props }, ref) => (
+  ({ hideCCRecipients, ...props }, ref) => (
     <Select {...props}>
       <SelectTrigger ref={ref} className="bg-background w-[60px]">
         {/* eslint-disable-next-line @typescript-eslint/consistent-type-assertions */}
@@ -74,7 +74,7 @@ export const RecipientRoleSelect = forwardRef<HTMLButtonElement, RecipientRoleSe
           </div>
         </SelectItem>
 
-        {!hideCCer && (
+        {!hideCCRecipients && (
           <SelectItem value={RecipientRole.CC}>
             <div className="flex items-center">
               <div className="flex w-[150px] items-center">
