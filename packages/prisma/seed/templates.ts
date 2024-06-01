@@ -143,12 +143,20 @@ export const seedDirectTemplate = async (options: SeedTemplateOptions) => {
     },
   });
 
+  const directTemplateRecpient = template.Recipient.find(
+    (recipient) => recipient.email === DIRECT_TEMPLATE_RECIPIENT_EMAIL,
+  );
+
+  if (!directTemplateRecpient) {
+    throw new Error('Need to create a direct template recipient');
+  }
+
   await prisma.templateDirectLink.create({
     data: {
       templateId: template.id,
       enabled: true,
       token: Math.random().toString(),
-      directTemplateRecipientId: template.Recipient[0].id,
+      directTemplateRecipientId: directTemplateRecpient.id,
     },
   });
 

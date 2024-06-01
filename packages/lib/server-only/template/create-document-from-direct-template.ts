@@ -516,7 +516,7 @@ export const createDocumentFromDirectTemplate = async ({
       requestMetadata,
     });
   } catch (err) {
-    console.error('[CREATE_DOCUMENT_FROM_DIRECT_TEMPLATE]:',err);
+    console.error('[CREATE_DOCUMENT_FROM_DIRECT_TEMPLATE]:', err);
 
     // Don't launch an error since the document has already been created.
     // Log and reseal as required until we configure middleware.
