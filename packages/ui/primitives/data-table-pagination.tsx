@@ -34,7 +34,7 @@ export function DataTablePagination<TData>({
             const visibleRows = table.getFilteredRowModel().rows.length;
 
             return (
-              <span>
+              <span data-testid="data-table-count">
                 Showing {visibleRows} result{visibleRows > 1 && 's'}.
               </span>
             );

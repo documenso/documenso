@@ -13,6 +13,7 @@ import { getFile } from '@documenso/lib/universal/upload/get-file';
 import { putPdfFile } from '@documenso/lib/universal/upload/put-file';
 import { prisma } from '@documenso/prisma';
 import {
+  DocumentSource,
   DocumentStatus,
   FieldType,
   ReadStatus,
@@ -95,6 +96,7 @@ export const singleplayerRouter = router({
             // Create document.
             const document = await tx.document.create({
               data: {
+                source: DocumentSource.DOCUMENT,
                 title: documentName,
                 status: DocumentStatus.COMPLETED,
                 documentDataId,
