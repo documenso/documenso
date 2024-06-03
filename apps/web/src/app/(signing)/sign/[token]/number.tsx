@@ -249,7 +249,7 @@ export const NumberField = ({ field, recipient }: NumberFieldProps) => {
       )}
 
       {field.inserted && (
-        <p className="text-muted-foreground flex items-center justify-center gap-x-1 duration-200">
+        <p className="text-muted-foreground dark:text-background flex items-center justify-center gap-x-1 duration-200">
           {field.customText}
         </p>
       )}

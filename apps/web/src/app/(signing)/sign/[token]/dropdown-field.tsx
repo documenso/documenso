@@ -173,8 +173,8 @@ export const DropdownField = ({ field, recipient }: DropdownFieldProps) => {
         )}
 
         {field.inserted && (
-          <p className="text-muted-foreground flex items-center justify-center gap-x-1 duration-200">
-            <span className="flex items-center justify-center gap-x-1">{field.customText}</span>
+          <p className="text-muted-foreground dark:text-background flex items-center justify-center gap-x-1 duration-200">
+            {field.customText}
           </p>
         )}
       </SigningFieldContainer>

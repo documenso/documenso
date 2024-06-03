@@ -102,7 +102,11 @@ export const EmailField = ({ field, recipient }: EmailFieldProps) => {
         </p>
       )}
 
-      {field.inserted && <p className="text-muted-foreground duration-200">{field.customText}</p>}
+      {field.inserted && (
+        <p className="text-muted-foreground dark:text-background duration-200">
+          {field.customText}
+        </p>
+      )}
     </SigningFieldContainer>
   );
 };

@@ -174,12 +174,12 @@ export const SignatureField = ({ field, recipient }: SignatureFieldProps) => {
         <img
           src={signature.signatureImageAsBase64}
           alt={`Signature for ${recipient.name}`}
-          className="h-full w-full object-contain dark:invert"
+          className="h-full w-full object-contain"
         />
       )}
 
       {state === 'signed-text' && (
-        <p className="font-signature text-muted-foreground text-lg duration-200 sm:text-xl md:text-2xl lg:text-3xl">
+        <p className="font-signature text-muted-foreground dark:text-background text-lg duration-200 sm:text-xl md:text-2xl lg:text-3xl">
           {/* This optional chaining is intentional, we don't want to move the check into the condition above */}
           {signature?.typedSignature}
         </p>

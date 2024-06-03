@@ -148,7 +148,11 @@ export const NameField = ({ field, recipient }: NameFieldProps) => {
         </p>
       )}
 
-      {field.inserted && <p className="text-muted-foreground duration-200">{field.customText}</p>}
+      {field.inserted && (
+        <p className="text-muted-foreground dark:text-background duration-200">
+          {field.customText}
+        </p>
+      )}
 
       <Dialog open={showFullNameModal} onOpenChange={setShowFullNameModal}>
         <DialogContent>
