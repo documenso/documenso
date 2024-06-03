@@ -586,7 +586,7 @@ export const AddFieldsFormPartial = ({
                       variant="outline"
                       role="combobox"
                       className={cn(
-                        'bg-background text-muted-foreground hover:text-foreground mb-12 mt-2 justify-between font-normal ring ring-offset-2',
+                        'bg-background text-muted-foreground hover:text-foreground mb-12 mt-2 justify-between border-2 font-normal ring-2 ring-offset-2',
                         selectedSignerRingClass,
                       )}
                     >
@@ -688,7 +688,10 @@ export const AddFieldsFormPartial = ({
               )}
 
               <div className="-mx-2 flex-1 overflow-y-auto px-2">
-                <fieldset disabled={isFieldsDisabled} className="grid grid-cols-2 gap-x-4 gap-y-8">
+                <fieldset
+                  disabled={isFieldsDisabled}
+                  className="my-2 grid grid-cols-2 gap-x-4 gap-y-8"
+                >
                   <button
                     type="button"
                     className="group h-full w-full"
@@ -709,7 +712,7 @@ export const AddFieldsFormPartial = ({
                             fontCaveat.className,
                           )}
                         >
-                          {selectedSigner?.name || 'Signature'}
+                          Signature
                         </p>
                       </CardContent>
                     </Card>
@@ -736,7 +739,7 @@ export const AddFieldsFormPartial = ({
                           )}
                         >
                           <Mail />
-                          {'Email'}
+                          Email
                         </p>
                       </CardContent>
                     </Card>
@@ -762,7 +765,7 @@ export const AddFieldsFormPartial = ({
                           )}
                         >
                           <User />
-                          {'Name'}
+                          Name
                         </p>
                       </CardContent>
                     </Card>
@@ -788,7 +791,7 @@ export const AddFieldsFormPartial = ({
                           )}
                         >
                           <CalendarDays />
-                          {'Date'}
+                          Date
                         </p>
                       </CardContent>
                     </Card>
@@ -814,7 +817,7 @@ export const AddFieldsFormPartial = ({
                           )}
                         >
                           <Type />
-                          {'Text'}
+                          Text
                         </p>
                       </CardContent>
                     </Card>
@@ -840,7 +843,7 @@ export const AddFieldsFormPartial = ({
                           )}
                         >
                           <Hash />
-                          {'Number'}
+                          Number
                         </p>
                       </CardContent>
                     </Card>
@@ -866,7 +869,7 @@ export const AddFieldsFormPartial = ({
                           )}
                         >
                           <Disc />
-                          {'Radio'}
+                          Radio
                         </p>
                       </CardContent>
                     </Card>
@@ -892,7 +895,7 @@ export const AddFieldsFormPartial = ({
                           )}
                         >
                           <CheckSquare />
-                          {'Checkbox'}
+                          Checkbox
                         </p>
                       </CardContent>
                     </Card>
@@ -918,7 +921,7 @@ export const AddFieldsFormPartial = ({
                           )}
                         >
                           <ChevronDown />
-                          {'Dropdown'}
+                          Dropdown
                         </p>
                       </CardContent>
                     </Card>
