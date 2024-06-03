@@ -94,66 +94,114 @@ export type AddFieldsFormProps = {
 */
 export const combinedStyles = {
   'orange-500': {
-    ringColor: 'ring-orange-500/30 ring-offset-orange-500',
-    borderWithHover: 'group-data-[selected]:border-orange-500 hover:border-orange-500',
+    ringColor:
+      'border-orange-500 ring-orange-200/60 ring-offset-orange-200/60 dark:ring-orange-900/60 dark:ring-offset-orange-900/60',
+    borderWithHover:
+      'group-data-[selected]:border-orange-500 group-data-[selected]:bg-orange-500/20 hover:border-orange-500 hover:ring-2 hover:ring-orange-200 hover:ring-offset-2 hover:ring-offset-orange-200 dark:hover:ring-orange-900/60 dark:hover:ring-offset-orange-900/60 shadow-none group-data-[selected]:ring-2 group-data-[selected]:ring-orange-200 group-data-[selected]:ring-offset-2 group-data-[selected]:ring-offset-orange-200 dark:group-data-[selected]:ring-orange-900/60 dark:group-data-[selected]:ring-offset-orange-900/60',
     border: 'border-orange-500',
-    borderActive: 'border-orange-500 bg-orange-500/20',
+    borderActive: 'border-2 border-orange-500 bg-orange-500/20 shadow-none',
+    borderActiveWithinBounds:
+      'ring-2 ring-orange-200/60 ring-offset-2 ring-offset-orange-200/60 shadow-none',
+    borderActiveOutsideBounds:
+      'ring-2 ring-orange-200/60 ring-offset-2 ring-offset-orange-200/60 dark:ring-2 dark:ring-orange-900/60 dark:ring-offset-2 dark:ring-offset-orange-900/60 shadow-none',
     background: 'bg-orange-500/60 border-orange-500',
     initialsBG: 'bg-orange-500',
   },
   'green-500': {
-    ringColor: 'ring-green-500/30 ring-offset-green-500',
-    borderWithHover: 'group-data-[selected]:border-green-500 hover:border-green-500',
+    ringColor:
+      'border-green-500 ring-green-200/60 ring-offset-green-200/60 dark:ring-green-900/60 dark:ring-offset-green-900/60',
+    borderWithHover:
+      'group-data-[selected]:border-green-500 group-data-[selected]:bg-green-500/20 hover:border-green-500 hover:ring-2 hover:ring-green-200 hover:ring-offset-2 hover:ring-offset-green-200 dark:hover:ring-green-900/60 dark:hover:ring-offset-green-900/60 shadow-none group-data-[selected]:ring-2 group-data-[selected]:ring-green-200 group-data-[selected]:ring-offset-2 group-data-[selected]:ring-offset-green-200 dark:group-data-[selected]:ring-green-900/60 dark:group-data-[selected]:ring-offset-green-900/60',
     border: 'border-green-500',
-    borderActive: 'border-green-500 bg-green-500/20',
+    borderActive: 'border-2 border-green-500 bg-green-500/20 shadow-none',
+    borderActiveWithinBounds:
+      'ring-2 ring-green-200/60 ring-offset-2 ring-offset-green-200/60 shadow-none',
+    borderActiveOutsideBounds:
+      'ring-2 ring-green-200/60 ring-offset-2 ring-offset-green-200/60 dark:ring-2 dark:ring-green-900/60 dark:ring-offset-2 dark:ring-offset-green-900/60 shadow-none',
     background: 'bg-green-500/60 border-green-500',
     initialsBG: 'bg-green-500',
   },
   'cyan-500': {
-    ringColor: 'ring-cyan-500/30 ring-offset-cyan-500',
-    borderWithHover: 'group-data-[selected]:border-cyan-500 hover:border-cyan-500',
+    ringColor:
+      'border-cyan-500 ring-cyan-200/60 ring-offset-cyan-200/60 dark:ring-cyan-900/60 dark:ring-offset-cyan-900/60',
+    borderWithHover:
+      'group-data-[selected]:border-cyan-500 group-data-[selected]:bg-cyan-500/20 hover:border-cyan-500 hover:ring-2 hover:ring-cyan-200 hover:ring-offset-2 hover:ring-offset-cyan-200 dark:hover:ring-cyan-900/60 dark:hover:ring-offset-cyan-900/60 shadow-none group-data-[selected]:ring-2 group-data-[selected]:ring-cyan-200 group-data-[selected]:ring-offset-2 group-data-[selected]:ring-offset-cyan-200 dark:group-data-[selected]:ring-cyan-900/60 dark:group-data-[selected]:ring-offset-cyan-900/60',
     border: 'border-cyan-500',
-    borderActive: 'border-cyan-500 bg-cyan-500/20',
+    borderActive: 'border-2 border-cyan-500 bg-cyan-500/20 shadow-none',
+    borderActiveWithinBounds:
+      'ring-2 ring-cyan-200/60 ring-offset-2 ring-offset-cyan-200/60 shadow-none',
+    borderActiveOutsideBounds:
+      'ring-2 ring-cyan-200/60 ring-offset-2 ring-offset-cyan-200/60 dark:ring-2 dark:ring-cyan-900/60 dark:ring-offset-2 dark:ring-offset-cyan-900/60 shadow-none',
     background: 'bg-cyan-500/60 border-cyan-500',
     initialsBG: 'bg-cyan-500',
   },
   'blue-500': {
-    ringColor: 'ring-blue-500/30 ring-offset-blue-500',
-    borderWithHover: 'group-data-[selected]:border-blue-500 hover:border-blue-500',
+    ringColor:
+      'border-blue-500 ring-blue-200/60 ring-offset-blue-200/60 dark:ring-blue-900/60 dark:ring-offset-blue-900/60',
+    borderWithHover:
+      'group-data-[selected]:border-blue-500 group-data-[selected]:bg-blue-500/20 hover:border-blue-500 hover:ring-2 hover:ring-blue-200 hover:ring-offset-2 hover:ring-offset-blue-200 dark:hover:ring-blue-900/60 dark:hover:ring-offset-blue-900/60 shadow-none group-data-[selected]:ring-2 group-data-[selected]:ring-blue-200 group-data-[selected]:ring-offset-2 group-data-[selected]:ring-offset-blue-200 dark:group-data-[selected]:ring-blue-900/60 dark:group-data-[selected]:ring-offset-blue-900/60',
     border: 'border-blue-500',
-    borderActive: 'border-blue-500 bg-blue-500/20',
+    borderActive: 'border-2 border-blue-500 bg-blue-500/20 shadow-none',
+    borderActiveWithinBounds:
+      'ring-2 ring-blue-200/60 ring-offset-2 ring-offset-blue-200/60 shadow-none',
+    borderActiveOutsideBounds:
+      'ring-2 ring-blue-200/60 ring-offset-2 ring-offset-blue-200/60 dark:ring-2 dark:ring-blue-900/60 dark:ring-offset-2 dark:ring-offset-blue-900/60 shadow-none',
     background: 'bg-blue-500/60 border-blue-500',
     initialsBG: 'bg-blue-500',
   },
   'indigo-500': {
-    ringColor: 'ring-indigo-500/30 ring-offset-indigo-500',
-    borderWithHover: 'group-data-[selected]:border-indigo-500 hover:border-indigo-500',
+    ringColor:
+      'border-indigo-500 ring-indigo-200/60 ring-offset-indigo-200/60 dark:ring-indigo-900/60 dark:ring-offset-indigo-900/60',
+    borderWithHover:
+      'group-data-[selected]:border-indigo-500 group-data-[selected]:bg-indigo-500/20 hover:border-indigo-500 hover:ring-2 hover:ring-indigo-200 hover:ring-offset-2 hover:ring-offset-indigo-200 dark:hover:ring-indigo-900/60 dark:hover:ring-offset-indigo-900/60 shadow-none group-data-[selected]:ring-2 group-data-[selected]:ring-indigo-200 group-data-[selected]:ring-offset-2 group-data-[selected]:ring-offset-indigo-200 dark:group-data-[selected]:ring-indigo-900/60 dark:group-data-[selected]:ring-offset-indigo-900/60',
     border: 'border-indigo-500',
-    borderActive: 'border-indigo-500 bg-indigo-500/20',
+    borderActive: 'border-2 border-indigo-500 bg-indigo-500/20 shadow-none',
+    borderActiveWithinBounds:
+      'ring-2 ring-indigo-200/60 ring-offset-2 ring-offset-indigo-200/60 shadow-none',
+    borderActiveOutsideBounds:
+      'ring-2 ring-indigo-200/60 ring-offset-2 ring-offset-indigo-200/60 dark:ring-2 dark:ring-indigo-900/60 dark:ring-offset-2 dark:ring-offset-indigo-900/60 shadow-none',
     background: 'bg-indigo-500/60 border-indigo-500',
     initialsBG: 'bg-indigo-500',
   },
   'purple-500': {
-    ringColor: 'ring-purple-500/30 ring-offset-purple-500',
-    borderWithHover: 'group-data-[selected]:border-purple-500 hover:border-purple-500',
+    ringColor:
+      'border-purple-500 ring-purple-200/60 ring-offset-purple-200/60 dark:ring-purple-900/60 dark:ring-offset-purple-900/60',
+    borderWithHover:
+      'group-data-[selected]:border-purple-500 group-data-[selected]:bg-purple-500/20 hover:border-purple-500 hover:ring-2 hover:ring-purple-200 hover:ring-offset-2 hover:ring-offset-purple-200 dark:hover:ring-purple-900/60 dark:hover:ring-offset-purple-900/60 shadow-none group-data-[selected]:ring-2 group-data-[selected]:ring-purple-200 group-data-[selected]:ring-offset-2 group-data-[selected]:ring-offset-purple-200 dark:group-data-[selected]:ring-purple-900/60 dark:group-data-[selected]:ring-offset-purple-900/60',
     border: 'border-purple-500',
-    borderActive: 'border-purple-500 bg-purple-500/20',
+    borderActive: 'border-2 border-purple-500 bg-purple-500/20 shadow-none',
+    borderActiveWithinBounds:
+      'ring-2 ring-purple-200/60 ring-offset-2 ring-offset-purple-200/60 shadow-none',
+    borderActiveOutsideBounds:
+      'ring-2 ring-purple-200/60 ring-offset-2 ring-offset-purple-200/60 dark:ring-2 dark:ring-purple-900/60 dark:ring-offset-2 dark:ring-offset-purple-900/60 shadow-none',
     background: 'bg-purple-500/60 border-purple-500',
     initialsBG: 'bg-purple-500',
   },
   'pink-500': {
-    ringColor: 'ring-pink-500/30 ring-offset-pink-500',
-    borderWithHover: 'group-data-[selected]:border-pink-500 hover:border-pink-500',
+    ringColor:
+      'border-pink-500 ring-pink-200/60 ring-offset-pink-200/60 dark:ring-pink-900/60 dark:ring-offset-pink-900/60',
+    borderWithHover:
+      'group-data-[selected]:border-pink-500 group-data-[selected]:bg-pink-500/20 hover:border-pink-500 hover:ring-2 hover:ring-pink-200 hover:ring-offset-2 hover:ring-offset-pink-200 dark:hover:ring-pink-900/60 dark:hover:ring-offset-pink-900/60 shadow-none group-data-[selected]:ring-2 group-data-[selected]:ring-pink-200 group-data-[selected]:ring-offset-2 group-data-[selected]:ring-offset-pink-200 dark:group-data-[selected]:ring-pink-900/60 dark:group-data-[selected]:ring-offset-pink-900/60',
     border: 'border-pink-500',
-    borderActive: 'border-pink-500 bg-pink-500/20',
+    borderActive: 'border-2 border-pink-500 bg-pink-500/20 shadow-none',
+    borderActiveWithinBounds:
+      'ring-2 ring-pink-200/60 ring-offset-2 ring-offset-pink-200/60 shadow-none',
+    borderActiveOutsideBounds:
+      'ring-2 ring-pink-200/60 ring-offset-2 ring-offset-pink-200/60 dark:ring-2 dark:ring-pink-900/60 dark:ring-offset-2 dark:ring-offset-pink-900/60 shadow-none',
     background: 'bg-pink-500/60 border-pink-500',
     initialsBG: 'bg-pink-500',
   },
   'gray-500': {
-    ringColor: 'ring-gray-500/30 ring-offset-gray-500',
-    borderWithHover: 'group-data-[selected]:border-gray-500 hover:border-gray-500',
+    ringColor:
+      'border-gray-500 ring-gray-200/60 ring-offset-gray-200/60 dark:ring-gray-900/60 dark:ring-offset-gray-900/60',
+    borderWithHover:
+      'group-data-[selected]:border-gray-500 group-data-[selected]:bg-gray-500/20 hover:border-gray-500 hover:ring-2 hover:ring-gray-200 hover:ring-offset-2 hover:ring-offset-gray-200 dark:hover:ring-gray-900/60 dark:hover:ring-offset-gray-900/60 shadow-none group-data-[selected]:ring-2 group-data-[selected]:ring-gray-200 group-data-[selected]:ring-offset-2 group-data-[selected]:ring-offset-gray-200 dark:group-data-[selected]:ring-gray-900/60 dark:group-data-[selected]:ring-offset-gray-900/60',
     border: 'border-gray-500',
-    borderActive: 'border-gray-500 bg-gray-500/20',
+    borderActive: 'border-2 border-gray-500 bg-gray-500/20 shadow-none',
+    borderActiveWithinBounds:
+      'ring-2 ring-gray-200/60 ring-offset-2 ring-offset-gray-200/60 shadow-none',
+    borderActiveOutsideBounds:
+      'ring-2 ring-gray-200/60 ring-offset-2 ring-offset-gray-200/60 dark:ring-2 dark:ring-gray-900/60 dark:ring-offset-2 dark:ring-offset-gray-900/60 shadow-none',
     background: 'bg-gray-500/60 border-gray-500',
     initialsBG: 'bg-gray-500',
     fieldBackground: 'bg-gray-500/[.025]',
@@ -265,6 +313,8 @@ export const AddFieldsFormPartial = ({
       ringClass: styles?.ringColor,
       borderClass: styles?.borderWithHover,
       activeBorderClass: styles?.borderActive,
+      activeBorderWithinBoundsClass: styles?.borderActiveWithinBounds,
+      activeBorderOutsideBoundsClass: styles?.borderActiveOutsideBounds,
     };
   }, [selectedSigner]);
 
@@ -272,6 +322,8 @@ export const AddFieldsFormPartial = ({
     ringClass: selectedSignerRingClass,
     borderClass: selectedSignerBorderClass,
     activeBorderClass: selectedSignerActiveBorderClass,
+    activeBorderWithinBoundsClass: selectedSignerActiveWithinBoundsClass,
+    activeBorderOutsideBoundsClass: selectedSignerActiveOutsideBoundsClass,
   } = selectedSignerStyles;
 
   const hasSelectedSignerBeenSent = selectedSigner?.sendStatus === SendStatus.SENT;
@@ -532,8 +584,11 @@ export const AddFieldsFormPartial = ({
                   className={cn(
                     'pointer-events-none fixed z-50 cursor-pointer border-2 backdrop-blur-[1px]',
                     selectedSignerActiveBorderClass,
+                    isFieldWithinBounds
+                      ? selectedSignerActiveWithinBoundsClass
+                      : selectedSignerActiveOutsideBoundsClass,
                     {
-                      'text-field-card-foreground border-2': isFieldWithinBounds,
+                      'text-field-card-foreground': isFieldWithinBounds,
                       'opacity-50': !isFieldWithinBounds,
                     },
                   )}
