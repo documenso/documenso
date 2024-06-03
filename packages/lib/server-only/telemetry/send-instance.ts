@@ -1,10 +1,10 @@
-export type SendInstanceInfo = {
+export type SendInstance = {
   uniqueId: string;
   timestamp: Date;
   version: string;
 };
 
-export const sendInstanceInfo = async ({ uniqueId, timestamp, version }: SendInstanceInfo) => {
+export const sendInstance = async ({ uniqueId, timestamp, version }: SendInstance) => {
   const isProduction = process.env.NODE_ENV === 'production';
   const isTelemetryDisabled = process.env.DISABLE_TELEMETRY === 'true';
 

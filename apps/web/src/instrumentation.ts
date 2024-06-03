@@ -1,9 +1,7 @@
-import { sendInstanceInfo } from '@documenso/lib/server-only/telemetry/send-instance-info';
+import { registerInstance } from '@documenso/lib/server-only/telemetry/register-instance';
 
-export async function register() {
-  await sendInstanceInfo({
-    uniqueId: '1',
-    timestamp: new Date(),
-    version: '1.2.3',
-  });
-}
+export const register = async () => {
+  if (process.env.NEXT_RUNTIME === 'nodejs') {
+    await registerInstance();
+  }
+};

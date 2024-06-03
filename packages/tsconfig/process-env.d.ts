@@ -70,6 +70,7 @@ declare namespace NodeJS {
     VERCEL?: string;
     VERCEL_ENV?: 'production' | 'development' | 'preview';
     VERCEL_URL?: string;
+    NEXT_RUNTIME?: 'nodejs' | 'edge';
 
     DEPLOYMENT_TARGET?: 'webapp' | 'marketing';
     FONT_CAVEAT_URI: string;

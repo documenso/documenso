@@ -3,7 +3,7 @@ import { prisma } from '@documenso/prisma';
 import type { TSiteSettingSchema } from './schema';
 
 export type UpsertSiteSettingOptions = TSiteSettingSchema & {
-  userId: number;
+  userId: number | null;
 };
 
 export const upsertSiteSetting = async ({

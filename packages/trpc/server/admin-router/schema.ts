@@ -1,7 +1,7 @@
 import { Role } from '@prisma/client';
 import z from 'zod';
 
-import { ZSiteSettingSchema } from '@documenso/lib/server-only/site-settings/schema';
+import { ZSiteSettingsBannerSchema } from '@documenso/lib/server-only/site-settings/schemas/banner';
 
 export const ZAdminFindDocumentsQuerySchema = z.object({
   term: z.string().optional(),
@@ -30,7 +30,7 @@ export type TAdminUpdateRecipientMutationSchema = z.infer<
   typeof ZAdminUpdateRecipientMutationSchema
 >;
 
-export const ZAdminUpdateSiteSettingMutationSchema = ZSiteSettingSchema;
+export const ZAdminUpdateSiteSettingMutationSchema = ZSiteSettingsBannerSchema;
 
 export type TAdminUpdateSiteSettingMutationSchema = z.infer<
   typeof ZAdminUpdateSiteSettingMutationSchema

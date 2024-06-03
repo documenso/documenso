@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 
-import { WebhookTriggerEvents } from '@prisma/client/';
+import { WebhookTriggerEvents } from '@prisma/client';
 import { Check, ChevronsUpDown } from 'lucide-react';
 
 import { toFriendlyWebhookEventName } from '@documenso/lib/universal/webhook/to-friendly-webhook-event-name';
