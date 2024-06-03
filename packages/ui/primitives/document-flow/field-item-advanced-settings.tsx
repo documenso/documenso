@@ -191,19 +191,6 @@ export const FieldAdvancedSettings = forwardRef<HTMLDivElement, FieldAdvancedSet
       });
     };
 
-    const handleToggleChange = (key: FieldMetaKeys) => {
-      setFieldState((prevState: FieldMeta) => {
-        if (prevState && key in prevState) {
-          return {
-            ...prevState,
-            // @ts-expect-error fix this later
-            [key]: !prevState[key],
-          };
-        }
-        return prevState;
-      });
-    };
-
     const numberField = field.type === FieldType.NUMBER;
     const checkBoxField = field.type === FieldType.CHECKBOX;
     const radioField = field.type === FieldType.RADIO;
@@ -306,19 +293,45 @@ export const FieldAdvancedSettings = forwardRef<HTMLDivElement, FieldAdvancedSet
           )}
 
           {checkBoxField && (
-            <CheckboxFieldAdvancedSettings
-              fieldState={fieldState}
-              handleFieldChange={handleFieldChange}
-              handleToggleChange={handleToggleChange}
-            />
+            <div>
+              <CheckboxFieldAdvancedSettings
+                fieldState={fieldState}
+                handleFieldChange={handleFieldChange}
+                handleErrors={setErrors}
+              />
+              {errors.length > 0 && (
+                <div className="mt-4">
+                  <ul>
+                    {errors.map((error, index) => (
+                      <li className="text-sm text-red-500" key={index}>
+                        {error}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </div>
           )}
 
           {dropdownField && (
-            <DropdownFieldAdvancedSettings
-              fieldState={fieldState}
-              handleFieldChange={handleFieldChange}
-              handleToggleChange={handleToggleChange}
-            />
+            <div>
+              <DropdownFieldAdvancedSettings
+                fieldState={fieldState}
+                handleFieldChange={handleFieldChange}
+                handleErrors={setErrors}
+              />
+              {errors.length > 0 && (
+                <div className="mt-4">
+                  <ul>
+                    {errors.map((error, index) => (
+                      <li className="text-sm text-red-500" key={index}>
+                        {error}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </div>
           )}
         </DocumentFlowFormContainerContent>
         <DocumentFlowFormContainerFooter className="mt-auto">

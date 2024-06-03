@@ -24,22 +24,59 @@ type CheckboxFieldAdvancedSettingsProps = {
   fieldState: CheckboxFieldMeta;
   handleFieldChange: (
     key: keyof CheckboxFieldMeta,
-    value: string | { checked: boolean; value: string }[],
+    value: string | { checked: boolean; value: string }[] | boolean,
   ) => void;
-  handleToggleChange: (key: keyof CheckboxFieldMeta) => void;
+  handleErrors: (errors: string[]) => void;
 };
 
 export const CheckboxFieldAdvancedSettings = ({
   fieldState,
   handleFieldChange,
-  handleToggleChange,
+  handleErrors,
 }: CheckboxFieldAdvancedSettingsProps) => {
   const [showValidation, setShowValidation] = useState(false);
   const [values, setValues] = useState(fieldState.values ?? [{ checked: false, value: '' }]);
+  const [readOnly, setReadOnly] = useState(fieldState.readOnly ?? false);
+  const [required, setRequired] = useState(fieldState.required ?? false);
+
+  const validateReadOnlyAndRequired = (
+    readOnly: boolean,
+    required: boolean,
+    values: { checked: boolean; value: string }[],
+  ) => {
+    const errors = [];
+
+    if (readOnly && required) {
+      errors.push('A field cannot be both read only and required');
+    }
+
+    if (readOnly && values.length === 0) {
+      errors.push('A read only field must have at least one value');
+    }
+
+    return errors;
+  };
+
+  const handleToggleChange = (field: keyof CheckboxFieldMeta, value: string | boolean) => {
+    const readOnly = field === 'readOnly' ? Boolean(value) : Boolean(fieldState.readOnly);
+    const required = field === 'required' ? Boolean(value) : Boolean(fieldState.required);
+    setReadOnly(readOnly);
+    setRequired(required);
+
+    const errors = validateReadOnlyAndRequired(readOnly, required, values);
+    handleErrors(errors);
+
+    handleFieldChange(field, value);
+  };
 
   const addValue = () => {
     setValues([...values, { checked: false, value: '' }]);
   };
+
+  useEffect(() => {
+    const errors = validateReadOnlyAndRequired(readOnly, required, values);
+    handleErrors(errors);
+  }, [values]);
 
   // This might look redundant but the values are not updated when the fieldState is updated withouth this useEffect
   useEffect(() => {
@@ -99,12 +136,7 @@ export const CheckboxFieldAdvancedSettings = ({
           <Switch
             className="bg-background"
             checked={fieldState.required}
-            onCheckedChange={() => {
-              if (fieldState.readOnly === true) {
-                handleToggleChange('readOnly');
-              }
-              handleToggleChange('required');
-            }}
+            onCheckedChange={(checked) => handleToggleChange('required', checked)}
           />
           <Label>Required field</Label>
         </div>
@@ -112,12 +144,7 @@ export const CheckboxFieldAdvancedSettings = ({
           <Switch
             className="bg-background"
             checked={fieldState.readOnly}
-            onCheckedChange={() => {
-              if (fieldState.required) {
-                handleToggleChange('required');
-              }
-              handleToggleChange('readOnly');
-            }}
+            onCheckedChange={(checked) => handleToggleChange('readOnly', checked)}
           />
           <Label>Read only</Label>
         </div>

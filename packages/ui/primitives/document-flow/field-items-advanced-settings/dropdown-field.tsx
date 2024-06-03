@@ -5,7 +5,6 @@ import { useEffect, useMemo, useState } from 'react';
 import { ChevronDown, ChevronUp, Trash } from 'lucide-react';
 
 import { type TDropdownFieldMeta as DropdownFieldMeta } from '@documenso/lib/types/field-field-meta';
-import { ZDropdownFieldMeta } from '@documenso/lib/types/field-field-meta';
 import { Button } from '@documenso/ui/primitives/button';
 import { Input } from '@documenso/ui/primitives/input';
 import { Label } from '@documenso/ui/primitives/label';
@@ -20,16 +19,18 @@ import { Switch } from '@documenso/ui/primitives/switch';
 
 type DropdownFieldAdvancedSettingsProps = {
   fieldState: DropdownFieldMeta;
-  handleFieldChange: (key: keyof DropdownFieldMeta, value: string | { value: string }[]) => void;
-  handleToggleChange: (key: keyof DropdownFieldMeta) => void;
+  handleFieldChange: (
+    key: keyof DropdownFieldMeta,
+    value: string | { value: string }[] | boolean,
+  ) => void;
+  handleErrors: (errors: string[]) => void;
 };
 
 export const DropdownFieldAdvancedSettings = ({
   fieldState,
   handleFieldChange,
-  handleToggleChange,
+  handleErrors,
 }: DropdownFieldAdvancedSettingsProps) => {
-  const parsedFieldState = ZDropdownFieldMeta.parse(fieldState);
   // Weird type check to handle the case where the values are not an array of objects
   const fieldStateValues: { value: string }[] = useMemo(() => {
     return Array.isArray(fieldState.values)
@@ -39,6 +40,26 @@ export const DropdownFieldAdvancedSettings = ({
 
   const [showValidation, setShowValidation] = useState(false);
   const [values, setValues] = useState(fieldStateValues);
+  const [readOnly, setReadOnly] = useState(fieldState.readOnly ?? false);
+  const [required, setRequired] = useState(fieldState.required ?? false);
+
+  const validateReadOnlyAndRequired = (
+    readOnly: boolean,
+    required: boolean,
+    values: { value: string }[],
+  ) => {
+    const errors = [];
+
+    if (readOnly && required) {
+      errors.push('A field cannot be both read only and required');
+    }
+
+    if (readOnly && values.length === 0) {
+      errors.push('A read only field must have at least one value');
+    }
+
+    return errors;
+  };
 
   const addValue = () => {
     setValues([...values, { value: 'New option' }]);
@@ -52,6 +73,23 @@ export const DropdownFieldAdvancedSettings = ({
     setValues(newValues);
     handleFieldChange('values', newValues);
   };
+
+  const handleToggleChange = (field: keyof DropdownFieldMeta, value: string | boolean) => {
+    const readOnly = field === 'readOnly' ? Boolean(value) : Boolean(fieldState.readOnly);
+    const required = field === 'required' ? Boolean(value) : Boolean(fieldState.required);
+    setReadOnly(readOnly);
+    setRequired(required);
+
+    const errors = validateReadOnlyAndRequired(readOnly, required, values);
+    handleErrors(errors);
+
+    handleFieldChange(field, value);
+  };
+
+  useEffect(() => {
+    const errors = validateReadOnlyAndRequired(readOnly, required, values);
+    handleErrors(errors);
+  }, [values]);
 
   useEffect(() => {
     setValues(fieldStateValues);
@@ -82,12 +120,7 @@ export const DropdownFieldAdvancedSettings = ({
           <Switch
             className="bg-background"
             checked={fieldState.required}
-            onCheckedChange={() => {
-              if (fieldState.readOnly === true) {
-                handleToggleChange('readOnly');
-              }
-              handleToggleChange('required');
-            }}
+            onCheckedChange={(checked) => handleToggleChange('required', checked)}
           />
           <Label>Required field</Label>
         </div>
@@ -95,12 +128,7 @@ export const DropdownFieldAdvancedSettings = ({
           <Switch
             className="bg-background"
             checked={fieldState.readOnly}
-            onCheckedChange={() => {
-              if (fieldState.required) {
-                handleToggleChange('required');
-              }
-              handleToggleChange('readOnly');
-            }}
+            onCheckedChange={(checked) => handleToggleChange('readOnly', checked)}
           />
           <Label>Read only</Label>
         </div>

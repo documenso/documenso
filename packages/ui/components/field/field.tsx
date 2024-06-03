@@ -124,7 +124,7 @@ export function FieldRootContainer({ field, children, cardClassName }: FieldCont
                 field.inserted,
             },
             {
-              'border-yellow-300 ring-2 ring-yellow-100 ring-offset-2 ring-offset-yellow-100':
+              'border-yellow-300 shadow-none ring-2 ring-yellow-100 ring-offset-2 ring-offset-yellow-100 dark:border-2':
                 !field.inserted && !checkBoxOrRadio,
             },
             {
@@ -134,7 +134,7 @@ export function FieldRootContainer({ field, children, cardClassName }: FieldCont
               'border-orange-300 ring-1 ring-orange-300': !field.inserted && isValidating,
             },
             {
-              'border-red-500 ring-2 ring-red-200 ring-offset-2 ring-offset-red-200 hover:text-red-500':
+              'border-red-500 shadow-none ring-2 ring-red-200 ring-offset-2 ring-offset-red-200 hover:text-red-500':
                 !field.inserted && parsedField?.required && !checkBoxOrRadio,
             },
             {

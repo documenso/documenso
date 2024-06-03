@@ -15,21 +15,53 @@ type RadioFieldAdvancedSettingsProps = {
   fieldState: RadioFieldMeta;
   handleFieldChange: (
     key: keyof RadioFieldMeta,
-    value: string | { checked: boolean; value: string }[],
+    value: string | { checked: boolean; value: string }[] | boolean,
   ) => void;
-  handleToggleChange: (key: keyof RadioFieldMeta) => void;
+  handleErrors: (errors: string[]) => void;
 };
 
 export const RadioFieldAdvancedSettings = ({
   fieldState,
   handleFieldChange,
-  handleToggleChange,
+  handleErrors,
 }: RadioFieldAdvancedSettingsProps) => {
   const [showValidation, setShowValidation] = useState(false);
-  const [values, setValues] = useState(fieldState.values ?? [{ checked: false, value: '' }]);
+  const [values, setValues] = useState(
+    fieldState.values ?? [{ checked: false, value: 'Default value' }],
+  );
+  const [readOnly, setReadOnly] = useState(fieldState.readOnly ?? false);
+  const [required, setRequired] = useState(fieldState.required ?? false);
+
+  const validateReadOnlyAndRequired = (
+    readOnly: boolean,
+    required: boolean,
+    values: { checked: boolean; value: string }[],
+  ) => {
+    const errors = [];
+
+    if (readOnly && required) {
+      errors.push('A field cannot be both read only and required');
+    }
+
+    if (readOnly && values.length === 0) {
+      errors.push('A read only field must have at least one value');
+    }
+
+    return errors;
+  };
 
   const addValue = () => {
     setValues([...values, { checked: false, value: '' }]);
+    handleFieldChange('values', [...values, { checked: false, value: '' }]);
+  };
+
+  const removeValue = (index: number) => {
+    if (values.length === 1) return;
+
+    const newValues = [...values];
+    newValues.splice(index, 1);
+    setValues(newValues);
+    handleFieldChange('values', newValues);
   };
 
   const handleCheckedChange = (checked: boolean, index: number) => {
@@ -45,25 +77,35 @@ export const RadioFieldAdvancedSettings = ({
     handleFieldChange('values', newValues);
   };
 
+  const handleToggleChange = (field: keyof RadioFieldMeta, value: string | boolean) => {
+    const readOnly = field === 'readOnly' ? Boolean(value) : Boolean(fieldState.readOnly);
+    const required = field === 'required' ? Boolean(value) : Boolean(fieldState.required);
+    setReadOnly(readOnly);
+    setRequired(required);
+
+    const errors = validateReadOnlyAndRequired(readOnly, required, values);
+    handleErrors(errors);
+
+    handleFieldChange(field, value);
+  };
+
   const handleInputChange = (value: string, index: number) => {
     const newValues = [...values];
     newValues[index].value = value;
     setValues(newValues);
     handleFieldChange('values', newValues);
-  };
 
-  const removeValue = (index: number) => {
-    if (values.length === 1) return;
-
-    const newValues = [...values];
-    newValues.splice(index, 1);
-    setValues(newValues);
-    handleFieldChange('values', newValues);
+    return newValues;
   };
 
   useEffect(() => {
-    setValues(fieldState.values ?? [{ checked: false, value: '' }]);
+    setValues(fieldState.values ?? [{ checked: false, value: 'Default value' }]);
   }, [fieldState.values]);
+
+  useEffect(() => {
+    const errors = validateReadOnlyAndRequired(readOnly, required, values);
+    handleErrors(errors);
+  }, [values]);
 
   return (
     <div className="flex flex-col gap-4">
@@ -72,12 +114,7 @@ export const RadioFieldAdvancedSettings = ({
           <Switch
             className="bg-background"
             checked={fieldState.required}
-            onCheckedChange={() => {
-              if (fieldState.readOnly === true) {
-                handleToggleChange('readOnly');
-              }
-              handleToggleChange('required');
-            }}
+            onCheckedChange={(checked) => handleToggleChange('required', checked)}
           />
           <Label>Required field</Label>
         </div>
@@ -85,12 +122,7 @@ export const RadioFieldAdvancedSettings = ({
           <Switch
             className="bg-background"
             checked={fieldState.readOnly}
-            onCheckedChange={() => {
-              if (fieldState.required) {
-                handleToggleChange('required');
-              }
-              handleToggleChange('readOnly');
-            }}
+            onCheckedChange={(checked) => handleToggleChange('readOnly', checked)}
           />
           <Label>Read only</Label>
         </div>
