@@ -3,6 +3,7 @@ import {
   type TFieldMetaSchema as FieldMeta,
   ZFieldMetaSchema,
   ZNumberFieldMeta,
+  ZRadioFieldMeta,
   ZTextFieldMeta,
 } from '@documenso/lib/types/field-field-meta';
 import type { RequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
@@ -171,6 +172,21 @@ export const setFieldsForDocument = async ({
           }
         }
 
+        if (field.type === FieldType.RADIO) {
+          const radioFieldParsedMeta = ZRadioFieldMeta.parse(field.fieldMeta);
+          const checkedRadioFieldValues =
+            radioFieldParsedMeta.values &&
+            radioFieldParsedMeta.values.filter((value) => value.checked === true);
+
+          if (!radioFieldParsedMeta.values || radioFieldParsedMeta.values.length === 0) {
+            throw new Error('Radio field must have at least one option');
+          }
+
+          if (checkedRadioFieldValues && checkedRadioFieldValues.length > 1) {
+            throw new Error('There cannnot be more than one checked option');
+          }
+        }
+
         const upsertedField = await tx.field.upsert({
           where: {
             id: field._persisted?.id ?? -1,
@@ -182,7 +198,7 @@ export const setFieldsForDocument = async ({
             positionY: field.pageY,
             width: field.pageWidth,
             height: field.pageHeight,
-            fieldMeta: field.fieldMeta,
+            fieldMeta: parsedFieldMeta,
           },
           create: {
             type: field.type,
@@ -193,7 +209,7 @@ export const setFieldsForDocument = async ({
             height: field.pageHeight,
             customText: '',
             inserted: false,
-            fieldMeta: field.fieldMeta,
+            fieldMeta: parsedFieldMeta,
             Document: {
               connect: {
                 id: documentId,

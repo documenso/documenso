@@ -45,6 +45,14 @@ export const NumberFieldAdvancedSettings = ({
       errors.push(`Value ${value} is greater than the max value ${maxNumber}`);
     }
 
+    if (minNumber > maxNumber) {
+      errors.push('Min value cannot be greater than max value');
+    }
+
+    if (maxNumber < minNumber) {
+      errors.push('Max value cannot be less than min value');
+    }
+
     return errors;
   };
 

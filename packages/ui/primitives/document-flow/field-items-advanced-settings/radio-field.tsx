@@ -32,6 +32,26 @@ export const RadioFieldAdvancedSettings = ({
     setValues([...values, { checked: false, value: '' }]);
   };
 
+  const handleCheckedChange = (checked: boolean, index: number) => {
+    const newValues = values.map((val, idx) => {
+      if (idx === index) {
+        return { ...val, checked: Boolean(checked) };
+      } else {
+        return { ...val, checked: false };
+      }
+    });
+
+    setValues(newValues);
+    handleFieldChange('values', newValues);
+  };
+
+  const handleInputChange = (value: string, index: number) => {
+    const newValues = [...values];
+    newValues[index].value = value;
+    setValues(newValues);
+    handleFieldChange('values', newValues);
+  };
+
   const removeValue = (index: number) => {
     if (values.length === 1) return;
 
@@ -91,28 +111,18 @@ export const RadioFieldAdvancedSettings = ({
           {values.map((value, index) => (
             <div key={index} className="mt-2 flex items-center gap-4">
               <Checkbox
-                className="data-[state=checked]:bg-documenso border-foreground/30 data-[state=checked]:ring-documenso h-5 w-5 rounded-full data-[state=checked]:ring-1 data-[state=checked]:ring-offset-2 data-[state=checked]:ring-offset-white"
+                className="data-[state=checked]:bg-documenso border-foreground/30 data-[state=checked]:ring-documenso dark:data-[state=checked]:ring-offset-background h-5 w-5 rounded-full data-[state=checked]:ring-1 data-[state=checked]:ring-offset-2 data-[state=checked]:ring-offset-white"
                 checked={value.checked}
-                onCheckedChange={(checked) => {
-                  const newValues = [...values];
-                  newValues[index].checked = Boolean(checked);
-                  setValues(newValues);
-                  handleFieldChange('values', newValues);
-                }}
+                onCheckedChange={(checked) => handleCheckedChange(Boolean(checked), index)}
               />
               <Input
                 className="w-1/2"
                 value={value.value}
-                onChange={(e) => {
-                  const newValues = [...values];
-                  newValues[index].value = e.target.value;
-                  setValues(newValues);
-                  handleFieldChange('values', newValues);
-                }}
+                onChange={(e) => handleInputChange(e.target.value, index)}
               />
               <button
                 type="button"
-                className="col-span-1 mt-auto inline-flex h-10 w-10 items-center  text-slate-500 hover:opacity-80 disabled:cursor-not-allowed disabled:opacity-50"
+                className="col-span-1 mt-auto inline-flex h-10 w-10 items-center text-slate-500 hover:opacity-80 disabled:cursor-not-allowed disabled:opacity-50 dark:text-white"
                 onClick={() => {
                   removeValue(index);
                 }}
