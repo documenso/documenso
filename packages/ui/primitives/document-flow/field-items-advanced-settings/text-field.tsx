@@ -6,18 +6,21 @@ import { Textarea } from '@documenso/ui/primitives/textarea';
 
 type TextFieldAdvancedSettingsProps = {
   fieldState: TextFieldMeta;
-  handleFieldChange: (key: keyof TextFieldMeta, value: string) => void;
-  handleToggleChange: (key: keyof TextFieldMeta) => void;
+  handleFieldChange: (key: keyof TextFieldMeta, value: string | boolean) => void;
   handleErrors: (errors: string[]) => void;
 };
 
 export const TextFieldAdvancedSettings = ({
   fieldState,
   handleFieldChange,
-  handleToggleChange,
   handleErrors,
 }: TextFieldAdvancedSettingsProps) => {
-  const validateText = (value: string, characterLimit: string | undefined) => {
+  const validateText = (
+    value: string,
+    characterLimit: string | undefined,
+    readOnly: boolean,
+    required: boolean,
+  ) => {
     const errors = [];
 
     const limit = characterLimit ? Number(characterLimit) : 0;
@@ -30,15 +33,25 @@ export const TextFieldAdvancedSettings = ({
       errors.push('Character limit must be a number');
     }
 
+    if (readOnly && value.length < 1) {
+      errors.push('A read only field must have text');
+    }
+
+    if (readOnly && required) {
+      errors.push('A field cannot be both read only and required');
+    }
+
     return errors;
   };
 
-  const handleInput = (field: keyof TextFieldMeta, value: string) => {
-    const text = field === 'text' ? value : fieldState.text || '';
+  const handleInput = (field: keyof TextFieldMeta, value: string | boolean) => {
+    const text = field === 'text' ? String(value) : fieldState.text || '';
     const limit =
       field === 'characterLimit' ? Number(value) : Number(fieldState.characterLimit || 0);
+    const readOnly = field === 'readOnly' ? Boolean(value) : Boolean(fieldState.readOnly);
+    const required = field === 'required' ? Boolean(value) : Boolean(fieldState.required);
 
-    const textErrors = validateText(text, String(limit));
+    const textErrors = validateText(text, String(limit), readOnly, required);
     handleErrors(textErrors);
 
     handleFieldChange(field, value);
@@ -94,12 +107,7 @@ export const TextFieldAdvancedSettings = ({
           <Switch
             className="bg-background"
             checked={fieldState.required}
-            onCheckedChange={() => {
-              if (fieldState.readOnly === true) {
-                handleToggleChange('readOnly');
-              }
-              handleToggleChange('required');
-            }}
+            onCheckedChange={(checked) => handleInput('required', checked)}
           />
           <Label>Required field</Label>
         </div>
@@ -107,12 +115,7 @@ export const TextFieldAdvancedSettings = ({
           <Switch
             className="bg-background"
             checked={fieldState.readOnly}
-            onCheckedChange={() => {
-              if (fieldState.required) {
-                handleToggleChange('required');
-              }
-              handleToggleChange('readOnly');
-            }}
+            onCheckedChange={(checked) => handleInput('readOnly', checked)}
           />
           <Label>Read only</Label>
         </div>

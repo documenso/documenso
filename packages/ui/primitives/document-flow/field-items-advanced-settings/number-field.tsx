@@ -21,20 +21,24 @@ import { numberFormatValues } from './constants';
 
 type NumberFieldAdvancedSettingsProps = {
   fieldState: NumberFieldMeta;
-  handleFieldChange: (key: keyof NumberFieldMeta, value: string) => void;
-  handleToggleChange: (key: keyof NumberFieldMeta) => void;
+  handleFieldChange: (key: keyof NumberFieldMeta, value: string | boolean) => void;
   handleErrors: (errors: string[]) => void;
 };
 
 export const NumberFieldAdvancedSettings = ({
   fieldState,
   handleFieldChange,
-  handleToggleChange,
   handleErrors,
 }: NumberFieldAdvancedSettingsProps) => {
   const [showValidation, setShowValidation] = useState(false);
 
-  const validateValue = (value: number, minNumber: number, maxNumber: number) => {
+  const validateValue = (
+    value: number,
+    minNumber: number,
+    maxNumber: number,
+    readOnly: boolean,
+    required: boolean,
+  ) => {
     const errors = [];
 
     if (minNumber > 0 && value < minNumber) {
@@ -53,15 +57,25 @@ export const NumberFieldAdvancedSettings = ({
       errors.push('Max value cannot be less than min value');
     }
 
+    if (readOnly && value < 1) {
+      errors.push('A read only field must have a value greater than 0');
+    }
+
+    if (readOnly && required) {
+      errors.push('A field cannot be both read only and required');
+    }
+
     return errors;
   };
 
-  const handleInput = (field: keyof NumberFieldMeta, value: string) => {
+  const handleInput = (field: keyof NumberFieldMeta, value: string | boolean) => {
     const userValue = field === 'value' ? Number(value) : Number(fieldState.value || 0);
     const userMinValue = field === 'minValue' ? Number(value) : Number(fieldState.minValue || 0);
     const userMaxValue = field === 'maxValue' ? Number(value) : Number(fieldState.maxValue || 0);
+    const readOnly = field === 'readOnly' ? Boolean(value) : Boolean(fieldState.readOnly);
+    const required = field === 'required' ? Boolean(value) : Boolean(fieldState.required);
 
-    const valueErrors = validateValue(userValue, userMinValue, userMaxValue);
+    const valueErrors = validateValue(userValue, userMinValue, userMaxValue, readOnly, required);
     handleErrors(valueErrors);
 
     handleFieldChange(field, value);
@@ -122,12 +136,7 @@ export const NumberFieldAdvancedSettings = ({
           <Switch
             className="bg-background"
             checked={fieldState.required}
-            onCheckedChange={() => {
-              if (fieldState.readOnly === true) {
-                handleToggleChange('readOnly');
-              }
-              handleToggleChange('required');
-            }}
+            onCheckedChange={(checked) => handleInput('required', checked)}
           />
           <Label>Required field</Label>
         </div>
@@ -135,12 +144,7 @@ export const NumberFieldAdvancedSettings = ({
           <Switch
             className="bg-background"
             checked={fieldState.readOnly}
-            onCheckedChange={() => {
-              if (fieldState.required) {
-                handleToggleChange('required');
-              }
-              handleToggleChange('readOnly');
-            }}
+            onCheckedChange={(checked) => handleInput('readOnly', checked)}
           />
           <Label>Read only</Label>
         </div>

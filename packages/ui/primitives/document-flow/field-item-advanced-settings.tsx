@@ -172,7 +172,7 @@ export const FieldAdvancedSettings = forwardRef<HTMLDivElement, FieldAdvancedSet
 
     const handleFieldChange = (
       key: FieldMetaKeys,
-      value: string | { checked: boolean; value: string }[] | { value: string }[],
+      value: string | { checked: boolean; value: string }[] | { value: string }[] | boolean,
     ) => {
       setFieldState((prevState: FieldMeta) => {
         if (['characterLimit', 'minValue', 'maxValue', 'value', 'validationLength'].includes(key)) {
@@ -247,7 +247,6 @@ export const FieldAdvancedSettings = forwardRef<HTMLDivElement, FieldAdvancedSet
               <TextFieldAdvancedSettings
                 fieldState={fieldState}
                 handleFieldChange={handleFieldChange}
-                handleToggleChange={handleToggleChange}
                 handleErrors={setErrors}
               />
               {errors.length > 0 && (
@@ -269,7 +268,6 @@ export const FieldAdvancedSettings = forwardRef<HTMLDivElement, FieldAdvancedSet
               <NumberFieldAdvancedSettings
                 fieldState={fieldState}
                 handleFieldChange={handleFieldChange}
-                handleToggleChange={handleToggleChange}
                 handleErrors={setErrors}
               />
               {errors.length > 0 && (
@@ -287,11 +285,24 @@ export const FieldAdvancedSettings = forwardRef<HTMLDivElement, FieldAdvancedSet
           )}
 
           {radioField && (
-            <RadioFieldAdvancedSettings
-              fieldState={fieldState}
-              handleFieldChange={handleFieldChange}
-              handleToggleChange={handleToggleChange}
-            />
+            <div>
+              <RadioFieldAdvancedSettings
+                fieldState={fieldState}
+                handleFieldChange={handleFieldChange}
+                handleErrors={setErrors}
+              />
+              {errors.length > 0 && (
+                <div className="mt-4">
+                  <ul>
+                    {errors.map((error, index) => (
+                      <li className="text-sm text-red-500" key={index}>
+                        {error}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </div>
           )}
 
           {checkBoxField && (
