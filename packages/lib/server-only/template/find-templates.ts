@@ -8,6 +8,9 @@ export type FindTemplatesOptions = {
   perPage: number;
 };
 
+export type FindTemplatesResponse = Awaited<ReturnType<typeof findTemplates>>;
+export type FindTemplateRow = FindTemplatesResponse['templates'][number];
+
 export const findTemplates = async ({
   userId,
   teamId,
@@ -45,6 +48,12 @@ export const findTemplates = async ({
         },
         Field: true,
         Recipient: true,
+        directLink: {
+          select: {
+            token: true,
+            enabled: true,
+          },
+        },
       },
       skip: Math.max(page - 1, 0) * perPage,
       orderBy: {

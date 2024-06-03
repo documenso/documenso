@@ -4,7 +4,7 @@ import { redirect } from 'next/navigation';
 
 import { env } from 'next-runtime-env';
 
-import { IS_GOOGLE_SSO_ENABLED } from '@documenso/lib/constants/auth';
+import { IS_GOOGLE_SSO_ENABLED, IS_OIDC_SSO_ENABLED } from '@documenso/lib/constants/auth';
 import { decryptSecondaryData } from '@documenso/lib/server-only/crypto/decrypt';
 
 import { SignInForm } from '~/components/forms/signin';
@@ -37,10 +37,13 @@ export default function SignInPage({ searchParams }: SignInPageProps) {
         <p className="text-muted-foreground mt-2 text-sm">
           Welcome back, we are lucky to have you.
         </p>
-
         <hr className="-mx-6 my-4" />
 
-        <SignInForm initialEmail={email || undefined} isGoogleSSOEnabled={IS_GOOGLE_SSO_ENABLED} />
+        <SignInForm
+          initialEmail={email || undefined}
+          isGoogleSSOEnabled={IS_GOOGLE_SSO_ENABLED}
+          isOIDCSSOEnabled={IS_OIDC_SSO_ENABLED}
+        />
 
         {NEXT_PUBLIC_DISABLE_SIGNUP !== 'true' && (
           <p className="text-muted-foreground mt-6 text-center text-sm">
