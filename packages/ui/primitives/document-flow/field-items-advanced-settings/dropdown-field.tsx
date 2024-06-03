@@ -103,7 +103,7 @@ export const DropdownFieldAdvancedSettings = ({
           value={fieldState.defaultValue}
           onValueChange={(val) => handleFieldChange('defaultValue', val)}
         >
-          <SelectTrigger className="text-muted-foreground mt-2 w-full bg-white">
+          <SelectTrigger className="text-muted-foreground bg-background mt-2 w-full">
             <SelectValue placeholder={'-- Select --'} />
           </SelectTrigger>
           <SelectContent position="popper">

@@ -7,6 +7,7 @@ import { ChevronDown, ChevronUp, Trash } from 'lucide-react';
 import { type TCheckboxFieldMeta as CheckboxFieldMeta } from '@documenso/lib/types/field-field-meta';
 import { Button } from '@documenso/ui/primitives/button';
 import { Checkbox } from '@documenso/ui/primitives/checkbox';
+import { checkboxValidationSigns } from '@documenso/ui/primitives/document-flow/field-items-advanced-settings/constants';
 import { Input } from '@documenso/ui/primitives/input';
 import { Label } from '@documenso/ui/primitives/label';
 import {
@@ -38,13 +39,22 @@ export const CheckboxFieldAdvancedSettings = ({
   const [values, setValues] = useState(fieldState.values ?? [{ checked: false, value: '' }]);
   const [readOnly, setReadOnly] = useState(fieldState.readOnly ?? false);
   const [required, setRequired] = useState(fieldState.required ?? false);
+  const [validationLength, setValidationLength] = useState(fieldState.validationLength ?? 0);
+  const [validationRule, setValidationRule] = useState(fieldState.validationRule ?? '');
 
   const validateReadOnlyAndRequired = (
     readOnly: boolean,
     required: boolean,
+    validationRule: string,
+    validationLength: number,
     values: { checked: boolean; value: string }[],
   ) => {
     const errors = [];
+    const validation = checkboxValidationSigns.find((sign) => sign.label === validationRule);
+    const lengthCondition =
+      (validation?.value === '>=' && values.length < validationLength) ||
+      (validation?.value === '=' && values.length !== validationLength) ||
+      (validation?.value === '<=' && values.length > validationLength);
 
     if (readOnly && required) {
       errors.push('A field cannot be both read only and required');
@@ -54,16 +64,33 @@ export const CheckboxFieldAdvancedSettings = ({
       errors.push('A read only field must have at least one value');
     }
 
+    if (lengthCondition) {
+      errors.push(`You need to ${validationRule.toLowerCase()} ${validationLength} options`);
+    }
+
     return errors;
   };
 
   const handleToggleChange = (field: keyof CheckboxFieldMeta, value: string | boolean) => {
     const readOnly = field === 'readOnly' ? Boolean(value) : Boolean(fieldState.readOnly);
     const required = field === 'required' ? Boolean(value) : Boolean(fieldState.required);
+    const validationRule =
+      field === 'validationRule' ? String(value) : String(fieldState.validationRule);
+    const validationLength =
+      field === 'validationLength' ? Number(value) : Number(fieldState.validationLength);
+
     setReadOnly(readOnly);
     setRequired(required);
+    setValidationRule(validationRule);
+    setValidationLength(validationLength);
 
-    const errors = validateReadOnlyAndRequired(readOnly, required, values);
+    const errors = validateReadOnlyAndRequired(
+      readOnly,
+      required,
+      validationRule,
+      validationLength,
+      values,
+    );
     handleErrors(errors);
 
     handleFieldChange(field, value);
@@ -74,7 +101,13 @@ export const CheckboxFieldAdvancedSettings = ({
   };
 
   useEffect(() => {
-    const errors = validateReadOnlyAndRequired(readOnly, required, values);
+    const errors = validateReadOnlyAndRequired(
+      readOnly,
+      required,
+      validationRule,
+      validationLength,
+      values,
+    );
     handleErrors(errors);
   }, [values]);
 
@@ -99,9 +132,9 @@ export const CheckboxFieldAdvancedSettings = ({
           <Label>Validation</Label>
           <Select
             value={fieldState.validationRule}
-            onValueChange={(val) => handleFieldChange('validationRule', val)}
+            onValueChange={(val) => handleToggleChange('validationRule', val)}
           >
-            <SelectTrigger className="text-muted-foreground mt-2 w-full bg-white">
+            <SelectTrigger className="text-muted-foreground bg-background mt-2 w-full">
               <SelectValue placeholder="Select at least" />
             </SelectTrigger>
             <SelectContent position="popper">
@@ -116,9 +149,9 @@ export const CheckboxFieldAdvancedSettings = ({
         <div className="mt-3 flex w-1/3 flex-col">
           <Select
             value={fieldState.validationLength ? String(fieldState.validationLength) : ''}
-            onValueChange={(val) => handleFieldChange('validationLength', val)}
+            onValueChange={(val) => handleToggleChange('validationLength', val)}
           >
-            <SelectTrigger className="text-muted-foreground mt-2 w-full bg-white">
+            <SelectTrigger className="text-muted-foreground bg-background mt-2 w-full">
               <SelectValue placeholder="Pick a number" />
             </SelectTrigger>
             <SelectContent position="popper">
