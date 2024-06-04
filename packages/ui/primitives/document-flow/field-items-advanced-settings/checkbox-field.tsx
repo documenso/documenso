@@ -109,6 +109,7 @@ export const CheckboxFieldAdvancedSettings = ({
       values,
     );
     handleErrors(errors);
+    handleFieldChange('values', values);
   }, [values]);
 
   // This might look redundant but the values are not updated when the fieldState is updated withouth this useEffect

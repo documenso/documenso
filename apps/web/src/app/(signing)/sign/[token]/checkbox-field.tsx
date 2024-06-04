@@ -47,10 +47,11 @@ export const CheckboxField = ({ field, recipient }: CheckboxFieldProps) => {
   );
 
   const isLengthConditionMet = useMemo(() => {
+    if (!validationSign) return true;
     return (
-      (validationSign?.value === '>=' && checkedValues.length >= (checkboxValidationLength || 0)) ||
-      (validationSign?.value === '=' && checkedValues.length === (checkboxValidationLength || 0)) ||
-      (validationSign?.value === '<=' && checkedValues.length <= (checkboxValidationLength || 0))
+      (validationSign.value === '>=' && checkedValues.length >= (checkboxValidationLength || 0)) ||
+      (validationSign.value === '=' && checkedValues.length === (checkboxValidationLength || 0)) ||
+      (validationSign.value === '<=' && checkedValues.length <= (checkboxValidationLength || 0))
     );
   }, [checkedValues, validationSign, checkboxValidationLength]);
 
@@ -168,7 +169,7 @@ export const CheckboxField = ({ field, recipient }: CheckboxFieldProps) => {
   };
 
   useEffect(() => {
-    if (!field.inserted && isLengthConditionMet) {
+    if (!field.inserted && checkedValues.length > 0 && isLengthConditionMet) {
       void executeActionAuthProcedure({
         onReauthFormSubmit: async (authOptions) => await onSign(authOptions),
         actionTarget: field.type,

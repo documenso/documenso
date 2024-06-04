@@ -13,6 +13,8 @@ import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
 import { cn } from '../../lib/utils';
 import { Card, CardContent } from '../card';
 import type { CombinedStylesKey } from './add-fields';
+import { CheckboxField } from './advanced-fields/checkbox';
+import { RadioField } from './advanced-fields/radio';
 import { FieldIcon } from './field-icon';
 import type { TDocumentFlowFormSchema } from './types';
 
@@ -260,8 +262,8 @@ export const FieldItem = ({
       default={{
         x: coords.pageX,
         y: coords.pageY,
-        height: coords.pageHeight,
-        width: coords.pageWidth,
+        height: field.type === 'CHECKBOX' || field.type === 'RADIO' ? '' : coords.pageHeight,
+        width: field.type === 'CHECKBOX' || field.type === 'RADIO' ? '' : coords.pageWidth,
       }}
       bounds={`${PDF_VIEWER_PAGE_SELECTOR}[data-page-number="${field.pageNumber}"]`}
       onDragStart={() => setActive(true)}
@@ -293,13 +295,26 @@ export const FieldItem = ({
             },
           )}
         >
-          <FieldIcon
-            fieldMeta={field.fieldMeta}
-            type={field.type}
-            signerEmail={field.signerEmail}
-            fontCaveatClassName={fontCaveat.className}
-          />
+          {field.type === 'CHECKBOX' && (
+            <div>
+              <CheckboxField field={field} />
+            </div>
+          )}
 
+          {field.type === 'RADIO' && (
+            <div>
+              <RadioField field={field} />
+            </div>
+          )}
+
+          {field.type !== 'CHECKBOX' && field.type !== 'RADIO' && (
+            <FieldIcon
+              fieldMeta={field.fieldMeta}
+              type={field.type}
+              signerEmail={field.signerEmail}
+              fontCaveatClassName={fontCaveat.className}
+            />
+          )}
           {!hideRecipients && (
             <p
               className={cn(

@@ -32,6 +32,8 @@ export const RadioField = ({ field, recipient }: RadioFieldProps) => {
   const { toast } = useToast();
   const [isPending, startTransition] = useTransition();
   const [selectedOption, setSelectedOption] = useState('');
+  const [optionSelected, setOptionSelected] = useState(false);
+  const [selectedOptionIndex, setSelectedOptionIndex] = useState<number | null>(null);
 
   const { executeActionAuthProcedure } = useRequiredDocumentAuthContext();
 
@@ -56,7 +58,7 @@ export const RadioField = ({ field, recipient }: RadioFieldProps) => {
       await signFieldWithToken({
         token: recipient.token,
         fieldId: field.id,
-        value: selectedOption,
+        value: selectedOption === 'empty-value' ? '' : selectedOption,
         isBase64: true,
         authOptions,
       });
@@ -89,6 +91,7 @@ export const RadioField = ({ field, recipient }: RadioFieldProps) => {
       });
 
       setSelectedOption('');
+      setSelectedOptionIndex(null);
 
       startTransition(() => router.refresh());
     } catch (err) {
@@ -104,16 +107,18 @@ export const RadioField = ({ field, recipient }: RadioFieldProps) => {
 
   const handleSelectItem = (selectedOption: string) => {
     setSelectedOption(selectedOption);
+    setOptionSelected(true);
   };
 
   useEffect(() => {
-    if (!field.inserted && selectedOption) {
+    if (!field.inserted && optionSelected) {
       void executeActionAuthProcedure({
         onReauthFormSubmit: async (authOptions) => await onSign(authOptions),
         actionTarget: field.type,
       });
+      setOptionSelected(false);
     }
-  }, [selectedOption]);
+  }, [optionSelected]);
 
   return (
     <SigningFieldContainer field={field} onSign={onSign} onRemove={onRemove} type="Radio">
@@ -124,7 +129,16 @@ export const RadioField = ({ field, recipient }: RadioFieldProps) => {
       )}
 
       {!field.inserted && (
-        <RadioGroup onValueChange={handleSelectItem} className="z-10">
+        <RadioGroup
+          onValueChange={(value) => {
+            if (value) {
+              handleSelectItem(value);
+            } else {
+              handleSelectItem('empty-value');
+            }
+          }}
+          className="z-10"
+        >
           {parsedFieldMeta.values?.map((item, index) => (
             <Card
               id={String(index)}
@@ -155,7 +169,8 @@ export const RadioField = ({ field, recipient }: RadioFieldProps) => {
                 <RadioGroupItem
                   value={item.value}
                   id={`option-${index}`}
-                  checked={item.value === field.customText}
+                  checked={item.checked}
+                  onClick={() => setSelectedOptionIndex(index)}
                 />
                 <Label htmlFor={`option-${index}`}>{item.value}</Label>
               </CardContent>
@@ -178,7 +193,9 @@ export const RadioField = ({ field, recipient }: RadioFieldProps) => {
                 },
                 {
                   'bg-documenso/20 border-documenso':
-                    field.inserted && item.value === field.customText,
+                    field.inserted && item.value.length > 0
+                      ? item.value === field.customText
+                      : selectedOptionIndex === index,
                 },
               )}
             >
@@ -187,7 +204,11 @@ export const RadioField = ({ field, recipient }: RadioFieldProps) => {
                   className="data-[state=checked]:ring-documenso data-[state=checked]:bg-documenso h-5 w-5 shrink-0 data-[state=checked]:ring-1 data-[state=checked]:ring-offset-2"
                   value={item.value}
                   id={`option-${index}`}
-                  checked={item.value === field.customText}
+                  checked={
+                    item.value.length > 0
+                      ? item.value === field.customText
+                      : selectedOptionIndex === index
+                  }
                 />
                 <Label htmlFor={`option-${index}`}>{item.value}</Label>
               </CardContent>
