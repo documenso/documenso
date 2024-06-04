@@ -9,7 +9,7 @@ import { ClaimProfileAlertDialog } from './claim-profile-alert-dialog';
 import { DeleteAccountDialog } from './delete-account-dialog';
 
 export const metadata: Metadata = {
-  title: 'Profile',
+  title: 'პროფილი',
 };
 
 export default async function ProfileSettingsPage() {

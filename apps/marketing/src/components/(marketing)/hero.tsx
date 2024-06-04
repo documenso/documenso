@@ -190,7 +190,7 @@ export const Hero = ({ className, ...props }: HeroProps) => {
           <Widget className="mt-12 text-sm">
             <strong>SignStream მხარდამჭერი პირობა</strong>
             <p className="w-full lg:max-w-[70ch]">
-              მოგესალმებით SignStream-ში, ელექტრონული ხელმოწერების პლატფორმაზე. ჩვენ ვამარტივებთ
+              მოგესალმებით Ipografi-ზე, ელექტრონული ხელმოწერების პლატფორმაზე. ჩვენ ვამარტივებთ
               ხელმოწერების პროცესს, ვხდით მას უსაფრთხოს, ეფექტურსა და სწრაფს.
               {/* რომელიც მორგებულია ყველა ზომის ბიზნესისთვის. */}
             </p>
@@ -229,7 +229,7 @@ export const Hero = ({ className, ...props }: HeroProps) => {
 
             <div>
               <strong>ლუკა ჩქოვანი & გიორგი ჩიქოვანი</strong>
-              <p className="mt-1">დამფუძნებლები, CHIKOVANI</p>
+              <p className="mt-1">დამფუძნებლები, Ipografi</p>
             </div>
           </Widget>
         </motion.div>

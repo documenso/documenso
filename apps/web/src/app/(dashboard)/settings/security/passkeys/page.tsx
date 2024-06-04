@@ -9,7 +9,8 @@ import { CreatePasskeyDialog } from './create-passkey-dialog';
 import { UserPasskeysDataTable } from './user-passkeys-data-table';
 
 export const metadata: Metadata = {
-  title: 'Manage passkeys',
+  title: 'მართეთ საიდუმლო გასაღებები',
+  // title: 'Manage passkeys',
 };
 
 export default async function SettingsManagePasskeysPage() {

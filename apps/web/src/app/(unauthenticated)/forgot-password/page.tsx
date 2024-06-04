@@ -5,6 +5,7 @@ import { ForgotPasswordForm } from '~/components/forms/forgot-password';
 
 export const metadata: Metadata = {
   title: 'Forgot Password',
+  // title: 'Forgot Password',
 };
 
 export default function ForgotPasswordPage() {

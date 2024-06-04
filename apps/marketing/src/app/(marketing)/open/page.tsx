@@ -132,7 +132,7 @@ export default function OpenPage() {
       <div className="mx-auto mt-6 max-w-screen-lg sm:mt-12">
         <div className="flex flex-col items-center justify-center">
           <h1 className="text-center text-3xl font-bold lg:text-5xl">
-            Simplify Your Workflow with Our E-Sign Platform
+            გაამარტივეთ თქვენი სამუშაო პროცესი ჩვენი ელექტორნული ხელმოწერების პლატფორმით
           </h1>
 
           <p className="text-muted-foreground mt-4 max-w-[60ch] text-center text-lg leading-normal">

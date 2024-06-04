@@ -28,7 +28,7 @@ export const generateMetadata = ({ params }: { params: { post: string } }) => {
 
   return {
     title: {
-      absolute: `${blogPost.title} - Documenso Blog`,
+      absolute: `${blogPost.title} - Ipografi Blog`,
     },
     description: blogPost.description,
     openGraph: {

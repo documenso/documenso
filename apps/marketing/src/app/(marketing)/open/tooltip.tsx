@@ -29,7 +29,8 @@ export function OpenPageTooltip() {
           </svg>
         </TooltipTrigger>
         <TooltipContent>
-          <p>Active Subscriptions.</p>
+          <p>მოქმედი პაკეტები.</p>
+          {/* <p>Active Subscriptions.</p> */}
         </TooltipContent>
       </Tooltip>
     </TooltipProvider>

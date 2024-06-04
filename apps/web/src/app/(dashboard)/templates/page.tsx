@@ -10,7 +10,7 @@ type TemplatesPageProps = {
 };
 
 export const metadata: Metadata = {
-  title: 'Templates',
+  title: 'შაბლონები',
 };
 
 export default function TemplatesPage({ searchParams = {} }: TemplatesPageProps) {

@@ -10,7 +10,8 @@ import { decryptSecondaryData } from '@documenso/lib/server-only/crypto/decrypt'
 import { SignInForm } from '~/components/forms/signin';
 
 export const metadata: Metadata = {
-  title: 'Sign In',
+  title: 'ავტორიზაცია',
+  // title: 'Sign In',
 };
 
 type SignInPageProps = {

@@ -9,7 +9,8 @@ import { decryptSecondaryData } from '@documenso/lib/server-only/crypto/decrypt'
 import { SignUpFormV2 } from '~/components/forms/v2/signup';
 
 export const metadata: Metadata = {
-  title: 'Sign Up',
+  title: 'რეგისტრაცია',
+  // title: 'Sign Up',
 };
 
 type SignUpPageProps = {

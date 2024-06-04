@@ -25,7 +25,8 @@ export const MonthlyCompletedDocumentsChart = ({
     <div className={className}>
       <div className="border-border flex flex-col justify-center rounded-2xl border p-6 pl-2 shadow-sm hover:shadow">
         <div className="mb-6 flex px-4">
-          <h3 className="text-lg font-semibold">Completed Documents per Month</h3>
+          <h3 className="text-lg font-semibold">ხელმოწერილი დოკუმენტები თვეში</h3>
+          {/* <h3 className="text-lg font-semibold">Completed Documents per Month</h3> */}
         </div>
 
         <ResponsiveContainer width="100%" height={400}>

@@ -20,7 +20,8 @@ import { BillingPlans } from './billing-plans';
 import { BillingPortalButton } from './billing-portal-button';
 
 export const metadata: Metadata = {
-  title: 'Billing',
+  title: 'გადახდები',
+  // title: 'Billing',
 };
 
 export default async function BillingSettingsPage() {

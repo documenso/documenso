@@ -20,7 +20,8 @@ import { OpenBuildTemplateBento } from '~/components/(marketing)/open-build-temp
 export const revalidate = 600;
 export const metadata: Metadata = {
   title: {
-    absolute: 'Documenso - The Open Source DocuSign Alternative',
+    absolute: 'ელექტრონული ხელმოწერების პლატფორმა | Ipografi',
+    // absolute: 'Documenso - The Open Source DocuSign Alternative',
   },
 };
 

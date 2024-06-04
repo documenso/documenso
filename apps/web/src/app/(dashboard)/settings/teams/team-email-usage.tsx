@@ -30,8 +30,8 @@ export const TeamEmailUsage = ({ teamEmail }: TeamEmailUsageProps) => {
     trpc.team.deleteTeamEmail.useMutation({
       onSuccess: () => {
         toast({
-          title: 'გილოცავთ!',
-          description: 'თქვენ წარმატებით გააუქმეთ წვდომა.',
+          title: '',
+          description: 'თქვენ წარმატებით გააუქმეთ წვდომა!',
           duration: 5000,
         });
       },

@@ -6,7 +6,8 @@ import ActivityPageBackButton from '../../../../../components/(dashboard)/settin
 import { UserSecurityActivityDataTable } from './user-security-activity-data-table';
 
 export const metadata: Metadata = {
-  title: 'Security activity',
+  title: 'უსაფრთხოების აქტივობა',
+  // title: 'Security activity',
 };
 
 export default function SettingsSecurityActivityPage() {

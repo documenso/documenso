@@ -11,7 +11,7 @@ import {
 import { PricingTable } from '~/components/(marketing)/pricing-table';
 
 export const metadata: Metadata = {
-  title: 'Pricing',
+  title: 'ფასები',
 };
 
 export const dynamic = 'force-dynamic';
@@ -148,7 +148,7 @@ export default function PricingPage() {
 
           <AccordionItem value="why-prefer-documenso">
             <AccordionTrigger className="text-left text-lg font-semibold">
-              საჭიროა თუ არა, რომ ხელმომწერი პირი რეგისტრირებული იყოს CHIKOVANI-ზე?
+              საჭიროა თუ არა, რომ ხელმომწერი პირი რეგისტრირებული იყოს Ipografi-ზე?
             </AccordionTrigger>
 
             <AccordionContent className="text-muted-foreground max-w-prose text-sm leading-relaxed">

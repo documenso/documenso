@@ -3,7 +3,7 @@ import type { Metadata } from 'next';
 import { allBlogPosts } from 'contentlayer/generated';
 
 export const metadata: Metadata = {
-  title: 'Blog',
+  title: 'ბლოგი',
 };
 
 export default function BlogPage() {

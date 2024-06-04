@@ -37,7 +37,7 @@ export default async function AdminStatsPage() {
         <CardMetric icon={File} title="ყველა დოკუმენტი" value={docStats.ALL} />
         <CardMetric
           icon={UserPlus2}
-          title="გაააქტიურეთ პაკეტი"
+          title="გაიაქტიურეთ პაკეტი"
           value={usersWithSubscriptionsCount}
         />
         <CardMetric icon={UserPlus2} title="App Version" value={`v${process.env.APP_VERSION}`} />

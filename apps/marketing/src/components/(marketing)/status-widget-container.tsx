@@ -6,7 +6,8 @@ import { StatusWidget } from './status-widget';
 export function StatusWidgetContainer() {
   return (
     <Suspense fallback={<StatusWidgetFallback />}>
-      <StatusWidget slug="documenso-status" />
+      <StatusWidget slug="ipografi-status" />
+      {/* <StatusWidget slug="documenso-status" /> */}
     </Suspense>
   );
 }

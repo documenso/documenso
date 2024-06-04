@@ -4,7 +4,8 @@ import Link from 'next/link';
 import { Button } from '@documenso/ui/primitives/button';
 
 export const metadata: Metadata = {
-  title: 'Reset Password',
+  title: 'პაროლის აღდგენა',
+  // title: 'Reset Password',
 };
 
 export default function ResetPasswordPage() {

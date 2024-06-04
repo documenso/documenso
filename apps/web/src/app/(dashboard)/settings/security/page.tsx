@@ -13,7 +13,8 @@ import { ViewRecoveryCodesDialog } from '~/components/forms/2fa/view-recovery-co
 import { PasswordForm } from '~/components/forms/password';
 
 export const metadata: Metadata = {
-  title: 'Security',
+  title: 'უსაფრთხოება',
+  // title: 'Security',
 };
 
 export default async function SecuritySettingsPage() {
