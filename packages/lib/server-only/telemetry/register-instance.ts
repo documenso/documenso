@@ -8,7 +8,11 @@ import {
 import { upsertSiteSetting } from '../site-settings/upsert-site-setting';
 import { sendInstance } from './send-instance';
 
-export const registerInstance = async () => {
+type ResigsterInstanceOptions = {
+  version: string;
+};
+
+export const registerInstance = async ({ version }: ResigsterInstanceOptions) => {
   const instanceResponse = await getSiteSettings().then((settings) =>
     settings.find((setting) => setting.id === SITE_SETTINGS_TELEMETRY_ID),
   );
@@ -30,13 +34,13 @@ export const registerInstance = async () => {
     return await sendInstance({
       uniqueId: instance.data?.instanceId,
       timestamp: new Date(),
-      version: '1.2.3',
+      version,
     });
   }
 
   return await sendInstance({
     uniqueId: instance.data.instanceId,
     timestamp: new Date(),
-    version: '1.2.3',
+    version,
   });
 };
