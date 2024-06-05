@@ -54,6 +54,7 @@ export const CheckboxField = ({
       )
       .filter(Boolean) || [],
   );
+  const isReadOnly = parsedFieldMeta.readOnly;
 
   const checkboxValidationRule = parsedFieldMeta.validationRule;
   const checkboxValidationLength = parsedFieldMeta.validationLength;
@@ -204,7 +205,10 @@ export const CheckboxField = ({
   };
 
   useEffect(() => {
-    if (!field.inserted && checkedValues.length > 0 && isLengthConditionMet) {
+    if (
+      (!field.inserted && checkedValues.length > 0 && isLengthConditionMet) ||
+      (!field.inserted && isReadOnly && isLengthConditionMet)
+    ) {
       void executeActionAuthProcedure({
         onReauthFormSubmit: async (authOptions) => await onSign(authOptions),
         actionTarget: field.type,

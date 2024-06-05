@@ -95,7 +95,9 @@ export const NumberField = ({ field, recipient, onSignField, onUnsignField }: Nu
   const [showRadioModal, setShowRadioModal] = useState(false);
 
   const parsedFieldMeta = ZNumberFieldMeta.parse(field.fieldMeta);
-  const [localNumber, setLocalNumber] = useState(String(parsedFieldMeta.value));
+  const isReadOnly = parsedFieldMeta?.readOnly;
+  const defaultValue = parsedFieldMeta?.value;
+  const [localNumber, setLocalNumber] = useState(String(parsedFieldMeta.value) ?? '');
 
   const initialErrors: ValidationErrors = {
     isNumber: [],
@@ -224,7 +226,10 @@ export const NumberField = ({ field, recipient, onSignField, onUnsignField }: Nu
   }, [showRadioModal]);
 
   useEffect(() => {
-    if (!field.inserted && parsedFieldMeta.value && localNumber) {
+    if (
+      (!field.inserted && defaultValue && localNumber) ||
+      (!field.inserted && isReadOnly && defaultValue)
+    ) {
       void executeActionAuthProcedure({
         onReauthFormSubmit: async (authOptions) => await onSign(authOptions),
         actionTarget: field.type,

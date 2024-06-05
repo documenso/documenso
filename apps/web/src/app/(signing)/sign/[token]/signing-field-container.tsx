@@ -120,7 +120,7 @@ export const SigningFieldContainer = ({
   return (
     <div className={cn(type === 'Checkbox' ? 'group' : '')}>
       <FieldRootContainer field={field}>
-        {!field.inserted && !loading && (
+        {!field.inserted && !loading && !readOnlyField && (
           <button
             type="submit"
             className="absolute inset-0 z-10 h-full w-full rounded-md border"
@@ -128,7 +128,15 @@ export const SigningFieldContainer = ({
           />
         )}
 
-        {type === 'Date' && field.inserted && !loading && (
+        {readOnlyField && (
+          <button className="bg-background/40 absolute inset-0 z-10 flex h-full w-full items-center justify-center rounded-md text-sm opacity-0 backdrop-blur-sm duration-200 group-hover:opacity-100">
+            <span className="bg-foreground/50 dark:bg-background/50 text-background dark:text-foreground rounded-xl p-2 backdrop-blur-3xl">
+              Read only field
+            </span>
+          </button>
+        )}
+
+        {type === 'Date' && field.inserted && !loading && !readOnlyField && (
           <Tooltip delayDuration={0}>
             <TooltipTrigger asChild>
               <button
@@ -143,7 +151,7 @@ export const SigningFieldContainer = ({
           </Tooltip>
         )}
 
-        {type === 'Checkbox' && field.inserted && !loading && (
+        {type === 'Checkbox' && field.inserted && !loading && !readOnlyField && (
           <button
             className="dark:bg-background absolute -bottom-10 flex items-center justify-evenly rounded-md border bg-gray-900 opacity-0 group-hover:opacity-100"
             onClick={() => void onClearCheckBoxValues(type)}
@@ -154,7 +162,7 @@ export const SigningFieldContainer = ({
           </button>
         )}
 
-        {type !== 'Date' && type !== 'Checkbox' && field.inserted && !loading && (
+        {type !== 'Date' && type !== 'Checkbox' && field.inserted && !loading && !readOnlyField && (
           <button
             className="text-destructive bg-background/50 absolute inset-0 z-10 flex h-full w-full items-center justify-center rounded-md text-sm opacity-0 backdrop-blur-sm duration-200 group-hover:opacity-100"
             onClick={onRemoveSignedFieldClick}

@@ -133,7 +133,10 @@ export const RadioField = ({ field, recipient, onSignField, onUnsignField }: Rad
   };
 
   useEffect(() => {
-    if ((!field.inserted && optionSelected) || (!field.inserted && parsedFieldMeta.readOnly)) {
+    if (
+      (!field.inserted && optionSelected) ||
+      (!field.inserted && parsedFieldMeta.readOnly && defaultValue)
+    ) {
       void executeActionAuthProcedure({
         onReauthFormSubmit: async (authOptions) => await onSign(authOptions),
         actionTarget: field.type,

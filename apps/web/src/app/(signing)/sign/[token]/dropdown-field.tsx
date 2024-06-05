@@ -50,6 +50,8 @@ export const DropdownField = ({
   const { executeActionAuthProcedure } = useRequiredDocumentAuthContext();
 
   const parsedFieldMeta = ZDropdownFieldMeta.parse(field.fieldMeta);
+  const isReadOnly = parsedFieldMeta?.readOnly;
+  const defaultValue = parsedFieldMeta?.defaultValue;
   const [localChoice, setLocalChoice] = useState(parsedFieldMeta.defaultValue ?? '');
 
   const { mutateAsync: signFieldWithToken, isLoading: isSignFieldWithTokenLoading } =
@@ -149,7 +151,7 @@ export const DropdownField = ({
   }, [localChoice]);
 
   useEffect(() => {
-    if (!field.inserted && parsedFieldMeta.defaultValue) {
+    if ((!field.inserted && defaultValue) || (!field.inserted && isReadOnly && defaultValue)) {
       void executeActionAuthProcedure({
         onReauthFormSubmit: async (authOptions) => await onSign(authOptions),
         actionTarget: field.type,
