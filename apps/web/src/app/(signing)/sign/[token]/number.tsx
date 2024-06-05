@@ -14,6 +14,10 @@ import { ZNumberFieldMeta } from '@documenso/lib/types/field-field-meta';
 import type { Recipient } from '@documenso/prisma/client';
 import type { FieldWithSignature } from '@documenso/prisma/types/field-with-signature';
 import { trpc } from '@documenso/trpc/react';
+import type {
+  TRemovedSignedFieldWithTokenMutationSchema,
+  TSignFieldWithTokenMutationSchema,
+} from '@documenso/trpc/server/field-router/schema';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
 import { Dialog, DialogContent, DialogFooter, DialogTitle } from '@documenso/ui/primitives/dialog';
@@ -80,9 +84,11 @@ const validateNumber = (text: string, fieldMeta: TNumberFieldMeta): ValidationEr
 export type NumberFieldProps = {
   field: FieldWithSignature;
   recipient: Recipient;
+  onSignField?: (value: TSignFieldWithTokenMutationSchema) => Promise<void> | void;
+  onUnsignField?: (value: TRemovedSignedFieldWithTokenMutationSchema) => Promise<void> | void;
 };
 
-export const NumberField = ({ field, recipient }: NumberFieldProps) => {
+export const NumberField = ({ field, recipient, onSignField, onUnsignField }: NumberFieldProps) => {
   const router = useRouter();
   const { toast } = useToast();
   const [isPending, startTransition] = useTransition();
@@ -136,13 +142,20 @@ export const NumberField = ({ field, recipient }: NumberFieldProps) => {
         return;
       }
 
-      await signFieldWithToken({
+      const payload: TSignFieldWithTokenMutationSchema = {
         token: recipient.token,
         fieldId: field.id,
         value: localNumber,
         isBase64: true,
         authOptions,
-      });
+      };
+
+      if (onSignField) {
+        await onSignField(payload);
+        return;
+      }
+
+      await signFieldWithToken(payload);
 
       setLocalNumber('');
 
@@ -177,10 +190,17 @@ export const NumberField = ({ field, recipient }: NumberFieldProps) => {
 
   const onRemove = async () => {
     try {
-      await removeSignedFieldWithToken({
+      const payload: TRemovedSignedFieldWithTokenMutationSchema = {
         token: recipient.token,
         fieldId: field.id,
-      });
+      };
+
+      if (onUnsignField) {
+        await onUnsignField(payload);
+        return;
+      }
+
+      await removeSignedFieldWithToken(payload);
 
       setLocalNumber(parsedFieldMeta.value ? String(parsedFieldMeta.value) : '');
 

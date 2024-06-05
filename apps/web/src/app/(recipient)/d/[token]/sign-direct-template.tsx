@@ -6,6 +6,13 @@ import { match } from 'ts-pattern';
 import { DEFAULT_DOCUMENT_DATE_FORMAT } from '@documenso/lib/constants/date-formats';
 import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
 import { DEFAULT_DOCUMENT_TIME_ZONE } from '@documenso/lib/constants/time-zones';
+import {
+  ZCheckboxFieldMeta,
+  ZDropdownFieldMeta,
+  ZNumberFieldMeta,
+  ZRadioFieldMeta,
+  ZTextFieldMeta,
+} from '@documenso/lib/types/field-field-meta';
 import { sortFieldsByPosition, validateFieldsInserted } from '@documenso/lib/utils/fields';
 import type { Field, Recipient, Signature } from '@documenso/prisma/client';
 import { FieldType } from '@documenso/prisma/client';
@@ -30,10 +37,14 @@ import { Label } from '@documenso/ui/primitives/label';
 import { SignaturePad } from '@documenso/ui/primitives/signature-pad';
 import { useStep } from '@documenso/ui/primitives/stepper';
 
+import { CheckboxField } from '~/app/(signing)/sign/[token]/checkbox-field';
 import { DateField } from '~/app/(signing)/sign/[token]/date-field';
+import { DropdownField } from '~/app/(signing)/sign/[token]/dropdown-field';
 import { EmailField } from '~/app/(signing)/sign/[token]/email-field';
 import { NameField } from '~/app/(signing)/sign/[token]/name-field';
+import { NumberField } from '~/app/(signing)/sign/[token]/number';
 import { useRequiredSigningContext } from '~/app/(signing)/sign/[token]/provider';
+import { RadioField } from '~/app/(signing)/sign/[token]/radio-field';
 import { SignDialog } from '~/app/(signing)/sign/[token]/sign-dialog';
 import { SignatureField } from '~/app/(signing)/sign/[token]/signature-field';
 import { TextField } from '~/app/(signing)/sign/[token]/text-field';
@@ -200,15 +211,86 @@ export const SignDirectTemplateForm = ({
                   onUnsignField={onUnsignField}
                 />
               ))
-              .with(FieldType.TEXT, () => (
-                <TextField
-                  key={field.id}
-                  field={field}
-                  recipient={directRecipient}
-                  onSignField={onSignField}
-                  onUnsignField={onUnsignField}
-                />
-              ))
+              .with(FieldType.TEXT, () => {
+                const parsedFieldMeta = ZTextFieldMeta.parse(field.fieldMeta);
+
+                return (
+                  <TextField
+                    key={field.id}
+                    field={{
+                      ...field,
+                      fieldMeta: parsedFieldMeta,
+                    }}
+                    recipient={directRecipient}
+                    onSignField={onSignField}
+                    onUnsignField={onUnsignField}
+                  />
+                );
+              })
+              .with(FieldType.NUMBER, () => {
+                const parsedFieldMeta = ZNumberFieldMeta.parse(field.fieldMeta);
+
+                return (
+                  <NumberField
+                    key={field.id}
+                    field={{
+                      ...field,
+                      fieldMeta: parsedFieldMeta,
+                    }}
+                    recipient={directRecipient}
+                    onSignField={onSignField}
+                    onUnsignField={onUnsignField}
+                  />
+                );
+              })
+              .with(FieldType.DROPDOWN, () => {
+                const parsedFieldMeta = ZDropdownFieldMeta.parse(field.fieldMeta);
+
+                return (
+                  <DropdownField
+                    key={field.id}
+                    field={{
+                      ...field,
+                      fieldMeta: parsedFieldMeta,
+                    }}
+                    recipient={directRecipient}
+                    onSignField={onSignField}
+                    onUnsignField={onUnsignField}
+                  />
+                );
+              })
+              .with(FieldType.RADIO, () => {
+                const parsedFieldMeta = ZRadioFieldMeta.parse(field.fieldMeta);
+
+                return (
+                  <RadioField
+                    key={field.id}
+                    field={{
+                      ...field,
+                      fieldMeta: parsedFieldMeta,
+                    }}
+                    recipient={directRecipient}
+                    onSignField={onSignField}
+                    onUnsignField={onUnsignField}
+                  />
+                );
+              })
+              .with(FieldType.CHECKBOX, () => {
+                const parsedFieldMeta = ZCheckboxFieldMeta.parse(field.fieldMeta);
+
+                return (
+                  <CheckboxField
+                    key={field.id}
+                    field={{
+                      ...field,
+                      fieldMeta: parsedFieldMeta,
+                    }}
+                    recipient={directRecipient}
+                    onSignField={onSignField}
+                    onUnsignField={onUnsignField}
+                  />
+                );
+              })
               .otherwise(() => null),
           )}
         </ElementVisible>

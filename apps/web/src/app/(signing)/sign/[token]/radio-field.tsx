@@ -13,6 +13,10 @@ import { ZRadioFieldMeta } from '@documenso/lib/types/field-field-meta';
 import type { Recipient } from '@documenso/prisma/client';
 import type { FieldWithSignatureAndFieldMeta } from '@documenso/prisma/types/field-with-signature-and-fieldmeta';
 import { trpc } from '@documenso/trpc/react';
+import type {
+  TRemovedSignedFieldWithTokenMutationSchema,
+  TSignFieldWithTokenMutationSchema,
+} from '@documenso/trpc/server/field-router/schema';
 import { cn } from '@documenso/ui/lib/utils';
 import { Card, CardContent } from '@documenso/ui/primitives/card';
 import { Label } from '@documenso/ui/primitives/label';
@@ -25,9 +29,11 @@ import { SigningFieldContainer } from './signing-field-container';
 export type RadioFieldProps = {
   field: FieldWithSignatureAndFieldMeta;
   recipient: Recipient;
+  onSignField?: (value: TSignFieldWithTokenMutationSchema) => Promise<void> | void;
+  onUnsignField?: (value: TRemovedSignedFieldWithTokenMutationSchema) => Promise<void> | void;
 };
 
-export const RadioField = ({ field, recipient }: RadioFieldProps) => {
+export const RadioField = ({ field, recipient, onSignField, onUnsignField }: RadioFieldProps) => {
   const router = useRouter();
   const { toast } = useToast();
   const [isPending, startTransition] = useTransition();
@@ -55,13 +61,20 @@ export const RadioField = ({ field, recipient }: RadioFieldProps) => {
         return;
       }
 
-      await signFieldWithToken({
+      const payload: TSignFieldWithTokenMutationSchema = {
         token: recipient.token,
         fieldId: field.id,
         value: selectedOption === 'empty-value' ? '' : selectedOption,
         isBase64: true,
         authOptions,
-      });
+      };
+
+      if (onSignField) {
+        await onSignField(payload);
+        return;
+      }
+
+      await signFieldWithToken(payload);
 
       setSelectedOption('');
 
@@ -85,10 +98,17 @@ export const RadioField = ({ field, recipient }: RadioFieldProps) => {
 
   const onRemove = async () => {
     try {
-      await removeSignedFieldWithToken({
+      const payload: TRemovedSignedFieldWithTokenMutationSchema = {
         token: recipient.token,
         fieldId: field.id,
-      });
+      };
+
+      if (onUnsignField) {
+        await onUnsignField(payload);
+        return;
+      }
+
+      await removeSignedFieldWithToken(payload);
 
       setSelectedOption('');
       setSelectedOptionIndex(null);

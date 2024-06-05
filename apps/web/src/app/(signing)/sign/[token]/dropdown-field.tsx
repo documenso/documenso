@@ -13,6 +13,10 @@ import { ZDropdownFieldMeta } from '@documenso/lib/types/field-field-meta';
 import type { Recipient } from '@documenso/prisma/client';
 import type { FieldWithSignatureAndFieldMeta } from '@documenso/prisma/types/field-with-signature-and-fieldmeta';
 import { trpc } from '@documenso/trpc/react';
+import type {
+  TRemovedSignedFieldWithTokenMutationSchema,
+  TSignFieldWithTokenMutationSchema,
+} from '@documenso/trpc/server/field-router/schema';
 import { cn } from '@documenso/ui/lib/utils';
 import {
   Select,
@@ -29,9 +33,16 @@ import { SigningFieldContainer } from './signing-field-container';
 export type DropdownFieldProps = {
   field: FieldWithSignatureAndFieldMeta;
   recipient: Recipient;
+  onSignField?: (value: TSignFieldWithTokenMutationSchema) => Promise<void> | void;
+  onUnsignField?: (value: TRemovedSignedFieldWithTokenMutationSchema) => Promise<void> | void;
 };
 
-export const DropdownField = ({ field, recipient }: DropdownFieldProps) => {
+export const DropdownField = ({
+  field,
+  recipient,
+  onSignField,
+  onUnsignField,
+}: DropdownFieldProps) => {
   const router = useRouter();
   const { toast } = useToast();
   const [isPending, startTransition] = useTransition();
@@ -57,13 +68,20 @@ export const DropdownField = ({ field, recipient }: DropdownFieldProps) => {
         return;
       }
 
-      await signFieldWithToken({
+      const payload: TSignFieldWithTokenMutationSchema = {
         token: recipient.token,
         fieldId: field.id,
         value: localChoice,
         isBase64: true,
         authOptions,
-      });
+      };
+
+      if (onSignField) {
+        await onSignField(payload);
+        return;
+      }
+
+      await signFieldWithToken(payload);
 
       setLocalChoice('');
 
@@ -91,10 +109,17 @@ export const DropdownField = ({ field, recipient }: DropdownFieldProps) => {
 
   const onRemove = async () => {
     try {
-      await removeSignedFieldWithToken({
+      const payload: TRemovedSignedFieldWithTokenMutationSchema = {
         token: recipient.token,
         fieldId: field.id,
-      });
+      };
+
+      if (onUnsignField) {
+        await onUnsignField(payload);
+        return;
+      }
+
+      await removeSignedFieldWithToken(payload);
 
       setLocalChoice(parsedFieldMeta.defaultValue ?? '');
 

@@ -26,6 +26,7 @@ import { AppError, AppErrorCode } from '../../errors/app-error';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '../../types/document-audit-logs';
 import type { TRecipientActionAuthTypes } from '../../types/document-auth';
 import { DocumentAccessAuth, ZRecipientAuthOptionsSchema } from '../../types/document-auth';
+import { ZFieldMetaSchema } from '../../types/field-field-meta';
 import type { RequestMetadata } from '../../universal/extract-request-metadata';
 import type { CreateDocumentAuditLogDataResponse } from '../../utils/document-audit-logs';
 import { createDocumentAuditLogData } from '../../utils/document-audit-logs';
@@ -284,12 +285,16 @@ export const createDocumentFromDirectTemplate = async ({
           height: field.height,
           customText: '',
           inserted: false,
+          fieldMeta: field.fieldMeta,
         })),
       );
     });
 
     await tx.field.createMany({
-      data: nonDirectRecipientFieldsToCreate,
+      data: nonDirectRecipientFieldsToCreate.map((field) => ({
+        ...field,
+        fieldMeta: field.fieldMeta ? ZFieldMetaSchema.parse(field.fieldMeta) : {},
+      })),
     });
 
     // Create the direct recipient and their non signature fields.
@@ -442,10 +447,20 @@ export const createDocumentFromDirectTemplate = async ({
                 data:
                   field.Signature?.signatureImageAsBase64 || field.Signature?.typedSignature || '',
               }))
-              .with(FieldType.DATE, FieldType.EMAIL, FieldType.NAME, FieldType.TEXT, (type) => ({
-                type,
-                data: field.customText,
-              }))
+              .with(
+                FieldType.DATE,
+                FieldType.EMAIL,
+                FieldType.NAME,
+                FieldType.TEXT,
+                FieldType.NUMBER,
+                FieldType.CHECKBOX,
+                FieldType.DROPDOWN,
+                FieldType.RADIO,
+                (type) => ({
+                  type,
+                  data: field.customText,
+                }),
+              )
               .exhaustive(),
             fieldSecurity: derivedRecipientActionAuth
               ? {

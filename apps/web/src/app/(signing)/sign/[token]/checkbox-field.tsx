@@ -13,6 +13,10 @@ import { ZCheckboxFieldMeta } from '@documenso/lib/types/field-field-meta';
 import type { Recipient } from '@documenso/prisma/client';
 import type { FieldWithSignatureAndFieldMeta } from '@documenso/prisma/types/field-with-signature-and-fieldmeta';
 import { trpc } from '@documenso/trpc/react';
+import type {
+  TRemovedSignedFieldWithTokenMutationSchema,
+  TSignFieldWithTokenMutationSchema,
+} from '@documenso/trpc/server/field-router/schema';
 import { FieldToolTip } from '@documenso/ui/components/field/field-tooltip';
 import { cn } from '@documenso/ui/lib/utils';
 import { Card, CardContent } from '@documenso/ui/primitives/card';
@@ -27,9 +31,16 @@ import { SigningFieldContainer } from './signing-field-container';
 export type CheckboxFieldProps = {
   field: FieldWithSignatureAndFieldMeta;
   recipient: Recipient;
+  onSignField?: (value: TSignFieldWithTokenMutationSchema) => Promise<void> | void;
+  onUnsignField?: (value: TRemovedSignedFieldWithTokenMutationSchema) => Promise<void> | void;
 };
 
-export const CheckboxField = ({ field, recipient }: CheckboxFieldProps) => {
+export const CheckboxField = ({
+  field,
+  recipient,
+  onSignField,
+  onUnsignField,
+}: CheckboxFieldProps) => {
   const router = useRouter();
   const { toast } = useToast();
   const [isPending, startTransition] = useTransition();
@@ -71,13 +82,20 @@ export const CheckboxField = ({ field, recipient }: CheckboxFieldProps) => {
 
   const onSign = async (authOptions?: TRecipientActionAuth) => {
     try {
-      await signFieldWithToken({
+      const payload: TSignFieldWithTokenMutationSchema = {
         token: recipient.token,
         fieldId: field.id,
         value: checkedValues.map((val) => (val.includes('empty') ? ' ' : val)).join(','),
         isBase64: true,
         authOptions,
-      });
+      };
+
+      if (onSignField) {
+        await onSignField(payload);
+        return;
+      }
+
+      await signFieldWithToken(payload);
 
       startTransition(() => router.refresh());
     } catch (err) {
@@ -99,10 +117,17 @@ export const CheckboxField = ({ field, recipient }: CheckboxFieldProps) => {
 
   const onRemove = async (fieldType?: string) => {
     try {
-      await removeSignedFieldWithToken({
+      const payload: TRemovedSignedFieldWithTokenMutationSchema = {
         token: recipient.token,
         fieldId: field.id,
-      });
+      };
+
+      if (onUnsignField) {
+        await onUnsignField(payload);
+        return;
+      }
+
+      await removeSignedFieldWithToken(payload);
 
       if (fieldType === 'Checkbox') {
         setCheckedValues([]);
