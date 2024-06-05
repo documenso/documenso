@@ -6,6 +6,7 @@ import { type Recipient, WebhookTriggerEvents } from '@documenso/prisma/client';
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '../../types/document-audit-logs';
 import { ZRecipientAuthOptionsSchema } from '../../types/document-auth';
+import { ZFieldMetaSchema } from '../../types/field-field-meta';
 import type { RequestMetadata } from '../../universal/extract-request-metadata';
 import { createDocumentAuditLogData } from '../../utils/document-audit-logs';
 import {
@@ -213,8 +214,10 @@ export const createDocumentFromTemplate = async ({
     });
 
     await tx.field.createMany({
-      // @ts-expect-error fix this later
-      data: fieldsToCreate,
+      data: fieldsToCreate.map((field) => ({
+        ...field,
+        fieldMeta: field.fieldMeta ? ZFieldMetaSchema.parse(field.fieldMeta) : {},
+      })),
     });
 
     await tx.documentAuditLog.create({

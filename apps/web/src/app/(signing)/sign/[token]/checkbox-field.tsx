@@ -39,7 +39,7 @@ export const CheckboxField = ({ field, recipient }: CheckboxFieldProps) => {
   const [checkedValues, setCheckedValues] = useState<string[]>(
     parsedFieldMeta.values
       ?.map((item, index) =>
-        item.checked ? (item.value.length > 0 ? item.value : String(index)) : '',
+        item.checked ? (item.value.length > 0 ? item.value : `empty-${index}`) : '',
       )
       .filter(Boolean) || [],
   );
@@ -74,7 +74,7 @@ export const CheckboxField = ({ field, recipient }: CheckboxFieldProps) => {
       await signFieldWithToken({
         token: recipient.token,
         fieldId: field.id,
-        value: checkedValues.join(','),
+        value: checkedValues.map((val) => (val.includes('empty') ? ' ' : val)).join(','),
         isBase64: true,
         authOptions,
       });
@@ -121,7 +121,7 @@ export const CheckboxField = ({ field, recipient }: CheckboxFieldProps) => {
   };
 
   const handleCheckboxChange = (value: string, index: number) => {
-    const updatedValue = value.length > 0 ? value : String(index);
+    const updatedValue = value.length > 0 ? value : `empty-${index}`;
     const updatedValues = checkedValues.includes(updatedValue)
       ? checkedValues.filter((v) => v !== updatedValue)
       : [...checkedValues, updatedValue];
@@ -136,10 +136,12 @@ export const CheckboxField = ({ field, recipient }: CheckboxFieldProps) => {
     let updatedValues: string[] = [];
 
     try {
-      const isChecked = checkedValues.includes(item.value.length > 0 ? item.value : String(index));
+      const isChecked = checkedValues.includes(
+        item.value.length > 0 ? item.value : `empty-${index}`,
+      );
 
       if (!isChecked) {
-        updatedValues = [...checkedValues, item.value.length > 0 ? item.value : String(index)];
+        updatedValues = [...checkedValues, item.value.length > 0 ? item.value : `empty-${index}`];
 
         await removeSignedFieldWithToken({
           token: recipient.token,
@@ -150,12 +152,12 @@ export const CheckboxField = ({ field, recipient }: CheckboxFieldProps) => {
           await signFieldWithToken({
             token: recipient.token,
             fieldId: field.id,
-            value: updatedValues.join(','),
+            value: updatedValues.map((val) => (val.includes('empty') ? ' ' : val)).join(','),
             isBase64: true,
           });
         }
       } else {
-        updatedValues = checkedValues.filter((v) => v !== item.value && v !== String(index));
+        updatedValues = checkedValues.filter((v) => v !== item.value && v !== `empty-${index}`);
 
         await removeSignedFieldWithToken({
           token: recipient.token,
@@ -203,7 +205,7 @@ export const CheckboxField = ({ field, recipient }: CheckboxFieldProps) => {
           <div className="z-50 space-y-4">
             {parsedFieldMeta.values?.map(
               (item: { value: string; checked: boolean }, index: number) => {
-                const itemValue = item.value.length > 0 ? item.value : String(index);
+                const itemValue = item.value.length > 0 ? item.value : `empty-${index}`;
 
                 return (
                   <Card
@@ -266,7 +268,7 @@ export const CheckboxField = ({ field, recipient }: CheckboxFieldProps) => {
         <div className="flex flex-col gap-y-2">
           {parsedFieldMeta.values?.map(
             (item: { value: string; checked: boolean }, index: number) => {
-              const itemValue = item.value.length > 0 ? item.value : String(index);
+              const itemValue = item.value.length > 0 ? item.value : `empty-${index}`;
 
               return (
                 <Card

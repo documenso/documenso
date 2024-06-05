@@ -18,6 +18,46 @@ const RADIO_MARK = 'O';
 const MARK_FONT_SIZE = 20;
 const MARK_OFFSET = 40;
 
+const handleCheckboxField = (
+  page: PDFPage,
+  fieldX: number,
+  fieldY: number,
+  fieldWidth: number,
+  fieldHeight: number,
+  pageHeight: number,
+  font: PDFFont,
+  checkboxValues: string[],
+) => {
+  const lineHeight = font.heightAtSize(MARK_FONT_SIZE);
+  let currentY = fieldY;
+  const spaceBetweenMarkAndText = 10;
+
+  for (const value of checkboxValues) {
+    const checkboxMarkX = fieldX;
+    const markWidth = font.widthOfTextAtSize(CHECKBOX_MARK, MARK_FONT_SIZE);
+    const textX = checkboxMarkX + markWidth + spaceBetweenMarkAndText;
+    let markY = currentY + lineHeight / 2;
+
+    markY = pageHeight - markY - lineHeight / 2;
+
+    page.drawText(CHECKBOX_MARK, {
+      x: checkboxMarkX,
+      y: markY,
+      size: MARK_FONT_SIZE,
+      font,
+    });
+
+    page.drawText(value, {
+      x: textX,
+      y: markY,
+      size: MARK_FONT_SIZE,
+      font,
+    });
+
+    currentY -= lineHeight;
+  }
+};
+
 const handleMarkField = (
   page: PDFPage,
   fieldX: number,
@@ -127,16 +167,17 @@ export const insertFieldInPDF = async (pdf: PDFDocument, field: FieldWithSignatu
     textY = pageHeight - textY - textHeight;
 
     if (field.type === FieldType.CHECKBOX) {
-      handleMarkField(
+      const checkboxValues = field.customText.split(',').map((value) => value.trim());
+
+      handleCheckboxField(
         page,
         fieldX,
         fieldY,
         fieldWidth,
         fieldHeight,
         pageHeight,
-        textWidth,
         font,
-        CHECKBOX_MARK,
+        checkboxValues,
       );
     }
 
@@ -154,12 +195,14 @@ export const insertFieldInPDF = async (pdf: PDFDocument, field: FieldWithSignatu
       );
     }
 
-    page.drawText(field.customText, {
-      x: textX,
-      y: textY,
-      size: fontSize,
-      font,
-    });
+    if (field.type !== 'CHECKBOX') {
+      page.drawText(field.customText, {
+        x: textX,
+        y: textY,
+        size: fontSize,
+        font,
+      });
+    }
   }
 
   return pdf;

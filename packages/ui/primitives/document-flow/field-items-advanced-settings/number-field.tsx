@@ -119,7 +119,7 @@ export const NumberFieldAdvancedSettings = ({
           value={fieldState.numberFormat}
           onValueChange={(val) => handleFieldChange('numberFormat', val)}
         >
-          <SelectTrigger className="text-muted-foreground mt-2 w-full bg-white">
+          <SelectTrigger className="text-muted-foreground bg-background mt-2 w-full">
             <SelectValue placeholder="Field format" />
           </SelectTrigger>
           <SelectContent position="popper">
