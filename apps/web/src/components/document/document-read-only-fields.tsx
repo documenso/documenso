@@ -41,12 +41,12 @@ export const DocumentReadOnlyFields = ({ documentMeta, fields }: DocumentReadOnl
             <FieldRootContainer
               field={field}
               key={field.id}
-              cardClassName="border-gray-100/50 !shadow-none backdrop-blur-[1px] bg-background/90"
+              cardClassName="border-gray-300/50 !shadow-none backdrop-blur-[1px] bg-gray-50 ring-0 ring-offset-0"
             >
               <div className="absolute -right-3 -top-3">
                 <PopoverHover
                   trigger={
-                    <Avatar className="dark:border-border h-8 w-8 border-2 border-solid border-gray-200/50 transition-colors hover:border-gray-200">
+                    <Avatar className="dark:border-foreground h-8 w-8 border-2 border-solid border-gray-200/50 transition-colors hover:border-gray-200">
                       <AvatarFallback className="bg-neutral-50 text-xs text-gray-400">
                         {extractInitials(field.Recipient.name || field.Recipient.email)}
                       </AvatarFallback>
@@ -75,14 +75,14 @@ export const DocumentReadOnlyFields = ({ documentMeta, fields }: DocumentReadOnl
                 </PopoverHover>
               </div>
 
-              <div className="text-muted-foreground break-all text-sm">
+              <div className="text-muted-foreground dark:text-background/70 break-all text-sm">
                 {match(field)
                   .with({ type: FieldType.SIGNATURE }, (field) =>
                     field.Signature?.signatureImageAsBase64 ? (
                       <img
                         src={field.Signature.signatureImageAsBase64}
                         alt="Signature"
-                        className="h-full w-full object-contain dark:invert"
+                        className="h-full w-full object-contain"
                       />
                     ) : (
                       <p className="font-signature text-muted-foreground text-lg duration-200 sm:text-xl md:text-2xl lg:text-3xl">

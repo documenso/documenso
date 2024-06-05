@@ -92,10 +92,12 @@ export function FieldRootContainer({ field, children, cardClassName }: FieldCont
           data-inserted={field.inserted ? 'true' : 'false'}
           className={cn(
             {
-              'border-documenso border-dashed shadow-none': field.inserted,
+              'border-documenso bg-documenso/20 ring-documenso-200 ring-offset-documenso-200 text-background border-dashed shadow-none ring-2 ring-offset-2':
+                field.inserted,
             },
             {
-              'border-dashed border-yellow-300': !field.inserted && !parsedField?.required,
+              'ring-offset-yello-200 border-dashed border-yellow-300 ring-2 ring-yellow-200 ring-offset-2 dark:shadow-none':
+                !field.inserted && !parsedField?.required,
             },
             {
               'shadow-none': !field.inserted && checkBoxOrRadio,
@@ -104,7 +106,7 @@ export function FieldRootContainer({ field, children, cardClassName }: FieldCont
               'border-orange-300 ring-1 ring-orange-300': !field.inserted && isValidating,
             },
             {
-              'border-dashed border-red-500 hover:text-red-500':
+              'border-dashed border-red-500 ring-2 ring-red-300 ring-offset-2 ring-offset-red-300 hover:text-red-500 dark:shadow-none':
                 !field.inserted && parsedField?.required && checkBoxOrRadio,
             },
             cardClassName,
@@ -120,7 +122,7 @@ export function FieldRootContainer({ field, children, cardClassName }: FieldCont
           className={cn(
             'field-card-container relative z-20 h-full w-full transition-all',
             {
-              'bg-documenso/20 border-documenso ring-documenso-200 ring-offset-documenso-200 ring-2 ring-offset-2':
+              'bg-documenso/20 border-documenso ring-documenso-200 ring-offset-documenso-200 ring-2 ring-offset-2 dark:shadow-none':
                 field.inserted,
             },
             {
@@ -138,7 +140,7 @@ export function FieldRootContainer({ field, children, cardClassName }: FieldCont
                 !field.inserted && parsedField?.required && !checkBoxOrRadio,
             },
             {
-              'border-dashed border-red-500 hover:text-red-500':
+              'border-dashed border-red-500':
                 !field.inserted && parsedField?.required && checkBoxOrRadio,
             },
             cardClassName,

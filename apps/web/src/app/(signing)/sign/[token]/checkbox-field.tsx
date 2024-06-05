@@ -249,7 +249,7 @@ export const CheckboxField = ({
                           !checkedValues.includes(itemValue),
                       },
                       {
-                        'border-documenso ring-documenso-200 ring-offset-documenso-200 bg-documenso/20 ring-2 ring-offset-2 hover:text-blue-500':
+                        'border-documenso ring-documenso-200 ring-offset-documenso-200 bg-documenso/20 ring-2 ring-offset-2':
                           checkedValues.includes(itemValue),
                       },
                     )}
@@ -300,13 +300,13 @@ export const CheckboxField = ({
                   key={index}
                   onClick={() => void handleCheckboxOptionClick(item, index)}
                   className={cn(
-                    'm-1 flex items-center justify-center p-2',
+                    'text-muted-foreground m-1 flex items-center justify-center p-2',
                     {
-                      'border-documenso ring-documenso-200 ring-offset-documenso-200 ring-2 ring-offset-2':
+                      'border-documenso ring-documenso-200 ring-offset-documenso-200 dark:text-foreground/80 ring-2 ring-offset-2':
                         field.inserted,
                     },
                     {
-                      'bg-documenso/20 border-documenso ring-documenso-200 ring-offset-documenso-200 ring-2 ring-offset-2':
+                      'bg-documenso/20 border-documenso ring-documenso-200 ring-offset-documenso-200 dark:text-background/80 ring-2 ring-offset-2':
                         field.inserted && checkedValues.includes(itemValue),
                     },
                   )}

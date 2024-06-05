@@ -5,6 +5,7 @@ import React from 'react';
 import { X } from 'lucide-react';
 
 import { type TRecipientActionAuth } from '@documenso/lib/types/document-auth';
+import { ZFieldMetaSchema } from '@documenso/lib/types/field-field-meta';
 import { FieldType } from '@documenso/prisma/client';
 import type { FieldWithSignature } from '@documenso/prisma/types/field-with-signature';
 import { FieldRootContainer } from '@documenso/ui/components/field/field';
@@ -53,6 +54,9 @@ export const SigningFieldContainer = ({
   tooltipText,
 }: SignatureFieldProps) => {
   const { executeActionAuthProcedure, isAuthRedirectRequired } = useRequiredDocumentAuthContext();
+
+  const parsedFieldMeta = field.fieldMeta ? ZFieldMetaSchema.parse(field.fieldMeta) : undefined;
+  const readOnlyField = parsedFieldMeta?.readOnly || false;
 
   const handleInsertField = async () => {
     if (field.inserted || !onSign) {

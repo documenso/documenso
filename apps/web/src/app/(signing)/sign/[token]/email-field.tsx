@@ -125,7 +125,7 @@ export const EmailField = ({ field, recipient, onSignField, onUnsignField }: Ema
       )}
 
       {field.inserted && (
-        <p className="text-muted-foreground dark:text-background duration-200">
+        <p className="text-muted-foreground dark:text-background/80 duration-200">
           {field.customText}
         </p>
       )}

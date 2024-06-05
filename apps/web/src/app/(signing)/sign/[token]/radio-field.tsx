@@ -37,13 +37,15 @@ export const RadioField = ({ field, recipient, onSignField, onUnsignField }: Rad
   const router = useRouter();
   const { toast } = useToast();
   const [isPending, startTransition] = useTransition();
-  const [selectedOption, setSelectedOption] = useState('');
+
+  const parsedFieldMeta = ZRadioFieldMeta.parse(field.fieldMeta);
+  const defaultValue = parsedFieldMeta.values?.filter((item) => item.checked === true)[0].value;
+
+  const [selectedOption, setSelectedOption] = useState(defaultValue || '');
   const [optionSelected, setOptionSelected] = useState(false);
   const [selectedOptionIndex, setSelectedOptionIndex] = useState<number | null>(null);
 
   const { executeActionAuthProcedure } = useRequiredDocumentAuthContext();
-
-  const parsedFieldMeta = ZRadioFieldMeta.parse(field.fieldMeta);
 
   const { mutateAsync: signFieldWithToken, isLoading: isSignFieldWithTokenLoading } =
     trpc.field.signFieldWithToken.useMutation(DO_NOT_INVALIDATE_QUERY_ON_MUTATION);
@@ -131,7 +133,7 @@ export const RadioField = ({ field, recipient, onSignField, onUnsignField }: Rad
   };
 
   useEffect(() => {
-    if (!field.inserted && optionSelected) {
+    if ((!field.inserted && optionSelected) || (!field.inserted && parsedFieldMeta.readOnly)) {
       void executeActionAuthProcedure({
         onReauthFormSubmit: async (authOptions) => await onSign(authOptions),
         actionTarget: field.type,
@@ -177,7 +179,7 @@ export const RadioField = ({ field, recipient, onSignField, onUnsignField }: Rad
             >
               <CardContent
                 className={cn(
-                  'text-muted-foreground hover:shadow-primary-foreground group flex h-full w-full flex-row items-center space-x-2 p-2',
+                  'text-muted-foreground dark:text-foreground/80 hover:shadow-primary-foreground group flex h-full w-full flex-row items-center space-x-2 p-2',
                   {
                     'hover:text-red-300': !field.inserted && parsedFieldMeta.required,
                   },
@@ -187,6 +189,7 @@ export const RadioField = ({ field, recipient, onSignField, onUnsignField }: Rad
                 )}
               >
                 <RadioGroupItem
+                  className="data-[state=checked]:ring-documenso data-[state=checked]:bg-documenso h-5 w-5 shrink-0 data-[state=checked]:ring-1 data-[state=checked]:ring-offset-2"
                   value={item.value}
                   id={`option-${index}`}
                   checked={item.checked}
@@ -206,13 +209,13 @@ export const RadioField = ({ field, recipient, onSignField, onUnsignField }: Rad
               id={String(index)}
               key={index}
               className={cn(
-                'm-1 flex items-center justify-center p-2',
+                'text-muted-foreground m-1 flex items-center justify-center p-2',
                 {
-                  'border-documenso ring-documenso-200 ring-offset-documenso-200 ring-2 ring-offset-2':
+                  'border-documenso ring-documenso-200 ring-offset-documenso-200 dark:text-foreground/80 ring-2 ring-offset-2':
                     field.inserted,
                 },
                 {
-                  'bg-documenso/20 border-documenso':
+                  'bg-documenso/20 border-documenso dark:text-background/80':
                     field.inserted && item.value.length > 0
                       ? item.value === field.customText
                       : selectedOptionIndex === index,
@@ -221,7 +224,7 @@ export const RadioField = ({ field, recipient, onSignField, onUnsignField }: Rad
             >
               <CardContent className="flex h-full w-full flex-row items-center space-x-2 p-2">
                 <RadioGroupItem
-                  className="data-[state=checked]:ring-documenso data-[state=checked]:bg-documenso h-5 w-5 shrink-0 data-[state=checked]:ring-1 data-[state=checked]:ring-offset-2"
+                  className="data-[state=checked]:ring-documenso data-[state=checked]:bg-documenso dark:data-[state=checked]:border-documenso h-5 w-5 shrink-0 data-[state=checked]:ring-1 data-[state=checked]:ring-offset-2 dark:data-[state=checked]:ring-offset-white"
                   value={item.value}
                   id={`option-${index}`}
                   checked={
