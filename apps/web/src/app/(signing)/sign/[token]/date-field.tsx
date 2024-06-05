@@ -17,6 +17,10 @@ import type { TRecipientActionAuth } from '@documenso/lib/types/document-auth';
 import type { Recipient } from '@documenso/prisma/client';
 import type { FieldWithSignature } from '@documenso/prisma/types/field-with-signature';
 import { trpc } from '@documenso/trpc/react';
+import type {
+  TRemovedSignedFieldWithTokenMutationSchema,
+  TSignFieldWithTokenMutationSchema,
+} from '@documenso/trpc/server/field-router/schema';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
 import { SigningFieldContainer } from './signing-field-container';
@@ -26,6 +30,8 @@ export type DateFieldProps = {
   recipient: Recipient;
   dateFormat?: string | null;
   timezone?: string | null;
+  onSignField?: (value: TSignFieldWithTokenMutationSchema) => Promise<void> | void;
+  onUnsignField?: (value: TRemovedSignedFieldWithTokenMutationSchema) => Promise<void> | void;
 };
 
 export const DateField = ({
@@ -33,6 +39,8 @@ export const DateField = ({
   recipient,
   dateFormat = DEFAULT_DOCUMENT_DATE_FORMAT,
   timezone = DEFAULT_DOCUMENT_TIME_ZONE,
+  onSignField,
+  onUnsignField,
 }: DateFieldProps) => {
   const router = useRouter();
 
@@ -58,12 +66,19 @@ export const DateField = ({
 
   const onSign = async (authOptions?: TRecipientActionAuth) => {
     try {
-      await signFieldWithToken({
+      const payload: TSignFieldWithTokenMutationSchema = {
         token: recipient.token,
         fieldId: field.id,
         value: dateFormat ?? DEFAULT_DOCUMENT_DATE_FORMAT,
         authOptions,
-      });
+      };
+
+      if (onSignField) {
+        await onSignField(payload);
+        return;
+      }
+
+      await signFieldWithToken(payload);
 
       startTransition(() => router.refresh());
     } catch (err) {
@@ -85,10 +100,17 @@ export const DateField = ({
 
   const onRemove = async () => {
     try {
-      await removeSignedFieldWithToken({
+      const payload: TRemovedSignedFieldWithTokenMutationSchema = {
         token: recipient.token,
         fieldId: field.id,
-      });
+      };
+
+      if (onUnsignField) {
+        await onUnsignField(payload);
+        return;
+      }
+
+      await removeSignedFieldWithToken(payload);
 
       startTransition(() => router.refresh());
     } catch (err) {

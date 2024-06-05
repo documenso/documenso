@@ -14,6 +14,10 @@ import { ZTextFieldMeta } from '@documenso/lib/types/field-field-meta';
 import type { Recipient } from '@documenso/prisma/client';
 import type { FieldWithSignatureAndFieldMeta } from '@documenso/prisma/types/field-with-signature-and-fieldmeta';
 import { trpc } from '@documenso/trpc/react';
+import type {
+  TRemovedSignedFieldWithTokenMutationSchema,
+  TSignFieldWithTokenMutationSchema,
+} from '@documenso/trpc/server/field-router/schema';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
 import { Dialog, DialogContent, DialogFooter, DialogTitle } from '@documenso/ui/primitives/dialog';
@@ -43,9 +47,11 @@ const validateText = (text: string, fieldMeta: TTextFieldMeta) => {
 export type TextFieldProps = {
   field: FieldWithSignatureAndFieldMeta;
   recipient: Recipient;
+  onSignField?: (value: TSignFieldWithTokenMutationSchema) => Promise<void> | void;
+  onUnsignField?: (value: TRemovedSignedFieldWithTokenMutationSchema) => Promise<void> | void;
 };
 
-export const TextField = ({ field, recipient }: TextFieldProps) => {
+export const TextField = ({ field, recipient, onSignField, onUnsignField }: TextFieldProps) => {
   const router = useRouter();
   const { toast } = useToast();
 
@@ -127,13 +133,20 @@ export const TextField = ({ field, recipient }: TextFieldProps) => {
         return;
       }
 
-      await signFieldWithToken({
+      const payload: TSignFieldWithTokenMutationSchema = {
         token: recipient.token,
         fieldId: field.id,
         value: localText,
         isBase64: true,
         authOptions,
-      });
+      };
+
+      if (onSignField) {
+        await onSignField(payload);
+        return;
+      }
+
+      await signFieldWithToken(payload);
 
       setLocalCustomText('');
 
@@ -157,10 +170,17 @@ export const TextField = ({ field, recipient }: TextFieldProps) => {
 
   const onRemove = async () => {
     try {
-      await removeSignedFieldWithToken({
+      const payload: TRemovedSignedFieldWithTokenMutationSchema = {
         token: recipient.token,
         fieldId: field.id,
-      });
+      };
+
+      if (onUnsignField) {
+        await onUnsignField(payload);
+        return;
+      }
+
+      await removeSignedFieldWithToken(payload);
 
       setLocalCustomText(parsedFieldMeta.text ?? '');
 

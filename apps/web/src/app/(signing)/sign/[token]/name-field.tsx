@@ -12,6 +12,10 @@ import type { TRecipientActionAuth } from '@documenso/lib/types/document-auth';
 import { type Recipient } from '@documenso/prisma/client';
 import type { FieldWithSignature } from '@documenso/prisma/types/field-with-signature';
 import { trpc } from '@documenso/trpc/react';
+import type {
+  TRemovedSignedFieldWithTokenMutationSchema,
+  TSignFieldWithTokenMutationSchema,
+} from '@documenso/trpc/server/field-router/schema';
 import { Button } from '@documenso/ui/primitives/button';
 import { Dialog, DialogContent, DialogFooter, DialogTitle } from '@documenso/ui/primitives/dialog';
 import { Input } from '@documenso/ui/primitives/input';
@@ -25,9 +29,11 @@ import { SigningFieldContainer } from './signing-field-container';
 export type NameFieldProps = {
   field: FieldWithSignature;
   recipient: Recipient;
+  onSignField?: (value: TSignFieldWithTokenMutationSchema) => Promise<void> | void;
+  onUnsignField?: (value: TRemovedSignedFieldWithTokenMutationSchema) => Promise<void> | void;
 };
 
-export const NameField = ({ field, recipient }: NameFieldProps) => {
+export const NameField = ({ field, recipient, onSignField, onUnsignField }: NameFieldProps) => {
   const router = useRouter();
 
   const { toast } = useToast();
@@ -83,13 +89,20 @@ export const NameField = ({ field, recipient }: NameFieldProps) => {
         return;
       }
 
-      await signFieldWithToken({
+      const payload: TSignFieldWithTokenMutationSchema = {
         token: recipient.token,
         fieldId: field.id,
         value,
         isBase64: false,
         authOptions,
-      });
+      };
+
+      if (onSignField) {
+        await onSignField(payload);
+        return;
+      }
+
+      await signFieldWithToken(payload);
 
       startTransition(() => router.refresh());
     } catch (err) {
@@ -111,10 +124,17 @@ export const NameField = ({ field, recipient }: NameFieldProps) => {
 
   const onRemove = async () => {
     try {
-      await removeSignedFieldWithToken({
+      const payload: TRemovedSignedFieldWithTokenMutationSchema = {
         token: recipient.token,
         fieldId: field.id,
-      });
+      };
+
+      if (onUnsignField) {
+        await onUnsignField(payload);
+        return;
+      }
+
+      await removeSignedFieldWithToken(payload);
 
       startTransition(() => router.refresh());
     } catch (err) {

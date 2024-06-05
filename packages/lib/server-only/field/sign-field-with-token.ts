@@ -9,7 +9,6 @@ import { checkboxValidationSigns } from '@documenso/ui/primitives/document-flow/
 
 import { DEFAULT_DOCUMENT_DATE_FORMAT } from '../../constants/date-formats';
 import { DEFAULT_DOCUMENT_TIME_ZONE } from '../../constants/time-zones';
-import { AppError, AppErrorCode } from '../../errors/app-error';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '../../types/document-audit-logs';
 import type { TRecipientActionAuth } from '../../types/document-auth';
 import {
@@ -20,8 +19,7 @@ import {
 } from '../../types/field-field-meta';
 import type { RequestMetadata } from '../../universal/extract-request-metadata';
 import { createDocumentAuditLogData } from '../../utils/document-audit-logs';
-import { extractDocumentAuthMethods } from '../../utils/document-auth';
-import { isRecipientAuthorized } from '../document/is-recipient-authorized';
+import { validateFieldAuth } from '../document/validate-field-auth';
 
 export type SignFieldWithTokenOptions = {
   token: string;
@@ -33,6 +31,16 @@ export type SignFieldWithTokenOptions = {
   requestMetadata?: RequestMetadata;
 };
 
+/**
+ * Please read.
+ *
+ * Content within this function has been duplicated in the
+ * createDocumentFromDirectTemplate file.
+ *
+ * Any update to this should be reflected in the other file if required.
+ *
+ * Todo: Extract common logic.
+ */
 export const signFieldWithToken = async ({
   token,
   fieldId,
@@ -176,32 +184,13 @@ export const signFieldWithToken = async ({
     }
   }
 
-  let { derivedRecipientActionAuth } = extractDocumentAuthMethods({
-    documentAuth: document.authOptions,
-    recipientAuth: recipient.authOptions,
+  const derivedRecipientActionAuth = await validateFieldAuth({
+    documentAuthOptions: document.authOptions,
+    recipient,
+    field,
+    userId,
+    authOptions,
   });
-
-  // Override all non-signature fields to not require any auth.
-  if (field.type !== FieldType.SIGNATURE) {
-    derivedRecipientActionAuth = null;
-  }
-
-  let isValid = true;
-
-  // Only require auth on signature fields for now.
-  if (field.type === FieldType.SIGNATURE) {
-    isValid = await isRecipientAuthorized({
-      type: 'ACTION',
-      document: document,
-      recipient: recipient,
-      userId,
-      authOptions,
-    });
-  }
-
-  if (!isValid) {
-    throw new AppError(AppErrorCode.UNAUTHORIZED, 'Invalid authentication values');
-  }
 
   const documentMeta = await prisma.documentMeta.findFirst({
     where: {
@@ -239,10 +228,6 @@ export const signFieldWithToken = async ({
     });
 
     if (isSignatureField) {
-      if (!field.recipientId) {
-        throw new Error('Field has no recipientId');
-      }
-
       const signature = await tx.signature.upsert({
         where: {
           fieldId: field.id,

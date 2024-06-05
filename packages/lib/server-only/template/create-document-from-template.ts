@@ -1,7 +1,14 @@
 import { nanoid } from '@documenso/lib/universal/id';
 import { prisma } from '@documenso/prisma';
 import type { Field } from '@documenso/prisma/client';
-import { type Recipient, WebhookTriggerEvents } from '@documenso/prisma/client';
+import {
+  DocumentSource,
+  type Recipient,
+  RecipientRole,
+  SendStatus,
+  SigningStatus,
+  WebhookTriggerEvents,
+} from '@documenso/prisma/client';
 
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '../../types/document-audit-logs';
@@ -140,6 +147,8 @@ export const createDocumentFromTemplate = async ({
   return await prisma.$transaction(async (tx) => {
     const document = await tx.document.create({
       data: {
+        source: DocumentSource.TEMPLATE,
+        templateId: template.id,
         userId,
         teamId: template.teamId,
         title: override?.title || template.title,
@@ -171,6 +180,12 @@ export const createDocumentFromTemplate = async ({
                   accessAuth: authOptions.accessAuth,
                   actionAuth: authOptions.actionAuth,
                 }),
+                sendStatus:
+                  recipient.role === RecipientRole.CC ? SendStatus.SENT : SendStatus.NOT_SENT,
+                signingStatus:
+                  recipient.role === RecipientRole.CC
+                    ? SigningStatus.SIGNED
+                    : SigningStatus.NOT_SIGNED,
                 token: nanoid(),
               };
             }),
@@ -228,6 +243,10 @@ export const createDocumentFromTemplate = async ({
         requestMetadata,
         data: {
           title: document.title,
+          source: {
+            type: DocumentSource.TEMPLATE,
+            templateId: template.id,
+          },
         },
       }),
     });
