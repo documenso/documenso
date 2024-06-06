@@ -9,7 +9,7 @@
 
 -- Custom (Drop duplicate)
 UPDATE "User"
-SET "User"."url" = NULL
+SET "url" = NULL
 WHERE "User"."url" IN (
   SELECT "UserTeamUrl"."url"
   FROM (
