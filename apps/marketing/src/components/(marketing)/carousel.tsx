@@ -14,37 +14,37 @@ const SLIDES = [
   {
     label: 'Signing Process',
     type: 'video',
-    src: '/signing.mp4',
+    src: 'https://github.com/documenso/design/raw/main/marketing/signing.webm',
   },
-  {
-    label: 'Templates/Fields',
-    type: 'video',
-    src: '/signing.mp4',
-  },
-  {
-    label: 'Zapier',
-    type: 'video',
-    src: '/signing.mp4',
-  },
+  // {
+  //   label: 'Templates/Fields',
+  //   type: 'video',
+  //   src: '/signing.mp4',
+  // },
+  // {
+  //   label: 'Zapier',
+  //   type: 'video',
+  //   src: '/signing.mp4',
+  // },
   {
     label: 'Webhooks',
     type: 'video',
-    src: '/signing.mp4',
+    src: 'https://github.com/documenso/design/raw/main/marketing/webhooks.webm',
   },
   {
     label: 'API',
     type: 'video',
-    src: '/signing.mp4',
+    src: 'https://github.com/documenso/design/raw/main/marketing/api.webm',
   },
   {
     label: 'Teams',
     type: 'video',
-    src: '/signing.mp4',
+    src: 'https://github.com/documenso/design/raw/main/marketing/teams.webm',
   },
   {
     label: 'Profile',
     type: 'video',
-    src: '/signing.mp4',
+    src: 'https://github.com/documenso/design/raw/main/marketing/profile_teaser.webm',
   },
 ];
 
@@ -171,7 +171,7 @@ export const Carousel = () => {
                     loop
                     className="h-auto w-full rounded-xl"
                   >
-                    <source src={slide.src} type="video/mp4" />
+                    <source src={slide.src} type="video/webm" />
                     Your browser does not support the video tag.
                   </video>
                 )}
