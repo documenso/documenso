@@ -19,6 +19,8 @@ import { useFieldArray, useForm } from 'react-hook-form';
 
 import { getBoundingClientRect } from '@documenso/lib/client-only/get-bounding-client-rect';
 import { useDocumentElement } from '@documenso/lib/client-only/hooks/use-document-element';
+import { useRecipientColorClasses } from '@documenso/lib/client-only/hooks/use-recipient-color-classes';
+import { useSelectedSignerStyles } from '@documenso/lib/client-only/hooks/use-selected-signer-styles';
 import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
 import { RECIPIENT_ROLES_DESCRIPTION } from '@documenso/lib/constants/recipient-roles';
 import { ZFieldMetaSchema } from '@documenso/lib/types/field-field-meta';
@@ -51,7 +53,6 @@ import { Popover, PopoverContent, PopoverTrigger } from '@documenso/ui/primitive
 import type { CombinedStylesKey, FieldFormType } from '../document-flow/add-fields';
 import { FieldAdvancedSettings } from '../document-flow/field-item-advanced-settings';
 import { useStep } from '../stepper';
-// import { Tooltip, TooltipContent, TooltipTrigger } from '@documenso/ui/primitives/tooltip';
 import type { TAddTemplateFieldsFormSchema } from './add-template-fields.types';
 
 const fontCaveat = Caveat({
@@ -217,15 +218,7 @@ export const AddTemplateFieldsFormPartial = ({
   const { currentStep, totalSteps, previousStep } = useStep();
   const [showAdvancedSettings, setShowAdvancedSettings] = useState(false);
   const [currentField, setCurrentField] = useState<FieldFormType>();
-  const settingsRef = useRef<HTMLDivElement>(null);
-
-  const recipientColorClasses = useMemo(() => {
-    const colorMap = new Map<Recipient['id'], CombinedStylesKey>();
-    recipients.forEach((recipient, index) => {
-      colorMap.set(recipient.id, colorClasses[index % colorClasses.length]);
-    });
-    return colorMap;
-  }, [recipients]);
+  const recipientColorClasses = useRecipientColorClasses(recipients, colorClasses);
 
   const {
     control,
@@ -288,30 +281,7 @@ export const AddTemplateFieldsFormPartial = ({
   const [selectedSigner, setSelectedSigner] = useState<Recipient | null>(null);
   const [showRecipientsSelector, setShowRecipientsSelector] = useState(false);
 
-  const selectedSignerStyles = useMemo(() => {
-    if (!selectedSigner) return {};
-
-    const colorClass = recipientColorClasses.get(selectedSigner.id);
-    if (!colorClass) return {};
-
-    const styles = combinedStyles[colorClass];
-
-    return {
-      ringClass: styles?.ringColor,
-      borderClass: styles?.borderWithHover,
-      activeBorderClass: styles?.borderActive,
-      activeBorderWithinBoundsClass: styles?.borderActiveWithinBounds,
-      activeBorderOutsideBoundsClass: styles?.borderActiveOutsideBounds,
-    };
-  }, [selectedSigner]);
-
-  const {
-    ringClass: selectedSignerRingClass,
-    borderClass: selectedSignerBorderClass,
-    activeBorderClass: selectedSignerActiveBorderClass,
-    activeBorderWithinBoundsClass: selectedSignerActiveWithinBoundsClass,
-    activeBorderOutsideBoundsClass: selectedSignerActiveOutsideBoundsClass,
-  } = selectedSignerStyles;
+  const selectedSignerStyles = useSelectedSignerStyles(selectedSigner, recipientColorClasses);
 
   const [isFieldWithinBounds, setIsFieldWithinBounds] = useState(false);
   const [coords, setCoords] = useState({
@@ -521,24 +491,6 @@ export const AddTemplateFieldsFormPartial = ({
     setShowAdvancedSettings((prev) => !prev);
   };
 
-  const handleClickOutsideAdancedSettingsTab = (event: MouseEvent) => {
-    if (
-      showAdvancedSettings &&
-      settingsRef.current &&
-      !event.composedPath().includes(settingsRef.current)
-    ) {
-      setShowAdvancedSettings(false);
-    }
-  };
-
-  useEffect(() => {
-    document.body.addEventListener('click', handleClickOutsideAdancedSettingsTab);
-
-    return () => {
-      document.body.removeEventListener('click', handleClickOutsideAdancedSettingsTab);
-    };
-  }, [showAdvancedSettings]);
-
   return (
     <>
       {showAdvancedSettings && currentField ? (
@@ -548,7 +500,6 @@ export const AddTemplateFieldsFormPartial = ({
           field={currentField}
           fields={localFields}
           onAdvancedSettings={handleAdvancedSettings}
-          ref={settingsRef}
           onSave={handleSavedFieldSettings}
         />
       ) : (
@@ -563,12 +514,12 @@ export const AddTemplateFieldsFormPartial = ({
                 <Card
                   className={cn(
                     'pointer-events-none fixed z-50 cursor-pointer border-2 backdrop-blur-[1px]',
-                    selectedSignerActiveBorderClass,
+                    selectedSignerStyles.activeBorderClass,
                     isFieldWithinBounds
-                      ? selectedSignerActiveWithinBoundsClass
-                      : selectedSignerActiveOutsideBoundsClass,
+                      ? selectedSignerStyles.activeBorderWithinBoundsClass
+                      : selectedSignerStyles.activeBorderOutsideBoundsClass,
                     {
-                      'text-field-card-foreground border-2': isFieldWithinBounds,
+                      'text-field-card-foreground': isFieldWithinBounds,
                       'opacity-50': !isFieldWithinBounds,
                     },
                   )}
@@ -618,8 +569,8 @@ export const AddTemplateFieldsFormPartial = ({
                       variant="outline"
                       role="combobox"
                       className={cn(
-                        'bg-background text-muted-foreground hover:text-foreground mb-12 mt-2 justify-between font-normal ring ring-offset-2',
-                        selectedSignerRingClass,
+                        'bg-background text-muted-foreground hover:text-foreground mb-12 mt-2 justify-between border-2 font-normal ring-2 ring-offset-2',
+                        selectedSignerStyles.ringClass,
                       )}
                     >
                       {selectedSigner?.email && (
@@ -694,7 +645,7 @@ export const AddTemplateFieldsFormPartial = ({
               )}
 
               <div className="-mx-2 flex-1 overflow-y-auto px-2">
-                <div className="grid grid-cols-2 gap-x-4 gap-y-8">
+                <div className="my-2 grid grid-cols-2 gap-x-4 gap-y-8">
                   <button
                     type="button"
                     className="group h-full w-full"
@@ -705,7 +656,7 @@ export const AddTemplateFieldsFormPartial = ({
                     <Card
                       className={cn(
                         'h-full w-full cursor-pointer group-disabled:opacity-50',
-                        selectedSignerBorderClass,
+                        selectedSignerStyles.borderClass,
                       )}
                     >
                       <CardContent className="flex flex-col items-center justify-center px-6 py-4">
@@ -715,7 +666,7 @@ export const AddTemplateFieldsFormPartial = ({
                             fontCaveat.className,
                           )}
                         >
-                          {selectedSigner?.name || 'Signature'}
+                          Signature
                         </p>
                       </CardContent>
                     </Card>
@@ -731,7 +682,7 @@ export const AddTemplateFieldsFormPartial = ({
                     <Card
                       className={cn(
                         'h-full w-full cursor-pointer group-disabled:opacity-50',
-                        selectedSignerBorderClass,
+                        selectedSignerStyles.borderClass,
                       )}
                     >
                       <CardContent className="flex flex-col items-center justify-center px-6 py-4">
@@ -742,7 +693,7 @@ export const AddTemplateFieldsFormPartial = ({
                           )}
                         >
                           <Mail />
-                          {'Email'}
+                          Email
                         </p>
                       </CardContent>
                     </Card>
@@ -758,7 +709,7 @@ export const AddTemplateFieldsFormPartial = ({
                     <Card
                       className={cn(
                         'h-full w-full cursor-pointer group-disabled:opacity-50',
-                        selectedSignerBorderClass,
+                        selectedSignerStyles.borderClass,
                       )}
                     >
                       <CardContent className="flex flex-col items-center justify-center px-6 py-4">
@@ -768,7 +719,7 @@ export const AddTemplateFieldsFormPartial = ({
                           )}
                         >
                           <User />
-                          {'Name'}
+                          Name
                         </p>
                       </CardContent>
                     </Card>
@@ -784,7 +735,7 @@ export const AddTemplateFieldsFormPartial = ({
                     <Card
                       className={cn(
                         'h-full w-full cursor-pointer group-disabled:opacity-50',
-                        selectedSignerBorderClass,
+                        selectedSignerStyles.borderClass,
                       )}
                     >
                       <CardContent className="flex flex-col items-center justify-center px-6 py-4">
@@ -794,7 +745,7 @@ export const AddTemplateFieldsFormPartial = ({
                           )}
                         >
                           <CalendarDays />
-                          {'Date'}
+                          Date
                         </p>
                       </CardContent>
                     </Card>
@@ -810,7 +761,7 @@ export const AddTemplateFieldsFormPartial = ({
                     <Card
                       className={cn(
                         'h-full w-full cursor-pointer group-disabled:opacity-50',
-                        selectedSignerBorderClass,
+                        selectedSignerStyles.borderClass,
                       )}
                     >
                       <CardContent className="flex flex-col items-center justify-center px-6 py-4">
@@ -820,7 +771,7 @@ export const AddTemplateFieldsFormPartial = ({
                           )}
                         >
                           <Type />
-                          {'Text'}
+                          Text
                         </p>
                       </CardContent>
                     </Card>
@@ -836,7 +787,7 @@ export const AddTemplateFieldsFormPartial = ({
                     <Card
                       className={cn(
                         'h-full w-full cursor-pointer group-disabled:opacity-50',
-                        selectedSignerBorderClass,
+                        selectedSignerStyles.borderClass,
                       )}
                     >
                       <CardContent className="flex flex-col items-center justify-center px-6 py-4">
@@ -846,7 +797,7 @@ export const AddTemplateFieldsFormPartial = ({
                           )}
                         >
                           <Hash />
-                          {'Number'}
+                          Number
                         </p>
                       </CardContent>
                     </Card>
@@ -862,7 +813,7 @@ export const AddTemplateFieldsFormPartial = ({
                     <Card
                       className={cn(
                         'h-full w-full cursor-pointer group-disabled:opacity-50',
-                        selectedSignerBorderClass,
+                        selectedSignerStyles.borderClass,
                       )}
                     >
                       <CardContent className="flex flex-col items-center justify-center px-6 py-4">
@@ -872,7 +823,7 @@ export const AddTemplateFieldsFormPartial = ({
                           )}
                         >
                           <Disc />
-                          {'Radio'}
+                          Radio
                         </p>
                       </CardContent>
                     </Card>
@@ -888,7 +839,7 @@ export const AddTemplateFieldsFormPartial = ({
                     <Card
                       className={cn(
                         'h-full w-full cursor-pointer group-disabled:opacity-50',
-                        selectedSignerBorderClass,
+                        selectedSignerStyles.borderClass,
                       )}
                     >
                       <CardContent className="flex flex-col items-center justify-center px-6 py-4">
@@ -898,7 +849,7 @@ export const AddTemplateFieldsFormPartial = ({
                           )}
                         >
                           <CheckSquare />
-                          {'Checkbox'}
+                          Checkbox
                         </p>
                       </CardContent>
                     </Card>
@@ -914,7 +865,7 @@ export const AddTemplateFieldsFormPartial = ({
                     <Card
                       className={cn(
                         'h-full w-full cursor-pointer group-disabled:opacity-50',
-                        selectedSignerBorderClass,
+                        selectedSignerStyles.borderClass,
                       )}
                     >
                       <CardContent className="flex flex-col items-center justify-center px-6 py-4">
@@ -924,7 +875,7 @@ export const AddTemplateFieldsFormPartial = ({
                           )}
                         >
                           <ChevronDown />
-                          {'Dropdown'}
+                          Dropdown
                         </p>
                       </CardContent>
                     </Card>
