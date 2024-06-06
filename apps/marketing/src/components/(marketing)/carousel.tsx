@@ -4,6 +4,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 
 import Autoplay from 'embla-carousel-autoplay';
 import useEmblaCarousel from 'embla-carousel-react';
+import { useTheme } from 'next-themes';
 
 import { Card } from '@documenso/ui/primitives/card';
 import { Progress } from '@documenso/ui/primitives/progress';
@@ -14,37 +15,32 @@ const SLIDES = [
   {
     label: 'Signing Process',
     type: 'video',
-    src: 'https://github.com/documenso/design/raw/main/marketing/signing.webm',
+    srcLight: 'https://github.com/documenso/design/raw/main/marketing/signing.webm',
+    srcDark: 'https://github.com/documenso/design/raw/main/marketing/signing.webm',
   },
-  // {
-  //   label: 'Templates/Fields',
-  //   type: 'video',
-  //   src: '/signing.mp4',
-  // },
-  // {
-  //   label: 'Zapier',
-  //   type: 'video',
-  //   src: '/signing.mp4',
-  // },
   {
     label: 'Webhooks',
     type: 'video',
-    src: 'https://github.com/documenso/design/raw/main/marketing/webhooks.webm',
+    srcLight: 'https://github.com/documenso/design/raw/main/marketing/webhooks.webm',
+    srcDark: 'https://github.com/documenso/design/raw/main/marketing/webhooks.webm',
   },
   {
     label: 'API',
     type: 'video',
-    src: 'https://github.com/documenso/design/raw/main/marketing/api.webm',
+    srcLight: 'https://github.com/documenso/design/raw/main/marketing/api.webm',
+    srcDark: 'https://github.com/documenso/design/raw/main/marketing/api.webm',
   },
   {
     label: 'Teams',
     type: 'video',
-    src: 'https://github.com/documenso/design/raw/main/marketing/teams.webm',
+    srcLight: 'https://github.com/documenso/design/raw/main/marketing/teams.webm',
+    srcDark: 'https://github.com/documenso/design/raw/main/marketing/teams.webm',
   },
   {
     label: 'Profile',
     type: 'video',
-    src: 'https://github.com/documenso/design/raw/main/marketing/profile_teaser.webm',
+    srcLight: 'https://github.com/documenso/design/raw/main/marketing/profile_teaser.webm',
+    srcDark: 'https://github.com/documenso/design/raw/main/marketing/profile_teaser.webm',
   },
 ];
 
@@ -52,8 +48,10 @@ export const Carousel = () => {
   const slides = SLIDES;
   const [_isPlaying, setIsPlaying] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(0);
-  const [progress, setProgress] = React.useState(0);
+  const [progress, setProgress] = useState(0);
   const videoRefs = useRef<(HTMLVideoElement | null)[]>([]);
+  const { theme } = useTheme();
+
   const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true }, [
     Autoplay({ playOnInit: true, delay: 5000 }),
   ]);
@@ -120,7 +118,7 @@ export const Carousel = () => {
     return () => {
       observer.disconnect();
     };
-  }, [slides]);
+  }, [slides, theme]);
 
   useEffect(() => {
     if (!emblaApi) return;
@@ -157,6 +155,17 @@ export const Carousel = () => {
     return () => clearInterval(timer);
   }, [selectedIndex]);
 
+  useEffect(() => {
+    if (!emblaApi) return;
+
+    const resetCarousel = () => {
+      emblaApi.reInit();
+      emblaApi.scrollTo(0);
+    };
+
+    resetCarousel();
+  }, [theme, emblaApi]);
+
   return (
     <>
       <Card className="mx-auto mt-12 w-full max-w-4xl rounded-2xl p-1 before:rounded-2xl" gradient>
@@ -166,12 +175,16 @@ export const Carousel = () => {
               <div className="min-w-[10rem] flex-none basis-full rounded-xl" key={index}>
                 {slide.type === 'video' && (
                   <video
+                    key={`${theme}-${index}`}
                     ref={(el) => (videoRefs.current[index] = el)}
                     muted
                     loop
                     className="h-auto w-full rounded-xl"
                   >
-                    <source src={slide.src} type="video/webm" />
+                    <source
+                      src={theme === 'light' ? slide.srcLight : slide.srcDark}
+                      type="video/webm"
+                    />
                     Your browser does not support the video tag.
                   </video>
                 )}
