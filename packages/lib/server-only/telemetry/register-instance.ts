@@ -8,11 +8,11 @@ import {
 import { upsertSiteSetting } from '../site-settings/upsert-site-setting';
 import { sendInstance } from './send-instance';
 
-type ResigsterInstanceOptions = {
+type RegisterInstanceOptions = {
   version: string;
 };
 
-export const registerInstance = async ({ version }: ResigsterInstanceOptions) => {
+export const registerInstance = async ({ version }: RegisterInstanceOptions) => {
   const instanceResponse = await getSiteSettings().then((settings) =>
     settings.find((setting) => setting.id === SITE_SETTINGS_TELEMETRY_ID),
   );
