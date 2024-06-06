@@ -1,3 +1,4 @@
+import { validateTextField } from '@documenso/lib/advanced-fields-validation/validate-text';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
 import {
   type TFieldMetaSchema as FieldMeta,
@@ -121,14 +122,10 @@ export const setFieldsForDocument = async ({
 
         if (field.type === FieldType.TEXT && field.fieldMeta) {
           const textFieldParsedMeta = ZTextFieldMeta.parse(field.fieldMeta);
+          const errors = validateTextField(textFieldParsedMeta.text || '', textFieldParsedMeta);
 
-          if (
-            textFieldParsedMeta.text &&
-            textFieldParsedMeta.characterLimit &&
-            textFieldParsedMeta.characterLimit > 0 &&
-            textFieldParsedMeta.text.length > textFieldParsedMeta.characterLimit
-          ) {
-            throw new Error('Entered text exceeds character limit');
+          if (errors.length > 0) {
+            throw new Error(errors.join(', '));
           }
         }
 

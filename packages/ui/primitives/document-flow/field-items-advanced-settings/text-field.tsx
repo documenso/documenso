@@ -1,3 +1,4 @@
+import { validateTextField } from '@documenso/lib/advanced-fields-validation/validate-text';
 import { type TTextFieldMeta as TextFieldMeta } from '@documenso/lib/types/field-field-meta';
 import { Input } from '@documenso/ui/primitives/input';
 import { Label } from '@documenso/ui/primitives/label';
@@ -15,35 +16,6 @@ export const TextFieldAdvancedSettings = ({
   handleFieldChange,
   handleErrors,
 }: TextFieldAdvancedSettingsProps) => {
-  const validateText = (
-    value: string,
-    characterLimit: string | undefined,
-    readOnly: boolean,
-    required: boolean,
-  ) => {
-    const errors = [];
-
-    const limit = characterLimit ? Number(characterLimit) : 0;
-
-    if (limit > 0 && value.length > limit) {
-      errors.push(`Text length (${value.length}) exceeds the character limit (${limit})`);
-    }
-
-    if (characterLimit && isNaN(Number(characterLimit))) {
-      errors.push('Character limit must be a number');
-    }
-
-    if (readOnly && value.length < 1) {
-      errors.push('A read only field must have text');
-    }
-
-    if (readOnly && required) {
-      errors.push('A field cannot be both read only and required');
-    }
-
-    return errors;
-  };
-
   const handleInput = (field: keyof TextFieldMeta, value: string | boolean) => {
     const text = field === 'text' ? String(value) : fieldState.text || '';
     const limit =
@@ -51,9 +23,13 @@ export const TextFieldAdvancedSettings = ({
     const readOnly = field === 'readOnly' ? Boolean(value) : Boolean(fieldState.readOnly);
     const required = field === 'required' ? Boolean(value) : Boolean(fieldState.required);
 
-    const textErrors = validateText(text, String(limit), readOnly, required);
-    handleErrors(textErrors);
+    const textErrors = validateTextField(text, {
+      characterLimit: Number(limit),
+      readOnly,
+      required,
+    });
 
+    handleErrors(textErrors);
     handleFieldChange(field, value);
   };
 

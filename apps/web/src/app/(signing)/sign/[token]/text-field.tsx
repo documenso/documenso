@@ -6,10 +6,10 @@ import { useRouter } from 'next/navigation';
 
 import { Loader, Type } from 'lucide-react';
 
+import { validateTextField } from '@documenso/lib/advanced-fields-validation/validate-text';
 import { DO_NOT_INVALIDATE_QUERY_ON_MUTATION } from '@documenso/lib/constants/trpc';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import type { TRecipientActionAuth } from '@documenso/lib/types/document-auth';
-import type { TTextFieldMeta } from '@documenso/lib/types/field-field-meta';
 import { ZTextFieldMeta } from '@documenso/lib/types/field-field-meta';
 import type { Recipient } from '@documenso/prisma/client';
 import type { FieldWithSignatureAndFieldMeta } from '@documenso/prisma/types/field-with-signature-and-fieldmeta';
@@ -26,23 +26,6 @@ import { useToast } from '@documenso/ui/primitives/use-toast';
 
 import { useRequiredDocumentAuthContext } from './document-auth-provider';
 import { SigningFieldContainer } from './signing-field-container';
-
-const validateText = (text: string, fieldMeta: TTextFieldMeta) => {
-  const errors: Record<string, string[]> = {
-    required: [],
-    characterLimit: [],
-  };
-
-  if (fieldMeta.required && !text) {
-    errors.required.push('This field is required');
-  }
-
-  if (fieldMeta.characterLimit && text.length > fieldMeta.characterLimit) {
-    errors.characterLimit.push(`Text exceeds the character limit of ${fieldMeta.characterLimit}`);
-  }
-
-  return errors;
-};
 
 export type TextFieldProps = {
   field: FieldWithSignatureAndFieldMeta;
@@ -94,8 +77,11 @@ export const TextField = ({ field, recipient, onSignField, onUnsignField }: Text
     setLocalCustomText(text);
 
     if (parsedFieldMeta) {
-      const validationErrors = validateText(text, parsedFieldMeta);
-      setErrors(validationErrors);
+      const validationErrors = validateTextField(text, parsedFieldMeta, true);
+      setErrors({
+        required: validationErrors.filter((error) => error.includes('required')),
+        characterLimit: validationErrors.filter((error) => error.includes('character limit')),
+      });
     }
   };
 
@@ -104,10 +90,13 @@ export const TextField = ({ field, recipient, onSignField, onUnsignField }: Text
    */
   const onDialogSignClick = () => {
     if (parsedFieldMeta) {
-      const validationErrors = validateText(localText, parsedFieldMeta);
+      const validationErrors = validateTextField(localText, parsedFieldMeta, true);
 
-      if (validationErrors.required.length > 0 || validationErrors.characterLimit.length > 0) {
-        setErrors(validationErrors);
+      if (validationErrors.length > 0) {
+        setErrors({
+          required: validationErrors.filter((error) => error.includes('required')),
+          characterLimit: validationErrors.filter((error) => error.includes('character limit')),
+        });
         return;
       }
     }
@@ -124,8 +113,11 @@ export const TextField = ({ field, recipient, onSignField, onUnsignField }: Text
     setShowCustomTextModal(true);
 
     if (localText && parsedFieldMeta) {
-      const validationErrors = validateText(localText, parsedFieldMeta);
-      setErrors(validationErrors);
+      const validationErrors = validateTextField(localText, parsedFieldMeta, true);
+      setErrors({
+        required: validationErrors.filter((error) => error.includes('required')),
+        characterLimit: validationErrors.filter((error) => error.includes('character limit')),
+      });
     }
 
     return false;
@@ -323,9 +315,7 @@ export const TextField = ({ field, recipient, onSignField, onUnsignField }: Text
               <Button
                 type="button"
                 className="flex-1"
-                disabled={
-                  !localText || errors.required.length > 0 || errors.characterLimit.length > 0
-                }
+                disabled={!localText || userInputHasErrors}
                 onClick={() => onDialogSignClick()}
               >
                 Save

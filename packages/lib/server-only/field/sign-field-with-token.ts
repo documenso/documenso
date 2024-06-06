@@ -3,6 +3,7 @@
 import { DateTime } from 'luxon';
 import { match } from 'ts-pattern';
 
+import { validateTextField } from '@documenso/lib/advanced-fields-validation/validate-text';
 import { prisma } from '@documenso/prisma';
 import { DocumentStatus, FieldType, SigningStatus } from '@documenso/prisma/client';
 import { checkboxValidationSigns } from '@documenso/ui/primitives/document-flow/field-items-advanced-settings/constants';
@@ -136,16 +137,11 @@ export const signFieldWithToken = async ({
   }
 
   if (field.type === FieldType.TEXT && field.fieldMeta) {
-    const parsedFieldMeta = ZTextFieldMeta.parse(field.fieldMeta);
+    const textFieldParsedMeta = ZTextFieldMeta.parse(field.fieldMeta);
+    const errors = validateTextField(value, textFieldParsedMeta, true);
 
-    if (parsedFieldMeta.required && !value) {
-      throw new Error(`Value is required for field ${field.id}`);
-    }
-
-    if (parsedFieldMeta.characterLimit && value.length > parsedFieldMeta.characterLimit) {
-      throw new Error(
-        `Value ${value} exceeds the character limit of ${parsedFieldMeta.characterLimit}`,
-      );
+    if (errors.length > 0) {
+      throw new Error(errors.join(', '));
     }
   }
 
