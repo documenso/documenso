@@ -4,7 +4,7 @@ import path from 'node:path';
 import { hashSync } from '@documenso/lib/server-only/auth/hash';
 
 import { prisma } from '..';
-import { DocumentDataType, Role } from '../client';
+import { DocumentDataType, DocumentSource, Role } from '../client';
 
 export const seedDatabase = async () => {
   const examplePdf = fs
@@ -54,6 +54,7 @@ export const seedDatabase = async () => {
 
   await prisma.document.create({
     data: {
+      source: DocumentSource.DOCUMENT,
       title: 'Example Document',
       documentDataId: examplePdfData.id,
       userId: exampleUser.id,

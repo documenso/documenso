@@ -6,6 +6,10 @@ declare namespace NodeJS {
     NEXT_PRIVATE_GOOGLE_CLIENT_ID?: string;
     NEXT_PRIVATE_GOOGLE_CLIENT_SECRET?: string;
 
+    NEXT_PRIVATE_OIDC_WELL_KNOWN?: string;
+    NEXT_PRIVATE_OIDC_CLIENT_ID?: string;
+    NEXT_PRIVATE_OIDC_CLIENT_SECRET?: string;
+
     NEXT_PRIVATE_DATABASE_URL: string;
     NEXT_PRIVATE_ENCRYPTION_KEY: string;
     NEXT_PRIVATE_ENCRYPTION_SECONDARY_KEY: string;
@@ -73,6 +77,7 @@ declare namespace NodeJS {
 
     DEPLOYMENT_TARGET?: 'webapp' | 'marketing';
     FONT_CAVEAT_URI: string;
+    FONT_NOTO_SANS_URI: string;
 
     POSTGRES_URL?: string;
     DATABASE_URL?: string;

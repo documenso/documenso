@@ -1,3 +1,7 @@
+generator kysely {
+  provider = "prisma-kysely"
+}
+
 generator client {
   provider = "prisma-client-js"
 }
@@ -11,6 +15,7 @@ datasource db {
 enum IdentityProvider {
   DOCUMENSO
   GOOGLE
+  OIDC
 }
 
 enum Role {
@@ -228,6 +233,10 @@ model Account {
   refresh_token     String? @db.Text
   access_token      String? @db.Text
   expires_at        Int?
+  // Some providers return created_at so we need to make it optional
+  created_at        Int?
+  // Stops next-auth from crashing when dealing with AzureAD
+  ext_expires_in    Int?
   token_type        String?
   scope             String?
   id_token          String? @db.Text
@@ -252,6 +261,12 @@ enum DocumentStatus {
   COMPLETED
 }
 
+enum DocumentSource {
+  DOCUMENT
+  TEMPLATE
+  TEMPLATE_DIRECT_LINK
+}
+
 model Document {
   id             Int                 @id @default(autoincrement())
   userId         Int
@@ -272,6 +287,9 @@ model Document {
   deletedAt      DateTime?
   teamId         Int?
   team           Team?               @relation(fields: [teamId], references: [id])
+  templateId     Int?
+  template       Template?           @relation(fields: [templateId], references: [id], onDelete: SetNull)
+  source         DocumentSource
 
   auditLogs DocumentAuditLog[]
 
@@ -563,13 +581,27 @@ model Template {
   createdAt              DateTime      @default(now())
   updatedAt              DateTime      @default(now()) @updatedAt
 
-  team                 Team?        @relation(fields: [teamId], references: [id], onDelete: Cascade)
-  templateDocumentData DocumentData @relation(fields: [templateDocumentDataId], references: [id], onDelete: Cascade)
-  User                 User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  team                 Team?               @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  templateDocumentData DocumentData        @relation(fields: [templateDocumentDataId], references: [id], onDelete: Cascade)
+  User                 User                @relation(fields: [userId], references: [id], onDelete: Cascade)
   Recipient            Recipient[]
   Field                Field[]
+  directLink           TemplateDirectLink?
+  documents            Document[]
 
   @@unique([templateDocumentDataId])
+}
+
+model TemplateDirectLink {
+  id         String   @id @unique @default(cuid())
+  templateId Int      @unique
+  token      String   @unique
+  createdAt  DateTime @default(now())
+  enabled    Boolean
+
+  directTemplateRecipientId Int
+
+  template Template @relation(fields: [templateId], references: [id], onDelete: Cascade)
 }
 
 model SiteSettings {

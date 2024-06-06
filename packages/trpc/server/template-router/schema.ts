@@ -6,10 +6,19 @@ import {
   ZDocumentActionAuthTypesSchema,
 } from '@documenso/lib/types/document-auth';
 
+import { ZSignFieldWithTokenMutationSchema } from '../field-router/schema';
+
 export const ZCreateTemplateMutationSchema = z.object({
   title: z.string().min(1).trim(),
   teamId: z.number().optional(),
   templateDocumentDataId: z.string().min(1),
+});
+
+export const ZCreateDocumentFromDirectTemplateMutationSchema = z.object({
+  directRecipientEmail: z.string().email(),
+  directTemplateToken: z.string().min(1),
+  signedFieldValues: z.array(ZSignFieldWithTokenMutationSchema),
+  templateUpdatedAt: z.date(),
 });
 
 export const ZCreateDocumentFromTemplateMutationSchema = z.object({
@@ -33,6 +42,20 @@ export const ZCreateDocumentFromTemplateMutationSchema = z.object({
 export const ZDuplicateTemplateMutationSchema = z.object({
   templateId: z.number(),
   teamId: z.number().optional(),
+});
+
+export const ZCreateTemplateDirectLinkMutationSchema = z.object({
+  templateId: z.number().min(1),
+  directRecipientId: z.number().min(1).optional(),
+});
+
+export const ZDeleteTemplateDirectLinkMutationSchema = z.object({
+  templateId: z.number().min(1),
+});
+
+export const ZToggleTemplateDirectLinkMutationSchema = z.object({
+  templateId: z.number().min(1),
+  enabled: z.boolean(),
 });
 
 export const ZDeleteTemplateMutationSchema = z.object({

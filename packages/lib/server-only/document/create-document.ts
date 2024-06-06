@@ -5,7 +5,7 @@ import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-log
 import type { RequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 import { createDocumentAuditLogData } from '@documenso/lib/utils/document-audit-logs';
 import { prisma } from '@documenso/prisma';
-import { WebhookTriggerEvents } from '@documenso/prisma/client';
+import { DocumentSource, WebhookTriggerEvents } from '@documenso/prisma/client';
 
 import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
 
@@ -54,6 +54,7 @@ export const createDocument = async ({
         userId,
         teamId,
         formValues,
+        source: DocumentSource.DOCUMENT,
       },
     });
 
@@ -65,6 +66,9 @@ export const createDocument = async ({
         requestMetadata,
         data: {
           title,
+          source: {
+            type: DocumentSource.DOCUMENT,
+          },
         },
       }),
     });

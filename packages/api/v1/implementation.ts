@@ -1,6 +1,7 @@
 import { createNextRoute } from '@ts-rest/next';
 
 import { getServerLimits } from '@documenso/ee/server-only/limits/server';
+import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { AppError } from '@documenso/lib/errors/app-error';
 import { createDocumentData } from '@documenso/lib/server-only/document-data/create-document-data';
 import { upsertDocumentMeta } from '@documenso/lib/server-only/document-meta/upsert-document-meta';
@@ -76,7 +77,10 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
         status: 200,
         body: {
           ...document,
-          recipients,
+          recipients: recipients.map((recipient) => ({
+            ...recipient,
+            signingUrl: `${NEXT_PUBLIC_WEBAPP_URL()}/sign/${recipient.token}`,
+          })),
         },
       };
     } catch (err) {
@@ -258,6 +262,8 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
             email: recipient.email,
             token: recipient.token,
             role: recipient.role,
+
+            signingUrl: `${NEXT_PUBLIC_WEBAPP_URL()}/sign/${recipient.token}`,
           })),
         },
       };
@@ -349,6 +355,8 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
           email: recipient.email,
           token: recipient.token,
           role: recipient.role,
+
+          signingUrl: `${NEXT_PUBLIC_WEBAPP_URL()}/sign/${recipient.token}`,
         })),
       },
     };
@@ -428,6 +436,8 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
           email: recipient.email,
           token: recipient.token,
           role: recipient.role,
+
+          signingUrl: `${NEXT_PUBLIC_WEBAPP_URL()}/sign/${recipient.token}`,
         })),
       },
     };
@@ -435,6 +445,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
 
   sendDocument: authenticatedMiddleware(async (args, user, team) => {
     const { id } = args.params;
+    const { sendEmail = true } = args.body ?? {};
 
     const document = await getDocumentById({ id: Number(id), userId: user.id, teamId: team?.id });
 
@@ -490,10 +501,11 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
       //     });
       //   }
 
-      await sendDocument({
+      const { Recipient: recipients, ...sentDocument } = await sendDocument({
         documentId: Number(id),
         userId: user.id,
         teamId: team?.id,
+        sendEmail,
         requestMetadata: extractNextApiRequestMetadata(args.req),
       });
 
@@ -501,6 +513,11 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
         status: 200,
         body: {
           message: 'Document sent for signing successfully',
+          ...sentDocument,
+          recipients: recipients.map((recipient) => ({
+            ...recipient,
+            signingUrl: `${NEXT_PUBLIC_WEBAPP_URL()}/sign/${recipient.token}`,
+          })),
         },
       };
     } catch (err) {
@@ -585,6 +602,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
         body: {
           ...newRecipient,
           documentId: Number(documentId),
+          signingUrl: `${NEXT_PUBLIC_WEBAPP_URL()}/sign/${newRecipient.token}`,
         },
       };
     } catch (err) {
@@ -650,6 +668,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
       body: {
         ...updatedRecipient,
         documentId: Number(documentId),
+        signingUrl: `${NEXT_PUBLIC_WEBAPP_URL()}/sign/${updatedRecipient.token}`,
       },
     };
   }),
@@ -703,6 +722,7 @@ export const ApiContractV1Implementation = createNextRoute(ApiContractV1, {
       body: {
         ...deletedRecipient,
         documentId: Number(documentId),
+        signingUrl: '',
       },
     };
   }),

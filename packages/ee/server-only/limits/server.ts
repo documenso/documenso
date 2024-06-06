@@ -2,11 +2,12 @@ import { DateTime } from 'luxon';
 
 import { IS_BILLING_ENABLED } from '@documenso/lib/constants/app';
 import { prisma } from '@documenso/prisma';
-import { SubscriptionStatus } from '@documenso/prisma/client';
+import { DocumentSource, SubscriptionStatus } from '@documenso/prisma/client';
 
 import { getDocumentRelatedPrices } from '../stripe/get-document-related-prices.ts';
 import { FREE_PLAN_LIMITS, SELFHOSTED_PLAN_LIMITS, TEAM_PLAN_LIMITS } from './constants';
 import { ERROR_CODES } from './errors';
+import type { TLimitsResponseSchema } from './schema';
 import { ZLimitsSchema } from './schema';
 
 export type GetServerLimitsOptions = {
@@ -14,7 +15,10 @@ export type GetServerLimitsOptions = {
   teamId?: number | null;
 };
 
-export const getServerLimits = async ({ email, teamId }: GetServerLimitsOptions) => {
+export const getServerLimits = async ({
+  email,
+  teamId,
+}: GetServerLimitsOptions): Promise<TLimitsResponseSchema> => {
   if (!IS_BILLING_ENABLED()) {
     return {
       quota: SELFHOSTED_PLAN_LIMITS,
@@ -74,19 +78,37 @@ const handleUserLimits = async ({ email }: HandleUserLimitsOptions) => {
         remaining = structuredClone(quota);
       }
     }
+
+    // Assume all active subscriptions provide unlimited direct templates.
+    remaining.directTemplates = Infinity;
   }
 
-  const documents = await prisma.document.count({
-    where: {
-      userId: user.id,
-      teamId: null,
-      createdAt: {
-        gte: DateTime.utc().startOf('month').toJSDate(),
+  const [documents, directTemplates] = await Promise.all([
+    prisma.document.count({
+      where: {
+        userId: user.id,
+        teamId: null,
+        createdAt: {
+          gte: DateTime.utc().startOf('month').toJSDate(),
+        },
+        source: {
+          not: DocumentSource.TEMPLATE_DIRECT_LINK,
+        },
       },
-    },
-  });
+    }),
+    prisma.template.count({
+      where: {
+        userId: user.id,
+        teamId: null,
+        directLink: {
+          isNot: null,
+        },
+      },
+    }),
+  ]);
 
   remaining.documents = Math.max(remaining.documents - documents, 0);
+  remaining.directTemplates = Math.max(remaining.directTemplates - directTemplates, 0);
 
   return {
     quota,
@@ -127,10 +149,12 @@ const handleTeamLimits = async ({ email, teamId }: HandleTeamLimitsOptions) => {
       quota: {
         documents: 0,
         recipients: 0,
+        directTemplates: 0,
       },
       remaining: {
         documents: 0,
         recipients: 0,
+        directTemplates: 0,
       },
     };
   }

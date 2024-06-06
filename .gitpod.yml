@@ -6,7 +6,7 @@ tasks:
       set -a; source .env &&
       export NEXTAUTH_URL="$(gp url 3000)" &&
       export NEXT_PUBLIC_WEBAPP_URL="$(gp url 3000)" &&
-      export NEXT_PUBLIC_MARKETING_URL="$(gp url 3001)" 
+      export NEXT_PUBLIC_MARKETING_URL="$(gp url 3001)"
     command: npm run d
 
 ports:
@@ -25,19 +25,9 @@ ports:
   - port: 2500
     visibility: private
     onOpen: ignore
-  - port: 54320 
-    visibility: private 
+  - port: 54320
+    visibility: private
     onOpen: ignore
-
-
-github:
-  prebuilds:
-    master: true
-    pullRequests: true
-    pullRequestsFromForks: true
-    addCheck: true
-    addComment: true
-    addBadge: true
 
 vscode:
   extensions:
@@ -47,9 +37,5 @@ vscode:
     - esbenp.prettier-vscode
     - mikestead.dotenv
     - unifiedjs.vscode-mdx
-    - GitHub.copilot-chat
-    - GitHub.copilot-labs
-    - GitHub.copilot
     - GitHub.vscode-pull-request-github
     - Prisma.prisma
-    - VisualStudioExptTeam.vscodeintellicode
