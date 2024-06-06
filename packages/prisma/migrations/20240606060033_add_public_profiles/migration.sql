@@ -25,6 +25,9 @@ WHERE "User"."url" IN (
   HAVING COUNT("UserTeamUrl"."url") > 1
 );
 
+-- Custom (Drop existing profiles since they're not used)
+DELETE FROM "UserProfile";
+
 -- DropForeignKey
 ALTER TABLE "UserProfile" DROP CONSTRAINT "UserProfile_id_fkey";
 
