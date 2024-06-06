@@ -212,7 +212,9 @@ export const SignDirectTemplateForm = ({
                 />
               ))
               .with(FieldType.TEXT, () => {
-                const parsedFieldMeta = ZTextFieldMeta.parse(field.fieldMeta);
+                const parsedFieldMeta = field.fieldMeta
+                  ? ZTextFieldMeta.parse(field.fieldMeta)
+                  : null;
 
                 return (
                   <TextField
@@ -228,7 +230,9 @@ export const SignDirectTemplateForm = ({
                 );
               })
               .with(FieldType.NUMBER, () => {
-                const parsedFieldMeta = ZNumberFieldMeta.parse(field.fieldMeta);
+                const parsedFieldMeta = field.fieldMeta
+                  ? ZNumberFieldMeta.parse(field.fieldMeta)
+                  : null;
 
                 return (
                   <NumberField
@@ -244,7 +248,9 @@ export const SignDirectTemplateForm = ({
                 );
               })
               .with(FieldType.DROPDOWN, () => {
-                const parsedFieldMeta = ZDropdownFieldMeta.parse(field.fieldMeta);
+                const parsedFieldMeta = field.fieldMeta
+                  ? ZDropdownFieldMeta.parse(field.fieldMeta)
+                  : null;
 
                 return (
                   <DropdownField
@@ -260,7 +266,9 @@ export const SignDirectTemplateForm = ({
                 );
               })
               .with(FieldType.RADIO, () => {
-                const parsedFieldMeta = ZRadioFieldMeta.parse(field.fieldMeta);
+                const parsedFieldMeta = field.fieldMeta
+                  ? ZRadioFieldMeta.parse(field.fieldMeta)
+                  : null;
 
                 return (
                   <RadioField
@@ -276,7 +284,9 @@ export const SignDirectTemplateForm = ({
                 );
               })
               .with(FieldType.CHECKBOX, () => {
-                const parsedFieldMeta = ZCheckboxFieldMeta.parse(field.fieldMeta);
+                const parsedFieldMeta = field.fieldMeta
+                  ? ZCheckboxFieldMeta.parse(field.fieldMeta)
+                  : null;
 
                 return (
                   <CheckboxField
