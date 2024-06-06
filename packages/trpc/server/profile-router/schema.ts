@@ -2,6 +2,8 @@ import { z } from 'zod';
 
 import { ZCurrentPasswordSchema, ZPasswordSchema } from '../auth-router/schema';
 
+export const MAX_PROFILE_BIO_LENGTH = 256;
+
 export const ZFindUserSecurityAuditLogsSchema = z.object({
   page: z.number().optional(),
   perPage: z.number().optional(),
@@ -17,6 +19,8 @@ export const ZUpdateProfileMutationSchema = z.object({
 });
 
 export const ZUpdatePublicProfileMutationSchema = z.object({
+  bio: z.string().max(MAX_PROFILE_BIO_LENGTH).optional(),
+  enabled: z.boolean().optional(),
   url: z
     .string()
     .trim()
@@ -24,7 +28,8 @@ export const ZUpdatePublicProfileMutationSchema = z.object({
     .min(1, { message: 'Please enter a valid username.' })
     .regex(/^[a-z0-9-]+$/, {
       message: 'Username can only container alphanumeric characters and dashes.',
-    }),
+    })
+    .optional(),
 });
 
 export const ZUpdatePasswordMutationSchema = z.object({

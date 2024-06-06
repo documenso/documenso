@@ -5,7 +5,7 @@ import type { HTMLAttributes } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
-import { Braces, CreditCard, Lock, User, Users, Webhook } from 'lucide-react';
+import { Braces, CreditCard, Globe2Icon, Lock, User, Users, Webhook } from 'lucide-react';
 
 import { useFeatureFlags } from '@documenso/lib/client-only/providers/feature-flag';
 import { cn } from '@documenso/ui/lib/utils';
@@ -19,6 +19,7 @@ export const MobileNav = ({ className, ...props }: MobileNavProps) => {
   const { getFlag } = useFeatureFlags();
 
   const isBillingEnabled = getFlag('app_billing');
+  const isPublicProfileEnabled = getFlag('app_public_profile');
 
   return (
     <div
@@ -37,6 +38,21 @@ export const MobileNav = ({ className, ...props }: MobileNavProps) => {
           Profile
         </Button>
       </Link>
+
+      {isPublicProfileEnabled && (
+        <Link href="/settings/public-profile">
+          <Button
+            variant="ghost"
+            className={cn(
+              'w-full justify-start',
+              pathname?.startsWith('/settings/public-profile') && 'bg-secondary',
+            )}
+          >
+            <Globe2Icon className="mr-2 h-5 w-5" />
+            Public Profile
+          </Button>
+        </Link>
+      )}
 
       <Link href="/settings/teams">
         <Button

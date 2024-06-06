@@ -35,7 +35,7 @@ export default async function TeamsSettingsPage({ params }: TeamsSettingsPagePro
 
   return (
     <div>
-      <SettingsHeader title="Team Profile" subtitle="Here you can edit your team's details." />
+      <SettingsHeader title="General settings" subtitle="Here you can edit your team's details." />
 
       <TeamTransferStatus
         className="mb-4"

@@ -16,6 +16,18 @@ export const subscriptionsContainsActivePlan = (
       subscription.status === SubscriptionStatus.ACTIVE && priceIds.includes(subscription.priceId),
   );
 };
+/**
+ * Returns true if there is a subscription that is active and is one of the provided product IDs.
+ */
+export const subscriptionsContainsActiveProductId = (
+  subscriptions: Subscription[],
+  productId: string[],
+) => {
+  return subscriptions.some(
+    (subscription) =>
+      subscription.status === SubscriptionStatus.ACTIVE && productId.includes(subscription.planId),
+  );
+};
 
 export const subscriptionsContainActiveEnterprisePlan = (
   subscriptions?: Subscription[],

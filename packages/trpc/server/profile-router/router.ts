@@ -88,9 +88,9 @@ export const profileRouter = router({
     .input(ZUpdatePublicProfileMutationSchema)
     .mutation(async ({ input, ctx }) => {
       try {
-        const { url } = input;
+        const { url, bio, enabled } = input;
 
-        if (IS_BILLING_ENABLED() && url.length < 6) {
+        if (IS_BILLING_ENABLED() && url !== undefined && url.length < 6) {
           const subscriptions = await getSubscriptionsByUserId({
             userId: ctx.user.id,
           }).then((subscriptions) =>
@@ -107,7 +107,11 @@ export const profileRouter = router({
 
         const user = await updatePublicProfile({
           userId: ctx.user.id,
-          url,
+          data: {
+            url,
+            bio,
+            enabled,
+          },
         });
 
         return { success: true, url: user.url };

@@ -50,7 +50,7 @@ model User {
   twoFactorBackupCodes String?
   url                  String?              @unique
 
-  userProfile       UserProfile?
+  profile           UserProfile?
   VerificationToken VerificationToken[]
   ApiToken          ApiToken[]
   Template          Template[]
@@ -63,10 +63,21 @@ model User {
 }
 
 model UserProfile {
-  id  Int     @id
-  bio String?
+  id      String  @id @default(cuid())
+  enabled Boolean @default(false)
+  userId  Int     @unique
+  bio     String?
 
-  User User? @relation(fields: [id], references: [id], onDelete: Cascade)
+  User User? @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model TeamProfile {
+  id      String  @id @default(cuid())
+  enabled Boolean @default(false)
+  teamId  Int     @unique
+  bio     String?
+
+  team Team? @relation(fields: [teamId], references: [id], onDelete: Cascade)
 }
 
 enum UserSecurityAuditLogType {
@@ -475,6 +486,7 @@ model Team {
   emailVerification    TeamEmailVerification?
   transferVerification TeamTransferVerification?
 
+  profile      TeamProfile?
   owner        User          @relation(fields: [ownerUserId], references: [id], onDelete: Cascade)
   subscription Subscription?
 
@@ -580,6 +592,8 @@ model Template {
   templateDocumentDataId String
   createdAt              DateTime      @default(now())
   updatedAt              DateTime      @default(now()) @updatedAt
+  publicTitle            String        @default("")
+  publicDescription      String        @default("")
 
   team                 Team?               @relation(fields: [teamId], references: [id], onDelete: Cascade)
   templateDocumentData DocumentData        @relation(fields: [templateDocumentDataId], references: [id], onDelete: Cascade)
