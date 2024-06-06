@@ -6,10 +6,10 @@ import { useRouter } from 'next/navigation';
 
 import { Hash, Loader } from 'lucide-react';
 
+import { validateNumberField } from '@documenso/lib/advanced-fields-validation/validate-number';
 import { DO_NOT_INVALIDATE_QUERY_ON_MUTATION } from '@documenso/lib/constants/trpc';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import type { TRecipientActionAuth } from '@documenso/lib/types/document-auth';
-import type { TNumberFieldMeta } from '@documenso/lib/types/field-field-meta';
 import { ZNumberFieldMeta } from '@documenso/lib/types/field-field-meta';
 import type { Recipient } from '@documenso/prisma/client';
 import type { FieldWithSignature } from '@documenso/prisma/types/field-with-signature';
@@ -33,52 +33,6 @@ type ValidationErrors = {
   minValue: string[];
   maxValue: string[];
   numberFormat: string[];
-};
-
-const validateNumber = (text: string, fieldMeta: TNumberFieldMeta): ValidationErrors => {
-  const errors: ValidationErrors = {
-    isNumber: [],
-    required: [],
-    minValue: [],
-    maxValue: [],
-    numberFormat: [],
-  };
-
-  const numericRegex = /^[\d,.]+$/;
-  const isNumeric = numericRegex.test(text);
-
-  if (fieldMeta.required && !text) {
-    errors.required.push('This field is required.');
-  }
-
-  if (!isNumeric && text.length > 0) {
-    errors.isNumber.push(`Value is not a number`);
-  }
-
-  if (fieldMeta.minValue && Number(text) < fieldMeta.minValue) {
-    errors.minValue.push(`Value must be greater than or equal to ${fieldMeta.minValue}`);
-  }
-
-  if (fieldMeta.maxValue && Number(text) > fieldMeta.maxValue) {
-    errors.maxValue.push(`Value must be less than or equal to ${fieldMeta.maxValue}`);
-  }
-
-  if (fieldMeta.numberFormat) {
-    const formatRegex =
-      fieldMeta.numberFormat === '123.456,78'
-        ? new RegExp(/^(\d+(?:\.\d+)?(?:,\d+)?)$/)
-        : fieldMeta.numberFormat === '123,456.78'
-        ? new RegExp(/^(\d+(?:,\d+)?(?:\.\d+)?)$/)
-        : new RegExp(/.*/);
-
-    if (!formatRegex.test(text)) {
-      errors.numberFormat.push(
-        `Value does not match the number format - ${fieldMeta.numberFormat}`,
-      );
-    }
-  }
-
-  return errors;
 };
 
 export type NumberFieldProps = {
@@ -125,8 +79,14 @@ export const NumberField = ({ field, recipient, onSignField, onUnsignField }: Nu
     const text = e.target.value;
     setLocalNumber(text);
 
-    const validationErrors = validateNumber(text, parsedFieldMeta);
-    setErrors(validationErrors);
+    const validationErrors = validateNumberField(text, parsedFieldMeta, true);
+    setErrors({
+      isNumber: validationErrors.filter((error) => error.includes('valid number')),
+      required: validationErrors.filter((error) => error.includes('required')),
+      minValue: validationErrors.filter((error) => error.includes('minimum value')),
+      maxValue: validationErrors.filter((error) => error.includes('maximum value')),
+      numberFormat: validationErrors.filter((error) => error.includes('number format')),
+    });
   };
 
   const onDialogSignClick = () => {
@@ -182,9 +142,15 @@ export const NumberField = ({ field, recipient, onSignField, onUnsignField }: Nu
   const onPreSign = () => {
     setShowRadioModal(true);
 
-    if (localNumber) {
-      const validationErrors = validateNumber(localNumber, parsedFieldMeta);
-      setErrors(validationErrors);
+    if (localNumber && parsedFieldMeta) {
+      const validationErrors = validateNumberField(localNumber, parsedFieldMeta, true);
+      setErrors({
+        isNumber: validationErrors.filter((error) => error.includes('valid number')),
+        required: validationErrors.filter((error) => error.includes('required')),
+        minValue: validationErrors.filter((error) => error.includes('minimum value')),
+        maxValue: validationErrors.filter((error) => error.includes('maximum value')),
+        numberFormat: validationErrors.filter((error) => error.includes('number format')),
+      });
     }
 
     return false;

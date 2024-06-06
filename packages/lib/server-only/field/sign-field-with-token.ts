@@ -3,6 +3,7 @@
 import { DateTime } from 'luxon';
 import { match } from 'ts-pattern';
 
+import { validateNumberField } from '@documenso/lib/advanced-fields-validation/validate-number';
 import { validateTextField } from '@documenso/lib/advanced-fields-validation/validate-text';
 import { prisma } from '@documenso/prisma';
 import { DocumentStatus, FieldType, SigningStatus } from '@documenso/prisma/client';
@@ -97,42 +98,10 @@ export const signFieldWithToken = async ({
 
   if (field.type === FieldType.NUMBER && field.fieldMeta) {
     const parsedFieldMeta = ZNumberFieldMeta.parse(field.fieldMeta);
-    const numericRegex = /^[\d,.]+$/;
-    const isNumeric = numericRegex.test(value);
+    const errors = validateNumberField(value, parsedFieldMeta, true);
 
-    if (!isNumeric) {
-      throw new Error(`Value ${value} is not a number`);
-    }
-
-    if (parsedFieldMeta.required && !value) {
-      throw new Error(`Value is required for field ${field.id}`);
-    }
-
-    if (parsedFieldMeta.minValue && Number(value) < parsedFieldMeta.minValue) {
-      throw new Error(
-        `Value ${value} is less than the minimum value of ${parsedFieldMeta.minValue}`,
-      );
-    }
-
-    if (parsedFieldMeta.maxValue && Number(value) > parsedFieldMeta.maxValue) {
-      throw new Error(
-        `Value ${value} is greater than the maximum value of ${parsedFieldMeta.maxValue}`,
-      );
-    }
-
-    if (parsedFieldMeta.numberFormat) {
-      const formatRegex =
-        parsedFieldMeta.numberFormat === '123.456,78'
-          ? new RegExp(/^(\d+(?:\.\d+)?(?:,\d+)?)$/)
-          : parsedFieldMeta.numberFormat === '123,456.78'
-          ? new RegExp(/^(\d+(?:,\d+)?(?:\.\d+)?)$/)
-          : new RegExp(/.*/);
-
-      if (!formatRegex.test(value)) {
-        throw new Error(
-          `Value ${value} does not match the number format - ${parsedFieldMeta.numberFormat}`,
-        );
-      }
+    if (errors.length > 0) {
+      throw new Error(errors.join(', '));
     }
   }
 

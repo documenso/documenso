@@ -16,6 +16,8 @@ import { prisma } from '@documenso/prisma';
 import type { Field } from '@documenso/prisma/client';
 import { FieldType, SendStatus, SigningStatus } from '@documenso/prisma/client';
 
+import { validateNumberField } from '../../advanced-fields-validation/validate-number';
+
 export interface SetFieldsForDocumentOptions {
   userId: number;
   documentId: number;
@@ -131,43 +133,13 @@ export const setFieldsForDocument = async ({
 
         if (field.type === FieldType.NUMBER && field.fieldMeta) {
           const numberFieldParsedMeta = ZNumberFieldMeta.parse(field.fieldMeta);
+          const errors = validateNumberField(
+            String(numberFieldParsedMeta.value),
+            numberFieldParsedMeta,
+          );
 
-          if (numberFieldParsedMeta.value && isNaN(numberFieldParsedMeta.value)) {
-            throw new Error('Invalid number entered');
-          }
-
-          if (
-            numberFieldParsedMeta.minValue &&
-            numberFieldParsedMeta.minValue > 0 &&
-            numberFieldParsedMeta.value &&
-            numberFieldParsedMeta.value < numberFieldParsedMeta.minValue
-          ) {
-            throw new Error('Entered number is less than minimum value');
-          }
-
-          if (
-            numberFieldParsedMeta.maxValue &&
-            numberFieldParsedMeta.maxValue > 0 &&
-            numberFieldParsedMeta.value &&
-            numberFieldParsedMeta.value > numberFieldParsedMeta.maxValue
-          ) {
-            throw new Error('Entered number is greater than maximum value');
-          }
-
-          if (
-            numberFieldParsedMeta.minValue &&
-            numberFieldParsedMeta.maxValue &&
-            numberFieldParsedMeta.minValue > numberFieldParsedMeta.maxValue
-          ) {
-            throw new Error('Minimum value cannot be greater than maximum value');
-          }
-
-          if (
-            numberFieldParsedMeta.maxValue &&
-            numberFieldParsedMeta.minValue &&
-            numberFieldParsedMeta.maxValue < numberFieldParsedMeta.minValue
-          ) {
-            throw new Error('Maximum value cannot be less than minimum value');
+          if (errors.length > 0) {
+            throw new Error(errors.join(', '));
           }
         }
 

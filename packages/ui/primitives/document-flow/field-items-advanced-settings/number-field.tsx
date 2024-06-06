@@ -4,6 +4,7 @@ import { useState } from 'react';
 
 import { ChevronDown, ChevronUp } from 'lucide-react';
 
+import { validateNumberField } from '@documenso/lib/advanced-fields-validation/validate-number';
 import { type TNumberFieldMeta as NumberFieldMeta } from '@documenso/lib/types/field-field-meta';
 import { Button } from '@documenso/ui/primitives/button';
 import { Input } from '@documenso/ui/primitives/input';
@@ -32,50 +33,21 @@ export const NumberFieldAdvancedSettings = ({
 }: NumberFieldAdvancedSettingsProps) => {
   const [showValidation, setShowValidation] = useState(false);
 
-  const validateValue = (
-    value: number,
-    minNumber: number,
-    maxNumber: number,
-    readOnly: boolean,
-    required: boolean,
-  ) => {
-    const errors = [];
-
-    if (minNumber > 0 && value < minNumber) {
-      errors.push(`Value ${value} is less than the min value ${minNumber}`);
-    }
-
-    if (maxNumber > 0 && value > maxNumber) {
-      errors.push(`Value ${value} is greater than the max value ${maxNumber}`);
-    }
-
-    if (minNumber > maxNumber) {
-      errors.push('Min value cannot be greater than max value');
-    }
-
-    if (maxNumber < minNumber) {
-      errors.push('Max value cannot be less than min value');
-    }
-
-    if (readOnly && value < 1) {
-      errors.push('A read only field must have a value greater than 0');
-    }
-
-    if (readOnly && required) {
-      errors.push('A field cannot be both read only and required');
-    }
-
-    return errors;
-  };
-
   const handleInput = (field: keyof NumberFieldMeta, value: string | boolean) => {
     const userValue = field === 'value' ? Number(value) : Number(fieldState.value || 0);
     const userMinValue = field === 'minValue' ? Number(value) : Number(fieldState.minValue || 0);
     const userMaxValue = field === 'maxValue' ? Number(value) : Number(fieldState.maxValue || 0);
     const readOnly = field === 'readOnly' ? Boolean(value) : Boolean(fieldState.readOnly);
     const required = field === 'required' ? Boolean(value) : Boolean(fieldState.required);
+    const numberFormat = field === 'numberFormat' ? String(value) : fieldState.numberFormat || '';
 
-    const valueErrors = validateValue(userValue, userMinValue, userMaxValue, readOnly, required);
+    const valueErrors = validateNumberField(String(userValue), {
+      minValue: userMinValue,
+      maxValue: userMaxValue,
+      readOnly,
+      required,
+      numberFormat,
+    });
     handleErrors(valueErrors);
 
     handleFieldChange(field, value);
