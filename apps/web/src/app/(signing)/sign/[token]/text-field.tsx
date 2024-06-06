@@ -75,16 +75,16 @@ export const TextField = ({ field, recipient, onSignField, onUnsignField }: Text
     isLoading: isRemoveSignedFieldWithTokenLoading,
   } = trpc.field.removeSignedFieldWithToken.useMutation(DO_NOT_INVALIDATE_QUERY_ON_MUTATION);
 
-  const parsedFieldMeta = ZTextFieldMeta.parse(field.fieldMeta);
+  const parsedFieldMeta = field.fieldMeta ? ZTextFieldMeta.parse(field.fieldMeta) : null;
 
   const isLoading = isSignFieldWithTokenLoading || isRemoveSignedFieldWithTokenLoading || isPending;
 
   const [showCustomTextModal, setShowCustomTextModal] = useState(false);
-  const [localText, setLocalCustomText] = useState(parsedFieldMeta.text ?? '');
+  const [localText, setLocalCustomText] = useState(parsedFieldMeta?.text ?? '');
 
   useEffect(() => {
     if (!showCustomTextModal) {
-      setLocalCustomText(parsedFieldMeta.text ?? '');
+      setLocalCustomText(parsedFieldMeta?.text ?? '');
       setErrors(initialErrors);
     }
   }, [showCustomTextModal]);
@@ -93,19 +93,23 @@ export const TextField = ({ field, recipient, onSignField, onUnsignField }: Text
     const text = e.target.value;
     setLocalCustomText(text);
 
-    const validationErrors = validateText(text, parsedFieldMeta);
-    setErrors(validationErrors);
+    if (parsedFieldMeta) {
+      const validationErrors = validateText(text, parsedFieldMeta);
+      setErrors(validationErrors);
+    }
   };
 
   /**
    * When the user clicks the sign button in the dialog where they enter the text field.
    */
   const onDialogSignClick = () => {
-    const validationErrors = validateText(localText, parsedFieldMeta);
+    if (parsedFieldMeta) {
+      const validationErrors = validateText(localText, parsedFieldMeta);
 
-    if (validationErrors.required.length > 0 || validationErrors.characterLimit.length > 0) {
-      setErrors(validationErrors);
-      return;
+      if (validationErrors.required.length > 0 || validationErrors.characterLimit.length > 0) {
+        setErrors(validationErrors);
+        return;
+      }
     }
 
     setShowCustomTextModal(false);
@@ -119,7 +123,7 @@ export const TextField = ({ field, recipient, onSignField, onUnsignField }: Text
   const onPreSign = () => {
     setShowCustomTextModal(true);
 
-    if (localText) {
+    if (localText && parsedFieldMeta) {
       const validationErrors = validateText(localText, parsedFieldMeta);
       setErrors(validationErrors);
     }
@@ -182,7 +186,7 @@ export const TextField = ({ field, recipient, onSignField, onUnsignField }: Text
 
       await removeSignedFieldWithToken(payload);
 
-      setLocalCustomText(parsedFieldMeta.text ?? '');
+      setLocalCustomText(parsedFieldMeta?.text ?? '');
 
       startTransition(() => router.refresh());
     } catch (err) {
@@ -197,7 +201,7 @@ export const TextField = ({ field, recipient, onSignField, onUnsignField }: Text
   };
 
   useEffect(() => {
-    if (!field.inserted && parsedFieldMeta.text && localText) {
+    if (!field.inserted && parsedFieldMeta?.text && localText) {
       void executeActionAuthProcedure({
         onReauthFormSubmit: async (authOptions) => await onSign(authOptions),
         actionTarget: field.type,
@@ -205,24 +209,24 @@ export const TextField = ({ field, recipient, onSignField, onUnsignField }: Text
     }
   }, []);
 
-  const parsedField = ZTextFieldMeta.parse(field.fieldMeta);
+  const parsedField = field.fieldMeta ? ZTextFieldMeta.parse(field.fieldMeta) : undefined;
 
   const labelDisplay =
     parsedField?.label && parsedField.label.length < 20
       ? parsedField.label
-      : parsedField.label
-      ? parsedField.label.substring(0, 20) + '...'
+      : parsedField?.label
+      ? parsedField?.label.substring(0, 20) + '...'
       : undefined;
 
   const textDisplay =
     parsedField?.text && parsedField.text.length < 20
       ? parsedField.text
-      : parsedField.text
-      ? parsedField.text.substring(0, 20) + '...'
+      : parsedField?.text
+      ? parsedField?.text.substring(0, 20) + '...'
       : undefined;
 
   const fieldDisplayName = labelDisplay ? labelDisplay : textDisplay ? textDisplay : 'Add text';
-  const charactersRemaining = (parsedFieldMeta.characterLimit ?? 0) - (localText.length ?? 0);
+  const charactersRemaining = (parsedFieldMeta?.characterLimit ?? 0) - (localText.length ?? 0);
 
   return (
     <SigningFieldContainer
@@ -243,8 +247,8 @@ export const TextField = ({ field, recipient, onSignField, onUnsignField }: Text
           className={cn(
             'group-hover:text-primary text-muted-foreground flex flex-col items-center justify-center duration-200',
             {
-              'group-hover:text-yellow-300': !field.inserted && !parsedFieldMeta.required,
-              'group-hover:text-red-300': !field.inserted && parsedFieldMeta.required,
+              'group-hover:text-yellow-300': !field.inserted && !parsedFieldMeta?.required,
+              'group-hover:text-red-300': !field.inserted && parsedFieldMeta?.required,
             },
           )}
         >
@@ -265,12 +269,12 @@ export const TextField = ({ field, recipient, onSignField, onUnsignField }: Text
 
       <Dialog open={showCustomTextModal} onOpenChange={setShowCustomTextModal}>
         <DialogContent>
-          <DialogTitle>{parsedFieldMeta.label ? parsedFieldMeta.label : 'Add Text'}</DialogTitle>
+          <DialogTitle>{parsedFieldMeta?.label ? parsedFieldMeta?.label : 'Add Text'}</DialogTitle>
 
           <div>
             <Textarea
               id="custom-text"
-              placeholder={parsedFieldMeta.placeholder ?? 'Enter your text here'}
+              placeholder={parsedFieldMeta?.placeholder ?? 'Enter your text here'}
               className={cn('mt-2 w-full rounded-md', {
                 'border-2 border-red-300 ring-2 ring-red-200 ring-offset-2 ring-offset-red-200 focus-visible:border-red-400 focus-visible:ring-4 focus-visible:ring-red-200 focus-visible:ring-offset-2 focus-visible:ring-offset-red-200':
                   userInputHasErrors,
@@ -280,7 +284,7 @@ export const TextField = ({ field, recipient, onSignField, onUnsignField }: Text
             />
           </div>
 
-          {parsedFieldMeta.characterLimit && !userInputHasErrors && (
+          {parsedFieldMeta?.characterLimit && !userInputHasErrors && (
             <div className="text-muted-foreground text-sm">
               {charactersRemaining} characters remaining
             </div>

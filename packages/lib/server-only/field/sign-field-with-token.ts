@@ -94,7 +94,7 @@ export const signFieldWithToken = async ({
     throw new Error(`Field ${fieldId} has no recipientId`);
   }
 
-  if (field.type === FieldType.NUMBER) {
+  if (field.type === FieldType.NUMBER && field.fieldMeta) {
     const parsedFieldMeta = ZNumberFieldMeta.parse(field.fieldMeta);
     const numericRegex = /^[\d,.]+$/;
     const isNumeric = numericRegex.test(value);
@@ -135,7 +135,7 @@ export const signFieldWithToken = async ({
     }
   }
 
-  if (field.type === FieldType.TEXT) {
+  if (field.type === FieldType.TEXT && field.fieldMeta) {
     const parsedFieldMeta = ZTextFieldMeta.parse(field.fieldMeta);
 
     if (parsedFieldMeta.required && !value) {
@@ -149,7 +149,7 @@ export const signFieldWithToken = async ({
     }
   }
 
-  if (field.type === FieldType.RADIO) {
+  if (field.type === FieldType.RADIO && field.fieldMeta) {
     const parsedFieldMeta = ZRadioFieldMeta.parse(field.fieldMeta);
 
     if (parsedFieldMeta.required && !value) {
@@ -157,7 +157,7 @@ export const signFieldWithToken = async ({
     }
   }
 
-  if (field.type === FieldType.CHECKBOX) {
+  if (field.type === FieldType.CHECKBOX && field.fieldMeta) {
     const parsedFieldMeta = ZCheckboxFieldMeta.parse(field.fieldMeta);
     const checkboxFieldValues = value.split(',');
     const checkboxValidationRule = parsedFieldMeta.validationRule;

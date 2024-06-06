@@ -111,13 +111,15 @@ export const setFieldsForDocument = async ({
       linkedFields.map(async (field) => {
         const fieldSignerEmail = field.signerEmail.toLowerCase();
 
-        const parsedFieldMeta = ZFieldMetaSchema.parse(field.fieldMeta);
+        const parsedFieldMeta = field.fieldMeta
+          ? ZFieldMetaSchema.parse(field.fieldMeta)
+          : undefined;
 
         if (parsedFieldMeta?.readOnly === true && parsedFieldMeta?.required === true) {
           throw new Error('Field cannot be both read-only and required');
         }
 
-        if (field.type === FieldType.TEXT) {
+        if (field.type === FieldType.TEXT && field.fieldMeta) {
           const textFieldParsedMeta = ZTextFieldMeta.parse(field.fieldMeta);
 
           if (
@@ -130,7 +132,7 @@ export const setFieldsForDocument = async ({
           }
         }
 
-        if (field.type === FieldType.NUMBER) {
+        if (field.type === FieldType.NUMBER && field.fieldMeta) {
           const numberFieldParsedMeta = ZNumberFieldMeta.parse(field.fieldMeta);
 
           if (numberFieldParsedMeta.value && isNaN(numberFieldParsedMeta.value)) {
@@ -172,7 +174,7 @@ export const setFieldsForDocument = async ({
           }
         }
 
-        if (field.type === FieldType.RADIO) {
+        if (field.type === FieldType.RADIO && field.fieldMeta) {
           const radioFieldParsedMeta = ZRadioFieldMeta.parse(field.fieldMeta);
           const checkedRadioFieldValues =
             radioFieldParsedMeta.values &&

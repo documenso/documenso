@@ -116,35 +116,35 @@ export const SigningPageView = ({
             .with(FieldType.TEXT, () => {
               const fieldWithMeta: FieldWithSignatureAndFieldMeta = {
                 ...field,
-                fieldMeta: ZTextFieldMeta.parse(field.fieldMeta),
+                fieldMeta: field.fieldMeta ? ZTextFieldMeta.parse(field.fieldMeta) : null,
               };
               return <TextField key={field.id} field={fieldWithMeta} recipient={recipient} />;
             })
             .with(FieldType.NUMBER, () => {
               const fieldWithMeta: FieldWithSignatureAndFieldMeta = {
                 ...field,
-                fieldMeta: ZNumberFieldMeta.parse(field.fieldMeta),
+                fieldMeta: field.fieldMeta ? ZNumberFieldMeta.parse(field.fieldMeta) : null,
               };
               return <NumberField key={field.id} field={fieldWithMeta} recipient={recipient} />;
             })
             .with(FieldType.RADIO, () => {
               const fieldWithMeta: FieldWithSignatureAndFieldMeta = {
                 ...field,
-                fieldMeta: ZRadioFieldMeta.parse(field.fieldMeta),
+                fieldMeta: field.fieldMeta ? ZRadioFieldMeta.parse(field.fieldMeta) : null,
               };
               return <RadioField key={field.id} field={fieldWithMeta} recipient={recipient} />;
             })
             .with(FieldType.CHECKBOX, () => {
               const fieldWithMeta: FieldWithSignatureAndFieldMeta = {
                 ...field,
-                fieldMeta: ZCheckboxFieldMeta.parse(field.fieldMeta),
+                fieldMeta: field.fieldMeta ? ZCheckboxFieldMeta.parse(field.fieldMeta) : null,
               };
               return <CheckboxField key={field.id} field={fieldWithMeta} recipient={recipient} />;
             })
             .with(FieldType.DROPDOWN, () => {
               const fieldWithMeta: FieldWithSignatureAndFieldMeta = {
                 ...field,
-                fieldMeta: ZDropdownFieldMeta.parse(field.fieldMeta),
+                fieldMeta: field.fieldMeta ? ZDropdownFieldMeta.parse(field.fieldMeta) : null,
               };
               return <DropdownField key={field.id} field={fieldWithMeta} recipient={recipient} />;
             })
