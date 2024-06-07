@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from 'react';
 
 import { ChevronDown, ChevronUp, Trash } from 'lucide-react';
 
+import { validateDropdownField } from '@documenso/lib/advanced-fields-validation/validate-dropdown';
 import { type TDropdownFieldMeta as DropdownFieldMeta } from '@documenso/lib/types/field-field-meta';
 import { Button } from '@documenso/ui/primitives/button';
 import { Input } from '@documenso/ui/primitives/input';
@@ -43,26 +44,9 @@ export const DropdownFieldAdvancedSettings = ({
   const [readOnly, setReadOnly] = useState(fieldState.readOnly ?? false);
   const [required, setRequired] = useState(fieldState.required ?? false);
 
-  const validateReadOnlyAndRequired = (
-    readOnly: boolean,
-    required: boolean,
-    values: { value: string }[],
-  ) => {
-    const errors = [];
-
-    if (readOnly && required) {
-      errors.push('A field cannot be both read only and required');
-    }
-
-    if (readOnly && values.length === 0) {
-      errors.push('A read only field must have at least one value');
-    }
-
-    return errors;
-  };
-
   const addValue = () => {
     setValues([...values, { value: 'New option' }]);
+    handleFieldChange('values', [...values, { value: 'New option' }]);
   };
 
   const removeValue = (index: number) => {
@@ -80,14 +64,14 @@ export const DropdownFieldAdvancedSettings = ({
     setReadOnly(readOnly);
     setRequired(required);
 
-    const errors = validateReadOnlyAndRequired(readOnly, required, values);
+    const errors = validateDropdownField(undefined, { readOnly, required, values });
     handleErrors(errors);
 
     handleFieldChange(field, value);
   };
 
   useEffect(() => {
-    const errors = validateReadOnlyAndRequired(readOnly, required, values);
+    const errors = validateDropdownField(undefined, { readOnly, required, values });
     handleErrors(errors);
   }, [values]);
 

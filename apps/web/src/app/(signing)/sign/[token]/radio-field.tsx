@@ -56,6 +56,10 @@ export const RadioField = ({ field, recipient, onSignField, onUnsignField }: Rad
   } = trpc.field.removeSignedFieldWithToken.useMutation(DO_NOT_INVALIDATE_QUERY_ON_MUTATION);
 
   const isLoading = isSignFieldWithTokenLoading || isRemoveSignedFieldWithTokenLoading || isPending;
+  const shouldAutoSignField =
+    (!field.inserted && optionSelected) ||
+    (!field.inserted && defaultValue) ||
+    (!field.inserted && parsedFieldMeta.readOnly && defaultValue);
 
   const onSign = async (authOptions?: TRecipientActionAuth) => {
     try {
@@ -133,10 +137,7 @@ export const RadioField = ({ field, recipient, onSignField, onUnsignField }: Rad
   };
 
   useEffect(() => {
-    if (
-      (!field.inserted && optionSelected) ||
-      (!field.inserted && parsedFieldMeta.readOnly && defaultValue)
-    ) {
+    if (shouldAutoSignField) {
       void executeActionAuthProcedure({
         onReauthFormSubmit: async (authOptions) => await onSign(authOptions),
         actionTarget: field.type,

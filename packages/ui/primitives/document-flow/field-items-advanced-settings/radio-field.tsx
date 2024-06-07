@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 
 import { ChevronDown, ChevronUp, Trash } from 'lucide-react';
 
+import { validateRadioField } from '@documenso/lib/advanced-fields-validation/validate-radio';
 import { type TRadioFieldMeta as RadioFieldMeta } from '@documenso/lib/types/field-field-meta';
 import { Button } from '@documenso/ui/primitives/button';
 import { Checkbox } from '@documenso/ui/primitives/checkbox';
@@ -31,24 +32,6 @@ export const RadioFieldAdvancedSettings = ({
   );
   const [readOnly, setReadOnly] = useState(fieldState.readOnly ?? false);
   const [required, setRequired] = useState(fieldState.required ?? false);
-
-  const validateReadOnlyAndRequired = (
-    readOnly: boolean,
-    required: boolean,
-    values: { checked: boolean; value: string }[],
-  ) => {
-    const errors = [];
-
-    if (readOnly && required) {
-      errors.push('A field cannot be both read only and required');
-    }
-
-    if (readOnly && values.length === 0) {
-      errors.push('A read only field must have at least one value');
-    }
-
-    return errors;
-  };
 
   const addValue = () => {
     setValues([...values, { checked: false, value: '' }]);
@@ -83,7 +66,7 @@ export const RadioFieldAdvancedSettings = ({
     setReadOnly(readOnly);
     setRequired(required);
 
-    const errors = validateReadOnlyAndRequired(readOnly, required, values);
+    const errors = validateRadioField(String(value), { readOnly, required, values });
     handleErrors(errors);
 
     handleFieldChange(field, value);
@@ -103,7 +86,7 @@ export const RadioFieldAdvancedSettings = ({
   }, [fieldState.values]);
 
   useEffect(() => {
-    const errors = validateReadOnlyAndRequired(readOnly, required, values);
+    const errors = validateRadioField(undefined, { readOnly, required, values });
     handleErrors(errors);
   }, [values]);
 

@@ -1,7 +1,12 @@
+import { validateCheckboxField } from '@documenso/lib/advanced-fields-validation/validate-checkbox';
+import { validateDropdownField } from '@documenso/lib/advanced-fields-validation/validate-dropdown';
+import { validateRadioField } from '@documenso/lib/advanced-fields-validation/validate-radio';
 import { validateTextField } from '@documenso/lib/advanced-fields-validation/validate-text';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
 import {
   type TFieldMetaSchema as FieldMeta,
+  ZCheckboxFieldMeta,
+  ZDropdownFieldMeta,
   ZFieldMetaSchema,
   ZNumberFieldMeta,
   ZRadioFieldMeta,
@@ -143,18 +148,37 @@ export const setFieldsForDocument = async ({
           }
         }
 
+        if (field.type === FieldType.CHECKBOX && field.fieldMeta) {
+          const checkboxFieldParsedMeta = ZCheckboxFieldMeta.parse(field.fieldMeta);
+          const errors = validateCheckboxField(
+            checkboxFieldParsedMeta?.values?.map((item) => item.value) ?? [],
+            checkboxFieldParsedMeta,
+          );
+
+          if (errors.length > 0) {
+            throw new Error(errors.join(', '));
+          }
+        }
+
         if (field.type === FieldType.RADIO && field.fieldMeta) {
           const radioFieldParsedMeta = ZRadioFieldMeta.parse(field.fieldMeta);
-          const checkedRadioFieldValues =
-            radioFieldParsedMeta.values &&
-            radioFieldParsedMeta.values.filter((value) => value.checked === true);
+          const checkedRadioFieldValue = radioFieldParsedMeta.values?.find(
+            (option) => option.checked,
+          )?.value;
 
-          if (!radioFieldParsedMeta.values || radioFieldParsedMeta.values.length === 0) {
-            throw new Error('Radio field must have at least one option');
+          const errors = validateRadioField(checkedRadioFieldValue, radioFieldParsedMeta);
+
+          if (errors.length > 0) {
+            throw new Error(errors.join('. '));
           }
+        }
 
-          if (checkedRadioFieldValues && checkedRadioFieldValues.length > 1) {
-            throw new Error('There cannnot be more than one checked option');
+        if (field.type === FieldType.DROPDOWN && field.fieldMeta) {
+          const dropdownFieldParsedMeta = ZDropdownFieldMeta.parse(field.fieldMeta);
+          const errors = validateDropdownField(undefined, dropdownFieldParsedMeta);
+
+          if (errors.length > 0) {
+            throw new Error(errors.join('. '));
           }
         }
 

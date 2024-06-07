@@ -4,10 +4,10 @@ import { useEffect, useState } from 'react';
 
 import { ChevronDown, ChevronUp, Trash } from 'lucide-react';
 
+import { validateCheckboxField } from '@documenso/lib/advanced-fields-validation/validate-checkbox';
 import { type TCheckboxFieldMeta as CheckboxFieldMeta } from '@documenso/lib/types/field-field-meta';
 import { Button } from '@documenso/ui/primitives/button';
 import { Checkbox } from '@documenso/ui/primitives/checkbox';
-import { checkboxValidationSigns } from '@documenso/ui/primitives/document-flow/field-items-advanced-settings/constants';
 import { Input } from '@documenso/ui/primitives/input';
 import { Label } from '@documenso/ui/primitives/label';
 import {
@@ -42,35 +42,6 @@ export const CheckboxFieldAdvancedSettings = ({
   const [validationLength, setValidationLength] = useState(fieldState.validationLength ?? 0);
   const [validationRule, setValidationRule] = useState(fieldState.validationRule ?? '');
 
-  const validateReadOnlyAndRequired = (
-    readOnly: boolean,
-    required: boolean,
-    validationRule: string,
-    validationLength: number,
-    values: { checked: boolean; value: string }[],
-  ) => {
-    const errors = [];
-    const validation = checkboxValidationSigns.find((sign) => sign.label === validationRule);
-    const lengthCondition =
-      (validation?.value === '>=' && values.length < validationLength) ||
-      (validation?.value === '=' && values.length !== validationLength) ||
-      (validation?.value === '<=' && values.length > validationLength);
-
-    if (readOnly && required) {
-      errors.push('A field cannot be both read only and required');
-    }
-
-    if (readOnly && values.length === 0) {
-      errors.push('A read only field must have at least one value');
-    }
-
-    if (lengthCondition) {
-      errors.push(`You need to ${validationRule.toLowerCase()} ${validationLength} options`);
-    }
-
-    return errors;
-  };
-
   const handleToggleChange = (field: keyof CheckboxFieldMeta, value: string | boolean) => {
     const readOnly = field === 'readOnly' ? Boolean(value) : Boolean(fieldState.readOnly);
     const required = field === 'required' ? Boolean(value) : Boolean(fieldState.required);
@@ -84,12 +55,14 @@ export const CheckboxFieldAdvancedSettings = ({
     setValidationRule(validationRule);
     setValidationLength(validationLength);
 
-    const errors = validateReadOnlyAndRequired(
-      readOnly,
-      required,
-      validationRule,
-      validationLength,
-      values,
+    const errors = validateCheckboxField(
+      values.map((item) => item.value),
+      {
+        readOnly,
+        required,
+        validationRule,
+        validationLength,
+      },
     );
     handleErrors(errors);
 
@@ -101,12 +74,14 @@ export const CheckboxFieldAdvancedSettings = ({
   };
 
   useEffect(() => {
-    const errors = validateReadOnlyAndRequired(
-      readOnly,
-      required,
-      validationRule,
-      validationLength,
-      values,
+    const errors = validateCheckboxField(
+      values.map((item) => item.value),
+      {
+        readOnly,
+        required,
+        validationRule,
+        validationLength,
+      },
     );
     handleErrors(errors);
     handleFieldChange('values', values);
