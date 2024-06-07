@@ -12,7 +12,7 @@ import { Input } from '@documenso/ui/primitives/input';
 import { Label } from '@documenso/ui/primitives/label';
 import { Switch } from '@documenso/ui/primitives/switch';
 
-type RadioFieldAdvancedSettingsProps = {
+export type RadioFieldAdvancedSettingsProps = {
   fieldState: RadioFieldMeta;
   handleFieldChange: (
     key: keyof RadioFieldMeta,
@@ -138,9 +138,7 @@ export const RadioFieldAdvancedSettings = ({
               <button
                 type="button"
                 className="col-span-1 mt-auto inline-flex h-10 w-10 items-center text-slate-500 hover:opacity-80 disabled:cursor-not-allowed disabled:opacity-50 dark:text-white"
-                onClick={() => {
-                  removeValue(index);
-                }}
+                onClick={() => removeValue(index)}
               >
                 <Trash className="h-5 w-5" />
               </button>

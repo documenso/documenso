@@ -87,11 +87,6 @@ export const CheckboxFieldAdvancedSettings = ({
     handleFieldChange('values', values);
   }, [values]);
 
-  // This might look redundant but the values are not updated when the fieldState is updated withouth this useEffect
-  useEffect(() => {
-    setValues(fieldState.values ?? [{ checked: false, value: '' }]);
-  }, [fieldState.values]);
-
   const removeValue = (index: number) => {
     if (values.length === 1) return;
 
@@ -100,6 +95,27 @@ export const CheckboxFieldAdvancedSettings = ({
     setValues(newValues);
     handleFieldChange('values', newValues);
   };
+
+  const handleCheckboxValue = (
+    index: number,
+    property: 'value' | 'checked',
+    newValue: string | boolean,
+  ) => {
+    const newValues = [...values];
+
+    if (property === 'checked') {
+      newValues[index].checked = Boolean(newValue);
+    } else if (property === 'value') {
+      newValues[index].value = String(newValue);
+    }
+
+    setValues(newValues);
+    handleFieldChange('values', newValues);
+  };
+
+  useEffect(() => {
+    setValues(fieldState.values ?? [{ checked: false, value: '' }]);
+  }, [fieldState.values]);
 
   return (
     <div className="flex flex-col gap-4">
@@ -177,29 +193,17 @@ export const CheckboxFieldAdvancedSettings = ({
                 className="data-[state=checked]:bg-documenso border-foreground/30 h-5 w-5"
                 checkClassName="text-white"
                 checked={value.checked}
-                onCheckedChange={(checked) => {
-                  const newValues = [...values];
-                  newValues[index].checked = Boolean(checked);
-                  setValues(newValues);
-                  handleFieldChange('values', newValues);
-                }}
+                onCheckedChange={(checked) => handleCheckboxValue(index, 'checked', checked)}
               />
               <Input
                 className="w-1/2"
                 value={value.value}
-                onChange={(e) => {
-                  const newValues = [...values];
-                  newValues[index].value = e.target.value;
-                  setValues(newValues);
-                  handleFieldChange('values', newValues);
-                }}
+                onChange={(e) => handleCheckboxValue(index, 'value', e.target.value)}
               />
               <button
                 type="button"
                 className="col-span-1 mt-auto inline-flex h-10 w-10 items-center  text-slate-500 hover:opacity-80 disabled:cursor-not-allowed disabled:opacity-50"
-                onClick={() => {
-                  removeValue(index);
-                }}
+                onClick={() => removeValue(index)}
               >
                 <Trash className="h-5 w-5" />
               </button>

@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { ChevronDown, ChevronUp, Trash } from 'lucide-react';
 
@@ -32,15 +32,8 @@ export const DropdownFieldAdvancedSettings = ({
   handleFieldChange,
   handleErrors,
 }: DropdownFieldAdvancedSettingsProps) => {
-  // Weird type check to handle the case where the values are not an array of objects
-  const fieldStateValues: { value: string }[] = useMemo(() => {
-    return Array.isArray(fieldState.values)
-      ? fieldState.values.map((value) => (typeof value === 'string' ? { value } : value))
-      : [{ value: 'Option 1' }];
-  }, [fieldState.values]);
-
   const [showValidation, setShowValidation] = useState(false);
-  const [values, setValues] = useState(fieldStateValues);
+  const [values, setValues] = useState(fieldState.values ?? [{ value: 'Option 1' }]);
   const [readOnly, setReadOnly] = useState(fieldState.readOnly ?? false);
   const [required, setRequired] = useState(fieldState.required ?? false);
 
@@ -70,14 +63,21 @@ export const DropdownFieldAdvancedSettings = ({
     handleFieldChange(field, value);
   };
 
+  const handleValueChange = (index: number, newValue: string) => {
+    const updatedValues = [...values];
+    updatedValues[index].value = newValue;
+    setValues(updatedValues);
+    handleFieldChange('values', updatedValues);
+  };
+
   useEffect(() => {
     const errors = validateDropdownField(undefined, { readOnly, required, values });
     handleErrors(errors);
   }, [values]);
 
   useEffect(() => {
-    setValues(fieldStateValues);
-  }, [fieldStateValues]);
+    setValues(fieldState.values ?? [{ value: 'Option 1' }]);
+  }, [fieldState.values]);
 
   return (
     <div className="flex flex-col gap-4">
@@ -92,7 +92,7 @@ export const DropdownFieldAdvancedSettings = ({
           </SelectTrigger>
           <SelectContent position="popper">
             {values.map((item, index) => (
-              <SelectItem key={index} value={item.value}>
+              <SelectItem key={index} value={String(index)}>
                 {item.value}
               </SelectItem>
             ))}
@@ -135,19 +135,12 @@ export const DropdownFieldAdvancedSettings = ({
               <Input
                 className="w-1/2"
                 value={value.value}
-                onChange={(e) => {
-                  const newValues = [...values];
-                  newValues[index].value = e.target.value;
-                  setValues(newValues);
-                  handleFieldChange('values', newValues);
-                }}
+                onChange={(e) => handleValueChange(index, e.target.value)}
               />
               <button
                 type="button"
                 className="col-span-1 mt-auto inline-flex h-10 w-10 items-center  text-slate-500 hover:opacity-80 disabled:cursor-not-allowed disabled:opacity-50"
-                onClick={() => {
-                  removeValue(index);
-                }}
+                onClick={() => removeValue(index)}
               >
                 <Trash className="h-5 w-5" />
               </button>

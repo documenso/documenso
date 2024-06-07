@@ -12,8 +12,6 @@ export const validateDropdownField = (
 ): string[] => {
   const errors = [];
 
-  console.log('validateDropdownField value', value);
-
   const { readOnly, required, values, defaultValue } = fieldMeta;
 
   if (readOnly && required) {
@@ -42,6 +40,14 @@ export const validateDropdownField = (
 
   if (values && defaultValue && !values.find((item) => item.value === defaultValue)) {
     errors.push('Default value must be one of the available options');
+  }
+
+  if (values && values.some((item) => item.value.length < 1)) {
+    errors.push('Option value cannot be empty');
+  }
+
+  if (values && new Set(values.map((item) => item.value)).size !== values.length) {
+    errors.push('Duplicate values are not allowed');
   }
 
   return errors;
