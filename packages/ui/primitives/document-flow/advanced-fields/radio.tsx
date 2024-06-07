@@ -21,6 +21,12 @@ export const RadioField = ({ field }: RadioFieldProps) => {
     parsedFieldMeta = ZRadioFieldMeta.parse(field.fieldMeta);
   }
 
+  if (parsedFieldMeta && (!parsedFieldMeta.values || parsedFieldMeta.values.length === 0)) {
+    return (
+      <FieldIcon fieldMeta={field.fieldMeta} type={field.type} signerEmail={field.signerEmail} />
+    );
+  }
+
   return (
     <div>
       {!parsedFieldMeta?.values ? (

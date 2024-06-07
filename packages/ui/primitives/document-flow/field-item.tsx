@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { Caveat } from 'next/font/google';
 
@@ -8,6 +8,7 @@ import { Settings2, Trash } from 'lucide-react';
 import { createPortal } from 'react-dom';
 import { Rnd } from 'react-rnd';
 
+import { useFieldItemStyles } from '@documenso/lib/client-only/hooks/use-field-item-styles';
 import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
 
 import { cn } from '../../lib/utils';
@@ -162,32 +163,9 @@ export const FieldItem = ({
   const [settingsActive, setSettingsActive] = useState(false);
   const cardRef = useRef(null);
 
-  const selectedSignerStyles = useMemo(() => {
-    if (!color) {
-      return null;
-    }
-
-    const selectedColorVariant = combinedStyles[color];
-
-    return {
-      activeBorderClass: selectedColorVariant?.borderActive,
-      borderClass: selectedColorVariant?.border,
-      initialsBGClass: selectedColorVariant?.initialsBG,
-      fieldBackground: selectedColorVariant?.fieldBackground,
-    };
-  }, [color]);
-
-  const {
-    borderClass: selectedSignerBorderClass,
-    activeBorderClass: selectedSignerActiveBorderClass,
-    initialsBGClass: selectedSignerInitialsBGClass,
-    fieldBackground: selectedSignerFieldBackground,
-  } = selectedSignerStyles || {
-    borderClass: 'border-field-card-border',
-    activeBorderClass: 'border-field-card-border/80',
-    initialsBGClass: 'text-field-card-foreground/50 bg-slate-900/10',
-    fieldBackground: 'bg-field-card-background',
-  };
+  const { borderClass, activeBorderClass, initialsBGClass, fieldBackground } = useFieldItemStyles(
+    color || 'gray-500',
+  );
 
   const advancedField = ['NUMBER', 'RADIO', 'CHECKBOX', 'DROPDOWN', 'TEXT'].includes(field.type);
 
@@ -278,9 +256,9 @@ export const FieldItem = ({
       }}
     >
       <Card
-        className={cn('h-full w-full backdrop-blur-[1px]', selectedSignerFieldBackground, {
-          [selectedSignerBorderClass]: !disabled,
-          [selectedSignerActiveBorderClass]: active || settingsActive,
+        className={cn('h-full w-full backdrop-blur-[1px]', fieldBackground, {
+          [borderClass]: !disabled,
+          [activeBorderClass]: active || settingsActive,
         })}
         onClick={() => {
           setSettingsActive((prev) => !prev);
@@ -315,11 +293,12 @@ export const FieldItem = ({
               fontCaveatClassName={fontCaveat.className}
             />
           )}
+
           {!hideRecipients && (
             <p
               className={cn(
                 'absolute -right-9 z-20 hidden h-8 w-9 items-center justify-center rounded-r-xl font-semibold text-white group-hover:flex',
-                selectedSignerInitialsBGClass,
+                initialsBGClass,
                 {
                   'text-field-card-foreground/50 bg-slate-900/10': disabled || passive,
                 },

@@ -5,6 +5,8 @@ import { forwardRef, useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import { usePathname } from 'next/navigation';
 
+import { match } from 'ts-pattern';
+
 import {
   type TBaseFieldMeta as BaseFieldMeta,
   type TCheckboxFieldMeta as CheckboxFieldMeta,
@@ -51,6 +53,59 @@ export type FieldMetaKeys =
   | keyof CheckboxFieldMeta
   | keyof DropdownFieldMeta;
 
+const getDefaultState = (fieldType: FieldType): FieldMeta => {
+  switch (fieldType) {
+    case FieldType.TEXT:
+      return {
+        type: 'text',
+        label: '',
+        placeholder: '',
+        text: '',
+        characterLimit: 0,
+        required: false,
+        readOnly: false,
+      };
+    case FieldType.NUMBER:
+      return {
+        type: 'number',
+        label: '',
+        placeholder: '',
+        numberFormat: '',
+        value: 0,
+        minValue: 0,
+        maxValue: 0,
+        required: false,
+        readOnly: false,
+      };
+    case FieldType.RADIO:
+      return {
+        type: 'radio',
+        values: [],
+        required: false,
+        readOnly: false,
+      };
+    case FieldType.CHECKBOX:
+      return {
+        type: 'checkbox',
+        values: [],
+        validationRule: '',
+        validationLength: 0,
+        required: false,
+        readOnly: false,
+      };
+    case FieldType.DROPDOWN:
+      return {
+        type: 'dropdown',
+        values: [],
+        defaultValue: '',
+        required: false,
+        readOnly: false,
+      };
+    default:
+      throw new Error(`Unsupported field type: ${fieldType}`);
+  }
+};
+
 export const FieldAdvancedSettings = forwardRef<HTMLDivElement, FieldAdvancedSettingsProps>(
   (
     { title, description, field, fields, onAdvancedSettings, isDocumentPdfLoaded = true, onSave },
@@ -63,59 +118,6 @@ export const FieldAdvancedSettings = forwardRef<HTMLDivElement, FieldAdvancedSet
     const isTemplatePage = pathname?.includes('template');
     const isDocumentPage = pathname?.includes('document');
     const [errors, setErrors] = useState<string[]>([]);
-
-    const getDefaultState = (fieldType: FieldType): FieldMeta => {
-      switch (fieldType) {
-        case FieldType.TEXT:
-          return {
-            type: 'text',
-            label: '',
-            placeholder: '',
-            text: '',
-            characterLimit: 0,
-            required: false,
-            readOnly: false,
-          };
-        case FieldType.NUMBER:
-          return {
-            type: 'number',
-            label: '',
-            placeholder: '',
-            numberFormat: '',
-            value: 0,
-            minValue: 0,
-            maxValue: 0,
-            required: false,
-            readOnly: false,
-          };
-        case FieldType.RADIO:
-          return {
-            type: 'radio',
-            values: [],
-            required: false,
-            readOnly: false,
-          };
-        case FieldType.CHECKBOX:
-          return {
-            type: 'checkbox',
-            values: [],
-            validationRule: '',
-            validationLength: 0,
-            required: false,
-            readOnly: false,
-          };
-        case FieldType.DROPDOWN:
-          return {
-            type: 'dropdown',
-            values: [],
-            defaultValue: '',
-            required: false,
-            readOnly: false,
-          };
-        default:
-          throw new Error(`Unsupported field type: ${fieldType}`);
-      }
-    };
 
     const { data: template } = trpc.template.getTemplateWithDetailsById.useQuery(
       {
@@ -148,7 +150,9 @@ export const FieldAdvancedSettings = forwardRef<HTMLDivElement, FieldAdvancedSet
       },
     );
 
-    const fieldMeta = fieldData?.fieldMeta;
+    const fieldMeta = fieldData?.fieldMeta
+      ? ZFieldMetaSchema.parse(fieldData.fieldMeta)
+      : undefined;
 
     const localStorageKey = `field_${field.formId}_${field.type}`;
 
@@ -161,11 +165,9 @@ export const FieldAdvancedSettings = forwardRef<HTMLDivElement, FieldAdvancedSet
 
     useEffect(() => {
       if (fieldMeta && typeof fieldMeta === 'object') {
-        const parsedFieldMeta = ZFieldMetaSchema.parse(fieldMeta);
-
         setFieldState({
           ...defaultState,
-          ...parsedFieldMeta,
+          ...fieldMeta,
         });
       }
     }, [fieldMeta]);
@@ -190,12 +192,6 @@ export const FieldAdvancedSettings = forwardRef<HTMLDivElement, FieldAdvancedSet
         }
       });
     };
-
-    const numberField = field.type === FieldType.NUMBER;
-    const checkBoxField = field.type === FieldType.CHECKBOX;
-    const radioField = field.type === FieldType.RADIO;
-    const textField = field.type === FieldType.TEXT;
-    const dropdownField = field.type === FieldType.DROPDOWN;
 
     const handleOnGoNextClick = () => {
       try {
@@ -229,108 +225,53 @@ export const FieldAdvancedSettings = forwardRef<HTMLDivElement, FieldAdvancedSet
               </span>
             ))}
 
-          {textField && (
-            <div>
+          {match(field.type)
+            .with(FieldType.TEXT, () => (
               <TextFieldAdvancedSettings
                 fieldState={fieldState}
                 handleFieldChange={handleFieldChange}
                 handleErrors={setErrors}
               />
-              {errors.length > 0 && (
-                <div className="mt-4">
-                  <ul>
-                    {errors.map((error, index) => (
-                      <li className="text-sm text-red-500" key={index}>
-                        {error}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-            </div>
-          )}
-
-          {numberField && (
-            <div>
+            ))
+            .with(FieldType.NUMBER, () => (
               <NumberFieldAdvancedSettings
                 fieldState={fieldState}
                 handleFieldChange={handleFieldChange}
                 handleErrors={setErrors}
               />
-              {errors.length > 0 && (
-                <div className="mt-4">
-                  <ul>
-                    {errors.map((error, index) => (
-                      <li className="text-sm text-red-500" key={index}>
-                        {error}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-            </div>
-          )}
-
-          {radioField && (
-            <div>
+            ))
+            .with(FieldType.RADIO, () => (
               <RadioFieldAdvancedSettings
                 fieldState={fieldState}
                 handleFieldChange={handleFieldChange}
                 handleErrors={setErrors}
               />
-              {errors.length > 0 && (
-                <div className="mt-4">
-                  <ul>
-                    {errors.map((error, index) => (
-                      <li className="text-sm text-red-500" key={index}>
-                        {error}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-            </div>
-          )}
-
-          {checkBoxField && (
-            <div>
+            ))
+            .with(FieldType.CHECKBOX, () => (
               <CheckboxFieldAdvancedSettings
                 fieldState={fieldState}
                 handleFieldChange={handleFieldChange}
                 handleErrors={setErrors}
               />
-              {errors.length > 0 && (
-                <div className="mt-4">
-                  <ul>
-                    {errors.map((error, index) => (
-                      <li className="text-sm text-red-500" key={index}>
-                        {error}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-            </div>
-          )}
-
-          {dropdownField && (
-            <div>
+            ))
+            .with(FieldType.DROPDOWN, () => (
               <DropdownFieldAdvancedSettings
                 fieldState={fieldState}
                 handleFieldChange={handleFieldChange}
                 handleErrors={setErrors}
               />
-              {errors.length > 0 && (
-                <div className="mt-4">
-                  <ul>
-                    {errors.map((error, index) => (
-                      <li className="text-sm text-red-500" key={index}>
-                        {error}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
+            ))
+            .otherwise(() => null)}
+
+          {errors.length > 0 && (
+            <div className="mt-4">
+              <ul>
+                {errors.map((error, index) => (
+                  <li className="text-sm text-red-500" key={index}>
+                    {error}
+                  </li>
+                ))}
+              </ul>
             </div>
           )}
         </DocumentFlowFormContainerContent>
