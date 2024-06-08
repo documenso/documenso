@@ -10,7 +10,6 @@ import {
 import { IS_BILLING_ENABLED } from '../../constants/app';
 import { STRIPE_COMMUNITY_PLAN_PRODUCT_ID } from '../../constants/billing';
 import { AppError, AppErrorCode } from '../../errors/app-error';
-import { subscriptionsContainsActiveProductId } from '../../utils/billing';
 
 export type GetPublicProfileByUrlOptions = {
   profileUrl: string;
@@ -26,7 +25,10 @@ type PublicDirectLinkTemplate = Template & {
 type BaseResponse = {
   url: string;
   name: string;
-  badge?: 'Premium' | 'EarlySupporter';
+  badge?: {
+    type: 'Premium' | 'EarlySupporter';
+    since: Date;
+  };
   templates: PublicDirectLinkTemplate[];
 };
 
@@ -69,15 +71,18 @@ export const getPublicProfileByUrl = async ({
             directLink: true,
           },
         },
-        // Subscriptions and _count are used to calculate the badges.
+        // Subscriptions and teamMembers are used to calculate the badges.
         Subscription: {
           where: {
             status: SubscriptionStatus.ACTIVE,
           },
         },
-        _count: {
+        teamMembers: {
           select: {
-            teamMembers: true,
+            createdAt: true,
+          },
+          orderBy: {
+            createdAt: 'asc',
           },
         },
       },
@@ -115,19 +120,27 @@ export const getPublicProfileByUrl = async ({
   if (user?.profile?.enabled) {
     let badge: BaseResponse['badge'] = undefined;
 
-    if (user._count.teamMembers > 0) {
-      badge = 'Premium';
+    if (user.teamMembers[0]) {
+      badge = {
+        type: 'Premium',
+        since: user.teamMembers[0]['createdAt'],
+      };
     }
 
     const earlyAdopterProductId = STRIPE_COMMUNITY_PLAN_PRODUCT_ID();
 
     if (IS_BILLING_ENABLED() && earlyAdopterProductId) {
-      const isEarlyAdopter = subscriptionsContainsActiveProductId(user.Subscription, [
-        earlyAdopterProductId,
-      ]);
+      const activeEarlyAdopterSub = user.Subscription.find(
+        (subscription) =>
+          subscription.status === SubscriptionStatus.ACTIVE &&
+          earlyAdopterProductId === subscription.planId,
+      );
 
-      if (isEarlyAdopter) {
-        badge = 'EarlySupporter';
+      if (activeEarlyAdopterSub) {
+        badge = {
+          type: 'EarlySupporter',
+          since: activeEarlyAdopterSub.createdAt,
+        };
       }
     }
 
@@ -147,7 +160,10 @@ export const getPublicProfileByUrl = async ({
   if (team?.profile?.enabled) {
     return {
       type: 'Team',
-      badge: 'Premium',
+      badge: {
+        type: 'Premium',
+        since: team.createdAt,
+      },
       profile: team.profile,
       url: profileUrl,
       name: team.name || '',

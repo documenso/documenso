@@ -2,10 +2,12 @@
 
 import { useEffect, useState } from 'react';
 
+import Image from 'next/image';
 import Link from 'next/link';
 
 import { PlusIcon } from 'lucide-react';
 
+import LogoIcon from '@documenso/assets/logo_icon.png';
 import type { GetTeamsResponse } from '@documenso/lib/server-only/team/get-teams';
 import type { User } from '@documenso/prisma/client';
 import { cn } from '@documenso/ui/lib/utils';
@@ -46,20 +48,35 @@ export const ProfileHeader = ({ user, teams = [] }: ProfileHeaderProps) => {
       <div className="mx-auto flex w-full max-w-screen-xl items-center justify-between gap-x-4 px-4 md:px-8">
         <Link
           href="/"
-          className="focus-visible:ring-ring ring-offset-background hidden rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 md:inline"
+          className="focus-visible:ring-ring ring-offset-background rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 md:inline"
         >
-          <Logo className="h-6 w-auto" />
+          <Logo className="hidden h-6 w-auto sm:block" />
+
+          <Image
+            src={LogoIcon}
+            alt="Documenso Logo"
+            width={48}
+            height={48}
+            className="h-10 w-auto dark:invert sm:hidden"
+          />
         </Link>
 
         <div className="flex flex-row items-center justify-center">
-          <p className="text-muted-foreground mr-4">
-            Like to have your own public profile with agreements?
+          <p className="mr-4 text-neutral-400">
+            <span className="text-sm sm:hidden">Want your own public profile?</span>
+            <span className="hidden sm:block">
+              Like to have your own public profile with agreements?
+            </span>
           </p>
 
           <Button asChild variant="secondary">
             <Link href="/signup">
-              <PlusIcon className="mr-1 h-5 w-5" />
-              Create now
+              <div className="hidden flex-row items-center sm:flex">
+                <PlusIcon className="mr-1 h-5 w-5" />
+                Create now
+              </div>
+
+              <span className="sm:hidden">Create</span>
             </Link>
           </Button>
         </div>

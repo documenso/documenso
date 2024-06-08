@@ -19,7 +19,12 @@ export const ZUpdateProfileMutationSchema = z.object({
 });
 
 export const ZUpdatePublicProfileMutationSchema = z.object({
-  bio: z.string().max(MAX_PROFILE_BIO_LENGTH).optional(),
+  bio: z
+    .string()
+    .max(MAX_PROFILE_BIO_LENGTH, {
+      message: `Bio must be shorter than ${MAX_PROFILE_BIO_LENGTH + 1} characters`,
+    })
+    .optional(),
   enabled: z.boolean().optional(),
   url: z
     .string()

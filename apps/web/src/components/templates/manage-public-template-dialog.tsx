@@ -66,12 +66,16 @@ export type ManagePublicTemplateDialogProps = {
 const ZUpdatePublicTemplateFormSchema = z.object({
   publicTitle: z
     .string()
-    .min(1, { message: 'Title must be at least 1 character long' })
-    .max(MAX_TEMPLATE_PUBLIC_TITLE_LENGTH),
+    .min(1, { message: 'Title is required' })
+    .max(MAX_TEMPLATE_PUBLIC_TITLE_LENGTH, {
+      message: `Title cannot be longer than ${MAX_TEMPLATE_PUBLIC_TITLE_LENGTH} characters`,
+    }),
   publicDescription: z
     .string()
-    .min(1, { message: 'Description must be at least 1 character long' })
-    .max(MAX_TEMPLATE_PUBLIC_DESCRIPTION_LENGTH),
+    .min(1, { message: 'Description is required' })
+    .max(MAX_TEMPLATE_PUBLIC_DESCRIPTION_LENGTH, {
+      message: `Description cannot be longer than ${MAX_TEMPLATE_PUBLIC_DESCRIPTION_LENGTH} characters`,
+    }),
 });
 
 type TUpdatePublicTemplateFormSchema = z.infer<typeof ZUpdatePublicTemplateFormSchema>;
