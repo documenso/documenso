@@ -16,31 +16,37 @@ const SLIDES = [
     label: 'Signing Process',
     type: 'video',
     srcLight: 'https://github.com/documenso/design/raw/main/marketing/signing.webm',
-    srcDark: 'https://github.com/documenso/design/raw/main/marketing/signing.webm',
-  },
-  {
-    label: 'Webhooks',
-    type: 'video',
-    srcLight: 'https://github.com/documenso/design/raw/main/marketing/webhooks.webm',
-    srcDark: 'https://github.com/documenso/design/raw/main/marketing/webhooks.webm',
-  },
-  {
-    label: 'API',
-    type: 'video',
-    srcLight: 'https://github.com/documenso/design/raw/main/marketing/api.webm',
-    srcDark: 'https://github.com/documenso/design/raw/main/marketing/api.webm',
+    srcDark: 'https://github.com/documenso/design/raw/main/marketing/dark/signing.webm',
   },
   {
     label: 'Teams',
     type: 'video',
     srcLight: 'https://github.com/documenso/design/raw/main/marketing/teams.webm',
-    srcDark: 'https://github.com/documenso/design/raw/main/marketing/teams.webm',
+    srcDark: 'https://github.com/documenso/design/raw/main/marketing/dark/teams.webm',
+  },
+  {
+    label: 'Zapier',
+    type: 'video',
+    srcLight: 'https://github.com/documenso/design/raw/main/marketing/zapier.webm',
+    srcDark: 'https://github.com/documenso/design/raw/main/marketing/dark/zapier.webm',
+  },
+  {
+    label: 'Webhooks',
+    type: 'video',
+    srcLight: 'https://github.com/documenso/design/raw/main/marketing/webhooks.webm',
+    srcDark: 'https://github.com/documenso/design/raw/main/marketing/dark/webhooks.webm',
+  },
+  {
+    label: 'API',
+    type: 'video',
+    srcLight: 'https://github.com/documenso/design/raw/main/marketing/api.webm',
+    srcDark: 'https://github.com/documenso/design/raw/main/marketing/dark/api.webm',
   },
   {
     label: 'Profile',
     type: 'video',
     srcLight: 'https://github.com/documenso/design/raw/main/marketing/profile_teaser.webm',
-    srcDark: 'https://github.com/documenso/design/raw/main/marketing/profile_teaser.webm',
+    srcDark: 'https://github.com/documenso/design/raw/main/marketing/dark/profile_teaser.webm',
   },
 ];
 
