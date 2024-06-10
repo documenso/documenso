@@ -17,30 +17,29 @@ export const validateNumberField = (
 
   const { minValue, maxValue, readOnly, required, numberFormat } = fieldMeta;
 
-  const sanitizedValue = value.replace(/\./g, '').replace(/,/g, '.');
-  const numberValue = parseFloat(sanitizedValue);
-
   const formatRegex: { [key: string]: RegExp } = {
-    '123,456,789.00': /^\d{1,3}(?:,\d{3})*(?:\.\d{1,2})?$/,
-    '123`456`789`00': /^\d{1,3}(?:`\d{3})*(?:`\d{1,2})?$/,
-    '123.456.789,00': /^\d{1,3}(?:\.\d{3})*(?:,\d{1,2})?$/,
-    '123 456 789,00': /^\d{1,3}(?: \d{3})*(?:,\d{1,2})?$/,
-    '12,34,56,789.00': /^(?:\d{1,2},){2,}\d{1,3}(?:\.\d{1,2})?$/,
-    '123456,789.00': /^\d{1,6}(?:,\d{1,3}(?:\.\d{1,2})?)?$/,
-    '123 456 789.00': /^\d{1,3}(?: \d{3})*(?:\.\d{1,2})?$/,
+    '123,456,789.00': /^(?:\d{1,3}(?:,\d{3})*|\d+)(?:\.\d{1,2})?$/,
+    '123`456`789`00': /^(?:\d{1,3}(?:`\d{3})*|\d+)(?:\.\d{1,2})?$/,
+    '123.456.789,00': /^(?:\d{1,3}(?:\.\d{3})*|\d+)(?:,\d{1,2})?$/,
+    '123 456 789,00': /^(?:\d{1,3}(?: \d{3})*|\d+)(?:,\d{1,2})?$/,
+    '12,34,56,789.00': /^(?:\d{2}(?:,\d{2})*,\d{3}(?:\.\d{2})?|\d+)$/,
+    '123456,789.00': /^(?:\d+)(?:,\d{1,3}(?:\.\d{1,2})?)?$/,
+    '123 456 789.00': /^(?:\d{1,3}(?: \d{3})*|\d+)(?:\.\d{1,2})?$/,
   };
 
-  const isValidFormat = numberFormat ? formatRegex[numberFormat].test(String(numberValue)) : true;
+  const isValidFormat = numberFormat ? formatRegex[numberFormat].test(value) : true;
 
   if (!isValidFormat) {
     errors.push(`Value ${value} does not match the number format - ${numberFormat}`);
   }
 
+  const numberValue = parseFloat(value);
+
   if (isSigningPage && required && !value) {
     errors.push('Value is required');
   }
 
-  if (isNaN(numberValue)) {
+  if (!/^[0-9,.]+$/.test(value.trim())) {
     errors.push(`Value is not a valid number`);
   }
 

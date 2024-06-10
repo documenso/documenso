@@ -39,11 +39,18 @@ export const RadioField = ({ field, recipient, onSignField, onUnsignField }: Rad
   const [isPending, startTransition] = useTransition();
 
   const parsedFieldMeta = ZRadioFieldMeta.parse(field.fieldMeta);
-  const defaultValue = parsedFieldMeta.values?.filter((item) => item.checked === true)[0].value;
+  const checkedItem = parsedFieldMeta.values?.find((item) => item.checked);
+  const defaultValue = !field.inserted
+    ? checkedItem?.value && checkedItem.value.length > 0
+      ? checkedItem.value
+      : 'empty-value'
+    : '';
+  const defaultIndex = !field.inserted
+    ? parsedFieldMeta.values?.findIndex((item) => item.checked) || null
+    : null;
 
-  const [selectedOption, setSelectedOption] = useState(defaultValue || '');
-  const [optionSelected, setOptionSelected] = useState(false);
-  const [selectedOptionIndex, setSelectedOptionIndex] = useState<number | null>(null);
+  const [selectedOption, setSelectedOption] = useState(defaultValue);
+  const [selectedOptionIndex, setSelectedOptionIndex] = useState<number | null>(defaultIndex);
 
   const { executeActionAuthProcedure } = useRequiredDocumentAuthContext();
 
@@ -57,9 +64,7 @@ export const RadioField = ({ field, recipient, onSignField, onUnsignField }: Rad
 
   const isLoading = isSignFieldWithTokenLoading || isRemoveSignedFieldWithTokenLoading || isPending;
   const shouldAutoSignField =
-    (!field.inserted && optionSelected) ||
-    (!field.inserted && defaultValue) ||
-    (!field.inserted && parsedFieldMeta.readOnly && defaultValue);
+    !field.inserted && (selectedOption || parsedFieldMeta.readOnly) && defaultValue;
 
   const onSign = async (authOptions?: TRecipientActionAuth) => {
     try {
@@ -77,13 +82,11 @@ export const RadioField = ({ field, recipient, onSignField, onUnsignField }: Rad
 
       if (onSignField) {
         await onSignField(payload);
-        return;
+      } else {
+        await signFieldWithToken(payload);
       }
 
-      await signFieldWithToken(payload);
-
       setSelectedOption('');
-
       startTransition(() => router.refresh());
     } catch (err) {
       const error = AppError.parseError(err);
@@ -111,10 +114,9 @@ export const RadioField = ({ field, recipient, onSignField, onUnsignField }: Rad
 
       if (onUnsignField) {
         await onUnsignField(payload);
-        return;
+      } else {
+        await removeSignedFieldWithToken(payload);
       }
-
-      await removeSignedFieldWithToken(payload);
 
       setSelectedOption('');
       setSelectedOptionIndex(null);
@@ -133,7 +135,6 @@ export const RadioField = ({ field, recipient, onSignField, onUnsignField }: Rad
 
   const handleSelectItem = (selectedOption: string) => {
     setSelectedOption(selectedOption);
-    setOptionSelected(true);
   };
 
   useEffect(() => {
@@ -142,9 +143,8 @@ export const RadioField = ({ field, recipient, onSignField, onUnsignField }: Rad
         onReauthFormSubmit: async (authOptions) => await onSign(authOptions),
         actionTarget: field.type,
       });
-      setOptionSelected(false);
     }
-  }, [optionSelected]);
+  }, [selectedOption]);
 
   return (
     <SigningFieldContainer field={field} onSign={onSign} onRemove={onRemove} type="Radio">

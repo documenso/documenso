@@ -61,6 +61,9 @@ export const TextField = ({ field, recipient, onSignField, onUnsignField }: Text
   const parsedFieldMeta = field.fieldMeta ? ZTextFieldMeta.parse(field.fieldMeta) : null;
 
   const isLoading = isSignFieldWithTokenLoading || isRemoveSignedFieldWithTokenLoading || isPending;
+  const shouldAutoSignField =
+    (!field.inserted && parsedFieldMeta?.text) ||
+    (!field.inserted && parsedFieldMeta?.text && parsedFieldMeta?.readOnly);
 
   const [showCustomTextModal, setShowCustomTextModal] = useState(false);
   const [localText, setLocalCustomText] = useState(parsedFieldMeta?.text ?? '');
@@ -193,7 +196,7 @@ export const TextField = ({ field, recipient, onSignField, onUnsignField }: Text
   };
 
   useEffect(() => {
-    if (!field.inserted && parsedFieldMeta?.text && localText) {
+    if (shouldAutoSignField) {
       void executeActionAuthProcedure({
         onReauthFormSubmit: async (authOptions) => await onSign(authOptions),
         actionTarget: field.type,

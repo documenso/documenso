@@ -80,6 +80,9 @@ export const CheckboxField = ({
   } = trpc.field.removeSignedFieldWithToken.useMutation(DO_NOT_INVALIDATE_QUERY_ON_MUTATION);
 
   const isLoading = isSignFieldWithTokenLoading || isRemoveSignedFieldWithTokenLoading || isPending;
+  const shouldAutoSignField =
+    (!field.inserted && checkedValues.length > 0 && isLengthConditionMet) ||
+    (!field.inserted && isReadOnly && isLengthConditionMet);
 
   const onSign = async (authOptions?: TRecipientActionAuth) => {
     try {
@@ -93,10 +96,9 @@ export const CheckboxField = ({
 
       if (onSignField) {
         await onSignField(payload);
-        return;
+      } else {
+        await signFieldWithToken(payload);
       }
-
-      await signFieldWithToken(payload);
 
       startTransition(() => router.refresh());
     } catch (err) {
@@ -125,10 +127,9 @@ export const CheckboxField = ({
 
       if (onUnsignField) {
         await onUnsignField(payload);
-        return;
+      } else {
+        await removeSignedFieldWithToken(payload);
       }
-
-      await removeSignedFieldWithToken(payload);
 
       if (fieldType === 'Checkbox') {
         setCheckedValues([]);
@@ -205,10 +206,7 @@ export const CheckboxField = ({
   };
 
   useEffect(() => {
-    if (
-      (!field.inserted && checkedValues.length > 0 && isLengthConditionMet) ||
-      (!field.inserted && isReadOnly && isLengthConditionMet)
-    ) {
+    if (shouldAutoSignField) {
       void executeActionAuthProcedure({
         onReauthFormSubmit: async (authOptions) => await onSign(authOptions),
         actionTarget: field.type,

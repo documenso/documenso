@@ -34,7 +34,7 @@ export const NumberFieldAdvancedSettings = ({
   const [showValidation, setShowValidation] = useState(false);
 
   const handleInput = (field: keyof NumberFieldMeta, value: string | boolean) => {
-    const userValue = field === 'value' ? Number(value) : Number(fieldState.value || 0);
+    const userValue = field === 'value' ? value : fieldState.value || 0;
     const userMinValue = field === 'minValue' ? Number(value) : Number(fieldState.minValue || 0);
     const userMaxValue = field === 'maxValue' ? Number(value) : Number(fieldState.maxValue || 0);
     const readOnly = field === 'readOnly' ? Boolean(value) : Boolean(fieldState.readOnly);
@@ -89,7 +89,7 @@ export const NumberFieldAdvancedSettings = ({
         <Label>Number format</Label>
         <Select
           value={fieldState.numberFormat}
-          onValueChange={(val) => handleFieldChange('numberFormat', val)}
+          onValueChange={(val) => handleInput('numberFormat', val)}
         >
           <SelectTrigger className="text-muted-foreground bg-background mt-2 w-full">
             <SelectValue placeholder="Field format" />

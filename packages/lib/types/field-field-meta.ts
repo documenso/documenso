@@ -20,7 +20,7 @@ export type TTextFieldMeta = z.infer<typeof ZTextFieldMeta>;
 export const ZNumberFieldMeta = ZBaseFieldMeta.extend({
   type: z.literal('number').default('number'),
   numberFormat: z.string().optional(),
-  value: z.number().optional(),
+  value: z.string().optional(),
   minValue: z.number().optional(),
   maxValue: z.number().optional(),
 });

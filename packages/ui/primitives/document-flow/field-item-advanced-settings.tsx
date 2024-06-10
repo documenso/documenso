@@ -71,7 +71,7 @@ const getDefaultState = (fieldType: FieldType): FieldMeta => {
         label: '',
         placeholder: '',
         numberFormat: '',
-        value: 0,
+        value: '0',
         minValue: 0,
         maxValue: 0,
         required: false,
@@ -177,7 +177,7 @@ export const FieldAdvancedSettings = forwardRef<HTMLDivElement, FieldAdvancedSet
       value: string | { checked: boolean; value: string }[] | { value: string }[] | boolean,
     ) => {
       setFieldState((prevState: FieldMeta) => {
-        if (['characterLimit', 'minValue', 'maxValue', 'value', 'validationLength'].includes(key)) {
+        if (['characterLimit', 'minValue', 'maxValue', 'validationLength'].includes(key)) {
           const parsedValue = Number(value);
 
           return {

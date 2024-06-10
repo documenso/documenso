@@ -36,6 +36,7 @@ export const DropdownFieldAdvancedSettings = ({
   const [values, setValues] = useState(fieldState.values ?? [{ value: 'Option 1' }]);
   const [readOnly, setReadOnly] = useState(fieldState.readOnly ?? false);
   const [required, setRequired] = useState(fieldState.required ?? false);
+  const [defaultValue, setDefaultValue] = useState(fieldState.defaultValue ?? 'Option 1');
 
   const addValue = () => {
     setValues([...values, { value: 'New option' }]);
@@ -79,20 +80,30 @@ export const DropdownFieldAdvancedSettings = ({
     setValues(fieldState.values ?? [{ value: 'Option 1' }]);
   }, [fieldState.values]);
 
+  useEffect(() => {
+    setDefaultValue(fieldState.defaultValue ?? 'Option 1');
+  }, [fieldState.defaultValue]);
+
   return (
-    <div className="flex flex-col gap-4">
+    <div className="text-dark flex flex-col gap-4">
       <div>
         <Label>Select default option</Label>
         <Select
-          value={fieldState.defaultValue}
-          onValueChange={(val) => handleFieldChange('defaultValue', val)}
+          defaultValue={defaultValue}
+          onValueChange={(val) => {
+            setDefaultValue(val);
+            handleFieldChange('defaultValue', val);
+          }}
         >
           <SelectTrigger className="text-muted-foreground bg-background mt-2 w-full">
-            <SelectValue placeholder={'-- Select --'} />
+            <SelectValue defaultValue={defaultValue} placeholder="-- Select --" />
           </SelectTrigger>
           <SelectContent position="popper">
             {values.map((item, index) => (
-              <SelectItem key={index} value={String(index)}>
+              <SelectItem
+                key={index}
+                value={item.value && item.value.length > 0 ? item.value.toString() : String(index)}
+              >
                 {item.value}
               </SelectItem>
             ))}

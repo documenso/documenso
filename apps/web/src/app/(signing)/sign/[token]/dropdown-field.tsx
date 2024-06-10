@@ -63,6 +63,8 @@ export const DropdownField = ({
   } = trpc.field.removeSignedFieldWithToken.useMutation(DO_NOT_INVALIDATE_QUERY_ON_MUTATION);
 
   const isLoading = isSignFieldWithTokenLoading || isRemoveSignedFieldWithTokenLoading || isPending;
+  const shouldAutoSignField =
+    (!field.inserted && localChoice) || (!field.inserted && isReadOnly && defaultValue);
 
   const onSign = async (authOptions?: TRecipientActionAuth) => {
     try {
@@ -80,13 +82,11 @@ export const DropdownField = ({
 
       if (onSignField) {
         await onSignField(payload);
-        return;
+      } else {
+        await signFieldWithToken(payload);
       }
 
-      await signFieldWithToken(payload);
-
       setLocalChoice('');
-
       startTransition(() => router.refresh());
     } catch (err) {
       const error = AppError.parseError(err);
@@ -119,12 +119,11 @@ export const DropdownField = ({
       if (onUnsignField) {
         await onUnsignField(payload);
         return;
+      } else {
+        await removeSignedFieldWithToken(payload);
       }
 
-      await removeSignedFieldWithToken(payload);
-
       setLocalChoice(parsedFieldMeta.defaultValue ?? '');
-
       startTransition(() => router.refresh());
     } catch (err) {
       console.error(err);
@@ -151,7 +150,7 @@ export const DropdownField = ({
   }, [localChoice]);
 
   useEffect(() => {
-    if ((!field.inserted && defaultValue) || (!field.inserted && isReadOnly && defaultValue)) {
+    if (shouldAutoSignField) {
       void executeActionAuthProcedure({
         onReauthFormSubmit: async (authOptions) => await onSign(authOptions),
         actionTarget: field.type,
