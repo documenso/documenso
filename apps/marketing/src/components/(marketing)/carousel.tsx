@@ -208,10 +208,6 @@ export const Carousel = () => {
       </Card>
 
       <div className="mx-auto mt-12 max-w-4xl px-2">
-        <div className="bg-muted-foreground/10 dark:bg-muted text-foreground dark:text-muted-foreground inline-block rounded-xl px-3 py-2 text-sm">
-          What's new
-        </div>
-
         <div className="mt-2 flex justify-between" ref={emblaThumbsRef}>
           {slides.map((slide, index) => (
             <Thumb
