@@ -15,6 +15,7 @@ import { trpc } from '@documenso/trpc/react';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
 import { Switch } from '@documenso/ui/primitives/switch';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@documenso/ui/primitives/tooltip';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
 import { SettingsHeader } from '~/components/(dashboard)/settings/layout/header';
@@ -54,6 +55,7 @@ export const PublicProfilePageView = ({ user, team, profile }: PublicProfilePage
   const { toast } = useToast();
 
   const [isPublicProfileVisible, setIsPublicProfileVisible] = useState(profile.enabled);
+  const [isTooltipOpen, setIsTooltipOpen] = useState(false);
 
   const { data } = trpc.template.findTemplates.useQuery({
     perPage: 100,
@@ -80,16 +82,22 @@ export const PublicProfilePageView = ({ user, team, profile }: PublicProfilePage
 
   const onProfileUpdate = async (data: TPublicProfileFormSchema) => {
     if (team) {
-      return updateTeamProfile({
+      await updateTeamProfile({
         teamId: team.id,
         ...data,
       });
+    } else {
+      await updateUserProfile(data);
     }
 
-    return updateUserProfile(data);
+    if (data.enabled === undefined && !isPublicProfileVisible) {
+      setIsTooltipOpen(true);
+    }
   };
 
   const togglePublicProfileVisibility = async (isVisible: boolean) => {
+    setIsTooltipOpen(false);
+
     if (isUpdating) {
       return;
     }
@@ -127,23 +135,47 @@ export const PublicProfilePageView = ({ user, team, profile }: PublicProfilePage
   return (
     <div className="max-w-2xl">
       <SettingsHeader title={profileText.settingsTitle} subtitle={profileText.settingsSubtitle}>
-        <div
-          className={cn(
-            'text-muted-foreground/50 flex flex-row items-center justify-center space-x-2 text-xs',
-            {
-              '[&>*:first-child]:text-muted-foreground': !isPublicProfileVisible,
-              '[&>*:last-child]:text-muted-foreground': isPublicProfileVisible,
-            },
-          )}
-        >
-          <span>Hide</span>
-          <Switch
-            disabled={isUpdating}
-            checked={isPublicProfileVisible}
-            onCheckedChange={togglePublicProfileVisibility}
-          />
-          <span>Show</span>
-        </div>
+        <Tooltip open={isTooltipOpen} onOpenChange={setIsTooltipOpen}>
+          <TooltipTrigger asChild>
+            <div
+              className={cn(
+                'text-muted-foreground/50 flex flex-row items-center justify-center space-x-2 text-xs',
+                {
+                  '[&>*:first-child]:text-muted-foreground': !isPublicProfileVisible,
+                  '[&>*:last-child]:text-muted-foreground': isPublicProfileVisible,
+                },
+              )}
+            >
+              <span>Hide</span>
+              <Switch
+                disabled={isUpdating}
+                checked={isPublicProfileVisible}
+                onCheckedChange={togglePublicProfileVisibility}
+              />
+              <span>Show</span>
+            </div>
+          </TooltipTrigger>
+
+          <TooltipContent className="text-muted-foreground max-w-[40ch] space-y-2 py-2">
+            {isPublicProfileVisible ? (
+              <>
+                <p>
+                  Profile is currently <strong>visible</strong>.
+                </p>
+
+                <p>Toggle the switch to hide your profile from the public.</p>
+              </>
+            ) : (
+              <>
+                <p>
+                  Profile is currently <strong>hidden</strong>.
+                </p>
+
+                <p>Toggle the switch to show your profile to the public.</p>
+              </>
+            )}
+          </TooltipContent>
+        </Tooltip>
       </SettingsHeader>
 
       <PublicProfileForm

@@ -58,7 +58,7 @@ export default async function PublicProfilePage({ params }: PublicProfilePagePro
     <div className="flex flex-col items-center justify-center py-4 sm:py-32">
       <div className="flex flex-col items-center">
         <Avatar className="dark:border-border h-24 w-24 border-2 border-solid">
-          <AvatarFallback className="text-xs text-gray-400">
+          <AvatarFallback className="text-sm text-gray-400">
             {extractInitials(publicProfile.name)}
           </AvatarFallback>
         </Avatar>

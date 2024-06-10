@@ -1,9 +1,11 @@
 'use client';
 
+import { useState } from 'react';
+
 import { zodResolver } from '@hookform/resolvers/zod';
 import { motion } from 'framer-motion';
 import { AnimatePresence } from 'framer-motion';
-import { CopyIcon } from 'lucide-react';
+import { CheckSquareIcon, CopyIcon } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import type { z } from 'zod';
 
@@ -55,6 +57,8 @@ export const PublicProfileForm = ({
 
   const [, copy] = useCopyToClipboard();
 
+  const [copiedTimeout, setCopiedTimeout] = useState<NodeJS.Timeout | null>(null);
+
   const form = useForm<TPublicProfileFormSchema>({
     values: {
       url: profileUrl ?? '',
@@ -103,13 +107,24 @@ export const PublicProfileForm = ({
     }
   };
 
-  const onCopy = async () =>
-    copy(formatUserProfilePath(form.getValues('url') ?? '')).then(() => {
+  const onCopy = async () => {
+    await copy(formatUserProfilePath(form.getValues('url') ?? '')).then(() => {
       toast({
         title: 'Copied to clipboard',
         description: 'The profile link has been copied to your clipboard',
       });
     });
+
+    if (copiedTimeout) {
+      clearTimeout(copiedTimeout);
+    }
+
+    setCopiedTimeout(
+      setTimeout(() => {
+        setCopiedTimeout(null);
+      }, 2000),
+    );
+  };
 
   return (
     <Form {...form}>
@@ -152,7 +167,21 @@ export const PublicProfileForm = ({
                             </p>
 
                             <div className="ml-1 flex h-6 w-6 items-center justify-center rounded transition-all hover:bg-neutral-200 hover:active:bg-neutral-300 dark:hover:bg-neutral-500 dark:hover:active:bg-neutral-400">
-                              <CopyIcon className="h-3.5 w-3.5" />
+                              <AnimatePresence mode="wait" initial={false}>
+                                <motion.div
+                                  key={copiedTimeout ? 'copied' : 'copy'}
+                                  initial={{ opacity: 0 }}
+                                  animate={{ opacity: 1 }}
+                                  exit={{ opacity: 0, transition: { duration: 0.1 } }}
+                                  className="absolute"
+                                >
+                                  {copiedTimeout ? (
+                                    <CheckSquareIcon className="h-3.5 w-3.5" />
+                                  ) : (
+                                    <CopyIcon className="h-3.5 w-3.5" />
+                                  )}
+                                </motion.div>
+                              </AnimatePresence>
                             </div>
                           </Button>
                         </div>
