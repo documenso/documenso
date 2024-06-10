@@ -57,11 +57,7 @@ export const updatePublicProfile = async ({ userId, data }: UpdatePublicProfileO
     });
 
     if (isUrlTakenByAnotherUser || isUrlTakenByAnotherTeam) {
-      throw new AppError(
-        AppErrorCode.PROFILE_URL_TAKEN,
-        'Profile username is taken',
-        'The profile username is already taken',
-      );
+      throw new AppError(AppErrorCode.PROFILE_URL_TAKEN, 'The profile username is already taken');
     }
   }
 

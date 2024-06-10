@@ -91,7 +91,7 @@ export const PublicProfileForm = ({
         case AppErrorCode.PROFILE_URL_TAKEN:
           form.setError('url', {
             type: 'manual',
-            message: error.userMessage,
+            message: error.message,
           });
 
           break;
