@@ -2,14 +2,14 @@ import React from 'react';
 
 import { cn } from '@documenso/ui/lib/utils';
 
-type PropType = {
+type SlideProps = {
   selected: boolean;
   index: number;
   onClick: () => void;
   label: string;
 };
 
-export const Thumb: React.FC<PropType> = (props) => {
+export const Slide: React.FC<SlideProps> = (props) => {
   const { selected, label, onClick } = props;
 
   return (

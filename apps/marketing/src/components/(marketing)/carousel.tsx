@@ -9,7 +9,7 @@ import { useTheme } from 'next-themes';
 import { Card } from '@documenso/ui/primitives/card';
 import { Progress } from '@documenso/ui/primitives/progress';
 
-import { Thumb } from './thumb';
+import { Slide } from './slide';
 
 const SLIDES = [
   {
@@ -264,7 +264,7 @@ export const Carousel = () => {
       <div className="mx-auto mt-12 max-w-4xl px-2">
         <div className="mt-2 flex justify-between" ref={emblaThumbsRef}>
           {slides.map((slide, index) => (
-            <Thumb
+            <Slide
               key={index}
               onClick={() => onThumbClick(index)}
               selected={index === selectedIndex}
