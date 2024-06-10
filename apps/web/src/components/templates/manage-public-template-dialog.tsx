@@ -281,9 +281,9 @@ export const ManagePublicTemplateDialog = ({
 
                           <TableCell>
                             {selectedTemplateId === row.id ? (
-                              <CheckCircle2Icon className="h-5 w-5 text-neutral-600" />
+                              <CheckCircle2Icon className="h-5 w-5 text-neutral-600 dark:text-neutral-200" />
                             ) : (
-                              <CircleIcon className="h-5 w-5 text-neutral-300" />
+                              <CircleIcon className="h-5 w-5 text-neutral-300 dark:text-neutral-600" />
                             )}
                           </TableCell>
                         </TableRow>
