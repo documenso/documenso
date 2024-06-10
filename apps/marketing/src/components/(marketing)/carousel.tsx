@@ -57,9 +57,10 @@ export const Carousel = () => {
   const [progress, setProgress] = useState(0);
   const videoRefs = useRef<(HTMLVideoElement | null)[]>([]);
   const { theme } = useTheme();
+  const [autoplayDelay, setAutoplayDelay] = useState<number[]>([]);
 
   const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true }, [
-    Autoplay({ playOnInit: true, delay: 5000 }),
+    Autoplay({ playOnInit: true, delay: autoplayDelay[selectedIndex] || 5000 }),
   ]);
   const [emblaThumbsRef, emblaThumbsApi] = useEmblaCarousel(
     {
@@ -67,7 +68,7 @@ export const Carousel = () => {
       containScroll: 'keepSnaps',
       dragFree: true,
     },
-    [Autoplay({ playOnInit: true, delay: 5000 })],
+    [Autoplay({ playOnInit: true, delay: autoplayDelay[selectedIndex] || 5000 })],
   );
 
   const onThumbClick = useCallback(
@@ -94,6 +95,27 @@ export const Carousel = () => {
   const resetProgress = useCallback(() => {
     setProgress(0);
   }, []);
+
+  useEffect(() => {
+    const setVideoDurations = async () => {
+      const durations = await Promise.all(
+        videoRefs.current.map(
+          async (video) =>
+            new Promise<number>((resolve) => {
+              if (video) {
+                video.onloadedmetadata = () => resolve(video.duration * 1000);
+              } else {
+                resolve(5000);
+              }
+            }),
+        ),
+      );
+
+      setAutoplayDelay(durations);
+    };
+
+    void setVideoDurations();
+  }, [slides, theme]);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -144,22 +166,54 @@ export const Carousel = () => {
       .on('reInit', () => setIsPlaying(autoplay.isPlaying()));
   }, [emblaApi]);
 
+  // useEffect(() => {
+  //   const updateInterval = 50;
+  //   const increment = 100 / (autoplayDelay[selectedIndex] / updateInterval);
+
+  //   const timer = setInterval(() => {
+  //     setProgress((prevProgress) => {
+  //       if (prevProgress >= 100) {
+  //         clearInterval(timer);
+  //         return 100;
+  //       }
+  //       return prevProgress + increment;
+  //     });
+  //   }, updateInterval);
+
+  //   return () => clearInterval(timer);
+  // }, [selectedIndex, autoplayDelay]);
+
   useEffect(() => {
+    if (autoplayDelay[selectedIndex] === undefined) return;
+
     const updateInterval = 50;
-    const increment = 100 / (5000 / updateInterval);
+    const increment = 100 / (autoplayDelay[selectedIndex] / updateInterval);
+    let progressValue = 0;
 
     const timer = setInterval(() => {
       setProgress((prevProgress) => {
-        if (prevProgress >= 100) {
+        progressValue = prevProgress + increment;
+        if (progressValue >= 100) {
           clearInterval(timer);
+          if (emblaApi) {
+            emblaApi.scrollNext();
+          }
           return 100;
         }
-        return prevProgress + increment;
+        return progressValue;
       });
     }, updateInterval);
 
     return () => clearInterval(timer);
-  }, [selectedIndex]);
+  }, [selectedIndex, autoplayDelay, emblaApi]);
+
+  useEffect(() => {
+    videoRefs.current.forEach((video) => {
+      if (video) {
+        video.load();
+      }
+    });
+  }, [theme]);
 
   useEffect(() => {
     if (!emblaApi) return;
@@ -170,7 +224,7 @@ export const Carousel = () => {
     };
 
     resetCarousel();
-  }, [theme, emblaApi]);
+  }, [theme, emblaApi, autoplayDelay]);
 
   return (
     <>
@@ -188,7 +242,7 @@ export const Carousel = () => {
                     className="h-auto w-full rounded-xl"
                   >
                     <source
-                      src={theme === 'light' ? slide.srcLight : slide.srcDark}
+                      src={theme === 'dark' ? slide.srcDark : slide.srcLight}
                       type="video/webm"
                     />
                     Your browser does not support the video tag.
