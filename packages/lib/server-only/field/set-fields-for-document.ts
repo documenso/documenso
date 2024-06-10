@@ -1,5 +1,6 @@
 import { validateCheckboxField } from '@documenso/lib/advanced-fields-validation/validate-checkbox';
 import { validateDropdownField } from '@documenso/lib/advanced-fields-validation/validate-dropdown';
+import { validateNumberField } from '@documenso/lib/advanced-fields-validation/validate-number';
 import { validateRadioField } from '@documenso/lib/advanced-fields-validation/validate-radio';
 import { validateTextField } from '@documenso/lib/advanced-fields-validation/validate-text';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
@@ -20,8 +21,6 @@ import {
 import { prisma } from '@documenso/prisma';
 import type { Field } from '@documenso/prisma/client';
 import { FieldType, SendStatus, SigningStatus } from '@documenso/prisma/client';
-
-import { validateNumberField } from '../../advanced-fields-validation/validate-number';
 
 export interface SetFieldsForDocumentOptions {
   userId: number;
@@ -122,10 +121,6 @@ export const setFieldsForDocument = async ({
         const parsedFieldMeta = field.fieldMeta
           ? ZFieldMetaSchema.parse(field.fieldMeta)
           : undefined;
-
-        if (parsedFieldMeta?.readOnly === true && parsedFieldMeta?.required === true) {
-          throw new Error('Field cannot be both read-only and required');
-        }
 
         if (field.type === FieldType.TEXT && field.fieldMeta) {
           const textFieldParsedMeta = ZTextFieldMeta.parse(field.fieldMeta);

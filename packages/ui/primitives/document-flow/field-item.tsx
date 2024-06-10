@@ -7,6 +7,7 @@ import { Caveat } from 'next/font/google';
 import { Settings2, Trash } from 'lucide-react';
 import { createPortal } from 'react-dom';
 import { Rnd } from 'react-rnd';
+import { match } from 'ts-pattern';
 
 import { useFieldItemStyles } from '@documenso/lib/client-only/hooks/use-field-item-styles';
 import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
@@ -273,26 +274,17 @@ export const FieldItem = ({
             },
           )}
         >
-          {field.type === 'CHECKBOX' && (
-            <div>
-              <CheckboxField field={field} />
-            </div>
-          )}
-
-          {field.type === 'RADIO' && (
-            <div>
-              <RadioField field={field} />
-            </div>
-          )}
-
-          {field.type !== 'CHECKBOX' && field.type !== 'RADIO' && (
-            <FieldIcon
-              fieldMeta={field.fieldMeta}
-              type={field.type}
-              signerEmail={field.signerEmail}
-              fontCaveatClassName={fontCaveat.className}
-            />
-          )}
+          {match(field.type)
+            .with('CHECKBOX', () => <CheckboxField field={field} />)
+            .with('RADIO', () => <RadioField field={field} />)
+            .otherwise(() => (
+              <FieldIcon
+                fieldMeta={field.fieldMeta}
+                type={field.type}
+                signerEmail={field.signerEmail}
+                fontCaveatClassName={fontCaveat.className}
+              />
+            ))}
 
           {!hideRecipients && (
             <p

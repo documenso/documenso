@@ -231,7 +231,7 @@ export const createDocumentFromTemplate = async ({
     await tx.field.createMany({
       data: fieldsToCreate.map((field) => ({
         ...field,
-        fieldMeta: field.fieldMeta ? ZFieldMetaSchema.parse(field.fieldMeta) : {},
+        fieldMeta: field.fieldMeta ? ZFieldMetaSchema.parse(field.fieldMeta) : undefined,
       })),
     });
 

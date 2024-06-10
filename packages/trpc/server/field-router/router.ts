@@ -134,13 +134,6 @@ export const fieldRouter = router({
         field = await getFieldById({ fieldId, templateId });
       }
 
-      if (!field) {
-        throw new TRPCError({
-          code: 'BAD_REQUEST',
-          message: 'We were unable to find this field. Please try again.',
-        });
-      }
-
       return field;
     } catch (err) {
       throw new TRPCError({

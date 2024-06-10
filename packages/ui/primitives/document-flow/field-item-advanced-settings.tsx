@@ -150,9 +150,7 @@ export const FieldAdvancedSettings = forwardRef<HTMLDivElement, FieldAdvancedSet
       },
     );
 
-    const fieldMeta = fieldData?.fieldMeta
-      ? ZFieldMetaSchema.parse(fieldData.fieldMeta)
-      : undefined;
+    const fieldMeta = fieldData?.fieldMeta;
 
     const localStorageKey = `field_${field.formId}_${field.type}`;
 
@@ -165,9 +163,11 @@ export const FieldAdvancedSettings = forwardRef<HTMLDivElement, FieldAdvancedSet
 
     useEffect(() => {
       if (fieldMeta && typeof fieldMeta === 'object') {
+        const parsedFieldMeta = ZFieldMetaSchema.parse(fieldMeta);
+
         setFieldState({
           ...defaultState,
-          ...fieldMeta,
+          ...parsedFieldMeta,
         });
       }
     }, [fieldMeta]);

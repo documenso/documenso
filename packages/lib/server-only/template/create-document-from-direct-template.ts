@@ -293,7 +293,7 @@ export const createDocumentFromDirectTemplate = async ({
     await tx.field.createMany({
       data: nonDirectRecipientFieldsToCreate.map((field) => ({
         ...field,
-        fieldMeta: field.fieldMeta ? ZFieldMetaSchema.parse(field.fieldMeta) : {},
+        fieldMeta: field.fieldMeta ? ZFieldMetaSchema.parse(field.fieldMeta) : undefined,
       })),
     });
 

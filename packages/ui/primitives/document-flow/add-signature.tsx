@@ -215,7 +215,7 @@ export const AddSignatureFormPartial = ({
         inserted: true,
       }))
       .with(FieldType.SIGNATURE, () => {
-        const value = form.getValues('customText');
+        const value = form.getValues('signature');
 
         return {
           ...field,
