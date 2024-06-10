@@ -1,3 +1,4 @@
+import { getCommunityPlanPriceIds } from '@documenso/ee/server-only/stripe/get-community-plan-prices';
 import { prisma } from '@documenso/prisma';
 import type { Template, TemplateDirectLink } from '@documenso/prisma/client';
 import {
@@ -8,7 +9,6 @@ import {
 } from '@documenso/prisma/client';
 
 import { IS_BILLING_ENABLED } from '../../constants/app';
-import { STRIPE_COMMUNITY_PLAN_PRODUCT_ID } from '../../constants/billing';
 import { AppError, AppErrorCode } from '../../errors/app-error';
 
 export type GetPublicProfileByUrlOptions = {
@@ -127,13 +127,13 @@ export const getPublicProfileByUrl = async ({
       };
     }
 
-    const earlyAdopterProductId = STRIPE_COMMUNITY_PLAN_PRODUCT_ID();
+    if (IS_BILLING_ENABLED()) {
+      const earlyAdopterPriceIds = await getCommunityPlanPriceIds();
 
-    if (IS_BILLING_ENABLED() && earlyAdopterProductId) {
       const activeEarlyAdopterSub = user.Subscription.find(
         (subscription) =>
           subscription.status === SubscriptionStatus.ACTIVE &&
-          earlyAdopterProductId === subscription.planId,
+          earlyAdopterPriceIds.includes(subscription.priceId),
       );
 
       if (activeEarlyAdopterSub) {
