@@ -3,12 +3,13 @@ import type { HTMLAttributes } from 'react';
 import Image from 'next/image';
 
 import backgroundPattern from '@documenso/assets/images/background-pattern.png';
-import cardConnectionsFigure from '@documenso/assets/images/card-connections-figure.png';
 import cardPaidFigure from '@documenso/assets/images/card-paid-figure.png';
 import cardSharingFigure from '@documenso/assets/images/card-sharing-figure.png';
 import cardWidgetFigure from '@documenso/assets/images/card-widget-figure.png';
 import { cn } from '@documenso/ui/lib/utils';
 import { Card, CardContent } from '@documenso/ui/primitives/card';
+
+import { DocumensoIntegrationsDataFlow } from './integrations-data-flow';
 
 export type ShareConnectPaidWidgetBentoProps = HTMLAttributes<HTMLDivElement>;
 
@@ -56,12 +57,9 @@ export const ShareConnectPaidWidgetBento = ({
               favorite tools.
             </p>
 
-            <div className="flex items-center justify-center p-8">
-              <Image
-                src={cardConnectionsFigure}
-                alt="its fast"
-                className="w-full max-w-sm dark:contrast-[70%] dark:hue-rotate-180 dark:invert"
-              />
+            <div className="flex w-full items-center justify-center p-0 md:p-8">
+              {/* Add Animated Beam */}
+              <DocumensoIntegrationsDataFlow />
             </div>
           </CardContent>
         </Card>
