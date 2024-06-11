@@ -20,6 +20,10 @@ export const validateCheckboxField = (
     errors.push('A field cannot be both read-only and required');
   }
 
+  if (values.length === 0) {
+    errors.push('At least one option must be added');
+  }
+
   if (readOnly && values.length === 0) {
     errors.push('A read-only field must have at least one value');
   }
@@ -38,13 +42,19 @@ export const validateCheckboxField = (
 
   if (validationRule && validationLength) {
     const validation = checkboxValidationSigns.find((sign) => sign.label === validationRule);
-    const lengthCondition =
-      (validation?.value === '>=' && values.length < validationLength) ||
-      (validation?.value === '=' && values.length !== validationLength) ||
-      (validation?.value === '<=' && values.length > validationLength);
 
-    if (lengthCondition) {
-      errors.push(`You need to ${validationRule.toLowerCase()} ${validationLength} options`);
+    if (validation) {
+      const lengthCondition =
+        (validation.value === '=' && values.length < validationLength) ||
+        (validation.value !== '=' && values.length < validationLength);
+
+      if (lengthCondition) {
+        const errorMessage = isSigningPage
+          ? `You need to ${validationRule.toLowerCase()} ${validationLength} options`
+          : `You need to add at least ${validationLength} options`;
+
+        errors.push(errorMessage);
+      }
     }
   }
 

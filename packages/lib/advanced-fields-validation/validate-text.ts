@@ -17,7 +17,7 @@ export const validateTextField = (
     errors.push('Value is required');
   }
 
-  if (characterLimit !== undefined && value.length > characterLimit) {
+  if (characterLimit !== undefined && characterLimit > 0 && value.length > characterLimit) {
     errors.push(`Value length (${value.length}) exceeds the character limit (${characterLimit})`);
   }
 

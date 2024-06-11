@@ -298,6 +298,35 @@ export const AddFieldsFormPartial = ({
 
   const hasSelectedSignerBeenSent = selectedSigner?.sendStatus === SendStatus.SENT;
 
+  const filterFieldsWithEmptyValues = (fields: typeof localFields, fieldType: string) =>
+    fields
+      .filter((field) => field.type === fieldType)
+      .filter((field) => {
+        if (field.fieldMeta && 'values' in field.fieldMeta) {
+          return field.fieldMeta.values?.length === 0;
+        }
+
+        return true;
+      });
+
+  const emptyCheckboxFields = useMemo(
+    () => filterFieldsWithEmptyValues(localFields, FieldType.CHECKBOX),
+    [localFields],
+  );
+
+  const emptyRadioFields = useMemo(
+    () => filterFieldsWithEmptyValues(localFields, FieldType.RADIO),
+    [localFields],
+  );
+
+  const emptySelectFields = useMemo(
+    () => filterFieldsWithEmptyValues(localFields, FieldType.DROPDOWN),
+    [localFields],
+  );
+
+  const hasErrors =
+    emptyCheckboxFields.length > 0 || emptyRadioFields.length > 0 || emptySelectFields.length > 0;
+
   const isFieldsDisabled =
     !selectedSigner ||
     hasSelectedSignerBeenSent ||
@@ -936,6 +965,21 @@ export const AddFieldsFormPartial = ({
               </div>
             </div>
           </DocumentFlowFormContainerContent>
+          {hasErrors && (
+            <div className="mt-4">
+              <ul>
+                <li className="text-sm text-red-500">
+                  To proceed further, please set at least one value for the{' '}
+                  {emptyCheckboxFields.length > 0
+                    ? 'Checkbox'
+                    : emptyRadioFields.length > 0
+                    ? 'Radio'
+                    : 'Select'}{' '}
+                  field.
+                </li>
+              </ul>
+            </div>
+          )}
           <DocumentFlowFormContainerFooter>
             <DocumentFlowFormContainerStep
               title={documentFlow.title}
@@ -946,6 +990,7 @@ export const AddFieldsFormPartial = ({
             <DocumentFlowFormContainerActions
               loading={isSubmitting}
               disabled={isSubmitting}
+              disableNextStep={hasErrors}
               onGoBackClick={() => {
                 previousStep();
                 remove();

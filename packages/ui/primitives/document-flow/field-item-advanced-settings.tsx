@@ -281,7 +281,7 @@ export const FieldAdvancedSettings = forwardRef<HTMLDivElement, FieldAdvancedSet
             goBackLabel="Cancel"
             onGoBackClick={onAdvancedSettings}
             onGoNextClick={handleOnGoNextClick}
-            disabled={errors.length > 0}
+            disableNextStep={errors.length > 0}
           />
         </DocumentFlowFormContainerFooter>
       </div>

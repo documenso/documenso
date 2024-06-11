@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { Caveat } from 'next/font/google';
 
@@ -11,6 +11,8 @@ import { match } from 'ts-pattern';
 
 import { useFieldItemStyles } from '@documenso/lib/client-only/hooks/use-field-item-styles';
 import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
+import type { TFieldMetaSchema } from '@documenso/lib/types/field-field-meta';
+import { ZCheckboxFieldMeta, ZRadioFieldMeta } from '@documenso/lib/types/field-field-meta';
 
 import { cn } from '../../lib/utils';
 import { Card, CardContent } from '../card';
@@ -228,6 +230,30 @@ export const FieldItem = ({
     };
   }, [settingsActive]);
 
+  const hasFieldMetaValues = (
+    fieldType: string,
+    fieldMeta: TFieldMetaSchema,
+    parser: typeof ZCheckboxFieldMeta | typeof ZRadioFieldMeta,
+  ) => {
+    if (field.type !== fieldType || !fieldMeta) {
+      return false;
+    }
+
+    const parsedMeta = parser?.parse(fieldMeta);
+    return parsedMeta && parsedMeta.values && parsedMeta.values.length > 0;
+  };
+
+  const checkBoxHasValues = useMemo(
+    () => hasFieldMetaValues('CHECKBOX', field.fieldMeta, ZCheckboxFieldMeta),
+    [field.fieldMeta],
+  );
+  const radioHasValues = useMemo(
+    () => hasFieldMetaValues('RADIO', field.fieldMeta, ZRadioFieldMeta),
+    [field.fieldMeta],
+  );
+
+  const fixedSize = checkBoxHasValues || radioHasValues;
+
   return createPortal(
     <Rnd
       key={coords.pageX + coords.pageY + coords.pageHeight + coords.pageWidth}
@@ -236,13 +262,13 @@ export const FieldItem = ({
         'opacity-75 active:pointer-events-none': disabled,
         'z-10': !active || disabled,
       })}
-      // minHeight={minHeight}
-      // minWidth={minWidth}
+      minHeight={fixedSize ? '' : _minHeight || 'auto'}
+      minWidth={fixedSize ? '' : _minWidth || 'auto'}
       default={{
         x: coords.pageX,
         y: coords.pageY,
-        height: field.type === 'CHECKBOX' || field.type === 'RADIO' ? '' : coords.pageHeight,
-        width: field.type === 'CHECKBOX' || field.type === 'RADIO' ? '' : coords.pageWidth,
+        height: fixedSize ? '' : coords.pageHeight,
+        width: fixedSize ? '' : coords.pageWidth,
       }}
       bounds={`${PDF_VIEWER_PAGE_SELECTOR}[data-page-number="${field.pageNumber}"]`}
       onDragStart={() => setActive(true)}

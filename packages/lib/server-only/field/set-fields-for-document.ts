@@ -143,37 +143,55 @@ export const setFieldsForDocument = async ({
           }
         }
 
-        if (field.type === FieldType.CHECKBOX && field.fieldMeta) {
-          const checkboxFieldParsedMeta = ZCheckboxFieldMeta.parse(field.fieldMeta);
-          const errors = validateCheckboxField(
-            checkboxFieldParsedMeta?.values?.map((item) => item.value) ?? [],
-            checkboxFieldParsedMeta,
-          );
+        if (field.type === FieldType.CHECKBOX) {
+          if (field.fieldMeta) {
+            const checkboxFieldParsedMeta = ZCheckboxFieldMeta.parse(field.fieldMeta);
+            const errors = validateCheckboxField(
+              checkboxFieldParsedMeta?.values?.map((item) => item.value) ?? [],
+              checkboxFieldParsedMeta,
+            );
 
-          if (errors.length > 0) {
-            throw new Error(errors.join(', '));
+            if (errors.length > 0) {
+              throw new Error(errors.join(', '));
+            }
+          } else {
+            throw new Error(
+              'To proceed further, please set at least one value for the Checkbox field',
+            );
           }
         }
 
-        if (field.type === FieldType.RADIO && field.fieldMeta) {
-          const radioFieldParsedMeta = ZRadioFieldMeta.parse(field.fieldMeta);
-          const checkedRadioFieldValue = radioFieldParsedMeta.values?.find(
-            (option) => option.checked,
-          )?.value;
+        if (field.type === FieldType.RADIO) {
+          if (field.fieldMeta) {
+            const radioFieldParsedMeta = ZRadioFieldMeta.parse(field.fieldMeta);
+            const checkedRadioFieldValue = radioFieldParsedMeta.values?.find(
+              (option) => option.checked,
+            )?.value;
 
-          const errors = validateRadioField(checkedRadioFieldValue, radioFieldParsedMeta);
+            const errors = validateRadioField(checkedRadioFieldValue, radioFieldParsedMeta);
 
-          if (errors.length > 0) {
-            throw new Error(errors.join('. '));
+            if (errors.length > 0) {
+              throw new Error(errors.join('. '));
+            }
+          } else {
+            throw new Error(
+              'To proceed further, please set at least one value for the Radio field',
+            );
           }
         }
 
-        if (field.type === FieldType.DROPDOWN && field.fieldMeta) {
-          const dropdownFieldParsedMeta = ZDropdownFieldMeta.parse(field.fieldMeta);
-          const errors = validateDropdownField(undefined, dropdownFieldParsedMeta);
+        if (field.type === FieldType.DROPDOWN) {
+          if (field.fieldMeta) {
+            const dropdownFieldParsedMeta = ZDropdownFieldMeta.parse(field.fieldMeta);
+            const errors = validateDropdownField(undefined, dropdownFieldParsedMeta);
 
-          if (errors.length > 0) {
-            throw new Error(errors.join('. '));
+            if (errors.length > 0) {
+              throw new Error(errors.join('. '));
+            }
+          } else {
+            throw new Error(
+              'To proceed further, please set at least one value for the Dropdown field',
+            );
           }
         }
 
