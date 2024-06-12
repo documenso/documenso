@@ -56,8 +56,19 @@ export const Carousel = () => {
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [progress, setProgress] = useState(0);
   const videoRefs = useRef<(HTMLVideoElement | null)[]>([]);
-  const { theme } = useTheme();
   const [autoplayDelay, setAutoplayDelay] = useState<number[]>([]);
+  const { resolvedTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (mounted && videoRefs.current[selectedIndex]) {
+      videoRefs.current[selectedIndex].load();
+    }
+  }, [selectedIndex, mounted, resolvedTheme]);
 
   const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true }, [
     Autoplay({ playOnInit: true, delay: autoplayDelay[selectedIndex] || 5000 }),
@@ -115,7 +126,7 @@ export const Carousel = () => {
     };
 
     void setVideoDurations();
-  }, [slides, theme]);
+  }, [slides, mounted, resolvedTheme]);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -146,14 +157,14 @@ export const Carousel = () => {
     return () => {
       observer.disconnect();
     };
-  }, [slides, theme]);
+  }, [slides, mounted, resolvedTheme]);
 
   useEffect(() => {
     if (!emblaApi) return;
     onSelect();
 
     emblaApi.on('select', onSelect).on('reInit', onSelect);
-  }, [emblaApi, onSelect]);
+  }, [emblaApi, onSelect, mounted, resolvedTheme]);
 
   useEffect(() => {
     const autoplay = emblaApi?.plugins()?.autoplay;
@@ -164,24 +175,7 @@ export const Carousel = () => {
       .on('autoplay:play', () => setIsPlaying(true))
       .on('autoplay:stop', () => setIsPlaying(false))
       .on('reInit', () => setIsPlaying(autoplay.isPlaying()));
-  }, [emblaApi]);
-
-  // useEffect(() => {
-  //   const updateInterval = 50;
-  //   const increment = 100 / (autoplayDelay[selectedIndex] / updateInterval);
-
-  //   const timer = setInterval(() => {
-  //     setProgress((prevProgress) => {
-  //       if (prevProgress >= 100) {
-  //         clearInterval(timer);
-  //         return 100;
-  //       }
-  //       return prevProgress + increment;
-  //     });
-  //   }, updateInterval);
-
-  //   return () => clearInterval(timer);
-  // }, [selectedIndex, autoplayDelay]);
+  }, [emblaApi, mounted, resolvedTheme]);
 
   useEffect(() => {
     if (autoplayDelay[selectedIndex] === undefined) return;
@@ -205,15 +199,7 @@ export const Carousel = () => {
     }, updateInterval);
 
     return () => clearInterval(timer);
-  }, [selectedIndex, autoplayDelay, emblaApi]);
-
-  useEffect(() => {
-    videoRefs.current.forEach((video) => {
-      if (video) {
-        video.load();
-      }
-    });
-  }, [theme]);
+  }, [selectedIndex, autoplayDelay, emblaApi, mounted, resolvedTheme]);
 
   useEffect(() => {
     if (!emblaApi) return;
@@ -224,8 +210,10 @@ export const Carousel = () => {
     };
 
     resetCarousel();
-  }, [theme, emblaApi, autoplayDelay]);
+  }, [emblaApi, autoplayDelay, mounted, resolvedTheme]);
 
+  // Ensure the component renders only after mounting to avoid theme issues
+  if (!mounted) return null;
   return (
     <>
       <Card className="mx-auto mt-12 w-full max-w-4xl rounded-2xl p-1 before:rounded-2xl" gradient>
@@ -235,14 +223,14 @@ export const Carousel = () => {
               <div className="min-w-[10rem] flex-none basis-full rounded-xl" key={index}>
                 {slide.type === 'video' && (
                   <video
-                    key={`${theme}-${index}`}
+                    key={`${resolvedTheme}-${index}`}
                     ref={(el) => (videoRefs.current[index] = el)}
                     muted
                     loop
                     className="h-auto w-full rounded-xl"
                   >
                     <source
-                      src={theme === 'dark' ? slide.srcDark : slide.srcLight}
+                      src={resolvedTheme === 'dark' ? slide.srcDark : slide.srcLight}
                       type="video/webm"
                     />
                     Your browser does not support the video tag.
