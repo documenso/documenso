@@ -64,12 +64,6 @@ export const Carousel = () => {
     setMounted(true);
   }, []);
 
-  useEffect(() => {
-    if (mounted && videoRefs.current[selectedIndex]) {
-      videoRefs.current[selectedIndex].load();
-    }
-  }, [selectedIndex, mounted, resolvedTheme]);
-
   const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true }, [
     Autoplay({ playOnInit: true, delay: autoplayDelay[selectedIndex] || 5000 }),
   ]);
