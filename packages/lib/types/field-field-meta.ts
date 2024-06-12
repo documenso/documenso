@@ -32,6 +32,7 @@ export const ZRadioFieldMeta = ZBaseFieldMeta.extend({
   values: z
     .array(
       z.object({
+        id: z.number(),
         checked: z.boolean(),
         value: z.string(),
       }),

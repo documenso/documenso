@@ -196,7 +196,10 @@ export const insertFieldInPDF = async (pdf: PDFDocument, field: FieldWithSignatu
     }
 
     if (field.type !== 'CHECKBOX') {
-      page.drawText(field.customText, {
+      const customText =
+        field.type === 'RADIO' && field.customText.includes('empty-value-') ? '' : field.customText;
+
+      page.drawText(customText, {
         x: textX,
         y: textY,
         size: fontSize,

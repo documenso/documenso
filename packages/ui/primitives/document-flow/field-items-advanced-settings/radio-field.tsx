@@ -28,28 +28,31 @@ export const RadioFieldAdvancedSettings = ({
 }: RadioFieldAdvancedSettingsProps) => {
   const [showValidation, setShowValidation] = useState(false);
   const [values, setValues] = useState(
-    fieldState.values ?? [{ checked: false, value: 'Default value' }],
+    fieldState.values ?? [{ id: 1, checked: false, value: 'Default value' }],
   );
   const [readOnly, setReadOnly] = useState(fieldState.readOnly ?? false);
   const [required, setRequired] = useState(fieldState.required ?? false);
 
   const addValue = () => {
-    setValues([...values, { checked: false, value: '' }]);
-    handleFieldChange('values', [...values, { checked: false, value: '' }]);
+    const newId = values.length > 0 ? Math.max(...values.map((val) => val.id)) + 1 : 1;
+    const newValue = { id: newId, checked: false, value: '' };
+    const updatedValues = [...values, newValue];
+
+    setValues(updatedValues);
+    handleFieldChange('values', updatedValues);
   };
 
-  const removeValue = (index: number) => {
+  const removeValue = (id: number) => {
     if (values.length === 1) return;
 
-    const newValues = [...values];
-    newValues.splice(index, 1);
+    const newValues = values.filter((val) => val.id !== id);
     setValues(newValues);
     handleFieldChange('values', newValues);
   };
 
-  const handleCheckedChange = (checked: boolean, index: number) => {
-    const newValues = values.map((val, idx) => {
-      if (idx === index) {
+  const handleCheckedChange = (checked: boolean, id: number) => {
+    const newValues = values.map((val) => {
+      if (val.id === id) {
         return { ...val, checked: Boolean(checked) };
       } else {
         return { ...val, checked: false };
@@ -72,9 +75,14 @@ export const RadioFieldAdvancedSettings = ({
     handleFieldChange(field, value);
   };
 
-  const handleInputChange = (value: string, index: number) => {
-    const newValues = [...values];
-    newValues[index].value = value;
+  const handleInputChange = (value: string, id: number) => {
+    const newValues = values.map((val) => {
+      if (val.id === id) {
+        return { ...val, value };
+      }
+      return val;
+    });
+
     setValues(newValues);
     handleFieldChange('values', newValues);
 
@@ -82,7 +90,7 @@ export const RadioFieldAdvancedSettings = ({
   };
 
   useEffect(() => {
-    setValues(fieldState.values ?? [{ checked: false, value: 'Default value' }]);
+    setValues(fieldState.values ?? [{ id: 1, checked: false, value: 'Default value' }]);
   }, [fieldState.values]);
 
   useEffect(() => {
@@ -123,22 +131,22 @@ export const RadioFieldAdvancedSettings = ({
 
       {showValidation && (
         <div>
-          {values.map((value, index) => (
-            <div key={index} className="mt-2 flex items-center gap-4">
+          {values.map((value) => (
+            <div key={value.id} className="mt-2 flex items-center gap-4">
               <Checkbox
                 className="data-[state=checked]:bg-documenso border-foreground/30 data-[state=checked]:ring-documenso dark:data-[state=checked]:ring-offset-background h-5 w-5 rounded-full data-[state=checked]:ring-1 data-[state=checked]:ring-offset-2 data-[state=checked]:ring-offset-white"
                 checked={value.checked}
-                onCheckedChange={(checked) => handleCheckedChange(Boolean(checked), index)}
+                onCheckedChange={(checked) => handleCheckedChange(Boolean(checked), value.id)}
               />
               <Input
                 className="w-1/2"
                 value={value.value}
-                onChange={(e) => handleInputChange(e.target.value, index)}
+                onChange={(e) => handleInputChange(e.target.value, value.id)}
               />
               <button
                 type="button"
                 className="col-span-1 mt-auto inline-flex h-10 w-10 items-center text-slate-500 hover:opacity-80 disabled:cursor-not-allowed disabled:opacity-50 dark:text-white"
-                onClick={() => removeValue(index)}
+                onClick={() => removeValue(value.id)}
               >
                 <Trash className="h-5 w-5" />
               </button>

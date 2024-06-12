@@ -39,18 +39,14 @@ export const RadioField = ({ field, recipient, onSignField, onUnsignField }: Rad
   const [isPending, startTransition] = useTransition();
 
   const parsedFieldMeta = ZRadioFieldMeta.parse(field.fieldMeta);
-  const checkedItem = parsedFieldMeta.values?.find((item) => item.checked);
-  const defaultValue = !field.inserted
-    ? checkedItem?.value && checkedItem.value.length > 0
-      ? checkedItem.value
-      : 'empty-value'
-    : '';
-  const defaultIndex = !field.inserted
-    ? parsedFieldMeta.values?.findIndex((item) => item.checked) || null
-    : null;
+  const values = parsedFieldMeta.values?.map((item) => ({
+    ...item,
+    value: item.value.length > 0 ? item.value : `empty-value-${item.id}`,
+  }));
+  const checkedItem = values?.find((item) => item.checked);
+  const defaultValue = !field.inserted && !!checkedItem ? checkedItem.value : '';
 
   const [selectedOption, setSelectedOption] = useState(defaultValue);
-  const [selectedOptionIndex, setSelectedOptionIndex] = useState<number | null>(defaultIndex);
 
   const { executeActionAuthProcedure } = useRequiredDocumentAuthContext();
 
@@ -64,7 +60,9 @@ export const RadioField = ({ field, recipient, onSignField, onUnsignField }: Rad
 
   const isLoading = isSignFieldWithTokenLoading || isRemoveSignedFieldWithTokenLoading || isPending;
   const shouldAutoSignField =
-    !field.inserted && (selectedOption || parsedFieldMeta.readOnly) && defaultValue;
+    (!field.inserted && selectedOption) ||
+    (!field.inserted && defaultValue) ||
+    (!field.inserted && parsedFieldMeta.readOnly && defaultValue);
 
   const onSign = async (authOptions?: TRecipientActionAuth) => {
     try {
@@ -75,7 +73,7 @@ export const RadioField = ({ field, recipient, onSignField, onUnsignField }: Rad
       const payload: TSignFieldWithTokenMutationSchema = {
         token: recipient.token,
         fieldId: field.id,
-        value: selectedOption === 'empty-value' ? '' : selectedOption,
+        value: selectedOption,
         isBase64: true,
         authOptions,
       };
@@ -119,7 +117,6 @@ export const RadioField = ({ field, recipient, onSignField, onUnsignField }: Rad
       }
 
       setSelectedOption('');
-      setSelectedOptionIndex(null);
 
       startTransition(() => router.refresh());
     } catch (err) {
@@ -144,7 +141,7 @@ export const RadioField = ({ field, recipient, onSignField, onUnsignField }: Rad
         actionTarget: field.type,
       });
     }
-  }, [selectedOption]);
+  }, [selectedOption, field]);
 
   return (
     <SigningFieldContainer field={field} onSign={onSign} onRemove={onRemove} type="Radio">
@@ -155,17 +152,8 @@ export const RadioField = ({ field, recipient, onSignField, onUnsignField }: Rad
       )}
 
       {!field.inserted && (
-        <RadioGroup
-          onValueChange={(value) => {
-            if (value) {
-              handleSelectItem(value);
-            } else {
-              handleSelectItem('empty-value');
-            }
-          }}
-          className="z-10"
-        >
-          {parsedFieldMeta.values?.map((item, index) => (
+        <RadioGroup onValueChange={(value) => handleSelectItem(value)} className="z-10">
+          {values?.map((item, index) => (
             <Card
               id={String(index)}
               key={index}
@@ -197,9 +185,10 @@ export const RadioField = ({ field, recipient, onSignField, onUnsignField }: Rad
                   value={item.value}
                   id={`option-${index}`}
                   checked={item.checked}
-                  onClick={() => setSelectedOptionIndex(index)}
                 />
-                <Label htmlFor={`option-${index}`}>{item.value}</Label>
+                <Label htmlFor={`option-${index}`}>
+                  {item.value.includes('empty-value-') ? '' : item.value}
+                </Label>
               </CardContent>
             </Card>
           ))}
@@ -208,7 +197,7 @@ export const RadioField = ({ field, recipient, onSignField, onUnsignField }: Rad
 
       {field.inserted && (
         <RadioGroup>
-          {parsedFieldMeta.values?.map((item, index) => (
+          {values?.map((item, index) => (
             <Card
               id={String(index)}
               key={index}
@@ -220,9 +209,7 @@ export const RadioField = ({ field, recipient, onSignField, onUnsignField }: Rad
                 },
                 {
                   'bg-documenso/20 border-documenso dark:text-background/80':
-                    field.inserted && item.value.length > 0
-                      ? item.value === field.customText
-                      : selectedOptionIndex === index,
+                    field.inserted && item.value === field.customText,
                 },
               )}
             >
@@ -231,13 +218,11 @@ export const RadioField = ({ field, recipient, onSignField, onUnsignField }: Rad
                   className="data-[state=checked]:ring-documenso data-[state=checked]:bg-documenso dark:data-[state=checked]:border-documenso h-5 w-5 shrink-0 data-[state=checked]:ring-1 data-[state=checked]:ring-offset-2 dark:data-[state=checked]:ring-offset-white"
                   value={item.value}
                   id={`option-${index}`}
-                  checked={
-                    item.value.length > 0
-                      ? item.value === field.customText
-                      : selectedOptionIndex === index
-                  }
+                  checked={item.value === field.customText}
                 />
-                <Label htmlFor={`option-${index}`}>{item.value}</Label>
+                <Label htmlFor={`option-${index}`}>
+                  {item.value.includes('empty-value-') ? '' : item.value}
+                </Label>
               </CardContent>
             </Card>
           ))}
