@@ -52,8 +52,15 @@ export const insertFieldInPDF = async (pdf: PDFDocument, field: FieldWithSignatu
 
   let { width: pageWidth, height: pageHeight } = page.getSize();
 
-  // For landscape pages, swap the width and height so we can calculate item position the same way
-  // the user placed it in the editor.
+  // PDFs can have pages that are rotated, which are correctly rendered in the frontend.
+  // However when we load the PDF in the backend, the rotation is applied.
+  //
+  // To account for this, we swap the width and height for pages that are rotated by 90/270
+  // degrees. This is so we can calculate the virtual position the field was placed if it
+  // was correctly oriented in the frontend.
+  //
+  // Then when we insert the fields, we apply a transformation to the position of the field
+  // so it is rotated correctly.
   if (isPageRotatedToLandscape) {
     [pageWidth, pageHeight] = [pageHeight, pageWidth];
   }
@@ -174,16 +181,15 @@ const adjustPositionForRotation = (
 ) => {
   if (pageRotationInDegrees === 270) {
     xPos = pageWidth - xPos;
-
     [xPos, yPos] = [yPos, xPos];
   }
 
   if (pageRotationInDegrees === 90) {
     yPos = pageHeight - yPos;
-
     [xPos, yPos] = [yPos, xPos];
   }
 
+  // Invert all the positions since it's rotated by 180 degrees.
   if (pageRotationInDegrees === 180) {
     xPos = pageWidth - xPos;
     yPos = pageHeight - yPos;
