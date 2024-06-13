@@ -30,8 +30,6 @@ export const getStats = async ({ user, period, ...options }: GetStatsInput) => {
     ? getTeamCounts({ ...options.team, createdAt })
     : getCounts({ user, createdAt }));
 
-  console.log(deletedCounts);
-
   const stats: Record<ExtendedDocumentStatus, number> = {
     [ExtendedDocumentStatus.DRAFT]: 0,
     [ExtendedDocumentStatus.PENDING]: 0,
@@ -266,7 +264,7 @@ const getTeamCounts = async (options: GetTeamCountsOption) => {
       },
     } satisfies Prisma.DocumentGroupByArgs;
 
-    // TODO: fix this because its returning 0 always
+    // Deleted counts.
     deletedCountsGroupByArgs = {
       by: ['status'],
       _count: {
@@ -275,6 +273,16 @@ const getTeamCounts = async (options: GetTeamCountsOption) => {
       where: {
         userId: userIdWhereClause,
         createdAt,
+        status: ExtendedDocumentStatus.COMPLETED,
+        Recipient: {
+          some: {
+            email: teamEmail,
+            signingStatus: SigningStatus.SIGNED,
+            documentDeletedAt: {
+              gte: DateTime.now().minus({ days: 30 }).startOf('day').toJSDate(),
+            },
+          },
+        },
         deletedAt: {
           gte: DateTime.now().minus({ days: 30 }).startOf('day').toJSDate(),
         },
