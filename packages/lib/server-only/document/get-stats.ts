@@ -26,7 +26,7 @@ export const getStats = async ({ user, period, ...options }: GetStatsInput) => {
     };
   }
 
-  const [ownerCounts, notSignedCounts, hasSignedCounts] = await (options.team
+  const [ownerCounts, notSignedCounts, hasSignedCounts, deletedCounts] = await (options.team
     ? getTeamCounts({ ...options.team, createdAt })
     : getCounts({ user, createdAt }));
 
@@ -55,6 +55,10 @@ export const getStats = async ({ user, period, ...options }: GetStatsInput) => {
     if (stat.status === ExtendedDocumentStatus.PENDING) {
       stats[ExtendedDocumentStatus.PENDING] += stat._count._all;
     }
+  });
+
+  deletedCounts.forEach((stat) => {
+    stats[ExtendedDocumentStatus.BIN] += stat._count._all;
   });
 
   Object.keys(stats).forEach((key) => {
@@ -141,6 +145,20 @@ const getCounts = async ({ user, createdAt }: GetCountsOption) => {
         ],
       },
     }),
+    // Deleted counts.
+    prisma.document.groupBy({
+      by: ['status'],
+      _count: {
+        _all: true,
+      },
+      where: {
+        userId: user.id,
+        createdAt,
+        deletedAt: {
+          not: null,
+        },
+      },
+    }),
   ]);
 };
 
@@ -172,6 +190,7 @@ const getTeamCounts = async (options: GetTeamCountsOption) => {
 
   let notSignedCountsGroupByArgs = null;
   let hasSignedCountsGroupByArgs = null;
+  let deletedCountsGroupByArgs = null;
 
   if (teamEmail) {
     ownerCountsWhereInput = {
@@ -244,6 +263,20 @@ const getTeamCounts = async (options: GetTeamCountsOption) => {
         ],
       },
     } satisfies Prisma.DocumentGroupByArgs;
+
+    deletedCountsGroupByArgs = {
+      by: ['status'],
+      _count: {
+        _all: true,
+      },
+      where: {
+        userId: userIdWhereClause,
+        createdAt,
+        deletedAt: {
+          not: null,
+        },
+      },
+    } satisfies Prisma.DocumentGroupByArgs;
   }
 
   return Promise.all([
@@ -256,5 +289,6 @@ const getTeamCounts = async (options: GetTeamCountsOption) => {
     }),
     notSignedCountsGroupByArgs ? prisma.document.groupBy(notSignedCountsGroupByArgs) : [],
     hasSignedCountsGroupByArgs ? prisma.document.groupBy(hasSignedCountsGroupByArgs) : [],
+    deletedCountsGroupByArgs ? prisma.document.groupBy(deletedCountsGroupByArgs) : [],
   ]);
 };
