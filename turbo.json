@@ -2,8 +2,13 @@
   "$schema": "https://turbo.build/schema.json",
   "pipeline": {
     "build": {
-      "dependsOn": ["^build"],
-      "outputs": [".next/**", "!.next/cache/**"]
+      "dependsOn": [
+        "^build"
+      ],
+      "outputs": [
+        ".next/**",
+        "!.next/cache/**"
+      ]
     },
     "lint": {
       "cache": false
@@ -19,7 +24,9 @@
       "persistent": true
     },
     "start": {
-      "dependsOn": ["^build"],
+      "dependsOn": [
+        "^build"
+      ],
       "cache": false,
       "persistent": true
     },
@@ -27,11 +34,15 @@
       "cache": false
     },
     "test:e2e": {
-      "dependsOn": ["^build"],
+      "dependsOn": [
+        "^build"
+      ],
       "cache": false
     }
   },
-  "globalDependencies": ["**/.env.*local"],
+  "globalDependencies": [
+    "**/.env.*local"
+  ],
   "globalEnv": [
     "APP_VERSION",
     "NEXT_PRIVATE_ENCRYPTION_KEY",
@@ -59,6 +70,9 @@
     "NEXT_PRIVATE_SIGNING_GCLOUD_APPLICATION_CREDENTIALS_CONTENTS",
     "NEXT_PRIVATE_GOOGLE_CLIENT_ID",
     "NEXT_PRIVATE_GOOGLE_CLIENT_SECRET",
+    "NEXT_PRIVATE_OIDC_WELL_KNOWN",
+    "NEXT_PRIVATE_OIDC_CLIENT_ID",
+    "NEXT_PRIVATE_OIDC_CLIENT_SECRET",
     "NEXT_PUBLIC_UPLOAD_TRANSPORT",
     "NEXT_PRIVATE_UPLOAD_ENDPOINT",
     "NEXT_PRIVATE_UPLOAD_FORCE_PATH_STYLE",
@@ -93,6 +107,7 @@
     "NEXT_PRIVATE_STRIPE_API_KEY",
     "NEXT_PRIVATE_STRIPE_WEBHOOK_SECRET",
     "NEXT_PRIVATE_GITHUB_TOKEN",
+    "NEXT_PRIVATE_BROWSERLESS_URL",
     "CI",
     "VERCEL",
     "VERCEL_ENV",
@@ -100,6 +115,7 @@
     "NODE_ENV",
     "DEPLOYMENT_TARGET",
     "FONT_CAVEAT_URI",
+    "FONT_NOTO_SANS_URI",
     "POSTGRES_URL",
     "DATABASE_URL",
     "DATABASE_URL_UNPOOLED",

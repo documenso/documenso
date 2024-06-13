@@ -1,3 +1,7 @@
+generator kysely {
+  provider = "prisma-kysely"
+}
+
 generator client {
   provider = "prisma-client-js"
 }
@@ -11,6 +15,7 @@ datasource db {
 enum IdentityProvider {
   DOCUMENSO
   GOOGLE
+  OIDC
 }
 
 enum Role {
@@ -98,7 +103,7 @@ model PasswordResetToken {
   createdAt DateTime @default(now())
   expiry    DateTime
   userId    Int
-  User      User     @relation(fields: [userId], references: [id])
+  User      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Passkey {
@@ -228,6 +233,10 @@ model Account {
   refresh_token     String? @db.Text
   access_token      String? @db.Text
   expires_at        Int?
+  // Some providers return created_at so we need to make it optional
+  created_at        Int?
+  // Stops next-auth from crashing when dealing with AzureAD
+  ext_expires_in    Int?
   token_type        String?
   scope             String?
   id_token          String? @db.Text
@@ -252,11 +261,18 @@ enum DocumentStatus {
   COMPLETED
 }
 
+enum DocumentSource {
+  DOCUMENT
+  TEMPLATE
+  TEMPLATE_DIRECT_LINK
+}
+
 model Document {
   id             Int                 @id @default(autoincrement())
   userId         Int
   User           User                @relation(fields: [userId], references: [id], onDelete: Cascade)
   authOptions    Json?
+  formValues     Json?
   title          String
   status         DocumentStatus      @default(DRAFT)
   Recipient      Recipient[]
@@ -271,6 +287,9 @@ model Document {
   deletedAt      DateTime?
   teamId         Int?
   team           Team?               @relation(fields: [teamId], references: [id])
+  templateId     Int?
+  template       Template?           @relation(fields: [templateId], references: [id], onDelete: SetNull)
+  source         DocumentSource
 
   auditLogs DocumentAuditLog[]
 
@@ -346,23 +365,24 @@ enum RecipientRole {
 }
 
 model Recipient {
-  id            Int           @id @default(autoincrement())
-  documentId    Int?
-  templateId    Int?
-  email         String        @db.VarChar(255)
-  name          String        @default("") @db.VarChar(255)
-  token         String
-  expired       DateTime?
-  signedAt      DateTime?
-  authOptions   Json?
-  role          RecipientRole @default(SIGNER)
-  readStatus    ReadStatus    @default(NOT_OPENED)
-  signingStatus SigningStatus @default(NOT_SIGNED)
-  sendStatus    SendStatus    @default(NOT_SENT)
-  Document      Document?     @relation(fields: [documentId], references: [id], onDelete: Cascade)
-  Template      Template?     @relation(fields: [templateId], references: [id], onDelete: Cascade)
-  Field         Field[]
-  Signature     Signature[]
+  id                Int           @id @default(autoincrement())
+  documentId        Int?
+  templateId        Int?
+  email             String        @db.VarChar(255)
+  name              String        @default("") @db.VarChar(255)
+  token             String
+  documentDeletedAt DateTime?
+  expired           DateTime?
+  signedAt          DateTime?
+  authOptions       Json?
+  role              RecipientRole @default(SIGNER)
+  readStatus        ReadStatus    @default(NOT_OPENED)
+  signingStatus     SigningStatus @default(NOT_SIGNED)
+  sendStatus        SendStatus    @default(NOT_SENT)
+  Document          Document?     @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  Template          Template?     @relation(fields: [templateId], references: [id], onDelete: Cascade)
+  Field             Field[]
+  Signature         Signature[]
 
   @@unique([documentId, email])
   @@unique([templateId, email])
@@ -385,7 +405,7 @@ model Field {
   secondaryId String     @unique @default(cuid())
   documentId  Int?
   templateId  Int?
-  recipientId Int?
+  recipientId Int
   type        FieldType
   page        Int
   positionX   Decimal    @default(0)
@@ -396,7 +416,7 @@ model Field {
   inserted    Boolean
   Document    Document?  @relation(fields: [documentId], references: [id], onDelete: Cascade)
   Template    Template?  @relation(fields: [templateId], references: [id], onDelete: Cascade)
-  Recipient   Recipient? @relation(fields: [recipientId], references: [id], onDelete: Cascade)
+  Recipient   Recipient  @relation(fields: [recipientId], references: [id], onDelete: Cascade)
   Signature   Signature?
 
   @@index([documentId])
@@ -413,7 +433,7 @@ model Signature {
   typedSignature         String?
 
   Recipient Recipient @relation(fields: [recipientId], references: [id], onDelete: Cascade)
-  Field     Field     @relation(fields: [fieldId], references: [id], onDelete: Restrict)
+  Field     Field     @relation(fields: [fieldId], references: [id], onDelete: Cascade)
 
   @@index([recipientId])
 }
@@ -455,7 +475,7 @@ model Team {
   emailVerification    TeamEmailVerification?
   transferVerification TeamTransferVerification?
 
-  owner        User          @relation(fields: [ownerUserId], references: [id])
+  owner        User          @relation(fields: [ownerUserId], references: [id], onDelete: Cascade)
   subscription Subscription?
 
   document  Document[]
@@ -481,7 +501,7 @@ model TeamMember {
   createdAt DateTime       @default(now())
   role      TeamMemberRole
   userId    Int
-  user      User           @relation(fields: [userId], references: [id])
+  user      User           @relation(fields: [userId], references: [id], onDelete: Cascade)
   team      Team           @relation(fields: [teamId], references: [id], onDelete: Cascade)
 
   @@unique([userId, teamId])
@@ -537,23 +557,51 @@ enum TemplateType {
   PRIVATE
 }
 
+model TemplateMeta {
+  id          String   @id @default(cuid())
+  subject     String?
+  message     String?
+  timezone    String?  @default("Etc/UTC") @db.Text
+  password    String?
+  dateFormat  String?  @default("yyyy-MM-dd hh:mm a") @db.Text
+  templateId  Int      @unique
+  template    Template @relation(fields: [templateId], references: [id], onDelete: Cascade)
+  redirectUrl String?
+}
+
 model Template {
-  id                     Int          @id @default(autoincrement())
-  type                   TemplateType @default(PRIVATE)
+  id                     Int           @id @default(autoincrement())
+  type                   TemplateType  @default(PRIVATE)
   title                  String
   userId                 Int
   teamId                 Int?
+  authOptions            Json?
+  templateMeta           TemplateMeta?
   templateDocumentDataId String
-  createdAt              DateTime     @default(now())
-  updatedAt              DateTime     @default(now()) @updatedAt
+  createdAt              DateTime      @default(now())
+  updatedAt              DateTime      @default(now()) @updatedAt
 
-  team                 Team?        @relation(fields: [teamId], references: [id], onDelete: Cascade)
-  templateDocumentData DocumentData @relation(fields: [templateDocumentDataId], references: [id], onDelete: Cascade)
-  User                 User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  team                 Team?               @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  templateDocumentData DocumentData        @relation(fields: [templateDocumentDataId], references: [id], onDelete: Cascade)
+  User                 User                @relation(fields: [userId], references: [id], onDelete: Cascade)
   Recipient            Recipient[]
   Field                Field[]
+  directLink           TemplateDirectLink?
+  documents            Document[]
 
   @@unique([templateDocumentDataId])
+}
+
+model TemplateDirectLink {
+  id         String   @id @unique @default(cuid())
+  templateId Int      @unique
+  token      String   @unique
+  createdAt  DateTime @default(now())
+  enabled    Boolean
+
+  directTemplateRecipientId Int
+
+  template Template @relation(fields: [templateId], references: [id], onDelete: Cascade)
 }
 
 model SiteSettings {
@@ -562,5 +610,5 @@ model SiteSettings {
   data                 Json
   lastModifiedByUserId Int?
   lastModifiedAt       DateTime @default(now())
-  lastModifiedByUser   User?    @relation(fields: [lastModifiedByUserId], references: [id])
+  lastModifiedByUser   User?    @relation(fields: [lastModifiedByUserId], references: [id], onDelete: SetNull)
 }

@@ -1,4 +1,4 @@
-import { HTMLAttributes } from 'react';
+import type { HTMLAttributes } from 'react';
 
 import Image from 'next/image';
 
@@ -51,7 +51,7 @@ export const ShareConnectPaidWidgetBento = ({
         <Card className="col-span-2 lg:col-span-1" spotlight>
           <CardContent className="grid grid-cols-1 gap-8 p-6">
             <p className="text-foreground/80 leading-relaxed">
-              <strong className="block">Connections (Soon).</strong>
+              <strong className="block">Connections</strong>
               Create connections and automations with Zapier and more to integrate with your
               favorite tools.
             </p>
@@ -70,7 +70,7 @@ export const ShareConnectPaidWidgetBento = ({
           <CardContent className="grid grid-cols-1 gap-8 p-6">
             <p className="text-foreground/80 leading-relaxed">
               <strong className="block">Get paid (Soon).</strong>
-              Integrated payments with stripe so you don’t have to worry about getting paid.
+              Integrated payments with Stripe so you don’t have to worry about getting paid.
             </p>
 
             <div className="flex items-center justify-center p-8">

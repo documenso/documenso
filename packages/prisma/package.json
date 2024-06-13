@@ -12,21 +12,25 @@
     "prisma:generate": "prisma generate",
     "prisma:migrate-dev": "prisma migrate dev --skip-seed",
     "prisma:migrate-deploy": "prisma migrate deploy",
+    "prisma:migrate-reset": "prisma migrate reset",
     "prisma:seed": "prisma db seed",
     "prisma:studio": "prisma studio"
   },
   "prisma": {
-    "seed": "ts-node --transpileOnly --project ./tsconfig.seed.json ./seed-database.ts"
+    "seed": "tsx ./seed-database.ts"
   },
   "dependencies": {
     "@prisma/client": "5.4.2",
+    "kysely": "^0.27.3",
     "prisma": "5.4.2",
+    "prisma-extension-kysely": "^2.1.0",
     "ts-pattern": "^5.0.6"
   },
   "devDependencies": {
     "dotenv": "^16.3.1",
     "dotenv-cli": "^7.3.0",
-    "ts-node": "^10.9.1",
+    "prisma-kysely": "^1.8.0",
+    "tsx": "^4.11.0",
     "typescript": "5.2.2"
   }
 }

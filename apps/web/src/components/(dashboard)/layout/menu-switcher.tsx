@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
+import { motion } from 'framer-motion';
 import { CheckCircle2, ChevronsUpDown, Plus, Settings2 } from 'lucide-react';
 import { signOut } from 'next-auth/react';
 
@@ -24,6 +25,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@documenso/ui/primitives/dropdown-menu';
+
+const MotionLink = motion(Link);
 
 export type MenuSwitcherProps = {
   user: User;
@@ -93,7 +96,7 @@ export const MenuSwitcher = ({ user, teams: initialTeamsData }: MenuSwitcherProp
         <Button
           data-testid="menu-switcher"
           variant="none"
-          className="relative flex h-12 flex-row items-center px-2 py-2 ring-0 focus:outline-none focus-visible:border-0 focus-visible:ring-0 focus-visible:ring-transparent"
+          className="relative flex h-12 flex-row items-center px-0 py-2 ring-0 focus:outline-none focus-visible:border-0 focus-visible:ring-0 focus-visible:ring-transparent md:px-2"
         >
           <AvatarWithText
             avatarFallback={formatAvatarFallback(selectedTeam?.name)}
@@ -102,12 +105,13 @@ export const MenuSwitcher = ({ user, teams: initialTeamsData }: MenuSwitcherProp
             rightSideComponent={
               <ChevronsUpDown className="text-muted-foreground ml-auto h-4 w-4" />
             }
+            textSectionClassName="hidden lg:flex"
           />
         </Button>
       </DropdownMenuTrigger>
 
       <DropdownMenuContent
-        className={cn('z-[60] ml-2 w-full md:ml-0', teams ? 'min-w-[20rem]' : 'min-w-[12rem]')}
+        className={cn('z-[60] ml-6 w-full md:ml-0', teams ? 'min-w-[20rem]' : 'min-w-[12rem]')}
         align="end"
         forceMount
       >
@@ -169,18 +173,43 @@ export const MenuSwitcher = ({ user, teams: initialTeamsData }: MenuSwitcherProp
             <div className="custom-scrollbar max-h-[40vh] overflow-auto">
               {teams.map((team) => (
                 <DropdownMenuItem asChild key={team.id}>
-                  <Link href={formatRedirectUrlOnSwitch(team.url)}>
+                  <MotionLink
+                    initial="initial"
+                    animate="initial"
+                    whileHover="animate"
+                    href={formatRedirectUrlOnSwitch(team.url)}
+                  >
                     <AvatarWithText
                       avatarFallback={formatAvatarFallback(team.name)}
                       primaryText={team.name}
-                      secondaryText={formatSecondaryAvatarText(team)}
+                      secondaryText={
+                        <div className="relative">
+                          <motion.span
+                            className="overflow-hidden"
+                            variants={{
+                              initial: { opacity: 1, translateY: 0 },
+                              animate: { opacity: 0, translateY: '100%' },
+                            }}
+                          >
+                            {formatSecondaryAvatarText(team)}
+                          </motion.span>
+
+                          <motion.span
+                            className="absolute inset-0"
+                            variants={{
+                              initial: { opacity: 0, translateY: '100%' },
+                              animate: { opacity: 1, translateY: 0 },
+                            }}
+                          >{`/t/${team.url}`}</motion.span>
+                        </div>
+                      }
                       rightSideComponent={
                         isPathTeamUrl(team.url) && (
                           <CheckCircle2 className="ml-auto fill-black text-white dark:fill-white dark:text-black" />
                         )
                       }
                     />
-                  </Link>
+                  </MotionLink>
                 </DropdownMenuItem>
               ))}
             </div>

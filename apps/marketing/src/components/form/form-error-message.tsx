@@ -1,5 +1,5 @@
 import { AnimatePresence, motion } from 'framer-motion';
-import { FieldError } from 'react-hook-form';
+import type { FieldError } from 'react-hook-form';
 
 import { cn } from '@documenso/ui/lib/utils';
 

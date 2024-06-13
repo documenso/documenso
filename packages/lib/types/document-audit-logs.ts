@@ -6,7 +6,7 @@
 /////////////////////////////////////////////////////////////////////////////////////////////
 import { z } from 'zod';
 
-import { FieldType } from '@documenso/prisma/client';
+import { DocumentSource, FieldType } from '@documenso/prisma/client';
 
 import { ZRecipientActionAuthTypesSchema } from './document-auth';
 
@@ -192,6 +192,22 @@ export const ZDocumentAuditLogEventDocumentCreatedSchema = z.object({
   type: z.literal(DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_CREATED),
   data: z.object({
     title: z.string(),
+    source: z
+      .union([
+        z.object({
+          type: z.literal(DocumentSource.DOCUMENT),
+        }),
+        z.object({
+          type: z.literal(DocumentSource.TEMPLATE),
+          templateId: z.number(),
+        }),
+        z.object({
+          type: z.literal(DocumentSource.TEMPLATE_DIRECT_LINK),
+          templateId: z.number(),
+          directRecipientEmail: z.string().email(),
+        }),
+      ])
+      .optional(),
   }),
 });
 
@@ -236,11 +252,29 @@ export const ZDocumentAuditLogEventDocumentFieldInsertedSchema = z.object({
         data: z.string(),
       }),
     ]),
-    fieldSecurity: z
-      .object({
-        type: ZRecipientActionAuthTypesSchema,
-      })
-      .optional(),
+    fieldSecurity: z.preprocess(
+      (input) => {
+        const legacyNoneSecurityType = JSON.stringify({
+          type: 'NONE',
+        });
+
+        // Replace legacy 'NONE' field security type with undefined.
+        if (
+          typeof input === 'object' &&
+          input !== null &&
+          JSON.stringify(input) === legacyNoneSecurityType
+        ) {
+          return undefined;
+        }
+
+        return input;
+      },
+      z
+        .object({
+          type: ZRecipientActionAuthTypesSchema,
+        })
+        .optional(),
+    ),
   }),
 });
 

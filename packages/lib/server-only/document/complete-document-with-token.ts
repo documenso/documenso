@@ -49,8 +49,8 @@ export const completeDocumentWithToken = async ({
 
   const document = await getDocument({ token, documentId });
 
-  if (document.status === DocumentStatus.COMPLETED) {
-    throw new Error(`Document ${document.id} has already been completed`);
+  if (document.status !== DocumentStatus.PENDING) {
+    throw new Error(`Document ${document.id} must be pending`);
   }
 
   if (document.Recipient.length === 0) {
@@ -137,7 +137,7 @@ export const completeDocumentWithToken = async ({
     await sendPendingEmail({ documentId, recipientId: recipient.id });
   }
 
-  const documents = await prisma.document.updateMany({
+  const haveAllRecipientsSigned = await prisma.document.findFirst({
     where: {
       id: document.id,
       Recipient: {
@@ -146,13 +146,9 @@ export const completeDocumentWithToken = async ({
         },
       },
     },
-    data: {
-      status: DocumentStatus.COMPLETED,
-      completedAt: new Date(),
-    },
   });
 
-  if (documents.count > 0) {
+  if (haveAllRecipientsSigned) {
     await sealDocument({ documentId: document.id, requestMetadata });
   }
 

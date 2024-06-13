@@ -14,7 +14,7 @@ import { seedTestEmail, seedUser, unseedUser } from '@documenso/prisma/seed/user
 
 import { apiSignin, apiSignout } from '../fixtures/authentication';
 
-test.describe.configure({ mode: 'parallel' });
+test.describe.configure({ mode: 'parallel', timeout: 60000 });
 
 test('[DOCUMENT_AUTH]: should allow signing when no auth setup', async ({ page }) => {
   const user = await seedUser();

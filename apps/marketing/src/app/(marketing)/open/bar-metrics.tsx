@@ -55,6 +55,7 @@ export const BarMetric = <T extends Record<string, Record<keyof T[string], unkno
               cursor={{ fill: 'hsl(var(--primary) / 10%)' }}
             />
             <Bar
+              // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
               dataKey={metricKey as string}
               maxBarSize={60}
               fill="hsl(var(--primary))"

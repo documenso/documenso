@@ -2,14 +2,14 @@ name: 'PR Review Reminder'
 
 on:
   pull_request:
-    types: ['opened', 'reopened', 'ready_for_review', 'review_requested']
+    types: ['opened', 'ready_for_review']
 
 permissions:
   pull-requests: write
 
 jobs:
   checkPRs:
-    if: ${{ github.event.pull_request.user.login }} && github.event.action == ('opened' || 'reopened' || 'ready_for_review' || 'review_requested')
+    if: ${{ github.event.pull_request.user.login }} && github.event.action == ('opened' || 'ready_for_review')
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
