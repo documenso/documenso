@@ -4,6 +4,7 @@ export enum STRIPE_CUSTOMER_TYPE {
 }
 
 export enum STRIPE_PLAN_TYPE {
+  REGULAR = 'regular',
   TEAM = 'team',
   COMMUNITY = 'community',
   ENTERPRISE = 'enterprise',
