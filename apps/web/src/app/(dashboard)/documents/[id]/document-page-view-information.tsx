@@ -26,6 +26,9 @@ export const DocumentPageViewInformation = ({
 
   const documentInformation = useMemo(() => {
     let createdValue = DateTime.fromJSDate(document.createdAt).toFormat('MMMM d, yyyy');
+    let deletedValue =
+      document.deletedAt && DateTime.fromJSDate(document.deletedAt).toFormat('MMMM d, yyyy');
+
     let lastModifiedValue = DateTime.fromJSDate(document.updatedAt).toRelative();
 
     if (!isMounted) {
@@ -34,9 +37,13 @@ export const DocumentPageViewInformation = ({
         .toFormat('MMMM d, yyyy');
 
       lastModifiedValue = DateTime.fromJSDate(document.updatedAt).setLocale(locale).toRelative();
+
+      deletedValue =
+        document.deletedAt &&
+        DateTime.fromJSDate(document.deletedAt).setLocale(locale).toFormat('MMMM d, yyyy');
     }
 
-    return [
+    const info = [
       {
         description: 'Uploaded by',
         value: userId === document.userId ? 'You' : document.User.name ?? document.User.email,
@@ -50,6 +57,15 @@ export const DocumentPageViewInformation = ({
         value: lastModifiedValue,
       },
     ];
+
+    if (deletedValue) {
+      info.push({
+        description: 'Deleted',
+        value: deletedValue,
+      });
+    }
+
+    return info;
   }, [isMounted, document, locale, userId]);
 
   return (
