@@ -162,8 +162,6 @@ export const CheckboxField = ({
     setCheckedValues(updatedValues);
   };
 
-  console.log('checkedValues', checkedValues);
-
   const handleCheckboxOptionClick = async (item: {
     id: number;
     checked: boolean;
