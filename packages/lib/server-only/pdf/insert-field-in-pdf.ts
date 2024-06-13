@@ -168,6 +168,9 @@ export const insertFieldInPDF = async (pdf: PDFDocument, field: FieldWithSignatu
 
     if (field.type === FieldType.CHECKBOX) {
       const checkboxValues = field.customText.split(',').map((value) => value.trim());
+      const formattedCheckboxValues = checkboxValues.map((value) =>
+        value.includes('empty-value-') ? '' : value,
+      );
 
       handleCheckboxField(
         page,
@@ -177,7 +180,7 @@ export const insertFieldInPDF = async (pdf: PDFDocument, field: FieldWithSignatu
         fieldHeight,
         pageHeight,
         font,
-        checkboxValues,
+        formattedCheckboxValues,
       );
     }
 

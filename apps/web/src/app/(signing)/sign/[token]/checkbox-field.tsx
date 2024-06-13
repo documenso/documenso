@@ -47,13 +47,19 @@ export const CheckboxField = ({
   const { executeActionAuthProcedure } = useRequiredDocumentAuthContext();
 
   const parsedFieldMeta = ZCheckboxFieldMeta.parse(field.fieldMeta);
-  const [checkedValues, setCheckedValues] = useState<string[]>(
-    parsedFieldMeta.values
-      ?.map((item, index) =>
-        item.checked ? (item.value.length > 0 ? item.value : `empty-${index}`) : '',
+
+  const values = parsedFieldMeta.values?.map((item) => ({
+    ...item,
+    value: item.value.length > 0 ? item.value : `empty-value-${item.id}`,
+  }));
+  const [checkedValues, setCheckedValues] = useState(
+    values
+      ?.map((item) =>
+        item.checked ? (item.value.length > 0 ? item.value : `empty-value-${item.id}`) : '',
       )
       .filter(Boolean) || [],
   );
+
   const isReadOnly = parsedFieldMeta.readOnly;
 
   const checkboxValidationRule = parsedFieldMeta.validationRule;
@@ -89,7 +95,7 @@ export const CheckboxField = ({
       const payload: TSignFieldWithTokenMutationSchema = {
         token: recipient.token,
         fieldId: field.id,
-        value: checkedValues.map((val) => (val.includes('empty') ? ' ' : val)).join(','),
+        value: checkedValues.join(','),
         isBase64: true,
         authOptions,
       };
@@ -147,8 +153,8 @@ export const CheckboxField = ({
     }
   };
 
-  const handleCheckboxChange = (value: string, index: number) => {
-    const updatedValue = value.length > 0 ? value : `empty-${index}`;
+  const handleCheckboxChange = (value: string, itemId: number) => {
+    const updatedValue = value || `empty-value-${itemId}`;
     const updatedValues = checkedValues.includes(updatedValue)
       ? checkedValues.filter((v) => v !== updatedValue)
       : [...checkedValues, updatedValue];
@@ -156,19 +162,25 @@ export const CheckboxField = ({
     setCheckedValues(updatedValues);
   };
 
-  const handleCheckboxOptionClick = async (
-    item: { checked: boolean; value: string },
-    index: number,
-  ) => {
+  console.log('checkedValues', checkedValues);
+
+  const handleCheckboxOptionClick = async (item: {
+    id: number;
+    checked: boolean;
+    value: string;
+  }) => {
     let updatedValues: string[] = [];
 
     try {
       const isChecked = checkedValues.includes(
-        item.value.length > 0 ? item.value : `empty-${index}`,
+        item.value.length > 0 ? item.value : `empty-value-${item.id}`,
       );
 
       if (!isChecked) {
-        updatedValues = [...checkedValues, item.value.length > 0 ? item.value : `empty-${index}`];
+        updatedValues = [
+          ...checkedValues,
+          item.value.length > 0 ? item.value : `empty-value-${item.id}`,
+        ];
 
         await removeSignedFieldWithToken({
           token: recipient.token,
@@ -179,12 +191,14 @@ export const CheckboxField = ({
           await signFieldWithToken({
             token: recipient.token,
             fieldId: field.id,
-            value: updatedValues.map((val) => (val.includes('empty') ? ' ' : val)).join(','),
+            value: updatedValues.join(','),
             isBase64: true,
           });
         }
       } else {
-        updatedValues = checkedValues.filter((v) => v !== item.value && v !== `empty-${index}`);
+        updatedValues = checkedValues.filter(
+          (v) => v !== item.value && v !== `empty-value-${item.id}`,
+        );
 
         await removeSignedFieldWithToken({
           token: recipient.token,
@@ -230,104 +244,107 @@ export const CheckboxField = ({
             </FieldToolTip>
           )}
           <div className="z-50 space-y-4">
-            {parsedFieldMeta.values?.map(
-              (item: { value: string; checked: boolean }, index: number) => {
-                const itemValue = item.value.length > 0 ? item.value : `empty-${index}`;
+            {values?.map((item: { id: number; value: string; checked: boolean }, index: number) => {
+              const itemValue = item.value || `empty-value-${item.id}`;
 
-                return (
-                  <Card
-                    id={String(index)}
-                    key={index}
+              return (
+                <Card
+                  id={String(index)}
+                  key={index}
+                  className={cn(
+                    'm-1 p-2',
+                    {
+                      'border-yellow-300 ring-2 ring-yellow-100 ring-offset-2 ring-offset-yellow-100':
+                        !field.inserted && !checkedValues.includes(itemValue),
+                    },
+                    {
+                      'border-red-500 ring-2 ring-red-200 ring-offset-2 ring-offset-red-200':
+                        !field.inserted &&
+                        parsedFieldMeta.required &&
+                        !checkedValues.includes(itemValue),
+                    },
+                    {
+                      'border-documenso ring-documenso-200 ring-offset-documenso-200 bg-documenso/20 ring-2 ring-offset-2':
+                        checkedValues.includes(itemValue),
+                    },
+                  )}
+                >
+                  <CardContent
                     className={cn(
-                      'm-1 p-2',
+                      'text-muted-foreground hover:shadow-primary-foreground group flex h-full w-full flex-row items-center space-x-2 p-2',
                       {
-                        'border-yellow-300 ring-2 ring-yellow-100 ring-offset-2 ring-offset-yellow-100':
-                          !field.inserted && !checkedValues.includes(itemValue),
-                      },
-                      {
-                        'border-red-500 ring-2 ring-red-200 ring-offset-2 ring-offset-red-200':
+                        'hover:text-red-300':
                           !field.inserted &&
                           parsedFieldMeta.required &&
                           !checkedValues.includes(itemValue),
                       },
                       {
-                        'border-documenso ring-documenso-200 ring-offset-documenso-200 bg-documenso/20 ring-2 ring-offset-2':
-                          checkedValues.includes(itemValue),
+                        'hover:text-yellow-400': !field.inserted && !parsedFieldMeta.required,
+                      },
+                      {
+                        'hover:text-foreground/80':
+                          !field.inserted && checkedValues.includes(itemValue),
                       },
                     )}
                   >
-                    <CardContent
-                      className={cn(
-                        'text-muted-foreground hover:shadow-primary-foreground group flex h-full w-full flex-row items-center space-x-2 p-2',
-                        {
-                          'hover:text-red-300':
-                            !field.inserted &&
-                            parsedFieldMeta.required &&
-                            !checkedValues.includes(itemValue),
-                        },
-                        {
-                          'hover:text-yellow-400': !field.inserted && !parsedFieldMeta.required,
-                        },
-                        {
-                          'hover:text-foreground/80':
-                            !field.inserted && checkedValues.includes(itemValue),
-                        },
-                      )}
-                    >
-                      <Checkbox
-                        className="data-[state=checked]:bg-documenso h-5 w-5"
-                        checkClassName="text-white"
-                        id={`checkbox-${index}`}
-                        checked={checkedValues.includes(itemValue)}
-                        onCheckedChange={() => handleCheckboxChange(item.value, index)}
-                      />
-                      <Label htmlFor={`checkbox-${index}`}>{item.value}</Label>
-                    </CardContent>
-                  </Card>
-                );
-              },
-            )}
+                    <Checkbox
+                      className="data-[state=checked]:bg-documenso h-5 w-5"
+                      checkClassName="text-white"
+                      id={`checkbox-${index}`}
+                      checked={checkedValues.includes(itemValue)}
+                      onCheckedChange={() => handleCheckboxChange(item.value, item.id)}
+                    />
+                    <Label htmlFor={`checkbox-${index}`}>
+                      {item.value.includes('empty-value-') ? '' : item.value}
+                    </Label>
+                  </CardContent>
+                </Card>
+              );
+            })}
           </div>
         </>
       )}
 
       {field.inserted && (
         <div className="flex flex-col gap-y-2">
-          {parsedFieldMeta.values?.map(
-            (item: { value: string; checked: boolean }, index: number) => {
-              const itemValue = item.value.length > 0 ? item.value : `empty-${index}`;
+          {values?.map((item: { id: number; value: string; checked: boolean }, index: number) => {
+            const itemValue = item.value || `empty-value-${item.id}`;
 
-              return (
-                <Card
-                  key={index}
-                  onClick={() => void handleCheckboxOptionClick(item, index)}
-                  className={cn(
-                    'text-muted-foreground m-1 flex items-center justify-center p-2',
-                    {
-                      'border-documenso ring-documenso-200 ring-offset-documenso-200 dark:text-foreground/80 ring-2 ring-offset-2':
-                        field.inserted,
-                    },
-                    {
-                      'bg-documenso/20 border-documenso ring-documenso-200 ring-offset-documenso-200 dark:text-background/80 ring-2 ring-offset-2':
-                        field.inserted && checkedValues.includes(itemValue),
-                    },
-                  )}
-                >
-                  <CardContent className="flex h-full w-full flex-row items-center space-x-2 p-2">
-                    <Checkbox
-                      className="data-[state=checked]:bg-documenso h-5 w-5"
-                      checkClassName="text-white"
-                      id={`checkbox-${index}`}
-                      checked={checkedValues.includes(itemValue)}
-                      disabled={isLoading}
-                      onCheckedChange={() => handleCheckboxChange(item.value, index)}
-                    />
-                    <Label htmlFor={`checkbox-${index}`}>{item.value}</Label>
-                  </CardContent>
-                </Card>
-              );
-            },
-          )}
+            return (
+              <Card
+                key={index}
+                onClick={() => void handleCheckboxOptionClick(item)}
+                className={cn(
+                  'text-muted-foreground m-1 flex items-center justify-center p-2',
+                  {
+                    'border-documenso ring-documenso-200 ring-offset-documenso-200 dark:text-foreground/80 ring-2 ring-offset-2':
+                      field.inserted,
+                  },
+                  {
+                    'bg-documenso/20 border-documenso ring-documenso-200 ring-offset-documenso-200 dark:text-background/80 ring-2 ring-offset-2':
+                      field.inserted &&
+                      field.customText.split(',').some((customValue) => customValue === itemValue),
+                  },
+                )}
+              >
+                <CardContent className="flex h-full w-full flex-row items-center space-x-2 p-2">
+                  <Checkbox
+                    className="data-[state=checked]:bg-documenso h-5 w-5"
+                    checkClassName="text-white"
+                    id={`checkbox-${index}`}
+                    checked={field.customText
+                      .split(',')
+                      .some((customValue) => customValue === itemValue)}
+                    disabled={isLoading}
+                    onCheckedChange={() => handleCheckboxChange(item.value, index)}
+                  />
+                  <Label htmlFor={`checkbox-${index}`}>
+                    {item.value.includes('empty-value-') ? '' : item.value}
+                  </Label>
+                </CardContent>
+              </Card>
+            );
+          })}
         </div>
       )}
     </SigningFieldContainer>

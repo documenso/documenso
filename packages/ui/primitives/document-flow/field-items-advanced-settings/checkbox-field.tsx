@@ -36,7 +36,7 @@ export const CheckboxFieldAdvancedSettings = ({
   handleErrors,
 }: CheckboxFieldAdvancedSettingsProps) => {
   const [showValidation, setShowValidation] = useState(false);
-  const [values, setValues] = useState(fieldState.values ?? [{ checked: false, value: '' }]);
+  const [values, setValues] = useState(fieldState.values ?? [{ id: 1, checked: false, value: '' }]);
   const [readOnly, setReadOnly] = useState(fieldState.readOnly ?? false);
   const [required, setRequired] = useState(fieldState.required ?? false);
   const [validationLength, setValidationLength] = useState(fieldState.validationLength ?? 0);
@@ -70,7 +70,8 @@ export const CheckboxFieldAdvancedSettings = ({
   };
 
   const addValue = () => {
-    setValues([...values, { checked: false, value: '' }]);
+    const newId = values.length > 0 ? Math.max(...values.map((val) => val.id)) + 1 : 1;
+    setValues([...values, { id: newId, checked: false, value: '' }]);
   };
 
   useEffect(() => {
@@ -114,7 +115,7 @@ export const CheckboxFieldAdvancedSettings = ({
   };
 
   useEffect(() => {
-    setValues(fieldState.values ?? [{ checked: false, value: '' }]);
+    setValues(fieldState.values ?? [{ id: 1, checked: false, value: '' }]);
   }, [fieldState.values]);
 
   return (

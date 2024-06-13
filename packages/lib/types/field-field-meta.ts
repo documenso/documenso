@@ -47,6 +47,7 @@ export const ZCheckboxFieldMeta = ZBaseFieldMeta.extend({
   values: z
     .array(
       z.object({
+        id: z.number(),
         checked: z.boolean(),
         value: z.string(),
       }),

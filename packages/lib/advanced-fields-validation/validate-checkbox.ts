@@ -44,14 +44,34 @@ export const validateCheckboxField = (
     const validation = checkboxValidationSigns.find((sign) => sign.label === validationRule);
 
     if (validation) {
-      const lengthCondition =
-        (validation.value === '=' && values.length < validationLength) ||
-        (validation.value !== '=' && values.length < validationLength);
+      let lengthCondition = false;
+
+      switch (validation.value) {
+        case '=':
+          lengthCondition = isSigningPage
+            ? values.length !== validationLength
+            : values.length < validationLength;
+          break;
+        case '>=':
+          lengthCondition = values.length < validationLength;
+          break;
+        case '<=':
+          lengthCondition = isSigningPage
+            ? values.length > validationLength
+            : values.length < validationLength;
+          break;
+      }
 
       if (lengthCondition) {
-        const errorMessage = isSigningPage
-          ? `You need to ${validationRule.toLowerCase()} ${validationLength} options`
-          : `You need to add at least ${validationLength} options`;
+        let errorMessage;
+        if (isSigningPage) {
+          errorMessage = `You need to ${validationRule.toLowerCase()} ${validationLength} options`;
+        } else {
+          errorMessage =
+            validation.value === '<='
+              ? `You need to select at least ${validationLength} options`
+              : `You need to add at least ${validationLength} options`;
+        }
 
         errors.push(errorMessage);
       }
