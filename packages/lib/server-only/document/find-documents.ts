@@ -167,6 +167,12 @@ export const findDocuments = async ({
     };
   }
 
+  if (status === ExtendedDocumentStatus.BIN) {
+    whereClause.deletedAt = {
+      gte: DateTime.now().minus({ days: 30 }).startOf('day').toJSDate(),
+    };
+  }
+
   if (senderIds && senderIds.length > 0) {
     whereClause.userId = {
       in: senderIds,
@@ -309,7 +315,7 @@ const findDocumentsFilter = (status: ExtendedDocumentStatus, user: User) => {
           teamId: null,
           status: ExtendedDocumentStatus.COMPLETED,
           deletedAt: {
-            gte: DateTime.now().minus({ days: 30 }).startOf('day').toJSDate(),
+            not: null,
           },
         },
         {
@@ -318,7 +324,7 @@ const findDocumentsFilter = (status: ExtendedDocumentStatus, user: User) => {
             some: {
               email: user.email,
               documentDeletedAt: {
-                gte: DateTime.now().minus({ days: 30 }).startOf('day').toJSDate(),
+                not: null,
               },
             },
           },
@@ -510,7 +516,7 @@ const findTeamDocumentsFilter = (
           {
             teamId: team.id,
             deletedAt: {
-              gte: DateTime.now().minus({ days: 30 }).startOf('day').toJSDate(),
+              not: null,
             },
           },
         ],
@@ -523,7 +529,7 @@ const findTeamDocumentsFilter = (
               email: teamEmail,
             },
             deletedAt: {
-              gte: DateTime.now().minus({ days: 30 }).startOf('day').toJSDate(),
+              not: null,
             },
           },
           {
@@ -531,7 +537,7 @@ const findTeamDocumentsFilter = (
               some: {
                 email: teamEmail,
                 documentDeletedAt: {
-                  gte: DateTime.now().minus({ days: 30 }).startOf('day').toJSDate(),
+                  not: null,
                 },
               },
             },
