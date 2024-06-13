@@ -61,23 +61,6 @@ export default async function AdminStatsPage() {
 
       <div className="mt-16 gap-8">
         <div>
-          <h3 className="text-3xl font-semibold">User metrics</h3>
-
-          <div className="mb-8 mt-4 grid flex-1 grid-cols-1 gap-4 md:grid-cols-2">
-            <CardMetric
-              icon={File}
-              title="Users who uploaded one or more documents in the past month"
-              value={userWithAtLeastOneDocumentPerMonth}
-            />
-            <CardMetric
-              icon={File}
-              title="Users that created at least 1 document and had it completed"
-              value={userWithAtLeastOneDocumentSignedPerMonth}
-            />
-          </div>
-        </div>
-
-        <div>
           <h3 className="text-3xl font-semibold">Document metrics</h3>
 
           <div className="mb-8 mt-4 grid flex-1 grid-cols-1 gap-4 md:grid-cols-2">
