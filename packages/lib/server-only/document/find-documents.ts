@@ -168,9 +168,24 @@ export const findDocuments = async ({
   }
 
   if (status === ExtendedDocumentStatus.BIN) {
-    whereClause.deletedAt = {
-      gte: DateTime.now().minus({ days: 30 }).startOf('day').toJSDate(),
-    };
+    whereClause.OR = [
+      {
+        userId: user.id,
+        deletedAt: {
+          gte: DateTime.now().minus({ days: 30 }).startOf('day').toJSDate(),
+        },
+      },
+      {
+        Recipient: {
+          some: {
+            email: user.email,
+            documentDeletedAt: {
+              gte: DateTime.now().minus({ days: 30 }).startOf('day').toJSDate(),
+            },
+          },
+        },
+      },
+    ];
   }
 
   if (senderIds && senderIds.length > 0) {
