@@ -235,16 +235,16 @@ export const Carousel = () => {
           </div>
         </div>
 
-        <div className="dark:bg-background absolute bottom-2 right-2 flex w-[5%] flex-col items-center space-y-1 rounded-lg bg-white  p-1.5">
-          <span className="text-foreground dark:text-muted-foreground text-xs">
+        <div className="dark:bg-background absolute bottom-2 right-2 flex w-[20%] flex-col items-center space-y-1 rounded-lg bg-white p-1.5 sm:w-[5%]">
+          <span className="text-foreground dark:text-muted-foreground text-[10px] sm:text-xs">
             {selectedIndex + 1}/{slides.length}
           </span>
           <Progress value={progress} className="h-1" />
         </div>
       </Card>
 
-      <div className="mx-auto mt-12 max-w-4xl px-2">
-        <div className="mt-2 flex justify-between" ref={emblaThumbsRef}>
+      <div className="mx-auto mt-6 w-full max-w-4xl px-2 sm:mt-12">
+        <div className="mt-2 flex flex-wrap justify-between gap-6" ref={emblaThumbsRef}>
           {slides.map((slide, index) => (
             <Slide
               key={index}
