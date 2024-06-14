@@ -10,12 +10,12 @@ interface NumberFieldMeta {
 
 export const validateNumberField = (
   value: string,
-  fieldMeta: NumberFieldMeta,
+  fieldMeta?: NumberFieldMeta,
   isSigningPage: boolean = false,
 ): string[] => {
   const errors = [];
 
-  const { minValue, maxValue, readOnly, required, numberFormat } = fieldMeta;
+  const { minValue, maxValue, readOnly, required, numberFormat } = fieldMeta || {};
 
   const formatRegex: { [key: string]: RegExp } = {
     '123,456,789.00': /^(?:\d{1,3}(?:,\d{3})*|\d+)(?:\.\d{1,2})?$/,
