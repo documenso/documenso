@@ -41,7 +41,10 @@ export type JobDefinition<Name extends string = string, Schema = any> = {
 
 export interface JobRunIO {
   // stableRun<T extends Json | void>(cacheKey: string, callback: (io: JobRunIO) => T | Promise<T>): Promise<T>;
-  runTask<T extends Json | void>(cacheKey: string, callback: () => Promise<T>): Promise<T>;
+  runTask<T extends Json | void | undefined>(
+    cacheKey: string,
+    callback: () => Promise<T>,
+  ): Promise<T>;
   triggerJob(cacheKey: string, options: SimpleTriggerJobOptions): Promise<unknown>;
   wait(cacheKey: string, ms: number): Promise<void>;
   logger: {

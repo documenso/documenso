@@ -36,6 +36,7 @@
     "@trigger.dev/sdk": "^2.3.18",
     "@upstash/redis": "^1.20.6",
     "@vvo/tzdb": "^6.117.0",
+    "inngest": "^3.19.13",
     "kysely": "^0.26.3",
     "luxon": "^3.4.0",
     "nanoid": "^4.0.2",
@@ -52,8 +53,8 @@
     "zod": "^3.22.4"
   },
   "devDependencies": {
+    "@playwright/browser-chromium": "1.43.0",
     "@types/luxon": "^3.3.1",
-    "@types/pg": "^8.11.4",
-    "@playwright/browser-chromium": "1.43.0"
+    "@types/pg": "^8.11.4"
   }
 }
