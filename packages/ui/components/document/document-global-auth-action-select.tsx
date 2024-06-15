@@ -33,7 +33,7 @@ export const DocumentGlobalAuthActionSelect = forwardRef<HTMLButtonElement, Sele
           ))}
 
         {/* Note: -1 is remapped in the Zod schema to the required value. */}
-        <SelectItem value={'-1'}>None</SelectItem>
+        <SelectItem value={'-1'}>No Restrictions</SelectItem>
       </SelectContent>
     </Select>
   ),
@@ -72,7 +72,7 @@ export const DocumentGlobalAuthActionTooltip = () => (
           their settings
         </li>
         <li>
-          <strong>None</strong> - No authentication required
+          <strong>No Restrictions</strong> - No authentication required
         </li>
       </ul>
     </TooltipContent>

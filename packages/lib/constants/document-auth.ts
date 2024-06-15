@@ -21,6 +21,6 @@ export const DOCUMENT_AUTH_TYPES: Record<string, DocumentAuthTypeData> = {
   },
   [DocumentAuth.EXPLICIT_NONE]: {
     key: DocumentAuth.EXPLICIT_NONE,
-    value: 'None (Overrides global settings)',
+    value: 'No Restrictions (Overrides global settings)',
   },
 } satisfies Record<TDocumentAuth, DocumentAuthTypeData>;

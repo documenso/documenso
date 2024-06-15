@@ -232,11 +232,11 @@ export const DocumentHistorySheet = ({
                         values={[
                           {
                             key: 'Old',
-                            value: DOCUMENT_AUTH_TYPES[data.from || '']?.value || 'None',
+                            value: DOCUMENT_AUTH_TYPES[data.from || '']?.value || 'No Restrictions',
                           },
                           {
                             key: 'New',
-                            value: DOCUMENT_AUTH_TYPES[data.to || '']?.value || 'None',
+                            value: DOCUMENT_AUTH_TYPES[data.to || '']?.value || 'No Restrictions',
                           },
                         ]}
                       />
