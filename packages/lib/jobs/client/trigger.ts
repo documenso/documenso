@@ -1,5 +1,3 @@
-import type { NextApiRequest, NextApiResponse } from 'next';
-
 import { createPagesRoute } from '@trigger.dev/nextjs';
 import type { IO } from '@trigger.dev/sdk';
 import { TriggerClient, eventTrigger } from '@trigger.dev/sdk';
@@ -54,7 +52,7 @@ export class TriggerJobProvider extends BaseJobProvider {
     });
   }
 
-  public getApiHandler(): (req: NextApiRequest, res: NextApiResponse) => Promise<void> {
+  public getApiHandler() {
     const { handler } = createPagesRoute(this._client);
 
     return handler;

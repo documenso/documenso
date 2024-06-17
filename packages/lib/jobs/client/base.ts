@@ -13,7 +13,7 @@ export abstract class BaseJobProvider {
     throw new Error('Not implemented');
   }
 
-  public getApiHandler(): (req: NextApiRequest, res: NextApiResponse) => Promise<void> {
+  public getApiHandler(): (req: NextApiRequest, res: NextApiResponse) => Promise<Response | void> {
     throw new Error('Not implemented');
   }
 }

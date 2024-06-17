@@ -68,7 +68,7 @@ declare namespace NodeJS {
     //
     NEXT_PRIVATE_BROWSERLESS_URL?: string;
 
-    NEXT_PRIVATE_JOBS_PROVIDER?: 'trigger' | 'local';
+    NEXT_PRIVATE_JOBS_PROVIDER?: 'trigger' | 'inngest' | 'local';
 
     /**
      * Trigger.dev environment variables
