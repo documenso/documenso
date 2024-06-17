@@ -2,8 +2,8 @@
 
 set -x
 
-echo ${CERT_P12} | base64 --decode > /opt/documenso/cert.p12
-
 npx prisma migrate deploy --schema ./packages/prisma/schema.prisma
+
+echo ${cert_file} | base64 --decode > /opt/documenso/cert.p12
 
 node apps/web/server.js

@@ -57,6 +57,8 @@ jobs:
           tags: documenso-${{ github.sha }}
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache-new,mode=max
+          secrets: |
+            "cert_file=${{ secrets.CERT_P12 }}"
 
       - # Temp fix
         # https://github.com/docker/build-push-action/issues/252
