@@ -137,6 +137,15 @@ const handleDocumentOwnerRestore = async ({
         }),
       });
 
+      await tx.recipient.updateMany({
+        where: {
+          documentId: document.id,
+        },
+        data: {
+          documentDeletedAt: null,
+        },
+      });
+
       return await tx.document.update({
         where: {
           id: document.id,
