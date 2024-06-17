@@ -247,12 +247,14 @@ const findDocumentsFilter = (status: ExtendedDocumentStatus, user: User) => {
         {
           userId: user.id,
           teamId: null,
+          deletedAt: null,
         },
         {
           status: ExtendedDocumentStatus.COMPLETED,
           Recipient: {
             some: {
               email: user.email,
+              documentDeletedAt: null,
             },
           },
         },
@@ -261,6 +263,7 @@ const findDocumentsFilter = (status: ExtendedDocumentStatus, user: User) => {
           Recipient: {
             some: {
               email: user.email,
+              documentDeletedAt: null,
             },
           },
         },
@@ -277,6 +280,7 @@ const findDocumentsFilter = (status: ExtendedDocumentStatus, user: User) => {
           role: {
             not: RecipientRole.CC,
           },
+          documentDeletedAt: null,
         },
       },
     }))
@@ -291,6 +295,7 @@ const findDocumentsFilter = (status: ExtendedDocumentStatus, user: User) => {
           userId: user.id,
           teamId: null,
           status: ExtendedDocumentStatus.PENDING,
+          deletedAt: null,
         },
         {
           status: ExtendedDocumentStatus.PENDING,
@@ -301,6 +306,7 @@ const findDocumentsFilter = (status: ExtendedDocumentStatus, user: User) => {
               role: {
                 not: RecipientRole.CC,
               },
+              documentDeletedAt: null,
             },
           },
         },
@@ -312,12 +318,14 @@ const findDocumentsFilter = (status: ExtendedDocumentStatus, user: User) => {
           userId: user.id,
           teamId: null,
           status: ExtendedDocumentStatus.COMPLETED,
+          deletedAt: null,
         },
         {
           status: ExtendedDocumentStatus.COMPLETED,
           Recipient: {
             some: {
               email: user.email,
+              documentDeletedAt: null,
             },
           },
         },
