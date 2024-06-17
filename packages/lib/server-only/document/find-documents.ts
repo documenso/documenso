@@ -338,7 +338,7 @@ const findDocumentsFilter = (status: ExtendedDocumentStatus, user: User) => {
           teamId: null,
           status: ExtendedDocumentStatus.COMPLETED,
           deletedAt: {
-            not: null,
+            gte: DateTime.now().minus({ days: 30 }).startOf('day').toJSDate(),
           },
         },
         {
@@ -347,7 +347,7 @@ const findDocumentsFilter = (status: ExtendedDocumentStatus, user: User) => {
             some: {
               email: user.email,
               documentDeletedAt: {
-                not: null,
+                gte: DateTime.now().minus({ days: 30 }).startOf('day').toJSDate(),
               },
             },
           },
@@ -539,7 +539,7 @@ const findTeamDocumentsFilter = (
           {
             teamId: team.id,
             deletedAt: {
-              not: null,
+              gte: DateTime.now().minus({ days: 30 }).startOf('day').toJSDate(),
             },
           },
         ],
@@ -552,7 +552,7 @@ const findTeamDocumentsFilter = (
               email: teamEmail,
             },
             deletedAt: {
-              not: null,
+              gte: DateTime.now().minus({ days: 30 }).startOf('day').toJSDate(),
             },
           },
           {
@@ -560,7 +560,7 @@ const findTeamDocumentsFilter = (
               some: {
                 email: teamEmail,
                 documentDeletedAt: {
-                  not: null,
+                  gte: DateTime.now().minus({ days: 30 }).startOf('day').toJSDate(),
                 },
               },
             },

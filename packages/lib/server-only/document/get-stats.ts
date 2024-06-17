@@ -152,11 +152,38 @@ const getCounts = async ({ user, createdAt }: GetCountsOption) => {
         _all: true,
       },
       where: {
-        userId: user.id,
-        createdAt,
-        deletedAt: {
-          gte: DateTime.now().minus({ days: 30 }).startOf('day').toJSDate(),
-        },
+        OR: [
+          {
+            userId: user.id,
+            deletedAt: {
+              gte: DateTime.now().minus({ days: 30 }).startOf('day').toJSDate(),
+            },
+          },
+          {
+            status: ExtendedDocumentStatus.PENDING,
+            Recipient: {
+              some: {
+                email: user.email,
+                signingStatus: SigningStatus.SIGNED,
+                documentDeletedAt: {
+                  gte: DateTime.now().minus({ days: 30 }).startOf('day').toJSDate(),
+                },
+              },
+            },
+          },
+          {
+            status: ExtendedDocumentStatus.COMPLETED,
+            Recipient: {
+              some: {
+                email: user.email,
+                signingStatus: SigningStatus.SIGNED,
+                documentDeletedAt: {
+                  gte: DateTime.now().minus({ days: 30 }).startOf('day').toJSDate(),
+                },
+              },
+            },
+          },
+        ],
       },
     }),
   ]);
@@ -273,19 +300,36 @@ const getTeamCounts = async (options: GetTeamCountsOption) => {
       where: {
         userId: userIdWhereClause,
         createdAt,
-        status: ExtendedDocumentStatus.COMPLETED,
-        Recipient: {
-          some: {
-            email: teamEmail,
-            signingStatus: SigningStatus.SIGNED,
-            documentDeletedAt: {
+        OR: [
+          {
+            status: ExtendedDocumentStatus.PENDING,
+            Recipient: {
+              some: {
+                email: teamEmail,
+                signingStatus: SigningStatus.SIGNED,
+                documentDeletedAt: null,
+              },
+            },
+            deletedAt: {
               gte: DateTime.now().minus({ days: 30 }).startOf('day').toJSDate(),
             },
           },
-        },
-        deletedAt: {
-          gte: DateTime.now().minus({ days: 30 }).startOf('day').toJSDate(),
-        },
+          {
+            status: ExtendedDocumentStatus.COMPLETED,
+            Recipient: {
+              some: {
+                email: teamEmail,
+                signingStatus: SigningStatus.SIGNED,
+                documentDeletedAt: {
+                  gte: DateTime.now().minus({ days: 30 }).startOf('day').toJSDate(),
+                },
+              },
+            },
+            deletedAt: {
+              gte: DateTime.now().minus({ days: 30 }).startOf('day').toJSDate(),
+            },
+          },
+        ],
       },
     } satisfies Prisma.DocumentGroupByArgs;
   }

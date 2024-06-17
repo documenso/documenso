@@ -138,6 +138,16 @@ const handleDocumentOwnerDelete = async ({
         }),
       });
 
+      // Soft delete for document recipients since the owner is deleting it
+      await tx.recipient.updateMany({
+        where: {
+          documentId: document.id,
+        },
+        data: {
+          documentDeletedAt: new Date().toISOString(),
+        },
+      });
+
       return await tx.document.update({
         where: {
           id: document.id,
