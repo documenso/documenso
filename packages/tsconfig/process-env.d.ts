@@ -77,6 +77,11 @@ declare namespace NodeJS {
     NEXT_PRIVATE_TRIGGER_API_URL?: string;
 
     /**
+     * Inngest environment variables
+     */
+    NEXT_PRIVATE_INNGEST_EVENT_KEY?: string;
+
+    /**
      * Vercel environment variables
      */
     VERCEL?: string;
