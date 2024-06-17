@@ -1,15 +1,17 @@
 name: documenso-development
 
 services:
-  database:
+  documensodb:
     image: postgres:15
-    container_name: database
+    container_name: documensodb
     environment:
       - POSTGRES_USER=documenso
       - POSTGRES_PASSWORD=password
       - POSTGRES_DB=documenso
     ports:
       - 54320:5432
+    networks:
+      - my-custom-created-network
 
   inbucket:
     image: inbucket/inbucket
@@ -18,6 +20,8 @@ services:
       - 9000:9000
       - 2500:2500
       - 1100:1100
+    networks:
+      - my-custom-created-network
 
   minio:
     image: minio/minio
@@ -32,6 +36,12 @@ services:
       MINIO_ROOT_PASSWORD: password
     entrypoint: sh
     command: -c 'mkdir -p /data/documenso && minio server /data --console-address ":9001" --address ":9002"'
+    networks:
+      - my-custom-created-network
 
 volumes:
   minio:
+
+networks:
+  my-custom-created-network:
+    external: true
