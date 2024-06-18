@@ -29,6 +29,7 @@ export const getTemplateWithDetailsById = async ({
       ],
     },
     include: {
+      directLink: true,
       templateDocumentData: true,
       templateMeta: true,
       Recipient: true,
