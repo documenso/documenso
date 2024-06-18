@@ -22,7 +22,6 @@ import { LazyPDFViewer } from '@documenso/ui/primitives/lazy-pdf-viewer';
 import { StackAvatarsWithTooltip } from '~/components/(dashboard)/avatar/stack-avatars-with-tooltip';
 import { DocumentHistorySheet } from '~/components/document/document-history-sheet';
 import { DocumentPendingFields } from '~/components/document/document-pending-readonly-fields';
-import { DocumentReadOnlyFields } from '~/components/document/document-read-only-fields';
 import {
   DocumentStatus as DocumentStatusComponent,
   FRIENDLY_STATUS_MAP,
@@ -170,13 +169,6 @@ export const DocumentPageView = async ({ params, team }: DocumentPageViewProps) 
             <LazyPDFViewer document={document} key={documentData.id} documentData={documentData} />
           </CardContent>
         </Card>
-
-        {document.status === DocumentStatus.COMPLETED && (
-          <DocumentReadOnlyFields
-            fields={completedFields}
-            documentMeta={document.documentMeta || undefined}
-          />
-        )}
 
         {document.status === DocumentStatus.PENDING && (
           <DocumentPendingFields fields={pendingFields} />
