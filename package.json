@@ -58,6 +58,7 @@
     },
     "next-contentlayer": {
       "next": "14.0.3"
-    }
+    },
+    "packageManager": "npm"
   }
 }
