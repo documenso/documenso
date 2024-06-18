@@ -6,5 +6,5 @@ import { getPricesByPlan } from './get-prices-by-plan';
  * Returns the prices of items that count as the account's primary plan.
  */
 export const getPrimaryAccountPlanPrices = async () => {
-  return await getPricesByPlan([STRIPE_PLAN_TYPE.COMMUNITY, STRIPE_PLAN_TYPE.ENTERPRISE]);
+  return await getPricesByPlan([STRIPE_PLAN_TYPE.REGULAR, STRIPE_PLAN_TYPE.COMMUNITY, STRIPE_PLAN_TYPE.ENTERPRISE]);
 };

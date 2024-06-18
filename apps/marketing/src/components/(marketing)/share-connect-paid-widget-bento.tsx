@@ -70,7 +70,7 @@ export const ShareConnectPaidWidgetBento = ({
           <CardContent className="grid grid-cols-1 gap-8 p-6">
             <p className="text-foreground/80 leading-relaxed">
               <strong className="block">Get paid (Soon).</strong>
-              Integrated payments with stripe so you don’t have to worry about getting paid.
+              Integrated payments with Stripe so you don’t have to worry about getting paid.
             </p>
 
             <div className="flex items-center justify-center p-8">

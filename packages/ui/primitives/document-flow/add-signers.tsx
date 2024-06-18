@@ -105,9 +105,13 @@ export const AddSignersFormPartial = ({
   const [showAdvancedSettings, setShowAdvancedSettings] = useState(alwaysShowAdvancedSettings);
 
   const {
+    setValue,
     formState: { errors, isSubmitting },
     control,
+    watch,
   } = form;
+
+  const watchedSigners = watch('signers');
 
   const onFormSubmit = form.handleSubmit(onSubmit);
 
@@ -120,6 +124,11 @@ export const AddSignersFormPartial = ({
     name: 'signers',
   });
 
+  const emptySignerIndex = watchedSigners.findIndex((signer) => !signer.name && !signer.email);
+  const isUserAlreadyARecipient = watchedSigners.some(
+    (signer) => signer.email.toLowerCase() === user?.email?.toLowerCase(),
+  );
+
   const hasBeenSentToRecipientId = (id?: number) => {
     if (!id) {
       return false;
@@ -131,16 +140,6 @@ export const AddSignersFormPartial = ({
         recipient.sendStatus === SendStatus.SENT &&
         recipient.role !== RecipientRole.CC,
     );
-  };
-
-  const onAddSelfSigner = () => {
-    appendSigner({
-      formId: nanoid(12),
-      name: user?.name ?? '',
-      email: user?.email ?? '',
-      role: RecipientRole.SIGNER,
-      actionAuth: undefined,
-    });
   };
 
   const onAddSigner = () => {
@@ -167,6 +166,21 @@ export const AddSignersFormPartial = ({
     }
 
     removeSigner(index);
+  };
+
+  const onAddSelfSigner = () => {
+    if (emptySignerIndex !== -1) {
+      setValue(`signers.${emptySignerIndex}.name`, user?.name ?? '');
+      setValue(`signers.${emptySignerIndex}.email`, user?.email ?? '');
+    } else {
+      appendSigner({
+        formId: nanoid(12),
+        name: user?.name ?? '',
+        email: user?.email ?? '',
+        role: RecipientRole.SIGNER,
+        actionAuth: undefined,
+      });
+    }
   };
 
   const onKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
@@ -218,11 +232,7 @@ export const AddSignersFormPartial = ({
                             type="email"
                             placeholder="Email"
                             {...field}
-                            disabled={
-                              isSubmitting ||
-                              hasBeenSentToRecipientId(signer.nativeId) ||
-                              signers[index].email === user?.email
-                            }
+                            disabled={isSubmitting || hasBeenSentToRecipientId(signer.nativeId)}
                             onKeyDown={onKeyDown}
                           />
                         </FormControl>
@@ -248,11 +258,7 @@ export const AddSignersFormPartial = ({
                           <Input
                             placeholder="Name"
                             {...field}
-                            disabled={
-                              isSubmitting ||
-                              hasBeenSentToRecipientId(signer.nativeId) ||
-                              signers[index].email === user?.email
-                            }
+                            disabled={isSubmitting || hasBeenSentToRecipientId(signer.nativeId)}
                             onKeyDown={onKeyDown}
                           />
                         </FormControl>
@@ -335,14 +341,12 @@ export const AddSignersFormPartial = ({
                 <Plus className="-ml-1 mr-2 h-5 w-5" />
                 Add Signer
               </Button>
+
               <Button
                 type="button"
                 variant="secondary"
                 className="dark:bg-muted dark:hover:bg-muted/80 bg-black/5 hover:bg-black/10"
-                disabled={
-                  isSubmitting ||
-                  form.getValues('signers').some((signer) => signer.email === user?.email)
-                }
+                disabled={isSubmitting || isUserAlreadyARecipient}
                 onClick={() => onAddSelfSigner()}
               >
                 <Plus className="-ml-1 mr-2 h-5 w-5" />

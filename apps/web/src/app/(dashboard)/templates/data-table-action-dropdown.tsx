@@ -4,10 +4,10 @@ import { useState } from 'react';
 
 import Link from 'next/link';
 
-import { Copy, Edit, MoreHorizontal, Trash2 } from 'lucide-react';
+import { Copy, Edit, MoreHorizontal, Share2Icon, Trash2 } from 'lucide-react';
 import { useSession } from 'next-auth/react';
 
-import type { Template } from '@documenso/prisma/client';
+import { type FindTemplateRow } from '@documenso/lib/server-only/template/find-templates';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -18,9 +18,10 @@ import {
 
 import { DeleteTemplateDialog } from './delete-template-dialog';
 import { DuplicateTemplateDialog } from './duplicate-template-dialog';
+import { TemplateDirectLinkDialog } from './template-direct-link-dialog';
 
 export type DataTableActionDropdownProps = {
-  row: Template;
+  row: FindTemplateRow;
   templateRootPath: string;
   teamId?: number;
 };
@@ -33,6 +34,7 @@ export const DataTableActionDropdown = ({
   const { data: session } = useSession();
 
   const [isDeleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [isTemplateDirectLinkDialogOpen, setTemplateDirectLinkDialogOpen] = useState(false);
   const [isDuplicateDialogOpen, setDuplicateDialogOpen] = useState(false);
 
   if (!session) {
@@ -66,6 +68,11 @@ export const DataTableActionDropdown = ({
           Duplicate
         </DropdownMenuItem>
 
+        <DropdownMenuItem onClick={() => setTemplateDirectLinkDialogOpen(true)}>
+          <Share2Icon className="mr-2 h-4 w-4" />
+          Direct link
+        </DropdownMenuItem>
+
         <DropdownMenuItem
           disabled={!isOwner && !isTeamTemplate}
           onClick={() => setDeleteDialogOpen(true)}
@@ -80,6 +87,12 @@ export const DataTableActionDropdown = ({
         teamId={teamId}
         open={isDuplicateDialogOpen}
         onOpenChange={setDuplicateDialogOpen}
+      />
+
+      <TemplateDirectLinkDialog
+        template={row}
+        open={isTemplateDirectLinkDialogOpen}
+        onOpenChange={setTemplateDirectLinkDialogOpen}
       />
 
       <DeleteTemplateDialog

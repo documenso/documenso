@@ -36,11 +36,6 @@ export const DocumentEditPageView = async ({ params, team }: DocumentEditPageVie
 
   const { user } = await getRequiredServerComponentSession();
 
-  const isDocumentEnterprise = await isUserEnterprise({
-    userId: user.id,
-    teamId: team?.id,
-  });
-
   const document = await getDocumentWithDetailsById({
     id: documentId,
     userId: user.id,
@@ -73,6 +68,11 @@ export const DocumentEditPageView = async ({ params, team }: DocumentEditPageVie
 
     documentMeta.password = securePassword;
   }
+
+  const isDocumentEnterprise = await isUserEnterprise({
+    userId: user.id,
+    teamId: team?.id,
+  });
 
   return (
     <div className="mx-auto -mt-4 w-full max-w-screen-xl px-4 md:px-8">

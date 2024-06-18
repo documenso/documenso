@@ -6,6 +6,7 @@ import { useForm } from 'react-hook-form';
 import type { Field, Recipient } from '@documenso/prisma/client';
 import { DocumentStatus } from '@documenso/prisma/client';
 import type { DocumentWithData } from '@documenso/prisma/types/document-with-data';
+import { DocumentSendEmailMessageHelper } from '@documenso/ui/components/document/document-send-email-message-helper';
 
 import { FormErrorMessage } from '../form/form-error-message';
 import { Input } from '../input';
@@ -104,32 +105,7 @@ export const AddSubjectFormPartial = ({
               />
             </div>
 
-            <div>
-              <p className="text-muted-foreground text-sm">
-                You can use the following variables in your message:
-              </p>
-
-              <ul className="mt-2 flex list-inside list-disc flex-col gap-y-2 text-sm">
-                <li className="text-muted-foreground">
-                  <code className="text-muted-foreground bg-muted-foreground/20 rounded p-1 text-sm">
-                    {'{signer.name}'}
-                  </code>{' '}
-                  - The signer's name
-                </li>
-                <li className="text-muted-foreground">
-                  <code className="text-muted-foreground bg-muted-foreground/20 rounded p-1 text-sm">
-                    {'{signer.email}'}
-                  </code>{' '}
-                  - The signer's email
-                </li>
-                <li className="text-muted-foreground">
-                  <code className="text-muted-foreground bg-muted-foreground/20 rounded p-1 text-sm">
-                    {'{document.name}'}
-                  </code>{' '}
-                  - The document's name
-                </li>
-              </ul>
-            </div>
+            <DocumentSendEmailMessageHelper />
           </div>
         </div>
       </DocumentFlowFormContainerContent>
