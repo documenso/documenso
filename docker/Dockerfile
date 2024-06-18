@@ -106,7 +106,5 @@ RUN ln -s /app/node_modules/prisma/build/index.js ./node_modules/.bin/prisma
 
 # Get the start script from docker/start.sh
 COPY --chown=nextjs:nodejs ./docker/start.sh ./start.sh
-RUN --mount=type=secret, id=cert_file \ 
-  cat /run/secrets/cert_file
 
 CMD ["sh", "start.sh"]
