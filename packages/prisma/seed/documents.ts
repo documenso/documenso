@@ -7,6 +7,7 @@ import { match } from 'ts-pattern';
 import { prisma } from '..';
 import {
   DocumentDataType,
+  DocumentSource,
   DocumentStatus,
   FieldType,
   Prisma,
@@ -68,6 +69,7 @@ export const seedBlankDocument = async (owner: User, options: CreateDocumentOpti
 
   return await prisma.document.create({
     data: {
+      source: DocumentSource.DOCUMENT,
       title: `[TEST] Document ${key} - Draft`,
       status: DocumentStatus.DRAFT,
       documentDataId: documentData.id,
@@ -102,6 +104,7 @@ export const seedDraftDocument = async (
 
   const document = await prisma.document.create({
     data: {
+      source: DocumentSource.DOCUMENT,
       title: `[TEST] Document ${key} - Draft`,
       status: DocumentStatus.DRAFT,
       documentDataId: documentData.id,
@@ -170,6 +173,7 @@ export const seedPendingDocument = async (
 
   const document = await prisma.document.create({
     data: {
+      source: DocumentSource.DOCUMENT,
       title: `[TEST] Document ${key} - Pending`,
       status: DocumentStatus.PENDING,
       documentDataId: documentData.id,
@@ -375,6 +379,7 @@ export const seedCompletedDocument = async (
 
   const document = await prisma.document.create({
     data: {
+      source: DocumentSource.DOCUMENT,
       title: `[TEST] Document ${key} - Completed`,
       status: DocumentStatus.COMPLETED,
       documentDataId: documentData.id,

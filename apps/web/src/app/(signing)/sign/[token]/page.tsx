@@ -65,7 +65,7 @@ export default async function SigningPage({ params: { token } }: SigningPageProp
 
   const isDocumentAccessValid = await isRecipientAuthorized({
     type: 'ACCESS',
-    document,
+    documentAuthOptions: document.authOptions,
     recipient,
     userId: user?.id,
   });
@@ -126,7 +126,11 @@ export default async function SigningPage({ params: { token } }: SigningPageProp
       fullName={user?.email === recipient.email ? user.name : recipient.name}
       signature={user?.email === recipient.email ? user.signature : undefined}
     >
-      <DocumentAuthProvider document={document} recipient={recipient} user={user}>
+      <DocumentAuthProvider
+        documentAuthOptions={document.authOptions}
+        recipient={recipient}
+        user={user}
+      >
         <SigningPageView
           recipient={recipient}
           document={document}

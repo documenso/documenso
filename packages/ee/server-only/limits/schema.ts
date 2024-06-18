@@ -10,6 +10,10 @@ export const ZLimitsSchema = z.object({
     .preprocess((v) => (v === null ? Infinity : Number(v)), z.number())
     .optional()
     .default(0),
+  directTemplates: z
+    .preprocess((v) => (v === null ? Infinity : Number(v)), z.number())
+    .optional()
+    .default(0),
 });
 
 export type TLimitsSchema = z.infer<typeof ZLimitsSchema>;
