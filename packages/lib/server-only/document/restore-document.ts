@@ -1,16 +1,8 @@
 'use server';
 
-import { createElement } from 'react';
-
-import { mailer } from '@documenso/email/mailer';
-import { render } from '@documenso/email/render';
-import DocumentRestoreTemplate from '@documenso/email/templates/document-restore';
 import { prisma } from '@documenso/prisma';
 import type { Document, DocumentMeta, Recipient, User } from '@documenso/prisma/client';
-import { DocumentStatus } from '@documenso/prisma/client';
 
-import { NEXT_PUBLIC_WEBAPP_URL } from '../../constants/app';
-import { FROM_ADDRESS, FROM_NAME } from '../../constants/email';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '../../types/document-audit-logs';
 import type { RequestMetadata } from '../../universal/extract-request-metadata';
 import { createDocumentAuditLogData } from '../../utils/document-audit-logs';
@@ -123,42 +115,7 @@ const handleDocumentOwnerRestore = async ({
   }
 
   // Restore soft-deleted documents.
-  if (document.status === DocumentStatus.COMPLETED) {
-    return await prisma.$transaction(async (tx) => {
-      await tx.documentAuditLog.create({
-        data: createDocumentAuditLogData({
-          documentId: document.id,
-          type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_RESTORED,
-          user,
-          requestMetadata,
-          data: {
-            type: 'RESTORE',
-          },
-        }),
-      });
-
-      await tx.recipient.updateMany({
-        where: {
-          documentId: document.id,
-        },
-        data: {
-          documentDeletedAt: null,
-        },
-      });
-
-      return await tx.document.update({
-        where: {
-          id: document.id,
-        },
-        data: {
-          deletedAt: null,
-        },
-      });
-    });
-  }
-
-  // Restore draft and pending documents.
-  const restoredDocument = await prisma.$transaction(async (tx) => {
+  return await prisma.$transaction(async (tx) => {
     await tx.documentAuditLog.create({
       data: createDocumentAuditLogData({
         documentId: document.id,
@@ -171,6 +128,15 @@ const handleDocumentOwnerRestore = async ({
       }),
     });
 
+    await tx.recipient.updateMany({
+      where: {
+        documentId: document.id,
+      },
+      data: {
+        documentDeletedAt: null,
+      },
+    });
+
     return await tx.document.update({
       where: {
         id: document.id,
@@ -180,34 +146,4 @@ const handleDocumentOwnerRestore = async ({
       },
     });
   });
-
-  // Send restoration emails to recipients.
-  await Promise.all(
-    document.Recipient.map(async (recipient) => {
-      const assetBaseUrl = NEXT_PUBLIC_WEBAPP_URL() || 'http://localhost:3000';
-
-      const template = createElement(DocumentRestoreTemplate, {
-        documentName: document.title,
-        inviterName: user.name || undefined,
-        inviterEmail: user.email,
-        assetBaseUrl,
-      });
-
-      await mailer.sendMail({
-        to: {
-          address: recipient.email,
-          name: recipient.name,
-        },
-        from: {
-          name: FROM_NAME,
-          address: FROM_ADDRESS,
-        },
-        subject: 'Document Restored',
-        html: render(template),
-        text: render(template, { plainText: true }),
-      });
-    }),
-  );
-
-  return restoredDocument;
 };
