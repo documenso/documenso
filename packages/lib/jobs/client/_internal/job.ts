@@ -17,7 +17,7 @@ export const ZSimpleTriggerJobOptionsSchema = z.object({
 });
 
 // Map the array to create a union of objects we may accept
-export type TriggerJobOptions<Definitions extends Array<JobDefinition> = []> = {
+export type TriggerJobOptions<Definitions extends ReadonlyArray<JobDefinition> = []> = {
   [K in keyof Definitions]: {
     id?: string;
     name: Definitions[K]['trigger']['name'];

@@ -6,9 +6,7 @@ import { InngestJobProvider } from './inngest';
 import { LocalJobProvider } from './local';
 import { TriggerJobProvider } from './trigger';
 
-export class JobClient<T extends Array<JobDefinition> = []> {
-  private static _instance: JobClient;
-
+export class JobClient<T extends ReadonlyArray<JobDefinition> = []> {
   private _provider: JobClientProvider;
 
   public constructor(definitions: T) {
