@@ -86,9 +86,9 @@ export default async function AdminStatsPage() {
       <div className="mt-16">
         <h3 className="text-3xl font-semibold">Charts</h3>
         <div className="mt-5 grid grid-cols-2 gap-x-10">
-          <SignerConversionChart title="Recipients that signed up" data={signerConversionMonthly} />
+          <SignerConversionChart title="Signers that Signed Up" data={signerConversionMonthly} />
           <SignerConversionChart
-            title="Total Recipients that signed up"
+            title="Total Signers that Signed Up"
             data={signerConversionMonthly}
             cummulative
           />
