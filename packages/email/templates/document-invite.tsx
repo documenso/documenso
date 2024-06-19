@@ -64,7 +64,7 @@ export const DocumentInviteEmailTemplate = ({
               <Section>
                 <Img
                   src={getAssetUrl('/static/logo.png')}
-                  alt="Documenso Logo"
+                  alt="BusinessKitz Logo"
                   className="mb-4 h-6"
                 />
 
@@ -101,9 +101,9 @@ export const DocumentInviteEmailTemplate = ({
 
             <Hr className="mx-auto mt-12 max-w-xl" />
 
-            <Container className="mx-auto max-w-xl">
+            {/*<Container className="mx-auto max-w-xl">
               <TemplateFooter />
-            </Container>
+            </Container>*/}
           </Section>
         </Body>
       </Tailwind>

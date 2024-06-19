@@ -53,9 +53,9 @@ export const DocumentSuperDeleteEmailTemplate = ({
 
             <Hr className="mx-auto mt-12 max-w-xl" />
 
-            <Container className="mx-auto max-w-xl">
+            {/*<Container className="mx-auto max-w-xl">
               <TemplateFooter />
-            </Container>
+            </Container>*/}
           </Section>
         </Body>
       </Tailwind>

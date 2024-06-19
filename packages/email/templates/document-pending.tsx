@@ -44,9 +44,9 @@ export const DocumentPendingEmailTemplate = ({
               </Section>
             </Container>
 
-            <Container className="mx-auto max-w-xl">
+            {/*<Container className="mx-auto max-w-xl">
               <TemplateFooter />
-            </Container>
+            </Container>*/}
           </Section>
         </Body>
       </Tailwind>

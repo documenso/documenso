@@ -34,7 +34,7 @@ export const ConfirmEmailTemplate = ({
               <Section>
                 <Img
                   src={getAssetUrl('/static/logo.png')}
-                  alt="Documenso Logo"
+                  alt="BusinessKitz Logo"
                   className="mb-4 h-6"
                 />
 
@@ -46,9 +46,9 @@ export const ConfirmEmailTemplate = ({
             </Container>
             <div className="mx-auto mt-12 max-w-xl" />
 
-            <Container className="mx-auto max-w-xl">
+            {/*<Container className="mx-auto max-w-xl">
               <TemplateFooter isDocument={false} />
-            </Container>
+            </Container>*/}
           </Section>
         </Body>
       </Tailwind>
