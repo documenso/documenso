@@ -41,7 +41,7 @@ export const verifyEmail = async ({ token }: VerifyEmailProps) => {
       DateTime.now().minus({ hours: 1 }).toJSDate() > mostRecentToken.createdAt
     ) {
       await jobsClient.triggerJob({
-        name: 'send.confirmation.email',
+        name: 'send.signup.confirmation.email',
         payload: {
           email: verificationToken.user.email,
         },

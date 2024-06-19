@@ -109,7 +109,7 @@ export const NEXT_AUTH_OPTIONS: AuthOptions = {
             DateTime.fromJSDate(mostRecentToken.createdAt).diffNow('minutes').minutes > -5
           ) {
             await jobsClient.triggerJob({
-              name: 'send.confirmation.email',
+              name: 'send.signup.confirmation.email',
               payload: {
                 email: user.email,
               },

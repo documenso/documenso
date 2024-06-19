@@ -201,7 +201,7 @@ export const profileRouter = router({
         const { email } = input;
 
         await jobsClient.triggerJob({
-          name: 'send.confirmation.email',
+          name: 'send.signup.confirmation.email',
           payload: {
             email,
           },

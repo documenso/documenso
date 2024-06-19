@@ -127,7 +127,7 @@ export const sendDocument = async ({
         }
 
         await jobsClient.triggerJob({
-          name: 'send.signing.email',
+          name: 'send.signing.requested.email',
           payload: {
             userId,
             documentId,

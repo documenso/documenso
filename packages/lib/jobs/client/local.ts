@@ -80,144 +80,144 @@ export class LocalJobProvider extends BaseJobProvider {
 
   public getApiHandler() {
     return async (req: NextApiRequest, res: NextApiResponse) => {
-      if (req.method === 'POST') {
-        const jobId = req.headers['x-job-id'];
-        const signature = req.headers['x-job-signature'];
-        const isRetry = req.headers['x-job-retry'] !== undefined;
+      if (req.method !== 'POST') {
+        res.status(405).send('Method not allowed');
+      }
 
+      const jobId = req.headers['x-job-id'];
+      const signature = req.headers['x-job-signature'];
+      const isRetry = req.headers['x-job-retry'] !== undefined;
+
+      // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+      const options = await json(req)
+        .then(async (data) => ZSimpleTriggerJobOptionsSchema.parseAsync(data))
         // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-        const options = await json(req)
-          .then(async (data) => ZSimpleTriggerJobOptionsSchema.parseAsync(data))
-          // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-          .then((data) => data as SimpleTriggerJobOptions)
-          .catch(() => null);
+        .then((data) => data as SimpleTriggerJobOptions)
+        .catch(() => null);
 
-        if (!options) {
+      if (!options) {
+        res.status(400).send('Bad request');
+        return;
+      }
+
+      const definition = this._jobDefinitions[options.name];
+
+      if (
+        typeof jobId !== 'string' ||
+        typeof signature !== 'string' ||
+        typeof options !== 'object'
+      ) {
+        res.status(400).send('Bad request');
+        return;
+      }
+
+      if (!definition) {
+        res.status(404).send('Job not found');
+        return;
+      }
+
+      if (definition && !definition.enabled) {
+        console.log('Attempted to trigger a disabled job', options.name);
+
+        res.status(404).send('Job not found');
+        return;
+      }
+
+      if (!signature || !verify(options, signature)) {
+        res.status(401).send('Unauthorized');
+        return;
+      }
+
+      if (definition.trigger.schema) {
+        const result = definition.trigger.schema.safeParse(options.payload);
+
+        if (!result.success) {
           res.status(400).send('Bad request');
           return;
         }
+      }
 
-        const definition = this._jobDefinitions[options.name];
+      console.log(`[JOBS]: Triggering job ${options.name} with payload`, options.payload);
 
-        if (
-          typeof jobId !== 'string' ||
-          typeof signature !== 'string' ||
-          typeof options !== 'object'
-        ) {
-          res.status(400).send('Bad request');
-          return;
-        }
-
-        if (!definition) {
-          res.status(404).send('Job not found');
-          return;
-        }
-
-        if (definition && !definition.enabled) {
-          console.log('Attempted to trigger a disabled job', options.name);
-
-          res.status(404).send('Job not found');
-          return;
-        }
-
-        if (!signature || !verify(options, signature)) {
-          res.status(401).send('Unauthorized');
-          return;
-        }
-
-        if (definition.trigger.schema) {
-          const result = definition.trigger.schema.safeParse(options.payload);
-
-          if (!result.success) {
-            res.status(400).send('Bad request');
-            return;
-          }
-        }
-
-        console.log(`[JOBS]: Triggering job ${options.name} with payload`, options.payload);
-
-        let backgroundJob = await prisma.backgroundJob
-          .update({
-            where: {
-              id: jobId,
-              status: BackgroundJobStatus.PENDING,
+      let backgroundJob = await prisma.backgroundJob
+        .update({
+          where: {
+            id: jobId,
+            status: BackgroundJobStatus.PENDING,
+          },
+          data: {
+            status: BackgroundJobStatus.PROCESSING,
+            retried: {
+              increment: isRetry ? 1 : 0,
             },
-            data: {
-              status: BackgroundJobStatus.PROCESSING,
-              retried: {
-                increment: isRetry ? 1 : 0,
-              },
-              lastRetriedAt: isRetry ? new Date() : undefined,
-            },
-          })
-          .catch(() => null);
+            lastRetriedAt: isRetry ? new Date() : undefined,
+          },
+        })
+        .catch(() => null);
 
-        if (!backgroundJob) {
-          res.status(404).send('Job not found');
-          return;
-        }
+      if (!backgroundJob) {
+        res.status(404).send('Job not found');
+        return;
+      }
 
-        try {
-          await definition.handler({
-            payload: options.payload,
-            io: this.createJobRunIO(jobId),
-          });
+      try {
+        await definition.handler({
+          payload: options.payload,
+          io: this.createJobRunIO(jobId),
+        });
 
+        backgroundJob = await prisma.backgroundJob.update({
+          where: {
+            id: jobId,
+            status: BackgroundJobStatus.PROCESSING,
+          },
+          data: {
+            status: BackgroundJobStatus.COMPLETED,
+            completedAt: new Date(),
+          },
+        });
+      } catch (error) {
+        console.error(`[JOBS]: Job ${options.name} failed`, error);
+
+        const taskHasExceededRetries = error instanceof BackgroundTaskExceededRetriesError;
+        const jobHasExceededRetries =
+          backgroundJob.retried >= backgroundJob.maxRetries &&
+          !(error instanceof BackgroundTaskFailedError);
+
+        if (taskHasExceededRetries || jobHasExceededRetries) {
           backgroundJob = await prisma.backgroundJob.update({
             where: {
               id: jobId,
               status: BackgroundJobStatus.PROCESSING,
             },
             data: {
-              status: BackgroundJobStatus.COMPLETED,
+              status: BackgroundJobStatus.FAILED,
               completedAt: new Date(),
             },
           });
-        } catch (error) {
-          console.error(`[JOBS]: Job ${options.name} failed`, error);
 
-          const taskHasExceededRetries = error instanceof BackgroundTaskExceededRetriesError;
-          const jobHasExceededRetries =
-            backgroundJob.retried >= backgroundJob.maxRetries &&
-            !(error instanceof BackgroundTaskFailedError);
-
-          if (taskHasExceededRetries || jobHasExceededRetries) {
-            backgroundJob = await prisma.backgroundJob.update({
-              where: {
-                id: jobId,
-                status: BackgroundJobStatus.PROCESSING,
-              },
-              data: {
-                status: BackgroundJobStatus.FAILED,
-                completedAt: new Date(),
-              },
-            });
-
-            res.status(500).send('Task exceeded retries');
-            return;
-          }
-
-          backgroundJob = await prisma.backgroundJob.update({
-            where: {
-              id: jobId,
-              status: BackgroundJobStatus.PROCESSING,
-            },
-            data: {
-              status: BackgroundJobStatus.PENDING,
-            },
-          });
-
-          await this.submitJobToEndpoint({
-            jobId,
-            jobDefinitionId: backgroundJob.jobId,
-            data: options,
-          });
+          res.status(500).send('Task exceeded retries');
+          return;
         }
 
-        res.status(200).send('OK');
-      } else {
-        res.status(405).send('Method not allowed');
+        backgroundJob = await prisma.backgroundJob.update({
+          where: {
+            id: jobId,
+            status: BackgroundJobStatus.PROCESSING,
+          },
+          data: {
+            status: BackgroundJobStatus.PENDING,
+          },
+        });
+
+        await this.submitJobToEndpoint({
+          jobId,
+          jobDefinitionId: backgroundJob.jobId,
+          data: options,
+        });
       }
+
+      res.status(200).send('OK');
     };
   }
 

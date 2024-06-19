@@ -53,7 +53,7 @@ export const authRouter = router({
       const user = await createUser({ name, email, password, signature, url });
 
       await jobsClient.triggerJob({
-        name: 'send.confirmation.email',
+        name: 'send.signup.confirmation.email',
         payload: {
           email: user.email,
         },

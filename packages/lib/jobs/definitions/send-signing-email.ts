@@ -26,11 +26,11 @@ import { renderCustomEmailTemplate } from '../../utils/render-custom-email-templ
 import type { JobDefinition } from '../client/_internal/job';
 
 export const SEND_SIGNING_EMAIL_JOB_DEFINITION = {
-  id: 'send.signing.email',
+  id: 'send.signing.requested.email',
   name: 'Send Signing Email',
   version: '1.0.0',
   trigger: {
-    name: 'send.signing.email',
+    name: 'send.signing.requested.email',
     schema: z.object({
       userId: z.number(),
       documentId: z.number(),
