@@ -179,7 +179,7 @@ export const EnableAuthenticatorAppDialog = ({ onSuccess }: EnableAuthenticatorA
                     <DialogTitle>ავთენტიფიკატორი აპლიკაციის გააქტიურება</DialogTitle>
                     <DialogDescription>
                       ორფაქტორიანი ავთენტიფიკაციის ჩასართავად, დაასკანერეთ შემდეგი QR კოდი თქვენი
-                      ავთენტიფიკატორის აპის გამოყენებით.
+                      ავთენტიფიკატორის აპლიკაციის გამოყენებით.
                     </DialogDescription>
                   </DialogHeader>
 
@@ -192,7 +192,7 @@ export const EnableAuthenticatorAppDialog = ({ onSuccess }: EnableAuthenticatorA
                     />
 
                     <p className="text-muted-foreground text-sm">
-                      თუ თქვენი ავთენტიფიკატორი აპლიკაცია არ აღიქვავს QR კოდებსს, ამის ნაცვლად
+                      თუ თქვენი ავთენტიფიკატორი აპლიკაცია არ აღიქვავს QR კოდებს, ამის ნაცვლად
                       შეგიძლიათ გამოიყენოთ შემდეგი კოდი:
                     </p>
 

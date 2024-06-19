@@ -15,7 +15,7 @@ export default function SettingsSecurityActivityPage() {
     <div>
       <SettingsHeader
         title="უსაფრთხოება"
-        subtitle="თქვენს ანგარიშთან დაკავშირებული უსაფრთხოების ყველა ბოლო აქტივობის ნახვა."
+        subtitle="თქვენს ანგარიშთან დაკავშირებული ყველა აქტივობა"
         hideDivider={true}
       >
         <ActivityPageBackButton />

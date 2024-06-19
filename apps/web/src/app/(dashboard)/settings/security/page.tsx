@@ -92,7 +92,9 @@ export default async function SecuritySettingsPage() {
           </div>
 
           <Button asChild variant="outline" className="bg-background">
-            <Link href="/settings/security/passkeys">მართეთ საიდუმლო გასაღებები</Link>
+            <Link href="/settings/security/passkeys" className="w-1/3">
+              მართეთ გასაღებები
+            </Link>
           </Button>
         </Alert>
       )}
@@ -105,7 +107,7 @@ export default async function SecuritySettingsPage() {
           <AlertTitle>ბოლო აქტივობა</AlertTitle>
 
           <AlertDescription className="mr-2">
-            თქვენს ანგარიშთან დაკავშირებული უსაფრთხოების ყველა ბოლო აქტივობის ნახვა.
+            თქვენს ანგარიშთან დაკავშირებული ყველა აქტივობის ნახვა.
           </AlertDescription>
         </div>
 

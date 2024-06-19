@@ -104,7 +104,7 @@ export const ViewRecoveryCodesDialog = () => {
                 <DialogTitle>იხილეთ აღდგენის კოდები</DialogTitle>
 
                 <DialogDescription>
-                  გთხოვთ მოგვაწოდოთ ტოკენი თქვენი ავთენტიფიკატორიდან ან სარეზერვო კოდი.
+                  გთხოვთ მოგვაწოდოთ სარეზერვო კოდი ან ტოკენი თქვენი ავთენტიფიკატორი აპლიკაციიდან.
                 </DialogDescription>
               </DialogHeader>
 

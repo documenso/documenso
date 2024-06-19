@@ -137,10 +137,10 @@ export const CreateTeamDialog = ({ trigger, ...props }: CreateTeamDialogProps) =
 
       <DialogContent position="center">
         <DialogHeader>
-          <DialogTitle>შექმენით გუნდი</DialogTitle>
+          <DialogTitle>გუნდის შექმნა</DialogTitle>
 
           <DialogDescription className="mt-4">
-            შექმენით გუნდი თქვენი გუნდის წევრებთან თანამშრომლობისთვის.
+            შექმენით გუნდი თქვენთვის სასურველ წევრებთან თანამშრომლობისთვის.
           </DialogDescription>
         </DialogHeader>
 

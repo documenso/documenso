@@ -81,7 +81,7 @@ export const CurrentUserTeamsDataTable = () => {
               : TEAM_MEMBER_ROLE_MAP[row.original.currentTeamMember.role],
         },
         {
-          header: 'მომხმარებელი წლიდან',
+          header: 'გაწევრიანების თარიღი',
           accessorKey: 'createdAt',
           cell: ({ row }) => <LocaleDate date={row.original.createdAt} />,
         },
