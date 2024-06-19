@@ -214,9 +214,12 @@ export const InviteTeamMembersDialog = ({
 
   const downloadTemplate = () => {
     const data = [
-      { email: 'admin@documenso.com', role: 'Admin' },
-      { email: 'manager@documenso.com', role: 'Manager' },
-      { email: 'member@documenso.com', role: 'Member' },
+      { email: 'admin@documenso.com', role: 'ადმინი' },
+      // { email: 'admin@documenso.com', role: 'Admin' },
+      { email: 'manager@documenso.com', role: 'მენეჯერი' },
+      // { email: 'manager@documenso.com', role: 'Manager' },
+      { email: 'member@documenso.com', role: 'წევრი' },
+      // { email: 'member@documenso.com', role: 'Member' },
     ];
 
     const csvContent =

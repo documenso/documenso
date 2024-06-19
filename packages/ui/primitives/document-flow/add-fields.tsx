@@ -403,7 +403,7 @@ export const AddFieldsFormPartial = ({
                           key={`${role}-empty`}
                           className="text-muted-foreground/80 px-4 pb-4 pt-2.5 text-center text-xs"
                         >
-                          ამ როლის მქონდე მიმღები ვერ მოიძებნა
+                          ამ როლის მქონე მიმღები ვერ მოიძებნა
                         </div>
                       )}
 

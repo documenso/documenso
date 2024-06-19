@@ -136,7 +136,8 @@ export const UpdateTeamMemberDialog = ({
           <DialogTitle>დააწინაურეთ გუნდის წევრი</DialogTitle>
 
           <DialogDescription className="mt-4">
-            თქვენ ახლა აწინაურებთ <span className="font-bold">{teamMemberName}.</span>
+            თქვენ ახლა აწინაურებთ გუნდის წევრს -{' '}
+            <span className="font-bold">{teamMemberName}.</span>
           </DialogDescription>
         </DialogHeader>
 

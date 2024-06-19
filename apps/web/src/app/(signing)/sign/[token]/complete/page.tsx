@@ -118,9 +118,12 @@ export default async function CompletedSigningPage({
 
           <h2 className="mt-6 max-w-[35ch] text-center text-2xl font-semibold leading-normal md:text-3xl lg:text-4xl">
             დოკუმენტი
-            {recipient.role === RecipientRole.SIGNER && ' Signed '}
-            {recipient.role === RecipientRole.VIEWER && ' Viewed '}
-            {recipient.role === RecipientRole.APPROVER && ' Approved '}
+            {recipient.role === RecipientRole.SIGNER && ' ხელმოწერილია '}
+            {/* {recipient.role === RecipientRole.SIGNER && ' Signed '} */}
+            {recipient.role === RecipientRole.VIEWER && ' ნანახია '}
+            {/* {recipient.role === RecipientRole.VIEWER && ' Viewed '} */}
+            {recipient.role === RecipientRole.APPROVER && ' დამტკიცებულია '}
+            {/* {recipient.role === RecipientRole.APPROVER && ' Approved '} */}
           </h2>
 
           {match({ status: document.status, deletedAt: document.deletedAt })

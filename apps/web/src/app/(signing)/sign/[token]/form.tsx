@@ -117,9 +117,12 @@ export const SigningForm = ({ document, recipient, fields, redirectUrl }: Signin
       >
         <div className={cn('flex flex-1 flex-col')}>
           <h3 className="text-foreground text-2xl font-semibold">
-            {recipient.role === RecipientRole.VIEWER && 'View Document'}
-            {recipient.role === RecipientRole.SIGNER && 'Sign Document'}
-            {recipient.role === RecipientRole.APPROVER && 'Approve Document'}
+            {recipient.role === RecipientRole.VIEWER && 'იხილეთ დოკუმენტი'}
+            {/* {recipient.role === RecipientRole.VIEWER && 'View Document'} */}
+            {recipient.role === RecipientRole.SIGNER && 'ხელი მოაწერეთ დოკუმენტს'}
+            {/* {recipient.role === RecipientRole.SIGNER && 'Sign Document'} */}
+            {recipient.role === RecipientRole.APPROVER && 'დაადასტურეთ დოკუმენტი'}
+            {/* {recipient.role === RecipientRole.APPROVER && 'Approve Document'} */}
           </h3>
 
           {recipient.role === RecipientRole.VIEWER ? (

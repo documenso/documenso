@@ -72,29 +72,35 @@ export const SignDialog = ({
       <DialogContent>
         <DialogTitle>
           <div className="text-foreground text-xl font-semibold">
-            {role === RecipientRole.VIEWER && 'Complete Viewing'}
-            {role === RecipientRole.SIGNER && 'Complete Signing'}
-            {role === RecipientRole.APPROVER && 'Complete Approval'}
+            {role === RecipientRole.VIEWER && 'დაასრულეთ ნახვა'}
+            {/* {role === RecipientRole.VIEWER && 'Complete Viewing'} */}
+            {role === RecipientRole.SIGNER && 'დაასრულეთ ხელმოწერა'}
+            {/* {role === RecipientRole.SIGNER && 'Complete Signing'} */}
+            {role === RecipientRole.APPROVER && 'დაასრულეთ დადასტურება'}
+            {/* {role === RecipientRole.APPROVER && 'Complete Approval'} */}
           </div>
         </DialogTitle>
 
         <div className="text-muted-foreground max-w-[50ch]">
           {role === RecipientRole.VIEWER && (
             <span>
-              You are about to complete viewing "{truncatedTitle}".
-              <br /> Are you sure?
+              თქვენ ახლა დაასრულებთ "{truncatedTitle}"-ის ხილვას.
+              {/* You are about to complete viewing "{truncatedTitle}". */}
+              <br /> დარწმუნდით სანამ განაგრძობთ.
             </span>
           )}
           {role === RecipientRole.SIGNER && (
             <span>
-              You are about to complete signing "{truncatedTitle}".
-              <br /> Are you sure?
+              თქვენ ახლა ხელს მოაწერთ "{truncatedTitle}"-ს.
+              {/* You are about to complete signing "{truncatedTitle}". */}
+              <br /> დარწმუნდით სანამ განაგრძობთ.
             </span>
           )}
           {role === RecipientRole.APPROVER && (
             <span>
-              You are about to complete approving "{truncatedTitle}".
-              <br /> Are you sure?
+              თქვენ ახლა დაამტკიცებთ "{truncatedTitle}"-ს.
+              {/* You are about to complete approving "{truncatedTitle}". */}
+              <br /> დარწმუნდით სანამ განაგრძობთ.
             </span>
           )}
         </div>

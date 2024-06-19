@@ -21,10 +21,13 @@ export const RecipientRoleSelect = forwardRef<HTMLButtonElement, SelectProps>((p
 
     <SelectContent align="end">
       <SelectItem value={RecipientRole.SIGNER}>
-        <div className="flex items-center">
-          <div className="flex w-[150px] items-center">
-            მიმღებმა <span className="mr-2">({ROLE_ICONS[RecipientRole.SIGNER]})</span>
-            საჭიროა ხელი მოაწეროს
+        <div className="flex w-96 items-center justify-between">
+          <div className="flex w-full items-center justify-between  ">
+            {/* w-[150px] */}
+            მიმღებმა
+            <span className="mr-2 flex items-center gap-x-2">
+              {ROLE_ICONS[RecipientRole.SIGNER]}საჭიროა ხელი მოაწეროს
+            </span>
             {/* Needs to sign */}
           </div>
           <Tooltip>
@@ -40,10 +43,13 @@ export const RecipientRoleSelect = forwardRef<HTMLButtonElement, SelectProps>((p
       </SelectItem>
 
       <SelectItem value={RecipientRole.APPROVER}>
-        <div className="flex items-center">
-          <div className="flex w-[150px] items-center">
-            მიმღებმა <span className="mr-2">({ROLE_ICONS[RecipientRole.APPROVER]})</span>
-            საჭიროა დაამტკიცოს
+        <div className="flex w-96 items-center justify-between">
+          <div className="flex  w-full w-full items-center justify-between">
+            {/* w-[150px] */}
+            მიმღებმა{' '}
+            <span className="mr-2 flex items-center gap-x-2">
+              {ROLE_ICONS[RecipientRole.APPROVER]} საჭიროა დაამტკიცოს
+            </span>
             {/* Needs to approve */}
           </div>
           <Tooltip>
@@ -58,10 +64,13 @@ export const RecipientRoleSelect = forwardRef<HTMLButtonElement, SelectProps>((p
       </SelectItem>
 
       <SelectItem value={RecipientRole.VIEWER}>
-        <div className="flex items-center">
-          <div className="flex w-[150px] items-center">
-            მიმღბმა <span className="mr-2">({ROLE_ICONS[RecipientRole.VIEWER]})</span>
-            საჭიროა იხილოს
+        <div className="flex w-96 items-center justify-between">
+          <div className="flex  w-full items-center justify-between">
+            {/* w-[150px] */}
+            მიმღებმა{' '}
+            <span className="mr-2 flex items-center gap-x-2">
+              {ROLE_ICONS[RecipientRole.VIEWER]} საჭიროა იხილოს
+            </span>
           </div>
           <Tooltip>
             <TooltipTrigger>
@@ -75,10 +84,13 @@ export const RecipientRoleSelect = forwardRef<HTMLButtonElement, SelectProps>((p
       </SelectItem>
 
       <SelectItem value={RecipientRole.CC}>
-        <div className="flex items-center">
-          <div className="flex w-[150px] items-center">
-            მიმღები <span className="mr-2">({ROLE_ICONS[RecipientRole.CC]})</span>
-            იღებს ასლს
+        <div className="flex w-96 items-center justify-between">
+          <div className="flex  w-full items-center justify-between">
+            {/* w-[150px] */}
+            მიმღები{' '}
+            <span className="mr-2 flex items-center gap-x-2">
+              {ROLE_ICONS[RecipientRole.CC]} იღებს ასლს
+            </span>
             {/* Receives copy */}
           </div>
           <Tooltip>

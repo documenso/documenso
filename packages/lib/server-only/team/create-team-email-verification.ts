@@ -134,7 +134,7 @@ export const sendTeamEmailVerificationEmail = async (
       name: FROM_NAME,
       address: FROM_ADDRESS,
     },
-    subject: `${teamName} ითხოვს თქვენი ელ.ფოსტის გამოყენების Documenso-ზე`,
+    subject: `${teamName} ითხოვს თქვენი ელ.ფოსტის გამოყენებას Documenso-ზე`,
     html: render(template),
     text: render(template, { plainText: true }),
   });

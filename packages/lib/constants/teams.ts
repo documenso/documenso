@@ -4,9 +4,12 @@ export const TEAM_URL_ROOT_REGEX = new RegExp('^/t/[^/]+$');
 export const TEAM_URL_REGEX = new RegExp('^/t/[^/]+');
 
 export const TEAM_MEMBER_ROLE_MAP: Record<keyof typeof TeamMemberRole, string> = {
-  ADMIN: 'Admin',
-  MANAGER: 'Manager',
-  MEMBER: 'Member',
+  ADMIN: 'ადმინი',
+  // ADMIN: 'Admin',
+  MANAGER: 'მენეჯერი',
+  // MANAGER: 'Manager',
+  MEMBER: 'წევრი',
+  // MEMBER: 'Member',
 };
 
 export const TEAM_MEMBER_ROLE_PERMISSIONS_MAP = {

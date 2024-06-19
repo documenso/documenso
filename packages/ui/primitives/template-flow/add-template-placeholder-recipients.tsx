@@ -78,8 +78,8 @@ export const AddTemplatePlaceholderRecipientsFormPartial = ({
           : [
               {
                 formId: initialId,
-                name: `Recipient 1`,
-                email: `recipient.1@documenso.com`,
+                name: `მიმღები`,
+                email: `mimghebi.1@ipografi.com`,
                 role: RecipientRole.SIGNER,
                 actionAuth: undefined,
               },
@@ -131,9 +131,9 @@ export const AddTemplatePlaceholderRecipientsFormPartial = ({
     appendSigner({
       formId: nanoid(12),
       // Update TEMPLATE_RECIPIENT_NAME_PLACEHOLDER_REGEX if this is ever changed.
-      name: `Recipient ${placeholderRecipientCount}`,
+      name: `მიმღები ${placeholderRecipientCount}`,
       // Update TEMPLATE_RECIPIENT_EMAIL_PLACEHOLDER_REGEX if this is ever changed.
-      email: `recipient.${placeholderRecipientCount}@documenso.com`,
+      email: `mimghebi.${placeholderRecipientCount}@ipografi.com`,
       role: RecipientRole.SIGNER,
     });
 

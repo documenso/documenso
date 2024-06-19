@@ -183,7 +183,7 @@ export const DataTableActionDropdown = ({ row, team }: DataTableActionDropdownPr
             <DropdownMenuItem disabled={disabled || isDraft} onSelect={(e) => e.preventDefault()}>
               {/* <div className="flex items-center">
                 {loading ? <Loader className="mr-2 h-4 w-4" /> : <Share className="mr-2 h-4 w-4" />}
-                გააზიარეთ ხელმოწერის ბარათი
+                გააზიარეთ ხელმოწერა
               </div> */}
               {/* მე დავაკომენტარე */}
             </DropdownMenuItem>
