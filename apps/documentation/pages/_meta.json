@@ -71,8 +71,20 @@
         "href": "/documents"
       },
       "templates": {
-        "title": "Templates",
+        "title": "Creating Templates",
         "href": "/templates"
+      },
+      "direct-links": {
+        "title": "Using Direct Links",
+        "href": "/direct-links"
+      },
+      "signing-levels": {
+        "title": "Signing Levels",
+        "href": "/signing-levels"
+      },
+      "compliance": {
+        "title": "Compliance",
+        "href": "/compliance"
       }
     }
   },
