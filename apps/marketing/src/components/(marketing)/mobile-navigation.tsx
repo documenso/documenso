@@ -8,7 +8,8 @@ import { FaXTwitter } from 'react-icons/fa6';
 import { LiaDiscord } from 'react-icons/lia';
 import { LuGithub } from 'react-icons/lu';
 
-import LogoImage from '@documenso/assets/logo.png';
+import LogoImage from '@documenso/assets/IPOGRAFI.svg';
+// import LogoImage from '@documenso/assets/logo.png';
 import { Sheet, SheetContent } from '@documenso/ui/primitives/sheet';
 
 export type MobileNavigationProps = {

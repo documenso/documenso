@@ -6,7 +6,8 @@ import { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 
-import LogoImage from '@documenso/assets/logo.png';
+import LogoImage from '@documenso/assets/IPOGRAFI.svg';
+// import LogoImage from '@documenso/assets/logo.png';
 import { useFeatureFlags } from '@documenso/lib/client-only/providers/feature-flag';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
@@ -31,8 +32,8 @@ export const Header = ({ className, ...props }: HeaderProps) => {
             src={LogoImage}
             alt="Ipografi Logo"
             className="dark:invert"
-            width={170}
-            height={25}
+            width={230}
+            height={30}
           />
         </Link>
 

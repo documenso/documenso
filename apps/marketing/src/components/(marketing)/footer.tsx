@@ -9,7 +9,8 @@ import { FaFacebookF } from 'react-icons/fa6';
 import { FaInstagram } from 'react-icons/fa6';
 import { FaYoutube } from 'react-icons/fa6';
 
-import LogoImage from '@documenso/assets/logo.png';
+import LogoImage from '@documenso/assets/IPOGRAFI.svg';
+// import LogoImage from '@documenso/assets/logo.png';
 import { cn } from '@documenso/ui/lib/utils';
 import { ThemeSwitcher } from '@documenso/ui/primitives/theme-switcher';
 
@@ -41,7 +42,7 @@ export const Footer = ({ className, ...props }: FooterProps) => {
               src={LogoImage}
               alt="Ipografi Logo"
               className="dark:invert"
-              width={170}
+              width={200}
               height={0}
             />
           </Link>
@@ -79,7 +80,7 @@ export const Footer = ({ className, ...props }: FooterProps) => {
       </div>
       <div className="mx-auto mt-4 flex w-full max-w-screen-xl flex-wrap items-center justify-between gap-4 px-8 md:mt-12 lg:mt-24">
         <p className="text-muted-foreground text-sm">
-          © {new Date().getFullYear()} Ipografi, Inc. ყველა უფლება დაცულია
+          © {new Date().getFullYear()} შპს Ipografi. ყველა უფლება დაცულია
         </p>
 
         <div className="flex flex-wrap">

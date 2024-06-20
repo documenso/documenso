@@ -48,8 +48,8 @@ export const ResetPasswordTemplate = ({
             <Container className="mx-auto mb-2 mt-8 max-w-xl rounded-lg border border-solid border-slate-200 p-4 backdrop-blur-sm">
               <Section>
                 <Img
-                  src={getAssetUrl('/static/logo.png')}
-                  alt="Documenso Logo"
+                  src={getAssetUrl('/static/IPOGRAFI.svg')}
+                  alt="Ipografi Logo"
                   className="mb-4 h-6"
                 />
 

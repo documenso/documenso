@@ -30,7 +30,10 @@ export async function GET(_request: Request) {
     fetch(new URL('@documenso/assets/images/background-blog-og.png', import.meta.url)).then(
       async (res) => res.arrayBuffer(),
     ),
-    fetch(new URL('@documenso/assets/logo.png', import.meta.url)).then(async (res) =>
+    // fetch(new URL('@documenso/assets/logo.png', import.meta.url)).then(async (res) =>
+    //   res.arrayBuffer(),
+    // ),
+    fetch(new URL('@documenso/assets/IPOGRAFI.svg', import.meta.url)).then(async (res) =>
       res.arrayBuffer(),
     ),
   ]);
@@ -48,7 +51,7 @@ export async function GET(_request: Request) {
           {title}
         </h1>
 
-        <p tw="font-normal">დაწერა: {author} </p>
+        <p tw="font-normal">ავტორი: {author} </p>
       </div>
     ),
     {

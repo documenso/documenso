@@ -124,11 +124,11 @@ export const resendDocument = async ({
       //   : `შეხსენება: გთხოვთ ${actionVerb} ამ დოკუმენტს`;
 
       const emailSubject = `
-        ${actionVerb === 'ხელი მოაწეროთ' && `შეხსენება: გთხოვთ ${actionVerb} ამ დოკუმენტს`}
-        ${actionVerb === 'დაამტკიცოთ' && `შეხსენება: გთხოვთ ${actionVerb} ეს დოკუმენტი`}
-        ${actionVerb === 'იხილოთ' && `შეხსენება: გთხოვთ ${actionVerb} ეს დოკუმენტი`}
-        ${actionVerb === 'ასლი მიიღოთ' && `შეხსენება: გთხოვთ ამ დოკუმენტის ${actionVerb}`}
-      `;
+      ${actionVerb === 'ხელი მოაწეროთ' ? `შეხსენება: გთხოვთ ${actionVerb} ამ დოკუმენტს` : ''}
+      ${actionVerb === 'დაამტკიცოთ' ? `შეხსენება: გთხოვთ ${actionVerb} ეს დოკუმენტი` : ''}
+      ${actionVerb === 'იხილოთ' ? `შეხსენება: გთხოვთ ${actionVerb} ეს დოკუმენტი` : ''}
+      ${actionVerb === 'ასლი მიიღოთ' ? `შეხსენება: გთხოვთ ამ დოკუმენტის ${actionVerb}` : ''}
+    `;
 
       await prisma.$transaction(
         async (tx) => {

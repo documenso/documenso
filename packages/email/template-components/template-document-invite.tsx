@@ -44,7 +44,7 @@ export const TemplateDocumentInvite = ({
           ) : (
             <>
               {`${inviterName}: მოგიწვიათ, რათა 
-              ${actionVerb === 'ასლი მიიღოთ' && 'დოკუმენტის'} 
+              ${actionVerb === 'ასლი მიიღოთ' ? 'დოკუმენტის' : ''} 
               ${actionVerb} 
               ${
                 actionVerb === 'ხელი მოაწეროთ'

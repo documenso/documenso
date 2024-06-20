@@ -41,16 +41,30 @@ export const DocumentInviteEmailTemplate = ({
   // ? `please ${action} your document ${documentName}`
   // : `${inviterName} has invited you to ${action} ${documentName}`;
 
+  // const previewText = selfSigner
+  //   ? `გთხოვთ
+  //   ${action === 'ასლი მიიღოთ' && 'თქვენი დოკუმენტის'}
+  //   ${action}
+  //   ${action === 'დაამტკიცოთ' && 'თქვენი დოკუმენტი'}
+  //   ${action === 'ხელი მოაწეროთ' && 'თქვენს დოკუმენტს'}
+  //   ${action === 'იხილოთ' && 'თქვენი დოკუმენტი'}
+  //   "${documentName}"`
+  //   : `${inviterName}: მოგიწვიათ, რათა
+  //    ${action === 'ასლი მიიღოთ' && 'დოკუმენტის'}
+  //    ${action}
+  //    ${action === 'ხელი მოაწეროთ' ? 'დოკუმენტს' : action === 'ასლი მიიღოთ' ? '' : 'დოკუმენტი'}
+  //     "${documentName}"`;
+
   const previewText = selfSigner
     ? `გთხოვთ 
-    ${action === 'ასლი მიიღოთ' && 'თქვენი დოკუმენტის'}
+    ${action === 'ასლი მიიღოთ' ? 'თქვენი დოკუმენტის' : ''}
     ${action} 
-    ${action === 'დაამტკიცოთ' && 'თქვენი დოკუმენტი'}
-    ${action === 'ხელი მოაწეროთ' && 'თქვენს დოკუმენტს'}
-    ${action === 'იხილოთ' && 'თქვენი დოკუმენტი'}
+    ${action === 'დაამტკიცოთ' ? 'თქვენი დოკუმენტი' : ''}
+    ${action === 'ხელი მოაწეროთ' ? 'თქვენს დოკუმენტს' : ''}
+    ${action === 'იხილოთ' ? 'თქვენი დოკუმენტი' : ''}
     "${documentName}"`
     : `${inviterName}: მოგიწვიათ, რათა 
-     ${action === 'ასლი მიიღოთ' && 'დოკუმენტის'} 
+     ${action === 'ასლი მიიღოთ' ? 'დოკუმენტის' : ''} 
      ${action} 
      ${action === 'ხელი მოაწეროთ' ? 'დოკუმენტს' : action === 'ასლი მიიღოთ' ? '' : 'დოკუმენტი'}
       "${documentName}"`;
@@ -77,9 +91,10 @@ export const DocumentInviteEmailTemplate = ({
             <Container className="mx-auto mb-2 mt-8 max-w-xl rounded-lg border border-solid border-slate-200 p-4 backdrop-blur-sm">
               <Section>
                 <Img
-                  src={getAssetUrl('/static/logo.png')}
-                  alt="Documenso Logo"
-                  className="mb-4 h-6"
+                  src={getAssetUrl('/static/IPOGRAFI.svg')}
+                  alt="Ipografi Logo"
+                  className="mb-4 w-40"
+                  // className="mb-4 h-6"
                 />
 
                 <TemplateDocumentInvite
