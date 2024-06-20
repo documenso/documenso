@@ -117,8 +117,9 @@
     "type": "menu",
     "items": {
       "changelog": {
-        "title": "Release Notes",
-        "href": "/release-notes"
+        "title": "Changelog",
+        "href": "https://documenso.com/changelog",
+        "newWindow": true
       },
       "blog": {
         "title": "Blog",
