@@ -39,7 +39,7 @@ export default async function BillingSettingsPage() {
 
   const [subscriptions, prices, primaryAccountPlanPrices] = await Promise.all([
     getSubscriptionsByUserId({ userId: user.id }),
-    getPricesByInterval({ plan: STRIPE_PLAN_TYPE.COMMUNITY }),
+    getPricesByInterval({ plan: STRIPE_PLAN_TYPE.REGULAR }),
     getPrimaryAccountPlanPrices(),
   ]);
 
