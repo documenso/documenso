@@ -23,20 +23,24 @@ import { DOCUMENT_AUDIT_LOG_TYPE } from '../../types/document-audit-logs';
 import { ZRequestMetadataSchema } from '../../universal/extract-request-metadata';
 import { createDocumentAuditLogData } from '../../utils/document-audit-logs';
 import { renderCustomEmailTemplate } from '../../utils/render-custom-email-template';
-import type { JobDefinition } from '../client/_internal/job';
+import { type JobDefinition } from '../client/_internal/job';
+
+const SEND_SIGNING_EMAIL_JOB_DEFINITION_ID = 'send.signing.requested.email';
+
+const SEND_SIGNING_EMAIL_JOB_DEFINITION_SCHEMA = z.object({
+  userId: z.number(),
+  documentId: z.number(),
+  recipientId: z.number(),
+  requestMetadata: ZRequestMetadataSchema.optional(),
+});
 
 export const SEND_SIGNING_EMAIL_JOB_DEFINITION = {
-  id: 'send.signing.requested.email',
+  id: SEND_SIGNING_EMAIL_JOB_DEFINITION_ID,
   name: 'Send Signing Email',
   version: '1.0.0',
   trigger: {
-    name: 'send.signing.requested.email',
-    schema: z.object({
-      userId: z.number(),
-      documentId: z.number(),
-      recipientId: z.number(),
-      requestMetadata: ZRequestMetadataSchema.optional(),
-    }),
+    name: SEND_SIGNING_EMAIL_JOB_DEFINITION_ID,
+    schema: SEND_SIGNING_EMAIL_JOB_DEFINITION_SCHEMA,
   },
   handler: async ({ payload, io }) => {
     const { userId, documentId, recipientId, requestMetadata } = payload;
@@ -161,4 +165,7 @@ export const SEND_SIGNING_EMAIL_JOB_DEFINITION = {
       });
     });
   },
-} as const satisfies JobDefinition;
+} as const satisfies JobDefinition<
+  typeof SEND_SIGNING_EMAIL_JOB_DEFINITION_ID,
+  z.infer<typeof SEND_SIGNING_EMAIL_JOB_DEFINITION_SCHEMA>
+>;

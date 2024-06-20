@@ -7,6 +7,6 @@ import { SEND_SIGNING_EMAIL_JOB_DEFINITION } from './definitions/send-signing-em
  * triggering jobs.
  */
 export const jobsClient = new JobClient([
-  SEND_CONFIRMATION_EMAIL_JOB_DEFINITION,
   SEND_SIGNING_EMAIL_JOB_DEFINITION,
+  SEND_CONFIRMATION_EMAIL_JOB_DEFINITION,
 ] as const);
