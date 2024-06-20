@@ -47,14 +47,6 @@ export const TEAM_MEMBERS = [
     engagement: 'Full-Time',
     joinDate: 'October 9th, 2023',
   },
-  {
-    name: 'Adithya Krishna',
-    role: 'Software Engineer - II',
-    salary: '-',
-    location: 'India',
-    engagement: 'Full-Time',
-    joinDate: 'December 1st, 2023',
-  },
 ];
 
 export const FUNDING_RAISED = [
