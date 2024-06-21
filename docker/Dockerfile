@@ -15,8 +15,7 @@ WORKDIR /app
 
 COPY . .
 
-RUN TURBO_VERSION="$(npm list --package-lock-only --json turbo | jq -r '.dependencies.turbo.version')"
-RUN npm install -g "turbo@$TURBO_VERSION"
+RUN npm install -g "turbo@^1.9.3"
 
 # Outputs to the /out folder
 # source: https://turbo.build/repo/docs/reference/command-line-reference/prune#--docker
@@ -66,8 +65,7 @@ COPY --from=builder /app/out/full/ .
 # Finally copy the turbo.json file so that we can run turbo commands
 COPY turbo.json turbo.json
 
-RUN TURBO_VERSION="$(npm list --package-lock-only --json turbo | jq -r '.dependencies.turbo.version')"
-RUN npm install -g "turbo@$TURBO_VERSION"
+RUN npm install -g "turbo@^1.9.3"
 
 RUN turbo run build --filter=@documenso/web...
 
