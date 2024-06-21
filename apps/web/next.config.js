@@ -24,7 +24,7 @@ const FONT_NOTO_SANS_BYTES = fs.readFileSync(
 
 /** @type {import('next').NextConfig} */
 const config = {
-  output: process.env.DOCKER_OUTPUT ? 'standalone' : undefined,
+  output: 'standalone',
   experimental: {
     outputFileTracingRoot: path.join(__dirname, '../../'),
     serverComponentsExternalPackages: ['@node-rs/bcrypt', '@documenso/pdf-sign', 'playwright'],
