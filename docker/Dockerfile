@@ -12,7 +12,7 @@ FROM base AS builder
 RUN apk add --no-cache libc6-compat
 RUN apk add --no-cache jq
 WORKDIR /app
-
+ENV DOCKER_OUTPUT 1
 COPY . .
 
 RUN TURBO_VERSION="$(npm list --package-lock-only --json turbo | jq -r '.dependencies.turbo.version')"
