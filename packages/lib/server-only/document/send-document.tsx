@@ -1,16 +1,9 @@
-import { createElement } from 'react';
-
-import { mailer } from '@documenso/email/mailer';
-import { render } from '@documenso/email/render';
-import { DocumentInviteEmailTemplate } from '@documenso/email/templates/document-invite';
-import { FROM_ADDRESS, FROM_NAME } from '@documenso/lib/constants/email';
 import { sealDocument } from '@documenso/lib/server-only/document/seal-document';
 import { updateDocument } from '@documenso/lib/server-only/document/update-document';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
 import type { RequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 import { putPdfFile } from '@documenso/lib/universal/upload/put-file';
 import { createDocumentAuditLogData } from '@documenso/lib/utils/document-audit-logs';
-import { renderCustomEmailTemplate } from '@documenso/lib/utils/render-custom-email-template';
 import { prisma } from '@documenso/prisma';
 import {
   DocumentSource,
@@ -21,11 +14,7 @@ import {
 } from '@documenso/prisma/client';
 import { WebhookTriggerEvents } from '@documenso/prisma/client';
 
-import { NEXT_PUBLIC_WEBAPP_URL } from '../../constants/app';
-import {
-  RECIPIENT_ROLES_DESCRIPTION,
-  RECIPIENT_ROLE_TO_EMAIL_TYPE,
-} from '../../constants/recipient-roles';
+import { jobsClient } from '../../jobs/client';
 import { getFile } from '../../universal/upload/get-file';
 import { insertFormValuesInPdf } from '../pdf/insert-form-values-in-pdf';
 import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
@@ -137,92 +126,15 @@ export const sendDocument = async ({
           return;
         }
 
-        const recipientEmailType = RECIPIENT_ROLE_TO_EMAIL_TYPE[recipient.role];
-
-        const { email, name } = recipient;
-        const selfSigner = email === user.email;
-        const { actionVerb } = RECIPIENT_ROLES_DESCRIPTION[recipient.role];
-        const recipientActionVerb = actionVerb.toLowerCase();
-
-        let emailMessage = customEmail?.message || '';
-        let emailSubject = `Please ${recipientActionVerb} this document`;
-
-        if (selfSigner) {
-          emailMessage = `You have initiated the document ${`"${document.title}"`} that requires you to ${recipientActionVerb} it.`;
-          emailSubject = `Please ${recipientActionVerb} your document`;
-        }
-
-        if (isDirectTemplate) {
-          emailMessage = `A document was created by your direct template that requires you to ${recipientActionVerb} it.`;
-          emailSubject = `Please ${recipientActionVerb} this document created by your direct template`;
-        }
-
-        const customEmailTemplate = {
-          'signer.name': name,
-          'signer.email': email,
-          'document.name': document.title,
-        };
-
-        const assetBaseUrl = NEXT_PUBLIC_WEBAPP_URL() || 'http://localhost:3000';
-        const signDocumentLink = `${NEXT_PUBLIC_WEBAPP_URL()}/sign/${recipient.token}`;
-
-        const template = createElement(DocumentInviteEmailTemplate, {
-          documentName: document.title,
-          inviterName: user.name || undefined,
-          inviterEmail: user.email,
-          assetBaseUrl,
-          signDocumentLink,
-          customBody: renderCustomEmailTemplate(emailMessage, customEmailTemplate),
-          role: recipient.role,
-          selfSigner,
-        });
-
-        await prisma.$transaction(
-          async (tx) => {
-            await mailer.sendMail({
-              to: {
-                address: email,
-                name,
-              },
-              from: {
-                name: FROM_NAME,
-                address: FROM_ADDRESS,
-              },
-              subject: customEmail?.subject
-                ? renderCustomEmailTemplate(customEmail.subject, customEmailTemplate)
-                : emailSubject,
-              html: render(template),
-              text: render(template, { plainText: true }),
-            });
-
-            await tx.recipient.update({
-              where: {
-                id: recipient.id,
-              },
-              data: {
-                sendStatus: SendStatus.SENT,
-              },
-            });
-
-            await tx.documentAuditLog.create({
-              data: createDocumentAuditLogData({
-                type: DOCUMENT_AUDIT_LOG_TYPE.EMAIL_SENT,
-                documentId: document.id,
-                user,
-                requestMetadata,
-                data: {
-                  emailType: recipientEmailType,
-                  recipientEmail: recipient.email,
-                  recipientName: recipient.name,
-                  recipientRole: recipient.role,
-                  recipientId: recipient.id,
-                  isResending: false,
-                },
-              }),
-            });
+        await jobsClient.triggerJob({
+          name: 'send.signing.requested.email',
+          payload: {
+            userId,
+            documentId,
+            recipientId: recipient.id,
+            requestMetadata,
           },
-          { timeout: 30_000 },
-        );
+        });
       }),
     );
   }
