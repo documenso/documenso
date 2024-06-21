@@ -3,11 +3,18 @@
   "pipeline": {
     "build": {
       "dependsOn": [
+        "prebuild",
         "^build"
       ],
       "outputs": [
         ".next/**",
         "!.next/cache/**"
+      ]
+    },
+    "prebuild": {
+      "cache": false,
+      "dependsOn": [
+        "^prebuild"
       ]
     },
     "lint": {
