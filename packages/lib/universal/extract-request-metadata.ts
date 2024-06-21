@@ -5,10 +5,12 @@ import { z } from 'zod';
 
 const ZIpSchema = z.string().ip();
 
-export type RequestMetadata = {
-  ipAddress?: string;
-  userAgent?: string;
-};
+export const ZRequestMetadataSchema = z.object({
+  ipAddress: ZIpSchema.optional(),
+  userAgent: z.string().optional(),
+});
+
+export type RequestMetadata = z.infer<typeof ZRequestMetadataSchema>;
 
 export const extractNextApiRequestMetadata = (req: NextApiRequest): RequestMetadata => {
   const parsedIp = ZIpSchema.safeParse(req.headers['x-forwarded-for'] || req.socket.remoteAddress);
