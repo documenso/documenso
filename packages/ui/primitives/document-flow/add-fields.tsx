@@ -186,7 +186,7 @@ export const AddFieldsFormPartial = ({
       pageX -= fieldPageWidth / 2;
       pageY -= fieldPageHeight / 2;
 
-      append({
+      const field = {
         formId: nanoid(12),
         type: selectedField,
         pageNumber,
@@ -195,7 +195,10 @@ export const AddFieldsFormPartial = ({
         pageWidth: fieldPageWidth,
         pageHeight: fieldPageHeight,
         signerEmail: selectedSigner.email,
-      });
+      };
+
+      append(field);
+      setLastActiveField({ ...field, id: field.formId });
 
       setIsFieldWithinBounds(false);
       setSelectedField(null);
@@ -671,6 +674,3 @@ export const AddFieldsFormPartial = ({
     </>
   );
 };
-
-// TODO: clear local storage and set recent field when the field is deleted
-// TODO: set the last active immediately the document is added
