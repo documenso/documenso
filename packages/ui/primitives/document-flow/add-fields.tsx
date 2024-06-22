@@ -5,6 +5,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Caveat } from 'next/font/google';
 
 import { Check, ChevronsUpDown, Info } from 'lucide-react';
+import type { FieldArrayWithId } from 'react-hook-form';
 import { useFieldArray, useForm } from 'react-hook-form';
 
 import { getBoundingClientRect } from '@documenso/lib/client-only/get-bounding-client-rect';
@@ -107,6 +108,9 @@ export const AddFieldsFormPartial = ({
   const [selectedField, setSelectedField] = useState<FieldType | null>(null);
   const [selectedSigner, setSelectedSigner] = useState<Recipient | null>(null);
   const [showRecipientsSelector, setShowRecipientsSelector] = useState(false);
+  const [lastActiveField, setLastActiveField] = useState<FieldArrayWithId<
+    TAddFieldsFormSchema['fields']
+  > | null>(null);
 
   const hasSelectedSignerBeenSent = selectedSigner?.sendStatus === SendStatus.SENT;
 
@@ -226,6 +230,8 @@ export const AddFieldsFormPartial = ({
         pageWidth,
         pageHeight,
       });
+
+      setLastActiveField(field);
     },
     [getFieldPosition, localFields, update],
   );
@@ -249,9 +255,30 @@ export const AddFieldsFormPartial = ({
         pageX,
         pageY,
       });
+
+      setLastActiveField(field);
     },
     [getFieldPosition, localFields, update],
   );
+
+  const onFieldCopy = useCallback(() => {
+    if (lastActiveField) {
+      localStorage.setItem('copied-field', JSON.stringify(lastActiveField));
+    }
+  }, [lastActiveField]);
+
+  const onFieldPaste = useCallback(() => {
+    const copiedFieldString = localStorage.getItem('copied-field');
+    if (copiedFieldString) {
+      const copiedField = JSON.parse(copiedFieldString);
+      append({
+        ...copiedField,
+        formId: nanoid(12),
+        pageX: copiedField.pageX + 2,
+        pageY: copiedField.pageY + 2,
+      });
+    }
+  }, [append]);
 
   useEffect(() => {
     if (selectedField) {
@@ -295,6 +322,24 @@ export const AddFieldsFormPartial = ({
     setSelectedSigner(recipients.find((r) => r.sendStatus !== SendStatus.SENT) ?? recipients[0]);
   }, [recipients]);
 
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.ctrlKey || event.metaKey) {
+        if (event.key === 'c') {
+          onFieldCopy();
+        } else if (event.key === 'v') {
+          onFieldPaste();
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [onFieldCopy, onFieldPaste]);
+
   const recipientsByRole = useMemo(() => {
     const recipientsByRole: Record<RecipientRole, Recipient[]> = {
       CC: [],
@@ -316,6 +361,8 @@ export const AddFieldsFormPartial = ({
       ([role]) => role !== RecipientRole.CC && role !== RecipientRole.VIEWER,
     );
   }, [recipientsByRole]);
+
+  console.log('Last active field', lastActiveField);
 
   return (
     <>
@@ -608,3 +655,7 @@ export const AddFieldsFormPartial = ({
     </>
   );
 };
+
+// TODO: clear local storage and set recent field when the field is deleted
+// TODO: set the last active immediately the document is added
+// TODO: Command + D to duplicate a field without command c + v
