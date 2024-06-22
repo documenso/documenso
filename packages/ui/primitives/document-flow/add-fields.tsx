@@ -108,9 +108,8 @@ export const AddFieldsFormPartial = ({
   const [selectedField, setSelectedField] = useState<FieldType | null>(null);
   const [selectedSigner, setSelectedSigner] = useState<Recipient | null>(null);
   const [showRecipientsSelector, setShowRecipientsSelector] = useState(false);
-  const [lastActiveField, setLastActiveField] = useState<FieldArrayWithId<
-    TAddFieldsFormSchema['fields']
-  > | null>(null);
+  const [lastActiveField, setLastActiveField] =
+    useState<FieldArrayWithId<TAddFieldsFormSchema> | null>(null);
 
   const hasSelectedSignerBeenSent = selectedSigner?.sendStatus === SendStatus.SENT;
 
@@ -261,11 +260,25 @@ export const AddFieldsFormPartial = ({
     [getFieldPosition, localFields, update],
   );
 
-  const onFieldCopy = useCallback(() => {
-    if (lastActiveField) {
-      localStorage.setItem('copied-field', JSON.stringify(lastActiveField));
-    }
-  }, [lastActiveField]);
+  const onFieldCopy = useCallback(
+    ({ duplicate }: { duplicate: boolean }) => {
+      if (lastActiveField) {
+        const fieldToCopy = {
+          ...lastActiveField,
+          formId: nanoid(12),
+          pageX: lastActiveField.pageX + 2,
+          pageY: lastActiveField.pageY + 2,
+        };
+
+        localStorage.setItem('copied-field', JSON.stringify(fieldToCopy));
+
+        if (duplicate) {
+          append(fieldToCopy);
+        }
+      }
+    },
+    [lastActiveField, append],
+  );
 
   const onFieldPaste = useCallback(() => {
     const copiedFieldString = localStorage.getItem('copied-field');
@@ -326,9 +339,12 @@ export const AddFieldsFormPartial = ({
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.ctrlKey || event.metaKey) {
         if (event.key === 'c') {
-          onFieldCopy();
+          onFieldCopy({ duplicate: false });
         } else if (event.key === 'v') {
           onFieldPaste();
+        } else if (event.key === 'd') {
+          event.preventDefault();
+          onFieldCopy({ duplicate: true });
         }
       }
     };
@@ -658,4 +674,3 @@ export const AddFieldsFormPartial = ({
 
 // TODO: clear local storage and set recent field when the field is deleted
 // TODO: set the last active immediately the document is added
-// TODO: Command + D to duplicate a field without command c + v
