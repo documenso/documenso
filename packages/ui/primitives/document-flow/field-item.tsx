@@ -123,7 +123,6 @@ export const FieldItem = ({
           onClick={() => onRemove?.()}
           onTouchEnd={() => onRemove?.()}
         >
-          {/* TODO: set the last active field as null */}
           <Trash className="h-4 w-4" />
         </button>
       )}

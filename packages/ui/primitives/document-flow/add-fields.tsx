@@ -266,17 +266,15 @@ export const AddFieldsFormPartial = ({
   const onFieldCopy = useCallback(
     ({ duplicate }: { duplicate: boolean }) => {
       if (lastActiveField) {
-        const fieldToCopy = {
-          ...lastActiveField,
-          formId: nanoid(12),
-          pageX: lastActiveField.pageX + 2,
-          pageY: lastActiveField.pageY + 2,
-        };
-
-        localStorage.setItem('copied-field', JSON.stringify(fieldToCopy));
+        localStorage.setItem('copied-field', JSON.stringify(lastActiveField));
 
         if (duplicate) {
-          append(fieldToCopy);
+          append({
+            ...lastActiveField,
+            formId: nanoid(12),
+            pageX: lastActiveField.pageX + 2,
+            pageY: lastActiveField.pageY + 2,
+          });
         }
       }
     },
@@ -380,8 +378,6 @@ export const AddFieldsFormPartial = ({
       ([role]) => role !== RecipientRole.CC && role !== RecipientRole.VIEWER,
     );
   }, [recipientsByRole]);
-
-  console.log('Last active field', lastActiveField);
 
   return (
     <>
