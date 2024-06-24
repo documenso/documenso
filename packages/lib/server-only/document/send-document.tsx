@@ -5,13 +5,7 @@ import type { RequestMetadata } from '@documenso/lib/universal/extract-request-m
 import { putPdfFile } from '@documenso/lib/universal/upload/put-file';
 import { createDocumentAuditLogData } from '@documenso/lib/utils/document-audit-logs';
 import { prisma } from '@documenso/prisma';
-import {
-  DocumentSource,
-  DocumentStatus,
-  RecipientRole,
-  SendStatus,
-  SigningStatus,
-} from '@documenso/prisma/client';
+import { DocumentStatus, RecipientRole, SendStatus, SigningStatus } from '@documenso/prisma/client';
 import { WebhookTriggerEvents } from '@documenso/prisma/client';
 
 import { jobsClient } from '../../jobs/client';
@@ -71,8 +65,6 @@ export const sendDocument = async ({
     },
   });
 
-  const customEmail = document?.documentMeta;
-
   if (!document) {
     throw new Error('Document not found');
   }
@@ -87,8 +79,6 @@ export const sendDocument = async ({
 
   const { documentData } = document;
 
-  const isDirectTemplate = document.source === DocumentSource.TEMPLATE_DIRECT_LINK;
-
   if (!documentData.data) {
     throw new Error('Document data not found');
   }
@@ -98,6 +88,7 @@ export const sendDocument = async ({
 
     const prefilled = await insertFormValuesInPdf({
       pdf: Buffer.from(file),
+      // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
       formValues: document.formValues as Record<string, string | number | boolean>,
     });
 
@@ -118,6 +109,31 @@ export const sendDocument = async ({
 
     Object.assign(document, result);
   }
+
+  // Commented out server side checks for minimum 1 signature per signer now since we need to
+  // decide if we want to enforce this for API & templates.
+  // const fields = await getFieldsForDocument({
+  //   documentId: documentId,
+  //   userId: userId,
+  // });
+
+  // const fieldsWithSignerEmail = fields.map((field) => ({
+  //   ...field,
+  //   signerEmail:
+  //     document.Recipient.find((recipient) => recipient.id === field.recipientId)?.email ?? '',
+  // }));
+
+  // const everySignerHasSignature = document?.Recipient.every(
+  //   (recipient) =>
+  //     recipient.role !== RecipientRole.SIGNER ||
+  //     fieldsWithSignerEmail.some(
+  //       (field) => field.type === 'SIGNATURE' && field.signerEmail === recipient.email,
+  //     ),
+  // );
+
+  // if (!everySignerHasSignature) {
+  //   throw new Error('Some signers have not been assigned a signature field.');
+  // }
 
   if (sendEmail) {
     await Promise.all(

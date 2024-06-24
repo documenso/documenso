@@ -383,7 +383,7 @@ export const TemplateDirectLinkDialog = ({
                   </div>
                 </div>
 
-                <DialogFooter className='mt-4'>
+                <DialogFooter className="mt-4">
                   <Button
                     type="button"
                     variant="destructive"
