@@ -71,7 +71,7 @@ export const UploadDocument = ({ className, team }: UploadDocumentProps) => {
         teamId: team?.id,
       });
 
-      await refreshLimits();
+      void refreshLimits();
 
       toast({
         title: 'Document uploaded',

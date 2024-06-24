@@ -19,9 +19,9 @@ export const useLimits = () => {
     throw new Error('useLimits must be used within a LimitsProvider');
   }
 
-  const safeRefreshLimits = async () => {
+  const safeRefreshLimits = () => {
     if (typeof limits.refreshLimits === 'function') {
-      await limits.refreshLimits();
+      void limits.refreshLimits();
     } else {
       throw new Error('the refreshLimits function is not available');
     }
