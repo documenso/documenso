@@ -12,6 +12,7 @@ export enum AppErrorCode {
   'EXPIRED_CODE' = 'ExpiredCode',
   'INVALID_BODY' = 'InvalidBody',
   'INVALID_REQUEST' = 'InvalidRequest',
+  'LIMIT_EXCEEDED' = 'LimitExceeded',
   'NOT_FOUND' = 'NotFound',
   'NOT_SETUP' = 'NotSetup',
   'UNAUTHORIZED' = 'Unauthorized',

@@ -54,6 +54,7 @@ export type AddFieldsFormProps = {
   recipients: Recipient[];
   fields: Field[];
   onSubmit: (_data: TAddFieldsFormSchema) => void;
+  canGoBack?: boolean;
   isDocumentPdfLoaded: boolean;
 };
 
@@ -63,12 +64,15 @@ export const AddFieldsFormPartial = ({
   recipients,
   fields,
   onSubmit,
+  canGoBack = false,
   isDocumentPdfLoaded,
 }: AddFieldsFormProps) => {
   const [isMissingSignatureDialogVisible, setIsMissingSignatureDialogVisible] = useState(false);
 
   const { isWithinPageBounds, getFieldPosition, getPage } = useDocumentElement();
   const { currentStep, totalSteps, previousStep } = useStep();
+  const canRenderBackButtonAsRemove =
+    currentStep === 1 && typeof documentFlow.onBackStep === 'function' && canGoBack;
 
   const {
     control,
@@ -614,7 +618,9 @@ export const AddFieldsFormPartial = ({
           onGoBackClick={() => {
             previousStep();
             remove();
+            documentFlow.onBackStep?.();
           }}
+          goBackLabel={canRenderBackButtonAsRemove ? 'Remove' : undefined}
           onGoNextClick={handleGoNextClick}
         />
       </DocumentFlowFormContainerFooter>

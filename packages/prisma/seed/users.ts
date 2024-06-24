@@ -4,8 +4,6 @@ import { hashSync } from '@documenso/lib/server-only/auth/hash';
 
 import { prisma } from '..';
 
-export const seedTestEmail = () => `user-${Date.now()}@test.documenso.com`;
-
 type SeedUserOptions = {
   name?: string;
   email?: string;
@@ -14,6 +12,8 @@ type SeedUserOptions = {
 };
 
 const nanoid = customAlphabet('1234567890abcdef', 10);
+
+export const seedTestEmail = () => `${nanoid()}@test.documenso.com`;
 
 export const seedUser = async ({
   name,

@@ -1,5 +1,6 @@
 import type Stripe from 'stripe';
 
+import type { STRIPE_PLAN_TYPE } from '@documenso/lib/constants/billing';
 import { stripe } from '@documenso/lib/server-only/stripe';
 
 // Utility type to handle usage of the `expand` option.
@@ -11,7 +12,7 @@ export type GetPricesByIntervalOptions = {
   /**
    * Filter products by their meta 'plan' attribute.
    */
-  plan?: 'community';
+  plan?: STRIPE_PLAN_TYPE.COMMUNITY | STRIPE_PLAN_TYPE.REGULAR;
 };
 
 export const getPricesByInterval = async ({ plan }: GetPricesByIntervalOptions = {}) => {

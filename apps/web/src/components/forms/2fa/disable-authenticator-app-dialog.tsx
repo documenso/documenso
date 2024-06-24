@@ -28,7 +28,7 @@ import {
   FormItem,
   FormMessage,
 } from '@documenso/ui/primitives/form/form';
-import { Input } from '@documenso/ui/primitives/input';
+import { PinInput, PinInputGroup, PinInputSlot } from '@documenso/ui/primitives/pin-input';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
 export const ZDisable2FAForm = z.object({
@@ -107,7 +107,15 @@ export const DisableAuthenticatorAppDialog = () => {
                 render={({ field }) => (
                   <FormItem>
                     <FormControl>
-                      <Input {...field} placeholder="Token" />
+                      <PinInput {...field} value={field.value ?? ''} maxLength={6}>
+                        {Array(6)
+                          .fill(null)
+                          .map((_, i) => (
+                            <PinInputGroup key={i}>
+                              <PinInputSlot index={i} />
+                            </PinInputGroup>
+                          ))}
+                      </PinInput>
                     </FormControl>
                     <FormMessage />
                   </FormItem>

@@ -45,7 +45,11 @@ export type TSuccessfulGetDocumentResponseSchema = z.infer<
 
 export type TSuccessfulDocumentResponseSchema = z.infer<typeof ZSuccessfulDocumentResponseSchema>;
 
-export const ZSendDocumentForSigningMutationSchema = null;
+export const ZSendDocumentForSigningMutationSchema = z
+  .object({
+    sendEmail: z.boolean().optional().default(true),
+  })
+  .or(z.literal('').transform(() => ({ sendEmail: true })));
 
 export type TSendDocumentForSigningMutationSchema = typeof ZSendDocumentForSigningMutationSchema;
 
@@ -89,8 +93,12 @@ export const ZCreateDocumentMutationResponseSchema = z.object({
   recipients: z.array(
     z.object({
       recipientId: z.number(),
+      name: z.string(),
+      email: z.string().email().min(1),
       token: z.string(),
       role: z.nativeEnum(RecipientRole),
+
+      signingUrl: z.string(),
     }),
   ),
 });
@@ -134,6 +142,8 @@ export const ZCreateDocumentFromTemplateMutationResponseSchema = z.object({
       email: z.string().email().min(1),
       token: z.string(),
       role: z.nativeEnum(RecipientRole).optional().default(RecipientRole.SIGNER),
+
+      signingUrl: z.string(),
     }),
   ),
 });
@@ -187,6 +197,8 @@ export const ZGenerateDocumentFromTemplateMutationResponseSchema = z.object({
       email: z.string().email().min(1),
       token: z.string(),
       role: z.nativeEnum(RecipientRole),
+
+      signingUrl: z.string(),
     }),
   ),
 });
@@ -229,6 +241,8 @@ export const ZSuccessfulRecipientResponseSchema = z.object({
   readStatus: z.nativeEnum(ReadStatus),
   signingStatus: z.nativeEnum(SigningStatus),
   sendStatus: z.nativeEnum(SendStatus),
+
+  signingUrl: z.string(),
 });
 
 export type TSuccessfulRecipientResponseSchema = z.infer<typeof ZSuccessfulRecipientResponseSchema>;
@@ -279,9 +293,11 @@ export const ZSuccessfulResponseSchema = z.object({
 
 export type TSuccessfulResponseSchema = z.infer<typeof ZSuccessfulResponseSchema>;
 
-export const ZSuccessfulSigningResponseSchema = z.object({
-  message: z.string(),
-});
+export const ZSuccessfulSigningResponseSchema = z
+  .object({
+    message: z.string(),
+  })
+  .and(ZSuccessfulGetDocumentResponseSchema);
 
 export type TSuccessfulSigningResponseSchema = z.infer<typeof ZSuccessfulSigningResponseSchema>;
 

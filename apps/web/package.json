@@ -28,6 +28,7 @@
     "cookie-es": "^1.0.0",
     "formidable": "^2.1.1",
     "framer-motion": "^10.12.8",
+    "input-otp": "^1.2.4",
     "lucide-react": "^0.279.0",
     "luxon": "^3.4.0",
     "micro": "^10.0.1",
