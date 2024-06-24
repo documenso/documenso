@@ -163,7 +163,9 @@ export const DocumentPageView = async ({ params, team }: DocumentPageViewProps) 
           </CardContent>
         </Card>
 
-        {document.status === DocumentStatus.PENDING && <DocumentReadOnlyFields fields={fields} />}
+        {document.status === DocumentStatus.PENDING && (
+          <DocumentReadOnlyFields fields={fields} documentMeta={documentMeta || undefined} />
+        )}
 
         <div className="col-span-12 lg:col-span-6 xl:col-span-5">
           <div className="space-y-6">
