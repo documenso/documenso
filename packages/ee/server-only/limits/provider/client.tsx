@@ -23,7 +23,7 @@ export const useLimits = () => {
     if (typeof limits.refreshLimits === 'function') {
       void limits.refreshLimits();
     } else {
-      throw new Error('the refreshLimits function is not available');
+      console.warn('Refresh limits function is not provided.');
     }
   };
 
