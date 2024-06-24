@@ -26,6 +26,7 @@ export const getCompletedFieldsForToken = async ({ token }: GetCompletedFieldsFo
         select: {
           name: true,
           email: true,
+          signingStatus: true,
         },
       },
     },
