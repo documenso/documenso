@@ -12,7 +12,7 @@ import { getFieldsForDocument } from '@documenso/lib/server-only/field/get-field
 import { getRecipientsForDocument } from '@documenso/lib/server-only/recipient/get-recipients-for-document';
 import { symmetricDecrypt } from '@documenso/lib/universal/crypto';
 import { formatDocumentsPath } from '@documenso/lib/utils/teams';
-import { DocumentStatus, SigningStatus } from '@documenso/prisma/client';
+import { DocumentStatus } from '@documenso/prisma/client';
 import type { Team, TeamEmail } from '@documenso/prisma/client';
 import { Badge } from '@documenso/ui/primitives/badge';
 import { Button } from '@documenso/ui/primitives/button';
@@ -21,7 +21,7 @@ import { LazyPDFViewer } from '@documenso/ui/primitives/lazy-pdf-viewer';
 
 import { StackAvatarsWithTooltip } from '~/components/(dashboard)/avatar/stack-avatars-with-tooltip';
 import { DocumentHistorySheet } from '~/components/document/document-history-sheet';
-import { DocumentPendingFields } from '~/components/document/document-pending-readonly-fields';
+import { DocumentReadOnlyFields } from '~/components/document/document-read-only-fields';
 import {
   DocumentStatus as DocumentStatusComponent,
   FRIENDLY_STATUS_MAP,
@@ -98,13 +98,6 @@ export const DocumentPageView = async ({ params, team }: DocumentPageViewProps) 
     }),
   ]);
 
-  const pendingFields = fields.filter(
-    (field) => field.Recipient.signingStatus === SigningStatus.NOT_SIGNED,
-  );
-  const completedFields = fields.filter(
-    (field) => field.Recipient.signingStatus === SigningStatus.SIGNED && field.inserted,
-  );
-
   const documentWithRecipients = {
     ...document,
     Recipient: recipients,
@@ -170,9 +163,7 @@ export const DocumentPageView = async ({ params, team }: DocumentPageViewProps) 
           </CardContent>
         </Card>
 
-        {document.status === DocumentStatus.PENDING && (
-          <DocumentPendingFields fields={pendingFields} />
-        )}
+        {document.status === DocumentStatus.PENDING && <DocumentReadOnlyFields fields={fields} />}
 
         <div className="col-span-12 lg:col-span-6 xl:col-span-5">
           <div className="space-y-6">
