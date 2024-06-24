@@ -8,7 +8,7 @@ import { getLimits } from '../client';
 import { FREE_PLAN_LIMITS } from '../constants';
 import type { TLimitsResponseSchema } from '../schema';
 
-export type LimitsContextValue = TLimitsResponseSchema;
+export type LimitsContextValue = TLimitsResponseSchema & { refreshLimits?: () => Promise<void> };
 
 const LimitsContext = createContext<LimitsContextValue | null>(null);
 
@@ -19,7 +19,15 @@ export const useLimits = () => {
     throw new Error('useLimits must be used within a LimitsProvider');
   }
 
-  return limits;
+  const safeRefreshLimits = async () => {
+    if (typeof limits.refreshLimits === 'function') {
+      await limits.refreshLimits();
+    } else {
+      throw new Error('the refreshLimits function is not available');
+    }
+  };
+
+  return { ...limits, refreshLimits: safeRefreshLimits };
 };
 
 export type LimitsProviderProps = {
@@ -66,5 +74,10 @@ export const LimitsProvider = ({
     };
   }, []);
 
-  return <LimitsContext.Provider value={limits}>{children}</LimitsContext.Provider>;
+  const contextValues = {
+    ...limits,
+    refreshLimits,
+  };
+
+  return <LimitsContext.Provider value={contextValues}>{children}</LimitsContext.Provider>;
 };
