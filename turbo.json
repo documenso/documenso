@@ -3,11 +3,18 @@
   "pipeline": {
     "build": {
       "dependsOn": [
+        "prebuild",
         "^build"
       ],
       "outputs": [
         ".next/**",
         "!.next/cache/**"
+      ]
+    },
+    "prebuild": {
+      "cache": false,
+      "dependsOn": [
+        "^prebuild"
       ]
     },
     "lint": {
@@ -108,6 +115,10 @@
     "NEXT_PRIVATE_STRIPE_WEBHOOK_SECRET",
     "NEXT_PRIVATE_GITHUB_TOKEN",
     "NEXT_PRIVATE_BROWSERLESS_URL",
+    "NEXT_PRIVATE_JOBS_PROVIDER",
+    "NEXT_PRIVATE_TRIGGER_API_KEY",
+    "NEXT_PRIVATE_TRIGGER_API_URL",
+    "NEXT_PRIVATE_INNGEST_EVENT_KEY",
     "CI",
     "VERCEL",
     "VERCEL_ENV",
