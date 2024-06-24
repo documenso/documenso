@@ -320,20 +320,20 @@ export const AddFieldsFormPartial = ({
     );
   }, [recipientsByRole]);
 
-  const everySignerHasSignature = recipientsByRole.SIGNER.every((signer) =>
-    localFields.some((field) => field.type === 'SIGNATURE' && field.signerEmail === signer.email),
-  );
-
   const handleGoNextClick = () => {
+    const everySignerHasSignature = recipientsByRole.SIGNER.every((signer) =>
+      localFields.some(
+        (field) =>
+          (field.type === FieldType.SIGNATURE || field.type === FieldType.FREE_SIGNATURE) &&
+          field.signerEmail === signer.email,
+      ),
+    );
+
     if (!everySignerHasSignature) {
       setIsMissingSignatureDialogVisible(true);
     } else {
       void onFormSubmit();
     }
-  };
-
-  const handleOpenChange = () => {
-    setIsMissingSignatureDialogVisible((prev) => !prev);
   };
 
   return (
@@ -625,12 +625,10 @@ export const AddFieldsFormPartial = ({
         />
       </DocumentFlowFormContainerFooter>
 
-      {!everySignerHasSignature && (
-        <MissingSignatureFieldDialog
-          isOpen={isMissingSignatureDialogVisible}
-          onOpenChange={handleOpenChange}
-        />
-      )}
+      <MissingSignatureFieldDialog
+        isOpen={isMissingSignatureDialogVisible}
+        onOpenChange={(value) => setIsMissingSignatureDialogVisible(value)}
+      />
     </>
   );
 };

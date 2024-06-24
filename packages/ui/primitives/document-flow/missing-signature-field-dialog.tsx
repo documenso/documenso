@@ -1,5 +1,7 @@
 'use client';
 
+import { DialogClose } from '@radix-ui/react-dialog';
+
 import { Button } from '@documenso/ui/primitives/button';
 import {
   Dialog,
@@ -12,7 +14,7 @@ import {
 
 export type MissingSignatureFieldDialogProps = {
   isOpen: boolean;
-  onOpenChange: () => void;
+  onOpenChange: (value: boolean) => void;
 };
 
 export const MissingSignatureFieldDialog = ({
@@ -26,18 +28,17 @@ export const MissingSignatureFieldDialog = ({
           <DialogTitle>No signature field found</DialogTitle>
           <DialogDescription>
             <p className="mt-2">
-              Some signers have not been assigned a signature field. Please assign at least 1 signature field
-              to each signer before proceeding.
+              Some signers have not been assigned a signature field. Please assign at least 1
+              signature field to each signer before proceeding.
             </p>
           </DialogDescription>
         </DialogHeader>
         <DialogFooter>
-          <Button type="button" variant="secondary" onClick={onOpenChange}>
-            Cancel
-          </Button>
-          <Button type="submit" onClick={onOpenChange}>
-            Proceed
-          </Button>
+          <DialogClose asChild>
+            <Button type="button" variant="secondary">
+              Close
+            </Button>
+          </DialogClose>
         </DialogFooter>
       </DialogContent>
     </Dialog>
