@@ -2,7 +2,8 @@
 /*overriding Documenso styles*/
 
 header {
-  display: none !important;
+  /*display: none !important;*/
+  visibility: hidden;
 }
 
 a[href="/documents"] {
