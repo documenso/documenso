@@ -12,7 +12,6 @@ FROM base AS builder
 RUN apk add --no-cache libc6-compat
 RUN apk add --no-cache jq
 WORKDIR /app
-
 COPY . .
 
 RUN TURBO_VERSION="$(npm list --package-lock-only --json turbo | jq -r '.dependencies.turbo.version')"
@@ -81,7 +80,14 @@ WORKDIR /app
 # Don't run production as root
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs
-
+# Install necessary tools
+RUN apk add --no-cache libc6-compat
+RUN apk add --no-cache jq
+# Switch to root user to create the directory and change its ownership
+USER root
+RUN mkdir -p /opt/documenso/
+RUN chown nextjs:nodejs /opt/documenso/
+# Switch back to nextjs user
 USER nextjs
 
 COPY --from=installer /app/apps/web/next.config.js .
