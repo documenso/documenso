@@ -26,9 +26,14 @@ export type UploadDocumentProps = {
     id: number;
     url: string;
   };
+  refetchDocumentResults: () => Promise<void>;
 };
 
-export const UploadDocument = ({ className, team }: UploadDocumentProps) => {
+export const UploadDocument = ({
+  className,
+  team,
+  refetchDocumentResults,
+}: UploadDocumentProps) => {
   const router = useRouter();
   const analytics = useAnalytics();
 
@@ -84,6 +89,7 @@ export const UploadDocument = ({ className, team }: UploadDocumentProps) => {
         documentId: id,
         timestamp: new Date().toISOString(),
       });
+      await refetchDocumentResults();
 
       router.push(`${formatDocumentsPath(team?.url)}/${id}/edit`);
     } catch (err) {
