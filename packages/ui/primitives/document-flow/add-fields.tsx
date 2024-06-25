@@ -49,6 +49,7 @@ import {
 } from './document-flow-root';
 import { FieldItem } from './field-item';
 import { FieldAdvancedSettings } from './field-item-advanced-settings';
+import { MissingSignatureFieldDialog } from './missing-signature-field-dialog';
 import { type DocumentFlowStep, FRIENDLY_FIELD_TYPE } from './types';
 
 const fontCaveat = Caveat({
@@ -229,6 +230,8 @@ export const AddFieldsFormPartial = ({
   canGoBack = false,
   isDocumentPdfLoaded,
 }: AddFieldsFormProps) => {
+  const [isMissingSignatureDialogVisible, setIsMissingSignatureDialogVisible] = useState(false);
+
   const { isWithinPageBounds, getFieldPosition, getPage } = useDocumentElement();
   const { currentStep, totalSteps, previousStep } = useStep();
   const canRenderBackButtonAsRemove =
@@ -537,6 +540,22 @@ export const AddFieldsFormPartial = ({
 
   const handleAdvancedSettings = () => {
     setShowAdvancedSettings((prev) => !prev);
+  };
+
+  const handleGoNextClick = () => {
+    const everySignerHasSignature = recipientsByRole.SIGNER.every((signer) =>
+      localFields.some(
+        (field) =>
+          (field.type === FieldType.SIGNATURE || field.type === FieldType.FREE_SIGNATURE) &&
+          field.signerEmail === signer.email,
+      ),
+    );
+
+    if (!everySignerHasSignature) {
+      setIsMissingSignatureDialogVisible(true);
+    } else {
+      void onFormSubmit();
+    }
   };
 
   return (
@@ -997,9 +1016,14 @@ export const AddFieldsFormPartial = ({
                 documentFlow.onBackStep?.();
               }}
               goBackLabel={canRenderBackButtonAsRemove ? 'Remove' : undefined}
-              onGoNextClick={() => void onFormSubmit()}
+              onGoNextClick={handleGoNextClick}
             />
           </DocumentFlowFormContainerFooter>
+
+          <MissingSignatureFieldDialog
+            isOpen={isMissingSignatureDialogVisible}
+            onOpenChange={(value) => setIsMissingSignatureDialogVisible(value)}
+          />
         </>
       )}
     </>

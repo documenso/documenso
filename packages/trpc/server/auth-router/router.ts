@@ -5,6 +5,7 @@ import { env } from 'next-runtime-env';
 
 import { IS_BILLING_ENABLED } from '@documenso/lib/constants/app';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
+import { jobsClient } from '@documenso/lib/jobs/client';
 import { ErrorCode } from '@documenso/lib/next-auth/error-codes';
 import { createPasskey } from '@documenso/lib/server-only/auth/create-passkey';
 import { createPasskeyAuthenticationOptions } from '@documenso/lib/server-only/auth/create-passkey-authentication-options';
@@ -15,7 +16,6 @@ import { findPasskeys } from '@documenso/lib/server-only/auth/find-passkeys';
 import { compareSync } from '@documenso/lib/server-only/auth/hash';
 import { updatePasskey } from '@documenso/lib/server-only/auth/update-passkey';
 import { createUser } from '@documenso/lib/server-only/user/create-user';
-import { sendConfirmationToken } from '@documenso/lib/server-only/user/send-confirmation-token';
 import { extractNextApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 
 import { authenticatedProcedure, procedure, router } from '../trpc';
@@ -52,7 +52,12 @@ export const authRouter = router({
 
       const user = await createUser({ name, email, password, signature, url });
 
-      await sendConfirmationToken({ email: user.email });
+      await jobsClient.triggerJob({
+        name: 'send.signup.confirmation.email',
+        payload: {
+          email: user.email,
+        },
+      });
 
       return user;
     } catch (err) {

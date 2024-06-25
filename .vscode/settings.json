@@ -5,11 +5,19 @@
   "editor.codeActionsOnSave": {
     "source.fixAll": "explicit"
   },
-  "eslint.validate": ["typescript", "typescriptreact", "javascript", "javascriptreact"],
+  "eslint.validate": [
+    "typescript",
+    "typescriptreact",
+    "javascript",
+    "javascriptreact"
+  ],
   "javascript.preferences.importModuleSpecifier": "non-relative",
   "javascript.preferences.useAliasesForRenames": false,
   "typescript.enablePromptUseWorkspaceTsdk": true,
   "files.eol": "\n",
   "editor.tabSize": 2,
-  "editor.insertSpaces": true
+  "editor.insertSpaces": true,
+  "[prisma]": {
+    "editor.defaultFormatter": "Prisma.prisma"
+  },
 }
