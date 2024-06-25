@@ -25,7 +25,7 @@ export const CardMetric = ({ icon: Icon, title, value, className }: CardMetricPr
             </div>
           )}
 
-          <h3 className="text-primary-forground flex items-end text-sm font-medium leading-tight">
+          <h3 className="text-primary-forground mb-2 flex items-end text-sm font-medium leading-tight">
             {title}
           </h3>
         </div>
