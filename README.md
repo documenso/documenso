@@ -77,7 +77,7 @@ Contact us if you are interested in our Enterprise plan for large organizations 
   <a href="https://www.typescriptlang.org"><img src="https://shields.io/badge/TypeScript-3178C6?logo=TypeScript&logoColor=FFF&style=flat-square" alt="TypeScript"></a>
   <a href="https://nextjs.org/"><img src="https://img.shields.io/badge/next.js-000000?style=flat-square&logo=nextdotjs&logoColor=white" alt="NextJS"></a>
   <a href="https://prisma.io"><img width="122" height="20" src="http://made-with.prisma.io/indigo.svg" alt="Made with Prisma" /></a>
-  <a href=""><img src="https://img.shields.io/badge/tailwindcss-0F172A?&logo=tailwindcss" alt=""></a>
+  <a href="https://tailwindcss.com/"><img src="https://img.shields.io/badge/tailwindcss-0F172A?&logo=tailwindcss" alt="Tailwind CSS"></a>
   <a href=""><img src="" alt=""></a>
   <a href=""><img src="" alt=""></a>
   <a href=""><img src="" alt=""></a>
