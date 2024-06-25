@@ -25,7 +25,7 @@ export const getUserWithAtLeastOneDocumentPerMonth = async () => {
       Document: {
         some: {
           createdAt: {
-            gte: new Date(new Date().setMonth(new Date().getMonth() - 1)),
+            gte: DateTime.now().minus({ months: 1 }).toJSDate(),
           },
         },
       },
@@ -42,7 +42,7 @@ export const getUserWithAtLeastOneDocumentSignedPerMonth = async () => {
             equals: DocumentStatus.COMPLETED,
           },
           completedAt: {
-            gte: new Date(new Date().setMonth(new Date().getMonth() - 1)),
+            gte: DateTime.now().minus({ months: 1 }).toJSDate(),
           },
         },
       },
