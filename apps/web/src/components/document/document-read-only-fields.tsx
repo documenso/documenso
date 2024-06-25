@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 
+import { EyeOffIcon } from 'lucide-react';
 import { P, match } from 'ts-pattern';
 
 import {
@@ -10,19 +11,19 @@ import {
 } from '@documenso/lib/constants/date-formats';
 import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
 import { DEFAULT_DOCUMENT_TIME_ZONE } from '@documenso/lib/constants/time-zones';
-import type { CompletedField } from '@documenso/lib/types/fields';
+import type { DocumentField } from '@documenso/lib/server-only/field/get-fields-for-document';
 import { extractInitials } from '@documenso/lib/utils/recipient-formatter';
 import type { DocumentMeta } from '@documenso/prisma/client';
-import { FieldType } from '@documenso/prisma/client';
+import { FieldType, SigningStatus } from '@documenso/prisma/client';
 import { FieldRootContainer } from '@documenso/ui/components/field/field';
+import { cn } from '@documenso/ui/lib/utils';
 import { Avatar, AvatarFallback } from '@documenso/ui/primitives/avatar';
-import { Button } from '@documenso/ui/primitives/button';
 import { FRIENDLY_FIELD_TYPE } from '@documenso/ui/primitives/document-flow/types';
 import { ElementVisible } from '@documenso/ui/primitives/element-visible';
 import { PopoverHover } from '@documenso/ui/primitives/popover';
 
 export type DocumentReadOnlyFieldsProps = {
-  fields: CompletedField[];
+  fields: DocumentField[];
   documentMeta?: DocumentMeta;
 };
 
@@ -53,56 +54,71 @@ export const DocumentReadOnlyFields = ({ documentMeta, fields }: DocumentReadOnl
                     </Avatar>
                   }
                   contentProps={{
-                    className: 'flex w-fit flex-col py-2.5 text-sm',
+                    className: 'relative flex w-fit flex-col p-2.5 text-sm',
                   }}
                 >
-                  <p>
-                    <span className="font-semibold">
-                      {field.Recipient.name
-                        ? `${field.Recipient.name} (${field.Recipient.email})`
-                        : field.Recipient.email}{' '}
-                    </span>
-                    inserted a {FRIENDLY_FIELD_TYPE[field.type].toLowerCase()}
+                  <p className="font-semibold">
+                    {field.Recipient.signingStatus === SigningStatus.SIGNED ? 'Signed' : 'Pending'}{' '}
+                    {FRIENDLY_FIELD_TYPE[field.type].toLowerCase()} field
                   </p>
 
-                  <Button
-                    variant="outline"
-                    className="mt-2.5 h-6 text-xs focus:outline-none focus-visible:ring-0"
+                  <p className="text-muted-foreground text-xs">
+                    {field.Recipient.name
+                      ? `${field.Recipient.name} (${field.Recipient.email})`
+                      : field.Recipient.email}{' '}
+                  </p>
+
+                  <button
+                    className="absolute right-0 top-0 my-1 p-2 focus:outline-none focus-visible:ring-0"
                     onClick={() => handleHideField(field.secondaryId)}
+                    title="Hide field"
                   >
-                    Hide field
-                  </Button>
+                    <EyeOffIcon className="h-3 w-3" />
+                  </button>
                 </PopoverHover>
               </div>
 
               <div className="text-muted-foreground break-all text-sm">
-                {match(field)
-                  .with({ type: FieldType.SIGNATURE }, (field) =>
-                    field.Signature?.signatureImageAsBase64 ? (
-                      <img
-                        src={field.Signature.signatureImageAsBase64}
-                        alt="Signature"
-                        className="h-full w-full object-contain dark:invert"
-                      />
-                    ) : (
-                      <p className="font-signature text-muted-foreground text-lg duration-200 sm:text-xl md:text-2xl lg:text-3xl">
-                        {field.Signature?.typedSignature}
-                      </p>
-                    ),
-                  )
-                  .with(
-                    { type: P.union(FieldType.NAME, FieldType.TEXT, FieldType.EMAIL) },
-                    () => field.customText,
-                  )
-                  .with({ type: FieldType.DATE }, () =>
-                    convertToLocalSystemFormat(
-                      field.customText,
-                      documentMeta?.dateFormat ?? DEFAULT_DOCUMENT_DATE_FORMAT,
-                      documentMeta?.timezone ?? DEFAULT_DOCUMENT_TIME_ZONE,
-                    ),
-                  )
-                  .with({ type: FieldType.FREE_SIGNATURE }, () => null)
-                  .exhaustive()}
+                {field.Recipient.signingStatus === SigningStatus.SIGNED &&
+                  match(field)
+                    .with({ type: FieldType.SIGNATURE }, (field) =>
+                      field.Signature?.signatureImageAsBase64 ? (
+                        <img
+                          src={field.Signature.signatureImageAsBase64}
+                          alt="Signature"
+                          className="h-full w-full object-contain dark:invert"
+                        />
+                      ) : (
+                        <p className="font-signature text-muted-foreground text-lg duration-200 sm:text-xl md:text-2xl lg:text-3xl">
+                          {field.Signature?.typedSignature}
+                        </p>
+                      ),
+                    )
+                    .with(
+                      { type: P.union(FieldType.NAME, FieldType.TEXT, FieldType.EMAIL) },
+                      () => field.customText,
+                    )
+                    .with({ type: FieldType.DATE }, () =>
+                      convertToLocalSystemFormat(
+                        field.customText,
+                        documentMeta?.dateFormat ?? DEFAULT_DOCUMENT_DATE_FORMAT,
+                        documentMeta?.timezone ?? DEFAULT_DOCUMENT_TIME_ZONE,
+                      ),
+                    )
+                    .with({ type: FieldType.FREE_SIGNATURE }, () => null)
+                    .exhaustive()}
+
+                {field.Recipient.signingStatus === SigningStatus.NOT_SIGNED && (
+                  <p
+                    className={cn('text-muted-foreground text-lg duration-200', {
+                      'font-signature sm:text-xl md:text-2xl lg:text-3xl':
+                        field.type === FieldType.SIGNATURE ||
+                        field.type === FieldType.FREE_SIGNATURE,
+                    })}
+                  >
+                    {FRIENDLY_FIELD_TYPE[field.type]}
+                  </p>
+                )}
               </div>
             </FieldRootContainer>
           ),

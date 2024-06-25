@@ -612,3 +612,53 @@ model SiteSettings {
   lastModifiedAt       DateTime @default(now())
   lastModifiedByUser   User?    @relation(fields: [lastModifiedByUserId], references: [id], onDelete: SetNull)
 }
+
+enum BackgroundJobStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
+}
+
+model BackgroundJob {
+  id         String              @id @default(cuid())
+  status     BackgroundJobStatus @default(PENDING)
+  payload    Json?
+  retried    Int                 @default(0)
+  maxRetries Int                 @default(3)
+
+  // Taken from the job definition
+  jobId   String
+  name    String
+  version String
+
+  submittedAt   DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  completedAt   DateTime?
+  lastRetriedAt DateTime?
+
+  tasks BackgroundJobTask[]
+}
+
+enum BackgroundJobTaskStatus {
+  PENDING
+  COMPLETED
+  FAILED
+}
+
+model BackgroundJobTask {
+  id     String                  @id
+  name   String
+  status BackgroundJobTaskStatus @default(PENDING)
+
+  result     Json?
+  retried    Int   @default(0)
+  maxRetries Int   @default(3)
+
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  completedAt DateTime?
+
+  jobId         String
+  backgroundJob BackgroundJob @relation(fields: [jobId], references: [id], onDelete: Cascade)
+}

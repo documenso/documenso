@@ -2,13 +2,13 @@ import { TRPCError } from '@trpc/server';
 
 import { IS_BILLING_ENABLED } from '@documenso/lib/constants/app';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
+import { jobsClient } from '@documenso/lib/jobs/client';
 import { getSubscriptionsByUserId } from '@documenso/lib/server-only/subscription/get-subscriptions-by-user-id';
 import { deleteUser } from '@documenso/lib/server-only/user/delete-user';
 import { findUserSecurityAuditLogs } from '@documenso/lib/server-only/user/find-user-security-audit-logs';
 import { forgotPassword } from '@documenso/lib/server-only/user/forgot-password';
 import { getUserById } from '@documenso/lib/server-only/user/get-user-by-id';
 import { resetPassword } from '@documenso/lib/server-only/user/reset-password';
-import { sendConfirmationToken } from '@documenso/lib/server-only/user/send-confirmation-token';
 import { updatePassword } from '@documenso/lib/server-only/user/update-password';
 import { updateProfile } from '@documenso/lib/server-only/user/update-profile';
 import { updatePublicProfile } from '@documenso/lib/server-only/user/update-public-profile';
@@ -200,7 +200,12 @@ export const profileRouter = router({
       try {
         const { email } = input;
 
-        return await sendConfirmationToken({ email });
+        await jobsClient.triggerJob({
+          name: 'send.signup.confirmation.email',
+          payload: {
+            email,
+          },
+        });
       } catch (err) {
         console.error(err);
 
