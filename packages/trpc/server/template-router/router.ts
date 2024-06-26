@@ -151,11 +151,11 @@ export const templateRouter = router({
     .input(ZDeleteTemplateMutationSchema)
     .mutation(async ({ input, ctx }) => {
       try {
-        const { id } = input;
+        const { id, teamId } = input;
 
         const userId = ctx.user.id;
 
-        return await deleteTemplate({ userId, id });
+        return await deleteTemplate({ userId, id, teamId });
       } catch (err) {
         console.error(err);
 

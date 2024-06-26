@@ -15,10 +15,15 @@ import {
   ZGenerateDocumentFromTemplateMutationResponseSchema,
   ZGenerateDocumentFromTemplateMutationSchema,
   ZGetDocumentsQuerySchema,
+  ZGetTemplatesQuerySchema,
+  ZNoBodyMutationSchema,
   ZSendDocumentForSigningMutationSchema,
+  ZSuccessfulDeleteTemplateResponseSchema,
   ZSuccessfulDocumentResponseSchema,
   ZSuccessfulFieldResponseSchema,
   ZSuccessfulGetDocumentResponseSchema,
+  ZSuccessfulGetTemplateResponseSchema,
+  ZSuccessfulGetTemplatesResponseSchema,
   ZSuccessfulRecipientResponseSchema,
   ZSuccessfulResponseSchema,
   ZSuccessfulSigningResponseSchema,
@@ -75,6 +80,41 @@ export const ApiContractV1 = c.router(
         404: ZUnsuccessfulResponseSchema,
       },
       summary: 'Upload a new document and get a presigned URL',
+    },
+
+    deleteTemplate: {
+      method: 'DELETE',
+      path: '/api/v1/templates/:id',
+      body: ZNoBodyMutationSchema,
+      responses: {
+        200: ZSuccessfulDeleteTemplateResponseSchema,
+        401: ZUnsuccessfulResponseSchema,
+        404: ZUnsuccessfulResponseSchema,
+      },
+      summary: 'Delete a template',
+    },
+
+    getTemplate: {
+      method: 'GET',
+      path: '/api/v1/templates/:id',
+      responses: {
+        200: ZSuccessfulGetTemplateResponseSchema,
+        401: ZUnsuccessfulResponseSchema,
+        404: ZUnsuccessfulResponseSchema,
+      },
+      summary: 'Get a single template',
+    },
+
+    getTemplates: {
+      method: 'GET',
+      path: '/api/v1/templates',
+      query: ZGetTemplatesQuerySchema,
+      responses: {
+        200: ZSuccessfulGetTemplatesResponseSchema,
+        401: ZUnsuccessfulResponseSchema,
+        404: ZUnsuccessfulResponseSchema,
+      },
+      summary: 'Get all templates',
     },
 
     createDocumentFromTemplate: {
