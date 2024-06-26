@@ -1,5 +1,5 @@
-import { Button, Section, Text } from '../components';
-import { TemplateDocumentImage } from './template-document-image';
+import {Button, Section, Text} from '../components';
+import {TemplateDocumentImage} from './template-document-image';
 
 export type TemplateConfirmationEmailProps = {
   confirmationLink: string;
@@ -7,16 +7,16 @@ export type TemplateConfirmationEmailProps = {
 };
 
 export const TemplateConfirmationEmail = ({
-  confirmationLink,
-  assetBaseUrl,
-}: TemplateConfirmationEmailProps) => {
+                                            confirmationLink,
+                                            assetBaseUrl,
+                                          }: TemplateConfirmationEmailProps) => {
   return (
     <>
-      <TemplateDocumentImage className="mt-6" assetBaseUrl={assetBaseUrl} />
+      <TemplateDocumentImage className="mt-6" assetBaseUrl={assetBaseUrl}/>
 
       <Section className="flex-row items-center justify-center">
         <Text className="text-primary mx-auto mb-0 max-w-[80%] text-center text-lg font-semibold">
-          Welcome to Documenso!
+          Welcome to BusinessKitz signing!
         </Text>
 
         <Text className="my-1 text-center text-base text-slate-400">
@@ -25,7 +25,8 @@ export const TemplateConfirmationEmail = ({
 
         <Section className="mb-6 mt-8 text-center">
           <Button
-            className="bg-documenso-500 inline-flex items-center justify-center rounded-lg px-6 py-3 text-center text-sm font-medium text-black no-underline"
+            style={{backgroundColor: '#6414db'}}
+            className="bg-primary inline-flex items-center justify-center rounded-lg px-6 py-3 text-center text-sm font-medium text-white no-underline"
             href={confirmationLink}
           >
             Confirm email

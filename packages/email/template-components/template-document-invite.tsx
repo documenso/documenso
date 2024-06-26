@@ -51,11 +51,18 @@ export const TemplateDocumentInvite = ({
 
         <Section className="mb-6 mt-8 text-center">
           <Button
-            className="bg-documenso-500 inline-flex items-center justify-center rounded-lg px-6 py-3 text-center text-sm font-medium text-black no-underline"
+            style={{backgroundColor: '#6414db'}}
+            className="inline-flex items-center justify-center rounded-lg px-6 py-3 text-center text-sm font-medium text-white no-underline"
             href={signDocumentLink}
           >
             {actionVerb} Document
           </Button>
+          {/*<Button
+            className="bg-documenso-500 inline-flex items-center justify-center rounded-lg px-6 py-3 text-center text-sm font-medium text-white no-underline"
+            href={signDocumentLink}
+          >
+            {actionVerb} Document
+          </Button>*/}
         </Section>
       </Section>
     </>
