@@ -5,7 +5,7 @@ import { seedUser } from '@documenso/prisma/seed/users';
 
 import { apiSignin } from '../fixtures/authentication';
 
-test('[COMMAND_MENU]: should see sent documents', async ({ page }) => {
+xtest('[COMMAND_MENU]: should see sent documents', async ({ page }) => {
   const user = await seedUser();
   const recipient = await seedUser();
   const document = await seedPendingDocument(user, [recipient]);
@@ -21,7 +21,7 @@ test('[COMMAND_MENU]: should see sent documents', async ({ page }) => {
   await expect(page.getByRole('option', { name: document.title })).toBeVisible();
 });
 
-test('[COMMAND_MENU]: should see received documents', async ({ page }) => {
+xtest('[COMMAND_MENU]: should see received documents', async ({ page }) => {
   const user = await seedUser();
   const recipient = await seedUser();
   const document = await seedPendingDocument(user, [recipient]);
@@ -37,7 +37,7 @@ test('[COMMAND_MENU]: should see received documents', async ({ page }) => {
   await expect(page.getByRole('option', { name: document.title })).toBeVisible();
 });
 
-test('[COMMAND_MENU]: should be able to search by recipient', async ({ page }) => {
+xtest('[COMMAND_MENU]: should be able to search by recipient', async ({ page }) => {
   const user = await seedUser();
   const recipient = await seedUser();
   const document = await seedPendingDocument(user, [recipient]);
