@@ -166,7 +166,9 @@ export const PricingTable = ({ className, ...props }: PricingTableProps) => {
             <p className="text-foreground py-4">Email and Discord Support</p>
             <p className="text-foreground py-4 font-medium">Team Inbox</p>
             <p className="text-foreground py-4">5 Users Included</p>
-            <p className="text-foreground py-4">Add More Users for $10/ mo.</p>
+            <p className="text-foreground py-4">
+              Add More Users for {period === 'MONTHLY' ? '$10/ mo.' : '$96/ yr.'}
+            </p>
           </div>
         </div>
       </div>
