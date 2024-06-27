@@ -31,6 +31,12 @@ const SLIDES = [
     srcDark: 'https://github.com/documenso/design/raw/main/marketing/dark/zapier.webm',
   },
   {
+    label: 'Direct Link',
+    type: 'video',
+    srcLight: 'https://github.com/documenso/design/raw/main/marketing/direct-links.webm',
+    srcDark: 'https://github.com/documenso/design/raw/main/marketing/dark/direct-links.webm',
+  },
+  {
     label: 'Webhooks',
     type: 'video',
     srcLight: 'https://github.com/documenso/design/raw/main/marketing/webhooks.webm',
