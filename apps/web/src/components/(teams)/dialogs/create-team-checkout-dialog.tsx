@@ -158,7 +158,6 @@ export const CreateTeamCheckoutDialog = ({
 
               <Button
                 type="submit"
-                disabled={selectedPrice.interval === 'yearly'}
                 loading={isCreatingCheckout}
                 onClick={async () =>
                   createCheckout({
@@ -167,7 +166,7 @@ export const CreateTeamCheckoutDialog = ({
                   })
                 }
               >
-                {selectedPrice.interval === 'monthly' ? 'Checkout' : 'Coming soon'}
+                Checkout
               </Button>
             </DialogFooter>
           </div>

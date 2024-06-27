@@ -24,19 +24,21 @@ enum Role {
 }
 
 model User {
-  id                   Int                  @id @default(autoincrement())
-  name                 String?
-  customerId           String?              @unique
-  email                String               @unique
-  emailVerified        DateTime?
-  password             String?
-  source               String?
-  signature            String?
-  createdAt            DateTime             @default(now())
-  updatedAt            DateTime             @default(now()) @updatedAt
-  lastSignedIn         DateTime             @default(now())
-  roles                Role[]               @default([USER])
-  identityProvider     IdentityProvider     @default(DOCUMENSO)
+  id               Int              @id @default(autoincrement())
+  name             String?
+  customerId       String?          @unique
+  email            String           @unique
+  emailVerified    DateTime?
+  password         String?
+  source           String?
+  signature        String?
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @default(now()) @updatedAt
+  lastSignedIn     DateTime         @default(now())
+  roles            Role[]           @default([USER])
+  identityProvider IdentityProvider @default(DOCUMENSO)
+  avatarImageId    String?
+
   accounts             Account[]
   sessions             Session[]
   Document             Document[]
@@ -50,7 +52,7 @@ model User {
   twoFactorBackupCodes String?
   url                  String?              @unique
 
-  userProfile       UserProfile?
+  profile           UserProfile?
   VerificationToken VerificationToken[]
   ApiToken          ApiToken[]
   Template          Template[]
@@ -58,15 +60,27 @@ model User {
   Webhooks          Webhook[]
   siteSettings      SiteSettings[]
   passkeys          Passkey[]
+  avatarImage       AvatarImage?           @relation(fields: [avatarImageId], references: [id], onDelete: SetNull)
 
   @@index([email])
 }
 
 model UserProfile {
-  id  Int     @id
-  bio String?
+  id      String  @id @default(cuid())
+  enabled Boolean @default(false)
+  userId  Int     @unique
+  bio     String?
 
-  User User? @relation(fields: [id], references: [id], onDelete: Cascade)
+  User User? @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model TeamProfile {
+  id      String  @id @default(cuid())
+  enabled Boolean @default(false)
+  teamId  Int     @unique
+  bio     String?
+
+  team Team? @relation(fields: [teamId], references: [id], onDelete: Cascade)
 }
 
 enum UserSecurityAuditLogType {
@@ -463,18 +477,22 @@ enum TeamMemberInviteStatus {
 }
 
 model Team {
-  id                   Int                       @id @default(autoincrement())
-  name                 String
-  url                  String                    @unique
-  createdAt            DateTime                  @default(now())
-  customerId           String?                   @unique
-  ownerUserId          Int
+  id            Int      @id @default(autoincrement())
+  name          String
+  url           String   @unique
+  createdAt     DateTime @default(now())
+  avatarImageId String?
+  customerId    String?  @unique
+  ownerUserId   Int
+
   members              TeamMember[]
   invites              TeamMemberInvite[]
   teamEmail            TeamEmail?
   emailVerification    TeamEmailVerification?
   transferVerification TeamTransferVerification?
+  avatarImage          AvatarImage?              @relation(fields: [avatarImageId], references: [id], onDelete: SetNull)
 
+  profile      TeamProfile?
   owner        User          @relation(fields: [ownerUserId], references: [id], onDelete: Cascade)
   subscription Subscription?
 
@@ -580,6 +598,8 @@ model Template {
   templateDocumentDataId String
   createdAt              DateTime      @default(now())
   updatedAt              DateTime      @default(now()) @updatedAt
+  publicTitle            String        @default("")
+  publicDescription      String        @default("")
 
   team                 Team?               @relation(fields: [teamId], references: [id], onDelete: Cascade)
   templateDocumentData DocumentData        @relation(fields: [templateDocumentDataId], references: [id], onDelete: Cascade)
@@ -661,4 +681,12 @@ model BackgroundJobTask {
 
   jobId         String
   backgroundJob BackgroundJob @relation(fields: [jobId], references: [id], onDelete: Cascade)
+}
+
+model AvatarImage {
+  id    String @id @default(cuid())
+  bytes String
+
+  team Team[]
+  user User[]
 }
