@@ -5,6 +5,8 @@ export interface GetFieldsForDocumentOptions {
   userId: number;
 }
 
+export type DocumentField = Awaited<ReturnType<typeof getFieldsForDocument>>[number];
+
 export const getFieldsForDocument = async ({ documentId, userId }: GetFieldsForDocumentOptions) => {
   const fields = await prisma.field.findMany({
     where: {
@@ -24,6 +26,16 @@ export const getFieldsForDocument = async ({ documentId, userId }: GetFieldsForD
             },
           },
         ],
+      },
+    },
+    include: {
+      Signature: true,
+      Recipient: {
+        select: {
+          name: true,
+          email: true,
+          signingStatus: true,
+        },
       },
     },
     orderBy: {
