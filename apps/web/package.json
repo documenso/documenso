@@ -48,6 +48,7 @@
     "react-hotkeys-hook": "^4.4.1",
     "react-icons": "^4.11.0",
     "react-rnd": "^10.4.1",
+    "recharts": "^2.7.2",
     "remeda": "^1.27.1",
     "sharp": "^0.33.1",
     "ts-pattern": "^5.0.5",
