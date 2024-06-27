@@ -169,6 +169,8 @@ export const ManagePublicTemplateDialog = ({
         description: 'Template has been updated.',
         duration: 5000,
       });
+
+      onOpenChange(false);
     } catch {
       toast({
         title: 'An unknown error occurred',

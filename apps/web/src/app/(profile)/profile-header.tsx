@@ -62,9 +62,9 @@ export const ProfileHeader = ({ user, teams = [] }: ProfileHeaderProps) => {
         </Link>
 
         <div className="flex flex-row items-center justify-center">
-          <p className="mr-4 text-neutral-400">
+          <p className="text-muted-foreground mr-4">
             <span className="text-sm sm:hidden">Want your own public profile?</span>
-            <span className="hidden sm:block">
+            <span className="hidden text-sm sm:block">
               Like to have your own public profile with agreements?
             </span>
           </p>

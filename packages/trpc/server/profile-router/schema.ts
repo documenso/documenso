@@ -9,14 +9,20 @@ export const ZFindUserSecurityAuditLogsSchema = z.object({
   perPage: z.number().optional(),
 });
 
+export type TFindUserSecurityAuditLogsSchema = z.infer<typeof ZFindUserSecurityAuditLogsSchema>;
+
 export const ZRetrieveUserByIdQuerySchema = z.object({
   id: z.number().min(1),
 });
+
+export type TRetrieveUserByIdQuerySchema = z.infer<typeof ZRetrieveUserByIdQuerySchema>;
 
 export const ZUpdateProfileMutationSchema = z.object({
   name: z.string().min(1),
   signature: z.string(),
 });
+
+export type TUpdateProfileMutationSchema = z.infer<typeof ZUpdateProfileMutationSchema>;
 
 export const ZUpdatePublicProfileMutationSchema = z.object({
   bio: z
@@ -37,28 +43,37 @@ export const ZUpdatePublicProfileMutationSchema = z.object({
     .optional(),
 });
 
+export type TUpdatePublicProfileMutationSchema = z.infer<typeof ZUpdatePublicProfileMutationSchema>;
+
 export const ZUpdatePasswordMutationSchema = z.object({
   currentPassword: ZCurrentPasswordSchema,
   password: ZPasswordSchema,
 });
 
+export type TUpdatePasswordMutationSchema = z.infer<typeof ZUpdatePasswordMutationSchema>;
+
 export const ZForgotPasswordFormSchema = z.object({
   email: z.string().email().min(1),
 });
+
+export type TForgotPasswordFormSchema = z.infer<typeof ZForgotPasswordFormSchema>;
 
 export const ZResetPasswordFormSchema = z.object({
   password: ZPasswordSchema,
   token: z.string().min(1),
 });
 
+export type TResetPasswordFormSchema = z.infer<typeof ZResetPasswordFormSchema>;
+
 export const ZConfirmEmailMutationSchema = z.object({
   email: z.string().email().min(1),
 });
 
-export type TFindUserSecurityAuditLogsSchema = z.infer<typeof ZFindUserSecurityAuditLogsSchema>;
-export type TRetrieveUserByIdQuerySchema = z.infer<typeof ZRetrieveUserByIdQuerySchema>;
-export type TUpdateProfileMutationSchema = z.infer<typeof ZUpdateProfileMutationSchema>;
-export type TUpdatePasswordMutationSchema = z.infer<typeof ZUpdatePasswordMutationSchema>;
-export type TForgotPasswordFormSchema = z.infer<typeof ZForgotPasswordFormSchema>;
-export type TResetPasswordFormSchema = z.infer<typeof ZResetPasswordFormSchema>;
 export type TConfirmEmailMutationSchema = z.infer<typeof ZConfirmEmailMutationSchema>;
+
+export const ZSetProfileImageMutationSchema = z.object({
+  bytes: z.string().nullish(),
+  teamId: z.number().min(1).nullish(),
+});
+
+export type TSetProfileImageMutationSchema = z.infer<typeof ZSetProfileImageMutationSchema>;

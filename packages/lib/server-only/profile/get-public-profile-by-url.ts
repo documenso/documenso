@@ -25,6 +25,7 @@ type PublicDirectLinkTemplate = Template & {
 type BaseResponse = {
   url: string;
   name: string;
+  avatarImageId?: string | null;
   badge?: {
     type: 'Premium' | 'EarlySupporter';
     since: Date;
@@ -149,6 +150,7 @@ export const getPublicProfileByUrl = async ({
       badge,
       profile: user.profile,
       url: profileUrl,
+      avatarImageId: user.avatarImageId,
       name: user.name || '',
       templates: user.Template.filter(
         (template): template is PublicDirectLinkTemplate =>
@@ -166,6 +168,7 @@ export const getPublicProfileByUrl = async ({
       },
       profile: team.profile,
       url: profileUrl,
+      avatarImageId: team.avatarImageId,
       name: team.name || '',
       templates: team.templates.filter(
         (template): template is PublicDirectLinkTemplate =>

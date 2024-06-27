@@ -13,6 +13,7 @@ import { AddTeamEmailDialog } from '~/components/(teams)/dialogs/add-team-email-
 import { DeleteTeamDialog } from '~/components/(teams)/dialogs/delete-team-dialog';
 import { TransferTeamDialog } from '~/components/(teams)/dialogs/transfer-team-dialog';
 import { UpdateTeamForm } from '~/components/(teams)/forms/update-team-form';
+import { AvatarImageForm } from '~/components/forms/avatar-image';
 
 import { TeamEmailDropdown } from './team-email-dropdown';
 import { TeamTransferStatus } from './team-transfer-status';
@@ -43,6 +44,8 @@ export default async function TeamsSettingsPage({ params }: TeamsSettingsPagePro
         teamId={team.id}
         transferVerification={team.transferVerification}
       />
+
+      <AvatarImageForm className="mb-8" team={team} user={session.user} />
 
       <UpdateTeamForm teamId={team.id} teamName={team.name} teamUrl={team.url} />
 
