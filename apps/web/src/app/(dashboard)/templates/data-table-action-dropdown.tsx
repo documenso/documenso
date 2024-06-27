@@ -97,6 +97,7 @@ export const DataTableActionDropdown = ({
 
       <DeleteTemplateDialog
         id={row.id}
+        teamId={row.teamId || undefined}
         open={isDeleteDialogOpen}
         onOpenChange={setDeleteDialogOpen}
       />

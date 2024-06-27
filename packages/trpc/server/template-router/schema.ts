@@ -60,6 +60,7 @@ export const ZToggleTemplateDirectLinkMutationSchema = z.object({
 
 export const ZDeleteTemplateMutationSchema = z.object({
   id: z.number().min(1),
+  teamId: z.number().optional(),
 });
 
 export const ZUpdateTemplateSettingsMutationSchema = z.object({
