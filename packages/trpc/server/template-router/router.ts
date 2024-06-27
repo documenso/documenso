@@ -10,6 +10,7 @@ import { createTemplateDirectLink } from '@documenso/lib/server-only/template/cr
 import { deleteTemplate } from '@documenso/lib/server-only/template/delete-template';
 import { deleteTemplateDirectLink } from '@documenso/lib/server-only/template/delete-template-direct-link';
 import { duplicateTemplate } from '@documenso/lib/server-only/template/duplicate-template';
+import { findTemplates } from '@documenso/lib/server-only/template/find-templates';
 import { getTemplateWithDetailsById } from '@documenso/lib/server-only/template/get-template-with-details-by-id';
 import { toggleTemplateDirectLink } from '@documenso/lib/server-only/template/toggle-template-direct-link';
 import { updateTemplateSettings } from '@documenso/lib/server-only/template/update-template-settings';
@@ -25,6 +26,7 @@ import {
   ZDeleteTemplateDirectLinkMutationSchema,
   ZDeleteTemplateMutationSchema,
   ZDuplicateTemplateMutationSchema,
+  ZFindTemplatesQuerySchema,
   ZGetTemplateWithDetailsByIdQuerySchema,
   ZToggleTemplateDirectLinkMutationSchema,
   ZUpdateTemplateSettingsMutationSchema,
@@ -211,6 +213,21 @@ export const templateRouter = router({
           message:
             'We were unable to update the settings for this template. Please try again later.',
         });
+      }
+    }),
+
+  findTemplates: authenticatedProcedure
+    .input(ZFindTemplatesQuerySchema)
+    .query(async ({ input, ctx }) => {
+      try {
+        return await findTemplates({
+          userId: ctx.user.id,
+          ...input,
+        });
+      } catch (err) {
+        console.error(err);
+
+        throw AppError.parseErrorToTRPCError(err);
       }
     }),
 
