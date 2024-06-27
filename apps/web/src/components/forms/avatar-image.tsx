@@ -154,6 +154,7 @@ export const AvatarImageForm = ({ className, user, team }: AvatarImageFormProps)
 
                       {hasAvatarImage && (
                         <button
+                          type="button"
                           className="bg-background/70 text-destructive absolute inset-0 flex cursor-pointer items-center justify-center text-xs opacity-0 transition-opacity hover:opacity-100"
                           disabled={form.formState.isSubmitting}
                           onClick={() => void onFormSubmit({ bytes: null })}
