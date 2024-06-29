@@ -5,7 +5,7 @@ import { z } from 'zod';
 import { getCompletedDocumentsMonthly } from '@documenso/lib/server-only/user/get-monthly-completed-document';
 import { getUserMonthlyGrowth } from '@documenso/lib/server-only/user/get-user-monthly-growth';
 
-import { FUNDING_RAISED } from '~/app/(marketing)/open/data';
+import { FUNDING_RAISED } from '~/app/[lang]/(marketing)/open/data';
 import { CallToAction } from '~/components/(marketing)/call-to-action';
 
 import { BarMetric } from './bar-metrics';

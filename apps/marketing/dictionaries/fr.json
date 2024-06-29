@@ -1,0 +1,25 @@
+{
+  "header": {
+    "pricing": "Prix",
+    "blog": "Blog",
+    "open_startup": "Open Startup",
+    "signin": "Se connecter",
+    "signup": "S'inscrire"
+  },
+  "hero": {
+    "document_signin": "Signature de documents,",
+    "finally_os": "enfin en open source.",
+    "try_freeplan": "Essayez notre plan gratuit",
+    "no_creditcard": "Pas de carte de crédit nécessaire",
+    "star_github": "Étoile sur GitHub"
+  },
+  "blog": {
+    "from_blog": "Du blog",
+    "get_news": "Recevez les dernières nouvelles de Documenso, y compris les mises à jour de produits, les annonces de l'équipe et plus encore!"
+  },
+  "announcement_bar": {
+    "claim_profil": "Réclamez maintenant votre nom d'utilisateur de profil public documenso!",
+    "yourname": "votrenom",
+    "claimnow": "Réclamez maintenant"
+  }
+}

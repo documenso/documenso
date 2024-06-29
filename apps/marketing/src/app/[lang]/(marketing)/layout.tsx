@@ -10,6 +10,7 @@ import { cn } from '@documenso/ui/lib/utils';
 
 import { Footer } from '~/components/(marketing)/footer';
 import { Header } from '~/components/(marketing)/header';
+import { useDictionary } from '~/providers/dictionary-provider';
 
 export type MarketingLayoutProps = {
   children: React.ReactNode;
@@ -20,6 +21,7 @@ export default function MarketingLayout({ children }: MarketingLayoutProps) {
   const pathname = usePathname();
 
   const { getFlag } = useFeatureFlags();
+  const dictionary = useDictionary();
 
   const showProfilesAnnouncementBar = getFlag('marketing_profiles_announcement_bar');
 
@@ -47,15 +49,17 @@ export default function MarketingLayout({ children }: MarketingLayoutProps) {
       >
         {showProfilesAnnouncementBar && (
           <div className="relative inline-flex w-full items-center justify-center overflow-hidden bg-[#e7f3df] px-4 py-2.5">
-            <div className="text-black text-center text-sm font-medium">
-              Claim your documenso public profile username now!{' '}
-              <span className="hidden font-semibold md:inline">documenso.com/u/yourname</span>
+            <div className="text-center text-sm font-medium text-black">
+              {dictionary.announcement_bar.claim_profil}{' '}
+              <span className="hidden font-semibold md:inline">
+                documenso.com/u/{dictionary.announcement_bar.yourname}
+              </span>
               <div className="mt-1.5 block md:ml-4 md:mt-0 md:inline-block">
                 <a
                   href={`${NEXT_PUBLIC_WEBAPP_URL()}/signup?utm_source=marketing-announcement-bar`}
                   className="bg-background text-foreground rounded-md px-2.5 py-1 text-xs font-medium duration-300"
                 >
-                  Claim Now
+                  {dictionary.announcement_bar.claimnow}
                 </a>
               </div>
             </div>

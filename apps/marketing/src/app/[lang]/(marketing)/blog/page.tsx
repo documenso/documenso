@@ -1,27 +1,29 @@
 import type { Metadata } from 'next';
 
 import { allBlogPosts } from 'contentlayer/generated';
+import { getDictionary } from 'get-dictionary';
+import type { Locale } from 'i18n-config';
 
 export const metadata: Metadata = {
   title: 'Blog',
 };
 
-export default function BlogPage() {
+export default async function BlogPage({ params: { lang } }: { params: { lang: Locale } }) {
   const blogPosts = allBlogPosts.sort((a, b) => {
     const dateA = new Date(a.date);
     const dateB = new Date(b.date);
 
     return dateB.getTime() - dateA.getTime();
   });
+  const dictionary = await getDictionary(lang);
 
   return (
     <div className="mt-6 sm:mt-12">
       <div className="text-center">
-        <h1 className="text-3xl font-bold lg:text-5xl">From the blog</h1>
+        <h1 className="text-3xl font-bold lg:text-5xl">{dictionary.blog.from_blog}</h1>
 
         <p className="text-muted-foreground mx-auto mt-4 max-w-xl text-center text-lg leading-normal">
-          Get the latest news from Documenso, including product updates, team announcements and
-          more!
+          {dictionary.blog.get_news}
         </p>
       </div>
 

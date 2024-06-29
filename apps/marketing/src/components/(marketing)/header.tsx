@@ -11,6 +11,8 @@ import { useFeatureFlags } from '@documenso/lib/client-only/providers/feature-fl
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
 
+import { useDictionary } from '~/providers/dictionary-provider';
+
 import { HamburgerMenu } from './mobile-hamburger';
 import { MobileNavigation } from './mobile-navigation';
 
@@ -18,6 +20,7 @@ export type HeaderProps = HTMLAttributes<HTMLElement>;
 
 export const Header = ({ className, ...props }: HeaderProps) => {
   const [isHamburgerMenuOpen, setIsHamburgerMenuOpen] = useState(false);
+  const dictionary = useDictionary();
 
   const { getFlag } = useFeatureFlags();
 
@@ -51,21 +54,21 @@ export const Header = ({ className, ...props }: HeaderProps) => {
           href="/pricing"
           className="text-muted-foreground hover:text-muted-foreground/80 text-sm font-semibold"
         >
-          Pricing
+          {dictionary.header.pricing}
         </Link>
 
         <Link
           href="/blog"
           className="text-muted-foreground hover:text-muted-foreground/80 text-sm font-semibold"
         >
-          Blog
+          {dictionary.header.blog}
         </Link>
 
         <Link
           href="/open"
           className="text-muted-foreground hover:text-muted-foreground/80 text-sm font-semibold"
         >
-          Open Startup
+          {dictionary.header.open_startup}
         </Link>
 
         <Link
@@ -73,12 +76,12 @@ export const Header = ({ className, ...props }: HeaderProps) => {
           target="_blank"
           className="text-muted-foreground hover:text-muted-foreground/80 text-sm font-semibold"
         >
-          Sign in
+          {dictionary.header.signin}
         </Link>
 
         <Button className="rounded-full" size="sm" asChild>
           <Link href="https://app.documenso.com/signup?utm_source=marketing-header" target="_blank">
-            Sign up
+            {dictionary.header.signup}
           </Link>
         </Button>
       </div>

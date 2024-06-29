@@ -2,6 +2,8 @@ import { Suspense } from 'react';
 
 import { Caveat, Inter } from 'next/font/google';
 
+import { getDictionary } from 'get-dictionary';
+import { type Locale, i18n } from 'i18n-config';
 import { AxiomWebVitals } from 'next-axiom';
 import { PublicEnvScript } from 'next-runtime-env';
 
@@ -12,6 +14,7 @@ import { TrpcProvider } from '@documenso/trpc/react';
 import { cn } from '@documenso/ui/lib/utils';
 import { Toaster } from '@documenso/ui/primitives/toaster';
 
+import DictionaryProvider from '~/providers/dictionary-provider';
 import { ThemeProvider } from '~/providers/next-theme';
 import { PlausibleProvider } from '~/providers/plausible';
 import { PostHogPageview } from '~/providers/posthog';
@@ -20,6 +23,10 @@ import './globals.css';
 
 const fontInter = Inter({ subsets: ['latin'], variable: '--font-sans' });
 const fontCaveat = Caveat({ subsets: ['latin'], variable: '--font-signature' });
+
+export function generateStaticParams() {
+  return i18n.locales.map((locale) => ({ lang: locale }));
+}
 
 export function generateMetadata() {
   return {
@@ -51,12 +58,19 @@ export function generateMetadata() {
   };
 }
 
-export default async function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({
+  children,
+  params,
+}: {
+  children: React.ReactNode;
+  params: { lang: Locale };
+}) {
   const flags = await getAllAnonymousFlags();
+  const dictionary = await getDictionary(params.lang);
 
   return (
     <html
-      lang="en"
+      lang={params.lang}
       className={cn(fontInter.variable, fontCaveat.variable)}
       suppressHydrationWarning
     >
@@ -75,14 +89,15 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       </Suspense>
 
       <body>
-        <FeatureFlagProvider initialFlags={flags}>
-          <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-            <PlausibleProvider>
-              <TrpcProvider>{children}</TrpcProvider>
-            </PlausibleProvider>
-          </ThemeProvider>
-        </FeatureFlagProvider>
-
+        <DictionaryProvider dictionary={dictionary}>
+          <FeatureFlagProvider initialFlags={flags}>
+            <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+              <PlausibleProvider>
+                <TrpcProvider>{children}</TrpcProvider>
+              </PlausibleProvider>
+            </ThemeProvider>
+          </FeatureFlagProvider>
+        </DictionaryProvider>
         <Toaster />
       </body>
     </html>

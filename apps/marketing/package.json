@@ -18,6 +18,7 @@
     "@documenso/tailwind-config": "*",
     "@documenso/trpc": "*",
     "@documenso/ui": "*",
+    "@formatjs/intl-localematcher": "^0.5.4",
     "@hookform/resolvers": "^3.1.0",
     "@openstatus/react": "^0.0.3",
     "contentlayer": "^0.3.4",
@@ -28,6 +29,7 @@
     "lucide-react": "^0.279.0",
     "luxon": "^3.4.0",
     "micro": "^10.0.1",
+    "negotiator": "^0.6.3",
     "next": "14.0.3",
     "next-auth": "4.24.5",
     "next-axiom": "^1.1.1",
@@ -35,7 +37,7 @@
     "next-plausible": "^3.10.1",
     "perfect-freehand": "^1.2.0",
     "posthog-js": "^1.77.3",
-    "react": "18.2.0",
+    "react": "^18.2.0",
     "react-confetti": "^6.1.0",
     "react-dom": "18.2.0",
     "react-hook-form": "^7.43.9",
@@ -46,6 +48,7 @@
     "zod": "^3.22.4"
   },
   "devDependencies": {
+    "@types/negotiator": "^0.6.3",
     "@types/node": "20.1.0",
     "@types/react": "18.2.18",
     "@types/react-dom": "18.2.7"

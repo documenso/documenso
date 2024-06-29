@@ -1,0 +1,25 @@
+{
+  "header": {
+    "pricing": "Pricing",
+    "blog": "Blog",
+    "open_startup": "Open Startup",
+    "signin": "Sign in",
+    "signup": "Sign up"
+  },
+  "hero": {
+    "document_signin": "Document signing,",
+    "finally_os": "finally open source.",
+    "try_freeplan": "Try our Free Plan",
+    "no_creditcard": "No Credit Card required",
+    "star_github": "Star on GitHub"
+  },
+  "blog": {
+    "from_blog": "From the blog",
+    "get_news": "Get the latest news from Documenso, including product updates, team announcements and more!"
+  },
+  "announcement_bar": {
+    "claim_profil": "Claim your documenso public profile username now!",
+    "yourname": "yourname",
+    "claimnow": "Claim now"
+  }
+}
