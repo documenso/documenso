@@ -9,5 +9,9 @@ const dictionaries = {
   fr: async () => import('./dictionaries/fr.json').then((module) => module.default),
 };
 
-export const getDictionary = async (locale: Locale) =>
-  dictionaries[locale]?.() ?? dictionaries.en();
+export const getDictionary = async (locale: Locale) => {
+  if (!dictionaries[locale]) {
+    console.warn(`Locale ${locale} not supported, defaulting to English.`);
+  }
+  return dictionaries[locale]?.() ?? dictionaries.en();
+}
