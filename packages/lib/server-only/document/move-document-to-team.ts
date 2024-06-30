@@ -3,6 +3,9 @@ import { TRPCError } from '@trpc/server';
 import type { RequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 import { prisma } from '@documenso/prisma';
 
+import { DOCUMENT_AUDIT_LOG_TYPE } from '../../types/document-audit-logs';
+import { createDocumentAuditLogData } from '../../utils/document-audit-logs';
+
 export type MoveDocumentToTeamOptions = {
   documentId: number;
   teamId: number;
@@ -25,7 +28,7 @@ export const moveDocumentToTeam = async ({
       where: {
         id: documentId,
         userId,
-        teamId: null, // Ensure the document is not already associated with a team
+        teamId: null,
       },
     });
 
@@ -58,6 +61,22 @@ export const moveDocumentToTeam = async ({
       where: { id: documentId },
       data: { teamId },
     });
+
+    const log = await tx.documentAuditLog.create({
+      data: createDocumentAuditLogData({
+        type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_MOVED_TO_TEAM,
+        documentId: updatedDocument.id,
+        user,
+        requestMetadata,
+        data: {
+          movedByUserId: userId,
+          fromPersonalAccount: true,
+          toTeamId: teamId,
+        },
+      }),
+    });
+
+    console.log(log);
 
     return updatedDocument;
   });
