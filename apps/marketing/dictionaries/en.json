@@ -1,10 +1,30 @@
 {
+  "metadata": {
+    "title": "Documenso - The Open Source DocuSign Alternative",
+    "description": "Join Documenso, the open signing infrastructure, and get a 10x better signing experience. Pricing starts at $30/mo. forever! Sign in now and enjoy a faster, smarter, and more beautiful document signing process. Integrates with your favorite tools, customizable, and expandable. Support our mission and become a part of our open-source community.",
+    "keywords": "Documenso, open source, DocuSign alternative, document signing, open signing infrastructure, open-source community, fast signing, beautiful signing, smart templates"
+  },
   "header": {
     "pricing": "Pricing",
     "blog": "Blog",
     "open_startup": "Open Startup",
     "signin": "Sign in",
     "signup": "Sign up"
+  },
+  "footer": {
+    "rights": "All rights reserved.",
+    "pricing": "Pricing",
+    "singleplayer": "Singleplayer",
+    "blog": "Blog",
+    "design": "Design",
+    "open_startup": "Open Startup",
+    "shop": "Shop",
+    "status": "Status",
+    "support": "Support",
+    "oss_friends": "OSS Friends",
+    "careers": "Careers",
+    "privacy": "Privacy",
+    "changelog": "Changelog"
   },
   "hero": {
     "document_signin": "Document signing,",
@@ -17,9 +37,52 @@
     "from_blog": "From the blog",
     "get_news": "Get the latest news from Documenso, including product updates, team announcements and more!"
   },
+  "carousel": {
+    "signing_process": "Signing Process",
+    "teams": "Teams",
+    "zapier": "Zapier",
+    "direct_link": "Direct Link",
+    "webhooks": "Webhooks",
+    "api": "API",
+    "profile": "Profile"
+  },
   "announcement_bar": {
     "claim_profil": "Claim your documenso public profile username now!",
     "yourname": "yourname",
     "claimnow": "Claim now"
+  },
+  "bento": {
+    "faster_smarter_beautiful": {
+      "ten_x_better": "A 10x better signing experience.",
+      "faster_smarter": "Faster, smarter and more beautiful.",
+      "fast": "Fast.",
+      "beautiful": "Beautiful.",
+      "smart": "Smart.",
+      "contract_promotion": "When it comes to sending or receiving a contract, you can count on lightning-fast speeds.",
+      "celebrated_signing": "Because signing should be celebrated. That’s why we care about the smallest detail in our product.",
+      "custom_templates": "Our custom templates come with smart rules that can help you save time and energy."
+    },
+    "share_connect_paid_widget": {
+      "integrate": "Integrates with all your favourite tools.",
+      "everywhere": "Send, connect, receive and embed everywhere.",
+      "sharing": "Easy Sharing (Soon).",
+      "personal_link": "Receive your personal link to share with everyone you care about.",
+      "connections": "Connections",
+      "create_connections": "Create connections and automations with Zapier and more to integrate with your favorite tools.",
+      "paid": "Get paid (Soon).",
+      "integrated_payments": "Integrated payments with Stripe so you don’t have to worry about getting paid.",
+      "react_widget": "React Widget (Soon).",
+      "embed": "Easily embed Documenso into your product. Simply copy and paste our react widget into your application."
+    },
+    "open_build_template": {
+      "trully": "Truly your own.",
+      "customise": "Customise and expand.",
+      "os_or_hosted": "Open Source or Hosted.",
+      "up_to_you": "It’s up to you. Either clone our repository or rely on our easy to use hosting solution.",
+      "build": "Build on top.",
+      "make_it_your_own": "Make it your own through advanced customization and adjustability.",
+      "template_store": "Template Store (Soon).",
+      "choose_or_submit": "Choose a template from the community app store. Or submit your own template for others to use."
+    }
   }
 }

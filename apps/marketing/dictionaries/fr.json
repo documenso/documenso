@@ -1,10 +1,30 @@
 {
+  "metadata": {
+    "title": "Documenso – L'alternative open source à DocuSign",
+    "description": "Rejoignez Documenso, l'infrastructure de signature ouverte, et obtenez une expérience de signature 10 fois meilleure. Les tarifs commencent à 30 $/mois pour toujours ! Connectez-vous maintenant et profitez d'un processus de signature de documents plus rapide, plus intelligent et plus beau. S'intègre à vos outils préférés, personnalisable et extensible. Soutenez notre mission et devenez membre de notre communauté open source.",
+    "keywords": "Documenso, open source, Alternative à DocuSign, signature de documents, infrastructure de signature ouverte, communauté open source, signature rapide, belle signature, modèles intelligents"
+  },
   "header": {
     "pricing": "Prix",
     "blog": "Blog",
     "open_startup": "Open Startup",
     "signin": "Se connecter",
     "signup": "S'inscrire"
+  },
+  "footer": {
+    "rights": "Tous droits réservés.",
+    "pricing": "Tarif",
+    "singleplayer": "Mode solo",
+    "blog": "Blog",
+    "design": "Design",
+    "open_startup": "Open Startup",
+    "shop": "Boutique",
+    "status": "Statut",
+    "support": "Support",
+    "oss_friends": "Amis de l'OSS",
+    "careers": "Carrières",
+    "privacy": "Confidentialité",
+    "changelog": "Journal des modifications"
   },
   "hero": {
     "document_signin": "Signature de documents,",
@@ -17,9 +37,52 @@
     "from_blog": "Du blog",
     "get_news": "Recevez les dernières nouvelles de Documenso, y compris les mises à jour de produits, les annonces de l'équipe et plus encore!"
   },
+  "carousel": {
+    "signing_process": "Processus de signature",
+    "teams": "Teams",
+    "zapier": "Zapier",
+    "direct_link": "Lien direct",
+    "webhooks": "Webhooks",
+    "api": "API",
+    "profile": "Profil"
+  },
   "announcement_bar": {
     "claim_profil": "Réclamez maintenant votre nom d'utilisateur de profil public documenso!",
     "yourname": "votrenom",
     "claimnow": "Réclamez maintenant"
+  },
+  "bento": {
+    "faster_smarter_beautiful": {
+      "ten_x_better": "Une expérience de signature 10 fois meilleure.",
+      "faster_smarter": "Plus rapide, plus intelligent et plus beau.",
+      "fast": "Rapide.",
+      "beautiful": "Beau.",
+      "smart": "Intelligent.",
+      "contract_promotion": "Lorsqu'il s'agit d'envoyer ou de recevoir un contrat, vous pouvez compter sur des délais ultra-rapides.",
+      "celebrated_signing": "Parce que la signature doit être célébrée. C’est pourquoi nous accordons une grande importance au moindre détail de notre produit.",
+      "custom_templates": "Nos modèles personnalisés sont accompagnés de règles intelligentes qui peuvent vous aider à économiser du temps et de l'énergie."
+    },
+    "share_connect_paid_widget": {
+      "integrate": "S'intègre à tous vos outils préférés.",
+      "everywhere": "Envoyez, connectez, recevez et intégrez partout.",
+      "sharing": "Partage facile (bientôt).",
+      "personal_link": "Recevez votre lien personnel à partager avec tous ceux qui vous sont chers.",
+      "connections": "Connexions",
+      "create_connections": "Créez des connexions et des automatisations avec Zapier et plus encore pour intégrer vos outils préférés.",
+      "paid": "Soyez payé (bientôt).",
+      "integrated_payments": "Paiements intégrés avec Stripe pour que vous n’ayez pas à vous soucier d’être payé.",
+      "react_widget": "Widget React (Bientôt).",
+      "embed": "Intégrez facilement Documenso dans votre produit. Copiez et collez simplement notre widget React dans votre application."
+    },
+    "open_build_template": {
+      "trully": "Vraiment à toi.",
+      "customise": "Personnalisez et développez.",
+      "os_or_hosted": "Open Source ou hébergé.",
+      "up_to_you": "C'est à vous de décider. Soit vous clonez notre référentiel, soit vous vous fiez à notre solution d'hébergement facile à utiliser.",
+      "build": "Construire au sommet.",
+      "make_it_your_own": "Personnalisez-le grâce à une personnalisation et des possibilités de réglage avancées.",
+      "template_store": "Boutique de modèles (bientôt).",
+      "choose_or_submit": "Choisissez un modèle dans la boutique d'applications communautaire. Ou soumettez votre propre modèle pour que d'autres puissent l'utiliser."
+    }
   }
 }

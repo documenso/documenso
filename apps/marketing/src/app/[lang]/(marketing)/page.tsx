@@ -42,9 +42,15 @@ export default async function IndexPage({ params: { lang } }: { params: { lang: 
     <div className={cn('mt-12', fontCaveat.variable)}>
       <Hero starCount={starCount} dictionary={dictionary.hero} />
 
-      <FasterSmarterBeautifulBento className="my-48" />
-      <ShareConnectPaidWidgetBento className="my-48" />
-      <OpenBuildTemplateBento className="my-48" />
+      <FasterSmarterBeautifulBento
+        className="my-48"
+        dictionary={dictionary.bento.faster_smarter_beautiful}
+      />
+      <ShareConnectPaidWidgetBento
+        className="my-48"
+        dictionary={dictionary.bento.share_connect_paid_widget}
+      />
+      <OpenBuildTemplateBento className="my-48" dictionary={dictionary.bento.open_build_template} />
 
       <Callout starCount={starCount} />
     </div>
