@@ -52,7 +52,7 @@ export default async function IndexPage({ params: { lang } }: { params: { lang: 
       />
       <OpenBuildTemplateBento className="my-48" dictionary={dictionary.bento.open_build_template} />
 
-      <Callout starCount={starCount} />
+      <Callout starCount={starCount} dictionary={dictionary.hero} />
     </div>
   );
 }

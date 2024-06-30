@@ -2,23 +2,24 @@
 
 import Link from 'next/link';
 
+import type { getDictionary } from 'get-dictionary';
 import { usePlausible } from 'next-plausible';
 
 import { Button } from '@documenso/ui/primitives/button';
 
-export const Enterprise = () => {
+type EnterpriseProps = {
+  dictionary: Awaited<ReturnType<typeof getDictionary>>['pricing'];
+};
+
+export const Enterprise = ({ dictionary }: EnterpriseProps) => {
   const event = usePlausible();
 
   return (
     <div className="mx-auto mt-36 max-w-2xl">
-      <h2 className="text-center text-2xl font-semibold">
-        Enterprise Compliance, License or Technical Needs?
-      </h2>
+      <h2 className="text-center text-2xl font-semibold">{dictionary.enterprise_compliance}</h2>
 
       <p className="text-muted-foreground mt-4 text-center leading-relaxed">
-        Our Enterprise License is great large organizations looking to switch to Documenso for all
-        their signing needs. It's availible for our cloud offering as well as self-hosted setups and
-        offer a wide range of compliance and Adminstration Features.
+        {dictionary.our_entreprise}
       </p>
 
       <div className="mt-4 flex justify-center">
@@ -28,7 +29,7 @@ export const Enterprise = () => {
           className="mt-6"
           onClick={() => event('enterprise-contact')}
         >
-          <Button className="rounded-full text-base">Contact Us</Button>
+          <Button className="rounded-full text-base">{dictionary.contact_us}</Button>
         </Link>
       </div>
     </div>

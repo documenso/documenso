@@ -6,19 +6,21 @@ import { useState } from 'react';
 import Link from 'next/link';
 
 import { AnimatePresence, motion } from 'framer-motion';
+import type { getDictionary } from 'get-dictionary';
 import { usePlausible } from 'next-plausible';
 
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
 
-export type PricingTableProps = HTMLAttributes<HTMLDivElement>;
+export type PricingTableProps = HTMLAttributes<HTMLDivElement> & {
+  dictionary: Awaited<ReturnType<typeof getDictionary>>['pricing'];
+};
 
 const SELECTED_PLAN_BAR_LAYOUT_ID = 'selected-plan-bar';
 
 export const PricingTable = ({ className, ...props }: PricingTableProps) => {
   const event = usePlausible();
-
   const [period, setPeriod] = useState<'MONTHLY' | 'YEARLY'>('MONTHLY');
 
   return (
@@ -36,7 +38,7 @@ export const PricingTable = ({ className, ...props }: PricingTableProps) => {
             )}
             onClick={() => setPeriod('MONTHLY')}
           >
-            Monthly
+            {props.dictionary.monthly}
             {period === 'MONTHLY' && (
               <motion.div
                 layoutId={SELECTED_PLAN_BAR_LAYOUT_ID}
@@ -56,9 +58,9 @@ export const PricingTable = ({ className, ...props }: PricingTableProps) => {
             )}
             onClick={() => setPeriod('YEARLY')}
           >
-            Yearly
+            {props.dictionary.yearly}
             <div className="bg-muted text-foreground block rounded-full px-2 py-0.5 text-xs">
-              Save $60 or $120
+              {props.dictionary.save}
             </div>
             {period === 'YEARLY' && (
               <motion.div
@@ -75,11 +77,11 @@ export const PricingTable = ({ className, ...props }: PricingTableProps) => {
           data-plan="free"
           className="bg-background shadow-foreground/5 flex flex-col items-center justify-center rounded-lg border px-8 py-12 shadow-lg"
         >
-          <p className="text-foreground text-4xl font-medium">Free</p>
-          <p className="text-primary mt-2.5 text-xl font-medium">$0</p>
+          <p className="text-foreground text-4xl font-medium">{props.dictionary.free}</p>
+          <p className="text-primary mt-2.5 text-xl font-medium">{props.dictionary.zero}</p>
 
           <p className="text-foreground mt-4 max-w-[30ch] text-center">
-            For small teams and individuals with basic needs.
+            {props.dictionary.for_small_teams}
           </p>
 
           <Button className="rounded-full text-base" asChild>
@@ -88,14 +90,14 @@ export const PricingTable = ({ className, ...props }: PricingTableProps) => {
               target="_blank"
               className="mt-6"
             >
-              Signup Now
+              {props.dictionary.signup_now}
             </Link>
           </Button>
 
           <div className="mt-8 flex w-full flex-col divide-y">
-            <p className="text-foreground py-4">5 standard documents per month</p>
-            <p className="text-foreground py-4">Up to 10 recipients per document</p>
-            <p className="text-foreground py-4">No credit card required</p>
+            <p className="text-foreground py-4">{props.dictionary.five_standard_documents}</p>
+            <p className="text-foreground py-4">{props.dictionary.up_to_ten}</p>
+            <p className="text-foreground py-4">{props.dictionary.no_credit_card}</p>
           </div>
 
           <div className="flex-1" />
@@ -105,16 +107,20 @@ export const PricingTable = ({ className, ...props }: PricingTableProps) => {
           data-plan="individual"
           className="bg-background shadow-foreground/5 flex flex-col items-center justify-center rounded-lg border-2 px-8 py-12 shadow-[0px_0px_0px_4px_#E3E3E380]"
         >
-          <p className="text-foreground text-4xl font-medium">Individual</p>
+          <p className="text-foreground text-4xl font-medium">{props.dictionary.individual}</p>
           <div className="text-primary mt-2.5 text-xl font-medium">
             <AnimatePresence mode="wait">
-              {period === 'MONTHLY' && <motion.div layoutId="pricing">$30</motion.div>}
-              {period === 'YEARLY' && <motion.div layoutId="pricing">$300</motion.div>}
+              {period === 'MONTHLY' && (
+                <motion.div layoutId="pricing">{props.dictionary.thirty}</motion.div>
+              )}
+              {period === 'YEARLY' && (
+                <motion.div layoutId="pricing">{props.dictionary.three_hundred}</motion.div>
+              )}
             </AnimatePresence>
           </div>
 
           <p className="text-foreground mt-4 max-w-[30ch] text-center">
-            Everything you need for a great signing experience.
+            {props.dictionary.everything_you_need}
           </p>
 
           <Button className="mt-6 rounded-full text-base" asChild>
@@ -127,10 +133,10 @@ export const PricingTable = ({ className, ...props }: PricingTableProps) => {
           </Button>
 
           <div className="mt-8 flex w-full flex-col divide-y">
-            <p className="text-foreground py-4">Unlimited Documents per Month</p>
-            <p className="text-foreground py-4">API Accesss</p>
-            <p className="text-foreground py-4">Email and Discord Support</p>
-            <p className="text-foreground py-4">Premium Profile Name</p>
+            <p className="text-foreground py-4">{props.dictionary.unlimited_documents}</p>
+            <p className="text-foreground py-4">{props.dictionary.api_access}</p>
+            <p className="text-foreground py-4">{props.dictionary.email_and_discord}</p>
+            <p className="text-foreground py-4">{props.dictionary.premium_profile}</p>
           </div>
           <div className="flex-1" />
         </div>
@@ -139,16 +145,22 @@ export const PricingTable = ({ className, ...props }: PricingTableProps) => {
           data-plan="teams"
           className="border-primary bg-background shadow-foreground/5 flex flex-col items-center justify-center rounded-lg border px-8 py-12 shadow-lg"
         >
-          <p className="text-foreground text-4xl font-medium">Teams</p>
+          <p className="text-foreground text-4xl font-medium">{props.dictionary.teams}</p>
           <div className="text-primary mt-2.5 text-xl font-medium">
             <AnimatePresence mode="wait">
-              {period === 'MONTHLY' && <motion.div layoutId="pricingTeams">$50</motion.div>}
-              {period === 'YEARLY' && <motion.div layoutId="pricingTeams">$480</motion.div>}
+              {period === 'MONTHLY' && (
+                <motion.div layoutId="pricingTeams">{props.dictionary.fifty}</motion.div>
+              )}
+              {period === 'YEARLY' && (
+                <motion.div layoutId="pricingTeams">
+                  {props.dictionary.four_hundred_eighty}
+                </motion.div>
+              )}
             </AnimatePresence>
           </div>
 
           <p className="text-foreground mt-4 max-w-[30ch] text-center">
-            For companies looking to scale across multiple teams.
+            {props.dictionary.for_companies}
           </p>
 
           <Button className="mt-6 rounded-full text-base" asChild>
@@ -156,18 +168,19 @@ export const PricingTable = ({ className, ...props }: PricingTableProps) => {
               href={`${NEXT_PUBLIC_WEBAPP_URL()}/signup?utm_source=pricing-teams-plan`}
               target="_blank"
             >
-              Signup Now
+              {props.dictionary.signup_now}
             </Link>
           </Button>
 
           <div className="mt-8 flex w-full flex-col divide-y">
-            <p className="text-foreground py-4">Unlimited Documents per Month</p>
-            <p className="text-foreground py-4">API Accesss</p>
-            <p className="text-foreground py-4">Email and Discord Support</p>
-            <p className="text-foreground py-4 font-medium">Team Inbox</p>
-            <p className="text-foreground py-4">5 Users Included</p>
+            <p className="text-foreground py-4">{props.dictionary.unlimited_documents}</p>
+            <p className="text-foreground py-4">{props.dictionary.api_access}</p>
+            <p className="text-foreground py-4">{props.dictionary.email_and_discord}</p>
+            <p className="text-foreground py-4 font-medium">{props.dictionary.team_inbox}</p>
+            <p className="text-foreground py-4">{props.dictionary.five_users_included}</p>
             <p className="text-foreground py-4">
-              Add More Users for {period === 'MONTHLY' ? '$10/ mo.' : '$96/ yr.'}
+              {props.dictionary.add_more_users}{' '}
+              {period === 'MONTHLY' ? props.dictionary.ten : props.dictionary.ninety_six}
             </p>
           </div>
         </div>
